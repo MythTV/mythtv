@@ -4,6 +4,7 @@
 #include "mythuitype.h"
 #include "mythuiimage.h"
 #include "mythuitext.h"
+#include "mythuibutton.h"
 
 class MythListButtonItem;
 class MythFontProperties;
@@ -58,14 +59,6 @@ class MythListButton : public MythUIType
   signals:
     void itemSelected(MythListButtonItem* item);
 
-  protected:
-    // This needs fixed - shouldn't have an override for active
-    virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod);
-
-    void DrawSelf(MythPainter *p, int xoffset, int yoffset, bool active_on,
-                  int alphaMod);
-
   private:
     void Init();
     void LoadPixmap(MythImage **pix, const QString& fileName);
@@ -88,17 +81,10 @@ class MythListButton : public MythUIType
     bool m_showScrollArrows;
     bool m_showArrow;
 
-    MythImage *m_itemRegPix;
-    MythImage *m_itemSelActPix;
-    MythImage *m_itemSelInactPix;
-
     MythUIStateImage *m_upArrow;
     MythUIStateImage *m_downArrow;
 
-    MythImage *m_arrowPix;
-    MythImage *m_checkNonePix;
-    MythImage *m_checkHalfPix;
-    MythImage *m_checkFullPix;
+    QValueVector<MythUIButton *> m_ButtonList;
 
     QColor m_itemRegBeg;
     QColor m_itemRegEnd;
@@ -172,26 +158,16 @@ class MythListButtonItem
 
     bool moveUpDown(bool flag);
 
-    void paint(MythPainter *p, MythFontProperties *font, int x, int y, 
-               bool active_on, int alpha);
+    void SetToRealButton(MythUIButton *button, bool active_on); 
 
   protected:
-    void  CalcDimensions(void);
-
     MythListButton *m_parent;
     QString         m_text;
     MythImage      *m_image;
     bool            m_checkable;
     CheckState      m_state;
     void           *m_data;
-
-    QRect           m_checkRect;
-    QRect           m_imageRect;
-    QRect           m_textRect;
-    QRect           m_arrowRect;
-
     bool            m_showArrow;
-
     bool            m_overrideInactive;
 
     friend class MythListButton;

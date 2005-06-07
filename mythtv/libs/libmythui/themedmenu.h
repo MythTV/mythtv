@@ -28,7 +28,7 @@ class ThemedMenu : public MythScreenType
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod);
+                          int alphaMod, QRect clipRect);
     virtual bool keyPressEvent(QKeyEvent *e);
 
   private:

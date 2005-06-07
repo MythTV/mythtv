@@ -19,8 +19,8 @@ using namespace std;
 #include "mythpainter_ogl.h"
 #include "mythfontproperties.h"
 
-#define MAX_GL_ITEMS 64
-#define MAX_STRING_ITEMS 8
+#define MAX_GL_ITEMS 128
+#define MAX_STRING_ITEMS 48
 
 #ifndef GL_TEXTURE_RECTANGLE_ARB
 #define GL_TEXTURE_RECTANGLE_ARB 0x84F5 

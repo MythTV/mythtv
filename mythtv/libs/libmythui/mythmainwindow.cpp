@@ -93,6 +93,9 @@ class MythMainWindowPrivate
 
     float wmult, hmult;
     int screenwidth, screenheight;
+
+    QRect screenRect;
+
     int xbase, ybase;
     bool does_fill_screen;
 
@@ -276,21 +279,12 @@ void MythMainWindow::drawTimeout(void)
 {
     bool redraw = false;
 
-    if(!d->repaintRegion.isEmpty())
-    {
+    if (!d->repaintRegion.isEmpty())
         redraw = true;
-    }
-    
+
     QValueVector<MythScreenStack *>::Iterator it;
     for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
     {
-    
-        //
-        //  Shouldn't we be pushing down the redraw region here (ie. the
-        //  thing passed to us by Qt/Window events that said "this region
-        //  needs to be redrawn")?
-        //
-
         QValueVector<MythScreenType *> drawList;
         (*it)->GetDrawOrder(drawList);
 
@@ -301,11 +295,14 @@ void MythMainWindow::drawTimeout(void)
             (*screenit)->Pulse();
         }
 
-         // Should we care if non-top level screens need redrawing?
-         // Good Question
+        // Should we care if non-top level screens need redrawing?
         MythScreenType *top = (*it)->GetTopScreen();
         if (top && top->NeedsRedraw())
+        {
+            QRect topDirty = top->GetDirtyArea();
+            d->repaintRegion = d->repaintRegion.unite(topDirty);
             redraw = true;
+        }
     }
 
     if (!redraw)
@@ -313,7 +310,12 @@ void MythMainWindow::drawTimeout(void)
         return;
     }
 
+    if (!d->painter->SupportsClipping())
+        d->repaintRegion = d->repaintRegion.unite(d->screenRect);
+
     d->painter->Begin(this);
+
+    d->painter->SetClipRect(d->repaintRegion.boundingRect());
 
     for (it = d->stackList.begin(); it != d->stackList.end(); ++it)
     {
@@ -324,7 +326,7 @@ void MythMainWindow::drawTimeout(void)
         for (screenit = redrawList.begin(); screenit != redrawList.end(); 
              ++screenit)
         {
-            (*screenit)->Draw(d->painter, 0, 0);
+            (*screenit)->Draw(d->painter, 0, 0, 255, d->repaintRegion.boundingRect());
         }
     }
 
@@ -348,6 +350,9 @@ void MythMainWindow::Init(void)
 {
     gContext->GetScreenSettings(d->xbase, d->screenwidth, d->wmult,
                                 d->ybase, d->screenheight, d->hmult);
+
+    d->screenRect = QRect(d->xbase, d->ybase, d->screenwidth, d->screenheight);
+
     setGeometry(d->xbase, d->ybase, d->screenwidth, d->screenheight);
     setFixedSize(QSize(d->screenwidth, d->screenheight));
 

@@ -2295,7 +2295,8 @@ void ThemedMenu::ReloadExitKey(void)
         d->exitModifier = -1;
 }
 
-void ThemedMenu::DrawSelf(MythPainter *p, int xoffset, int yoffset, int alphaMod)
+void ThemedMenu::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
+                          int alphaMod, QRect clipRect)
 {
 #if 0
     d->paintLogo(p, alphaMod);

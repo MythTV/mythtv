@@ -5,6 +5,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythscreentype.h"
 #include "mythscreenstack.h"
+#include "mythmainwindow.h"
 
 MythScreenType::MythScreenType(MythScreenStack *parent, const char *name,
                                bool fullscreen)
@@ -17,6 +18,9 @@ MythScreenType::MythScreenType(MythScreenStack *parent, const char *name,
 
     m_ScreenStack = parent;
     m_IsDeleting = false;
+
+    // Can be overridden, of course, but default to full sized.
+    m_Area = GetMythMainWindow()->GetUIScreenRect();
 }
 
 MythScreenType::~MythScreenType()

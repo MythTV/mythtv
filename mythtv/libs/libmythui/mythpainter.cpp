@@ -3,6 +3,10 @@
 #include <cassert>
 #include "mythimage.h"
 
+void MythPainter::SetClipRect(const QRect &)
+{
+}
+
 void MythPainter::DrawImage(int x, int y, MythImage *im, int alpha)
 {
     assert(im);

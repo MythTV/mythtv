@@ -13,6 +13,7 @@ class MythFontProperties;
 class MythUIText : public MythUIType
 {
   public:
+    MythUIText(MythUIType *parent, const char *name);
     MythUIText(const QString &text, const MythFontProperties &font,
                QRect displayRect, QRect altDisplayRect,
                MythUIType *parent, const char *name);
@@ -30,7 +31,7 @@ class MythUIText : public MythUIType
     int GetJustification(void);
     void SetCutDown(bool cut);
 
-    void SetDisplayArea(const QRect &rect);
+    void SetArea(const QRect &rect);
 
     virtual void Pulse(void);
 
@@ -39,7 +40,7 @@ class MythUIText : public MythUIType
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod);
+                          int alphaMod, QRect clipRect);
 
     int m_Justification;
     QRect m_OrigDisplayRect;

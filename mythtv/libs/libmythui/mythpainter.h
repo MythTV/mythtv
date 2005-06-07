@@ -20,9 +20,12 @@ class MythPainter
     virtual QString GetName(void) = 0;
     virtual bool SupportsAnimation(void) = 0;
     virtual bool SupportsAlpha(void) = 0;
+    virtual bool SupportsClipping(void) = 0;
 
     virtual void Begin(QWidget *parent) { m_Parent = parent; }
     virtual void End() { m_Parent = NULL; }
+
+    virtual void SetClipRect(const QRect &clipRect);
 
     QWidget *GetParent(void) { return m_Parent; }
 

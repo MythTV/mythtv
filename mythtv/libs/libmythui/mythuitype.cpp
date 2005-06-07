@@ -12,7 +12,7 @@ MythUIType::MythUIType(QObject *parent, const char *name)
           : QObject(parent, name)
 {
     m_Visible = true;
-    m_HasFocus = false;
+    m_CanHaveFocus = m_HasFocus = false;
     m_Area = QRect(0, 0, 0, 0);
     m_NeedsRedraw = false;
     m_Alpha = 255;
@@ -87,11 +87,33 @@ bool MythUIType::NeedsRedraw(void)
     return m_NeedsRedraw;
 }
 
-void MythUIType::SetRedraw(bool set)
+void MythUIType::SetRedraw(void)
 {
-    m_NeedsRedraw = set;
+    m_NeedsRedraw = true;
+    m_DirtyRect = m_Area;
     if (m_Parent)
-        m_Parent->SetRedraw(set);
+        m_Parent->SetChildNeedsRedraw(this);
+}
+
+void MythUIType::SetChildNeedsRedraw(MythUIType *child)
+{
+    m_NeedsRedraw = true;
+
+    QRect childRect = child->GetDirtyArea();
+    childRect.moveBy(m_Area.x(), m_Area.y());
+
+    if (m_DirtyRect != QRect())
+        m_DirtyRect = m_DirtyRect.unite(childRect);
+    else
+        m_DirtyRect = childRect;
+
+    // For poorly defined items
+    QSize aSize = m_Area.size();
+    aSize = aSize.expandedTo(m_DirtyRect.size());
+    m_Area.setSize(aSize);
+
+    if (m_Parent)
+        m_Parent->SetChildNeedsRedraw(this);
 }
 
 bool MythUIType::CanTakeFocus(void)
@@ -204,28 +226,36 @@ void MythUIType::makeDebugImages()
     m_debug_ver_line = MythImage::FromQImage(&temp_image);
 }
 
-void MythUIType::DrawSelf(MythPainter *, int, int, int)
+void MythUIType::DrawSelf(MythPainter *, int, int, int, QRect)
 {
 }
 
-void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
+void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
+                      QRect clipRect)
 {
     if (!m_Visible)
     {
         return;
     }
 
-    DrawSelf(p, xoffset, yoffset, alphaMod);
+    QRect realArea = m_Area;
+    realArea.moveBy(xoffset, yoffset);
+
+    if (!realArea.intersects(clipRect))
+        return;
+
+    DrawSelf(p, xoffset, yoffset, alphaMod, clipRect);
 
     QValueVector<MythUIType *>::Iterator it;
     for (it = m_ChildrenList.begin(); it != m_ChildrenList.end(); ++it)
     {
         (*it)->Draw(p, xoffset + m_Area.x(), yoffset + m_Area.y(), 
-                    CalcAlpha(alphaMod));
+                    CalcAlpha(alphaMod), clipRect);
     }
 
-    SetRedraw(false);
-    
+    m_NeedsRedraw = false;
+    m_DirtyRect = QRect();
+ 
     //
     //  If I'm in debugging mode, draw a frame at the edge of my area
     //
@@ -255,14 +285,25 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod)
     }
 }
 
-void MythUIType::SetPosition(QPoint pos)
+void MythUIType::SetPosition(int x, int y)
 {
+    SetPosition(QPoint(x, y));
+}
+
+void MythUIType::SetPosition(const QPoint &pos)
+{
+    if (m_Area.topLeft() == pos)
+        return;
+
     m_Area.moveTopLeft(pos);
     SetRedraw();
 }
 
-void MythUIType::SetArea(QRect rect)
+void MythUIType::SetArea(const QRect &rect)
 {
+    if (rect == m_Area)
+        return;
+
     m_Area = rect;
     SetRedraw();
 }
@@ -270,6 +311,11 @@ void MythUIType::SetArea(QRect rect)
 QRect MythUIType::GetArea(void)
 {
     return m_Area;
+}
+
+QRect MythUIType::GetDirtyArea(void)
+{
+    return m_DirtyRect;
 }
 
 QString MythUIType::cutDown(const QString &data, QFont *font,
@@ -409,6 +455,15 @@ void MythUIType::Activate(void)
 void MythUIType::Refresh(void)
 {
     SetRedraw();
+}
+
+void MythUIType::SetVisible(bool visible)
+{
+    if (visible != m_Visible)
+    {
+        m_Visible = visible;
+        SetRedraw();
+    }
 }
 
 void MythUIType::Hide(void)

@@ -3,6 +3,25 @@
 #include "mythmainwindow.h"
 #include "mythfontproperties.h"
 
+MythUIText::MythUIText(MythUIType *parent, const char *name)
+          : MythUIType(parent, name)
+{
+    m_Message = m_DefaultMessage = " ";
+
+    m_Font = new MythFontProperties();
+
+    m_OrigDisplayRect = m_AltDisplayRect = m_Area = QRect();
+
+    m_Cutdown = true;
+    m_CutMessage = "";
+
+    m_Justification = (Qt::AlignLeft | Qt::AlignTop);
+
+    m_colorCycling = false;
+
+    setDebugColor(QColor(255,255,255));
+}
+
 MythUIText::MythUIText(const QString &text, const MythFontProperties &font,
                        QRect displayRect, QRect altDisplayRect,
                        MythUIType *parent, const char *name)
@@ -65,9 +84,12 @@ void MythUIText::UseAlternateArea(bool useAlt)
 
 void MythUIText::SetJustification(int just)
 {
-    m_Justification = just;
-    m_CutMessage = "";
-    SetRedraw();
+    if (m_Justification != just)
+    {
+        m_Justification = just;
+        m_CutMessage = "";
+        SetRedraw();
+    }
 }
 
 int MythUIText::GetJustification(void)
@@ -82,15 +104,14 @@ void MythUIText::SetCutDown(bool cut)
     SetRedraw();
 }
 
-void MythUIText::SetDisplayArea(const QRect &rect)
+void MythUIText::SetArea(const QRect &rect)
 {
-    m_Area = rect;
     m_CutMessage = "";
-    SetRedraw();
+    MythUIType::SetArea(rect);
 }
 
 void MythUIText::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
-                          int alphaMod)
+                          int alphaMod, QRect clipRect)
 {
     QRect area = m_Area;
     area.moveBy(xoffset, yoffset);

@@ -28,7 +28,9 @@ class MythUIType : public QObject
 
     // Check set dirty status
     bool NeedsRedraw(void);
-    void SetRedraw(bool set = true);
+    void SetRedraw();
+
+    void SetChildNeedsRedraw(MythUIType *child);
 
     // Check set if this can take focus
     bool CanTakeFocus(void);
@@ -37,17 +39,22 @@ class MythUIType : public QObject
     // Called each draw pulse.  Will redraw automatically if dirty afterwards
     virtual void Pulse(void);
 
-    void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod = 255);
+    void Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod = 255,
+              QRect clipRegion = QRect());
 
-    virtual void SetPosition(QPoint pos);
-    virtual void SetArea(QRect rect);
+    virtual void SetPosition(int x, int y);
+    virtual void SetPosition(const QPoint &pos);
+    virtual void SetArea(const QRect &rect);
     virtual QRect GetArea(void);
+
+    virtual QRect GetDirtyArea(void);
 
     QString cutDown(const QString &data, QFont *font,
                     bool multiline = false, int overload_width = -1,
                     int overload_height = -1);
 
     bool IsVisible(void);
+    void SetVisible(bool visible);
 
     void MoveTo(QPoint destXY, QPoint speedXY);
     // make mode enum
@@ -84,7 +91,7 @@ class MythUIType : public QObject
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod);
+                          int alphaMod, QRect clipRegion);
 
     void AddFocusableChildrenToList(QPtrList<MythUIType> &focusList);
     void HandleAlphaPulse();
@@ -108,6 +115,7 @@ class MythUIType : public QObject
 
     QRect m_Area;
 
+    QRect m_DirtyRect;
     bool m_NeedsRedraw;
 
     int m_Alpha;

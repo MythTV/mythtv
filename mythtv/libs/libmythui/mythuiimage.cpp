@@ -5,12 +5,30 @@ using namespace std;
 #include "mythpainter.h"
 #include "mythmainwindow.h"
 
+MythUIImage::MythUIImage(const QString &filepattern,
+                         int low, int high, int delayms,
+                         MythUIType *parent, const char *name)
+           : MythUIType(parent, name)
+{
+    m_Filename = filepattern;
+    m_LowNum = low;
+    m_HighNum = high;
+
+    m_Delay = delayms;
+
+    Init();
+}
+
 MythUIImage::MythUIImage(const QString &filename, MythUIType *parent, 
                          const char *name)
            : MythUIType(parent, name)
 {
     m_Filename = filename;
     m_OrigFilename = filename;
+
+    m_LowNum = 0;
+    m_HighNum = 0;
+    m_Delay = -1;
 
     Init();
 }
@@ -23,7 +41,16 @@ MythUIImage::MythUIImage(MythUIType *parent, const char *name)
 
 MythUIImage::~MythUIImage()
 {
-    m_Image->DownRef();
+    Clear();
+}
+
+void MythUIImage::Clear(void)
+{
+    while (!m_Images.isEmpty())
+    {
+        m_Images.back()->DownRef();
+        m_Images.pop_back();
+    }
 }
 
 void MythUIImage::Init(void)
@@ -31,12 +58,28 @@ void MythUIImage::Init(void)
     m_SkipX = m_SkipY = 0;
     m_ForceW = m_ForceH = -1;
 
-    m_Image = GetMythPainter()->GetFormatImage();
+    m_CurPos = 0;
+    m_LastDisplay = QTime::currentTime();
 }
 
 void MythUIImage::SetFilename(const QString &filename)
 {
     m_Filename = filename;
+}
+
+void MythUIImage::SetFilepattern(const QString &filepattern, int low,
+                                         int high)
+{
+    m_Filename = filepattern;
+    m_LowNum = low;
+    m_HighNum = high;
+}
+
+void MythUIImage::SetDelay(int delayms)
+{
+    m_Delay = delayms;
+    m_LastDisplay = QTime::currentTime();
+    m_CurPos = 0;
 }
 
 void MythUIImage::ResetFilename(void)
@@ -45,10 +88,34 @@ void MythUIImage::ResetFilename(void)
     Load();
 }
 
-void MythUIImage::SetImage(const QImage &img)
+void MythUIImage::SetImage(MythImage *img)
 {
-    m_Image->Assign(img);
-    m_Area.setSize(m_Image->size());
+    Clear();
+    m_Delay = -1;
+
+    img->UpRef();
+    m_Images.push_back(img);
+    m_Area.setSize(img->size());
+    m_CurPos = 0;
+}
+
+void MythUIImage::SetImages(QValueVector<MythImage *> &m_Images)
+{
+    Clear();
+
+    QValueVector<MythImage *>::iterator it;
+    for (it = m_Images.begin(); it != m_Images.end(); ++it)
+    {
+        MythImage *im = (*it);
+        im->UpRef();
+        m_Images.push_back(im);
+
+        QSize aSize = m_Area.size();
+        aSize = aSize.expandedTo(im->size());
+        m_Area.setSize(aSize);
+    }
+
+    m_CurPos = 0;
 }
 
 void MythUIImage::SetSize(int width, int height)
@@ -65,38 +132,74 @@ void MythUIImage::SetSkip(int x, int y)
 
 void MythUIImage::Load(void)
 {
-    m_Image->Load(m_Filename);
-
-    if (m_ForceW != -1 || m_ForceH != -1)
+    for (int i = m_LowNum; i <= m_HighNum; i++)
     {
-        int w = (m_ForceW != -1) ? m_ForceW : m_Image->width();
-        int h = (m_ForceH != -1) ? m_ForceH : m_Image->height();
+        MythImage *image = GetMythPainter()->GetFormatImage();
+        QString filename = m_Filename;
+        if (m_HighNum >= 1)
+            filename = QString(m_Filename).arg(i);
 
-        m_Image->Assign(m_Image->smoothScale(w, h));
+        image->Load(filename);
+
+        if (m_ForceW != -1 || m_ForceH != -1)
+        {
+            int w = (m_ForceW != -1) ? m_ForceW : image->width();
+            int h = (m_ForceH != -1) ? m_ForceH : image->height();
+
+            image->Assign(image->smoothScale(w, h));
+        }
+
+        QSize aSize = m_Area.size();
+        aSize = aSize.expandedTo(image->size());
+        m_Area.setSize(aSize);
+
+        image->SetChanged();
+
+        if (image->isNull())
+            image->DownRef();
+        else
+            m_Images.push_back(image);
     }
 
-    m_Area.setSize(m_Image->size());
-    m_Image->SetChanged();
-
+    m_LastDisplay = QTime::currentTime();
     SetRedraw();
 }
 
 void MythUIImage::Reset(void)
 {
-    m_Image->Assign(QImage());
+    Clear();
+}
+
+void MythUIImage::Pulse(void)
+{
+    if (m_Delay > 0 && m_LastDisplay.msecsTo(QTime::currentTime()) > m_Delay)
+    {
+        m_CurPos++;
+        if (m_CurPos >= m_Images.size())
+            m_CurPos = 0;
+
+        SetRedraw();
+        m_LastDisplay = QTime::currentTime();
+    }
 }
 
 void MythUIImage::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
-                           int alphaMod)
+                           int alphaMod, QRect clipRect)
 {
-    QRect area = m_Area;
-    area.moveBy(xoffset, yoffset);
+    if (m_Images.size() > 0)
+    {
+        if (m_CurPos > m_Images.size())
+            m_CurPos = 0;
+
+        QRect area = m_Area;
+        area.moveBy(xoffset, yoffset);
     
-    int alpha = CalcAlpha(alphaMod); 
+        int alpha = CalcAlpha(alphaMod); 
 
-    QRect srcRect = m_Image->rect();
-    srcRect.setTopLeft(QPoint(m_SkipX, m_SkipY));
+        QRect srcRect = m_Images[m_CurPos]->rect();
+        srcRect.setTopLeft(QPoint(m_SkipX, m_SkipY));
 
-    p->DrawImage(area, m_Image, srcRect, alpha);
+        p->DrawImage(area, m_Images[m_CurPos], srcRect, alpha);
+    }
 }
 

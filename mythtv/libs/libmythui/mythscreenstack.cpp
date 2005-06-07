@@ -50,7 +50,10 @@ void MythScreenStack::AddScreen(MythScreenType *screen, bool allowFade)
         DoNewFadeTransition();
     }
     else
+    {
+        reinterpret_cast<MythMainWindow *>(parent())->update();
         RecalculateDrawOrder();
+    }
 
     screen->aboutToShow();
 
@@ -85,8 +88,7 @@ void MythScreenStack::PopScreen(void)
         delete top;
         top = NULL;
 
-        if (m_Children.isEmpty())
-            reinterpret_cast<MythMainWindow *>(parent())->update();
+        reinterpret_cast<MythMainWindow *>(parent())->update();
     }
 
     topScreen = NULL;

@@ -59,6 +59,22 @@ void MythQtPainter::End(void)
     MythPainter::End();
 }
 
+void MythQtPainter::SetClipRect(const QRect &clipRect)
+{
+    painter->setClipRect(clipRect);
+    mainPainter->setClipRect(clipRect);
+    if (clipRect != QRect())
+    {
+        painter->setClipping(true);
+        mainPainter->setClipping(true);
+    }
+    else
+    {
+        painter->setClipping(false);
+        mainPainter->setClipping(false);
+    }
+}
+
 void MythQtPainter::DrawImage(const QRect &r, MythImage *im,
                               const QRect &src, int alpha)
 {

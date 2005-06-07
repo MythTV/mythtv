@@ -43,7 +43,7 @@ bool MythUIStateImage::AddImage(StateType type, MythImage *image)
     return true;
 }
 
-void MythUIStateImage::DisplayImage(const QString &name)
+bool MythUIStateImage::DisplayImage(const QString &name)
 {
     MythImage *old = m_CurrentImage;
 
@@ -55,9 +55,11 @@ void MythUIStateImage::DisplayImage(const QString &name)
 
     if (m_CurrentImage != old)
         SetRedraw();
+
+    return (m_CurrentImage != NULL);
 }
 
-void MythUIStateImage::DisplayImage(StateType type)
+bool MythUIStateImage::DisplayImage(StateType type)
 {
     MythImage *old = m_CurrentImage;
 
@@ -69,6 +71,8 @@ void MythUIStateImage::DisplayImage(StateType type)
 
     if (m_CurrentImage != old)
         SetRedraw();
+
+    return (m_CurrentImage != NULL);
 }
 
 void MythUIStateImage::ClearMaps()
@@ -98,7 +102,7 @@ void MythUIStateImage::ClearImages()
 }
 
 void MythUIStateImage::DrawSelf(MythPainter *p, int xoffset, int yoffset, 
-                                int alphaMod)
+                                int alphaMod, QRect clipRect)
 {
     if (m_CurrentImage)
     {

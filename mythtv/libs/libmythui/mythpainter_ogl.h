@@ -16,6 +16,7 @@ class MythOpenGLPainter : public MythPainter
     virtual QString GetName(void) { return QString("OpenGL"); }
     virtual bool SupportsAnimation(void) { return true; }
     virtual bool SupportsAlpha(void) { return true; }
+    virtual bool SupportsClipping(void) { return false; }
 
     virtual void Begin(QWidget *parent);
     virtual void End();

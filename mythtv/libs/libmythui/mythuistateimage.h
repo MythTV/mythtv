@@ -22,14 +22,14 @@ class MythUIStateImage : public MythUIType
     bool AddImage(const QString &name, MythImage *image);
     bool AddImage(StateType type, MythImage *image);
 
-    void DisplayImage(const QString &name);
-    void DisplayImage(StateType type);
+    bool DisplayImage(const QString &name);
+    bool DisplayImage(StateType type);
 
     void ClearImages();
 
   protected:
     virtual void DrawSelf(MythPainter *p, int xoffset, int yoffset,
-                          int alphaMod);
+                          int alphaMod, QRect clipRect);
 
     void ClearMaps();
 

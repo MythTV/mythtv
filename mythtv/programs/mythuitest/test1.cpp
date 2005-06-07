@@ -4,7 +4,6 @@
 
 #include "mythuiimage.h"
 #include "mythuitext.h"
-#include "mythuianimatedimage.h"
 #include "mythmainwindow.h"
 #include "mythlistbutton.h"
 #include "dialogbox.h"
@@ -220,9 +219,8 @@ void TestScreen1::Launch5(void)
     diag->SetReturnEvent(this, "FIFTH_DIALOG");
     diag->AddButton("Sweet.");
 
-    MythUIAnimatedImage *aniwait = new MythUIAnimatedImage("images/watch%1.png",
-                                                           1, 16,
-                                                           30, diag, "ani");
+    MythUIImage *aniwait = new MythUIImage("images/watch%1.png", 1, 16,
+                                           30, diag, "ani");
     aniwait->SetPosition(NormPoint(QPoint(350, 275)));
     aniwait->Load();
 
