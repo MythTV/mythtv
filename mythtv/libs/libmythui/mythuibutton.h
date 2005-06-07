@@ -4,7 +4,7 @@
 #include <qstring.h>
 
 #include "mythuitype.h"
-#include "mythuistateimage.h"
+#include "mythuistatetype.h"
 #include "mythuitext.h"
 #include "mythuiimage.h"
 #include "mythfontproperties.h"

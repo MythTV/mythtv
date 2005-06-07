@@ -1,11 +1,15 @@
+INCLUDEPATH += ../../libs/libmythui ../../libs/libmyth
+
+LIBS += -L../../libs/libmyth -L../../libmythui
+
 include ( ../../config.mak )
 include ( ../../settings.pro )
 
-INCLUDEPATH += ../../libs/libmythui ../../libs/libmyth
-DEPENDPATH += ../../libs/libmythui ../../libs/libmyth
+TEMPLATE = app
+TARGET = mythuitest
+CONFIG += thread opengl
 
-LIBS += -L../../libs/libmythui -lmythui-$$LIBVERSION
-LIBS += -L../../libs/libmyth -lmyth-$$LIBVERSION
+LIBS += -lmythui-$$LIBVERSION -lmyth-$$LIBVERSION
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
@@ -14,6 +18,7 @@ isEmpty(QMAKE_EXTENSION_LIB) {
   QMAKE_EXTENSION_LIB=a
 }
 TARGETDEPS += ../../libs/libmythui/libmythui-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../../libs/libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 macx {
     # Duplication of source with libmyth (e.g. oldsettings.cpp)
@@ -21,10 +26,7 @@ macx {
     QMAKE_LFLAGS += -multiply_defined suppress
 }
 
-
-TEMPLATE = app
-TARGET = mythuitest
-CONFIG += thread opengl
+DEPENDPATH += ../../libs/libmythui ../../libs/libmyth
 
 # Input
 HEADERS = test1.h

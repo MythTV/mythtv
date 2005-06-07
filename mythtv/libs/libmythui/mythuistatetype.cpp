@@ -1,4 +1,4 @@
-#include "mythuistateimage.h"
+#include "mythuistatetype.h"
 #include "mythuiimage.h"
 #include "mythpainter.h"
 #include "mythmainwindow.h"

@@ -9,7 +9,7 @@
 #include "mythmainwindow.h"
 #include "mythcontext.h"
 #include "mythfontproperties.h"
-#include "mythuistateimage.h"
+#include "mythuistatetype.h"
 #include "mythuibutton.h"
 
 MythListButton::MythListButton(MythUIType *parent, const char *name, 
