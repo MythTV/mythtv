@@ -45,7 +45,7 @@ extern "C" uint32_t read_callback(void *user_data, void *buffer, uint32_t length
     
 }
     
-uint32_t seek_callback(void *user_data, uint64_t position)
+extern "C" uint32_t seek_callback(void *user_data, uint64_t position)
 {
     aacDecoder *the_decoder_object = (aacDecoder*) user_data;
     if(the_decoder_object)
@@ -625,12 +625,12 @@ void aacDecoder::run()
 //
 
 
-uint32_t md_read_callback(void *user_data, void *buffer, uint32_t length)
+extern "C" uint32_t md_read_callback(void *user_data, void *buffer, uint32_t length)
 {
     return fread(buffer, 1, length, (FILE*)user_data);
 }
 
-uint32_t md_seek_callback(void *user_data, uint64_t position)
+extern "C" uint32_t md_seek_callback(void *user_data, uint64_t position)
 {
     return fseek((FILE*)user_data, position, SEEK_SET);
 }
@@ -832,7 +832,12 @@ uint32_t aacDecoder::aacSeek(uint64_t position)
 {
     if(input())
     {
-        return input()->at(position);
+        if(input()->at(position))
+        {
+            return 1;
+        }
+        warning("aacDecoder: failed to seek");
+        return 0;
     }
     warning("aacDecoder: aacSeek() was called, but there is no input");
     return 0;

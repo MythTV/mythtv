@@ -22,7 +22,12 @@ using namespace std;
 //  Set up the structure to make daap calls
 //
 
-DaapInput::DaapInput(MFDServicePlugin *owner, QUrl a_url, DaapServerType l_daap_server_type)
+DaapInput::DaapInput(
+                        MFDServicePlugin *owner, 
+                        QUrl a_url, 
+                        DaapServerType l_daap_server_type, 
+                        int l_payload_max_size
+                    )
           :QIODevice()
 {
     socket_to_daap_server = NULL;
@@ -39,6 +44,7 @@ DaapInput::DaapInput(MFDServicePlugin *owner, QUrl a_url, DaapServerType l_daap_
     range_begin = 0;
     range_end = 0;
     connection_count = 0;
+    payload_max_size = l_payload_max_size;
     headers.setAutoDelete(true);
     
     //
@@ -157,70 +163,90 @@ bool DaapInput::open(int)
 Q_LONG DaapInput::readBlock( char *data, long unsigned int maxlen )
 {
 
+    if((int) maxlen > payload_max_size)
+    {
+        payload_max_size = (int) maxlen;
+    }
+
+    if(fake_seek_position < range_begin)
+    {
+        warning("bad logic or major socket failure in DaapInput::readBlock()");
+        return -1;
+    }
+
+    if(!data)
+    {
+        warning("asked to readBlock(), but handed null pointer");
+        return -1;
+    }
+
     if(fake_seek_position >= total_possible_range)
     {
         if(fake_seek_position > total_possible_range)
         {
-            warning("something tried to read beyond my stream size");
+            warning(QString("something tried to readBlock() beyond my stream size (%1 > %2)")
+                            .arg(fake_seek_position)
+                            .arg(total_possible_range));
         }
-        return 0;
+        return -1;
     }
 
+    bool socket_ok = true;
 
     //
-    //  If there's anything in our payload buffer send that first
+    //  faad always want maxlen bytes (any less, and the sample played will
+    //  chirp, plus it will screw up how faad seeks for the next sample). So
+    //  ... unless it would actually take us beyond the end of the file, we
+    //  always want to make sure there are enough bytes in the payload
+    //  buffer to fill to maxlen.
     //
-    
-    if(payload.size() > 0)
+
+    if(fake_seek_position + maxlen <= total_possible_range)
     {
-        if(maxlen >= payload.size())
+        while(fake_seek_position + maxlen > range_begin + payload.size())
         {
-            int how_much = payload.size();
-            for(uint i = 0; i < payload.size(); i++)
+            if(!fillSomePayload())
             {
-                data[i] = payload[i];
+                socket_ok = false;
+                break;
             }
-            payload.clear();
-            fake_seek_position += how_much;
-            return how_much;
-        }
-        else
-        {
-            int how_much = maxlen;
-            for(uint i = 0; i < maxlen; i++)
-            {
-                data[i] = payload.front();
-                payload.erase(payload.begin());
-            }
-            fake_seek_position += how_much;
-            return how_much;
         }
     }
-
-    //
-    //  Otherwise, we need to send whatever we can pull from the server
-    //
-
-    if(socket_to_daap_server->socket() > 0)
+    else
     {
-        socket_to_daap_server->waitForMore (5000);  //  wait up to 5 seconds for data to arrive
-        Q_LONG length = socket_to_daap_server->readBlock(data, maxlen);
-
-        if(length > 0)
+        while(fake_seek_position >= range_begin + payload.size())
         {
-            fake_seek_position += length;
-            payload_bytes_read += length;
-            return length;
-        }
-        else
-        {
-            warning("problem reading from daapserver");
-            return -1;
+            if(!fillSomePayload())
+            {
+                socket_ok = false;
+                break;
+            }
         }
     }
 
-    warning("daap server seems to have gone away");
-    return -1;
+    if(!socket_ok)
+    {
+        warning("something fundamental wrong with talking to the server");
+        return -1;
+    }
+
+
+    int how_much = 0;
+    if((int) maxlen >= ((int)payload.size() - ((int)fake_seek_position - (int)range_begin)))
+    {
+        how_much = (int)payload.size() - ((int)fake_seek_position - (int)range_begin);
+    }
+    else
+    {
+        how_much = maxlen;
+    }
+    for(int i = 0; i < how_much; i++)
+    {
+        data[i] = payload[((int)fake_seek_position - (int)range_begin) + i];
+    }
+
+    fake_seek_position += how_much;
+    return how_much;
 }
 
 
@@ -230,14 +256,10 @@ Q_ULONG DaapInput::size() const
     return total_possible_range;
 }
 
-
-
-
 unsigned long int DaapInput::at() const
 {
     return fake_seek_position;
 }
-
 
 bool DaapInput::at(unsigned long int an_offset)
 {
@@ -249,7 +271,6 @@ bool DaapInput::at(unsigned long int an_offset)
     if(an_offset == total_possible_range)
     {
         fake_seek_position = an_offset;
-        payload.clear();
         return true;
     }
 
@@ -259,19 +280,24 @@ bool DaapInput::at(unsigned long int an_offset)
 
     if(an_offset > total_possible_range)
     {
-        warning("something wanted me to seek beyond my size");
+        warning(QString("something tried to seek beyond my stream size (%1 > %2)")
+                            .arg(an_offset)
+                            .arg(total_possible_range));
         return false;
     } 
 
-    //
-    //  If we happen to be already seeked to where it wants us to be, then we're fine
-    //
-    
-    if(an_offset == fake_seek_position)
+    if(an_offset < range_begin)
     {
-        return true;
+        return reallySeek(an_offset);
     }
 
+    fake_seek_position = an_offset;
+    return true;
+
+}
+
+bool DaapInput::reallySeek(unsigned long int an_offset)
+{
 
     //
     //  To actually "seek", first we need to throw away the current daap connection
@@ -280,6 +306,19 @@ bool DaapInput::at(unsigned long int an_offset)
     socket_to_daap_server->close();
     delete socket_to_daap_server;
     socket_to_daap_server = NULL;
+    
+    //
+    //  Sleep for a bit (if you don't, iTunes will die ... the guess is it
+    //  needs to get through a select() call once when the socket is closed
+    //  and get back into before it's re-opened, otherwise it sends BAD
+    //  http/daap back).
+    //
+
+    struct timespec timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_nsec = 1000000;
+    nanosleep(&timeout, NULL);
+
     socket_to_daap_server = new QSocketDevice (QSocketDevice::Stream);
     socket_to_daap_server->setBlocking(false);
     connected = false;
@@ -363,12 +402,7 @@ bool DaapInput::at(unsigned long int an_offset)
         return false;
     }
     return true;
-
 }
-
-
-
-
 
 void DaapInput::close()
 {
@@ -407,7 +441,7 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
     //  Read off something from the socket
     //
 
-    socket_to_daap_server->waitForMore (5000);  //  wait up to 5 seconds for data to arrive
+    socket_to_daap_server->waitForMore (10000);  //  wait up to 10 seconds for data to arrive
     length = socket_to_daap_server->readBlock(incoming, buffer_size);
 
     if(length < 0)
@@ -638,7 +672,11 @@ void DaapInput::eatThroughHeadersAndGetToPayload()
         range_begin = 0;
         range_end = 0;
     }
-    
+
+    if(all_is_well)
+    {
+        fillSomePayload();
+    }
 }
 
 int DaapInput::readLine(int *parse_point, char *parsing_buffer, char *raw_response, int raw_length)
@@ -705,6 +743,44 @@ void DaapInput::warning(const QString &warn_message)
         parent->warning(marked_warn_message);
     }
 }
+
+
+bool DaapInput::fillSomePayload()
+{
+
+    int length;
+    int buffer_size = 256 * 1024;
+    char incoming[buffer_size];
+    if(payload.size() < total_possible_range)
+    {
+        socket_to_daap_server->waitForMore (5000);  //  wait up to 5 seconds for data to arrive
+        length = socket_to_daap_server->readBlock(incoming, buffer_size);
+        if(length < 0)
+        {
+            return false;
+        }
+        else
+        {
+            for(int i = 0; i < length; i++)
+            {
+                payload.push_back(incoming[i]);
+            }
+        }
+    }
+    
+    //
+    //  So that we don't grow beyond bound:
+    //
+
+    while((int) payload.size() > payload_max_size)
+    {
+        payload.pop_front();
+        range_begin++;
+    }
+    
+    return true;
+}
+
 
 DaapInput::~DaapInput()
 {

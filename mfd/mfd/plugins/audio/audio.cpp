@@ -23,7 +23,7 @@
 #include "settings.h"
 
 AudioPlugin::AudioPlugin(MFD *owner, int identity)
-      :MFDServicePlugin(owner, identity, mfdContext->getNumSetting("mfd_audio_port"), "audio")
+      :MFDServicePlugin(owner, identity, mfdContext->getNumSetting("mfd_audio_port"), "audio", true, 2)
 {
     input = NULL;
     output = NULL;

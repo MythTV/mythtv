@@ -27,7 +27,12 @@ class DaapInput: public QIODevice
 
   public:
 
-    DaapInput(MFDServicePlugin*, QUrl, DaapServerType l_daap_server_type = DAAP_SERVER_MYTH);
+    DaapInput(
+                MFDServicePlugin*, 
+                QUrl, 
+                DaapServerType l_daap_server_type = DAAP_SERVER_MYTH, 
+                int l_payload_max_size = 262400
+             );
     ~DaapInput();
 
     bool              open(int mode );
@@ -35,6 +40,7 @@ class DaapInput: public QIODevice
     Q_ULONG           size() const;
     unsigned long int at() const;
     bool              at(long unsigned int );
+    bool              reallySeek(long unsigned int );
     void              close();
     bool              isOpen() const;
     int               status();
@@ -43,6 +49,7 @@ class DaapInput: public QIODevice
     bool              isDirectAccess(){return true;}
     void              log(const QString &log_message, int verbosity);
     void              warning(const QString &error_message);
+    bool              fillSomePayload();
 
     //
     //  Things we have to define but don't ever use
@@ -65,7 +72,7 @@ class DaapInput: public QIODevice
     QSocketDevice       *socket_to_daap_server;
     bool                connected;
     QDict<HttpHeader>   headers;
-    QValueVector<char>  payload;
+    std::deque<char>    payload;
     uint                payload_size;
     uint                total_possible_range;
     uint                range_begin;
@@ -75,6 +82,7 @@ class DaapInput: public QIODevice
     MFDServicePlugin    *parent;
     int                 connection_count;
     DaapServerType      daap_server_type;
+    int                 payload_max_size;
 };
 
 #endif  // daapinput_h_
