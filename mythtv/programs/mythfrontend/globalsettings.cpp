@@ -2190,10 +2190,10 @@ static HostCheckBox *UseXVMC()
     gc->setLabel(QObject::tr("Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr(
-                        "This enables the hardware accelerated MPEG decoding"
-                        "available with many popular video output cards.")+
+                        "This enables the hardware accelerated MPEG decoding "
+                        "available with many popular video output cards.  ")+
                     QObject::tr(
-                        "This is incompatible with libmpeg2 decoding, and"
+                        "This is incompatible with libmpeg2 decoding, and "
                         "will be disabled if libmpeg2 decoding is selected."));
     return gc;
 };
@@ -2206,9 +2206,9 @@ static HostCheckBox *UseXvMcVld()
     gc->setLabel(QObject::tr("Use hardware XVMC VLD Decoding (incompatible with libmpeg2)"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("Enables the use of viaXvMC hardware MPEG "
-                                "decoding for the Via Unichrome Chipset")+
+                                "decoding for the Via Unichrome Chipset.  ")+
                     QObject::tr(
-                        "This is incompatible with libmpeg2 decoding, and"
+                        "This is incompatible with libmpeg2 decoding, and "
                         "will be disabled if libmpeg2 decoding is selected."));
     return gc;
 };
