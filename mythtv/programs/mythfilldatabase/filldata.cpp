@@ -48,11 +48,13 @@ bool refresh_today = false;
 bool refresh_tomorrow = true;
 bool refresh_second = false;
 bool refresh_tba = true;
-int listing_wrap_offset = 0;
 bool dd_grab_all = false;
 bool dddataretrieved = false;
 bool mark_repeats = true;
 bool channel_updates = false;
+
+int maxDays = 0;
+int listing_wrap_offset = 0;
 
 QString lastdduserid;
 DataDirectProcessor ddprocessor;
@@ -2777,6 +2779,9 @@ bool fillData(QValueList<Source> &sourcelist)
 
             QDate qCurrentDate = QDate::currentDate();
 
+            if (maxDays == 1)
+                refresh_today = true;
+
             if (refresh_today)
             {
                 if (!quiet)
@@ -2819,6 +2824,9 @@ bool fillData(QValueList<Source> &sourcelist)
                 maxday = 5;
             else if (xmltv_grabber == "tv_grab_be_tlm")
                 maxday = 5;
+
+            if (maxDays > 0)
+                maxday = maxDays;
 
             for (int i = 0; i < maxday; i++)
             {
@@ -3242,6 +3250,22 @@ int main(int argc, char *argv[])
 
             graboptions = QString(" ") + QString(a.argv()[++argpos]);
         }
+        else if (!strcmp(a.argv()[argpos], "--max-days"))
+        {
+            if (((argpos + 1) >= a.argc()))
+            {
+                printf("missing parameter for --max-days option\n");
+                return FILLDB_EXIT_INVALID_CMDLINE;
+            }
+
+            maxDays = QString(a.argv()[++argpos]).toInt();
+
+            if (maxDays < 1 || maxDays > 21)
+            {
+                printf("ignoring invalid parameter for --max-days\n");
+                maxDays = 0;
+            }
+        }
         else if (!strcmp(a.argv()[argpos], "--refresh-today"))
         {
             refresh_today = true;
@@ -3392,6 +3416,9 @@ int main(int argc, char *argv[])
             cout << "--graboptions <\"options\">\n";
             cout << "   Pass options to grabber\n";
             cout << "\n";
+            cout << "--max-days <number>\n";
+            cout << "   Force the maximum number of days, counting today,\n";
+            cout << "   for the grabber to check for future listings\n";
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";
             cout << "   (Only valid for grabbers: na, se_swedb, no, ee, de_tvtoday)\n";
@@ -3399,7 +3426,9 @@ int main(int argc, char *argv[])
             cout << "--dont-refresh-tomorrow\n";
             cout << "   Tomorrow will be refreshed always unless this argument is used\n";
             cout << "--dont-refresh-tba\n";
-            cout << "   \"To be announced\" progs will be refreshed always unless this argument is used\n";
+            cout << "   \"To be announced\" progs will be refreshed always\n";
+            cout << "   unless this argument is used\n";
+            cout << "\n";
             cout << "--export-icon-map [<filename>]\n";
             cout << "   Exports your current icon map to <filename> (default: "
                     << export_icon_map_filename << ")\n";
@@ -3410,8 +3439,10 @@ int main(int argc, char *argv[])
             cout << "   Updates icon map icons only\n";
             cout << "--reset-icon-map [all]\n";
             cout << "   Resets your icon map (pass all to reset channel icons as well)\n";
+            cout << "\n";
             cout << "--mark-repeats\n";
-            cout << "   Marks any programs with a OriginalAirDate earlier than their start date as a repeat\n";
+            cout << "   Marks any programs with a OriginalAirDate earlier\n";
+            cout << "   than their start date as a repeat\n";
             cout << "\n";
 #if 0
             cout << "--dd-grab-all\n";
