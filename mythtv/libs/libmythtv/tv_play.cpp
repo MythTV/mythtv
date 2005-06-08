@@ -3278,10 +3278,12 @@ void TV::doLoadMenu(void)
 
     if (fullscreen) 
     {
-        mwnd->setGeometry(0, 0, QApplication::desktop()->width(),
-                          QApplication::desktop()->height());
-        mwnd->setFixedSize(QSize(QApplication::desktop()->width(),
-                                 QApplication::desktop()->height()));
+        int xbase, ybase, screenwidth, screenheight;
+        float wmult, hmult;
+        gContext->GetScreenSettings(xbase, screenwidth, wmult,
+                                    ybase, screenheight, hmult);
+        mwnd->setGeometry(xbase, ybase, screenwidth, screenheight);
+        mwnd->setFixedSize(QSize(screenwidth, screenheight));
     }
 
     menurunning = false;
