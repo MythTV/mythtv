@@ -1,0 +1,17 @@
+
+README for libmtcp, the mdtcp library
+
+This library and the underlying interface specification is Copyright 
+(c) 2005 by Thor Sigvaldason and Isaac Richards.
+
+It is distributed and licensed under the terms of the GPL, version 2 only.
+If you don't have a copy of the GPL, you can get one at:
+
+        http://www.gnu.org/licenses/gpl.txt
+
+MTCP is an acronym for "Myth TransCoding Protocol". It is (meant to be) a
+mechanism for exchanging information about transcoding jobs. That is, it
+allows a server process to explain to a client process what content is being
+transcoded. The client software can also ask for transcoding jobs to be
+started and stopped.
+

@@ -542,6 +542,7 @@ void MfdInstance::addMtcpClient(const QString &address, uint a_port)
     if(new_transcoder->connect())
     {
         my_service_clients->append(new_transcoder);
+        new_transcoder->sendFirstRequest();
         MfdTranscoderPluginExistsEvent *tpee = new MfdTranscoderPluginExistsEvent(mfd_id);
         QApplication::postEvent(mfd_interface, tpee);
     }

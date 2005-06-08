@@ -39,7 +39,7 @@ inc.path = $${PREFIX}/include/mfdclient/
 inc.files  = mfdinterface.h mfdcontent.h ../mfdlib/metadata.h playlist.h playlistentry.h \
 			 speakertracker.h visualbase.h
 
-LIBS += -L../mdcaplib -lmdcap -Wl,--export-dynamic
+LIBS += -L../mdcaplib -lmdcap -L../mtcplib -lmtcp -Wl,--export-dynamic
 
 INSTALLS += inc
 

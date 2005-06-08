@@ -17,6 +17,8 @@ using namespace std;
 #include "job.h"
 
 class QDir;
+class MtcpOutput;
+class ClientTracker;
 
 class Transcoder: public MFDHttpPlugin
 {
@@ -29,12 +31,14 @@ class Transcoder: public MFDHttpPlugin
     void    run();
     bool    initialize();
     void    handleIncoming(HttpInRequest *httpin_request, int client_id);
-    void    handleStatusRequest(HttpInRequest *httpin_request);
+    void    handleStatusRequest(HttpInRequest *httpin_request, int client_id);
+    int     buildStatusResponse(MtcpOutput *status_response);
     void    handleStartJobRequest(HttpInRequest *httpin_request);
     void    checkJobs();
     void    updateStatusClients();
     int     bumpStatusGeneration();
-
+    void    sendResponse(HttpOutResponse *httpout, MtcpOutput &reponse, int generation_value);
+    
   private:
   
     MetadataServer         *metadata_server;
@@ -44,6 +48,8 @@ class Transcoder: public MFDHttpPlugin
     QDir                   *music_destination_directory;
     QMutex                  jobs_mutex;
     QPtrList<TranscoderJob> jobs;
+    QPtrList<ClientTracker> hanging_status_clients;
+    QMutex                  hanging_status_mutex;
 };
 
 #endif  // transcoder_h_

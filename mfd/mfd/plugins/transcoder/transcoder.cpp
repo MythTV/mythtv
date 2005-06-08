@@ -14,6 +14,9 @@
 #include "settings.h"
 #include "httpoutresponse.h"
 #include "audiocdjob.h"
+#include "clienttracker.h"
+#include "../../../mtcplib/markupcodes.h"
+#include "../../../mtcplib/mtcpoutput.h"
 
 Transcoder *transcoder = NULL;
 
@@ -26,6 +29,7 @@ Transcoder::Transcoder(MFD *owner, int identity)
     top_level_directory = NULL;
     music_destination_directory = NULL;
     jobs.setAutoDelete(true);
+    hanging_status_clients.setAutoDelete(true);
 }
 
 
@@ -223,6 +227,7 @@ void Transcoder::run()
         checkInternalMessages();
         checkMetadataChanges();
         checkJobs();
+        updateStatusClients();
     }
     
     //
@@ -241,7 +246,7 @@ void Transcoder::run()
     jobs_mutex.unlock();
 }
 
-void Transcoder::handleIncoming(HttpInRequest *httpin_request, int)
+void Transcoder::handleIncoming(HttpInRequest *httpin_request, int client_id)
 {
 
     //
@@ -253,7 +258,7 @@ void Transcoder::handleIncoming(HttpInRequest *httpin_request, int)
 
     if (top_level == "status")
     {
-        handleStatusRequest(httpin_request);
+        handleStatusRequest(httpin_request, client_id);
     }
     else if(top_level == "startjob")
     {
@@ -266,8 +271,12 @@ void Transcoder::handleIncoming(HttpInRequest *httpin_request, int)
     }
 }
 
-void Transcoder::handleStatusRequest(HttpInRequest *httpin_request)
+void Transcoder::handleStatusRequest(HttpInRequest *httpin_request, int client_id)
 {
+    status_generation_mutex.lock();
+        int current_generation = status_generation;
+    status_generation_mutex.unlock();
+
     //
     //  See what generation the client thinks it is for overall status. If
     //  they're current, hold them in a "hanging status" request.
@@ -294,7 +303,7 @@ void Transcoder::handleStatusRequest(HttpInRequest *httpin_request)
         return;
     }
     
-    if(client_generation > status_generation)
+    if(client_generation > current_generation)
     {
         //
         //  WTF? Client is ahead of us?
@@ -305,18 +314,86 @@ void Transcoder::handleStatusRequest(HttpInRequest *httpin_request)
         return;
     }
     
-    if(client_generation < status_generation)
+    if(client_generation < current_generation)
     {
         //
         //  Need to tell client about new status of jobs
         //
+        
+        MtcpOutput status_response;
+        int generation_value = buildStatusResponse(&status_response);
+        sendResponse(httpin_request->getResponse(), status_response, generation_value);
+        cout << "send status of " << generation_value << " to client " << client_id << endl;
     }
     else
     {
         //
         //  They're up to speed, put 'em in hanging status 
         //
+        
+        hanging_status_mutex.lock();
+
+            bool found_it = false;
+            ClientTracker *ct;
+            for ( ct = hanging_status_clients.first(); ct; ct = hanging_status_clients.next() )            
+            {
+                if(ct->getClientId() == client_id)
+                {
+                    ct->setGeneration(current_generation);
+                    found_it = true;
+                }
+            }
+            if(!found_it)
+            {
+                ClientTracker *new_ct = new ClientTracker(client_id, current_generation);
+                hanging_status_clients.append(new_ct);
+            }
+        hanging_status_mutex.unlock();
+        httpin_request->sendResponse(false);
     }    
+}
+
+int Transcoder::buildStatusResponse(MtcpOutput *status_response)
+{
+    //
+    //  Lock the status_generation_mutex so that the status generation value
+    //  is valid throughout the building of this status response
+    //
+
+    status_generation_mutex.lock();
+        int return_value = status_generation;
+
+    status_response->addServerInfoGroup();
+        status_response->addServiceName(QString("mtcp server on %1").arg(hostname));
+        status_response->addProtocolVersion();
+
+        status_response->addJobInfoGroup();
+
+        jobs_mutex.lock();
+            status_response->addJobCount(jobs.count());
+            TranscoderJob *a_job;
+            for(a_job = jobs.first(); a_job; a_job = jobs.next())
+            {
+                status_response->addJobGroup();
+                    status_response->addJobMajorDescription(a_job->getMajorStatusDescription());
+                    status_response->addJobMajorProgress(a_job->getMajorProgress());
+                    status_response->addJobMinorDescription(a_job->getMinorStatusDescription());
+                    status_response->addJobMinorProgress(a_job->getMinorProgress());
+                status_response->endGroup();
+            }
+        jobs_mutex.unlock();
+        status_response->endGroup();        
+    status_response->endGroup();
+
+    //
+    //  Unlock the status generation value, and return the generation that
+    //  was valid when this status response was constructed
+    //
+    
+    status_generation_mutex.unlock();
+    
+    return return_value;
+
 }
 
 void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
@@ -368,18 +445,19 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
                 new_job->start();
                 jobs.append(new_job);
             jobs_mutex.unlock();
-            updateStatusClients();
-            
+            httpin_request->sendResponse(false);
         }
         else
         {
             warning(QString("could not parse playlist id from \"%1\" to "
                             "start audio cd rip").arg(playlist_id_string));
+            httpin_request->getResponse()->setError(404);
         }
     }
     else
     {
         warning("unrecognized Job-Type in Transcoder::handleStartJobRequest()");
+        httpin_request->getResponse()->setError(404);
     }
 
 }
@@ -412,7 +490,6 @@ void Transcoder::checkJobs()
     if(something_changed)
     {
         bumpStatusGeneration();
-        updateStatusClients();
     }
 }
 
@@ -422,6 +499,38 @@ void Transcoder::updateStatusClients()
     //  Tell every connected client with an unanswered /status request that
     //  things have changed
     //
+    
+    HttpOutResponse *hanging_response = new HttpOutResponse(this, NULL);
+    MtcpOutput status_response;
+    int generation_value = buildStatusResponse(&status_response);
+    sendResponse(hanging_response, status_response, generation_value);
+
+    status_generation_mutex.lock();
+        int current_generation = status_generation;
+    status_generation_mutex.unlock();
+
+
+    hanging_status_mutex.lock();
+
+        QPtrListIterator<ClientTracker> iter( hanging_status_clients );
+        ClientTracker *ct = NULL;
+        while( (ct = iter.current()) != NULL)
+        {
+            if(ct->getGeneration() < current_generation)
+            {
+                MFDHttpPlugin::sendResponse(ct->getClientId(), hanging_response);
+                hanging_status_clients.remove(ct);
+                cout << "send status of " << current_generation << " to client " << ct->getClientId() << endl;
+            }
+            else
+            {
+                ++iter;
+            }            
+        }
+
+    hanging_status_mutex.unlock();
+    
+    delete hanging_response;
 }
 
 int Transcoder::bumpStatusGeneration()
@@ -435,6 +544,45 @@ int Transcoder::bumpStatusGeneration()
 
     return return_value;
 }
+
+void Transcoder::sendResponse(HttpOutResponse *httpout, MtcpOutput &response, int generation_value)
+{
+
+    //
+    //  Make sure we don't have any open content code groups in what we're sending
+    //
+    
+    if(response.openGroups())
+    {
+        warning("asked to send mtcp response, but there are open groups");
+        httpout->setError(500);
+        return;
+    }
+
+    //
+    //  Tell them our status generation 
+    //
+    
+    httpout->addHeader(QString("Server-Generation: %1").arg(generation_value));
+
+    //
+    //  Set some header stuff 
+    //
+    
+    httpout->addHeader(
+                        QString("MTCP-Server: MythTV/%1.%1 (Probably Linux)")
+                            .arg(MTCP_PROTOCOL_VERSION_MAJOR)
+                            .arg(MTCP_PROTOCOL_VERSION_MINOR)
+                      );
+                        
+    //
+    //  Set the payload
+    //
+    
+    httpout->setPayload(response.getContents());
+}
+
+
 
 Transcoder::~Transcoder()
 {
@@ -461,5 +609,7 @@ Transcoder::~Transcoder()
         delete music_destination_directory;
         music_destination_directory = NULL;
     }
+    
+    hanging_status_clients.clear();
 }
 

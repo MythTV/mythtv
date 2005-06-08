@@ -64,6 +64,91 @@ void TranscoderJob::warning(const QString &warn_message)
     }
 }
 
+QString TranscoderJob::getMajorStatusDescription()
+{
+    QString response;
+    status_mutex.lock();
+        response = major_status_description;
+    status_mutex.unlock();
+    return response;
+}
+
+int TranscoderJob::getMajorProgress()
+{
+    int response;
+    status_mutex.lock();
+        response = major_status;
+    status_mutex.unlock();
+    return response;
+}
+
+QString TranscoderJob::getMinorStatusDescription()
+{
+    QString response;
+    status_mutex.lock();
+        response = minor_status_description;
+    status_mutex.unlock();
+    return response;
+}
+
+int TranscoderJob::getMinorProgress()
+{
+    int response;
+    status_mutex.lock();
+        response = minor_status;
+    status_mutex.unlock();
+    return response;
+}
+
+void TranscoderJob::setMajorStatusDescription(const QString &new_status)
+{
+    status_mutex.lock();
+        major_status_description = new_status;
+    status_mutex.unlock();
+}
+
+void TranscoderJob::setMajorProgress(int new_progress)
+{
+    if(new_progress < 0)
+    {
+        new_progress = 0;
+        warning("told to set major status below 0, changing to 0");
+    }
+    else if (new_progress > 100)
+    {
+        new_progress = 100;
+        warning("told to set major status above 100, changing to 100");
+    }
+    status_mutex.lock();
+        major_status = new_progress;
+    status_mutex.unlock();
+}
+
+void TranscoderJob::setMinorStatusDescription(const QString &new_status)
+{
+    status_mutex.lock();
+        minor_status_description = new_status;
+    status_mutex.unlock();
+}
+
+void TranscoderJob::setMinorProgress(int new_progress)
+{
+    if(new_progress < 0)
+    {
+        new_progress = 0;
+        warning("told to set minor status below 0, changing to 0");
+    }
+    else if (new_progress > 100)
+    {
+        new_progress = 100;
+        warning("told to set minor status above 100, changing to 100");
+    }
+    status_mutex.lock();
+        minor_status = new_progress;
+    status_mutex.unlock();
+}
+
+
 TranscoderJob::~TranscoderJob()
 {
 }

@@ -45,6 +45,10 @@ AudioCdJob::AudioCdJob(
 {
     codec = l_codec;
     quality = l_quality;
+    setMajorStatusDescription("Working");
+    setMajorProgress(0);
+    setMinorStatusDescription("Working");
+    setMinorProgress(0);
 }         
 
 void AudioCdJob::run()
@@ -121,6 +125,10 @@ void AudioCdJob::run()
         exit();
     }
 
+    setMajorStatusDescription(QString("Import of %1").arg(playlist_name));
+    parent->bumpStatusGeneration();
+    parent->wakeUp();
+    
     //
     //  Ask the metadata server to mark the collection as being ripped
     //
@@ -137,11 +145,15 @@ void AudioCdJob::run()
     //
 
 
+    int counter = 0;
     QUrl track_url;
     bool found_track;
     QValueList<int>::Iterator iter;
     for ( iter = metadata_list.begin(); iter != metadata_list.end(); ++iter )
     {
+        parent->bumpStatusGeneration();
+        parent->wakeUp();
+        
         if(!keep_going)
         {   
             break;
@@ -209,10 +221,12 @@ void AudioCdJob::run()
         }
         else
         {
-            ripAndEncodeTrack(track_url, destination_filename, private_copy_of_metadata);
+            ripAndEncodeTrack(track_url, destination_filename, private_copy_of_metadata, counter, metadata_list.count());
         }
         
         delete private_copy_of_metadata;
+        
+        counter++;
     }
 
     //
@@ -239,13 +253,23 @@ void AudioCdJob::run()
     parent->wakeUp();
 }
 
-bool AudioCdJob::ripAndEncodeTrack(QUrl track_url, QString destination_filename, AudioMetadata *metadata)
+bool AudioCdJob::ripAndEncodeTrack(
+                                    QUrl track_url, 
+                                    QString destination_filename, 
+                                    AudioMetadata *metadata, 
+                                    int current_track_num,
+                                    int total_tracks
+                                  ) 
 {
     QCString destination = destination_filename.local8Bit();
     QCString temp_filename = destination;
     temp_filename.append(".nosweep");
 
-
+    setMinorStatusDescription(metadata->getTitle());
+    setMinorProgress(0);
+    parent->bumpStatusGeneration();
+    parent->wakeUp();
+    
     log(QString("attempting to rip this url: \"%1\"").arg(track_url), 3);
 
     QIODevice *source = NULL;
@@ -350,6 +374,19 @@ bool AudioCdJob::ripAndEncodeTrack(QUrl track_url, QString destination_filename,
         else
         {
             amount_read = source->readBlock(buffer, 4096);
+            int progress_before = getMinorProgress();
+            setMinorProgress(  (int) (((float) total_read / (float) file_size ) * 100.0));
+            int progress_after = getMinorProgress();
+
+            if(progress_before != progress_after)
+            {
+                float base_progress = (float) current_track_num / (float) total_tracks;
+                float incr_progress = (1.0 / (float) total_tracks) * ( (float) progress_after / 100.0); 
+                setMajorProgress( (int) ((base_progress + incr_progress ) * 100.0));
+                parent->bumpStatusGeneration();
+                parent->wakeUp();
+            }            
+            
             if(amount_read > 0)
             {
                 total_read += amount_read;

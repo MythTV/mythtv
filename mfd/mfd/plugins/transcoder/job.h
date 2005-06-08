@@ -27,11 +27,22 @@ class TranscoderJob: public QThread
                     int             l_job_id
                  );
     virtual ~TranscoderJob();
-    virtual void stop();
 
-    void log(const QString &log_message, int verbosity);
-    void warning(const QString &warn_message);
-    int  getId();
+    virtual void stop();
+    void    log(const QString &log_message, int verbosity);
+    void    warning(const QString &warn_message);
+    int     getId();
+
+    QString getMajorStatusDescription();
+    int     getMajorProgress();
+    QString getMinorStatusDescription();
+    int     getMinorProgress();
+
+    void    setMajorStatusDescription(const QString &new_status);
+    void    setMajorProgress(int new_progress);
+    void    setMinorStatusDescription(const QString &new_status);
+    void    setMinorProgress(int new_progress);
+
 
   protected:
   

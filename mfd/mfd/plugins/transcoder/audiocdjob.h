@@ -52,7 +52,13 @@ class AudioCdJob: public ImportJob
     
   protected:
   
-    bool            ripAndEncodeTrack(QUrl track_url, QString destination_filename, AudioMetadata *metadata);
+    bool            ripAndEncodeTrack(
+                                        QUrl track_url, 
+                                        QString destination_filename, 
+                                        AudioMetadata *metadata,
+                                        int current_track_num,
+                                        int total_tracks
+                                     );
     void            tryToCleanUp(QCString filename);
     void            handleFileTokens(QString &filename, AudioMetadata *track);
     static QString  fixFileToken(QString token);
