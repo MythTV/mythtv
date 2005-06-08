@@ -34,25 +34,17 @@ using namespace std;
 Action::Action(const QString & description, const QString & keys)
 {
     this->description() = description;
-    this->keys() = keys;
+    this->keys() = QStringList::split(", ", QString(QKeySequence(keys)));
 }
 
 
 
 bool Action::hasKey(const QString & key) const
 {
-
-    /* of course we dont silly */
-    if (this->getKeys().isEmpty() || this->getKeys().isNull()) return false;
-
-    /* Using the key sequence means we dont have to worry about
-       incorrect or malformed separators ("," vs ", ").*/
-    QKeySequence keyseq(this->getKeys());
-    QKeySequence newkey(key);
-
-    for (size_t i = 0; i < keyseq.count(); i++)
+    /* check the keys */
+    for (size_t i = 0; i < getKeys().count(); i++)
     {
-	if (newkey[0] == keyseq[i]) return true;
+	if (getKeys()[i] == key) return true;
     }
 
     /* the key was not found, so return false */
@@ -61,49 +53,39 @@ bool Action::hasKey(const QString & key) const
 
 
 
-void Action::addKey(const QString & key)
+bool Action::addKey(const QString & key)
 {
 
-    /* just add the key if there are none */
-    if ((this->getKeys().isEmpty()) || (this->getKeys().isNull()))
-    {
-	this->keys() = key;
-    }
-    else if (!hasKey(key))
-    {
-	QStringList keylist;
-	QKeySequence keyseq(key + "," + this->getKeys());
+    /* dont add empty keys and dont add too many, or duplicates  */
+    if ((key.length() == 0) ||
+	(getKeys().size() >= MAX_KEYS) ||
+	(getKeys().contains(key)))
+	return false;
 
-	/* add each key to the list */
-	for (size_t i = 0; i < keyseq.count(); i++)
-	    keylist.push_back(QString(QKeySequence(keyseq[i])));
-
-	/* join the darkside */
-	this->keys() = keylist.join(",");
-    }
+    /* add the key */
+    this->keys().push_back(key);
+    return true;
 }
 
 
 
-void Action::removeKey(const QString & key)
+/* comments in header */
+bool Action::replaceKey(const QString & newkey, const QString &oldkey)
 {
-
-    if (hasKey(key))
+    /* make sure that the key list doesn't already have the new key */
+    if (getKeys().contains(newkey) == 0)
     {
-	QStringList keylist;
-	QKeySequence keyseq(this->getKeys());
-	QKeySequence newkey(key);
-
-	for (size_t i = 0; i < keyseq.count(); i++)
+	for (size_t i = 0; i < getKeys().size(); i++)
 	{
-	    if (newkey[0] != keyseq[i])
+	    if (getKeys()[i] == oldkey)
 	    {
-		keylist.push_back(QString(QKeySequence(keyseq[i])));
+		keys()[i] = newkey;
+		return true;
 	    }
 	}
-
-	this->keys() = keylist.join(",");
     }
+
+    return false;
 }
 
 #endif /* ACTION_CPP */

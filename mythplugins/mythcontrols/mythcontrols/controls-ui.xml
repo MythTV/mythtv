@@ -1,167 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
 <mythuitheme>
 
  <window name="controls">
 
-  <font name="active" face="Arial">
-   <color>#ffffff</color>
-   <size>16</size>
-   <bold>yes</bold>
-  </font>
+   <font name="selected" face="Arial">
+     <color>#ffffff</color>
+     <size>14</size>
+     <bold>yes</bold>
+   </font>
 
-  <font name="inactive" face="Arial">
-   <color>#9999cc</color>
-   <size>16</size>
-   <bold>yes</bold>
-  </font>
+   <font name="active" face="Arial">
+     <color>#aaaaaa</color>
+     <size>14</size>
+     <bold>yes</bold>
+   </font>
 
-  <font name="selectable" face="Arial">
-   <color>#8cdeff</color>
-   <size>16</size>
-   <bold>yes</bold>
-  </font>
+   <font name="inactive" face="Arial">
+     <color>#9999cc</color>
+     <size>14</size>
+     <bold>yes</bold>
+   </font>
 
-  <font name="labels" face="Arial">
-   <color>#ffffff</color>
-   <size>16</size>
-   <shadow>1,1</shadow>
-   <bold>yes</bold>
-  </font>
+   <font name="selectable" face="Arial">
+     <color>#8cdeff</color>
+     <size>14</size>
+     <bold>yes</bold>
+   </font>
 
-  <font name="keysfont" face="Arial">
-   <color>#ffffff</color>
-   <size>12</size>
-   <shadow>1,1</shadow>
-   <bold>yes</bold>
-  </font>
+   <font name="labels" face="Arial">
+     <color>#ffffff</color>
+     <size>16</size>
+     <shadow>1,1</shadow>
+     <bold>yes</bold>
+   </font>
 
-  <font name="directorfnt" face="Arial">
-   <color>#ffffff</color>
-   <size>18</size>
-   <shadow>1,1</shadow>
-   <bold>yes</bold>
-  </font>
+   <font name="keys" face="Arial">
+     <color>#000000</color>
+     <size>18</size>
+     <shadow>1,1</shadow>
+     <bold>yes</bold>
+   </font>
 
-  <font name="moviedata" face="Arial">
-   <color>#ffff33</color>
-   <size>16</size>
-   <shadow>1,1</shadow>
-   <bold>yes</bold>
-  </font>
+   <font name="info" face="Arial">
+     <color>#ffffff</color>
+     <size>18</size>
+     <shadow>1,1</shadow>
+     <bold>yes</bold>
+   </font>
 
-  <font name="inactive_font" face="Arial">
-   <color>#9999cc</color>
-   <size>16</size>
-   <bold>yes</bold>
-  </font>
+   <font name="infotitle" face="Arial">
+     <color>#ffffff</color>
+     <size>24</size>
+     <shadow>10,10</shadow>
+     <bold>yes</bold>
+   </font>
 
-  <font name="bigtitle" face="Arial">
-   <color>#ffffff</color>
-   <dropcolor>#000000</dropcolor>
-   <size>50</size>
-   <shadow>3,3</shadow>
-   <bold>yes</bold>
-  </font>
+   <font name="message" face="Arial">
+     <color>#ffffff</color>
+     <size>16</size>
+     <shadow>1,1</shadow>
+     <bold>yes</bold>
+   </font>
 
-  <font name="titlefnt" face="Arial">
-   <color>#ffffff</color>
-   <dropcolor>#000000</dropcolor>
-   <shadow>1,1</shadow>
-   <size>27</size>
-   <bold>yes</bold>
-  </font>
+   <container name="controls">
+     <area>0,0,800,350</area>
 
-  <font name="leadfnt" face="Arial">
-   <color>#ffffff</color>
-   <dropcolor>#000000</dropcolor>
-   <shadow>1,1</shadow>
-   <size>40</size>
-   <bold>yes</bold>
-  </font>
+     <managedtreelist name="controltree" draworder="1" bins="2">
+       <area>0,40,800,310</area>
 
-  <font name="info" face="Arial">
-   <color>#ffffff</color>
-   <size>14</size>
-   <shadow>1,1</shadow>
-   <bold>yes</bold>
-  </font>
+       <image function="selectionbar" filename="bar.png"/>
+       <image function="uparrow" filename="scrollarrow-up.png"/>
+       <image function="downarrow" filename="scrollarrow-dn.png"/>
+       <image function="leftarrow" filename="scrollarrow-left.png"/>
+       <image function="rightarrow" filename="scrollarrow-right.png"/>
 
-  <font name="message" face="Arial">
-   <color>#ffffff</color>
-   <size>16</size>
-   <shadow>1,1</shadow>
-   <bold>yes</bold>
-  </font>
+       <bin number="1">
+	 <area>30,14,190,250</area>
+	 <fcnfont name="active" function="active"/>
+	 <fcnfont name="inactive" function="inactive"/>
+	 <fcnfont name="selected" function="selected"/>
+	 <fcnfont name="selectable" function="selectable"/>     
+       </bin>
 
-  <container name="controls">
-   <area>0,0,800,305</area>
+       <bin number="2">
+	 <area>240,14,530,265</area>
+	 <fcnfont name="active" function="active"/>
+	 <fcnfont name="inactive" function="inactive"/>
+	 <fcnfont name="active" function="selected"/>
+	 <fcnfont name="selectable" function="selectable"/>     
+       </bin>
 
-   <managedtreelist name="controltree" draworder="1" bins="2">
-    <area>0,40,800,310</area>
+     </managedtreelist>
 
-    <image function="selectionbar" filename="bar.png"/>
-    <image function="uparrow" filename="scrollarrow-up.png"/>
-    <image function="downarrow" filename="scrollarrow-dn.png"/>
-    <image function="leftarrow" filename="scrollarrow-left.png"/>
-    <image function="rightarrow" filename="scrollarrow-right.png"/>
+     <image name="showinglines" draworder="2" fleximage="yes">
+       <filename>showings.png</filename>
+       <position>0,0</position>
+     </image>
 
-    <bin number="1">
-     <area>30,22,190,250</area>
-     <fcnfont name="active" function="active"></fcnfont>
-     <fcnfont name="inactive" function="inactive"></fcnfont>
-     <fcnfont name="active" function="selected"></fcnfont>
-     <fcnfont name="selectable" function="selectable"></fcnfont>     
-    </bin>
+   </container>
 
-    <bin number="2">
-     <area>240,18,525,265</area>
-     <fcnfont name="active" function="active"></fcnfont>
-     <fcnfont name="inactive" function="inactive"></fcnfont>
-     <fcnfont name="active" function="selected"></fcnfont>
-     <fcnfont name="selectable" function="selectable"></fcnfont>     
-    </bin>
+   <container name="keys">
+     <area>0,300,800,320</area>
 
-   </managedtreelist>
+     <textarea name="infotitle" draworder="0">
+       <font>infotitle</font>
+       <area>282,20,236,40</area>
+       <value>Key Bindings</value>
+     </textarea>
 
-   <image name="showinglines" draworder="2" fleximage="yes">
-    <filename>showings.png</filename>
-    <position>0,4</position>
-   </image>
+     <textbutton name="action_one" draworder="0">
+       <position>20,100</position>
+       <image function="on" filename="kb-button-on.png"/>
+       <image function="off" filename="kb-button-off.png"/>
+       <font>keys</font>
+     </textbutton>
 
-  </container>
+     <textbutton name="action_two" draworder="0">
+       <position>200,100</position>
+       <image function="on" filename="kb-button-on.png"/>
+       <image function="off" filename="kb-button-off.png"/>
+       <font>keys</font>
+     </textbutton>
 
-  <container name="actioninfo">
-   <area>20,400,780,500</area>
+     <textbutton name="action_three" draworder="0">
+       <position>390,100</position>
+       <image function="on" filename="kb-button-on.png"/>
+       <image function="off" filename="kb-button-off.png"/>
+       <font>keys</font>
+     </textbutton>
 
-   <textarea name="action_keys_label" draworder="1" allign="left">
-    <font>info</font>
-    <area>20,10,130,30</area>
-    <value>Keys:</value>
-   </textarea>
+     <textbutton name="action_four" draworder="0">
+       <position>580,100</position>
+       <image function="on" filename="kb-button-on.png"/>
+       <image function="off" filename="kb-button-off.png"/>
+       <font>keys</font>
+     </textbutton>
 
-   <textarea name="action_keys" draworder="1" allign="left">
-    <font>info</font>
-    <area>175,10,680,30</area>
-   </textarea>
+     <image name="actionlines" draworder="1" allign="left">
+       <filename>cr-lines.png</filename>
+       <position>0,0</position>
+     </image>
 
-   <textarea name="action_description_label" draworder="1" allign="left">
-    <font>info</font>
-    <area>20,40,140,60</area>
-    <value>Description:</value>
-   </textarea>
+     <textarea name="description" draworder="1" allign="left">
+       <font>info</font>
+       <area>30,180,740,140</area>
+       <multiline>yes</multiline>
+     </textarea>
 
-   <textarea name="action_description" draworder="1" allign="left">
-    <font>info</font>
-    <multiline>yes</multiline>
-    <area>175,40,580,80</area>
-   </textarea>
-
-   <image name="datalines" draworder="3" fleximage="no">
-    <filename>rk-lines.png</filename>
-    <position>0,0</position>
-    <staticsize>760,100</staticsize>
-   </image>
-
-  </container>
+     
+   </container>
 
  </window>
 </mythuitheme>

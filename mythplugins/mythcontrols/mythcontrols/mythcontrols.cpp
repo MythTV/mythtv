@@ -47,37 +47,44 @@ using namespace std;
 
 #include "mythcontrols.h"
 #include "keygrabber.h"
-#include "conflictresolver.h"
+
+
+class ConflictResolver : public MythPopupBox
+{
+
+public:
+    ConflictResolver(MythMainWindow *window, ActionID *conflict)
+	: MythPopupBox(window, "conflictresolver")
+    {
+	QString warning = "The key you have chosen is already bound to "
+	    + conflict->action() + " in the " + conflict->context()
+	    + " context; please rebind it before binding this key.";
+	
+	addLabel("Action Conflict", Large, false);
+	addLabel(warning, Small, true);
+    }
+
+
+    ConflictResolver(MythMainWindow *window)
+	: MythPopupBox(window,"conflictresolver")
+    {
+
+	QString warning;
+	warning = "This action is manditory and needs at least one key bound ";
+	warning += "to it.  Instead, try rebinding with another key.";
+	    
+	addLabel("Manditory Action", Large, false);
+	addLabel(warning, Small, true);
+    }
+};
 
 
 /* comments in header */
 MythControls::MythControls (MythMainWindow *parent, const char *name) 
     :MythThemedDialog(parent, "controls", "controls-", name)
 {
-    /* by default, there is no popup */
-    popup = NULL;
-
-    /* Get the UI widgets that we need to work with */
-    action_description = getUITextType("action_description");
-    if (!action_description)
-      VERBOSE(VB_ALL, "Unable to load action_description");
-
-    action_keys = getUITextType("action_keys");
-    if (!action_keys)
-      VERBOSE(VB_ALL, "Unable to load action_keys");
-
-    control_tree_list=getUIManagedTreeListType("controltree");
-    if (!control_tree_list)
-    {
-	VERBOSE(VB_ALL, "Unable to load controltree");
-    }
-    else {
-
-	/* set some parameters for the tree */
-	control_tree_list->showWholeTree(true);
-	control_tree_list->colorSelectables(true);
-
-    }
+    /* load up the ui components */
+    loadUI();
 
     /* for starters, load this host */
     loadHost(gContext->GetHostName());
@@ -93,6 +100,109 @@ MythControls::~MythControls() { delete(this->key_bindings); }
 
 
 
+/* comments in header */
+bool MythControls::loadUI()
+{
+    /* the return value of the method */
+    bool retval = true;
+
+    /* by default, there is no popup */
+    popup = NULL;
+
+    /* Get the UI widgets that we need to work with */
+    description = getUITextType("description");
+    if (!description) {
+	VERBOSE(VB_ALL, "Unable to load action_description");
+	retval = false;
+    }
+
+    control_tree_list=getUIManagedTreeListType("controltree");
+    if (!control_tree_list)
+    {
+	VERBOSE(VB_ALL, "Unable to load controltree");
+	retval = false;
+    }
+    else {
+
+	/* set some parameters for the tree */
+	control_tree_list->showWholeTree(true);
+	control_tree_list->colorSelectables(true);
+	focused=control_tree_list;
+    }
+
+    /* Check that all the buttons are there */
+    if ((action_buttons[0] = getUITextButtonType("action_one")) == NULL)
+    {
+	VERBOSE(VB_ALL, "Unable to load first action button");
+	retval = false;
+    }
+    else if ((action_buttons[1] = getUITextButtonType("action_two")) == NULL)
+    {
+	VERBOSE(VB_ALL, "Unable to load second action button");
+	retval = false;
+    }
+    else if ((action_buttons[2] = getUITextButtonType("action_three")) == NULL)
+    {
+	VERBOSE(VB_ALL, "Unable to load thrid action button");
+	retval = false;
+    }
+    else if ((action_buttons[3] = getUITextButtonType("action_four")) == NULL)
+    {
+	VERBOSE(VB_ALL, "Unable to load fourth action button");
+	retval = false;
+    }
+
+    return retval;
+}
+
+
+
+/* comments in header */
+size_t MythControls::focusedButton(void) const
+{
+
+    for (size_t i = 0; i < Action::MAX_KEYS; i++)
+	if (focused == action_buttons[i]) return i;
+
+    return Action::MAX_KEYS;
+}
+
+
+void MythControls::focusButton(int direction)
+{
+    if (direction == 0)
+    {
+	focused = action_buttons[0];
+	action_buttons[0]->takeFocus();
+	control_tree_list->looseFocus();
+    }
+    else
+    {
+
+	/* change focus by at most one in either direction */
+	if (direction > 0) direction = 1;
+	else direction = -1;
+
+	/* figure out which button is focused */
+	int current = 0;
+	if (focused == action_buttons[1]) current=1;
+	else if (focused == action_buttons[2]) current = 2;
+	else if (focused == action_buttons[3]) current = 3;
+
+	/* determine the new focused button index */
+	int newb = current + direction;
+
+	/* focus an existing button */
+	if ((newb >= 0) && (newb < Action::MAX_KEYS))
+	{
+	    focused->looseFocus();
+	    focused = action_buttons[newb];
+	    focused->takeFocus();
+	}
+    }
+}
+
+
 void MythControls::keyPressEvent(QKeyEvent *e) {
 
     bool handled = false;
@@ -104,43 +214,90 @@ void MythControls::keyPressEvent(QKeyEvent *e) {
 	QString action = actions[i];
 	handled = true;
 
-	if (action == "SELECT" || action == "MENU" || action == "INFO")
+
+	if (action == "MENU" || action == "INFO")
 	{
-	    control_tree_list->select();
-	    actionMenu();
+	    /* bring up the menu */
+	    this->actionMenu();
 	}
-	else if (action == "MENU" || action == "INFO")
+	else if (action == "SELECT")
 	{
+	    if (focused == control_tree_list)
+	    {
+		if (control_tree_list->getActiveBin() == 1)
+		    control_tree_list->pushDown();
+		else
+		    focusButton(0);
+	    }
+	    else {
+		popup = new MythPopupBox(gContext->GetMainWindow(),"decision");
+		popup->addLabel(tr("Modify Action"),MythPopupBox::Large,false);
+		popup->addButton(tr("Set Binding"),this, SLOT(captureKey()));
+		popup->addButton(tr("Remove Binding"),this, SLOT(deleteKey()));
+		popup->addButton(tr("Cancel"), this,
+				 SLOT(killPopup()))->setFocus();
+		popup->ShowPopup();
+	    }
+	}
+	else if ((action == "ESCAPE") && (focused != control_tree_list))
+	{
+	    /* take focus away from the button, and give it to the
+	     * control tree */
+	    focused->looseFocus();
+	    control_tree_list->takeFocus();
+	    focused = control_tree_list;
 	}
 	else if (action == "UP")
 	{
-	    control_tree_list->moveUp();
-	    refreshKeyInformation();
+	    if (focused == control_tree_list)
+	    {
+		control_tree_list->moveUp();
+		refreshKeyInformation();
+	    }
+	    else focusButton(-1);
 	}
 	else if (action == "DOWN")
 	{
-	    control_tree_list->moveDown();
-	    refreshKeyInformation();
+	    if (focused == control_tree_list)
+	    {
+		control_tree_list->moveDown();
+		refreshKeyInformation();
+	    }
+	    else focusButton(1);
 	}
 	else if (action == "LEFT")
 	{
-	    control_tree_list->popUp();
-	    refreshKeyInformation();
+	    if (focused == control_tree_list)
+	    {
+		control_tree_list->popUp();
+		refreshKeyInformation();
+	    }
+	    else focusButton(-1);
 	}
 	else if (action == "RIGHT")
 	{
-	    control_tree_list->pushDown();
-	    refreshKeyInformation();
+	    if (focused == control_tree_list)
+	    {
+		control_tree_list->pushDown();
+		refreshKeyInformation();
+	    }
+	    else focusButton(1);
 	}
 	else if (action == "PAGEUP")
 	{
-	    control_tree_list->pageUp();
-	    refreshKeyInformation();
+	    if (focused == control_tree_list)
+	    {
+		control_tree_list->pageUp();
+		refreshKeyInformation();
+	    }
 	}
 	else if (action == "PAGEDOWN")
 	{
-	    control_tree_list->pageDown();
-	    refreshKeyInformation();
+	    if (focused == control_tree_list)
+	    {
+		control_tree_list->pageDown();
+		refreshKeyInformation();
+	    }
 	}
 	else handled = false;
     }
@@ -150,16 +307,29 @@ void MythControls::keyPressEvent(QKeyEvent *e) {
 
 
 
+/* comments in header */
 void MythControls::refreshKeyInformation() {
 
+    /* get the description of the current action */
     QString desc = key_bindings->getActionDescription(getCurrentContext(),
 						      getCurrentAction());
-    QString keys = key_bindings->getActionKeys(getCurrentContext(),
-					       getCurrentAction());
-    /* set the information */
-    action_description->SetText(desc);
-    action_keys->SetText(keys);
 
+    /* get the bindings of the current action */
+    QStringList keys = key_bindings->getActionKeys(getCurrentContext(),
+						   getCurrentAction());
+
+    size_t i;
+
+    /* fill existing keys */
+    for (i = 0; i < keys.count(); i++)
+	action_buttons[i]->setText(keys[i]);
+
+    /* blank the other ones */
+    for (; i < Action::MAX_KEYS; i++)
+	action_buttons[i]->setText("");
+
+    /* set the information */
+    description->SetText(desc);
 }
 
 
@@ -234,15 +404,8 @@ void MythControls::actionMenu()
     if (popup != NULL) return;
 
     popup = new MythPopupBox(gContext->GetMainWindow(), "editaction");
-
-    if (control_tree_list->getActiveBin() == 2)
-    {
-	popup->addButton(tr("Add Key"),this, SLOT(captureKey()));
-	popup->addButton(tr("Clear Key"), this, SLOT(clearActionKeys()));
-    }
-
     popup->addButton(tr("Save Changes"), this, SLOT(save()));
-    popup->addButton(tr("Done"),this, SLOT(killPopup()))->setFocus();
+    popup->addButton(tr("Cancel"),this, SLOT(killPopup()))->setFocus();
     popup->ShowPopup(this, SLOT(killPopup()));
 }
 
@@ -262,91 +425,73 @@ void MythControls::captureKey()
 
 
 
-void MythControls::addKeyToAction()
+void MythControls::deleteKey()
 {
-    QString event = ((KeyGrabPopupBox*)popup)->getCapturedKeyEvent();
 
-    key_bindings->addActionKey(getCurrentContext(),
-			       getCurrentAction(),
-			       event);
+    killPopup();
+
+    size_t b = focusedButton();
+    QString action = getCurrentAction(), context = getCurrentContext();
+    QStringList keys = key_bindings->getActionKeys(context, action);
+    if (b < keys.count())
+    {
+	if (!key_bindings->removeActionKey(context, action, keys[b]))
+	{
+	    this->popup = new ConflictResolver(gContext->GetMainWindow());
+	    this->popup->ExecPopup(this, SLOT(killPopup()));
+	}
+	else refreshKeyInformation();
+    }
+}
+
+
+
+void MythControls::addKeyToAction(void)
+{
+    size_t b = focusedButton();
+    QString newkey = ((KeyGrabPopupBox*)popup)->getCapturedKeyEvent();
+    QString action = getCurrentAction(), context = getCurrentContext();
+    QStringList keys = key_bindings->getActionKeys(context, action);
+    ActionID *conflict = NULL;
+
+    /* having got the key, kill the key grabber */
+    killPopup();
+
+    if (b < keys.count())
+    {
+	/* dont replace with the same key */
+	if (keys[b] != newkey) {
+	    if ((conflict = key_bindings->conflicts(context, newkey)))
+	    {
+		this->popup = new ConflictResolver(gContext->GetMainWindow(),
+						   conflict);
+		this->popup->ExecPopup(this, SLOT(killPopup()));
+	    }
+	    else key_bindings->replaceActionKey(context,action,newkey,keys[b]);
+	}
+    }
+    else {
+	if ((conflict = key_bindings->conflicts(context, newkey)))
+	{
+	    this->popup = new ConflictResolver(gContext->GetMainWindow(),
+					       conflict);
+	    this->popup->ExecPopup(this, SLOT(killPopup()));
+	}
+	else key_bindings->addActionKey(context, action, newkey);
+    }
+
+    /* delete the conflict and hide the popup*/
+    if (conflict) {
+	delete conflict;
+	killPopup();
+    }
 
     refreshKeyInformation();
+}
+
+void MythControls::save(void) {
+    key_bindings->commitChanges();
     killPopup();
 }
-
-
-
-void MythControls::clearActionKeys()
-{
-    key_bindings->setActionKeys(getCurrentContext(), getCurrentAction(), "");
-    refreshKeyInformation();
-}
-
-
-
-void MythControls::save()
-{
-
-    /* ensure the manditory keys are bound to something */
-    if (!key_bindings->hasManditoryBindings())
-    {
-	VERBOSE(VB_ALL, "Manditory bindings are not set, setting to defaults");
-	key_bindings->defaultManditoryBindings();
-	refreshKeyInformation();
-    }
-
-    /* check for conflicts */
-    KeyConflict *conflict = key_bindings->getKeyConflict();
-    if (conflict)
-    {
-	/* kill any popup that is currently showing */
-	killPopup();
-
-	ConflictResolver *cr;
-	cr = new ConflictResolver(gContext->GetMainWindow(),conflict);
-	this->popup = (MythPopupBox*)cr;
-	cr->addButton(cr->getButtonCaption(1), this,
-		      SLOT(keepFirst()))->setFocus();
-
-	cr->addButton(cr->getButtonCaption(2), this,
-		      SLOT(keepSecond()));
-
-	this->popup->ShowPopup(this,SLOT(killPopup()));
-    }
-    else key_bindings->commitChanges();
-}
-
-
-void MythControls::resolve(int winner)
-{
-
-    ConflictResolver *resolver = (ConflictResolver*)this->popup;
-    KeyConflict *conflict =  resolver->key_conflict;
-
-
-    if (winner == 1)
-    {
-	key_bindings->removeActionKey(conflict->getSecond().first,
-				      conflict->getSecond().second,
-				      conflict->getKey());
-    }
-    else if (winner == 2)
-    {
-	key_bindings->removeActionKey(conflict->getFirst().first,
-				      conflict->getFirst().second,
-				      conflict->getKey());
-    }
-    else
-    {
-	VERBOSE(VB_ALL, "Help!  Someone is abusing MythControls::resolve");
-	VERBOSE(VB_ALL, "I'm a private method, how is this possible");
-    }
-
-    this->killPopup();
-    this->refreshKeyInformation();
-    this->save();
-    delete conflict;
-}
-
 
 #endif /* MYTHCONTROLS_CPP */

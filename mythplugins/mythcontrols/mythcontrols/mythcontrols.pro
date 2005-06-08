@@ -16,8 +16,9 @@ INSTALLS += uifiles
 CFLAGS += -I$${PREFIX}/include
 
 # Input
-HEADERS += action.h keyconflict.h actionidentifier.h mythcontrols.h keybindings.h keygrabber.h conflictresolver.h
-SOURCES += main.cpp action.cpp keyconflict.cpp mythcontrols.cpp keybindings.cpp keygrabber.cpp conflictresolver.cpp
+HEADERS += action.h actionid.h mythcontrols.h keybindings.h keygrabber.h
+SOURCES += action.cpp actionset.cpp keybindings.cpp mythcontrols.cpp
+SOURCES += keygrabber.cpp main.cpp 
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

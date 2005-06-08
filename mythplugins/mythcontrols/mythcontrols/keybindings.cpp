@@ -20,11 +20,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
  * 02111-1307, USA
  *
- * @todo Make jump points take effect immediately.  This requires
- * changes to myth.
+ * This class is responsible for storing and loading the controls.  It
+ * acts as a layer between the actual key/action bindings (actionset)
+ * and the UI.
  *
- * @todo Prompt with a dialog when unbound manditory keys are going to
- * be bound to their defaults.
+ * @todo Unify the mapping stuff into separate function calls.  EG:
+ * remove, add
+ *
+ * @todo New data struct which holds the dicts and map, and maintains
+ * them both automatically.
  */
 
 /* QT */
@@ -40,9 +44,6 @@ using namespace std;
 
 enum query_indicies {CTXT, ACTN, DESC, KEYS};
 
-#define JUMP_DESC "For now, mythtv must be restarted for new jump point key bindings to take effect"
-
-
 
 KeyBindings::KeyBindings(const QString & hostname) {
     this->hostname() = hostname;
@@ -54,125 +55,31 @@ KeyBindings::KeyBindings(const QString & hostname) {
 
 
 
-QStringList KeyBindings::getContexts() const
+ActionID * KeyBindings::conflicts(const QString & context_name,
+				  const QString & key) const
 {
-    QStringList context_strings;
-    QDictIterator<Context> it(this->_contexts);
+    const QValueList<ActionID> &ids = actionset.getActions(key);
 
-    for (; it.current(); ++it)
-	context_strings.append(it.currentKey());
-    
-    return context_strings;
-}
+    /* trying to bind a jumppoint to an already bound key */
+    if ((context_name == JUMP_CONTEXT) && (ids.count() > 0))
+	return new ActionID(ids[0]);
 
-
-QStringList KeyBindings::getActions(const QString & context)
-{
-    QStringList action_strings;
-    QDictIterator<Action> it(*getContext(context));
-
-    for (; it.current(); ++it)
-	action_strings.append(it.currentKey());
-    
-    return action_strings;
-}
-
-
-
-QString KeyBindings::getActionKeys(const QString & context_name,
-				   const QString & action_name) const
-{
-  Action *action = getAction(context_name, action_name);
-
-  return action ? action->getKeys() : "";
-}
-
-
-
-QString KeyBindings::getActionDescription(const QString & context_name,
-					  const QString & action_name) const
-{
-    Action *action = this->getAction(context_name, action_name);
-
-    return action ? action->getDescription() : "";
-}
-
-
-
-void KeyBindings::addActionKey(const QString & context_name,
-			       const QString & action_name,
-			       const QString & key)
-{
-    Action *action = this->getAction(context_name, action_name);
-    if (action)
+    /* check the contexts of the other bindings */
+    for (size_t i = 0; i < ids.count(); i++)
     {
-	action->addKey(key);
-	this->modify(context_name,action_name);
+	if (ids[i].context() == JUMP_CONTEXT) return new ActionID(ids[i]);
+	else if (ids[i].context() == context_name) return new ActionID(ids[i]);
     }
-}
 
-void KeyBindings::removeActionKey(const QString & context_name,
-				  const QString & action_name,
-				  const QString & key)
-{
-    Action *action = this->getAction(context_name, action_name);
-
-    if (action)
-    {
-	action->removeKey(key);
-	this->modify(context_name,action_name);
-    }
+    /* no conflicts */
+    return NULL;
 }
 
 
 
-void KeyBindings::setActionKeys(const QString & context_name,
-				const QString & action_name,
-				const QString & keys)
-{
-    Action *action = this->getAction(context_name, action_name);
-    if (action)
-    {
-	action->setKeys(keys);
-	this->modify(context_name, action_name);
-    }
-}
-
-
-
-bool KeyBindings::isModified(const QString & context_name,
-			     const QString & action_name) const
+void KeyBindings::commitAction(const ActionID & id)
 {
 
-    QValueList<ActionIdentifier> modlist=this->getModified(context_name);
-    QValueList<ActionIdentifier>::iterator it;
-
-    for (it= modlist.begin(); it != modlist.end(); ++it)
-    {
-	if (((*it).first == context_name) && ((*it).second == action_name))
-	{
-	    return true;
-	}
-    }
-    return false;
-}
-
-
-void KeyBindings::modify(const QString & context_name,
-			 const QString & action_name)
-{
-    if (isModified(context_name, action_name)) return;
-
-    modified(context_name).push_back(ActionIdentifier(context_name,
-						      action_name));
-}
-
-
-
-void KeyBindings::commitAction(const ActionIdentifier & id)
-{
-
-    Action *action = getAction(id.first,id.second);
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE keybindings SET keylist = :KEYLIST "
 		  "WHERE hostname = :HOSTNAME "
@@ -181,31 +88,28 @@ void KeyBindings::commitAction(const ActionIdentifier & id)
 
     if (query.isConnected())
     {
+	QString keys = actionset.keyString(id);
 	query.bindValue(":HOSTNAME", this->getHostname());
-	query.bindValue(":CONTEXT", id.first);
-	query.bindValue(":ACTION", id.second);
-	query.bindValue(":KEYLIST", action->getKeys());
+	query.bindValue(":CONTEXT", id.context());
+	query.bindValue(":ACTION", id.action());
+	query.bindValue(":KEYLIST", keys);
 
 	if (query.exec() && query.isActive())
 	{
 	    /* remove the current bindings */
-	    gContext->GetMainWindow()->ClearKeylist(id.first,id.second);
+	    gContext->GetMainWindow()->ClearKey(id.context(),id.action());
 
 	    /* make the settings take effect */
-	    gContext->GetMainWindow()->RegisterKey(id.first,
-						   id.second,
-						   action->getDescription(),
-						   action->getKeys());
+	    gContext->GetMainWindow()->BindKey(id.context(), id.action(),keys);
 	}
     }
 }
 
 
 
-void KeyBindings::commitJumppoint(const ActionIdentifier &id)
+void KeyBindings::commitJumppoint(const ActionID &id)
 {
 
-    Action *action = getAction(id.first,id.second);
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE jumppoints "
 		  "SET keylist = :KEYLIST "
@@ -214,33 +118,41 @@ void KeyBindings::commitJumppoint(const ActionIdentifier &id)
 
     if (query.isConnected())
     {
+	QString keys = actionset.keyString(id);
 	query.bindValue(":HOSTNAME", this->getHostname());
-	query.bindValue(":DESTINATION", id.second);
-	query.bindValue(":KEYLIST", action->getKeys());
+	query.bindValue(":DESTINATION", id.action());
+	query.bindValue(":KEYLIST", keys);
 
 	/* tell the user to restart for settings to take effect */
-	if (query.exec() && query.isActive())
-	    VERBOSE(VB_ALL, "Restart myth to for jumppoint to take effect");
+	if (query.exec() && query.isActive()) {
 
-	/* reminds me of when I used windoze ;) */
+	    /* clear bindings to the jumppoint */
+	    gContext->GetMainWindow()->ClearJump(id.action());
+
+	    /* make the bindings take effect */
+	    gContext->GetMainWindow()->BindJump(id.action(),keys);
+	}
     }
-    
 }
 
 
 
 void KeyBindings::commitChanges(void)
 {
-    while (modifiedActions().size() > 0)
-    {	
-	commitAction(modifiedActions().front());
-	modifiedActions().pop_front();
-    }
+    ActionList modified = actionset.getModified();
 
-    while (modifiedJumppoints().size() > 0)
+    while (modified.size() > 0)
     {
-	commitJumppoint(modifiedJumppoints().front());
-	modifiedJumppoints().pop_front();
+	ActionID id = modified.front();
+
+	/* commit either a jumppoint or an action */
+	if (id.context() == JUMP_CONTEXT) commitJumppoint(id);
+	else commitAction(id);
+
+	/* tell the action set that the action is no longer modified */
+	actionset.unmodify(id);
+
+	modified.pop_front();
     }
 }
 
@@ -262,15 +174,14 @@ void KeyBindings::retrieveJumppoints()
     query.exec();
 
     /* add a context for jumppoints */
-    contexts().insert(JUMP_CONTEXT, new Context());
-    Context *jumppoints = getContext(JUMP_CONTEXT);
+    /*contexts().insert(JUMP_CONTEXT, new Context());
+      Context *jumppoints = getContext(JUMP_CONTEXT);*/
 
     for (query.next(); query.isValid(); query.next())
     {
-	Action *action = new Action(JUMP_DESC, query.value(2).toString());
-
-	jumppoints->insert(query.value(0).toString(), action);
-	
+	ActionID id(JUMP_CONTEXT, query.value(0).toString());
+	this->actionset.addAction(id,query.value(1).toString(),
+				  query.value(2).toString());
     }
 }
 
@@ -295,80 +206,40 @@ void KeyBindings::retrieveContexts()
 
     for (query.next(); query.isValid(); query.next())
     {
-	QString context_name = query.value(CTXT).toString();
-	if (!getContext(context_name))
-	    contexts().insert(context_name, new Context());
+	ActionID id(query.value(CTXT).toString(),query.value(ACTN).toString());
+	this->actionset.addAction(id,query.value(DESC).toString(),
+				  query.value(KEYS).toString());
 
-	Action *action = new Action(query.value(DESC).toString(),
-				    query.value(KEYS).toString());
+	/*if (!getContext(id.context()))
+	{
+	    contexts().insert(id.context(), new Context());
+	    }*/
 
-	getContext(context_name)->insert(query.value(ACTN).toString(),action);
+	/*Action *action = new Action(query.value(DESC).toString(),
+	  query.value(KEYS).toString());
+
+	  const QStringList &keys = action->getKeys();
+	  for (size_t i = 0; i < keys.count(); i++)
+	  {
+	  
+	  QValueList<ActionID> &ids = key_map[keys[i]];
+	  ids.push_back(id);
+	}
+
+	getContext(id.context())->insert(id.action(),action);*/
     }
 }
 
 
 
 /* comments in header */
-bool KeyBindings::actionsCanConflict(const ActionIdentifier & first,
-				     const ActionIdentifier & second) const
-{
-
-    /* necessasary conditions for a conflict */
-    return  (first.first == JUMP_CONTEXT ||
-	     second.first == JUMP_CONTEXT ||
-	     first.first == second.first);
-}
-
-
-
-/* comments in header */
-KeyConflict * KeyBindings::getKeyConflict(void) const
-{
-
-    QMap<QString,QValueList<ActionIdentifier> > key_map;
-
-
-    /* build a map based on key name */
-    for (QDictIterator<Context> cit(this->_contexts); cit.current(); ++cit)
-    {
-	QString context_string = cit.currentKey();
-	QDictIterator<Action> ait(*(cit.current()));
-	for (; ait.current(); ++ait)
-	{
-	    QStringList keys = QStringList::split(",",
-						  ait.current()->getKeys(),
-						  false);
-
-	    for(size_t i = 0; i < keys.count(); i++)
-		key_map[keys[i]].append(ActionIdentifier(cit.currentKey(),
-							 ait.currentKey()));
-	}
-    }
-
-    QValueList<KeyConflict> conflicts;
-
-    QMap<QString,QValueList<ActionIdentifier> >::Iterator it;
-
-    for (it = key_map.begin(); it != key_map.end(); it++)
-    {
-	QValueList<ActionIdentifier> actions = it.data();
-
-	for (size_t i = 0; i < actions.size(); i++)
-	{
-	    for (size_t j = i+1; j < actions.size(); j++)
-	    {
-		if (actionsCanConflict(actions[i], actions[j]))
-		{
-		    return new KeyConflict(it.key(), actions[i],
-					   actions[j]);
-		}
-	    }
-	}
-    }
-
-    /* no conflicts, return null */
-    return NULL;
-}
+/*bool KeyBindings::actionsCanConflict(const ActionID & first,
+  const ActionID & second) const
+  {
+  return  (first.context() == JUMP_CONTEXT ||
+  second.context() == JUMP_CONTEXT ||
+  first.context() == second.context());
+  }*/
 
 
 
@@ -376,22 +247,22 @@ void KeyBindings::loadManditoryBindings(void)
 {
     if (getManditoryBindings().empty())
     {
-	manditoryBindings().append(ActionIdentifier(GLOBAL_CONTEXT, "DOWN"));
+	manditoryBindings().append(ActionID(GLOBAL_CONTEXT, "DOWN"));
 	defaultKeys().append("Down");
 
-	manditoryBindings().append(ActionIdentifier(GLOBAL_CONTEXT, "UP"));
+	manditoryBindings().append(ActionID(GLOBAL_CONTEXT, "UP"));
 	defaultKeys().append("Up");
 
-	manditoryBindings().append(ActionIdentifier(GLOBAL_CONTEXT, "LEFT"));
+	manditoryBindings().append(ActionID(GLOBAL_CONTEXT, "LEFT"));
 	defaultKeys().append("Left");
 
-	manditoryBindings().append(ActionIdentifier(GLOBAL_CONTEXT, "RIGHT"));
+	manditoryBindings().append(ActionID(GLOBAL_CONTEXT, "RIGHT"));
 	defaultKeys().append("Right");
 
-	manditoryBindings().append(ActionIdentifier(GLOBAL_CONTEXT, "ESCAPE"));
+	manditoryBindings().append(ActionID(GLOBAL_CONTEXT, "ESCAPE"));
 	defaultKeys().append("Esc");
 
-	manditoryBindings().append(ActionIdentifier(GLOBAL_CONTEXT, "SELECT"));
+	manditoryBindings().append(ActionID(GLOBAL_CONTEXT, "SELECT"));
 	defaultKeys().append("Return,Enter,Space");
     }
 }
@@ -400,23 +271,13 @@ void KeyBindings::loadManditoryBindings(void)
 
 bool KeyBindings::hasManditoryBindings(void) const
 {
-    QValueList<ActionIdentifier> manlist = getManditoryBindings();
+    QValueList<ActionID> manlist = getManditoryBindings();
     for (size_t i = 0; i < manlist.count(); i++)
     {
-	if (getAction(manlist[i].first, manlist[i].second)->empty())
+	if (actionset.getKeys(manlist[i]).isEmpty())
 	    return false;
     }
 
     /* none are empty, return true */
     return true;
-}
-
-void KeyBindings::defaultManditoryBindings(void)
-{
-    QValueList<ActionIdentifier> manlist = getManditoryBindings();
-    for (size_t i = 0; i < manlist.count(); i++)    
-    {
-	Action *action = getAction(manlist[i].first, manlist[i].second);
-	if (action->empty()) action->setKeys(defaultKeys()[i]);
-    }
 }

@@ -23,19 +23,14 @@
 #ifndef MAIN_CPP
 #define MAIN_CPP
 
-/* C++ includes */
-#include <iostream>
-
-/* MythTV includes */
-#include <mythtv/mythcontext.h>
-#include <mythtv/uitypes.h>
-#include <mythtv/mythdialogs.h>
-#include <mythtv/themedmenu.h>
-
 using namespace std;
 
 #include "mythcontrols.h"
 
+
+
+/* These methods will be called in every share library containing a
+   plugin.  Use them to initialize, configure and run the plugin. */
 extern "C" {
   int mythplugin_init(const char *libversion);
   int mythplugin_run(void);
@@ -43,51 +38,50 @@ extern "C" {
 }
 
 
+
 /**
  * @brief Initialize the MythControls plugin
  * @param libversion The library version, I assume.
- * @return zero.
+ * @return zero if initialization was ok, otherwise, less than zero.
  */
 int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythcontrols", libversion,
-				    MYTH_BINARY_VERSION))
-    {
-
-	cout << "Returning" << endl;
-	return -1;
-    }
-
-    return 0;
+				    MYTH_BINARY_VERSION)) return -1;
+    else return 0;
 }
 
 
 
 /**
  * @brief Run the MythControls plugin.
- * @return zero.
+ * @return zero if the plugin was run successfully, otherwise, a value
+ * less than zero is returned.
  */
 int mythplugin_run (void)
 {
     MythControls controls(gContext->GetMainWindow(), "controls");
 
-    cout << "Executing" << endl;
-    controls.exec();
-    return 0;    
+    /* if the UI is successfully loaded, just giv'er*/
+    if (controls.loadUI())
+    {
+	controls.exec();
+	return 0;    
+    }
+    else
+    {
+	VERBOSE(VB_ALL, "Unable to load theme, exiting");
+	return -1;
+    }
 }
 
 
 
 /**
- * @brief Configure the MythNews plugin.
+ * @brief Configure the MythControls plugin.
  * @return zero.
  */
-int mythplugin_config (void)
-{
-    cout << "Configuring MythControls" << endl;
-
-    return 0;
-}
+int mythplugin_config (void) { return 0; }
 
 
 

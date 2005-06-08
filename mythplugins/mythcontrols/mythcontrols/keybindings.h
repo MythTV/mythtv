@@ -26,8 +26,8 @@
 #include <mythtv/mythdbcon.h>
 
 #include "action.h"
-#include "actionidentifier.h"
-#include "keyconflict.h"
+#include "actionid.h"
+#include "actionset.h"
 
 #define JUMP_CONTEXT "JumpPoints"
 #define GLOBAL_CONTEXT "Global"
@@ -66,14 +66,16 @@ class KeyBindings {
    * @brief Get a list of the context names.
    * @return A list of the context names.
    */
-  QStringList getContexts() const;
+  inline QStringList getContexts() const {return actionset.contextStrings();}
 
   /**
    * @brief Get a list of the actions in a context.
    * @param context The name of the context.
    * @return A list of action (names) for the target context.
    */
-  QStringList getActions(const QString & context);
+  inline QStringList getActions(const QString & context) {
+    return actionset.actionStrings(context);
+  }
 
   /**
    * @brief Get an action's keys.
@@ -81,8 +83,10 @@ class KeyBindings {
    * @param action_name The name of the action.
    * @return The keys bound to the specified context's action
    */
-  QString getActionKeys(const QString & context_name,
-			const QString & action_name) const;
+  inline QStringList getActionKeys(const QString & context_name,
+				   const QString & action_name) const {
+      return actionset.getKeys(ActionID(context_name, action_name));
+  }
 
   /**
    * @brief Get an action's description.
@@ -90,8 +94,10 @@ class KeyBindings {
    * @param action_name The name of the action.
    * @return The description of the specified context's action
    */
-  QString getActionDescription(const QString & context_name,
-			       const QString & action_name) const;
+  inline QString getActionDescription(const QString & context_name,
+				      const QString & action_name) const {
+    return actionset.getDescription(ActionID(context_name, action_name));
+  }
 
   /**
    * @brief Add a key to an action.
@@ -103,46 +109,61 @@ class KeyBindings {
    * This does not take effect until the commitChanges function is
    * called.
    */
-  void addActionKey(const QString & context_name,
+  inline void addActionKey(const QString & context_name,
 		    const QString & action_name,
-		    const QString & key);
+		    const QString & key) {
+      this->actionset.add(ActionID(context_name, action_name), key);
+  }
+
+  /**
+   * @brief Determine if adding a key would cause a conflict.
+   * @param context_name The name of the context.
+   * @param action_name The name of the action.
+   * @param key The key to add.
+   * @return true if adding the key would cause a conflict.
+   *
+   * Conflicts occur if:
+   * @li the key is a jump point, but is bound elsewhere
+   * @li the key is already bound to a jumppoint.
+   * @li the key is bound to something else in the specified context
+   */
+  ActionID * conflicts(const QString & context_name,
+		       const QString & key) const;
+
+  /**
+   * @brief Replace a key in an action.
+   * @param context_name The name of the context.
+   * @param action_name The name of the action.
+   * @param newkey The key to add.
+   * @param oldkey The index of the key to be replaced
+   * @see commitChanges
+   *
+   * This does not take effect until the commitChanges function is
+   * called.
+   */
+  inline void replaceActionKey(const QString & context_name,
+			       const QString & action_name,
+			       const QString & newkey,
+			       const QString & oldkey) {
+      this->actionset.replace(ActionID(context_name, action_name),
+			     newkey, oldkey);
+  }
 
   /**
    * @brief Unbind a key from an action.
    * @param context_name The name of the context.
    * @param action_name The name of the action.
    * @param key The key to remove.
-   */
-  void removeActionKey(const QString & context_name,
-		       const QString & action_name,
-		       const QString & key);
-
-  /**
-   * @brief Set the keys for an action.
-   * @param context_name The name of the context.
-   * @param action_name The name of the action.
-   * @param key The key to add.
-   * @see commitChanges
+   * @return true if the key was removed, or false if it was not.
    *
-   * This does not take effect until the commitChanges function is
-   * called.
+   * Unless the action is manditory there is only one key in the
+   * action, this method should return true.
    */
-  void setActionKeys(const QString & context_name,
-		     const QString & action_name,
-		     const QString & keys);
-
-  /**
-   * @brief Get a conflicting key.
-   * @return The first identified conflicting key.  If there are no
-   * conflicts NULL is returned.
-   */
-  KeyConflict * getKeyConflict(void) const;
-
-  /**
-   * @brief Determine if the manditory bindings are set.
-   * @return true if the manditory bindings are set, otherwise false.
-   */
-  bool hasManditoryBindings(void) const;
+  bool removeActionKey(const QString & context_name,
+		       const QString & action_name,
+		       const QString & key) {
+      return this->actionset.remove(ActionID(context_name, action_name),key);
+  }
 
   /**
    * @brief Set the manditory bindings to their defaults.
@@ -159,26 +180,18 @@ class KeyBindings {
   void commitChanges(void);
 
   /**
-   * @brief Get the appropriate container of modified actions based on
-   * context.
-   * @return The appropriate container of modified actions.
-   */
-  inline const QValueList<ActionIdentifier> & getModified(const QString & context_name) const
-  {
-    return (context_name == JUMP_CONTEXT) ? _modified_jumppoints :
-      _modified_actions;
-  }
-
-
-  /**
    * @brief Get a list of the manditory key bindings.
    * @return A list of the manditory bindings.
    */
-  inline const QValueList<ActionIdentifier>& getManditoryBindings(void) const
-  {
+  inline const QValueList<ActionID>& getManditoryBindings(void) const {
       return this->_manditory_bindings;
   }
-  
+
+  /**
+   * @brief Determine if all manditory bindings are satisfied.
+   * @return true if all manditory bindings are satisfied, otherwise, false.
+   */
+  bool hasManditoryBindings(void) const;
 
  protected:
 
@@ -189,101 +202,16 @@ class KeyBindings {
   inline QString & hostname() { return this->_hostname; }
 
   /**
-   * @brief Get a reference to the contexts.
-   * @return A reference to the contexts.
-   */
-  inline QDict<Context> & contexts() { return this->_contexts; }
-
-  /**
-   * @brief Get a context by its identifier.
-   * @param context The context identifier.
-   * @return The context, or null.
-   */
-  inline Context * getContext(const QString &context) const
-  {
-      return _contexts[context];
-  }
-
-  /**
-   * @brief Get an action by its context and name.
-   * @param context The context.
-   * @param action The action name.
-   * @return A pointer to the action.
-   */
-  inline Action * getAction(const QString & context,
-			    const QString & action) const
-  {
-    return getContext(context) ? (*getContext(context))[action] : NULL;
-  }
-
-  /**
-   * @brief Get an action by its action identifier.
-   * @param id The action identifier.
-   * @return A pointer to the action, or NULL.
-   */
-  inline Action * getAction (const ActionIdentifier &id) const
-  {
-      return getAction(id.first, id.second);
-  }
-
-  /**
-   * @brief Add an action to the list of modified actions.
-   * @param context_name The context the action is in.
-   * @param action_name The name of the action.
-   */
-  void modify(const QString & context_name, const QString & action_name);
-
-  /**
-   * @brief Determine if an action has been modified.
-   * @param context_name The context the action is in.
-   * @param action_name The name of the action.
-   * @return true if the action is modified, otherwise, false.
-   */
-  bool isModified(const QString & context_name,
-		  const QString & action_name) const;
-
-  /**
-   * @brief Get the appropriate container of modified actions based on
-   * context.
-   * @return The appropriate container of modified actions.
-   */
-  inline QValueList<ActionIdentifier> & modified(const QString & context_name)
-  {
-    return (context_name == JUMP_CONTEXT) ? _modified_jumppoints :
-      _modified_actions;
-  }
-
-  /**
-   * @brief Get a reference to the actions which have been modified.
-   * @return A value list of Action Identifiers corresponding to the
-   * actions that have been modified.
-   */
-  inline QValueList<ActionIdentifier> & modifiedActions()
-  {
-    return this->_modified_actions;
-  }
-
-  /**
-   * @brief Get a reference to the jumppoints which have been modified.
-   * @return A value list of Action Identifiers corresponding to the 
-   * jumppoints that have been modified.
-   */
-  inline QValueList<ActionIdentifier> & modifiedJumppoints()
-  {
-    return this->_modified_jumppoints;
-  }
-
-  /**
    * @brief Commit a jumppoint to the database.
    *
    * This (currently) does not reload the jumppoint.
    */
-  void commitJumppoint(const ActionIdentifier &id);
+  void commitJumppoint(const ActionID &id);
 
   /**
    * @brief Commit an action to the database, and reload its keybindings.
    */
-  void commitAction(const ActionIdentifier & id);
+  void commitAction(const ActionID & id);
 
   /**
    * @brief Load the jumppoints from the database.
@@ -307,20 +235,19 @@ class KeyBindings {
    * @return true if the actions could conflict if bound to the same
    * key.
    */
-  bool actionsCanConflict(const ActionIdentifier & first,
-			  const ActionIdentifier & second) const;
+  /*bool actionsCanConflict(const ActionID & first,
+    const ActionID & second) const;*/
 
   /**
    * @brief Load the manditory bindings.
    */
   void loadManditoryBindings(void);
 
-
   /**
    * @brief Get a reference to the list of the manditory key bindings.
    * @return A reference to the list of the manditory bindings.
    */
-  inline QValueList<ActionIdentifier> & manditoryBindings(void)
+  inline QValueList<ActionID> & manditoryBindings(void)
   {
       return this->_manditory_bindings;
   }
@@ -334,11 +261,9 @@ class KeyBindings {
  private:
 
   QString _hostname;
-  QDict<Context> _contexts;
-  QValueList<ActionIdentifier> _modified_actions;
-  QValueList<ActionIdentifier> _modified_jumppoints;
-  QValueList<ActionIdentifier> _manditory_bindings;
+  QValueList<ActionID> _manditory_bindings;
   QStringList _default_keys;
+  ActionSet actionset;
 };
 
 #endif /* KEYBINDINGS_H */

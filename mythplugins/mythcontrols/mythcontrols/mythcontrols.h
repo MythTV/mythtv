@@ -56,6 +56,17 @@ class MythControls : virtual public MythThemedDialog
     ~MythControls();
 
     /**
+     * @brief Load up UI.
+     * @return true if all UI elements were loaded successfully,
+     * otherwise false it returned.
+     *
+     * This method grabs all of the UI "thingies" that are needed by
+     * mythcontrols.  If this method returns false, the plugin should
+     * exit since it will probably just core dump.
+     */
+    bool loadUI();
+
+    /**
      * @brief Get the currently selected context string.
      * @return The currently selected context string.
      *
@@ -98,12 +109,23 @@ class MythControls : virtual public MythThemedDialog
      */
     void loadHost(const QString & hostname);
 
- private slots:
+    /**
+     * @brief Focus a button in a particular direction.
+     * @param direction Positave values focus to the right, negatives
+     * to the left.  A value of zero focuses the first button.
+     */
+    void focusButton(int direction);
 
-     /**
-      * @brief Clear the keys for the selected action.
-      */
-     void clearActionKeys();
+    /**
+     * @brief Determine which button is focused.
+     * @return Action::MAX_KEYS is no button is focused, otherwise, the
+     * index of the button is returned.
+     *
+     * @sa Action::MAX_KEYS
+     */
+    size_t focusedButton(void) const;
+
+ private slots:
 
      /**
       * @brief Add a key to the currently selected action.
@@ -116,6 +138,11 @@ class MythControls : virtual public MythThemedDialog
      void captureKey();
 
      /**
+      * @brief Delete the currently active key.
+      */
+     void deleteKey();
+
+     /**
       * @brief Kill the currently visbile popup window.
       */
      void killPopup();
@@ -125,24 +152,13 @@ class MythControls : virtual public MythThemedDialog
       */
      void save();
 
-     /**
-      * @brief Resolve the conflict.
-      * @param winner Which conflicting action to keep (first or second).
-      *
-      * This is supposed to be called when a conflict resolver has
-      * one of its buttons clicked.
-      */
-     void resolve(int winner);
-
-     inline void keepFirst() { resolve(1); }
-     inline void keepSecond() { resolve(2); }
-
  private:
 
+     UIType *focused;
      GenericTree * context_tree;
      UIManagedTreeListType * control_tree_list;
-     UITextType * action_description;
-     UITextType * action_keys;
+     UITextType *description;
+     UITextButtonType * action_buttons[Action::MAX_KEYS];
      KeyBindings *key_bindings;
      MythPopupBox *popup;
 };
