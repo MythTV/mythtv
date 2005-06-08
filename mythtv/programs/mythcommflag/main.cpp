@@ -503,7 +503,7 @@ int main(int argc, char *argv[])
 
     QString binname = finfo.baseName();
 
-    print_verbose_messages = VB_NONE;
+    print_verbose_messages = VB_IMPORTANT;
     verboseString = "important";
 
     while (argpos < a.argc())
@@ -680,6 +680,7 @@ int main(int argc, char *argv[])
                     QStringList verboseOpts;
                     verboseOpts = QStringList::split(',', a.argv()[argpos+1]);
                     ++argpos;
+                    print_verbose_messages = VB_NONE;
                     for (QStringList::Iterator it = verboseOpts.begin();
                          it != verboseOpts.end(); ++it )
                     {
