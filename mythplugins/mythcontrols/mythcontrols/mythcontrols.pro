@@ -7,7 +7,7 @@ target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target
 
 uifiles.path = $${PREFIX}/share/mythtv/themes/default
-uifiles.files = controls-ui.xml
+uifiles.files = controls-ui.xml ../images/kb-button-on.png ../images/kb-button-off.png
 installfiles.path = $${PREFIX}/share/mythtv
 installfiles.files = controls-ui.xml
 
