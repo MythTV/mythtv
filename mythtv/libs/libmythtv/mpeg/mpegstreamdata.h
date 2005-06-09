@@ -11,6 +11,7 @@ class ProgramMapTable;
 class HDTVRecorder;
 class PSIPTable;
 class RingBuffer;
+class PESPacket;
 
 typedef QMap<unsigned int, PESPacket*> pid_pes_map_t;
 
