@@ -3,6 +3,7 @@
 // Some functions to do simple sanity checks on the MythTV setup.
 // CheckSetup() is currently meant for the mythtv-setup program,
 // but the other functions could probably be called from anywhere.
+// They all return true if any problems are found.
 
 #include <qstring.h>
 #include <qdir.h>
@@ -10,7 +11,7 @@
 #include "libmyth/mythcontext.h"
 
 
-static void checkPath(QString path, QString *probs)
+static bool checkPath(QString path, QString *probs)
 {
     QDir dir(path);
     if (!dir.exists())
@@ -19,7 +20,7 @@ static void checkPath(QString path, QString *probs)
         probs->append(QString(" %1 ").arg(path));
         probs->append(QObject::tr("doesn't exist"));
         probs->append(".\n");
-        return;
+        return true;
     }
 
     QFile test(path.append("/.test"));
@@ -31,15 +32,20 @@ static void checkPath(QString path, QString *probs)
         probs->append(QString(" %1 - ").arg(path));
         probs->append(QObject::tr("directory is not writable?"));
         probs->append("\n");
+        return true;
     }
+
+    return false;
 }
 
 
 // Do the recording and Live TV filesystem paths exist? Are they writable?
 // Note that this should be checking by hostname, but doesn't yet.
 
-void checkStoragePaths(QString *probs)
+bool checkStoragePaths(QString *probs)
 {
+    bool problemFound = false;
+
     MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
 
     query->prepare("SELECT data FROM settings"
@@ -48,13 +54,14 @@ void checkStoragePaths(QString *probs)
     if (!query->exec() || !query->isActive())
     {
         MythContext::DBError("checkStoragePaths", *query);
-        return;
+        return false;
     }
 
     if (query->size())
     {
         query->first();
-        checkPath(query->value(0).toString(), probs);
+        if (checkPath(query->value(0).toString(), probs))
+            problemFound = true;
     }
     else
         VERBOSE(VB_GENERAL, QString("RecordFilePrefix is not set?"));
@@ -68,19 +75,22 @@ void checkStoragePaths(QString *probs)
     if (!query2->exec() || !query2->isActive())
     {
         MythContext::DBError("checkStoragePaths", *query2);
-        return;
+        return false;
     }
 
     if (query2->size())
     {
         query2->first();
         if (query->value(0).toString() != query2->value(0).toString())
-            checkPath(query2->value(0).toString(), probs);
+            if (checkPath(query2->value(0).toString(), probs))
+                problemFound = true;
     }
     else
         VERBOSE(VB_GENERAL, QString("LiveBufferDir is not set?"));
 
     delete query; delete query2;
+
+    return problemFound;
 }
 
 
@@ -88,8 +98,10 @@ void checkStoragePaths(QString *probs)
 // so this checks that the assigned channel (which may be the default of 3)
 // actually exists. This should save a few beginner Live TV problems
 
-void checkChannelPresets(QString *probs)
+bool checkChannelPresets(QString *probs)
 {
+    bool problemFound = false;
+
     MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
 
     query->prepare("SELECT cardid, startchan, sourceid, inputname"
@@ -98,7 +110,7 @@ void checkChannelPresets(QString *probs)
     if (!query->exec() || !query->isActive())
     {
         MythContext::DBError("checkChannelPresets", *query);
-        return;
+        return false;
     }
 
     while (query->next())
@@ -120,7 +132,7 @@ void checkChannelPresets(QString *probs)
         if (!channelExists.exec() || !channelExists.isActive())
         {
             MythContext::DBError("checkChannelPresets", channelExists);
-            return;
+            return problemFound;
         }
 
         if (channelExists.size() == 0)
@@ -133,20 +145,18 @@ void checkChannelPresets(QString *probs)
             probs->append(QString(" %1, ").arg(startchan));
             probs->append(QObject::tr("which does not exist"));
             probs->append(".\n");
+            problemFound = true;
         }
     }
 
     delete query;
+
+    return problemFound;
 }
 
 
 bool CheckSetup(QString *problems)
 {
-    checkStoragePaths(problems);
-    checkChannelPresets(problems);
-
-    if (problems->isNull())
-        return false;
- 
-    return true;
+    return checkStoragePaths(problems)
+        || checkChannelPresets(problems);
 }
