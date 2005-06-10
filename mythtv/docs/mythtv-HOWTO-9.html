@@ -59,6 +59,7 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  The last slash "/" is not required.</P>
 <P>The first thing to configure is the Master backend system.  If you are
 running multiple backend systems, the Master backend will make all
 decisions about which programs will be recorded on which tuners.  If you
@@ -315,8 +316,9 @@ mythbackend, type <CODE>mythbackend -h</CODE> for help.</P>
 <P>As of MythTV v0.18.1, the available options are:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ mythbackend -h
+$ mythbackend --help
 Valid options are:
+-h or --help                   List valid command line parameters
 -l or --logfile filename       Writes STDERR and STDOUT messages to filename
 -p or --pidfile filename       Write PID of mythbackend to filename
 -d or --daemon                 Runs mythbackend as a daemon

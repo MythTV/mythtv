@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-05-25, v0.18.05
+<date>2005-06-10, v0.18.06
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -14,9 +14,9 @@ necessary.
 <toc>
 <sect>First things first.
 <sect1>What is MythTV?
-<p>MythTV is a suite of programs that allow you to build the mythical home
-media convergence box on your own using Open Source software and operating
-systems.
+<p>MythTV is a GPL licensed suite of programs that allow you to build the
+mythical home media convergence box on your own using Open Source software
+and operating systems.
 
 MythTV has a number of capabilities.  The television portion allows you to
 do the following:
@@ -1284,9 +1284,10 @@ name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
 </caption>
 </figure>
 
-If you are in North America you will use the DataDirect
-grabber which is built-in to MythTV.  You <em>do not</em> need to install
-XMLTV, but you need <bf>wget</bf> version 1.9.1 or higher.
+If you are in North America you will use the DataDirect grabber which is
+built-in to MythTV.  You <em>do not</em> need to install XMLTV (so you may
+skip XMLTV-related instructions), but you need <bf>wget</bf> version 1.9.1
+or higher.
 
 Get XMLTV from <url url="http://xmltv.sourceforge.net"
 name="http://xmltv.sourceforge.net">.  Download the latest version (0.5.39).
@@ -1405,7 +1406,6 @@ $ su
 </verb></tscreen>
 
 <sect1>Configuring the Zap2It.com DataDirect service <label id="ConfigureDD">
-<sect2>Introduction
 <p>Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
 Tribune Media Services.  TMS is one of the primary providers for program
 listing data in the United States and Canada.  There are a number of
@@ -2378,6 +2378,8 @@ $ su
 # exit
 </verb></tscreen>
 
+<bf>NOTE</bf>:  The last slash "/" is not required.
+
 The first thing to configure is the Master backend system.  If you are
 running multiple backend systems, the Master backend will make all
 decisions about which programs will be recorded on which tuners.  If you
@@ -2645,8 +2647,9 @@ mythbackend, type <tt>mythbackend -h</tt> for help.
 
 As of MythTV v0.18.1, the available options are:
 <tscreen><verb>
-$ mythbackend -h
+$ mythbackend --help
 Valid options are:
+-h or --help                   List valid command line parameters
 -l or --logfile filename       Writes STDERR and STDOUT messages to filename
 -p or --pidfile filename       Write PID of mythbackend to filename
 -d or --daemon                 Runs mythbackend as a daemon
@@ -7500,6 +7503,10 @@ input device in each class.  Remove note that Plextor is in CVS since it's
 now in released code.  Add more information on hard drive requirements.  Spelling.
 v0.18.04, 2005-05-16.  Bump to v0.18.1.
 v0.18.05, 2005-05-25.  Alter some of the troubleshooting text about full duplex.
+v0.18.06, 2005-06-10.  Add note about mulitple slashes.  Update mythbackend
+help text.  Add GPL.  Add a bit on skipping XMLTV.  Get rid of a superfluous
+subsection for DataDirect.
+
 -->
 
 <!--

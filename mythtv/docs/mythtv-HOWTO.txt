@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-05-25, v0.18.05
+  2005-06-10, v0.18.06
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -85,7 +85,6 @@
         5.2.2 Mandrake
         5.2.3 Manual installation
      5.3 Configuring the Zap2It.com DataDirect service
-        5.3.1 Introduction
      5.4 Manually building MythTV
         5.4.1 Enabling real-time scheduling of the display thread.
         5.4.2 Frontend-only configuration
@@ -213,7 +212,6 @@
      19.1 Manual Compilation of Prerequisites
      19.2 Pre-compiled binaries
      19.3 Running the Myth Transcoding Daemon
-
   20. MythNews.
   21. Troubleshooting.
      21.1 Compiling
@@ -323,9 +321,9 @@
 
   [1m1.1.  What is MythTV?[0m
 
-  MythTV is a suite of programs that allow you to build the mythical
-  home media convergence box on your own using Open Source software and
-  operating systems.
+  MythTV is a GPL licensed suite of programs that allow you to build the
+  mythical home media convergence box on your own using Open Source
+  software and operating systems.
 
   MythTV has a number of capabilities.  The television portion allows
   you to do the following:
@@ -344,6 +342,8 @@
      client can watch any program that was recorded by any of the
      servers.  Clients can be diskless and controlled entirely by a
      remote control.
+
+
   +o  You may use any combination of standard analog capture card,
      MPEG-2, MJPEG, DVB or HDTV capture devices.  With appropriate
      hardware, MythTV can control set top boxes, often found in digital
@@ -1747,8 +1747,9 @@
   <http://www.mythtv.org/mailman/listinfo/mythtv-dev/> mailing lists.
 
   If you are in North America you will use the DataDirect grabber which
-  is built-in to MythTV.  You [4mdo[24m [4mnot[24m need to install XMLTV, but you need
-  [1mwget [22mversion 1.9.1 or higher.
+  is built-in to MythTV.  You [4mdo[24m [4mnot[24m need to install XMLTV (so you may
+  skip XMLTV-related instructions), but you need [1mwget [22mversion 1.9.1 or
+  higher.
 
   Get XMLTV from http://xmltv.sourceforge.net
   <http://xmltv.sourceforge.net>.  Download the latest version (0.5.39).
@@ -1900,8 +1901,6 @@
 
   [1m5.3.  Configuring the Zap2It.com DataDirect service[0m
 
-  [1m5.3.1.  Introduction[0m
-
   Zap2It DataDirect is a service provided by Zap2It, a subsidiary of
   Tribune Media Services.  TMS is one of the primary providers for
   program listing data in the United States and Canada.  There are a
@@ -1962,6 +1961,8 @@
 
   On a single CPU machine, you would type the following to compile
   MythTV:
+
+
 
   $ qmake mythtv.pro
   $ make
@@ -3010,6 +3011,8 @@
 
 
 
+  [1mNOTE[22m:  The last slash "/" is not required.
+
   The first thing to configure is the Master backend system.  If you are
   running multiple backend systems, the Master backend will make all
   decisions about which programs will be recorded on which tuners.  If
@@ -3048,10 +3051,8 @@
   remote access to the MySQL database.  The following instructions may
   or may not work.  Add the following to /etc/my.cnf on the backend
   machine and restart MySQL.
-
-
-  skip-innodb
-  set-variable=thread_stack=256k
+       skip-innodb
+       set-variable=thread_stack=256k
 
 
 
@@ -3297,8 +3298,9 @@
 
 
 
-  $ mythbackend -h
+  $ mythbackend --help
   Valid options are:
+  -h or --help                   List valid command line parameters
   -l or --logfile filename       Writes STDERR and STDOUT messages to filename
   -p or --pidfile filename       Write PID of mythbackend to filename
   -d or --daemon                 Runs mythbackend as a daemon
@@ -3355,7 +3357,6 @@
   depending on any number of factors, most of which you can't control.
   It's best to just let the program run to completion.  [1mmythfilldatabase[0m
   [1m--help [22mwill give a full listing of the options available.
-
   [1mmythfilldatabase --manual [22mis another option; the manual option will
   allow you to fine tune channel frequencies and specify which channels
   will be added to the database.  If you are not using the tv_grab_na
