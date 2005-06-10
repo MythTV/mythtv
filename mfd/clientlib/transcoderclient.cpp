@@ -11,7 +11,12 @@
 #include <iostream>
 using namespace std;
 
+#include <qapplication.h>
+
 #include "transcoderclient.h"
+#include "jobtracker.h"
+#include "events.h"
+#include "mfdinterface.h"
 #include "../mfdlib/httpoutrequest.h"
 #include "../mfdlib/httpinresponse.h"
 #include "../mtcplib/markupcodes.h"
@@ -33,14 +38,15 @@ TranscoderClient::TranscoderClient(
                           )
 {
     generation = 0;
+    job_list.setAutoDelete(true);
 }
 
 void TranscoderClient::executeCommand(QStringList new_command)
 {
 
-    if(new_command.count() != 3)
+    if(new_command.count() < 1)
     {
-        cerr << "wrong number of tokens to TranscoderClient::executeCommand(): "
+        cerr << "no tokens to TranscoderClient::executeCommand(): "
              << new_command.join(" ")
              << endl;
         return;
@@ -48,6 +54,13 @@ void TranscoderClient::executeCommand(QStringList new_command)
 
     if(new_command[0] == "ripaudiocd")
     {
+        if(new_command.count() != 3)
+        {
+            cerr << "bad tokens to TranscoderClient::executeCommand(): "
+                 << new_command.join(" ")
+                 << endl;
+            return;
+        }
         bool ok;
         int which_collection = new_command[1].toInt(&ok);
         if(!ok)
@@ -86,6 +99,40 @@ void TranscoderClient::executeCommand(QStringList new_command)
             return;
         }
         requestRipAudioCd(which_collection, which_playlist);
+    }
+    else if(new_command[0] == "canceljob")
+    {
+        if(new_command.count() != 2)
+        {
+            cerr << "bad number of tokens to TranscoderClient::executeCommand(): "
+                 << new_command.join(" ")
+                 << endl;
+            return;
+        }
+        bool ok;
+        int which_job = new_command[1].toInt(&ok);
+        if(!ok)
+        {
+            cerr << "could not parse \""
+                 << new_command[1]
+                 << "\" into a job number in "
+                 << "TranscoderClient::executeCommand()"
+                 <<endl;
+            return;
+        }
+        if(which_job < 1)
+        {
+            cerr << "bad job number ("
+                 << which_job
+                 << ") is TranscoderClient::executeCommand()"
+                 <<endl;
+            return;
+        }
+        requestCancelJob(which_job);
+    }
+    else
+    {
+        cerr << "bad command to TranscoderClient::executeCommand()" << endl;
     }
 }
 
@@ -176,6 +223,13 @@ void TranscoderClient::requestRipAudioCd(int collection_id, int playlist_id)
     request.send(client_socket_to_service);
 }
 
+void TranscoderClient::requestCancelJob(int job_id)
+{
+    HttpOutRequest request("/canceljob", ip_address);
+    request.addHeader(QString("Job: %1").arg(job_id));
+    request.send(client_socket_to_service);
+}
+
 void TranscoderClient::processResponse(HttpInResponse *httpin_response)
 {
 
@@ -261,6 +315,12 @@ void TranscoderClient::processResponse(HttpInResponse *httpin_response)
     }
 
     //
+    //  Clear out any previous job history
+    //
+
+    job_list.clear();
+
+    //
     //  Create an mtcp input object with the payload from the response
     //
     
@@ -282,7 +342,16 @@ void TranscoderClient::processResponse(HttpInResponse *httpin_response)
         return;
     }
 
+    //
+    //  Build an send an event that has the current state of all the jobs
+    //
+    
+    MfdTranscoderJobListEvent *jle = new MfdTranscoderJobListEvent(mfd_id, &job_list);
+    QApplication::postEvent(mfd_interface, jle);
+
     sendStatusRequest();
+    
+    
 }
 
 void TranscoderClient::sendFirstRequest()
@@ -420,7 +489,6 @@ void TranscoderClient::parseJobInfo(MtcpInput &mtcp_input)
             break;
         }
     }
-    //cout << "I see " << new_job_count << " jobs" << endl;
 }
 
 
@@ -444,6 +512,7 @@ void TranscoderClient::parseJob(MtcpInput &mtcp_input)
     
     MtcpInput rebuilt_internals(group_contents);
 
+    uint32_t    new_job_id = 0;
     QString     new_job_major_description;
     uint32_t    new_job_major_progress = 0;
     QString     new_job_minor_description;
@@ -460,6 +529,10 @@ void TranscoderClient::parseJob(MtcpInput &mtcp_input)
         
         switch(content_code)
         {
+            case MtcpMarkupCodes::job_id:
+                new_job_id = rebuilt_internals.popJobId();
+                break;
+                
             case MtcpMarkupCodes::job_major_description:
                 new_job_major_description = rebuilt_internals.popMajorDescription();
                 break;
@@ -488,21 +561,28 @@ void TranscoderClient::parseJob(MtcpInput &mtcp_input)
         }
     }
 
-/*
-    cout << "Job: \"" 
-         << new_job_major_description 
-         << "\" (" 
-         << new_job_major_progress
-         << ")  ~  \""
-         << new_job_minor_description
-         << "\" ("
-         << new_job_minor_progress
-         << ")"
-         << endl;
-*/
-         
+    //
+    //  Create a new job tracker object to store the state of this job
+    //
+    
+    if(new_job_id > 0)
+    {
+        JobTracker *new_jt = new JobTracker(
+                                            new_job_id,
+                                            new_job_major_progress,
+                                            new_job_minor_progress,
+                                            new_job_major_description,
+                                            new_job_minor_description
+                                           );
+        job_list.append(new_jt);
+    }
+    else
+    {
+        cerr << "transcoderclient.o: bad job id in mtcp payload" << endl;
+    }
 }
 
 TranscoderClient::~TranscoderClient()
 {
+    job_list.clear();
 }

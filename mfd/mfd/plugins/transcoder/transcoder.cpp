@@ -24,7 +24,7 @@ Transcoder *transcoder = NULL;
 Transcoder::Transcoder(MFD *owner, int identity)
       :MFDHttpPlugin(owner, identity, mfdContext->getNumSetting("mfd_transcoder_port"), "transcoder", 2)
 {
-
+    job_id = 0;    
     status_generation = 1;
     top_level_directory = NULL;
     music_destination_directory = NULL;
@@ -264,6 +264,10 @@ void Transcoder::handleIncoming(HttpInRequest *httpin_request, int client_id)
     {
         handleStartJobRequest(httpin_request);
     }
+    else if(top_level == "canceljob")
+    {
+        handleCancelJobRequest(httpin_request);
+    }
     else
     {
         HttpOutResponse *response = httpin_request->getResponse();
@@ -323,7 +327,6 @@ void Transcoder::handleStatusRequest(HttpInRequest *httpin_request, int client_i
         MtcpOutput status_response;
         int generation_value = buildStatusResponse(&status_response);
         sendResponse(httpin_request->getResponse(), status_response, generation_value);
-        cout << "send status of " << generation_value << " to client " << client_id << endl;
     }
     else
     {
@@ -375,6 +378,7 @@ int Transcoder::buildStatusResponse(MtcpOutput *status_response)
             for(a_job = jobs.first(); a_job; a_job = jobs.next())
             {
                 status_response->addJobGroup();
+                    status_response->addJobId(a_job->getId());
                     status_response->addJobMajorDescription(a_job->getMajorStatusDescription());
                     status_response->addJobMajorProgress(a_job->getMajorProgress());
                     status_response->addJobMinorDescription(a_job->getMinorStatusDescription());
@@ -432,7 +436,7 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
             jobs_mutex.lock();
                 TranscoderJob *new_job = new AudioCdJob(    
                                                         this, 
-                                                        bumpStatusGeneration(),
+                                                        bumpJobId(),
                                                         top_level_directory->path(),
                                                         music_destination_directory->path(),
                                                         metadata_server,
@@ -460,6 +464,55 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
         httpin_request->getResponse()->setError(404);
     }
 
+}
+
+void Transcoder::handleCancelJobRequest(HttpInRequest *httpin_request)
+{
+    //
+    //  Client wants to cancel an existing job
+    //
+    
+    QString job_string = httpin_request->getHeader("Job");
+
+
+    bool ok;
+    int job_id = job_string.toInt(&ok);
+    if(!ok)
+    {
+        warning(QString("could not parse job id from \"%1\" to "
+                        "cancel job").arg(job_string));
+        return;
+    }
+
+    //
+    //  Find job and kill it
+    //
+
+    bool found_job = false;
+    jobs_mutex.lock();
+        TranscoderJob *a_job;
+        for(a_job = jobs.first(); a_job; a_job = jobs.next())
+        {
+            if(a_job->getId() == job_id)
+            {
+                a_job->stop();
+                a_job->wait();
+                jobs.remove(a_job);
+                found_job = true;
+                bumpStatusGeneration();
+                break;
+            }
+        }
+    jobs_mutex.unlock();
+
+    if(!found_job)
+    {
+        warning(QString("could not find a job with an id of %1 "
+                        "to satisy a cancel job request")
+                        .arg(job_id));
+    }
+
+    httpin_request->sendResponse(false);
 }
 
 void Transcoder::checkJobs()
@@ -520,7 +573,6 @@ void Transcoder::updateStatusClients()
             {
                 MFDHttpPlugin::sendResponse(ct->getClientId(), hanging_response);
                 hanging_status_clients.remove(ct);
-                cout << "send status of " << current_generation << " to client " << ct->getClientId() << endl;
             }
             else
             {
@@ -542,6 +594,16 @@ int Transcoder::bumpStatusGeneration()
         return_value = status_generation;
     status_generation_mutex.unlock();
 
+    return return_value;
+}
+
+int Transcoder::bumpJobId()
+{
+    int return_value = 0;
+    job_id_mutex.lock();
+        job_id++;
+        return_value = job_id;
+    job_id_mutex.unlock();
     return return_value;
 }
 

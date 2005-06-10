@@ -250,6 +250,7 @@ void AudioCdJob::run()
     //  Nudge our parent, that they might notice our demise
     //
 
+    parent->bumpStatusGeneration();
     parent->wakeUp();
 }
 
@@ -264,8 +265,50 @@ bool AudioCdJob::ripAndEncodeTrack(
     QCString destination = destination_filename.local8Bit();
     QCString temp_filename = destination;
     temp_filename.append(".nosweep");
+    
+    //
+    //  Need to check that both temp_file and destination can be created
+    //
+    
+    QFile temp_checker(temp_filename);
+    if(!temp_checker.open(IO_ReadWrite))
+    {
+        warning(QString("can't write temporary file: \"%1\"")
+                        .arg(temp_filename));
+        return false;
+    }
+    else
+    {
+        if(!temp_checker.remove())
+        {
+            warning(QString("can't remove temporary file: \"%1\"")
+                            .arg(temp_filename));
+        }
+    }
 
-    setMinorStatusDescription(metadata->getTitle());
+    QFile dest_checker(destination);
+    if(!dest_checker.open(IO_ReadWrite))
+    {
+        warning(QString("can't write temporary file: \"%1\"")
+                        .arg(destination));
+        return false;
+    }
+    else
+    {
+        if(!dest_checker.remove())
+        {
+            warning(QString("can't remove temporary file: \"%1\"")
+                            .arg(destination));
+        }
+    }
+
+
+    setMinorStatusDescription(QString("Track %1 of %2 ~ %3")
+                                    .arg(current_track_num + 1)
+                                    .arg(total_tracks)
+                                    .arg(metadata->getTitle()));
+
+    setMajorProgress( (int) (((float) current_track_num / (float) total_tracks) * 100.0) );
     setMinorProgress(0);
     parent->bumpStatusGeneration();
     parent->wakeUp();
@@ -359,7 +402,7 @@ bool AudioCdJob::ripAndEncodeTrack(
     }
     else
     {
-        warning("unknown or non-sensical codec quality settings will setting encoder");
+        warning("unknown or non-sensical codec quality settings while setting encoder");
         done = true;
         success = false;
     }

@@ -58,6 +58,7 @@ class MtcpOutput
 
     void addProtocolVersion();
     void addJobCount(int count);
+    void addJobId(int id);
     void addJobMajorProgress(int major_progress);
     void addJobMinorProgress(int minor_progress);
 

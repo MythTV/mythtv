@@ -22,7 +22,7 @@ HEADERS += mfdinterface.h   discoverythread.h   mfdinstance.h \
            ../mfdlib/httpgetvar.h \
            mdcaprequest.h mdcapresponse.h metadatacollection.h ../mfdlib/metadata.h \
            playlist.h playlistentry.h mfdcontent.h playlistchecker.h speakertracker.h \
-           rtspclient.h rtspin.h visualbase.h transcoderclient.h
+           rtspclient.h rtspin.h visualbase.h transcoderclient.h jobtracker.h
 
 SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            ./mdnsd/mdnsd.c ./mdnsd/1035.c discovered.cpp \
@@ -33,11 +33,11 @@ SOURCES += mfdinterface.cpp discoverythread.cpp mfdinstance.cpp \
            ../mfdlib/httpgetvar.cpp \
            mdcaprequest.cpp mdcapresponse.cpp metadatacollection.cpp ../mfdlib/metadata.cpp \
            playlist.cpp playlistentry.cpp mfdcontent.cpp playlistchecker.cpp speakertracker.cpp \
-           rtspclient.cpp rtspin.cpp visualbase.cpp transcoderclient.cpp
+           rtspclient.cpp rtspin.cpp visualbase.cpp transcoderclient.cpp jobtracker.cpp
 
 inc.path = $${PREFIX}/include/mfdclient/
 inc.files  = mfdinterface.h mfdcontent.h ../mfdlib/metadata.h playlist.h playlistentry.h \
-			 speakertracker.h visualbase.h
+			 speakertracker.h visualbase.h jobtracker.h
 
 LIBS += -L../mdcaplib -lmdcap -L../mtcplib -lmtcp -Wl,--export-dynamic
 

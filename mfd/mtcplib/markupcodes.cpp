@@ -20,5 +20,6 @@ const char MtcpMarkupCodes::job_minor_description;
 
 const char MtcpMarkupCodes::protocol_version;
 const char MtcpMarkupCodes::job_count;
+const char MtcpMarkupCodes::job_id;
 const char MtcpMarkupCodes::job_major_progress;
 const char MtcpMarkupCodes::job_minor_progress;

@@ -312,6 +312,35 @@ QString MtcpInput::popMinorDescription()
     delete [] utf8_minor;
     return the_minor;
 }
+
+uint32_t MtcpInput::popJobId()
+{
+    //
+    //  job id is always 5 bytes
+    //  1st byte - job id markup code
+    //    next 4 - 32 bit id number
+    //
+    
+    if(amountLeft() < 5)
+    {
+        cerr << "mtcpinput.o: asked to popJobId(), but there are not "
+             << "enough bytes left in the stream "
+             << endl;
+        return 0;
+    }
+
+    char content_code = popByte();
+    if(content_code != MtcpMarkupCodes::job_id)
+    {
+        cerr << "mtcpinput.o: asked to popJobId(), but content code is "
+             << "not job_id "
+             << endl;
+        return 0;       
+    }
+
+    return popU32();    
+}
+
     
 uint32_t MtcpInput::popMajorProgress()
 {

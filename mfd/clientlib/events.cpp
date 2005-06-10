@@ -10,6 +10,7 @@
 
 #include "events.h"
 #include "speakertracker.h"
+#include "jobtracker.h"
 
 MfdDiscoveryEvent::MfdDiscoveryEvent(
                                      bool  is_it_lost_or_found,
@@ -258,3 +259,33 @@ int MfdTranscoderPluginExistsEvent::getMfd()
     return mfd_id;
 }
 
+/*
+---------------------------------------------------------------------
+*/
+
+MfdTranscoderJobListEvent::MfdTranscoderJobListEvent(
+                                                        int which_mfd,
+                                                        QPtrList<JobTracker> *l_job_list
+                                                    )
+                    :QCustomEvent(MFD_CLIENTLIB_EVENT_JOB_LIST)
+
+{
+    job_list.setAutoDelete(true);
+
+    JobTracker *jt;
+    QPtrListIterator<JobTracker> iter( *l_job_list );
+
+    while ( (jt = iter.current()) != 0 )
+    {
+        JobTracker *new_jt = new JobTracker(*jt);
+        job_list.append(new_jt);
+        ++iter;
+    }
+    
+    mfd_id = which_mfd;
+}
+
+MfdTranscoderJobListEvent::~MfdTranscoderJobListEvent()
+{
+    job_list.clear();
+}

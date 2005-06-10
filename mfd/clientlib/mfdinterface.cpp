@@ -17,6 +17,7 @@ using namespace std;
 #include "playlistchecker.h"
 #include "events.h"
 #include "speakertracker.h"
+#include "jobtracker.h"
 #include "visualbase.h"
 
 MfdInterface::MfdInterface(int client_screen_width, int client_screen_height)
@@ -458,6 +459,36 @@ void MfdInterface::ripPlaylist(int which_mfd, int which_collection, int which_pl
 
 }
 
+void MfdInterface::cancelJob(int which_mfd, int which_job)
+{
+
+    bool found_it = false;
+    for(
+        MfdInstance *an_mfd = mfd_instances->first();
+        an_mfd;
+        an_mfd = mfd_instances->next()
+       )
+    {
+        if (an_mfd->getId() == which_mfd)
+        {
+            an_mfd->addPendingCommand(
+                                        QStringList::split(" ", QString("transcoder canceljob %1")
+                                                .arg(which_job))
+                                     );
+
+            found_it = true;
+            break;
+        }
+    }
+    
+    if (!found_it)
+    {
+        cerr << "mfdinterface.o: could not find an mfd "
+             << "for a cancelJob() request"
+             << endl;
+    }
+}
+
 void MfdInterface::startPlaylistCheck(
                                         MfdContentCollection *mfd_collection,
                                         UIListGenericTree *playlist, 
@@ -680,6 +711,15 @@ void MfdInterface::customEvent(QCustomEvent *ce)
         if(speakers)
         {
             emit speakerList(sle->getMfd(), speakers);
+        }
+    }
+    else if (ce->type() == MFD_CLIENTLIB_EVENT_JOB_LIST)
+    {
+        MfdTranscoderJobListEvent *jle = (MfdTranscoderJobListEvent*)ce;
+        QPtrList<JobTracker>    *jobs = jle->getJobList();
+        if(jobs)
+        {
+            emit jobList(jle->getMfd(), jobs);
         }
     }
 /*

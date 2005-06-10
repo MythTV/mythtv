@@ -14,6 +14,7 @@
 
 class HttpInResponse;
 class MtcpInput;
+class JobTracker;
 
 class TranscoderClient : public ServiceClient
 {
@@ -31,6 +32,7 @@ class TranscoderClient : public ServiceClient
     void executeCommand(QStringList new_command);
     void handleIncoming();
     void requestRipAudioCd(int collection_id, int playlist_id);
+    void requestCancelJob(int job_id);
     void processResponse(HttpInResponse *httpin_response);
     void sendFirstRequest();
     void sendStatusRequest();
@@ -39,10 +41,9 @@ class TranscoderClient : public ServiceClient
     void parseJob(MtcpInput &mtcp_input);
 
   private:
-  
 
     int generation;    
-
+    QPtrList<JobTracker>    job_list;
 };
 
 #endif

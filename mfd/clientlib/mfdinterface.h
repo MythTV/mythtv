@@ -20,6 +20,7 @@ class DiscoveryThread;
 class PlaylistChecker;
 class MfdInstance;
 class SpeakerTracker;
+class JobTracker;
 class VisualBase;
 
 class MfdInterface : public QObject
@@ -79,7 +80,12 @@ class MfdInterface : public QObject
                         int which_collection,
                         int which_playlist
                        );
-                
+                       
+    //
+    //  Cancel a job (e.g. a rip)
+    //
+    
+    void    cancelJob(int which_mfd, int which_job);
 
     //
     //  Methods that will ask this library to perform some background work
@@ -121,6 +127,7 @@ class MfdInterface : public QObject
     void metadataChanged(int, MfdContentCollection*);
     void playlistCheckDone();
     void speakerList(int, QPtrList<SpeakerTracker> *speakers);
+    void jobList(int, QPtrList<JobTracker> *jobs);
     void audioData(int, uchar*, int);
 
   protected:

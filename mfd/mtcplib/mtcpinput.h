@@ -42,48 +42,9 @@ class MtcpInput
     QString     popMajorDescription();
     QString     popMinorDescription();
     
+    uint32_t    popJobId();
     uint32_t    popMajorProgress();
     uint32_t    popMinorProgress();
-
-/*
-    int         popStatus();
-    uint32_t    popSessionId();
-    uint32_t    popCollectionCount();
-    uint32_t    popCollectionId();
-    uint32_t    popCollectionType();
-    bool        popCollectionEditable();
-    bool        popCollectionRipable();
-    bool        popCollectionBeingRipped();
-    uint32_t    popCollectionGeneration();
-    bool        popUpdateType();
-    uint32_t    popTotalItems();
-    uint32_t    popAddedItems();
-    uint32_t    popDeletedItems();
-    uint8_t     popItemType();
-    uint32_t    popItemId();
-    uint8_t     popItemRating();
-    uint32_t    popItemLastPlayed();
-    uint32_t    popItemPlayCount();
-    uint32_t    popItemYear();
-    uint32_t    popItemTrack();
-    uint32_t    popItemLength();
-    bool        popItemDupFlag();
-    QString     popItemUrl();
-    QString     popItemArtist();
-    QString     popItemAlbum();
-    QString     popItemTitle();
-    QString     popItemGenre();
-    int         popListId();
-    QString     popListName();
-    uint32_t    popListItem();
-    uint32_t    popDeletedList();
-    bool        popListEditable();
-    bool        popListRipable();
-    bool        popListBeingRipped();
-    uint32_t    popDeletedItem();
-    QString     popListItemName();
-    bool        popCommitListType();
-*/
 
     void        printContents();    // Debugging
     

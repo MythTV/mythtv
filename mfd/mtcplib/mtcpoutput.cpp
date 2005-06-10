@@ -198,6 +198,16 @@ void MtcpOutput::addJobCount(int count)
     append((uint32_t) count);
 }
     
+void MtcpOutput::addJobId(int id)
+{
+    //
+    //  job id is always 5 bytes
+    //
+    
+    append(MtcpMarkupCodes::job_id);
+    append((uint32_t) id);
+}
+    
 void MtcpOutput::addJobMajorProgress(int major_progress)
 {
     //

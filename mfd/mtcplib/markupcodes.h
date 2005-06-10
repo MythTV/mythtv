@@ -49,8 +49,9 @@ class MtcpMarkupCodes
 
     static const char protocol_version        = 75;
     static const char job_count               = 76;
-    static const char job_major_progress      = 77;
-    static const char job_minor_progress      = 78;
+    static const char job_id                  = 77;
+    static const char job_major_progress      = 78;
+    static const char job_minor_progress      = 79;
 
   private:
 

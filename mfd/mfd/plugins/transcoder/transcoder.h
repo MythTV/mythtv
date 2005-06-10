@@ -34,9 +34,11 @@ class Transcoder: public MFDHttpPlugin
     void    handleStatusRequest(HttpInRequest *httpin_request, int client_id);
     int     buildStatusResponse(MtcpOutput *status_response);
     void    handleStartJobRequest(HttpInRequest *httpin_request);
+    void    handleCancelJobRequest(HttpInRequest *httpin_request);
     void    checkJobs();
     void    updateStatusClients();
     int     bumpStatusGeneration();
+    int     bumpJobId();
     void    sendResponse(HttpOutResponse *httpout, MtcpOutput &reponse, int generation_value);
     
   private:
@@ -50,6 +52,8 @@ class Transcoder: public MFDHttpPlugin
     QPtrList<TranscoderJob> jobs;
     QPtrList<ClientTracker> hanging_status_clients;
     QMutex                  hanging_status_mutex;
+    int                     job_id;
+    QMutex                  job_id_mutex;
 };
 
 #endif  // transcoder_h_

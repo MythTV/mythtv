@@ -25,8 +25,10 @@
 #define MFD_CLIENTLIB_EVENT_SPEAKER_LIST        65425
 #define MFD_CLIENTLIB_EVENT_SPEAKER_STREAM      65424
 #define MFD_CLIENTLIB_EVENT_TRANSCODER_EXISTS   65423
+#define MFD_CLIENTLIB_EVENT_JOB_LIST            65422
 
 class SpeakerTracker;
+class JobTracker;
 
 class MfdDiscoveryEvent: public QCustomEvent
 {
@@ -251,8 +253,28 @@ class MfdTranscoderPluginExistsEvent: public QCustomEvent
     int                getMfd();
 
   private:
+
+    int mfd_id;  
+};
+
+class MfdTranscoderJobListEvent: public QCustomEvent
+{
+    //
+    //  Sent by mfdinstance when it discovers a transcoder plugin in it's mfd
+    //
+    
+  public:
   
-    int                mfd_id;
+    MfdTranscoderJobListEvent(int which_mfd, QPtrList<JobTracker> *l_job_list);
+    ~MfdTranscoderJobListEvent();
+
+    QPtrList<JobTracker>*   getJobList(){ return &job_list; }
+    int                     getMfd(){ return mfd_id; }
+
+  private:
+  
+    int                     mfd_id;
+    QPtrList<JobTracker>    job_list;
 };
 
 
