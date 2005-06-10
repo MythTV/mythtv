@@ -27,4 +27,4 @@ hack-around (as root) should fix that:
         ln -s libopendaap.so.0.1.0 libopendaap.so
         ldconfig
 
-    Version 0.4.0 has fixed this annoyance, and shoudl be used instead.
+    Version 0.4.0 has fixed this annoyance, and should be used instead.
