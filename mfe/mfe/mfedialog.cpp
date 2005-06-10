@@ -1449,71 +1449,100 @@ void MfeDialog::doSillyThings()
     //  names
     //
     
+    possessors.append("A Single");
+    possessors.append("Another");
     possessors.append("Big Daddy's");
+    possessors.append("Categorically");
     possessors.append("Certainly");
     possessors.append("Chutt's");
     possessors.append("Deviously");
+    possessors.append("Differently");
     possessors.append("Everyone's");
     possessors.append("Existentially");
     possessors.append("Flatly");
     possessors.append("Foobar's");
     possessors.append("His Majesty's");
     possessors.append("Infinitely");
+    possessors.append("Metaphysically");
     possessors.append("Neatly");
     possessors.append("Nobody's");
     possessors.append("One's");
-    possessors.append("The Other's");
     possessors.append("Our");
     possessors.append("Plainly");
+    possessors.append("Pseudo-Randomly");
+    possessors.append("Quickly");
     possessors.append("Squarely");
+    possessors.append("The Other's");
+    possessors.append("Their");
+    possessors.append("Tomorrow's");
     possessors.append("Walter's");
+    possessors.append("Yesterday's");
     possessors.append("Yo Mama's");
     possessors.append("Zippy's");
 
 
+    modifiers.append("Artificial");
     modifiers.append("Blue");
     modifiers.append("Bouncy");
     modifiers.append("Buzzed");
     modifiers.append("Cacaphonous");
     modifiers.append("Dark");
+    modifiers.append("Dated");
     modifiers.append("Diabolical");
     modifiers.append("Dotted");
     modifiers.append("Easy");
     modifiers.append("Efficient");
     modifiers.append("Happy");
+    modifiers.append("Hobbesian");
     modifiers.append("Inverted");
+    modifiers.append("Libertarian");
+    modifiers.append("Liquid Cooled");
     modifiers.append("Obtuse");
     modifiers.append("Odd");
     modifiers.append("Orthogonal");
+    modifiers.append("Overrated");
     modifiers.append("Pedantic");
+    modifiers.append("Postmodern");
     modifiers.append("Refracted");
+    modifiers.append("Shiny");
     modifiers.append("Spotted");
+    modifiers.append("Squeaky");
     modifiers.append("Sublime");
     modifiers.append("Tempted");
+    modifiers.append("Tweaked");
     modifiers.append("Weak");
     
     
     nouns.append("Accoutrement");
+    nouns.append("Amusement(s)");
     nouns.append("Appliance");
     nouns.append("Big Bah");
     nouns.append("Bottom");
     nouns.append("Breakdown");
+    nouns.append("Code");
     nouns.append("Creep");
     nouns.append("Device");
+    nouns.append("Ditty");
     nouns.append("Endeavour");
     nouns.append("Expanse");
     nouns.append("Expression");
     nouns.append("Freedom");
     nouns.append("Gesture");
+    nouns.append("Groove");
+    nouns.append("Interface");
     nouns.append("Inversion");
-    nouns.append("Mountains");
+    nouns.append("Mechanism");
+    nouns.append("Model");
+    nouns.append("Mountain");
     nouns.append("Mix");
-    nouns.append("Other");
-    nouns.append("Staples");
+    nouns.append("Ride");
+    nouns.append("Ritual");
+    nouns.append("Standard");
     nouns.append("Stretch");
+    nouns.append("Theme");
     nouns.append("Top");
+    nouns.append("Vernacular");
     nouns.append("Wonder Bread");
-
 }
 
 void MfeDialog::toggleVizFullscreen()
