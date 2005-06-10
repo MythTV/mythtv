@@ -51,7 +51,7 @@
             <textarea name="temp_message" draworder="0" align="center">
                 <font>temp_font</font>
                 <area>0,485,800,30</area>
-                <value>M for menu  |  4 to toggle Viz  |  6 to change Viz</value>
+                <value>M for menu  |  4 to toggle Viz  |  6 to change Viz | T for jobs</value>
             </textarea>
         </container>
 
@@ -406,4 +406,139 @@
 
     
     </window>
+
+    <window name="job_dialog">
+
+        <font name="title" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>40</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+        </font>
+
+        <font name="description" face="Arial">
+            <color>#ffffff</color>
+            <dropcolor>#000000</dropcolor>
+            <size>24</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+        </font>
+  
+        <font name="display" face="Arial">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>yes</bold>
+        </font>
+
+        <font name="buttons" face="Arial">
+            <color>#ffffff</color>
+            <size>14</size>
+            <bold>yes</bold>
+        </font>
+
+        <container name="background">
+            <area>0,0,800,600</area>
+            <image name="mfe_background" draworder="0" fleximage="no">
+                <filename>mfe_back.png</filename>
+                <position>0,0</position>
+            </image>
+            <textarea name="banner" draworder="0">
+                <font>title</font>
+                <area>200,5,600,95</area>
+                <value>Rip/Transcode</value>
+            </textarea>
+            <image name="progress_background" draworder="0">
+                <filename>mfe_progress_background.png</filename>
+                <position>50,120</position>
+            </image>
+        </container>
+
+        <container name="main_display">
+            <area>50,120,700,480</area>
+
+
+            <!-- 
+                Context 1 
+                Warnings or Status Messages
+            -->
+
+            <textarea name="description" draworder="0" align="center">
+                <context>1</context>
+                <multiline>yes</multiline>
+                <font>description</font>
+                <area>50,50,600,300</area>
+            </textarea>
+
+            <!-- 
+                Context 2
+                Browse active jobs
+            -->
+
+            <textarea name="major_description" draworder="1" align="center">
+                <context>2</context>
+                <font>display</font>
+                <area>0,30,700,30</area>
+            </textarea>
+
+            <textarea name="minor_description" draworder="1" align="center">
+                <context>2</context>
+                <font>display</font>
+                <area>0,180,700,30</area>
+            </textarea>
+
+            <textarea name="numb_jobs_text" draworder="1" align="center">
+                <context>2</context>
+                <font>display</font>
+                <area>275,330,150,30</area>
+                <value>Job 1 of 1</value>
+            </textarea>
+
+            <statusbar name="major_progress" draworder="1" whitespace="15">
+                <context>2</context>
+                <container fleximage="no">mfe_job_progress_background.png</container>
+                <fill>mfe_job_progress_foreground.png</fill>
+                <position>110,70</position>
+                <orientation>LeftToRight</orientation>
+            </statusbar>
+        
+            <statusbar name="minor_progress" draworder="1" whitespace="15">
+                <context>2</context>
+                <container fleximage="no">mfe_job_progress_background.png</container>
+                <fill>mfe_job_progress_foreground.png</fill>
+                <position>110,220</position>
+                <orientation>LeftToRight</orientation>
+            </statusbar>
+
+            <pushbutton name="job_next_button" draworder="2">
+                <context>2</context>
+                <position>435,315</position>
+                <image function="on" filename="mfe_job_next_on.png"></image>
+                <image function="off" filename="mfe_job_next_off.png"></image>
+                <image function="pushed" filename="mfe_job_next_pushed.png"></image>
+            </pushbutton>
+            
+            <pushbutton name="job_prev_button" draworder="2">
+                <context>2</context>
+                <position>205,315</position>
+                <image function="on" filename="mfe_job_prev_on.png"></image>
+                <image function="off" filename="mfe_job_prev_off.png"></image>
+                <image function="pushed" filename="mfe_job_prev_pushed.png"></image>
+            </pushbutton>
+            
+            <textbutton name="cancel_button" draworder="2">
+                <context>2</context>
+                <position>275,410</position>
+                <image function="on" filename="mfe_text_button_on.png"></image>
+                <image function="off" filename="mfe_text_button_off.png"></image>
+                <image function="pushed" filename="mfe_text_button_pushed.png"></image>
+                <font>buttons</font>
+            </textbutton>
+
+        </container>
+
+    </window>
+
+
+
 </mythuitheme>

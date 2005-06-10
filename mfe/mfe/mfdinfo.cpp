@@ -28,6 +28,7 @@ MfdInfo::MfdInfo( int an_id, const QString &a_name, const QString &a_host)
     current_elapsed = -1;
     is_stopped = true;
     my_speakers.setAutoDelete(true);
+    my_jobs.setAutoDelete(true);
     has_transcoder = false;
 }
 
@@ -222,6 +223,27 @@ void MfdInfo::setSpeakerList(QPtrList<SpeakerTracker>* new_speakers)
     
 }
 
+void MfdInfo::setJobList(QPtrList<JobTracker>* new_jobs)
+{
+    //
+    //  We have a new list of jobs/status for this mfd. Make a copy
+    //  and store them.
+    //   
+    
+    my_jobs.clear();
+    
+    JobTracker *a_job;
+    QPtrListIterator<JobTracker> iter( *new_jobs );
+
+    while ( (a_job = iter.current()) != 0 )
+    {
+        JobTracker *new_job = new JobTracker(*a_job);
+        my_jobs.append(new_job);
+        ++iter;
+    }
+    
+}
+
 void MfdInfo::printTree(UIListGenericTree *node, int depth)
 {
     if (mfd_content_collection)
@@ -232,6 +254,8 @@ void MfdInfo::printTree(UIListGenericTree *node, int depth)
 
 MfdInfo::~MfdInfo()
 {
+    my_speakers.clear();
+    my_jobs.clear();
 }
 
 

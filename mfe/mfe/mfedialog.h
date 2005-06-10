@@ -18,10 +18,12 @@
 #include "mfdinfo.h"
 #include "netflasher.h"
 #include "playlistdialog.h"
+#include "jobdialog.h"
 
 typedef QValueVector<int> IntVector;
 
 class SpeakerTracker;
+class JobTracker;
 class VisualWrapper;
 
 class MfeDialog : public MythThemedDialog
@@ -61,10 +63,15 @@ class MfeDialog : public MythThemedDialog
     void seekAudio(bool forward_or_back);
     void nextPrevAudio(bool next_or_prev);
     void speakerList(int which_mfd, QPtrList<SpeakerTracker>* speakers);
+    void jobList(int which_mfd, QPtrList<JobTracker>* jobs);
     void hideNewPlaylistPopup();
     void createNewPlaylist();
     void toggleVizFullscreen();
     void cycleVisualizer();
+
+  signals:
+  
+    void jobsChanged();
 
   private:
 
@@ -155,6 +162,11 @@ class MfeDialog : public MythThemedDialog
     int mfd_id_for_playlist_dialog;
     int content_collection_for_new_playlist;
 
+    //
+    //  Job Dialog 
+    //
+
+    JobDialog *job_dialog;
 
     //
     //  Widgets for the New Playlist popup

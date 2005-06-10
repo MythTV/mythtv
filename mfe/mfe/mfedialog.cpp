@@ -38,6 +38,7 @@ MfeDialog::MfeDialog(
     //
     
     playlist_dialog = NULL;
+    job_dialog = NULL;
     mfd_id_for_playlist_dialog = -1;
 
     //
@@ -184,7 +185,24 @@ void MfeDialog::keyPressEvent(QKeyEvent *e)
             }
             handled = true;
             break;
+        
+        case Key_T:
+
+            job_dialog = new JobDialog(
+                                        gContext->GetMainWindow(),
+                                        "job_dialog",
+                                        "mfe-",
+                                        current_mfd,
+                                        mfd_interface
+                                      );
+            connect(this, SIGNAL(jobsChanged()), job_dialog, SLOT(checkJobs()));
+            job_dialog->exec();
+            delete job_dialog;
+            job_dialog = NULL;
             
+            handled = true;
+            break;
+    
         case Key_1:
         case Key_C:
 
@@ -480,6 +498,17 @@ void MfeDialog::handleTreeSignals(UIListGenericTree *node)
             node->setActive(false);
             menu->refresh();
             mfd_interface->ripPlaylist(current_mfd->getId(), node->getInt(), node->getAttribute(0));
+            job_dialog = new JobDialog(
+                                        gContext->GetMainWindow(),
+                                        "job_dialog",
+                                        "mfe-",
+                                        current_mfd,
+                                        mfd_interface
+                                      );
+            connect(this, SIGNAL(jobsChanged()), job_dialog, SLOT(checkJobs()));
+            job_dialog->exec();
+            delete job_dialog;
+            job_dialog = NULL;
         }
     }
 }
@@ -665,6 +694,9 @@ void MfeDialog::connectUpMfd()
     connect(mfd_interface, SIGNAL(speakerList(int, QPtrList<SpeakerTracker>*)),
             this, SLOT(speakerList(int, QPtrList<SpeakerTracker>*)));
             
+    connect(mfd_interface, SIGNAL(jobList(int, QPtrList<JobTracker>*)),
+            this, SLOT(jobList(int, QPtrList<JobTracker>*)));
+            
 }
 
 void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool found)
@@ -724,7 +756,6 @@ void MfeDialog::mfdDiscovered(int which_mfd, QString name, QString host, bool fo
             //
 
             playlist_dialog->close();
-
         }
         
     }
@@ -1264,6 +1295,20 @@ void MfeDialog::speakerList(int which_mfd, QPtrList<SpeakerTracker>* speakers)
     {
         updateSpeakerDisplay();
     }
+}
+    
+void MfeDialog::jobList(int which_mfd, QPtrList<JobTracker>* jobs)
+{
+    MfdInfo *target_mfd = available_mfds.find(which_mfd);
+    if(!target_mfd)
+    {
+        cerr << "can't store job information for an mfd that doesn't exist" << endl;
+        return;
+    }
+    
+    target_mfd->setJobList(jobs);
+    
+    emit jobsChanged();
 }
     
 void MfeDialog::updateSpeakerDisplay()

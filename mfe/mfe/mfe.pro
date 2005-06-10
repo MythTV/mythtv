@@ -20,12 +20,13 @@ HEADERS +=          mfedialog.h   mfdinfo.h   playlistdialog.h   netflasher.h
 HEADERS += visualize/visual.h   visualize/visualnode.h   visualize/stereoscope.h
 HEADERS += visualize/inlines.h  visualize/visualwrapper.h
 HEADERS += visualize/monoscope.h
+HEADERS += jobdialog.h
 
 SOURCES += main.cpp mfedialog.cpp mfdinfo.cpp playlistdialog.cpp netflasher.cpp
 SOURCES += visualize/visual.cpp visualize/visualnode.cpp visualize/stereoscope.cpp
 SOURCES += visualize/visualwrapper.cpp
 SOURCES += visualize/monoscope.cpp
-
+SOURCES += jobdialog.cpp
 
 HEADERS += visualize/goom/filters.h visualize/goom/goomconfig.h visualize/goom/goom_core.h visualize/goom/graphic.h
 HEADERS += visualize/goom/ifs.h visualize/goom/lines.h visualize/goom/mythgoom.h visualize/goom/drawmethods.h
