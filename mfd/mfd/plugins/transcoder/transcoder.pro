@@ -20,5 +20,5 @@ HEADERS += ../audio/daapinput.h   ../daapclient/daaprequest.h   clienttracker.h
 SOURCES += ../audio/daapinput.cpp ../daapclient/daaprequest.cpp clienttracker.cpp
 
 LIBS    += -lmad -lid3tag -logg -lvorbisfile -lvorbis -lvorbisenc -lcdaudio -lFLAC
-LIBS    += -lmp3lame -lcdda_paranoia -lcdda_interface -lmtcp
+LIBS    += -lmp3lame -lcdda_paranoia -lcdda_interface -L../../../mtcplib -lmtcp
 
