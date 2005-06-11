@@ -256,15 +256,15 @@ void Transcoder::handleIncoming(HttpInRequest *httpin_request, int client_id)
     QString get_request = httpin_request->getUrl();
     QString top_level = get_request.section('/',1,1);
 
-    if (top_level == "status")
+    if (top_level.lower() == "status")
     {
         handleStatusRequest(httpin_request, client_id);
     }
-    else if(top_level == "startjob")
+    else if(top_level.lower() == "startjob")
     {
         handleStartJobRequest(httpin_request);
     }
-    else if(top_level == "canceljob")
+    else if(top_level.lower() == "canceljob")
     {
         handleCancelJobRequest(httpin_request);
     }
@@ -432,6 +432,49 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
             //  launch an audio cd ripping job
             //
             
+            //
+            //  Get the quality and encoder settings
+            //
+
+            MfdTranscoderAudioQuality quality = MFD_TRANSCODER_AUDIO_QUALITY_LOW;
+            int quality_setting = mfdContext->getNumSetting("DefaultRipQuality", 23);
+            
+            if(quality_setting > 3)
+            {
+                warning("no DefaultRipQuality defined in settings, will use low");
+                quality_setting = 0;
+            }
+            else if(quality_setting < 0)
+            {
+                warning("DefaultRipQuality defined as less than 0, will use low");
+                quality_setting = 0;
+            }
+            
+            if (quality_setting == 1)
+            {
+                quality = MFD_TRANSCODER_AUDIO_QUALITY_MED;
+            }
+            else if (quality_setting == 2)
+            {
+                quality = MFD_TRANSCODER_AUDIO_QUALITY_HIGH;
+            }
+            else if (quality_setting == 3)
+            {
+                quality = MFD_TRANSCODER_AUDIO_QUALITY_PERFECT;
+            }
+            
+            MfdTranscoderAudioCodec codec = MFD_TRANSCODER_AUDIO_CODEC_OGG;
+
+            QString codec_setting = mfdContext->getSetting("EncoderType");
+
+            if (codec_setting == "flac")
+            {
+                codec = MFD_TRANSCODER_AUDIO_CODEC_FLAC;
+            }
+            else if (codec_setting == "mp3")
+            {
+                codec = MFD_TRANSCODER_AUDIO_CODEC_MP3;
+            }
             
             jobs_mutex.lock();
                 TranscoderJob *new_job = new AudioCdJob(    
@@ -442,8 +485,8 @@ void Transcoder::handleStartJobRequest(HttpInRequest *httpin_request)
                                                         metadata_server,
                                                         container_id,
                                                         playlist_id,
-                                                        MFD_TRANSCODER_AUDIO_CODEC_OGG,
-                                                        MFD_TRANSCODER_AUDIO_QUALITY_HIGH
+                                                        codec,
+                                                        quality
                                                        );
                 log(QString("started new audio cd job (total now %1)").arg(jobs.count() + 1), 3);
                 new_job->start();
