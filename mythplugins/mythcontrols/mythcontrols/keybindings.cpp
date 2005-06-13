@@ -23,12 +23,6 @@
  * This class is responsible for storing and loading the controls.  It
  * acts as a layer between the actual key/action bindings (actionset)
  * and the UI.
- *
- * @todo Unify the mapping stuff into separate function calls.  EG:
- * remove, add
- *
- * @todo New data struct which holds the dicts and map, and maintains
- * them both automatically.
  */
 
 /* QT */
@@ -42,7 +36,6 @@ using namespace std;
 
 #include "keybindings.h"
 
-enum query_indicies {CTXT, ACTN, DESC, KEYS};
 
 
 KeyBindings::KeyBindings(const QString & hostname) {
@@ -58,7 +51,7 @@ KeyBindings::KeyBindings(const QString & hostname) {
 ActionID * KeyBindings::conflicts(const QString & context_name,
 				  const QString & key) const
 {
-    const QValueList<ActionID> &ids = actionset.getActions(key);
+    const ActionList &ids = actionset.getActions(key);
 
     /* trying to bind a jumppoint to an already bound key */
     if ((context_name == JUMP_CONTEXT) && (ids.count() > 0))
@@ -173,10 +166,6 @@ void KeyBindings::retrieveJumppoints()
 
     query.exec();
 
-    /* add a context for jumppoints */
-    /*contexts().insert(JUMP_CONTEXT, new Context());
-      Context *jumppoints = getContext(JUMP_CONTEXT);*/
-
     for (query.next(); query.isValid(); query.next())
     {
 	ActionID id(JUMP_CONTEXT, query.value(0).toString());
@@ -206,40 +195,11 @@ void KeyBindings::retrieveContexts()
 
     for (query.next(); query.isValid(); query.next())
     {
-	ActionID id(query.value(CTXT).toString(),query.value(ACTN).toString());
-	this->actionset.addAction(id,query.value(DESC).toString(),
-				  query.value(KEYS).toString());
-
-	/*if (!getContext(id.context()))
-	{
-	    contexts().insert(id.context(), new Context());
-	    }*/
-
-	/*Action *action = new Action(query.value(DESC).toString(),
-	  query.value(KEYS).toString());
-
-	  const QStringList &keys = action->getKeys();
-	  for (size_t i = 0; i < keys.count(); i++)
-	  {
-	  
-	  QValueList<ActionID> &ids = key_map[keys[i]];
-	  ids.push_back(id);
-	}
-
-	getContext(id.context())->insert(id.action(),action);*/
+	ActionID id(query.value(0).toString(), query.value(1).toString());
+	this->actionset.addAction(id, query.value(2).toString(),
+				  query.value(3).toString());
     }
 }
-
-
-
-/* comments in header */
-/*bool KeyBindings::actionsCanConflict(const ActionID & first,
-  const ActionID & second) const
-  {
-  return  (first.context() == JUMP_CONTEXT ||
-  second.context() == JUMP_CONTEXT ||
-  first.context() == second.context());
-  }*/
 
 
 
@@ -271,7 +231,7 @@ void KeyBindings::loadManditoryBindings(void)
 
 bool KeyBindings::hasManditoryBindings(void) const
 {
-    QValueList<ActionID> manlist = getManditoryBindings();
+    ActionList manlist = getManditoryBindings();
     for (size_t i = 0; i < manlist.count(); i++)
     {
 	if (actionset.getKeys(manlist[i]).isEmpty())

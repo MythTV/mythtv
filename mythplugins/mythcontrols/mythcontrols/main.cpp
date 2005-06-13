@@ -29,21 +29,41 @@ using namespace std;
 
 
 
-/* These methods will be called in every share library containing a
-   plugin.  Use them to initialize, configure and run the plugin. */
+/**
+ * @name Plugin API
+ *
+ * The following methods are required by all MythTV plugins.
+ */
+//@{
 extern "C" {
+
+  /**
+   * @brief Called by mythtv to initialize the plugin.
+   * @param libversion Used to make sure that the requried version of
+   * the library is being used.
+   * @return I dont really know what difference your return values makes.
+   * @todo Find out the difference this return values makes.
+   */
   int mythplugin_init(const char *libversion);
+
+  /**
+   * @brief Runs the plugin.
+   * @return I dont really know what difference your return values makes.
+   * @todo Find out the difference this return values makes.
+   */
   int mythplugin_run(void);
+
+  /**
+   * @brief Called to configure the plugin.
+   * @return I dont really know what difference your return values makes.
+   * @todo Find out the difference this return values makes.
+   */
   int mythplugin_config(void);
 }
+//@}
 
 
-
-/**
- * @brief Initialize the MythControls plugin
- * @param libversion The library version, I assume.
- * @return zero if initialization was ok, otherwise, less than zero.
- */
+/* documented above */
 int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythcontrols", libversion,
@@ -53,11 +73,7 @@ int mythplugin_init(const char *libversion)
 
 
 
-/**
- * @brief Run the MythControls plugin.
- * @return zero if the plugin was run successfully, otherwise, a value
- * less than zero is returned.
- */
+/* documented above */
 int mythplugin_run (void)
 {
     MythControls controls(gContext->GetMainWindow(), "controls");
@@ -77,10 +93,7 @@ int mythplugin_run (void)
 
 
 
-/**
- * @brief Configure the MythControls plugin.
- * @return zero.
- */
+/* documented above*/
 int mythplugin_config (void) { return 0; }
 
 

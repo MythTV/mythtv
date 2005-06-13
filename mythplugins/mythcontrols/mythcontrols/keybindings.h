@@ -29,22 +29,14 @@
 #include "actionid.h"
 #include "actionset.h"
 
-#define JUMP_CONTEXT "JumpPoints"
-#define GLOBAL_CONTEXT "Global"
-
-
-/**
- * @brief Contexts are dictionaries of actions.
- */
-typedef QDict<Action> Context;
-
-
 
 /**
  * @class KeyBindings.
  * @brief Information about the current keybindings.
  *
- * This class can retrieve, set, and modify the keybindings used by mythtv.
+ * This class can retrieve, set, and modify the keybindings used by
+ * mythtv.  It is a layer between the user interface, and the
+ * keybindings themeslfs.
  */
 class KeyBindings {
 
@@ -110,15 +102,14 @@ class KeyBindings {
    * called.
    */
   inline void addActionKey(const QString & context_name,
-		    const QString & action_name,
-		    const QString & key) {
-      this->actionset.add(ActionID(context_name, action_name), key);
+			   const QString & action_name,
+			   const QString & key) {
+    this->actionset.add(ActionID(context_name, action_name), key);
   }
 
   /**
    * @brief Determine if adding a key would cause a conflict.
    * @param context_name The name of the context.
-   * @param action_name The name of the action.
    * @param key The key to add.
    * @return true if adding the key would cause a conflict.
    *
@@ -171,6 +162,12 @@ class KeyBindings {
   void defaultManditoryBindings(void);
 
   /**
+   * @brief Determine if there are changes to the keybindings.
+   * @return True if keys have been changed, otherwise, false.
+   */
+  inline bool hasChanges(void) const { return actionset.hasModified(); }
+
+  /**
    * @brief Commit all changes made to the keybindings.
    *
    * This method will write the changes to the database, unbind myth's
@@ -183,7 +180,7 @@ class KeyBindings {
    * @brief Get a list of the manditory key bindings.
    * @return A list of the manditory bindings.
    */
-  inline const QValueList<ActionID>& getManditoryBindings(void) const {
+  inline const ActionList& getManditoryBindings(void) const {
       return this->_manditory_bindings;
   }
 
@@ -229,16 +226,6 @@ class KeyBindings {
   void retrieveContexts(void);
 
   /**
-   * @brief Determine if two actions can conflict.
-   * @param first The first action identifier.
-   * @param second The second action identifier.
-   * @return true if the actions could conflict if bound to the same
-   * key.
-   */
-  /*bool actionsCanConflict(const ActionID & first,
-    const ActionID & second) const;*/
-
-  /**
    * @brief Load the manditory bindings.
    */
   void loadManditoryBindings(void);
@@ -247,10 +234,7 @@ class KeyBindings {
    * @brief Get a reference to the list of the manditory key bindings.
    * @return A reference to the list of the manditory bindings.
    */
-  inline QValueList<ActionID> & manditoryBindings(void)
-  {
-      return this->_manditory_bindings;
-  }
+  inline ActionList & manditoryBindings(void) { return _manditory_bindings; }
 
   /**
    * @brief Get the default keys.
@@ -261,7 +245,7 @@ class KeyBindings {
  private:
 
   QString _hostname;
-  QValueList<ActionID> _manditory_bindings;
+  ActionList _manditory_bindings;
   QStringList _default_keys;
   ActionSet actionset;
 };

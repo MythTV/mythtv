@@ -48,7 +48,10 @@ using namespace std;
 #include "mythcontrols.h"
 #include "keygrabber.h"
 
-
+/**
+ * @class ConflictResolver
+ * @brief A MythDialog that notifies the user of conflicts. 
+ */
 class ConflictResolver : public MythPopupBox
 {
 
@@ -239,13 +242,36 @@ void MythControls::keyPressEvent(QKeyEvent *e) {
 		popup->ShowPopup();
 	    }
 	}
-	else if ((action == "ESCAPE") && (focused != control_tree_list))
+	else if (action == "ESCAPE")
 	{
-	    /* take focus away from the button, and give it to the
-	     * control tree */
-	    focused->looseFocus();
-	    control_tree_list->takeFocus();
-	    focused = control_tree_list;
+	    if (focused == control_tree_list)
+	    {
+		/* ask the user to save if there are unsaved changes*/
+		if (key_bindings->hasChanges())
+		{
+		    popup = new MythPopupBox(gContext->GetMainWindow(),
+					     "unsaged");
+		    popup->addLabel(tr("Unsaged Changes"),
+				    MythPopupBox::Large,
+				    false);
+
+		    popup->addLabel(tr("Would you like to save now?"));
+		    popup->addButton(tr("Save"), this,
+				     SLOT(save()))->setFocus();
+		    popup->addButton(tr("Exit"), this, SLOT(killPopup()));
+		    popup->ExecPopup(this, SLOT(killPopup()));
+		}
+
+		/* let the user exit */
+		handled = false;
+	    }
+	    else
+	    {
+		/* take focus away from the button */
+		focused->looseFocus();
+		control_tree_list->takeFocus();
+		focused = control_tree_list;
+	    }
 	}
 	else if (action == "UP")
 	{

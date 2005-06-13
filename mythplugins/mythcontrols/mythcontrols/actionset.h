@@ -1,4 +1,3 @@
-/*-*- c++ -*-*/
 /**
  * @file actionset.h
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -24,11 +23,28 @@
 #ifndef ACTIONSET_H
 #define ACTIONSET_H
 
+
+/**
+ * @brief The statically assigned context for jump point actions.
+ */
 #define JUMP_CONTEXT "JumpPoints"
+
+/**
+ * @brief The name of global actions.
+ */
+#define GLOBAL_CONTEXT "Global"
+
 
 typedef QDict<Action> Context;
 typedef QValueList<ActionID> ActionList;
 
+
+/**
+ * @class ActionSet
+ * @brief Maintains consistancy between actions and keybindings.
+ *
+ * This class handles adding a removing bindings to keys.
+ */
 class ActionSet
 {
 
@@ -125,6 +141,12 @@ class ActionSet
     inline const ActionList & getModified(void) const { return _modified; }
 
     /**
+     * @brief Determine if the action set has been modified.
+     * @return True if changes have been made, otherwise, false.
+     */
+    inline bool hasModified(void) const { return !(_modified.isEmpty()); }
+
+    /**
      * @brief Mark an action as unmodified.
      * @return true if the action was modified, and is set to unmodified.
      */
@@ -175,24 +197,11 @@ class ActionSet
 	return this->_contexts[name];
     }
 
-    /**
-     * @brief Get the correct modified list.
-     * @param context_name The name of the context.
-     * @return The appropriate modifier list.
-     */
-    /*inline ActionList & modified(const QString &context_name) {
-	return (context_name == JUMP_CONTEXT) ?
-	    _modified_jumppoints : _modified_actions;
-	    }*/
-
  private:
 
     QMap<QString, ActionList> _keymap;
     QDict<Context> _contexts;
     ActionList _modified;
-    //ActionList _modified_actions;
-    //ActionList _modified_jumppoints;
-
 };
 
 #endif /* ACTIONSET_H */

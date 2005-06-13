@@ -1,5 +1,5 @@
 /**
- * @file actionidentifier.h
+ * @file actionid.h
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
  * @brief Header for the action identifier.
  *
@@ -25,6 +25,13 @@
 
 #include <qstring.h>
 
+
+/**
+ * @class ActionID
+ * @brief A class that uniquely identifies an action.
+ *
+ * Actions are identified based on their action name and context.
+ */
 class ActionID
 {
 
