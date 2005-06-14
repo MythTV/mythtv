@@ -126,6 +126,7 @@ SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
     ScanTimeout = 0; 		/* Set scan timeout off by default */
 
     FTAOnly = false;
+    RadioServices = false;
     forceUpdate = false;
 
     pthread_mutex_init(&events_lock, NULL);
@@ -224,19 +225,28 @@ int SIScan::CreateMultiplex(const fe_type_t cardType,
     case FE_QPSK:
          break;
     case FE_OFDM:
-        query.bindValue(":INVERSION",tuning.inversion());
-        query.bindValue(":BANDWIDTH",tuning.bandwidth());
-        query.bindValue(":CODERATE_HP",tuning.hpCoderate());
-        query.bindValue(":CODERATE_LP",tuning.lpCoderate());
-        query.bindValue(":CONSTELLATION",tuning.constellation());
-        query.bindValue(":TRANS_MODE",tuning.transmissionMode());
-        query.bindValue(":GUARD_INTERVAL",tuning.guardInterval());
-        query.bindValue(":HIERARCHY",tuning.hierarchy());
+        query.bindValue(":INVERSION",
+            DVBInversion::toString(tuning.params.inversion));
+        query.bindValue(":BANDWIDTH",
+            DVBBandwidth::toString(tuning.params.u.ofdm.bandwidth));
+        query.bindValue(":CODERATE_HP",
+            DVBCodeRate::toString(tuning.params.u.ofdm.code_rate_HP));
+        query.bindValue(":CODERATE_LP",
+            DVBCodeRate::toString(tuning.params.u.ofdm.code_rate_LP));
+        query.bindValue(":CONSTELLATION",
+            DVBModulation::toString(tuning.params.u.ofdm.constellation));
+        query.bindValue(":TRANS_MODE",
+            DVBTransmitMode::toString(tuning.params.u.ofdm.transmission_mode));
+        query.bindValue(":GUARD_INTERVAL",
+            DVBGuardInterval::toString(tuning.params.u.ofdm.guard_interval));
+        query.bindValue(":HIERARCHY",
+            DVBHierarchy::toString(tuning.params.u.ofdm.hierarchy_information));
         break; 
 #if (DVB_API_VERSION_MINOR == 1)
-         case FE_ATSC:
-             query.bindValue(":MODULATION",tuning.modulation());
-         break; 
+    case FE_ATSC:
+        query.bindValue(":MODULATION",
+            DVBModulation::toString(tuning.params.u.vsb.modulation));
+        break; 
 #endif
     }
 
@@ -735,6 +745,10 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     else
         return;    
 
+#if 0
+
+    // This code has caused too much trouble to leave in for now - Taylor
+
     // Clear out entries in the channel table that don't exist anymore
     QString deleteQuery = "delete from channel where not (";
     for (s = SDT.begin() ; s != SDT.end() ; ++s )
@@ -763,11 +777,14 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     if (!query.isActive())
         MythContext::DBError("Deleting non-existant channels", query);
 
+#endif
+
 
     for (s = SDT.begin() ; s != SDT.end() ; ++s )
     {
         // Its a TV Service so add it also only do FTA
-        if(((*s).ServiceType==SDTObject::TV) &&
+        if( (((*s).ServiceType==SDTObject::TV) || 
+             ((*s).ServiceType==SDTObject::RADIO) && RadioServices) &&
            (!FTAOnly || (FTAOnly && ((*s).CAStatus == 0))))
         {
             // See if transport already in database based on serviceid,networkid  and transportid

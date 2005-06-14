@@ -1,160 +1,309 @@
 #include <mythcontext.h>
 #include "dvbtypes.h"
 
-QString DVBTuning::inversion() const
-{ 
-    switch(params.inversion)
-    {
-    case INVERSION_ON:
-        return "1";
-    case INVERSION_OFF:
-        return "0";
-    default:
-        return "a";
-    }
-}
-
-QString DVBTuning::bandwidth() const
+DVBParamHelper<PolarityValues>::Table DVBPolarity::parseTable[] =
 {
-    switch (params.u.ofdm.bandwidth)
-    {
-       case BANDWIDTH_8_MHZ:
-           return "8";
-       case BANDWIDTH_7_MHZ:
-           return "7";
-       case BANDWIDTH_6_MHZ:
-           return "6";
-       default:
-               return "auto";
-    }
-}
+    {"v",Vertical},
+    {"h",Horizontal},
+    {"r",Right},
+    {"l",Left},
+    {NULL,Vertical}
+};
 
-QString DVBTuning::coderate(fe_code_rate_t coderate) const
+char *DVBPolarity::stringLookup[] =
 {
-    switch (coderate) 
-    {
-    case FEC_NONE:
-         return "none";
-    case FEC_1_2:
-        return "1/2";
-    case FEC_2_3:
-        return "2/3";
-    case FEC_3_4:
-        return "3/4";
-    case FEC_4_5:
-        return "4/5";
-    case FEC_5_6:
-        return "5/6";
-    case FEC_6_7:
-        return "6/7";
-    case FEC_7_8:
-        return "7/8";
-    default:
-        return "auto";
-    }
-}
+   "v",   // Vertical
+   "h",   // Horizontal
+   "r",   // Right
+   "l"    // Left
+};
 
-QString DVBTuning::constellation() const
+DVBParamHelper<fe_spectral_inversion_t>::Table DVBInversion::confTable[] =
 {
-    switch (params.u.ofdm.constellation)
-    {
-       case QPSK:
-               return "qpsk";
-       case QAM_16:
-               return "qam_16";
-       case QAM_32:
-               return "qam_32";
-       case QAM_64:
-               return "qam_64";
-       case QAM_128:
-               return "qam_128";
-       case QAM_256:
-               return "qam_256";
-       default:
-               return "auto";
-    }
-}
+   {"INVERSION_AUTO",INVERSION_AUTO},
+   {"INVERSION_OFF",INVERSION_OFF},
+   {"INVERSION_ON",INVERSION_ON},
+   {NULL,INVERSION_AUTO}
+};
 
-QString DVBTuning::transmissionMode() const
+DVBParamHelper<fe_spectral_inversion_t>::Table DVBInversion::vdrTable[] =
 {
-    //TransmissionMode
-    switch (params.u.ofdm.transmission_mode) 
-    {
-    case TRANSMISSION_MODE_2K:
-        return "2";
-    case TRANSMISSION_MODE_8K:
-        return "8";
-    default:
-        return "auto";
-    }    
-}
+   {"999",INVERSION_AUTO},
+   {"0",INVERSION_OFF},
+   {"1",INVERSION_ON},
+   {NULL,INVERSION_AUTO}
+};
 
-QString DVBTuning::guardInterval() const
+DVBParamHelper<fe_spectral_inversion_t>::Table DVBInversion::parseTable[] =
 {
-    //Guard Interval
-    switch (params.u.ofdm.guard_interval) 
-    {
-    case GUARD_INTERVAL_1_32:
-        return "1/32";
-    case GUARD_INTERVAL_1_16:
-        return "1/16";
-    case GUARD_INTERVAL_1_8:
-        return "1/8";
-    case GUARD_INTERVAL_1_4:
-        return "1/4";
-    default:
-        return "auto";
-    } 
-}
+   {"a",INVERSION_AUTO},
+   {"0",INVERSION_OFF},
+   {"1",INVERSION_ON},
+   {NULL,INVERSION_AUTO}
+};
 
-QString DVBTuning::hierarchy() const
+char* DVBInversion::stringLookup[] =
 {
-   // Hierarchy
-    switch (params.u.ofdm.hierarchy_information) 
-    {
-       case HIERARCHY_NONE:
-               return "n";
-       case HIERARCHY_1:
-               return "1";
-       case HIERARCHY_2:
-               return "2";
-       case HIERARCHY_4:
-               return "4";
-       default:
-               return "a";
-    }
-}
+    "1", // INVERSION_OFF,
+    "0", // INVERSION_ON,
+    "a"  //INVERSION_AUTO
+};
 
-QString DVBTuning::modulation() const
+DVBParamHelper<fe_bandwidth_t>::Table DVBBandwidth::confTable[] =
 {
+   {"BANDWIDTH_AUTO",BANDWIDTH_AUTO},
+   {"BANDWIDTH_8_MHZ",BANDWIDTH_8_MHZ},
+   {"BANDWIDTH_7_MHZ",BANDWIDTH_7_MHZ},
+   {"BANDWIDTH_6_MHZ",BANDWIDTH_6_MHZ},
+   {NULL,BANDWIDTH_AUTO}
+};
 
+DVBParamHelper<fe_bandwidth_t>::Table DVBBandwidth::vdrTable[] =
+{
+   {"999",BANDWIDTH_AUTO},
+   {"8",BANDWIDTH_8_MHZ},
+   {"7",BANDWIDTH_7_MHZ},
+   {"6",BANDWIDTH_6_MHZ},
+   {NULL,BANDWIDTH_AUTO},
+};
+
+DVBParamHelper<fe_bandwidth_t>::Table DVBBandwidth::parseTable[] =
+{
+   {"auto",BANDWIDTH_AUTO},
+   {"8",BANDWIDTH_8_MHZ},
+   {"7",BANDWIDTH_7_MHZ},
+   {"6",BANDWIDTH_6_MHZ},
+   {NULL,BANDWIDTH_AUTO}
+};
+
+char *DVBBandwidth::stringLookup[]=
+{
+    "8",   //BANDWIDTH_8_MHZ,
+    "7",   //BANDWIDTH_7_MHZ,
+    "6",   //BANDWIDTH_6_MHZ,
+    "auto" //BANDWIDTH_AUTO
+};
+
+DVBParamHelper<fe_code_rate_t>::Table DVBCodeRate::confTable[] =
+{
+    {"FEC_AUTO",FEC_AUTO},
+    {"FEC_1_2",FEC_1_2},
+    {"FEC_2_3",FEC_2_3},
+    {"FEC_3_4",FEC_3_4},
+    {"FEC_4_5",FEC_4_5},
+    {"FEC_5_6",FEC_5_6},
+    {"FEC_6_7",FEC_6_7},
+    {"FEC_7_8",FEC_7_8},
+    {"FEC_8_9",FEC_8_9},
+    {"FEC_NONE",FEC_NONE},
+    {NULL,FEC_AUTO}
+};
+
+DVBParamHelper<fe_code_rate_t>::Table DVBCodeRate::vdrTable[] =
+{
+    {"999",FEC_AUTO},
+    {"12",FEC_1_2},
+    {"23",FEC_2_3},
+    {"34",FEC_3_4},
+    {"45",FEC_4_5},
+    {"56",FEC_5_6},
+    {"67",FEC_6_7},
+    {"78",FEC_7_8},
+    {"89",FEC_8_9},
+    {"0",FEC_NONE},
+    {NULL,FEC_AUTO}
+};
+
+DVBParamHelper<fe_code_rate_t>::Table DVBCodeRate::parseTable[] =
+{
+    {"auto",FEC_AUTO},
+    {"1/2",FEC_1_2},
+    {"2/3",FEC_2_3},
+    {"3/4",FEC_3_4},
+    {"4/5",FEC_4_5},
+    {"5/6",FEC_5_6},
+    {"6/7",FEC_6_7},
+    {"7/8",FEC_7_8},
+    {"8/9",FEC_8_9},
+    {"none",FEC_NONE},
+    {NULL,FEC_AUTO}
+};
+
+char *DVBCodeRate::stringLookup[] =
+{
+     "none", //FEC_NONE,
+     "1/2",  //FEC_1_2,
+     "2/3",  //FEC_2_3,
+     "3/4",  //FEC_3_4,
+     "4/5",  //FEC_4_5,
+     "5/6",  //FEC_5_6,
+     "6/7",  //FEC_6_7,
+     "7/8",  //FEC_7_8,
+     "8/9",  //FEC_8_9,
+     "auto"  //FEC_AUTO
+};
+
+DVBParamHelper<fe_modulation_t>::Table DVBModulation::confTable[] =
+{
+   {"QAM_AUTO",QAM_AUTO},
+   {"QAM_16",QAM_16},
+   {"QAM_32",QAM_32},
+   {"QAM_64",QAM_64},
+   {"QAM_128",QAM_128},
+   {"QAM_256",QAM_256},
+   {"QPSK",QPSK},
+   {NULL,QAM_AUTO},
+};
+
+DVBParamHelper<fe_modulation_t>::Table DVBModulation::vdrTable[] =
+{
+   {"999",QAM_AUTO},
+   {"16",QAM_16},
+   {"32",QAM_32},
+   {"64",QAM_64},
+   {"128",QAM_128},
+   {"256",QAM_256},
+   {"0",QPSK},
+   {NULL,QAM_AUTO},
+};
+
+DVBParamHelper<fe_modulation_t>::Table DVBModulation::parseTable[] =
+{
+   {"auto",QAM_AUTO},
+   {"qam_16",QAM_16},
+   {"qam_32",QAM_32},
+   {"qam_64",QAM_64},
+   {"qam_128",QAM_128},
+   {"qam_256",QAM_256},
+   {"qpsk",QPSK},
 #if (DVB_API_VERSION_MINOR == 1)
-    switch(params.u.vsb.modulation)
-    {
-        case QPSK:
-            return "qpsk";
-        case QAM_16:
-            return "qam_16";
-        case QAM_32:  
-            return "qam_32";
-        case QAM_64:   
-            return "qam_64";
-        case QAM_128:
-            return "qam_128";
-        case QAM_256:
-            return "qam_256";
-        case VSB_8:
-            return "8vsb";
-        case VSB_16:
-            return "16vsb";
-        case QAM_AUTO:
-        default:
-            return "auto";
-    }
-#else
-    return "auto";
+   {"8vsb",VSB_8},
+   {"16vsb",VSB_16},
 #endif
-}
+   {NULL,QAM_AUTO},
+};
+
+char *DVBModulation::stringLookup[] =
+{
+    "qpsk",    //QPSK,
+    "qam_16",  //QAM_16,
+    "qam_32",  //QAM_32,
+    "qam_64",  //QAM_64,
+    "qam_128", //QAM_128,
+    "qam_256", //QAM_256,
+    "auto",    //QAM_AUTO,
+    "8vsb",    //VSB_8,
+    "16vsb"    //VSB_16
+};
+
+DVBParamHelper<fe_transmit_mode_t>::Table DVBTransmitMode::confTable[] =
+{
+   {"TRANSMISSION_MODE_AUTO",TRANSMISSION_MODE_AUTO},
+   {"TRANSMISSION_MODE_2K",TRANSMISSION_MODE_2K},
+   {"TRANSMISSION_MODE_8K",TRANSMISSION_MODE_2K},
+   {NULL,TRANSMISSION_MODE_AUTO},
+};
+
+DVBParamHelper<fe_transmit_mode_t>::Table DVBTransmitMode::vdrTable[] =
+{
+   {"999",TRANSMISSION_MODE_AUTO},
+   {"2",TRANSMISSION_MODE_2K},
+   {"8",TRANSMISSION_MODE_2K},
+   {NULL,TRANSMISSION_MODE_AUTO},
+};
+
+DVBParamHelper<fe_transmit_mode_t>::Table DVBTransmitMode::parseTable[] =
+{
+   {"auto",TRANSMISSION_MODE_AUTO},
+   {"2",TRANSMISSION_MODE_2K},
+   {"8",TRANSMISSION_MODE_2K},
+   {NULL,TRANSMISSION_MODE_AUTO},
+};
+
+char *DVBTransmitMode::stringLookup[] =
+{
+    "2",   //TRANSMISSION_MODE_2K,
+    "8",   //TRANSMISSION_MODE_8K,
+    "auto" //TRANSMISSION_MODE_AUTO
+};
+
+DVBParamHelper<fe_guard_interval_t>::Table DVBGuardInterval::confTable[] =
+{
+   {"GUARD_INTERVAL_AUTO",GUARD_INTERVAL_AUTO},
+   {"GUARD_INTERVAL_1_32",GUARD_INTERVAL_1_32},
+   {"GUARD_INTERVAL_1_16",GUARD_INTERVAL_1_16},
+   {"GUARD_INTERVAL_1_8",GUARD_INTERVAL_1_8},
+   {"GUARD_INTERVAL_1_4",GUARD_INTERVAL_1_4},
+   {NULL,GUARD_INTERVAL_AUTO},
+};
+
+DVBParamHelper<fe_guard_interval_t>::Table DVBGuardInterval::vdrTable[] =
+{
+   {"999",GUARD_INTERVAL_AUTO},
+   {"32",GUARD_INTERVAL_1_32},
+   {"16",GUARD_INTERVAL_1_16},
+   {"8",GUARD_INTERVAL_1_8},
+   {"4",GUARD_INTERVAL_1_4},
+   {NULL,GUARD_INTERVAL_AUTO},
+};
+
+DVBParamHelper<fe_guard_interval_t>::Table DVBGuardInterval::parseTable[] =
+{
+   {"auto",GUARD_INTERVAL_AUTO},
+   {"1/32",GUARD_INTERVAL_1_32},
+   {"1/16",GUARD_INTERVAL_1_16},
+   {"1/8",GUARD_INTERVAL_1_8},
+   {"1/4",GUARD_INTERVAL_1_4},
+   {NULL,GUARD_INTERVAL_AUTO},
+};
+
+char *DVBGuardInterval::stringLookup[] =
+{
+    "1/32", // GUARD_INTERVAL_1_32,
+    "1/16", // GUARD_INTERVAL_1_16,
+    "1/8",  // GUARD_INTERVAL_1_8,
+    "1/4",  // GUARD_INTERVAL_1_4,
+    "auto"  // GUARD_INTERVAL_AUTO
+};
+
+DVBParamHelper<fe_hierarchy_t>::Table DVBHierarchy::confTable[] =
+{
+   {"HIERARCHY_NONE",HIERARCHY_NONE},
+   {"HIERARCHY_1",HIERARCHY_1},
+   {"HIERARCHY_2",HIERARCHY_2},
+   {"HIERARCHY_4",HIERARCHY_4},
+   {"HIERARCHY_AUTO",HIERARCHY_AUTO},
+   {NULL,HIERARCHY_AUTO},
+};
+
+DVBParamHelper<fe_hierarchy_t>::Table DVBHierarchy::vdrTable[] =
+{
+   {"0",HIERARCHY_NONE},
+   {"1",HIERARCHY_1},
+   {"2",HIERARCHY_2},
+   {"4",HIERARCHY_4},
+   {"999",HIERARCHY_AUTO},
+   {NULL,HIERARCHY_AUTO},
+};
+
+DVBParamHelper<fe_hierarchy_t>::Table DVBHierarchy::parseTable[] =
+{
+   {"n",HIERARCHY_NONE},
+   {"1",HIERARCHY_1},
+   {"2",HIERARCHY_2},
+   {"4",HIERARCHY_4},
+   {"a",HIERARCHY_AUTO},
+   {NULL,HIERARCHY_AUTO},
+};
+
+char *DVBHierarchy::stringLookup[] =
+{
+    "n", //HIERARCHY_NONE,
+    "1", //HIERARCHY_1,
+    "2", //HIERARCHY_2,
+    "4", //HIERARCHY_4,
+    "a"  //HIERARCHY_AUTO
+};
 
 bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
 {

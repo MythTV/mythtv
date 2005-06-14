@@ -14,21 +14,68 @@
 #include "dvbchannel.h"
 #endif
 
+/**
+  class CardUtil
+  @brief Collection of helper utilities for capture cards
+ */
 class CardUtil
 {
   public:
-    enum DVB_TYPES {ERROR_OPEN, ERROR_PROBE, QPSK, QAM, OFDM, ATSC};
+    /**@brief all the different capture cards*/
+    enum CARD_TYPES {ERROR_OPEN, ERROR_PROBE, QPSK, QAM, OFDM, ATSC,
+                V4L, MPEG, HDTV, FIREWIRE};
+    /**@brief all the different dvb diseqc*/
     enum DISEQC_TYPES { SINGLE=0, MINI_2, SWITCH_2_1_0, SWITCH_2_1_1,
                         SWITCH_4_1_0, SWITCH_4_1_1, POSITIONER_1_2,
                         POSITIONER_X, POSITIONER_1_2_SWITCH_2,
                         POSITIONER_X_SWITCH_2 };
+    /**@brief dvb card type*/
     static const QString DVB;
 
+    /**@brief returns true if the card type is present
+       @param [in]strType card type being checked for
+     */
     static bool isCardPresent(const QString &strType);
-    static DVB_TYPES cardDVBType(unsigned nVideoDev);
-    static DVB_TYPES cardDVBType(unsigned nVideoDev, QString &name);
-    static int CardUtil::videoDeviceFromCardID(unsigned nCardID);
+    /**@brief returns the card type from the video device
+       @param [in]nVideoDev video dev to be checked
+       @returns the card type
+     */
+    static CARD_TYPES cardType(unsigned nVideoDev);
+    /**@brief returns the card type from the video device
+       @param [in]nVideoDev video dev to be checked
+       @param [out]name the probed card name
+       @returns the card type
+     */
+    static CARD_TYPES cardType(unsigned nVideoDev, QString &name);
+    /**@brief returns the card type from the video device
+       @param [in]nVideoDev video dev to be checked
+       @param [out]name the probed card name
+       @returns the card type
+     */
+    static CARD_TYPES cardDVBType(unsigned nVideoDev, QString &name);
+    /**@brief returns the the video device associated with the card id
+       @param [in]nCardID card id to check
+       @param [out]device the returned device
+       @returns true on success
+     */
+    static bool CardUtil::videoDeviceFromCardID(unsigned nCardID,QString& device);
+    /**@brief returns the the video devices associated with the card id
+       @param [in]nCardID card id to check
+       @param [out]video the returned video device
+       @param [out]vbi the returned vbi device
+       @returns true on success
+     */
+    static bool CardUtil::videoDeviceFromCardID(unsigned nCardID,QString& video,
+                                                QString& vbi);
+    /**@brief returns true if the card is a DVB card
+       @param [in]nCardID card id to check
+       @returns true if the card is a DVB one
+    */
     static bool CardUtil::isDVB(unsigned nCardID);
+    /**@brief returns the disqec type associated with a DVB card
+       @param [in]nCardID card id to check
+       @returns the disqec type
+    */
     static DISEQC_TYPES CardUtil::diseqcType(unsigned nCardID);
 };
 

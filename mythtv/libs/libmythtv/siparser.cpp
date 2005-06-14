@@ -733,7 +733,8 @@ void SIParser::ParsePMT(tablehead_t* head, uint8_t* buffer, int size)
             case 0x01:
                 e.Type = ES_TYPE_VIDEO_MPEG1;
                 break;
-            case 0x02:
+            case 0x80:  // OpenCable Mpeg2
+            case 0x02:  // DVB/ATSC Mpeg2
                 e.Type = ES_TYPE_VIDEO_MPEG2;
                 break;
             case 0x03:

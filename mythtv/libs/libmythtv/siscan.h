@@ -74,6 +74,7 @@ public:
     void SetSourceID(int _SourceID);
 
     void SetFTAOnly(bool _fFTAOnly) { FTAOnly = _fFTAOnly;}
+    void SetRadioServices(bool _fRadio) { RadioServices = _fRadio;}
     void SetForceUpdate(bool _force) { forceUpdate = _force;}
     void SetScanTimeout(int _timeout) { ScanTimeout = _timeout;}
 
@@ -131,6 +132,7 @@ private:
 
     bool threadExit;
     bool FTAOnly;
+    bool RadioServices;
     bool forceUpdate;
     int ScanTimeout;
     SCANMODE scanMode;

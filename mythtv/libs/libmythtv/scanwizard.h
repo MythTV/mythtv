@@ -37,7 +37,9 @@
 
 #include <mythwizard.h>
 #include "settings.h"
+#ifdef USING_DVB
 #include "dvbtypes.h"
+#endif
 
 class OFDMPane;
 class QPSKPane;
@@ -51,6 +53,7 @@ class ScanCountry;
 class OptionalTypeSetting;
 class ScanWizard;
 class ScanWizardScanner;
+class AnalogScan;
 
 class VideoSourceSetting: public ComboBoxSetting
 {
@@ -95,24 +98,38 @@ public slots:
 class ScanCountry: public ComboBoxSetting,TransientStorage
 {
 public:
-    enum Lang{AU,FI,SE,UK,DE};
+    enum Country{AU,FI,SE,UK,DE};
 
     ScanCountry();
 };
 
-class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
+class ScanFileImport : public LineEditSetting, TransientStorage
 {
 public:
-    enum Type {FullScan,FullTunedScan,FullTransportScan,TransportScan} ;
+    ScanFileImport() : LineEditSetting()
+    {
+        setLabel(QObject::tr("File location"));
+        setHelpText(QObject::tr("Location of the channels.conf file."));
+    }
+};
+
+
+class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
+{
+    Q_OBJECT
+public:
+    enum Type {Error_Open,Error_Probe,
+               FullScan_Analog,FullScan_ATSC,FullScan_OFDM,
+               FullTunedScan_OFDM,FullTunedScan_QPSK,FullTunedScan_QAM,
+               FullTransportScan,TransportScan, Import};
 
     ScanTypeSetting()
     {
         setLabel(QObject::tr("Scan Type"));
-        addSelection(tr("Full Scan"),QString::number(FullScan),true);
-        addSelection(tr("Full Scan (Tuned)"),QString::number(FullTunedScan));
-        addSelection(tr("Full Scan of Existing Transports"),QString::number(FullTransportScan));
-        addSelection(tr("Existing Transport Scan"),QString::number(TransportScan));
+        refresh("");
     }
+protected slots:
+    void refresh(const QString&);
 };
 
 class ScanOptionalConfig: public VerticalConfigurationGroup,
@@ -120,24 +137,20 @@ class ScanOptionalConfig: public VerticalConfigurationGroup,
 {
     Q_OBJECT
 public:
-    ScanOptionalConfig(ScanWizard* wizard);
+    ScanOptionalConfig(ScanWizard* wizard,ScanTypeSetting* scanType);
 
-    OptionalTypeSetting *optionalTypeSetting;
     TransportSetting *transport;
     ScanCountry *country;
+    ScanFileImport *filename;
 protected slots:
     void triggerChanged(const QString&);
 };
 
 class ScanWizardScanType: public VerticalConfigurationGroup
 {
-    Q_OBJECT
     friend class ScanWizard;
 public:
     ScanWizardScanType(ScanWizard *_parent);
-
-protected slots:
-    void scanTypeChanged(const QString& value);
 
 protected:
     ScanWizard *parent;
@@ -146,9 +159,6 @@ protected:
     CaptureCardSetting *capturecard;
     VideoSourceSetting *videoSource;
     ScanTypeSetting *scanType;
-
-signals:
-    void scanOptionChange(const QString&);
 };
 
 class ScanWizard: public ConfigurationWizard 
@@ -187,6 +197,7 @@ protected:
     int country() {return page1->scanConfig->country->getValue().toInt();}
     int captureCard() {return page1->capturecard->getValue().toInt();}
     int scanType() {return page1->scanType->getValue().toInt();}
+    QString filename() {return page1->scanConfig->filename->getValue();}
 };
 
 class ScanSignalMeter: public ProgressSetting, public TransientStorage {
@@ -216,7 +227,7 @@ protected:
     ScanSignalMeter *progressBar;
 
 public:
-    ScanProgressPopup(ScanWizardScanner *parent);
+    ScanProgressPopup(ScanWizardScanner *parent,bool signalmonitors = true);
     ~ScanProgressPopup();
     void exec(ScanWizardScanner *parent);
     void signalToNoise(int value);
@@ -278,19 +289,23 @@ protected:
     };
 
     ScanWizard *parent;
-
+    AnalogScan *analogScan;
     LogList *log;
 
     bool scanthread_running;
     bool tunerthread_running;
+#ifdef USING_DVB
     pthread_t scanner_thread;
     pthread_t tuner_thread;
     DVBChannel* dvbchannel;
     DVBSignalMonitor* monitor;
     SIScan* scanner;
     dvb_channel_t chan_opts;
+#endif
     ScanProgressPopup *popupProgress;
     int nTransportToTuneTo;
+    int nScanType;
+    int nVideoSource;
 
     void finish();
     static void *SpawnScanner(void *param);

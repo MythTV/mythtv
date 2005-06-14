@@ -18,9 +18,7 @@
 #include "channelsettings.h"
 #include "dvbtransporteditor.h"
 
-#ifdef USING_DVB
 #include "scanwizard.h"
-#endif
 
 ChannelWizard::ChannelWizard(int id)
              : ConfigurationWizard() {
@@ -111,6 +109,7 @@ void ChannelListSetting::fillSelections(void)
     QString currentValue = getValue();
     clearSelections();
     addSelection(QObject::tr("(New Channel)"));
+    bool fAllSources = true;
 
     QString querystr = "SELECT channel.name,channum,chanid ";
 
@@ -119,11 +118,13 @@ void ChannelListSetting::fillSelections(void)
         querystr += ",videosource.name FROM channel "
                     "LEFT JOIN videosource ON "
                     "(channel.sourceid = videosource.sourceid) ";
+        fAllSources = true;
     }
     else
     {
         querystr += QString("FROM channel WHERE sourceid='%1' ")
                            .arg(currentSourceID);
+        fAllSources = false;
     }
         
     if (currentSortMode == QObject::tr("Channel Name"))
@@ -147,7 +148,7 @@ void ChannelListSetting::fillSelections(void)
             QString chanid = query.value(2).toString();
             QString sourceid = "Unassigned";
 
-            if (!query.value(3).toString().isNull())
+            if (fAllSources && !query.value(3).toString().isNull())
             {
                 sourceid = query.value(3).toString();
                 if (currentSourceID == "Unassigned")
@@ -240,10 +241,10 @@ ChannelEditor::ChannelEditor():
     addChild(source);
     addChild(hide);
 
-#ifdef USING_DVB
     buttonScan = new TransButtonSetting();
     buttonScan->setLabel(QObject::tr("Scan for channels(s)"));
     buttonScan->setHelpText(QObject::tr("This button will scan for digital channels."));
+#ifdef USING_DVB
     buttonAdvanced = new TransButtonSetting();
     buttonAdvanced->setLabel(QObject::tr("Advanced"));
     buttonAdvanced->setHelpText(QObject::tr("Advanced editing options for digital channels"));
@@ -252,6 +253,8 @@ ChannelEditor::ChannelEditor():
     h->addChild(buttonScan);
     h->addChild(buttonAdvanced);
     addChild(h);
+#else
+    addChild(buttonScan);
 #endif
 
     connect(source, SIGNAL(valueChanged(const QString&)),
@@ -262,8 +265,8 @@ ChannelEditor::ChannelEditor():
             list, SLOT(setHideMode(bool)));
     connect(list, SIGNAL(accepted(int)), this, SLOT(edit(int)));
     connect(list, SIGNAL(menuButtonPressed(int)), this, SLOT(menu(int)));
-#ifdef USING_DVB
     connect(buttonScan, SIGNAL(pressed()), this, SLOT(scan()));
+#ifdef USING_DVB
     connect(buttonAdvanced, SIGNAL(pressed()), this, SLOT(advanced()));
 #endif
 }
@@ -273,10 +276,7 @@ int ChannelEditor::exec() {
     //Make sure we have dvb card installed
 #ifdef USING_DVB
     if (!CardUtil::isCardPresent(CardUtil::DVB))
-    {
-        buttonScan->setEnabled(false);
         buttonAdvanced->setEnabled(false);
-    }
 #endif
 
     while (ConfigurationDialog::exec() == QDialog::Accepted)  {}
@@ -338,13 +338,11 @@ void ChannelEditor::menu(int /*iSelected*/) {
 
 void ChannelEditor::scan()
 {
-#ifdef USING_DVB
     ScanWizard scanwizard;
     scanwizard.exec(false,true);
 
     list->fillSelections();
     list->setFocus();
-#endif
 }
 
 void ChannelEditor::advanced()

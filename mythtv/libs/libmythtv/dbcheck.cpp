@@ -336,7 +336,7 @@ bool doUpgradeTVDatabaseSchema(void)
     {
         const QString updates[] = {
 "ALTER TABLE capturecard CHANGE use_ts dvb_swfilter INT DEFAULT '0';",
-"ALTER TABLE capturecard CHANGE dvb_type dvb_recordts INT DEFAULT '0';",
+"ALTER TABLE capturecard CHANGE dvb_type dvb_recordts INT DEFAULT '1';",
 "DROP TABLE IF EXISTS channel_dvb;",
 "CREATE TABLE IF NOT EXISTS dvb_channel ("
 "   chanid              SMALLINT NOT NULL,"
@@ -1730,7 +1730,7 @@ bool InitializeDatabase(void)
 "  audioratelimit int(11) default NULL,"
 "  hostname varchar(255) default NULL,"
 "  dvb_swfilter int(11) default '0',"
-"  dvb_recordts int(11) default '0',"
+"  dvb_recordts int(11) default '1',"
 "  dvb_sat_type int(11) NOT NULL default '0',"
 "  dvb_wait_for_seqstart int(11) NOT NULL default '1',"
 "  dvb_dmx_buf_size int(11) NOT NULL default '8192',"

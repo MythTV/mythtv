@@ -56,13 +56,12 @@ bool CardUtil::isCardPresent(const QString &strType)
     return false;
 }
 
-enum CardUtil::DVB_TYPES CardUtil::cardDVBType(unsigned nVideoDev,
-                                               QString &name)
+enum CardUtil::CARD_TYPES CardUtil::cardDVBType(unsigned nCardNumber,QString &name)
 {
-    DVB_TYPES nRet = ERROR_OPEN;
+    CARD_TYPES nRet = ERROR_OPEN;
 #ifdef USING_DVB
-    int fd_frontend = open(dvbdevice(DVB_DEV_FRONTEND, nVideoDev),
-                           O_RDWR | O_NONBLOCK);
+    int fd_frontend = open(dvbdevice(DVB_DEV_FRONTEND, nCardNumber),
+                       O_RDWR | O_NONBLOCK);
     if (fd_frontend >= 0)
     {
         struct dvb_frontend_info info;
@@ -89,23 +88,61 @@ enum CardUtil::DVB_TYPES CardUtil::cardDVBType(unsigned nVideoDev,
             }
         }
         close(fd_frontend);
-    }
+    } 
 #else
-    (void)nVideoDev;
+    (void)nCardNumber;
     (void)name;
 #endif
     return nRet;
 }
 
-enum CardUtil::DVB_TYPES CardUtil::cardDVBType(unsigned nVideoDev)
+enum CardUtil::CARD_TYPES CardUtil::cardType(unsigned nCardID,
+                                               QString &name)
 {
-    QString name;
-    return CardUtil::cardDVBType(nVideoDev,name);
+    CARD_TYPES nRet = ERROR_OPEN;
+    QString strDevice;
+    QString strType;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT videodevice,cardtype FROM capturecard "
+                  " WHERE capturecard.cardid = :CARDID ;");
+    query.bindValue(":CARDID", nCardID);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        strDevice = query.value(0).toString();
+        strType = query.value(1).toString();
+    }
+    else
+        return nRet;
+
+    if (strType=="V4L")
+        nRet = V4L;
+    else if (strType=="MPEG")
+        nRet = MPEG;
+    else if (strType=="FIREWIRE")
+        nRet = FIREWIRE;
+    else if (strType=="HDTV")
+        nRet = HDTV;
+#ifdef USING_DVB
+    else if (strType=="DVB")
+        nRet = cardDVBType(strDevice.toInt(),name);
+#else
+    (void)name;
+#endif
+    return nRet;
 }
 
-int CardUtil::videoDeviceFromCardID(unsigned nCardID)
+enum CardUtil::CARD_TYPES CardUtil::cardType(unsigned nCardID)
 {
-    int iRet = -1;
+    QString name;
+    return CardUtil::cardType(nCardID,name);
+}
+
+bool CardUtil::videoDeviceFromCardID(unsigned nCardID,QString& device)
+{
+    bool fRet=false;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT videodevice FROM capturecard "
                   " WHERE capturecard.cardid = :CARDID ;");
@@ -114,9 +151,29 @@ int CardUtil::videoDeviceFromCardID(unsigned nCardID)
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-        iRet = query.value(0).toInt();
+        device = query.value(0).toString();
+        fRet = true;
     }
-    return iRet;
+    return fRet;
+}
+
+bool CardUtil::videoDeviceFromCardID(unsigned nCardID,QString& device,
+                                                      QString& vbi)
+{
+    bool fRet=false;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT videodevice,vbidevice FROM capturecard "
+                  " WHERE capturecard.cardid = :CARDID ;");
+    query.bindValue(":CARDID", nCardID);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        device = query.value(0).toString();
+        vbi = query.value(1).toString();
+        fRet = true;
+    }
+    return fRet;
 }
 
 bool CardUtil::isDVB(unsigned nCardID)
@@ -1418,10 +1475,8 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
 
     if (CardUtil::isDVB(_cardid))
     {
-        int iVideoDev = CardUtil::videoDeviceFromCardID(_cardid);
-        CardUtil::DVB_TYPES dvbType;
-        if ((iVideoDev >= 0) &&
-           ((dvbType = CardUtil::cardDVBType(iVideoDev))>CardUtil::ERROR_PROBE))
+        CardUtil::CARD_TYPES dvbType;
+        if ((dvbType = CardUtil::cardType(_cardid))>CardUtil::ERROR_PROBE)
         {
             if (dvbType == CardUtil::QPSK)
             {
@@ -1918,7 +1973,8 @@ void DVBConfigurationGroup::probeCard(const QString& cardNumber)
             cardtype->setValue("ATSC");
             cardname->setValue(name);
             break;
-
+        default:
+            fEnable = false;
     }
     defaultinput->setEnabled(fEnable);
     diseqctype->setEnabled(fEnable);

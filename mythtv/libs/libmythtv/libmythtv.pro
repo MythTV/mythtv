@@ -57,7 +57,8 @@ HEADERS += fifowriter.h filtermanager.h videooutbase.h videoout_null.h xbox.h
 HEADERS += dbcheck.h udpnotify.h channeleditor.h channelsettings.h
 HEADERS += osdlistbtntype.h blend.h datadirect.h sr_dialog.h
 HEADERS += sr_items.h sr_root.h recordingtypes.h jobqueue.h dtvrecorder.h
-HEADERS += videobuffers.h
+HEADERS += videobuffers.h 
+HEADERS += scanwizard.h analogscan.h
 
 SOURCES += frequencies.c guidegrid.cpp #infodialog.cpp 
 SOURCES += infostructs.cpp jitterometer.cpp minilzo.cpp NuppelVideoPlayer.cpp 
@@ -72,6 +73,7 @@ SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
 SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp decoderbase.cpp
 SOURCES += recordingtypes.cpp jobqueue.cpp dtvrecorder.cpp
 SOURCES += videobuffers.cpp
+SOURCES += scanwizard.cpp analogscan.cpp
 
 
 unix {
@@ -140,13 +142,13 @@ using_dvb {
     using_dvb_eit:DEFINES += USING_DVB_EIT
     SOURCES += dvbrecorder.cpp dvbchannel.cpp dvbdiseqc.cpp dvbcam.cpp
     SOURCES += dvbtransporteditor.cpp dvbsiparser.cpp siparser.cpp siscan.cpp
-    SOURCES += scanwizard.cpp dvbsignalmonitor.cpp sitypes.cpp dvbtypes.cpp
+    SOURCES += dvbsignalmonitor.cpp sitypes.cpp dvbtypes.cpp dvbconfparser.cpp
     SOURCES += dvbdev/dvbdev.c dvbdev/transform.c dvbdev/ringbuffy.c 
     SOURCES += dvbdev/dvbci.cpp
 
     HEADERS += dvbtypes.h dvbrecorder.h dvbchannel.h dvbdiseqc.h dvbcam.h
     HEADERS += dvbtransporteditor.h dvbsiparser.h siparser.h siscan.h
-    HEADERS += scanwizard.h dvbsignalmonitor.h sitypes.h
+    HEADERS += dvbsignalmonitor.h sitypes.h dvbconfparser.h
     HEADERS += dvbdev/dvbdev.h dvbdev/transform.h dvbdev/ringbuffy.h 
     HEADERS += dvbdev/dvbci.h
 }

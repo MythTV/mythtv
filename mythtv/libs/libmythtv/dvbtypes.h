@@ -39,6 +39,226 @@ using namespace std;
 #define MAX_SECTION_SIZE 4096
 #define DMX_DONT_FILTER 0x2000
 
+//The following are a set of helper classes to allow easy translation
+//between the actual dvb enums and db strings.
+
+//Helper abstract template to do some of the mundain bits
+//of translating the DVBParamHelpers
+template <typename V> class DVBParamHelper 
+{
+protected:
+    V value;
+
+    struct Table
+    {
+        QString symbol;
+        V value;
+    };
+
+    static bool parseParam(QString& symbol, V& value, Table *table)
+    {
+        Table *p = table;
+        while (p->symbol!=NULL)
+        {
+            if (p->symbol==symbol.left(p->symbol.length()))
+            {
+                 symbol=symbol.mid(p->symbol.length());
+                 value = p->value;
+                 return true;
+            }
+            p++;
+        }
+        return false;
+    }
+
+public:
+    DVBParamHelper(V _value) : value(_value) {}
+
+    operator V() const { return value; }
+    V operator=(V _value) {return value = _value;}
+    bool operator==(const V& v) const {return value == v;}
+};
+
+class DVBInversion : public DVBParamHelper<fe_spectral_inversion_t>
+{
+protected:
+    static Table confTable[];
+    static Table vdrTable[];
+    static Table parseTable[];
+    static char* stringLookup[];
+
+public:
+    DVBInversion() : DVBParamHelper<fe_spectral_inversion_t>(INVERSION_AUTO) {}
+    bool parseConf(QString& _value) 
+           {return parseParam(_value,value,confTable);}
+    bool parseVDR(QString& _value)
+           {return parseParam(_value,value,vdrTable);}
+    bool parse(QString& _value)
+           {return parseParam(_value,value,parseTable);}
+
+    QString toString() const {return toString(value);}
+    static QString toString(fe_spectral_inversion_t _value)
+           {return stringLookup[_value];}
+};
+
+class DVBBandwidth : public DVBParamHelper<fe_bandwidth_t>
+{
+protected:
+    static Table confTable[];
+    static Table vdrTable[];
+    static Table parseTable[];
+    static char* stringLookup[];
+
+public:
+    DVBBandwidth() : DVBParamHelper<fe_bandwidth_t>(BANDWIDTH_AUTO) {}
+    bool parseConf(QString& _value) 
+           {return parseParam(_value,value,confTable);}
+    bool parseVDR(QString& _value)
+           {return parseParam(_value,value,vdrTable);}
+    bool parse(QString& _value)
+           {return parseParam(_value,value,parseTable);}
+
+    QString toString() const {return toString(value);}
+    static QString toString(fe_bandwidth_t _value)
+           {return stringLookup[_value];}
+};
+
+class DVBCodeRate : public DVBParamHelper<fe_code_rate_t>
+{
+protected:
+    static Table confTable[];
+    static Table vdrTable[];
+    static Table parseTable[];
+    static char* stringLookup[];
+
+public:
+    DVBCodeRate() : DVBParamHelper<fe_code_rate_t>(FEC_AUTO) {}
+
+    bool parseConf(QString& _value) 
+           {return parseParam(_value,value,confTable);}
+    bool parseVDR(QString& _value)
+           {return parseParam(_value,value,vdrTable);}
+    bool parse(QString& _value)
+           {return parseParam(_value,value,parseTable);}
+
+    QString toString() const {return toString(value);}
+    static QString toString(fe_code_rate_t _value)
+           {return stringLookup[_value];}
+};
+
+class DVBModulation : public DVBParamHelper<fe_modulation_t>
+{
+protected:
+    static Table confTable[];
+    static Table vdrTable[];
+    static Table parseTable[];
+    static char* stringLookup[];
+
+public:
+    DVBModulation() : DVBParamHelper<fe_modulation_t>(QAM_AUTO) {}
+
+    bool parseConf(QString& _value) 
+           {return parseParam(_value,value,confTable);}
+    bool parseVDR(QString& _value)
+           {return parseParam(_value,value,vdrTable);}
+    bool parse(QString& _value)
+           {return parseParam(_value,value,parseTable);}
+
+    QString toString() const {return toString(value);}
+    static QString toString(fe_modulation_t _value)
+           {return stringLookup[_value];}
+};
+
+class DVBTransmitMode : public DVBParamHelper<fe_transmit_mode_t>
+{
+protected:
+    static Table confTable[];
+    static Table vdrTable[];
+    static Table parseTable[];
+    static char* stringLookup[];
+
+public:
+    DVBTransmitMode() : DVBParamHelper<fe_transmit_mode_t>(TRANSMISSION_MODE_AUTO) {}
+
+    bool parseConf(QString& _value) 
+           {return parseParam(_value,value,confTable);}
+    bool parseVDR(QString& _value)
+           {return parseParam(_value,value,vdrTable);}
+    bool parse(QString& _value)
+           {return parseParam(_value,value,parseTable);}
+
+    QString toString() const {return toString(value);}
+    static QString toString(fe_transmit_mode_t _value)
+           {return stringLookup[_value];}
+};
+
+class DVBGuardInterval : public DVBParamHelper<fe_guard_interval_t>
+{
+protected:
+    static Table confTable[];
+    static Table vdrTable[];
+    static Table parseTable[];
+    static char* stringLookup[];
+
+public:
+    DVBGuardInterval() : DVBParamHelper<fe_guard_interval_t>(GUARD_INTERVAL_AUTO) {}
+
+    bool parseConf(QString& _value) 
+           {return parseParam(_value,value,confTable);}
+    bool parseVDR(QString& _value)
+           {return parseParam(_value,value,vdrTable);}
+    bool parse(QString& _value)
+           {return parseParam(_value,value,parseTable);}
+
+    QString toString() const {return toString(value);}
+    static QString toString(fe_guard_interval_t _value)
+           {return stringLookup[_value];}
+};
+
+class DVBHierarchy : public DVBParamHelper<fe_hierarchy_t>
+{
+protected:
+    static Table confTable[];
+    static Table vdrTable[];
+    static Table parseTable[];
+    static char* stringLookup[];
+
+public:
+    DVBHierarchy() : DVBParamHelper<fe_hierarchy_t>(HIERARCHY_AUTO) {}
+
+    bool parseConf(QString& _value) 
+           {return parseParam(_value,value,confTable);}
+    bool parseVDR(QString& _value)
+           {return parseParam(_value,value,vdrTable);}
+    bool parse(QString& _value)
+           {return parseParam(_value,value,parseTable);}
+
+    QString toString() const {return toString(value);}
+    static QString toString(fe_hierarchy_t _value)
+           {return stringLookup[_value];}
+};
+
+enum PolarityValues {Vertical,Horizontal,Right,Left};
+class DVBPolarity : public DVBParamHelper<PolarityValues>
+{
+protected:
+    static Table parseTable[];
+    static char* stringLookup[];
+public:
+    DVBPolarity() :  DVBParamHelper<PolarityValues>(Vertical) { }
+
+    bool parseConf(QString& _value) 
+           {return parseParam(_value,value,parseTable);}
+    bool parseVDR(QString& _value)
+           {return parseParam(_value,value,parseTable);}
+    bool parse(QString& _value)
+           {return parseParam(_value,value,parseTable);}
+
+    QString toString() const {return toString(value);}
+    static QString toString(PolarityValues _value) 
+           {return stringLookup[_value];}
+};
+
 typedef vector<uint16_t> dvb_pid_t;
 // needs to add provider id so dvbcam doesnt require parsing
 // of the pmt and or the pmtcache
@@ -57,17 +277,6 @@ public:
     unsigned int lnb_lof_hi;
     unsigned int lnb_lof_lo;
 
-    //Helper functions to get the paramaters as DB friendly strings
-    QString inversion() const;
-    QString bandwidth() const;
-    QString hpCoderate() const {return coderate(params.u.ofdm.code_rate_HP);}
-    QString lpCoderate() const {return coderate(params.u.ofdm.code_rate_HP);}
-    QString constellation() const;
-    QString transmissionMode() const;
-    QString guardInterval() const;
-    QString hierarchy() const;
-    QString modulation() const;
-
     bool parseATSC(const QString& frequency, const QString modulation);
     bool parseOFDM(const QString& frequency, const QString& inversion,
                    const QString& bandwidth, const QString& coderate_hp,
@@ -85,9 +294,6 @@ public:
     bool parseQAM(const QString& frequency, const QString& inversion,
                   const QString& symbol_rate, const QString& fec_inner,
                   const QString& modulation);
-
-protected:
-    QString coderate(fe_code_rate_t coderate) const;
 };
 
 class dvb_channel_t
