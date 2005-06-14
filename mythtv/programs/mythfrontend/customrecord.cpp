@@ -30,6 +30,8 @@ using namespace std;
 CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
               : MythDialog(parent, name)
 {
+    prevItem = 0;
+
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
     // Window title
@@ -41,6 +43,44 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
 
     QVBoxLayout *vkbox = new QVBoxLayout(vbox, (int)(1 * wmult));
     QHBoxLayout *hbox = new QHBoxLayout(vkbox, (int)(1 * wmult));
+
+    // Edit selection
+    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+
+    message = tr("Edit Rule") + ": ";
+    label = new QLabel(message, this);
+    label->setBackgroundOrigin(WindowOrigin);
+    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    hbox->addWidget(label);
+
+    m_rule = new MythComboBox( false, this, "rule");
+    m_rule->setBackgroundOrigin(WindowOrigin);
+
+    m_rule->insertItem(tr("<New rule>"));
+    m_recid   << "0";
+    m_recdesc << "";
+
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare("SELECT recordid, title, description FROM record "
+                   "WHERE search = :SEARCH ORDER BY title;");
+    result.bindValue(":SEARCH", kPowerSearch);
+
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
+        while (result.next()) 
+        {
+            QString trimTitle = QString::fromUtf8(result.value(1).toString());
+            trimTitle.remove(QRegExp(" \\(.*\\)$"));
+
+            m_rule->insertItem(trimTitle);
+            m_recid   << result.value(0).toString();
+            m_recdesc << QString::fromUtf8(result.value(2).toString());
+        }
+    }
+    else
+        MythContext::DBError("Get power searc rules query", result);
+
+    hbox->addWidget(m_rule);
 
     // Title edit box
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
@@ -197,6 +237,8 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
 
     connect(this, SIGNAL(dismissWindow()), this, SLOT(accept()));
      
+    connect(m_rule, SIGNAL(activated(int)), this, SLOT(ruleChanged(void)));
+    connect(m_rule, SIGNAL(highlighted(int)), this, SLOT(ruleChanged(void)));
     connect(m_title, SIGNAL(textChanged(void)), this, SLOT(textChanged(void)));
     connect(m_addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(m_clause, SIGNAL(activated(int)), this, SLOT(clauseChanged(void)));
@@ -210,7 +252,7 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     gContext->addListener(this);
 
     if (m_title->text().isEmpty())
-        m_title->setFocus();
+        m_rule->setFocus();
     else 
         m_clause->setFocus();
 
@@ -220,6 +262,23 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
 CustomRecord::~CustomRecord(void)
 {
     gContext->removeListener(this);
+}
+
+void CustomRecord::ruleChanged(void)
+{
+    int curItem = m_rule->currentItem();
+    if (curItem == prevItem)
+        return;
+
+    prevItem = curItem;
+
+    if (curItem > 0)
+        m_title->setText(m_rule->currentText());
+    else
+        m_title->setText("");
+
+    m_description->setText(m_recdesc[curItem]);
+    textChanged();
 }
 
 void CustomRecord::textChanged(void)
@@ -275,7 +334,15 @@ void CustomRecord::recordClicked(void)
     }
 
     ScheduledRecording record;
-    record.loadBySearch(kPowerSearch, m_title->text(), m_description->text());
+
+    int cur_recid = m_recid[m_rule->currentItem()].toInt();
+    cerr << cur_recid << endl; 
+    if (cur_recid > 0)
+        record.modifyPowerSearchByID(cur_recid, m_title->text(),
+                                     m_description->text());
+    else
+        record.loadBySearch(kPowerSearch, m_title->text(),
+                             m_description->text());
     record.exec();
 
     if (record.getRecordID())

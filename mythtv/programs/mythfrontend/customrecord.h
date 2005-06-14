@@ -23,6 +23,7 @@ class CustomRecord : public MythDialog
     void dismissWindow();
 
   protected slots:
+    void ruleChanged(void);
     void textChanged(void);
     void clauseChanged(void);
     void addClicked(void);
@@ -33,10 +34,17 @@ class CustomRecord : public MythDialog
   private:
     bool checkSyntax(void);
 
-    MythRemoteLineEdit *m_title;
-    MythRemoteLineEdit *m_preview;
-    MythComboBox *m_clause;
+    int prevItem;
+
+    QStringList m_recid;
+    QStringList m_recdesc;
+
     QStringList m_csql;
+
+    MythComboBox *m_rule;
+    MythRemoteLineEdit *m_title;
+    MythComboBox *m_clause;
+    MythRemoteLineEdit *m_preview;
     MythRemoteLineEdit *m_description;
     MythPushButton *m_addButton;
     MythPushButton *m_testButton;

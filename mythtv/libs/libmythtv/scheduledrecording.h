@@ -92,7 +92,9 @@ public:
     virtual void loadByID(int id);
     virtual void loadByProgram(ProgramInfo* proginfo);
     virtual void loadBySearch(RecSearchType lsearch,
-                              QString text, QString what);
+                              QString textname, QString forwhat);
+    virtual void modifyPowerSearchByID(int rid,
+                                       QString textname, QString forwhat);
 
     virtual int exec(bool saveOnExec = true, bool doLoad = false)
         { return ConfigurationDialog::exec(saveOnExec, doLoad); }    

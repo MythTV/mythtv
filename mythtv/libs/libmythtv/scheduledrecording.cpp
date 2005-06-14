@@ -164,6 +164,22 @@ void ScheduledRecording::loadBySearch(RecSearchType lsearch,
     } 
 }
 
+void ScheduledRecording::modifyPowerSearchByID(int rid,
+                                               QString textname,
+                                               QString forwhat)
+{
+    if (rid <= 0)
+        return;
+
+    loadByID(rid);
+    if (search->intValue() != kPowerSearch)
+        return;
+
+    QString ltitle = textname + " (" + QObject::tr("Power Search") + ")";
+    title->setValue(ltitle);
+    description->setValue(forwhat);
+}
+
 void ScheduledRecording::fetchChannelInfo()
 {
     
