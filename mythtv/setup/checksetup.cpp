@@ -116,16 +116,16 @@ bool checkChannelPresets(QString *probs)
     while (query->next())
     {
         int cardid    = query->value(0).toInt();
-        int startchan = query->value(1).toInt();
+        QString startchan = query->value(1).toString();
         int sourceid  = query->value(2).toInt();
 
         if (query->value(1).toString() == "")    // Logic from tv_rec.cpp
-            startchan = 3;
+            startchan = "3";
 
         MSqlQuery channelExists(MSqlQuery::InitCon());
         QString   channelQuery;
         channelQuery = QString("SELECT chanid FROM channel"
-                               " WHERE channum=%1 AND sourceid=%2;")
+                               " WHERE channum=\"%1\" AND sourceid=%2;")
                               .arg(startchan).arg(sourceid);
         channelExists.prepare(channelQuery);
 
