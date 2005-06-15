@@ -35,6 +35,7 @@
 
 #include <qobject.h>
 #include <qstring.h>
+#include <pthread.h>
 #include "frequencies.h"
 
 /**
