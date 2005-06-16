@@ -938,23 +938,56 @@ int main(int argc, char *argv[])
                 {
                     // check to see if this show is already marked
                     MSqlQuery markupquery(MSqlQuery::InitCon());
-                    QString markupstr = QString("SELECT count(*) "
-                                                "FROM recordedmarkup "
-                                                "WHERE chanid = %1 "
-                                                "AND starttime = %2 "
-                                                "AND type in (%3,%4);")
-                                                .arg(chanid)
-                                                .arg(starttime)
-                                                .arg(MARK_COMM_START)
-                                                .arg(MARK_COMM_END);
-
+                    QString markupstr;
+                   
+                    markupstr = QString("SELECT commflagged, count(rm.type) "
+                                        "FROM recorded r "
+                                        "LEFT JOIN recordedmarkup rm ON "
+                                            "( r.chanid = rm.chanid AND "
+                                              "r.starttime = rm.starttime AND "
+                                              "type in (%1,%2)) "
+                                        "WHERE r.chanid = %3 AND "
+                                            "r.starttime = %4 "
+                                        "GROUP BY COMMFLAGGED;")
+                                        .arg(MARK_COMM_START)
+                                        .arg(MARK_COMM_END)
+                                        .arg(chanid)
+                                        .arg(starttime);
                     markupquery.exec(markupstr);
                     if ((markupquery.isActive()) &&
                         (markupquery.numRowsAffected() > 0))
                     {
                         if (markupquery.next())
                         {
-                            if (markupquery.value(0).toInt() == 0)
+                            int flagStatus = markupquery.value(0).toInt();
+                            int marksFound = markupquery.value(1).toInt();
+
+                            QString flagStatusStr = "UNKNOWN";
+                            switch (flagStatus) {
+                                case COMM_FLAG_NOT_FLAGGED:
+                                        flagStatusStr = "Not Flagged";
+                                        break;
+                                case COMM_FLAG_DONE:
+                                        flagStatusStr =
+                                            QString("Flagged with %1 breaks")
+                                                    .arg(marksFound / 2);
+                                        break;
+                                case COMM_FLAG_PROCESSING:
+                                        flagStatusStr = "Flagging";
+                                        break;
+                                case COMM_FLAG_COMMFREE:
+                                        flagStatusStr = "Commercial Free";
+                                        break;
+                            }
+
+                            VERBOSE(VB_COMMFLAG,
+                                    QString("Status for chanid %1 @ %2 is '%3'")
+                                            .arg(chanid)
+                                            .arg(starttime)
+                                            .arg(flagStatusStr));
+
+                            if ((flagStatus == COMM_FLAG_NOT_FLAGGED) &&
+                                (marksFound == 0))
                                 FlagCommercials(chanid, starttime);
                         }
                     }
