@@ -31,13 +31,14 @@ using namespace std;
 #include <mythtv/util.h>
 #include <mythtv/mythdbcon.h>
 
-
-VideoSelected::VideoSelected(MythMainWindow *parent, const char *name, 
+VideoSelected::VideoSelected(VideoList *lvideo_list,
+                             MythMainWindow *parent, const char *name, 
                              int idnum)
             : MythDialog(parent, name)
 {
+    video_list = lvideo_list;
 
-    curitem = new Metadata();
+    curitem = video_list->getVideoListMetadata(idnum);
     curitem->setID(idnum);
     curitem->fillDataFromID();
 
@@ -66,8 +67,6 @@ VideoSelected::~VideoSelected()
 {
     delete theme;
     delete bgTransBackup;
-    if (curitem)
-        delete curitem;
 }
 
 void VideoSelected::keyPressEvent(QKeyEvent *e)
@@ -190,7 +189,7 @@ void VideoSelected::updatePlayWait(QPainter *p)
     while (parentItem->ChildID() > 0 && playing_time.elapsed() > 10000)
     {
         childItem->setID(parentItem->ChildID());
-        childItem->fillDataFromID();
+        childItem = video_list->getVideoListMetadata(parentItem->ChildID());
 
         if (parentItem->ChildID() > 0)
         {
@@ -205,8 +204,8 @@ void VideoSelected::updatePlayWait(QPainter *p)
     }
 
     delete childItem;
-    delete parentItem;
-
+    delete parentItem;    
+    
     backup.begin(this);
     backup.drawPixmap(0, 0, myBackground);
     backup.end();

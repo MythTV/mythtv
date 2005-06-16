@@ -73,6 +73,30 @@ static HostCheckBox *VideoListUnknownFiletypes()
     return gc;
 };
 
+static HostCheckBox *VideoBrowserNoDB()
+{
+    HostCheckBox *gc = new HostCheckBox("VideoBrowserNoDB");
+    gc->setLabel(QObject::tr("Video Browser browses files"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, this will cause the Video Browser "
+                    "screen to show all relevant files below "
+                    "the MythVideo starting directory whether "
+                    "they have been scanned or not."));
+    return gc;
+};
+
+static HostCheckBox *VideoGalleryNoDB()
+{
+    HostCheckBox *gc = new HostCheckBox("VideoGalleryNoDB");
+    gc->setLabel(QObject::tr("Video Gallery browses files"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If set, this will cause the Video Gallery "
+                    "screen to show all relevant files below "
+                    "the MythVideo starting directory whether "
+                    "they have been scanned or not."));
+    return gc;
+};
+
 static HostCheckBox *VideoTreeNoDB()
 {
     HostCheckBox *gc = new HostCheckBox("VideoTreeNoDB");
@@ -208,17 +232,23 @@ static HostCheckBox *VideoGalleryAspectRatio()
 VideoGeneralSettings::VideoGeneralSettings()
 {
     VerticalConfigurationGroup* general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("General Settings"));
+    general->setLabel(QObject::tr("General Settings (1/2)"));
     general->addChild(VideoStartupDirectory());
     general->addChild(VideoArtworkDirectory());
     general->addChild(VideoDefaultParentalLevel());
     general->addChild(VideoAdminPassword());
     general->addChild(VideoAggressivePC());
-    general->addChild(VideoListUnknownFiletypes());
-    general->addChild(VideoTreeNoDB());
-    general->addChild(VideoNewBrowsable());
-    general->addChild(VideoDefaultView());
     addChild(general);
+
+    VerticalConfigurationGroup* general2 = new VerticalConfigurationGroup(false);
+    general2->setLabel(QObject::tr("General Settings (2/2)"));
+    general2->addChild(VideoListUnknownFiletypes());
+    general2->addChild(VideoBrowserNoDB());
+    general2->addChild(VideoGalleryNoDB());
+    general2->addChild(VideoTreeNoDB());
+    general2->addChild(VideoNewBrowsable());
+    general2->addChild(VideoDefaultView());
+    addChild(general2);
 
     VerticalConfigurationGroup* vman = new VerticalConfigurationGroup(false);
     vman->setLabel(QObject::tr("Video Manager"));

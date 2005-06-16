@@ -30,6 +30,7 @@ VideoBrowser::VideoBrowser(MythMainWindow *parent, const char *name)
     curitem = NULL;
     inData = 0;
     
+    setFileBrowser(gContext->GetNumSetting("VideoBrowserNoDB", 0));
     loadWindow(xmldata);        
     bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
     
@@ -137,15 +138,20 @@ void VideoBrowser::doMenu(bool info)
         }
         else
         {
-            focusButton = popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
-            addDests();
+            if (!isFileBrowser)
+                focusButton = popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
+            
+            QButton* tempButton = addDests();
+            if (!focusButton)
+                focusButton = tempButton;
         }
         
         popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
         
         popup->ShowPopup(this, SLOT(slotDoCancel()));
     
-        focusButton->setFocus();
+        if (focusButton)
+            focusButton->setFocus();
     }
     
 }
@@ -160,6 +166,7 @@ void VideoBrowser::fetchVideos()
     m_list.clear();
 
     VideoDialog::fetchVideos();
+    video_list->wantVideoListUpdirs(true);
     
     updateML = false;
     SetCurrentItem();

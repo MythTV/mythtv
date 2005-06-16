@@ -9,6 +9,7 @@
 #include <mythtv/uitypes.h>
 
 #include "metadata.h"
+#include "videolist.h"
 
 class VideoFilterSettings;
 
@@ -25,8 +26,6 @@ class VideoTree : public MythThemedDialog
    ~VideoTree();
 
     void buildVideoList();
-    void buildFileList(QString directory, bool checklevel);
-    bool ignoreExtension(QString extension);
     
     virtual void playVideo(Metadata *someItem);
     QString getHandler(Metadata *someItem);
@@ -60,8 +59,7 @@ class VideoTree : public MythThemedDialog
     void         wireUpTheme();
     int          current_parental_level;
     bool         file_browser;
-    QStringList  browser_mode_files;
-       
+
     //
     //  Theme-related "widgets"
     //
@@ -69,6 +67,7 @@ class VideoTree : public MythThemedDialog
     UIManagedTreeListType *video_tree_list;
     GenericTree           *video_tree_root;
     GenericTree           *video_tree_data;
+    VideoList             *video_list;
     UITextType            *video_title;
     UITextType            *video_file;
     UITextType            *video_plot;

@@ -48,7 +48,6 @@ class VideoGallery : public VideoDialog
     
   protected:
     virtual void parseContainer(QDomElement &element);
-    virtual void handleMetaFetch(Metadata*);
     virtual void fetchVideos();
     void doMenu(bool info=false);
     void paintEvent(QPaintEvent *);
@@ -74,10 +73,6 @@ class VideoGallery : public VideoDialog
     void actionFilter(UIListBtnTypeItem*);
 
     void positionIcon();
-    
-    //typedef QValueVector<Metadata> MetaVector;
-    //MetaVector metas;
-    QMap<int, Metadata> metas;
     
     int curView;
     bool subtitleOn;
@@ -113,7 +108,6 @@ class VideoGallery : public VideoDialog
     QString prefix;
     
     GenericTree *video_tree_root;
-    GenericTree *video_tree_data;
     GenericTree *where_we_are;
 
     //typedef void (VideoGallery::*Action)(UIListBtnTypeItem*);

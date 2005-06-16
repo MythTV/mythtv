@@ -19,6 +19,7 @@ VideoDialog::VideoDialog(DialogType _myType, MythMainWindow *_parent,
     myType = _myType;
     curitem = NULL;    
     popup = NULL;
+    jumping = false;
     
     //
     //  Load the theme. Crap out if we can't find it.
@@ -39,29 +40,38 @@ VideoDialog::VideoDialog(DialogType _myType, MythMainWindow *_parent,
     allowPaint = true;
     currentParentalLevel = gContext->GetNumSetting("VideoDefaultParentalLevel", 1);
     currentVideoFilter = new VideoFilterSettings(true, _winName);
+
+    isFileBrowser = false;
+    isFlatList = false;
+    video_list = new VideoList(_winName);
+    video_tree_root = NULL;
+    
 }
 
 VideoDialog::~VideoDialog()
 {
-    if (currentVideoFilter)
-        delete currentVideoFilter;
+    delete currentVideoFilter;
+    delete video_list;
     
 }
 
 void VideoDialog::slotVideoBrowser()
 {
+    jumping = true;
     cancelPopup();
     gContext->GetMainWindow()->JumpTo("Video Browser");
 }
 
 void VideoDialog::slotVideoGallery()
 {
+    jumping = true;
     cancelPopup();
     gContext->GetMainWindow()->JumpTo("Video Gallery");
 }
 
 void VideoDialog::slotVideoTree()
 {
+    jumping = true;
     cancelPopup();
     gContext->GetMainWindow()->JumpTo("Video Listings");
 }
@@ -438,34 +448,27 @@ void VideoDialog::shiftParental(int amount)
 }
 
 
+GenericTree *VideoDialog::getVideoTreeRoot(void)
+{
+    return(video_tree_root);
+}
+
+
 void VideoDialog::fetchVideos()
 {
+    typedef QMap<int, Metadata> metaMap;
     
-    QString thequery = QString("SELECT intid FROM %1 %2 %3")
-                        .arg(currentVideoFilter->BuildClauseFrom())
-                        .arg(currentVideoFilter->BuildClauseWhere())
-                        .arg(currentVideoFilter->BuildClauseOrderBy());
+    metaMap myMetas;
+    metaMap::Iterator it;
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec(thequery);
+    video_tree_root = video_list->buildVideoList(isFileBrowser, isFlatList,
+                                                 currentParentalLevel);
 
-    Metadata *myData;
-
-    if (query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            myData = new Metadata();
-            
-            myData->setID(query.value(0).toUInt());
-            myData->fillDataFromID();
-            if (myData->ShowLevel() <= currentParentalLevel && myData->ShowLevel() != 0)
-            {
-                handleMetaFetch(myData);
-            }
-        
-            delete myData;
-        }
+    // XXX: This is suboptimal. The classes should not need this. They
+    //      can retrieve the data through VideoList::getVideoListMetadata()
+    myMetas = video_list->getVideoListMetas();
+    for (it = myMetas.begin(); it != myMetas.end(); ++it) {
+            handleMetaFetch(&it.data());
     }
 
 }
@@ -473,7 +476,7 @@ void VideoDialog::fetchVideos()
 void VideoDialog::slotDoFilter()
 {
     cancelPopup();
-    VideoFilterDialog * vfd = new VideoFilterDialog(currentVideoFilter,
+    VideoFilterDialog * vfd = new VideoFilterDialog(video_list->getCurrentVideoFilter(),
                                                     gContext->GetMainWindow(),
                                                     "filter", "video-",
                                                     "Video Filter Dialog");

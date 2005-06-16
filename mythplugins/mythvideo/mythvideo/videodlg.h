@@ -9,6 +9,7 @@
 #include <mythtv/uitypes.h>
 
 #include "metadata.h"
+#include "videolist.h"
 
 class VideoFilterSettings;
 
@@ -30,6 +31,10 @@ class VideoDialog : public MythDialog
         QString getHandler(Metadata *someItem);
         QString getCommand(Metadata *someItem);
         bool checkParentPassword();
+        GenericTree *getVideoTreeRoot(void);
+        
+        void setFileBrowser(bool toWhat) { isFileBrowser = toWhat; }
+        void setFlatList(bool toWhat) { isFlatList = toWhat;}
         
     protected slots:
         void slotDoCancel();
@@ -57,6 +62,8 @@ class VideoDialog : public MythDialog
         
         QPixmap myBackground;
         int currentParentalLevel;        
+        bool isFileBrowser;
+        bool isFlatList;
         Metadata* curitem;
         MythPopupBox* popup;
         bool expectingPopup;
@@ -69,6 +76,11 @@ class VideoDialog : public MythDialog
         QDomElement xmldata;
         
         VideoFilterSettings *currentVideoFilter;
+
+        VideoList   *video_list;
+        GenericTree *video_tree_root;
+        
+        bool jumping;
 };
 
 #endif

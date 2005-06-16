@@ -20,6 +20,7 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include <qstringlist.h>
 
 #include "metadata.h"
+#include "videolist.h"
 #include <mythtv/mythwidgets.h>
 #include <qdom.h>
 #include <mythtv/uitypes.h>
@@ -31,7 +32,8 @@ class VideoSelected : public MythDialog
 {
     Q_OBJECT
   public:
-    VideoSelected(MythMainWindow *parent, const char *name = 0, int idnum = 0);
+    VideoSelected(VideoList *lvideolist,
+                 MythMainWindow *parent, const char *name = 0, int idnum = 0);
     ~VideoSelected();
     void VideoSelected::processEvents() { qApp->processEvents(); }
     
@@ -74,6 +76,8 @@ class VideoSelected : public MythDialog
     QRect fullRect;
 
     bool allowselect;
+
+    VideoList *video_list;
 };
 
 #endif
