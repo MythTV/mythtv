@@ -2007,7 +2007,15 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
         WriteStringList(d->serverSock, strlist);
         ok = ReadStringList(d->serverSock, strlist, quickTimeout);
 
-        // this should be obsolete...
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Connection to backend server lost"));
+            ConnectToMasterServer();
+            WriteStringList(d->serverSock, strlist);
+            ok = ReadStringList(d->serverSock, strlist, quickTimeout);
+        }
+
+        // this should not happen
         while (ok && strlist[0] == "BACKEND_MESSAGE")
         {
             // oops, not for us
@@ -2025,7 +2033,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
         if (!ok)
         {
             qApp->lock();
-            VERBOSE(VB_ALL, QString("Connection to backend server lost"));
+            VERBOSE(VB_ALL, QString("Reconnection to backend server failed"));
             MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
                              tr("The connection to the master backend "
                                 "server has gone away for some reason.. "
