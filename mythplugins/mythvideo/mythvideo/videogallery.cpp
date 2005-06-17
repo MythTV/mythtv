@@ -654,7 +654,7 @@ void VideoGallery::exitWin()
     emit accept();
 }
 
-void VideoGallery::moveCursor(QString action)
+void VideoGallery::moveCursor(const QString& action)
 {
     int prevCol = currCol;
     int prevRow = currRow;
@@ -751,6 +751,7 @@ void VideoGallery::moveCursor(QString action)
     {
         update(viewRect);
         update(textRect);
+        update(arrowsRect);
     }
     else                     // partial update only
     {

@@ -37,11 +37,11 @@ class VideoGallery : public VideoDialog
     VideoGallery(MythMainWindow *parent, const char *name = 0);
     ~VideoGallery();
     
-    void VideoGallery::processEvents() { qApp->processEvents(); }
+    void processEvents() { qApp->processEvents(); }
     
     
   protected slots:
-    void moveCursor(QString action);
+    void moveCursor(const QString& action);
     void exitWin();
     void slotChangeView();
     void handleVideoSelect();
