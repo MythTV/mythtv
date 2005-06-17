@@ -214,6 +214,15 @@ class NuppelVideoPlayer
         return audio_timecode_offset; 
     }
 
+    long long ResetAudioTimecodeOffset() { 
+        audio_timecode_offset = 0;
+        return audio_timecode_offset; 
+    }
+    long long ResyncAudioTimecodeOffset() { 
+        audio_timecode_offset = (long long)0x8000000000000000LL;
+        return 0; 
+    }
+
  protected:
     void DisplayPauseFrame(void);
     void DisplayNormalFrame(void);

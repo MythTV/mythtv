@@ -1247,6 +1247,7 @@ void RingBuffer::ReadAheadThread(void)
     long long totfree = 0;
     int ret = -1;
     int used = 0;
+    int loops = 0;
 
     pausereadthread = false;
 
@@ -1273,8 +1274,13 @@ void RingBuffer::ReadAheadThread(void)
         {
             usleep(50000);
             totfree = ReadBufFree();
-            continue;
+            ++loops;
+            // break out if we've spent lots of time here, just in case things
+            // are waiting on a wait condition that never got triggered.
+            if (readsallowed && loops < 10)
+                continue;
         }
+        loops = 0;
 
         pthread_rwlock_rdlock(&rwlock);
         if (totfree > readblocksize && !commserror)

@@ -1610,6 +1610,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ChangeAudioSync(-10);
             else if (action == "DOWN")
                 ChangeAudioSync(10);
+            else if (action == "1")
+                ChangeAudioSync(1000000);
+            else if (action == "0")
+                ChangeAudioSync(-1000000);
             else if (action == "TOGGLEAUDIOSYNC")
                 ClearOSD();
             else
@@ -3466,20 +3470,41 @@ void TV::ChangeTimeStretch(int dir, bool allowEdit)
 // dir in 10ms jumps
 void TV::ChangeAudioSync(int dir, bool allowEdit)
 {
+    long long newval;
+
     if (!audiosyncAdjustment)
         audiosyncBaseline = activenvp->GetAudioTimecodeOffset();
 
     audiosyncAdjustment = allowEdit;
 
-    long long newval = activenvp->AdjustAudioTimecodeOffset(dir*10) - 
-                        audiosyncBaseline;
+    if (dir == 1000000)
+    {
+        newval = activenvp->ResyncAudioTimecodeOffset() - 
+                 audiosyncBaseline;
+        audiosyncBaseline = activenvp->GetAudioTimecodeOffset();
+    }
+    else if (dir == -1000000)
+    {
+        newval = activenvp->ResetAudioTimecodeOffset() - 
+                 audiosyncBaseline;
+        audiosyncBaseline = activenvp->GetAudioTimecodeOffset();
+    }
+    else
+        newval = activenvp->AdjustAudioTimecodeOffset(dir*10) - 
+                 audiosyncBaseline;
 
     if (osd && !browsemode)
     {
         QString text = QString(" %1 ms").arg(newval);
-        text = tr("Audio Sync") + text;
-
         int val = (int)newval;
+        if (dir == 1000000 || dir == -1000000)
+        {
+            text = tr("Audio Resync") + text;
+            val = 0;
+        }
+        else
+            text = tr("Audio Sync") + text;
+
         osd->StartPause((val/2)+500, false, tr("Adjust Audio Sync"), text, 10, 
                         kOSDFunctionalType_AudioSyncAdjust);
         update_osd_pos = false;

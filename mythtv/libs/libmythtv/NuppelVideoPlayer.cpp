@@ -1424,35 +1424,25 @@ void NuppelVideoPlayer::AVSync(void)
 
     if (audioOutput && normal_speed)
     {
+        long long currentaudiotime = audioOutput->GetAudiotime();
+        if (audio_timecode_offset == (long long)0x8000000000000000LL)
+            audio_timecode_offset = buffer->timecode - currentaudiotime;
+
         // ms, same scale as timecodes
-         lastaudiotime = audioOutput->GetAudiotime() + audio_timecode_offset;
-         VERBOSE(VB_PLAYBACK, QString("A/V timecodes audio %1 video %2 frameinterval %3 avdel %4 avg %5 tcoffset %6")
-                 .arg(lastaudiotime)
-                 .arg(buffer->timecode)
-                 .arg(frame_interval)
-                 .arg(buffer->timecode - lastaudiotime)
-                 .arg(avsync_avg)
-                 .arg(audio_timecode_offset)
+        lastaudiotime = currentaudiotime + audio_timecode_offset;
+        VERBOSE(VB_PLAYBACK, QString("A/V timecodes audio %1 video %2 frameinterval %3 avdel %4 avg %5 tcoffset %6")
+                .arg(lastaudiotime)
+                .arg(buffer->timecode)
+                .arg(frame_interval)
+                .arg(buffer->timecode - lastaudiotime)
+                .arg(avsync_avg)
+                .arg(audio_timecode_offset)
                  );
-        if (lastaudiotime != 0 && buffer->timecode != 0)
-          { // lastaudiotime == 0 after a seek
-             if (labs(buffer->timecode - lastaudiotime)>1000000)
-             {
-                 VERBOSE(VB_IMPORTANT, QString("A/V timecodes audio %1 video %2 frameinterval %3 avdel %4 avg %5")
-                         .arg(lastaudiotime)
-                         .arg(buffer->timecode)
-                         .arg(frame_interval)
-                         .arg(buffer->timecode - lastaudiotime)
-                         .arg(avsync_avg)
-                         );
-                 lastaudiotime = audioOutput->GetAudiotime();
-                 audio_timecode_offset = buffer->timecode - lastaudiotime;
-                 VERBOSE(VB_IMPORTANT, QString("A/V audio timecode instantaneously diverged by %1")
-                         .arg(audio_timecode_offset));
-             }
+        if (currentaudiotime != 0 && buffer->timecode != 0)
+        { // currentaudiotime == 0 after a seek
             // The time at the start of this frame (ie, now) is given by
             // last->timecode
-            int delta = buffer->timecode - prevtc - (frame_interval / 1000);
+            int delta = (int)((buffer->timecode - prevtc)/play_speed) - (frame_interval / 1000);
             prevtc = buffer->timecode;
             //cerr << delta << " ";
 
