@@ -24,7 +24,16 @@ class RatingRegionTable;
 class DirectedChannelChangeTable;
 class DirectedChannelChangeSelectionCodeTable;
 
-class ATSCStreamData : public MPEGStreamData
+typedef vector<uint>                    uint_vec_t;
+typedef QMap<uint, uint_vec_t>          pid_tsid_vec_t;
+typedef TerrestrialVirtualChannelTable* tvct_ptr_t;
+typedef CableVirtualChannelTable*       cvct_ptr_t;
+typedef vector<const TerrestrialVirtualChannelTable*> tvct_vec_t;
+typedef vector<const CableVirtualChannelTable*>       cvct_vec_t;
+typedef QMap<uint, tvct_ptr_t>          tvct_cache_t;
+typedef QMap<uint, cvct_ptr_t>          cvct_cache_t;
+
+class ATSCStreamData : virtual public MPEGStreamData
 {
     Q_OBJECT
   public:
@@ -33,64 +42,99 @@ class ATSCStreamData : public MPEGStreamData
                    bool cacheTables = false);
 
     void Reset(int desiredMajorChannel = -1, int desiredMinorChannel = -1);
-    void SetDesiredChannel(int major, int minor)
-    {
-        _desired_major_channel = major;
-        _desired_minor_channel = minor;
-    }
+    void SetDesiredChannel(int major, int minor);
 
-    void SetVersionMGT(int version)             {    _mgt_version     = version; }
-    void SetVersionTVCT(uint tsid, int version) { _tvct_version[tsid] = version; }
-    void SetVersionCVCT(uint tsid, int version) { _cvct_version[tsid] = version; }
-    void SetVersionEIT(uint pid,   int version) {   _eit_version[pid] = version; }
-    void SetVersionETT(uint pid,   int version) {   _ett_version[pid] = version; }
+    // Table processing
+    virtual bool HandleTables(uint pid, const PSIPTable &psip);
+    bool IsRedundant(const PSIPTable&) const;
 
-    int VersionMGT() const                      { return _mgt_version; }
+    /// Current UTC to GPS time offset in seconds
+    uint GPSOffset() const { return _GPS_UTC_offset; }
+
+    // Table versions
+    void SetVersionMGT(int version)
+        {    _mgt_version     = version; }
+    void SetVersionTVCT(uint tsid, int version)
+        { _tvct_version[tsid] = version; }
+    void SetVersionCVCT(uint tsid, int version)
+        { _cvct_version[tsid] = version; }
+    void SetVersionEIT(uint pid,   int version)
+        {   _eit_version[pid] = version; }
+    void SetVersionETT(uint pid,   int version)
+        {   _ett_version[pid] = version; }
+
+    int VersionMGT() const { return _mgt_version; }
     inline int VersionTVCT(uint tsid) const;
     inline int VersionCVCT(uint tsid) const;
     inline int VersionEIT(uint pid) const;
     inline int VersionETT(uint pid) const;
 
-    void HandleTables(const TSPacket* tspacket);
-    bool IsRedundant(const PSIPTable&) const;
+    // Caching
+    bool HasCachedMGT(bool current = true) const;
+    bool HasCachedTVCT(uint pid, bool current = true) const;
+    bool HasCachedCVCT(uint pid, bool current = true) const;
+    bool HasCachedAllTVCTs(bool current = true) const;
+    bool HasCachedAllCVCTs(bool current = true) const;
+    bool HasCachedAllVCTs(bool current = true) const 
+        { return HasCachedAllTVCTs(current) && HasCachedAllCVCTs(current); }
 
-    uint GPSOffset() const { return _GPS_UTC_offset; }
+    const MasterGuideTable *GetCachedMGT(bool current = true) const;
+    const tvct_ptr_t        GetCachedTVCT(uint pid, bool current = true) const;
+    const cvct_ptr_t        GetCachedCVCT(uint pid, bool current = true) const;
+
+    tvct_vec_t GetAllCachedTVCTs(bool current = true) const;
+    cvct_vec_t GetAllCachedCVCTs(bool current = true) const;
+
+    void ReturnCachedTables(tvct_vec_t&) const;
+    void ReturnCachedTables(cvct_vec_t&) const;
 
     // Single channel stuff
-    int DesiredMajorChannel() const { return _desired_major_channel; }
-    int DesiredMinorChannel() const { return _desired_minor_channel; }
+    int DesiredMajorChannel(void) const { return _desired_major_channel; }
+    int DesiredMinorChannel(void) const { return _desired_minor_channel; }
   signals:
-    void UpdateMGT(const MasterGuideTable*);
-    void UpdateSTT(const SystemTimeTable*);
-    void UpdateRRT(const RatingRegionTable*);
-    void UpdateDCCT(const DirectedChannelChangeTable*);
+    void UpdateMGT(   const MasterGuideTable*);
+    void UpdateSTT(   const SystemTimeTable*);
+    void UpdateRRT(   const RatingRegionTable*);
+    void UpdateDCCT(  const DirectedChannelChangeTable*);
     void UpdateDCCSCT(const DirectedChannelChangeSelectionCodeTable*);
 
-    void UpdateVCT(uint tsid,  const VirtualChannelTable*);
-    void UpdateTVCT(uint tsid, const TerrestrialVirtualChannelTable*);
-    void UpdateCVCT(uint tsid, const CableVirtualChannelTable*);
-    void UpdateEIT(uint pid,   const EventInformationTable*);
-    void UpdateETT(uint pid,   const ExtendedTextTable*);
+    void UpdateVCT( uint pid, const VirtualChannelTable*);
+    void UpdateTVCT(uint pid, const TerrestrialVirtualChannelTable*);
+    void UpdateCVCT(uint pid, const CableVirtualChannelTable*);
+    void UpdateEIT( uint pid, const EventInformationTable*);
+    void UpdateETT( uint pid, const ExtendedTextTable*);
 
   private slots:
-    void PrintMGT(const MasterGuideTable*) const;
-    void PrintSTT(const SystemTimeTable*) const;
-    void PrintRRT(const RatingRegionTable*) const;
-    void PrintDCCT(const DirectedChannelChangeTable*) const;
+    void PrintMGT(   const MasterGuideTable*) const;
+    void PrintSTT(   const SystemTimeTable*) const;
+    void PrintRRT(   const RatingRegionTable*) const;
+    void PrintDCCT(  const DirectedChannelChangeTable*) const;
     void PrintDCCSCT(const DirectedChannelChangeSelectionCodeTable*) const;
 
-    void PrintTVCT(uint tsid, const TerrestrialVirtualChannelTable*) const;
-    void PrintCVCT(uint tsid, const CableVirtualChannelTable*) const;
-    void PrintEIT(uint pid,   const EventInformationTable*) const;
-    void PrintETT(uint pid,   const ExtendedTextTable*) const;
+    void PrintTVCT(uint pid, const TerrestrialVirtualChannelTable*) const;
+    void PrintCVCT(uint pid, const CableVirtualChannelTable*) const;
+    void PrintEIT( uint pid, const EventInformationTable*) const;
+    void PrintETT( uint pid, const ExtendedTextTable*) const;
 
   private:
-    int             _mgt_version;
+    // Caching
+    void CacheMGT(MasterGuideTable*);
+    void CacheTVCT(uint pid, TerrestrialVirtualChannelTable*);
+    void CacheCVCT(uint pid, CableVirtualChannelTable*);
+
+  private:
     uint            _GPS_UTC_offset;
+    int             _mgt_version;
     QMap<uint, int> _tvct_version;
     QMap<uint, int> _cvct_version;
     QMap<uint, int> _eit_version;
     QMap<uint, int> _ett_version;
+
+    // Caching
+    MasterGuideTable *_cached_mgt;
+    tvct_cache_t      _cached_tvcts; // pid->tvct
+    cvct_cache_t      _cached_cvcts; // pid->cvct
+    pid_tsid_vec_t    _cached_pid_tsids;
 
     // Single program variables
     int _desired_major_channel;

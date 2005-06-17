@@ -1,6 +1,5 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#include <iostream>
 #include "atsctables.h"
 #include "atscdescriptors.h"
 #include "qstring.h"
@@ -84,23 +83,23 @@ QString MasterGuideTable::toString(void) const
         if (0 != TableDescriptorsLength(i))
         {
             vector<const unsigned char*> desc = 
-                ATSCDescriptor::Parse(TableDescriptors(i),
+                MPEGDescriptor::Parse(TableDescriptors(i),
                                       TableDescriptorsLength(i));
             for (uint i = 0; i < desc.size(); i++)
                 str.append(QString("  %1\n")
-                           .arg(ATSCDescriptor(desc[i]).toString()));
+                           .arg(MPEGDescriptor(desc[i]).toString()));
         }
     }
     if (0 != GlobalDescriptorsLength())
     {
-        str.append(QString("global descriptors length: %1\n")
+        str.append(QString("Global descriptors length: %1\n")
                    .arg(GlobalDescriptorsLength()));
         vector<const unsigned char*> desc = 
-            ATSCDescriptor::Parse(GlobalDescriptors(),
+            MPEGDescriptor::Parse(GlobalDescriptors(),
                                   GlobalDescriptorsLength());
         for (uint i = 0; i < desc.size(); i++)
             str.append(QString(" %1\n")
-                       .arg(ATSCDescriptor(desc[i]).toString()));
+                       .arg(MPEGDescriptor(desc[i]).toString()));
     }
     return str;
 }
@@ -139,11 +138,11 @@ QString TerrestrialVirtualChannelTable::toString(int chan) const
         str.append(QString(" descriptors length(%1) ")
                    .arg(DescriptorsLength(chan)));
         vector<const unsigned char*> desc = 
-            ATSCDescriptor::Parse(Descriptors(chan), DescriptorsLength(chan));
+            MPEGDescriptor::Parse(Descriptors(chan), DescriptorsLength(chan));
         str.append(QString("count(%1)\n").arg(desc.size()));
         for (uint i = 0; i < desc.size(); i++)
             str.append(QString("  %1\n")
-                       .arg(ATSCDescriptor(desc[i]).toString()));
+                       .arg(MPEGDescriptor(desc[i]).toString()));
     }
     return str;
 }
@@ -163,12 +162,12 @@ QString TerrestrialVirtualChannelTable::toString(void) const
         str.append(QString("global descriptors length: %1\n")
                    .arg(GlobalDescriptorsLength()));
         vector<const unsigned char*> desc = 
-            ATSCDescriptor::Parse(GlobalDescriptors(),
+            MPEGDescriptor::Parse(GlobalDescriptors(),
                                   GlobalDescriptorsLength());
         str.append(QString("global descriptors count: %1\n").arg(desc.size()));
         for (uint i = 0; i < desc.size(); i++)
             str.append(QString(" %1\n")
-                       .arg(ATSCDescriptor(desc[i]).toString()));
+                       .arg(MPEGDescriptor(desc[i]).toString()));
     }
     return str;
 }
@@ -210,11 +209,11 @@ QString CableVirtualChannelTable::toString(int chan) const
         str.append(QString(" descriptors length(%1) ")
                    .arg(DescriptorsLength(chan)));
         vector<const unsigned char*> desc = 
-            ATSCDescriptor::Parse(Descriptors(chan), DescriptorsLength(chan));
+            MPEGDescriptor::Parse(Descriptors(chan), DescriptorsLength(chan));
         str.append(QString("count(%1)\n").arg(desc.size()));
         for (uint i = 0; i < desc.size(); i++)
             str.append(QString("  %1\n")
-                       .arg(ATSCDescriptor(desc[i]).toString()));
+                       .arg(MPEGDescriptor(desc[i]).toString()));
     }
     return str;
 }
@@ -234,13 +233,13 @@ QString CableVirtualChannelTable::toString(void) const
         str.append(QString("global descriptors length: %1\n")
                    .arg(GlobalDescriptorsLength()));
         vector<const unsigned char*> desc = 
-            ATSCDescriptor::Parse(GlobalDescriptors(),
+            MPEGDescriptor::Parse(GlobalDescriptors(),
                                   GlobalDescriptorsLength());
         str.append(QString("global descriptors count: %1\n").arg(desc.size()));
         for (uint i = 0; i < desc.size(); i++)
         {
             str.append(QString(" %1\n")
-                       .arg(ATSCDescriptor(desc[i]).toString()));
+                       .arg(MPEGDescriptor(desc[i]).toString()));
         }
     }
     return str;
@@ -264,10 +263,10 @@ QString EventInformationTable::toString(void) const
         if (0 != DescriptorsLength(i))
         {
             vector<const unsigned char*> desc = 
-                ATSCDescriptor::Parse(Descriptors(i), DescriptorsLength(i));
+                MPEGDescriptor::Parse(Descriptors(i), DescriptorsLength(i));
             for (uint j=0; j<desc.size(); j++)
                 str.append(QString("%1\n")
-                           .arg(ATSCDescriptor(desc[j]).toString()));
+                           .arg(MPEGDescriptor(desc[j]).toString()));
         }
     }
     return str;
@@ -286,11 +285,22 @@ QString ExtendedTextTable::toString(void) const
 
 int VirtualChannelTable::Find(int major, int minor) const
 {
-    for (uint i = 0; i < ChannelCount(); i++)
+    if (major>0)
     {
-        if ((MajorChannel(i) == (uint)major) &&
-            (MinorChannel(i) == (uint)minor))
-            return (int)i;
+        for (uint i = 0; i < ChannelCount(); i++)
+        {
+            if ((MajorChannel(i) == (uint)major) &&
+                (MinorChannel(i) == (uint)minor))
+                return (int)i;
+        }
+    }
+    else if (minor>0)
+    {
+        for (uint i = 0; i < ChannelCount(); i++)
+        {
+            if (MinorChannel(i) == (uint)minor)
+                return (int)i;
+        }        
     }
     return -1;
 }

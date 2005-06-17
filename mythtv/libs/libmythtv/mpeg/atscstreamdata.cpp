@@ -3,30 +3,47 @@
 #include "atscstreamdata.h"
 #include "atsctables.h"
 #include "RingBuffer.h"
-#include "hdtvrecorder.h"
 
 /** \class ATSCStreamData
  *  \brief Encapsulates data about ATSC stream and emits events for most tables.
  */
 
+/** \fn ATSCStreamData::ATSCStreamData(int, int, bool)
+ *  \brief Initializes ATSCStreamData.
+ *
+ *   This adds the PID of the PAT and ATSC PSIP tables to "_pids_listening"
+ *
+ *  \param desiredMajorChannel If you want rewritten PAT and PMTs for a desired
+ *                             channel set this to a value greater than zero.
+ *  \param desiredMinorChannel If you want rewritten PAT and PMTs for a desired
+ *                             channel set this to a value greater than zero.
+ *  \param cacheTables         If true important tables will be cached.
+ */
 ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
                                int desiredMinorChannel,
                                bool cacheTables)
-    : MPEGStreamData(-1, cacheTables),
-      _mgt_version(-1),
+    : QObject(NULL, "ATSCStreamData"),
+      MPEGStreamData(-1, cacheTables),
       _GPS_UTC_offset(13 /* leap seconds as of 2004 */),
+      _mgt_version(-1),
+      _cached_mgt(NULL),
       _desired_major_channel(desiredMajorChannel),
       _desired_minor_channel(desiredMinorChannel)
 {
     AddListeningPID(ATSC_PSIP_PID);
 }
 
+void ATSCStreamData::SetDesiredChannel(int major, int minor)
+{
+    // TODO this should reset only if it can't regen from cached tables.
+    _desired_major_channel = major;
+    _desired_minor_channel = minor;
+}
+
 void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
 {
-    if (desiredMajorChannel > 0)
-        _desired_major_channel = desiredMajorChannel;
-    if (desiredMinorChannel >= 0)
-        _desired_minor_channel = desiredMinorChannel;
+    _desired_major_channel = desiredMajorChannel;
+    _desired_minor_channel = desiredMinorChannel;
     
     MPEGStreamData::Reset(-1);
     _mgt_version = -1;
@@ -34,6 +51,25 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
     _cvct_version.clear();
     _eit_version.clear();
     _ett_version.clear();
+
+    { 
+        _cache_lock.lock();
+
+        DeleteCachedTable(_cached_mgt);
+        _cached_mgt = NULL;
+
+        tvct_cache_t::iterator tit = _cached_tvcts.begin();
+        for (; tit != _cached_tvcts.end(); ++tit)
+            DeleteCachedTable(*tit);
+        _cached_tvcts.clear();
+
+        cvct_cache_t::iterator cit = _cached_cvcts.begin();
+        for (; cit != _cached_cvcts.end(); ++cit)
+            DeleteCachedTable(*cit);
+        _cached_cvcts.clear();
+
+        _cache_lock.unlock();
+    }
 }
 
 /** \fn ATSCStreamData::IsRedundant(const PSIPTable&) const
@@ -89,146 +125,324 @@ bool ATSCStreamData::IsRedundant(const PSIPTable &psip) const
     return false;
 }
 
-void ATSCStreamData::HandleTables(const TSPacket* tspacket)
+bool ATSCStreamData::HandleTables(uint pid, const PSIPTable &psip)
 {
-#define HT_RETURN { delete psip; return; }
-    // Assemble PSIP
-    PSIPTable *psip = AssemblePSIP(tspacket);
-    if (!psip)
-        return;
-    const int version = psip->Version();
+    if (MPEGStreamData::HandleTables(pid, psip))
+        return true;
 
-    // Validate PSIP
-    if (!psip->IsGood())
+    const int version = psip.Version();
+
+    // Decode any table we know about
+    switch (psip.TableID())
     {
-        VERBOSE(VB_RECORD, QString("PSIP packet failed CRC check"));
-        HT_RETURN;
-    }
-
-    if (!psip->IsCurrent()) // we don't cache the next table, for now
-        HT_RETURN;
-
-    if (1!=tspacket->AdaptationFieldControl())
-    { // payload only, ATSC req.
-        VERBOSE(VB_RECORD,
-                "PSIP packet has Adaptation Field Control, not ATSC compiant");
-        HT_RETURN;
-    }
-
-    if (tspacket->ScramplingControl())
-    { // scrambled! ATSC, DVB require tables not to be scrambled
-        VERBOSE(VB_RECORD,
-                "PSIP packet is scrambled, not ATSC/DVB compiant");
-        HT_RETURN;
-    }
-
-    // Don't decode redundant packets,
-    // but if it is a PAT or PMT emit a "heartbeat" signal.
-    if (IsRedundant(*psip))
-    {
-        if (TableID::PAT == psip->TableID())
-            emit UpdatePATSingleProgram(PATSingleProgram());
-        if (TableID::PMT == psip->TableID())
-            emit UpdatePMTSingleProgram(PMTSingleProgram());
-        HT_RETURN; // already parsed this table, toss it.
-    }
-
-    // If we get this far decode any table
-    switch (psip->TableID())
-    {
-        case TableID::PAT:
-        {
-            ProgramAssociationTable pat(*psip);
-            emit UpdatePAT(&pat);
-            if (CreatePATSingleProgram(pat))
-            {
-                emit UpdatePATSingleProgram(PATSingleProgram());
-            }
-            HT_RETURN;
-        }
-        case TableID::PMT:
-        {
-            ProgramMapTable pmt(*psip);
-            emit UpdatePMT(tspacket->PID(), &pmt);
-            if (tspacket->PID() == _pid_pmt_single_program)
-            {
-                if (CreatePMTSingleProgram(pmt))
-                    emit UpdatePMTSingleProgram(PMTSingleProgram());
-            }
-            HT_RETURN;
-        }
         case TableID::MGT:
         {
             SetVersionMGT(version);
-            MasterGuideTable mgt(*psip);
-            emit UpdateMGT(&mgt);
-            HT_RETURN;
+            if (_cache_tables)
+            {
+                MasterGuideTable *mgt = new MasterGuideTable(psip);
+                CacheMGT(mgt);
+                emit UpdateMGT(mgt);
+            }
+            else
+            {
+                MasterGuideTable mgt(psip);
+                emit UpdateMGT(&mgt);
+            }
+            return true;
         }
         case TableID::TVCT:
         {
-            TerrestrialVirtualChannelTable vct(*psip);
-            SetVersionTVCT(vct.TransportStreamID(), version);
-            emit UpdateTVCT(vct.TransportStreamID(), &vct);
-            emit UpdateVCT(vct.TransportStreamID(), &vct);
-            break;
+            uint tsid = psip.TableIDExtension();
+            SetVersionTVCT(tsid, version);
+            if (_cache_tables)
+            {
+                TerrestrialVirtualChannelTable *vct =
+                    new TerrestrialVirtualChannelTable(psip); 
+                CacheTVCT(pid, vct);
+                emit UpdateTVCT(tsid, vct);
+                emit UpdateVCT(tsid,  vct);
+            }
+            else
+            {
+                TerrestrialVirtualChannelTable vct(psip);
+                emit UpdateTVCT(tsid, &vct);
+                emit UpdateVCT(tsid,  &vct);
+            }
+            return true;
         }
         case TableID::CVCT:
         {
-            CableVirtualChannelTable vct(*psip);
-            SetVersionCVCT(vct.TransportStreamID(), version);
-            emit UpdateCVCT(vct.TransportStreamID(), &vct);
-            emit UpdateVCT(vct.TransportStreamID(), &vct);
-            break;
+            uint tsid = psip.TableIDExtension();
+            SetVersionCVCT(tsid, version);
+            if (_cache_tables)
+            {
+                CableVirtualChannelTable *vct =
+                    new CableVirtualChannelTable(psip);
+                CacheCVCT(pid, vct);
+                emit UpdateCVCT(tsid, vct);
+                emit UpdateVCT(tsid,  vct);
+            }
+            else
+            {
+                CableVirtualChannelTable vct(psip);
+                emit UpdateCVCT(tsid, &vct);
+                emit UpdateVCT(tsid,  &vct);
+            }
+            return true;
         }
         case TableID::RRT:
         {
-            RatingRegionTable rrt(*psip);
+            RatingRegionTable rrt(psip);
             emit UpdateRRT(&rrt);
-            break;
+            return true;
         }
         case TableID::EIT:
         {
-            EventInformationTable eit(*psip);
-            SetVersionEIT(tspacket->PID(), version);
-            emit UpdateEIT(tspacket->PID(), &eit);
-            break;
+            EventInformationTable eit(psip);
+            SetVersionEIT(pid, version);
+            emit UpdateEIT(pid, &eit);
+            return true;
         }
         case TableID::ETT:
         {
-            ExtendedTextTable ett(*psip);
-            SetVersionETT(tspacket->PID(), version);
-            emit UpdateETT(tspacket->PID(), &ett);
-            break;
+            ExtendedTextTable ett(psip);
+            SetVersionETT(pid, version);
+            emit UpdateETT(pid, &ett);
+            return true;
         }
         case TableID::STT:
         {
-            SystemTimeTable stt(*psip);
+            SystemTimeTable stt(psip);
             if (stt.GPSOffset() != _GPS_UTC_offset) // only update if it changes
                 _GPS_UTC_offset = stt.GPSOffset();
             emit UpdateSTT(&stt);
-            break;
+            return true;
         }
         case TableID::DCCT:
         {
-            DirectedChannelChangeTable dcct(*psip);
+            DirectedChannelChangeTable dcct(psip);
             emit UpdateDCCT(&dcct);
-            break;
+            return true;
         }
         case TableID::DCCSCT:
         {
-            DirectedChannelChangeSelectionCodeTable dccsct(*psip);
+            DirectedChannelChangeSelectionCodeTable dccsct(psip);
             emit UpdateDCCSCT(&dccsct);
-            break;
+            return true;
         }
         default:
         {
-            VERBOSE(VB_RECORD, QString("Unknown table 0x%1")
-                    .arg(psip->TableID(),0,16));
+            VERBOSE(VB_RECORD,
+                    QString("ATSCStreamData::HandleTables(): Unknown "
+                            "table 0x%1").arg(psip.TableID(),0,16));
             break;
         }
     }
-    HT_RETURN;
-#undef HT_RETURN
+    return false;
+}
+
+bool ATSCStreamData::HasCachedMGT(bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    return (bool)(_cached_mgt);
+}
+
+bool ATSCStreamData::HasCachedTVCT(uint pid, bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    _cache_lock.lock();
+    tvct_cache_t::const_iterator it = _cached_tvcts.find(pid);
+    bool exists = (it != _cached_tvcts.end());
+    _cache_lock.unlock();
+
+    return exists;
+}
+
+bool ATSCStreamData::HasCachedCVCT(uint pid, bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    _cache_lock.lock();
+    cvct_cache_t::const_iterator it = _cached_cvcts.find(pid);
+    bool exists = (it != _cached_cvcts.end());
+    _cache_lock.unlock();
+
+    return exists;
+}
+
+bool ATSCStreamData::HasCachedAllTVCTs(bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    if (!_cached_mgt)
+        return false;
+
+    _cache_lock.lock();
+    bool ret = true;
+    for (uint i = 0; ret && (i < _cached_mgt->TableCount()); ++i)
+    {
+        if (TableClass::TVCTc == _cached_mgt->TableClass(i))
+            ret &= HasCachedTVCT(_cached_mgt->TablePID(i));
+    }
+    _cache_lock.unlock();
+
+    return ret;
+}
+
+bool ATSCStreamData::HasCachedAllCVCTs(bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    if (!_cached_mgt)
+        return false;
+
+    _cache_lock.lock();
+    bool ret = true;
+    for (uint i = 0; ret && (i < _cached_mgt->TableCount()); ++i)
+    {
+        if (TableClass::CVCTc == _cached_mgt->TableClass(i))
+            ret &= HasCachedCVCT(_cached_mgt->TablePID(i));
+    }
+    _cache_lock.unlock();
+
+    return ret;
+}
+
+const MasterGuideTable *ATSCStreamData::GetCachedMGT(bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    _cache_lock.lock();
+    const MasterGuideTable *mgt = _cached_mgt;
+    IncrementRefCnt(mgt);
+    _cache_lock.unlock();
+
+    return mgt;
+}
+
+const tvct_ptr_t ATSCStreamData::GetCachedTVCT(uint pid, bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    TerrestrialVirtualChannelTable *tvct = NULL;
+
+    _cache_lock.lock();
+    tvct_cache_t::const_iterator it = _cached_tvcts.find(pid);
+    if (it != _cached_tvcts.end())
+        IncrementRefCnt(tvct = *it);
+    _cache_lock.unlock();
+
+    return tvct;
+}
+
+const cvct_ptr_t ATSCStreamData::GetCachedCVCT(uint pid, bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    CableVirtualChannelTable *cvct = NULL;
+
+    _cache_lock.lock();
+    cvct_cache_t::const_iterator it = _cached_cvcts.find(pid);
+    if (it != _cached_cvcts.end())
+        IncrementRefCnt(cvct = *it);
+    _cache_lock.unlock();
+
+    return cvct;
+}
+
+tvct_vec_t ATSCStreamData::GetAllCachedTVCTs(bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    vector<const TerrestrialVirtualChannelTable*> tvcts;
+
+    _cache_lock.lock();
+    tvct_cache_t::const_iterator it = _cached_tvcts.begin();
+    for (; it != _cached_tvcts.end(); ++it)
+    {
+        TerrestrialVirtualChannelTable* tvct = *it;
+        IncrementRefCnt(tvct);
+        tvcts.push_back(tvct);
+    }
+    _cache_lock.unlock();
+
+    return tvcts;
+}
+
+cvct_vec_t ATSCStreamData::GetAllCachedCVCTs(bool current) const
+{
+    if (!current)
+        VERBOSE(VB_IMPORTANT, "Currently we ignore \'current\' param");
+
+    vector<const CableVirtualChannelTable*> cvcts;
+
+    _cache_lock.lock();
+    cvct_cache_t::const_iterator it = _cached_cvcts.begin();
+    for (; it != _cached_cvcts.end(); ++it)
+    {
+        CableVirtualChannelTable* cvct = *it;
+        IncrementRefCnt(cvct);
+        cvcts.push_back(cvct);
+    }
+    _cache_lock.unlock();
+
+    return cvcts;
+}
+
+void ATSCStreamData::CacheMGT(MasterGuideTable *mgt)
+{
+    _cache_lock.lock();
+    DeleteCachedTable(_cached_mgt);
+    _cached_mgt = mgt;
+    _cache_lock.unlock();
+}
+
+void ATSCStreamData::CacheTVCT(uint pid, TerrestrialVirtualChannelTable* tvct)
+{
+    _cache_lock.lock();
+    tvct_cache_t::iterator it = _cached_tvcts.find(pid);
+    if (it != _cached_tvcts.end())
+        DeleteCachedTable(*it);
+    _cached_tvcts[pid] = tvct;
+
+    _cache_lock.unlock();
+}
+
+void ATSCStreamData::CacheCVCT(uint pid, CableVirtualChannelTable* cvct)
+{
+    _cache_lock.lock();
+    cvct_cache_t::iterator it = _cached_cvcts.find(pid);
+    if (it != _cached_cvcts.end())
+        DeleteCachedTable(*it);
+    _cached_cvcts[pid] = cvct;
+
+    _cache_lock.unlock();
+}
+
+void ATSCStreamData::ReturnCachedTables(tvct_vec_t &tvcts) const
+{
+    for (tvct_vec_t::iterator it = tvcts.begin(); it != tvcts.end(); ++it)
+        ReturnCachedTable(*it);
+    tvcts.clear();
+}
+
+void ATSCStreamData::ReturnCachedTables(cvct_vec_t &cvcts) const
+{
+    for (cvct_vec_t::iterator it = cvcts.begin(); it != cvcts.end(); ++it)
+        ReturnCachedTable(*it);
+    cvcts.clear();
 }
 
 void ATSCStreamData::PrintMGT(const MasterGuideTable *mgt) const

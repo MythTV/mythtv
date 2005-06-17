@@ -12,8 +12,6 @@ using namespace std;
 #define VIDEO_PID(bp) ((bp)+1)
 #define AUDIO_PID(bp) ((bp)+4)
 #define SYNC_BYTE     0x0047
-#define MPEG_PAT_PID  0x0000
-#define ATSC_PSIP_PID 0x1ffb
 
 /** \class TSHeader
  *  \brief Used to access header of a TSPacket.

@@ -5,65 +5,178 @@
 
 #include <qstring.h>
 #include "mpegtables.h"
+#include "dvbdescriptors.h"
 
 /** \class NetworkInformationTable
  *  \brief This table tells the decoder on which PIDs to find other tables.
  *  \todo This is just a stub.
  */
-class NetworkInformationTable : PSIPTable
+class NetworkInformationTable : public PSIPTable
 {
   public:
-    NetworkInformationTable(const PSIPTable& table) : PSIPTable(table)
+    NetworkInformationTable(const PSIPTable& table)
+        : PSIPTable(table), _cached_network_name(QString::null)
     {
     // start_code_prefix        8   0.0          0
-    // table_id                 8   1.0       0x40
-        assert(TableID::NIT == TableID());
+    // table_id                 8   1.0       0x40/0x41
+        assert(TableID::NIT == TableID() || TableID::NITo == TableID());
         Parse();
     // section_syntax_indicator 1   2.0          1
-    // private_indicator        1   2.1          1
+    // reserved_future_use      1   2.1          1
     // reserved                 2   2.2          3
-    // table_id_extension      16   4.0     0x0000
+    // section_length          12   2.4          0
     // reserved                 2   6.0          3
+    // version_number           5   6.2          0
     // current_next_indicator   1   6.7          1
     // section_number           8   7.0       0x00
     // last_section_number      8   8.0       0x00
     }
     ~NetworkInformationTable() { ; }
 
+    /// network_id             16   4.0     0x0000
+    uint NetworkID() const { return TableIDExtension(); }
+
+    // reserved_future_use      4   9.0        0xf
+    /// network_desc_length    12   9.4          0
+    uint NetworkDescriptorsLength() const
+        { return ((pesdata()[9]<<8) | pesdata()[10]) & 0xfff; }
+
+    /// for(i=0; i<N; i++)      x  11.0
+    ///   { descriptor() }
+    const unsigned char* NetworkDescriptors() const { return pesdata()+11; }
+
+    // reserved_future_use      4  0.0+ndl     0xf
+    /// trans_stream_loop_len  12  0.4+ndl
+    uint TransportStreamCount() const
+        { return ((_tsc_ptr[0]<<8) | _tsc_ptr[1]) & 0xfff; }
+    // for(i=0; i<N; i++) { 
+    ///  transport_stream_id   16  0.0+p
+    uint TSID(uint i) const { return (_ptrs[i][0]<<8) | _ptrs[i][1]; }
+    ///  original_network_id   16  2.0+p
+    uint OriginalNetworkID(uint i) const
+        { return (_ptrs[i][2]<<8) | _ptrs[i][3]; }
+    //   reserved_future_use    4  4.0+p
+    ///  trans_desc_length     12  4.4+p
+    uint TransportDescriptorsLength(uint i) const
+        { return ((_ptrs[i][4]<<8) | _ptrs[i][5]) & 0xfff; }
+    ///    for(j=0;j<N;j++)     x  6.0+p
+    ///      { descriptor() }
+    const unsigned char* TransportDescriptors(uint i) const
+        { return _ptrs[i]+6; }
+    // }
+
     void Parse(void) const;
     QString toString(void) const;
+    QString NetworkName() const;
+
   private:
-    mutable vector<unsigned char*> _ptrs; // used to parse
+    mutable QString _cached_network_name;
+    mutable const unsigned char* _tsc_ptr;
+    mutable vector<const unsigned char*> _ptrs; // used to parse
 };
 
 /** \class ServiceDescriptionTable
  *  \brief This table tells the decoder on which PIDs to find A/V data.
  *  \todo This is just a stub.
  */
-class ServiceDescriptionTable: PSIPTable
+class ServiceDescriptionTable: public PSIPTable
 {
   public:
     ServiceDescriptionTable(const PSIPTable& table) : PSIPTable(table)
     {
     // start_code_prefix        8   0.0          0
-    // table_id                 8   1.0       0x42
-        assert(TableID::SDT == TableID());
+    // table_id                 8   1.0       0x42/0x46
+        assert(TableID::SDT == TableID() || TableID::SDTo == TableID());
         Parse();
     // section_syntax_indicator 1   2.0          1
-    // private_indicator        1   2.1          1
+    // reserved_future_use      1   2.1          1
     // reserved                 2   2.2          3
-    // table_id_extension      16   4.0     0x0000
+    // section_length          12   2.4          0
     // reserved                 2   6.0          3
+    // version_number           5   6.2          0
     // current_next_indicator   1   6.7          1
     // section_number           8   7.0       0x00
     // last_section_number      8   8.0       0x00
     }
     ~ServiceDescriptionTable() { ; }
 
+    /// transport_stream_id    16   4.0     0x0000
+    uint TSID() const { return TableIDExtension(); }
+
+    /// original_network_id    16   9.0
+    uint OriginalNetworkID() const { return (pesdata()[4]<<8) | pesdata()[5]; }
+
+    /// Number of services
+    uint ServiceCount() const { return _ptrs.size()-1; }
+
+    // reserved_future_use      8  11.0
+    // for (i=0;i<N;i++) { 
+    ///  service_id            16  0.0+p
+    uint ServiceID(uint i) const { return (_ptrs[i][0]<<8) | (_ptrs[i][1]); }
+    //   reserved_future_use    6  2.0+p
+    //   EIT_schedule_flag      1  2.6+p
+    bool HasEITSchedule(uint i) const { return bool(_ptrs[i][2] & 0x2); }
+    //   EIT_present_following  1  2.7+p
+    bool HasEITPresentFollowing(uint i) const
+        { return bool(_ptrs[i][2] & 0x1); }
+    //   running_status         3  3.0+p
+    ///  free_CA_mode           1  3.3+p
+    bool HasFreeCA(uint i) const { return bool(_ptrs[i][3] & 0x10); }
+    ///  desc_loop_length      12  3.4+p
+    uint ServiceDescriptorsLength(uint i) const
+        { return ((_ptrs[i][3]<<8) | (_ptrs[i][4])) & 0xfff; }
+    ///  for (j=0;j<N;j++)      x  5.0+p
+    ///    { descriptor() }
+    const unsigned char* ServiceDescriptors(uint i) const
+        { return _ptrs[i]+5; }
+    // }
+
     void Parse(void) const;
     QString toString(void) const;
   private:
-    mutable vector<unsigned char*> _ptrs; // used to parse
+    mutable vector<const unsigned char*> _ptrs; // used to parse
+};
+
+class DiscontinuityInformationTable : public PSIPTable
+{
+    DiscontinuityInformationTable(const PSIPTable& table) : PSIPTable(table)
+        { ; }
+    // table_id 8 
+    // section_syntax_indicator 1
+    // reserved_future_use      1
+    // reserved                 2
+    // section_length          12 
+    // transition_flag          1 
+    // reserved_future_use      7
+};
+
+class SelectionInformationTable : public PSIPTable
+{
+    SelectionInformationTable(const PSIPTable& table) : PSIPTable(table)
+        { ; }
+    // table_id 8 
+    // section_syntax_indicator 1
+    // DVB_reserved_future_use  1
+    // ISO_reserved             2
+    // section_length          12 
+    // DVB_reserved_future_use 16 
+    // ISO_reserved             2
+    // version_number           5 
+    // current_next_indicator   1
+    // section_number           8 
+    // last_section_number      8 
+    // DVB_reserved_for_future_use 4 
+    // transmission_info_loop_length 12
+    // for (i =0;i<N;i++) { descriptor() }
+    // for (i=0;i<N;i++)
+    // {
+    //   service_id 16 
+    //   DVB_reserved_future_use  1 
+    //   running_status           3
+    //   service_loop_length     12
+    //   for(j=0;j<N;j++) { descriptor() }
+    // }
+    // CRC_32 32 rpchof 
 };
 
 #endif // _DVB_TABLES_H_

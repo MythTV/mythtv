@@ -45,11 +45,22 @@
 
 #define secs_Between_1Jan1970_6Jan1980 315982800
 
-class TableClass {
+class TableClass
+{
   public:
-    typedef enum {
-        UNKNOWN=-1, TVCTc=0, TVCTnc, CVCTc, CVCTnc,
-        ETTc, DCCSCT, EIT, ETTe, DCCT, RRT
+    typedef enum
+    {
+        UNKNOWN=-1,
+        TVCTc=0,
+        TVCTnc,
+        CVCTc,
+        CVCTnc,
+        ETTc,
+        DCCSCT,
+        EIT,
+        ETTe,
+        DCCT,
+        RRT,
     };
 };
 
@@ -57,7 +68,8 @@ class TableClass {
  *  \brief This table tells the decoder on which PIDs to find other tables,
  *         and their sizes and each table's current version number.
  */
-class MasterGuideTable : PSIPTable {
+class MasterGuideTable : public PSIPTable
+{
   public:
     MasterGuideTable(const PSIPTable& table) : PSIPTable(table)
     {
@@ -77,34 +89,40 @@ class MasterGuideTable : PSIPTable {
     ~MasterGuideTable() { ; }
 
     // tables_defined          16  10.0, 6-370 valid OTA, 2-370 valid w/Cable
-    uint TableCount() const {
+    uint TableCount() const
+    {
          return (pesdata()[10]<<8) | pesdata()[11];
     }
     // for (i=0; i<tableCount(); i++) {
     //   table_type                    16  0.0
-    uint TableType(uint i) const {
+    uint TableType(uint i) const
+    {
         return (_ptrs[i][0]<<8) | _ptrs[i][1];
     }
     int TableClass(uint i) const;
     QString TableClassString(uint i) const;
     //   reserved                       3  2.0    0x7
     //   table_type_PID                13  2.3
-    uint TablePID(uint i) const {
+    uint TablePID(uint i) const
+    {
         return ((_ptrs[i][2]<<8) | (_ptrs[i][3])) & 0x1fff;
     }
     //   reserved                       3  4.0    0x7
     //   table_type_version_number      5  4.3
-    uint TableVersion(uint i) const {
+    uint TableVersion(uint i) const
+    {
         return (_ptrs[i][4]) & 0x1f;
     }
     //   number_bytes for table desc.  32  5.0
-    uint TableDescriptorsBytes(uint i) const {
+    uint TableDescriptorsBytes(uint i) const
+    {
         return ((_ptrs[i][5]<<24) | (_ptrs[i][6]<<16) |
                 (_ptrs[i][7]<<8)  | (_ptrs[i][8]));
     }
     //   reserved                       4  9.0    0xf
     //   table_type_descriptors_length 12  9.4
-    uint TableDescriptorsLength(uint i) const {
+    uint TableDescriptorsLength(uint i) const
+    {
         return ((_ptrs[i][9]<<8) | (_ptrs[i][10])) & 0xfff;
     }
 
@@ -112,17 +130,20 @@ class MasterGuideTable : PSIPTable {
     //     descriptor = 11 + (offset)
     //   }
     // }
-    const unsigned char* TableDescriptors(uint i) const {
+    const unsigned char* TableDescriptors(uint i) const
+    {
         return _ptrs[i]+11;
     }
     // reserved                         4         0xf
     // descriptors_length              12
-    uint GlobalDescriptorsLength() const {
+    uint GlobalDescriptorsLength() const
+    {
         return ((_ptrs[TableCount()][0]<<8) |
                 (_ptrs[TableCount()][1])) & 0xfff;
     }
 
-    const unsigned char* GlobalDescriptors() const {
+    const unsigned char* GlobalDescriptors() const
+    {
         return _ptrs[TableCount()]+2;
     }
     // for (I=0; I<N; I++) {
@@ -158,15 +179,17 @@ class VirtualChannelTable : public PSIPTable
     uint TransportStreamID() const { return TableIDExtension(); }
 
     // num_channels_in_section  8  10.0
-    uint ChannelCount() const { return pesdata()[10]; }
+    uint ChannelCount()      const { return pesdata()[10]; }
 
     // for(i=0; i<num_channels_in_section; i++) {
     //   short_name          7*16   0.0 (7 UTF-16 chars padded by 0x0000)
-    const QString ShortChannelName(uint i) const {
+    const QString ShortChannelName(uint i) const
+    {
         QString str;
         const unsigned short* ustr =
             reinterpret_cast<const unsigned short*>(_ptrs[i]);
-        for (int j=0; j<7; j++) {
+        for (int j=0; j<7; j++)
+        {
             QChar c((ustr[j]<<8) | (ustr[j]>>8));
             if (c != QChar('\0')) str.append(c);
         }
@@ -177,70 +200,85 @@ class VirtualChannelTable : public PSIPTable
     //   major_channel_number  10  14.4
     // 14 RRRR JJJJ 15 jjjj jjmm  16 MMMM MMMM
     //              JJ JJjj jjjj  mm MMMM MMMM
-    uint MajorChannel(uint i) const {
+    uint MajorChannel(uint i) const
+    {
         return (((_ptrs[i][14])<<6)&0x3c0) | (_ptrs[i][15]>>2);
     }
     //   minor_channel_number  10  15.6
-    uint MinorChannel(uint i) const {
+    uint MinorChannel(uint i) const
+    {
         return (((_ptrs[i][15])<<8)&0x300) | _ptrs[i][16];
     }
     //   modulation_mode        8  17.0
-    uint ModulationMode(uint i) const {
+    uint ModulationMode(uint i) const
+    {
         return _ptrs[i][17];
     }
     //   carrier_frequency     32  18.0 deprecated
     //   channel_TSID          16  22.0
-    uint ChannelTransportStreamID(uint i) const {
+    uint ChannelTransportStreamID(uint i) const
+    {
         return ((_ptrs[i][22]<<8) | _ptrs[i][23]);
     }
     //   program_number        16  24.0
-    uint ProgramNumber(uint i) const {
+    uint ProgramNumber(uint i) const
+    {
         return ((_ptrs[i][24]<<8) | _ptrs[i][25]);
     }
     //   ETM_location           2  26.0
-    uint ETMlocation(uint i) const {
+    uint ETMlocation(uint i) const
+    {
         return (_ptrs[i][26]>>6) & 0x03;
     }
     //   access_controlled      1  26.2
-    bool IsAccessControlled(uint i) const {
+    bool IsAccessControlled(uint i) const
+    {
         return bool(_ptrs[i][26] & 0x20);
     }
     //   hidden                 1  26.3
-    bool IsHidden(uint i) const {
+    bool IsHidden(uint i) const
+    {
         return bool(_ptrs[i][26] & 0x10);
     }
     //   reserved               2  26.4          3
     //   hide_guide             1  26.6
-    bool IsHiddenInGuide(uint i) const {
+    bool IsHiddenInGuide(uint i) const
+    {
         return bool(_ptrs[i][26] & 0x2);
     }
     //   reserved               6  26.7       0x3f 
     //   service_type           6  27.2
-    uint ServiceType(uint i) const {
+    uint ServiceType(uint i) const
+    {
         return _ptrs[i][27] & 0x3f;
     }
     //   source_id             16  28.0
-    uint SourceID(uint i) const {
+    uint SourceID(uint i) const
+    {
         return ((_ptrs[i][28]<<8) | _ptrs[i][29]);
     }
     //   reserved               6  30.0       0xfb
     //   descriptors_length    10  30.6-31
-    uint DescriptorsLength(uint i) const {
+    uint DescriptorsLength(uint i) const
+    {
         return ((_ptrs[i][30]<<8) | _ptrs[i][31]) & 0x03ff;
     }
     //   for (i=0;i<N;i++) { descriptor() }
-    const unsigned char* Descriptors(uint i) const {
+    const unsigned char* Descriptors(uint i) const
+    {
         return _ptrs[i]+32;
     }
     // }
     // reserved                 6             0xfb
     // additional_descriptors_length 10
-    uint GlobalDescriptorsLength() const {
+    uint GlobalDescriptorsLength() const
+    {
         uint i = ChannelCount();
         return ((_ptrs[i][0]<<8) | _ptrs[i][1]) & 0x03ff;
     }
     // for (j=0; j<N; j++) { additional_descriptor() }
-    const unsigned char* GlobalDescriptors() const {
+    const unsigned char* GlobalDescriptors() const
+    {
         return _ptrs[ChannelCount()]+2;
     }
     // CRC_32                  32
@@ -272,7 +310,8 @@ class TerrestrialVirtualChannelTable : public VirtualChannelTable
     // transport_stream_id     16   4.0
     // num_channels_in_section  8  10.0
 
-    // for(i=0; i<num_channels_in_section; i++) {
+    // for (i=0; i<num_channels_in_section; i++)
+    // {
     //   short_name          7*16   0.0 (7 UTF-16 chars padded by 0x0000)
     //   reserved               4  14.0        0xf
 
@@ -324,7 +363,8 @@ class CableVirtualChannelTable : public VirtualChannelTable
     }
     ~CableVirtualChannelTable() { ; }
 
-    // for(i=0; i<num_channels_in_section; i++) {
+    // for (i=0; i<num_channels_in_section; i++)
+    // {
     //   short_name          7*16   0.0 (7 UTF-16 chars padded by 0x0000)
     //   reserved               4  14.0        0xf
 
@@ -340,11 +380,13 @@ class CableVirtualChannelTable : public VirtualChannelTable
     //   access_controlled      1  26.2
     //   hidden                 1  26.3
     //   path_select            1  26.4
-    bool IsPathSelect(uint i) const {
+    bool IsPathSelect(uint i) const
+    {
         return bool(_ptrs[i][26] & 0x8);
     }
     //   out_of_band            1  26.5
-    bool IsOutOfBand(uint i) const {
+    bool IsOutOfBand(uint i) const
+    {
         return bool(_ptrs[i][26] & 0x4);
     }
     //   hide_guide             1  26.6
@@ -368,7 +410,8 @@ class CableVirtualChannelTable : public VirtualChannelTable
  *         and channel information.
  *  \sa ExtendedTextTable, TerrestrialVirtualChannelTable, CableVirtualChannelTable
  */
-class EventInformationTable : public PSIPTable {
+class EventInformationTable : public PSIPTable
+{
   public:
     EventInformationTable(const PSIPTable& table) : PSIPTable(table)
     {
@@ -384,14 +427,17 @@ class EventInformationTable : public PSIPTable {
 
     // num_events_in_section    8  10.0
     uint EventCount() const { return pesdata()[10]; }
-    // for (j = 0; j< num_events_in_section;j++) {
+    // for (j = 0; j< num_events_in_section;j++)
+    // {
     //   reserved               2   0.0    3
     //   event_id              14   0.2
-    uint EventID(uint i) const {
+    uint EventID(uint i) const
+    {
         return ((_ptrs[i][0]<<8) | _ptrs[i][1])&0x3fff;
     }
     //   start_time            32   2.0
-    QDateTime StartTimeGPS(uint i) const {
+    QDateTime StartTimeGPS(uint i) const
+    {
         // Time in GPS seconds since 00:00:00 on January 6th, 1980 UTC
         uint t = ((_ptrs[i][2]<<24) | (_ptrs[i][3]<<16) |
                   (_ptrs[i][4]<<8)  | (_ptrs[i][5]));
@@ -401,29 +447,36 @@ class EventInformationTable : public PSIPTable {
     }
     //   reserved               2   6.0    3
     //   ETM_location           2   6.2
-    uint ETMLocation(uint i) const {
+    uint ETMLocation(uint i) const
+    {
         return (_ptrs[i][6]>>4)&3;
     }
     //   length_in_seconds     20   6.4
-    uint LengthInSeconds(uint i) const {
+    uint LengthInSeconds(uint i) const
+    {
         return ((_ptrs[i][6]<<16) | (_ptrs[i][7]<<8) |
                 (_ptrs[i][8])) & 0xfffff;
     }
     //   title_length           8   9.0
-    uint TitleLength(uint i) const { return _ptrs[i][9]; }
+    uint TitleLength(uint i) const
+    { return _ptrs[i][9]; }
     //   title_text() var       *  10.0
-    MultipleStringStructure title(int i) const {
+    MultipleStringStructure title(int i) const
+    {
         return MultipleStringStructure(_ptrs[i]+10);
     }
     //   reserved               4        0xf
     //   descriptors_length    12
-    uint DescriptorsLength(uint i) const {
+    uint DescriptorsLength(uint i) const
+    {
         unsigned char *desc=_ptrs[i]+10+TitleLength(i);
         return ((desc[0]<<8)|(desc[1]))&0xfff;
     }
-    //   for (i=0;i<N;i++) {
+    //   for (i=0;i<N;i++)
+    //   {
     //      descriptor()
-    const unsigned char* Descriptors(uint i) const {
+    const unsigned char* Descriptors(uint i) const
+    {
         return _ptrs[i]+12+TitleLength(i);
     }
     //   }
@@ -440,7 +493,8 @@ class EventInformationTable : public PSIPTable {
  *         contained in EventInformationTables.
  *  \sa EventInformationTable
  */
-class ExtendedTextTable : public PSIPTable {
+class ExtendedTextTable : public PSIPTable
+{
   public:
     ExtendedTextTable(const PSIPTable& table) : PSIPTable(table)
     {
@@ -472,12 +526,13 @@ class ExtendedTextTable : public PSIPTable {
     // channel ETM_id   source_id       0         00
     // event   ETM_id   source_id   event_id      10
     bool IsChannelETM() const { return 0==(pesdata()[13]&3); }
-    bool IsEventETM() const { return 2==(pesdata()[13]&3); }
+    bool IsEventETM() const   { return 2==(pesdata()[13]&3); }
     int SourceID() const { return (pesdata()[10]<<8) | pesdata()[11]; }
-    int EventID() const { return (pesdata()[12]<<6) | (pesdata()[13]>>2); }
+    int EventID() const  { return (pesdata()[12]<<6) | (pesdata()[13]>>2); }
 
     // extended_text_message    *  14.0  multiple string structure a/65b p81
-    const MultipleStringStructure ExtendedTextMessage() const {
+    const MultipleStringStructure ExtendedTextMessage() const
+    {
         return MultipleStringStructure(pesdata()+14);
     }
 
@@ -492,7 +547,8 @@ class ExtendedTextTable : public PSIPTable {
  *   is currently at 13 seconds.
  *   See also: a_65b.pdf page 23
  */
-class SystemTimeTable : public PSIPTable {
+class SystemTimeTable : public PSIPTable
+{
   public:
     SystemTimeTable(const PSIPTable& table) : PSIPTable(table)
     {
@@ -514,7 +570,8 @@ class SystemTimeTable : public PSIPTable {
     }
 
     // system_time             32  10.0
-    QDateTime SystemTimeGPS() const {
+    QDateTime SystemTimeGPS() const
+    {
         uint t = ((pesdata()[10]<<24) | (pesdata()[11]<<16) |
                   (pesdata()[12]<< 8) |  pesdata()[13]);
         QDateTime dt;
@@ -528,18 +585,21 @@ class SystemTimeTable : public PSIPTable {
     //   reserved               2  15.1          3
     //   DS_day_of_month        5  15.3
     //   DS_hour                8  16.0
-    bool InDaylightSavingsTime() const { return pesdata()[15]&0x80; }
-    uint DayDaylightSavingsStarts() const { return pesdata()[15]&0x1f; }
+    bool InDaylightSavingsTime()     const { return pesdata()[15]&0x80; }
+    uint DayDaylightSavingsStarts()  const { return pesdata()[15]&0x1f; }
     uint HourDaylightSavingsStarts() const { return pesdata()[16]; }
     // for (I = 0;I< N;I++) { descriptor() } 
     // CRC_32 32 rpchof
 
-    QString toString() const {
-        QString str("    SystemTimeTable   ");
-        str.append(QString("GPSTime(%1) GPS2UTC_Offset(%2)")/* DS(%3) Day(%4) Hour(%5)")*/.
-                   arg(SystemTimeGPS().toString(Qt::LocalDate)).
-                   arg(GPSOffset())/*.arg(InDaylightSavingsTime()).
-                   arg(DayDaylightSavingsStarts()).arg(HourDaylightSavingsStarts())*/);
+    QString toString() const
+    {
+        QString str =
+            QString("    SystemTimeTable  GPSTime(%1) GPS2UTC_Offset(%2) ")
+            .arg(SystemTimeGPS().toString(Qt::LocalDate)).arg(GPSOffset());
+        str.append(QString("DS(%3) Day(%4) Hour(%5)")
+                   .arg(InDaylightSavingsTime())
+                   .arg(DayDaylightSavingsStarts())
+                   .arg(HourDaylightSavingsStarts()));
         return str;
     }
 };

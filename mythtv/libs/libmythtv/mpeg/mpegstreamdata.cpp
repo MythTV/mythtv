@@ -9,9 +9,20 @@
  *  \brief Encapsulates data about MPEG stream and emits events for each table.
  */
 
+/** \fn MPEGStreamData::MPEGStreamData(int, bool)
+ *  \brief Initializes MPEGStreamData.
+ *
+ *   This adds the PID of the PAT table to "_pids_listening"
+ *
+ *  \param desiredProgram If you want rewritten PAT and PMTs, for
+ *                        a desired program set this to a value > -1
+ *  \param cacheTables    If true PAT and PMT tables will be cached
+ */
 MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
-    : _cache_tables(cacheTables), _desired_program(desiredProgram),
-      _pat_single_program(0), _pmt_single_program(0)
+    : QObject(NULL, "MPEGStreamData"),
+      _pat_version(-1), _cache_tables(cacheTables), _cache_lock(true),
+      _cached_pat(NULL), _desired_program(desiredProgram),
+      _pat_single_program(NULL), _pmt_single_program(NULL)
 {
     AddListeningPID(MPEG_PAT_PID);
 
@@ -47,6 +58,20 @@ void MPEGStreamData::Reset(int desiredProgram)
     
     _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
     _pmt_version.clear();
+
+    {
+        _cache_lock.lock();
+
+        DeleteCachedTable(_cached_pat);
+        _cached_pat = NULL;
+
+        pmt_cache_t::iterator it = _cached_pmts.begin();
+        for (; it != _cached_pmts.end(); ++it)
+            DeleteCachedTable(*it);
+        _cached_pmts.clear();
+
+        _cache_lock.unlock();
+    }
 }
 
 void MPEGStreamData::DeletePartialPES(uint pid)
@@ -269,39 +294,98 @@ bool MPEGStreamData::IsRedundant(const PSIPTable &psip) const
     return false;
 }
 
-/** \fn MPEGStreamData::HandleTables(const TSPacket*)
+/** \fn MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
  *  \brief Assembles PSIP packets and processes them.
  */
-void MPEGStreamData::HandleTables(const TSPacket* tspacket)
+bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
 {
-#define HT_RETURN { delete psip; return; }
+    // If we get this far decode table
+    switch (psip.TableID())
+    {
+        case TableID::PAT:
+        { 
+            SetVersionPAT(psip.Version());
+            if (_cache_tables)
+            {
+                ProgramAssociationTable *pat =
+                    new ProgramAssociationTable(psip);
+                CachePAT(pat);
+                emit UpdatePAT(pat);
+                if (CreatePATSingleProgram(*pat))
+                    emit UpdatePATSingleProgram(PATSingleProgram());
+            }
+            else
+            {
+                ProgramAssociationTable pat(psip);
+                emit UpdatePAT(&pat);
+                if (CreatePATSingleProgram(pat))
+                    emit UpdatePATSingleProgram(PATSingleProgram());
+            }
+            return true;
+        }
+        case TableID::PMT:
+        {
+            SetVersionPMT(pid, psip.Version());
+            if (_cache_tables)
+            {
+                ProgramMapTable *pmt = new ProgramMapTable(psip);
+                CachePMT(pid, pmt);
+                emit UpdatePMT(pid, pmt);
+                if (pid == _pid_pmt_single_program)
+                {
+                    if (CreatePMTSingleProgram(*pmt))
+                        emit UpdatePMTSingleProgram(PMTSingleProgram());
+                }
+            }
+            else
+            {
+                ProgramMapTable pmt(psip);
+                emit UpdatePMT(pid, &pmt);
+                if (pid == _pid_pmt_single_program)
+                {
+                    if (CreatePMTSingleProgram(pmt))
+                        emit UpdatePMTSingleProgram(PMTSingleProgram());
+                }
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+/** \fn MPEGStreamData::HandleTSTables(const TSPacket*)
+ *  \brief Assembles PSIP packets and processes them.
+ */
+bool MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
+{
+#define HT_RETURN(HANDLED) { delete psip; return HANDLED; }
     // Assemble PSIP
     PSIPTable *psip = AssemblePSIP(tspacket);
     if (!psip)
-        return;
+        return true;
 
     // Validate PSIP
     if (!psip->IsGood())
     {
         VERBOSE(VB_RECORD, QString("PSIP packet failed CRC check"));
-        HT_RETURN;
+        HT_RETURN(true);
     }
 
     if (!psip->IsCurrent()) // we don't cache the next table, for now
-        HT_RETURN;
+        HT_RETURN(true);
 
     if (1!=tspacket->AdaptationFieldControl())
     { // payload only, ATSC req.
         VERBOSE(VB_RECORD,
                 "PSIP packet has Adaptation Field Control, not ATSC compiant");
-        HT_RETURN;
+        HT_RETURN(true);
     }
 
     if (tspacket->ScramplingControl())
     { // scrambled! ATSC, DVB require tables not to be scrambled
         VERBOSE(VB_RECORD,
                 "PSIP packet is scrambled, not ATSC/DVB compiant");
-        HT_RETURN;
+        HT_RETURN(true);
     }
 
     // Don't decode redundant packets,
@@ -313,32 +397,12 @@ void MPEGStreamData::HandleTables(const TSPacket* tspacket)
         if (TableID::PMT == psip->TableID() &&
             tspacket->PID() == _pid_pmt_single_program)
             emit UpdatePMTSingleProgram(PMTSingleProgram());
-        HT_RETURN; // already parsed this table, toss it.
+        HT_RETURN(true); // already parsed this table, toss it.
     }
 
-    // If we get this far decode table
-    switch (psip->TableID())
-    {
-        case TableID::PAT:
-        {
-            ProgramAssociationTable pat(*psip);
-            emit UpdatePAT(&pat);
-            if (CreatePATSingleProgram(pat))
-                emit UpdatePATSingleProgram(PATSingleProgram());
-            HT_RETURN;
-        }
-        case TableID::PMT:
-        {
-            ProgramMapTable pmt(*psip);
-            emit UpdatePMT(tspacket->PID(), &pmt);
-            if (tspacket->PID() == _pid_pmt_single_program)
-            {
-                if (CreatePMTSingleProgram(pmt))
-                    emit UpdatePMTSingleProgram(PMTSingleProgram());
-            }
-            HT_RETURN;
-        }
-    }
+    bool handled = HandleTables(tspacket->PID(), *psip);
+    HT_RETURN(handled);
+#undef HT_RETURN
 }
 
 int MPEGStreamData::ProcessData(unsigned char *buffer, int len)
@@ -374,7 +438,7 @@ bool MPEGStreamData::ProcessTSPacket(const TSPacket& tspacket)
     if (ok && !tspacket.ScramplingControl() && tspacket.HasPayload() &&
         IsListeningPID(tspacket.PID()))
     {
-        HandleTables(&tspacket);
+        HandleTSTables(&tspacket);
     }
     return ok;
 }
@@ -433,4 +497,120 @@ void MPEGStreamData::SavePartialPES(uint pid, PESPacket* packet)
         _partial_pes_packet_cache.replace(pid, packet);
         delete old;
     }
+}
+
+bool MPEGStreamData::HasCachedPAT(void) const
+{
+    return (bool)(_cached_pat);
+}
+
+bool MPEGStreamData::HasCachedPMT(uint pid) const
+{
+    _cache_lock.lock();
+    pmt_cache_t::const_iterator it = _cached_pmts.find(pid);
+    bool exists = (it != _cached_pmts.end());
+    _cache_lock.unlock();
+    return exists;
+}
+
+bool MPEGStreamData::HasAllPMTsCached(void) const
+{
+    if (_cached_pat)
+        return false;
+
+    bool ret = true;
+    _cache_lock.lock();
+
+    if (_cached_pat->ProgramCount() > _cached_pmts.size())
+        ret = false;
+    else
+    {
+        // Verify we have the right ones
+        pmt_cache_t::const_iterator it = _cached_pmts.begin();
+        for (; it != _cached_pmts.end() && ret; ++it)
+            ret &= (bool)(_cached_pat->FindProgram(it.key()));
+    }
+
+    _cache_lock.unlock();
+    return ret;
+}
+
+const ProgramAssociationTable *MPEGStreamData::GetCachedPAT(void) const
+{
+    _cache_lock.lock();
+    const ProgramAssociationTable *pat = _cached_pat;
+    IncrementRefCnt(pat);
+    _cache_lock.unlock();
+
+    return pat;
+}
+
+const ProgramMapTable *MPEGStreamData::GetCachedPMT(uint pid) const
+{
+    ProgramMapTable *pmt = NULL;
+
+    _cache_lock.lock();
+    pmt_cache_t::const_iterator it = _cached_pmts.find(pid);
+    if (it != _cached_pmts.end())
+        IncrementRefCnt(pmt = *it);
+    _cache_lock.unlock();
+
+    return pmt;
+}
+
+vector<const ProgramMapTable*> MPEGStreamData::GetCachedPMTs(void) const
+{
+    vector<const ProgramMapTable*> pmts;
+
+    _cache_lock.lock();
+    pmt_cache_t::const_iterator it = _cached_pmts.begin();
+    for (; it != _cached_pmts.end(); ++it)
+    {
+        ProgramMapTable* pmt = *it;
+        IncrementRefCnt(pmt);
+        pmts.push_back(pmt);
+    }
+    _cache_lock.unlock();
+
+    return pmts;
+}
+
+void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
+{
+    // TODO
+}
+
+void MPEGStreamData::ReturnCachedTables(pmt_vec_t &pmts) const
+{
+    for (pmt_vec_t::iterator it = pmts.begin(); it != pmts.end(); ++it)
+        ReturnCachedTable(*it);
+    pmts.clear();
+}
+
+void MPEGStreamData::IncrementRefCnt(const PSIPTable *psip) const
+{
+    // TODO
+}
+
+void MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
+{
+    // TODO
+}
+
+void MPEGStreamData::CachePAT(ProgramAssociationTable *pat)
+{
+    _cache_lock.lock();
+    DeleteCachedTable(_cached_pat);
+    _cached_pat = pat;
+    _cache_lock.unlock();
+}
+
+void MPEGStreamData::CachePMT(uint pid, ProgramMapTable *pmt)
+{
+    _cache_lock.lock();
+    pmt_cache_t::iterator it = _cached_pmts.find(pid);
+    if (it != _cached_pmts.end())
+        DeleteCachedTable(*it);
+    _cached_pmts[pid] = pmt;
+    _cache_lock.unlock();
 }

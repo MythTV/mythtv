@@ -857,7 +857,7 @@ bool HDTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
             else if (StreamData()->IsAudioPID(lpid))
                 HandleAudio(&tspacket);
             else if (StreamData()->IsListeningPID(lpid))
-                StreamData()->HandleTables(&tspacket);
+                StreamData()->HandleTSTables(&tspacket);
             else if (StreamData()->IsWritingPID(lpid))
                 ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
             else if (StreamData()->VersionMGT()>=0)

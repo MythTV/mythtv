@@ -109,11 +109,14 @@ const QString PSIPTable::toString() const
     //for (unsigned int i=0; i<9; i++)
     //str.append(QString(" 0x%1").arg(int(pesdata()[i]), 0, 16));
     //str.append("\n");
-    str.append(QString(" PSIP prefix(0x%1) tableID(0x%1) length(%2) extension(0x%3)\n").
-               arg(StartCodePrefix(), 0, 16).arg(TableID(), 0, 16).
-               arg(Length()).arg(TableIDExtension(), 0, 16));
-    str.append(QString("      version(%1) current(%2) section(%3) last_section(%4)\n").
-               arg(Version()).arg(IsCurrent()).arg(Section()).arg(LastSection()));
+    str.append(QString(" PSIP prefix(0x%1) tableID(0x%1) "
+                       "length(%2) extension(0x%3)\n")
+               .arg(StartCodePrefix(), 0, 16).arg(TableID(), 0, 16)
+               .arg(Length()).arg(TableIDExtension(), 0, 16));
+    str.append(QString("      version(%1) current(%2) "
+                       "section(%3) last_section(%4)\n")
+               .arg(Version()).arg(IsCurrent())
+               .arg(Section()).arg(LastSection()));
     //str.append(QString("   protocol ver: "<<protocolVersion()<<endl;
     return str;
 }
@@ -138,25 +141,32 @@ const QString ProgramAssociationTable::toString() const
 const QString ProgramMapTable::toString() const
 {
     Parse();
-    QString str;
-    str.append(QString("Program Map Table ver(%1) pid(0x%2) pnum(%3)\n").
-               arg(Version()).arg(tsheader()->PID(), 0, 16).arg(ProgramNumber()));
-    if (0!=ProgramInfoLength()) {
+    QString str = 
+        QString("Program Map Table ver(%1) pid(0x%2) pnum(%3)\n")
+        .arg(Version()).arg(tsheader()->PID(), 0, 16)
+        .arg(ProgramNumber());
+
+    if (0 != ProgramInfoLength())
+    {
         vector<const unsigned char*> desc = 
-            ATSCDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
+            MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());
         for (uint i=0; i<desc.size(); i++)
-            str.append(QString("  %1\n").arg(ATSCDescriptor(desc[i]).toString()));
+            str.append(QString("  %1\n")
+                       .arg(MPEGDescriptor(desc[i]).toString()));
     }
     str.append("\n");
-    for (unsigned int i=0; i<StreamCount(); i++) {
-        str.append(QString(" Stream #%1 pid(0x%2) type(%3  0x%4)\n").
-                   arg(i).arg(StreamPID(i), 0, 16).
-                   arg(StreamTypeString(i)).arg(int(StreamType(i))));
-        if (0!=StreamInfoLength(i)) {
+    for (unsigned int i=0; i<StreamCount(); i++)
+    {
+        str.append(QString(" Stream #%1 pid(0x%2) type(%3  0x%4)\n")
+                   .arg(i).arg(StreamPID(i), 0, 16)
+                   .arg(StreamTypeString(i)).arg(int(StreamType(i))));
+        if (0 != StreamInfoLength(i))
+        {
             vector<const unsigned char*> desc = 
-                ATSCDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
+                MPEGDescriptor::Parse(StreamInfo(i), StreamInfoLength(i));
             for (uint i=0; i<desc.size(); i++)
-                str.append(QString("  %1\n").arg(ATSCDescriptor(desc[i]).toString()));
+                str.append(QString("  %1\n")
+                           .arg(MPEGDescriptor(desc[i]).toString()));
         }
     }
     return str;

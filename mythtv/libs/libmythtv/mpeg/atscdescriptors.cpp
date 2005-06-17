@@ -16,58 +16,6 @@ static inline int iso639_2toInt(const char *iso639_2) {
     return iso639_2toInt((const unsigned char*)iso639_2);
 }
 
-vector<const unsigned char*> ATSCDescriptor::Parse(
-    const unsigned char* data, uint len) {
-    vector<const unsigned char*> tmp;
-    uint off=0;
-    while (off<len) {
-        tmp.push_back(data+off);
-        ATSCDescriptor desc(data+off);
-        off+=desc.DescriptorLength()+2;
-    }
-    return tmp;
-}
-
-QString ATSCDescriptor::DescriptorTagString() const {
-    switch(DescriptorTag()) {
-        case 0x05: return QString("Registration");
-        case 0x6A: return QString("AC-3");
-        case 0x80: return QString("Stuffing");
-        case 0x81: return QString("Audio");
-        case 0x86: return QString("Caption Service");
-        case 0x87: return QString("Content Advisory");
-        case 0xA0: return QString("Extended Channel Name");
-        case 0xA1: return QString("Service Location");
-        case 0xA2: return QString("Time-shifted Service");
-        case 0xA3: return QString("Component Name");
-        case 0xA8: return QString("DCC Departing Request");
-        case 0xA9: return QString("DCC Arriving Request");
-        case 0xAA: return QString("DRM Control");
-        case 0xB6: return QString("Content Identifier");
-        default: return QString("Unknown");
-    }
-}
-
-QString ATSCDescriptor::toString() const {
-    QString str;
-    if (0x86==DescriptorTag()) {
-        str = CaptionServiceDescriptor(_data).toString();
-    } else if (0x05==DescriptorTag()) {
-        str = RegistrationDescriptor(_data).toString();
-    } else if (0x81==DescriptorTag()) {
-        str = AudioStreamDescriptor(_data).toString();
-    } else if (0xA3==DescriptorTag()) {
-        str = ComponentNameDescriptor(_data).toString();
-    } else {
-        str.append(QString("   %1 Descriptor (0x%2)").
-                   arg(DescriptorTagString()).arg(int(DescriptorTag()), 0, 16));
-        str.append(QString(" length(%1)").arg(int(DescriptorLength())));
-        //for (uint i=0; i<DescriptorLength(); i++)
-        //    str.append(QString(" 0x%1").arg(int(_data[i+2]), 0, 16));
-    }
-    return str;
-}
-
 QString AudioStreamDescriptor::SampleRateCodeString() const {
     static const char* asd[] = {
         "48kbps", "44.1kbps", "32kbps", "Reserved",

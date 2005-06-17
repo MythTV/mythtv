@@ -9,6 +9,7 @@
 #include <qstring.h>
 #include <qmap.h>
 #include "mythcontext.h"
+#include "mpegdescriptors.h"
 
 using namespace std;
 
@@ -66,7 +67,8 @@ class MultipleStringStructure {
     static QString Huffman1(const unsigned char* buf, int len);
     static QString Huffman2(const unsigned char* buf, int len);
     static uint Index(int i, int j) { return (i<<8)|(j&0xff); }
-    const unsigned char* Offset(int i, int j) const { return _ptrs[Index(i,j)]; }
+    const unsigned char* Offset(int i, int j) const
+        { return _ptrs[Index(i,j)]; }
 
   public:
     QString CompressedString(int i, int j) const;
@@ -78,24 +80,11 @@ class MultipleStringStructure {
     mutable IntToBuf _ptrs;
 };
 
-class ATSCDescriptor {
-  public:
-    ATSCDescriptor(const unsigned char* data) : _data(data) { ; }
-    uint DescriptorTag() const { return _data[0]; }
-    QString DescriptorTagString() const;
-    uint DescriptorLength() const { return _data[1]; }
-    static vector<const unsigned char*>
-        Parse(const unsigned char* data, uint len);
-    QString toString() const;
-  protected:
-    const unsigned char* _data;
-};
-
-class CaptionServiceDescriptor : public ATSCDescriptor {
+class CaptionServiceDescriptor : public MPEGDescriptor {
     mutable IntToBuf _ptrs;
   public:
     CaptionServiceDescriptor(const unsigned char* data) :
-        ATSCDescriptor(data) {
+        MPEGDescriptor(data) {
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x86
         assert(0x86==DescriptorTag());
@@ -146,7 +135,8 @@ class CaptionServiceDescriptor : public ATSCDescriptor {
             str.append(QString("easy_reader(%1) wide(%2) ").
                        arg(EasyReader(i)).arg(WideAspectRatio(i)));
             if (Type(i))
-                str.append(QString("service_num(%1)").arg(CaptionServiceNumber(i)));
+                str.append(QString("service_num(%1)")
+                           .arg(CaptionServiceNumber(i)));
             else
                 str.append(QString("line_21_field(%1)").arg(Line21Field(i)));
         }
@@ -159,10 +149,10 @@ class CaptionServiceDescriptor : public ATSCDescriptor {
     }    
 };
 
-class ComponentNameDescriptor : public ATSCDescriptor {
+class ComponentNameDescriptor : public MPEGDescriptor {
   public:
     ComponentNameDescriptor(const unsigned char* data) :
-        ATSCDescriptor(data) {
+        MPEGDescriptor(data) {
         assert(0xA3==DescriptorTag());
     }
     const MultipleStringStructure ComponentNameStrings() const {
@@ -174,35 +164,12 @@ class ComponentNameDescriptor : public ATSCDescriptor {
     }
 };
 
-// a_52a.pdf p119, Table A1
-class RegistrationDescriptor : public ATSCDescriptor {
-  public:
-    RegistrationDescriptor(const unsigned char* data) :
-        ATSCDescriptor(data) {
-        assert(0x05==DescriptorTag());
-        if (0x04!=DescriptorLength()) {
-            cerr<<"Registration Descriptor length != 4 !!!!"<<endl;
-        }
-        //assert(0x41432d33==formatIdentifier());
-    }
-    uint FormatIdentifier() const {
-        return (_data[2]<<24) | (_data[3]<<16) |
-            (_data[4]<<8) | (_data[5]);
-    }
-    QString toString() const {
-        if (0x41432d33==FormatIdentifier())
-            return QString("           Registration Descriptor   OK");
-        return QString("           Registration Descriptor   not OK \n"
-                       " format Identifier is 0x%1 but should be 0x41432d33").
-            arg(FormatIdentifier(), 0, 16);
-    }
-};
 
 // a_52a.pdf p120, Table A2
-class AudioStreamDescriptor : public ATSCDescriptor {
+class AudioStreamDescriptor : public MPEGDescriptor {
   public:
     AudioStreamDescriptor(const unsigned char* data) :
-        ATSCDescriptor(data) {
+        MPEGDescriptor(data) {
 // descriptor_tag   The value for the AC-3 descriptor tag is 0x81.
         assert(0x81==DescriptorTag());
     }
@@ -298,37 +265,13 @@ class AudioStreamDescriptor : public ATSCDescriptor {
     QString toString() const;
 };
 
-/*
-// a_52a.pdf p125 Table A7 (for DVB)
-AC3Descriptor {
- descriptor_tag 8 uimsbf
-// descriptor_tag   The descriptor tag is an 8-bit field which
-// identifies each descriptor. The AC-3 descriptor_tag shall
-// have a value of 0x6A.
- descriptor_length 8 uimsbf
- AC-3_type_flag 1 bslbf
- bsid_flag 1 bslbf
- mainid_flag 1 bslbf
- asvc_flag 1 bslbf
- reserved 1 bslbf
- reserved 1 bslbf
- reserved 1 bslbf
- reserved 1 bslbf
- If (AC-3_type_flag)==1 { AC-3_type } 8 uimsbf
- If (bsid_flag)==1 { bsid { 8 uimsbf
-   If (mainid_flag)==1{ mainid } 8 uimsbf
-   If (asvc_flag)==1{ asvc } 8 bslbf
-   For(I=0;I<N;I++){ additional_info[I] } N x 8 uimsbf
-};
-*/
-
 /** \class ContentIdentifierDescriptor
  *   This is something like an ISBN for %TV shows.
  *   See also: a_57a.pdf page6 Tables 6.1, 6.2, and 7.1
  */
-class ContentIdentifierDescriptor : public ATSCDescriptor {
+class ContentIdentifierDescriptor : public MPEGDescriptor {
     ContentIdentifierDescriptor(const unsigned char* data) :
-        ATSCDescriptor(data) {
+        MPEGDescriptor(data) {
     // descriptor_tag                        8   0.0  0xB6
         assert(0xB6==DescriptorTag());
     }

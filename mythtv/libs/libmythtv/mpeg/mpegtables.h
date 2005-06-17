@@ -25,21 +25,41 @@
 class StreamID
 {
   public:
-    enum {
-        MPEG1Video = 0x01,
-        MPEG2Video = 0x02,
-        MPEG4Video = 0x10,
-        H264Video  = 0x1b,
+    enum
+    {
+        // video
+        MPEG1Video     = 0x01,
+        MPEG2Video     = 0x02,
+        MPEG4Video     = 0x10,
+        H264Video      = 0x1b,
+        OpenCableVideo = 0x80,
 
-        MPEG1Audio = 0x03,
-        MPEG2Audio = 0x04,
-        AACAudio   = 0x0f,
-        AC3Audio   = 0x81,
-        DTSAudio   = 0x8a,
+        // audio
+        MPEG1Audio     = 0x03,
+        MPEG2Audio     = 0x04,
+        AACAudio       = 0x0f,
+        AC3Audio       = 0x81,
+        DTSAudio       = 0x8a,
 
-        PrivSec    = 0x05,
-        PrivData   = 0x06,
+        // other
+        PrivSec        = 0x05,
+        PrivData       = 0x06,
     };
+};
+
+enum
+{
+    MPEG_PAT_PID  = 0x0000,
+    MPEG_CAT_PID  = 0x0001,
+    MPEG_TSDT_PID = 0x0002,
+
+    DVB_NIT_PID   = 0x0010,
+    DVB_SDT_PID   = 0x0011,
+    DVB_EIT_PID   = 0x0012,
+    DVB_RST_PID   = 0x0013,
+    DVB_TOT_PID   = 0x0013,
+
+    ATSC_PSIP_PID = 0x1ffb,
 };
 
 /** \class TableID
@@ -65,8 +85,8 @@ class TableID
         SDTo     = 0x46, // always on pid 0x11
         BAT      = 0x4a, // always on pid 0x11
         PF_EITo  = 0x4f, // always on pid 0x12
-        SC_EITbeg = 0x50, // always on pid 0x12
-        SC_EITend = 0x5f, // always on pid 0x12
+        SC_EITbeg  = 0x50, // always on pid 0x12
+        SC_EITend  = 0x5f, // always on pid 0x12
         SC_EITbego = 0x60, // always on pid 0x12
         SC_EITendo = 0x6f, // always on pid 0x12
         RST      = 0x71, // always on pid 0x13
@@ -90,7 +110,7 @@ class TableID
         TSS      = 0xA2,
         CMPNAME  = 0xA3,
 
-        MGT      = 0xC7,
+        MGT      = 0xC7, // always on pid 0x1ffb
         TVCT     = 0xC8,
         CVCT     = 0xC9,
         RRT      = 0xCA,
