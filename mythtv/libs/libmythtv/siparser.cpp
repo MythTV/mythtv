@@ -414,6 +414,18 @@ void SIParser::DelAllPids()
     SIPARSER("Using DelAllPids from SIParser which does nothing");
 }
 
+/** \fn SIParser::FillPMap(SISTANDARD _SIStandard)
+ *  \brief Adds basic PID's corresponding to standard to the list
+ *         of PIDs we are listening to.
+ *
+ *   For ATSC this adds the PAT (0) and MGT (0x1ffb) pids.
+ *
+ *   For DVB this adds the PAT(0), SDT (0x11), STT (?), and
+ *       NIT (0x10) pids.
+ *
+ *   Note: This actually adds all of the above so as to simplify channel
+ *         scanning, but this may change as this can break ATSC.
+ */
 bool SIParser::FillPMap(SISTANDARD _SIStandard)
 {
 
@@ -437,11 +449,18 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
     return true;
 }
 
+/** \fn SIParser::AddPMT(uint16_t ServiceID)
+ *   Adds program number 'ServiceID' to the list of PMT tables on which we will
+ *   emit an UpdatePMT() Qt signal.
+ *  \param ServiceID The MPEG Program Number in the PAT that we wish to see.
+ *  \return true on success, false on failure.
+ */
 bool SIParser::AddPMT(uint16_t ServiceID)
 {
 
     pthread_mutex_lock(&pmap_lock);
-    SIPARSER(QString("Adding a PMT (%1) to the request list").arg(ServiceID));
+    SIPARSER(QString("Adding a PMT #%1 in PAT to the request list")
+             .arg(ServiceID, 0, 16));
     Table[PMT]->RequestEmit(ServiceID);
     pthread_mutex_unlock(&pmap_lock);
 
@@ -453,7 +472,12 @@ bool SIParser::AddPMT(uint16_t ServiceID)
  */
 bool SIParser::ReinitSIParser(const QString& si_std, uint service_id)
 {
-    SISTANDARD std = (si_std == "atsc") ? SI_STANDARD_ATSC : SI_STANDARD_DVB;
+    SIPARSER(QString("ReinitSIParser(std %1, service #%2)")
+             .arg(si_std).arg(service_id));
+
+    SISTANDARD std = (si_std.lower() == "atsc") ?
+        SI_STANDARD_ATSC : SI_STANDARD_DVB;
+
     return FillPMap(std) & AddPMT(service_id);
 }
 
@@ -622,6 +646,7 @@ void SIParser::ParsePAT(tablehead_t* head,uint8_t *buffer,int size)
         uint16_t pid = ((buffer[pos + 3] & 0x1f)<<8) | buffer[pos + 4];
         if (program != 0)
         {
+            SIPARSER(QString("PMT #%1 on PID 0x%2").arg(program).arg(pid));
             ((PATHandler*) Table[PAT])->pids[program]=pid;
             Table[PMT]->AddKey(pid,0);
             ((PMTHandler*) Table[PMT])->pmt[program].PMTPID = pid;
@@ -630,7 +655,8 @@ void SIParser::ParsePAT(tablehead_t* head,uint8_t *buffer,int size)
         {
             // Program 0 in the PAT represents the location of the NIT in DVB
             NITPID = pid;
-            SIPARSER(QString("NIT Present on this transport on PID %1").arg(NITPID));
+            SIPARSER(QString("NIT Present on this transport on PID 0x%1")
+                     .arg(NITPID,0,16));
         }
         pos += 4;
 
@@ -2132,27 +2158,29 @@ void SIParser::ParseMGT(tablehead_t* head, uint8_t* buffer, int size)
                                break;
             case 0x04:
                                TableSourcePIDs.ChannelETT = table_type_pid;
-                               SIPARSER(QString("Channel ETT Present on PID %1 (%2)")
+                               SIPARSER(QString("Channel ETT Present on PID 0x%1 (%2)")
                                         .arg(table_type_pid,4,16).arg(size));
                                break;
 
             case 0x100 ... 0x17F:
-                               SIPARSER(QString("EIT-%1 Present on PID %2")
+                               SIPARSER(QString("EIT-%1 Present on PID 0x%2")
                                        .arg(table_type - 0x100)
                                        .arg(table_type_pid,4,16));
 
-                               Table[EVENTS]->AddPid(table_type_pid,0xCB,0xFF,table_type - 0x100);
+                               Table[EVENTS]->AddPid(table_type_pid,0xCB,0xFF,
+                                                     table_type - 0x100);
                                break;
 
             case 0x200 ... 0x27F:
-                               SIPARSER(QString("ETT-%1 Present on PID %2")
+                               SIPARSER(QString("ETT-%1 Present on PID 0x%2")
                                        .arg(table_type - 0x200)
                                        .arg(table_type_pid,4,16));
-                               Table[EVENTS]->AddPid(table_type_pid,0xCC,0xFF,table_type - 0x200);
+                               Table[EVENTS]->AddPid(table_type_pid,0xCC,0xFF,
+                                                     table_type - 0x200);
                                break;
 
             default:
-                               SIPARSER(QString("Unknown Table %1 in MGT on PID %2")
+                               SIPARSER(QString("Unknown Table %1 in MGT on PID 0x%2")
                                        .arg(table_type,4,16)
                                        .arg(table_type_pid,4,16));
                                break;

@@ -25,21 +25,19 @@ using namespace std;
 
 
 /**
- *  Custom descriptors allow or disallow
- *  HUFFMAN_TEXT - For North American DVB providers who use Huffman compressed
- *      guide in the 9x descriptors
+ *  Custom descriptors allow or disallow HUFFMAN_TEXT - For North American 
+ *  DVB providers who use Huffman compressed guide in the 9x descriptors.
  */
 #define CUSTOM_DESC_HUFFMAN_TEXT               1
 /**
- *  Custom descriptors allow or disallow
- *  CHANNEL_NUMBERS - For the UK where channel numbers are sent in one of the
- *      SDT tables (at least per scan.c docs)
+ *  Custom descriptors allow or disallow CHANNEL_NUMBERS - For the UK where
+ *  channel numbers are sent in one of the SDT tables (at least per scan.c docs)
  */
 #define CUSTOM_DESC_CHANNEL_NUMBERS         2
 
 /*
- *  Standard for parser to use.  ATSC over DVB is the same for now, but if it changes
- *  this define will need to be changed as well.
+ *  Standard for parser to use.  ATSC over DVB is the same for now, but if 
+ *  it changes this define will need to be changed as well.
  */
 
 /**
@@ -47,8 +45,8 @@ using namespace std;
  */
 #define GUIDE_STANDARD                0
 /**
- * GUIDE_DATA_PID is for nonstandard PID being used for EIT style guide this is seen
- *    in North America (this only applies to DVB)
+ *  GUIDE_DATA_PID is for nonstandard PID being used for EIT style guide
+ *  this is seen in North America (this only applies to DVB)
  */
 #define GUIDE_DATA_PID                1
 
@@ -69,12 +67,13 @@ using namespace std;
  *
  *  This class is generalized so it can be used with DVB Cards with a simple
  *  sct filter, sending the read data into this class, and the PCHDTV card by
- *  filtering the TS packets through another class to convert it into tables, and
- *  passing this data into this class as well.
+ *  filtering the TS packets through another class to convert it into tables,
+ *  and passing this data into this class as well.
  *
- *  Both DVB and ATSC are combined into this class since ATSC over DVB is present
- *  in some place.  (One example is PBS on AMC3 in North America).  Argentenia is
- *  also has announced their Digital TV Standard will be ATSC over DVB-T
+ *  Both DVB and ATSC are combined into this class since ATSC over DVB is 
+ *  present in some place.  (One example is PBS on AMC3 in North America).
+ *  Argentenia has also has announced their Digital TV Standard will be 
+ *  ATSC over DVB-T
  *
  *  Impliemntation of OpenCable or other MPEG-TS based standards (DirecTV?)
  *  is also possible with this class if their specs are ever known.
