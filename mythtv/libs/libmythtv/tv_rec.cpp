@@ -261,6 +261,8 @@ TVState TVRec::GetState(void)
  */
 ProgramInfo *TVRec::GetRecording(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     ProgramInfo *tmppginfo = NULL;
 
     if (curRecording && !changeState)
@@ -514,6 +516,8 @@ void TVRec::FinishedRecording(void)
  */
 void TVRec::HandleStateChange(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     TVState tmpInternalState = internalState;
 
     frontendReady = false;
@@ -1065,8 +1069,8 @@ void *TVRec::ScannerThread(void *param)
 #ifdef USING_DVB
     SIScan *scanner = (SIScan *)param;
     scanner->StartScanner();
-    return NULL;
 #endif
+    return NULL;
 }
 
 /** \fn TVRec::RunTV()
@@ -2014,6 +2018,8 @@ float TVRec::GetFramerate(void)
  */
 long long TVRec::GetFramesWritten(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (recorder)
         return recorder->GetFramesWritten();
     return -1;
@@ -2027,6 +2033,8 @@ long long TVRec::GetFramesWritten(void)
  */
 long long TVRec::GetFilePosition(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (rbuffer)
         return rbuffer->GetTotalWritePosition();
     return -1;
@@ -2041,6 +2049,8 @@ long long TVRec::GetFilePosition(void)
  */
 long long TVRec::GetKeyframePosition(long long desired)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (recorder)
         return recorder->GetKeyframePosition(desired);
     return -1;
@@ -2059,6 +2069,8 @@ long long TVRec::GetKeyframePosition(long long desired)
  */
 long long TVRec::GetFreeSpace(long long totalreadpos)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (rbuffer)
         return totalreadpos + rbuffer->GetFileSize() - 
                rbuffer->GetTotalWritePosition() - rbuffer->GetSmudgeSize();
@@ -2114,6 +2126,8 @@ void TVRec::StopPlaying(void)
 bool TVRec::SetupRingBuffer(QString &path, long long &filesize, 
                             long long &fillamount, bool pip)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (rbuffer)
     {
         VERBOSE(VB_ALL, "TVRec: Attempting to setup "
@@ -2152,8 +2166,10 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
  */
 void TVRec::SpawnLiveTV(void)
 {
+    stateChangeLock.lock();
     nextState = kState_WatchingLiveTV;
     changeState = true;
+    stateChangeLock.unlock();
 
     while (changeState)
         usleep(50);
@@ -2165,8 +2181,10 @@ void TVRec::SpawnLiveTV(void)
  */
 void TVRec::StopLiveTV(void)
 {
+    stateChangeLock.lock();
     nextState = kState_None;
     changeState = true;
+    stateChangeLock.unlock();
 
     while (changeState)
         usleep(50);
@@ -2179,6 +2197,8 @@ void TVRec::StopLiveTV(void)
  */
 void TVRec::PauseRecorder(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!recorder)
         return;
 
@@ -2187,6 +2207,8 @@ void TVRec::PauseRecorder(void)
 
 void TVRec::ToggleInputs(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!recorder || !channel || !rbuffer)
         return;
 
@@ -2217,6 +2239,8 @@ void TVRec::ToggleInputs(void)
  */
 void TVRec::ChangeChannel(ChannelChangeDirection dir)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!recorder || !channel || !rbuffer)
         return;
 
@@ -2246,6 +2270,8 @@ void TVRec::ChangeChannel(ChannelChangeDirection dir)
  */
 void TVRec::ToggleChannelFavorite(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!channel)
         return;
 
@@ -2333,6 +2359,8 @@ void TVRec::ToggleChannelFavorite(void)
  */
 int TVRec::ChangeContrast(bool direction)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!channel)
         return -1;
 
@@ -2349,6 +2377,8 @@ int TVRec::ChangeContrast(bool direction)
  */
 int TVRec::ChangeBrightness(bool direction)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!channel)
         return -1;
 
@@ -2365,6 +2395,8 @@ int TVRec::ChangeBrightness(bool direction)
  */
 int TVRec::ChangeColour(bool direction)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!channel)
         return -1;
 
@@ -2381,6 +2413,8 @@ int TVRec::ChangeColour(bool direction)
  */
 int TVRec::ChangeHue(bool direction)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!channel)
         return -1;
 
@@ -2395,6 +2429,8 @@ int TVRec::ChangeHue(bool direction)
  */
 void TVRec::SetChannel(QString name)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!recorder || !channel || !rbuffer)
         return;
 
@@ -2573,6 +2609,8 @@ void TVRec::GetChannelInfo(QString &title,       QString &subtitle,
  */
 void TVRec::GetInputName(QString &inputname)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if (!channel)
         return;
 
@@ -2610,6 +2648,8 @@ void TVRec::PauseClearRingBuffer(void)
  */
 long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     PauseClearRingBuffer();
 
     if (!rbuffer || !readthreadlive)
@@ -2646,6 +2686,8 @@ QSocket *TVRec::GetReadThreadSocket(void)
  */
 void TVRec::SetReadThreadSock(QSocket *sock)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     if ((readthreadlive && sock) || (!readthreadlive && !sock))
         return;
 

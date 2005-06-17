@@ -29,7 +29,8 @@
  * Or, point your browser to http://www.gnu.org/copyleft/gpl.html
  *
  */
-#include <qt.h>
+#include <qobject.h>
+#include <qfile.h>
 #include <qapplication.h>
 #include "mythcontext.h"
 #include "dvbtypes.h"

@@ -280,6 +280,8 @@ class TVRec
     // Other
     bool watchingLiveTV;
     ProgramInfo *prevRecording;
+
+    QMutex stateChangeLock;
 };
 
 #endif
