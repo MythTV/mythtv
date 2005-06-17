@@ -29,10 +29,10 @@ class EditMetadataDialog : public MythThemedDialog
     
   public:
   
-    EditMetadataDialog(Metadata *source_metadata,
+    EditMetadataDialog(const Metadata *source_metadata,
                        MythMainWindow *parent, 
-                       QString window_name,
-                       QString theme_filename,
+                       const QString& window_name,
+                       const QString& theme_filename,
                        const char* name = 0);
     ~EditMetadataDialog();
 
@@ -67,7 +67,7 @@ class EditMetadataDialog : public MythThemedDialog
     MythRemoteLineEdit  *player_editor;
     UIBlackHoleType     *player_hack;
 
-    UISelectorType	*category_select;
+    UISelectorType	    *category_select;
     UISelectorType      *level_select;
     UICheckBoxType      *child_check;
     UISelectorType      *child_select;

@@ -13,10 +13,10 @@
 #include "editmetadata.h"
 
 
-EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
+EditMetadataDialog::EditMetadataDialog(const Metadata *source_metadata,
                                        MythMainWindow *parent, 
-                                       QString window_name,
-                                       QString theme_filename,
+                                       const QString& window_name,
+                                       const QString& theme_filename,
                                        const char* name)
                   : MythThemedDialog(parent, window_name, theme_filename, name)
 {
@@ -31,12 +31,24 @@ EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
     //  Make a copy, so we can abandon changes if desired
     //
 
-    working_metadata = new Metadata();
-    working_metadata->setID(source_metadata->ID());
-    working_metadata->fillDataFromID();
+    working_metadata = new Metadata(*source_metadata);
+    //working_metadata->setID(source_metadata->ID());
+    //working_metadata->fillDataFromID();
     
+
+    title_hack = NULL;
+    player_hack = NULL;
+    category_select = NULL;
+    level_select = NULL;
+    child_check = NULL;
+    child_select = NULL;
+    browse_check = NULL;
+    coverart_button = NULL;
+    coverart_text = NULL;
+    done_button = NULL;
     title_editor = NULL; 
     player_editor = NULL; 
+    
     wireUpTheme();
     fillWidgets();
     assignFirstFocus();
@@ -48,6 +60,7 @@ void EditMetadataDialog::fillWidgets()
     {
         title_editor->setText(working_metadata->Title());
     }
+    
     if (category_select)
     {
         category_select->addItem(0,"Unknown");
@@ -66,6 +79,7 @@ void EditMetadataDialog::fillWidgets()
         }
         category_select->setToItem(working_metadata->getIdCategory());
     }
+    
     if(level_select)
     {
         for(int i = 1; i < 5; i++)
@@ -74,6 +88,7 @@ void EditMetadataDialog::fillWidgets()
         }
         level_select->setToItem(working_metadata->ShowLevel());
     }
+    
     if(child_select)
     {
         //
@@ -153,19 +168,23 @@ void EditMetadataDialog::fillWidgets()
             cachedChildSelection = possible_starting_point;
         }
     }
+    
     if(child_select && child_check)
     {
         child_check->setState(cachedChildSelection > 0);
         child_select->allowFocus(cachedChildSelection > 0);
     }
+    
     if(browse_check)
     {
         browse_check->setState(working_metadata->Browse());
     }
+    
     if(coverart_text)
     {
         coverart_text->SetText(working_metadata->CoverFile());
     }
+    
     if(player_editor)
     {
         player_editor->setText(working_metadata->PlayCommand());
@@ -440,7 +459,7 @@ void EditMetadataDialog::wireUpTheme()
     }
 
     category_select = getUISelectorType("category_select");
-    if(level_select)
+    if(category_select)
     {
         connect(category_select, SIGNAL(pushed(int)),
                 this, SLOT(setCategory(int)));

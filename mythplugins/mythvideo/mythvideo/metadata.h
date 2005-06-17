@@ -11,15 +11,15 @@
 class Metadata
 {
   public:
-    Metadata(QString lfilename = "", QString lcoverfile = "", 
-             QString ltitle = "", int lyear = 0, QString linetref = "", 
-             QString ldirector = "", QString lplot = "", 
-             float luserrating = 0.0, QString lrating = "", int llength = 0, 
+    Metadata(const QString& lfilename = "", const QString& lcoverfile = "", 
+             const QString& ltitle = "", int lyear = 0, const QString& linetref = "", 
+             const QString& ldirector = "", const QString& lplot = "", 
+             float luserrating = 0.0, const QString& lrating = "", int llength = 0, 
              int lid = 0, int lshowlevel = 1, int lchildID = -1,
-             bool lbrowse = true, QString lplaycommand = "",
-             QString lcategory = "",
-             QStringList lgenres = QStringList(),
-             QStringList lcountries = QStringList())
+             bool lbrowse = true, const QString& lplaycommand = "",
+             const QString& lcategory = "",
+             const QStringList& lgenres = QStringList(),
+             const QStringList& lcountries = QStringList())
     {
         coverImage = NULL;
         coverPixmap = NULL;
@@ -43,7 +43,9 @@ class Metadata
         countries = lcountries;
     }
     
-    Metadata(const Metadata &other) 
+    Metadata(const Metadata &other) { clone(other); }
+    
+    void clone(const Metadata &other) 
     {
         coverImage = NULL;
         coverPixmap = NULL;
@@ -66,6 +68,7 @@ class Metadata
         genres = other.genres;
         countries = other.countries;
     }
+    
     
     static void purgeByFilename( const QString& filename );
     static void purgeByID( int ID );
@@ -100,60 +103,61 @@ class Metadata
     ~Metadata() { if (coverImage) delete coverImage; }
 
 
-    QString Title() { return title; }
+    const QString& Title() const { return title; }
     void setTitle(const QString &ltitle) { title = ltitle; }
     
-    int Year() { return year; }
+    int Year() const { return year; }
     void setYear(const int &lyear) { year = lyear; }
 
-    QString InetRef() { return inetref; }
+    const QString& InetRef() const { return inetref; }
     void setInetRef(const QString &linetref) { inetref = linetref; }
 
-    QString Director() { return director; }
+    const QString& Director() const { return director; }
     void setDirector(const QString &ldirector) { director = ldirector; }
 
-    QString Plot() { return plot; }
+    const QString& Plot() const { return plot; }
     void setPlot(const QString &lplot) { plot = lplot; }
 
-    float UserRating() { return userrating; }
+    float UserRating() const { return userrating; }
     void setUserRating(float luserrating) { userrating = luserrating; }
  
-    QString Rating() { return rating; }
+    const QString& Rating() const { return rating; }
     void setRating(QString lrating) { rating = lrating; }
 
-    int Length() { return length; }
+    int Length() const { return length; }
     void setLength(int llength) { length = llength; }
 
-    unsigned int ID() { return id; }
+    unsigned int ID() const { return id; }
     void setID(int lid) { id = lid; }
 
-    int ChildID() { return childID; }
+    int ChildID() const { return childID; }
     void setChildID(int lchildID) { childID = lchildID; }
     
-    bool Browse() {return browse; }
+    bool Browse() const {return browse; }
     void setBrowse(bool y_or_n){ browse = y_or_n;}
    
-    QString PlayCommand() {return playcommand;}
+    const QString& PlayCommand() const {return playcommand;}
     void setPlayCommand(const QString &new_command){playcommand = new_command;}
     
-    int ShowLevel() { return showlevel; }
+    int ShowLevel() const { return showlevel; }
     void setShowLevel(int lshowlevel) { showlevel = lshowlevel; }
 
-    QString Filename() const { return filename; }
+    const QString& Filename() const { return filename; }
     void setFilename(QString &lfilename) { filename = lfilename; }
 
-    QString CoverFile() const { return coverfile; }
+    const QString& CoverFile() const { return coverfile; }
     void setCoverFile(QString &lcoverfile) { coverfile = lcoverfile; }
     
-    QString Player() const { return player; }
+    const QString& Player() const { return player; }
     void setPlayer(const QString &_player) { player = _player; }
 
-    QString Category() const { return category;}
+    const QString& Category() const { return category;}
     void setCategory(QString lcategory){category = lcategory;}
-    QStringList Genres() const { return genres; }
+    
+    const QStringList& Genres() const { return genres; }
     void setGenres(QStringList lgenres){genres = lgenres;}
 
-    QStringList Countries() const { return countries;}
+    const QStringList& Countries() const { return countries;}
     void setCountries(QStringList lcountries){countries = lcountries;}
 
     void guessTitle();
