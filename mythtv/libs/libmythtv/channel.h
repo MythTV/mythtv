@@ -1,8 +1,6 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
-#include <map>
-#include <qstring.h>
 #include "channelbase.h"
 #include "videodev_myth.h" // needed for v4l2_std_id type
 
@@ -32,6 +30,7 @@ class Channel : public ChannelBase
 
     // Gets
     int  GetFd() const { return videofd; }
+    QString GetDevice() const { return device; }
 
     // Commands
     void SwitchToInput(int newcapchannel, bool setstarting);
@@ -46,6 +45,10 @@ class Channel : public ChannelBase
     int  ChangeContrast(bool up);
     int  ChangeHue(bool up);
 
+    // PID caching
+    void SaveCachedPids(const pid_cache_t&) const;
+    void GetCachedPids(pid_cache_t&) const;
+
   private:
     // Helper Sets
     void SetColourAttribute(int attrib, const char *name);
@@ -54,7 +57,8 @@ class Channel : public ChannelBase
 
     // Helper Gets
     unsigned short *GetV4L1Field(int attrib, struct video_picture &vid_pic);
-    int GetCurrentChannelNum(const QString &channame);
+    int  GetChanID() const;
+    int  GetCurrentChannelNum(const QString &channame);
 
     // Helper Commands
     int  ChangeColourAttribute(int attrib, const char *name, bool up);

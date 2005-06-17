@@ -25,7 +25,6 @@ using namespace std;
  *         when using Video4Linux based drivers.
  */
 
-
 Channel::Channel(TVRec *parent, const QString &videodevice)
     : ChannelBase(parent), device(videodevice), videofd(-1),
       curList(NULL), totalChannels(0), usingv4l2(false),
@@ -309,6 +308,43 @@ int Channel::GetCurrentChannelNum(const QString &channame)
     return -1;
 }
 
+int Channel::GetChanID() const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        QString(
+            "SELECT chanid FROM channel "
+            "WHERE channum = \"%1\" AND channel.sourceid = \"%2\"")
+        .arg(curchannelname).arg(sourceid[currentcapchannel]));
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("fetching chanid", query);
+        return -1;
+    }
+
+    if (query.size() <= 0)
+        return -1;
+
+    query.next();
+    return query.value(0).toInt();
+}
+
+void Channel::SaveCachedPids(const pid_cache_t &pid_cache) const
+{
+    int chanid = GetChanID();
+    if (chanid >= 0)
+        ChannelBase::SaveCachedPids(chanid, pid_cache);
+}
+
+void Channel::GetCachedPids(pid_cache_t &pid_cache) const
+{
+    int chanid = GetChanID();
+    if (chanid >= 0)
+        ChannelBase::GetCachedPids(chanid, pid_cache);
+}
+
 bool Channel::SetChannelByDirection(ChannelChangeDirection dir)
 {
     if (ChannelBase::SetChannelByDirection(dir))
@@ -345,7 +381,8 @@ bool Channel::SetChannelByDirection(ChannelChangeDirection dir)
 
 bool Channel::SetChannelByString(const QString &chan)
 {
-    QString inputName;
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::SetChannelByString(%2)")
+            .arg(device).arg(chan));
     
     if (!Open())
     {
@@ -355,6 +392,7 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
     }
 
+    QString inputName;
     if (!pParent->CheckChannel(this, chan, inputName))
     {
         VERBOSE(VB_IMPORTANT, QString(
@@ -364,11 +402,13 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
     }
 
+    SetCachedATSCInfo("");
     // If CheckChannel filled in the inputName then we need to change inputs
     // and return, since the act of changing inputs will change the channel as well.
     if (!inputName.isEmpty())
     {
         ChannelBase::SwitchToInput(inputName, chan);
+        SetCachedATSCInfo(chan);
         return true;
     }
 
@@ -447,6 +487,7 @@ bool Channel::SetChannelByString(const QString &chan)
     else if (!ChangeExternalChannel(freqid))
         return false;
 
+    SetCachedATSCInfo(chan);
     return true;
 }
 

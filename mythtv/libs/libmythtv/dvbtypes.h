@@ -18,6 +18,7 @@ using namespace std;
 #include <unistd.h>
 #include <qdatetime.h>
 #include <qstringlist.h>
+#include <qmutex.h>
 
 #include <linux/dvb/version.h>
 #if (DVB_API_VERSION != 3)
@@ -270,29 +271,74 @@ public:
     struct dvb_frontend_parameters params;
     fe_sec_voltage_t    voltage;
     fe_sec_tone_mode_t  tone;
-    unsigned int diseqc_type;
-    unsigned int diseqc_port;
-    float        diseqc_pos;
-    unsigned int lnb_lof_switch;
-    unsigned int lnb_lof_hi;
-    unsigned int lnb_lof_lo;
+    unsigned int        diseqc_type;
+    unsigned int        diseqc_port;
+    float               diseqc_pos;
+    unsigned int        lnb_lof_switch;
+    unsigned int        lnb_lof_hi;
+    unsigned int        lnb_lof_lo;
 
-    bool parseATSC(const QString& frequency, const QString modulation);
-    bool parseOFDM(const QString& frequency, const QString& inversion,
-                   const QString& bandwidth, const QString& coderate_hp,
-                   const QString& coderate_lp, const QString& constellation,
-                   const QString& trans_mode, const QString& guard_interval,
+    bool equal_qpsk(const DVBTuning& other) const;
+    bool equal_atsc(const DVBTuning& other) const;
+    bool equal_qam( const DVBTuning& other) const;
+    bool equal_ofdm(const DVBTuning& other) const;
+    bool equal(fe_type_t type, const DVBTuning& other) const;
+
+    // Helper functions to get the paramaters as DB friendly strings
+    char InversionChar() const;
+    char TransmissionModeChar() const;
+    char BandwidthChar() const;
+    char HierarchyChar() const;
+    QString ConstellationDB() const;
+    QString ModulationDB() const;
+
+    // Helper functions to parse params from DB friendly strings
+    static fe_bandwidth      parseBandwidth(    const QString&, bool &ok);
+    static fe_sec_voltage    parsePolarity(     const QString&, bool &ok);
+    static fe_guard_interval parseGuardInterval(const QString&, bool &ok);
+    static fe_transmit_mode  parseTransmission( const QString&, bool &ok);
+    static fe_hierarchy      parseHierarchy(    const QString&, bool &ok);
+    static fe_spectral_inversion parseInversion(const QString&, bool &ok);
+    static fe_code_rate      parseCodeRate(     const QString&, bool &ok);
+    static fe_modulation     parseModulation(   const QString&, bool &ok);
+
+    // Helper functions for UI and DB
+    uint Frequency()      const { return params.frequency; }
+    uint QPSKSymbolRate() const { return params.u.qpsk.symbol_rate; }
+    uint QAMSymbolRate()  const { return params.u.qam.symbol_rate; }
+    QString GuardIntervalString() const;
+    QString InversionString() const;
+    QString BandwidthString() const;
+    QString TransmissionModeString() const;
+    QString HPCodeRateString() const;
+    QString LPCodeRateString() const;
+    QString QAMInnerFECString() const;
+    QString ModulationString() const;
+    QString ConstellationString() const;
+    QString HierarchyString() const;
+    QString toString(fe_type_t type) const;
+
+    bool parseATSC(const QString& frequency,      const QString modulation);
+
+    bool parseOFDM(const QString& frequency,      const QString& inversion,
+                   const QString& bandwidth,      const QString& coderate_hp,
+                   const QString& coderate_lp,    const QString& constellation,
+                   const QString& trans_mode,     const QString& guard_interval,
                    const QString& hierarchy);
-    bool parseQPSK(const QString& frequency, const QString& inversion,
-                   const QString& symbol_rate, const QString& fec_inner,
-                   const QString& pol, 
-                   const QString& diseqc_type, const QString& diseqc_port,
-                   const QString& diseqc_pos,
+
+    bool parseOFDM(const TransportObject&);
+
+    bool parseQPSK(const QString& frequency,      const QString& inversion,
+                   const QString& symbol_rate,    const QString& fec_inner,
+                   const QString& pol,            const QString& diseqc_type,
+                   const QString& diseqc_port,    const QString& diseqc_pos,
                    const QString& lnb_lof_switch, const QString& lnb_lof_hi,
                    const QString& lnb_lof_lo);
 
-    bool parseQAM(const QString& frequency, const QString& inversion,
-                  const QString& symbol_rate, const QString& fec_inner,
+    bool parseQAM(const TransportObject&);
+
+    bool parseQAM(const QString& frequency,       const QString& inversion,
+                  const QString& symbol_rate,     const QString& fec_inner,
                   const QString& modulation);
 };
 
@@ -302,19 +348,51 @@ class dvb_channel_t
     dvb_channel_t() : PMTSet(false), serviceID(0xffff), networkID(0xffff),
         providerID(0xffff), transportID(0xffff), sistandard(""), version(255) {;}
 
+    bool IsPMTSet() const
+    {
+        lock.lock();
+        bool is_set = PMTSet;
+        lock.unlock();
+        return is_set;
+    }
+
+    void SetPMT(const PMTObject *_pmt)
+    {
+        lock.lock();
+        if (_pmt)
+        {
+            pmt = *_pmt;
+            PMTSet = true;
+        }
+        else
+            PMTSet = false;
+        lock.unlock();
+    }
+
+    bool Parse(
+        fe_type_t type,
+        QString frequency,         QString inversion,      QString symbolrate,
+        QString fec,               QString polarity,       QString dvb_diseqc_type,
+        QString diseqc_port,       QString diseqc_pos,     QString lnb_lof_switch,
+        QString lnb_lof_hi,        QString lnb_lof_lo,     QString _sistandard,
+        QString hp_code_rate,      QString lp_code_rate,   QString constellation,
+        QString transmission_mode, QString guard_interval, QString hierarchy,
+        QString modulation,        QString bandwidth);
+
     DVBTuning      tuning;
 
     PMTObject       pmt;
     bool            PMTSet;
 
-    uint16_t        serviceID;
-    uint16_t        networkID;
+    uint16_t        serviceID; /// program number in PAT
+    uint16_t        networkID; /// network ID from PAT
     uint16_t        providerID;
     uint16_t        transportID;
 
     QString         sistandard;
     uint8_t         version;
-    pthread_mutex_t lock;
+  private:
+    mutable QMutex  lock;
 };
 
 typedef struct dvbstats

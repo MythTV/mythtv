@@ -14,13 +14,17 @@
 #include "tv.h"
 #include "mythcontext.h"
 #include "exitcodes.h"
+#include "mythdbcon.h"
 
 #include <iostream>
 using namespace std;
 
 ChannelBase::ChannelBase(TVRec *parent)
-    : pParent(parent), channelorder("channum + 0"), curchannelname(""),
-      capchannels(0), currentcapchannel(-1), commfree(false)
+    : 
+    pParent(parent), channelorder("channum + 0"), curchannelname(""),
+    capchannels(0), currentcapchannel(-1), commfree(false),
+    currentATSCMajorChannel(-1), currentATSCMinorChannel(-1),
+    currentProgramNum(-1)
 {
 }
 
@@ -195,4 +199,109 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
 void ChannelBase::StoreInputChannels(void)
 {
     pParent->StoreInputChannels(inputChannel);
+}
+
+/** \fn ChannelBase::GetCachedPids(int, pid_cache_t&)
+ *  \brief Returns cached MPEG PIDs when given a Channel ID.
+ *
+ *  \param chanid   Channel ID to fetch cached pids for.
+ *  \param pid_cache List of PIDs with their TableID
+ *                   types is returned in pid_cache.
+ */
+void ChannelBase::GetCachedPids(int chanid, pid_cache_t &pid_cache)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString thequery = QString("SELECT pid, tableid FROM pidcache "
+                               "WHERE chanid='%1'").arg(chanid);
+    query.prepare(thequery);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("GetCachedPids: fetching pids", query);
+        return;
+    }
+    
+    while (query.next())
+    {
+        int pid = query.value(0).toInt(), tid = query.value(1).toInt();
+        if ((pid >= 0) && (tid >= 0))
+            pid_cache.push_back(pid_cache_item_t(pid, tid));
+    }
+}
+
+/** \fn ChannelBase::SaveCachedPids(int, const pid_cache_t&)
+ *  \brief Saves PIDs for PSIP tables to database.
+ *
+ *  \param chanid    Channel ID to fetch cached pids for.
+ *  \param pid_cache List of PIDs with their TableID types to be saved.
+ */
+void ChannelBase::SaveCachedPids(int chanid, const pid_cache_t &pid_cache)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    /// delete
+    QString thequery =
+        QString("DELETE FROM pidcache WHERE chanid='%1'").arg(chanid);
+    query.prepare(thequery);
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("GetCachedPids -- delete", query);
+        return;
+    }
+
+    /// insert
+    pid_cache_t::const_iterator it = pid_cache.begin();
+    for (; it != pid_cache.end(); ++it)
+    {
+        thequery = QString("INSERT INTO pidcache "
+                           "SET chanid='%1', pid='%2', tableid='%3'")
+            .arg(chanid).arg(it->first).arg(it->second);
+
+        query.prepare(thequery);
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("GetCachedPids -- insert", query);
+            return;
+        }
+    }
+}
+
+void ChannelBase::SetCachedATSCInfo(const QString &chan)
+{
+    int progsep = chan.find("-");
+    int chansep = chan.find("_");
+    if (progsep>=0)
+    {
+        currentProgramNum = chan.right(chan.length()-progsep-1).toInt();
+        currentATSCMinorChannel = -1;
+        currentATSCMajorChannel = chan.left(progsep).toInt();
+    }
+    else if (chansep>=0)
+    {
+        currentProgramNum = -1;
+        currentATSCMinorChannel = chan.right(chan.length()-chansep-1).toInt();
+        currentATSCMajorChannel = chan.left(chansep).toInt();
+    }
+    else
+    {
+        bool ok;
+        int chanNum = chan.toInt(&ok);
+        if (ok && chanNum>=10)
+        {
+            currentATSCMinorChannel = chanNum%10;
+            currentATSCMajorChannel = chanNum/10;
+        }
+        else
+        {
+            currentProgramNum = -1;
+            currentATSCMajorChannel = currentATSCMinorChannel = -1;
+        }
+    }
+    if (currentATSCMinorChannel>=0)
+        VERBOSE(VB_CHANNEL, QString("SetCachedATSCInfo(): %1_%2")
+                .arg(currentATSCMajorChannel).arg(currentATSCMinorChannel));
+    else
+        VERBOSE(VB_CHANNEL, QString("SetCachedATSCInfo(): %1-%2")
+                .arg(currentATSCMajorChannel).arg(currentProgramNum));
 }

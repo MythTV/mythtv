@@ -31,18 +31,27 @@ class FirewireChannel : public ChannelBase
     FirewireChannel(firewire_options_t firewire_opts, TVRec *parent);
     ~FirewireChannel(void);
 
-    bool SetChannelByString(const QString &chan);
     bool Open();
     void Close();
+
+    // Sets
+    bool SetChannelByString(const QString &chan);
+    void SetExternalChanger(void);    
+
+    // Gets
+    QString GetDevice() const
+        { return QString("%1:%2").arg(fw_opts.port).arg(fw_opts.node); }
+
+    // Commands
     void SwitchToInput(const QString &inputname, const QString &chan);
     void SwitchToInput(int newcapchannel, bool setstarting)
-                      { (void)newcapchannel; (void)setstarting; }
-    void SetExternalChanger(void);
+        { (void)newcapchannel; (void)setstarting; }
+
 private:
     firewire_options_t fw_opts;
-    nodeid_t fwnode;
-    raw1394handle_t fwhandle;
-    bool isopen;
+    nodeid_t           fwnode;
+    raw1394handle_t    fwhandle;
+    bool               isopen;
 };
 
 #endif

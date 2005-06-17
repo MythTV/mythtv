@@ -1,16 +1,23 @@
 #ifndef CHANNELBASE_H
 #define CHANNELBASE_H
 
+// C++ headers
+#include <vector>
+
 // Qt headers
 #include <qmap.h>
 #include <qstring.h>
 #include <qsqldatabase.h>
 
 // MythTV headers
+
 #include "frequencies.h"
 #include "tv.h"
 
 class TVRec;
+
+typedef std::pair<uint,uint> pid_cache_item_t;
+typedef std::vector<pid_cache_item_t> pid_cache_t;
 
 /** \class ChannelBase
  *  \brief Abstract class providing a generic interface to tuning hardware.
@@ -42,10 +49,6 @@ class ChannelBase
     /// \brief Returns file descriptor, -1 if it does not exist.
     virtual int GetFd(void) const { return -1; };
 
-    // Sets
-    virtual void SetChannelOrdering(const QString &chanorder)
-        { channelorder = chanorder; }
-
     // Gets
     virtual int GetInputByName(const QString &input) const;
     virtual QString GetInputByNum(int capchannel) const;
@@ -60,20 +63,15 @@ class ChannelBase
     /// \brief Returns true iff commercial detection is not required
     //         on current channel, for BBC, CBC, etc.
     bool IsCommercialFree(void) const { return commfree; }
+    /// \brief Returns String representing device, useful for debugging
+    virtual QString GetDevice(void) const { return ""; }
+
+    // Sets
+    virtual void SetChannelOrdering(const QString &chanorder)
+        { channelorder = chanorder; }
 
     // Channel setting convenience method
     virtual bool SetChannelByDirection(ChannelChangeDirection);
-#if 0
-    /// @deprecated use SetChannelByDirection(ChannelChangeDirection)
-    virtual bool ChannelUp(void)
-        { return SetChannelByDirection(CHANNEL_DIRECTION_UP); }
-    /// @deprecated use SetChannelByDirection(ChannelChangeDirection)
-    virtual bool ChannelDown(void)
-        { return SetChannelByDirection(CHANNEL_DIRECTION_DOWN); }
-    /// @deprecated use SetChannelByDirection(ChannelChangeDirection)
-    virtual bool NextFavorite(void)
-        { return SetChannelByDirection(CHANNEL_DIRECTION_FAVORITE); }
-#endif
 
     // Input toggling convenience methods
     virtual void ToggleInputs(void);
@@ -93,8 +91,26 @@ class ChannelBase
     virtual int  ChangeContrast(bool up)   { (void)up; return 0; };
     virtual int  ChangeHue(bool up)        { (void)up; return 0; };
 
+    // MPEG stuff
+    /** \brief Returns cached MPEG PIDs for last tuned channel.
+     *  \param pid_cache List of PIDs with their TableID
+     *                   types is returned in pid_cache. */
+    virtual void GetCachedPids(pid_cache_t&) const { ; };
+    /// \brief Saves MPEG PIDs to cache to database
+    /// \param pid_cache List of PIDs with their TableID types to be saved.
+    virtual void SaveCachedPids(const pid_cache_t&) const { ; };
+    /// \brief Returns program number in PAT, -1 if unknown.
+    virtual int GetProgramNumber(void) const { return currentProgramNum; };
+    /// \brief Returns major channel, -1 if unknown.
+    virtual int GetMajorChannel(void) const { return currentATSCMajorChannel; };
+    /// \brief Returns minor channel, -1 if unknown.
+    virtual int GetMinorChannel(void) const { return currentATSCMinorChannel; };
+
   protected:
     virtual bool ChangeExternalChannel(const QString &newchan);
+    virtual void SetCachedATSCInfo(const QString &chan);
+    static void GetCachedPids(int chanid, pid_cache_t&);
+    static void SaveCachedPids(int chanid, const pid_cache_t&);
 
     TVRec  *pParent;
     QString channelorder;
@@ -102,6 +118,10 @@ class ChannelBase
     int     capchannels;
     int     currentcapchannel;
     bool    commfree;
+
+    int     currentATSCMajorChannel;
+    int     currentATSCMinorChannel;
+    int     currentProgramNum;
 
     QMap<int, QString> channelnames;
     QMap<int, QString> inputChannel;
