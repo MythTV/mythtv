@@ -1,6 +1,10 @@
+// -*- Mode: c++ -*-
+// Copyright (c) 2005, Daniel Thor Kristjansson
+
 #include <cerrno>
 #include <unistd.h>
 #include <sys/ioctl.h>
+
 #include "videodev_myth.h"
 #include "mythcontext.h"
 #include "pchdtvsignalmonitor.h"
@@ -25,11 +29,11 @@
  *  \param _input          Input of device to monitor.
  *  \param _channel        File descriptor for device being monitored.
  */
-pcHDTVSignalMonitor::pcHDTVSignalMonitor(int _capturecardnum, uint _input,
-                                         Channel *_channel, uint _flags):
-    DTVSignalMonitor(_capturecardnum, _channel->GetFd(), _flags),
-    input(_input), usingv4l2(false), dtvMonitorRunning(false),
-    channel(_channel)
+pcHDTVSignalMonitor::pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
+                                         uint _flags, const char *_name)
+    : DTVSignalMonitor(db_cardnum, _channel->GetFd(), _flags, _name),
+      input(_channel->GetCurrentInputNum()), usingv4l2(false),
+      dtvMonitorRunning(false), channel(_channel)
 {
     int wait = gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
     int threshold = gContext->GetNumSetting("ATSCCheckSignalThreshold", 65);
@@ -148,7 +152,8 @@ V clamp(V val, V minv, V maxv) { return std::min(maxv, std::max(minv, val)); }
  *
  *  \param fd        File descriptor of V4L device.
  *  \param input     Input of device to monitor.
- *  \param usingv4l2 If true use V4L version 2 ioctls, else use V4L version 1 ioctls.
+ *  \param usingv4l2 If true use V4L version 2 ioctls,
+ *                   else use V4L version 1 ioctls.
  *  \return ATSC signal strength 0-100. >75 is good.
  */
 int pcHDTVSignalMonitor::GetSignal(int fd, uint input, bool usingv4l2)
@@ -166,16 +171,18 @@ int pcHDTVSignalMonitor::GetSignal(int fd, uint input, bool usingv4l2)
         if (ioctlval != -1)
         {
             VERBOSE(VB_RECORD,
-                    QString("pcHDTV::GetSignal(2): raw signal(%1)")
-                    .arg(vsig.signal));
+                    QString("pcHDTV::GetSignal_v4l2(fd %1, input %2, v4l%3): "
+                            "raw signal(%4)")
+                    .arg(fd).arg(input).arg(usingv4l2 ? 2 : 1).arg(vsig.signal));
 
             return clamp(vsig.signal, 0, 100);
         }
         else
         {
             VERBOSE(VB_IMPORTANT,
-                    QString("pcHDTV::GetSignal(2), error: %1")
-                    .arg(strerror(errno)));
+                    QString("pcHDTV::GetSignal_v4l2(fd %1, input %2, v4l%3): "
+                            "error(%4)")
+                    .arg(fd).arg(input).arg(usingv4l2 ? 2 : 1).arg(strerror(errno)));
             // falling through to v4l v1
         }
     }
@@ -186,8 +193,10 @@ int pcHDTVSignalMonitor::GetSignal(int fd, uint input, bool usingv4l2)
     int ioctlval = ioctl(fd, VIDIOCGSIGNAL, &vsig);
     if (ioctlval == -1) 
     {
-        VERBOSE(VB_IMPORTANT, QString("pcHDTV::GetSignal(1), error: %1")
-                .arg(strerror(errno)));
+        VERBOSE(VB_IMPORTANT,
+                QString("pcHDTV::GetSignal_v4l1(fd %1, input %2, v4l%3): "
+                        "error(%4)")
+                .arg(fd).arg(input).arg(usingv4l2 ? 2 : 1).arg(strerror(errno)));
         return 0;
     }
 
@@ -198,8 +207,9 @@ int pcHDTVSignalMonitor::GetSignal(int fd, uint input, bool usingv4l2)
         retsig = clamp(101 - (signal >> 9), 0, 100);
 
     VERBOSE(VB_RECORD,
-            QString("pcHDTV::GetSignal(1): raw signal(0x%1), processed "
-                    "signal(%2)").arg(signal,0,16).arg(retsig));
+            QString("pcHDTV::GetSignal_v4l1(fd %1, input %2, v4l%3): "
+                    "processed signal(%4)")
+            .arg(fd).arg(input).arg(usingv4l2 ? 2 : 1).arg(retsig));
 
     return retsig;
 }

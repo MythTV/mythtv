@@ -1,8 +1,16 @@
-#include "mythcontext.h"
-#include "signalmonitor.h"
+// -*- Mode: c++ -*-
+// Copyright (c) 2005, Daniel Thor Kristjansson
+
 #include <sys/types.h>
 #include <signal.h>
 #include <unistd.h>
+
+#include "mythcontext.h"
+#include "signalmonitor.h"
+#include "dvbsignalmonitor.h"
+#include "pchdtvsignalmonitor.h"
+#include "dvbchannel.h"
+#include "channel.h"
 
 /** \class SignalMonitor
  *  \brief Signal monitoring base class.
@@ -26,6 +34,42 @@ void ALRMhandler(int /*sig*/)
      signal(SIGINT, ALRMhandler);
 }
 
+bool SignalMonitor::IsSupported(QString cardtype)
+{
+#ifdef USING_DVB
+    if (cardtype.upper() == "DVB")
+        return true;
+#endif
+    if (cardtype.upper() == "HDTV")
+        return true;
+
+    return false;
+}
+
+SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
+                                   ChannelBase *channel)
+{
+    SignalMonitor *signalMonitor = NULL;
+
+    if (cardtype.upper() == "DVB")
+    {
+#ifdef USING_DVB
+        DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+        if (dvbc)
+            signalMonitor = new DVBSignalMonitor(db_cardnum, dvbc);
+#endif
+    }
+
+    if (cardtype.upper() == "HDTV")
+    {
+        Channel *hdtvc = dynamic_cast<Channel*>(channel);
+        if (hdtvc)
+            signalMonitor = new pcHDTVSignalMonitor(db_cardnum, hdtvc);
+    }
+
+    return signalMonitor;
+}
+
 /** \fn SignalMonitor::SignalMonitor(int,int)
  *  \brief Initializes signal lock and signal values.
  *
@@ -39,11 +83,14 @@ void ALRMhandler(int /*sig*/)
  *  \param fd file descriptor for device being monitored.
  *  \param wait_for_mask SignalMonitorFlags to start with.
  */
-SignalMonitor::SignalMonitor(int _capturecardnum, int _fd, uint wait_for_mask):
-    capturecardnum(_capturecardnum), fd(_fd), flags(wait_for_mask), update_rate(25),
-    running(false), exit(false), update_done(false), notify_frontend(true),
-    signalLock(QObject::tr("Signal Lock"), "slock", 1, true, 0, 1, 0),
-    signalStrength(QObject::tr("Signal Power"), "signal", 0, true, 0, 100, 0)
+SignalMonitor::SignalMonitor(int _capturecardnum, int _fd, uint wait_for_mask,
+                             const char *name)
+    : QObject(NULL, name),
+      capturecardnum(_capturecardnum), fd(_fd), flags(wait_for_mask),
+      update_rate(25), running(false), exit(false), update_done(false),
+      notify_frontend(true),
+      signalLock(QObject::tr("Signal Lock"), "slock", 1, true, 0, 1, 0),
+      signalStrength(QObject::tr("Signal Power"), "signal", 0, true, 0, 100, 0)
 {
 }
 
@@ -131,8 +178,6 @@ void SignalMonitor::MonitorLoop()
     running = true;
     exit = false;
 
-    VERBOSE(VB_RECORD, "Signal Monitor Starting");
-
     while (!exit)
     {
         UpdateValues();
@@ -147,8 +192,6 @@ void SignalMonitor::MonitorLoop()
 
         usleep(update_rate * 1000);
     }
-
-    VERBOSE(VB_RECORD, "Signal Monitor Stopped");
 
     //signal(SIGALRM, SIG_DFL);
 

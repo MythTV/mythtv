@@ -1,3 +1,6 @@
+// -*- Mode: c++ -*-
+// Copyright (c) 2005, Daniel Thor Kristjansson
+
 #ifndef PCHDTVSIGNALMONITOR_H
 #define PCHDTVSIGNALMONITOR_H
 
@@ -8,8 +11,9 @@ class Channel;
 class pcHDTVSignalMonitor: public DTVSignalMonitor
 {
 public:
-    pcHDTVSignalMonitor(int _capturecardnum, uint _inputnum, Channel *_channel,
-                        uint _flags = kDTVSigMon_WaitForSig);
+    pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
+                        uint _flags = kDTVSigMon_WaitForSig,
+                        const char *_name = "pcHDTVSignalMonitor");
     ~pcHDTVSignalMonitor();
 
     void Stop();

@@ -1,9 +1,14 @@
+// -*- Mode: c++ -*-
+// Copyright (c) 2005, Daniel Thor Kristjansson
+
 #ifndef SIGNALMONITOR_H
 #define SIGNALMONITOR_H
 
 #include "signalmonitorvalue.h"
 #include <pthread.h>
 #include <qobject.h>
+
+class ChannelBase;
 
 enum {
     kDTVSigMon_PATSeen    = 0x00000001, ///< maps program numbers to PMT pids
@@ -32,18 +37,22 @@ enum {
     kDTVSigMon_WaitForSDT = 0x00200000,
     kDTVSigMon_WaitForSig = 0x00400000,
 
+    kDTVSigMon_WaitForAll = 0x00FF0000,
+
     kDVBSigMon_WaitForSNR = 0x01000000,
     kDVBSigMon_WaitForBER = 0x02000000,
     kDVBSigMon_WaitForUB  = 0x04000000,
 };
 
-class SignalMonitor: public QObject
+class SignalMonitor: virtual public QObject
 {
     Q_OBJECT
 public:
-    SignalMonitor(int capturecardnum, int fd, uint wait_for_mask);
+    static bool IsSupported(QString cardtype);
+    static SignalMonitor *Init(QString cardtype, int db_cardnum,
+                               ChannelBase *channel);
     virtual ~SignalMonitor();
-    
+
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Control  // // // // // // // // // // // // // // // // // // // //
 
@@ -102,7 +111,22 @@ signals:
      */
     void StatusSignalStrength(int);
 
+    /** \brief Signal to be sent as true when it is safe to begin
+     *   or continue recording, and false if it may not be safe.
+     *
+     *   Note: Signals are only sent once the monitoring thread has been started.
+     */
+    void StatusSignalLock(const SignalMonitorValue&);
+
+    /** \brief Signal to be sent as with an actual signal value.
+     *
+     *   Note: Signals are only sent once the monitoring thread has been started.
+     */
+    void StatusSignalStrength(const SignalMonitorValue&);
 protected:
+    SignalMonitor(int capturecardnum, int fd, uint wait_for_mask,
+                  const char *name = "SignalMonitor");
+    
     static void* SpawnMonitorLoop(void*);
     virtual void MonitorLoop();
 

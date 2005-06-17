@@ -1117,7 +1117,7 @@ void ScanWizardScanner::scan()
         connect(scanner,SIGNAL(PctServiceScanComplete(int)),
                 this,SLOT(serviceScanPctComplete(int)));
     
-        monitor = new DVBSignalMonitor(-1, dvbchannel->GetCardNum(), dvbchannel);
+        monitor = new DVBSignalMonitor(-1, dvbchannel);
 
         // Signal Meters Need connecting here
         connect(monitor,SIGNAL(StatusSignalLock(int)),this,SLOT(dvbLock(int)));

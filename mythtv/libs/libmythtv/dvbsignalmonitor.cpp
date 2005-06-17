@@ -1,3 +1,5 @@
+// -*- Mode: c++ -*-
+
 #include <cerrno>
 #include <cstring>
 #include <unistd.h>
@@ -33,17 +35,17 @@
  *  \param cardnum DVB card number.
  *  \param channel DVBChannel for card.
  */
-DVBSignalMonitor::DVBSignalMonitor(int _capturecardnum, int _cardnum,
-                                   DVBChannel* _channel, uint _flags) :
-    DTVSignalMonitor(_capturecardnum, _channel->GetFd(), _flags),
-    cardnum(_cardnum),
-    signalToNoise(QObject::tr("Signal To Noise"), "snr", 0,  true, 0, 65535, 0),
-    bitErrorRate(
-        QObject::tr("Bit Error Rate"), "ber", 65535, false, 0, 65535, 0),
-    uncorrectedBlocks(
-        QObject::tr("Uncorrected Blocks"), "ucb", 65535,  false, 0, 65535, 0),
-    dtvMonitorRunning(false),
-    channel(_channel)
+DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
+                                   uint _flags, const char *_name)
+    : DTVSignalMonitor(db_cardnum, _channel->GetFd(), _flags, _name),
+      cardnum(_channel->GetCardNum()),
+      signalToNoise(
+          QObject::tr("Signal To Noise"), "snr", 0,  true, -32768, 32767, 0),
+      bitErrorRate(
+          QObject::tr("Bit Error Rate"), "ber", 65535, false, 0, 65535, 0),
+      uncorrectedBlocks(
+          QObject::tr("Uncorrected Blocks"), "ucb", 65535,  false, 0, 65535, 0),
+      dtvMonitorRunning(false), channel(_channel)
 {
     // These two values should probably come from the database...
     int wait = 3000; // timeout when waiting on signal
@@ -60,7 +62,7 @@ DVBSignalMonitor::DVBSignalMonitor(int _capturecardnum, int _cardnum,
     bzero(&stats, sizeof(stats));
     uint newflags = 0;
     QString msg = QString("DVBSignalMonitor(%1,%2): %3 (%4)")
-        .arg(_capturecardnum).arg(_cardnum);
+        .arg(capturecardnum).arg(cardnum);
 
 #define DVB_IO(WHAT,WHERE,ERRMSG,FLAG) \
     if (ioctl(fd, WHAT, WHERE)) \
@@ -68,13 +70,13 @@ DVBSignalMonitor::DVBSignalMonitor(int _capturecardnum, int _cardnum,
     else newflags |= FLAG;
 
     DVB_IO(FE_READ_SIGNAL_STRENGTH, &stats.ss,
-          "Warning, can not measure Signal Strength", kDTVSigMon_WaitForSig);
+           "Warning, can not measure Signal Strength", kDTVSigMon_WaitForSig);
     DVB_IO(FE_READ_SNR, &stats.snr,
-          "Warning, can not measure S/N", kDVBSigMon_WaitForSNR);
+           "Warning, can not measure S/N", kDVBSigMon_WaitForSNR);
     DVB_IO(FE_READ_BER, &stats.ber,
-          "Warning, can not measure Bit Error Rate", kDVBSigMon_WaitForBER);
+           "Warning, can not measure Bit Error Rate", kDVBSigMon_WaitForBER);
     DVB_IO(FE_READ_UNCORRECTED_BLOCKS, &stats.ub,
-          "Warning, can not count Uncorrected Blocks", kDVBSigMon_WaitForUB);
+           "Warning, can not count Uncorrected Blocks", kDVBSigMon_WaitForUB);
     DVB_IO(FE_READ_STATUS, &stats.status, "Error, can not read status!", 0);
     AddFlags(newflags);
 #undef DVB_IO
@@ -126,7 +128,6 @@ const int buffer_size = TSPacket::SIZE * 1500;
 
 bool DVBSignalMonitor::AddPIDFilter(uint pid)
 {
-    cerr<<"AddPIDFilter("<<pid<<") -- begin"<<endl;
     int mux_fd = open(dvbdevice(DVB_DEV_DEMUX, cardnum), O_RDWR | O_NONBLOCK);
     if (mux_fd == -1)
     {
@@ -170,13 +171,12 @@ bool DVBSignalMonitor::AddPIDFilter(uint pid)
  
         return false;
     }
-    cerr<<"AddPIDFilter("<<pid<<") -- end"<<endl;
+
     return true;
 }
 
 bool DVBSignalMonitor::RemovePIDFilter(uint pid)
 {
-    cerr<<"RemovePIDFilter("<<pid<<") -- begin"<<endl;
     if (filters.find(pid)==filters.end())
         return false;
 
@@ -193,7 +193,6 @@ bool DVBSignalMonitor::RemovePIDFilter(uint pid)
 
     remainders.erase(remainders.find(pid));
 
-    cerr<<"RemovePIDFilter("<<pid<<") -- end"<<endl;
     return err >= 0;
 }
 
@@ -308,7 +307,8 @@ void DVBSignalMonitor::UpdateValues(void)
         signalToNoise.SetValue((int) stats.snr);
         bitErrorRate.SetValue(stats.ber);
         uncorrectedBlocks.SetValue(stats.ub);
-        
+
+        //cerr<<"locked("<<locked<<") slock("<<signalLock.IsGood()<<")"<<endl;
         emit StatusSignalLock(locked);
         if (HasFlags(kDTVSigMon_WaitForSig))
             emit StatusSignalStrength((int) stats.ss);
@@ -332,7 +332,6 @@ void DVBSignalMonitor::UpdateValues(void)
             while (!dtvMonitorRunning)
                 usleep(50);
         }
-
     }
     else
     {

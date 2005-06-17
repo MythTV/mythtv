@@ -1,3 +1,5 @@
+// -*- Mode: c++ -*-
+
 #ifndef DVBSIGNALMONITOR_H
 #define DVBSIGNALMONITOR_H
 
@@ -15,8 +17,8 @@ class DVBSignalMonitor: public DTVSignalMonitor
 {
     Q_OBJECT
 public:
-    DVBSignalMonitor(int capturecardnum, int cardnum, DVBChannel* _channel,
-                     uint _flags = 0);
+    DVBSignalMonitor(int db_cardnum, DVBChannel* _channel, uint _flags = 0,
+                     const char *_name = "DVBSignalMonitor");
     virtual ~DVBSignalMonitor();
 
     virtual QStringList GetStatusList(bool kick);

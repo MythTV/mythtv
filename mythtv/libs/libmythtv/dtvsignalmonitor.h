@@ -7,6 +7,8 @@
 class MPEGStreamData;
 class ATSCStreamData;
 class DVBStreamData;
+class ScanStreamData;
+
 class TSPacket;
 class ProgramAssociationTable;
 class ProgramMapTable;
@@ -20,7 +22,8 @@ class DTVSignalMonitor: public SignalMonitor
 {
     Q_OBJECT
   public:
-    DTVSignalMonitor(int capturecardnum, int fd, uint wait_for_mask);
+    DTVSignalMonitor(int capturecardnum, int fd, uint wait_for_mask,
+                     const char *name = "DTVSignalMonitor");
 
     virtual QStringList GetStatusList(bool kick = true);
 
@@ -34,23 +37,27 @@ class DTVSignalMonitor: public SignalMonitor
     void AddFlags(uint _flags);
     void RemoveFlags(uint _flags);
 
-    // ATSC
-    void SetStreamData(ATSCStreamData* data);
-    /// Returns the ATSC stream data if it exists
-    ATSCStreamData *GetATSCStreamData() { return atsc_stream_data; }
-    /// Returns the ATSC stream data if it exists
-    const ATSCStreamData *GetATSCStreamData() const { return atsc_stream_data; }
+    /// Sets the MPEG stream data for DTVSignalMonitor to use,
+    /// and connects the table signals to the monitor.
+    void SetStreamData(MPEGStreamData* data);
 
-    // DVB
-    void SetStreamData(DVBStreamData* data);
+    /// Returns the MPEG stream data if it exists
+    MPEGStreamData *GetStreamData()      { return stream_data; }
+    /// Returns the ATSC stream data if it exists
+    ATSCStreamData *GetATSCStreamData();
     /// Returns the DVB stream data if it exists
-    DVBStreamData *GetDVBStreamData() { return dvb_stream_data; }
-    /// Returns the DVB stream data if it exists
-    const DVBStreamData *GetDVBStreamData() const { return dvb_stream_data; }
+    DVBStreamData *GetDVBStreamData();
+    /// Returns the scan stream data if it exists
+    ScanStreamData *GetScanStreamData();
 
-    // Generic
-    MPEGStreamData *GetStreamData() { return stream_data; }
+    /// Returns the MPEG stream data if it exists
     const MPEGStreamData *GetStreamData() const { return stream_data; }
+    /// Returns the ATSC stream data if it exists
+    const ATSCStreamData *GetATSCStreamData() const;
+    /// Returns the DVB stream data if it exists
+    const DVBStreamData *GetDVBStreamData() const;
+    /// Returns the scan stream data if it exists
+    const ScanStreamData *GetScanStreamData() const;
 
   private slots:
     void SetPAT(const ProgramAssociationTable*);
@@ -58,14 +65,12 @@ class DTVSignalMonitor: public SignalMonitor
     void SetMGT(const MasterGuideTable*);
     void SetVCT(uint, const TerrestrialVirtualChannelTable*);
     void SetVCT(uint, const CableVirtualChannelTable*);
-    void SetNIT(uint, const NetworkInformationTable*);
+    void SetNIT(const NetworkInformationTable*);
     void SetSDT(uint, const ServiceDescriptionTable*);
 
   private:
     void UpdateMonitorValues();
     MPEGStreamData    *stream_data;
-    ATSCStreamData    *atsc_stream_data;
-    DVBStreamData     *dvb_stream_data;
     SignalMonitorValue seenPAT;
     SignalMonitorValue seenPMT;
     SignalMonitorValue seenMGT;
