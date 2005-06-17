@@ -55,6 +55,9 @@ libmpeg2 decodes MPEG-2 more quickly than ffmpeg on some systems, and
 libmythsamplerate resamples audio with better quality when we only need
 to match the hardware sample rate to the A/V streams audio sample rate.
 
+\section db Database Schema
+The database schema is documented here \ref db_schema.
+
 \section apps Applications
 %MythTV contains 12 applications:
 
