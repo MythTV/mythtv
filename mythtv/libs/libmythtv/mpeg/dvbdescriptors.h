@@ -152,7 +152,7 @@ class AdaptationFieldDataDescriptor : public MPEGDescriptor
     {
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x
-        assert(DescriptorID::Adaptation_field_data == DescriptorTag());
+        assert(DescriptorID::adaptation_field_data == DescriptorTag());
     // descriptor_length        8   1.0
     }
 
@@ -1201,7 +1201,7 @@ class TimeShiftedEventDescriptor : public MPEGDescriptor
     {
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x
-        assert(DescriptorID::dvb_time_shifted_event == DescriptorTag());
+        assert(DescriptorID::time_shifted_event == DescriptorTag());
     // descriptor_length        8   1.0
     }
 
@@ -1217,7 +1217,7 @@ class TimeShiftedServiceDescriptor : public MPEGDescriptor
     {
     //       Name             bits  loc  expected value
     // descriptor_tag           8   0.0       0x
-        assert(DescriptorID::time_shifted_service == DescriptorTag());
+        assert(DescriptorID::dvb_time_shifted_service == DescriptorTag());
     // descriptor_length        8   1.0
     }
 
