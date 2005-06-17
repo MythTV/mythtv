@@ -206,8 +206,10 @@ bool DVBChannel::SetChannelByString(const QString &chan)
     if (curchannelname == chan && !force_channel_change)
         return true;
 
+#if (DVB_API_VERSION_MINOR == 1)
     if (FE_ATSC == info.type)
         SetCachedATSCInfo("");
+#endif
 
     force_channel_change = false;
 
@@ -240,8 +242,10 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 
     inputChannel[currentcapchannel] = curchannelname;
 
+#if (DVB_API_VERSION_MINOR == 1)
     if (FE_ATSC == info.type)
         SetCachedATSCInfo(chan);
+#endif
 
     return true;
 }
