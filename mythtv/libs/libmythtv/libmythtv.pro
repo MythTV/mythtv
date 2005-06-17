@@ -58,7 +58,7 @@ HEADERS += dbcheck.h udpnotify.h channeleditor.h channelsettings.h
 HEADERS += osdlistbtntype.h blend.h datadirect.h sr_dialog.h
 HEADERS += sr_items.h sr_root.h recordingtypes.h jobqueue.h dtvrecorder.h
 HEADERS += videobuffers.h 
-HEADERS += scanwizard.h analogscan.h
+HEADERS += scanwizard.h scanwizardhelpers.h analogscan.h
 
 SOURCES += frequencies.c guidegrid.cpp #infodialog.cpp 
 SOURCES += infostructs.cpp jitterometer.cpp minilzo.cpp NuppelVideoPlayer.cpp 
@@ -73,7 +73,7 @@ SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
 SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp decoderbase.cpp
 SOURCES += recordingtypes.cpp jobqueue.cpp dtvrecorder.cpp
 SOURCES += videobuffers.cpp
-SOURCES += scanwizard.cpp analogscan.cpp
+SOURCES += scanwizard.cpp scanwizardhelpers.cpp analogscan.cpp
 
 
 unix {
