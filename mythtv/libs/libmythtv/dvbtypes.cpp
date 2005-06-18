@@ -319,8 +319,12 @@ bool DVBTuning::equal_qpsk(const DVBTuning& other) const
 
 bool DVBTuning::equal_atsc(const DVBTuning& other) const
 {
+#if (DVB_API_VERSION_MINOR == 1)
     return params.frequency     == other.params.frequency             &&
         params.u.vsb.modulation == other.params.u.vsb.modulation;
+#else
+    return params.frequency     == other.params.frequency;
+#endif
 }
 
 bool DVBTuning::equal_qam(const DVBTuning& other) const
@@ -427,7 +431,11 @@ QString DVBTuning::ConstellationDB() const
 
 QString DVBTuning::ModulationDB() const
 {
+#if (DVB_API_VERSION_MINOR == 1)
     return mod2dbstr(params.u.vsb.modulation);
+#else
+    return mod2dbstr((fe_modulation)0);
+#endif
 }
 
 QString DVBTuning::InversionString() const
@@ -550,12 +558,14 @@ QString DVBTuning::toString(fe_type_t type) const
             .arg(InversionString())
             .arg(QAMInnerFECString());
     }
+#if (DVB_API_VERSION_MINOR == 1)
     else if (FE_ATSC == type)
     {
         msg = QString("Frequency: %1 Modulation: %2")
             .arg(Frequency())
             .arg(ModulationString());
     }
+#endif
     else if (FE_OFDM == type)
     {
         msg = QString("Frequency: %1 BW: %2 HP: %3 LP: %4"
@@ -577,6 +587,7 @@ bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
     bool ok = true;
 
     params.frequency = frequency.toInt();
+#if (DVB_API_VERSION_MINOR == 1)
     dvb_vsb_parameters& p = params.u.vsb;
 
     p.modulation = parseModulation(modulation, ok);
@@ -586,6 +597,7 @@ bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
                                "falling back to '8-VSB'.").arg(modulation));
         p.modulation = VSB_8;
     }
+#endif
 
     return true;
 }
@@ -904,8 +916,10 @@ bool dvb_channel_t::Parse(
             frequency,       inversion,     bandwidth,    hp_code_rate,
             lp_code_rate,    constellation, trans_mode,   guard_interval,
             hierarchy);
+#if (DVB_API_VERSION_MINOR == 1)
     else if (FE_ATSC == type)
         ok = tuning.parseATSC(frequency, modulation);
+#endif
         
     sistandard = _sistandard;
         
