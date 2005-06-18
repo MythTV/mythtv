@@ -20,6 +20,9 @@
 #include "dvbdev.h"
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
+#include "dvbtypes.h"
+
+static bool fill_frontend_stats(int fd_frontend, dvb_stats_t &stats);
 
 /** \fn DVBSignalMonitor::DVBSignalMonitor(int,int,int)
  *  \brief Initializes signal lock and signal values.
@@ -288,7 +291,7 @@ void DVBSignalMonitor::RunTableMonitor(void)
 /** \fn DVBSignalMonitor::UpdateValues()
  *  \brief Fills in frontend stats and emits status Qt signals.
  *
- *   This uses FillFrontendStats(int,dvb_stats_t&)
+ *   This uses fill_frontend_stats(int,dvb_stats_t&)
  *   to actually collect the signal values. It is automatically
  *   called by MonitorLoop(), after Start() has been used to start
  *   the signal monitoring thread.
@@ -297,7 +300,7 @@ void DVBSignalMonitor::UpdateValues(void)
 {
     dvb_stats_t stats;
 
-    if (!dtvMonitorRunning && FillFrontendStats(fd, stats) &&
+    if (!dtvMonitorRunning && fill_frontend_stats(fd, stats) &&
         !(stats.status & FE_TIMEDOUT))
     {
         //int wasLocked = signalLock.GetValue();
@@ -341,7 +344,7 @@ void DVBSignalMonitor::UpdateValues(void)
     update_done = true;
 }
 
-/** \fn DVBSignalMonitor::FillFrontendStats(int,dvb_stats_t&)
+/** \fn fill_frontend_stats(int,dvb_stats_t&)
  *  \brief Returns signal statistics for the frontend file descriptor.
  *
  *   This function uses five ioctl's FE_READ_SNR, FE_READ_SIGNAL_STRENGTH
@@ -352,7 +355,7 @@ void DVBSignalMonitor::UpdateValues(void)
  *  \param stats Used to return the statistics collected.
  *  \return true if successful, false if there is an error.
  */
-bool DVBSignalMonitor::FillFrontendStats(int fd_frontend, dvb_stats_t& stats)
+static bool fill_frontend_stats(int fd_frontend, dvb_stats_t& stats)
 {
     if (fd_frontend < 0)
         return false;

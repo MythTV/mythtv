@@ -7,10 +7,13 @@
 
 #include "mythcontext.h"
 #include "signalmonitor.h"
-#include "dvbsignalmonitor.h"
 #include "pchdtvsignalmonitor.h"
-#include "dvbchannel.h"
 #include "channel.h"
+
+#ifdef USING_DVB
+#   include "dvbsignalmonitor.h"
+#   include "dvbchannel.h"
+#endif
 
 /** \class SignalMonitor
  *  \brief Signal monitoring base class.

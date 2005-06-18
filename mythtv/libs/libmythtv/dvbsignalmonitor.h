@@ -5,7 +5,6 @@
 
 #include "dtvsignalmonitor.h"
 #include "qstringlist.h"
-#include "dvbtypes.h"
 
 class DVBChannel;
 
@@ -34,8 +33,6 @@ private:
     DVBSignalMonitor(const DVBSignalMonitor&);
 
     virtual void UpdateValues(void);
-
-    static bool FillFrontendStats(int fd_frontend, dvb_stats_t &stats);
 
     static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);
