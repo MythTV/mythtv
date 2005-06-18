@@ -58,6 +58,7 @@ HEADERS += dbcheck.h udpnotify.h channeleditor.h channelsettings.h
 HEADERS += osdlistbtntype.h blend.h datadirect.h sr_dialog.h
 HEADERS += sr_items.h sr_root.h recordingtypes.h jobqueue.h dtvrecorder.h
 HEADERS += videobuffers.h 
+HEADERS += signalmonitorvalue.h
 HEADERS += scanwizard.h scanwizardhelpers.h analogscan.h
 
 SOURCES += frequencies.c guidegrid.cpp #infodialog.cpp 
@@ -73,6 +74,7 @@ SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
 SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp decoderbase.cpp
 SOURCES += recordingtypes.cpp jobqueue.cpp dtvrecorder.cpp
 SOURCES += videobuffers.cpp
+SOURCES += signalmonitorvalue.cpp
 SOURCES += scanwizard.cpp scanwizardhelpers.cpp analogscan.cpp
 
 
@@ -80,7 +82,7 @@ unix {
     # The backend uses these, but the frontend doesn't.
     # Comment out for a faster frontend-only build!
     HEADERS += channel.h
-    HEADERS += signalmonitorvalue.h signalmonitor.h dtvsignalmonitor.h
+    HEADERS += signalmonitor.h             dtvsignalmonitor.h
     HEADERS += pchdtvsignalmonitor.h
 
     HEADERS += mpeg/tspacket.h             mpeg/pespacket.h
@@ -92,10 +94,11 @@ unix {
     HEADERS += mpeg/dvbdescriptors.h
     HEADERS += mpeg/tsstats.h 
 
-    SOURCES += channel.cpp NuppelVideoRecorder.cpp tv_rec.cpp channelbase.cpp
-    SOURCES += hdtvrecorder.cpp fifowriter.cpp
-    SOURCES += signalmonitorvalue.cpp signalmonitor.cpp dtvsignalmonitor.cpp
+    SOURCES += channel.cpp                 channelbase.cpp
+    SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
     SOURCES += pchdtvsignalmonitor.cpp
+    SOURCES += NuppelVideoRecorder.cpp     tv_rec.cpp
+    SOURCES += hdtvrecorder.cpp            fifowriter.cpp
 
     SOURCES += mpeg/tspacket.cpp           mpeg/pespacket.cpp
     SOURCES += mpeg/mpegtables.cpp         mpeg/atsctables.cpp
@@ -107,9 +110,6 @@ unix {
 }
 
 macx {
-    HEADERS -= pchdtvsignalmonitor.h
-    SOURCES -= pchdtvsignalmonitor.cpp
-
     SOURCES += videoout_quartz.cpp
     HEADERS += videoout_quartz.h
 
