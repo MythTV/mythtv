@@ -862,7 +862,7 @@ fe_modulation DVBTuning::parseModulation(const QString &mod, bool &ok)
     QString modulation = mod.lower();
     ok = true;
     if (     modulation ==    "qpsk") return QPSK;
-    else if (modulation == "   auto") return QAM_AUTO;
+    else if (modulation ==    "auto") return QAM_AUTO;
     else if (modulation == "qam_256") return QAM_256;
     else if (modulation == "qam_128") return QAM_128;
     else if (modulation ==  "qam_64") return QAM_64;
@@ -879,7 +879,7 @@ fe_modulation DVBTuning::parseModulation(const QString &mod, bool &ok)
     else if (modulation ==  "qam-16") return QAM_16;
 #if (DVB_API_VERSION_MINOR == 1)
     else if (modulation ==   "8-vsb") return VSB_8;
-    else if (modulation == " 16-vsb") return VSB_16;
+    else if (modulation ==  "16-vsb") return VSB_16;
 #endif
 
     ok = false;
