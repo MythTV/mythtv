@@ -912,7 +912,7 @@ bool dvb_channel_t::Parse(
             lnb_lof_switch,  lnb_lof_hi,    lnb_lof_lo);
     else if (FE_QAM == type)
         ok = tuning.parseQAM(
-            frequency,       inversion,     symbolrate,   fec,   hierarchy);
+            frequency,       inversion,     symbolrate,   fec,   modulation);
     else if (FE_OFDM == type)
         ok = tuning.parseOFDM(
             frequency,       inversion,     bandwidth,    hp_code_rate,
