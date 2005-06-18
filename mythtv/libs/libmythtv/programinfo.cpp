@@ -491,7 +491,17 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap) const
     progMap["rec_str"] = RecTypeText();
     if (rectype != kNotRecording)
     {
-        progMap["rec_str"] += " - ";
+        if (recstatus <= rsWillRecord || recstatus == rsConflict)
+        {
+            if (recpriority >= 0)       
+                progMap["rec_str"] += QString(" +%1 ").arg(recpriority);
+            else
+                progMap["rec_str"] += QString(" %1 ").arg(recpriority);
+        }
+        else
+        {
+            progMap["rec_str"] += " - ";
+        }
         progMap["rec_str"] += RecStatusText();
     }
     progMap["recordingstatus"] = progMap["rec_str"];
