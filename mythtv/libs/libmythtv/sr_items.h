@@ -547,8 +547,8 @@ class SRAutoTranscode: public SRSelectSetting
             : SRSelectSetting(_parent, "autoTranscodeList", "[ Automatically Transcode ]", _group, 
                               "autotranscode", _list) 
         {
-            addSelection("Transcode new recordings", 1);
-            addSelection("Do not Transcode new recordings", 0);
+            addSelection(QObject::tr("Transcode new recordings"), 1);
+            addSelection(QObject::tr("Do not Transcode new recordings"), 0);
             setValue(0);
             _parent.setAutoTranscodeObj(this);
         }

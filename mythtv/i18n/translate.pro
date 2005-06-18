@@ -50,6 +50,7 @@ SOURCES += ../programs/mythfrontend/statusbox.cpp
 SOURCES += ../programs/mythfrontend/viewscheduled.cpp
 SOURCES += ../programs/mythfrontend/channelrecpriority.cpp
 SOURCES += ../setup/backendsettings.cpp
+SOURCES += ../setup/checksetup.cpp
 SOURCES += ../setup/main.cpp
 SOURCES += ../themes/themestrings.h
 

@@ -858,7 +858,7 @@ void RecordingProfile::fillSelections(SelectSetting* setting, int group,
         {
             if (group == RecordingProfile::TranscoderGroup && foldautodetect)
             {
-                setting->addSelection(QString("Autodetect"),
+                setting->addSelection(QObject::tr("Autodetect"),
                                       QString::number(
                                       RecordingProfile::TranscoderAutodetect));
             }
@@ -875,7 +875,7 @@ void RecordingProfile::fillSelections(SelectSetting* setting, int group,
                         }
                         else
                         {
-                            setting->addSelection(QString("Autodetect from %1")
+                            setting->addSelection(QObject::tr("Autodetect from %1")
                                               .arg(result.value(0).toString()),
                                               result.value(1).toString());
                         }
@@ -918,7 +918,7 @@ void RecordingProfile::fillSelections(SelectManagedListItem* setting, int group)
         {
             if (group == RecordingProfile::TranscoderGroup)
             {
-                setting->addSelection(QString("Transcode using Autodetect"),
+                setting->addSelection(QObject::tr("Transcode using Autodetect"),
                                       QString::number(
                                       RecordingProfile::TranscoderAutodetect));
             }
