@@ -565,6 +565,16 @@ static HostCheckBox *JobAllowCommFlag()
     return gc;
 };
 
+static HostCheckBox *JobAllowTranscode()
+{
+    HostCheckBox *gc = new HostCheckBox("JobAllowTranscode");
+    gc->setLabel(QObject::tr("Allow Transcoding jobs"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Allow jobs of this type to run on this "
+                                "backend."));
+    return gc;
+};
+
 static HostCheckBox *JobAllowUserJob1()
 {
     HostCheckBox *gc = new HostCheckBox("JobAllowUserJob1");
@@ -674,6 +684,7 @@ BackendSettings::BackendSettings() {
     group5a1->addChild(JobQueueWindowEnd());
     group5a1->addChild(JobQueueCPU());
     group5a1->addChild(JobAllowCommFlag());
+    group5a1->addChild(JobAllowTranscode());
     group5a->addChild(group5a1);
 
     VerticalConfigurationGroup* group5a2 =
