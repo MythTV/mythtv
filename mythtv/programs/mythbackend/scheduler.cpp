@@ -955,25 +955,24 @@ void Scheduler::RunScheduler(void)
                 // started the BE, 'auto' means it was started automatically
                 QString startupParam = "user";
                 
-                // check once on startup, if a recording starts within the
-                // idleWaitForRecordingTime. If no, block the shutdown,
-                // because system seems to be waken up by the user and not by a
-                // wakeup call
-                if (blockShutdown)
+                // have we been started automatically?
+                if ((startIter != reclist.end()) &&
+                    ((curtime.secsTo((*startIter)->startts) - prerollseconds)
+                        < (idleWaitForRecordingTime * 60)))
                 {
-                    // have we been started automatically?
-                    if (startIter != reclist.end() &&
-                        curtime.secsTo((*startIter)->startts) - prerollseconds
-                        < idleWaitForRecordingTime * 60)
-                    {
-                        VERBOSE(VB_ALL,
-                                "Recording starts soon, AUTO-Startup assumed");
-                        blockShutdown = false;
-                        startupParam = "auto";
-                    }
-                    else
-                        VERBOSE(VB_ALL, "Seem to be woken up by USER");
+                    VERBOSE(VB_ALL,
+                            "Recording starts soon, AUTO-Startup assumed");
+                    startupParam = "auto";
+            
+                    // Since we've started automatically, don't wait for
+                    // client to connect before allowing shutdown.
+                    blockShutdown = false;
                 }
+                else
+                {
+                    VERBOSE(VB_ALL, "Seem to be woken up by USER");
+                }
+        
                 QString startupCommand = gContext->GetSetting("startupCommand",
                                                               "");
                 if (!startupCommand.isEmpty())
