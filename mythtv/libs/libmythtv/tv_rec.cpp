@@ -32,6 +32,11 @@ using namespace std;
 #include "jobqueue.h"
 #include "scheduledrecording.h"
 
+#include "atscstreamdata.h"
+#include "hdtvrecorder.h"
+#include "pchdtvsignalmonitor.h"
+#include "atsctables.h"
+
 #ifdef USING_IVTV
 #include "mpegrecorder.h"
 #endif
@@ -39,6 +44,8 @@ using namespace std;
 #ifdef USING_DVB
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
+#include "dvbsignalmonitor.h"
+#include "dvbsiparser.h"
 #include "siscan.h"
 #endif
 
@@ -46,6 +53,8 @@ using namespace std;
 #include "firewirerecorder.h"
 #include "firewirechannel.h"
 #endif
+
+const int TVRec::kRequestBufferSize = 256*1000;
 
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
@@ -86,6 +95,7 @@ TVRec::TVRec(int capturecardnum)
       // Configuration variables from setup rutines
       m_capturecardnum(capturecardnum), ispip(false),
       // State variables
+      stateChangeLock(true),
       internalState(kState_None), nextState(kState_None), changeState(false),
       frontendReady(false), runMainLoop(false), exitPlayer(false),
       finishRecording(false), paused(false), prematurelystopped(false),
@@ -97,14 +107,14 @@ TVRec::TVRec(int capturecardnum)
       // Pending recording info
       pendingRecording(NULL), recordPending(false), cancelNextRecording(false),
       // RingBuffer info
-      outputFilename(""), readthreadSock(NULL),
+      outputFilename(""), requestBuffer(NULL), readthreadSock(NULL),
       readthreadLock(false), readthreadlive(false),
       // Current recorder info
       videodev(""), vbidev(""), audiodev(""), cardtype(""),
       audiosamplerate(-1), skip_btaudio(false)
 {
-    event           = PTHREAD_CREATE_JOINABLE;
-    encode          = static_cast<pthread_t>(0);
+    event_thread    = PTHREAD_CREATE_JOINABLE;
+    recorder_thread = static_cast<pthread_t>(0);
 #ifdef USING_DVB
     scanner_thread  = PTHREAD_CREATE_JOINABLE;
 #endif
@@ -207,7 +217,16 @@ bool TVRec::Init(void)
     liveTVRingBufLoc  = gContext->GetSetting("LiveBufferDir");
     recprefix         = gContext->GetSetting("RecordFilePrefix");
 
-    pthread_create(&event, NULL, EventThread, this);
+    requestBuffer = new char[kRequestBufferSize+64];
+    if (!requestBuffer)
+    {
+        VERBOSE(VB_IMPORTANT,
+                "TVRec: Error, failed to allocate requestBuffer.");
+        errored = true;
+        return false;
+    }
+
+    pthread_create(&event_thread, NULL, EventThread, this);
 
     while (!runMainLoop)
         usleep(50);
@@ -222,7 +241,7 @@ bool TVRec::Init(void)
 TVRec::~TVRec(void)
 {
     runMainLoop = false;
-    pthread_join(event, NULL);
+    pthread_join(event_thread, NULL);
 
 #ifdef USING_DVB
     if (scanner)
@@ -670,7 +689,7 @@ void TVRec::HandleStateChange(void)
                     channel->Close();
                 }
             }
-            pthread_create(&encode, NULL, RecorderThread, recorder);
+            pthread_create(&recorder_thread, NULL, RecorderThread, recorder);
 
             while (!recorder->IsRecording() && !recorder->IsErrored())
                 usleep(50);
@@ -685,29 +704,23 @@ void TVRec::HandleStateChange(void)
                 channel->SetFd(recorder->GetVideoFd());
             frameRate = recorder->GetFrameRate();
 
-            int transcodeFirst =
-                  gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0);
-
             if ((tmpInternalState != kState_WatchingLiveTV) &&
                 (!curRecording->chancommfree) &&
                 (curRecording->GetAutoRunJobs() & JOB_COMMFLAG) &&
                 (earlyCommFlag) &&
                 ((autoTranscode && !transcodeFirst) || (!autoTranscode)))
             {
-
-
-                QString jobHost = "";
-                if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
-                    jobHost = gContext->GetHostName();
-
-                JobQueue::QueueJob(JOB_COMMFLAG, curRecording->chanid,
-                                   curRecording->recstartts, "", "",
-                                   jobHost, JOB_LIVE_REC);
+                JobQueue::QueueJob(
+                    JOB_COMMFLAG, curRecording->chanid,
+                    curRecording->recstartts, "", "",
+                    (runJobOnHostOnly) ? gContext->GetHostName() : "",
+                    JOB_LIVE_REC);
             }
         }
         else
         {
-            if (error || recorder->IsErrored()) {
+            if (error || recorder->IsErrored())
+            {
                 VERBOSE(VB_IMPORTANT, "TVRec: Recording Prematurely Stopped");
 
                 QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
@@ -891,49 +904,43 @@ void TVRec::TeardownRecorder(bool killFile)
         recorder->StopRecording();
         profileName = "";
 
-        if (encode)
-            pthread_join(encode, NULL);
-        encode = static_cast<pthread_t>(0);
+        if (recorder_thread)
+            pthread_join(recorder_thread, NULL);
+        recorder_thread = static_cast<pthread_t>(0);
         delete recorder;
+        recorder = NULL;
     }
-    recorder = NULL;
 
     if (rbuffer)
     {
         rbuffer->StopReads();
         readthreadLock.lock();
-        delete rbuffer;
         readthreadlive = false;
-        rbuffer = NULL;
         readthreadLock.unlock();
+        delete rbuffer;
+        rbuffer = NULL;
     }
 
     if (killFile)
     {
         unlink(outputFilename.ascii());
-        if (curRecording)
-        {
-            delete curRecording;
-            curRecording = NULL;
-        }
         outputFilename = "";
     }
-    else if (curRecording)
+
+    if (curRecording)
     {
         delete curRecording;
         curRecording = NULL;
-
-        MythEvent me("RECORDING_LIST_CHANGE");
-        gContext->dispatch(me);
     }
 
-    if ((prevRecording) && (!killFile))
+    MythEvent me("RECORDING_LIST_CHANGE");
+    gContext->dispatch(me);
+
+    if (prevRecording && !killFile)
     {
         if (!prematurelystopped)
         {
-            int jobTypes;
-
-            jobTypes = prevRecording->GetAutoRunJobs();
+            int jobTypes = prevRecording->GetAutoRunJobs();
 
             if ((prevRecording->chancommfree) ||
                 ((earlyCommFlag) &&
@@ -959,10 +966,7 @@ void TVRec::TeardownRecorder(bool killFile)
     }
 
     if (prevRecording)
-    {
         delete prevRecording;
-        prevRecording = NULL;
-    }
 }    
 
 /** \fn TVRec::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)
@@ -1051,10 +1055,11 @@ void TVRec::SetChannel(bool needopen)
     }
 
     if (channel)
+    {
         channel->SwitchToInput(inputname, chanstr);
-
-    if (needopen && channel)
-        channel->Close();
+        if (needopen)
+            channel->Close();
+    }
 }
 
 /** \fn TVRec::EventThread(void*)
@@ -2224,31 +2229,19 @@ void TVRec::PauseRecorder(void)
     recorder->Pause();
 } 
 
+/** \fn TVRec::ToggleInputs(void)
+ *  \brief Toggles between inputs on current capture card.
+ */
 void TVRec::ToggleInputs(void)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (!recorder || !channel || !rbuffer)
-        return;
-
-    recorder->WaitForPause();
-
-    PauseClearRingBuffer();
-
-    if (!rbuffer)
+    if (channel)
     {
-        UnpauseRingBuffer();
-        return;
+        Pause();
+        channel->ToggleInputs();
+        Unpause();
     }
-
-    rbuffer->Reset();
-
-    channel->ToggleInputs();
-
-    recorder->Reset();
-    recorder->Unpause();
-
-    UnpauseRingBuffer();
 }
 
 /** \fn TVRec::ChangeChannel(ChannelChangeDirection)
@@ -2260,28 +2253,12 @@ void TVRec::ChangeChannel(ChannelChangeDirection dir)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (!recorder || !channel || !rbuffer)
-        return;
-
-    recorder->WaitForPause();
-
-    PauseClearRingBuffer();
-
-    if (!rbuffer)
+    if (channel)
     {
-        UnpauseRingBuffer();
-        return;
+        Pause();
+        channel->SetChannelByDirection(dir);
+        Unpause();
     }
-
-    rbuffer->Reset();
-
-    channel->SetChannelByDirection(dir);
-
-    recorder->ChannelNameChanged(channel->GetCurrentName());
-    recorder->Reset();
-    recorder->Unpause();
-
-    UnpauseRingBuffer();
 }
 
 /** \fn TVRec::ToggleChannelFavorite()
@@ -2450,10 +2427,31 @@ void TVRec::SetChannel(QString name)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (!recorder || !channel || !rbuffer)
+    if (!channel)
         return;
 
-    recorder->WaitForPause();
+    Pause();
+
+    QString chan = name.stripWhiteSpace();
+    QString prevchan = channel->GetCurrentName();
+
+    if (!channel->SetChannelByString(chan))
+        channel->SetChannelByString(prevchan);
+
+    Unpause();
+}
+
+/** \fn TVRec::Pause()
+ *  \brief Waits for recorder pause and then resets the pauses and
+ *         resets ring buffer.
+ *  \sa PauseRecorder(), Unpause()
+ */
+void TVRec::Pause(void)
+{
+    QMutexLocker lock(&stateChangeLock);
+
+    if (recorder)
+        recorder->WaitForPause();
 
     PauseClearRingBuffer();
 
@@ -2462,19 +2460,24 @@ void TVRec::SetChannel(QString name)
         UnpauseRingBuffer();
         return;
     }
-
     rbuffer->Reset();
+}
 
-    QString chan = name.stripWhiteSpace();
-    QString prevchan = channel->GetCurrentName();
+/** \fn TVRec::Unpause()
+ *  \brief unpauses recorder and ring buffer.
+ *  \sa Pause()
+ */
+void TVRec::Unpause(void)
+{
+    QMutexLocker lock(&stateChangeLock);
 
-    if (!channel->SetChannelByString(chan))
-        channel->SetChannelByString(prevchan);
-
-    recorder->ChannelNameChanged(channel->GetCurrentName());
-    recorder->Reset();
-    recorder->Unpause();
-
+    if (recorder)
+    {
+        if (channel)
+            recorder->ChannelNameChanged(channel->GetCurrentName());
+        recorder->Reset();
+        recorder->Unpause();
+    }
     UnpauseRingBuffer();
 }
 
@@ -2750,8 +2753,7 @@ int TVRec::RequestRingBufferBlock(int size)
     {
         int request = size - tot;
 
-        if (request > 256000)
-            request = 256000;
+        request = min(request, kRequestBufferSize);
  
         ret = rbuffer->Read(requestBuffer, request);
         
@@ -2824,13 +2826,13 @@ void TVRec::RetrieveInputChannels(QMap<int, QString> &inputChannel,
 
 }
 
-/** \fn TVRec::StoreInputChannels(QMap<int, QString>&)
+/** \fn TVRec::StoreInputChannels(const QMap<int, QString>&)
  *  \brief Sets starting channel for the each input in the "inputChannel" map.
  *
  *  \param inputChannel Map from input number to channel, with an input and 
  *                      default channel for each input to update.
  */
-void TVRec::StoreInputChannels(QMap<int, QString> &inputChannel)
+void TVRec::StoreInputChannels(const QMap<int, QString> &inputChannel)
 {
     if (!channel)
         return;

@@ -7,16 +7,20 @@
 #include <qvaluelist.h>
 #include <qptrlist.h>
 #include <qmap.h>
+#include <qstringlist.h>
 
 #include "tv.h"
 
 class QSocket;
-class ChannelBase;
 class ProgramInfo;
 class RingBuffer;
 class NuppelVideoRecorder;
 class RecorderBase;
 class SIScan;
+class DVBSIParser;
+class SignalMonitor;
+class ChannelBase;
+class DVBChannel;
 
 typedef enum
 {
@@ -102,7 +106,7 @@ class TVRec
                                QMap<int, QString> &inputTuneTo,
                                QMap<int, QString> &externalChanger,
                                QMap<int, QString> &sourceid);
-    void StoreInputChannels(QMap<int, QString> &inputChannel);
+    void StoreInputChannels(const QMap<int, QString> &inputChannel);
 
     bool IsBusy(void);
     bool IsReallyRecording(void);
@@ -123,6 +127,8 @@ class TVRec
     void ToggleChannelFavorite(void);
     void ChangeChannel(ChannelChangeDirection dir);
     void SetChannel(QString name);
+    void Pause(void);
+    void Unpause(void);
     int ChangeColour(bool direction);
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);
@@ -158,7 +164,7 @@ class TVRec
     /// \brief Returns the caputure card number
     int GetCaptureCardNum(void) { return m_capturecardnum; }
     /// \brief Returns true is "errored" is true, false otherwise.
-    bool IsErrored() { return errored; }
+    bool IsErrored(void) { return errored; }
   protected:
     void RunTV(void);
     static void *EventThread(void *param);
@@ -207,10 +213,9 @@ class TVRec
 
     // Various threads
     /// Event processing thread, runs RunTV().
-    pthread_t event;
+    pthread_t event_thread;
     /// Recorder thread, runs RecorderBase::StartRecording()
-    pthread_t encode;
-    pthread_t readthread;
+    pthread_t recorder_thread;
 #ifdef USING_DVB
     pthread_t scanner_thread;
 #endif
@@ -235,6 +240,7 @@ class TVRec
     firewire_options_t firewire_options;
 
     // State variables
+    QMutex  stateChangeLock;
     TVState internalState;
     TVState nextState;
     bool    changeState;
@@ -263,8 +269,8 @@ class TVRec
     bool         cancelNextRecording;
 
     // RingBuffer info
-    QString outputFilename;
-    char     requestBuffer[256001];
+    QString  outputFilename;
+    char    *requestBuffer;
     QSocket *readthreadSock;
     QMutex   readthreadLock;
     bool     readthreadlive;
@@ -277,11 +283,8 @@ class TVRec
     int      audiosamplerate;
     bool     skip_btaudio;
 
-    // Other
-    bool watchingLiveTV;
-    ProgramInfo *prevRecording;
-
-    QMutex stateChangeLock;
+    // class constants
+    static const int kRequestBufferSize;
 };
 
 #endif
