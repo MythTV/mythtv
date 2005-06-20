@@ -338,11 +338,16 @@ void ChannelEditor::menu(int /*iSelected*/) {
 
 void ChannelEditor::scan()
 {
+#ifdef USING_BACKEND
     ScanWizard scanwizard;
     scanwizard.exec(false,true);
 
     list->fillSelections();
     list->setFocus();
+#else
+    VERBOSE(VB_IMPORTANT,  "You must compile the backend "
+            "to be able to scan for channels");
+#endif
 }
 
 void ChannelEditor::advanced()

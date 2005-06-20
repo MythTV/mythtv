@@ -69,8 +69,9 @@ ScheduledRecording::ScheduledRecording()
     findid = new SRFindId(*this);
     parentid = new SRParentId(*this);
     search = new SRRecSearchType(*this);
-    
+#ifdef USING_FRONTEND
     rootGroup = new RootSRGroup(*this);
+#endif
 }
 
 
@@ -705,12 +706,20 @@ QString ScheduledRecording::getProfileName(void) const {
 
 
 
-MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent, const char *name)
+MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
+                                             const char *name)
 {
-
+    (void) parent;
+    (void) name;
+#ifdef USING_FRONTEND
     MythDialog* dlg = new RecOptDialog(this, parent, name);
     rootGroup->setDialog(dlg);
     return dlg;
+#else
+    VERBOSE(VB_IMPORTANT, "You must compile the frontend "
+            "to use a dialogWidget.");
+    return NULL;
+#endif
 }
 
 

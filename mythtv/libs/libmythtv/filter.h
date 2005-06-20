@@ -5,6 +5,10 @@
 #ifndef _FILTER_H
 #define _FILTER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "frame.h"
 
 typedef struct FmtConv_
@@ -106,4 +110,8 @@ typedef struct  VideoFilter_
 #define TF_END(filter,prefix)
 #endif /* TIME_FILTER */
 
-#endif // #ifndef _FILTER_H
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* #ifndef _FILTER_H */

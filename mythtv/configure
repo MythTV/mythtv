@@ -59,6 +59,9 @@ CONFIG_DEFINES=""
 PROFILEFLAGS=""
 proc_opt="no"
 dvd="yes"
+v4l="no"
+frontend="yes"
+backend="no"
 
 KERNEL_RELEASE=`uname -r 2>/dev/null`
 if test x"$KERNEL_RELEASE" != x"" ; then
@@ -130,8 +133,9 @@ echo "  --disable-audio-alsa     disable ALSA audio support"
 echo "  --disable-audio-arts     disable aRts audio support"
 echo "  --disable-audio-jack     disable JACK audio support"
 echo "  --disable-dvd            disable native DVD playback"
+echo "  --disable-frontend       disable frontend [breaks dependency checking]"
+echo "  --disable-backend        disable backend  [breaks dependency checking]"
 #echo "  --disable-audio-beos     disable BeOS audio support [default=no]"
-#echo "  --disable-v4l            disable video4linux grabbing [default=no]"
 #echo "  --disable-dv1394         disable DV1394 grabbing [default=no]"
 #echo "  --disable-network        disable network support [default=no]"
 #echo "  --disable-zlib           disable zlib [default=no]"
@@ -153,7 +157,8 @@ echo "  --disable-dvd            disable native DVD playback"
 echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
 echo "  --disable-joystick-menu  disable joystick menu"
 echo "  --disable-firewire       disable support for FireWire cable boxes"
-echo "  --disable-ivtv           disable ivtv support (PVR-250, PVR-350)"
+echo "  --disable-v4l            disable Video4Linux support"
+echo "  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support"
 #echo "  --enable-ivtv-sys-header use ivtv system headers instead of myth headers"
 echo "  --enable-dvb             enable DVB support (must supply header directory)"
 echo "  --dvb-path=HDRLOC        location of directory containing"
@@ -274,7 +279,6 @@ case "$cpu" in
 esac
 
 gprof="no"
-v4l="yes"
 audio_beos="no"
 dv1394="no"
 dc1394="no"
@@ -395,13 +399,14 @@ LDFLAGS="$LDFLAGS -export-dynamic -pthread"
 extralibs="$extralibs -lossaudio"
 ;;
 FreeBSD)
-v4l="no"
 joystick_menu="no"
 dv1394="no"
 make="gmake"
 CFLAGS="-pthread"
 LDFLAGS="$LDFLAGS -export-dynamic -pthread"
-CCONFIG="$CCONFIG freebsd backend"
+CCONFIG="$CCONFIG freebsd"
+backend="yes"
+v4l="yes"
 ;;
 BSD/OS)
 v4l="no"
@@ -453,7 +458,9 @@ CONFIG_DEFINES="$CONFIG_DEFINES _WIN32"
 ;;
 Linux)
 LDFLAGS="$LDFLAGS -rdynamic"
-CCONFIG="$CCONFIG linux backend"
+CCONFIG="$CCONFIG linux"
+backend="yes"
+v4l="yes"
 ;;
 IRIX*)
 ranlib="echo ignoring ranlib"
@@ -571,6 +578,8 @@ for opt do
   --disable-altivec) altivec="no"
   ;;
   --enable-gprof) gprof="yes"
+  ;;
+  --enable-v4l) v4l="yes"
   ;;
   --disable-v4l) v4l="no"
   ;;
@@ -730,8 +739,20 @@ for opt do
   ;;
   --disable-dvd) dvd="no"
   ;;
+  --enable-frontend) frontend="yes"
+  ;;
+  --disable-frontend) frontend="no"
+  ;;
+  --enable-backend) backend="yes"
+  ;;
+  --disable-backend) backend="no"
+  ;;
   esac
 done
+
+if test x"$v4l" = x"no" ; then
+  ivtv="no"
+fi
 
 has_library()
 {
@@ -1909,34 +1930,44 @@ fi
 #echo "License: GPL"
 #fi
 echo
-echo "# Input Support"
-echo "Joystick menu    $joystick_menu"
-echo "lirc support     $lirc"
-echo "ivtv support     $ivtv"
-if test x"$ivtv_header" = x"yes" ; then
-echo "ivtv sys headers $ivtv_header"
+if test x"$frontend" = x"yes" ; then
+  echo "# Input Support"
+  echo "Joystick menu    $joystick_menu"
+  echo "lirc support     $lirc"
 fi
-echo "FireWire support $firewire_cable_box"
-echo "DVB support      $dvb [$dvb_path]"
-echo
-echo "# Sound Output Support"
-echo "OSS support      $audio_oss"
-echo "ALSA support     $audio_alsa"
-echo "aRts support     $audio_arts"
-echo "JACK support     $audio_jack"
-echo
-echo "# Video Output Support"
-echo "x11 support      $x11"
-echo "xrandr support   $xrandr"
-echo "xv support       $xv"
-echo "XvMC support     $xvmc"
-echo "XvMC VLD support $xvmc_vld"
-echo "OpenGL vsync     $opengl_vsync"
-echo "DirectFB         $direct_fb"
-if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
-echo "DirectX          $direct_x"
+
+if test x"$backend" = x"yes" ; then
+  echo "Video4Linux sup. $v4l"
+  echo "ivtv support     $ivtv"
+  if test x"$ivtv_header" = x"yes" ; then
+    echo "ivtv sys headers $ivtv_header"
+  fi
+  echo "FireWire support $firewire_cable_box"
+  echo "DVB support      $dvb [$dvb_path]"
+fi
+
+if test x"$frontend" = x"yes" ; then
+  echo
+  echo "# Sound Output Support"
+  echo "OSS support      $audio_oss"
+  echo "ALSA support     $audio_alsa"
+  echo "aRts support     $audio_arts"
+  echo "JACK support     $audio_jack"
+  echo
+  echo "# Video Output Support"
+  echo "x11 support      $x11"
+  echo "xrandr support   $xrandr"
+  echo "xv support       $xv"
+  echo "XvMC support     $xvmc"
+  echo "XvMC VLD support $xvmc_vld"
+  echo "OpenGL vsync     $opengl_vsync"
+  echo "DirectFB         $direct_fb"
+  if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
+  echo "DirectX          $direct_x"
 fi
 echo
+fi
+
 echo "# Misc Features"
 echo "DVD playback     $dvd"
 echo
@@ -2158,6 +2189,7 @@ if test "$mpegaudio_hp" = "yes" ; then
 fi
 
 if test "$v4l" = "yes" ; then
+  CCONFIG="$CCONFIG using_v4l"
   echo "#define CONFIG_VIDEO4LINUX 1" >> $TMPH
   echo "CONFIG_VIDEO4LINUX=yes" >> $MYTH_CONFIG_MAK
 fi
@@ -2494,6 +2526,14 @@ fi
 if test x"$opengl_vsync" = x"yes" ; then
   CCONFIG="$CCONFIG using_opengl_vsync"
   echo "CONFIG_OPENGL_VSYNC_LIBS=$CONFIG_OPENGL_VSYNC_LIBS" >> $MYTH_CONFIG_MAK
+fi
+
+if test x"$frontend" = x"yes" ; then
+  CCONFIG="$CCONFIG using_frontend"
+fi
+
+if test x"$backend" = x"yes" ; then
+  CCONFIG="$CCONFIG using_backend"
 fi
 
 if test x"$CCONFIG" != x"" ; then

@@ -179,6 +179,7 @@ bool TVRec::Init(void)
     }
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
+#ifdef USING_V4L
         Channel *achannel = new Channel(this, videodev);
         channel = achannel; // here for SetFormat()->RetrieveInputChannels()
         channel->Open();
@@ -190,6 +191,7 @@ bool TVRec::Init(void)
             channel->SwitchToInput(inputname, startchannel);
         channel->SetChannelOrdering(chanorder);
         channel->Close();
+#endif
     }
 
     transcodeFirst    =
@@ -775,6 +777,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     }
     else if (cardtype == "HDTV")
     {
+#ifdef USING_V4L
         rbuffer->SetWriteBufferSize(4*1024*1024);
         recorder = new HDTVRecorder();
         recorder->SetRingBuffer(rbuffer);
@@ -782,6 +785,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
         recorder->Initialize();
+#endif // USING_V4L
     }
     else if (cardtype == "FIREWIRE")
     {
@@ -826,6 +830,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     }
     else
     {
+#ifdef USING_V4L
         // V4L/MJPEG/GO7007 from here on
 
         recorder = new NuppelVideoRecorder(channel);
@@ -836,6 +841,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
  
         recorder->Initialize();
+#endif // USING_V4L
     }
 
     if (recorder->IsErrored())
@@ -975,6 +981,13 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
                            int secondsin, int &bufferlen,
                            int &video_width, int &video_height)
 {
+    (void) pginfo;
+    (void) filename;
+    (void) secondsin;
+    (void) bufferlen;
+    (void) video_width;
+    (void) video_height;
+#ifdef USING_FRONTEND
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
 
     if (!MSqlQuery::testDBConnection())
@@ -992,6 +1005,11 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
     delete tmprbuf;
 
     return retbuf;
+#else // USING_FRONTEND
+    VERBOSE(VB_IMPORTANT, "You must compile the frontend "
+            "to use TVRec::GetScreenGrab");
+    return NULL;
+#endif // USING_FRONTEND
 }
 
 /** \fn TVRec::SetChannel(bool)
@@ -1066,6 +1084,7 @@ void *TVRec::RecorderThread(void *param)
  */
 void *TVRec::ScannerThread(void *param)
 {
+    (void) param;
 #ifdef USING_DVB
     SIScan *scanner = (SIScan *)param;
     scanner->StartScanner();

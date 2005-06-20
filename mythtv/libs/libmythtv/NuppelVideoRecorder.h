@@ -1,13 +1,10 @@
 #ifndef NUPPELVIDEORECORDER
 #define NUPPELVIDEORECORDER
 
-#include <qstring.h>
-#include <qmap.h>
-#include <vector>
+// C headers
 #include <sys/time.h>
 #include <time.h>
 #include <pthread.h>
-
 #ifdef MMX
 #undef MMX
 #define MMXBLAH
@@ -17,17 +14,22 @@
 #define MMX
 #endif
 
-#include "recorderbase.h"
-
-#include "minilzo.h"
-#include "format.h"
-
-extern "C" {
-#include "../libavcodec/avcodec.h"
 #include "filter.h"
-}
+#include "minilzo.h"
+#undef HAVE_AV_CONFIG_H
+#include "../libavcodec/avcodec.h"
 
+// C++ std headers
+#include <vector>
 using namespace std;
+
+// Qt headers
+#include <qstring.h>
+#include <qmap.h>
+
+// MythTV headers
+#include "recorderbase.h"
+#include "format.h"
 
 struct video_audio;
 struct VBIData;

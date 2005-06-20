@@ -13,6 +13,7 @@
 #include <X11/extensions/Xv.h>
 #include <X11/extensions/Xvlib.h>
 
+#undef HAVE_AV_CONFIG_H
 #include "../libavcodec/avcodec.h"
 
 #ifdef USING_XVMC

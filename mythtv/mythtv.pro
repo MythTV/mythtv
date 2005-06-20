@@ -10,4 +10,8 @@ CONFIG += ordered
 }
 
 # Directories
-SUBDIRS += libs filters programs themes setup i18n
+SUBDIRS += libs filters programs themes i18n
+
+mythfrontend {
+    SUBDIRS += setup
+}

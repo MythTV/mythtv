@@ -27,8 +27,6 @@
 #include "util-x11.h"
 
 extern "C" {
-#include "../libavcodec/avcodec.h"
-
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
 #include <X11/extensions/Xinerama.h>

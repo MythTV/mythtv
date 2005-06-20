@@ -286,6 +286,10 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
                                               const QString &pwd,
                                               int _source) 
 {
+    (void) uid;
+    (void) pwd;
+    (void) _source;
+#ifdef USING_BACKEND
     if (uid.isEmpty() || pwd.isEmpty())
         return;
 
@@ -322,6 +326,10 @@ void DataDirectLineupSelector::fillSelections(const QString &uid,
 
     pdlg.setProgress(2);
     pdlg.Close();
+#else // USING_BACKEND
+    VERBOSE(VB_IMPORTANT, "You must compile the backend "
+            "to set up a DataDirect line-up");
+#endif // USING_BACKEND
 }
 
 void DataDirect_config::load() 
@@ -1871,6 +1879,7 @@ QValueList<DVBDiseqcInputList> VideoDevice::fillDVBInputsDiseqc(int dvb_diseqc_t
 }
 
 QStringList VideoDevice::probeInputs(QString device) {
+    (void) device;
     QStringList ret;
 
 #if defined(CONFIG_VIDEO4LINUX)

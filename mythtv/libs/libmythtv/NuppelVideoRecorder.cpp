@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "config.h"
+#include "mythconfig.h"
 #ifndef CONFIG_DARWIN
     #include <sys/soundcard.h>
 #endif
@@ -47,7 +47,11 @@ extern "C" {
 
 #include "programinfo.h"
 
+#ifdef USING_FRONTEND
 extern pthread_mutex_t avcodeclock;
+#else
+pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
                    : RecorderBase()

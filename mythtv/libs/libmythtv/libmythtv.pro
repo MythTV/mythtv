@@ -29,90 +29,11 @@ TARGETDEPS += ../libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHL
 TARGETDEPS += ../libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libmythmpeg2/libmythmpeg2-$${LIBVERSION}.$${QMAKE_EXTENSION_LIB}
 
-QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
-QMAKE_CFLAGS_DEBUG = -g -DHAVE_AV_CONFIG_H -I.. -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE
-
+DEFINES += _LARGEFILE_SOURCE
 QMAKE_CXXFLAGS_RELEASE += `freetype-config --cflags`
 QMAKE_CXXFLAGS_DEBUG += `freetype-config --cflags`
 
-# old libvbitext
-
-!win32 {
-    HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h 
-    HEADERS += vbitext/vbi.h vbitext/vt.h
-    SOURCES += vbitext/cc.cpp vbitext/vbi.c vbitext/hamm.c vbitext/lang.c
-}
-
-# libmythtv proper
-
-HEADERS += filter.h format.h frame.h frequencies.h 
-HEADERS += guidegrid.h infostructs.h jitterometer.h lzoconf.h #infodialog.h
-HEADERS += minilzo.h NuppelVideoPlayer.h NuppelVideoRecorder.h osd.h 
-HEADERS += osdtypes.h programinfo.h profilegroup.h recordingprofile.h 
-HEADERS += remoteencoder.h remoteutil.h RingBuffer.h scheduledrecording.h 
-HEADERS += RTjpegN.h ttfont.h tv_play.h tv_rec.h videosource.h yuv2rgb.h
-HEADERS += progfind.h decoderbase.h nuppeldecoder.h avformatdecoder.h
-HEADERS += recorderbase.h channelbase.h vsync.h proglist.h hdtvrecorder.h 
-HEADERS += fifowriter.h filtermanager.h videooutbase.h videoout_null.h xbox.h
-HEADERS += dbcheck.h udpnotify.h channeleditor.h channelsettings.h
-HEADERS += osdlistbtntype.h blend.h datadirect.h sr_dialog.h
-HEADERS += sr_items.h sr_root.h recordingtypes.h jobqueue.h dtvrecorder.h
-HEADERS += videobuffers.h 
-HEADERS += signalmonitorvalue.h
-HEADERS += scanwizard.h scanwizardhelpers.h analogscan.h
-
-SOURCES += frequencies.c guidegrid.cpp #infodialog.cpp 
-SOURCES += infostructs.cpp jitterometer.cpp minilzo.cpp NuppelVideoPlayer.cpp 
-SOURCES += osd.cpp osdtypes.cpp programinfo.cpp recordingprofile.cpp 
-SOURCES += remoteencoder.cpp remoteutil.cpp RingBuffer.cpp RTjpegN.cpp 
-SOURCES += scheduledrecording.cpp ttfont.cpp tv_play.cpp videosource.cpp 
-SOURCES += yuv2rgb.cpp progfind.cpp nuppeldecoder.cpp avformatdecoder.cpp 
-SOURCES += recorderbase.cpp filtermanager.cpp vsync.cpp proglist.cpp videooutbase.cpp 
-SOURCES += videoout_null.cpp xbox.cpp dbcheck.cpp profilegroup.cpp
-SOURCES += udpnotify.cpp channeleditor.cpp channelsettings.cpp
-SOURCES += osdsurface.cpp osdlistbtntype.cpp blend.c datadirect.cpp
-SOURCES += sr_dialog.cpp sr_root.cpp sr_items.cpp decoderbase.cpp
-SOURCES += recordingtypes.cpp jobqueue.cpp dtvrecorder.cpp
-SOURCES += videobuffers.cpp
-SOURCES += signalmonitorvalue.cpp
-SOURCES += scanwizard.cpp scanwizardhelpers.cpp analogscan.cpp
-
-
-unix {
-    # The backend uses these, but the frontend doesn't.
-    # Comment out for a faster frontend-only build!
-    HEADERS += channel.h
-    HEADERS += signalmonitor.h             dtvsignalmonitor.h
-    HEADERS += pchdtvsignalmonitor.h
-
-    HEADERS += mpeg/tspacket.h             mpeg/pespacket.h
-    HEADERS += mpeg/mpegtables.h           mpeg/atsctables.h
-    HEADERS += mpeg/dvbtables.h
-    HEADERS += mpeg/mpegstreamdata.h       mpeg/atscstreamdata.h
-    HEADERS += mpeg/dvbstreamdata.h        mpeg/scanstreamdata.h
-    HEADERS += mpeg/mpegdescriptors.h      mpeg/atscdescriptors.h
-    HEADERS += mpeg/dvbdescriptors.h
-    HEADERS += mpeg/tsstats.h 
-
-    SOURCES += channel.cpp                 channelbase.cpp
-    SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
-    SOURCES += pchdtvsignalmonitor.cpp
-    SOURCES += NuppelVideoRecorder.cpp     tv_rec.cpp
-    SOURCES += hdtvrecorder.cpp            fifowriter.cpp
-
-    SOURCES += mpeg/tspacket.cpp           mpeg/pespacket.cpp
-    SOURCES += mpeg/mpegtables.cpp         mpeg/atsctables.cpp
-    SOURCES += mpeg/dvbtables.cpp
-    SOURCES += mpeg/mpegstreamdata.cpp     mpeg/atscstreamdata.cpp
-    SOURCES += mpeg/dvbstreamdata.cpp      mpeg/scanstreamdata.cpp
-    SOURCES += mpeg/mpegdescriptors.cpp    mpeg/atscdescriptors.cpp
-    SOURCES += mpeg/dvbdescriptors.cpp     mpeg/atscdescriptorsmap.cpp
-}
-
 macx {
-    SOURCES += videoout_quartz.cpp
-    HEADERS += videoout_quartz.h
-
     # Mac OS X Frameworks
     FWKS = ApplicationServices Carbon QuickTime
 
@@ -126,65 +47,234 @@ macx {
     QMAKE_LFLAGS_SHLIB += -seg1addr 0xC9000000
 }
 
-using_x11 {
+# Enable Linux Open Sound System support
+using_oss:DEFINES += USING_OSS
+
+# old libvbitext (Caption decoder)
+!win32 {
+    HEADERS += vbitext/cc.h vbitext/dllist.h vbitext/hamm.h vbitext/lang.h 
+    HEADERS += vbitext/vbi.h vbitext/vt.h
+    SOURCES += vbitext/cc.cpp vbitext/vbi.c vbitext/hamm.c vbitext/lang.c
+}
+
+# mmx macros from avlib
+contains( TARGET_MMX, yes ) {
+    HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
+}
+
+##########################################################################
+# libmythtv proper
+
+# Headers needed by frontend & backend
+HEADERS += filter.h                 format.h
+HEADERS += frame.h
+
+# LZO / RTjpegN, used by NuppelDecoder & NuppelVideoRecorder
+HEADERS += lzoconf.h
+HEADERS += minilzo.h                RTjpegN.h
+SOURCES += minilzo.cpp              RTjpegN.cpp
+
+# Misc. needed by backend/frontend
+HEADERS += programinfo.h            proglist.h
+HEADERS += dbcheck.h                RingBuffer.h
+HEADERS += remoteutil.h             tv.h
+HEADERS += recordingtypes.h         jobqueue.h
+HEADERS += filtermanager.h          recordingprofile.h
+HEADERS += remoteencoder.h          videosource.h
+HEADERS += scheduledrecording.h
+SOURCES += programinfo.cpp          proglist.cpp
+SOURCES += dbcheck.cpp              RingBuffer.cpp
+SOURCES += remoteutil.cpp           tv.cpp
+SOURCES += recordingtypes.cpp       jobqueue.cpp
+SOURCES += filtermanager.cpp        recordingprofile.cpp
+SOURCES += remoteencoder.cpp        videosource.cpp
+SOURCES += scheduledrecording.cpp
+
+using_frontend {
+    # Recording profile stuff
+    HEADERS += profilegroup.h
+    SOURCES += profilegroup.cpp
+
+    # Scheduled Recording Dialog stuff
+    HEADERS += sr_dialog.h              sr_root.h
+    HEADERS += sr_items.h
+    SOURCES += sr_dialog.cpp            sr_root.cpp
+    SOURCES += sr_items.cpp
+
+    # XBox LED control
+    HEADERS += xbox.h
+    SOURCES += xbox.cpp
+
+    # Video playback
+    HEADERS += tv_play.h                NuppelVideoPlayer.h
+    SOURCES += tv_play.cpp              NuppelVideoPlayer.cpp
+
+    # A/V decoders
+    HEADERS += decoderbase.h
+    HEADERS += nuppeldecoder.h          avformatdecoder.h
+    SOURCES += decoderbase.cpp
+    SOURCES += nuppeldecoder.cpp        avformatdecoder.cpp 
+
+    using_ivtv:HEADERS += ivtvdecoder.h
+    using_ivtv:SOURCES += ivtvdecoder.cpp
+
+    # On screen display (video output overlay)
+    HEADERS += osd.h                    osdtypes.h
+    HEADERS += osdsurface.h             osdlistbtntype.h
+    HEADERS += udpnotify.h 
+    SOURCES += osd.cpp                  osdtypes.cpp
+    SOURCES += osdsurface.cpp           osdlistbtntype.cpp
+    SOURCES += udpnotify.cpp 
+
+    # Video output
+    HEADERS += videooutbase.h           videoout_null.h
+    HEADERS += videobuffers.h           vsync.h
+    HEADERS += jitterometer.h           yuv2rgb.h
+    SOURCES += videooutbase.cpp         videoout_null.cpp
+    SOURCES += videobuffers.cpp         vsync.cpp
+    SOURCES += jitterometer.cpp         yuv2rgb.cpp
+
+    using_opengl_vsync:CONFIG +=  opengl
+    using_opengl_vsync:DEFINES += USING_OPENGL_VSYNC
+
+    macx:HEADERS +=               videoout_quartz.h
+    macx:SOURCES +=               videoout_quartz.cpp
+
+    using_directfb:HEADERS +=     videoout_directfb.h
+    using_directfb:SOURCES +=     videoout_directfb.cpp
+    using_directfb:DEFINES +=     USING_DIRECTFB
+
+    using_directx:HEADERS +=      videoout_dx.h
+    using_directx:SOURCES +=      videoout_dx.cpp
+
+    using_ivtv:HEADERS +=         videoout_ivtv.h
+    using_ivtv:SOURCES +=         videoout_ivtv.cpp
+
+    using_xv:HEADERS += videoout_xv.h   XvMCSurfaceTypes.h   osdxvmc.h
+    using_xv:SOURCES += videoout_xv.cpp XvMCSurfaceTypes.cpp osdxvmc.cpp
+    using_xv:DEFINES += USING_XV
+
     using_xvmc:DEFINES += USING_XVMC
     using_xvmcw:DEFINES += USING_XVMCW
     using_xvmc_vld:DEFINES += USING_XVMC_VLD
 
-    using_xv {
-        SOURCES += videoout_xv.cpp XvMCSurfaceTypes.cpp osdxvmc.cpp
-        HEADERS += videoout_xv.h XvMCSurfaceTypes.h osdxvmc.h
-        DEFINES += USING_XV
+    # Misc. frontend
+    HEADERS += channeleditor.h          channelsettings.h
+    HEADERS += guidegrid.h              infostructs.h
+    HEADERS += progfind.h               ttfont.h
+    SOURCES += channeleditor.cpp        channelsettings.cpp
+    SOURCES += guidegrid.cpp            infostructs.cpp
+    SOURCES += progfind.cpp             ttfont.cpp
+
+    # C stuff
+    HEADERS += blend.h
+    SOURCES += blend.c
+
+    DEFINES += USING_FRONTEND
+}
+
+using_backend {
+    # Channel stuff
+    HEADERS += channelbase.h               signalmonitorvalue.h 
+    HEADERS += signalmonitor.h             dtvsignalmonitor.h
+    SOURCES += channelbase.cpp             signalmonitorvalue.cpp
+    SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
+
+    # Channel scanner stuff
+    HEADERS += scanwizard.h                scanwizardhelpers.h
+    HEADERS += analogscan.h
+    SOURCES += scanwizard.cpp              scanwizardhelpers.cpp
+    SOURCES += analogscan.cpp
+
+    # TVRec & Recorder base classes
+    HEADERS += tv_rec.h
+    HEADERS += recorderbase.h              dtvrecorder.h
+    SOURCES += tv_rec.cpp
+    SOURCES += recorderbase.cpp            dtvrecorder.cpp
+
+    # MPEG parsing stuff
+    HEADERS += mpeg/tspacket.h             mpeg/pespacket.h
+    HEADERS += mpeg/mpegtables.h           mpeg/atsctables.h
+    HEADERS += mpeg/dvbtables.h
+    HEADERS += mpeg/mpegstreamdata.h       mpeg/atscstreamdata.h
+    HEADERS += mpeg/dvbstreamdata.h        mpeg/scanstreamdata.h
+    HEADERS += mpeg/mpegdescriptors.h      mpeg/atscdescriptors.h
+    HEADERS += mpeg/dvbdescriptors.h
+    HEADERS += mpeg/tsstats.h 
+    SOURCES += mpeg/tspacket.cpp           mpeg/pespacket.cpp
+    SOURCES += mpeg/mpegtables.cpp         mpeg/atsctables.cpp
+    SOURCES += mpeg/dvbtables.cpp
+    SOURCES += mpeg/mpegstreamdata.cpp     mpeg/atscstreamdata.cpp
+    SOURCES += mpeg/dvbstreamdata.cpp      mpeg/scanstreamdata.cpp
+    SOURCES += mpeg/mpegdescriptors.cpp    mpeg/atscdescriptors.cpp
+    SOURCES += mpeg/dvbdescriptors.cpp     mpeg/atscdescriptorsmap.cpp
+
+    # Listings downloading classes
+    HEADERS += datadirect.h
+    SOURCES += datadirect.cpp
+
+    # Simple NuppelVideo Recorder
+    HEADERS += NuppelVideoRecorder.h       fifowriter.h
+    SOURCES += NuppelVideoRecorder.cpp     fifowriter.cpp
+
+    # Support for Video4Linux devices
+    using_v4l {
+        HEADERS += channel.h                   pchdtvsignalmonitor.h
+        HEADERS += hdtvrecorder.h 
+        SOURCES += channel.cpp                 pchdtvsignalmonitor.cpp
+        SOURCES += hdtvrecorder.cpp
+
+        DEFINES += USING_V4L
     }
-}
 
-using_ivtv {
-    DEFINES += USING_IVTV
-    SOURCES += mpegrecorder.cpp ivtvdecoder.cpp videoout_ivtv.cpp
-    HEADERS += mpegrecorder.h ivtvdecoder.h videoout_ivtv.h
-}
-using_ivtv_header:DEFINES += USING_IVTV_HEADER
+    # Support for cable boxes that provide Firewire out on Linux
+    using_firewire:HEADERS += firewirerecorder.h   firewirechannel.h
+    using_firewire:SOURCES += firewirerecorder.cpp firewirechannel.cpp
+    using_firewire:DEFINES += USING_FIREWIRE
 
-using_dvb {
-    DEFINES += USING_DVB
-    using_dvb_eit:DEFINES += USING_DVB_EIT
-    SOURCES += dvbrecorder.cpp dvbchannel.cpp dvbdiseqc.cpp dvbcam.cpp
-    SOURCES += dvbtransporteditor.cpp dvbsiparser.cpp siparser.cpp siscan.cpp
-    SOURCES += dvbsignalmonitor.cpp sitypes.cpp dvbtypes.cpp dvbconfparser.cpp
-    SOURCES += dvbdev/dvbdev.c dvbdev/transform.c dvbdev/ringbuffy.c 
-    SOURCES += dvbdev/dvbci.cpp
+    # Support for PVR-150/250/350/500, etc. on Linux
+    using_ivtv:HEADERS += mpegrecorder.h
+    using_ivtv:SOURCES += mpegrecorder.cpp
+    using_ivtv:DEFINES += USING_IVTV
+    using_ivtv_header:DEFINES += USING_IVTV_HEADER
 
-    HEADERS += dvbtypes.h dvbrecorder.h dvbchannel.h dvbdiseqc.h dvbcam.h
-    HEADERS += dvbtransporteditor.h dvbsiparser.h siparser.h siscan.h
-    HEADERS += dvbsignalmonitor.h sitypes.h dvbconfparser.h
-    HEADERS += dvbdev/dvbdev.h dvbdev/transform.h dvbdev/ringbuffy.h 
-    HEADERS += dvbdev/dvbci.h
-}
+    # Support for Linux DVB drivers
+    using_dvb {
+        # C files
+        HEADERS += dvbdev/dvbdev.h   dvbdev/transform.h   dvbdev/ringbuffy.h
+        SOURCES += dvbdev/dvbdev.c   dvbdev/transform.c   dvbdev/ringbuffy.c
 
-using_firewire {
-    DEFINES += USING_FIREWIRE
-    SOURCES += firewirerecorder.cpp firewirechannel.cpp
-    HEADERS += firewirerecorder.h firewirechannel.h
-}
+        # Basic DVB types
+        HEADERS += sitypes.h              dvbtypes.h
+        SOURCES += sitypes.cpp            dvbtypes.cpp
 
-using_directfb {
-    SOURCES += videoout_directfb.cpp
-    HEADERS += videoout_directfb.h
-    DEFINES += USING_DIRECTFB
-}
+        # Section/Table/Descriptor parsers
+        HEADERS += siparser.h             dvbsiparser.h
+        SOURCES += siparser.cpp           dvbsiparser.cpp
 
-using_directx {
-    SOURCES += videoout_dx.cpp
-    HEADERS += videoout_dx.h
-}
+        # Channel stuff
+        HEADERS += dvbchannel.h           dvbsignalmonitor.h
+        HEADERS += dvbdiseqc.h            dvbcam.h
+        HEADERS += siscan.h
+        SOURCES += dvbchannel.cpp         dvbsignalmonitor.cpp
+        SOURCES += dvbdiseqc.cpp          dvbcam.cpp
+        SOURCES += siscan.cpp
 
-using_opengl_vsync {
-    CONFIG += opengl
-    DEFINES += USING_OPENGL_VSYNC
-}
+        # DVB Recorder
+        HEADERS += dvbrecorder.h
+        SOURCES += dvbrecorder.cpp
 
-using_oss:DEFINES += USING_OSS
+        # Misc
+        HEADERS += dvbtransporteditor.h   dvbconfparser.h   dvbdev/dvbci.h
+        SOURCES += dvbtransporteditor.cpp dvbconfparser.cpp dvbdev/dvbci.cpp
 
-contains( TARGET_MMX, yes ) {
-    HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
+        DEFINES += USING_DVB
+        using_dvb_eit:DEFINES += USING_DVB_EIT
+    }
+
+    # C stuff
+    HEADERS += frequencies.h
+    SOURCES += frequencies.c
+
+    DEFINES += USING_BACKEND
 }

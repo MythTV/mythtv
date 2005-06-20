@@ -39,12 +39,15 @@ void ALRMhandler(int /*sig*/)
 
 bool SignalMonitor::IsSupported(QString cardtype)
 {
+    (void) cardtype;
 #ifdef USING_DVB
     if (cardtype.upper() == "DVB")
         return true;
 #endif
+#ifdef USING_V4L
     if (cardtype.upper() == "HDTV")
         return true;
+#endif
 
     return false;
 }
@@ -52,23 +55,29 @@ bool SignalMonitor::IsSupported(QString cardtype)
 SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
                                    ChannelBase *channel)
 {
+    (void) cardtype;
+    (void) db_cardnum;
+    (void) channel;
+
     SignalMonitor *signalMonitor = NULL;
 
+#ifdef USING_DVB
     if (cardtype.upper() == "DVB")
     {
-#ifdef USING_DVB
         DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
         if (dvbc)
             signalMonitor = new DVBSignalMonitor(db_cardnum, dvbc);
-#endif
     }
+#endif
 
+#ifdef USING_V4L
     if (cardtype.upper() == "HDTV")
     {
         Channel *hdtvc = dynamic_cast<Channel*>(channel);
         if (hdtvc)
             signalMonitor = new pcHDTVSignalMonitor(db_cardnum, hdtvc);
     }
+#endif
 
     return signalMonitor;
 }
