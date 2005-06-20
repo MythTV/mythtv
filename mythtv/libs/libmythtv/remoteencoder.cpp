@@ -117,6 +117,12 @@ ProgramInfo *RemoteEncoder::GetRecording(void)
     return proginfo;
 }
 
+/** \fn RemoteEncoder::GetFramerate()
+ *  \brief Returns recordering frame rate set by nvr.
+ *  \sa TVRec::GetFramerate(), EncoderLink::GetFramerate(void),
+ *      RecorderBase::GetFrameRate()
+ *  \return Frames per second if query succeeds -1 otherwise.
+ */
 float RemoteEncoder::GetFrameRate(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -128,6 +134,13 @@ float RemoteEncoder::GetFrameRate(void)
     return retval;
 }
 
+/** \fn RemoteEncoder::GetFramesWritten()
+ *  \brief Returns number of frames written to disk by TVRec's RecorderBase
+ *         instance.
+ *
+ *  \sa TVRec::GetFramesWritten(), EncoderLink::GetFramesWritten()
+ *  \return Number of frames if query succeeds, -1 otherwise.
+ */
 long long RemoteEncoder::GetFramesWritten(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -140,6 +153,12 @@ long long RemoteEncoder::GetFramesWritten(void)
     return retval;
 }
 
+/** \fn RemoteEncoder::GetFilePosition()
+ *  \brief Returns total number of bytes written by TVRec's RingBuffer.
+ *
+ *  \sa TVRec::GetFilePosition(), EncoderLink::GetFilePosition()
+ *  \return Bytes written if query succeeds, -1 otherwise.
+ */
 long long RemoteEncoder::GetFilePosition(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -152,6 +171,17 @@ long long RemoteEncoder::GetFilePosition(void)
     return retval;
 }
 
+/** \fn TVRec::GetFreeSpace(long long)
+ *  \brief Returns number of bytes beyond "totalreadpos" it is safe to read.
+ *
+ *  Note: This may return a negative number, including -1 if the call
+ *  succeeds. This means totalreadpos is past the "safe read" portion of
+ *  the file.
+ *
+ *  \sa TVRec::GetFreeSpace(long long), EncoderLink::GetFreeSpace(long long)
+ *  \return Returns number of bytes ahead of totalreadpos it is safe to read
+ *          if call succeeds, -1 otherwise.
+ */
 long long RemoteEncoder::GetFreeSpace(long long totalreadpos)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -165,6 +195,10 @@ long long RemoteEncoder::GetFreeSpace(long long totalreadpos)
     return retval;
 }
 
+/** \fn TVRec::GetMaxBitrate()
+ *   Returns the maximum bits per second this recorder can produce.
+ *  \sa TVRec::GetMaxBitrate(), EncoderLink::GetMaxBitrate()
+ */
 long long RemoteEncoder::GetMaxBitrate()
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -177,6 +211,13 @@ long long RemoteEncoder::GetMaxBitrate()
     return retval;
 }
 
+/** \fn RemoteEncoder::GetKeyframePosition(long long)
+ *  \brief Returns byte position in RingBuffer of a keyframe.
+ *
+ *  \sa TVRec::GetKeyframePosition(long long),
+ *      EncoderLink::GetKeyframePosition(long long)
+ *  \return Byte position of keyframe if query succeeds, -1 otherwise.
+ */
 long long RemoteEncoder::GetKeyframePosition(long long desired)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -232,6 +273,10 @@ void RemoteEncoder::FrontendReady(void)
     SendReceiveStringList(strlist);
 }
 
+/** \fn RemoteEncoder::StopPlaying()
+ *  \brief Tells TVRec to stop streaming a recording to the frontend.
+ *  \sa TVRec::StopPlaying(), EncoderLink::StopPlaying()
+ */
 void RemoteEncoder::StopPlaying(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -240,6 +285,19 @@ void RemoteEncoder::StopPlaying(void)
     SendReceiveStringList(strlist);
 }
 
+/** \fn RemoteEncoder::SetupRingBuffer(QString&,long long&,long long&,bool)
+ *  \brief Sets up TVRec's RingBuffer for "Live TV" playback.
+ *
+ *  \sa TVRec::SetupRingBuffer(QString&,long long&,long long&,bool),
+ *      EncoderLink::SetupRingBuffer(QString&,long long&,long long&,bool),
+ *      StopLiveTV()
+ *
+ *  \param path Returns path to recording.
+ *  \param filesize Returns size of recording file in bytes.
+ *  \param fillamount Returns the maximum buffer fill in bytes.
+ *  \param pip Tells TVRec's RingBuffer that this is for a Picture in Picture display.
+ *  \return true if successful, false otherwise.
+ */
 bool RemoteEncoder::SetupRingBuffer(QString &path, long long &filesize,
                                     long long &fillamount, bool pip)
 {
@@ -257,6 +315,10 @@ bool RemoteEncoder::SetupRingBuffer(QString &path, long long &filesize,
     return ok;
 }
 
+/** \fn TVRec::SpawnLiveTV()
+ *  \brief Tells TVRec to Spawn a "Live TV" recorder.
+ *  \sa TVRec::SpawnLiveTV(), EncoderLink::SpawnLiveTV()
+ */
 void RemoteEncoder::SpawnLiveTV(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -265,6 +327,11 @@ void RemoteEncoder::SpawnLiveTV(void)
     SendReceiveStringList(strlist);
 }
 
+/** \fn EncoderLink::StopLiveTV()
+ *  \brief Tells TVRec to stop a "Live TV" recorder.
+ *         <b>This only works on local recorders.</b>
+ *  \sa TVRec::StopLiveTV(), EncoderLink::StopLiveTV()
+ */
 void RemoteEncoder::StopLiveTV(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -273,6 +340,9 @@ void RemoteEncoder::StopLiveTV(void)
     SendReceiveStringList(strlist);
 }
 
+/** \fn RemoteEncoder::Pause()
+ *  \brief Tells TVRec to pause a recorder, used for channel and input changes.
+ */
 void RemoteEncoder::Pause(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -329,6 +399,13 @@ void RemoteEncoder::SetChannel(QString channel)
     lastchannel = "";
 }
 
+/** \fn RemoteEncoder::ChangeContrast(bool)
+ *  \brief Changes contrast of a recording.
+ *
+ *  Note: In practice this only works with frame grabbing recorders.
+ *
+ *  \return contrast if it succeeds, -1 otherwise.
+ */
 int RemoteEncoder::ChangeContrast(bool direction)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -341,6 +418,13 @@ int RemoteEncoder::ChangeContrast(bool direction)
     return retval;
 }
 
+/** \fn RemoteEncoder::ChangeBrightness(bool)
+ *  \brief Changes the brightness of a recording.
+ *
+ *   Note: In practice this only works with frame grabbing recorders.
+ *
+ *  \return brightness if it succeeds, -1 otherwise.
+ */
 int RemoteEncoder::ChangeBrightness(bool direction)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -353,6 +437,13 @@ int RemoteEncoder::ChangeBrightness(bool direction)
     return retval;
 }
 
+/** \fn RemoteEncoder::ChangeColour(bool)
+ *  \brief Changes the colour phase of a recording.
+ *
+ *   Note: In practice this only works with frame grabbing recorders.
+ *
+ *  \return colour if it succeeds, -1 otherwise.
+ */
 int RemoteEncoder::ChangeColour(bool direction)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -365,6 +456,13 @@ int RemoteEncoder::ChangeColour(bool direction)
     return retval;
 }
 
+/** \fn RemoteEncoder::ChangeHue(bool)
+ *  \brief Changes the hue of a recording.
+ *
+ *   Note: In practice this only works with frame grabbing recorders.
+ *
+ *  \return hue if it succeeds, -1 otherwise.
+ */
 int RemoteEncoder::ChangeHue(bool direction)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -386,6 +484,15 @@ void RemoteEncoder::ChangeDeinterlacer(int deint_mode)
     SendReceiveStringList(strlist);
 }
 
+/** \fn RemoteEncoder::CheckChannel(QString)
+ *  \brief Checks if named channel exists on current tuner.
+ *
+ *  \param channel Channel to verify against current tuner.
+ *  \return true if it succeeds, false otherwise.
+ *  \sa TVRec::CheckChannel(QString),
+ *      EncoderLink::CheckChannel(const QString&),
+ *      ShouldSwitchToAnotherCard(QString)
+ */
 bool RemoteEncoder::CheckChannel(QString channel)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -398,6 +505,15 @@ bool RemoteEncoder::CheckChannel(QString channel)
     return retval;
 }
 
+/** \fn EncoderLink::ShouldSwitchToAnotherCard(QString)
+ *  \brief Checks if named channel exists on current tuner, or
+ *         another tuner.
+ *         <b>This only works on local recorders.</b>
+ *  \param channelid channel to verify against tuners.
+ *  \return true if the channel on another tuner and not current tuner,
+ *          false otherwise.
+ *  \sa CheckChannel(const QString&)
+ */
 bool RemoteEncoder::ShouldSwitchToAnotherCard(QString channelid)
 {
     // this function returns true if the channelid is not a valid
@@ -427,6 +543,12 @@ bool RemoteEncoder::CheckChannelPrefix(QString channel, bool &unique)
     return retval;
 }
 
+/** \fn RemoteEncoder::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
+ *  \brief Returns information about the program that would be seen if we changed
+ *         the channel using ChangeChannel(int) with "direction".
+ *  \sa TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
+ *      EncoderLink::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
+ */
 void RemoteEncoder::GetNextProgram(int direction,
                                    QString &title, QString &subtitle,
                                    QString &desc, QString &category,
@@ -483,6 +605,11 @@ void RemoteEncoder::GetNextProgram(int direction,
         programid = "";
 }
 
+/** \fn RemoteEncoder::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
+ *  \brief Returns information on the current program and current channel.
+ *  \sa TVRec::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
+ *      EncoderLink::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
+ */
 void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
                                    QString &desc, QString &category,
                                    QString &starttime, QString &endtime,
@@ -551,6 +678,13 @@ void RemoteEncoder::GetChannelInfo(QString &title, QString &subtitle,
     lastchannel = channelname;
 }
 
+/** \fn EncoderLink::GetInputName(QString&)
+ *  \brief Returns the textual name of the current input,
+ *         if a tuner is being used.
+ *         <b>This only works on local recorders.</b>
+ *  \sa TVRec::GetInputName(QString&), EncoderLink::GetInputName()
+ *  \return Returns input name if successful, "" if not.
+ */
 void RemoteEncoder::GetInputName(QString &inputname)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
@@ -561,6 +695,9 @@ void RemoteEncoder::GetInputName(QString &inputname)
     inputname = strlist[0];
 }
 
+/** \fn RemoteEncoder::GetOutputFilters(QString&)
+ *  \brief Returns just the channel name string from GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&).
+ */
 QString RemoteEncoder::GetCurrentChannel(void)
 {
     if (lastchannel == "" || lastchannel == "0")
@@ -573,6 +710,9 @@ QString RemoteEncoder::GetCurrentChannel(void)
     return lastchannel;
 }
 
+/** \fn RemoteEncoder::GetOutputFilters(QString&)
+ *  \brief Returns just the filters string from GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&).
+ */
 void RemoteEncoder::GetOutputFilters(QString& filters)
 {
     QString dummy;
