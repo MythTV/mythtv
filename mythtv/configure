@@ -756,16 +756,22 @@ fi
 
 has_library()
 {
-    LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
+    if test -f /etc/ld.so.conf ; then
+        LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
+    else
+        LIBPATHS=''
+    fi
     LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
 
     # recurse down just one level, should be enough in most cases
-    INCL=`cat /etc/ld.so.conf | grep -v "#" | grep "include "`
-    SRCH=`echo $INCL | sed s/"include "//g`
-    for x in $SRCH ; do
-        LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "include"`
-        LIBPATHS="$LIBPATHS $LP_APPEND"
-    done
+    if test -f /etc/ld.so.conf ; then
+        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep  "include"`
+        SRCH=`echo $INCL | sed s/"include "//g`
+        for x in $SRCH ; do
+            LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "include"`
+            LIBPATHS="$LIBPATHS $LP_APPEND"
+        done
+    fi
 
     LIBPATHS="`echo $LIBPATHS /lib /usr/lib | sed s/'\/ '/' '/g` "
 
@@ -1970,6 +1976,8 @@ fi
 
 echo "# Misc Features"
 echo "DVD playback     $dvd"
+echo "Frontend         $frontend"
+echo "Backend          $backend"
 echo
 
 MYTH_CONFIG_H=libs/libmyth/mythconfig.h
