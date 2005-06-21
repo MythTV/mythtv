@@ -51,6 +51,7 @@ xrandr="yes"
 xv="yes"
 xvmc="no"
 xvmc_vld="yes"
+xvmc_pro="no"
 opengl_vsync="no"
 direct_fb="no"
 direct_x="no"
@@ -169,6 +170,7 @@ echo "  --disable-x11            disable X11 support"
 echo "  --disable-xrandr         disable X11 resolution switching"
 echo "  --disable-xv             disable XVideo   (X11 video output accel.)"
 echo "  --enable-xvmc            enable XvMC      (Linux/BSD MPEG accel.)"
+echo "  --enable-xvmc-pro        enable XvMC for the unichrome pro (NOT unichrome) chipset"
 #echo "  --disable-xvmc-vld       disable XvMC-VLD (VIA Epia MPEG accel.)"
 echo "  --enable-opengl-vsync    enable OpenGL vsync method"
 echo "  --enable-directfb        enable DirectFB  (Linux non-X11 video)"
@@ -722,6 +724,10 @@ for opt do
   --enable-xvmc-vld) xvmc_vld="yes"
   ;;
   --disable-xvmc-vld) xvmc_vld="no"
+  ;;
+  --enable-xvmc-pro) xvmc_pro="yes"
+  ;;
+  --disable-xvmc-pro) xvmc_pro="no"
   ;;
   --enable-opengl-vsync) opengl_vsync="yes"
   ;;
@@ -1831,6 +1837,12 @@ if test x"$xvmc" = x"yes"; then
         else
             xvmc_vld="no"
         fi
+    elif test x"$xvmc_pro" = x"yes"; then
+        if has_library libviaXvMCPro ; then
+            VENDOR_XVMC_LIBS="-lviaXvMCPro"
+            xvmc="yes"
+            xvmc_vld="yes"
+        fi
     elif has_library libviaXvMC ; then
         VENDOR_XVMC_LIBS="-lviaXvMC"
         xvmc="yes"
@@ -1966,6 +1978,8 @@ if test x"$frontend" = x"yes" ; then
   echo "xv support       $xv"
   echo "XvMC support     $xvmc"
   echo "XvMC VLD support $xvmc_vld"
+  echo "XvMC pro support $xvmc_pro"
+  echo "XvMC libs        $VENDOR_XVMC_LIBS"
   echo "OpenGL vsync     $opengl_vsync"
   echo "DirectFB         $direct_fb"
   if test x"$mingw32" = x"yes" -o x"$cygwin" = x"yes" ; then
