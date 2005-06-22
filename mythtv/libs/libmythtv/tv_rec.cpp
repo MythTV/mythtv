@@ -1368,7 +1368,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         test = query.value(16).toString();
         if (test != QString::null)
             firewire_opts.model = QString::fromUtf8(test);
-	firewire_opts.connection = query.value(17).toInt();
+        firewire_opts.connection = query.value(17).toInt();
     }
 
     query.prepare("SELECT if(startchan!='', startchan, '3') "
