@@ -19,12 +19,9 @@ The following is a list of some of the prerequisites you will need installed:
                 so get it from http://www.mp3dev.org/ (follow the using Lame
                 link).
 
-   QT - Version 3.1 or greater is strongly recommended.  MythTV will probably
-        compile with version 3.0, but there are known bugs in that version        
-        which can crash MythTV.  MythTV will not include any workarounds for
-        bugs in QT 3.0.  Again, the best way to get this is from your
-        distro.  You need it compiled threadsafe and with the MySQL
-        bindings.  I'm using version 3.1.1.  http://www.trolltech.com
+   QT - Version 3.1 or greater is strongly recommended.  You need it 
+        compiled threadsafe and with the MySQL bindings.  I'm using 
+        version 3.1.1.  http://www.trolltech.com
 
    MySQL - You need this setup and working.  A recent version, I think, would
            be best.  I don't know, though, I'm utterly new to it.  Get it from
