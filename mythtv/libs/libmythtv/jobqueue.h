@@ -140,6 +140,13 @@ class JobQueue : public QObject
 
     static bool DeleteAllJobs(QString chanid, QDateTime starttime);
 
+    static void ClearJobMask(int &mask) { mask = JOB_NONE; }
+    static bool JobIsInMask(int job, int mask) { return (bool)(job & mask); }
+    static bool JobIsNotInMask(int job, int mask)
+                               { return ! JobIsInMask(job, mask); }
+    static void AddJobsToMask(int jobs, int &mask) { mask |= jobs; }
+    static void RemoveJobsFromMask(int jobs, int &mask) { mask &= ~jobs; }
+
     static QString JobText(int jobType);
     static QString StatusText(int status);
 
@@ -198,3 +205,4 @@ class JobQueue : public QObject
 
 #endif
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -103,7 +103,7 @@ TVRec::TVRec(int capturecardnum)
       frameRate(-1.0f), overrecordseconds(0), 
       // Current recording info
       curRecording(NULL), profileName(""),
-      askAllowRecording(false), autoTranscode(false),
+      askAllowRecording(false), autoRunJobs(JOB_NONE),
       // Pending recording info
       pendingRecording(NULL), recordPending(false), cancelNextRecording(false),
       // RingBuffer info
@@ -660,11 +660,23 @@ void TVRec::HandleStateChange(void)
         QString msg = QString("Using profile '%1' to record").arg(profileName);
         VERBOSE(VB_RECORD, msg);
 
-        // Determine whether to automatically run the transcoder or not
-        Setting *profileAutoTranscode = profile.byName("autotranscode");
-        autoTranscode = (profileAutoTranscode &&
-                         profileAutoTranscode->getValue().toInt() != 0) ?
-                         true : false;
+        JobQueue::ClearJobMask(autoRunJobs);
+        if ((tmpInternalState != kState_WatchingLiveTV) &&
+            (curRecording))
+        {
+            JobQueue::AddJobsToMask(curRecording->GetAutoRunJobs(),
+                                    autoRunJobs);
+
+            // Make sure transcoding is OFF if the profile does not allow
+            // AutoTranscoding.
+            Setting *profileAutoTranscode = profile.byName("autotranscode");
+            if ((!profileAutoTranscode) ||
+                (profileAutoTranscode->getValue().toInt() == 0))
+                JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, autoRunJobs);
+
+            if (curRecording->chancommfree)
+                JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
+        }
 
         bool error = false;
 
@@ -705,16 +717,19 @@ void TVRec::HandleStateChange(void)
             frameRate = recorder->GetFrameRate();
 
             if ((tmpInternalState != kState_WatchingLiveTV) &&
-                (!curRecording->chancommfree) &&
-                (curRecording->GetAutoRunJobs() & JOB_COMMFLAG) &&
+                (curRecording) &&
+                (JobQueue::JobIsInMask(JOB_COMMFLAG, autoRunJobs)) &&
                 (earlyCommFlag) &&
-                ((autoTranscode && !transcodeFirst) || (!autoTranscode)))
+                ((JobQueue::JobIsNotInMask(JOB_TRANSCODE, autoRunJobs)) ||
+                 (!transcodeFirst)))
             {
                 JobQueue::QueueJob(
                     JOB_COMMFLAG, curRecording->chanid,
                     curRecording->recstartts, "", "",
                     (runJobOnHostOnly) ? gContext->GetHostName() : "",
                     JOB_LIVE_REC);
+
+                JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
             }
         }
         else
@@ -875,8 +890,8 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
  *
  *   A "RECORDING_LIST_CHANGE" message is dispatched.
  *
- *   Finally if there was a recording and it was not deleted
- *   commercial flagging and user jobs are scheduled.
+ *   Finally, if there was a recording and it was not deleted,
+ *   schedule any post-processing jobs.
  *
  *  \param killFile if true the recorded file is deleted.
  */
@@ -885,10 +900,6 @@ void TVRec::TeardownRecorder(bool killFile)
     QString oldProfileName = profileName;
 
     int filelen = -1;
-
-    ProgramInfo *prevRecording = NULL;
-    if (curRecording)
-        prevRecording = new ProgramInfo(*curRecording);
 
     ispip = false;
 
@@ -929,44 +940,17 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (curRecording)
     {
+        if (autoRunJobs && !killFile && !prematurelystopped)
+            JobQueue::QueueJobs(
+                autoRunJobs, curRecording->chanid, curRecording->recstartts,
+                "", "", (runJobOnHostOnly) ? gContext->GetHostName() : "");
+
         delete curRecording;
         curRecording = NULL;
     }
 
     MythEvent me("RECORDING_LIST_CHANGE");
     gContext->dispatch(me);
-
-    if (prevRecording && !killFile)
-    {
-        if (!prematurelystopped)
-        {
-            int jobTypes = prevRecording->GetAutoRunJobs();
-
-            if ((prevRecording->chancommfree) ||
-                ((earlyCommFlag) &&
-                 ((!autoTranscode) || (autoTranscode && !transcodeFirst))))
-                jobTypes = jobTypes & (~JOB_COMMFLAG);
-
-            // Only auto-transcode if recording profile allows it.
-            if (!autoTranscode)
-                jobTypes &= ~JOB_TRANSCODE;
-
-            if (jobTypes)
-            {
-                QString jobHost = "";
-
-                if (runJobOnHostOnly)
-                    jobHost = gContext->GetHostName();
-
-                JobQueue::QueueJobs(jobTypes,
-                                    prevRecording->chanid,
-                                    prevRecording->recstartts, "", "", jobHost);
-            }
-        }
-    }
-
-    if (prevRecording)
-        delete prevRecording;
 }    
 
 /** \fn TVRec::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)

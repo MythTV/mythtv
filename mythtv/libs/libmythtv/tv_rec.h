@@ -260,7 +260,7 @@ class TVRec
     QDateTime    recordEndTime;
     QString      profileName;
     bool         askAllowRecording;
-    bool         autoTranscode;
+    int          autoRunJobs;
 
     // Pending recording info
     ProgramInfo *pendingRecording;

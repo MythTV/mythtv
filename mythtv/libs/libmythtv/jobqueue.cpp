@@ -713,7 +713,8 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
     // wait until running job(s) are done
     bool jobsAreRunning = true;
     int totalSlept = 0;
-    while (jobsAreRunning && totalSlept < 20)
+    int maxSleep = 90;
+    while (jobsAreRunning && totalSlept < maxSleep)
     {
         usleep(1000);
         query.prepare("SELECT id FROM jobqueue "
@@ -735,21 +736,24 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
             return false;
         }
 
-        if (query.numRowsAffected() > 0)
+        if (query.numRowsAffected() == 0)
+        {
+            jobsAreRunning = false;
+            break;
+        }
+        else if ((totalSlept % 5) == 0)
         {
             message = QString("JobQueue: Waiting on %1 jobs still running for "
                               "chanid %2 @ %3").arg(query.numRowsAffected())
                               .arg(chanid).arg(starttime.toString());
             VERBOSE(VB_JOBQUEUE, message);
         }
-        else
-            jobsAreRunning = false;
 
         sleep(1);
         totalSlept++;
     }
 
-    if (totalSlept < 20)
+    if (totalSlept < maxSleep)
     {
         query.prepare("DELETE FROM jobqueue "
                       "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
@@ -1132,14 +1136,22 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
         (job.hostname != m_hostname))
         return false;
 
-    if (job.type == JOB_TRANSCODE)
-        allowSetting = "JobAllowTranscode";
-    else if (job.type == JOB_COMMFLAG)
-        allowSetting = "JobAllowCommFlag";
-    else if (job.type & JOB_USERJOB)
-        allowSetting = QString("JobAllowUserJob%1").arg(job.type >> 8);
-    else
-        return false;
+    switch (job.type)
+    {
+        case JOB_TRANSCODE:  allowSetting = "JobAllowTranscode";
+                             break;
+        case JOB_COMMFLAG:   allowSetting = "JobAllowCommFlag";
+                             break;
+        case JOB_USERJOB1:   allowSetting = "JobAllowUserJob1";
+                             break;
+        case JOB_USERJOB2:   allowSetting = "JobAllowUserJob2";
+                             break;
+        case JOB_USERJOB3:   allowSetting = "JobAllowUserJob3";
+                             break;
+        case JOB_USERJOB4:   allowSetting = "JobAllowUserJob4";
+                             break;
+        default:             return false;
+    }
 
     if (gContext->GetNumSetting(allowSetting, 1))
         return true;
