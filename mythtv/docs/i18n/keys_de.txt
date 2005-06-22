@@ -1,0 +1,298 @@
+Translation provided by Michael Haas (hansi.urpils at gmail.com) 2005-06-22
+
+Verschiedene Tasten und ihre Funktionen:
+
+mythfrontend
+------------
+
+- Pfeiltasten werden benutzt, um einen Menuepunkt auszuwaehlen.
+- ALT-F4 beendet die Anwendung.
+- Leertaste oder Enter, um den gewählten Menupünkt zu aktiveren.
+- P zum Abspielen, sowohl in "Aufnahmen ansehen" als auch in "Loeschen".
+- D zum Loeschen, sowohl in "Aufnahmen ansehen" als auch in "Loeschen".
+- U fuer eine Detailansicht der momentan ausgewaehlten Sendung in "Aufnahmen
+  ansehen", "Loeschen", "EPG", "Suche" und "FIXME" sowie in den Suchergebnissen.
+- O für eine Liste der anstehenden Folgen der momentan ausgewählten Sendung in
+  "EPG", "Suche", "Sendung Aufnahmeprioritaeten" und "FIXME" sowie in den 
+  Suchergebnissen.
+- I zum Bearbeiten der Aufnahmeoptionen in "EPG", "Suche", 
+  "Sendung Aufnahmeprioritäten" und FIXME. In den Bildschirmen 
+  "Aufnahmen ansehen" und "Loeschen" zeigt 'I' Optionen für aufgenommene 
+  Sendungen wie "Automatisch löschen" oder "Aufnahme stoppen".
+
+Aufnahmen oder Fernsehen schauen
+--------------------------------
+
+- Pfeiltasten hoch und runter, um den Kanal zu wechseln
+- Eine Nummer eintippen, um zu einem bestimmten Kanal oder um um eine bestimmte
+  Zeitspanne zu springen (HHMM-Format)
+- P für Pause/Abspielen
+  - Es ist ebenfalls möglich, eine bestimmte Taste fuer "Abspielen" 
+    ueber die Konfiguration der Tastenbelegung in MythWeb festzulegen,
+    um von Zeitlupenmodus, Zurückspulen, Vorspulen oder Pause wieder auf 
+    normale Geschwindigkeit zu wechseln.
+ - C zum Wechseln des Eingangs auf der TV-Karte
+ - ESC zum Abbrechen
+ - I ruft das On-Screen-Display auf.
+   - Während der Wiedergabe wechselt 'I' zwischen Informationen zur aktuellen
+     Position und der Beschreibung der Sendung hin und her. Wenn eine Zeit
+     (HHMM) angegeben wird, springt MythTV um diese Zeit.
+ - M ruft das EPG auf. siehe Abschnitt zu EPG.
+ - Bild Runter springt um die vorkonfigurierte Zeitspanne zurueck. Standardwert   ist 10 Minuten.
+ - Bild Hoch springt um die vorkonfigurierte Zeitspanne vor. Standardwert ist
+   10 Minuten.
+ - Ende oder 'Z', um zur nächsten Werbungsmarkierung zu springen.
+ - Position 1 oder 'Q', um zur vorherigen Werbungsmarkierung zu springen.
+ - T zum Ein-/Ausschalten der Untertitel.
+ - F rotiert zwischen den verschiedenen Bildeinstellungen (Farbe, Farbton etc.)
+   Waehrend dieser Bildschirm zu sehen ist, benutzt man die linke bzw 
+   rechte Pfeiltaste, um Einstellungen vorzunehmen. Diese Einstellungen
+   beeinflussen das Aussehen der Videowiedergabe und sind unabhaengig von
+   den Einstellungen, die mit der Taste 'G' gemacht werden koennen (siehe 
+   unten) die bei der Aufnahme benutzt werden.
+ - [ oder F10 verringert die Lautstaerke
+ - ] oder F11 erhoeht die Lautstaerke
+ - / springt zum nächsten "bevorzugten Sender".
+ - ? kennzeichnet den aktuellen Kanal als "bevorzugten Sender"
+ - U erhöht die Abspielgeschwindigkeit
+ - J verringert die Abspielgeschwindigkeit
+ - A passt den Zeitraffer an (Beschleunigung oder Verlangsamung FIXME)
+ - W veraendert das Seitenverhaeltnis. Zur Auswahl stehen: 4:3, 16:9, 
+   4:3 Zoom (wie "Pan and Scan" FIXME), 16:9 Zoom und 16:9 "Stretch" FIXME
+   (beseitigt schwarze Raender im TV-Signal)
+ - Links (falls eine Sprungzeit angegeben wurde), um diese Zeitspanne 
+   zurueckspringen
+ - Rechts (falls eine Sprungzeit angegeben wurde), um diese Zeitspanne
+    vorzuspringen
+ - F8 wechselt zwischen den Einstellungen des "sleep timer" FIXME: 
+    30min->1h->1h30min->2h->Aus.
+ 
+"Klebrige" Tasten ("sticky keys") ausgeschaltet:
+
+ - Linke Pfeiltaste spult um die konfigurierte Zeitspanne (Standard: 5s)
+   zurueck.
+ - Rechte Pfeiltaste spult um die konfigurierte Zeitspanne (Standard: 30s)
+   vor.
+ - < startet den Rueckspulmodus (wie wenn "klebrige Tasten" aktiviert waere)
+ - > startet den Vorspulmodus (wie wenn "klebrige Tasten" aktiviert waere)
+
+ "Klebrige" Tasten ("sticky keys") eingeschaltet:
+  
+ - Rechte Pfeiltaste startet den Vorspulmodus
+ - Linke Pfeiltaste startet den Rueckspulmodus
+   Waehrend dem Spulen:
+   - Linke/Rechte Pfeiltaste erhoeht die Vor-/Rueckspulgeschwindigkeit
+   - 0 spielt mit Normalgeschnwindigkeit, laesst allerdings den Zeitanzeiger
+     auf dem Bildschirm
+   - 1 oder 2, um langsamer als normales Vor-/Zurueckspulen zu spulen 
+     (1 ist am langsamsten)
+   - 3 fuer normale Vor-/Rueckspulgeschwindigkeit
+   - 4 - 9 spult schneller als normales Vor-/Zurueckspulen
+     (9 ist am schnellsten)
+   - Leertaste, um den Spulmodus zu verlassen
+
+Nur Fernsehen:
+
+ - G rotiert zwischen den verschiedenen Bildeinstellungen (Farbe, Farbton etc.)
+   fuer Aufnahmen. Diese Werte beeinflussen das Aussehen der resultierenden 
+   .nuv-Datei. Waehrend dieser Bildschirm zu sehen ist, 
+   benutzt man die linke bzw rechte Pfeiltaste, um Einstellungen vorzunehmen.
+ - H Senderverlauf. Jeder Druck auf diese Taste schaltet auf den jeweils 
+   vorher geschauten Sender um.
+ - O schaltet den Browse-Modus an und erlaubt es so dem Benutzer, in den
+   Kanaelen und deren Programminformation zu stoebern waehrend er die 
+   aktuelle Sendung in voller groesse schaut.
+ - Y wechselt zwischen den TV-Karten.
+
+Browse-Modus waehrend LiveTV
+
+ - Linke Pfeiltaste blaettert im Programm vor dem aktuell angezeigten.
+ - Rechte Pfeiltaste blaettert im Programm nach dem aktuell angezeigten.
+ - Pfeiltaste Hoch blaettert im Programm des Kanals ueber dem aktuell 
+   angezeigten.
+ - Pfeiltaste Runter blaettert im Programm des Kanals unter dem aktuell 
+   angezeigten.
+ - / blattert durch das Programm des naechsten "bevorzugten Senders".
+ - 0-9 ermoeglicht es, eine Kanalnummer einzugeben und deren Programm
+   einzusehen.
+ - Leertaste/Enter wechselt den Kanal zu dem aktuell angezeigten.
+ - R/r nimmt die angezeigte Sendung auf (wechselt durch die Typen)
+ - ESC/O beendet den Browse-Modus
+
+Zoom-Modus während der Wiedergabe einer Aufnahme
+ - Linke Pfeiltaste bewegt das Video nach links
+ - Rechte Pfeiltaste bewegt das Video nach rechts
+ - Pfeiltaste Hoch bewegt das Video nach oben
+ - Pfeiltaste Runter bewegt das Video nach unten
+ - Bild Hoch zoomt rein
+ - Bild Runter zoomt raus
+ - Leertaste/Enter beendet den Zoom-Modus und laesst das Bild bei der momentanen
+   Groesse und Position
+ - ESC  beendet den Zoom-Modus und kehrt zur Ausgangsgroesse zurück.
+ 
+Wenn man zwei oder mehr TV-Karten hat:
+
+ - V schaltet Bild-in-Bild ein oder aus
+ - B holt die verschiedenen Fenster nacheinander in den Fokus
+   (erlaubt den Kanalwechsel im Bild-in-Bild-Fenster
+ - N vertauscht die Beiden Sender, indem die Kanäle auf beiden Karten gewechselt
+   werden
+
+Waehrend man eine Aufnahme ansieht:
+ - Leertaste oder Enter setzt ein Lesezeichen an dem Punkt. Wenn die Aufnahme
+   das nächste mal angeschaut wird, springt MythTV automatisch zu diesem
+   Punkt und loescht das Lesezeichen.
+ - E oder M startet/beendet den "Aufnahme bearbeiten"-Modus.
+   - Die linke und rechte Pfeiltaste bewegen den Cursor rueckwaerts und 
+     vorwaerts
+   - Die Pfeiltasten Hoch und Runter veraendern die Zeitspanne, um die man
+     vorwaerts oder rueckwaerts springt. Verfügbare Schritte: naechster 
+     Schnittpunkt, naechster Video-Keyframe, 1 frame, 0,5 Sekunden, 
+     1 Sekunde, 20 Sekunden, 1 Minute, 5 Minuten und 10 Minuten.
+   - Bild Hoch und Bild Runter wechseln zum naechsten Schnittpunkt
+   - < und > springen um das 10-fache der gesetzten Zeitspanne
+     nach vorne.
+   - 'Z' laedt die Liste mit den erkannten Werbespots in die Schnittliste,
+      falls eine existiert.
+   - 'C'  oder 'Q' löschen alle Schnittpunkte in der Schnittliste.
+   - 'I' kehrt die Schnittliste um.
+ - X reiht die Aufnahme in die Warteschlange zur Umwandlung ein.
+ - O ruft das Menue zur Einstellung von "Automatisch loeschen", 
+   "Werbung ueberspringen", etc auf.
+ - D beendet die gerade laufende Wiedergabe und zeigt das "Löschen"-Menue an.
+
+EPG
+---
+
+- Pfeiltasten werden benutzt, um einen Menuepunkt auszuwaehlen.
+- A, D, S und W tun das selbe wie die Pfeiltasten.
+- Bild Hoch/Bild Runter bewegen die Kanalliste eine Seite hoch oder runter.
+- Position 1 oder Ende bewegen die Auswahl um einen Tag nach links oder rechts.
+- 9, 3, 7 und 1 (wie auf dem Nummernblock) tun das gleiche wie Bild Hoch,
+  Bild Runter, Position 1 und Ende.
+- I zeigt mehr Informationen ueber eine Sendung an und erlaubt es, eine 
+  Aufnahme zu programmieren.
+  - Wenn man "Diese Sendung aufnehmen" auswaehlt waehrend man LiveTV schaut,
+    kann man eine Sendung direkt aufnehmen.
+- Leertaste oder Enter, um Konflikte aufzuloesen oder um Sonderoptionen
+  zu veraendern. Wenn die Sendung nicht bereits zur Aufnahme bestimmt ist,
+  verhaelt sich MythTV als waere stattdessen 'I' gedrueckt worden.
+- M, um auf den ausgewaehlten Kanal zu wechseln.
+- ESC oder C, um den EPG zu verlassen, ohne den Kanal zu wechseln.
+- R wechselt zwischen Aufnehmen/nicht Aufnehmen. Fortlaufendes Betätigen
+  wechselt zwischen den Aufnahmemodi.
+- X wechselt den Kanal zu dem momentan ausgewaehlten, ohne den EPG zu verlassen.
+- ? kennzeichnet den aktuellen Kanal als "bevorzugten Sender" 
+- / oder 4 zeigt alternativ nur die "bevorzugten Sender" an, bzw. schaltet
+  wieder zurueck zur normalen Ansicht.
+
+Setzen der "Sendung Aufnahmeprioritäten" und der "Sender Aufnahmeprioritäten"
+----------------------------------------------------------------------------
+
+- Die Rechte Pfeiltaste erhöht den Prioritaetswert
+- Die Linke Pfeiltaste verringert den Prioritaetswert
+- 1 sortiert nach dem Titel
+- 2 sortiert nach der Priorität
+- Position 1/Ende schaltet zwischen der Sortierung nach Prioritaet hin und her
+- I, um die Aufnahmeoptionen zu editieren
+- ESC speichert die Änderungen und verlässt den Bildschirm
+
+Ansehen der geplanten Aufnahmen/Konflikte lösen
+------------------------------------------------
+
+- 1 zeigt alle Aufnahmen an
+- 2 zeigt nur wichtige Aufnahmen 
+- Position1/Ende wechselt zwischen der Ansicht von wichtigen und normalen 
+  Aufnahmen.
+- I, um die Aufnahmeoptionen zu editieren
+- Leertaste oder Enter, um Konflikte zu lösen/außer Kraft zu setzen
+
+Ansehen der Suchlisten:
+-----------------------
+
+- Position 1 wechselt zur vorherigen Ansicht, wenn anwendbar
+- Ende wechselt zur naechsten Ansicht, wenn verfügbar
+- M wechselt zu einer anderen Ansicht, wenn moeglich
+  - In dem Suchbildschirm für Titel und Beschreibung, druecke M noch einmal um
+    die ausgewählte Ansicht zu editieren oder zu löschen
+      
+Einstellungsbildschirm der Aufnahmeprofile:
+------------------------------------------
+- D ruft einen Bildschirm zum Löschen einer eigenen Profilgruppe auf.
+
+Aufnahmegruppen:
+---------------
+
+Aufnahmegruppen erlauben es, Programme in benutzerdefinierte Kategorien zu 
+unterteilen, wie beispielsweise "Kinder", "Alice", "Karl-Heinz" etc. 
+Diese Funktion kann benutzt werden, um Durcheinanger zu reduzieren oder um
+Inhalt (Sendungen etc) abzusondern, wenn man die PIN-Funktion nutzt.
+
+Im "Aufnahmen ansehen"-Bildschirm:
+- M wechselt die Ansicht oder setzt ein Passwort für die Gruppe
+- I verschiebt eine Sendung von einer Gruppe in eine andere
+
+"Aufnahmen ansehen"-Bildschirm:
+-------------------------------
+
+- "1" oder F1 zeigt einen Bildschirm mit der Bedeutung der Icons
+- / markiert eine Aufnahme. Markierte Aufnahmen koennen als Gruppe 
+  abgespielt (in Reihenfolge oder zufaellig) und geloescht werden.
+  Man kann ebenfalls die Aufnahmegruppe für einige Aufnahmen aendern,
+  indem man sie markiert und dann mit dem INFO-Menue die Aufnahmegruppe
+  aendert.
+- ? leert die Liste der markierten Aufnahmen
+
+Fernbedienungen
+---------------
+
+Wenn man MythTV nur mit einer Fernbedienung benutzt, ist es empfohlen, dass man
+die Tasten auf der Fernbedienung wie unten beschrieben belegt. 
+Es ist moeglich, dass die Fernbedienung nicht den gleichen Satz an Tasten 
+wie die unten genannten hat, die Namen sind nur Vorschlaege, die ungefaehr
+der Funktion entsprechen.
+
+Wenn man neue Tastaturbelegungen zu dem Programm hinzufügt, wird es Benutzern
+von Fernbedienungen helfen, wenn die vorgeschlagene Liste berücksichtigt wird.
+
+Diese Liste nimmt eine minimale Fernbedienung an, die nur 20 Tasten hat. 
+Nahezu alle Faehigkeiten koennen mit dieser Konfiguration genutzt werden.
+Wenn man mehr Tasten hart, kann man alle Faehigkeiten ausnutzen. 
+Mit nru 16 Tasten sind die meisten Fähigkeiten verfügbar.
+
+
+Fernbedienung 		LIRC-Tastendruck	Funktion
+-------------		----------------	--------
+
+0 - 9 			0 - 9			Kanalauswahl, Navigation im
+						EPG, 
+						Rück-/Vorspulgeschwindigkeit
+						(mit "klebigen Tasten")
+
+Linke Pfeiltaste	Left			nach links scrollen,
+						zurueckspulen
+
+Rechte Pfeiltaste	Right			nach rechts scrollen,
+						vorspulen
+
+Pfeiltaste hoch		Up			hoch scrollen, Kanalwechsel
+						nach oben
+
+Pfeiltaste runter	Down			runter scrollen, Kanalwechsel
+						nach unten
+
+Auswahl/OK/Abspielen	Space			Menuepunkt auswaehlen, Abspielen
+						(mit "klebrigen Tasten"),
+						Lesezeichen setzen
+
+Abbrechen		Escape			Abbrechen, Wiedergabe beenden
+
+Menue			m			EPG (in LiveTV)
+						Editieren (bei Aufnahmen)
+
+Pause			p			Pause
+
+Andere Taste 1		i			Information
+
+Andere Taste 2		c			Wechselt den Eingang der 
+						TV-Karte
