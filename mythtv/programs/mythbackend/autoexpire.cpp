@@ -54,12 +54,13 @@ AutoExpire::AutoExpire(bool runthread, bool master)
       desired_freq(10), expire_thread_running(runthread),
       is_master_backend(master), disable_expire(true), update_pending(false)    
 {
-    expire_thread = PTHREAD_CREATE_JOINABLE;
-    update_thread = PTHREAD_CREATE_DETACHED;
-
     if (runthread)
     {
-        pthread_create(&expire_thread, NULL, ExpirerThread, this);
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+        pthread_create(&expire_thread, &attr, ExpirerThread, this);
         gContext->addListener(this);
     }
 }
@@ -633,8 +634,11 @@ void AutoExpire::Update(QMap<int, EncoderLink*> *encoderList, bool immediately)
     else
     {
         // create thread to do work
-        expirer->update_thread = PTHREAD_CREATE_DETACHED;
-        pthread_create(&expirer->update_thread, NULL,
+        pthread_attr_t attr;
+        pthread_attr_init(&attr);
+        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+        pthread_create(&expirer->update_thread, &attr,
                        SpawnUpdateThread, expirer);
     }
 }
