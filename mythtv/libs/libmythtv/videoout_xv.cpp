@@ -1006,7 +1006,7 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 bool VideoOutputXv::SetupDeinterlace(bool interlaced)
 {
     if (VideoOutputSubType() > XVideo)
-        m_deintfiltername == "bobdeint";
+        m_deintfiltername = "bobdeint";
     bool deint = VideoOutput::SetupDeinterlace(interlaced);
     needrepaint = true;
     return deint;
