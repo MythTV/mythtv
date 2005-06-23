@@ -44,14 +44,26 @@ int write_buffer(char *buf, int bufsize, FILE *fp)
 
 void LameEncoder::init_id3tags(lame_global_flags *gf)
 {
-    // Very basic ID3v2 Header. Rewritten later, but libid3tag.
     id3tag_init(gf);
-
-    // Dummy tag. It'll get overwritten later by the more flexible
-    // libid3 (MAD). Unf. it wont write the id3 tag to the file if
-    // none exists, hense this dummy entry.
-    id3tag_set_title(gf, "Title");
-
+    
+    QString tagstr = metadata->getArtist();
+    id3tag_set_artist(gf, tagstr);    
+             
+    tagstr = metadata->getTitle();
+    id3tag_set_title(gf, tagstr);
+                     
+    tagstr = metadata->getAlbum();
+    id3tag_set_album(gf, tagstr);
+                             
+    tagstr = metadata->getGenre();
+    id3tag_set_genre(gf, tagstr);
+                                    
+    tagstr = QString::number(metadata->getTrack(), 10);
+    id3tag_set_track(gf, tagstr);
+                                             
+    tagstr = QString::number(metadata->getYear(), 10);
+    id3tag_set_year(gf, tagstr);
+                                                     
     // write v2 tags.
     id3tag_v2_only(gf);
 }
@@ -95,9 +107,9 @@ int LameEncoder::init_encoder(lame_global_flags *gf, int quality, bool vbr)
     return lameret;
 }
 
-LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
-                         AudioMetadata *metadata, bool vbr)
-           : Encoder(outfile, qualitylevel, metadata)
+LameEncoder::LameEncoder(const QString &l_outfile, int qualitylevel,
+                         AudioMetadata *l_metadata, bool vbr)
+           : Encoder(l_outfile, qualitylevel, l_metadata)
 { 
     channels = 2;
     bits = 16;
@@ -119,39 +131,6 @@ LameEncoder::LameEncoder(const QString &outfile, int qualitylevel,
         VERBOSE(VB_GENERAL, QString("Error initializing LAME encoder. "
                                     "Got return code: %1").arg(lameret));
         return;
-    }
-}
-
-LameEncoder::~LameEncoder()
-{
-    addSamples(0, 0); //flush
-
-    if (gf)
-        lame_close(gf);
-    if (mp3buf)
-        delete[] mp3buf;
-        
-    // Need to close the file here.
-    if (out)
-    {
-        fclose(out);
-        
-        // Make sure the base class doesn't do a double clear.
-        out = NULL;
-    }
-       
-    // Now write the Metadata
-    if (metadata)
-    {
-/*
-        MetaIOID3v2* p_tagger = new MetaIOID3v2;
-        QString filename = metadata->Filename();
-        QString tmp = *outfile;
-        metadata->setFilename(tmp);
-        p_tagger->write(metadata);
-        metadata->setFilename(filename);
-        delete p_tagger;
-*/
     }
 }
 
@@ -189,5 +168,26 @@ int LameEncoder::addSamples(int16_t * bytes, unsigned int length)
     }
 
     return 0;
+}
+
+
+
+LameEncoder::~LameEncoder()
+{
+    addSamples(0, 0); //flush
+
+    if (gf)
+        lame_close(gf);
+    if (mp3buf)
+        delete[] mp3buf;
+        
+    // Need to close the file here.
+    if (out)
+    {
+        fclose(out);
+        
+        // Make sure the base class doesn't do a double clear.
+        out = NULL;
+    }
 }
 

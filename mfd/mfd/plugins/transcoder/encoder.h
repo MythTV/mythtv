@@ -13,14 +13,14 @@ class AudioMetadata;
 class Encoder 
 {
   public:
-    Encoder(const QString &outfile, int qualitylevel, AudioMetadata *metadata);
+    Encoder(const QString &l_outfile, int qualitylevel, AudioMetadata *l_metadata);
     virtual ~Encoder();
     virtual int addSamples(int16_t * bytes, unsigned int len) = 0;
 
     virtual bool isValid() { return (out != NULL); }
 
   protected:
-    const QString *outfile;
+    QString outfile;
     FILE *out;
     int quality;
     AudioMetadata *metadata;

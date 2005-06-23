@@ -36,7 +36,6 @@ class Metadata;
 #endif
 
 #include <lame/lame.h>
-
 #ifdef LAME_WORKAROUND
 #define MMX 1
 #endif
@@ -46,14 +45,15 @@ class Metadata;
 class LameEncoder : public Encoder 
 {
   public:
-    LameEncoder(const QString &outfile, int qualitylevel, AudioMetadata *metadata,
+    LameEncoder(const QString &l_outfile, int qualitylevel, AudioMetadata *l_metadata,
                 bool vbr = false);
    ~LameEncoder();
-    int addSamples(int16_t *bytes, unsigned int len);
+
+    int     addSamples(int16_t *bytes, unsigned int len);
 
   private:
-    int init_encoder(lame_global_flags *gf, int quality, bool vbr);
-    void init_id3tags(lame_global_flags *gf);
+    int     init_encoder(lame_global_flags *gf, int quality, bool vbr);
+    void    init_id3tags(lame_global_flags *gf);
 
     int quality;
     int bits;

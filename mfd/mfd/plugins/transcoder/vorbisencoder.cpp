@@ -23,9 +23,9 @@ int write_page(ogg_page *page, FILE *fp)
     return written;
 }
 
-VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
-                             AudioMetadata *metadata)
-             : Encoder(outfile, qualitylevel, metadata)
+VorbisEncoder::VorbisEncoder(const QString &l_outfile, int qualitylevel,
+                             AudioMetadata *l_metadata)
+             : Encoder(l_outfile, qualitylevel, l_metadata)
 { 
     int result;
 
@@ -33,23 +33,58 @@ VorbisEncoder::VorbisEncoder(const QString &outfile, int qualitylevel,
 
     QCString utf8str = metadata->getArtist().utf8();
     char *artist = utf8str.data();
-    vorbis_comment_add_tag(&vc, (char *)"artist", artist);    
+    vorbis_comment_add_tag(&vc, (char *)"ARTIST", artist);    
              
     utf8str = metadata->getTitle().utf8();
     char *title = utf8str.data();
-    vorbis_comment_add_tag(&vc, (char *)"title", title);
+    vorbis_comment_add_tag(&vc, (char *)"TITLE", title);
                          
     utf8str = metadata->getAlbum().utf8();
     char *album = utf8str.data();
-    vorbis_comment_add_tag(&vc, (char *)"album", album);
+    vorbis_comment_add_tag(&vc, (char *)"ALBUM", album);
                                      
     utf8str = metadata->getGenre().utf8();
     char *genre = utf8str.data();
-    vorbis_comment_add_tag(&vc, (char *)"genre", genre);
+    vorbis_comment_add_tag(&vc, (char *)"GENRE", genre);
                                                  
     char tracknum[10];
     sprintf(tracknum, "%d", metadata->getTrack());
-    vorbis_comment_add_tag(&vc, (char *)"tracknumber", tracknum);
+    vorbis_comment_add_tag(&vc, (char *)"TRACKNUMBER", tracknum);
+
+    char year[10];
+    if(metadata->getYear() > 0)
+    {
+        snprintf(year, 9, "%d", metadata->getYear());
+        vorbis_comment_add_tag(&vc, (char *)"DATE", year);
+    }
+
+    if(metadata->getCompilation())
+    {
+        //
+        //  Add a tag flag that says this is a compilation (we use the
+        //  MUSICBRAINZ tag and flag value only because we have to use
+        //  something, and it makes slightly more sense to use their
+        //  "standard" than it does to just completely invent one ourselves)
+        //
+
+        vorbis_comment_add_tag(&vc, (char *)"MUSICBRAINZ_ALBUMARTISTID",
+                                "89ad4ac3-39f7-470e-963a-56509c546377");
+
+        //
+        //  The tag above says this is a compilation. Any software that
+        //  parses the resulting file can just assume "Various Artists",
+        //  unless we specifically have an "Album Artist" tag (which would
+        //  get used for things like a DJ re-mix album)
+        //
+
+        if(metadata->getCompilationArtist().length() > 0)
+        {
+            QString compilation_artist = metadata->getCompilationArtist();
+            char *cartist = compilation_artist.utf8().data();
+            vorbis_comment_add_tag(&vc, (char *)"ALBUM ARTIST", cartist);
+        }
+    }
+
 
     packetsdone = 0;
     bytes_written = 0;

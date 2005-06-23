@@ -7,24 +7,26 @@
 
 using namespace std;
 
-Encoder::Encoder(const QString &outfile, int qualitylevel, AudioMetadata *metadata) 
+Encoder::Encoder(const QString &l_outfile, int qualitylevel, AudioMetadata *l_metadata) 
 {
-    if (outfile) 
+    if (l_outfile) 
     {
-        out = fopen(outfile.local8Bit(), "w");
+        out = fopen(l_outfile.local8Bit(), "w");
         if (!out) 
-            VERBOSE(VB_GENERAL, QString("Error opening output file: %1").arg(outfile.local8Bit()));
+        {
+            warning(QString("Error opening output file: %1").arg(l_outfile.local8Bit()));
+        }
     } 
     else 
     {
         out = NULL;
     }
 
-    this->outfile = &outfile;
-    this->quality = qualitylevel;
-    if(metadata)
+    outfile = l_outfile;
+    quality = qualitylevel;
+    if(l_metadata)
     {
-        this->metadata = metadata;
+        metadata = l_metadata;
     }
     else
     {

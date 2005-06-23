@@ -11,7 +11,7 @@ class AudioMetadata;
 class VorbisEncoder : public Encoder 
 {
   public:
-    VorbisEncoder(const QString &outfile, int qualitylevel, AudioMetadata *metadata);
+    VorbisEncoder(const QString &l_outfile, int qualitylevel, AudioMetadata *l_metadata);
    ~VorbisEncoder();
     int addSamples(int16_t *bytes, unsigned int len);
 
