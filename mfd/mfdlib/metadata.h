@@ -179,6 +179,8 @@ class AudioMetadata : public Metadata
     QString     getAlbum() { return album; }
     void        setAlbum(const QString &lalbum) { album = lalbum; }
 
+    QString     getCompilationArtist() { return compilation_artist; }
+    void        setCompilationArtist(const QString &lcompilation_artist);
 
     QString     getGenre() { return genre; }
     void        setGenre(const QString &lgenre) { genre = lgenre; }
@@ -231,6 +233,7 @@ class AudioMetadata : public Metadata
   protected:
 
     QString     artist;
+    QString     compilation_artist;
     QString     album;
     QString     genre;
     int         year;

@@ -182,6 +182,18 @@ AudioMetadata::AudioMetadata(
     track_count = -1;
 }
 
+void AudioMetadata::setCompilationArtist(const QString &lcompilation_artist)
+{
+    compilation_artist = lcompilation_artist;
+    if(compilation_artist.length() > 0)
+    {
+        compilation = true;
+    }
+    else
+    {
+        compilation = false;
+    }
+}
 
 AudioMetadata::~AudioMetadata()
 {
