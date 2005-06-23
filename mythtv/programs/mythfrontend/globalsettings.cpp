@@ -530,7 +530,6 @@ static GlobalComboBox *AutoExpireMethod()
 }
 #endif
 
-#if 0
 static GlobalCheckBox *AutoExpireDefault()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireDefault");
@@ -541,7 +540,6 @@ static GlobalCheckBox *AutoExpireDefault()
                     "Existing recordings will keep their current value."));
     return bc;
 }
-#endif
 
 #if 0
 static GlobalSpinBox *MinRecordDiskThreshold()
@@ -3020,6 +3018,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(SmartChannelChange());
     general->addChild(LastFreeCard());
     general->addChild(AutoExpireEnabled());
+    general->addChild(AutoExpireDefault());
     addChild(general);
 
     VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);
