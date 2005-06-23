@@ -1361,13 +1361,13 @@ bool AvFormatDecoder::autoSelectAudioTrack()
                 }
             }
         }
-        if (selectedTrack > maxTracks)
+        if (selectedTrack == -1)
         {
             minChannels--;
         }
     }
 
-    if (selectedTrack  > maxTracks)
+    if (selectedTrack == -1)
     {
         VERBOSE(VB_AUDIO,
                 QString("No suitable audio track exists."));
