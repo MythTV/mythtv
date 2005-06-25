@@ -272,10 +272,9 @@ ChannelEditor::ChannelEditor():
 }
 
 int ChannelEditor::exec() {
-
-    //Make sure we have dvb card installed
 #ifdef USING_DVB
-    if (!CardUtil::isCardPresent(CardUtil::DVB))
+    // Make sure we have dvb card installed
+    if (!CardUtil::IsCardTypePresent(CardUtil::DVB))
         buttonAdvanced->setEnabled(false);
 #endif
 

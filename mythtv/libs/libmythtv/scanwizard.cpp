@@ -387,7 +387,7 @@ void ScanWizardScanner::scan()
     {
         nTransportToTuneTo = parent->transport();
         QString device;
-        if (!CardUtil::videoDeviceFromCardID(parent->captureCard(),device))
+        if (!CardUtil::GetVideoDevice(parent->captureCard(),device))
             return;
         dvbchannel = new DVBChannel(device.toInt());
 
@@ -553,7 +553,7 @@ void ScanWizard::captureCard(const QString& str)
         (nCardType == CardUtil::ERROR_OPEN))
     {
         nCaptureCard = nNewCaptureCard;
-        nCardType = CardUtil::cardType(nCaptureCard);
+        nCardType = CardUtil::GetCardType(nCaptureCard);
         emit cardTypeChanged(QString::number(nCardType));
     }
 }

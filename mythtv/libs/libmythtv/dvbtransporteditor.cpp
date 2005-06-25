@@ -466,7 +466,7 @@ DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID) :
 
     CardUtil::CARD_TYPES nType = CardUtil::ERROR_PROBE;
     if (iVideoDev >= 0)
-        nType = CardUtil::cardType(iVideoDev);
+        nType = CardUtil::GetCardType(iVideoDev);
 
      addChild(new DVBTransportPage(*dvbtid,nType));
 }

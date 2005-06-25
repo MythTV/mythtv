@@ -224,7 +224,7 @@ void CaptureCardSetting::sourceID(const QString& str)
 void ScanTypeSetting::refresh(const QString& card)
 {
     int nCard = card.toInt();
-    int nCardType = CardUtil::cardType(nCard);
+    int nCardType = CardUtil::GetCardType(nCard);
     clearSelections();
 
     switch (nCardType)

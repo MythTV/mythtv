@@ -67,7 +67,7 @@ AnalogScan::~AnalogScan()
 
 bool AnalogScan::start()
 {
-    if (!CardUtil::videoDeviceFromCardID(cardid,device,vbidevice))
+    if (!CardUtil::GetVideoDevice(cardid, device, vbidevice))
         return false;
 
     fd = ::open(device.ascii(),O_RDWR); 
