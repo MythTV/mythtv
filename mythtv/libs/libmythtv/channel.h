@@ -49,6 +49,10 @@ class Channel : public ChannelBase
     void SaveCachedPids(const pid_cache_t&) const;
     void GetCachedPids(pid_cache_t&) const;
 
+    // ATSC scanning stuff
+    bool TuneMultiplex(uint mplexid);
+    bool Tune(uint frequency, QString inputname="",
+              QString modulation="analog");
   private:
     // Helper Sets
     void SetColourAttribute(int attrib, const char *name);
@@ -58,12 +62,12 @@ class Channel : public ChannelBase
     // Helper Gets
     unsigned short *GetV4L1Field(int attrib, struct video_picture &vid_pic);
     int  GetChanID() const;
+    int  GetCardID() const;
     int  GetCurrentChannelNum(const QString &channame);
 
     // Helper Commands
     int  ChangeColourAttribute(int attrib, const char *name, bool up);
     bool TuneTo(const QString &chan, int finetune);
-    bool TuneToFrequency(int frequency);
 
   private:
     // Data

@@ -32,6 +32,9 @@ class CardUtil
     /**@brief dvb card type*/
     static const QString DVB;
 
+    static int          GetCardID(const QString &videodevice,
+                                  QString hostname = QString::null);
+
     /**@brief returns true if the card type is present
        @param [in]strType card type being checked for
      */

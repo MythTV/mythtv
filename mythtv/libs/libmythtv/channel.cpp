@@ -16,6 +16,8 @@
 #include "tv.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "channelutil.h"
+#include "videosource.h" // for CardUtil
 
 #include <iostream>
 using namespace std;
@@ -168,6 +170,18 @@ static QString mode_to_format(int mode, int v4l_version)
     return "Unknown";
 }
 
+/** \fn Channel::SetFormat(const QString &format)
+ *  \brief Initializes tuner and modulator variables
+ *
+ *  This enumerates the inputs, converts the format
+ *  string to something the hardware understands, and
+ *  if the parent pointer is valid retrieves the
+ *  channels from the database.
+ *
+ *  \param format One of eight formats, 
+ *                "NTSC", "NTSC-JP", "ATSC", "SECAM",
+ *                "PAL", "PAL-NC", "PAL-M" or "PAL-N".
+ */
 void Channel::SetFormat(const QString &format)
 {
     if (!Open())
@@ -190,14 +204,15 @@ void Channel::SetFormat(const QString &format)
     if (usingv4l2)
     {
         struct v4l2_input vin;
-        memset(&vin, 0, sizeof(vin));
+        bzero(&vin, sizeof(vin));
+
         vin.index = 0;
 
         while (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0)
         {
             VERBOSE(VB_CHANNEL, QString("Channel(%1):SetFormat(): Probed "
-                                        "input: %2, name = %3").
-                    arg(device).arg(vin.index).arg((char *)vin.name));
+                                        "input: %2, name = %3")
+                    .arg(device).arg(vin.index).arg((char*)vin.name));
             channelnames[vin.index] = (char *)vin.name;
             inputChannel[vin.index] = "";
             inputTuneTo[vin.index] = "";
@@ -207,52 +222,53 @@ void Channel::SetFormat(const QString &format)
 
             capchannels = vin.index;
         }
-
-        pParent->RetrieveInputChannels(inputChannel, inputTuneTo, 
-                                       externalChanger, sourceid);
-        return;
     }
- 
-    struct video_tuner tuner;
-
-    memset(&tuner, 0, sizeof(tuner));
-
-    ioctl(videofd, VIDIOCGTUNER, &tuner);
-    
-    tuner.mode = videomode_v4l1;
-    ioctl(videofd, VIDIOCSTUNER, &tuner);
-
-    struct video_capability vidcap;
-    memset(&vidcap, 0, sizeof(vidcap));
-    ioctl(videofd, VIDIOCGCAP, &vidcap);
-
-    capchannels = vidcap.channels;
-    for (int i = 0; i < vidcap.channels; i++)
+    else
     {
-        struct video_channel test;
-        memset(&test, 0, sizeof(test));
-        test.channel = i;
-        ioctl(videofd, VIDIOCGCHAN, &test);
+        struct video_tuner tuner;
+        bzero(&tuner, sizeof(tuner));
 
-        VERBOSE(VB_CHANNEL, QString("Channel(%1):SetFormat(): Probed "
-                                    "input: %2, name = %3").
-                arg(device).arg(i).arg((char *)test.name));
-        channelnames[i] = test.name;
-        inputChannel[i] = "";
-        inputTuneTo[i] = "";
-        externalChanger[i] = "";
-        sourceid[i] = "";
+        ioctl(videofd, VIDIOCGTUNER, &tuner);
+        tuner.mode = videomode_v4l1;
+        ioctl(videofd, VIDIOCSTUNER, &tuner);
+
+        struct video_capability vidcap;
+        bzero(&vidcap, sizeof(vidcap));
+        ioctl(videofd, VIDIOCGCAP, &vidcap);
+
+        capchannels = vidcap.channels;
+        for (int i = 0; i < vidcap.channels; i++)
+        {
+            struct video_channel test;
+            bzero(&test, sizeof(test));
+
+            test.channel = i;
+            ioctl(videofd, VIDIOCGCHAN, &test);
+
+            VERBOSE(VB_CHANNEL, QString("Channel(%1):SetFormat(): Probed "
+                                        "input: %2, name = %3")
+                    .arg(device).arg(i).arg((char *)test.name));
+            channelnames[i] = test.name;
+            inputChannel[i] = "";
+            inputTuneTo[i] = "";
+            externalChanger[i] = "";
+            sourceid[i] = "";
+        }
+
+        struct video_channel vc;
+        bzero(&vc, sizeof(vc));
+
+        vc.channel = currentcapchannel;
+        ioctl(videofd, VIDIOCGCHAN, &vc);
+        vc.norm = videomode_v4l1;
+        ioctl(videofd, VIDIOCSCHAN, &vc);
     }
 
-    struct video_channel vc;
-    memset(&vc, 0, sizeof(vc));
-    vc.channel = currentcapchannel;
-    ioctl(videofd, VIDIOCGCHAN, &vc);
-    vc.norm = videomode_v4l1;
-    ioctl(videofd, VIDIOCSCHAN, &vc);
-
-    pParent->RetrieveInputChannels(inputChannel, inputTuneTo, externalChanger,
-                                   sourceid);
+    if (pParent)
+    {
+        pParent->RetrieveInputChannels(inputChannel, inputTuneTo,
+                                       externalChanger, sourceid);
+    }
 }
 
 int Channel::SetDefaultFreqTable(const QString &name)
@@ -304,6 +320,10 @@ int Channel::GetCurrentChannelNum(const QString &channame)
         if (real_channame == curList[i].name)
             return i;
     }
+    VERBOSE(VB_IMPORTANT,
+            QString("Channel::GetCurrentChannelNum(%1): "
+                    "Failed to find Channel '%2'")
+            .arg(channame).arg(real_channame));
 
     return -1;
 }
@@ -393,7 +413,7 @@ bool Channel::SetChannelByString(const QString &chan)
     }
 
     QString inputName;
-    if (!pParent->CheckChannel(this, chan, inputName))
+    if (pParent && !pParent->CheckChannel(this, chan, inputName))
     {
         VERBOSE(VB_IMPORTANT, QString(
                     "Channel(%1): CheckChannel failed. Please verify "
@@ -403,25 +423,16 @@ bool Channel::SetChannelByString(const QString &chan)
     }
 
     SetCachedATSCInfo("");
-    // If CheckChannel filled in the inputName then we need to change inputs
-    // and return, since the act of changing inputs will change the channel as well.
-    if (!inputName.isEmpty())
-    {
-        ChannelBase::SwitchToInput(inputName, chan);
-        SetCachedATSCInfo(chan);
-        return true;
-    }
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString thequery = QString("SELECT finetune, freqid, tvformat, "
-                                   "freqtable, commfree "
-                               "FROM channel "
-                               "LEFT JOIN videosource USING (sourceid) "
-                               "WHERE channum = \"%1\" AND "
-                               "channel.sourceid = \"%2\";")
-                               .arg(chan)
-                               .arg(sourceid[currentcapchannel]);
+    QString thequery = QString(
+        "SELECT finetune, freqid, tvformat, freqtable, atscsrcid, commfree, mplexid "
+        "FROM channel, videosource "
+        "WHERE videosource.sourceid = channel.sourceid AND "
+        "      channum = '%1' AND channel.sourceid = '%2'")
+        .arg(chan).arg(sourceid[currentcapchannel]);
+
     query.prepare(thequery);
 
     if (!query.exec() || !query.isActive())
@@ -436,32 +447,53 @@ bool Channel::SetChannelByString(const QString &chan)
     }
     query.next();
 
-    int finetune = query.value(0).toInt();
-    QString freqid = query.value(1).toString();
-    QString tvformat = query.value(2).toString();
+    int finetune      = query.value(0).toInt();
+    QString freqid    = query.value(1).toString();
+    QString tvformat  = query.value(2).toString();
     QString freqtable = query.value(3).toString();
-    commfree = query.value(4).toBool();
+    uint atscsrcid    = query.value(4).toInt();
+    commfree          = query.value(5).toBool();
+    uint mplexid      = query.value(6).toInt();
+    QString atsc_chan = (atscsrcid < 256) ?
+        chan : QString("%1_%2").arg(atscsrcid >> 8).arg(atscsrcid & 0xff);
 
-    if (freqtable == "default" || freqtable.isNull() || freqtable.isEmpty())
-        SetFreqTable(defaultFreqTable);
-    else
-        SetFreqTable(freqtable);
+    // If CheckChannel filled in the inputName then we need to change inputs
+    // and return, since the act of changing inputs will change the channel as well.
+    if (!inputName.isEmpty())
+    {
+        ChannelBase::SwitchToInput(inputName, chan);
+        SetCachedATSCInfo(atsc_chan);
+        return true;
+    }
+
+    QString modulation;
+    int frequency = ChannelUtil::GetTuningParams(mplexid, modulation);
+    bool ok = (frequency > 0);
+
+    if (!ok)
+    {
+        frequency = freqid.toInt(&ok) * 1000 + finetune;
+        mplexid = 0;
+    }
+    bool isFrequency = ok && (frequency > 45000);
+
+    if (!isFrequency)
+    {
+        if (freqtable == "default" || freqtable.isNull() || freqtable.isEmpty())
+            SetFreqTable(defaultFreqTable);
+        else
+            SetFreqTable(freqtable);
+    }
 
     if (tvformat.isNull() || tvformat.isEmpty())
         tvformat = "Default";
-
-    // Determine if freqid is id or frequency
-    //  freqid is a frequency if and only if it is a valid integer and 
-    //  larger than 45 MHz
-    bool ok;
-    int frequency = freqid.toInt(&ok);
-    bool isFrequency = ok && frequency > 45000;
-
     SetFormat(tvformat);
 
     curchannelname = chan;
 
-    pParent->SetVideoFiltersForChannel(this, chan);
+    if (pParent)
+        pParent->SetVideoFiltersForChannel(this, chan);
+
     SetContrast();
     SetColour();
     SetBrightness();
@@ -474,8 +506,7 @@ bool Channel::SetChannelByString(const QString &chan)
     {
         if (isFrequency)
         {
-            frequency = frequency * 16 / 1000 + finetune;
-            if (!TuneToFrequency(frequency))
+            if (!Tune(frequency))
                 return false;
         }
         else
@@ -487,7 +518,8 @@ bool Channel::SetChannelByString(const QString &chan)
     else if (!ChangeExternalChannel(freqid))
         return false;
 
-    SetCachedATSCInfo(chan);
+    SetCachedATSCInfo(atsc_chan);
+
     return true;
 }
 
@@ -499,48 +531,171 @@ bool Channel::TuneTo(const QString &channum, int finetune)
             .arg((i != -1) ? curList[i].freq : -1));
 
     if (i == -1)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Channel(%1)::TuneTo(%2): Error, "
+                                      "failed to find channel.")
+                .arg(device).arg(channum));
         return false;
+    }
 
-    int frequency = curList[i].freq * 16 / 1000 + finetune;
+    int frequency = curList[i].freq * 1000 + finetune;
 
-    return TuneToFrequency(frequency);
+    return Tune(frequency);
 }
 
-bool Channel::TuneToFrequency(int frequency)
+/** \fn Channel::Tune(uint frequency, QString inputname, QString modulation)
+ *  \brief Tunes to a specifix frequency (Hz) on a particular input, using
+ *         the specified modulation.
+ *
+ *  Note: This function always uses modulator zero.
+ *
+ *  \param frequency Frequency in Hz, this is divided by 62.5 kHz or 62.5 Hz
+ *                   depending on the modulator and sent to the hardware.
+ *  \param inputname Name of the input (Television, Antenna 1, etc.)
+ *  \param modulation "radio", "analog", or "digital"
+ */
+bool Channel::Tune(uint frequency, QString inputname, QString modulation)
 {
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneToFrequency(%2)").
-            arg(device).arg(frequency));
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::Tune(%2, %3, %4)")
+            .arg(device).arg(frequency).arg(inputname).arg(modulation));
     int ioctlval = 0;
+
+    if (currentFormat == "")
+        SetFormat("Default");
+    int inputnum = GetInputByName(inputname);
+
+    if ((inputnum >= 0) && (GetCurrentInputNum() != inputnum))
+        SwitchToInput(inputnum, false);
+    else if (GetCurrentInputNum() < 0)
+        SwitchToInput(0, false);
 
     if (usingv4l2)
     {
+        bool isTunerCapLow = false;
+        struct v4l2_modulator mod;
+        bzero(&mod, sizeof(mod));
+        mod.index = 0;
+        ioctlval = ioctl(videofd, VIDIOC_G_MODULATOR, &mod);
+        if (ioctlval >= 0)
+        {
+            isTunerCapLow = (mod.capability & V4L2_TUNER_CAP_LOW);
+            VERBOSE(VB_CHANNEL, "  name: "<<mod.name);
+            VERBOSE(VB_CHANNEL, "CapLow: "<<isTunerCapLow);
+        }
+
         struct v4l2_frequency vf;
-        memset(&vf, 0, sizeof(vf));
-        vf.frequency = frequency;
+        bzero(&vf, sizeof(vf));
+
+        vf.frequency = (isTunerCapLow) ?
+            ((int)(frequency / 62.5)) : (frequency / 62500);
+
+        if (modulation.lower() != "analog")
+        {
+/*
+            vf.type = V4L2_TUNER_DIGITAL_TV;
+            if (ioctl(videofd, VIDIOC_S_FREQUENCY, &vf)>=0)
+                return true;
+*/
+        }
+
+        vf.tuner = 0; // use first tuner
         vf.type = V4L2_TUNER_ANALOG_TV;
 
         ioctlval = ioctl(videofd, VIDIOC_S_FREQUENCY, &vf);
         if (ioctlval < 0)
         {
             VERBOSE(VB_IMPORTANT,
-                    QString("Channel(%1)::TuneToFrequence(): Error %2 "
-                            "while setting frequency (v2): %3").
-                    arg(device).arg(ioctlval).arg(strerror(errno)));
+                    QString("Channel(%1)::Tune(): Error %2 "
+                            "while setting frequency (v2): %3")
+                    .arg(device).arg(ioctlval).arg(strerror(errno)));
             return false;
+        }
+        ioctlval = ioctl(videofd, VIDIOC_G_FREQUENCY, &vf);
+
+        if (ioctlval >= 0)
+        {
+            VERBOSE(VB_CHANNEL, QString(
+                        "Channel(%1)::Tune(): Frequency is now %2")
+                    .arg(device).arg(vf.frequency * 62500));
         }
 
         return true;
     }
 
-    ioctlval = ioctl(videofd, VIDIOCSFREQ, &frequency);
+    uint freq = frequency / 62500;
+    ioctlval = ioctl(videofd, VIDIOCSFREQ, &freq);
     if (ioctlval < 0)
     {
         VERBOSE(VB_IMPORTANT,
-                QString("Channel(%1)::TuneToFrequence(): Error %2 "
+                QString("Channel(%1)::Tune(): Error %2 "
                         "while setting frequency (v1): %3")
                 .arg(device).arg(ioctlval).arg(strerror(errno)));
         return false;
     }
+
+    return true;
+}
+
+int Channel::GetCardID() const
+{
+    if (pParent)
+        return pParent->GetCaptureCardNum();
+    else
+        return CardUtil::GetCardID(GetDevice());
+}
+
+/** \fn Channel::TuneMultiplex(uint mplexid)
+ *  \brief To be used by the siscan
+ *
+ *   mplexid is how the db indexes each transport
+ */
+bool Channel::TuneMultiplex(uint mplexid)
+{
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneMultiplex(%2)")
+            .arg(device).arg(mplexid));
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    int cardid = GetCardID();
+    if (cardid < 0)
+        return false;
+
+    // Query for our tuning params
+    QString thequery(
+        "SELECT frequency, inputname, modulation "
+        "FROM dtv_multiplex, cardinput, capturecard "
+        "WHERE dtv_multiplex.sourceid = cardinput.sourceid AND "
+        "      cardinput.cardid = capturecard.cardid AND ");
+
+    thequery += QString("mplexid = '%1' AND cardinput.cardid = '%2'")
+        .arg(mplexid).arg(cardid);
+
+    query.prepare(thequery);
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError(
+            QString("Channel(%1)::TuneMultiplex(): Error, could not find "
+                    "tuning parameters for transport %1.")
+            .arg(device).arg(mplexid), query);
+        return false;
+    }
+    if (query.size() <= 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString(
+                    "Channel(%1)::TuneMultiplex(): Error, could not find "
+                    "tuning parameters for transport %1.")
+                .arg(device).arg(mplexid));
+        return false;
+    }
+    query.next();
+
+    uint    frequency  = query.value(0).toInt();
+    QString inputname  = query.value(1).toString();
+    QString modulation = query.value(2).toString();
+    (void) modulation; // we don't actually use this yet.
+
+    if (!Tune(frequency, inputname))
+        return false;
 
     return true;
 }
@@ -642,6 +797,9 @@ unsigned short *Channel::GetV4L1Field(int attrib, struct video_picture &vid_pic)
 
 void Channel::SetColourAttribute(int attrib, const char *name)
 {
+    if (!pParent)
+        return;
+
     QString field_name = name;
     int field = pParent->GetChannelValue(field_name, this, curchannelname);
 
@@ -737,6 +895,9 @@ void Channel::SetHue(void)
 
 int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
 {
+    if (!pParent)
+        return -1;
+
     int newvalue;    // The int should have ample space to avoid overflow
                      // in the case that we're just over or under 65535
 

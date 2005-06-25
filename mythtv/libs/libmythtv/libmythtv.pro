@@ -175,10 +175,12 @@ using_frontend {
 
 using_backend {
     # Channel stuff
-    HEADERS += channelbase.h               signalmonitorvalue.h 
+    HEADERS += channelbase.h               channelutil.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
-    SOURCES += channelbase.cpp             signalmonitorvalue.cpp
+    HEADERS += signalmonitorvalue.h 
+    SOURCES += channelbase.cpp             channelutil.cpp
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
+    SOURCES += signalmonitorvalue.cpp
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h

@@ -96,6 +96,127 @@ enum CardUtil::CARD_TYPES CardUtil::cardDVBType(unsigned nCardNumber,QString &na
     return nRet;
 }
 
+/** \fn CardUtil::GetCardType(uint, QString&, QString&)
+ *  \brief Returns the card type from the video device
+ *  \param [in]nVideoDev video dev to be checked
+ *  \param [out]name the probed card name
+ *  \param [out]card_type the card_type as a string
+ *  \return the card type from CARD_TYPES enum
+ */
+enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID, QString &name,
+                                                QString &card_type)
+{
+    CARD_TYPES nRet = ERROR_OPEN;
+    QString strDevice;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT videodevice, cardtype "
+                  "FROM capturecard "
+                  "WHERE capturecard.cardid = :CARDID");
+    query.bindValue(":CARDID", nCardID);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        strDevice = query.value(0).toString();
+        card_type = query.value(1).toString().upper();
+    }
+    else
+        return nRet;
+
+    if (card_type == "V4L")
+        nRet = V4L;
+    else if (card_type == "MPEG")
+        nRet = MPEG;
+    else if (card_type == "FIREWIRE")
+        nRet = FIREWIRE;
+    else if (card_type == "HDTV")
+        nRet = HDTV;
+#ifdef USING_DVB
+    else if (card_type == "DVB")
+        nRet = GetDVBType(strDevice.toInt(), name);
+#else
+    (void)name;
+#endif
+    return nRet;
+}
+
+/** \fn CardUtil::GetCardType(uint, QString&)
+ *  \brief Returns the card type from the video device
+ *  \param [in]nVideoDev video dev to be checked
+ *  \param [out]name the probed card name
+ *  \return the card type
+ */
+enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID, QString &name)
+{
+    QString card_type;
+    return CardUtil::GetCardType(nCardID, name, card_type);
+}
+
+/** \fn CardUtil::GetCardType(uint)
+ *  \brief Returns the card type from the video device
+ *  \param [in]nVideoDev video dev to be checked
+ *  \return the card type
+ */
+enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID)
+{
+    QString name, card_type;
+    return CardUtil::GetCardType(nCardID, name, card_type);
+}
+
+/** \fn CardUtil::GetVideoDevice(uint, QString&)
+ *  \brief Returns the card type from the video device
+ *  \param [in]nVideoDev video dev to be checked
+ *  \param [out]name the probed card name
+ *  \return the card type
+ */
+bool CardUtil::GetVideoDevice(uint nCardID, QString& device)
+{
+    bool fRet=false;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT videodevice "
+                  "FROM capturecard "
+                  "WHERE capturecard.cardid = :CARDID");
+    query.bindValue(":CARDID", nCardID);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        device = query.value(0).toString();
+        fRet = true;
+    }
+    return fRet;
+}
+
+/** \fn CardUtil::GetCardID(const QString&, QString)
+ *  \brief Returns the cardid of the card that uses the specified
+ *         videodevice, and optionally a non-local hostname.
+ *  \param videodevice Video device we want card id for
+ *  \param hostname    Host on which device resides, only
+ *                     required if said host is not the localhost
+ */
+int CardUtil::GetCardID(const QString &videodevice, QString hostname)
+{
+    if (hostname == QString::null)
+        hostname = gContext->GetHostName();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString thequery =
+        QString("SELECT cardid FROM capturecard "
+                "WHERE videodevice = '%1' AND "
+                "      hostname = '%2'")
+        .arg(videodevice).arg(hostname);
+
+    query.prepare(thequery);
+    if (!query.exec() || !query.isActive() || query.size() <= 0)
+    {
+        MythContext::DBError("CardUtil::GetCardID()", query);
+        return -1;
+    }
+    query.next();
+    return query.value(0).toInt();
+}
+
 enum CardUtil::CARD_TYPES CardUtil::cardType(unsigned nCardID,
                                                QString &name)
 {
