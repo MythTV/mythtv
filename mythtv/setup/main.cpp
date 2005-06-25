@@ -19,13 +19,14 @@
 #include "libmyth/mythdbcon.h"
 #include "libmyth/langsettings.h"
 #include "libmyth/dialogbox.h"
-#include "libmythtv/videosource.h"
-#include "libmythtv/channeleditor.h"
+#include "libmyth/exitcodes.h"
 #include "libmyth/themedmenu.h"
-#include "backendsettings.h"
-#include "checksetup.h"
 
 #include "libmythtv/dbcheck.h"
+#include "libmythtv/videosource.h"
+#include "libmythtv/channeleditor.h"
+#include "backendsettings.h"
+#include "checksetup.h"
 
 using namespace std;
 
@@ -96,6 +97,8 @@ void SetupMenu(void)
 int main(int argc, char *argv[])
 {
     QString geometry = "";
+    QString verboseString = QString(" important general");
+
 #ifdef Q_WS_X11
     // Remember any -geometry argument which QApplication init will remove
     for(int argpos = 1; argpos + 1 < argc; ++argpos)
@@ -131,18 +134,130 @@ int main(int argc, char *argv[])
                 return -1;
             }            
         }
+        else if ((!strcmp(a.argv()[argpos],"-v") ||
+                  !strcmp(a.argv()[argpos],"--verbose")) && (a.argc() <= argpos))
+        {
+            cerr << "Missing argument to -v/--verbose option\n";
+            return BACKEND_EXIT_INVALID_CMDLINE;
+        }
+        else if ((!strcmp(a.argv()[argpos],"-v") ||
+                  !strcmp(a.argv()[argpos],"--verbose")) && (a.argc() > argpos))
+        {
+            QString temp = a.argv()[argpos+1];
+            if (temp.startsWith("-"))
+            {
+                cerr << "Invalid or missing argument to -v/--verbose option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            } 
+            else
+            {
+                QStringList verboseOpts;
+                verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
+                ++argpos;
+                for (QStringList::Iterator it = verboseOpts.begin(); 
+                     it != verboseOpts.end(); ++it )
+                {
+                    if (!strcmp(*it,"none"))
+                    {
+                        print_verbose_messages = VB_NONE;
+                        verboseString = "";
+                    }
+                    else if (!strcmp(*it,"all"))
+                    {
+                        print_verbose_messages = VB_ALL;
+                        verboseString = "all";
+                    }
+                    else if (!strcmp(*it,"quiet"))
+                    {
+                        print_verbose_messages = VB_IMPORTANT;
+                        verboseString = "important";
+                    }
+                    else if (!strcmp(*it,"record"))
+                    {
+                        print_verbose_messages |= VB_RECORD;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"playback"))
+                    {
+                        print_verbose_messages |= VB_PLAYBACK;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"channel"))
+                    {
+                        print_verbose_messages |= VB_CHANNEL;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"osd"))
+                    {
+                        print_verbose_messages |= VB_OSD;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"file"))
+                    {
+                        print_verbose_messages |= VB_FILE;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"schedule"))
+                    {
+                        print_verbose_messages |= VB_SCHEDULE;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"network"))
+                    {
+                        print_verbose_messages |= VB_NETWORK;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"commflag"))
+                    {
+                        print_verbose_messages |= VB_COMMFLAG;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"jobqueue"))
+                    {
+                        print_verbose_messages |= VB_JOBQUEUE;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"audio"))
+                    {
+                        print_verbose_messages |= VB_AUDIO;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"libav"))
+                    {
+                        print_verbose_messages |= VB_LIBAV;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"siparser"))
+                    {
+                        print_verbose_messages |= VB_SIPARSER;
+                        verboseString += " " + *it;
+                    }
+                    else
+                    {
+                        cerr << "Unknown argument for -v/--verbose: "
+                             << *it << endl;;
+                    }
+                }
+            }
+        } 
         else
         {
-            if (!(!strcmp(a.argv()[argpos],"-h") ||    
+            if (!(!strcmp(a.argv()[argpos],"-h") ||
                 !strcmp(a.argv()[argpos],"--help") ||
                 !strcmp(a.argv()[argpos],"--usage")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            cerr << "Valid options are: \n" << 
+
+            cerr << "Valid options are: "<<endl
 #ifdef Q_WS_X11 
-                    "-display X-server     Create GUI on X-server, not localhost\n" <<
+                 <<"-display X-server              Create GUI on X-server, not localhost"<<endl
 #endif          
-                    "--geometry WxH        Override window size settings\n" <<
-                    "-geometry WxH+X+Y     Override window size and position\n";
+                 <<"--geometry WxH                 Override window size settings"<<endl
+                 <<"-geometry WxH+X+Y              Override window size and position"<<endl
+                 <<"-v or --verbose debug-level    Prints more information\n"
+                 <<"                               Accepts any combination (separated by comma)\n"
+                 <<"                               of all,none,quiet,record,playback,channel,\n"
+                 <<"                               osd,file,schedule,network,commflag,audio,\n"
+                 <<"                               libav,jobqueue"<<endl;
             return -1;
         }
     }
