@@ -79,6 +79,7 @@ enum v4l2_ctrl_type {
 enum v4l2_tuner_type {
 	V4L2_TUNER_RADIO	     = 1,
 	V4L2_TUNER_ANALOG_TV	     = 2,
+	V4L2_TUNER_DIGITAL_TV	     = 3,
 };
 
 enum v4l2_memory {
