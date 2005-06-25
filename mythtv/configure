@@ -2560,6 +2560,7 @@ fi
 
 if test x"$CCONFIG" != x"" ; then
   echo "CCONFIG=$CCONFIG" >> $MYTH_CONFIG_MAK
+  echo "#define MYTH_BUILD_CONFIG \"$CCONFIG\"" >>$TMPH
 fi
 
 if test x"$CONFIG_DEFINES" != x"" ; then

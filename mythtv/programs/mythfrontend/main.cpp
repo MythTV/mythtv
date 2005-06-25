@@ -13,6 +13,7 @@
 #include <iostream>
 using namespace std;
 
+#include "mythconfig.h"
 #include "tv.h"
 #include "proglist.h"
 #include "progfind.h"
@@ -887,6 +888,10 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"--version"))
         {
             cout << MYTH_BINARY_VERSION << endl;
+#ifdef MYTH_BUILD_CONFIG
+            cout << "Options compiled in:" <<endl;
+            cout << MYTH_BUILD_CONFIG << endl;
+#endif
             return FRONTEND_EXIT_OK;
         }
         else if (!strcmp(a.argv()[argpos],"-geometry") ||

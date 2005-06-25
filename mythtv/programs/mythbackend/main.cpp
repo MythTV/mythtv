@@ -9,7 +9,6 @@
 #include <libgen.h>
 #include <signal.h>
 
-#include "../../config.h"
 #ifdef CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
 #endif
@@ -18,6 +17,7 @@
 #include <fstream>
 using namespace std;
 
+#include "mythconfig.h"
 #include "tv.h"
 #include "autoexpire.h"
 #include "scheduler.h"
@@ -360,6 +360,10 @@ int main(int argc, char **argv)
         else if (!strcmp(a.argv()[argpos],"--version"))
         {
             cout << MYTH_BINARY_VERSION << endl;
+#ifdef MYTH_BUILD_CONFIG
+            cout << "Options compiled in:" <<endl;
+            cout << MYTH_BUILD_CONFIG << endl;
+#endif
             return BACKEND_EXIT_OK;
         }
         else
