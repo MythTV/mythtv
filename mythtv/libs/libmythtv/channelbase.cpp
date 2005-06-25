@@ -271,13 +271,13 @@ void ChannelBase::SetCachedATSCInfo(const QString &chan)
 {
     int progsep = chan.find("-");
     int chansep = chan.find("_");
-    if (progsep>=0)
+    if (progsep >= 0)
     {
         currentProgramNum = chan.right(chan.length()-progsep-1).toInt();
         currentATSCMinorChannel = -1;
         currentATSCMajorChannel = chan.left(progsep).toInt();
     }
-    else if (chansep>=0)
+    else if (chansep >= 0)
     {
         currentProgramNum = -1;
         currentATSCMinorChannel = chan.right(chan.length()-chansep-1).toInt();
@@ -287,7 +287,7 @@ void ChannelBase::SetCachedATSCInfo(const QString &chan)
     {
         bool ok;
         int chanNum = chan.toInt(&ok);
-        if (ok && chanNum>=10)
+        if (ok && chanNum >= 10)
         {
             currentATSCMinorChannel = chanNum%10;
             currentATSCMajorChannel = chanNum/10;
@@ -298,10 +298,14 @@ void ChannelBase::SetCachedATSCInfo(const QString &chan)
             currentATSCMajorChannel = currentATSCMinorChannel = -1;
         }
     }
-    if (currentATSCMinorChannel>=0)
-        VERBOSE(VB_CHANNEL, QString("SetCachedATSCInfo(): %1_%2")
+    if (currentATSCMinorChannel >= 0)
+        VERBOSE(VB_CHANNEL,
+                QString("ChannelBase(%1)::SetCachedATSCInfo(%2): %3_%4")
+                .arg(GetDevice()).arg(chan)
                 .arg(currentATSCMajorChannel).arg(currentATSCMinorChannel));
     else
-        VERBOSE(VB_CHANNEL, QString("SetCachedATSCInfo(): %1-%2")
+        VERBOSE(VB_CHANNEL,
+                QString("ChannelBase(%1)::SetCachedATSCInfo(%2): %3-%4")
+                .arg(GetDevice()).arg(chan)
                 .arg(currentATSCMajorChannel).arg(currentProgramNum));
 }
