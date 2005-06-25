@@ -180,7 +180,7 @@ sdt_vec_t DVBStreamData::GetAllCachedSDTs(bool current) const
     return sdts;
 }
 
-void DVBStreamData::ReturnCachedTables(sdt_vec_t &sdts) const
+void DVBStreamData::ReturnCachedSDTTables(sdt_vec_t &sdts) const
 {
     for (sdt_vec_t::iterator it = sdts.begin(); it != sdts.end(); ++it)
         ReturnCachedTable(*it);

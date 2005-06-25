@@ -40,7 +40,7 @@ class DVBStreamData : virtual public MPEGStreamData
     const sdt_ptr_t GetCachedSDT(uint tsid, bool current = true) const;
     sdt_vec_t GetAllCachedSDTs(bool current = true) const;
 
-    void ReturnCachedTables(sdt_vec_t&) const;
+    void ReturnCachedSDTTables(sdt_vec_t&) const;
 
   signals:
     void UpdateNIT(const NetworkInformationTable*);

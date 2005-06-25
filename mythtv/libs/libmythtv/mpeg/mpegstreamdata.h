@@ -3,6 +3,9 @@
 #ifndef MPEGSTREAMDATA_H_
 #define MPEGSTREAMDATA_H_
 
+#include <vector>
+using namespace std;
+
 #include <qmap.h>
 #include "tspacket.h"
 

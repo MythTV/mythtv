@@ -85,8 +85,8 @@ class ATSCStreamData : virtual public MPEGStreamData
     tvct_vec_t GetAllCachedTVCTs(bool current = true) const;
     cvct_vec_t GetAllCachedCVCTs(bool current = true) const;
 
-    void ReturnCachedTables(tvct_vec_t&) const;
-    void ReturnCachedTables(cvct_vec_t&) const;
+    void ReturnCachedTVCTTables(tvct_vec_t&) const;
+    void ReturnCachedCVCTTables(cvct_vec_t&) const;
 
     // Single channel stuff
     int DesiredMajorChannel(void) const { return _desired_major_channel; }

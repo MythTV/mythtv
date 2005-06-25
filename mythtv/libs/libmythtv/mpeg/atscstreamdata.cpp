@@ -431,14 +431,14 @@ void ATSCStreamData::CacheCVCT(uint pid, CableVirtualChannelTable* cvct)
     _cache_lock.unlock();
 }
 
-void ATSCStreamData::ReturnCachedTables(tvct_vec_t &tvcts) const
+void ATSCStreamData::ReturnCachedTVCTTables(tvct_vec_t &tvcts) const
 {
     for (tvct_vec_t::iterator it = tvcts.begin(); it != tvcts.end(); ++it)
         ReturnCachedTable(*it);
     tvcts.clear();
 }
 
-void ATSCStreamData::ReturnCachedTables(cvct_vec_t &cvcts) const
+void ATSCStreamData::ReturnCachedCVCTTables(cvct_vec_t &cvcts) const
 {
     for (cvct_vec_t::iterator it = cvcts.begin(); it != cvcts.end(); ++it)
         ReturnCachedTable(*it);
