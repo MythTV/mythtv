@@ -417,6 +417,9 @@ Metadata *CdDecoder::getMetadata()
       artist = compilation_artist;
       compilation_artist = "";
     }
+
+    if (title.length() < 1)
+        title = QString(QObject::tr("Track %1")).arg(tracknum);
     
     cddb_write_data(cd, &discdata);
 
