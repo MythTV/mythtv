@@ -14,7 +14,7 @@
 #define DVBTSCAN_TIMEOUT 40000
 //#define SISCAN_DEBUG
 
-struct FrequencyTable
+struct FrequencyTableOld
 {
     int frequencyStart;                 //The staring centre frequency
     int frequencyEnd;                   //The ending centre frequency
@@ -34,25 +34,25 @@ struct FrequencyTable
     int offset2;                       //The second offset from the center f'
 };
 
-FrequencyTable frequenciesUK[]=
+FrequencyTableOld frequenciesUK[]=
 {
    {474000000,850000000,8000000,"",0,INVERSION_OFF,BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_2K,GUARD_INTERVAL_1_32,HIERARCHY_NONE,QAM_AUTO,166670,-166670},
    {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
 };
 
-FrequencyTable frequenciesFI[]=
+FrequencyTableOld frequenciesFI[]=
 {
    {474000000,850000000,8000000,"",0,INVERSION_OFF,BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,0,0},
    {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
 };
 
-FrequencyTable frequenciesSE[]=
+FrequencyTableOld frequenciesSE[]=
 {
    {474000000,850000000,8000000,"",0,INVERSION_OFF,BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,0,0},
    {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
 };
 
-FrequencyTable frequenciesAU[]=
+FrequencyTableOld frequenciesAU[]=
 {
    // VHF 6-12
    {177500000,226500000,7000000,"",0,INVERSION_OFF,
@@ -66,7 +66,7 @@ FrequencyTable frequenciesAU[]=
    {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
 };
 
-FrequencyTable frequenciesDE[]=
+FrequencyTableOld frequenciesDE[]=
 {
    // VHF 6-12
    {177500000,226500000,7000000,"",0,INVERSION_OFF,
@@ -81,7 +81,7 @@ FrequencyTable frequenciesDE[]=
 },
 };
 
-FrequencyTable *frequenciesDVBT[]=
+FrequencyTableOld *frequenciesDVBT[]=
 {
    frequenciesAU,
    frequenciesFI,
@@ -90,7 +90,7 @@ FrequencyTable *frequenciesDVBT[]=
    frequenciesDE,
 };
 
-FrequencyTable frequenciesATSC_T[]=
+FrequencyTableOld frequenciesATSC_T[]=
 {
 #if (DVB_API_VERSION_MINOR == 1)
    // VHF 2-6 
@@ -103,7 +103,7 @@ FrequencyTable frequenciesATSC_T[]=
    {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
 };
 
-FrequencyTable frequenciesATSC_C[]=
+FrequencyTableOld frequenciesATSC_C[]=
 {
    {75000000,801000000,6000000,"QAM Channel %1",1,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_256,0,0},
    {10000000,52000000,6000000,"QAM Channel T-%1",7,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_256,0,0},
@@ -187,7 +187,7 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         query.next();
         if (query.value(1).toString() == QString("atsc"))
             ScanTimeout = CHECKNIT_TIMER;
-        TransportScanList t;
+        TransportScanItem t;
         t.mplexid = query.value(0).toInt();
         t.SourceID = SourceID;
         t.FriendlyName = QString("Transport ID %1").arg(query.value(2).toString());
@@ -208,7 +208,7 @@ bool SIScan::ScanServices(int TransportID)
 }
 
 int SIScan::CreateMultiplex(const fe_type_t cardType,
-                            const TransportScanList& a, 
+                            const TransportScanItem& a, 
                             const DVBTuning& tuning)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -332,7 +332,7 @@ void SIScan::StartScanner()
         {
             if ((!sourceIDTransportTuned) || ((ScanTimeout > 0) && (timer.elapsed() > ScanTimeout)))
             {
-                QValueList<TransportScanList>::Iterator i;
+                QValueList<TransportScanItem>::Iterator i;
                 bool done = false;
                 for (i = scanTransports.begin() ; i != scanTransports.end() ; ++i)
                 {
@@ -426,7 +426,7 @@ void SIScan::StopScanner()
 
 }
 
-void SIScan::verifyTransport(TransportScanList& t)
+void SIScan::verifyTransport(TransportScanItem& t)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     /* See if mplexid is already in the database */
@@ -493,7 +493,7 @@ bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
     if (scanMode == TRANSPORT_LIST)
         return false;
 
-    FrequencyTable *t = NULL;
+    FrequencyTableOld *t = NULL;
     switch (FrequencyBand)
     {
         case 0:
@@ -512,15 +512,15 @@ bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
     /* Now generate a list of frequencies to scan and add it to the atscScanTransportList */
     while (t && t->frequencyStart)
     {
-        FrequencyTable *f = t;
+        FrequencyTableOld *f = t;
         int name_num = f->name_offset;
         QString strNameFormat = f->name_format;
         for (int x = f->frequencyStart ;x<=f->frequencyEnd; x+=f->frequencyStep)
         {
-            TransportScanList a;
+            TransportScanItem a;
             a.SourceID = SourceID;
             a.standard="atsc";
-            a.timeoutTune = TransportScanList::ATSC_TUNINGTIMEOUT;
+            a.timeoutTune = TransportScanItem::ATSC_TUNINGTIMEOUT;
             a.FriendlyName = strNameFormat.arg(name_num);
             a.tuning.params.frequency = x;
             a.tuning.params.inversion = f->inversion;
@@ -560,16 +560,16 @@ bool SIScan::DVBTScanTransport(int SourceID,unsigned country)
     /* Now generate a list of frequencies to scan and add it to the atscScanTransportList */
 
     transportsCount=0;
-    FrequencyTable *t = frequenciesDVBT[country];
+    FrequencyTableOld *t = frequenciesDVBT[country];
     while (t && t->frequencyStart)
     {
-        FrequencyTable *f = t;
+        FrequencyTableOld *f = t;
         for (int x = f->frequencyStart ;x<=f->frequencyEnd; x+=f->frequencyStep)
         {
-            TransportScanList a;
+            TransportScanItem a;
             a.SourceID = SourceID;
             a.standard="dvb";
-            a.timeoutTune = TransportScanList::DVBT_TUNINGTIMEOUT;
+            a.timeoutTune = TransportScanItem::DVBT_TUNINGTIMEOUT;
             
             a.tuning.params.frequency = x;
             a.tuning.params.inversion = f->inversion;

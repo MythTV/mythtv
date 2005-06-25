@@ -4,55 +4,12 @@
 #include "dvbchannel.h"
 #include "sitypes.h"
 #include "dvbtypes.h"
+#include "frequencytables.h"
 
 typedef QValueList<Event> QList_Events;
 typedef QValueList<QList_Events*> QListList_Events;
 
 typedef enum { IDLE, TRANSPORT_LIST, EIT_CRAWL } SCANMODE;
-
-/* Class used for doing a list of frequencies / transports 
-   This is used for ATSC/NA Digital Cable and also scan all transports */
-class TransportScanList
-{
-public:
-    enum {DVBT_TUNINGTIMEOUT=1000, ATSC_TUNINGTIMEOUT=2000};
-
-    TransportScanList()
-    {
-        mplexid = -1;
-        complete = false;
-        scanning = false;
-        FriendlyName = "";
-        offset1 = 0;
-        offset2 = 0;
-        timeoutTune = ATSC_TUNINGTIMEOUT; 
-    }
-
-    TransportScanList(int _mplexid)
-    {
-        mplexid = _mplexid;
-        complete = false;
-        scanning = false;
-        FriendlyName = "";
-        offset1 = 0;
-        offset2 = 0;
-        timeoutTune = ATSC_TUNINGTIMEOUT; 
-    }
-
-    int mplexid;                /* DB Mplexid */
-    bool complete;              /* scan status */
-    QString standard;           /* DVB/ATSC */
-    DVBTuning tuning;        /* DVB Tuning struct if mplexid == -1 */
-
-    QString FriendlyName;       /* Name to display in scanner dialog */
-    int SourceID;               /* Associated SourceID */
-    bool UseTimer;              /* Set if timer is used after lock for getting PAT */
-
-    bool scanning;              /* Probbably Unnecessary */
-    int offset1;                /* First frequency offset */
-    int offset2;                /* Second frequency offset */
-    unsigned timeoutTune;      /* Timeout to tune to a frequency*/
-};
 
 class SIScan : public QObject
 {
@@ -99,9 +56,9 @@ private:
     static void *ServiceScanThreadHelper(void*);
     static void *TransportScanThreadHelper(void*);
 
-    void verifyTransport(TransportScanList& t);
+    void verifyTransport(TransportScanItem& t);
 
-    int CreateMultiplex(const fe_type_t cardType,const TransportScanList& a,
+    int CreateMultiplex(const fe_type_t cardType,const TransportScanItem& a,
                     const DVBTuning& tuning);
 
     void UpdateTransportsInDB(NITObject NIT);
@@ -126,7 +83,7 @@ private:
     NITObject NIT;
     DVBChannel *chan;
     int sourceID;
-    QValueList<TransportScanList> scanTransports;
+    QValueList<TransportScanItem> scanTransports;
 
     QTime timer;
 

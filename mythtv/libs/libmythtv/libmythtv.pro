@@ -185,8 +185,10 @@ using_backend {
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
     HEADERS += analogscan.h
+    HEADERS += frequencytables.h
     SOURCES += scanwizard.cpp              scanwizardhelpers.cpp
     SOURCES += analogscan.cpp
+    SOURCES += frequencytables.cpp
 
     # TVRec & Recorder base classes
     HEADERS += tv_rec.h
@@ -271,7 +273,11 @@ using_backend {
         SOURCES += dvbtransporteditor.cpp dvbconfparser.cpp dvbdev/dvbci.cpp
 
         DEFINES += USING_DVB
-        using_dvb_eit:DEFINES += USING_DVB_EIT
+        using_dvb_eit {
+            HEADERS += eithelper.h
+            SOURCES += eithelper.cpp
+            DEFINES += USING_DVB_EIT
+        }
     }
 
     # C stuff
