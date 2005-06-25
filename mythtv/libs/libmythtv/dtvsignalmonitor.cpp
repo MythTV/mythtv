@@ -8,10 +8,10 @@
  *  \brief This class is intended to detect the presence of needed tables.
  */
 
-DTVSignalMonitor::DTVSignalMonitor(int capturecardnum, int fd,
+DTVSignalMonitor::DTVSignalMonitor(int capturecardnum,
                                    uint wait_for_mask,
                                    const char *name)
-    : SignalMonitor(capturecardnum, fd, wait_for_mask, name), stream_data(NULL),
+    : SignalMonitor(capturecardnum, wait_for_mask, name), stream_data(NULL),
       seenPAT(QObject::tr("Seen PAT"), "seen_pat", 1, true, 0, 1, 0),
       seenPMT(QObject::tr("Seen PMT"), "seen_pmt", 1, true, 0, 1, 0),
       seenMGT(QObject::tr("Seen MGT"), "seen_mgt", 1, true, 0, 1, 0),
@@ -30,7 +30,8 @@ DTVSignalMonitor::DTVSignalMonitor(int capturecardnum, int fd,
                   "matching_nit", 1, true, 0, 1, 0),
       matchingSDT(QObject::tr("Matching SDT"),
                   "matching_sdt", 1, true, 0, 1, 0),
-      majorChannel(-1), minorChannel(-1), programNumber(-1)
+      majorChannel(-1), minorChannel(-1), programNumber(-1),
+      error("")
 {
 }
 
@@ -70,6 +71,10 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
         list<<seenSDT.GetName()<<seenSDT.GetStatus();
         list<<matchingSDT.GetName()<<matchingSDT.GetStatus();
     }
+    if (error != "")
+    {
+        list<<"error"<<error;
+    }
     return list;
 }
 
@@ -103,7 +108,7 @@ void DTVSignalMonitor::UpdateMonitorValues()
 
 void DTVSignalMonitor::SetChannel(int major, int minor)
 {
-    VERBOSE(VB_RECORD, "SetChannel("<<major<<", "<<minor<<")");
+    VERBOSE(VB_CHANNEL, "SetChannel("<<major<<", "<<minor<<")");
     if (GetATSCStreamData() && (majorChannel != major || minorChannel != minor))
     {
         RemoveFlags(kDTVSigMon_PATSeen | kDTVSigMon_PATMatch |
@@ -112,12 +117,13 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
         majorChannel = major;
         minorChannel = minor;
         GetATSCStreamData()->SetDesiredChannel(major, minor);
-        AddFlags(kDTVSigMon_WaitForVCT);
+        AddFlags(kDTVSigMon_WaitForVCT | kDTVSigMon_WaitForPAT);
     }
 }
 
 void DTVSignalMonitor::SetProgramNumber(int progNum)
 {
+    VERBOSE(VB_CHANNEL, QString("SetProgramNumber(): %1").arg(progNum));
     if (programNumber != progNum)
     {
         RemoveFlags(kDTVSigMon_PMTSeen | kDTVSigMon_PMTMatch);
@@ -174,6 +180,21 @@ void DTVSignalMonitor::SetPAT(const ProgramAssociationTable *pat)
         AddFlags(kDTVSigMon_PATMatch);
         GetStreamData()->AddListeningPID(pmt_pid);
     }
+    else if (programNumber >= 0 && pat->ProgramCount() == 1)
+    {
+        QString errStr = QObject::tr("Program #%1 not found in PAT!").arg(programNumber);
+        VERBOSE(VB_IMPORTANT, errStr<<endl<<pat->toString()<<endl);
+        VERBOSE(VB_IMPORTANT, "But there is only one program in the PAT, "
+                "so we'll just use it");
+        SetProgramNumber(pat->ProgramNumber(0));
+        AddFlags(kDTVSigMon_PATMatch);
+        GetStreamData()->AddListeningPID(pat->ProgramPID(0));
+    }
+    else if (programNumber >= 0)
+    {
+        error = QObject::tr("Program #%1 not found in PAT!").arg(programNumber);
+        VERBOSE(VB_IMPORTANT, error<<endl<<pat->toString()<<endl);
+    }
 }
 
 void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
@@ -217,6 +238,7 @@ static int get_idx(const VirtualChannelTable* vct,
                    int majorChannel, int minorChannel)
 {
     int idx = vct->Find(majorChannel, minorChannel);
+#if 0
     if (idx < 0 && minorChannel > 0)
     {
         // BEGIN HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
@@ -243,6 +265,7 @@ static int get_idx(const VirtualChannelTable* vct,
         }
         // END   HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
     }
+#endif
     return idx;
 }
 
@@ -254,6 +277,9 @@ void DTVSignalMonitor::SetVCT(uint, const TerrestrialVirtualChannelTable* tvct)
     if (idx < 0)
         return;
 
+    VERBOSE(VB_IMPORTANT, QString("tvct->ProgramNumber(%1): %2")
+            .arg(idx).arg(tvct->ProgramNumber(idx)));
+#if 0
     // BEGIN HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
     if (((int)tvct->MajorChannel(idx) != majorChannel) ||
         ((int)tvct->MinorChannel(idx) != minorChannel))
@@ -263,6 +289,7 @@ void DTVSignalMonitor::SetVCT(uint, const TerrestrialVirtualChannelTable* tvct)
         //GetATSCStreamData()->SetDesiredProgram(tvct->ProgramNumber(idx));
     }
     // END   HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+#endif
 
     SetProgramNumber(tvct->ProgramNumber(idx));
     AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_TVCTMatch);
@@ -276,6 +303,9 @@ void DTVSignalMonitor::SetVCT(uint, const CableVirtualChannelTable* cvct)
     if (idx < 0)
         return;
 
+    VERBOSE(VB_IMPORTANT, QString("cvct->ProgramNumber(%1): %2")
+            .arg(idx).arg(cvct->ProgramNumber(idx)));
+#if 0
     // BEGIN HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
     if (((int)cvct->MajorChannel(idx) != majorChannel) ||
         ((int)cvct->MinorChannel(idx) != minorChannel))
@@ -285,6 +315,7 @@ void DTVSignalMonitor::SetVCT(uint, const CableVirtualChannelTable* cvct)
         //GetATSCStreamData()->SetDesiredProgram(cvct->ProgramNumber(idx));
     }
     // END   HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+#endif
 
     SetProgramNumber(cvct->ProgramNumber(idx));
     AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_CVCTMatch);
@@ -333,4 +364,34 @@ const DVBStreamData *DTVSignalMonitor::GetDVBStreamData() const
 const ScanStreamData *DTVSignalMonitor::GetScanStreamData() const
 {
     return dynamic_cast<const ScanStreamData*>(stream_data);
+}
+
+/** \fn  SignalMonitor::WaitForLock(int)
+ *  \brief Wait for a StatusSignaLock(int) of true.
+ *
+ *   This can be called only after the signal
+ *   monitoring thread has been started.
+ *
+ *  \param timeout maximum time to wait in milliseconds.
+ *  \return true if signal was acquired.
+ */
+bool DTVSignalMonitor::WaitForLock(int timeout)
+{
+    if (-1 == timeout)
+        timeout = signalLock.GetTimeout();
+    if (timeout < 0)
+        return false;
+
+    QTime t;
+    t.start();
+    while (t.elapsed()<timeout && running)
+    {
+        SignalMonitorList slist = 
+            SignalMonitorValue::Parse(GetStatusList());
+        if (SignalMonitorValue::AllGood(slist))
+            return true;
+        usleep(250);
+    }
+
+    return false;
 }

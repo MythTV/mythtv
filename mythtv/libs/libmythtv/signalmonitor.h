@@ -124,7 +124,7 @@ signals:
      */
     void StatusSignalStrength(const SignalMonitorValue&);
 protected:
-    SignalMonitor(int capturecardnum, int fd, uint wait_for_mask,
+    SignalMonitor(int capturecardnum, uint wait_for_mask,
                   const char *name = "SignalMonitor");
     
     static void* SpawnMonitorLoop(void*);
@@ -135,7 +135,6 @@ protected:
 
     pthread_t   monitor_thread;
     int         capturecardnum;
-    int         fd;
     uint        flags;
     int         update_rate;
     bool        running;

@@ -31,9 +31,8 @@
  */
 pcHDTVSignalMonitor::pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
                                          uint _flags, const char *_name)
-    : DTVSignalMonitor(db_cardnum, _channel->GetFd(), _flags, _name),
-      input(_channel->GetCurrentInputNum()), usingv4l2(false),
-      dtvMonitorRunning(false), channel(_channel)
+    : DTVSignalMonitor(db_cardnum, _flags, _name),
+      usingv4l2(false), dtvMonitorRunning(false), channel(_channel)
 {
     int wait = gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
     int threshold = gContext->GetNumSetting("ATSCCheckSignalThreshold", 65);
@@ -46,7 +45,7 @@ pcHDTVSignalMonitor::pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
 
     struct v4l2_capability vcap;
     bzero(&vcap, sizeof(vcap));
-    usingv4l2 = (ioctl(fd, VIDIOC_QUERYCAP, &vcap) >= 0) &&
+    usingv4l2 = (ioctl(channel->GetFd(), VIDIOC_QUERYCAP, &vcap) >= 0) &&
         (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE);
 }
 
@@ -60,14 +59,14 @@ pcHDTVSignalMonitor::~pcHDTVSignalMonitor()
  */
 void pcHDTVSignalMonitor::Stop()
 {
-    VERBOSE(VB_IMPORTANT, "pcHDTVSignalMonitor::Stop() -- begin");
+    VERBOSE(VB_CHANNEL, "pcHDTVSignalMonitor::Stop() -- begin");
     SignalMonitor::Stop();
     if (dtvMonitorRunning)
     {
         dtvMonitorRunning = false;
         pthread_join(table_monitor_thread, NULL);
     }
-    VERBOSE(VB_IMPORTANT, "pcHDTVSignalMonitor::Stop() -- end");
+    VERBOSE(VB_CHANNEL, "pcHDTVSignalMonitor::Stop() -- end");
 }
 
 void *pcHDTVSignalMonitor::TableMonitorThread(void *param)
@@ -87,11 +86,11 @@ void pcHDTVSignalMonitor::RunTableMonitor()
         return;
     bzero(buffer, buffer_size);
 
-    VERBOSE(VB_IMPORTANT, "RunTableMonitor() -- begin ("
+    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- begin ("
             <<GetStreamData()->ListeningPIDs().size()<<")");
     while (dtvMonitorRunning && GetStreamData())
     {
-        long long len = read(fd, &(buffer[remainder]), buffer_size - remainder);
+        long long len = read(channel->GetFd(), &(buffer[remainder]), buffer_size - remainder);
 
         if ((0 == len) || (-1 == len))
         {
@@ -105,7 +104,7 @@ void pcHDTVSignalMonitor::RunTableMonitor()
         if (remainder > 0) // leftover bytes
             memmove(buffer, &(buffer[buffer_size - remainder]), remainder);
     }
-    VERBOSE(VB_IMPORTANT, "RunTableMonitor() -- end");
+    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- end");
 }
 
 /** \fn pcHDTVSignalMonitor::UpdateValues()
@@ -119,8 +118,12 @@ void pcHDTVSignalMonitor::UpdateValues()
 {
     if (!dtvMonitorRunning)
     {
-        signalStrength.SetValue(GetSignal(fd, input, usingv4l2));
+        int sig = GetSignal(channel->GetFd(), channel->GetCurrentInputNum(),
+                            usingv4l2);
+
+        signalStrength.SetValue(sig);
         signalLock.SetValue(signalStrength.IsGood());
+
         if (signalLock.IsGood() && GetStreamData() &&
             HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
                        kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
@@ -136,7 +139,6 @@ void pcHDTVSignalMonitor::UpdateValues()
     {
         // TODO dtv signals...
     }
-
 
     emit StatusSignalLock(signalLock.GetValue());
     emit StatusSignalStrength(signalStrength.GetValue());
@@ -170,7 +172,7 @@ int pcHDTVSignalMonitor::GetSignal(int fd, uint input, bool usingv4l2)
         int ioctlval = ioctl(fd, VIDIOC_G_TUNER, &vsig);
         if (ioctlval != -1)
         {
-            VERBOSE(VB_RECORD,
+            VERBOSE(VB_CHANNEL,
                     QString("pcHDTV::GetSignal_v4l2(fd %1, input %2, v4l%3): "
                             "raw signal(%4)")
                     .arg(fd).arg(input).arg(usingv4l2 ? 2 : 1).arg(vsig.signal));
@@ -206,7 +208,7 @@ int pcHDTVSignalMonitor::GetSignal(int fd, uint input, bool usingv4l2)
     if ((signal & 0xff) == 0x43)
         retsig = clamp(101 - (signal >> 9), 0, 100);
 
-    VERBOSE(VB_RECORD,
+    VERBOSE(VB_CHANNEL,
             QString("pcHDTV::GetSignal_v4l1(fd %1, input %2, v4l%3): "
                     "processed signal(%4)")
             .arg(fd).arg(input).arg(usingv4l2 ? 2 : 1).arg(retsig));

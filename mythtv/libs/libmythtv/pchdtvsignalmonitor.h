@@ -28,7 +28,6 @@ private:
     static void *TableMonitorThread(void *param);
     void RunTableMonitor();
 
-    uint      input;
     bool      usingv4l2;
     bool      dtvMonitorRunning;
     pthread_t table_monitor_thread;

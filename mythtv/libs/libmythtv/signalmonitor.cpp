@@ -78,6 +78,12 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
             signalMonitor = new pcHDTVSignalMonitor(db_cardnum, hdtvc);
     }
 #endif
+    if (!signalMonitor)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Failed to create signal monitor in Init(%1, %2, 0x%3)")
+                .arg(cardtype).arg(db_cardnum).arg((int)channel,0,16));
+    }
 
     return signalMonitor;
 }
@@ -92,13 +98,12 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
  *         if this is less than 0, SIGNAL events will not be
  *         sent to the frontend even if SetNotifyFrontend(true)
  *         is called.
- *  \param fd file descriptor for device being monitored.
  *  \param wait_for_mask SignalMonitorFlags to start with.
  */
-SignalMonitor::SignalMonitor(int _capturecardnum, int _fd, uint wait_for_mask,
+SignalMonitor::SignalMonitor(int _capturecardnum, uint wait_for_mask,
                              const char *name)
     : QObject(NULL, name),
-      capturecardnum(_capturecardnum), fd(_fd), flags(wait_for_mask),
+      capturecardnum(_capturecardnum), flags(wait_for_mask),
       update_rate(25), running(false), exit(false), update_done(false),
       notify_frontend(true),
       signalLock(QObject::tr("Signal Lock"), "slock", 1, true, 0, 1, 0),
@@ -119,10 +124,12 @@ SignalMonitor::~SignalMonitor()
  */
 void SignalMonitor::Start()
 {
+    VERBOSE(VB_CHANNEL, "SignalMonitor::Start() -- begin");
     if (!running)
         pthread_create(&monitor_thread, NULL, SpawnMonitorLoop, this);
     while (!running)
         usleep(50);
+    VERBOSE(VB_CHANNEL, "SignalMonitor::Start() -- end");
 }
 
 /** \fn SignalMonitor::Stop()

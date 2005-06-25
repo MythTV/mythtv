@@ -24,6 +24,10 @@ public:
     void Stop(void);
 
 signals:
+    void StatusSignalToNoise(const SignalMonitorValue&);
+    void StatusBitErrorRate(const SignalMonitorValue&);
+    void StatusUncorrectedBlocks(const SignalMonitorValue&);
+
     void StatusSignalToNoise(int);
     void StatusBitErrorRate(int);
     void StatusUncorrectedBlocks(int);

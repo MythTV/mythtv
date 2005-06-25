@@ -40,7 +40,7 @@ static bool fill_frontend_stats(int fd_frontend, dvb_stats_t &stats);
  */
 DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
                                    uint _flags, const char *_name)
-    : DTVSignalMonitor(db_cardnum, _channel->GetFd(), _flags, _name),
+    : DTVSignalMonitor(db_cardnum, _flags, _name),
       cardnum(_channel->GetCardNum()),
       signalToNoise(
           QObject::tr("Signal To Noise"), "snr", 0,  true, -32768, 32767, 0),
@@ -68,7 +68,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
         .arg(capturecardnum).arg(cardnum);
 
 #define DVB_IO(WHAT,WHERE,ERRMSG,FLAG) \
-    if (ioctl(fd, WHAT, WHERE)) \
+    if (ioctl(_channel->GetFd(), WHAT, WHERE)) \
         VERBOSE(VB_IMPORTANT, msg.arg(ERRMSG).arg(strerror(errno))); \
     else newflags |= FLAG;
 
@@ -186,7 +186,7 @@ bool DVBSignalMonitor::RemovePIDFilter(uint pid)
     int mux_fd = filters[pid];
     filters.erase(filters.find(pid));
     int err = close(mux_fd);
-    if (err<0)
+    if (err < 0)
         VERBOSE(VB_IMPORTANT, QString("Failed to close mux (pid %1)").arg(pid));
 
     unsigned char *buffer = buffers[pid];
@@ -300,7 +300,7 @@ void DVBSignalMonitor::UpdateValues(void)
 {
     dvb_stats_t stats;
 
-    if (!dtvMonitorRunning && fill_frontend_stats(fd, stats) &&
+    if (!dtvMonitorRunning && fill_frontend_stats(channel->GetFd(), stats) &&
         !(stats.status & FE_TIMEDOUT))
     {
         //int wasLocked = signalLock.GetValue();
@@ -314,13 +314,21 @@ void DVBSignalMonitor::UpdateValues(void)
         //cerr<<"locked("<<locked<<") slock("<<signalLock.IsGood()<<")"<<endl;
         emit StatusSignalLock(locked);
         if (HasFlags(kDTVSigMon_WaitForSig))
+        {
             emit StatusSignalStrength((int) stats.ss);
+        }
         if (HasFlags(kDVBSigMon_WaitForSNR))
+        {
             emit StatusSignalToNoise((int) stats.snr);
+        }
         if (HasFlags(kDVBSigMon_WaitForBER))
+        {
             emit StatusBitErrorRate(stats.ber);
+        }
         if (HasFlags(kDVBSigMon_WaitForUB))
+        {
             emit StatusUncorrectedBlocks(stats.ub);
+        }
 
         //if (wasLocked != signalLock.GetValue())
         //    GENERAL((wasLocked ? "Signal Lost" : "Signal Lock"));

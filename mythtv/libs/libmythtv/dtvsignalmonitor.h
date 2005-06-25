@@ -22,7 +22,7 @@ class DTVSignalMonitor: public SignalMonitor
 {
     Q_OBJECT
   public:
-    DTVSignalMonitor(int capturecardnum, int fd, uint wait_for_mask,
+    DTVSignalMonitor(int capturecardnum, uint wait_for_mask,
                      const char *name = "DTVSignalMonitor");
 
     virtual QStringList GetStatusList(bool kick = true);
@@ -59,6 +59,8 @@ class DTVSignalMonitor: public SignalMonitor
     /// Returns the scan stream data if it exists
     const ScanStreamData *GetScanStreamData() const;
 
+    bool WaitForLock(int timeout=-1);
+
   private slots:
     void SetPAT(const ProgramAssociationTable*);
     void SetPMT(uint, const ProgramMapTable*);
@@ -86,6 +88,7 @@ class DTVSignalMonitor: public SignalMonitor
     int                majorChannel;
     int                minorChannel;
     int                programNumber;
+    QString            error;
 };
 
 #endif // DTVSIGNALMONITOR_H
