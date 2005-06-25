@@ -2589,3 +2589,5 @@ rm -f config.mak
 ln -s $MYTH_CONFIG_MAK config.mak
 
 rm -f $TMPO $TMPC $TMPE $TMPS $TMPH
+
+qmake mythtv.pro

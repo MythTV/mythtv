@@ -605,3 +605,5 @@ if test "$phone" = "yes" ; then
 fi
 
 echo ""
+
+qmake mythplugins.pro
