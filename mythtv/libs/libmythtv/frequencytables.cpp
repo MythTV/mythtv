@@ -59,7 +59,9 @@ TransportScanItem::TransportScanItem(int sourceid,
     }
     else if (standard == "atsc")
     {
+#if (DVB_API_VERSION_MINOR == 1)
         tuning.params.u.vsb.modulation = (fe_modulation) ft.modulation;
+#endif
     }
 #else
     frequency  = freq;
