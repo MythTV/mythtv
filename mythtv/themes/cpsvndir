@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# cpsvndir: recursive directory copy excluding .svn sub dirs.
+
+mkdir -p $2/$1 || exit 1
+
+find ./$1 -path '*/.svn' -prune -o -print | 
+    xargs -i cp --parents {} $2 2> /dev/null
+
+exit 0
