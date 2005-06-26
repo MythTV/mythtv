@@ -3919,69 +3919,6 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
 
     QDomText dataDirectMessage = pDoc->createTextNode(gContext->GetSetting("DataDirectMessage"));
     guide.appendChild(dataDirectMessage);
-
-#if USING_DVB
-    // DVB Status
-
-    QDomElement dvbstatus = pDoc->createElement("DVBStatus");
-    root.appendChild(dvbstatus);
-
-    MSqlQuery oquery(MSqlQuery::InitCon());
-    oquery.prepare("SELECT starttime,endtime FROM recorded "
-                   "WHERE starttime >= DATE_SUB(NOW(), INTERVAL 48 HOUR) "
-                   "ORDER BY starttime;");
-
-    QString querytext;
-
-    if (oquery.exec() && oquery.isActive() && oquery.size() > 0)
-    {
-        MSqlQuery query(MSqlQuery::InitCon());
-        querytext = QString("SELECT cardid,"
-                            "max(fe_ss),min(fe_ss),avg(fe_ss),"
-                            "max(fe_snr),min(fe_snr),avg(fe_snr),"
-                            "max(fe_ber),min(fe_ber),avg(fe_ber),"
-                            "max(fe_unc),min(fe_unc),avg(fe_unc),"
-                            "max(myth_cont),max(myth_over),max(myth_pkts) "
-                            "FROM dvb_signal_quality "
-                            "WHERE sampletime BETWEEN ? AND ? "
-                            "GROUP BY cardid");
-
-        query.prepare(querytext);
-
-        while (oquery.next())
-        {
-            QDomElement dvbinterval = pDoc->createElement("DVBInterval");
-            dvbstatus.appendChild(dvbinterval);
-
-            QDateTime t_start = oquery.value(0).toDateTime();
-            QDateTime t_end   = oquery.value(1).toDateTime();
-
-            dvbinterval.setAttribute("start", t_start.toTime_t());
-            dvbinterval.setAttribute("end"  , t_end.toTime_t());
-
-            query.bindValue(0, t_start);
-            query.bindValue(1, t_end);
-
-            query.exec();
-            if (query.isActive() && query.numRowsAffected())
-            {
-                while (query.next())
-                {
-                    QDomElement dvbInfo = pDoc->createElement("DVBInfo");
-                    dvbinterval.appendChild(dvbInfo);
-
-                    dvbInfo.setAttribute("cardId"   , query.value(0).toInt() );
-                    dvbInfo.setAttribute("minSNR"   , query.value(5).toInt() );
-                    dvbInfo.setAttribute("avgSNR"   , query.value(6).toInt() );
-                    dvbInfo.setAttribute("minBER"   , query.value(8).toInt() );
-                    dvbInfo.setAttribute("avgBER"   , query.value(9).toInt() );
-                    dvbInfo.setAttribute("contErrs" , query.value(13).toInt());
-                    dvbInfo.setAttribute("overflows", query.value(14).toInt());
-                }
-            }
-        }
-    }
-#endif
 }
 
 void MainServer::FillProgramInfo(QDomDocument *pDoc, QDomElement &e, 

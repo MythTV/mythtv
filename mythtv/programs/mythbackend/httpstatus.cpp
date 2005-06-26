@@ -218,15 +218,6 @@ void HttpStatus::PrintStatus(QSocket *socket, QDomDocument *pDoc )
     if (!node.isNull())
         PrintMachineInfo( os, node.toElement());
 
-#if USING_DVB
-    // DVB Signal Information ------------------
-
-    node = docElem.namedItem( "DVBStatus" );
-
-    if (!node.isNull())
-        PrintDVBStatus( os, node.toElement());
-#endif
-
     os << "\r\n</body>\r\n</html>\r\n";
 }
 
@@ -757,67 +748,3 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
     return( 1 );
 }
-
-#if USING_DVB
-
-int HttpStatus::PrintDVBStatus( QTextStream &os, QDomElement status )
-{
-    QString timeDateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d") +
-                       " " + gContext->GetSetting("TimeFormat", "h:mm AP");
-
-    int nCount = 0;
-
-    os << "\r\n  <div class=\"content\">\r\n" <<
-        "    <h2>DVB Signal Information</h2>\r\n" <<
-        "    Details of DVB error statistics for last 48 hours:<br />\r\n";
-
-
-    QDomNode node = status.firstChild();
-
-    while (!node.isNull())
-    {
-        QDomElement eStatus = node.toElement();
-        QDateTime   start   = GetDateTime( eStatus.attribute( "start" ,"" ));
-        QDateTime   end     = GetDateTime( eStatus.attribute( "end"   ,"" ));
-
-        QDomNode nodeInfo = node.firstChild();
-
-        if (!nodeInfo.isNull() )
-            os << "    <br />Recording period from " 
-               << start.toString(timeDateFormat)
-               << " to " << end.toString( timeDateFormat ) 
-               << "<br />\n";
-
-        while (!nodeInfo.isNull())
-        {
-            QDomElement e = nodeInfo.toElement();
-                
-            os << "    Encoder " << e.attribute( "cardId"   , "0").toInt()
-               << " Min SNR: "   << e.attribute( "minSNR"   , "0").toInt()
-               << " Avg SNR: "   << e.attribute( "avgSNR"   , "0").toInt()
-               << " Min BER: "   << e.attribute( "minBER"   , "0").toInt()
-               << " Avg BER: "   << e.attribute( "avgBER"   , "0").toInt()
-               << " Cont Errs: " << e.attribute( "contErrs" , "0").toInt()
-               << " Overflows: " << e.attribute( "overflows", "0").toInt()
-               << "<br />\r\n";
-
-            nCount++;
-
-            nodeInfo = nodeInfo.nextSibling();
-        }
-
-        node = node.nextSibling();
-    }
-
-    if (nCount == 0)
-    {
-        os << "    <br />There is no DVB signal quality data available to "
-            "display.<br />\r\n";
-    }
-
-    os << "  </div>\r\n";
-
-    return( nCount );
-}
-
-#endif

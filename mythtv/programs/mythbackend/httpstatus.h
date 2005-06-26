@@ -29,10 +29,6 @@ class HttpStatus : public QServerSocket
     int       PrintJobQueue     ( QTextStream &os, QDomElement jobs );
     int       PrintMachineInfo  ( QTextStream &os, QDomElement info );
 
-#if USING_DVB
-    int       PrintDVBStatus    ( QTextStream &os, QDomElement info );
-#endif
-
   private:
     MainServer *m_parent;
 };
