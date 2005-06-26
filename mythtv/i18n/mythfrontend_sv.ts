@@ -1,5 +1,68 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>@default</name>
+    <message>
+        <source>Unknown</source>
+        <translation>Okänt</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation>Köad</translation>
+    </message>
+    <message>
+        <source>Pending</source>
+        <translation>Avvaktande</translation>
+    </message>
+    <message>
+        <source>Starting</source>
+        <translation>Startar</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation>Körs</translation>
+    </message>
+    <message>
+        <source>Stopping</source>
+        <translation>Stoppar</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>Pausad</translation>
+    </message>
+    <message>
+        <source>Retrying</source>
+        <translation>Försöker igen</translation>
+    </message>
+    <message>
+        <source>Erroring</source>
+        <translation>Fel</translation>
+    </message>
+    <message>
+        <source>Aborting</source>
+        <translation>Avbryter</translation>
+    </message>
+    <message>
+        <source>Done (Invalid status!)</source>
+        <translation>Klar (Ogiltig status!)</translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation>Avslutad</translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation>Avbruten</translation>
+    </message>
+    <message>
+        <source>Errored</source>
+        <translation>Fel</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation>Avbruten</translation>
+    </message>
+</context>
+<context>
     <name>CaptureCard</name>
     <message>
         <source>You have to save the current card before configuring it, would you like to do this now?</source>
@@ -237,6 +300,14 @@
         <source>Movie of the Week (complete example - use FindWeekly)</source>
         <translation>Veckans film (komplett exempel - använder Hitta veckovis)</translation>
     </message>
+    <message>
+        <source>Edit Rule</source>
+        <translation>Redigera regel</translation>
+    </message>
+    <message>
+        <source>&lt;New rule&gt;</source>
+        <translation>&lt;Ny regel&gt;</translation>
+    </message>
 </context>
 <context>
     <name>DVBTransportsEditor</name>
@@ -346,52 +417,8 @@
         <translation>Okänt jobb</translation>
     </message>
     <message>
-        <source>Queued</source>
-        <translation>Köad</translation>
-    </message>
-    <message>
-        <source>Pending</source>
-        <translation>Avvaktande</translation>
-    </message>
-    <message>
-        <source>Starting</source>
-        <translation>Startar</translation>
-    </message>
-    <message>
-        <source>Running</source>
-        <translation>Körs</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation>Pausad</translation>
-    </message>
-    <message>
-        <source>Stopping</source>
-        <translation>Stoppar</translation>
-    </message>
-    <message>
-        <source>Done (Invalid status!)</source>
-        <translation>Klar (Ogiltig status!)</translation>
-    </message>
-    <message>
-        <source>Finished</source>
-        <translation>Avslutad</translation>
-    </message>
-    <message>
-        <source>Aborted</source>
-        <translation>Avbruten</translation>
-    </message>
-    <message>
-        <source>Errored</source>
-        <translation>Fel</translation>
-    </message>
-    <message>
         <source>Undefined</source>
         <translation>Odefinierad</translation>
-    </message>
-    <message>
-        <source>Cancelled</source>
-        <translation>Avbruten</translation>
     </message>
 </context>
 <context>
@@ -1324,10 +1351,6 @@ Returning to previous menu.</source>
         <translation>Radera efter denna ruta</translation>
     </message>
     <message>
-        <source>Found %1 sec. commercial</source>
-        <translation>Hittade %1 sek. reklam</translation>
-    </message>
-    <message>
         <source>Start of program.</source>
         <translation>Början på program.</translation>
     </message>
@@ -1338,18 +1361,6 @@ Returning to previous menu.</source>
     <message>
         <source>Not Recording</source>
         <translation>Ingen inspelning</translation>
-    </message>
-    <message>
-        <source>Air Date:</source>
-        <translation type="obsolete">Sändningstid:</translation>
-    </message>
-    <message>
-        <source>Episode:</source>
-        <translation type="obsolete">Avsnitt:</translation>
-    </message>
-    <message>
-        <source>Description:</source>
-        <translation type="obsolete">Beskrivning:</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
@@ -1444,14 +1455,6 @@ Returning to previous menu.</source>
         <translation>Strikt reklamdetektering</translation>
     </message>
     <message>
-        <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation>Tröskelvärde för automatisk radering (Gigabyte)</translation>
-    </message>
-    <message>
-        <source>Auto Expire Frequency (in minutes)</source>
-        <translation>Kontrollintervall för autoradering (minuter)</translation>
-    </message>
-    <message>
         <source>Auto Expire Method</source>
         <translation>Metod för autoradering</translation>
     </message>
@@ -1510,10 +1513,6 @@ Returning to previous menu.</source>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
         <translation>PIN-koden för inställningsmenyerna måste matas in innan det går att komma tillbaka hit.</translation>
-    </message>
-    <message>
-        <source>Reposition after fast forward/rewind</source>
-        <translation type="obsolete">Positionera om efter snabbspolning framåt/bakåt</translation>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
@@ -1856,10 +1855,6 @@ Returning to previous menu.</source>
         <translation>Generellt</translation>
     </message>
     <message>
-        <source>Global Auto Expire Settings</source>
-        <translation>Globala inställningar för autoradering</translation>
-    </message>
-    <message>
         <source>Program Guide</source>
         <translation>Programguide</translation>
     </message>
@@ -2070,10 +2065,6 @@ Returning to previous menu.</source>
     <message>
         <source>MPEG-2 Hardware Encoder</source>
         <translation>MPEG-2 hårdvarukodare</translation>
-    </message>
-    <message>
-        <source>Automatically transcode after recording</source>
-        <translation>Omkoda automatiskt efter inspelning</translation>
     </message>
     <message>
         <source>Width</source>
@@ -2428,14 +2419,6 @@ Returning to previous menu.</source>
     <message>
         <source>No, Don&apos;t delete group</source>
         <translation>Nej, ta inte bort grupp</translation>
-    </message>
-    <message>
-        <source>Skip Unflagged Commercials</source>
-        <translation>Hoppa över oidentifierad reklam</translation>
-    </message>
-    <message>
-        <source>Try to skip commercial breaks even if they have not been flagged.  This does not always work well and can disrupt playback if commercial breaks aren&apos;t detected properly.</source>
-        <translation>Försök att hoppa över reklampauser även fast de inte har identifierats. Detta fungerar inte alltid bra och kan avbryta uppspelningen om reklamen inte identifieras riktigt.</translation>
     </message>
     <message>
         <source>Program Guide Alpha</source>
@@ -3649,18 +3632,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Videolägesinställningar</translation>
     </message>
     <message>
-        <source>ATSC Signal Threshold</source>
-        <translation>Tröskelvärde för ATSC-signal</translation>
-    </message>
-    <message>
-        <source>General (page 2)</source>
-        <translation>Generellt (sida 2)</translation>
-    </message>
-    <message>
-        <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="obsolete">När snabbspolning framåt/bakåt m h a &quot;klistriga tangenter&quot; används är det svårt att stoppa på exakt rätt ställe. Denna funktion hoppar framåt/bakåt en bit vid stopp för att kompensera för detta.</translation>
-    </message>
-    <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
         <translation>Ett kommando som ska exekveras innan inspelningsservern stängs ner. Returvärdet avgör om nedstängningen ska fortsätta: 0 - ja, 1 - försök senare, 2 - vänta på uppspelningsklient</translation>
     </message>
@@ -3887,14 +3858,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>If set, MythTV will act like a commercial begins this many seconds early.  This can be useful when commercial notification is used in place of automatic skipping.</source>
         <translation>Meddela om reklam så här många sekunder innan då &quot;Meddela innan&quot; används.</translation>
-    </message>
-    <message>
-        <source>Trigger AutoExpire when available disk space is below this value.  Disable AutoExpire by setting to 0.</source>
-        <translation>Utlös autoradera när tillgängligt diskutrymme är mindre än detta värde. Avaktivera autoradera genom att sätta till 0.</translation>
-    </message>
-    <message>
-        <source>How often the AutoExpire process checks for free disk space.</source>
-        <translation>Hur ofta autoradera-processen kollar fritt diskutrymme.</translation>
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
@@ -4417,26 +4380,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Visa programguiden när TV-läge startas</translation>
     </message>
     <message>
-        <source>Completed</source>
-        <translation>Slutförd</translation>
-    </message>
-    <message>
-        <source>Paused</source>
-        <translation>Pausad</translation>
-    </message>
-    <message>
-        <source>Restarting</source>
-        <translation>Startar om</translation>
-    </message>
-    <message>
-        <source>Completed, %1 FPS</source>
-        <translation>Slutförd, %1 FPS</translation>
-    </message>
-    <message>
-        <source>Commercial Breaks Found</source>
-        <translation>Reklamavbrott hittade</translation>
-    </message>
-    <message>
         <source>Post Recording Processing</source>
         <translation>Efterinspelningsbearbetning</translation>
     </message>
@@ -4718,7 +4661,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Do not run &apos;%1&apos; for new recordings</source>
-        <translation>Kör inte &apos;%1&apos; för nya inspelningar</translation>
+        <translation>Kör inte &apos;%1&apos; på nya inspelningar</translation>
     </message>
     <message>
         <source>Title</source>
@@ -4799,14 +4742,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Maskinstatus visar statistik för den här datorn</translation>
     </message>
     <message>
-        <source>used</source>
-        <translation>använt</translation>
-    </message>
-    <message>
-        <source>free</source>
-        <translation>ledigt</translation>
-    </message>
-    <message>
         <source>Uptime</source>
         <translation>Drifttid</translation>
     </message>
@@ -4843,26 +4778,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>inspelningsserver</translation>
     </message>
     <message>
-        <source>Disk space:</source>
-        <translation>Diskutrymme:</translation>
-    </message>
-    <message>
-        <source>Recordings</source>
-        <translation>Inspelningar</translation>
-    </message>
-    <message>
-        <source>DB error - RecordFilePrefix unknown</source>
-        <translation>DB fel - RecordFilePrefix okänt</translation>
-    </message>
-    <message>
-        <source>TV buffer</source>
-        <translation>TV-buffert</translation>
-    </message>
-    <message>
-        <source>DB error - LiveBufferDir unknown</source>
-        <translation>DB fel - LiveBufferDir okänt</translation>
-    </message>
-    <message>
         <source>and the MythTV server</source>
         <translation>och inspelningsservern</translation>
     </message>
@@ -4877,10 +4792,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>Yes, delete my card settings</source>
         <translation>Ja, ta bort mina TV-kortsinställningar</translation>
-    </message>
-    <message>
-        <source>%1% Completed @ %2 fps.</source>
-        <translation>%1% färdig vid %2 fps.</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
@@ -5029,10 +4940,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>Delete oldest if this would exceed the max episodes</source>
         <translation>Radera äldsta om max antal avsnitt överskrids</translation>
-    </message>
-    <message>
-        <source>Searching for Logo</source>
-        <translation>Letar efter logo</translation>
     </message>
     <message>
         <source>All</source>
@@ -5251,16 +5158,8 @@ som du startade detta programmet ifrån.</translation>
         <translation>Transport</translation>
     </message>
     <message>
-        <source>Capture Card</source>
-        <translation>TV-kort</translation>
-    </message>
-    <message>
         <source>Scanning</source>
         <translation>Sökning</translation>
-    </message>
-    <message>
-        <source>Scan Activity</source>
-        <translation>Sök aktivitet</translation>
     </message>
     <message>
         <source>Free to air channels only.</source>
@@ -5583,14 +5482,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>TV-ljud endast genom PVR-350</translation>
     </message>
     <message>
-        <source>Building Detection Buffer</source>
-        <translation>Bygger detekteringsbuffert</translation>
-    </message>
-    <message>
-        <source>%1 Frames Completed @ %2 fps.</source>
-        <translation>%1 bildrutor färdiga med %2 fps.</translation>
-    </message>
-    <message>
         <source>Terrestrial</source>
         <translation>Marksänt</translation>
     </message>
@@ -5659,44 +5550,8 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Hoppar bakåt.</translation>
     </message>
     <message>
-        <source>Default Auto Commercial Flagging setting</source>
-        <translation>Automatisk reklamdetektering som standard</translation>
-    </message>
-    <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
         <translation>Detta är det förvalda värdet för inställningen Automatisk reklamdetektering när en ny schemalagd inspelning skapas.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #1&apos; setting</source>
-        <translation>Kör användarjobb #1 som standard</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
-        <translation>Detta är det förvalda värdet för inställningen &apos;Kör användarjobb #1&apos; när en ny schemalagd inspelning skapas.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #2&apos; setting</source>
-        <translation>Kör användarjobb #2 som standard</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
-        <translation>Detta är det förvalda värdet för inställningen &apos;Kör användarjobb #2&apos; när en ny schemalagd inspelning skapas.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #3&apos; setting</source>
-        <translation>Kör användarjobb #3 som standard</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
-        <translation>Detta är det förvalda värdet för inställningen &apos;Kör användarjobb #3&apos; när en ny schemalagd inspelning skapas.</translation>
-    </message>
-    <message>
-        <source>Default &apos;Run User Job #4&apos; setting</source>
-        <translation>Kör användarjobb #4 som standard</translation>
-    </message>
-    <message>
-        <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
-        <translation>Detta är det förvalda värdet för inställningen &apos;Kör användarjobb #4&apos; när en ny schemalagd inspelning skapas.</translation>
     </message>
     <message>
         <source>Bad Menu File</source>
@@ -5705,18 +5560,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>No Menu File</source>
         <translation>Ingen menyfil</translation>
-    </message>
-    <message>
-        <source>Timed out waiting for signal.</source>
-        <translation>Väntat för länge på signal.</translation>
-    </message>
-    <message>
-        <source>Signal Locked</source>
-        <translation>Signal låst</translation>
-    </message>
-    <message>
-        <source>No Lock</source>
-        <translation>Inget lås</translation>
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
@@ -5849,20 +5692,8 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Använd XvMC MPEG-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
     </message>
     <message>
-        <source>This enables the hardware accelerated MPEG decodingavailable with many popular video output cards.</source>
-        <translation>Aktiverar hårdvaruaccelererad MPEG-avkodning med flera populära grafikkort.</translation>
-    </message>
-    <message>
-        <source>This is incompatible with libmpeg2 decoding, andwill be disabled if libmpeg2 decoding is selected.</source>
-        <translation>Detta är inkompatibelt med libmpeg2-avkodning och avaktiveras om libmpeg2-avkodning aktiveras.</translation>
-    </message>
-    <message>
         <source>Use hardware XVMC VLD Decoding (incompatible with libmpeg2)</source>
         <translation>Använd XvMC VLD-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
-    </message>
-    <message>
-        <source>Enables the use of viaXvMC hardware MPEG decoding for the Via Unichrome Chipset</source>
-        <translation>Aktiverar hårdvaruaccelererad MPEG-avkodning för Via Unichrome-chipsetet</translation>
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems.</source>
@@ -5871,12 +5702,12 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>c</source>
         <comment>RecStatusChar rsCancelled</comment>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <source>N</source>
         <comment>RecStatusChar rsNotListed</comment>
-        <translation type="unfinished"></translation>
+        <translation>E</translation>
     </message>
     <message>
         <source>Not Listed</source>
@@ -6127,12 +5958,344 @@ Myth kommer nu att avslutas.</translation>
         <translation>Ompositionering efter snabbspolning</translation>
     </message>
     <message>
-        <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. Thiscompensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation type="obsolete">När snabbspolning framåt/bakåt m h a &quot;klistriga tangenter&quot; används är det svårt att stoppa på exakt rätt ställe. Denna funktion hoppar framåt/bakåt en bit vid stopp för att kompensera för detta.</translation>
-    </message>
-    <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
         <translation>När snabbspolning framåt/bakåt m h a &quot;klistriga tangenter&quot; används är det svårt att stoppa på exakt rätt ställe. Denna funktion hoppar framåt/bakåt en bit vid stopp för att kompensera för detta (hundradels sekunder).</translation>
+    </message>
+    <message>
+        <source>Signal To Noise</source>
+        <translation>Signal-till-brus</translation>
+    </message>
+    <message>
+        <source>Bit Error Rate</source>
+        <translation>Bitfelsfrekvens</translation>
+    </message>
+    <message>
+        <source>Uncorrected Blocks</source>
+        <translation>Okorrigerade block</translation>
+    </message>
+    <message>
+        <source>Enable auto-transcode after recording</source>
+        <translation>Aktivera omkodning efter inspelning</translation>
+    </message>
+    <message>
+        <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configurd to allow transcoding.</source>
+        <translation>Omkoda automatiskt när en inspelning görs med denna profil och inspelningens schema är inställt på att tillåta omkodning.</translation>
+    </message>
+    <message>
+        <source>Transcode using &quot;%1&quot;</source>
+        <translation>Omkoda med &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>[ Select transcoder ]</source>
+        <translation>[ Välj omkodare ]</translation>
+    </message>
+    <message>
+        <source>Commercial Flag New Recordings</source>
+        <translation>Markera reklam i nya inspelningar</translation>
+    </message>
+    <message>
+        <source>Default Auto Transcode setting</source>
+        <translation>Omkoda som standard</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the Auto-Transcode setting when a new scheduled recording is created.</source>
+        <translation>Detta är det förvalda värdet för inställningen &apos;Omkoda nya inspelningar&apos; när en ny schemalagd inspelning skapas.</translation>
+    </message>
+    <message>
+        <source>Default Transcoder</source>
+        <translation>Förvald omkodare</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the transcoder setting when a new scheduled recording is created.</source>
+        <translation>Detta är det förvalda värdet för inställningen &apos;Omkoda med&apos; när en ny schemalagd inspelning skapas.</translation>
+    </message>
+    <message>
+        <source>Run User Job #%1 On New Recordings</source>
+        <translation>Kör användarjobb #%1 på nya inspelningar</translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #%1&apos; setting when a new scheduled recording is created.</source>
+        <translation>Detta är det förvalda värdet för inställningen &apos;Kör Användarjobb #%1&apos; när en ny schemalagd inspelning skapas.</translation>
+    </message>
+    <message>
+        <source>Auto Expire Enabled</source>
+        <translation>Autoradering aktiverad</translation>
+    </message>
+    <message>
+        <source>When enabled, old programs will be deleted to make space for new ones.</source>
+        <translation>Ta bort gamla program för att skapa utrymme för nya.</translation>
+    </message>
+    <message>
+        <source>Extra Disk Space (in Gigabytes)</source>
+        <translation>Extra diskutrymme (i Gigabyte)</translation>
+    </message>
+    <message>
+        <source>Extra disk space you want on the recording file system beyond what MythTV requires. This is useful if you use the recording file system for data other than MythTV recordings.</source>
+        <translation>Extra diskutrymme du vill ha på inspelningsfilsystemet utöver vad MythTV kräver. Användbart om du använder filsystemet för andra data än MythTV-inspelningar.</translation>
+    </message>
+    <message>
+        <source>ATSC Signal Threshold (%)</source>
+        <translation>ATSC signaltröskel (%)</translation>
+    </message>
+    <message>
+        <source>Enable OpenGL vertical sync for timing</source>
+        <translation>Använd OpenGL vertikalsynkronisering</translation>
+    </message>
+    <message>
+        <source>If it is supported by your hardware/drivers, MythTV will use OpenGL vertical syncing for video timing, reducing frame jitter.</source>
+        <translation>Om det stöds av din hårdvara och drivrutiner använder MythTV OpenGL vertikalsynkronisering vilket minskar skakningar i bilden.</translation>
+    </message>
+    <message>
+        <source>General (Basic)</source>
+        <translation>Generellt (Grundläggande)</translation>
+    </message>
+    <message>
+        <source>General (Jobs)</source>
+        <translation>Generellt (Jobb)</translation>
+    </message>
+    <message>
+        <source>General (Advanced)</source>
+        <translation>Generellt (Avancerat)</translation>
+    </message>
+    <message>
+        <source>%1 total, %2 used, %3 (or %4%) free.</source>
+        <translation>%1 totalt, %2 använt, %3 (eller %4%) ledigt.</translation>
+    </message>
+    <message>
+        <source>, using recording profile &apos;%1&apos;</source>
+        <translation>med inspelningsprofil &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>, using your typical recording profile.</source>
+        <translation>med din vanliga inspelningsprofil.</translation>
+    </message>
+    <message>
+        <source>%1 hours left %2</source>
+        <translation>%1 timmar kvar %2</translation>
+    </message>
+    <message>
+        <source>%1 hours and %2 minutes left %3</source>
+        <translation>%1 timmar och %2 minuter kvar %3</translation>
+    </message>
+    <message>
+        <source>%1 minutes left %2</source>
+        <translation>%1 minuter kvar %2</translation>
+    </message>
+    <message>
+        <source>Disk usage on %1:</source>
+        <translation>Diskanvändning på %1:</translation>
+    </message>
+    <message>
+        <source>Transcode new recordings</source>
+        <translation>Omkoda nya inspelningar</translation>
+    </message>
+    <message>
+        <source>Do not Transcode new recordings</source>
+        <translation>Omkoda inte nya inspelningar</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Autodetektera</translation>
+    </message>
+    <message>
+        <source>Autodetect from %1</source>
+        <translation>Autodetektera från %1</translation>
+    </message>
+    <message>
+        <source>Transcode using Autodetect</source>
+        <translation>Omkoda med autodetektering</translation>
+    </message>
+    <message>
+        <source>And, never ask again.</source>
+        <translation>Fråga aldrig mer.</translation>
+    </message>
+    <message>
+        <source>And, don&apos;t ask again in this session.</source>
+        <translation>Fråga inte igen under denna session.</translation>
+    </message>
+    <message>
+        <source>Category of shows to be extended</source>
+        <translation>Kategori för program som ska utökas</translation>
+    </message>
+    <message>
+        <source>category name</source>
+        <translation>kategorinamn</translation>
+    </message>
+    <message>
+        <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended.  Only works if a show&apos;s category can be determined.</source>
+        <translation>Begär att program i en viss kategori (t.ex. &quot;SciFi&quot;) förlängs automatiskt.  Fungerar bara för program som är kategoribestämda.</translation>
+    </message>
+    <message>
+        <source>Record past end of show (in minutes)</source>
+        <translation>Spela in efter programslut (i minuter)</translation>
+    </message>
+    <message>
+        <source>For the specified category, an attempt will be made to extend the recording by the specified time.  It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation>För angiven kategori görs ett försök att utöka inspelningstiden med angivet antal minuter.  Ignoreras om två program schemalagts utan tillräckligt med tid emellan.</translation>
+    </message>
+    <message>
+        <source>Category record over-time</source>
+        <translation>Kategoribaserad övertid</translation>
+    </message>
+    <message>
+        <source>Enable warning about missing audio output</source>
+        <translation>Varna vid ljudutmatningsfel</translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will warn you whenever you try to watch a something and MythTV can&apos;t access the soundcard.</source>
+        <translation>Varna om du försöker titta på en inspelning och MythTV inte kan komma åt ljudkortet.</translation>
+    </message>
+    <message>
+        <source>This enables the hardware accelerated MPEG decoding available with many popular video output cards.  </source>
+        <translation>Aktiverar den hårdvaruaccelererade MPEG-avkodning som finns för många populära grafikkort.  </translation>
+    </message>
+    <message>
+        <source>This is incompatible with libmpeg2 decoding, and will be disabled if libmpeg2 decoding is selected.</source>
+        <translation>Detta är inkompatibelt med libmpeg2-avkodning och stängs därför av om libmpeg2-avkodning väljs.</translation>
+    </message>
+    <message>
+        <source>Enables the use of viaXvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
+        <translation>Aktiverar den hårdvaruaccelererade MPEG-avkodning som finns i Via Unichrome chipsetet.  </translation>
+    </message>
+    <message>
+        <source>Do you want to fix these problems?</source>
+        <translation>Vill du rätta till dessa problem?</translation>
+    </message>
+    <message>
+        <source>Do you want to fix this problem?</source>
+        <translation>Vill du rätta till detta problem?</translation>
+    </message>
+    <message>
+        <source>Yes please</source>
+        <translation>Ja, tack</translation>
+    </message>
+    <message>
+        <source>No, I know what I am doing</source>
+        <translation>Nej, jag vet vad jag gör</translation>
+    </message>
+    <message>
+        <source>If this is the master backend server, please run &apos;mythfilldatabase&apos; to populate the database with channel information.</source>
+        <translation>Om detta är huvudinspelningsservern, kör &apos;mythfilldatabase&apos; för att fylla databasen med kanalinformation.</translation>
+    </message>
+    <message>
+        <source>Card</source>
+        <translation>Kort</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation>Sökning</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Sökväg</translation>
+    </message>
+    <message>
+        <source>doesn&apos;t exist</source>
+        <translation>existerar inte</translation>
+    </message>
+    <message>
+        <source>Cannot create a file</source>
+        <translation>Kan inte skapa fil</translation>
+    </message>
+    <message>
+        <source>directory is not writable?</source>
+        <translation>är katalogen inte skrivbar?</translation>
+    </message>
+    <message>
+        <source>type</source>
+        <translation>typ</translation>
+    </message>
+    <message>
+        <source>is set to start on channel</source>
+        <translation>är satt att starta på kanal</translation>
+    </message>
+    <message>
+        <source>which does not exist</source>
+        <translation>som inte existerar</translation>
+    </message>
+    <message>
+        <source>ATSC Channel %1</source>
+        <translation>ATSC kanal %1</translation>
+    </message>
+    <message>
+        <source>Capture Card</source>
+        <translation>TV-kort</translation>
+    </message>
+    <message>
+        <source>File location</source>
+        <translation>Sökväg</translation>
+    </message>
+    <message>
+        <source>Location of the channels.conf file.</source>
+        <translation>Sökväg till filen channels.conf.</translation>
+    </message>
+    <message>
+        <source>Scan Type</source>
+        <translation>Söktyp</translation>
+    </message>
+    <message>
+        <source>Signal Lock</source>
+        <translation>Signallås</translation>
+    </message>
+    <message>
+        <source>Signal Power</source>
+        <translation>Signalstyrka</translation>
+    </message>
+    <message>
+        <source>Seen PAT</source>
+        <translation>PAT sedd</translation>
+    </message>
+    <message>
+        <source>Seen PMT</source>
+        <translation>PMT sedd</translation>
+    </message>
+    <message>
+        <source>Seen MGT</source>
+        <translation>MGT sedd</translation>
+    </message>
+    <message>
+        <source>Seen VCT</source>
+        <translation>VCT sedd</translation>
+    </message>
+    <message>
+        <source>Seen NIT</source>
+        <translation>NIT sedd</translation>
+    </message>
+    <message>
+        <source>Seen SDT</source>
+        <translation>SDT sedd</translation>
+    </message>
+    <message>
+        <source>Matching PAT</source>
+        <translation>Matchande PAT</translation>
+    </message>
+    <message>
+        <source>Matching PMT</source>
+        <translation>Matchande PMT</translation>
+    </message>
+    <message>
+        <source>Matching MGT</source>
+        <translation>Matchande MGT</translation>
+    </message>
+    <message>
+        <source>Matching VCT</source>
+        <translation>Matchande VCT</translation>
+    </message>
+    <message>
+        <source>Matching NIT</source>
+        <translation>Matchande NIT</translation>
+    </message>
+    <message>
+        <source>Matching SDT</source>
+        <translation>Matchande SDT</translation>
+    </message>
+    <message>
+        <source>Allow Transcoding jobs</source>
+        <translation>Tillåt omkodningsjobb</translation>
+    </message>
+    <message>
+        <source>Program #%1 not found in PAT!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6158,6 +6321,29 @@ Myth kommer nu att avslutas.</translation>
     </message>
 </context>
 <context>
+    <name>ScanTypeSetting</name>
+    <message>
+        <source>Full Scan</source>
+        <translation>Full sökning</translation>
+    </message>
+    <message>
+        <source>Full Scan (Tuned)</source>
+        <translation>Full sökning (justerad)</translation>
+    </message>
+    <message>
+        <source>Import channels.conf</source>
+        <translation>Importera channels.conf</translation>
+    </message>
+    <message>
+        <source>Full Scan of Existing Transports</source>
+        <translation>Full sökning av existerande transporter</translation>
+    </message>
+    <message>
+        <source>Existing Transport Scan</source>
+        <translation>Sök av existerande transporter</translation>
+    </message>
+</context>
+<context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
@@ -6179,12 +6365,20 @@ Myth kommer nu att avslutas.</translation>
         <translation>Fel vid justering till transport</translation>
     </message>
     <message>
-        <source>Error detecting card type</source>
-        <translation>Fel vid korttypsdetektering</translation>
-    </message>
-    <message>
         <source>Error parsing parameters</source>
         <translation>Fel vid inläsning av parametrar</translation>
+    </message>
+    <message>
+        <source>Error starting scan</source>
+        <translation>Fel vid start av sökning</translation>
+    </message>
+    <message>
+        <source>Failed to open : </source>
+        <translation>Kan inte öppna : </translation>
+    </message>
+    <message>
+        <source>Failed to parse : </source>
+        <translation>Kan inte tolka : </translation>
     </message>
 </context>
 <context>
@@ -6342,14 +6536,6 @@ Inga andra detaljer</translation>
     <message>
         <source>Speed 1/16X</source>
         <translation>Hastighet 1/16X</translation>
-    </message>
-    <message>
-        <source>Forward </source>
-        <translation>Framåt</translation>
-    </message>
-    <message>
-        <source>Rewind </source>
-        <translation>Bakåt</translation>
     </message>
     <message>
         <source>Stopping Transcode</source>
@@ -6706,6 +6892,34 @@ Inga andra detaljer</translation>
     <message>
         <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
         <translation>MythTV använder redan alla tillgängliga ingångar för den kanal du valde. Du kan titta på den pågående inspelningen genom att välja den i uppspelningsmenyn.</translation>
+    </message>
+    <message>
+        <source>Forward %1X</source>
+        <translation>Framåt %1X</translation>
+    </message>
+    <message>
+        <source>Rewind %1X</source>
+        <translation>Bakåt %1X</translation>
+    </message>
+    <message>
+        <source>Previous Chapter</source>
+        <translation>Föregående kapitel</translation>
+    </message>
+    <message>
+        <source>Next Chapter</source>
+        <translation>Nästa kapitel</translation>
+    </message>
+    <message>
+        <source>Audio Sync</source>
+        <translation>Ljudsynk</translation>
+    </message>
+    <message>
+        <source>Adjust Audio Sync</source>
+        <translation>Justera ljudsynk</translation>
+    </message>
+    <message>
+        <source>Audio Resync</source>
+        <translation>Ljudåtersynk</translation>
     </message>
 </context>
 <context>

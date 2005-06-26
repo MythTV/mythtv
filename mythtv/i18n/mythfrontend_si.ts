@@ -1,5 +1,68 @@
 <!DOCTYPE TS><TS>
 <context>
+    <name>@default</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Neznan</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation type="unfinished">Čakalna vrsta</translation>
+    </message>
+    <message>
+        <source>Pending</source>
+        <translation type="unfinished">V teku</translation>
+    </message>
+    <message>
+        <source>Starting</source>
+        <translation type="unfinished">Zaganjam</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation type="unfinished">Teče</translation>
+    </message>
+    <message>
+        <source>Stopping</source>
+        <translation type="unfinished">Ustavljanje</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retrying</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Erroring</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Done (Invalid status!)</source>
+        <translation type="unfinished">Narejeno (nepravilno stanje!)</translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation type="unfinished">Končano</translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation type="unfinished">Preklicano</translation>
+    </message>
+    <message>
+        <source>Errored</source>
+        <translation type="unfinished">Napake</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="unfinished">Preklicano</translation>
+    </message>
+</context>
+<context>
     <name>CaptureCard</name>
     <message>
         <source>You have to save the current card before configuring it, would you like to do this now?</source>
@@ -237,6 +300,14 @@
         <source>Movie of the Week (complete example - use FindWeekly)</source>
         <translation>Filmi čez teden (celoten primer - uporabite NajdiTedensko)</translation>
     </message>
+    <message>
+        <source>Edit Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;New rule&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DVBTransportsEditor</name>
@@ -274,6 +345,10 @@
     <message>
         <source>Fetching lineups from DataDirect service...</source>
         <translation>Prenos nastavitev iz DataDirect-a</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from the Myth Plus service...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -343,43 +418,43 @@
     </message>
     <message>
         <source>Queued</source>
-        <translation>Čakalna vrsta</translation>
+        <translation type="obsolete">Čakalna vrsta</translation>
     </message>
     <message>
         <source>Pending</source>
-        <translation>V teku</translation>
+        <translation type="obsolete">V teku</translation>
     </message>
     <message>
         <source>Starting</source>
-        <translation>Zaganjam</translation>
+        <translation type="obsolete">Zaganjam</translation>
     </message>
     <message>
         <source>Running</source>
-        <translation>Teče</translation>
+        <translation type="obsolete">Teče</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation>Pavzirano</translation>
+        <translation type="obsolete">Pavzirano</translation>
     </message>
     <message>
         <source>Stopping</source>
-        <translation>Ustavljanje</translation>
+        <translation type="obsolete">Ustavljanje</translation>
     </message>
     <message>
         <source>Done (Invalid status!)</source>
-        <translation>Narejeno (nepravilno stanje!)</translation>
+        <translation type="obsolete">Narejeno (nepravilno stanje!)</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation>Končano</translation>
+        <translation type="obsolete">Končano</translation>
     </message>
     <message>
         <source>Aborted</source>
-        <translation>Preklicano</translation>
+        <translation type="obsolete">Preklicano</translation>
     </message>
     <message>
         <source>Errored</source>
-        <translation>Napake</translation>
+        <translation type="obsolete">Napake</translation>
     </message>
     <message>
         <source>Undefined</source>
@@ -387,7 +462,7 @@
     </message>
     <message>
         <source>Cancelled</source>
-        <translation>Preklicano</translation>
+        <translation type="obsolete">Preklicano</translation>
     </message>
 </context>
 <context>
@@ -480,6 +555,25 @@
     </message>
 </context>
 <context>
+    <name>MythImageFileDialog</name>
+    <message>
+        <source>The theme you are using is missing &apos;file_browser_background&apos; element. 
+
+Returning to previous menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing UI Element</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The theme you are using is missing &apos;file_browser&apos; element. 
+
+Returning to previous menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MythPopupBox</name>
     <message>
         <source>OK</source>
@@ -499,6 +593,19 @@
     <message>
         <source>Cancel</source>
         <translation>Prekliči</translation>
+    </message>
+</context>
+<context>
+    <name>MythThemedDialog</name>
+    <message>
+        <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;
+
+Returning to previous menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missing UI Element</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -748,11 +855,11 @@
     </message>
     <message>
         <source>Show group list as recording groups</source>
-        <translation>Prikaži seznam skupin, kot snemalne skupine</translation>
+        <translation type="obsolete">Prikaži seznam skupin, kot snemalne skupine</translation>
     </message>
     <message>
         <source>Show group list as titles</source>
-        <translation>Prikaži seznam skupin, kot naslove</translation>
+        <translation type="obsolete">Prikaži seznam skupin, kot naslove</translation>
     </message>
     <message>
         <source>Shuffle Play</source>
@@ -764,11 +871,11 @@
     </message>
     <message>
         <source>Add this Category/Title Group to Playlist</source>
-        <translation>Dodaj to Kategorijo/Naslov Skupine v predvajalni seznam</translation>
+        <translation type="obsolete">Dodaj to Kategorijo/Naslov Skupine v predvajalni seznam</translation>
     </message>
     <message>
         <source>Add this Recording Group to Playlist</source>
-        <translation>Dodaj to snemalno skupino v predvajalni seznam</translation>
+        <translation type="obsolete">Dodaj to snemalno skupino v predvajalni seznam</translation>
     </message>
     <message>
         <source>Add this recording to Playlist</source>
@@ -841,6 +948,46 @@
     <message>
         <source>Password:</source>
         <translation>Geslo:</translation>
+    </message>
+    <message>
+        <source>Change Group Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add this Group to Playlist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR: Recorded file does not exist.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles and Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles, Categories, and Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles and Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Categories only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Categories and Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recording Groups only</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1515,23 +1662,23 @@
     </message>
     <message>
         <source>Completed</source>
-        <translation>Končano</translation>
+        <translation type="obsolete">Končano</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation>Pavzirano</translation>
+        <translation type="obsolete">Pavzirano</translation>
     </message>
     <message>
         <source>Restarting</source>
-        <translation>Ponovno zaganjam</translation>
+        <translation type="obsolete">Ponovno zaganjam</translation>
     </message>
     <message>
         <source>Completed, %1 FPS</source>
-        <translation>Končano, %1 FPS</translation>
+        <translation type="obsolete">Končano, %1 FPS</translation>
     </message>
     <message>
         <source>Commercial Breaks Found</source>
-        <translation>Najden prelom za reklame</translation>
+        <translation type="obsolete">Najden prelom za reklame</translation>
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
@@ -1555,7 +1702,7 @@
     </message>
     <message>
         <source>Found %1 sec. commercial</source>
-        <translation>Najdeno %1 sekund reklame</translation>
+        <translation type="obsolete">Najdeno %1 sekund reklame</translation>
     </message>
     <message>
         <source>Not Flagged</source>
@@ -1732,15 +1879,15 @@
     </message>
     <message>
         <source>Air Date:</source>
-        <translation>Datum predvajanja:</translation>
+        <translation type="obsolete">Datum predvajanja:</translation>
     </message>
     <message>
         <source>Episode:</source>
-        <translation>Oddaja:</translation>
+        <translation type="obsolete">Oddaja:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation>Opis:</translation>
+        <translation type="obsolete">Opis:</translation>
     </message>
     <message>
         <source>OK</source>
@@ -2074,7 +2221,7 @@
     </message>
     <message>
         <source>Automatically transcode after recording</source>
-        <translation>Po zajemu avtomatsko pretvori</translation>
+        <translation type="obsolete">Po zajemu avtomatsko pretvori</translation>
     </message>
     <message>
         <source>Width</source>
@@ -2467,7 +2614,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>MPEG-2 Encoder card (PVR-250, PVR-350)</source>
-        <translation>MPEG-2 kodirna kartica (PVR-250, PVR-350)</translation>
+        <translation type="obsolete">MPEG-2 kodirna kartica (PVR-250, PVR-350)</translation>
     </message>
     <message>
         <source>Digital Video Broadcast card (DVB)</source>
@@ -2627,7 +2774,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Initial volume for the Master Mixer.  This affects all sound created by the soundcard.  Note: Do not set this too low.</source>
-        <translation>Začetna glasnost glavnega mešalca zvoka. To vpliva na vse zvoke ustvarjene z zvočno kartico. Opozorilo: Ne nastavite je prenizko.</translation>
+        <translation type="obsolete">Začetna glasnost glavnega mešalca zvoka. To vpliva na vse zvoke ustvarjene z zvočno kartico. Opozorilo: Ne nastavite je prenizko.</translation>
     </message>
     <message>
         <source>PCM Mixer Volume</source>
@@ -2737,7 +2884,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Default Recording Group to display</source>
-        <translation>Privzeta snemalna skupina za prikaz</translation>
+        <translation type="obsolete">Privzeta snemalna skupina za prikaz</translation>
     </message>
     <message>
         <source>All Programs</source>
@@ -2745,31 +2892,31 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Default Recording Group to display on the View Recordings screen.</source>
-        <translation>Privzeta snemalna skupina za prikaz na zaslonu Preglej zajeto.</translation>
+        <translation type="obsolete">Privzeta snemalna skupina za prikaz na zaslonu Preglej zajeto.</translation>
     </message>
     <message>
         <source>Save current Recording Group view when changed</source>
-        <translation>Kadar je spremenjen, shrani trenutni pogled snemalne skupine.</translation>
+        <translation type="obsolete">Kadar je spremenjen, shrani trenutni pogled snemalne skupine.</translation>
     </message>
     <message>
         <source>Remember the last selected Recording Group instead of displaying the Default group whenever you enter the playback screen.</source>
-        <translation>Kadarkoli v predvajalnem zaslonu, si zapomni zadnjo izbrano snemalno skupino, namesto privzete.</translation>
+        <translation type="obsolete">Kadarkoli v predvajalnem zaslonu, si zapomni zadnjo izbrano snemalno skupino, namesto privzete.</translation>
     </message>
     <message>
         <source>Use program categories as display groups</source>
-        <translation>Uporabi kategorije programa za prikaz skupin</translation>
+        <translation type="obsolete">Uporabi kategorije programa za prikaz skupin</translation>
     </message>
     <message>
         <source>Add the list of program categories to the list of Recording Groups used for display.  Only programs in non-password protected groups will be listed.</source>
-        <translation>Dodaj seznam programskih kategorij na seznam snemalnih skupin uporabljenih za prikaz. Izlistani bodo samo programi, ki niso zaščiteni z geslom.</translation>
+        <translation type="obsolete">Dodaj seznam programskih kategorij na seznam snemalnih skupin uporabljenih za prikaz. Izlistani bodo samo programi, ki niso zaščiteni z geslom.</translation>
     </message>
     <message>
         <source>Show group name instead of &quot;All Programs&quot;</source>
-        <translation>Prokaži ime skupine namesto &quot;Vsi programi&quot;</translation>
+        <translation type="obsolete">Prokaži ime skupine namesto &quot;Vsi programi&quot;</translation>
     </message>
     <message>
         <source>Use the name of the display group currently being shown in place of the term &quot;All Programs&quot; in the playback screen.</source>
-        <translation>V predvajalnem zaslonu uporabi ime prikazane skupine, ki je trenutno prikazana v &quot;Vsi programi&quot;.</translation>
+        <translation type="obsolete">V predvajalnem zaslonu uporabi ime prikazane skupine, ki je trenutno prikazana v &quot;Vsi programi&quot;.</translation>
     </message>
     <message>
         <source>Start in Title section</source>
@@ -2869,11 +3016,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Skip Unflagged Commercials</source>
-        <translation>Izpusti neoznačene reklame</translation>
+        <translation type="obsolete">Izpusti neoznačene reklame</translation>
     </message>
     <message>
         <source>Try to skip commercial breaks even if they have not been flagged.  This does not always work well and can disrupt playback if commercial breaks aren&apos;t detected properly.</source>
-        <translation>Poizkus izpustitve reklam, čeprav niso bile označene. Ne deluje vedno vredu in lahko povzroči napačno detekcijo reklam.</translation>
+        <translation type="obsolete">Poizkus izpustitve reklam, čeprav niso bile označene. Ne deluje vedno vredu in lahko povzroči napačno detekcijo reklam.</translation>
     </message>
     <message>
         <source>Automatically Flag Commercials</source>
@@ -2913,19 +3060,19 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Auto Expire Free Disk Space Threshold (in Gigabytes)</source>
-        <translation>Samopretek minimalne vrednosti prostega diska (v Gigabajtih)</translation>
+        <translation type="obsolete">Samopretek minimalne vrednosti prostega diska (v Gigabajtih)</translation>
     </message>
     <message>
         <source>Trigger AutoExpire when available disk space is below this value.  Disable AutoExpire by setting to 0.</source>
-        <translation>Sproži samopretek, kadar je vrednost prostega diska, ki je na voljo pod to vrednostjo. Onemogoči AutoExpire z nastavitvijo na 0.</translation>
+        <translation type="obsolete">Sproži samopretek, kadar je vrednost prostega diska, ki je na voljo pod to vrednostjo. Onemogoči AutoExpire z nastavitvijo na 0.</translation>
     </message>
     <message>
         <source>Auto Expire Frequency (in minutes)</source>
-        <translation>Frekvenca samopreteka (v minutah)</translation>
+        <translation type="obsolete">Frekvenca samopreteka (v minutah)</translation>
     </message>
     <message>
         <source>How often the AutoExpire process checks for free disk space.</source>
-        <translation>Kako pogosto proces samopreteka preverja prosti prostor na disku.</translation>
+        <translation type="obsolete">Kako pogosto proces samopreteka preverja prosti prostor na disku.</translation>
     </message>
     <message>
         <source>Auto Expire Method</source>
@@ -2961,7 +3108,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
-        <translation>Če nastavljeno, bo dovoljeno snemanje programov, ki so bili avtomatsko izbrisani in so se ponovno pokazali.</translation>
+        <translation type="obsolete">Če nastavljeno, bo dovoljeno snemanje programov, ki so bili avtomatsko izbrisani in so se ponovno pokazali.</translation>
     </message>
     <message>
         <source>Time to record before start of show (in seconds)</source>
@@ -2989,11 +3136,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Reposition after fast forward/rewind</source>
-        <translation>Ponovno pozicioniranje po hitrem previjanju naprej/nazaj</translation>
+        <translation type="obsolete">Ponovno pozicioniranje po hitrem previjanju naprej/nazaj</translation>
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
-        <translation>Pri preklopu iz načina lepljivik tipk, sledi ponovno pozicioniranje, pred nadanjevanjem normalnega predvajanja. To je neke vrste kompenzacija reakcijskega časa med iskanjem mesta nadaljevanja predvajanja in prenehanjem iskanja.</translation>
+        <translation type="obsolete">Pri preklopu iz načina lepljivik tipk, sledi ponovno pozicioniranje, pred nadanjevanjem normalnega predvajanja. To je neke vrste kompenzacija reakcijskega časa med iskanjem mesta nadaljevanja predvajanja in prenehanjem iskanja.</translation>
     </message>
     <message>
         <source>Reverse direction in fast forward/rewind</source>
@@ -3133,11 +3280,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Aggressive Soundcard Buffering</source>
-        <translation>Agresivno predpolnjenje Zvočne kartice</translation>
+        <translation type="obsolete">Agresivno predpolnjenje Zvočne kartice</translation>
     </message>
     <message>
         <source>If enabled, MythTV will pretend to have a smaller soundcard buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
-        <translation>Če omogočeno, bo MythTV predpostavljal, da ima zvočna kartica manjši predpomnilnik, kot ga ima v resnici. To lahko omogoči hitrejše iskanje, vendar se lahko pojavijo problemi pri predvajanju.</translation>
+        <translation type="obsolete">Če omogočeno, bo MythTV predpostavljal, da ima zvočna kartica manjši predpomnilnik, kot ga ima v resnici. To lahko omogoči hitrejše iskanje, vendar se lahko pojavijo problemi pri predvajanju.</translation>
     </message>
     <message>
         <source>Clear Saved Position on playback</source>
@@ -3221,7 +3368,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>MythTV will make a thumbnail image this many seconds from the beginning of the recording. Useful to skip over advertisements.</source>
-        <translation>MythTV bo prikazal slike zajemov toliko sekund, od začetka zajema. Uporabno za preskok reklam.</translation>
+        <translation type="obsolete">MythTV bo prikazal slike zajemov toliko sekund, od začetka zajema. Uporabno za preskok reklam.</translation>
     </message>
     <message>
         <source>Display live preview of recordings</source>
@@ -3569,7 +3716,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>ATSC Signal Threshold</source>
-        <translation>Nivo ATSC signala</translation>
+        <translation type="obsolete">Nivo ATSC signala</translation>
     </message>
     <message>
         <source>Threshold for a signal to be considered acceptable. If you set this too low MythTV may crash, and if you set it too high you may not be able to tune a channel on which reception would be acceptable.</source>
@@ -3785,7 +3932,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>This enables support for Xbox Specific hardware. Requires a frontend restart for changes to take effect.</source>
-        <translation>Omogoči podporo za določeno Xbox strojno opremo. Za spremembo efekta, potrebuje ponovni zagon frontend-a.</translation>
+        <translation type="obsolete">Omogoči podporo za določeno Xbox strojno opremo. Za spremembo efekta, potrebuje ponovni zagon frontend-a.</translation>
     </message>
     <message>
         <source>Xbox Linux Distribution</source>
@@ -3845,7 +3992,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and set up properly.</source>
-        <translation>MythTV lahko uporabi VR-350&apos; TV izhod in MPEG kodirnik za visoko kvalitetno predvajanje. Potrebuje primerno konfiguriran in zagnan ivtv-fb kernel modul.</translation>
+        <translation type="obsolete">MythTV lahko uporabi VR-350&apos; TV izhod in MPEG kodirnik za visoko kvalitetno predvajanje. Potrebuje primerno konfiguriran in zagnan ivtv-fb kernel modul.</translation>
     </message>
     <message>
         <source>Video device for the PVR-350 MPEG decoder</source>
@@ -3861,11 +4008,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Use hardware XvMC MPEG Decoding</source>
-        <translation>Uporabi strojno XvMC MPEG odkodiranje</translation>
+        <translation type="obsolete">Uporabi strojno XvMC MPEG odkodiranje</translation>
     </message>
     <message>
         <source>Use HW XVMC VLD Decoding (Via only)</source>
-        <translation>Uporabi HW XVMC VLD odkodiranje (samo Via)</translation>
+        <translation type="obsolete">Uporabi HW XVMC VLD odkodiranje (samo Via)</translation>
     </message>
     <message>
         <source>Hardware Decoding Settings</source>
@@ -4049,7 +4196,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Na mirujočem LCD monitorju prikaže tenutni čas. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
+        <translation type="obsolete">Na mirujočem LCD monitorju prikaže tenutni čas. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
     </message>
     <message>
         <source>LCD Displays Menus</source>
@@ -4057,7 +4204,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Na izbranem LCD monitorju prikaže izbrani menu. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
+        <translation type="obsolete">Na izbranem LCD monitorju prikaže izbrani menu. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
     </message>
     <message>
         <source>LCD Displays Music Artist and Title</source>
@@ -4065,7 +4212,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Prikaže izvajalca in naslov pesmi v MythMusic. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
+        <translation type="obsolete">Prikaže izvajalca in naslov pesmi v MythMusic. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
     </message>
     <message>
         <source>LCD Displays Channel Information</source>
@@ -4073,7 +4220,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Prikaže informacije o trenutnem kanalu. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
+        <translation type="obsolete">Prikaže informacije o trenutnem kanalu. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
     </message>
     <message>
         <source>LCD Displays Volume Information</source>
@@ -4081,7 +4228,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Prikaže informacije o glasnosti. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
+        <translation type="obsolete">Prikaže informacije o glasnosti. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
     </message>
     <message>
         <source>LCD Displays Generic Information</source>
@@ -4089,7 +4236,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Prikaže splošne informacije. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
+        <translation type="obsolete">Prikaže splošne informacije. Potreben ponovni zagon mythfrontenda za vklop/izklop.</translation>
     </message>
     <message>
         <source>LCD Backlight Always On</source>
@@ -4097,7 +4244,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Trajno prižge backlight. Za (de)aktivacijo potrebuje ponovni zagon mythfrontend-a.</translation>
+        <translation type="obsolete">Trajno prižge backlight. Za (de)aktivacijo potrebuje ponovni zagon mythfrontend-a.</translation>
     </message>
     <message>
         <source>Show the program guide when starting Live TV</source>
@@ -4145,11 +4292,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>General (page 2)</source>
-        <translation>Splošno (stran 2)</translation>
+        <translation type="obsolete">Splošno (stran 2)</translation>
     </message>
     <message>
         <source>Global Auto Expire Settings</source>
-        <translation>Globalne nastavitve avtomatskega preteka</translation>
+        <translation type="obsolete">Globalne nastavitve avtomatskega preteka</translation>
     </message>
     <message>
         <source>DVB Global Settings</source>
@@ -4212,7 +4359,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
 Please make that your ui.xml is valid.
 
 Myth will now exit.</source>
-        <translation>MythTv ni najdel izbranega objekta znotraj teme.
+        <translation type="obsolete">MythTv ni najdel izbranega objekta znotraj teme.
 Prosim preverite ali je vaš ui.xml veljaven.
 
 Myth se bo končal.</translation>
@@ -4475,7 +4622,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>If your local timezone does not match the timezone returned by XMLTV, use this setting to have mythfilldatabase adjust the program start and end times.None disables this feature, Auto automatically detects your local timezone</source>
-        <translation>Če se vaš časovni pas ne ujema z časovnim pasom vrnjenim z XMLTV, uporabite te nastavitve, da bo lahko mythfilldatabase spremenil čase zagonov in končanj programa. Ta opcija se ne da izklopit in &apos;Avto&apos; avtomatsko odkrije vašo lokalno časovni pas.</translation>
+        <translation type="obsolete">Če se vaš časovni pas ne ujema z časovnim pasom vrnjenim z XMLTV, uporabite te nastavitve, da bo lahko mythfilldatabase spremenil čase zagonov in končanj programa. Ta opcija se ne da izklopit in &apos;Avto&apos; avtomatsko odkrije vašo lokalno časovni pas.</translation>
     </message>
     <message>
         <source>Master Backend Override</source>
@@ -4833,7 +4980,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Enables the use of viaXvMC HW Mpeg decoding for the Via Unichrome Chipset</source>
-        <translation>Omogoči uporabo viaXvMC HW Mpeg dekodiranja za Via čipovje</translation>
+        <translation type="obsolete">Omogoči uporabo viaXvMC HW Mpeg dekodiranja za Via čipovje</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
@@ -4933,11 +5080,11 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>used</source>
-        <translation>uporabljeno</translation>
+        <translation type="obsolete">uporabljeno</translation>
     </message>
     <message>
         <source>free</source>
-        <translation>prosto</translation>
+        <translation type="obsolete">prosto</translation>
     </message>
     <message>
         <source>Uptime</source>
@@ -4977,23 +5124,23 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Disk space:</source>
-        <translation>Prostor na disku:</translation>
+        <translation type="obsolete">Prostor na disku:</translation>
     </message>
     <message>
         <source>Recordings</source>
-        <translation>Snemanja</translation>
+        <translation type="obsolete">Snemanja</translation>
     </message>
     <message>
         <source>DB error - RecordFilePrefix unknown</source>
-        <translation>DB napaka - RecordFilePrefix neznana</translation>
+        <translation type="obsolete">DB napaka - RecordFilePrefix neznana</translation>
     </message>
     <message>
         <source>TV buffer</source>
-        <translation>TV predpolnilnik</translation>
+        <translation type="obsolete">TV predpolnilnik</translation>
     </message>
     <message>
         <source>DB error - LiveBufferDir unknown</source>
-        <translation>DB napaka -  LiveBufferDir neznan</translation>
+        <translation type="obsolete">DB napaka -  LiveBufferDir neznan</translation>
     </message>
     <message>
         <source>Would you like to clear all capture card settings before starting configuration?</source>
@@ -5113,7 +5260,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>%1% Completed @ %2 fps.</source>
-        <translation>%1% Končano @ %2 fps.</translation>
+        <translation type="obsolete">%1% Končano @ %2 fps.</translation>
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
@@ -5189,7 +5336,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Searching for Logo</source>
-        <translation>Iskanje logotipa</translation>
+        <translation type="obsolete">Iskanje logotipa</translation>
     </message>
     <message>
         <source>Single Record</source>
@@ -5269,7 +5416,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Scan Activity</source>
-        <translation>Aktivnost iskanja</translation>
+        <translation type="obsolete">Aktivnost iskanja</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
@@ -5365,7 +5512,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
-        <translation>Če omogočeno bo namesto ffmpeg dekodiranja MPEG-1 in MPEG-2 videa uporabljen libmpeg2. Bo hitreje. Ni na voljo kadar je v uporabi XvMC.</translation>
+        <translation type="obsolete">Če omogočeno bo namesto ffmpeg dekodiranja MPEG-1 in MPEG-2 videa uporabljen libmpeg2. Bo hitreje. Ni na voljo kadar je v uporabi XvMC.</translation>
     </message>
     <message>
         <source>4/3</source>
@@ -5504,7 +5651,7 @@ Myth se bo končal.</translation>
     <message>
         <source>N</source>
         <comment>RecStatusChar rsCancelled</comment>
-        <translation>N</translation>
+        <translation type="obsolete">N</translation>
     </message>
     <message>
         <source>C</source>
@@ -5683,7 +5830,7 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information. Need to restart mythfrontend to (de)activate it.</source>
-        <translation>Uporaba LCD naprave, za predvajanje informacij o MythTV statusu. Za (de)aktivacijo potrebuje ponovni zagon mythfrontenda.</translation>
+        <translation type="obsolete">Uporaba LCD naprave, za predvajanje informacij o MythTV statusu. Za (de)aktivacijo potrebuje ponovni zagon mythfrontenda.</translation>
     </message>
     <message>
         <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
@@ -5727,15 +5874,15 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>Normally PVR-350 audio is looped into a soundcard, here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
-        <translation>Normalno je zvok PVR-350 povezan na zvočno kartico, tukaj pa definirate, če ni tako. Kadar je ta možnost omogočena MythTV ne more kontrolirati glasnosti.</translation>
+        <translation type="obsolete">Normalno je zvok PVR-350 povezan na zvočno kartico, tukaj pa definirate, če ni tako. Kadar je ta možnost omogočena MythTV ne more kontrolirati glasnosti.</translation>
     </message>
     <message>
         <source>Building Detection Buffer</source>
-        <translation>Detektor grajenja predpolnilnika</translation>
+        <translation type="obsolete">Detektor grajenja predpolnilnika</translation>
     </message>
     <message>
         <source>%1 Frames Completed @ %2 fps.</source>
-        <translation>%1 okvirjev končano @ %2 fps.</translation>
+        <translation type="obsolete">%1 okvirjev končano @ %2 fps.</translation>
     </message>
     <message>
         <source>Terrestrial</source>
@@ -5799,7 +5946,7 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems</source>
-        <translation>Če nastavljeno in je za snemanje omogočeno avtomatsko označevanje reklam, se bo označevanje začelo takoj po pričetku snemanje.  Ni primerno za šibkejše sisteme</translation>
+        <translation type="obsolete">Če nastavljeno in je za snemanje omogočeno avtomatsko označevanje reklam, se bo označevanje začelo takoj po pričetku snemanje.  Ni primerno za šibkejše sisteme</translation>
     </message>
     <message>
         <source>Job Queue (Job Commands)</source>
@@ -5815,15 +5962,15 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>Timed out waiting for signal.</source>
-        <translation>Potekel je čas čakanja signala.</translation>
+        <translation type="obsolete">Potekel je čas čakanja signala.</translation>
     </message>
     <message>
         <source>Signal Locked</source>
-        <translation>Signal zaklenjen</translation>
+        <translation type="obsolete">Signal zaklenjen</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation>Ni zaklenjen</translation>
+        <translation type="obsolete">Ni zaklenjen</translation>
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
@@ -5881,7 +6028,7 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>Default Auto Commercial Flagging setting</source>
-        <translation>Privzete nastavitve označevanja reklam</translation>
+        <translation type="obsolete">Privzete nastavitve označevanja reklam</translation>
     </message>
     <message>
         <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
@@ -5889,35 +6036,35 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>Default &apos;Run User Job #1&apos; setting</source>
-        <translation>Privzeta nastavitev &apos;Poženi uporabniško opravilo #1&apos; </translation>
+        <translation type="obsolete">Privzeta nastavitev &apos;Poženi uporabniško opravilo #1&apos; </translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #1&apos; setting when a new scheduled recording is created.</source>
-        <translation>TO so privzete vrednosti &apos;Poženi uporabniško opravilo #1&apos; , kadar je ustvarjen plan snemanja.</translation>
+        <translation type="obsolete">TO so privzete vrednosti &apos;Poženi uporabniško opravilo #1&apos; , kadar je ustvarjen plan snemanja.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #2&apos; setting</source>
-        <translation>Privzeta nastavitev &apos;Poženi uporabniško opravilo #2&apos; </translation>
+        <translation type="obsolete">Privzeta nastavitev &apos;Poženi uporabniško opravilo #2&apos; </translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #2&apos; setting when a new scheduled recording is created.</source>
-        <translation>TO so privzete vrednosti &apos;Poženi uporabniško opravilo #2&apos; , kadar je ustvarjen plan snemanja.</translation>
+        <translation type="obsolete">TO so privzete vrednosti &apos;Poženi uporabniško opravilo #2&apos; , kadar je ustvarjen plan snemanja.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #3&apos; setting</source>
-        <translation>Privzeta nastavitev &apos;Poženi uporabniško opravilo #3&apos; </translation>
+        <translation type="obsolete">Privzeta nastavitev &apos;Poženi uporabniško opravilo #3&apos; </translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #3&apos; setting when a new scheduled recording is created.</source>
-        <translation>TO so privzete vrednosti &apos;Poženi uporabniško opravilo #3&apos; , kadar je ustvarjen plan snemanja.</translation>
+        <translation type="obsolete">TO so privzete vrednosti &apos;Poženi uporabniško opravilo #3&apos; , kadar je ustvarjen plan snemanja.</translation>
     </message>
     <message>
         <source>Default &apos;Run User Job #4&apos; setting</source>
-        <translation>Privzeta nastavitev &apos;Poženi uporabniško opravilo #4&apos; </translation>
+        <translation type="obsolete">Privzeta nastavitev &apos;Poženi uporabniško opravilo #4&apos; </translation>
     </message>
     <message>
         <source>This is the default value used for the &apos;Run User Job #4&apos; setting when a new scheduled recording is created.</source>
-        <translation>TO so privzete vrednosti &apos;Poženi uporabniško opravilo #4&apos; , kadar je ustvarjen plan snemanja.</translation>
+        <translation type="obsolete">TO so privzete vrednosti &apos;Poženi uporabniško opravilo #4&apos; , kadar je ustvarjen plan snemanja.</translation>
     </message>
     <message>
         <source>Run on the specified screen or spanning all screens.</source>
@@ -5991,6 +6138,619 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
         <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation>Za uporabo razmerje monitorja, pusti &quot;Privzeto&quot;.  Nastavi na 16:9 ali 4:3 za drugo razmerje alike.</translation>
     </message>
+    <message>
+        <source>Signal Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Power</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seen PAT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seen PMT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seen MGT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seen VCT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seen NIT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Seen SDT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching PAT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching PMT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching MGT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching VCT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching NIT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching SDT</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program #%1 not found in PAT!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal To Noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bit Error Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uncorrected Blocks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to Reinit Video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>And, never ask again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>And, don&apos;t ask again in this session.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>c</source>
+        <comment>RecStatusChar rsCancelled</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N</source>
+        <comment>RecStatusChar rsNotListed</comment>
+        <translation type="unfinished">N</translation>
+    </message>
+    <message>
+        <source>Not Listed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>this show does not match the current program listings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Channel %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to probe the card</source>
+        <translation type="unfinished">Nisem mogel preizkusiti kartice</translation>
+    </message>
+    <message>
+        <source>Failed to open the card</source>
+        <translation type="unfinished">Nisem mogel odpreti kartice</translation>
+    </message>
+    <message>
+        <source>Australia</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finland</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sweden</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>United Kingdom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Germany</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location of the channels.conf file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan Type</source>
+        <translation type="unfinished">Tip iskanja</translation>
+    </message>
+    <message>
+        <source>Channel Change Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable auto-transcode after recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically transcode when a recording is made using this profile and the recording&apos;s schedule is configurd to allow transcoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Autodetect from %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcode using Autodetect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcode using &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcode new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not Transcode new recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>[ Select transcoder ]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MPEG-2 Encoder card (PVR-x50, PVR-500)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initial volume for the Master Mixer.  This affects all sound created by the sound card.  Note: Do not set this too low.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default group filter to apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default group filter to apply on the View Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save current group filter when changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember the last selected filter instead of displaying the default filter whenever you enter the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles and Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles, Categories, and Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Titles and Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Categories only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Categories and Recording Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Recording Groups only</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select what type of grouping to show on the Watch Recordings screen by default.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show filter name instead of &quot;All Programs&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flag New Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Auto Transcode setting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the Auto-Transcode setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Transcoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the transcoder setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run User Job #%1 On New Recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the &apos;Run User Job #%1&apos; setting when a new scheduled recording is created.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, old programs will be deleted to make space for new ones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extra Disk Space (in Gigabytes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Extra disk space you want on the recording file system beyond what MythTV requires. This is useful if you use the recording file system for data other than MythTV recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, programs that are automatically deleted (expired) will be allowed to be re-recorded if they are shown again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category of shows to be extended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>category name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For a specific category (e.g. &quot;Sports event&quot;), request that shows be autoextended.  Only works if a show&apos;s category can be determined.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record past end of show (in minutes)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For the specified category, an attempt will be made to extend the recording by the specified time.  It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Category record over-time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fast forward/rewind reposition amount</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
+WARNING: Enabling this option will disable XvMC video output.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aggressive Sound card Buffering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will pretend to have a smaller sound card buffer than is really present.  This may speed up seeking, but can also cause playback problems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable warning about missing audio output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will warn you whenever you try to watch a something and MythTV can&apos;t access the soundcard.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV will use this offset to make a thumbnail image this many seconds from the beginning of the recording, unless this offset happens to be between cutpoints or inside a flagged advertisement.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generate preview image from a bookmark if possible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, MythTV will ignore the above time offset, and use the bookmark inside the recording as the offset for creating a thumbnail image. As with the above, MythTV will honour cutlists and increase this offset if necessary.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Signal Threshold (%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables support for Xbox specific hardware. Requires a frontend restart for changes to take effect.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV can use the PVR-350&apos;s TV out and MPEG decoder for high quality playback.  This requires that the ivtv-fb kernel module is also loaded and configured properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally, PVR-350 audio is looped into a sound card; here you can indicate when that is not the case. MythTV cannot control TV volume when this option is checked.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable OpenGL vertical sync for timing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it is supported by your hardware/drivers, MythTV will use OpenGL vertical syncing for video timing, reducing frame jitter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This enables the hardware accelerated MPEG decoding available with many popular video output cards.  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is incompatible with libmpeg2 decoding, and will be disabled if libmpeg2 decoding is selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use hardware XVMC VLD Decoding (incompatible with libmpeg2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of viaXvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display current time on idle LCD display. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display selected menu on LCD display. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display playing artist and song title in MythMusic.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist - Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Artist [Album] Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Which items to show when playing music.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display tuned channel information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display volume level information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display generic information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the backlight permanently.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD HeartBeat Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the LCD heartbeat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use an LCD display to view MythTV status information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (Basic)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (Jobs)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General (Advanced)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Theme Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your theme does not contain elements required to display the status screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Myth could not locate the selector object within your theme.
+Please make sure that your ui.xml is valid.
+
+Myth will now exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording is currently Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording is currently being deleted and is unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The file for this recording can not be found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 total, %2 used, %3 (or %4%) free.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, using recording profile &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>, using your typical recording profile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 hours left %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 hours and %2 minutes left %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 minutes left %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disk usage on %1:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust the relative timezone of the XMLTV EPG data read by mythfilldatabase.  &apos;Auto&apos; converts the XMLTV time to local time using your computer&apos;s timezone.  &apos;None&apos; ignores the XMLTV timezone, interpreting times as local.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Transcoding jobs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>doesn&apos;t exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot create a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>directory is not writable?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>is set to start on channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>which does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to fix these problems?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you want to fix this problem?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes please</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, I know what I am doing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is the master backend server, please run &apos;mythfilldatabase&apos; to populate the database with channel information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScanCountry</name>
+    <message>
+        <source>Country</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
@@ -6005,6 +6765,29 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     <message>
         <source>Cancel</source>
         <translation>Prekliči</translation>
+    </message>
+</context>
+<context>
+    <name>ScanTypeSetting</name>
+    <message>
+        <source>Full Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full Scan (Tuned)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import channels.conf</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full Scan of Existing Transports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Existing Transport Scan</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6030,26 +6813,38 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>Error detecting card type</source>
-        <translation>Napaka v iskanju kartice</translation>
+        <translation type="obsolete">Napaka v iskanju kartice</translation>
     </message>
     <message>
         <source>Error parsing parameters</source>
         <translation>Napaka pri predelavi podatkov</translation>
+    </message>
+    <message>
+        <source>Error starting scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open : </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to parse : </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ScanWizardTuningPage</name>
     <message>
         <source>Tuning</source>
-        <translation>Uglaševanje</translation>
+        <translation type="obsolete">Uglaševanje</translation>
     </message>
     <message>
         <source>Failed to open the card</source>
-        <translation>Nisem mogel odpreti kartice</translation>
+        <translation type="obsolete">Nisem mogel odpreti kartice</translation>
     </message>
     <message>
         <source>Failed to probe the card</source>
-        <translation>Nisem mogel preizkusiti kartice</translation>
+        <translation type="obsolete">Nisem mogel preizkusiti kartice</translation>
     </message>
 </context>
 <context>
@@ -6104,6 +6899,10 @@ No other details</source>
         <translation>Na %1 %2 od %3.%4
 %5
 Ni ostalih podatkov</translation>
+    </message>
+    <message>
+        <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6226,11 +7025,11 @@ Ni ostalih podatkov</translation>
     </message>
     <message>
         <source>Forward </source>
-        <translation>Naprej</translation>
+        <translation type="obsolete">Naprej</translation>
     </message>
     <message>
         <source>Rewind </source>
-        <translation>Nazaj</translation>
+        <translation type="obsolete">Nazaj</translation>
     </message>
     <message>
         <source>Stopping Transcode</source>
@@ -6563,6 +7362,38 @@ Ni ostalih podatkov</translation>
     <message>
         <source>1.4X</source>
         <translation>1.4X</translation>
+    </message>
+    <message>
+        <source>Previous Chapter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Chapter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward %1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rewind %1X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Resync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audio Sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust Audio Sync</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
