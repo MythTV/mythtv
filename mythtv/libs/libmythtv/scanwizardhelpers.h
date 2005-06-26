@@ -198,13 +198,15 @@ class ScanTypeSetting : public ComboBoxSetting, public TransientStorage
         TransportScan,
         Import
     };
-    ScanTypeSetting()
+    ScanTypeSetting() : nCaptureCard(-1)
     {
         setLabel(QObject::tr("Scan Type"));
         refresh("");
     }
   protected slots:
     void refresh(const QString&);
+  protected:
+    int nCaptureCard;
 };
 
 class ScanOptionalConfig: public VerticalConfigurationGroup,

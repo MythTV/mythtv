@@ -224,6 +224,13 @@ void CaptureCardSetting::sourceID(const QString& str)
 void ScanTypeSetting::refresh(const QString& card)
 {
     int nCard = card.toInt();
+    // Only refresh if we really have to. If we do it too often
+    // Then we end up fighting the scan routine when we want to
+    // check the type of dvb card :/
+    if (nCard == nCaptureCard)
+        return;
+
+    nCaptureCard = nCard;
     int nCardType = CardUtil::GetCardType(nCard);
     clearSelections();
 
