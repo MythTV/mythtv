@@ -4,7 +4,7 @@
 
 mkdir -p $2/$1 || exit 1
 
-find ./$1 -path '*/.svn' -prune -o -print | 
-    xargs -i cp --parents {} $2 2> /dev/null
+find ./$1 -path '*/.svn' -prune -o -type f -print0 | 
+    xargs -0 -i cp --parents {} $2 
 
 exit 0
