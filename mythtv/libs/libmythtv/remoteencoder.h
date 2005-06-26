@@ -34,7 +34,7 @@ class RemoteEncoder
                          long long &fillamount, bool pip = false);
     void SpawnLiveTV(void);
     void StopLiveTV(void);
-    void Pause(void);
+    void PauseRecorder(void);
     void FinishRecording(void);
     void FrontendReady(void);
     void CancelNextRecording(void);

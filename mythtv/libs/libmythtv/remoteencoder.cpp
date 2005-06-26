@@ -340,10 +340,12 @@ void RemoteEncoder::StopLiveTV(void)
     SendReceiveStringList(strlist);
 }
 
-/** \fn RemoteEncoder::Pause()
+/** \fn RemoteEncoder::PauseRecorder()
  *  \brief Tells TVRec to pause a recorder, used for channel and input changes.
+ *  \sa TVRec::PauseRecorder(), EncoderLink::PauseRecorder(),
+ *      RecorderBase::Pause()
  */
-void RemoteEncoder::Pause(void)
+void RemoteEncoder::PauseRecorder(void)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "PAUSE";

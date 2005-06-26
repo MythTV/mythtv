@@ -16,6 +16,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "tv.h"
 #include "osd.h"
+#include "osdsurface.h"
 #include "osdtypes.h"
 #include "osdlistbtntype.h"
 #include "mythcontext.h"
@@ -31,27 +32,12 @@ using namespace std;
 #include "jobqueue.h"
 #include "audiooutput.h"
 #include "DisplayRes.h"
+#include "signalmonitorvalue.h"
 
-const int SSPEED_NORMAL = 0;
-
-struct SleepTimer {
-    QString   dispString;
-    unsigned long seconds;
-};
-
-SleepTimer sleep_timer_array[] =
-{
-    {QObject::tr("Off"),       0},
-    {QObject::tr("30m"),   30*60},
-    {QObject::tr("1h"),    60*60},
-    {QObject::tr("1h30m"), 90*60},
-    {QObject::tr("2h"),   120*60},
-};
-
-const int SSLEEP_MAX = sizeof sleep_timer_array / sizeof sleep_timer_array[0];
-
-const int kMuteTimeout = 800;
-const int kLCDTimeout = 30000;
+const int TV::kInitFFRWSpeed  = 0;
+const int TV::kMuteTimeout    = 800;   
+const int TV::kLCDTimeout     = 30000;
+const int TV::kChannelKeysMax = 6;
 
 void TV::InitKeys(void)
 {
@@ -166,77 +152,92 @@ void *SpawnDecode(void *param)
     return NULL;
 }
 
+/** \fn TV:TV()
+ *  \brief Performs instance initialiation not requiring access to database.
+ *  \sa Init()
+ */
 TV::TV(void)
-    : QObject(),
+    : QObject(NULL, "TV"),
       // Configuration variables from database
       baseFilters(""), fftime(0), rewtime(0),
       jumptime(0), usePicControls(false), smartChannelChange(false),
+      MuteIndividualChannels(false), arrowAccel(false), osd_display_time(0),
+      autoCommercialSkip(false), tryUnflaggedSkip(false),
+      smartForward(false), stickykeys(0),
+      ff_rew_repos(1.0f), ff_rew_reverse(false),
       showBufferedWarnings(false), bufferedChannelThreshold(0),
-      MuteIndividualChannels(false), arrowAccel(false),
-      vbimode(0), 
-      // Configuretion variables from DB in RunTV
-      stickykeys(0), ff_rew_repos(1.00), ff_rew_reverse(false),
-      smartForward(false),
-      // Configuration varibles from DB just before playback
-      autoCommercialSkip(false),
-      osd_display_time(0),
+      vbimode(0),
       // State variables
-      internalState(kState_None), nextState(kState_None), changeState(false),
-      menurunning(false), runMainLoop(false), wantsToQuit(true), 
+      internalState(kState_None),
+      menurunning(false), runMainLoop(false), wantsToQuit(true),
       exitPlayer(false), paused(false), errored(false),
-      stretchAdjustment(false), 
-      audiosyncAdjustment(false),
+      stretchAdjustment(false),
+      audiosyncAdjustment(false), audiosyncBaseline(0),
       editmode(false), zoomMode(false),
       update_osd_pos(false), endOfRecording(false), requestDelete(false),
       doSmartForward(false), switchingCards(false), lastRecorderNum(-1),
-      queuedTranscode(false), getRecorderPlaybackInfo(false), 
-      sleep_index(0), sleepTimer(new QTimer(this)), 
+      queuedTranscode(false), getRecorderPlaybackInfo(false),
       picAdjustment(kPictureAttribute_None),
       recAdjustment(kPictureAttribute_None),
+      // Sleep Timer
+      sleep_index(0), sleepTimer(new QTimer(this)),
       // Key processing buffer, lock, and state
       keyRepeat(true), keyrepeatTimer(new QTimer(this)),
       // Fast forward state
-      doing_ff_rew(0), ff_rew_index(0), speed_index(0), normal_speed(1.0f),
+      doing_ff_rew(0), ff_rew_index(0), speed_index(0),
+      // Time Stretch state
+      normal_speed(1.0f),
+      // Estimated framerate from recorder
+      frameRate(30.0f),
       // Channel changing state variables
-      channelqueued(false), channelkeysstored(0), lookForChannel(0),
+      channelqueued(false), channelKeys(""), lookForChannel(false),
       lastCC(""), lastCCDir(0), muteTimer(new QTimer(this)),
       // previous channel functionality state variables
-      times_pressed(0), prevChannelTimer(new QTimer(this)),
+      prevChanKeyCnt(0), prevChanTimer(new QTimer(this)),
       // channel browsing state variables
       browsemode(false), persistentbrowsemode(false),
       browseTimer(new QTimer(this)),
       browsechannum(""), browsechanid(""), browsestarttime(""),
       // Program Info for currently playing video
-      playbackinfo(NULL), inputFilename(""), playbackLen(0),
       recorderPlaybackInfo(NULL),
-      // estimated framerate from recorder
-      frameRate(30.0f),
+      playbackinfo(NULL), inputFilename(""), playbackLen(0),
       // Video Players
       nvp(NULL), pipnvp(NULL), activenvp(NULL),
       // Remote Encoders
       recorder(NULL), piprecorder(NULL), activerecorder(NULL),
       // RingBuffers
-      prbuffer(NULL), piprbuffer(NULL), activerbuffer(NULL), 
+      prbuffer(NULL), piprbuffer(NULL), activerbuffer(NULL),
       // OSD info
-      osd(NULL), dialogname(""), treeMenu(NULL), udpnotify(NULL),
+      dialogname(""), osd(NULL), treeMenu(NULL), udpnotify(NULL),
       // LCD Info
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
-      myWindow(NULL), embedid(0), embx(0), emby(0), embw(0), embh(0)
+      myWindow(NULL), embedWinID(0), embedBounds(0,0,0,0)
 {
-    memset(channelKeys, 0, sizeof(channelKeys));
     lastLcdUpdate = QDateTime::currentDateTime();
     lastLcdUpdate.addYears(-1); // make last LCD update last year..
 
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("Off"),       0));
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("30m"),   30*60));
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("1h"),    60*60));
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("1h30m"), 90*60));
+    sleep_times.push_back(SleepTimerInfo(QObject::tr("2h"),   120*60));
+
     gContext->addListener(this);
 
-    connect(prevChannelTimer, SIGNAL(timeout()), SLOT(SetPreviousChannel()));
+    connect(prevChanTimer,    SIGNAL(timeout()), SLOT(SetPreviousChannel()));
     connect(browseTimer,      SIGNAL(timeout()), SLOT(BrowseEndTimer()));
     connect(muteTimer,        SIGNAL(timeout()), SLOT(UnMute()));
     connect(keyrepeatTimer,   SIGNAL(timeout()), SLOT(KeyRepeatOK()));
     connect(sleepTimer,       SIGNAL(timeout()), SLOT(SleepEndTimer()));
 }
 
+/** \fn TV::Init(bool)
+ *  \brief Performs instance initialization, returns true on success.
+ *
+ *  \param createWindow If true a MythDialog is created for display.
+ *  \return Returns true on success, false on failure.
+ */
 bool TV::Init(bool createWindow)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -248,17 +249,29 @@ bool TV::Init(bool createWindow)
         return false;
     }
 
-    baseFilters += gContext->GetSetting("CustomFilters");
-    fftime = gContext->GetNumSetting("FastForwardAmount", 30);
-    rewtime = gContext->GetNumSetting("RewindAmount", 5);
-    jumptime = gContext->GetNumSetting("JumpAmount", 10);
-    usePicControls = gContext->GetNumSetting("UseOutputPictureControls", 0);
-    smartChannelChange = gContext->GetNumSetting("SmartChannelChange", 0);
-    showBufferedWarnings = gContext->GetNumSetting("CCBufferWarnings", 0);
-    bufferedChannelThreshold = gContext->GetNumSetting("CCWarnThresh", 10);
-    MuteIndividualChannels = gContext->GetNumSetting("IndividualMuteControl",0);
-    arrowAccel = gContext->GetNumSetting("UseArrowAccels", 1);
+    baseFilters         += gContext->GetSetting("CustomFilters");
+    fftime               = gContext->GetNumSetting("FastForwardAmount", 30);
+    rewtime              = gContext->GetNumSetting("RewindAmount", 5);
+    jumptime             = gContext->GetNumSetting("JumpAmount", 10);
+    usePicControls       = gContext->GetNumSetting("UseOutputPictureControls",0);
+    smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
+    MuteIndividualChannels=gContext->GetNumSetting("IndividualMuteControl", 0);
+    arrowAccel           = gContext->GetNumSetting("UseArrowAccels", 1);
+    persistentbrowsemode = gContext->GetNumSetting("PersistentBrowseMode", 0);
+    osd_display_time     = gContext->GetNumSetting("OSDDisplayTime");
+    autoCommercialSkip   = gContext->GetNumSetting("AutoCommercialSkip", 0);
+    tryUnflaggedSkip     = gContext->GetNumSetting("TryUnflaggedSkip", 0);
+    smartForward         = gContext->GetNumSetting("SmartForward", 0);
+    stickykeys           = gContext->GetNumSetting("StickyKeys");
+    ff_rew_repos         = gContext->GetNumSetting("FFRewReposTime", 100)/100.0;
+    ff_rew_reverse       = gContext->GetNumSetting("FFRewReverse", 1);
+    int def[8] = { 3, 5, 10, 20, 30, 60, 120, 180 };
+    for (uint i = 0; i < sizeof(def)/sizeof(def[0]); i++)
+        ff_rew_speeds.push_back(
+            gContext->GetNumSetting(QString("FFRewSpeed%1").arg(i), def[i]));
 
+    showBufferedWarnings     = gContext->GetNumSetting("CCBufferWarnings", 0);
+    bufferedChannelThreshold = gContext->GetNumSetting("CCWarnThresh", 10);
     QString vbiformat = gContext->GetSetting("VbiFormat");
     vbimode = (vbiformat.lower() == "pal teletext") ? 1 : 0;
     vbimode = (vbiformat.lower().left(4) == "ntsc") ? 2 : vbimode;
@@ -384,7 +397,7 @@ TV::~TV(void)
 
 TVState TV::GetState(void)
 {
-    if (changeState)
+    if (InStateChange())
         return kState_ChangingState;
     return internalState;
 }
@@ -439,8 +452,7 @@ int TV::LiveTV(bool showDialogs)
 
         activerecorder = recorder = testrec;
         lastRecorderNum = recorder->GetRecorderNumber();
-        nextState = kState_WatchingLiveTV;
-        changeState = true;
+        ChangeState(kState_WatchingLiveTV);
         switchingCards = false;
     }
 
@@ -457,7 +469,7 @@ void TV::FinishRecording(void)
 
 void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
 {
-    if (GetState() != kState_WatchingLiveTV)
+    if (StateIsLiveTV(GetState()))
        return;
 
     QString title = messages[0];
@@ -476,7 +488,7 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
                                  .arg(channel)
                                  .arg(" %d ");
     
-    while (!osd)
+    while (!GetOSD())
     {
         qApp->unlock();
         qApp->processEvents();
@@ -490,7 +502,7 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
     options += tr("Don't let it record, I want to watch TV");
 
     dialogname = "allowrecordingbox";
-    osd->NewDialogBox(dialogname, message, options, timeuntil); 
+    GetOSD()->NewDialogBox(dialogname, message, options, timeuntil); 
 
 }
 
@@ -509,11 +521,9 @@ int TV::Playback(ProgramInfo *rcinfo)
     QDateTime endts = rcinfo->endts.addSecs(overrecordseconds);
 
     if (curtime < endts && !rcinfo->isVideo)
-        nextState = kState_WatchingRecording;
+        ChangeState(kState_WatchingRecording);
     else
-        nextState = kState_WatchingPreRecorded;
-
-    changeState = true;
+        ChangeState(kState_WatchingPreRecorded);
 
     if (class LCD * lcd = LCD::Get())
         lcd->switchToChannel(rcinfo->chansign, rcinfo->title, rcinfo->subtitle);
@@ -573,19 +583,6 @@ int TV::PlayFromRecorder(int recordernum)
     return retval;
 }
 
-void TV::StateToString(TVState state, QString &statestr)
-{
-    switch (state) {
-        case kState_None: statestr = "None"; break;
-        case kState_WatchingLiveTV: statestr = "WatchingLiveTV"; break;
-        case kState_WatchingPreRecorded: statestr = "WatchingPreRecorded";
-                                         break;
-        case kState_WatchingRecording: statestr = "WatchingRecording"; break;
-        case kState_RecordingOnly: statestr = "RecordingOnly"; break;
-        default: statestr = "Unknown"; break;
-    }
-}
-
 bool TV::StateIsRecording(TVState state)
 {
     return (state == kState_RecordingOnly || 
@@ -596,6 +593,11 @@ bool TV::StateIsPlaying(TVState state)
 {
     return (state == kState_WatchingPreRecorded || 
             state == kState_WatchingRecording);
+}
+
+bool TV::StateIsLiveTV(TVState state)
+{
+    return (state == kState_WatchingLiveTV);
 }
 
 TVState TV::RemoveRecording(TVState state)
@@ -616,6 +618,20 @@ TVState TV::RemovePlaying(TVState state)
     return kState_Error;
 }
 
+#define TRANSITION(ASTATE,BSTATE) \
+   ((internalState == ASTATE) && (desiredNextState == BSTATE))
+
+#define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0);
+#define SET_LAST() do { nextState = internalState; changed = true; } while(0);
+
+/** \fn TV::HandleStateChange(void)
+ *  \brief Changes the state to the state on the front of the 
+ *         state change queue.
+ *
+ *   Note: There must exist a state transition from any state we can enter
+ *   to  the kState_None state, as this is used to shutdown TV in RunTV.
+ *
+ */
 void TV::HandleStateChange(void)
 {
     if (IsErrored())
@@ -627,22 +643,30 @@ void TV::HandleStateChange(void)
 
     bool changed = false;
 
-    TVState tmpInternalState = internalState;
+    stateLock.lock();
+    TVState nextState = internalState;
+    if (!nextStates.size())
+    {
+        VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Warning, "
+                "called with no state to change to.");
+        stateLock.unlock();
+        return;
+    }
+    TVState desiredNextState = nextStates.dequeue();    
+    VERBOSE(VB_GENERAL, QString("Attempting to change from %1 to %2")
+            .arg(StateToString(nextState))
+            .arg(StateToString(desiredNextState)));
 
-    QString statename;
-    StateToString(nextState, statename);
-    QString origname;
-    StateToString(tmpInternalState, origname);
-
-    if (nextState == kState_Error)
+    if (desiredNextState == kState_Error)
     {
         VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, "
-                "attempting to set to an error state, exiting");
+                "attempting to set to an error state!");
         errored = true;
+        stateLock.unlock();
         return;
     }
 
-    if (internalState == kState_None && nextState == kState_WatchingLiveTV)
+    if (TRANSITION(kState_None, kState_WatchingLiveTV))
     {
         long long filesize = 0;
         long long smudge = 0;
@@ -653,56 +677,51 @@ void TV::HandleStateChange(void)
         {
             VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, "
                     "failed to start RingBuffer on backend. Aborting.");
-            tmpInternalState = internalState;
-            nextState = internalState;
+            SET_LAST();
+
             recorder = NULL;
         }
         else
         {
             prbuffer = new RingBuffer(name, filesize, smudge, recorder);
 
-            tmpInternalState = nextState;
-            changed = true;
-
-            persistentbrowsemode =
-                gContext->GetNumSetting("PersistentBrowseMode", 0);
+            SET_NEXT();
 
             recorder->SpawnLiveTV();
 
             gContext->DisableScreensaver();
-            StartPlayerAndRecorder(true, false);
-            if (recorder->IsRecording())
-                StartPlayerAndRecorder(false, true);
-            else
+
+            bool ok = false;
+            if (StartRecorder())
+            {
+                if (StartPlayer(false))
+                    ok = true;
+                else
+                    StopStuff(true, false, true);
+            }
+            if (!ok)
             {
                 VERBOSE(VB_IMPORTANT, "LiveTV not successfully started");
-                tmpInternalState = internalState;
-                nextState = internalState;
-                StopPlayerAndRecorder(true, false);
-                gContext->RestoreScreensaver();
+                SET_LAST();
                 recorder = NULL;
+
+                gContext->RestoreScreensaver();
             }
         }
     }
-    else if (internalState == kState_WatchingLiveTV && 
-             nextState == kState_None)
+    else if (TRANSITION(kState_WatchingLiveTV, kState_None))
     {
-        tmpInternalState = nextState;
-        changed = true;
+        SET_NEXT();
 
-        StopPlayerAndRecorder(true, true);
+        StopStuff(true, true, true);
         gContext->RestoreScreensaver();
     }
-    else if (internalState == kState_WatchingRecording &&
-             nextState == kState_WatchingPreRecorded)
+    else if (TRANSITION(kState_WatchingRecording, kState_WatchingPreRecorded))
     {
-        tmpInternalState = nextState;
-        changed = true;
+        SET_NEXT();
     }
-    else if ((internalState == kState_None && 
-              nextState == kState_WatchingPreRecorded) ||
-             (internalState == kState_None &&
-              nextState == kState_WatchingRecording))
+    else if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
+             TRANSITION(kState_None, kState_WatchingRecording))
     {
         QString tmpFilename;
         if ((inputFilename.left(7) == "myth://") &&
@@ -736,14 +755,14 @@ void TV::HandleStateChange(void)
         {
             gContext->DisableScreensaver();
     
-            if (nextState == kState_WatchingRecording)
+            if (desiredNextState == kState_WatchingRecording)
             {
                 recorder = RemoteGetExistingRecorder(playbackinfo);
                 if (!recorder || !recorder->IsValidRecorder())
                 {
                     cerr << "ERROR: couldn't find recorder for in-progress "
                          << "recording\n";
-                    nextState = kState_WatchingPreRecorded;
+                    desiredNextState = kState_WatchingPreRecorded;
                     if (recorder)
                         delete recorder;
                     activerecorder = recorder = NULL;
@@ -755,10 +774,9 @@ void TV::HandleStateChange(void)
                 }
             }
     
-            tmpInternalState = nextState;
-            changed = true;
-    
-            StartPlayerAndRecorder(true, false);
+            StartPlayer(desiredNextState == kState_WatchingRecording);
+
+            SET_NEXT();
 
             QString message = "COMMFLAG_REQUEST ";
             message += playbackinfo->chanid + " " +
@@ -767,57 +785,58 @@ void TV::HandleStateChange(void)
         }
         else
         {
-            nextState = kState_None;
+            SET_LAST();
         }
     }
-    else if ((internalState == kState_WatchingPreRecorded && 
-              nextState == kState_None) || 
-             (internalState == kState_WatchingRecording &&
-              nextState == kState_None))
+    else if (TRANSITION(kState_WatchingPreRecorded, kState_None) ||
+             TRANSITION(kState_WatchingRecording, kState_None))
     {
         if (internalState == kState_WatchingRecording)
             recorder->StopPlaying();
 
-        tmpInternalState = nextState;
-        changed = true;
+        SET_NEXT();
 
-        StopPlayerAndRecorder(true, false);
+        StopStuff(true, true, false);
         gContext->RestoreScreensaver();
     }
-    else if (internalState == kState_None && 
-             nextState == kState_None)
+    else if (TRANSITION(kState_None, kState_None))
     {
+        SET_NEXT();
+    }
+
+    // Check that new state is valid
+    if (kState_None != nextState &&
+        activenvp && !activenvp->IsDecoderThreadAlive())
+    {
+        VERBOSE(VB_IMPORTANT, "Error, decoder not alive, and trying to play..");
+        if (nextState == kState_WatchingLiveTV)
+        {
+            StopStuff(true, true, true);
+        }
+
+        nextState = kState_None;
         changed = true;
     }
 
+    // Print state changed message...
     if (!changed)
     {
         VERBOSE(VB_IMPORTANT, QString("Unknown state transition: %1 to %2")
-                .arg(internalState).arg(nextState));
+                .arg(StateToString(internalState))
+                .arg(StateToString(desiredNextState)));
     }
-    else
+    else if (internalState != nextState)
     {
         VERBOSE(VB_GENERAL, QString("Changing from %1 to %2")
-                .arg(origname).arg(statename));
+                .arg(StateToString(internalState))
+                .arg(StateToString(nextState)));
     }
 
-    if (kState_None != nextState && activenvp && 
-        !activenvp->IsDecoderThreadAlive())
-    {
-        VERBOSE(VB_IMPORTANT, "Decoder not alive, and trying to play..");
-        if (nextState == kState_WatchingLiveTV)
-        {
-            StopPlayerAndRecorder(false, true);
-            recorder = NULL;
-        }
+    // update internal state variable
+    internalState = nextState;
+    stateLock.unlock();
 
-        tmpInternalState = kState_None;
-    }
-
-    internalState = tmpInternalState;
-    changeState = false;
-
-    if (internalState == kState_WatchingLiveTV)
+    if (StateIsLiveTV(internalState))
     {
         UpdateOSDInput();
         UpdateLCD();
@@ -825,40 +844,128 @@ void TV::HandleStateChange(void)
     if (recorder)
         recorder->FrontendReady();
 }
+#undef TRANSITION
+#undef SET_NEXT
+#undef SET_LAST
 
-void TV::StartPlayerAndRecorder(bool startPlayer, bool startRecorder)
-{ 
-    if (startRecorder)
+/** \fn TV::InStateChange() const
+ *  \brief Returns true if there is a state change queued up.
+ */
+bool TV::InStateChange() const
+{
+    if (stateLock.locked())
+        return true;
+    stateLock.lock();
+    bool inStateChange = nextStates.size() > 0;
+    stateLock.unlock();
+    return inStateChange;
+}
+
+/** \fn TV::ChangeState(TVState nextState)
+ *  \brief Puts a state change on the nextState queue.
+ */
+void TV::ChangeState(TVState nextState)
+{
+    stateLock.lock();
+    nextStates.enqueue(nextState);
+    stateLock.unlock();
+}
+
+/** \fn TV::ForceNextStateNone()
+ *  \brief Removes any pending state changes, and puts kState_None on the queue.
+ */
+void TV::ForceNextStateNone()
+{
+    stateLock.lock();
+    nextStates.clear();
+    nextStates.push_back(kState_None);
+    stateLock.unlock();
+}
+
+
+/** \fn TV::StartRecorder(int)
+ *  \brief Starts recorder, must be called before StartPlayer().
+ *  \param maxWait How long to wait for RecorderBase to start recording.
+ *  \return true when successful, false otherwise.
+ */
+bool TV::StartRecorder(int maxWait)
+{
+    maxWait = (maxWait <= 0) ? 20000 : maxWait;
+    QTime t;
+    t.start();
+    while (!recorder->IsRecording() && !exitPlayer && t.elapsed() < maxWait)
+        usleep(50);
+    if (!recorder->IsRecording() || exitPlayer)
     {
-        while (!recorder->IsRecording() && !exitPlayer)
-            usleep(50);
-        if (exitPlayer)
-            return;
-        frameRate = recorder->GetFrameRate();
+        VERBOSE(VB_IMPORTANT, "StartRecorder() -- error");
+        return false;
     }
 
-    if (startPlayer)
+    frameRate = recorder->GetFrameRate();
+    return true;
+}
+
+/** \fn TV::StartPlayer(bool, int)
+ *  \brief Starts player, must be called after StartRecorder().
+ *  \param maxWait How long to wait for NuppelVideoPlayer to start playing.
+ *  \return true when successful, false otherwise.
+ */
+bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
+{ 
+    SetupPlayer(isWatchingRecording);
+    pthread_create(&decode, NULL, SpawnDecode, nvp);
+
+    maxWait = (maxWait <= 0) ? 20000 : maxWait;
+    QTime t;
+    t.start();
+    while (!nvp->IsPlaying() && nvp->IsDecoderThreadAlive() &&
+           (t.elapsed() < maxWait))
+        usleep(50);
+
+    if (nvp->IsPlaying())
     {
-        SetupPlayer();
-        pthread_create(&decode, NULL, SpawnDecode, nvp);
-
-        while (!nvp->IsPlaying() && nvp->IsDecoderThreadAlive())
-            usleep(50);
-
         activenvp = nvp;
         activerbuffer = prbuffer;
         activerecorder = recorder;
+        StartOSD();
+        return true;
+    }
+    VERBOSE(VB_IMPORTANT, "StartPlayer() -- error");
+    return false;
+}
 
+/** \fn TV::StartOSD()
+ *  \brief Initializes the on screen display.
+ *
+ *   If the NuppelVideoPlayer already exists we grab it's OSD via
+ *   NuppelVideoPlayer::GetOSD().
+ */
+void TV::StartOSD()
+{
+    if (nvp)
+    {
         frameRate = nvp->GetFrameRate();
-        osd = nvp->GetOSD();
-        if (osd)
-            osd->SetUpOSDClosedHandler(this);
+        if (nvp->GetOSD())
+            GetOSD()->SetUpOSDClosedHandler(this);
     }
 }
 
-void TV::StopPlayerAndRecorder(bool closePlayer, bool closeRecorder)
+/** \fn TV::StopStuff(bool, bool, bool)
+ *  \brief Can shut down the ringbuffers, the players, and in LiveTV it can 
+ *         shut down the recorders.
+ *
+ *   The player needs to be partially shutdown before the recorder,
+ *   and partially shutdown after the recorder. Hence these are shutdown
+ *   from within the same method. Also, shutting down things in the right
+ *   order avoids spewing error messages...
+ *
+ *  \param stopRingBuffers Set to true if ringbuffer must be shut down.
+ *  \param stopPlayers     Set to true if player must be shut down.
+ *  \param stopRecorders   Set to true if recorder must be shut down.
+ */
+void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 {
-    if (closePlayer)
+    if (stopRingBuffers)
     {
         if (prbuffer)
         {
@@ -867,40 +974,48 @@ void TV::StopPlayerAndRecorder(bool closePlayer, bool closeRecorder)
             prbuffer->WaitForPause();
         }
 
-        if (nvp)
-            nvp->StopPlaying();
-
         if (piprbuffer)
         {
             piprbuffer->StopReads();
             piprbuffer->Pause();
             piprbuffer->WaitForPause();
         }
+    }
+
+    if (stopPlayers)
+    {
+        if (nvp)
+            nvp->StopPlaying();
 
         if (pipnvp)
             pipnvp->StopPlaying();
     }
 
-    if (closeRecorder)
+    if (stopRecorders)
     {
-        recorder->StopLiveTV();
-        if (piprecorder > 0)
+        if (recorder)
+            recorder->StopLiveTV();
+
+        if (piprecorder)
             piprecorder->StopLiveTV();
     }
 
-    if (closePlayer)
+    if (stopPlayers)
     {
-        TeardownPlayer();
+        if (nvp)
+            TeardownPlayer();
+
         if (pipnvp)
             TeardownPipPlayer();
     }
 }
 
-void TV::SetupPlayer(void)
+void TV::SetupPlayer(bool isWatchingRecording)
 {
     if (nvp)
-    { 
-        printf("Attempting to setup a player, but it already exists.\n");
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Attempting to setup a player, but it already exists.");
         return;
     }
 
@@ -915,25 +1030,20 @@ void TV::SetupPlayer(void)
     nvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
     nvp->SetLength(playbackLen);
     nvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));
-
-    autoCommercialSkip = gContext->GetNumSetting("AutoCommercialSkip", 0);
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
-
-    osd_display_time = gContext->GetNumSetting("OSDDisplayTime");
 
     if (gContext->GetNumSetting("DefaultCCMode"))
         nvp->ToggleCC(vbimode, 0);
 
-    filters = getFiltersForChannel();
+    filters = GetFiltersForChannel();
     nvp->SetVideoFilters(filters);
 
-    if (embedid > 0)
-        nvp->EmbedInWidget(embedid, embx, emby, embw, embh);
+    if (embedWinID > 0)
+        nvp->EmbedInWidget(embedWinID, embedBounds.x(), embedBounds.y(),
+                           embedBounds.width(), embedBounds.height());
 
-    if (nextState == kState_WatchingRecording)
+    if (isWatchingRecording)
         nvp->SetWatchingRecording(true);
-
-    osd = NULL;
 
     int udp_port = gContext->GetNumSetting("UDPNotifyPort");
     if (udp_port > 0)
@@ -943,7 +1053,7 @@ void TV::SetupPlayer(void)
 }
 
 
-QString TV::getFiltersForChannel()
+QString TV::GetFiltersForChannel()
 {
     QString filters;
     QString chanFilters;
@@ -980,7 +1090,8 @@ void TV::SetupPipPlayer(void)
 {
     if (pipnvp)
     {
-        printf("Attempting to setup a pip player, but it already exists.\n");
+        VERBOSE(VB_IMPORTANT,
+                "Attempting to setup a PiP player, but it already exists.");
         return;
     }
 
@@ -1013,14 +1124,13 @@ void TV::TeardownPlayer(void)
 
     paused = false;
     doing_ff_rew = 0;
-    ff_rew_index = SSPEED_NORMAL;
+    ff_rew_index = kInitFFRWSpeed;
     speed_index = 0;
     sleep_index = 0;
-    normal_speed = 1.0;
+    normal_speed = 1.0f;
 
     nvp = activenvp = NULL;
-    osd = NULL;
- 
+
     playbackinfo = NULL;
  
     if (recorder) 
@@ -1086,23 +1196,10 @@ void TV::RunTV(void)
         }
     }
 
-    stickykeys = gContext->GetNumSetting("StickyKeys");
-    ff_rew_repos = gContext->GetNumSetting("FFRewReposTime", 100) / 100.0;
-    ff_rew_reverse = gContext->GetNumSetting("FFRewReverse", 1);
-    smartForward = gContext->GetNumSetting("SmartForward", 0);
-    seek_speed[0] = gContext->GetNumSetting("FFRewSpeed0", 3);
-    seek_speed[1] = gContext->GetNumSetting("FFRewSpeed1", 5);
-    seek_speed[2] = gContext->GetNumSetting("FFRewSpeed2", 10);
-    seek_speed[3] = gContext->GetNumSetting("FFRewSpeed3", 20);
-    seek_speed[4] = gContext->GetNumSetting("FFRewSpeed4", 30);
-    seek_speed[5] = gContext->GetNumSetting("FFRewSpeed5", 60);
-    seek_speed[6] = gContext->GetNumSetting("FFRewSpeed6", 120);
-    seek_speed[7] = gContext->GetNumSetting("FFRewSpeed7", 180);
-
     doing_ff_rew = 0;
-    ff_rew_index = SSPEED_NORMAL;
+    ff_rew_index = kInitFFRWSpeed;
     speed_index = 0;
-    normal_speed = 1.0;
+    normal_speed = 1.0f;
     sleep_index = 0;
 
     int updatecheck = 0;
@@ -1119,7 +1216,10 @@ void TV::RunTV(void)
 
     while (runMainLoop)
     {
-        if (changeState)
+        stateLock.lock();
+        bool doHandle = nextStates.size() > 0;
+        stateLock.unlock();
+        if (doHandle)
             HandleStateChange();
 
         usleep(1000);
@@ -1168,8 +1268,7 @@ void TV::RunTV(void)
         {
             if (!nvp->IsPlaying())
             {
-                nextState = RemovePlaying(internalState);
-                changeState = true;
+                ChangeState(RemovePlaying(internalState));
                 endOfRecording = true;
                 VERBOSE(VB_PLAYBACK, ">> Player timeout");
             }
@@ -1177,14 +1276,13 @@ void TV::RunTV(void)
 
         if (exitPlayer)
         {
-            while (osd->DialogShowing(dialogname))
+            while (GetOSD()->DialogShowing(dialogname))
             {
-                osd->DialogAbort(dialogname);
-                osd->TurnDialogOff(dialogname);
+                GetOSD()->DialogAbort(dialogname);
+                GetOSD()->TurnDialogOff(dialogname);
                 usleep(1000);
             }
-            nextState = kState_None;
-            changeState = true;
+            ChangeState(kState_None);
             exitPlayer = false;
         }
 
@@ -1193,22 +1291,21 @@ void TV::RunTV(void)
         {
             speed_index = 0;
             doing_ff_rew = 0;
-            ff_rew_index = SSPEED_NORMAL;
+            ff_rew_index = kInitFFRWSpeed;
             UpdatePosOSD(0.0, tr("Play"));
         }
 
         if (++updatecheck >= 20)
         {
             OSDSet *oset;
-            if (osd && (oset = osd->GetSet("status")) &&
+            if (GetOSD() && (oset = GetOSD()->GetSet("status")) &&
                 oset->Displaying() && update_osd_pos &&
-                (internalState == kState_WatchingLiveTV || 
-                 internalState == kState_WatchingRecording ||
-                 internalState == kState_WatchingPreRecorded))
+                (StateIsLiveTV(internalState) ||
+                 StateIsRecording(internalState)))
             {
                 QString desc = "";
                 int pos = nvp->calcSliderPos(desc);
-                osd->UpdatePause(pos, desc);
+                GetOSD()->UpdatePause(pos, desc);
             }
 
             updatecheck = 0;
@@ -1216,10 +1313,10 @@ void TV::RunTV(void)
 
         if (channelqueued && nvp && nvp->GetOSD())
         {
-            OSDSet *set = osd->GetSet("channel_number");
+            OSDSet *set = GetOSD()->GetSet("channel_number");
             if ((set && !set->Displaying()) || !set)
             {
-                if (internalState == kState_WatchingLiveTV)
+                if (StateIsLiveTV(GetState()))
                     ChannelCommit();
                 else
                     ChannelClear();
@@ -1233,7 +1330,7 @@ void TV::RunTV(void)
 
             float progress = 0.0;
 
-            if (internalState == kState_WatchingLiveTV)
+            if (StateIsLiveTV(GetState()))
                 ShowLCDChannelInfo();
 
             if (activenvp)
@@ -1248,9 +1345,9 @@ void TV::RunTV(void)
         }
     }
   
-    if (!IsErrored())
+    if (!IsErrored() && (GetState() != kState_None))
     {
-        nextState = kState_None;
+        ForceNextStateNone();
         HandleStateChange();
     }
 }
@@ -1305,9 +1402,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
         return;
     }
 
-    if (nvp->GetOSD() && osd->IsRunningTreeMenu())
+    if (GetOSD() && GetOSD()->IsRunningTreeMenu())
     {
-        osd->TreeMenuHandleKeypress(e);
+        GetOSD()->TreeMenuHandleKeypress(e);
         return;
     }
 
@@ -1428,7 +1525,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             return;
     }
 
-    if (nvp->GetOSD() && dialogname != "" && osd->DialogShowing(dialogname))
+    if (dialogname != "" && GetOSD() && GetOSD()->DialogShowing(dialogname))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -1436,20 +1533,20 @@ void TV::ProcessKeypress(QKeyEvent *e)
             handled = true;
 
             if (action == "UP")
-                osd->DialogUp(dialogname); 
+                GetOSD()->DialogUp(dialogname); 
             else if (action == "DOWN")
-                osd->DialogDown(dialogname);
+                GetOSD()->DialogDown(dialogname);
             else if (action == "SELECT" || action == "ESCAPE" || 
                      action == "CLEAROSD" ||
                      ((arrowAccel) && (action == "LEFT" || action == "RIGHT")))
             {
                 if (action == "ESCAPE" || action == "CLEAROSD" ||
                     (arrowAccel && action == "LEFT"))
-                    osd->DialogAbort(dialogname);
-                osd->TurnDialogOff(dialogname);
+                    GetOSD()->DialogAbort(dialogname);
+                GetOSD()->TurnDialogOff(dialogname);
                 if (dialogname == "alreadybeingedited")
                 {
-                    int result = osd->GetDialogResponse(dialogname);
+                    int result = GetOSD()->GetDialogResponse(dialogname);
                     if (result == 1) 
                     {
                        playbackinfo->SetEditing(false);
@@ -1463,7 +1560,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 }
                 else if (dialogname == "exitplayoptions") 
                 {
-                    int result = osd->GetDialogResponse(dialogname);
+                    int result = GetOSD()->GetDialogResponse(dialogname);
 
                     switch (result)
                     {
@@ -1489,7 +1586,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 }
                 else if (dialogname == "videoexitplayoptions") 
                 {
-                    int result = osd->GetDialogResponse(dialogname);
+                    int result = GetOSD()->GetDialogResponse(dialogname);
 
                     switch (result)
                     {
@@ -1510,21 +1607,21 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 }
                 else if (dialogname == "ccwarningdirection")
                 {
-                    if (osd->GetDialogResponse(dialogname) == 1)
+                    if (GetOSD()->GetDialogResponse(dialogname) == 1)
                         ChangeChannel(lastCCDir, true);
                     else if (!paused)
                         activenvp->Play(normal_speed, true);
                 }     
                 else if (dialogname == "ccwarningstring")
                 {
-                    if (osd->GetDialogResponse(dialogname) == 1)
+                    if (GetOSD()->GetDialogResponse(dialogname) == 1)
                         ChangeChannelByString(lastCC, true);
                     else if (!paused)
                         activenvp->Play(normal_speed, true);
                 }
                 else if (dialogname == "allowrecordingbox")
                 {
-                    int result = osd->GetDialogResponse(dialogname);
+                    int result = GetOSD()->GetDialogResponse(dialogname);
     
                     if (result == 2)
                         StopLiveTV();
@@ -1532,7 +1629,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                         recorder->CancelNextRecording();
                 }
 
-                while (osd->DialogShowing(dialogname))
+                while (GetOSD()->DialogShowing(dialogname))
                 {
                     usleep(1000);
                 }
@@ -1648,7 +1745,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoPlay();
         else if (action == "NEXTAUDIO")
         {
-            if(activenvp)
+            if (activenvp)
             {
                 activenvp->incCurrentAudioTrack();
                 if ( activenvp->getCurrentAudioTrack() )
@@ -1657,13 +1754,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
                                   .arg(tr("Audio track"))
                                   .arg(activenvp->getCurrentAudioTrack());
 
-                    osd->SetSettingsText(msg, 3);
+                    GetOSD()->SetSettingsText(msg, 3);
                 }
             }
         }
         else if (action == "PREVAUDIO")
         {
-            if(activenvp)
+            if (activenvp)
             {
                 activenvp->decCurrentAudioTrack();
                 if ( activenvp->getCurrentAudioTrack() )
@@ -1672,7 +1769,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                                   .arg(tr("Audio track"))
                                   .arg(activenvp->getCurrentAudioTrack());
 
-                    osd->SetSettingsText(msg, 3);
+                    GetOSD()->SetSettingsText(msg, 3);
                 }
 
             }
@@ -1746,7 +1843,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "JUMPRWND")
         {
-            if(prbuffer->isDVD())
+            if (prbuffer->isDVD())
             {
                 prbuffer->prevTrack();
                 UpdatePosOSD(0.0, tr("Previous Chapter"));
@@ -1758,7 +1855,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "JUMPFFWD")
         {
-            if(prbuffer->isDVD())
+            if (prbuffer->isDVD())
             {
                 prbuffer->nextTrack();
                 UpdatePosOSD(0.0, tr("Next Chapter"));
@@ -1778,7 +1875,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "ESCAPE")
         {
-            if (osd && ClearOSD())
+            if (GetOSD() && ClearOSD())
                 return;
 
             NormalSpeed();
@@ -1799,11 +1896,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 options += tr("Delete this recording");
 
                 dialogname = "exitplayoptions";
-                osd->NewDialogBox(dialogname, message, options, 0);
+                GetOSD()->NewDialogBox(dialogname, message, options, 0);
             }
-            else if(StateIsPlaying(internalState) &&
-                  gContext->GetNumSetting("PlaybackExitPrompt") == 1 && 
-                  playbackinfo && playbackinfo->isVideo)
+            else if (StateIsPlaying(internalState) &&
+                     gContext->GetNumSetting("PlaybackExitPrompt") == 1 && 
+                     playbackinfo && playbackinfo->isVideo)
             {
                 nvp->Pause();
 
@@ -1813,11 +1910,17 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 voptions += tr("Exit to the menu");
                 voptions += tr("Keep watching");
                 dialogname = "videoexitplayoptions";
-                osd->NewDialogBox(dialogname, vmessage, voptions, 0);
-            } 
+                GetOSD()->NewDialogBox(dialogname, vmessage, voptions, 0);
+            }
+            else if (StateIsLiveTV(GetState()))
+            {
+                ChangeState(kState_None);
+                exitPlayer = true;
+                wantsToQuit = true;
+            }
             else 
             {
-                if (gContext->GetNumSetting("PlaybackExitPrompt") == 2)
+                if (nvp && gContext->GetNumSetting("PlaybackExitPrompt") == 2)
                     nvp->SetBookmark();
                 exitPlayer = true;
                 wantsToQuit = true;
@@ -1852,7 +1955,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 bool ok = false;
                 int val = action.toInt(&ok);
 
-                if (ok && val < SSPEED_MAX)
+                if (ok && val < (int)ff_rew_speeds.size())
                 {
                     SetFFRew(val);
                     handled = true;
@@ -1896,7 +1999,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
     }
 
-    if (internalState == kState_WatchingLiveTV)
+    if (StateIsLiveTV(GetState()))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -2002,7 +2105,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ShowOSDTreeMenu();
             else if (action == "CHANNELUP")
             {
-                if(prbuffer->isDVD())
+                if (prbuffer->isDVD())
                 {
                     prbuffer->prevTrack();
                     UpdatePosOSD(0.0, tr("Previous Chapter"));
@@ -2014,7 +2117,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             }    
             else if (action == "CHANNELDOWN")
             {
-                if(prbuffer->isDVD())
+                if (prbuffer->isDVD())
                 {
                     prbuffer->nextTrack();
                     UpdatePosOSD(0.0, tr("Next Chapter"));
@@ -2226,21 +2329,21 @@ void TV::DoInfo(void)
     if (paused)
         return;
 
-    oset = osd->GetSet("status");
+    oset = GetOSD()->GetSet("status");
     if ((oset) && (oset->Displaying()) && !prbuffer->isDVD())
     {
         QMap<QString, QString> infoMap;
         playbackinfo->ToMap(infoMap);
-        osd->HideSet("status");
-        osd->ClearAllText("program_info");
-        osd->SetText("program_info", infoMap, osd_display_time);
+        GetOSD()->HideSet("status");
+        GetOSD()->ClearAllText("program_info");
+        GetOSD()->SetText("program_info", infoMap, osd_display_time);
     }
     else
     {
         QString desc = "";
         int pos = nvp->calcSliderPos(desc);
-        osd->HideSet("program_info");
-        osd->StartPause(pos, false, tr("Position"), desc, osd_display_time);
+        GetOSD()->HideSet("program_info");
+        GetOSD()->StartPause(pos, false, tr("Position"), desc, osd_display_time);
         update_osd_pos = true;
     }
 }
@@ -2260,10 +2363,10 @@ bool TV::UpdatePosOSD(float time, const QString &mesg, int disptime)
     {
         QString desc = "";
         int pos = nvp->calcSliderPos(desc);
-        bool slidertype = (internalState == kState_WatchingLiveTV);
+        bool slidertype = StateIsLiveTV(GetState());
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
                                          kOSDFunctionalType_Default;
-        osd->StartPause(pos, slidertype, mesg, desc, disptime, osdtype);
+        GetOSD()->StartPause(pos, slidertype, mesg, desc, disptime, osdtype);
         update_osd_pos = true;
     }
 
@@ -2366,12 +2469,12 @@ float TV::StopFFRew(void)
         return time;
 
     if (doing_ff_rew > 0)
-        time = -seek_speed[ff_rew_index] * ff_rew_repos;
+        time = -ff_rew_speeds[ff_rew_index] * ff_rew_repos;
     else
-        time = seek_speed[ff_rew_index] * ff_rew_repos;
+        time = ff_rew_speeds[ff_rew_index] * ff_rew_repos;
 
     doing_ff_rew = 0;
-    ff_rew_index = SSPEED_NORMAL;
+    ff_rew_index = kInitFFRWSpeed;
 
     activenvp->Play(normal_speed, true);
 
@@ -2382,19 +2485,19 @@ void TV::ChangeFFRew(int direction)
 {
     if (doing_ff_rew == direction)
     {
-        while (++ff_rew_index < SSPEED_MAX)
-            if (seek_speed[ff_rew_index])
+        while (++ff_rew_index < (int)ff_rew_speeds.size())
+            if (ff_rew_speeds[ff_rew_index])
                 break;
-        if (ff_rew_index >= SSPEED_MAX)
-            ff_rew_index = SSPEED_NORMAL;
+        if (ff_rew_index >= (int)ff_rew_speeds.size())
+            ff_rew_index = kInitFFRWSpeed;
         SetFFRew(ff_rew_index);
     }
     else if (!ff_rew_reverse && doing_ff_rew == -direction)
     {
-        while (--ff_rew_index >= SSPEED_NORMAL)
-            if (seek_speed[ff_rew_index])
+        while (--ff_rew_index >= kInitFFRWSpeed)
+            if (ff_rew_speeds[ff_rew_index])
                 break;
-        if (ff_rew_index >= SSPEED_NORMAL)
+        if (ff_rew_index >= kInitFFRWSpeed)
             SetFFRew(ff_rew_index);
         else
         {
@@ -2407,7 +2510,7 @@ void TV::ChangeFFRew(int direction)
         NormalSpeed();
         paused = false;
         doing_ff_rew = direction;
-        SetFFRew(SSPEED_NORMAL);
+        SetFFRew(kInitFFRWSpeed);
     }
 }
 
@@ -2416,7 +2519,7 @@ void TV::SetFFRew(int index)
     if (!doing_ff_rew)
         return;
 
-    if (!seek_speed[index])
+    if (!ff_rew_speeds[index])
         return;
 
     ff_rew_index = index;
@@ -2425,13 +2528,13 @@ void TV::SetFFRew(int index)
     QString mesg;
     if (doing_ff_rew > 0)
     {
-        mesg = tr("Forward %1X").arg(seek_speed[ff_rew_index]);
-        speed = seek_speed[ff_rew_index];
+        mesg = tr("Forward %1X").arg(ff_rew_speeds[ff_rew_index]);
+        speed = ff_rew_speeds[ff_rew_index];
     }
     else
     {
-        mesg = tr("Rewind %1X").arg(seek_speed[ff_rew_index]);
-        speed = -seek_speed[ff_rew_index];
+        mesg = tr("Rewind %1X").arg(ff_rew_speeds[ff_rew_index]);
+        speed = -ff_rew_speeds[ff_rew_index];
     }
 
     activenvp->Play(speed, false);
@@ -2456,7 +2559,7 @@ void TV::DoQueueTranscode(void)
                                     playbackinfo->startts, JOB_STOP);
             queuedTranscode = false;
             if (activenvp == nvp)
-                osd->SetSettingsText(tr("Stopping Transcode"), 3);
+                GetOSD()->SetSettingsText(tr("Stopping Transcode"), 3);
         }
         else
         {
@@ -2471,10 +2574,10 @@ void TV::DoQueueTranscode(void)
             {
                 queuedTranscode = true;
                 if (activenvp == nvp)
-                    osd->SetSettingsText(tr("Transcoding"), 3);
+                    GetOSD()->SetSettingsText(tr("Transcoding"), 3);
             } else {
                 if (activenvp == nvp)
-                    osd->SetSettingsText(tr("Try Again"), 3);
+                    GetOSD()->SetSettingsText(tr("Try Again"), 3);
             }
         }
     }
@@ -2500,7 +2603,7 @@ void TV::DoSkipCommercials(int direction)
     }
 
     bool slidertype = false;
-    if (internalState == kState_WatchingLiveTV)
+    if (StateIsLiveTV(GetState()))
         slidertype = true;
 
     if (activenvp == nvp)
@@ -2508,7 +2611,7 @@ void TV::DoSkipCommercials(int direction)
         QString dummy = "";
         QString desc = tr("Searching...");
         int pos = nvp->calcSliderPos(dummy);
-        osd->StartPause(pos, slidertype, tr("Skip"), desc, 6);
+        GetOSD()->StartPause(pos, slidertype, tr("Skip"), desc, 6);
         update_osd_pos = true;
     }
 
@@ -2520,7 +2623,7 @@ void TV::DoSkipCommercials(int direction)
 
 void TV::SwitchCards(void)
 {
-    if (internalState == kState_WatchingLiveTV)
+    if (StateIsLiveTV(GetState()))
     {
         switchingCards = true;
         exitPlayer = true;
@@ -2533,7 +2636,7 @@ void TV::ToggleInputs(void)
     {
         if (paused)
         {
-            osd->EndPause();
+            GetOSD()->EndPause();
             gContext->DisableScreensaver();
             paused = false;
         }
@@ -2544,7 +2647,7 @@ void TV::ToggleInputs(void)
     // all we care about is the ringbuffer being paused, here..
     activerbuffer->WaitForPause();
 
-    activerecorder->Pause();
+    activerecorder->PauseRecorder();
     activerbuffer->Reset();
     activerecorder->ToggleInputs();
 
@@ -2589,7 +2692,7 @@ void TV::ChangeChannel(int direction, bool force)
             lastCCDir = direction;
             dialogname = "ccwarningdirection";
 
-            osd->NewDialogBox(dialogname, message, options, 0);
+            GetOSD()->NewDialogBox(dialogname, message, options, 0);
             return;
         }
     }
@@ -2605,7 +2708,7 @@ void TV::ChangeChannel(int direction, bool force)
     {
         if (paused)
         {
-            osd->EndPause();
+            GetOSD()->EndPause();
             gContext->DisableScreensaver();
             paused = false;
         }
@@ -2616,16 +2719,17 @@ void TV::ChangeChannel(int direction, bool force)
     activerbuffer->WaitForPause();    
 
     // Save the current channel if this is the first time
-    if (channame_vector.size() == 0 && activenvp == nvp)
+    if (prevChan.size() == 0 && activenvp == nvp)
         AddPreviousChannel();
 
-    activerecorder->Pause();
+    activerecorder->PauseRecorder();
     activerbuffer->Reset();
     activerecorder->ChangeChannel(direction);
+    ChannelClear();
 
     activenvp->ResetPlaying();
     
-    QString filters = getFiltersForChannel();
+    QString filters = GetFiltersForChannel();
     activenvp->SetVideoFilters(filters);
     
     activenvp->Play(normal_speed, true, false);
@@ -2637,8 +2741,6 @@ void TV::ChangeChannel(int direction, bool force)
         AddPreviousChannel();
     }
 
-    ChannelClear();
-
     if (muted)
         muteTimer->start(kMuteTimeout * 2, true);
 }
@@ -2648,7 +2750,8 @@ QString TV::QueuedChannel(void)
     if (!channelqueued)
         return "";
 
-    for (int i = 0; i < channelkeysstored; i++)
+    // strip initial zeros.
+    for (uint i = 0; i < channelKeys.length(); i++)
     {
         if (channelKeys[i] == '0')
             channelKeys[i] = ' ';
@@ -2656,7 +2759,7 @@ QString TV::QueuedChannel(void)
             break;
     }
 
-    return QString(channelKeys).stripWhiteSpace();
+    return channelKeys.stripWhiteSpace();
 }
 
 void TV::ChannelClear(bool hideosd)
@@ -2664,33 +2767,18 @@ void TV::ChannelClear(bool hideosd)
     if (lookForChannel)
         return;
 
-    if (hideosd && osd) 
-        osd->HideSet("channel_number");
+    if (hideosd && GetOSD()) 
+        GetOSD()->HideSet("channel_number");
 
     channelqueued = false;
-    channelKeys[0] = channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
-    channelKeys[4] = 0;
-    channelkeysstored = 0;
+
+    channelKeys = "";
     channelid = "";
 }
 
 void TV::ChannelKey(char key)
 {
-
-    if (channelkeysstored == 4)
-    {
-        channelKeys[0] = channelKeys[1];
-        channelKeys[1] = channelKeys[2];
-        channelKeys[2] = channelKeys[3];
-        channelKeys[3] = key;
-    }
-    else
-    {
-        channelKeys[channelkeysstored] = key; 
-        channelkeysstored++;
-    }
-    channelKeys[4] = 0;
-
+    channelKeys = channelKeys.append(key).right(kChannelKeysMax);
     channelqueued = true;
 
     bool unique = false;
@@ -2702,39 +2790,27 @@ void TV::ChannelKey(char key)
      * the only way to enter a channel number to browse without waiting for the
      * OSD to fadeout after entering numbers.
      */
-    if (internalState == kState_WatchingLiveTV && 
+    if (StateIsLiveTV(GetState()) &&
         (smartChannelChange || browsemode))
     {
-        char *chan_no_leading_zero = NULL;
-        for (int i = 0; i < channelkeysstored; i++)
+        int nzi = channelKeys.find("([1-9]|\\w)");
+        if (nzi >= 0)
         {
-            if (channelKeys[i] != '0') 
-            {
-                chan_no_leading_zero = &channelKeys[i];
-                break;
-            }
-        }
-
-        if (chan_no_leading_zero)
-        {
-            QString chan = QString(chan_no_leading_zero).stripWhiteSpace();
+            uint idx = (uint)(channelKeys.length() - nzi);
+            QString chan = channelKeys.right(idx).stripWhiteSpace();
             if (!activerecorder->CheckChannelPrefix(chan, unique))
-            {
-                channelKeys[0] = key;
-                channelKeys[1] = channelKeys[2] = channelKeys[3] = ' ';
-                channelkeysstored = 1;
-            }
+                channelKeys = key;
         }
     }
 
-    if (activenvp == nvp && osd)
+    if (activenvp == nvp && GetOSD())
     {
         QMap<QString, QString> infoMap;
 
         infoMap["channum"] = channelKeys;
         infoMap["callsign"] = "";
-        osd->ClearAllText("channel_number");
-        osd->SetText("channel_number", infoMap, 2);
+        GetOSD()->ClearAllText("channel_number");
+        GetOSD()->SetText("channel_number", infoMap, 2);
     }
 
     if (unique)
@@ -2751,8 +2827,8 @@ void TV::ChannelCommit(void)
     if (browsemode)
     {
         BrowseChannel(chan);
-        if (activenvp == nvp && osd)
-            osd->HideSet("channel_number");
+        if (activenvp == nvp && GetOSD())
+            GetOSD()->HideSet("channel_number");
     }
     else
         ChangeChannelByString(chan);
@@ -2764,7 +2840,7 @@ void TV::ChangeChannelByString(QString &name, bool force)
 {
     bool muted = false;
 
-    if (!channelid.isEmpty() && 
+    if (!channelid.isEmpty() && activerecorder &&
         activerecorder->ShouldSwitchToAnotherCard(channelid))
     {
         RemoteEncoder *testrec = NULL;
@@ -2780,10 +2856,10 @@ void TV::ChangeChannelByString(QString &name, bool force)
             return;
         }
 
-        if (!channame_vector.empty() && channame_vector.back() == name)
+        if (!prevChan.empty() && prevChan.back() == name)
         {
             // need to remove it if the new channel is the same as the old.
-            channame_vector.pop_back();
+            prevChan.pop_back();
         }
 
         // found the card on a different recorder.
@@ -2794,13 +2870,13 @@ void TV::ChangeChannelByString(QString &name, bool force)
         return;
     }
 
-    if (!channame_vector.empty() && channame_vector.back() == name)
+    if (!prevChan.empty() && prevChan.back() == name)
         return;
 
     if (!activerecorder->CheckChannel(name))
         return;
 
-    if (!force && (activenvp == nvp) && showBufferedWarnings)
+    if (!force && nvp && (activenvp == nvp) && showBufferedWarnings)
     {
         int behind = activenvp->GetSecondsBehind();
         if (behind > bufferedChannelThreshold)
@@ -2822,7 +2898,7 @@ void TV::ChangeChannelByString(QString &name, bool force)
             lastCC = name;
             dialogname = "ccwarningstring";
 
-            osd->NewDialogBox(dialogname, message, options, 0);
+            GetOSD()->NewDialogBox(dialogname, message, options, 0);
             return;
         }
     }
@@ -2838,7 +2914,7 @@ void TV::ChangeChannelByString(QString &name, bool force)
     {
         if (paused)
         {
-            osd->EndPause();
+            GetOSD()->EndPause();
             gContext->DisableScreensaver();
             paused = false;
         }
@@ -2849,16 +2925,16 @@ void TV::ChangeChannelByString(QString &name, bool force)
     activerbuffer->WaitForPause();
 
     // Save the current channel if this is the first time
-    if (channame_vector.size() == 0)
+    if (prevChan.size() == 0)
         AddPreviousChannel();
 
-    activerecorder->Pause();
+    activerecorder->PauseRecorder();
     activerbuffer->Reset();
     activerecorder->SetChannel(name);
 
     activenvp->ResetPlaying();
     
-    QString filters = getFiltersForChannel();
+    QString filters = GetFiltersForChannel();
     activenvp->SetVideoFilters(filters);
     
     activenvp->Play(normal_speed, true, false);
@@ -2877,80 +2953,67 @@ void TV::ChangeChannelByString(QString &name, bool force)
 void TV::AddPreviousChannel(void)
 {
     // Don't store more than thirty channels.  Remove the first item
-    if (channame_vector.size() > 29)
-    {
-        PrevChannelVector::iterator it;
-        it = channame_vector.begin();
-        channame_vector.erase(it);
-    }
-
-    QString chan_name = activerecorder->GetCurrentChannel();
+    if (prevChan.size() > 29)
+        prevChan.erase(prevChan.begin());
 
     // This method builds the stack of previous channels
-    channame_vector.push_back(chan_name);
+    prevChan.push_back(activerecorder->GetCurrentChannel());
 }
 
 void TV::PreviousChannel(void)
 {
     // Save the channel if this is the first time, and return so we don't
     // change chan to the current chan
-    if (channame_vector.size() == 0)
+    if (prevChan.size() == 0)
         return;
 
-    // Increment the times_pressed counter so we know how far to jump
-    times_pressed++;
+    // Increment the prevChanKeyCnt counter so we know how far to jump
+    prevChanKeyCnt++;
 
-    //Figure out the vector the desired channel is in
-    int vector = (channame_vector.size() - times_pressed - 1) % 
-                 channame_vector.size();
+    // Figure out the vector the desired channel is in
+    int i = (prevChan.size() - prevChanKeyCnt - 1) % prevChan.size();
 
     // Display channel name in the OSD for up to 1 second.
-    if (activenvp == nvp && osd)
+    if (activenvp == nvp && GetOSD())
     {
-        osd->HideSet("program_info");
+        GetOSD()->HideSet("program_info");
 
         QMap<QString, QString> infoMap;
 
-        infoMap["channum"] = channame_vector[vector];
+        infoMap["channum"] = prevChan[i];
         infoMap["callsign"] = "";
-        osd->ClearAllText("channel_number");
-        osd->SetText("channel_number", infoMap, 1);
+        GetOSD()->ClearAllText("channel_number");
+        GetOSD()->SetText("channel_number", infoMap, 1);
     }
 
     // Reset the timer
-    prevChannelTimer->stop();
-    prevChannelTimer->start(750);
+    prevChanTimer->stop();
+    prevChanTimer->start(750);
 }
 
 void TV::SetPreviousChannel()
 {
     // Stop the timer
-    prevChannelTimer->stop();
+    prevChanTimer->stop();
 
     // Figure out the vector the desired channel is in
-    int vector = (channame_vector.size() - times_pressed - 1) % 
-                 channame_vector.size();
+    int i = (prevChan.size() - prevChanKeyCnt - 1) % prevChan.size();
 
-    // Reset the times_pressed counter
-    times_pressed = 0;
+    // Reset the prevChanKeyCnt counter
+    prevChanKeyCnt = 0;
 
-    // Only change channel if channame_vector[vector] != current channel
+    // Only change channel if prevChan[vector] != current channel
     QString chan_name = activerecorder->GetCurrentChannel();
 
-    if (chan_name != channame_vector[vector].latin1())
+    if (chan_name != prevChan[i].latin1())
     {
-        // Populate the array with the channel
-        for(uint i = 0; i < channame_vector[vector].length(); i++)
-        {
-            channelKeys[i] = (int)*channame_vector[vector].mid(i, 1).latin1();
-        }
-
+        channelKeys = prevChan[i];
         channelqueued = true;
     }
 
     //Turn off the OSD Channel Num so the channel changes right away
-    if (activenvp == nvp && osd)
-        osd->HideSet("channel_number");
+    if (activenvp == nvp && GetOSD())
+        GetOSD()->HideSet("channel_number");
 }
 
 bool TV::ClearOSD(void)
@@ -2963,10 +3026,10 @@ bool TV::ClearOSD(void)
         res = true;
     }
 
-    if (osd->HideAll())
+    if (GetOSD()->HideAll())
         res = true;
 
-    while (res && osd->HideAll())
+    while (res && GetOSD()->HideAll())
         usleep(1000);
 
     return res;
@@ -2974,52 +3037,73 @@ bool TV::ClearOSD(void)
 
 void TV::ToggleOSD(void)
 {
-    OSDSet *oset = osd->GetSet("program_info");
-    if (osd && (oset) && (oset->Displaying() || prbuffer->isDVD()))
-        osd->HideAll();
+    OSDSet *oset = GetOSD()->GetSet("program_info");
+    if (GetOSD() && (oset) && (oset->Displaying() || prbuffer->isDVD()))
+        GetOSD()->HideAll();
     else if (!prbuffer->isDVD())
         UpdateOSD();
+}
+
+static void GetProgramInfo(NuppelVideoPlayer *activenvp,
+                           QMap<QString,QString> &infoMap)
+{
+    ProgramInfo *progInfo = NULL;
+    QDateTime now = QDateTime::currentDateTime(), cur, prev;
+    QString prevTimeStr = infoMap["startts"];
+    int behind = 0;
+
+    // Current playback time
+    if (activenvp)
+        behind = activenvp->GetSecondsBehind();
+    cur = now.addSecs(0-behind);
+
+    // Previous osd time
+    if ((prevTimeStr == QString::null) || (prevTimeStr.length()<2))
+        prev = now.addSecs(1);
+    else 
+        prev = QDateTime::fromString(infoMap["startts"], Qt::ISODate);
+
+    // If we need it, try to set progInfo,
+    if (cur < prev)
+        progInfo = ProgramInfo::GetProgramAtDateTime(infoMap["chanid"], cur);
+
+    // If there is a progInfo, use it
+    if (progInfo)
+        progInfo->ToMap(infoMap);
 }
 
 void TV::UpdateOSD(void)
 {
     QMap<QString, QString> infoMap;
 
+    // Collect channel info
     GetChannelInfo(activerecorder, infoMap);
 
-    int behind = activenvp->GetSecondsBehind();
-    QDateTime now = QDateTime::currentDateTime();
-    QDateTime infoMapTime = QDateTime::fromString(infoMap["startts"],
-                                                  Qt::ISODate);
-    QDateTime curPlaybackTime = now.addSecs(0-behind);
-    ProgramInfo *curPlaybackInfo;
+    // Collect program info, if we are out of date
+    GetProgramInfo(activenvp, infoMap);
 
-    if (curPlaybackTime < infoMapTime)
+    if (GetOSD())
     {
-        curPlaybackInfo = ProgramInfo::GetProgramAtDateTime(infoMap["chanid"], 
-                                                            curPlaybackTime);
-        if (curPlaybackInfo)
-            curPlaybackInfo->ToMap(infoMap);
+        // Clear previous osd and add new info
+        GetOSD()->ClearAllText("program_info");
+        GetOSD()->SetText("program_info", infoMap, osd_display_time);
+        GetOSD()->ClearAllText("channel_number");
+        GetOSD()->SetText("channel_number", infoMap, osd_display_time);
     }
-
-    osd->ClearAllText("program_info");
-    osd->SetText("program_info", infoMap, osd_display_time);
-    osd->ClearAllText("channel_number");
-    osd->SetText("channel_number", infoMap, osd_display_time);
 }
 
 void TV::UpdateOSDInput(void)
 {
-    QString name = "";
+    if (!activerecorder)
+        return;
 
+    QString name = "";
     activerecorder->GetInputName(name);
-    QString msg = QString ("%1: %2").arg(activerecorder->GetRecorderNumber())
-                                    .arg(name);
-    if (osd)
-        osd->SetSettingsText(msg, 3);
-    else
-        VERBOSE(VB_OSD, QString("TV: Unable to display input ID (%1) on OSD.")
-                                .arg(msg));
+    QString msg = QString ("%1: %2")
+        .arg(activerecorder->GetRecorderNumber()).arg(name);
+
+    if (GetOSD())
+        GetOSD()->SetSettingsText(msg, 3);
 }
 
 void TV::UpdateLCD(void)
@@ -3139,10 +3223,6 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
     QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
     QString tmFmt = gContext->GetSetting("TimeFormat");
     QString dtFmt = gContext->GetSetting("ShortDateFormat");
-    QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
-    QDateTime endts = QDateTime::fromString(endtime, Qt::ISODate);
-    QString length;
-    int hours, minutes, seconds;
 
     infoMap["startts"] = starttime;
     infoMap["endts"] = endtime;
@@ -3153,28 +3233,51 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
     infoMap["description"] = description;
     infoMap["category"] = category;
     infoMap["callsign"] = callsign;
-    infoMap["starttime"] = startts.toString(tmFmt);
-    infoMap["startdate"] = startts.toString(dtFmt);
-    infoMap["endtime"] = endts.toString(tmFmt);
-    infoMap["enddate"] = endts.toString(dtFmt);
-    infoMap["channum"] = channum;
-    infoMap["chanid"] = chanid;
-    infoMap["iconpath"] = iconpath;
-    infoMap["seriesid"] = seriesid;
-    infoMap["programid"] = programid;
+    
+    QDateTime startts, endts;
+    if ("" == starttime)
+        infoMap["starttime"] = infoMap["startdate"] = "";
+    else
+    {
+        startts = QDateTime::fromString(starttime, Qt::ISODate);
+        infoMap["starttime"] = startts.toString(tmFmt);
+        infoMap["startdate"] = startts.toString(dtFmt);
+    }
+    if ("" == endtime)
+        infoMap["endtime"] = infoMap["enddate"] = "";
+    else
+    {
+        endts = QDateTime::fromString(endtime, Qt::ISODate);
+        infoMap["endtime"] = endts.toString(tmFmt);
+        infoMap["enddate"] = endts.toString(dtFmt);
+    }
 
-    seconds = startts.secsTo(endts);
-    minutes = seconds / 60;
-    infoMap["lenmins"] = QString("%1 %2").arg(minutes).arg(tr("minutes"));
-    hours   = minutes / 60;
-    minutes = minutes % 60;
-    length.sprintf("%d:%02d", hours, minutes);
+    infoMap["channum"]   = channum;
+    infoMap["chanid"]    = chanid;
+    infoMap["iconpath"]  = iconpath;
+    infoMap["seriesid"]  = seriesid;
+    infoMap["programid"] = programid;
     
-    infoMap["lentime"] = length;
-    
-    
-    if (stars.toFloat())
-        infoMap["stars"] = QString("(%1 %2) ").arg(4.0 * stars.toFloat()).arg(QObject::tr("stars"));
+    if ("" == starttime || "" == endtime)
+        infoMap["lenmins"] = infoMap["lentime"] = "";
+    else
+    {
+        QString length;
+        int hours, minutes, seconds;
+        seconds = startts.secsTo(endts);
+        minutes = seconds / 60;
+        infoMap["lenmins"] = QString("%1 %2").arg(minutes).arg(tr("minutes"));
+        hours   = minutes / 60;
+        minutes = minutes % 60;
+        length.sprintf("%d:%02d", hours, minutes);
+        infoMap["lentime"] = length;
+    }
+
+    bool ok;
+    double fstars = stars.toFloat(&ok);
+    if (ok)
+        infoMap["stars"] = QString("(%1 %2) ")
+            .arg(4.0 * fstars).arg(QObject::tr("stars"));
     else
         infoMap["stars"] = "";
 
@@ -3216,6 +3319,8 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
 {
     if (!enc)
         enc = activerecorder;
+    if (!enc)
+        return;
 
     enc->GetChannelInfo(title, subtitle, desc, category, starttime, endtime, 
                         callsign, iconpath, channelname, chanid,
@@ -3225,11 +3330,8 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
 
 void TV::EmbedOutput(WId wid, int x, int y, int w, int h)
 {
-    embedid = wid;
-    embx = x;
-    emby = y;
-    embw = w;
-    embh = h;
+    embedWinID = wid;
+    embedBounds = QRect(x,y,w,h);
 
     if (nvp)
         nvp->EmbedInWidget(wid, x, y, w, h);
@@ -3239,7 +3341,7 @@ void TV::StopEmbeddingOutput(void)
 {
     if (nvp)
         nvp->StopEmbedding();
-    embedid = 0;
+    embedWinID = 0;
 }
 
 void TV::doLoadMenu(void)
@@ -3272,8 +3374,7 @@ void TV::doLoadMenu(void)
 
     if (channame != "" && chanid != "")
     {
-        channame = channame.left(4);
-        sprintf(channelKeys, "%s", channame.ascii());
+        channelKeys = channame.left(4);
         channelid = chanid;
         channelqueued = true; 
     }
@@ -3319,13 +3420,13 @@ void TV::ChangeBrightness(bool up, bool recorder)
     int brightness;
     QString text;
 
-    if (osd)
+    if (GetOSD())
     {
         if (recorder)
         {
             brightness = activerecorder->ChangeBrightness(up);
             text = QString(tr("Brightness (REC) %1 %")).arg(brightness);
-            osd->StartPause(brightness * 10, true, tr("Adjust Recording"),
+            GetOSD()->StartPause(brightness * 10, true, tr("Adjust Recording"),
                 text, 5, kOSDFunctionalType_RecPictureAdjust);
         }
         else
@@ -3333,7 +3434,7 @@ void TV::ChangeBrightness(bool up, bool recorder)
             brightness = nvp->getVideoOutput()->ChangeBrightness(up);
             gContext->SaveSetting("PlaybackBrightness", brightness);
             text = QString(tr("Brightness %1 %")).arg(brightness);
-            osd->StartPause(brightness * 10, true, tr("Adjust Picture"),
+            GetOSD()->StartPause(brightness * 10, true, tr("Adjust Picture"),
                 text, 5, kOSDFunctionalType_PictureAdjust);
         }
 
@@ -3346,13 +3447,13 @@ void TV::ChangeContrast(bool up, bool recorder)
     int contrast;
     QString text;
 
-    if (osd)
+    if (GetOSD())
     {
         if (recorder)
         {
             contrast = activerecorder->ChangeContrast(up);
             text = QString(tr("Contrast (REC) %1 %")).arg(contrast);
-            osd->StartPause(contrast * 10, true, tr("Adjust Recording"),
+            GetOSD()->StartPause(contrast * 10, true, tr("Adjust Recording"),
                 text, 5, kOSDFunctionalType_RecPictureAdjust);
         }
         else
@@ -3360,7 +3461,7 @@ void TV::ChangeContrast(bool up, bool recorder)
             contrast = nvp->getVideoOutput()->ChangeContrast(up);
             gContext->SaveSetting("PlaybackContrast", contrast);
             text = QString(tr("Contrast %1 %")).arg(contrast);
-            osd->StartPause(contrast * 10, true, tr("Adjust Picture"),
+            GetOSD()->StartPause(contrast * 10, true, tr("Adjust Picture"),
                 text, 5, kOSDFunctionalType_PictureAdjust);
         }
 
@@ -3373,13 +3474,13 @@ void TV::ChangeColour(bool up, bool recorder)
     int colour;
     QString text;
 
-    if (osd)
+    if (GetOSD())
     {
         if (recorder)
         {
             colour = activerecorder->ChangeColour(up);
             text = QString(tr("Colour (REC) %1 %")).arg(colour);
-            osd->StartPause(colour * 10, true, tr("Adjust Recording"),
+            GetOSD()->StartPause(colour * 10, true, tr("Adjust Recording"),
                 text, 5, kOSDFunctionalType_RecPictureAdjust);
         }
         else
@@ -3387,7 +3488,7 @@ void TV::ChangeColour(bool up, bool recorder)
             colour = nvp->getVideoOutput()->ChangeColour(up);
             gContext->SaveSetting("PlaybackColour", colour);
             text = QString(tr("Colour %1 %")).arg(colour);
-            osd->StartPause(colour * 10, true, tr("Adjust Picture"),
+            GetOSD()->StartPause(colour * 10, true, tr("Adjust Picture"),
                 text, 5, kOSDFunctionalType_PictureAdjust);
         }
 
@@ -3400,13 +3501,13 @@ void TV::ChangeHue(bool up, bool recorder)
     int hue;
     QString text;
 
-    if (osd)
+    if (GetOSD())
     {
         if (recorder)
         {
             hue = activerecorder->ChangeHue(up);
             text = QString(tr("Hue (REC) %1 %")).arg(hue);
-            osd->StartPause(hue * 10, true, tr("Adjust Recording"),
+            GetOSD()->StartPause(hue * 10, true, tr("Adjust Recording"),
                 text, 5, kOSDFunctionalType_RecPictureAdjust);
         }
         else
@@ -3414,7 +3515,7 @@ void TV::ChangeHue(bool up, bool recorder)
             hue = nvp->getVideoOutput()->ChangeHue(up);
             gContext->SaveSetting("PlaybackHue", hue);
             text = QString(tr("Hue %1 %")).arg(hue);
-            osd->StartPause(hue * 10, true, tr("Adjust Picture"),
+            GetOSD()->StartPause(hue * 10, true, tr("Adjust Picture"),
                 text, 5, kOSDFunctionalType_PictureAdjust);
         }
 
@@ -3436,9 +3537,9 @@ void TV::ChangeVolume(bool up)
     int curvol = aud->GetCurrentVolume();
     QString text = QString(tr("Volume %1 %")).arg(curvol);
 
-    if (osd && !browsemode)
+    if (GetOSD() && !browsemode)
     {
-        osd->StartPause(curvol * 10, true, tr("Adjust Volume"), text, 5, 
+        GetOSD()->StartPause(curvol * 10, true, tr("Adjust Volume"), text, 5, 
                         kOSDFunctionalType_PictureAdjust);
         update_osd_pos = false;
     }
@@ -3458,10 +3559,10 @@ void TV::ChangeTimeStretch(int dir, bool allowEdit)
 
     QString text = QString(tr("Time Stretch %1X")).arg(normal_speed);
 
-    if (osd && !browsemode)
+    if (GetOSD() && !browsemode)
     {
         int val = (int)(normal_speed*500);
-        osd->StartPause(val, false, tr("Adjust Time Stretch"), text, 10, 
+        GetOSD()->StartPause(val, false, tr("Adjust Time Stretch"), text, 10, 
                         kOSDFunctionalType_TimeStretchAdjust);
         update_osd_pos = false;
     }
@@ -3493,7 +3594,7 @@ void TV::ChangeAudioSync(int dir, bool allowEdit)
         newval = activenvp->AdjustAudioTimecodeOffset(dir*10) - 
                  audiosyncBaseline;
 
-    if (osd && !browsemode)
+    if (GetOSD() && !browsemode)
     {
         QString text = QString(" %1 ms").arg(newval);
         int val = (int)newval;
@@ -3505,7 +3606,7 @@ void TV::ChangeAudioSync(int dir, bool allowEdit)
         else
             text = tr("Audio Sync") + text;
 
-        osd->StartPause((val/2)+500, false, tr("Adjust Audio Sync"), text, 10, 
+        GetOSD()->StartPause((val/2)+500, false, tr("Adjust Audio Sync"), text, 10, 
                         kOSDFunctionalType_AudioSyncAdjust);
         update_osd_pos = false;
     }
@@ -3540,8 +3641,8 @@ void TV::ToggleMute(void)
        case MUTE_RIGHT: text = tr("Right Channel Muted"); break;
     }
  
-    if (osd && !browsemode)
-        osd->SetSettingsText(text, 5);
+    if (GetOSD() && !browsemode)
+        GetOSD()->SetSettingsText(text, 5);
 }
 
 void TV::ToggleSleepTimer(void)
@@ -3549,29 +3650,29 @@ void TV::ToggleSleepTimer(void)
     QString text;
 
     // increment sleep index, cycle through
-    if (++sleep_index == SSLEEP_MAX) 
+    if (++sleep_index == sleep_times.size()) 
         sleep_index = 0;
 
     // turn sleep timer off
-    if (sleep_timer_array[sleep_index].seconds == 0)
+    if (sleep_times[sleep_index].seconds == 0)
         sleepTimer->stop();
     else
     {
         if (sleepTimer->isActive())
             // sleep timer is active, adjust interval
-            sleepTimer->changeInterval(sleep_timer_array[sleep_index].seconds *
+            sleepTimer->changeInterval(sleep_times[sleep_index].seconds *
                                        1000);
         else
             // sleep timer is not active, start it
-            sleepTimer->start(sleep_timer_array[sleep_index].seconds * 1000, 
+            sleepTimer->start(sleep_times[sleep_index].seconds * 1000, 
                               TRUE);
     }
 
-    text = tr("Sleep ") + " " + sleep_timer_array[sleep_index].dispString;
+    text = tr("Sleep ") + " " + sleep_times[sleep_index].dispString;
 
     // display OSD
-    if (osd && !browsemode)
-        osd->SetSettingsText(text, 3);
+    if (GetOSD() && !browsemode)
+        GetOSD()->SetSettingsText(text, 3);
 }
 
 void TV::SleepEndTimer(void)
@@ -3597,16 +3698,15 @@ void TV::ToggleLetterbox(int letterboxMode)
         default:                      text = tr("Off"); break;
     }
 
-    if (osd && !browsemode && !osd->IsRunningTreeMenu())
-        osd->SetSettingsText(text, 3);
+    if (GetOSD() && !browsemode && !GetOSD()->IsRunningTreeMenu())
+        GetOSD()->SetSettingsText(text, 3);
 }
 
 void TV::EPGChannelUpdate(QString chanid, QString chanstr)
 {
     if (chanid != "" && chanstr != "")
     {
-        chanstr = chanstr.left(4);
-        sprintf(channelKeys, "%s", chanstr.ascii());
+        channelKeys = chanstr.left(4);
         channelid = chanid;
         channelqueued = true; 
     }
@@ -3644,11 +3744,10 @@ void TV::customEvent(QCustomEvent *e)
             {
                 nvp->SetWatchingRecording(false);
                 nvp->SetLength(filelen);
-                nextState = kState_WatchingPreRecorded;
-                changeState = true;
+                ChangeState(kState_WatchingPreRecorded);
             }
         }
-        else if (GetState() == kState_WatchingLiveTV && 
+        else if (StateIsLiveTV(GetState()) &&
                  message.left(14) == "ASK_RECORDING ")
         {
             message = message.simplifyWhiteSpace();
@@ -3731,7 +3830,7 @@ void TV::BrowseStart(void)
     if (paused)
         return;
 
-    OSDSet *oset = osd->GetSet("browse_info");
+    OSDSet *oset = GetOSD()->GetSet("browse_info");
     if (!oset)
         return;
 
@@ -3764,7 +3863,7 @@ void TV::BrowseEnd(bool change)
 
     browseTimer->stop();
 
-    osd->HideSet("browse_info");
+    GetOSD()->HideSet("browse_info");
 
     if (change)
     {
@@ -3819,8 +3918,8 @@ void TV::BrowseDispInfo(int direction)
     if (program_info)
         program_info->ToMap(infoMap);
 
-    osd->ClearAllText("browse_info");
-    osd->SetText("browse_info", infoMap, -1);
+    GetOSD()->ClearAllText("browse_info");
+    GetOSD()->SetText("browse_info", infoMap, -1);
 
     delete program_info;
 }
@@ -3849,7 +3948,7 @@ void TV::ToggleRecord(void)
             QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(title);
 
             if (activenvp == nvp)
-                osd->SetSettingsText(msg, 3);
+                GetOSD()->SetSettingsText(msg, 3);
 
             delete program_info;
         }
@@ -3866,11 +3965,11 @@ void TV::ToggleRecord(void)
 
     program_info->ToMap(infoMap);
 
-    osd->ClearAllText("browse_info");
-    osd->SetText("browse_info", infoMap, -1);
+    GetOSD()->ClearAllText("browse_info");
+    GetOSD()->SetText("browse_info", infoMap, -1);
 
     if (activenvp == nvp)
-        osd->SetSettingsText(tr("Record"), 3);
+        GetOSD()->SetSettingsText(tr("Record"), 3);
 
     delete program_info;
 }
@@ -3912,9 +4011,9 @@ void TV::DoTogglePictureAttribute(void)
 {
     OSDSet *oset;
     int value = 0;
-    oset = osd->GetSet("status");
+    oset = GetOSD()->GetSet("status");
 
-    if (osd)
+    if (GetOSD())
     {
         QString title = tr("Adjust Picture");
         QString picName;
@@ -3946,7 +4045,7 @@ void TV::DoTogglePictureAttribute(void)
                 picName = QString("%1 %2 %").arg(tr("Volume")).arg(value);
                 break;
         }
-        osd->StartPause(value*10, true, title, picName, 5, 
+        GetOSD()->StartPause(value*10, true, title, picName, 5, 
                         kOSDFunctionalType_PictureAdjust);
         update_osd_pos = false;
     }
@@ -3956,11 +4055,11 @@ void TV::DoToggleRecPictureAttribute(void)
 {
     OSDSet *oset;
     int value = 0;
-    oset = osd->GetSet("status");
+    oset = GetOSD()->GetSet("status");
    
     recAdjustment = (recAdjustment % 4) + 1;
    
-    if (osd)
+    if (GetOSD())
     {
         QString title = tr("Adjust Recording");
         QString recName;
@@ -3992,7 +4091,7 @@ void TV::DoToggleRecPictureAttribute(void)
                                   .arg(tr("(REC)")).arg(value);
                 break;
         }
-        osd->StartPause(value * 10, true, title, recName, 5,
+        GetOSD()->StartPause(value * 10, true, title, recName, 5,
                         kOSDFunctionalType_RecPictureAdjust);
         update_osd_pos = false;
     }
@@ -4048,7 +4147,7 @@ void TV::DoEditMode(void)
         options += tr("Continue Editing");
         options += tr("Do not edit");
 
-        osd->NewDialogBox(dialogname, message, options, 0);
+        GetOSD()->NewDialogBox(dialogname, message, options, 0);
         return;
     }
 
@@ -4101,7 +4200,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         ToggleLetterbox(action.right(1).toInt());
         hidetree = false;
     }
-    else if (internalState == kState_WatchingLiveTV)
+    else if (StateIsLiveTV(GetState()))
     {
         if (action == "GUIDE")
             LoadMenu();
@@ -4158,7 +4257,7 @@ void TV::ShowOSDTreeMenu(void)
     {
         ClearOSD();
 
-        OSDListTreeType *tree = osd->ShowTreeMenu("menu", treeMenu);
+        OSDListTreeType *tree = GetOSD()->ShowTreeMenu("menu", treeMenu);
         if (tree)
         {
             connect(tree, SIGNAL(itemSelected(OSDListTreeType *,OSDGenericTree *)), 
@@ -4178,7 +4277,7 @@ void TV::BuildOSDTreeMenu(void)
     treeMenu = new OSDGenericTree(NULL, "treeMenu");
     OSDGenericTree *item, *subitem;
 
-    if (internalState == kState_WatchingLiveTV)
+    if (StateIsLiveTV(GetState()))
     {
         bool freeRecorders = (pipnvp != NULL);
         if (!freeRecorders)
@@ -4360,7 +4459,7 @@ void TV::ToggleAutoExpire(void)
     {
         QString curTime = "";
         int pos = nvp->calcSliderPos(curTime);
-        osd->StartPause(pos, false, desc, curTime, 1);
+        GetOSD()->StartPause(pos, false, desc, curTime, 1);
         update_osd_pos = false;
     }
 }
@@ -4386,7 +4485,7 @@ void TV::SetAutoCommercialSkip(int skipMode)
     {
         QString curTime = "";
         int pos = nvp->calcSliderPos(curTime);
-        osd->StartPause(pos, false, desc, curTime, 1);
+        GetOSD()->StartPause(pos, false, desc, curTime, 1);
         update_osd_pos = false;
     }
 }
@@ -4408,7 +4507,7 @@ void TV::SetManualZoom(bool zoomON)
     {
         QString curTime = "";
         int pos = nvp->calcSliderPos(curTime);
-        osd->StartPause(pos, false, desc, curTime, 1);
+        GetOSD()->StartPause(pos, false, desc, curTime, 1);
         update_osd_pos = false;
     }
 }
@@ -4466,16 +4565,16 @@ void TV::ToggleSleepTimer(const QString time)
         }
                
         // display OSD
-        if (osd && !browsemode)
+        if (GetOSD() && !browsemode)
         {
             QString out;
 
             if (mins != 0)
                 out = tr("Sleep") + " " + QString::number(mins);
             else
-                out = tr("Sleep") + " " + sleep_timer_array[0].dispString;
+                out = tr("Sleep") + " " + sleep_times[0].dispString;
 
-            osd->SetSettingsText(out, 3);
+            GetOSD()->SetSettingsText(out, 3);
         }
     }
     else

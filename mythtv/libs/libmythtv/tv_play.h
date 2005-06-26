@@ -8,7 +8,9 @@
 #include <qvaluevector.h>
 #include <qptrlist.h>
 #include <qmutex.h>
+#include <qstringlist.h>
 
+#include "mythdeque.h"
 #include "tv.h"
 
 #include <qobject.h>
@@ -24,10 +26,22 @@ class UDPNotify;
 class OSDListTreeType;
 class OSDGenericTree;
 
+typedef QValueVector<QString> str_vec_t;
+
 class TV : public QObject
 {
     Q_OBJECT
   public:
+    /// \brief Helper class for Sleep Timer code.
+    class SleepTimerInfo
+    {
+      public:
+        SleepTimerInfo(QString str, unsigned long secs)
+            : dispString(str), seconds(secs) { ; }
+        QString   dispString;
+        unsigned long seconds;
+    };
+
     TV(void);
    ~TV();
 
@@ -91,7 +105,7 @@ class TV : public QObject
 
     OSD *GetOSD(void);
 
-    bool IsErrored() { return errored; }
+    bool IsErrored(void) { return errored; }
   public slots:
     void HandleOSDClosed(int osdType);
 
@@ -114,11 +128,12 @@ class TV : public QObject
     bool eventFilter(QObject *o, QEvent *e);
 
   private:
-    void StartPlayerAndRecorder(bool StartPlayer, bool StartRecorder);
-    void StopPlayerAndRecorder(bool StopPlayer, bool StopRecorder);
+    bool StartRecorder(int maxWait=-1);
+    bool StartPlayer(bool isWatchingRecording, int maxWait=-1);
+    void StartOSD(void);
+    void StopStuff(bool stopRingbuffers, bool stopPlayers, bool stopRecorders);
     
-    void SetChannel(bool needopen = false);
-    QString getFiltersForChannel();
+    QString GetFiltersForChannel(void);
 
     void ToggleChannelFavorite(void);
     void ChangeChannel(int direction, bool force = false);
@@ -173,15 +188,18 @@ class TV : public QObject
 
     void LoadMenu(void);
 
-    void SetupPlayer();
-    void TeardownPlayer();
-    void SetupPipPlayer();
-    void TeardownPipPlayer();
+    void SetupPlayer(bool isWatchingRecording);
+    void TeardownPlayer(void);
+    void SetupPipPlayer(void);
+    void TeardownPipPlayer(void);
     
-    void StateToString(TVState state, QString &statestr);
-    void HandleStateChange();
+    void HandleStateChange(void);
+    bool InStateChange(void) const;
+    void ChangeState(TVState nextState);
+    void ForceNextStateNone(void);
     bool StateIsRecording(TVState state);
     bool StateIsPlaying(TVState state);
+    bool StateIsLiveTV(TVState state);
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
 
@@ -209,88 +227,100 @@ class TV : public QObject
 
     QString PlayMesg(void);
 
+  private:
     // Configuration variables from database
     QString baseFilters;
-    int fftime;
-    int rewtime;
-    int jumptime;
-    bool usePicControls;
-    bool smartChannelChange;
-    bool showBufferedWarnings;
-    int bufferedChannelThreshold;
-    bool MuteIndividualChannels;
-    bool arrowAccel;
-    char vbimode;
+    int     fftime;
+    int     rewtime;
+    int     jumptime;
+    bool    usePicControls;
+    bool    smartChannelChange;
+    bool    MuteIndividualChannels;
+    bool    arrowAccel;
+    int     osd_display_time;
 
-    // Configuretion variables from DB in RunTV
-    int stickykeys;
-    float ff_rew_repos;
-    bool ff_rew_reverse;
-    bool smartForward;
-    static const int SSPEED_MAX = 8;
-    int seek_speed[SSPEED_MAX];
-    
-    // Configuration variables from DB just before playback
-    int autoCommercialSkip;
-    int osd_display_time;
+    int     autoCommercialSkip;
+    bool    tryUnflaggedSkip;
+
+    bool    smartForward;
+    int     stickykeys;
+    float   ff_rew_repos;
+    bool    ff_rew_reverse;
+    vector<int> ff_rew_speeds;
+
+    bool    showBufferedWarnings;
+    int     bufferedChannelThreshold;
+    int     vbimode;
 
     // State variables
-    TVState internalState;
-    TVState nextState;
-    bool changeState;
+    MythDeque<TVState> nextStates;
+    mutable QMutex     stateLock;
+    TVState            internalState;
+
     bool menurunning;
     bool runMainLoop;
     bool wantsToQuit;
     bool exitPlayer;
     bool paused;
     bool errored;
-    bool stretchAdjustment; // is time stretch turned on
-    bool audiosyncAdjustment; // is audiosync turned on
+    bool stretchAdjustment; ///< True if time stretch is turned on
+    bool audiosyncAdjustment; ///< True if audiosync is turned on
     long long audiosyncBaseline;
-    bool editmode;       // are we in video editing mode
+    bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
-    bool update_osd_pos; // redisplay osd?
-    bool endOfRecording; // !nvp->IsPlaying() && StateIsPlaying(internalState)
-    bool requestDelete;  // user wants last video deleted
+    bool update_osd_pos; ///< Redisplay osd?
+    bool endOfRecording; ///< !nvp->IsPlaying() && StateIsPlaying(internalState)
+    bool requestDelete;  ///< User wants last video deleted
     bool doSmartForward;
-    bool switchingCards; // user wants new recorder, see mythfrontend/main.cpp
-    int lastRecorderNum; // last recorder, for implementing SwitchCards()
+    bool switchingCards; ///< User wants new recorder, see mythfrontend/main.cpp
+    int lastRecorderNum; ///< Last recorder, for implementing SwitchCards()
     bool queuedTranscode;
-    bool getRecorderPlaybackInfo; // main loop should get recorderPlaybackInfo
-    int sleep_index;     // Off, go to sleep in 30 minutes, 60 minutes...
-    QTimer *sleepTimer;  // timer for turning off playback
-    int picAdjustment;   // player pict attr to modify (on arrow left or right)
-    int recAdjustment;   // which recorder picture attribute to modify...
+    bool getRecorderPlaybackInfo; ///< Main loop should get recorderPlaybackInfo
+    int picAdjustment;   ///< Player pict attr to modify (on arrow left or right)
+    int recAdjustment;   ///< Which recorder picture attribute to modify...
 
-    // Key processing buffer, lock, and state
-    QMutex keyListLock;  // keys are processed outside Qt Event loop, need lock
-    QPtrList<QKeyEvent> keyList; // list of unprocessed key presses
-    bool keyRepeat;      // are repeats logical on last key?
-    QTimer *keyrepeatTimer; // timeout timer for repeat key filtering
+    /// Vector or sleep timer sleep times in seconds,
+    /// with the appropriate UI message.
+    vector<SleepTimerInfo> sleep_times;
+    uint    sleep_index; ///< Index into sleep_times.
+    QTimer *sleepTimer;  ///< Timer for turning off playback.
 
-    // Fast forward state
-    int doing_ff_rew;
-    int ff_rew_index;
-    int speed_index;
-    float normal_speed;
+    /// Queue of unprocessed key presses.
+    QPtrList<QKeyEvent> keyList;
+    /// Since keys are processed outside Qt event loop, we need a lock.
+    QMutex  keyListLock;
+    bool    keyRepeat;      ///< Are repeats logical on last key?
+    QTimer *keyrepeatTimer; ///< Timeout timer for repeat key filtering
+
+    int   doing_ff_rew;  ///< If true we are doing a rewind not a fast forward
+    int   ff_rew_index;  ///< Index into ff_rew_speeds for FF and Rewind speeds
+    int   speed_index;   ///< Caches value of ff_rew_speeds[ff_rew_index]
+
+    /** \brief Time stretch speed, 1.0f for normal playback.
+     *
+     *  Begins at 1.0f meaning normal playback, but can be increased
+     *  or decreased to speedup or slowdown playback.
+     *  Ignored when doing Fast Forward or Rewind.
+     */
+    float normal_speed; 
+
+    float frameRate;     ///< Estimated framerate from recorder
 
     // Channel changing state variables
-    bool channelqueued;
-    char channelKeys[5];
-    int channelkeysstored;
-    bool lookForChannel;
-    QString channelid;
-    QString lastCC;      // last channel
-    int lastCCDir;       // last channel changing direction
-    QTimer *muteTimer;   // for temporary audio muting during channel changes
+    bool    channelqueued;  ///< If true info is queued up for a channel change
+    QString channelKeys;    ///< Channel key presses queued up so far...
+    bool    lookForChannel; ///< If true try to find recorder for channel
+    QString channelid;      ///< Non-numeric Channel Name
+    QString lastCC;         ///< Last channel
+    int     lastCCDir;      ///< Last channel changing direction
+    QTimer *muteTimer;      ///< For temp. audio muting during channel changes
 
-    // previous channel functionality state variables
-    typedef QValueVector<QString> PrevChannelVector;
-    PrevChannelVector channame_vector; // previous channels
-    unsigned int times_pressed; // number of repeats detected
-    QTimer *prevChannelTimer;   // for special (slower) repeat key filtering
+    // Previous channel functionality state variables
+    str_vec_t prevChan;       ///< Previous channels
+    uint      prevChanKeyCnt; ///< Number of repeated channel button presses
+    QTimer   *prevChanTimer;  ///< Special (slower) repeat key filtering
 
-    // channel browsing state variables
+    // Channel browsing state variables
     bool browsemode;
     bool persistentbrowsemode;
     QTimer *browseTimer;
@@ -299,50 +329,62 @@ class TV : public QObject
     QString browsestarttime;
 
     // Program Info for currently playing video
-    // (or next video if changeState is true)
-    ProgramInfo *playbackinfo; // info sent in via Playback()
-    QString inputFilename;     // playbackinfo->pathname
-    int playbackLen;           // initial playbackinfo->CalculateLength()
-    ProgramInfo *recorderPlaybackInfo; // info requested from recorder
-
-    // other info on currently playing video
-    float frameRate; // estimated framerate from recorder
+    // (or next video if InChangeState() is true)
+    ProgramInfo *recorderPlaybackInfo; ///< info requested from recorder
+    ProgramInfo *playbackinfo;  ///< info sent in via Playback()
+    QString      inputFilename; ///< playbackinfo->pathname
+    int          playbackLen;   ///< initial playbackinfo->CalculateLength()
 
     // Video Players
     NuppelVideoPlayer *nvp;
     NuppelVideoPlayer *pipnvp;
-    NuppelVideoPlayer *activenvp;
+    NuppelVideoPlayer *activenvp;  ///< Player to which LiveTV events are sent
 
     // Remote Encoders
     RemoteEncoder *recorder;
     RemoteEncoder *piprecorder;
-    RemoteEncoder *activerecorder;
+    RemoteEncoder *activerecorder; ///< Recorder to which LiveTV events are sent
 
     // RingBuffers
     RingBuffer *prbuffer;
     RingBuffer *piprbuffer;
-    RingBuffer *activerbuffer;
+    RingBuffer *activerbuffer; ///< Ringbuffer to which LiveTV events are sent
+
 
     // OSD info
-    OSD *osd;
-    QString dialogname;
-    OSDGenericTree *treeMenu;
-    UDPNotify *udpnotify;
+    QString         dialogname; ///< Name of current OSD dialog
+    OSD            *osd;        ///< Pointer to OSD instance, use GetOSD()!
+    OSDGenericTree *treeMenu;   ///< OSD menu, 'm' using default keybindings
+    /// UDPNotify instance which shows messages sent
+    /// to the "UDPNotifyPort" in an OSD dialog.
+    UDPNotify      *udpnotify;
 
     // LCD Info
     QDateTime lastLcdUpdate;
-    QString lcdTitle, lcdSubtitle, lcdCallsign;
+    QString   lcdTitle;
+    QString   lcdSubtitle;
+    QString   lcdCallsign;
 
     // Window info (GUI is optional, transcoding, preview img, etc)
-    MythDialog *myWindow;// Our MythDialow window, if it exists
-    WId embedid;         // Window ID when embedded in another widget
-    int embx, emby, embw, embh; // bounds when embedded in another widget
-    QRect saved_gui_bounds; // prior GUI window bounds, for after player is done
+    MythDialog *myWindow;   ///< Our MythDialog window, if it exists
+    WId   embedWinID;       ///< Window ID when embedded in another widget
+    QRect embedBounds;      ///< Bounds when embedded in another widget
+    QRect saved_gui_bounds; ///< Prior GUI window bounds, for after player is done
 
     // Various threads
-    pthread_t event;     // TV::RunTV(), the event thread
-    pthread_t decode;    // nvp::StartPlaying(), video decoder thread
-    pthread_t pipdecode; // pipnvp, Picture-in-Picture video decoder thread
+    /// Event processing thread, runs RunTV().
+    pthread_t event;
+    /// Video decoder thread, runs nvp's NuppelVideoPlayer::StartPlaying().
+    pthread_t decode;
+    /// Picture-in-Picture video decoder thread,
+    /// runs pipnvp's NuppelVideoPlayer::StartPlaying().
+    pthread_t pipdecode;
+
+    // Constants
+    static const int kInitFFRWSpeed; ///< 1x, default to normal speed
+    static const int kMuteTimeout;   ///< Channel changing mute timeout in msec
+    static const int kLCDTimeout;    ///< Timeout for updating LCD info in msec
+    static const int kChannelKeysMax;///< When to start discarding early keys
 };
 
 #endif
