@@ -491,7 +491,8 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap) const
     progMap["rec_str"] = RecTypeText();
     if (rectype != kNotRecording)
     {
-        if (recstatus <= rsWillRecord || recstatus == rsConflict)
+        if (recendts > timeNow && recstatus <= rsWillRecord || 
+            recstatus == rsConflict)
         {
             if (recpriority >= 0)       
                 progMap["rec_str"] += QString(" +%1 ").arg(recpriority);
@@ -3195,6 +3196,7 @@ bool ProgramList::FromProgram(const QString sql, ProgramList &schedList)
                 p->recordid = s->recordid;
                 p->recstatus = s->recstatus;
                 p->rectype = s->rectype;
+                p->recpriority = s->recpriority;
                 p->recstartts = s->recstartts;
                 p->recendts = s->recendts;
                 p->cardid = s->cardid;
