@@ -816,7 +816,10 @@ void Scheduler::getAllPending(QStringList &strList)
     {
         ProgramInfo *p = *i;
         p->ToStringList(strList);
+        delete p;
     }
+
+    delete retList;
 }
 
 RecList *Scheduler::getAllScheduled(void)
