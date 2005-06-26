@@ -1003,11 +1003,12 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
     }
 }
 
-bool VideoOutputXv::SetupDeinterlace(bool interlaced)
+bool VideoOutputXv::SetupDeinterlace(bool interlaced,
+                                     const QString& overridefilter)
 {
     if (VideoOutputSubType() > XVideo)
         m_deintfiltername = "bobdeint";
-    bool deint = VideoOutput::SetupDeinterlace(interlaced);
+    bool deint = VideoOutput::SetupDeinterlace(interlaced, overridefilter);
     needrepaint = true;
     return deint;
 }

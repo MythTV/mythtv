@@ -45,7 +45,7 @@ class VideoOutputXv : public VideoOutput
 
     bool Init(int width, int height, float aspect, WId winid,
               int winx, int winy, int winw, int winh, WId embedid = 0);
-    bool SetupDeinterlace(bool interlaced);
+    bool SetupDeinterlace(bool interlaced, const QString& ovrf="");
     bool ApproveDeintFilter(const QString& filtername) const;
 
     void ProcessFrame(VideoFrame *frame, OSD *osd,

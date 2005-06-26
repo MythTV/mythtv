@@ -253,8 +253,10 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
  * \fn VideoOutput::SetupDeinterlace(bool)
  * \brief Attempts to enable or disable deinterlacing.
  * \return true if successful, false otherwise.
+ * \param overridefilter optional, explicitly use this nondefault deint filter
  */
-bool VideoOutput::SetupDeinterlace(bool interlaced)
+bool VideoOutput::SetupDeinterlace(bool interlaced, 
+                                   const QString& overridefilter)
 {
     if (VideoOutputNull *null = dynamic_cast<VideoOutputNull *>(this))
     {
@@ -289,6 +291,9 @@ bool VideoOutput::SetupDeinterlace(bool interlaced)
         
         m_deintfiltername = gContext->GetSetting("DeinterlaceFilter", 
                                                  "linearblend");
+        if (overridefilter != "")
+            m_deintfiltername = overridefilter;
+
         m_deintFiltMan = new FilterManager;
         m_deintFilter = NULL;
 

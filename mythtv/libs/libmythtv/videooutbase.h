@@ -129,7 +129,7 @@ class VideoOutput
                       WId winid, int winx, int winy, int winw, 
                       int winh, WId embedid = 0);
 
-    virtual bool SetupDeinterlace(bool i);
+    virtual bool SetupDeinterlace(bool i, const QString& ovrf="");
     virtual bool NeedsDoubleFramerate(void) const;
     virtual bool ApproveDeintFilter(const QString& filtername) const;
 

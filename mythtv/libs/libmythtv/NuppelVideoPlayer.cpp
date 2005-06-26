@@ -2413,17 +2413,17 @@ void NuppelVideoPlayer::DoPlay(void)
             if (!normal_speed || play_speed < 0.99 || play_speed > 1.01)
             {
                 m_double_framerate = false;
-                m_scan = kScan_Ignore;
                 videosync->SetFrameInterval(frame_interval, false);
                 videoOutput->SetupDeinterlace(false);
+                videoOutput->SetupDeinterlace(true, "onefield");
             }
         }
         else if (m_can_double && !m_double_framerate)
         {
             if (normal_speed && play_speed > 0.99 && play_speed < 1.01)
             {
-                m_scan = kScan_Interlaced;
                 videosync->SetFrameInterval(frame_interval, true);
+                videoOutput->SetupDeinterlace(false);
                 videoOutput->SetupDeinterlace(true);
                 if (videoOutput->NeedsDoubleFramerate())
                     m_double_framerate = true;
