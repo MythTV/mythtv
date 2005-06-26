@@ -1311,7 +1311,7 @@ void TV::RunTV(void)
             updatecheck = 0;
         }
 
-        if (channelqueued && nvp && nvp->GetOSD())
+        if (channelqueued && GetOSD())
         {
             OSDSet *set = GetOSD()->GetSet("channel_number");
             if ((set && !set->Displaying()) || !set)
@@ -4121,7 +4121,9 @@ void TV::DoChangePictureAttribute(int control, bool up, bool rec)
 
 OSD *TV::GetOSD(void)
 {
-    return nvp->GetOSD();
+    if (nvp)
+        return nvp->GetOSD();
+    return NULL;
 }
 
 void TV::TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item)
@@ -4253,7 +4255,7 @@ void TV::ShowOSDTreeMenu(void)
 {
     BuildOSDTreeMenu();
 
-    if (nvp->GetOSD())
+    if (GetOSD())
     {
         ClearOSD();
 
