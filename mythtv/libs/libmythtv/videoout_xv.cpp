@@ -313,18 +313,29 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     X11S(usingXinerama = 
          (XineramaQueryExtension(XJ_disp, &event_base, &error_base) &&
           XineramaIsActive(XJ_disp)));
-    if (w_mm == 0 || h_mm == 0 || usingXinerama)
+    if (w_mm == 0 || h_mm == 0)
     {
         w_mm = (int)(300 * XJ_aspect);
         h_mm = 300;
         display_aspect = XJ_aspect;
+
+        VERBOSE(VB_GENERAL,QString("Physical size of display unknown, using DisplaySize %1 %2").arg(w_mm).arg(h_mm));
     }
-    else if (gContext->GetNumSetting("GuiSizeForTV", 0))
+    else if (gContext->GetNumSetting("GuiSizeForTV", 0) || usingXinerama)
     {
         int w = DisplayWidth(XJ_disp, XJ_screen_num);
         int h = DisplayHeight(XJ_disp, XJ_screen_num);
+
         int gui_w = w, gui_h = h;
-        gContext->GetResolutionSetting("Gui", gui_w,  gui_h);
+
+        if (gContext->GetNumSetting("GuiSizeForTV", 0))
+            gContext->GetResolutionSetting("Gui", gui_w,  gui_h);
+        else    // usingXinerama
+        {
+            int xbase, ybase;
+            gContext->GetScreenBounds(xbase,ybase,gui_w,gui_h);
+        }
+
         if (gui_w)
             w_mm = w_mm * gui_w / w;
         if (gui_h)
