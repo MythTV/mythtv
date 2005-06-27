@@ -786,12 +786,14 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     }
     while (cnt <= maxConnTry);
 
+#ifdef IGNORE_PROTO_VER_MISMATCH
     if (!CheckProtoVersion(d->serverSock))
     {
         delete d->serverSock;
         d->serverSock = NULL;
         return false;
     }
+#endif
 
     // called with the lock
     QString str = QString("ANN Playback %1 %2")
@@ -955,19 +957,11 @@ void MythContext::LoadQtConfig(void)
 
         // Switch to desired GUI resolution
         d->display_res->SwitchToGUI();
+    }
 
-        // Note the possibly changed screen settings
-        d->GetScreenBounds();
-    }
-    else if (d->m_width <= 0 || d->m_height <= 0)
-    {
-        // For some reason, the screen resolution has not been stored yet.
-        // This could be some strange error, or we could be bootstrapping
-        // before connecting to a database. Either way, store screen size
-        d->GetScreenBounds();
-    }
-    
-    
+    // Note the possibly changed screen settings
+    d->GetScreenBounds();
+
 
     if (d->m_qtThemeSettings)
         delete d->m_qtThemeSettings;
