@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: Downloading and compiling.</TITLE>
+ <TITLE>Installing and using MythTV: Downloading and compiling. </TITLE>
  <LINK HREF="mythtv-HOWTO-6.html" REL=next>
  <LINK HREF="mythtv-HOWTO-4.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc5" REL=contents>
@@ -12,68 +12,23 @@
 <A HREF="mythtv-HOWTO-4.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc5">Contents</A>
 <HR>
-<H2><A NAME="s5">5.</A> <A HREF="mythtv-HOWTO.html#toc5">Downloading and compiling.</A></H2>
+<H2><A NAME="DownloadAndCompile"></A> <A NAME="s5">5.</A> <A HREF="mythtv-HOWTO.html#toc5">Downloading and compiling. </A></H2>
 
 <P>Get MythTV from the 
 <A HREF="http://www.mythtv.org">mythtv.org</A>
 web site.  There are two installation methods you may choose from.  The
 first is to download the latest release in tarball format and compile.  The
 tarball release of MythTV should work on a wide variety of systems and
-should be the preferred method for new users.  If you wish to use the CVS
-version of MythTV you may obtain it from CVS this way:
-<A NAME="cvs"></A> 
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mkdir mythtv
-$ cd mythtv
-$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
-Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
-CVS password: mythtv
-$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  You may get an error about cvs not finding a
-<CODE>.cvspass</CODE> file the very first time you run it.  This is normal.</CAPTION>
-</FIGURE>
-
-The other MythTV modules may be downloaded from CVS the same way; replace
-"mythtv" with "myththemes" or "mythplugins".</P>
-<P>MythTV also maintains a CVS branch that incorporates bugfixes for issues
-discovered after a release has been packaged into a tarball.</P>
-<P>If you would like to use code from this release branch, you would execute the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
-Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
-CVS password: mythtv
-
-$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythtv
-
-$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythplugins
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you wish to stay up-to-date with CVS, go into the MythTV subdirectory and type:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd mythtv
-$ cvs -z3 update -PAd
-</PRE>
-</CODE></BLOCKQUOTE>
-
-after you've done your initial download.</P>
+should be the preferred method for new users.  If you wish to use the
+<B>subversion</B> copy of MythTV you may obtain it from 
+<A HREF="http://cvs.mythtv.org">http://cvs.mythtv.org</A></P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: If you are going to use CVS to compile MythTV rather than
-using the distribution tarball, it is <B>strongly</B> recommended that you
-join the 
+<CAPTION><B>NOTE</B>: If you are going to use <B>subversion</B> to compile MythTV
+rather than using the distribution tarball, it is <B>strongly</B>
+recommended that you join the 
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">http://www.mythtv.org/mailman/listinfo/mythtv-commits/</A> and 
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">http://www.mythtv.org/mailman/listinfo/mythtv-dev/</A> mailing lists.</CAPTION>
 </FIGURE>

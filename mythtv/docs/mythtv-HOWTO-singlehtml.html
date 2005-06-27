@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-06-10, v0.18.06
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-06-27, v0.18.07
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -23,7 +23,7 @@ necessary.</EM>
 <LI><A NAME="toc1.1">1.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.1">What is MythTV?</A>
 <LI><A NAME="toc1.2">1.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.2">QuickStart</A>
 <LI><A NAME="toc1.3">1.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.3">Upgrading from previous versions</A>
-<LI><A NAME="toc1.4">1.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.4">How to obtain this document </A>
+<LI><A NAME="toc1.4">1.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.4">How to obtain this document / PDF versions of this document </A>
 <LI><A NAME="toc1.5">1.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.5">Document conventions</A>
 <LI><A NAME="toc1.6">1.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.6">Mailing lists / getting help</A>
 <LI><A NAME="toc1.7">1.7</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss1.7">IRC</A>
@@ -49,7 +49,7 @@ necessary.</EM>
 <LI><A NAME="toc4.3">4.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss4.3">Environment variable Requirements for MythTV</A>
 </UL>
 <P>
-<H2><A NAME="toc5">5.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s5">Downloading and compiling.</A></H2>
+<H2><A NAME="toc5">5.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s5">Downloading and compiling. </A></H2>
 
 <UL>
 <LI><A NAME="toc5.1">5.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss5.1">Building LAME</A>
@@ -140,6 +140,14 @@ necessary.</EM>
 <P>
 <H2><A NAME="toc15">15.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s15">MythGame.</A></H2>
 
+<UL>
+<LI><A NAME="toc15.1">15.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.1">Setup Directory Structure</A>
+<LI><A NAME="toc15.2">15.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.2">Download and Install xmame</A>
+<LI><A NAME="toc15.3">15.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.3">Download extra files</A>
+<LI><A NAME="toc15.4">15.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.4">Download and Install Mythgame.</A>
+<LI><A NAME="toc15.5">15.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.5">Setup mythgame</A>
+<LI><A NAME="toc15.6">15.6</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss15.6">Hints:</A>
+</UL>
 <P>
 <H2><A NAME="toc16">16.</A> <A HREF="mythtv-HOWTO-singlehtml.html#s16">MythMusic. </A></H2>
 
@@ -215,15 +223,25 @@ necessary.</EM>
 
 <UL>
 <LI><A NAME="toc23.1">23.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder </A>
-<LI><A NAME="toc23.2">23.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.2">Hauppauge PVR-250 remote and MythTV's native LIRC support</A>
-<LI><A NAME="toc23.3">23.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.3">Logical Volume Manager (LVM) </A>
-<LI><A NAME="toc23.4">23.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.4">Advanced Partition Formatting </A>
-<LI><A NAME="toc23.5">23.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.5">HDTV with the Air2PC-ATSC-PCI card</A>
+<LI><A NAME="toc23.2">23.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.2">Logical Volume Manager (LVM) </A>
+<LI><A NAME="toc23.3">23.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.3">Advanced Partition Formatting </A>
+<LI><A NAME="toc23.4">23.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss23.4">HDTV with the Air2PC-ATSC-PCI card</A>
 </UL>
 
 <HR>
 <H2><A NAME="s1">1.</A> <A HREF="#toc1">First things first.</A></H2>
 
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: Please note that I am <EM>NOT</EM> the author/programmer of
+the MythTV application!  I can not give you personalized installation
+support.  If you are having issues installing MythTV you should examine the
+archives, or post your question to the MythTV-users mailing list.  If you
+send me "Does MythTV work with 'X'"? messages I will simply delete your mail.</CAPTION>
+</FIGURE>
+</P>
 <H2><A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">What is MythTV?</A>
 </H2>
 
@@ -302,23 +320,13 @@ installing a new version of MythTV.</P>
 <P>See 
 <A HREF="#backupdb">Saving or Restoring the database</A> for instructions.</P>
 
-<H2><A NAME="how_to_obtain"></A> <A NAME="ss1.4">1.4</A> <A HREF="#toc1.4">How to obtain this document </A>
+<H2><A NAME="how_to_obtain"></A> <A NAME="ss1.4">1.4</A> <A HREF="#toc1.4">How to obtain this document / PDF versions of this document </A>
 </H2>
 
 <P>This HOWTO document is maintained at the primary MythTV website: 
 <A HREF="http://www.mythtv.org">http://www.mythtv.org</A> by Robert
 Kulagowski 
 <A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A>.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: Please note that I am <EM>NOT</EM> the author/programmer of
-the MythTV application!  I can not give you personalized installation
-support.  If you are having issues installing MythTV you should examine the
-archives, or post your question to the MythTV-users mailing list. </CAPTION>
-</FIGURE>
-</P>
 <P>This document is available as a single-page HTML document at 
 <A HREF="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html">http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html</A> or as a PDF
 at 
@@ -962,15 +970,15 @@ perform.  See your package documentation.</P>
 
 <H3><A NAME="atrpms"></A> Red Hat Linux/Fedora Core</H3>
 
-<P>Red Hat Linux (9, 8.0 and 7.3) and Fedora Core (2 and 1) packages
-for MythTV and all of its add-on modules and
-some themes have been packaged by 
-<A HREF="mailto:Axel.Thimm@ATrpms.net">mailto:Axel.Thimm@ATrpms.net</A> and are available at 
-<A HREF="http://ATrpms.net/topic/multimedia/">http://ATrpms.net/topic/multimedia/</A>. All of the
-prerequisites for MythTV (such as XMLTV) are available as RPM packages. If
-you have problems with the RPMs, please contact the ATrpms lists at 
-<A HREF="http://lists.ATrpms.net/">http://lists.ATrpms.net/</A> or file a bug
-against 
+<P>Red Hat Linux and Fedora Core 3 packages for MythTV and all of its add-on
+modules and some themes have been packaged by 
+<A HREF="mailto:Axel.Thimm@ATrpms.net">mailto:Axel.Thimm@ATrpms.net</A> and
+are available at 
+<A HREF="http://ATrpms.net/topic/multimedia/">http://ATrpms.net/topic/multimedia/</A>. All of the prerequisites for
+MythTV (such as XMLTV) are available as RPM packages. If you have problems
+with the RPMs, please contact the ATrpms lists at 
+<A HREF="http://lists.ATrpms.net/">http://lists.ATrpms.net/</A> or file a
+bug against 
 <A HREF="http://bugzilla.ATrpms.net/">http://bugzilla.ATrpms.net/</A>.</P>
 <P>Given the large number of dependent RPMs you are advised to use tools like
 apt or yum for automatic retrieval and installation of the required RPMs.
@@ -1262,8 +1270,9 @@ Do you want to continue? [Y/n]
 </P>
 <H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="#toc4">System Configuration Requirements for Compiling MythTV. </A></H2>
 
-<P>Before you compile MythTV from the current source tarball or from CVS, you 
-may need to modify your system configuration in a few ways.</P>
+<P>Before you compile MythTV from the current source tarball or from
+<B>subversion</B>, you may need to modify your system configuration in a
+few ways.</P>
 <P>In general, if you install MythTV from pre-packaged binaries for your Linux
 distribution/version, you don't need to be too concerned about the issues in
 this section of the HOWTO - the install script for the packages should take
@@ -1447,7 +1456,7 @@ sh-2.05b# ls -l ../*.deb
 </CODE></BLOCKQUOTE>
 </P>
 
-<P>If building from CVS instead of the source package, then the QTDIR
+<P>If building from <B>subversion</B> instead of the source package, then the QTDIR
 environment variable must be set when building.  On Debian unstable, QTDIR
 should be set to <CODE>/usr/share/qt3</CODE>.  Edit the <CODE>/etc/profile</CODE>
 file using your favorite text editor and add something like:
@@ -1488,68 +1497,23 @@ and replace it with
 </P>
 <P>What we're doing is allowing read and write access to the files in the
 video4linux directory.</P>
-<H2><A NAME="s5">5.</A> <A HREF="#toc5">Downloading and compiling.</A></H2>
+<H2><A NAME="DownloadAndCompile"></A> <A NAME="s5">5.</A> <A HREF="#toc5">Downloading and compiling. </A></H2>
 
 <P>Get MythTV from the 
 <A HREF="http://www.mythtv.org">mythtv.org</A>
 web site.  There are two installation methods you may choose from.  The
 first is to download the latest release in tarball format and compile.  The
 tarball release of MythTV should work on a wide variety of systems and
-should be the preferred method for new users.  If you wish to use the CVS
-version of MythTV you may obtain it from CVS this way:
-<A NAME="cvs"></A> 
-<BLOCKQUOTE><CODE>
-<PRE>
-$ mkdir mythtv
-$ cd mythtv
-$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
-Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
-CVS password: mythtv
-$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs checkout mythtv
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  You may get an error about cvs not finding a
-<CODE>.cvspass</CODE> file the very first time you run it.  This is normal.</CAPTION>
-</FIGURE>
-
-The other MythTV modules may be downloaded from CVS the same way; replace
-"mythtv" with "myththemes" or "mythplugins".</P>
-<P>MythTV also maintains a CVS branch that incorporates bugfixes for issues
-discovered after a release has been packaged into a tarball.</P>
-<P>If you would like to use code from this release branch, you would execute the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cvs -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs login
-Logging in to :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs
-CVS password: mythtv
-
-$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythtv
-
-$ cvs -z3 -d :pserver:mythtv@cvs.mythtv.org:/var/lib/mythcvs co -r release-0-18-fixes mythplugins
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you wish to stay up-to-date with CVS, go into the MythTV subdirectory and type:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd mythtv
-$ cvs -z3 update -PAd
-</PRE>
-</CODE></BLOCKQUOTE>
-
-after you've done your initial download.</P>
+should be the preferred method for new users.  If you wish to use the
+<B>subversion</B> copy of MythTV you may obtain it from 
+<A HREF="http://cvs.mythtv.org">http://cvs.mythtv.org</A></P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: If you are going to use CVS to compile MythTV rather than
-using the distribution tarball, it is <B>strongly</B> recommended that you
-join the 
+<CAPTION><B>NOTE</B>: If you are going to use <B>subversion</B> to compile MythTV
+rather than using the distribution tarball, it is <B>strongly</B>
+recommended that you join the 
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-commits/">http://www.mythtv.org/mailman/listinfo/mythtv-commits/</A> and 
 <A HREF="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">http://www.mythtv.org/mailman/listinfo/mythtv-dev/</A> mailing lists.</CAPTION>
 </FIGURE>
@@ -2187,17 +2151,7 @@ the manual compilation steps described below by jumping to the
 configure lircd.</CAPTION>
 </FIGURE>
 </P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  If you wish to use the remote control that comes with the
-Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2 code. See the example installation in the "Hauppauge PVR-250 remote and MythTV's
-native LIRC support" 
-<A HREF="#hauppauge_remote">section</A>.</CAPTION>
-</FIGURE>
-
-Some IR devices require a kernel recompile, and some don't. However, all at
+<P>Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
 build process. </P>
 
@@ -2254,12 +2208,12 @@ $ su
 
 <P>You're going to need to download and compile <B>lircd</B>.  Go to 
 <A HREF="http://www.lirc.org">http://www.lirc.org</A> and download lirc; as
-of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
+of 2005-05-17, the version available is 0.7.1.  Grab the remotes.tgz file as
 well. 
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf lirc-0.6.6.tar.bz2
-$ cd lirc-0.6.6
+$ tar -xjf lirc-0.7.1.tar.bz2
+$ cd lirc-0.7.1
 $ ./setup.sh
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -2361,75 +2315,6 @@ the PS/2 keyboard port on your PC and you would train your learning remote
 to emulate the various keystrokes from <CODE>keys.txt</CODE> of your IR
 keyboard.  Using this method removes lirc entirely from the picture - your
 remote will be sending keypresses that your PC "sees" on the keyboard port.</P>
-
-<H3>Recompiling your kernel on Red Hat Linux/Fedora Core</H3>
-
-<P>Don't Panic! Red Hat makes a kernel recompile very easy. They provide  
-configuration files that make it so you can recompile your kernel with  
-Red Hat defaults. And as a side benefit, your kernel will be compiled  
-specifically for your architecture. For a more detailed description (or  
-if you run into trouble) of how to do this go to  
-<A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html</A></P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
-CONFIG_SERIAL modularized) are available from ATrpms: 
-<A HREF="http://ATrpms.net/name/kernel/">http://ATrpms.net/name/kernel/</A>. You will also find
-suitable kernel modules for ALSA, lirc, bttv, ivtv, saa7134 etc. there. See
-also the 
-<A HREF="#atrpms">main Red Hat/Fedora Core section</A>.</CAPTION>
-</FIGURE>
-
-For the impatient:
-Make sure you have an emergency floppy boot disk available!
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd /usr/src/linux
-$ su
-# make mrproper
-# cd configs
-# ls
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>at this point you must look at the file names and determine which  
-config file is right for you. For instance if you have an Athlon XP you  
-should choose "kernel-2.4.18-athlon.config" but if you have a dual  
-processor P4 you might choose "kernel-2.4.18-i686-smp.config"
-<BLOCKQUOTE><CODE>
-<PRE>
-# cp yourconfig.config ../.config
-# cd ../
-# make xconfig
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>At this point you will get a graphical configuration utility. All that  
-you must do to make lirc work is go to the "character devices" section  
-and change "Standard/generic (8250/16550 and compatible UARTs) serial  
-support" from "y" to "m". Now if you want you can have a look around.  
-For instance, you might wish to turn off ham radio support, or perhaps  
-turn off PCMCIA support if you are not on a laptop. But be careful!  
-Only change things you know you can change. If you are not sure, just  
-stick to the one required change. Click "save and exit".
-Next:
-<BLOCKQUOTE><CODE>
-<PRE>
-# make dep
-# make clean
-# make bzImage modules
-# make modules_install
-# make install
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>if you are using <B>grub</B>, that should be it, reboot and select your custom  
-kernel upon boot. If you are using <B>lilo</B>, change your lilo configuration  
-according to  
-<A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html</A> Remember, if you have any custom  
-kernel modules (ALSA, etc) you will have to recompile/reinstall those.</P>
 
 <H2><A NAME="completing_lirc_install"></A> <A NAME="ss8.5">8.5</A> <A HREF="#toc8.5">Completing the lirc install </A>
 </H2>
@@ -4745,6 +4630,225 @@ end
 
 <H2><A NAME="s15">15.</A> <A HREF="#toc15">MythGame.</A></H2>
 
+<P>
+<A HREF="http://www.mameworld.net/">http://www.mameworld.net/</A> is
+an excellent resource for all things mame.</P>
+<P>Installation overview:
+<OL>
+<LI>Setup directory structure</LI>
+<LI>Download and install xmame</LI>
+<LI>Download and place files (artwork/catver.ini/etc..)</LI>
+<LI>Download and install mythgame plugin</LI>
+<LI>Setup mythgame from inside mythfrontend</LI>
+<LI>Hints: No joystick solution</LI>
+</OL>
+</P>
+<H2><A NAME="ss15.1">15.1</A> <A HREF="#toc15.1">Setup Directory Structure</A>
+</H2>
+
+<P>To keep things organized, create the following directories for <B>xmame</B> to use
+in <CODE>/usr/local/share/xmame</CODE>: hiscore, roms, and snaps.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mkdir -p /usr/local/share/xmame/{highscore,roms,snaps}
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss15.2">15.2</A> <A HREF="#toc15.2">Download and Install xmame</A>
+</H2>
+
+<P>Download the source to <B>xmame</B> from 
+<A HREF="http://x.mame.net/download/xmame-0.97.tar.bz2">http://x.mame.net/download/xmame-0.97.tar.bz2</A></P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ wget http://x.mame.net/download/xmame-0.97.tar.bz2
+$ tar -xjf xmame-0.97.tar.bz2
+$ cd xmame-0.97
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Edit the Makefile with your favorite editor.  Adjust the options as required for your system.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ joe Makefile
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Then make and install xmame
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make
+$ su
+(enter password)
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>After <B>mame</B> has been installed, we need to create some defaults.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mkdir ~/.xmame
+$ cp docs/xmamerc.dist ~/.xmame/xmamerc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Because some ROMS work better with different display toolkits, or possibly
+even older versions of xmame, it's convenient to keep all of your
+<B>xmame</B> binaries and to rename them to include the version number,
+then make a symbolic link to "xmame". If you want to test a different
+version of <B>xmame</B> at some point you only need to switch this link.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+(enter password)
+# mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.97.x11
+# ln -s /usr/local/bin/xmame-0.97.x11 /usr/local/bin/xmame
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>: Depending on how you compiled <B>xmame</B>, you may have
+<B>xmame.X11</B>, <B>xmame.SDL</B> or <B>xmame.xgl</B> based on what
+display toolkit you used. Also, you may need to remove and recreate
+<CODE>xmamerc</CODE> after upgrading since some of the default options may have
+changed.</P>
+<P>Confirm that <B>xmame</B> works before running it inside MythTV. Place
+your ROM in the <CODE>/usr/local/share/xmame/roms</CODE> directory you created
+earlier.</P>
+<P><B>NOTE</B>: There are three public domain ROM sets available at
+<A HREF="http://www.mame.net/downmisc.html">http://www.mame.net/downmisc.html</A></P>
+<P>Launch <B>xmame</B> with your game of choice.  In this example, we are using Gauntlet.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ xmame gauntlet
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Some basic <B>mame</B> keyboard commands:
+<BLOCKQUOTE><CODE>
+<PRE>
+5 = Insert coin
+1 = Player 1 start
+arrow keys = movement
+left control = button 1
+left alt = button 2
+SPACE = button 3
+ESC = exit
+TAB - menu
+~ to adjust Volume
+     &lt; and >
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss15.3">15.3</A> <A HREF="#toc15.3">Download extra files</A>
+</H2>
+
+<P>The following files allow you to add extra functionality.  Place them
+into <CODE>/usr/local/share/xmame</CODE></P>
+<P><CODE>catver.ini</CODE> is a catalog of categories and versions of popular mame ROMs.
+Useful for keeping large libraries of ROMs organized.</P>
+<P>It may be downloaded from 
+<A HREF="http://www.catver.com">http://www.catver.com</A> or 
+<A HREF="http://www.mameworld.net/catlist">http://www.mameworld.net/catlist</A></P>
+<P>- Screenshots aka "snaps"
+These may be downloaded from 
+<A HREF="http://www.classicgaming.com/mame32qa/">http://www.classicgaming.com/mame32qa/</A></P>
+<P>Screenshots are displayed when you are browsing your ROMS in <B>mythgame</B>.
+Unzip and place them in <CODE>/usr/local/share/xmame/snaps</CODE></P>
+<P><CODE>history.dat</CODE></P>
+<P>Download from 
+<A HREF="http://www.arcade-history.com/history_database.php">http://www.arcade-history.com/history_database.php</A>
+This file fills in a bit of background about each ROM.</P>
+<P><CODE>hiscore.dat</CODE>
+Download from 
+<A HREF="http://www.mameworld.net/highscore/">http://www.mameworld.net/highscore/</A></P>
+<P>- Cheats
+Download from 
+<A HREF="http://cheat.retrogames.com/">http://cheat.retrogames.com/</A></P>
+
+<H2><A NAME="ss15.4">15.4</A> <A HREF="#toc15.4">Download and Install Mythgame.</A>
+</H2>
+
+<P><B>mythgame</B> is part of the mythplugins package.  See the instructions
+in the 
+<A HREF="#DownloadAndCompile">Downloading and Compiling</A>
+section to obtain mythplugins.</P>
+<P>Switch to the mythplugins directory:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd mythplugins
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Compile and install mythgame:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ ./configure --disable-all --enable-mythgame
+$ qmake mythplugins.pro
+$ make
+$ su
+(enter password)
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss15.5">15.5</A> <A HREF="#toc15.5">Setup mythgame</A>
+</H2>
+
+<P>Start <B>mythfrontend</B> and navigate to Utilities/Setup>Setup>Media
+Settings>Game Settings>General Settings</P>
+<P>On page one you can setup the display order of your games, on page 2 and 3
+you need to enter the paths to files and directories that xmame uses.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+MAME binary location:  /usr/local/bin/xmame               (path to xmame binary)
+MAME ROM location:     /usr/local/share/xmame/roms        (where you store all your roms)
+catver.ini file:       /usr/local/share/xmame/catver.ini  (Category and Version information for your ROMs)
+MAME screenshots path: /usr/local/share/xmame/snaps       (screenshots of ROMs in play)
+MAME hiscores path:    /usr/local/share/xmame/hiscore     (directory for mame to create hiscore.hi files)
+MAME hiscores file:    /usr/local/share/xmame/hiscore.dat (file that tells mame how to store hiscores)
+MAME flyers path:      /usr/local/share/xmame/flyers      (not used with mythgame)
+MAME cabinets path:    /usr/local/share/xmame/cabinets    (not used with mythgame)
+MAME history path:     /usr/local/share/xmame/history.dat (a little history about each game)
+MAME cheat files path: /usr/local/share/xmame/cheats
+MAME image downloader                                     (no longer  used)
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Setup options:
+Automatically download images - no longer used
+Show disclaimer - show warning about illegal ROMs before starting each ROM.
+Show game info - show info about the game, ie:year, maker, CPU, sound,
+screen resolution before staring game</P>
+
+<H2><A NAME="ss15.6">15.6</A> <A HREF="#toc15.6">Hints:</A>
+</H2>
+
+<P>No joystick causing failure to launch.</P>
+<P>By default, <B>mythgame</B> expects that you have a joystick installed.
+<B>xmame</B> will fail to launch because <B>mythgame</B> sends the
+option "-joytype 4" to <B>xmame</B> by default.  You may reset this using
+the following command:</P>
+<P><B>NOTE</B>: The following command will set the joytype to "0" for all
+hosts.  If you need to specify this on a per-host basis you can either
+modify the command below (if you know SQL), or use a tool which simplifies
+access to MySQL such as <B>phpMyAdmin</B>.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root -e "update mythconverg.mamesettings set joytype=0"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 <H2><A NAME="s16">16.</A> <A HREF="#toc16">MythMusic. </A></H2>
 
 <P>MythMusic has a number of prerequisites that must be satisfied before it
@@ -5766,14 +5870,6 @@ libmp3lame library.</P>
 with no major errors?  Or, MythTV may not have permissions to the
 appropriate video4linux devices.  See the section titled 
 <A HREF="#devperms">Device Permissions</A> for an example.</P>
-
-<H3>Troubleshooting the Hauppauge PVR-250 IR remote</H3>
-
-<P>The most likely issue is that you have incompatible versions of the
-<B>lirc_i2c</B> and <B>lirc_dev</B> modules and the various
-<B>lircd</B> programs.  See the section called 
-<A HREF="#hauppauge_remote">Hauppauge PVR-250 remote and MythTV's native LIRC support.</A> for
-examples on finding and removing old versions of lirc.</P>
 
 <H3>Screen goes black when you try to play something</H3>
 
@@ -7414,259 +7510,7 @@ firmware issue, apparently.  There are two ways around this:</CAPTION>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="hauppauge_remote"></A> <A NAME="ss23.2">23.2</A> <A HREF="#toc23.2">Hauppauge PVR-250 remote and MythTV's native LIRC support</A>
-</H2>
-
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
-NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR LIRC DRIVER ASSISTANCE,
-SEE THE LIRC MAILING LIST.  
-<A HREF="http://lists.sourceforge.net/lists/listinfo/lirc-list">http://lists.sourceforge.net/lists/listinfo/lirc-list</A></CAPTION>
-</FIGURE>
-
-These instructions work for Mandrake 9.2 on a frontend machine which is
-hosting a single PVR-250 capture card using MythTV's native LIRC support.</P>
-<P>First, you need to ensure that you've installed the kernel source
-appropriate for the kernel that you're running.  In this case, we're using
-kernel 2.4.22-9, so when installing the kernel-source ensure that you've got
-the correct version.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# uname -a
-Linux frontend 2.4.22-9mdk #1 sam sep 13 06:54:11 CEST 2003 i686 unknown
-unknown GNU/Linux
-# rpm -qa|grep kernel-source
-kernel-source-2.4.22-9mdk
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you've already installed LIRC from the Mandrake packages, it's going to
-be version 0.6.6, and that won't work.  Uninstall it:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# urpme lirc lirc-remotes liblirc-devel
-# rm -rf /dev/lirc*
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Check to ensure that you don't have other versions of lirc modules and
-programs on your system:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# updatedb
-# locate lirc_i2c|grep `uname -r`
-/usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_i2c.c
-/lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_i2c.o.gz
-
-# locate lirc_dev|grep `uname -r`
-/usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.c
-/usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lirc_dev.h
-/usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.stamp
-/usr/src/linux-2.4.22-9mdk/include/linux/modules/lirc_dev.ver
-/lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc/lirc_dev.o.gz
-
-# locate irw|grep "/usr"
-/usr/bin/irw
-/usr/local/bin/irw
-/usr/local/man/man1/irw.1
-
-# locate lircd|grep "/usr"
-/usr/src/linux-2.4.22-9mdk/3rdparty/lirc/lircd.conf.RM-050
-/usr/share/man/man8/lircd.8.bz2
-/usr/share/doc/lirc-0.6.6/html/lircd.html
-/usr/sbin/lircd
-/usr/local/sbin/lircd
-/usr/local/man/man8/lircd.8
-
-# locate irxevent|grep "/usr"
-/usr/share/man/man1/irxevent.1.bz2
-/usr/share/doc/lirc-0.6.6/html/irxevent.html
-/usr/share/doc/lirc-0.6.6/irxevent.keys
-/usr/bin/irxevent
-/usr/local/bin/irxevent
-/usr/local/man/man1/irxevent.1
-</PRE>
-</CODE></BLOCKQUOTE>
-
-As you can see, there were a number of different versions of lirc already
-installed on this system.  They must be removed.  We don't care about the
-source code or the man pages, only the executables and the kernel modules.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# rm -rf /lib/modules/2.4.22-9mdk/kernel/3rdparty/lirc
-# rm -rf /usr/sbin/lircd /usr/local/sbin/lircd
-# rm -rf /usr/bin/irxevent /usr/local/bin/irxevent
-# rm -rf /usr/bin/irw /usr/local/bin/irw
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Download the lirc-0.7.0pre2 tarball:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ wget http://lirc.sourceforge.net/software/snapshots/lirc-0.7.0pre2.tar.bz2
-$ tar -xjf lirc-0.7.0pre2.tar.bz2
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Mandrake now includes i2c version 2.8.0 which changes the semantics of some
-low-level calls.  You will need to patch LIRC in order for it to work
-correctly.  Download the patch and install:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd lirc-0.7.0pre2
-$ wget http://delvare.nerim.net/i2c/other/lirc-CVS-i2c-2.8.0.patch
-$ patch -p1 &lt; lirc-CVS-i2c-2.8.0.patch
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Next, run the LIRC setup program:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ ./setup.sh
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Select "1" (Driver configuration), then scroll down to "5" (TV Card), press
-ENTER, then scroll down to "f" (Hauppauge TV card) and press ENTER again. 
-Once back at the main menu, press "3" for Save and run configure.</P>
-<P>If your build environment is ready, LIRC will create a Makefile for you. 
-Switch to root and compile:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# make
-# make install
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  If you receive a compile error stating:
-<CODE>lirc_i2c.c:296: unknown field 'owner' specified in initializer</CODE>, you
-will need to edit the file and comment out a line in the source code.  See
-message 
-<A HREF="http://www.gossamer-threads.com/lists/mythtv/users/40136">http://www.gossamer-threads.com/lists/mythtv/users/40136</A>
-for detailed instructions.</CAPTION>
-</FIGURE>
-
-As a part of the <CODE>make install</CODE> process, LIRC will create the
-appropriate device for you in <CODE>/dev</CODE>.  Check to make sure:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ ls -l /dev/lirc*
-crw-r--r--    1 root     root      61,   0 Sep 18 15:36 /dev/lirc
-srw-rw-rw-    1 root     root            0 Sep 18 15:38 /dev/lircd=
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Your <CODE>modules.conf</CODE> file should have already been modified if you've
-followed the instructions 
-<A HREF="#pvr250">above</A> for installing the PVR-250. 
-<B>modprobe</B> the lirc_i2c driver, run the <B>lircd</B> program and
-then check your <CODE>/var/log/messages</CODE> and <CODE>/var/log/lircd</CODE>
-files.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# modprobe lirc_i2c
-# lsmod
-Module                  Size  Used by    Not tainted
-lirc_i2c                5124   0
-lirc_dev               10096   1  [lirc_i2c]
-...
-# lircd
-# tail /var/log/messages
-Sep 18 15:38:26 frontend kernel: lirc_i2c: chip found @ 0x18 (Hauppauge IR)
-Sep 18 15:38:26 frontend kernel: lirc_dev: lirc_register_plugin:sample_rate:
-10
-...
-# tail /var/log/lircd
-Sep 18 15:24:52 frontend lircd 0.7.0pre2: lircd(hauppauge) ready
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>To check that your remote is working correctly, run the <B>irw</B> program
-and start pressing buttons.  If nothing is happening, you must begin
-troubleshooting.  Things to check:
-<UL>
-<LI>Are there batteries in the remote?  </LI>
-<LI>Does the remote work?  You may be able to see the
-flashes of IR coming from the remote if you look at it with a video camera.</LI>
-<LI>Is the IR dongle cable plugged in?</LI>
-<LI>Did you remove all of the old LIRC device drivers?  Run "updatedb" as
-root, then "locate lirc_i2c".  The only lirc_i2c should be the one in the
-misc/ directory for your kernel version.</LI>
-<LI>Did you run depmod?</LI>
-<LI>Is your modules.conf setup correctly?</LI>
-<LI>Did you modprobe lirc_i2c?</LI>
-<LI>Did you run lircd?</LI>
-<LI>Do you have an /etc/lircd.conf?</LI>
-<LI>Is /dev/lirc a character mode file, major 61, minor 0?  Is it readable
-by all groups?</LI>
-<LI>If you think you may have had old LIRC device drivers you may need to
-reboot to ensure that they're totally out of the system.  Try running
-modprobe -r lirc_i2c as root first, then modprobe lirc_i2c and try again.</LI>
-<LI>What path does modinfo lirc_i2c and modinfo lirc_dev show?  It
-should be in /lib/modules/{your kernel version}/misc/</LI>
-</UL>
-</P>
-<P>If none of the above works, and <B>irw</B> still isn't showing keypresses,
-then you will need to ask your question on the LIRC list.</P>
-<P>Assuming that <B>irw</B> is showing keypresses, you can continue:</P>
-<P>Recompile and install:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ make distclean
-$ ./configure --enable-lirc
-$ make
-$ su
-# make install
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you're not using native LIRC support, ensure that the button names that
-come up with <B>irw</B> match the ones in the <CODE>.lircrc</CODE> file in
-your home directory.  Note that if you are not using native LIRC support,
-the <CODE>.lircrc</CODE> file is in your home directory and has a "." as the first
-character.</P>
-<P>Since we're using native LIRC support within MythTV, copy the
-<CODE>configfiles/hauppauge-lircrc-nativelirc</CODE> file into your
-<CODE>.mythtv/</CODE> directory and call it <CODE>lircrc</CODE>.  It has a slightly
-different format than what you would use if you were using
-<B>irxevent</B>.  Also note that it is in your <CODE>.mythtv</CODE> directory
-and does <EM>not</EM> have a "." in the filename.  </P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cp configfiles/hauppauge-lircrc-nativelirc ~/.mythtv/lircrc
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Add the commands to load the LIRC device drivers and start <B>lircd</B> to
-your <CODE>rc.local</CODE>:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# echo "modprobe lirc_i2c" >> /etc/rc.d/rc.local
-# echo "/usr/local/sbin/lircd" >> /etc/rc.d/rc.local
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>You should now have native LIRC support within MythTV.</P>
-
-<H2><A NAME="LVM"></A> <A NAME="ss23.3">23.3</A> <A HREF="#toc23.3">Logical Volume Manager (LVM) </A>
+<H2><A NAME="LVM"></A> <A NAME="ss23.2">23.2</A> <A HREF="#toc23.2">Logical Volume Manager (LVM) </A>
 </H2>
 
 <P>LVM greatly increases the flexibility you have in managing your storage
@@ -7849,7 +7693,7 @@ unmounted during this procedure.
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss23.4">23.4</A> <A HREF="#toc23.4">Advanced Partition Formatting </A>
+<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss23.3">23.3</A> <A HREF="#toc23.3">Advanced Partition Formatting </A>
 </H2>
 
 <P>The partitions that your distribution sets up for you may not be
@@ -7936,7 +7780,7 @@ higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>
 
-<H2><A NAME="ss23.5">23.5</A> <A HREF="#toc23.5">HDTV with the Air2PC-ATSC-PCI card</A>
+<H2><A NAME="ss23.4">23.4</A> <A HREF="#toc23.4">HDTV with the Air2PC-ATSC-PCI card</A>
 </H2>
 
 <P>The Air2PC card has the capability to capture over-the-air HDTV signals

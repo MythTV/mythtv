@@ -31,17 +31,7 @@ the manual compilation steps described below by jumping to the
 configure lircd.</CAPTION>
 </FIGURE>
 </P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  If you wish to use the remote control that comes with the
-Hauppauge PVR-250/350 cards, you will need to run the lirc 0.7.0pre2 code. See the example installation in the "Hauppauge PVR-250 remote and MythTV's
-native LIRC support" 
-<A HREF="mythtv-HOWTO-23.html#hauppauge_remote">section</A>.</CAPTION>
-</FIGURE>
-
-Some IR devices require a kernel recompile, and some don't. However, all at
+<P>Some IR devices require a kernel recompile, and some don't. However, all at
 least require having the kernel source available as a resource for the lirc
 build process. </P>
 
@@ -98,12 +88,12 @@ $ su
 
 <P>You're going to need to download and compile <B>lircd</B>.  Go to 
 <A HREF="http://www.lirc.org">http://www.lirc.org</A> and download lirc; as
-of 2002-11-07, the version available is 0.6.6.  Grab the remotes.tgz file as
+of 2005-05-17, the version available is 0.7.1.  Grab the remotes.tgz file as
 well. 
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xjf lirc-0.6.6.tar.bz2
-$ cd lirc-0.6.6
+$ tar -xjf lirc-0.7.1.tar.bz2
+$ cd lirc-0.7.1
 $ ./setup.sh
 </PRE>
 </CODE></BLOCKQUOTE>
@@ -205,75 +195,6 @@ the PS/2 keyboard port on your PC and you would train your learning remote
 to emulate the various keystrokes from <CODE>keys.txt</CODE> of your IR
 keyboard.  Using this method removes lirc entirely from the picture - your
 remote will be sending keypresses that your PC "sees" on the keyboard port.</P>
-
-<H3>Recompiling your kernel on Red Hat Linux/Fedora Core</H3>
-
-<P>Don't Panic! Red Hat makes a kernel recompile very easy. They provide  
-configuration files that make it so you can recompile your kernel with  
-Red Hat defaults. And as a side benefit, your kernel will be compiled  
-specifically for your architecture. For a more detailed description (or  
-if you run into trouble) of how to do this go to  
-<A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/ch-custom-kernel.html</A></P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>: Suitable Red Hat kernels for MythTV (i2c update, v4l2 API,
-CONFIG_SERIAL modularized) are available from ATrpms: 
-<A HREF="http://ATrpms.net/name/kernel/">http://ATrpms.net/name/kernel/</A>. You will also find
-suitable kernel modules for ALSA, lirc, bttv, ivtv, saa7134 etc. there. See
-also the 
-<A HREF="mythtv-HOWTO-3.html#atrpms">main Red Hat/Fedora Core section</A>.</CAPTION>
-</FIGURE>
-
-For the impatient:
-Make sure you have an emergency floppy boot disk available!
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd /usr/src/linux
-$ su
-# make mrproper
-# cd configs
-# ls
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>at this point you must look at the file names and determine which  
-config file is right for you. For instance if you have an Athlon XP you  
-should choose "kernel-2.4.18-athlon.config" but if you have a dual  
-processor P4 you might choose "kernel-2.4.18-i686-smp.config"
-<BLOCKQUOTE><CODE>
-<PRE>
-# cp yourconfig.config ../.config
-# cd ../
-# make xconfig
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>At this point you will get a graphical configuration utility. All that  
-you must do to make lirc work is go to the "character devices" section  
-and change "Standard/generic (8250/16550 and compatible UARTs) serial  
-support" from "y" to "m". Now if you want you can have a look around.  
-For instance, you might wish to turn off ham radio support, or perhaps  
-turn off PCMCIA support if you are not on a laptop. But be careful!  
-Only change things you know you can change. If you are not sure, just  
-stick to the one required change. Click "save and exit".
-Next:
-<BLOCKQUOTE><CODE>
-<PRE>
-# make dep
-# make clean
-# make bzImage modules
-# make modules_install
-# make install
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>if you are using <B>grub</B>, that should be it, reboot and select your custom  
-kernel upon boot. If you are using <B>lilo</B>, change your lilo configuration  
-according to  
-<A HREF="http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html">http://www.redhat.com/docs/manuals/linux/RHL-8.0-Manual/custom-guide/  s1-custom-kernel-bootloader.html</A> Remember, if you have any custom  
-kernel modules (ALSA, etc) you will have to recompile/reinstall those.</P>
 
 <H2><A NAME="completing_lirc_install"></A> <A NAME="ss8.5">8.5</A> <A HREF="mythtv-HOWTO.html#toc8.5">Completing the lirc install </A>
 </H2>
