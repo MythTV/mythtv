@@ -515,6 +515,9 @@ void VideoOutputXv::CreatePauseFrame(void)
  *
  * \sideeffect sets video_output_subtype if it succeeds.
  *
+ * \bug Extra buffers are pre-allocated here for XVMC_VLD
+ *      due to a bug somewhere else, see comment in code.
+ *
  * \return success or failure at creating any buffers.
  */
 bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
@@ -528,11 +531,36 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     if (mcodecid > kCodec_NORMAL_END)
     {
         // Create ffmpeg VideoFrames    
-        vbuffers.Init(8 /*numdecode*/, false /*extra_for_pause*/,
-                      1+XVMC_OSD_RES_NUM /*need_free*/,
-                      5-XVMC_OSD_RES_NUM /*needprebuffer_normal*/,
-                      5-XVMC_OSD_RES_NUM /*needprebuffer_small*/,
-                      1 /*keepprebuffer*/, true /*use_frame_locking*/);
+
+#define UGLY_VLD_HACK 1
+#if UGLY_VLD_HACK
+	// This is a temprary hack to initialise more buffers for the XvMC
+	// VLD codec. This should not be needed because more XvMC surfaces
+        // should be allocated up to XVMC_MAX_SURF_NUM in
+        // VideoOutputXv::CreateXvMCBuffers() and vbuffers.Init() should
+        // be called with the absolute minimum number of XvMC surfaces, 8.
+
+        bool vld, idct, mc;
+        myth2av_codecid(myth_codec_id, vld, idct, mc);
+	
+	if (vld)
+        {
+        	vbuffers.Init(16 /*numdecode*/, false /*extra_for_pause*/,
+                	      1+XVMC_OSD_RES_NUM /*need_free*/,
+                	      5-XVMC_OSD_RES_NUM /*needprebuffer_normal*/,
+                	      5-XVMC_OSD_RES_NUM /*needprebuffer_small*/,
+                	      1 /*keepprebuffer*/, true /*use_frame_locking*/);
+	}
+	else
+#endif // UGLY_VLD_HACK
+        {
+        	vbuffers.Init(8 /*numdecode*/, false /*extra_for_pause*/,
+                	      1+XVMC_OSD_RES_NUM /*need_free*/,
+                	      5-XVMC_OSD_RES_NUM /*needprebuffer_normal*/,
+                	      5-XVMC_OSD_RES_NUM /*needprebuffer_small*/,
+                	      1 /*keepprebuffer*/, true /*use_frame_locking*/);
+	}
+
         done = InitXvMC(mcodecid);
 
         if (!done)
