@@ -377,13 +377,11 @@ TV::~TV(void)
     if (myWindow)
     {
         delete myWindow;
-        if (!gContext->GetNumSetting("GuiSizeForTV", 0))
-        {
-            gContext->GetMainWindow()->resize(saved_gui_bounds.size());
-            gContext->GetMainWindow()->setFixedSize(saved_gui_bounds.size());
-            gContext->GetMainWindow()->show();
-            gContext->GetMainWindow()->move(saved_gui_bounds.topLeft());
-        }
+        MythMainWindow* mwnd = gContext->GetMainWindow();
+        mwnd->resize(saved_gui_bounds.size());
+        mwnd->setFixedSize(saved_gui_bounds.size());
+        mwnd->show();
+        mwnd->move(saved_gui_bounds.topLeft());
     }
     if (recorderPlaybackInfo)
         delete recorderPlaybackInfo;
