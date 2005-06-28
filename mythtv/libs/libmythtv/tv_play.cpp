@@ -1299,7 +1299,7 @@ void TV::RunTV(void)
             if (GetOSD() && (oset = GetOSD()->GetSet("status")) &&
                 oset->Displaying() && update_osd_pos &&
                 (StateIsLiveTV(internalState) ||
-                 StateIsRecording(internalState)))
+                 StateIsPlaying(internalState)))
             {
                 QString desc = "";
                 int pos = nvp->calcSliderPos(desc);
