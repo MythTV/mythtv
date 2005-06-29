@@ -934,7 +934,7 @@ void Scheduler::RunScheduler(void)
                          (fillend.tv_usec - fillstart.tv_usec)) / 1000000.0;
 
             msg.sprintf("Scheduled %d items in "
-                        "%.1f = %.2f match + %.2f place", reclist.size(),
+                        "%.1f = %.2f match + %.2f place", (int)reclist.size(),
                         matchTime + placeTime, matchTime, placeTime);
                          
             VERBOSE(VB_GENERAL, msg);

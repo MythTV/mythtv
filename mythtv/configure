@@ -792,7 +792,7 @@ has_library()
 
 has_header()
 {
-    HPATHS="/usr/local/include /usr/include /usr/include/g++-v3 usr/X11R6/include"
+    HPATHS="/usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include"
     HAS_IT="no"
     for HPATH in $HPATHS ; do
         if test x`ls $HPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
@@ -1761,6 +1761,18 @@ if test x"$dvb_eit" = x"yes" ; then
     fi
 fi
 
+lamemp3="no"
+if has_library libmp3lame.so ; then
+    if has_header lame/lame.h ; then
+        lamemp3="yes"
+    fi
+fi
+
+if test x"$lamemp3" = x"no" ; then
+    echo "You must have the Lame MP3 encoding library installed to compile Myth."
+    exit -1
+fi
+
 #test for lirc client libraries
 if test x"$lirc" = x"yes" ; then
     lirc="no"
@@ -1795,6 +1807,9 @@ if test x"$x11" = x"yes" ; then
     if test -f /usr/X11R6/bin/xinit ; then
         x11="yes"
     fi
+    if test -f /usr/bin/xinit ; then
+        x11="yes"
+    fi
 fi
 if test x"$x11" = x"no" ; then
     xrandr="no"
@@ -1820,7 +1835,9 @@ fi
 if test x"$dvd" = x"yes" ; then
     dvd="no"
     if has_library libdvdnav ; then
-        dvd="yes"
+        if has_header dvdnav/dvdnav.h ; then
+            dvd="yes"
+        fi
     fi
 fi
 

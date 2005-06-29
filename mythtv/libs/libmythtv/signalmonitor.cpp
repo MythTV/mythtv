@@ -82,7 +82,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Failed to create signal monitor in Init(%1, %2, 0x%3)")
-                .arg(cardtype).arg(db_cardnum).arg((int)channel,0,16));
+                .arg(cardtype).arg(db_cardnum).arg((long)channel,0,16));
     }
 
     return signalMonitor;

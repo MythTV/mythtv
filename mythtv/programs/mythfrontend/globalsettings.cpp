@@ -2218,6 +2218,7 @@ public:
      HwDecSettings(HostCheckBox *use_mpeg):
          VerticalConfigurationGroup(false),
          TriggeredConfigurationGroup(false) {
+         (void)use_mpeg;
          setLabel(QObject::tr("Hardware Decoding Settings"));
          setUseLabel(false);
 

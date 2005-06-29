@@ -359,7 +359,7 @@ bool EncoderLink::HasEnoughFreeSpace(const ProgramInfo *rec, bool try_to_use_cac
     
     // if program is smaller than available space, then ok
     // if not ok, and we were using cache, try again with measured values
-    bool ok = programSizeKB < freeSpaceKB;
+    bool ok = ((long long)programSizeKB < freeSpaceKB);
     if (!ok && try_to_use_cache)
         ok = HasEnoughFreeSpace(rec, false);
     return ok;

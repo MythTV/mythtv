@@ -1430,6 +1430,7 @@ void NuppelVideoPlayer::AVSync(void)
 
         // ms, same scale as timecodes
         lastaudiotime = currentaudiotime + audio_timecode_offset;
+#if 0
         VERBOSE(VB_PLAYBACK, QString("A/V timecodes audio %1 video %2 frameinterval %3 avdel %4 avg %5 tcoffset %6")
                 .arg(lastaudiotime)
                 .arg(buffer->timecode)
@@ -1438,6 +1439,7 @@ void NuppelVideoPlayer::AVSync(void)
                 .arg(avsync_avg)
                 .arg(audio_timecode_offset)
                  );
+#endif
         if (currentaudiotime != 0 && buffer->timecode != 0)
         { // currentaudiotime == 0 after a seek
             // The time at the start of this frame (ie, now) is given by
