@@ -9,6 +9,7 @@ x86_mmx_cpus="$x86_mmx_cpus,c3,c3-2"
 x86_cpus="i386,i486,i586,i686,pentium,pentiumpro,${x86_mmx_cpus}"
 x86_cmov_cpus="i686,pentiumpro,pentium2,pentium3,pentium3m,pentium-m,pentium4,"
 x86_cmov_cpus="pentium4m,prescott,athlon,athlon-xp,c3-2"
+x86_64_cpus="x86-64,athlon64,k8,opteron,athlon-fx"
 
 # default parameters
 compile_type="release"
@@ -239,6 +240,14 @@ is_x86_cpu() {
 
 if is_x86_cpu "$cpu" ; then
     cpu="x86"
+fi
+
+is_x86_64_cpu() {
+    expr ",${x86_64_cpus}," : ".*,$1," > /dev/null
+}
+
+if is_x86_64_cpu "$cpu" ; then
+    cpu="x86_64"
 fi
 
 case "$cpu" in
