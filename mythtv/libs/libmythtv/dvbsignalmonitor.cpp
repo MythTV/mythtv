@@ -98,14 +98,14 @@ DVBSignalMonitor::~DVBSignalMonitor()
  */
 void DVBSignalMonitor::Stop(void)
 {
-    VERBOSE(VB_IMPORTANT, "DVBSignalMonitor::Stop() -- begin");
+    VERBOSE(VB_CHANNEL, "DVBSignalMonitor::Stop() -- begin");
     SignalMonitor::Stop();
     if (dtvMonitorRunning)
     {
         dtvMonitorRunning = false;
         pthread_join(table_monitor_thread, NULL);
     }
-    VERBOSE(VB_IMPORTANT, "DVBSignalMonitor::Stop() -- end");
+    VERBOSE(VB_CHANNEL, "DVBSignalMonitor::Stop() -- end");
 }
 
 QStringList DVBSignalMonitor::GetStatusList(bool kick)
@@ -130,7 +130,8 @@ void *DVBSignalMonitor::TableMonitorThread(void *param)
 const int buffer_size = TSPacket::SIZE * 1500;
 
 bool DVBSignalMonitor::AddPIDFilter(uint pid)
-{
+{ 
+    VERBOSE(VB_CHANNEL, QString("AddPIDFilter(0x%1)").arg(pid, 0, 16));
     int mux_fd = open(dvbdevice(DVB_DEV_DEMUX, cardnum), O_RDWR | O_NONBLOCK);
     if (mux_fd == -1)
     {
@@ -180,6 +181,7 @@ bool DVBSignalMonitor::AddPIDFilter(uint pid)
 
 bool DVBSignalMonitor::RemovePIDFilter(uint pid)
 {
+    VERBOSE(VB_CHANNEL, QString("RemovePIDFilter(0x%1)").arg(pid, 0, 16));
     if (filters.find(pid)==filters.end())
         return false;
 
@@ -215,16 +217,19 @@ bool DVBSignalMonitor::UpdateFiltersFromStreamData(void)
         if (lit.data() && (filters.find(lit.key()) == filters.end()))
             add_pids.push_back(lit.key());
 
+    // PIDs that need to be removed..
     FilterMap::const_iterator fit = filters.constBegin();
     for (; fit != filters.constEnd(); ++fit)
         if (listening.find(fit.key()) == listening.end())
             del_pids.push_back(fit.key());
 
+    // Remove PIDs
     bool ok = true;
     vector<int>::iterator dit = del_pids.begin();
     for (; dit != del_pids.end(); ++dit)
         ok &= RemovePIDFilter(*dit);
 
+    // Add PIDs
     vector<int>::iterator ait = add_pids.begin();
     for (; ait != add_pids.end(); ++ait)
         ok &= AddPIDFilter(*ait);
@@ -246,13 +251,13 @@ void DVBSignalMonitor::RunTableMonitor(void)
     if (dvr_fd < 0)
     {
         VERBOSE(VB_IMPORTANT,
-                QString("Failed to open dvr device %1 : %2")
+                QString("Failed to open DVR device %1 : %2")
                 .arg(dvbdevice(DVB_DEV_DVR, cardnum))
                 .arg(strerror(errno)));
         return;
     }
 
-    VERBOSE(VB_IMPORTANT, "RunTableMonitor() -- begin ("
+    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- begin ("
             <<GetStreamData()->ListeningPIDs().size()<<")");
     while (dtvMonitorRunning && GetStreamData())
     {
@@ -271,7 +276,7 @@ void DVBSignalMonitor::RunTableMonitor(void)
         if (remainder > 0) // leftover bytes
             memmove(buffer, &(buffer[buffer_size - remainder]), remainder);
     }
-    VERBOSE(VB_IMPORTANT, "RunTableMonitor() -- shutdown");
+    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- shutdown");
 
     if (GetStreamData())
     {
@@ -285,7 +290,7 @@ void DVBSignalMonitor::RunTableMonitor(void)
             RemovePIDFilter(*dit);
     }
     close(dvr_fd);
-    VERBOSE(VB_IMPORTANT, "RunTableMonitor() -- end");
+    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- end");
 }
 
 /** \fn DVBSignalMonitor::UpdateValues()
@@ -303,7 +308,7 @@ void DVBSignalMonitor::UpdateValues(void)
     if (!dtvMonitorRunning && fill_frontend_stats(channel->GetFd(), stats) &&
         !(stats.status & FE_TIMEDOUT))
     {
-        //int wasLocked = signalLock.GetValue();
+        int wasLocked = signalLock.GetValue();
         int locked = (stats.status & FE_HAS_LOCK) ? 1 : 0;
         signalLock.SetValue(locked);
         signalStrength.SetValue((int) stats.ss);
@@ -313,25 +318,31 @@ void DVBSignalMonitor::UpdateValues(void)
 
         //cerr<<"locked("<<locked<<") slock("<<signalLock.IsGood()<<")"<<endl;
         emit StatusSignalLock(locked);
+        emit StatusSignalLock(signalLock);
+
         if (HasFlags(kDTVSigMon_WaitForSig))
         {
             emit StatusSignalStrength((int) stats.ss);
+            emit StatusSignalStrength(signalStrength);
         }
         if (HasFlags(kDVBSigMon_WaitForSNR))
         {
             emit StatusSignalToNoise((int) stats.snr);
+            emit StatusSignalToNoise(signalToNoise);
         }
         if (HasFlags(kDVBSigMon_WaitForBER))
         {
             emit StatusBitErrorRate(stats.ber);
+            emit StatusBitErrorRate(bitErrorRate);
         }
         if (HasFlags(kDVBSigMon_WaitForUB))
         {
             emit StatusUncorrectedBlocks(stats.ub);
+            emit StatusUncorrectedBlocks(uncorrectedBlocks);
         }
 
-        //if (wasLocked != signalLock.GetValue())
-        //    GENERAL((wasLocked ? "Signal Lost" : "Signal Lock"));
+        if (wasLocked != signalLock.GetValue())
+            GENERAL((wasLocked ? "Signal Lost" : "Signal Lock"));
 
         if (signalLock.IsGood() && GetStreamData() &&
             HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |

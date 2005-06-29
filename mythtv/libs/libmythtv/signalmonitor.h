@@ -100,13 +100,13 @@ public:
 signals:
     /** \brief Signal to be sent as true when it is safe to begin
      *   or continue recording, and false if it may not be safe.
-     *
+     *  \deprecated Use the SignalMonitorValue based signal instead.
      *   Note: Signals are only sent once the monitoring thread has been started.
      */
     void StatusSignalLock(int);
 
     /** \brief Signal to be sent as with an actual signal value.
-     *
+     *  \deprecated Use the SignalMonitorValue based signal instead.
      *   Note: Signals are only sent once the monitoring thread has been started.
      */
     void StatusSignalStrength(int);

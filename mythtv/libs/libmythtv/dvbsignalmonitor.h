@@ -28,8 +28,11 @@ signals:
     void StatusBitErrorRate(const SignalMonitorValue&);
     void StatusUncorrectedBlocks(const SignalMonitorValue&);
 
+    /// \deprecated Use the SignalMonitorValue based signal instead.
     void StatusSignalToNoise(int);
+    /// \deprecated Use the SignalMonitorValue based signal instead.
     void StatusBitErrorRate(int);
+    /// \deprecated Use the SignalMonitorValue based signal instead.
     void StatusUncorrectedBlocks(int);
 
 private:

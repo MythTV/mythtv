@@ -143,6 +143,9 @@ void pcHDTVSignalMonitor::UpdateValues()
     emit StatusSignalLock(signalLock.GetValue());
     emit StatusSignalStrength(signalStrength.GetValue());
 
+    emit StatusSignalLock(signalLock);
+    emit StatusSignalStrength(signalStrength);
+
     update_done = true;
 }
 

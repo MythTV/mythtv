@@ -108,7 +108,8 @@ void DTVSignalMonitor::UpdateMonitorValues()
 
 void DTVSignalMonitor::SetChannel(int major, int minor)
 {
-    VERBOSE(VB_CHANNEL, "SetChannel("<<major<<", "<<minor<<")");
+    VERBOSE(VB_CHANNEL, QString("DTVSignalMonitor::SetChannel(%1, %2)")
+            .arg(major).arg(minor));
     if (GetATSCStreamData() && (majorChannel != major || minorChannel != minor))
     {
         RemoveFlags(kDTVSigMon_PATSeen | kDTVSigMon_PATMatch |
@@ -123,7 +124,8 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
 
 void DTVSignalMonitor::SetProgramNumber(int progNum)
 {
-    VERBOSE(VB_CHANNEL, QString("SetProgramNumber(): %1").arg(progNum));
+    VERBOSE(VB_CHANNEL, QString("DTVSignalMonitor::SetProgramNumber(): %1")
+            .arg(progNum));
     if (programNumber != progNum)
     {
         RemoveFlags(kDTVSigMon_PMTSeen | kDTVSigMon_PMTMatch);
@@ -234,62 +236,17 @@ void DTVSignalMonitor::SetMGT(const MasterGuideTable* mgt)
     }
 }
 
-static int get_idx(const VirtualChannelTable* vct,
-                   int majorChannel, int minorChannel)
-{
-    int idx = vct->Find(majorChannel, minorChannel);
-#if 0
-    if (idx < 0 && minorChannel > 0)
-    {
-        // BEGIN HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-        VERBOSE(VB_IMPORTANT, QString("Looking for %1_%2, but could "
-                                      "not find it in VCT.")
-                .arg(majorChannel).arg(minorChannel));
-        const TerrestrialVirtualChannelTable* tvct =
-            dynamic_cast<const TerrestrialVirtualChannelTable*>(vct);
-        const CableVirtualChannelTable* cvct =
-            dynamic_cast<const CableVirtualChannelTable*>(vct);
-        VERBOSE(VB_IMPORTANT, ((tvct) ? tvct->toString() : cvct->toString()));
-
-        idx = vct->Find(-1, minorChannel);
-        if (idx >= 0)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Found %1_%2, using it instead.")
-                    .arg(vct->MajorChannel(idx)).arg(vct->MinorChannel(idx)));
-        }
-        else if (vct->ChannelCount())
-        {
-            idx = 0;
-            VERBOSE(VB_IMPORTANT, QString("Using first channel, %1_%2 instead.")
-                    .arg(vct->MajorChannel(idx)).arg(vct->MinorChannel(idx)));
-        }
-        // END   HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-    }
-#endif
-    return idx;
-}
-
 void DTVSignalMonitor::SetVCT(uint, const TerrestrialVirtualChannelTable* tvct)
 { 
     AddFlags(kDTVSigMon_VCTSeen | kDTVSigMon_TVCTSeen);
-    int idx = get_idx(tvct, majorChannel, minorChannel);
+    int idx = tvct->Find(majorChannel, minorChannel);
 
     if (idx < 0)
         return;
 
-    VERBOSE(VB_IMPORTANT, QString("tvct->ProgramNumber(%1): %2")
+    VERBOSE(VB_CHANNEL, QString(
+                "DTVSignalMonitor::SetVCT(): tvct->ProgramNumber(%1): %2")
             .arg(idx).arg(tvct->ProgramNumber(idx)));
-#if 0
-    // BEGIN HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-    if (((int)tvct->MajorChannel(idx) != majorChannel) ||
-        ((int)tvct->MinorChannel(idx) != minorChannel))
-    {
-        GetATSCStreamData()->Reset(tvct->MajorChannel(idx),
-                                   tvct->MinorChannel(idx));
-        //GetATSCStreamData()->SetDesiredProgram(tvct->ProgramNumber(idx));
-    }
-    // END   HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-#endif
 
     SetProgramNumber(tvct->ProgramNumber(idx));
     AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_TVCTMatch);
@@ -298,39 +255,33 @@ void DTVSignalMonitor::SetVCT(uint, const TerrestrialVirtualChannelTable* tvct)
 void DTVSignalMonitor::SetVCT(uint, const CableVirtualChannelTable* cvct)
 {
     AddFlags(kDTVSigMon_VCTSeen | kDTVSigMon_CVCTSeen);
-    int idx = get_idx(cvct, majorChannel, minorChannel);
+    int idx = cvct->Find(majorChannel, minorChannel);
 
     if (idx < 0)
         return;
 
-    VERBOSE(VB_IMPORTANT, QString("cvct->ProgramNumber(%1): %2")
+    VERBOSE(VB_CHANNEL, QString(
+                "DTVSignalMonitor::SetVCT(): cvct->ProgramNumber(%1): %2")
             .arg(idx).arg(cvct->ProgramNumber(idx)));
-#if 0
-    // BEGIN HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-    if (((int)cvct->MajorChannel(idx) != majorChannel) ||
-        ((int)cvct->MinorChannel(idx) != minorChannel))
-    {
-        GetATSCStreamData()->Reset(cvct->MajorChannel(idx),
-                                   cvct->MinorChannel(idx));
-        //GetATSCStreamData()->SetDesiredProgram(cvct->ProgramNumber(idx));
-    }
-    // END   HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
-#endif
 
     SetProgramNumber(cvct->ProgramNumber(idx));
     AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_CVCTMatch);
 }
 
-void DTVSignalMonitor::SetNIT(const NetworkInformationTable*)
+void DTVSignalMonitor::SetNIT(const NetworkInformationTable *nit)
 {
+    VERBOSE(VB_CHANNEL, QString("DTVSignalMonitor::SetNIT(): net_id = %1")
+            .arg(nit->NetworkID()));
     AddFlags(kDTVSigMon_NITSeen);
     if (!GetDVBStreamData())
         return;
-
 }
 
-void DTVSignalMonitor::SetSDT(uint, const ServiceDescriptionTable*)
+void DTVSignalMonitor::SetSDT(uint, const ServiceDescriptionTable *sdt)
 {
+    VERBOSE(VB_CHANNEL, QString("DTVSignalMonitor::SetSDT(): "
+                                "tsid = %1 orig_net_id = %2")
+            .arg(sdt->TSID()).arg(sdt->OriginalNetworkID()));
     AddFlags(kDTVSigMon_SDTSeen);
     if (!GetDVBStreamData())
         return;
