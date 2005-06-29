@@ -23,6 +23,12 @@ typedef enum
      *         indicates that we are ready to change to some other state.
      */
     kState_None = 0,
+    /** \brief Waiting for LiveTV is a TV only state for when we are starting
+     *         to watch LiveTV, but do not yet have a solid signal lock.
+     *
+     *   On the backend this corresponds to the Wating LiveTV state.
+     */
+    kState_WaitingForLiveTV,
     /** \brief Watching LiveTV is the state for when we are watching a
      *         recording and the user has control over the channel and
      *         the recorder to use.

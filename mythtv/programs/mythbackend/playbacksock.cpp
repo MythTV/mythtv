@@ -250,3 +250,17 @@ void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,
 
     SendReceiveStringList(strlist);
 }
+
+int PlaybackSock::SetSignalMonitoringRate(int capturecardnum,
+                                          int rate, int notifyFrontend)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
+    strlist << "SET_SIGNAL_MONITORING_RATE";
+    strlist << QString::number(rate);
+    strlist << QString::number(notifyFrontend);
+
+    SendReceiveStringList(strlist);
+
+    int ret = strlist[0].toInt();
+    return ret;
+}

@@ -285,6 +285,30 @@ long long EncoderLink::GetMaxBitrate()
     return -1;
 }
 
+/** \fn EncoderLink::SetSignalMonitoringRate(int,int)
+ *  \brief Sets the signal monitoring rate.
+ *
+ *   May be a local or remote query.
+ *
+ *  \sa TVRec::SetSignalMonitoringRate(int,int),
+ *      RemoteEncoder::SetSignalMonitoringRate(int,int)
+ *  \param rate           Milliseconds between each signal check,
+ *                        0 to disable, -1 to preserve old value.
+ *  \param notifyFrontend If 1 SIGNAL messages are sent to the frontend,
+ *                        if 0 SIGNAL messages will not be sent, and if
+ *                        -1 the old value is preserved.
+ *  \return Old rate if it succeeds, -1 if it fails.
+ */
+int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
+{
+    if (local)
+        return tv->SetSignalMonitoringRate(rate, notifyFrontend);
+    else if (sock)
+        return sock->SetSignalMonitoringRate(m_capturecardnum, rate,
+                                             notifyFrontend);
+    return -1;
+}
+
 /** \brief Lock the tuner for exclusive use.
  *  \return -2 if tuner is already locked, GetCardID() if you get the lock.
  * \sa FreeTuner(), IsTunerLocked()
@@ -658,6 +682,8 @@ void EncoderLink::PauseRecorder(void)
  *  \brief Tells TVRec's recorder to change to the next input.
  *         <b>This only works on local recorders.</b>
  *
+ *   You must call Pause() before calling this, and Unpause()
+ *   after this.
  *  \sa PauseRecorder()
  */
 void EncoderLink::ToggleInputs(void)
@@ -685,6 +711,8 @@ void EncoderLink::ToggleChannelFavorite(void)
  *  \brief Changes to the next or previous channel.
  *         <b>This only works on local recorders.</b>
  *
+ *   You must call Pause() before calling this, and Unpause()
+ *   after this.
  *  \param channeldirection channel change direction \sa BrowseDirections.
  */
 void EncoderLink::ChangeChannel(int channeldirection)
@@ -699,6 +727,8 @@ void EncoderLink::ChangeChannel(int channeldirection)
  *  \brief Changes to a named channel on the current tuner.
  *         <b>This only works on local recorders.</b>
  *
+ *   You must call Pause() before calling this, and Unpause()
+ *   after this.
  *  \param name Name of channel to change to.
  */
 void EncoderLink::SetChannel(const QString &name)
@@ -707,6 +737,32 @@ void EncoderLink::SetChannel(const QString &name)
         tv->SetChannel(name);
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: SetChannel");
+}
+
+/** \fn EncoderLink::Pause()
+ *  \brief Waits for nvr pause and then resets the pauses & resets ring buffer.
+ *         <b>This only works on local recorders.</b>
+ *  \sa PauseRecorder(), Unpause()
+ */
+void EncoderLink::Pause(void)
+{
+    if (local)
+        tv->Pause();
+    else
+        VERBOSE(VB_IMPORTANT, "Should be local only query: Pause");
+}
+
+/** \fn EncoderLink::Unpause()
+ *  \brief unpauses nvr and ring buffer.
+ *         <b>This only works on local recorders.</b>
+ *  \sa Pause()
+ */
+void EncoderLink::Unpause(void)
+{
+    if (local)
+        tv->Unpause();
+    else
+        VERBOSE(VB_IMPORTANT, "Should be local only query: Unpause");
 }
 
 /** \fn EncoderLink::ChangeContrast(bool)

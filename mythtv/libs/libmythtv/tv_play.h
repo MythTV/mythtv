@@ -138,6 +138,8 @@ class TV : public QObject
     void ToggleChannelFavorite(void);
     void ChangeChannel(int direction, bool force = false);
     void ChangeChannelByString(QString &name, bool force = false);
+    void PauseLiveTV(void);
+    void UnpauseLiveTV(void);
 
     void ChangeVolume(bool up);
     void ToggleMute(void);
