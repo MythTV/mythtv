@@ -57,6 +57,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
     {
         case TableID::NIT:
         {
+            VERBOSE(VB_RECORD, "DVBStreamData: Got NIT");
             SetVersionNIT(psip.Version());
             if (_cache_tables)
             {
@@ -74,6 +75,7 @@ bool DVBStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::SDT:
         {
+            VERBOSE(VB_RECORD, "DVBStreamData: Got SDT");
             uint tsid = psip.TableIDExtension();
             SetVersionSDT(tsid, psip.Version());
             if (_cache_tables)

@@ -117,3 +117,18 @@ QString ServiceDescriptionTable::toString(void) const
     }
     return str;
 }
+
+ServiceDescriptor *ServiceDescriptionTable::GetServiceDescriptor(uint i) const
+{
+    desc_list_t parsed =
+        MPEGDescriptor::Parse(ServiceDescriptors(i),
+                              ServiceDescriptorsLength(i));
+
+    const unsigned char *desc =
+        MPEGDescriptor::Find(parsed, DescriptorID::service);
+
+    if (desc)
+        return new ServiceDescriptor(desc);
+
+    return NULL;
+}

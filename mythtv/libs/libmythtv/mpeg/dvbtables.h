@@ -130,9 +130,11 @@ class ServiceDescriptionTable: public PSIPTable
     const unsigned char* ServiceDescriptors(uint i) const
         { return _ptrs[i]+5; }
     // }
+    ServiceDescriptor *GetServiceDescriptor(uint i) const;
 
     void Parse(void) const;
     QString toString(void) const;
+
   private:
     mutable vector<const unsigned char*> _ptrs; // used to parse
 };

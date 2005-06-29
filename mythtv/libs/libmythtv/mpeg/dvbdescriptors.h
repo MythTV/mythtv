@@ -744,11 +744,11 @@ class FrequencyListDescriptor : public MPEGDescriptor
     unsigned long long Frequency(uint i) const
     {
         if (kCodingTypeTerrestrial == CodingType())
-            return ((_data[2 + (i<<2)]<<24) | (_data[3 + (i<<2)]<<16) |
-                    (_data[4 + (i<<2)]<<8)  | (_data[5 + (i<<2)]));
+            return ((_data[3 + (i<<2)]<<24) | (_data[4 + (i<<2)]<<16) |
+                    (_data[5 + (i<<2)]<<8)  | (_data[6 + (i<<2)]));
         else
-            return byte4BCD2int(_data[2 + (i<<2)], _data[3 + (i<<2)],
-                                _data[4 + (i<<2)], _data[5 + (i<<2)]);
+            return byte4BCD2int(_data[3 + (i<<2)], _data[4 + (i<<2)],
+                                _data[5 + (i<<2)], _data[6 + (i<<2)]);
     }
     unsigned long long FrequencyHz(uint i) const
     {
@@ -1020,6 +1020,10 @@ class ServiceDescriptor : public MPEGDescriptor
         return dvb_string(_data+4+ServiceProviderNameLength(),
                           ServiceNameLength());
     }
+    bool IsDTV() const
+        { return ServiceType() ==  kServiceTypeDigitalTelevision; }
+    bool IsDigitalAudio() const
+        { return ServiceType() ==  kServiceTypeDigitalRadioSound; }
 };
 
 class ServiceAvailabilityDescriptor : public MPEGDescriptor
@@ -1342,7 +1346,7 @@ static QString coderate_inner(uint cr)
 {
     switch (cr)
     {
-        case 0x0: return "None"; // not actually defined in spec
+        case 0x0:  return "None"; // not actually defined in spec
         case 0x1:  return "1/2";
         case 0x2:  return "2/3";
         case 0x3:  return "3/4";
@@ -1353,4 +1357,25 @@ static QString coderate_inner(uint cr)
         default:   return "Auto"; // not actually defined in spec
     }
 }
+
+class UKChannelListDescriptor : public MPEGDescriptor
+{
+  public:
+    UKChannelListDescriptor(const unsigned char* data) : MPEGDescriptor(data)
+    {
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x83
+        assert(DescriptorID::dvb_uk_channel_list == DescriptorTag());
+    // descriptor_length        8   1.0
+    }  
+
+    uint ChannelCount() const { return DescriptorLength() >> 4; }
+
+    uint ServiceID(uint i) const
+        { return (_data[2 + (i<<2)] << 8) | _data[3 + (i<<2)]; }
+
+    uint ChannelNumber(uint i) const
+        { return ((_data[4 + (i<<2)] << 8) | _data[5 + (i<<2)]) & 0x3ff; }
+};
+
 #endif
