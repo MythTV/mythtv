@@ -2427,7 +2427,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         enc->StopLiveTV();
         retlist << "ok";
     }
-    else if (command == "PAUSE_RECORDER")
+    else if (command == "PAUSE")
     {
         enc->PauseRecorder();
         retlist << "ok";
@@ -2458,23 +2458,6 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         QString name = slist[2];
         enc->SetChannel(name);
         retlist << "ok";
-    }
-    else if (command == "PAUSE")
-    {
-        enc->Pause();
-        retlist << "ok";
-    }
-    else if (command == "UNPAUSE")
-    {
-        enc->Unpause();
-        retlist << "ok";
-    }
-    else if (command == "SET_SIGNAL_MONITORING_RATE")
-    {
-        int rate = slist[2].toInt();
-        int notifyFrontend = slist[3].toInt();
-        int oldrate = enc->SetSignalMonitoringRate(rate, notifyFrontend);
-        retlist << QString::number(oldrate);
     }
     else if (command == "CHANGE_COLOUR")
     {

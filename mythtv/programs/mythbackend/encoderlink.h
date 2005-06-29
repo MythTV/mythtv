@@ -45,7 +45,6 @@ class EncoderLink
                                bool from_cache=false);
     long long GetFreeDiskSpace(bool from_cache=false);
     long long GetMaxBitrate(void);
-    int SetSignalMonitoringRate(int rate, int notifyFrontend);
 
     bool IsBusy(void);
     bool IsBusyRecording(void);
@@ -81,8 +80,6 @@ class EncoderLink
     void ToggleChannelFavorite(void);
     void ChangeChannel(int channeldirection);
     void SetChannel(const QString &name);
-    void Pause(void);
-    void Unpause(void);
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);
     int ChangeColour(bool direction);

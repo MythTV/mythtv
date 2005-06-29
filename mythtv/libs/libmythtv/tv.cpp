@@ -10,7 +10,6 @@ QString StateToString(TVState state)
     switch (state) {
         case kState_Error: statestr = "Error"; break;
         case kState_None: statestr = "None"; break;
-        case kState_WaitingForLiveTV:statestr = "WaitingForLiveTV"; break;
         case kState_WatchingLiveTV: statestr = "WatchingLiveTV"; break;
         case kState_WatchingPreRecorded:
             statestr = "WatchingPreRecorded"; break;

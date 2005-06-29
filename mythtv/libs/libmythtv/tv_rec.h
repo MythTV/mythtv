@@ -129,7 +129,6 @@ class TVRec
     void SetChannel(QString name);
     void Pause(void);
     void Unpause(void);
-    int SetSignalMonitoringRate(int msec, int notifyFrontend = 1);
     int ChangeColour(bool direction);
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);

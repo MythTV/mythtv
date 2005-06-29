@@ -595,8 +595,7 @@ bool TV::StateIsPlaying(TVState state)
 
 bool TV::StateIsLiveTV(TVState state)
 {
-    return (state == kState_WatchingLiveTV || 
-            state == kState_WaitingForLiveTV);
+    return (state == kState_WatchingLiveTV);
 }
 
 TVState TV::RemoveRecording(TVState state)
@@ -805,7 +804,6 @@ void TV::HandleStateChange(void)
 
     // Check that new state is valid
     if (kState_None != nextState &&
-        kState_WaitingForLiveTV != nextState &&
         activenvp && !activenvp->IsDecoderThreadAlive())
     {
         VERBOSE(VB_IMPORTANT, "Error, decoder not alive, and trying to play..");
@@ -1244,7 +1242,7 @@ void TV::RunTV(void)
             getRecorderPlaybackInfo = false;
         }
 
-        if (nvp || kState_WaitingForLiveTV == GetState())
+        if (nvp)
         {
             if (keyList.count() > 0)
             { 
@@ -1875,7 +1873,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "ESCAPE")
         {
-            if (GetOSD() && ClearOSD() && (internalState != kState_WaitingForLiveTV))
+            if (GetOSD() && ClearOSD())
                 return;
 
             NormalSpeed();
@@ -2632,18 +2630,33 @@ void TV::SwitchCards(void)
 
 void TV::ToggleInputs(void)
 {
-    if (activenvp == nvp && paused)
+    if (activenvp == nvp)
     {
-        GetOSD()->EndPause();
-        gContext->DisableScreensaver();
-        paused = false;
+        if (paused)
+        {
+            GetOSD()->EndPause();
+            gContext->DisableScreensaver();
+            paused = false;
+        }
     }
 
-    PauseLiveTV();
+    activenvp->Pause(false);
 
+    // all we care about is the ringbuffer being paused, here..
+    activerbuffer->WaitForPause();
+
+    activerecorder->PauseRecorder();
+    activerbuffer->Reset();
     activerecorder->ToggleInputs();
 
-    UnpauseLiveTV();
+    activenvp->ResetPlaying();
+    activenvp->Play(normal_speed, true, false);
+
+    if (activenvp == nvp)
+    {
+        UpdateOSDInput();
+        UpdateLCD();
+    }
 }
 
 void TV::ToggleChannelFavorite(void)
@@ -2655,7 +2668,7 @@ void TV::ChangeChannel(int direction, bool force)
 {
     bool muted = false;
 
-    if (nvp && !force && (activenvp == nvp) && showBufferedWarnings)
+    if (!force && (activenvp == nvp) && showBufferedWarnings)
     {
         int behind = activenvp->GetSecondsBehind();
         if (behind > bufferedChannelThreshold)
@@ -2682,82 +2695,52 @@ void TV::ChangeChannel(int direction, bool force)
         }
     }
 
-    if (nvp)
+    AudioOutput *aud = nvp->getAudioOutput();
+    if (aud && !aud->GetMute() && activenvp == nvp)
     {
-        AudioOutput *aud = nvp->getAudioOutput();
-        if (aud && !aud->GetMute() && activenvp == nvp)
+        aud->ToggleMute();
+        muted = true;
+    }
+
+    if (activenvp == nvp)
+    {
+        if (paused)
         {
-            aud->ToggleMute();
-            muted = true;
+            GetOSD()->EndPause();
+            gContext->DisableScreensaver();
+            paused = false;
         }
     }
 
-    if (nvp && (activenvp == nvp) && paused)
-    {
-        GetOSD()->EndPause();
-        gContext->DisableScreensaver();
-        paused = false;
-    }
+    activenvp->Pause(false);
+    // all we care about is the ringbuffer being paused, here..
+    activerbuffer->WaitForPause();    
 
     // Save the current channel if this is the first time
-    if (nvp && (activenvp == nvp) && prevChan.size() == 0)
+    if (prevChan.size() == 0 && activenvp == nvp)
         AddPreviousChannel();
 
-    PauseLiveTV();
-
+    activerecorder->PauseRecorder();
+    activerbuffer->Reset();
     activerecorder->ChangeChannel(direction);
     ChannelClear();
 
-    if (muted)
-        muteTimer->start(kMuteTimeout * 2, true);
+    activenvp->ResetPlaying();
+    
+    QString filters = GetFiltersForChannel();
+    activenvp->SetVideoFilters(filters);
+    
+    activenvp->Play(normal_speed, true, false);
 
-    UnpauseLiveTV();
-}
-
-/** \fn TV::PauseLiveTV()
- *  \brief Used in ChangeChannel(), ChangeChannelByString(),
- *         and ToggleInputs() to temporarily stop video output.
- */
-void TV::PauseLiveTV(void)
-{
-    VERBOSE(VB_PLAYBACK, "PauseLiveTV()");
-
-    if (activenvp)
-        activenvp->Pause(false);
-
-    if (activerbuffer)
-        activerbuffer->WaitForPause();
-
-    activerecorder->PauseRecorder();
-    if (activerbuffer)
-        activerbuffer->Reset();
-    activerecorder->Pause();
-}
-
-/** \fn TV::UnpauseLiveTV()
- *  \brief Used after ChangeChannel(), ChangeChannelByString(),
- *         and ToggleInputs() to restart video output.
- */
-void TV::UnpauseLiveTV(void)
-{
-    VERBOSE(VB_PLAYBACK, "UnpauseLiveTV()");
-
-    activerecorder->Unpause();
-
-    if (activenvp)
-    {
-        activenvp->ResetPlaying();
-        QString filters = GetFiltersForChannel();
-        activenvp->SetVideoFilters(filters);
-        activenvp->Play(normal_speed, true, false);
-    }
-
-    if (nvp && activenvp == nvp)
+    if (activenvp == nvp)
     {
         UpdateOSD();
         UpdateLCD();
         AddPreviousChannel();
     }
+
+    if (muted)
+        muteTimer->start(kMuteTimeout * 2, true);
 }
 
 QString TV::QueuedChannel(void)
@@ -2918,35 +2901,51 @@ void TV::ChangeChannelByString(QString &name, bool force)
         }
     }
 
-    if (nvp)
+    AudioOutput *aud = nvp->getAudioOutput();
+    if (aud && !aud->GetMute() && activenvp == nvp)
     {
-        AudioOutput *aud = nvp->getAudioOutput();
-        if (aud && !aud->GetMute() && activenvp == nvp)
+        aud->ToggleMute();
+        muted = true;
+    }
+
+    if (activenvp == nvp)
+    {
+        if (paused)
         {
-            aud->ToggleMute();
-            muted = true;
+            GetOSD()->EndPause();
+            gContext->DisableScreensaver();
+            paused = false;
         }
     }
 
-    if (activenvp == nvp && paused && GetOSD())
-    {
-        GetOSD()->EndPause();
-        gContext->DisableScreensaver();
-        paused = false;
-    }
+    activenvp->Pause(false);
+    // all we care about is the ringbuffer being paused, here..
+    activerbuffer->WaitForPause();
 
     // Save the current channel if this is the first time
     if (prevChan.size() == 0)
         AddPreviousChannel();
 
-    PauseLiveTV();
-
+    activerecorder->PauseRecorder();
+    activerbuffer->Reset();
     activerecorder->SetChannel(name);
+
+    activenvp->ResetPlaying();
+    
+    QString filters = GetFiltersForChannel();
+    activenvp->SetVideoFilters(filters);
+    
+    activenvp->Play(normal_speed, true, false);
+
+    if (activenvp == nvp)
+    {
+        UpdateOSD();
+        UpdateLCD();
+        AddPreviousChannel();
+    }
 
     if (muted)
         muteTimer->start(kMuteTimeout * 2, true);
-
-    UnpauseLiveTV();
 }
 
 void TV::AddPreviousChannel(void)

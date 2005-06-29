@@ -1376,28 +1376,6 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     }
 }
 
-/** \fn TVRec::SetSignalMonitoringRate(int,int)
- *  \brief Signal monitoring stub
- */
-int TVRec::SetSignalMonitoringRate(int,int)
-{
-    MythEvent me(QString("SIGNAL %1").arg(m_capturecardnum),
-                 SignalMonitorValue::SIGNAL_LOCK);
-    gContext->dispatch(me);
-    return 0;
-}
-
-/** \fn TVRec::ShouldSwitchToAnotherCard(QString)
- *  \brief Checks if named channel exists on current tuner, or
- *         another tuner.
- *
- *  \param channelid channel to verify against tuners.
- *  \return true if the channel on another tuner and not current tuner,
- *          false otherwise.
- *  \sa EncoderLink::ShouldSwitchToAnotherCard(const QString&),
- *      RemoteEncoder::ShouldSwitchToAnotherCard(QString),
- *      CheckChannel(QString)
- */
 bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2211,16 +2189,13 @@ void TVRec::SpawnLiveTV(void)
  */
 void TVRec::StopLiveTV(void)
 {
-    if (GetState() != kState_None)
-    {
-        stateChangeLock.lock();
-        nextState = kState_None;
-        changeState = true;
-        stateChangeLock.unlock();
-        
-        while (changeState)
-            usleep(50);
-    }
+    stateChangeLock.lock();
+    nextState = kState_None;
+    changeState = true;
+    stateChangeLock.unlock();
+
+    while (changeState)
+        usleep(50);
 }
 
 /** \fn TVRec::PauseRecorder()
@@ -2240,23 +2215,22 @@ void TVRec::PauseRecorder(void)
 
 /** \fn TVRec::ToggleInputs(void)
  *  \brief Toggles between inputs on current capture card.
- *
- *   You must call Pause() before calling this, and Unpause()
- *   after this.
  */
 void TVRec::ToggleInputs(void)
 {
     QMutexLocker lock(&stateChangeLock);
 
     if (channel)
+    {
+        Pause();
         channel->ToggleInputs();
+        Unpause();
+    }
 }
 
 /** \fn TVRec::ChangeChannel(ChannelChangeDirection)
  *  \brief Changes to a channel in the 'dir' channel change direction.
  *
- *   You must call Pause() before calling this, and Unpause()
- *   after this.
  *  \param dir channel change direction \sa ChannelChangeDirection.
  */
 void TVRec::ChangeChannel(ChannelChangeDirection dir)
@@ -2264,7 +2238,11 @@ void TVRec::ChangeChannel(ChannelChangeDirection dir)
     QMutexLocker lock(&stateChangeLock);
 
     if (channel)
+    {
+        Pause();
         channel->SetChannelByDirection(dir);
+        Unpause();
+    }
 }
 
 /** \fn TVRec::ToggleChannelFavorite()
@@ -2427,8 +2405,6 @@ int TVRec::ChangeHue(bool direction)
 /** \fn TVRec::SetChannel(QString name)
  *  \brief Changes to a named channel on the current tuner.
  *
- *   You must call Pause() before calling this, and Unpause()
- *   after this.
  *  \param name channel to change to.
  */
 void TVRec::SetChannel(QString name)
@@ -2438,14 +2414,15 @@ void TVRec::SetChannel(QString name)
     if (!channel)
         return;
 
+    Pause();
+
     QString chan = name.stripWhiteSpace();
     QString prevchan = channel->GetCurrentName();
 
     if (!channel->SetChannelByString(chan))
-    {
-        VERBOSE(VB_IMPORTANT, "SetChannelByString() failed");
         channel->SetChannelByString(prevchan);
-    }
+
+    Unpause();
 }
 
 /** \fn TVRec::Pause()
