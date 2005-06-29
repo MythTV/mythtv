@@ -141,10 +141,10 @@ vector<int> ChannelUtil::CreateMultiplexes(int sourceid,
         const desc_list_t& list = 
             MPEGDescriptor::Parse(nit->TransportDescriptors(i),
                                   nit->TransportDescriptorsLength(i));
-        uint tsid = nit->TSID(i);
-        uint netid = nit->OriginalNetworkID(i);
 
-        uint tag = MPEGDescriptor(list[i]).DescriptorTag();
+        uint tsid  = nit->TSID(i);
+        uint netid = nit->OriginalNetworkID(i);
+        uint tag   = MPEGDescriptor(list[i]).DescriptorTag();
 
         if (tag == DescriptorID::terrestrial_delivery_system)
         {
@@ -239,19 +239,6 @@ vector<int> ChannelUtil::CreateMultiplexes(int sourceid,
                     muxes.push_back(mux);
             }
         }
-        // also uk freq list desc
-
-        /*
-        QString msg;
-        if (GetMplexID(sourceid, frequency,
-                       nit->TSID(i), nit->NetworkID())>=0)
-        {
-            msg = QObject::tr("Transport %1 - %2 Already in Database")
-                .arg(nit->TSID(i)).arg(nit->NetworkID());
-        }
-
-        emit TransportScanUpdateText(msg);
-        */
     }
     return muxes;
 }
@@ -579,11 +566,104 @@ int ChannelUtil::GetChanID(int mplexid,       int service_transport_id,
     return -1;
 }
 
+/** \fn ChannelUtil::CreateChanID(uint, const QString&)
+ *  \brief Creates a unique channel ID for database use.
+ *  \return chanid if successful, -1 if not
+ */
+int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
+{
+    MSqlQuery query(MSqlQuery::DDCon());
+
+    uint desired_chanid = 0;
+    int chansep = chan_num.find("_");
+    if (chansep > 0)
+    {
+        desired_chanid =
+            sourceid * 1000 +
+            chan_num.left(chansep).toInt() * 10 +
+            chan_num.right(chan_num.length()-chansep-1).toInt();
+    }
+    else
+    {
+        desired_chanid = sourceid * 1000 + chan_num.toInt();
+    }
+
+    if (desired_chanid > sourceid * 1000)
+    {
+        query.prepare(
+            QString("SELECT chanid FROM channel "
+                    "WHERE chanid = '%1'").arg(desired_chanid));
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("Getting chanid for new channel (1)", query);
+            return -1;
+        }
+        if (query.size() == 0)
+            return desired_chanid;
+    }
+
+    query.prepare("SELECT MAX(chanid) FROM channel "
+                  "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("Getting chanid for new channel (2)", query);
+        return -1;
+    }
+    if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, "Error getting chanid for new channel.");
+        return -1;
+    }
+    return query.value(0).toInt() + 1;
+}
+
+bool ChannelUtil::CreateChannel(uint db_sourceid,
+                                uint new_channel_id,
+                                const QString &callsign,
+                                const QString &service_name,
+                                const QString &chan_num,
+                                uint atsc_major_channel,
+                                uint atsc_minor_channel,
+                                int  freqid,
+                                const QString &xmltvid,
+                                const QString &tvformat)
+{
+    uint atsc_src_id = (atsc_major_channel << 8) | (atsc_minor_channel & 0xff);
+
+    MSqlQuery query(MSqlQuery::DDCon());
+    query.prepare(
+        "INSERT INTO channel "
+        "       (chanid,    channum,   sourceid, "
+        "        callsign,  name,      xmltvid, "
+        "        freqid,    tvformat,  atscsrcid) "
+        "VALUES (:CHANID,   :CHANNUM,  :SOURCEID, "
+        "        :CALLSIGN, :NAME,     :XMLTVID, "
+        "        :FREQID,   :TVFORMAT, :ATSCSRCID)");
+
+    query.bindValue(":CHANID",    new_channel_id);
+    query.bindValue(":CHANNUM",   chan_num);
+    query.bindValue(":SOURCEID",  db_sourceid);
+    query.bindValue(":CALLSIGN",  callsign);
+    query.bindValue(":NAME",      service_name);
+    query.bindValue(":XMLTVID",   xmltvid);
+    query.bindValue(":FREQID",    freqid);
+    query.bindValue(":TVFORMAT",  tvformat);
+    query.bindValue(":ATSCSRCID", atsc_src_id);
+       
+    if (!query.exec())
+    {
+        MythContext::DBError("Inserting new channel", query);
+        return false;
+    }
+    return true;
+}
+
 bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 uint db_sourceid,
                                 uint new_channel_id,
-                                QString service_name,
-                                QString chan_num,
+                                const QString &service_name,
+                                const QString &chan_num,
                                 uint service_id,
                                 uint atsc_major_channel,
                                 uint atsc_minor_channel,
@@ -636,8 +716,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
 bool ChannelUtil::UpdateChannel(uint db_mplexid,
                                 uint source_id,
                                 uint channel_id,
-                                QString service_name,
-                                QString chan_num,
+                                const QString &service_name,
+                                const QString &chan_num,
                                 uint service_id,
                                 uint atsc_major_channel,
                                 uint atsc_minor_channel,
@@ -716,27 +796,30 @@ int ChannelUtil::GetServiceVersion(int mplexid)
     return -1;
 }
 
-/** \fn ChannelUtil::FindUnusedChannelID(int)
- *  \brief Creates a unique channel ID for database use.
- */
-int ChannelUtil::FindUnusedChannelID(int sourceid)
+QString ChannelUtil::GetDTVPrivateType(uint network_id,
+                                       const QString &key,
+                                       const QString table_standard)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare(QString(
-                      "SELECT max(chanid) as maxchan "
-                      "FROM channel WHERE sourceid=%1").arg(sourceid));
+    QString theQuery = QString(
+        "SELECT private_value "
+        "FROM dtv_privatetypes "
+        "WHERE networkid = %1 AND sitype = '%2' AND private_type = '%3'")
+        .arg(network_id).arg(table_standard).arg(key);
 
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Calculating new ChanID for DVB Channel", query);
+    query.prepare(theQuery);
 
-    int lastChanID = 0;
-    if (query.size() > 0)
+    if (!query.exec() && !query.isActive())
     {
-        query.next();
-        lastChanID = query.value(0).toInt();
+        MythContext::DBError(
+            QString("Error loading DTV private type %1").arg(key), query);
+
+        return QString::null;
     }
 
-    // If !lastChanID, create first channel in transport
-    return (!lastChanID) ? sourceid * 1000 : lastChanID + 1;
+    if (query.size() <= 0)
+        return QString::null;
+
+    return query.value(0).toString();
 }

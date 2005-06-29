@@ -29,6 +29,7 @@
 #include "libmyth/mythcontext.h"
 #include "libmythtv/scheduledrecording.h"
 #include "libmythtv/datadirect.h"
+#include "libmythtv/channelutil.h"
 #include "libmyth/mythdbcon.h"
 
 using namespace std;
@@ -741,129 +742,164 @@ void ResetIconMap(bool reset_icons)
 // DataDirect stuff
 void DataDirectStationUpdate(Source source)
 {
+    MSqlQuery no_xmltvid_q(MSqlQuery::DDCon());
     MSqlQuery query(MSqlQuery::DDCon());
+    MSqlQuery chan_update_q(MSqlQuery::DDCon());
     QString querystr;
-    int chanid;
 
     ddprocessor.updateStationViewTable();
 
-    MSqlQuery query1(MSqlQuery::DDCon());
-    query1.prepare("SELECT dd_v_station.stationid,dd_v_station.callsign,"
-               "dd_v_station.stationname,dd_v_station.channel,"
-               "dd_v_station.fccchannelnumber,dd_v_station.channelMinor "
-               "FROM dd_v_station LEFT JOIN channel ON "
-               "dd_v_station.stationid = channel.xmltvid "
-               "AND channel.sourceid = :SOURCEID "
-               "WHERE channel.chanid IS NULL;");
-    query1.bindValue(":SOURCEID", source.id);
+    // Find all the channels in the dd_v_station temp table
+    // where there is no channel with the same xmltvid in the
+    // DB using the same source.
+    no_xmltvid_q.prepare(
+        "SELECT dd_v_station.stationid,        dd_v_station.callsign,"
+        "       dd_v_station.stationname,      dd_v_station.channel,"
+        "       dd_v_station.fccchannelnumber, dd_v_station.channelMinor "
+        "FROM dd_v_station LEFT JOIN channel ON "
+        "     dd_v_station.stationid = channel.xmltvid AND "
+        "     channel.sourceid = :SOURCEID "
+        "WHERE channel.chanid IS NULL;");
+    no_xmltvid_q.bindValue(":SOURCEID", source.id);
 
-    if (!query1.exec())
-        MythContext::DBError("Selecting new channels", query1);
+    if (!no_xmltvid_q.exec())
+        MythContext::DBError("Selecting new channels", no_xmltvid_q);
 
-    if (query1.isActive() && query1.numRowsAffected() > 0)
+    if (no_xmltvid_q.isActive() && no_xmltvid_q.numRowsAffected() > 0)
     {
-        while (query1.next())
+        while (no_xmltvid_q.next())
         {
-            chanid = source.id * 1000 + query1.value(3).toString().toInt();
+            // Get the important info from our first query
+            QString xmltvid  = no_xmltvid_q.value(0).toString();
+            QString callsign = no_xmltvid_q.value(1).toString();
+            QString name     = no_xmltvid_q.value(2).toString();
+            QString channum  = no_xmltvid_q.value(3).toString();
+            int     freqid   = no_xmltvid_q.value(4).toInt();
+            QString minor    = no_xmltvid_q.value(5).toString();
+            QString tvformat = "Default";
+            callsign = (callsign == "") ? name : callsign;
 
-            while(1)
-            {
-                querystr.sprintf("SELECT channum FROM channel WHERE "
-                                 "chanid = %d;", chanid);
-                if (!query.exec(querystr))
-                    break;
-
-                if (query.isActive() && query.numRowsAffected() > 0)
-                    chanid++;
-                else
-                    break;
-            }
-
-            QString xmltvid = query1.value(0).toString();
-            QString callsign = query1.value(1).toString();
-            if (callsign == "")
-                callsign = QString::number(chanid);
-            QString name = query1.value(2).toString();
-            QString channel = query1.value(3).toString();
-            QString freqid = query1.value(4).toString();
-            QString minor = query1.value(5).toString();
-
+            int major = 0, atscsrcid = -9999;
             if (minor != "") 
             {
-                freqid += "-" + minor;
-                channel += "_" + minor; // default channel number
+                major = channum.toInt();
+                atscsrcid = (major << 8) | minor.toInt();
+                tvformat = "atsc";
+                channum += "_" + minor; // default channum number
             }
             else
-                freqid = channel;
+            {
+                freqid = channum.toInt();
+            }
 
-            query.prepare("INSERT INTO channel (chanid,channum,sourceid,"
-                          "callsign, name, xmltvid, freqid, tvformat) "
-                          "VALUES (:CHANID,:CHANNUM,:SOURCEID,:CALLSIGN,"
-                          ":NAME,:XMLTVID,:FREQID,:TVFORMAT);");
+            // First check if channel already in DB, but without xmltvid
+            query.prepare("SELECT chanid FROM channel "
+                          "WHERE sourceid = :SOURCEID AND "
+                          "      (channum=:CHANNUM OR atscsrcid=:ATSCSRCID)");
+            query.bindValue(":SOURCEID",  source.id);
+            query.bindValue(":CHANNUM",   channum);
+            query.bindValue(":ATSCSRCID", atscsrcid);
 
-            query.bindValue(":CHANID", chanid);
-            query.bindValue(":CHANNUM", channel);
-            query.bindValue(":SOURCEID", source.id);
-            query.bindValue(":CALLSIGN", callsign);
-            query.bindValue(":NAME", name);
-            query.bindValue(":XMLTVID", xmltvid);
-            query.bindValue(":FREQID", freqid);
-            query.bindValue(":TVFORMAT", "Default");
-        
-            if (!query.exec())
-                MythContext::DBError("Inserting new channel", query);
+            if (!query.exec() || !query.isActive())
+            {
+                MythContext::DBError(
+                    "Getting chanid of existing channel", query);
+                continue; // go on to next channel without xmltv
+            }
+
+            if (query.size() > 0)
+            {
+                // The channel already exists in DB, at least once,
+                // so set the xmltvid..
+                chan_update_q.prepare(
+                    "UPDATE channel "
+                    "SET xmltvid = :XMLTVID "
+                    "WHERE chanid = :CHANID AND sourceid = :SOURCEID");
+
+                while (query.next())
+                {
+                    uint chanid = query.value(0).toInt();
+                    chan_update_q.bindValue(":CHANID",    chanid);
+                    chan_update_q.bindValue(":XMLTVID",   xmltvid);
+                    chan_update_q.bindValue(":SOURCEID",  source.id);
+                    if (!chan_update_q.exec() || !chan_update_q.isActive())
+                    {
+                        MythContext::DBError(
+                            "Updating XMLTVID of existing channel", chan_update_q);
+                        continue; // go on to next instance of this channel
+                    }
+                }
+                continue; // go on to next channel without xmltv
+            }
+
+            // The channel doesn't exist in the DB, insert it...            
+            int chanid = ChannelUtil::CreateChanID(source.id, channum);
+            if (chanid > 0)
+            {
+                ChannelUtil::CreateChannel(
+                    source.id, chanid,
+                    callsign,  name,
+                    channum,
+                    major,     minor.toInt(),
+                    freqid,    xmltvid,
+                    tvformat);
+            }
         }
     }
 
-
-    if(channel_updates)
+    if (channel_updates)
     {
-
         //
         //  User must pass "--do_channel_update" for this block of code to
         //  execute
         //
 
         MSqlQuery dd_station_info(MSqlQuery::DDCon());
-        dd_station_info.prepare("SELECT callsign, stationname, stationid,"
-                "channel, fccchannelnumber, channelMinor FROM dd_v_station;");
+        dd_station_info.prepare(
+            "SELECT callsign, stationname,      stationid,"
+            "       channel,  fccchannelnumber, channelMinor "
+            "FROM dd_v_station");
         dd_station_info.exec();
 
-        if (dd_station_info.first())
+        if (chan_update_q.size() > 0)
         {
-            MSqlQuery dd_update(MSqlQuery::DDCon());
-            dd_update.prepare("UPDATE channel SET callsign = :CALLSIGN,"
-                    " name = :NAME, channum = :CHANNEL, freqid = :FREQID "
-                    " WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID;");
-            do
+            chan_update_q.prepare(
+                "UPDATE channel "
+                "SET callsign  = :CALLSIGN,  name   = :NAME, "
+                "    channum   = :CHANNEL,   freqid = :FREQID, "
+                "    atscsrcid = :ATSCSRCID "
+                "WHERE xmltvid = :STATIONID AND sourceid = :SOURCEID;");
+        }
+        while (dd_station_info.next())        
+        {
+            QString channel = dd_station_info.value(3).toString();
+            QString freqid = dd_station_info.value(4).toString();
+            QString minor = dd_station_info.value(5).toString();
+
+            uint atscsrcid = 0;
+            if (minor != "")
             {
-                QString channel = dd_station_info.value(3).toString();
-                QString freqid = dd_station_info.value(4).toString();
-                QString minor = dd_station_info.value(5).toString();
+                atscsrcid = (channel.toInt() << 8) | minor.toInt();
+                channel += "_" + minor; // default channel number
+            }
+            else
+            {
+                freqid = channel;
+            }
 
-                if (minor != "")
-                {
-                    freqid += "-" + minor;
-                    channel += "_" + minor; // default channel number
-                }
-                else
-                {
-                    freqid = channel;
-                }
+            chan_update_q.bindValue(":CALLSIGN",  dd_station_info.value(0));
+            chan_update_q.bindValue(":NAME",      dd_station_info.value(1));
+            chan_update_q.bindValue(":STATIONID", dd_station_info.value(2));
+            chan_update_q.bindValue(":CHANNEL",   channel);
+            chan_update_q.bindValue(":SOURCEID",  source.id);
+            chan_update_q.bindValue(":FREQID",    freqid);
+            chan_update_q.bindValue(":ATSCSRCID", atscsrcid);
 
-                dd_update.bindValue(":CALLSIGN", dd_station_info.value(0));
-                dd_update.bindValue(":NAME", dd_station_info.value(1));
-                dd_update.bindValue(":STATIONID", dd_station_info.value(2));
-                dd_update.bindValue(":CHANNEL", channel);
-                dd_update.bindValue(":SOURCEID", source.id);
-                dd_update.bindValue(":FREQID", freqid);
-                if (!dd_update.exec())
-                {
-                    MythContext::DBError("Updating channel table",
-                            dd_update.lastQuery());
-                }
-            } 
-            while (dd_station_info.next());
+            if (!chan_update_q.exec())
+            {
+                MythContext::DBError("Updating channel table",
+                                     chan_update_q.lastQuery());
+            }
         }
     }
 

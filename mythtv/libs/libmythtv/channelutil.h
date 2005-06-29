@@ -40,12 +40,23 @@ class ChannelUtil
 
     static int     GetTuningParams(int mplexid, QString &modulation);
 
-    // Service Stuff
+    // Channel/Service Stuff
+    static int     CreateChanID(uint sourceid, const QString &chan_num);
+    static bool    CreateChannel(uint db_sourceid,
+                                 uint new_channel_id,
+                                 const QString &callsign,
+                                 const QString &service_name,
+                                 const QString &chan_num,
+                                 uint atsc_major_channel,
+                                 uint atsc_minor_channel,
+                                 int  freqid,
+                                 const QString &xmltvid,
+                                 const QString &tvformat);
     static bool    CreateChannel(uint db_mplexid,
                                  uint db_sourceid,
                                  uint new_channel_id,
-                                 QString service_name,
-                                 QString chan_num,
+                                 const QString &service_name,
+                                 const QString &chan_num,
                                  uint service_id,
                                  uint atsc_major_channel,
                                  uint atsc_minor_channel,
@@ -56,8 +67,8 @@ class ChannelUtil
     static bool    UpdateChannel(uint db_mplexid,
                                  uint source_id,
                                  uint channel_id,
-                                 QString service_name,
-                                 QString chan_num,
+                                 const QString &service_name,
+                                 const QString &chan_num,
                                  uint service_id,
                                  uint atsc_major_channel,
                                  uint atsc_minor_channel,
@@ -73,10 +84,8 @@ class ChannelUtil
     static QString GetChanNum(int chanid);
     static int     GetSourceID(int mplexid);
     static QString GetInputName(int sourceid);
-
-
-  //private:
-    static int     FindUnusedChannelID(int sourceid);
+    static QString GetDTVPrivateType(uint networkid, const QString &key,
+                                     const QString sitype = "dvb");
 };
 
 #endif // CHANUTIL_H
