@@ -450,17 +450,41 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
 }
 
 /** \fn SIParser::AddPMT(uint16_t ServiceID)
- *   Adds program number 'ServiceID' to the list of PMT tables on which we will
- *   emit an UpdatePMT() Qt signal.
- *  \param ServiceID The MPEG Program Number in the PAT that we wish to see.
+ *  \brief Adds the pid associated with program number 'ServiceID' to the
+ *         listening list if this is an ATSC stream and adds the pid associated
+ *         with service with service id 'ServiceID' to the listending list if
+ *         this is a DVB stream.
+ *
+ *   If the table standard is ATSC then this adds the pid of the PMT listed
+ *   as program number 'ServiceID' in the PAT to the list of pids we want.
+ *
+ *   If the table standard is DVB then this looks up the program number
+ *   of the service listed with the 'ServiceID' in the SDT, then it looks
+ *   up that program number in the PAT table and adds the associated pid
+ *   to the list of pids we want.
+ *
+ *   Further the pid is identified as carrying a PMT, so a UpdatePMT Qt
+ *   signal is emitted when a table is seen on this pid. Normally this
+ *   signal is connected to the DVBChannel class, which relays the update
+ *   to the DVBCam class which handles decrypting encrypted services.
+ *
+ *  \param ServiceID Either the the MPEG Program Number or the DVB Service ID
  *  \return true on success, false on failure.
  */
 bool SIParser::AddPMT(uint16_t ServiceID)
 {
+    if (SIStandard == SI_STANDARD_ATSC)
+    {
+        SIPARSER(QString("Adding a PMT, #%1 in PAT, to the request list")
+                 .arg(ServiceID));
+    }
+    else
+    {
+        SIPARSER(QString("Adding the Service with ID %1 in the SDT to "
+                         "the request list").arg(ServiceID));
+    }
 
     pthread_mutex_lock(&pmap_lock);
-    SIPARSER(QString("Adding a PMT #%1 in PAT to the request list")
-             .arg(ServiceID, 0, 16));
     Table[PMT]->RequestEmit(ServiceID);
     pthread_mutex_unlock(&pmap_lock);
 
@@ -472,8 +496,10 @@ bool SIParser::AddPMT(uint16_t ServiceID)
  */
 bool SIParser::ReinitSIParser(const QString& si_std, uint service_id)
 {
-    SIPARSER(QString("ReinitSIParser(std %1, service #%2)")
-             .arg(si_std).arg(service_id));
+    SIPARSER(QString("ReinitSIParser(std %1, %2 #%3)")
+             .arg(si_std)
+             .arg((si_std.lower() == "atsc") ? "program" : "service")
+             .arg(service_id));
 
     SISTANDARD std = (si_std.lower() == "atsc") ?
         SI_STANDARD_ATSC : SI_STANDARD_DVB;
