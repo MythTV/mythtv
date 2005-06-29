@@ -602,6 +602,14 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
     if (directrendering)
         avcodec_align_dimensions(enc, &align_width, &align_height);
 
+    if (align_width == 0 && align_height == 0)
+    {
+        align_width = 640;
+        align_height = 480;
+        fps = 29.97;
+        aspect_ratio = 4.0 / 3;
+    }
+
     m_parent->SetVideoParams(align_width, align_height, fps,
                              keyframedist, aspect_ratio, kScan_Detect);
 }
