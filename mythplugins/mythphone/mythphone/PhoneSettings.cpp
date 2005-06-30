@@ -136,6 +136,11 @@ static HostComboBox *TTSVoice()
                  "[a-z]*;[A-Z]*", QDir::Name, QDir::Dirs);
                  // The name filter is to remove "." and ".." directories
     gc->fillSelectionsFromDir(festDir, false);
+
+    festDir = QDir("/usr/share/festival/voices/english/",
+                   "[a-z]*;[A-Z]*", QDir::Name, QDir::Dirs);
+                   // The name filter is to remove "." and ".." directories
+    gc->fillSelectionsFromDir(festDir, false);
 #endif
     gc->setHelpText(QObject::tr("Choose a voice to use from the Text To Speech "
                     "library. "));

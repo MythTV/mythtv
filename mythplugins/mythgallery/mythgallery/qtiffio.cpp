@@ -74,7 +74,7 @@ static toff_t tiff_size(thandle_t handle) {
 /*! \warning always returns MAP_FAILED.
 */
 static int tiff_mmap(thandle_t, tdata_t* ,toff_t* ) {
-  return (int) MAP_FAILED;
+  return (long) MAP_FAILED;
 }
 
 //! QIODevice / libtiff write wrapper

@@ -170,64 +170,165 @@ has_library()
     expr $HAS_IT : "yes" > /dev/null
 }
 
-if test "$opengl" = "default" ; then
+has_header()
+{
+    HPATHS="/usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include /"
+    HAS_IT="no"
+    for HPATH in $HPATHS ; do
+        if test x`ls $HPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
+            HAS_IT="yes"
+        fi
+    done
+    expr $HAS_IT : "yes" > /dev/null
+}
+
+if test "$opengl" != "no" ; then
     opengl="no"
     if has_library libGL.so ; then
         opengl="yes"
     fi
 fi
 
-if test "$fftw_lib3" = "default" ; then
+if test "$fftw_lib3" != "no" ; then
     fftw_lib3="no"
     if has_library libfftw3f_threads.so ; then
         if has_library libfftw3_threads.so ; then
-            fftw_lib3="yes"
+            if has_header fftw3.h ; then
+                fftw_lib3="yes"
+            fi
         fi
     fi
 fi
 
-if test "$fftw_lib" = "default" ; then
+if test "$fftw_lib" != "no" ; then
     fftw_lib="no"
     if has_library libfftw.so ; then
         if has_library librfftw.so ; then
-            fftw_lib="yes"
+            if has_header fftw.h ; then
+                fftw_lib="yes"
+            fi
         fi
     fi
 fi
 
-if test "$sdl" = "default" ; then
+if test "$sdl" != "no" ; then
     sdl="no"
     if test x`which sdl-config` != x ; then
         sdl="yes"
     fi
 fi
 
-if test "$aac" = "default" ; then
+if test "$aac" != "no" ; then
     aac="no"
     if has_library libfaad.so ; then
         if has_library libmp4ff.so ; then
-            aac="yes"
+            if has_header faad.h ; then
+                aac="yes"
+            fi
         fi
     fi
 fi
 
-if test "$transcode" = "default" ; then
+if test "$transcode" != "no" ; then
     transcode="no"
     if has_library libdvdread.so ; then
-        transcode="yes"
+        if has_header dvdread/dvd_reader.h ; then
+            transcode="yes"
+        fi
     fi
 fi
 
 # vcd support detection rutine does here
 
-if test "$exif" = "default" ; then
+if test "$exif" != "no" ; then
     exif="no"
     if has_library libexif.so ; then
-        exif="yes"
+        if has_header libexif/exif-data.h ; then
+            exif="yes"
+        fi
     fi
 fi
 
-# Festival detection rutine goes here
+if test "$music" != "no" ; then
+    mad="no"
+    if has_library libmad.so && has_header mad.h && has_library libid3tag.so && has_header id3tag.h ; then
+        mad="yes"
+    else
+        echo "MythMusic requires libmad and libid3tag."
+    fi 
+
+    vorbis="no"
+    if has_header ogg/ogg.h && has_header vorbis/vorbisenc.h && has_header vorbis/vorbisfile.h && has_header vorbis/codec.h && has_library libogg.so && has_library libvorbisfile.so && has_library libvorbisenc.so && has_library libvorbis.so ; then
+        vorbis="yes"
+    else
+        echo "MythMusic requires vorbis."
+    fi
+
+    flac="no"
+    if has_header FLAC/all.h && has_library libFLAC.so ; then
+        flac="yes"
+    else
+        echo "MythMusic requires FLAC."
+    fi
+
+    cdaudio="no"
+    if has_header cdaudio.h && has_library libcdaudio.so ; then
+        cdaudio="yes"
+    else
+        echo "MythMusic requires libcdaudio."
+    fi
+
+    paranoia="no"
+    if has_header cdda_paranoia.h && has_library libcdda_paranoia.so && has_library libcdda_interface.so ; then
+        paranoia="yes"
+    else
+        echo "MythMusic requires CDDA Paranoia."
+    fi
+
+    mp3lame="no"
+    if has_header lame/lame.h && has_library libmp3lame.so ; then
+        mp3lame="yes"
+    else
+        echo "MythMusic requires the LAME mp3 encoder."
+    fi
+
+    if test "$mad" = "no" -o "$vorbis" = "no" -o "$flac" = "no" -o "$cdaudio" = "no" -o "$paranoia" = "no" -o "$mp3lame" = "no" ; then
+        echo "Disabling MythMusic due to missing dependencies."
+        music="no"
+    fi 
+fi
+
+if test "$gallery" != "no" ; then
+    if has_library libtiff.so && has_header tiffio.h ; then
+        echo -n ""
+    else
+        echo "Disabling MythGallery due to missing libtiff."
+        gallery="no"
+    fi
+fi
+
+if test "$browser" != "no" ; then
+    hasit="no"
+    if has_library libkhtml.so ; then
+        if has_header kde/khtml_part.h  ; then
+           hasit="yes"
+        fi
+        if has_header /opt/kde3/include/khtml_part.h ; then
+           hasit="yes"
+        fi
+   fi
+   if test "$hasit" = "no" ; then
+       echo "Disabling MythBrowser due to missing KDE development packages."
+       browser="no"
+   fi
+fi
+
+if test "$festival" != "no" ; then
+    festival="no"
+    if has_library libFestival.a && has_library libestools.so && has_library libestbase.so && has_library libeststring.so && has_library libtermcap.so && has_header festival/festival.h ; then
+       festival="yes"
+    fi
+fi
 
 if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
 cat << EOF
@@ -590,12 +691,9 @@ if test "$phone" = "yes" ; then
         echo "        FESTIVAL      support will be included in MythPhone"
         echo "#define FESTIVAL_SUPPORT 1" >> ./mythphone/mythphone/config.h
         echo "FESTIVALDIR = /home/paul/Build/festival/festival/" >> ./mythphone/mythphone/config.pro
-        echo "SPEECHTOOLSDIR = /home/paul/Build/festival/speech_tools/" >> ./mythphone/mythphone/config.pro
-        echo "INCLUDEPATH += \$\${FESTIVALDIR}/src/include" >> ./mythphone/mythphone/config.pro
-        echo "INCLUDEPATH += \$\${SPEECHTOOLSDIR}/include" >> ./mythphone/mythphone/config.pro
         echo "DEFINES += FESTIVAL_HOME=\\\"\$\${FESTIVALDIR}\\\"" >> ./mythphone/mythphone/config.pro
-        echo "LIBS += -L\$\${FESTIVALDIR}/src/lib" >> ./mythphone/mythphone/config.pro
-        echo "LIBS += -L\$\${SPEECHTOOLSDIR}/lib" >> ./mythphone/mythphone/config.pro
+        echo "INCLUDEPATH += /usr/include/festival /usr/include/speech_tools" >> ./mythphone/mythphone/config.pro
+        echo "INCLUDEPATH += /usr/local/include/festival /usr/local/include/speech_tools" >> ./mythphone/mythphone/config.pro
         echo "LIBS += -lFestival -lestools -lestbase -leststring -ltermcap" >> ./mythphone/mythphone/config.pro
     fi
 
