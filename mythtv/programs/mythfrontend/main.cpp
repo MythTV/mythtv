@@ -610,7 +610,6 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
                         const char* director, int lenMins, const char* year) 
 {
     int res = -1; 
-    
    
     TV *tv = new TV();
 
@@ -637,16 +636,17 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
     
     pginfo->title = title;
 
-    tv->Playback(pginfo);
-    
+        
     if (tv->Playback(pginfo))
     {
+        
         while (tv->GetState() != kState_None)
         {
             qApp->unlock();
             qApp->processEvents();
             usleep(10000);
             qApp->lock();
+            
         }
     }
     
