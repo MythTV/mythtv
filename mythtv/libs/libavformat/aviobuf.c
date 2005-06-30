@@ -272,7 +272,8 @@ static void fill_buffer(ByteIOContext *s)
         return;
 
     if(s->update_checksum){
-        s->checksum= s->update_checksum(s->checksum, s->checksum_ptr, s->buf_end - s->checksum_ptr);
+        if(s->buf_end > s->checksum_ptr)
+            s->checksum= s->update_checksum(s->checksum, s->checksum_ptr, s->buf_end - s->checksum_ptr);
         s->checksum_ptr= s->buffer;
     }
 
@@ -491,7 +492,7 @@ static int url_read_packet(void *opaque, uint8_t *buf, int buf_size)
     return url_read(h, buf, buf_size);
 }
 
-static offset_t url_seek_packet(void *opaque, int64_t offset, int whence)
+static offset_t url_seek_packet(void *opaque, offset_t offset, int whence)
 {
     URLContext *h = opaque;
     return url_seek(h, offset, whence);
@@ -701,7 +702,7 @@ static int dyn_packet_buf_write(void *opaque, uint8_t *buf, int buf_size)
     return dyn_buf_write(opaque, buf, buf_size);
 }
 
-static int dyn_buf_seek(void *opaque, offset_t offset, int whence)
+static offset_t dyn_buf_seek(void *opaque, offset_t offset, int whence)
 {
     DynBuffer *d = opaque;
 

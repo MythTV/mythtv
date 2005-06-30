@@ -50,6 +50,7 @@ void ff_fdct_mmx(DCTELEM *block);
 void ff_fdct_mmx2(DCTELEM *block);
 void ff_fdct_sse2(DCTELEM *block);
 
+void ff_h264_idct8_add_c(uint8_t *dst, DCTELEM *block, int stride);
 void ff_h264_idct_add_c(uint8_t *dst, DCTELEM *block, int stride);
 void ff_h264_lowres_idct_add_c(uint8_t *dst, int stride, DCTELEM *block);
 void ff_h264_lowres_idct_put_c(uint8_t *dst, int stride, DCTELEM *block);
@@ -140,6 +141,8 @@ typedef struct DSPContext {
     void (*put_pixels_clamped)(const DCTELEM *block/*align 16*/, uint8_t *pixels/*align 8*/, int line_size);
     void (*put_signed_pixels_clamped)(const DCTELEM *block/*align 16*/, uint8_t *pixels/*align 8*/, int line_size);
     void (*add_pixels_clamped)(const DCTELEM *block/*align 16*/, uint8_t *pixels/*align 8*/, int line_size);
+    void (*add_pixels8)(uint8_t *pixels, DCTELEM *block, int line_size);
+    void (*add_pixels4)(uint8_t *pixels, DCTELEM *block, int line_size);
     /**
      * translational global motion compensation.
      */
@@ -325,6 +328,7 @@ typedef struct DSPContext {
 #define RECON_SHIFT 6
  
     void (*h264_idct_add)(uint8_t *dst, DCTELEM *block, int stride);
+    void (*h264_idct8_add)(uint8_t *dst, DCTELEM *block, int stride);
 } DSPContext;
 
 void dsputil_static_init(void);
@@ -427,6 +431,10 @@ void dsputil_init_pix_mmx(DSPContext* c, AVCodecContext *avctx);
    line optimizations */
 #define __align8 __attribute__ ((aligned (4)))
 #define STRIDE_ALIGN 4
+
+#define MM_IWMMXT    0x0100 /* XScale IWMMXT */
+
+extern int mm_flags;
 
 void dsputil_init_armv4l(DSPContext* c, AVCodecContext *avctx);
 

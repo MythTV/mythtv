@@ -335,7 +335,7 @@ static int asf_read_header(AVFormatContext *s, AVFormatParameters *ap)
                                 if (strcmp(name,"WM/AlbumTitle")==0) { pstrcpy(s->album, sizeof(s->album), value); }
                                 av_free(value);
                         }
-                        if ((value_type >= 2) || (value_type <= 5)) // boolean or DWORD or QWORD or WORD
+                        if ((value_type >= 2) && (value_type <= 5)) // boolean or DWORD or QWORD or WORD
                         {
                                 if (value_type==2) value_num = get_le32(pb);
                                 if (value_type==3) value_num = get_le32(pb);
@@ -604,6 +604,7 @@ static int asf_read_packet(AVFormatContext *s, AVPacket *pkt)
 	    asf_st->seq = asf->packet_seq;
 	    asf_st->pkt.pts = asf->packet_frag_timestamp;
 	    asf_st->pkt.stream_index = asf->stream_index;
+            asf_st->pkt.pos = 
             asf_st->packet_pos= asf->packet_pos;            
 //printf("new packet: stream:%d key:%d packet_key:%d audio:%d size:%d\n", 
 //asf->stream_index, asf->packet_key_frame, asf_st->pkt.flags & PKT_FLAG_KEY,

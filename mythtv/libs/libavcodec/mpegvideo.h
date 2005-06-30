@@ -181,7 +181,7 @@ typedef struct Picture{
     uint16_t *mb_var;           ///< Table for MB variances 
     uint16_t *mc_mb_var;        ///< Table for motion compensated MB variances 
     uint8_t *mb_mean;           ///< Table for MB luminance 
-    int32_t *mb_cmp_score;	///< Table for MB cmp scores, for mb decission FIXME remove
+    int32_t *mb_cmp_score;	///< Table for MB cmp scores, for mb decision FIXME remove
     int b_frame_score;          /* */
 } Picture;
 
@@ -292,10 +292,10 @@ typedef struct MpegEncContext {
     int b_frames_since_non_b;  ///< used for encoding, relative to not yet reordered input 
     int64_t user_specified_pts;///< last non zero pts from AVFrame which was passed into avcodec_encode_video()
     int mb_width, mb_height;   ///< number of MBs horizontally & vertically 
-    int mb_stride;             ///< mb_width+1 used for some arrays to allow simple addressng of left & top MBs withoutt sig11
-    int b8_stride;             ///< 2*mb_width+1 used for some 8x8 block arrays to allow simple addressng
-    int b4_stride;             ///< 4*mb_width+1 used for some 4x4 block arrays to allow simple addressng
-    int h_edge_pos, v_edge_pos;///< horizontal / vertical position of the right/bottom edge (pixel replicateion)
+    int mb_stride;             ///< mb_width+1 used for some arrays to allow simple addressing of left & top MBs without sig11
+    int b8_stride;             ///< 2*mb_width+1 used for some 8x8 block arrays to allow simple addressing
+    int b4_stride;             ///< 4*mb_width+1 used for some 4x4 block arrays to allow simple addressing
+    int h_edge_pos, v_edge_pos;///< horizontal / vertical position of the right/bottom edge (pixel replication)
     int mb_num;                ///< number of MBs of a picture 
     int linesize;              ///< line size, in bytes, may be different from width 
     int uvlinesize;            ///< line size, for chroma in bytes, may be different from width 
@@ -340,8 +340,8 @@ typedef struct MpegEncContext {
     int16_t *dc_val[3];            ///< used for mpeg4 DC prediction, all 3 arrays must be continuous 
     int16_t dc_cache[4*5];
     int y_dc_scale, c_dc_scale;
-    uint8_t *y_dc_scale_table;     ///< qscale -> y_dc_scale table 
-    uint8_t *c_dc_scale_table;     ///< qscale -> c_dc_scale table 
+    const uint8_t *y_dc_scale_table;     ///< qscale -> y_dc_scale table 
+    const uint8_t *c_dc_scale_table;     ///< qscale -> c_dc_scale table 
     const uint8_t *chroma_qscale_table;  ///< qscale -> chroma_qscale (h263)
     uint8_t *coded_block_base;
     uint8_t *coded_block;          ///< used for coded block pattern prediction (msmpeg4v3, wmv1)
@@ -358,7 +358,7 @@ typedef struct MpegEncContext {
     uint8_t *pred_dir_table;      ///< used to store pred_dir for partitioned decoding 
     uint8_t *allocated_edge_emu_buffer;
     uint8_t *edge_emu_buffer;     ///< points into the middle of allocated_edge_emu_buffer
-    uint8_t *rd_scratchpad;       ///< scartchpad for rate distortion mb decission
+    uint8_t *rd_scratchpad;       ///< scratchpad for rate distortion mb decision
     uint8_t *obmc_scratchpad;
     uint8_t *b_scratchpad;        ///< scratchpad used for writing into write only buffers
 
@@ -380,7 +380,7 @@ typedef struct MpegEncContext {
     int h263_long_vectors;      ///< use horrible h263v1 long vector mode 
     int decode;                 ///< if 0 then decoding will be skipped (for encoding b frames for example)
 
-    DSPContext dsp;             ///< pointers for accelerated dsp fucntions 
+    DSPContext dsp;             ///< pointers for accelerated dsp functions
     int f_code;                 ///< forward MV resolution 
     int b_code;                 ///< backward MV resolution for B Frames (mpeg4) 
     int16_t (*p_mv_table_base)[2];
@@ -820,7 +820,7 @@ int inline ff_get_mb_score(MpegEncContext * s, int mx, int my, int src_index,
 /* mpeg12.c */
 extern const int16_t ff_mpeg1_default_intra_matrix[64];
 extern const int16_t ff_mpeg1_default_non_intra_matrix[64];
-extern uint8_t ff_mpeg1_dc_scale_table[128];
+extern const uint8_t ff_mpeg1_dc_scale_table[128];
 
 void mpeg1_encode_picture_header(MpegEncContext *s, int picture_number);
 void mpeg1_encode_mb(MpegEncContext *s,
@@ -860,9 +860,9 @@ static inline int get_rl_index(const RLTable *rl, int last, int run, int level)
     return index + level - 1;
 }
 
-extern uint8_t ff_mpeg4_y_dc_scale_table[32];
-extern uint8_t ff_mpeg4_c_dc_scale_table[32];
-extern uint8_t ff_aic_dc_scale_table[32];
+extern const uint8_t ff_mpeg4_y_dc_scale_table[32];
+extern const uint8_t ff_mpeg4_c_dc_scale_table[32];
+extern const uint8_t ff_aic_dc_scale_table[32];
 extern const int16_t ff_mpeg4_default_intra_matrix[64];
 extern const int16_t ff_mpeg4_default_non_intra_matrix[64];
 extern const uint8_t ff_h263_chroma_qscale_table[32];

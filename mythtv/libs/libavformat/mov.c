@@ -253,9 +253,6 @@ typedef struct MOVStreamContext {
     int time_scale;
     long current_sample;
     long left_in_chunk; /* how many samples before next chunk */
-    /* specific MPEG4 header which is added at the beginning of the stream */
-    unsigned int header_len;
-    uint8_t *header_data;
     MOV_esds_t esds;
 } MOVStreamContext;
 
@@ -655,7 +652,7 @@ static int mov_read_mdhd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
 #ifdef DEBUG
     av_log(NULL, AV_LOG_DEBUG, "track[%i].time_scale = %i\n", c->fc->nb_streams-1, c->streams[c->fc->nb_streams-1]->time_scale); /* time scale */
 #endif
-    get_be32(pb); /* duration */
+    c->fc->streams[c->fc->nb_streams-1]->duration= get_be32(pb); /* duration */
 
     get_be16(pb); /* language */
     get_be16(pb); /* quality */
@@ -1341,44 +1338,20 @@ av_log(NULL, AV_LOG_DEBUG, "track[%i].stts.entries = %i\n", c->fc->nb_streams-1,
         sample_duration = get_be32(pb);
         c->streams[c->fc->nb_streams - 1]->stts_data[i].count= sample_count;
         c->streams[c->fc->nb_streams - 1]->stts_data[i].duration= sample_duration;
+
 #ifdef DEBUG
         av_log(NULL, AV_LOG_DEBUG, "sample_count=%d, sample_duration=%d\n",sample_count,sample_duration);
 #endif
         duration+=sample_duration*sample_count;
         total_sample_count+=sample_count;
-
-#if 0 //We calculate an average instead, needed by .mp4-files created with nec e606 3g phone
-
-        if (!i && st->codec.codec_type==CODEC_TYPE_VIDEO) {
-            st->codec.time_base.num = sample_duration ? sample_duration : 1;
-            st->codec.time_base.den = c->streams[c->fc->nb_streams-1]->time_scale;
-#ifdef DEBUG
-            av_log(NULL, AV_LOG_DEBUG, "VIDEO FRAME RATE= %i (sd= %i)\n", st->codec.time_base.den, sample_duration);
-#endif
-        }
-#endif
     }
 
-    /*The stsd atom which contain codec type sometimes comes after the stts so we cannot check for codec_type*/
-    if(duration>0)
-    {
-        av_reduce(
-            &st->codec.time_base.den, 
-            &st->codec.time_base.num, 
-            c->streams[c->fc->nb_streams-1]->time_scale * total_sample_count,
-            duration,
-            INT_MAX
-        );
-
-#ifdef DEBUG
-        av_log(NULL, AV_LOG_DEBUG, "FRAME RATE average (video or audio)= %f (tot sample count= %i ,tot dur= %i timescale=%d)\n", (float)st->codec.time_base.den/st->codec.time_base.num,total_sample_count,duration,c->streams[c->fc->nb_streams-1]->time_scale);
-#endif
-    }
-    else
-    {
-        st->codec.time_base.num = 1;
-        st->codec.time_base.den = c->streams[c->fc->nb_streams-1]->time_scale;
-    }
+    av_set_pts_info(st, 64, 1, c->streams[c->fc->nb_streams-1]->time_scale);
+//    st->codec.time_base.num = 1;
+//    st->codec.time_base.den = c->streams[c->fc->nb_streams-1]->time_scale;
+    st->nb_frames= total_sample_count;
+    if(duration)
+        st->duration= duration;
     return 0;
 }
 
@@ -1428,7 +1401,6 @@ static int mov_read_trak(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
     st->priv_data = sc;
     st->codec.codec_type = CODEC_TYPE_MOV_OTHER;
     st->start_time = 0; /* XXX: check */
-    st->duration = (c->duration * (int64_t)AV_TIME_BASE) / c->time_scale;
     c->streams[c->fc->nb_streams-1] = sc;
 
     return mov_read_default(c, pb, atom);
@@ -1458,7 +1430,7 @@ static int mov_read_tkhd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
     st->id = (int)get_be32(pb); /* track id (NOT 0 !)*/
     get_be32(pb); /* reserved */
     st->start_time = 0; /* check */
-    st->duration = (get_be32(pb) * (int64_t)AV_TIME_BASE) / c->time_scale; /* duration */
+    get_be32(pb); /* highlevel (considering edits) duration in movie timebase */
     get_be32(pb); /* reserved */
     get_be32(pb); /* reserved */
 
@@ -1470,8 +1442,8 @@ static int mov_read_tkhd(MOVContext *c, ByteIOContext *pb, MOV_atom_t atom)
     url_fskip(pb, 36); /* display matrix */
 
     /* those are fixed-point */
-    st->codec.width = get_be32(pb) >> 16; /* track width */
-    st->codec.height = get_be32(pb) >> 16; /* track height */
+    /*st->codec.width =*/ get_be32(pb) >> 16; /* track width */
+    /*st->codec.height =*/ get_be32(pb) >> 16; /* track height */
 
     return 0;
 }
@@ -1672,7 +1644,6 @@ static void mov_free_stream_context(MOVStreamContext *sc)
         av_freep(&sc->sample_to_chunk);
         av_freep(&sc->sample_sizes);
         av_freep(&sc->keyframes);
-        av_freep(&sc->header_data);
         av_freep(&sc->stts_data);        
         av_freep(&sc->ctts_data);        
         av_freep(&sc);
@@ -1974,18 +1945,7 @@ readchunk:
         return -1;
     url_fseek(&s->pb, offset, SEEK_SET);
 
-    //av_log(NULL, AV_LOG_DEBUG, "READCHUNK hlen: %d  %d off: %Ld   pos:%Ld\n", size, sc->header_len, offset, url_ftell(&s->pb));
-    if (sc->header_len > 0) {
-        av_new_packet(pkt, size + sc->header_len);
-        memcpy(pkt->data, sc->header_data, sc->header_len);
-        get_buffer(&s->pb, pkt->data + sc->header_len, size);
-        /* free header */
-        av_freep(&sc->header_data);
-        sc->header_len = 0;
-    } else {
-        av_new_packet(pkt, size);
-        get_buffer(&s->pb, pkt->data, pkt->size);
-    }
+    av_get_packet(&s->pb, pkt, size);
     pkt->stream_index = sc->ffindex;
     
     // If the keyframes table exists, mark any samples that are in the table as key frames.
@@ -2048,12 +2008,8 @@ readchunk:
             pts = dts + duration;
         }else
             pts = dts;
-        pkt->pts = av_rescale( pts,
-                         (int64_t)s->streams[sc->ffindex]->time_base.den,
-                         (int64_t)sc->time_scale * (int64_t)s->streams[sc->ffindex]->time_base.num );
-        pkt->dts = av_rescale( dts,
-                         (int64_t)s->streams[sc->ffindex]->time_base.den,
-                         (int64_t)sc->time_scale * (int64_t)s->streams[sc->ffindex]->time_base.num );
+        pkt->pts = pts;
+        pkt->dts = dts;
 #ifdef DEBUG
     av_log(NULL, AV_LOG_DEBUG, "stream #%d smp #%ld dts = %lld pts = %lld (smp:%ld time:%lld idx:%d ent:%d count:%d dur:%d)\n"
       , pkt->stream_index, sc->current_sample-1, pkt->dts, pkt->pts
@@ -2073,12 +2029,11 @@ readchunk:
 /**
  * Seek method based on the one described in the Appendix C of QTFileFormat.pdf
  */
-static int mov_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp, int flags)
+static int mov_read_seek(AVFormatContext *s, int stream_index, int64_t sample_time, int flags)
 {
     MOVContext* mov = (MOVContext *) s->priv_data;
     MOVStreamContext* sc;
     int32_t i, a, b, m;
-    int64_t sample_time;
     int64_t start_time;
     int32_t seek_sample, sample;
     int32_t duration;
@@ -2115,10 +2070,6 @@ static int mov_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
 #ifdef DEBUG
   av_log(s, AV_LOG_DEBUG, "Searching for time %li in stream #%i (time_scale=%i)\n", (long)timestamp, mov_idx, sc->time_scale);
 #endif
-    // convert timestamp from time_base unit to timescale unit
-    sample_time = av_rescale( timestamp,
-                            (int64_t)sc->time_scale * s->streams[stream_index]->time_base.num,
-                            (int64_t)s->streams[stream_index]->time_base.den);
     start_time = 0; // FIXME use elst atom
     sample = 1; // sample are 0 based in table
 #ifdef DEBUG

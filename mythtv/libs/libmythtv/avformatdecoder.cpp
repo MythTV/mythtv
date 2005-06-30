@@ -1207,7 +1207,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
         // if we don't have an entry, fill it in with what we've just parsed
         if (framesRead > last_frame && keyframedist > 0)
         {
-            long long startpos = pkt->startpos;
+            long long startpos = pkt->pos;
             VERBOSE(VB_PLAYBACK, QString("positionMap[ %1 ] == %2.").arg(prevgoppos / keyframedist)
                                          .arg((int)startpos));
 
@@ -1224,7 +1224,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
         // length based on the actual bitrate seen so far
         if (framesRead > 150 && !recordingHasPositionMap && !livetv)
         {
-            bitrate = (int)((pkt->startpos * 8 * fps) / (framesRead - 1));
+            bitrate = (int)((pkt->pos * 8 * fps) / (framesRead - 1));
             float bytespersec = (float)bitrate / 8;
             float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
             m_parent->SetFileLength((int)(secs), (int)(secs * fps));

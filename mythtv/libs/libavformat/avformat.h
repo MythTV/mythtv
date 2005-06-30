@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define LIBAVFORMAT_BUILD       4624
+#define LIBAVFORMAT_BUILD       4628
 
 #define LIBAVFORMAT_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVFORMAT_VERSION     FFMPEG_VERSION
@@ -28,36 +28,36 @@ extern "C" {
 #endif
 
 typedef struct AVPacket {
-    int64_t pts; /* presentation time stamp in AV_TIME_BASE units (or
-                    pts_den units in muxers or demuxers) */
-    int64_t dts; /* decompression time stamp in AV_TIME_BASE units (or
-                    pts_den units in muxers or demuxers) */
+    int64_t pts;                            ///< presentation time stamp in time_base units
+    int64_t dts;                            ///< decompression time stamp in time_base units
     uint8_t *data;
     int   size;
     int   stream_index;
     int   flags;
-    int   duration; /* presentation duration (0 if not available) */
-    int64_t startpos;
+    int   duration;                         ///< presentation duration in time_base units (0 if not available)
     void  (*destruct)(struct AVPacket *);
     void  *priv;
+    int64_t pos;                            ///< byte position in stream, -1 if unknown
 } AVPacket; 
 #define PKT_FLAG_KEY   0x0001
 
 void av_destruct_packet_nofree(AVPacket *pkt);
+void av_destruct_packet(AVPacket *pkt);
 
 /* initialize optional fields of a packet */
 static inline void av_init_packet(AVPacket *pkt)
 {
     pkt->pts   = AV_NOPTS_VALUE;
     pkt->dts   = AV_NOPTS_VALUE;
+    pkt->pos   = -1;
     pkt->duration = 0;
     pkt->flags = 0;
     pkt->stream_index = 0;
-    pkt->startpos = 0;
     pkt->destruct= av_destruct_packet_nofree;
 }
 
 int av_new_packet(AVPacket *pkt, int size);
+int av_get_packet(ByteIOContext *s, AVPacket *pkt, int size);
 int av_dup_packet(AVPacket *pkt);
 
 /**
@@ -108,7 +108,7 @@ typedef struct AVFormatParameters {
     enum PixelFormat pix_fmt;
     struct AVImageFormat *image_format;
     int channel; /* used to select dv channel */
-    const char *device; /* video4linux, audio or DV device */
+    const char *device; /* video, audio or DV device */
     const char *standard; /* tv standard, NTSC, PAL, SECAM */
     int mpeg2ts_raw:1;  /* force raw MPEG2 transport stream output, if possible */
     int mpeg2ts_compute_pcr:1; /* compute exact PCR for each transport
@@ -226,7 +226,12 @@ typedef struct AVStream {
     int index;    /* stream index in AVFormatContext */
     int id;       /* format specific stream id */
     AVCodecContext codec; /* codec context */
-    AVRational r_frame_rate;     /* real frame rate of the stream */
+    /**
+     * real base frame rate of the stream.
+     * for example if the timebase is 1/90000 and all frames have either 
+     * approximately 3600 or 1800 timer ticks then r_frame_rate will be 50/1
+     */
+    AVRational r_frame_rate;
     void *priv_data;
     /* internal data used in av_find_stream_info() */
     int64_t codec_info_duration;     
@@ -249,6 +254,8 @@ typedef struct AVStream {
        seconds. */
     int64_t duration;
 
+    char language[4]; /* ISO 639 3-letter language code (empty string if undefined) */
+
     /* av_read_frame() support */
     int need_parsing;
     struct AVCodecParserContext *parser;
@@ -261,6 +268,8 @@ typedef struct AVStream {
                                     support seeking natively */
     int nb_index_entries;
     int index_entries_allocated_size;
+    
+    int64_t nb_frames;                 ///< number of frames in this stream if known or 0
 
     int got_frame;
     int64_t cur_frame_startpos;
@@ -333,6 +342,12 @@ typedef struct AVFormatContext {
     int build_index;
     void (*streams_changed)(void*);
     void *stream_change_data;
+
+#define AVFMT_NOOUTPUTLOOP -1 
+#define AVFMT_INFINITEOUTPUTLOOP 0 
+    /* number of times to loop output in formats that support it */
+    int loop_output;
+    
 } AVFormatContext;
 
 typedef struct AVPacketList {

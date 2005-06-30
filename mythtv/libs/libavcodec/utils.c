@@ -583,11 +583,20 @@ int avcodec_encode_video(AVCodecContext *avctx, uint8_t *buf, int buf_size,
     if((avctx->codec->capabilities & CODEC_CAP_DELAY) || pict){
         int ret = avctx->codec->encode(avctx, buf, buf_size, (void *)pict);
         avctx->frame_number++;
-        emms_c(); //needed to avoid a emms_c() call before every return;
+        emms_c(); //needed to avoid an emms_c() call before every return;
     
         return ret;
     }else
         return 0;
+}
+
+int avcodec_encode_subtitle(AVCodecContext *avctx, uint8_t *buf, int buf_size, 
+                            const AVSubtitle *sub)
+{
+    int ret;
+    ret = avctx->codec->encode(avctx, buf, buf_size, (void *)sub);
+    avctx->frame_number++;
+    return ret;
 }
 
 /** 
@@ -612,7 +621,7 @@ int avcodec_decode_video(AVCodecContext *avctx, AVFrame *picture,
         ret = avctx->codec->decode(avctx, picture, got_picture_ptr, 
                                 buf, buf_size);
 
-        emms_c(); //needed to avoid a emms_c() call before every return;
+        emms_c(); //needed to avoid an emms_c() call before every return;
     
         if (*got_picture_ptr)                           
             avctx->frame_number++;
@@ -636,6 +645,23 @@ int avcodec_decode_audio(AVCodecContext *avctx, int16_t *samples,
     ret = avctx->codec->decode(avctx, samples, frame_size_ptr, 
                                buf, buf_size);
     avctx->frame_number++;
+    return ret;
+}
+
+/* decode a subtitle message. return -1 if error, otherwise return the
+   *number of bytes used. If no subtitle could be decompressed,
+   *got_sub_ptr is zero. Otherwise, the subtitle is stored in *sub. */
+int avcodec_decode_subtitle(AVCodecContext *avctx, AVSubtitle *sub,
+                            int *got_sub_ptr,
+                            const uint8_t *buf, int buf_size)
+{
+    int ret;
+
+    *got_sub_ptr = 0;
+    ret = avctx->codec->decode(avctx, sub, got_sub_ptr, 
+                               (uint8_t *)buf, buf_size);
+    if (*got_sub_ptr)
+        avctx->frame_number++;
     return ret;
 }
 
@@ -808,6 +834,10 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
         snprintf(buf, buf_size, "Data: %s", codec_name);
         bitrate = enc->bit_rate;
         break;
+    case CODEC_TYPE_SUBTITLE:
+        snprintf(buf, buf_size, "Subtitle: %s", codec_name);
+        bitrate = enc->bit_rate;
+        break;
     default:
         snprintf(buf, buf_size, "Invalid Codec type %d", enc->codec_type);
         return;
@@ -961,7 +991,7 @@ int64_t ff_gcd(int64_t a, int64_t b){
 
 /* av_log API */
 
-static int av_log_level = AV_LOG_DEBUG;
+static int av_log_level = AV_LOG_INFO;
 
 static void av_log_default_callback(void* ptr, int level, const char* fmt, va_list vl)
 {

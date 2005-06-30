@@ -921,7 +921,7 @@ static void mpegts_push_data(void *opaque,
                     pkt->stream_index = pes->st->index;
                     pkt->pts = pes->pts;
                     pkt->dts = pes->dts;
-                    pkt->startpos = pes->startpos;
+                    pkt->pos = pes->startpos;
                     /* reset pts values */
                     pes->pts = AV_NOPTS_VALUE;
                     pes->dts = AV_NOPTS_VALUE;
@@ -1281,7 +1281,7 @@ static int mpegts_read_header(AVFormatContext *s,
             av_log(NULL, AV_LOG_ERROR, "mpegts_read_header: av_new_stream() failed\n");
             goto fail;
         }
-        av_set_pts_info(st, 60, 1, 27000000);
+        av_set_pts_info(st, 33, 1, 90000);
         st->codec.codec_type = CODEC_TYPE_DATA;
         st->codec.codec_id = CODEC_ID_MPEG2TS;
         

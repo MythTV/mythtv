@@ -199,7 +199,7 @@ AVInputFormat *av_find_input_format(const char *short_name)
 /**
  * @brief Default packet destructor.
  */
-static void av_destruct_packet(AVPacket *pkt)
+void av_destruct_packet(AVPacket *pkt)
 {
     av_free(pkt->data);
     pkt->data = NULL; pkt->size = 0;
@@ -228,6 +228,31 @@ int av_new_packet(AVPacket *pkt, int size)
     pkt->size = size;
     pkt->destruct = av_destruct_packet;
     return 0;
+}
+
+/**
+ * Allocate and read the payload of a packet and intialized its fields to default values.
+ *
+ * @param pkt packet
+ * @param size wanted payload size
+ * @return >0 (read size) if OK. AVERROR_xxx otherwise.
+ */
+int av_get_packet(ByteIOContext *s, AVPacket *pkt, int size)
+{
+    int ret= av_new_packet(pkt, size);
+
+    if(ret<0)
+        return ret;
+
+    pkt->pos= url_ftell(s);
+
+    ret= get_buffer(s, pkt->data, size);
+    if(ret<=0)
+        av_free_packet(pkt);
+    else
+        pkt->size= ret;
+
+    return ret;
 }
 
 /**
@@ -915,7 +940,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
         /* select current input stream component */
         st = s->cur_st;
         if (st) {
-            if (!st->parser) {
+            if (!st->need_parsing || !st->parser) {
                 /* no parsing needed: we just output the packet as is */
                 /* raw data support */
                 *pkt = s->cur_pkt;
@@ -924,7 +949,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 return 0;
             } else if (s->cur_len > 0 && st->discard < AVDISCARD_ALL) {
                 if (!st->got_frame) {
-                    st->cur_frame_startpos = s->cur_pkt.startpos;
+                    st->cur_frame_startpos = s->cur_pkt.pos;
                     st->got_frame = 1;
                 }
                 len = av_parser_parse(st->parser, &st->codec, &pkt->data, &pkt->size, 
@@ -944,7 +969,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                     pkt->pts = st->parser->pts;
                     pkt->dts = st->parser->dts;
                     pkt->destruct = av_destruct_packet_nofree;
-                    pkt->startpos = st->cur_frame_startpos;
+                    pkt->pos = st->cur_frame_startpos;
                     compute_pkt_fields(s, st, st->parser, pkt);
                     st->got_frame = 0;
                     return 0;
@@ -956,7 +981,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
             }
         } else {
             startpos = url_ftell(&s->pb);
-            s->cur_pkt.startpos = 0;
+            s->cur_pkt.pos = 0;
 
             /* read next packet */
             ret = av_read_packet(s, &s->cur_pkt);
@@ -966,7 +991,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 /* return the last frames, if any */
                 for(i = 0; i < s->nb_streams; i++) {
                     st = s->streams[i];
-                    if (st->parser) {
+                    if (st->parser && st->need_parsing) {
                         av_parser_parse(st->parser, &st->codec, 
                                         &pkt->data, &pkt->size, 
                                         NULL, 0, 
@@ -979,8 +1004,8 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 return ret;
             }
 
-            if (s->cur_pkt.startpos == 0)
-                s->cur_pkt.startpos = startpos;
+            if (s->cur_pkt.pos == 0)
+                s->cur_pkt.pos = startpos;
 
             st = s->streams[s->cur_pkt.stream_index];
             if (st) {
@@ -1819,15 +1844,17 @@ static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
 {
     int16_t *samples;
     AVCodec *codec;
-    int got_picture, ret;
+    int got_picture, ret=0;
     AVFrame picture;
-    
+
+  if(!st->codec.codec){    
     codec = avcodec_find_decoder(st->codec.codec_id);
     if (!codec)
         return -1;
     ret = avcodec_open(&st->codec, codec);
     if (ret < 0)
         return ret;
+  }
 
   if(!has_codec_parameters(&st->codec)){
     switch(st->codec.codec_type) {
@@ -1848,7 +1875,6 @@ static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
     }
   }
  fail:
-    avcodec_close(&st->codec);
     return ret;
 }
 
@@ -1856,7 +1882,7 @@ static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
 #define MAX_READ_SIZE        5000000
 
 /** Maximum duration until we stop analysing the stream. */
-#define MAX_STREAM_DURATION  ((int)(AV_TIME_BASE * 1.0))
+#define MAX_STREAM_DURATION  ((int)(AV_TIME_BASE * 2.0))
 
 /**
  * @brief Read the beginning of a media file to get stream information.
@@ -1887,6 +1913,10 @@ int av_find_stream_info(AVFormatContext *ic)
             if(!st->codec.time_base.num)
                 st->codec.time_base= st->time_base;
         }
+        //only for the split stuff
+        if (!st->parser) {
+            st->parser = av_parser_init(st->codec.codec_id);
+        }
     }
 
     for(i=0;i<MAX_STREAMS;i++){
@@ -1906,6 +1936,8 @@ int av_find_stream_info(AVFormatContext *ic)
             /* variable fps and no guess at the real fps */
             if(   st->codec.time_base.den >= 1000LL*st->codec.time_base.num
                && duration_count[i]<20 && st->codec.codec_type == CODEC_TYPE_VIDEO)
+                break;
+            if(st->parser && st->parser->parser->split && !st->codec.extradata)
                 break;
         }
 
@@ -1982,11 +2014,20 @@ int av_find_stream_info(AVFormatContext *ic)
                     duration_sum[index] += duration;
                     duration_count[index]+= factor;
                 }
-                if(st->codec_info_nb_frames == 0)
+                if(st->codec_info_nb_frames == 0 && 0)
                     st->codec_info_duration += duration;
             }
             last_dts[pkt->stream_index]= pkt->dts;
         }
+        if(st->parser && st->parser->parser->split && !st->codec.extradata){
+            int i= st->parser->parser->split(&st->codec, pkt->data, pkt->size);
+            if(i){
+                st->codec.extradata_size= i;
+                st->codec.extradata= av_malloc(st->codec.extradata_size);
+                memcpy(st->codec.extradata, pkt->data, st->codec.extradata_size);
+            }
+        }
+
         /* if still no information, we try to open the codec and to
            decompress the frame. We try to avoid that in most cases as
            it takes longer and uses more memory. For MPEG4, we need to
@@ -2014,6 +2055,12 @@ int av_find_stream_info(AVFormatContext *ic)
         count++;
     }
 
+    // close codecs which where opened in try_decode_frame()
+    for(i=0;i<ic->nb_streams;i++) {
+        st = ic->streams[i];
+        if(st->codec.codec)
+            avcodec_close(&st->codec);
+    }
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
         if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
@@ -2412,6 +2459,8 @@ int av_write_frame(AVFormatContext *s, AVPacket *pkt)
 
 /**
  * @brief interleave_packet implementation which will interleave per DTS.
+ * packets with pkt->destruct == av_destruct_packet will be freed inside this function.
+ * so they cannot be used after it, note calling av_free_packet() on them is still safe
  */
 static int av_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out, AVPacket *pkt, int flush){
     AVPacketList *pktl, **next_point, *this_pktl;
@@ -2421,11 +2470,14 @@ static int av_interleave_packet_per_dts(AVFormatContext *s, AVPacket *out, AVPac
     if(pkt){
         AVStream *st= s->streams[ pkt->stream_index];
 
-        assert(pkt->destruct != av_destruct_packet); //FIXME
+//        assert(pkt->destruct != av_destruct_packet); //FIXME
 
         this_pktl = av_mallocz(sizeof(AVPacketList));
         this_pktl->pkt= *pkt;
-        av_dup_packet(&this_pktl->pkt);
+        if(pkt->destruct == av_destruct_packet)
+            pkt->destruct= NULL; // non shared -> must keep original from being freed
+        else
+            av_dup_packet(&this_pktl->pkt);  //shared -> must dup
 
         next_point = &s->packet_buffer;
         while(*next_point){
@@ -2577,14 +2629,13 @@ void dump_format(AVFormatContext *ic,
     int i, flags;
     char buf[256];
 
-    av_log(NULL, AV_LOG_DEBUG, "%s #%d, %s, %s '%s':\n", 
+    av_log(NULL, AV_LOG_INFO, "%s #%d, %s, %s '%s':\n", 
             is_output ? "Output" : "Input",
             index, 
             is_output ? ic->oformat->name : ic->iformat->name, 
             is_output ? "to" : "from", url);
     if (!is_output) {
-/*
-        av_log(NULL, AV_LOG_DEBUG, "  Duration: ");
+        av_log(NULL, AV_LOG_INFO, "  Duration: ");
         if (ic->duration != AV_NOPTS_VALUE) {
             int hours, mins, secs, us;
             secs = ic->duration / AV_TIME_BASE;
@@ -2593,32 +2644,31 @@ void dump_format(AVFormatContext *ic,
             secs %= 60;
             hours = mins / 60;
             mins %= 60;
-            av_log(NULL, AV_LOG_DEBUG, "%02d:%02d:%02d.%01d", hours, mins, secs, 
+            av_log(NULL, AV_LOG_INFO, "%02d:%02d:%02d.%01d", hours, mins, secs, 
                    (10 * us) / AV_TIME_BASE);
         } else {
-            av_log(NULL, AV_LOG_DEBUG, "N/A");
+            av_log(NULL, AV_LOG_INFO, "N/A");
         }
         if (ic->start_time != AV_NOPTS_VALUE) {
             int secs, us;
-            av_log(NULL, AV_LOG_DEBUG, ", start: ");
+            av_log(NULL, AV_LOG_INFO, ", start: ");
             secs = ic->start_time / AV_TIME_BASE;
             us = ic->start_time % AV_TIME_BASE;
-            av_log(NULL, AV_LOG_DEBUG, "%d.%06d",
+            av_log(NULL, AV_LOG_INFO, "%d.%06d",
                    secs, (int)av_rescale(us, 1000000, AV_TIME_BASE));
         }
-        av_log(NULL, AV_LOG_DEBUG, ", bitrate: ");
+        av_log(NULL, AV_LOG_INFO, ", bitrate: ");
         if (ic->bit_rate) {
-            av_log(NULL, AV_LOG_DEBUG,"%d kb/s", ic->bit_rate / 1000);
+            av_log(NULL, AV_LOG_INFO,"%d kb/s", ic->bit_rate / 1000);
         } else {
-            av_log(NULL, AV_LOG_DEBUG, "N/A");
+            av_log(NULL, AV_LOG_INFO, "N/A");
         }
-        av_log(NULL, AV_LOG_DEBUG, "\n");
-*/
+        av_log(NULL, AV_LOG_INFO, "\n");
     }
     for(i=0;i<ic->nb_streams;i++) {
         AVStream *st = ic->streams[i];
         avcodec_string(buf, sizeof(buf), &st->codec, is_output);
-        av_log(NULL, AV_LOG_DEBUG, "  Stream #%d.%d", index, i);
+        av_log(NULL, AV_LOG_INFO, "  Stream #%d.%d", index, i);
         /* the pid is an important information, so we display it */
         /* XXX: add a generic system */
         if (is_output)
@@ -2626,9 +2676,9 @@ void dump_format(AVFormatContext *ic,
         else
             flags = ic->iformat->flags;
         if (flags & AVFMT_SHOW_IDS) {
-            av_log(NULL, AV_LOG_DEBUG, "[0x%x]", st->id);
+            av_log(NULL, AV_LOG_INFO, "[0x%x]", st->id);
         }
-        av_log(NULL, AV_LOG_DEBUG, ": %s\n", buf);
+        av_log(NULL, AV_LOG_INFO, ": %s\n", buf);
     }
 }
 

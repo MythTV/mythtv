@@ -1007,7 +1007,7 @@ int MPEG2trans::BuildKeyframeIndex(QString filename, QMap <long long, long long>
         if (pkt->stream_index == videoin_index)
         {
             if (process_video(pkt, true))
-                posMap[count] = pkt->startpos;
+                posMap[count] = pkt->pos;
             count++;
         }
     }

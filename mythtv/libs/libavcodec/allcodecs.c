@@ -186,6 +186,9 @@ void avcodec_register_all(void)
     register_avcodec(&x264_encoder);
 #endif //CONFIG_X264_ENCODER
 #endif
+#ifdef CONFIG_LIBGSM
+    register_avcodec(&libgsm_encoder);
+#endif //CONFIG_LIBGSM
 #endif /* CONFIG_ENCODERS */
 #ifdef CONFIG_RAWVIDEO_ENCODER
     register_avcodec(&rawvideo_encoder);
@@ -487,6 +490,9 @@ void avcodec_register_all(void)
 #ifdef CONFIG_VORBIS_DECODER
     register_avcodec(&vorbis_decoder);
 #endif
+#ifdef CONFIG_LIBGSM
+    register_avcodec(&libgsm_decoder);
+#endif //CONFIG_LIBGSM
 #endif /* CONFIG_DECODERS */
 
 #ifdef AMR_NB
@@ -550,6 +556,10 @@ PCM_CODEC(CODEC_ID_ADPCM_SWF, adpcm_swf);
 
 #undef PCM_CODEC
 
+    /* subtitles */
+    register_avcodec(&dvdsub_decoder);
+    register_avcodec(&dvbsub_encoder);
+
     /* parsers */ 
     av_register_codec_parser(&mpegvideo_parser);
     av_register_codec_parser(&mpeg4video_parser);
@@ -567,5 +577,6 @@ PCM_CODEC(CODEC_ID_ADPCM_SWF, adpcm_swf);
 #ifdef CONFIG_AC3
     av_register_codec_parser(&ac3_parser);
 #endif
+    av_register_codec_parser(&dvdsub_parser);
 }
 

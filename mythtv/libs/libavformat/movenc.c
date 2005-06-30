@@ -79,7 +79,7 @@ const CodecTag ff_mov_obj_type[] = {
     { CODEC_ID_MPEG2VIDEO,  96 },//mpeg2 profiles
     { CODEC_ID_MP2       , 107 },//FIXME mpeg2 mpeg audio -> 105
     { CODEC_ID_MP3       , 107 },//FIXME mpeg2 mpeg audio -> 105
-    { CODEC_ID_H264      , 241 },
+    { CODEC_ID_H264      ,  33 },
     { CODEC_ID_H263      , 242 },
     { CODEC_ID_H261      , 243 },
     { CODEC_ID_MJPEG     , 108 },
@@ -259,7 +259,7 @@ static int mov_write_wave_tag(ByteIOContext *pb, MOVTrack* track)
     return updateSize (pb, pos);
 }
 
-const CodecTag codec_movaudio_tags[] = {
+static const CodecTag codec_movaudio_tags[] = {
     { CODEC_ID_PCM_MULAW, MKTAG('u', 'l', 'a', 'w') },
     { CODEC_ID_PCM_ALAW, MKTAG('a', 'l', 'a', 'w') },
     { CODEC_ID_ADPCM_IMA_QT, MKTAG('i', 'm', 'a', '4') },
@@ -459,6 +459,8 @@ static int mov_write_esds_tag(ByteIOContext *pb, MOVTrack* track) // Basic
     // Object type indication
     put_byte(pb, codec_get_tag(ff_mov_obj_type, track->enc->codec_id));
 
+    // the following fields is made of 6 bits to identify the streamtype (4 for video, 5 for audio)
+    // plus 1 bit to indicate upstream and 1 bit set to 1 (reserved)
     if(track->enc->codec_type == CODEC_TYPE_AUDIO)
         put_byte(pb, 0x15);            // flags (= Audiostream)
     else
@@ -489,11 +491,12 @@ static int mov_write_esds_tag(ByteIOContext *pb, MOVTrack* track) // Basic
     return updateSize (pb, pos);
 }
 
-const CodecTag codec_movvideo_tags[] = {
+static const CodecTag codec_movvideo_tags[] = {
     { CODEC_ID_SVQ1, MKTAG('S', 'V', 'Q', '1') },
     { CODEC_ID_SVQ3, MKTAG('S', 'V', 'Q', '3') },
     { CODEC_ID_MPEG4, MKTAG('m', 'p', '4', 'v') },
     { CODEC_ID_H263, MKTAG('s', '2', '6', '3') },
+    { CODEC_ID_H264, MKTAG('a', 'v', 'c', '1') },
     { CODEC_ID_DVVIDEO, MKTAG('d', 'v', 'c', ' ') },
     { 0, 0 },
 };

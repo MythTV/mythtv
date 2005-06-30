@@ -9,6 +9,7 @@ typedef struct {
     uint_fast8_t maxdepth;
     VLC vlc;
     float *codevectors;
+    unsigned int nb_bits;
 } vorbis_codebook;
 
 typedef struct {
@@ -88,6 +89,8 @@ typedef struct {
     float *saved;
     uint_fast16_t saved_start;
     float *ret;
+    float *buf;
+    float *buf_tmp;
 } vorbis_context;
 
 

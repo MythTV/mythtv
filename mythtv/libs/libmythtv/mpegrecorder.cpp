@@ -633,7 +633,7 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 }
 
                 long long startpos = ringBuffer->GetFileWritePosition();
-                startpos += pkt.startpos;
+                startpos += pkt.pos;
 
                 long long keyCount = frameNum / keyframedist;
 
