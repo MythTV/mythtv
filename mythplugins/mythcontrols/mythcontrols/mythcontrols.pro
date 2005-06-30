@@ -13,8 +13,6 @@ installfiles.files = controls-ui.xml
 
 INSTALLS += uifiles
 
-CFLAGS += -I$${PREFIX}/include
-
 # Input
 HEADERS += action.h actionid.h mythcontrols.h keybindings.h keygrabber.h
 SOURCES += action.cpp actionset.cpp keybindings.cpp mythcontrols.cpp
