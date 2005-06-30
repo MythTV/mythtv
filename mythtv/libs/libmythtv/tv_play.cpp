@@ -1742,37 +1742,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "PLAY")
             DoPlay();
         else if (action == "NEXTAUDIO")
-        {
-            if (activenvp)
-            {
-                activenvp->incCurrentAudioTrack();
-                if ( activenvp->getCurrentAudioTrack() )
-                {
-                    QString msg = QString("%1 %2")
-                                  .arg(tr("Audio track"))
-                                  .arg(activenvp->getCurrentAudioTrack());
-
-                    GetOSD()->SetSettingsText(msg, 3);
-                }
-            }
-        }
-        else if (action == "PREVAUDIO")
-        {
-            if (activenvp)
-            {
-                activenvp->decCurrentAudioTrack();
-                if ( activenvp->getCurrentAudioTrack() )
-                {
-                    QString msg = QString("%1 %2")
-                                  .arg(tr("Audio track"))
-                                  .arg(activenvp->getCurrentAudioTrack());
-
-                    GetOSD()->SetSettingsText(msg, 3);
-                }
-
-            }
-        }
-        else if (action == "PAUSE") 
+            ChangeAudioTrack(1);
+	else if (action == "PREVAUDIO")
+            ChangeAudioTrack(-1);
+	else if (action == "PAUSE") 
             DoPause();
         else if (action == "SPEEDINC")
             ChangeSpeed(1);
@@ -4200,6 +4173,10 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         ToggleLetterbox(action.right(1).toInt());
         hidetree = false;
     }
+    else if (action == "NEXTAUDIO")
+        ChangeAudioTrack(1);
+    else if (action == "PREVAUDIO")
+        ChangeAudioTrack(-1);
     else if (StateIsLiveTV(GetState()))
     {
         if (action == "GUIDE")
@@ -4429,6 +4406,8 @@ void TV::BuildOSDTreeMenu(void)
                                  (speedX100 == 150) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
 
+    item = new OSDGenericTree(treeMenu, tr("Next Audio Track"), "NEXTAUDIO");
+
     // add sleep items to menu
 
     item = new OSDGenericTree(treeMenu, tr("Sleep"), "TOGGLESLEEPON");
@@ -4438,6 +4417,26 @@ void TV::BuildOSDTreeMenu(void)
     subitem = new OSDGenericTree(item, "60 " + tr("minutes"), "TOGGLESLEEP60");
     subitem = new OSDGenericTree(item, "90 " + tr("minutes"), "TOGGLESLEEP90");
     subitem = new OSDGenericTree(item, "120 " + tr("minutes"), "TOGGLESLEEP120");
+}
+
+void TV::ChangeAudioTrack(int dir)
+{
+    if (activenvp)
+    {
+        if (dir > 0)
+            activenvp->incCurrentAudioTrack(); 
+        else
+            activenvp->decCurrentAudioTrack();
+
+        if (activenvp->getCurrentAudioTrack())
+        {
+            QString msg = QString("%1 %2")
+                          .arg(tr("Audio track"))
+                          .arg(activenvp->getCurrentAudioTrack());
+
+            osd->SetSettingsText(msg, 3);
+        }
+    }
 }
 
 void TV::ToggleAutoExpire(void)

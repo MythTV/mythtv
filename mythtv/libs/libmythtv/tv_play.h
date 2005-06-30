@@ -147,6 +147,8 @@ class TV : public QObject
     void ChangeColour(bool up, bool recorder);
     void ChangeHue(bool up, bool recorder);
 
+    void ChangeAudioTrack(int dir);
+    
     QString QueuedChannel(void);
     void ChannelClear(bool hideosd = false); 
     void ChannelKey(char key);
