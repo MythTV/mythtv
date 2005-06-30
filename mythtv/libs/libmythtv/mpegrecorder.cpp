@@ -491,7 +491,7 @@ static int mpg_read_packet(void *opaque, uint8_t *buf, int buf_size)
     return 0;
 }
 
-static int mpg_seek_packet(void *opaque, int64_t offset, int whence)
+static offset_t mpg_seek_packet(void *opaque, int64_t offset, int whence)
 {
     (void)opaque;
     (void)offset;

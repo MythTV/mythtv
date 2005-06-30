@@ -767,6 +767,7 @@ static int avi_read_seek(AVFormatContext *s, int stream_index, int64_t timestamp
         ast2->frame_offset = st2->index_entries[index].timestamp;
         if(ast2->sample_size)
             ast2->frame_offset *=ast2->sample_size;
+        st2->cur_dts = ast2->frame_offset;
     }
 
     if (avi->dv_demux)

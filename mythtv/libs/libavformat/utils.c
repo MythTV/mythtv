@@ -203,6 +203,7 @@ static void av_destruct_packet(AVPacket *pkt)
 {
     av_free(pkt->data);
     pkt->data = NULL; pkt->size = 0;
+    pkt->destruct = NULL;
 }
 
 /**
@@ -669,6 +670,9 @@ int av_open_input_file(AVFormatContext **ic_ptr, const char *filename,
  */
 int av_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
+    av_init_packet(pkt);
+    pkt->data = NULL;
+    pkt->size = 0;
     return s->iformat->read_packet(s, pkt);
 }
 
@@ -1569,7 +1573,7 @@ static void av_update_stream_timings(AVFormatContext *ic)
     }
     if (start_time != MAXINT64) {
         ic->start_time = start_time;
-        if (end_time != MAXINT64) {
+        if (end_time != MININT64) {
             ic->duration = end_time - start_time;
             if (ic->file_size > 0) {
                 /* compute the bit rate */
@@ -1685,6 +1689,8 @@ static void av_estimate_timings_from_pts(AVFormatContext *ic)
         if (ret != 0)
             break;
         read_size += pkt->size;
+        if (pkt->stream_index >= ic->nb_streams)
+            continue;
         st = ic->streams[pkt->stream_index];
         if (pkt->pts != AV_NOPTS_VALUE) {
             if (st->start_time == AV_NOPTS_VALUE)
@@ -1718,6 +1724,9 @@ static void av_estimate_timings_from_pts(AVFormatContext *ic)
         if (ret != 0)
             break;
         read_size += pkt->size;
+        if (pkt->stream_index >= ic->nb_streams)
+            continue;
+
         st = ic->streams[pkt->stream_index];
         if (pkt->pts != AV_NOPTS_VALUE) {
             end_time = pkt->pts;

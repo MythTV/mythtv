@@ -77,6 +77,9 @@ class AvFormatDecoder : public DecoderBase
 
     int ScanStreams(bool novideo);
 
+    virtual bool DoRewind(long long desiredFrame, bool doflush = true);
+    virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
+
   protected:
     /// Attempt to find the optimal audio stream to use based on the number of channels,
     /// and if we're doing AC3 passthrough.  This will select the highest stream number
@@ -174,6 +177,8 @@ class AvFormatDecoder : public DecoderBase
 
     bool using_null_videoout;
     MythCodecID video_codec_id;
+
+    int maxkeyframedist;
 };
 
 #endif

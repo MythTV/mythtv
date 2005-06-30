@@ -168,6 +168,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
     prevgoppos = 0;
 
     fps = 29.97;
+    maxkeyframedist = -1;
 
     lastKey = 0;
 
@@ -210,6 +211,92 @@ void AvFormatDecoder::CloseContext()
     d->DestroyMPEG2();
 }
 
+static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
+{
+    int64_t mask = (lsb_bits < 64) ? (1LL<<lsb_bits)-1 : -1LL;
+    return  ((lsb - base_ts)&mask);
+}
+
+bool AvFormatDecoder::DoRewind(long long desiredFrame, bool doflush)
+{
+    if (recordingHasPositionMap)
+        return DecoderBase::DoRewind(desiredFrame, doflush);
+
+    // avformat-based seeking
+    return DoFastForward(desiredFrame, doflush);
+}
+
+bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
+{
+    if (recordingHasPositionMap)
+        return DecoderBase::DoFastForward(desiredFrame, doflush);
+
+    bool oldrawstate = getrawframes;
+    getrawframes = false;
+
+    AVStream *st = NULL;
+    int i;
+    for (i = 0; i < ic->nb_streams; i++)
+    {
+        AVStream *st1 = ic->streams[i];
+        if (st1 && st1->codec.codec_type == CODEC_TYPE_VIDEO)
+        {
+            st = st1;
+            break;
+        }
+    }
+    if (!st)
+        return false;
+
+    int64_t frameseekadjust = 0;
+    AVCodecContext *context = &(st->codec);
+
+    if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
+        context->codec_id == CODEC_ID_MPEG2VIDEO ||
+        context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
+        context->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD)
+    {
+        frameseekadjust = maxkeyframedist+1;
+    }
+
+    // convert framenumber to normalized timestamp
+    long long ts = (long long)(((desiredFrame-frameseekadjust)*AV_TIME_BASE)/(long double)fps);
+    if (av_seek_frame(ic,-1,ts,AVSEEK_FLAG_BACKWARD)<0)
+        return false;
+
+    int64_t adj_cur_dts = st->cur_dts;
+    if(ic->start_time != (int64_t)AV_NOPTS_VALUE)
+    {
+        int64_t st1 = av_rescale(ic->start_time,
+                                st->time_base.den,
+                                AV_TIME_BASE * (int64_t)st->time_base.num);
+        adj_cur_dts = lsb3full(adj_cur_dts, st1, st->pts_wrap_bits);
+    }
+
+    long long newts = av_rescale(adj_cur_dts,
+                            (int64_t)AV_TIME_BASE * (int64_t)st->time_base.num,
+                            st->time_base.den);
+
+    // convert current timestamp to frame number
+    lastKey = (long long)((newts*(long double)fps)/AV_TIME_BASE);
+    framesPlayed = lastKey;
+    framesRead = lastKey;
+
+    int normalframes = desiredFrame - framesPlayed;
+
+    SeekReset(lastKey, normalframes, doflush);
+
+    if (doflush)
+    {
+        m_parent->SetFramesPlayed(framesPlayed + 1);
+        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
+    }
+
+    getrawframes = oldrawstate;
+
+    return true;
+}
+
 void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
 {
     lastapts = 0;
@@ -219,9 +306,13 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
     
     d->ResetMPEG2();
 
-    ic->pb.pos = ringBuffer->GetTotalReadPosition();
-    ic->pb.buf_ptr = ic->pb.buffer;
-    ic->pb.buf_end = ic->pb.buffer;
+    // only reset the internal state if we're using our seeking, not libavformat's
+    if (recordingHasPositionMap)
+    {
+        ic->pb.pos = ringBuffer->GetTotalReadPosition();
+        ic->pb.buf_ptr = ic->pb.buffer;
+        ic->pb.buf_end = ic->pb.buffer;
+    }
 
     if (doflush)
     {
@@ -340,6 +431,9 @@ offset_t seek_avf(URLContext *h, offset_t offset, int whence)
 {
     AvFormatDecoder *dec = (AvFormatDecoder *)h->priv_data;
 
+    if (whence == SEEK_END)
+        return dec->getRingBuf()->GetRealFileSize() + offset;
+
     return dec->getRingBuf()->Seek(offset, whence);
 }
 
@@ -371,11 +465,10 @@ static int avf_read_packet(void *opaque, uint8_t *buf, int buf_size)
     return url_read(h, buf, buf_size);
 }
 
-static int avf_seek_packet(void *opaque, int64_t offset, int whence)
+static offset_t avf_seek_packet(void *opaque, int64_t offset, int whence)
 {
     URLContext *h = (URLContext *)opaque;
-    url_seek(h, offset, whence);
-    return 0;
+    return url_seek(h, offset, whence);
 }
 
 void AvFormatDecoder::InitByteContext(void)
@@ -477,6 +570,14 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
 
     fmt->flags &= ~AVFMT_NOFILE;
 
+    //struct timeval one, two, res;
+    //gettimeofday(&one, NULL);
+    av_estimate_timings(ic);
+    //gettimeofday(&two, NULL);
+
+    //timersub(&two, &one, &res);
+    //printf("estimate: %d.%06d\n", (int)res.tv_sec, (int)res.tv_usec);
+
     bitrate = 0;
     fps = 0;
 
@@ -503,20 +604,36 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
 
     if (!recordingHasPositionMap)
     {
-        VERBOSE(VB_PLAYBACK, "recording has no position -- guessing at length");
-        // the pvr-250 seems to overreport the bitrate by * 2
-        float bytespersec = (float)bitrate / 8 / 2;
-        float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
-        m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+        VERBOSE(VB_PLAYBACK, "recording has no position -- using libavformat");
+        int64_t dur = ic->duration / (int64_t)AV_TIME_BASE;
+
+        if (dur > 0)
+        {
+            m_parent->SetFileLength((int)(dur), (int)(dur * fps));
+        }
+        else
+        {
+            // the pvr-250 seems to overreport the bitrate by * 2
+            float bytespersec = (float)bitrate / 8 / 2;
+            float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
+            m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+        }
 
         // we will not see a position map from db or remote encoder,
         // set the gop interval to 15 frames.  if we guess wrong, the
         // auto detection will change it.
         keyframedist = 15;
         positionMapType = MARK_GOP_START;
+
+        if (!strcmp(fmt->name, "avi"))
+        {
+            // avi keyframes are too irregular
+            keyframedist = 1;
+            positionMapType = MARK_GOP_BYFRAME;
+        }
     }
 
-    //if (livetv || watchingrecording)
+    if (livetv || watchingrecording)
         ic->build_index = 0;
 
     dump_format(ic, 0, filename, 0);
@@ -1027,6 +1144,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             {
                 gopset = true;
                 keyframedist = tempKeyFrameDist;
+                if (keyframedist > maxkeyframedist)
+                    maxkeyframedist = keyframedist;
 
                 if ((keyframedist == 15) ||
                     (keyframedist == 12))
@@ -1046,6 +1165,8 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                                              .arg(tempKeyFrameDist).arg(keyframedist));
 
                 keyframedist = tempKeyFrameDist;
+                if (keyframedist > maxkeyframedist)
+                    maxkeyframedist = keyframedist;
 
                 if ((keyframedist == 15) ||
                     (keyframedist == 12))
@@ -1055,6 +1176,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 
                 m_parent->SetKeyframeDistance(keyframedist);
 
+#if 0
                 // also reset length
                 long long index = m_positionMap[m_positionMap.size() - 1].index;
                 long long totframes = index * keyframedist;
@@ -1064,6 +1186,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                                              "total frames %2")
                                              .arg(length).arg((int)totframes));
                 m_parent->SetFileLength(length, totframes);
+#endif
             }
         }
     }
@@ -1096,6 +1219,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             m_positionMap.push_back(entry);
         }
 
+#if 0
         // If we are > 150 frames in and saw no positionmap at all, reset
         // length based on the actual bitrate seen so far
         if (framesRead > 150 && !recordingHasPositionMap && !livetv)
@@ -1105,6 +1229,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
             m_parent->SetFileLength((int)(secs), (int)(secs * fps));
         }
+#endif
     }
 }
 
