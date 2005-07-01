@@ -528,7 +528,7 @@ TARGET_OS=`( uname -s ) 2>&1`
   esac
 
 # find source path
-source_path="`echo $0 | sed -e 's#/configure##'`"
+source_path="`dirname $0`"
 source_path_used="yes"
 if test -z "$source_path" -o "$source_path" = "." ; then
     source_path=`pwd`
@@ -2614,6 +2614,10 @@ if test $? -ne 0 ; then
   ln -s $MYTH_CONFIG_H config.h
 else
   echo "$MYTH_CONFIG_H is unchanged"
+fi
+
+if [ ! -e config.h ] ; then
+  ln -s $MYTH_CONFIG_H config.h
 fi
 
 rm -f config.mak
