@@ -358,7 +358,6 @@ class TV : public QObject
 
     // OSD info
     QString         dialogname; ///< Name of current OSD dialog
-    OSD            *osd;        ///< Pointer to OSD instance, use GetOSD()!
     OSDGenericTree *treeMenu;   ///< OSD menu, 'm' using default keybindings
     /// UDPNotify instance which shows messages sent
     /// to the "UDPNotifyPort" in an OSD dialog.

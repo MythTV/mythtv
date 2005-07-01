@@ -208,7 +208,7 @@ TV::TV(void)
       // RingBuffers
       prbuffer(NULL), piprbuffer(NULL), activerbuffer(NULL),
       // OSD info
-      dialogname(""), osd(NULL), treeMenu(NULL), udpnotify(NULL),
+      dialogname(""), treeMenu(NULL), udpnotify(NULL),
       // LCD Info
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
@@ -1274,7 +1274,7 @@ void TV::RunTV(void)
 
         if (exitPlayer)
         {
-            while (GetOSD()->DialogShowing(dialogname))
+            while (GetOSD() && GetOSD()->DialogShowing(dialogname))
             {
                 GetOSD()->DialogAbort(dialogname);
                 GetOSD()->TurnDialogOff(dialogname);
@@ -1867,7 +1867,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 options += tr("Delete this recording");
 
                 dialogname = "exitplayoptions";
-                GetOSD()->NewDialogBox(dialogname, message, options, 0);
+                if (GetOSD())
+                    GetOSD()->NewDialogBox(dialogname, message, options, 0);
             }
             else if (StateIsPlaying(internalState) &&
                      gContext->GetNumSetting("PlaybackExitPrompt") == 1 && 
@@ -1881,7 +1882,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 voptions += tr("Exit to the menu");
                 voptions += tr("Keep watching");
                 dialogname = "videoexitplayoptions";
-                GetOSD()->NewDialogBox(dialogname, vmessage, voptions, 0);
+                if (GetOSD())
+                    GetOSD()->NewDialogBox(dialogname, vmessage, voptions, 0);
             }
             else if (StateIsLiveTV(GetState()))
             {
@@ -2297,7 +2299,7 @@ void TV::DoInfo(void)
     QString callsign, iconpath;
     OSDSet *oset;
 
-    if (paused)
+    if (paused || !GetOSD())
         return;
 
     oset = GetOSD()->GetSet("status");
@@ -2337,7 +2339,9 @@ bool TV::UpdatePosOSD(float time, const QString &mesg, int disptime)
         bool slidertype = StateIsLiveTV(GetState());
         int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
                                          kOSDFunctionalType_Default;
-        GetOSD()->StartPause(pos, slidertype, mesg, desc, disptime, osdtype);
+        if (GetOSD())
+            GetOSD()->StartPause(pos, slidertype, mesg, desc, disptime, 
+                                 osdtype);
         update_osd_pos = true;
     }
 
@@ -2529,7 +2533,7 @@ void TV::DoQueueTranscode(void)
                                     playbackinfo->chanid,
                                     playbackinfo->startts, JOB_STOP);
             queuedTranscode = false;
-            if (activenvp == nvp)
+            if (activenvp == nvp && GetOSD())
                 GetOSD()->SetSettingsText(tr("Stopping Transcode"), 3);
         }
         else
@@ -2544,10 +2548,10 @@ void TV::DoQueueTranscode(void)
                                jobHost, "", "", JOB_USE_CUTLIST))
             {
                 queuedTranscode = true;
-                if (activenvp == nvp)
+                if (activenvp == nvp && GetOSD())
                     GetOSD()->SetSettingsText(tr("Transcoding"), 3);
             } else {
-                if (activenvp == nvp)
+                if (activenvp == nvp && GetOSD())
                     GetOSD()->SetSettingsText(tr("Try Again"), 3);
             }
         }
@@ -2577,7 +2581,7 @@ void TV::DoSkipCommercials(int direction)
     if (StateIsLiveTV(GetState()))
         slidertype = true;
 
-    if (activenvp == nvp)
+    if (activenvp == nvp && GetOSD())
     {
         QString dummy = "";
         QString desc = tr("Searching...");
@@ -2607,7 +2611,8 @@ void TV::ToggleInputs(void)
     {
         if (paused)
         {
-            GetOSD()->EndPause();
+            if (GetOSD())
+                GetOSD()->EndPause();
             gContext->DisableScreensaver();
             paused = false;
         }
@@ -2641,7 +2646,7 @@ void TV::ChangeChannel(int direction, bool force)
 {
     bool muted = false;
 
-    if (!force && (activenvp == nvp) && showBufferedWarnings)
+    if (!force && GetOSD() && (activenvp == nvp) && showBufferedWarnings)
     {
         int behind = activenvp->GetSecondsBehind();
         if (behind > bufferedChannelThreshold)
@@ -2679,7 +2684,8 @@ void TV::ChangeChannel(int direction, bool force)
     {
         if (paused)
         {
-            GetOSD()->EndPause();
+            if (GetOSD())
+                GetOSD()->EndPause();
             gContext->DisableScreensaver();
             paused = false;
         }
@@ -2847,7 +2853,7 @@ void TV::ChangeChannelByString(QString &name, bool force)
     if (!activerecorder->CheckChannel(name))
         return;
 
-    if (!force && nvp && (activenvp == nvp) && showBufferedWarnings)
+    if (!force && GetOSD() && nvp && (activenvp == nvp) && showBufferedWarnings)
     {
         int behind = activenvp->GetSecondsBehind();
         if (behind > bufferedChannelThreshold)
@@ -2885,7 +2891,8 @@ void TV::ChangeChannelByString(QString &name, bool force)
     {
         if (paused)
         {
-            GetOSD()->EndPause();
+            if (GetOSD())
+                GetOSD()->EndPause();
             gContext->DisableScreensaver();
             paused = false;
         }
@@ -2997,10 +3004,10 @@ bool TV::ClearOSD(void)
         res = true;
     }
 
-    if (GetOSD()->HideAll())
+    if (GetOSD() && GetOSD()->HideAll())
         res = true;
 
-    while (res && GetOSD()->HideAll())
+    while (res && GetOSD() && GetOSD()->HideAll())
         usleep(1000);
 
     return res;
@@ -3008,8 +3015,11 @@ bool TV::ClearOSD(void)
 
 void TV::ToggleOSD(void)
 {
+    if (!GetOSD())
+        return;
+
     OSDSet *oset = GetOSD()->GetSet("program_info");
-    if (GetOSD() && (oset) && (oset->Displaying() || prbuffer->isDVD()))
+    if ((oset) && (oset->Displaying() || prbuffer->isDVD()))
         GetOSD()->HideAll();
     else if (!prbuffer->isDVD())
         UpdateOSD();
@@ -3798,7 +3808,7 @@ void TV::BrowseStart(void)
     if (activenvp != nvp)
         return;
 
-    if (paused)
+    if (paused || !GetOSD())
         return;
 
     OSDSet *oset = GetOSD()->GetSet("browse_info");
@@ -3829,7 +3839,7 @@ void TV::BrowseStart(void)
 
 void TV::BrowseEnd(bool change)
 {
-    if (!browsemode)
+    if (!browsemode || !GetOSD())
         return;
 
     browseTimer->stop();
@@ -3854,7 +3864,7 @@ void TV::BrowseDispInfo(int direction)
                   QDateTime::fromString(browsestarttime, Qt::ISODate);
     QMap<QString, QString> infoMap;
 
-    if (paused)
+    if (paused || !GetOSD())
         return;
 
     browseTimer->changeInterval(30000);
@@ -3918,7 +3928,7 @@ void TV::ToggleRecord(void)
 
             QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(title);
 
-            if (activenvp == nvp)
+            if (activenvp == nvp && GetOSD())
                 GetOSD()->SetSettingsText(msg, 3);
 
             delete program_info;
@@ -3936,11 +3946,14 @@ void TV::ToggleRecord(void)
 
     program_info->ToMap(infoMap);
 
-    GetOSD()->ClearAllText("browse_info");
-    GetOSD()->SetText("browse_info", infoMap, -1);
+    if (GetOSD())
+    {
+        GetOSD()->ClearAllText("browse_info");
+        GetOSD()->SetText("browse_info", infoMap, -1);
 
-    if (activenvp == nvp)
-        GetOSD()->SetSettingsText(tr("Record"), 3);
+        if (activenvp == nvp)
+            GetOSD()->SetSettingsText(tr("Record"), 3);
+    }
 
     delete program_info;
 }
@@ -3982,10 +3995,10 @@ void TV::DoTogglePictureAttribute(void)
 {
     OSDSet *oset;
     int value = 0;
-    oset = GetOSD()->GetSet("status");
 
     if (GetOSD())
     {
+        oset = GetOSD()->GetSet("status");
         QString title = tr("Adjust Picture");
         QString picName;
 
@@ -4026,12 +4039,12 @@ void TV::DoToggleRecPictureAttribute(void)
 {
     OSDSet *oset;
     int value = 0;
-    oset = GetOSD()->GetSet("status");
    
     recAdjustment = (recAdjustment % 4) + 1;
    
     if (GetOSD())
     {
+        oset = GetOSD()->GetSet("status");
         QString title = tr("Adjust Recording");
         QString recName;
       
@@ -4108,7 +4121,7 @@ void TV::DoEditMode(void)
 {
     bool isEditing = playbackinfo->IsEditing();
 
-    if (isEditing)
+    if (isEditing && GetOSD())
     {
         nvp->Pause();
 
@@ -4434,7 +4447,8 @@ void TV::ChangeAudioTrack(int dir)
                           .arg(tr("Audio track"))
                           .arg(activenvp->getCurrentAudioTrack());
 
-            osd->SetSettingsText(msg, 3);
+            if (GetOSD())
+                GetOSD()->SetSettingsText(msg, 3);
         }
     }
 }
@@ -4454,7 +4468,7 @@ void TV::ToggleAutoExpire(void)
         desc = tr("Auto-Expire ON");
     }
 
-    if (activenvp == nvp && desc != "" )
+    if (GetOSD() && activenvp == nvp && desc != "" )
     {
         QString curTime = "";
         int pos = nvp->calcSliderPos(curTime);
@@ -4480,7 +4494,7 @@ void TV::SetAutoCommercialSkip(int skipMode)
 
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
 
-    if (activenvp == nvp && desc != "" )
+    if (GetOSD() && activenvp == nvp && desc != "" )
     {
         QString curTime = "";
         int pos = nvp->calcSliderPos(curTime);
@@ -4502,7 +4516,7 @@ void TV::SetManualZoom(bool zoomON)
     else
         desc = tr("Zoom Mode OFF");
 
-    if (activenvp == nvp && desc != "" )
+    if (GetOSD() && activenvp == nvp && desc != "" )
     {
         QString curTime = "";
         int pos = nvp->calcSliderPos(curTime);
