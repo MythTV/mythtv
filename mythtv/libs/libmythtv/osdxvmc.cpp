@@ -5,6 +5,7 @@
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <unistd.h>
 
 #include "osdxvmc.h"
 #include "videoout_xv.h"

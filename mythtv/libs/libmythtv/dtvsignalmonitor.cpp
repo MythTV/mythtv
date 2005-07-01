@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "dtvsignalmonitor.h"
 #include "scanstreamdata.h"
 #include "mpegtables.h"

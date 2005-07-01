@@ -2042,6 +2042,7 @@ echo "PREFIX=$prefix" >> $MYTH_CONFIG_MAK
 #echo "MAKE=$make" >> $MYTH_CONFIG_MAK
 echo "QMAKE_CC=$cc" >> $MYTH_CONFIG_MAK
 echo "QMAKE_CXX=$cxx" >> $MYTH_CONFIG_MAK
+echo "QMAKE_LINK=$cxx" >> $MYTH_CONFIG_MAK
 #echo "AR=$ar" >> $MYTH_CONFIG_MAK
 #echo "RANLIB=$ranlib" >> $MYTH_CONFIG_MAK
 #if test "$dostrip" = "yes" ; then
