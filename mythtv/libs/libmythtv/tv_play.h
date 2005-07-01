@@ -15,6 +15,9 @@
 
 #include <qobject.h>
 
+#include <vector>
+using namespace std;
+
 class QDateTime;
 class OSD;
 class RemoteEncoder;

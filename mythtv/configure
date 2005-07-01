@@ -1790,7 +1790,7 @@ fi
 #test for lirc client libraries
 if test x"$lirc" = x"yes" ; then
     lirc="no"
-    if has_library liblirc_client.so ; then
+    if has_library liblirc_client ; then
         lirc="yes"
     fi
 fi

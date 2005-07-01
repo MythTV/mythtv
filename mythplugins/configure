@@ -184,15 +184,15 @@ has_header()
 
 if test "$opengl" != "no" ; then
     opengl="no"
-    if has_library libGL.so ; then
+    if has_library libGL ; then
         opengl="yes"
     fi
 fi
 
 if test "$fftw_lib3" != "no" ; then
     fftw_lib3="no"
-    if has_library libfftw3f_threads.so ; then
-        if has_library libfftw3_threads.so ; then
+    if has_library libfftw3f_threads ; then
+        if has_library libfftw3_threads ; then
             if has_header fftw3.h ; then
                 fftw_lib3="yes"
             fi
@@ -202,8 +202,8 @@ fi
 
 if test "$fftw_lib" != "no" ; then
     fftw_lib="no"
-    if has_library libfftw.so ; then
-        if has_library librfftw.so ; then
+    if has_library libfftw ; then
+        if has_library librfftw ; then
             if has_header fftw.h ; then
                 fftw_lib="yes"
             fi
@@ -220,8 +220,8 @@ fi
 
 if test "$aac" != "no" ; then
     aac="no"
-    if has_library libfaad.so ; then
-        if has_library libmp4ff.so ; then
+    if has_library libfaad ; then
+        if has_library libmp4ff ; then
             if has_header faad.h ; then
                 aac="yes"
             fi
@@ -231,7 +231,7 @@ fi
 
 if test "$transcode" != "no" ; then
     transcode="no"
-    if has_library libdvdread.so ; then
+    if has_library libdvdread ; then
         if has_header dvdread/dvd_reader.h ; then
             transcode="yes"
         fi
@@ -242,7 +242,7 @@ fi
 
 if test "$exif" != "no" ; then
     exif="no"
-    if has_library libexif.so ; then
+    if has_library libexif ; then
         if has_header libexif/exif-data.h ; then
             exif="yes"
         fi
@@ -251,42 +251,49 @@ fi
 
 if test "$music" != "no" ; then
     mad="no"
-    if has_library libmad.so && has_header mad.h && has_library libid3tag.so && has_header id3tag.h ; then
+    if has_library libmad && has_header mad.h && has_library libid3tag && has_header id3tag.h ; then
         mad="yes"
     else
         echo "MythMusic requires libmad and libid3tag."
     fi 
 
     vorbis="no"
-    if has_header ogg/ogg.h && has_header vorbis/vorbisenc.h && has_header vorbis/vorbisfile.h && has_header vorbis/codec.h && has_library libogg.so && has_library libvorbisfile.so && has_library libvorbisenc.so && has_library libvorbis.so ; then
+    if has_header ogg/ogg.h && has_header vorbis/vorbisenc.h && has_header vorbis/vorbisfile.h && has_header vorbis/codec.h && has_library libogg && has_library libvorbisfile && has_library libvorbisenc && has_library libvorbis ; then
         vorbis="yes"
     else
         echo "MythMusic requires vorbis."
     fi
 
     flac="no"
-    if has_header FLAC/all.h && has_library libFLAC.so ; then
+    if has_header FLAC/all.h && has_library libFLAC ; then
         flac="yes"
     else
         echo "MythMusic requires FLAC."
     fi
 
     cdaudio="no"
-    if has_header cdaudio.h && has_library libcdaudio.so ; then
+    if has_header cdaudio.h && has_library libcdaudio ; then
         cdaudio="yes"
     else
         echo "MythMusic requires libcdaudio."
     fi
 
     paranoia="no"
-    if has_header cdda_paranoia.h && has_library libcdda_paranoia.so && has_library libcdda_interface.so ; then
-        paranoia="yes"
-    else
+    if has_library libcdda_paranoia && has_library libcdda_interface ; then
+        if has_header cdda_paranoia.h ; then
+            paranoia="yes"
+        fi
+        if has_header cdda/cdda_paranoia.h ; then
+            paranoia="yes"
+        fi
+    fi
+
+    if test "$paranoia" = "no" ; then
         echo "MythMusic requires CDDA Paranoia."
     fi
 
     mp3lame="no"
-    if has_header lame/lame.h && has_library libmp3lame.so ; then
+    if has_header lame/lame.h && has_library libmp3lame ; then
         mp3lame="yes"
     else
         echo "MythMusic requires the LAME mp3 encoder."
@@ -299,7 +306,7 @@ if test "$music" != "no" ; then
 fi
 
 if test "$gallery" != "no" ; then
-    if has_library libtiff.so && has_header tiffio.h ; then
+    if has_library libtiff && has_header tiffio.h ; then
         echo -n ""
     else
         echo "Disabling MythGallery due to missing libtiff."
@@ -309,7 +316,7 @@ fi
 
 if test "$browser" != "no" ; then
     hasit="no"
-    if has_library libkhtml.so ; then
+    if has_library libkhtml ; then
         if has_header kde/khtml_part.h  ; then
            hasit="yes"
         fi
@@ -325,7 +332,7 @@ fi
 
 if test "$festival" != "no" ; then
     festival="no"
-    if has_library libFestival.a && has_library libestools.so && has_library libestbase.so && has_library libeststring.so && has_library libtermcap.so && has_header festival/festival.h ; then
+    if has_library libFestival && has_library libestools && has_library libestbase && has_library libeststring && has_library libtermcap && has_header festival/festival.h ; then
        festival="yes"
     fi
 fi
