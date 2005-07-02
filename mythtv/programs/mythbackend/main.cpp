@@ -40,6 +40,7 @@ JobQueue *jobqueue = NULL;
 QString pidfile;
 QString lockfile_location;
 HouseKeeper *housekeeping = NULL;
+QString logfile = "";
 
 bool setupTVs(bool ismaster, bool &error)
 {
@@ -168,8 +169,42 @@ void cleanup(void)
         unlink(pidfile.ascii());
 
     unlink(lockfile_location.ascii());
+
+    signal(SIGHUP, SIG_DFL);
 }
-    
+
+int log_rotate(int report_error)
+{
+    /* http://www.gossamer-threads.com/lists/mythtv/dev/110113 */
+
+    int new_logfd = open(logfile, O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
+    if (new_logfd < 0)
+    {
+        // If we can't open the new logfile, send data to /dev/null
+        if (report_error)
+        {
+            cerr << "cannot open logfile " << logfile << endl;
+            return -1;
+        }
+        new_logfd = open("/dev/null", O_WRONLY);
+        if (new_logfd < 0)
+        {
+            // There's not much we can do, so punt.
+            return -1;
+        }
+    }
+    while (dup2(new_logfd, 1) < 0 && errno == EINTR) ;
+    while (dup2(new_logfd, 2) < 0 && errno == EINTR) ;
+    while (close(new_logfd) < 0 && errno == EINTR) ;
+    return 0;
+}
+
+void log_rotate_handler(int)
+{
+    log_rotate(0);
+}
+
+
 int main(int argc, char **argv)
 {
     for(int i = 3; i < sysconf(_SC_OPEN_MAX) - 1; ++i)
@@ -177,7 +212,7 @@ int main(int argc, char **argv)
 
     QApplication a(argc, argv, false);
 
-    QString logfile = "";
+    
     QString binname = basename(a.argv()[0]);
     QString verboseString = QString(" important general");
 
@@ -392,18 +427,12 @@ int main(int argc, char **argv)
         }
     }
 
-    int logfd = -1;
-
-    if (logfile != "")
+    if (logfile != "" )
     {
-        logfd = open(logfile.ascii(), O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0664);
-         
-        if (logfd < 0)
-        {
-            perror(logfile.ascii());
-            cerr << "Error opening logfile\n";
-            return BACKEND_EXIT_OPENING_LOGFILE_ERROR;
-        }
+        if (log_rotate(1) < 0)
+            cerr << "cannot open logfile; using stdout/stderr" << endl;
+        else
+            signal(SIGHUP, &log_rotate_handler);
     }
     
     ofstream pidfs;
@@ -433,17 +462,6 @@ int main(int argc, char **argv)
     {
         pidfs << getpid() << endl;
         pidfs.close();
-    }
-
-    if (logfd != -1)
-    {
-        // Send stdout and stderr to the logfile
-        dup2(logfd, 1);
-        dup2(logfd, 2);
-
-        // Close the unduplicated logfd
-        if (logfd != 1 && logfd != 2)
-            close(logfd);
     }
 
     gContext = NULL;
