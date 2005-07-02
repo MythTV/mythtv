@@ -922,7 +922,7 @@ void IconView::actionImport()
         {
             QString cmd = *it + " " + importdir.absPath();
             cerr << "Executing " << cmd << "\n";
-            system(cmd);
+            myth_system(cmd);
         } 
         else
         {
@@ -993,7 +993,7 @@ void IconView::importFromDir(const QString &fromDir, const QString &toDir)
                  << " to " << toDir.local8Bit() << "\n";
             QString cmd = "cp \"" + fi->absFilePath().local8Bit() + 
                           "\" \"" + toDir.local8Bit() + "\"";
-            system(cmd);
+            myth_system(cmd);
         }
     }
 }

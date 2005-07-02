@@ -26,6 +26,7 @@
 #include <qdir.h>
 
 #include "mythtv/mythcontext.h"
+#include "mythtv/util.h"
 
 #include "thumbgenerator.h"
 #include "constants.h"
@@ -250,7 +251,7 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
       {
           QString cmd = "cd " + tmpDir.absPath()
             + "; mplayer -nosound -frames 1 -vo png " + fi.absFilePath();
-          if (! system(cmd))
+          if (myth_system(cmd) == 0)
           {
               QFileInfo thumb(tmpDir.filePath("00000001.png"));
               if (thumb.exists())
