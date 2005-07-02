@@ -556,6 +556,7 @@ void VideoGallery::doMenu(bool info)
     if (createPopup())
     {
         QButton *focusButton = NULL;
+        
         if(info)
         {
             focusButton = popup->addButton(tr("Watch This Video"), this, SLOT(slotWatchVideo()));
@@ -566,8 +567,14 @@ void VideoGallery::doMenu(bool info)
         else
         {
             if (!isFileBrowser)
+            {
                 focusButton = popup->addButton(tr("Filter Display"), this, SLOT(slotDoFilter()));
-            addDests();
+                addDests();
+            }
+            else
+            {
+                focusButton = addDests();
+            }
         }
 
         popup->addButton(tr("Cancel"), this, SLOT(slotDoCancel()));
