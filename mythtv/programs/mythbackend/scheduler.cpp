@@ -981,7 +981,7 @@ void Scheduler::RunScheduler(void)
                 if (!startupCommand.isEmpty())
                 {
                     startupCommand.replace("$status", startupParam);
-                    system(startupCommand.ascii());
+                    myth_system(startupCommand.ascii());
                 }
                 firstRun = false;
             }
@@ -1215,7 +1215,7 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
     int state = 0;
     if (!preSDWUCheckCommand.isEmpty())
     {
-        state = system(preSDWUCheckCommand.ascii());
+        state = myth_system(preSDWUCheckCommand.ascii());
                       
         if (WIFEXITED(state) && state != -1)
         {
@@ -1289,7 +1289,7 @@ void Scheduler::ShutdownServer(int prerollseconds)
 
         // now run the command to set the wakeup time
         if (!setwakeup_cmd.isEmpty())
-            system(setwakeup_cmd.ascii());
+            myth_system(setwakeup_cmd.ascii());
     }
 
     QString halt_cmd = gContext->GetSetting("ServerHaltCommand",
@@ -1301,7 +1301,7 @@ void Scheduler::ShutdownServer(int prerollseconds)
         m_mainServer->ShutSlaveBackendsDown(halt_cmd);
 
         // and now shutdown myself
-        system(halt_cmd.ascii());
+        myth_system(halt_cmd.ascii());
     }
 }
 
