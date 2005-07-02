@@ -39,7 +39,6 @@ VideoSelected::VideoSelected(VideoList *lvideo_list,
     video_list = lvideo_list;
 
     curitem = video_list->getVideoListMetadata(idnum);
-    curitem->setID(idnum);
     curitem->fillDataFromID();
 
     noUpdate = false;
