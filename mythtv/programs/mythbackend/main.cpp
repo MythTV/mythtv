@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <signal.h>
+#include <cerrno>
 
 #ifdef CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
