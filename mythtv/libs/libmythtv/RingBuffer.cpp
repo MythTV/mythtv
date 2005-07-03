@@ -76,6 +76,20 @@ class DVDRingBufferPriv
             title = 0;           
         }
         
+        ~DVDRingBufferPriv()
+        {
+            close();
+        }
+        
+        void close()
+        {
+            if (dvdnav)
+            {
+                dvdnav_close(dvdnav);
+                dvdnav = NULL;
+            }            
+        }
+        
         long long Seek(long long pos, int whence)
         {
             dvdnav_sector_search(this->dvdnav, pos / DVD_BLOCK_SIZE , whence);
@@ -983,6 +997,12 @@ RingBuffer::~RingBuffer(void)
         close(fd2);
         fd2 = -1;
     }
+    
+    if (dvdPriv)
+    {
+        delete dvdPriv;
+    }
+    
 }
 
 void RingBuffer::Start(void)

@@ -751,6 +751,7 @@ void TV::HandleStateChange(void)
         prbuffer = new RingBuffer(tmpFilename, false);
         if (prbuffer->IsOpen())
         {
+
             gContext->DisableScreensaver();
     
             if (desiredNextState == kState_WatchingRecording)
@@ -771,15 +772,18 @@ void TV::HandleStateChange(void)
                     recorder->Setup();
                 }
             }
-    
+
             StartPlayer(desiredNextState == kState_WatchingRecording);
-
+            
+            
             SET_NEXT();
-
-            QString message = "COMMFLAG_REQUEST ";
-            message += playbackinfo->chanid + " " +
-                       playbackinfo->startts.toString(Qt::ISODate);
-            RemoteSendMessage(message);
+            if (!playbackinfo->isVideo)
+            {
+                QString message = "COMMFLAG_REQUEST ";
+                message += playbackinfo->chanid + " " +
+                           playbackinfo->startts.toString(Qt::ISODate);
+                RemoteSendMessage(message);
+            }                
         }
         else
         {
@@ -1044,10 +1048,10 @@ void TV::SetupPlayer(bool isWatchingRecording)
         nvp->SetWatchingRecording(true);
 
     int udp_port = gContext->GetNumSetting("UDPNotifyPort");
-    if (udp_port > 0)
-        udpnotify = new UDPNotify(this, udp_port);
-    else
-        udpnotify = NULL;
+     if (udp_port > 0)
+         udpnotify = new UDPNotify(this, udp_port);
+     else
+         udpnotify = NULL;
 }
 
 
