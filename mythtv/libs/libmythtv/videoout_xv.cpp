@@ -14,6 +14,10 @@
 #include <sys/shm.h>
 #include <X11/keysym.h>
 
+#include <qsqldatabase.h>
+#include <qsqlquery.h>
+
+
 #include <iostream>
 
 #include "yuv2rgb.h"
@@ -25,6 +29,8 @@
 #include "videoout_xv.h"
 #include "XvMCSurfaceTypes.h"
 #include "util-x11.h"
+#include "libmyth/mythdbcon.h"
+
 
 extern "C" {
 #define XMD_H 1
@@ -38,14 +44,17 @@ extern "C" {
 
 static QString xvflags2str(int flags);
 
+
+
 //#define DEBUG_PAUSE /* enable to debug XvMC pause frame */
 
 #ifdef USING_XVMC
-#   define AGGRESSIVE_BUFFER_MANAGEMENT
+/*#   define AGGRESSIVE_BUFFER_MANAGEMENT
 #   define XVMC_OSD_NUM       2
 #   define XVMC_OSD_RES_NUM   2
 #   define XVMC_MIN_SURF_NUM  8
-#   define XVMC_MAX_SURF_NUM 16
+#   define XVMC_MAX_SURF_NUM 16*/
+
     static inline xvmc_render_state_t *GetRender(VideoFrame *frame);
 
 #   if defined(USING_XVMCW) || defined(USING_XVMC_VLD)
@@ -103,6 +112,28 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     // to a singleton instance of the DisplayRes class
     if (gContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes();
+        
+#ifdef USING_XVMC
+    int bufferID = gContext->GetNumSetting("xvmcBuffersID", 1);
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare( "SELECT osd_num, osd_res_num, min_surf, max_surf, decode_num, agressive "
+                   "FROM xvmc_buffer_settings "
+                   "WHERE id = :BUFFID" );
+    query.bindValue( ":BUFFID", bufferID );
+    
+    if (query.exec() && query.isActive() && query.size())
+    {
+        VERBOSE(VB_PLAYBACK, QString( "Using XvMC buffer settings ID: %1" ).arg(bufferID));
+                                    
+        query.next();
+        xvmcBuffers.OSDNum    = query.value(0).toInt();
+        xvmcBuffers.OSDResNum = query.value(1).toInt();
+        xvmcBuffers.MinSurf   = query.value(2).toInt();
+        xvmcBuffers.MaxSurf   = query.value(3).toInt();
+        xvmcBuffers.NumDecode = query.value(4).toInt();
+        xvmcBuffers.Agressive = query.value(5).toInt();
+    }
+#endif
 }
 
 VideoOutputXv::~VideoOutputXv()
@@ -542,36 +573,15 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
     if (mcodecid > kCodec_NORMAL_END)
     {
         // Create ffmpeg VideoFrames    
-
-#define UGLY_VLD_HACK 1
-#if UGLY_VLD_HACK
-	// This is a temprary hack to initialise more buffers for the XvMC
-	// VLD codec. This should not be needed because more XvMC surfaces
-        // should be allocated up to XVMC_MAX_SURF_NUM in
-        // VideoOutputXv::CreateXvMCBuffers() and vbuffers.Init() should
-        // be called with the absolute minimum number of XvMC surfaces, 8.
-
         bool vld, idct, mc;
         myth2av_codecid(myth_codec_id, vld, idct, mc);
-	
-	if (vld)
-        {
-        	vbuffers.Init(16 /*numdecode*/, false /*extra_for_pause*/,
-                	      1+XVMC_OSD_RES_NUM /*need_free*/,
-                	      5-XVMC_OSD_RES_NUM /*needprebuffer_normal*/,
-                	      5-XVMC_OSD_RES_NUM /*needprebuffer_small*/,
-                	      1 /*keepprebuffer*/, true /*use_frame_locking*/);
-	}
-	else
-#endif // UGLY_VLD_HACK
-        {
-        	vbuffers.Init(8 /*numdecode*/, false /*extra_for_pause*/,
-                	      1+XVMC_OSD_RES_NUM /*need_free*/,
-                	      5-XVMC_OSD_RES_NUM /*needprebuffer_normal*/,
-                	      5-XVMC_OSD_RES_NUM /*needprebuffer_small*/,
-                	      1 /*keepprebuffer*/, true /*use_frame_locking*/);
-	}
-
+        vbuffers.Init( xvmcBuffers.NumDecode/*numdecode*/, false /*extra_for_pause*/,
+                       1 + xvmcBuffers.OSDResNum /*need_free*/,
+                       5 - xvmcBuffers.OSDResNum /*needprebuffer_normal*/,
+                       5 - xvmcBuffers.OSDResNum /*needprebuffer_small*/,
+                       1 /*keepprebuffer*/, true /*use_frame_locking*/);
+        
+        
         done = InitXvMC(mcodecid);
 
         if (!done)
@@ -1135,8 +1145,8 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
         return false;
 
     bool createBlocks = !(XVMC_VLD == (xvmc_surf_info.mc_type & XVMC_VLD));
-    xvmc_surfs = CreateXvMCSurfaces(XVMC_MAX_SURF_NUM, createBlocks);
-    if (xvmc_surfs.size() < XVMC_MIN_SURF_NUM)
+    xvmc_surfs = CreateXvMCSurfaces(xvmcBuffers.MaxSurf, createBlocks);
+    if (xvmc_surfs.size() < xvmcBuffers.MinSurf)
     {
         VERBOSE(VB_IMPORTANT, "Unable to create XvMC Surfaces");
         DeleteBuffers(XVideoMC, false);
@@ -1153,7 +1163,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
     }
 
     xvmc_osd_lock.lock();
-    for (uint i=0; i<XVMC_OSD_NUM; i++)
+    for (uint i=0; i < xvmcBuffers.OSDNum; i++)
     {
         XvMCOSD *xvmc_osd =
             new XvMCOSD(XJ_disp, xv_port, xvmc_surf_info.surface_type_id,
@@ -2633,37 +2643,38 @@ void VideoOutputXv::CheckDisplayedFramesForAvailability(void)
 #ifdef USING_XVMC
     frame_queue_t::iterator it;
 
-#ifdef AGGRESSIVE_BUFFER_MANAGEMENT
-    it = vbuffers.begin_lock(kVideoBuffer_displayed);
-    for (;it != vbuffers.end(kVideoBuffer_displayed); ++it)
+    if ( xvmcBuffers.Agressive )
     {
-        VideoFrame* frame = *it;
-        frame_queue_t c = vbuffers.Children(frame);
-        frame_queue_t::iterator cit = c.begin();
-        for (; cit != c.end(); ++cit)
+        it = vbuffers.begin_lock(kVideoBuffer_displayed);
+        for (;it != vbuffers.end(kVideoBuffer_displayed); ++it)
         {
-            VideoFrame *cframe = *cit;
-            vbuffers.LockFrame(cframe, "CDFForAvailability 1");
-            if (!IsRendering(cframe))
+            VideoFrame* frame = *it;
+            frame_queue_t c = vbuffers.Children(frame);
+            frame_queue_t::iterator cit = c.begin();
+            for (; cit != c.end(); ++cit)
             {
-                GetRender(cframe)->p_past_surface   = NULL;
-                GetRender(cframe)->p_future_surface = NULL;
-                vbuffers.RemoveInheritence(cframe);
-                vbuffers.UnlockFrame(cframe, "CDFForAvailability 2");
-                if (!vbuffers.HasChildren(frame))
-                    break;
-                else
+                VideoFrame *cframe = *cit;
+                vbuffers.LockFrame(cframe, "CDFForAvailability 1");
+                if (!IsRendering(cframe))
                 {
-                    c = vbuffers.Children(frame);
-                    cit = c.begin();
+                    GetRender(cframe)->p_past_surface   = NULL;
+                    GetRender(cframe)->p_future_surface = NULL;
+                    vbuffers.RemoveInheritence(cframe);
+                    vbuffers.UnlockFrame(cframe, "CDFForAvailability 2");
+                    if (!vbuffers.HasChildren(frame))
+                        break;
+                    else
+                    {
+                        c = vbuffers.Children(frame);
+                        cit = c.begin();
+                    }
                 }
+                else
+                    vbuffers.UnlockFrame(cframe, "CDFForAvailability 3");
             }
-            else
-                vbuffers.UnlockFrame(cframe, "CDFForAvailability 3");
         }
+        vbuffers.end_lock();
     }
-    vbuffers.end_lock();
-#endif // AGGRESSIVE_BUFFER_MANAGEMENT
 
     it = vbuffers.begin_lock(kVideoBuffer_displayed);
     for (;it != vbuffers.end(kVideoBuffer_displayed); ++it)

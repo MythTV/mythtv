@@ -1923,6 +1923,27 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
             return false;
     }
 
+    if (dbver == "1086")
+    {
+        const QString updates[] = {
+            "CREATE TABLE IF NOT EXISTS xvmc_buffer_settings ( "
+            "  id int(11) NOT NULL auto_increment, "
+            "  description varchar(255) NOT NULL default '',"
+            "  osd_num int(11) NOT NULL default '0',"
+            "  osd_res_num int(11) NOT NULL default '0',"
+            "  min_surf int(11) NOT NULL default '0',"
+            "  max_surf int(11) NOT NULL default '0',"
+            "  decode_num int(11) NOT NULL default '0',"
+            "  agressive int(11) NOT NULL default '1',"
+            "  PRIMARY KEY  (id) );",
+            "INSERT INTO xvmc_buffer_settings VALUES (1,'Default / nVidia',2,2,8,16,8,1);",
+            "INSERT INTO xvmc_buffer_settings VALUES (2,'VLD (More decode buffers)',2,2,8,16,16,1);"
+        }; 
+        
+        if (!performActualUpdate(updates, "1087", dbver))
+            return false;
+    }
+    
     return true;
 }
 

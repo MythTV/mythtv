@@ -16,7 +16,19 @@
 #undef HAVE_AV_CONFIG_H
 #include "../libavcodec/avcodec.h"
 
-#ifdef USING_XVMC
+#ifdef USING_XVMC 
+class XvMCBufferSettings
+{
+    public:
+        XvMCBufferSettings() { OSDNum = OSDResNum = 2; MinSurf = 8; MaxSurf = 16; NumDecode = 8; Agressive = 1; }
+        unsigned int OSDNum;
+        unsigned int OSDResNum;
+        unsigned int MinSurf;
+        unsigned int MaxSurf;
+        unsigned int NumDecode;
+        unsigned int Agressive;
+};
+
 class XvMCOSD;
 #include "XvMCSurfaceTypes.h"
 #include "../libavcodec/xvmc_render.h"
@@ -138,6 +150,7 @@ class VideoOutputXv : public VideoOutput
 #ifdef USING_XVMC 
     XvMCOSD* GetAvailableOSD();
     void ReturnAvailableOSD(XvMCOSD*);
+    XvMCBufferSettings xvmcBuffers;
 #endif // USING_XVMC
 
     // Misc.
