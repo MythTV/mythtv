@@ -48,8 +48,8 @@ DVBParamHelper<fe_spectral_inversion_t>::Table DVBInversion::parseTable[] =
 
 char* DVBInversion::stringLookup[] =
 {
-    "1", // INVERSION_OFF,
-    "0", // INVERSION_ON,
+    "0", // INVERSION_OFF,
+    "1", // INVERSION_ON,
     "a"  //INVERSION_AUTO
 };
 
