@@ -1687,6 +1687,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ChangeTimeStretch(-1);
             else if (action == "RIGHT")
                 ChangeTimeStretch(1);
+            else if (action == "DOWN")
+                ChangeTimeStretch(-5);
+            else if (action == "UP")
+                ChangeTimeStretch(5);
             else if (action == "TOGGLESTRETCH")
                 ClearOSD();
             else
