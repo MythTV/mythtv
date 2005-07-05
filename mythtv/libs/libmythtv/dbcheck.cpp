@@ -1937,7 +1937,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
             "  agressive int(11) NOT NULL default '1',"
             "  PRIMARY KEY  (id) );",
             "INSERT INTO xvmc_buffer_settings VALUES (1,'Default / nVidia',2,2,8,16,8,1);",
-            "INSERT INTO xvmc_buffer_settings VALUES (2,'VLD (More decode buffers)',2,2,8,16,16,1);"
+            "INSERT INTO xvmc_buffer_settings VALUES (2,'VLD (More decode buffers)',2,2,8,16,16,1);",
+            ""
         }; 
         
         if (!performActualUpdate(updates, "1087", dbver))
