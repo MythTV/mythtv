@@ -143,6 +143,7 @@ QStringList LanguageSettings::getLanguages(void)
           << QString::fromUtf8("Français")    << "FR"   // French
           << QString::fromUtf8("Deutsch")     << "DE"   // German
           << QString::fromUtf8("Dansk")       << "DK"   // Danish
+          << QString::fromUtf8("Norsk (bokmål)") << "NB" // Norwegian (Bokmål)
           << QString::fromUtf8("Svenska")     << "SV"   // Swedish
           << QString::fromUtf8("Português")   << "PT"   // Portuguese
           << QString::fromUtf8("Nihongo")     << "JA"   // Japanese

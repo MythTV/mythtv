@@ -17,6 +17,7 @@
       <text lang="ZH_TW">預設錄影</text>
       <text lang="SI">Planiranje snemanj</text>
       <text lang="ET">Planeeri salvestamisi</text>
+      <text lang="NB">Planlegg opptak</text>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -32,6 +33,7 @@
       <text lang="ZH_TW">錄影優先次序</text>
       <text lang="SI">Nastavitve prioritet</text>
       <text lang="ET">Muuda prioriteete</text>
+      <text lang="NB">Sett prioriteter</text>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -52,6 +54,7 @@
       <text lang="ZH_TW">修正預設錄影衝突</text>
       <text lang="SI">Prihajajoča snemanja</text>
       <text lang="ET">Tulevased salvestamised</text>
+      <text lang="NB">Planlagte opptak</text>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
@@ -72,6 +75,7 @@
       <text lang="ZH_TW">刪除錄影</text>
       <text lang="SI">Brisanje snemanj</text>
       <text lang="ET">Kustuta salvestusi</text>
+      <text lang="NB">Slett opptak</text>
       <action>TV_DELETE</action>
    </button>
 
@@ -87,6 +91,7 @@
       <text lang="ZH_TW">以前的錄影</text>
       <text lang="SI">Že posneto</text>
       <text lang="ET">Varem salvestatud</text>
+      <text lang="NB">Tatt opp tidligere</text>
       <action>TV_PREVIOUS</action>
    </button>
 

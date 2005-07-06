@@ -15,6 +15,7 @@
      <text lang="ZH_TW">音樂設定</text>
      <text lang="SI">Glasbene nastavitve</text>
      <text lang="ET">Muusika seaded</text>
+     <text lang="NB">Musikkinnstillinger</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -35,6 +36,7 @@
        <text lang="ZH_TW">電影設定</text>
        <text lang="SI">Video nastavitve</text>
        <text lang="ET">Video seaded</text>
+       <text lang="NB">Videoinnstillinger</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -54,6 +56,7 @@
      <text lang="ZH_TW">DVD設定</text>
      <text lang="SI">DVD nastavitve</text>
      <text lang="ET">DVD seaded</text>
+     <text lang="NB">DVD-innstillinger</text>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -74,6 +77,7 @@
       <text lang="ZH_TW">照相館設定</text>
       <text lang="SI">Nastavitve slik</text>
       <text lang="ET">Galerii seaded</text>
+      <text lang="NB">Bildeinnstillinger</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -94,6 +98,7 @@
      <text lang="ZH_TW">遊戲設定</text>
      <text lang="SI">Nastavitve iger</text>
      <text lang="ET">Mängude seaded</text>
+     <text lang="NB">Spillinnstillinger</text>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -108,6 +113,7 @@
      <text lang="FI">Radioasetukset</text>
      <text lang="SI">Radio nastavitve</text>
      <text lang="ET">Raadio seaded</text>
+     <text lang="NB">Radioinnstillinger</text>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>

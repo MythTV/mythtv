@@ -10,6 +10,7 @@
      <text lang="FR">Téléphone</text>
      <text lang="SI">Telefon</text>
      <text lang="ET">Telefon</text>
+     <text lang="NB">Telefon</text>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
@@ -28,6 +29,7 @@
      <text lang="ZH_TW">網上新聞</text>
      <text lang="SI">Novice</text>
      <text lang="ET">Uudised</text>
+     <text lang="NB">Nyheter</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -58,6 +60,7 @@
      <text lang="ZH_TW">天氣報告</text>
      <text lang="SI">Vreme</text>
      <text lang="ET">Ilmateade</text>
+     <text lang="NB">Været</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -73,6 +76,7 @@
       <text lang="ZH_TW">互聯網</text>
       <text lang="SI">Splet</text>
       <text lang="ET">Veeb</text>
+      <text lang="NB">Nettleser</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -89,6 +93,7 @@
      <text lang="FI">Reseptit</text>
      <text lang="SI">Recepti</text> 
      <text lang="ET">Retseptid</text>
+     <text lang="NB">Oppskrifter</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -105,6 +110,7 @@
       <text lang="ZH_TW">系統狀態</text>
       <text lang="SI">Status sistema</text>
       <text lang="ET">Süsteemi olek</text>
+      <text lang="NB">Systemstatus</text>
       <action>TV_STATUS</action>
    </button>
 

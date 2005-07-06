@@ -12,6 +12,7 @@
       <text lang="ZH_TW">新標題</text>
       <text lang="SI">Novi naslovi</text>
       <text lang="ET">Uued pealkirjad</text>
+      <text lang="NB">Nye titler</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -27,6 +28,7 @@
       <text lang="ZH_TW">電影</text>
       <text lang="SI">Filmi</text>
       <text lang="ET">Filmid</text>
+      <text lang="NB">Filmer</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -42,6 +44,7 @@
       <text lang="ZH_TW">種類</text>
       <text lang="SI">Kategorije</text>
       <text lang="ET">Kategooriad</text>
+      <text lang="NB">Kategories</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -57,6 +60,7 @@
       <text lang="ZH_TW">電視台</text>
       <text lang="SI">Kanali</text>
       <text lang="ET">Kanalid</text>
+      <text lang="NB">Kanaler</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -72,6 +76,7 @@
       <text lang="ZH_TW">時間</text>
       <text lang="SI">Čas</text>
       <text lang="ET">Aeg</text>
+      <text lang="NB">Tid</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 

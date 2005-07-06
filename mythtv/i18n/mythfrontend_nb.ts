@@ -3,11 +3,11 @@
     <name>@default</name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ukjent</translation>
     </message>
     <message>
         <source>Queued</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lagt i kø</translation>
     </message>
     <message>
         <source>Pending</source>
@@ -15,19 +15,19 @@
     </message>
     <message>
         <source>Starting</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Starter</translation>
     </message>
     <message>
         <source>Running</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kjører</translation>
     </message>
     <message>
         <source>Stopping</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stopper</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pause</translation>
     </message>
     <message>
         <source>Retrying</source>
@@ -43,46 +43,46 @@
     </message>
     <message>
         <source>Done (Invalid status!)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fullført (ugyldig status!)</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ferdig</translation>
     </message>
     <message>
         <source>Aborted</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avbrutt</translation>
     </message>
     <message>
         <source>Errored</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Feil</translation>
     </message>
     <message>
         <source>Cancelled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kansellert</translation>
     </message>
 </context>
 <context>
     <name>CaptureCard</name>
     <message>
         <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="unfinished"></translation>
+        <translation>Kortet må lagres før det kan konfigureres. Skal dette gjøres nå?</translation>
     </message>
     <message>
         <source>Yes, save now</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, lagre nå</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Nei, ikke lagre nå</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Avansert konfigurasjon</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Innstillinger for opptak</translation>
     </message>
     <message>
         <source>Diseqc</source>
@@ -93,73 +93,73 @@
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture Card Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-kortmeny</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger . . .</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett . . .</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation type="unfinished"></translation>
+        <translation>Virkelig slette dette TV-kortet?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, slett TV-kortet</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Nei, ikke slett TV-kortet</translation>
     </message>
     <message>
         <source>Capture cards</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-kort</translation>
     </message>
 </context>
 <context>
     <name>ChannelEditor</name>
     <message>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaler</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete this channel?</source>
-        <translation type="unfinished"></translation>
+        <translation>Virkelig slette denne kanalen?</translation>
     </message>
     <message>
         <source>Yes, delete the channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, slett kanalen</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Nei, ikke slett kanalen</translation>
     </message>
     <message>
         <source>Channel Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalmeny</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger . . .</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett . . .</translation>
     </message>
 </context>
 <context>
     <name>ChannelRecPriority</name>
     <message>
         <source>The theme you are using does not contain a &apos;recprioritychannels&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temaet som brukes inneholder ikke et &apos;recprioritychannels&apos;-element. Kontakt temaets forfatter for å få temaet oppdatert.&lt;br&gt;&lt;br&gt;Det neste skjermbildet vil være tomt; bruk &apos;Esc&apos;-tasten for å komme tilbake til menyen.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -170,6 +170,14 @@
     </message>
     <message>
         <source>Rule Name</source>
+        <translation>Regelnavn</translation>
+    </message>
+    <message>
+        <source>Match an exact title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Match an exact episode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -178,39 +186,43 @@
     </message>
     <message>
         <source>Match in any descriptive field</source>
-        <translation type="unfinished"></translation>
+        <translation>F</translation>
     </message>
     <message>
         <source>Limit by category</source>
-        <translation type="unfinished"></translation>
+        <translation>Begrens til kategori</translation>
     </message>
     <message>
         <source>New episodes only</source>
-        <translation type="unfinished"></translation>
+        <translation>Bare nye episoder</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke ta med uidentifiserte episoder (Data Direct)</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke ta med uidentifiserte episoder (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategoritype</translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation>eller</translation>
     </message>
     <message>
         <source>Limit movies by the year of release</source>
-        <translation type="unfinished"></translation>
+        <translation>Begrens filmer etter utgivelsesår</translation>
     </message>
     <message>
         <source>Minimum star rating (0.0 to 1.0 for movies only)</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimumsrangering (0,0 til 1,0 kun for filmer)</translation>
     </message>
     <message>
         <source>Exclude one station</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekskluder en stasjon</translation>
     </message>
     <message>
         <source>Match related callsigns</source>
@@ -218,23 +230,27 @@
     </message>
     <message>
         <source>Only channels from a specific video source</source>
-        <translation type="unfinished"></translation>
+        <translation>Bare kanaler fra en bestemt videokilde</translation>
     </message>
     <message>
         <source>Only channels marked as commercial free</source>
-        <translation type="unfinished"></translation>
+        <translation>Bare kanaler markert som reklamefrie</translation>
+    </message>
+    <message>
+        <source>Only shows marked as HDTV</source>
+        <translation>Bare sendinger markert som HDTV</translation>
     </message>
     <message>
         <source>Anytime on a specific day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>Når som helst på en bestemt ukedag</translation>
     </message>
     <message>
         <source>Only on weekdays (Monday through Friday)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bare på hverdager (mandag til fredag)</translation>
     </message>
     <message>
         <source>Only on weekends</source>
-        <translation type="unfinished"></translation>
+        <translation>Bare i helger</translation>
     </message>
     <message>
         <source>Only in primetime</source>
@@ -246,50 +262,10 @@
     </message>
     <message>
         <source>Multiple sports teams (complete example)</source>
-        <translation type="unfinished"></translation>
+        <translation>Flere idrettslag (komplett eksempel)</translation>
     </message>
     <message>
         <source>Sci-fi B-movies (complete example)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add this example clause</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>or</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Match an exact title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Match an exact episode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An error was found when checking</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The database error was</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Only shows marked as HDTV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -299,6 +275,30 @@
     <message>
         <source>Movie of the Week (complete example - use FindWeekly)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add this example clause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation>Test</translation>
+    </message>
+    <message>
+        <source>Record</source>
+        <translation>Ta opp</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>An error was found when checking</source>
+        <translation>En feil ble funnet under kontrollering</translation>
+    </message>
+    <message>
+        <source>The database error was</source>
+        <translation>Databasefeilen var</translation>
     </message>
     <message>
         <source>Edit Rule</source>
@@ -313,31 +313,31 @@
     <name>DVBTransportsEditor</name>
     <message>
         <source>DVB Transport Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Transportredigerer for DVB</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete this transport?</source>
-        <translation type="unfinished"></translation>
+        <translation>Virkelig slette denne transporten?</translation>
     </message>
     <message>
         <source>Yes, delete the transport</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, slett transporten</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Nei, ikke slett transporten</translation>
     </message>
     <message>
         <source>Transport Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Transportmeny</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger . . .</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett . . .</translation>
     </message>
 </context>
 <context>
@@ -355,159 +355,199 @@
     <name>InfoDialog</name>
     <message>
         <source>Record this program whenever it&apos;s shown anywhere</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp dette programmet uansett hvor og når det vises</translation>
     </message>
     <message>
         <source>Record this program whenever it&apos;s shown on this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp dette programmet uansett sendetid på denne kanalen</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp dette programmet i dette tidsrommet hver uke</translation>
     </message>
     <message>
         <source>Record this program in this timeslot every day</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record only this showing of the program</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t record this program</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t record this showing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record this showing with override options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record this showing with normal options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To go to the advanced recordings screen, press &apos;i&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp dette programmet i dette tidsrommet hver dag</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp én sending av denne tittelen</translation>
+    </message>
+    <message>
+        <source>Record only this showing of the program</source>
+        <translation>Ta bare opp denne sendingen av programmet</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record this program</source>
+        <translation>Ikke ta opp dette programmet</translation>
+    </message>
+    <message>
+        <source>Don&apos;t record this showing</source>
+        <translation>Ikke ta opp denne sendingen</translation>
+    </message>
+    <message>
+        <source>Record this showing with override options</source>
+        <translation>Ta opp denne sendingen med overstyringinnstillinger</translation>
+    </message>
+    <message>
+        <source>Record this showing with normal options</source>
+        <translation>Ta opp denne sendingen med vanlige innstillinger</translation>
+    </message>
+    <message>
+        <source>To go to the advanced recordings screen, press &apos;i&apos;</source>
+        <translation>Trykk &apos;i&apos; for avanserte opptaksinnstillinger</translation>
+    </message>
+    <message>
+        <source>To see a list of all up-coming showings of this program, press &apos;5&apos;</source>
+        <translation>Trykk &apos;5&apos; for å se en liste over kommende sendinger av dette programmet</translation>
     </message>
 </context>
 <context>
     <name>JobQueue</name>
     <message>
         <source>Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>Konverter</translation>
     </message>
     <message>
         <source>Flag Commercials</source>
-        <translation type="unfinished"></translation>
+        <translation>Marker reklamer</translation>
     </message>
     <message>
         <source>Unknown Job</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukjent jobb</translation>
+    </message>
+    <message>
+        <source>Queued</source>
+        <translation type="obsolete">Lagt i kø</translation>
+    </message>
+    <message>
+        <source>Starting</source>
+        <translation type="obsolete">Starter</translation>
+    </message>
+    <message>
+        <source>Running</source>
+        <translation type="obsolete">Kjører</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="obsolete">Pause</translation>
+    </message>
+    <message>
+        <source>Stopping</source>
+        <translation type="obsolete">Stopper</translation>
+    </message>
+    <message>
+        <source>Done (Invalid status!)</source>
+        <translation type="obsolete">Fullført (ugyldig status!)</translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation type="obsolete">Ferdig</translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation type="obsolete">Avbrutt</translation>
+    </message>
+    <message>
+        <source>Errored</source>
+        <translation type="obsolete">Feil</translation>
+    </message>
+    <message>
+        <source>Cancelled</source>
+        <translation type="obsolete">Kansellert</translation>
     </message>
     <message>
         <source>Undefined</source>
-        <translation type="unfinished"></translation>
+        <translation>Udefinert</translation>
     </message>
 </context>
 <context>
     <name>ManualBox</name>
     <message>
         <source>Manual Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuelt opptak</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tittel:</translation>
     </message>
     <message>
         <source>Subtitle:</source>
-        <translation type="unfinished"></translation>
+        <translation>Undertekst:</translation>
     </message>
     <message>
         <source>Duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>Varighet:</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minutter</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Start</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopp</translation>
     </message>
 </context>
 <context>
     <name>ManualSchedule</name>
     <message>
         <source>Manual Recording Scheduler</source>
-        <translation type="unfinished"></translation>
+        <translation>Planlegger for manuelle opptak</translation>
     </message>
     <message>
         <source>Channel:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Time:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Duration:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal:</translation>
     </message>
     <message>
         <source>Date or day of the week</source>
-        <translation type="unfinished"></translation>
+        <translation>Dato eller ukedag</translation>
+    </message>
+    <message>
+        <source>Time:</source>
+        <translation>Tid:</translation>
+    </message>
+    <message>
+        <source>Duration:</source>
+        <translation>Varighet:</translation>
     </message>
     <message>
         <source>minute</source>
-        <translation type="unfinished"></translation>
+        <translation>minutt</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minutter</translation>
     </message>
     <message>
         <source>Title (optional):</source>
-        <translation type="unfinished"></translation>
+        <translation>Tittel (valgfritt):</translation>
     </message>
     <message>
         <source>Set Recording Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagre opptaksinnstillinger</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuelt opptak</translation>
     </message>
 </context>
 <context>
     <name>MythContext</name>
     <message>
         <source>Could not connect to the master backend server -- is it running?  Is the IP address set for it in the setup program correct?</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke koble til hovedtjeneren. Den kjører kanskje ikke, eller IP-adressen angitt i oppsettsprogrammet kan være feil.</translation>
     </message>
     <message>
         <source>The connection to the master backend server has gone away for some reason.. Is it running?</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilkoblingen til hovedtjeneren har av en eller anenn grunn forsvunnet. Kjører den?</translation>
     </message>
 </context>
 <context>
@@ -533,22 +573,22 @@ Returning to previous menu.</source>
     <name>MythPopupBox</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
     <name>MythSearchDialog</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbryt</translation>
     </message>
 </context>
 <context>
@@ -568,270 +608,166 @@ Returning to previous menu.</source>
     <name>MythWizard</name>
     <message>
         <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Avbryt</translation>
     </message>
     <message>
         <source>&lt; &amp;Back</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; Til&amp;bake</translation>
     </message>
     <message>
         <source>&amp;Next &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Neste &gt;</translation>
     </message>
     <message>
         <source>&amp;Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ferdig</translation>
     </message>
 </context>
 <context>
     <name>PlaybackBox</name>
     <message>
         <source>All Programs</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle programmer</translation>
     </message>
     <message>
         <source>There are %1 recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>Det er %1 opptak i denne gruppen</translation>
     </message>
     <message>
         <source>There is one recording in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>Det er ett opptak i denne gruppen</translation>
     </message>
     <message>
         <source>There are no recordings in this display group</source>
-        <translation type="unfinished"></translation>
+        <translation>Det er ingen opptak i denne gruppen</translation>
     </message>
     <message>
         <source>% used</source>
-        <translation type="unfinished"></translation>
+        <translation>% brukt</translation>
     </message>
     <message>
         <source>, %1 GB free</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording List Menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Group View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Group Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You have finished watching:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow this program to AutoExpire?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Are you sure you want to stop:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes, and allow re-record</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes, delete it</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes, AutoExpire</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes, stop recording it</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No, keep it, I changed my mind</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No, do not AutoExpire</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No, continue recording it</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop Recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Recording Group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit Recording Schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop Transcoding</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Begin Transcoding</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop Commercial Flagging</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Begin Commercial Flagging</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Status Icons</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Commercials are flagged</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An editing cutlist is present</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The program is able to auto-expire</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Commercials are being flagged</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A bookmark is set</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ok</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording Group View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Recording Group Password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording Group:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Old Password:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>,%1GB ledig</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Play from beginning</source>
-        <translation type="unfinished"></translation>
+        <source>Recording List Menu</source>
+        <translation>Opptakslistemeny</translation>
     </message>
     <message>
-        <source>Play from bookmark</source>
-        <translation type="unfinished"></translation>
+        <source>Change Group View</source>
+        <translation>Endre gruppens visning</translation>
     </message>
     <message>
-        <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
-        <translation type="unfinished"></translation>
+        <source>Change Group Password</source>
+        <translation>Endre gruppens passord</translation>
     </message>
     <message>
-        <source>Do not preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <source>Show group list as recording groups</source>
+        <translation type="obsolete">Vis gruppeliste som opptaksgrupper</translation>
     </message>
     <message>
-        <source>Preserve this episode</source>
-        <translation type="unfinished"></translation>
+        <source>Show group list as titles</source>
+        <translation type="obsolete">Vis gruppeliste som titler</translation>
     </message>
     <message>
-        <source>Play from...</source>
-        <translation type="unfinished"></translation>
+        <source>Playlist options</source>
+        <translation>Spillelisteinnstillinger</translation>
     </message>
     <message>
-        <source>Storage Options</source>
-        <translation type="unfinished"></translation>
+        <source>Add this Category/Title Group to Playlist</source>
+        <translation type="obsolete">Legg til denne kategorien/tittelgruppen i spillelisten</translation>
     </message>
     <message>
-        <source>Recording Options</source>
-        <translation type="unfinished"></translation>
+        <source>Add this Recording Group to Playlist</source>
+        <translation type="obsolete">Legg denne opptaksgruppen til i spillelisten</translation>
     </message>
     <message>
-        <source>Job Options</source>
-        <translation type="unfinished"></translation>
+        <source>Add this recording to Playlist</source>
+        <translation>Legg dette opptaket til i spillelisten</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>You have finished watching:</source>
+        <translation>Ferdig med å se på:</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete:</source>
+        <translation>Virkelig slette:</translation>
+    </message>
+    <message>
+        <source>Allow this program to AutoExpire?</source>
+        <translation>Tillate at dette programmet løper ut automatisk?</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop:</source>
+        <translation>Virkelig stoppe:</translation>
+    </message>
+    <message>
+        <source>Delete it, but allow it to re-record</source>
+        <translation>Slett det, men tillat at det blir tatt opp igjen</translation>
+    </message>
+    <message>
+        <source>Yes, and allow re-record</source>
+        <translation>Ja, og tillat det å bli tatt opp igjen</translation>
+    </message>
+    <message>
+        <source>Delete it</source>
+        <translation>Slett det</translation>
+    </message>
+    <message>
+        <source>Yes, delete it</source>
+        <translation>Ja, slett det</translation>
+    </message>
+    <message>
+        <source>Yes, AutoExpire</source>
+        <translation>Ja, utløp automatisk</translation>
+    </message>
+    <message>
+        <source>Yes, stop recording it</source>
+        <translation>Ja, ikke ta opp mer av det</translation>
+    </message>
+    <message>
+        <source>Save it so I can watch it again</source>
+        <translation>Lagre det til seinere visning</translation>
+    </message>
+    <message>
+        <source>No, keep it, I changed my mind</source>
+        <translation>Nei, behold det</translation>
+    </message>
+    <message>
+        <source>No, do not AutoExpire</source>
+        <translation>Nei, ikke utløp automatisk</translation>
+    </message>
+    <message>
+        <source>No, continue recording it</source>
+        <translation>Nei, fortsett å ta det opp</translation>
+    </message>
+    <message>
+        <source>There are %1 items in the playlist.</source>
+        <translation>Det er %1 elementer i spillelisten.</translation>
+    </message>
+    <message>
+        <source>There is %1 item in the playlist.</source>
+        <translation>Det er %1 element i spillelisten.</translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation>Spill av</translation>
     </message>
     <message>
         <source>Shuffle Play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Playlist options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add this recording to Playlist</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There are %1 items in the playlist.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is %1 item in the playlist.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Clear Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Tøm spilleliste</translation>
     </message>
     <message>
         <source>Toggle playlist for this Category/Title</source>
@@ -847,47 +783,167 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>These actions affect all items in the playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Disse handlingene berører alle elementene i spillelisten</translation>
     </message>
     <message>
-        <source>Remove from Playlist</source>
-        <translation type="unfinished"></translation>
+        <source>Change Recording Group</source>
+        <translation>Endre opptaksgruppe</translation>
     </message>
     <message>
-        <source>Add to Playlist</source>
-        <translation type="unfinished"></translation>
+        <source>Job Options</source>
+        <translation>Jobbinnstillinger</translation>
     </message>
     <message>
-        <source>User Job</source>
-        <translation type="unfinished"></translation>
+        <source>Delete</source>
+        <translation>Slett</translation>
     </message>
     <message>
-        <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <source>Begin Transcoding</source>
+        <translation>Start konvertering</translation>
+    </message>
+    <message>
+        <source>Stop Transcoding</source>
+        <translation>Stopp konvertering</translation>
+    </message>
+    <message>
+        <source>Begin Commercial Flagging</source>
+        <translation>Begynn markering av reklamer</translation>
+    </message>
+    <message>
+        <source>Stop Commercial Flagging</source>
+        <translation>Stopp markering av reklamer</translation>
     </message>
     <message>
         <source>Begin</source>
+        <translation>Begynn</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Stopp</translation>
+    </message>
+    <message>
+        <source>Play from bookmark</source>
+        <translation>Spill av fra bokmerke</translation>
+    </message>
+    <message>
+        <source>Play from beginning</source>
+        <translation>Spill av fra begynnelsen</translation>
+    </message>
+    <message>
+        <source>A preserved episode is ignored in calculations for deleting episodes above the limit.  Auto-expiration is used to remove eligable programs when disk space is low.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete it, but allow it to re-record</source>
+        <source>Don&apos;t Auto Expire</source>
+        <translation>Ikke utløp automatisk</translation>
+    </message>
+    <message>
+        <source>Auto Expire</source>
+        <translation>Utløp automatisk</translation>
+    </message>
+    <message>
+        <source>Do not preserve this episode</source>
+        <translation>Ikke bevar denne episoden</translation>
+    </message>
+    <message>
+        <source>Preserve this episode</source>
+        <translation>Bevar denne episoden</translation>
+    </message>
+    <message>
+        <source>Edit Recording Schedule</source>
+        <translation>Rediger opptaksplan</translation>
+    </message>
+    <message>
+        <source>User Job</source>
+        <translation>Brukerjobb</translation>
+    </message>
+    <message>
+        <source>Play from...</source>
+        <translation>Spill av fra . . .</translation>
+    </message>
+    <message>
+        <source>Remove from Playlist</source>
+        <translation>Fjern fra spilleliste</translation>
+    </message>
+    <message>
+        <source>Add to Playlist</source>
+        <translation>Legg til i spilleliste</translation>
+    </message>
+    <message>
+        <source>Stop Recording</source>
+        <translation>Stopp opptak</translation>
+    </message>
+    <message>
+        <source>Storage Options</source>
+        <translation>Lagringsinnstillinger</translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation>Opptaksinnstillinger</translation>
+    </message>
+    <message>
+        <source>Status Icons</source>
+        <translation>Statusikoner</translation>
+    </message>
+    <message>
+        <source>Commercials are flagged</source>
+        <translation>Reklamer blir markert</translation>
+    </message>
+    <message>
+        <source>An editing cutlist is present</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete it</source>
+        <source>The program is able to auto-expire</source>
+        <translation>Dette programme kan utløpe automatisk</translation>
+    </message>
+    <message>
+        <source>Commercials are being flagged</source>
+        <translation>Reklamer blir markert</translation>
+    </message>
+    <message>
+        <source>A bookmark is set</source>
+        <translation>Et bokmerke er satt</translation>
+    </message>
+    <message>
+        <source>Ok</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Recording Group View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save it so I can watch it again</source>
-        <translation type="unfinished"></translation>
+        <source>Default</source>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Gruppe</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Passord:</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Change Recording Group Password</source>
+        <translation>Endre passord for opptaksgruppe</translation>
+    </message>
+    <message>
+        <source>Recording Group:</source>
+        <translation>Opptaksgruppe:</translation>
+    </message>
+    <message>
+        <source>Old Password:</source>
+        <translation>Gammelt passord:</translation>
+    </message>
+    <message>
+        <source>New Password:</source>
+        <translation>Nytt passord:</translation>
     </message>
     <message>
         <source>Change Group Filter</source>
@@ -934,7 +990,7 @@ Returning to previous menu.</source>
     <name>PreviousBox</name>
     <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Tatt opp tidligere</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
@@ -942,7 +998,7 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Sort by Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorter etter tittel</translation>
     </message>
     <message>
         <source>Reverse Title</source>
@@ -950,7 +1006,7 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Sort by Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorter etter tid</translation>
     </message>
     <message>
         <source>Reverse Time</source>
@@ -958,41 +1014,41 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>MERK: å slette elementer fra denne listen vil ikke slette noen opptak</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation type="unfinished"></translation>
+        <translation>Behold denne episoden i listen</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern denne episoden fra listen</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern alle episoder av dette programmet</translation>
     </message>
 </context>
 <context>
     <name>ProgFinder</name>
     <message>
         <source>No Programs</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen programmer</translation>
     </message>
     <message>
         <source>There are no available programs under this search. Please select another search.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det er ingen tilgjengelige programmet i dette søket.</translation>
     </message>
     <message>
         <source>       !! No Programs !!</source>
-        <translation type="unfinished"></translation>
+        <translation>        !! Ingen programmer !!</translation>
     </message>
 </context>
 <context>
     <name>ProgLister</name>
     <message>
         <source>Program Listings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Programlister</translation>
     </message>
     <message>
         <source>New Title Search</source>
@@ -1015,11 +1071,11 @@ Returning to previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Channel Search</source>
+        <source>Category Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Category Search</source>
+        <source>Channel Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1036,23 +1092,23 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Select Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg rangering</translation>
     </message>
     <message>
         <source>Select Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg kanal</translation>
     </message>
     <message>
         <source>Select Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg kategori</translation>
     </message>
     <message>
         <source>Select List</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg liste</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg</translation>
     </message>
     <message>
         <source>Select Phrase</source>
@@ -1064,15 +1120,15 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp</translation>
     </message>
     <message>
         <source>Select Search</source>
@@ -1084,7 +1140,7 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger</translation>
     </message>
     <message>
         <source>Select Time</source>
@@ -1107,59 +1163,59 @@ Returning to previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Movies</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Series</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sports</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Specials</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4 stars</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>At least 3 1/2 stars</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>At least 3 stars</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>At least 2 stars</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Power Recording Rule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>(Any Program Type)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Movies</source>
+        <translation>Filmer</translation>
+    </message>
+    <message>
+        <source>Series</source>
+        <translation>Serier</translation>
+    </message>
+    <message>
+        <source>Show</source>
+        <translation>Sending</translation>
+    </message>
+    <message>
+        <source>Sports</source>
+        <translation>Sport</translation>
+    </message>
+    <message>
         <source>(Any Category)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Alle kategorier)</translation>
     </message>
     <message>
         <source>(Any Station)</source>
+        <translation>(Alle stasjoner)</translation>
+    </message>
+    <message>
+        <source>All</source>
+        <translation>Alle</translation>
+    </message>
+    <message>
+        <source>Specials</source>
+        <translation>Spesielle</translation>
+    </message>
+    <message>
+        <source>4 stars</source>
+        <translation>4 stjerner</translation>
+    </message>
+    <message>
+        <source>At least 3 1/2 stars</source>
+        <translation>Minst 3 1/2 stjerne</translation>
+    </message>
+    <message>
+        <source>At least 3 stars</source>
+        <translation>Minst 3 stjerner</translation>
+    </message>
+    <message>
+        <source>At least 2 stars</source>
+        <translation>Minst 2 stjerner</translation>
+    </message>
+    <message>
+        <source>Power Recording Rule</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1167,130 +1223,270 @@ Returning to previous menu.</source>
     <name>ProgramRecPriority</name>
     <message>
         <source>The theme you are using does not contain a &apos;recpriorityprograms&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temaet som er i bruk inneholder ikke et &apos;recpriorityprograms&apos;-element. Kontakt forfatteren og spør om de kan oppdatere det.&lt;br&gt;&lt;br&gt;Det neste skjermbildet vil være tomt; trykk &apos;Esc&apos; for å komme tilbake til menyen.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording just this showing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording with override options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording every week</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording in this timeslot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording on this channel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording all showings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording one showing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not allowed to record this showing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not recording this showing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>^(The |A |An )</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Recording %1 of %2</source>
+        <translation>Tar opp %1 av %2</translation>
+    </message>
+    <message>
+        <source>Recording just this showing</source>
+        <translation>Tar bare opp denne sendingen</translation>
+    </message>
+    <message>
+        <source>Recording with override options</source>
+        <translation>Tar opp med overstyringsinnstillinger</translation>
+    </message>
+    <message>
+        <source>Recording every week</source>
+        <translation>Tar opp hver uke</translation>
+    </message>
+    <message>
+        <source>Recording in this timeslot</source>
+        <translation>Tar opp i dette tidsrommet</translation>
+    </message>
+    <message>
+        <source>Recording on this channel</source>
+        <translation>Tar opp på denne kanalen</translation>
+    </message>
+    <message>
+        <source>Recording all showings</source>
+        <translation>Tar opp alle sendinger</translation>
+    </message>
+    <message>
+        <source>Recording one showing</source>
+        <translation>Tar opp én sending</translation>
+    </message>
+    <message>
         <source>Recording a showing daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Tar opp én sending hver dag</translation>
     </message>
     <message>
         <source>Recording a showing weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Tar opp én sending hver uke</translation>
     </message>
     <message>
-        <source>Recording %1 of %2</source>
-        <translation type="unfinished"></translation>
+        <source>Not allowed to record this showing</source>
+        <translation>Ikke tillatt å ta opp denne sendingen</translation>
+    </message>
+    <message>
+        <source>Not recording this showing</source>
+        <translation>Tar ikke opp denne sendingen</translation>
+    </message>
+    <message>
+        <source>Error!</source>
+        <translation>Feil</translation>
+    </message>
+    <message>
+        <source>Any</source>
+        <translation>Alle</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>Go Back</source>
+        <source>Use custom identifier for frontend preferences</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wake-On-LAN settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database Configuration</source>
+        <translation>Databasekonfigurasjon</translation>
+    </message>
+    <message>
+        <source>All database settings take effect when you restart this program.</source>
+        <translation>Alle databaseinnstillinger trer i kraft når programmet startes på nytt.</translation>
+    </message>
+    <message>
+        <source>Myth could not connect to the database. Please verify your database settings below.</source>
+        <translation>Myth kunne ikke koble til databasen; kontroller databaseinnstillingene under.</translation>
+    </message>
+    <message>
+        <source>Host name</source>
+        <translation>Vertsnavn</translation>
+    </message>
+    <message>
+        <source>The host name or IP address of the machine hosting the database. This information is required.</source>
+        <translation>Vertsnavnet eller IP-adressen til maskinen som har databasen. Dette feltet må fylles ut.</translation>
+    </message>
+    <message>
+        <source>Database</source>
+        <translation>Database</translation>
+    </message>
+    <message>
+        <source>The name of the database. This information is required.</source>
+        <translation>Databasens navn. Dette feltet må fylles ut.</translation>
+    </message>
+    <message>
+        <source>User</source>
+        <translation>Bruker</translation>
+    </message>
+    <message>
+        <source>The user name to use while connecting to the database. This information is required.</source>
+        <translation>Brukernavnet som skal brukes for å koble til databasen. Dette feltet må fylles ut.</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Passord</translation>
+    </message>
+    <message>
+        <source>The password to use while connecting to the database. This information is required.</source>
+        <translation>Passordet som skal brukes for å koble til databasen. Dette feltet må fylles ut.</translation>
+    </message>
+    <message>
+        <source>Database type</source>
+        <translation>Databasetype</translation>
+    </message>
+    <message>
+        <source>MySQL</source>
+        <translation>MySQL</translation>
+    </message>
+    <message>
+        <source>The database implementation used for your server.</source>
+        <translation>Databaseversjonen som brukes av tjeneren.</translation>
+    </message>
+    <message>
+        <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom identifier</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An identifier to use while saving the settings for this frontend.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Wake-On-LAN to wake database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The time in seconds to wait for the server to wake up.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry attempts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The number of retries to wake the server before the frontend gives up.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Wake command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The command executed on this frontend to wake up the database server.</source>
+        <translation>Kommandoen som denne klienten kjører for å vekke opp databasetjeneren.</translation>
+    </message>
+    <message>
+        <source>Select your preferred language</source>
+        <translation>Velg ønsket språk</translation>
+    </message>
+    <message>
+        <source>Go Back</source>
+        <translation>Gå tilbake</translation>
     </message>
     <message>
         <source>No Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen forandringer</translation>
     </message>
     <message>
         <source>Pre-scaling theme images</source>
-        <translation type="unfinished"></translation>
+        <translation>Pre-skalerer temabilder</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>Any</source>
+        <translation>Alle</translation>
+    </message>
+    <message>
+        <source>Bad Menu File</source>
+        <translation>Korrupt menyfil</translation>
+    </message>
+    <message>
+        <source>No Menu File</source>
+        <translation>Ingen menyfil</translation>
     </message>
     <message>
         <source>Channel Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalinnstillinger</translation>
     </message>
     <message>
         <source>(New Channel)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Ny kanal)</translation>
     </message>
     <message>
         <source>Channel Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalnavn</translation>
     </message>
     <message>
         <source>Channel Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalnummer</translation>
     </message>
     <message>
         <source>Video Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Videokilde</translation>
     </message>
     <message>
         <source>(All)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Alle)</translation>
     </message>
     <message>
         <source>(Unassigned)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Uoppnevnt)</translation>
     </message>
     <message>
         <source>Sort Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorteringsmodus</translation>
     </message>
     <message>
         <source>Hide channels without channel number.</source>
-        <translation type="unfinished"></translation>
+        <translation>Skjul kanaler uten kanalnummer</translation>
+    </message>
+    <message>
+        <source>Scan for channels(s)</source>
+        <translation>Søk etter kanaler (s)</translation>
+    </message>
+    <message>
+        <source>This button will scan for digital channels.</source>
+        <translation>Dette knappen vil søke etter digitale kanaler.</translation>
+    </message>
+    <message>
+        <source>Advanced</source>
+        <translation>Avansert</translation>
+    </message>
+    <message>
+        <source>Advanced editing options for digital channels</source>
+        <translation>Avanserte innstillinger for digitale kanaler</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Ikke valgt]</translation>
     </message>
     <message>
         <source>Callsign</source>
@@ -1298,7 +1494,7 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>TV Format</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-standard</translation>
     </message>
     <message>
         <source>If this channel uses a format other than TV Format in the General Backend Setup screen, set it here.</source>
@@ -1306,15 +1502,15 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Rank</source>
-        <translation type="unfinished"></translation>
+        <translation>Rangering</translation>
     </message>
     <message>
         <source>Icon</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikon</translation>
     </message>
     <message>
         <source>Video filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Videofiltre</translation>
     </message>
     <message>
         <source>Filters to be used when recording from this channel.  Not used with hardware encoding cards.</source>
@@ -1322,7 +1518,7 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Playback filters</source>
-        <translation type="unfinished"></translation>
+        <translation>Avspillingsfiltre</translation>
     </message>
     <message>
         <source>Filters to be used when recordings from this channel are viewed.  Start with a plus to append to the global playback filters.</source>
@@ -1330,11 +1526,11 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>XMLTV ID</source>
-        <translation type="unfinished"></translation>
+        <translation>XMLTV-ID</translation>
     </message>
     <message>
         <source>Commercial Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklamefri</translation>
     </message>
     <message>
         <source>If set automatic commercial flagging will be skipped for this channel.  Useful for premium channels like HBO.</source>
@@ -1342,55 +1538,106 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Visible</source>
-        <translation type="unfinished"></translation>
+        <translation>Synlig</translation>
     </message>
     <message>
         <source>If set, the channel will be visible in the EPG.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Frequency ID</source>
+        <source>Use on air guide</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set the guide information will be taken from the On Air Channel guide.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency ID</source>
+        <translation>Frekvens-ID</translation>
     </message>
     <message>
         <source>Finetune</source>
-        <translation type="unfinished"></translation>
+        <translation>Finjustering</translation>
     </message>
     <message>
         <source>Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast</translation>
     </message>
     <message>
         <source>Brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Lysstyrke</translation>
     </message>
     <message>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Farge</translation>
     </message>
     <message>
         <source>Hue</source>
+        <translation>Nyanse</translation>
+    </message>
+    <message>
+        <source>Channel Options - Common</source>
+        <translation>Kanalinnstillinger - vanlige</translation>
+    </message>
+    <message>
+        <source>Channel Options - Video 4 Linux</source>
+        <translation>Kanalinnstillinger - Video 4 Linux</translation>
+    </message>
+    <message>
+        <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Standard</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>Digital TV standard.
+</source>
+        <translation>Digital-TV-standard.</translation>
+    </message>
+    <message>
+        <source>DVB</source>
+        <translation>DVB</translation>
+    </message>
+    <message>
+        <source>ATSC</source>
+        <translation>ATSC</translation>
+    </message>
+    <message>
         <source>Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvens</translation>
+    </message>
+    <message>
+        <source>Frequency (Option has no default)
+The frequency for this channel in Hz.</source>
+        <translation>Frekvens (ingen standardverdi) 
+Frekvensen for denne kanalen i Hertz.</translation>
     </message>
     <message>
         <source>Symbol Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Polarity</source>
+        <source>Symbol Rate (Option has no default)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Polarity</source>
+        <translation>Polaritet</translation>
+    </message>
+    <message>
+        <source>Polarity (Option has no default)</source>
+        <translation>Polaritet (ingen standardverdi)</translation>
     </message>
     <message>
         <source>Horizontal</source>
-        <translation type="unfinished"></translation>
+        <translation>Horisontalt</translation>
     </message>
     <message>
         <source>Vertical</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertikalt</translation>
     </message>
     <message>
         <source>Right Circular</source>
@@ -1401,7 +1648,32 @@ Returning to previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Modulation Used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>8VSB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM64</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QAM256</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Inversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Inversion (Default: Auto):
+Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1410,18 +1682,34 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>På</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Av</translation>
     </message>
     <message>
         <source>Bandwidth</source>
-        <translation type="unfinished"></translation>
+        <translation>Båndbredde</translation>
     </message>
     <message>
-        <source>Modulation</source>
+        <source>Bandwidth (Default: Auto)</source>
+        <translation>Båndbredde (standard: automatisk)</translation>
+    </message>
+    <message>
+        <source>6 MHz</source>
+        <translation>6MHz</translation>
+    </message>
+    <message>
+        <source>7 MHz</source>
+        <translation>7MHz</translation>
+    </message>
+    <message>
+        <source>8 MHz</source>
+        <translation>8MHz</translation>
+    </message>
+    <message>
+        <source>Modulation (Default: Auto)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1429,11 +1717,19 @@ Returning to previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>None</source>
+        <source>Constellation (Default: Auto)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>None</source>
+        <translation>Ingen</translation>
+    </message>
+    <message>
         <source>FEC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward Error Correction (Default: Auto)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1441,7 +1737,15 @@ Returning to previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Low Priority Code Rate (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>HP Coderate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High Priority Code Rate (Default: Auto)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1449,7 +1753,15 @@ Returning to previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Guard Interval (Default: Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Trans. Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transmission Mode (Default: Auto)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1457,19 +1769,15 @@ Returning to previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Audio</source>
+        <source>Hierarchy (Default: Auto)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Other</source>
+        <source>DVB Transport</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Channel Options - Common</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel Options - Video 4 Linux</source>
+        <source>Transport Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1506,155 +1814,284 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Return to menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gå tilbake til menyen.</translation>
+    </message>
+    <message>
+        <source>Unable to initialize video.</source>
+        <translation>Kunne ikke initialisere video.</translation>
+    </message>
+    <message>
+        <source>Error was encountered while displaying video.</source>
+        <translation>Feil ved visning av video.</translation>
+    </message>
+    <message>
+        <source>Return to Menu</source>
+        <translation>Gå tilbake til menyen</translation>
     </message>
     <message>
         <source>Position Saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Posisjon lagret</translation>
     </message>
     <message>
         <source>Position Cleared</source>
-        <translation type="unfinished"></translation>
+        <translation>Posisjon slettet</translation>
     </message>
     <message>
         <source>cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Klippingspunkt</translation>
     </message>
     <message>
         <source>keyframe</source>
-        <translation type="unfinished"></translation>
+        <translation>Nøkkelbilde</translation>
     </message>
     <message>
         <source>1 frame</source>
-        <translation type="unfinished"></translation>
+        <translation>1 bilde</translation>
     </message>
     <message>
         <source>0.5 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>0,5 sekunder</translation>
     </message>
     <message>
         <source>1 second</source>
-        <translation type="unfinished"></translation>
+        <translation>1 sekund</translation>
     </message>
     <message>
         <source>5 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>5 sekunder</translation>
     </message>
     <message>
         <source>20 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>20 sekunder</translation>
     </message>
     <message>
         <source>1 minute</source>
-        <translation type="unfinished"></translation>
+        <translation>1 minutt</translation>
     </message>
     <message>
         <source>5 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>5 minutter</translation>
     </message>
     <message>
         <source>10 minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>10 minutter</translation>
     </message>
     <message>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>Feil</translation>
     </message>
     <message>
         <source>cut</source>
-        <translation type="unfinished"></translation>
+        <translation>Klipp</translation>
     </message>
     <message>
         <source>You are close to an existing cut point.  Would you like to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Posisjonen er nær et eksisterende klippepunkt.</translation>
     </message>
     <message>
         <source>Delete this cut point</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett dette klippepunktet</translation>
     </message>
     <message>
         <source>Move this cut point to the current position</source>
-        <translation type="unfinished"></translation>
+        <translation>Flytt klippepunktet til denne posisjonen</translation>
     </message>
     <message>
         <source>Flip directions - delete to the </source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt retninger - slett til </translation>
     </message>
     <message>
         <source>right</source>
-        <translation type="unfinished"></translation>
+        <translation>høyre</translation>
     </message>
     <message>
         <source>left</source>
-        <translation type="unfinished"></translation>
+        <translation>venstre</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Insert a new cut point?</source>
-        <translation type="unfinished"></translation>
+        <translation>Sette inn et nytt klippepunkt?</translation>
     </message>
     <message>
         <source>Delete before this frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett før dette bildet</translation>
     </message>
     <message>
         <source>Delete after this frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett etter dette bildet</translation>
+    </message>
+    <message>
+        <source>Completed</source>
+        <translation type="obsolete">Fullført</translation>
+    </message>
+    <message>
+        <source>Searching for Logo</source>
+        <translation type="obsolete">Søker etter logo</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation type="obsolete">Pause</translation>
+    </message>
+    <message>
+        <source>Restarting</source>
+        <translation type="obsolete">Starter på nytt</translation>
+    </message>
+    <message>
+        <source>%1% Completed @ %2 fps.</source>
+        <translation type="obsolete">%1% ferdig med %2 bilder per sek.</translation>
+    </message>
+    <message>
+        <source>%1 Frames Completed @ %2 fps.</source>
+        <translation type="obsolete">%1 bilder ferdige med %2 bilder per sek.</translation>
+    </message>
+    <message>
+        <source>Completed, %1 FPS</source>
+        <translation type="obsolete">Ferdig, %1 bilder per sek.</translation>
+    </message>
+    <message>
+        <source>Commercial Breaks Found</source>
+        <translation type="obsolete">Reklamepauser funnet</translation>
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 bak - %2 full</translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 bak</translation>
     </message>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 av %2</translation>
     </message>
     <message>
         <source>Skip %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol %1</translation>
     </message>
     <message>
         <source>Commercial: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklame: %1</translation>
+    </message>
+    <message>
+        <source>Found %1 sec. commercial</source>
+        <translation type="obsolete">Fant %1 sekunders reklame</translation>
     </message>
     <message>
         <source>Not Flagged</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke merket</translation>
+    </message>
+    <message>
+        <source>Skipping Back.</source>
+        <translation>Spoler tilbake.</translation>
     </message>
     <message>
         <source>Start of program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Begynnelsen av programmet.</translation>
     </message>
     <message>
         <source>At End, can not Skip.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ved slutten; kan ikke spole forbi.</translation>
     </message>
     <message>
         <source>GB</source>
         <comment>GigaBytes</comment>
-        <translation type="unfinished"></translation>
+        <translation>GB</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minutter</translation>
     </message>
     <message>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation>Gjenta</translation>
     </message>
     <message>
         <source>stars</source>
-        <translation type="unfinished"></translation>
+        <translation>stjerner</translation>
     </message>
     <message>
         <source>star</source>
+        <translation>stjerne</translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecTypeChar kSingleRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecTypeChar kTimeslotRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>W</source>
+        <comment>RecTypeChar kWeekslotRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecTypeChar kChannelRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecTypeChar kAllRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F</source>
+        <comment>RecTypeChar kFindOneRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>d</source>
+        <comment>RecTypeChar kFindDailyRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>w</source>
+        <comment>RecTypeChar kFindWeeklyRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>O</source>
+        <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Record</source>
+        <translation>Enkelt opptak</translation>
+    </message>
+    <message>
+        <source>Record Daily</source>
+        <translation>Ta opp daglig</translation>
+    </message>
+    <message>
+        <source>Record Weekly</source>
+        <translation>Ta opp ukentlig</translation>
+    </message>
+    <message>
+        <source>Channel Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record All</source>
+        <translation>Ta opp alle</translation>
+    </message>
+    <message>
+        <source>Find One</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Daily</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Find Weekly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1663,192 +2100,417 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Not Recording</source>
+        <translation>Tar ikke opp</translation>
+    </message>
+    <message>
+        <source>D</source>
+        <comment>RecStatusChar rsDeleted</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
+        <comment>RecStatusChar rsStopped</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsRecorded</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
+        <comment>RecStatusChar rsDontRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>P</source>
+        <comment>RecStatusChar rsPreviousRecording</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>R</source>
+        <comment>RecStatusChar rsCurrentRecording</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>r</source>
+        <comment>RecStatusChar rsRepeat</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>E</source>
+        <comment>RecStatusChar rsEarlierShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>T</source>
+        <comment>RecStatusChar rsTooManyRecordings</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>C</source>
+        <comment>RecStatusChar rsConflict</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>L</source>
+        <comment>RecStatusChar rsLaterShowing</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>K</source>
+        <comment>RecStatusChar rsLowDiskSpace</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>B</source>
+        <comment>RecStatusChar rsTunerBusy</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>x</source>
+        <comment>RecStatusChar rsInactive</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Slettet</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Stoppet</translation>
     </message>
     <message>
         <source>Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Tatt opp</translation>
     </message>
     <message>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Tar opp</translation>
     </message>
     <message>
         <source>Will Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Skal ta opp</translation>
     </message>
     <message>
         <source>Don&apos;t Record</source>
+        <translation>Ikke ta opp</translation>
+    </message>
+    <message>
+        <source>Previously Recorded</source>
+        <translation>Tatt opp tidligere</translation>
+    </message>
+    <message>
+        <source>Currently Recorded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Earlier Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidligere sending</translation>
     </message>
     <message>
         <source>Max Recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Maks. opptak</translation>
     </message>
     <message>
         <source>Manual Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuell avbryting</translation>
     </message>
     <message>
         <source>Conflicting</source>
-        <translation type="unfinished"></translation>
+        <translation>Konflikt</translation>
     </message>
     <message>
         <source>Later Showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Seinere sending</translation>
     </message>
     <message>
         <source>Low Disk Space</source>
-        <translation type="unfinished"></translation>
+        <translation>Lite diskplass</translation>
     </message>
     <message>
         <source>Tuner Busy</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-kort opptatt</translation>
+    </message>
+    <message>
+        <source>Inactive</source>
+        <translation>Inaktiv</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukjent</translation>
     </message>
     <message>
         <source>This showing will be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denne sendingen vil bil tatt opp.</translation>
     </message>
     <message>
         <source>This showing is being recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denne sendingen taes opp.</translation>
     </message>
     <message>
         <source>This showing was recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denne sendingen ble tatt opp.</translation>
     </message>
     <message>
         <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denne sendingen ble tatt opp, men ble stoppet før opptaket var fullført.</translation>
     </message>
     <message>
         <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denne sendingen ble tatt opp, men ble slettet før opptaket var ferdig.</translation>
     </message>
     <message>
         <source>The status of this showing is unknown.</source>
-        <translation type="unfinished"></translation>
+        <translation>Statusen til denne sendingen er ukjent.</translation>
     </message>
     <message>
         <source>This showing will not be recorded because </source>
-        <translation type="unfinished"></translation>
+        <translation>Denne sendingen vil ikke bli tatt opp fordi </translation>
     </message>
     <message>
         <source>This showing was not recorded because </source>
-        <translation type="unfinished"></translation>
+        <translation>Denne sendingen vil ikke bli tatt opp fordi </translation>
     </message>
     <message>
         <source>it was manually set to not record.</source>
-        <translation type="unfinished"></translation>
+        <translation>det ble manuelt satt til ikke å ta opp.</translation>
     </message>
     <message>
         <source>this episode was previously recorded according to the duplicate policy chosen for this title.</source>
-        <translation type="unfinished"></translation>
+        <translation>ifølge dupliseringsreglene valgt for denne tittelen, var episoden tatt opp tidligere.</translation>
     </message>
     <message>
         <source>this episode was previously recorded and is still available in the list of recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>denne episoden er tatt opp tidligere, og fortsatt tilgjengelige i listen over opptak.</translation>
     </message>
     <message>
         <source>this episode will be recorded at an earlier time instead.</source>
-        <translation type="unfinished"></translation>
+        <translation>denne episoden vil bli tatt opp ved en tidligere sending i stedet.</translation>
     </message>
     <message>
         <source>this episode is a repeat.</source>
-        <translation type="unfinished"></translation>
+        <translation>denne episoden er en reprise.</translation>
+    </message>
+    <message>
+        <source>this recording schedule is inactive.</source>
+        <translation>denne opptaksplanen er inaktiv.</translation>
     </message>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>for mange opptak av denne serien er allerede tatt opp.</translation>
     </message>
     <message>
         <source>it was manually cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>det ble avbrutt manuelt.</translation>
     </message>
     <message>
         <source>another program with a higher priority will be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>et annet program med en høyere prioritet taes opp i stedet.</translation>
     </message>
     <message>
         <source>this episode will be recorded at a later time.</source>
-        <translation type="unfinished"></translation>
+        <translation>denne episoden vil bli tatt opp ved en seinere sending.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
-        <translation type="unfinished"></translation>
+        <translation>det var ikke nok tilgjengelig diskplass.</translation>
     </message>
     <message>
         <source>the tuner card was already being used.</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-kortet var allerede i bruk.</translation>
     </message>
     <message>
         <source>you should never see this.</source>
+        <translation>dette skal ikke skje.</translation>
+    </message>
+    <message>
+        <source>Air Date:</source>
+        <translation type="obsolete">Sendedato:</translation>
+    </message>
+    <message>
+        <source>Episode:</source>
+        <translation type="obsolete">Episode:</translation>
+    </message>
+    <message>
+        <source>Description:</source>
+        <translation type="obsolete">Beskrivelse:</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation>Tittel</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Beskrivelse</translation>
+    </message>
+    <message>
+        <source>Part %1 of %2, </source>
+        <translation>Del %1 av %2, </translation>
+    </message>
+    <message>
+        <source>HDTV</source>
+        <translation>HDTV</translation>
+    </message>
+    <message>
+        <source>CC</source>
+        <comment>Close Captioned</comment>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitled</source>
+        <translation>Undertekster</translation>
+    </message>
+    <message>
+        <source>Stereo</source>
+        <translation>Stereo</translation>
+    </message>
+    <message>
+        <source>Category</source>
+        <translation>Kategori</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <comment>category_type</comment>
+        <translation>Type</translation>
+    </message>
+    <message>
+        <source>Episode Number</source>
+        <translation>Episodenummer</translation>
+    </message>
+    <message>
+        <source>Original Airdate</source>
+        <translation>Opprinnelig sendedato</translation>
+    </message>
+    <message>
+        <source>Program ID</source>
+        <translation>Program-ID</translation>
+    </message>
+    <message>
+        <source>Find ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actors</source>
+        <translation>Skuespillere</translation>
+    </message>
+    <message>
+        <source>Guest Star</source>
+        <translation>Gjesteopptreden</translation>
+    </message>
+    <message>
+        <source>Director</source>
+        <translation>Regissør</translation>
+    </message>
+    <message>
+        <source>Recording Host</source>
+        <translation>Opptaksvert</translation>
+    </message>
+    <message>
+        <source>Filesize</source>
+        <translation>Filstørrelse</translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation>Opptaksgruppe</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Reactivate</source>
-        <translation type="unfinished"></translation>
+        <translation>Reaktiver</translation>
     </message>
     <message>
         <source>Stop recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopp opptak</translation>
     </message>
     <message>
         <source>Don&apos;t record</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke ta opp</translation>
     </message>
     <message>
         <source>Never record</source>
-        <translation type="unfinished"></translation>
+        <translation>Aldri ta opp</translation>
     </message>
     <message>
         <source>Edit Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger innstillinger</translation>
     </message>
     <message>
         <source>Add Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Legg til overstyring</translation>
     </message>
     <message>
         <source>Edit Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger overstyring</translation>
     </message>
     <message>
         <source>Clear Override</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern overstyring</translation>
     </message>
     <message>
         <source> The following programs will be recorded instead:
 </source>
-        <translation type="unfinished"></translation>
+        <translation> Følgende programmer vil bli tatt opp i stedet:</translation>
     </message>
     <message>
         <source>Record anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp uansett</translation>
     </message>
     <message>
         <source>Forget Previous</source>
+        <translation>Glem forrige</translation>
+    </message>
+    <message>
+        <source>Absolutely don&apos;t record</source>
+        <translation>Ta for all del ikke opp</translation>
+    </message>
+    <message>
+        <source>Terrestrial</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable</source>
+        <translation>Kabel</translation>
+    </message>
+    <message>
+        <source>ATSC Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC transport, cable or terrestrial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bandwidth (Default: Auto)
+</source>
+        <translation>Båndbredde (standard: automatisk)</translation>
+    </message>
+    <message>
+        <source>Transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card</source>
+        <translation>TV-kort</translation>
+    </message>
+    <message>
+        <source>Scanning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation>Signalstyrke</translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation>Signal/Støy</translation>
     </message>
     <message>
         <source>Power Search</source>
@@ -1871,32 +2533,28 @@ Returning to previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Any</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>30m</source>
-        <translation type="unfinished"></translation>
+        <translation>30m</translation>
     </message>
     <message>
         <source>1h</source>
-        <translation type="unfinished"></translation>
+        <translation>1t</translation>
     </message>
     <message>
         <source>1h30m</source>
-        <translation type="unfinished"></translation>
+        <translation>1t30m</translation>
     </message>
     <message>
         <source>2h</source>
-        <translation type="unfinished"></translation>
+        <translation>2t</translation>
     </message>
     <message>
         <source>MythTV wants to record &quot;%1&quot; on %2 in %3 seconds. Do you want to:</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV vil ta opp &quot;%1&quot; på %2 om %3 sekunder. Hva skal gjøres?</translation>
     </message>
     <message>
         <source>ProfileGroup</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilgruppe</translation>
     </message>
     <message>
         <source>Transcoders</source>
@@ -1908,55 +2566,55 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>(Create new profile group)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Lag ny profilgruppe)</translation>
     </message>
     <message>
         <source>Delete profile group:</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett profilgruppe:</translation>
     </message>
     <message>
         <source>Yes, delete group</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, slett gruppen</translation>
     </message>
     <message>
         <source>No, Don&apos;t delete group</source>
-        <translation type="unfinished"></translation>
+        <translation>Nei, ikke slett gruppen</translation>
     </message>
     <message>
         <source>Profile Group Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Navn på profilgruppe</translation>
     </message>
     <message>
         <source>Hostname</source>
-        <translation type="unfinished"></translation>
+        <translation>Vertsnavn</translation>
     </message>
     <message>
         <source>Card-Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Korttype</translation>
     </message>
     <message>
         <source>Profile name</source>
-        <translation type="unfinished"></translation>
+        <translation>Profilnavn</translation>
     </message>
     <message>
         <source>Codec</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodek</translation>
     </message>
     <message>
         <source>MP3 Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>MP3-kvalitet</translation>
     </message>
     <message>
         <source>The higher the slider number, the lower the quality of the audio.  Better quality audio (lower numbers) requires more CPU.</source>
-        <translation type="unfinished"></translation>
+        <translation>Høyere tall gir dårligere kvalitet, men krever mindre prosessorbruk.</translation>
     </message>
     <message>
         <source>Volume (%)</source>
-        <translation type="unfinished"></translation>
+        <translation>Volum (%)</translation>
     </message>
     <message>
         <source>Recording volume of the capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksvolum på TV-kortet</translation>
     </message>
     <message>
         <source>Sampling rate</source>
@@ -1968,39 +2626,39 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Type</translation>
     </message>
     <message>
         <source>Sets the audio type</source>
-        <translation type="unfinished"></translation>
+        <translation>Velger lydtypen</translation>
     </message>
     <message>
         <source>Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitrate</translation>
     </message>
     <message>
         <source>Sets the audio bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Angir bitraten for lyd</translation>
     </message>
     <message>
         <source>Volume of the recording </source>
-        <translation type="unfinished"></translation>
+        <translation>Volum i opptaket</translation>
     </message>
     <message>
         <source>Bitrate Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitrateinnstillinger</translation>
     </message>
     <message>
         <source>Audio Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Lydkvalitet</translation>
     </message>
     <message>
         <source>RTjpeg Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>RTjpeg-kvalitet</translation>
     </message>
     <message>
         <source>Higher is better quality.</source>
-        <translation type="unfinished"></translation>
+        <translation>Høyere verdier gir bedre kvalitet.</translation>
     </message>
     <message>
         <source>Luma filter</source>
@@ -2008,7 +2666,7 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Lower is better.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lavere er bedre.</translation>
     </message>
     <message>
         <source>Chroma filter</source>
@@ -2016,59 +2674,59 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitrate i kilobiter per sekund. 2200kbps er omtrent 1GB i timen.</translation>
     </message>
     <message>
         <source>Scale bitrate for frame size</source>
-        <translation type="unfinished"></translation>
+        <translation>Skaler bitrate etter bildestørrelse</translation>
     </message>
     <message>
         <source>If set, the MPEG4 bitrate will be used for 640x480.  If other resolutions are used, the bitrate will be scaled appropriately.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis aktivert vil MPEG4-bitraten bli brukt for 640x480, med andre oppløsninger vil bitraten bli skalert tilsvarende.</translation>
     </message>
     <message>
         <source>Minimum quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Minimumskvalitet</translation>
     </message>
     <message>
         <source>Modifying the default may have severe consequences.</source>
-        <translation type="unfinished"></translation>
+        <translation>Å endre standardverdien kan få alvorlige konsekvenser.</translation>
     </message>
     <message>
         <source>Maximum quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimumskvalitet</translation>
     </message>
     <message>
         <source>Max quality difference between frames</source>
-        <translation type="unfinished"></translation>
+        <translation>Høyeste kvalitetsforskjell mellom bilder</translation>
     </message>
     <message>
         <source>Enable interlaced DCT encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiver flettet DCT-koding</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced DCT encoding.  You probably want this when encoding interlaced video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis aktivert vil MPEG4-koderen bruke flettet DCT-koding. Dette er nyttig ved koding av flettet video.</translation>
     </message>
     <message>
         <source>Enable interlaced motion estimation</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiver flettet bevegelsesberegning</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use interlaced motion estimation.  You probably want this when encoding interlaced video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis aktivert vil MPEG4-koderen bruke flettet bevegelsesberegning. Dette er nyttig ved koding av flettet video.</translation>
     </message>
     <message>
         <source>Enable high-quality encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiver høykvalitetskoding</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use &apos;high-quality&apos; encoding options.  This requires much more processing, but can result in better video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis aktivert vil MPEG4-koderen bruke innstillinger for høykvalitetskoding. Dette krever mye mer prosessorkraft, men kan resultere i bedre video.</translation>
     </message>
     <message>
         <source>Enable 4MV encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiver 4MV-koding</translation>
     </message>
     <message>
         <source>If set, the MPEG4 encoder will use &apos;4MV&apos; motion-vector encoding.  This requires much more processing, but can result in better video. It is highly recommended that the HQ option is enabled if 4MV is enabled.</source>
@@ -2076,35 +2734,35 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>Max. Bitrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Høyeste bitrate</translation>
     </message>
     <message>
         <source>Maximum Bitrate in kilobits/second.  2200Kbps is approximately 1 Gigabyte per hour.</source>
-        <translation type="unfinished"></translation>
+        <translation>Høyeste bitrate i kilobiter per sekund. 2200kbps er omtrent 1GB i timen.</translation>
     </message>
     <message>
         <source>Stream Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Strømtype</translation>
     </message>
     <message>
         <source>Sets the type of stream generated by your PVR.</source>
-        <translation type="unfinished"></translation>
+        <translation>Angir strømtypen generert av TV-kortet.</translation>
     </message>
     <message>
         <source>Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Aspektforhold</translation>
     </message>
     <message>
         <source>Square</source>
-        <translation type="unfinished"></translation>
+        <translation>Kvadrat</translation>
     </message>
     <message>
         <source>Sets the aspect ratio of stream generated by your PVR.</source>
-        <translation type="unfinished"></translation>
+        <translation>Angir aspektforholdet generet av TV-kortet.</translation>
     </message>
     <message>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Kvalitet</translation>
     </message>
     <message>
         <source>Horizontal Decimation</source>
@@ -2120,372 +2778,416 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>RTjpeg Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>RTjpeg-parametere</translation>
     </message>
     <message>
         <source>MPEG-4 Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG4-parametere</translation>
     </message>
     <message>
         <source>Hardware MJPEG Parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Maskinvare MJPEG-parametere</translation>
     </message>
     <message>
         <source>MPEG-2 Hardware Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG2-maskinvarekoder</translation>
+    </message>
+    <message>
+        <source>Automatically transcode after recording</source>
+        <translation type="obsolete">Konverter automatisk etter opptak</translation>
+    </message>
+    <message>
+        <source>Resize Video while transcoding</source>
+        <translation>Endre videostørrelse under konvertering</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Bredde</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Høyde</translation>
     </message>
     <message>
         <source>Image size</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildestørrelse</translation>
     </message>
     <message>
         <source>Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Profil</translation>
     </message>
     <message>
         <source>Record using the &quot;%1&quot; profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp med &apos;%1&apos;-profilen</translation>
     </message>
     <message>
         <source>Scheduling Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Planleggingsinnstillinger</translation>
     </message>
     <message>
         <source>Post Recording Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Behandling etter opptak</translation>
     </message>
     <message>
         <source>Storage Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagringsinnstillinger</translation>
     </message>
     <message>
         <source>Create New Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Lag ny opptaksgruppe</translation>
     </message>
     <message>
         <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruk tastaturet eller fjernkontrollen til å skrive inn gruppens navn</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; recording group</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagre i opptaksgruppen &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Select Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg opptaksplan</translation>
     </message>
     <message>
         <source>Do not record this program</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke ta opp dette programmet</translation>
     </message>
     <message>
         <source>Record only this showing</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta kun opp denne sendingen</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title</source>
+        <translation>Ta opp én sending av denne tittelen</translation>
     </message>
     <message>
         <source>Record in this timeslot every week</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp i denne tidsperioden hver uke</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every week</source>
+        <translation>Ta opp én sending av denne tittelen hver uke</translation>
     </message>
     <message>
         <source>Record in this timeslot every day</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp i denne tidsperioden hver dag</translation>
+    </message>
+    <message>
+        <source>Record one showing of this title every day</source>
+        <translation>Ta opp én sending av denne tittelen hver dag</translation>
     </message>
     <message>
         <source>Record at any time on this channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp når som helst på denne kanalen</translation>
     </message>
     <message>
         <source>Record at any time on any channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp når som helst på enhver kanal</translation>
     </message>
     <message>
         <source>Record this showing with normal options</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp denne sendingen med normale innstillinger</translation>
     </message>
     <message>
         <source>Record this showing with override options</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp denne sendingen med overstyringsinnstillinger</translation>
     </message>
     <message>
         <source>Do not allow this showing to be recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke tillat dette programmet å bli tatt opp</translation>
     </message>
     <message>
         <source>Start recording %1 minutes late</source>
-        <translation type="unfinished"></translation>
+        <translation>Start opptaket %1 minutter seinere</translation>
     </message>
     <message>
         <source>Start recording %1 minute late</source>
-        <translation type="unfinished"></translation>
+        <translation>Start opptaket %1 minutt seinere</translation>
     </message>
     <message>
         <source>Start recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>Start opptaket ifølge sendeskjema</translation>
     </message>
     <message>
         <source>Start recording %1 minute early</source>
-        <translation type="unfinished"></translation>
+        <translation>Start opptaket %1 minutter før</translation>
     </message>
     <message>
         <source>Start recording %1 minutes early</source>
-        <translation type="unfinished"></translation>
+        <translation>Start opptaket %1 minutt før</translation>
     </message>
     <message>
         <source>End recording %1 minutes early</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopp opptaket %1 minutter før</translation>
     </message>
     <message>
         <source>End recording %1 minute early</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopp opptaket %1 minutt før</translation>
     </message>
     <message>
         <source>End recording on time</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopp opptaket ifølge sendeskjema</translation>
     </message>
     <message>
         <source>End recording %1 minute late</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopp opptaket %1 minutt seinere</translation>
     </message>
     <message>
         <source>End recording %1 minutes late</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopp opptaket %1 minutter seinere</translation>
     </message>
     <message>
         <source>Record new episodes only</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta bare opp nye episoder</translation>
     </message>
     <message>
         <source>Look for duplicates in current and previous recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Se etter dupliseringer i nåværende og tidligere opptak</translation>
     </message>
     <message>
         <source>Look for duplicates in current recordings only</source>
-        <translation type="unfinished"></translation>
+        <translation>Se etter dupliseringer kun i nåværende opptak</translation>
     </message>
     <message>
         <source>Look for duplicates in previous recordings only</source>
-        <translation type="unfinished"></translation>
+        <translation>Se etter dupliseringer kun i tidligere opptak</translation>
     </message>
     <message>
         <source>[ Match duplicates with ]</source>
-        <translation type="unfinished"></translation>
+        <translation>[ Finn dupliseringer med ]</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle &amp; description</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn dupliseringer ved hjelp av undertittel og beskrivelse</translation>
     </message>
     <message>
         <source>Match duplicates using subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn duplisering ved hejlp av undertittel</translation>
     </message>
     <message>
         <source>Match duplicates using description</source>
-        <translation type="unfinished"></translation>
+        <translation>Finn dupliseringer ved hjelp av beskrivelse</translation>
     </message>
     <message>
         <source>Don&apos;t match duplicates</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke finn dupliseringer</translation>
     </message>
     <message>
         <source>[ Select recording Profile ]</source>
-        <translation type="unfinished"></translation>
+        <translation>[ Velg opptaksprofil ]</translation>
     </message>
     <message>
         <source>Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Merk reklame i nye opptak</translation>
     </message>
     <message>
         <source>Do not Commercial Flag new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke merk reklame i nye opptak</translation>
     </message>
     <message>
         <source>Run &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Kjør &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Do not run &apos;%1&apos; for new recordings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke kjør &apos;%1&apos; for nye opptak</translation>
     </message>
     <message>
         <source>Allow auto expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillatt automatisk utløing</translation>
     </message>
     <message>
         <source>Don&apos;t allow auto expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke tillat automatisk utløping</translation>
+    </message>
+    <message>
+        <source>This recording schedule is inactive</source>
+        <translation>Denne opptaksplanen er inaktiv</translation>
+    </message>
+    <message>
+        <source>This recording schedule is active</source>
+        <translation>Denne opptaksplanen er aktiv</translation>
+    </message>
+    <message>
+        <source>Delete oldest if this would exceed the max episodes</source>
+        <translation>Slett den eldste hvis denne overstiger tillate episoder</translation>
     </message>
     <message>
         <source>Don&apos;t record if this would exceed the max episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke ta opp hvis denne overstiger tillate episoder</translation>
     </message>
     <message>
         <source>No episode limit</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen episodebegrensning</translation>
     </message>
     <message>
         <source>Keep only one episode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Behold kun én episode.</translation>
     </message>
     <message>
         <source>Keep at most %1 episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Behold minst %1 episoder</translation>
     </message>
     <message>
         <source>Reduce priority by %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Reduser prioritet med %1</translation>
     </message>
     <message>
         <source>Normal recording priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal opptaksprioritet</translation>
     </message>
     <message>
         <source>Raise priority by %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Hev prioritet med %1</translation>
     </message>
     <message>
         <source>Select Recording Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg opptaksgruppe</translation>
     </message>
     <message>
         <source>Create a new recording group</source>
-        <translation type="unfinished"></translation>
+        <translation>Lag en ny opptaksgruppe</translation>
     </message>
     <message>
         <source>Program details</source>
-        <translation type="unfinished"></translation>
+        <translation>Programdetaljer</translation>
     </message>
     <message>
         <source>List upcoming episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis kommende episoder</translation>
     </message>
     <message>
         <source>Save these settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagre innstillinger</translation>
     </message>
     <message>
         <source>XMLTV listings grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-programhenter for XMLTV</translation>
     </message>
     <message>
         <source>Channel frequency table</source>
-        <translation type="unfinished"></translation>
+        <translation>Frekvenstabell for kanaler</translation>
     </message>
     <message>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruk standard med mindre denne kilden bruker en annen frekvenstabell enn systemtabellen angitt i &apos;Generelle innstillinger&apos;.</translation>
     </message>
     <message>
         <source>User ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruker-ID</translation>
     </message>
     <message>
         <source>Failed to retrieve provider list</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke hente giverliste</translation>
     </message>
     <message>
         <source>You probably need to update XMLTV.</source>
-        <translation type="unfinished"></translation>
+        <translation>XMLTV må antakelig opptateres.</translation>
     </message>
     <message>
         <source>tv_grab_uk configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;tv_grab_uk&apos;-konfigurering</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels
 .  You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vent mens MythTV henter listen over tilgjengelige kanaler. Det blir kanskje vist viktig utdate i terminalen dette programmet ble startet fra.</translation>
     </message>
     <message>
         <source>Failed to retrieve channel information.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke hente kanalinformasjon.</translation>
     </message>
     <message>
         <source>MythTV was unable to retrieve channel information for your provider.
 Please check the terminal window for more information</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV kunne ikke hente kanalinformasjon for giveren. Se i terminalvinduet for mer informasjon</translation>
     </message>
     <message>
         <source>Configuration will run in the terminal window</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurasjonen vil foregå i terminalvinduet</translation>
     </message>
     <message>
         <source>Please wait while MythTV retrieves the list of available channels.
 You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vent mens MythTV henter listen over tilgjengelige kanaler. Det blir kanskje vist viktig utdata i terminalen dette programmet ble startet fra.</translation>
     </message>
     <message>
         <source>Warning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Advarsel</translation>
     </message>
     <message>
         <source>You MUST run &apos;mythfilldatabase --manual the first time,
  instead of just &apos;mythfilldatabase&apos;.
 Your grabber does not provide channel numbers, so you have to set them manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>Første gangen MÅ &apos;mythfilldatabase --manual&apos; kjøres i stedet for bare &apos;mythfilldatabase&apos;. Henteren tildeler ikke kanalnumbre, så disse må angis manuelt.</translation>
     </message>
     <message>
         <source>Video source setup</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppsett av videokilder</translation>
     </message>
     <message>
         <source>Video device</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoenhet</translation>
     </message>
     <message>
         <source>VBI device</source>
-        <translation type="unfinished"></translation>
+        <translation>VBI-enhet</translation>
     </message>
     <message>
         <source>Audio device</source>
-        <translation type="unfinished"></translation>
+        <translation>Lydenhet</translation>
     </message>
     <message>
         <source>(None)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Ingen)</translation>
     </message>
     <message>
         <source>Audio sampling rate limit</source>
-        <translation type="unfinished"></translation>
+        <translation>Begrensning for lydsamplingsrate</translation>
     </message>
     <message>
         <source>Do not adjust volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke juster volumet</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg dette for lavpris-BT878-baserte DVB-T-kort som for eksempel &apos;AverTV DVB-T&apos; som krever at lydvolumet ikke endres.</translation>
     </message>
     <message>
         <source>DVB Card Number</source>
-        <translation type="unfinished"></translation>
+        <translation>CVB-kortnummer</translation>
     </message>
     <message>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Når denne innstillingen endres, bør teksten under endres til kortets type og navn. Hvis kortet ikke kan åpnes, vil en feilmelding bli vist.</translation>
     </message>
     <message>
         <source>Card Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Korttype</translation>
     </message>
     <message>
         <source>Card Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Kortnavn</translation>
+    </message>
+    <message>
+        <source>Use hardware MPEG decoder</source>
+        <translation>Bruk maskinvare MPEG-dekoder</translation>
+    </message>
+    <message>
+        <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
+        <translation>Hvis DVB-kortet har en innebygget MPEG-dekoder kan den aktiveres her. (Bare for fullfunksjonskort og noen USB-enheter.)</translation>
+    </message>
+    <message>
+        <source>Record in TS format instead of PS.</source>
+        <translation>Ta opp i TS-format i stedet for PS.</translation>
+    </message>
+    <message>
+        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
+        <translation>Deaktiverer transportstrøm til programstrøm-konvertering. TS-opptak fører til litt støre filer, men reduserer risikoen for behandlingsfeil.</translation>
     </message>
     <message>
         <source>Wait for SEQ start header.</source>
@@ -2493,14 +3195,22 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Normalt vil DVB-opptak droppe pakker fra kortet helt til en sekvensstart-beskjed blir sett. Denne innstillingen slår av denne funksjonen.</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
-        <translation type="unfinished"></translation>
+        <translation>Åpne DVB-kort når nødvendig</translation>
     </message>
     <message>
         <source>This option makes the backend dvb-recorder only open the card when it is actually in-use leaving it free for other programs at other times.</source>
+        <translation>Denne innstillingen gjør at tjeneren for DVB-opptak bare åpner kortet når det er nødvendig, slik at det ellers kan brukes av andre programmer.</translation>
+    </message>
+    <message>
+        <source>DiSEqC Input Type: (DVB-S)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2512,12 +3222,80 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Capture Card Setup</source>
+        <source>Firewire Model</source>
+        <translation>Firewire-modell</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Annet</translation>
+    </message>
+    <message>
+        <source>DCT-6200</source>
+        <translation type="obsolete">DCT-6200</translation>
+    </message>
+    <message>
+        <source>Select DCT-6200 to enable internal channel-changing support, Other for any other supported device.</source>
+        <translation type="obsolete">Velg &apos;DCT-6200&apos; for å aktivere intern kanalendringsstøtte, &apos;Annet&apos; for andre støttede enheter.</translation>
+    </message>
+    <message>
+        <source>Firewire Connection Type</source>
+        <translation>Forbindelsestype for Firewire</translation>
+    </message>
+    <message>
+        <source>Point to Point</source>
+        <translation>Punkt til punkt</translation>
+    </message>
+    <message>
+        <source>Broadcast</source>
+        <translation>Kringkasting</translation>
+    </message>
+    <message>
+        <source>Firewire Port</source>
+        <translation>Firewire-port</translation>
+    </message>
+    <message>
+        <source>Firewire port on your firewire card.</source>
+        <translation>Firewire-port på Firewire-kortet.</translation>
+    </message>
+    <message>
+        <source>Firewire Node</source>
+        <translation>Firewire-node</translation>
+    </message>
+    <message>
+        <source>Firewire node is the remote device.</source>
+        <translation>Firewire-node er den eksterne enheten.</translation>
+    </message>
+    <message>
+        <source>Firewire Speed</source>
+        <translation>Firewire-hastighet</translation>
+    </message>
+    <message>
+        <source>100Mbps</source>
+        <translation>100Mbps</translation>
+    </message>
+    <message>
+        <source>200Mbps</source>
+        <translation>200Mbps</translation>
+    </message>
+    <message>
+        <source>400Mbps</source>
+        <translation>400Mbps</translation>
+    </message>
+    <message>
+        <source>Default Input</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Only MPEG2TS is supported at this time.</source>
+        <translation>Kun MPEG2TS er støtted for øyeblikket.</translation>
+    </message>
+    <message>
+        <source>Capture Card Setup</source>
+        <translation>Oppsett av TV-kort</translation>
+    </message>
+    <message>
         <source>Card type</source>
-        <translation type="unfinished"></translation>
+        <translation>Korttype</translation>
     </message>
     <message>
         <source>Change the cardtype to the appropriate type for the capture card you are configuring.</source>
@@ -2532,7 +3310,19 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Digital Video Broadcast card (DVB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FireWire Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2545,6 +3335,46 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Switch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LNB LOF Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Satellite Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free to air channels only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, only free to air channels will be used.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2600,31 +3430,23 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Signal/Noise</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Advanced Configuration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LNB LOF Switch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LNB LOF High</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LNB LOF Low</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avansert konfigurasjon</translation>
     </message>
     <message>
         <source>Recorder Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diseqc Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2649,10 +3471,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Default input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2740,6 +3558,10 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Deinterlace settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2794,7 +3616,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>All Programs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alle programmer</translation>
     </message>
     <message>
         <source>Start in Title section</source>
@@ -2873,6 +3695,10 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>All</source>
+        <translation type="unfinished">Alle</translation>
+    </message>
+    <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2890,6 +3716,10 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Automatically skip commercial breaks that have been flagged during Automatic Commercial Flagging or by the mythcommflag program, or just notify that a commercial has been detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2961,7 +3791,15 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Time to record past end of show (in seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2970,6 +3808,22 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>When enabled, the most recent recording will be listed first in the &apos;Watch Recordings&apos; screen, otherwise the oldest recording will be listed first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort Episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Record date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Original Air date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selects how to sort a shows episodes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3082,6 +3936,10 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Adjust this to move the image vertically.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use libmpeg2 for decoding</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3205,6 +4063,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>CPU friendly preview of recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Use Transparent Boxes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3218,7 +4084,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Fill</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fyll</translation>
     </message>
     <message>
         <source>Image</source>
@@ -3309,15 +4175,35 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Run on the specified screen or spanning all screens.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Aspect Override</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>16/9 Zoom</source>
-        <translation type="unfinished"></translation>
+        <source>4/3</source>
+        <translation type="unfinished">4/3</translation>
+    </message>
+    <message>
+        <source>16/9</source>
+        <translation type="unfinished">16/9</translation>
     </message>
     <message>
         <source>4/3 Zoom</source>
+        <translation type="unfinished">4/3 forstørret</translation>
+    </message>
+    <message>
+        <source>16/9 Zoom</source>
+        <translation type="unfinished">16/9 forstørret</translation>
+    </message>
+    <message>
+        <source>16/9 Stretch</source>
+        <translation type="unfinished">16/9 strukket</translation>
+    </message>
+    <message>
+        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3385,7 +4271,83 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>In X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Horizontal resolution of video which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Vertical resolution of video which needs a special output resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GUI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resolution of screen when not watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default screen resolution when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen resolution when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default refresh rate when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Refresh rate when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ratio when watching a video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect ration when watching a video at a specific resolution.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aspect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Video Mode Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Mouse Cursor in Myth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3497,6 +4459,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>HD Ringbuffer size (KB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Change channels immediately without select</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3601,6 +4571,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Allow channel jumping in guide</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Reschedule Higher Priorities</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3653,6 +4631,10 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Override Recordings Priority</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3693,6 +4675,10 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Language</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3702,6 +4688,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Enable Xbox Hardware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable realtime priority threads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3770,6 +4764,10 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>How much to blend the program guide over the live TV image.  Higher numbers mean more guide and less TV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TV audio through PVR-350 only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3945,6 +4943,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Menu Pop-up Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The time (in seconds) that the menu will remain visible after navigation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>LCD Displays Music Artist and Title</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3962,6 +4968,30 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>LCD Backlight Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable LCD device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD device display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable gamma correction for video</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Altivec-enhanced color space conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4093,8 +5123,12 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Program Guide</source>
+        <source>Job Queue</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Guide</source>
+        <translation type="unfinished">Programoversikt</translation>
     </message>
     <message>
         <source>General Recording Priorities Settings</source>
@@ -4110,10 +5144,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>QT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LCD device display</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4153,15 +5183,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DVB Status</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Log Entries</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Job Queue</source>
+        <source>Machine Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4185,6 +5211,10 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>DVB Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>DVB Status shows the quality statistics of all DVB cards, if present</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4194,6 +5224,14 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Job Queue shows any jobs currently in Myth&apos;s Job Queue such as a commercial flagging job.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Machine Status shows some operating system statistics of this machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and the MythTV server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4210,7 +5248,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stopp</translation>
     </message>
     <message>
         <source>Job Queue Actions:</source>
@@ -4282,6 +5320,42 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Job Queue is currently empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uptime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>RAM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Swap</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4378,6 +5452,10 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Follow symbolic links when deleting files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4537,11 +5615,39 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Job Queue Start Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Job Queue End Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Run Jobs only on original recording host</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>If set, jobs in the queue will be required to run on the backend that made the original recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4585,11 +5691,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow jobs of this type to run on this backend.</source>
+        <source>Allow Commercial Detection jobs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Allow Commercial Detection jobs</source>
+        <source>Allow jobs of this type to run on this backend.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4641,121 +5747,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Part %1 of %2, </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>HDTV</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CC</source>
-        <comment>Close Captioned</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Subtitled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stereo</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <comment>category_type</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Episode Number</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Original Airdate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Program ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Actors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Guest Star</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Director</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Filesize</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording Group</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Machine Status</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Machine Status shows some operating system statistics of this machine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and the MythTV server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Uptime</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This machine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Load</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>RAM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Swap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MythTV server</source>
+        <source>Job Queue (Job Commands)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4771,134 +5763,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use custom identifier for frontend preferences</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wake-On-LAN settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Database Configuration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All database settings take effect when you restart this program.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Myth could not connect to the database. Please verify your database settings below.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Host name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The host name or IP address of the machine hosting the database. This information is required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The name of the database. This information is required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The user name to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The password to use while connecting to the database. This information is required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Database type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MySQL</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The database implementation used for your server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If this frontend&apos;s host name changes often, check this box and provide a network-unique name to identify it. If unchecked, the frontend machine&apos;s local host name will be used to save preferences in the database.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Custom identifier</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>An identifier to use while saving the settings for this frontend.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use Wake-On-LAN to wake database</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If checked, the frontend will use Wake-On-LAN parameters to reconnect to the database server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reconnect time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The time in seconds to wait for the server to wake up.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Retry attempts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The number of retries to wake the server before the frontend gives up.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Wake command</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The command executed on this frontend to wake up the database server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable gamma correction for video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If checked, QuickTime will correct the gamma of the video to match your monitor.  Turning this off can save some CPU cycles.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use Altivec-enhanced color space conversion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If checked, YUV 4:2:0 will be converted to UYVY 4:2:2 in an Altivec-enabled routine.  If unchecked, QuickTime will handle the conversion instead.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording Host</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4908,757 +5772,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Yes, delete my channel settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Scan for channels(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This button will scan for digital channels.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Advanced editing options for digital channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use on air guide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set the guide information will be taken from the On Air Channel guide.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to initialize video.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error was encountered while displaying video.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Return to Menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Single Record</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record Daily</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record Weekly</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel Record</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Find One</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Find Daily</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Find Weekly</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Previously Recorded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Currently Recorded</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Inactive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>this recording schedule is inactive.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Find ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>6 MHz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>7 MHz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>8 MHz</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transport</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Capture Card</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Scanning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record one showing of this title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every week</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record one showing of this title every day</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This recording schedule is inactive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This recording schedule is active</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete oldest if this would exceed the max episodes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record in TS format instead of PS.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC Input Type: (DVB-S)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select the input type for DVB-S cards. Leave as Single LNB/Input for DVB-C or DVB-T. The inputs are mapped from Input Connections option on the main menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines at what frequency (in Hz) the LNB will do a switch from high to low setting, and vice versa.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in high setting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This defines the offset (in Hz) the frequency coming from the lnb will be in low setting.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DiSEqC Satellite Location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The longitude of the satellite you are aiming at.  For western hemisphere use a negative value.  Value is in decimal.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Free to air channels only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set, only free to air channels will be used.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Diseqc Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use libmpeg2 for decoding</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4/3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16/9</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16/9 Stretch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will override any aspect ratio in the recorded stream, the same as pressing the W Key during playback. Fill will &quot;fill&quot; the screen with the image clipping as required. Fill is useful when using 4:3 interlaced TV&apos;s for display.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>HD Ringbuffer size (KB)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The HD device ringbuffer allows the backend to weather moments of stress. The larger the ringbuffer, the longer the moments of stress can be. However, setting the size too large can cause swapping, which is detrimental.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Find One, Find Weekly and Find Daily recording types will receive this additional recording priority value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Follow symbolic links when deleting files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sort Episodes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selects how to sort a shows episodes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecTypeChar kSingleRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecTypeChar kTimeslotRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>W</source>
-        <comment>RecTypeChar kWeekslotRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecTypeChar kChannelRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>A</source>
-        <comment>RecTypeChar kAllRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>F</source>
-        <comment>RecTypeChar kFindOneRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>RecTypeChar kFindDailyRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>w</source>
-        <comment>RecTypeChar kFindWeeklyRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>O</source>
-        <comment>RecTypeChar kOverrideRecord/kDontRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>D</source>
-        <comment>RecStatusChar rsDeleted</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar rsStopped</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>R</source>
-        <comment>RecStatusChar rsRecorded</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>X</source>
-        <comment>RecStatusChar rsDontRecord</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>P</source>
-        <comment>RecStatusChar rsPreviousRecording</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>R</source>
-        <comment>RecStatusChar rsCurrentRecording</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>r</source>
-        <comment>RecStatusChar rsRepeat</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>E</source>
-        <comment>RecStatusChar rsEarlierShowing</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>T</source>
-        <comment>RecStatusChar rsTooManyRecordings</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>C</source>
-        <comment>RecStatusChar rsConflict</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>L</source>
-        <comment>RecStatusChar rsLaterShowing</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>K</source>
-        <comment>RecStatusChar rsLowDiskSpace</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>B</source>
-        <comment>RecStatusChar rsTunerBusy</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>x</source>
-        <comment>RecStatusChar rsInactive</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire Port</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire port on your firewire card.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire Node</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire node is the remote device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire Speed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>100Mbps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>200Mbps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>400Mbps</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Only MPEG2TS is supported at this time.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>FireWire Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Allow channel jumping in guide</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If enabled, you will be able to press numbers and jump the selection to whatever channel you enter.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select your preferred language</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Frequency (Option has no default)
-The frequency for this channel in Hz.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Symbol Rate (Option has no default)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Polarity (Option has no default)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Inversion (Default: Auto):
-Most cards can autodetect this now, so leave it at Auto unless it won&apos;t work.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bandwidth (Default: Auto)
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Modulation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Constellation (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Forward Error Correction (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>High Priority Code Rate (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Guard Interval (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transmission Mode (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hierarchy (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CPU friendly preview of recordings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When enabled, recording previews will play with reduced FPS to save CPU.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Menu Pop-up Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The time (in seconds) that the menu will remain visible after navigation.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable realtime priority threads</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When running mythfrontend with root privileges, some threads can be given enhanced priority. Disable this if mythfrontend freezes during video playback.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enable LCD device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This global setting allows the recorder to start before the scheduled start time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This global setting allows the recorder to record beyond the scheduled end time. It does not affect the scheduler. It is ignored when two shows have been scheduled without enough time in between.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Resize Video while transcoding</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Absolutely don&apos;t record</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Firewire Connection Type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Point to Point</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Broadcast</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Original Air date</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>TV audio through PVR-350 only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Terrestrial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ATSC Transport</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ATSC transport, cable or terrestrial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use hardware MPEG decoder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hide Mouse Cursor in Myth</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Toggles mouse cursor visibility. Most of the Myth GUI does not respond to mouse clicks, this is only to avoid &quot;losing&quot; your mouse cursor.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Job Queue Start Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This setting controls the start of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Job Queue End Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This setting controls the end of the Job Queue time window which determines when new jobs will be started.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Run Transcode Jobs before Auto-Commercial Flagging</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set, if both auto-transcode and auto commercial flagging are turned ON for a recording, transcoding will run first, otherwise, commercial flagging runs first.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start Auto-Commercial Flagging jobs when the recording starts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Job Queue (Job Commands)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bad Menu File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No Menu File</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Standard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Digital TV standard.
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DVB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ATSC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Modulation Used</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>8VSB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>QAM64</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>QAM256</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bandwidth (Default: Auto)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DVB Transport</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Transport Options</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Skipping Back.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is the default value used for the Auto-Commercial Flagging setting when a new scheduled recording is created.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Run on the specified screen or spanning all screens.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Horizontal resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Y</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Vertical resolution of video which needs a special output resolution.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>GUI</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Resolution of screen when not watching a video.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default screen resolution when watching a video.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Screen resolution when watching a video at a specific resolution.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Video Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default refresh rate when watching a video.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Refresh rate when watching a video at a specific resolution.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Aspect ratio when watching a video.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Aspect ration when watching a video at a specific resolution.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Aspect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Leave at &quot;Default&quot; to use ratio reported by the monitor.  Set to 16:9 or 4:3 to force a specific aspect ratio.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5773,11 +5886,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Failed to probe the card</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kunne ikke undersøke kortet</translation>
     </message>
     <message>
         <source>Failed to open the card</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Kunne ikke åpne kortet</translation>
     </message>
     <message>
         <source>Australia</source>
@@ -5849,6 +5962,10 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>[ Select transcoder ]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Firewire Model is for future use in case there is a need to model specific workarounds.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6287,7 +6404,7 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Avbryt</translation>
     </message>
 </context>
 <context>
@@ -6352,53 +6469,68 @@ Myth will now exit.</source>
     </message>
 </context>
 <context>
+    <name>ScanWizardTuningPage</name>
+    <message>
+        <source>Failed to open the card</source>
+        <translation type="obsolete">Kunne ikke åpne kortet</translation>
+    </message>
+    <message>
+        <source>Failed to probe the card</source>
+        <translation type="obsolete">Kunne ikke undersøke kortet</translation>
+    </message>
+</context>
+<context>
     <name>ScheduledRecording</name>
     <message>
         <source>or later</source>
-        <translation type="unfinished"></translation>
+        <translation>eller seinere</translation>
     </message>
 </context>
 <context>
     <name>StatusBox</name>
     <message>
         <source>Tuner %1 </source>
-        <translation type="unfinished"></translation>
+        <translation>TV-kort %1 </translation>
     </message>
     <message>
         <source>is not available</source>
-        <translation type="unfinished"></translation>
+        <translation>er ikke tilgjengelig</translation>
     </message>
     <message>
         <source>is watching live TV</source>
-        <translation type="unfinished"></translation>
+        <translation>ser på TV</translation>
     </message>
     <message>
         <source>is recording</source>
-        <translation type="unfinished"></translation>
+        <translation>tar opp</translation>
     </message>
     <message>
         <source>is not recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Job:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Status: </source>
-        <translation type="unfinished"></translation>
+        <translation>tar ikke opp</translation>
     </message>
     <message>
         <source>On %1 %2 from %3.%4
 %5
 %6</source>
-        <translation type="unfinished"></translation>
+        <translation>På %1 %2 fra %3.%4 
+%5 
+%6</translation>
     </message>
     <message>
         <source>On %1 %2 from %3.%4
 %5
 No other details</source>
-        <translation type="unfinished"></translation>
+        <translation>På %1 %2 fra %3.%4 
+%5 
+Ingen flere detaljer</translation>
+    </message>
+    <message>
+        <source>Job:</source>
+        <translation>Jobb:</translation>
+    </message>
+    <message>
+        <source>Status: </source>
+        <translation>Status: </translation>
     </message>
     <message>
         <source>The theme you are using contains an unknown element (&apos;%1&apos;).  It will be ignored</source>
@@ -6409,351 +6541,375 @@ No other details</source>
     <name>TV</name>
     <message>
         <source>MythTV is already using all available inputs for recording.  If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV bruker allerede alle TV-kortene til opptak. Program som taes opp kan sees i mediebiblioteket. For å se direkte TV må et av opptakene slettes fra opptaksmenyen.</translation>
     </message>
     <message>
         <source>Cancel and go back to the TV menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbryt og gå tilbake til hovedmenyen</translation>
     </message>
     <message>
         <source>Record and watch while it records</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp og se på mens det taes opp</translation>
     </message>
     <message>
         <source>Let it record and go back to the Main Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta det opp, og gå tilbake til hovedmenyen</translation>
     </message>
     <message>
         <source>Don&apos;t let it record, I want to watch TV</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke ta det opp, se direkte TV i stedet</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Spill av</translation>
     </message>
     <message>
         <source>Audio track</source>
-        <translation type="unfinished"></translation>
+        <translation>Lydspor</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Framover</translation>
     </message>
     <message>
         <source>Skip Ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol framover</translation>
     </message>
     <message>
         <source>Rewind</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilbake</translation>
     </message>
     <message>
         <source>Skip Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Spol tilbake</translation>
     </message>
     <message>
         <source>Jump Back</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp tilbake</translation>
     </message>
     <message>
         <source>Jump Ahead</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp framover</translation>
     </message>
     <message>
         <source>Jump to Beginning</source>
-        <translation type="unfinished"></translation>
+        <translation>Gå til begynnelsen</translation>
     </message>
     <message>
         <source>You are exiting this recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaket forlates</translation>
     </message>
     <message>
         <source>Save this position and go to the menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Lagre posisjonen og gå til hovedmenyen</translation>
     </message>
     <message>
         <source>Do not save, just exit to the menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke lagre, bare gå til menyen</translation>
     </message>
     <message>
         <source>Keep watching</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortsett å se på</translation>
     </message>
     <message>
         <source>Delete this recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett opptaket</translation>
     </message>
     <message>
         <source>You are exiting this video</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoen avsluttes</translation>
     </message>
     <message>
         <source>Exit to the menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Gå ut til menyen</translation>
     </message>
     <message>
         <source>Paused</source>
-        <translation type="unfinished"></translation>
+        <translation>Pause</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Posisjon</translation>
     </message>
     <message>
         <source>Jump To</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp til</translation>
     </message>
     <message>
         <source>Speed 3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Fart: 3X</translation>
     </message>
     <message>
         <source>Speed 2X</source>
-        <translation type="unfinished"></translation>
+        <translation>Fart: 2X</translation>
     </message>
     <message>
         <source>Speed 1/3X</source>
-        <translation type="unfinished"></translation>
+        <translation>Fart: 1/3X</translation>
     </message>
     <message>
         <source>Speed 1/8X</source>
-        <translation type="unfinished"></translation>
+        <translation>Fart: 1/8X</translation>
     </message>
     <message>
         <source>Speed 1/16X</source>
-        <translation type="unfinished"></translation>
+        <translation>Fart: 1/16X</translation>
+    </message>
+    <message>
+        <source>Forward </source>
+        <translation type="obsolete">Framover</translation>
+    </message>
+    <message>
+        <source>Rewind </source>
+        <translation type="obsolete">Bakover</translation>
     </message>
     <message>
         <source>Stopping Transcode</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopper konvertering</translation>
     </message>
     <message>
         <source>Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Konverterer</translation>
     </message>
     <message>
         <source>Try Again</source>
-        <translation type="unfinished"></translation>
+        <translation>Prøv på nytt</translation>
     </message>
     <message>
         <source>Searching...</source>
-        <translation type="unfinished"></translation>
+        <translation>Søker . . .</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det som vises nå, er midlertidig lagret på datamaskinen fordi TV-visningen har blitt spolt bakover. Å bytte kanal nå vil gjøre at den midlertidige videon går tapt.</translation>
     </message>
     <message>
         <source>Change the channel anyway</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt kanal allikevel</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation> minutter</translation>
     </message>
     <message>
         <source>Brightness (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Lysstyrke (opptak): %1%</translation>
     </message>
     <message>
         <source>Adjust Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger opptak</translation>
     </message>
     <message>
         <source>Brightness %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Lysstyrke: %1%</translation>
     </message>
     <message>
         <source>Adjust Picture</source>
-        <translation type="unfinished"></translation>
+        <translation>juster bilde</translation>
     </message>
     <message>
         <source>Contrast (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast (opptak): %1%</translation>
     </message>
     <message>
         <source>Contrast %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast: %1%</translation>
     </message>
     <message>
         <source>Colour (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Farge (opptak): %1%</translation>
     </message>
     <message>
         <source>Colour %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Farge: %1%</translation>
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyanse (opptak): %1%</translation>
     </message>
     <message>
         <source>Hue %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyanse: %1%</translation>
     </message>
     <message>
         <source>Volume %1 %</source>
-        <translation type="unfinished"></translation>
+        <translation>Volum: %1%</translation>
     </message>
     <message>
         <source>Adjust Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Juster volum</translation>
+    </message>
+    <message>
+        <source>Time Stretch %1X</source>
+        <translation>Tidsstrekking: %1X</translation>
+    </message>
+    <message>
+        <source>Adjust Time Stretch</source>
+        <translation>Juster tidsstrekking</translation>
     </message>
     <message>
         <source>Mute Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillhet: av</translation>
     </message>
     <message>
         <source>Mute On</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillhet: på</translation>
     </message>
     <message>
         <source>Left Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillhet på venstre lydkanal</translation>
     </message>
     <message>
         <source>Right Channel Muted</source>
-        <translation type="unfinished"></translation>
+        <translation>Stillhet på høyre lydkanal</translation>
     </message>
     <message>
         <source>Sleep </source>
-        <translation type="unfinished"></translation>
+        <translation>Sove</translation>
     </message>
     <message>
         <source>4:3</source>
-        <translation type="unfinished"></translation>
+        <translation>4:3</translation>
     </message>
     <message>
         <source>16:9</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <source>4:3 Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>4:3 forstørret</translation>
     </message>
     <message>
         <source>16:9 Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9 forstørret</translation>
     </message>
     <message>
         <source>16:9 Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>16:9 strukket</translation>
+    </message>
+    <message>
+        <source>Fill</source>
+        <translation>Fyll</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Av</translation>
     </message>
     <message>
         <source>Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Ta opp</translation>
     </message>
     <message>
         <source>Brightness</source>
-        <translation type="unfinished"></translation>
+        <translation>Lysstyrke</translation>
     </message>
     <message>
         <source>Contrast</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast</translation>
     </message>
     <message>
         <source>Colour</source>
-        <translation type="unfinished"></translation>
+        <translation>Farge</translation>
     </message>
     <message>
         <source>Hue</source>
-        <translation type="unfinished"></translation>
+        <translation>Nyanse</translation>
     </message>
     <message>
         <source>Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Volum</translation>
     </message>
     <message>
         <source>(REC)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Opptak)</translation>
     </message>
     <message>
         <source>This program is currently being edited</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette programmet er under redigering</translation>
     </message>
     <message>
         <source>Continue Editing</source>
-        <translation type="unfinished"></translation>
+        <translation>Fortsett redigering</translation>
     </message>
     <message>
         <source>Do not edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Ikke rediger</translation>
     </message>
     <message>
         <source>Program Guide</source>
-        <translation type="unfinished"></translation>
+        <translation>Programoversikt</translation>
     </message>
     <message>
         <source>Picture-in-Picture</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilde-i-bilde</translation>
     </message>
     <message>
         <source>Enable/Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiver/Deaktiver</translation>
     </message>
     <message>
         <source>Swap Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Bytt kanaler</translation>
     </message>
     <message>
         <source>Change Active Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Endre aktivt vindu</translation>
     </message>
     <message>
         <source>Enable Browse Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiver bla-modus</translation>
     </message>
     <message>
         <source>Previous Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Forrige kanal</translation>
     </message>
     <message>
         <source>Edit Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger opptak</translation>
     </message>
     <message>
         <source>Stop Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Stopp konvertering</translation>
     </message>
     <message>
         <source>Begin Transcoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Start konvertering</translation>
     </message>
     <message>
         <source>Commercial Auto-Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp over reklamer automatisk</translation>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp over reklame: av</translation>
     </message>
     <message>
         <source>Auto-Skip Notify</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp over reklame: gi beskjed</translation>
     </message>
     <message>
         <source>Auto-Skip Pre-Notify</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp over reklame: gi beskjed før</translation>
     </message>
     <message>
         <source>Auto-Skip ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Hopp over reklame: på</translation>
     </message>
     <message>
         <source>Turn Auto-Expire OFF</source>
-        <translation type="unfinished"></translation>
+        <translation>Skru av automatisk utløping</translation>
     </message>
     <message>
         <source>Turn Auto-Expire ON</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisk utløping: på</translation>
     </message>
     <message>
         <source>Toggle Teletext</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis/Skjul tekst-TV</translation>
     </message>
     <message>
         <source>Closed Captioning</source>
@@ -6773,87 +6929,71 @@ No other details</source>
     </message>
     <message>
         <source>Change Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Endre aspektforhold</translation>
     </message>
     <message>
         <source>Manual Zoom Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto-Expire OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto-Expire ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zoom Mode ON</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zoom Mode OFF</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Time Stretch %1X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adjust Time Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuell forstørringsmodus</translation>
     </message>
     <message>
         <source>Adjust</source>
-        <translation type="unfinished"></translation>
+        <translation>Juster</translation>
     </message>
     <message>
         <source>0.5X</source>
-        <translation type="unfinished"></translation>
+        <translation>0,5X</translation>
     </message>
     <message>
         <source>0.9X</source>
-        <translation type="unfinished"></translation>
+        <translation>0,9X</translation>
     </message>
     <message>
         <source>1.0X</source>
-        <translation type="unfinished"></translation>
+        <translation>1,0X</translation>
     </message>
     <message>
         <source>1.1X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>1.5X</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sleep</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sleep Off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Fill</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>1,1X</translation>
     </message>
     <message>
         <source>1.2X</source>
-        <translation type="unfinished"></translation>
+        <translation>1,2X</translation>
     </message>
     <message>
         <source>1.3X</source>
-        <translation type="unfinished"></translation>
+        <translation>1,3X</translation>
     </message>
     <message>
         <source>1.4X</source>
-        <translation type="unfinished"></translation>
+        <translation>1,4X</translation>
+    </message>
+    <message>
+        <source>1.5X</source>
+        <translation>1,5X</translation>
+    </message>
+    <message>
+        <source>Sleep</source>
+        <translation>Soving</translation>
+    </message>
+    <message>
+        <source>Sleep Off</source>
+        <translation>Soving: av</translation>
+    </message>
+    <message>
+        <source>Auto-Expire OFF</source>
+        <translation>Automatisk utløp: av</translation>
+    </message>
+    <message>
+        <source>Auto-Expire ON</source>
+        <translation>Automatisk utdatering: på</translation>
+    </message>
+    <message>
+        <source>Zoom Mode ON</source>
+        <translation>Forstørringsmodus: på</translation>
+    </message>
+    <message>
+        <source>Zoom Mode OFF</source>
+        <translation>Forstørringsmodus: av</translation>
     </message>
     <message>
         <source>Previous Chapter</source>
@@ -6884,11 +7024,11 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
+        <source>Next Audio Track</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Next Audio Track</source>
+        <source>MythTV is already using all available inputs for the channel you selected. If you want to watch an in-progress recording, select one from the playback menu.  If you want to watch live TV, cancel one of the in-progress recordings from the delete menu.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6896,201 +7036,201 @@ No other details</source>
     <name>ThemeUI</name>
     <message>
         <source>Scheduled Recordings:</source>
-        <translation type="unfinished"></translation>
+        <translation>Planlagte opptak</translation>
     </message>
     <message>
         <source>Show  (1) All  (2) Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis: (1) Alle - (2) Viktige</translation>
     </message>
     <message>
         <source>Showing:</source>
-        <translation type="unfinished"></translation>
+        <translation>Viser:</translation>
     </message>
     <message>
         <source>You Haven&apos;t Scheduled Any Programs To Be Recorded</source>
-        <translation type="unfinished"></translation>
+        <translation>Det er ingen planlagte opptak</translation>
     </message>
     <message>
         <source>To schedule a recording, exit this screen and</source>
-        <translation type="unfinished"></translation>
+        <translation>For å ta opp et program, gå tilbake og</translation>
     </message>
     <message>
         <source>Select &apos;Program Guide&apos; or &apos;Program Finder&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>velg &apos;Programoversikt&apos; eller &apos;Programfinner&apos;</translation>
     </message>
     <message>
         <source>Channel Recording Priorities</source>
-        <translation type="unfinished"></translation>
+        <translation>Opptaksprioritet for kanaler</translation>
     </message>
     <message>
         <source>(1) Sort by Channel    (2) Sort by Priority</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Priority:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Program Recording Priorities</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Final Priority</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Record Type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sorry, No Recordings Available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>(4) Program Guide   **(6) Program Finder **</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select a letter...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select a program...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No Programs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There are no available programs under this search. Please select another search.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Program Listings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No listings found for this program. </source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Sorter etter kanal - (2) Sorter etter prioritet</translation>
     </message>
     <message>
         <source>Source:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kilde:</translation>
+    </message>
+    <message>
+        <source>Priority:</source>
+        <translation>Prioritet:</translation>
+    </message>
+    <message>
+        <source>Program Recording Priorities</source>
+        <translation>Opptaksprioritet for programmer</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Prioritet</translation>
+    </message>
+    <message>
+        <source>Final Priority</source>
+        <translation>Endelig prioritet</translation>
     </message>
     <message>
         <source>(1) Sort by Title    (2) Sort by Priority    (4) Sort by Type</source>
-        <translation type="unfinished"></translation>
+        <translation>(1) Sorter etter tittel    (2) Sorter etter prioritet    (4) Sorter etter type</translation>
+    </message>
+    <message>
+        <source>Record Type:</source>
+        <translation>Opptakstype:</translation>
+    </message>
+    <message>
+        <source>Channel:</source>
+        <translation>Kanal:</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et opptak som skal slettes for godt</translation>
     </message>
     <message>
         <source>Select a recording to watch</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et opptak som skal sees</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase:</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et opptak som skal slettes for godt:</translation>
     </message>
     <message>
         <source>Select a recording to watch:</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et opptak som skal sees:</translation>
     </message>
     <message>
         <source>Select a recording to permanently erase.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et opptak som skal slettes for godt.</translation>
     </message>
     <message>
         <source>Select a recording to watch.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg et opptak som skal sees.</translation>
+    </message>
+    <message>
+        <source>Sorry, No Recordings Available</source>
+        <translation>Ingen tilgjengelige opptak</translation>
+    </message>
+    <message>
+        <source>Select &apos;Schedule a Recording&apos; from the Main Menu</source>
+        <translation>Velg &apos;Planlegg et opptak&apos; fra hovedmenyen</translation>
+    </message>
+    <message>
+        <source>(4) Program Guide   **(6) Program Finder **</source>
+        <translation>(4) Programoversikt   **(6) Programfinner **</translation>
+    </message>
+    <message>
+        <source>Select a letter...</source>
+        <translation>Velg en bokstav . . .</translation>
     </message>
     <message>
         <source>Pick the letter in which the show starts with, then press SELECT or the right arrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg bokstaven som programmet starter på, og trykk VELG eller høyre piltast</translation>
+    </message>
+    <message>
+        <source>Select a program...</source>
+        <translation>Velg et program . . .</translation>
     </message>
     <message>
         <source>Select the title of the program you wish to find. When finished return with the left arrow key. Press SELECT to schedule a recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velg tittelen på programmet som skal finnes, trykk venstre piltast for å returnere. Bruk VELG for å planlegge et opptak.</translation>
+    </message>
+    <message>
+        <source>No Programs</source>
+        <translation>Ingen programmer</translation>
+    </message>
+    <message>
+        <source>There are no available programs under this search. Please select another search.</source>
+        <translation>Det ble ikke funnet noen programmer under dette søket; velg et annet søk.</translation>
+    </message>
+    <message>
+        <source>Program Listings</source>
+        <translation>Programlister</translation>
+    </message>
+    <message>
+        <source>No listings found for this program. </source>
+        <translation>Ingen lister ble funnet for dette programmet. </translation>
     </message>
     <message>
         <source>Airdate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sendedato:</translation>
     </message>
     <message>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beskrivelse:</translation>
     </message>
     <message>
         <source>System Status - Select a category to view the status</source>
-        <translation type="unfinished"></translation>
+        <translation>Systemstatus - velg en kategori for å vise statusen</translation>
     </message>
     <message>
         <source>This screen displays the status of various system components</source>
-        <translation type="unfinished"></translation>
+        <translation>Her vises statusen til forskjellige systemkomponenter</translation>
     </message>
 </context>
 <context>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video Source Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Videokildemeny</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger . . .</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished"></translation>
+        <translation>Slett . . .</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation type="unfinished"></translation>
+        <translation>VIrkelig slette denne videokilden?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja, slett videokilden</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished"></translation>
+        <translation>Nei, ikke slett videokilden</translation>
     </message>
     <message>
         <source>Video sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Videokilder</translation>
     </message>
 </context>
 <context>
     <name>ViewScheduled</name>
     <message>
         <source>Time Conflict</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidskonflikt</translation>
     </message>
     <message>
         <source>No Conflicts</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen konflikter</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <source>Important</source>
-        <translation type="unfinished"></translation>
+        <translation>Viktig</translation>
     </message>
 </context>
 </TS>

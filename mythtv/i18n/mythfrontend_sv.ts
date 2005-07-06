@@ -6921,6 +6921,10 @@ Inga andra detaljer</translation>
         <source>Audio Resync</source>
         <translation>Ljudåtersynk</translation>
     </message>
+    <message>
+        <source>Next Audio Track</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>

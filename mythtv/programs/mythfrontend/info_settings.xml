@@ -16,6 +16,7 @@
      <text lang="ZH_TW">天氣報告設定</text>
      <text lang="SI">Nastavitve vremena</text>
      <text lang="ET">Ilmateate seaded</text>
+     <text lang="NB">Innstillinger for vær</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -34,6 +35,7 @@
      <text lang="ZH_TW">網上新聞設定</text>
      <text lang="SI">Nastavitve novic</text>
      <text lang="ET">Uudiste seaded</text>
+     <text lang="NB">Innstillinger for nyheter</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -60,6 +62,7 @@
      <text lang="ZH_TW">互聯網設定</text>
      <text lang="SI">Spletne nastavitve</text>
      <text lang="ET">Veebi seaded</text>
+     <text lang="NB">Innstilinger for nettleser</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -75,6 +78,7 @@
      <text lang="NL">Kookboek Instellingen</text>     
      <text lang="SI">Nastavitve receptov</text>
      <text lang="ET">Retseptide seaded</text>     
+     <text lang="NB">Innstillinger for oppskrifter</text>
      <alttext lang="DE">Rezepte</alttext>
      <alttext lang="ET">Retseptid</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>

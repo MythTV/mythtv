@@ -17,6 +17,7 @@
       <text lang="ZH_TW">觀看電視</text>
       <text lang="SI">Gledanje TV</text>
       <text lang="ET">Vaata telerit</text>
+      <text lang="NB">Se på TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -37,6 +38,7 @@
       <text lang="ZH_TW">預設錄影</text>
       <text lang="SI">Plan snemanj</text>
       <text lang="ET">Planeeri salvestamisi</text>
+      <text lang="NB">Planlegg opptak</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Programmation</alttext>
       <alttext lang="ES">Temporizadores</alttext>
@@ -51,6 +53,7 @@
       <alttext lang="ZH_TW">預錄</alttext>
       <alttext lang="SI">Plan</alttext>
       <alttext lang="ET">Planeerimine</alttext>
+      <alttext lang="NB">Planlegg</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -71,6 +74,7 @@
       <text lang="ZH_TW">觀看預錄節目</text>
       <text lang="SI">Predvajanje snemanj</text>
       <text lang="ET">Vaata salvestusi</text>
+      <text lang="NB">Se på opptak</text>
       <alttext lang="ET">Salvestused</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
@@ -92,6 +96,7 @@
       <text lang="ZH_TW">刪除錄影</text>
       <text lang="SI">Brisanje snemanj</text>
       <text lang="ET">Kustuta salvestusi</text>
+      <text lang="NB">Slett opptak</text>
       <alttext lang="ET">Kustuta</alttext>
       <action>TV_DELETE</action>
    </button> 
@@ -123,6 +128,7 @@
       <text lang="ZH_TW">系統狀態</text>
       <text lang="SI">Status sistema</text>
       <text lang="ET">Süsteemi olek</text>
+      <text lang="NB">Systemstatus</text>
       <action>TV_STATUS</action>
    </button>
 

@@ -16,6 +16,7 @@
       <text lang="ZH_TW">播放DVD</text>
       <text lang="SI">Predvajaj DVD</text>
       <text lang="ET">Näita DVD-d</text>
+      <text lang="NB">Se på DVD</text>
       <action>JUMP Play DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -36,6 +37,7 @@
       <text lang="ZH_TW">播放VCD</text>
       <text lang="SI">Predvajaj VCD</text>
       <text lang="ET">Näita VCD-d</text>
+      <text lang="NB">Se på VCD</text>
       <action>JUMP Play VCD</action>
       <depends>mythdvd</depends>
    </button>
@@ -57,6 +59,7 @@
       <text lang="ZH_TW">輸入DVD</text>
       <text lang="SI">Ripanje DVD</text>
       <text lang="ET">DVD rippimine</text>
+      <text lang="NB">Importer DVD</text>
       <action>JUMP Rip DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -78,6 +81,7 @@
       <text lang="ZH_TW">輸入音樂CD</text>
       <text lang="SI">Ripanje CD</text>
       <text lang="ET">CD rippimine</text>
+      <text lang="NB">Importer CD</text>
       <action>JUMP Rip CD</action>
       <depends>mythmusic</depends>
    </button>
