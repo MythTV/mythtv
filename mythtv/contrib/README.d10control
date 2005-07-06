@@ -1,0 +1,33 @@
+d10control.pl:  Remote control of a DirecTV unit via the serial port
+By Josh Wilmes (http://www.hitchhiker.org/dss)
+Based on info from http://www.isd.net/mevenmo/audiovideo.html
+
+Usage: ./d10control.pl command ...
+Commands:
+  box_type RCA|D10-100|D10-200  - select set top box type
+  delay number    - wait for number seconds. Floating point is valid
+  key string      - send remote key string.  See source for supported keys
+  last_param      - execute last parameter on command line at current location
+  number{-number} - change to specified channel-subchannel
+  off             - turn box off
+  on              - turn box on
+  port string     - select port to send commands on, currently /dev/ttyS0
+  setup_channel number - send on, channel change command and OSD off command
+  version         - display program version
+
+  baudrate number      - select serial port baudrate, currently 9600
+  channel_change_type key|command - select channel change method
+  get_channel          - print current channel
+  get_datetime         - print date and time
+  get_signal           - print signal strength
+  hide                 - hide text, will also prevent info button from working
+  retries number       - set maximum number of retries on error
+  set_system_datetime  - set PC clock from box.  ntp is more accurate
+  text string          - display string on screen, "" to clear
+  verbose|quiet        - select how much information printed
+
+Mythtv command for normal RCA box: directv.pl setup_channel
+Complex Mythtv command for D10-200 box doing same as setup_channel:
+   directv.pl box_type D10-200 on last_param delay .2 key exit
+Mythtv adds channel number at end of command
+
