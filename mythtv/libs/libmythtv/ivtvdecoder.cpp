@@ -535,11 +535,11 @@ void IvtvDecoder::UpdateFramesPlayed(void)
     m_parent->SetFramesPlayed(videoPlayed);
 }
 
-bool IvtvDecoder::StepFrames(int start, int count)
+bool IvtvDecoder::StepFrames(long long start, long long count)
 {
     VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
 
-    int step, cur = 0, last = start;
+    long long step, cur = 0, last = start;
 
     //fprintf(stderr, "stepping %d from %d\n", count, last);
 

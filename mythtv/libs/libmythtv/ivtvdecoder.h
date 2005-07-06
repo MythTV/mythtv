@@ -61,7 +61,7 @@ class IvtvDecoder : public DecoderBase
     void SeekReset(long long newkey = 0, int skipframes = 0,
                    bool needFlush = false);
     bool ReadWrite(int onlyvideo, long stopframe = LONG_MAX);
-    bool StepFrames(int start, int count);
+    bool StepFrames(long long start, long long count);
 
     int frame_decoded;
 
