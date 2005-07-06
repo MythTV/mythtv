@@ -3,7 +3,6 @@
 
 #include <qstring.h>
 
-
 class RomInfo
 {
   public:
@@ -40,6 +39,9 @@ class RomInfo
     QString Genre() { return genre; }
     void setGenre(const QString &lgenre) { genre = lgenre; }
 
+    QString ImagePath() { return imagepath; }
+    void setImagePath(const QString &limagepath) { imagepath = limagepath; } 
+
     int Year() { return year; }
     void setYear(int lyear) { year = lyear; }
 
@@ -48,16 +50,14 @@ class RomInfo
 
     virtual void setField(QString field, QString data);
     virtual void fillData();
-
-    virtual bool FindImage(QString type, QString *result) { type = type;
-                                                            result = result;
-                                                            return false; }
+    bool FindImage(QString BaseFileName, QString *result);
 
   protected:
     QString romname;
     QString system;
     QString gamename;
     QString genre;
+    QString imagepath; 
     int year;
     bool favorite;
 };

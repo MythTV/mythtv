@@ -68,7 +68,6 @@ class GameTreeItem
     void setFilled(bool isFilled)     { m_isFilled = isFilled; }
 
     GameTreeItem* createChild(const QSqlQuery& query) const;
-    void editSettings() const;
 
   private:
     GameTreeRoot* m_root;
@@ -160,16 +159,6 @@ GameTreeItem* GameTreeItem::createChild(const QSqlQuery& query) const
     return childItem;
 }
 
-void GameTreeItem::editSettings() const
-{
-    QString level = getLevel();
-
-    if (level == "system")
-        GameHandler::EditSystemSettings(m_romInfo);
-    else if (level == "gamename")
-        GameHandler::EditSettings(m_romInfo);
-}
-
 /**************************************************************************
     GameTree - main game tree class
  **************************************************************************/
@@ -185,12 +174,11 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     m_gameTree = new GenericTree("game root", 0, false);
 
     wireUpTheme();
-
     //  create system filter to only select games where handlers are present
     QString systemFilter;
     for (unsigned i = 0; i < GameHandler::count(); ++i)
     {
-        QString system = GameHandler::getHandler(i)->Systemname();
+        QString system = GameHandler::getHandler(i)->SystemName();
         if (i == 0)
             systemFilter = "system in ('" + system + "'";
         else
@@ -237,6 +225,7 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
     node = m_gameTree->addNode(tr("Favourites"), m_gameTreeItems.size(), false);
+    m_favouriteNode = node;
 
     m_gameTreeUI->assignTreeData(m_gameTree);
     m_gameTreeUI->enter();
@@ -262,7 +251,7 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
     GameTreeItem *item = nodeInt ? m_gameTreeItems[nodeInt - 1] : 0;
     RomInfo *romInfo = item ? item->getRomInfo() : 0;
 
-    if (item && !item->isLeaf() && !item->isFilled())
+    if (item && !item->isLeaf())
     {
         GenericTree *node = m_gameTreeUI->getCurrentNode();
         if (!node)
@@ -270,8 +259,12 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
             cerr << "gametree.o: Couldn't get current node\n";
             return;
         }
-        fillNode(node);
-    }
+        if (!item->isFilled() || node == m_favouriteNode)
+        {
+            node->deleteAllChildren();
+            fillNode(node);
+        }
+    } 
 
     if (romInfo)
     {
@@ -298,7 +291,7 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
                 m_gameFavourite->SetText("No");
 
             QString imagename;
-            if (romInfo->FindImage("screenshot", &imagename))
+            if (romInfo->FindImage(romInfo->ImagePath(),&imagename))
                 m_gameImage->SetImage(imagename);
         }
     }
@@ -334,8 +327,6 @@ void GameTree::keyPressEvent(QKeyEvent *e)
 
         if (action == "SELECT")
             m_gameTreeUI->select();
-        else if (action == "MENU" || action == "INFO")
-            edit();
         else if (action == "UP")
             m_gameTreeUI->moveUp();
         else if (action == "DOWN")
@@ -418,16 +409,6 @@ void GameTree::fillNode(GenericTree *node)
         }
     }
     curItem->setFilled(true);
-}
-
-void GameTree::edit(void)
-{
-    GenericTree *curNode = m_gameTreeUI->getCurrentNode();
-    int i = curNode->getInt();
-    GameTreeItem *curItem = i ? m_gameTreeItems[i - 1] : 0;
-
-    if (curItem)
-        curItem->editSettings();
 }
 
 void GameTree::toggleFavorite(void)

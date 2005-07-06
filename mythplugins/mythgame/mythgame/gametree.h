@@ -39,6 +39,7 @@ class GameTree : public MythThemedDialog
     void toggleFavorite(void);
 
     GenericTree           *m_gameTree;
+    GenericTree		  *m_favouriteNode;
     UIManagedTreeListType *m_gameTreeUI;
 
     QValueVector<GameTreeRoot *> m_gameTreeRoots;

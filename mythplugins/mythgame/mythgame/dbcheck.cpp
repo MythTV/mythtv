@@ -8,7 +8,9 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1004";
+#include "gamesettings.h"
+
+const QString currentDatabaseVersion = "1005";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -1107,4 +1109,46 @@ QString("update mamemetadata set rom_path ='%1' WHERE rom_path ='';").arg(gConte
 };
         performActualUpdate(updates, "1004", dbver);
     }
+
+    if (dbver == "1004")
+    {   
+        const QString updates[] = {
+
+"CREATE TABLE gameplayers ("
+"  gameplayerid int(10) unsigned NOT NULL auto_increment,"
+"  playername varchar(64) NOT NULL default '',"
+"  workingpath varchar(255) NOT NULL default '',"
+"  rompath varchar(255) NOT NULL default '',"
+"  screenshots varchar(255) NOT NULL default '',"
+" commandline varchar(255) NOT NULL default '',"
+"  gametype varchar(64) NOT NULL default '',"
+"  extensions varchar(128) NOT NULL default '',"
+"  PRIMARY KEY (gameplayerid),"
+"  UNIQUE KEY playername (playername)"
+");",
+"ALTER TABLE gamemetadata ADD COLUMN rompath varchar(255) NOT NULL default \"\"; ",
+"ALTER TABLE gamemetadata ADD COLUMN gametype varchar(64) NOT NULL default \"\"; ",
+QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gametype,extensions) VALUES ('NES Player','%1','%2','%3','NES','%4');")
+    .arg(gContext->GetSetting("NesBinary"))
+    .arg(gContext->GetSetting("NesRomLocation"))
+    .arg(gContext->GetSetting("NesScreensLocation"))
+    .arg(GetGameExtensions("NES")),
+
+QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gametype,extensions) VALUES ('%1','%2','%3','%4','SNES','%5');")
+    .arg(gContext->GetSetting("SnesEmulator")) 
+    .arg(gContext->GetSetting("SnesBinary"))
+    .arg(gContext->GetSetting("SnesRomLocation"))
+    .arg(gContext->GetSetting("SnesScreensLocation"))
+    .arg(GetGameExtensions("SNES")),
+
+QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gametype,extensions) VALUES ('XMame','xmame','%1','%2','MAME','%3');")
+    .arg(gContext->GetSetting("MameRomLocation"))
+    .arg(gContext->GetSetting("MameScreensLocation"))
+    .arg(GetGameExtensions("MAME")),
+""
+};
+
+        performActualUpdate(updates, "1005", dbver);
+    }
+
 }

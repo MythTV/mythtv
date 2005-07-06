@@ -16,6 +16,21 @@
    </button>
 
    <button>
+      <type>GAME_SETTINGS_GENERAL</type>
+      <text>Game Players</text>
+      <text lang="IT">Impostazioni generali</text>
+      <text lang="ES">Opciones Generales</text>
+      <text lang="CA">Opcions Generals</text>
+      <text lang="DE">Grundeinstellungen</text>
+      <text lang="DK">Generelle indstillinger</text>
+      <text lang="NL">Algemeen</text>
+      <text lang="PT">Configurações Gerais</text>
+      <text lang="SV">Generella inställningar</text>
+      <text lang="SI">Splošne nastavitve</text>
+      <action>GAME_PLAYERS</action>
+   </button>
+
+   <button>
       <type>GAME_SCAN</type>
       <text>Scan for Games</text>
       <text lang="PT">Procurar Jogos</text>

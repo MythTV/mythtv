@@ -28,9 +28,15 @@ void GameCallback(void *data, QString &selection)
     (void)ddata;
 
     if (sel == "game_settings")
-    {
-        MythGameSettings settings;
+    {   
+        MythGameGeneralSettings settings;
         settings.exec();
+    }
+
+    if (sel == "game_players")
+    {
+	MythGamePlayerEditor mgpe;
+	mgpe.exec();
     }
     else if (sel == "search_for_games")
     {
@@ -91,9 +97,9 @@ int mythplugin_init(const char *libversion)
 
     UpgradeGameDatabaseSchema();
 
-    MythGameSettings settings;
-    settings.load();
-    settings.save();
+    MythGamePlayerSettings settings;
+//    settings.load();
+//    settings.save();
 
     setupKeys();
 
@@ -102,32 +108,6 @@ int mythplugin_init(const char *libversion)
 
 void runGames(void)
 {
-    //look for new systems that haven't been added to the database
-    //yet and tell them to scan their games
-
-    //build a list of all the systems in the database
-    QStringList systems;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT DISTINCT system FROM gamemetadata;");
-    while (query.next())
-    {
-        QString name = query.value(0).toString();
-        systems.append(name);
-    }
-
-    //run through the list of registered systems, and if they're not
-    //in the database, tell them to scan for games
-    for (uint i = 0; i < GameHandler::count(); ++i)
-    {
-        GameHandler* handler = GameHandler::getHandler(i);
-        bool found = systems.find(handler->Systemname()) != systems.end();
-        if (!found)
-        {
-            handler->processGames();
-        }
-    }
-
     GameTree gametree(gContext->GetMainWindow(), "gametree", "game-");
     gametree.exec();
 }
