@@ -7,7 +7,7 @@ isEmpty( PREFIX ) {
 LIBVERSION = 0.18
 
 # Die on the (common) case where OS X users inadvertently use Fink's
-# Qt/X11 install instead of Qt/Mac.
+# Qt/X11 install instead of Qt/Mac. '
 contains(CONFIG_DARWIN, yes) {
     !macx {
         message(You are building with Qt/X11 on the Mac platform.)
