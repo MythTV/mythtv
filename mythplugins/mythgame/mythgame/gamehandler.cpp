@@ -37,30 +37,25 @@ bool existsHandler(const QString name)
 
 static void checkHandlers(void)
 {
+    // If a handlers list doesn't currently exist create one. Otherwise
+    // clear the existing list so that we can regenerate a new one.
+
     if (! handlers)
     {   
         handlers = new QPtrList<GameHandler>;
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.exec("SELECT DISTINCT playername FROM gameplayers WHERE playername <> '';");
-        while (query.next()) 
-        {   
-            QString name = query.value(0).toString();
-            GameHandler::registerHandler(GameHandler::newHandler(name));
-        }   
     }
-    else 
-    {
+    else {
+        handlers->clear();
+    }
 
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.exec("SELECT DISTINCT playername FROM gameplayers WHERE playername <> '';");
-        while (query.next()) 
-        {   
-            QString name = query.value(0).toString();
-            if (! existsHandler(name)) {
-               GameHandler::registerHandler(GameHandler::newHandler(name));
-            }
-        }   
-    }
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec("SELECT DISTINCT playername FROM gameplayers WHERE playername <> '';");
+    while (query.next()) 
+    {   
+        QString name = query.value(0).toString();
+        GameHandler::registerHandler(GameHandler::newHandler(name));
+    }   
+
 }
 
 
@@ -182,6 +177,10 @@ void GameHandler::processGames(GameHandler *handler)
     // Remove all metadata entries from the tables, all correct values will be
     // added as they are found.  This is done so that entries that may no longer be
     // available or valid are removed each time the game list is remade.
+
+    // If we are not going to call processGames from anywhere but processAllGames then the following
+    // Deletion can likely be removed and processGames and processAllGames merged together.
+
     thequery = "DELETE FROM gamemetadata WHERE system = \"" + handler->SystemName() + "\";";
     query.exec(thequery);
 
@@ -221,6 +220,14 @@ void GameHandler::processGames(GameHandler *handler)
 void GameHandler::processAllGames(void)
 {
     checkHandlers();
+
+    // Since we are processing all game handlers with a freshly built handler list
+    // we can safely remove all existing gamemetadata first so that we don't have any 
+    // left overs from removed or renamed handlers.
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString thequery = "DELETE FROM gamemetadata;";
+    query.exec(thequery);
+
     GameHandler *handler = handlers->first();
     while(handler)
     {
@@ -262,7 +269,7 @@ void GameHandler::Launchgame(RomInfo *romdata)
        }
 
        // GREG: Change to working dir here
-
+       
        cout << "Launching Game : " << handler->SystemName() << " : " << exec << " : " << endl;
 
        // Run the emulator/game and wait for it to terminate.
