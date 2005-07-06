@@ -21,6 +21,15 @@ static HostLineEdit *MythGalleryDir()
     return gc;
 };
 
+static HostCheckBox *MythGalleryThumbnailLocation()
+{
+    HostCheckBox *gc = new HostCheckBox("GalleryThumbnailLocation");
+    gc->setLabel(QObject::tr("Store thumbnails in image directory"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If set, thumbnails are stored in '.thumbcache' directories within the above directory. If cleared, they are stored in your home directory."));
+    return gc;
+};
+
 static HostLineEdit *MythGalleryMoviePlayerCmd()
 {
     HostLineEdit *gc = new HostLineEdit("GalleryMoviePlayerCmd");
@@ -132,6 +141,7 @@ public:
         setUseLabel(false);
 
         addChild(MythGalleryDir());
+        addChild(MythGalleryThumbnailLocation());
         addChild(MythGalleryImportDirs());
         addChild(MythGalleryMoviePlayerCmd());
 

@@ -45,6 +45,8 @@ public:
     void setDirectory(const QString& directory, bool isGallery=false);
     void addFile(const QString& fileName);
     void cancel();
+    
+    QString getThumbcacheDir(const QString& inDir);
 
 protected:
 
@@ -57,6 +59,8 @@ private:
     bool checkGalleryFile(const QFileInfo& fi);
     void loadDir(QImage& image, const QFileInfo& fi);
     void loadFile(QImage& image, const QFileInfo& fi);
+    
+    bool mkpath(const QString& inPath);
 
     QObject     *m_parent;
     QString      m_directory;

@@ -104,7 +104,7 @@ void ThumbGenerator::run()
 
         if (!isGallery) {
         
-            QString cachePath = dir + QString("/.thumbcache/") + file;
+            QString cachePath = getThumbcacheDir(dir) + file;
             QFileInfo cacheInfo(cachePath);
 
             if (cacheInfo.exists() &&
@@ -275,4 +275,50 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
   {
       image.load(fi.absFilePath());
   }
+}
+
+QString ThumbGenerator::getThumbcacheDir(const QString& inDir)
+{
+    // For directory "/my/images/january", this function either returns 
+    // "/my/images/january/.thumbcache" or "~/.mythtv/mythgallery/january/.thumbcache"
+    QString aPath = inDir + QString("/.thumbcache/");
+    if ( gContext->GetNumSetting("GalleryThumbnailLocation") 
+            && ! QDir(aPath).exists() )
+    {
+        mkpath(aPath);
+    }
+    if ( ! gContext->GetNumSetting("GalleryThumbnailLocation") || ! QDir(aPath).exists() ) 
+    {
+        // Arrive here if storing thumbs in home dir, 
+        // OR failed to create thumb dir in gallery pics location
+        int prefixLen = gContext->GetSetting("GalleryDir").length();
+        aPath = gContext->GetConfDir() + "/MythGallery";
+        aPath += inDir.right(inDir.length() - prefixLen);
+        aPath += QString("/.thumbcache/");
+        mkpath(aPath);
+    }
+    
+    return aPath;
+}
+
+bool ThumbGenerator::mkpath(const QString& inPath)
+{
+    // The function will create all parent directories necessary to create the directory.
+    // We can replace this function with QDir::mkpath() when uprading to Qt 4.0
+    int i = 0;
+    QString absPath = QDir(inPath).absPath() + "/";
+    QDir parent("/");
+    do {
+        i = absPath.find('/', i + 1);
+        if (i == -1) {
+            return true;
+        }
+        QString subPath(absPath.left(i));
+        if (! QDir(subPath).exists()) {
+            if (! parent.mkdir(subPath.right(subPath.length() - parent.absPath().length() - 1))) {
+                return false;
+            }
+        }
+        parent = QDir(subPath);
+    } while(true);
 }

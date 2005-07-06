@@ -602,9 +602,8 @@ void IconView::loadDirectory(const QString& dir)
     else
         m_isGallery = false;
 
-    QFileInfo cdir(d.absPath() + "/.thumbcache");
-    if (!cdir.exists())
-        d.mkdir(".thumbcache");
+    // Create .thumbcache dir if neccesary
+    m_thumbGen->getThumbcacheDir(m_currDir);
 
     d.setNameFilter(MEDIA_FILENAMES);
     d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
@@ -686,8 +685,7 @@ void IconView::loadThumbnail(ThumbItem *item)
     }
 
     if (!canLoadGallery) {
-        QString cachePath = m_currDir + QString("/.thumbcache/") +
-                            item->name;
+        QString cachePath = m_thumbGen->getThumbcacheDir(m_currDir) + item->name;
         image.load(cachePath);
     }
 
