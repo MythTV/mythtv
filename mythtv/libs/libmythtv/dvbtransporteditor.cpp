@@ -447,12 +447,12 @@ DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID) :
     addChild(dvbtid);
     addChild(new DvbTVideoSourceID(*dvbtid,_nVideoSourceID));
 
-    int iVideoDev = -1;
+    int iCardID = -1;
 
     //Work out what kind of card we've got
     MSqlQuery query(MSqlQuery::InitCon());
     QString querystr = QString(
-           "SELECT capturecard.videodevice FROM cardinput,capturecard "
+           "SELECT capturecard.cardid FROM cardinput,capturecard "
            " WHERE capturecard.cardid = cardinput.cardid "
            " AND cardinput.sourceid=%1 "
            " AND capturecard.cardtype=\"DVB\"").arg(_nVideoSourceID);
@@ -461,12 +461,12 @@ DVBTransportWizard::DVBTransportWizard(int id, unsigned _nVideoSourceID) :
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-        iVideoDev = query.value(0).toInt();
+        iCardID = query.value(0).toInt();
     }
 
     CardUtil::CARD_TYPES nType = CardUtil::ERROR_PROBE;
-    if (iVideoDev >= 0)
-        nType = CardUtil::GetCardType(iVideoDev);
+    if (iCardID >= 0)
+        nType = CardUtil::GetCardType(iCardID);
 
      addChild(new DVBTransportPage(*dvbtid,nType));
 }
