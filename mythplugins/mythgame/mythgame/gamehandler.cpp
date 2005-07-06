@@ -162,7 +162,8 @@ void GameHandler::buildFileList(QString directory,
                            "VALUES (\"%1\", \"%1\", \"%2\", \"%3\", %4, \"%5\", \"%6\");")
                            .arg(handler->SystemName())
                            .arg(Info.fileName().latin1())
-                           .arg(GameName.latin1()).arg(Genre.latin1())
+                           .arg(GameName.latin1())
+                           .arg(Genre.latin1())
                            .arg(Year)
                            .arg(handler->GameType())
                            .arg(Info.dirPath().latin1());
@@ -187,14 +188,31 @@ void GameHandler::processGames(GameHandler *handler)
     MythProgressDialog pdial(QObject::tr("Looking for " + handler->SystemName() + " game(s)..."), 100);
     pdial.setProgress(50);
 
-    QDir d(handler->SystemRomPath());
-    if (d.exists())
+    if (handler->GameType() == "PC") 
     {
-        buildFileList(handler->SystemRomPath(),handler,&query);
+        thequery = QString("INSERT INTO gamemetadata "
+                           "(system, romname, gamename, genre, year, gametype) "
+                           "VALUES (\"%1\", \"%2\", \"%3\", \"Unknown\", 0 , \"%4\");")
+                           .arg(handler->SystemName())
+                           .arg(handler->SystemName())
+                           .arg(handler->SystemName())
+                           .arg(handler->GameType());
+
+        query.exec(thequery);
+
+        cout << " PC Game " << handler->SystemName() << endl;
     }
     else
-    {
-        cout << "Rom Path does not exist : " << handler->SystemRomPath() << endl;
+    {   
+        QDir d(handler->SystemRomPath());
+        if (d.exists())
+        {
+            buildFileList(handler->SystemRomPath(),handler,&query);
+        }
+        else
+        {
+            cout << "Rom Path does not exist : " << handler->SystemRomPath() << endl;
+        }
     }
 
     pdial.Close();
@@ -234,15 +252,20 @@ void GameHandler::Launchgame(RomInfo *romdata)
     GameHandler *handler;
     if((handler = GetHandler(romdata)))
     {
-       QString exec = handler->SystemCmdLine() + " \"" + 
-                      handler->SystemRomPath() + "/" +
-                      romdata->Romname() + "\"";
+       QString exec = handler->SystemCmdLine();
+
+       if (handler->GameType() != "PC")
+       {
+           exec = exec + " \"" + 
+                  handler->SystemRomPath() + "/" +
+                  romdata->Romname() + "\"";
+       }
 
        // GREG: Change to working dir here
 
-       cout << "Launching Game : " << exec << " : " << endl;
+       cout << "Launching Game : " << handler->SystemName() << " : " << exec << " : " << endl;
 
-       // Run the emulator and wait for it to terminate.
+       // Run the emulator/game and wait for it to terminate.
        FILE* command = popen(exec, "w");
        pclose(command);
 
