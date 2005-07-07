@@ -16,15 +16,15 @@ struct GameTypes {
 
 const GameTypes GameTypeList[MAX_GAME_TYPES] =
 {   
-    QObject::tr("OTHER"),   "OTHER",  "",
-    QObject::tr("MAME"),    "MAME",   "",
-    QObject::tr("NES"),     "NES",    "zip,nes",
-    QObject::tr("SNES"),    "SNES",   "zip,smc,sfc,fig,swc",
-    QObject::tr("N64"),     "N64",    "",
-    QObject::tr("PCE/TG16"),"PCE",    "pce",
-    QObject::tr("GENESIS/MEGADRIVE"), "GENESIS", "smd,bin,md",
-    QObject::tr("PC GAME"), "PC",     "",
-    QObject::tr("ATARI"),   "ATARI",  "bin,a26",
+    { QObject::tr("OTHER"),   "OTHER",  "" },
+    { QObject::tr("MAME"),    "MAME",   "" },
+    { QObject::tr("NES"),     "NES",    "zip,nes" },
+    { QObject::tr("SNES"),    "SNES",   "zip,smc,sfc,fig,swc" },
+    { QObject::tr("N64"),     "N64",    "" },
+    { QObject::tr("PCE/TG16"),"PCE",    "pce" },
+    { QObject::tr("GENESIS/MEGADRIVE"), "GENESIS", "smd,bin,md" },
+    { QObject::tr("PC GAME"), "PC",     "" },
+    { QObject::tr("ATARI"),   "ATARI",  "bin,a26" },
 
 };
 
