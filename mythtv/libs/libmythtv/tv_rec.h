@@ -75,7 +75,8 @@ class TVRec
 
     char *GetScreenGrab(const ProgramInfo *pginfo, const QString &filename, 
                         int secondsin, int &bufferlen,
-                        int &video_width, int &video_height);
+                        int &video_width, int &video_height,
+                        float &video_aspect);
 
     /// \brief Returns true if event loop has not been told to shut down
     bool IsRunning(void) { return runMainLoop; }

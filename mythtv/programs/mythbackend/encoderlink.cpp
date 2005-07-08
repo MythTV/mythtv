@@ -993,11 +993,12 @@ long long EncoderLink::SeekRingBuffer(long long curpos, long long pos,
 char *EncoderLink::GetScreenGrab(const ProgramInfo *pginfo,
                                  const QString &filename, 
                                  int secondsin, int &bufferlen, 
-                                 int &video_width, int &video_height)
+                                 int &video_width, int &video_height,
+                                 float &video_aspect)
 {
     if (local)
         return tv->GetScreenGrab(pginfo, filename, secondsin, bufferlen, 
-                                 video_width, video_height);
+                                 video_width, video_height, video_aspect);
 
     VERBOSE(VB_IMPORTANT, "Should be local only query: GetScreenGrab");
     return NULL;

@@ -967,7 +967,8 @@ void TVRec::TeardownRecorder(bool killFile)
  */
 char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
                            int secondsin, int &bufferlen,
-                           int &video_width, int &video_height)
+                           int &video_width, int &video_height,
+                           float &video_aspect)
 {
     (void) pginfo;
     (void) filename;
@@ -987,7 +988,7 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
     nupvidplay->SetAudioSampleRate(audioSampleRateDB);
 
     char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen, video_width,
-                                             video_height);
+                                             video_height, video_aspect);
 
     delete nupvidplay;
     delete tmprbuf;

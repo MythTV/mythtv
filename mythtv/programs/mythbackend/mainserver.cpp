@@ -10,6 +10,7 @@
 
 #include <cstdlib>
 #include <cerrno>
+#include <math.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include "../../config.h"
@@ -3171,6 +3172,7 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     int len = 0;
     int width = 0, height = 0;
+    float aspect = 0;
     int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64) +
                     gContext->GetNumSetting("RecordPreRoll",0);
 
@@ -3178,15 +3180,25 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
                                                                 filename, 
                                                                 secondsin,
                                                                 len, width,
-                                                                height);
+                                                                height, aspect);
 
     if (data)
     {
         QImage img(data, width, height, 32, NULL, 65536 * 65536,
                    QImage::LittleEndian);
-        img = img.smoothScale(gContext->GetNumSetting("PreviewPixmapWidth", 160),
-                              gContext->GetNumSetting("PreviewPixmapHeight", 120), 
-                              QImage::ScaleMin);
+
+        float ppw = gContext->GetNumSetting("PreviewPixmapWidth", 160);
+        float pph = gContext->GetNumSetting("PreviewPixmapHeight", 120);
+
+        if (aspect <= 0)
+            aspect = ((float) width) / height;
+
+        if (aspect > ppw / pph)
+            pph = rint(ppw / aspect);
+        else
+            ppw = rint(pph * aspect);
+
+        img = img.smoothScale((int) ppw, (int) pph);
 
         filename += ".png";
         img.save(filename.ascii(), "PNG");

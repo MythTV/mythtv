@@ -101,7 +101,7 @@ class NuppelVideoPlayer
     OSD *GetOSD(void) { return osd; }
 
     // don't use this on something you're playing
-    char *GetScreenGrab(int secondsin, int &buflen, int &vw, int &vh);
+    char *GetScreenGrab(int secondsin, int &buflen, int &vw, int &vh, float &ar);
 
     void SetLength(int len) { totalLength = len; }
     int GetLength(void) { return totalLength; }

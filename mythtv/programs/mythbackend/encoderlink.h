@@ -109,7 +109,8 @@ class EncoderLink
 
     char *GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
                         int secondsin, int &bufferlen,
-                        int &video_width, int &video_height);
+                        int &video_width, int &video_height,
+                        float &video_aspect);
 
   private:
     int m_capturecardnum;

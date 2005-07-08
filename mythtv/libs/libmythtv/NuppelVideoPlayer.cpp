@@ -3359,7 +3359,7 @@ bool NuppelVideoPlayer::FrameIsInMap(long long frameNumber,
 }
 
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
-                                       int &vh)
+                                       int &vh, float &ar)
 {
     using_null_videoout = true;
 
@@ -3425,6 +3425,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     {
         bufflen = 0;
         vw = vh = 0;
+        ar = 0;
         return NULL;
     }
 
@@ -3434,6 +3435,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
     {
         bufflen = 0;
         vw = vh = 0;
+        ar = 0;
         return NULL;
     }
 
@@ -3454,6 +3456,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
     vw = video_width;
     vh = video_height;
+    ar = video_aspect;
 
     return (char *)outputbuf;
 }
