@@ -39,7 +39,6 @@ static void checkHandlers(void)
 {
     // If a handlers list doesn't currently exist create one. Otherwise
     // clear the existing list so that we can regenerate a new one.
-
     if (! handlers)
     {   
         handlers = new QPtrList<GameHandler>;
@@ -61,7 +60,7 @@ static void checkHandlers(void)
 
 GameHandler* GameHandler::getHandler(uint i)
 {
-    checkHandlers();
+    //checkHandlers();
     return handlers->at(i);
 }
 
@@ -93,6 +92,7 @@ GameHandler* GameHandler::newHandler(QString name)
     return newInstance;
 }
 
+// Creates/rebuilds the handler list and then returns the count.
 uint GameHandler::count(void)
 {
     checkHandlers();
@@ -153,7 +153,7 @@ void GameHandler::buildFileList(QString directory,
             {
                 QRegExp r;
 
-                r.setPattern("^" + Info.extension() + "$");
+                r.setPattern("^" + Info.extension( FALSE ) + "$");
                 r.setCaseSensitive(false);
                 QStringList result = handler->validextensions.grep(r);
                 if (result.isEmpty()) {
@@ -260,7 +260,8 @@ GameHandler* GameHandler::GetHandler(RomInfo *rominfo)
 {
     if (!rominfo)
         return NULL;
-    checkHandlers();
+
+    //checkHandlers();
     GameHandler *handler = handlers->first();
     while(handler)
     {   

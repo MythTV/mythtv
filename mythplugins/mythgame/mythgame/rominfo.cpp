@@ -12,6 +12,32 @@ bool operator==(const RomInfo& a, const RomInfo& b)
     return false;
 }
 
+bool RomInfo::FindImage(QString BaseFileName, QString *result)
+{
+    QStringList graphic_formats;
+    graphic_formats.append("png");
+    graphic_formats.append("gif");
+    graphic_formats.append("jpg");
+    graphic_formats.append("jpeg");
+    graphic_formats.append("xpm");
+    graphic_formats.append("bmp");
+    graphic_formats.append("pnm");
+    graphic_formats.append("tif");
+    graphic_formats.append("tiff");
+
+    int dotLocation = BaseFileName.findRev('.');
+    if(dotLocation == -1)
+        return false;
+    BaseFileName.truncate(dotLocation + 1);
+    for (QStringList::Iterator i = graphic_formats.begin(); i != graphic_formats.end(); i++)
+    {
+        *result = BaseFileName + *i;
+        if(QFile::exists(*result))
+            return true;
+    }
+    return false;
+}
+
 void RomInfo::setField(QString field, QString data)
 {
     if (field == "system")
@@ -73,36 +99,12 @@ void RomInfo::fillData()
     if (query.isActive() && query.size() > 0);
     {
         query.next();
-
-        setImagePath(query.value(0).toString() + "/" + romname);
+        QString Image = query.value(0).toString() + "/" + romname;
+        if (FindImage(query.value(0).toString() + "/" + romname, &Image))
+            setImagePath(Image);
+        else
+            setImagePath("");
     }
 
 }
-
-bool RomInfo::FindImage(QString BaseFileName, QString *result)
-{
-    QStringList graphic_formats;
-    graphic_formats.append("png");
-    graphic_formats.append("gif");
-    graphic_formats.append("jpg");
-    graphic_formats.append("jpeg");
-    graphic_formats.append("xpm");
-    graphic_formats.append("bmp");
-    graphic_formats.append("pnm");
-    graphic_formats.append("tif");
-    graphic_formats.append("tiff");
-
-    int dotLocation = BaseFileName.findRev('.');
-    if(dotLocation == -1)
-        return false;
-    BaseFileName.truncate(dotLocation + 1);
-    for (QStringList::Iterator i = graphic_formats.begin(); i != graphic_formats.end(); i++)
-    {
-        *result = BaseFileName + *i;
-        if(QFile::exists(*result))
-            return true;
-    }
-    return false;
-}
-
 

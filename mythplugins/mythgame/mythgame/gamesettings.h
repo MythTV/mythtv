@@ -12,7 +12,7 @@ struct GameTypes {
     QString   extensions;
 };
 
-#define MAX_GAME_TYPES 9
+#define MAX_GAME_TYPES 10
 
 const GameTypes GameTypeList[MAX_GAME_TYPES] =
 {   
@@ -20,10 +20,11 @@ const GameTypes GameTypeList[MAX_GAME_TYPES] =
     { QObject::tr("MAME"),    "MAME",   "" },
     { QObject::tr("NES"),     "NES",    "zip,nes" },
     { QObject::tr("SNES"),    "SNES",   "zip,smc,sfc,fig,swc" },
-    { QObject::tr("N64"),     "N64",    "" },
+    { QObject::tr("N64"),     "N64",    "v64,n64" },
     { QObject::tr("PCE/TG16"),"PCE",    "pce" },
     { QObject::tr("GENESIS/MEGADRIVE"), "GENESIS", "smd,bin,md" },
     { QObject::tr("PC GAME"), "PC",     "" },
+    { QObject::tr("AMIGA"),   "AMIGA",  "adf" },
     { QObject::tr("ATARI"),   "ATARI",  "bin,a26" },
 
 };

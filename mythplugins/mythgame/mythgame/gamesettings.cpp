@@ -20,12 +20,10 @@ const QString GetGameExtensions(const QString GameType)
             break;
         }
     }
-
     return result;
 }
 
 // General Settings
-
 static HostLineEdit *GameAllTreeLevels()
 {
     HostLineEdit *gc = new HostLineEdit("GameAllTreeLevels");
@@ -70,12 +68,22 @@ MythGameGeneralSettings::MythGameGeneralSettings()
 
 }
 
+// Player Settings
+class AllowMultipleRoms: virtual public MGSetting, virtual public CheckBoxSetting {
+public:
+    AllowMultipleRoms(const MythGamePlayerSettings& parent):
+        MGSetting(parent, "spandisks") {
+        setLabel(QObject::tr("Allow games to span multiple roms/disks"));
+        setHelpText(QObject::tr("This setting means that we will look for items like game.1.rom, game.2.rom and consider them a single game."));
+    };
+};
+
 class Command: virtual public MGSetting, virtual public LineEditSetting {
 public:
     Command(const MythGamePlayerSettings& parent):
         MGSetting(parent, "commandline") {
         setLabel(QObject::tr("Command"));
-        setHelpText(QObject::tr("Path+name of the Emulator/PC Game binary and any optional parameters. \%s can be used to represent the name of any rom being launched. if no \%s is specified the rom filename will be added to the end of the command."));
+        setHelpText(QObject::tr("Path+name of binary and optional parameters. \%s can be used to represent the name of any rom being launched. if not specified the rom filename will be added to the end of the command. As well \%d1, \%d2, \%d3 and \%d4 represent disks in a multidisk/game situation"));
     };
 };
 
@@ -129,6 +137,7 @@ public:
     };
 };
 
+
 MythGamePlayerSettings::MythGamePlayerSettings()
 {
     // must be first
@@ -143,7 +152,7 @@ MythGamePlayerSettings::MythGamePlayerSettings()
     group->addChild(new ScreenPath(*this));
     group->addChild(new WorkingDirPath(*this));
     group->addChild(new Extensions(*this));
-
+    group->addChild(new AllowMultipleRoms(*this));
     addChild(group);
 };
 

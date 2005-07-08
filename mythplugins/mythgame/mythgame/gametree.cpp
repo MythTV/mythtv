@@ -176,7 +176,12 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     wireUpTheme();
     //  create system filter to only select games where handlers are present
     QString systemFilter;
-    for (unsigned i = 0; i < GameHandler::count(); ++i)
+
+    // The call to GameHandler::count() fills the handler list for us
+    // to move through.
+
+    unsigned handlercount = GameHandler::count();
+    for (unsigned i = 0; i < handlercount; ++i)
     {
         QString system = GameHandler::getHandler(i)->SystemName();
         if (i == 0)
@@ -201,6 +206,11 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     m_gameTreeItems.push_back(new GameTreeItem(root));
     node = m_gameTree->addNode(tr("All Games"), m_gameTreeItems.size(), false);
 
+    root = new GameTreeRoot("system gamename", systemFilter);
+    m_gameTreeRoots.push_back(root);
+    m_gameTreeItems.push_back(new GameTreeItem(root));
+    node = m_gameTree->addNode(tr("-   By System"), m_gameTreeItems.size(), false);
+
     root = new GameTreeRoot("gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
@@ -211,15 +221,11 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     m_gameTreeItems.push_back(new GameTreeItem(root));
     node = m_gameTree->addNode(tr("-   By Year"), m_gameTreeItems.size(), false);
 
-    root = new GameTreeRoot("system gamename", systemFilter);
-    m_gameTreeRoots.push_back(root);
-    m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("-   By System"), m_gameTreeItems.size(), false);
-
     root = new GameTreeRoot("genre gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
     node = m_gameTree->addNode(tr("-   By Genre"), m_gameTreeItems.size(), false);
+
     levels = gContext->GetSetting("GameFavTreeLevels");
     root = new GameTreeRoot(levels, systemFilter + " and favorite=1");
     m_gameTreeRoots.push_back(root);
@@ -241,13 +247,6 @@ GameTree::~GameTree()
 
 void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
 {
-    m_gameImage->SetImage("");
-    m_gameTitle->SetText("");
-    m_gameSystem->SetText("");
-    m_gameYear->SetText("");
-    m_gameGenre->SetText("");
-    m_gameFavourite->SetText("");
-
     GameTreeItem *item = nodeInt ? m_gameTreeItems[nodeInt - 1] : 0;
     RomInfo *romInfo = item ? item->getRomInfo() : 0;
 
@@ -268,20 +267,11 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
 
     if (romInfo)
     {
-        if (item->isLeaf() && romInfo->Romname().isEmpty())
-            romInfo->fillData();
-
-        if (!romInfo->Gamename().isEmpty())
-            m_gameTitle->SetText(romInfo->Gamename());
-
-        if (!romInfo->System().isEmpty())
-            m_gameSystem->SetText(romInfo->System());
-
-        if (romInfo->Year() > 0)
-            m_gameYear->SetText(QString::number(romInfo->Year()));
-
-        if (!romInfo->Genre().isEmpty())
-            m_gameGenre->SetText(romInfo->Genre());
+        romInfo->fillData();
+        m_gameTitle->SetText(romInfo->Gamename());
+        m_gameSystem->SetText(romInfo->System());
+        m_gameYear->SetText(QString::number(romInfo->Year()));
+        m_gameGenre->SetText(romInfo->Genre());
 
         if (item->isLeaf())
         {
@@ -290,13 +280,23 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
             else
                 m_gameFavourite->SetText("No");
 
-            QString imagename;
-            if (romInfo->FindImage(romInfo->ImagePath(),&imagename))
-                m_gameImage->SetImage(imagename);
+            if (romInfo->ImagePath()) 
+            {
+                m_gameImage->SetImage(romInfo->ImagePath());
+                m_gameImage->LoadImage();
+            }
         }
     }
+    else 
+    {   // Otherwise use some defaults.
+        m_gameImage->SetImage("");
+        m_gameTitle->SetText("");
+        m_gameSystem->SetText("");
+        m_gameYear->SetText("0");
+        m_gameGenre->SetText("Unknown");
+        m_gameFavourite->SetText("");
+    }
 
-    m_gameImage->LoadImage();
 }
 
 void GameTree::handleTreeListSelection(int nodeInt, IntVector *)

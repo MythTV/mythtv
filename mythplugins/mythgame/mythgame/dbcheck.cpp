@@ -10,7 +10,7 @@ using namespace std;
 
 #include "gamesettings.h"
 
-const QString currentDatabaseVersion = "1005";
+const QString currentDatabaseVersion = "1006";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -1147,8 +1147,18 @@ QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gam
     .arg(GetGameExtensions("MAME")),
 ""
 };
-
         performActualUpdate(updates, "1005", dbver);
     }
+
+    if (dbver == "1005")
+    {   
+        const QString updates[] = {
+"ALTER TABLE gameplayers ADD COLUMN spandisks tinyint(1) NOT NULL default 0; ",
+"ALTER TABLE gamemetadata ADD COLUMN diskcount tinyint(1) NOT NULL default 1; ",
+""
+};
+        performActualUpdate(updates, "1006", dbver);
+    }
+
 
 }
