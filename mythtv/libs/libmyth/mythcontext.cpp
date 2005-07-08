@@ -1410,7 +1410,12 @@ QString MythContext::FindThemeDir(const QString &themename)
         if (dir.exists())
             return testdir;
     }
-    
+
+    testdir = d->m_installprefix + "/share/mythtv/themes/G.A.N.T.";
+    dir.setPath(testdir);
+    if (dir.exists())
+        return testdir;
+ 
     cerr << "Could not find theme: " << themename << endl;
     return "";
 }
