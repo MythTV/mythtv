@@ -1126,8 +1126,8 @@ QString("update mamemetadata set rom_path ='%1' WHERE rom_path ='';").arg(gConte
 "  PRIMARY KEY (gameplayerid),"
 "  UNIQUE KEY playername (playername)"
 ");",
-"ALTER TABLE gamemetadata ADD COLUMN rompath varchar(255) NOT NULL default \"\"; ",
-"ALTER TABLE gamemetadata ADD COLUMN gametype varchar(64) NOT NULL default \"\"; ",
+"ALTER TABLE gamemetadata ADD COLUMN rompath varchar(255) NOT NULL default ''; ",
+"ALTER TABLE gamemetadata ADD COLUMN gametype varchar(64) NOT NULL default ''; ",
 QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gametype,extensions) VALUES ('NES Player','%1','%2','%3','NES','%4');")
     .arg(gContext->GetSetting("NesBinary"))
     .arg(gContext->GetSetting("NesRomLocation"))

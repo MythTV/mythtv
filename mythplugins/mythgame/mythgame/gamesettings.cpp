@@ -75,8 +75,7 @@ public:
     Command(const MythGamePlayerSettings& parent):
         MGSetting(parent, "commandline") {
         setLabel(QObject::tr("Command"));
-        setHelpText(QObject::tr("Location of the Emulator binary and optional parameters "));
-
+        setHelpText(QObject::tr("Path+name of the Emulator/PC Game binary and any optional parameters. \%s can be used to represent the name of any rom being launched. if no \%s is specified the rom filename will be added to the end of the command."));
     };
 };
 
@@ -141,9 +140,10 @@ MythGamePlayerSettings::MythGamePlayerSettings()
     group->addChild(new GameType(*this));
     group->addChild(new Command(*this));
     group->addChild(new RomPath(*this));
-    group->addChild(new Extensions(*this));
     group->addChild(new ScreenPath(*this));
     group->addChild(new WorkingDirPath(*this));
+    group->addChild(new Extensions(*this));
+
     addChild(group);
 };
 

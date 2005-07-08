@@ -59,7 +59,6 @@ static void checkHandlers(void)
 }
 
 
-
 GameHandler* GameHandler::getHandler(uint i)
 {
     checkHandlers();
@@ -78,7 +77,8 @@ void GameHandler::updateSettings(GameHandler *handler)
     handler->screenshots = query.value(3).toString();
     handler->gameplayerid = query.value(4).toInt();
     handler->gametype = query.value(5).toString();
-    handler->validextensions = QStringList::split(",", query.value(6).toString());
+    handler->validextensions = QStringList::split(",", query.value(6).toString().stripWhiteSpace().remove(" "));
+
 }
 
 GameHandler* GameHandler::newInstance = 0;
@@ -103,6 +103,25 @@ bool GameHandler::validRom(QString RomName,GameHandler *handler)
 {
     // Add proper checks here
     return TRUE;
+}
+
+void GameHandler::GetMetadata(GameHandler *handler,QString GameName, QString *Genre, int *Year)
+{
+    // Set some default return values
+    //Genre = QObject::tr("Unknown");
+    //Year = 0;
+
+    if (handler->GameType() == "MAME")
+    {
+    }
+    else if (handler->GameType() == "SNES")
+    {
+    }
+    else if (handler->GameType() == "NES")
+    {
+    }
+
+    
 }
 
 void GameHandler::buildFileList(QString directory,
@@ -260,21 +279,43 @@ void GameHandler::Launchgame(RomInfo *romdata)
     if((handler = GetHandler(romdata)))
     {
        QString exec = handler->SystemCmdLine();
+       QString arg = " \"" + handler->SystemRomPath() + 
+                     "/" + romdata->Romname() + "\"";
 
        if (handler->GameType() != "PC")
        {
-           exec = exec + " \"" + 
-                  handler->SystemRomPath() + "/" +
-                  romdata->Romname() + "\"";
+           QString arg = " \"" + handler->SystemRomPath() +
+                         "/" + romdata->Romname() + "\"";
+
+           // If they specified a %s in the commandline place the romname
+           // in that location, otherwise tack it on to the end of
+           // the command.
+           if (exec.contains("%s"))
+           {
+               exec = exec.replace(QRegExp("%s"),arg);
+           }
+           else
+           {
+               exec = exec + " \"" + 
+                      handler->SystemRomPath() + "/" +
+                      romdata->Romname() + "\"";
+           }
        }
 
-       // GREG: Change to working dir here
+       QString savedir = QDir::currentDirPath ();
+       QDir d;
+       if (handler->SystemWorkingPath()) {
+           if (!d.cd(handler->SystemWorkingPath()))
+           {
+               cout << "Failed to change to specified Working Directory : " << handler->SystemWorkingPath() << endl;
+           }
+       }
        
        cout << "Launching Game : " << handler->SystemName() << " : " << exec << " : " << endl;
 
-       // Run the emulator/game and wait for it to terminate.
-       FILE* command = popen(exec, "w");
-       pclose(command);
+       myth_system(exec);
+
+       (void)d.cd(savedir);      
 
     }
 }

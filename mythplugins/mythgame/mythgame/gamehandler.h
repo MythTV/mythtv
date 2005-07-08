@@ -22,6 +22,9 @@ class GameHandler
     static GameHandler* newHandler(QString name);
     static uint count(void);
 
+    static void GetMetadata(GameHandler *handler, QString GameName, 
+                             QString *Genre, int *Year);
+
     static bool validRom(QString RomName,GameHandler *handler);
     static void buildFileList(QString directory,
                                 GameHandler *handler, MSqlQuery *query);
