@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-06-27, v0.18.07
+  2005-07-08, v0.18.08
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3780,7 +3780,7 @@
   Space/Enter         take action on the item under the highlight point
                 P     play in both "Watch a Recording" and "Delete a Recording"
                 D     delete in both "Watch a Recording" and "Delete a Recording"
-                U     to view details for the currently selected show on the Watch or Delete screens, EPG, "Program Finder", "Fix Scheduling Conflicts" or search results screens
+                U     to view details for the currently selected show on the Watch or Delete screens, EPG, "Program Finder", "Fix Scheduling Conflicts" and search results screens
                 O     to list the upcoming episodes for the currently selected show on the EPG, "Program Finder", "Program Recording Priorities", "Fix Scheduling Conflicts" or search results screens
                 I     edit recording options from the EPG, "Program Finder", "Program Recording Priorities", or "Fix Scheduling Conflicts" screens. From the Playback and Delete screens, 'I' presents options for recorded shows such as Auto Expire or Stop Recording. Pressing 'I' while on the Recording Options screen will take you to the Advanced Recording Options screen.
 
@@ -3826,7 +3826,7 @@
   Page Down           jump ahead the configured number of minutes (default is 10)
   End or Z            skip to next commercial break marker
   Home or Q           skip back to previous commercial break marker
-                T     toggle close caption support
+                T     toggle close caption support Pressing 0-9 (preferably 3 times) + T changes teletext page and turns on teletext.
                 F     rotate between the various Picture Adjustments (Colour, Hue, etc.) While Picture Adjustment is on-screen, use Left and Right arrows to adjust. These settings adjust the look of the video playback, and are independent of the G-key settings used at record-time.
   [ or F10            decrease volume
   ] or F11            increase volume
@@ -5082,29 +5082,38 @@
   The following files allow you to add extra functionality.  Place them
   into /usr/local/share/xmame
 
-  catver.ini is a catalog of categories and versions of popular mame
-  ROMs.  Useful for keeping large libraries of ROMs organized.
+  - catver.ini is a catalog of categories and versions of popular mame
+  ROMs.
+
+  Useful for keeping large libraries of ROMs organized.
+
 
   It may be downloaded from http://www.catver.com
   <http://www.catver.com> or http://www.mameworld.net/catlist
   <http://www.mameworld.net/catlist>
-  - Screenshots aka "snaps" These may be downloaded from
-  http://www.classicgaming.com/mame32qa/
+
+  - Screenshots aka "snaps"
+
+  These may be downloaded from http://www.classicgaming.com/mame32qa/
   <http://www.classicgaming.com/mame32qa/>
 
   Screenshots are displayed when you are browsing your ROMS in [1mmythgame[22m.
   Unzip and place them in /usr/local/share/xmame/snaps
 
-  history.dat
+  - history.dat
 
   Download from http://www.arcade-history.com/history_database.php
   <http://www.arcade-history.com/history_database.php> This file fills
   in a bit of background about each ROM.
 
-  hiscore.dat Download from http://www.mameworld.net/highscore/
+  - hiscore.dat
+
+  Download from http://www.mameworld.net/highscore/
   <http://www.mameworld.net/highscore/>
 
-  - Cheats Download from http://cheat.retrogames.com/
+  - Cheats
+
+  Download from http://cheat.retrogames.com/
   <http://cheat.retrogames.com/>
 
 
@@ -5116,7 +5125,7 @@
   Switch to the mythplugins directory:
 
 
-       $ cd mythplugins
+       $ cd ~/mythplugins-0.18.1
 
 
 
@@ -5142,26 +5151,29 @@
   and 3 you need to enter the paths to files and directories that xmame
   uses.
 
-
-
-  MAME binary location:  /usr/local/bin/xmame               (path to xmame binary)
-  MAME ROM location:     /usr/local/share/xmame/roms        (where you store all your roms)
-  catver.ini file:       /usr/local/share/xmame/catver.ini  (Category and Version information for your ROMs)
-  MAME screenshots path: /usr/local/share/xmame/snaps       (screenshots of ROMs in play)
-  MAME hiscores path:    /usr/local/share/xmame/hiscore     (directory for mame to create hiscore.hi files)
-  MAME hiscores file:    /usr/local/share/xmame/hiscore.dat (file that tells mame how to store hiscores)
-  MAME flyers path:      /usr/local/share/xmame/flyers      (not used with mythgame)
-  MAME cabinets path:    /usr/local/share/xmame/cabinets    (not used with mythgame)
-  MAME history path:     /usr/local/share/xmame/history.dat (a little history about each game)
-  MAME cheat files path: /usr/local/share/xmame/cheats
-  MAME image downloader                                     (no longer  used)
+       MAME binary location:  /usr/local/bin/xmame               (path to xmame binary)
+       MAME ROM location:     /usr/local/share/xmame/roms        (where you store all your roms)
+       catver.ini file:       /usr/local/share/xmame/catver.ini  (Category and Version information for your ROMs)
+       MAME screenshots path: /usr/local/share/xmame/snaps       (screenshots of ROMs in play)
+       MAME hiscores path:    /usr/local/share/xmame/hiscore     (directory for mame to create hiscore.hi files)
+       MAME hiscores file:    /usr/local/share/xmame/hiscore.dat (file that tells mame how to store hiscores)
+       MAME flyers path:      /usr/local/share/xmame/flyers      (not used with mythgame)
+       MAME cabinets path:    /usr/local/share/xmame/cabinets    (not used with mythgame)
+       MAME history path:     /usr/local/share/xmame/history.dat (a little history about each game)
+       MAME cheat files path: /usr/local/share/xmame/cheats
+       MAME image downloader                                     (no longer used)
 
 
 
-  Setup options: Automatically download images - no longer used Show
-  disclaimer - show warning about illegal ROMs before starting each ROM.
+  Setup options:
+
+  Automatically download images - no longer used
+
+  Show disclaimer - show warning about illegal ROMs before starting each
+  ROM.
+
   Show game info - show info about the game, ie:year, maker, CPU, sound,
-  screen resolution before staring game
+  screen resolution before starting the game
 
 
   [1m15.6.  Hints:[0m
@@ -5263,7 +5275,6 @@
   Download libcdaudio from libcdaudio.sourceforge.net
   <http://sourceforge.net/project/showfiles.php?group_id=27134> and
   install:
-
 
 
   $ tar -xzf libcdaudio-0.99.9.tar.gz

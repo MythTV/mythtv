@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-06-27, v0.18.07
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-07-08, v0.18.08
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -3475,7 +3475,7 @@ ALT-F4 </TD><TD> exit out of the application </TD></TR><TR><TD>
 Space/Enter     </TD><TD> take action on the item under the highlight point </TD></TR><TR><TD>
 P </TD><TD> play in both "Watch a Recording" and "Delete a Recording"   </TD></TR><TR><TD>
 D </TD><TD> delete in both "Watch a Recording" and "Delete a Recording" </TD></TR><TR><TD>
-U </TD><TD> to view details for the currently selected show on the Watch&nbsp;or Delete screens, EPG, "Program Finder", "Fix Scheduling&nbsp;Conflicts" or search results screens </TD></TR><TR><TD>
+U </TD><TD> to view details for the currently selected show on the Watch&nbsp;or Delete screens, EPG, "Program Finder", "Fix Scheduling&nbsp;Conflicts" and search results screens </TD></TR><TR><TD>
 O </TD><TD> to list the upcoming episodes for the currently selected show&nbsp;on the EPG, "Program Finder", "Program Recording Priorities",&nbsp;"Fix Scheduling Conflicts" or search results screens </TD></TR><TR><TD>
 I </TD><TD> edit recording options from the EPG, "Program Finder",&nbsp;"Program Recording Priorities", or "Fix Scheduling Conflicts"&nbsp;screens. From the Playback and Delete screens, 'I' presents&nbsp;options for recorded shows such as Auto Expire or Stop Recording.&nbsp;Pressing 'I' while on the Recording Options screen will take you&nbsp;to the Advanced Recording Options screen.
 </TD></TR></TABLE>
@@ -3497,7 +3497,7 @@ Page Up </TD><TD> jump back the configured number of minutes (default is 10) </T
 Page Down       </TD><TD> jump ahead the configured number of minutes (default is 10) </TD></TR><TR><TD>
 End or Z        </TD><TD> skip to next commercial break marker </TD></TR><TR><TD>
 Home or Q       </TD><TD> skip back to previous commercial break marker </TD></TR><TR><TD>
-T </TD><TD> toggle close caption support </TD></TR><TR><TD>
+T </TD><TD> toggle close caption support&nbsp;Pressing 0-9 (preferably 3 times) + T changes teletext page and turns on teletext. </TD></TR><TR><TD>
 F </TD><TD> rotate between the various Picture Adjustments (Colour, Hue, etc.)&nbsp;While Picture Adjustment is on-screen, use Left and Right arrows to&nbsp;adjust. These settings adjust the look of the video playback, and are&nbsp;independent of the G-key settings used at record-time. </TD></TR><TR><TD>
 [ or F10        </TD><TD> decrease volume </TD></TR><TR><TD>
 ] or F11        </TD><TD> increase volume </TD></TR><TR><TD>
@@ -4751,25 +4751,25 @@ TAB - menu
 
 <P>The following files allow you to add extra functionality.  Place them
 into <CODE>/usr/local/share/xmame</CODE></P>
-<P><CODE>catver.ini</CODE> is a catalog of categories and versions of popular mame ROMs.
-Useful for keeping large libraries of ROMs organized.</P>
+<P>- <CODE>catver.ini</CODE> is a catalog of categories and versions of popular mame ROMs.</P>
+<P>Useful for keeping large libraries of ROMs organized.</P>
 <P>It may be downloaded from 
 <A HREF="http://www.catver.com">http://www.catver.com</A> or 
 <A HREF="http://www.mameworld.net/catlist">http://www.mameworld.net/catlist</A></P>
-<P>- Screenshots aka "snaps"
-These may be downloaded from 
+<P>- Screenshots aka "snaps"</P>
+<P>These may be downloaded from 
 <A HREF="http://www.classicgaming.com/mame32qa/">http://www.classicgaming.com/mame32qa/</A></P>
 <P>Screenshots are displayed when you are browsing your ROMS in <B>mythgame</B>.
 Unzip and place them in <CODE>/usr/local/share/xmame/snaps</CODE></P>
-<P><CODE>history.dat</CODE></P>
+<P>- <CODE>history.dat</CODE></P>
 <P>Download from 
 <A HREF="http://www.arcade-history.com/history_database.php">http://www.arcade-history.com/history_database.php</A>
 This file fills in a bit of background about each ROM.</P>
-<P><CODE>hiscore.dat</CODE>
-Download from 
+<P>- <CODE>hiscore.dat</CODE></P>
+<P>Download from 
 <A HREF="http://www.mameworld.net/highscore/">http://www.mameworld.net/highscore/</A></P>
-<P>- Cheats
-Download from 
+<P>- Cheats</P>
+<P>Download from 
 <A HREF="http://cheat.retrogames.com/">http://cheat.retrogames.com/</A></P>
 
 <H2><A NAME="ss15.4">15.4</A> <A HREF="#toc15.4">Download and Install Mythgame.</A>
@@ -4782,7 +4782,7 @@ section to obtain mythplugins.</P>
 <P>Switch to the mythplugins directory:
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd mythplugins
+$ cd ~/mythplugins-0.18.1
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -4820,15 +4820,15 @@ MAME flyers path:      /usr/local/share/xmame/flyers      (not used with mythgam
 MAME cabinets path:    /usr/local/share/xmame/cabinets    (not used with mythgame)
 MAME history path:     /usr/local/share/xmame/history.dat (a little history about each game)
 MAME cheat files path: /usr/local/share/xmame/cheats
-MAME image downloader                                     (no longer  used)
+MAME image downloader                                     (no longer used)
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Setup options:
-Automatically download images - no longer used
-Show disclaimer - show warning about illegal ROMs before starting each ROM.
-Show game info - show info about the game, ie:year, maker, CPU, sound,
-screen resolution before staring game</P>
+<P>Setup options:</P>
+<P>Automatically download images - no longer used</P>
+<P>Show disclaimer - show warning about illegal ROMs before starting each ROM.</P>
+<P>Show game info - show info about the game, ie:year, maker, CPU, sound,
+screen resolution before starting the game</P>
 
 <H2><A NAME="ss15.6">15.6</A> <A HREF="#toc15.6">Hints:</A>
 </H2>

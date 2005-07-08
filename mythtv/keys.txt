@@ -10,7 +10,7 @@ mythfrontend
 - D to delete in both "Watch a Recording" and "Delete a Recording".
 - U to view details for the currently selected show on the Watch or
     Delete screens, EPG, "Program Finder", "Fix Scheduling Conflicts"
-    or search results screens.
+    and search results screens.
 - O to list the upcoming episodes for the currently selected show
     on the EPG, "Program Finder", "Program Recording Priorities",
     "Fix Scheduling Conflicts" or search results screens.
@@ -39,7 +39,7 @@ Watching TV or a recording
 - End or 'Z' to skip to next commercial break marker
 - Home or 'Q' to skip back to previous commercial break marker
 - T to toggle close caption support
-- Pressing 0-9 (preferrably 3 times) + T changes teletext page and turns on 
+- Pressing 0-9 (preferably 3 times) + T changes teletext page and turns on 
   teletext.
 - F to rotate between the various Picture Adjustments (Colour, Hue, etc.)
     While Picture Adjustment is on-screen, use Left and Right arrows to adjust.
@@ -58,7 +58,7 @@ Watching TV or a recording
 - Left (if a jump amount is entered) to jump back that amount.
 - Right (if a jump amount is entered) to jump ahead that amount.
 - F8 to toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
-- Ctrl+B to jump to the begining of the recording / ringbuffer.
+- Ctrl+B to jump to the beginning of the recording / ringbuffer.
 - + to switch between audio streams
 
 Without the stickykeys option selected:
@@ -176,7 +176,7 @@ EPG
   leaving the EPG (Most useful in the alternate EPG)
 - Pressing '?' will mark/unmark the current channel as a "favorite"
 - Pressing '/' or 4 will toggle the guide listing between all channels and
-  and "favorites".
+  "favorites".
 
 Set Program Recording Priorities and Set Channel Recording Priorities
 ---------------------------------------------
