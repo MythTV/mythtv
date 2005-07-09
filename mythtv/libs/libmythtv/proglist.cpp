@@ -1292,6 +1292,9 @@ void ProgLister::fillViewList(const QString &view)
         viewList << "all";
         viewTextList << tr("All");
 
+        viewList << "premieres";
+        viewTextList << tr("Premieres");
+
         viewList << "movies";
         viewTextList << tr("Movies");
 
@@ -1396,22 +1399,30 @@ void ProgLister::fillItemList(void)
                         "  AND program.manualid = 0 ")
                         .arg(startstr);
 
-        if (qphrase == "movies")
+        if (qphrase == "premieres")
         {
-            where += "AND program.category_type = 'movie' ";
+            where += "  AND program.previouslyshown = 0 ";
+            where += "  AND (program.category = 'Special' ";
+            where += "    OR program.programid LIKE 'EP%0001') ";
+            where += "  AND DAYOFYEAR(program.originalairdate) = "; 
+            where += "      DAYOFYEAR(program.starttime) ";
+        }
+        else if (qphrase == "movies")
+        {
+            where += "  AND program.category_type = 'movie' ";
         }
         else if (qphrase == "series")
         {
-            where += "AND program.category_type = 'series' ";
+            where += "  AND program.category_type = 'series' ";
         }
         else if (qphrase == "specials")
         {
-            where += "AND program.category_type = 'tvshow' ";
+            where += "  AND program.category_type = 'tvshow' ";
         }
         else
         {
-            where += "AND (program.category_type <> 'movie' ";
-            where += "OR program.airdate >= YEAR(NOW() - INTERVAL 2 YEAR)) ";
+            where += "  AND (program.category_type <> 'movie' ";
+            where += "  OR program.airdate >= YEAR(NOW() - INTERVAL 2 YEAR)) ";
         }
     }
     else if (type == plTitleSearch) // keyword search

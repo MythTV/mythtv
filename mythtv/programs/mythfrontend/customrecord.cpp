@@ -188,6 +188,12 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
               "AND DAYNAME(program.starttime) = \"Friday\" \n"
               "AND HOUR(program.starttime) >= 12 ");
 
+    m_clause->insertItem(tr("First Episodes (complete example for Data Direct)"));
+    m_csql << QString("program.previouslyshown = 0 \n"
+              "AND program.programid LIKE \"EP%0001\" \n"
+              "AND DAYOFYEAR(program.originalairdate) = \n"
+              "    DAYOFYEAR(program.starttime) ");
+
     vbox->addWidget(m_clause);
 
     // Preview box
