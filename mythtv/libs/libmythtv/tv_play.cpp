@@ -2575,7 +2575,10 @@ void TV::DoSkipCommercials(int direction)
 {
     NormalSpeed();
     StopFFRew();
-
+    
+    if (StateIsLiveTV(GetState()))
+        return;
+        
     bool muted = false;
 
     AudioOutput *aud = nvp->getAudioOutput();
@@ -2586,8 +2589,6 @@ void TV::DoSkipCommercials(int direction)
     }
 
     bool slidertype = false;
-    if (StateIsLiveTV(GetState()))
-        slidertype = true;
 
     if (activenvp == nvp && GetOSD())
     {
@@ -2598,7 +2599,8 @@ void TV::DoSkipCommercials(int direction)
         update_osd_pos = true;
     }
 
-    activenvp->SkipCommercials(direction);
+    if (activenvp)
+        activenvp->SkipCommercials(direction);
 
     if (muted) 
         muteTimer->start(kMuteTimeout, true);
