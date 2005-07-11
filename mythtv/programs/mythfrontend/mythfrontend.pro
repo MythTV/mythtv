@@ -51,6 +51,7 @@ SOURCES += customrecord.cpp
 
 macx {
     RC_FILE += mythfrontend.icns
+    LIBS += `freetype-config --libs`
 }
 
 using_xvmc:DEFINES += USING_XVMC
