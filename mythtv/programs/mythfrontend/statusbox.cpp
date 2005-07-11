@@ -9,19 +9,6 @@
 
 #include <unistd.h>
 
-#ifdef __linux__
-#include <sys/statvfs.h>
-#include <sys/sysinfo.h>
-#endif
-#if defined(__FreeBSD__) || defined(CONFIG_DARWIN)
-#include <sys/sysctl.h>
-#include <sys/param.h>
-#include <sys/mount.h>
-#endif
-#ifdef CONFIG_DARWIN
-#include <mach/mach.h>
-#endif
-
 #include <iostream>
 #include <cerrno>
 using namespace std;
