@@ -4,9 +4,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
-#ifdef USING_OSS
-    #include <sys/soundcard.h>
-#endif
 #include <sys/ioctl.h>
 #include <cerrno>
 #include <cstring>
