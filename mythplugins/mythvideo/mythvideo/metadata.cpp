@@ -104,7 +104,7 @@ bool Metadata::Remove()
         }
 
         query.prepare("DELETE FROM filemarkup WHERE filename = :FILENAME");
-        query.bindValue(":FILENAME", filename);
+        query.bindValue(":FILENAME", filename.utf8());
         if (!query.exec()){
             MythContext::DBError("delete from filemarkup", query);
         }
@@ -678,7 +678,7 @@ void Metadata::purgeByID( int ID )
 
         query.prepare("DELETE FROM filemarkup WHERE "
                       "filename = :FILE ;");
-        query.bindValue(":FILE", filename);
+        query.bindValue(":FILE", filename.utf8());
         query.exec();
     }
 
@@ -691,7 +691,7 @@ void Metadata::purgeByFilename( const QString& filename )
     
     query.prepare("SELECT intid FROM videometadata WHERE "
                   "filename = :FILE ;");
-    query.bindValue(":FILE", filename);
+    query.bindValue(":FILE", filename.utf8());
     query.exec();
     
     if (query.isActive() && query.size() > 0)
