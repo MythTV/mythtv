@@ -636,6 +636,27 @@ bool Channel::Tune(uint frequency, QString inputname, QString modulation)
     return true;
 }
 
+bool Channel::IsTuned() const
+{
+    if (usingv4l2)
+    {
+        struct v4l2_tuner tuner;
+
+        memset(&tuner,0,sizeof(tuner));
+        if (-1 == ::ioctl(videofd,VIDIOC_G_TUNER,&tuner,0))
+            return false;
+        return tuner.signal ? true : false;
+    }
+    else 
+    {
+        struct video_tuner tuner;
+        memset(&tuner,0,sizeof(tuner));
+        if (-1 == ::ioctl(videofd,VIDIOCGTUNER,&tuner,0))
+             return false;
+        return tuner.signal ? true : false;
+    }
+}
+
 int Channel::GetCardID() const
 {
     if (pParent)

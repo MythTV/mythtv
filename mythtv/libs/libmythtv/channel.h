@@ -53,6 +53,8 @@ class Channel : public ChannelBase
     bool TuneMultiplex(uint mplexid);
     bool Tune(uint frequency, QString inputname="",
               QString modulation="analog");
+    // V4L scanning stuff
+    bool IsTuned() const;
   private:
     // Helper Sets
     void SetColourAttribute(int attrib, const char *name);

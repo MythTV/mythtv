@@ -58,14 +58,8 @@ public:
     /** @brief Stops the scanning thread running */
     void stop();
 
-    /** @brief Scans the given frequency list, implies start()
-        @see start()
-     */
-    bool scan(unsigned nList);
-    /** @brief Scans the given frequency table, implies start()
-        @see start()
-     */
-    bool scan(const QString& table);
+    /** @brief Scans the given frequency list, implies starting the thread() */
+    bool scan();
 
 signals:
     /** @brief Indicates how far through the scan we are as a percentage
@@ -86,43 +80,19 @@ protected:
     unsigned sourceid;
     unsigned cardid;
     unsigned nTable;
-    int fd;
-    QString device;
-    QString vbidevice;
-    struct vbi *vbi;
 
-    /** @brief Is the current channel tuned
-        @returns true if tuned
-      */ 
-    bool isTuned();
     /** @brief adds a found channel to the database
         @param name name of the channel
         @param frequency freqency/frequencyid of the channel
       */
-    void addChannel(const QString& name, int frequency);
-    /** @brief find the next available channel id 
-        @param sourceID the source id of the video source to check 
-    */
-    int generateNewChanID(int sourceID);
-    /** @brief Starts the scanning thread running */
-    bool start();
-
-    /** @brief Controls access to the thread*/
-    pthread_mutex_t lock;
+    void addChannel(int number, const QString& channum,
+                    const QString& name, int frequency);
     /** @brief Scanning thread*/
     pthread_t thread;
-    /** @brief vbi thread*/
-    pthread_t threadVBI;
 
     /** @brief Actual scanning proc */
     void doScan();
     /** @brief Actual thread proc , calls doScan*/
     static void *spawn(void *param);
-    /** @brief Actual thread proc for vbi, calls doVBI*/
-    static void *spawnVBI(void *param);
-    /** @brief Actual vbi proc */
-    void doVBI();
-    /** @brief vbi callback proc */
-    static void vbi_event(AnalogScan* data, struct vt_event *ev);
 };
 #endif //ANALOGSCAN_H

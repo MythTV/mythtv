@@ -67,6 +67,7 @@ class CardUtil
     static DISEQC_TYPES GetDISEqCType(uint cardid);
 
     static CARD_TYPES   GetDVBType(uint device, QString &name);
+    static QString      GetDefaultInput(uint cardid);
 };
 
 class VideoSource;

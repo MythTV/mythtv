@@ -308,23 +308,6 @@ void ScanWizardScanner::scan()
         //Create an analog scan object
         analogScan = new AnalogScan(nVideoSource, parent->captureCard());
 
-        MSqlQuery query(MSqlQuery::InitCon());
-
-        QString thequery = QString("SELECT freqtable "
-                               "FROM videosource WHERE "
-                               "sourceid = \"%1\";")
-                               .arg(nVideoSource);
-        query.prepare(thequery);
-
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("fetchtuningparams", query);
-        if (query.size() <= 0)
-             return;
-        query.next();
-
-        QString freqtable = query.value(0).toString();
-//        cerr << "frequency table = " << freqtable.ascii() << endl; 
-
         popupProgress = new ScanProgressPopup(this,false);
         connect(analogScan,SIGNAL(serviceScanComplete(void)),
                 this,SLOT(scanComplete(void)));
@@ -335,7 +318,7 @@ void ScanWizardScanner::scan()
         popupProgress->progress(0);
         popupProgress->exec(this);
 
-        if (!analogScan->scan(freqtable))
+        if (!analogScan->scan())
         {
              MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                       tr("ScanWizard"),

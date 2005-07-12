@@ -297,6 +297,28 @@ enum CardUtil::DISEQC_TYPES CardUtil::GetDISEqCType(uint nCardID)
     return (DISEQC_TYPES)iRet;
 }
 
+/** \fn CardUtil::GetDefaultInput(uint)
+ *  \brief Returns the default input for the card
+ *  \param [in]nCardID card id to check
+ *  \return the default input
+ */
+QString CardUtil::GetDefaultInput(uint nCardID)
+{
+    QString str;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT defaultinput "
+                  "FROM capturecard "
+                  "WHERE capturecard.cardid = :CARDID");
+    query.bindValue(":CARDID", nCardID);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        str = query.value(0).toString();
+    }
+    return str;
+}
+
 QString VSSetting::whereClause(void)
 {
     return QString("sourceid = %1").arg(parent.getSourceID());

@@ -38,15 +38,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include <qmutex.h>
 #include "mythcontext.h"
 #include "videosource.h"
 #include "frequencies.h"
-#include "videodev_myth.h"
-
-extern "C" {
-#include "vbitext/vbi.h"
-};
+#include "channel.h"
+#include "channelutil.h"
 
 #include "analogscan.h"
 
@@ -56,69 +52,18 @@ AnalogScan::AnalogScan(unsigned _sourceid,unsigned _cardid) :
     sourceid(_sourceid),
     cardid(_cardid)
 {
-    pthread_mutex_init(&lock, NULL);
-    vbi=NULL;
 }
 
 AnalogScan::~AnalogScan()
 {
-    pthread_mutex_destroy(&lock);
-}
-
-bool AnalogScan::start()
-{
-    if (!CardUtil::GetVideoDevice(cardid, device, vbidevice))
-        return false;
-
-    fd = ::open(device.ascii(),O_RDWR); 
-    if (fd < 0)
-        return false;
-
-    pthread_mutex_lock(&lock);
-    fRunning = true;
-    fStop = false;
-    pthread_mutex_unlock(&lock);
-
-    pthread_create(&thread, NULL, spawn, this);
-#ifdef DOVBI
-    pthread_create(&threadVBI, NULL, spawnVBI, this);
-#endif
-
-    return true;
 }
 
 void AnalogScan::stop()
 {
-    bool _stop = false;
-    pthread_mutex_lock(&lock);
-    if (fRunning && !fStop)
-        _stop = true; 
-    fStop = true;
-    pthread_mutex_unlock(&lock);
-
-    if (_stop)
+    if (fRunning)
     {
-        pthread_join(thread,NULL);
-#ifdef DO_VBI
-        pthread_join(threadVBI,NULL);
-#endif
-        if (fd >=0)
-           ::close(fd);
-   }
-}
-
-void AnalogScan::vbi_event(AnalogScan* _this, struct vt_event *ev)
-{
-    (void)_this;
-    //cerr << "AnalogScan::vbi_event " << ev->type << "\n";
-    switch (ev->type)
-    {
-    case EV_HEADER:
-        break;
-    case EV_XPACKET:
-        break;
-//    default:
-//        cerr << "AnalogScan unkown " << ev->type << "\n";
+        fStop = true;
+        pthread_join(thread, NULL);
     }
 }
 
@@ -129,149 +74,90 @@ void *AnalogScan::spawn(void *param)
     return NULL;
 }
 
-void *AnalogScan::spawnVBI(void *param)
-{
-    AnalogScan *_this = (AnalogScan*)param;
-    _this->doVBI();
-    return NULL;
-}
-
-void AnalogScan::doVBI()
-{
-    vbi = ::vbi_open(vbidevice.ascii(), NULL, 99, -1);
-    if (!vbi)
-        return;
-    VERBOSE(VB_IMPORTANT, QString("AnalogScan opened vbi device: %1").arg(vbidevice));
-    vbi_add_handler(vbi, (void*)vbi_event,this);
-
-    while(!fStop)
-    {
-        struct timeval tv;
-        fd_set rdset;
-
-        tv.tv_sec = 0;
-        tv.tv_usec = 10000;
-        FD_ZERO(&rdset);
-        FD_SET(vbi->fd, &rdset);
-
-        switch (::select(vbi->fd + 1, &rdset, 0, 0, &tv))
-        {
-            case -1:
-                  perror("vbi select");
-                  continue;
-            case 0:
-                  //printf("vbi select timeout\n");
-                  continue;
-        }
-        vbi_handler(vbi, vbi->fd);
-    }
-    vbi_del_handler(vbi, (void*)vbi_event,this);
-    ::vbi_close(vbi);
-}
-
 void AnalogScan::doScan()
 {
-    struct CHANLIST *l = chanlists[nTable].list;
-    int count = chanlists[nTable].count;
-    for (int i = 0; i < count && !fStop; i++,l++)
+    fRunning = true;
+    QString device;
+    if (CardUtil::GetVideoDevice(cardid, device))
     {
-        //cerr << i << " " << l->name << " " << l->freq << endl;
-        struct v4l2_frequency vf;
-        memset(&vf, 0, sizeof(vf));
-        vf.frequency = l->freq * 16 / 1000;
-        vf.type = V4L2_TUNER_ANALOG_TV;
-
-        ::ioctl(fd, VIDIOC_S_FREQUENCY, &vf);
-        usleep(200000); /* 0.2 sec */
-        if (isTuned())
-        {
-#ifdef DOVBI
-             usleep(2000000); /* 0.2 sec */
-#endif
-             addChannel(l->name,l->freq);
-             emit serviceScanUpdateText(QObject::tr("Channel %1").arg(l->name));
+         Channel channel(NULL,device);
+         if (channel.Open())
+         {
+             QString input = CardUtil::GetDefaultInput(cardid);
+             struct CHANLIST *l = chanlists[nTable].list;
+             int count = chanlists[nTable].count;
+             for (int i = 0; i < count && !fStop; i++,l++)
+             {
+                 unsigned frequency = l->freq*1000;
+                 channel.Tune(frequency,input);
+                 usleep(200000); /* 0.2 sec */
+                 if (channel.IsTuned())
+                 {
+                      //cerr << i << " " << l->name << " " << frequency <<  " Tuned " << endl;
+                      QString name = QObject::tr("Channel %1").arg(l->name);
+                      addChannel(i,l->name,name,l->freq);
+                      emit serviceScanUpdateText(name);
+                 }
+                 emit serviceScanPCTComplete((i*100)/count);
+             }
+             channel.Close();
         }
-        emit serviceScanPCTComplete((i*100)/count);
     }
     emit serviceScanComplete();
-    pthread_mutex_lock(&lock);
-    fRunning = false;
-    pthread_mutex_unlock(&lock);
 }
 
-bool AnalogScan::scan(const QString& freqtable)
+bool AnalogScan::scan()
 {
     int i = 0;
     char *listname = (char *)chanlists[i].name;
     QString table;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    QString thequery = QString("SELECT freqtable FROM videosource WHERE "
+                               "sourceid = \"%1\";").arg(sourceid);
+    query.prepare(thequery);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("analog scan freqtable", query);
+    if (query.size() <= 0)
+         return false;
+    query.next();
+
+    QString freqtable = query.value(0).toString();
+//        cerr << "frequency table = " << freqtable.ascii() << endl; 
 
     if (freqtable == "default" || freqtable.isNull() || freqtable.isEmpty())
         table = gContext->GetSetting("FreqTable");
     else
         table = freqtable;
 
+    nTable = 0;
     while (listname != NULL)
     {
         if (table == listname)
-            return scan(i);
+        {
+           nTable = i;
+           break;
+        }
         i++;
         listname = (char *)chanlists[i].name;
     }
 
-    return scan(0);
+    if (!fRunning)
+        pthread_create(&thread, NULL, spawn, this);
+    while (!fRunning)
+        usleep(50);
+    return true;
 }
 
-bool AnalogScan::isTuned()
-{
-    struct v4l2_tuner tuner;
-
-    memset(&tuner,0,sizeof(tuner));
-    if (-1 == ::ioctl(fd,VIDIOC_G_TUNER,&tuner,0))
-        return 0;
-    return tuner.signal ? true : false;
-}
-
-bool AnalogScan::scan(unsigned table)
-{
-    nTable = table;
-    return start();
-}
-
-int AnalogScan::generateNewChanID(int sourceID)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    QString theQuery =
-        QString("SELECT max(chanid) as maxchan "
-                "FROM channel WHERE sourceid=%1").arg(sourceID);
-    query.prepare(theQuery);
-
-    if(!query.exec())
-        MythContext::DBError("Calculating new ChanID", query);
-
-    if (!query.isActive())
-        MythContext::DBError("Calculating new ChanID for Analog Channel",query);
-
-    query.next();
-
-    // If transport not present add it, and move on to the next
-    if (query.size() <= 0)
-        return sourceID * 1000;
-
-    int MaxChanID = query.value(0).toInt();
-
-    if (MaxChanID == 0)
-        return sourceID * 1000;
-    else
-        return MaxChanID + 1;
-}
-
-void AnalogScan::addChannel(const QString& name, int frequency)
+void AnalogScan::addChannel(int number,const QString& channumber,
+                            const QString& name, int frequency)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM channel WHERE channum=:CHANNUM AND "
                   "sourceid=:SOURCEID");
-    query.bindValue(":CHANNUM",name);
+    query.bindValue(":CHANNUM",channumber);
     query.bindValue(":SOURCEID",sourceid);
     query.exec();
 
@@ -280,16 +166,17 @@ void AnalogScan::addChannel(const QString& name, int frequency)
                    "VALUES (:CHANID,:CHANNUM,:SOURCEID,:CALLSIGN,"
                    ":NAME,:FREQID);");
 
-    query.bindValue(":CHANID",generateNewChanID(sourceid));
-    query.bindValue(":CHANNUM",name);
+    int chanid = ChannelUtil::CreateChanID(sourceid,QString::number(number));
+    query.bindValue(":CHANID",chanid);
+    query.bindValue(":CHANNUM",channumber);
     query.bindValue(":SOURCEID",sourceid);
     query.bindValue(":CALLSIGN",name);
     query.bindValue(":NAME",name);
     query.bindValue(":FREQID",frequency);
 
     if(!query.exec())
-        MythContext::DBError("Adding new DVB Channel", query);
+        MythContext::DBError("Adding new Channel", query);
 
     if (!query.isActive())
-        MythContext::DBError("Adding new DVB Channel", query);
+        MythContext::DBError("Adding new Channel", query);
 }
