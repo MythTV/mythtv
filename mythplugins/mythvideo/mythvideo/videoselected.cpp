@@ -33,12 +33,12 @@ using namespace std;
 
 VideoSelected::VideoSelected(VideoList *lvideo_list,
                              MythMainWindow *parent, const char *name, 
-                             int idnum)
+                             int index)
             : MythDialog(parent, name)
 {
     video_list = lvideo_list;
 
-    curitem = video_list->getVideoListMetadata(idnum);
+    curitem = video_list->getVideoListMetadata(index);
     curitem->fillDataFromID();
 
     noUpdate = false;

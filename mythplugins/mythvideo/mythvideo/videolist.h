@@ -28,10 +28,11 @@ class VideoList
 
         GenericTree *buildVideoList(bool filebrowser, bool flatlist,
                                                         int parental_level);
-        Metadata *getVideoListMetadata(int id);
-        QMap<int, Metadata>& getVideoListMetas(void);
+        Metadata *getVideoListMetadata(int index);
         void wantVideoListUpdirs(bool yes);
         VideoFilterSettings *getCurrentVideoFilter() { return currentVideoFilter; }
+        unsigned int count(void) const { return metas.count(); }
+
     private:
         void buildFsysList(bool flatlist, int parental_level);
         void buildDbList(bool flatlist, int parental_level);
@@ -50,8 +51,10 @@ class VideoList
         bool has_updirs; // True if tree has updirs
         QStringList  browser_mode_files;
         GenericTree *video_tree_root;
-        QMap<int, Metadata> metas;
+        QValueVector<Metadata> metas;   // sorted/indexed by current filter
         VideoFilterSettings *currentVideoFilter;
 };
 
 #endif // VIDEOLIST_H
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

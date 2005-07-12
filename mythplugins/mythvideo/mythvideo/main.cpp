@@ -73,6 +73,9 @@ void setupKeys(void)
     REG_KEY("Video","BROWSE","Change browsable in video manager","B");
     REG_KEY("Video","INCPARENT","Increase Parental Level","],},F11");
     REG_KEY("Video","DECPARENT","Decrease Parental Level","[,{,F10");
+
+    REG_KEY("Video","HOME","Go to the first video","Home");
+    REG_KEY("Video","END","Go to the last video","End");
 }
 
 

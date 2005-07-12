@@ -51,7 +51,6 @@ class VideoDialog : public MythDialog
         virtual void updateBackground(void);
         virtual void parseContainer(QDomElement&) = 0;
         virtual void loadWindow(QDomElement &element);
-        virtual void handleMetaFetch(Metadata*){}
         virtual void fetchVideos();
         virtual void setParentalLevel(int which_level);
         void shiftParental(int amount);

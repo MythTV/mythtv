@@ -26,7 +26,8 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings, const QString
         runtime = gContext->GetNumSetting( QString("%1Runtime").arg(prefix),-2);
         userrating = gContext->GetNumSetting( QString("%1Userrating").arg(prefix),-1);
         browse = gContext->GetNumSetting( QString("%1Browse").arg(prefix),-1);
-        orderby = gContext->GetNumSetting( QString("%1Orderby").arg(prefix),0);
+        orderby = (enum ordering)gContext->GetNumSetting(
+                QString("%1Orderby").arg(prefix),kOrderByTitle);
     }
     else
     {
@@ -37,7 +38,7 @@ VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings, const QString
         runtime = -2;
         userrating = -1;
         browse = -1;
-        orderby = 0;
+        orderby = kOrderByTitle;
     }
 
 }
@@ -206,13 +207,13 @@ QString VideoFilterSettings::BuildClauseOrderBy()
 {
     switch (orderby)
     {
-        case 0 : 
+        case kOrderByTitle : 
             return " ORDER BY title";
-        case 1 : 
+        case kOrderByYearDescending : 
             return " ORDER BY year DESC";
-        case 2 : 
+        case kOrderByUserRatingDescending : 
             return " ORDER BY userrating DESC";
-        case 3 : 
+        case kOrderByLength : 
             return " ORDER BY length";
         default:
             return "";        
@@ -493,8 +494,8 @@ void VideoFilterDialog::saveAsDefault()
 
 void VideoFilterDialog::saveAndExit()
 {
-     if (originalSettings)
-     {
+    if (originalSettings)
+    {
         originalSettings->setCategory(currentSettings->getCategory());
         originalSettings->setGenre(currentSettings->getGenre());
         originalSettings->setCountry(currentSettings->getCountry());
@@ -557,7 +558,8 @@ void VideoFilterDialog::setBrowse(int new_browse)
 
 void VideoFilterDialog::setOrderby(int new_orderby)
 {
-        currentSettings->setOrderby(new_orderby);
+        currentSettings->setOrderby(
+                (enum VideoFilterSettings::ordering)new_orderby);
         update_numvideo();
 }
 
@@ -630,3 +632,4 @@ VideoFilterDialog::~VideoFilterDialog()
 {
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

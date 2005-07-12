@@ -27,41 +27,20 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/util.h>
 
-enum GAL_VIEWS { VIEW_DB, VIEW_FILE };
-
 VideoGallery::VideoGallery(MythMainWindow *parent, const char *name)
             : VideoDialog(DLG_GALLERY, parent, "gallery", name)
 {
-    updateML = false;
+    setFileBrowser(gContext->GetNumSetting("VideoGalleryNoDB", 0));
+    setFlatList(!isFileBrowser);
 
-    // load default settings from the database
-    
-    if (gContext->GetNumSetting("VideoGalleryNoDB", false) == false)
-        curView = VIEW_DB;
-    else
-        curView = VIEW_FILE;
-        
     nCols                = gContext->GetNumSetting("VideoGalleryColsPerPage",4);
     nRows                = gContext->GetNumSetting("VideoGalleryRowsPerPage",3);
     subtitleOn           = gContext->GetNumSetting("VideoGallerySubtitle",1);
     keepAspectRatio      = gContext->GetNumSetting("VideoGalleryAspectRatio",1);
 
-
     // XXX Fixme: this is wrong...
     prefix = gContext->GetSetting("VideoStartupDir");
 
-    if (curView == VIEW_DB)
-    {
-        setFlatList(true);
-        setFileBrowser(false);
-    }
-    else
-    {
-        setFlatList(false);
-        setFileBrowser(true);
-    }
-    
-    
     loadWindow(xmldata);
     LoadIconWindow(); // load icon settings
 
@@ -70,91 +49,42 @@ VideoGallery::VideoGallery(MythMainWindow *parent, const char *name)
     setNoErase();
 }
 
-VideoGallery::~VideoGallery()
-{
-    // save current settings as default
-    gContext->SaveSetting("VideoDefaultView", curView);
-}
-
-
-
 void VideoGallery::keyPressEvent(QKeyEvent *e)
 {
-    
     bool handled = false;
     QStringList actions;
     
-    gContext->GetMainWindow()->TranslateKeyPress("Global", e, actions);
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
+        handled = true;
 
         if (action == "SELECT")
-        {
-            handled = true;
             handled = handleSelect();
-        }
-        else if ( (action == "UP")  || (action == "DOWN") ||
-                  (action == "LEFT") ||(action == "RIGHT") ||
-                  (action == "PAGEUP") || (action == "PAGEDOWN"))
-        {
-            handled = true;
+        else if (action == "INFO") {
+            if (where_we_are->getInt() > SUB_FOLDER)
+                doMenu(true);
+        } else if (action == "UP" || action == "DOWN" ||
+                 action == "LEFT" || action == "RIGHT" ||
+                 action == "PAGEUP" || action == "PAGEDOWN" ||
+                 action == "HOME" || action == "END")
             moveCursor(action);
-        }
+        else if (action == "INCPARENT")
+            shiftParental(1);
+        else if (action == "DECPARENT")
+            shiftParental(-1);            
         else if (action == "1" || action == "2" ||
                  action == "3" || action == "4")
-        {
-            handled = true;
-            setParentalLevel(action.toInt());        // parental control
-        }
-        
-        if (handled)
-            break;
-    }    
-    
-    
-    if (!handled)
-    {
-        gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            handled = true;
-    
-            if (action == "SELECT")
-            {
-                handled = handleSelect();
-            }
-            else if (action == "FILTER")
-            {
-                slotDoFilter();
-            }
-            else if (action == "INFO")
-            {
-                // pop-up menu with video description
-                if ((where_we_are->getInt() > SUB_FOLDER ))
-                {
-                    doMenu(true);
-                }
-            }
-            else if (action == "INCPARENT")
-                shiftParental(1);
-            else if (action == "DECPARENT")
-                shiftParental(-1);            
-            else if (action == "MENU")
-            {
-                doMenu(false);
-            }
-            else if (action == "ESCAPE")
-            {
-                 handled = goBack();
-            }
-            else
-                handled = false;
-            
-            if (handled)
-                break;
-        }
+            setParentalLevel(action.toInt());
+        else if (action == "FILTER")
+            slotDoFilter();
+        else if (action == "MENU")
+            doMenu(false);
+        else if (action == "ESCAPE")
+            handled = goBack();
+        else
+            handled = false;
     }
     
     if (!handled)
@@ -180,7 +110,7 @@ bool VideoGallery::goBack()
 {
     bool handled = false;
     // one dir up
-    if ((curView == VIEW_FILE) && !jumping)
+    if (isFileBrowser && !jumping)
     {
         GenericTree *parent = where_we_are->getParent();
         if (parent)
@@ -205,18 +135,19 @@ bool VideoGallery::goBack()
      return handled;
 }
 
+void VideoGallery::computeLastRowCol(int list_count)
+{
+    lastRow = QMAX((int)ceilf((float)list_count / nCols) - 1, 0);
+    lastCol = (list_count % nCols - 1 + nCols) % nCols;
+}
+
 void VideoGallery::fetchVideos()
 {
-    if (updateML == true)
-        return;
-    updateML = true;
-    
     VideoDialog::fetchVideos();
-    video_tree_root = VideoDialog::getVideoTreeRoot();
+    video_list->wantVideoListUpdirs(isFileBrowser);
 
-    video_list->wantVideoListUpdirs(curView != VIEW_DB);
+    video_tree_root = VideoDialog::getVideoTreeRoot();
     video_tree_root->setOrderingIndex(0);
-    video_tree_root->sortByAttributeThenByString(0);
 
     //
     // Select initial view
@@ -228,7 +159,8 @@ void VideoGallery::fetchVideos()
 
     if (video_tree_root->childCount() > 0)
         where_we_are = video_tree_root->getChildAt(0,0);
-    else where_we_are = video_tree_root;
+    else
+        where_we_are = video_tree_root;
     
     // Move a node down if there is a single directory item here...
     if (where_we_are->siblingCount() == 1 && where_we_are->getInt() < 0)
@@ -236,24 +168,23 @@ void VideoGallery::fetchVideos()
         // Get rid of the up node, if it's there, it _should_ be the first
         // child...
         GenericTree *upnode = where_we_are->getChildAt(0,0);
-        if ((upnode != NULL) && (upnode->getInt() == UP_FOLDER))
-                where_we_are->removeNode(upnode);
+        if (upnode && upnode->getInt() == UP_FOLDER)
+            where_we_are->removeNode(upnode);
         if (where_we_are->childCount() > 1)
-                where_we_are = where_we_are->getChildAt(0,0);
+            where_we_are = where_we_are->getChildAt(0,0);
         // else { we have an empty tree! }
     }
     int list_count = where_we_are->siblingCount();
-    lastRow = QMAX((int)ceilf((float)list_count/(float)nCols)-1,0);
-    lastCol = QMAX(list_count-lastRow*nCols-1,0);
+    computeLastRowCol(list_count);
     
-    allowselect = (bool)(where_we_are->siblingCount() > 0);
+    allowselect = list_count > 0;
 
-    updateML = false;
     update();         // renew the screen
     
     if (where_we_are->getInt() >= 0)
         curitem = video_list->getVideoListMetadata(where_we_are->getInt());
-    else curitem = NULL;
+    else
+        curitem = NULL;
 }
 
 void VideoGallery::paintEvent(QPaintEvent *e)
@@ -350,17 +281,14 @@ void VideoGallery::updateView(QPainter *p)
 
     int list_count = parent->childCount();
 
-    int curPos = topRow*nCols;
-
-    for (int y = 0; y < nRows; y++)    {
-
+    for (int y = 0, curPos = topRow * nCols;
+            y < nRows && curPos < list_count;
+            y++)
+    {
         int ypos = y * (spaceH + thumbH);
 
-        for (int x = 0; x < nCols; x++)
+        for (int x = 0; x < nCols && curPos < list_count; x++)
         {
-            if (curPos >= list_count)
-                continue;
-
             int xpos = x * (spaceW + thumbW);
 
             GenericTree* curTreePos = parent->getChildAt(curPos,0);
@@ -414,7 +342,6 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
 {
     QImage *image = 0;
     int yoffset = 0;
-    bool myImage = true;
     Metadata *meta = NULL;
 
     if (curTreePos->getInt() < 0) // directory
@@ -457,7 +384,6 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         meta = video_list->getVideoListMetadata(curTreePos->getInt());
 
         image = meta->getCoverImage();
-        myImage = false;
     }
 
     int bw  = backRegPix.width();
@@ -470,7 +396,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
     {
 
         QPixmap *pixmap = NULL;
-        if (!myImage && meta && meta->haveCoverPixmap())
+        if (meta && meta->haveCoverPixmap())
             pixmap = meta->getCoverPixmap();
 
         if (!pixmap)
@@ -485,10 +411,10 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
                           (pixmap->height()-bh+yoffset)/2+sh,
                           bw-2*sw, bh-2*sh-yoffset);
 
-        if (myImage)
-            delete pixmap;
-        else
+        if (meta)
             meta->setCoverPixmap(pixmap);
+        else
+            delete pixmap;
     }
 
 
@@ -546,7 +472,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         ttype->Draw(p, 3, 0);
     }
 
-    if (image && myImage)
+    if (image && !meta)
         delete image;
 }
 
@@ -663,96 +589,142 @@ void VideoGallery::exitWin()
 
 void VideoGallery::moveCursor(const QString& action)
 {
+    // Support wrap-around navigation, but not wrap-around display
+    int lastTopRow = QMAX(lastRow - nRows + 1, 0);
     int prevCol = currCol;
     int prevRow = currRow;
     int oldRow  = topRow;
 
     if (action == "LEFT")
     {
-        if (currRow == 0 && currCol == 0)
-            return;
-
-        currCol--;
-        if (currCol < 0) {
-            currCol = nCols - 1;
-            currRow--;
-            if (currRow < topRow)
-                topRow = currRow;
+        if (currCol > 0) {
+            currCol--;
+        } else {
+            if (currRow > 0) {
+                if (topRow == currRow)
+                    topRow--;
+                currRow--;
+                currCol = nCols - 1;
+            } else {
+                // "Flip" to last page
+                topRow = lastTopRow;
+                currRow = lastRow;
+                currCol = lastCol;
+            }
         }
     }
     else if (action == "RIGHT")
     {
-        if (currRow*nCols+currCol >= (int)(where_we_are->siblingCount())-1)
-            return;
-
-        currCol++;
-        if (currCol >= nCols) {
-            currCol = 0;
-            currRow++;
-            if (currRow >= topRow+nRows)
-                topRow++;
+        if (currRow < lastRow) {
+            if (currCol < nCols - 1) {
+                currCol++;
+            } else {
+                if (topRow + nRows - 1 == currRow)
+                    topRow++;
+                currRow++;
+                currCol = 0;
+            }
+        } else {
+            if (currCol < lastCol) {
+                currCol++;
+            } else {
+                // "Flip" to first page
+                topRow = 0;
+                currRow = 0;
+                currCol = 0;
+            }
         }
     }
     else if (action == "UP")
     {
-        if (currRow == 0) {
-            currRow = lastRow;
-            currCol = QMIN(currCol,lastCol);
-            topRow  = QMAX(currRow - nRows + 1,0);
-        } else {
+        if (currRow > 0) {
+            if (topRow == currRow)
+                topRow--;
             currRow--;
-            if (currRow < topRow)
-                topRow = currRow;
+        } else {
+            // "Flip" to last page
+            topRow = lastTopRow;
+            currRow = lastRow;
+            currCol = QMIN(currCol, lastCol);
         }
     }
     else if (action == "DOWN")
     {
-        if (currRow == lastRow) {
-            currRow = 0;
-            topRow = 0;
-        } else {
-            currRow++;
-
-            if (currRow == lastRow)
-                currCol = QMIN(currCol,lastCol);
-
-            if (currRow >= topRow+nRows)
+        if (currRow < lastRow) {
+            if (topRow + nRows - 1 == currRow)
                 topRow++;
+            currRow++;
+            if (currRow == lastRow)
+                currCol = QMIN(currCol, lastCol);
+        } else {
+            // "Flip" to first page
+            topRow = 0;
+            currRow = 0;
         }
     }
     else if (action == "PAGEUP")
     {
-        if (currRow == 0)
-            return; // or wrap around: currRow = QMAX(lastRow - nRows + 1, 0);
-        else
-            currRow = QMAX(currRow - nRows, 0);
-
-        topRow = currRow;
+        // Converge to (0,0), then "flip" to last page
+        if (topRow >= nRows) {
+            topRow -= nRows;
+            currRow -= nRows;
+        } else if (topRow > 0) {
+            unsigned int scrollrows = topRow;
+            topRow -= scrollrows;
+            currRow -= scrollrows;
+        } else if (currRow > 0 || currCol > 0) {
+            currRow = 0;
+            currCol = 0;
+        } else {
+            // "Flip" to last page
+            topRow = lastTopRow;
+            currRow = lastRow;
+            currCol = QMIN(currCol, lastCol);
+        }
     }
     else if (action == "PAGEDOWN")
     {
-        if (currRow == lastRow)
-            return; // or wrap around: currRow = QMAX(nRows - 1,0);
-        else
+        // Converge to (lastRow,lastCol), then "flip" to first page
+        if (topRow <= lastTopRow - nRows) {
+            topRow += nRows;
             currRow += nRows;
-
-        if (currRow >= lastRow) {
+            if (currRow == lastRow)
+                currCol = QMIN(currCol, lastCol);
+        } else if (topRow < lastTopRow) {
+            unsigned int scrollrows = lastTopRow - topRow;
+            topRow += scrollrows;
+            currRow += scrollrows;
+            if (currRow == lastRow)
+                currCol = QMIN(currCol, lastCol);
+        } else if (currRow < lastRow || currCol < lastCol) {
             currRow = lastRow;
-            currCol = QMIN(currCol,lastCol);
+            currCol = lastCol;
+        } else {
+            // "Flip" to first page
+            topRow = 0;
+            currRow = 0;
         }
-
-        topRow = QMAX(currRow - nRows + 1,0);
+    }
+    else if (action == "HOME")
+    {
+        topRow = 0;
+        currRow = 0;
+        currCol = 0;
+    }
+    else if (action == "END")
+    {
+        topRow = lastTopRow;
+        currRow = lastRow;
+        currCol = lastCol;
     }
     else
         return;
 
     GenericTree *parent = where_we_are->getParent();
     if (parent)
-        where_we_are = parent->getChildAt(currRow * nCols + currCol,0);
-
+        where_we_are = parent->getChildAt(currRow * nCols + currCol, 0);
 
     curitem = video_list->getVideoListMetadata(where_we_are->getInt());
-
 
     if (topRow != oldRow)     // renew the whole screen
     {
@@ -776,18 +748,8 @@ void VideoGallery::slotChangeView()
     // menu option to toggle between plain and folder view
     //
     cancelPopup();
-    curView = curView ? VIEW_DB : VIEW_FILE;
-
-    if (curView == VIEW_DB)
-    {
-        setFlatList(true);
-        setFileBrowser(false);
-    }
-    else
-    {
-        setFlatList(false);
-        setFileBrowser(true);
-    }
+    setFileBrowser(!isFileBrowser);
+    setFlatList(!isFileBrowser);
     
     fetchVideos(); // reload videos
 }
@@ -797,14 +759,12 @@ void VideoGallery::positionIcon()
 {
     // determine the x,y position of the current icon anew
     int inData = where_we_are->getPosition(0);
-    currRow = (int)floorf((float)inData/(float)nCols);
-    currCol = (int)(inData-currRow*nCols);
+    currRow = inData / nCols;
+    currCol = inData % nCols;
 
     // determine which part of the list is shown
-    int list_count = where_we_are->siblingCount();
-    lastRow = QMAX((int)ceilf((float)list_count/(float)nCols)-1,0);
-    lastCol = QMAX(list_count-lastRow*nCols-1,0);
-    topRow  = QMIN(currRow, QMAX(lastRow - nRows + 1, 0));
+    computeLastRowCol(where_we_are->siblingCount());
+    topRow = QMIN(currRow, QMAX(lastRow - nRows + 1, 0));
 }
 
 
@@ -820,11 +780,14 @@ void VideoGallery::handleDirSelect()
 
         where_we_are = where_we_are->getChildAt(0,0);
 
-        lastRow = QMAX((int)ceilf((float)list_count/(float)nCols)-1,0);
-        lastCol = QMAX(list_count-lastRow*nCols-1,0);
-    }
+        computeLastRowCol(list_count);
 
-    allowselect = (bool)(list_count > 0);
+        allowselect = true;
+    }
+    else
+    {
+        allowselect = false;
+    }
 }
 
 void VideoGallery::handleUpDirSelect()
@@ -901,3 +864,5 @@ void VideoGallery::parseContainer(QDomElement &element)
     else if (name.lower() == "arrows")
         arrowsRect = area;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

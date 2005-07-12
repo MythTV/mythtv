@@ -33,7 +33,7 @@ class VideoSelected : public MythDialog
     Q_OBJECT
   public:
     VideoSelected(VideoList *lvideolist,
-                 MythMainWindow *parent, const char *name = 0, int idnum = 0);
+                 MythMainWindow *parent, const char *name = 0, int index = 0);
     ~VideoSelected();
     void VideoSelected::processEvents() { qApp->processEvents(); }
     

@@ -14,8 +14,6 @@
 
 #include "videodlg.h"
 
-typedef QValueList<Metadata>  ValueMetadata;
-
 class VideoBrowser : public VideoDialog
 {
     Q_OBJECT
@@ -29,7 +27,6 @@ class VideoBrowser : public VideoDialog
     void cursorRight();
     
     virtual void slotParentalLevelChanged();
-    
 
   protected:
     virtual void parseContainer(QDomElement &element);
@@ -37,35 +34,26 @@ class VideoBrowser : public VideoDialog
     void keyPressEvent(QKeyEvent *e);
     void doMenu(bool info=false);
     virtual void fetchVideos();
-    virtual void handleMetaFetch(Metadata* meta);
     
     LayerSet* getContainer(const QString &name);
     
   private:
     QPixmap getPixmap(QString &level);
+    void jumpToSelection(int amount);
     void jumpSelection(int amount);
-    void RefreshMovieList();
-    void SetCurrentItem();
+    void SetCurrentItem(unsigned int index);
     void updateInfo(QPainter *);
     void updateBrowsing(QPainter *);
     void updatePlayWait(QPainter *);
     void grayOut(QPainter *);
 
-    bool updateML;
-    bool allowselect;
-           
-    ValueMetadata m_list;
-    
     QPixmap *bgTransBackup;
-    
-
     QPainter backup;
 
-    int inData;
+    unsigned int inData;	// index of curItem in VideoList.metas
     int m_state;
 
     QString m_title;
-    QString curitemMovie;
     
     QRect infoRect;
     QRect browsingRect;

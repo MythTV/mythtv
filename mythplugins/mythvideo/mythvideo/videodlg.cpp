@@ -456,21 +456,8 @@ GenericTree *VideoDialog::getVideoTreeRoot(void)
 
 void VideoDialog::fetchVideos()
 {
-    typedef QMap<int, Metadata> metaMap;
-    
-    metaMap myMetas;
-    metaMap::Iterator it;
-
     video_tree_root = video_list->buildVideoList(isFileBrowser, isFlatList,
                                                  currentParentalLevel);
-
-    // XXX: This is suboptimal. The classes should not need this. They
-    //      can retrieve the data through VideoList::getVideoListMetadata()
-    myMetas = video_list->getVideoListMetas();
-    for (it = myMetas.begin(); it != myMetas.end(); ++it) {
-            handleMetaFetch(&it.data());
-    }
-
 }
 
 void VideoDialog::slotDoFilter()

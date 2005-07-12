@@ -20,24 +20,17 @@ VideoList::~VideoList()
     delete currentVideoFilter;
 }
 
-Metadata *VideoList::getVideoListMetadata(int id)
+Metadata *VideoList::getVideoListMetadata(int index)
 {
-    if (id < 0) {
-        // These are special node types
-        return NULL;
-    }
-    if (metas.contains(id))
-        return(&metas[id]);
-    else {
-        cerr << __FILE__ << ": getVideoListMetadata: unknown key:"
-                << id << endl;
-        return NULL;
-    }
-}
+    if (index < 0)
+        return NULL;    // Special node types
 
-QMap<int, Metadata>& VideoList::getVideoListMetas(void)
-{
-    return(metas);
+    if ((unsigned int)index < count())
+        return(&metas[index]);
+
+    cerr << __FILE__ << ": getVideoListMetadata: index out of bounds: "
+        << index << endl;
+    return NULL;
 }
 
 void VideoList::wantVideoListUpdirs(bool yes)
@@ -68,7 +61,8 @@ void VideoList::wantVideoListUpdirs(bool yes)
 //      If false, the hierarchy present on the filesystem or in the database
 //      is preserved. In this mode, both sub-dirs and updirs are present.
 
-GenericTree *VideoList::buildVideoList(bool filebrowser, bool flatlist, int parental_level)
+GenericTree *VideoList::buildVideoList(bool filebrowser, bool flatlist,
+    int parental_level)
 {
     // Clear out the old stuff
     browser_mode_files.clear();
@@ -119,76 +113,100 @@ void VideoList::buildDbList(bool flatlist, int parental_level)
         
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec(thequery);
-    Metadata *myData;
+    unsigned int numrows;
 
-    if(!query.isActive())
+    if (!query.isActive())
     {
         cerr << __FILE__ << ": Your database sucks" << endl;
+        return;
     }
-    else if (query.numRowsAffected() > 0)
+
+    if ((numrows = query.numRowsAffected()) <= 0)
+        return;
+
+    QString prefix = gContext->GetSetting("VideoStartupDir");
+    if (prefix.length() < 1)
     {
-        QString prefix = gContext->GetSetting("VideoStartupDir");
-        if(prefix.length() < 1)
-        {
-            cerr << __FILE__ <<
-                         ": Seems unlikely that this is going to work" << endl;
-        }
+        cerr << __FILE__ << ": Seems unlikely that this is going to work" <<
+            endl;
+    }
 
-        if (!flatlist)
-            (void)addDirNode(video_tree_root, "videos");
+    if (!flatlist)
+        (void)addDirNode(video_tree_root, "videos");
 
-        
-        // Let's loop over the query and build a sorted list
-        QMap<QString, Metadata*> sortedList;
-        QRegExp prefixes = QObject::tr("^(The |A |An )");
-        QString sTitle = "";
-    
-        while (query.next())
-        {
-            unsigned int idnum = query.value(0).toUInt();
-            //
-            //  Create metadata object and fill it
-            //
-        
-            myData = new Metadata();
-            myData->setID(idnum);
-            myData->fillDataFromID();
-            sTitle = myData->Title();
-            sTitle.remove(prefixes);
-            sortedList[sTitle] = myData;
-        }
-        
-        QMap<QString, Metadata*>::iterator it = sortedList.begin();
-        
-        for ( ; it != sortedList.end(); it++)
-        {
-            GenericTree *where_to_add = video_tree_root->getChildAt(0);
-
-            //
-            //  Create metadata object and fill it
-            //
-        
-            myData = *it;
-            if ((myData->ShowLevel() <= parental_level) &&
-                (myData->ShowLevel() != 0))
-            {
-                QString file_string = myData->Filename();
-                file_string.remove(0, prefix.length());
-                if (!flatlist) 
-                {
-
-                    where_to_add = addFileNode(where_to_add, file_string, myData->ID());
-                }
-                else 
-                {
-                    video_tree_root->addNode(file_string, myData->ID(), true);
-                    nitems++;
-                }
-                metas[myData->ID()] = *myData; 
-            }
-
+    //
+    //  Accumulate query results into the metaptrs list. The "parental_level"
+    //  filtering really ought to be incorporated into BuildClauseWhere().
+    //
+    QPtrList<Metadata> metaptrs;
+    while (query.next())
+    {
+        unsigned int intid = query.value(0).toUInt();
+        Metadata *myData = new Metadata();
+        myData->setID(intid);
+        myData->fillDataFromID();
+        if (myData->ShowLevel() <= parental_level && myData->ShowLevel() != 0)
+            metaptrs.append(myData);
+        else
             delete myData;
+    }
+
+    //
+    //  If sorting by title, re-sort by hand because the SQL sort doesn't
+    //  ignore articles when sorting. This assumes all titles are in English.
+    //  This means a movie with a foreign-language title like "A la carte" will
+    //  be incorrectly alphabetized, because the "A" is actually significant.
+    //  The set of ignored prefixes should be a database option, or each
+    //  video's metadata should include a separate sort key.
+    //
+    if (currentVideoFilter->getOrderby() == VideoFilterSettings::kOrderByTitle)
+    {
+        //
+        //  Pull things off the metaptrs list and put them into the
+        //  "stringsort" qmap (which will automatically sort them by qmap key).
+        //
+        QMap<QString, Metadata*> stringsort;
+        QRegExp prefixes = QObject::tr("^(The |A |An )");
+        while (!metaptrs.isEmpty())
+        {
+            Metadata *myData = metaptrs.take(0);
+            QString sTitle = myData->Title();
+            sTitle.remove(prefixes);
+            stringsort[sTitle] = myData;
         }
+
+        //
+        //  Now walk through the "stringsort" qmap and put them back on the
+        //  list (in stringsort order).
+        //
+        for (QMap<QString, Metadata*>::iterator it = stringsort.begin();
+                it != stringsort.end();
+                it++)
+        {
+            metaptrs.append(*it);
+        }
+    }
+
+    //
+    //  Build list of videos.
+    //
+    for (unsigned int count = 0; !metaptrs.isEmpty(); count++)
+    {
+        Metadata *myData = metaptrs.take(0);
+        GenericTree *where_to_add = video_tree_root->getChildAt(0);
+        QString file_string = myData->Filename();
+        file_string.remove(0, prefix.length());
+        if (flatlist) 
+        {
+            video_tree_root->addNode(file_string, count, true);
+            nitems++;
+        }
+        else 
+        {
+            where_to_add = addFileNode(where_to_add, file_string, count);
+        }
+        metas.append(*myData);
+        delete myData;
     }
 }
 
@@ -304,7 +322,7 @@ void VideoList::buildFsysList(bool flatlist, int parental_level)
             // XXX: Maybe more...
         }
 
-        metas[i] = *myData; 
+        metas.append(*myData); 
 
         if (myData->ShowLevel() <= parental_level && myData->ShowLevel() != 0)
         {
@@ -389,7 +407,7 @@ GenericTree *VideoList::addDirNode(GenericTree *where_to_add,
 }
 
 GenericTree *VideoList::addFileNode(GenericTree *where_to_add,
-                                                const QString& fname, int id)
+                                                const QString& fname, int index)
 {
     int a_counter = 0;
     GenericTree *sub_node;
@@ -401,7 +419,8 @@ GenericTree *VideoList::addFileNode(GenericTree *where_to_add,
         if(a_counter + 1 >= (int) list.count()) // video
         {
             QString title = (*an_it);
-            sub_node = where_to_add->addNode(title.section(".",0,-2), id, true);
+            sub_node = where_to_add->addNode(title.section(".",0,-2),
+                    index, true);
             sub_node->setAttribute(0, ORDER_ITEM);
             sub_node->setOrderingIndex(0);
             nitems++;
@@ -458,3 +477,5 @@ void VideoList::buildFileList(const QString& directory)
         else browser_mode_files.append(filename);
     }
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

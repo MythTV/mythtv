@@ -200,7 +200,7 @@ class Metadata
     QStringList genres;
     QStringList countries;
     QString player;
-    unsigned int id;
+    unsigned int id;	// videometadata.intid
     
     QString filename;
     QString coverfile;

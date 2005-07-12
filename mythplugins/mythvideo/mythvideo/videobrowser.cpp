@@ -24,11 +24,7 @@ using namespace std;
 VideoBrowser::VideoBrowser(MythMainWindow *parent, const char *name)
             : VideoDialog(DLG_BROWSER, parent, "browser", name)
 {
-    updateML = false;
-    
     m_state = 0;
-    curitem = NULL;
-    inData = 0;
     
     setFileBrowser(gContext->GetNumSetting("VideoBrowserNoDB", 0));
     loadWindow(xmldata);        
@@ -40,16 +36,11 @@ VideoBrowser::VideoBrowser(MythMainWindow *parent, const char *name)
     setNoErase();
 
     fetchVideos();
-
-    SetCurrentItem();
     updateBackground();
 }
 
 VideoBrowser::~VideoBrowser()
 {
-    if (curitem)
-        delete curitem;
-
     delete bgTransBackup;
 }
 
@@ -69,34 +60,39 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
 
+    gContext->GetMainWindow()->TranslateKeyPress("Video", e, actions);
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
         QString action = actions[i];
         handled = true;
 
-        if ((action == "SELECT" || action == "PLAY") && allowselect)
+        if ((action == "SELECT" || action == "PLAY") && curitem)
             playVideo(curitem);
         else if (action == "INFO")
             doMenu(true);
-        else if (action == "UP")
-            jumpSelection(1);
         else if (action == "DOWN")
+            jumpSelection(1);
+        else if (action == "UP")
             jumpSelection(-1);
         else if (action == "PAGEDOWN")
-            jumpSelection((int)(m_list.count() / 5));
+            jumpSelection(video_list->count() / 5);
         else if (action == "PAGEUP")
-            jumpSelection(0-(int)(m_list.count() / 5));
-        else if (action == "INCPARENT")
-            shiftParental(1);
-        else if (action == "DECPARENT")
-            shiftParental(-1);            
+            jumpSelection(-(video_list->count() / 5));
         else if (action == "LEFT")
             cursorLeft();
         else if (action == "RIGHT")
             cursorRight();
-        else if (action == "1" || action == "2" || action == "3" || action == "4")
+        else if (action == "HOME")
+            jumpToSelection(0);
+        else if (action == "END")
+            jumpToSelection(video_list->count() - 1);
+        else if (action == "INCPARENT")
+            shiftParental(1);
+        else if (action == "DECPARENT")
+            shiftParental(-1);            
+        else if (action == "1" || action == "2" ||
+                action == "3" || action == "4")
             setParentalLevel(action.toInt());
         else if (action == "FILTER")
             slotDoFilter();
@@ -120,7 +116,6 @@ void VideoBrowser::keyPressEvent(QKeyEvent *e)
             }
         }            
     }
-
     
     if (!handled)
         MythDialog::keyPressEvent(e);
@@ -159,25 +154,13 @@ void VideoBrowser::doMenu(bool info)
 
 void VideoBrowser::fetchVideos()
 {
-    if (updateML == true)
-        return;
-    
-    updateML = true;
-    m_list.clear();
-
     VideoDialog::fetchVideos();
-    video_list->wantVideoListUpdirs(true);
+    video_list->wantVideoListUpdirs(isFileBrowser);
     
-    updateML = false;
-    SetCurrentItem();
+    SetCurrentItem(0);
     update(infoRect);
     update(browsingRect);
     repaint();
-}
-
-void VideoBrowser::handleMetaFetch(Metadata* meta)
-{
-    m_list.append(*meta);
 }
 
 void VideoBrowser::grayOut(QPainter *tmp)
@@ -243,44 +226,17 @@ void VideoBrowser::updatePlayWait(QPainter *p)
 }
 
 
-void VideoBrowser::SetCurrentItem()
+void VideoBrowser::SetCurrentItem(unsigned int index)
 {
-    ValueMetadata::Iterator it;
-
-    if(curitem)
-    {
-        delete curitem;
-    }
     curitem = NULL;
     
+    unsigned int list_count = video_list->count();
     
-    //
-    //  The count may have changed because
-    //  the Parental Level might have been
-    //  altered
-    //
+    if (list_count == 0)
+        return;
 
-    int list_count = m_list.count();
-    
-    if(list_count == 0)
-    {
-        inData = 0;
-        allowselect = false;
-    }
-    else
-    {
-        if(inData < list_count)
-        {
-            it = m_list.at(inData);
-        }
-        else
-        {
-            inData = 0;
-            it = m_list.begin();
-        }
-
-        curitem = new Metadata(*(it));
-    }
+    inData = QMIN(list_count - 1, index);
+    curitem = video_list->getVideoListMetadata(inData);
 }
 
 void VideoBrowser::updateBrowsing(QPainter *p)
@@ -289,16 +245,13 @@ void VideoBrowser::updateBrowsing(QPainter *p)
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
+    unsigned int list_count = video_list->count();
 
     QString vidnum;  
-    if(m_list.count() > 0)
-    {
-        vidnum = QString(tr("%1 of %2")).arg(inData + 1).arg(m_list.count());
-    }
+    if (list_count > 0)
+        vidnum = QString(tr("%1 of %2")).arg(inData + 1).arg(list_count);
     else
-    {
         vidnum = tr("No Videos");
-    }
 
     LayerSet *container = NULL;
     container = theme->GetSet("browsing");
@@ -334,7 +287,7 @@ void VideoBrowser::updateInfo(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
 
-    if (m_list.count() > 0 && curitem)
+    if (video_list->count() > 0 && curitem)
     {
        QString title = curitem->Title();
        QString filename = curitem->Filename();
@@ -426,8 +379,6 @@ void VideoBrowser::updateInfo(QPainter *p)
            container->Draw(&tmp, 7, 0);
            container->Draw(&tmp, 8, 0);
        }
-
-       allowselect = true;
     }
     else
     {
@@ -440,26 +391,30 @@ void VideoBrowser::updateInfo(QPainter *p)
            norec->Draw(&tmp, 7, 0);
            norec->Draw(&tmp, 8, 0);
        }
-
-       allowselect = false;
     }
     tmp.end();
     p->drawPixmap(pr.topLeft(), pix);
 
 }
 
-void VideoBrowser::jumpSelection(int amount)
+void VideoBrowser::jumpToSelection(int index)
 {
-    inData += amount;
-     
-    if (inData < 0)
-        inData = m_list.count() + inData;
-    else if(inData >= (int)m_list.count())
-        inData = inData - m_list.count();
-     
-    SetCurrentItem();
+    SetCurrentItem(index);
     update(infoRect);
     update(browsingRect);
+}
+
+void VideoBrowser::jumpSelection(int amount)
+{
+    unsigned int list_count = video_list->count();
+    int index;
+
+    if (amount >= 0 || inData >= (unsigned int)-amount)
+        index = (inData + amount) % list_count;
+    else
+        index = list_count + amount + inData;  // unsigned arithmetic
+
+    jumpToSelection(index);
 }
    
 
@@ -486,3 +441,4 @@ void VideoBrowser::parseContainer(QDomElement &element)
         browsingRect = area;
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

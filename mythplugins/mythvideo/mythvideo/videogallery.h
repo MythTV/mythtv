@@ -28,14 +28,11 @@ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #include "videodlg.h"
 
 
-typedef QValueList<Metadata>  ValueMetadata;
-
 class VideoGallery : public VideoDialog
 {
     Q_OBJECT
   public:
     VideoGallery(MythMainWindow *parent, const char *name = 0);
-    ~VideoGallery();
     
     void processEvents() { qApp->processEvents(); }
     
@@ -74,7 +71,6 @@ class VideoGallery : public VideoDialog
 
     void positionIcon();
     
-    int curView;
     bool subtitleOn;
     bool keepAspectRatio;
     QString curPath;
@@ -103,14 +99,13 @@ class VideoGallery : public VideoDialog
     int thumbH;
 
     bool allowselect;
-    bool updateML;
     
     QString prefix;
     
     GenericTree *video_tree_root;
     GenericTree *where_we_are;
 
-    //typedef void (VideoGallery::*Action)(UIListBtnTypeItem*);
+    void computeLastRowCol(int list_count);
 };
 
 #endif

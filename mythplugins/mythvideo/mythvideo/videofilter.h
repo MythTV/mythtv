@@ -27,6 +27,15 @@ class VideoFilterSettings
         QString BuildClauseWhere();
         QString BuildClauseOrderBy();
         void saveAsDefault();
+
+        enum ordering {
+            // These values must be explicitly assigned; they represent
+            // database values
+            kOrderByTitle = 0,
+            kOrderByYearDescending = 1,
+            kOrderByUserRatingDescending = 2,
+            kOrderByLength = 3,
+        };
         
         int getCategory(void){return category;};
         void setCategory (int lcategory){category = lcategory;};
@@ -40,13 +49,10 @@ class VideoFilterSettings
         void setRuntime (int lruntime){runtime = lruntime;};
         int getUserrating(void){return userrating;};
         void setUserrating (int luserrating){userrating = luserrating;};
-        /*int getShowlevel(void){return showlevel;};
-        void setShowlevel (int lshowlevel)
-        {showlevel = lshowlevel;};*/
         int getBrowse(void){return browse;};
         void setBrowse(int lbrowse){browse = lbrowse;};
-        int getOrderby (void) {return orderby;};
-        void setOrderby (int lorderby) {orderby = lorderby;};
+        enum ordering getOrderby (void) {return orderby;};
+        void setOrderby (enum ordering lorderby) {orderby = lorderby;};
     
     private : 
         int category;
@@ -56,7 +62,7 @@ class VideoFilterSettings
         int runtime;
         int userrating;
         int browse;
-        int orderby;
+        enum ordering orderby;
         QString prefix;
 };
 
@@ -95,9 +101,8 @@ class VideoFilterDialog : public MythThemedDialog
     void setCountry(int new_country);
     void setGenre(int new_genre);
     void setRunTime(int new_runtime);
-//    void setShowlevel(int new_showlevel);
     void setBrowse(int new_browse);
-    void setOrderby(int new_orderby);
+    void setOrderby(/* enum VideoFilterSettings::ordering */ int new_orderby);
  private:
     void update_numvideo();
     VideoFilterSettings *originalSettings;
@@ -121,3 +126,5 @@ class VideoFilterDialog : public MythThemedDialog
 
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
