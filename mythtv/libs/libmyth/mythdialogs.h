@@ -241,6 +241,8 @@ class MythProgressDialog: public MythDialog
     int steps;
 
     QPtrList<class LCDTextItem> * textItems;
+
+    int m_totalSteps;
 };
 
 class MythThemedDialog : public MythDialog

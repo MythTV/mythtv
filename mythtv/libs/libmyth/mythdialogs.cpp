@@ -1493,6 +1493,7 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     progress->setBackgroundOrigin(ParentOrigin);
     progress->setProgress(0);
 
+    m_totalSteps = totalSteps;
     steps = totalSteps / 1000;
     if (steps == 0)
         steps = 1;
@@ -1530,12 +1531,16 @@ void MythProgressDialog::Close(void)
 
 void MythProgressDialog::setProgress(int curprogress)
 {
-    float fProgress = (float)curprogress / (steps * 1000.0);
-    if (class LCD * lcddev = LCD::Get())
-        lcddev->setGenericProgress(fProgress);
     progress->setProgress(curprogress);
     if (curprogress % steps == 0)
+    {
         qApp->processEvents();
+        if (LCD * lcddev = LCD::Get())
+        {
+            float fProgress = (float)curprogress / m_totalSteps;
+            lcddev->setGenericProgress(fProgress);
+        }
+    }
 }
 
 void MythProgressDialog::keyPressEvent(QKeyEvent *e)
