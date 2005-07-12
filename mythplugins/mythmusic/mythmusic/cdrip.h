@@ -49,14 +49,13 @@ class Ripper : public MythDialog
     QFrame *firstdiag;
 
     MythComboBox *artistedit;
+    MythComboBox *qualchooser;
     MythLineEdit *albumedit;
     MythComboBox *genreedit;
     MythCheckBox *compilation;
     MythPushButton *switchtitleartist;
 
     MythTable *table;
-
-    MythButtonGroup *qualitygroup;
 
     QLabel *statusline;
     QProgressBar *overall;

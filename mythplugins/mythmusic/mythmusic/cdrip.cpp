@@ -74,33 +74,16 @@ Ripper::Ripper(MythMainWindow *parent, const char *name)
     inst->setBackgroundOrigin(WindowOrigin);
     vbox->addWidget(inst);
 
-    QHBoxLayout *qualbox = new QHBoxLayout(vbox, 10);
-    qualitygroup = new MythButtonGroup(firstdiag);
-    qualitygroup->setFrameStyle(QFrame::NoFrame);
-    qualitygroup->hide();
+    QLabel *quality = new QLabel(tr("Quality: "), firstdiag);
+    quality->setBackgroundOrigin(WindowOrigin);
 
-    QRadioButton *lowquality = new QRadioButton(tr("Low"), firstdiag);
-    lowquality->setBackgroundOrigin(WindowOrigin);
-    qualbox->addWidget(lowquality);
-    qualitygroup->insert(lowquality);
-
-    QRadioButton *mediumquality = new QRadioButton(tr("Medium"), firstdiag);
-    mediumquality->setBackgroundOrigin(WindowOrigin);
-    qualbox->addWidget(mediumquality);
-    qualitygroup->insert(mediumquality);
-
-    QRadioButton *highquality = new QRadioButton(tr("High"), firstdiag);
-    highquality->setBackgroundOrigin(WindowOrigin);
-    qualbox->addWidget(highquality);
-    qualitygroup->insert(highquality);
-
-    QRadioButton *perfectflac = new QRadioButton(tr("Perfect"), firstdiag);
-    perfectflac->setBackgroundOrigin(WindowOrigin);
-    qualbox->addWidget(perfectflac);
-    qualitygroup->insert(perfectflac);
-
-    qualitygroup->setRadioButtonExclusive(true);
-    qualitygroup->setButton(gContext->GetNumSetting("DefaultRipQuality", 1));
+    qualchooser = new MythComboBox(false, firstdiag);
+    qualchooser->insertItem(tr("Low"));
+    qualchooser->insertItem(tr("Medium"));
+    qualchooser->insertItem(tr("High"));
+    qualchooser->insertItem(tr("Perfect"));
+    qualchooser->setCurrentItem(gContext->GetNumSetting("DefaultRipQuality", 1));
+    qualchooser->setMaximumWidth(screenwidth / 2);
 
     QGridLayout *grid = new QGridLayout(vbox, 1, 1, 20);
     
@@ -137,17 +120,19 @@ Ripper::Ripper(MythMainWindow *parent, const char *name)
     connect(switchtitleartist, SIGNAL(clicked()), this, SLOT(switchTitlesAndArtists())); 
     
 
-    grid->addMultiCellWidget(artistl, 0, 0, 0, 0);
-    grid->addMultiCellWidget(artistedit,  0, 0, 1, 2);
-    grid->addMultiCellWidget(albuml, 1, 1, 0, 0);
-    grid->addMultiCellWidget(albumedit,  1, 1, 1, 2);
-    grid->addMultiCellWidget(genrelabel, 2, 2, 0, 0);
-    grid->addMultiCellWidget(genreedit, 2, 2, 1, 2);
-    grid->addMultiCellWidget(compilation, 3, 3, 0, 0);
-    grid->addMultiCellWidget(switchtitleartist, 3, 3, 1, 2);
+    grid->addMultiCellWidget(quality, 0, 0, 0, 0);
+    grid->addMultiCellWidget(qualchooser,  0, 0, 1, 2);
+    grid->addMultiCellWidget(artistl, 1, 1, 0, 0);
+    grid->addMultiCellWidget(artistedit,  1, 1, 1, 2);
+    grid->addMultiCellWidget(albuml, 2, 2, 0, 0);
+    grid->addMultiCellWidget(albumedit,  2, 2, 1, 2);
+    grid->addMultiCellWidget(genrelabel, 3, 3, 0, 0);
+    grid->addMultiCellWidget(genreedit, 3, 3, 1, 2);
+    grid->addMultiCellWidget(compilation, 4, 4, 0, 0);
+    grid->addMultiCellWidget(switchtitleartist, 4, 4, 1, 2);
 
     table = new MythTable(firstdiag);
-    grid->addMultiCellWidget(table, 4, 4, 0, 2);
+    grid->addMultiCellWidget(table, 5, 5, 0, 2);
     table->setNumCols(4);
     table->setLeftMargin(0);
     table->setNumRows(1);
@@ -660,7 +645,7 @@ void Ripper::ripthedisc(void)
     overall->setBackgroundOrigin(WindowOrigin);
     overall->setProgress(0);
     vb->addWidget(overall);
-    
+
     statusline = new QLabel(" ", newdiag);
     statusline->setBackgroundOrigin(WindowOrigin);
     statusline->setAlignment(AlignAuto | AlignVCenter | ExpandTabs | WordBreak);
@@ -679,7 +664,7 @@ void Ripper::ripthedisc(void)
     QString textstatus;
     QString cddevice = gContext->GetSetting("CDDevice");
     QString encodertype = gContext->GetSetting("EncoderType");
-    int encodequal = qualitygroup->id(qualitygroup->selected());
+    int encodequal = qualchooser->currentItem();
     bool mp3usevbr = gContext->GetNumSetting("Mp3UseVBR", 0);
 
     CdDecoder *decoder = new CdDecoder("cda", NULL, NULL, NULL);
