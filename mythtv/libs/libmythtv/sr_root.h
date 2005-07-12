@@ -10,7 +10,7 @@ class RootSRGroup : public ManagedListGroup
 {
     Q_OBJECT
     public:
-        RootSRGroup(ScheduledRecording& _rec, ManagedList* _parentList=NULL, QObject* _parent=NULL);
+        RootSRGroup(ScheduledRecording *_rec, ManagedList* _parentList=NULL, QObject* _parent=NULL);
         void setDialog(MythDialog* dlg);
         
         class SRSchedOptionsGroup* getSchedOptions() {return schedOptions;}
@@ -22,7 +22,7 @@ class RootSRGroup : public ManagedListGroup
         
      protected:
          
-         ScheduledRecording& schedRec;
+         ScheduledRecording *schedRec;
          
          DialogDoneListItem* cancelItem;
          DialogDoneListItem* recordAsShownItem;

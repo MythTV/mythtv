@@ -1,7 +1,7 @@
 #include "sr_items.h"
 #include "sr_root.h"
 
-RootSRGroup::RootSRGroup(ScheduledRecording& _rec,ManagedList* _parentList, QObject* _parent)
+RootSRGroup::RootSRGroup(ScheduledRecording *_rec,ManagedList* _parentList, QObject* _parent)
            : ManagedListGroup( "rootGroup", NULL, _parentList, _parent, "rootGroup"),
              schedRec(_rec)
 {
@@ -27,12 +27,12 @@ RootSRGroup::RootSRGroup(ScheduledRecording& _rec,ManagedList* _parentList, QObj
     detailsButton = new ManagedListItem(QObject::tr("Program details"),
                                          _parentList, this, "showDetails");
     addItem(detailsButton, -1);
-    connect(detailsButton, SIGNAL(selected(ManagedListItem*)), &_rec, SLOT(runShowDetails()));
+    connect(detailsButton, SIGNAL(selected(ManagedListItem*)), _rec, SLOT(runShowDetails()));
 
     upcomingButton = new ManagedListItem(QObject::tr("List upcoming episodes"),
                                          _parentList, this, "listUpcoming");
     addItem(upcomingButton, -1);
-    connect(upcomingButton, SIGNAL(selected(ManagedListItem*)), &_rec, SLOT(runProgList()));
+    connect(upcomingButton, SIGNAL(selected(ManagedListItem*)), _rec, SLOT(runProgList()));
 
     recordAsShownItem = new DialogDoneListItem(QString("[ %1 ]").arg(QObject::tr("Save these settings")),
                                                MythDialog::Accepted, NULL, _parentList, this, "recordAsShown");
@@ -74,7 +74,7 @@ void RootSRGroup::itemChanged(ManagedListItem*)
     }
     else
     {
-        if (schedRec.getRecordID() > 0)
+        if (schedRec->getRecordID() > 0)
         {
             recordAsShownItem->setState(MLS_BOLD);
         }

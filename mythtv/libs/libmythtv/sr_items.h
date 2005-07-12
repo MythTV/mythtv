@@ -11,11 +11,11 @@
 class SimpleSRSetting: public SimpleDBStorage
 {
     protected:
-        SimpleSRSetting(ScheduledRecording& _parent, QString name)
+        SimpleSRSetting(ScheduledRecording *_parent, QString name)
                       : SimpleDBStorage("record", name),
                         parent(_parent)
        {
-            parent.addChild(this);
+            parent->addChild(this);
             setName(name);
         }
 
@@ -25,28 +25,28 @@ class SimpleSRSetting: public SimpleDBStorage
             value.replace(QRegExp("\""), QString("\\\""));
 
             return QString("recordid = %1, %2 = \"%3\"")
-                .arg(parent.getRecordID())
+                .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());
         }
 
         virtual QString whereClause(void)
         {
-            return QString("recordid = %1").arg(parent.getRecordID());
+            return QString("recordid = %1").arg(parent->getRecordID());
         }
 
-        ScheduledRecording& parent;
+        ScheduledRecording *parent;
 };
 
 
 class SRSetting: public ManagedListSetting
 {
     protected:
-        SRSetting(ScheduledRecording& _parent, QString name, ManagedList* _parentList=NULL)
+        SRSetting(ScheduledRecording *_parent, QString name, ManagedList* _parentList=NULL)
             : ManagedListSetting("record", name, _parentList),
               parent(_parent)
         {
-            _parent.addChild(this);
+            parent->addChild(this);
             setName(name);
         }
 
@@ -55,16 +55,16 @@ class SRSetting: public ManagedListSetting
             value.replace(QRegExp("\""), QString("\\\""));
 
             return QString("recordid = %1, %2 = \"%3\"")
-                .arg(parent.getRecordID())
+                .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());
         };
 
         virtual QString whereClause(void) {
-            return QString("recordid = %1").arg(parent.getRecordID());
+            return QString("recordid = %1").arg(parent->getRecordID());
             }
 
-        ScheduledRecording& parent;
+        ScheduledRecording *parent;
 };
 
 
@@ -72,12 +72,12 @@ class SRSetting: public ManagedListSetting
 class SRSelectSetting : public SelectManagedListSetting
 {
     protected:
-        SRSelectSetting(ScheduledRecording& _parent, const QString& listName,  const QString& listText,
+        SRSelectSetting(ScheduledRecording *_parent, const QString& listName,  const QString& listText,
                         ManagedListGroup* _group, QString _column, ManagedList* _parentList=NULL)
             : SelectManagedListSetting(listName, listText, _group, "record", _column, _parentList),
               parent(_parent)
         {
-            _parent.addChild(this);
+            parent->addChild(this);
             setName(_column);
         }
         virtual QString setClause(void) {
@@ -85,28 +85,28 @@ class SRSelectSetting : public SelectManagedListSetting
             value.replace(QRegExp("\""), QString("\\\""));
 
             return QString("recordid = %1, %2 = \"%3\"")
-                .arg(parent.getRecordID())
+                .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());
         };
 
         virtual QString whereClause(void) {
-            return QString("recordid = %1").arg(parent.getRecordID());
+            return QString("recordid = %1").arg(parent->getRecordID());
             }
-        ScheduledRecording& parent;
+        ScheduledRecording *parent;
 };
 
 class SRBoolSetting : public BoolManagedListSetting
 {
     public:
-        SRBoolSetting(ScheduledRecording& _parent, const QString& trueText, const QString& falseText,
+        SRBoolSetting(ScheduledRecording *_parent, const QString& trueText, const QString& falseText,
                       const QString& ItemName, QString _column, ManagedListGroup* _group,
                       ManagedList* _parentList=NULL)
             : BoolManagedListSetting(trueText, falseText, ItemName, "record", _column, _group, _parentList),
               parent(_parent)
 
         {
-            _parent.addChild(this);
+            parent->addChild(this);
             setName(_column);
         }
 
@@ -115,22 +115,22 @@ class SRBoolSetting : public BoolManagedListSetting
             value.replace(QRegExp("\""), QString("\\\""));
 
             return QString("recordid = %1, %2 = \"%3\"")
-                .arg(parent.getRecordID())
+                .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());
         };
 
         virtual QString whereClause(void) {
-            return QString("recordid = %1").arg(parent.getRecordID());
+            return QString("recordid = %1").arg(parent->getRecordID());
             }
-        ScheduledRecording& parent;
+        ScheduledRecording *parent;
 };
 
 
 class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
 {
     public:
-        SRBoundedIntegerSetting(int _min, int _max, int _bigStep, int _step, ScheduledRecording& _parent,
+        SRBoundedIntegerSetting(int _min, int _max, int _bigStep, int _step, ScheduledRecording *_parent,
                                 const QString& ItemName, QString _column, ManagedListGroup* _group,
                                 ManagedList* _parentList=NULL,  bool _invert = false)
             : BoundedIntegerManagedListSetting(_min, _max, _bigStep, _step, ItemName, "record",
@@ -138,7 +138,7 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
               parent(_parent)
 
         {
-            _parent.addChild(this);
+            parent->addChild(this);
             setName(_column);
         }
         virtual QString setClause(void)
@@ -147,28 +147,28 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
             value.replace(QRegExp("\""), QString("\\\""));
 
             return QString("recordid = %1, %2 = \"%3\"")
-                .arg(parent.getRecordID())
+                .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());
         };
 
         virtual QString whereClause(void)
         {
-            return QString("recordid = %1").arg(parent.getRecordID());
+            return QString("recordid = %1").arg(parent->getRecordID());
         }
 
-        ScheduledRecording& parent;
+        ScheduledRecording *parent;
 };
 
 
 class SRRecordingType : public SRSelectSetting
 {
     public:
-        SRRecordingType(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRRecordingType(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "typeList", QString("[ %1 ]").arg(QObject::tr("Select Recording Schedule")),
                               _group, "type", _list)
         {
-            _parent.setRecTypeObj(this);
+            _parent->setRecTypeObj(this);
         }
 
 
@@ -211,7 +211,7 @@ class SRRecordingType : public SRSelectSetting
 class SRStartOffset : public SRBoundedIntegerSetting
 {
     public:
-        SRStartOffset(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+        SRStartOffset(ScheduledRecording *_parent, ManagedListGroup* _group, ManagedList* _list)
                      : SRBoundedIntegerSetting( -480, 480, 10, 1, _parent, "startoffsetList", "startoffset",
                                                 _group, _list, true)
         {
@@ -221,7 +221,7 @@ class SRStartOffset : public SRBoundedIntegerSetting
                          QObject::tr("Start recording %1 minute early"),
                          QObject::tr("Start recording %1 minutes early"));
 
-            _parent.setStartOffsetObj(this);
+            _parent->setStartOffsetObj(this);
         }
 };
 
@@ -230,7 +230,7 @@ class SRStartOffset : public SRBoundedIntegerSetting
 class SREndOffset : public SRBoundedIntegerSetting
 {
     public:
-        SREndOffset(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+        SREndOffset(ScheduledRecording *_parent, ManagedListGroup* _group, ManagedList* _list)
                      : SRBoundedIntegerSetting( -480, 480, 10, 1, _parent, "endoffsetList", "endoffset",
                                                 _group, _list)
         {
@@ -239,7 +239,7 @@ class SREndOffset : public SRBoundedIntegerSetting
                          QObject::tr("End recording on time"), QObject::tr("End recording %1 minute late"),
                          QObject::tr("End recording %1 minutes late"));
 
-            _parent.setEndOffsetObj(this);
+            _parent->setEndOffsetObj(this);
         }
 };
 
@@ -247,7 +247,7 @@ class SREndOffset : public SRBoundedIntegerSetting
 class SRDupIn : public SRSelectSetting
 {
     public:
-        SRDupIn(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRDupIn(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "dupInList", "[ Check for duplicates in ]", _group, "dupin", _list )
         {
             if (gContext->GetNumSetting("HaveRepeats", 0))
@@ -256,7 +256,7 @@ class SRDupIn : public SRSelectSetting
             addSelection(QObject::tr("Look for duplicates in current recordings only"), kDupsInRecorded);
             addSelection(QObject::tr("Look for duplicates in previous recordings only"), kDupsInOldRecorded);
             setValue(kDupsInAll);
-            _parent.setDupInObj(this);
+            _parent->setDupInObj(this);
         }
 };
 
@@ -264,7 +264,7 @@ class SRDupIn : public SRSelectSetting
 class SRDupMethod: public SRSelectSetting
 {
     public:
-        SRDupMethod(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRDupMethod(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "dupMethodList", QObject::tr("[ Match duplicates with ]"), _group,
                               "dupmethod", _list)
         {
@@ -273,7 +273,7 @@ class SRDupMethod: public SRSelectSetting
             addSelection(QObject::tr("Match duplicates using description"), kDupCheckDesc);
             addSelection(QObject::tr("Don't match duplicates"), kDupCheckNone);
             setValue(kDupCheckSubDesc);
-            _parent.setDupMethodObj(this);
+            _parent->setDupMethodObj(this);
         }
 };
 
@@ -281,7 +281,7 @@ class SRDupMethod: public SRSelectSetting
 class SRRecSearchType: public IntegerSetting, public SimpleSRSetting
 {
     public:
-        SRRecSearchType(ScheduledRecording& parent):
+        SRRecSearchType(ScheduledRecording *parent):
             SimpleSRSetting(parent, "search") {
             setVisible(false);
         }
@@ -290,11 +290,11 @@ class SRRecSearchType: public IntegerSetting, public SimpleSRSetting
 
 class SRProfileSelector: public SRSelectSetting {
     public:
-        SRProfileSelector(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRProfileSelector(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "profileList", QObject::tr("[ Select recording Profile ]"), _group,
                               "profile", _list )
         {
-            _parent.setProfileObj(this);
+            _parent->setProfileObj(this);
         }
 
 
@@ -314,7 +314,7 @@ class SRSchedOptionsGroup : public ManagedListGroup
     Q_OBJECT
 
     public:
-        SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, 
+        SRSchedOptionsGroup(ScheduledRecording *_rec, ManagedList* _list, ManagedListGroup* _group, 
                             QObject* _parent);
 
         void setEnabled(bool isScheduled, bool multiEpisode);
@@ -332,7 +332,7 @@ class SRSchedOptionsGroup : public ManagedListGroup
         class SRDupMethod* dupMethItem;
         class SRDupIn* dupLocItem;
 
-        ScheduledRecording& schedRec;
+        ScheduledRecording *schedRec;
 };
 
 class SRJobQueueGroup : public ManagedListGroup
@@ -340,7 +340,7 @@ class SRJobQueueGroup : public ManagedListGroup
     Q_OBJECT
     
     public:
-        SRJobQueueGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
+        SRJobQueueGroup(ScheduledRecording *_rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
         
     protected:
 
@@ -353,7 +353,7 @@ class SRJobQueueGroup : public ManagedListGroup
         class SRAutoUserJob3* autoUserJob3;
         class SRAutoUserJob4* autoUserJob4;
 
-        ScheduledRecording& schedRec;
+        ScheduledRecording *schedRec;
 };
 
 
@@ -362,7 +362,7 @@ class SRStorageOptionsGroup : public ManagedListGroup
     Q_OBJECT
 
     public:
-        SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _list, ManagedListGroup* _group, 
+        SRStorageOptionsGroup(ScheduledRecording *_rec, ManagedList* _list, ManagedListGroup* _group, 
                               QObject* _parent);
 
         void setEnabled(bool isScheduled, bool multiEpisode);
@@ -379,14 +379,14 @@ class SRStorageOptionsGroup : public ManagedListGroup
         class SRMaxEpisodes* maxEpisodes;
         class SRMaxNewest* maxNewest;
 
-        ScheduledRecording& schedRec;
+        ScheduledRecording *schedRec;
 };
 
 
 class SRChannel: public ChannelSetting, public SimpleSRSetting
 {
     public:
-        SRChannel(ScheduledRecording& parent): SimpleSRSetting(parent, "chanid") {
+        SRChannel(ScheduledRecording *parent): SimpleSRSetting(parent, "chanid") {
             setVisible(false);
         }
 };
@@ -394,7 +394,7 @@ class SRChannel: public ChannelSetting, public SimpleSRSetting
 class SRStation: public LineEditSetting, public SimpleSRSetting
 {
     public:
-        SRStation(ScheduledRecording& parent): SimpleSRSetting(parent, "station") {
+        SRStation(ScheduledRecording *parent): SimpleSRSetting(parent, "station") {
             setVisible(false);
         }
 };
@@ -402,7 +402,7 @@ class SRStation: public LineEditSetting, public SimpleSRSetting
 class SRTitle: public LineEditSetting, public SimpleSRSetting
 {
     public:
-        SRTitle(ScheduledRecording& parent)
+        SRTitle(ScheduledRecording *parent)
               : SimpleSRSetting(parent, "title")
         {
             setVisible(false);
@@ -412,7 +412,7 @@ class SRTitle: public LineEditSetting, public SimpleSRSetting
 class SRSubtitle: public LineEditSetting, public SimpleSRSetting
 {
     public:
-        SRSubtitle(ScheduledRecording& parent)
+        SRSubtitle(ScheduledRecording *parent)
                  : SimpleSRSetting(parent, "subtitle")
         {
             setVisible(false);
@@ -422,7 +422,7 @@ class SRSubtitle: public LineEditSetting, public SimpleSRSetting
 class SRDescription: public LineEditSetting, public SimpleSRSetting
 {
     public:
-        SRDescription(ScheduledRecording& parent)
+        SRDescription(ScheduledRecording *parent)
                     : SimpleSRSetting(parent, "description")
         {
             setVisible(false);
@@ -432,7 +432,7 @@ class SRDescription: public LineEditSetting, public SimpleSRSetting
 class SRStartTime: public TimeSetting, public SimpleSRSetting
 {
     public:
-        SRStartTime(ScheduledRecording& parent)
+        SRStartTime(ScheduledRecording *parent)
                   : SimpleSRSetting(parent, "starttime")
         {
             setVisible(false);
@@ -442,7 +442,7 @@ class SRStartTime: public TimeSetting, public SimpleSRSetting
 class SRStartDate: public DateSetting, public SimpleSRSetting
 {
     public:
-        SRStartDate(ScheduledRecording& parent)
+        SRStartDate(ScheduledRecording *parent)
                   : SimpleSRSetting(parent, "startdate")
         {
             setVisible(false);
@@ -452,7 +452,7 @@ class SRStartDate: public DateSetting, public SimpleSRSetting
 class SREndTime: public TimeSetting, public SimpleSRSetting
 {
     public:
-        SREndTime(ScheduledRecording& parent)
+        SREndTime(ScheduledRecording *parent)
                 : SimpleSRSetting(parent, "endtime")
         {
             setVisible(false);
@@ -462,7 +462,7 @@ class SREndTime: public TimeSetting, public SimpleSRSetting
 class SREndDate: public DateSetting, public SimpleSRSetting
 {
     public:
-        SREndDate(ScheduledRecording& parent)
+        SREndDate(ScheduledRecording *parent)
                 : SimpleSRSetting(parent, "enddate")
         {
             setVisible(false);
@@ -473,7 +473,7 @@ class SREndDate: public DateSetting, public SimpleSRSetting
 class SRCategory: public LineEditSetting, public SimpleSRSetting
 {
     public:
-        SRCategory(ScheduledRecording& parent)
+        SRCategory(ScheduledRecording *parent)
                  : SimpleSRSetting(parent, "category")
         {
             setVisible(false);
@@ -483,7 +483,7 @@ class SRCategory: public LineEditSetting, public SimpleSRSetting
 class SRSeriesid: public LineEditSetting, public SimpleSRSetting
 {
     public:
-        SRSeriesid(ScheduledRecording& parent)
+        SRSeriesid(ScheduledRecording *parent)
                  : SimpleSRSetting(parent, "seriesid")
         {
             setVisible(false);
@@ -493,7 +493,7 @@ class SRSeriesid: public LineEditSetting, public SimpleSRSetting
 class SRProgramid: public LineEditSetting, public SimpleSRSetting
 {
     public:
-        SRProgramid(ScheduledRecording& parent)
+        SRProgramid(ScheduledRecording *parent)
                   : SimpleSRSetting(parent, "programid")
         {
             setVisible(false);
@@ -503,7 +503,7 @@ class SRProgramid: public LineEditSetting, public SimpleSRSetting
 class SRFindDay: public IntegerSetting, public SimpleSRSetting
 {
     public:
-        SRFindDay(ScheduledRecording& parent)
+        SRFindDay(ScheduledRecording *parent)
             : SimpleSRSetting(parent, "findday")
         {
             setVisible(false);
@@ -513,7 +513,7 @@ class SRFindDay: public IntegerSetting, public SimpleSRSetting
 class SRFindTime: public TimeSetting, public SimpleSRSetting
 {
     public:
-        SRFindTime(ScheduledRecording& parent)
+        SRFindTime(ScheduledRecording *parent)
             : SimpleSRSetting(parent, "findtime")
         {
             setVisible(false);
@@ -523,7 +523,7 @@ class SRFindTime: public TimeSetting, public SimpleSRSetting
 class SRFindId: public IntegerSetting, public SimpleSRSetting
 {
     public:
-        SRFindId(ScheduledRecording& parent)
+        SRFindId(ScheduledRecording *parent)
             : SimpleSRSetting(parent, "findid")
         {
             setVisible(false);
@@ -533,7 +533,7 @@ class SRFindId: public IntegerSetting, public SimpleSRSetting
 class SRParentId: public IntegerSetting, public SimpleSRSetting
 {
     public:
-        SRParentId(ScheduledRecording& parent)
+        SRParentId(ScheduledRecording *parent)
             : SimpleSRSetting(parent, "parentid")
         {
             setVisible(false);
@@ -543,26 +543,26 @@ class SRParentId: public IntegerSetting, public SimpleSRSetting
 class SRAutoTranscode: public SRSelectSetting 
 {
     public:
-        SRAutoTranscode(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRAutoTranscode(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "autoTranscodeList", "[ Automatically Transcode ]", _group, 
                               "autotranscode", _list) 
         {
             addSelection(QObject::tr("Transcode new recordings"), 1);
             addSelection(QObject::tr("Do not Transcode new recordings"), 0);
             setValue(0);
-            _parent.setAutoTranscodeObj(this);
+            _parent->setAutoTranscodeObj(this);
         }
 };
 
 class SRTranscoderSelector: public SRSelectSetting {
     public:
-        SRTranscoderSelector(ScheduledRecording& _parent, ManagedList* _list,
+        SRTranscoderSelector(ScheduledRecording *_parent, ManagedList* _list,
                              ManagedListGroup* _group)
             : SRSelectSetting(_parent, "transcoderList",
                               QObject::tr("[ Select transcoder ]"), _group,
                               "transcoder", _list )
         {
-            _parent.setTranscoderObj(this);
+            _parent->setTranscoderObj(this);
         }
 
 
@@ -581,21 +581,21 @@ class SRTranscoderSelector: public SRSelectSetting {
 class SRAutoCommFlag: public SRSelectSetting 
 {
     public:
-        SRAutoCommFlag(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRAutoCommFlag(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "autoCommFlagList", "[ Automatically Commercial Flag ]", _group, 
                               "autocommflag", _list) 
         {
             addSelection(QObject::tr("Commercial Flag new recordings"), 1);
             addSelection(QObject::tr("Do not Commercial Flag new recordings"), 0);
             setValue(1);
-            _parent.setAutoCommFlagObj(this);
+            _parent->setAutoCommFlagObj(this);
         }
 };
 
 class SRAutoUserJob1: public SRSelectSetting 
 {
     public:
-        SRAutoUserJob1(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRAutoUserJob1(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "autoUserJob1List", "[ Automatically Run User Job #1 ]", _group, 
                               "autouserjob1", _list) 
         {
@@ -603,14 +603,14 @@ class SRAutoUserJob1: public SRSelectSetting
             addSelection(QObject::tr("Run '%1'").arg(desc), 1);
             addSelection(QObject::tr("Do not run '%1' for new recordings").arg(desc), 0);
             setValue(0);
-            _parent.setAutoUserJob1Obj(this);
+            _parent->setAutoUserJob1Obj(this);
         }
 };
 
 class SRAutoUserJob2: public SRSelectSetting 
 {
     public:
-        SRAutoUserJob2(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRAutoUserJob2(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "autoUserJob2List", "[ Automatically Run User Job #2 ]", _group, 
                               "autouserjob2", _list) 
         {
@@ -618,14 +618,14 @@ class SRAutoUserJob2: public SRSelectSetting
             addSelection(QObject::tr("Run '%1'").arg(desc), 1);
             addSelection(QObject::tr("Do not run '%1' for new recordings").arg(desc), 0);
             setValue(0);
-            _parent.setAutoUserJob2Obj(this);
+            _parent->setAutoUserJob2Obj(this);
         }
 };
 
 class SRAutoUserJob3: public SRSelectSetting 
 {
     public:
-        SRAutoUserJob3(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRAutoUserJob3(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "autoUserJob3List", "[ Automatically Run User Job #3 ]", _group, 
                               "autouserjob3", _list) 
         {
@@ -633,14 +633,14 @@ class SRAutoUserJob3: public SRSelectSetting
             addSelection(QObject::tr("Run '%1'").arg(desc), 1);
             addSelection(QObject::tr("Do not run '%1' for new recordings").arg(desc), 0);
             setValue(0);
-            _parent.setAutoUserJob3Obj(this);
+            _parent->setAutoUserJob3Obj(this);
         }
 };
 
 class SRAutoUserJob4: public SRSelectSetting 
 {
     public:
-        SRAutoUserJob4(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRAutoUserJob4(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "autoUserJob4List", "[ Automatically Run User Job #4 ]", _group, 
                               "autouserjob4", _list) 
         {
@@ -648,44 +648,44 @@ class SRAutoUserJob4: public SRSelectSetting
             addSelection(QObject::tr("Run '%1'").arg(desc), 1);
             addSelection(QObject::tr("Do not run '%1' for new recordings").arg(desc), 0);
             setValue(0);
-            _parent.setAutoUserJob4Obj(this);
+            _parent->setAutoUserJob4Obj(this);
         }
 };
 
 class SRAutoExpire: public SRBoolSetting
 {
     public:
-        SRAutoExpire(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+        SRAutoExpire(ScheduledRecording *_parent, ManagedListGroup* _group, ManagedList* _list)
                     : SRBoolSetting(_parent, QObject::tr("Allow auto expire"), 
                                      QObject::tr("Don't allow auto expire"),
                                     "autoExpireItem", "autoexpire", _group, _list )
         {
-            _parent.setAutoExpireObj(this);
+            _parent->setAutoExpireObj(this);
         }
 };
 
 class SRInactive: public SRBoolSetting
 {
     public:
-        SRInactive(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+        SRInactive(ScheduledRecording *_parent, ManagedListGroup* _group, ManagedList* _list)
                     : SRBoolSetting(_parent, QObject::tr("This recording schedule is inactive"), 
                                      QObject::tr("This recording schedule is active"),
                                     "inactiveItem", "inactive", _group, _list )
         {
-            _parent.setInactiveObj(this);
+            _parent->setInactiveObj(this);
         }
 };
 
 class SRMaxNewest: public SRBoolSetting
 {
     public:
-        SRMaxNewest(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+        SRMaxNewest(ScheduledRecording *_parent, ManagedListGroup* _group, ManagedList* _list)
                    : SRBoolSetting(_parent, QObject::tr("Delete oldest if this would exceed the max episodes"),
                                    QObject::tr("Don't record if this would exceed the max episodes"),
                                    "maxnewestItem", "maxnewest", _group, _list )
         {
             setValue(false);
-            _parent.setMaxNewestObj(this);
+            _parent->setMaxNewestObj(this);
         }
 };
 
@@ -695,13 +695,13 @@ class SRMaxNewest: public SRBoolSetting
 class SRMaxEpisodes : public SRBoundedIntegerSetting
 {
     public:
-    SRMaxEpisodes(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+    SRMaxEpisodes(ScheduledRecording *_parent, ManagedListGroup* _group, ManagedList* _list)
                  : SRBoundedIntegerSetting( 0, 100, 5, 1, _parent, "maxepisodesList", "maxepisodes",
                                             _group, _list)
     {
         setTemplates("", "", QObject::tr("No episode limit"), 
                      QObject::tr("Keep only one episode."), QObject::tr("Keep at most %1 episodes"));
-        _parent.setMaxEpisodesObj(this);
+        _parent->setMaxEpisodesObj(this);
     }
 };
 
@@ -709,7 +709,7 @@ class SRMaxEpisodes : public SRBoundedIntegerSetting
 class SRRecPriority: public SRBoundedIntegerSetting
 {
     public:
-        SRRecPriority(ScheduledRecording& _parent, ManagedListGroup* _group, ManagedList* _list)
+        SRRecPriority(ScheduledRecording *_parent, ManagedListGroup* _group, ManagedList* _list)
                     : SRBoundedIntegerSetting( -99, 99, 5, 1, _parent, "recpriorityList", "recpriority",
                                                _group, _list)
         {
@@ -717,7 +717,7 @@ class SRRecPriority: public SRBoundedIntegerSetting
                           QObject::tr("Normal recording priority"),
                           QObject::tr("Raise priority by %1"), QObject::tr("Raise priority by %1") );
             setValue(0);
-            _parent.setRecPriorityObj(this);
+            _parent->setRecPriorityObj(this);
         }
 };
 
@@ -727,13 +727,13 @@ class SRRecGroup: public SRSelectSetting
     Q_OBJECT
 
     public:
-        SRRecGroup(ScheduledRecording& _parent, ManagedList* _list, ManagedListGroup* _group)
+        SRRecGroup(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
             : SRSelectSetting(_parent, "recgroupList", QString("[ %1 ]")
                                                        .arg(QObject::tr("Select Recording Group")),
                               _group, "recgroup", _list )
         {
             setValue("Default");
-            _parent.setRecGroupObj(this);
+            _parent->setRecGroupObj(this);
             connect(selectItem, SIGNAL(goingBack()), this, SLOT(onGoingBack()));
         }
 

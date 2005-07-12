@@ -5,7 +5,7 @@
 
 
 
-SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, 
+SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording *_rec, ManagedList* _parentList, 
                                          ManagedListGroup* _group, QObject* _parent)
                    : ManagedListGroup( QObject::tr("Scheduling Options"), _group, _parentList,
                                        _parent, "schedOpts"),
@@ -66,7 +66,7 @@ void SRSchedOptionsGroup::setEnabled(bool isScheduled, bool multiEpisode)
 }
 
 
-SRJobQueueGroup::SRJobQueueGroup(ScheduledRecording& _rec, ManagedList* _parentList, ManagedListGroup* _group,
+SRJobQueueGroup::SRJobQueueGroup(ScheduledRecording *_rec, ManagedList* _parentList, ManagedListGroup* _group,
                                              QObject* _parent)
                      : ManagedListGroup(QObject::tr("Post Recording Processing"), _group, _parentList,
                                         _parent, "postProcessing"),
@@ -94,7 +94,7 @@ SRJobQueueGroup::SRJobQueueGroup(ScheduledRecording& _rec, ManagedList* _parentL
     addItem(autoUserJob4->getItem(), -1);
 }
 
-SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording& _rec, ManagedList* _parentList, 
+SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording *_rec, ManagedList* _parentList, 
                                              ManagedListGroup* _group, QObject* _parent)
                      : ManagedListGroup(QObject::tr("Storage Options"), _group, _parentList,
                                         _parent, "storageOpts"),

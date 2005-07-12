@@ -52,26 +52,24 @@ ScheduledRecording::ScheduledRecording()
     
     addChild(id = new ID());
     
-    channel = new SRChannel(*this);
-    station = new SRStation(*this);
-    title = new SRTitle(*this);
-    subtitle = new SRSubtitle(*this);
-    description = new SRDescription(*this);
-    startTime = new SRStartTime(*this);
-    endTime = new SREndTime(*this);
-    startDate = new SRStartDate(*this);
-    endDate = new SREndDate(*this);
-    category = new SRCategory(*this);
-    seriesid = new SRSeriesid(*this);
-    programid = new SRProgramid(*this);
-    findday = new SRFindDay(*this);
-    findtime = new SRFindTime(*this);
-    findid = new SRFindId(*this);
-    parentid = new SRParentId(*this);
-    search = new SRRecSearchType(*this);
-#ifdef USING_FRONTEND
-    rootGroup = new RootSRGroup(*this);
-#endif
+    channel = new SRChannel(this);
+    station = new SRStation(this);
+    title = new SRTitle(this);
+    subtitle = new SRSubtitle(this);
+    description = new SRDescription(this);
+    startTime = new SRStartTime(this);
+    endTime = new SREndTime(this);
+    startDate = new SRStartDate(this);
+    endDate = new SREndDate(this);
+    category = new SRCategory(this);
+    seriesid = new SRSeriesid(this);
+    programid = new SRProgramid(this);
+    findday = new SRFindDay(this);
+    findtime = new SRFindTime(this);
+    findid = new SRFindId(this);
+    parentid = new SRParentId(this);
+    search = new SRRecSearchType(this);
+    rootGroup = new RootSRGroup(this);
 }
 
 
@@ -89,9 +87,10 @@ void ScheduledRecording::load()
         else
             type->addNormalSelections(!station->getValue().isEmpty(),
                                       search->intValue() == kManualSearch);
-        
+       
         type->setValue(tmpType);
         type->setUnchanged();
+
         fetchChannelInfo();
     }
 }

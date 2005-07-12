@@ -83,6 +83,9 @@ HEADERS += recordingtypes.h         jobqueue.h
 HEADERS += filtermanager.h          recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
 HEADERS += scheduledrecording.h
+HEADERS += sr_dialog.h              sr_root.h
+HEADERS += sr_items.h
+
 SOURCES += programinfo.cpp          proglist.cpp
 SOURCES += dbcheck.cpp              RingBuffer.cpp
 SOURCES += remoteutil.cpp           tv.cpp
@@ -90,17 +93,14 @@ SOURCES += recordingtypes.cpp       jobqueue.cpp
 SOURCES += filtermanager.cpp        recordingprofile.cpp
 SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += scheduledrecording.cpp
+SOURCES += sr_dialog.cpp            sr_root.cpp
+SOURCES += sr_items.cpp
+
 
 using_frontend {
     # Recording profile stuff
     HEADERS += profilegroup.h
     SOURCES += profilegroup.cpp
-
-    # Scheduled Recording Dialog stuff
-    HEADERS += sr_dialog.h              sr_root.h
-    HEADERS += sr_items.h
-    SOURCES += sr_dialog.cpp            sr_root.cpp
-    SOURCES += sr_items.cpp
 
     # XBox LED control
     HEADERS += xbox.h
