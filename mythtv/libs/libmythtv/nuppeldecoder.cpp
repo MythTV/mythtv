@@ -628,7 +628,7 @@ bool NuppelDecoder::InitAVCodec(int codec)
         directrendering = true;
 
     if (mpa_ctx)
-        free(mpa_ctx);
+        av_free(mpa_ctx);
 
     mpa_ctx = avcodec_alloc_context();
 
@@ -670,7 +670,7 @@ void NuppelDecoder::CloseAVCodec(void)
     avcodec_close(mpa_ctx);
 
     if (mpa_ctx)
-        free(mpa_ctx);
+        av_free(mpa_ctx);
     mpa_ctx = NULL;
 }
 

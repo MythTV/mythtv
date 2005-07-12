@@ -222,7 +222,22 @@ void ClassicCommDetector::Init()
 }
 
 ClassicCommDetector::~ClassicCommDetector()
-{}
+{
+    if (edgeMask)
+        delete [] edgeMask;
+    if (logoFrame)
+        delete [] logoFrame;
+    if (logoMask)
+        delete [] logoMask;
+    if (logoCheckMask)
+        delete [] logoCheckMask;
+    if (logoMaxValues)
+        delete [] logoMaxValues;
+    if (logoMinValues)
+        delete [] logoMinValues;
+    if (tmpBuf)
+        delete [] tmpBuf;
+}
 
 bool ClassicCommDetector::go()
 {

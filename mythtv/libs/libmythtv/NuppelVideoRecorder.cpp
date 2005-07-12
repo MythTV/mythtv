@@ -211,7 +211,7 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         avcodec_close(mpa_ctx);
 
     if (mpa_ctx)
-        free(mpa_ctx);
+        av_free(mpa_ctx);
     mpa_ctx = NULL;
 
     if (videoFilters)
@@ -445,7 +445,7 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
         avcodec_close(mpa_ctx);
     
     if (mpa_ctx)
-        free(mpa_ctx);
+        av_free(mpa_ctx);
     mpa_ctx = NULL;
 
     mpa_codec = avcodec_find_encoder_by_name(codec.ascii());
