@@ -1149,8 +1149,8 @@ QWidget* ImageSelectSetting::configWidget(ConfigurationGroup *cg,
         widget->setCurrentItem(current);
     else
         current = 0;
-   
-    if (images.size() != 0 && images[current])
+
+    if (images.size() != 0 && current < images.size() && images[current])
     { 
         QImage temp = *(images[current]);
         temp = temp.smoothScale((int)(184 * m_hmult), (int)(138 * m_hmult), 
