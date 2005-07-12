@@ -78,12 +78,17 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     // --------------------------------------------------------------------
 
     // remove all dirs from m_itemList;
+    bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+
     m_itemList.setAutoDelete(false);
     ThumbItem* item = m_itemList.first();
     while (item) {
         ThumbItem* next = m_itemList.next();
-        if (item->isDir)
+        if (item->isDir) {
+            if (recurse)
+                GalleryUtil::loadDirectory(m_itemList, item->path, recurse, NULL, NULL);
             m_itemList.remove(item);
+        }
         item = next;
     }
     

@@ -19,6 +19,8 @@
 #ifndef EXIFUTIL_H
 #define EXIFUTIL_H
 
+#include "iconview.h"
+
 class GalleryUtil
 {
 
@@ -27,6 +29,9 @@ class GalleryUtil
 	static bool isMovie(const char* filePath);
 	static long getNaturalRotation(const char* filePath);
 
+    static bool loadDirectory(ThumbList& itemList,
+                              const QString& dir, bool recurse,
+                              ThumbDict *itemDict, ThumbGenerator* thumbGen);
 };
 
 #endif /* EXIFUTIL_H */

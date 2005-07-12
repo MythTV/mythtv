@@ -596,57 +596,7 @@ void IconView::loadDirectory(const QString& dir)
     m_lastCol = 0;
     m_topRow  = 0;
 
-    const QFileInfoList* gList = d.entryInfoList("serial*.dat", QDir::Files);
-    if (gList)
-        m_isGallery = (gList->count() != 0);
-    else
-        m_isGallery = false;
-
-    // Create .thumbcache dir if neccesary
-    m_thumbGen->getThumbcacheDir(m_currDir);
-
-    d.setNameFilter(MEDIA_FILENAMES);
-    d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
-
-    d.setMatchAllDirs(true);
-    const QFileInfoList *list = d.entryInfoList();
-    if (!list)
-        return;
-
-    QFileInfoListIterator it(*list);
-    QFileInfo *fi;
-
-    m_thumbGen->cancel();
-    m_thumbGen->setDirectory(m_currDir, m_isGallery);
-        
-    while ((fi = it.current()) != 0)
-    {
-        ++it;
-        if (fi->fileName() == "." || fi->fileName() == "..")
-            continue;
-
-        // remove these already-resized pictures.  
-        if (m_isGallery && (
-                (fi->fileName().find(".thumb.") > 0) ||
-                (fi->fileName().find(".sized.") > 0) ||
-                (fi->fileName().find(".highlight.") > 0)))
-            continue;
-        
-        ThumbItem* item = new ThumbItem;
-        item->name      = fi->fileName();
-        item->path      = QDir::cleanDirPath(fi->absFilePath());
-        item->isDir     = fi->isDir();
-
-        m_itemList.append(item);
-        m_itemDict.insert(item->name, item);
-        m_thumbGen->addFile(item->name);
-    }
-
-    if (!m_thumbGen->running())
-    {
-        m_thumbGen->start();
-    }
-
+    m_isGallery = GalleryUtil::loadDirectory(m_itemList, dir, false, &m_itemDict, m_thumbGen);;
     m_lastRow = QMAX((int)ceilf((float)m_itemList.count()/(float)m_nCols)-1,0);
     m_lastCol = QMAX(m_itemList.count()-m_lastRow*m_nCols-1,0);
 }
@@ -827,7 +777,8 @@ void IconView::actionSlideShow()
 {
     ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
                                     m_currCol);
-    if (!item || item->isDir)
+    bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    if (!item || (item->isDir && !recurse))
         return;
 
     int pos = m_currRow * m_nCols + m_currCol;
@@ -857,7 +808,8 @@ void IconView::actionRandomShow()
 {
     ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
                                     m_currCol);
-    if (!item || item->isDir)
+    bool recurse = gContext->GetNumSetting("GalleryRecursiveSlideshow", 0);
+    if (!item || (item->isDir && !recurse))
         return;
 
     int pos = m_currRow * m_nCols + m_currCol;

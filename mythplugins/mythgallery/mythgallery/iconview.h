@@ -58,6 +58,7 @@ public:
 };
 
 typedef QPtrList<ThumbItem> ThumbList;
+typedef QDict<ThumbItem>    ThumbDict;
 
 class IconView : public MythDialog
 {

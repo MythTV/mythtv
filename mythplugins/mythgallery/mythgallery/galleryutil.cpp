@@ -18,10 +18,12 @@
 
 #include <iostream>
 #include <qfileinfo.h>
+#include <qdir.h>
 
 #include "config.h"
 #include "constants.h"
 #include "galleryutil.h"
+#include "thumbgenerator.h"
 
 #ifdef EXIF_SUPPORT
 #include <libexif/exif-data.h>
@@ -32,13 +34,13 @@
 bool GalleryUtil::isImage(const char* filePath)
 {
     QFileInfo fi(filePath);
-    return IMAGE_FILENAMES.find(fi.extension()) != -1;
+    return !fi.isDir() && IMAGE_FILENAMES.find(fi.extension()) != -1;
 }
 
 bool GalleryUtil::isMovie(const char* filePath)
 {
     QFileInfo fi(filePath);
-    return MOVIE_FILENAMES.find(fi.extension()) != -1;
+    return !fi.isDir() && MOVIE_FILENAMES.find(fi.extension()) != -1;
 }
 
 long GalleryUtil::getNaturalRotation(const char* filePath)
@@ -118,4 +120,80 @@ long GalleryUtil::getNaturalRotation(const char* filePath)
     }
 
     return rotateAngle;
+}
+
+bool GalleryUtil::loadDirectory(ThumbList& itemList,
+                                const QString& dir, bool recurse,
+                                ThumbDict *itemDict, ThumbGenerator* thumbGen)
+{
+    QDir d(dir);
+    QString currDir = d.absPath();
+
+    bool isGallery;
+    const QFileInfoList* gList = d.entryInfoList("serial*.dat", QDir::Files);
+    if (gList)
+        isGallery = (gList->count() != 0);
+    else
+        isGallery = false;
+
+    // Create .thumbcache dir if neccesary
+    if(thumbGen)
+        thumbGen->getThumbcacheDir(currDir);
+
+    d.setNameFilter(MEDIA_FILENAMES);
+    d.setSorting(QDir::Name | QDir::DirsFirst | QDir::IgnoreCase);
+
+    d.setMatchAllDirs(true);
+    const QFileInfoList *list = d.entryInfoList();
+    if (!list)
+        return false;
+
+    QFileInfoListIterator it(*list);
+    QFileInfo *fi;
+
+    if(thumbGen) {
+        thumbGen->cancel();
+        thumbGen->setDirectory(currDir, isGallery);
+    }
+
+    while ((fi = it.current()) != 0)
+    {
+        ++it;
+        if (fi->fileName() == "." || fi->fileName() == "..")
+            continue;
+
+        // remove these already-resized pictures.
+        if (isGallery && (
+                (fi->fileName().find(".thumb.") > 0) ||
+                (fi->fileName().find(".sized.") > 0) ||
+                (fi->fileName().find(".highlight.") > 0)))
+            continue;
+
+        if(fi->isDir() && recurse) {
+            GalleryUtil::loadDirectory(itemList,
+                                       QDir::cleanDirPath(fi->absFilePath()), true,
+                                       itemDict, thumbGen);
+        }
+        else {
+            ThumbItem* item = new ThumbItem;
+            item->name      = fi->fileName();
+            item->path      = QDir::cleanDirPath(fi->absFilePath());
+            item->isDir     = fi->isDir();
+
+            itemList.append(item);
+
+            if(itemDict)
+                itemDict->insert(item->name, item);
+
+            if(thumbGen)
+                thumbGen->addFile(item->name);
+        }
+    }
+
+    if (thumbGen && !thumbGen->running())
+    {
+        thumbGen->start();
+    }
+
+    return isGallery;
 }

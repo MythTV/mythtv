@@ -129,6 +129,14 @@ static HostSpinBox *SlideshowDelay()
     return gc;
 };
 
+static HostCheckBox *SlideshowRecursive()
+{
+    HostCheckBox *gc = new HostCheckBox("GalleryRecursiveSlideshow");
+    gc->setLabel(QObject::tr("Recurse into directories"));
+    gc->setHelpText(QObject::tr("Check this to let the slideshow recurse into "
+                                "sub-directories."));
+    return gc;
+};
 
 class GalleryConfigurationGroup: public VerticalConfigurationGroup,
                                  public TriggeredConfigurationGroup {
@@ -170,7 +178,7 @@ public:
         
         
         addChild(SlideshowDelay());
-
+        addChild(SlideshowRecursive());
     }
 
 };
