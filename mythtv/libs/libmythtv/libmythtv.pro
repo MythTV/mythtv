@@ -185,10 +185,8 @@ using_backend {
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
-    HEADERS += analogscan.h
     HEADERS += frequencytables.h
     SOURCES += scanwizard.cpp              scanwizardhelpers.cpp
-    SOURCES += analogscan.cpp
     SOURCES += frequencytables.cpp
 
     # TVRec & Recorder base classes
@@ -225,9 +223,9 @@ using_backend {
     # Support for Video4Linux devices
     using_v4l {
         HEADERS += channel.h                   pchdtvsignalmonitor.h
-        HEADERS += hdtvrecorder.h 
+        HEADERS += hdtvrecorder.h              analogscan.h
         SOURCES += channel.cpp                 pchdtvsignalmonitor.cpp
-        SOURCES += hdtvrecorder.cpp
+        SOURCES += hdtvrecorder.cpp            analogscan.cpp
 
         DEFINES += USING_V4L
     }

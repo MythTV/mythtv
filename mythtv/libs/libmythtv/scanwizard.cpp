@@ -43,7 +43,9 @@
 #endif
 #include "videosource.h"
 #include "frequencies.h"
+#ifdef USING_V4L
 #include "analogscan.h"
+#endif
 #include "mythdbcon.h"
 
 #include "scanwizard.h"
@@ -65,7 +67,9 @@ ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent) :
     dvbchannel = NULL;
     monitor = NULL;
 #endif
+#ifdef USING_V4L
     analogScan = NULL;
+#endif
     scanthread_running = false;
     setLabel(strTitle);
     setUseLabel(false);
@@ -98,12 +102,14 @@ void ScanWizardScanner::finish()
         dvbchannel = NULL;
     }
 #endif
+#ifdef USING_V4L
     if (analogScan)
     {
         analogScan->stop();
         delete analogScan;
         analogScan=NULL;
     }
+#endif
 }
 
 void ScanWizardScanner::customEvent(QCustomEvent *e)
@@ -305,6 +311,7 @@ void ScanWizardScanner::scan()
     nVideoSource = parent->videoSource();
     if (nScanType == ScanTypeSetting::FullScan_Analog)
     {
+#ifdef USING_V4L
         //Create an analog scan object
         analogScan = new AnalogScan(nVideoSource, parent->captureCard());
 
@@ -325,6 +332,7 @@ void ScanWizardScanner::scan()
                                       tr("Error starting scan"));
              cancelScan();
         }
+#endif
     }
 #ifdef USING_DVB
     else if (nScanType == ScanTypeSetting::Import)
