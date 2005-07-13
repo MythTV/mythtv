@@ -2626,30 +2626,6 @@ fi
 rm -f config.mak
 ln -s $MYTH_CONFIG_MAK config.mak
 
-# Create a special cleanup makefile that will allow make clean to work
-if [ ! -e config ] ; then
-  mkdir config
-fi
-cat - > config/Makefile <<END
-
-all:	
-qmake_all:
-
-clean:
-	-rm -f ../*/*/*.so*
-	-rm -f ../*/*/*.a
-
-install:
-uninstall:
-
-distclean: clean
-	-rm -f ../$MYTH_CONFIG_MAK
-	-rm -f ../$MYTH_CONFIG_H
-	-rm -f ../config.mak ../config.h
-	-rm -f ../Makefile
-
-END
-
 rm -f $TMPO $TMPC $TMPE $TMPS $TMPH
 
 qmake mythtv.pro
