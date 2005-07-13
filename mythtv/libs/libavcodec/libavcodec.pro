@@ -32,7 +32,7 @@ SOURCES += h264idct.c rangecoder.c pnm.c h263.c msmpeg4.c h263dec.c dvdsub.c
 SOURCES += dvbsub.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
-inc.files = avcodec.h rational.h common.h
+inc.files = avcodec.h rational.h common.h i386/mmx.h
 
 INSTALLS += inc
 
