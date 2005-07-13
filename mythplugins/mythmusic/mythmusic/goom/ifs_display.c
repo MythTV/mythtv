@@ -1,7 +1,7 @@
 #include "ifs.h"
 #include "goomconfig.h"
 
-#ifdef HAVE_MMX
+#ifdef MMX
 #include "mmx.h"
 #endif
 
@@ -50,7 +50,7 @@ ifs_update (guint32 * data, guint32 * back, int width, int height,
 	points = draw_ifs (&nbpt);
 	nbpt--;
 
-#ifdef HAVE_MMX
+#ifdef MMX
 	movd_m2r (couleursl, mm1);
 	punpckldq_r2r (mm1, mm1);
 	for (i = 0; i < nbpt; i += increment) {

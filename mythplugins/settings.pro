@@ -1,5 +1,5 @@
 include ( mythconfig.mak )
-CONFIG += $$CONFIG
+CONFIG += $$CCONFIG
 
 LIBVERSION = 0.18
 

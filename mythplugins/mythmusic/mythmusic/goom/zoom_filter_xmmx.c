@@ -1,4 +1,6 @@
-#ifdef HAVE_MMX
+#include <mythtv/mythconfig.h>
+
+#if defined(MMX) && !defined(ARCH_X86_64)
 /* a definir pour avoir exactement le meme resultat que la fonction C
  * (un chouillat plus lent)
  */

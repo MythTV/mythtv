@@ -5,7 +5,7 @@
 
 #define DRAWMETHOD_NORMAL(adr,col) {*(adr) = (col);}
 
-#ifdef HAVE_MMX
+#ifdef MMX
 #include "mmx.h"
 
 #define DRAWMETHOD_PLUS(_out,_backbuf,_col) \
@@ -34,7 +34,7 @@ movd_r2m (mm0, _out); \
 
 #define DRAWMETHOD_OR(adr,col) {*(adr)|=(col);}
 
-#ifdef HAVE_MMX
+#ifdef MMX
 #define DRAWMETHOD_DONE() {__asm__ __volatile__ ("emms");}
 #else
 #define DRAWMETHOD_DONE() {}

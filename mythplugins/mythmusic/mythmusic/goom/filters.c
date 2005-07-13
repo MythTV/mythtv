@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#ifdef HAVE_MMX
+#ifdef MMX
 #define USE_ASM
 #endif
 #ifdef POWERPC
@@ -35,7 +35,7 @@ extern volatile guint32 c_resoly;
 
 void c_zoom (unsigned int *expix1, unsigned int *expix2, unsigned int prevX, unsigned int prevY, signed int *brutS, signed int *brutD);
 
-#ifdef HAVE_MMX
+#ifdef MMX
 
 void    zoom_filter_xmmx (int prevX, int prevY, unsigned int *expix1, unsigned int *expix2, int *brutS, int *brutD, int buffratio, int precalCoef[16][16]);
 int 	zoom_filter_xmmx_supported ();
@@ -50,14 +50,14 @@ static void select_zoom_filter () {
 	if (firsttime){
 		if (zoom_filter_xmmx_supported()) {
 			zf_use_xmmx = 1;
-			//printf ("Extended MMX detected. Using the fastest method !\n");
+			printf ("Extended MMX detected. Using the fastest method !\n");
 		}
 		else if (zoom_filter_mmx_supported()) {
 			zf_use_mmx = 1;
-			//printf ("MMX detected. Using fast method !\n");
+			printf ("MMX detected. Using fast method !\n");
 		}
 		else {
-			//printf ("Too bad ! No MMX detected.\n");
+			printf ("Too bad ! No MMX detected.\n");
 		}
 		firsttime = 0;
 	}
@@ -695,7 +695,7 @@ zoomFilterFastRGB (Uint * pix1, Uint * pix2, ZoomFilterData * zf, Uint resx, Uin
 	mmx_zoom_size = prevX * prevY;
 
 #ifdef USE_ASM
-#ifdef HAVE_MMX
+#ifdef MMX
 	if (zf_use_xmmx)
 		zoom_filter_xmmx (prevX, prevY,expix1, expix2,
 											brutS, brutD, buffratio, precalCoef);

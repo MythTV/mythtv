@@ -1,4 +1,4 @@
-#ifdef HAVE_MMX
+#ifdef MMX
 #define BUFFPOINTNB 16
 #define BUFFPOINTMASK 0xffff
 #define BUFFINCR 0xff
