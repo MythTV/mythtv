@@ -2612,9 +2612,11 @@ diff $TMPH $MYTH_CONFIG_H >/dev/null 2>&1
 if test $? -ne 0 ; then
   mv -f $TMPH $MYTH_CONFIG_H
   rm -f config.h
-  ln -s $MYTH_CONFIG_H config.h
 else
   echo "$MYTH_CONFIG_H is unchanged"
+fi
+if ! test -L config.h ; then
+  ln -s $MYTH_CONFIG_H config.h
 fi
 
 if [ ! -e config.h ] ; then
@@ -2623,6 +2625,30 @@ fi
 
 rm -f config.mak
 ln -s $MYTH_CONFIG_MAK config.mak
+
+# Create a special cleanup makefile that will allow make clean to work
+if [ ! -e config ] ; then
+  mkdir config
+fi
+cat - > config/Makefile <<END
+
+all:	
+qmake_all:
+
+clean:
+	-rm -f ../*/*/*.so*
+	-rm -f ../*/*/*.a
+
+install:
+uninstall:
+
+distclean: clean
+	-rm -f ../$MYTH_CONFIG_MAK
+	-rm -f ../$MYTH_CONFIG_H
+	-rm -f ../config.mak ../config.h
+	-rm -f ../Makefile
+
+END
 
 rm -f $TMPO $TMPC $TMPE $TMPS $TMPH
 

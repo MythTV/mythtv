@@ -13,6 +13,8 @@ include ( settings.pro )
 
 # Directories
 SUBDIRS += libs filters programs themes i18n
+# clean up config on distclean
+SUBDIRS += config
 
 using_frontend {
     SUBDIRS += setup
