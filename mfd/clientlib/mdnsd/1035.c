@@ -2,7 +2,7 @@
 #include <string.h> 
 #include <stdio.h>
 
-unsigned short int net2short(unsigned char **bufp)
+uint16_t net2short(unsigned char **bufp)
 {
     short int i;
     i = **bufp;
@@ -12,7 +12,7 @@ unsigned short int net2short(unsigned char **bufp)
     return i;
 }
 
-unsigned long int net2long(unsigned char **bufp)
+uint32_t net2long(unsigned char **bufp)
 {
     long int l;
     l = **bufp;
@@ -26,7 +26,7 @@ unsigned long int net2long(unsigned char **bufp)
     return l;
 }
 
-void short2net(unsigned short int i, unsigned char **bufp)
+void short2net(uint16_t i, unsigned char **bufp)
 {
     *(*bufp + 1) = (unsigned char)i;
     i >>= 8;
@@ -34,7 +34,7 @@ void short2net(unsigned short int i, unsigned char **bufp)
     *bufp += 2;    
 }
 
-void long2net(unsigned long int l, unsigned char **bufp)
+void long2net(uint32_t l, unsigned char **bufp)
 {
     *(*bufp + 3) = (unsigned char)l;
     l >>= 8;
@@ -46,9 +46,9 @@ void long2net(unsigned long int l, unsigned char **bufp)
     *bufp += 4;
 }
 
-unsigned short int _ldecomp(unsigned char *ptr)
+uint16_t _ldecomp(unsigned char *ptr)
 {
-    unsigned short int i;
+    uint16_t i;
     i = 0xc0 ^ ptr[0];
     i <<= 8;
     i |= ptr[1];
@@ -242,7 +242,7 @@ void message_parse(struct message *m, unsigned char *packet)
     if(packet == 0 || m == 0) return;
 
     // keep all our mem in one (aligned) block for easy freeing
-    #define my(x,y) while(m->_len&7) m->_len++; x = (void*)(m->_packet + m->_len); m->_len += y;
+    #define my(x,y,t) while(m->_len&7) m->_len++; x = (t)(m->_packet + m->_len); m->_len += y;
 
     // header stuff bit crap
     m->_buf = buf = packet;
@@ -266,7 +266,7 @@ void message_parse(struct message *m, unsigned char *packet)
     if(m->_len + (sizeof(struct resource) * m->arcount) > MAX_PACKET_LEN - 8) { m->arcount = 0; return; }
 
     // process questions
-    my(m->qd, sizeof(struct question) * m->qdcount);
+    my(m->qd, sizeof(struct question) * m->qdcount, struct question *);
     for(i=0; i < m->qdcount; i++)
     {
         _label(m, &buf, &(m->qd[i].name));
@@ -275,15 +275,15 @@ void message_parse(struct message *m, unsigned char *packet)
     }
 
     // process rrs
-    my(m->an, sizeof(struct resource) * m->ancount);
-    my(m->ns, sizeof(struct resource) * m->nscount);
-    my(m->ar, sizeof(struct resource) * m->arcount);
+    my(m->an, sizeof(struct resource) * m->ancount, struct resource *);
+    my(m->ns, sizeof(struct resource) * m->nscount, struct resource *);
+    my(m->ar, sizeof(struct resource) * m->arcount, struct resource *);
     if(_rrparse(m,m->an,m->ancount,&buf)) return;
     if(_rrparse(m,m->ns,m->nscount,&buf)) return;
     if(_rrparse(m,m->ar,m->arcount,&buf)) return;
 }
 
-void message_qd(struct message *m, unsigned char *name, unsigned short int type, unsigned short int a_class)
+void message_qd(struct message *m, unsigned char *name, uint16_t type, uint16_t a_class)
 {
     m->qdcount++;
     if(m->_buf == 0) m->_buf = m->_packet + 12; // initialization
@@ -292,7 +292,7 @@ void message_qd(struct message *m, unsigned char *name, unsigned short int type,
     short2net(a_class, &(m->_buf));
 }
 
-void _rrappend(struct message *m, unsigned char *name, unsigned short int type, unsigned short int a_class, unsigned long int ttl)
+void _rrappend(struct message *m, unsigned char *name, uint16_t type, uint16_t a_class, uint32_t ttl)
 {
     if(m->_buf == 0) m->_buf = m->_packet + 12; // initialization
     _host(m, &(m->_buf), name);
@@ -301,25 +301,25 @@ void _rrappend(struct message *m, unsigned char *name, unsigned short int type, 
     long2net(ttl, &(m->_buf));
 }
 
-void message_an(struct message *m, unsigned char *name, unsigned short int type, unsigned short int a_class, unsigned long int ttl)
+void message_an(struct message *m, unsigned char *name, uint16_t type, uint16_t a_class, uint32_t ttl)
 {
     m->ancount++;
     _rrappend(m,name,type,a_class,ttl);
 }
 
-void message_ns(struct message *m, unsigned char *name, unsigned short int type, unsigned short int a_class, unsigned long int ttl)
+void message_ns(struct message *m, unsigned char *name, uint16_t type, uint16_t a_class, uint32_t ttl)
 {
     m->nscount++;
     _rrappend(m,name,type,a_class,ttl);
 }
 
-void message_ar(struct message *m, unsigned char *name, unsigned short int type, unsigned short int a_class, unsigned long int ttl)
+void message_ar(struct message *m, unsigned char *name, uint16_t type, uint16_t a_class, uint32_t ttl)
 {
     m->arcount++;
     _rrappend(m,name,type,a_class,ttl);
 }
 
-void message_rdata_long(struct message *m, unsigned long int l)
+void message_rdata_long(struct message *m, uint32_t l)
 {
     short2net(4, &(m->_buf));
     long2net(l, &(m->_buf));
@@ -332,7 +332,7 @@ void message_rdata_name(struct message *m, unsigned char *name)
     short2net(_host(m, &(m->_buf), name),&mybuf); // hackish, but cute
 }
 
-void message_rdata_srv(struct message *m, unsigned short int priority, unsigned short int weight, unsigned short int port, unsigned char *name)
+void message_rdata_srv(struct message *m, uint16_t priority, uint16_t weight, uint16_t port, unsigned char *name)
 {
     unsigned char *mybuf = m->_buf;
     m->_buf += 2;
@@ -342,7 +342,7 @@ void message_rdata_srv(struct message *m, unsigned short int priority, unsigned 
     short2net(_host(m, &(m->_buf), name) + 6, &mybuf);
 }
 
-void message_rdata_raw(struct message *m, unsigned char *rdata, unsigned short int rdlength)
+void message_rdata_raw(struct message *m, unsigned char *rdata, uint16_t rdlength)
 {
     if((m->_buf - m->_packet) + rdlength > 4096) rdlength = 0;
     short2net(rdlength, &(m->_buf));

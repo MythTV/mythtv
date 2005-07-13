@@ -8,6 +8,8 @@
 // should be reasonably large, for udp
 #define MAX_PACKET_LEN 4000
 
+#include <sys/types.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -17,7 +19,7 @@ extern "C"
 struct question
 {
     unsigned char *name;
-    unsigned short int type, a_class;
+    uint16_t type, a_class;
 };
 
 #define QTYPE_A 1
@@ -29,25 +31,25 @@ struct question
 struct resource
 {
     unsigned char *name;
-    unsigned short int type, a_class;
-    unsigned long int ttl;
-    unsigned short int rdlength;
+    uint16_t type, a_class;
+    uint32_t ttl;
+    uint16_t rdlength;
     unsigned char *rdata;
     union {
-        struct { unsigned long int ip; char *name; } a;
+        struct { uint32_t ip; char *name; } a;
         struct { unsigned char *name; } ns;
         struct { unsigned char *name; } cname;
         struct { unsigned char *name; } ptr;
-        struct { unsigned short int priority, weight, port; unsigned char *name; } srv;
+        struct { uint16_t priority, weight, port; unsigned char *name; } srv;
     } known;
 };
 
 struct message
 {
     // external data
-    unsigned short int id;
+    uint16_t id;
     struct { unsigned short qr:1, opcode:4, aa:1, tc:1, rd:1, ra:1, z:3, rcode:4; } header;
-    unsigned short int qdcount, ancount, nscount, arcount;
+    uint16_t qdcount, ancount, nscount, arcount;
     struct question *qd;
     struct resource *an, *ns, *ar;
 
@@ -60,12 +62,12 @@ struct message
 };
 
 // returns the next short/long off the buffer (and advances it)
-unsigned short int net2short(unsigned char **buf);
-unsigned long int net2long(unsigned char **buf);
+uint16_t net2short(unsigned char **buf);
+uint32_t net2long(unsigned char **buf);
 
 // copies the short/long into the buffer (and advances it)
-void short2net(unsigned short int i, unsigned char **buf);
-void long2net(unsigned long int l, unsigned char **buf);
+void short2net(uint16_t i, unsigned char **buf);
+void long2net(uint32_t l, unsigned char **buf);
 
 // parse packet into message, packet must be at least MAX_PACKET_LEN and message must be zero'd for safety
 void message_parse(struct message *m, unsigned char *packet);
@@ -74,18 +76,18 @@ void message_parse(struct message *m, unsigned char *packet);
 struct message *message_wire(void);
 
 // append a question to the wire message
-void message_qd(struct message *m, unsigned char *name, unsigned short int type, unsigned short int a_class);
+void message_qd(struct message *m, unsigned char *name, uint16_t type, uint16_t a_class);
 
 // append a resource record to the message, all called in order!
-void message_an(struct message *m, unsigned char *name, unsigned short int type, unsigned short int a_class, unsigned long int ttl);
-void message_ns(struct message *m, unsigned char *name, unsigned short int type, unsigned short int a_class, unsigned long int ttl);
-void message_ar(struct message *m, unsigned char *name, unsigned short int type, unsigned short int a_class, unsigned long int ttl);
+void message_an(struct message *m, unsigned char *name, uint16_t type, uint16_t a_class, uint32_t ttl);
+void message_ns(struct message *m, unsigned char *name, uint16_t type, uint16_t a_class, uint32_t ttl);
+void message_ar(struct message *m, unsigned char *name, uint16_t type, uint16_t a_class, uint32_t ttl);
 
 // append various special types of resource data blocks
-void message_rdata_long(struct message *m, unsigned long int l);
+void message_rdata_long(struct message *m, uint32_t l);
 void message_rdata_name(struct message *m, unsigned char *name);
-void message_rdata_srv(struct message *m, unsigned short int priority, unsigned short int weight, unsigned short int port, unsigned char *name);
-void message_rdata_raw(struct message *m, unsigned char *rdata, unsigned short int rdlength);
+void message_rdata_srv(struct message *m, uint16_t priority, uint16_t weight, uint16_t port, unsigned char *name);
+void message_rdata_raw(struct message *m, unsigned char *rdata, uint16_t rdlength);
 
 // return the wire format (and length) of the message, just free message when done
 unsigned char *message_packet(struct message *m);

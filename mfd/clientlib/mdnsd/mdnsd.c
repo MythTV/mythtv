@@ -30,6 +30,7 @@ struct query
     int (*answer)(mdnsda, void *);
     void *arg;
     struct query *next, *list;
+    int answered_cached;
 };
 
 struct unicast
@@ -215,7 +216,7 @@ void _q_done(mdnsd d, struct query *q)
 { // no more query, update all it's cached entries, remove from lists
     struct cached *c = 0;
     struct query *cur;
-    int i = _namehash(q->name) % LPRIME;
+    int i = _namehash(q->name) % SPRIME;
     while( (c = _c_next(d,c,q->name,q->type)) ) c->q = 0;
     if(d->qlist == q) d->qlist = q->list;
     else {
@@ -311,6 +312,20 @@ void _cache(mdnsd d, struct resource *r)
         return;
     }
 
+    /* don't want to recache records we already have! */
+    if (d->cache[i])
+    {
+        while((c = _c_next(d,c,r->name,r->type)))
+        {
+            if (_a_match(r,&c->rr))
+            {
+                /* just update the ttl (and answer if necessary) */
+                c->rr.ttl = d->now.tv_sec + r->ttl;
+                goto answer;
+            }
+        }
+    }
+
     c = (struct cached *)malloc(sizeof(struct cached));
     bzero(c,sizeof(struct cached));
     c->rr.name = strdup(r->name);
@@ -338,6 +353,7 @@ void _cache(mdnsd d, struct resource *r)
     }
     c->next = d->cache[i];
     d->cache[i] = c;
+answer:
     if( (c->q = _q_next(d, 0, r->name, r->type)) )
         _q_answer(d,c);
 }
@@ -430,10 +446,10 @@ void mdnsd_in(mdnsd d, struct message *m, unsigned long int ip, unsigned short i
     {
         for(i=0;i<m->qdcount;i++)
         { // process each query
-            if(m->qd[i].a_class != d->a_class || (r = _r_next(d,0,m->qd[i].name,m->qd[i].type)) == 0) continue;
+            if((m->qd[i].a_class & 0x7fff) != d->a_class || (r = _r_next(d,0,m->qd[i].name,m->qd[i].type)) == 0) continue;
 
             // send the matching unicast reply
-            if(port != 5353) _u_push(d,r,m->id,ip,port);
+            if(port != 5353 || (m->qd[i].a_class & 0x8000)) _u_push(d,r,m->id,ip,port);
 
             for(;r != 0; r = _r_next(d,r,m->qd[i].name,m->qd[i].type))
             { // check all of our potential answers
@@ -604,10 +620,24 @@ int mdnsd_out(mdnsd d, struct message *m, unsigned long int *ip, unsigned short 
                 nextbest = q->nexttry;
             // if room, add all known good entries
             c = 0;
-            while((c = _c_next(d,c,q->name,q->type)) != 0 && c->rr.ttl > (unsigned int) d->now.tv_sec + 8 && message_packet_len(m) + _rr_len(&c->rr) < d->frame)
+            while((c = _c_next(d,c,q->name,q->type)) != 0 && c->rr.ttl > (unsigned int) d->now.tv_sec + 8 && (message_packet_len(m) + _rr_len(&c->rr)) < d->frame)
             {
                 message_an(m,q->name,q->type,d->a_class,c->rr.ttl - d->now.tv_sec);
                 _a_copy(m,&c->rr);
+            }
+            /* answer cached answers to the question that would have been
+             * sent out with the question (so we wont get a reply, most likely)
+             */
+            if (!q->answered_cached)
+            {
+                c = 0;
+                while((c = _c_next(d,c,q->name,q->type)) != 0 &&
+                        c->rr.ttl > (unsigned)d->now.tv_sec + 8)
+                {
+                    /* FIXME HERE */
+                    _q_answer(d,c);
+                }
+                q->answered_cached = 1;
             }
         }
         d->checkqlist = nextbest;
@@ -674,6 +704,7 @@ void mdnsd_query(mdnsd d, char *host, int type, int (*answer)(mdnsda a, void *ar
         q->type = type;
         q->next = d->queries[i];
         q->list = d->qlist;
+        q->answered_cached = 0;
         d->qlist = d->queries[i] = q;
         while( (cur = _c_next(d,cur,q->name,q->type)) )
             cur->q = q; // any cached entries should be associated

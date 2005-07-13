@@ -310,7 +310,7 @@ void DiscoveryThread::run()
                 mdnsd_in(
                             mdns_daemon,
                             &m,
-                            (unsigned long int)from.sin_addr.s_addr,
+                            (unsigned int)from.sin_addr.s_addr,
                             from.sin_port
                         );
             }
@@ -359,7 +359,7 @@ void DiscoveryThread::run()
                 mdnsd_in(
                             mdns_ipaddr_daemon,
                             &m,
-                            (unsigned long int)from.sin_addr.s_addr,
+                            (unsigned int)from.sin_addr.s_addr,
                             from.sin_port
                         );
             }
