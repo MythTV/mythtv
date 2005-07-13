@@ -15,6 +15,8 @@ DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 
 LIBS += $$LOCAL_LIBDIR_X11
 
+QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
+
 # Input
 HEADERS += asf.h avformat.h avi.h avio.h dv.h mpegts.h os_support.h qtpalette.h
 

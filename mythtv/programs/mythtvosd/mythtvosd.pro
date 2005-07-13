@@ -10,5 +10,7 @@ INSTALLS = target
 LIBS += $$EXTRA_LIBS 
 INCLUDEPATH += ../../libs/libmyth
 
+QMAKE_CLEAN += $(TARGET)
+
 # Input
 SOURCES += main.cpp

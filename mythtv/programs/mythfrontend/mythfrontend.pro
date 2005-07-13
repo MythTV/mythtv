@@ -39,6 +39,8 @@ TARGETDEPS += ../../libs/libmythtv/libmythtv-$${LIBVERSION}.$${QMAKE_EXTENSION_S
 TARGETDEPS += ../../libs/libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../../libs/libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
+QMAKE_CLEAN += $(TARGET)
+
 # Input
 HEADERS += manualbox.h playbackbox.h viewscheduled.h globalsettings.h
 HEADERS += manualschedule.h programrecpriority.h channelrecpriority.h

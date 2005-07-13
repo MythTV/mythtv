@@ -26,5 +26,7 @@ TARGETDEPS += ../../libs/libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXT
 
 DEPENDPATH += ../../libs/libmyth ../../libs/libmythtv
 
+QMAKE_CLEAN += $(TARGET)
+
 # Input
 SOURCES += main.cpp

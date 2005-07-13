@@ -9,6 +9,8 @@ INSTALLS = target
 
 VERSION = 0.18.0
 
+QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
+
 # Input
 HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h  
 HEADERS += remotefile.h settings.h themedmenu.h util.h mythwizard.h

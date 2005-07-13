@@ -21,6 +21,8 @@ debug:contains(TARGET_ARCH_X86, yes) {
 
 QMAKE_CFLAGS_DEBUG += -O
 
+QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
+
 # Input
 SOURCES += bitstream.c utils.c mem.c allcodecs.c mpegvideo.c jrevdct.c 
 SOURCES += jfdctfst.c jfdctint.c mpegaudio.c ac3enc.c mjpeg.c audresample.c

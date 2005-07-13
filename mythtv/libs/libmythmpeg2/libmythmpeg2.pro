@@ -12,6 +12,8 @@ VERSION = 0.18.0
 QMAKE_CFLAGS_RELEASE += -fPIC -fno-common
 QMAKE_CFLAGS_DEBUG += -fPIC -fno-common
 
+QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
+
 # Input
 HEADERS += attributes.h vlc.h mpeg2_internal.h mpeg2.h
 

@@ -15,6 +15,8 @@ DEPENDPATH += ../libmyth .
 LIBS += -L../libmyth -lmyth-$$LIBVERSION
 VERSION = 0.18.0
 
+QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
+
 # Input
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h
 HEADERS += mythpainter_ogl.h mythpainter_qt.h

@@ -63,6 +63,8 @@ contains( TARGET_MMX, yes ) {
     HEADERS += ../../libs/libavcodec/i386/mmx.h ../../libs/libavcodec/dsputil.h
 }
 
+QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
+
 ##########################################################################
 # libmythtv proper
 

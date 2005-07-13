@@ -14,6 +14,8 @@ INCLUDEPATH += ../../libs/libavcodec ../..
 QMAKE_CXXFLAGS_RELEASE += -fPIC -DPIC
 QMAKE_CXXFLAGS_DEBUG   += -fPIC -DPIC
 
+QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
+
 # Input
 HEADERS += AAFilter.h
 HEADERS += cpu_detect.h
