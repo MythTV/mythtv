@@ -1561,7 +1561,7 @@ void Scheduler::UpdateMatches(int recordid) {
 " IF(search = %1, recordid, 0) "
 "FROM record, program ").arg(kManualSearch) + fromclauses[clause] + QString(
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
-"WHERE ") + whereclauses[clause] + QString(" AND "
+"WHERE ") + whereclauses[clause] + QString(" AND channel.visible = 1 AND "
 "((record.type = %1 " // allrecord
 "OR record.type = %2 " // findonerecord
 "OR record.type = %3 " // finddailyrecord
