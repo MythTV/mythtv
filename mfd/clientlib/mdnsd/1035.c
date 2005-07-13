@@ -242,7 +242,7 @@ void message_parse(struct message *m, unsigned char *packet)
     if(packet == 0 || m == 0) return;
 
     // keep all our mem in one (aligned) block for easy freeing
-    #define my(x,y) while(m->_len&7) m->_len++; (void*)x = (void*)(m->_packet + m->_len); m->_len += y;
+    #define my(x,y) while(m->_len&7) m->_len++; x = (void*)(m->_packet + m->_len); m->_len += y;
 
     // header stuff bit crap
     m->_buf = buf = packet;
