@@ -36,6 +36,6 @@ SOURCES += visualize/goom/filters.c visualize/goom/goom_core.c visualize/goom/gr
 SOURCES += visualize/goom/ifs.c visualize/goom/ifs_display.c visualize/goom/lines.c visualize/goom/surf3d.c 
 SOURCES += visualize/goom/zoom_filter_mmx.c visualize/goom/zoom_filter_xmmx.c visualize/goom/mythgoom.cpp
 
-DEFINES += HAVE_MMX
+#DEFINES += HAVE_MMX
 
 LIBS += -L$${PREFIX}/lib -lmfdclient
