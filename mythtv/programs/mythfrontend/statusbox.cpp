@@ -911,17 +911,17 @@ static const QString sm_str(long long sizeKB, int prec=1)
 {
     if (sizeKB>1024*1024*1024) // Terabytes
     {
-        double sizeGB = sizeKB/(1024*1024*1024);
+        double sizeGB = sizeKB/(1024*1024*1024.0);
         return QString("%1 TB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
     else if (sizeKB>1024*1024) // Gigabytes
     {
-        double sizeGB = sizeKB/(1024*1024);
+        double sizeGB = sizeKB/(1024*1024.0);
         return QString("%1 GB").arg(sizeGB, 0, 'f', (sizeGB>10)?0:prec);
     }
     else if (sizeKB>1024) // Megabytes
     {
-        double sizeMB = sizeKB/1024;
+        double sizeMB = sizeKB/1024.0;
         return QString("%1 MB").arg(sizeMB, 0, 'f', (sizeMB>10)?0:prec);
     }
     // Kilobytes
