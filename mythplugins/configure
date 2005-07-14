@@ -20,15 +20,68 @@ phone="yes"
 browser="yes"
 controls="yes"
 
-opengl="default"
-fftw_lib="default"
-fftw_lib3="default"
-sdl="default"
+opengl="detect"
+fftw_lib="detect"
+fftw_lib3="detect"
+sdl="detect"
 aac="no"          # compile fails w/libfaad v2.0
 transcode="no"    # need to check for more stuff?
 vcdsupport="no"   # no config detection rutine
-exif="default"
+exif="detect"
 festival="no"     # no config detection/setup rutine
+
+if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
+cat << EOF
+
+Usage:   configure [options]
+Options: [defaults in brackets after descriptions]
+NB:      all --enable-* options can be reversed with --disable-*
+
+Generic options:
+  --prefix=PREFIX          MythTV install location PREFIX [$prefix]"
+  --help                   print this message
+  --enable-all             Enable all options
+  --enable-opengl          enable OpenGL (Music and Gallery) [$opengl]
+
+MythBrowser related options:
+  --enable-mythbrowser     build the mythbrowser plugin [$browser]
+
+MythControls related options:
+  --enable-mythcontrols     build the mythcontrols plugin [$controls]
+
+MythDVD related options:
+  --enable-mythdvd         build the mythdvd plugin [$dvd]
+  --enable-transcode       enable DVD ripping and transcoding [$transcode]
+  --enable-vcd             enable VCD playing [$vcdsupport]
+
+MythGallery related options:
+  --enable-mythgallery     build the mythgallery plugin [$gallery]
+  --enable-exif            enable reading of EXIF headers [$exif]
+
+MythGame related options:
+  --enable-mythgame        build the mythgame plugin [$game]
+
+MythMusic related options:
+  --enable-mythmusic       build the mythmusic plugin [$music]
+  --enable-fftw            enable fftw visualizers [$fftw_lib]
+  --enable-sdl             use SDL for the synaesthesia output [$sdl]
+  --enable-aac             enable AAC/MP4 audio file decompression [$aac]
+
+MythNews related options:
+  --enable-mythnews        build the mythnews plugin [$news]
+
+MythPhone related options:
+  --enable-mythphone       build the mythphone plugin [$phone]
+  --enable-festival        enable festival TTS Engine [$festival]
+
+MythVideo related options:
+  --enable-mythvideo       build the mythvideo plugin [$video]
+
+MythWeather related options:
+  --enable-mythweather     build the mythweather plugin [$weather]
+EOF
+exit 1
+fi
 
 for opt do
   case "$opt" in
@@ -335,59 +388,6 @@ if test "$festival" != "no" ; then
     if has_library libFestival && has_library libestools && has_library libestbase && has_library libeststring && has_library libtermcap && has_header festival/festival.h ; then
        festival="yes"
     fi
-fi
-
-if test x"$1" = x"-h" -o x"$1" = x"--help" ; then
-cat << EOF
-
-Usage:   configure [options]
-Options: [defaults in brackets after descriptions]
-NB:      all --enable-* options can be reversed with --disable-*
-
-Generic options:
-  --prefix=PREFIX          MythTV install location PREFIX [$prefix]"
-  --help                   print this message
-  --enable-all             Enable all options
-  --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
-
-MythBrowser related options:
-  --enable-mythbrowser     build the mythbrowser plugin [default=yes]
-
-MythControls related options:
-  --enable-mythcontrols     build the mythcontrols plugin [default=yes]
-
-MythDVD related options:
-  --enable-mythdvd         build the mythdvd plugin [default=yes]
-  --enable-transcode       enable DVD ripping and transcoding [default=no]
-  --enable-vcd             enable VCD playing [default=no]
-
-MythGallery related options:
-  --enable-mythgallery     build the mythgallery plugin [default=yes]
-  --enable-exif            enable reading of EXIF headers [default=no]
-
-MythGame related options:
-  --enable-mythgame        build the mythgame plugin [default=yes]
-
-MythMusic related options:
-  --enable-mythmusic       build the mythmusic plugin [default=yes]
-  --enable-fftw            enable fftw visualizers [default=no]
-  --enable-sdl             use SDL for the synaesthesia output [default=no]
-  --enable-aac             enable AAC/MP4 audio file decompression [default=no]
-
-MythNews related options:
-  --enable-mythnews        build the mythnews plugin [default=yes]
-
-MythPhone related options:
-  --enable-mythphone       build the mythphone plugin [default=yes]
-  --enable-festival        enable festival TTS Engine [default=no]
-
-MythVideo related options:
-  --enable-mythvideo       build the mythvideo plugin [default=yes]
-
-MythWeather related options:
-  --enable-mythweather     build the mythweather plugin [default=yes]
-EOF
-exit 1
 fi
 
 ###########################################################
