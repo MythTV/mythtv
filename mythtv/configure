@@ -88,6 +88,7 @@ EOF
 echo "Standard options:"
 echo "  --help                   print this message"
 echo "  --compile-type=CTYPE     one of release, profile, debug [$compile_type]"
+echo "                           NOTE: profile is for sampling profilers"
 echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
 #echo "  --libdir=DIR             install libs in DIR [PREFIX/lib]"
 #echo "  --mandir=DIR             man documentation in DIR [PREFIX/man]"
