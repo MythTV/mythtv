@@ -291,8 +291,9 @@ void ScheduledRecording::ToMap(QMap<QString, QString>& progMap)
         QString findfrom = findtime->timeValue().toString(timeFormat);
         if (recType == kFindWeeklyRecord)
         {
+            int daynum = (findday->intValue() + 5) % 7 + 1;
             findfrom = QString("%1, %2")
-                               .arg(QDate::shortDayName(findday->intValue()-1))
+                               .arg(QDate::shortDayName(daynum))
                                .arg(findfrom);
         }
         progMap["subtitle"] = QString("(%1 %2) %3")
