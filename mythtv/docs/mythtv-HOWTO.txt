@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-07-08, v0.18.08
+  2005-07-14, v0.18.09
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -318,6 +318,7 @@
         23.3.4 JFS
         23.3.5 XFS
      23.4 HDTV with the Air2PC-ATSC-PCI card
+     23.5 Diskless Ubuntu
 
 
   ______________________________________________________________________
@@ -339,8 +340,10 @@
   mythical home media convergence box on your own using Open Source
   software and operating systems.
 
+
   MythTV has a number of capabilities.  The television portion allows
   you to do the following:
+
   +o  You may pause, fast-forward and rewind live Television.
 
   +o  You may install multiple video capture cards to record more than
@@ -403,9 +406,9 @@
   workstation / server software packages that may be installed by
   default if you use one of the big-name OS packages.
 
+
   See http://mysettopbox.tv <http://mysettopbox.tv> if you'd like to
   install a custom version of Knoppix optimized for MythTV.
-
 
   See http://linpvr.org/ <http://linpvr.org/> if you'd like to install
   MythTV onto a VIA Epia M machine.
@@ -529,6 +532,7 @@
   American environment. If you have installation instructions for a
   different region or Linux distribution, please send them to the author
   so that it can be included in other versions of this document.
+
 
   [1m3.  Checking prerequisites.[0m
 
@@ -654,11 +658,13 @@
   time. See the Troubleshooting Section for ``instructions'' on how to
   do this.
 
+
   Writing video to disk is sensitive to timing issues; RTjpeg requires
   less CPU with the tradeoff being larger files and needing to write to
   the disk faster.  MPEG-4 requires more CPU, but the files are smaller.
   At the default resolution, MPEG-2 creates the largest files of all
   with almost no CPU impact.
+
   See the Troubleshooting ``section'' for more information.
 
 
@@ -779,7 +785,6 @@
      for information on installing a PVR-250 on Mandrake 9.1.  The
      information contained in the section will also apply to other
      MPEG-2 encoder cards supported by the IVTV driver.
-
   [1m3.1.5.3.  DVB capture cards.[0m
 
   DVB is a video standard primarily found in Europe.  MythTV supports
@@ -6632,6 +6637,21 @@
 
 
 
+  [1mNOTE[22m:  Newer versions of [1mmysqldump [22mplace backticks around the table
+  names.  Backticks are not the same as apostrophes!  On a typical North
+  American keyboard, backticks are located to the left of the "1" key,
+  on the same key as the tilde " ".
+
+  If your restore.sql file is empty, re-run the commands like this:
+
+
+       $ grep "INSERT INTO `record` "         mythtv_backup.sql > restore.sql
+       $ grep "INSERT INTO `recorded` "       mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO `oldrecorded` "    mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO `recordedmarkup` " mythtv_backup.sql >> restore.sql
+
+
+
   Note the space after the table name and the ">>" to append to the file
   for all but the first grep. "recordedmarkup" is huge and may be
   hundreds of thousands of lines if you had lots of hours of recordings.
@@ -6650,7 +6670,6 @@
 
   After successful insertion of the data you may delete the restore.sql
   file.
-
 
 
   [1m22.8.  btaudio[0m
@@ -6766,7 +6785,6 @@
        masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
 
 
-
   Then run # mount -a to re-read the file to mount the file system.
 
   In this case, the source is a machine called "masterbackend" which is
@@ -6775,7 +6793,6 @@
   performance of NFS; "hard,intr" is there because that's the
   recommendation of the NFS-HOWTO, and the nfsvers is required for
   filesizes over 2GB.
-
 
 
   [1m22.11.  Automatically starting mythfrontend at system boot time[0m
@@ -6832,8 +6849,6 @@
 
   etc.rc.d.init.mythbackend should be made executable and copied to
   /etc/rc.d/init.d/:
-
-
        $ cd contrib
        $ su
        # chmod a+x etc.rc.d.init.d.mythbackend
@@ -6902,12 +6917,13 @@
   to edit the /etc/security/msec/perm.local file to include the
   following:
 
-  # /etc/security/msec/perm.local
-  # Local overrides to the msec program
-  #
-  # Full file path                user.group              permissions
-  /var/log/mythtv/                root.mythtv             775
-  /var/log/mythtv/*               root.mythtv             664
+
+       # /etc/security/msec/perm.local
+       # Local overrides to the msec program
+       #
+       # Full file path                user.group              permissions
+       /var/log/mythtv/                root.mythtv             775
+       /var/log/mythtv/*               root.mythtv             664
 
 
 
@@ -6958,7 +6974,8 @@
 
   To obtain a list of options:
 
-  # /etc/init.d/mythbackend
+
+       # /etc/init.d/mythbackend
 
 
 
@@ -7020,7 +7037,6 @@
   create MPEG-4 streams to save space.
 
   The transcoder can be used in two ways:
-
 
   +o  Automatically re-encode every file once it has completed recording
 
@@ -7084,9 +7100,8 @@
   script, you would do something like the following:
 
 
-
-  $ su
-  # /etc/init.d/mythbackend stop
+       $ su
+       # /etc/init.d/mythbackend stop
 
 
 
@@ -7136,6 +7151,7 @@
   and replace.  When saving the file, make sure you use the new name,
   mythtv_restore.sql or the rest of the steps below will fail.
 
+
   5.  Drop and recreate the database.
 
 
@@ -7143,6 +7159,7 @@
        mysql>drop database mythconverg;
        mysql>create database mythconverg;
        mysql>exit
+
 
 
   6.  Restore the database using your edited version.
@@ -7260,6 +7277,7 @@
 
   +o  dvd+rw-tools
 
+
   +o  dvdauthor
 
   +o  mjpegtools
@@ -7270,7 +7288,6 @@
      video
 
   +o  k3b - a GUI for burning DVD's and CD's.  Not necessary, but useful.
-
 
   1. Find the file you want.
 
@@ -7337,7 +7354,6 @@
 
   3. the selected buttons
 
-
   You would then use [1mspumux [22mto combine the background video with the
   overlay menus.
 
@@ -7389,6 +7405,7 @@
   jpeg2yuv -n 50 -I p -f 25 -j menu.jpg | mpeg2enc -n p -f 8 -o menu.m2v
 
 
+
   [1m22.21.1.4.  Merge the background you just created with audio[0m
 
   You will need some sort of audio to [1mmplex [22mwith the M2V file you just
@@ -7397,7 +7414,6 @@
 
   dd if=/dev/zero bs=4 count=2000 | toolame -b 128 -s 48 /dev/stdin
   menu.mp2
-
 
 
   [1m22.21.1.5.  Merge the M2V video with the MP2 audio[0m
@@ -8477,6 +8493,15 @@
   Broadcast".
 
   For HDTV you do not need to use the Advanced configuration.
+
+  [1m23.5.  Diskless Ubuntu[0m
+
+
+
+       # mkdir /nfsroot/pundit
+       # debootstrap --exclude=postfix,postfix-tls,pppoeconf,reiser4progs,reiserfsprogs,\
+       jfsutils,ppp,pppconfig,xfsprogs,lvm-common,lvm10,lvm2 --arch i386 \
+       hoary /nfsroot/pundit/ http://archive.ubuntulinux.org/ubuntu
 
 
 

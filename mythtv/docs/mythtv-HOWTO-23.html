@@ -743,7 +743,19 @@ cables, etc.</P>
 is time to configure MythTV. Start the setup program, and in the Capture
 Cards section change the card type to "Digital Video Broadcast".</P>
 <P>For HDTV you do not need to use the Advanced configuration. </P>
+<H2><A NAME="ss23.5">23.5</A> <A HREF="mythtv-HOWTO.html#toc23.5">Diskless Ubuntu</A>
+</H2>
 
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# mkdir /nfsroot/pundit
+# debootstrap --exclude=postfix,postfix-tls,pppoeconf,reiser4progs,reiserfsprogs,\
+jfsutils,ppp,pppconfig,xfsprogs,lvm-common,lvm10,lvm2 --arch i386 \
+hoary /nfsroot/pundit/ http://archive.ubuntulinux.org/ubuntu
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <HR>
 Next

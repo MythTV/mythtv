@@ -291,6 +291,20 @@ $ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P><B>NOTE</B>:  Newer versions of <B>mysqldump</B> place backticks around
+the table names.  Backticks are not the same as apostrophes!  On a typical
+North American keyboard, backticks are located to the left of the "1" key,
+on the same key as the tilde "&nbsp;".</P>
+<P>If your <CODE>restore.sql</CODE> file is empty, re-run the commands like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ grep "INSERT INTO `record` "         mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO `recorded` "       mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO `oldrecorded` "    mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO `recordedmarkup` " mythtv_backup.sql >> restore.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>Note the space after the table name and the ">>" to append to the file for
 all but the first grep. "recordedmarkup" is huge and may be hundreds of
 thousands of lines if you had lots of hours of recordings.</P>
