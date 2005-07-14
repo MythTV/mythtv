@@ -1058,7 +1058,7 @@ bool getMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)
     // able to report what filesystem it is using for the swapfiles. So, we do:
     long long total, used, free;
     free = getDiskSpace("/private/var/vm", total, used);
-    totalVM = (int)(total*1024LL), freeVM = (int)(free*1024LL);
+    totalVM = (int)(total/1024LL), freeVM = (int)(free/1024LL);
 
 #else
     VERBOSE(VB_IMPORTANT, "getMemStats(): Unknown platform. "
