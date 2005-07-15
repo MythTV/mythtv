@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-07-14, v0.18.09
+  2005-07-15, v0.18.10
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -319,6 +319,7 @@
         23.3.5 XFS
      23.4 HDTV with the Air2PC-ATSC-PCI card
      23.5 Diskless Ubuntu
+        23.5.1 Backend Configuration
 
 
   ______________________________________________________________________
@@ -339,7 +340,6 @@
   MythTV is a GPL licensed suite of programs that allow you to build the
   mythical home media convergence box on your own using Open Source
   software and operating systems.
-
 
   MythTV has a number of capabilities.  The television portion allows
   you to do the following:
@@ -6640,20 +6640,22 @@
   [1mNOTE[22m:  Newer versions of [1mmysqldump [22mplace backticks around the table
   names.  Backticks are not the same as apostrophes!  On a typical North
   American keyboard, backticks are located to the left of the "1" key,
-  on the same key as the tilde " ".
+  on the same key as the tilde.  Also, because the [1mbash [22mshell may try to
+  interpret the backticks, make sure you use a \ before each one.
 
-  If your restore.sql file is empty, re-run the commands like this:
+  If your restore.sql file is empty, you'll need to re-run the commands
+  like this:
 
 
-       $ grep "INSERT INTO `record` "         mythtv_backup.sql > restore.sql
-       $ grep "INSERT INTO `recorded` "       mythtv_backup.sql >> restore.sql
-       $ grep "INSERT INTO `oldrecorded` "    mythtv_backup.sql >> restore.sql
-       $ grep "INSERT INTO `recordedmarkup` " mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`record\` "         mythtv_backup.sql > restore.sql
+       $ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
+       $ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
 
 
 
   Note the space after the table name and the ">>" to append to the file
-  for all but the first grep. "recordedmarkup" is huge and may be
+  for all but the first [1mgrep[22m. "recordedmarkup" is huge and may be
   hundreds of thousands of lines if you had lots of hours of recordings.
 
   After you have moved the data files to the new hardware, configure
@@ -6782,7 +6784,9 @@
   add something like:
 
 
-       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
+
+  masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
+
 
 
   Then run # mount -a to re-read the file to mount the file system.
@@ -6843,12 +6847,15 @@
   and Stu Tomlinson (mailto:stu@nosnilmot.com
   <mailto:stu@nosnilmot.com>).
 
+
   Copy the files from the MythTV contrib directory or from Mike's web
   site (http://m-thomson.net/mythtv/ <http://m-thomson.net/mythtv/>) as
   follows:
 
   etc.rc.d.init.mythbackend should be made executable and copied to
   /etc/rc.d/init.d/:
+
+
        $ cd contrib
        $ su
        # chmod a+x etc.rc.d.init.d.mythbackend
@@ -6896,14 +6903,15 @@
   follows:
 
 
-       $ su
-       # mkdir /var/log/mythtv
-       # chown root:mythtv /var/log/mythtv
-       # chmod 0775 /var/log/mythtv
-       # exit
-       $ ls -ld /var/log/mythtv
-       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
-       $
+
+  $ su
+  # mkdir /var/log/mythtv
+  # chown root:mythtv /var/log/mythtv
+  # chmod 0775 /var/log/mythtv
+  # exit
+  $ ls -ld /var/log/mythtv
+  drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+  $
 
 
 
@@ -6952,7 +6960,6 @@
   you don't get the results you expect, check that you're not asking
   msec to add missing permissions to the files or directories you
   created.
-
   [1m22.12.2.  Gentoo[0m
 
   The portage file for MythTV has scripts that will allow you to run
@@ -7080,6 +7087,7 @@
   with the new as soon as it is no longer in use.
 
 
+
   [1m22.15.  Changing your hostname[0m
 
   If you need to change the name of the computers used with MythTV
@@ -7151,7 +7159,6 @@
   and replace.  When saving the file, make sure you use the new name,
   mythtv_restore.sql or the rest of the steps below will fail.
 
-
   5.  Drop and recreate the database.
 
 
@@ -7199,6 +7206,7 @@
 
   The ReplayTV runs VxWorks, a Real Time Operating System from Wind
   River Systems.
+
 
   [1m22.18.  Can a wireless connection be used between the frontend and the[0m
   [1mbackend?[0m
@@ -7265,8 +7273,6 @@
        mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
        driveropts=burnfree -dao -v tsize="$TSIZE"s -
 
-
-
   [1m22.20.  Burning a MythTV recording to a DVD (alternate version)[0m
 
 
@@ -7276,7 +7282,6 @@
   The software packages you will want are:
 
   +o  dvd+rw-tools
-
 
   +o  dvdauthor
 
@@ -7331,6 +7336,7 @@
   The steps above create a DVD that starts playing the video
   automatically. If you want to burn a DVD with menus and multiple video
   titles, see the next section.
+
 
 
   [1m22.21.  Creating a DVD with Menus[0m
@@ -7393,17 +7399,17 @@
   For PAL Video
 
 
-       width: 720
-       height: 576
-       x-axis: 75dpi
-       y-axis: 80dpi
+
+  width: 720
+  height: 576
+  x-axis: 75dpi
+  y-axis: 80dpi
 
 
 
   [1m22.21.1.3.  Convert the background JPG file into a M2V video file[0m
 
   jpeg2yuv -n 50 -I p -f 25 -j menu.jpg | mpeg2enc -n p -f 8 -o menu.m2v
-
 
 
   [1m22.21.1.4.  Merge the background you just created with audio[0m
@@ -7457,6 +7463,7 @@
   and make sure that "Save Background Color" and "Save Resolution" are
   selected.
 
+
   Select the bottom layer and change the Opacity to 0%.  Now save the
   image as menu1.png.
 
@@ -7471,23 +7478,23 @@
 
 
 
-  ###begin menu.xml###
-  <subpictures>
-    <stream>
-      <spu
-       force="yes"
-       start="00:00:00.00"
-       image="menu1.png"
-       select="menu2.png"
-       highlight="menu2.png"
-       autooutline="infer"
-       outlinewidth="6"
-       autoorder="rows"
-      >
-      </spu>
-    </stream>
-  </subpictures>
-  ###end menu.xml###
+       ###begin menu.xml###
+       <subpictures>
+         <stream>
+           <spu
+            force="yes"
+            start="00:00:00.00"
+            image="menu1.png"
+            select="menu2.png"
+            highlight="menu2.png"
+            autooutline="infer"
+            outlinewidth="6"
+            autoorder="rows"
+           >
+           </spu>
+         </stream>
+       </subpictures>
+       ###end menu.xml###
 
 
 
@@ -8496,12 +8503,34 @@
 
   [1m23.5.  Diskless Ubuntu[0m
 
+  (This information is a work in progress - 2005-07-15.)
+
+  In the following examples, we are going to create an environment which
+  can be used to boot a diskless workstation using PXE.
+
+  There are two machines in this scenario:  the backend, a Debian Sarge
+  system which has the disks and which will run the necessary support
+  software, and the "basement" machine, an Intel D865PERL motherboard
+  with 512MB of DRAM, a NVidia 440MX video card, a Microsoft MCE USB
+  remote and a HD44780 16x2 Vacuum Fluorescent Display.
 
 
-       # mkdir /nfsroot/pundit
+  [1m23.5.1.  Backend Configuration[0m
+
+  The backend machine needs to provide the support software for the
+  services needed to boot a diskless workstation.
+
+
+
+       $ su
+       # apt-get install dhcpd atftpd syslinux
+
+
+
+       # mkdir -p /nfsroot/basement
        # debootstrap --exclude=postfix,postfix-tls,pppoeconf,reiser4progs,reiserfsprogs,\
        jfsutils,ppp,pppconfig,xfsprogs,lvm-common,lvm10,lvm2 --arch i386 \
-       hoary /nfsroot/pundit/ http://archive.ubuntulinux.org/ubuntu
+       hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
 
 
 

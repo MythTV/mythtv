@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-07-14, v0.18.09
+<date>2005-07-15, v0.18.10
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -5627,19 +5627,21 @@ $ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
 <bf>NOTE</bf>:  Newer versions of <bf>mysqldump</bf> place backticks around
 the table names.  Backticks are not the same as apostrophes!  On a typical
 North American keyboard, backticks are located to the left of the "1" key,
-on the same key as the tilde "~".
+on the same key as the tilde.  Also, because the <bf>bash</bf> shell may try
+to interpret the backticks, make sure you use a \ before each one.
 
-If your <tt>restore.sql</tt> file is empty, re-run the commands like this:
+If your <tt>restore.sql</tt> file is empty, you'll need to re-run the
+commands like this:
 <tscreen><verb>
-$ grep "INSERT INTO `record` "         mythtv_backup.sql > restore.sql
-$ grep "INSERT INTO `recorded` "       mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO `oldrecorded` "    mythtv_backup.sql >> restore.sql
-$ grep "INSERT INTO `recordedmarkup` " mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`record\` "         mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
 </verb></tscreen>
 
 Note the space after the table name and the ">>" to append to the file for
-all but the first grep. "recordedmarkup" is huge and may be hundreds of
-thousands of lines if you had lots of hours of recordings.
+all but the first <bf>grep</bf>. "recordedmarkup" is huge and may be
+hundreds of thousands of lines if you had lots of hours of recordings.
 
 After you have moved the data files to the new hardware, configure MythTV
 using the <bf>mythtv-setup</bf> program as you normally would with a
@@ -7343,12 +7345,31 @@ Cards section change the card type to "Digital Video Broadcast".
 
 For HDTV you do not need to use the Advanced configuration. 
 <sect1>Diskless Ubuntu
-<p>
+<p>(This information is a work in progress - 2005-07-15.)
+
+In the following examples, we are going to create an environment which can
+be used to boot a diskless workstation using PXE.
+
+There are two machines in this scenario:  the backend, a Debian Sarge system
+which has the disks and which will run the necessary support software, and
+the "basement" machine, an Intel D865PERL motherboard with 512MB of DRAM, a
+NVidia 440MX video card, a Microsoft MCE USB remote and a HD44780 16x2
+Vacuum Fluorescent Display.
+
+<sect2>Backend Configuration
+<p>The backend machine needs to provide the support software for the
+services needed to boot a diskless workstation.
+
 <tscreen><verb>
-# mkdir /nfsroot/pundit
+$ su
+# apt-get install dhcpd atftpd syslinux
+</verb></tscreen>
+
+<tscreen><verb>
+# mkdir -p /nfsroot/basement
 # debootstrap --exclude=postfix,postfix-tls,pppoeconf,reiser4progs,reiserfsprogs,\
 jfsutils,ppp,pppconfig,xfsprogs,lvm-common,lvm10,lvm2 --arch i386 \
-hoary /nfsroot/pundit/ http://archive.ubuntulinux.org/ubuntu
+hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
 </verb></tscreen>
 
 </article>
@@ -7380,6 +7401,7 @@ are ancient.  Update instructions to reference subversion.  Get rid of
 instructions on recompiling RHL 8.0 kernel.
 v0.18.08, 2005-07-08.  Spelling.
 v0.18.09, 2005-07-14.  Start diskless ubuntu.  Backticks on table names in mysqldump.
+v0.18.10, 2005-07-15.  Escape backticks in the mysqldump example, otherwise bash complains.
 -->
 
 <!--
