@@ -87,6 +87,7 @@ Options: [defaults in brackets after descriptions]
 EOF
 echo "Standard options:"
 echo "  --help                   print this message"
+echo "  --previous               use previous configure parameters if possible"
 echo "  --compile-type=CTYPE     one of release, profile, debug [$compile_type]"
 echo "                           NOTE: profile is for sampling profilers"
 echo "  --prefix=PREFIX          install in PREFIX [$prefix]"
@@ -544,6 +545,22 @@ for opt do
 done
 
 CODEC_LIST=`grep 'register_avcodec(&[a-z]' $source_path/libs/libavcodec/allcodecs.c| sed 's/.*&\(.*\)).*/\1/'`
+
+if [ -e config.log ] ; then
+    PCONF=`cat config.log | tail -n 1 | grep configure`
+    if test x"$PCONF" != x"" ; then
+        PCONF=`echo $PCONF | sed 's/.\/configure//g'`
+    fi
+    for opt do
+        if test x"$opt" = x"--prev" -o x"$opt" = x"--previous" ; then
+            if test x"$PCONF" != "--prev" ; then
+                echo "Options: $PCONF"
+                ./configure "$PCONF"
+                exit
+            fi
+        fi
+    done
+fi
 
 for opt do
   case "$opt" in
