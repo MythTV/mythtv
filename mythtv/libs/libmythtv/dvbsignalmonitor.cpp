@@ -43,7 +43,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     : DTVSignalMonitor(db_cardnum, _flags, _name),
       cardnum(_channel->GetCardNum()),
       signalToNoise(
-          QObject::tr("Signal To Noise"), "snr", 0,  true, -32768, 32767, 0),
+          QObject::tr("Signal To Noise"), "snr", -32768,  true, -32768, 32767, 0),
       bitErrorRate(
           QObject::tr("Bit Error Rate"), "ber", 65535, false, 0, 65535, 0),
       uncorrectedBlocks(
