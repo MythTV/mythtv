@@ -402,59 +402,69 @@ TVState TV::GetState(void)
 
 int TV::LiveTV(bool showDialogs)
 {
-    if (internalState == kState_None)
+    if (internalState == kState_None && RequestNextRecorder(showDialogs))
     {
-        RemoteEncoder *testrec = NULL;
-
-        if (lookForChannel)
-        {
-            QStringList reclist;
-            GetValidRecorderList(channelid, reclist);
-            testrec = RemoteRequestFreeRecorderFromList(reclist);
-            lookForChannel = false;
-            channelqueued = true;
-            channelid = "";
-        }
-        else
-        {
-            // The default behavior for starting live tv is to get the next
-            // free recorder.  This is also how switching to the next recorder
-            // works
-            testrec = RemoteRequestNextFreeRecorder(lastRecorderNum);
-        }
-
-        if (!testrec)
-            return 0;
-
-        if (!testrec->IsValidRecorder())
-        {
-            if (showDialogs)
-            {
-                QString title = tr("MythTV is already using all available "
-                                   "inputs for recording.  If you want to "
-                                   "watch an in-progress recording, select one "
-                                   "from the playback menu.  If you want to "
-                                   "watch live TV, cancel one of the "
-                                   "in-progress recordings from the delete "
-                                   "menu.");
-    
-                DialogBox diag(gContext->GetMainWindow(), title);
-                diag.AddButton(tr("Cancel and go back to the TV menu"));
-                diag.exec();
-            }        
-
-            delete testrec;
- 
-            return 0;
-        }
-
-        activerecorder = recorder = testrec;
-        lastRecorderNum = recorder->GetRecorderNumber();
         ChangeState(kState_WatchingLiveTV);
         switchingCards = false;
+        return 1;
+    }
+    return 0;
+}
+
+bool TV::RequestNextRecorder(bool showDialogs)
+{
+    if (recorder)
+    {
+        delete recorder;
+        activerecorder = recorder = NULL;
     }
 
-    return 1;
+    RemoteEncoder *testrec = NULL;
+    if (lookForChannel)
+    {
+        QStringList reclist;
+        GetValidRecorderList(channelid, reclist);
+        testrec = RemoteRequestFreeRecorderFromList(reclist);
+        lookForChannel = false;
+        channelqueued = true;
+        channelid = "";
+    }
+    else
+    {
+        // The default behavior for starting live tv is to get the next
+        // free recorder.  This is also how switching to the next recorder
+        // works
+        testrec = RemoteRequestNextFreeRecorder(lastRecorderNum);
+    }
+
+    if (!testrec)
+        return false;
+    
+    if (!testrec->IsValidRecorder())
+    {
+        if (showDialogs)
+        {
+            QString title = tr("MythTV is already using all available "
+                               "inputs for recording.  If you want to "
+                               "watch an in-progress recording, select one "
+                               "from the playback menu.  If you want to "
+                               "watch live TV, cancel one of the "
+                               "in-progress recordings from the delete "
+                               "menu.");
+            
+            DialogBox diag(gContext->GetMainWindow(), title);
+            diag.AddButton(tr("Cancel and go back to the TV menu"));
+            diag.exec();
+        }        
+        
+        delete testrec;
+        
+        return false;
+    }
+    
+    activerecorder = recorder = testrec;
+    lastRecorderNum = recorder->GetRecorderNumber();
+    return true;
 }
 
 void TV::FinishRecording(void)
@@ -1724,6 +1734,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
     }
    
+#if 0 /* set to 1 to debug actions */
+    for (uint i = 0; i < actions.size(); ++i)
+        VERBOSE(VB_IMPORTANT, QString("handled(%1) actions[%2](%3)")
+                .arg(handled).arg(i).arg(actions[i]));
+#endif
     if (handled)
         return;
 
@@ -2617,34 +2632,19 @@ void TV::SwitchCards(void)
 
 void TV::ToggleInputs(void)
 {
-    if (activenvp == nvp)
+    if (activenvp == nvp && paused)
     {
-        if (paused)
-        {
-            if (GetOSD())
-                GetOSD()->EndPause();
-            gContext->DisableScreensaver();
-            paused = false;
-        }
+        if (GetOSD())
+            GetOSD()->EndPause();
+        gContext->DisableScreensaver();
+        paused = false;
     }
 
-    activenvp->Pause(false);
+    PauseLiveTV();
 
-    // all we care about is the ringbuffer being paused, here..
-    activerbuffer->WaitForPause();
-
-    activerecorder->PauseRecorder();
-    activerbuffer->Reset();
     activerecorder->ToggleInputs();
 
-    activenvp->ResetPlaying();
-    activenvp->Play(normal_speed, true, false);
-
-    if (activenvp == nvp)
-    {
-        UpdateOSDInput();
-        UpdateLCD();
-    }
+    UnpauseLiveTV();
 }
 
 void TV::ToggleChannelFavorite(void)
@@ -2656,7 +2656,8 @@ void TV::ChangeChannel(int direction, bool force)
 {
     bool muted = false;
 
-    if (!force && GetOSD() && (activenvp == nvp) && showBufferedWarnings)
+    if (!force && GetOSD() && showBufferedWarnings && 
+        (nvp && (activenvp == nvp)))
     {
         int behind = activenvp->GetSecondsBehind();
         if (behind > bufferedChannelThreshold)
@@ -2683,53 +2684,37 @@ void TV::ChangeChannel(int direction, bool force)
         }
     }
 
-    AudioOutput *aud = nvp->getAudioOutput();
-    if (aud && !aud->GetMute() && activenvp == nvp)
+    if (nvp)
     {
-        aud->ToggleMute();
-        muted = true;
-    }
-
-    if (activenvp == nvp)
-    {
-        if (paused)
+        AudioOutput *aud = nvp->getAudioOutput();
+        if (aud && !aud->GetMute() && activenvp == nvp)
         {
-            if (GetOSD())
-                GetOSD()->EndPause();
-            gContext->DisableScreensaver();
-            paused = false;
+            aud->ToggleMute();
+            muted = true;
         }
     }
 
-    activenvp->Pause(false);
-    // all we care about is the ringbuffer being paused, here..
-    activerbuffer->WaitForPause();    
+    if (nvp && (activenvp == nvp) && paused)
+    {
+        if (GetOSD())
+            GetOSD()->EndPause();
+        gContext->DisableScreensaver();
+        paused = false;
+    }
 
     // Save the current channel if this is the first time
-    if (prevChan.size() == 0 && activenvp == nvp)
+    if (nvp && (activenvp == nvp) && prevChan.size() == 0)
         AddPreviousChannel();
 
-    activerecorder->PauseRecorder();
-    activerbuffer->Reset();
+    PauseLiveTV();
+
     activerecorder->ChangeChannel(direction);
     ChannelClear();
 
-    activenvp->ResetPlaying();
-    
-    QString filters = GetFiltersForChannel();
-    activenvp->SetVideoFilters(filters);
-    
-    activenvp->Play(normal_speed, true, false);
-
-    if (activenvp == nvp)
-    {
-        UpdateOSD();
-        UpdateLCD();
-        AddPreviousChannel();
-    }
-
     if (muted)
         muteTimer->start(kMuteTimeout * 2, true);
+
+    UnpauseLiveTV();
 }
 
 QString TV::QueuedChannel(void)
@@ -2890,52 +2875,35 @@ void TV::ChangeChannelByString(QString &name, bool force)
         }
     }
 
-    AudioOutput *aud = nvp->getAudioOutput();
-    if (aud && !aud->GetMute() && activenvp == nvp)
+    if (nvp)
     {
-        aud->ToggleMute();
-        muted = true;
-    }
-
-    if (activenvp == nvp)
-    {
-        if (paused)
+        AudioOutput *aud = nvp->getAudioOutput();
+        if (aud && !aud->GetMute() && activenvp == nvp)
         {
-            if (GetOSD())
-                GetOSD()->EndPause();
-            gContext->DisableScreensaver();
-            paused = false;
+            aud->ToggleMute();
+            muted = true;
         }
     }
 
-    activenvp->Pause(false);
-    // all we care about is the ringbuffer being paused, here..
-    activerbuffer->WaitForPause();
+    if (nvp && (activenvp == nvp) && paused && GetOSD())
+    {
+        GetOSD()->EndPause();
+        gContext->DisableScreensaver();
+        paused = false;
+    }
 
     // Save the current channel if this is the first time
     if (prevChan.size() == 0)
         AddPreviousChannel();
 
-    activerecorder->PauseRecorder();
-    activerbuffer->Reset();
+    PauseLiveTV();
+
     activerecorder->SetChannel(name);
-
-    activenvp->ResetPlaying();
-    
-    QString filters = GetFiltersForChannel();
-    activenvp->SetVideoFilters(filters);
-    
-    activenvp->Play(normal_speed, true, false);
-
-    if (activenvp == nvp)
-    {
-        UpdateOSD();
-        UpdateLCD();
-        AddPreviousChannel();
-    }
 
     if (muted)
         muteTimer->start(kMuteTimeout * 2, true);
+
+    UnpauseLiveTV();
 }
 
 void TV::AddPreviousChannel(void)
@@ -4632,4 +4600,47 @@ void TV::ShowNoRecorderDialog(void)
     MythPopupBox::showOkPopup(
             gContext->GetMainWindow(), QObject::tr("Channel Change Error"),
             errorText);
+}
+
+/** \fn TV::PauseLiveTV()
+ *  \brief Used in ChangeChannel(), ChangeChannelByString(),
+ *         and ToggleInputs() to temporarily stop video output.
+ */
+void TV::PauseLiveTV(void)
+{
+    VERBOSE(VB_PLAYBACK, "PauseLiveTV()");
+
+    if (activenvp)
+        activenvp->Pause(false);
+
+    if (activerbuffer)
+        activerbuffer->WaitForPause();
+
+    activerecorder->PauseRecorder();
+    if (activerbuffer)
+        activerbuffer->Reset();
+}
+
+/** \fn TV::UnpauseLiveTV()
+ *  \brief Used in ChangeChannel(), ChangeChannelByString(),
+ *         and ToggleInputs() to restart video output.
+ */
+void TV::UnpauseLiveTV(void)
+{
+    VERBOSE(VB_IMPORTANT, "UnpauseLiveTV()");
+
+    if (activenvp)
+    {
+        activenvp->ResetPlaying();
+        QString filters = GetFiltersForChannel();
+        activenvp->SetVideoFilters(filters);
+        activenvp->Play(normal_speed, true, false);
+    }
+
+    if (!nvp || (nvp && activenvp == nvp))
+    {
+        UpdateOSD();
+        UpdateLCD();
+        AddPreviousChannel();
+    }
 }
