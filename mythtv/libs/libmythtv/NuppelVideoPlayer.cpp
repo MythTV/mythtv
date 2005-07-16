@@ -3874,8 +3874,6 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
             (((autocommercialskip == 1) &&
               (framesPlayed >= commBreakIter.key())) ||
              ((autocommercialskip == 2) &&
-              (framesPlayed >= commBreakIter.key())) ||
-             ((autocommercialskip == 3) &&
               (framesPlayed + commnotifyamount * video_frame_rate >=
                commBreakIter.key()))))
         {

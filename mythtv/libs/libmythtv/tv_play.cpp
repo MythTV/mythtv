@@ -4320,10 +4320,6 @@ void TV::BuildOSDTreeMenu(void)
                                      "TOGGLECOMMSKIP2",
                                      (autoCommercialSkip == 2) ? 1 : 0, NULL,
                                      "COMMSKIPGROUP");
-        subitem = new OSDGenericTree(item, tr("Auto-Skip Pre-Notify"),
-                                     "TOGGLECOMMSKIP3",
-                                     (autoCommercialSkip == 3) ? 1 : 0, NULL,
-                                     "COMMSKIPGROUP");
         subitem = new OSDGenericTree(item, tr("Auto-Skip ON"),
                                      "TOGGLECOMMSKIP1",
                                      (autoCommercialSkip == 1) ? 1 : 0, NULL,
@@ -4499,8 +4495,6 @@ void TV::SetAutoCommercialSkip(int skipMode)
         desc = tr("Auto-Skip ON");
     else if (autoCommercialSkip == 2)
         desc = tr("Auto-Skip Notify");
-    else if (autoCommercialSkip == 3)
-        desc = tr("Auto-Skip Pre-Notify");
 
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
 
