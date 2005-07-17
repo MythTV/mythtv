@@ -45,6 +45,7 @@ class EncoderLink
                                bool from_cache=false);
     long long GetFreeDiskSpace(bool from_cache=false);
     long long GetMaxBitrate(void);
+    int SetSignalMonitoringRate(int rate, int notifyFrontend);
 
     bool IsBusy(void);
     bool IsBusyRecording(void);

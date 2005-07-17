@@ -82,7 +82,7 @@ const int TVRec::kRequestBufferSize = 256*1000;
  */
 TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
-    : rbuffer(NULL), recorder(NULL), channel(NULL),
+    : rbuffer(NULL), recorder(NULL), channel(NULL), signalMonitor(NULL),
 #ifdef USING_DVB
       scanner(NULL),
 #endif
@@ -201,6 +201,14 @@ bool TVRec::Init(void)
             channel->SwitchToInput(inputname, startchannel);
         channel->SetChannelOrdering(chanorder);
         channel->Close();
+#else
+        QString msg = QString(
+            "ERROR: V4L Input configured, but MythTV was not compiled\n"
+            "with V4L support. Recompile MythTV with V4L supprt\n"
+            "or remove the card from configuration and restart MythTV.");
+        VERBOSE(VB_IMPORTANT, msg);
+        errored = true;
+        return false;
 #endif
     }
 
@@ -801,6 +809,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 #else
         VERBOSE(VB_IMPORTANT, "MPEG Recorder requested, but MythTV was "
                 "compiled without ivtv driver support.");
+        errored = true;
 #endif
     }
     else if (cardtype == "HDTV")
@@ -813,6 +822,10 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
         recorder->Initialize();
+#else
+        VERBOSE(VB_IMPORTANT, "V4L HDTV Recorder requested, but MythTV was "
+                "compiled without V4L support.");
+        errored = true;
 #endif // USING_V4L
     }
     else if (cardtype == "FIREWIRE")
@@ -830,6 +843,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 #else
         VERBOSE(VB_IMPORTANT, "FireWire Recorder requested, but MythTV was "
                 "compiled without firewire support.");
+        errored = true;
 #endif
     }
     else if (cardtype == "DVB")
@@ -854,6 +868,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 #else
         VERBOSE(VB_IMPORTANT, "DVB Recorder requested, but MythTV was "
                 "compiled without DVB support.");
+        errored = true;
 #endif
     }
     else
@@ -869,6 +884,10 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
  
         recorder->Initialize();
+#else
+        VERBOSE(VB_IMPORTANT, "V4L Recorder requested, but MythTV was "
+                "compiled without V4L support.");
+        errored = true;
 #endif // USING_V4L
     }
 
@@ -1377,6 +1396,299 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     }
 }
 
+void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
+{
+    if (!dtvMon->GetATSCStreamData())
+        return;
+
+    const MasterGuideTable *mgt = dtvMon->GetATSCStreamData()->GetCachedMGT();
+    if (!mgt)
+        return;
+
+    for (uint i = 0; i < mgt->TableCount(); ++i)
+    {
+        pid_cache.push_back(pid_cache_item_t(mgt->TablePID(i), mgt->TableType(i)));
+    }
+}
+
+void setup_table_monitoring(ChannelBase* channel,
+                            DTVSignalMonitor* dtvSignalMonitor,
+                            RecorderBase* recorder)
+{
+    VERBOSE(VB_RECORD, "setting up table monitoring");
+
+    pid_cache_t pid_cache;
+    channel->GetCachedPids(pid_cache);
+#if 0
+    int progNum = channel->GetProgramNumber();
+    if (progNum >= 0)
+    {
+        VERBOSE(VB_RECORD, "mpeg program number: "<<progNum);
+        ATSCStreamData *sd = NULL;
+        HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
+        if (rec)
+        {
+            sd = rec->StreamData();
+            sd->SetCaching(true);
+        }
+        if (!sd)
+            sd = new ATSCStreamData(-1, -1, true);
+        
+        dtvSignalMonitor->SetStreamData(sd);
+        sd->Reset(progNum);
+
+        dtvSignalMonitor->SetProgramNumber(progNum);
+        dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
+
+        return;
+    }
+#endif
+
+    int major = channel->GetMajorChannel();
+    int minor = channel->GetMinorChannel();
+    VERBOSE(VB_RECORD, QString("atsc channel: %1_%2").arg(major).arg(minor));
+    if (minor > 0)
+    {
+        ATSCStreamData *sd = NULL;
+        HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
+        if (rec)
+        {
+            sd = rec->StreamData();
+            sd->SetCaching(true);
+        }
+        if (!sd)
+            sd = new ATSCStreamData(major, minor, true);
+
+        dtvSignalMonitor->SetStreamData(sd);
+        sd->Reset(major, minor);
+        dtvSignalMonitor->SetChannel(major, minor);
+
+        VERBOSE(VB_RECORD, "set up table monitoring successfully");
+
+        pid_cache_t::const_iterator it = pid_cache.begin();
+        bool vctpid_cached = false;
+        for (; it != pid_cache.end(); ++it)
+        {
+            if ((it->second == TableID::TVCT) ||
+                (it->second == TableID::CVCT))
+            {
+                vctpid_cached = true;
+                dtvSignalMonitor->GetATSCStreamData()->
+                    AddListeningPID(it->first);
+            }
+        }
+        if (!vctpid_cached)
+            dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForMGT);
+
+        return;
+    }
+
+#if 0
+    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+    if (dvbc)
+    {
+        int serviceid = dvbc->GetServiceID();
+        DVBStreamData *sd = NULL;
+        if (!sd)
+            sd = new DVBStreamData(serviceid, true);
+
+        dtvSignalMonitor->SetStreamData(sd);
+        sd->Reset(serviceid);
+        dtvSignalMonitor->SetService(serviceid);
+
+        VERBOSE(VB_RECORD, "set up table monitoring successfully");
+
+        //dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForSDT);
+
+        return;
+    }
+#endif
+}
+
+/** \fn TVRec::SetupSignalMonitor()
+ *  \brief This creates a SignalMonitor instance if one is needed and
+ *         begins signal monitoring.
+ *
+ *   If the channel exists and the cardtype is "DVB" or "HDTV" a 
+ *   SignalMonitor instance is created and SignalMonitor::Start()
+ *   is called to start the signal monitoring thread.
+ */
+void TVRec::SetupSignalMonitor(void)
+{
+    VERBOSE(VB_RECORD, "SetupSignalMonitor()");
+    // if it already exists, there no need to initialize it
+    if (signalMonitor)
+        return;
+
+    // if there is no channel object we can't monitor it
+    if (!channel)
+        return;
+
+    // make sure statics are initialized
+    SignalMonitorValue::Init();
+
+    if (SignalMonitor::IsSupported(cardtype) && channel->Open())
+    {
+#if USING_DVB
+        VERBOSE(VB_RECORD, "SetupSignalMonitor() -- DVB hack begin");
+        //TeardownSIParser();
+        DVBRecorder *rec = dynamic_cast<DVBRecorder*>(recorder);
+        if (rec)
+            rec->Close();
+        VERBOSE(VB_RECORD, "SetupSignalMonitor() -- DVB hack end");
+#endif
+
+        // TODO reset the tuner hardware
+        //channel->SwitchToInput(channel->GetCurrentInputNum(), true);
+
+        signalMonitor =
+            SignalMonitor::Init(cardtype, GetCaptureCardNum(), channel);
+    }
+    
+    if (signalMonitor)
+    {
+        VERBOSE(VB_RECORD, "signal monitor successfully created");
+        // If this is a monitor for Digital TV, initialize table monitors
+        DTVSignalMonitor *dtvMon = dynamic_cast<DTVSignalMonitor*>(signalMonitor);
+        if (dtvMon)
+            setup_table_monitoring(channel, dtvMon, recorder);
+
+        // Start the monitoring thread
+        signalMonitor->Start();
+    }
+}
+
+/** \fn TVRec::TeardownSignalMonitor()
+ *  \brief If a SignalMonitor instance exists, the monitoring thread is
+ *         stopped and the instance is deleted.
+ */
+void TVRec::TeardownSignalMonitor()
+{
+    VERBOSE(VB_RECORD, "TeardownSignalMonitor() -- begin");
+
+    // If this is a DTV signal monitor, save any pids we know about.
+    DTVSignalMonitor *dtvMon = dynamic_cast<DTVSignalMonitor*>(signalMonitor);
+    if (channel && dtvMon)
+    {
+        pid_cache_t pid_cache;
+        GetPidsToCache(dtvMon, pid_cache);
+        if (pid_cache.size())
+            channel->SaveCachedPids(pid_cache);
+    }
+
+#ifdef USING_DVB
+    int progNum = -1;
+    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+    if (dvbc && dtvMon && dtvMon->GetATSCStreamData())
+    {
+        dtvMon->Stop();
+        progNum = dtvMon->GetProgramNumber();
+        delete dtvMon->GetATSCStreamData();
+    }
+#endif // USING_DVB
+
+    if (signalMonitor)
+    {
+        delete signalMonitor;
+        signalMonitor = NULL;
+    }
+
+    if (kState_None == GetState() && channel/* && closeChannel*/)
+        channel->Close();
+
+    // BEGIN HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+#ifdef USING_DVB
+    if ((kState_WatchingLiveTV == GetState()) && dvbc)
+    {
+        VERBOSE(VB_RECORD, "TeardownSignalMonitor() -- "
+                "dvb hack begin progNum("<<progNum<<")");
+        dvbc->SetPMT(NULL);
+        //CreateSIParser(progNum);
+        ((DVBRecorder*)recorder)->Open();
+        VERBOSE(VB_RECORD, "TeardownSignalMonitor() -- dvb hack done");
+    }
+#endif // USING_DVB
+    // END   HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
+
+    VERBOSE(VB_RECORD, "TeardownSignalMonitor() -- end");
+}
+
+/** \fn TVRec::SetSignalMonitoringRate(int,int)
+ *  \brief Sets the signal monitoring rate.
+ *
+ *  This will actually call SetupSignalMonitor() and 
+ *  TeardownSignalMonitor(bool) as needed, so it can
+ *  be used directly, without worrying about the 
+ *  SignalMonitor instance.
+ *
+ *  \sa EncoderLink::SetSignalMonitoringRate(int,bool),
+ *      RemoteEncoder::SetSignalMonitoringRate(int,int)
+ *  \param rate           The update rate to use in milliseconds,
+ *                        use 0 to disable, -1 to leave the same.
+ *  \param notifyFrontend If 1, SIGNAL messages will be sent to
+ *                        the frontend using this recorder, if 0
+ *                        they will not be sent, if -1 then messages
+ *                        will be sent if they were already being
+ *                        sent.
+ *  \return Previous update rate
+ */
+int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
+{
+    VERBOSE(VB_RECORD, "SetSignalMonitoringRate("<<rate<<", "
+            <<notifyFrontend<<")");
+    int oldrate = 0; 
+    if (signalMonitor)
+        oldrate = signalMonitor->GetUpdateRate();
+
+    if (rate == 0)
+    {
+        TeardownSignalMonitor();
+    }
+    else if (rate < 0)
+    {
+        if (signalMonitor && notifyFrontend >= 0)
+            signalMonitor->SetNotifyFrontend(notifyFrontend);
+    }
+    else
+    {
+        SetupSignalMonitor();
+        
+        if (signalMonitor)
+        {
+            signalMonitor->SetUpdateRate(rate);
+            if (notifyFrontend >= 0)
+                signalMonitor->SetNotifyFrontend(notifyFrontend);
+            else if (0 == oldrate)
+                signalMonitor->SetNotifyFrontend(false);
+        }
+        else
+        {
+            // send status to frontend, since this may be used in tuning.
+            // if this is a card capable of signal monitoring, send error
+            // otherwise send an signal lock message.
+            bool useMonitor = "DVB" == cardtype || "HDTV" == cardtype;
+            QStringList slist = useMonitor ?
+                SignalMonitorValue::ERROR_NO_CHANNEL :
+                SignalMonitorValue::SIGNAL_LOCK;
+            
+            MythEvent me(QString("SIGNAL %1").arg(m_capturecardnum), slist);
+            gContext->dispatch(me);
+        }
+    }
+    return oldrate;
+}
+
+/** \fn TVRec::ShouldSwitchToAnotherCard(QString)
+ *  \brief Checks if named channel exists on current tuner, or
+ *         another tuner.
+ *
+ *  \param channelid channel to verify against tuners.
+ *  \return true if the channel on another tuner and not current tuner,
+ *          false otherwise.
+ *  \sa EncoderLink::ShouldSwitchToAnotherCard(const QString&),
+ *      RemoteEncoder::ShouldSwitchToAnotherCard(QString),
+ *      CheckChannel(QString)
+ */
 bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2170,7 +2482,7 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
 }
 
 /** \fn TVRec::SpawnLiveTV()
- *  \brief Tells Spawns a "Live TV" recorder.
+ *  \brief Tells TVRec to spawn a "Live TV" recorder.
  *  \sa EncoderLink::SpawnLiveTV(), RemoteEncoder::SpawnLiveTV()
  */
 void TVRec::SpawnLiveTV(void)
@@ -2190,13 +2502,16 @@ void TVRec::SpawnLiveTV(void)
  */
 void TVRec::StopLiveTV(void)
 {
-    stateChangeLock.lock();
-    nextState = kState_None;
-    changeState = true;
-    stateChangeLock.unlock();
-
-    while (changeState)
-        usleep(50);
+    if (GetState() != kState_None)
+    {
+        stateChangeLock.lock();
+        nextState = kState_None;
+        changeState = true;
+        stateChangeLock.unlock();
+        
+        while (changeState)
+            usleep(50);
+    }
 }
 
 /** \fn TVRec::PauseRecorder()
@@ -2216,21 +2531,23 @@ void TVRec::PauseRecorder(void)
 
 /** \fn TVRec::ToggleInputs(void)
  *  \brief Toggles between inputs on current capture card.
+ *
+ *   You must call PauseRecorder() before calling this.
  */
 void TVRec::ToggleInputs(void)
 {
     QMutexLocker lock(&stateChangeLock);
 
+    Pause();
     if (channel)
-    {
-        Pause();
         channel->ToggleInputs();
-        Unpause();
-    }
+    Unpause();
 }
 
 /** \fn TVRec::ChangeChannel(ChannelChangeDirection)
  *  \brief Changes to a channel in the 'dir' channel change direction.
+ *
+ *   You must call PauseRecorder() before calling this.
  *
  *  \param dir channel change direction \sa ChannelChangeDirection.
  */
@@ -2238,12 +2555,10 @@ void TVRec::ChangeChannel(ChannelChangeDirection dir)
 {
     QMutexLocker lock(&stateChangeLock);
 
+    Pause();
     if (channel)
-    {
-        Pause();
         channel->SetChannelByDirection(dir);
-        Unpause();
-    }
+    Unpause();
 }
 
 /** \fn TVRec::ToggleChannelFavorite()
@@ -2406,23 +2721,26 @@ int TVRec::ChangeHue(bool direction)
 /** \fn TVRec::SetChannel(QString name)
  *  \brief Changes to a named channel on the current tuner.
  *
+ *   You must call PauseRecorder() before calling this.
+ *
  *  \param name channel to change to.
  */
 void TVRec::SetChannel(QString name)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (!channel)
-        return;
-
     Pause();
+    if (channel)
+    {
+        QString chan = name.stripWhiteSpace();
+        QString prevchan = channel->GetCurrentName();
 
-    QString chan = name.stripWhiteSpace();
-    QString prevchan = channel->GetCurrentName();
-
-    if (!channel->SetChannelByString(chan))
-        channel->SetChannelByString(prevchan);
-
+        if (!channel->SetChannelByString(chan))
+        {
+            VERBOSE(VB_IMPORTANT, "SetChannelByString() failed");
+            channel->SetChannelByString(prevchan);
+        }
+    }
     Unpause();
 }
 

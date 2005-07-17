@@ -3065,6 +3065,90 @@ void TV::UpdateOSDInput(void)
         GetOSD()->SetSettingsText(msg, 3);
 }
 
+/** \fn TV::UpdateOSDSignal(const QStringList&)
+ *  \brief Updates Signal portion of OSD...
+ */
+void TV::UpdateOSDSignal(const QStringList& strlist)
+{
+    if (!GetOSD())
+        return;
+
+    SignalMonitorList slist = SignalMonitorValue::Parse(strlist);
+
+    QMap<QString, QString> infoMap;
+    infoMap["name"] = "signalmonitor";
+    infoMap["title"] = "Signal Monitor";
+    int i = 0;
+    SignalMonitorList::const_iterator it;
+    for (it = slist.begin(); it != slist.end(); ++it)
+        if ("error" == it->GetShortName())
+            infoMap[QString("error%1").arg(i++)] = it->GetName();
+    i = 0;
+    for (it = slist.begin(); it != slist.end(); ++it)
+        if ("message" == it->GetShortName())
+            infoMap[QString("message%1").arg(i++)] = it->GetName();
+
+    QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt("");
+    for (it = slist.begin(); it != slist.end(); ++it)
+    {
+        if ("error" != it->GetShortName() && "message" != it->GetShortName())
+        {
+            infoMap[it->GetShortName()] = QString::number(it->GetValue());
+            if ("signal" == it->GetShortName())
+            {
+                int val = it->GetNormalizedValue(0, 100);
+                infoMap["signal"] = QString::number(val);
+            }
+            else if ("seen_pat" == it->GetShortName())
+                pat = it->IsGood() ? "a" : " ";
+            else if ("matching_pat" == it->GetShortName())
+                pat = it->IsGood() ? "A" : pat;
+            else if ("seen_pmt" == it->GetShortName())
+                pmt = it->IsGood() ? "m" : " ";
+            else if ("matching_pmt" == it->GetShortName())
+                pmt = it->IsGood() ? "M" : pmt;
+            else if ("seen_mgt" == it->GetShortName())
+                mgt = it->IsGood() ? "g" : " ";
+            else if ("matching_mgt" == it->GetShortName())
+                mgt = it->IsGood() ? "G" : mgt;
+            else if ("seen_vct" == it->GetShortName())
+                vct = it->IsGood() ? "v" : " ";
+            else if ("matching_vct" == it->GetShortName())
+                vct = it->IsGood() ? "V" : vct;
+            else if ("seen_nit" == it->GetShortName())
+                nit = it->IsGood() ? "n" : " ";
+            else if ("matching_nit" == it->GetShortName())
+                nit = it->IsGood() ? "N" : nit;
+            else if ("seen_sdt" == it->GetShortName())
+                sdt = it->IsGood() ? "s" : " ";
+            else if ("matching_sdt" == it->GetShortName())
+                sdt = it->IsGood() ? "S" : sdt;
+        }
+    }
+
+    QString slock   = ("1" == infoMap["slock"]) ? "L" : "l";
+    bool allGood    = SignalMonitorValue::AllGood(slist);
+    QString sigDesc = QString("Signal %1\% (%2%3%4%5%6%7%8) %9")
+        .arg(infoMap["signal"])
+        .arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct).arg(nit).arg(sdt)
+        .arg(allGood ? tr("Channel Lock") :
+             ((slock=="L") ? tr("Signal Lock") : tr("No Lock")));
+    //GetOSD()->ClearAllText("signal_info");
+    //GetOSD()->SetText("signal_info", infoMap, -1);
+
+    // Channel info
+    GetChannelInfo(activerecorder, infoMap);
+
+    GetOSD()->ClearAllText("channel_number");
+    GetOSD()->SetText("channel_number", infoMap, osd_display_time);
+ 
+    // Use program info to present signal info
+    GetProgramInfo(activenvp, infoMap);
+    infoMap["description"] = sigDesc;
+    GetOSD()->ClearAllText("program_info");
+    GetOSD()->SetText("program_info", infoMap, osd_display_time);
+}
+
 void TV::UpdateLCD(void)
 {
     // Make sure the LCD information gets updated shortly
@@ -3740,6 +3824,16 @@ void TV::customEvent(QCustomEvent *e)
                 nvp->SetBookmark();
             wantsToQuit = true;
             exitPlayer = true;
+        }
+        else if (message.left(6) == "SIGNAL")
+        {
+            int cardnum = (QStringList::split(" ", message))[1].toInt();
+            QStringList signalList = me->ExtraDataList();
+            if (recorder && (recorder->GetRecorderNumber() == cardnum) &&
+                signalList.size() && GetOSD())
+            {
+                UpdateOSDSignal(signalList);
+            }
         }
         else if (message.left(14) == "COMMFLAG_START")
         {

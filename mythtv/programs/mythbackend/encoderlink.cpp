@@ -285,6 +285,30 @@ long long EncoderLink::GetMaxBitrate()
     return -1;
 }
 
+/** \fn EncoderLink::SetSignalMonitoringRate(int,int)
+ *  \brief Sets the signal monitoring rate.
+ *
+ *   May be a local or remote query.
+ *
+ *  \sa TVRec::SetSignalMonitoringRate(int,int),
+ *      RemoteEncoder::SetSignalMonitoringRate(int,int)
+ *  \param rate           Milliseconds between each signal check,
+ *                        0 to disable, -1 to preserve old value.
+ *  \param notifyFrontend If 1 SIGNAL messages are sent to the frontend,
+ *                        if 0 SIGNAL messages will not be sent, and if
+ *                        -1 the old value is preserved.
+ *  \return Old rate if it succeeds, -1 if it fails.
+ */
+int EncoderLink::SetSignalMonitoringRate(int rate, int notifyFrontend)
+{
+    if (local)
+        return tv->SetSignalMonitoringRate(rate, notifyFrontend);
+    else if (sock)
+        return sock->SetSignalMonitoringRate(m_capturecardnum, rate,
+                                             notifyFrontend);
+    return -1;
+}
+
 /** \brief Lock the tuner for exclusive use.
  *  \return -2 if tuner is already locked, GetCardID() if you get the lock.
  * \sa FreeTuner(), IsTunerLocked()
@@ -658,7 +682,7 @@ void EncoderLink::PauseRecorder(void)
  *  \brief Tells TVRec's recorder to change to the next input.
  *         <b>This only works on local recorders.</b>
  *
- *  \sa PauseRecorder()
+ *   You must call PauseRecorder() before calling this.
  */
 void EncoderLink::ToggleInputs(void)
 {
@@ -685,6 +709,7 @@ void EncoderLink::ToggleChannelFavorite(void)
  *  \brief Changes to the next or previous channel.
  *         <b>This only works on local recorders.</b>
  *
+ *   You must call PauseRecorder() before calling this.
  *  \param channeldirection channel change direction \sa BrowseDirections.
  */
 void EncoderLink::ChangeChannel(int channeldirection)
@@ -699,6 +724,7 @@ void EncoderLink::ChangeChannel(int channeldirection)
  *  \brief Changes to a named channel on the current tuner.
  *         <b>This only works on local recorders.</b>
  *
+ *   You must call PauseRecorder() before calling this.
  *  \param name Name of channel to change to.
  */
 void EncoderLink::SetChannel(const QString &name)

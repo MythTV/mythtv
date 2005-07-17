@@ -41,13 +41,13 @@ public:
     void StartRecording(void);
     void Reset(void);
 
+    bool Open();
+    void Close();
+
 public slots:
     void ChannelChanged(dvb_channel_t& chan);
 
 private:
-    bool Open();
-    void Close();
-
     void ReadFromDMX();
     static void ProcessDataPS(unsigned char *buffer, int len, void *priv);
     void LocalProcessDataPS(unsigned char *buffer, int len);

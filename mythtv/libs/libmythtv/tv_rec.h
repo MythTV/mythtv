@@ -130,6 +130,7 @@ class TVRec
     void SetChannel(QString name);
     void Pause(void);
     void Unpause(void);
+    int SetSignalMonitoringRate(int msec, int notifyFrontend = 1);
     int ChangeColour(bool direction);
     int ChangeContrast(bool direction);
     int ChangeBrightness(bool direction);
@@ -193,6 +194,9 @@ class TVRec
     void SetupRecorder(class RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
     
+    void SetupSignalMonitor(void);
+    void TeardownSignalMonitor(void);
+
     void HandleStateChange(void);
     bool StateIsRecording(TVState state);
     bool StateIsPlaying(TVState state);
@@ -208,6 +212,7 @@ class TVRec
     RingBuffer    *rbuffer;
     RecorderBase  *recorder;
     ChannelBase   *channel;
+    SignalMonitor *signalMonitor;
 #ifdef USING_DVB
     SIScan        *scanner;
 #endif

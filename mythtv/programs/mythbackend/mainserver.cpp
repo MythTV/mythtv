@@ -2460,6 +2460,13 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         enc->SetChannel(name);
         retlist << "ok";
     }
+    else if (command == "SET_SIGNAL_MONITORING_RATE")
+    {
+        int rate = slist[2].toInt();
+        int notifyFrontend = slist[3].toInt();
+        int oldrate = enc->SetSignalMonitoringRate(rate, notifyFrontend);
+        retlist << QString::number(oldrate);
+    }
     else if (command == "CHANGE_COLOUR")
     {
         bool up = slist[2].toInt(); 

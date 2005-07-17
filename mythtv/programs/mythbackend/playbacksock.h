@@ -52,6 +52,7 @@ class PlaybackSock
     bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
     int StartRecording(int capturecardnum, const ProgramInfo *pginfo);
     void RecordPending(int capturecardnum, const ProgramInfo *pginfo, int secsleft);
+    int SetSignalMonitoringRate(int capturecardnum, int rate, int notifyFrontend);
 
   private:
     bool SendReceiveStringList(QStringList &strlist);

@@ -194,6 +194,7 @@ class TV : public QObject
     void ToggleOSD(void); 
     void UpdateOSD(void);
     void UpdateOSDInput(void);
+    void UpdateOSDSignal(const QStringList& strlist);
 
     void LoadMenu(void);
 
