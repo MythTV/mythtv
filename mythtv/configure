@@ -555,7 +555,7 @@ if [ -e config.log ] ; then
         if test x"$opt" = x"--prev" -o x"$opt" = x"--previous" ; then
             if test x"$PCONF" != "--prev" ; then
                 echo "Options: $PCONF"
-                ./configure "$PCONF"
+                ./configure $PCONF
                 exit
             fi
         fi
