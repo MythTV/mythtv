@@ -2,18 +2,21 @@
 #include <stdio.h>
 #include <qmutex.h>
 #include "siscan.h"
-#include "dvbchannel.h"
-#include "siparser.h"
-#include "dvbtypes.h"
 #include "libmythtv/scheduledrecording.h"
 #include "frequencies.h"
 #include "mythdbcon.h"
 
+#ifdef USING_DVB
+#include "dvbchannel.h"
+#include "siparser.h"
+#include "dvbtypes.h"
+#endif
 
 #define CHECKNIT_TIMER 5000
 #define DVBTSCAN_TIMEOUT 40000
 //#define SISCAN_DEBUG
 
+#ifdef USING_DVB
 struct FrequencyTableOld
 {
     int frequencyStart;                 //The staring centre frequency
@@ -109,6 +112,7 @@ FrequencyTableOld frequenciesATSC_C[]=
    {10000000,52000000,6000000,"QAM Channel T-%1",7,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_256,0,0},
    {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
 };
+#endif // USING_DVB
 
 SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
 {
@@ -131,17 +135,19 @@ SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
 
     pthread_mutex_init(&events_lock, NULL);
 
+#ifdef USING_DVB
     /* Signals to process tables and do database inserts */
     connect(chan->siparser,SIGNAL(FindTransportsComplete()),this,SLOT(TransportTableComplete()));
     connect(chan->siparser,SIGNAL(FindServicesComplete()),this,SLOT(ServiceTableComplete()));
     connect(chan->siparser,SIGNAL(EventsReady(QMap_Events*)),this,SLOT(EventsReady(QMap_Events*)));
+#endif // USING_DVB
 }
 
 SIScan::~SIScan()
 {
     while(scannerRunning)
        usleep(50);
-    SIPARSER("SIScanner Stopped");
+    SISCAN("SIScanner Stopped");
 
     pthread_mutex_destroy(&events_lock);
 }
@@ -154,7 +160,11 @@ void SIScan::SetSourceID(int _SourceID)
 
 bool SIScan::ScanTransports()
 {
+#ifdef USING_DVB
     return chan->siparser->FindTransports();
+#else
+    return false;
+#endif // USING_DVB
 }
 
 bool SIScan::ScanServicesSourceID(int SourceID)
@@ -204,13 +214,21 @@ bool SIScan::ScanServices(int TransportID)
 {
     (void) TransportID;
     // Requests the SDT table for the current transport from sections
+#ifdef USING_DVB
     return chan->siparser->FindServices();
+#else
+    return false;
+#endif // USING_DVB
 }
 
 int SIScan::CreateMultiplex(const fe_type_t cardType,
                             const TransportScanItem& a, 
                             const DVBTuning& tuning)
 {
+    (void) cardType;
+    (void) a;
+    (void) tuning;
+#ifdef USING_DVB
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT into dtv_multiplex (frequency, "
                    "sistandard, sourceid,inversion,bandwidth,hp_code_rate,lp_code_rate,constellation,transmission_mode,guard_interval,hierarchy,modulation) "
@@ -267,11 +285,14 @@ int SIScan::CreateMultiplex(const fe_type_t cardType,
         transport = query.value(0).toInt();
     }
     return transport;
+#else
+    return -1;
+#endif // USING_DVB
 }
  
 void SIScan::StartScanner()
 {
-    SIPARSER("Starting SIScanner");
+    SISCAN("Starting SIScanner");
     scannerRunning = true;
     threadExit = false;
 
@@ -291,6 +312,7 @@ void SIScan::StartScanner()
 
         if (serviceListReady)
         {
+#ifdef USING_DVB
             if (chan->siparser->GetServiceObject(SDT))
             {
                 SISCAN("Updating Services");
@@ -299,6 +321,7 @@ void SIScan::StartScanner()
                 SISCAN("Service Update Complete");
                 emit ServiceScanUpdateText("Finished processing Transport");
             }
+#endif // USING_DVB
             serviceListReady = false;
             if (scanMode == TRANSPORT_LIST)
             {
@@ -315,6 +338,7 @@ void SIScan::StartScanner()
         }
         if (transportListReady)
         {
+#ifdef USING_DVB
             if (chan->siparser->GetTransportObject(NIT))
             {
                 emit TransportScanUpdateText("Processing Transport List");
@@ -325,11 +349,13 @@ void SIScan::StartScanner()
                 emit TransportScanUpdateText("Finished processing Transport List");
             }
             transportListReady = false;
+#endif // USING_DVB
             emit TransportScanComplete();
         }
 
         if (scanMode == TRANSPORT_LIST)
         {
+#ifdef USING_DVB
             if ((!sourceIDTransportTuned) || ((ScanTimeout > 0) && (timer.elapsed() > ScanTimeout)))
             {
                 QValueList<TransportScanItem>::Iterator i;
@@ -377,7 +403,7 @@ void SIScan::StartScanner()
                         }
                         else 
                             result = chan->SetTransportByInt((*i).mplexid);
-        
+
                         if (!result)
                         {
                             int pct = ((transportsToScan-transportsCount)*100)/transportsToScan;
@@ -410,6 +436,7 @@ void SIScan::StartScanner()
                     }
                 }
             }
+#endif // USING_DVB
         }
     }
     scannerRunning = false;
@@ -418,16 +445,19 @@ void SIScan::StartScanner()
 void SIScan::StopScanner()
 {
     threadExit = true;
+#ifdef USING_DVB
     /* Force dvbchannel to exit */
     chan->StopTuning();
-    SIPARSER("Stopping SIScanner");
+    SISCAN("Stopping SIScanner");
     while (scannerRunning)
        usleep(50);
-
+#endif // USING_DVB
 }
 
 void SIScan::verifyTransport(TransportScanItem& t)
 {
+    (void) t;
+#ifdef USING_DVB
     MSqlQuery query(MSqlQuery::InitCon());
     /* See if mplexid is already in the database */
     QString theQuery = QString("select mplexid from dtv_multiplex where "
@@ -485,6 +515,7 @@ void SIScan::verifyTransport(TransportScanItem& t)
     }
 
     t.mplexid = -1;
+#endif // USING_DVB
 }
 
 bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
@@ -548,10 +579,11 @@ bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
 #endif
 }
 
-
-
-bool SIScan::DVBTScanTransport(int SourceID,unsigned country)
+bool SIScan::DVBTScanTransport(int SourceID, unsigned country)
 {
+    (void) SourceID;
+    (void) country;
+#ifdef USING_DVB
     if (scanMode == TRANSPORT_LIST)
         return false;
 
@@ -597,11 +629,14 @@ bool SIScan::DVBTScanTransport(int SourceID,unsigned country)
     ScanTimeout = DVBTSCAN_TIMEOUT;
     sourceIDTransportTuned = false;
     scanMode = TRANSPORT_LIST;    
+#endif // USING_DVB
     return true;
 }
 
 void SIScan::EventsReady(QMap_Events* EventList)
 {
+    (void) EventList;
+#ifdef USING_DVB
     // Extra check since adding events to the DB is SLOW..
     if (threadExit)
         return;
@@ -613,6 +648,7 @@ void SIScan::EventsReady(QMap_Events* EventList)
     eventsReady = true;
     Events.append(events);
     pthread_mutex_unlock(&events_lock);
+#endif // USING_DVB
 }
 
 void SIScan::ServiceTableComplete()
@@ -627,6 +663,8 @@ void SIScan::TransportTableComplete()
 
 void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
 {
+    (void) SDT;
+#ifdef USING_DVB
     /* This will be fixed post .17 to be more elegant */
     int localSourceID = -1;
 
@@ -879,10 +917,13 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                 emit ServiceScanUpdateText(status);
             }
     }
+#endif // USING_DVB
 }
 
 void SIScan::CheckNIT(NITObject& NIT)
 {
+    (void) NIT;
+#ifdef USING_DVB
     dvb_channel_t chan_opts;
     QValueList<TransportObject>::Iterator t;
     for (t = NIT.Transport.begin() ; t != NIT.Transport.end() ; ++t )
@@ -950,10 +991,13 @@ void SIScan::CheckNIT(NITObject& NIT)
             }
         }
     }
+#endif // USING_DVB
 }
 
 void SIScan::UpdateTransportsInDB(NITObject NIT)
 {
+    (void) NIT;
+#ifdef USING_DVB
     QValueList<NetworkObject>::Iterator n;
     QValueList<TransportObject>::Iterator t;
 
@@ -1040,10 +1084,15 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                    .arg((*t).NetworkID));
         }
     }
+#endif // USING_DVB
 }
 
-int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId)
+int SIScan::GetDVBTID(uint16_t NetworkID, uint16_t TransportID, int CurrentMplexId)
 {
+    (void) NetworkID;
+    (void) TransportID;
+    (void) CurrentMplexId;
+#ifdef USING_DVB
 
 #ifdef SISCAN_DEBUG
     printf("Request for Networkid/Transportid %d %d\n",NetworkID,TransportID);
@@ -1173,12 +1222,13 @@ int SIScan::GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexId
     int retval = query.value(0).toInt();
 
     return retval;
-
+#else // USING_DVB
+    return -1;
+#endif // USING_DVB
 }
 
 int SIScan::GenerateNewChanID(int sourceID)
 {
-
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString theQuery =
@@ -1204,11 +1254,11 @@ int SIScan::GenerateNewChanID(int sourceID)
         return sourceID * 1000;
     else
         return MaxChanID + 1;
-
 }
 
 void SIScan::AddEvents()
 {
+#ifdef USING_DVB
     MSqlQuery query(MSqlQuery::InitCon());
     MSqlQuery query2(MSqlQuery::InitCon());
     QString theQuery;
@@ -1401,4 +1451,5 @@ void SIScan::AddEvents()
         pthread_mutex_lock(&events_lock);
     }
     pthread_mutex_unlock(&events_lock);
+#endif // USING_DVB
 }

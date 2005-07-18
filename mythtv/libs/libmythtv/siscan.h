@@ -1,13 +1,34 @@
-
+// -*- Mode: c++ -*-
 #include <qobject.h>
 #include <qstring.h>
+#include <qmap.h>
+#include <qvaluelist.h>
+#include <qdatetime.h>
+
+#include "frequencytables.h"
+
+#ifdef USING_DVB
 #include "dvbchannel.h"
 #include "sitypes.h"
 #include "dvbtypes.h"
-#include "frequencytables.h"
-
 typedef QValueList<Event> QList_Events;
 typedef QValueList<QList_Events*> QListList_Events;
+#define SISCAN(args...) \
+    VERBOSE(VB_SIPARSER, QString("SIScan(%1): ").arg(chan->GetDevice()) << args);
+#else
+typedef unsigned short uint16_t;
+typedef QMap<uint16_t, void*> QMap_Events;
+typedef QMap<uint16_t, void*> QMap_SDTObject;
+typedef QValueList<void*> QList_Events;
+typedef QValueList<QList_Events> QListList_Events;
+typedef void* DVBChannel;
+typedef void* DVBTuning;
+typedef int fe_type_t;
+typedef void* NITObject;
+typedef void* NIT;
+#define SISCAN(args...) \
+    VERBOSE(VB_SIPARSER, QString("SIScan: ") << args);
+#endif // USING_DVB
 
 typedef enum { IDLE, TRANSPORT_LIST, EIT_CRAWL } SCANMODE;
 
@@ -95,6 +116,3 @@ private:
     SCANMODE scanMode;
     pthread_mutex_t events_lock;
 };
-
-#define SISCAN(args...) \
-    VERBOSE(VB_SIPARSER, QString("SIScan#%1: ").arg(chan->GetCardNum()) << args);

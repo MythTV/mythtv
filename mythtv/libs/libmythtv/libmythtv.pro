@@ -187,9 +187,9 @@ using_backend {
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
-    HEADERS += frequencytables.h
+    HEADERS += siscan.h                    frequencytables.h
     SOURCES += scanwizard.cpp              scanwizardhelpers.cpp
-    SOURCES += frequencytables.cpp
+    SOURCES += siscan.cpp                  frequencytables.cpp
 
     # TVRec & Recorder base classes
     HEADERS += tv_rec.h
@@ -260,10 +260,8 @@ using_backend {
         # Channel stuff
         HEADERS += dvbchannel.h           dvbsignalmonitor.h
         HEADERS += dvbdiseqc.h            dvbcam.h
-        HEADERS += siscan.h
         SOURCES += dvbchannel.cpp         dvbsignalmonitor.cpp
         SOURCES += dvbdiseqc.cpp          dvbcam.cpp
-        SOURCES += siscan.cpp
 
         # DVB Recorder
         HEADERS += dvbrecorder.h
