@@ -401,6 +401,35 @@ void RemoteEncoder::SetChannel(QString channel)
     lastchannel = "";
 }
 
+/** \fn RemoteEncoder::SetSignalMonitoringRate(int,int)
+ *  \brief Sets the signal monitoring rate.
+ *
+ *  This will actually call SetupSignalMonitor() and 
+ *  TeardownSignalMonitor(bool) as needed, so it can
+ *  be used directly, without worrying about the 
+ *  SignalMonitor instance.
+ *
+ *  \sa TVRec::RemoteEncoder::SetSignalMonitoringRate(int,int),
+ *      EncoderLink::SetSignalMonitoringRate(int,bool)
+ *  \param rate           The update rate to use in milliseconds,
+ *                        use 0 to disable.
+ *  \param notifyFrontend If true, SIGNAL messages will be sent to
+ *                        the frontend using this recorder.
+ *  \return Previous update rate
+ */
+int RemoteEncoder::SetSignalMonitoringRate(int msec, bool notifyFrontend)
+{
+    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
+    strlist << "SET_SIGNAL_MONITORING_RATE";
+    strlist << QString::number(msec);
+    strlist << QString::number((int)notifyFrontend);
+
+    SendReceiveStringList(strlist);
+  
+    int retval = strlist[0].toInt();
+    return retval;
+}
+
 /** \fn RemoteEncoder::ChangeContrast(bool)
  *  \brief Changes contrast of a recording.
  *

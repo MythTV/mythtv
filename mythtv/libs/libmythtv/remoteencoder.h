@@ -48,6 +48,7 @@ class RemoteEncoder
     void ChangeDeinterlacer(int deint_mode);
     void ToggleChannelFavorite(void);
     void SetChannel(QString channel);
+    int SetSignalMonitoringRate(int msec, bool notifyFrontend = true);
     bool CheckChannel(QString channel);
     bool ShouldSwitchToAnotherCard(QString channelid);
     bool CheckChannelPrefix(QString channel, bool &unique);
