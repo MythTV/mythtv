@@ -32,4 +32,8 @@ void ScanStreamData::Reset()
 {
     ATSCStreamData::Reset(-1,-1);
     DVBStreamData::Reset();
+
+    AddListeningPID(MPEG_PAT_PID);
+    AddListeningPID(ATSC_PSIP_PID);
+    AddListeningPID(DVB_NIT_PID);
 }

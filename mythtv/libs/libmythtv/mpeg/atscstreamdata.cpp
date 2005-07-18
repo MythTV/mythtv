@@ -70,6 +70,8 @@ void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)
 
         _cache_lock.unlock();
     }
+
+    AddListeningPID(ATSC_PSIP_PID);
 }
 
 /** \fn ATSCStreamData::IsRedundant(const PSIPTable&) const

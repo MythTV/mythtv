@@ -49,13 +49,9 @@ void MPEGStreamData::Reset(int desiredProgram)
     _partial_pes_packet_cache.clear();
 
     _pids_listening.clear();
-    
-    AddListeningPID(MPEG_PAT_PID);
-    AddListeningPID(ATSC_PSIP_PID);
-
     _pids_notlistening.clear();
     _pids_writing.clear();
-    
+
     _pid_video_single_program = _pid_pmt_single_program = 0xffffffff;
     _pmt_version.clear();
 
@@ -72,6 +68,8 @@ void MPEGStreamData::Reset(int desiredProgram)
 
         _cache_lock.unlock();
     }
+
+    AddListeningPID(MPEG_PAT_PID);
 }
 
 void MPEGStreamData::DeletePartialPES(uint pid)
