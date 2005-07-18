@@ -6,7 +6,7 @@
  */
 QString StateToString(TVState state)
 {
-    QString statestr = "Unknown";
+    QString statestr = QString("Unknown(%1)").arg((int)state);
     switch (state) {
         case kState_Error: statestr = "Error"; break;
         case kState_None: statestr = "None"; break;
