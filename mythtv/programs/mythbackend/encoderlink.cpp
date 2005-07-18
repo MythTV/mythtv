@@ -351,7 +351,7 @@ bool EncoderLink::HasEnoughFreeSpace(const ProgramInfo *rec, bool try_to_use_cac
         return false;
 
     // if auto expire is enabled, the space will be freed just in time...
-    if (gContext->GetNumSetting("AutoExpireEnabled", 1))
+    if (gContext->GetNumSetting("AutoExpireMethod", 1))
         return true;
 
     // if we can't determine the free space, assume it's just an fstat problem.

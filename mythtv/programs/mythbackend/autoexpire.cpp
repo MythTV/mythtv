@@ -93,7 +93,7 @@ void AutoExpire::CalcParams(vector<EncoderLink*> recs)
 {
     DBG_CALC_PARAM("CalcParams() -- begin");
     QString recordFilePrefix = gContext->GetSetting("RecordFilePrefix");
-    bool disableAutoExpire = !(gContext->GetNumSetting("AutoExpireEnabled", 1));
+    bool disableAutoExpire = !(gContext->GetNumSetting("AutoExpireMethod", 1));
 
     DBG_CALC_PARAM("CalcParams() -- A recs.size():"<<recs.size());
 
@@ -461,7 +461,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
  */
 void AutoExpire::FillExpireList(void)
 {
-    int expMethod = gContext->GetNumSetting("AutoExpireMethod", 0);
+    int expMethod = gContext->GetNumSetting("AutoExpireMethod", 1);
 
     ClearExpireList();
 

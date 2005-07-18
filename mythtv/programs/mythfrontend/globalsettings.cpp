@@ -495,16 +495,6 @@ static HostSpinBox *CommNotifyAmount()
     return gs;
 }
 
-static GlobalCheckBox *AutoExpireEnabled()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireEnabled");
-    bc->setLabel(QObject::tr("Auto Expire Enabled"));
-    bc->setValue(true);
-    bc->setHelpText(QObject::tr("When enabled, old programs will be "
-                                "deleted to make space for new ones."));
-    return bc;
-}
-
 static GlobalSpinBox *AutoExpireExtraSpace()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireExtraSpace", 0, 200, 1);
@@ -514,26 +504,27 @@ static GlobalSpinBox *AutoExpireExtraSpace()
                         "file system beyond what MythTV requires. "
                         "This is useful if you use the recording file system "
                         "for data other than MythTV recordings."));
-    bs->setValue(0);
+    bs->setValue(1);
     return bs;
 };
 
-#if 0
 static GlobalComboBox *AutoExpireMethod()
 {
     GlobalComboBox *bc = new GlobalComboBox("AutoExpireMethod");
     bc->setLabel(QObject::tr("Auto Expire Method"));
+    bc->addSelection(QObject::tr("None"), "0");
     bc->addSelection(QObject::tr("Oldest Show First"), "1");
     bc->setHelpText(QObject::tr("Method used to determine which recorded "
-                    "shows to AutoExpire first."));
+                                "shows to delete first. Set to 'None' to "
+                                "disable Auto Expire (not recommended)."));
+    bc->setValue(1);
     return bc;
 }
-#endif
 
 static GlobalCheckBox *AutoExpireDefault()
 {
     GlobalCheckBox *bc = new GlobalCheckBox("AutoExpireDefault");
-    bc->setLabel(QObject::tr("Auto-Expire Default"));
+    bc->setLabel(QObject::tr("Auto Expire Default"));
     bc->setValue(true);
     bc->setHelpText(QObject::tr("When enabled, any newly recorded programs "
                     "will be marked as eligible for Auto-Expiration. "
@@ -3018,7 +3009,7 @@ GeneralSettings::GeneralSettings()
     general->addChild(LongChannelFormat());
     general->addChild(SmartChannelChange());
     general->addChild(LastFreeCard());
-    general->addChild(AutoExpireEnabled());
+    general->addChild(AutoExpireMethod());
     general->addChild(AutoExpireDefault());
     addChild(general);
 
