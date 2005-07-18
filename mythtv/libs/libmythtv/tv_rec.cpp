@@ -680,10 +680,11 @@ void TVRec::HandleStateChange(void)
             }
 
             // This is required to trigger a re-tune w/DVB on demand
+#ifdef USING_DVB
             DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
             if (dvbc && dvb_options.dvb_on_demand && dvbc->Open())
                 dvbc->SetChannelByString(dvbc->GetCurrentName());
-
+#endif // USING_DVB
             pthread_create(&recorder_thread, NULL, RecorderThread, recorder);
 
             while (!recorder->IsRecording() && !recorder->IsErrored())
