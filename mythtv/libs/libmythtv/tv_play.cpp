@@ -4721,7 +4721,7 @@ void TV::PauseLiveTV(void)
  */
 void TV::UnpauseLiveTV(void)
 {
-    VERBOSE(VB_IMPORTANT, "UnpauseLiveTV()");
+    VERBOSE(VB_PLAYBACK, "UnpauseLiveTV()");
 
     if (activenvp)
     {
