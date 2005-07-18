@@ -1,4 +1,5 @@
 #include <qapplication.h>
+#include <qpushbutton.h>
 #include <stdlib.h>
 #include <iostream>
 using namespace std;
@@ -10,71 +11,6 @@ using namespace std;
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
-
-/**************************************************************************
-    GameTreeRoot - helper class holding tree root details
- **************************************************************************/
-
-class GameTreeRoot
-{
-  public:
-    GameTreeRoot(const QString& levels, const QString& filter)
-      : m_levels(QStringList::split(" ", levels))
-      , m_filter(filter)
-    {
-    }
-
-    ~GameTreeRoot()
-    {
-    }
-
-    unsigned getDepth() const                   { return m_levels.size(); }
-    const QString& getLevel(unsigned i) const   { return m_levels[i]; }
-    const QString& getFilter() const            { return m_filter; }
-
-  private:
-    QStringList m_levels;
-    QString m_filter;
-};
-
-/**************************************************************************
-    GameTreeItem - helper class supplying data and methods to each node
- **************************************************************************/
-
-class GameTreeItem
-{
-  public:
-    GameTreeItem(GameTreeRoot* root)
-      : m_root(root)
-      , m_romInfo(0)
-      , m_depth(0)
-      , m_isFilled(false)
-    {
-    }
-
-    ~GameTreeItem()
-    {
-        if (m_romInfo)
-            delete m_romInfo;
-    }
-
-    bool isFilled() const             { return m_isFilled; }
-    bool isLeaf() const               { return m_depth == m_root->getDepth(); }
-
-    const QString& getLevel() const   { return m_root->getLevel(m_depth - 1); }
-    RomInfo* getRomInfo() const       { return m_romInfo; }
-    QString getFillSql() const;
-
-    void setFilled(bool isFilled)     { m_isFilled = isFilled; }
-
-    GameTreeItem* createChild(const QSqlQuery& query) const;
-
-  private:
-    GameTreeRoot* m_root;
-    RomInfo* m_romInfo;
-    unsigned m_depth;
-    bool m_isFilled;
-};
 
 QString GameTreeItem::getFillSql() const
 {
@@ -118,7 +54,10 @@ QString GameTreeItem::getFillSql() const
         {
             filter += conj + "trim(gamename)='" + m_romInfo->Gamename() + "'";
         }
+
     }
+
+    filter += conj + " display = 1 ";
 
     QString sql = "select distinct "
                 + columns
@@ -131,22 +70,22 @@ QString GameTreeItem::getFillSql() const
     return sql;
 }
 
-GameTreeItem* GameTreeItem::createChild(const QSqlQuery& query) const
+GameTreeItem* GameTreeItem::createChild(QSqlQuery *query) const
 {
     GameTreeItem *childItem = new GameTreeItem(m_root);
     childItem->m_depth = m_depth + 1;
 
-    QString current = query.value(0).toString().stripWhiteSpace();
+    QString current = query->value(0).toString().stripWhiteSpace();
     if (childItem->isLeaf())
     {
         RomInfo temp;
-        temp.setSystem(query.value(1).toString().stripWhiteSpace());
+        temp.setSystem(query->value(1).toString().stripWhiteSpace());
         childItem->m_romInfo = GameHandler::CreateRomInfo(&temp);
 
         childItem->m_romInfo->setSystem(temp.System());
-        childItem->m_romInfo->setYear(query.value(2).toInt());
-        childItem->m_romInfo->setGenre(query.value(3).toString().stripWhiteSpace());
-        childItem->m_romInfo->setGamename(query.value(4).toString().stripWhiteSpace());
+        childItem->m_romInfo->setYear(query->value(2).toInt());
+        childItem->m_romInfo->setGenre(query->value(3).toString().stripWhiteSpace());
+        childItem->m_romInfo->setGamename(query->value(4).toString().stripWhiteSpace());
     }
     else
     {
@@ -179,8 +118,8 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
 
     // The call to GameHandler::count() fills the handler list for us
     // to move through.
-
     unsigned handlercount = GameHandler::count();
+
     for (unsigned i = 0; i < handlercount; ++i)
     {
         QString system = GameHandler::getHandler(i)->SystemName();
@@ -206,10 +145,12 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     m_gameTreeItems.push_back(new GameTreeItem(root));
     node = m_gameTree->addNode(tr("All Games"), m_gameTreeItems.size(), false);
 
-    root = new GameTreeRoot("system gamename", systemFilter);
+    levels = gContext->GetSetting("GameFavTreeLevels");
+    root = new GameTreeRoot(levels, systemFilter + " and favorite=1");
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("-   By System"), m_gameTreeItems.size(), false);
+    node = m_gameTree->addNode(tr("Favourites"), m_gameTreeItems.size(), false);
+    m_favouriteNode = node;
 
     root = new GameTreeRoot("gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
@@ -225,13 +166,6 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
     node = m_gameTree->addNode(tr("-   By Genre"), m_gameTreeItems.size(), false);
-
-    levels = gContext->GetSetting("GameFavTreeLevels");
-    root = new GameTreeRoot(levels, systemFilter + " and favorite=1");
-    m_gameTreeRoots.push_back(root);
-    m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("Favourites"), m_gameTreeItems.size(), false);
-    m_favouriteNode = node;
 
     m_gameTreeUI->assignTreeData(m_gameTree);
     m_gameTreeUI->enter();
@@ -267,9 +201,11 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
 
     if (romInfo)
     {
-        romInfo->fillData();
+        if (item->isLeaf() && romInfo->Romname().isEmpty())
+            romInfo->fillData();
+
         m_gameTitle->SetText(romInfo->Gamename());
-        m_gameSystem->SetText(romInfo->System());
+        m_gameSystem->SetText(romInfo->AllSystems());
         m_gameYear->SetText(QString::number(romInfo->Year()));
         m_gameGenre->SetText(romInfo->Genre());
 
@@ -279,6 +215,10 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
                 m_gameFavourite->SetText("Yes");
             else
                 m_gameFavourite->SetText("No");
+
+            if (romInfo->DiskCount())
+            {
+            }
 
             if (romInfo->ImagePath()) 
             {
@@ -291,12 +231,24 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
     {   // Otherwise use some defaults.
         m_gameImage->SetImage("");
         m_gameTitle->SetText("");
-        m_gameSystem->SetText("");
+        m_gameSystem->SetText("Unknown");
         m_gameYear->SetText("0");
         m_gameGenre->SetText("Unknown");
         m_gameFavourite->SetText("");
     }
 
+}
+
+QString getElement(QStringList list, int pos)
+{
+    int curpos = 0;
+
+    for ( QStringList::Iterator it = list.begin(); it != list.end(); ++it ) {
+        if (curpos == pos)
+            return *it;
+        curpos++;
+    }
+    return NULL;
 }
 
 void GameTree::handleTreeListSelection(int nodeInt, IntVector *)
@@ -307,11 +259,66 @@ void GameTree::handleTreeListSelection(int nodeInt, IntVector *)
 
         if (item->isLeaf())
         {
-            GameHandler::Launchgame(item->getRomInfo());
+            if (item->getRomInfo()->RomCount() == 1)
+                GameHandler::Launchgame(item->getRomInfo(),NULL);
+            else 
+            {
+                QStringList players = QStringList::split(",", item->getRomInfo()->AllSystems());
+                players += "Cancel";
+
+                int val = MythPopupBox::showButtonPopup(gContext->GetMainWindow(), "", tr("Players Available. \n\n Please pick one."), players,0);
+
+                if (val != -1) {
+                    QString systemname = getElement(players,val);
+                    if (systemname)
+                        GameHandler::Launchgame(item->getRomInfo(), systemname);
+                }
+            }
             raise();
             setActiveWindow();
         }
     }
+}
+
+void GameTree::showInfo(void)
+{
+    GenericTree *curNode = m_gameTreeUI->getCurrentNode();
+    int i = curNode->getInt();
+    GameTreeItem *curItem = i ? m_gameTreeItems[i - 1] : 0;
+
+    if (curItem->isLeaf())
+        curItem->showGameInfo(curItem->getRomInfo());
+}
+
+void GameTreeItem::showGameInfo(RomInfo *rom) 
+{
+    if (info_popup) 
+        return;
+
+    info_popup = new MythPopupBox(gContext->GetMainWindow(), "info_popup");
+
+    info_popup->addLabel(QObject::tr("Rom Information\n"));
+    info_popup->addLabel(QString("Rom : %1").arg(rom->Romname()));
+    info_popup->addLabel(QString("CRC : %1").arg(rom->CRC_VALUE()));
+    info_popup->addLabel(QString("Path: %1").arg(rom->Rompath()));
+    info_popup->addLabel(QString("Type: %1").arg(rom->GameType()));
+    info_popup->addLabel(QString("Player(s): %1").arg(rom->AllSystems())); 
+
+    OKButton = info_popup->addButton(QString("OK"), this,
+                              SLOT(closeGameInfo()));
+    OKButton->setFocus();
+
+    info_popup->ShowPopup(this,SLOT(closeGameInfo()));
+}
+
+void GameTreeItem::closeGameInfo(void)
+{
+    if (!info_popup)
+        return;
+
+    info_popup->hide();
+    delete info_popup;
+    info_popup = NULL;
 }
 
 void GameTree::keyPressEvent(QKeyEvent *e)
@@ -327,6 +334,8 @@ void GameTree::keyPressEvent(QKeyEvent *e)
 
         if (action == "SELECT")
             m_gameTreeUI->select();
+        else if (action == "MENU" || action == "INFO")
+            showInfo();
         else if (action == "UP")
             m_gameTreeUI->moveUp();
         else if (action == "DOWN")
@@ -402,7 +411,7 @@ void GameTree::fillNode(GenericTree *node)
     {
         while (query.next())
         {
-            GameTreeItem *childItem = curItem->createChild(query);
+            GameTreeItem *childItem = curItem->createChild(&query);
             m_gameTreeItems.push_back(childItem);
             node->addNode(query.value(0).toString().stripWhiteSpace(),
                               m_gameTreeItems.size(), childItem->isLeaf());

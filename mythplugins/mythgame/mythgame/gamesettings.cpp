@@ -28,12 +28,12 @@ static HostLineEdit *GameAllTreeLevels()
 {
     HostLineEdit *gc = new HostLineEdit("GameAllTreeLevels");
     gc->setLabel(QObject::tr("Game display order"));
-    gc->setValue("system year genre gamename");
+    gc->setValue("system gamename");
     gc->setHelpText(QObject::tr("Order in which to sort the games "
                     "- this is for all systems. Available choices: "
                     "system, year, genre and gamename"));
     return gc;
-};
+}
 
 static HostLineEdit *GameFavTreeLevels()
 {
@@ -45,8 +45,30 @@ static HostLineEdit *GameFavTreeLevels()
                     "- this is for all systems. Available choices: "
                     "system, year, genre and gamename"));
     return gc;
-};
+}
 
+static GlobalCheckBox *GameDeepScan()
+{   
+    GlobalCheckBox *gc = new GlobalCheckBox("GameDeepScan");
+    gc->setLabel(QObject::tr("Indepth Game Scan"));
+    gc->setHelpText(QObject::tr("Enabling this causes a game scan to gather crc values and attempt to find out more"
+                    " detailed information about the game: NOTE this can greatly increase the time a gamescan takes"
+                    " based on the amount of games scanned."));
+    return gc;
+}   
+
+MythGameGeneralSettings::MythGameGeneralSettings()
+{
+    VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
+    general->setLabel(QObject::tr("MythGame Settings -- General"));
+    general->addChild(GameAllTreeLevels());
+    general->addChild(GameFavTreeLevels());
+    general->addChild(GameDeepScan());
+    addChild(general);
+
+}
+
+// Player Settings
 QString MGSetting::whereClause(void) {
     return QString("gameplayerid = %1").arg(parent.getGamePlayerID());
 }
@@ -58,17 +80,6 @@ QString MGSetting::setClause(void) {
         .arg(getValue());
 }
 
-MythGameGeneralSettings::MythGameGeneralSettings()
-{
-    VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
-    general->setLabel(QObject::tr("MythGame Settings -- General"));
-    general->addChild(GameAllTreeLevels());
-    general->addChild(GameFavTreeLevels());
-    addChild(general);
-
-}
-
-// Player Settings
 class AllowMultipleRoms: virtual public MGSetting, virtual public CheckBoxSetting {
 public:
     AllowMultipleRoms(const MythGamePlayerSettings& parent):

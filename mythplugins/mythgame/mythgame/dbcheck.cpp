@@ -10,7 +10,7 @@ using namespace std;
 
 #include "gamesettings.h"
 
-const QString currentDatabaseVersion = "1006";
+const QString currentDatabaseVersion = "1007";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -1063,7 +1063,8 @@ static void InitializeDatabase(void)
 void UpgradeGameDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("GameDBSchemaVer");
-    
+    MSqlQuery query(MSqlQuery::InitCon());
+   
     if (dbver == currentDatabaseVersion)
         return;
 
@@ -1159,6 +1160,23 @@ QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gam
 };
         performActualUpdate(updates, "1006", dbver);
     }
+
+    if (dbver == "1006")
+    {   
+        
+        if (gContext->GetSetting("GameAllTreeLevels"))
+            query.exec("UPDATE settings SET data = 'system gamename' WHERE value = 'GameAllTreeLevels'; ");
+
+        QString updates[] = {
+"ALTER TABLE gamemetadata ADD COLUMN country varchar(128) NOT NULL default ''; ",
+"ALTER TABLE gamemetadata ADD COLUMN crc_value varchar(64) NOT NULL default ''; ",
+"ALTER TABLE gamemetadata ADD COLUMN display tinyint(1) NOT NULL default 1; ",
+""
+};
+
+        performActualUpdate(updates, "1007", dbver);
+    }
+
 
 
 }

@@ -6,6 +6,7 @@
 
 #include "rominfo.h"
 #include <mythtv/mythdbcon.h>
+#include <mythtv/mythdialogs.h>
 
 class MythMainWindow;
 class GameHandler;
@@ -22,25 +23,26 @@ class GameHandler
     static GameHandler* newHandler(QString name);
     static uint count(void);
 
-    static void GetMetadata(GameHandler *handler, QString GameName, 
-                             QString *Genre, int *Year);
+    static void GetMetadata(GameHandler *handler, QString rom, 
+                             QString* Genre, int* Year, QString* Country,
+                             QString* CRC32);
 
     static bool validRom(QString RomName,GameHandler *handler);
-    static void buildFileList(QString directory,
-                                GameHandler *handler, MSqlQuery *query);
+    static int buildFileCount(QString directory, GameHandler *handler);
+    static void buildFileList(QString directory, GameHandler *handler, 
+                              MSqlQuery *query, MythProgressDialog *pdial, 
+                              int indepth, int filecount);
 
     static void processGames(GameHandler *);
     static void processAllGames(void);
     static void registerHandler(GameHandler *);
-    static void Launchgame(RomInfo *romdata);
+    static void Launchgame(RomInfo *romdata, QString systemname);
     static void EditSettings(RomInfo *romdata);
     static void EditSystemSettings(RomInfo *romdata);
     static RomInfo* CreateRomInfo(RomInfo* parent);
 
-//    virtual void start_game(RomInfo *romdata) = 0;
-//    virtual void edit_settings(RomInfo *romdata) = 0;
-//    virtual void edit_system_settings(RomInfo *romdata) = 0;
     static RomInfo* create_rominfo(RomInfo* parent);
+    int SpanDisks() const { return spandisks; }
     QString SystemName() const { return systemname; }
     QString SystemCmdLine() const { return commandline; }
     QString SystemRomPath() const { return rompath; }
@@ -51,7 +53,9 @@ class GameHandler
 
   protected:
     static GameHandler* GetHandler(RomInfo *rominfo);
+    static GameHandler* GameHandler::GetHandlerByName(QString systemname);
 
+    int spandisks;
     QString systemname;
     QString rompath;
     QString commandline;

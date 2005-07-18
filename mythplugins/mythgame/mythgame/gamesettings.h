@@ -24,7 +24,7 @@ const GameTypes GameTypeList[MAX_GAME_TYPES] =
     { QObject::tr("PCE/TG16"),"PCE",    "pce" },
     { QObject::tr("GENESIS/MEGADRIVE"), "GENESIS", "smd,bin,md" },
     { QObject::tr("PC GAME"), "PC",     "" },
-    { QObject::tr("AMIGA"),   "AMIGA",  "adf" },
+    { QObject::tr("AMIGA"),   "AMIGA",  "adf,ipf" },
     { QObject::tr("ATARI"),   "ATARI",  "bin,a26" },
 
 };

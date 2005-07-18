@@ -12,6 +12,29 @@ bool operator==(const RomInfo& a, const RomInfo& b)
     return false;
 }
 
+// Return the count of how many times this apperas in the db already
+int romInDB(QString rom, QString gametype)
+{
+    QString thequery;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    int romcount = 0;
+
+    thequery = QString("SELECT count(*) FROM gamemetadata WHERE gametype = \"%1\" AND romname = \"%2\";")
+                        .arg(gametype)
+                        .arg(rom);
+    query.exec(thequery);
+
+    if (query.isActive() && query.size() > 0);
+    {
+        query.next();
+        romcount = query.value(0).toInt();
+    };
+
+    return romcount;
+}
+
+
 bool RomInfo::FindImage(QString BaseFileName, QString *result)
 {
     QStringList graphic_formats;
@@ -50,6 +73,19 @@ void RomInfo::setField(QString field, QString data)
         year = data.toInt();
     else if (field == "favorite")
         favorite = data.toInt();
+    else if (field == "rompath")
+        rompath = data;
+    else if (field == "country")
+        country = data;
+    else if (field == "crc_value")
+        crc_value = data;
+    else if (field == "diskcount")
+        diskcount = data.toInt();
+    else if (field == "gametype")
+        gametype = data;
+    else if (field == "romcount")
+        romcount = data.toInt();
+
 }
 
 void RomInfo::setFavorite()
@@ -62,6 +98,19 @@ void RomInfo::setFavorite()
     query.exec(thequery);
 }
 
+QString RomInfo::getExtension()
+{
+    int pos = Romname().findRev(".");
+    if (pos == -1)
+        return NULL;
+
+    pos = Romname().length() - pos;
+    pos--;
+
+    QString ext = Romname().right(pos);
+    return ext;
+}
+
 void RomInfo::fillData()
 {
     if (gamename == "")
@@ -69,8 +118,9 @@ void RomInfo::fillData()
         return;
     }
 
-    QString thequery = "SELECT system,gamename,genre,year,romname,favorite"
-                       " FROM gamemetadata WHERE gamename=\"" + gamename + "\"";
+    QString thequery = "SELECT system,gamename,genre,year,romname,favorite,"
+                       "rompath,country,crc_value,diskcount,gametype FROM gamemetadata WHERE gamename=\"" 
+                       + gamename + "\"";
 
     if (system != "")
         thequery += " AND system=\"" + system + "\"";
@@ -90,6 +140,11 @@ void RomInfo::fillData()
         year = query.value(3).toInt();
         romname = query.value(4).toString();
         favorite = query.value(5).toInt();
+        rompath = query.value(6).toString();
+        country = query.value(7).toString();
+        crc_value = query.value(8).toString();
+        diskcount = query.value(9).toInt();
+        gametype = query.value(10).toString();
     }
 
     thequery = "SELECT screenshots FROM gameplayers WHERE playername = \"" + system + "\";";
@@ -106,5 +161,29 @@ void RomInfo::fillData()
             setImagePath("");
     }
 
+    romcount = romInDB(romname,gametype);
+
+    // If we have more than one instance of this rom in the DB fill in all
+    // systems available to play it.
+    if (romcount > 1) 
+    {
+        thequery = "SELECT DISTINCT system FROM gamemetadata WHERE romname = \"" + romname + "\";";
+
+        query.exec(thequery);
+
+        if (query.isActive() && query.size() > 0);
+        {
+            while(query.next())
+            {
+                if (allsystems == "")
+                    allsystems = query.value(0).toString();
+                else
+                    allsystems += "," + query.value(0).toString();
+            }
+        }
+    } else 
+        allsystems = system;
+
 }
+
 
