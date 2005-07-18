@@ -42,6 +42,8 @@ class ChannelBase
     ///        and sets the channel is setstarting is true.
     virtual void SwitchToInput(int newcapchannel, bool setstarting) = 0;
     virtual bool SetChannelByString(const QString &chan) = 0;
+    /// \brief Reports whether channel is already open
+    virtual bool IsOpen(void) const = 0;
 
     // Methods that one might want to specialize
     /// \brief Sets file descriptor.

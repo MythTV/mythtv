@@ -72,7 +72,7 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
 
 DVBChannel::~DVBChannel()
 {
-    CloseDVB();
+    Close();
     delete dvbcam;
 }
 
@@ -83,7 +83,7 @@ void *DVBChannel::SpawnSectionReader(void *param)
     return NULL;
 }
 
-void DVBChannel::CloseDVB()
+void DVBChannel::Close()
 {
     CHANNEL("Closing DVB channel");
     if (fd_frontend >= 0)

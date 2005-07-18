@@ -174,7 +174,7 @@ class TVRec
     static void *ScannerThread(void *param);
 
   private:
-    void SetChannel(bool needopen = false);
+    void SetChannel();
 
     void GetChannelInfo(ChannelBase *chan,  QString &title,
                         QString &subtitle,  QString &desc,
@@ -194,8 +194,12 @@ class TVRec
     void SetupRecorder(class RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
     
+    void InitChannel(const QString &inputname, const QString &startchannel);
+    void CloseChannel(void);
+
     void SetupSignalMonitor(void);
     void TeardownSignalMonitor(void);
+
 
     void HandleStateChange(void);
     void ChangeState(TVState nextState);

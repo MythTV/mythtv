@@ -31,15 +31,16 @@ class FirewireChannel : public ChannelBase
     FirewireChannel(firewire_options_t firewire_opts, TVRec *parent);
     ~FirewireChannel(void);
 
-    bool Open();
-    void Close();
+    bool Open(void);
+    void Close(void);
 
     // Sets
     bool SetChannelByString(const QString &chan);
     void SetExternalChanger(void);    
 
     // Gets
-    QString GetDevice() const
+    bool IsOpen(void) const { return isopen; }
+    QString GetDevice(void) const
         { return QString("%1:%2").arg(fw_opts.port).arg(fw_opts.node); }
 
     // Commands

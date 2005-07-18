@@ -64,7 +64,6 @@ private:
     // Options set in SetOption()
     int  _card_number_option;
     bool _record_transport_stream_option;
-    bool _dvb_on_demand_option;
     bool _hw_decoder_option;
 
     // DVB stuff

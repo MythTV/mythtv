@@ -70,7 +70,6 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel): DTVRecorder()
     _reset_pid_filters = true;
     dvbchannel = advbchannel;
 
-    _dvb_on_demand_option = false;
     _hw_decoder_option = false;
     _record_transport_stream_option = false;
 
@@ -127,10 +126,6 @@ void DVBRecorder::SetOption(const QString &name, int value)
             expire_data_days = 1;
     }
 #endif
-    else if (name == "dvb_on_demand")
-    {
-        _dvb_on_demand_option = value;
-    }
     else
         DTVRecorder::SetOption(name, value);
 }
@@ -168,12 +163,6 @@ bool DVBRecorder::Open()
     if (_stream_fd >= 0)
         return true;
 
-    if (_dvb_on_demand_option && dvbchannel->Open())
-    {
-        // this is required to trigger a re-tune
-        dvbchannel->SetChannelByString(dvbchannel->GetCurrentName());
-    }
-
     _stream_fd = open(dvbdevice(DVB_DEV_DVR,_card_number_option), O_RDONLY | O_NONBLOCK);
     if (_stream_fd < 0)
     {
@@ -206,9 +195,6 @@ void DVBRecorder::Close()
 
     if (_stream_fd >= 0)
         close(_stream_fd);
-
-    if (_dvb_on_demand_option && dvbchannel)
-        dvbchannel->CloseDVB();
 
     _stream_fd = -1;
 }

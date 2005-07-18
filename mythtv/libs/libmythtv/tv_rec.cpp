@@ -126,7 +126,6 @@ TVRec::TVRec(int capturecardnum)
  */
 bool TVRec::Init(void)
 {
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
     QString inputname, startchannel;
 
     GetDevices(m_capturecardnum, videodev, vbidev, 
@@ -143,14 +142,8 @@ bool TVRec::Init(void)
         scanner = new SIScan((DVBChannel *)channel, 1);
         pthread_create(&scanner_thread, NULL, ScannerThread, scanner);
 
-        if (inputname.isEmpty())
-            channel->SetChannelByString(startchannel);
-        else
-            channel->SwitchToInput(inputname, startchannel);
-        channel->SetChannelOrdering(chanorder);
-        // don't close this channel, otherwise we cannot read data
-        if (dvb_options.dvb_on_demand) 
-            ((DVBChannel *)channel)->CloseDVB();
+        InitChannel(inputname, startchannel);
+        CloseChannel();
 #else
         QString msg = QString(
             "ERROR: DVB Card configured on %1, but MythTV was not compiled\n"
@@ -167,11 +160,7 @@ bool TVRec::Init(void)
 #ifdef USING_FIREWIRE
         channel = new FirewireChannel(firewire_options, this);
         channel->Open();
-        if (inputname.isEmpty())
-            channel->SetChannelByString(startchannel);
-        else
-            channel->SwitchToInput(inputname, startchannel);
-        channel->SetChannelOrdering(chanorder);
+        InitChannel(inputname, startchannel);
 #else
         QString msg = QString(
             "ERROR: FireWire Input configured, but MythTV was not compiled\n"
@@ -189,17 +178,10 @@ bool TVRec::Init(void)
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
 #ifdef USING_V4L
-        Channel *achannel = new Channel(this, videodev);
-        channel = achannel; // here for SetFormat()->RetrieveInputChannels()
+        channel = new Channel(this, videodev);
         channel->Open();
-        achannel->SetFormat(gContext->GetSetting("TVFormat"));
-        achannel->SetDefaultFreqTable(gContext->GetSetting("FreqTable"));
-        if (inputname.isEmpty())
-            channel->SetChannelByString(startchannel);
-        else
-            channel->SwitchToInput(inputname, startchannel);
-        channel->SetChannelOrdering(chanorder);
-        channel->Close();
+        InitChannel(inputname, startchannel);
+        CloseChannel();
 #else
         QString msg = QString(
             "ERROR: V4L Input configured, but MythTV was not compiled\n"
@@ -595,7 +577,7 @@ void TVRec::HandleStateChange(void)
     }
     else if (TRANSITION(kState_None, kState_RecordingOnly))
     {
-        SetChannel(true /* keep channel open */);
+        SetChannel();
         rbuffer = new RingBuffer(outputFilename, true);
         if (rbuffer->IsOpen())
         {
@@ -693,9 +675,15 @@ void TVRec::HandleStateChange(void)
                     channel->SetContrast();
                     channel->SetColour();
                     channel->SetHue();
-                    channel->Close();
+                    CloseChannel();
                 }
             }
+
+            // This is required to trigger a re-tune w/DVB on demand
+            DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+            if (dvbc && dvb_options.dvb_on_demand && dvbc->Open())
+                dvbc->SetChannelByString(dvbc->GetCurrentName());
+
             pthread_create(&recorder_thread, NULL, RecorderThread, recorder);
 
             while (!recorder->IsRecording() && !recorder->IsErrored())
@@ -749,8 +737,7 @@ void TVRec::HandleStateChange(void)
     if (closeRecorder)
     {
         TeardownRecorder(killRecordingFile);
-        if (channel)
-            channel->SetFd(-1);
+        CloseChannel();
     }
 
     // update internal state variable
@@ -974,6 +961,46 @@ void TVRec::TeardownRecorder(bool killFile)
     gContext->dispatch(me);
 }    
 
+void TVRec::InitChannel(const QString &inputname, const QString &startchannel)
+{
+    if (!channel)
+        return;
+
+#ifdef USING_V4L
+    Channel *chan = dynamic_cast<Channel*>(channel);
+    if (chan)
+    {
+        chan->SetFormat(gContext->GetSetting("TVFormat"));
+        chan->SetDefaultFreqTable(gContext->GetSetting("FreqTable"));
+    }
+#endif // USING_V4L
+
+    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
+    if (inputname.isEmpty())
+        channel->SetChannelByString(startchannel);
+    else
+        channel->SwitchToInput(inputname, startchannel);
+    channel->SetChannelOrdering(chanorder);
+}
+
+void TVRec::CloseChannel(void)
+{
+    if (!channel)
+        return;
+
+#ifdef USING_DVB
+    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+    if (dvbc)
+    {
+        if (dvb_options.dvb_on_demand)
+            dvbc->Close();
+        return;
+    }
+#endif // USING_DVB
+
+    channel->Close();
+}
+
 /** \fn TVRec::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *
@@ -1023,16 +1050,17 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
 }
 
 /** \fn TVRec::SetChannel(bool)
- *  \brief If successful sets the channel to the channel needed to record the
+ *  \brief If successful, sets the channel to the channel needed to record the
  *         "curRecording" program.
- *
- *  \param needopen Set to true if channel->Open() must be called before
- *                  changing the channel.
  */
-void TVRec::SetChannel(bool needopen)
+void TVRec::SetChannel()
 {
-    if (needopen && channel)
+    bool need_close = false;
+    if (channel && !channel->IsOpen())
+    {
         channel->Open();
+        need_close = true;
+    }
 
     QString inputname = "";
     QString chanstr = "";
@@ -1061,11 +1089,10 @@ void TVRec::SetChannel(bool needopen)
     }
 
     if (channel)
-    {
         channel->SwitchToInput(inputname, chanstr);
-        if (needopen)
-            channel->Close();
-    }
+
+    if (need_close)
+        CloseChannel();
 }
 
 /** \fn TVRec::EventThread(void*)
@@ -1596,8 +1623,8 @@ void TVRec::TeardownSignalMonitor()
         signalMonitor = NULL;
     }
 
-    if (kState_None == GetState() && channel/* && closeChannel*/)
-        channel->Close();
+    if (kState_None == GetState() && channel)
+        CloseChannel();
 
     // BEGIN HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK
 #ifdef USING_DVB

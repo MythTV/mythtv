@@ -29,17 +29,18 @@ class Channel : public ChannelBase
     bool SetChannelByDirection(ChannelChangeDirection);
 
     // Gets
-    int  GetFd() const { return videofd; }
-    QString GetDevice() const { return device; }
+    bool IsOpen(void)       const { return GetFd() >= 0; }
+    int  GetFd(void)        const { return videofd; }
+    QString GetDevice(void) const { return device; }
 
     // Commands
     void SwitchToInput(int newcapchannel, bool setstarting);
 
     // Picture attributes.
-    void SetBrightness();
-    void SetContrast();
-    void SetColour();
-    void SetHue();
+    void SetBrightness(void);
+    void SetContrast(void);
+    void SetColour(void);
+    void SetHue(void);
     int  ChangeBrightness(bool up);
     int  ChangeColour(bool up);
     int  ChangeContrast(bool up);
@@ -54,7 +55,7 @@ class Channel : public ChannelBase
     bool Tune(uint frequency, QString inputname="",
               QString modulation="analog");
     // V4L scanning stuff
-    bool IsTuned() const;
+    bool IsTuned(void) const;
   private:
     // Helper Sets
     void SetColourAttribute(int attrib, const char *name);
@@ -63,8 +64,8 @@ class Channel : public ChannelBase
 
     // Helper Gets
     unsigned short *GetV4L1Field(int attrib, struct video_picture &vid_pic);
-    int  GetChanID() const;
-    int  GetCardID() const;
+    int  GetChanID(void) const;
+    int  GetCardID(void) const;
     int  GetCurrentChannelNum(const QString &channame);
 
     // Helper Commands

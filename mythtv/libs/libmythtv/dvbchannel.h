@@ -31,9 +31,8 @@ class DVBChannel : public QObject, public ChannelBase
     DVBChannel(int cardnum, TVRec *parent = NULL);
     ~DVBChannel();
 
-    bool Open();
-    void Close() {};
-    void CloseDVB();
+    bool Open(void);
+    void Close(void);
 
     // Sets
     bool SetChannelByString(const QString &chan);
@@ -41,28 +40,30 @@ class DVBChannel : public QObject, public ChannelBase
     void SetCAPMT(const PMTObject *pmt);
 
     // Gets
-    int  GetFd()                   const { return fd_frontend; }
+    bool IsOpen(void)                   const { return GetFd() >= 0; }
+    int  GetFd(void)                    const { return fd_frontend; }
 
     QString GetDevice(void) const { return QString::number(GetCardNum()); }
-    int  GetCardNum()              const { return cardnum; };
+    int  GetCardNum(void)               const { return cardnum; };
     const dvb_channel_t& GetCurrentChannel() const
         { return chan_opts; };
     bool GetTuningParams(DVBTuning &tuning) const;
-    fe_type_t   GetCardType()      const { return info.type; };
+    fe_type_t   GetCardType(void)       const { return info.type; };
     /// Returns table standard ("dvb" or "atsc")
-    QString     GetSIStandard()    const { return chan_opts.sistandard; }
+    QString     GetSIStandard(void)     const { return chan_opts.sistandard; }
 
     // Commands
     void SwitchToInput(const QString &inputname, const QString &chan);
     void SwitchToInput(int newcapchannel, bool setstarting)
         { (void)newcapchannel; (void)setstarting; }
     bool Tune(dvb_channel_t& channel, bool all=false);
-    bool TuneTransport(dvb_channel_t& channel, bool all=false, int timeout=30000);
-    void StopTuning();
+    bool TuneTransport(dvb_channel_t& channel, bool all=false,
+                       int timeout=30000);
+    void StopTuning(void);
 
     // Set/Get/Command just for SIScan/ScanWizardScanner
-    void SetMultiplexID(int mplexid) { currentTID = mplexid; };
-    int  GetMultiplexID() const { return currentTID; };
+    void SetMultiplexID(int mplexid)          { currentTID = mplexid; };
+    int  GetMultiplexID(void)           const { return currentTID; };
     bool TuneMultiplex(int mplexid);
 
     // PID caching
@@ -71,13 +72,13 @@ class DVBChannel : public QObject, public ChannelBase
 
     // Old stuff
     /// @deprecated Use SetMultiplexID(int)
-    void SetCurrentTransportDBID(int _id) { SetMultiplexID(_id); }
+    void SetCurrentTransportDBID(int _id)     { SetMultiplexID(_id); }
     /// @deprecated Use TuneMultiplex(int)
-    bool SetTransportByInt(int mplexid)   { return TuneMultiplex(mplexid); }
+    bool SetTransportByInt(int mplexid)       { return TuneMultiplex(mplexid); }
     /// @deprecated Use GetMultiplexID()
-    int  GetCurrentTransportDBID()  const { return GetMultiplexID(); }
+    int  GetCurrentTransportDBID(void)  const { return GetMultiplexID(); }
     /// @deprecated Use GetProgramNumber()
-    uint GetServiceID()             const { return GetProgramNumber(); }
+    uint GetServiceID(void)             const { return GetProgramNumber(); }
 
     // Messages to DVBChannel
   public slots:

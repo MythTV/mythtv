@@ -79,6 +79,8 @@ void Channel::Close(void)
 
 void Channel::SetFd(int fd)
 {
+    if (fd != videofd)
+        Close();
     videofd = (fd >= 0) ? fd : -1;
 }
 
