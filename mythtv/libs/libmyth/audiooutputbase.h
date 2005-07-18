@@ -11,7 +11,7 @@ using namespace std;
 #include "samplerate.h"
 #include "SoundTouch.h"
 
-#define AUDBUFSIZE 512000
+#define AUDBUFSIZE 768000
 
 class AudioOutputBase : public AudioOutput
 {
