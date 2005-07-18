@@ -132,6 +132,7 @@ class TV : public QObject
 
   private:
     bool RequestNextRecorder(bool showDialogs);
+    void DeleteRecorder();
 
     bool StartRecorder(int maxWait=-1);
     bool StartPlayer(bool isWatchingRecording, int maxWait=-1);

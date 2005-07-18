@@ -411,13 +411,17 @@ int TV::LiveTV(bool showDialogs)
     return 0;
 }
 
+void TV::DeleteRecorder()
+{
+    RemoteEncoder *rec = recorder;
+    activerecorder = recorder = NULL;
+    if (rec)
+        delete rec;
+}
+
 bool TV::RequestNextRecorder(bool showDialogs)
 {
-    if (recorder)
-    {
-        delete recorder;
-        activerecorder = recorder = NULL;
-    }
+    DeleteRecorder();
 
     RemoteEncoder *testrec = NULL;
     if (lookForChannel)
@@ -567,8 +571,7 @@ int TV::PlayFromRecorder(int recordernum)
         }
     }
 
-    delete recorder;
-    recorder = NULL;
+    DeleteRecorder();
 
     if (recorderPlaybackInfo)
     {
@@ -685,9 +688,9 @@ void TV::HandleStateChange(void)
         {
             VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, "
                     "failed to start RingBuffer on backend. Aborting.");
-            SET_LAST();
+            DeleteRecorder();
 
-            recorder = NULL;
+            SET_LAST();
         }
         else
         {
@@ -710,10 +713,10 @@ void TV::HandleStateChange(void)
             if (!ok)
             {
                 VERBOSE(VB_IMPORTANT, "LiveTV not successfully started");
-                SET_LAST();
-                recorder = NULL;
-
                 gContext->RestoreScreensaver();
+                DeleteRecorder();
+
+                SET_LAST();
             }
         }
     }
@@ -772,9 +775,7 @@ void TV::HandleStateChange(void)
                     cerr << "ERROR: couldn't find recorder for in-progress "
                          << "recording\n";
                     desiredNextState = kState_WatchingPreRecorded;
-                    if (recorder)
-                        delete recorder;
-                    activerecorder = recorder = NULL;
+                    DeleteRecorder();
                 }
                 else
                 {
@@ -1145,11 +1146,8 @@ void TV::TeardownPlayer(void)
 
     playbackinfo = NULL;
  
-    if (recorder) 
-        delete recorder; 
+    DeleteRecorder();
 
-    recorder = activerecorder = NULL;
- 
     if (prbuffer)
     {
         delete prbuffer;
