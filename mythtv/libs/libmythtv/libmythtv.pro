@@ -87,6 +87,7 @@ HEADERS += remoteencoder.h          videosource.h
 HEADERS += scheduledrecording.h
 HEADERS += sr_dialog.h              sr_root.h
 HEADERS += sr_items.h
+HEADERS += signalmonitorvalue.h 
 
 SOURCES += programinfo.cpp          proglist.cpp
 SOURCES += dbcheck.cpp              RingBuffer.cpp
@@ -97,6 +98,7 @@ SOURCES += remoteencoder.cpp        videosource.cpp
 SOURCES += scheduledrecording.cpp
 SOURCES += sr_dialog.cpp            sr_root.cpp
 SOURCES += sr_items.cpp
+SOURCES += signalmonitorvalue.cpp
 
 
 using_frontend {
@@ -180,10 +182,8 @@ using_backend {
     # Channel stuff
     HEADERS += channelbase.h               channelutil.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
-    HEADERS += signalmonitorvalue.h 
     SOURCES += channelbase.cpp             channelutil.cpp
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
-    SOURCES += signalmonitorvalue.cpp
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h

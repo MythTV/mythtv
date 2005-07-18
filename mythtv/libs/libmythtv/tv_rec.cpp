@@ -25,7 +25,6 @@ using namespace std;
 #include "programinfo.h"
 #include "recorderbase.h"
 #include "NuppelVideoRecorder.h"
-#include "hdtvrecorder.h"
 #include "NuppelVideoPlayer.h"
 #include "channel.h"
 #include "mythdbcon.h"
@@ -1425,12 +1424,14 @@ void setup_table_monitoring(ChannelBase* channel,
     {
         VERBOSE(VB_RECORD, "mpeg program number: "<<progNum);
         ATSCStreamData *sd = NULL;
+#ifdef USING_V4L
         HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
         if (rec)
         {
             sd = rec->StreamData();
             sd->SetCaching(true);
         }
+#endif //USING_V4L
         if (!sd)
             sd = new ATSCStreamData(-1, -1, true);
         
@@ -1450,12 +1451,14 @@ void setup_table_monitoring(ChannelBase* channel,
     if (minor > 0)
     {
         ATSCStreamData *sd = NULL;
+#ifdef USING_V4L
         HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
         if (rec)
         {
             sd = rec->StreamData();
             sd->SetCaching(true);
         }
+#endif // USING_V4L
         if (!sd)
             sd = new ATSCStreamData(major, minor, true);
 
