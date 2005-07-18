@@ -198,6 +198,7 @@ class TVRec
     void TeardownSignalMonitor(void);
 
     void HandleStateChange(void);
+    void ChangeState(TVState nextState);
     bool StateIsRecording(TVState state);
     bool StateIsPlaying(TVState state);
     TVState RemovePlaying(TVState state);
@@ -248,7 +249,7 @@ class TVRec
     // State variables
     QMutex  stateChangeLock;
     TVState internalState;
-    TVState nextState;
+    TVState desiredNextState;
     bool    changeState;
     bool    frontendReady;
     bool    runMainLoop;

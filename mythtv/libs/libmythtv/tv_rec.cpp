@@ -96,7 +96,7 @@ TVRec::TVRec(int capturecardnum)
       m_capturecardnum(capturecardnum), ispip(false),
       // State variables
       stateChangeLock(true),
-      internalState(kState_None), nextState(kState_None), changeState(false),
+      internalState(kState_None), desiredNextState(kState_None), changeState(false),
       frontendReady(false), runMainLoop(false), exitPlayer(false),
       finishRecording(false), paused(false), prematurelystopped(false),
       inoverrecord(false), errored(false),
@@ -343,8 +343,7 @@ int TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     if (inoverrecord)
     {
-        nextState = kState_None;
-        changeState = true;
+        ChangeState(kState_None);
 
         while (changeState)
             usleep(50);
@@ -405,8 +404,7 @@ int TVRec::StartRecording(const ProgramInfo *rcinfo)
                     .arg(curRecording->category).arg(overrecordseconds));
         }
         
-        nextState = kState_RecordingOnly;
-        changeState = true;
+        ChangeState(kState_RecordingOnly);
         retval = 1;
     }
     else if (!cancelNextRecording)
@@ -442,8 +440,7 @@ void TVRec::StopRecording(void)
 {
     if (StateIsRecording(internalState))
     {
-        nextState = RemoveRecording(internalState);
-        changeState = true;
+        ChangeState(RemoveRecording(internalState));
         prematurelystopped = false;
 
         while (changeState)
@@ -536,8 +533,13 @@ void TVRec::FinishedRecording(void)
     curRecording->FinishedRecording(prematurelystopped);
 }
 
+#define TRANSITION(ASTATE,BSTATE) \
+   ((internalState == ASTATE) && (desiredNextState == BSTATE))
+#define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0);
+#define SET_LAST() do { nextState = internalState; changed = true; } while(0);
+
 /** \fn TVRec::HandleStateChange()
- *  \brief Changes the internalState to the nextState if possible.
+ *  \brief Changes the internalState to the desiredNextState if possible.
  *
  *   Note: There must exist a state transition from any state we can enter
  *   to  the kState_None state, as this is used to shutdown TV in RunTV.
@@ -547,7 +549,7 @@ void TVRec::HandleStateChange(void)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    TVState tmpInternalState = internalState;
+    TVState nextState = internalState;
 
     frontendReady = false;
     askAllowRecording = true;
@@ -558,50 +560,49 @@ void TVRec::HandleStateChange(void)
     bool closeRecorder = false;
     bool killRecordingFile = false;
 
-    QString statename = StateToString(nextState);
-    QString origname = StateToString(tmpInternalState);
+    QString transMsg = QString(" %1 to %2")
+        .arg(StateToString(nextState))
+        .arg(StateToString(desiredNextState));
 
-    if (nextState == kState_Error)
+    if (desiredNextState == internalState)
     {
-        VERBOSE(VB_IMPORTANT, "TVRec::HandleStateChange() Error, "
-                "attempting to set to an error state.");
+        VERBOSE(VB_IMPORTANT, "TVRec::HandleStateChange(): "
+                "Null transition" + transMsg);
+        return;
+    }
+
+    if (desiredNextState == kState_Error)
+    {
+        VERBOSE(VB_IMPORTANT, "TVRec::HandleStateChange(): "
+                "Error, attempting to set to an error state.");
         errored = true;
         return;
     }
 
-    if (tmpInternalState == kState_None && nextState == kState_WatchingLiveTV)
+    // Handle different state transitions
+    if (TRANSITION(kState_None, kState_WatchingLiveTV))
     {
-        tmpInternalState = nextState;
-        changed = true;
-
         startRecorder = true;
+        SET_NEXT();
     }
-    else if (tmpInternalState == kState_WatchingLiveTV && 
-             nextState == kState_None)
+    else if (TRANSITION(kState_WatchingLiveTV, kState_None))
     {
         if (channel)
             channel->StoreInputChannels();
 
         closeRecorder = true;
-
-        tmpInternalState = nextState;
-        changed = true;
-
         killRecordingFile = true;
+        SET_NEXT();
     }
-    else if (tmpInternalState == kState_None && 
-             nextState == kState_RecordingOnly) 
+    else if (TRANSITION(kState_None, kState_RecordingOnly))
     {
-        SetChannel(true);  
+        SetChannel(true /* keep channel open */);
         rbuffer = new RingBuffer(outputFilename, true);
         if (rbuffer->IsOpen())
         {
             StartedRecording();
-
-            tmpInternalState = nextState;
-            nextState = kState_None;
-
             startRecorder = true;
+            SET_NEXT();
         }
         else
         {
@@ -609,35 +610,23 @@ void TVRec::HandleStateChange(void)
                     "Aborting new recording.");
             delete rbuffer;
             rbuffer = NULL;
+            SET_LAST();
         }
-        changed = true;
-    }   
-    else if (tmpInternalState == kState_RecordingOnly && 
-             nextState == kState_None)
+    }
+    else if (TRANSITION(kState_RecordingOnly, kState_None))
     {
         FinishedRecording();
         closeRecorder = true;
-        tmpInternalState = nextState;
-        changed = true;
         inoverrecord = false;
-    }
-    else if (tmpInternalState == kState_None && 
-             nextState == kState_None)
-    {
-        changed = true;
+
+        SET_NEXT();
     }
 
-    if (!changed)
-    {
-        VERBOSE(VB_IMPORTANT, QString("Unknown state transition: %1 to %2")
-                .arg(origname).arg(statename));
-    }
-    else
-    {
-        VERBOSE(VB_GENERAL, QString("Changing from %1 to %2")
-                .arg(origname).arg(statename));
-    }
+    QString msg = QString((changed) ? "Changing from" : "Unknown state transition:");
+    VERBOSE(VB_IMPORTANT, msg + transMsg);
  
+    // Handle starting the recorder
+    bool livetv = (nextState == kState_WatchingLiveTV);
     if (startRecorder)
     {
         RecordingProfile profile;
@@ -669,8 +658,7 @@ void TVRec::HandleStateChange(void)
         VERBOSE(VB_RECORD, msg);
 
         JobQueue::ClearJobMask(autoRunJobs);
-        if ((tmpInternalState != kState_WatchingLiveTV) &&
-            (curRecording))
+        if (!livetv && curRecording)
         {
             JobQueue::AddJobsToMask(curRecording->GetAutoRunJobs(),
                                     autoRunJobs);
@@ -724,8 +712,7 @@ void TVRec::HandleStateChange(void)
                 channel->SetFd(recorder->GetVideoFd());
             frameRate = recorder->GetFrameRate();
 
-            if ((tmpInternalState != kState_WatchingLiveTV) &&
-                (curRecording) &&
+            if (!livetv && curRecording &&
                 (JobQueue::JobIsInMask(JOB_COMMFLAG, autoRunJobs)) &&
                 (earlyCommFlag) &&
                 ((JobQueue::JobIsNotInMask(JOB_TRANSCODE, autoRunJobs)) ||
@@ -755,10 +742,11 @@ void TVRec::HandleStateChange(void)
             FinishedRecording();
             killRecordingFile = true;
             closeRecorder = true;
-            tmpInternalState = kState_None;
+            SET_LAST();
         }
     }
 
+    // Handle closing the recorder
     if (closeRecorder)
     {
         TeardownRecorder(killRecordingFile);
@@ -766,8 +754,23 @@ void TVRec::HandleStateChange(void)
             channel->SetFd(-1);
     }
 
-    internalState = tmpInternalState;
+    // update internal state variable
+    internalState = nextState;
     changeState = false;
+}
+#undef TRANSITION
+#undef SET_NEXT
+#undef SET_LAST
+
+/** \fn TVRec::ChangeState(TVState)
+ *  \brief Puts a state change on the nextState queue.
+ */
+void TVRec::ChangeState(TVState nextState)
+{
+    QMutexLocker lock(&stateChangeLock);
+
+    desiredNextState = nextState;
+    changeState = true;
 }
 
 /** \fn TVRec::SetOption(RecordingProfile&, const QString&)
@@ -1160,8 +1163,7 @@ void TVRec::RunTV(void)
                 }
                 else
                 {
-                    nextState = RemoveRecording(internalState);
-                    changeState = true;
+                    ChangeState(RemoveRecording(internalState));
                 }
                 finishRecording = false;
             }
@@ -1171,13 +1173,11 @@ void TVRec::RunTV(void)
         {
             if (internalState == kState_WatchingLiveTV)
             {
-                nextState = kState_None;
-                changeState = true;
+                ChangeState(kState_None);
             }
             else if (StateIsPlaying(internalState))
             {
-                nextState = RemovePlaying(internalState);
-                changeState = true;
+                ChangeState(RemovePlaying(internalState));
             }
             exitPlayer = false;
         }
@@ -1185,7 +1185,7 @@ void TVRec::RunTV(void)
   
     if (GetState() != kState_None)
     {
-        nextState = kState_None;
+        ChangeState(kState_None);
         HandleStateChange();
     }
 }
@@ -2487,10 +2487,7 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
  */
 void TVRec::SpawnLiveTV(void)
 {
-    stateChangeLock.lock();
-    nextState = kState_WatchingLiveTV;
-    changeState = true;
-    stateChangeLock.unlock();
+    ChangeState(kState_WatchingLiveTV);
 
     while (changeState)
         usleep(50);
@@ -2504,10 +2501,7 @@ void TVRec::StopLiveTV(void)
 {
     if (GetState() != kState_None)
     {
-        stateChangeLock.lock();
-        nextState = kState_None;
-        changeState = true;
-        stateChangeLock.unlock();
+        ChangeState(kState_None);
         
         while (changeState)
             usleep(50);
