@@ -209,10 +209,12 @@ void CaptureCardSetting::refresh()
     query.prepare(thequery);
 
     if (query.exec() && query.isActive() && query.size() > 0)
-        while(query.next())
+    {
+        while (query.next())
             addSelection("[ " + query.value(0).toString() + " : " +
                          query.value(1).toString() + " ]",
                          query.value(2).toString());
+    }
 }
 
 void CaptureCardSetting::sourceID(const QString& str)
@@ -239,11 +241,11 @@ void ScanTypeSetting::refresh(const QString& card)
     case CardUtil::V4L:
     case CardUtil::MPEG:
         addSelection(tr("Full Scan"),
-                     QString::number(FullScan_Analog),true);
+                     QString::number(FullScan_Analog), true);
         return;
     case CardUtil::OFDM:
         addSelection(tr("Full Scan"),
-                     QString::number(FullScan_OFDM),true);
+                     QString::number(FullScan_OFDM), true);
         addSelection(tr("Full Scan (Tuned)"),
                      QString::number(FullTunedScan_OFDM));
         addSelection(tr("Import channels.conf"),
@@ -262,16 +264,17 @@ void ScanTypeSetting::refresh(const QString& card)
                      QString::number(Import));
         break;
     case CardUtil::ATSC:
+    case CardUtil::HDTV:
         addSelection(tr("Full Scan"),
-                     QString::number(FullScan_ATSC),true);
+                     QString::number(FullScan_ATSC), true);
         break;
     case CardUtil::ERROR_PROBE:
         addSelection(QObject::tr("Failed to probe the card"),
-                     QString::number(Error_Probe),true);
+                     QString::number(Error_Probe), true);
         return;
     default:
         addSelection(QObject::tr("Failed to open the card"),
-                     QString::number(Error_Open),true);
+                     QString::number(Error_Open), true);
         return;
     }
 
@@ -300,16 +303,11 @@ ScanCountry::ScanCountry()
 #endif
 
     setLabel(tr("Country"));
-    addSelection(QObject::tr("Australia"),
-                 QString::number(AU), country == AU);
-    addSelection(QObject::tr("Finland"),
-                 QString::number(FI), country == FI);
-    addSelection(QObject::tr("Sweden"),
-                 QString::number(SE), country == SE);
-    addSelection(QObject::tr("United Kingdom"),
-                 QString::number(UK), country == UK);
-    addSelection(QObject::tr("Germany"),
-                 QString::number(DE), country == DE);
+    addSelection(QObject::tr("Australia"),      "au", country == AU);
+    addSelection(QObject::tr("Finland"),        "fi", country == FI);
+    addSelection(QObject::tr("Sweden"),         "se", country == SE);
+    addSelection(QObject::tr("United Kingdom"), "uk", country == UK);
+    addSelection(QObject::tr("Germany"),        "de", country == DE);
 }
 
 ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,

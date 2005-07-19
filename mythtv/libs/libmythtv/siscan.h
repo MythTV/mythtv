@@ -21,8 +21,8 @@ typedef QMap<uint16_t, void*> QMap_Events;
 typedef QMap<uint16_t, void*> QMap_SDTObject;
 typedef QValueList<void*> QList_Events;
 typedef QValueList<QList_Events> QListList_Events;
-typedef void* DVBChannel;
-typedef void* DVBTuning;
+class DVBChannel;
+class DVBTuning;
 typedef int fe_type_t;
 typedef void* NITObject;
 typedef void* NIT;
@@ -44,8 +44,10 @@ public:
     void StartScanner();
     void StopScanner();
 
-    bool ATSCScanTransport(int SourceID, int FrequencyBand);
-    bool DVBTScanTransport(int SourceID, unsigned country);
+    bool ScanTransports(int SourceID,
+                        const QString std,
+                        const QString modulation,
+                        const QString country);
     bool ScanTransports();
     bool ScanServices(int TransportID = -1);
     bool ScanServicesSourceID(int SourceID);
@@ -55,6 +57,7 @@ public:
     void SetRadioServices(bool _fRadio) { RadioServices = _fRadio;}
     void SetForceUpdate(bool _force) { forceUpdate = _force;}
     void SetScanTimeout(int _timeout) { ScanTimeout = _timeout;}
+    void SetChannelFormat(const QString _fmt) { channelFormat   = _fmt; }
 
 public slots:
 
@@ -73,6 +76,8 @@ signals:
     void TransportScanComplete();
 
 private:
+    bool ATSCScanTransport(int SourceID, int FrequencyBand);
+    bool DVBTScanTransport(int SourceID, unsigned country);
 
     static void *ServiceScanThreadHelper(void*);
     static void *TransportScanThreadHelper(void*);
@@ -90,6 +95,23 @@ private:
     int  GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexID);
     void AddEvents();
 
+  private:
+    // Set in constructor
+    DVBChannel       *chan;
+    int               sourceID;
+    SCANMODE          scanMode;
+
+    // Settable
+    bool              RadioServices;
+    bool              FTAOnly;
+    bool              forceUpdate;
+    int               ScanTimeout;
+    QString           channelFormat;
+
+    // State
+    bool              threadExit;
+    QTime             timer;
+
     bool scannerRunning;                 
     bool serviceListReady;
     bool sourceIDTransportTuned;
@@ -102,17 +124,7 @@ private:
     QMap_SDTObject SDT;
 
     NITObject NIT;
-    DVBChannel *chan;
-    int sourceID;
     QValueList<TransportScanItem> scanTransports;
 
-    QTime timer;
-
-    bool threadExit;
-    bool FTAOnly;
-    bool RadioServices;
-    bool forceUpdate;
-    int ScanTimeout;
-    SCANMODE scanMode;
     pthread_mutex_t events_lock;
 };

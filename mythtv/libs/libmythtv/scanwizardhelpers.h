@@ -251,16 +251,31 @@ class LogList: public ListBoxSetting, public TransientStorage
 class ScanATSCTransport: public ComboBoxSetting, public TransientStorage
 {
   public:
-    enum Type {Terrestrial,Cable} ;
     ScanATSCTransport()
     {
-        addSelection(QObject::tr("Terrestrial"),
-                     QString::number(Terrestrial), true);
-        addSelection(QObject::tr("Cable"),
-                     QString::number(Cable));
+        addSelection(QObject::tr("Terrestrial"),        "vsb8",   true);
+        addSelection(QObject::tr("Cable")+" (QAM-256)", "qam256", false);
+        //addSelection(QObject::tr("Cable-HRC")+" (QAM-256)", "qam256hrc", false);
+        //addSelection(QObject::tr("Cable")+" (QAM-128)", "qam128", false);
+        //addSelection(QObject::tr("Cable")+" (QAM-64)",  "qam64",  false);
 
         setLabel(QObject::tr("ATSC Transport"));
         setHelpText(QObject::tr("ATSC transport, cable or terrestrial"));
+    }
+};
+
+class ScanATSCChannelFormat: public ComboBoxSetting, public TransientStorage
+{
+  public:
+    ScanATSCChannelFormat()
+    {
+        addSelection(QObject::tr("Underscore (5_1)"), "%1_%2", false);
+        addSelection(QObject::tr("None (51)"),        "%1%2",  true);
+        addSelection(QObject::tr("Minus (5-1)"),      "%1-%2", false);
+        addSelection(QObject::tr("Zero (501)"),       "%10%2", false);
+        setLabel(QObject::tr("Channel Seperator"));
+        setHelpText(QObject::tr("What to use to separate ATSC major "
+                                "and minor channels."));
     }
 };
 
@@ -584,15 +599,16 @@ class ATSCPane : public HorizontalConfigurationGroup
     ATSCPane() : HorizontalConfigurationGroup(false,false,true,false)
     {
         setUseFrame(false);
-        addChild(patscTransport = new ScanATSCTransport());
+        addChild(atsc_transport = new ScanATSCTransport());
+        addChild(atsc_format = new ScanATSCChannelFormat());
     }
 
-    int atscTransport()
-    {
-        return patscTransport->getValue().toInt();
-    }
+    QString atscTransport() { return atsc_transport->getValue(); }
+    QString atscFormat()    { return atsc_format->getValue();    }
+
   protected:
-    ScanATSCTransport *patscTransport;
+    ScanATSCTransport *atsc_transport;
+    ScanATSCChannelFormat *atsc_format;
 };
 
 class ErrorPane : public HorizontalConfigurationGroup

@@ -47,6 +47,8 @@ class QPSKPane;
 class ATSCPane;
 class QAMPane;
 class SIScan;
+class ChannelBase;
+class Channel;
 class DVBChannel;
 class DVBSignalMonitor;
 class ScanOptionalConfig;
@@ -79,8 +81,7 @@ class ScanWizard: public ConfigurationWizard
     int videoSource()  const { return page1->videoSource->getValue().toInt(); }
     int transport()    const
         { return page1->scanConfig->transport->getValue().toInt(); }
-    int country()      const
-        { return page1->scanConfig->country->getValue().toInt(); }
+    QString country()  const { return page1->scanConfig->country->getValue(); }
     int captureCard()  const { return page1->capturecard->getValue().toInt(); }
     int scanType()     const { return page1->scanType->getValue().toInt();    }
     QString filename() const { return page1->scanConfig->filename->getValue();}
@@ -124,26 +125,31 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
 
   protected:
     void finish();
+    void HandleTuneComplete(void);
     void customEvent(QCustomEvent *e);
     static void *SpawnScanner(void *param);
     static void *SpawnTune(void *param);
+    DVBChannel *GetDVBChannel();
+    Channel *GetChannel();
 
     ScanWizard        *parent;
     AnalogScan        *analogScan;
     LogList           *log;
     bool               scanthread_running;
     bool               tunerthread_running;
+    pthread_t          tuner_thread;
+    ChannelBase       *channel;
     ScanProgressPopup *popupProgress;
     int                nTransportToTuneTo;
+    SIScan            *scanner;
+
     int                nScanType;
     int                nVideoSource;
 
 #ifdef USING_DVB
     pthread_t          scanner_thread;
-    pthread_t          tuner_thread;
     DVBChannel        *dvbchannel;
     DVBSignalMonitor  *monitor;
-    SIScan            *scanner;
     dvb_channel_t      chan_opts;
 #endif
 };

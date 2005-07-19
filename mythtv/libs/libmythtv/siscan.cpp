@@ -115,6 +115,7 @@ FrequencyTableOld frequenciesATSC_C[]=
 #endif // USING_DVB
 
 SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
+    : channelFormat("%1_%2")
 {
     /* setup links to parents and db connections */
     chan = advbchannel;
@@ -518,6 +519,29 @@ void SIScan::verifyTransport(TransportScanItem& t)
 #endif // USING_DVB
 }
 
+/** \fn SIScan::ScanTransports(int,const QString,const QString,const QString)
+ *  \brief Generates a list of frequencies to scan and adds it to the
+ *   scanTransport list, and then sets the scanMode to TRANSPORT_LIST.
+ */
+bool SIScan::ScanTransports(int SourceID,
+                            const QString std,
+                            const QString modulation,
+                            const QString country)
+{
+    QMap<QString, uint> country_to_table_num;
+    country_to_table_num["au"] = 0;
+    country_to_table_num["fi"] = 1;
+    country_to_table_num["se"] = 2;
+    country_to_table_num["uk"] = 3;
+    country_to_table_num["de"] = 4;
+
+    if (std.lower() == "atsc")
+        return ATSCScanTransport(SourceID, (modulation == "vsb8") ? 0 : 1);
+    else
+        return DVBTScanTransport(SourceID, country_to_table_num[country]);
+}
+
+
 bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
 {
 #if (DVB_API_VERSION_MINOR == 1)
@@ -861,13 +885,18 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                     else
                         ChanNum = (*s).ChanNum;
 
+                    QString chanNum = QString::number(ChanNum);
+                    if ((*s).ATSCSourceID)
+                        chanNum = channelFormat
+                            .arg(ChanNum / 10).arg(ChanNum % 10);
+
                      query.prepare("INSERT INTO channel (chanid, channum, "
                                "sourceid, callsign, name,  mplexid, "
                                "serviceid, atscsrcid, useonairguide ) "
                                "VALUES (:CHANID,:CHANNUM,:SOURCEID,:CALLSIGN,"
                                ":NAME,:MPLEXID,:SERVICEID,:ATSCSRCID,:USEOAG);");
                      query.bindValue(":CHANID",chanid);
-                     query.bindValue(":CHANNUM",ChanNum);
+                     query.bindValue(":CHANNUM",chanNum);
                      query.bindValue(":SOURCEID",localSourceID);
                      query.bindValue(":CALLSIGN",(*s).ServiceName.utf8());
                      query.bindValue(":NAME",(*s).ServiceName.utf8());
