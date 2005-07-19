@@ -49,7 +49,7 @@ KeyBindings::KeyBindings(const QString & hostname) {
 
 
 ActionID * KeyBindings::conflicts(const QString & context_name,
-				  const QString & key) const
+				  const QString & key, int &level) const
 {
     const ActionList &ids = actionset.getActions(key);
 
@@ -60,8 +60,19 @@ ActionID * KeyBindings::conflicts(const QString & context_name,
     /* check the contexts of the other bindings */
     for (size_t i = 0; i < ids.count(); i++)
     {
-	if (ids[i].context() == JUMP_CONTEXT) return new ActionID(ids[i]);
-	else if (ids[i].context() == context_name) return new ActionID(ids[i]);
+	/* jump points, then global, then the same context */
+	if (ids[i].context() == JUMP_CONTEXT) {
+	    level = KeyBindings::Error;
+	    return new ActionID(ids[i]);
+	}
+	else if (ids[i].context() == context_name) {
+	    level = KeyBindings::Error;
+	    return new ActionID(ids[i]);
+	}
+	else if (ids[i].context()==GLOBAL_CONTEXT) {
+	    level = KeyBindings::Warning;
+	    return new ActionID(ids[i]);
+	}
     }
 
     /* no conflicts */
@@ -70,6 +81,23 @@ ActionID * KeyBindings::conflicts(const QString & context_name,
 
 
 
+/* method description in header */
+bool KeyBindings::removeActionKey(const QString & context_name,
+		     const QString & action_name,
+		     const QString & key) {
+
+    ActionID id(context_name, action_name);
+
+    /* dont remove the last manditory binding */
+    if (getManditoryBindings().contains(id)&&(actionset.getKeys(id).count()<2))
+	return false;
+    else
+	return this->actionset.remove(id,key);
+}
+
+
+
+/* method description in header */
 void KeyBindings::commitAction(const ActionID & id)
 {
 
@@ -169,8 +197,14 @@ void KeyBindings::retrieveJumppoints()
     for (query.next(); query.isValid(); query.next())
     {
 	ActionID id(JUMP_CONTEXT, query.value(0).toString());
-	this->actionset.addAction(id,query.value(1).toString(),
-				  query.value(2).toString());
+
+	if (query.value(1).toString().isEmpty())
+	{
+	    actionset.addAction(id, query.value(0).toString(),
+				query.value(2).toString());
+	}
+	else actionset.addAction(id,query.value(1).toString(),
+				 query.value(2).toString());
     }
 }
 

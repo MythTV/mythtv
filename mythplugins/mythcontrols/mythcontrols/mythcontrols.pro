@@ -1,7 +1,7 @@
 include ( ../../settings.pro )
 
 TEMPLATE = lib
-CONFIG += plugin thread warn_on debug
+CONFIG += plugin thread
 TARGET = mythcontrols
 target.path = $${PREFIX}/lib/mythtv/plugins
 INSTALLS += target

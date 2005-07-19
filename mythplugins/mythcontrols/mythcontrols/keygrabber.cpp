@@ -27,6 +27,7 @@ using namespace std;
 
 #include "keygrabber.h"
 
+#include <mythtv/mythcontext.h>
 
 
 KeyGrabPopupBox::KeyGrabPopupBox(MythMainWindow *window)
@@ -36,6 +37,10 @@ KeyGrabPopupBox::KeyGrabPopupBox(MythMainWindow *window)
     this->has_captured = false;
     addLabel("Press A Key", Large, false);
     key_label = addLabel("Waiting for key press", Small, false);
+
+    ok_button = this->addButton(tr("OK"), this, SLOT(acceptBinding()));
+    this->addButton(tr("Cancel"), this, SLOT(cancel()));
+
     this->grabKeyboard();
 }
 
@@ -82,6 +87,57 @@ void KeyGrabPopupBox::keyPressEvent(QKeyEvent *e)
     /* accept events while we are capturing */
     if (this->is_capturing) e->accept();
     else MythPopupBox::keyPressEvent(e);
+}
 
-    cout << QString(QKeySequence(Qt::UNICODE_ACCEL & e->key())) << endl;
+InvalidBindingPopup::InvalidBindingPopup(MythMainWindow *window)
+    : MythPopupBox(window, "invalidbinding")
+{
+    QString warning = "This action is manditory and needs at least one key"
+	" bound to it.  Instead, try rebinding with another key.";
+    addLabel("Manditory Action", Large, false);
+    addLabel(warning, Small, true);
+}
+
+
+
+InvalidBindingPopup::InvalidBindingPopup(MythMainWindow *window,
+					 const QString &action,
+					 const QString &context)
+    : MythPopupBox(window, "invalidbinding")
+{
+    QString message = "This kebinding conflicts with ";
+    message += action + " in the " + context;
+    message += " context.";
+
+    addLabel("Conflicting Binding", Large, false);
+    addLabel(message, Small, true);
+}
+
+
+
+OptionsMenu::OptionsMenu(MythMainWindow *window)
+    : MythPopupBox(window, "optionmenu")
+{
+    addLabel(tr("Options"), Large, false);
+    addButton(tr("Save"), this, SLOT(save()));
+    addButton(tr("Cancel"), this, SLOT(cancel()))->setFocus();
+}
+    
+
+ActionMenu::ActionMenu(MythMainWindow *window)
+    : MythPopupBox(window, "actionmenu")
+{
+    addLabel(tr("Modify Action"), Large, false);
+    addButton(tr("Set Binding"), this, SLOT(set()));
+    addButton(tr("Remove Binding"), this, SLOT(remove()));
+    addButton(tr("Cancel"), this, SLOT(cancel()))->setFocus();
+}
+
+UnsavedMenu::UnsavedMenu(MythMainWindow *window)
+    : MythPopupBox(window, "unsavedmenu")
+{
+    addLabel(tr("Unsaged Changes"), Large, false);
+    addLabel(tr("Would you like to save now?"));
+    addButton(tr("Save"), this, SLOT(save()))->setFocus();
+    addButton(tr("Exit"), this, SLOT(cancel()));
 }

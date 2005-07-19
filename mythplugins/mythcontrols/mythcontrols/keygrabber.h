@@ -44,16 +44,26 @@ class KeyGrabPopupBox : public MythPopupBox
     KeyGrabPopupBox(MythMainWindow * window);
 
     /**
-     * @brief Add the OK button.
-     * @param button The button that will be hilighed once a key has
-     * been captured.
-     */
-    inline void addOKButton(QButton *button) { ok_button = button; }
-
-    /**
      * @brief Get the string containing the captured key event.
      */
-    inline QString getCapturedKeyEvent() { return this->captured_key_event; }
+    inline QString getCapturedKey() { return this->captured_key_event; }
+
+ public slots:
+
+    /**
+     * @brief Accept the captured keybinding.
+     *
+     * The QString provided in the constructor will be set to the
+     * captured key value.
+     */
+    inline void acceptBinding(void) { done(1); }
+
+    /**
+     * @brief Reject the captured key binding.
+     *
+     * The QString provided in the constructor will be set to NULL.
+     */
+    inline void cancel(void) { done(0); }
 
  protected:
 
@@ -76,4 +86,160 @@ class KeyGrabPopupBox : public MythPopupBox
     QString captured_key_event;
     QButton *ok_button;
     QLabel *key_label;
+};
+
+
+/**
+ * @class InvalidBindingPopup
+ * @brief Tells the user that they are being bad!!!
+ */
+class InvalidBindingPopup : public MythPopupBox
+{
+    Q_OBJECT;
+
+ public:
+
+    /**
+     * @brief Create a popup that explains that they are removing a
+     * critical key binding.
+     * @param window The main myth window.
+     */
+    InvalidBindingPopup(MythMainWindow *window);
+
+    /**
+     * @brief Tell the user that the binding conflicts with another
+     * action.
+     */
+    InvalidBindingPopup(MythMainWindow *window, const QString &action,
+			const QString &context);
+
+    /**
+     * @brief Execute the error popup
+     */
+    inline int getOption(void) { return ExecPopup(this,SLOT(finish())); }
+
+ protected slots:
+    /**
+     * @brief Close the popup.
+     */
+    inline void finish(void) { done(0); }
+};
+
+
+/**
+ * @class OptionsMenu
+ * @brief A popup containing a list of options.
+ */
+class OptionsMenu : public MythPopupBox
+{
+
+    Q_OBJECT;
+
+ public:
+
+    enum actons { SAVE, CANCEL };
+
+    /**
+     * @brief Create a new action window.
+     */
+    OptionsMenu(MythMainWindow *window);
+
+    /**
+     * @brief Execute the option popup.
+     */
+    inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
+
+ public slots:
+
+    /**
+     * @brief Slot to connect to when the save button is pressed.
+     */
+    inline void save(void) { done(OptionsMenu::SAVE); }
+
+    /**
+     * @brief Slot to connect to when the cancel button is pressed.
+     */
+    inline void cancel(void) { done(OptionsMenu::CANCEL); }
+
+};
+
+
+
+/**
+ * @class ActionMenu
+ * @brief A popup listing ways to modify an action.
+ */
+class ActionMenu : public MythPopupBox
+{
+
+        Q_OBJECT;
+
+ public:
+
+    enum actons { SET, REMOVE, CANCEL };
+
+    /**
+     * @brief Create a new action window.
+     */
+    ActionMenu(MythMainWindow *window);
+
+    /**
+     * @brief Execute the option popup.
+     */
+    inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
+
+ public slots:
+
+    /**
+     * @brief Slot to connect to when the set button is pressed.
+     */
+    inline void set(void) { done(ActionMenu::SET); }
+
+    /**
+     * @brief Slot to connect to when the remove button is pressed.
+     */
+    inline void remove(void) { done(ActionMenu::REMOVE); }
+
+    /**
+     * @brief Slot to connect to when the cancel button is pressed.
+     */
+    inline void cancel(void) { done(ActionMenu::CANCEL); }
+
+};
+
+/**
+ * @class OptionsMenu
+ * @brief A popup containing a list of options.
+ */
+class UnsavedMenu : public MythPopupBox
+{
+
+    Q_OBJECT;
+
+ public:
+
+    enum actons { SAVE, EXIT };
+
+    /**
+     * @brief Create a new action window.
+     */
+    UnsavedMenu(MythMainWindow *window);
+
+    /**
+     * @brief Execute the option popup.
+     */
+    inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
+
+ public slots:
+
+    /**
+     * @brief Slot to connect to when the save button is pressed.
+     */
+    inline void save(void) { done(UnsavedMenu::SAVE); }
+
+    /**
+     * @brief Slot to connect to when the cancel button is pressed.
+     */
+    inline void cancel(void) { done(UnsavedMenu::EXIT); }
+
 };

@@ -3,152 +3,90 @@
 
  <window name="controls">
 
-   <font name="selected" face="Arial">
-     <color>#ffffff</color>
-     <size>14</size>
-     <bold>yes</bold>
-   </font>
+  <font name="active" face="Arial">
+   <color>#ffffff</color>
+   <size>14</size>
+   <bold>yes</bold>
+  </font>
 
-   <font name="active" face="Arial">
-     <color>#aaaaaa</color>
-     <size>14</size>
-     <bold>yes</bold>
-   </font>
+  <font name="inactive" face="Arial">
+   <color>#9999cc</color>
+   <size>14</size>
+   <bold>yes</bold>
+  </font>
 
-   <font name="inactive" face="Arial">
-     <color>#9999cc</color>
-     <size>14</size>
-     <bold>yes</bold>
-   </font>
+  <font name="keys" face="Arial">
+   <color>#000000</color>
+   <size>18</size>
+   <shadow>1,1</shadow>
+   <bold>yes</bold>
+  </font>
 
-   <font name="selectable" face="Arial">
-     <color>#8cdeff</color>
-     <size>14</size>
-     <bold>yes</bold>
-   </font>
+  <font name="info" face="Arial">
+   <color>#ffffff</color>
+   <size>18</size>
+   <shadow>1,1</shadow>
+   <bold>yes</bold>
+  </font>
 
-   <font name="labels" face="Arial">
-     <color>#ffffff</color>
-     <size>16</size>
-     <shadow>1,1</shadow>
-     <bold>yes</bold>
-   </font>
+  <font name="infotitle" face="Arial">
+   <color>#ffffff</color>
+   <size>24</size>
+   <shadow>10,10</shadow>
+   <bold>yes</bold>
+  </font>
 
-   <font name="keys" face="Arial">
-     <color>#000000</color>
-     <size>18</size>
-     <shadow>1,1</shadow>
-     <bold>yes</bold>
-   </font>
+  <container name="controls">
+   <area>20,20,780,380</area>
+   <listtreearea name="controltree" draworder="0">
+    <area>0,0,760,360</area>
+    <listsize>0,0,370,360</listsize>
+    <leveloffset>15</leveloffset>
+    <gradient type="unselected" start="#505050" end="#000000" alpha="100"/>
+    <gradient type="selected" start="#52CA38" end="#349838" alpha="255"/>
+    <fcnfont name="active" function="active"/>
+    <fcnfont name="inactive" function="inactive"/>
+   </listtreearea>
+  </container>
 
-   <font name="info" face="Arial">
-     <color>#ffffff</color>
-     <size>18</size>
-     <shadow>1,1</shadow>
-     <bold>yes</bold>
-   </font>
+  <container name="keys">
+   <area>20,400,780,180</area>
 
-   <font name="infotitle" face="Arial">
-     <color>#ffffff</color>
-     <size>24</size>
-     <shadow>10,10</shadow>
-     <bold>yes</bold>
-   </font>
+   <textbutton name="action_one" draworder="0">
+    <position>20,20</position>
+    <image function="on" filename="kb-button-on.png"/>
+    <image function="off" filename="kb-button-off.png"/>
+    <font>keys</font>
+   </textbutton>
 
-   <font name="message" face="Arial">
-     <color>#ffffff</color>
-     <size>16</size>
-     <shadow>1,1</shadow>
-     <bold>yes</bold>
-   </font>
+   <textbutton name="action_two" draworder="0">
+    <position>200,20</position>
+    <image function="on" filename="kb-button-on.png"/>
+    <image function="off" filename="kb-button-off.png"/>
+    <font>keys</font>
+   </textbutton>
 
-   <container name="controls">
-     <area>0,0,800,350</area>
+   <textbutton name="action_three" draworder="0">
+    <position>390,20</position>
+    <image function="on" filename="kb-button-on.png"/>
+    <image function="off" filename="kb-button-off.png"/>
+    <font>keys</font>
+   </textbutton>
 
-     <managedtreelist name="controltree" draworder="1" bins="2">
-       <area>0,40,800,310</area>
+   <textbutton name="action_four" draworder="0">
+    <position>580,20</position>
+    <image function="on" filename="kb-button-on.png"/>
+    <image function="off" filename="kb-button-off.png"/>
+    <font>keys</font>
+   </textbutton>
 
-       <image function="selectionbar" filename="bar.png"/>
-       <image function="uparrow" filename="scrollarrow-up.png"/>
-       <image function="downarrow" filename="scrollarrow-dn.png"/>
-       <image function="leftarrow" filename="scrollarrow-left.png"/>
-       <image function="rightarrow" filename="scrollarrow-right.png"/>
+   <textarea name="description" draworder="1" allign="left">
+    <font>info</font>
+    <area>30,100,740,140</area>
+    <multiline>yes</multiline>
+   </textarea>
 
-       <bin number="1">
-	 <area>30,14,190,250</area>
-	 <fcnfont name="active" function="active"/>
-	 <fcnfont name="inactive" function="inactive"/>
-	 <fcnfont name="selected" function="selected"/>
-	 <fcnfont name="selectable" function="selectable"/>     
-       </bin>
-
-       <bin number="2">
-	 <area>240,14,530,265</area>
-	 <fcnfont name="active" function="active"/>
-	 <fcnfont name="inactive" function="inactive"/>
-	 <fcnfont name="active" function="selected"/>
-	 <fcnfont name="selectable" function="selectable"/>     
-       </bin>
-
-     </managedtreelist>
-
-     <image name="showinglines" draworder="2" fleximage="yes">
-       <filename>showings.png</filename>
-       <position>0,0</position>
-     </image>
-
-   </container>
-
-   <container name="keys">
-     <area>0,300,800,320</area>
-
-     <textarea name="infotitle" draworder="0">
-       <font>infotitle</font>
-       <area>282,20,236,40</area>
-       <value>Key Bindings</value>
-     </textarea>
-
-     <textbutton name="action_one" draworder="0">
-       <position>20,100</position>
-       <image function="on" filename="kb-button-on.png"/>
-       <image function="off" filename="kb-button-off.png"/>
-       <font>keys</font>
-     </textbutton>
-
-     <textbutton name="action_two" draworder="0">
-       <position>200,100</position>
-       <image function="on" filename="kb-button-on.png"/>
-       <image function="off" filename="kb-button-off.png"/>
-       <font>keys</font>
-     </textbutton>
-
-     <textbutton name="action_three" draworder="0">
-       <position>390,100</position>
-       <image function="on" filename="kb-button-on.png"/>
-       <image function="off" filename="kb-button-off.png"/>
-       <font>keys</font>
-     </textbutton>
-
-     <textbutton name="action_four" draworder="0">
-       <position>580,100</position>
-       <image function="on" filename="kb-button-on.png"/>
-       <image function="off" filename="kb-button-off.png"/>
-       <font>keys</font>
-     </textbutton>
-
-     <image name="actionlines" draworder="1" allign="left">
-       <filename>cr-lines.png</filename>
-       <position>0,0</position>
-     </image>
-
-     <textarea name="description" draworder="1" allign="left">
-       <font>info</font>
-       <area>30,180,740,140</area>
-       <multiline>yes</multiline>
-     </textarea>
-
-     
-   </container>
+  </container>
 
  </window>
 </mythuitheme>

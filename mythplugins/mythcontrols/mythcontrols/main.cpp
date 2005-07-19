@@ -26,45 +26,15 @@
 using namespace std;
 
 #include "mythcontrols.h"
-
+#include <mythtv/mythdialogs.h>
 
 
 /**
- * @name Plugin API
- *
- * The following methods are required by all MythTV plugins.
+ * @brief Initializes the plugin.
+ * @param libversion The mythtv library version.
+ * @return zero if all is well, otherwise, less than zero
  */
-//@{
-extern "C" {
-
-  /**
-   * @brief Called by mythtv to initialize the plugin.
-   * @param libversion Used to make sure that the requried version of
-   * the library is being used.
-   * @return I dont really know what difference your return values makes.
-   * @todo Find out the difference this return values makes.
-   */
-  int mythplugin_init(const char *libversion);
-
-  /**
-   * @brief Runs the plugin.
-   * @return I dont really know what difference your return values makes.
-   * @todo Find out the difference this return values makes.
-   */
-  int mythplugin_run(void);
-
-  /**
-   * @brief Called to configure the plugin.
-   * @return I dont really know what difference your return values makes.
-   * @todo Find out the difference this return values makes.
-   */
-  int mythplugin_config(void);
-}
-//@}
-
-
-/* documented above */
-int mythplugin_init(const char *libversion)
+extern "C" int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythcontrols", libversion,
 				    MYTH_BINARY_VERSION)) return -1;
@@ -73,28 +43,42 @@ int mythplugin_init(const char *libversion)
 
 
 
-/* documented above */
-int mythplugin_run (void)
+/**
+ * @brief Runs the plugin.
+ * @return zero if all is well, otherwise, less than zero
+ */
+extern "C" int mythplugin_run (void)
 {
-    MythControls controls(gContext->GetMainWindow(), "controls");
+    bool uiloaded;
+    MythMainWindow *window = gContext->GetMainWindow();
+
+    /* create the keybinding plugin.  uiloaded will be set to false
+     * if the theme was not correct */
+    MythControls controls(window, uiloaded);
 
     /* if the UI is successfully loaded, just giv'er*/
-    if (controls.loadUI())
+    if (uiloaded)
     {
 	controls.exec();
 	return 0;    
     }
     else
     {
-	VERBOSE(VB_ALL, "Unable to load theme, exiting");
+	MythPopupBox::showOkPopup(window, "Theme Error", "Could not load the "
+				  "keybinding plugin's theme.  Check the "
+				  "console for detailed output.");
+
 	return -1;
     }
 }
 
 
 
-/* documented above*/
-int mythplugin_config (void) { return 0; }
+/**
+ * @brief Configures the plugin.
+ * @return zero.
+ */
+extern "C" int mythplugin_config (void) { return 0; }
 
 
 

@@ -22,8 +22,6 @@
 #ifndef ACTIONSET_CPP
 #define ACTIONSET_CPP
 
-#include <iostream>
-
 #include <qmap.h>
 #include <qdict.h>
 #include <qvaluelist.h>
@@ -34,7 +32,6 @@
 using namespace std;
 
 #include "actionset.h"
-
 
 
 /* method description in header */
@@ -54,8 +51,8 @@ bool ActionSet::add(const ActionID &id, const QString &key)
 	    ids.push_back(id);
 	    this->modify(id);	
 	    return true;
-	} else cerr << "Key not added" << endl;
-    } else cerr << "No action" << endl;
+	}
+    }
 
     return false;
 }

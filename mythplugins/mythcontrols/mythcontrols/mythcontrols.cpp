@@ -36,70 +36,39 @@
 
 /* MythTV includes */
 #include <mythtv/mythcontext.h>
-#include <mythtv/uitypes.h>
 #include <mythtv/mythdialogs.h>
-#include <mythtv/dialogbox.h>
-#include <mythtv/xmlparse.h>
 #include <mythtv/themedmenu.h>
-#include <mythtv/mythdbcon.h>
 
 using namespace std;
 
 #include "mythcontrols.h"
 #include "keygrabber.h"
 
-/**
- * @class ConflictResolver
- * @brief A MythDialog that notifies the user of conflicts. 
- */
-class ConflictResolver : public MythPopupBox
-{
-
-public:
-    ConflictResolver(MythMainWindow *window, ActionID *conflict)
-	: MythPopupBox(window, "conflictresolver")
-    {
-	QString warning = "The key you have chosen is already bound to "
-	    + conflict->action() + " in the " + conflict->context()
-	    + " context; please rebind it before binding this key.";
-	
-	addLabel("Action Conflict", Large, false);
-	addLabel(warning, Small, true);
-    }
-
-
-    ConflictResolver(MythMainWindow *window)
-	: MythPopupBox(window,"conflictresolver")
-    {
-
-	QString warning;
-	warning = "This action is manditory and needs at least one key bound ";
-	warning += "to it.  Instead, try rebinding with another key.";
-	    
-	addLabel("Manditory Action", Large, false);
-	addLabel(warning, Small, true);
-    }
-};
 
 
 /* comments in header */
-MythControls::MythControls (MythMainWindow *parent, const char *name) 
-    :MythThemedDialog(parent, "controls", "controls-", name)
+MythControls::MythControls (MythMainWindow *parent, bool& ui_ok)
+    :MythThemedDialog(parent, "controls", "controls-", "controls")
 {
+    /* Nullify keybindings so the deconstructor knows not to delete it */
+    this->key_bindings = NULL;
+
+    
     /* load up the ui components */
-    loadUI();
+    if ((ui_ok = loadUI()))
+    {
+	/* for starters, load this host */
+	loadHost(gContext->GetHostName());
 
-    /* for starters, load this host */
-    loadHost(gContext->GetHostName());
-
-    /* update the information */
-    refreshKeyInformation();
+	/* update the information */
+	refreshKeyInformation();
+    }
 }
 
 
 
 /* comments in header */
-MythControls::~MythControls() { delete(this->key_bindings); }
+MythControls::~MythControls() { delete this->key_bindings; }
 
 
 
@@ -109,49 +78,44 @@ bool MythControls::loadUI()
     /* the return value of the method */
     bool retval = true;
 
-    /* by default, there is no popup */
-    popup = NULL;
-
     /* Get the UI widgets that we need to work with */
-    description = getUITextType("description");
-    if (!description) {
-	VERBOSE(VB_ALL, "Unable to load action_description");
+    if ((description = getUITextType("description")) == NULL)
+    {
+	VERBOSE(VB_ALL, "MythControls: Unable to load action_description");
 	retval = false;
     }
 
-    control_tree_list=getUIManagedTreeListType("controltree");
-    if (!control_tree_list)
+    if ((control_list=getUIListTreeType("controltree")) == NULL)
     {
-	VERBOSE(VB_ALL, "Unable to load controltree");
+	VERBOSE(VB_ALL, "MythControls: Unable to load controltree");
 	retval = false;
     }
     else {
 
 	/* set some parameters for the tree */
-	control_tree_list->showWholeTree(true);
-	control_tree_list->colorSelectables(true);
-	focused=control_tree_list;
+	focused=control_list;
+	control_list->setActive(true);
     }
 
     /* Check that all the buttons are there */
     if ((action_buttons[0] = getUITextButtonType("action_one")) == NULL)
     {
-	VERBOSE(VB_ALL, "Unable to load first action button");
+	VERBOSE(VB_ALL, "MythControls: Unable to load first action button");
 	retval = false;
     }
     else if ((action_buttons[1] = getUITextButtonType("action_two")) == NULL)
     {
-	VERBOSE(VB_ALL, "Unable to load second action button");
+	VERBOSE(VB_ALL, "MythControls: Unable to load second action button");
 	retval = false;
     }
     else if ((action_buttons[2] = getUITextButtonType("action_three")) == NULL)
     {
-	VERBOSE(VB_ALL, "Unable to load thrid action button");
+	VERBOSE(VB_ALL, "MythControls: Unable to load thrid action button");
 	retval = false;
     }
     else if ((action_buttons[3] = getUITextButtonType("action_four")) == NULL)
     {
-	VERBOSE(VB_ALL, "Unable to load fourth action button");
+	VERBOSE(VB_ALL, "MythControls: Unable to load fourth action button");
 	retval = false;
     }
 
@@ -177,7 +141,8 @@ void MythControls::focusButton(int direction)
     {
 	focused = action_buttons[0];
 	action_buttons[0]->takeFocus();
-	control_tree_list->looseFocus();
+	control_list->looseFocus();
+	control_list->setActive(false);
     }
     else
     {
@@ -220,46 +185,32 @@ void MythControls::keyPressEvent(QKeyEvent *e) {
 
 	if (action == "MENU" || action == "INFO")
 	{
-	    /* bring up the menu */
-	    this->actionMenu();
+	    OptionsMenu popup(gContext->GetMainWindow());
+	    if (popup.getOption() == OptionsMenu::SAVE) save();
 	}
 	else if (action == "SELECT")
 	{
-	    if (focused == control_tree_list)
+	    if (focused == control_list)
 	    {
-		if (control_tree_list->getActiveBin() == 1)
-		    control_tree_list->pushDown();
-		else
-		    focusButton(0);
+		if (control_list->getDepth() == 0) control_list->MoveRight();
+		else focusButton(0);
 	    }
 	    else {
-		popup = new MythPopupBox(gContext->GetMainWindow(),"decision");
-		popup->addLabel(tr("Modify Action"),MythPopupBox::Large,false);
-		popup->addButton(tr("Set Binding"),this, SLOT(captureKey()));
-		popup->addButton(tr("Remove Binding"),this, SLOT(deleteKey()));
-		popup->addButton(tr("Cancel"), this,
-				 SLOT(killPopup()))->setFocus();
-		popup->ShowPopup();
+		ActionMenu popup(gContext->GetMainWindow());
+		int result = popup.getOption();
+		if (result == ActionMenu::SET) addKeyToAction();
+		else if (result == ActionMenu::REMOVE) deleteKey();
 	    }
 	}
 	else if (action == "ESCAPE")
 	{
-	    if (focused == control_tree_list)
+	    if (focused == control_list)
 	    {
 		/* ask the user to save if there are unsaved changes*/
 		if (key_bindings->hasChanges())
 		{
-		    popup = new MythPopupBox(gContext->GetMainWindow(),
-					     "unsaged");
-		    popup->addLabel(tr("Unsaged Changes"),
-				    MythPopupBox::Large,
-				    false);
-
-		    popup->addLabel(tr("Would you like to save now?"));
-		    popup->addButton(tr("Save"), this,
-				     SLOT(save()))->setFocus();
-		    popup->addButton(tr("Exit"), this, SLOT(killPopup()));
-		    popup->ExecPopup(this, SLOT(killPopup()));
+		    UnsavedMenu popup(gContext->GetMainWindow());
+		    if (popup.getOption() == UnsavedMenu::SAVE) save();
 		}
 
 		/* let the user exit */
@@ -269,61 +220,51 @@ void MythControls::keyPressEvent(QKeyEvent *e) {
 	    {
 		/* take focus away from the button */
 		focused->looseFocus();
-		control_tree_list->takeFocus();
-		focused = control_tree_list;
+		focused = control_list;
+		control_list->takeFocus();
+		control_list->setActive(true);
 	    }
 	}
-	else if (action == "UP")
+	else if ((action == "UP") && (focused == control_list))
 	{
-	    if (focused == control_tree_list)
-	    {
-		control_tree_list->moveUp();
-		refreshKeyInformation();
-	    }
-	    else focusButton(-1);
+	    control_list->MoveUp();
+	    refreshKeyInformation();
 	}
-	else if (action == "DOWN")
+	else if ((action == "DOWN") && (focused == control_list))
 	{
-	    if (focused == control_tree_list)
-	    {
-		control_tree_list->moveDown();
-		refreshKeyInformation();
-	    }
-	    else focusButton(1);
+	    control_list->MoveDown();
+	    refreshKeyInformation();
 	}
 	else if (action == "LEFT")
 	{
-	    if (focused == control_tree_list)
+	    if (focused==control_list)
 	    {
-		control_tree_list->popUp();
+		control_list->MoveLeft();
 		refreshKeyInformation();
 	    }
 	    else focusButton(-1);
 	}
 	else if (action == "RIGHT")
 	{
-	    if (focused == control_tree_list)
+	    if (focused == control_list)
 	    {
-		control_tree_list->pushDown();
-		refreshKeyInformation();
+		if (control_list->getDepth() == 0)
+		{
+		    control_list->MoveRight();
+		    refreshKeyInformation();
+		}
 	    }
 	    else focusButton(1);
 	}
-	else if (action == "PAGEUP")
+	else if ((action == "PAGEUP") && (focused == control_list))
 	{
-	    if (focused == control_tree_list)
-	    {
-		control_tree_list->pageUp();
-		refreshKeyInformation();
-	    }
+	    control_list->MoveUp(UIListTreeType::MovePage);
+	    refreshKeyInformation();
 	}
-	else if (action == "PAGEDOWN")
+	else if ((action == "PAGEDOWN") && (focused == control_list))
 	{
-	    if (focused == control_tree_list)
-	    {
-		control_tree_list->pageDown();
-		refreshKeyInformation();
-	    }
+	    control_list->MoveDown(UIListTreeType::MovePage);
+	    refreshKeyInformation();
 	}
 	else handled = false;
     }
@@ -363,10 +304,11 @@ void MythControls::refreshKeyInformation() {
 /* comments in header */
 QString MythControls::getCurrentContext(void) const
 {
-    if (control_tree_list->getActiveBin() == 2)
-	return control_tree_list->getCurrentNode()->getParent()->getString();
-    else if (control_tree_list->getActiveBin() == 1)
-	return control_tree_list->getCurrentNode()->getString();
+    UIListGenericTree *current = control_list->GetCurrentPosition();
+    if (control_list->getDepth() == 1 )
+	return current->getParent()->getString();
+    else if (control_list->getDepth() == 0)
+	return current->getString();
     else
 	return "";
 }
@@ -376,8 +318,8 @@ QString MythControls::getCurrentContext(void) const
 /* comments in header */
 QString MythControls::getCurrentAction(void) const
 {
-    if (control_tree_list->getActiveBin() == 2)
- 	return control_tree_list->getCurrentNode()->getString();
+    if (control_list->getDepth() == 1)
+ 	return control_list->GetCurrentPosition()->getString();
     else
 	return "";
 }
@@ -389,73 +331,43 @@ void MythControls::loadHost(const QString & hostname) {
 
     /* create the key bindings and the tree */
     key_bindings = new KeyBindings(hostname);
-    context_tree = new GenericTree(hostname, 0, false);
     QStringList context_names = key_bindings->getContexts();
 
-    for (size_t i = 0; i < context_names.size(); i++) {
+    /* Alphabetic order, but jump and global at the top  */
+    context_names.sort();
+    context_names.remove(JUMP_CONTEXT);
+    context_names.remove(GLOBAL_CONTEXT);
+    context_names.insert(context_names.begin(), 1, GLOBAL_CONTEXT);
+    context_names.insert(context_names.begin(), 1, JUMP_CONTEXT);
 
-	GenericTree *context_node = new GenericTree(context_names[i], i, true);
+    UIListGenericTree *root = new UIListGenericTree(NULL, "ROOT");
 
-	/* add the context to the tree of contexts */
-	context_tree->addNode(context_node);
+    for (size_t i = 0; i < context_names.size(); i++)
+    {
+	UIListGenericTree *context_node;
+	context_node = new UIListGenericTree(root, context_names[i],
+					     context_names[i]);
 
 	QStringList action_names = key_bindings->getActions(context_names[i]);
+	action_names.sort();
 
 	/* add all actions to the context */
 	for (size_t j = 0; j < action_names.size(); j++)
-	    context_node->addNode(action_names[j], j, true);
-
-	/* put the data in the tree */
-	control_tree_list->assignTreeData(context_node);
+	{
+	    new UIListGenericTree(context_node, action_names[j],
+				  action_names[j]);
+	}
     }
-}
 
-
-
-void MythControls::killPopup()
-{
-    if (this->popup == NULL) return;
-
-    this->popup->hide();
-    delete this->popup;
-    this->popup = NULL;
-    setActiveWindow();
+    control_list->SetTree(root);
+    control_list->setActive(true);
 }
 
 
 
 /* comments in header */
-void MythControls::actionMenu()
-{
-    if (popup != NULL) return;
-
-    popup = new MythPopupBox(gContext->GetMainWindow(), "editaction");
-    popup->addButton(tr("Save Changes"), this, SLOT(save()));
-    popup->addButton(tr("Cancel"),this, SLOT(killPopup()))->setFocus();
-    popup->ShowPopup(this, SLOT(killPopup()));
-}
-
-
-
-void MythControls::captureKey()
-{
-    killPopup();
-
-    KeyGrabPopupBox * kg = new KeyGrabPopupBox(gContext->GetMainWindow());
-
-    kg->addOKButton(kg->addButton(tr("OK"), this, SLOT(addKeyToAction())));
-    kg->addButton(tr("Cancel"), this, SLOT(killPopup()));
-    this->popup = (MythPopupBox*)kg;
-    this->popup->ShowPopup(this,SLOT(killPopup()));
-}
-
-
-
 void MythControls::deleteKey()
 {
-
-    killPopup();
-
     size_t b = focusedButton();
     QString action = getCurrentAction(), context = getCurrentContext();
     QStringList keys = key_bindings->getActionKeys(context, action);
@@ -463,8 +375,8 @@ void MythControls::deleteKey()
     {
 	if (!key_bindings->removeActionKey(context, action, keys[b]))
 	{
-	    this->popup = new ConflictResolver(gContext->GetMainWindow());
-	    this->popup->ExecPopup(this, SLOT(killPopup()));
+	    InvalidBindingPopup popup(gContext->GetMainWindow());
+	    popup.getOption();
 	}
 	else refreshKeyInformation();
     }
@@ -472,52 +384,77 @@ void MythControls::deleteKey()
 
 
 
-void MythControls::addKeyToAction(void)
+/* method description in header */
+bool MythControls::resolveConflict(ActionID *conflict, int level)
 {
-    size_t b = focusedButton();
-    QString newkey = ((KeyGrabPopupBox*)popup)->getCapturedKeyEvent();
-    QString action = getCurrentAction(), context = getCurrentContext();
-    QStringList keys = key_bindings->getActionKeys(context, action);
-    ActionID *conflict = NULL;
+    MythMainWindow *window = gContext->GetMainWindow();
 
-    /* having got the key, kill the key grabber */
-    killPopup();
-
-    if (b < keys.count())
+    /* prevent a fatal binding */
+    if (level == KeyBindings::Error)
     {
-	/* dont replace with the same key */
-	if (keys[b] != newkey) {
-	    if ((conflict = key_bindings->conflicts(context, newkey)))
-	    {
-		this->popup = new ConflictResolver(gContext->GetMainWindow(),
-						   conflict);
-		this->popup->ExecPopup(this, SLOT(killPopup()));
-	    }
-	    else key_bindings->replaceActionKey(context,action,newkey,keys[b]);
-	}
+	InvalidBindingPopup popup(gContext->GetMainWindow(),
+				  conflict->action(),
+				  conflict->context());
+	popup.getOption();
+	return false;
     }
-    else {
-	if ((conflict = key_bindings->conflicts(context, newkey)))
-	{
-	    this->popup = new ConflictResolver(gContext->GetMainWindow(),
-					       conflict);
-	    this->popup->ExecPopup(this, SLOT(killPopup()));
-	}
-	else key_bindings->addActionKey(context, action, newkey);
+    else
+    {
+	/* warn the user that this could conflict */
+	QString message = "This kebinding may conflict with ";
+	message += conflict->action() + " in the " + conflict->context();
+	message += " context.  Do you want to bind it anyways?";
+
+	if (MythPopupBox::show2ButtonPopup(window, "Conflict Warning",
+					   message,"Bind Key","Cancel",0))
+	    return false;
     }
 
-    /* delete the conflict and hide the popup*/
-    if (conflict) {
-	delete conflict;
-	killPopup();
-    }
-
-    refreshKeyInformation();
+    return true;
 }
 
-void MythControls::save(void) {
-    key_bindings->commitChanges();
-    killPopup();
+
+
+/* method description in header */
+void MythControls::addKeyToAction(void)
+{
+    /* grab a key from the user */
+    KeyGrabPopupBox *kg = new KeyGrabPopupBox(gContext->GetMainWindow());
+    int result = kg->ExecPopup(kg,SLOT(cancel()));
+    QString key = kg->getCapturedKey();
+    delete kg;
+
+    /* go no further if canceled */
+    if (result == 0) return;
+
+    /* get the keys for the selected action */
+    size_t b = focusedButton();
+    QString action = getCurrentAction(), context = getCurrentContext();
+    QStringList keys = key_bindings->getActionKeys(context, action);
+
+    /* dont bother rebinding the same key */
+    if (keys[b] == key) return;
+
+    bool bind = false;
+    int level;
+
+    /* get the potential conflict */
+    ActionID *conflict = NULL;
+    if ((conflict = key_bindings->conflicts(context, key, level)))
+	bind = resolveConflict(conflict, level);
+
+    delete conflict;
+
+    /* dont bind if we shouldn't bind */
+    if (!bind) return;
+
+    /* finally bind or rebind a key to the action */
+    if (b < keys.count())
+	key_bindings->replaceActionKey(context,action, key, keys[b]);
+    else
+	key_bindings->addActionKey(context, action, key);
+
+    refreshKeyInformation();
 }
 
 #endif /* MYTHCONTROLS_CPP */

@@ -23,11 +23,8 @@
 #ifndef MYTHCONTROLS_H
 #define MYTHCONTROLS_H
 
-#include <stdexcept>
-
 #include <mythtv/mythdialogs.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/uitypes.h>
+#include <mythtv/uilistbtntype.h>
 
 #include "keybindings.h"
 
@@ -47,24 +44,15 @@ class MythControls : virtual public MythThemedDialog
      * @param parent The main myth window.
      * @param name The name of this window?  I dunno, none of the docs
      * say.
+     * @param ui_ok Will be set according to weather the UI was
+     * correctly loaded.
      */
-    MythControls(MythMainWindow *parent, const char *name=0);
+    MythControls(MythMainWindow *parent, bool& ui_ok);
 
     /**
      * @brief Delete the myth controls object.
      */
     ~MythControls();
-
-    /**
-     * @brief Load up UI.
-     * @return true if all UI elements were loaded successfully,
-     * otherwise false it returned.
-     *
-     * This method grabs all of the UI "thingies" that are needed by
-     * mythcontrols.  If this method returns false, the plugin should
-     * exit since it will probably just core dump.
-     */
-    bool loadUI();
 
     /**
      * @brief Get the currently selected context string.
@@ -82,7 +70,20 @@ class MythControls : virtual public MythThemedDialog
      */
     QString getCurrentAction(void) const;
 
+    
+    
  protected:
+
+    /**
+     * @brief Load up UI.
+     * @return true if all UI elements were loaded successfully,
+     * otherwise false it returned.
+     *
+     * This method grabs all of the UI "thingies" that are needed by
+     * mythcontrols.  If this method returns false, the plugin should
+     * exit since it will probably just core dump.
+     */
+    bool loadUI();
 
     /**
      * @brief The key press handler.
@@ -97,11 +98,6 @@ class MythControls : virtual public MythThemedDialog
      * the action.
      */
     void refreshKeyInformation();
-
-    /**
-     * @brief Launches the action menu.
-     */
-    void actionMenu();
 
     /**
      * @brief Load the settings for a particular host.
@@ -125,17 +121,19 @@ class MythControls : virtual public MythThemedDialog
      */
     size_t focusedButton(void) const;
 
+    /**
+     * @brief Resolve a potential conflict.
+     * @return true if the conflict should be bound, otherwise, false
+     * is returned.
+     */
+    bool resolveConflict(ActionID *conflict, int level);
+
  private slots:
 
      /**
       * @brief Add a key to the currently selected action.
       */
-     void addKeyToAction();
-
-     /**
-      * @brief Capture a key press using the key grabber.
-      */
-     void captureKey();
+     void addKeyToAction(void);
 
      /**
       * @brief Delete the currently active key.
@@ -143,24 +141,17 @@ class MythControls : virtual public MythThemedDialog
      void deleteKey();
 
      /**
-      * @brief Kill the currently visbile popup window.
-      */
-     void killPopup();
-
-     /**
       * @brief Save the settings.
       */
-     void save();
+     inline void save(void) { key_bindings->commitChanges(); }
 
  private:
 
      UIType *focused;
-     GenericTree * context_tree;
-     UIManagedTreeListType * control_tree_list;
+     UIListTreeType *control_list;
      UITextType *description;
      UITextButtonType * action_buttons[Action::MAX_KEYS];
      KeyBindings *key_bindings;
-     MythPopupBox *popup;
 };
 
 

@@ -29,7 +29,6 @@
 #include "actionid.h"
 #include "actionset.h"
 
-
 /**
  * @class KeyBindings.
  * @brief Information about the current keybindings.
@@ -41,6 +40,14 @@
 class KeyBindings {
 
  public:
+
+  /**
+   * @brief Levels of conflict 
+   * @li None: Does not conflict
+   * @li Potential: May conflict.
+   * @li Fatal: Frontend will become inoperable.
+   */
+  enum ConflictLevels { Warning, Error};
 
   /**
    * @brief Create a new KeyBindings instance.
@@ -111,15 +118,23 @@ class KeyBindings {
    * @brief Determine if adding a key would cause a conflict.
    * @param context_name The name of the context.
    * @param key The key to add.
+   * @param level The level of conflict.  Check this if the return
+   * value is not NULL
    * @return true if adding the key would cause a conflict.
    *
    * Conflicts occur if:
    * @li the key is a jump point, but is bound elsewhere
    * @li the key is already bound to a jumppoint.
+   * @li the key is bound to something in the global context.
    * @li the key is bound to something else in the specified context
+   *
+   * If the method does not return NULL, check the value given to
+   * level.  Warnings can be ignored (at the users disgression), but
+   * errors should be prevented no matter what.  If they dont like it,
+   * they can learn SQL.
    */
   ActionID * conflicts(const QString & context_name,
-		       const QString & key) const;
+		       const QString & key, int &level) const;
 
   /**
    * @brief Replace a key in an action.
@@ -152,9 +167,7 @@ class KeyBindings {
    */
   bool removeActionKey(const QString & context_name,
 		       const QString & action_name,
-		       const QString & key) {
-      return this->actionset.remove(ActionID(context_name, action_name),key);
-  }
+		       const QString & key);
 
   /**
    * @brief Set the manditory bindings to their defaults.
