@@ -2230,7 +2230,7 @@ static int mpeg1_decode_picture(AVCodecContext *avctx,
     if (s->pict_type == P_TYPE || s->pict_type == B_TYPE) {
         s->full_pel[0] = get_bits1(&s->gb);
         f_code = get_bits(&s->gb, 3);
-        if (f_code == 0)
+        if (f_code == 0 && avctx->error_resilience >= FF_ER_COMPLIANT)
             return -1;
         s->mpeg_f_code[0][0] = f_code;
         s->mpeg_f_code[0][1] = f_code;
@@ -2238,7 +2238,7 @@ static int mpeg1_decode_picture(AVCodecContext *avctx,
     if (s->pict_type == B_TYPE) {
         s->full_pel[1] = get_bits1(&s->gb);
         f_code = get_bits(&s->gb, 3);
-        if (f_code == 0)
+        if (f_code == 0 && avctx->error_resilience >= FF_ER_COMPLIANT)
             return -1;
         s->mpeg_f_code[1][0] = f_code;
         s->mpeg_f_code[1][1] = f_code;
@@ -3118,7 +3118,7 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
         /* find start next code */
         start_code = find_start_code(&buf_ptr, buf_end);
         if (start_code < 0){
-            if(s2->pict_type != B_TYPE || avctx->hurry_up==0){
+            if(s2->pict_type != B_TYPE || avctx->skip_frame <= AVDISCARD_DEFAULT){
                 if(avctx->thread_count > 1){
                     int i;
 
@@ -3169,11 +3169,19 @@ static int mpeg_decode_frame(AVCodecContext *avctx,
                     if (start_code >= SLICE_MIN_START_CODE &&
                         start_code <= SLICE_MAX_START_CODE) {
                         int mb_y= start_code - SLICE_MIN_START_CODE;
-                        
+
+                        if(s2->last_picture_ptr==NULL){                        
                         /* skip b frames if we dont have reference frames */
-                        if(s2->last_picture_ptr==NULL && s2->pict_type==B_TYPE) break;
+                            if(s2->pict_type==B_TYPE) break;
+                        /* skip P frames if we dont have reference frame no valid header */
+                            if(s2->pict_type==P_TYPE && !s2->first_slice) break;
+                        }
                         /* skip b frames if we are in a hurry */
                         if(avctx->hurry_up && s2->pict_type==B_TYPE) break;
+                        if(  (avctx->skip_frame >= AVDISCARD_NONREF && s2->pict_type==B_TYPE)
+                           ||(avctx->skip_frame >= AVDISCARD_NONKEY && s2->pict_type!=I_TYPE)
+                           || avctx->skip_frame >= AVDISCARD_ALL)
+                            break;
                         /* skip everything if we are in a hurry>=5 */
                         if(avctx->hurry_up>=5) break;
                         

@@ -615,7 +615,7 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
         }
 
         AVStream *curstream = ic->streams[pkt.stream_index];
-        if (pkt.size > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
+        if (pkt.size > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
             if (PacketHasHeader(pkt.data, pkt.size, PICTURE_START))
             {

@@ -27,10 +27,10 @@ SOURCES += mpjpeg.c nut.c os_support.c rm.c psxstr.c raw.c flic.c audio.c
 SOURCES += segafilm.c swf.c utils.c wav.c wc3movie.c westwood.c yuv4mpeg.c
 SOURCES += sierravmd.c asf-enc.c matroska.c img2.c electronicarts.c sol.c
 SOURCES += nsvdec.c ogg2.c oggparsevorbis.c oggparsetheora.c oggparseflac.c
+SOURCES += mmf.c gif.c gifdec.c jpeg.c png.c pnm.c sgi.c yuv.c
 
 # not using:  barpainet.* beosaudio.cpp, dv1394.*, dc1394.c, framehook.*
-# not using:  gif.c gifdec.c grab.c http.c jpeg.c png.c pnm.c rtp.*
-# not using:  rtpproto.c rtsp* sgi.c tcp.c udp.c yuv.c
+# not using:  grab.c
 
 contains( AMR_NB, yes ) {
     SOURCES += amr.c
@@ -44,6 +44,10 @@ contains( AMR_WB, yes ) {
 
 contains( CONFIG_VORBIS, yes ) {
     SOURCES += ogg.c
+}
+
+contains( CONFIG_NETWORK, yes ) {
+    SOURCES += rtp.c rtpproto.c rtsp.c udp.c tcp.c http.c
 }
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/

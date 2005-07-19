@@ -51,15 +51,16 @@ void av_register_all(void)
 #endif //CONFIG_ENCODERS
     avidec_init();
     ff_wav_init();
+    ff_mmf_init();
     swf_init();
     au_init();
 #ifdef CONFIG_ENCODERS
-    //gif_init();
+    gif_init();
 #endif //CONFIG_ENCODERS
     mov_init();
 #ifdef CONFIG_ENCODERS
     movenc_init();
-    //jpeg_init();
+    jpeg_init();
 #endif //CONFIG_ENCODERS
     ff_dv_init();
     fourxm_init();
@@ -89,7 +90,7 @@ void av_register_all(void)
 
     ffm_init();
 #if defined(CONFIG_VIDEO4LINUX) || defined(CONFIG_BKTR)
-    //video_grab_init();
+//    video_grab_init();
 #endif
 #if defined(CONFIG_AUDIO_OSS) || defined(CONFIG_AUDIO_BEOS)
     audio_init();
@@ -124,14 +125,14 @@ void av_register_all(void)
 #endif
     av_register_image_format(&jpeg_image_format);
 #endif
-//    av_register_image_format(&gif_image_format);  
+    av_register_image_format(&gif_image_format);  
 //    av_register_image_format(&sgi_image_format); heap corruption, dont enable
 #endif //CONFIG_ENCODERS
 
     /* file protocols */
     register_protocol(&file_protocol);
     register_protocol(&pipe_protocol);
-#if 0 //CONFIG_NETWORK
+#ifdef CONFIG_NETWORK
     rtsp_init();
     rtp_init();
     register_protocol(&udp_protocol);

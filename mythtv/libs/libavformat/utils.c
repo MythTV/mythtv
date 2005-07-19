@@ -754,14 +754,14 @@ static void compute_frame_duration(int *pnum, int *pden, AVStream *st,
 
     *pnum = 0;
     *pden = 0;
-    switch(st->codec.codec_type) {
+    switch(st->codec->codec_type) {
     case CODEC_TYPE_VIDEO:
         if(st->time_base.num*1000LL > st->time_base.den){
             *pnum = st->time_base.num;
             *pden = st->time_base.den;
-        }else if(st->codec.time_base.num*1000LL > st->codec.time_base.den){
-            *pnum = st->codec.time_base.num;
-            *pden = st->codec.time_base.den;
+        }else if(st->codec->time_base.num*1000LL > st->codec->time_base.den){
+            *pnum = st->codec->time_base.num;
+            *pden = st->codec->time_base.den;
             if (pc && pc->repeat_pict) {
                 *pden *= 2;
                 *pnum = (*pnum) * (2 + pc->repeat_pict);
@@ -769,11 +769,11 @@ static void compute_frame_duration(int *pnum, int *pden, AVStream *st,
         }
         break;
     case CODEC_TYPE_AUDIO:
-        frame_size = get_audio_frame_size(&st->codec, pkt->size);
+        frame_size = get_audio_frame_size(st->codec, pkt->size);
         if (frame_size < 0)
             break;
         *pnum = frame_size;
-        *pden = st->codec.sample_rate;
+        *pden = st->codec->sample_rate;
         break;
     default:
         break;
@@ -828,16 +828,16 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
         }
     }
 
-    if(is_intra_only(&st->codec))
+    if(is_intra_only(st->codec))
         pkt->flags |= PKT_FLAG_KEY;
 
     /* do we have a video B frame ? */
     presentation_delayed = 0;
-    if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
+    if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
         /* XXX: need has_b_frame, but cannot get it if the codec is
            not initialized */
-        if ((   st->codec.codec_id == CODEC_ID_H264
-             || st->codec.has_b_frames) &&
+        if ((   st->codec->codec_id == CODEC_ID_H264
+             || st->codec->has_b_frames) &&
             pc && pc->pict_type != FF_B_TYPE)
             presentation_delayed = 1;
         /* this may be redundant, but it shouldnt hurt */
@@ -906,7 +906,7 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
     if (pc) {
         pkt->flags = 0;
         /* key frame computation */
-        switch(st->codec.codec_type) {
+        switch(st->codec->codec_type) {
         case CODEC_TYPE_VIDEO:
             if (pc->pict_type == FF_I_TYPE)
                 pkt->flags |= PKT_FLAG_KEY;
@@ -952,7 +952,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                     st->cur_frame_startpos = s->cur_pkt.pos;
                     st->got_frame = 1;
                 }
-                len = av_parser_parse(st->parser, &st->codec, &pkt->data, &pkt->size, 
+                len = av_parser_parse(st->parser, st->codec, &pkt->data, &pkt->size, 
                                       s->cur_ptr, s->cur_len,
                                       s->cur_pkt.pts, s->cur_pkt.dts);
                 s->cur_pkt.pts = AV_NOPTS_VALUE;
@@ -992,7 +992,7 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 for(i = 0; i < s->nb_streams; i++) {
                     st = s->streams[i];
                     if (st->parser && st->need_parsing) {
-                        av_parser_parse(st->parser, &st->codec, 
+                        av_parser_parse(st->parser, st->codec, 
                                         &pkt->data, &pkt->size, 
                                         NULL, 0, 
                                         AV_NOPTS_VALUE, AV_NOPTS_VALUE);
@@ -1013,13 +1013,13 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
                 s->cur_ptr = s->cur_pkt.data;
                 s->cur_len = s->cur_pkt.size;
                 if (st->need_parsing && !st->parser) {
-                    st->parser = av_parser_init(st->codec.codec_id);
+                    st->parser = av_parser_init(st->codec->codec_id);
                     if (!st->parser) {
                         /* no parser available : just output the raw packets */
                         st->need_parsing = 0;
 			av_log(s, AV_LOG_ERROR,
                                "Parser not found for Codec Id: %d !\n",
-                               st->codec.codec_id);
+                               st->codec->codec_id);
                     }
 		}
 	    }
@@ -1092,7 +1092,7 @@ int av_find_default_stream_index(AVFormatContext *s)
         return -1;
     for(i = 0; i < s->nb_streams; i++) {
         st = s->streams[i];
-        if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
+        if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
             return i;
         }
     }
@@ -1302,7 +1302,7 @@ int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts
     AVInputFormat *avif= s->iformat;
     int64_t pos_min, pos_max, pos, pos_limit;
     int64_t ts_min, ts_max, ts;
-    int64_t start_pos;
+    int64_t start_pos, filesize;
     int index, no_change;
     AVStream *st;
 
@@ -1359,7 +1359,8 @@ int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts
 
     if(ts_max == AV_NOPTS_VALUE){
         int step= 1024;
-        pos_max = url_fsize(&s->pb) - 1;
+        filesize = url_fsize(&s->pb);
+        pos_max = filesize - 1;
         do{
             pos_max -= step;
             ts_max = avif->read_timestamp(s, stream_index, &pos_max, pos_max + step);
@@ -1375,6 +1376,8 @@ int av_seek_frame_binary(AVFormatContext *s, int stream_index, int64_t target_ts
                 break;
             ts_max= tmp_ts;
             pos_max= tmp_pos;
+            if(tmp_pos >= filesize)
+                break;
         }
         pos_limit= pos_max;
     }
@@ -1639,7 +1642,7 @@ static void av_estimate_timings_from_bit_rate(AVFormatContext *ic)
         bit_rate = 0;
         for(i=0;i<ic->nb_streams;i++) {
             st = ic->streams[i];
-            bit_rate += st->codec.bit_rate;
+            bit_rate += st->codec->bit_rate;
         }
         ic->bit_rate = bit_rate;
     }
@@ -1848,26 +1851,26 @@ static int try_decode_frame(AVStream *st, const uint8_t *data, int size)
     int got_picture, ret=0;
     AVFrame picture;
 
-  if(!st->codec.codec){    
-    codec = avcodec_find_decoder(st->codec.codec_id);
+  if(!st->codec->codec){    
+    codec = avcodec_find_decoder(st->codec->codec_id);
     if (!codec)
         return -1;
-    ret = avcodec_open(&st->codec, codec);
+    ret = avcodec_open(st->codec, codec);
     if (ret < 0)
         return ret;
   }
 
-  if(!has_codec_parameters(&st->codec)){
-    switch(st->codec.codec_type) {
+  if(!has_codec_parameters(st->codec)){
+    switch(st->codec->codec_type) {
     case CODEC_TYPE_VIDEO:
-        ret = avcodec_decode_video(&st->codec, &picture, 
+        ret = avcodec_decode_video(st->codec, &picture, 
                                    &got_picture, (uint8_t *)data, size);
         break;
     case CODEC_TYPE_AUDIO:
         samples = av_malloc(AVCODEC_MAX_AUDIO_FRAME_SIZE);
         if (!samples)
             goto fail;
-        ret = avcodec_decode_audio(&st->codec, samples, 
+        ret = avcodec_decode_audio(st->codec, samples, 
                                    &got_picture, (uint8_t *)data, size);
         av_free(samples);
         break;
@@ -1908,15 +1911,15 @@ int av_find_stream_info(AVFormatContext *ic)
 
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
-        if(st->codec.codec_type == CODEC_TYPE_VIDEO){
+        if(st->codec->codec_type == CODEC_TYPE_VIDEO){
 /*            if(!st->time_base.num)
                 st->time_base= */
-            if(!st->codec.time_base.num)
-                st->codec.time_base= st->time_base;
+            if(!st->codec->time_base.num)
+                st->codec->time_base= st->time_base;
         }
         //only for the split stuff
         if (!st->parser) {
-            st->parser = av_parser_init(st->codec.codec_id);
+            st->parser = av_parser_init(st->codec->codec_id);
         }
     }
 
@@ -1932,13 +1935,13 @@ int av_find_stream_info(AVFormatContext *ic)
         /* check if one codec still needs to be handled */
         for(i=0;i<ic->nb_streams;i++) {
             st = ic->streams[i];
-            if (!has_codec_parameters(&st->codec))
+            if (!has_codec_parameters(st->codec))
                 break;
             /* variable fps and no guess at the real fps */
-            if(   st->codec.time_base.den >= 1000LL*st->codec.time_base.num
-               && duration_count[i]<20 && st->codec.codec_type == CODEC_TYPE_VIDEO)
+            if(   st->codec->time_base.den >= 1000LL*st->codec->time_base.num
+               && duration_count[i]<20 && st->codec->codec_type == CODEC_TYPE_VIDEO)
                 break;
-            if(st->parser && st->parser->parser->split && !st->codec.extradata)
+            if(st->parser && st->parser->parser->split && !st->codec->extradata)
                 break;
         }
 
@@ -1967,7 +1970,7 @@ int av_find_stream_info(AVFormatContext *ic)
             ret = -1; /* we could not have all the codec parameters before EOF */
             for(i=0;i<ic->nb_streams;i++) {
                 st = ic->streams[i];
-                if (!has_codec_parameters(&st->codec))
+                if (!has_codec_parameters(st->codec))
                     break;
             }
             if (i == ic->nb_streams)
@@ -2020,12 +2023,12 @@ int av_find_stream_info(AVFormatContext *ic)
             }
             last_dts[pkt->stream_index]= pkt->dts;
         }
-        if(st->parser && st->parser->parser->split && !st->codec.extradata){
-            int i= st->parser->parser->split(&st->codec, pkt->data, pkt->size);
+        if(st->parser && st->parser->parser->split && !st->codec->extradata){
+            int i= st->parser->parser->split(st->codec, pkt->data, pkt->size);
             if(i){
-                st->codec.extradata_size= i;
-                st->codec.extradata= av_malloc(st->codec.extradata_size);
-                memcpy(st->codec.extradata, pkt->data, st->codec.extradata_size);
+                st->codec->extradata_size= i;
+                st->codec->extradata= av_malloc(st->codec->extradata_size);
+                memcpy(st->codec->extradata, pkt->data, st->codec->extradata_size);
             }
         }
 
@@ -2033,21 +2036,21 @@ int av_find_stream_info(AVFormatContext *ic)
            decompress the frame. We try to avoid that in most cases as
            it takes longer and uses more memory. For MPEG4, we need to
            decompress for Quicktime. */
-        if (!has_codec_parameters(&st->codec) /*&&
-            (st->codec.codec_id == CODEC_ID_FLV1 ||
-             st->codec.codec_id == CODEC_ID_H264 ||
-             st->codec.codec_id == CODEC_ID_H263 ||
-             st->codec.codec_id == CODEC_ID_H261 ||
-             st->codec.codec_id == CODEC_ID_VORBIS ||
-             st->codec.codec_id == CODEC_ID_MJPEG ||
-             st->codec.codec_id == CODEC_ID_PNG ||
-             st->codec.codec_id == CODEC_ID_PAM ||
-             st->codec.codec_id == CODEC_ID_PGM ||
-             st->codec.codec_id == CODEC_ID_PGMYUV ||
-             st->codec.codec_id == CODEC_ID_PBM ||
-             st->codec.codec_id == CODEC_ID_PPM ||
-             st->codec.codec_id == CODEC_ID_SHORTEN ||
-             (st->codec.codec_id == CODEC_ID_MPEG4 && !st->need_parsing))*/)
+        if (!has_codec_parameters(st->codec) /*&&
+            (st->codec->codec_id == CODEC_ID_FLV1 ||
+             st->codec->codec_id == CODEC_ID_H264 ||
+             st->codec->codec_id == CODEC_ID_H263 ||
+             st->codec->codec_id == CODEC_ID_H261 ||
+             st->codec->codec_id == CODEC_ID_VORBIS ||
+             st->codec->codec_id == CODEC_ID_MJPEG ||
+             st->codec->codec_id == CODEC_ID_PNG ||
+             st->codec->codec_id == CODEC_ID_PAM ||
+             st->codec->codec_id == CODEC_ID_PGM ||
+             st->codec->codec_id == CODEC_ID_PGMYUV ||
+             st->codec->codec_id == CODEC_ID_PBM ||
+             st->codec->codec_id == CODEC_ID_PPM ||
+             st->codec->codec_id == CODEC_ID_SHORTEN ||
+             (st->codec->codec_id == CODEC_ID_MPEG4 && !st->need_parsing))*/)
             try_decode_frame(st, pkt->data, pkt->size);
         
         if (av_rescale_q(st->codec_info_duration, st->time_base, AV_TIME_BASE_Q) >= MAX_STREAM_DURATION) {
@@ -2059,16 +2062,16 @@ int av_find_stream_info(AVFormatContext *ic)
     // close codecs which where opened in try_decode_frame()
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
-        if(st->codec.codec)
-            avcodec_close(&st->codec);
+        if(st->codec->codec)
+            avcodec_close(st->codec);
     }
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
-        if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
-            if(st->codec.codec_id == CODEC_ID_RAWVIDEO && !st->codec.codec_tag && !st->codec.bits_per_sample)
-                st->codec.codec_tag= avcodec_pix_fmt_to_codec_tag(st->codec.pix_fmt);
+        if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
+            if(st->codec->codec_id == CODEC_ID_RAWVIDEO && !st->codec->codec_tag && !st->codec->bits_per_sample)
+                st->codec->codec_tag= avcodec_pix_fmt_to_codec_tag(st->codec->pix_fmt);
 
-            if(duration_count[i] && st->codec.time_base.num*1000LL <= st->codec.time_base.den &&
+            if(duration_count[i] && st->codec->time_base.num*1000LL <= st->codec->time_base.den &&
                st->time_base.num*duration_sum[i]/duration_count[i]*1000LL > st->time_base.den){
                 AVRational fps1;
                 int64_t num, den;
@@ -2086,16 +2089,16 @@ int av_find_stream_info(AVFormatContext *ic)
 
             /* set real frame rate info */
             /* compute the real frame rate for telecine */
-            if ((st->codec.codec_id == CODEC_ID_MPEG1VIDEO ||
-                 st->codec.codec_id == CODEC_ID_MPEG2VIDEO ||
-                 st->codec.codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
-                 st->codec.codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD) &&
-                st->codec.sub_id == 2) {
+            if ((st->codec->codec_id == CODEC_ID_MPEG1VIDEO ||
+                 st->codec->codec_id == CODEC_ID_MPEG2VIDEO ||
+                 st->codec->codec_id == CODEC_ID_MPEG2VIDEO_XVMC ||
+                 st->codec->codec_id == CODEC_ID_MPEG2VIDEO_XVMC_VLD) &&
+                st->codec->sub_id == 2) {
                 if (st->codec_info_nb_frames >= 20) {
                     float coded_frame_rate, est_frame_rate;
                     est_frame_rate = ((double)st->codec_info_nb_frames * AV_TIME_BASE) / 
                         (double)st->codec_info_duration ;
-                    coded_frame_rate = 1.0/av_q2d(st->codec.time_base);
+                    coded_frame_rate = 1.0/av_q2d(st->codec->time_base);
 #if 0
                     printf("telecine: coded_frame_rate=%0.3f est_frame_rate=%0.3f\n", 
                            coded_frame_rate, est_frame_rate);
@@ -2111,8 +2114,8 @@ int av_find_stream_info(AVFormatContext *ic)
             }
             /* if no real frame rate, use the codec one */
             if (!st->r_frame_rate.num){
-                st->r_frame_rate.num = st->codec.time_base.den;
-                st->r_frame_rate.den = st->codec.time_base.num;
+                st->r_frame_rate.num = st->codec->time_base.den;
+                st->r_frame_rate.den = st->codec->time_base.num;
             }
         }
     }
@@ -2122,7 +2125,7 @@ int av_find_stream_info(AVFormatContext *ic)
     /* correct DTS for b frame streams with no timestamps */
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
-        if (st->codec.codec_type == CODEC_TYPE_VIDEO) {
+        if (st->codec->codec_type == CODEC_TYPE_VIDEO) {
             if(b-frames){
                 ppktl = &ic->packet_buffer;
                 while(ppkt1){
@@ -2193,6 +2196,7 @@ void av_close_input_file(AVFormatContext *s)
             av_parser_close(st->parser);
         }
         av_free(st->index_entries);
+        av_free(st->codec);
         av_free(st);
     }
     flush_packet_queue(s);
@@ -2221,7 +2225,7 @@ AVStream *av_new_stream(AVFormatContext *s, int id)
 {
     AVStream *st = av_mallocz(sizeof(AVStream));
     if (st) {
-        avcodec_get_context_defaults(&st->codec);
+        st->codec = avcodec_alloc_context();
         AVStream *stream = av_add_stream(s, st, id);
         if (!stream)
             av_free(st);
@@ -2252,7 +2256,7 @@ AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id)
 
     if (s->iformat) {
         /* no default bitrate if decoding */
-        st->codec.bit_rate = 0;
+        st->codec->bit_rate = 0;
     }
     st->index = s->nb_streams;
     st->id = id;
@@ -2333,14 +2337,14 @@ int av_write_header(AVFormatContext *s)
     for(i=0;i<s->nb_streams;i++) {
         st = s->streams[i];
 
-        switch (st->codec.codec_type) {
+        switch (st->codec->codec_type) {
         case CODEC_TYPE_AUDIO:
             av_frac_init(&st->pts, 0, 0, 
-                         (int64_t)st->time_base.num * st->codec.sample_rate);
+                         (int64_t)st->time_base.num * st->codec->sample_rate);
             break;
         case CODEC_TYPE_VIDEO:
             av_frac_init(&st->pts, 0, 0, 
-                         (int64_t)st->time_base.num * st->codec.time_base.den);
+                         (int64_t)st->time_base.num * st->codec->time_base.den);
             break;
         default:
             break;
@@ -2351,7 +2355,7 @@ int av_write_header(AVFormatContext *s)
 
 //FIXME merge with compute_pkt_fields
 static int compute_pkt_fields2(AVStream *st, AVPacket *pkt){
-    int b_frames = FFMAX(st->codec.has_b_frames, st->codec.max_b_frames);
+    int b_frames = FFMAX(st->codec->has_b_frames, st->codec->max_b_frames);
     int num, den, frame_size;
 
 //    av_log(NULL, AV_LOG_DEBUG, "av_write_frame: pts:%lld dts:%lld cur_dts:%lld b:%d size:%d st:%d\n", pkt->pts, pkt->dts, st->cur_dts, b_frames, pkt->size, pkt->stream_index);
@@ -2403,9 +2407,9 @@ static int compute_pkt_fields2(AVStream *st, AVPacket *pkt){
     st->pts.val= pkt->dts;
 
     /* update pts */
-    switch (st->codec.codec_type) {
+    switch (st->codec->codec_type) {
     case CODEC_TYPE_AUDIO:
-        frame_size = get_audio_frame_size(&st->codec, pkt->size);
+        frame_size = get_audio_frame_size(st->codec, pkt->size);
 
         /* HACK/FIXME, we skip the initial 0-size packets as they are most likely equal to the encoder delay,
            but it would be better if we had the real timestamps from the encoder */
@@ -2414,7 +2418,7 @@ static int compute_pkt_fields2(AVStream *st, AVPacket *pkt){
         }
         break;
     case CODEC_TYPE_VIDEO:
-        av_frac_add(&st->pts, (int64_t)st->time_base.den * st->codec.time_base.num);
+        av_frac_add(&st->pts, (int64_t)st->time_base.den * st->codec->time_base.num);
         break;
     default:
         break;
@@ -2551,7 +2555,7 @@ int av_interleaved_write_frame(AVFormatContext *s, AVPacket *pkt){
     AVStream *st= s->streams[ pkt->stream_index];
 
     //FIXME/XXX/HACK drop zero sized packets
-    if(st->codec.codec_type == CODEC_TYPE_AUDIO && pkt->size==0)
+    if(st->codec->codec_type == CODEC_TYPE_AUDIO && pkt->size==0)
         return 0;
 
 //av_log(NULL, AV_LOG_DEBUG, "av_interleaved_write_frame %d %Ld %Ld\n", pkt->size, pkt->dts, pkt->pts);
@@ -2668,7 +2672,7 @@ void dump_format(AVFormatContext *ic,
     }
     for(i=0;i<ic->nb_streams;i++) {
         AVStream *st = ic->streams[i];
-        avcodec_string(buf, sizeof(buf), &st->codec, is_output);
+        avcodec_string(buf, sizeof(buf), st->codec, is_output);
         av_log(NULL, AV_LOG_INFO, "  Stream #%d.%d", index, i);
         /* the pid is an important information, so we display it */
         /* XXX: add a generic system */
@@ -2678,6 +2682,9 @@ void dump_format(AVFormatContext *ic,
             flags = ic->iformat->flags;
         if (flags & AVFMT_SHOW_IDS) {
             av_log(NULL, AV_LOG_INFO, "[0x%x]", st->id);
+        }
+        if (strlen(st->language) > 0) {
+            av_log(NULL, AV_LOG_INFO, "(%s)", st->language);
         }
         av_log(NULL, AV_LOG_INFO, ": %s\n", buf);
     }

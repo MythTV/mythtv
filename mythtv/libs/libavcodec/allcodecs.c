@@ -553,12 +553,14 @@ PCM_CODEC(CODEC_ID_ADPCM_EA, adpcm_ea);
 PCM_CODEC(CODEC_ID_ADPCM_G726, adpcm_g726);
 PCM_CODEC(CODEC_ID_ADPCM_CT, adpcm_ct);
 PCM_CODEC(CODEC_ID_ADPCM_SWF, adpcm_swf);
+PCM_CODEC(CODEC_ID_ADPCM_YAMAHA, adpcm_yamaha);
 
 #undef PCM_CODEC
 
-    /* subtitles */
+    /* subtitles */ 
     register_avcodec(&dvdsub_decoder);
     register_avcodec(&dvbsub_encoder);
+    register_avcodec(&dvbsub_decoder);
 
     /* parsers */ 
     av_register_codec_parser(&mpegvideo_parser);
@@ -578,5 +580,6 @@ PCM_CODEC(CODEC_ID_ADPCM_SWF, adpcm_swf);
     av_register_codec_parser(&ac3_parser);
 #endif
     av_register_codec_parser(&dvdsub_parser);
+    av_register_codec_parser(&dvbsub_parser);
 }
 

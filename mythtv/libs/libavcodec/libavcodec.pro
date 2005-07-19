@@ -31,7 +31,7 @@ SOURCES += mpeg12.c mpegaudiodec.c pcm.c simple_idct.c ratecontrol.c adpcm.c
 SOURCES += eval.c error_resilience.c fft.c mdct.c raw.c golomb.c cabac.c
 SOURCES += dpcm.c adx.c rational.c faandct.c parser.c g726.c vp3dsp.c integer.c
 SOURCES += h264idct.c rangecoder.c pnm.c h263.c msmpeg4.c h263dec.c dvdsub.c 
-SOURCES += dvbsub.c
+SOURCES += dvbsub.c dvbsubdec.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files = avcodec.h rational.h common.h i386/mmx.h

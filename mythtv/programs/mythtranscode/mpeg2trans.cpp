@@ -269,7 +269,7 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
             int64_t bufpts = buf->getPTS() - buf->getDelta();
             audioout_st->pts.val = INT2PTS(bufpts, audioout_st);
 //            long long orig = PTS2INT(audioout_st->pts, audioout_st);
-            audioout_st->codec.coded_frame= &avframe;
+            audioout_st->codec->coded_frame= &avframe;
             if (av_write_frame(outputContext, buf->getPkt()) != 0)
             {
                 VERBOSE(VB_IMPORTANT, "Error while writing audio frame");
@@ -286,7 +286,7 @@ void MPEG2trans::write_muxed_frame(AVStream *stream, AVPacket *pkt, int advance,
             int64_t bufpts = buf->getPTS() - buf->getDelta();
             videoout_st->pts.val = INT2PTS(bufpts, videoout_st);
 //            int64_t oldpts = PTS2INT(videoout_st->pts, videoout_st);
-            videoout_st->codec.coded_frame= &avframe;
+            videoout_st->codec->coded_frame= &avframe;
             if (av_write_frame(outputContext, buf->getPkt()) != 0)
             {
                 VERBOSE(VB_IMPORTANT, "Error while writing video frame");
@@ -695,13 +695,13 @@ int MPEG2trans::DoTranscode(QString inputFilename, QString outputFilename)
     }
     for (i = 0; i < inputContext->nb_streams; i++)
     {
-        AVCodecContext *enc = &inputContext->streams[i]->codec;
+        AVCodecContext *enc = inputContext->streams[i]->codec;
         VERBOSE(VB_GENERAL, QString("Stream: %1 Type: %2")
                 .arg(i).arg(enc->codec_type));
         switch(enc->codec_type) {
             case CODEC_TYPE_AUDIO:
                 if (!use_ac3 && 
-                    (inputContext->streams[i])->codec.codec_id == CODEC_ID_AC3) {
+                    (inputContext->streams[i])->codec->codec_id == CODEC_ID_AC3) {
                     use_ac3 = 1;
                     audioin_index = i;
                 } else if (audioin_index == -1) 
@@ -931,8 +931,8 @@ void MPEG2trans::init_audioout_stream(void)
 {
     AVCodecContext *c;
 
-    c = &audioout_st->codec;
-    c->codec_id = (inputContext->streams[audioin_index])->codec.codec_id;
+    c = audioout_st->codec;
+    c->codec_id = (inputContext->streams[audioin_index])->codec->codec_id;
     c->codec_type = CODEC_TYPE_AUDIO;
 
     /* put sample parameters */
@@ -948,8 +948,8 @@ void MPEG2trans::init_videoout_stream()
 {
     AVCodecContext *c;
 
-    c = &videoout_st->codec;
-    c->codec_id = (inputContext->streams[videoin_index])->codec.codec_id;
+    c = videoout_st->codec;
+    c->codec_id = (inputContext->streams[videoin_index])->codec->codec_id;
     c->codec_type = CODEC_TYPE_VIDEO;
 
     /* put sample parameters */
@@ -994,7 +994,7 @@ int MPEG2trans::BuildKeyframeIndex(QString filename, QMap <long long, long long>
 
     for (i = 0; i < inputContext->nb_streams; i++)
     {
-        AVCodecContext *enc = &inputContext->streams[i]->codec;
+        AVCodecContext *enc = inputContext->streams[i]->codec;
         if (enc->codec_type == CODEC_TYPE_VIDEO)
         {
             videoin_index = i;

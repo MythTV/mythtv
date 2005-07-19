@@ -896,11 +896,8 @@ static int mjpeg_decode_init(AVCodecContext *avctx)
     s->idct_put= s2.dsp.idct_put;
 
     s->mpeg_enc_ctx_allocated = 0;
-    s->buffer_size = 102400; /* smaller buffer should be enough,
-				but photojpg files could ahive bigger sizes */
-    s->buffer = av_malloc(s->buffer_size);
-    if (!s->buffer)
-	return -1;
+    s->buffer_size = 0;
+    s->buffer = NULL;
     s->start_code = -1;
     s->first_picture = 1;
     s->org_height = avctx->coded_height;
@@ -1585,10 +1582,11 @@ static int mjpeg_decode_app(MJpegDecodeContext *s)
 {
     int len, id;
 
-    /* XXX: verify len field validity */
     len = get_bits(&s->gb, 16);
     if (len < 5)
 	return -1;
+    if(8*len + get_bits_count(&s->gb) > s->gb.size_in_bits)
+        return -1;
 
     id = (get_bits(&s->gb, 16) << 16) | get_bits(&s->gb, 16);
     id = be2me_32(id);
@@ -1727,10 +1725,8 @@ out:
 
 static int mjpeg_decode_com(MJpegDecodeContext *s)
 {
-    /* XXX: verify len field validity */
     int len = get_bits(&s->gb, 16);
-    if (len >= 2 && len < 32768) {
-	/* XXX: any better upper bound */
+    if (len >= 2 && 8*len - 16 + get_bits_count(&s->gb) <= s->gb.size_in_bits) {
 	uint8_t *cbuf = av_malloc(len - 1);
 	if (cbuf) {
 	    int i;
@@ -1842,7 +1838,7 @@ static int mjpeg_decode_frame(AVCodecContext *avctx,
 		{
 		    av_free(s->buffer);
 		    s->buffer_size = buf_end-buf_ptr;
-		    s->buffer = av_malloc(s->buffer_size);
+                    s->buffer = av_malloc(s->buffer_size + FF_INPUT_BUFFER_PADDING_SIZE);
 		    dprintf("buffer too small, expanding to %d bytes\n",
 			s->buffer_size);
 		}

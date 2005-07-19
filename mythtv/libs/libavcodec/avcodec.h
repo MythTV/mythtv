@@ -16,8 +16,9 @@ extern "C" {
 #include <sys/types.h> /* size_t */
 
 #define FFMPEG_VERSION_INT     0x000409
-#define FFMPEG_VERSION         "0.4.9-pre1"
-#define LIBAVCODEC_BUILD       4757
+#define FFMPEG_VERSION         "CVS"
+#define LIBAVCODEC_BUILD       4758
+
 
 #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVCODEC_VERSION     FFMPEG_VERSION
@@ -137,6 +138,7 @@ enum CodecID {
     CODEC_ID_ADPCM_G726,
     CODEC_ID_ADPCM_CT,
     CODEC_ID_ADPCM_SWF,
+    CODEC_ID_ADPCM_YAMAHA,
 
     /* AMR */
     CODEC_ID_AMR_NB= 0x12000,
@@ -283,6 +285,16 @@ enum AVRounding {
     AV_ROUND_DOWN     = 2, ///< round toward -infinity
     AV_ROUND_UP       = 3, ///< round toward +infinity
     AV_ROUND_NEAR_INF = 5, ///< round to nearest and halfway cases away from zero
+};
+
+enum AVDiscard{
+//we leave some space between them for extensions (drop some keyframes for intra only or drop just some bidir frames)
+    AVDISCARD_NONE   =-16, ///< discard nothing
+    AVDISCARD_DEFAULT=  0, ///< discard useless packets like 0 size packets in avi
+    AVDISCARD_NONREF =  8, ///< discard all non reference
+    AVDISCARD_BIDIR  = 16, ///< discard all bidirectional frames
+    AVDISCARD_NONKEY = 32, ///< discard all frames except keyframes
+    AVDISCARD_ALL    = 48, ///< discard all
 };
 
 typedef struct RcOverride{
@@ -859,6 +871,7 @@ typedef struct AVCodecContext {
 
     /**
      * hurry up amount.
+     * deprecated in favor of skip_idct and skip_frame
      * - encoding: unused
      * - decoding: set by user. 1-> skip b frames, 2-> skip idct/dequant too, 5-> skip everything except header
      */
@@ -1810,12 +1823,32 @@ typedef struct AVCodecContext {
     int me_penalty_compensation;
 
     /**
+     * 
+     * - encoding: unused
+     * - decoding: set by user.
+     */
+    enum AVDiscard skip_loop_filter;
+
+    /**
+     * 
+     * - encoding: unused
+     * - decoding: set by user.
+     */
+    enum AVDiscard skip_idct;
+
+    /**
+     * 
+     * - encoding: unused
+     * - decoding: set by user.
+     */
+    enum AVDiscard skip_frame;
+
+    /**
      * XVMC_VLD (VIA CLE266) Hardware MPEG decoding
      * - encoding: forbidden
      * - decoding: set by decoder
      */
     int xvmc_vld_hwslice;
-
 } AVCodecContext;
 
 
@@ -1905,18 +1938,23 @@ typedef struct AVPaletteControl {
 
 } AVPaletteControl;
 
-typedef struct AVSubtitle {
-    uint16_t format; /* 0 = graphics */
+typedef struct AVSubtitleRect {
     uint16_t x;
     uint16_t y;
     uint16_t w;
     uint16_t h;
     uint16_t nb_colors;
-    uint32_t start_display_time; /* relative to packet pts, in ms */
-    uint32_t end_display_time; /* relative to packet pts, in ms */
     int linesize;
     uint32_t *rgba_palette;
     uint8_t *bitmap;
+} AVSubtitleRect;
+
+typedef struct AVSubtitle {
+    uint16_t format; /* 0 = graphics */
+    uint32_t start_display_time; /* relative to packet pts, in ms */
+    uint32_t end_display_time; /* relative to packet pts, in ms */
+    uint32_t num_rects;
+    AVSubtitleRect *rects;
 } AVSubtitle;
 
 extern AVCodec ac3_encoder;
@@ -2096,6 +2134,7 @@ PCM_CODEC(CODEC_ID_ADPCM_EA, adpcm_ea);
 PCM_CODEC(CODEC_ID_ADPCM_G726, adpcm_g726);
 PCM_CODEC(CODEC_ID_ADPCM_CT, adpcm_ct);
 PCM_CODEC(CODEC_ID_ADPCM_SWF, adpcm_swf);
+PCM_CODEC(CODEC_ID_ADPCM_YAMAHA, adpcm_yamaha);
 
 #undef PCM_CODEC
 
@@ -2110,6 +2149,7 @@ extern AVCodec dts_decoder;
 /* subtitles */
 extern AVCodec dvdsub_decoder;
 extern AVCodec dvbsub_encoder;
+extern AVCodec dvbsub_decoder;
 
 /* resample.c */
 
@@ -2365,6 +2405,7 @@ extern AVCodecParser pnm_parser;
 extern AVCodecParser mpegaudio_parser;
 extern AVCodecParser ac3_parser;
 extern AVCodecParser dvdsub_parser;
+extern AVCodecParser dvbsub_parser;
 
 /* memory */
 void *av_malloc(unsigned int size);

@@ -251,8 +251,8 @@ static int mp3_read_header(AVFormatContext *s,
     if (!st)
         return AVERROR_NOMEM;
 
-    st->codec.codec_type = CODEC_TYPE_AUDIO;
-    st->codec.codec_id = CODEC_ID_MP3;
+    st->codec->codec_type = CODEC_TYPE_AUDIO;
+    st->codec->codec_id = CODEC_ID_MP3;
     st->need_parsing = 1;
     
     /* try to get the TAG */
@@ -350,7 +350,7 @@ AVInputFormat mp3_iformat = {
     mp3_read_header,
     mp3_read_packet,
     mp3_read_close,
-    .extensions = "mp2,mp3", /* XXX: use probe */
+    .extensions = "mp2,mp3,m2a", /* XXX: use probe */
 };
 
 #ifdef CONFIG_ENCODERS
@@ -359,9 +359,9 @@ AVOutputFormat mp2_oformat = {
     "MPEG audio layer 2",
     "audio/x-mpeg",
 #ifdef CONFIG_MP3LAME
-    "mp2",
+    "mp2,m2a",
 #else
-    "mp2,mp3",
+    "mp2,mp3,m2a",
 #endif
     0,
     CODEC_ID_MP2,

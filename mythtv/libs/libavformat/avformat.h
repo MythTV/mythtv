@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define LIBAVFORMAT_BUILD       4628
+#define LIBAVFORMAT_BUILD       4629
 
 #define LIBAVFORMAT_VERSION_INT FFMPEG_VERSION_INT
 #define LIBAVFORMAT_VERSION     FFMPEG_VERSION
@@ -213,19 +213,10 @@ typedef struct AVIndexEntry {
     int min_distance;         /* min distance between this and the previous keyframe, used to avoid unneeded searching */
 } AVIndexEntry;
 
-enum AVDiscard{
-//we leave some space between them for extensions (drop some keyframes for intra only or drop just some bidir frames)
-    AVDISCARD_NONE   =-16, ///< discard nothing
-    AVDISCARD_DEFAULT=  0, ///< discard useless packets like 0 size packets in avi
-    AVDISCARD_BIDIR  = 16, ///< discard all bidirectional frames
-    AVDISCARD_NONKEY = 32, ///< discard all frames except keyframes
-    AVDISCARD_ALL    = 48, ///< discard all
-};
-
 typedef struct AVStream {
     int index;    /* stream index in AVFormatContext */
     int id;       /* format specific stream id */
-    AVCodecContext codec; /* codec context */
+    AVCodecContext *codec; /* codec context */
     /**
      * real base frame rate of the stream.
      * for example if the timebase is 1/90000 and all frames have either 
@@ -478,6 +469,9 @@ int amr_init(void);
 /* wav.c */
 int ff_wav_init(void);
 
+/* mmf.c */
+int ff_mmf_init(void);
+
 /* raw.c */
 int pcm_read_seek(AVFormatContext *s, 
                   int stream_index, int64_t timestamp, int flags);
@@ -550,9 +544,9 @@ int ea_init(void);
 /* nsvdec.c */
 int nsvdec_init(void);
 
-//#include "rtp.h"
+#include "rtp.h"
 
-//#include "rtsp.h"
+#include "rtsp.h"
 
 /* yuv4mpeg.c */
 extern AVOutputFormat yuv4mpegpipe_oformat;

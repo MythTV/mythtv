@@ -267,6 +267,7 @@ static const CodecTag codec_movaudio_tags[] = {
     { CODEC_ID_MACE6, MKTAG('M', 'A', 'C', '6') },
     { CODEC_ID_AAC, MKTAG('m', 'p', '4', 'a') },
     { CODEC_ID_AMR_NB, MKTAG('s', 'a', 'm', 'r') },
+    { CODEC_ID_AMR_WB, MKTAG('s', 'a', 'w', 'b') },
     { CODEC_ID_PCM_S16BE, MKTAG('t', 'w', 'o', 's') },
     { CODEC_ID_PCM_S16LE, MKTAG('s', 'o', 'w', 't') },
     { CODEC_ID_MP3, MKTAG('.', 'm', 'p', '3') },
@@ -1255,11 +1256,11 @@ int mov_write_ftyp_tag(ByteIOContext *pb, AVFormatContext *s)
 
 static void mov_write_uuidprof_tag(ByteIOContext *pb, AVFormatContext *s)
 {
-    int AudioRate = s->streams[1]->codec.sample_rate;
-    int FrameRate = ((s->streams[0]->codec.time_base.den) * (0x10000))/ (s->streams[0]->codec.time_base.num);
+    int AudioRate = s->streams[1]->codec->sample_rate;
+    int FrameRate = ((s->streams[0]->codec->time_base.den) * (0x10000))/ (s->streams[0]->codec->time_base.num);
  
     //printf("audiorate = %d\n",AudioRate);
-    //printf("framerate = %d / %d = 0x%x\n",s->streams[0]->codec.time_base.den,s->streams[0]->codec.time_base.num,FrameRate);
+    //printf("framerate = %d / %d = 0x%x\n",s->streams[0]->codec->time_base.den,s->streams[0]->codec->time_base.num,FrameRate);
 
     put_be32(pb, 0x94 ); /* size */
     put_tag(pb, "uuid");
@@ -1301,8 +1302,8 @@ static void mov_write_uuidprof_tag(ByteIOContext *pb, AVFormatContext *s)
     put_be32(pb, 0xc0 );
     put_be32(pb, FrameRate);  // was 0xefc29   
     put_be32(pb, FrameRate );  // was 0xefc29
-    put_be16(pb, s->streams[0]->codec.width);
-    put_be16(pb, s->streams[0]->codec.height);
+    put_be16(pb, s->streams[0]->codec->width);
+    put_be16(pb, s->streams[0]->codec->height);
     put_be32(pb, 0x010001 );
 }
 
@@ -1313,7 +1314,7 @@ static int mov_write_header(AVFormatContext *s)
     int i;
 
     for(i=0; i<s->nb_streams; i++){
-        AVCodecContext *c= &s->streams[i]->codec;
+        AVCodecContext *c= s->streams[i]->codec;
 
         if      (c->codec_type == CODEC_TYPE_VIDEO){
             if (!codec_get_tag(codec_movvideo_tags, c->codec_id)){
@@ -1366,7 +1367,7 @@ static int mov_write_packet(AVFormatContext *s, AVPacket *pkt)
 {
     MOVContext *mov = s->priv_data;
     ByteIOContext *pb = &s->pb;
-    AVCodecContext *enc = &s->streams[pkt->stream_index]->codec;
+    AVCodecContext *enc = s->streams[pkt->stream_index]->codec;
     MOVTrack* trk = &mov->tracks[pkt->stream_index];
     int cl, id;
     unsigned int samplesInChunk = 0;

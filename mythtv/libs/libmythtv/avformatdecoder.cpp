@@ -198,8 +198,8 @@ void AvFormatDecoder::CloseContext()
         for (int i = 0; i < ic->nb_streams; i++)
         {
             AVStream *st = ic->streams[i];
-            if (st->codec.codec)
-                avcodec_close(&st->codec);
+            if (st->codec->codec)
+                avcodec_close(st->codec);
         }
 
         ic->iformat->flags |= AVFMT_NOFILE;
@@ -239,7 +239,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
     for (i = 0; i < ic->nb_streams; i++)
     {
         AVStream *st1 = ic->streams[i];
-        if (st1 && st1->codec.codec_type == CODEC_TYPE_VIDEO)
+        if (st1 && st1->codec->codec_type == CODEC_TYPE_VIDEO)
         {
             st = st1;
             break;
@@ -249,7 +249,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
         return false;
 
     int64_t frameseekadjust = 0;
-    AVCodecContext *context = &(st->codec);
+    AVCodecContext *context = st->codec;
 
     if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
         context->codec_id == CODEC_ID_MPEG2VIDEO ||
@@ -319,7 +319,7 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
         VERBOSE(VB_PLAYBACK, "AvFormatDecoder::SeekReset() flushing");
         for (int i = 0; i < ic->nb_streams; i++)
         {
-            AVCodecContext *enc = &ic->streams[i]->codec;
+            AVCodecContext *enc = ic->streams[i]->codec;
             if (enc->codec)
                 avcodec_flush_buffers(enc);
         }
@@ -369,11 +369,11 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
     /// NOTE: As of the 12th of May, 2005 VLD is defined whenever libXVMCW
     ///       exits, so the following hack will no longer work.
 #ifdef USING_XVMC_VLD
-        if (st->codec.codec_type == CODEC_TYPE_AUDIO)
+        if (st->codec->codec_type == CODEC_TYPE_AUDIO)
 #endif
         {
-            if (st->codec.codec)
-                avcodec_close(&st->codec);
+            if (st->codec->codec)
+                avcodec_close(st->codec);
             av_remove_stream(ic, st->id);
         }
     }
@@ -790,7 +790,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
-        AVCodecContext *enc = &ic->streams[i]->codec;
+        AVCodecContext *enc = ic->streams[i]->codec;
         VERBOSE(VB_PLAYBACK, QString("AVFD: Opening Stream #%1: codec id %2").
                 arg(i).arg(enc->codec_id));
 
@@ -930,7 +930,7 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
-        AVCodecContext *enc = &ic->streams[i]->codec;
+        AVCodecContext *enc = ic->streams[i]->codec;
         switch (enc->codec_type)
         {
             case CODEC_TYPE_VIDEO:
@@ -992,7 +992,7 @@ void AvFormatDecoder::CheckAudioParams(int freq, int channels, bool safe)
                 " %2hz to %3 channels %4hz").arg(audio_channels)
                 .arg(audio_sampling_rate).arg(channels).arg(freq));
 
-    AVCodecContext *enc = &ic->streams[wantedAudioStream]->codec;
+    AVCodecContext *enc = ic->streams[wantedAudioStream]->codec;
     AVCodec *codec = enc->codec;
     if (codec)
         avcodec_close(enc);
@@ -1244,7 +1244,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 
 void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 {
-    AVCodecContext *context = &(stream->codec);
+    AVCodecContext *context = stream->codec;
     unsigned char *bufptr = pkt->data;
     //unsigned char *bufend = pkt->data + pkt->size;
     unsigned int state = 0xFFFFFFFF, v = 0;
@@ -1401,7 +1401,7 @@ void AvFormatDecoder::incCurrentAudioTrack()
         currentAudioTrack = tempTrackNo;
         wantedAudioStream = audioStreams[currentAudioTrack];
 
-        AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+        AVCodecContext *e = ic->streams[wantedAudioStream]->codec;
         SetupAudioStream();
         CheckAudioParams(e->sample_rate, e->channels, true);
     }
@@ -1419,7 +1419,7 @@ void AvFormatDecoder::decCurrentAudioTrack()
         currentAudioTrack = tempTrackNo;
         wantedAudioStream = audioStreams[currentAudioTrack];
 
-        AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+        AVCodecContext *e = ic->streams[wantedAudioStream]->codec;
         SetupAudioStream();
         CheckAudioParams(e->sample_rate, e->channels, true);
     }
@@ -1438,7 +1438,7 @@ bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
 
     wantedAudioStream = audioStreams[currentAudioTrack];
 
-    AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+    AVCodecContext *e = ic->streams[wantedAudioStream]->codec;
     SetupAudioStream();
     CheckAudioParams(e->sample_rate, e->channels, true);
     return true;
@@ -1475,7 +1475,7 @@ bool AvFormatDecoder::autoSelectAudioTrack()
         for (track = 0; track <= maxTracks; track++)
         {
             int tempStream = audioStreams[track];
-            AVCodecContext *e = &ic->streams[tempStream]->codec;
+            AVCodecContext *e = ic->streams[tempStream]->codec;
 
             if (e->channels > minChannels)
             {
@@ -1513,7 +1513,7 @@ bool AvFormatDecoder::autoSelectAudioTrack()
     currentAudioTrack = selectedTrack;
     wantedAudioStream = audioStreams[currentAudioTrack];
      
-    AVCodecContext *e = &ic->streams[wantedAudioStream]->codec;
+    AVCodecContext *e = ic->streams[wantedAudioStream]->codec;
     if (e->codec_id == CODEC_ID_AC3)
     {
         VERBOSE(VB_AUDIO, 
@@ -1546,9 +1546,9 @@ void AvFormatDecoder::SetupAudioStream(void)
     VERBOSE(VB_AUDIO, QString("Initializing audio parms from audio track #%1.")
             .arg(currentAudioTrack));
 
-    m_parent->SetEffDsp(curstream->codec.sample_rate * 100);
+    m_parent->SetEffDsp(curstream->codec->sample_rate * 100);
 
-    do_ac3_passthru = curstream->codec.codec_id == CODEC_ID_AC3 &&
+    do_ac3_passthru = curstream->codec->codec_id == CODEC_ID_AC3 &&
                       !transcoding &&
                       gContext->GetNumSetting("AC3PassThru", false);
 }
@@ -1634,7 +1634,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             pts = (long long)(av_q2d(curstream->time_base) * pkt->dts * 1000);
 
         if (storevideoframes &&
-            curstream->codec.codec_type == CODEC_TYPE_VIDEO)
+            curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
             av_dup_packet(pkt);
             storedPackets.append(pkt);
@@ -1642,13 +1642,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             continue;
         }
 
-        if (len > 0 && curstream->codec.codec_type == CODEC_TYPE_VIDEO)
+        if (len > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
             framesRead++;
             if (exitafterdecoded)
                 gotvideo = 1;
 
-            AVCodecContext *context = &(curstream->codec);
+            AVCodecContext *context = curstream->codec;
 
             if (context->codec_id == CODEC_ID_MPEG1VIDEO ||
                 context->codec_id == CODEC_ID_MPEG2VIDEO ||
@@ -1675,7 +1675,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             }
         }
 
-        if (!curstream->codec.codec)
+        if (!curstream->codec->codec)
         {
             VERBOSE(VB_PLAYBACK, QString("No codec for stream index %1").arg(pkt->stream_index));
             av_free_packet(pkt);
@@ -1687,7 +1687,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         while (!have_err && len > 0)
         {
-            switch (curstream->codec.codec_type)
+            switch (curstream->codec->codec_type)
             {
                 case CODEC_TYPE_AUDIO:
                 {
@@ -1721,7 +1721,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                     else
                     {
-                        ret = avcodec_decode_audio(&curstream->codec,
+                        ret = avcodec_decode_audio(curstream->codec,
                                                    audioSamples, &data_size,
                                                    ptr, len);
                     }
@@ -1733,14 +1733,15 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
 
                     if (!do_ac3_passthru)
-                        CheckAudioParams(curstream->codec.sample_rate,
-                                         curstream->codec.channels, false);
+                        CheckAudioParams(curstream->codec->sample_rate,
+                                         curstream->codec->channels, false);
 
                     long long temppts = lastapts;
 
                     // calc for next frame
                     lastapts += (long long)((double)(data_size * 1000) /
-                                (curstream->codec.channels * 2) / curstream->codec.sample_rate);
+                                (curstream->codec->channels * 2) / 
+                                curstream->codec->sample_rate);
 
                     m_parent->AddAudioData((char *)audioSamples, data_size, temppts);
 
@@ -1756,7 +1757,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         continue;
                     }
 
-                    AVCodecContext *context = &(curstream->codec);
+                    AVCodecContext *context = curstream->codec;
                     AVFrame mpa_pic;
 
                     int gotpicture = 0;
@@ -1852,7 +1853,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     break;
                 }
                 default:
-                    cerr << "error decoding - " << curstream->codec.codec_type
+                    cerr << "error decoding - " << curstream->codec->codec_type
                          << endl;
                     have_err = true;
                     break;
