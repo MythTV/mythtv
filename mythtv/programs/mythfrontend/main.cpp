@@ -628,6 +628,12 @@ int internal_play_media(const char *mrl, const char* plot, const char* title,
     pginfo->lenMins = lenMins;
     pginfo->isVideo = true;
     pginfo->pathname = mrl;
+    
+    if (pginfo->pathname.find(".iso", false) )
+    {
+        pginfo->pathname = QString("dvd:%1").arg(mrl);
+    }
+    
     pginfo->description = plot;
     
     
