@@ -48,7 +48,8 @@ enum MetadataCollectionServerType
     MST_daap_itunes45,
     MST_daap_itunes46,
     MST_daap_itunes47,
-    MST_daap_itunes48
+    MST_daap_itunes48,
+    MST_daap_itunes49
 };
 
 class MetadataContainer

@@ -387,6 +387,10 @@ void DaapServer::parsePath(HttpInRequest *http_request, DaapRequest *daap_reques
             {
                 daap_request->setClientType(DAAP_CLIENT_ITUNES48);
             }
+            else if(itunes_sub_version == 9)
+            {
+                daap_request->setClientType(DAAP_CLIENT_ITUNES49);
+            }
             else
             {
                 warning(QString("daapserver does not yet have "
@@ -432,7 +436,8 @@ void DaapServer::sendServerInfo(HttpInRequest *http_request, DaapRequest *daap_r
                 if(daap_request->getClientType() == DAAP_CLIENT_ITUNES45 ||
                    daap_request->getClientType() == DAAP_CLIENT_ITUNES46 ||
                    daap_request->getClientType() == DAAP_CLIENT_ITUNES47 ||
-                   daap_request->getClientType() == DAAP_CLIENT_ITUNES48 )
+                   daap_request->getClientType() == DAAP_CLIENT_ITUNES48 ||
+                   daap_request->getClientType() == DAAP_CLIENT_ITUNES49)
                 {
                     response << Tag('apro') << daapVersion3 << end ;
                 }
@@ -1224,7 +1229,8 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
             if(daap_request->getClientType() == DAAP_CLIENT_ITUNES45 ||
                daap_request->getClientType() == DAAP_CLIENT_ITUNES46 ||
                daap_request->getClientType() == DAAP_CLIENT_ITUNES47 ||
-               daap_request->getClientType() == DAAP_CLIENT_ITUNES48)
+               daap_request->getClientType() == DAAP_CLIENT_ITUNES48 ||
+               daap_request->getClientType() == DAAP_CLIENT_ITUNES49)
             {
                 http_request->getResponse()->setBytesInContentRangeHeader(true);
             }
