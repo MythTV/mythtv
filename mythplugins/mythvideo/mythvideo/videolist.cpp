@@ -108,7 +108,7 @@ void VideoList::buildDbList(bool flatlist, int parental_level)
 
     QString thequery = QString("SELECT intid FROM %1 %2 %3")
                     .arg(currentVideoFilter->BuildClauseFrom())
-                    .arg(currentVideoFilter->BuildClauseWhere())
+                    .arg(currentVideoFilter->BuildClauseWhere(parental_level))
                     .arg(currentVideoFilter->BuildClauseOrderBy());
         
     MSqlQuery query(MSqlQuery::InitCon());
@@ -135,8 +135,7 @@ void VideoList::buildDbList(bool flatlist, int parental_level)
         (void)addDirNode(video_tree_root, "videos");
 
     //
-    //  Accumulate query results into the metaptrs list. The "parental_level"
-    //  filtering really ought to be incorporated into BuildClauseWhere().
+    //  Accumulate query results into the metaptrs list.
     //
     QPtrList<Metadata> metaptrs;
     while (query.next())
@@ -145,10 +144,7 @@ void VideoList::buildDbList(bool flatlist, int parental_level)
         Metadata *myData = new Metadata();
         myData->setID(intid);
         myData->fillDataFromID();
-        if (myData->ShowLevel() <= parental_level && myData->ShowLevel() != 0)
-            metaptrs.append(myData);
-        else
-            delete myData;
+        metaptrs.append(myData);
     }
 
     //

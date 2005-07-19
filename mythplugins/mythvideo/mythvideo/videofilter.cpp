@@ -132,73 +132,44 @@ QString VideoFilterSettings::BuildClauseFrom(){
     return from;
 }
 
-QString VideoFilterSettings::BuildClauseWhere()
+QString VideoFilterSettings::BuildClauseWhere(int parental_level)
 {
-    QString where = NULL;
-    if (genre!=-1)
+    QString where = "WHERE 1";
+    QString condition;
+
+    if (genre != -1)
     {
-        QString condition;
-        if (genre ==0 )
-            condition = QString(" IS NULL");
-        else
-            condition = QString(" = %1").arg(genre);
-        where = QString(" WHERE videometadatagenre.idgenre %1 ").arg(condition);
+        condition = genre ? QString("= %1").arg(genre) : QString("IS NULL");
+        where = QString(" AND videometadatagenre.idgenre %1").arg(condition);
     }
     
-    if (country!=-1)
+    if (country != -1)
     {
-        QString condition;
-        if (country==0)
-            condition = QString(" IS NULL");
-        else
-            condition = QString(" = %1").arg(country);
-        
-        if (where)
-            where +=  QString(" AND videometadatacountry.idcountry %1 ").arg(condition);
-        else
-            where = QString(" WHERE videometadatacountry.idcountry %1 ").arg(condition);
+        condition = country ? QString("= %1").arg(country) : QString("IS NULL");
+        where += QString(" AND videometadatacountry.idcountry %1")
+                                .arg(condition);
     }
     
     if (category != -1)
-    {
-        if (where)
-            where += QString(" AND category = %1").arg(category);
-        else
-            where = QString(" WHERE category = %1").arg(category);
-    }
+        where += QString(" AND category = %1").arg(category);
     
-    if (year!=-1)
-    {
-        if (where)
-            where += QString(" AND year = %1").arg(year);
-        else
-            where = QString(" WHERE year = %1").arg(year);
-    }
+    if (year != -1)
+        where += QString(" AND year = %1").arg(year);
     
     if (runtime != -2)
-    {
-        if (where)
-            where += QString(" AND FLOOR((length-1)/30) = %1").arg(runtime);
-        else
-            where = QString(" WHERE FLOOR((length-1)/30) = %1").arg(runtime);
-    }
+        where += QString(" AND FLOOR((length-1)/30) = %1").arg(runtime);
     
-    if (userrating !=-1)
-    {
-        if (where)
-            where += QString(" AND userrating >= %1").arg(userrating);
-        else 
-            where = QString(" WHERE userrating >= %1").arg(userrating);
-    }
+    if (userrating != -1)
+        where += QString(" AND userrating >= %1").arg(userrating);
 
-    if (browse !=-1)
+    if (browse != -1)
+        where += QString(" AND browse = %1").arg(browse);
+
+    if (parental_level)
     {
-        if (where)
-            where += QString(" AND browse = %1").arg(browse);
-        else 
-            where = QString(" WHERE browse = %1").arg(browse);
-    } 
-    
+        where += QString(" AND showlevel != 0 AND showlevel <= %1")
+                                .arg(parental_level);
+    }
 
     return where;
 }
@@ -225,11 +196,10 @@ void VideoFilterDialog::update_numvideo()
     
     if (numvideos_text)
     {
-        QString select = QString("SELECT NULL FROM ");
         QString from = currentSettings->BuildClauseFrom();
-        QString where = currentSettings->BuildClauseWhere();
-        QString q_string = QString("%1 %2 %3")
-                           .arg(select).arg(from).arg(where);
+        QString where = currentSettings->BuildClauseWhere(0);
+        QString q_string = QString("SELECT NULL FROM %1 %2")
+                           .arg(from).arg(where);
         
 
         MSqlQuery a_query(MSqlQuery::InitCon());

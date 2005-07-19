@@ -675,11 +675,14 @@ void VideoGallery::moveCursor(const QString& action)
         } else if (currRow > 0 || currCol > 0) {
             currRow = 0;
             currCol = 0;
-        } else {
+        } else if (lastTopRow > 0) {
             // "Flip" to last page
             topRow = lastTopRow;
             currRow = lastRow;
             currCol = QMIN(currCol, lastCol);
+        } else {
+            // Only one page's worth of stuff to display; no-op
+            return;
         }
     }
     else if (action == "PAGEDOWN")
@@ -699,10 +702,13 @@ void VideoGallery::moveCursor(const QString& action)
         } else if (currRow < lastRow || currCol < lastCol) {
             currRow = lastRow;
             currCol = lastCol;
-        } else {
+        } else if (topRow > 0) {
             // "Flip" to first page
             topRow = 0;
             currRow = 0;
+        } else {
+            // Only one page's worth of stuff to display; no-op
+            return;
         }
     }
     else if (action == "HOME")

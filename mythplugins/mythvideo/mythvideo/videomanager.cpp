@@ -192,7 +192,7 @@ void VideoManager::RefreshMovieList()
 
     QString thequery = QString("SELECT intid FROM %1 %2 %3")
                                .arg(currentVideoFilter->BuildClauseFrom())
-                               .arg(currentVideoFilter->BuildClauseWhere())
+                               .arg(currentVideoFilter->BuildClauseWhere(0))
                                .arg(currentVideoFilter->BuildClauseOrderBy());
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec(thequery);

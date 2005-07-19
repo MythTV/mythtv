@@ -24,7 +24,7 @@ class VideoFilterSettings
         VideoFilterSettings(VideoFilterSettings *other);
         ~VideoFilterSettings();
         QString BuildClauseFrom();
-        QString BuildClauseWhere();
+        QString BuildClauseWhere(int parental_level);
         QString BuildClauseOrderBy();
         void saveAsDefault();
 
@@ -87,8 +87,6 @@ class VideoFilterDialog : public MythThemedDialog
     void keyPressEvent(QKeyEvent *e);
     void wireUpTheme();
     void fillWidgets();
-//    QString BuildClauseFrom();
-//    QString BuildClauseWhere();
 
   public slots:
   
