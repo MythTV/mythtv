@@ -1217,10 +1217,10 @@ bool Scheduler::CheckShutdownServer(int prerollseconds, QDateTime &idleSince,
     {
         state = myth_system(preSDWUCheckCommand.ascii());
                       
-        if (WIFEXITED(state) && state != -1)
+        if (GENERIC_EXIT_NOT_OK != state)
         {
             retval = false;
-            switch(WEXITSTATUS(state))
+            switch(state)
             {
                 case 0:
                     retval = true;
