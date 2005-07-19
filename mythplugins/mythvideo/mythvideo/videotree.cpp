@@ -315,10 +315,24 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
         //  not a leaf node 
         //  (no video file here, just a directory)
         //
+        curitem = NULL;
         
-        video_title->SetText("");
-        video_file->SetText("");
-        video_player->SetText(""); 
+        if (video_poster)
+            video_poster->ResetImage();
+        
+        if (video_plot)
+            video_plot->SetText("");
+        
+        if (video_title)            
+            video_title->SetText("");
+
+        if (video_file)            
+            video_file->SetText("");
+        
+        if (video_player)                
+            video_player->SetText(""); 
+        
+                    
         
     }
 }
