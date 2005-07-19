@@ -18,6 +18,7 @@
 #include "mtd.h"
 #include "logging.h"
 
+enum RIP_QUALITIES { QUALITY_ISO = -1, QUALITY_PERFECT, QUALITY_TRANSCODE };
 
 DiscCheckingThread::DiscCheckingThread(MTD *owner,
                                        DVDProbe *probe, 
@@ -625,7 +626,7 @@ void MTD::startDVD(const QStringList &tokens)
     }
     
     int quality = tokens[4].toInt(&ok);
-    if(quality < 0 || !ok)
+    if(quality < QUALITY_ISO || !ok)
     {
         emit writeToLog(QString("bad quality value in job request: %1").arg(flat));
         return;
@@ -685,9 +686,36 @@ void MTD::startDVD(const QStringList &tokens)
 
     //
     //  OK, we are ready to launch this job
-    // 
+    //
 
-    if(quality == 0)
+    if(quality == QUALITY_ISO)
+    {
+        QFile final_file(dest_dir.filePath(file_name));
+
+        if(!checkFinalFile(&final_file, ".iso"))
+        {
+            emit writeToLog("Final file name is not useable. File exists? Other Pending job?");
+            return;
+        }
+    
+        emit writeToLog(QString("launching job: %1").arg(flat));
+
+        //
+        //  Full disc copy to an iso image.
+        //
+ 
+        JobThread *new_job = new DVDISOCopyThread(this, 
+                                                  dvd_drive_access, 
+                                                  dvd_device, 
+                                                  dvd_title, 
+                                                  final_file.name(), 
+                                                  file_name,
+                                                  flat,
+                                                  nice_level);
+        job_threads.append(new_job);
+        new_job->start();
+    }
+    else if(quality == QUALITY_PERFECT)
     {
         QFile final_file(dest_dir.filePath(file_name));
 
@@ -714,7 +742,7 @@ void MTD::startDVD(const QStringList &tokens)
         job_threads.append(new_job);
         new_job->start();
     }
-    else if (quality > 0)
+    else if (quality >= QUALITY_TRANSCODE)
     {
         QFile final_file(dest_dir.filePath(file_name));
 

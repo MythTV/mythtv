@@ -113,6 +113,7 @@ void TitleDialog::showCurrentTitle()
         if(quality_select)
         {
             quality_select->cleanOut();
+            quality_select->addItem(-1, tr("ISO Image"));
             quality_select->addItem(0, tr("Perfect"));
             QString q_string = QString("SELECT name,intid FROM dvdtranscode "
                                        "WHERE input = %1 ;")

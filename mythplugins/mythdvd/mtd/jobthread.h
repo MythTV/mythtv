@@ -113,6 +113,31 @@ class DVDThread : public JobThread
     QString      rip_name;
 };
 
+class DVDISOCopyThread : public DVDThread
+{
+    //
+    // Copy a byte-for-byte image of the disk
+    // to an iso file.
+    //
+
+  public:
+
+    DVDISOCopyThread(MTD *owner,
+		     QMutex *drive_mutex, 
+                     const QString &dvd_device, 
+                     int track, 
+                     const QString &dest_file, 
+                     const QString &name,
+                     const QString &start_string,
+                     int nice_priority);
+
+    ~DVDISOCopyThread();
+                     
+    virtual void run();
+
+    bool copyFullDisc(void);
+};
+
 class DVDPerfectThread : public DVDThread
 {
     //

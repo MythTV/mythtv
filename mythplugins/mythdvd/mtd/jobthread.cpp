@@ -8,6 +8,10 @@
 
 */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #include <iostream>
 using namespace std;
 
@@ -537,6 +541,174 @@ DVDThread::~DVDThread()
     {
         delete ripfile;
     }
+}
+
+/*
+---------------------------------------------------------------------
+*/
+
+DVDISOCopyThread::DVDISOCopyThread(MTD *owner, 
+                                   QMutex *drive_mutex, 
+                                   const QString &dvd_device, 
+                                   int track, 
+                                   const QString &dest_file, 
+                                   const QString &name,
+                                   const QString &start_string,
+                                   int nice_priority)
+                 :DVDThread(owner,
+                            drive_mutex, 
+                            dvd_device, 
+                            track, 
+                            dest_file, 
+                            name,
+                            start_string,
+                            nice_priority)
+
+{
+}
+
+void DVDISOCopyThread::run()
+{
+    //
+    //  Be nice
+    //
+    
+    nice(nice_level);
+    job_name = QString(QObject::tr("ISO Image Copy of %1")).arg(rip_name);
+    if(keepGoing())
+    {
+        copyFullDisc();
+    }
+}
+
+bool DVDISOCopyThread::copyFullDisc(void)
+{
+    bool loop = true;
+
+    setSubName(QObject::tr("Waiting for Access to DVD"), 1);
+
+    while(loop)
+    {
+        if(dvd_device_access->tryLock())
+        {
+            loop = false;
+        }
+        else
+        {
+            if(keepGoing())
+            {
+                sleep(5);
+            }
+            else
+            {
+                problem("abandoned job because master control said we need to shut down");
+                return false;
+            }
+        }
+    }
+
+    if(!keepGoing())
+    {
+        problem("abandoned job because master control said we need to shut down");
+        dvd_device_access->unlock();
+        return false;
+    }
+
+    ripfile = new RipFile(destination_file_string, ".iso");
+    if(!ripfile->open(IO_WriteOnly | IO_Raw | IO_Truncate, false))
+    {
+        problem(QString("DVDISOCopyThread could not open output file: %1").arg(ripfile->name()));
+        dvd_device_access->unlock();
+        return false;
+    }
+
+    sendLoggingEvent(QString("ISO DVD image copy to: %1").arg(ripfile->name()));
+
+    int file = open( dvd_device_location, O_RDONLY );
+    if(file == -1)
+    {
+        problem(QString("DVDISOCopyThread could not open dvd device: %1").arg(dvd_device_location));
+        ripfile->remove();
+        delete ripfile;
+        ripfile = NULL;
+        dvd_device_access->unlock();
+        return false;
+    }
+
+    off_t dvd_size = lseek(file, 0, SEEK_END);
+    lseek(file, 0, SEEK_SET);
+
+    int buf_size = 4098;
+    unsigned char *buffer = new unsigned char[buf_size];
+    long long total_bytes(0);
+
+    QTime job_time;
+    job_time.start();
+
+    while( 1 )
+    {
+        int bytes_read = read(file, buffer, buf_size);
+        if(bytes_read == -1)
+        {
+            perror("read");
+            problem(QString("DVDISOCopyThread dvd device read error"));
+            ripfile->remove();
+            delete ripfile;
+            ripfile = NULL;
+            delete buffer;
+            dvd_device_access->unlock();
+            return false;
+        }
+        if(bytes_read == 0)
+        {
+            break;
+        }
+
+        if(!ripfile->writeBlocks(buffer, bytes_read))
+        {
+            problem(QString("DVDISOCopyThread rip file write error"));
+            ripfile->remove();
+            delete ripfile;
+            ripfile = NULL;
+            delete buffer;
+            dvd_device_access->unlock();
+            return false;
+        }
+
+        total_bytes += bytes_read;
+
+        setSubProgress((double) (total_bytes) / (double) (dvd_size), 1);
+        overall_progress = subjob_progress * sub_to_overall_multiple;
+        updateSubjobString(job_time.elapsed() / 1000,
+                           QObject::tr("Ripping to file ~"));
+
+        //
+        //  Escape out and clean up if mtd main thread
+        //  tells us to
+        //
+            
+        if(!keepGoing())
+        {
+            problem("abandoned job because master control said we need to shut down");
+            ripfile->remove();
+            delete ripfile;
+            ripfile = NULL;
+            delete buffer;
+            dvd_device_access->unlock();
+            return false;
+        }
+    }
+
+    delete buffer;
+    ripfile->close();
+    delete ripfile;
+    dvd_device_access->unlock();
+    sendLoggingEvent("job thread finished copying ISO image");
+    return true;
+}
+
+DVDISOCopyThread::~DVDISOCopyThread()
+{
 }
 
 /*

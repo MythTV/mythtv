@@ -43,7 +43,7 @@ DVDTitleInfo::DVDTitleInfo()
     subtitles.setAutoDelete(true);
     
     is_selected = false;
-    selected_quality = 0;
+    selected_quality = -1;
 
     selected_audio = 1;
     selected_subtitle = -1;
