@@ -167,6 +167,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
     firstgoppos = 0;
     prevgoppos = 0;
 
+    subtitleLanguagePreferences = QStringList::split(",", 
+                                gContext->GetSetting("PreferredLanguages", ""));
     fps = 29.97;
     maxkeyframedist = -1;
 
@@ -189,6 +191,56 @@ AvFormatDecoder::~AvFormatDecoder()
 {
     CloseContext();
     delete d;
+}
+
+// evaluates whether the given language is the subtitle language that is
+// preferred
+//
+// in case there's only one subtitle language available, always returns true
+//
+// if more than one subtitle languages are found, the best one is
+// picked according to the PreferredLanguages setting
+//
+// in case there's no PreferredLanguages setting, or no preferred language
+// is found, the first found subtitle stream is preferred
+bool AvFormatDecoder::IsWantedSubtitleLanguage(const QString &language) 
+{
+    if (!ic)
+        return true;
+
+    // count the subtitle streams
+    int subtitleStreams = 0;
+    AVStream *first = NULL;
+    for (int i = 0; i < ic->nb_streams; i++)
+    {
+        AVStream* st = ic->streams[i];
+        if (st->codec->codec_type == CODEC_TYPE_SUBTITLE) 
+        {
+            if (first == NULL)
+                first = ic->streams[i];
+            ++subtitleStreams;
+        }
+    }
+
+    if (subtitleStreams == 1)
+        return true;
+
+    // go through all preferred languages and pick the best found
+    for (QStringList::iterator l = subtitleLanguagePreferences.begin();
+         l != subtitleLanguagePreferences.end(); ++l) 
+    {
+        for (int i = 0; i < ic->nb_streams; i++)
+        {
+            AVStream* st = ic->streams[i];
+
+            if (st->language == *l)
+                return (language == st->language);
+        }
+    }
+
+    // no preferences at all, or no language that is preferred found --
+    // let's pick the first subtitle stream
+    return (language == first->language);
 }
 
 void AvFormatDecoder::CloseContext()
@@ -845,6 +897,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 bitrate += enc->bit_rate;
                 break;
             }
+            case CODEC_TYPE_SUBTITLE:
+            {
+                bitrate += enc->bit_rate;
+                VERBOSE(VB_PLAYBACK,
+                        QString("AvFormatDecoder: subtitle codec (%1)")
+                        .arg(enc->codec_type));
+                break;
+            }
             case CODEC_TYPE_DATA:
             {
                 bitrate += enc->bit_rate;
@@ -864,7 +924,8 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         }
 
         if (enc->codec_type != CODEC_TYPE_AUDIO && 
-            enc->codec_type != CODEC_TYPE_VIDEO)
+            enc->codec_type != CODEC_TYPE_VIDEO &&
+            enc->codec_type != CODEC_TYPE_SUBTITLE)
             continue;
 
         VERBOSE(VB_PLAYBACK, QString("AVFD: Looking for decoder for %1")
@@ -1850,6 +1911,31 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     framesPlayed++;
 
                     lastvpts = temppts;
+                    break;
+                }
+                case CODEC_TYPE_SUBTITLE:
+                {
+                    AVCodecContext *context = curstream->codec;
+                    int gotSubtitles = 0;
+                    AVSubtitle subtitle;
+
+                    if (IsWantedSubtitleLanguage(curstream->language))
+                    {
+                        avcodec_decode_subtitle(context, &subtitle, 
+                                                &gotSubtitles, ptr, len);
+                    }
+
+                    // the subtitle decoder always consumes the whole packet
+                    ptr += len;
+                    len = 0;
+
+                    if (gotSubtitles) 
+                    {
+                        subtitle.start_display_time += pts;
+                        subtitle.end_display_time += pts;
+                        m_parent->AddSubtitle(subtitle);
+                    }
+
                     break;
                 }
                 default:

@@ -207,6 +207,9 @@ NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
 
     errored = false;
     audio_timecode_offset = 0;
+
+    osdHasSubtitles = false;
+    osdSubtitlesExpireAt = -1;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -218,6 +221,9 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         delete m_playbackinfo;
     if (weMadeBuffer)
         delete ringBuffer;
+
+    ClearSubtitles();
+
     if (osd)
         delete osd;
     
@@ -952,7 +958,6 @@ void NuppelVideoPlayer::ToggleCC(char mode, int arg)
         }
         else if (mode == 2)
         {
-            cc = true;
             switch (arg)
             {
             case  0:                   break;  // same mode
@@ -997,7 +1002,7 @@ void NuppelVideoPlayer::ToggleCC(char mode, int arg)
             }
         }
         else
-            msg = QString(QObject::tr("CC/TXT disabled"));
+            msg = QString(QObject::tr("CC/TXT enabled"));
     }
 
     if (osd)
@@ -1036,7 +1041,6 @@ void NuppelVideoPlayer::ShowText(void)
                     struct teletextsubtitle st;
                     memcpy(&st, inpos, sizeof(st));
                     inpos += sizeof(st);
-                    printf("%s\n", (char*) inpos);
                     QString s((const char*) inpos);
                     osd->AddCCText(s, st.row, st.col, st.fg, true);
                     inpos += st.len;
@@ -1589,7 +1593,14 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     VideoFrame *frame = videoOutput->GetLastShownFrame();
 
     if (cc)
+    {
         ShowText();
+        DisplaySubtitles();
+    }
+    else if (osdHasSubtitles || nonDisplayedSubtitles.size() > 20)
+    {
+        ClearSubtitles();
+    }
 
     videofiltersLock.lock();
     videoOutput->ProcessFrame(frame, osd, videoFilters, pipplayer);
@@ -4109,5 +4120,153 @@ int NuppelVideoPlayer::getCurrentAudioTrack()
         return decoder->getCurrentAudioTrack() + 1;
     else
         return 0;
+}
+
+// updates new subtitles to the screen and clears old ones
+void NuppelVideoPlayer::DisplaySubtitles()
+{
+    OSDSet *subtitleOSD;
+    bool setVisible = false;
+    VideoFrame *currentFrame = videoOutput->GetLastShownFrame();
+
+    if (!osd || !currentFrame || !(subtitleOSD = osd->GetSet("subtitles")))
+        return;
+
+    subtitleLock.lock();
+
+    subtitleOSD = osd->GetSet("subtitles");
+
+    // hide the subs if they have been long enough in the screen without
+    // new subtitles replacing them
+    if (osdHasSubtitles && currentFrame->timecode >= osdSubtitlesExpireAt) 
+    {
+        osd->HideSet("subtitles");
+        VERBOSE(VB_PLAYBACK,
+                QString("Clearing expired subtitles from OSD set."));
+        osd->ClearAll("subtitles");
+        osdHasSubtitles = false;
+    }
+
+    while (nonDisplayedSubtitles.size() > 0)
+    {
+        const AVSubtitle subtitlePage = nonDisplayedSubtitles.front();
+
+        if (subtitlePage.start_display_time > currentFrame->timecode)
+            break;
+
+        nonDisplayedSubtitles.pop_front();
+
+        // clear old subtitles
+        if (osdHasSubtitles) 
+        {
+            osd->HideSet("subtitles");
+            osd->ClearAll("subtitles");
+            osdHasSubtitles = false;
+        }
+
+        // draw the subtitle bitmap(s) to the OSD
+        for (std::size_t i = 0; i < subtitlePage.num_rects; ++i) 
+        {
+            AVSubtitleRect* rect = &subtitlePage.rects[i];
+
+            bool displaysub = true;
+            if (nonDisplayedSubtitles.size() > 0 &&
+                nonDisplayedSubtitles.front().start_display_time < 
+                currentFrame->timecode)
+            {
+                displaysub = false;
+            }
+
+            if (displaysub)
+            {
+                // AVSubtitleRect's image data's not guaranteed to be 4 byte
+                // aligned.
+                QImage qImage(rect->w, rect->h, 32);
+                qImage.setAlphaBuffer(true);
+                for (int y = 0; y < rect->h; ++y) 
+                {
+                    for (int x = 0; x < rect->w; ++x) 
+                    {
+                        const uint8_t color = rect->bitmap[y*rect->w + x];
+                        const uint32_t pixel = rect->rgba_palette[color];
+                        qImage.setPixel(x, y, pixel);
+                    }
+                }
+
+                OSDTypeImage* image = new OSDTypeImage();
+                image->SetPosition(QPoint(rect->x, rect->y));
+                image->LoadFromQImage(qImage);
+
+                subtitleOSD->AddType(image);
+
+                osdSubtitlesExpireAt = subtitlePage.end_display_time;
+                setVisible = true;
+                osdHasSubtitles = true;
+            }
+
+            av_free(rect->rgba_palette);
+            av_free(rect->bitmap);
+        }
+
+        if (subtitlePage.num_rects > 0)
+            av_free(subtitlePage.rects);
+    }
+
+    subtitleLock.unlock();
+
+    if (setVisible)
+    {
+        VERBOSE(VB_PLAYBACK,
+                QString("Setting subtitles visible, frame_timecode=%1")
+                .arg(currentFrame->timecode));
+        osd->SetVisible(subtitleOSD, 0);
+    }
+}
+
+// hide subtitles and free the undisplayed subtitles
+void NuppelVideoPlayer::ClearSubtitles() 
+{
+    subtitleLock.lock();
+
+    while (nonDisplayedSubtitles.size() > 0) 
+    {
+        AVSubtitle& subtitle = nonDisplayedSubtitles.front();
+
+        // Because the subtitles were not displayed, OSDSet does not
+        // free the OSDTypeImages in ClearAll(), so we have to free
+        // the dynamic buffers here
+        for (std::size_t i = 0; i < subtitle.num_rects; ++i) 
+        {
+             AVSubtitleRect* rect = &subtitle.rects[i];
+             av_free(rect->rgba_palette);
+             av_free(rect->bitmap);
+        }
+
+        if (subtitle.num_rects > 0)
+            av_free(subtitle.rects);
+
+        nonDisplayedSubtitles.pop_front();
+    }
+
+    subtitleLock.unlock();
+
+    // Clear subtitles from OSD
+    if (osdHasSubtitles && osd)
+    {
+        if (OSDSet *osdSet = osd->GetSet("subtitles"))
+        {
+            osd->HideSet("subtitles");
+            osdSet->Clear();
+            osdHasSubtitles = false;
+        }
+    }
+}
+
+// adds a new subtitle to be shown
+void NuppelVideoPlayer::AddSubtitle(const AVSubtitle &subtitle) 
+{
+    subtitleLock.lock();
+    nonDisplayedSubtitles.push_back(subtitle);
+    subtitleLock.unlock();
 }
 

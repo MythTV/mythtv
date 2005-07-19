@@ -128,7 +128,8 @@ class AvFormatDecoder : public DecoderBase
 
     // Update our position map, keyframe distance, and the like.  Called for key frame packets.
     void HandleGopStart(AVPacket *pkt);
-    
+
+    bool IsWantedSubtitleLanguage(const QString &language);    
     class AvFormatDecoderPrivate *d;
 
     AVFormatContext *ic;
@@ -179,6 +180,8 @@ class AvFormatDecoder : public DecoderBase
     MythCodecID video_codec_id;
 
     int maxkeyframedist;
+
+    QStringList subtitleLanguagePreferences;
 };
 
 #endif

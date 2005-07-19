@@ -196,6 +196,16 @@ void OSD::SetDefaults(void)
 
         container->AddType(lb);
     }
+
+    // Create container for subtitles
+    container = GetSet("subtitles");
+    if (!container)
+    {
+        QString name = "subtitles";
+        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult,
+                               frameint);
+        AddSet(container, name);
+    }
 }
 
 void OSD::Reinit(int width, int height, int frint, int dispx, int dispy, 
@@ -1222,6 +1232,16 @@ QRect OSD::parseRect(QString text)
         retval = QRect(x, y, w, h);
 
     return retval;
+}
+
+void OSD::ClearAll(const QString &name)
+{
+    osdlock.lock();
+    OSDSet *container = GetSet(name);
+    if (container)
+        container->Clear();
+
+    osdlock.unlock();
 }
 
 void OSD::ClearAllText(const QString &name)

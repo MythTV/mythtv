@@ -133,6 +133,12 @@ OSDSet::OSDSet(const OSDSet &other)
 
 OSDSet::~OSDSet()
 {
+    Clear();
+    delete allTypes;
+}
+
+void OSDSet::Clear()
+{
     vector<OSDType *>::iterator i = allTypes->begin();
     for (; i != allTypes->end(); i++)
     {
@@ -140,7 +146,7 @@ OSDSet::~OSDSet()
         if (type)
             delete type;
     }
-    delete allTypes;
+    allTypes->clear();
 }
  
 void OSDSet::AddType(OSDType *type)

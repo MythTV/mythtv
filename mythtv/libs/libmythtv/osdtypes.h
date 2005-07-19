@@ -25,6 +25,8 @@ class OSDSet : public QObject
     OSDSet(const OSDSet &other);
    ~OSDSet();
 
+    void Clear();
+
     void SetCache(bool cache) { m_cache = cache; }
     bool GetCache() { return m_cache; }
 

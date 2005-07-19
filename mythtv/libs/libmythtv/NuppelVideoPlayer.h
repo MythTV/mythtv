@@ -30,6 +30,7 @@ class AudioOutput;
 class FilterManager;
 class FilterChain;
 class VideoSync;
+struct AVSubtitle;
 
 struct TextContainer
 {
@@ -218,10 +219,13 @@ class NuppelVideoPlayer
         audio_timecode_offset = 0;
         return audio_timecode_offset; 
     }
+
     long long ResyncAudioTimecodeOffset() { 
         audio_timecode_offset = (long long)0x8000000000000000LL;
         return 0; 
     }
+
+    void AddSubtitle(const AVSubtitle& subtitle);
 
  protected:
     void DisplayPauseFrame(void);
@@ -293,6 +297,9 @@ class NuppelVideoPlayer
 
     FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
                                   float fps, int video_height);
+
+    void DisplaySubtitles();
+    void ClearSubtitles();
 
     QString filename;
 
@@ -484,6 +491,11 @@ class NuppelVideoPlayer
     bool errored;
 
     int m_DeintSetting;
+
+    MythDeque<AVSubtitle> nonDisplayedSubtitles;
+    QMutex subtitleLock;
+    bool osdHasSubtitles;
+    long long osdSubtitlesExpireAt;
 };
 
 #endif
