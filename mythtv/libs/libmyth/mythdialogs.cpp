@@ -805,6 +805,11 @@ void MythMainWindow::customEvent(QCustomEvent *ce)
                 text = QString(c);
             }
 
+            mod = ((mod & Qt::CTRL) ? Qt::ControlButton : 0) |
+                  ((mod & Qt::META) ? Qt::MetaButton : 0) |
+                  ((mod & Qt::ALT) ? Qt::AltButton : 0) |
+                  ((mod & Qt::SHIFT) ? Qt::ShiftButton : 0);
+
             QKeyEvent key(lke->isKeyDown() ? QEvent::KeyPress :
                           QEvent::KeyRelease, k, ascii, mod, text);
 
