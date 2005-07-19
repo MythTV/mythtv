@@ -236,7 +236,7 @@ void updateDiskCount(QString romname, int diskcount)
 }
 
 void GameHandler::buildFileList(QString directory, GameHandler *handler, 
-                                MSqlQuery *query, MythProgressDialog *pdial, int indepth, int filecount)
+                                MSqlQuery *query, MythProgressDialog *pdial, int indepth, int* filecount)
 {
     QString thequery;
     QString queryvalues;
@@ -250,7 +250,6 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
     QDir RomDir(directory);
     RomDir.setSorting( QDir:: DirsFirst | QDir::Name );
     const QFileInfoList* List = RomDir.entryInfoList();
-
     for (QFileInfoListIterator it(*List); it; ++it)
     {
         QFileInfo Info(*it.current());
@@ -300,9 +299,9 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
                 // If the rom is already in the DB then  don't display the duplicate
                 // Probably convert this to use a QMap and update the database after the map is filled
                 // just like mythvideo does.
-                if (romInDB(RomName, handler->GameType()))
-                    displayrom = 0;
-                else
+                //if (romInDB(RomName, handler->GameType()))
+                //    displayrom = 0;
+                //else
                     displayrom = 1;
 
                 if (handler->SpanDisks()) 
@@ -352,8 +351,8 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
                 thequery.append(queryvalues);
                 query->exec(thequery);
 
-                filecount++;
-                pdial->setProgress(filecount);
+                *filecount = *filecount + 1;
+                pdial->setProgress(*filecount);
 
             }
             // else skip it
@@ -413,8 +412,9 @@ void GameHandler::processGames(GameHandler *handler)
     }
     else
     {   
+        int filecount = 0;
         buildFileList(handler->SystemRomPath(),handler,&query,&pdial,
-                            handler->SpanDisks(),gContext->GetSetting("GameDeepScan").toInt());
+                      gContext->GetSetting("GameDeepScan").toInt(),&filecount);
     }
 
     pdial.Close();

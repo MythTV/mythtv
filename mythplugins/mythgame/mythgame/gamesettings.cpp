@@ -47,9 +47,9 @@ static HostLineEdit *GameFavTreeLevels()
     return gc;
 }
 
-static GlobalCheckBox *GameDeepScan()
+static HostCheckBox *GameDeepScan()
 {   
-    GlobalCheckBox *gc = new GlobalCheckBox("GameDeepScan");
+    HostCheckBox *gc = new HostCheckBox("GameDeepScan");
     gc->setLabel(QObject::tr("Indepth Game Scan"));
     gc->setHelpText(QObject::tr("Enabling this causes a game scan to gather crc values and attempt to find out more"
                     " detailed information about the game: NOTE this can greatly increase the time a gamescan takes"

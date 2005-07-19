@@ -31,7 +31,7 @@ class GameHandler
     static int buildFileCount(QString directory, GameHandler *handler);
     static void buildFileList(QString directory, GameHandler *handler, 
                               MSqlQuery *query, MythProgressDialog *pdial, 
-                              int indepth, int filecount);
+                              int indepth, int* filecount);
 
     static void processGames(GameHandler *);
     static void processAllGames(void);
