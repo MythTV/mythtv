@@ -30,6 +30,9 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording *_rec, ManagedList* 
 
     inactive = new SRInactive(_rec, this, _parentList);
     addItem(inactive->getItem(), -1);
+
+    tsValue = new SRTimeStretch(_rec, _parentList, this);
+    addItem(tsValue->getItem(), -1);
 }
 
 
@@ -152,4 +155,32 @@ void SRRecGroup::showNewRecGroup()
     }
 }
 
+SRTimeStretch::SRTimeStretch(ScheduledRecording *_parent, ManagedList *_list,
+        ManagedListGroup *_group) : SRSelectSetting(_parent,
+        "timeStretchList", QString("[ %1 ]").arg(QObject::tr("Time Stretch")),
+        _group, "tsdefault", _list)
+{
+    _parent->setTimeStretchIDObj(this);
+}
 
+void SRTimeStretch::load()
+{
+    fillSelections();
+    SRSelectSetting::load();
+
+    setValue(QString::number(settingValue.toDouble(), 'f', 2));
+    setUnchanged();
+}
+
+void SRTimeStretch::fillSelections()
+{
+    clearSelections();
+    QString ts_text = QObject::tr("Default time stretch %1");
+    float tsfac = 0.5;
+    float tsstep = 0.05;
+    while (tsfac < 2.01) {
+        addSelection(ts_text.arg(tsfac, 0, 'f', 2),
+                QString::number(tsfac, 'f', 2));
+        tsfac += tsstep;
+    }
+}

@@ -66,6 +66,7 @@ ProgramInfo::ProgramInfo(void)
     year = "";
     stars = 0;
     availableStatus = asAvailable;    
+    timestretch = 1.0;
 
     pathname = "";
     filesize = 0;
@@ -193,6 +194,8 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     hasAirDate = other.hasAirDate;
     repeat = other.repeat;
 
+    timestretch = other.timestretch;
+
     seriesid = other.seriesid;
     programid = other.programid;
     catType = other.catType;
@@ -286,6 +289,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     FLOAT_TO_LIST(stars)
     DATETIME_TO_LIST(QDateTime(originalAirDate))
     INT_TO_LIST(hasAirDate)     
+    FLOAT_TO_LIST(timestretch);
 }
 
 /** \fn ProgramInfo::FromStringList(QStringList&,int)
@@ -382,6 +386,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     FLOAT_FROM_LIST(stars)
     DATE_FROM_LIST(originalAirDate);
     INT_FROM_LIST(hasAirDate);
+    FLOAT_FROM_LIST(timestretch);
 
     return true;
 }
@@ -546,6 +551,8 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap) const
         progMap["REPEAT"] = "";
         progMap["LONGREPEAT"] = "";
     }
+
+    progMap["timestretch"] = QString::number(timestretch, 'f', 2);
    
     progMap["seriesid"] = seriesid;
     progMap["programid"] = programid;
@@ -692,7 +699,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                   "channel.callsign,channel.name,channel.commfree, "
                   "channel.outputfilters,seriesid,programid,filesize, "
                   "lastmodified,stars,previouslyshown,originalairdate, "
-                  "hostname,recordid,transcoder "
+                  "hostname,recordid,transcoder,timestretch "
                   "FROM recorded "
                   "LEFT JOIN channel "
                   "ON recorded.chanid = channel.chanid "
@@ -751,6 +758,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->spread = -1;
 
         proginfo->programflags = proginfo->getProgramFlags();
+
+        proginfo->timestretch = query.value(21).toString().toFloat();
 
         return proginfo;
     }
@@ -1213,11 +1222,12 @@ void ProgramInfo::StartedRecording(void)
     query.prepare("INSERT INTO recorded (chanid,starttime,endtime,title,"
                   " subtitle,description,hostname,category,recgroup,"
                   " autoexpire,recordid,seriesid,programid,stars,"
-                  " previouslyshown,originalairdate,findid,transcoder)"
+                  " previouslyshown,originalairdate,findid,transcoder,"
+                  " timestretch)"
                   " VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
                   " :HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
                   " :SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE,"
-                  " :FINDID,:TRANSCODER);");
+                  " :FINDID,:TRANSCODER,:TIMESTRETCH);");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTS", starts);
     query.bindValue(":ENDS", ends);
@@ -1236,6 +1246,7 @@ void ProgramInfo::StartedRecording(void)
     query.bindValue(":REPEAT", repeat);
     query.bindValue(":ORIGAIRDATE", originalAirDate);
     query.bindValue(":TRANSCODER", record->GetTranscoder());
+    query.bindValue(":TIMESTRETCH", timestretch);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("WriteRecordedToDB", query);

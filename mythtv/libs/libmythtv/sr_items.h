@@ -331,6 +331,7 @@ class SRSchedOptionsGroup : public ManagedListGroup
         class SREndOffset* endOffset;
         class SRDupMethod* dupMethItem;
         class SRDupIn* dupLocItem;
+        class SRTimeStretch* tsValue;
 
         ScheduledRecording *schedRec;
 };
@@ -793,5 +794,15 @@ class SRRecGroup: public SRSelectSetting
         void showNewRecGroup();
         void onGoingBack();
 };
+
+class SRTimeStretch : public SRSelectSetting 
+{
+    public:
+        SRTimeStretch(ScheduledRecording *_parent, ManagedList *_list,
+                ManagedListGroup *_group);
+        void load();
+        void fillSelections();
+};
+
 #endif
 

@@ -1861,6 +1861,10 @@ void NuppelVideoPlayer::StartPlaying(void)
             return;
     }
 
+    if (audioOutput)
+        audioOutput->SetStretchFactor(audio_stretchfactor);
+    next_play_speed = audio_stretchfactor;
+
     if (!InitVideo())
     {
         qApp->lock();

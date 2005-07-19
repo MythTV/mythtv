@@ -43,6 +43,7 @@ ScheduledRecording::ScheduledRecording()
     inactive = NULL;
     searchType = "";
     searchForWhat = "";
+    timestretchid = NULL;
         
     longChannelFormat = gContext->GetSetting("LongChannelFormat", "<num> <name>");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
@@ -786,6 +787,9 @@ void ScheduledRecording::setDefault(bool haschannel)
     recgroup->setValue("Default");
 
     inactive->setValue(0);
+
+    timestretchid->fillSelections();
+    timestretchid->setValue(QString::number(1.0f, 'f', 2));
 }
 
 void ScheduledRecording::setProgram(ProgramInfo *proginfo)

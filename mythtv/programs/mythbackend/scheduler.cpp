@@ -1723,7 +1723,7 @@ void Scheduler::AddNewRecords(void) {
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid, program.category_type, "
 "program.airdate, program.stars, program.originalairdate, record.inactive, "
-"record.parentid, ") + progfindid + QString(
+"record.parentid, ") + progfindid + ", record.tsdefault " + QString(
 "FROM recordmatch "
 
 " INNER JOIN record ON (recordmatch.recordid = record.recordid) "
@@ -1862,6 +1862,7 @@ void Scheduler::AddNewRecords(void) {
         bool inactive = result.value(33).toInt();
         p->parentid = result.value(34).toInt();
         p->findid = result.value(35).toInt();
+        p->timestretch = result.value(36).toString().toFloat();
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
@@ -2052,7 +2053,8 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "record.subtitle, record.description, record.recpriority, record.type, "
 "channel.name, record.recordid, record.recgroup, record.dupin, "
 "record.dupmethod, channel.commfree, channel.channum, record.station, "
-"record.seriesid, record.programid, record.category, record.findid "
+"record.seriesid, record.programid, record.category, record.findid, "
+"record.tsdefault"
 "FROM record "
 "LEFT JOIN channel ON channel.callsign = record.station "
 "GROUP BY recordid "
@@ -2112,6 +2114,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->programid = result.value(19).toString();
             proginfo->category = result.value(20).toString();
             proginfo->findid = result.value(21).toInt();
+            proginfo->timestretch = result.value(22).toString().toFloat();
             
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;

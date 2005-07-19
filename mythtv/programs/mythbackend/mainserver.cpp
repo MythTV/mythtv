@@ -888,7 +888,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                        "record.recordid,outputfilters,"
                        "recorded.seriesid,recorded.programid,recorded.filesize, "
                        "recorded.lastmodified, recorded.findid, "
-                       "recorded.originalairdate "
+                       "recorded.originalairdate, recorded.timestretch "
                        "FROM recorded "
                        "LEFT JOIN record ON recorded.recordid = record.recordid "
                        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -951,6 +951,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     QDate::fromString(query.value(26).toString(),Qt::ISODate);
                 proginfo->hasAirDate = true;
             }
+
+            proginfo->timestretch = query.value(27).toString().toFloat();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();

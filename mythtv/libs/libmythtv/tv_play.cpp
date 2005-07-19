@@ -537,6 +537,8 @@ int TV::Playback(ProgramInfo *rcinfo)
     else
         ChangeState(kState_WatchingPreRecorded);
 
+    normal_speed = playbackinfo->timestretch;
+
     if (class LCD * lcd = LCD::Get())
         lcd->switchToChannel(rcinfo->chansign, rcinfo->title, rcinfo->subtitle);
 
@@ -1044,6 +1046,8 @@ void TV::SetupPlayer(bool isWatchingRecording)
     nvp->SetLength(playbackLen);
     nvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
+
+    nvp->SetAudioStretchFactor(normal_speed);
 
     if (gContext->GetNumSetting("DefaultCCMode"))
         nvp->ToggleCC(vbimode, 0);
