@@ -1,0 +1,8 @@
+#!/bin/sh
+#
+# iso_play - A simple script to playback an iso rip of a DVD using xine.
+#
+#            Put this into /usr/local/bin then set it as the default player for 
+#            files with the extension .iso in MythVideo.
+#
+xine --fullscreen --hide-gui --auto-play --no-logo --no-splash  dvd:/$1
