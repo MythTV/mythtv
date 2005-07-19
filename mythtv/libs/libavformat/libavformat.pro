@@ -51,7 +51,7 @@ contains( CONFIG_NETWORK, yes ) {
 }
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
-inc.files = avformat.h avio.h
+inc.files = avformat.h avio.h rtp.h rtsp.h rtspcodes.h
 
 INSTALLS += inc
 
