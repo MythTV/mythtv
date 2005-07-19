@@ -1565,7 +1565,7 @@ void HttpOutResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_cl
         //  Store what kind of decoder we need to use
         //
         
-        AVCodecContext *audio_decoder_context = &format_context->streams[0]->codec;
+        AVCodecContext *audio_decoder_context = format_context->streams[0]->codec;
         
         //
         //  Store the input format
@@ -1607,11 +1607,11 @@ void HttpOutResponse::convertToWavAndStreamFile(MFDServiceClientSocket *which_cl
         output_context->oformat = output_format;        
         
         AVStream *decoded_stream = av_new_stream(output_context, 0);
-        decoded_stream->codec.codec_type = CODEC_TYPE_AUDIO;
-        decoded_stream->codec.codec_id = output_context->oformat->audio_codec;
-        decoded_stream->codec.sample_rate = audio_decoder_context->sample_rate;
-        decoded_stream->codec.channels = audio_decoder_context->channels;
-        decoded_stream->codec.bit_rate = audio_decoder_context->bit_rate;
+        decoded_stream->codec->codec_type = CODEC_TYPE_AUDIO;
+        decoded_stream->codec->codec_id = output_context->oformat->audio_codec;
+        decoded_stream->codec->sample_rate = audio_decoder_context->sample_rate;
+        decoded_stream->codec->channels = audio_decoder_context->channels;
+        decoded_stream->codec->bit_rate = audio_decoder_context->bit_rate;
     
         av_set_parameters(output_context, NULL);
 

@@ -193,7 +193,7 @@ bool avfDecoder::initialize()
         return FALSE;
 
     // Store the audio codec of the stream
-    audio_dec = &ic->streams[0]->codec;
+    audio_dec = ic->streams[0]->codec;
 
     // Store the input format of the context
     ifmt = ic->iformat;
@@ -212,11 +212,11 @@ bool avfDecoder::initialize()
     oc->oformat = fmt;
 
     dec_st = av_new_stream(oc,0);
-    dec_st->codec.codec_type = CODEC_TYPE_AUDIO;
-    dec_st->codec.codec_id = oc->oformat->audio_codec;
-    dec_st->codec.sample_rate = audio_dec->sample_rate;
-    dec_st->codec.channels = audio_dec->channels;
-    dec_st->codec.bit_rate = audio_dec->bit_rate;
+    dec_st->codec->codec_type = CODEC_TYPE_AUDIO;
+    dec_st->codec->codec_id = oc->oformat->audio_codec;
+    dec_st->codec->sample_rate = audio_dec->sample_rate;
+    dec_st->codec->channels = audio_dec->channels;
+    dec_st->codec->bit_rate = audio_dec->bit_rate;
     av_set_parameters(oc, NULL);
 
     // Prepare the decoding codec
@@ -226,7 +226,7 @@ bool avfDecoder::initialize()
     codec = avcodec_find_decoder(audio_dec->codec_id);
     if (!codec)
         return FALSE;
-    if (avcodec_open(audio_dec,codec) < 0)
+    if (avcodec_open(audio_dec, codec) < 0)
         return FALSE;
     totalTime = (ic->duration / AV_TIME_BASE) * 1000;
 
