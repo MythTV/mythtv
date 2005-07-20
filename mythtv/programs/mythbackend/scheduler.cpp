@@ -2054,7 +2054,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "channel.name, record.recordid, record.recgroup, record.dupin, "
 "record.dupmethod, channel.commfree, channel.channum, record.station, "
 "record.seriesid, record.programid, record.category, record.findid, "
-"record.tsdefault"
+"record.tsdefault "
 "FROM record "
 "LEFT JOIN channel ON channel.callsign = record.station "
 "GROUP BY recordid "
