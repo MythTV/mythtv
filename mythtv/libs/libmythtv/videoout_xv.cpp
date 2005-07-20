@@ -14,10 +14,6 @@
 #include <sys/shm.h>
 #include <X11/keysym.h>
 
-#include <qsqldatabase.h>
-#include <qsqlquery.h>
-
-
 #include <iostream>
 
 #include "yuv2rgb.h"
@@ -29,8 +25,6 @@
 #include "videoout_xv.h"
 #include "XvMCSurfaceTypes.h"
 #include "util-x11.h"
-#include "libmyth/mythdbcon.h"
-
 
 extern "C" {
 #define XMD_H 1
@@ -113,27 +107,12 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     if (gContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes();
         
-#ifdef USING_XVMC
-    int bufferID = gContext->GetNumSetting("xvmcBuffersID", 1);
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare( "SELECT osd_num, osd_res_num, min_surf, max_surf, decode_num, agressive "
-                   "FROM xvmc_buffer_settings "
-                   "WHERE id = :BUFFID" );
-    query.bindValue( ":BUFFID", bufferID );
-    
-    if (query.exec() && query.isActive() && query.size())
-    {
-        VERBOSE(VB_PLAYBACK, QString( "Using XvMC buffer settings ID: %1" ).arg(bufferID));
-                                    
-        query.next();
-        xvmcBuffers.OSDNum    = query.value(0).toInt();
-        xvmcBuffers.OSDResNum = query.value(1).toInt();
-        xvmcBuffers.MinSurf   = query.value(2).toInt();
-        xvmcBuffers.MaxSurf   = query.value(3).toInt();
-        xvmcBuffers.NumDecode = query.value(4).toInt();
-        xvmcBuffers.Agressive = query.value(5).toInt();
-    }
-#endif
+    xvmcBuffers.OSDNum    = 2;
+    xvmcBuffers.OSDResNum = 2;
+    xvmcBuffers.MinSurf   = 8;
+    xvmcBuffers.MaxSurf   = 16;
+    xvmcBuffers.NumDecode = 8;
+    xvmcBuffers.Agressive = 1;
 }
 
 VideoOutputXv::~VideoOutputXv()
@@ -575,7 +554,11 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
         // Create ffmpeg VideoFrames    
         bool vld, idct, mc;
         myth2av_codecid(myth_codec_id, vld, idct, mc);
-        vbuffers.Init( xvmcBuffers.NumDecode/*numdecode*/, false /*extra_for_pause*/,
+
+        if (vld)
+            xvmcBuffers.NumDecode = 16;
+
+        vbuffers.Init( xvmcBuffers.NumDecode, false /*extra_for_pause*/,
                        1 + xvmcBuffers.OSDResNum /*need_free*/,
                        5 - xvmcBuffers.OSDResNum /*needprebuffer_normal*/,
                        5 - xvmcBuffers.OSDResNum /*needprebuffer_small*/,
@@ -1942,7 +1925,7 @@ static void calc_bob(FrameScanType scan, int imgh, int disphoff,
         (scan == kScan_Intr2ndField && top_field_first == 0))
     {
         field = 1;
-        xv_src_y_incr = - imgy / 2;
+        xv_src_y_incr += - imgy / 2;
     }
     else if ((scan == kScan_Interlaced && top_field_first == 0) ||
              (scan == kScan_Intr2ndField && top_field_first == 1))

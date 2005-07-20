@@ -1956,7 +1956,10 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 };
         performActualUpdate(updates, "1088", dbver);
     }
-   
+
+
+// Drop xvmc_buffer_settings at some point
+// Drop dead DVB tables eventually, too   
     return true;
 }
 

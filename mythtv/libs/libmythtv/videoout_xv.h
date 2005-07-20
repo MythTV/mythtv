@@ -16,7 +16,6 @@
 #undef HAVE_AV_CONFIG_H
 #include "../libavcodec/avcodec.h"
 
-#ifdef USING_XVMC 
 class XvMCBufferSettings
 {
     public:
@@ -29,6 +28,7 @@ class XvMCBufferSettings
         unsigned int Agressive;
 };
 
+#ifdef USING_XVMC
 class XvMCOSD;
 #include "XvMCSurfaceTypes.h"
 #include "../libavcodec/xvmc_render.h"
@@ -150,8 +150,8 @@ class VideoOutputXv : public VideoOutput
 #ifdef USING_XVMC 
     XvMCOSD* GetAvailableOSD();
     void ReturnAvailableOSD(XvMCOSD*);
-    XvMCBufferSettings xvmcBuffers;
 #endif // USING_XVMC
+    XvMCBufferSettings xvmcBuffers;
 
     // Misc.
     MythCodecID          myth_codec_id;
