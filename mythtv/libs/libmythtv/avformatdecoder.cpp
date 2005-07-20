@@ -1520,7 +1520,10 @@ bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
 bool AvFormatDecoder::autoSelectAudioTrack()
 {
     if (!audioStreams.size())
+    {
+        m_parent->SetAudioParams(-1, -1, -1);
         return false;
+    }
 
     int minChannels = 1;
     int maxTracks = (audioStreams.size() - 1);

@@ -476,13 +476,41 @@ void NuppelVideoPlayer::ReinitVideo(void)
     ClearAfterSeek();
 }
 
-void NuppelVideoPlayer::ReinitAudio(void)
+QString NuppelVideoPlayer::ReinitAudio(void)
 {
-    if (audioOutput)
+    QString errMsg = QString::null;
+    if (!audioOutput)
+    {
+        bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
+        audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
+                                             audio_channels, audio_samplerate, 
+                                             AUDIOOUTPUT_VIDEO,
+                                             setVolume);
+        if (!audioOutput)
+            errMsg = QObject::tr("Unable to create AudioOutput.");
+        else
+            errMsg = audioOutput->GetError();
+
+        if (errMsg != QString::null)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Disabling Audio, reason is: %1")
+                    .arg(errMsg));
+            if (audioOutput)
+            {
+                delete audioOutput;
+                audioOutput = NULL;
+            }
+            disableaudio = true;
+        }
+    }
+    else
     {
         audioOutput->Reconfigure(audio_bits, audio_channels, audio_samplerate);
-        audioOutput->SetStretchFactor(audio_stretchfactor);
+        errMsg = audioOutput->GetError();
     }
+    if (audioOutput)
+        audioOutput->SetStretchFactor(audio_stretchfactor);
+    return errMsg;
 }
 
 static inline QString toQString(FrameScanType scan) {
@@ -1803,22 +1831,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (!disableaudio || (forceVideoOutput == kVideoOutput_IVTV &&
                           !gContext->GetNumSetting("PVR350InternalAudioOnly")))
     {
-        bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
-        audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
-                                             audio_channels, audio_samplerate, 
-                                             AUDIOOUTPUT_VIDEO,
-                                             setVolume);
-
-        QString errMsg = QString::null;
-        if (audioOutput == NULL)
-        {
-            errMsg = QObject::tr("Unable to create AudioOutput.");
-        }
-        else if (audioOutput->GetError() != QString::null)
-        {
-            errMsg = audioOutput->GetError();
-        }
-
+        QString errMsg = ReinitAudio();
         int ret = 1;
         if ((errMsg != QString::null) && gContext->GetNumSetting("AudioNag", 1))
         {
@@ -1839,18 +1852,6 @@ void NuppelVideoPlayer::StartPlaying(void)
             qApp->lock();
             ret = dialog.exec();
             qApp->unlock();
-        }
-        
-        if (errMsg != QString::null)
-        {
-            VERBOSE(VB_IMPORTANT, QString("Disabling Audio, reason is: %1")
-                    .arg(errMsg));
-            if (audioOutput)
-            {
-                delete audioOutput;
-                audioOutput = NULL;
-            }
-            disableaudio = true;
         }
             
         if (ret == 2)

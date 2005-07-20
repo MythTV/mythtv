@@ -190,7 +190,7 @@ class NuppelVideoPlayer
 
     void ReinitOSD(void);
     void ReinitVideo(void);
-    void ReinitAudio(void);
+    QString ReinitAudio(void);
 
     void ToggleLetterbox(int letterboxMode = -1);
     void Zoom(int direction);
