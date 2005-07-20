@@ -446,7 +446,7 @@ void ScanWizardScanner::scan()
 
 #ifdef USING_DVB
         monitor = new DVBSignalMonitor(-1, GetDVBChannel());
-#endif
+
         // Signal Meters are connected here
         if (monitor)
         {
@@ -455,7 +455,7 @@ void ScanWizardScanner::scan()
             connect(monitor, SIGNAL(StatusSignalStrength(const SignalMonitorValue&)),
                     this, SLOT(dvbSignalStrength(const SignalMonitorValue&)));
         }
-#ifdef USING_DVB
+
         DVBSignalMonitor *dvbm = dynamic_cast<DVBSignalMonitor*>(monitor);
         if (dvbm)
         {
@@ -463,9 +463,10 @@ void ScanWizardScanner::scan()
                     this, SLOT(  dvbSNR(const SignalMonitorValue&)));
         }
         bzero(&chan_opts.tuning, sizeof(chan_opts.tuning));
-#endif // USING_DVB
+
         if (monitor)
             monitor->Start();
+#endif // USING_DVB
 
         popupProgress = new ScanProgressPopup(this);
         popupProgress->progress(0);

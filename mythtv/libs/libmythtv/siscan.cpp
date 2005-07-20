@@ -40,7 +40,7 @@
 class TransportObject;
 class DVBTuning;
 class dvb_channel_t;
-typedef uint fe_type_t;
+typedef int fe_type_t;
 #endif // USING_DVB
 
 /// \brief How long we wait for the hardware to stabalize on a signal
