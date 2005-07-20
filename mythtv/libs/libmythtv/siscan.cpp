@@ -1,20 +1,54 @@
+// -*- Mode: c++ -*-
+
+// C includes
+#include <cstdio>
 #include <pthread.h>
-#include <stdio.h>
+
+// Qt includes
 #include <qmutex.h>
+
+// MythTV includes - General
 #include "siscan.h"
-#include "libmythtv/scheduledrecording.h"
+#include "scheduledrecording.h"
 #include "frequencies.h"
 #include "mythdbcon.h"
+#include "channelbase.h"
+#include "channelutil.h"
+#include "videosource.h" // for CardUtil
+
+#ifdef USING_V4L
+#include "channel.h"
+#endif // USING_V4L
+
+// MythTV includes - DTV
+#include "dtvsignalmonitor.h"
+#include "scanstreamdata.h"
+
+// MythTV includes - ATSC
+#include "atsctables.h"
+
+// MythTV includes - DVB
+#include "dvbsignalmonitor.h"
+#include "dvbtables.h"
+#include "eithelper.h"
 
 #ifdef USING_DVB
 #include "dvbchannel.h"
 #include "siparser.h"
 #include "dvbtypes.h"
-#endif
+#else // if !USING_DVB
+class TransportObject;
+class DVBTuning;
+class dvb_channel_t;
+typedef uint fe_type_t;
+#endif // USING_DVB
 
-#define CHECKNIT_TIMER 5000
-#define DVBTSCAN_TIMEOUT 40000
-//#define SISCAN_DEBUG
+/// \brief How long we wait for the hardware to stabalize on a signal
+#define SIGNAL_LOCK_TIMEOUT   500
+/// \brief How long we wait for ATSC tables, before giving up
+#define ATSC_TABLES_TIMEOUT 15000
+/// \brief How long we wait for DVB tables, before giving up
+#define DVB_TABLES_TIMEOUT  40000
 
 #ifdef USING_DVB
 struct FrequencyTableOld
@@ -122,7 +156,7 @@ SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
     sourceID = _sourceID;
 
     /* setup boolean values for thread */
-    scannerRunning = false;
+    scanner_thread_running = false;
     serviceListReady = false;
     transportListReady = false;
     eventsReady = false;
@@ -146,17 +180,10 @@ SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
 
 SIScan::~SIScan()
 {
-    while(scannerRunning)
-       usleep(50);
+    StopScanner();
     SISCAN("SIScanner Stopped");
 
     pthread_mutex_destroy(&events_lock);
-}
-
-void SIScan::SetSourceID(int _SourceID)
-{
-    // Todo: this needs to be used more so you don't get data fubared running in auto-scan mode
-    sourceID = _SourceID;
 }
 
 bool SIScan::ScanTransports()
@@ -168,36 +195,53 @@ bool SIScan::ScanTransports()
 #endif // USING_DVB
 }
 
+/** \fn SIScan::ScanServicesSourceID(int)
+ *  \brief If we are not already scanning a frequency table, this creates
+ *         a new frequency table from database and begins scanning it.
+ *
+ *   This is used by DVB to scan for channels we are told about from other
+ *   channels.
+ *
+ *   Note: Something similar could be used with ATSC when EIT for other
+ *   channels is available on another ATSC channel, as encouraged by the
+ *   ATSC specification.
+ */
 bool SIScan::ScanServicesSourceID(int SourceID)
 {
     if (scanMode == TRANSPORT_LIST)
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    /* Run DB query to get transports on sourceid SourceID connected to this card */
-    QString theQuery = QString("select mplexid, sistandard, transportid from dtv_multiplex where "
-                       "sourceid = %1")
-                       .arg(SourceID);
+    // Run DB query to get transports on sourceid SourceID
+    // connected to this card
+    QString theQuery = QString("SELECT mplexid, sistandard, transportid "
+                               "FROM dtv_multiplex "
+                               "WHERE sourceid = %1").arg(SourceID);
     query.prepare(theQuery);
 
     if (!query.exec() || !query.isActive())
+    {
         MythContext::DBError("Get Transports for SourceID", query);
+        return false;
+    }
 
     if (query.size() <= 0)
     {
-        SISCAN(QString("Unable to find any transports for sourceId %1.").arg(sourceID));
+        SISCAN(QString("Unable to find any transports for sourceId %1.")
+               .arg(sourceID));
         return false;
     }
 
     scanTransports.clear();
 
     transportsCount = transportsToScan = query.size();
-    int tmp = transportsToScan;
-    while (tmp--)
+    while (query.next())
     {
-        query.next();
-        if (query.value(1).toString() == QString("atsc"))
-            ScanTimeout = CHECKNIT_TIMER;
+        if (query.value(1).toString() == "atsc")
+            ScanTimeout = ATSC_TABLES_TIMEOUT;
+
+        QString fn = QString("Transport ID %1").arg(query.value(2).toString());
+
         TransportScanItem t;
         t.mplexid = query.value(0).toInt();
         t.SourceID = SourceID;
@@ -291,10 +335,32 @@ int SIScan::CreateMultiplex(const fe_type_t cardType,
 #endif // USING_DVB
 }
  
-void SIScan::StartScanner()
+/** \fn SIScan::SpawnScanner(void*)
+ *  \brief Thunk that allows scanner_thread pthread to
+ *         call SIScan::RunScanner().
+ */
+void *SIScan::SpawnScanner(void *param)
+{
+    SIScan *scanner = (SIScan *)param;
+    scanner->RunScanner();
+    return NULL;
+}
+
+/** \fn SIScan::StartScanner(void)
+ *  \brief Starts the SIScan event loop.
+ */
+void SIScan::StartScanner(void)
+{
+    pthread_create(&scanner_thread, NULL, SpawnScanner, this);
+}
+
+/** \fn SIScan::RunScanner(void)
+ *  \brief This runs the event loop for SIScan until 'threadExit' is true.
+ */
+void SIScan::RunScanner()
 {
     SISCAN("Starting SIScanner");
-    scannerRunning = true;
+    scanner_thread_running = true;
     threadExit = false;
 
     while (!threadExit)
@@ -440,7 +506,7 @@ void SIScan::StartScanner()
 #endif // USING_DVB
         }
     }
-    scannerRunning = false;
+    scanner_thread_running = false;
 }
 
 void SIScan::StopScanner()
@@ -448,9 +514,13 @@ void SIScan::StopScanner()
     threadExit = true;
 #ifdef USING_DVB
     /* Force dvbchannel to exit */
-    chan->StopTuning();
-    SISCAN("Stopping SIScanner");
-    while (scannerRunning)
+    if (scanner_thread_running)
+    {
+        chan->StopTuning();
+        SISCAN("Stopping SIScanner");
+        pthread_join(scanner_thread, NULL);
+    }
+    while (scanner_thread_running)
        usleep(50);
 #endif // USING_DVB
 }
@@ -592,7 +662,7 @@ bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
  
     transportsToScan=transportsCount;
     timer.start();
-    ScanTimeout = CHECKNIT_TIMER;
+    ScanTimeout = DVB_TABLES_TIMEOUT;
     sourceIDTransportTuned = false;
     scanMode = TRANSPORT_LIST;    
     return true;
@@ -650,7 +720,7 @@ bool SIScan::DVBTScanTransport(int SourceID, unsigned country)
     
     transportsToScan=transportsCount;
     timer.start();
-    ScanTimeout = DVBTSCAN_TIMEOUT;
+    ScanTimeout = DVB_TABLES_TIMEOUT;
     sourceIDTransportTuned = false;
     scanMode = TRANSPORT_LIST;    
 #endif // USING_DVB
@@ -999,7 +1069,7 @@ void SIScan::CheckNIT(NITObject& NIT)
             break;
 
         //Start off with the main frequency,
-        if (chan->TuneTransport(chan_opts,true,CHECKNIT_TIMER))
+        if (chan->TuneTransport(chan_opts, true, ScanTimeout))
         {
 //             cerr << "Tuned to main frequency "<< transport.Frequency << "\n";
             continue;
@@ -1012,7 +1082,7 @@ void SIScan::CheckNIT(NITObject& NIT)
             unsigned nfrequency = *f;
             chan_opts.tuning.params.frequency = nfrequency;
 //            cerr << "CheckNIT " << nfrequency << "\n";
-            if (chan->TuneTransport(chan_opts,true,CHECKNIT_TIMER))
+            if (chan->TuneTransport(chan_opts, true, ScanTimeout))
             {
 //                cerr << "Tuned frequency "<< nfrequency << "\n";
                 transport.Frequency = nfrequency;

@@ -317,29 +317,16 @@ void DVBSignalMonitor::UpdateValues(void)
         uncorrectedBlocks.SetValue(stats.ub);
 
         //cerr<<"locked("<<locked<<") slock("<<signalLock.IsGood()<<")"<<endl;
-        emit StatusSignalLock(locked);
         emit StatusSignalLock(signalLock);
 
         if (HasFlags(kDTVSigMon_WaitForSig))
-        {
-            emit StatusSignalStrength((int) stats.ss);
             emit StatusSignalStrength(signalStrength);
-        }
         if (HasFlags(kDVBSigMon_WaitForSNR))
-        {
-            emit StatusSignalToNoise((int) stats.snr);
             emit StatusSignalToNoise(signalToNoise);
-        }
         if (HasFlags(kDVBSigMon_WaitForBER))
-        {
-            emit StatusBitErrorRate(stats.ber);
             emit StatusBitErrorRate(bitErrorRate);
-        }
         if (HasFlags(kDVBSigMon_WaitForUB))
-        {
-            emit StatusUncorrectedBlocks(stats.ub);
             emit StatusUncorrectedBlocks(uncorrectedBlocks);
-        }
 
         if (wasLocked != signalLock.GetValue())
             GENERAL((wasLocked ? "Signal Lost" : "Signal Lock"));

@@ -81,13 +81,12 @@ Channel *ScanWizardScanner::GetChannel()
 #endif
 }
 
-ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent) :
-          parent(_parent) 
+ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent)
+    : parent(_parent), frequency(0), modulation("8vsb")
 {
     scanner = NULL;
     channel = NULL;
     tunerthread_running = false;
-    scanthread_running = false;
 #ifdef USING_DVB
     monitor = NULL;
 #endif
@@ -102,23 +101,21 @@ ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent) :
 
 void ScanWizardScanner::finish()
 {
-#ifdef USING_DVB
     //Join the thread and close the channel
     if (scanner)
     {
-        scanner->StopScanner();
-        if (scanthread_running)
-            pthread_join(scanner_thread, NULL);
         delete scanner;
         scanner = NULL;
     }
 
+#ifdef USING_DVB
     if (monitor)
     {
         delete monitor;
         monitor = NULL;
     }
 #endif
+
     if (channel)
     {
         delete channel;
@@ -200,17 +197,6 @@ void ScanWizardScanner::transportScanComplete()
     QApplication::postEvent(this, e);
 }
 
-void *ScanWizardScanner::SpawnScanner(void *param)
-{
-#ifdef USING_DVB
-    SIScan *scanner = (SIScan *)param;
-    scanner->StartScanner();
-#else
-    (void)param;
-#endif
-    return NULL;
-}
-
 void *ScanWizardScanner::SpawnTune(void *param)
 {
     bool ok = false;
@@ -225,6 +211,10 @@ void *ScanWizardScanner::SpawnTune(void *param)
         if (scanner->GetDVBChannel())
             ok = scanner->GetDVBChannel()->TuneMultiplex(mplexid);
 #endif
+#ifdef USING_V4L
+        if (scanner->GetChannel())
+            ok = scanner->GetChannel()->TuneMultiplex(mplexid);
+#endif
     }
     else if ((scanner->nScanType == ScanTypeSetting::FullTunedScan_OFDM) ||
              (scanner->nScanType == ScanTypeSetting::FullTunedScan_QPSK) ||
@@ -233,6 +223,11 @@ void *ScanWizardScanner::SpawnTune(void *param)
 #ifdef USING_DVB
         if (scanner->GetDVBChannel())
             ok = scanner->GetDVBChannel()->Tune(scanner->chan_opts, true);
+#endif
+#ifdef USING_V4L
+        if (scanner->GetChannel())
+            ok = scanner->GetChannel()->Tune(scanner->frequency,
+                                             scanner->modulation);
 #endif
     }
 
@@ -262,6 +257,29 @@ void ScanWizardScanner::updateText(const QString &str)
     ScannerEvent* e = new ScannerEvent(ScannerEvent::Update);
     e->strValue(str);
     QApplication::postEvent(this, e);
+}
+
+void ScanWizardScanner::updateStatusText(const QString &str)
+{
+    if (str.isEmpty())
+        return;
+    if (popupProgress)
+        popupProgress->status(tr("Scanning")+" "+str);
+}
+
+void ScanWizardScanner::dvbLock(const SignalMonitorValue &val)
+{
+    dvbLock(val.GetValue());
+}
+
+void ScanWizardScanner::dvbSNR(const SignalMonitorValue &val)
+{
+    dvbSNR(val.GetNormalizedValue(0, 65535));
+}
+
+void ScanWizardScanner::dvbSignalStrength(const SignalMonitorValue &val)
+{
+    dvbSignalStrength(val.GetNormalizedValue(0, 65535));
 }
 
 void ScanWizardScanner::dvbLock(int locked)
@@ -371,7 +389,7 @@ void ScanWizardScanner::scan()
         }
 #endif // USING_DVB
     }
-    else //DVB
+    else // DVB || V4L
     {
         nTransportToTuneTo = parent->transport();
         int cardid = parent->captureCard();
@@ -417,6 +435,8 @@ void ScanWizardScanner::scan()
                 this,    SLOT(  scanComplete(void)));
         connect(scanner, SIGNAL(TransportScanComplete(void)),
                 this,    SLOT(  transportScanComplete(void)));
+        connect(scanner, SIGNAL(ServiceScanUpdateStatusText(const QString&)),
+                this,    SLOT(  updateStatusText(const QString&)));
         connect(scanner, SIGNAL(ServiceScanUpdateText(const QString&)),
                 this,    SLOT(  updateText(const QString&)));
         connect(scanner, SIGNAL(TransportScanUpdateText(const QString&)),
@@ -426,23 +446,30 @@ void ScanWizardScanner::scan()
 
 #ifdef USING_DVB
         monitor = new DVBSignalMonitor(-1, GetDVBChannel());
-
+#endif
         // Signal Meters are connected here
-        connect(monitor, SIGNAL(StatusSignalLock(int)), this, SLOT(dvbLock(int)));
-        connect(monitor, SIGNAL(StatusSignalToNoise(int)), this, SLOT(dvbSNR(int)));
-        connect(monitor, SIGNAL(StatusSignalStrength(int)),
-            this, SLOT(dvbSignalStrength(int)));
-
-        monitor->Start();
+        if (monitor)
+        {
+            connect(monitor, SIGNAL(StatusSignalLock(const SignalMonitorValue&)),
+                    this, SLOT(dvbLock(const SignalMonitorValue&)));
+            connect(monitor, SIGNAL(StatusSignalStrength(const SignalMonitorValue&)),
+                    this, SLOT(dvbSignalStrength(const SignalMonitorValue&)));
+        }
+#ifdef USING_DVB
+        DVBSignalMonitor *dvbm = dynamic_cast<DVBSignalMonitor*>(monitor);
+        if (dvbm)
+        {
+            connect(dvbm, SIGNAL(StatusSignalToNoise(const SignalMonitorValue&)),
+                    this, SLOT(  dvbSNR(const SignalMonitorValue&)));
+        }
+        bzero(&chan_opts.tuning, sizeof(chan_opts.tuning));
 #endif // USING_DVB
+        if (monitor)
+            monitor->Start();
 
         popupProgress = new ScanProgressPopup(this);
         popupProgress->progress(0);
         popupProgress->exec(this);
-
-#ifdef USING_DVB
-        memset(&chan_opts.tuning, 0, sizeof(chan_opts.tuning));
-#endif // USING_DVB
 
         bool fParseError = false;
         if (nScanType == ScanTypeSetting::FullTunedScan_OFDM)
@@ -465,7 +492,7 @@ void ScanWizardScanner::scan()
         else if (nScanType == ScanTypeSetting::FullTunedScan_QPSK)
         {
 #ifdef USING_DVB
-           // SQL code to get the disqec paramters HERE
+            // SQL code to get the disqec paramters HERE
             thequery = QString(
                 "SELECT dvb_diseqc_type, diseqc_port,  diseqc_pos, "
                 "       lnb_lof_switch, lnb_lof_hi,    lnb_lof_lo "
@@ -508,8 +535,7 @@ void ScanWizardScanner::scan()
                 fParseError = true;
 #endif // USING_DVB
         }
-        else if ((nScanType == ScanTypeSetting::FullScan_OFDM) ||
-                 (nScanType == ScanTypeSetting::FullScan_ATSC))
+        else if (nScanType == ScanTypeSetting::FullScan_OFDM)
         {
 #ifdef USING_DVB
             ScannerEvent* e = new ScannerEvent(ScannerEvent::TuneComplete);
@@ -518,6 +544,14 @@ void ScanWizardScanner::scan()
             return;
 #endif // USING_DVB
         }
+        else if (nScanType == ScanTypeSetting::FullScan_ATSC)
+        {
+            ScannerEvent* e = new ScannerEvent(ScannerEvent::TuneComplete);
+            e->intValue(ScannerEvent::OK);
+            QApplication::postEvent(this, e);
+            return;
+        }
+
         if (fParseError)
         {
              MythPopupBox::showOkPopup(gContext->GetMainWindow(),
@@ -586,8 +620,7 @@ void ScanWizardScanner::HandleTuneComplete(void)
 #ifdef USING_DVB
     if (tunerthread_running)
         pthread_join(tuner_thread, NULL);
-    pthread_create(&scanner_thread, NULL, SpawnScanner, scanner);
-    scanthread_running = true;
+    scanner->StartScanner();
 
     // Wait for dvbsections to start this is silly, but does the trick
     while (GetDVBChannel()->siparser == NULL)

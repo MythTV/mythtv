@@ -53,9 +53,9 @@ class DVBChannel;
 class DVBSignalMonitor;
 class ScanOptionalConfig;
 class ScanCountry;
-class OptionalTypeSetting;
 class ScanWizard;
 class ScanWizardScanner;
+class SignalMonitorValue;
 class AnalogScan;
 
 class ScanWizard: public ConfigurationWizard 
@@ -99,6 +99,7 @@ class ScanWizard: public ConfigurationWizard
 
 class ScanWizardScanner :  public VerticalConfigurationGroup
 {
+    friend class ScanWizard;
     Q_OBJECT
   public:
     static const QString strTitle;
@@ -114,20 +115,23 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
     void scanComplete(void);
     void transportScanComplete(void);
     void updateText(const QString& status);
+    void updateStatusText(const QString& status);
 
-    void dvbLock(int);
-    void dvbSNR(int);
-    void dvbSignalStrength(int);
+    void dvbLock(const SignalMonitorValue&);
+    void dvbSNR(const SignalMonitorValue&);
+    void dvbSignalStrength(const SignalMonitorValue&);
 
     void TableLoaded(void);
 
     void serviceScanPctComplete(int pct);
 
   protected:
-    void finish();
+    void dvbLock(int);
+    void dvbSNR(int);
+    void dvbSignalStrength(int);
+    void finish(void);
     void HandleTuneComplete(void);
     void customEvent(QCustomEvent *e);
-    static void *SpawnScanner(void *param);
     static void *SpawnTune(void *param);
     DVBChannel *GetDVBChannel();
     Channel *GetChannel();
@@ -135,7 +139,6 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
     ScanWizard        *parent;
     AnalogScan        *analogScan;
     LogList           *log;
-    bool               scanthread_running;
     bool               tunerthread_running;
     pthread_t          tuner_thread;
     ChannelBase       *channel;
@@ -146,9 +149,10 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
     int                nScanType;
     int                nVideoSource;
 
+    // tranport info
+    uint               frequency;
+    QString            modulation;
 #ifdef USING_DVB
-    pthread_t          scanner_thread;
-    DVBChannel        *dvbchannel;
     DVBSignalMonitor  *monitor;
     dvb_channel_t      chan_opts;
 #endif

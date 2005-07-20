@@ -23,17 +23,11 @@ public:
     virtual QStringList GetStatusList(bool kick);
     void Stop(void);
 
+    bool UpdateFiltersFromStreamData(void);
 signals:
     void StatusSignalToNoise(const SignalMonitorValue&);
     void StatusBitErrorRate(const SignalMonitorValue&);
     void StatusUncorrectedBlocks(const SignalMonitorValue&);
-
-    /// \deprecated Use the SignalMonitorValue based signal instead.
-    void StatusSignalToNoise(int);
-    /// \deprecated Use the SignalMonitorValue based signal instead.
-    void StatusBitErrorRate(int);
-    /// \deprecated Use the SignalMonitorValue based signal instead.
-    void StatusUncorrectedBlocks(int);
 
 private:
     DVBSignalMonitor(void);
@@ -43,7 +37,6 @@ private:
 
     static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);
-    bool UpdateFiltersFromStreamData(void);
     bool AddPIDFilter(uint pid);
     bool RemovePIDFilter(uint pid);
 

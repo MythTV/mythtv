@@ -1,14 +1,20 @@
 // -*- Mode: c++ -*-
+
+#ifndef SISCAN_H
+#define SISCAN_H
+
+// Qt includes
 #include <qobject.h>
 #include <qstring.h>
 #include <qmap.h>
+#include <qmutex.h>
 #include <qvaluelist.h>
 #include <qdatetime.h>
 
+// MythTV includes
 #include "frequencytables.h"
 
 #ifdef USING_DVB
-#include "dvbchannel.h"
 #include "sitypes.h"
 #include "dvbtypes.h"
 typedef QValueList<Event> QList_Events;
@@ -21,7 +27,6 @@ typedef QMap<uint16_t, void*> QMap_Events;
 typedef QMap<uint16_t, void*> QMap_SDTObject;
 typedef QValueList<void*> QList_Events;
 typedef QValueList<QList_Events> QListList_Events;
-class DVBChannel;
 class DVBTuning;
 typedef int fe_type_t;
 typedef void* NITObject;
@@ -30,52 +35,74 @@ typedef void* NIT;
     VERBOSE(VB_SIPARSER, QString("SIScan: ") << args);
 #endif // USING_DVB
 
-typedef enum { IDLE, TRANSPORT_LIST, EIT_CRAWL } SCANMODE;
+class MSqlQuery;
+class ChannelBase;
+class Channel;
+class DVBChannel;
+class SignalMonitor;
+class DTVSignalMonitor;
+class DVBSignalMonitor;
+class ServiceDescriptionTable;
+class NetworkInformationTable;
+class VirtualChannelTable;
+class MasterGuideTable;
+class ScanStreamData;
+class EITHelper;
+
+typedef enum
+{
+    IDLE,           ///< Don't do anything
+    TRANSPORT_LIST, ///< Actively scan for channels
+    EIT_CRAWL       ///< Scan for event information
+} SCANMODE;
 
 class SIScan : public QObject
 {
-Q_OBJECT
-
-public:
-
+    Q_OBJECT
+  public:
     SIScan(DVBChannel* advbchannel, int _sourceID);
     ~SIScan();
 
-    void StartScanner();
-    void StopScanner();
+    void StartScanner(void);
+    void StopScanner(void);
 
     bool ScanTransports(int SourceID,
                         const QString std,
                         const QString modulation,
                         const QString country);
-    bool ScanTransports();
+    bool ScanTransports(void);
     bool ScanServices(int TransportID = -1);
     bool ScanServicesSourceID(int SourceID);
-    void SetSourceID(int _SourceID);
 
-    void SetFTAOnly(bool _fFTAOnly) { FTAOnly = _fFTAOnly;}
-    void SetRadioServices(bool _fRadio) { RadioServices = _fRadio;}
-    void SetForceUpdate(bool _force) { forceUpdate = _force;}
-    void SetScanTimeout(int _timeout) { ScanTimeout = _timeout;}
+    void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
+    void SetFTAOnly(bool _fFTAOnly)   { FTAOnly                 = _fFTAOnly; }
+    void SetRadioServices(bool _fRadio) { RadioServices         = _fRadio;   }
+    void SetForceUpdate(bool _force)  { forceUpdate             = _force;    }
+    void SetScanTimeout(int _timeout) { ScanTimeout             = _timeout;  }
     void SetChannelFormat(const QString _fmt) { channelFormat   = _fmt; }
 
-public slots:
-
+  public slots:
     // Handler for complete tables
     void TransportTableComplete();
     void ServiceTableComplete();
     void EventsReady(QMap_Events* EventList);
 
-signals:
+  signals:
     // Values from 1-100 of scan completion
     void PctServiceScanComplete(int pct);
     void PctTransportScanComplete(int pct);
+    void ServiceScanUpdateStatusText(const QString& status);
     void ServiceScanUpdateText(const QString& status);
     void TransportScanUpdateText(const QString& status);
-    void ServiceScanComplete();
-    void TransportScanComplete();
+    void ServiceScanComplete(void);
+    void TransportScanComplete(void);
 
-private:
+  private:
+    /// \brief Called by SpawnScanner to run scanning thread
+    void RunScanner(void);
+    /// \brief Thunk to call RunScanner from pthread
+    static void *SpawnScanner(void *param);
+
     bool ATSCScanTransport(int SourceID, int FrequencyBand);
     bool DVBTScanTransport(int SourceID, unsigned country);
 
@@ -112,7 +139,6 @@ private:
     bool              threadExit;
     QTime             timer;
 
-    bool scannerRunning;                 
     bool serviceListReady;
     bool sourceIDTransportTuned;
     bool transportListReady;
@@ -127,4 +153,10 @@ private:
     QValueList<TransportScanItem> scanTransports;
 
     pthread_mutex_t events_lock;
+
+    /// Scanner thread, runs SIScan::StartScanner()
+    pthread_t        scanner_thread;
+    bool             scanner_thread_running;
 };
+
+#endif // SISCAN_H
