@@ -2062,8 +2062,15 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);
+    result.exec();
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (!result.isActive())
+    {
+        MythContext::DBError("findAllScheduledPrograms", result);
+        return;
+    }
+    if (result.size() > 0)
+    {
         while (result.next()) 
         {
             ProgramInfo *proginfo = new ProgramInfo;
@@ -2121,5 +2128,6 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 
             proglist.push_back(proginfo);
         }
+    }
 }
 
