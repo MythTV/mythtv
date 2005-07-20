@@ -1839,10 +1839,7 @@ fi
 
 if test x"$x11" = x"yes" ; then
     x11="no"
-    if test -f /usr/X11R6/bin/xinit ; then
-        x11="yes"
-    fi
-    if test -f /usr/bin/xinit ; then
+    if has_library libX11 ; then
         x11="yes"
     fi
 fi
