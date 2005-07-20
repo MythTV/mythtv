@@ -12,17 +12,50 @@ using namespace std;
 
 const QString currentDatabaseVersion = "1007";
 
-static void UpdateDBVersionNumber(const QString &newnumber)
+static bool UpdateDBVersionNumber(const QString &newnumber)
 {
+    // delete old schema version
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.exec("DELETE FROM settings WHERE value='GameDBSchemaVer';");
-    query.exec(QString("INSERT INTO settings (value, data, hostname) "
+    QString thequery = "DELETE FROM settings WHERE value='GameDBSchemaVer';";
+    query.prepare(thequery);
+    query.exec();
+
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (Deleting old DB version number): \n"
+                    "Query was: %1 \nError was: %2 \nnew version: %3")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()))
+            .arg(newnumber);
+        VERBOSE(VB_IMPORTANT, msg);
+        return false;
+    }
+
+    // set new schema version
+    thequery = QString("INSERT INTO settings (value, data, hostname) "
                           "VALUES ('GameDBSchemaVer', %1, NULL);")
-                         .arg(newnumber));
+                         .arg(newnumber);
+    query.prepare(thequery);
+    query.exec();
+
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (Setting new DB version number): \n"
+                    "Query was: %1 \nError was: %2 \nnew version: %3")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()))
+            .arg(newnumber);
+        VERBOSE(VB_IMPORTANT, msg);
+        return false;
+    }
+
+    return true;
 }
 
-static void performActualUpdate(const QString updates[], QString version,
+static bool performActualUpdate(const QString updates[], QString version,
                                 QString &dbver)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -35,16 +68,33 @@ static void performActualUpdate(const QString updates[], QString version,
 
     while (thequery != "")
     {
-        query.exec(thequery);
+        query.prepare(thequery);
+        query.exec();
+
+        if (query.lastError().type() != QSqlError::None)
+        {
+            QString msg =
+                QString("DB Error (Performing database upgrade): \n"
+                        "Query was: %1 \nError was: %2 \nnew version: %3")
+                .arg(thequery)
+                .arg(MythContext::DBErrorMessage(query.lastError()))
+                .arg(version);
+            VERBOSE(VB_IMPORTANT, msg);
+            return false;
+        }
+
         counter++;
         thequery = updates[counter];
     }
 
-    UpdateDBVersionNumber(version);
+    if (!UpdateDBVersionNumber(version))
+        return false;
+
     dbver = version;
+    return true;
 }
 
-static void InitializeDatabase(void)
+bool InitializeDatabase(void)
 {
     VERBOSE(VB_ALL, "Inserting MythGame initial database information.");
 
@@ -165,7 +215,8 @@ static void InitializeDatabase(void)
 ""
 };
     QString dbver = "";
-    performActualUpdate(updates, "1000", dbver);
+    if (!performActualUpdate(updates, "1000", dbver))
+        return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec("SELECT * FROM mamesettings WHERE "
@@ -208,7 +259,7 @@ static void InitializeDatabase(void)
         const QString updates2[] = {
 "INSERT INTO nestitle VALUES (1,'10 Yard Fight',2,2,1985,897,'1PL 2PX FTB SPT');",
 "INSERT INTO nestitle VALUES (10,'The Adventures Of Dino Riki',18,18,1989,415,'1PL ACT');",
-"INSERT INTO nestitle VALUES (100,'Caesar\'s Palace',78,78,1990,452,'1PL GMB');",
+"INSERT INTO nestitle VALUES (100,'Caesar\\'s Palace',78,78,1990,452,'1PL GMB');",
 "INSERT INTO nestitle VALUES (101,'California Games',108,25,1989,453,'1PL 8PA SPT');",
 "INSERT INTO nestitle VALUES (102,'Captain America And The Avengers',22,22,1991,454,'1PL ARC CBK');",
 "INSERT INTO nestitle VALUES (103,'Captain Comic',43,43,1989,792,'1PL ACT ADV UNL');",
@@ -223,8 +274,8 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (111,'Castle of Dragon',66,66,1990,458,'1PL ACT');",
 "INSERT INTO nestitle VALUES (112,'Castlequest',41,81,1989,837,'1PL ACT ADV PUZ');",
 "INSERT INTO nestitle VALUES (113,'Castlevania',4,4,1987,347,'1PL ACT VMP');",
-"INSERT INTO nestitle VALUES (114,'Castlevania II: Simon\'s Quest',4,4,1988,348,'1PL ACT ADV PSS VMP');",
-"INSERT INTO nestitle VALUES (115,'Castlevania III: Dracula\'s Curse',4,4,1990,838,'1PL ACT ADV PSS VMP');",
+"INSERT INTO nestitle VALUES (114,'Castlevania II: Simon\\'s Quest',4,4,1988,348,'1PL ACT ADV PSS VMP');",
+"INSERT INTO nestitle VALUES (115,'Castlevania III: Dracula\\'s Curse',4,4,1990,838,'1PL ACT ADV PSS VMP');",
 "INSERT INTO nestitle VALUES (116,'Caveman Games',55,22,1990,459,'1PL');",
 "INSERT INTO nestitle VALUES (117,'Challenge Of The Dragon',43,43,1990,839,'1PL UNL');",
 "INSERT INTO nestitle VALUES (118,'Championship Bowling',82,82,1990,840,'1PL 4PA SPT');",
@@ -254,17 +305,17 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (14,'The Adventures Of Lolo',19,19,1989,370,'1PL ACT PSS PUZ');",
 "INSERT INTO nestitle VALUES (140,'Cowboy Kid',138,82,1991,849,'1PL');",
 "INSERT INTO nestitle VALUES (141,'The Incredible Crash Dummies',35,35,2000,901,'1PL ACT');",
-"INSERT INTO nestitle VALUES (142,'Crash \'n\' The Boys Street Challenge',44,110,1993,471,'1PL 2PX 4PX MAR SPT TRK');",
+"INSERT INTO nestitle VALUES (142,'Crash \\'n\\' The Boys Street Challenge',44,110,1993,471,'1PL 2PX 4PX MAR SPT TRK');",
 "INSERT INTO nestitle VALUES (143,'Crystal Mines',43,43,1989,472,'1PL UNL');",
 "INSERT INTO nestitle VALUES (144,'Crystalis',1,1,1990,351,'1PL ACT ADV');",
 "INSERT INTO nestitle VALUES (145,'Cyberball',20,23,1991,473,'1PL');",
 "INSERT INTO nestitle VALUES (146,'Cybernoid',8,8,1989,474,'1PL ACT SHO');",
 "INSERT INTO nestitle VALUES (147,'Dance Aerobics',28,2,1988,850,'1PL PPD SPT');",
 "INSERT INTO nestitle VALUES (148,'Darkman',65,65,1991,478,'1PL ACT MOV');",
-"INSERT INTO nestitle VALUES (149,'Disney\'s Darkwing Duck',3,3,1993,479,'1PL ACT TVA');",
+"INSERT INTO nestitle VALUES (149,'Disney\\'s Darkwing Duck',3,3,1993,479,'1PL ACT TVA');",
 "INSERT INTO nestitle VALUES (15,'The Adventures Of Lolo 2',19,19,1990,371,'1PL ACT PSS PUZ');",
 "INSERT INTO nestitle VALUES (150,'Dash Galaxy In The Alien Asylum',96,22,1990,852,'1PL ACT ADV');",
-"INSERT INTO nestitle VALUES (151,'Day Dreamin\' Davey',105,19,1990,480,'1PL');",
+"INSERT INTO nestitle VALUES (151,'Day Dreamin\\' Davey',105,19,1990,480,'1PL');",
 "INSERT INTO nestitle VALUES (152,'Days Of Thunder',24,24,1990,902,'1PL DRV MOV RAC SPT');",
 "INSERT INTO nestitle VALUES (153,'Deadly Towers',12,21,1987,496,'1PL ACT ADV PSS');",
 "INSERT INTO nestitle VALUES (154,'Death Race',83,83,2000,0,'1PL MOV UNL');",
@@ -300,7 +351,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (181,'Dr. Chaos',11,11,1988,863,'1PL PSS');",
 "INSERT INTO nestitle VALUES (182,'Dr. Jekyll & Mr. Hyde',28,28,1989,864,'1PL ACT BOK');",
 "INSERT INTO nestitle VALUES (183,'Dr. Mario',2,2,1990,357,'1PL 2PX PUZ');",
-"INSERT INTO nestitle VALUES (184,'Bram Stoker\'s Dracula',131,84,1993,865,'1PL MOV VMP');",
+"INSERT INTO nestitle VALUES (184,'Bram Stoker\\'s Dracula',131,84,1993,865,'1PL MOV VMP');",
 "INSERT INTO nestitle VALUES (185,'Dragon Fighter',32,32,1991,494,'1PL');",
 "INSERT INTO nestitle VALUES (186,'Dragon Power',28,28,1988,896,'1PL ACT ADV');",
 "INSERT INTO nestitle VALUES (187,'Dragon Spirit',51,28,1990,355,'1PL ACT SHO');",
@@ -309,14 +360,14 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (19,'Air Fortress',19,19,1989,795,'1PL ACT ADV PSS SHO');",
 "INSERT INTO nestitle VALUES (190,'Dragon Warrior III',34,34,1991,867,'1PL ADV RPG');",
 "INSERT INTO nestitle VALUES (191,'Dragon Warrior IV',34,34,1992,868,'1PL ADV RPG');",
-"INSERT INTO nestitle VALUES (192,'Dragon\'s Lair',142,84,1990,869,'1PL ARC');",
+"INSERT INTO nestitle VALUES (192,'Dragon\\'s Lair',142,84,1990,869,'1PL ARC');",
 "INSERT INTO nestitle VALUES (193,'Advanced Dungeons & Dragons: Dragonstrike',143,11,1992,870,'1PL');",
 "INSERT INTO nestitle VALUES (194,'Duck Hunt',2,2,1985,498,'1PL GUN SHO SPT');",
-"INSERT INTO nestitle VALUES (195,'Disney\'s Duck Tales',3,3,1989,358,'1PL ACT TVA');",
-"INSERT INTO nestitle VALUES (196,'Disney\'s Duck Tales 2',3,3,1993,359,'1PL ACT TVA');",
+"INSERT INTO nestitle VALUES (195,'Disney\\'s Duck Tales',3,3,1989,358,'1PL ACT TVA');",
+"INSERT INTO nestitle VALUES (196,'Disney\\'s Duck Tales 2',3,3,1993,359,'1PL ACT TVA');",
 "INSERT INTO nestitle VALUES (197,'Dudes With Attitude',72,72,1990,871,'1PL PUZ UNL');",
 "INSERT INTO nestitle VALUES (198,'Dungeon Magic',50,10,1989,488,'1PL ADV RPG');",
-"INSERT INTO nestitle VALUES (199,'Dusty Diamond\'s All-Star Softball',144,21,1990,477,'1PL 2PX BAS SPT');",
+"INSERT INTO nestitle VALUES (199,'Dusty Diamond\\'s All-Star Softball',144,21,1990,477,'1PL 2PX BAS SPT');",
 "INSERT INTO nestitle VALUES (2,'1942',3,3,1986,339,'1PL 2PA ACT SHO');",
 "INSERT INTO nestitle VALUES (20,'Airwolf',8,8,1989,435,'1PL ACT TVA');",
 "INSERT INTO nestitle VALUES (200,'Dynowarz',28,28,1990,872,'1PL ACT PSS');",
@@ -329,14 +380,14 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (207,'F-117 Stealth Fighter',85,85,1992,876,'1PL');",
 "INSERT INTO nestitle VALUES (208,'F-15 City War',72,72,1990,877,'1PL UNL');",
 "INSERT INTO nestitle VALUES (209,'F-15 Strike Eagle',85,85,1991,878,'1PL');",
-"INSERT INTO nestitle VALUES (21,'Al Unser Jr\'s Turbo Racing',22,22,1990,796,'1PL BTT RAC SPT');",
+"INSERT INTO nestitle VALUES (21,'Al Unser Jr\\'s Turbo Racing',22,22,1990,796,'1PL BTT RAC SPT');",
 "INSERT INTO nestitle VALUES (210,'Family Feud',96,37,1990,879,'1PL GSH');",
 "INSERT INTO nestitle VALUES (211,'Fantasy Zone',20,20,1989,881,'1PL ARC UNL');",
 "INSERT INTO nestitle VALUES (212,'Faria',145,81,1990,882,'1PL ACT ADV');",
 "INSERT INTO nestitle VALUES (213,'Faxanadu',18,2,1989,512,'1PL ACT ADV RPG');",
 "INSERT INTO nestitle VALUES (214,'Felix The Cat',18,18,1992,513,'1PL TVA');",
 "INSERT INTO nestitle VALUES (215,'Ferrari Grand Prix',109,8,1992,883,'1PL RAC');",
-"INSERT INTO nestitle VALUES (216,'Fester\'s Quest',5,5,1989,362,'1PL ACT ADV TVA');",
+"INSERT INTO nestitle VALUES (216,'Fester\\'s Quest',5,5,1989,362,'1PL ACT ADV TVA');",
 "INSERT INTO nestitle VALUES (217,'Final Fantasy',39,2,1990,884,'1PL ADV RPG');",
 "INSERT INTO nestitle VALUES (218,'Fire Hawk',97,62,1992,885,'1PL UNL');",
 "INSERT INTO nestitle VALUES (219,'Fisher Price: Firehouse Rescue',112,37,1990,761,'1PL KID');",
@@ -357,7 +408,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (232,'Galactic Crusader',141,80,1990,759,'1PL ACT SHO SPC UNL');",
 "INSERT INTO nestitle VALUES (233,'Galaga',28,28,1988,518,'1PL 2PA ACT SHO');",
 "INSERT INTO nestitle VALUES (234,'Galaxy 5000',38,38,1990,904,'1PL 2PX RAC SPC SPT');",
-"INSERT INTO nestitle VALUES (235,'Gargoyle\'s Quest II: The Demon Darkness',3,3,1992,519,'1PL ADV');",
+"INSERT INTO nestitle VALUES (235,'Gargoyle\\'s Quest II: The Demon Darkness',3,3,1992,519,'1PL ADV');",
 "INSERT INTO nestitle VALUES (236,'Gauntlet',20,20,2000,520,'1PL 2PC ACT ADV UNL');",
 "INSERT INTO nestitle VALUES (237,'Gauntlet 2',20,24,2000,0,'1PL 2PC 4PC ACT ADV');",
 "INSERT INTO nestitle VALUES (238,'Gemfire',70,70,2000,0,'1PL');",
@@ -371,13 +422,13 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (245,'Ghoul School',112,67,1991,950,'1PL ACT');",
 "INSERT INTO nestitle VALUES (246,'G.I. Joe',9,9,2000,526,'1PL');",
 "INSERT INTO nestitle VALUES (247,'G.I. Joe: The Atlantis Factor',3,3,2000,527,'1PL');",
-"INSERT INTO nestitle VALUES (248,'Gilligan\'s Island',28,28,2000,528,'1PL TVA');",
+"INSERT INTO nestitle VALUES (248,'Gilligan\\'s Island',28,28,2000,528,'1PL TVA');",
 "INSERT INTO nestitle VALUES (249,'Goal!',23,23,1989,0,'1PL 2PX PSS SOC SPT');",
 "INSERT INTO nestitle VALUES (25,'All Pro Basketball',30,30,1989,437,'1PL 2PX BSK SPT');",
 "INSERT INTO nestitle VALUES (250,'Goal! 2',23,23,2000,0,'1PL SOC SPT');",
 "INSERT INTO nestitle VALUES (251,'Godzilla',36,36,1989,529,'1PL ACT');",
 "INSERT INTO nestitle VALUES (252,'Godzilla 2',36,36,2000,530,'1PL');",
-"INSERT INTO nestitle VALUES (253,'Capcom\'s Gold Medal Challenge 92',3,3,2000,531,'1PL SPT');",
+"INSERT INTO nestitle VALUES (253,'Capcom\\'s Gold Medal Challenge 92',3,3,2000,531,'1PL SPT');",
 "INSERT INTO nestitle VALUES (254,'Golf',2,2,1985,532,'1PL 2PX GLF SPT');",
 "INSERT INTO nestitle VALUES (255,'Golf Grand Slam',86,86,1991,905,'1PL GLF SPT');",
 "INSERT INTO nestitle VALUES (256,'Bandai Golf: Challenge Pebble Beach',28,28,1988,807,'1PL 2PA GLF SPT');",
@@ -400,11 +451,11 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (271,'The Harlem Globetrotters',111,37,1990,539,'1PL BSK SPT');",
 "INSERT INTO nestitle VALUES (272,'Hatris',87,87,2000,540,'1PL PUZ');",
 "INSERT INTO nestitle VALUES (273,'Heavy Barrel',22,22,1990,541,'1PL 2PC ACT SHO');",
-"INSERT INTO nestitle VALUES (274,'Heavy Shreddin\'',112,88,1990,542,'1PL SNO SPT');",
+"INSERT INTO nestitle VALUES (274,'Heavy Shreddin\\'',112,88,1990,542,'1PL SNO SPT');",
 "INSERT INTO nestitle VALUES (275,'Advanced Dungeons & Dragons: Heroes Of The Lance',150,11,1990,544,'1PL ACT ADV');",
 "INSERT INTO nestitle VALUES (276,'High Speed',6,6,2000,0,'1PL');",
 "INSERT INTO nestitle VALUES (277,'Advanced Dungeons & Dragons: Hillsfar',151,11,1992,0,'1PL ADV');",
-"INSERT INTO nestitle VALUES (278,'Hogan\'s Alley',2,2,1985,545,'1PL ACT GUN SHO');",
+"INSERT INTO nestitle VALUES (278,'Hogan\\'s Alley',2,2,1985,545,'1PL ACT GUN SHO');",
 "INSERT INTO nestitle VALUES (279,'Hollywood Squares',37,37,1989,0,'1PL 2PX GSH');",
 "INSERT INTO nestitle VALUES (28,'American Gladiators',132,37,1991,409,'1PL SPT TVA');",
 "INSERT INTO nestitle VALUES (280,'Home Alone',113,68,1991,546,'1PL ACT MOV');",
@@ -426,13 +477,13 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (295,'Impossible Mission 2',72,72,2000,0,'1PL UNL');",
 "INSERT INTO nestitle VALUES (296,'Indiana Jones & The Temple Of Doom',20,24,1988,561,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (297,'Indiana Jones & The Last Crusade',10,10,1990,560,'1PL ACT MOV');",
-"INSERT INTO nestitle VALUES (298,'Danny Sullivan\'s Indy Heat',7,6,1992,851,'1PL RAC SPT');",
+"INSERT INTO nestitle VALUES (298,'Danny Sullivan\\'s Indy Heat',7,6,1992,851,'1PL RAC SPT');",
 "INSERT INTO nestitle VALUES (299,'Infiltrator',114,24,1989,557,'1PL ACT');",
 "INSERT INTO nestitle VALUES (3,'1943: The Battle Of Midway',3,3,1988,340,'1PL ACT PSS SHO');",
 "INSERT INTO nestitle VALUES (30,'Arch Rivals',7,8,1989,800,'1PL ARC BSK SPT');",
 "INSERT INTO nestitle VALUES (300,'Iron Tank',1,1,2000,558,'1PL ACT PSS');",
 "INSERT INTO nestitle VALUES (301,'Isolated Warrior',115,89,1990,559,'1PL ACT PSS');",
-"INSERT INTO nestitle VALUES (302,'Jack Niklaus\'s Greatest 18 Holes Of Major Championship Golf',4,4,1990,562,'1PL 4PA GLF SPT');",
+"INSERT INTO nestitle VALUES (302,'Jack Niklaus\\'s Greatest 18 Holes Of Major Championship Golf',4,4,1990,562,'1PL 4PA GLF SPT');",
 "INSERT INTO nestitle VALUES (303,'Jackal',4,4,1989,563,'1PL 2PC ACT SHO');",
 "INSERT INTO nestitle VALUES (304,'Jackie Chan Kung Fu Heroes',18,18,2000,0,'1PL ACT MAR');",
 "INSERT INTO nestitle VALUES (305,'James Bond Jr.',68,68,1992,907,'1PL ACT');",
@@ -441,15 +492,15 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (308,'Jeopardy! Junior Edition',7,37,1989,567,'1PL 3PX GSH');",
 "INSERT INTO nestitle VALUES (309,'Jeopardy! 25th Anniversary',7,37,1990,566,'1PL 3PX GSH');",
 "INSERT INTO nestitle VALUES (31,'Archon',55,38,1990,801,'1PL 2PX STR');",
-"INSERT INTO nestitle VALUES (310,'The Jetsons: Cogswell\'s Caper',10,10,1992,568,'1PL TVA');",
+"INSERT INTO nestitle VALUES (310,'The Jetsons: Cogswell\\'s Caper',10,10,1992,568,'1PL TVA');",
 "INSERT INTO nestitle VALUES (311,'Jimmy Connors Tennis',148,90,1993,908,'1PL SPT TNS');",
 "INSERT INTO nestitle VALUES (312,'Joe And Mac',22,22,1991,909,'1PL 2PC ACT');",
-"INSERT INTO nestitle VALUES (313,'John Elway\'s Quarterback',6,6,1989,569,'1PL 2PX FTB SPT');",
+"INSERT INTO nestitle VALUES (313,'John Elway\\'s Quarterback',6,6,1989,569,'1PL 2PX FTB SPT');",
 "INSERT INTO nestitle VALUES (314,'Jordan vs. Bird: One on One',7,25,1989,570,'1PL 2PX BSK SPT');",
 "INSERT INTO nestitle VALUES (315,'Joshua',61,61,2000,0,'1PL BBL UNL');",
 "INSERT INTO nestitle VALUES (316,'Journey To Silius',5,5,1990,368,'1PL ACT');",
 "INSERT INTO nestitle VALUES (317,'Joust',19,19,1988,930,'1PL 2PX ACT');",
-"INSERT INTO nestitle VALUES (318,'Disney\'s The Jungle Book',78,78,1994,572,'1PL ACT MOV');",
+"INSERT INTO nestitle VALUES (318,'Disney\\'s The Jungle Book',78,78,1994,572,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (319,'Jurassic Park',65,65,1993,910,'1PL MOV');",
 "INSERT INTO nestitle VALUES (32,'Arkanoid',10,10,1987,802,'1PL 2PA ARC PUZ');",
 "INSERT INTO nestitle VALUES (320,'Kabuki Quantum Fighter',19,19,1990,573,'1PL ACT');",
@@ -462,13 +513,13 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (327,'Kid Klown',77,77,2000,0,'1PL');",
 "INSERT INTO nestitle VALUES (328,'Kid Kool',30,30,1990,576,'1PL ACT');",
 "INSERT INTO nestitle VALUES (329,'Kid Niki',12,22,1987,577,'1PL 2PA ACT');",
-"INSERT INTO nestitle VALUES (33,'Arkista\'s Ring',26,26,1989,803,'1PL ADV');",
-"INSERT INTO nestitle VALUES (330,'King Neptune\'s Adventure',43,43,2000,0,'1PL UNL');",
+"INSERT INTO nestitle VALUES (33,'Arkista\\'s Ring',26,26,1989,803,'1PL ADV');",
+"INSERT INTO nestitle VALUES (330,'King Neptune\\'s Adventure',43,43,2000,0,'1PL UNL');",
 "INSERT INTO nestitle VALUES (331,'The King Of Kings',61,61,1991,912,'1PL BBL UNL');",
-"INSERT INTO nestitle VALUES (332,'King\'s Knight',39,39,1989,360,'1PL ACT SHO');",
+"INSERT INTO nestitle VALUES (332,'King\\'s Knight',39,39,1989,360,'1PL ACT SHO');",
 "INSERT INTO nestitle VALUES (333,'Kings Of The Beach',58,58,1989,0,'1PL 4PX SPT');",
-"INSERT INTO nestitle VALUES (334,'King\'s Quest 5',4,4,1991,914,'1PL ADV');",
-"INSERT INTO nestitle VALUES (335,'Kirby\'s Adventure',19,2,1993,578,'1PL ACT ADV BTT');",
+"INSERT INTO nestitle VALUES (334,'King\\'s Quest 5',4,4,1991,914,'1PL ADV');",
+"INSERT INTO nestitle VALUES (335,'Kirby\\'s Adventure',19,2,1993,578,'1PL ACT ADV BTT');",
 "INSERT INTO nestitle VALUES (336,'Kiwi Kraze',10,10,1991,579,'1PL ACT');",
 "INSERT INTO nestitle VALUES (337,'Klash Ball',116,32,1991,580,'1PL SPT');",
 "INSERT INTO nestitle VALUES (338,'Klax',20,20,2000,0,'1PL PUZ UNL');",
@@ -476,16 +527,16 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (34,'Astyanax',23,23,1990,343,'1PL ACT');",
 "INSERT INTO nestitle VALUES (340,'Krazy Kreatures',72,72,2000,0,'1PL UNL');",
 "INSERT INTO nestitle VALUES (341,'The Krion Conquest',30,30,1990,582,'1PL ACT');",
-"INSERT INTO nestitle VALUES (342,'Krusty\'s Fun House',8,8,2000,0,'1PL ACT TVA');",
+"INSERT INTO nestitle VALUES (342,'Krusty\\'s Fun House',8,8,2000,0,'1PL ACT TVA');",
 "INSERT INTO nestitle VALUES (343,'Kung Fu',12,2,1985,583,'1PL 2PA ACT MAR');",
 "INSERT INTO nestitle VALUES (344,'Kung Fu Heroes',27,27,1989,0,'1PL 2PC ACT MAR');",
-"INSERT INTO nestitle VALUES (345,'L\'Empereur',70,70,2000,0,'1PL');",
+"INSERT INTO nestitle VALUES (345,'L\\'Empereur',70,70,2000,0,'1PL');",
 "INSERT INTO nestitle VALUES (346,'Laser Invasion',4,4,1991,0,'1PL ACT SHO');",
 "INSERT INTO nestitle VALUES (347,'Last Action Hero',84,84,1993,764,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (348,'Last Ninja',23,23,2000,0,'1PL ACT ADV NNJ');",
 "INSERT INTO nestitle VALUES (349,'The Last Starfighter',24,24,2000,0,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (35,'Athena',1,1,1987,412,'1PL ACT');",
-"INSERT INTO nestitle VALUES (350,'Lee Trevino\'s Fighting Golf',1,1,1988,584,'1PL 4PA GLF SPT');",
+"INSERT INTO nestitle VALUES (350,'Lee Trevino\\'s Fighting Golf',1,1,1988,584,'1PL 4PA GLF SPT');",
 "INSERT INTO nestitle VALUES (351,'Legacy Of The Wizard',47,21,1989,585,'1PL ACT ADV PSS');",
 "INSERT INTO nestitle VALUES (352,'The Legend Of Kage',10,10,1987,763,'1PL 2PA ACT NNJ');",
 "INSERT INTO nestitle VALUES (353,'The Legend Of Zelda',2,2,2000,407,'1PL ACT ADV BTT');",
@@ -497,21 +548,21 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (359,'Linus Spacehead',97,62,2000,0,'1PL UNL');",
 "INSERT INTO nestitle VALUES (36,'Athletic World',28,28,1989,804,'1PL 2PA PPD SPT');",
 "INSERT INTO nestitle VALUES (360,'Little League Baseball',1,1,1990,590,'1PL BAS SPT');",
-"INSERT INTO nestitle VALUES (361,'Disney\'s The Little Mermaid',3,3,1991,915,'1PL ACT MOV');",
+"INSERT INTO nestitle VALUES (361,'Disney\\'s The Little Mermaid',3,3,1991,915,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (362,'Little Nemo The Dream Master',3,3,1990,591,'1PL ACT');",
 "INSERT INTO nestitle VALUES (363,'Little Ninja Brothers',27,27,1990,589,'1PL ACT ADV MAR NNJ RPG');",
 "INSERT INTO nestitle VALUES (364,'Little Samson',10,10,1992,765,'1PL ACT PSS');",
 "INSERT INTO nestitle VALUES (365,'Championship Lode Runner',21,21,1987,0,'1PL 2PA ACT');",
 "INSERT INTO nestitle VALUES (366,'The Lone Ranger',4,4,1991,592,'1PL ACT ADV GUN WST');",
 "INSERT INTO nestitle VALUES (367,'Loopz',117,24,1990,593,'1PL');",
-"INSERT INTO nestitle VALUES (368,'Low \'G\' Man',9,9,1990,594,'1PL ACT');",
+"INSERT INTO nestitle VALUES (368,'Low \\'G\\' Man',9,9,1990,594,'1PL ACT');",
 "INSERT INTO nestitle VALUES (369,'Lunar Pool',11,11,1987,766,'1PL 2PA POO SPT');",
 "INSERT INTO nestitle VALUES (37,'Attack of the Killer Tomatoes',68,68,1991,416,'1PL MOV');",
 "INSERT INTO nestitle VALUES (370,'Mach Rider',2,2,1985,597,'1PL ACT RAC');",
 "INSERT INTO nestitle VALUES (371,'Mad Max',24,24,1990,931,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (372,'The Mafat Conspiracy',30,30,1990,598,'1PL ACT DRV MAR SHO');",
 "INSERT INTO nestitle VALUES (373,'Magic Darts',82,82,1991,600,'1PL DRT SPT');",
-"INSERT INTO nestitle VALUES (374,'Magic Johnson\'s Fast Break',6,6,1990,601,'1PL 4PX BSK SPT');",
+"INSERT INTO nestitle VALUES (374,'Magic Johnson\\'s Fast Break',6,6,1990,601,'1PL 4PX BSK SPT');",
 "INSERT INTO nestitle VALUES (375,'The Magic of Scheherazade',27,27,1990,916,'1PL ACT ADV PSS RPG');",
 "INSERT INTO nestitle VALUES (376,'Magician',9,9,1990,602,'1PL ADV');",
 "INSERT INTO nestitle VALUES (377,'Magmax',11,11,1988,599,'1PL 2PA ACT');",
@@ -522,7 +573,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (381,'Marble Madness',25,25,1989,918,'1PL 2PX ACT');",
 "INSERT INTO nestitle VALUES (382,'Mario Bros.',2,2,1986,605,'1PL 2PC ACT');",
 "INSERT INTO nestitle VALUES (383,'Mario Is Missing',118,119,1993,606,'1PL ACT ADV');",
-"INSERT INTO nestitle VALUES (384,'Mario\'s Time Machine',118,24,1994,919,'1PL TIM');",
+"INSERT INTO nestitle VALUES (384,'Mario\\'s Time Machine',118,24,1994,919,'1PL TIM');",
 "INSERT INTO nestitle VALUES (385,'Master Chu And The Drunkard Hu',120,43,1989,607,'1PL ACT');",
 "INSERT INTO nestitle VALUES (386,'M.C. Kids',78,24,1991,595,'1PL ACT');",
 "INSERT INTO nestitle VALUES (387,'Mechanized Attack',1,1,1990,608,'1PL ACT GUN');",
@@ -543,19 +594,19 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (40,'Back To The Future 2 & 3',96,35,1989,756,'1PL ACT MOV TIM');",
 "INSERT INTO nestitle VALUES (400,'Metal Storm',12,12,1990,613,'1PL ACT');",
 "INSERT INTO nestitle VALUES (401,'Metroid',2,2,1986,378,'1PL ACT ADV PSS');",
-"INSERT INTO nestitle VALUES (402,'Michael Andretti\'s World Grand Prix',26,26,1990,757,'1PL RAC SPT');",
+"INSERT INTO nestitle VALUES (402,'Michael Andretti\\'s World Grand Prix',26,26,1990,757,'1PL RAC SPT');",
 "INSERT INTO nestitle VALUES (403,'Mickey Mousecapade',3,3,1988,0,'1PL ACT');",
-"INSERT INTO nestitle VALUES (404,'Mickey\'s Adventure In Numberland',17,17,2000,0,'1PL KID EDU');",
-"INSERT INTO nestitle VALUES (405,'Mickey\'s Safari In Letterland',17,17,2000,0,'1PL');",
+"INSERT INTO nestitle VALUES (404,'Mickey\\'s Adventure In Numberland',17,17,2000,0,'1PL KID EDU');",
+"INSERT INTO nestitle VALUES (405,'Mickey\\'s Safari In Letterland',17,17,2000,0,'1PL');",
 "INSERT INTO nestitle VALUES (406,'Micro Machines',97,62,1991,614,'1PL RAC UNL');",
 "INSERT INTO nestitle VALUES (407,'MIG-29',62,62,2000,0,'1PL UNL');",
 "INSERT INTO nestitle VALUES (408,'Might And Magic',121,26,1991,615,'1PL ADV RPG');",
 "INSERT INTO nestitle VALUES (409,'Mighty Bomb Jack',13,13,2000,616,'1PL ACT');",
 "INSERT INTO nestitle VALUES (41,'Bad Dudes',22,22,2000,432,'1PL 2PA ACT ARC MAR NNJ');",
 "INSERT INTO nestitle VALUES (410,'Mighty Final Fight',3,3,1993,934,'1PL ACT MAR');",
-"INSERT INTO nestitle VALUES (411,'Mike Tyson\'s Punch Out!!',2,2,1987,0,'1PL BOX PSS SPT');",
+"INSERT INTO nestitle VALUES (411,'Mike Tyson\\'s Punch Out!!',2,2,1987,0,'1PL BOX PSS SPT');",
 "INSERT INTO nestitle VALUES (412,'Millipede',19,19,1988,617,'1PL 2PA ACT');",
-"INSERT INTO nestitle VALUES (413,'Milon\'s Secret Castle',18,18,1988,379,'1PL ACT ADV');",
+"INSERT INTO nestitle VALUES (413,'Milon\\'s Secret Castle',18,18,1988,379,'1PL ACT ADV');",
 "INSERT INTO nestitle VALUES (414,'Mission Cobra',80,80,1990,935,'1PL UNL');",
 "INSERT INTO nestitle VALUES (415,'Mission: Impossible',4,58,1990,618,'1PL ACT ADV');",
 "INSERT INTO nestitle VALUES (416,'Monopoly',105,88,1991,619,'1PL 2PX BGA');",
@@ -567,12 +618,12 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (421,'Motor City Patrol',122,92,1991,621,'1PL ACT ADV DRV');",
 "INSERT INTO nestitle VALUES (422,'Ms. Pac-Man',51,20,1990,622,'1PL ACT UNL');",
 "INSERT INTO nestitle VALUES (423,'M.U.L.E.',24,24,1990,623,'1PL 4PX');",
-"INSERT INTO nestitle VALUES (424,'Jim Henson\'s Muppet Adventure: Chaos at the Carnival',123,17,1990,625,'1PL ACT BOA KID DRV FLY SPC');",
+"INSERT INTO nestitle VALUES (424,'Jim Henson\\'s Muppet Adventure: Chaos at the Carnival',123,17,1990,625,'1PL ACT BOA KID DRV FLY SPC');",
 "INSERT INTO nestitle VALUES (425,'M.U.S.C.L.E.',28,28,1986,596,'1PL 2PX SPT WRE');",
 "INSERT INTO nestitle VALUES (426,'Mutant Virus',93,93,2000,0,'1PL');",
 "INSERT INTO nestitle VALUES (427,'Mystery Quest',9,9,1989,624,'1PL ACT');",
 "INSERT INTO nestitle VALUES (428,'NARC',7,8,1989,0,'1PL ACT');",
-"INSERT INTO nestitle VALUES (429,'Bill Elliott\'s NASCAR Challenge',107,4,1991,449,'1PL RAC SPT');",
+"INSERT INTO nestitle VALUES (429,'Bill Elliott\\'s NASCAR Challenge',107,4,1991,449,'1PL RAC SPT');",
 "INSERT INTO nestitle VALUES (43,'Bad Street Brawler',96,69,1989,417,'1PL 2PA ACT MAR');",
 "INSERT INTO nestitle VALUES (430,'NES Open Tournament Golf',2,2,1991,0,'1PL GLF SPT');",
 "INSERT INTO nestitle VALUES (431,'NFL Football',35,35,1989,627,'1PL 2PX FTB SPT');",
@@ -585,14 +636,14 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (438,'Ninja Gaiden III: The Ancient Ship Of Doom',13,13,1991,382,'1PL ACT MAR NNJ');",
 "INSERT INTO nestitle VALUES (439,'Ninja Kid',28,28,1986,0,'1PL ACT NNJ');",
 "INSERT INTO nestitle VALUES (44,'Balloon Fight',2,2,1986,419,'1PL 2PX ACT');",
-"INSERT INTO nestitle VALUES (440,'Nobunaga\'s Ambition',70,70,1989,0,'1PL 8PX BTT SIM STR');",
-"INSERT INTO nestitle VALUES (441,'Nobunaga\'s Ambition 2',70,70,2000,0,'1PL SIM STR');",
+"INSERT INTO nestitle VALUES (440,'Nobunaga\\'s Ambition',70,70,1989,0,'1PL 8PX BTT SIM STR');",
+"INSERT INTO nestitle VALUES (441,'Nobunaga\\'s Ambition 2',70,70,2000,0,'1PL SIM STR');",
 "INSERT INTO nestitle VALUES (442,'North And South',77,77,2000,0,'1PL SIM STR');",
 "INSERT INTO nestitle VALUES (443,'Operation Wolf',10,10,1989,629,'1PL ACT GUN SHO');",
 "INSERT INTO nestitle VALUES (444,'Orb 3D',119,17,1990,630,'1PL PUZ');",
 "INSERT INTO nestitle VALUES (445,'Othello',8,8,1988,631,'1PL 2PX BGA');",
 "INSERT INTO nestitle VALUES (446,'Overlord',78,78,1992,921,'1PL');",
-"INSERT INTO nestitle VALUES (447,'P\'radikus Conflict',43,43,2000,768,'1PL ACT SPC UNL');",
+"INSERT INTO nestitle VALUES (447,'P\\'radikus Conflict',43,43,2000,768,'1PL ACT SPC UNL');",
 "INSERT INTO nestitle VALUES (448,'Pac-Man',51,20,2000,922,'1PL ACT UNL');",
 "INSERT INTO nestitle VALUES (449,'Pac-Mania',20,20,2000,0,'1PL ACT UNL');",
 "INSERT INTO nestitle VALUES (45,'Bandit Kings Of Ancient China',70,70,1991,808,'1PL SIM STR');",
@@ -617,7 +668,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (467,'Popeye',2,2,1986,639,'1PL 2PA ACT TVA');",
 "INSERT INTO nestitle VALUES (468,'P.O.W.',1,1,1989,640,'1PL ACT');",
 "INSERT INTO nestitle VALUES (469,'Power Punch 2',93,93,2000,0,'1PL');",
-"INSERT INTO nestitle VALUES (47,'Bard\'s Tale',55,11,1991,421,'1PL ADV RPG');",
+"INSERT INTO nestitle VALUES (47,'Bard\\'s Tale',55,11,1991,421,'1PL ADV RPG');",
 "INSERT INTO nestitle VALUES (470,'Power Blade',10,10,1991,926,'1PL ACT PSS');",
 "INSERT INTO nestitle VALUES (471,'Power Blade 2',10,10,1992,927,'1PL ACT PSS');",
 "INSERT INTO nestitle VALUES (472,'Predator',38,38,1989,641,'1PL ACT MOV');",
@@ -625,11 +676,11 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (474,'Princess Tomato In The Salad Kingdom',18,18,1990,399,'1PL ADV RPG');",
 "INSERT INTO nestitle VALUES (475,'Pro Sport Hockey',23,23,2000,0,'1PL HOC SPT');",
 "INSERT INTO nestitle VALUES (476,'Pro Wrestling',2,2,1987,642,'1PL 2PX SPT WRE');",
-"INSERT INTO nestitle VALUES (477,'Pugsley\'s Scavenger Hunt',65,65,2000,0,'1PL');",
+"INSERT INTO nestitle VALUES (477,'Pugsley\\'s Scavenger Hunt',65,65,2000,0,'1PL');",
 "INSERT INTO nestitle VALUES (478,'Punch Out!!',2,2,2000,0,'1PL BOX SPT');",
 "INSERT INTO nestitle VALUES (479,'Punisher',96,35,1990,0,'1PL ACT SHO');",
 "INSERT INTO nestitle VALUES (48,'Baseball',2,2,1985,423,'1PL 2PX BAS SPT');",
-"INSERT INTO nestitle VALUES (480,'Puss \'N\' Boots',67,67,1990,0,'1PL 2PA ACT');",
+"INSERT INTO nestitle VALUES (480,'Puss \\'N\\' Boots',67,67,1990,0,'1PL 2PA ACT');",
 "INSERT INTO nestitle VALUES (481,'Puzzle',72,72,2000,643,'1PL PUZ UNL');",
 "INSERT INTO nestitle VALUES (482,'Puzznic',10,10,1990,769,'1PL PUZ');",
 "INSERT INTO nestitle VALUES (483,'Pyramid',141,72,1990,949,'1PL PUZ UNL');",
@@ -664,8 +715,8 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (509,'Renegade',10,10,1988,659,'1PL 2PA ACT MAR');",
 "INSERT INTO nestitle VALUES (51,'Baseball Stars II',1,82,1992,425,'1PL BAS SPT');",
 "INSERT INTO nestitle VALUES (510,'Rescue: The Embassy Mission',77,77,1990,661,'1PL ACT ADV');",
-"INSERT INTO nestitle VALUES (511,'Disney\'s Chip \'n Dale Rescue Rangers',3,3,1990,462,'1PL 2PC ACT TVA');",
-"INSERT INTO nestitle VALUES (512,'Disney\'s Chip \'n Dale Rescue Rangers 2',3,3,1993,928,'1PL ACT TVA');",
+"INSERT INTO nestitle VALUES (511,'Disney\\'s Chip \\'n Dale Rescue Rangers',3,3,1990,462,'1PL 2PC ACT TVA');",
+"INSERT INTO nestitle VALUES (512,'Disney\\'s Chip \\'n Dale Rescue Rangers 2',3,3,1993,928,'1PL ACT TVA');",
 "INSERT INTO nestitle VALUES (513,'Ring King',22,22,1987,662,'1PL BOX PSS SPT');",
 "INSERT INTO nestitle VALUES (514,'River City Ransom',44,44,1989,385,'1PL 2PX 2PC ACT ADV MAR PSS');",
 "INSERT INTO nestitle VALUES (515,'Road Blasters',96,24,1990,663,'1PL ACT DRV SHO');",
@@ -680,7 +731,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (523,'Rock N Ball',115,89,1990,667,'1PL 6PA ACT');",
 "INSERT INTO nestitle VALUES (524,'Rocket Ranger',77,77,2000,0,'1PL');",
 "INSERT INTO nestitle VALUES (525,'Rocketeer',28,28,1991,657,'1PL ACT MOV SHO');",
-"INSERT INTO nestitle VALUES (526,'Rockin\' Kats',86,86,1991,668,'1PL ACT');",
+"INSERT INTO nestitle VALUES (526,'Rockin\\' Kats',86,86,1991,668,'1PL ACT');",
 "INSERT INTO nestitle VALUES (527,'The Adventures Of Rocky & Bullwinkle',118,68,1991,793,'1PL ACT TVA');",
 "INSERT INTO nestitle VALUES (528,'Roger Clemens MVP Baseball',105,35,1991,655,'1PL BAS SPT');",
 "INSERT INTO nestitle VALUES (529,'Who Framed Roger Rabbit?',35,35,1989,0,'1PL ADV MOV PSS');",
@@ -731,13 +782,13 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (57,'Batman',5,5,1990,344,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (570,'Slalom',7,2,1987,687,'1PL SKI SPT');",
 "INSERT INTO nestitle VALUES (571,'Smash TV',96,8,1991,937,'1PL 2PC ACT SHO');",
-"INSERT INTO nestitle VALUES (572,'Snake Rattle \'n\' Roll',7,2,2000,0,'1PL ACT');",
-"INSERT INTO nestitle VALUES (573,'Metal Gear 2: Snake\'s Revenge',4,58,1990,938,'1PL ACT ADV MIL PSS');",
-"INSERT INTO nestitle VALUES (574,'Snoopy\'s Silly Sports',77,77,1990,689,'1PL 2PX SPT');",
+"INSERT INTO nestitle VALUES (572,'Snake Rattle \\'n\\' Roll',7,2,2000,0,'1PL ACT');",
+"INSERT INTO nestitle VALUES (573,'Metal Gear 2: Snake\\'s Revenge',4,58,1990,938,'1PL ACT ADV MIL PSS');",
+"INSERT INTO nestitle VALUES (574,'Snoopy\\'s Silly Sports',77,77,1990,689,'1PL 2PX SPT');",
 "INSERT INTO nestitle VALUES (575,'Snow Bros.',3,3,1991,690,'1PL 2PC ACT');",
 "INSERT INTO nestitle VALUES (576,'Soccer',2,2,1987,691,'1PL 2PX SOC SPT');",
 "INSERT INTO nestitle VALUES (578,'Solitaire',72,72,2000,0,'1PL UNL');",
-"INSERT INTO nestitle VALUES (579,'Solomon\'s Key',13,13,2000,0,'1PL PUZ');",
+"INSERT INTO nestitle VALUES (579,'Solomon\\'s Key',13,13,2000,0,'1PL PUZ');",
 "INSERT INTO nestitle VALUES (58,'Batman Returns',4,4,1993,815,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (580,'Solstice',125,84,1989,693,'1PL ADV PUZ');",
 "INSERT INTO nestitle VALUES (581,'Space Shuttle Project',29,29,2000,0,'1PL');",
@@ -757,7 +808,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (594,'Star Trek: 25th Anniversary',58,58,1991,943,'1PL ADV TVA');",
 "INSERT INTO nestitle VALUES (595,'Star Trek: The Next Generation',29,29,1993,702,'1PL ADV TVA');",
 "INSERT INTO nestitle VALUES (596,'Startropics',2,2,1990,391,'1PL ACT ADV BTT');",
-"INSERT INTO nestitle VALUES (597,'Startropics II: Zoda\'s Revenge',2,2,1994,390,'1PL ACT ADV');",
+"INSERT INTO nestitle VALUES (597,'Startropics II: Zoda\\'s Revenge',2,2,1994,390,'1PL ACT ADV');",
 "INSERT INTO nestitle VALUES (598,'Star Voyager',8,8,1987,0,'1PL ACT SHO');",
 "INSERT INTO nestitle VALUES (599,'Star Wars',106,75,1991,0,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (6,'Abadox',50,25,1990,341,'1PL ACT SHO');",
@@ -779,9 +830,9 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (613,'Super Mario Bros.',2,2,1985,389,'1PL 2PA ACT');",
 "INSERT INTO nestitle VALUES (614,'Super Mario Bros. 2',2,2,1988,374,'1PL ACT');",
 "INSERT INTO nestitle VALUES (615,'Super Mario Bros. 3',2,2,1990,688,'1PL ACT ADV');",
-"INSERT INTO nestitle VALUES (616,'Ivan \"Ironman\" Stewart\'s Super Off Road',7,6,1990,674,'1PL 2PX 4PX RAC SPT');",
+"INSERT INTO nestitle VALUES (616,'Ivan \"Ironman\" Stewart\\'s Super Off Road',7,6,1990,674,'1PL 2PX 4PX RAC SPT');",
 "INSERT INTO nestitle VALUES (617,'Super Pitfall',38,38,1988,696,'1PL 2PA ACT');",
-"INSERT INTO nestitle VALUES (618,'Super Spike V\'Ball',101,2,1990,705,'1PL 2PX 4PX SPT VLB');",
+"INSERT INTO nestitle VALUES (618,'Super Spike V\\'Ball',101,2,1990,705,'1PL 2PX 4PX SPT VLB');",
 "INSERT INTO nestitle VALUES (619,'Super Sprint',20,20,1988,697,'1PL ACT DRV RAC UNL');",
 "INSERT INTO nestitle VALUES (62,'Battletank',29,29,1990,0,'1PL MIL');",
 "INSERT INTO nestitle VALUES (620,'Super Spy Hunter',5,5,1991,706,'1PL ACT');",
@@ -791,7 +842,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (624,'Swords & Serpents',57,8,1990,707,'1PL 2PC 4PC ADV RPG');",
 "INSERT INTO nestitle VALUES (625,'Taboo, The 6th Sense',7,6,1989,951,'1PL');",
 "INSERT INTO nestitle VALUES (626,'Tag Team Pro Wrestling',22,22,1986,0,'1PL 2PX SPT WRE');",
-"INSERT INTO nestitle VALUES (627,'Tagin\' Dragon',80,80,1990,710,'1PL 2PX 2PC ACT UNL');",
+"INSERT INTO nestitle VALUES (627,'Tagin\\' Dragon',80,80,1990,710,'1PL 2PX 2PC ACT UNL');",
 "INSERT INTO nestitle VALUES (628,'Tale Spin',3,3,2000,712,'1PL ACT');",
 "INSERT INTO nestitle VALUES (629,'Target: Renegade',10,10,1990,0,'1PL ACT MAR');",
 "INSERT INTO nestitle VALUES (63,'Battleship',24,24,1993,816,'1PL SIM STR');",
@@ -827,20 +878,20 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (658,'Tom And Jerry',125,17,1991,0,'1PL ACT TVA');",
 "INSERT INTO nestitle VALUES (659,'Tombs And Treasure',47,48,1989,393,'1PL ADV PUZ RPG');",
 "INSERT INTO nestitle VALUES (66,'Bee 52',97,62,1992,819,'1PL ACT UNL');",
-"INSERT INTO nestitle VALUES (660,'Toobin\'',20,20,1989,0,'1PL SPT UNL');",
+"INSERT INTO nestitle VALUES (660,'Toobin\\'',20,20,1989,0,'1PL SPT UNL');",
 "INSERT INTO nestitle VALUES (661,'Top Gun',4,4,1987,723,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (662,'Top Gun II: The Second Mission',4,4,1989,958,'1PL 2PC ACT FLY MOV');",
 "INSERT INTO nestitle VALUES (663,'Total Recall',8,8,1990,0,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (664,'Totally Rad',23,23,1991,724,'1PL ACT');",
 "INSERT INTO nestitle VALUES (665,'Touchdown Fever',1,1,1988,960,'1PL 2PX 2PC FTB SPT');",
 "INSERT INTO nestitle VALUES (666,'T&C Surf Design',35,35,1988,708,'1PL 2PA SKA SPT SRF');",
-"INSERT INTO nestitle VALUES (667,'T&C Surf Design 2: Thrilla\'s Safari',105,35,1991,720,'1PL ACT SKA SPT SRF');",
+"INSERT INTO nestitle VALUES (667,'T&C Surf Design 2: Thrilla\\'s Safari',105,35,1991,720,'1PL ACT SKA SPT SRF');",
 "INSERT INTO nestitle VALUES (668,'Toxic Crusaders',28,28,1991,961,'1PL ACT PSS TVA');",
 "INSERT INTO nestitle VALUES (669,'Track & Field',4,4,1987,0,'1PL 2PX SPT TRK');",
 "INSERT INTO nestitle VALUES (67,'Beetlejuice',7,35,1991,820,'1PL MOV');",
 "INSERT INTO nestitle VALUES (670,'Track & Field II',4,4,1989,726,'1PL 2PX PSS SPT TRK');",
 "INSERT INTO nestitle VALUES (671,'Treasure Master',93,93,2000,0,'1PL ACT');",
-"INSERT INTO nestitle VALUES (672,'Barker Bill\'s Trick Shooting',2,2,2000,809,'1PL GUN');",
+"INSERT INTO nestitle VALUES (672,'Barker Bill\\'s Trick Shooting',2,2,2000,809,'1PL GUN');",
 "INSERT INTO nestitle VALUES (673,'Trog',129,8,1990,962,'1PL ACT ARC');",
 "INSERT INTO nestitle VALUES (674,'Trojan',3,3,1987,0,'1PL 2PA 2PX ACT');",
 "INSERT INTO nestitle VALUES (675,'Trolls On Treasure Island',72,72,2000,0,'1PL UNL');",
@@ -868,21 +919,21 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (695,'Wacky Races',86,86,1992,734,'1PL RAC SPT');",
 "INSERT INTO nestitle VALUES (696,'Wall Street Kid',32,32,1990,0,'1PL PSS SIM');",
 "INSERT INTO nestitle VALUES (697,'Wally Bear And The No! Gang',72,72,2000,976,'1PL ACT SKA UNL');",
-"INSERT INTO nestitle VALUES (698,'Wario\'s Woods',2,2,1994,736,'1PL ACT');",
+"INSERT INTO nestitle VALUES (698,'Wario\\'s Woods',2,2,1994,736,'1PL ACT');",
 "INSERT INTO nestitle VALUES (699,'Wayne Gretzky Hockey',113,68,1990,737,'1PL 2PX 2PC HOC SPT');",
 "INSERT INTO nestitle VALUES (7,'The Addams Family',65,65,1991,789,'1PL');",
 "INSERT INTO nestitle VALUES (70,'Bible Buffet',61,61,1993,948,'1PL 4PX BBL UNL');",
-"INSERT INTO nestitle VALUES (700,'Wayne\'s World',118,68,1993,965,'1PL ACT MOV');",
+"INSERT INTO nestitle VALUES (700,'Wayne\\'s World',118,68,1993,965,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (701,'Werewolf: The Last Warrior',22,22,1990,966,'1PL 2PA ACT');",
 "INSERT INTO nestitle VALUES (702,'Wheel Of Fortune',7,37,1988,739,'1PL 3PX GSH');",
 "INSERT INTO nestitle VALUES (703,'Wheel Of Fortune: Family Edition',7,37,1990,740,'1PL 3PX GSH');",
 "INSERT INTO nestitle VALUES (704,'Wheel Of Fortune: Junior Edition',7,37,1989,775,'1PL 3PX GSH');",
 "INSERT INTO nestitle VALUES (705,'Wheel Of Fortune With Vanna White',7,37,1991,744,'1PL 3PX GSH');",
 "INSERT INTO nestitle VALUES (706,'Where In Time Is Carmen Sandiego?',4,4,1989,733,'1PL EDU PUZ RPG TIM');",
-"INSERT INTO nestitle VALUES (707,'Where\'s Waldo?',113,68,1991,735,'1PL KID PUZ');",
-"INSERT INTO nestitle VALUES (708,'Whomp\'em',23,23,1991,0,'1PL ACT');",
+"INSERT INTO nestitle VALUES (707,'Where\\'s Waldo?',113,68,1991,735,'1PL KID PUZ');",
+"INSERT INTO nestitle VALUES (708,'Whomp\\'em',23,23,1991,0,'1PL ACT');",
 "INSERT INTO nestitle VALUES (709,'Widget',86,86,2000,0,'1PL');",
-"INSERT INTO nestitle VALUES (71,'Big Bird\'s Hide And Speak',127,17,1990,698,'1PL KID EDU');",
+"INSERT INTO nestitle VALUES (71,'Big Bird\\'s Hide And Speak',127,17,1990,698,'1PL KID EDU');",
 "INSERT INTO nestitle VALUES (710,'Wild Gunman',2,2,1985,0,'1PL 2PA GUN');",
 "INSERT INTO nestitle VALUES (711,'Willow',3,3,1989,403,'1PL ACT ADV PSS');",
 "INSERT INTO nestitle VALUES (712,'Win, Lose, Or Draw',127,17,1990,741,'1PL 2PX GSH PSS');",
@@ -908,13 +959,13 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (730,'WWF Wrestlemania Challenge',7,35,1990,0,'1PL SPT WRE');",
 "INSERT INTO nestitle VALUES (731,'WWF King Of The Ring',35,35,1993,913,'1PL SPT WRE');",
 "INSERT INTO nestitle VALUES (732,'WWF Steel Cage Challenge',105,35,1992,971,'1PL 2PX SPT WRE');",
-"INSERT INTO nestitle VALUES (733,'Marvel\'s X-Men',35,35,2000,406,'1PL 2PC ACT CBK');",
+"INSERT INTO nestitle VALUES (733,'Marvel\\'s X-Men',35,35,2000,406,'1PL 2PC ACT CBK');",
 "INSERT INTO nestitle VALUES (734,'Xenophobe',5,5,1988,750,'1PL 2PC ACT ADV');",
 "INSERT INTO nestitle VALUES (735,'Xevious',28,28,1988,751,'1PL 2PA ACT SHO');",
 "INSERT INTO nestitle VALUES (736,'XEXYZ',18,18,1990,752,'1PL ACT ADV PSS');",
 "INSERT INTO nestitle VALUES (737,'Yo! Noid',3,3,1990,753,'1PL ACT');",
 "INSERT INTO nestitle VALUES (738,'Yoshi',2,2,1992,0,'1PL 2PX PUZ');",
-"INSERT INTO nestitle VALUES (739,'Yoshi\'s Cookie',2,2,1993,754,'1PL 2PX PUZ');",
+"INSERT INTO nestitle VALUES (739,'Yoshi\\'s Cookie',2,2,1993,754,'1PL 2PX PUZ');",
 "INSERT INTO nestitle VALUES (74,'Big Nose Freaks Out',97,62,1992,823,'1PL UNL');",
 "INSERT INTO nestitle VALUES (740,'The Young Indy Chronicles',23,23,1992,972,'1PL ACT');",
 "INSERT INTO nestitle VALUES (741,'Zanac',104,11,1988,755,'1PL ACT SHO');",
@@ -924,7 +975,7 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (746,'Elite',45,45,1991,0,'1PL UNL');",
 "INSERT INTO nestitle VALUES (747,'Gyromite',2,2,1985,786,'1PL 2PC ACT ROB');",
 "INSERT INTO nestitle VALUES (748,'Eggsplode',2,2,1989,0,'1PL PPD');",
-"INSERT INTO nestitle VALUES (75,'Bill & Ted\'s Excellent Video Game Adventure',133,35,1990,439,'1PL ACT ADV MOV TIM');",
+"INSERT INTO nestitle VALUES (75,'Bill & Ted\\'s Excellent Video Game Adventure',133,35,1990,439,'1PL ACT ADV MOV TIM');",
 "INSERT INTO nestitle VALUES (751,'Tetris (I)',20,20,2000,0,'1PL 2PX PUZ UNL');",
 "INSERT INTO nestitle VALUES (752,'Tetris (II)',0,2,1989,716,'1PL PUZ');",
 "INSERT INTO nestitle VALUES (753,'Stack-Up',2,2,1985,783,'1PL ROB');",
@@ -945,14 +996,14 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (77,'The Black Bass',71,71,1989,430,'1PL FSH PSS SPT');",
 "INSERT INTO nestitle VALUES (78,'Blackjack',139,72,1992,0,'1PL GMB UNL');",
 "INSERT INTO nestitle VALUES (79,'Blades Of Steel',4,4,1988,826,'1PL 2PX HOC PSS SPT');",
-"INSERT INTO nestitle VALUES (8,'Disney\'s Adventures In The Magic Kingdom',3,3,1989,436,'1PL ACT ADV SHO');",
+"INSERT INTO nestitle VALUES (8,'Disney\\'s Adventures In The Magic Kingdom',3,3,1989,436,'1PL ACT ADV SHO');",
 "INSERT INTO nestitle VALUES (80,'Blaster Master',5,5,1988,312,'1PL ACT ADV');",
 "INSERT INTO nestitle VALUES (81,'The Blue Marlin',71,71,1991,827,'1PL FSH SPT');",
 "INSERT INTO nestitle VALUES (82,'The Blues Brothers',73,73,1991,828,'1PL ACT MOV');",
 "INSERT INTO nestitle VALUES (83,'Bo Jackson Baseball',96,22,1991,460,'1PL BAS SPT');",
 "INSERT INTO nestitle VALUES (84,'Bomberman',18,18,1989,829,'1PL ACT PSS');",
 "INSERT INTO nestitle VALUES (85,'Bomberman 2',18,18,1992,830,'1PL');",
-"INSERT INTO nestitle VALUES (86,'Bonk\'s Adventure',134,18,1993,831,'1PL');",
+"INSERT INTO nestitle VALUES (86,'Bonk\\'s Adventure',134,18,1993,831,'1PL');",
 "INSERT INTO nestitle VALUES (87,'Boulder Dash',22,75,1990,442,'1PL');",
 "INSERT INTO nestitle VALUES (88,'A Boy & His Blob',52,29,1990,342,'1PL ACT ADV PUZ');",
 "INSERT INTO nestitle VALUES (89,'Break Time',49,11,1992,0,'1PL');",
@@ -960,17 +1011,18 @@ static void InitializeDatabase(void)
 "INSERT INTO nestitle VALUES (90,'Breakthru',22,22,1987,900,'1PL 2PA ACT');",
 "INSERT INTO nestitle VALUES (91,'Bubble Bobble',10,10,1988,446,'1PL 2PC PSS PUZ');",
 "INSERT INTO nestitle VALUES (92,'Bubble Bobble 2',10,10,1993,445,'1PL');",
-"INSERT INTO nestitle VALUES (93,'Bucky O\'Hare',4,4,1992,429,'1PL TVA');",
-"INSERT INTO nestitle VALUES (94,'Bugs Bunny\'s Birthday Blowout',77,77,1990,428,'1PL TVA');",
-"INSERT INTO nestitle VALUES (95,'Bugs Bunny\'s Crazy Castle',77,77,1989,833,'1PL ACT PSS TVA');",
-"INSERT INTO nestitle VALUES (96,'Bump \'N\' Jump',22,30,1988,440,'1PL ACT');",
+"INSERT INTO nestitle VALUES (93,'Bucky O\\'Hare',4,4,1992,429,'1PL TVA');",
+"INSERT INTO nestitle VALUES (94,'Bugs Bunny\\'s Birthday Blowout',77,77,1990,428,'1PL TVA');",
+"INSERT INTO nestitle VALUES (95,'Bugs Bunny\\'s Crazy Castle',77,77,1989,833,'1PL ACT PSS TVA');",
+"INSERT INTO nestitle VALUES (96,'Bump \\'N\\' Jump',22,30,1988,440,'1PL ACT');",
 "INSERT INTO nestitle VALUES (97,'Burai Fighter',9,9,1990,447,'1PL ACT SHO');",
 "INSERT INTO nestitle VALUES (98,'Burgertime',22,22,1987,834,'1PL 2PA ACT ARC');",
 "INSERT INTO nestitle VALUES (99,'Cabal',7,25,1989,835,'1PL ACT ARC SHO');",
 ""
 };
         dbver = "";
-        performActualUpdate(updates2, "1000", dbver);
+        if(!performActualUpdate(updates2, "1000", dbver))
+            return false;
     }
 
     query.exec("SELECT * FROM neskeyword;");
@@ -1056,21 +1108,25 @@ static void InitializeDatabase(void)
 ""
 };
         dbver = "";
-        performActualUpdate(updates2, "1000", dbver);        
+        if(!performActualUpdate(updates2, "1000", dbver))
+            return false;
     }
+
+    return true;
 }
 
-void UpgradeGameDatabaseSchema(void)
+bool UpgradeGameDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("GameDBSchemaVer");
     MSqlQuery query(MSqlQuery::InitCon());
    
     if (dbver == currentDatabaseVersion)
-        return;
+        return true;
 
     if (dbver == "")
     {
-        InitializeDatabase();
+        if (!InitializeDatabase())
+            return false;
         dbver = "1000";
     }
 
@@ -1080,8 +1136,8 @@ void UpgradeGameDatabaseSchema(void)
 "ALTER TABLE gamemetadata ADD COLUMN favorite BOOL NULL;",
 ""
 };
-
-        performActualUpdate(updates, "1001", dbver);
+        if (!performActualUpdate(updates, "1001", dbver))
+            return false;
     }
 
     if (dbver == "1001")
@@ -1090,7 +1146,8 @@ void UpgradeGameDatabaseSchema(void)
 "ALTER TABLE mamemetadata ADD image_searched tinyint(1) NOT NULL DEFAULT 0;",
 ""
 };
-        performActualUpdate(updates, "1002", dbver);
+        if (!performActualUpdate(updates, "1002", dbver))
+            return false;
     }
 
     if (dbver == "1002")
@@ -1099,7 +1156,8 @@ void UpgradeGameDatabaseSchema(void)
 "ALTER TABLE mamemetadata ADD rom_path varchar(255) NOT NULL DEFAULT \"\";",
 ""
 };
-        performActualUpdate(updates, "1003", dbver);
+        if (!performActualUpdate(updates, "1003", dbver))
+            return false;
     }
 
     if (dbver == "1003")
@@ -1108,7 +1166,8 @@ void UpgradeGameDatabaseSchema(void)
 QString("update mamemetadata set rom_path ='%1' WHERE rom_path ='';").arg(gContext->GetSetting("MameRomLocation")),
 ""
 };
-        performActualUpdate(updates, "1004", dbver);
+        if (!performActualUpdate(updates, "1004", dbver))
+            return false;
     }
 
     if (dbver == "1004")
@@ -1129,26 +1188,10 @@ QString("update mamemetadata set rom_path ='%1' WHERE rom_path ='';").arg(gConte
 ");",
 "ALTER TABLE gamemetadata ADD COLUMN rompath varchar(255) NOT NULL default ''; ",
 "ALTER TABLE gamemetadata ADD COLUMN gametype varchar(64) NOT NULL default ''; ",
-QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gametype,extensions) VALUES ('NES Player','%1','%2','%3','NES','%4');")
-    .arg(gContext->GetSetting("NesBinary"))
-    .arg(gContext->GetSetting("NesRomLocation"))
-    .arg(gContext->GetSetting("NesScreensLocation"))
-    .arg(GetGameExtensions("NES")),
-
-QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gametype,extensions) VALUES ('%1','%2','%3','%4','SNES','%5');")
-    .arg(gContext->GetSetting("SnesEmulator")) 
-    .arg(gContext->GetSetting("SnesBinary"))
-    .arg(gContext->GetSetting("SnesRomLocation"))
-    .arg(gContext->GetSetting("SnesScreensLocation"))
-    .arg(GetGameExtensions("SNES")),
-
-QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gametype,extensions) VALUES ('XMame','xmame','%1','%2','MAME','%3');")
-    .arg(gContext->GetSetting("MameRomLocation"))
-    .arg(gContext->GetSetting("MameScreensLocation"))
-    .arg(GetGameExtensions("MAME")),
 ""
 };
-        performActualUpdate(updates, "1005", dbver);
+        if (!performActualUpdate(updates, "1005", dbver))
+            return false;
     }
 
     if (dbver == "1005")
@@ -1158,7 +1201,8 @@ QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gam
 "ALTER TABLE gamemetadata ADD COLUMN diskcount tinyint(1) NOT NULL default 1; ",
 ""
 };
-        performActualUpdate(updates, "1006", dbver);
+        if (!performActualUpdate(updates, "1006", dbver))
+            return false;
     }
 
     if (dbver == "1006")
@@ -1174,9 +1218,9 @@ QString("INSERT INTO gameplayers (playername,commandline,rompath,screenshots,gam
 ""
 };
 
-        performActualUpdate(updates, "1007", dbver);
+        if (!performActualUpdate(updates, "1007", dbver))
+            return false;
     }
 
-
-
+    return true;
 }

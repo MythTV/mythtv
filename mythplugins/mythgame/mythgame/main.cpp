@@ -95,7 +95,12 @@ int mythplugin_init(const char *libversion)
         return -1;
 
 
-    UpgradeGameDatabaseSchema();
+    if (!UpgradeGameDatabaseSchema())
+    {
+        VERBOSE(VB_IMPORTANT,
+                "Couldn't upgrade database to new schema, exiting.");
+        return -1;
+    }
 
     MythGamePlayerSettings settings;
 //    settings.load();

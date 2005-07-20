@@ -390,7 +390,7 @@ void GameHandler::processGames(GameHandler *handler)
     else
         maxcount = 100;
 
-    MythProgressDialog pdial(QObject::tr("Looking for " + handler->SystemName() + " game(s)..."), maxcount);
+    MythProgressDialog pdial(QObject::tr("Scanning for " + handler->SystemName() + " game(s)..."), maxcount);
     pdial.setProgress(0);
 
     if (handler->GameType() == "PC") 
