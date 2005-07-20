@@ -9,11 +9,11 @@ static bool insert_dtv_multiplex(int db_source_id, QString sistandard,
                                  // DVB specific
                                  int transport_id,      int network_id,
                                  bool set_odfm_info,
-                                 int symbol_rate,       signed char bandwidth,
-                                 signed char polarity,  signed char inversion,
-                                 signed char trans_mode,
+                                 int symbol_rate,       char bandwidth,
+                                 char polarity,         char inversion,
+                                 char trans_mode,
                                  QString inner_FEC,     QString constellation,
-                                 signed char hierarchy, QString hp_code_rate,
+                                 char hierarchy,        QString hp_code_rate,
                                  QString lp_code_rate,  QString guard_interval)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -43,18 +43,18 @@ static bool insert_dtv_multiplex(int db_source_id, QString sistandard,
     if (symbol_rate >= 0)
         query.bindValue(":SYMBOLRATE", symbol_rate);
     if (polarity >= 0)
-        query.bindValue(":POLARITY",   polarity);
+        query.bindValue(":POLARITY",   QString("%1").arg(polarity));
     if (inner_FEC != QString::null)
         query.bindValue(":FEC",        inner_FEC);
 
     if (set_odfm_info)
     {
-        query.bindValue(":INVERSION",      inversion);
-        query.bindValue(":BANDWIDTH",      bandwidth);
+        query.bindValue(":INVERSION",      QString("%1").arg(inversion));
+        query.bindValue(":BANDWIDTH",      QString("%1").arg(bandwidth));
         query.bindValue(":HP_CODE_RATE",   hp_code_rate);
         query.bindValue(":LP_CODE_RATE",   lp_code_rate);
         query.bindValue(":CONSTELLATION",  constellation);
-        query.bindValue(":TRANS_MODE",     trans_mode);
+        query.bindValue(":TRANS_MODE",     QString("%1").arg(trans_mode));
         query.bindValue(":GUARD_INTERVAL", guard_interval);
         query.bindValue(":HIERARCHY",      hierarchy);
     }
