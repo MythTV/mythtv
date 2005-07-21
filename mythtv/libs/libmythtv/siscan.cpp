@@ -46,7 +46,7 @@ typedef int fe_type_t;
 /// \brief How long we wait for the hardware to stabalize on a signal
 #define SIGNAL_LOCK_TIMEOUT   500
 /// \brief How long we wait for ATSC tables, before giving up
-#define ATSC_TABLES_TIMEOUT 15000
+#define ATSC_TABLES_TIMEOUT 1500
 /// \brief How long we wait for DVB tables, before giving up
 #define DVB_TABLES_TIMEOUT  40000
 
@@ -148,23 +148,34 @@ FrequencyTableOld frequenciesATSC_C[]=
 };
 #endif // USING_DVB
 
-SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
-    : channelFormat("%1_%2")
+/** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
+ */
+SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
+    : // Set in constructor
+      channel(_channel),
+      signalMonitor(SignalMonitor::Init(_cardtype, -1, _channel)),
+      sourceID(_sourceID),
+      scanMode(IDLE),
+      // Settable
+      RadioServices(false),
+      ignoreEncryptedServices(false),
+      forceUpdate(false),
+      scanTimeout(0), /* Set scan timeout off by default */
+      channelFormat("%1_%2"),
+      // State
+      threadExit(false),
+      waitingForTables(false),
+      // Misc
+      scanner_thread_running(false)
 {
-    /* setup links to parents and db connections */
-    chan = advbchannel;
-    sourceID = _sourceID;
+    // Initialize statics
+    init_freq_tables();
 
     /* setup boolean values for thread */
-    scanner_thread_running = false;
     serviceListReady = false;
     transportListReady = false;
     eventsReady = false;
-
-    scanMode = IDLE;
-    ScanTimeout = 0; 		/* Set scan timeout off by default */
-
-    FTAOnly = false;
+    ignoreEncryptedServices = false;
     RadioServices = false;
     forceUpdate = false;
 
@@ -172,24 +183,29 @@ SIScan::SIScan(DVBChannel* advbchannel, int _sourceID)
 
 #ifdef USING_DVB
     /* Signals to process tables and do database inserts */
-    connect(chan->siparser,SIGNAL(FindTransportsComplete()),this,SLOT(TransportTableComplete()));
-    connect(chan->siparser,SIGNAL(FindServicesComplete()),this,SLOT(ServiceTableComplete()));
-    connect(chan->siparser,SIGNAL(EventsReady(QMap_Events*)),this,SLOT(EventsReady(QMap_Events*)));
+    connect(GetDVBChannel()->siparser, SIGNAL(FindTransportsComplete()),
+            this,                      SLOT(TransportTableComplete()));
+    connect(GetDVBChannel()->siparser, SIGNAL(FindServicesComplete()),
+            this,                      SLOT(ServiceTableComplete()));
+    connect(GetDVBChannel()->siparser, SIGNAL(EventsReady(QMap_Events*)),
+            this,                      SLOT(EventsReady(QMap_Events*)));
 #endif // USING_DVB
 }
 
-SIScan::~SIScan()
+SIScan::~SIScan(void)
 {
     StopScanner();
     SISCAN("SIScanner Stopped");
+    if (signalMonitor)
+        delete signalMonitor;
 
     pthread_mutex_destroy(&events_lock);
 }
 
-bool SIScan::ScanTransports()
+bool SIScan::ScanTransports(void)
 {
 #ifdef USING_DVB
-    return chan->siparser->FindTransports();
+    return GetDVBChannel()->siparser->FindTransports();
 #else
     return false;
 #endif // USING_DVB
@@ -238,29 +254,59 @@ bool SIScan::ScanServicesSourceID(int SourceID)
     while (query.next())
     {
         if (query.value(1).toString() == "atsc")
-            ScanTimeout = ATSC_TABLES_TIMEOUT;
+            scanTimeout = ATSC_TABLES_TIMEOUT;
 
         QString fn = QString("Transport ID %1").arg(query.value(2).toString());
 
         TransportScanItem t;
         t.mplexid = query.value(0).toInt();
         t.SourceID = SourceID;
-        t.FriendlyName = QString("Transport ID %1").arg(query.value(2).toString());
+        t.FriendlyName = fn;
         scanTransports += t;
     }
 
-    sourceIDTransportTuned = false;
-    scanMode = TRANSPORT_LIST;    
+    waitingForTables  = false;
+    scanMode          = TRANSPORT_LIST;
     return true;
 }
 
-// This function requires you be tuned to a transport already
-bool SIScan::ScanServices(int TransportID)
+DTVSignalMonitor* SIScan::GetDTVSignalMonitor(void)
 {
-    (void) TransportID;
+    return dynamic_cast<DTVSignalMonitor*>(signalMonitor);
+}
+
+DVBSignalMonitor* SIScan::GetDVBSignalMonitor(void)
+{
+#ifdef USING_DVB
+    return dynamic_cast<DVBSignalMonitor*>(signalMonitor);
+#else
+    return NULL;
+#endif
+}
+
+DVBChannel *SIScan::GetDVBChannel(void)
+{
+#ifdef USING_DVB
+    return dynamic_cast<DVBChannel*>(channel);
+#else
+    return NULL;
+#endif
+}
+
+Channel *SIScan::GetChannel(void)
+{
+#ifdef USING_V4L
+    return dynamic_cast<Channel*>(channel);
+#else
+    return NULL;
+#endif
+}
+
+bool SIScan::ScanServices(void)
+{
     // Requests the SDT table for the current transport from sections
 #ifdef USING_DVB
-    return chan->siparser->FindServices();
+    return GetDVBChannel()->siparser->FindServices();
 #else
     return false;
 #endif // USING_DVB
@@ -334,7 +380,7 @@ int SIScan::CreateMultiplex(const fe_type_t cardType,
     return -1;
 #endif // USING_DVB
 }
- 
+
 /** \fn SIScan::SpawnScanner(void*)
  *  \brief Thunk that allows scanner_thread pthread to
  *         call SIScan::RunScanner().
@@ -357,7 +403,7 @@ void SIScan::StartScanner(void)
 /** \fn SIScan::RunScanner(void)
  *  \brief This runs the event loop for SIScan until 'threadExit' is true.
  */
-void SIScan::RunScanner()
+void SIScan::RunScanner(void)
 {
     SISCAN("Starting SIScanner");
     scanner_thread_running = true;
@@ -380,7 +426,7 @@ void SIScan::RunScanner()
         if (serviceListReady)
         {
 #ifdef USING_DVB
-            if (chan->siparser->GetServiceObject(SDT))
+            if (GetDVBChannel()->siparser->GetServiceObject(SDT))
             {
                 SISCAN("Updating Services");
                 emit ServiceScanUpdateText("Processing new Transport");
@@ -392,10 +438,8 @@ void SIScan::RunScanner()
             serviceListReady = false;
             if (scanMode == TRANSPORT_LIST)
             {
-
-                /* We could just look at the transportsCount here but it's not really thread safe */
-                emit PctServiceScanComplete(((transportsToScan-transportsCount)*100)/transportsToScan);
-                sourceIDTransportTuned = false;
+                UpdateScanPercentCompleted();
+                waitingForTables = false;
             }
             else
             {
@@ -406,7 +450,7 @@ void SIScan::RunScanner()
         if (transportListReady)
         {
 #ifdef USING_DVB
-            if (chan->siparser->GetTransportObject(NIT))
+            if (GetDVBChannel()->siparser->GetTransportObject(NIT))
             {
                 emit TransportScanUpdateText("Processing Transport List");
                 SISCAN("Updating Transports");
@@ -423,7 +467,7 @@ void SIScan::RunScanner()
         if (scanMode == TRANSPORT_LIST)
         {
 #ifdef USING_DVB
-            if ((!sourceIDTransportTuned) || ((ScanTimeout > 0) && (timer.elapsed() > ScanTimeout)))
+            if ((!waitingForTables) || ((scanTimeout > 0) && (timer.elapsed() > scanTimeout)))
             {
                 QValueList<TransportScanItem>::Iterator i;
                 bool done = false;
@@ -432,7 +476,7 @@ void SIScan::RunScanner()
                     if (!done && !(*i).complete && !threadExit)
                     {
                         (*i).complete = true;
-                        if ((ScanTimeout > 0) && (timer.elapsed() > ScanTimeout))
+                        if ((scanTimeout > 0) && (timer.elapsed() > scanTimeout))
                             emit ServiceScanUpdateText("Timeout Scanning Channel");
                         emit ServiceScanUpdateText((*i).FriendlyName);
                         SISCAN(QString("Tuning to mplexid %1").arg((*i).mplexid));
@@ -452,29 +496,28 @@ void SIScan::RunScanner()
                             {
                                 t.tuning = (*i).tuning;
                                 t.tuning.params.frequency+=(*i).offset1;
-                                result = chan->TuneTransport(t,true,(*i).timeoutTune);
+                                result = GetDVBChannel()->TuneTransport(t,true,(*i).timeoutTune);
                             }
                             
                             if (!result && (*i).offset2)
                             {
                                 t.tuning = (*i).tuning;
                                 t.tuning.params.frequency+=(*i).offset2;
-                                result = chan->TuneTransport(t,true,(*i).timeoutTune);
+                                result = GetDVBChannel()->TuneTransport(t,true,(*i).timeoutTune);
                             }
 
                             if (!result)
                             {
                                 t.tuning = (*i).tuning;
-                                result = chan->TuneTransport(t,true,(*i).timeoutTune);
+                                result = GetDVBChannel()->TuneTransport(t,true,(*i).timeoutTune);
                             }
                         }
                         else 
-                            result = chan->SetTransportByInt((*i).mplexid);
+                            result = GetDVBChannel()->SetTransportByInt((*i).mplexid);
 
                         if (!result)
                         {
-                            int pct = ((transportsToScan-transportsCount)*100)/transportsToScan;
-                            emit PctServiceScanComplete(pct);
+                            UpdateScanPercentCompleted();
                             emit ServiceScanUpdateText("Failed to tune");
                             if (transportsCount == 0)
                                 emit ServiceScanComplete();
@@ -486,18 +529,18 @@ void SIScan::RunScanner()
                                 int transport;
                                 DVBTuning tuning;
                                 //read the actual values back from the card
-                                if (chan->GetTuningParams(tuning))
-                                    transport = CreateMultiplex(chan->GetCardType(),(*i),tuning);
+                                if (GetDVBChannel()->GetTuningParams(tuning))
+                                    transport = CreateMultiplex(GetDVBChannel()->GetCardType(),(*i),tuning);
                                 else
-                                    transport = CreateMultiplex(chan->GetCardType(),(*i),(*i).tuning);
+                                    transport = CreateMultiplex(GetDVBChannel()->GetCardType(),(*i),(*i).tuning);
                                 if (transport >=0) 
-                                    chan->SetCurrentTransportDBID(transport);
+                                    GetDVBChannel()->SetMultiplexID(transport);
                             }
                             else
-                                chan->SetCurrentTransportDBID((*i).mplexid);
+                                GetDVBChannel()->SetMultiplexID((*i).mplexid);
                             timer.start();
-                            chan->siparser->FindServices();
-                            sourceIDTransportTuned = true;
+                            GetDVBChannel()->siparser->FindServices();
+                            waitingForTables = true;
                             done = true;
                         }
                     }
@@ -509,20 +552,23 @@ void SIScan::RunScanner()
     scanner_thread_running = false;
 }
 
-void SIScan::StopScanner()
+/** \fn SIScan::StopScanner(void)
+ *  \brief Stops the SIScan event loop and the signal monitor,
+ *         blocking until both exit.
+ */
+void SIScan::StopScanner(void)
 {
     threadExit = true;
+    SISCAN("Stopping SIScanner");
 #ifdef USING_DVB
     /* Force dvbchannel to exit */
-    if (scanner_thread_running)
-    {
-        chan->StopTuning();
-        SISCAN("Stopping SIScanner");
-        pthread_join(scanner_thread, NULL);
-    }
-    while (scanner_thread_running)
-       usleep(50);
+    if (GetDVBChannel())
+        GetDVBChannel()->StopTuning();
 #endif // USING_DVB
+    if (signalMonitor)
+        signalMonitor->Stop();
+    if (scanner_thread_running)
+        pthread_join(scanner_thread, NULL);
 }
 
 void SIScan::verifyTransport(TransportScanItem& t)
@@ -660,11 +706,11 @@ bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
         t++;
     }
  
-    transportsToScan=transportsCount;
+    transportsToScan = transportsCount;
     timer.start();
-    ScanTimeout = DVB_TABLES_TIMEOUT;
-    sourceIDTransportTuned = false;
-    scanMode = TRANSPORT_LIST;    
+    scanTimeout      = ATSC_TABLES_TIMEOUT;
+    waitingForTables = false;
+    scanMode         = TRANSPORT_LIST;
     return true;
 #else
     (void)SourceID;
@@ -718,11 +764,11 @@ bool SIScan::DVBTScanTransport(int SourceID, unsigned country)
         t++;
     }
     
-    transportsToScan=transportsCount;
+    transportsToScan = transportsCount;
     timer.start();
-    ScanTimeout = DVB_TABLES_TIMEOUT;
-    sourceIDTransportTuned = false;
-    scanMode = TRANSPORT_LIST;    
+    scanTimeout      = DVB_TABLES_TIMEOUT;
+    waitingForTables = false;
+    scanMode         = TRANSPORT_LIST;
 #endif // USING_DVB
     return true;
 }
@@ -755,6 +801,36 @@ void SIScan::TransportTableComplete()
     transportListReady = true;
 }
 
+/** \fn SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
+ *
+ *   If the mplexid matches the first networkid/transport ID assume you
+ *   are on the right mplexid..
+ *
+ *   If NOT then search that SourceID for a matching
+ *   NetworkId/TransportID and use that as the mplexid..
+ *
+ *     3. Check the existance of each ServiceID on the correct mplexid.
+ *     If there are any extras mark then as hidden (as opposed to
+ *     removing them).  There might also be a better way of marking
+ *     them as old.. I am not sure yet.. If the ChanID scheme is
+ *     better than whats in place now this might be easier..
+ *
+ *     4. Add any missing ServiceIDs.. Set the hidden flag if they are
+ *     not a TV service, and or if they are not FTA (Depends on if FTA
+ *     is allowed or not)..
+ *
+ *     First get the mplexid from channel.. This will help you determine
+ *     what mplexid these channels are really associated with..
+ *     They COULD be from another transport..
+ *
+ *     Check the ServiceVersion and if its the same as you have, or a
+ *     forced update is required because its been too long since an update
+ *     forge ahead.
+ *
+ *  \todo If you get a Version mismatch and you are not in setupscan
+ *        mode you will want to issue a scan of the other transports
+ *        that have the same networkID.
+ */
 void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
 {
     (void) SDT;
@@ -771,34 +847,11 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     QMap_SDTObject::Iterator s;
     int chanid=0;
 
-/*
-
-
-       If the mplexid matches the first networkid/transport ID assume you are on the right
-       mplexid..
-
-       If NOT then search that SourceID for a matching NetworkId/TransportID and use that
-       as the mplexid..
-
-
-    3. Check the existnce of each ServiceID on the correct mplexid.  If there are any extras mark
-       then as hidden (as opposed to removing them).  There migth also be a better way of marking
-       them as old.. I am not sure yet.. If the ChanID scheme is better than whats in place now
-       this might be easier..
-
-    4. Add any missing ServiceIDs.. Set the hidden flag if they are not a TV service, and or if
-       they are not FTA (Depends on if FTA is allowed or not)..
-
-*/
-
-/*  First get the mplexid from channel.. This will help you determine what mplexid these
-    channels are really associated with.. They COULD be from another transport..   */
-
     s = SDT.begin();
 
-    int DVBTID = GetDVBTID((*s).NetworkID,(*s).TransportID,chan->GetCurrentTransportDBID());
+    int DVBTID = GetDVBTID((*s).NetworkID,(*s).TransportID,GetDVBChannel()->GetMultiplexID());
 
-//    int DVBTID = chan->GetCurrentTransportDBID();
+//    int DVBTID = GetDVBChannel()->GetMultiplexID();
 
 #ifdef  SISCAN_DEBUG
     printf("The mplexid is %d\n",DVBTID);
@@ -863,7 +916,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                                "cardinput.cardid = capturecard.cardid AND "
                                "mplexid=%1 and videodevice = \"%2\"")
                                .arg(DVBTID)
-                               .arg(chan->GetCardNum());
+                               .arg(GetDVBChannel()->GetCardNum());
     query.prepare(FTAQuery); 
 
     if(!query.exec())      
@@ -872,7 +925,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
     if (query.size() > 0)
     {
         query.next();
-        FTAOnly = query.value(0).toBool();
+        ignoreEncryptedServices = query.value(0).toBool();
     }
     else
         return;    
@@ -899,7 +952,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                        .arg((*s).ATSCSourceID);
     }
     deleteQuery += QString(") and mplexid = %1")
-                           .arg(chan->GetCurrentTransportDBID());
+                           .arg(GetDVBChannel()->GetMultiplexID());
 
     query.prepare(deleteQuery);
 
@@ -917,7 +970,8 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
         // Its a TV Service so add it also only do FTA
         if( (((*s).ServiceType==SDTObject::TV) || 
              ((*s).ServiceType==SDTObject::RADIO) && RadioServices) &&
-           (!FTAOnly || (FTAOnly && ((*s).CAStatus == 0))))
+           (!ignoreEncryptedServices ||
+            (ignoreEncryptedServices && ((*s).CAStatus == 0))))
         {
             // See if transport already in database based on serviceid,networkid  and transportid
             QString theQuery = QString("SELECT chanid FROM channel "
@@ -925,7 +979,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                                        .arg((*s).ServiceID)
                                        // Use a different style query here in the future when you are
                                        // parsing other transports..  This will work for now..
-                                       .arg(chan->GetCurrentTransportDBID());
+                                       .arg(GetDVBChannel()->GetMultiplexID());
             query.prepare(theQuery);
 
             if(!query.exec())
@@ -970,7 +1024,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                      query.bindValue(":SOURCEID",localSourceID);
                      query.bindValue(":CALLSIGN",(*s).ServiceName.utf8());
                      query.bindValue(":NAME",(*s).ServiceName.utf8());
-                     query.bindValue(":MPLEXID",chan->GetCurrentTransportDBID());
+                     query.bindValue(":MPLEXID",GetDVBChannel()->GetMultiplexID());
                      query.bindValue(":SERVICEID",(*s).ServiceID);
                      query.bindValue(":ATSCSRCID",(*s).ATSCSourceID);
                      query.bindValue(":USEOAG",(*s).EITPresent);
@@ -988,7 +1042,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                                   "WHERE serviceid=:SERVICEID and mplexid=:MPLEXID");
                     query.bindValue(":ATSCSRCID",(*s).ATSCSourceID);
                     query.bindValue(":SERVICEID",(*s).ServiceID);
-                    query.bindValue(":MPLEXID",chan->GetCurrentTransportDBID());
+                    query.bindValue(":MPLEXID",GetDVBChannel()->GetMultiplexID());
 
                     if(!query.exec())
                         MythContext::DBError("Updating ATSC SourceID", query);
@@ -1069,7 +1123,7 @@ void SIScan::CheckNIT(NITObject& NIT)
             break;
 
         //Start off with the main frequency,
-        if (chan->TuneTransport(chan_opts, true, ScanTimeout))
+        if (GetDVBChannel()->TuneTransport(chan_opts, true, scanTimeout))
         {
 //             cerr << "Tuned to main frequency "<< transport.Frequency << "\n";
             continue;
@@ -1082,7 +1136,7 @@ void SIScan::CheckNIT(NITObject& NIT)
             unsigned nfrequency = *f;
             chan_opts.tuning.params.frequency = nfrequency;
 //            cerr << "CheckNIT " << nfrequency << "\n";
-            if (chan->TuneTransport(chan_opts, true, ScanTimeout))
+            if (GetDVBChannel()->TuneTransport(chan_opts, true, scanTimeout))
             {
 //                cerr << "Tuned frequency "<< nfrequency << "\n";
                 transport.Frequency = nfrequency;
@@ -1380,7 +1434,7 @@ void SIScan::AddEvents()
         {
             theQuery = QString("select chanid,useonairguide from channel where atscsrcid=%1 and mplexid=%2")
                            .arg((*e).ServiceID)
-                           .arg(chan->GetCurrentTransportDBID());
+                           .arg(GetDVBChannel()->GetMultiplexID());
 #ifdef SISCAN_DEBUG
              printf("CHANID QUERY: %s\n",theQuery.ascii());
 #endif

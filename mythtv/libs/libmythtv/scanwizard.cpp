@@ -87,9 +87,6 @@ ScanWizardScanner::ScanWizardScanner(ScanWizard *_parent)
     scanner = NULL;
     channel = NULL;
     tunerthread_running = false;
-#ifdef USING_DVB
-    monitor = NULL;
-#endif
 #ifdef USING_V4L
     analogScan = NULL;
 #endif
@@ -107,14 +104,6 @@ void ScanWizardScanner::finish()
         delete scanner;
         scanner = NULL;
     }
-
-#ifdef USING_DVB
-    if (monitor)
-    {
-        delete monitor;
-        monitor = NULL;
-    }
-#endif
 
     if (channel)
     {
@@ -394,12 +383,24 @@ void ScanWizardScanner::scan()
         nTransportToTuneTo = parent->transport();
         int cardid = parent->captureCard();
 
-        QString device;
+        QString device, cn, card_type;
         if (!CardUtil::GetVideoDevice(cardid, device))
             return;
+
+        int nCardType = CardUtil::GetCardType(cardid, cn, card_type);
 #ifdef USING_DVB
-        channel = new DVBChannel(device.toInt());
-#endif // USING_DVB
+        if (CardUtil::IsDVB(cardid))
+            channel = new DVBChannel(device.toInt());
+#endif
+#ifdef USING_V4L
+        if (nCardType == CardUtil::HDTV)
+            channel = new Channel(NULL, device);
+#endif
+        if (!channel)
+        {
+            VERBOSE(VB_IMPORTANT, "Error, Channel not created");
+            return;
+        }
 
         // These locks and objects might already exist in videosource need to check
         if (!channel->Open())
@@ -408,7 +409,7 @@ void ScanWizardScanner::scan()
             return;
         }
 
-        scanner = new SIScan(GetDVBChannel(), nVideoSource);
+        scanner = new SIScan(card_type, channel, parent->videoSource());
     
         scanner->SetForceUpdate(true);
 
@@ -444,10 +445,8 @@ void ScanWizardScanner::scan()
         connect(scanner, SIGNAL(PctServiceScanComplete(int)),
                 this,    SLOT(  serviceScanPctComplete(int)));
 
-#ifdef USING_DVB
-        monitor = new DVBSignalMonitor(-1, GetDVBChannel());
-
         // Signal Meters are connected here
+        SignalMonitor *monitor = scanner->GetSignalMonitor();
         if (monitor)
         {
             connect(monitor, SIGNAL(StatusSignalLock(const SignalMonitorValue&)),
@@ -456,7 +455,7 @@ void ScanWizardScanner::scan()
                     this, SLOT(dvbSignalStrength(const SignalMonitorValue&)));
         }
 
-        DVBSignalMonitor *dvbm = dynamic_cast<DVBSignalMonitor*>(monitor);
+        DVBSignalMonitor *dvbm = scanner->GetDVBSignalMonitor();
         if (dvbm)
         {
             connect(dvbm, SIGNAL(StatusSignalToNoise(const SignalMonitorValue&)),
@@ -466,7 +465,6 @@ void ScanWizardScanner::scan()
 
         if (monitor)
             monitor->Start();
-#endif // USING_DVB
 
         popupProgress = new ScanProgressPopup(this);
         popupProgress->progress(0);

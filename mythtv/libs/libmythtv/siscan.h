@@ -19,8 +19,6 @@
 #include "dvbtypes.h"
 typedef QValueList<Event> QList_Events;
 typedef QValueList<QList_Events*> QListList_Events;
-#define SISCAN(args...) \
-    VERBOSE(VB_SIPARSER, QString("SIScan(%1): ").arg(chan->GetDevice()) << args);
 #else
 typedef unsigned short uint16_t;
 typedef QMap<uint16_t, void*> QMap_Events;
@@ -31,9 +29,10 @@ class DVBTuning;
 typedef int fe_type_t;
 typedef void* NITObject;
 typedef void* NIT;
-#define SISCAN(args...) \
-    VERBOSE(VB_SIPARSER, QString("SIScan: ") << args);
 #endif // USING_DVB
+
+#define SISCAN(args...) \
+    VERBOSE(VB_SIPARSER, QString("SIScan(%1): ").arg(channel->GetDevice()) << args);
 
 class MSqlQuery;
 class ChannelBase;
@@ -60,7 +59,7 @@ class SIScan : public QObject
 {
     Q_OBJECT
   public:
-    SIScan(DVBChannel* advbchannel, int _sourceID);
+    SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID);
     ~SIScan();
 
     void StartScanner(void);
@@ -71,15 +70,19 @@ class SIScan : public QObject
                         const QString modulation,
                         const QString country);
     bool ScanTransports(void);
-    bool ScanServices(int TransportID = -1);
+    bool ScanServices(void);
     bool ScanServicesSourceID(int SourceID);
 
     void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
-    void SetFTAOnly(bool _fFTAOnly)   { FTAOnly                 = _fFTAOnly; }
+    void SetFTAOnly(bool _fFTAOnly)   { ignoreEncryptedServices = _fFTAOnly; }
     void SetRadioServices(bool _fRadio) { RadioServices         = _fRadio;   }
     void SetForceUpdate(bool _force)  { forceUpdate             = _force;    }
-    void SetScanTimeout(int _timeout) { ScanTimeout             = _timeout;  }
+    void SetScanTimeout(int _timeout) { scanTimeout             = _timeout;  }
     void SetChannelFormat(const QString _fmt) { channelFormat   = _fmt; }
+
+    SignalMonitor    *GetSignalMonitor(void) { return signalMonitor; }
+    DTVSignalMonitor *GetDTVSignalMonitor(void);
+    DVBSignalMonitor *GetDVBSignalMonitor(void);
 
   public slots:
     // Handler for complete tables
@@ -98,10 +101,17 @@ class SIScan : public QObject
     void TransportScanComplete(void);
 
   private:
+    // some useful gets
+    Channel          *GetChannel(void);
+    DVBChannel       *GetDVBChannel(void);
+
     /// \brief Called by SpawnScanner to run scanning thread
     void RunScanner(void);
     /// \brief Thunk to call RunScanner from pthread
     static void *SpawnScanner(void *param);
+
+    /// \brief Updates Transport Scan progress bar
+    inline void UpdateScanPercentCompleted(void);
 
     bool ATSCScanTransport(int SourceID, int FrequencyBand);
     bool DVBTScanTransport(int SourceID, unsigned country);
@@ -124,23 +134,24 @@ class SIScan : public QObject
 
   private:
     // Set in constructor
-    DVBChannel       *chan;
+    ChannelBase      *channel;
+    SignalMonitor    *signalMonitor;
     int               sourceID;
     SCANMODE          scanMode;
 
     // Settable
     bool              RadioServices;
-    bool              FTAOnly;
+    bool              ignoreEncryptedServices;
     bool              forceUpdate;
-    int               ScanTimeout;
+    int               scanTimeout;
     QString           channelFormat;
 
     // State
     bool              threadExit;
+    bool              waitingForTables;
     QTime             timer;
 
     bool serviceListReady;
-    bool sourceIDTransportTuned;
     bool transportListReady;
     bool eventsReady;
     int  transportsToScan;
@@ -158,5 +169,11 @@ class SIScan : public QObject
     pthread_t        scanner_thread;
     bool             scanner_thread_running;
 };
+
+inline void SIScan::UpdateScanPercentCompleted(void)
+{
+    int tmp = ((transportsToScan - transportsCount) * 100) / transportsToScan;
+    emit PctServiceScanComplete(tmp);
+}
 
 #endif // SISCAN_H

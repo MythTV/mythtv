@@ -139,7 +139,7 @@ bool TVRec::Init(void)
         channel = new DVBChannel(videodev.toInt(), this);
         channel->Open();
 
-        scanner = new SIScan((DVBChannel *)channel, 1);
+        scanner = new SIScan("dvb", channel, 1 /* BUG -- should pass sourceid */);
         pthread_create(&scanner_thread, NULL, ScannerThread, scanner);
 
         InitChannel(inputname, startchannel);

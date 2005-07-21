@@ -153,7 +153,6 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
     uint               frequency;
     QString            modulation;
 #ifdef USING_DVB
-    DVBSignalMonitor  *monitor;
     dvb_channel_t      chan_opts;
 #endif
 };
