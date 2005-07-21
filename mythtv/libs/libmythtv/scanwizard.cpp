@@ -388,6 +388,7 @@ void ScanWizardScanner::scan()
             return;
 
         int nCardType = CardUtil::GetCardType(cardid, cn, card_type);
+        (void) nCardType;
 #ifdef USING_DVB
         if (CardUtil::IsDVB(cardid))
             channel = new DVBChannel(device.toInt());
@@ -455,6 +456,7 @@ void ScanWizardScanner::scan()
                     this, SLOT(dvbSignalStrength(const SignalMonitorValue&)));
         }
 
+#ifdef USING_DVB
         DVBSignalMonitor *dvbm = scanner->GetDVBSignalMonitor();
         if (dvbm)
         {
@@ -462,6 +464,7 @@ void ScanWizardScanner::scan()
                     this, SLOT(  dvbSNR(const SignalMonitorValue&)));
         }
         bzero(&chan_opts.tuning, sizeof(chan_opts.tuning));
+#endif // USING_DVB
 
         if (monitor)
             monitor->Start();
@@ -494,7 +497,7 @@ void ScanWizardScanner::scan()
             // SQL code to get the disqec paramters HERE
             thequery = QString(
                 "SELECT dvb_diseqc_type, diseqc_port,  diseqc_pos, "
-                "       lnb_lof_switch, lnb_lof_hi,    lnb_lof_lo "
+                "       lnb_lof_switch,  lnb_lof_hi,   lnb_lof_lo "
                 "FROM cardinput, capturecard "
                 "WHERE capturecard.cardid=%1 and cardinput.sourceid=%2")
                 .arg(parent->captureCard()).arg(nVideoSource);
@@ -616,11 +619,11 @@ void ScanWizard::pageSelected(const QString& strTitle)
 
 void ScanWizardScanner::HandleTuneComplete(void)
 {
-#ifdef USING_DVB
     if (tunerthread_running)
         pthread_join(tuner_thread, NULL);
     scanner->StartScanner();
 
+#ifdef USING_DVB
     // Wait for dvbsections to start this is silly, but does the trick
     while (GetDVBChannel()->siparser == NULL)
         usleep(250);
