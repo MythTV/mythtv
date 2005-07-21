@@ -27,19 +27,5 @@ Having built MythControls, execute:
 
 make install.
 
-Following the installation of the library and UI files, you need to
-update the MythTV menus to include MythControls.
-
-The most logical place (I can think of) to include the MythControls
-menu item is in the main settings menu.  To add the MythControls menu
-item to the main settings menu, add the following to
-main_settings.xml:
-
-<button>
-  <type>CONTROL_MENU</type>
-  <text>Controls</text>
-  <action>PLUGIN mythcontrols</action>
-  <depends>mythcontrols</depends>
-</button>
 
 I think that is all you need to do.
