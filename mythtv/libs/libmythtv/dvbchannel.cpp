@@ -559,7 +559,7 @@ void DVBChannel::SetPMT(const PMTObject *pmt)
 }
 
 /** \fn DVBChannel::SetCAPMT(const PMTObject*)
- *  \brief Tells the Access Controller which stream we wish to decode.
+ *  \brief Tells the Conditional Access Module which streams we wish to decode.
  *
  *   If dvbcam exists and DVBCam::IsRunning() returns true we tell it
  *   about our PMT, otherwise we do nothing.

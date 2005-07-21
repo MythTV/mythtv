@@ -100,8 +100,13 @@ bool DVBCam::Start()
         return false;
     }
 
-    pthread_create(&ciHandlerThread, NULL, CiHandlerThreadHelper, this);
+    if (pthread_create(&ciHandlerThread, NULL, CiHandlerThreadHelper, this))
+    {
+        ERROR("CA: Failed to create CI handler thread");
+        return false;
+    }
 
+    ciThreadRunning = true;
     GENERAL("CA: CI handler successfully initialized!");
 
     return true;
@@ -138,8 +143,6 @@ void *DVBCam::CiHandlerThreadHelper(void*self)
 void DVBCam::CiHandlerLoop()
 {
     GENERAL(QString("CA: CI handler thread running"));
-
-    ciThreadRunning = true;
 
     while (!exitCiThread)
     {
