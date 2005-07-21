@@ -3806,7 +3806,7 @@ void TV::customEvent(QCustomEvent *e)
                 AskAllowRecording(me->ExtraDataList(), timeuntil);
             }
         }
-        else if (message.left(11) == "QUIT_LIVETV")
+        else if (recorder && message.left(11) == "QUIT_LIVETV")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
@@ -3819,7 +3819,7 @@ void TV::customEvent(QCustomEvent *e)
                 exitPlayer = true;
             }
         }
-        else if (message.left(12) == "EXIT_TO_MENU")
+        else if (nvp && message.left(12) == "EXIT_TO_MENU")
         {
             int exitprompt = gContext->GetNumSetting("PlaybackExitPrompt");
             if (exitprompt == 1 || exitprompt == 2)
@@ -3837,7 +3837,7 @@ void TV::customEvent(QCustomEvent *e)
                 UpdateOSDSignal(signalList);
             }
         }
-        else if (message.left(14) == "COMMFLAG_START")
+        else if (playbackinfo && message.left(14) == "COMMFLAG_START")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
@@ -3852,7 +3852,7 @@ void TV::customEvent(QCustomEvent *e)
                 RemoteSendMessage(msg);
             }
         }
-        else if (message.left(15) == "COMMFLAG_UPDATE")
+        else if (playbackinfo && message.left(15) == "COMMFLAG_UPDATE")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
