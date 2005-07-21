@@ -331,7 +331,6 @@ class SRSchedOptionsGroup : public ManagedListGroup
         class SREndOffset* endOffset;
         class SRDupMethod* dupMethItem;
         class SRDupIn* dupLocItem;
-        class SRTimeStretch* tsValue;
 
         ScheduledRecording *schedRec;
 };
@@ -376,6 +375,7 @@ class SRStorageOptionsGroup : public ManagedListGroup
         friend class RootSRGroup;
         class SRProfileSelector* profile;
         class SRRecGroup* recGroup;
+        class SRTimeStretch* tsValue;
         class SRAutoExpire* autoExpire;
         class SRMaxEpisodes* maxEpisodes;
         class SRMaxNewest* maxNewest;

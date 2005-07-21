@@ -30,9 +30,6 @@ SRSchedOptionsGroup::SRSchedOptionsGroup(ScheduledRecording *_rec, ManagedList* 
 
     inactive = new SRInactive(_rec, this, _parentList);
     addItem(inactive->getItem(), -1);
-
-    tsValue = new SRTimeStretch(_rec, _parentList, this);
-    addItem(tsValue->getItem(), -1);
 }
 
 
@@ -108,6 +105,9 @@ SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording *_rec, ManagedLi
 
     recGroup = new SRRecGroup(_rec, _parentList, this);
     addItem(recGroup->getItem(), -1);
+
+    tsValue = new SRTimeStretch(_rec, _parentList, this);
+    addItem(tsValue->getItem(), -1);
 
     autoExpire = new SRAutoExpire(_rec, this, parentList);
     addItem(autoExpire->getItem(), -1);
