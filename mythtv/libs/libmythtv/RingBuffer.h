@@ -23,11 +23,8 @@ class RingBuffer
                RemoteEncoder *enc = NULL);
     
    ~RingBuffer();
-#ifdef HAVE_DVDNAV
+
     bool IsOpen(void);
-#else
-    bool IsOpen(void) { return (tfw || fd2 > -1 || remotefile); }    
-#endif    
     
     int Read(void *buf, int count);
     int Write(const void *buf, int count);
