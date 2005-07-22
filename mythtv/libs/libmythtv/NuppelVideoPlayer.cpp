@@ -479,7 +479,7 @@ void NuppelVideoPlayer::ReinitVideo(void)
 QString NuppelVideoPlayer::ReinitAudio(void)
 {
     QString errMsg = QString::null;
-    if (!audioOutput)
+    if (!audioOutput && !using_null_videoout)
     {
         bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
         audioOutput = AudioOutput::OpenAudio(audiodevice, audio_bits,
