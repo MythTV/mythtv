@@ -503,7 +503,7 @@ QString NuppelVideoPlayer::ReinitAudio(void)
             disableaudio = true;
         }
     }
-    else
+    else if (audioOutput)
     {
         audioOutput->Reconfigure(audio_bits, audio_channels, audio_samplerate);
         errMsg = audioOutput->GetError();
