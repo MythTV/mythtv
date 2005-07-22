@@ -430,7 +430,10 @@ class DVDRingBufferPriv
         void getDescForPos(QString& desc){}; 
 };
 
-
+bool RingBuffer::IsOpen(void) 
+{ 
+    return tfw || (fd2 > -1) || remotefile; 
+}
 
 #endif // DVDNAV
 
