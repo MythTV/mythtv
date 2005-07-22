@@ -193,9 +193,11 @@ using_backend {
 
     # TVRec & Recorder base classes
     HEADERS += tv_rec.h
-    HEADERS += recorderbase.h              dtvrecorder.h
+    HEADERS += recorderbase.h
+    HEADERS += dtvrecorder.h               dummydtvrecorder.h
     SOURCES += tv_rec.cpp
-    SOURCES += recorderbase.cpp            dtvrecorder.cpp
+    SOURCES += recorderbase.cpp
+    SOURCES += dtvrecorder.cpp             dummydtvrecorder.cpp
 
     # MPEG parsing stuff
     HEADERS += mpeg/tspacket.h             mpeg/pespacket.h
