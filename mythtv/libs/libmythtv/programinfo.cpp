@@ -2264,6 +2264,14 @@ void ProgramInfo::ForgetHistory(void)
     if (!result.isActive())
         MythContext::DBError("forgetHistory", result);
 
+    result.prepare("DELETE FROM oldrecorded "
+                   "WHERE recstatus = :NEVER AND duplicate = 0");
+    result.bindValue(":NEVER", rsNeverRecord);
+    
+    result.exec();
+    if (!result.isActive())
+        MythContext::DBError("forgetNeverHisttory", result);
+
     if (findid)
     {
         result.prepare("DELETE FROM oldfind WHERE "

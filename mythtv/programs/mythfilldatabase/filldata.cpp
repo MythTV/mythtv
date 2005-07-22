@@ -2758,10 +2758,12 @@ void clearOldDBEntries(void)
                      kSingleRecord, kOverrideRecord, kDontRecord);
     query.exec(querystr);
 
+    int cleanOldRecorded = gContext->GetNumSetting( "CleanOldRecorded", 60);
+
     querystr.sprintf("DELETE FROM oldrecorded WHERE "
                      "recstatus <> %d AND duplicate = 0 AND "
-                     "endtime < DATE_SUB(CURRENT_DATE, INTERVAL 60 DAY);",
-                     rsRecorded);
+                     "endtime < DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);",
+                     rsRecorded, cleanOldRecorded);
     query.exec(querystr);
 }
 
