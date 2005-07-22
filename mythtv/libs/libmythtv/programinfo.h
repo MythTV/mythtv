@@ -59,6 +59,9 @@ enum FlagMask {
 };
 
 enum RecStatusType {
+    rsTunerBusy = -8,
+    rsLowDiskSpace = -7,
+    rsCancelled = -6,
     rsDeleted = -5,
     rsStopped = -4,
     rsRecorded = -3,
@@ -70,14 +73,12 @@ enum RecStatusType {
     rsCurrentRecording = 3,
     rsEarlierShowing = 4,
     rsTooManyRecordings = 5,
-    rsCancelled = 6,
+    rsNotListed = 6,
     rsConflict = 7,
     rsLaterShowing = 8,
     rsRepeat = 9,
     rsInactive = 10,
-    rsLowDiskSpace = 11,
-    rsTunerBusy = 12,
-    rsNotListed = 13
+    rsNeverRecord = 11
 };
 
 enum AvailableStatusType {
@@ -135,7 +136,9 @@ class ProgramInfo
                                const QDateTime &newendts);
     void ApplyRecordRecPriorityChange(int);
     void ToggleRecord(void);
+    void AddHistory(bool resched = true);
     void DeleteHistory(void);
+    void ForgetHistory(void);
 
     // Used to update database with recording info
     void StartedRecording(void);
@@ -279,7 +282,7 @@ class ProgramInfo
     int inputid;
     int cardid;
     bool shareable;
-    bool conflictfixed;
+    bool duplicate;
 
     QString schedulerid;
     int findid;

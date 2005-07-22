@@ -31,6 +31,7 @@
 #include "libmythtv/datadirect.h"
 #include "libmythtv/channelutil.h"
 #include "libmyth/mythdbcon.h"
+#include "libmythtv/programinfo.h"
 
 using namespace std;
 
@@ -2755,6 +2756,12 @@ void clearOldDBEntries(void)
     querystr.sprintf("DELETE FROM record WHERE (type = %d "
                      "OR type = %d OR type = %d) AND enddate < NOW();",
                      kSingleRecord, kOverrideRecord, kDontRecord);
+    query.exec(querystr);
+
+    querystr.sprintf("DELETE FROM oldrecorded WHERE "
+                     "recstatus <> %d AND duplicate = 0 AND "
+                     "endtime < DATE_SUB(CURRENT_DATE, INTERVAL 60 DAY);",
+                     rsRecorded);
     query.exec(querystr);
 }
 

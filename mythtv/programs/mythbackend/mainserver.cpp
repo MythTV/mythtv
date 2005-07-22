@@ -573,7 +573,7 @@ void MainServer::customEvent(QCustomEvent *e)
             if (pinfo)
             {
                 if (gContext->GetNumSetting("RerecordAutoExpired", 0))
-                    pinfo->DeleteHistory();
+                    pinfo->ForgetHistory();
                 DoHandleDeleteRecording(pinfo, NULL, false);
             }
             else
@@ -1760,7 +1760,7 @@ void MainServer::HandleForgetRecording(QStringList &slist, PlaybackSock *pbs)
     if (pbs)
         pbssock = pbs->getSocket();
 
-    pginfo->DeleteHistory();
+    pginfo->ForgetHistory();
 
     if (pbssock)
     {

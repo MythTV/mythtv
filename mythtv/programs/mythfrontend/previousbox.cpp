@@ -83,7 +83,7 @@ PreviousBox::PreviousBox(MythMainWindow *parent, const char *name)
     chooseHour = NULL;
 
     curView = -1;
-    fillViewList(view);
+    fillViewList("time");
 
     curItem = -1;
     fillItemList();
@@ -400,17 +400,17 @@ void PreviousBox::fillViewList(const QString &view)
     viewList.clear();
     viewTextList.clear();
 
-    viewList << "sort by title";
-    viewTextList << tr("Sort by Title");
-
-    viewList << "reverse title";
-    viewTextList << tr("Reverse Title");
-
     viewList << "sort by time";
     viewTextList << tr("Sort by Time");
 
     viewList << "reverse time";
     viewTextList << tr("Reverse Time");
+
+    viewList << "sort by title";
+    viewTextList << tr("Sort by Title");
+
+    viewList << "reverse title";
+    viewTextList << tr("Reverse Title");
 
     curView = viewList.findIndex(view);
 
@@ -450,9 +450,9 @@ class pbTimeSort
         bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
         {
             if (m_reverse)
-                return (a->startts > b->startts);
-            else
                 return (a->startts < b->startts);
+            else
+                return (a->startts > b->startts);
         }
 
     private:
@@ -571,6 +571,14 @@ void PreviousBox::updateList(QPainter *p)
                 }
 
                 ltype->SetItemText(i, 3, tmptitle);
+
+                if (pi->recstatus == rsRecording)
+                    ltype->EnableForcedFont(i, "recording");
+                else if (pi->recstatus < rsRecorded ||
+                         pi->recstatus == rsConflict)
+                    ltype->EnableForcedFont(i, "conflicting");
+                else if (pi->recstatus > rsRecorded)
+                    ltype->EnableForcedFont(i, "inactive");
 
                 //if ((pi->catType == "series" &&
                 //     pi->programid.contains(QRegExp(".*0000$"))) ||

@@ -108,15 +108,7 @@ public:
 
     // Do any necessary bookkeeping after a matching program has been
     // recorded
-    void doneRecording(const ProgramInfo& proginfo);
-
-    // Remember a program has been reccorded before (means it won't
-    // be recorded again)
-    void addHistory(const ProgramInfo& proginfo);
-
-    // Forget whether a program has been recorded before (allows it to
-    // be recorded again)
-    void forgetHistory(const ProgramInfo& proginfo);
+    void doneRecording(ProgramInfo& proginfo);
 
     static void fillSelections(SelectSetting* setting);
 

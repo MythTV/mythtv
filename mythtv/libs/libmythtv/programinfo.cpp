@@ -97,6 +97,7 @@ ProgramInfo::ProgramInfo(void)
     inputid = 0;
     cardid = 0;
     shareable = false;
+    duplicate = false;
     schedulerid = "";
     findid = 0;
     recpriority = 0;
@@ -184,6 +185,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     inputid = other.inputid;
     cardid = other.cardid;
     shareable = other.shareable;
+    duplicate = other.duplicate;
     schedulerid = other.schedulerid;
     findid = other.findid;
     recpriority = other.recpriority;
@@ -263,7 +265,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
 
     DATETIME_TO_LIST(startts)
     DATETIME_TO_LIST(endts)
-    STR_TO_LIST(QString::null) // dummy place holder
+    INT_TO_LIST(duplicate)
     INT_TO_LIST(shareable)
     INT_TO_LIST(findid);
     STR_TO_LIST(hostname)
@@ -506,9 +508,12 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap) const
         }
         else
         {
-            progMap["rec_str"] += " - ";
+            progMap["rec_str"] += " -- ";
         }
-        progMap["rec_str"] += RecStatusText();
+        if (recstatus == rsRecorded && !duplicate)
+            progMap["rec_str"] += QObject::tr("Re-Record");
+        else
+            progMap["rec_str"] += RecStatusText();
     }
     progMap["recordingstatus"] = progMap["rec_str"];
     progMap["type"] = progMap["rec_str"];
@@ -2144,13 +2149,136 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
     }
 }
 
+/** \fn ProgramInfo::AddHistory(bool resched)
+ *  \brief Adds recording history, creating "record" it if necessary.
+ */
+void ProgramInfo::AddHistory(bool resched)
+{
+    bool dup = (recstatus == rsRecording || 
+                recstatus == rsRecorded ||
+                recstatus == rsNeverRecord);
+    RecStatusType rs = (recstatus == rsCurrentRecording) ?
+        rsPreviousRecording : recstatus;
+
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
+                   "endtime,title,subtitle,description,category,"
+                   "seriesid,programid,findid,recordid,station,"
+                   "rectype,recstatus,duplicate) "
+                   "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
+                   ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID,"
+                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE);");
+    result.bindValue(":CHANID", chanid);
+    result.bindValue(":START", startts.toString(Qt::ISODate));
+    result.bindValue(":END", endts.toString(Qt::ISODate));
+    result.bindValue(":TITLE", title.utf8());
+    result.bindValue(":SUBTITLE", subtitle.utf8());
+    result.bindValue(":DESC", description.utf8());
+    result.bindValue(":CATEGORY", category.utf8());
+    result.bindValue(":SERIESID", seriesid.utf8());
+    result.bindValue(":PROGRAMID", programid.utf8());
+    result.bindValue(":FINDID", findid);
+    result.bindValue(":RECORDID", recordid);
+    result.bindValue(":STATION", chansign);
+    result.bindValue(":RECTYPE", rectype);
+    result.bindValue(":RECSTATUS", rs);
+    result.bindValue(":DUPLICATE", dup);
+
+    result.exec();
+    if (!result.isActive())
+        MythContext::DBError("addHistory", result);
+
+    if (dup && findid)
+    {
+        result.prepare("REPLACE INTO oldfind (recordid, findid) "
+                       "VALUES(:RECORDID,:FINDID);");
+        result.bindValue(":RECORDID", recordid);
+        result.bindValue(":FINDID", findid);
+    
+        result.exec();
+        if (!result.isActive())
+            MythContext::DBError("addFindHistory", result);
+    }
+
+    // The removal of an entry from oldrecorded may affect near-future
+    // scheduling decisions, so recalculate
+    if (resched)
+        ScheduledRecording::signalChange(0);
+}
+
 /** \fn ProgramInfo::DeleteHistory()
  *  \brief Deletes recording history, creating "record" it if necessary.
  */
 void ProgramInfo::DeleteHistory(void)
 {
-    GetProgramRecordingStatus();
-    record->forgetHistory(*this);
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    result.prepare("DELETE FROM oldrecorded WHERE title = :TITLE AND "
+                   "starttime = :START AND station = :STATION");
+    result.bindValue(":TITLE", title.utf8());
+    result.bindValue(":START", recstartts);
+    result.bindValue(":STATION", chansign);
+    
+    result.exec();
+    if (!result.isActive())
+        MythContext::DBError("deleteHistory", result);
+
+    if (/*duplicate &&*/ findid)
+    {
+        result.prepare("DELETE FROM oldfind WHERE "
+                       "recordid = :RECORDID AND findid = :FINDID");
+        result.bindValue(":RECORDID", recordid);
+        result.bindValue(":FINDID", findid);
+    
+        result.exec();
+        if (!result.isActive())
+            MythContext::DBError("deleteFindHistory", result);
+    }
+
+    // The removal of an entry from oldrecorded may affect near-future
+    // scheduling decisions, so recalculate
+    ScheduledRecording::signalChange(0);
+}
+
+/** \fn ProgramInfo::ForgetHistory()
+ *  \brief Forget the recording of a program so it will be recorded again.
+ */
+void ProgramInfo::ForgetHistory(void)
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    result.prepare("UPDATE oldrecorded SET duplicate = 0 "
+                   "WHERE duplicate = 1 "
+                   "AND title = :TITLE AND "
+                   "((subtitle = :SUBTITLE AND description = :DESC) OR "
+                   "(programid <> '' AND programid = :PROGRAMID) OR "
+                   "(findid <> 0 AND findid = :FINDID))");
+    result.bindValue(":TITLE", title.utf8());
+    result.bindValue(":SUBTITLE", subtitle.utf8());
+    result.bindValue(":DESC", description.utf8());
+    result.bindValue(":PROGRAMID", programid);
+    result.bindValue(":FINDID", findid);
+    
+    result.exec();
+    if (!result.isActive())
+        MythContext::DBError("forgetHistory", result);
+
+    if (findid)
+    {
+        result.prepare("DELETE FROM oldfind WHERE "
+                       "recordid = :RECORDID AND findid = :FINDID");
+        result.bindValue(":RECORDID", recordid);
+        result.bindValue(":FINDID", findid);
+    
+        result.exec();
+        if (!result.isActive())
+            MythContext::DBError("forgetFindHistory", result);
+    }
+
+    // The removal of an entry from oldrecorded may affect near-future
+    // scheduling decisions, so recalculate
+    ScheduledRecording::signalChange(0);
 }
 
 /** \fn ProgramInfo::RecTypeChar(void) const
@@ -2259,6 +2387,8 @@ QString ProgramInfo::RecStatusChar(void) const
         return QObject::tr("B", "RecStatusChar rsTunerBusy");
     case rsNotListed:
         return QObject::tr("N", "RecStatusChar rsNotListed");
+    case rsNeverRecord:
+        return QObject::tr("V", "RecStatusChar rsNeverRecord");
     default:
         return "-";
     }
@@ -2311,6 +2441,8 @@ QString ProgramInfo::RecStatusText(void) const
             return QObject::tr("Tuner Busy");
         case rsNotListed:
             return QObject::tr("Not Listed");
+        case rsNeverRecord:
+            return QObject::tr("Never Record");
         default:
             return QObject::tr("Unknown");
         }
@@ -2409,6 +2541,9 @@ QString ProgramInfo::RecStatusDesc(void) const
         case rsNotListed:
             message += QObject::tr("this show does not match the current "
                                    "program listings.");
+            break;            
+        case rsNeverRecord:
+            message += QObject::tr("it was marked to never be recorded.");
             break;            
         default:
             message += QObject::tr("you should never see this.");
@@ -2901,8 +3036,10 @@ void ProgramInfo::ShowRecordingDialog(void)
         ApplyRecordStateChange(kDontRecord);
     else if (ret == forget)
     {
-        GetProgramRecordingStatus();
-        record->addHistory(*this);
+        recstatus = rsNeverRecord;
+        startts = QDateTime::currentDateTime();
+        endts = recstartts;
+        AddHistory();
     }
     else if (ret == clearov)
         ApplyRecordStateChange(kNotRecording);
@@ -3052,16 +3189,15 @@ void ProgramInfo::ShowNotRecordingDialog(void)
             RemoteReactivateRecording(this);
     }
     else if (ret == forget)
-    {
-        GetProgramRecordingStatus();
-        record->forgetHistory(*this);
-    }
+        ForgetHistory();
     else if (ret == addov1)
         ApplyRecordStateChange(kDontRecord);
     else if (ret == forget1)
     {
-        GetProgramRecordingStatus();
-        record->addHistory(*this);
+        recstatus = rsNeverRecord;
+        startts = QDateTime::currentDateTime();
+        endts = recstartts;
+        AddHistory();
     }
     else if (ret == clearov)
         ApplyRecordStateChange(kNotRecording);
@@ -3130,25 +3266,44 @@ bool ProgramList::FromProgram(const QString sql, ProgramList &schedList)
     clear();
 
     QString querystr = QString(
-        "SELECT program.chanid, program.starttime, program.endtime, "
+        "SELECT DISTINCT program.chanid, program.starttime, program.endtime, "
         "    program.title, program.subtitle, program.description, "
         "    program.category, channel.channum, channel.callsign, "
         "    channel.name, program.previouslyshown, channel.commfree, "
         "    channel.outputfilters, program.seriesid, program.programid, "
         "    program.airdate, program.stars, program.originalairdate, "
-        "    program.category_type "
+        "    program.category_type, oldrecorded.starttime IS NOT NULL "
         "FROM program "
         "LEFT JOIN channel ON program.chanid = channel.chanid "
-        "%1 ").arg(sql);
+        "LEFT JOIN oldrecorded ON "
+        "    oldrecorded.recstatus = -3 AND "
+        "    program.title = oldrecorded.title "
+        "     AND "
+        "     ( "
+        "      (program.programid <> '' AND NOT "
+        "       (program.category_type = 'series' AND "
+        "        program.programid LIKE '%0000') "
+        "       AND program.programid = oldrecorded.programid) "
+        "      OR "
+        "      ( "
+        "       (program.programid = '' OR oldrecorded.programid = '') "
+        "       AND "
+        "       ((program.subtitle <> '' "
+        "          AND program.subtitle = oldrecorded.subtitle)) "
+        "       AND "
+        "       ((program.description <> '' "
+        "          AND program.description = oldrecorded.description)) "
+        "      ) "
+        "   ) ") + sql;
 
     if (!sql.contains(" GROUP BY "))
-        querystr += "GROUP BY program.starttime, channel.channum, "
+        querystr += " GROUP BY program.starttime, channel.channum, "
             "  channel.callsign, program.title ";
     if (!sql.contains(" ORDER BY "))
-        querystr += QString("ORDER BY program.starttime, %2 ")
+        querystr += QString(" ORDER BY program.starttime, %2 ")
             .arg(gContext->GetSetting("ChannelOrdering", "channum+0"));
     if (!sql.contains(" LIMIT "))
-        querystr += "LIMIT 1000 ";
+        querystr += " LIMIT 1000 ";
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
@@ -3198,6 +3353,8 @@ bool ProgramList::FromProgram(const QString sql, ProgramList &schedList)
             p->hasAirDate = true;
         }
         p->catType = query.value(18).toString();
+        p->duplicate = query.value(19).toInt();
+        //cout << p->duplicate << " " << query.value(1).toString() << " " << p->title << endl;
 
         ProgramInfo *s;
         for (s = schedList.first(); s; s = schedList.next())
@@ -3232,7 +3389,8 @@ bool ProgramList::FromOldRecorded(const QString sql)
     query.prepare("SELECT oldrecorded.chanid, starttime, endtime, "
                   " title, subtitle, description, category, seriesid, "
                   " programid, channel.channum, channel.callsign, "
-                  " channel.name, findid "
+                  " channel.name, findid, rectype, recstatus, recordid, "
+                  " duplicate "
                   " FROM oldrecorded "
                   " LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
                   + sql);
@@ -3265,7 +3423,10 @@ bool ProgramList::FromOldRecorded(const QString sql)
         p->chansign = QString::fromUtf8(query.value(10).toString());
         p->channame = QString::fromUtf8(query.value(11).toString());
         p->findid = query.value(12).toInt();
-        p->recstatus = rsPreviousRecording;
+        p->rectype = RecordingType(query.value(13).toInt());
+        p->recstatus = RecStatusType(query.value(14).toInt());
+        p->recordid = query.value(15).toInt();
+        p->duplicate = query.value(16).toInt();
 
         append(p);
     }

@@ -421,9 +421,7 @@ void Scheduler::PruneOldRecords(void)
     {
         ProgramInfo *p = *dreciter;
         if (p->recendts < deltime ||
-            (p->recstartts > schedTime && p->recstatus >= rsWillRecord && 
-             p->recstatus != rsCancelled && p->recstatus != rsLowDiskSpace && 
-             p->recstatus != rsTunerBusy))
+            (p->recstartts > schedTime && p->recstatus >= rsWillRecord))
         {
             delete p;
             dreciter = reclist.erase(dreciter);
@@ -989,7 +987,7 @@ void Scheduler::RunScheduler(void)
       }
 
         for ( ; startIter != reclist.end(); startIter++)
-            if ((*startIter)->recstatus == rsWillRecord)
+            if ((*startIter)->spread < 1)
                 break;
 
         curtime = QDateTime::currentDateTime();
@@ -1002,7 +1000,15 @@ void Scheduler::RunScheduler(void)
             nextRecording = *recIter;
 
             if (nextRecording->recstatus != rsWillRecord)
+            {
+                if (nextRecording->spread < 1 &&
+                    nextRecording->recstartts <= curtime)
+                {
+                    nextRecording->AddHistory(false);
+                    nextRecording->spread = 1;
+                }
                 continue;
+            }
 
             nextrectime = nextRecording->recstartts;
             secsleft = curtime.secsTo(nextrectime);
@@ -1019,6 +1025,8 @@ void Scheduler::RunScheduler(void)
 
                 QMutexLocker lockit(reclist_lock);
                 nextRecording->recstatus = rsTunerBusy;
+                nextRecording->AddHistory(true);
+                nextRecording->spread = 1;
                 statuschanged = true;
                 continue;
             }
@@ -1040,6 +1048,8 @@ void Scheduler::RunScheduler(void)
                 VERBOSE(VB_GENERAL, msg);
                 QMutexLocker lockit(reclist_lock);
                 nextRecording->recstatus = rsLowDiskSpace;
+                nextRecording->AddHistory(true);
+                nextRecording->spread = 1;
                 statuschanged = true;
                 continue;
             }
@@ -1057,6 +1067,8 @@ void Scheduler::RunScheduler(void)
 
                 QMutexLocker lockit(reclist_lock);
                 nextRecording->recstatus = rsTunerBusy;
+                nextRecording->AddHistory(true);
+                nextRecording->spread = 1;
                 statuschanged = true;
                 continue;
             }
@@ -1101,6 +1113,8 @@ void Scheduler::RunScheduler(void)
             {
                 msg = "Started recording";
                 nextRecording->recstatus = rsRecording;
+                //nextRecording->AddHistory(false);
+                nextRecording->spread = 1;
             }
             else
             {
@@ -1109,6 +1123,8 @@ void Scheduler::RunScheduler(void)
                     nextRecording->recstatus = rsTunerBusy;
                 else
                     nextRecording->recstatus = rsCancelled;
+                nextRecording->AddHistory(true);
+                nextRecording->spread = 1;
             }
             statuschanged = true;
 
@@ -1736,6 +1752,7 @@ void Scheduler::AddNewRecords(void) {
 " LEFT JOIN oldrecorded ON "
 "  ( "
 "    record.dupmethod > 1 AND "
+"    oldrecorded.duplicate <> 0 AND "
 "    program.title = oldrecorded.title "
 "     AND "
 "     ( "

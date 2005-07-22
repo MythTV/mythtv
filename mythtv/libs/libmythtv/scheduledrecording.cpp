@@ -442,7 +442,7 @@ void ScheduledRecording::signalChange(int recordid)
     }
 }
 
-void ScheduledRecording::doneRecording(const ProgramInfo& proginfo) 
+void ScheduledRecording::doneRecording(ProgramInfo& proginfo) 
 {
     if (getRecordingType() == kFindOneRecord)
         remove();
@@ -457,94 +457,9 @@ void ScheduledRecording::doneRecording(const ProgramInfo& proginfo)
     gContext->LogEntry("scheduler", LP_NOTICE, "Finished recording", 
                        msg);
 
-    addHistory(proginfo);
+    proginfo.recstatus = rsRecorded;
+    proginfo.AddHistory();
 }
-
-void ScheduledRecording::addHistory(const ProgramInfo& proginfo) 
-{
-    MSqlQuery result(MSqlQuery::InitCon());
-
-    result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
-                   "endtime,title,subtitle,description,category,"
-                   "seriesid,programid,findid,recordid) "
-                   "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
-                   ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID);");
-    result.bindValue(":CHANID", proginfo.chanid);
-    result.bindValue(":START", proginfo.recstartts.toString(Qt::ISODate));
-    result.bindValue(":END", proginfo.recendts.toString(Qt::ISODate));
-    result.bindValue(":TITLE", proginfo.title.utf8());
-    result.bindValue(":SUBTITLE", proginfo.subtitle.utf8());
-    result.bindValue(":DESC", proginfo.description.utf8());
-    result.bindValue(":CATEGORY", proginfo.category.utf8());
-    result.bindValue(":SERIESID", proginfo.seriesid.utf8());
-    result.bindValue(":PROGRAMID", proginfo.programid.utf8());
-    result.bindValue(":FINDID", proginfo.findid);
-    result.bindValue(":RECORDID", proginfo.recordid);
-
-    result.exec();
-
-    if (!result.isActive())
-    {
-        MythContext::DBError("addHistory", result);
-    }
-
-    if (proginfo.findid)
-    {
-        result.prepare("REPLACE INTO oldfind (recordid, findid) "
-                       "VALUES(:RECORDID,:FINDID);");
-        result.bindValue(":RECORDID", proginfo.recordid);
-        result.bindValue(":FINDID", proginfo.findid);
-    
-        result.exec();
-        if (!result.isActive())
-        {
-            MythContext::DBError("addFindHistory", result);
-        }
-    }
-    // The removal of an entry from oldrecorded may affect near-future
-    // scheduling decisions, so recalculate
-    signalChange(0);
-}
-
-void ScheduledRecording::forgetHistory(const ProgramInfo& proginfo)
-{
-    MSqlQuery result(MSqlQuery::InitCon());
-
-    result.prepare("DELETE FROM oldrecorded WHERE title = :TITLE AND "
-                   "((subtitle = :SUBTITLE AND description = :DESC) OR "
-                   "(programid <> '' AND programid = :PROGRAMID) OR "
-                   "(findid <> 0 AND findid = :FINDID))");
-    result.bindValue(":TITLE", proginfo.title.utf8());
-    result.bindValue(":SUBTITLE", proginfo.subtitle.utf8());
-    result.bindValue(":DESC", proginfo.description.utf8());
-    result.bindValue(":PROGRAMID", proginfo.programid);
-    result.bindValue(":FINDID", proginfo.findid);
-    
-    result.exec();
-    if (!result.isActive())
-    {
-        MythContext::DBError("forgetHistory", result);
-    }
-
-    if (proginfo.findid)
-    {
-        result.prepare("DELETE FROM oldfind WHERE "
-                       "recordid = :RECORDID AND findid = :FINDID");
-        result.bindValue(":RECORDID", proginfo.recordid);
-        result.bindValue(":FINDID", proginfo.findid);
-    
-        result.exec();
-        if (!result.isActive())
-        {
-            MythContext::DBError("forgetFindHistory", result);
-        }
-    }
-    // The removal of an entry from oldrecorded may affect near-future
-    // scheduling decisions, so recalculate
-    signalChange(0);
-}
-
-
 
 void ScheduledRecording::runProgList(void)
 {
