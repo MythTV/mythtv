@@ -107,6 +107,7 @@ public:
         {
             addSelection(GameTypeList[i].nameStr, GameTypeList[i].idStr);
         }
+        setValue(0);
         setHelpText(QObject::tr("Type of Game/Emulator. Mostly for informational purposes and has little effect on the function of your system."));
     };
 };
