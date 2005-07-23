@@ -176,7 +176,8 @@ bool Metadata::fillDataFromFilename()
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT intid FROM videometadata WHERE filename = :FILE ;");
+    QString thequery = "SELECT intid FROM videometadata WHERE filename = :FILE ;";
+    query.prepare(thequery);
     query.bindValue(":FILE", filename.utf8());
 
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -186,9 +187,17 @@ bool Metadata::fillDataFromFilename()
         id = query.value(0).toInt();
 
         return fillDataFromID();
-    }
+    } 
 
-    MythContext::DBError("fillfromfilename", query);
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (Deleting old DB version number): \n"
+                    "Query was: %1 \nError was: %2 \n")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()));
+        VERBOSE(VB_IMPORTANT, msg);
+    }
 
     return false;
 }
