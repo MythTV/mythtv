@@ -75,7 +75,7 @@ class SIScan : public QObject
 
     void SetSourceID(int _SourceID)   { sourceID                = _SourceID; }
     void SetFTAOnly(bool _fFTAOnly)   { ignoreEncryptedServices = _fFTAOnly; }
-    void SetRadioServices(bool _fRadio) { RadioServices         = _fRadio;   }
+    void SetTVOnly(bool _tvOnly)      { ignoreAudioOnlyServices = _tvOnly;   }
     void SetForceUpdate(bool _force)  { forceUpdate             = _force;    }
     void SetScanTimeout(int _timeout) { scanTimeout             = _timeout;  }
     void SetChannelFormat(const QString _fmt) { channelFormat   = _fmt; }
@@ -110,6 +110,8 @@ class SIScan : public QObject
     /// \brief Thunk to call RunScanner from pthread
     static void *SpawnScanner(void *param);
 
+    void HandleActiveScan(void);
+
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
 
@@ -140,7 +142,7 @@ class SIScan : public QObject
     SCANMODE          scanMode;
 
     // Settable
-    bool              RadioServices;
+    bool              ignoreAudioOnlyServices;
     bool              ignoreEncryptedServices;
     bool              forceUpdate;
     int               scanTimeout;
@@ -168,6 +170,9 @@ class SIScan : public QObject
     /// Scanner thread, runs SIScan::StartScanner()
     pthread_t        scanner_thread;
     bool             scanner_thread_running;
+
+    /// EIT Helper, if USING_DVB is true
+    EITHelper       *eitHelper;
 };
 
 inline void SIScan::UpdateScanPercentCompleted(void)
