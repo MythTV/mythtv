@@ -13,9 +13,12 @@
 class DummyDTVRecorder: public DTVRecorder
 {
   public:
-    DummyDTVRecorder::DummyDTVRecorder(bool tsmode = true,
-                                       RingBuffer *rbuffer = NULL,
-                                       bool autoStart = true);
+    DummyDTVRecorder::DummyDTVRecorder(
+        bool tsmode = true,        RingBuffer *rbuffer = NULL,
+        uint desired_width = 1920, uint desired_height = 1088,
+        double desired_frame_rate = 29.97,
+        bool autoStart = true);
+
     DummyDTVRecorder::~DummyDTVRecorder();
 
     void SetOptionsFromProfile(RecordingProfile*, const QString&,

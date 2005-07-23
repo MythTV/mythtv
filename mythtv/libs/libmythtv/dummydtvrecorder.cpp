@@ -41,9 +41,13 @@ OR, convert it to a ps or pes stream and use the following
 \endcode
  */
 
-DummyDTVRecorder::DummyDTVRecorder(bool tsmode, RingBuffer *rbuffer, bool autoStart)
+DummyDTVRecorder::DummyDTVRecorder(bool tsmode, RingBuffer *rbuffer,
+                                   uint desired_width, uint desired_height,
+                                   double desired_frame_rate,
+                                   bool autoStart)
     : _tsmode(tsmode),
-      _desired_width(1920), _desired_height(1088), _desired_frame_rate(29.97),
+      _desired_width(desired_width), _desired_height(desired_height),
+      _desired_frame_rate(desired_frame_rate),
       _stream_data(-1)
 {
     gettimeofday(&_next_frame_time, NULL);
@@ -81,11 +85,13 @@ void DummyDTVRecorder::SetDesiredAttributes(uint width, uint height,
 
 void DummyDTVRecorder::StartRecording(void)
 {
-    VERBOSE(VB_RECORD, QString("StartRecording"));
+    VERBOSE(VB_RECORD, QString("DummyDTVRecorder::StartRecording -- begin"));
 
     if (!Open())
     {
-        _error = true;        
+        VERBOSE(VB_IMPORTANT,
+                QString("DummyDTVRecorder::StartRecording -- open failed"));
+        _error = true;
         return;
     }
 
@@ -114,6 +120,7 @@ void DummyDTVRecorder::StartRecording(void)
 
     FinishRecording();
     _recording = false;
+    VERBOSE(VB_RECORD, QString("DummyDTVRecorder::StartRecording -- end"));
 }
 
 /** \fn DummyDTVRecorder::Open()
@@ -125,14 +132,16 @@ void DummyDTVRecorder::StartRecording(void)
  */
 bool DummyDTVRecorder::Open(void)
 {
-    QString filename = QString("dummy%1x%2a%3.%4")
+    QString filename = QString("%1dummy%2x%3a%4.%5")
         .arg(gContext->GetShareDir()+"videos/")
         .arg(_desired_width).arg(_desired_height)
         .arg(_desired_frame_rate, 0, 'f', 2)
         .arg(_tsmode ? "ts" : "pes");
 
+    VERBOSE(VB_IMPORTANT, "Opening: "<<filename);
+
     SetFrameRate(_desired_frame_rate);
-    _stream_fd = open(filename.ascii(), O_RDWR);    
+    _stream_fd = open(filename.ascii(), O_RDONLY);
 
     return _stream_fd >= 0;
 }
