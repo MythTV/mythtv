@@ -211,13 +211,17 @@ void *ScanWizardScanner::SpawnTune(void *param)
     {
 #ifdef USING_DVB
         if (scanner->GetDVBChannel())
-            ok = scanner->GetDVBChannel()->Tune(scanner->chan_opts, true);
+            ok = scanner->GetDVBChannel()->TuneTransport(scanner->chan_opts, true);
 #endif
 #ifdef USING_V4L
         if (scanner->GetChannel())
             ok = scanner->GetChannel()->Tune(scanner->frequency,
                                              scanner->modulation);
 #endif
+    }
+    else
+    {
+        ok = true;
     }
 
     e->intValue((ok) ? ScannerEvent::OK : ScannerEvent::ERROR_TUNE);
