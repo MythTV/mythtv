@@ -62,8 +62,8 @@ TransportScanItem::TransportScanItem(int sourceid,
     if (standard == "dvb" && dvbft)
     {
         tuning.params.inversion                    = dvbft->inversion;
-        freq_offsets[1]                            = dvbft->offset1;
-        freq_offsets[2]                            = dvbft->offset2;
+        freq_offsets[1] = offset1                  = dvbft->offset1;
+        freq_offsets[2] = offset2                  = dvbft->offset2;
         tuning.params.u.ofdm.bandwidth             = dvbft->bandwidth;
         tuning.params.u.ofdm.code_rate_HP          = dvbft->coderate_hp;
         tuning.params.u.ofdm.code_rate_LP          = dvbft->coderate_lp;

@@ -579,48 +579,13 @@ bool SIScan::ScanTransports(int SourceID,
             if (strNameFormat.length() >= 2)
                 name = strNameFormat.arg(name_num);
 
-            if (si_std == "atsc")
-            {
-                TransportScanItem item(SourceID, si_std, name, name_num, freq, ft);
-                scanTransports += item;
+            TransportScanItem item(SourceID, si_std, name, name_num, freq, ft);
+            scanTransports += item;
 
-                VERBOSE(VB_SIPARSER, "Created ATSC Transport Item");
-                VERBOSE(VB_SIPARSER, item.toString());
-            }
-            else
-            {
-#ifdef USING_DVB
-                const DVBFrequencyTable *f = dynamic_cast<const DVBFrequencyTable*>(&ft);
-                assert(f);
-                TransportScanItem item;
-                item.SourceID = SourceID;
-                item.standard = si_std;
-                item.timeoutTune = TransportScanItem::DVBT_TUNINGTIMEOUT;
-            
-                item.tuning.params.frequency = freq;
-                item.tuning.params.inversion = f->inversion;
-                item.tuning.params.u.ofdm.bandwidth = f->bandwidth;
-                item.tuning.params.u.ofdm.code_rate_HP = f->coderate_hp;
-                item.tuning.params.u.ofdm.code_rate_LP = f->coderate_lp;
-                item.tuning.params.u.ofdm.constellation = f->constellation;
-                item.tuning.params.u.ofdm.transmission_mode = f->trans_mode;
-                item.tuning.params.u.ofdm.guard_interval = f->guard_interval;
-                item.tuning.params.u.ofdm.hierarchy_information = f->hierarchy;
-            
-                item.offset1 = f->offset1;
-                item.offset2 = f->offset2;
+            VERBOSE(VB_SIPARSER, "Created Transport Item");
+            VERBOSE(VB_SIPARSER, item.toString());
 
-                VERBOSE(VB_SIPARSER, "Created Transport Item");
-                VERBOSE(VB_SIPARSER, item.toString());
-
-                verifyTransport(item);
-
-                VERBOSE(VB_SIPARSER, "Transport After Verify");
-                VERBOSE(VB_SIPARSER, item.toString());
-
-                scanTransports += item;
-#endif // USING_DVB
-            }
+            verifyTransport(item);
 
             transportsCount++;
 
