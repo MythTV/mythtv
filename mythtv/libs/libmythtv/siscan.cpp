@@ -50,104 +50,6 @@ typedef int fe_type_t;
 /// \brief How long we wait for DVB tables, before giving up
 #define DVB_TABLES_TIMEOUT  40000
 
-#ifdef USING_DVB
-struct FrequencyTableOld
-{
-    int frequencyStart;                 //The staring centre frequency
-    int frequencyEnd;                   //The ending centre frequency
-    int frequencyStep;                  //The step in frequency
-    QString name_format;                //pretty name format
-    int name_offset;                    //Offset to add to the pretty name
-    fe_spectral_inversion_t inversion;
-    fe_bandwidth_t bandwidth;
-    fe_code_rate_t coderate_hp;
-    fe_code_rate_t coderate_lp;
-    fe_modulation_t constellation;  
-    fe_transmit_mode_t trans_mode; 
-    fe_guard_interval_t guard_interval;
-    fe_hierarchy_t hierarchy;
-    fe_modulation_t modulation;
-    int offset1;                       //The first offset from the centre f'
-    int offset2;                       //The second offset from the center f'
-};
-
-FrequencyTableOld frequenciesUK[]=
-{
-   {474000000,850000000,8000000,"",0,INVERSION_OFF,BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_2K,GUARD_INTERVAL_1_32,HIERARCHY_NONE,QAM_AUTO,166670,-166670},
-   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
-};
-
-FrequencyTableOld frequenciesFI[]=
-{
-   {474000000,850000000,8000000,"",0,INVERSION_OFF,BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,0,0},
-   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
-};
-
-FrequencyTableOld frequenciesSE[]=
-{
-   {474000000,850000000,8000000,"",0,INVERSION_OFF,BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,0,0},
-   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
-};
-
-FrequencyTableOld frequenciesAU[]=
-{
-   // VHF 6-12
-   {177500000,226500000,7000000,"",0,INVERSION_OFF,
-    BANDWIDTH_7_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,
-    TRANSMISSION_MODE_8K,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,125000,0},
-   // UHF 28-69
-   {529500000,816500000,7000000,"",0,INVERSION_OFF,
-    BANDWIDTH_7_MHZ,FEC_AUTO,FEC_AUTO,QAM_64,
-    TRANSMISSION_MODE_8K,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,125000,0},
-
-   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
-};
-
-FrequencyTableOld frequenciesDE[]=
-{
-   // VHF 6-12
-   {177500000,226500000,7000000,"",0,INVERSION_OFF,
-    BANDWIDTH_7_MHZ,FEC_AUTO,FEC_AUTO,QAM_AUTO,
-    TRANSMISSION_MODE_8K,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,125000,0},
-   // UHF 21-65
-   {474000000,826000000,8000000,"",0,INVERSION_OFF,
-    BANDWIDTH_8_MHZ,FEC_AUTO,FEC_AUTO,QAM_AUTO,
-    TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_NONE,QAM_AUTO,125000,0},
-
-   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0
-},
-};
-
-FrequencyTableOld *frequenciesDVBT[]=
-{
-   frequenciesAU,
-   frequenciesFI,
-   frequenciesSE,
-   frequenciesUK,
-   frequenciesDE,
-};
-
-FrequencyTableOld frequenciesATSC_T[]=
-{
-#if (DVB_API_VERSION_MINOR == 1)
-   // VHF 2-6 
-   {57000000,85000000,6000000,"ATSC Channel %1",2,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,VSB_8,0,0},
-   // VHF 7-13
-   {177000000,213000000,6000000,"ATSC Channel %1",7,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,VSB_8,0,0},
-   // UHF 14-69
-   {473000000,803000000,6000000,"ATSC Channel %1",14,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,VSB_8,0,0},
-#endif
-   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
-};
-
-FrequencyTableOld frequenciesATSC_C[]=
-{
-   {75000000,801000000,6000000,"QAM Channel %1",1,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_256,0,0},
-   {10000000,52000000,6000000,"QAM Channel T-%1",7,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_256,0,0},
-   {0,0,0,"",0,INVERSION_AUTO,BANDWIDTH_AUTO,FEC_AUTO,FEC_AUTO,QAM_AUTO,TRANSMISSION_MODE_AUTO,GUARD_INTERVAL_AUTO,HIERARCHY_AUTO,QAM_AUTO,0,0},
-};
-#endif // USING_DVB
-
 /** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
  */
 SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
@@ -653,132 +555,85 @@ bool SIScan::ScanTransports(int SourceID,
                             const QString modulation,
                             const QString country)
 {
-    QMap<QString, uint> country_to_table_num;
-    country_to_table_num["au"] = 0;
-    country_to_table_num["fi"] = 1;
-    country_to_table_num["se"] = 2;
-    country_to_table_num["uk"] = 3;
-    country_to_table_num["de"] = 4;
-
-    if (std.lower() == "atsc")
-        return ATSCScanTransport(SourceID, (modulation == "vsb8") ? 0 : 1);
-    else
-        return DVBTScanTransport(SourceID, country_to_table_num[country]);
-}
-
-
-bool SIScan::ATSCScanTransport(int SourceID, int FrequencyBand)
-{
-#if (DVB_API_VERSION_MINOR == 1)
+    QString si_std = (std.lower() != "atsc") ? "dvb" : "atsc";
+    QString name("");
     if (scanMode == TRANSPORT_LIST)
         return false;
 
-    FrequencyTableOld *t = NULL;
-    switch (FrequencyBand)
-    {
-        case 0:
-            t = frequenciesATSC_T;
-            break;
-        case 1:
-            t = frequenciesATSC_C;
-            break;
-        default:
-            return false;
-    }
-
     scanTransports.clear();
     transportsCount=0;
+
+    freq_table_list_t tables = get_matching_freq_tables(std, modulation, country);
+    VERBOSE(VB_IMPORTANT, QString("Looked up freq table (%1, %2, %3)")
+            .arg(std).arg(modulation).arg(country));
 	
-    /* Now generate a list of frequencies to scan and add it to the atscScanTransportList */
-    while (t && t->frequencyStart)
+    freq_table_list_t::iterator it = tables.begin();
+    for (; it != tables.end(); ++it)
     {
-        FrequencyTableOld *f = t;
-        int name_num = f->name_offset;
-        QString strNameFormat = f->name_format;
-        for (int x = f->frequencyStart ;x<=f->frequencyEnd; x+=f->frequencyStep)
+        const FrequencyTable &ft = **it;
+        int     name_num         = ft.name_offset;
+        QString strNameFormat    = ft.name_format;
+        uint    freq             = ft.frequencyStart;
+        while (freq <= ft.frequencyEnd)
         {
-            TransportScanItem a;
-            a.SourceID = SourceID;
-            a.standard="atsc";
-            a.timeoutTune = TransportScanItem::ATSC_TUNINGTIMEOUT;
-            a.FriendlyName = strNameFormat.arg(name_num);
-            a.tuning.params.frequency = x;
-            a.tuning.params.inversion = f->inversion;
-            a.tuning.params.u.vsb.modulation = f->modulation;
+            if (strNameFormat.length() >= 2)
+                name = strNameFormat.arg(name_num);
+
+            if (si_std == "atsc")
+            {
+                TransportScanItem item(SourceID, si_std, name, name_num, freq, ft);
+                scanTransports += item;
+
+                VERBOSE(VB_IMPORTANT, "Created ATSC Transport Item");
+                VERBOSE(VB_IMPORTANT, item.toString());
+            }
+            else
+            {
+#ifdef USING_DVB
+                const DVBFrequencyTable *f = dynamic_cast<const DVBFrequencyTable*>(&ft);
+                assert(f);
+                TransportScanItem item;
+                item.SourceID = SourceID;
+                item.standard = si_std;
+                item.timeoutTune = TransportScanItem::DVBT_TUNINGTIMEOUT;
             
-            verifyTransport(a); 
+                item.tuning.params.frequency = freq;
+                item.tuning.params.inversion = f->inversion;
+                item.tuning.params.u.ofdm.bandwidth = f->bandwidth;
+                item.tuning.params.u.ofdm.code_rate_HP = f->coderate_hp;
+                item.tuning.params.u.ofdm.code_rate_LP = f->coderate_lp;
+                item.tuning.params.u.ofdm.constellation = f->constellation;
+                item.tuning.params.u.ofdm.transmission_mode = f->trans_mode;
+                item.tuning.params.u.ofdm.guard_interval = f->guard_interval;
+                item.tuning.params.u.ofdm.hierarchy_information = f->hierarchy;
             
-            scanTransports += a;
-            name_num++;
+                item.offset1 = f->offset1;
+                item.offset2 = f->offset2;
+
+                VERBOSE(VB_IMPORTANT, "Created Transport Item");
+                VERBOSE(VB_IMPORTANT, item.toString());
+
+                verifyTransport(item);
+
+                VERBOSE(VB_IMPORTANT, "Transport After Verify");
+                VERBOSE(VB_IMPORTANT, item.toString());
+
+                scanTransports += item;
+#endif // USING_DVB
+            }
+
             transportsCount++;
+
+            name_num++;
+            freq += ft.frequencyStep;
         }    
-        t++;
     }
  
     transportsToScan = transportsCount;
     timer.start();
-    scanTimeout      = ATSC_TABLES_TIMEOUT;
+    scanTimeout      = (si_std == "dvb") ? DVB_TABLES_TIMEOUT : ATSC_TABLES_TIMEOUT;
     waitingForTables = false;
     scanMode         = TRANSPORT_LIST;
-    return true;
-#else
-    (void)SourceID;
-    (void)FrequencyBand;
-    return false;
-#endif
-}
-
-bool SIScan::DVBTScanTransport(int SourceID, unsigned country)
-{
-    (void) SourceID;
-    (void) country;
-#ifdef USING_DVB
-    if (scanMode == TRANSPORT_LIST)
-        return false;
-
-    scanTransports.clear();
-	
-    /* Now generate a list of frequencies to scan and add it to the atscScanTransportList */
-
-    transportsCount=0;
-    FrequencyTableOld *t = frequenciesDVBT[country];
-    while (t && t->frequencyStart)
-    {
-        FrequencyTableOld *f = t;
-        for (int x = f->frequencyStart ;x<=f->frequencyEnd; x+=f->frequencyStep)
-        {
-            TransportScanItem a;
-            a.SourceID = SourceID;
-            a.standard="dvb";
-            a.timeoutTune = TransportScanItem::DVBT_TUNINGTIMEOUT;
-            
-            a.tuning.params.frequency = x;
-            a.tuning.params.inversion = f->inversion;
-            a.tuning.params.u.ofdm.bandwidth = f->bandwidth;
-            a.tuning.params.u.ofdm.code_rate_HP = f->coderate_hp;
-            a.tuning.params.u.ofdm.code_rate_LP = f->coderate_lp;
-            a.tuning.params.u.ofdm.constellation = f->constellation;
-            a.tuning.params.u.ofdm.transmission_mode = f->trans_mode;
-            a.tuning.params.u.ofdm.guard_interval = f->guard_interval;
-            a.tuning.params.u.ofdm.hierarchy_information = f->hierarchy;
-            
-            a.offset1 = f->offset1;
-            a.offset2 = f->offset2;
-
-            verifyTransport(a); 
-            
-            scanTransports += a;
-            transportsCount++;
-        }    
-        t++;
-    }
-    
-    transportsToScan = transportsCount;
-    timer.start();
-    scanTimeout      = DVB_TABLES_TIMEOUT;
-    waitingForTables = false;
-    scanMode         = TRANSPORT_LIST;
-#endif // USING_DVB
     return true;
 }
 

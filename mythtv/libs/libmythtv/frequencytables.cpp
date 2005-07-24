@@ -11,6 +11,11 @@ TransportScanItem::TransportScanItem()
       scanning(false),  timeoutTune(ATSC_TUNINGTIMEOUT), complete(false)
 { 
     bzero(freq_offsets, sizeof(int)*3);
+#ifdef USING_DVB
+    bzero(&tuning, sizeof(DVBTuning));
+#endif
+    complete = false;
+    offset1 = offset2 = 0;
 }
 
 TransportScanItem::TransportScanItem(int sourceid,
@@ -21,6 +26,11 @@ TransportScanItem::TransportScanItem(int sourceid,
       scanning(false),   timeoutTune(ATSC_TUNINGTIMEOUT), complete(false)
 {
     bzero(freq_offsets, sizeof(int)*3);
+#ifdef USING_DVB
+    bzero(&tuning, sizeof(DVBTuning));
+#endif
+    complete = false;
+    offset1 = offset2 = 0;
 }
 
 TransportScanItem::TransportScanItem(int sourceid,
@@ -34,6 +44,11 @@ TransportScanItem::TransportScanItem(int sourceid,
     scanning(false), complete(false)
 {
     bzero(freq_offsets, sizeof(int)*3);
+#ifdef USING_DVB
+    bzero(&tuning, sizeof(DVBTuning));
+#endif
+    complete = false;
+    offset1 = offset2 = 0;
 
     // set timeout
     timeoutTune = (standard == "dvb") ?
@@ -92,6 +107,53 @@ uint TransportScanItem::freq_offset(uint i) const
 #endif
 
     return (uint) (freq + freq_offsets[i]);
+}
+
+QString TransportScanItem::toString() const
+{
+    QString str = QString("Transport Scan Item '%1' #%2\n")
+        .arg(FriendlyName).arg(friendlyNum);
+    str += QString("\tmplexid(%1) standard(%2) sourceid(%3)\n")
+        .arg(mplexid).arg(standard).arg(SourceID);
+    str += QString("\tUseTimer(%1) scanning(%2) complete(%1)\n")
+        .arg(UseTimer).arg(scanning).arg(complete);
+    str += QString("\ttimeoutTune(%3 msec)\n").arg(timeoutTune);
+#ifdef USING_DVB
+    if (standard == "atsc")
+    {
+        str += QString("\tfrequency(%1) modulation(%2)\n")
+            .arg(tuning.params.frequency)
+            .arg(tuning.params.u.vsb.modulation);
+    }
+    else
+    {
+        str += QString("\tfrequency(%1) modulation(%2)\n")
+            .arg(tuning.params.frequency)
+            .arg(tuning.params.u.vsb.modulation);
+        str += QString("\t  inv(%1) bandwidth(%2) hp(%3) lp(%4)\n")
+            .arg(tuning.params.inversion)
+            .arg(tuning.params.u.ofdm.bandwidth)
+            .arg(tuning.params.u.ofdm.code_rate_HP)
+            .arg(tuning.params.u.ofdm.code_rate_LP);
+        str += QString("\t  const(%1) trans_mode(%2)")
+            .arg(tuning.params.u.ofdm.constellation)
+            .arg(tuning.params.u.ofdm.transmission_mode);
+        str += QString(" guard_int(%3) hierarchy(%4)\n")
+            .arg(tuning.params.u.ofdm.guard_interval)
+            .arg(tuning.params.u.ofdm.hierarchy_information);
+    }
+#else
+    str += QString("\tfrequency(%1) modulation(%2)")
+        .arg(frequency).arg(modulation);
+#endif
+#if 1
+    str += QString("\toffset1(%1) offset2(%2)\n")
+        .arg(offset1).arg(offset2);
+#else
+    str += QString("\t offset[0..2]: %1 %2 %3")
+        .arg(freq_offsets[0]).arg(freq_offsets[1]).arg(freq_offsets[2]);
+#endif
+    return str;
 }
 
 void init_freq_tables()

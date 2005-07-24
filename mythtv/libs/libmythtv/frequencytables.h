@@ -164,6 +164,8 @@ class TransportScanItem
     bool      complete;         ///< Used by old siscan
     int       offset1;          ///< Used by old siscan
     int       offset2;          ///< Used by old siscan
+
+    QString toString() const;
 };
 
 #endif // FREQUENCY_TABLE_H

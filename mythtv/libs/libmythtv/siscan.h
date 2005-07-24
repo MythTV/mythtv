@@ -115,9 +115,6 @@ class SIScan : public QObject
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
 
-    bool ATSCScanTransport(int SourceID, int FrequencyBand);
-    bool DVBTScanTransport(int SourceID, unsigned country);
-
     static void *ServiceScanThreadHelper(void*);
     static void *TransportScanThreadHelper(void*);
 
