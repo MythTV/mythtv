@@ -50,7 +50,6 @@ class SIScan;
 class ChannelBase;
 class Channel;
 class DVBChannel;
-class DVBSignalMonitor;
 class ScanOptionalConfig;
 class ScanCountry;
 class ScanWizard;

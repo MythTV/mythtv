@@ -564,7 +564,7 @@ bool SIScan::ScanTransports(int SourceID,
     transportsCount=0;
 
     freq_table_list_t tables = get_matching_freq_tables(std, modulation, country);
-    VERBOSE(VB_IMPORTANT, QString("Looked up freq table (%1, %2, %3)")
+    VERBOSE(VB_SIPARSER, QString("Looked up freq table (%1, %2, %3)")
             .arg(std).arg(modulation).arg(country));
 	
     freq_table_list_t::iterator it = tables.begin();
@@ -584,8 +584,8 @@ bool SIScan::ScanTransports(int SourceID,
                 TransportScanItem item(SourceID, si_std, name, name_num, freq, ft);
                 scanTransports += item;
 
-                VERBOSE(VB_IMPORTANT, "Created ATSC Transport Item");
-                VERBOSE(VB_IMPORTANT, item.toString());
+                VERBOSE(VB_SIPARSER, "Created ATSC Transport Item");
+                VERBOSE(VB_SIPARSER, item.toString());
             }
             else
             {
@@ -610,13 +610,13 @@ bool SIScan::ScanTransports(int SourceID,
                 item.offset1 = f->offset1;
                 item.offset2 = f->offset2;
 
-                VERBOSE(VB_IMPORTANT, "Created Transport Item");
-                VERBOSE(VB_IMPORTANT, item.toString());
+                VERBOSE(VB_SIPARSER, "Created Transport Item");
+                VERBOSE(VB_SIPARSER, item.toString());
 
                 verifyTransport(item);
 
-                VERBOSE(VB_IMPORTANT, "Transport After Verify");
-                VERBOSE(VB_IMPORTANT, item.toString());
+                VERBOSE(VB_SIPARSER, "Transport After Verify");
+                VERBOSE(VB_SIPARSER, item.toString());
 
                 scanTransports += item;
 #endif // USING_DVB

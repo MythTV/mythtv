@@ -623,6 +623,7 @@ void ScanWizard::pageSelected(const QString& strTitle)
 
 void ScanWizardScanner::HandleTuneComplete(void)
 {
+    //cerr<<"ScannerEvent::HandleTuneComplete()"<<endl;
     if (tunerthread_running)
         pthread_join(tuner_thread, NULL);
     scanner->StartScanner();
