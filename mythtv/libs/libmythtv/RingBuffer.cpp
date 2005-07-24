@@ -1613,8 +1613,9 @@ int RingBuffer::Read(void *buf, int count)
             {
                 if (!availWait.wait(&availWaitMutex, 15000))
                 {
-                    VERBOSE(VB_IMPORTANT,"Couldn't read data from the capture card in 15 "
-                            "seconds. Stopping.");
+                    VERBOSE(VB_IMPORTANT,
+                            "RingBuffer: Couldn't read data from the "
+                            "capture card in 15 seconds. Stopping.");
                     StopReads();
                 }
 
