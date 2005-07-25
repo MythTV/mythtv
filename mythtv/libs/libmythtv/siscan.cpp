@@ -166,7 +166,7 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         scanTransports += t;
     }
 
-    timer.start();
+    timer = QTime();
     waitingForTables  = false;
     scanMode          = TRANSPORT_LIST;
 
@@ -515,6 +515,14 @@ void SIScan::HandleActiveScan(void)
         QObject::tr("Timeout Scanning %1 offset %2 -- no signal")
         .arg((*scanIt).FriendlyName).arg(scanOffsetIt);
 
+    // handle first transport
+    if (timer.isNull())
+    {
+        timer.start();
+        ScanTransport(*scanIt, scanOffsetIt);
+        return;
+    }
+
     // See if we have timed out
     bool timed_out = ((scanTimeout > 0) && (timer.elapsed() > scanTimeout));
     if (timed_out)
@@ -772,7 +780,7 @@ bool SIScan::ScanTransports(int SourceID,
         }
     }
  
-    timer.start();
+    timer = QTime();
     scanTimeout      = (si_std == "dvb") ? DVB_TABLES_TIMEOUT : ATSC_TABLES_TIMEOUT;
     waitingForTables = false;
     scanMode         = TRANSPORT_LIST;
