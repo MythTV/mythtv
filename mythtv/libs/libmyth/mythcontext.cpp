@@ -795,17 +795,19 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     }
 #endif
 
-    // called with the lock
-    QString str = QString("ANN Playback %1 %2")
-                         .arg(d->m_localhostname).arg(false);
-    QStringList strlist = str;
-    WriteStringList(d->serverSock, strlist);
-    ReadStringList(d->serverSock, strlist, true);
+    if (d->serverSock)
+    {
+        // called with the lock
+        QString str = QString("ANN Playback %1 %2")
+            .arg(d->m_localhostname).arg(false);
+        QStringList strlist = str;
+        WriteStringList(d->serverSock, strlist);
+        ReadStringList(d->serverSock, strlist, true);
 
-    if (d->eventSock->state() == QSocket::Idle)    
-        d->eventSock->connectToHost(hostname, port);
-    
-    return true;
+        if (d->eventSock->state() == QSocket::Idle)    
+            d->eventSock->connectToHost(hostname, port);
+    }
+    return (bool)(d->serverSock);
 }
 
 bool MythContext::IsConnectedToMaster(void)
