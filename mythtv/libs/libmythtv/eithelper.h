@@ -17,16 +17,15 @@ typedef QValueList<QList_Events*> QListList_Events;
 
 class EITHelper : public QObject
 {
+    Q_OBJECT
   public:
     EITHelper() : QObject(NULL, "EITHelper") { ; }
-
-    void AddEvents(QMap_Events* eventList);
 
     uint GetListSize(void) const;
     void ProcessEvents(int mplexid);
 
   public slots:
-    void HandleEITs(QMap_Events* events) { AddEvents(events); }
+    void HandleEITs(QMap_Events* events);
 
   private:
     QListList_Events  eitList;      ///< Event Information Tables List

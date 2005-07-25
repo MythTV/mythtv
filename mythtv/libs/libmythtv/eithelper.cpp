@@ -10,8 +10,9 @@ static void update_eit_list_in_db(int mplexid, const QList_Events *events);
 static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
                              int chanid, const Event &event);
 
-void EITHelper::AddEvents(QMap_Events* eventList)
+void EITHelper::HandleEITs(QMap_Events* eventList)
 {
+    VERBOSE(VB_IMPORTANT, "HandleEITs()");
     QList_Events* events = new QList_Events();
     eitList_lock.lock();
     QMap_Events::Iterator e;
@@ -31,6 +32,7 @@ uint EITHelper::GetListSize(void) const
 
 void EITHelper::ProcessEvents(int mplexid)
 {
+    VERBOSE(VB_IMPORTANT, "ProcessEvents("<<mplexid<<")");
     while (GetListSize())
     {
         eitList_lock.lock();
