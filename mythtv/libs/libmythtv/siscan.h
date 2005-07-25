@@ -150,18 +150,19 @@ class SIScan : public QObject
     bool              waitingForTables;
     QTime             timer;
 
+    // Transports List
+    int                         transportsScanned;
+    transport_scan_items_t      scanTransports;
+    transport_scan_items_it_t   scanIt;
+    uint                        scanOffsetIt;
+    QMap<uint, uint>            dvbChanNums;
+
     bool serviceListReady;
     bool transportListReady;
     bool eventsReady;
-    int  transportsToScan;
-    int  transportsCount;
-
     QListList_Events Events;
     QMap_SDTObject SDT;
-
     NITObject NIT;
-    QValueList<TransportScanItem> scanTransports;
-
     pthread_mutex_t events_lock;
 
     /// Scanner thread, runs SIScan::StartScanner()
@@ -174,7 +175,7 @@ class SIScan : public QObject
 
 inline void SIScan::UpdateScanPercentCompleted(void)
 {
-    int tmp = ((transportsToScan - transportsCount) * 100) / transportsToScan;
+    int tmp = (transportsScanned * 100) / scanTransports.size();
     emit PctServiceScanComplete(tmp);
 }
 

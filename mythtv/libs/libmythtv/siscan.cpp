@@ -67,6 +67,8 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
       // State
       threadExit(false),
       waitingForTables(false),
+      // Transports List
+      transportsScanned(0),
       // Misc
       scanner_thread_running(false),
       eitHelper(NULL)
@@ -151,7 +153,6 @@ bool SIScan::ScanServicesSourceID(int SourceID)
 
     scanTransports.clear();
 
-    transportsCount = transportsToScan = query.size();
     while (query.next())
     {
         if (query.value(1).toString() == "atsc")
@@ -166,8 +167,14 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         scanTransports += t;
     }
 
+    timer.start();
     waitingForTables  = false;
     scanMode          = TRANSPORT_LIST;
+
+    scanIt            = scanTransports.begin();
+    transportsScanned = 0;
+    scanOffsetIt      = 0;
+
     return true;
 }
 
@@ -336,6 +343,7 @@ void SIScan::RunScanner(void)
                 UpdateServicesInDB(SDT);
                 SISCAN("Service Update Complete");
                 emit ServiceScanUpdateText("Finished processing Transport");
+                scanOffsetIt = (*scanIt).offset_cnt();
             }
 #endif // USING_DVB
             serviceListReady = false;
@@ -380,87 +388,106 @@ void SIScan::RunScanner(void)
  */
 void SIScan::HandleActiveScan(void)
 {
-#ifdef USING_DVB
-    if ((!waitingForTables) || ((scanTimeout > 0) && (timer.elapsed() > scanTimeout)))
+    QString time_out_table_str =
+        QObject::tr("Timeout Scanning %1 offset %2 -- no tables")
+        .arg((*scanIt).FriendlyName).arg(scanOffsetIt);
+    QString time_out_sig_str =
+        QObject::tr("Timeout Scanning %1 offset %2 -- no signal")
+        .arg((*scanIt).FriendlyName).arg(scanOffsetIt);
+
+    // See if we have timed out
+    bool timed_out = ((scanTimeout > 0) && (timer.elapsed() > scanTimeout));
+    if (timed_out)
     {
-        QValueList<TransportScanItem>::Iterator i;
-        bool done = false;
-        for (i = scanTransports.begin() ; i != scanTransports.end() ; ++i)
+        if (scanOffsetIt < (*scanIt).offset_cnt())
         {
-            if (!done && !(*i).complete && !threadExit)
-            {
-                (*i).complete = true;
-                if ((scanTimeout > 0) && (timer.elapsed() > scanTimeout))
-                    emit ServiceScanUpdateText("Timeout Scanning Channel");
-                emit ServiceScanUpdateText((*i).FriendlyName);
-                SISCAN(QString("Tuning to mplexid %1").arg((*i).mplexid));
-                transportsCount--;
-                if (transportsCount == 0)
-                    scanMode = IDLE; 
-         
-                bool result = false;                
-                dvb_channel_t t;
-                if ((*i).mplexid == -1)
-                {
-                    /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
-                    t.sistandard =  (*i).standard;
-                    result=0;
+            emit ServiceScanUpdateText(time_out_table_str);
+            SISCAN(time_out_table_str);
+        }
+        waitingForTables = false;
+        timer.start();
+    }
+    else if (waitingForTables)
+    {
+        return;
+    }
 
-                    if ((*i).offset1)
-                    {
-                        t.tuning = (*i).tuning;
-                        t.tuning.params.frequency+=(*i).offset1;
-                        result = GetDVBChannel()->TuneTransport(t,true,(*i).timeoutTune);
-                    }
-                            
-                    if (!result && (*i).offset2)
-                    {
-                        t.tuning = (*i).tuning;
-                        t.tuning.params.frequency+=(*i).offset2;
-                        result = GetDVBChannel()->TuneTransport(t,true,(*i).timeoutTune);
-                    }
+    QString cur_chan = QString("%1 offset %2")
+        .arg((*scanIt).FriendlyName).arg(scanOffsetIt);
+    emit ServiceScanUpdateStatusText(cur_chan);
+    SISCAN(QString("Tuning to %1 mplexid(%2) at offset %3")
+           .arg(cur_chan).arg((*scanIt).mplexid).arg(scanOffsetIt));
 
-                    if (!result)
-                    {
-                        t.tuning = (*i).tuning;
-                        result = GetDVBChannel()->TuneTransport(t,true,(*i).timeoutTune);
-                    }
-                }
-                else 
-                    result = GetDVBChannel()->SetTransportByInt((*i).mplexid);
-
-                if (!result)
-                {
-                    UpdateScanPercentCompleted();
-                    emit ServiceScanUpdateText("Failed to tune");
-                    if (transportsCount == 0)
-                        emit ServiceScanComplete();
-                }
-                else
-                {
-                    if ((*i).mplexid == -1)
-                    {
-                        int transport;
-                        DVBTuning tuning;
-                        //read the actual values back from the card
-                        if (GetDVBChannel()->GetTuningParams(tuning))
-                            transport = CreateMultiplex(GetDVBChannel()->GetCardType(),(*i),tuning);
-                        else
-                            transport = CreateMultiplex(GetDVBChannel()->GetCardType(),(*i),(*i).tuning);
-                        if (transport >=0) 
-                            GetDVBChannel()->SetMultiplexID(transport);
-                    }
-                    else
-                        GetDVBChannel()->SetMultiplexID((*i).mplexid);
-                    timer.start();
-                    GetDVBChannel()->siparser->FindServices();
-                    waitingForTables = true;
-                    done = true;
-                }
-            }
+    // Increment iterator
+    if (scanIt != scanTransports.end())
+    {
+        scanOffsetIt++;
+        if (scanOffsetIt >= (*scanIt).offset_cnt())
+        {
+            transportsScanned++;
+            UpdateScanPercentCompleted();
+            scanOffsetIt=0;
+            scanIt++;
         }
     }
+
+    if (scanIt == scanTransports.end() && timed_out)
+    {
+        emit ServiceScanComplete();
+        scanMode = IDLE;
+    }
+    else
+    {
+        bool result = false;
+
+#ifdef USING_DVB
+        dvb_channel_t t;
+        if ((*scanIt).mplexid == -1)
+        {
+            /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
+            t.sistandard = (*scanIt).standard;
+            t.tuning = (*scanIt).tuning;
+            t.tuning.params.frequency = (*scanIt).freq_offset(scanOffsetIt);
+            result = GetDVBChannel()->TuneTransport(t, true, (*scanIt).timeoutTune);
+        }
+        else 
+            result = GetDVBChannel()->TuneMultiplex((*scanIt).mplexid);
 #endif // USING_DVB
+
+        if (!result)
+        {
+            UpdateScanPercentCompleted();
+            SISCAN(QString("Failed to tune to mplexid %1 at offset %2")
+                   .arg((*scanIt).mplexid).arg(scanOffsetIt));
+        }
+        else
+        {
+#ifdef USING_DVB
+            if ((*scanIt).mplexid == -1)
+            {
+                int transport;
+                DVBTuning tuning;
+                //read the actual values back from the card
+                if (GetDVBChannel()->GetTuningParams(tuning))
+                    transport = CreateMultiplex(
+                        GetDVBChannel()->GetCardType(), (*scanIt), tuning);
+                else
+                    transport = CreateMultiplex(
+                        GetDVBChannel()->GetCardType(), (*scanIt), (*scanIt).tuning);
+
+                if (transport >=0) 
+                    GetDVBChannel()->SetMultiplexID(transport);
+            }
+            else
+            {
+                GetDVBChannel()->SetMultiplexID((*scanIt).mplexid);
+            }
+#endif // USING_DVB
+            timer.start();
+            GetDVBChannel()->siparser->FindServices();
+            waitingForTables = true;
+        }
+    }
 }
 
 /** \fn SIScan::StopScanner(void)
@@ -561,7 +588,6 @@ bool SIScan::ScanTransports(int SourceID,
         return false;
 
     scanTransports.clear();
-    transportsCount=0;
 
     freq_table_list_t tables = get_matching_freq_tables(std, modulation, country);
     VERBOSE(VB_SIPARSER, QString("Looked up freq table (%1, %2, %3)")
@@ -580,25 +606,26 @@ bool SIScan::ScanTransports(int SourceID,
                 name = strNameFormat.arg(name_num);
 
             TransportScanItem item(SourceID, si_std, name, name_num, freq, ft);
-            scanTransports += item;
-
-            VERBOSE(VB_SIPARSER, "Created Transport Item");
-            VERBOSE(VB_SIPARSER, item.toString());
 
             verifyTransport(item);
 
-            transportsCount++;
+            scanTransports += item;
+            VERBOSE(VB_SIPARSER, item.toString());
 
             name_num++;
             freq += ft.frequencyStep;
-        }    
+        }
     }
  
-    transportsToScan = transportsCount;
     timer.start();
     scanTimeout      = (si_std == "dvb") ? DVB_TABLES_TIMEOUT : ATSC_TABLES_TIMEOUT;
     waitingForTables = false;
     scanMode         = TRANSPORT_LIST;
+
+    scanIt            = scanTransports.begin();
+    transportsScanned = 0;
+    scanOffsetIt      = 0;
+
     return true;
 }
 
