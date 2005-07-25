@@ -267,8 +267,11 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
 
         video_title->SetText(curitem->Title());
         video_file->SetText(curitem->Filename().section("/", -1));
-        video_poster->SetImage(curitem->CoverFile());
-        video_poster->LoadImage();
+        if (curitem->CoverFile() != "No Cover")
+        {
+            video_poster->SetImage(curitem->CoverFile());
+            video_poster->LoadImage();
+        }
         if (video_plot)
                 video_plot->SetText(curitem->Plot());
 
