@@ -439,7 +439,18 @@ void SIScan::RunScanner(void)
     {
 #ifdef USING_DVB_EIT
         if (eitHelper && eitHelper->GetListSize())
-            eitHelper->ProcessEvents((*scanIt).mplexid);
+        {
+            if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() >= 0)
+            {
+                eitHelper->ProcessEvents(GetDVBChannel()->GetMultiplexID());
+            }
+            else if (scanTransports.size() &&
+                     scanIt != scanTransports.end() &&
+                     (*scanIt).mplexid >= 0)
+            {
+                eitHelper->ProcessEvents((*scanIt).mplexid);
+            }
+        }
 #endif // USING_DVB_EIT
 
         if (serviceListReady)
