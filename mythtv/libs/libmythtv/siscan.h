@@ -100,6 +100,12 @@ class SIScan : public QObject
     void ServiceScanComplete(void);
     void TransportScanComplete(void);
 
+  private slots:
+    void HandleVCT(uint tsid, const VirtualChannelTable*);
+    void HandleMGT(const MasterGuideTable*);
+    void HandleSDT(uint tsid, const ServiceDescriptionTable*);
+    void HandleNIT(const NetworkInformationTable*);
+
   private:
     // some useful gets
     Channel          *GetChannel(void);
@@ -111,10 +117,22 @@ class SIScan : public QObject
     static void *SpawnScanner(void *param);
 
     void HandleActiveScan(void);
+    void ScanTransport(TransportScanItem &item, uint scanOffsetIt);
 
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
 
+    void HandleATSCDBInsertion(const ScanStreamData *sd, bool wait);
+    void UpdateVCTinDB(int mplexid,
+                       const VirtualChannelTable*,
+                       bool force_update);
+
+    void HandleDVBDBInsertion(const ScanStreamData *sd, bool wait);
+    void UpdateSDTinDB(int mplexid,
+                       const ServiceDescriptionTable*,
+                       bool force_update);
+
+    // old stuff
     static void *ServiceScanThreadHelper(void*);
     static void *TransportScanThreadHelper(void*);
 

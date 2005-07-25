@@ -178,6 +178,124 @@ bool SIScan::ScanServicesSourceID(int SourceID)
     return true;
 }
 
+void SIScan::HandleVCT(uint, const VirtualChannelTable*)
+{
+    SISCAN(QString("Got a Virtual Channel Table for %1")
+           .arg((*scanIt).FriendlyName));
+    HandleATSCDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
+}
+
+void SIScan::HandleMGT(const MasterGuideTable*)
+{
+    SISCAN(QString("Got the Master Guide for %1").arg((*scanIt).FriendlyName));
+    HandleATSCDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
+}
+
+void SIScan::HandleSDT(uint, const ServiceDescriptionTable*)
+{
+    SISCAN(QString("Got a Service Description Table for %1")
+           .arg((*scanIt).FriendlyName));
+    HandleDVBDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
+}
+
+void SIScan::HandleNIT(const NetworkInformationTable*)
+{
+    SISCAN(QString("Got a Network Information Table for %1")
+           .arg((*scanIt).FriendlyName));
+    const ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
+    const NetworkInformationTable *nit = sd->GetCachedNIT();
+    if (!nit)
+        return;
+
+    dvbChanNums.clear();
+
+    //emit TransportScanUpdateText(tr("Optimizing transport frequency"));
+    //OptimizeNITFrequencies(&nit);
+
+    if (nit->TransportStreamCount())
+    {
+        emit TransportScanUpdateText(
+            tr("Network %1 Processing").arg(nit->NetworkName()));
+
+        ChannelUtil::CreateMultiplexes(sourceID, nit);
+
+        // Get channel numbers from UK Frequency List Descriptors
+        for (uint i = 0; i < nit->TransportStreamCount(); i++)
+        {
+            const desc_list_t& list =
+                MPEGDescriptor::Parse(nit->TransportDescriptors(i),
+                                      nit->TransportDescriptorsLength(i));
+
+            const unsigned char* desc =
+                MPEGDescriptor::Find(list, DescriptorID::dvb_uk_channel_list);
+
+            if (desc)
+            {
+                UKChannelListDescriptor uklist(desc);
+                for (uint j = 0; j < uklist.ChannelCount(); j++)
+                    dvbChanNums[uklist.ServiceID(j)] = uklist.ChannelNumber(j);
+            }
+        }
+    }
+    sd->ReturnCachedTable(nit);
+
+    emit TransportScanUpdateText(tr("Finished processing Transport List"));
+    emit TransportScanComplete();
+}
+
+void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd, bool wait_until_complete)
+{
+    bool hasAll = sd->HasCachedAllVCTs();
+    if (wait_until_complete && !hasAll)
+        return;
+
+    // Insert TVCTs
+    tvct_vec_t tvcts = sd->GetAllCachedTVCTs();
+    for (uint i = 0; i < tvcts.size(); i++)
+        UpdateVCTinDB((*scanIt).mplexid, tvcts[i], true);
+    sd->ReturnCachedTVCTTables(tvcts);
+
+    // Insert CVCTs
+    cvct_vec_t cvcts = sd->GetAllCachedCVCTs();
+    for (uint i = 0; i < cvcts.size(); i++)
+        UpdateVCTinDB((*scanIt).mplexid, cvcts[i], true);
+    sd->ReturnCachedCVCTTables(cvcts);
+
+    // tell UI we are done with these channels
+    if (scanMode == TRANSPORT_LIST)
+    {
+        UpdateScanPercentCompleted();
+        waitingForTables = false;
+    }
+}
+
+void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd, bool wait_until_complete)
+{
+    bool hasAll = sd->HasCachedAllVCTs();
+    if (wait_until_complete && !hasAll)
+        return;
+
+    emit ServiceScanUpdateText(tr("Updating Services"));
+
+    vector<const ServiceDescriptionTable*> sdts = sd->GetAllCachedSDTs();
+    for (uint i = 0; i < sdts.size(); i++)
+        UpdateSDTinDB((*scanIt).mplexid, sdts[i], forceUpdate);
+    sd->ReturnCachedSDTTables(sdts);
+
+    emit ServiceScanUpdateText(tr("Finished processing Transport"));
+
+    if (scanMode == TRANSPORT_LIST)
+    {
+        UpdateScanPercentCompleted();
+        waitingForTables = false;
+    }
+    else
+    {
+        emit PctServiceScanComplete(100);
+        emit ServiceScanComplete();
+    }    
+}
+
 DTVSignalMonitor* SIScan::GetDTVSignalMonitor(void)
 {
     return dynamic_cast<DTVSignalMonitor*>(signalMonitor);
@@ -438,55 +556,60 @@ void SIScan::HandleActiveScan(void)
     }
     else
     {
-        bool result = false;
+        ScanTransport(*scanIt, scanOffsetIt);
+    }
+}
+
+void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
+{
+    bool result = false;
 
 #ifdef USING_DVB
-        dvb_channel_t t;
-        if ((*scanIt).mplexid == -1)
-        {
-            /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
-            t.sistandard = (*scanIt).standard;
-            t.tuning = (*scanIt).tuning;
-            t.tuning.params.frequency = (*scanIt).freq_offset(scanOffsetIt);
-            result = GetDVBChannel()->TuneTransport(t, true, (*scanIt).timeoutTune);
-        }
-        else 
-            result = GetDVBChannel()->TuneMultiplex((*scanIt).mplexid);
+    dvb_channel_t t;
+    if (item.mplexid == -1)
+    {
+        /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
+        t.sistandard = item.standard;
+        t.tuning = item.tuning;
+        t.tuning.params.frequency = item.freq_offset(scanOffsetIt);
+        result = GetDVBChannel()->TuneTransport(t, true, item.timeoutTune);
+    }
+    else 
+        result = GetDVBChannel()->TuneMultiplex(item.mplexid);
 #endif // USING_DVB
 
-        if (!result)
+    if (!result)
+    {
+        UpdateScanPercentCompleted();
+        SISCAN(QString("Failed to tune to mplexid %1 at offset %2")
+               .arg(item.mplexid).arg(scanOffsetIt));
+    }
+    else
+    {
+#ifdef USING_DVB
+        if (item.mplexid == -1)
         {
-            UpdateScanPercentCompleted();
-            SISCAN(QString("Failed to tune to mplexid %1 at offset %2")
-                   .arg((*scanIt).mplexid).arg(scanOffsetIt));
+            int transport;
+            DVBTuning tuning;
+            //read the actual values back from the card
+            if (GetDVBChannel()->GetTuningParams(tuning))
+                transport = CreateMultiplex(
+                    GetDVBChannel()->GetCardType(), item, tuning);
+            else
+                transport = CreateMultiplex(
+                    GetDVBChannel()->GetCardType(), item, item.tuning);
+
+            if (transport >=0) 
+                GetDVBChannel()->SetMultiplexID(transport);
         }
         else
         {
-#ifdef USING_DVB
-            if ((*scanIt).mplexid == -1)
-            {
-                int transport;
-                DVBTuning tuning;
-                //read the actual values back from the card
-                if (GetDVBChannel()->GetTuningParams(tuning))
-                    transport = CreateMultiplex(
-                        GetDVBChannel()->GetCardType(), (*scanIt), tuning);
-                else
-                    transport = CreateMultiplex(
-                        GetDVBChannel()->GetCardType(), (*scanIt), (*scanIt).tuning);
-
-                if (transport >=0) 
-                    GetDVBChannel()->SetMultiplexID(transport);
-            }
-            else
-            {
-                GetDVBChannel()->SetMultiplexID((*scanIt).mplexid);
-            }
-            timer.start();
-            GetDVBChannel()->siparser->FindServices();
-            waitingForTables = true;
-#endif // USING_DVB
+            GetDVBChannel()->SetMultiplexID(item.mplexid);
         }
+        timer.start();
+        GetDVBChannel()->siparser->FindServices();
+        waitingForTables = true;
+#endif // USING_DVB
     }
 }
 
@@ -655,6 +778,35 @@ void SIScan::ServiceTableComplete()
 void SIScan::TransportTableComplete()
 {
     transportListReady = true;
+}
+
+// ///////////////////// DB STUFF /////////////////////
+// ///////////////////// DB STUFF /////////////////////
+// ///////////////////// DB STUFF /////////////////////
+// ///////////////////// DB STUFF /////////////////////
+// ///////////////////// DB STUFF /////////////////////
+
+/** \fn UpdateVCTinDB(int, const const VirtualChannelTable*, bool)
+ *  \brief dummy method for now.
+ */
+void SIScan::UpdateVCTinDB(int tid_db,
+                           const VirtualChannelTable *vct,
+                           bool force_update)
+{
+    (void) tid_db;
+    (void) vct;
+    (void) force_update;
+}
+
+/** \fn SIScan::UpdateSDTinDB(int,const ServiceDescriptionTable*,bool)
+ *  \brief dummy method for now.
+ */
+void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
+                           bool force_update)
+{
+    (void) tid_db;
+    (void) sdt;
+    (void) force_update;
 }
 
 /** \fn SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
