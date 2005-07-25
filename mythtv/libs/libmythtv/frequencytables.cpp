@@ -77,6 +77,11 @@ TransportScanItem::TransportScanItem(int sourceid,
 #if (DVB_API_VERSION_MINOR == 1)
         tuning.params.u.vsb.modulation = (fe_modulation) ft.modulation;
 #endif
+        if (dvbft)
+        {
+            freq_offsets[1] = offset1              = dvbft->offset1;
+            freq_offsets[2] = offset2              = dvbft->offset2;
+        }
     }
 #else
     frequency  = freq;
@@ -232,6 +237,13 @@ static void init_freq_tables(freq_table_map_t &fmap)
         GUARD_INTERVAL_AUTO, HIERARCHY_NONE, QAM_AUTO, 125000, 0); // UHF 21-65
 #endif // USING_DVB
 
+//#define DEBUG_DVB_OFFSETS
+#ifdef DEBUG_DVB_OFFSETS
+    fmap["atsc_vsb8_us0"] = new DVBFrequencyTable(
+        533000000, 803000000, 6000000, "xATSC Channel %1", 24, INVERSION_OFF,
+        BANDWIDTH_7_MHZ, FEC_AUTO, FEC_AUTO, QAM_AUTO, TRANSMISSION_MODE_8K,
+        GUARD_INTERVAL_AUTO, HIERARCHY_NONE, VSB_8, -100000, 100000); // UHF 14-69
+#else
     // USA Terrestrial (center frequency, subtract 1.75 Mhz for visual carrier)
     fmap["atsc_vsb8_us0"] = new FrequencyTable(
         "ATSC Channel %1",  2,  57000000,  85000000, 6000000, VSB_8); // VHF 2-6
@@ -241,6 +253,7 @@ static void init_freq_tables(freq_table_map_t &fmap)
         "ATSC Channel %1", 14, 473000000, 803000000, 6000000, VSB_8); // UHF 14-69
     fmap["atsc_vsb8_us3"] = new FrequencyTable(
         "ATSC Channel %1", 70, 809000000, 887000000, 6000000, VSB_8); // UHF 70-83
+#endif // USING_DVB
 
     // USA Cable, QAM 256
     fmap["atsc_qam256_us0"] = new FrequencyTable(
