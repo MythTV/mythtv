@@ -88,7 +88,6 @@ class SIScan : public QObject
     // Handler for complete tables
     void TransportTableComplete();
     void ServiceTableComplete();
-    void EventsReady(QMap_Events* EventList);
 
   signals:
     // Values from 1-100 of scan completion
@@ -147,7 +146,6 @@ class SIScan : public QObject
     void UpdateServicesInDB(QMap_SDTObject SDT);
     int  GenerateNewChanID(int SourceID);
     int  GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexID);
-    void AddEvents();
 
   private:
     // Set in constructor
@@ -177,11 +175,9 @@ class SIScan : public QObject
 
     bool serviceListReady;
     bool transportListReady;
-    bool eventsReady;
-    QListList_Events Events;
+
     QMap_SDTObject SDT;
     NITObject NIT;
-    pthread_mutex_t events_lock;
 
     /// Scanner thread, runs SIScan::StartScanner()
     pthread_t        scanner_thread;

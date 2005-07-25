@@ -171,7 +171,6 @@ class TVRec
     void RunTV(void);
     static void *EventThread(void *param);
     static void *RecorderThread(void *param);
-    static void *ScannerThread(void *param);
 
   private:
     void SetChannel();
@@ -227,9 +226,6 @@ class TVRec
     pthread_t event_thread;
     /// Recorder thread, runs RecorderBase::StartRecording()
     pthread_t recorder_thread;
-#ifdef USING_DVB
-    pthread_t scanner_thread;
-#endif
 
     // Configuration variables from database
     bool    transcodeFirst;

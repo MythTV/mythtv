@@ -79,10 +79,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
     /* setup boolean values for thread */
     serviceListReady = false;
     transportListReady = false;
-    eventsReady = false;
     forceUpdate = false;
-
-    pthread_mutex_init(&events_lock, NULL);
 
 #ifdef USING_DVB
     /* Signals to process tables and do database inserts */
@@ -90,9 +87,13 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
             this,                      SLOT(TransportTableComplete()));
     connect(GetDVBChannel()->siparser, SIGNAL(FindServicesComplete()),
             this,                      SLOT(ServiceTableComplete()));
-    connect(GetDVBChannel()->siparser, SIGNAL(EventsReady(QMap_Events*)),
-            this,                      SLOT(EventsReady(QMap_Events*)));
 #endif // USING_DVB
+
+#ifdef USING_DVB_EIT
+    eitHelper = new EITHelper();
+    connect(GetDVBChannel()->siparser, SIGNAL(EventsReady(QMap_Events*)),
+            eitHelper,                 SLOT(HandleEITs(QMap_Events*)));
+#endif // USING_DVB_EIT
 }
 
 SIScan::~SIScan(void)
@@ -101,8 +102,6 @@ SIScan::~SIScan(void)
     SISCAN("SIScanner Stopped");
     if (signalMonitor)
         delete signalMonitor;
-
-    pthread_mutex_destroy(&events_lock);
 }
 
 bool SIScan::ScanTransports(void)
@@ -439,16 +438,8 @@ void SIScan::RunScanner(void)
     while (!threadExit)
     {
 #ifdef USING_DVB_EIT
-        if (eventsReady)
-        {
-            SISCAN(QString("Got an EventsQMap to process"));
-            pthread_mutex_lock(&events_lock);
-            bool ready = eventsReady;
-            eventsReady = false;
-            pthread_mutex_unlock(&events_lock);
-            if (ready)
-                AddEvents();
-        }
+        if (eitHelper && eitHelper->GetListSize())
+            eitHelper->ProcessEvents((*scanIt).mplexid);
 #endif // USING_DVB_EIT
 
         if (serviceListReady)
@@ -780,24 +771,6 @@ bool SIScan::ScanTransports(int SourceID,
     scanOffsetIt      = 0;
 
     return true;
-}
-
-void SIScan::EventsReady(QMap_Events* EventList)
-{
-    (void) EventList;
-#ifdef USING_DVB
-    // Extra check since adding events to the DB is SLOW..
-    if (threadExit)
-        return;
-    QList_Events* events = new QList_Events();
-    pthread_mutex_lock(&events_lock);
-    QMap_Events::Iterator e;
-    for (e = EventList->begin() ; e != EventList->end() ; ++e)
-        events->append(*e);
-    eventsReady = true;
-    Events.append(events);
-    pthread_mutex_unlock(&events_lock);
-#endif // USING_DVB
 }
 
 void SIScan::ServiceTableComplete()
@@ -1445,202 +1418,4 @@ int SIScan::GenerateNewChanID(int sourceID)
         return sourceID * 1000;
     else
         return MaxChanID + 1;
-}
-
-void SIScan::AddEvents()
-{
-#ifdef USING_DVB
-    MSqlQuery query(MSqlQuery::InitCon());
-    MSqlQuery query2(MSqlQuery::InitCon());
-    QString theQuery;
-    int counter = 0;
-
-    pthread_mutex_lock(&events_lock);
-    while (!Events.empty())
-    {
-        QList_Events *events = Events.first();
-        Events.pop_front();
-        pthread_mutex_unlock(&events_lock);
-
-        // All events are assumed to be for the same channel here
-        QList_Events::Iterator e;
-        e = events->begin();
-
-        // Now figure out the chanid for this networkid/serviceid/sourceid/transport?
-       /* if the event is associated with an ATSC channel the linkage to chanid is different than DVB */
-        if ((*e).ATSC == true)
-        {
-            theQuery = QString("select chanid,useonairguide from channel where atscsrcid=%1 and mplexid=%2")
-                           .arg((*e).ServiceID)
-                           .arg(GetDVBChannel()->GetMultiplexID());
-#ifdef SISCAN_DEBUG
-             printf("CHANID QUERY: %s\n",theQuery.ascii());
-#endif
-        }
-        else  /* DVB Link to chanid */
-        {
-            theQuery = QString("select chanid,useonairguide from channel,dtv_multiplex where serviceid=%1"
-                           " and networkid=%2 and channel.mplexid = dtv_multiplex.mplexid")
-                           .arg((*e).ServiceID)
-                           .arg((*e).NetworkID);
-
-#ifdef SISCAN_DEBUG
-            printf("CHANID QUERY: %s\n",theQuery.ascii());
-#endif
-        }
-
-        query.prepare(theQuery);
-
-        if(!query.exec())
-            MythContext::DBError("Looking up chanID", query);
-
-        if (!query.isActive())
-            MythContext::DBError("Looking up chanID", query);
-
-        query.next();
-
-        if (query.size() <= 0)
-        {
-            SISCAN("ChanID not found so event skipped");
-            events->clear();
-            delete events;
-            continue;
-        }
-
-        int ChanID = query.value(0).toInt();
-        // Check to see if we are interseted in this channel 
-        if (!query.value(1).toBool())
-        {
-            events->clear();
-            delete events;
-            continue;
-        }
-
-#ifdef SISCAN_DEBUG
-        printf("QUERY: %d Events found for ChanId=%d\n",events->size(),ChanID);
-#endif
-        for (e = events->begin() ; e != events->end() ; ++e)
-        {
-            query.prepare("select starttime, endtime, title "
-                        "from program where chanid=:CHANID and "
-                        "((starttime>=:STARTTIME and starttime<:ENDTIME) "
-                        "and not (starttime=:STARTTIME "
-                        "and endtime=:ENDTIME and title=:TITLE))");
-            query.bindValue(":CHANID",ChanID);
-            query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
-            query.bindValue(":ENDTIME",(*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")));
-            query.bindValue(":TITLE",(*e).Event_Name.utf8());
-
-            if(!query.exec())
-                MythContext::DBError("Checking Rescheduled Event", query);
-            if (!query.isActive())
-                MythContext::DBError("Checking Rescheduled Event", query);
-
-            for (query.first(); query.isValid(); query.next()) 
-            // New guide data overriding existing
-            // Possibly more than one conflict
-            {
-                VERBOSE(VB_GENERAL, QString("Schedule Change on Channel %1")
-                     .arg(ChanID));
-                VERBOSE(VB_GENERAL, QString("Old: %1 %2 %3")
-                    .arg(query.value(0).toString())
-                    .arg(query.value(1).toString())
-                    .arg(query.value(2).toString()));
-                VERBOSE(VB_GENERAL, QString("New: %1 %2 %3") 
-                    .arg((*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")))
-                    .arg((*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")))
-                    .arg((*e).Event_Name.utf8()));
-                // Delete old EPG record.
-                query2.prepare("delete from program where chanid=:CHANID and "
-                    "starttime=:STARTTIME and endtime=:ENDTIME and title=:TITLE");
-                query2.bindValue(":CHANID",ChanID);
-                query2.bindValue(":STARTTIME",query.value(0).toString());
-                query2.bindValue(":ENDTIME",query.value(1).toString());
-                query2.bindValue(":TITLE",query.value(2).toString());
-                if(!query2.exec())
-                    MythContext::DBError("Deleting Rescheduled Event", query2);
-                if (!query2.isActive())
-                    MythContext::DBError("Deleting Rescheduled Event", query2);
-            }
-
-            query.prepare("select 1 from program where chanid=:CHANID and "
-                        "starttime=:STARTTIME and endtime=:ENDTIME and "
-                        "title=:TITLE");
-            query.bindValue(":CHANID",ChanID);
-            query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
-            query.bindValue(":ENDTIME",(*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")));
-            query.bindValue(":TITLE",(*e).Event_Name.utf8());
-
-            if(!query.exec())
-                MythContext::DBError("Checking If Event Exists", query);
-            if (!query.isActive())
-                MythContext::DBError("Checking If Event Exists", query);
-
-            if (query.size() <= 0)
-            {
-                counter++;
-
-                query.prepare("REPLACE INTO program (chanid,starttime,endtime,"
-                          "title,description,subtitle,category,"
-                          "stereo,closecaptioned,hdtv,airdate,originalairdate)"
-                          "VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,:DESCRIPTION,:SUBTITLE,:CATEGORY,:STEREO,:CLOSECAPTIONED,:HDTV,:AIRDATE,:ORIGINALAIRDATE);");
-                query.bindValue(":CHANID",ChanID);
-                query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
-                query.bindValue(":ENDTIME",(*e).EndTime.toString(QString("yyyy-MM-dd hh:mm:00")));
-                query.bindValue(":TITLE",(*e).Event_Name.utf8());
-                query.bindValue(":DESCRIPTION",(*e).Description.utf8());
-                query.bindValue(":SUBTITLE",(*e).Event_Subtitle.utf8());
-                query.bindValue(":CATEGORY",(*e).ContentDescription.utf8());
-                query.bindValue(":STEREO",(*e).Stereo);
-                query.bindValue(":CLOSECAPTIONED",(*e).SubTitled);
-                query.bindValue(":HDTV",(*e).HDTV);
-                query.bindValue(":AIRDATE",(*e).Year);
-                query.bindValue(":ORIGINALAIRDATE",(*e).OriginalAirDate.toString(QString("yyyy-MM-dd")));
-
-                if(!query.exec())
-                    MythContext::DBError("Adding Event", query);
-
-                if (!query.isActive())
-                    MythContext::DBError("Adding Event", query);
-
-                for(QValueList<Person>::Iterator it=(*e).Credits.begin();it!=(*e).Credits.end();it++)
-                {
-                    query.prepare("INSERT IGNORE INTO people (name) VALUES (:NAME);");
-                    query.bindValue(":NAME",(*it).name.utf8());
-
-                    if(!query.exec())
-                        MythContext::DBError("Adding Event (People)", query);
-
-                    if (!query.isActive())
-                        MythContext::DBError("Adding Event (People)", query);
-
-                    query.prepare("INSERT INTO credits (person,chanid,starttime,"
-                        "role) SELECT person,:CHANID,:STARTTIME,:ROLE FROM "
-                        "people WHERE people.name=:NAME");
-                    query.bindValue(":CHANID",ChanID);
-                    query.bindValue(":STARTTIME",(*e).StartTime.toString(QString("yyyy-MM-dd hh:mm:00")));
-                    query.bindValue(":ROLE",(*it).role.utf8());
-                    query.bindValue(":NAME",(*it).name.utf8());
-
-                    if(!query.exec())
-                        MythContext::DBError("Adding Event (Credits)", query);
-
-                    if (!query.isActive())
-                        MythContext::DBError("Adding Event (Credits)", query);
-                }
-            }
-        }
-
-        if (counter > 0)
-        {
-            SISCAN(QString("Added %1 events, running scheduler to check for updates").arg(counter));
-            ScheduledRecording::signalChange(-1);
-            gContext->LogEntry("DVB/ATSC Guide Scanner", LP_INFO,"Added some events", "");
-        }
-        events->clear();
-        delete events;
-        pthread_mutex_lock(&events_lock);
-    }
-    pthread_mutex_unlock(&events_lock);
-#endif // USING_DVB
 }

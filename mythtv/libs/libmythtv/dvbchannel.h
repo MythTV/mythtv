@@ -26,6 +26,7 @@ class DVBChannel : public QObject, public ChannelBase
 {
     friend class ScanWizardScanner; // needs access to siparser
     friend class SIScan;            // needs access to siparser
+    friend class TVRec;             // needs access to siparser
     Q_OBJECT
   public:
     DVBChannel(int cardnum, TVRec *parent = NULL);

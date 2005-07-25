@@ -114,9 +114,6 @@ TVRec::TVRec(int capturecardnum)
 {
     event_thread    = PTHREAD_CREATE_JOINABLE;
     recorder_thread = static_cast<pthread_t>(0);
-#ifdef USING_DVB
-    scanner_thread  = PTHREAD_CREATE_JOINABLE;
-#endif
 }
 
 /** \fn TVRec::Init()
@@ -139,10 +136,15 @@ bool TVRec::Init(void)
         channel = new DVBChannel(videodev.toInt(), this);
         channel->Open();
 
-        scanner = new SIScan("dvb", channel, 1 /* BUG -- should pass sourceid */);
-        pthread_create(&scanner_thread, NULL, ScannerThread, scanner);
-
         InitChannel(inputname, startchannel);
+
+        if (!dvb_options.dvb_on_demand &&
+            dynamic_cast<DVBChannel*>(channel)->siparser)
+        {
+            scanner = new SIScan("dvb", channel, -1);
+            scanner->StartScanner();
+        }
+
         CloseChannel();
 #else
         QString msg = QString(
@@ -234,11 +236,7 @@ TVRec::~TVRec(void)
 
 #ifdef USING_DVB
     if (scanner)
-    {
-        scanner->StopScanner();
-        pthread_join(scanner_thread, NULL);
         delete scanner;
-    }
 #endif
 
     if (channel)
@@ -1114,20 +1112,6 @@ void *TVRec::RecorderThread(void *param)
 {
     RecorderBase *recorder = (RecorderBase *)param;
     recorder->StartRecording();
-    return NULL;
-}
-
-/** \fn TVRec::ScannerThread(void*)
- *  \brief Thunk that allows scanner_thread pthread to
- *         call SIScan::StartScanner().
- */
-void *TVRec::ScannerThread(void *param)
-{
-    (void) param;
-#ifdef USING_DVB
-    SIScan *scanner = (SIScan *)param;
-    scanner->StartScanner();
-#endif
     return NULL;
 }
 
