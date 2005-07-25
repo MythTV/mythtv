@@ -461,7 +461,7 @@ void SIScan::RunScanner(void)
                 UpdateServicesInDB(SDT);
                 SISCAN("Service Update Complete");
                 emit ServiceScanUpdateText("Finished processing Transport");
-                scanOffsetIt = (*scanIt).offset_cnt();
+                scanOffsetIt = 99;
             }
 #endif // USING_DVB
             serviceListReady = false;
@@ -562,55 +562,85 @@ void SIScan::HandleActiveScan(void)
 
 void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
 {
-    bool result = false;
-
+    bool ok = false;
 #ifdef USING_DVB
-    dvb_channel_t t;
-    if (item.mplexid == -1)
+    // Tune to multiplex
+    if (GetDVBChannel())
     {
-        /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
-        t.sistandard = item.standard;
-        t.tuning = item.tuning;
-        t.tuning.params.frequency = item.freq_offset(scanOffsetIt);
-        result = GetDVBChannel()->TuneTransport(t, true, item.timeoutTune);
-    }
-    else 
-        result = GetDVBChannel()->TuneMultiplex(item.mplexid);
-#endif // USING_DVB
-
-    if (!result)
-    {
-        UpdateScanPercentCompleted();
-        SISCAN(QString("Failed to tune to mplexid %1 at offset %2")
-               .arg(item.mplexid).arg(scanOffsetIt));
-    }
-    else
-    {
-#ifdef USING_DVB
-        if (item.mplexid == -1)
+        dvb_channel_t t;
+        if (item.mplexid >= 0)
         {
-            int transport;
-            DVBTuning tuning;
-            //read the actual values back from the card
-            if (GetDVBChannel()->GetTuningParams(tuning))
-                transport = CreateMultiplex(
-                    GetDVBChannel()->GetCardType(), item, tuning);
-            else
-                transport = CreateMultiplex(
-                    GetDVBChannel()->GetCardType(), item, item.tuning);
-
-            if (transport >=0) 
-                GetDVBChannel()->SetMultiplexID(transport);
+            ok = GetDVBChannel()->TuneMultiplex(item.mplexid);
+            if (ok)
+                GetDVBChannel()->SetMultiplexID(item.mplexid);
         }
         else
         {
-            GetDVBChannel()->SetMultiplexID(item.mplexid);
+            /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
+            t.sistandard = item.standard;
+            t.tuning = item.tuning;
+            t.tuning.params.frequency = item.freq_offset(scanOffsetIt);
+            ok = GetDVBChannel()->TuneTransport(t, true, item.timeoutTune);
+
+            if (ok)
+            {
+                // Try to read the actual values back from the card
+                DVBTuning tuning;
+                bool ok = GetDVBChannel()->GetTuningParams(tuning);
+                if (!ok)
+                    tuning = item.tuning;
+
+                item.mplexid = CreateMultiplex(
+                    GetDVBChannel()->GetCardType(), item, tuning);
+
+                if (item.mplexid >= 0)
+                    GetDVBChannel()->SetMultiplexID(item.mplexid);
+            }
         }
-        timer.start();
-        GetDVBChannel()->siparser->FindServices();
-        waitingForTables = true;
-#endif // USING_DVB
     }
+#endif // USING_DVB
+#ifdef USING_V4L
+    if (GetChannel())
+    {
+        uint freq = item.freq_offset(scanOffsetIt);
+        if (item.mplexid >= 0)
+            ok = GetChannel()->TuneMultiplex(item.mplexid);
+        else 
+        {
+            uint f = freq - 1750000; // convert to visual carrier
+            QString inputname = ChannelUtil::GetInputName(item.SourceID);
+            if (ok = GetChannel()->Tune(f, inputname, "8vsb"))
+            {
+                item.mplexid = ChannelUtil::CreateMultiplex(
+                    item.SourceID, item.standard, f, "8vsb");
+            }
+        }
+    }
+#endif
+    ok = (item.mplexid < 0) ? false : ok;
+
+    // If we didn't tune successfully, bail with message
+    if (!ok)
+    {
+        UpdateScanPercentCompleted();
+        SISCAN(QString("Failed to tune %1 mplexid(%2) at offset %3")
+               .arg(item.FriendlyName).arg(item.mplexid).arg(scanOffsetIt));
+        return;
+    }
+
+    // If we have a DTV Signal Monitor, perform table scanner reset
+    if (GetDTVSignalMonitor() && GetDTVSignalMonitor()->GetScanStreamData())
+    {
+        GetDTVSignalMonitor()->GetScanStreamData()->Reset();
+        GetDTVSignalMonitor()->SetChannel(-1,-1);
+    }
+
+#ifdef USING_DVB
+    GetDVBChannel()->siparser->FindServices();
+#endif // USING_DVB
+
+    timer.start();
+    waitingForTables = true;
 }
 
 /** \fn SIScan::StopScanner(void)
