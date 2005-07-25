@@ -482,10 +482,10 @@ void SIScan::HandleActiveScan(void)
             {
                 GetDVBChannel()->SetMultiplexID((*scanIt).mplexid);
             }
-#endif // USING_DVB
             timer.start();
             GetDVBChannel()->siparser->FindServices();
             waitingForTables = true;
+#endif // USING_DVB
         }
     }
 }
