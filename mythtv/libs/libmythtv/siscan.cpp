@@ -51,8 +51,11 @@ typedef int fe_type_t;
 #define DVB_TABLES_TIMEOUT  40000
 
 #ifdef USING_DVB
+static bool ignore_encrypted_services(int db_mplexid, QString videodevice);
+static void delete_services(int db_mplexid, QMap_SDTObject SDT);
 static int  create_dtv_multiplex_ofdm(
     const TransportScanItem& item, const DVBTuning& tuning);
+int  GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexID);
 #endif // USING_DVB
 
 /** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
@@ -812,56 +815,45 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
 {
     (void) SDT;
 #ifdef USING_DVB
-    /* This will be fixed post .17 to be more elegant */
-    int localSourceID = -1;
-
     if (SDT.empty())
     {
         SISCAN("SDT List Empty assuming this is by error leaving services intact");
         return;
     }
 
-    QMap_SDTObject::Iterator s;
-    int chanid=0;
+    QMap_SDTObject::Iterator s = SDT.begin();
 
-    s = SDT.begin();
+    int db_mplexid = GetDVBTID((*s).NetworkID, (*s).TransportID,
+                               GetDVBChannel()->GetMultiplexID());
 
-    int DVBTID = GetDVBTID((*s).NetworkID,(*s).TransportID,GetDVBChannel()->GetMultiplexID());
-
-//    int DVBTID = GetDVBChannel()->GetMultiplexID();
-
-#ifdef  SISCAN_DEBUG
-    printf("The mplexid is %d\n",DVBTID);
-#endif
-    if (DVBTID == -1)
+    if (db_mplexid == -1)
     {
-        SISCAN("Error determing what transport this service table is associated with so failing");
+        VERBOSE(VB_IMPORTANT, "Error determing what transport this "
+                "service table is associated with so failing");
         return;
     }
+
 /*  Check the ServiceVersion and if its the same as you have, or a 
     forced update is required because its been too long since an update 
     forge ahead.
 
-    TODO: If you get a Version mismatch and you are not in setupscan mode you will want to issue a
-          scan of the other transports that have the same networkID */
+    TODO: If you get a Version mismatch and you are not in setupscan
+          mode you will want to issue a scan of the other transports
+          that have the same networkID
+*/
 
     MSqlQuery query(MSqlQuery::InitCon());
     QString versionQuery = QString("SELECT serviceversion,sourceid FROM dtv_multiplex "
                                    "WHERE mplexid = %1")
-                                   .arg(DVBTID);
+                                   .arg(db_mplexid);
     query.prepare(versionQuery);
 
-    if(!query.exec())
+    if (!query.exec() || !query.isActive())
         MythContext::DBError("Selecting channel/dtv_multiplex", query);
-
-    if (!query.isActive())
-         MythContext::DBError("Check Channel full in channel/dtv_multiplex.", query);
 
     if (query.size() > 0)
     {
         query.next();
-
-        localSourceID = query.value(1).toInt();
 
         if (!forceUpdate && (query.value(0).toInt() == (*s).Version))
         {
@@ -874,7 +866,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
             versionQuery = QString("UPDATE dtv_multiplex SET serviceversion = %1 "
                                    "WHERE mplexid = %2")
                                    .arg((*s).Version)
-                                   .arg(DVBTID);
+                                   .arg(db_mplexid);
             query.prepare(versionQuery);
 
             if(!query.exec())
@@ -885,167 +877,108 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
         }
     }
 
-// Get the freetoaironly field from cardinput 
-    QString FTAQuery = QString("SELECT freetoaironly "
-                               "from cardinput,dtv_multiplex, "
-                               "capturecard WHERE "
-                               "cardinput.sourceid = dtv_multiplex.sourceid AND "
-                               "cardinput.cardid = capturecard.cardid AND "
-                               "mplexid=%1 and videodevice = \"%2\"")
-                               .arg(DVBTID)
-                               .arg(GetDVBChannel()->GetCardNum());
-    query.prepare(FTAQuery); 
-
-    if(!query.exec())      
-        MythContext::DBError("Getting FreeToAir for cardinput", query);
-            
-    if (query.size() > 0)
-    {
-        query.next();
-        ignoreEncryptedServices = query.value(0).toBool();
-    }
-    else
-        return;    
-
-#if 0
+    ignoreEncryptedServices = 
+        ignore_encrypted_services(db_mplexid, GetDVBChannel()->GetDevice());
 
     // This code has caused too much trouble to leave in for now - Taylor
+    //delete_services(db_mplexid, SDT);
 
-    // Clear out entries in the channel table that don't exist anymore
-    QString deleteQuery = "delete from channel where not (";
-    for (s = SDT.begin() ; s != SDT.end() ; ++s )
-    {
-        if (s == SDT.begin())
-            deleteQuery += "(";
-        else
-            deleteQuery += " or (";
-
-        if ( (*s).ChanNum != -1)
-            deleteQuery += QString("channum = \"%1\" and ").arg((*s).ChanNum);
-
-        deleteQuery += QString("callsign = \"%1\" and serviceid=%2 and atscsrcid=%3) ")
-                       .arg((*s).ServiceName.utf8())
-                       .arg((*s).ServiceID)
-                       .arg((*s).ATSCSourceID);
-    }
-    deleteQuery += QString(") and mplexid = %1")
-                           .arg(GetDVBChannel()->GetMultiplexID());
-
-    query.prepare(deleteQuery);
-
-    if(!query.exec())
-        MythContext::DBError("Deleting non-existant channels", query);
-
-    if (!query.isActive())
-        MythContext::DBError("Deleting non-existant channels", query);
-
-#endif
-
+    int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
+    int freqid         = (*scanIt).friendlyNum;
 
     for (s = SDT.begin() ; s != SDT.end() ; ++s )
     {
-        // Its a TV Service so add it also only do FTA
-        if( (((*s).ServiceType==SDTObject::TV) || 
-             ((*s).ServiceType==SDTObject::RADIO) && !ignoreAudioOnlyServices) &&
-           (!ignoreEncryptedServices ||
-            (ignoreEncryptedServices && ((*s).CAStatus == 0))))
+        QString service_name = (*s).ServiceName;
+
+        if (service_name.stripWhiteSpace().isEmpty())
+            service_name = QString("%1 %2")
+                .arg((*s).ServiceID).arg(db_mplexid);
+
+        if (((*s).ServiceType == SDTObject::RADIO) && ignoreAudioOnlyServices)
         {
-            // See if transport already in database based on serviceid,networkid  and transportid
-            QString theQuery = QString("SELECT chanid FROM channel "
-                                       "WHERE serviceID=%1 and mplexid=%2")
-                                       .arg((*s).ServiceID)
-                                       // Use a different style query here in the future when you are
-                                       // parsing other transports..  This will work for now..
-                                       .arg(GetDVBChannel()->GetMultiplexID());
-            query.prepare(theQuery);
+            emit ServiceScanUpdateText(
+                tr("Skipping %1 - Radio Service").arg(service_name));
+            continue;
+        }
+        else if (((*s).ServiceType != SDTObject::TV) &&
+                 ((*s).ServiceType != SDTObject::RADIO))
+        {
+            emit ServiceScanUpdateText(tr("Skipping %1 - not a Television or "
+                                          "Radio Service").arg(service_name));
+            continue;
+        }
+        else if (ignoreEncryptedServices && ((*s).CAStatus != 0))
+        {
+            emit ServiceScanUpdateText(tr("Skipping %1 - Encrypted Service")
+                                       .arg(service_name));
+            continue;
+        }
 
-            if(!query.exec())
-                MythContext::DBError("Selecting channel/dtv_multiplex", query);
+        // See if service already in database
+        int chanid = ((*s).ATSCSourceID)
+            ? ChannelUtil::GetChanID(
+                db_mplexid, -1,
+                (*s).ChanNum / 10, (*s).ChanNum % 10,
+                (*s).ServiceID)
+            : ChannelUtil::GetChanID(db_mplexid, -1, 0, 0,
+                                     (*s).ServiceID);
 
-            if (!query.isActive())
-                MythContext::DBError("Check Channel full in channel/dtv_multiplex.", query);
+        QString chan_num = QString::number((*s).ServiceID);
+        if ((*s).ChanNum != -1)
+            chan_num = QString::number((*s).ChanNum);
 
-            // If channel not present add it
-            if (query.size() <= 0)
-            {
-                    if ((*s).ServiceName.stripWhiteSpace().isEmpty())
-                    {
-                        (*s).ServiceName = "Unnamed Channel";
-                    }
+        if ((*s).ATSCSourceID && (*s).ChanNum > 0)
+            chan_num = channelFormat
+                .arg((*s).ChanNum / 10)
+                .arg((*s).ChanNum % 10);
 
-                    SISCAN(QString("Channel %1 Not Found in Database - Adding").arg((*s).ServiceName));
-                    QString status = QString("Adding %1").arg((*s).ServiceName);
-                    emit ServiceScanUpdateText(status);
-                    // Get next chanid and determine what Transport its on
+        QString common_status_info = tr("%1 %2-%3 as %4 on %5 (%6)")
+            .arg(service_name)
+            .arg((*s).ChanNum / 10).arg((*s).ChanNum % 10)
+            .arg(chan_num)
+            .arg((*scanIt).FriendlyName).arg(freqid);
 
-                    chanid = GenerateNewChanID(localSourceID);
+        if (!(*s).ATSCSourceID)
+            common_status_info = service_name;
 
-                    int ChanNum;
-                    if( (*s).ChanNum == -1 )
-                        ChanNum = (*s).ServiceID;
-                    else
-                        ChanNum = (*s).ChanNum;
+        if (chanid < 0)
+        {   // The service is not in database, add it
+            emit ServiceScanUpdateText(tr("Adding %1").arg(service_name));
+            chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
+            int atsc_major = ((*s).ATSCSourceID) ? ((*s).ChanNum / 10) : 0;
+            int atsc_minor = ((*s).ATSCSourceID) ? ((*s).ChanNum % 10) : 0;
 
-                    QString chanNum = QString::number(ChanNum);
-                    if ((*s).ATSCSourceID)
-                        chanNum = channelFormat
-                            .arg(ChanNum / 10).arg(ChanNum % 10);
-
-                     query.prepare("INSERT INTO channel (chanid, channum, "
-                               "sourceid, callsign, name,  mplexid, "
-                               "serviceid, atscsrcid, useonairguide ) "
-                               "VALUES (:CHANID,:CHANNUM,:SOURCEID,:CALLSIGN,"
-                               ":NAME,:MPLEXID,:SERVICEID,:ATSCSRCID,:USEOAG);");
-                     query.bindValue(":CHANID",chanid);
-                     query.bindValue(":CHANNUM",chanNum);
-                     query.bindValue(":SOURCEID",localSourceID);
-                     query.bindValue(":CALLSIGN",(*s).ServiceName.utf8());
-                     query.bindValue(":NAME",(*s).ServiceName.utf8());
-                     query.bindValue(":MPLEXID",GetDVBChannel()->GetMultiplexID());
-                     query.bindValue(":SERVICEID",(*s).ServiceID);
-                     query.bindValue(":ATSCSRCID",(*s).ATSCSourceID);
-                     query.bindValue(":USEOAG",(*s).EITPresent);
-
-                     if(!query.exec())
-                        MythContext::DBError("Adding new DVB Channel", query);
-
-                     if (!query.isActive())
-                         MythContext::DBError("Adding new DVB Channel", query);
-
-                }
-                else
-                {
-                    query.prepare("UPDATE channel set atscsrcid=:ATSCSRCID "
-                                  "WHERE serviceid=:SERVICEID and mplexid=:MPLEXID");
-                    query.bindValue(":ATSCSRCID",(*s).ATSCSourceID);
-                    query.bindValue(":SERVICEID",(*s).ServiceID);
-                    query.bindValue(":MPLEXID",GetDVBChannel()->GetMultiplexID());
-
-                    if(!query.exec())
-                        MythContext::DBError("Updating ATSC SourceID", query);
- 
-                    if (!query.isActive())
-                        MythContext::DBError("Updating ATSC SourceID", query);
-
-                    SISCAN(QString("Channel %1 already in Database - Skipping").arg((*s).ServiceName));
-                    QString status = QString("Updating %1").arg((*s).ServiceName);
-                    emit ServiceScanUpdateText(status);
-                }
-            }
-            else
-            {
-// These channels need to be added but have their type set to hidden or something like that
-                QString status;
-                if((*s).ServiceType == 1)
-                    status = QString("Skipping %1 - Encrypted Service")
-                                     .arg((*s).ServiceName);
-                else
-                    status = QString("Skipping %1 not a Television Service")
-                                     .arg((*s).ServiceName);
- 
-                SISCAN(status);
-                emit ServiceScanUpdateText(status);
-            }
+            ChannelUtil::CreateChannel(
+                db_mplexid,
+                db_source_id,
+                chanid,
+                (*s).ServiceName,
+                chan_num,
+                (*s).ServiceID,
+                atsc_major, atsc_minor,
+                true,
+                !(*s).EITPresent, !(*s).EITPresent,
+                freqid);
+        }
+        else if ((*s).ATSCSourceID)
+        {
+            emit ServiceScanUpdateText(tr("Updating %1").arg(service_name));
+            ChannelUtil::UpdateChannel(
+                db_mplexid,
+                db_source_id,
+                chanid,
+                (*s).ServiceName,
+                chan_num,
+                (*s).ServiceID,
+                (*s).ChanNum / 10, (*s).ChanNum % 10,
+                freqid);
+        }
+        else
+        {
+            emit ServiceScanUpdateText(
+                tr("Skipping %1 - already in DB, and we don't have better data.")
+                .arg(service_name));
+        }
     }
 #endif // USING_DVB
 }
@@ -1217,7 +1150,7 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
 #endif // USING_DVB
 }
 
-int SIScan::GetDVBTID(uint16_t NetworkID, uint16_t TransportID, int CurrentMplexId)
+int GetDVBTID(uint16_t NetworkID, uint16_t TransportID, int CurrentMplexId)
 {
     (void) NetworkID;
     (void) TransportID;
@@ -1338,12 +1271,14 @@ int SIScan::GetDVBTID(uint16_t NetworkID, uint16_t TransportID, int CurrentMplex
         return -1;
     }
 
-    // Now you are in trouble.. You found more than 1 match, so just guess that its the first
-    // entry in the database..
+    // Now you are in trouble.. You found more than 1 match, 
+    // so just guess that its the first entry in the database..
     if (query.size() > 1)
     {
-        SISCAN(QString("Found more than 1 match for NetworkID %1 TransportID %2")
-               .arg(NetworkID).arg(TransportID));
+        VERBOSE(VB_IMPORTANT,
+                QString("Warning: Found more than one match for "
+                        "NetworkID %1 TransportID %2")
+                .arg(NetworkID).arg(TransportID));
         int tmp = query.value(0).toInt();
         return tmp;
     }
@@ -1357,33 +1292,62 @@ int SIScan::GetDVBTID(uint16_t NetworkID, uint16_t TransportID, int CurrentMplex
 #endif // USING_DVB
 }
 
-int SIScan::GenerateNewChanID(int sourceID)
+// ///////////////////// Static DB helper methods /////////////////////
+// ///////////////////// Static DB helper methods /////////////////////
+// ///////////////////// Static DB helper methods /////////////////////
+// ///////////////////// Static DB helper methods /////////////////////
+// ///////////////////// Static DB helper methods /////////////////////
+
+static bool ignore_encrypted_services(int db_mplexid, QString videodevice)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+    // Get the freetoaironly field from cardinput
+    QString FTAQuery = QString(
+        "SELECT freetoaironly from cardinput, dtv_multiplex, capturecard "
+        "WHERE cardinput.sourceid = dtv_multiplex.sourceid AND "
+        "      cardinput.cardid = capturecard.cardid AND "
+        "      mplexid=%1 AND videodevice = '%2'")
+        .arg(db_mplexid).arg(videodevice);
+    query.prepare(FTAQuery);
 
-    QString theQuery =
-        QString("SELECT max(chanid) as maxchan "
-                "FROM channel WHERE sourceid=%1").arg(sourceID);
-    query.prepare(theQuery);
+    if (!query.exec())
+        MythContext::DBError("Getting FreeToAir for cardinput", query);
 
-    if(!query.exec())
-        MythContext::DBError("Calculating new ChanID", query);
+    if (query.size() > 0)
+    {
+        query.next();
+        return query.value(0).toBool();
+    }
+    return true;
+}
 
-    if (!query.isActive())
-        MythContext::DBError("Calculating new ChanID for DVB Channel", query);
+static void delete_services(int db_mplexid, QMap_SDTObject SDT)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    // Clear out entries in the channel table that don't exist anymore
+    QString deleteQuery = "DELETE FROM channel WHERE NOT (";
+    for (QMap_SDTObject::Iterator s = SDT.begin(); s != SDT.end(); ++s)
+    {
+        if (s == SDT.begin())
+            deleteQuery += "(";
+        else
+            deleteQuery += " OR (";
 
-    query.next();
+        if ( (*s).ChanNum != -1)
+            deleteQuery += QString("channum = \"%1\" AND ").arg((*s).ChanNum);
 
-    // If transport not present add it, and move on to the next
-    if (query.size() <= 0)
-        return sourceID * 1000;
+        deleteQuery += QString("callsign = \"%1\" AND serviceid=%2 AND atscsrcid=%3) ")
+                       .arg((*s).ServiceName.utf8())
+                       .arg((*s).ServiceID)
+                       .arg((*s).ATSCSourceID);
+    }
+    deleteQuery += QString(") AND mplexid = %1")
+                           .arg(db_mplexid);
 
-    int MaxChanID = query.value(0).toInt();
+    query.prepare(deleteQuery);
 
-    if (MaxChanID == 0)
-        return sourceID * 1000;
-    else
-        return MaxChanID + 1;
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Deleting non-existant channels", query);
 }
 
 #ifdef USING_DVB
