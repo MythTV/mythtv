@@ -56,7 +56,7 @@ static bool insert_dtv_multiplex(int db_source_id, QString sistandard,
         query.bindValue(":CONSTELLATION",  constellation);
         query.bindValue(":TRANS_MODE",     QString("%1").arg(trans_mode));
         query.bindValue(":GUARD_INTERVAL", guard_interval);
-        query.bindValue(":HIERARCHY",      hierarchy);
+        query.bindValue(":HIERARCHY",      QString("%1").arg(hierarchy));
     }
 
     if (!query.exec() || !query.isActive())
