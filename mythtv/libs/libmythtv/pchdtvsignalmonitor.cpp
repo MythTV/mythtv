@@ -97,7 +97,6 @@ void pcHDTVSignalMonitor::RunTableMonitor()
             usleep(100);
             continue;
         }
-        cerr<<len<<endl;
 
         len += remainder;
         remainder = GetStreamData()->ProcessData(buffer, len);
@@ -121,10 +120,16 @@ void pcHDTVSignalMonitor::UpdateValues()
         int sig = GetSignal(channel->GetFd(), channel->GetCurrentInputNum(),
                             usingv4l2);
 
+        statusLock.lock();
         signalStrength.SetValue(sig);
         signalLock.SetValue(signalStrength.IsGood());
+        statusLock.unlock();
 
-        if (signalLock.IsGood() && GetStreamData() &&
+        statusLock.lock();
+        bool ok = signalLock.IsGood();
+        statusLock.unlock();
+
+        if (ok && GetStreamData() &&
             HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
                        kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                        kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
@@ -140,11 +145,13 @@ void pcHDTVSignalMonitor::UpdateValues()
         // TODO dtv signals...
     }
 
+    statusLock.lock();
     emit StatusSignalLock(signalLock.GetValue());
     emit StatusSignalStrength(signalStrength.GetValue());
 
     emit StatusSignalLock(signalLock);
     emit StatusSignalStrength(signalStrength);
+    statusLock.unlock();
 
     update_done = true;
 }

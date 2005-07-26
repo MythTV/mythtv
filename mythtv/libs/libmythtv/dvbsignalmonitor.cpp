@@ -111,12 +111,14 @@ void DVBSignalMonitor::Stop(void)
 QStringList DVBSignalMonitor::GetStatusList(bool kick)
 {
     QStringList list = DTVSignalMonitor::GetStatusList(kick);
+    statusLock.lock();
     if (HasFlags(kDVBSigMon_WaitForSNR))
         list<<signalToNoise.GetName()<<signalToNoise.GetStatus();
     if (HasFlags(kDVBSigMon_WaitForBER))
         list<<bitErrorRate.GetName()<<bitErrorRate.GetStatus();
     if (HasFlags(kDVBSigMon_WaitForUB))
         list<<uncorrectedBlocks.GetName()<<uncorrectedBlocks.GetStatus();
+    statusLock.unlock();
     return list;
 }
 
@@ -308,6 +310,7 @@ void DVBSignalMonitor::UpdateValues(void)
     if (!dtvMonitorRunning && fill_frontend_stats(channel->GetFd(), stats) &&
         !(stats.status & FE_TIMEDOUT))
     {
+        statusLock.lock();
         int wasLocked = signalLock.GetValue();
         int locked = (stats.status & FE_HAS_LOCK) ? 1 : 0;
         signalLock.SetValue(locked);
@@ -315,8 +318,10 @@ void DVBSignalMonitor::UpdateValues(void)
         signalToNoise.SetValue((int) stats.snr);
         bitErrorRate.SetValue(stats.ber);
         uncorrectedBlocks.SetValue(stats.ub);
+        statusLock.unlock();
 
         //cerr<<"locked("<<locked<<") slock("<<signalLock.IsGood()<<")"<<endl;
+        statusLock.lock();
         emit StatusSignalLock(signalLock);
 
         if (HasFlags(kDTVSigMon_WaitForSig))
@@ -330,8 +335,12 @@ void DVBSignalMonitor::UpdateValues(void)
 
         if (wasLocked != signalLock.GetValue())
             GENERAL((wasLocked ? "Signal Lost" : "Signal Lock"));
+        statusLock.unlock();
 
-        if (signalLock.IsGood() && GetStreamData() &&
+        statusLock.lock();
+        bool ok = signalLock.IsGood();
+        statusLock.unlock();
+        if (ok && GetStreamData() &&
             HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
                        kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                        kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))

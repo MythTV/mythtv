@@ -180,9 +180,11 @@ QStringList SignalMonitor::GetStatusList(bool kick)
         UpdateValues();
 
     QStringList list;
+    statusLock.lock();
     list<<signalLock.GetName()<<signalLock.GetStatus();
     if (HasFlags(kDTVSigMon_WaitForSig))
         list<<signalStrength.GetName()<<signalStrength.GetStatus();
+    statusLock.unlock();
 
     return list;
 }
@@ -237,8 +239,10 @@ void* SignalMonitor::SpawnMonitorLoop(void* self)
  */
 bool SignalMonitor::WaitForLock(int timeout)
 {
+    statusLock.lock();
     if (-1 == timeout)
         timeout = signalLock.GetTimeout();
+    statusLock.unlock();
     if (timeout<0)
         return false;
 
@@ -249,7 +253,10 @@ bool SignalMonitor::WaitForLock(int timeout)
         while (t.elapsed()<timeout && running)
         {
             Kick();
-            if (signalLock.IsGood())
+            statusLock.lock();
+            bool ok = signalLock.IsGood();
+            statusLock.unlock();
+            if (ok)
                 return true;
 
             usleep(50);
@@ -262,7 +269,10 @@ bool SignalMonitor::WaitForLock(int timeout)
         while (t.elapsed()<timeout && !running)
         {
             UpdateValues();
-            if (signalLock.IsGood())
+            statusLock.lock();
+            bool ok = signalLock.IsGood();
+            statusLock.unlock();
+            if (ok)
                 return true;
 
             usleep(50);

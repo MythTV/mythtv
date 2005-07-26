@@ -7,6 +7,7 @@
 #include "signalmonitorvalue.h"
 #include <pthread.h>
 #include <qobject.h>
+#include <qmutex.h>
 
 class ChannelBase;
 
@@ -144,6 +145,7 @@ protected:
 
     SignalMonitorValue signalLock;
     SignalMonitorValue signalStrength;
+    mutable QMutex statusLock;
 };
 
 #endif // SIGNALMONITOR_H
