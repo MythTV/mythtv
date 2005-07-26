@@ -40,6 +40,7 @@ DTVSignalMonitor::DTVSignalMonitor(int capturecardnum,
 QStringList DTVSignalMonitor::GetStatusList(bool kick)
 {
     QStringList list = SignalMonitor::GetStatusList(kick);
+    statusLock.lock();
     // mpeg tables
     if (flags & kDTVSigMon_WaitForPAT)
     {
@@ -77,6 +78,7 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
     {
         list<<"error"<<error;
     }
+    statusLock.unlock();
     return list;
 }
 
@@ -94,6 +96,7 @@ void DTVSignalMonitor::RemoveFlags(uint _flags)
 
 void DTVSignalMonitor::UpdateMonitorValues()
 {
+    statusLock.lock();
     seenPAT.SetValue(    (flags & kDTVSigMon_PATSeen)  ? 1 : 0);
     seenPMT.SetValue(    (flags & kDTVSigMon_PMTSeen)  ? 1 : 0);
     seenMGT.SetValue(    (flags & kDTVSigMon_MGTSeen)  ? 1 : 0);
@@ -106,6 +109,7 @@ void DTVSignalMonitor::UpdateMonitorValues()
     matchingVCT.SetValue((flags & kDTVSigMon_VCTMatch) ? 1 : 0);
     matchingNIT.SetValue((flags & kDTVSigMon_NITMatch) ? 1 : 0);
     matchingSDT.SetValue((flags & kDTVSigMon_SDTMatch) ? 1 : 0);
+    statusLock.unlock();
 }
 
 void DTVSignalMonitor::SetChannel(int major, int minor)
@@ -330,8 +334,10 @@ const ScanStreamData *DTVSignalMonitor::GetScanStreamData() const
  */
 bool DTVSignalMonitor::WaitForLock(int timeout)
 {
+    statusLock.lock();
     if (-1 == timeout)
         timeout = signalLock.GetTimeout();
+    statusLock.unlock();
     if (timeout < 0)
         return false;
 
