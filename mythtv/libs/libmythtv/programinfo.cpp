@@ -621,8 +621,8 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     ProgramList progList;
 
     QString querystr = QString(
-        "WHERE program.chanid = '%1' AND starttime < '%2' AND "
-        "    endtime > '%3' ")
+        "WHERE program.chanid = '%1' AND program.starttime < '%2' AND "
+        "    program.endtime > '%3' ")
         .arg(channel)
         .arg(dtime.toString("yyyyMMddhhmm50"))
         .arg(dtime.toString("yyyyMMddhhmm50"));
