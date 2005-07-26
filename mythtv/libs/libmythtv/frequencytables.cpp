@@ -124,6 +124,7 @@ QString TransportScanItem::toString() const
         .arg(UseTimer).arg(scanning).arg(complete);
     str += QString("\ttimeoutTune(%3 msec)\n").arg(timeoutTune);
 #ifdef USING_DVB
+#if (DVB_API_VERSION_MINOR == 1)
     if (standard == "atsc")
     {
         str += QString("\tfrequency(%1) modulation(%2)\n")
@@ -131,26 +132,25 @@ QString TransportScanItem::toString() const
             .arg(tuning.params.u.vsb.modulation);
     }
     else
+#endif // (DVB_API_VERSION_MINOR == 1)
     {
-        str += QString("\tfrequency(%1) modulation(%2)\n")
+        str += QString("\tfrequency(%1) constellation(%2)\n")
             .arg(tuning.params.frequency)
-            .arg(tuning.params.u.vsb.modulation);
+            .arg(tuning.params.u.ofdm.constellation);
         str += QString("\t  inv(%1) bandwidth(%2) hp(%3) lp(%4)\n")
             .arg(tuning.params.inversion)
             .arg(tuning.params.u.ofdm.bandwidth)
             .arg(tuning.params.u.ofdm.code_rate_HP)
             .arg(tuning.params.u.ofdm.code_rate_LP);
-        str += QString("\t  const(%1) trans_mode(%2)")
-            .arg(tuning.params.u.ofdm.constellation)
-            .arg(tuning.params.u.ofdm.transmission_mode);
-        str += QString(" guard_int(%3) hierarchy(%4)\n")
+        str += QString("\t  trans_mode(%1) guard_int(%2) hierarchy(%3)\n")
+            .arg(tuning.params.u.ofdm.transmission_mode)
             .arg(tuning.params.u.ofdm.guard_interval)
             .arg(tuning.params.u.ofdm.hierarchy_information);
     }
 #else
     str += QString("\tfrequency(%1) modulation(%2)")
         .arg(frequency).arg(modulation);
-#endif
+#endif // USING_DVB
 #if 1
     str += QString("\toffset1(%1) offset2(%2)\n")
         .arg(offset1).arg(offset2);
