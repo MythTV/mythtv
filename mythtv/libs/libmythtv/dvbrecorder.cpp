@@ -376,6 +376,7 @@ void DVBRecorder::SetDemuxFilters()
     {
         VERBOSE(VB_IMPORTANT, QString("DVB#%1 ERROR - ").arg(_card_number_option)
                 << "No PIDS set, please correct your channel setup.");
+        _error = true;
         return;
     }
 }
@@ -547,11 +548,13 @@ void DVBRecorder::StartRecording()
     pmt_cc = 0x00;
     pkts_until_pat_pmt = 0;
 
-    while (_request_recording)
+    while (_request_recording && !_error)
     {
         if (_reset_pid_filters)
         {
             SetDemuxFilters();
+            if (_error)
+                break;
             CreatePAT(pat_pkt);
             CreatePMT(pmt_pkt);
             _reset_pid_filters = false;
