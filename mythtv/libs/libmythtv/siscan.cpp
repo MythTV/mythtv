@@ -1323,6 +1323,9 @@ static bool ignore_encrypted_services(int db_mplexid, QString videodevice)
 
 static void delete_services(int db_mplexid, QMap_SDTObject SDT)
 {
+    (void) db_mplexid;
+    (void) SDT;
+#ifdef USING_DVB
     MSqlQuery query(MSqlQuery::InitCon());
     // Clear out entries in the channel table that don't exist anymore
     QString deleteQuery = "DELETE FROM channel WHERE NOT (";
@@ -1348,6 +1351,7 @@ static void delete_services(int db_mplexid, QMap_SDTObject SDT)
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Deleting non-existant channels", query);
+#endif // USING_DVB
 }
 
 #ifdef USING_DVB
