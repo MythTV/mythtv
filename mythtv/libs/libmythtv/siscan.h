@@ -137,9 +137,6 @@ class SIScan : public QObject
 
     void verifyTransport(TransportScanItem& t);
 
-    int CreateMultiplex(const fe_type_t cardType,const TransportScanItem& a,
-                    const DVBTuning& tuning);
-
     void UpdateTransportsInDB(NITObject NIT);
     void CheckNIT(NITObject& NIT);
 

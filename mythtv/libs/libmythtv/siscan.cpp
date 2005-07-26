@@ -50,6 +50,11 @@ typedef int fe_type_t;
 /// \brief How long we wait for DVB tables, before giving up
 #define DVB_TABLES_TIMEOUT  40000
 
+#ifdef USING_DVB
+static int  create_dtv_multiplex_ofdm(
+    const TransportScanItem& item, const DVBTuning& tuning);
+#endif // USING_DVB
+
 /** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
  */
 SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
@@ -338,75 +343,6 @@ bool SIScan::ScanServices(void)
 #endif // USING_DVB
 }
 
-int SIScan::CreateMultiplex(const fe_type_t cardType,
-                            const TransportScanItem& a, 
-                            const DVBTuning& tuning)
-{
-    (void) cardType;
-    (void) a;
-    (void) tuning;
-#ifdef USING_DVB
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT into dtv_multiplex (frequency, "
-                   "sistandard, sourceid,inversion,bandwidth,hp_code_rate,lp_code_rate,constellation,transmission_mode,guard_interval,hierarchy,modulation) "
-                   "VALUES (:FREQUENCY,:STANDARD,:SOURCEID,:INVERSION,:BANDWIDTH,:CODERATE_HP,:CODERATE_LP,:CONSTELLATION,:TRANS_MODE,:GUARD_INTERVAL,:HIERARCHY,:MODULATION);");
-    query.bindValue(":STANDARD",a.standard);
-    query.bindValue(":FREQUENCY",tuning.params.frequency);
-    query.bindValue(":SOURCEID",a.SourceID);
-
-    switch (cardType)
-    {
-    case FE_QAM: //TODO
-    case FE_QPSK:
-         break;
-    case FE_OFDM:
-        query.bindValue(":INVERSION",
-            DVBInversion::toString(tuning.params.inversion));
-        query.bindValue(":BANDWIDTH",
-            DVBBandwidth::toString(tuning.params.u.ofdm.bandwidth));
-        query.bindValue(":CODERATE_HP",
-            DVBCodeRate::toString(tuning.params.u.ofdm.code_rate_HP));
-        query.bindValue(":CODERATE_LP",
-            DVBCodeRate::toString(tuning.params.u.ofdm.code_rate_LP));
-        query.bindValue(":CONSTELLATION",
-            DVBModulation::toString(tuning.params.u.ofdm.constellation));
-        query.bindValue(":TRANS_MODE",
-            DVBTransmitMode::toString(tuning.params.u.ofdm.transmission_mode));
-        query.bindValue(":GUARD_INTERVAL",
-            DVBGuardInterval::toString(tuning.params.u.ofdm.guard_interval));
-        query.bindValue(":HIERARCHY",
-            DVBHierarchy::toString(tuning.params.u.ofdm.hierarchy_information));
-        break; 
-#if (DVB_API_VERSION_MINOR == 1)
-    case FE_ATSC:
-        query.bindValue(":MODULATION",
-            DVBModulation::toString(tuning.params.u.vsb.modulation));
-        break; 
-#endif
-    }
-
-    if(!query.exec())
-        MythContext::DBError("Inserting new transport", query);
-    if (!query.isActive())
-         MythContext::DBError("Adding transport to Database.", query);
-    query.prepare("select max(mplexid) from dtv_multiplex;");
-    if(!query.exec())
-        MythContext::DBError("Getting ID of new Transport", query);
-    if (!query.isActive())
-        MythContext::DBError("Getting ID of new Transport.", query);
-
-    int transport = -1;
-    if (query.size() > 0)
-    {
-        query.next();
-        transport = query.value(0).toInt();
-    }
-    return transport;
-#else
-    return -1;
-#endif // USING_DVB
-}
-
 /** \fn SIScan::SpawnScanner(void*)
  *  \brief Thunk that allows scanner_thread pthread to
  *         call SIScan::RunScanner().
@@ -508,12 +444,14 @@ void SIScan::RunScanner(void)
  */
 void SIScan::HandleActiveScan(void)
 {
+    QString offset_str = (scanOffsetIt) ?
+        QObject::tr(" offset %2").arg(scanOffsetIt) : "";
+    QString cur_chan = QString("%1%2")
+        .arg((*scanIt).FriendlyName).arg(offset_str);
     QString time_out_table_str =
-        QObject::tr("Timeout Scanning %1 offset %2 -- no tables")
-        .arg((*scanIt).FriendlyName).arg(scanOffsetIt);
+        QObject::tr("Timeout Scanning %1 -- no tables").arg(cur_chan);
     QString time_out_sig_str =
-        QObject::tr("Timeout Scanning %1 offset %2 -- no signal")
-        .arg((*scanIt).FriendlyName).arg(scanOffsetIt);
+        QObject::tr("Timeout Scanning %1 -- no signal").arg(cur_chan);
 
     // handle first transport
     if (timer.isNull())
@@ -533,18 +471,11 @@ void SIScan::HandleActiveScan(void)
             SISCAN(time_out_table_str);
         }
         waitingForTables = false;
-        timer.start();
     }
-    else if (waitingForTables)
+    else if (waitingForTables && scanOffsetIt < (*scanIt).offset_cnt())
     {
         return;
     }
-
-    QString cur_chan = QString("%1 offset %2")
-        .arg((*scanIt).FriendlyName).arg(scanOffsetIt);
-    emit ServiceScanUpdateStatusText(cur_chan);
-    SISCAN(QString("Tuning to %1 mplexid(%2) at offset %3")
-           .arg(cur_chan).arg((*scanIt).mplexid).arg(scanOffsetIt));
 
     // Increment iterator
     if (scanIt != scanTransports.end())
@@ -572,12 +503,22 @@ void SIScan::HandleActiveScan(void)
 
 void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
 {
+    QString offset_str = (scanOffsetIt) ?
+        QObject::tr(" offset %2").arg(scanOffsetIt) : "";
+    QString cur_chan = QString("%1%2")
+        .arg((*scanIt).FriendlyName).arg(offset_str);
+    QString tune_msg_str =
+        QObject::tr("Tuning to %1 mplexid(%2)")
+        .arg(cur_chan).arg((*scanIt).mplexid);
+
+    emit ServiceScanUpdateStatusText(cur_chan);
+    SISCAN(tune_msg_str);
+
     bool ok = false;
 #ifdef USING_DVB
     // Tune to multiplex
     if (GetDVBChannel())
     {
-        dvb_channel_t t;
         if (item.mplexid >= 0)
         {
             ok = GetDVBChannel()->TuneMultiplex(item.mplexid);
@@ -587,10 +528,11 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
         else
         {
             /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
-            t.sistandard = item.standard;
-            t.tuning = item.tuning;
-            t.tuning.params.frequency = item.freq_offset(scanOffsetIt);
-            ok = GetDVBChannel()->TuneTransport(t, true, item.timeoutTune);
+            dvb_channel_t dvbchan;
+            dvbchan.sistandard = item.standard;
+            dvbchan.tuning     = item.tuning;
+            dvbchan.tuning.params.frequency = item.freq_offset(scanOffsetIt);
+            ok = GetDVBChannel()->TuneTransport(dvbchan, true, item.timeoutTune);
 
             if (ok)
             {
@@ -600,8 +542,13 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
                 if (!ok)
                     tuning = item.tuning;
 
-                item.mplexid = CreateMultiplex(
-                    GetDVBChannel()->GetCardType(), item, tuning);
+                // Write the best info we have to the DB
+                if (FE_OFDM == GetDVBChannel()->GetCardType())
+                    item.mplexid = create_dtv_multiplex_ofdm(item, tuning);
+                else
+                    item.mplexid = ChannelUtil::CreateMultiplex(
+                        item.SourceID, item.standard,
+                        tuning.Frequency(), tuning.ModulationDB());
 
                 if (item.mplexid >= 0)
                     GetDVBChannel()->SetMultiplexID(item.mplexid);
@@ -1438,3 +1385,21 @@ int SIScan::GenerateNewChanID(int sourceID)
     else
         return MaxChanID + 1;
 }
+
+#ifdef USING_DVB
+static int create_dtv_multiplex_ofdm(const TransportScanItem& item,
+                                     const DVBTuning& tuning)
+{
+    return ChannelUtil::CreateMultiplex(
+        item.SourceID,              item.standard,
+        tuning.Frequency(),         tuning.ModulationDB(),
+        -1,                         -1,
+        true,
+        -1,                         tuning.BandwidthChar(),
+        -1,                         tuning.InversionChar(),
+        tuning.TransmissionModeChar(),
+        QString::null,              tuning.ConstellationDB(),
+        tuning.HierarchyChar(),     tuning.HPCodeRateString(),
+        tuning.LPCodeRateString(),  tuning.GuardIntervalString());
+}
+#endif // USING_DVB
