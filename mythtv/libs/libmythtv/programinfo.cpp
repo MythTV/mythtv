@@ -2834,14 +2834,6 @@ void ProgramInfo::showDetails(void) const
     if (programid  != "")
         msg += QObject::tr("Program ID") + ":  " + programid + "\n";
 
-    if (findid > 0)
-    {
-        QString dfmt = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
-        QDate fdate = QDate::QDate (1970, 1, 1);
-        fdate = fdate.addDays(findid - 719528);
-        msg += QString("%1: %2 (%3)\n").arg(QObject::tr("Find ID"))
-                       .arg(findid).arg(fdate.toString(dfmt));
-    }
     QString role = "", pname = "";
 
     if (endts != startts)
@@ -2900,6 +2892,68 @@ void ProgramInfo::showDetails(void) const
             if (rstr == "director")
                 msg += QObject::tr("Director") + ":  " + plist + "\n";
         }
+    }
+
+    QDateTime statusDate;
+    if (recstatus == rsWillRecord)
+        statusDate = startts;
+
+    ProgramInfo *p = new ProgramInfo;
+    p->rectype = kSingleRecord; // must be != kNotRecording
+    p->recstatus = recstatus;
+
+    if ( p->recstatus == rsPreviousRecording ||  p->recstatus == rsUnknown)
+    {
+        query.prepare("SELECT recstatus, starttime "
+                      "FROM oldrecorded WHERE duplicate > 0 AND "
+                      "((programid <> '' AND programid = :PROGRAMID) OR "
+                      " (title <> '' AND title = :TITLE AND "
+                      "  subtitle <> '' AND subtitle = :SUBTITLE AND "
+                      "  description <> '' AND description = :DECRIPTION));");
+
+        query.bindValue(":PROGRAMID", programid);
+        query.bindValue(":TITLE", title);
+        query.bindValue(":SUBTITLE", subtitle);
+        query.bindValue(":DECRIPTION", description);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("showDetails", query);
+
+        if (query.isActive() && query.size() > 0)
+        {
+            query.next();
+            if (p->recstatus == rsUnknown)
+                p->recstatus = RecStatusType(query.value(0).toInt());
+            if (p->recstatus == rsPreviousRecording || 
+                p->recstatus == rsRecorded)
+                statusDate = QDateTime::fromString(query.value(1).toString(),
+                                                  Qt::ISODate);
+        }
+    }
+    if (p->recstatus == rsUnknown)
+    {
+        if (filesize > 0)
+        {
+            p->recstatus = rsRecorded;
+            statusDate = startts;
+        }
+        else
+        {
+            p->rectype = rectype; // re-enable "Not Recording" status text.
+        }
+    }
+    msg += "\nMythTV " + QObject::tr("Status: ") + p->RecStatusText();
+    if (statusDate.isValid())
+        msg += " " + statusDate.toString(oldDateFormat);
+    msg += "\n";
+    delete p;
+
+    if (findid > 0)
+    {
+        QDate fdate = QDate::QDate (1970, 1, 1);
+        fdate = fdate.addDays(findid - 719528);
+        msg += QString("%1: %2 (%3)\n").arg(QObject::tr("Find ID"))
+                       .arg(findid).arg(fdate.toString(oldDateFormat));
     }
     if (filesize > 0)
     {
