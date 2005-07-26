@@ -52,12 +52,16 @@ class DVBChannel : public QObject, public ChannelBase
     fe_type_t   GetCardType(void)       const { return info.type; };
     /// Returns table standard ("dvb" or "atsc")
     QString     GetSIStandard(void)     const { return chan_opts.sistandard; }
+    /// Returns the dvb service id if the table standard is "dvb"
+    uint        GetServiceID()          const { return chan_opts.serviceID; }
+    /// Returns true iff SetPMT has been called with a non-NULL value.
+    bool        IsPMTSet()              const { return chan_opts.IsPMTSet(); }
 
     // Commands
     void SwitchToInput(const QString &inputname, const QString &chan);
     void SwitchToInput(int newcapchannel, bool setstarting)
         { (void)newcapchannel; (void)setstarting; }
-    bool Tune(dvb_channel_t& channel, bool all=false);
+    bool Tune(const dvb_channel_t& channel, bool force_reset=false);
     bool TuneTransport(dvb_channel_t& channel, bool all=false,
                        int timeout=30000);
     void StopTuning(void);
@@ -65,7 +69,7 @@ class DVBChannel : public QObject, public ChannelBase
     // Set/Get/Command just for SIScan/ScanWizardScanner
     void SetMultiplexID(int mplexid)          { currentTID = mplexid; };
     int  GetMultiplexID(void)           const { return currentTID; };
-    bool TuneMultiplex(int mplexid);
+    bool TuneMultiplex(uint mplexid);
 
     // PID caching
     void SaveCachedPids(const pid_cache_t&) const;
@@ -78,8 +82,6 @@ class DVBChannel : public QObject, public ChannelBase
     bool SetTransportByInt(int mplexid)       { return TuneMultiplex(mplexid); }
     /// @deprecated Use GetMultiplexID()
     int  GetCurrentTransportDBID(void)  const { return GetMultiplexID(); }
-    /// @deprecated Use GetProgramNumber()
-    uint GetServiceID(void)             const { return GetProgramNumber(); }
 
     // Messages to DVBChannel
   public slots:
@@ -91,9 +93,7 @@ class DVBChannel : public QObject, public ChannelBase
     void ChannelChanged(dvb_channel_t& chan);
 
   private:
-    // Helper methods
-    void SetCachedATSCInfo(const QString &chan);
-
+    int  GetCardID() const;
     int  GetChanID() const;
     bool GetTransportOptions(int mplexid);
     bool GetChannelOptions(const QString &channum);
@@ -124,7 +124,6 @@ class DVBChannel : public QObject, public ChannelBase
 
     bool              first_tune;  ///< Used to force hardware reset
 
-    bool              force_channel_change; ///< Used to force hardware reset
     bool              stopTuning;
     pthread_t         siparser_thread;
     DVBSIParser*      siparser;

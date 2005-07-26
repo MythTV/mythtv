@@ -48,6 +48,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "tv_rec.h"
+#include "videosource.h"
 
 #include "dvbtypes.h"
 #include "dvbdev.h"
@@ -57,17 +58,30 @@ using namespace std;
 #include "dvbcam.h"
 #include "dvbsiparser.h"
 
+#if (DVB_API_VERSION_MINOR <= 3 && DVB_API_VERSION_MINOR == 0)
+#    define FE_ATSC       (FE_OFDM+1)
+#    define FE_CAN_8VSB   0x200000
+#    define FE_CAN_16VSB  0x400000
+#    define VSB_8         (QAM_AUTO+1)
+#    define VSB_16        (QAM_AUTO+2)
+#endif
+
 //Timeout between checking for a tuning lock micro seconds
 #define TUNER_INTERVAL 300000
 
+/** \class DVBChannel
+ *  \brief Provides interface to the tuning hardware when using DVB drivers
+ *
+ *  \bug Only supports single input cards.
+ */
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     : ChannelBase(parent),
       diseqc(NULL), dvbcam(NULL),
       fd_frontend(-1), cardnum(aCardNum), currentTID(-1),
-      first_tune(true), 
-      force_channel_change(false), stopTuning(false), siparser(NULL)
+      first_tune(true), stopTuning(false), siparser(NULL)
 {
     dvbcam = new DVBCam(cardnum);
+    bzero(&info, sizeof(info));
 }
 
 DVBChannel::~DVBChannel()
@@ -86,6 +100,7 @@ void *DVBChannel::SpawnSectionReader(void *param)
 void DVBChannel::Close()
 {
     CHANNEL("Closing DVB channel");
+
     if (fd_frontend >= 0)
     {
         close(fd_frontend);
@@ -116,6 +131,7 @@ void DVBChannel::StopTuning()
 
 bool DVBChannel::Open()
 {
+    CHANNEL("Opening DVB channel");
     if (siparser == NULL )
     {
         // TODO: Rename sections to PMap and have it ONLY pull the ProgramMap
@@ -167,18 +183,17 @@ bool DVBChannel::Open()
     
     dvbcam->Start();
 
-    force_channel_change = true;
     first_tune = true;
 
     return (fd_frontend >= 0 );
 }
 
-/** \fn DVBChannel::TuneMultiplex(int mplexid)
+/** \fn DVBChannel::TuneMultiplex(uint mplexid)
  *  \brief To be used by setup sdt/nit scanner and eit parser.
  *
  *   mplexid is how the db indexes each transport
  */
-bool DVBChannel::TuneMultiplex(int mplexid)
+bool DVBChannel::TuneMultiplex(uint mplexid)
 {
     currentTID = -1;
 
@@ -192,7 +207,7 @@ bool DVBChannel::TuneMultiplex(int mplexid)
         return false;
 
 
-    GENERAL(QString("Setting currenTID = %1").arg(mplexid));
+    CHANNEL(QString("Setting mplexid = %1").arg(mplexid));
     currentTID = mplexid;
 
     return true;
@@ -203,15 +218,13 @@ bool DVBChannel::SetChannelByString(const QString &chan)
     if (fd_frontend < 0)
         return false;
 
-    if (curchannelname == chan && !force_channel_change)
+    if (curchannelname == chan && !first_tune)
         return true;
 
 #if (DVB_API_VERSION_MINOR == 1)
     if (FE_ATSC == info.type)
         SetCachedATSCInfo("");
 #endif
-
-    force_channel_change = false;
 
     CHANNEL(QString("Trying to tune to channel %1.").arg(chan));
 
@@ -268,12 +281,12 @@ void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
 
 /** \fn DVBChannel::GetChannelOptions(const QString&)
  *  \brief This function called when tuning to a specific stream.
- *  \todo pParent doesn't exist when you create a DVBChannel from videosource
- *        but this is important (i think) for remote backends
  */
 bool DVBChannel::GetChannelOptions(const QString& channum)
 {
     MSqlQuery query(MSqlQuery::InitCon());
+
+    int cardid = GetCardID();
 
     QString thequery =
         QString("SELECT chanid, serviceid, mplexid, atscsrcid "
@@ -281,13 +294,9 @@ bool DVBChannel::GetChannelOptions(const QString& channum)
                 "WHERE channel.channum='%1' AND "
                 "      cardinput.sourceid = channel.sourceid AND "
                 "      capturecard.cardid = cardinput.cardid AND "
-                "      capturecard.cardtype = 'DVB' AND ").arg(channum);
-
-    if (pParent == NULL)
-        thequery += QString("cardinput.videodevice = '%1'").arg(cardnum);
-    else
-        thequery += QString("cardinput.cardid = '%1'")
-            .arg(pParent->GetCaptureCardNum());
+                "      capturecard.cardtype = 'DVB' AND "
+                "      cardinput.cardid = '%2'")
+        .arg(channum).arg(cardid);
 
     query.prepare(thequery);
 
@@ -304,14 +313,13 @@ bool DVBChannel::GetChannelOptions(const QString& channum)
 
     query.next();
     // TODO: Fix structs to be more useful to new DB structure
-    currentProgramNum = chan_opts.serviceID = query.value(1).toInt();
-    currentATSCMajorChannel = query.value(3).toInt() >> 8;
-    currentATSCMinorChannel = query.value(3).toInt() & 0xff;
-    // HACK for broken atscsrcid values
-    if (currentATSCMinorChannel && !currentATSCMajorChannel)
-        currentATSCMajorChannel = -1;
-
-    VERBOSE(VB_CHANNEL, "atscsrcid: "<<query.value(3).toInt());
+    chan_opts.serviceID = query.value(1).toInt();
+    if (query.value(3).toInt() > 256)
+    {
+        SetCachedATSCInfo(QString("%1_%2")
+                          .arg(query.value(3).toInt() >> 8)
+                          .arg(query.value(3).toInt() & 0xff));
+    }
 
     int mplexid = query.value(2).toInt();
 
@@ -334,25 +342,7 @@ bool DVBChannel::GetTransportOptions(int mplexid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    int capturecardnumber;
-    if (pParent)
-        capturecardnumber = pParent->GetCaptureCardNum();
-    else
-    {
-        QString thequery =
-            QString("SELECT cardid FROM capturecard "
-                    "WHERE videodevice = '%1'").arg(cardnum);
-
-       query.prepare(thequery);
-       if (!query.exec() || !query.isActive() || query.size() <= 0)
-       {
-           ERROR(QString("Could not find capture card for transport %1")
-                 .arg(mplexid));
-           return false;
-       }
-       query.next();
-       capturecardnumber = query.value(0).toInt();
-    }
+    int capturecardnumber = GetCardID();
 
     // Query for our DVBTuning params
     QString thequery(
@@ -472,11 +462,9 @@ void DVBChannel::CheckOptions()
 
             if (!CheckModulation(t.params.u.ofdm.constellation))
                 WARNING("Unsupported constellation parameter.");
-#if (DVB_API_VERSION_MINOR == 1)
+            break;
        case FE_ATSC:
-
             // ATSC doesn't need any validation
-#endif
             break;
     }
 
@@ -527,10 +515,8 @@ bool DVBChannel::CheckModulation(fe_modulation_t modulation) const
         case QAM_128:  if (info.caps & FE_CAN_QAM_128)  return true;
         case QAM_256:  if (info.caps & FE_CAN_QAM_256)  return true;
         case QAM_AUTO: if (info.caps & FE_CAN_QAM_AUTO) return true;
-#if (DVB_API_VERSION_MINOR == 1)
         case VSB_8:    if (info.caps & FE_CAN_8VSB)     return true;
         case VSB_16:   if (info.caps & FE_CAN_16VSB)    return true;
-#endif
     }
     return false;
 }
@@ -578,7 +564,7 @@ void DVBChannel::SetCAPMT(const PMTObject *pmt)
            Tuning functions for each of the four types of cards.
  *****************************************************************************/
 
-/** \fn DVBChannel::Tune(dvb_channel_t&, bool)
+/** \fn DVBChannel::Tune(const dvb_channel_t&, bool)
  *  \brief Tunes the card to a frequency but does not deal with PIDs.
  *
  *   This is used by DVB Channel Scanner, the EIT Parser, and by TVRec.
@@ -587,13 +573,18 @@ void DVBChannel::SetCAPMT(const PMTObject *pmt)
  *  \param force_reset If true frequency tuning is done even if not strictly needed
  *  \return true on success, false on failure
  */
-bool DVBChannel::Tune(dvb_channel_t& channel, bool all)
+bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
 {
-    // This function allows you to tune to more than just a transport, and also
-    // verifies the service exists, and get the PIDs if auto-pid is turned on
-    chan_opts.SetPMT(NULL);
+    if (fd_frontend < 0)
+    {
+        ERROR("Card not open!");
+        return false;
+    }
 
-    if (!TuneTransport(channel,all))
+    // We are now waiting for a new PMT to forward to Access Control (dvbcam).
+    SetPMT(NULL);
+
+    if (!TuneTransport((dvb_channel_t&)(channel), force_reset))
         return false;
 
     GENERAL("Multiplex Locked");
@@ -888,22 +879,31 @@ bool DVBChannel::TuneOFDM(DVBTuning& tuning, bool reset, bool& havetuned)
     return true;
 }
 
+/** \fn DVBChannel::GetCardID() const
+ *  \brief Returns card id.
+ */
+int DVBChannel::GetCardID() const
+{
+    if (pParent)
+        return pParent->GetCaptureCardNum();
+    else
+        return CardUtil::GetCardID(GetDevice());
+}
+
 int DVBChannel::GetChanID() const
 {
-    if (pParent == NULL)
-        return -1;
+    int cardid = GetCardID();
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-     QString thequery =
-        QString("SELECT chanid "
-                "FROM channel, cardinput "
-                "WHERE channel.channum='%1' AND "
-                "      cardinput.sourceid = channel.sourceid AND "
-                "      cardinput.cardid = '%2'")
-         .arg(curchannelname).arg(pParent->GetCaptureCardNum());
+    query.prepare("SELECT chanid "
+                  "FROM channel, cardinput "
+                  "WHERE cardinput.sourceid = channel.sourceid AND "
+                  "      channel.channum = :CHANNUM AND "
+                  "      cardinput.cardid = :CARDID");
 
-    query.prepare(thequery);
+    query.bindValue(":CHANNUM", curchannelname);
+    query.bindValue(":CARDID",  cardid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -918,18 +918,6 @@ int DVBChannel::GetChanID() const
     return query.value(0).toInt();
 }
 
-/** \fn DVBChannel::SetCachedATSCInfo(const QString &chan)
- *  \brief Uses service id to set major and minor channels.
- */
-void DVBChannel::SetCachedATSCInfo(const QString &chan)
-{
-    if (chan == "")
-    {
-        currentATSCMajorChannel = currentATSCMinorChannel = -1;
-        currentProgramNum = -1;
-    }
-}
-
 void DVBChannel::SaveCachedPids(const pid_cache_t &pid_cache) const
 {
     int chanid = GetChanID();
@@ -937,12 +925,6 @@ void DVBChannel::SaveCachedPids(const pid_cache_t &pid_cache) const
         ChannelBase::SaveCachedPids(chanid, pid_cache);
 }
 
-/** \fn DVBChannel::GetCachedPids(pid_cache_t&)
- *  \brief Returns cached MPEG PIDs for last tuned channel.
- *
- *  \param pid_cache List of PIDs with their TableID
- *                   types is returned in pid_cache.
- */
 void DVBChannel::GetCachedPids(pid_cache_t &pid_cache) const
 {
     int chanid = GetChanID();
