@@ -702,8 +702,7 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     query.bindValue(":VISIBLE",   !(hidden || hidden_in_guide));
     if (freqid > 0)
         query.bindValue(":FREQID",    freqid);
-    if (atsc_major_channel > 0)
-        query.bindValue(":TVFORMAT",  "atsc");
+    query.bindValue(":TVFORMAT", (atsc_major_channel > 0) ? "atsc" : "dvb");
 
     if (!query.exec() || !query.isActive())
     {
