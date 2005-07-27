@@ -38,6 +38,16 @@
 #include "channel.h"
 #include "qlocale.h"
 
+#if defined(USING_DVB) && defined(USING_V4L)
+#define CARDTYPES "('DVB','MPEG','V4L','HDTV')"
+#elif defined(USING_DVB)
+#define CARDTYPES "('DVB')"
+#elif defined(USING_V4L)
+#define CARDTYPES "('MPEG','V4L','HDTV')"
+#else
+#define CARDTYPES "('DUMMY')"
+#endif
+
 ScanProgressPopup::ScanProgressPopup(ScanWizardScanner *parent,
                                      bool signalmonitors)
     : VerticalConfigurationGroup(false,false)
@@ -121,7 +131,7 @@ void VideoSourceSetting::load()
         "FROM cardinput, videosource, capturecard "
         "WHERE cardinput.sourceid=videosource.sourceid AND "
         "      cardinput.cardid=capturecard.cardid AND "
-        "      capturecard.cardtype in (\"DVB\",\"MPEG\",\"V4L\") AND "
+        "      capturecard.cardtype in " CARDTYPES " AND "
         "      capturecard.hostname = '%1'").arg(gContext->GetHostName());
     
     query.prepare(querystr);
@@ -203,7 +213,7 @@ void CaptureCardSetting::refresh()
         "WHERE videosource.sourceid = %1 AND "
         "      cardinput.sourceid   = videosource.sourceid AND "
         "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardtype in (\"DVB\",\"MPEG\",\"V4L\") AND "
+        "      capturecard.cardtype in " CARDTYPES " AND "
         "      capturecard.hostname = '%2';")
         .arg(nSourceID).arg(gContext->GetHostName());
     query.prepare(thequery);

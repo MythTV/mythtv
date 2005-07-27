@@ -47,6 +47,7 @@ class VirtualChannelTable;
 class MasterGuideTable;
 class ScanStreamData;
 class EITHelper;
+class SIParser;
 
 typedef enum
 {
@@ -131,16 +132,13 @@ class SIScan : public QObject
                        const ServiceDescriptionTable*,
                        bool force_update);
 
+    void OptimizeNITFrequencies(NetworkInformationTable *nit);
+
     // old stuff
-    static void *ServiceScanThreadHelper(void*);
-    static void *TransportScanThreadHelper(void*);
-
     void verifyTransport(TransportScanItem& t);
-
-    void UpdateTransportsInDB(NITObject NIT);
     void CheckNIT(NITObject& NIT);
-
-    void UpdateServicesInDB(QMap_SDTObject SDT);
+    void UpdateTransportsInDB(NITObject NIT);
+    void UpdateServicesInDB(int tid_db, QMap_SDTObject SDT);
 
   private:
     // Set in constructor
@@ -173,6 +171,7 @@ class SIScan : public QObject
 
     QMap_SDTObject SDT;
     NITObject NIT;
+    SIParser* siparser;
 
     /// Scanner thread, runs SIScan::StartScanner()
     pthread_t        scanner_thread;

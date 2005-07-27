@@ -51,11 +51,13 @@ typedef int fe_type_t;
 #define DVB_TABLES_TIMEOUT  40000
 
 #ifdef USING_DVB
+static uint scan_for_best_freq(const TransportObject& transport,
+                               DVBChannel* channel,
+                               dvb_channel_t& chan_opts);
 static bool ignore_encrypted_services(int db_mplexid, QString videodevice);
-static void delete_services(int db_mplexid, QMap_SDTObject SDT);
 static int  create_dtv_multiplex_ofdm(
     const TransportScanItem& item, const DVBTuning& tuning);
-int  GetDVBTID(uint16_t NetworkID,uint16_t TransportID,int CurrentMplexID);
+void delete_services(int db_mplexid, QMap_SDTObject SDT);
 #endif // USING_DVB
 
 /** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
@@ -89,19 +91,47 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
     transportListReady = false;
     forceUpdate = false;
 
+    siparser = NULL;
 #ifdef USING_DVB
-    /* Signals to process tables and do database inserts */
-    connect(GetDVBChannel()->siparser, SIGNAL(FindTransportsComplete()),
-            this,                      SLOT(TransportTableComplete()));
-    connect(GetDVBChannel()->siparser, SIGNAL(FindServicesComplete()),
-            this,                      SLOT(ServiceTableComplete()));
-#endif // USING_DVB
+    if (GetDVBChannel())
+        siparser = GetDVBChannel()->siparser;
+    if (siparser)
+    {
+        /* Signals to process tables and do database inserts */
+        connect(siparser, SIGNAL(FindTransportsComplete()),
+                this,     SLOT(TransportTableComplete()));
+        connect(siparser, SIGNAL(FindServicesComplete()),
+                this,     SLOT(ServiceTableComplete()));
 
 #ifdef USING_DVB_EIT
-    eitHelper = new EITHelper();
-    connect(GetDVBChannel()->siparser, SIGNAL(EventsReady(QMap_Events*)),
-            eitHelper,                 SLOT(HandleEITs(QMap_Events*)));
+        eitHelper = new EITHelper();
+        connect(siparser,  SIGNAL(EventsReady(QMap_Events*)),
+                eitHelper, SLOT(HandleEITs(QMap_Events*)));
 #endif // USING_DVB_EIT
+        return;
+    }
+#endif // USING_DVB
+    // Create a stream data for digital signal monitors
+    DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
+    if (dtvSigMon)
+    {
+        MPEGStreamData *data = new ScanStreamData();
+
+        // Get NIT before we enable SDT in case of UK channel descriptor.
+        data->RemoveListeningPID(DVB_SDT_PID);
+
+        dtvSigMon->SetStreamData(data);
+        dtvSigMon->AddFlags(kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
+                            kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT);
+        connect(data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
+                this, SLOT(  HandleMGT(const MasterGuideTable*)));
+        connect(data, SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
+                this, SLOT(  HandleVCT(uint, const VirtualChannelTable*)));
+        connect(data, SIGNAL(UpdateNIT(const NetworkInformationTable*)),
+                this, SLOT(  HandleNIT(const NetworkInformationTable*)));
+        connect(data, SIGNAL(UpdateSDT(uint, const ServiceDescriptionTable*)),
+                this, SLOT(  HandleSDT(uint, const ServiceDescriptionTable*)));
+    }
 }
 
 SIScan::~SIScan(void)
@@ -114,11 +144,13 @@ SIScan::~SIScan(void)
 
 bool SIScan::ScanTransports(void)
 {
+    VERBOSE(VB_SIPARSER, "ScanTransports()");
 #ifdef USING_DVB
-    return GetDVBChannel()->siparser->FindTransports();
-#else
-    return false;
+    if (siparser)
+        return siparser->FindTransports();
 #endif // USING_DVB
+    // We are always scanning for transports when tuned..
+    return true;
 }
 
 /** \fn SIScan::ScanServicesSourceID(int)
@@ -159,6 +191,7 @@ bool SIScan::ScanServicesSourceID(int SourceID)
     }
 
     scanTransports.clear();
+    scanIt = scanTransports.end();
 
     while (query.next())
     {
@@ -167,20 +200,17 @@ bool SIScan::ScanServicesSourceID(int SourceID)
 
         QString fn = QString("Transport ID %1").arg(query.value(2).toString());
 
-        TransportScanItem t;
-        t.mplexid = query.value(0).toInt();
-        t.SourceID = SourceID;
-        t.FriendlyName = fn;
-        scanTransports += t;
+        TransportScanItem item(SourceID, query.value(0).toInt(), fn);
+        scanTransports += item;
     }
 
     timer = QTime();
     waitingForTables  = false;
-    scanMode          = TRANSPORT_LIST;
 
     scanIt            = scanTransports.begin();
     transportsScanned = 0;
     scanOffsetIt      = 0;
+    scanMode          = TRANSPORT_LIST;
 
     return true;
 }
@@ -338,12 +368,25 @@ Channel *SIScan::GetChannel(void)
 bool SIScan::ScanServices(void)
 {
     VERBOSE(VB_SIPARSER, "ScanServices()");
-    // Requests the SDT table for the current transport from sections
 #ifdef USING_DVB
-    return GetDVBChannel()->siparser->FindServices();
-#else
-    return false;
+    if (siparser)
+    {
+        // Requests the SDT table for the current transport from sections
+        return siparser->FindServices();
+    }
+    if (GetDVBSignalMonitor())
+    {
+        // We are always scanning for VCTs, but we disable
+        // SDT scans until we hace an NIT since it the NIT may
+        // contain human friendly channel numbers to use in the
+        // SDT insertion.
+        GetDVBSignalMonitor()->GetScanStreamData()->
+            AddListeningPID(DVB_SDT_PID);
+        GetDVBSignalMonitor()->UpdateFiltersFromStreamData();
+        return true;
+    }
 #endif // USING_DVB
+    return false;
 }
 
 /** \fn SIScan::SpawnScanner(void*)
@@ -376,32 +419,26 @@ void SIScan::RunScanner(void)
 
     while (!threadExit)
     {
+        int mplex = -1;
+        if (scanTransports.size() && scanIt != scanTransports.end() &&
+            (*scanIt).mplexid >= 0)
+            mplex = (*scanIt).mplexid;
+#ifdef USING_DVB
+        if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() > 0)
+            mplex = GetDVBChannel()->GetMultiplexID();
+#endif // USING_DVB
+
 #ifdef USING_DVB_EIT
-        if (eitHelper && eitHelper->GetListSize())
-        {
-            if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() >= 0)
-            {
-                eitHelper->ProcessEvents(GetDVBChannel()->GetMultiplexID());
-            }
-            else if (scanTransports.size() &&
-                     scanIt != scanTransports.end() &&
-                     (*scanIt).mplexid >= 0)
-            {
-                eitHelper->ProcessEvents((*scanIt).mplexid);
-            }
-        }
+        if (eitHelper && eitHelper->GetListSize() && (mplex > 0))
+            eitHelper->ProcessEvents(mplex);
 #endif // USING_DVB_EIT
 
-        if (serviceListReady)
+        if (serviceListReady && siparser && (mplex > 0))
         {
 #ifdef USING_DVB
-            if (GetDVBChannel()->siparser->GetServiceObject(SDT))
+            if (siparser->GetServiceObject(SDT))
             {
-                SISCAN("Updating Services");
-                emit ServiceScanUpdateText("Processing new Transport");
-                UpdateServicesInDB(SDT);
-                SISCAN("Service Update Complete");
-                emit ServiceScanUpdateText("Finished processing Transport");
+                UpdateServicesInDB(mplex, SDT);
                 scanOffsetIt = 99;
             }
 #endif // USING_DVB
@@ -417,10 +454,10 @@ void SIScan::RunScanner(void)
                 emit ServiceScanComplete();
             }
         }
-        if (transportListReady)
+        if (transportListReady && siparser && (mplex > 0))
         {
 #ifdef USING_DVB
-            if (GetDVBChannel()->siparser->GetTransportObject(NIT))
+            if (siparser->GetTransportObject(NIT))
             {
                 emit TransportScanUpdateText("Processing Transport List");
                 SISCAN("Updating Transports");
@@ -477,13 +514,26 @@ void SIScan::HandleActiveScan(void)
     }
     else if (waitingForTables && scanOffsetIt < (*scanIt).offset_cnt())
     {
-        return;
+        return; // still waiting
+    }
+
+    // Check if we got some tables, but not all...
+    if (!siparser && GetDTVSignalMonitor())
+    {
+        const ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
+        if (timed_out && waitingForTables && sd->GetCachedMGT())
+        {
+            VERBOSE(VB_IMPORTANT, sd->GetCachedMGT()->toString());
+        }
+
+        // Get NIT before we enable SDT in case of UK channel descriptor.
+        GetDTVSignalMonitor()->GetScanStreamData()->RemoveListeningPID(DVB_SDT_PID);
     }
 
     // Increment iterator
+    scanOffsetIt++;
     if (scanIt != scanTransports.end())
     {
-        scanOffsetIt++;
         if (scanOffsetIt >= (*scanIt).offset_cnt())
         {
             transportsScanned++;
@@ -493,7 +543,9 @@ void SIScan::HandleActiveScan(void)
         }
     }
 
-    if (scanIt == scanTransports.end() && timed_out)
+    // If we are done emit ServiceScanComplete(), otherwise scan the transport..
+    if ((scanIt == scanTransports.end()) &&
+        (scanOffsetIt >= (*scanIt).offset_cnt()))
     {
         emit ServiceScanComplete();
         scanMode = IDLE;
@@ -514,6 +566,16 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
         QObject::tr("Tuning to %1 mplexid(%2)")
         .arg(cur_chan).arg((*scanIt).mplexid);
 
+    if (scanOffsetIt && (scanOffsetIt >= (*scanIt).offset_cnt()) &&
+        item.freq_offset(scanOffsetIt) == item.freq_offset(0))
+    {
+        timer.addSecs(-120);
+        return; // nothing to do
+    }
+
+    // Stop signal monitor for previous channel
+    signalMonitor->Stop();
+
     emit ServiceScanUpdateStatusText(cur_chan);
     SISCAN(tune_msg_str);
 
@@ -522,15 +584,14 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
     // Tune to multiplex
     if (GetDVBChannel())
     {
+        // Start signal monitor for this channel
+        signalMonitor->Start();
         if (item.mplexid >= 0)
         {
             ok = GetDVBChannel()->TuneMultiplex(item.mplexid);
-            if (ok)
-                GetDVBChannel()->SetMultiplexID(item.mplexid);
         }
         else
         {
-            /* For ATSC / Cable try for 2 seconds to tune otherwise give up */
             dvb_channel_t dvbchan;
             dvbchan.sistandard = item.standard;
             dvbchan.tuning     = item.tuning;
@@ -552,9 +613,6 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
                     item.mplexid = ChannelUtil::CreateMultiplex(
                         item.SourceID, item.standard,
                         tuning.Frequency(), tuning.ModulationDB());
-
-                if (item.mplexid >= 0)
-                    GetDVBChannel()->SetMultiplexID(item.mplexid);
             }
         }
     }
@@ -595,8 +653,12 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
         GetDTVSignalMonitor()->SetChannel(-1,-1);
     }
 
+    // Start signal monitor for this channel
+    if (!siparser)
+        signalMonitor->Start();
 #ifdef USING_DVB
-    GetDVBChannel()->siparser->FindServices();
+    if (siparser)
+        siparser->FindServices();
 #endif // USING_DVB
 
     timer.start();
@@ -613,7 +675,7 @@ void SIScan::StopScanner(void)
     SISCAN("Stopping SIScanner");
 #ifdef USING_DVB
     /* Force dvbchannel to exit */
-    if (GetDVBChannel())
+    if (siparser && GetDVBChannel())
         GetDVBChannel()->StopTuning();
 #endif // USING_DVB
     if (signalMonitor)
@@ -701,11 +763,12 @@ bool SIScan::ScanTransports(int SourceID,
         return false;
 
     scanTransports.clear();
+    scanIt = scanTransports.end();
 
     freq_table_list_t tables = get_matching_freq_tables(std, modulation, country);
     VERBOSE(VB_SIPARSER, QString("Looked up freq table (%1, %2, %3)")
             .arg(std).arg(modulation).arg(country));
-	
+
     freq_table_list_t::iterator it = tables.begin();
     for (; it != tables.end(); ++it)
     {
@@ -719,25 +782,24 @@ bool SIScan::ScanTransports(int SourceID,
                 name = strNameFormat.arg(name_num);
 
             TransportScanItem item(SourceID, si_std, name, name_num, freq, ft);
-
             verifyTransport(item);
-
             scanTransports += item;
+
             VERBOSE(VB_SIPARSER, item.toString());
 
             name_num++;
             freq += ft.frequencyStep;
         }
     }
- 
+
     timer = QTime();
     scanTimeout      = (si_std == "dvb") ? DVB_TABLES_TIMEOUT : ATSC_TABLES_TIMEOUT;
     waitingForTables = false;
-    scanMode         = TRANSPORT_LIST;
 
     scanIt            = scanTransports.begin();
     transportsScanned = 0;
     scanOffsetIt      = 0;
+    scanMode         = TRANSPORT_LIST;
 
     return true;
 }
@@ -752,6 +814,79 @@ void SIScan::TransportTableComplete()
     transportListReady = true;
 }
 
+/** \fn SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
+ *  \brief Checks that we can tune to a transports described in NIT.
+ *
+ *   For each transport freqency list entry, we try to tune to it
+ *   if it works use it as the frequency.
+ *
+ *  \todo We should probably try and work out the strongest signal.
+ */
+void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
+{
+    (void) nit;
+#if 0
+    dvb_channel_t chan_opts;
+    DVBTuning    &tuning = chan_opts.tuning;
+
+    QValueList<TransportObject>::iterator it;
+    for (it = NIT.Transport.begin() ; it != NIT.Transport.end() ; ++it )
+    {
+        const TransportObject& transport = *it;
+        // Parse the default transport object
+        bool ok = false;
+        if (transport.Type == "DVB-T")
+            ok = tuning.parseOFDM(transport);
+        else if (transport.Type == "DVB-C")
+            ok = tuning.parseQAM(transport);
+
+        // Find the best frequency from those listed in transport object.
+        if (ok)
+        {
+            (*it).Frequency = scan_for_best_freq(
+                transport, GetDVBChannel(), chan_opts);
+        }
+    }
+#endif // USING_DVB
+}
+
+// ///////////////////// Static helper methods /////////////////////
+// ///////////////////// Static helper methods /////////////////////
+// ///////////////////// Static helper methods /////////////////////
+// ///////////////////// Static helper methods /////////////////////
+// ///////////////////// Static helper methods /////////////////////
+
+#ifdef USING_DVB
+static uint scan_for_best_freq(const TransportObject& transport,
+                               DVBChannel *dvbc,
+                               dvb_channel_t& chan_opts)
+{
+    uint init_freq = chan_opts.tuning.params.frequency;
+    // Start off with the main frequency,
+    // then try the other ones in the list
+    QValueList<unsigned>::const_iterator fit = transport.frequencies.begin();
+    bool first_it = true;
+    do
+    {
+        if (!first_it)
+        {
+            chan_opts.tuning.params.frequency = *fit;
+            fit++;
+        }
+        first_it = false;
+
+        if (dvbc->Tune(chan_opts, true))
+        {
+            return chan_opts.tuning.params.frequency;
+            break;
+        }
+    }
+    while (fit != transport.frequencies.end());
+
+    return init_freq;
+}
+#endif // USING_DVB
+
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
@@ -759,15 +894,114 @@ void SIScan::TransportTableComplete()
 // ///////////////////// DB STUFF /////////////////////
 
 /** \fn UpdateVCTinDB(int, const const VirtualChannelTable*, bool)
- *  \brief dummy method for now.
  */
 void SIScan::UpdateVCTinDB(int tid_db,
                            const VirtualChannelTable *vct,
                            bool force_update)
 {
-    (void) tid_db;
-    (void) vct;
     (void) force_update;
+
+    int db_mplexid = ChannelUtil::GetBetterMplexID(
+        tid_db, vct->TransportStreamID(), 0);
+
+    if (db_mplexid == -1)
+    {
+        VERBOSE(VB_IMPORTANT, "Error determing what transport this "
+                "service table is associated with so failing");
+        return;
+    }
+
+/*    bool fta_only     = ignore_encrypted_services(db_mplexid, videodevice);*/
+    int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
+    int freqid         = (*scanIt).friendlyNum;
+
+    for (uint i = 0; i < vct->ChannelCount(); i++)
+    {
+        if (vct->ModulationMode(i) == 0x01 /* NTSC Modulation */ ||
+            vct->ServiceType(i)    == 0x01 /* Analog TV */)
+        {
+            continue;
+        }
+
+        if (vct->ServiceType(i) == 0x04)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Ignoring Data Service: %1 %2-%3")
+                    .arg(vct->ShortChannelName(i))
+                    .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i)));
+            continue;            
+        }
+
+        if (vct->ServiceType(i) == 0x03 && ignoreAudioOnlyServices)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Ignoring Radio Service: %1 %2-%3")
+                    .arg(vct->ShortChannelName(i))
+                    .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i)));
+            continue;            
+        }
+
+        if (vct->IsAccessControlled(i) && ignoreEncryptedServices)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Ignoring Encrypted Service: %1 %2-%3")
+                    .arg(vct->ShortChannelName(i))
+                    .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i)));
+            continue;
+        }
+
+        // See if service already in database
+        int chanid = ChannelUtil::GetChanID(
+            db_mplexid, vct->ChannelTransportStreamID(i),
+            vct->MajorChannel(i), vct->MinorChannel(i),
+            vct->ProgramNumber(i));
+
+        QString chan_num = ChannelUtil::GetChanNum(chanid);
+        if (chan_num == QString::null || chan_num == "")
+        {
+            chan_num = channelFormat
+                .arg(vct->MajorChannel(i))
+                .arg(vct->MinorChannel(i));
+        }
+
+        QString common_status_info = tr("%1 %2-%3 as %4 on %5 (%6)")
+            .arg(vct->ShortChannelName(i))
+            .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i))
+            .arg(chan_num)
+            .arg((*scanIt).FriendlyName).arg(freqid);
+
+        if (chanid < 0)
+        {   // The service is not in database, add it
+            emit ServiceScanUpdateText(
+                tr("Adding %1").arg(common_status_info));
+            chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
+            if (chanid > 0)
+            {
+                ChannelUtil::CreateChannel(
+                    db_mplexid,
+                    db_source_id,
+                    chanid,
+                    vct->ShortChannelName(i),
+                    chan_num,
+                    vct->ProgramNumber(i),
+                    vct->MajorChannel(i), vct->MinorChannel(i),
+                    true,
+                    vct->IsHidden(i), vct->IsHiddenInGuide(i),
+                    freqid);
+            }
+        }
+        else
+        {   // The service is in database, update it
+            emit ServiceScanUpdateText(
+                tr("Updating %1").arg(common_status_info));
+            ChannelUtil::UpdateChannel(
+                db_mplexid,
+                db_source_id,
+                chanid,
+                vct->ShortChannelName(i),
+                chan_num,
+                vct->ProgramNumber(i),
+                vct->MajorChannel(i), vct->MinorChannel(i),
+                freqid);
+        }
+    }
 }
 
 /** \fn SIScan::UpdateSDTinDB(int,const ServiceDescriptionTable*,bool)
@@ -781,7 +1015,7 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
     (void) force_update;
 }
 
-/** \fn SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
+/** \fn SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
  *
  *   If the mplexid matches the first networkid/transport ID assume you
  *   are on the right mplexid..
@@ -811,7 +1045,7 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
  *        mode you will want to issue a scan of the other transports
  *        that have the same networkID.
  */
-void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
+void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
 {
     (void) SDT;
 #ifdef USING_DVB
@@ -823,8 +1057,8 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
 
     QMap_SDTObject::Iterator s = SDT.begin();
 
-    int db_mplexid = GetDVBTID((*s).NetworkID, (*s).TransportID,
-                               GetDVBChannel()->GetMultiplexID());
+    int db_mplexid = ChannelUtil::GetBetterMplexID(
+        tid_db, (*s).TransportID, (*s).NetworkID);
 
     if (db_mplexid == -1)
     {
@@ -910,7 +1144,7 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
         else if (ignoreEncryptedServices && ((*s).CAStatus != 0))
         {
             emit ServiceScanUpdateText(tr("Skipping %1 - Encrypted Service")
-                                       .arg(service_name));
+                .arg(service_name));
             continue;
         }
 
@@ -961,8 +1195,9 @@ void SIScan::UpdateServicesInDB(QMap_SDTObject SDT)
                 freqid);
         }
         else if ((*s).ATSCSourceID)
-        {
+        {   // The service is in database & we have good info, update it
             emit ServiceScanUpdateText(tr("Updating %1").arg(service_name));
+
             ChannelUtil::UpdateChannel(
                 db_mplexid,
                 db_source_id,
@@ -1150,148 +1385,6 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
 #endif // USING_DVB
 }
 
-int GetDVBTID(uint16_t NetworkID, uint16_t TransportID, int CurrentMplexId)
-{
-    (void) NetworkID;
-    (void) TransportID;
-    (void) CurrentMplexId;
-#ifdef USING_DVB
-
-#ifdef SISCAN_DEBUG
-    printf("Request for Networkid/Transportid %d %d\n",NetworkID,TransportID);
-#endif
-
-    // See if you can get an exact match baed on the current mplexid's sourceID
-    // and the NetworkID/TransportID
-
-    // First see if current one is NULL, if so update those values and return current mplexid
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    QString theQuery;
-
-    theQuery = QString("select networkid,transportid from dtv_multiplex where "
-                       "mplexid = %1")
-                       .arg(CurrentMplexId);
-    query.prepare(theQuery);
-
-    if(!query.exec())
-        MythContext::DBError("Getting mplexid global search", query);
-
-    if (!query.isActive())
-        MythContext::DBError("Getting mplexid global search", query);
-
-    query.next();
-
-#ifdef SISCAN_DEBUG
-    printf("Query Results: %d %d\n",query.value(0).toInt(),query.value(1).toInt());
-#endif
-
-    if ((query.value(0).toInt() == NetworkID) && (query.value(1).toInt() == TransportID))
-    {
-        return CurrentMplexId;
-    }
-
-    if ((query.value(0).toInt() == 0) && (query.value(1).toInt() == 0))
-    {
-        theQuery = QString("UPDATE dtv_multiplex set networkid=%1,transportid=%2 where "
-                           "mplexid = %3")
-                           .arg(NetworkID)
-                           .arg(TransportID)
-                           .arg(CurrentMplexId);
-        query.prepare(theQuery);
-
-        if(!query.exec())
-            MythContext::DBError("Getting mplexid global search", query);
-
-        if (!query.isActive())
-            MythContext::DBError("Getting mplexid global search", query);
-
-        return CurrentMplexId;
-
-    }
-
-    // Values were set, so see where you can find this NetworkID/TransportID
-    theQuery = QString("SELECT a.mplexid FROM "
-                       "dtv_multiplex a, dtv_multiplex b WHERE "
-                       "a.networkid=%1 and a.transportid=%2 and "
-                       "a.sourceId=b.sourceID and b.mplexid=%3;")
-                       .arg(NetworkID)
-                       .arg(TransportID)
-                       .arg(CurrentMplexId);
-    query.prepare(theQuery);
-
-    if(!query.exec())
-        MythContext::DBError("Finding matching mplexid", query);
-
-    if (!query.isActive())
-        MythContext::DBError("Finding matching mplexid", query);
-
-    query.next();
-
-    // If you got an exact match just return it, since there is no question what
-    // mplexid this NetworkId/TransportId is for.
-    if (query.size() == 1)
-    {
-#ifdef SISCAN_DEBUG
-        printf("Exact Match!\n");
-#endif
-        int tmp = query.value(0).toInt();
-        return tmp;
-    }
-
-    // If you got more than 1 hit then all you can do is hope that this NetworkID/TransportID
-    // pair belongs to the CurrentMplexId;
-    if (query.size() > 1)
-    {
-#ifdef SISCAN_DEBUG
-        printf("more than 1 hit\n");
-#endif
-        return CurrentMplexId;
-    }
-
-    // If you got here you didn't find any match at all.. Try to see if this N/T pair is
-    // on a transport that we know about..  Search without the SourceID restriction..
-    theQuery = QString("select mplexid from dtv_multiplex where "
-                       "networkID = %1 and transportID = %2")
-                       .arg(NetworkID)
-                       .arg(TransportID);
-    query.prepare(theQuery);
-
-    if(!query.exec())
-        MythContext::DBError("Getting mplexid global search", query);
-
-    if (!query.isActive())
-        MythContext::DBError("Getting mplexid global search", query);
-
-    query.next();
-
-    // If you still didn't find this combo return -1 (failure)
-    if (query.size() <= 0)
-    {
-        return -1;
-    }
-
-    // Now you are in trouble.. You found more than 1 match, 
-    // so just guess that its the first entry in the database..
-    if (query.size() > 1)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Warning: Found more than one match for "
-                        "NetworkID %1 TransportID %2")
-                .arg(NetworkID).arg(TransportID));
-        int tmp = query.value(0).toInt();
-        return tmp;
-    }
-
-    // You found the entries, but it was on a different sourceID, so return that value
-    int retval = query.value(0).toInt();
-
-    return retval;
-#else // USING_DVB
-    return -1;
-#endif // USING_DVB
-}
-
 // ///////////////////// Static DB helper methods /////////////////////
 // ///////////////////// Static DB helper methods /////////////////////
 // ///////////////////// Static DB helper methods /////////////////////
@@ -1321,7 +1414,7 @@ static bool ignore_encrypted_services(int db_mplexid, QString videodevice)
     return true;
 }
 
-static void delete_services(int db_mplexid, QMap_SDTObject SDT)
+void delete_services(int db_mplexid, QMap_SDTObject SDT)
 {
     (void) db_mplexid;
     (void) SDT;
@@ -1331,21 +1424,17 @@ static void delete_services(int db_mplexid, QMap_SDTObject SDT)
     QString deleteQuery = "DELETE FROM channel WHERE NOT (";
     for (QMap_SDTObject::Iterator s = SDT.begin(); s != SDT.end(); ++s)
     {
-        if (s == SDT.begin())
-            deleteQuery += "(";
-        else
-            deleteQuery += " OR (";
+        deleteQuery += (s == SDT.begin()) ? "(" : " OR (";
 
         if ( (*s).ChanNum != -1)
             deleteQuery += QString("channum = \"%1\" AND ").arg((*s).ChanNum);
 
-        deleteQuery += QString("callsign = \"%1\" AND serviceid=%2 AND atscsrcid=%3) ")
+        deleteQuery += QString("callsign = '%1' AND serviceid=%2 AND atscsrcid=%3) ")
                        .arg((*s).ServiceName.utf8())
                        .arg((*s).ServiceID)
                        .arg((*s).ATSCSourceID);
     }
-    deleteQuery += QString(") AND mplexid = %1")
-                           .arg(db_mplexid);
+    deleteQuery += QString(") AND mplexid = %1").arg(db_mplexid);
 
     query.prepare(deleteQuery);
 

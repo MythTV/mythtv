@@ -470,9 +470,6 @@ void ScanWizardScanner::scan()
         bzero(&chan_opts.tuning, sizeof(chan_opts.tuning));
 #endif // USING_DVB
 
-        if (monitor)
-            monitor->Start();
-
         popupProgress = new ScanProgressPopup(this);
         popupProgress->progress(0);
         popupProgress->exec(this);
@@ -629,10 +626,14 @@ void ScanWizardScanner::HandleTuneComplete(void)
     scanner->StartScanner();
 
 #ifdef USING_DVB
-    // Wait for dvbsections to start this is silly, but does the trick
-    while (GetDVBChannel()->siparser == NULL)
-        usleep(250);
-    connect(GetDVBChannel()->siparser, SIGNAL(TableLoaded()), this, SLOT(TableLoaded()));
+    if (GetDVBChannel())
+    {
+        // Wait for dvbsections to start this is silly, but does the trick
+        while (GetDVBChannel()->siparser == NULL)
+            usleep(250);
+        connect(GetDVBChannel()->siparser, SIGNAL(TableLoaded()),
+                this, SLOT(TableLoaded()));
+    }
 #endif // USING_DVB
 
     popupProgress->status(tr("Scanning"));
