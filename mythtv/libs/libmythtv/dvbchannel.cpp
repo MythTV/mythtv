@@ -671,15 +671,14 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
             /* Stop the SIParser.  It will be resumed as soon as a lock is
                obtained.  For DVB-C/T/S with no Dish Movement it could be
                immediatly started */
-            siparser->Reset();
+            if (siparser)
+                siparser->Reset();
 
             if (havetuned == false)
             {
                 /* Start the SIParser back now that a lock has been obtained */
-                if (channel.sistandard == "atsc")
-                    siparser->FillPMap(SI_STANDARD_ATSC);
-                else
-                    siparser->FillPMap(SI_STANDARD_DVB);
+                if (siparser)
+                    siparser->FillPMap(channel.sistandard);
                 return true;
             }
 
@@ -720,10 +719,7 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
                 status += "LOCK.";
                 GENERAL(status);
                 /* Start the SIParser back now that a lock has been obtained */
-                if (channel.sistandard == "atsc")
-                    siparser->FillPMap(SI_STANDARD_ATSC);
-                else
-                    siparser->FillPMap(SI_STANDARD_DVB);
+                siparser->FillPMap(channel.sistandard);
                 return true;
             }
 
