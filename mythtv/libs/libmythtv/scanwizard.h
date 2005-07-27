@@ -129,6 +129,7 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
     void dvbSNR(int);
     void dvbSignalStrength(int);
     void finish(void);
+    bool TransportScanComplete(void);
     void HandleTuneComplete(void);
     void customEvent(QCustomEvent *e);
     static void *SpawnTune(void *param);

@@ -71,6 +71,8 @@ class SIScan : public QObject
                         const QString modulation,
                         const QString country);
     bool ScanTransports(void);
+    bool ScanTransport(int mplexid);
+
     bool ScanServices(void);
     bool ScanServicesSourceID(int SourceID);
 

@@ -186,6 +186,26 @@ void ScanWizardScanner::transportScanComplete()
     QApplication::postEvent(this, e);
 }
 
+bool ScanWizardScanner::TransportScanComplete()
+{
+    if (scanner->ScanServicesSourceID(nVideoSource))
+    {
+        VERBOSE(VB_SIPARSER, "ScanServicesSourceID() succeeded");
+        ScannerEvent* e = new ScannerEvent(ScannerEvent::ServicePct);
+        e->intValue(TRANSPORT_PCT);
+        QApplication::postEvent(this, e);
+        return true;
+    }
+    else
+    {
+        VERBOSE(VB_SIPARSER, "ScanServicesSourceID() failed");
+        ScannerEvent* e = new ScannerEvent(ScannerEvent::TuneComplete);
+        e->intValue(ScannerEvent::ERROR_TUNE);
+        QApplication::postEvent(this, e);
+        return false;
+    }
+}
+
 void *ScanWizardScanner::SpawnTune(void *param)
 {
     bool ok = false;
@@ -305,9 +325,11 @@ void ScanWizardScanner::cancelScan()
 
 void ScanWizardScanner::scan()
 {
-    //cerr<<"ScanWizardScanner::scan "<<parent->scanType()<<" "
-    //    <<parent->videoSource()<<" "<<parent->transport()<<" "
-    //    <<parent->captureCard()<<endl;
+    VERBOSE(VB_SIPARSER,
+            QString("ScanWizardScanner::scan(): "
+                    "type(%1) src(%2) transport(%3) card(%4)")
+            .arg(parent->scanType()).arg(parent->videoSource())
+            .arg(parent->transport()).arg(parent->captureCard()));
 
     tunerthread_running = false;
 
@@ -620,7 +642,7 @@ void ScanWizard::pageSelected(const QString& strTitle)
 
 void ScanWizardScanner::HandleTuneComplete(void)
 {
-    //cerr<<"ScannerEvent::HandleTuneComplete()"<<endl;
+    VERBOSE(VB_SIPARSER, "ScannerEvent::HandleTuneComplete()");
     if (tunerthread_running)
         pthread_join(tuner_thread, NULL);
     scanner->StartScanner();
@@ -649,10 +671,11 @@ void ScanWizardScanner::HandleTuneComplete(void)
         country = "us";
     }
 
-    bool ok = true;
+    bool ok = false;
     if ((nScanType == ScanTypeSetting::FullScan_ATSC) ||
         (nScanType == ScanTypeSetting::FullScan_OFDM))
     {
+        cerr<<"ScanTransports("<<std<<", "<<mod<<", "<<country<<")"<<endl;
         scanner->SetChannelFormat(parent->paneATSC->atscFormat());
         ok = scanner->ScanTransports(nVideoSource, std, mod, country);
     }
@@ -660,15 +683,18 @@ void ScanWizardScanner::HandleTuneComplete(void)
              (nScanType == ScanTypeSetting::FullTunedScan_QPSK) ||
              (nScanType == ScanTypeSetting::FullTunedScan_QAM))
     {
+        cerr<<"ScanTransports()"<<endl;
         ok = scanner->ScanTransports();
     }
     else if (nScanType == ScanTypeSetting::FullTransportScan)
     {
-        transportScanComplete();
+        cerr<<"TransportScanComplete()"<<endl;
+        ok = TransportScanComplete();
     }
-    else
+    else if (nScanType == ScanTypeSetting::TransportScan)
     {
-        ok = scanner->ScanServices();
+        cerr<<"ScanTransport("<<parent->transport()<<")"<<endl;
+        ok = scanner->ScanTransport(parent->transport());
     }
 
     if (!ok)

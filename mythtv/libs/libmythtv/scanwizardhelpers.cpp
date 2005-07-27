@@ -154,11 +154,10 @@ void TransportSetting::refresh()
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString querystr = QString(
-        "SELECT mplexid, networkid, transportid, "
+        "SELECT mplexid,   networkid,  transportid, "
         "       frequency, symbolrate, modulation "
-        "FROM dtv_multiplex channel "
-        "WHERE sourceid=%1 "
-        "ORDER by networkid, transportid ").arg(nSourceID);
+        "FROM dtv_multiplex WHERE sourceid = '%1' "
+        "ORDER by frequency, networkid, transportid").arg(nSourceID);
 
     query.prepare(querystr);
 
@@ -170,17 +169,19 @@ void TransportSetting::refresh()
         QString DisplayText;
         if (query.value(5).toString() == "8vsb")
         {
-            QString ChannelNumber;
+            QString ChannelNumber =
+                QString("Freq %1").arg(query.value(3).toInt());
             struct CHANLIST* curList = chanlists[0].list;
             int totalChannels = chanlists[0].count;
             int findFrequency = (query.value(3).toInt() / 1000) - 1750;
-
             for (int x = 0 ; x < totalChannels ; x++)
             {
-                if (curList[x].freq == findFrequency)
+                if ((curList[x].freq <= findFrequency + 200) &&
+                    (curList[x].freq >= findFrequency - 200))
+                {
                     ChannelNumber = QString("%1").arg(curList[x].name);
+                }
             }
-
             DisplayText = QObject::tr("ATSC Channel %1").arg(ChannelNumber);
         }
         else
