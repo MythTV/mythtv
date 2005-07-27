@@ -95,6 +95,7 @@ public:
     bool FindTransports();
     bool FindServices();
     bool FillPMap(SISTANDARD _SIStandard);
+    bool FillPMap(const QString&);
 
     bool AddPMT(uint16_t ServiceID);
 

@@ -449,6 +449,18 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
     return true;
 }
 
+/** \fn SIParser::FillPMap(const QString&)
+ *  \brief Adds basic PID's corresponding to standard to the list
+ *         of PIDs we are listening to.
+ *
+ *   This is a convenience function that calls SIParser::FillPMap(SISTANDARD)
+ */
+bool SIParser::FillPMap(const QString& si_std)
+{
+    bool is_atsc = si_std.lower() == "atsc";
+    return FillPMap((is_atsc) ? SI_STANDARD_ATSC : SI_STANDARD_DVB);
+}
+
 /** \fn SIParser::AddPMT(uint16_t ServiceID)
  *  \brief Adds the pid associated with program number 'ServiceID' to the
  *         listening list if this is an ATSC stream and adds the pid associated
@@ -501,10 +513,7 @@ bool SIParser::ReinitSIParser(const QString& si_std, uint service_id)
              .arg((si_std.lower() == "atsc") ? "program" : "service")
              .arg(service_id));
 
-    SISTANDARD std = (si_std.lower() == "atsc") ?
-        SI_STANDARD_ATSC : SI_STANDARD_DVB;
-
-    return FillPMap(std) & AddPMT(service_id);
+    return FillPMap(si_std) & AddPMT(service_id);
 }
 
 
