@@ -452,7 +452,7 @@ void SipMsg::decodeAuthenticate(QString auth)
 
         QString thisParamNoWs = thisParam.stripWhiteSpace();
         QString ParamName  = thisParamNoWs.section('=', 0, 0);
-        QString ParamValue = thisParamNoWs.section('=', 1, 1);
+        QString ParamValue = thisParamNoWs.section('=', 1);
         QString ParamValueNoQuotes = (ParamValue.startsWith("\"")) ? ParamValue.section('\"', 1, 1) : ParamValue;
 
         if (ParamName == "realm")
