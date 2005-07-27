@@ -127,6 +127,8 @@ class DVBChannel : public QObject, public ChannelBase
     bool              stopTuning;
     pthread_t         siparser_thread;
     DVBSIParser*      siparser;
+    bool              disable_signal_wait;
+    bool              disable_siparser;
 };
 
 #endif

@@ -78,7 +78,8 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     : ChannelBase(parent),
       diseqc(NULL), dvbcam(NULL),
       fd_frontend(-1), cardnum(aCardNum), currentTID(-1),
-      first_tune(true), stopTuning(false), siparser(NULL)
+      first_tune(true), stopTuning(false), siparser(NULL),
+      disable_signal_wait(false), disable_siparser(false)
 {
     dvbcam = new DVBCam(cardnum);
     bzero(&info, sizeof(info));
@@ -132,7 +133,7 @@ void DVBChannel::StopTuning()
 bool DVBChannel::Open()
 {
     CHANNEL("Opening DVB channel");
-    if (siparser == NULL )
+    if (siparser == NULL && !disable_siparser)
     {
         // TODO: Rename sections to PMap and have it ONLY pull the ProgramMap
         siparser = new DVBSIParser(cardnum);
@@ -589,7 +590,8 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
 
     GENERAL("Multiplex Locked");
 
-    siparser->AddPMT(channel.serviceID);
+    if (siparser)
+        siparser->AddPMT(channel.serviceID);
 
 
 // TODO: Pick a more reasonable time here
@@ -690,6 +692,9 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
         fe_status_t stat;
         int timeout = 0;
         QString status = "Status: ";
+
+        if (!siparser)
+            return true;
 
         do {
             if (ioctl(fd_frontend, FE_READ_STATUS, &stat) < 0)
