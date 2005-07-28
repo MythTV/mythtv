@@ -431,6 +431,11 @@ void ScanWizardScanner::scan()
             return;
         }
 
+#ifdef USE_OWN_SIPARSER
+        if (GetDVBChannel())
+            GetDVBChannel()->disable_siparser = true;
+#endif // !USE_OWN_SIPARSER
+
         // These locks and objects might already exist in videosource need to check
         if (!channel->Open())
         {
@@ -439,7 +444,7 @@ void ScanWizardScanner::scan()
         }
 
         scanner = new SIScan(card_type, channel, parent->videoSource());
-    
+
         scanner->SetForceUpdate(true);
 
         bool ftao = ignore_encrypted(parent->captureCard(), channel->GetCurrentInput());
@@ -631,17 +636,30 @@ void ScanWizard::pageSelected(const QString& strTitle)
 void ScanWizardScanner::HandleTuneComplete(void)
 {
     VERBOSE(VB_SIPARSER, "ScannerEvent::HandleTuneComplete()");
-    if (tunerthread_running)
-        pthread_join(tuner_thread, NULL);
-    scanner->StartScanner();
 
+    if (!scanner)
+    {
+        VERBOSE(VB_SIPARSER, "ScannerEvent::HandleTuneComplete(): "
+                "Waiting for scan to start");
+        QTime t = QTime::currentTime();
+        while (!scanner && t.elapsed() < 500)
+            usleep(250);
+        if (!scanner)
+        {
+            VERBOSE(VB_SIPARSER, "ScannerEvent::HandleTuneComplete(): "
+                    "scan() did not start scanner! Aborting");
+            return;
+        }
+        VERBOSE(VB_SIPARSER, "ScannerEvent::HandleTuneComplete(): "
+                "scan() has started scanner");
+        usleep(5000);
+    }
+
+    scanner->StartScanner();
 #ifdef USING_DVB
     if (GetDVBChannel())
     {
-        // Wait for dvbsections to start this is silly, but does the trick
-        while (GetDVBChannel()->siparser == NULL)
-            usleep(250);
-        connect(GetDVBChannel()->siparser, SIGNAL(TableLoaded()),
+        connect(scanner->siparser, SIGNAL(TableLoaded()),
                 this, SLOT(TableLoaded()));
     }
 #endif // USING_DVB

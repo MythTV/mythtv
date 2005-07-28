@@ -31,6 +31,9 @@ typedef void* NITObject;
 typedef void* NIT;
 #endif // USING_DVB
 
+#define USE_OWN_SIPARSER
+#define DVB_QUICKSCAN
+
 #define SISCAN(args...) \
     VERBOSE(VB_SIPARSER, QString("SIScan(%1): ").arg(channel->GetDevice()) << args);
 
@@ -47,7 +50,7 @@ class VirtualChannelTable;
 class MasterGuideTable;
 class ScanStreamData;
 class EITHelper;
-class SIParser;
+class DVBSIParser;
 
 typedef enum
 {
@@ -141,6 +144,7 @@ class SIScan : public QObject
     void CheckNIT(NITObject& NIT);
     void UpdateTransportsInDB(NITObject NIT);
     void UpdateServicesInDB(int tid_db, QMap_SDTObject SDT);
+    static void *SpawnSectionReader(void*);
 
   private:
     // Set in constructor
@@ -173,7 +177,10 @@ class SIScan : public QObject
 
     QMap_SDTObject SDT;
     NITObject NIT;
-    SIParser* siparser;
+    pthread_t siparser_thread;
+  public:
+    DVBSIParser* siparser;
+  private:
 
     /// Scanner thread, runs SIScan::StartScanner()
     pthread_t        scanner_thread;
