@@ -107,7 +107,8 @@ SignalMonitor::SignalMonitor(int _capturecardnum, uint wait_for_mask,
       update_rate(25), running(false), exit(false), update_done(false),
       notify_frontend(true),
       signalLock(QObject::tr("Signal Lock"), "slock", 1, true, 0, 1, 0),
-      signalStrength(QObject::tr("Signal Power"), "signal", 0, true, 0, 100, 0)
+      signalStrength(QObject::tr("Signal Power"), "signal", 0, true, 0, 100, 0),
+      statusLock(true)
 {
 }
 

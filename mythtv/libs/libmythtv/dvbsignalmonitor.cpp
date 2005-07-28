@@ -82,6 +82,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
            "Warning, can not count Uncorrected Blocks", kDVBSigMon_WaitForUB);
     DVB_IO(FE_READ_STATUS, &stats.status, "Error, can not read status!", 0);
     AddFlags(newflags);
+    cerr<<"newflags: "<<newflags<<endl;
 #undef DVB_IO
 }
 
@@ -295,6 +296,12 @@ void DVBSignalMonitor::RunTableMonitor(void)
     VERBOSE(VB_CHANNEL, "RunTableMonitor() -- end");
 }
 
+#define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \
+    do { statusLock.lock(); \
+         SignalMonitorValue val = SIGNAL_VAL; \
+         statusLock.unlock(); \
+         emit SIGNAL_FUNC(val); } while (false)
+
 /** \fn DVBSignalMonitor::UpdateValues()
  *  \brief Fills in frontend stats and emits status Qt signals.
  *
@@ -321,21 +328,20 @@ void DVBSignalMonitor::UpdateValues(void)
         statusLock.unlock();
 
         //cerr<<"locked("<<locked<<") slock("<<signalLock.IsGood()<<")"<<endl;
-        statusLock.lock();
-        emit StatusSignalLock(signalLock);
+        
+        EMIT(StatusSignalLock, signalLock);
 
         if (HasFlags(kDTVSigMon_WaitForSig))
-            emit StatusSignalStrength(signalStrength);
+            EMIT(StatusSignalStrength, signalStrength);
         if (HasFlags(kDVBSigMon_WaitForSNR))
-            emit StatusSignalToNoise(signalToNoise);
+            EMIT(StatusSignalToNoise, signalToNoise);
         if (HasFlags(kDVBSigMon_WaitForBER))
-            emit StatusBitErrorRate(bitErrorRate);
+            EMIT(StatusBitErrorRate, bitErrorRate);
         if (HasFlags(kDVBSigMon_WaitForUB))
-            emit StatusUncorrectedBlocks(uncorrectedBlocks);
+            EMIT(StatusUncorrectedBlocks, uncorrectedBlocks);
 
         if (wasLocked != signalLock.GetValue())
             GENERAL((wasLocked ? "Signal Lost" : "Signal Lock"));
-        statusLock.unlock();
 
         statusLock.lock();
         bool ok = signalLock.IsGood();
@@ -358,6 +364,7 @@ void DVBSignalMonitor::UpdateValues(void)
 
     update_done = true;
 }
+#undef EMIT
 
 /** \fn fill_frontend_stats(int,dvb_stats_t&)
  *  \brief Returns signal statistics for the frontend file descriptor.

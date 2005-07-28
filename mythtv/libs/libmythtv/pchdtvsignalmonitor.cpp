@@ -106,6 +106,12 @@ void pcHDTVSignalMonitor::RunTableMonitor()
     VERBOSE(VB_CHANNEL, "RunTableMonitor() -- end");
 }
 
+#define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \
+    do { statusLock.lock(); \
+         SignalMonitorValue val = SIGNAL_VAL; \
+         statusLock.unlock(); \
+         emit SIGNAL_FUNC(val); } while (false)
+
 /** \fn pcHDTVSignalMonitor::UpdateValues()
  *  \brief Queries signal strength and emits status Qt signals.
  *
@@ -145,16 +151,13 @@ void pcHDTVSignalMonitor::UpdateValues()
         // TODO dtv signals...
     }
 
-    statusLock.lock();
-    emit StatusSignalLock(signalLock.GetValue());
-    emit StatusSignalStrength(signalStrength.GetValue());
-
-    emit StatusSignalLock(signalLock);
-    emit StatusSignalStrength(signalStrength);
-    statusLock.unlock();
+    EMIT(StatusSignalLock, signalLock);
+    EMIT(StatusSignalStrength, signalStrength);
 
     update_done = true;
 }
+
+#undef EMIT
 
 template<typename V>
 V clamp(V val, V minv, V maxv) { return std::min(maxv, std::max(minv, val)); }
