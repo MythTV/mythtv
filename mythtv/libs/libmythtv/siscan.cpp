@@ -60,8 +60,6 @@ static int  create_dtv_multiplex_ofdm(
 void delete_services(int db_mplexid, QMap_SDTObject SDT);
 #endif // USING_DVB
 
-int GetDVBTID(uint16_t NetworkID, uint16_t TransportID, int CurrentMplexId);
-
 /** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
  */
 SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
@@ -91,7 +89,6 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
     /* setup boolean values for thread */
     serviceListReady = false;
     transportListReady = false;
-    forceUpdate = false;
 
     siparser = NULL;
 #ifdef USING_DVB
@@ -425,10 +422,10 @@ void SIScan::RunScanner(void)
     {
         int mplex = -1;
         if (scanTransports.size() && scanIt != scanTransports.end() &&
-            (*scanIt).mplexid >= 0)
+            (*scanIt).mplexid > 0)
             mplex = (*scanIt).mplexid;
 #ifdef USING_DVB
-        if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() > 0)
+        else if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() > 0)
             mplex = GetDVBChannel()->GetMultiplexID();
 #endif // USING_DVB
 
@@ -990,21 +987,16 @@ void SIScan::UpdateVCTinDB(int tid_db,
 {
     (void) force_update;
 
+    VERBOSE(VB_SIPARSER, QString("UpdateVCTinDB(): mplex: %1:%2")
+            .arg(tid_db).arg((*scanIt).mplexid));
     int db_mplexid = ChannelUtil::GetBetterMplexID(
-        tid_db, vct->TransportStreamID(), 0);
+        tid_db, vct->TransportStreamID(), 1);
 
     if (db_mplexid == -1)
     {
-        VERBOSE(VB_IMPORTANT, "Warning: Could not determine "
-                " what transport this channel is associated with, \n"
-                " using GetBetterMplex(), trying GetDVBTID().");
-        db_mplexid = GetDVBTID(0, vct->TransportStreamID(), tid_db);
-        if (db_mplexid == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "VCT: Error determing what transport this "
-                    "service table is associated with so failing");
-            return;
-        }
+        VERBOSE(VB_IMPORTANT, "VCT: Error determing what transport this "
+                "service table is associated with so failing");
+        return;
     }
 
 /*    bool fta_only     = ignore_encrypted_services(db_mplexid, videodevice);*/
@@ -1154,20 +1146,13 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
     QMap_SDTObject::Iterator s = SDT.begin();
 
     int db_mplexid = ChannelUtil::GetBetterMplexID(
-        tid_db, (*s).TransportID, (*s).NetworkID);
+        tid_db, (*s).TransportID, ((*s).ATSCSourceID) ? 1 : (*s).NetworkID);
 
     if (db_mplexid == -1)
     {
-        VERBOSE(VB_IMPORTANT, "Warning: Could not determine "
-                " what transport this channel is associated with, \n"
-                " using GetBetterMplex(), trying GetDVBTID().");
-        db_mplexid = GetDVBTID((*s).NetworkID, (*s).TransportID, tid_db);
-        if (db_mplexid == -1)
-        {
-            VERBOSE(VB_IMPORTANT, "SRV: Error determing what transport this "
-                    "service table is associated with so failing");
-            return;
-        }
+        VERBOSE(VB_IMPORTANT, "SRV: Error determing what transport this "
+                "service table is associated with so failing");
+        return;
     }
 
 /*  Check the ServiceVersion and if its the same as you have, or a 
@@ -1216,9 +1201,6 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
 
     ignoreEncryptedServices = 
         ignore_encrypted_services(db_mplexid, GetDVBChannel()->GetDevice());
-
-    // This code has caused too much trouble to leave in for now - Taylor
-    //delete_services(db_mplexid, SDT);
 
     int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
     int freqid         = (*scanIt).friendlyNum;
@@ -1488,133 +1470,6 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
 #endif // USING_DVB
 }
 
-#define SISCAN_DEBUG
-int GetDVBTID(uint16_t NetworkID, uint16_t TransportID, int CurrentMplexId)
-{
-#ifdef SISCAN_DEBUG
-    printf("Request for Networkid/Transportid %d %d\n",NetworkID,TransportID);
-#endif
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    QString theQuery;
-    query.prepare(
-        QString("SELECT networkid, transportid FROM dtv_multiplex "
-                "WHERE mplexid = %1").arg(CurrentMplexId));
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Getting mplexid global search", query);
-
-
-    if (query.size() >= 1)
-    {
-        query.next();
-
-#ifdef SISCAN_DEBUG
-        printf("Query Results: %d %d\n",
-               query.value(0).toInt(), query.value(1).toInt());
-#endif
-
-        // See if you can get an exact match based on the current 
-        // mplexid's sourceID and the NetworkID/TransportID
-
-        if ((query.value(0).toInt() == NetworkID) &&
-            (query.value(1).toInt() == TransportID))
-        {
-            return CurrentMplexId;
-        }
-
-        // Then see if current one is NULL.
-        // If so, update those values and return current mplexid
-
-        if ((query.value(0).toInt() == 0) && (query.value(1).toInt() == 0))
-        {
-            query.prepare(
-                QString("UPDATE dtv_multiplex SET networkid=%1, transportid=%2 "
-                        "WHERE mplexid = %3")
-                .arg(NetworkID).arg(TransportID).arg(CurrentMplexId));
-
-            if (!query.exec() || !query.isActive())
-                MythContext::DBError("Getting mplexid global search", query);
-
-            return CurrentMplexId;
-        }
-    }
-
-    // Values were set, so see where you can find this NetworkID/TransportID
-    query.prepare(
-        QString("SELECT a.mplexid "
-                "FROM dtv_multiplex a, dtv_multiplex b "
-                "WHERE a.sourceid=b.sourceID AND a.networkid='%1' AND "
-                "      a.transportid='%2'    AND a.mplexid='%3'")
-        .arg(NetworkID).arg(TransportID).arg(CurrentMplexId));
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Finding matching mplexid", query);
-
-    // If you got an exact match just return it, since there is no question what
-    // mplexid this NetworkId/TransportId is for.
-    if (query.size() == 1)
-    {
-#ifdef SISCAN_DEBUG
-        printf("Exact Match!\n");
-#endif
-        query.next();
-        int tmp = query.value(0).toInt();
-        return tmp;
-    }
-
-    // If you got more than 1 hit then all you can do is hope that 
-    // this NetworkID/TransportID pair belongs to the CurrentMplexId;
-    if (query.size() > 1)
-    {
-#ifdef SISCAN_DEBUG
-        printf("more than 1 hit\n");
-#endif
-        return CurrentMplexId;
-    }
-
-    // If you got here you didn't find any match at all..
-    // Try to see if this N/T pair is on a transport that we know about..
-    // Search without the SourceID restriction..
-    query.prepare(
-        QString("SELECT mplexid FROM dtv_multiplex "
-                "WHERE networkid = %1 AND transportid = %2")
-        .arg(NetworkID).arg(TransportID));
-        
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Getting mplexid global search", query);
-
-    // If you still didn't find this combo return -1 (failure)
-    if (query.size() <= 0)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Error: Found no match for "
-                        "NetworkID %1 TransportID %2")
-                .arg(NetworkID).arg(TransportID));
-        return -1;
-    }
-
-    query.next();
-
-    // Now you are in trouble.. You found more than 1 match, 
-    // so just guess that its the first entry in the database..
-    if (query.size() > 1)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Warning: Found more than one match for "
-                        "NetworkID %1 TransportID %2")
-                .arg(NetworkID).arg(TransportID));
-        int tmp = query.value(0).toInt();
-        return tmp;
-    }
-
-    // You found the entries.
-    // But it was on a different sourceID, so return that value.
-    int retval = query.value(0).toInt();
-
-    return retval;
-}
-
 // ///////////////////// Static DB helper methods /////////////////////
 // ///////////////////// Static DB helper methods /////////////////////
 // ///////////////////// Static DB helper methods /////////////////////
@@ -1642,35 +1497,6 @@ static bool ignore_encrypted_services(int db_mplexid, QString videodevice)
         return query.value(0).toBool();
     }
     return true;
-}
-
-void delete_services(int db_mplexid, QMap_SDTObject SDT)
-{
-    (void) db_mplexid;
-    (void) SDT;
-#ifdef USING_DVB
-    MSqlQuery query(MSqlQuery::InitCon());
-    // Clear out entries in the channel table that don't exist anymore
-    QString deleteQuery = "DELETE FROM channel WHERE NOT (";
-    for (QMap_SDTObject::Iterator s = SDT.begin(); s != SDT.end(); ++s)
-    {
-        deleteQuery += (s == SDT.begin()) ? "(" : " OR (";
-
-        if ( (*s).ChanNum != -1)
-            deleteQuery += QString("channum = \"%1\" AND ").arg((*s).ChanNum);
-
-        deleteQuery += QString("callsign = '%1' AND serviceid=%2 AND atscsrcid=%3) ")
-                       .arg((*s).ServiceName.utf8())
-                       .arg((*s).ServiceID)
-                       .arg((*s).ATSCSourceID);
-    }
-    deleteQuery += QString(") AND mplexid = %1").arg(db_mplexid);
-
-    query.prepare(deleteQuery);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Deleting non-existant channels", query);
-#endif // USING_DVB
 }
 
 #ifdef USING_DVB

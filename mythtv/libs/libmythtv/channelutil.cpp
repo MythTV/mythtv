@@ -315,6 +315,10 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
                                   int transport_id,
                                   int network_id)
 {
+    VERBOSE(VB_SIPARSER,
+            QString("GetBetterMplexID(mplexId %1, tId %2, netId %3)")
+            .arg(current_mplexid).arg(transport_id).arg(network_id));
+
     int q_networkid = 0, q_transportid = 0;
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -333,11 +337,17 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
 
     // Got a match, return it.
     if ((q_networkid == network_id) && (q_transportid == transport_id))
+    {
+        VERBOSE(VB_SIPARSER,
+                QString("GetBetterMplexID(): Returning perfect match %1")
+                .arg(current_mplexid));
         return current_mplexid;
+    }
 
     // Not in DB at all, insert it
     if (!q_networkid && !q_transportid)
     {
+        int qsize = query.size();
         query.prepare(QString("UPDATE dtv_multiplex "
                               "SET networkid = %1, transportid = %2 "
                               "WHERE mplexid = %3")
@@ -346,6 +356,10 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
         if (!query.exec() || !query.isActive())
             MythContext::DBError("Getting mplexid global search", query);
 
+        VERBOSE(VB_SIPARSER, QString(
+                    "GetBetterMplexID(): net id and transport id "
+                    "are null, qsize(%1), Returning %2")
+                .arg(qsize).arg(current_mplexid));
         return current_mplexid;
     }
 
@@ -356,14 +370,14 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
                 "FROM dtv_multiplex a, dtv_multiplex b "
                 "WHERE a.networkid   = %1 AND "
                 "      a.transportid = %2 AND "
-                "      a.sourceId    = b.sourceID AND "
+                "      a.sourceid    = b.sourceid AND "
                 "      b.mplexid     = %3")
         .arg(network_id).arg(transport_id).arg(current_mplexid),
 
         QString("SELECT mplexid "
                 "FROM dtv_multiplex "
-                "WHERE networkID = %1 AND "
-                "      transportID = %2")
+                "WHERE networkid = %1 AND "
+                "      transportid = %2")
         .arg(network_id).arg(transport_id),
     };
 
@@ -376,23 +390,28 @@ int ChannelUtil::GetBetterMplexID(int current_mplexid,
 
         if (query.size() == 1)
         {
+            VERBOSE(VB_SIPARSER, QString(
+                        "GetBetterMplexID(): query#%1 qsize(%2) "
+                        "Returning %3")
+                    .arg(i).arg(query.size()).arg(current_mplexid));
             query.next();
             return query.value(0).toInt();
         }
 
         if (query.size() > 1)
         {
-            // Now you are in trouble.. You found more than 1 match, so
-            // just guess that it is the first entry in the database..S
-            VERBOSE(VB_IMPORTANT,
-                    QString("Found more than 1 match for network_id %1 "
-                            "transport_id %2").arg(network_id).arg(transport_id));
             query.next();
-            return (i==0) ? current_mplexid : query.value(0).toInt();
+            int ret = (i==0) ? current_mplexid : query.value(0).toInt();
+            VERBOSE(VB_SIPARSER, QString(
+                        "GetBetterMplexID(): query#%1 qsize(%2) "
+                        "Returning %3")
+                    .arg(i).arg(query.size()).arg(ret));
+            return ret;
         }
     }
 
     // If you still didn't find this combo return -1 (failure)
+    VERBOSE(VB_SIPARSER, QString("GetBetterMplexID(): Returning -1"));
     return -1;
 }
 
