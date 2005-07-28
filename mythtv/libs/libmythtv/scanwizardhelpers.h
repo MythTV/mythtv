@@ -255,7 +255,7 @@ class ScanATSCTransport: public ComboBoxSetting, public TransientStorage
     {
         addSelection(QObject::tr("Terrestrial"),        "vsb8",   true);
         addSelection(QObject::tr("Cable")+" (QAM-256)", "qam256", false);
-        //addSelection(QObject::tr("Cable-HRC")+" (QAM-256)", "qam256hrc", false);
+        addSelection(QObject::tr("Cable-HRC")+" (QAM-256)", "qam256hrc", false);
         //addSelection(QObject::tr("Cable")+" (QAM-128)", "qam128", false);
         //addSelection(QObject::tr("Cable")+" (QAM-64)",  "qam64",  false);
 
@@ -605,6 +605,12 @@ class ATSCPane : public HorizontalConfigurationGroup
 
     QString atscTransport() { return atsc_transport->getValue(); }
     QString atscFormat()    { return atsc_format->getValue();    }
+
+    void SetDefaultFormat(QString d)
+    {
+        int val = atsc_format->getValueIndex(d);
+        atsc_format->setValue(val);
+    }
 
   protected:
     ScanATSCTransport *atsc_transport;

@@ -425,6 +425,18 @@ void SelectSetting::setValue(const QString& newValue)  {
         addSelection(newValue, newValue, true);
 }
 
+void SelectSetting::setValue(int which)
+{
+    if ((unsigned)which > values.size()-1 || which < 0) {
+        VERBOSE(VB_IMPORTANT, 
+                "SelectSetting::setValue(): invalid index " << which);
+        return;
+    }
+    current = which;
+    isSet = true;
+    Setting::setValue(values[current]);
+}
+
 QWidget* LabelSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
                                     const char* widgetName) {
     (void)cg;
@@ -707,6 +719,26 @@ void ComboBoxSetting::setVisible(bool b)
             widget->hide();
     }
 }
+
+void ComboBoxSetting::setValue(QString newValue)
+{
+    if (!rw)
+    {
+        VERBOSE(VB_IMPORTANT, "ComboBoxSetting::setValue(QString): "
+                "BUG: attempted to set value of read-only ComboBox");
+        return;
+    }
+    Setting::setValue(newValue);
+    if (widget)
+        widget->setCurrentItem(current);
+};
+
+void ComboBoxSetting::setValue(int which)
+{
+    if (widget)
+        widget->setCurrentItem(which);
+    SelectSetting::setValue(which);
+};
 
 void HostRefreshRateComboBox::ChangeResolution(const QString& resolution)
 {

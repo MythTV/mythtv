@@ -56,6 +56,8 @@
 #include "dvbconfparser.h"
 #endif
 
+static bool ignore_encrypted(int cardid, QString input_name);
+
 /// Percentage to set to after the transports have been scanned
 #define TRANSPORT_PCT 6
 /// Percentage to set to after the first tune
@@ -440,24 +442,8 @@ void ScanWizardScanner::scan()
     
         scanner->SetForceUpdate(true);
 
-        MSqlQuery query(MSqlQuery::InitCon());
-
-        QString thequery = QString("SELECT freetoaironly "
-                                   "FROM cardinput "
-                                   "WHERE cardinput.cardid=%1 AND "
-                                   "cardinput.sourceid=%2")
-            .arg(parent->captureCard())
-            .arg(nVideoSource);
-
-        query.prepare(thequery);
-
-        bool freetoair = true;
-        if (query.exec() && query.isActive() && query.size() > 0)
-        {
-            query.next();
-            freetoair = query.value(0).toBool();
-        }
-        scanner->SetFTAOnly(freetoair);
+        bool ftao = ignore_encrypted(parent->captureCard(), channel->GetCurrentInput());
+        scanner->SetFTAOnly(ftao);
 
         connect(scanner, SIGNAL(ServiceScanComplete(void)),
                 this,    SLOT(  scanComplete(void)));
@@ -518,15 +504,15 @@ void ScanWizardScanner::scan()
         {
 #ifdef USING_DVB
             // SQL code to get the disqec paramters HERE
-            thequery = QString(
-                "SELECT dvb_diseqc_type, diseqc_port,  diseqc_pos, "
-                "       lnb_lof_switch,  lnb_lof_hi,   lnb_lof_lo "
-                "FROM cardinput, capturecard "
-                "WHERE capturecard.cardid=%1 and cardinput.sourceid=%2")
-                .arg(parent->captureCard()).arg(nVideoSource);
-    
-            query.prepare(thequery);
-    
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare(
+                QString(
+                    "SELECT dvb_diseqc_type, diseqc_port,  diseqc_pos, "
+                    "       lnb_lof_switch,  lnb_lof_hi,   lnb_lof_lo "
+                    "FROM cardinput, capturecard "
+                    "WHERE capturecard.cardid=%1 and cardinput.sourceid=%2")
+                .arg(parent->captureCard()).arg(nVideoSource));
+
             if (query.exec() && query.isActive() && query.size() > 0)
             {
                 QPSKPane *pane = parent->paneQPSK;
@@ -619,6 +605,8 @@ void ScanWizard::captureCard(const QString& str)
     {
         nCaptureCard = nNewCaptureCard;
         nCardType = CardUtil::GetCardType(nCaptureCard);
+        QString fmt = (nCardType == CardUtil::HDTV) ? "%1_%2" : "%1%2";
+        paneATSC->SetDefaultFormat(fmt);
         emit cardTypeChanged(QString::number(nCardType));
     }
 }
@@ -701,4 +689,21 @@ void ScanWizardScanner::HandleTuneComplete(void)
     {
         VERBOSE(VB_IMPORTANT, "Failed to handle tune complete.");
     }
+}
+
+static bool ignore_encrypted(int cardid, QString input_name)
+{
+    bool freetoair = true;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        QString("SELECT freetoaironly FROM cardinput "
+                "WHERE cardid='%1' AND inputname='%2'")
+        .arg(cardid).arg(input_name));
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        freetoair = query.value(0).toBool();
+    }
+    return freetoair;
 }

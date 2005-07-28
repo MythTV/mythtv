@@ -329,14 +329,7 @@ signals:
 public slots:
 
     virtual void setValue(const QString& newValue);
-
-    virtual void setValue(int which) {
-        if ((unsigned)which > values.size()-1) {
-            cout << "SelectSetting::setValue(): invalid index " << which << endl;
-            return;
-        }
-        setValue(values[which]);
-    };
+    virtual void setValue(int which);
 
     virtual QString getSelectionLabel(void) const {
         if (!isSet)
@@ -386,16 +379,8 @@ protected:
     };
 
 public:
-    virtual void setValue(QString newValue) {
-        if (!rw)
-            cout << "BUG: attempted to set value of read-only ComboBox as string\n";
-        else
-            Setting::setValue(newValue);
-    };
-
-    virtual void setValue(int which) {
-        SelectSetting::setValue(which);
-    };
+    virtual void setValue(QString newValue);
+    virtual void setValue(int which);
 
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 
                                   const char* widgetName = 0);
