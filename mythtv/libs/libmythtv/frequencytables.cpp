@@ -255,6 +255,21 @@ static void init_freq_tables(freq_table_map_t &fmap)
         "ATSC Channel %1", 70, 809000000, 887000000, 6000000, VSB_8); // UHF 70-83
 #endif // USING_DVB
 
+    fmap["atsc_qam256hrc_us0"] = new FrequencyTable(
+        "QAM-256 HRC %1",   1,  73750000,  73750001, 6000000, QAM_256);
+    fmap["atsc_qam256hrc_us1"] = new FrequencyTable(
+        "QAM-256 HRC %1",   2,  55750000,  67750000, 6000000, QAM_256);
+    fmap["atsc_qam256hrc_us2"] = new FrequencyTable(
+        "QAM-256 HRC %1",   5,  79750000,  85750000, 6000000, QAM_256);
+    fmap["atsc_qam256hrc_us3"] = new FrequencyTable(
+        "QAM-256 HRC %1",   7, 175750000, 643750000, 6000000, QAM_256);
+    fmap["atsc_qam256hrc_us4"] = new FrequencyTable(
+        "QAM-256 HRC %1",  95,  91750000, 114000000, 6000000, QAM_256);
+    fmap["atsc_qam256hrc_us5"] = new FrequencyTable(
+        "QAM-256 HRC %1", 100, 649750000, 799750000, 6000000, QAM_256);
+    fmap["atsc_qam256hrc_us6"] = new FrequencyTable(
+        "QAM-256 HRC T-%1", 7,   8175000,  50750000, 6000000, QAM_256);
+
     // USA Cable, QAM 256
     fmap["atsc_qam256_us0"] = new FrequencyTable(
         "QAM-256 Channel %1",   1, 75000000, 801000000, 6000000, QAM_256);
