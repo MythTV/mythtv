@@ -790,7 +790,7 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
     currentcapchannel = newcapchannel;
     curchannelname = "";
 
-    if (inputTuneTo[currentcapchannel] != "Undefined")
+    if (setstarting && inputTuneTo[currentcapchannel] != "Undefined")
         TuneTo(inputTuneTo[currentcapchannel], 0);
 
     if (setstarting && !inputChannel[currentcapchannel].isEmpty())

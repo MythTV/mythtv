@@ -118,7 +118,7 @@ class TransportScanItem
     enum
     {
         DVBT_TUNINGTIMEOUT = 1000,
-        ATSC_TUNINGTIMEOUT = 2000,
+        ATSC_TUNINGTIMEOUT = 500,
     };
 
   public:

@@ -43,8 +43,6 @@ class dvb_channel_t;
 typedef int fe_type_t;
 #endif // USING_DVB
 
-/// \brief How long we wait for the hardware to stabalize on a signal
-#define SIGNAL_LOCK_TIMEOUT   500
 /// \brief How long we wait for ATSC tables, before giving up
 #define ATSC_TABLES_TIMEOUT 1500
 /// \brief How long we wait for DVB tables, before giving up
@@ -515,7 +513,7 @@ void SIScan::HandleActiveScan(void)
     }
     else if ((*scanIt).standard.lower() == "atsc")
     {
-        if ((scanTimeout > 0) && (timer.elapsed() > SIGNAL_LOCK_TIMEOUT))
+        if (timer.elapsed() > (int)(*scanIt).timeoutTune)
         {
             // If we don't have a signal in SIGNAL_LOCK_TIMEOUT msec, continue..
             timed_out = false;
@@ -710,10 +708,10 @@ void SIScan::StopScanner(void)
     if (siparser && GetDVBChannel())
         GetDVBChannel()->StopTuning();
 #endif // USING_DVB
-    if (signalMonitor)
-        signalMonitor->Stop();
     if (scanner_thread_running)
         pthread_join(scanner_thread, NULL);
+    if (signalMonitor)
+        signalMonitor->Stop();
 }
 
 void SIScan::verifyTransport(TransportScanItem& t)

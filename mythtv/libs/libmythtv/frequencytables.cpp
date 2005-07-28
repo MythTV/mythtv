@@ -8,7 +8,7 @@ static void init_freq_tables(freq_table_map_t&);
 TransportScanItem::TransportScanItem()
     : mplexid(-1),      standard("dvb"),
       FriendlyName(""), SourceID(0),         UseTimer(false),
-      scanning(false),  timeoutTune(ATSC_TUNINGTIMEOUT), complete(false)
+      scanning(false),  timeoutTune(DVBT_TUNINGTIMEOUT), complete(false)
 { 
     bzero(freq_offsets, sizeof(int)*3);
 #ifdef USING_DVB
@@ -23,7 +23,7 @@ TransportScanItem::TransportScanItem(int sourceid,
                                      const QString &fn)
     : mplexid(_mplexid), standard("dvb"),
       FriendlyName(fn),  SourceID(sourceid), UseTimer(false),
-      scanning(false),   timeoutTune(ATSC_TUNINGTIMEOUT), complete(false)
+      scanning(false),   timeoutTune(DVBT_TUNINGTIMEOUT), complete(false)
 {
     bzero(freq_offsets, sizeof(int)*3);
 #ifdef USING_DVB
