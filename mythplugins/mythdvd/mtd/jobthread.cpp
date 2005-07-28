@@ -565,6 +565,8 @@ DVDISOCopyThread::DVDISOCopyThread(MTD *owner,
                             nice_priority)
 
 {
+
+    sendLoggingEvent(QString("Using DVD source: %1").arg(dvd_device));
 }
 
 void DVDISOCopyThread::run()
@@ -574,7 +576,7 @@ void DVDISOCopyThread::run()
     //
     
     nice(nice_level);
-    job_name = QString(QObject::tr("ISO Image Copy of %1")).arg(rip_name);
+    job_name = QString(QObject::tr("ISO copy of %1")).arg(rip_name);
     if(keepGoing())
     {
         copyFullDisc();
@@ -585,7 +587,7 @@ bool DVDISOCopyThread::copyFullDisc(void)
 {
     bool loop = true;
 
-    setSubName(QObject::tr("Waiting for Access to DVD"), 1);
+    setSubName(QObject::tr("Waiting for access to DVD"), 1);
 
     while(loop)
     {
@@ -638,8 +640,8 @@ bool DVDISOCopyThread::copyFullDisc(void)
     off_t dvd_size = lseek(file, 0, SEEK_END);
     lseek(file, 0, SEEK_SET);
 
-    int buf_size = 4098;
-    unsigned char *buffer = new unsigned char[buf_size];
+    const int buf_size = 4098;
+    unsigned char buffer[buf_size];
     long long total_bytes(0);
 
     QTime job_time;
@@ -655,7 +657,6 @@ bool DVDISOCopyThread::copyFullDisc(void)
             ripfile->remove();
             delete ripfile;
             ripfile = NULL;
-            delete buffer;
             dvd_device_access->unlock();
             return false;
         }
@@ -670,7 +671,6 @@ bool DVDISOCopyThread::copyFullDisc(void)
             ripfile->remove();
             delete ripfile;
             ripfile = NULL;
-            delete buffer;
             dvd_device_access->unlock();
             return false;
         }
@@ -693,13 +693,11 @@ bool DVDISOCopyThread::copyFullDisc(void)
             ripfile->remove();
             delete ripfile;
             ripfile = NULL;
-            delete buffer;
             dvd_device_access->unlock();
             return false;
         }
     }
 
-    delete buffer;
     ripfile->close();
     delete ripfile;
     dvd_device_access->unlock();
