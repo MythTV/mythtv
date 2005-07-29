@@ -301,6 +301,13 @@ class NuppelVideoPlayer
     void DisplaySubtitles();
     void ClearSubtitles();
 
+    void SetDecoder(DecoderBase *dec);
+    // Returns the stream decoder currently in use.
+    DecoderBase *GetDecoder() { return decoder; }
+    // Returns the stream decoder currently in use.
+    const DecoderBase *GetDecoder() const { return decoder; }
+
+  private:
     QString filename;
 
     /* rtjpeg_plugin stuff */

@@ -142,14 +142,6 @@ class AvFormatDecoder : public DecoderBase
     bool directrendering;
     bool drawband;
 
-    int audio_sample_size;
-    int audio_sampling_rate;
-    int audio_channels;
-
-    int audio_check_1st;         ///< Used by CheckAudioParams
-    int audio_sampling_rate_2nd; ///< Used by CheckAudioParams
-    int audio_channels_2nd;      ///< Used by CheckAudioParams
-
     int bitrate;
 
     bool gopset;
@@ -169,19 +161,24 @@ class AvFormatDecoder : public DecoderBase
     long long lastvpts;
     long long lastapts;
 
-    bool do_ac3_passthru;
-
-    short int audioSamples[AVCODEC_MAX_AUDIO_FRAME_SIZE];
-
-    QValueVector<int> audioStreams;
-    int wantedAudioStream;
-
     bool using_null_videoout;
     MythCodecID video_codec_id;
 
     int maxkeyframedist;
 
     QStringList subtitleLanguagePreferences;
+
+    // Audio
+    short int        *audioSamples;
+    int               audio_sample_size;
+    int               audio_sampling_rate;
+    int               audio_channels;
+    bool              do_ac3_passthru;
+    int               wantedAudioStream;
+    QValueVector<int> audioStreams;
+    int               audio_check_1st;         ///< Used by CheckAudioParams
+    int               audio_sampling_rate_2nd; ///< Used by CheckAudioParams
+    int               audio_channels_2nd;      ///< Used by CheckAudioParams
 };
 
 #endif

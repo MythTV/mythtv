@@ -30,29 +30,20 @@ extern pthread_mutex_t avcodeclock;
 class AvFormatDecoderPrivate
 {
   public:
-    AvFormatDecoderPrivate(AvFormatDecoder *lparent);
-   ~AvFormatDecoderPrivate();
+    AvFormatDecoderPrivate() : mpeg2dec(NULL) { ; }
+   ~AvFormatDecoderPrivate() { DestroyMPEG2(); }
     
     bool InitMPEG2();
+    bool HasMPEG2Dec() const { return (bool)(mpeg2dec); }
+
     void DestroyMPEG2();
     void ResetMPEG2();
     int DecodeMPEG2Video(AVCodecContext *avctx, AVFrame *picture,
                          int *got_picture_ptr, uint8_t *buf, int buf_size);
 
-    AvFormatDecoder *parent;
+  private:
     mpeg2dec_t *mpeg2dec;
 };
-
-AvFormatDecoderPrivate::AvFormatDecoderPrivate(AvFormatDecoder *lparent)
-{
-    parent = lparent;
-    mpeg2dec = NULL;
-}
-
-AvFormatDecoderPrivate::~AvFormatDecoderPrivate()
-{
-    DestroyMPEG2();
-}
 
 bool AvFormatDecoderPrivate::InitMPEG2()
 {
@@ -141,50 +132,27 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
 
 AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
                                  bool use_null_videoout)
-    : DecoderBase(parent, pginfo), using_null_videoout(use_null_videoout),
-      video_codec_id(kCodec_NONE)
+    : DecoderBase(parent, pginfo),
+      d(new AvFormatDecoderPrivate()), ic(NULL),
+      frame_decoded(0), directrendering(false), drawband(false), bitrate(0),
+      gopset(false), seen_gop(false), seq_count(0), firstgoppos(0),
+      prevgoppos(0), gotvideo(false), lastvpts(0), lastapts(0),
+      using_null_videoout(use_null_videoout), video_codec_id(kCodec_NONE),
+      maxkeyframedist(-1), 
+      // Audio
+      audioSamples(new (short int)[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
+      audio_sample_size(-1), audio_sampling_rate(-1), audio_channels(-1),
+      do_ac3_passthru(false), wantedAudioStream(-1),
+      audio_check_1st(2), audio_sampling_rate_2nd(0), audio_channels_2nd(0)
 {
-    d = new AvFormatDecoderPrivate(this);
+    bzero(&params, sizeof(AVFormatParameters));
+    bzero(prvpkt, 3 * sizeof(char));
+
+    subtitleLanguagePreferences = QStringList::split(
+        ",", gContext->GetSetting("PreferredLanguages", ""));
     
-    ic = NULL;
-    directrendering = false;
-    lastapts = lastvpts = 0;
-    framesPlayed = 0;
-    framesRead = 0;
-
-    wantedAudioStream = -1;
-
-    audio_check_1st = 2;
-    audio_channels = -1;
-    audio_sample_size = -1;
-    audio_sampling_rate = -1;
-
-    exitafterdecoded = false;
-    ateof = false;
-    gopset = false;
-    seen_gop = false;
-    seq_count = 0;
-    firstgoppos = 0;
-    prevgoppos = 0;
-
-    subtitleLanguagePreferences = QStringList::split(",", 
-                                gContext->GetSetting("PreferredLanguages", ""));
-    fps = 29.97;
-    maxkeyframedist = -1;
-
-    lastKey = 0;
-
-    positionMapType = MARK_UNSET;
-
-    do_ac3_passthru = false;
-
-    memset(&params, 0, sizeof(AVFormatParameters));
-    memset(prvpkt, 0, 3);
-
-    if (print_verbose_messages & VB_LIBAV)
-        av_log_set_level(AV_LOG_DEBUG);
-    else
-        av_log_set_level(AV_LOG_ERROR);
+    bool debug = (bool)(print_verbose_messages & VB_LIBAV);
+    av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -340,8 +308,8 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
 
     if (doflush)
     {
-        m_parent->SetFramesPlayed(framesPlayed + 1);
-        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
+        GetNVP()->SetFramesPlayed(framesPlayed + 1);
+        GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
     }
 
     getrawframes = oldrawstate;
@@ -378,7 +346,7 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
 
         // TODO here we may need to wait for flushing to complete...
 
-        m_parent->DiscardVideoFrames();
+        GetNVP()->DiscardVideoFrames();
     }
 
     while (storedPackets.count() > 0)
@@ -550,7 +518,8 @@ void AvFormatDecoder::InitByteContext(void)
 extern "C" void HandleStreamChange(void* data) {
     AvFormatDecoder* decoder = (AvFormatDecoder*) data;
     int cnt = decoder->ic->nb_streams;
-    VERBOSE(VB_PLAYBACK, QString("streams_changed() -- stream count %1").arg(cnt));
+    VERBOSE(VB_PLAYBACK, QString("streams_changed(0x%1) -- stream count %2")
+            .arg(((int)data),0,16).arg(cnt));
     decoder->ScanStreams(false);
 }
 
@@ -661,14 +630,14 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
 
         if (dur > 0)
         {
-            m_parent->SetFileLength((int)(dur), (int)(dur * fps));
+            GetNVP()->SetFileLength((int)(dur), (int)(dur * fps));
         }
         else
         {
             // the pvr-250 seems to overreport the bitrate by * 2
             float bytespersec = (float)bitrate / 8 / 2;
             float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
-            m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+            GetNVP()->SetFileLength((int)(secs), (int)(secs * fps));
         }
 
         // we will not see a position map from db or remote encoder,
@@ -782,7 +751,7 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
         aspect_ratio = 4.0 / 3;
     }
 
-    m_parent->SetVideoParams(align_width, align_height, fps,
+    GetNVP()->SetVideoParams(align_width, align_height, fps,
                              keyframedist, aspect_ratio, kScan_Detect);
 }
 
@@ -974,7 +943,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     // Select a new track at the next opportunity.
     currentAudioTrack = -1;
 
-    if (m_parent->IsErrored())
+    if (GetNVP()->IsErrored())
         scanerror = -1;
 
     return scanerror;
@@ -1075,8 +1044,8 @@ void AvFormatDecoder::CheckAudioParams(int freq, int channels, bool safe)
         audio_channels = channels;
     }
 
-    m_parent->SetAudioParams(16, audio_channels, audio_sampling_rate);
-    m_parent->ReinitAudio();
+    GetNVP()->SetAudioParams(16, audio_channels, audio_sampling_rate);
+    GetNVP()->ReinitAudio();
     return;
 }
 
@@ -1084,7 +1053,7 @@ int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
 
-    VideoFrame *frame = nd->m_parent->GetNextVideoFrame(true);
+    VideoFrame *frame = nd->GetNVP()->GetNextVideoFrame(true);
 
     int width = frame->width;
     int height = frame->height;
@@ -1125,7 +1094,7 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
 int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
 {
     AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
-    VideoFrame *frame = nd->m_parent->GetNextVideoFrame(false);
+    VideoFrame *frame = nd->GetNVP()->GetNextVideoFrame(false);
 
     pic->data[0] = frame->priv[0];
     pic->data[1] = frame->priv[1];
@@ -1187,7 +1156,7 @@ void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
         int width = s->width;
 
         VideoFrame *frame = (VideoFrame *)src->opaque;
-        nd->m_parent->DrawSlice(frame, 0, y, width, height);
+        nd->GetNVP()->DrawSlice(frame, 0, y, width, height);
     }
     else
         cerr<<"render_slice_xvmc called with bad avctx or src"<<endl;
@@ -1218,7 +1187,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                     positionMapType = MARK_GOP_BYFRAME;
 
                 VERBOSE(VB_PLAYBACK, QString("Stream initial keyframedist: %1.").arg(keyframedist));
-                m_parent->SetKeyframeDistance(keyframedist);
+                GetNVP()->SetKeyframeDistance(keyframedist);
             }
         }
         else
@@ -1238,7 +1207,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                 else
                     positionMapType = MARK_GOP_BYFRAME;
 
-                m_parent->SetKeyframeDistance(keyframedist);
+                GetNVP()->SetKeyframeDistance(keyframedist);
 
 #if 0
                 // also reset length
@@ -1249,7 +1218,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                 VERBOSE(VB_PLAYBACK, QString("Setting(2) length to: %1, "
                                              "total frames %2")
                                              .arg(length).arg((int)totframes));
-                m_parent->SetFileLength(length, totframes);
+                GetNVP()->SetFileLength(length, totframes);
 #endif
             }
         }
@@ -1291,7 +1260,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             bitrate = (int)((pkt->pos * 8 * fps) / (framesRead - 1));
             float bytespersec = (float)bitrate / 8;
             float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
-            m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+            GetNVP()->SetFileLength((int)(secs), (int)(secs * fps));
         }
 #endif
     }
@@ -1369,7 +1338,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                             avcodec_align_dimensions(context, &align_width, 
                                                      &align_height);
 
-                        m_parent->SetVideoParams(align_width,
+                        GetNVP()->SetVideoParams(align_width,
                                                  align_height, fps,
                                                  keyframedist, aspect, 
                                                  kScan_Detect, true);
@@ -1377,8 +1346,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                         current_height = height;
                         current_aspect = aspect;
 
-                        if (d->mpeg2dec)
-                            d->ResetMPEG2();
+                        d->ResetMPEG2();
 
                         gopset = false;
                         prevgoppos = 0;
@@ -1521,7 +1489,7 @@ bool AvFormatDecoder::autoSelectAudioTrack()
 {
     if (!audioStreams.size())
     {
-        m_parent->SetAudioParams(-1, -1, -1);
+        GetNVP()->SetAudioParams(-1, -1, -1);
         return false;
     }
 
@@ -1610,7 +1578,7 @@ void AvFormatDecoder::SetupAudioStream(void)
     VERBOSE(VB_AUDIO, QString("Initializing audio parms from audio track #%1.")
             .arg(currentAudioTrack));
 
-    m_parent->SetEffDsp(curstream->codec->sample_rate * 100);
+    GetNVP()->SetEffDsp(curstream->codec->sample_rate * 100);
 
     do_ac3_passthru = curstream->codec->codec_id == CODEC_ID_AC3 &&
                       !transcoding &&
@@ -1676,7 +1644,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             if (av_read_frame(ic, pkt) < 0)
             {
                 ateof = true;
-                m_parent->SetEof();
+                GetNVP()->SetEof();
                 return false;
             }
         }
@@ -1807,7 +1775,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                 (curstream->codec->channels * 2) / 
                                 curstream->codec->sample_rate);
 
-                    m_parent->AddAudioData((char *)audioSamples, data_size, temppts);
+                    GetNVP()->AddAudioData((char *)audioSamples, data_size, temppts);
 
                     break;
                 }
@@ -1827,7 +1795,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     int gotpicture = 0;
 
                     pthread_mutex_lock(&avcodeclock);
-                    if (d->mpeg2dec)
+                    if (d->HasMPEG2Dec())
                         ret = d->DecodeMPEG2Video(context, &mpa_pic,
                                                   &gotpicture, ptr, len);
                     else
@@ -1855,7 +1823,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         AVPicture tmppicture;
  
-                        picframe = m_parent->GetNextVideoFrame();
+                        picframe = GetNVP()->GetNextVideoFrame();
 
                         tmppicture.data[0] = picframe->buf;
                         tmppicture.data[1] = tmppicture.data[0] + 
@@ -1906,9 +1874,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     picframe->top_field_first = mpa_pic.top_field_first;
 
                     picframe->frameNumber = framesPlayed;
-                    m_parent->ReleaseNextVideoFrame(picframe, temppts);
+                    GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
                     if (!directrendering)
-                        m_parent->DiscardVideoFrame(picframe);
+                        GetNVP()->DiscardVideoFrame(picframe);
 
                     gotvideo = 1;
                     framesPlayed++;
@@ -1936,7 +1904,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         subtitle.start_display_time += pts;
                         subtitle.end_display_time += pts;
-                        m_parent->AddSubtitle(subtitle);
+                        GetNVP()->AddSubtitle(subtitle);
                     }
 
                     break;

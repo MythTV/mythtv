@@ -30,6 +30,8 @@ class DecoderBase
 
     virtual void setWatchingRecording(bool mode);
     virtual bool GetFrame(int onlyvideo) = 0;
+    NuppelVideoPlayer *GetNVP() { return m_parent; }
+    const NuppelVideoPlayer *GetNVP() const { return m_parent; }
     
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
@@ -83,14 +85,18 @@ class DecoderBase
     ProgramInfo *m_playbackinfo;
 
     RingBuffer *ringBuffer;
+    RemoteEncoder *nvr_enc;
 
     int current_width;
     int current_height;
     float current_aspect;
+    double fps;
 
     long long framesPlayed;
     long long framesRead;
     long long lastKey;
+    int keyframedist;
+
 
     bool ateof;
     bool exitafterdecoded;
@@ -103,14 +109,9 @@ class DecoderBase
  
     QValueVector<PosMapEntry> m_positionMap;
 
-    int keyframedist;
-
-    double fps;
-
     bool exactseeks;
     bool livetv;
     bool watchingrecording;
-    RemoteEncoder *nvr_enc;
 
     bool hasKeyFrameAdjustTable;
 

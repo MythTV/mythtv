@@ -66,7 +66,7 @@ void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
     framesPlayed = newkey;
 
     VideoOutputIvtv *videoout = 
-        (VideoOutputIvtv *)m_parent->getVideoOutput();
+        (VideoOutputIvtv*)(GetNVP()->getVideoOutput());
 
     if (needFlush)
     {
@@ -82,11 +82,11 @@ void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
 
         videoout->Start(0, skipframes+5);
 
-        if (m_parent->GetFFRewSkip() != 1)
+        if (GetNVP()->GetFFRewSkip() != 1)
             videoout->Play();
         else
         {
-            if (m_parent->GetPause())
+            if (GetNVP()->GetPause())
             {
                 videoout->Pause();
                 do
@@ -188,7 +188,7 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     ringBuffer = rbuffer;
 
-    m_parent->ForceVideoOutputType(kVideoOutput_IVTV);
+    GetNVP()->ForceVideoOutputType(kVideoOutput_IVTV);
 
     keyframedist = -1;
     positionMapType = MARK_UNSET;
@@ -200,7 +200,7 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         video_height = 576;
         fps = 25.00;
     }
-    m_parent->SetVideoParams(video_width, video_height, 
+    GetNVP()->SetVideoParams(video_width, video_height, 
                              fps, keyframedist, 1.33);
      
     ringBuffer->CalcReadAheadThresh(8000);
@@ -221,7 +221,7 @@ int IvtvDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         float bytespersec = (float)bitrate / 8 / 2;
         float secs = ringBuffer->GetRealFileSize() * 1.0 / bytespersec;
 
-        m_parent->SetFileLength((int)(secs), (int)(secs * fps));
+        GetNVP()->SetFileLength((int)(secs), (int)(secs * fps));
     }
 
     if (hasFullPositionMap)
@@ -286,7 +286,7 @@ int IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                                 positionMapType = MARK_GOP_BYFRAME;
 
                             gopset = true;
-                            m_parent->SetKeyframeDistance(keyframedist);
+                            GetNVP()->SetKeyframeDistance(keyframedist);
                             VERBOSE(VB_PLAYBACK,
                                     QString("keyframedist changed to %1")
                                     .arg(keyframedist));
@@ -323,7 +323,7 @@ int IvtvDecoder::MpegPreProcessPkt(unsigned char *buf, int len,
                             float bytespersec = (float)bitrate / 8;
                             float secs = ringBuffer->GetRealFileSize() * 1.0 /
                                              bytespersec;
-                            m_parent->SetFileLength((int)(secs),
+                            GetNVP()->SetFileLength((int)(secs),
                                                     (int)(secs * fps));
                         }
 
@@ -389,7 +389,7 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
         vidread = vidwrite = vidfull = 0;
     else if (vidfull || vidread != vidwrite)
     {
-        VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
+        VideoOutputIvtv *videoout = (VideoOutputIvtv*)(GetNVP()->getVideoOutput());
         bool canwrite = videoout->Poll(1) > 0;
 
         if (canwrite && vidwrite >= vidread)
@@ -467,7 +467,7 @@ bool IvtvDecoder::GetFrame(int onlyvideo)
 {
     long long last_read = framesRead;
 
-    if (m_parent->GetFFRewSkip() == 1 || onlyvideo < 0)
+    if (GetNVP()->GetFFRewSkip() == 1 || onlyvideo < 0)
         ReadWrite(onlyvideo, LONG_MAX);
     else
     {
@@ -476,10 +476,10 @@ bool IvtvDecoder::GetFrame(int onlyvideo)
             ;
     }
 
-    if (ateof && !m_parent->GetEditMode())
+    if (ateof && !GetNVP()->GetEditMode())
     {
         //cout << "setting eof at " << framesRead << endl;
-        m_parent->SetEof();
+        GetNVP()->SetEof();
     }
 
     framesPlayed = framesRead - 1;
@@ -491,12 +491,12 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame, bool doflush)
 {
     long long number = desiredFrame - videoPlayed;
 
-    if (m_parent->GetPause() && number < keyframedist)
+    if (GetNVP()->GetPause() && number < keyframedist)
     {
         StepFrames(videoPlayed, number+1);
         framesPlayed = desiredFrame + 1;
         videoPlayed = framesPlayed;
-        m_parent->SetFramesPlayed(videoPlayed);
+        GetNVP()->SetFramesPlayed(videoPlayed);
         return !ateof;
     }
 
@@ -505,7 +505,7 @@ bool IvtvDecoder::DoFastForward(long long desiredFrame, bool doflush)
 
 void IvtvDecoder::UpdateFramesPlayed(void)
 {
-    VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
+    VideoOutputIvtv *videoout = (VideoOutputIvtv*)(GetNVP()->getVideoOutput());
 
     int rawframes = videoout->GetFramesPlayed();
 
@@ -532,12 +532,12 @@ void IvtvDecoder::UpdateFramesPlayed(void)
         }
     }
 
-    m_parent->SetFramesPlayed(videoPlayed);
+    GetNVP()->SetFramesPlayed(videoPlayed);
 }
 
 bool IvtvDecoder::StepFrames(long long start, long long count)
 {
-    VideoOutputIvtv *videoout = (VideoOutputIvtv *)m_parent->getVideoOutput();
+    VideoOutputIvtv *videoout = (VideoOutputIvtv*)(GetNVP()->getVideoOutput());
 
     long long step, cur = 0, last = start;
 

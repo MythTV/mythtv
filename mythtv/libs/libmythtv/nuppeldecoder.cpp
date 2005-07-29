@@ -199,7 +199,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         fileheader.aspect = 4.0 / 3;
     current_aspect = fileheader.aspect;
 
-    m_parent->SetVideoParams(fileheader.width, fileheader.height,
+    GetNVP()->SetVideoParams(fileheader.width, fileheader.height,
                              fileheader.fps, fileheader.keyframedist,
                              fileheader.aspect, kScan_Detect);
 
@@ -349,7 +349,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 totalLength = (int)((ste.keyframe_number * keyframedist * 1.0) /
                                      video_frame_rate);
                 totalFrames = (long long)ste.keyframe_number * keyframedist;
-                m_parent->SetFileLength(totalLength, totalFrames);
+                GetNVP()->SetFileLength(totalLength, totalFrames);
 
                 delete [] seekbuf;
             }
@@ -413,7 +413,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
                 totalLength -= (int)(adjust / video_frame_rate);
                 totalFrames -= adjust;
-                m_parent->SetFileLength(totalLength, totalFrames);
+                GetNVP()->SetFileLength(totalLength, totalFrames);
 
                 adjust = 0;
                 for (unsigned int i=0; i < m_positionMap.size(); i++) 
@@ -460,18 +460,18 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     foundit = 0;
 
     effdsp = audio_samplerate * 100;
-    m_parent->SetEffDsp(effdsp);
+    GetNVP()->SetEffDsp(effdsp);
 
     if (usingextradata)
     {
         effdsp = extradata.audio_sample_rate * 100;
-        m_parent->SetEffDsp(effdsp);
+        GetNVP()->SetEffDsp(effdsp);
         audio_samplerate = extradata.audio_sample_rate;
 #ifdef WORDS_BIGENDIAN
         // Why only if using extradata?
         audio_bits_per_sample = extradata.audio_bits_per_sample;
 #endif
-        m_parent->SetAudioParams(extradata.audio_bits_per_sample,
+        GetNVP()->SetAudioParams(extradata.audio_bits_per_sample,
                                  extradata.audio_channels, 
                                  extradata.audio_sample_rate);
         foundit = 1;
@@ -487,7 +487,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 effdsp = frameheader.timecode;
                 if (effdsp > 0)
                 {
-                    m_parent->SetEffDsp(effdsp);
+                    GetNVP()->SetEffDsp(effdsp);
                     foundit = 1;
                     continue;
                 }
@@ -903,7 +903,7 @@ bool NuppelDecoder::GetFrame(int avignore)
             || (frameheader.frametype == 'Q') || (frameheader.frametype == 'K'))
         {
             ateof = true;
-            m_parent->SetEof();
+            GetNVP()->SetEof();
             return false;
         }
 
@@ -921,7 +921,7 @@ bool NuppelDecoder::GetFrame(int avignore)
             if (!ReadFrameheader(&frameheader))
             {
                 ateof = true;
-                m_parent->SetEof();
+                GetNVP()->SetEof();
                 return false;
             }
             seeklen = 1;
@@ -936,7 +936,7 @@ bool NuppelDecoder::GetFrame(int avignore)
             {
                 delete [] dummy;
                 ateof = true;
-                m_parent->SetEof();
+                GetNVP()->SetEof();
                 return false;
             }
 
@@ -959,7 +959,7 @@ bool NuppelDecoder::GetFrame(int avignore)
                     frameheader.timecode < 5500000)
                 {
                     effdsp = frameheader.timecode;
-                    m_parent->SetEffDsp(effdsp);
+                    GetNVP()->SetEffDsp(effdsp);
                 }
             }
             else if (frameheader.comptype == 'V')
@@ -1000,14 +1000,14 @@ bool NuppelDecoder::GetFrame(int avignore)
                         .arg(frameheader.frametype)
                         .arg(frameheader.packetlength));
                 ateof = true;
-                m_parent->SetEof();
+                GetNVP()->SetEof();
                 return false;
             }
             if (ringBuffer->Read(strm, frameheader.packetlength) !=
                 frameheader.packetlength)
             {
                 ateof = true;
-                m_parent->SetEof();
+                GetNVP()->SetEof();
                 return false;
             }
         }
@@ -1023,17 +1023,17 @@ bool NuppelDecoder::GetFrame(int avignore)
                 continue;
             }
 
-            VideoFrame *buf = m_parent->GetNextVideoFrame();
+            VideoFrame *buf = GetNVP()->GetNextVideoFrame();
 
             ret = DecodeFrame(&frameheader, strm, buf);
             if (!ret)
             {
-                m_parent->DiscardVideoFrame(buf);
+                GetNVP()->DiscardVideoFrame(buf);
                 continue;
             }
 
             buf->frameNumber = framesPlayed;
-            m_parent->ReleaseNextVideoFrame(buf, frameheader.timecode);
+            GetNVP()->ReleaseNextVideoFrame(buf, frameheader.timecode);
             gotvideo = 1;
             if (getrawframes && getrawvideo)
                 StoreRawData(strm);
@@ -1078,7 +1078,7 @@ bool NuppelDecoder::GetFrame(int avignore)
                     if (lameret > 0)
                     {
                         VERBOSE(VB_PLAYBACK, QString("3 audio timecode %1").arg(frameheader.timecode));
-                        m_parent->AddAudioData(pcmlbuffer, pcmrbuffer,
+                        GetNVP()->AddAudioData(pcmlbuffer, pcmrbuffer,
                                                lameret, frameheader.timecode);
                     }
                     else if (lameret < 0)
@@ -1107,7 +1107,7 @@ bool NuppelDecoder::GetFrame(int avignore)
                 }
 #endif
                 VERBOSE(VB_PLAYBACK, QString("A audio timecode %1").arg(frameheader.timecode));
-                m_parent->AddAudioData((char *)strm, frameheader.packetlength, 
+                GetNVP()->AddAudioData((char *)strm, frameheader.packetlength, 
                                        frameheader.timecode);
             }
         }
@@ -1117,7 +1117,7 @@ bool NuppelDecoder::GetFrame(int avignore)
             if (getrawframes)
                 StoreRawData(strm);
 
-            m_parent->AddTextData((char *)strm, frameheader.packetlength,
+            GetNVP()->AddTextData((char *)strm, frameheader.packetlength,
                                   frameheader.timecode, frameheader.comptype);
         }
     }

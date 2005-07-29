@@ -233,8 +233,7 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
             delete [] txtbuffers[i].buffer;
     }
 
-    if (decoder)
-        delete decoder;
+    SetDecoder(NULL);
 
     if (FiltMan)
         delete FiltMan;
@@ -252,15 +251,15 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 void NuppelVideoPlayer::SetWatchingRecording(bool mode)
 {
     watchingrecording = mode;
-    if (decoder)
-        decoder->setWatchingRecording(mode);
+    if (GetDecoder())
+        GetDecoder()->setWatchingRecording(mode);
 }
 
 void NuppelVideoPlayer::SetRecorder(RemoteEncoder *recorder)
 {
     nvr_enc = recorder;
-    if (decoder)
-        decoder->setRecorder(recorder);
+    if (GetDecoder())
+        GetDecoder()->setRecorder(recorder);
 }
 
 void NuppelVideoPlayer::Pause(bool waitvideo)
@@ -287,11 +286,11 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
     if (ringBuffer)
         ringBuffer->Pause();
 
-    if (decoder && videoOutput)
+    if (GetDecoder() && videoOutput)
     {
         //cout << "updating frames played" << endl;
         if (using_null_videoout || forceVideoOutput == kVideoOutput_IVTV)
-            decoder->UpdateFramesPlayed();
+            GetDecoder()->UpdateFramesPlayed();
         else
             framesPlayed = videoOutput->GetFramesPlayed();
     }
@@ -407,7 +406,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         }
 
         videoOutput = VideoOutput::InitVideoOut(forceVideoOutput,
-                                                decoder->GetVideoCodecID());
+                                                GetDecoder()->GetVideoCodecID());
 
         if (!videoOutput)
         {
@@ -416,7 +415,7 @@ bool NuppelVideoPlayer::InitVideo(void)
         }
 
         if (gContext->GetNumSetting("DecodeExtraAudio", 0))
-            decoder->SetLowBuffers(true);
+            GetDecoder()->SetLowBuffers(true);
 
         if (!videoOutput->Init(video_width, video_height, video_aspect,
                                widget->winId(), 0, 0, widget->width(),
@@ -680,47 +679,42 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     ringBuffer->Unpause();
 
     // delete any pre-existing recorder
-    if (decoder)
-    {
-        delete decoder;
-        decoder = NULL;
-    }
+    SetDecoder(NULL);
 
     if (NuppelDecoder::CanHandle(testbuf))
-        decoder = new NuppelDecoder(this, m_playbackinfo);
+        SetDecoder(new NuppelDecoder(this, m_playbackinfo));
 #ifdef USING_IVTV
     else if (!using_null_videoout && IvtvDecoder::CanHandle(testbuf,
                                                      ringBuffer->GetFilename()))
     {
-        decoder = new IvtvDecoder(this, m_playbackinfo);
+        SetDecoder(new IvtvDecoder(this, m_playbackinfo));
         disableaudio = true; // no audio with ivtv.
         audio_bits = 16;
     }
 #endif
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
-        decoder = new AvFormatDecoder(this, m_playbackinfo, using_null_videoout);
+        SetDecoder(new AvFormatDecoder(this, m_playbackinfo, using_null_videoout));
 
-
-    if (!decoder)
+    if (!GetDecoder())
     {
         VERBOSE(VB_IMPORTANT, 
                 QString("NVP: Couldn't find a matching decoder for: %1").
                 arg(ringBuffer->GetFilename()));
         return -1;
     } 
-    else if (decoder->IsErrored())
+    else if (GetDecoder()->IsErrored())
     {
         VERBOSE(VB_IMPORTANT, 
                 "NVP: NuppelDecoder encountered error during creation.");
-        delete decoder;
+        SetDecoder(NULL);
         return -1;
     }
 
-    decoder->setExactSeeks(exactseeks);
-    decoder->setLiveTVMode(livetv);
-    decoder->setWatchingRecording(watchingrecording);
-    decoder->setRecorder(nvr_enc);
-    decoder->setTranscoding(transcoding);
+    GetDecoder()->setExactSeeks(exactseeks);
+    GetDecoder()->setLiveTVMode(livetv);
+    GetDecoder()->setWatchingRecording(watchingrecording);
+    GetDecoder()->setRecorder(nvr_enc);
+    GetDecoder()->setTranscoding(transcoding);
 
     eof = 0;
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
@@ -728,7 +722,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     int ret;
     // We still want to locate decoder for video even if using_null_videoout is true
     bool disable_video_decoding = false; // set to true for audio only decodeing
-    if ((ret = decoder->OpenFile(ringBuffer, disable_video_decoding, testbuf)) < 0)
+    if ((ret = GetDecoder()->OpenFile(ringBuffer, disable_video_decoding, testbuf)) < 0)
     {
         VERBOSE(VB_IMPORTANT, QString("Couldn't open decoder for: %1")
                 .arg(ringBuffer->GetFilename()));
@@ -879,7 +873,13 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
         videobuf_retries = 0;
     }
 
-    if (!decoder->GetFrame(onlyvideo))
+    if (!GetDecoder())
+    {
+        VERBOSE(VB_IMPORTANT, "NVP::GetFrame() called with NULL decoder.");
+        return false;
+    }
+
+    if (!GetDecoder()->GetFrame(onlyvideo))
         return false;
 
 #ifdef USING_IVTV
@@ -897,16 +897,16 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 
         if (ffrew_skip > 0)
         {
-            long long delta = decoder->GetFramesRead() - framesPlayed;
+            long long delta = GetDecoder()->GetFramesRead() - framesPlayed;
             real_skip = CalcMaxFFTime(ffrew_skip + delta) - delta;
-            decoder->DoFastForward(decoder->GetFramesRead() + real_skip, false);
+            GetDecoder()->DoFastForward(GetDecoder()->GetFramesRead() + real_skip, false);
             stop = (CalcMaxFFTime(100) < 100);
         }
         else
         {
-            real_skip = (-decoder->GetFramesRead() > ffrew_skip) ? 
-                -decoder->GetFramesRead() : ffrew_skip;
-            decoder->DoRewind(decoder->GetFramesRead() + real_skip, false);
+            real_skip = (-GetDecoder()->GetFramesRead() > ffrew_skip) ? 
+                -GetDecoder()->GetFramesRead() : ffrew_skip;
+            GetDecoder()->DoRewind(GetDecoder()->GetFramesRead() + real_skip, false);
             stop = framesPlayed <= keyframedist;
         }
         if (stop)
@@ -1817,7 +1817,7 @@ void NuppelVideoPlayer::ResetPlaying(void)
 
     framesPlayed = 0;
 
-    decoder->Reset();
+    GetDecoder()->Reset();
 }
 
 void NuppelVideoPlayer::StartPlaying(void)
@@ -1893,8 +1893,8 @@ void NuppelVideoPlayer::StartPlaying(void)
         osd = new OSD(video_width, video_height, frame_interval,
                       dispx, dispy, dispw, disph);
 
-        if (kCodec_NORMAL_END < decoder->GetVideoCodecID() &&
-            kCodec_SPECIAL_END > decoder->GetVideoCodecID() &&
+        if (kCodec_NORMAL_END < GetDecoder()->GetVideoCodecID() &&
+            kCodec_SPECIAL_END > GetDecoder()->GetVideoCodecID() &&
             (600 < video_height))
         {            
             osd->DisableFade();
@@ -1941,13 +1941,13 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         bool seeks = exactseeks;
 
-        decoder->setExactSeeks(false);
+        GetDecoder()->setExactSeeks(false);
 
         fftime = bookmarkseek;
         DoFastForward();
         fftime = 0;
 
-        decoder->setExactSeeks(seeks);
+        GetDecoder()->setExactSeeks(seeks);
 
         if (gContext->GetNumSetting("ClearSavedPosition", 1))
             m_playbackinfo->SetBookmark(0);
@@ -2087,7 +2087,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         GetFrame(audioOutput == NULL || !normal_speed);
 
         if (using_null_videoout || forceVideoOutput == kVideoOutput_IVTV)
-            decoder->UpdateFramesPlayed();
+            GetDecoder()->UpdateFramesPlayed();
         else
             framesPlayed = videoOutput->GetFramesPlayed();
 
@@ -2168,8 +2168,8 @@ void NuppelVideoPlayer::SetTranscoding(bool value)
 {
     transcoding = value;
 
-    if (decoder)
-        decoder->setTranscoding(value);
+    if (GetDecoder())
+        GetDecoder()->setTranscoding(value);
 };
 
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
@@ -2355,8 +2355,8 @@ void NuppelVideoPlayer::DoPause(void)
         //cout << "handling skip change" << endl;
         videoOutput->SetPrebuffering(ffrew_skip == 1);
 
-        decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
-        decoder->DoFastForward(framesPlayed + ffrew_skip);
+        GetDecoder()->setExactSeeks(exactseeks && ffrew_skip == 1);
+        GetDecoder()->DoFastForward(framesPlayed + ffrew_skip);
         ClearAfterSeek();
     }
 
@@ -2406,8 +2406,8 @@ void NuppelVideoPlayer::DoPlay(void)
         }
 #endif
 
-        decoder->setExactSeeks(exactseeks && ffrew_skip == 1);
-        decoder->DoRewind(framesPlayed);
+        GetDecoder()->setExactSeeks(exactseeks && ffrew_skip == 1);
+        GetDecoder()->DoRewind(framesPlayed);
         ClearAfterSeek();
     }
 
@@ -2503,9 +2503,9 @@ bool NuppelVideoPlayer::DoRewind(void)
         limitKeyRepeat = true;
 
     if (paused && !editmode)
-        decoder->setExactSeeks(true);
-    decoder->DoRewind(desiredFrame);
-    decoder->setExactSeeks(exactseeks);
+        GetDecoder()->setExactSeeks(true);
+    GetDecoder()->DoRewind(desiredFrame);
+    GetDecoder()->setExactSeeks(exactseeks);
 
     ClearAfterSeek();
     return true;
@@ -2553,9 +2553,9 @@ bool NuppelVideoPlayer::DoFastForward(void)
     long long desiredFrame = framesPlayed + number;
 
     if (paused && !editmode)
-        decoder->setExactSeeks(true);
-    decoder->DoFastForward(desiredFrame);
-    decoder->setExactSeeks(exactseeks);
+        GetDecoder()->setExactSeeks(true);
+    GetDecoder()->DoFastForward(desiredFrame);
+    GetDecoder()->setExactSeeks(exactseeks);
 
     ClearAfterSeek();
     return true;
@@ -2565,7 +2565,7 @@ void NuppelVideoPlayer::JumpToFrame(long long frame)
 {
     bool exactstore = exactseeks;
 
-    decoder->setExactSeeks(true);
+    GetDecoder()->setExactSeeks(true);
     fftime = rewindtime = 0;
 
     if (frame > framesPlayed)
@@ -2581,7 +2581,7 @@ void NuppelVideoPlayer::JumpToFrame(long long frame)
         rewindtime = 0;
     }
 
-    decoder->setExactSeeks(exactstore);
+    GetDecoder()->setExactSeeks(exactstore);
 }
 
 int NuppelVideoPlayer::SkipTooCloseToEnd(int frames)
@@ -2781,7 +2781,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
 
     bool retval = true;
     bool exactstore = exactseeks;
-    decoder->setExactSeeks(true);
+    GetDecoder()->setExactSeeks(true);
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
@@ -2920,7 +2920,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
             handled = false;
     }
 
-    decoder->setExactSeeks(exactstore);
+    GetDecoder()->setExactSeeks(exactstore);
     return retval;
 }
 
@@ -3196,14 +3196,14 @@ void NuppelVideoPlayer::HandleArbSeek(bool right)
     {
         if (right)
         {
-            decoder->setExactSeeks(false);
+            GetDecoder()->setExactSeeks(false);
             fftime = (long long)(keyframedist * 1.1);
             while (fftime > 0)
                 usleep(50);
         }
         else
         {
-            decoder->setExactSeeks(false);
+            GetDecoder()->setExactSeeks(false);
             rewindtime = 2;
             while (rewindtime > 0)
                 usleep(50);
@@ -3381,7 +3381,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
 
     if (OpenFile() < 0)
         return NULL;
-    if (!decoder)
+    if (!GetDecoder())
         return NULL;
     if (!hasFullPositionMap)
         return NULL;
@@ -3494,12 +3494,12 @@ VideoFrame* NuppelVideoPlayer::GetRawVideoFrame(long long frameNumber)
 
 QString NuppelVideoPlayer::GetEncodingType(void)
 {
-    return decoder->GetEncodingType();
+    return GetDecoder()->GetEncodingType();
 }
 
 bool NuppelVideoPlayer::GetRawAudioState(void)
 {
-    return decoder->GetRawAudioState();
+    return GetDecoder()->GetRawAudioState();
 }
 
 void NuppelVideoPlayer::TranscodeWriteText(void (*func)
@@ -3543,12 +3543,12 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
     ClearAfterSeek();
 
     if (copyvideo)
-        decoder->SetRawVideoState(true);
+        GetDecoder()->SetRawVideoState(true);
     if (copyaudio)
-        decoder->SetRawAudioState(true);
+        GetDecoder()->SetRawAudioState(true);
 
-    decoder->setExactSeeks(true);
-    decoder->SetLowBuffers(true);
+    GetDecoder()->setExactSeeks(true);
+    GetDecoder()->SetLowBuffers(true);
 }
 
 bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
@@ -3557,7 +3557,7 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
     if (dm_iter == NULL && honorCutList)
         dm_iter = deleteMap.begin();
     
-    if (!decoder->GetFrame(0))
+    if (!GetDecoder()->GetFrame(0))
         return false;
     if (eof)
         return false;
@@ -3573,10 +3573,10 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
                 dm_iter++;
                 msg += QString(" to %1").arg((int)dm_iter.key());
                 VERBOSE(VB_GENERAL, msg);
-                decoder->DoFastForward(dm_iter.key());
-                decoder->ClearStoredData();
+                GetDecoder()->DoFastForward(dm_iter.key());
+                GetDecoder()->ClearStoredData();
                 ClearAfterSeek();
-                decoder->GetFrame(0);
+                GetDecoder()->GetFrame(0);
                 *did_ff = 1;
             }
             while((dm_iter.data() == 0) && (dm_iter != deleteMap.end()))
@@ -3587,20 +3587,20 @@ bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm
     }
     if (eof)
       return false;
-    *is_key = decoder->isLastFrameKey();
+    *is_key = GetDecoder()->isLastFrameKey();
     return true;
 }
 
 long NuppelVideoPlayer::UpdateStoredFrameNum(long curFrameNum)
 {
-    return decoder->UpdateStoredFrameNum(curFrameNum);
+    return GetDecoder()->UpdateStoredFrameNum(curFrameNum);
 }
 bool NuppelVideoPlayer::WriteStoredData(RingBuffer *outRingBuffer,
                                         bool writevideo, long timecodeOffset)
 {
-    if (writevideo && !decoder->GetRawVideoState())
+    if (writevideo && !GetDecoder()->GetRawVideoState())
         writevideo = false;
-    decoder->WriteStoredData(outRingBuffer, writevideo, timecodeOffset);
+    GetDecoder()->WriteStoredData(outRingBuffer, writevideo, timecodeOffset);
     return writevideo;
 }
 
@@ -3717,7 +3717,7 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
     playing = false;
     killplayer = true;
 
-    decoder->SetPositionMap();
+    GetDecoder()->SetPositionMap();
 
     return true;
 }
@@ -4100,20 +4100,20 @@ bool NuppelVideoPlayer::DoSkipCommercials(int direction)
 
 void NuppelVideoPlayer::incCurrentAudioTrack()
 {
-    if (decoder)
-        decoder->incCurrentAudioTrack();
+    if (GetDecoder())
+        GetDecoder()->incCurrentAudioTrack();
 }
 
 void NuppelVideoPlayer::decCurrentAudioTrack()
 {
-    if (decoder)
-        decoder->decCurrentAudioTrack();
+    if (GetDecoder())
+        GetDecoder()->decCurrentAudioTrack();
 }
 
 bool NuppelVideoPlayer::setCurrentAudioTrack(int trackNo)
 {
-    if (decoder)
-        return decoder->setCurrentAudioTrack(trackNo);
+    if (GetDecoder())
+        return GetDecoder()->setCurrentAudioTrack(trackNo);
     else
         return false;
 }
@@ -4121,8 +4121,8 @@ bool NuppelVideoPlayer::setCurrentAudioTrack(int trackNo)
 
 int NuppelVideoPlayer::getCurrentAudioTrack()
 {
-    if (decoder)
-        return decoder->getCurrentAudioTrack() + 1;
+    if (GetDecoder())
+        return GetDecoder()->getCurrentAudioTrack() + 1;
     else
         return 0;
 }
@@ -4275,3 +4275,18 @@ void NuppelVideoPlayer::AddSubtitle(const AVSubtitle &subtitle)
     subtitleLock.unlock();
 }
 
+/** \fn NuppelVideoPlayer::SetDecoder(DecoderBase*)
+ *  \brief Sets the stream decoder, deleting any existing recorder.
+ */
+void NuppelVideoPlayer::SetDecoder(DecoderBase *dec)
+{
+    //VERBOSE(VB_IMPORTANT, "SetDecoder("<<dec<<") was "<<decoder);
+    if (!decoder)
+        decoder = dec;
+    else
+    {
+        DecoderBase *d = decoder;
+        decoder = dec;
+        delete d;
+    }
+}

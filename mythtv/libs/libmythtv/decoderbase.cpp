@@ -6,40 +6,27 @@
 #include "programinfo.h"
 
 DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo) 
-{ 
-    m_parent = parent; 
-    m_playbackinfo = pginfo;
-    currentAudioTrack = -1;
-    
-    exactseeks = false;
-    livetv = false;
-    watchingrecording = false;
-    nvr_enc = NULL;
-    lowbuffers = false; 
-    ateof = false;
-    exitafterdecoded = false;
+    : m_parent(parent), m_playbackinfo(pginfo),
 
-    framesRead = 0;
-    framesPlayed = 0;
-    lastKey = 0;
+      ringBuffer(NULL), nvr_enc(NULL),
 
-    hasKeyFrameAdjustTable = false;
-    hasFullPositionMap = false;
-    recordingHasPositionMap = false;
-    posmapStarted = false;
+      current_width(640), current_height(480),
+      current_aspect(1.33333), fps(29.97),
 
-    keyframedist = -1;
-    positionMapType = MARK_UNSET;
+      framesPlayed(0), framesRead(0), lastKey(0), keyframedist(-1),
 
-    current_aspect = 1.33333;
-    current_width = 640;
-    current_height = 480;
-    fps = 29.97;
+      ateof(false), exitafterdecoded(false), transcoding(false),
 
-    getrawframes = false;
-    getrawvideo = false; 
-    errored = false;
-    transcoding = false;
+      hasFullPositionMap(false), recordingHasPositionMap(false),
+      posmapStarted(false), positionMapType(MARK_UNSET),
+
+      exactseeks(false), livetv(false), watchingrecording(false),
+
+      hasKeyFrameAdjustTable(false), lowbuffers(false),
+      getrawframes(false), getrawvideo(false),
+      currentAudioTrack(-1),
+      errored(false)
+{
 }
 
 void DecoderBase::Reset(void)
@@ -270,8 +257,8 @@ bool DecoderBase::SyncPositionMap(void)
         long long totframes = 
             m_positionMap[m_positionMap.size()-1].index * keyframedist;
         int length = (int)((totframes * 1.0) / fps);
-        m_parent->SetFileLength(length, totframes);
-        m_parent->SetKeyframeDistance(keyframedist);
+        GetNVP()->SetFileLength(length, totframes);
+        GetNVP()->SetKeyframeDistance(keyframedist);
         posmapStarted = true;
 
         VERBOSE(VB_PLAYBACK,
@@ -407,8 +394,8 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
 
     if (doflush)
     {
-        m_parent->SetFramesPlayed(framesPlayed+1);
-        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
+        GetNVP()->SetFramesPlayed(framesPlayed+1);
+        GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
     }
 
     return true;
@@ -505,8 +492,8 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
 
     if (doflush)
     {
-        m_parent->SetFramesPlayed(framesPlayed+1);
-        m_parent->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
+        GetNVP()->SetFramesPlayed(framesPlayed+1);
+        GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
     }
 
     getrawframes = oldrawstate;
@@ -516,6 +503,6 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
 
 void DecoderBase::UpdateFramesPlayed(void)
 {
-    m_parent->SetFramesPlayed(framesPlayed);
+    GetNVP()->SetFramesPlayed(framesPlayed);
 }
 
