@@ -16,7 +16,7 @@ class DummyDTVRecorder: public DTVRecorder
     DummyDTVRecorder::DummyDTVRecorder(
         bool tsmode = true,        RingBuffer *rbuffer = NULL,
         uint desired_width = 1920, uint desired_height = 1088,
-        double desired_frame_rate = 29.97,
+        double desired_frame_rate = 29.97, uint non_buf_frames = 0,
         bool autoStart = true);
 
     DummyDTVRecorder::~DummyDTVRecorder();
@@ -40,6 +40,7 @@ class DummyDTVRecorder: public DTVRecorder
     uint       _desired_width;
     uint       _desired_height;
     double     _desired_frame_rate;
+    uint       _non_buf_frames;
 
     // Internal
     int       _stream_data;

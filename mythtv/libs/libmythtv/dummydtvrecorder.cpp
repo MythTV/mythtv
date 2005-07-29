@@ -29,7 +29,9 @@
 To create a program stream video try something like:
   convert /tmp/hello_world.png ppm:- | \
           ppmtoy4m -n15 -F30000:1001 -A10:11 -I p -r | \
-          mpeg2enc -n n -f3 -b8000 -a3 --no-constraints -o /tmp/tmp.es
+          mpeg2enc -c -n n -f3 -b8000 -a3 --no-constraints -o /tmp/tmp.es
+          mplex -f3 -b8000 --no-constaints -L48000:1:8 -o /tmp/tmp.ps /tmp/tmp.es
+
 
 To convert this to a transport stream try something like:
   vlc /tmp/tmp.es --sout \
@@ -44,10 +46,12 @@ OR, convert it to a ps or pes stream and use the following
 DummyDTVRecorder::DummyDTVRecorder(bool tsmode, RingBuffer *rbuffer,
                                    uint desired_width, uint desired_height,
                                    double desired_frame_rate,
+                                   uint non_buf_frames,
                                    bool autoStart)
     : _tsmode(tsmode),
       _desired_width(desired_width), _desired_height(desired_height),
       _desired_frame_rate(desired_frame_rate),
+      _non_buf_frames(non_buf_frames),
       _stream_data(-1)
 {
     gettimeofday(&_next_frame_time, NULL);
@@ -101,12 +105,14 @@ void DummyDTVRecorder::StartRecording(void)
     int len;
     int remainder = 0;
     // TRANSFER DATA
-    while (_request_recording) 
+    while (_request_recording || _frames_seen_count <= 5)
     {
         len = read(_stream_fd, &(_buffer[remainder]), _buffer_size - remainder);
 
         if (len == 0)
         {
+            VERBOSE(VB_IMPORTANT, QString("\nRestart! Frames seen %1")
+                    .arg(_frames_seen_count));
             lseek(_stream_fd, 0, SEEK_SET);
             continue;
         }
@@ -161,6 +167,11 @@ int DummyDTVRecorder::ProcessData(unsigned char *buffer, int len)
 
         if (cnt != _frames_seen_count)
         {
+            if (_frames_seen_count < 20 || ((_frames_seen_count % 10) == 0))
+            {
+                //ringBuffer->WriterFlush();
+                ringBuffer->Sync();
+            }
             // we got a new frame
             struct timeval now;
             gettimeofday(&now, NULL);
@@ -169,15 +180,17 @@ int DummyDTVRecorder::ProcessData(unsigned char *buffer, int len)
                 (_next_frame_time.tv_usec - now.tv_usec);
 
             // sleep if we are sending too much data...
-            if (usec > 5000 && _frames_seen_count > 15)
+            if (usec > 5000 && _frames_seen_count > _non_buf_frames)
                 usleep(usec);
+            else
+                usleep(100); // let disk catch up a little
 
             // set next trigger
             gettimeofday(&_next_frame_time, NULL);
-            int delay = (int) (1000000.0 / GetFrameRate());
-            int x = _next_frame_time.tv_usec + delay;
+            int udelay = (int) (1000000.0 / GetFrameRate());
+            int x = _next_frame_time.tv_usec + udelay;
             _next_frame_time.tv_usec = x % 1000000;
-            _next_frame_time.tv_sec  = x / 1000000;
+            _next_frame_time.tv_sec  += x / 1000000;
         }
 
         ringBuffer->Write(pkt->data(), TSPacket::SIZE);
@@ -202,6 +215,7 @@ void DummyDTVRecorder::StartRecordingThread(void)
 
 void DummyDTVRecorder::StopRecordingThread(void)
 {
+    VERBOSE(VB_RECORD, "DummyDTVRecorder::StopRecordingThread(void)");
     if (_recording)
     {
         StopRecording();
