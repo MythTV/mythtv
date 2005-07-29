@@ -159,6 +159,8 @@ AvFormatDecoder::~AvFormatDecoder()
 {
     CloseContext();
     delete d;
+    if (audioSamples)
+        delete [] audioSamples;
 }
 
 // evaluates whether the given language is the subtitle language that is
@@ -518,8 +520,7 @@ void AvFormatDecoder::InitByteContext(void)
 extern "C" void HandleStreamChange(void* data) {
     AvFormatDecoder* decoder = (AvFormatDecoder*) data;
     int cnt = decoder->ic->nb_streams;
-    VERBOSE(VB_PLAYBACK, QString("streams_changed(0x%1) -- stream count %2")
-            .arg(((int)data),0,16).arg(cnt));
+    VERBOSE(VB_PLAYBACK, "streams_changed "<<data<<" -- stream count "<<cnt);
     decoder->ScanStreams(false);
 }
 
