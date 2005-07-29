@@ -140,7 +140,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
       using_null_videoout(use_null_videoout), video_codec_id(kCodec_NONE),
       maxkeyframedist(-1), 
       // Audio
-      audioSamples(new (short int)[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
+      audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       audio_sample_size(-1), audio_sampling_rate(-1), audio_channels(-1),
       do_ac3_passthru(false), wantedAudioStream(-1),
       audio_check_1st(2), audio_sampling_rate_2nd(0), audio_channels_2nd(0)
