@@ -155,8 +155,9 @@ class CaptureCardSetting: public ComboBoxSetting
     void sourceID(const QString& str);
 };
 
-class ScanCountry: public ComboBoxSetting,TransientStorage
+class ScanCountry: public ComboBoxSetting, public TransientStorage
 {
+    Q_OBJECT
   public:
     enum Country
     {
@@ -170,7 +171,7 @@ class ScanCountry: public ComboBoxSetting,TransientStorage
     ScanCountry();
 };
 
-class ScanFileImport : public LineEditSetting, TransientStorage
+class ScanFileImport : public LineEditSetting, public TransientStorage
 {
 public:
     ScanFileImport() : LineEditSetting()
@@ -225,6 +226,7 @@ class ScanOptionalConfig: public VerticalConfigurationGroup,
 
 class ScanWizardScanType: public VerticalConfigurationGroup
 {
+    Q_OBJECT
     friend class ScanWizard;
   public:
     ScanWizardScanType(ScanWizard *_parent);
