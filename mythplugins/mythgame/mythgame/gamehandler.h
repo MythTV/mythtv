@@ -29,11 +29,11 @@ class GameHandler
 
     static bool validRom(QString RomName,GameHandler *handler);
     static int buildFileCount(QString directory, GameHandler *handler);
-    static void buildFileList(QString directory, GameHandler *handler, 
+    void buildFileList(QString directory, GameHandler *handler, 
                               MSqlQuery *query, MythProgressDialog *pdial, 
                               int indepth, int* filecount);
 
-    static void processGames(GameHandler *);
+    void processGames(GameHandler *);
     static void processAllGames(void);
     static void registerHandler(GameHandler *);
     static void Launchgame(RomInfo *romdata, QString systemname);

@@ -129,37 +129,6 @@ bool InitializeDatabase(void)
 "    buttons INT UNSIGNED NOT NULL,"
 "    INDEX (romname)"
 ");",
-"CREATE TABLE IF NOT EXISTS mamesettings ("
-"    romname VARCHAR(128) NOT NULL,"
-"    usedefault BOOL NOT NULL,"
-"    fullscreen BOOL NOT NULL,"
-"    scanlines BOOL NOT NULL,"
-"    extra_artwork BOOL NOT NULL,"
-"    autoframeskip BOOL NOT NULL,"
-"    autocolordepth BOOL NOT NULL,"
-"    rotleft BOOL NOT NULL,"
-"    rotright BOOL NOT NULL,"
-"    flipx BOOL NOT NULL,"
-"    flipy BOOL NOT NULL,"
-"    scale TINYINT UNSIGNED NOT NULL,"
-"    antialias BOOL NOT NULL,"
-"    translucency BOOL NOT NULL,"
-"    beam FLOAT NOT NULL,"
-"    flicker FLOAT NOT NULL,"
-"    vectorres INT NOT NULL,"
-"    analogjoy BOOL NOT NULL,"
-"    mouse BOOL NOT NULL,"
-"    winkeys BOOL NOT NULL,"
-"    grabmouse BOOL NOT NULL,"
-"    joytype TINYINT UNSIGNED NOT NULL,"
-"    sound BOOL NOT NULL,"
-"    samples BOOL NOT NULL,"
-"    fakesound BOOL NOT NULL,"
-"    volume TINYINT NOT NULL,"
-"    cheat BOOL NOT NULL,"
-"    extraoption VARCHAR(128) NOT NULL"
-");",
-"alter table mamesettings change fullscreen fullscreen tinyint(2) not null;",
 "CREATE TABLE IF NOT EXISTS nestitle ("
 "  id int(11) default NULL,"
 "  description varchar(160) default NULL,"
@@ -174,84 +143,12 @@ bool InitializeDatabase(void)
 "  keyword varchar(8) default NULL,"
 "  value varchar(80) default NULL"
 ");",
-"CREATE TABLE IF NOT EXISTS snessettings ("
-"    romname VARCHAR(128) NOT NULL,"
-"    usedefault BOOL NOT NULL,"
-"    transparency BOOL NOT NULL,"
-"    sixteen BOOL NOT NULL,"
-"    hires BOOL NOT NULL,"
-"    interpolate TINYINT UNSIGNED NOT NULL,"
-"    nomodeswitch BOOL NOT NULL,"
-"    fullscreen BOOL NOT NULL,"
-"    stretch BOOL NOT NULL,"
-"    nosound BOOL NOT NULL,"
-"    soundskip TINYINT NOT NULL,"
-"    stereo BOOL NOT NULL,"
-"    soundquality TINYINT UNSIGNED NOT NULL,"
-"    envx BOOL NOT NULL,"
-"    threadsound BOOL NOT NULL,"
-"    syncsound BOOL NOT NULL,"
-"    interpolatedsound BOOL NOT NULL,"
-"    buffersize INT UNSIGNED NOT NULL,"
-"    nosamplecaching BOOL NOT NULL,"
-"    altsampledecode BOOL NOT NULL,"
-"    noecho BOOL NOT NULL,"
-"    nomastervolume BOOL NOT NULL,"
-"    nojoy BOOL NOT NULL,"
-"    interleaved BOOL NOT NULL,"
-"    altinterleaved BOOL NOT NULL,"
-"    hirom BOOL NOT NULL,"
-"    lowrom BOOL NOT NULL,"
-"    header BOOL NOT NULL,"
-"    noheader BOOL NOT NULL,"
-"    pal BOOL NOT NULL,"
-"    ntsc BOOL NOT NULL,"
-"    layering BOOL NOT NULL,"
-"    nohdma BOOL NOT NULL,"
-"    nospeedhacks BOOL NOT NULL,"
-"    nowindows BOOL NOT NULL,"
-"    extraoption VARCHAR(128) NOT NULL"
-");",
-""
 };
     QString dbver = "";
     if (!performActualUpdate(updates, "1000", dbver))
         return false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT * FROM mamesettings WHERE "
-                                     "romname = \"default\";");
-
-    if (!query.isActive() || query.size() <= 0)
-    {
-        query.exec("INSERT INTO mamesettings (romname,usedefault,"
-                      "fullscreen,scanlines,extra_artwork,autoframeskip,"
-                      "autocolordepth,rotleft,rotright,flipx,flipy,scale,"
-                      "antialias,translucency,beam,flicker,vectorres,analogjoy,"
-                      "mouse,winkeys,grabmouse,joytype,sound,samples,fakesound,"
-                      "volume,cheat,extraoption) VALUES"
-                      "(\"default\",1,1,0,0,0,0,0,0,0,0,1,0,0,1,0.0,0.0,0,"
-                      "0,0,0,4,1,1,0,-16,0,\"\");");
-    }
-
-    query.exec("SELECT * FROM snessettings WHERE "
-                           "romname = \"default\";");
-
-    if (!query.isActive() || query.size() <= 0)
-    {
-        query.exec("INSERT INTO snessettings (romname,usedefault,"
-                      "transparency,sixteen,hires,interpolate,nomodeswitch,"
-                      "fullscreen,stretch,nosound,soundskip,stereo,"
-                      "soundquality,envx,threadsound,syncsound,"
-                      "interpolatedsound,buffersize,nosamplecaching,"
-                      "altsampledecode,noecho,nomastervolume,nojoy,interleaved,"
-                      "altinterleaved,hirom,lowrom,header,noheader,pal,ntsc,"
-                      "layering,nohdma,nospeedhacks,nowindows," 
-                      "extraoption) VALUES"
-                      "(\"default\",1,0,0,0,0,0,0,0,0,0,1,4,0,0,0,0,0,0,1,1,"
-                      "0,0,0,0,0,0,0,0,0,0,0,0,0,0,\"\");");
-    }
-
     query.exec("SELECT * FROM nestitle;");
 
     if (!query.isActive() || query.size() <= 0)
@@ -1140,37 +1037,10 @@ bool UpgradeGameDatabaseSchema(void)
             return false;
     }
 
-    if (dbver == "1001")
-    {
-        const QString updates[] = {
-"ALTER TABLE mamemetadata ADD image_searched tinyint(1) NOT NULL DEFAULT 0;",
-""
-};
-        if (!performActualUpdate(updates, "1002", dbver))
-            return false;
-    }
-
-    if (dbver == "1002")
-    {
-        const QString updates[] = {
-"ALTER TABLE mamemetadata ADD rom_path varchar(255) NOT NULL DEFAULT \"\";",
-""
-};
-        if (!performActualUpdate(updates, "1003", dbver))
-            return false;
-    }
-
-    if (dbver == "1003")
-    {
-        const QString updates[] = {
-QString("update mamemetadata set rom_path ='%1' WHERE rom_path ='';").arg(gContext->GetSetting("MameRomLocation")),
-""
-};
-        if (!performActualUpdate(updates, "1004", dbver))
-            return false;
-    }
-
-    if (dbver == "1004")
+    if ((((dbver == "1004") 
+      || (dbver == "1003")) 
+      || (dbver == "1002"))
+      || (dbver == "1001"))
     {   
         const QString updates[] = {
 

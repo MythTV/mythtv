@@ -292,16 +292,16 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
                 if (indepth) 
                     GetMetadata(handler, Info.filePath(), &Genre, &Year, &Country, &CRC32);
 
-                // cout << "Found Rom : (" << handler->SystemName() << ") " << CRC32 << " - " << RomName << endl;
+                cout << "Found Rom : (" << handler->SystemName() << ") " << CRC32 << " - " << RomName << endl;
 
                 int displayrom;
 
                 // If the rom is already in the DB then  don't display the duplicate
                 // Probably convert this to use a QMap and update the database after the map is filled
                 // just like mythvideo does.
-                //if (romInDB(RomName, handler->GameType()))
-                //    displayrom = 0;
-                //else
+                if (romInDB(RomName, handler->GameType()))
+                    displayrom = 0;
+                else
                     displayrom = 1;
 
                 if (handler->SpanDisks()) 
@@ -355,7 +355,6 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
                 pdial->setProgress(*filecount);
 
             }
-            // else skip it
         }
     }
 }
