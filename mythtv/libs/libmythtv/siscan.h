@@ -19,6 +19,7 @@
 #include "dvbtypes.h"
 typedef QValueList<Event> QList_Events;
 typedef QValueList<QList_Events*> QListList_Events;
+#define USE_OWN_SIPARSER
 #else
 typedef unsigned short uint16_t;
 typedef QMap<uint16_t, void*> QMap_Events;
@@ -30,9 +31,6 @@ typedef int fe_type_t;
 typedef void* NITObject;
 typedef void* NIT;
 #endif // USING_DVB
-
-#define USE_OWN_SIPARSER
-#define DVB_QUICKSCAN
 
 #define SISCAN(args...) \
     VERBOSE(VB_SIPARSER, QString("SIScan(%1): ").arg(channel->GetDevice()) << args);

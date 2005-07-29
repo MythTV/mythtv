@@ -157,8 +157,11 @@ SIScan::~SIScan(void)
 
 void *SIScan::SpawnSectionReader(void *param)
 {
+    (void) param;
+#ifdef USING_DVB
     DVBSIParser *siparser = (DVBSIParser*) param;
     siparser->StartSectionReader();
+#endif // USING_DVB
     return NULL;
 }
 
@@ -1177,6 +1180,7 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
  */
 void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
 {
+    (void) tid_db;
     (void) SDT;
 #ifdef USING_DVB
     if (SDT.empty())
