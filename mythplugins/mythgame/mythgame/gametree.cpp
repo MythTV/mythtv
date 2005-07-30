@@ -255,13 +255,13 @@ void GameTree::handleTreeListSelection(int nodeInt, IntVector *)
 {
     if (nodeInt > 0)
     {
-        GameTreeItem *item = m_gameTreeItems[nodeInt - 1];
+        GameTreeItem *item = nodeInt ? m_gameTreeItems[nodeInt - 1] : 0;
 
         if (item->isLeaf())
         {
             if (item->getRomInfo()->RomCount() == 1)
                 GameHandler::Launchgame(item->getRomInfo(),NULL);
-            else 
+            else if (item->getRomInfo()->RomCount() > 1)
             {
                 QStringList players = QStringList::split(",", item->getRomInfo()->AllSystems());
                 players += "Cancel";
@@ -271,9 +271,9 @@ void GameTree::handleTreeListSelection(int nodeInt, IntVector *)
                 if (val != -1) {
                     QString systemname = getElement(players,val);
                     if (systemname)
-                        GameHandler::Launchgame(item->getRomInfo(), systemname);
+                        GameHandler::Launchgame(item->getRomInfo(),systemname);
                 }
-            }
+            } 
             raise();
             setActiveWindow();
         }
