@@ -991,7 +991,9 @@ long long getDiskSpace(const QString &file_on_disk,
     struct statfs statbuf;
     bzero(&statbuf, sizeof(statbuf));
     long long freespace = -1;
-    if (statfs(file_on_disk.local8Bit(), &statbuf) == 0)
+    QCString cstr = file_on_disk.local8Bit();
+
+    if (statfs(cstr, &statbuf) == 0)
     {
         freespace = statbuf.f_bsize * (statbuf.f_bavail >> 10);
         total = statbuf.f_bsize * (statbuf.f_blocks >> 10);

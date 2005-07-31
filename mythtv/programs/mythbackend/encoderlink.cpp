@@ -1022,11 +1022,13 @@ char *EncoderLink::GetScreenGrab(const ProgramInfo *pginfo,
                                  int &video_width, int &video_height,
                                  float &video_aspect)
 {
-    if (local)
+    if (local && tv)
         return tv->GetScreenGrab(pginfo, filename, secondsin, bufferlen, 
                                  video_width, video_height, video_aspect);
-
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetScreenGrab");
+    else if (local)
+        VERBOSE(VB_IMPORTANT, "EncoderLink::GetScreenGrab() -- Error, tv is null");
+    else
+        VERBOSE(VB_IMPORTANT, "Should be local only query: GetScreenGrab");
     return NULL;
 }
 

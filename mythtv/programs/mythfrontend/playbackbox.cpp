@@ -3295,7 +3295,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 {
     QPixmap retpixmap;
 
-    if (!generatePreviewPixmap)
+    if (!generatePreviewPixmap || !pginfo)
         return retpixmap;
         
     QString filename = pginfo->pathname;
