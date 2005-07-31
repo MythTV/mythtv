@@ -141,7 +141,7 @@ bool TVRec::Init(void)
         if (!dvb_options.dvb_on_demand &&
             dynamic_cast<DVBChannel*>(channel)->siparser)
         {
-            scanner = new SIScan("dvb", channel, -1);
+            scanner = new SIScan("dvb", channel, -1, true);
             scanner->StartScanner();
         }
 
@@ -1230,14 +1230,14 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
 
     char curtimestr[128];
     time_t curtime;
-    struct tm *loctime_r;
+    struct tm loctime_r;
     struct tm *loctime;
 
     if (!chan)
         return;
 
     curtime = time(NULL);
-    loctime = localtime_r(&curtime, loctime_r);
+    loctime = localtime_r(&curtime, &loctime_r);
 
     strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
    
