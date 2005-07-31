@@ -147,6 +147,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(prvpkt, 3 * sizeof(char));
+    bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
 
     subtitleLanguagePreferences = QStringList::split(
         ",", gContext->GetSetting("PreferredLanguages", ""));

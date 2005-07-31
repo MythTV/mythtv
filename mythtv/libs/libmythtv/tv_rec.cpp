@@ -1230,13 +1230,14 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
 
     char curtimestr[128];
     time_t curtime;
+    struct tm *loctime_r;
     struct tm *loctime;
 
     if (!chan)
         return;
 
     curtime = time(NULL);
-    loctime = localtime(&curtime);
+    loctime = localtime_r(&curtime, loctime_r);
 
     strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
    

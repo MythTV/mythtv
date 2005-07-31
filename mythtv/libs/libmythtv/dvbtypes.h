@@ -267,7 +267,15 @@ typedef vector<uint16_t> dvb_caid_t;
 
 class DVBTuning
 {
-public:
+  public:
+    DVBTuning()
+      : voltage(SEC_VOLTAGE_OFF), tone(SEC_TONE_OFF), 
+        diseqc_type(0), diseqc_port(0), diseqc_pos(0.0f),
+        lnb_lof_switch(0), lnb_lof_hi(0), lnb_lof_lo(0)
+    {
+        bzero(&params, sizeof(dvb_frontend_parameters));
+    }
+
     struct dvb_frontend_parameters params;
     fe_sec_voltage_t    voltage;
     fe_sec_tone_mode_t  tone;
@@ -379,7 +387,7 @@ class dvb_channel_t
         QString transmission_mode, QString guard_interval, QString hierarchy,
         QString modulation,        QString bandwidth);
 
-    DVBTuning      tuning;
+    DVBTuning       tuning;
 
     PMTObject       pmt;
     bool            PMTSet;
