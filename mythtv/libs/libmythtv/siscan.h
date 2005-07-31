@@ -61,7 +61,8 @@ class SIScan : public QObject
 {
     Q_OBJECT
   public:
-    SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID);
+    SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
+           bool _parseEIT = false);
     ~SIScan();
 
     void StartScanner(void);
@@ -71,7 +72,7 @@ class SIScan : public QObject
                         const QString std,
                         const QString modulation,
                         const QString country);
-    bool ScanTransports(void);
+    bool ScanTransports(const QString sistandard);
     bool ScanTransport(int mplexid);
 
     bool ScanServices(void);

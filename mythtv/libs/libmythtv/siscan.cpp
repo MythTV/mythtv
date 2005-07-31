@@ -60,7 +60,8 @@ void delete_services(int db_mplexid, QMap_SDTObject SDT);
 
 /** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
  */
-SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
+SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
+               bool _parseEIT)
     : // Set in constructor
       channel(_channel),
       signalMonitor(SignalMonitor::Init(_cardtype, -1, _channel)),
@@ -81,6 +82,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
       scanner_thread_running(false),
       eitHelper(NULL)
 {
+    (void) _parseEIT;
     // Initialize statics
     init_freq_tables();
 
@@ -116,9 +118,12 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
                 this,     SLOT(ServiceTableComplete()));
 
 #ifdef USING_DVB_EIT
-        eitHelper = new EITHelper();
-        connect(siparser,  SIGNAL(EventsReady(QMap_Events*)),
+        if (_parseEIT)
+        {
+            eitHelper = new EITHelper();
+            connect(siparser,  SIGNAL(EventsReady(QMap_Events*)),
                 eitHelper, SLOT(HandleEITs(QMap_Events*)));
+        }
 #endif // USING_DVB_EIT
         return;
     }
@@ -165,12 +170,16 @@ void *SIScan::SpawnSectionReader(void *param)
     return NULL;
 }
 
-bool SIScan::ScanTransports(void)
+bool SIScan::ScanTransports(const QString _sistandard)
 {
+    (void) _sistandard;
     VERBOSE(VB_SIPARSER, "ScanTransports()");
 #ifdef USING_DVB
     if (siparser)
+    {
+        siparser->FillPMap(_sistandard);
         return siparser->FindTransports();
+    }
 #endif // USING_DVB
     // We are always scanning for transports when tuned..
     return true;
@@ -479,7 +488,7 @@ void SIScan::RunScanner(void)
                 emit ServiceScanComplete();
             }
         }
-        if (transportListReady && siparser && (mplex > 0))
+        if (transportListReady && siparser)
         {
 #ifdef USING_DVB
             if (siparser->GetTransportObject(NIT))

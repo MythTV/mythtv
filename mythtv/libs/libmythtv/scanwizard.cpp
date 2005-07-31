@@ -690,7 +690,7 @@ void ScanWizardScanner::HandleTuneComplete(void)
              (nScanType == ScanTypeSetting::FullTunedScan_QAM))
     {
         cerr<<"ScanTransports()"<<endl;
-        ok = scanner->ScanTransports();
+        ok = scanner->ScanTransports("dvb");
     }
     else if (nScanType == ScanTypeSetting::FullTransportScan)
     {
