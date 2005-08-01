@@ -1103,50 +1103,50 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished">Valitse Kokoelman Esittäjä</translation>
+        <translation>Valitse Kokoelman Esittäjä</translation>
     </message>
 </context>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
         <source>Edit Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa Päivämäärää</translation>
     </message>
     <message>
         <source>Fixed Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiinteä Päivämäärä</translation>
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>Päivä</translation>
     </message>
     <message>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuukausi</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished">Vuosi</translation>
+        <translation>Vuosi</translation>
     </message>
     <message>
         <source>Use Current Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä Nykyistä Päivämäärää</translation>
     </message>
     <message>
         <source>+/- Days</source>
-        <translation type="unfinished"></translation>
+        <translation>+/- Päivää</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Peruuta</translation>
+        <translation>Peruuta</translation>
     </message>
     <message>
         <source>Invalid Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Virheellinen Päivämäärä</translation>
     </message>
 </context>
 <context>

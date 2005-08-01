@@ -42,6 +42,7 @@
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
       <text lang="DE">Tastenbelegung ändern</text>
+      <text lang="FI">Muokkaa Näppäimiä</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>

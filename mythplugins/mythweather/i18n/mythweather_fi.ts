@@ -469,63 +469,63 @@
     <name>String::WindDirection</name>
     <message>
         <source>N</source>
-        <translation>pohj</translation>
+        <translation type="unfinished">pohj</translation>
     </message>
     <message>
         <source>NNE</source>
-        <translation>pohj</translation>
+        <translation type="unfinished">pohj</translation>
     </message>
     <message>
         <source>NE</source>
-        <translation>koill</translation>
+        <translation type="unfinished">koill</translation>
     </message>
     <message>
         <source>E</source>
-        <translation>itä</translation>
+        <translation type="unfinished">itä</translation>
     </message>
     <message>
         <source>SE</source>
-        <translation>kaakko</translation>
+        <translation type="unfinished">kaakko</translation>
     </message>
     <message>
         <source>SSE</source>
-        <translation>etelä</translation>
+        <translation type="unfinished">etelä</translation>
     </message>
     <message>
         <source>S</source>
-        <translation>etelä</translation>
+        <translation type="unfinished">etelä</translation>
     </message>
     <message>
         <source>SSW</source>
-        <translation>etelä</translation>
+        <translation type="unfinished">etelä</translation>
     </message>
     <message>
         <source>SW</source>
-        <translation>lounas</translation>
+        <translation type="unfinished">lounas</translation>
     </message>
     <message>
         <source>W</source>
-        <translation>länsi</translation>
+        <translation type="unfinished">länsi</translation>
     </message>
     <message>
         <source>NW</source>
-        <translation>luode</translation>
+        <translation type="unfinished">luode</translation>
     </message>
     <message>
         <source>NNW</source>
-        <translation>pohj</translation>
+        <translation type="unfinished">pohj</translation>
     </message>
     <message>
         <source>ENE</source>
-        <translation>koill</translation>
+        <translation type="unfinished">koill</translation>
     </message>
     <message>
         <source>ESE</source>
-        <translation>kaakko</translation>
+        <translation type="unfinished">kaakko</translation>
     </message>
     <message>
         <source>WSW</source>
-        <translation>lounas</translation>
+        <translation type="unfinished">lounas</translation>
     </message>
     <message>
         <source>WNW</source>
@@ -584,7 +584,7 @@
     </message>
     <message>
         <source>today&apos;s forecast</source>
-        <translation>päivän sääennuste</translation>
+        <translation>Päivän Sääennuste</translation>
     </message>
     <message>
         <source>tomorrow&apos;s outlook</source>
@@ -636,15 +636,15 @@
     </message>
     <message>
         <source>COLD</source>
-        <translation type="unfinished"></translation>
+        <translation>KYLMÄ</translation>
     </message>
     <message>
         <source>COLDEST</source>
-        <translation type="unfinished"></translation>
+        <translation>KYLMIN</translation>
     </message>
     <message>
         <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
+        <translation>PILVEN LÄMPÖTILA</translation>
     </message>
 </context>
 <context>
@@ -791,7 +791,7 @@
     </message>
     <message>
         <source> Km/h from the </source>
-        <translation>km/h </translation>
+        <translation> km/h </translation>
     </message>
     <message>
         <source> Visibility will be unlimited for today.</source>
@@ -888,12 +888,14 @@
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth ei voinut hakea säätilatietoja (%1 sekunnin aikana).
+Paina OK yrittääksesi uudelleen suuremmalla aikavälillä. Paina Peruuta hakeaksesi tiedot ilman liikkuvaa kuvaa.</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth ei voinut hakea säätilatietoja (%1 sekunnin aikana).
+Paina OK yrittääksesi uudelleen suuremmalla aikavälillä. Paina Peruuta jos haluat peruuttaa toiminnon.</translation>
     </message>
 </context>
 </TS>
