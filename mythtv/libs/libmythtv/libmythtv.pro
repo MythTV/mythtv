@@ -50,6 +50,8 @@ macx {
 
 # Enable Linux Open Sound System support
 using_oss:DEFINES += USING_OSS
+# Enable Valgrind, i.e. disable some timeouts
+using_valgrind:DEFINES += USING_VALGRIND
 
 # old libvbitext (Caption decoder)
 !win32 {

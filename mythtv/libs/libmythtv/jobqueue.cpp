@@ -31,10 +31,12 @@ JobQueue::JobQueue(bool master)
 
     queuePoll = false;
 
+#ifdef USING_VALGRIND
     pthread_create(&queueThread, NULL, QueueProcesserThread, this);
 
     while (!queuePoll)
         usleep(50);
+#endif // USING_VALGRIND
 
     gContext->addListener(this);
 }

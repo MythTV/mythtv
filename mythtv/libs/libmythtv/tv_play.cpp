@@ -1280,6 +1280,14 @@ void TV::RunTV(void)
 
         if (StateIsPlaying(internalState))
         {
+#ifdef USING_VALGRIND
+            while (!nvp->IsPlaying())
+            {
+                VERBOSE(VB_IMPORTANT, "Waiting for Valgrind...");
+                sleep(1);
+            }
+#endif // USING_VALGRIND
+
             if (!nvp->IsPlaying())
             {
                 ChangeState(RemovePlaying(internalState));

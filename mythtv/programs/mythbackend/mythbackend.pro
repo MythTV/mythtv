@@ -41,3 +41,5 @@ SOURCES += housekeeper.cpp
 using_oss:DEFINES += USING_OSS
 
 using_dvb:DEFINES += USING_DVB
+
+using_valgrind:DEFINES += USING_VALGRIND
