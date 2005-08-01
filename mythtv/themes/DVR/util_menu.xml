@@ -178,6 +178,7 @@
     <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
+      <text lang="DE">Tastenbelegung ändern</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>
