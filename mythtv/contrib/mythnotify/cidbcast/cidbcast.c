@@ -607,6 +607,7 @@ int main(int argc, char *argv[])
     char* tmp1_message;
     char* tmp2_message;
     struct timeb time;
+    struct tm timeValues_r;
     struct tm* timeValues;
     FILE *fptr;
     long fsize;
@@ -777,7 +778,7 @@ int main(int argc, char *argv[])
 	}
 
 	ftime(&time);
-	timeValues = localtime(&(time.time));
+	timeValues = localtime_r(&(time.time), &timeValues_r);
 
 	replace(raw_message, tmp2_message, "%cid_number%", cid_info.number);
 	replace(tmp2_message, tmp1_message, "%cid_name%", cid_info.name);

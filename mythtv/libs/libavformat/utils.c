@@ -2802,6 +2802,7 @@ int parse_frame_rate(int *frame_rate, int *frame_rate_base, const char *arg)
  */
 int64_t parse_date(const char *datestr, int duration)
 {
+    struct tm time_r;
     const char *p;
     int64_t t;
     struct tm dt;
@@ -2843,9 +2844,9 @@ int64_t parse_date(const char *datestr, int duration)
 
         if (!q) {
             if (is_utc) {
-                dt = *gmtime(&now);
+                dt = *gmtime_r(&now, &time_r);
             } else {
-                dt = *localtime(&now);
+                dt = *localtime_r(&now, &time_r);
             }
             dt.tm_hour = dt.tm_min = dt.tm_sec = 0;
         } else {

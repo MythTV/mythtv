@@ -1227,20 +1227,13 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     airdate = "";
     stars = "";
     
-
-    char curtimestr[128];
-    time_t curtime;
-    struct tm loctime_r;
-    struct tm *loctime;
-
     if (!chan)
         return;
 
-    curtime = time(NULL);
-    loctime = localtime_r(&curtime, &loctime_r);
+    QString curtimestr = "20050801101900";
+    //QDateTime::currentDateTime()
+    //    .toString("yyyyMMddhhmmss");
 
-    strftime(curtimestr, 128, "%Y%m%d%H%M%S", loctime);
-   
     channelname = chan->GetCurrentName();
     QString channelinput = chan->GetCurrentInput();
  
