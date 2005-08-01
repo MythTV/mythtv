@@ -31,7 +31,7 @@ JobQueue::JobQueue(bool master)
 
     queuePoll = false;
 
-#ifdef USING_VALGRIND
+#ifndef USING_VALGRIND
     pthread_create(&queueThread, NULL, QueueProcesserThread, this);
 
     while (!queuePoll)
