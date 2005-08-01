@@ -1230,9 +1230,8 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     if (!chan)
         return;
 
-    QString curtimestr = "20050801101900";
-    //QDateTime::currentDateTime()
-    //    .toString("yyyyMMddhhmmss");
+    QString curtimestr = QDateTime::currentDateTime()
+        .toString("yyyyMMddhhmmss");
 
     channelname = chan->GetCurrentName();
     QString channelinput = chan->GetCurrentInput();
