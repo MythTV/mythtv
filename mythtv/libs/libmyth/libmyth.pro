@@ -1,6 +1,6 @@
 include ( ../../config.mak )
 include ( ../../settings.pro )
-
+ 
 TEMPLATE = lib
 TARGET = myth-$$LIBVERSION
 CONFIG += thread dll

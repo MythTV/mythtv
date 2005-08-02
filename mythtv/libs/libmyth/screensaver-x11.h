@@ -1,11 +1,15 @@
 #ifndef MYTH_SCREENSAVER_X11_H
 #define MYTH_SCREENSAVER_X11_H
 
+#include <qobject.h>
+
 #include "screensaver.h"
 
-class ScreenSaverX11 : public ScreenSaverControl
+class ScreenSaverX11 : public QObject, public ScreenSaverControl
 {
-public:
+    Q_OBJECT
+
+  public:
     ScreenSaverX11();
     ~ScreenSaverX11();
 
@@ -13,7 +17,10 @@ public:
     void Restore(void);
     void Reset(void);
 
-protected:
+  public slots:
+    void resetSlot();
+
+  protected:
     class ScreenSaverX11Private *d;
 };
 

@@ -1,5 +1,6 @@
 #define QT_CLEAN_NAMESPACE // no qt 1.x compatability, INT32 conflicts with X
 #include "screensaver-x11.h"
+#include <qtimer.h>
 
 #include <X11/Xlib.h>
 
@@ -8,6 +9,7 @@ extern "C" {
 }
 
 #include "mythcontext.h"
+#include "util.h"
 
 class ScreenSaverX11Private 
 {
@@ -19,14 +21,29 @@ class ScreenSaverX11Private
         int preferblank;
         int allowexposure;
         bool dpmsdisabled;
+        bool xscreensaverRunning;
     } state;
 
+    QTimer *resetTimer;
+    int timeoutInterval;
+
     friend class ScreenSaverX11;
+
 };
 
 ScreenSaverX11::ScreenSaverX11() 
 {
     d = new ScreenSaverX11Private();
+    d->state.xscreensaverRunning = 
+                  (myth_system("xscreensaver-command -version >&- 2>&-") == 0); 
+    if (d->state.xscreensaverRunning)
+    {
+        d->resetTimer = new QTimer(this);
+        connect(d->resetTimer, SIGNAL(timeout()), this, SLOT(resetSlot()));
+
+        d->timeoutInterval = -1;
+        VERBOSE(VB_GENERAL, "XScreenSaver support enabled");
+    }
 }
 
 ScreenSaverX11::~ScreenSaverX11() 
@@ -63,6 +80,24 @@ void ScreenSaverX11::Disable(void)
             VERBOSE(VB_GENERAL, "Disable DPMS");
         }
     }
+
+    if (d->state.xscreensaverRunning)
+    {
+        if (d->resetTimer)
+            d->resetTimer->stop();
+
+        if (d->timeoutInterval == -1)
+        {
+            d->timeoutInterval = 
+                gContext->GetNumSettingOnHost("xscreensaverInterval",
+                                          gContext->GetHostName(),
+                                          60) * 1000;
+        }
+        if (d->timeoutInterval > 0)
+        {
+            d->resetTimer->start(d->timeoutInterval, FALSE);
+        }
+    }
 }
 
 void ScreenSaverX11::Restore(void) 
@@ -84,10 +119,19 @@ void ScreenSaverX11::Restore(void)
             VERBOSE(VB_GENERAL, "Enable DPMS");
         }
     }
+
+    if (d->state.xscreensaverRunning && d->resetTimer)
+        d->resetTimer->stop();
 }
 
 void ScreenSaverX11::Reset(void) 
 {
     XResetScreenSaver(qt_xdisplay());
+    if (d->state.xscreensaverRunning)
+        resetSlot();
 }
 
+void ScreenSaverX11::resetSlot() 
+{
+    myth_system(QString("xscreensaver-command -deactivate >&- 2>&- &")); 
+}
