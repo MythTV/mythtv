@@ -249,8 +249,9 @@ void ThumbGenerator::loadFile(QImage& image, const QFileInfo& fi)
       }
       if (tmpDir.exists())
       {
-          QString cmd = "cd " + tmpDir.absPath()
-            + "; mplayer -nosound -frames 1 -vo png " + fi.absFilePath();
+          QString cmd = "cd \"" + tmpDir.absPath()
+            + "\"; mplayer -nosound -frames 1 -vo png \"" + fi.absFilePath() +
+            "\"";
           if (myth_system(cmd) == 0)
           {
               QFileInfo thumb(tmpDir.filePath("00000001.png"));
