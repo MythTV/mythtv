@@ -2721,7 +2721,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 
         if (i < active_bin)
         {
-            for(int j = 0; j < bins - i; j++)
+            for(int j = 0; j < active_bin - i; j++)
             {
                 if (hotspot_node)
                 {
