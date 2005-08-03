@@ -186,6 +186,7 @@ enum CodecID {
     CODEC_ID_MPEG2TS= 0x20000, /* _FAKE_ codec to indicate a raw MPEG2 transport
                          stream (only used by libavformat) */
 };
+const char *codec_id_string(enum CodecID codec_id);
 
 /* CODEC_ID_MP3LAME is absolete */
 #define CODEC_ID_MP3LAME CODEC_ID_MP3
@@ -197,6 +198,7 @@ enum CodecType {
     CODEC_TYPE_DATA,
     CODEC_TYPE_SUBTITLE,
 };
+const char *codec_type_string(enum CodecType codec_type);
 
 /**
  * Pixel format. Notes: 
@@ -2435,6 +2437,7 @@ void img_copy(AVPicture *dst, const AVPicture *src,
 #define AV_LOG_ERROR 0
 #define AV_LOG_INFO 1
 #define AV_LOG_DEBUG 2
+#define AV_LOG_DEBUG2 3
 
 #ifdef __GNUC__
 extern void av_log(void*, int level, const char *fmt, ...) __attribute__ ((__format__ (__printf__, 3, 4)));
