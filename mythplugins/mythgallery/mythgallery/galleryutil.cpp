@@ -126,7 +126,8 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList,
                                 const QString& dir, bool recurse,
                                 ThumbDict *itemDict, ThumbGenerator* thumbGen)
 {
-    QDir d(dir);
+    QString blah = dir;
+    QDir d(blah);
     QString currDir = d.absPath();
 
     bool isGallery;
@@ -137,7 +138,7 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList,
         isGallery = false;
 
     // Create .thumbcache dir if neccesary
-    if(thumbGen)
+    if (thumbGen)
         thumbGen->getThumbcacheDir(currDir);
 
     d.setNameFilter(MEDIA_FILENAMES);
@@ -151,7 +152,8 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList,
     QFileInfoListIterator it(*list);
     QFileInfo *fi;
 
-    if(thumbGen) {
+    if (thumbGen) 
+    {
         thumbGen->cancel();
         thumbGen->setDirectory(currDir, isGallery);
     }
@@ -169,12 +171,14 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList,
                 (fi->fileName().find(".highlight.") > 0)))
             continue;
 
-        if(fi->isDir() && recurse) {
+        if (fi->isDir() && recurse) 
+        {
             GalleryUtil::loadDirectory(itemList,
                                        QDir::cleanDirPath(fi->absFilePath()), true,
                                        itemDict, thumbGen);
         }
-        else {
+        else 
+        {
             ThumbItem* item = new ThumbItem;
             item->name      = fi->fileName();
             item->path      = QDir::cleanDirPath(fi->absFilePath());
@@ -182,10 +186,10 @@ bool GalleryUtil::loadDirectory(ThumbList& itemList,
 
             itemList.append(item);
 
-            if(itemDict)
+            if (itemDict)
                 itemDict->insert(item->name, item);
 
-            if(thumbGen)
+            if (thumbGen)
                 thumbGen->addFile(item->name);
         }
     }

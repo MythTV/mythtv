@@ -155,9 +155,9 @@ void SingleView::paintEvent(QPaintEvent *)
     {
         if (m_movieState == 1)
         {
-            QString path = QString("\"") + item->path + "\"";
             m_movieState = 2;
             ThumbItem* item = m_itemList.at(m_pos);
+            QString path = QString("\"") + item->path + "\"";
             QString cmd = gContext->GetSetting("GalleryMoviePlayerCmd");
             cmd.replace("%s", path);
             myth_system(cmd);
