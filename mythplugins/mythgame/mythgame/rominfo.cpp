@@ -50,11 +50,17 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
 
     int dotLocation = BaseFileName.findRev('.');
     if(dotLocation == -1)
-        return false;
+    {
+        BaseFileName.append('.');
+        dotLocation = BaseFileName.length();
+    }
+
+
     BaseFileName.truncate(dotLocation + 1);
     for (QStringList::Iterator i = graphic_formats.begin(); i != graphic_formats.end(); i++)
     {
         *result = BaseFileName + *i;
+        cout << "looking for " << *result << endl;
         if(QFile::exists(*result))
             return true;
     }
