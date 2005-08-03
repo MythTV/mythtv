@@ -68,6 +68,7 @@ LCD::LCD()
     connected = FALSE;
     send_buffer = "";
     lcdMenuItems = new QPtrList<LCDMenuItem>;
+    lcdMenuItems->setAutoDelete(true);
 
     timeTimer = new QTimer(this);
     connect(timeTimer, SIGNAL(timeout()), this, SLOT(outputTime()));    
