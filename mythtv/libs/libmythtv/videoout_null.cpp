@@ -46,10 +46,17 @@ void VideoOutputNull::InputChanged(int width, int height, float aspect)
     VERBOSE(VB_PLAYBACK, "InputChanged(w "<<width<<", h"
             <<height<<", a"<<aspect<<")");
     VideoOutput::InputChanged(width, height, aspect);
-#if 1
-    MoveResize();
-#else
-    // I don't see the need for this... -- dtk
+
+    if (width == vbuffers.GetScratchFrame()->width &&
+        height == vbuffers.GetScratchFrame()->height)
+    {
+        MoveResize();
+        return;
+    }
+
+    XJ_width = width;
+    XJ_height = height;
+
     vbuffers.DeleteBuffers();
 
     MoveResize();
@@ -70,7 +77,6 @@ void VideoOutputNull::InputChanged(int width, int height, float aspect)
     pauseFrame.size   = vbuffers.GetScratchFrame()->size;
     pauseFrame.buf    = new unsigned char[pauseFrame.size];
     pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
-#endif
 }
 
 int VideoOutputNull::GetRefreshRate(void)
@@ -88,7 +94,9 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
     VideoOutput::Init(width, height, aspect, winid,
                       winx, winy, winw, winh, embedid);
 
-    if (!vbuffers.CreateBuffers(XJ_width, XJ_height))
+    XJ_width = width;
+    XJ_height = height;
+    if (!vbuffers.CreateBuffers(width, height))
         return false;
 
     pauseFrame.height = vbuffers.GetScratchFrame()->height;
