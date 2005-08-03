@@ -188,7 +188,7 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     m_themeloaded = false;
     m_backgroundimage = NULL;
 
-    screensaver = ScreenSaverControl::get();
+    screensaver = NULL;
     m_baseHeight = 600;
     m_baseWidth = 800;
 
@@ -275,6 +275,9 @@ cout << "Total desktop width=" << desktop->width() <<
 
 bool MythContextPrivate::Init(bool gui)
 {
+    if (gui)
+        screensaver = ScreenSaverControl::get();
+
     m_gui = gui;
     if (!LoadDatabaseSettings(false))
         return false;
@@ -2214,6 +2217,8 @@ void MythContext::SetMainWindow(MythMainWindow *mainwin)
 
 MythMainWindow *MythContext::GetMainWindow(void)
 {
+    if (!d)
+        return NULL;
     return d->mainWindow;
 }
 
@@ -2276,24 +2281,35 @@ void MythContext::ResetScreensaver(void)
 
 void MythContext::DoDisableScreensaver(void)
 {
-    d->screensaver->Disable();
-    d->screensaverEnabled = false;
+    if (d && d->screensaver)
+    {
+        d->screensaver->Disable();
+        d->screensaverEnabled = false;
+    }
 }
 
 void MythContext::DoRestoreScreensaver(void)
 {
-    d->screensaver->Restore();
-    d->screensaverEnabled = true;
+    if (d && d->screensaver)
+    {
+        d->screensaver->Restore();
+        d->screensaverEnabled = true;
+    }
 }
 
 void MythContext::DoResetScreensaver(void)
 {
-    d->screensaver->Reset();
-    d->screensaverEnabled = false;
+    if (d && d->screensaver)
+    {
+        d->screensaver->Reset();
+        d->screensaverEnabled = false;
+    }
 }
 
 bool MythContext::GetScreensaverEnabled(void)
 {
+    if (!d)
+        return false;
     return d->screensaverEnabled;
 }
 
