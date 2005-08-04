@@ -1,29 +1,52 @@
-#include "mythmedia.h"
-#include <sys/types.h>
-#include <sys/stat.h>
+// C header
 #include <fcntl.h>
 #include <unistd.h>
-#include "qfile.h"
-#include "qtextstream.h"
-
-#include "mythcontext.h"
-
-#include <cstdio>
-#include <iostream>
-#include <cstdlib>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/param.h>
+
+// Qt Headers
+#include <qfile.h>
+
+// MythTV headers
+#include "mythmedia.h"
+#include "mythcontext.h"
+#include "util.h"
 
 using namespace std;
 
 // end for testing
 
-#define PATHTO_MOUNT "/bin/mount"
-#define PATHTO_UNMOUNT "/bin/umount"
-#define PATHTO_MOUNTS "/proc/mounts"
+static const QString PATHTO_MOUNT("/bin/mount");
+static const QString PATHTO_UNMOUNT("/bin/umount");
+static const QString PATHTO_MOUNTS("/proc/mounts");
 
-const char* MythMediaDevice::MediaStatusStrings[] = { "MEDIASTAT_ERROR", "MEDIASTAT_UNKNOWN", "MEDIASTAT_OPEN", "MEDIASTAT_USEABLE", "MEDIASTAT_NOTMOUNTED", "MEDIASTAT_MOUNTED" };
-const char* MythMediaDevice::MediaTypeStrings[] = { "MEDIATYPE_UNKNOWN", "MEDIATYPE_DATA", "MEDIATYPE_MIXED", "MEDIATYPE_AUDIO", "MEDIATYPE_DVD", "MEDIATYPE_VCD" };
-const char* MythMediaDevice::MediaErrorStrings[] = { "MEDIAERR_OK", "MEDIAERR_FAILED", "MEDIAERR_UNSUPPORTED" };
+const char* MythMediaDevice::MediaStatusStrings[] =
+{
+    "MEDIASTAT_ERROR",
+    "MEDIASTAT_UNKNOWN",
+    "MEDIASTAT_OPEN",
+    "MEDIASTAT_USEABLE",
+    "MEDIASTAT_NOTMOUNTED",
+    "MEDIASTAT_MOUNTED"
+};
+
+const char* MythMediaDevice::MediaTypeStrings[] =
+{
+    "MEDIATYPE_UNKNOWN",
+    "MEDIATYPE_DATA",
+    "MEDIATYPE_MIXED",
+    "MEDIATYPE_AUDIO",
+    "MEDIATYPE_DVD",
+    "MEDIATYPE_VCD"
+};
+
+const char* MythMediaDevice::MediaErrorStrings[] =
+{
+    "MEDIAERR_OK",
+    "MEDIAERR_FAILED",
+    "MEDIAERR_UNSUPPORTED"
+};
 
 MythMediaDevice::MythMediaDevice(QObject* par, const char* DevicePath, 
                                  bool SuperMount,  bool AllowEject) 
@@ -75,15 +98,12 @@ bool MythMediaDevice::performMountCmd(bool DoMount)
     if (!m_SuperMount) 
     {
         // Build a command line for mount/unmount and execute it...  Is there a better way to do this?
-        if (DoMount)
-            MountCommand.sprintf("%s %s", PATHTO_MOUNT, 
-                                 (const char*)m_DevicePath);
-        else
-            MountCommand.sprintf("%s %s", PATHTO_UNMOUNT, 
-                                 (const char*)m_DevicePath);
+        MountCommand = QString("%1 %2")
+            .arg((DoMount) ? PATHTO_MOUNT : PATHTO_UNMOUNT)
+            .arg(m_DevicePath);
     
         VERBOSE(VB_ALL,  QString("Executing '%1'").arg(MountCommand));
-        if (0 == system(MountCommand)) 
+        if (0 == myth_system(MountCommand)) 
         {
             if (DoMount)
             {
