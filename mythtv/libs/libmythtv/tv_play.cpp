@@ -1347,7 +1347,8 @@ void TV::RunTV(void)
 
         if (class LCD * lcd = LCD::Get())
         {
-            if (lastLcdUpdate.secsTo(QDateTime::currentDateTime()) < 60)
+            QDateTime curTime = QDateTime::currentDateTime();
+            if (lastLcdUpdate.secsTo(curTime) < 60)
                 continue;
 
             float progress = 0.0;
