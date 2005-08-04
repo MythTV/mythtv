@@ -58,3 +58,4 @@ MpegTSContext *mpegts_parse_open(AVFormatContext *s);
 int mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                         const uint8_t *buf, int len);
 void mpegts_parse_close(MpegTSContext *ts);
+void mpegts_remove_stream(MpegTSContext *ts, int pid);

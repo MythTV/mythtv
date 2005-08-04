@@ -1011,18 +1011,24 @@ bool VideoBuffers::CreateBuffers(int width, int height)
 bool VideoBuffers::CreateBuffers(int width, int height, vector<unsigned char*> bufs)
 {
     bool ok = true;
-    uint buf_size = (width * height * 3) / 2;
+    uint bpp = 12 / 4; /* bits per pixel div common factor */
+    uint bpb =  8 / 4; /* bits per byte div common factor */
+    uint buf_size = (width * height * bpp + 4/* to round up */) / bpb;
     while (bufs.size() < allocSize())
     {
         // init buffers (y plane to 0, u/v planes to 127) to prevent green
         // screens..
-        unsigned char *data = new unsigned char[buf_size + 64];
-        memset(data, 0, width * height);
+        unsigned char *data = new unsigned char[buf_size + buf_size/16 + 64];
+        bzero(data, width * height);
         memset(data + width * height, 127, width * height / 2);
 
         bufs.push_back(data);
         if (bufs.back())
+        {
+            VERBOSE(VB_PLAYBACK, "Created data @"
+                    <<((void*)data)<<"->"<<((void*)(data+buf_size)));
             allocated_arrays.push_back(bufs.back());
+        }
         else
             ok = false;
     }

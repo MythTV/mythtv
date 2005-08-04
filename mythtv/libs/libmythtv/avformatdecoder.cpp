@@ -814,8 +814,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     for (int i = 0; i < ic->nb_streams; i++)
     {
         AVCodecContext *enc = ic->streams[i]->codec;
-        VERBOSE(VB_PLAYBACK, QString("AVFD: Opening Stream #%1: codec id %2").
-                arg(i).arg(enc->codec_id));
+        VERBOSE(VB_PLAYBACK,
+                QString("AVFD: Stream #%1, has id 0x%2 codec id %3, type %4 at 0x")
+                .arg(i).arg((int)ic->streams[i]->id)
+                .arg(codec_id_string(enc->codec_id))
+                .arg(codec_type_string(enc->codec_type))
+                <<((void*)ic->streams[i]));
 
         switch (enc->codec_type)
         {
@@ -851,6 +855,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #else
                 video_codec_id = kCodec_MPEG2; // default to MPEG2
 #endif // USING_XVMC
+                if (enc->codec)
+                {
+                    VERBOSE(VB_IMPORTANT,
+                            "AVFD: Warning, video codec "<<enc<<" "
+                            <<"id("<<codec_id_string(enc->codec_id)<<") "
+                            <<"type ("<<codec_type_string(enc->codec_type)<<") "
+                            <<"already open.");
+                }
                 InitVideoCodec(enc);
                 // Only use libmpeg2 when not using XvMC
                 if (CODEC_ID_MPEG1VIDEO == enc->codec_id ||
@@ -862,6 +874,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             }
             case CODEC_TYPE_AUDIO:
             {
+                if (enc->codec)
+                {
+                    VERBOSE(VB_IMPORTANT,
+                            "AVFD: Warning, audio codec "<<enc
+                            <<" id("<<codec_id_string(enc->codec_id)
+                            <<") type ("<<codec_type_string(enc->codec_type)
+                            <<") already open, leaving it alone.");
+                }
                 assert(enc->codec_id);
                 if (enc->channels > 2)
                     enc->channels = 2;
@@ -871,25 +891,22 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case CODEC_TYPE_SUBTITLE:
             {
                 bitrate += enc->bit_rate;
-                VERBOSE(VB_PLAYBACK,
-                        QString("AvFormatDecoder: subtitle codec (%1)")
-                        .arg(enc->codec_type));
+                VERBOSE(VB_PLAYBACK, QString("AVFD: subtitle codec (%1)")
+                        .arg(codec_type_string(enc->codec_type)));
                 break;
             }
             case CODEC_TYPE_DATA:
             {
                 bitrate += enc->bit_rate;
-                VERBOSE(VB_PLAYBACK,
-                        QString("AvFormatDecoder: data codec, ignoring (%1)")
-                        .arg(enc->codec_type));
+                VERBOSE(VB_PLAYBACK, QString("AVFD: data codec, ignoring (%1)")
+                        .arg(codec_type_string(enc->codec_type)));
                 break;
             }
             default:
             {
                 bitrate += enc->bit_rate;
-                VERBOSE(VB_PLAYBACK,
-                        QString("AvFormatDecoder: Unknown codec type (%1)")
-                        .arg(enc->codec_type));
+                VERBOSE(VB_PLAYBACK, QString("AVFD: Unknown codec type (%1)")
+                        .arg(codec_type_string(enc->codec_type)));
                 break;
             }
         }
@@ -900,41 +917,45 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             continue;
 
         VERBOSE(VB_PLAYBACK, QString("AVFD: Looking for decoder for %1")
-                                     .arg(enc->codec_id));
+                .arg(codec_id_string(enc->codec_id)));
         AVCodec *codec = avcodec_find_decoder(enc->codec_id);
         if (!codec)
         {
             VERBOSE(VB_IMPORTANT, 
-                    QString("AvFormatDecoder: Could not find decoder for "
+                    QString("AVFD: Could not find decoder for "
                             "codec (%1), ignoring.")
-                           .arg(enc->codec_id));
+                    .arg(codec_id_string(enc->codec_id)));
             continue;
         }
 
-        if (enc->codec && enc->codec_type != CODEC_TYPE_VIDEO) 
+        if (!enc->codec)
         {
-            VERBOSE(VB_IMPORTANT, QString("Codec already open, closing first"));
-            avcodec_close(enc);
-        }
-        else if (enc->codec)
-            continue;
-
-        int open_val = avcodec_open(enc, codec);
-        if (open_val < 0)
-        {
-            VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder: Could not "
-                    "open codec aborting. reason %1").arg(open_val));
-            //av_close_input_file(ic); // causes segfault
-            ic = NULL;
-            scanerror = -1;
-            break;
+            int open_val = avcodec_open(enc, codec);
+            if (open_val < 0)
+            {
+                VERBOSE(VB_IMPORTANT, "AVFD: Could not "
+                        "open codec "<<enc<<", "
+                        <<"id("<<codec_id_string(enc->codec_id)<<") "
+                        <<"type("<<codec_type_string(enc->codec_type)<<") "
+                        <<"aborting. reason "<<open_val);
+                //av_close_input_file(ic); // causes segfault
+                ic = NULL;
+                scanerror = -1;
+                break;
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, "AVFD: Opened codec "<<enc<<", "
+                        <<"id("<<codec_id_string(enc->codec_id)<<") "
+                        <<"type("<<codec_type_string(enc->codec_type)<<")");
+            }
         }
 
         if (enc->codec_type == CODEC_TYPE_AUDIO)
         {
             audioStreams.push_back( i );
-            VERBOSE(VB_AUDIO, QString("Stream #%1 (audio track #%2) is an "
-                    "audio stream with %3 channels.")
+            VERBOSE(VB_AUDIO, QString("AVFD: Stream #%1 (audio track #%2) is an "
+                                      "audio stream with %3 channels.")
                     .arg(i).arg(audioStreams.size() - 1).arg(enc->channels));
         }
     }
@@ -972,8 +993,6 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
                     VERBOSE(VB_IMPORTANT, QString("codec for stream %1 is null").arg(i));
                     break;
                 }
-                avcodec_close(enc);
-                avcodec_open(enc, codec);
                 break;
             }
             default:
@@ -1641,7 +1660,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         else
         {
             if (!pkt)
+            {
                 pkt = new AVPacket;
+                bzero(pkt, sizeof(AVPacket));
+                av_init_packet(pkt);
+            }
 
             if (av_read_frame(ic, pkt) < 0)
             {
@@ -1721,7 +1744,10 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         while (!have_err && len > 0)
         {
-            switch (curstream->codec->codec_type)
+            pthread_mutex_lock(&avcodeclock);
+            int ctype = curstream->codec->codec_type;
+            pthread_mutex_unlock(&avcodeclock);
+            switch (ctype)
             {
                 case CODEC_TYPE_AUDIO:
                 {
@@ -1747,6 +1773,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                         else
                             skipaudio = false;
                     }
+
+                    pthread_mutex_lock(&avcodeclock);
                     if (do_ac3_passthru)
                     {
                         data_size = pkt->size;
@@ -1759,6 +1787,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                                    audioSamples, &data_size,
                                                    ptr, len);
                     }
+                    pthread_mutex_unlock(&avcodeclock);
 
                     ptr += ret;
                     len -= ret;
@@ -1793,6 +1822,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     AVCodecContext *context = curstream->codec;
                     AVFrame mpa_pic;
+                    bzero(&mpa_pic, sizeof(AVFrame));
 
                     int gotpicture = 0;
 

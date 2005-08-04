@@ -17,6 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "avformat.h"
+#include "mpegts.h"
 
 #undef NDEBUG
 #include <assert.h>
@@ -2247,12 +2248,18 @@ AVStream *av_new_stream(AVFormatContext *s, int id)
 AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id)
 {
     if (!st)
+    {
+        av_log(s, AV_LOG_ERROR, "av_add_stream: Error, AVStream is NULL");
         return NULL;
+    }
 
-    av_remove_stream(s, id);
+    av_remove_stream(s, id, 0);
 
     if (s->nb_streams >= MAX_STREAMS)
+    {
+        av_log(s, AV_LOG_ERROR, "av_add_stream: Error, (s->nb_streams >= MAX_STREAMS)");
         return NULL;
+    }
 
     if (s->iformat) {
         /* no default bitrate if decoding */
@@ -2279,20 +2286,67 @@ AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id)
  *
  * @param s MPEG media stream handle
  * @param id stream id of stream to remove
+ * @param remove_ts if true, remove any matching MPEG-TS filter as well
  */
-void av_remove_stream(AVFormatContext *s, int id) {
+void av_remove_stream(AVFormatContext *s, int id, int remove_ts) {
     int i;
-    for (i=0; i<s->nb_streams; i++)
-        if (s->streams[i]->id == id) {
-            av_log(NULL, AV_LOG_DEBUG, "av_remove_stream 0x%x\n", id);
-            s->nb_streams--;
-            if (s->nb_streams-i>0)
-                memmove(&s->streams[i], &s->streams[i+1],
-                        (s->nb_streams-i)*sizeof(AVFormatContext *));
+    int changes = 0;
+    for (i=0; i<s->nb_streams; i++) {
+        if (s->streams[i]->id != id)
             continue;
+
+        av_log(NULL, AV_LOG_DEBUG, "av_remove_stream 0x%x\n", id);
+
+        /* close codec context */
+        AVCodecContext *codec_ctx = s->streams[i]->codec;
+        if (codec_ctx->codec)
+            avcodec_close(codec_ctx);
+
+        /* make sure format context is not using the codec context */
+        if (&s->streams[i] == s->cur_st) {
+            av_log(NULL, AV_LOG_DEBUG, "av_remove_stream cur_st = NULL\n");
+            s->cur_st = NULL;
+            s->cur_ptr = NULL;
         }
-    for (i=0; i<s->nb_streams; i++)
-        s->streams[i]->index=i;
+        else if (s->cur_st > &s->streams[i]) {
+            av_log(NULL, AV_LOG_DEBUG, "av_remove_stream cur_st -= 1\n");
+            s->cur_st -= sizeof(AVFormatContext *);
+        }
+        else {
+            av_log(NULL, AV_LOG_DEBUG,
+                   "av_remove_stream: no change to cur_st\n");
+        }
+
+        av_log(NULL, AV_LOG_DEBUG, "av_remove_stream: removing... "
+               "s->nb_streams=%d i=%d\n", s->nb_streams, i);
+        /* actually remove av stream */
+        s->nb_streams--;
+        if ((s->nb_streams - i) > 0) {
+            memmove(&s->streams[i], &s->streams[i+1],
+                    (s->nb_streams-i)*sizeof(AVFormatContext *));
+        }
+        else
+            s->streams[i] = NULL;
+
+        /* remove ts filter if remove ts is true and
+         * the format decoder is the "mpegts" decoder
+         */
+        if (remove_ts && s->iformat && s->priv_data && 
+            (0 == strncmp(s->iformat->name, "mpegts", 6))) {
+            av_log(NULL, AV_LOG_DEBUG,
+                   "av_remove_stream: mpegts_remove_stream\n");
+            MpegTSContext *context = (MpegTSContext*) s->priv_data;
+            mpegts_remove_stream(context, id);
+        }
+        changes = 1;
+    }
+    if (changes)
+    {
+        /* renumber the streams */
+        av_log(NULL, AV_LOG_DEBUG, "av_remove_stream: renumbering streams\n");
+        for (i=0; i<s->nb_streams; i++)
+            s->streams[i]->index=i;
+    }
 }
 
 /************************************************************/
