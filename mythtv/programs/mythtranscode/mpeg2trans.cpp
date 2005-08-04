@@ -689,7 +689,7 @@ int MPEG2trans::DoTranscode(QString inputFilename, QString outputFilename)
     if (err < 0)
     {
         VERBOSE(VB_IMPORTANT,
-                QString("Could not find stream paramters for '%1',"
+                QString("Could not find stream parameters for '%1',"
                         " error code %2").arg(inputFilename).arg(err));
         return 2;
     }
@@ -987,7 +987,7 @@ int MPEG2trans::BuildKeyframeIndex(QString filename, QMap <long long, long long>
     if (err < 0)
     {
         VERBOSE(VB_IMPORTANT,
-                QString("Could not find stream paramters for '%1',"
+                QString("Could not find stream parameters for '%1',"
                         " error code %2").arg(filename).arg(err));
         return 2;
     }
