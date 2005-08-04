@@ -794,12 +794,16 @@ QRgb blendColors(QRgb source, QRgb add, int alpha)
 uint myth_system(const QString &command, int flags)
 {
     (void)flags; /* Kill warning */
+
+    bool ready_to_lock = gContext && gContext->GetMainWindow();
 #ifdef USE_LIRC
-    LircEventLock lirc_lock(!(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC));
+    bool lirc_lock_flag = !(flags & MYTH_SYSTEM_DONT_BLOCK_LIRC);
+    LircEventLock lirc_lock(lirc_lock_flag && ready_to_lock);
 #endif
 
 #ifdef USE_JOYSTICK_MENU
-    JoystickMenuEventLock joystick_lock(!(flags & MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU));
+    bool joy_lock_flag = !(flags & MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+    JoystickMenuEventLock joystick_lock(joy_lock_flag && ready_to_lock);
 #endif
 
     pid_t child = fork();

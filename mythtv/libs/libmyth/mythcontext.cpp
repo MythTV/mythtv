@@ -151,16 +151,35 @@ class MythContextPrivate
 
 
 MythContextPrivate::MythContextPrivate(MythContext *lparent)
+    : parent(lparent),
+      m_settings(new Settings()), m_qtThemeSettings(new Settings()),
+      m_installprefix(PREFIX),
+      m_gui(false), m_backend(false), m_themeloaded(false),
+      m_menuthemepathname(QString::null), m_themepathname(QString::null),
+      m_backgroundimage(NULL),
+      m_xbase(0), m_ybase(0), m_height(0), m_width(0),
+      m_baseWidth(800), m_baseHeight(600),
+      m_localhostname(QString::null),
+      serverSockLock(false),
+      language(""),
+      mainWindow(NULL),
+      m_wmult(1.0), m_hmult(1.0),
+      m_screenxbase(0), m_screenybase(0), m_screenwidth(0), m_screenheight(0),
+      m_geometry_x(0), m_geometry_y(0), m_geometry_w(0), m_geometry_h(0),
+      themecachedir(QString::null),
+      bigfontsize(0), mediumfontsize(0), smallfontsize(0),
+      serverSock(NULL), eventSock(new QSocket(0, "event socket")),
+      disablelibrarypopup(false),
+      pluginmanager(NULL),
+      screensaver(NULL),
+      m_logenable(-1), m_logmaxcount(-1), m_logprintlevel(-1),
+      screensaverEnabled(false),
+      display_res(NULL),
+      m_priv_mutex(new QMutex(true))
 {
-    pluginmanager = NULL;
-
-    parent = lparent;
-
     char *tmp_installprefix = getenv("MYTHTVDIR");
     if (tmp_installprefix)
         m_installprefix = tmp_installprefix;
-    else
-        m_installprefix = PREFIX;
 
     if (QDir(m_installprefix).isRelative())
     {
@@ -179,25 +198,6 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
         VERBOSE(VB_ALL, QString("Using runtime prefix = %1")
                                 .arg(m_installprefix));
     }
-
-    m_backend = false;
-    m_settings = new Settings;
-    m_qtThemeSettings = new Settings;
-
-    language = "";
-    m_themeloaded = false;
-    m_backgroundimage = NULL;
-
-    screensaver = NULL;
-    m_baseHeight = 600;
-    m_baseWidth = 800;
-
-    m_xbase = m_ybase = 0;
-    m_height = m_width = 0;
-    m_screenxbase = m_screenybase = 0;
-    m_screenheight = m_screenwidth = 0;
-    m_geometry_x = m_geometry_y = 0;
-    m_geometry_w = m_geometry_h = 0;
 }
 
 // Get screen size from Qt. If the windowing system environment
@@ -275,28 +275,21 @@ cout << "Total desktop width=" << desktop->width() <<
 
 bool MythContextPrivate::Init(bool gui)
 {
+    m_gui = gui;
+
+    // Creates screen saver control if we will have a GUI
     if (gui)
         screensaver = ScreenSaverControl::get();
 
-    m_gui = gui;
+    // ---- database connection stuff ----
+
+    // Attempts to read DB info from "mysql.txt" from the 
+    // filesystem, or create it if it does not exist.
     if (!LoadDatabaseSettings(false))
         return false;
 
-    serverSock = NULL;
-    eventSock = new QSocket(0);
-
-    m_logenable = -1;
-    m_logmaxcount = -1;
-    m_logprintlevel = -1;
-
-    mainWindow = NULL;
-
-    disablelibrarypopup = false;
-
-    display_res = NULL;
-
-    m_priv_mutex = new QMutex(true);
-
+    // Queries the user for the DB info, using the command 
+    // line or the GUI depending on the application.
     if (!MSqlQuery::testDBConnection())
     {
         if (m_gui && PromptForDatabaseParams())
@@ -625,6 +618,7 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
             VERBOSE(VB_IMPORTANT, "User canceled database configuration");
 
         // tear down temporary main window
+        parent->SetMainWindow(NULL);
         delete mainWindow;
     }
     else

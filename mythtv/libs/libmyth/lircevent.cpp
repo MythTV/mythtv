@@ -19,6 +19,8 @@ LircEventLock::~LircEventLock()
 
 void LircEventLock::lock()
 {
+    if (!gContext)
+        return;
     MythMainWindow *mw = gContext->GetMainWindow();
     if (mw)
     {
