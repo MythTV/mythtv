@@ -201,18 +201,20 @@ done
 
 has_library()
 {
-    LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
-    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
+    LIBPATHS="`echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
+    if [ -f /etc/ld.so.conf ]; then
+        LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
 
-    # recurse down just one level, should be enough in most cases
-    INCL=`cat /etc/ld.so.conf | grep -v "#" | grep "include "`
-    SRCH=`echo $INCL | sed s/"include "//g`
-    for x in $SRCH ; do
-        LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "include"`
-        LIBPATHS="$LIBPATHS $LP_APPEND"
-    done
+        # recurse down just one level, should be enough in most cases
+        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep "include "`
+        SRCH=`echo $INCL | sed s/"include "//g`
+        for x in $SRCH ; do
+            LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "include"`
+            LIBPATHS="$LIBPATHS $LP_APPEND"
+        done
+    fi
 
-    LIBPATHS="`echo $LIBPATHS /lib /usr/lib | sed s/'\/ '/' '/g` "
+    LIBPATHS="`echo $LIBPATHS $prefix/lib /lib /usr/lib | sed s/'\/ '/' '/g` "
 
     HAS_IT="no"
     for LIBPATH in $LIBPATHS ; do
@@ -225,7 +227,7 @@ has_library()
 
 has_header()
 {
-    HPATHS="/usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include /"
+    HPATHS="$prefix/include /usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include /"
     HAS_IT="no"
     for HPATH in $HPATHS ; do
         if test x`ls $HPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
