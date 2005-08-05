@@ -181,23 +181,28 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     if (tmp_installprefix)
         m_installprefix = tmp_installprefix;
 
+#if QT_VERSION >= 0x030200
+    QDir prefixDir = qApp->applicationDirPath();
+#else
+    QString appPath = QFileInfo(qApp->argv()[0]).absFilePath();
+    QDir prefixDir(appPath.left(appPath.findRev("/")));
+#endif
+
     if (QDir(m_installprefix).isRelative())
     {
         // If the PREFIX is relative, evaluate it relative to our
         // executable directory. This can be fragile on Unix, so
         // use relative PREFIX values with care.
-#if QT_VERSION >= 0x030200
-        QDir prefixDir = qApp->applicationDirPath();
-#else
-        QString appPath = QFileInfo(qApp->argv()[0]).absFilePath();
-        QDir prefixDir(appPath.left(appPath.findRev("/")));
-#endif
         prefixDir.cd(m_installprefix);
         m_installprefix = prefixDir.canonicalPath();
-
-        VERBOSE(VB_ALL, QString("Using runtime prefix = %1")
-                                .arg(m_installprefix));
     }
+    else if (prefixDir.path().contains(".app/Contents/MacOS"))
+    {
+        prefixDir.cd("../Resources");
+        m_installprefix = prefixDir.canonicalPath();
+    }
+    VERBOSE(VB_ALL, QString("Using runtime prefix = %1")
+            .arg(m_installprefix));
 }
 
 // Get screen size from Qt. If the windowing system environment
