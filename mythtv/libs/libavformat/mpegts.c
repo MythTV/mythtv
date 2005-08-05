@@ -448,12 +448,38 @@ static MpegTSService *new_service(MpegTSContext *ts, int sid,
     return service;
 }
 
+static int mpegts_parse_program_info_length(uint8_t **p, uint8_t *p_end)
+{
+    int program_info_length = get16(p, p_end);
+    if (program_info_length < 0)
+        return -1;
+    program_info_length &= 0xfff;
+    *p += program_info_length;
+    if (*p >= p_end)
+        return -1;
+    return program_info_length;
+}
+
 static int find_in_list(const int *pids, int pid) {
     int i;
     for (i=0; i<PMT_PIDS_MAX; i++)
         if (pids[i]==pid)
             return i;
     return -1;
+}
+
+static int mpegts_parse_pcrpid(MpegTSContext *mpegts_ctx,
+                               uint8_t **p, uint8_t *p_end)
+{
+    int pcr_pid = get16(p, p_end);
+    if (pcr_pid < 0)
+        return -1;
+    pcr_pid &= 0x1fff;
+    mpegts_ctx->pcr_pid = pcr_pid;
+#ifdef DEBUG_SI
+    av_log(NULL, AV_LOG_DEBUG, "pcr_pid=0x%x\n", pcr_pid);
+#endif
+    return pcr_pid;
 }
 
 #define HANDLE_PMT_ERROR(MSG) \
@@ -659,32 +685,6 @@ static int is_desired_stream(int type)
             break;
     }    
     return val;
-}
-
-static int mpegts_parse_pcrpid(MpegTSContext *mpegts_ctx,
-                               uint8_t **p, uint8_t *p_end)
-{
-    int pcr_pid = get16(p, p_end);
-    if (pcr_pid < 0)
-        return -1;
-    pcr_pid &= 0x1fff;
-    mpegts_ctx->pcr_pid = pcr_pid;
-#ifdef DEBUG_SI
-    av_log(NULL, AV_LOG_DEBUG, "pcr_pid=0x%x\n", pcr_pid);
-#endif
-    return pcr_pid;
-}
-
-static int mpegts_parse_program_info_length(uint8_t **p, uint8_t *p_end)
-{
-    int program_info_length = get16(p, p_end);
-    if (program_info_length < 0)
-        return -1;
-    program_info_length &= 0xfff;
-    *p += program_info_length;
-    if (*p >= p_end)
-        return -1;
-    return program_info_length;
 }
 
 static int mpegts_parse_desc(dvb_caption_info_t *dvbci,
