@@ -47,6 +47,7 @@ dvb_eit="no"
 lirc="yes"
 joystick_menu="yes"
 firewire_cable_box="yes"
+dbox2_dvb_box="yes"
 x11="yes"
 xrandr="yes"
 xv="yes"
@@ -163,6 +164,7 @@ echo "  --disable-backend        disable backend  [breaks dependency checking]"
 echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
 echo "  --disable-joystick-menu  disable joystick menu"
 echo "  --disable-firewire       disable support for FireWire cable boxes"
+echo "  --disable-dbox2          disable support for Nokia DBOX2 DVB boxes (or compatibles)"
 echo "  --disable-v4l            disable Video4Linux support"
 echo "  --disable-ivtv           disable ivtv support (PVR-x50) req. v4l support"
 #echo "  --enable-ivtv-sys-header use ivtv system headers instead of myth headers"
@@ -723,6 +725,10 @@ for opt do
   --enable-firewire) firewire_cable_box="yes"
   ;;
   --disable-firewire) firewire_cable_box="no"
+  ;;
+  --enable-dbox2) dbox2_dvb_box="yes"
+  ;;
+  --disable-dbox2) dbox2_dvb_box="no"
   ;;
   --enable-dvb) dvb="yes"
   ;;
@@ -2538,6 +2544,11 @@ fi
 if test x"$firewire_cable_box" = x"yes" ; then
   CCONFIG="$CCONFIG using_firewire"
   echo "CONFIG_FIREWIRE_LIBS=-lraw1394 -liec61883 -lavc1394" >> $MYTH_CONFIG_MAK
+fi
+
+if test x"$dbox2_dvb_box" = x"yes" ; then
+  CCONFIG="$CCONFIG using_dbox2"
+  CONFIG_DEFINES="$CONFIG_DEFINES USING_DBOX2"
 fi
 
 if test x"$lirc" = x"yes" ; then

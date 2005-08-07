@@ -241,6 +241,10 @@ using_backend {
     using_firewire:SOURCES += firewirerecorder.cpp firewirechannel.cpp
     using_firewire:DEFINES += USING_FIREWIRE
 
+    # Support for set top boxes (Nokia DBox2 etc.)
+    using_dbox2:SOURCES += dbox2recorder.cpp dbox2channel.cpp dbox2epg.cpp
+    using_dbox2:HEADERS += dbox2recorder.h dbox2channel.h dbox2epg.h
+
     # Support for PVR-150/250/350/500, etc. on Linux
     using_ivtv:HEADERS += mpegrecorder.h
     using_ivtv:SOURCES += mpegrecorder.cpp

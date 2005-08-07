@@ -53,6 +53,11 @@ using namespace std;
 #include "firewirechannel.h"
 #endif
 
+#ifdef USING_DBOX2
+#include "dbox2recorder.h"
+#include "dbox2channel.h"
+#endif
+
 const int TVRec::kRequestBufferSize = 256*1000;
 
 /** \class TVRec
@@ -128,7 +133,7 @@ bool TVRec::Init(void)
     GetDevices(m_capturecardnum, videodev, vbidev, 
                audiodev, audiosamplerate,
                inputname, startchannel, cardtype, dvb_options,
-               firewire_options, skip_btaudio);
+               firewire_options, dbox2_options, skip_btaudio);
 
     if (cardtype == "DVB")
     {
@@ -171,6 +176,23 @@ bool TVRec::Init(void)
         VERBOSE(VB_IMPORTANT, msg);
         errored = true;
         return false;
+#endif
+    }
+    else if (cardtype == "DBOX2")
+    {
+#ifdef USING_DBOX2
+        channel = new DBox2Channel(this, &dbox2_options, m_capturecardnum);
+        channel->Open();
+        if (inputname.isEmpty())
+            channel->SetChannelByString(startchannel);
+        else
+            channel->SwitchToInput(inputname, startchannel);
+#else
+        VERBOSE(VB_IMPORTANT, "ERROR: DBOX2 Input configured, "
+                              "but no DBOX2 support compiled in!");
+        VERBOSE(VB_IMPORTANT, "Remove the card from configuration, "
+                              "or recompile MythTV.");
+        exit(-20);
 #endif
     }
     else if ((cardtype == "MPEG") && (videodev.lower().left(5) == "file:"))
@@ -834,6 +856,23 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         errored = true;
 #endif
     }
+    else if (cardtype == "DBOX2")
+    {
+#ifdef USING_DBOX2
+        VERBOSE(VB_GENERAL,QString("TVRec::SetupRecorder() Initializing DBOX2 on Host: %1, Streaming-Port: %2, Http-Port: %3")
+                                  .arg(dbox2_options.host)
+                                  .arg(dbox2_options.port)
+	                          .arg(dbox2_options.httpport));
+        recorder = new DBox2Recorder(dynamic_cast<DBox2Channel*>(channel), m_capturecardnum);
+        recorder->SetRingBuffer(rbuffer);
+        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
+        recorder->SetOption("port", dbox2_options.port);
+        recorder->SetOption("host", dbox2_options.host);
+        recorder->SetOption("httpport", dbox2_options.httpport);
+        recorder->Initialize();
+#endif
+        return;
+    }
     else if (cardtype == "DVB")
     {
 #ifdef USING_DVB
@@ -1307,7 +1346,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
 void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
                        QString &audio, int &rate, QString &defaultinput,
                        QString &startchan, QString &type, 
-                       dvb_options_t &dvb_opts, firewire_options_t &firewire_opts, 
+                       dvb_options_t &dvb_opts, firewire_options_t &firewire_opts, dbox2_options_t &dbox2_opts,
                        bool &skip_bt)
 {
     video = "";
@@ -1328,7 +1367,7 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
                   "dvb_wait_for_seqstart,dvb_dmx_buf_size,"
                   "dvb_pkt_buf_size, skipbtaudio, dvb_on_demand,"
                   "firewire_port, firewire_node, firewire_speed,"
-                  "firewire_model, firewire_connection "
+                  "firewire_model, firewire_connection, dbox2_port, dbox2_host, dbox2_httpport "
                   "FROM capturecard WHERE cardid = :CARDID ;");
     query.bindValue(":CARDID", cardnum);
 
@@ -1377,6 +1416,13 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         if (test != QString::null)
             firewire_opts.model = QString::fromUtf8(test);
         firewire_opts.connection = query.value(17).toInt();
+
+        dbox2_opts.port = query.value(18).toInt();
+        dbox2_opts.httpport = query.value(20).toInt();
+        test = query.value(19).toString();
+        if (test != QString::null)
+           dbox2_opts.host = QString::fromUtf8(test);
+
     }
 
     query.prepare("SELECT if(startchan!='', startchan, '3') "

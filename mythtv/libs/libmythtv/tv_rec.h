@@ -51,6 +51,13 @@ typedef struct _firewire_options_t
     QString model;
 } firewire_options_t;
 
+typedef struct _dbox2_options_t
+{
+    int port;
+    int httpport;
+    QString host;
+} dbox2_options_t;
+
 class TVRec
 {
   public:
@@ -188,7 +195,8 @@ class TVRec
     void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
                     int &rate, QString &defaultinput, QString &startchannel,
                     QString &type, dvb_options_t &dvb_opts,
-                    firewire_options_t &firewire_opts, bool &skip_bt);
+		    firewire_options_t &firewire_opts, dbox2_options_t &dbox2_opts,
+                    bool &skip_bt);
 
     void SetupRecorder(class RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
@@ -240,11 +248,12 @@ class TVRec
     QString liveTVRingBufLoc;
     QString recprefix;
 
-    // Configuration variables from setup rutines
+    // Configuration variables from setup routines
     int     m_capturecardnum;
     bool    ispip;
     dvb_options_t dvb_options;
     firewire_options_t firewire_options;
+    dbox2_options_t dbox2_options;
 
     // State variables
     QMutex  stateChangeLock;

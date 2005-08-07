@@ -75,7 +75,7 @@ using namespace std;
  *  Argentenia has also has announced their Digital TV Standard will be 
  *  ATSC over DVB-T
  *
- *  Impliemntation of OpenCable or other MPEG-TS based standards (DirecTV?)
+ *  Implementation of OpenCable or other MPEG-TS based standards (DirecTV?)
  *  is also possible with this class if their specs are ever known.
  *
  */

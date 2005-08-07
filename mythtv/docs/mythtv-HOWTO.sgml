@@ -471,6 +471,10 @@ use a 1.8GHz processor.
 <sect3>Firewire.
 <p>You may use the Firewire output of the DCT6200 or the SA3250.
 
+<sect3>DBoxII or other devices running Neutrino
+<p>You may use the Ethernet port of an DBoxII or a similar device to capture 
+MPEG2. Your set top box has to be running the Neutrino GUI. 
+
 <sect3>USB Capture Devices.
 <p>The Plextor ConvertX PVR devices are supported through Linux drivers
 available from <url
@@ -6467,6 +6471,26 @@ Then burn the DVD file structure to a DVD with
 
 <tt>growisofs -Z /dev/scd0 -dvd-video DVD</tt>
 
+<sect1>Using the DBoxII within MythTV
+<p>The configuration of the DBoxII for use within MythTV is tricky 
+(as of May 16 2005), that's why it's covered here. Your DBoxII has to be 
+running linux and the Neutrino GUI instead of the stock BetaNova firmware. 
+For further information, please refer to <url url="http://www.tuxbox.org" name="http://www.tuxbox.org">. Additionally, you need to enable the SPTS mode in 
+Neutrino.
+
+1.) Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input", 
+the other values have to be adjusted according to your setup. 
+The default values, except for the "DBOX2 host ip", should work fine.
+2.) Define a new video source. It doesn't need to be configured, 
+you just need to define it. MythTV grabs the EPG from the DBoxII.
+3.) Connect the DBoxII to the newly defined input source in "input connections".
+4.) Since channel scanning is not implemented yet, you need to define channels 
+in the "Channel Editor". Make sure that you use the same value for 
+"Channel Name" as on the DBoxII. You can get a list of available 
+channels from the web interface of Neutrino at http://ip-of-your-box:80/. 
+Associate the channel with your new video source and repeat when needed.
+
+You may leave the Setup now and proceed as usual.
 
 <sect1>Migrating from XMLTV to DataDirect <label id="MigratingtoDD">
 <!-- Mostly from a post by Bruce Markey -->

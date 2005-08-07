@@ -1188,6 +1188,51 @@ class FirewireConfigurationGroup: public VerticalConfigurationGroup
     CaptureCard& parent;
 };
 
+class DBOX2Port: public LineEditSetting, public CCSetting {
+    public:
+      DBOX2Port(const CaptureCard& parent):
+      CCSetting(parent, "dbox2_port") {
+            setValue("31338");
+            setLabel(QObject::tr("DBOX2 Streaming Port"));
+            setHelpText(QObject::tr("DBOX2 streaming port on your DBOX2."));
+        }
+};
+
+class DBOX2HttpPort: public LineEditSetting, public CCSetting {
+  public:
+      DBOX2HttpPort(const CaptureCard& parent):
+      CCSetting(parent, "dbox2_httpport") {
+            setValue("80");
+            setLabel(QObject::tr("DBOX2 HTTP Port"));
+            setHelpText(QObject::tr("DBOX2 http port on your DBOX2."));
+        }
+};
+class DBOX2Host: public LineEditSetting, public CCSetting {
+   public:
+       DBOX2Host(const CaptureCard& parent):
+       CCSetting(parent, "dbox2_host") {
+           setValue("dbox");
+           setLabel(QObject::tr("DBOX2 Host IP"));
+           setHelpText(QObject::tr("DBOX2 Host IP is the remote device."));
+       }
+};
+
+class DBOX2ConfigurationGroup: public VerticalConfigurationGroup {
+public:
+   DBOX2ConfigurationGroup(CaptureCard& a_parent):
+       parent(a_parent) {
+       setUseLabel(false);
+       addChild(new DBOX2Port(parent));
+       addChild(new DBOX2HttpPort(parent));
+       addChild(new DBOX2Host(parent));
+   };
+  private:
+     CaptureCard& parent;
+ };
+
+
+
+
 class V4LConfigurationGroup: public VerticalConfigurationGroup
 {
   public:
@@ -1273,6 +1318,7 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent)
     addTarget("HDTV", new pcHDTVConfigurationGroup(parent));
     addTarget("MPEG", new MPEGConfigurationGroup(parent));
     addTarget("FIREWIRE", new FirewireConfigurationGroup(parent));
+    addTarget("DBOX2", new DBOX2ConfigurationGroup(parent));
 }
 
 void CaptureCardGroup::triggerChanged(const QString& value) 
@@ -1296,7 +1342,7 @@ void CaptureCard::fillSelections(SelectSetting* setting)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype, videodevice, cardid, "
-                  " firewire_port, firewire_node "
+                  " firewire_port, firewire_node, dbox2_port, dbox2_host, dbox2_httpport "
                   " FROM capturecard WHERE hostname = :HOSTNAME ;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
@@ -1313,6 +1359,13 @@ void CaptureCard::fillSelections(SelectSetting* setting)
                              query.value(4).toString() + "]",
                              query.value(2).toString());
             } 
+            else if(query.value(0).toString() == "DBOX2") {
+                     setting->addSelection("[ " + query.value(0).toString() + " " + 
+					   "Host IP: " + query.value(6).toString() +  ", " +
+					   "Streaming-Port: " + query.value(5).toString() + ", " +
+					   "Http-Port: " + query.value(7).toString() + 
+					   "] ", query.value(2).toString());
+	    }
             else 
             {
                 setting->addSelection(
@@ -1353,6 +1406,7 @@ void CardType::fillSelections(SelectSetting* setting)
     setting->addSelection(QObject::tr("FireWire Input"),
                           "FIREWIRE");
     setting->addSelection(QObject::tr("USB Mpeg-4 Encoder (Plextor ConvertX, etc)"), "GO7007");
+    setting->addSelection(QObject::tr("DBOX2 Input"), "DBOX2");
 }
 
 class CardID: public SelectLabelSetting, public CISetting {
@@ -1903,7 +1957,7 @@ void CardInputEditor::load()
     MSqlQuery capturecards(MSqlQuery::InitCon());
     
     capturecards.prepare("SELECT cardid, videodevice, cardtype, "
-                         "       dvb_diseqc_type, firewire_port, firewire_node "
+                         "       dvb_diseqc_type, firewire_port, firewire_node, dbox2_port, dbox2_host, dbox2_httpport "
                          "FROM capturecard "
                          "WHERE hostname = :HOSTNAME");
     capturecards.bindValue(":HOSTNAME", gContext->GetHostName());
@@ -1956,6 +2010,29 @@ void CardInputEditor::load()
                         .arg("[ " + capturecards.value(2).toString() +
                              " Port: " + capturecards.value(3).toString() +
                              ", Node: " + capturecards.value(4).toString() +
+                             " ]")
+                        .arg(*i)
+                        .arg(cardinput->getSourceName());
+                    addSelection(label, index);
+                }
+            }
+            else if(capturecards.value(2).toString() == "DBOX2")
+            {
+                inputs = QStringList("MPEG2TS");
+                for (QStringList::iterator i = inputs.begin();
+                     i != inputs.end(); ++i)
+                { 
+                    CardInput* cardinput = new CardInput();
+                    cardinput->loadByInput(cardid, *i);   
+                    cardinputs.push_back(cardinput);
+                    QString index = QString::number(cardinputs.size()-1);
+
+                    QString label;
+                    label = QString("%1 (%2) -> %3")
+                        .arg("[ " + capturecards.value(2).toString() +
+                             "IP: " + capturecards.value(7).toString() +
+                             ", Port: " + capturecards.value(6).toString() +
+                             ", HttpPort: " + capturecards.value(8).toString() +
                              " ]")
                         .arg(*i)
                         .arg(cardinput->getSourceName());
