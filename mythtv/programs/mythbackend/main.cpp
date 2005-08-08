@@ -575,33 +575,11 @@ int main(int argc, char **argv)
         sched = new Scheduler(true, &tvList);
     }
 
-#ifdef USING_VALGRIND
-    cerr<<"M1/7"<<endl;
-#endif // USING_VALGRIND
-
     expirer = new AutoExpire(true, ismaster);
-
-#ifdef USING_VALGRIND
-    cerr<<"M2/7"<<endl;
-    sleep(5);
-    cerr<<"M3/7"<<endl;
-#endif // USING_VALGRIND
 
     housekeeping = new HouseKeeper(true, ismaster);
 
-#ifdef USING_VALGRIND
-    cerr<<"M4/7"<<endl;
-    sleep(5);
-    cerr<<"M5/7"<<endl;
-#endif // USING_VALGRIND
-
     jobqueue = new JobQueue(ismaster);
-
-#ifdef USING_VALGRIND
-    cerr<<"M6/7"<<endl;
-    sleep(60);
-    cerr<<"M7/7"<<endl;
-#endif // USING_VALGRIND
 
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
