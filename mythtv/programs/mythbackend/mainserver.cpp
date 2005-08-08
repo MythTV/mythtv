@@ -1424,7 +1424,6 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
                 if (m_sched)
                     m_sched->UpdateRecStatus(pginfo);
             }
-
             if (pbssock)
             {
                 QStringList outputlist = "0";
@@ -1435,6 +1434,17 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             slave->DownRef();
             return;
         }
+        else
+        {
+            // If the slave is unreachable, we can assume that the 
+            // recording has stopped and the status should be updated.
+            // Continue so that the master can try to update the endtime
+            // of the file is in a shared directory.
+            pginfo->recstatus = rsStopped;
+            if (m_sched)
+                m_sched->UpdateRecStatus(pginfo);
+        }
+
     }
 
     int recnum = -1;
@@ -1476,42 +1486,16 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         return;
     }
 
-
-    QString startts = pginfo->recstartts.toString("yyyyMMddhhmm");
-    startts += "00";
-    QString recendts = pginfo->recendts.toString("yyyyMMddhhmm");
-    recendts += "00";
-    QDateTime now(QDateTime::currentDateTime());
-    QString newendts = now.toString("yyyyMMddhhmm");
-    newendts += "00";
-
     // Set the recorded end time to the current time
     // (we're stopping the recording so it'll never get to its originally 
     // intended end time)
 
-    VERBOSE(VB_RECORD, QString("Host %1 updating endtime to %2")
-                               .arg(gContext->GetHostName()).arg(newendts));
-    
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE recorded SET starttime = :NEWSTARTTIME, "
-                  "endtime = :NEWENDTIME WHERE chanid = :CHANID AND "
-                  "title = :TITLE AND starttime = :STARTTIME AND "
-                  "endtime = :ENDTIME;");
-    query.bindValue(":NEWSTARTTIME", startts);
-    query.bindValue(":NEWENDTIME", newendts);
-    query.bindValue(":CHANID", pginfo->chanid);
-    query.bindValue(":TITLE", pginfo->title.utf8());
-    query.bindValue(":STARTTIME", startts);
-    query.bindValue(":ENDTIME", recendts);
+    QDateTime now(QDateTime::currentDateTime());
 
-    query.exec();
+    QString startts = pginfo->recstartts.toString("yyyyMMddhhmm") + "00";
+    QString recendts = pginfo->recendts.toString("yyyyMMddhhmm") + "00";
+    QString newendts = now.toString("yyyyMMddhhmm") + "00";
 
-    if (!query.isActive())
-    {
-        MythContext::DBError("Stop recording program update", query);
-    }
-
-    // If we change the recording times we must also adjust the .nuv file's name
     QString fileprefix = gContext->GetFilePrefix();
     QString oldfilename = pginfo->GetRecordFilename(fileprefix);
     pginfo->recendts = now;
@@ -1521,28 +1505,46 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
     VERBOSE(VB_RECORD, QString("Host %1 renaming %2 to %3")
                                .arg(gContext->GetHostName())
                                .arg(oldfilename).arg(newfilename));
+    bool renamed = false;
     if (checkFile.exists())
     {
-        if (!QDir::root().rename(oldfilename, newfilename, TRUE))
-        {
+        if (QDir::root().rename(oldfilename, newfilename, TRUE))
+            renamed = true;
+        else
             VERBOSE(VB_IMPORTANT, QString("Could not rename: %1 to %2")
-                                         .arg(oldfilename).arg(newfilename));
-        }
+                                          .arg(oldfilename).arg(newfilename));
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString("File: %1 does not exist.")
-                                     .arg(oldfilename));
+        VERBOSE(VB_IMPORTANT, QString("Host %1: file %1 does not exist.")
+                                      .arg(gContext->GetHostName())
+                                      .arg(oldfilename));
+    }
 
-        if (pbssock)
+    if(renamed)
+    {
+        VERBOSE(VB_RECORD, QString("Host %1 updating endtime to %2")
+                                   .arg(gContext->GetHostName())
+                                   .arg(newendts));
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("UPDATE recorded SET starttime = :NEWSTARTTIME, "
+                      "endtime = :NEWENDTIME WHERE chanid = :CHANID AND "
+                      "title = :TITLE AND starttime = :STARTTIME AND "
+                      "endtime = :ENDTIME;");
+        query.bindValue(":NEWSTARTTIME", startts);
+        query.bindValue(":NEWENDTIME", newendts);
+        query.bindValue(":CHANID", pginfo->chanid);
+        query.bindValue(":TITLE", pginfo->title.utf8());
+        query.bindValue(":STARTTIME", startts);
+        query.bindValue(":ENDTIME", recendts);
+
+        query.exec();
+
+        if (!query.isActive())
         {
-            QStringList outputlist;
-            outputlist << "BAD: Tried to rename a file that was in "
-                          "the database but wasn't on the disk.";
-            SendResponse(pbssock, outputlist);
-
-            delete pginfo;
-            return;
+            MythContext::DBError("Stop recording program update", query);
+            QDir::root().rename(newfilename, oldfilename, TRUE);
         }
     }
 
