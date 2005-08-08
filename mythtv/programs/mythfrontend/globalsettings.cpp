@@ -547,20 +547,6 @@ static GlobalSpinBox *MinRecordDiskThreshold()
 }
 #endif
 
-#if 0
-static GlobalCheckBox *RerecordAutoExpired()
-{
-    GlobalCheckBox *bc = new GlobalCheckBox("RerecordAutoExpired");
-    bc->setLabel(QObject::tr("Re-record programs which have been "
-                             "automatically expired"));
-    bc->setValue(false);
-    bc->setHelpText(QObject::tr("If set, programs that are automatically "
-                    "deleted (expired) will be allowed to be "
-                    "re-recorded if they are shown again."));
-    return bc;
-}
-#endif
-
 static GlobalSpinBox *RecordPreRoll()
 {
     GlobalSpinBox *bs = new GlobalSpinBox("RecordPreRoll", 0, 600, 60, true);

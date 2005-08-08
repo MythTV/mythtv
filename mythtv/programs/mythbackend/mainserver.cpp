@@ -572,8 +572,7 @@ void MainServer::customEvent(QCustomEvent *e)
                                                                      startts);
             if (pinfo)
             {
-                if (gContext->GetNumSetting("RerecordAutoExpired", 0))
-                    pinfo->ForgetHistory();
+                pinfo->ForgetHistory(); // allow re-record of auto expired rec
                 DoHandleDeleteRecording(pinfo, NULL, false);
             }
             else
