@@ -2984,6 +2984,7 @@ static xvmc_render_state_t *GetRender(VideoFrame *frame)
         return (xvmc_render_state_t*) frame->buf;
     return NULL;
 }
+#endif // USING_XVMC
 
 static void clear_xv_buffers(VideoBuffers &vbuffers,
                              int width, int height,
@@ -3001,5 +3002,3 @@ static void clear_xv_buffers(VideoBuffers &vbuffers,
         }
     }
 }
-
-#endif // USING_XVMC
