@@ -1818,6 +1818,7 @@ void NuppelVideoPlayer::ResetPlaying(void)
     framesPlayed = 0;
 
     GetDecoder()->Reset();
+    errored |= GetDecoder()->IsErrored();
 }
 
 void NuppelVideoPlayer::StartPlaying(void)

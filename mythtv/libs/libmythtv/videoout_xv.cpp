@@ -37,8 +37,7 @@ extern "C" {
 }
 
 static QString xvflags2str(int flags);
-
-
+static void clear_xv_buffers(VideoBuffers&, int w, int h, int xv_chroma);
 
 //#define DEBUG_PAUSE /* enable to debug XvMC pause frame */
 
@@ -60,6 +59,7 @@ static QString xvflags2str(int flags);
     static inline QString ErrorStringXvMC(int);
 #endif // USING_XVMC
 
+// See http://www.fourcc.org/yuv.php for more info on formats
 #define GUID_I420_PLANAR 0x30323449
 #define GUID_YV12_PLANAR 0x32315659
 
@@ -170,7 +170,19 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
     VERBOSE(VB_PLAYBACK, "InputChanged()");
     global_lock.lock();
 
+    bool change = ((width != XJ_width) || (height != XJ_height));
+
     VideoOutput::InputChanged(width, height, aspect);
+
+    if (!change)
+    {
+        if (VideoOutputSubType() == XVideo)
+            clear_xv_buffers(vbuffers, XJ_width, XJ_height, xv_chroma);
+
+        global_lock.unlock();
+        return;
+    }
+
     DeleteBuffers(VideoOutputSubType(), false);
     ResizeForVideo((uint) width, (uint) height);
     bool ok = CreateBuffers(VideoOutputSubType());
@@ -1318,6 +1330,9 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         vector<unsigned char*> bufs = 
             CreateShmImages(vbuffers.allocSize(), true);
         ok = vbuffers.CreateBuffers(XJ_width, XJ_height, bufs);
+
+        clear_xv_buffers(vbuffers, XJ_width, XJ_height, xv_chroma);
+
         X11S(XSync(XJ_disp, False));
         if (xv_chroma != GUID_I420_PLANAR)
             xv_color_conv_buf = new unsigned char[XJ_width * XJ_height * 3 / 2];
@@ -2969,4 +2984,22 @@ static xvmc_render_state_t *GetRender(VideoFrame *frame)
         return (xvmc_render_state_t*) frame->buf;
     return NULL;
 }
+
+static void clear_xv_buffers(VideoBuffers &vbuffers,
+                             int width, int height,
+                             int xv_chroma)
+{
+    if ((GUID_I420_PLANAR == xv_chroma) ||
+        (GUID_YV12_PLANAR == xv_chroma))
+    {
+        for (uint i = 0; i < vbuffers.allocSize(); i++)
+        {
+            unsigned char *data = vbuffers.at(i)->buf;
+            bzero(data, width * height);
+            memset(data + width * height, 127,
+                   width * height / 2);
+        }
+    }
+}
+
 #endif // USING_XVMC

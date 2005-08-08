@@ -33,6 +33,7 @@ class AvFormatDecoder : public DecoderBase
    ~AvFormatDecoder();
 
     void CloseContext();
+    void Reset(void);
     void Reset(bool reset_video_data = true, bool seek_reset = true);
 
     /// Perform an av_probe_input_format on the passed data to see if we

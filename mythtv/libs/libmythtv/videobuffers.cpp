@@ -1016,9 +1016,10 @@ bool VideoBuffers::CreateBuffers(int width, int height, vector<unsigned char*> b
     uint buf_size = (width * height * bpp + 4/* to round up */) / bpb;
     while (bufs.size() < allocSize())
     {
-        // init buffers (y plane to 0, u/v planes to 127) to prevent green
-        // screens..
-        unsigned char *data = new unsigned char[buf_size + buf_size/16 + 64];
+        unsigned char *data = new unsigned char[buf_size + 64];
+
+        // init buffers (y plane to 0, u/v planes to 127),
+        // to prevent green screens..
         bzero(data, width * height);
         memset(data + width * height, 127, width * height / 2);
 

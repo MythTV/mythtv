@@ -27,6 +27,15 @@ extern "C" {
 
 extern pthread_mutex_t avcodeclock;
 
+void align_dimensions(AVCodecContext *avctx, int &width, int &height)
+{
+    // minimum buffer alignment
+    avcodec_align_dimensions(avctx, &width, &height);
+    // minimum MPEG alignment
+    width  = ((width  + 15) >> 4) << 4;
+    height = ((height + 15) >> 4) << 4;
+}
+
 class AvFormatDecoderPrivate
 {
   public:
@@ -379,29 +388,6 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
     if (seek_reset)
         SeekReset();
 
-#if 0
-    // mpegts.c already clears the streams, so this code results in 
-    // silence on livetv with mpeg-ts recordings.
-
-    // Clear out the existing mpeg streams
-    // so we can get a clean set from the 
-    // new seek position.
-    for (int i = ic->nb_streams - 1; i >= 0; i--)
-    {
-        AVStream *st = ic->streams[i];
-    /// NOTE: As of the 12th of May, 2005 VLD is defined whenever libXVMCW
-    ///       exits, so the following hack will no longer work.
-#ifdef USING_XVMC_VLD
-        if (st->codec->codec_type == CODEC_TYPE_AUDIO)
-#endif
-        {
-            if (st->codec->codec)
-                avcodec_close(st->codec);
-            av_remove_stream(ic, st->id);
-        }
-    }
-#endif
-
     if (reset_video_data)
     {
         m_positionMap.clear();
@@ -409,6 +395,48 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
         framesRead = 0;
         seen_gop = false;
         seq_count = 0;
+    }
+}
+
+void AvFormatDecoder::Reset()
+{
+    DecoderBase::Reset();
+
+    // mpeg ts reset
+    if (QString("mpegts") == ic->iformat->name)
+    {
+        AVInputFormat *fmt = (AVInputFormat*) av_mallocz(sizeof(AVInputFormat));
+        memcpy(fmt, ic->iformat, sizeof(AVInputFormat));
+        fmt->flags |= AVFMT_NOFILE;
+
+        CloseContext();
+        ic = av_alloc_format_context();
+        if (!ic)
+        {
+            VERBOSE(VB_IMPORTANT, "AvFormatDecoder: Error, could not "
+                    "allocate format context.");
+            av_free(fmt);
+            errored = true;
+            return;
+        }
+
+        InitByteContext();
+        ic->streams_changed = HandleStreamChange;
+        ic->stream_change_data = this;
+
+        char *filename = (char *)(ringBuffer->GetFilename().ascii());
+        int err = av_open_input_file(&ic, filename, fmt, 0, &params);
+        if (err < 0)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("AvFormatDecoder: avformat error (%1) "
+                            "on av_open_input_file call.").arg(err));
+            av_free(fmt);
+            errored = true;
+            return;
+        }
+
+        fmt->flags &= ~AVFMT_NOFILE;
     }
 }
 
@@ -522,7 +550,10 @@ extern "C" void HandleStreamChange(void* data) {
     AvFormatDecoder* decoder = (AvFormatDecoder*) data;
     int cnt = decoder->ic->nb_streams;
     VERBOSE(VB_PLAYBACK, "streams_changed "<<data<<" -- stream count "<<cnt);
+    pthread_mutex_lock(&avcodeclock);
+    decoder->SeekReset();
     decoder->ScanStreams(false);
+    pthread_mutex_unlock(&avcodeclock);
 }
 
 /** \fn AvFormatDecoder::OpenFile(RingBuffer*, bool, char[2048])
@@ -742,8 +773,7 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
     int align_width = enc->width;
     int align_height = enc->height;
 
-    if (directrendering)
-        avcodec_align_dimensions(enc, &align_width, &align_height);
+    align_dimensions(enc, align_width, align_height);
 
     if (align_width == 0 && align_height == 0)
     {
@@ -1318,26 +1348,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
             {
                 case SEQ_START:
                 {
-                    //int size = 8;
-                    //if (bufptr + size > bufend)
-                    //    return;
                     unsigned char *test = bufptr;
-                    /* XXX: Doesn't work properly.
-                    if (test[size - 1] & 0x40)
-                        size += 64;
-                    if (bufptr + size > bufend)
-                        return;
-                    if (test[size - 1] & 0x80)
-                        size += 64;
-                    if ((bufptr + size + 4) > bufend)
-                        return;
-                    test = bufptr + size;
-                    if (test[0] != 0x0 || test[1] != 0x0 || test[2] != 0x1) {
-                        cerr << "avfd: sequence header size mismatch" << endl;
-                        continue;
-                    }
-
-                    test = bufptr;*/
                     int width = (test[0] << 4) | (test[1] >> 4);
                     int height = ((test[1] & 0xff) << 8) | test[2];
 
@@ -1355,9 +1366,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                         fps = 1 / av_q2d(context->time_base); 
 
-                        if (directrendering)
-                            avcodec_align_dimensions(context, &align_width, 
-                                                     &align_height);
+                        align_dimensions(context, align_width, align_height);
 
                         GetNVP()->SetVideoParams(align_width,
                                                  align_height, fps,

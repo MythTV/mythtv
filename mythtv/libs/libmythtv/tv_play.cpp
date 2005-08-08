@@ -931,6 +931,9 @@ bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
     pthread_create(&decode, NULL, SpawnDecode, nvp);
 
     maxWait = (maxWait <= 0) ? 20000 : maxWait;
+#ifdef USING_VALGRIND
+    maxWait = (1<<30);
+#endif // USING_VALGRIND
     QTime t;
     t.start();
     while (!nvp->IsPlaying() && nvp->IsDecoderThreadAlive() &&
@@ -945,7 +948,9 @@ bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
         StartOSD();
         return true;
     }
-    VERBOSE(VB_IMPORTANT, "StartPlayer() -- error");
+    VERBOSE(VB_IMPORTANT,
+            QString("TV::StartPlayer: Error, NVP is not playing after %1 msec")
+            .arg(maxWait));
     return false;
 }
 
@@ -4737,6 +4742,13 @@ void TV::UnpauseLiveTV(void)
     if (activenvp)
     {
         activenvp->ResetPlaying();
+        if (activenvp->IsErrored())
+        {
+            VERBOSE(VB_IMPORTANT,
+                    "TVRec::UnpauseLiveTV(): Unable to reset playing.");
+            errored = true;
+            return;
+        }
         QString filters = GetFiltersForChannel();
         activenvp->SetVideoFilters(filters);
         activenvp->Play(normal_speed, true, false);
