@@ -23,6 +23,7 @@ using namespace std;
 #include <qdatetime.h>
 #include <qdir.h>
 #include <qapplication.h>
+#include <qdeepcopy.h>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
@@ -58,6 +59,18 @@ bool JobThread::keepGoing()
         return true;
     }
     return false;
+}
+
+QString JobThread::getProblem()
+{
+    QMutexLocker qml(&problem_string_mutex);
+    return QDeepCopy<QString>(problem_string);
+}
+
+QString JobThread::getJobString()
+{
+    QMutexLocker qml(&job_string_mutex);
+    return QDeepCopy<QString>(job_string);
 }
 
 void JobThread::updateSubjobString( int seconds_elapsed, 
@@ -100,7 +113,7 @@ void JobThread::setSubProgress(double some_value, uint priority)
 {
     if(priority > 0)
     {
-        while(!sub_progress_mutex.tryLock())
+        while(!subjob_progress_mutex.tryLock())
         {
             sleep(priority);
         }
@@ -111,20 +124,20 @@ void JobThread::setSubProgress(double some_value, uint priority)
     }
     else
     {
-        sub_progress_mutex.lock();
+        subjob_progress_mutex.lock();
         if(!cancel_me)
         {
             subjob_progress = some_value;
         }
     }
-    sub_progress_mutex.unlock();
+    subjob_progress_mutex.unlock();
 }
 
 void JobThread::setSubName(const QString &new_name, uint priority)
 {
     if(priority > 0)
     {
-        while(!sub_name_mutex.tryLock())
+        while(!subjob_name_mutex.tryLock())
         {
             sleep(1);
         }
@@ -135,14 +148,26 @@ void JobThread::setSubName(const QString &new_name, uint priority)
     }
     else
     {
-        sub_name_mutex.lock();
+        subjob_name_mutex.lock();
         if(!cancel_me)
         {
             subjob_name = new_name;
         }
     }
-    sub_name_mutex.unlock();
+    subjob_name_mutex.unlock();
     
+}
+
+QString JobThread::getJobName()
+{
+    QMutexLocker qml(&job_name_mutex);
+    return QDeepCopy<QString>(job_name);
+}
+
+QString JobThread::getSubName()
+{
+    QMutexLocker qml(&subjob_name_mutex);
+    return QDeepCopy<QString>(subjob_name);
 }
 
 void JobThread::problem(const QString &a_problem)
@@ -154,7 +179,7 @@ void JobThread::problem(const QString &a_problem)
     ErrorEvent *ee = new ErrorEvent(a_problem);
     QApplication::postEvent(parent, ee);
     
-    problem_string = a_problem;
+    setProblem(a_problem);
     
 }
 
@@ -170,6 +195,17 @@ void JobThread::sendLoggingEvent(const QString &event_string)
     QApplication::postEvent(parent, le);
 }
 
+void JobThread::setJobName(const QString &jname)
+{
+    QMutexLocker qml(&job_name_mutex);
+    job_name = jname;
+}
+
+void JobThread::setProblem(const QString &prob)
+{
+    QMutexLocker qml(&problem_string_mutex);
+    problem_string = prob;
+}
 
 /*
 ---------------------------------------------------------------------
@@ -252,8 +288,8 @@ bool DVDThread::ripTitle(int title_number,
     {
         cerr << "jobthread.o: How is it that you already have a ripfile set?" << endl;
         delete ripfile;
-        ripfile = NULL;
     }
+    
     ripfile = new RipFile(to_location, extension);
     if(!ripfile->open(IO_WriteOnly | IO_Raw | IO_Truncate, multiple_files))
     {
@@ -576,7 +612,7 @@ void DVDISOCopyThread::run()
     //
     
     nice(nice_level);
-    job_name = QString(QObject::tr("ISO copy of %1")).arg(rip_name);
+    setJobName(QString(QObject::tr("ISO copy of %1")).arg(rip_name));
     if(keepGoing())
     {
         copyFullDisc();
@@ -655,8 +691,11 @@ bool DVDISOCopyThread::copyFullDisc(void)
             perror("read");
             problem(QString("DVDISOCopyThread dvd device read error"));
             ripfile->remove();
-            delete ripfile;
-            ripfile = NULL;
+            if (ripfile)
+            {
+                delete ripfile;
+                ripfile = NULL;
+            }
             dvd_device_access->unlock();
             return false;
         }
@@ -669,8 +708,11 @@ bool DVDISOCopyThread::copyFullDisc(void)
         {
             problem(QString("DVDISOCopyThread rip file write error"));
             ripfile->remove();
-            delete ripfile;
-            ripfile = NULL;
+            if (ripfile)
+            {
+                delete ripfile;
+                ripfile = NULL;
+            }                
             dvd_device_access->unlock();
             return false;
         }
@@ -691,15 +733,22 @@ bool DVDISOCopyThread::copyFullDisc(void)
         {
             problem("abandoned job because master control said we need to shut down");
             ripfile->remove();
-            delete ripfile;
-            ripfile = NULL;
+            if (ripfile)
+            {
+                delete ripfile;
+                ripfile = NULL;
+            }                
             dvd_device_access->unlock();
             return false;
         }
     }
 
     ripfile->close();
-    delete ripfile;
+    if (ripfile)
+    {
+        delete ripfile;
+        ripfile = NULL;
+    }        
     dvd_device_access->unlock();
     sendLoggingEvent("job thread finished copying ISO image");
     return true;
@@ -740,7 +789,7 @@ void DVDPerfectThread::run()
     //
     
     nice(nice_level);
-    job_name = QString(QObject::tr("Perfect DVD Rip of %1")).arg(rip_name);
+    setJobName(QString(QObject::tr("Perfect DVD Rip of %1")).arg(rip_name));
     if(keepGoing())
     {
         ripTitle(dvd_title, destination_file_string, ".vob", true);
@@ -829,12 +878,12 @@ void DVDTranscodeThread::run()
         }
         if(two_pass)
         {
-            job_name = QString(QObject::tr("Transcode of %1")).arg(rip_name);
+            setJobName(QString(QObject::tr("Transcode of %1")).arg(rip_name));
             sub_to_overall_multiple = 0.333333333;
         }
         else
         {
-            job_name = QString(QObject::tr("Transcode of %1")).arg(rip_name);
+            setJobName(QString(QObject::tr("Transcode of %1")).arg(rip_name));
             sub_to_overall_multiple = 0.50;
         }
     }
@@ -1405,8 +1454,11 @@ void DVDTranscodeThread::cleanUp()
         if(ripfile)
         {
             ripfile->remove();
-            delete ripfile;
-            ripfile = NULL;
+            if (ripfile)
+            {
+                delete ripfile;
+                ripfile = NULL;
+            }                
         }
             
         if(two_pass)
@@ -1443,6 +1495,7 @@ DVDTranscodeThread::~DVDTranscodeThread()
     {
         delete tc_process;
     }
+    
     if(ripfile)
     {
         delete ripfile;

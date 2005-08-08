@@ -37,14 +37,14 @@ class JobThread : public QThread
     bool keepGoing();
     virtual bool transcodeSlotUsed(){return false;}
     
-    QString getJobName(){return job_name;}
-    QString getSubName(){return subjob_name;}
+    QString getJobName();
+    QString getSubName();
     double  getProgress(){return overall_progress;}
     double  getSubProgress(){return subjob_progress;}
     
     void    problem(const QString &a_problem);
-    QString getProblem(){return problem_string;}
-    QString getJobString(){return job_string;}
+    QString getProblem();
+    QString getJobString();
     void    updateSubjobString( int seconds_elapsed, 
                                 const QString &pre_string);
     void    cancelMe(bool yes_or_no){cancel_me = yes_or_no;}
@@ -54,20 +54,31 @@ class JobThread : public QThread
     void    sendLoggingEvent(const QString &event_string);
     
   protected:
-  
+
+    void setJobName(const QString &jname);
+    void setProblem(const QString &prob);
+
+  private:
+
     QString problem_string;
     QString job_name;
     QString subjob_name;
+    QString job_string;
+
+  protected:
+  
     double  overall_progress;
     double  subjob_progress;
     double  sub_to_overall_multiple;
     MTD     *parent;
-    QString job_string;
     int     nice_level;
     bool    cancel_me;
     
-    QMutex  sub_progress_mutex;
-    QMutex  sub_name_mutex;
+    QMutex  subjob_progress_mutex;
+    QMutex  subjob_name_mutex;
+    QMutex  problem_string_mutex;
+    QMutex  job_name_mutex;
+    QMutex  job_string_mutex;
 };
 
 
