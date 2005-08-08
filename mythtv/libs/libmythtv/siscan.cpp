@@ -123,6 +123,15 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
             eitHelper = new EITHelper();
             connect(siparser,  SIGNAL(EventsReady(QMap_Events*)),
                 eitHelper, SLOT(HandleEITs(QMap_Events*)));
+// TODO REMOVE THIS -- TEMPORARY EIT FIX -- begin
+            SIParser *csiparser = GetDVBChannel()->siparser;
+            if (csiparser)
+            {
+                VERBOSE(VB_IMPORTANT, "BUG!!!! USING TEMPORARY EIT HACK");
+                connect(csiparser, SIGNAL(EventsReady(QMap_Events*)),
+                        eitHelper, SLOT(HandleEITs(QMap_Events*)));
+            }
+// TODO REMOVE THIS -- TEMPORARY EIT FIX -- end
         }
 #endif // USING_DVB_EIT
         return;
