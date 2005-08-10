@@ -1015,7 +1015,7 @@ class DVBRecordTS: public CheckBoxSetting, public CCSetting
         setHelpText(
             QObject::tr("Disables Transport Stream to Program Stream "
                         "conversion. TS recording results in slightly bigger "
-                        "files, but reduces the risk for processing errors."));
+                        "files, but reduces the risk of processing errors."));
     };
 };
 
@@ -1029,7 +1029,7 @@ class DVBNoSeqStart: public CheckBoxSetting, public CCSetting
         setValue(true);
         setHelpText(
             QObject::tr("Normally the dvb-recording will drop packets "
-                        "from the card untill a sequence start header is seen. "
+                        "from the card until a sequence start header is seen. "
                         "This option turns off this feature."));
     };
 };
