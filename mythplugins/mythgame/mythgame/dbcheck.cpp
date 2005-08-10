@@ -143,6 +143,7 @@ bool InitializeDatabase(void)
 "  keyword varchar(8) default NULL,"
 "  value varchar(80) default NULL"
 ");",
+""
 };
     QString dbver = "";
     if (!performActualUpdate(updates, "1000", dbver))
