@@ -37,7 +37,7 @@
 #endif // USING_DVB
 
 #ifdef USE_SIPARSER
-#include "siparser.h"
+#include "dvbsiparser.h"
 #endif // USE_SIPARSER
 
 /// \brief How long we wait for ATSC tables, before giving up
@@ -701,8 +701,6 @@ void SIScan::StopScanner(void)
     /* Force dvbchannel to exit */
     if (siparser)
     {
-        if (GetDVBChannel())
-            GetDVBChannel()->StopTuning();
         siparser->StopSectionReader();
         pthread_join(siparser_thread, NULL);
         delete siparser;

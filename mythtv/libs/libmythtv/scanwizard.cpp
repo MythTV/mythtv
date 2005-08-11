@@ -56,6 +56,10 @@
 #include "dvbconfparser.h"
 #endif
 
+#ifdef USE_SIPARSER
+#include "dvbsiparser.h"
+#endif // USE_SIPARSER
+
 static bool ignore_encrypted(int cardid, QString input_name);
 
 /// Percentage to set to after the transports have been scanned
