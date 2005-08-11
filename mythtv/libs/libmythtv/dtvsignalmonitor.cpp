@@ -145,6 +145,8 @@ void DTVSignalMonitor::SetProgramNumber(int progNum)
 void DTVSignalMonitor::SetStreamData(MPEGStreamData *data)
 {
     stream_data = data;
+    if (!data)
+        return;
 
     connect(data, SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
             this, SLOT(SetPAT(const ProgramAssociationTable*)));
