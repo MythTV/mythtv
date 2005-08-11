@@ -17,6 +17,7 @@
 #include "dummydtvrecorder.h"
 #include "tspacket.h"
 #include "RingBuffer.h"
+#include "programinfo.h" // for MARK_GOP_BYFRAME
 
 #define DUMMY_VIDEO_PID VIDEO_PID(0x20)
 
@@ -47,12 +48,13 @@ DummyDTVRecorder::DummyDTVRecorder(bool tsmode, RingBuffer *rbuffer,
                                    uint desired_width, uint desired_height,
                                    double desired_frame_rate,
                                    uint non_buf_frames,
+                                   uint bitrate,
                                    bool autoStart)
     : _tsmode(tsmode),
       _desired_width(desired_width), _desired_height(desired_height),
-      _desired_frame_rate(desired_frame_rate),
-      _non_buf_frames(non_buf_frames),
-      _stream_data(-1)
+      _desired_frame_rate(desired_frame_rate), _desired_bitrate(bitrate),
+      _non_buf_frames(max(non_buf_frames,(uint)1)),
+      _stream_data(-1), _packets_in_frame(0)
 {
     gettimeofday(&_next_frame_time, NULL);
 
@@ -111,7 +113,7 @@ void DummyDTVRecorder::StartRecording(void)
 
         if (len == 0)
         {
-            VERBOSE(VB_IMPORTANT, QString("\nRestart! Frames seen %1")
+            VERBOSE(VB_IMPORTANT, QString("Restart! Frames seen %1")
                     .arg(_frames_seen_count));
             lseek(_stream_fd, 0, SEEK_SET);
             continue;
@@ -152,11 +154,48 @@ bool DummyDTVRecorder::Open(void)
     return _stream_fd >= 0;
 }
 
+static void set_trigger(struct timeval &trig, int udelay)
+{
+    gettimeofday(&trig, NULL);
+    int x = trig.tv_usec + udelay;
+    trig.tv_usec = x % 1000000;
+    trig.tv_sec += x / 1000000;
+}
+
+static void delay_to_trigger(const struct timeval &trig, bool &cont)
+{
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    int usec = ((trig.tv_sec - now.tv_sec) * 1000000 +
+                (trig.tv_usec - now.tv_usec));
+    usec = max(usec, 0);
+    int usec_f = usec / 5000;
+    int usec_r = usec % 5000;
+    cerr<<"usec: "<<usec<<" ("<<usec_f<<":"<<usec_r<<")"<<endl;
+    usleep(usec_r);
+    for (int i=0; i<usec_f && cont; i++)
+        usleep(5000);
+}
+
+static void frame_delay(bool to_trig, long long frames_seen,
+                        struct timeval &nframe, struct timeval &n5frame,
+                        double frame_delay, bool &cont)
+{
+    if (to_trig)
+        delay_to_trigger((frames_seen % 5) ? nframe : n5frame, cont);
+    else
+        usleep(100);
+
+    if (!(frames_seen % 5))
+        set_trigger(n5frame, (int) (5.0 * frame_delay));
+    set_trigger(nframe, (int) frame_delay);
+}
+
 int DummyDTVRecorder::ProcessData(unsigned char *buffer, int len)
 {
     int pos = 0;
 
-    while (pos + 187 < len) // while we have a whole packet left
+    while (pos + 187 < len && _request_recording) // while we have a whole packet left
     {
         const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[pos]);
 
@@ -167,33 +206,28 @@ int DummyDTVRecorder::ProcessData(unsigned char *buffer, int len)
 
         if (cnt != _frames_seen_count)
         {
+            // ensure desired bitrate with null packets
+            long long bpf = (long long)(_desired_bitrate / _desired_frame_rate);
+            uint desired_packets = bpf / (TSPacket::SIZE * 8);
+            for (; _packets_in_frame < desired_packets; _packets_in_frame++)
+                ringBuffer->Write(TSPacket::NULL_PACKET->data(), TSPacket::SIZE);
+            _packets_in_frame = 0;
+
+            // sync so that these packets are seen...
             if (_frames_seen_count < 20 || ((_frames_seen_count % 10) == 0))
             {
                 //ringBuffer->WriterFlush();
                 ringBuffer->Sync();
             }
-            // we got a new frame
-            struct timeval now;
-            gettimeofday(&now, NULL);
 
-            int usec = (_next_frame_time.tv_sec - now.tv_sec) * 1000000 +
-                (_next_frame_time.tv_usec - now.tv_usec);
-
-            // sleep if we are sending too much data...
-            if (usec > 5000 && _frames_seen_count > _non_buf_frames)
-                usleep(usec);
-            else
-                usleep(100); // let disk catch up a little
-
-            // set next trigger
-            gettimeofday(&_next_frame_time, NULL);
-            int udelay = (int) (1000000.0 / GetFrameRate());
-            int x = _next_frame_time.tv_usec + udelay;
-            _next_frame_time.tv_usec = x % 1000000;
-            _next_frame_time.tv_sec  += x / 1000000;
+            // make sure we don't send too many frames
+            frame_delay(_frames_seen_count > _non_buf_frames, _frames_seen_count,
+                        _next_frame_time, _next_5th_frame_time,
+                        1000000.0 / GetFrameRate(), _request_recording);
         }
 
         ringBuffer->Write(pkt->data(), TSPacket::SIZE);
+        _packets_in_frame++;
 
         pos += TSPacket::SIZE; // Advance to next TS packet
     }
@@ -211,6 +245,18 @@ void *DummyDTVRecorder::RecordingThread(void *param)
 void DummyDTVRecorder::StartRecordingThread(void)
 {
     pthread_create(&_rec_thread, NULL, RecordingThread, this);
+}
+
+void DummyDTVRecorder::FinishRecording(void)
+{
+    VERBOSE(VB_RECORD, "DummyDTVRecorder::FinishRecording()");
+    ringBuffer->Sync();
+    if (curRecording && _position_map_delta.size())
+    {
+        curRecording->SetPositionMapDelta(_position_map_delta,
+                                          MARK_GOP_BYFRAME);
+        _position_map_delta.clear();
+    }
 }
 
 void DummyDTVRecorder::StopRecordingThread(void)

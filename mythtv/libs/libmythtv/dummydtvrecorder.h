@@ -16,8 +16,8 @@ class DummyDTVRecorder: public DTVRecorder
     DummyDTVRecorder::DummyDTVRecorder(
         bool tsmode = true,        RingBuffer *rbuffer = NULL,
         uint desired_width = 1920, uint desired_height = 1088,
-        double desired_frame_rate = 29.97, uint non_buf_frames = 0,
-        bool autoStart = true);
+        double desired_frame_rate = 29.97, uint bits_per_sec = 20000000,
+        uint non_buf_frames = 0, bool autoStart = true);
 
     DummyDTVRecorder::~DummyDTVRecorder();
 
@@ -33,6 +33,7 @@ class DummyDTVRecorder: public DTVRecorder
     void StopRecordingThread(void);
   private:
     int ProcessData(unsigned char *buffer, int len);
+    void FinishRecording(void);
     static void *RecordingThread(void*);
 
     // Settable
@@ -40,12 +41,15 @@ class DummyDTVRecorder: public DTVRecorder
     uint       _desired_width;
     uint       _desired_height;
     double     _desired_frame_rate;
+    uint       _desired_bitrate;
     uint       _non_buf_frames;
 
     // Internal
     int       _stream_data;
+    uint      _packets_in_frame;
     pthread_t _rec_thread;
     struct timeval _next_frame_time;
+    struct timeval _next_5th_frame_time;
 };
 
 #endif // DUMMYDTVRECORDER_H
