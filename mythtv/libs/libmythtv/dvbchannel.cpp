@@ -588,22 +588,26 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
     if (!TuneTransport((dvb_channel_t&)(channel), force_reset))
         return false;
 
-    GENERAL("Multiplex Locked");
-
     if (siparser)
+    {
+        GENERAL("Multiplex Locked");
+
         siparser->AddPMT(channel.serviceID);
 
-
-// TODO: Pick a more reasonable time here
-    for (int x = 0; x < 3000 ; x++)
-    {
-        if (chan_opts.IsPMTSet())
-            return true;
-        usleep(100);
+        // TODO: Pick a more reasonable time here
+        for (int x = 0; x < 3000 ; x++)
+        {
+            if (chan_opts.IsPMTSet())
+                return true;
+            usleep(100);
+        }
+        GENERAL("Timeout Getting PMT");
+        return false;
     }
 
-    GENERAL("Timeout Getting PMT");
-    return false;
+    CHANNEL("Frequency tuning successful.");
+
+    return true;
 }
 
 /** \fn DVBChannel::TuneTransport(dvb_channel_t&, bool, int)

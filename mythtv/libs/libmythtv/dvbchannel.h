@@ -6,6 +6,7 @@
 
 #ifndef DVBCHANNEL_H
 #define DVBCHANNEL_H
+#define DVBCHANNEL_HAS_SIPARSER
 
 #include <qobject.h>
 #include <qstring.h>

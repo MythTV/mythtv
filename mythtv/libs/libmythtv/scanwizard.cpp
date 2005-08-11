@@ -233,7 +233,7 @@ void *ScanWizardScanner::SpawnTune(void *param)
     {
 #ifdef USING_DVB
         if (scanner->GetDVBChannel())
-            ok = scanner->GetDVBChannel()->TuneTransport(scanner->chan_opts, true);
+            ok = scanner->GetDVBChannel()->Tune(scanner->chan_opts, true);
 #endif
 #ifdef USING_V4L
         if (scanner->GetChannel())
@@ -254,7 +254,9 @@ void *ScanWizardScanner::SpawnTune(void *param)
 
 void ScanWizardScanner::TableLoaded()
 {
+#ifdef USE_SIPARSER
     QApplication::postEvent(this, new ScannerEvent(ScannerEvent::TableLoaded));
+#endif // USE_SIPARSER
 }
 
 void ScanWizardScanner::serviceScanPctComplete(int pct)
@@ -420,6 +422,8 @@ void ScanWizardScanner::scan()
 #ifdef USING_DVB
         if (CardUtil::IsDVB(cardid))
             channel = new DVBChannel(device.toInt());
+#endif
+#ifdef DVBCHANNEL_HAS_SIPARSER
         if (GetDVBChannel())
             GetDVBChannel()->disable_siparser = true;
 #endif
@@ -653,13 +657,13 @@ void ScanWizardScanner::HandleTuneComplete(void)
     }
 
     scanner->StartScanner();
-#ifdef USING_DVB
+#ifdef USE_SIPARSER
     if (GetDVBChannel())
     {
         connect(scanner->siparser, SIGNAL(TableLoaded()),
                 this, SLOT(TableLoaded()));
     }
-#endif // USING_DVB
+#endif // USE_SIPARSER
 
     popupProgress->status(tr("Scanning"));
     popupProgress->progress( (TUNED_PCT * PROGRESS_MAX) / 100 );
