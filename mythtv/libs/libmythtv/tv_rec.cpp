@@ -30,6 +30,7 @@ using namespace std;
 #include "mythdbcon.h"
 #include "jobqueue.h"
 #include "scheduledrecording.h"
+#include "eitscanner.h"
 
 #include "atscstreamdata.h"
 #include "hdtvrecorder.h"
@@ -45,7 +46,6 @@ using namespace std;
 #include "dvbrecorder.h"
 #include "dvbsignalmonitor.h"
 #include "dvbsiparser.h"
-#include "siscan.h"
 #endif
 
 #ifdef USING_FIREWIRE
@@ -87,9 +87,7 @@ const int TVRec::kRequestBufferSize = 256*1000;
 TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
     : rbuffer(NULL), recorder(NULL), channel(NULL), signalMonitor(NULL),
-#ifdef USING_DVB
       scanner(NULL),
-#endif
       // Configuration variables from database
       transcodeFirst(false), earlyCommFlag(false), runJobOnHostOnly(false),
       audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
@@ -137,18 +135,15 @@ bool TVRec::Init(void)
 
     if (cardtype == "DVB")
     {
+#ifdef USING_DVB_EIT
+        scanner = new EITScanner();
+#endif // USING_DVB_EIT
+
 #ifdef USING_DVB
         channel = new DVBChannel(videodev.toInt(), this);
         channel->Open();
 
         InitChannel(inputname, startchannel);
-
-        if (!dvb_options.dvb_on_demand &&
-            dynamic_cast<DVBChannel*>(channel)->siparser)
-        {
-            scanner = new SIScan("dvb", channel, -1, true);
-            scanner->StartScanner();
-        }
 
         CloseChannel();
 #else
@@ -256,7 +251,7 @@ TVRec::~TVRec(void)
     runMainLoop = false;
     pthread_join(event_thread, NULL);
 
-#ifdef USING_DVB
+#ifdef USING_DVB_EIT
     if (scanner)
         delete scanner;
 #endif
@@ -1019,6 +1014,12 @@ void TVRec::InitChannel(const QString &inputname, const QString &startchannel)
     else
         channel->SwitchToInput(inputname, startchannel);
     channel->SetChannelOrdering(chanorder);
+
+#ifdef USING_DVB_EIT
+    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+    if (dvbc && !dvb_options.dvb_on_demand)
+        scanner->StartPassiveScan(dvbc, dvbc->siparser);
+#endif // USING_DVB_EIT
 }
 
 void TVRec::CloseChannel(void)

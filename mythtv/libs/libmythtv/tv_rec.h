@@ -16,7 +16,7 @@ class ProgramInfo;
 class RingBuffer;
 class NuppelVideoRecorder;
 class RecorderBase;
-class SIScan;
+class EITScanner;
 class DVBSIParser;
 class SignalMonitor;
 class ChannelBase;
@@ -225,9 +225,7 @@ class TVRec
     RecorderBase  *recorder;
     ChannelBase   *channel;
     SignalMonitor *signalMonitor;
-#ifdef USING_DVB
-    SIScan        *scanner;
-#endif
+    EITScanner    *scanner;
 
     // Various threads
     /// Event processing thread, runs RunTV().

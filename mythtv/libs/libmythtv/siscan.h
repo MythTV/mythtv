@@ -54,15 +54,13 @@ typedef enum
 {
     IDLE,           ///< Don't do anything
     TRANSPORT_LIST, ///< Actively scan for channels
-    EIT_CRAWL       ///< Scan for event information
 } SCANMODE;
 
 class SIScan : public QObject
 {
     Q_OBJECT
   public:
-    SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
-           bool _parseEIT = false);
+    SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID);
     ~SIScan();
 
     void StartScanner(void);
@@ -184,9 +182,6 @@ class SIScan : public QObject
     /// Scanner thread, runs SIScan::StartScanner()
     pthread_t        scanner_thread;
     bool             scanner_thread_running;
-
-    /// EIT Helper, if USING_DVB is true
-    EITHelper       *eitHelper;
 };
 
 inline void SIScan::UpdateScanPercentCompleted(void)

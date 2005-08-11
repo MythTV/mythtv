@@ -12,13 +12,20 @@ static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
 
 void EITHelper::HandleEITs(QMap_Events* eventList)
 {
-    VERBOSE(VB_IMPORTANT, "HandleEITs()");
+    VERBOSE(VB_IMPORTANT, "EITHelper::HandleEITs()");
     QList_Events* events = new QList_Events();
     eitList_lock.lock();
     QMap_Events::Iterator e;
     for (e = eventList->begin() ; e != eventList->end() ; ++e)
         events->append(*e);
     eitList.append(events);
+    eitList_lock.unlock();
+}
+
+void EITHelper::ClearList(void)
+{
+    eitList_lock.lock();
+    eitList.clear();
     eitList_lock.unlock();
 }
 
@@ -32,7 +39,7 @@ uint EITHelper::GetListSize(void) const
 
 void EITHelper::ProcessEvents(int mplexid)
 {
-    VERBOSE(VB_IMPORTANT, "ProcessEvents("<<mplexid<<")");
+    VERBOSE(VB_IMPORTANT, "EITHelper::ProcessEvents("<<mplexid<<")");
     while (GetListSize())
     {
         eitList_lock.lock();
@@ -64,8 +71,8 @@ void update_eit_list_in_db(int mplexid, const QList_Events *events)
         if (counter > 0)
         {
             VERBOSE(VB_IMPORTANT,
-                    QString("Added %1 scheduler events, running scheduler "
-                            "to check for updates").arg(counter));
+                    QString("EITHelper: Added %1 scheduler events, running "
+                            "scheduler to check for updates").arg(counter));
             ScheduledRecording::signalChange(-1);
             QString msg = QString("Added %1 scheduler events").arg(counter);
             gContext->LogEntry("DVB/ATSC Guide Scanner", LP_INFO, msg, "");
@@ -103,7 +110,7 @@ static int get_chan_id_for_event(int tid_db, const Event &event)
 
     if (query.size() <= 0)
     {
-        VERBOSE(VB_IMPORTANT, "ChanID not found "
+        VERBOSE(VB_IMPORTANT, "EITHelper: ChanID not found "
                 "so event updates were skipped.");
         return -1;
     }

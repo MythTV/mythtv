@@ -75,7 +75,7 @@ using namespace std;
  *  \bug Only supports single input cards.
  */
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
-    : ChannelBase(parent),
+    : QObject(NULL, "DVBChannel"), ChannelBase(parent),
       diseqc(NULL), dvbcam(NULL),
       fd_frontend(-1), cardnum(aCardNum), currentTID(-1),
       first_tune(true), stopTuning(false), siparser(NULL),

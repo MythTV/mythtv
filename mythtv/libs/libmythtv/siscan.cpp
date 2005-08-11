@@ -30,7 +30,6 @@
 // MythTV includes - DVB
 #include "dvbsignalmonitor.h"
 #include "dvbtables.h"
-#include "eithelper.h"
 
 #ifdef USING_DVB
 #include "dvbchannel.h"
@@ -60,8 +59,7 @@ void delete_services(int db_mplexid, QMap_SDTObject SDT);
 
 /** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
  */
-SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
-               bool _parseEIT)
+SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
     : // Set in constructor
       channel(_channel),
       signalMonitor(SignalMonitor::Init(_cardtype, -1, _channel)),
@@ -79,10 +77,8 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
       // Transports List
       transportsScanned(0),
       // Misc
-      scanner_thread_running(false),
-      eitHelper(NULL)
+      scanner_thread_running(false)
 {
-    (void) _parseEIT;
     // Initialize statics
     init_freq_tables();
 
@@ -116,24 +112,6 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
                 this,     SLOT(TransportTableComplete()));
         connect(siparser, SIGNAL(FindServicesComplete()),
                 this,     SLOT(ServiceTableComplete()));
-
-#ifdef USING_DVB_EIT
-        if (_parseEIT)
-        {
-            eitHelper = new EITHelper();
-            connect(siparser,  SIGNAL(EventsReady(QMap_Events*)),
-                eitHelper, SLOT(HandleEITs(QMap_Events*)));
-// TODO REMOVE THIS -- TEMPORARY EIT FIX -- begin
-            SIParser *csiparser = GetDVBChannel()->siparser;
-            if (csiparser)
-            {
-                VERBOSE(VB_IMPORTANT, "BUG!!!! USING TEMPORARY EIT HACK");
-                connect(csiparser, SIGNAL(EventsReady(QMap_Events*)),
-                        eitHelper, SLOT(HandleEITs(QMap_Events*)));
-            }
-// TODO REMOVE THIS -- TEMPORARY EIT FIX -- end
-        }
-#endif // USING_DVB_EIT
         return;
     }
 #endif // USING_DVB
@@ -470,11 +448,6 @@ void SIScan::RunScanner(void)
         else if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() > 0)
             mplex = GetDVBChannel()->GetMultiplexID();
 #endif // USING_DVB
-
-#ifdef USING_DVB_EIT
-        if (eitHelper && eitHelper->GetListSize() && (mplex > 0))
-            eitHelper->ProcessEvents(mplex);
-#endif // USING_DVB_EIT
 
         if (serviceListReady && siparser && (mplex > 0))
         {

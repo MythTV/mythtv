@@ -21,6 +21,7 @@ class EITHelper : public QObject
   public:
     EITHelper() : QObject(NULL, "EITHelper") { ; }
 
+    void ClearList(void);
     uint GetListSize(void) const;
     void ProcessEvents(int mplexid);
 

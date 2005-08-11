@@ -281,8 +281,8 @@ using_backend {
 
         DEFINES += USING_DVB
         using_dvb_eit {
-            HEADERS += eithelper.h
-            SOURCES += eithelper.cpp
+            HEADERS += eithelper.h   eitscanner.h
+            SOURCES += eithelper.cpp eitscanner.cpp
             DEFINES += USING_DVB_EIT
         }
     }
