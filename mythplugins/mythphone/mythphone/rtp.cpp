@@ -1183,7 +1183,7 @@ void rtp::SendWaitingDtmf()
             DTMF_RFC2833 *dtmf = (DTMF_RFC2833 *)(dtmfPacket.RtpData);
             
             dtmf->dtmfDigit = CHAR2DTMF(digit);
-            dtmf->dtmfERVolume = 0x0A | RTP_DTMF_EBIT; // Volume=10; E-bit set indicating end of event
+            dtmf->dtmfERVolume = 0x0A; // Volume=10; E-bit not set indicating not end of event
             dtmf->dtmfDuration = htons(0x0500); // Duration = 16ms
 
             txSequenceNumber += 1; // Increment seq-num; don't increment timestamp
@@ -1193,6 +1193,13 @@ void rtp::SendWaitingDtmf()
             dtmfPacket.RtpTimeStamp = htonl(txTimeStamp);
             dtmfPacket.RtpSourceID = 0x666;    
             
+            rtpSocket->writeBlock((char *)&dtmfPacket.RtpVPXCC, RTP_HEADER_SIZE+sizeof(DTMF_RFC2833), yourIP, yourPort);
+            
+            // Send the packet twice, both to ensure delivery and because Asterisk
+            // has a bug where it does not like packets with the End bit set
+            dtmf->dtmfERVolume = 0x0A | RTP_DTMF_EBIT; // Volume=10; E-bit set indicating end of event
+            dtmf->dtmfDuration = htons(0x0A00); // Duration = 32ms
+            dtmfPacket.RtpMPT = dtmfPayload;
             rtpSocket->writeBlock((char *)&dtmfPacket.RtpVPXCC, RTP_HEADER_SIZE+sizeof(DTMF_RFC2833), yourIP, yourPort);
         }
     }
