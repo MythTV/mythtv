@@ -199,7 +199,8 @@ MythContextPrivate::MythContextPrivate(MythContext *lparent)
     else if (prefixDir.path().contains(".app/Contents/MacOS"))
     {
         prefixDir.cd("../Resources");
-        m_installprefix = prefixDir.canonicalPath();
+        if (QDir(prefixDir.canonicalPath() + "/share").exists())
+            m_installprefix = prefixDir.canonicalPath();
     }
     VERBOSE(VB_ALL, QString("Using runtime prefix = %1")
             .arg(m_installprefix));
