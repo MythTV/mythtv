@@ -34,11 +34,6 @@
 #ifdef USING_DVB
 #include "dvbchannel.h"
 #include "dvbtypes.h"
-#else // if !USING_DVB
-class TransportObject;
-class DVBTuning;
-class dvb_channel_t;
-typedef int fe_type_t;
 #endif // USING_DVB
 
 #ifdef USE_SIPARSER
@@ -57,7 +52,7 @@ static uint scan_for_best_freq(const TransportObject& transport,
 static bool ignore_encrypted_services(int db_mplexid, QString videodevice);
 static int  create_dtv_multiplex_ofdm(
     const TransportScanItem& item, const DVBTuning& tuning);
-void delete_services(int db_mplexid, QMap_SDTObject SDT);
+void delete_services(int db_mplexid, const ServiceDescriptionTable*);
 #endif // USING_DVB
 
 /** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
@@ -85,11 +80,11 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
     // Initialize statics
     init_freq_tables();
 
+#ifdef USE_SIPARSER
     /* setup boolean values for thread */
     serviceListReady = false;
     transportListReady = false;
 
-#ifdef USE_SIPARSER
     siparser = NULL;
     if (GetDVBChannel())
     {
@@ -184,12 +179,14 @@ bool SIScan::ScanServicesSourceID(int SourceID)
     if (scanMode == TRANSPORT_LIST)
         return false;
 
+    scanIt = scanTransports.end();
+
     MSqlQuery query(MSqlQuery::InitCon());
     // Run DB query to get transports on sourceid SourceID
     // connected to this card
-    QString theQuery = QString("SELECT mplexid, sistandard, transportid "
-                               "FROM dtv_multiplex "
-                               "WHERE sourceid = %1").arg(SourceID);
+    QString theQuery = QString(
+        "SELECT sourceid, mplexid, sistandard, transportid "
+        "FROM dtv_multiplex WHERE sourceid = %1").arg(SourceID);
     query.prepare(theQuery);
 
     if (!query.exec() || !query.isActive())
@@ -205,31 +202,38 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         return false;
     }
 
-    scanIt = scanTransports.end();
-
     scanTimeout = DVB_TABLES_TIMEOUT;
     while (query.next())
     {
-        if (query.value(1).toString() == "atsc")
-            scanTimeout = ATSC_TABLES_TIMEOUT;
+        int sourceid = query.value(0).toInt();
+        int mplexid  = query.value(1).toInt();
+        QString std  = query.value(2).toString();
+        int tsid     = query.value(3).toInt();
+        scanTimeout = (std == "atsc") ?
+            ATSC_TABLES_TIMEOUT : DVB_TABLES_TIMEOUT;
 
-        QString fn = QString("Transport ID %1").arg(query.value(2).toString());
+        QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
+            QString("Multiplex #%1").arg(mplexid);
+
         SISCAN("Adding "+fn);
 
-        TransportScanItem item(SourceID, query.value(0).toInt(), fn);
+        TransportScanItem item(sourceid, std, fn, mplexid);
         scanTransports += item;
     }
 
     timer = QTime();
     waitingForTables  = false;
 
-    scanIt            = scanTransports.begin();
     transportsScanned = 0;
     scanOffsetIt      = 0;
     if (scanTransports.size())
+    {
+        scanIt        = scanTransports.begin();
         scanMode      = TRANSPORT_LIST;
+        return true;
+    }
 
-    return true;
+    return false;
 }
 
 void SIScan::HandleVCT(uint, const VirtualChannelTable*)
@@ -436,49 +440,8 @@ void SIScan::RunScanner(void)
 
     while (!threadExit)
     {
-        int mplex = -1;
-        if (scanTransports.size() && scanIt != scanTransports.end() &&
-            (*scanIt).mplexid > 0)
-            mplex = (*scanIt).mplexid;
-#ifdef USING_DVB
-        else if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() > 0)
-            mplex = GetDVBChannel()->GetMultiplexID();
-#endif // USING_DVB
-
 #ifdef USE_SIPARSER
-        if (serviceListReady && siparser && (mplex > 0))
-        {
-            if (siparser->GetServiceObject(SDT))
-            {
-                UpdateServicesInDB(mplex, SDT);
-                scanOffsetIt = 99;
-            }
-            serviceListReady = false;
-            if (scanMode == TRANSPORT_LIST)
-            {
-                UpdateScanPercentCompleted();
-                waitingForTables = false;
-            }
-            else
-            {
-                emit PctServiceScanComplete(100);
-                emit ServiceScanComplete();
-            }
-        }
-        if (transportListReady && siparser)
-        {
-            if (siparser->GetTransportObject(NIT))
-            {
-                emit TransportScanUpdateText("Processing Transport List");
-                SISCAN("Updating Transports");
-                CheckNIT(NIT);
-                UpdateTransportsInDB(NIT);
-                SISCAN("Transport Update Complete");
-                emit TransportScanUpdateText("Finished processing Transport List");
-            }
-            transportListReady = false;
-            emit TransportScanComplete();
-        }
+        HandleSIParserEvents();
 #endif // USE_SIPARSER
 
         if (scanMode == TRANSPORT_LIST)
@@ -625,7 +588,6 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
     // Tune to multiplex
     if (GetDVBChannel())
     {
-        // Start signal monitor for this channel
         if (item.mplexid >= 0)
         {
 #ifdef USE_SIPARSER
@@ -634,7 +596,6 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
 #endif // USE_SIPARSER
 
             ok = GetDVBChannel()->TuneMultiplex(item.mplexid);
-            signalMonitor->Start();
 
 #ifdef USE_SIPARSER
             if (ok && siparser)
@@ -653,8 +614,7 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
                 siparser->Reset();
 #endif // USE_SIPARSER
 
-            ok = GetDVBChannel()->TuneTransport(dvbchan, true, item.timeoutTune);
-            signalMonitor->Start();
+            ok = GetDVBChannel()->Tune(dvbchan, true);
 
 #ifdef USE_SIPARSER
             if (ok && siparser)
@@ -755,70 +715,6 @@ void SIScan::StopScanner(void)
         signalMonitor->Stop();
 }
 
-void SIScan::verifyTransport(TransportScanItem& t)
-{
-    (void) t;
-#ifdef USING_DVB
-    MSqlQuery query(MSqlQuery::InitCon());
-    /* See if mplexid is already in the database */
-    QString theQuery = QString("select mplexid from dtv_multiplex where "
-                       "sourceid = %1 and frequency = %2")
-                       .arg(t.SourceID)
-                       .arg(t.tuning.params.frequency);
-    query.prepare(theQuery);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Check for existing transport", query);
-
-    if (query.size() > 0)
-    {
-        query.next();
-        t.mplexid = query.value(0).toInt();            
-        return;
-    }
-
-    if (t.offset1)
-    {
-        theQuery = QString("select mplexid from dtv_multiplex where "
-                       "sourceid = %1 and frequency = %2")
-                       .arg(t.SourceID)
-                       .arg(t.tuning.params.frequency+t.offset1);
-        query.prepare(theQuery);
-
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Check for existing transport", query);
-
-        if (query.size() > 0)
-        {
-            query.next();
-            t.mplexid = query.value(0).toInt();            
-            return;
-        }
-    }
-
-    if (t.offset2)
-    {
-        theQuery = QString("select mplexid from dtv_multiplex where "
-                       "sourceid = %1 and frequency = %2")
-                       .arg(t.SourceID)
-                       .arg(t.tuning.params.frequency+t.offset2);
-        query.prepare(theQuery);
-
-        if (!query.exec() || !query.isActive())
-            MythContext::DBError("Check for existing transport", query);
-
-        if (query.size() > 0)
-        {
-            query.next();
-            t.mplexid = query.value(0).toInt();            
-            return;
-        }
-    }
-
-    t.mplexid = -1;
-#endif // USING_DVB
-}
-
 /** \fn SIScan::ScanTransports(int,const QString,const QString,const QString)
  *  \brief Generates a list of frequencies to scan and adds it to the
  *   scanTransport list, and then sets the scanMode to TRANSPORT_LIST.
@@ -853,7 +749,6 @@ bool SIScan::ScanTransports(int SourceID,
                 name = strNameFormat.arg(name_num);
 
             TransportScanItem item(SourceID, si_std, name, name_num, freq, ft);
-            verifyTransport(item);
             scanTransports += item;
 
             VERBOSE(VB_SIPARSER, item.toString());
@@ -903,13 +798,19 @@ bool SIScan::ScanTransport(int mplexid)
     scanTimeout = DVB_TABLES_TIMEOUT;
     while (query.next())
     {
-        if (query.value(2).toString() == "atsc")
-            scanTimeout = ATSC_TABLES_TIMEOUT;
+        int sourceid = query.value(0).toInt();
+        int mplexid  = query.value(1).toInt();
+        QString std  = query.value(2).toString();
+        int tsid     = query.value(3).toInt();
+        scanTimeout = (std == "atsc") ?
+            ATSC_TABLES_TIMEOUT : DVB_TABLES_TIMEOUT;
 
-        QString fn = QString("Transport ID %1").arg(query.value(3).toString());
+        QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
+            QString("Multiplex #%1").arg(mplexid);
+        
         SISCAN("Adding "+fn);
 
-        TransportScanItem item(query.value(0).toInt(), query.value(1).toInt(), fn);
+        TransportScanItem item(sourceid, std, fn, mplexid);
         scanTransports += item;
     }
 
@@ -917,7 +818,6 @@ bool SIScan::ScanTransport(int mplexid)
     waitingForTables  = false;
 
     transportsScanned = 0;
-    scanIt            = scanTransports.end();
     scanOffsetIt      = 0;
     if (scanTransports.size())
     {
@@ -931,12 +831,16 @@ bool SIScan::ScanTransport(int mplexid)
 
 void SIScan::ServiceTableComplete()
 {
+#ifdef USE_SIPARSER
     serviceListReady = true;
+#endif // USE_SIPARSER
 }
 
 void SIScan::TransportTableComplete()
 {
+#ifdef USE_SIPARSER
     transportListReady = true;
+#endif // USE_SIPARSER
 }
 
 /** \fn SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
@@ -1132,14 +1036,147 @@ void SIScan::UpdateVCTinDB(int tid_db,
 }
 
 /** \fn SIScan::UpdateSDTinDB(int,const ServiceDescriptionTable*,bool)
- *  \brief dummy method for now.
+ *
+ *   If the mplexid matches the first networkid/transport ID assume you
+ *   are on the right mplexid..
+ *
+ *   If NOT then search that SourceID for a matching
+ *   NetworkId/TransportID and use that as the mplexid..
+ *
+ *     3. Check the existance of each ServiceID on the correct mplexid.
+ *     If there are any extras mark then as hidden (as opposed to
+ *     removing them).  There might also be a better way of marking
+ *     them as old.. I am not sure yet.. If the ChanID scheme is
+ *     better than whats in place now this might be easier..
+ *
+ *     4. Add any missing ServiceIDs.. Set the hidden flag if they are
+ *     not a TV service, and or if they are not FTA (Depends on if FTA
+ *     is allowed or not)..
+ *
+ *     First get the mplexid from channel.. This will help you determine
+ *     what mplexid these channels are really associated with..
+ *     They COULD be from another transport..
+ *
+ *     Check the ServiceVersion and if its the same as you have, or a
+ *     forced update is required because its been too long since an update
+ *     forge ahead.
+ *
+ *  \todo If you get a Version mismatch and you are not in setupscan
+ *        mode you will want to issue a scan of the other transports
+ *        that have the same networkID.
  */
 void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
                            bool force_update)
 {
-    (void) tid_db;
-    (void) sdt;
-    (void) force_update;
+    if (!sdt->ServiceCount())
+        return;
+
+    int db_mplexid = ChannelUtil::GetBetterMplexID(
+        tid_db, sdt->TSID(), sdt->OriginalNetworkID());
+
+    if (db_mplexid == -1)
+    {
+        VERBOSE(VB_IMPORTANT, "SDT: Error determing what transport this "
+                "service table is associated with so failing");
+        return;
+    }
+
+    //bool fta_only = ignore_encrypted_services(db_mplexid, videodevice);
+    int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
+
+    /* This will be fixed post .17 to be more elegant */
+    bool upToDate = ChannelUtil::GetServiceVersion(db_mplexid) == (int)sdt->Version();
+    if (upToDate && !force_update)
+    {
+        emit ServiceScanUpdateText("Channels up to date");
+        return;
+    }
+    if (!upToDate)
+        ChannelUtil::SetServiceVersion(db_mplexid, sdt->Version());
+
+    for (uint i = 0; i < sdt->ServiceCount(); i++)
+    {
+        // Figure out best service name...
+        ServiceDescriptor *desc = sdt->GetServiceDescriptor(i);
+        QString service_name = "";
+        if (desc)
+            service_name = desc->ServiceName();
+
+        if (service_name.stripWhiteSpace().isEmpty())
+            service_name = QString("%1 %2")
+                .arg(sdt->ServiceID(i)).arg(db_mplexid);
+
+        // Figure out best channel number
+        QString chan_num = QString::number(sdt->ServiceID(i));
+        bool have_uk_chan_num =
+            dvbChanNums.find(sdt->ServiceID(i)) != dvbChanNums.end();
+        if (have_uk_chan_num)
+            chan_num = QString::number(dvbChanNums[sdt->ServiceID(i)]);
+
+        // Skip to next if this is a service we don't care for
+        if (desc && desc->IsDigitalAudio() && ignoreAudioOnlyServices)
+        {
+            emit ServiceScanUpdateText(
+                tr("Skipping %1 - Radio Service").arg(service_name));
+            continue;
+        }
+        else if (desc && !desc->IsDTV() && !desc->IsDigitalAudio())
+        {
+            emit ServiceScanUpdateText(tr("Skipping %1 - not a Television or "
+                                          "Radio Service").arg(service_name));
+            continue;
+        }
+        else if (ignoreEncryptedServices && !sdt->HasFreeCA(i))
+        {
+            emit ServiceScanUpdateText(tr("Skipping %1 - Encrypted Service")
+                .arg(service_name));
+            continue;
+        }
+
+        // See if service already in database based on service ID
+        int chanid = ChannelUtil::GetChanID(db_mplexid, -1, 0, 0,
+                                            sdt->ServiceID(i));
+
+        if (chanid < 0)
+        {   // The service is not in database, add it
+            emit ServiceScanUpdateText(tr("Adding %1").arg(service_name));
+            chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
+            if (chanid > 0)
+            {
+                ChannelUtil::CreateChannel(
+                    db_mplexid, db_source_id, chanid,
+                    service_name,
+                    chan_num,
+                    sdt->ServiceID(i),
+                    0, 0,
+                    sdt->HasEITSchedule(i) || sdt->HasEITPresentFollowing(i),
+                    false, false, -1);
+            }
+        }
+        else if (force_update || (desc && have_uk_chan_num))
+        {   // The service is in database & we have good info, update it
+            emit ServiceScanUpdateText(tr("Updating %1").arg(service_name));
+
+            ChannelUtil::UpdateChannel(
+                db_mplexid,
+                db_source_id,
+                chanid,
+                service_name,
+                chan_num,
+                sdt->ServiceID(i),
+                0, 0, 
+                -1);
+        }
+        else
+        {
+            emit ServiceScanUpdateText(
+                tr("Skipping %1 - already in DB, and we don't have better data.")
+                .arg(service_name));
+        }
+
+        if (desc)
+            delete desc;
+    }
 }
 
 #ifdef USE_SIPARSER
@@ -1509,6 +1546,55 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                    .arg((*t).TransportID)
                    .arg((*t).NetworkID));
         }
+    }
+}
+#endif // USE_SIPARSER
+
+#ifdef USE_SIPARSER
+void SIScan::HandleSIParserEvents(void)
+{
+    if (!siparser)
+        return;
+
+    int mplex = -1;
+    if (scanTransports.size() && scanIt != scanTransports.end() &&
+        (*scanIt).mplexid > 0)
+        mplex = (*scanIt).mplexid;
+    else if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() > 0)
+        mplex = GetDVBChannel()->GetMultiplexID();
+
+    if (serviceListReady && (mplex > 0))
+    {
+        if (siparser->GetServiceObject(SDT))
+        {
+            UpdateServicesInDB(mplex, SDT);
+            scanOffsetIt = 99;
+        }
+        serviceListReady = false;
+        if (scanMode == TRANSPORT_LIST)
+        {
+            UpdateScanPercentCompleted();
+            waitingForTables = false;
+        }
+        else
+        {
+            emit PctServiceScanComplete(100);
+            emit ServiceScanComplete();
+        }
+    }
+    if (transportListReady)
+    {
+        if (siparser->GetTransportObject(NIT))
+        {
+            emit TransportScanUpdateText("Processing Transport List");
+            SISCAN("Updating Transports");
+            CheckNIT(NIT);
+            UpdateTransportsInDB(NIT);
+            SISCAN("Transport Update Complete");
+            emit TransportScanUpdateText("Finished processing Transport List");
+        }
+        transportListReady = false;
+        emit TransportScanComplete();
     }
 }
 #endif // USE_SIPARSER

@@ -19,9 +19,10 @@ TransportScanItem::TransportScanItem()
 }
 
 TransportScanItem::TransportScanItem(int sourceid,
-                                     int _mplexid,
-                                     const QString &fn)
-    : mplexid(_mplexid), standard("dvb"),
+                                     const QString &std,
+                                     const QString &fn,
+                                     int _mplexid)
+    : mplexid(_mplexid), standard(std),
       FriendlyName(fn),  SourceID(sourceid), UseTimer(false),
       scanning(false),   timeoutTune(DVBT_TUNINGTIMEOUT), complete(false)
 {
@@ -31,6 +32,10 @@ TransportScanItem::TransportScanItem(int sourceid,
 #endif
     complete = false;
     offset1 = offset2 = 0;
+
+    // set timeout
+    timeoutTune = (standard == "dvb") ?
+        DVBT_TUNINGTIMEOUT : ATSC_TUNINGTIMEOUT;
 }
 
 TransportScanItem::TransportScanItem(int sourceid,

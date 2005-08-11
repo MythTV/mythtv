@@ -18,19 +18,12 @@
 #define USE_SIPARSER
 #include "sitypes.h"
 #include "dvbtypes.h"
+#endif // USING_DVB
+
+#ifdef USE_SIPARSER
 typedef QValueList<Event> QList_Events;
 typedef QValueList<QList_Events*> QListList_Events;
-#else
-typedef unsigned short uint16_t;
-typedef QMap<uint16_t, void*> QMap_Events;
-typedef QMap<uint16_t, void*> QMap_SDTObject;
-typedef QValueList<void*> QList_Events;
-typedef QValueList<QList_Events> QListList_Events;
-class DVBTuning;
-typedef int fe_type_t;
-typedef void* NITObject;
-typedef void* NIT;
-#endif // USING_DVB
+#endif // USING_SIPARSER
 
 #define SISCAN(args...) \
     VERBOSE(VB_SIPARSER, QString("SIScan(%1): ").arg(channel->GetDevice()) << args);
@@ -139,6 +132,7 @@ class SIScan : public QObject
     // old stuff
     void verifyTransport(TransportScanItem& t);
 #ifdef USE_SIPARSER
+    void HandleSIParserEvents(void);
     void CheckNIT(NITObject& NIT);
     void UpdateTransportsInDB(NITObject NIT);
     void UpdateServicesInDB(int tid_db, QMap_SDTObject SDT);
@@ -171,17 +165,17 @@ class SIScan : public QObject
     uint                        scanOffsetIt;
     QMap<uint, uint>            dvbChanNums;
 
+#ifdef USE_SIPARSER
     bool serviceListReady;
     bool transportListReady;
 
     QMap_SDTObject SDT;
     NITObject NIT;
-#ifdef USE_SIPARSER
     pthread_t siparser_thread;
   public:
     DVBSIParser* siparser;
-#endif // USE_SIPARSER
   private:
+#endif // USE_SIPARSER
 
     /// Scanner thread, runs SIScan::StartScanner()
     pthread_t        scanner_thread;

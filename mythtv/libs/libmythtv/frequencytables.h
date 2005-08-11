@@ -123,7 +123,8 @@ class TransportScanItem
 
   public:
     TransportScanItem();
-    TransportScanItem(int sourceid, int mplexid, const QString &fn);
+    TransportScanItem(int sourceid, const QString &std,
+                      const QString &name, int mplexid);
     TransportScanItem(int sourceid,           /* source id in DB */
                       const QString &std,     /* atsc/dvb */
                       const QString &strFmt,  /* fmt for info shown to user  */
