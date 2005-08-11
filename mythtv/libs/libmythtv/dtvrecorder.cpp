@@ -190,7 +190,8 @@ void DTVRecorder::HandleKeyframe() {
         _position_map[frameNum] = startpos;
 
         if (curRecording &&
-            _position_map_delta.size() == 30)
+            (((_position_map.size() < 30) && (_position_map.size()%5 == 1)) ||
+             (_position_map_delta.size() >= 30)))
         {
             curRecording->SetPositionMapDelta(_position_map_delta, 
                                               MARK_GOP_BYFRAME);
