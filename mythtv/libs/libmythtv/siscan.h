@@ -15,11 +15,11 @@
 #include "frequencytables.h"
 
 #ifdef USING_DVB
+#define USE_SIPARSER
 #include "sitypes.h"
 #include "dvbtypes.h"
 typedef QValueList<Event> QList_Events;
 typedef QValueList<QList_Events*> QListList_Events;
-#define USE_OWN_SIPARSER
 #else
 typedef unsigned short uint16_t;
 typedef QMap<uint16_t, void*> QMap_Events;
@@ -138,10 +138,12 @@ class SIScan : public QObject
 
     // old stuff
     void verifyTransport(TransportScanItem& t);
+#ifdef USE_SIPARSER
     void CheckNIT(NITObject& NIT);
     void UpdateTransportsInDB(NITObject NIT);
     void UpdateServicesInDB(int tid_db, QMap_SDTObject SDT);
     static void *SpawnSectionReader(void*);
+#endif // USE_SIPARSER
 
   private:
     // Set in constructor
@@ -174,9 +176,11 @@ class SIScan : public QObject
 
     QMap_SDTObject SDT;
     NITObject NIT;
+#ifdef USE_SIPARSER
     pthread_t siparser_thread;
   public:
     DVBSIParser* siparser;
+#endif // USE_SIPARSER
   private:
 
     /// Scanner thread, runs SIScan::StartScanner()

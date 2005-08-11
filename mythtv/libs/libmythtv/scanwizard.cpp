@@ -420,6 +420,8 @@ void ScanWizardScanner::scan()
 #ifdef USING_DVB
         if (CardUtil::IsDVB(cardid))
             channel = new DVBChannel(device.toInt());
+        if (GetDVBChannel())
+            GetDVBChannel()->disable_siparser = true;
 #endif
 #ifdef USING_V4L
         if (nCardType == CardUtil::HDTV)
@@ -430,11 +432,6 @@ void ScanWizardScanner::scan()
             VERBOSE(VB_IMPORTANT, "Error, Channel not created");
             return;
         }
-
-#ifdef USE_OWN_SIPARSER
-        if (GetDVBChannel())
-            GetDVBChannel()->disable_siparser = true;
-#endif // !USE_OWN_SIPARSER
 
         // These locks and objects might already exist in videosource need to check
         if (!channel->Open())

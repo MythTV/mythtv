@@ -33,7 +33,6 @@
 
 #ifdef USING_DVB
 #include "dvbchannel.h"
-#include "siparser.h"
 #include "dvbtypes.h"
 #else // if !USING_DVB
 class TransportObject;
@@ -41,6 +40,10 @@ class DVBTuning;
 class dvb_channel_t;
 typedef int fe_type_t;
 #endif // USING_DVB
+
+#ifdef USE_SIPARSER
+#include "siparser.h"
+#endif // USE_SIPARSER
 
 /// \brief How long we wait for ATSC tables, before giving up
 #define ATSC_TABLES_TIMEOUT 1500
@@ -86,9 +89,8 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
     serviceListReady = false;
     transportListReady = false;
 
+#ifdef USE_SIPARSER
     siparser = NULL;
-#ifdef USING_DVB
-#ifdef USE_OWN_SIPARSER
     if (GetDVBChannel())
     {
         VERBOSE(VB_SIPARSER, "Creating SIParser");
@@ -97,13 +99,6 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
         connect(siparser,        SIGNAL(UpdatePMT(const PMTObject*)),
                 GetDVBChannel(), SLOT(SetPMT(const PMTObject*)));
     }    
-#else // if !USE_OWN_SIPARSER
-    if (GetDVBChannel())
-    {
-        VERBOSE(VB_SIPARSER, "Getting SIParser from DVBChannel");
-        siparser = GetDVBChannel()->siparser;
-    }
-#endif // !USE_OWN_SIPARSER
     if (siparser)
     {
         VERBOSE(VB_IMPORTANT, "Connecting up SIParser");
@@ -114,7 +109,8 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
                 this,     SLOT(ServiceTableComplete()));
         return;
     }
-#endif // USING_DVB
+#endif // USE_SIPARSER
+
     // Create a stream data for digital signal monitors
     DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
     if (dtvSigMon)
@@ -147,27 +143,27 @@ SIScan::~SIScan(void)
         delete signalMonitor;
 }
 
+#ifdef USE_SIPARSER
 void *SIScan::SpawnSectionReader(void *param)
 {
     (void) param;
-#ifdef USING_DVB
     DVBSIParser *siparser = (DVBSIParser*) param;
     siparser->StartSectionReader();
-#endif // USING_DVB
     return NULL;
 }
+#endif // USE_SIPARSER
 
 bool SIScan::ScanTransports(const QString _sistandard)
 {
     (void) _sistandard;
     VERBOSE(VB_SIPARSER, "ScanTransports()");
-#ifdef USING_DVB
+#ifdef USE_SIPARSER
     if (siparser)
     {
         siparser->FillPMap(_sistandard);
         return siparser->FindTransports();
     }
-#endif // USING_DVB
+#endif // USE_SIPARSER
     // We are always scanning for transports when tuned..
     return true;
 }
@@ -389,12 +385,12 @@ Channel *SIScan::GetChannel(void)
 bool SIScan::ScanServices(void)
 {
     VERBOSE(VB_SIPARSER, "SIScan::ScanServices()");
-#ifdef USING_DVB
+#ifdef USE_SIPARSER
+    // Requests the SDT table for the current transport from sections
     if (siparser)
-    {
-        // Requests the SDT table for the current transport from sections
         return siparser->FindServices();
-    }
+#endif // USE_SIPARSER
+#ifdef USING_DVB
     if (GetDVBSignalMonitor())
     {
         // We are always scanning for VCTs, but we disable
@@ -449,15 +445,14 @@ void SIScan::RunScanner(void)
             mplex = GetDVBChannel()->GetMultiplexID();
 #endif // USING_DVB
 
+#ifdef USE_SIPARSER
         if (serviceListReady && siparser && (mplex > 0))
         {
-#ifdef USING_DVB
             if (siparser->GetServiceObject(SDT))
             {
                 UpdateServicesInDB(mplex, SDT);
                 scanOffsetIt = 99;
             }
-#endif // USING_DVB
             serviceListReady = false;
             if (scanMode == TRANSPORT_LIST)
             {
@@ -472,7 +467,6 @@ void SIScan::RunScanner(void)
         }
         if (transportListReady && siparser)
         {
-#ifdef USING_DVB
             if (siparser->GetTransportObject(NIT))
             {
                 emit TransportScanUpdateText("Processing Transport List");
@@ -483,9 +477,9 @@ void SIScan::RunScanner(void)
                 emit TransportScanUpdateText("Finished processing Transport List");
             }
             transportListReady = false;
-#endif // USING_DVB
             emit TransportScanComplete();
         }
+#endif // USE_SIPARSER
 
         if (scanMode == TRANSPORT_LIST)
             HandleActiveScan();
@@ -560,7 +554,11 @@ void SIScan::HandleActiveScan(void)
     }
 
     // Check if we got some tables, but not all...
+#ifdef USE_SIPARSER
     if (!siparser && GetDTVSignalMonitor())
+#else // if !USE_SIPARSER
+    if (GetDTVSignalMonitor())
+#endif // !USE_SIPARSER
     {
         const ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
         if (timed_out && waitingForTables && sd->GetCachedMGT())
@@ -630,16 +628,18 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
         // Start signal monitor for this channel
         if (item.mplexid >= 0)
         {
-#ifdef USE_OWN_SIPARSER
+#ifdef USE_SIPARSER
             if (siparser)
                 siparser->Reset();
-#endif // USE_OWN_SIPARSER
+#endif // USE_SIPARSER
+
             ok = GetDVBChannel()->TuneMultiplex(item.mplexid);
             signalMonitor->Start();
-#ifdef USE_OWN_SIPARSER
+
+#ifdef USE_SIPARSER
             if (ok && siparser)
                 siparser->FillPMap(item.standard);
-#endif // USE_OWN_SIPARSER
+#endif // USE_SIPARSER
         }
         else
         {
@@ -648,16 +648,18 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
             dvbchan.tuning     = item.tuning;
             dvbchan.tuning.params.frequency = item.freq_offset(scanOffsetIt);
 
-#ifdef USE_OWN_SIPARSER
+#ifdef USE_SIPARSER
             if (siparser)
                 siparser->Reset();
-#endif // USE_OWN_SIPARSER
+#endif // USE_SIPARSER
+
             ok = GetDVBChannel()->TuneTransport(dvbchan, true, item.timeoutTune);
             signalMonitor->Start();
-#ifdef USE_OWN_SIPARSER
+
+#ifdef USE_SIPARSER
             if (ok && siparser)
                 siparser->FillPMap(item.standard);
-#endif // USE_OWN_SIPARSER
+#endif // USE_SIPARSER
 
             if (ok)
             {
@@ -716,10 +718,11 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
 
     // Start signal monitor for this channel
     signalMonitor->Start();
-#ifdef USING_DVB
+
+#ifdef USE_SIPARSER
     if (siparser)
         siparser->FindServices();
-#endif // USING_DVB
+#endif // USE_SIPARSER
 
     timer.start();
     waitingForTables = true;
@@ -733,19 +736,19 @@ void SIScan::StopScanner(void)
 {
     threadExit = true;
     SISCAN("Stopping SIScanner");
-#ifdef USING_DVB
+
+#ifdef USE_SIPARSER
     /* Force dvbchannel to exit */
-    if (siparser && GetDVBChannel())
-        GetDVBChannel()->StopTuning();
-#endif // USING_DVB
-#ifdef USE_OWN_SIPARSER
     if (siparser)
     {
+        if (GetDVBChannel())
+            GetDVBChannel()->StopTuning();
         siparser->StopSectionReader();
         pthread_join(siparser_thread, NULL);
         delete siparser;
     }
-#endif // !USE_OWN_SIPARSER
+#endif // USE_SIPARSER
+
     if (scanner_thread_running)
         pthread_join(scanner_thread, NULL);
     if (signalMonitor)
@@ -1139,6 +1142,7 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
     (void) force_update;
 }
 
+#ifdef USE_SIPARSER
 /** \fn SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
  *
  *   If the mplexid matches the first networkid/transport ID assume you
@@ -1173,7 +1177,7 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
 {
     (void) tid_db;
     (void) SDT;
-#ifdef USING_DVB
+
     if (SDT.empty())
     {
         SISCAN("SDT List Empty assuming this is by error leaving services intact");
@@ -1337,13 +1341,13 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
                 .arg(service_name));
         }
     }
-#endif // USING_DVB
 }
+#endif // USE_SIPARSER
 
+#ifdef USE_SIPARSER
 void SIScan::CheckNIT(NITObject& NIT)
 {
     (void) NIT;
-#ifdef USING_DVB
     dvb_channel_t chan_opts;
     QValueList<TransportObject>::Iterator t;
     for (t = NIT.Transport.begin() ; t != NIT.Transport.end() ; ++t )
@@ -1413,13 +1417,13 @@ void SIScan::CheckNIT(NITObject& NIT)
         }
 #endif
     }
-#endif // USING_DVB
 }
+#endif // USE_SIPARSER
 
+#ifdef USE_SIPARSER
 void SIScan::UpdateTransportsInDB(NITObject NIT)
 {
     (void) NIT;
-#ifdef USING_DVB
     QValueList<NetworkObject>::Iterator n;
     QValueList<TransportObject>::Iterator t;
 
@@ -1506,8 +1510,8 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                    .arg((*t).NetworkID));
         }
     }
-#endif // USING_DVB
 }
+#endif // USE_SIPARSER
 
 // ///////////////////// Static DB helper methods /////////////////////
 // ///////////////////// Static DB helper methods /////////////////////
