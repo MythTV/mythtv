@@ -11,6 +11,19 @@ const unsigned char TSHeader::PAYLOAD_ONLY_HEADER[4] =
     0x10,  // adaptation field control == payload only
 };
 
+const unsigned char NULL_PACKET_BYTES[188] =
+{
+    SYNC_BYTE, 0x1F, 0xFF, 0x00,
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, // 36
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, // 68
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, // 100
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, // 132
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, // 164
+    0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0, // 188
+};
+
+const TSPacket *TSPacket::NULL_PACKET =
+    reinterpret_cast<const TSPacket*>(NULL_PACKET_BYTES);
 
 QString TSPacket::toString() const {
     QString str;

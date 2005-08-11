@@ -148,6 +148,7 @@ class TSPacket : public TSHeader
 
     static const unsigned int SIZE         = 188;
     static const unsigned int PAYLOAD_SIZE = SIZE-HEADER_SIZE;
+    static const TSPacket *TSPacket::NULL_PACKET;
   private:
     unsigned char _tspayload[184];
 };
