@@ -21,7 +21,6 @@ class DVBSIParser;
 class SignalMonitor;
 class ChannelBase;
 class DVBChannel;
-class DummyDTVRecorder;
 
 typedef enum
 {
@@ -181,7 +180,6 @@ class TVRec
     static void *RecorderThread(void *param);
 
   private:
-    void ResetRecorder(void);
     void SetChannel();
 
     void GetChannelInfo(ChannelBase *chan,  QString &title,
@@ -204,14 +202,11 @@ class TVRec
     void TeardownRecorder(bool killFile = false);
     
     void InitChannel(const QString &inputname, const QString &startchannel);
-    bool StartChannel(bool livetv);
     void CloseChannel(void);
 
     void SetupSignalMonitor(void);
     void TeardownSignalMonitor(void);
 
-    void CreateSIParser(int num);
-    void TeardownSIParser(void);
 
     void HandleStateChange(void);
     void ChangeState(TVState nextState);
@@ -231,7 +226,6 @@ class TVRec
     ChannelBase   *channel;
     SignalMonitor *signalMonitor;
     EITScanner    *scanner;
-    DVBSIParser   *dvbsiparser;
 
     // Various threads
     /// Event processing thread, runs RunTV().

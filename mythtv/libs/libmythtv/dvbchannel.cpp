@@ -248,7 +248,7 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 
     GENERAL(QString("Successfully tuned to channel %1.").arg(chan));
 
-    if (siparser && !chan_opts.pmt.OnAir())
+    if (!chan_opts.pmt.OnAir())
     {
         ERROR(QString("Channel #%1 is off air.").arg(chan));
         return false;

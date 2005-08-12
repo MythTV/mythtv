@@ -912,9 +912,7 @@ bool TV::StartRecorder(int maxWait)
         usleep(50);
     if (!recorder->IsRecording() || exitPlayer)
     {
-        if (!exitPlayer)
-            VERBOSE(VB_IMPORTANT, "StartRecorder() -- "
-                    "timed out waiting for recorder to start");
+        VERBOSE(VB_IMPORTANT, "StartRecorder() -- error");
         return false;
     }
 
