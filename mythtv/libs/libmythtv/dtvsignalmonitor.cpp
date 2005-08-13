@@ -145,6 +145,8 @@ void DTVSignalMonitor::SetProgramNumber(int progNum)
 void DTVSignalMonitor::SetStreamData(MPEGStreamData *data)
 {
     stream_data = data;
+    if (!data)
+        return;
 
     connect(data, SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
             this, SLOT(SetPAT(const ProgramAssociationTable*)));
@@ -300,6 +302,8 @@ ATSCStreamData *DTVSignalMonitor::GetATSCStreamData()
 
 DVBStreamData *DTVSignalMonitor::GetDVBStreamData()
 {
+    if (GetScanStreamData())
+        return &(GetScanStreamData()->dvb);
     return dynamic_cast<DVBStreamData*>(stream_data);
 }
 
@@ -315,6 +319,8 @@ const ATSCStreamData *DTVSignalMonitor::GetATSCStreamData() const
 
 const DVBStreamData *DTVSignalMonitor::GetDVBStreamData() const
 {
+    if (GetScanStreamData())
+        return &(GetScanStreamData()->dvb);
     return dynamic_cast<const DVBStreamData*>(stream_data);
 }
 

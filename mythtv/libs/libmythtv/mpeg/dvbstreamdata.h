@@ -13,7 +13,7 @@ typedef ServiceDescriptionTable*               sdt_ptr_t;
 typedef vector<const ServiceDescriptionTable*> sdt_vec_t;
 typedef QMap<uint, sdt_ptr_t>                  sdt_cache_t;
 
-class DVBStreamData : virtual public MPEGStreamData
+class DVBStreamData : public MPEGStreamData
 {
     Q_OBJECT
   public:

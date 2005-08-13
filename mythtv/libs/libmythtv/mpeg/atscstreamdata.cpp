@@ -22,14 +22,14 @@
 ATSCStreamData::ATSCStreamData(int desiredMajorChannel,
                                int desiredMinorChannel,
                                bool cacheTables)
-    : QObject(NULL, "ATSCStreamData"),
-      MPEGStreamData(-1, cacheTables),
+    : MPEGStreamData(-1, cacheTables),
       _GPS_UTC_offset(13 /* leap seconds as of 2004 */),
       _mgt_version(-1),
       _cached_mgt(NULL),
       _desired_major_channel(desiredMajorChannel),
       _desired_minor_channel(desiredMinorChannel)
 {
+    setName("ATSCStreamData");
     AddListeningPID(ATSC_PSIP_PID);
 }
 

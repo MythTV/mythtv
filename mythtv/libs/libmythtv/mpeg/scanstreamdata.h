@@ -6,15 +6,11 @@
 #include "atscstreamdata.h"
 #include "dvbstreamdata.h"
 
-class ScanStreamData : virtual public MPEGStreamData,
-             virtual public ATSCStreamData,
-             virtual public DVBStreamData
+class ScanStreamData : public ATSCStreamData
 {
     Q_OBJECT
   public:
-    ScanStreamData() : QObject(NULL, "ScanStreamData"),
-                       MPEGStreamData(-1, true),
-                       ATSCStreamData(-1,-1, true), DVBStreamData(true) { ; }
+    ScanStreamData();
     virtual ~ScanStreamData();
 
     bool IsRedundant(const PSIPTable&) const;
@@ -22,25 +18,47 @@ class ScanStreamData : virtual public MPEGStreamData,
 
     void Reset();
 
+    void AddListeningPID(uint pid)
+        { ATSCStreamData::AddListeningPID(pid); dvb.AddListeningPID(pid); }
+    void RemoveListeningPID(uint pid)
+        { ATSCStreamData::RemoveListeningPID(pid); dvb.RemoveListeningPID(pid); }
+
+    void ReturnCachedTable(const PSIPTable *psip) const;
+    void ReturnCachedTables(pmt_vec_t&) const;
+
+    // DVB
+    const NetworkInformationTable *GetCachedNIT(bool current = true) const
+        { return dvb.GetCachedNIT(current); }
+    const sdt_ptr_t GetCachedSDT(uint tsid, bool current = true) const
+        { return dvb.GetCachedSDT(tsid, current); }
+    sdt_vec_t GetAllCachedSDTs(bool current = true) const
+        { return dvb.GetAllCachedSDTs(current); }
+    void ReturnCachedSDTTables(sdt_vec_t &x) const
+        { dvb.ReturnCachedSDTTables(x); }
+
+    operator DVBStreamData& ()
+    {
+        cerr<<"XcXcXc"<<endl;
+        return dvb;
+    }
+
   signals:
-    // ATSC
-    void UpdateMGT(   const MasterGuideTable*);
-    void UpdateSTT(   const SystemTimeTable*);
-    void UpdateRRT(   const RatingRegionTable*);
-    void UpdateDCCT(  const DirectedChannelChangeTable*);
-    void UpdateDCCSCT(const DirectedChannelChangeSelectionCodeTable*);
-
-    void UpdateVCT( uint pid, const VirtualChannelTable*);
-    void UpdateTVCT(uint pid, const TerrestrialVirtualChannelTable*);
-    void UpdateCVCT(uint pid, const CableVirtualChannelTable*);
-    void UpdateEIT( uint pid, const EventInformationTable*);
-    void UpdateETT( uint pid, const ExtendedTextTable*);
-
     // DVB
     void UpdateNIT(const NetworkInformationTable*);
     void UpdateSDT(uint tsid, const ServiceDescriptionTable*);
 
-  private:
+  private slots:
+    // MPEG
+    void RelayPAT(const ProgramAssociationTable *x)  { emit UpdatePAT(x); }
+    void RelayPMT(uint pid, const ProgramMapTable *x){ emit UpdatePMT(pid, x); }
+
+    // DVB
+    void RelayNIT(const NetworkInformationTable *x)  { emit UpdateNIT(x); }
+    void RelaySDT(uint tsid, const ServiceDescriptionTable *x)
+        { emit UpdateSDT(tsid, x); }
+
+  public:
+    DVBStreamData dvb;
 };
 
 #endif // SCANSTREAMDATA_H_

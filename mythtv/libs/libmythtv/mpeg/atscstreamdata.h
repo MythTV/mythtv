@@ -33,7 +33,7 @@ typedef vector<const CableVirtualChannelTable*>       cvct_vec_t;
 typedef QMap<uint, tvct_ptr_t>          tvct_cache_t;
 typedef QMap<uint, cvct_ptr_t>          cvct_cache_t;
 
-class ATSCStreamData : virtual public MPEGStreamData
+class ATSCStreamData : public MPEGStreamData
 {
     Q_OBJECT
   public:

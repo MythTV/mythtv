@@ -4,9 +4,9 @@
 #include "dvbtables.h"
 
 DVBStreamData::DVBStreamData(bool cacheTables)
-    : QObject(NULL, "DVBStreamData"),
-      MPEGStreamData(-1, cacheTables), _nit_version(-1), _cached_nit(NULL)
+    : MPEGStreamData(-1, cacheTables), _nit_version(-1), _cached_nit(NULL)
 {
+    setName("DVBStreamData");
     AddListeningPID(DVB_NIT_PID);
     AddListeningPID(DVB_SDT_PID);
 }

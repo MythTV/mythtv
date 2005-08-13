@@ -21,7 +21,7 @@ typedef QMap<const PSIPTable*, int>    psip_refcnt_map_t;
 typedef vector<const ProgramMapTable*> pmt_vec_t;
 typedef QMap<uint, ProgramMapTable*>   pmt_cache_t;
 
-class MPEGStreamData : virtual public QObject
+class MPEGStreamData : public QObject
 {
     Q_OBJECT
   public:
@@ -40,41 +40,41 @@ class MPEGStreamData : virtual public QObject
     inline  void HandleAdaptationFieldControl(const TSPacket* tspacket);
 
     // Listening
-    void AddListeningPID(uint pid)          { _pids_listening[pid] = true; }
-    void AddNotListeningPID(uint pid)       { _pids_notlistening[pid] = true; }
-    void AddWritingPID(uint pid)            { _pids_writing[pid] = true;   }
-    void AddAudioPID(uint pid)              { _pids_audio[pid] = true;     }
+    virtual void AddListeningPID(uint pid)  { _pids_listening[pid] = true; }
+    virtual void AddNotListeningPID(uint pid) { _pids_notlistening[pid] = true; }
+    virtual void AddWritingPID(uint pid)    { _pids_writing[pid] = true;   }
+    virtual void AddAudioPID(uint pid)      { _pids_audio[pid] = true;     }
 
-    void RemoveListeningPID(uint pid)       { _pids_listening.erase(pid);  }
-    void RemoveNotListeningPID(uint pid)    { _pids_notlistening.erase(pid); }
-    void RemoveWritingPID(uint pid)         { _pids_writing.erase(pid);    }
-    void RemoveAudioPID(uint pid)           { _pids_audio.erase(pid);      }
+    virtual void RemoveListeningPID(uint pid) { _pids_listening.erase(pid);  }
+    virtual void RemoveNotListeningPID(uint pid) { _pids_notlistening.erase(pid); }
+    virtual void RemoveWritingPID(uint pid) { _pids_writing.erase(pid);    }
+    virtual void RemoveAudioPID(uint pid)   { _pids_audio.erase(pid);      }
 
-    bool IsListeningPID(uint pid) const;
-    bool IsNotListeningPID(uint pid) const;
-    bool IsWritingPID(uint pid) const;
-    bool IsAudioPID(uint pid) const;
+    virtual bool IsListeningPID(uint pid) const;
+    virtual bool IsNotListeningPID(uint pid) const;
+    virtual bool IsWritingPID(uint pid) const;
+    virtual bool IsAudioPID(uint pid) const;
 
-    const QMap<uint, bool>& ListeningPIDs(void) const
+    virtual const QMap<uint, bool>& ListeningPIDs(void) const
         { return _pids_listening; }
 
     // Table versions
-    void SetVersionPAT(int version)         { _pat_version = version;  }
-    int  VersionPAT(void) const             { return _pat_version;     }
-    void SetVersionPMT(uint pid, int ver)   { _pmt_version[pid] = ver; }
-    inline int VersionPMT(uint pid) const;
+    virtual void SetVersionPAT(int version)         { _pat_version = version;  }
+    virtual int  VersionPAT(void) const             { return _pat_version;     }
+    virtual void SetVersionPMT(uint pid, int ver)   { _pmt_version[pid] = ver; }
+    virtual inline int VersionPMT(uint pid) const;
 
     // Caching
-    bool HasCachedPAT(void) const;
-    bool HasCachedPMT(uint pid) const;
-    bool HasAllPMTsCached(void) const;
+    virtual bool HasCachedPAT(void) const;
+    virtual bool HasCachedPMT(uint pid) const;
+    virtual bool HasAllPMTsCached(void) const;
 
-    const ProgramAssociationTable *GetCachedPAT(void) const;
-    const ProgramMapTable *GetCachedPMT(uint pid) const;
-    pmt_vec_t GetCachedPMTs(void) const;
+    virtual const ProgramAssociationTable *GetCachedPAT(void) const;
+    virtual const ProgramMapTable *GetCachedPMT(uint pid) const;
+    virtual pmt_vec_t GetCachedPMTs(void) const;
 
-    void ReturnCachedTable(const PSIPTable *psip) const;
-    void ReturnCachedTables(pmt_vec_t&) const;
+    virtual void ReturnCachedTable(const PSIPTable *psip) const;
+    virtual void ReturnCachedTables(pmt_vec_t&) const;
 
   signals:
     void UpdatePAT(const ProgramAssociationTable*);
