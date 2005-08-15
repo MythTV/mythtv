@@ -78,8 +78,8 @@ void LanguageSettings::load(QString module_name)
         trans->load(gContext->GetTranslationsDir() +
                     module_name + QString("_") +
                     d.m_language.lower() + QString(".qm"), ".");
-         qApp->installTranslator(trans);
-         d.m_translators[module_name] = trans;
+        qApp->installTranslator(trans);
+        d.m_translators[module_name] = trans;
     }
 }
 
@@ -137,15 +137,16 @@ QStringList LanguageSettings::getLanguages(void)
     QStringList langs;
     langs << QString::fromUtf8("English")     << "EN"   // English
           << QString::fromUtf8("Italiano")    << "IT"   // Italian
-          << QString::fromUtf8("Català")      << "CA"   // Catalan
-          << QString::fromUtf8("Español")     << "ES"   // Spanish
+          << QString::fromUtf8("Català")     << "CA"   // Catalan
+          << QString::fromUtf8("Español")    << "ES"   // Spanish
           << QString::fromUtf8("Nederlands")  << "NL"   // Dutch
-          << QString::fromUtf8("Français")    << "FR"   // French
+          << QString::fromUtf8("Français")   << "FR"   // French
           << QString::fromUtf8("Deutsch")     << "DE"   // German
           << QString::fromUtf8("Dansk")       << "DK"   // Danish
+          << QString::fromUtf8("Islenska")    << "IS"   // Icelandic
           << QString::fromUtf8("Norsk (bokmål)") << "NB" // Norwegian (Bokmål)
           << QString::fromUtf8("Svenska")     << "SV"   // Swedish
-          << QString::fromUtf8("Português")   << "PT"   // Portuguese
+          << QString::fromUtf8("Português")  << "PT"   // Portuguese
           << QString::fromUtf8("Nihongo")     << "JA"   // Japanese
           << QString::fromUtf8("Slovenski")   << "SI"   // Slovenian
           << QString::fromUtf8("Suomi")       << "FI"   // Finnish
