@@ -537,6 +537,193 @@ void TVRec::FinishedRecording(void)
     curRecording->FinishedRecording(prematurelystopped);
 }
 
+bool TVRec::CreateRecorderThread()
+{
+    pthread_create(&recorder_thread, NULL, TVRec::RecorderThread, recorder);
+
+    VERBOSE(VB_IMPORTANT, "Waiting for recorder to start");
+    while (!recorder->IsRecording() && !recorder->IsErrored())
+        usleep(50);
+    if (recorder->IsRecording())
+        VERBOSE(VB_IMPORTANT, "Recorder to started");
+    else
+        VERBOSE(VB_IMPORTANT, "Error encountered starting recorder");
+    return recorder->IsRecording();
+}
+
+static void load_recording_profile(
+    RecordingProfile &profile,
+    QString &profileName,
+    ProgramInfo *curRecording,
+    int m_capturecardnum)
+{
+    if (curRecording)
+    {
+        profileName = curRecording->
+            GetScheduledRecording()->getProfileName();
+        bool foundProf = false;
+        if (profileName != NULL)
+            foundProf = profile.loadByCard(profileName,
+                                           m_capturecardnum);
+
+        if (!foundProf)
+        {
+            profileName = QString("Default");
+            profile.loadByCard(profileName, m_capturecardnum);
+        }
+    }
+    else
+    {
+        profileName = "Live TV";
+        profile.loadByCard(profileName, m_capturecardnum);
+    }
+
+    QString msg = QString("Using profile '%1' to record").arg(profileName);
+    VERBOSE(VB_RECORD, msg);
+}
+
+static void enable_auto_transcode(RecordingProfile &profile,
+                                  ProgramInfo *curRecording,
+                                  int &autoRunJobs)
+{
+    if (!curRecording)
+        return;
+
+    JobQueue::AddJobsToMask(curRecording->GetAutoRunJobs(), autoRunJobs);
+
+    // Make sure transcoding is OFF if the profile does not allow
+    // AutoTranscoding.
+    Setting *profileAutoTranscode = profile.byName("autotranscode");
+    if ((!profileAutoTranscode) ||
+        (profileAutoTranscode->getValue().toInt() == 0))
+        JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, autoRunJobs);
+
+    if (curRecording->chancommfree)
+        JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
+}
+
+static void enable_realtime_commflag(ProgramInfo *curRecording,
+                                     int &autoRunJobs,
+                                     bool runJobOnHostOnly,
+                                     bool transcodeFirst,
+                                     bool earlyCommFlag)
+{
+    if (!curRecording)
+        return;
+
+    bool autocommflag = JobQueue::JobIsInMask(JOB_COMMFLAG, autoRunJobs) &&
+        earlyCommFlag;
+    bool commflagfirst = JobQueue::JobIsNotInMask(JOB_TRANSCODE, autoRunJobs) ||
+        !transcodeFirst;
+
+    if (autocommflag && commflagfirst)
+    {
+        JobQueue::QueueJob(
+            JOB_COMMFLAG, curRecording->chanid,
+            curRecording->recstartts, "", "",
+            (runJobOnHostOnly) ? gContext->GetHostName() : "",
+            JOB_LIVE_REC);
+
+        JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
+    }
+}
+
+bool TVRec::StartRecorder(bool livetv)
+{
+    prematurelystopped = false;
+
+    RecordingProfile profile;
+    load_recording_profile(profile, profileName, curRecording, m_capturecardnum);
+
+    JobQueue::ClearJobMask(autoRunJobs);
+    if (!livetv)
+        enable_auto_transcode(profile, curRecording, autoRunJobs);
+
+    SetupRecorder(profile);
+    if (IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, "TVRec: Tuning Error -- aborting recording");
+        if (livetv)
+        {
+            QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
+            MythEvent me(message);
+            gContext->dispatch(me);
+        }
+        prematurelystopped = true;
+        TeardownRecorder(true);
+        return false;
+    }
+    return StartRecorderPost(NULL, livetv);
+}
+
+bool TVRec::StartRecorderPost(DummyDTVRecorder *dummyrec, bool livetv)
+{
+    recorder->SetRecording(curRecording);
+    bool ok = true;
+    if (channel)
+        ok = StartChannel(livetv);
+
+#ifdef USING_DVB
+    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+    if (ok && dvbc)
+    {
+        VERBOSE(VB_IMPORTANT, "Waiting for PMT to be set for DVB Recorder");
+        QTime t;
+        t.start();
+        while (!dvbc->IsPMTSet() && t.elapsed() < 10000)
+            usleep(50);
+        ok = dvbc->IsPMTSet();
+    }
+#endif // USING_DVB
+
+    if (dummyrec)
+        delete dummyrec;
+
+    if (ok && !CreateRecorderThread())
+    {
+        VERBOSE(VB_IMPORTANT, "TVRec: Failed to start recorder thread -- "
+                "aborting recording");
+        ok = false;
+    }
+
+    if (ok)
+    {
+#ifdef USING_V4L
+        // Evil
+        if (dynamic_cast<Channel*>(channel))
+            channel->SetFd(recorder->GetVideoFd());
+#endif // USING_V4L
+
+        frameRate = recorder->GetFrameRate();
+
+        // Start up real-time comm flag if we can
+        if (!livetv)
+            enable_realtime_commflag(
+                curRecording, autoRunJobs, runJobOnHostOnly,
+                transcodeFirst, earlyCommFlag);
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "StartRecorderPost() -- failed");
+        if (livetv)
+        {
+            QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
+            MythEvent me(message);
+            gContext->dispatch(me);
+        }
+
+        prematurelystopped = true;
+
+        VERBOSE(VB_RECORD, "StartRecorderPost()::closeRecorder -- begin");
+        TeardownSignalMonitor();
+        TeardownRecorder(true);
+        CloseChannel();
+        VERBOSE(VB_RECORD, "StartRecorderPost()::closeRecorder -- end");
+    }
+
+    return ok;
+}
+
 #define TRANSITION(ASTATE,BSTATE) \
    ((internalState == ASTATE) && (desiredNextState == BSTATE))
 #define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0);
@@ -631,116 +818,8 @@ void TVRec::HandleStateChange(void)
  
     // Handle starting the recorder
     bool livetv = (nextState == kState_WatchingLiveTV);
-    if (startRecorder)
-    {
-        RecordingProfile profile;
-
-        prematurelystopped = false;
-
-        if (curRecording)
-        {
-            profileName = curRecording->
-                GetScheduledRecording()->getProfileName();
-            bool foundProf = false;
-            if (profileName != NULL)
-                foundProf = profile.loadByCard(profileName,
-                                               m_capturecardnum);
-
-            if (!foundProf)
-            {
-                profileName = QString("Default");
-                profile.loadByCard(profileName, m_capturecardnum);
-            }
-        }
-        else
-        {
-            profileName = "Live TV";
-            profile.loadByCard(profileName, m_capturecardnum);
-        }
-
-        QString msg = QString("Using profile '%1' to record").arg(profileName);
-        VERBOSE(VB_RECORD, msg);
-
-        JobQueue::ClearJobMask(autoRunJobs);
-        if (!livetv && curRecording)
-        {
-            JobQueue::AddJobsToMask(curRecording->GetAutoRunJobs(),
-                                    autoRunJobs);
-
-            // Make sure transcoding is OFF if the profile does not allow
-            // AutoTranscoding.
-            Setting *profileAutoTranscode = profile.byName("autotranscode");
-            if ((!profileAutoTranscode) ||
-                (profileAutoTranscode->getValue().toInt() == 0))
-                JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, autoRunJobs);
-
-            if (curRecording->chancommfree)
-                JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
-        }
-
-        bool error = false;
-
-        SetupRecorder(profile);
-        if (IsErrored())
-            error = true;
-
-        if (!error)
-        {
-            recorder->SetRecording(curRecording);
-            if (channel)
-                error = !StartChannel(false);
-
-            if (!error)
-            {
-                pthread_create(&recorder_thread, NULL, RecorderThread, recorder);
-                
-                while (!recorder->IsRecording() && !recorder->IsErrored())
-                    usleep(50);
-            }
-        } 
-        else
-            VERBOSE(VB_IMPORTANT, "Tuning Error -- aborting recording");
-
-        if (!error && recorder->IsRecording())
-        {
-            // evil.
-            if (channel)
-                channel->SetFd(recorder->GetVideoFd());
-            frameRate = recorder->GetFrameRate();
-
-            if (!livetv && curRecording &&
-                (JobQueue::JobIsInMask(JOB_COMMFLAG, autoRunJobs)) &&
-                (earlyCommFlag) &&
-                ((JobQueue::JobIsNotInMask(JOB_TRANSCODE, autoRunJobs)) ||
-                 (!transcodeFirst)))
-            {
-                JobQueue::QueueJob(
-                    JOB_COMMFLAG, curRecording->chanid,
-                    curRecording->recstartts, "", "",
-                    (runJobOnHostOnly) ? gContext->GetHostName() : "",
-                    JOB_LIVE_REC);
-
-                JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
-            }
-        }
-        else
-        {
-            if (error || recorder->IsErrored())
-            {
-                VERBOSE(VB_IMPORTANT, "TVRec: Recording Prematurely Stopped");
-
-                QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
-                MythEvent me(message);
-                gContext->dispatch(me);
-
-                prematurelystopped = true;
-            }
-            FinishedRecording();
-            killRecordingFile = true;
-            closeRecorder = true;
-            SET_LAST();
-        }
-    }
+    if (startRecorder && !StartRecorder(livetv))
+        SET_LAST();
 
     // Handle closing the recorder
     if (closeRecorder)

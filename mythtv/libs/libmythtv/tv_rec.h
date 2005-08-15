@@ -213,6 +213,10 @@ class TVRec
     void CreateSIParser(int num);
     void TeardownSIParser(void);
 
+    bool StartRecorder(bool livetv);
+    bool StartRecorderPost(DummyDTVRecorder *dummyrec, bool livetv);
+    bool CreateRecorderThread();
+    
     void HandleStateChange(void);
     void ChangeState(TVState nextState);
     bool StateIsRecording(TVState state);
