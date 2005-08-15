@@ -4,6 +4,7 @@
 #include <qstring.h>
 #include <qwidget.h>
 
+#include "rom_metadata.h"
 #include "rominfo.h"
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
@@ -27,7 +28,6 @@ class GameHandler
                              QString* Genre, int* Year, QString* Country,
                              QString* CRC32);
 
-    static bool validRom(QString RomName,GameHandler *handler);
     static int buildFileCount(QString directory, GameHandler *handler);
     void buildFileList(QString directory, GameHandler *handler, 
                               MSqlQuery *query, MythProgressDialog *pdial, 

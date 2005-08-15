@@ -17,10 +17,20 @@ QString GameTreeItem::getFillSql() const
     unsigned childDepth = m_depth + 1;
     bool childIsLeaf = childDepth == m_root->getDepth();
     QString childLevel = m_root->getLevel(childDepth - 1);
+    QString columns;
 
-    QString columns = childIsLeaf
+    if ((childLevel == "gamename") && (m_gameShowFileName))
+    {
+        columns = childIsLeaf
+                    ? "romname,system,year,genre,gamename"
+                    : "romname";
+    }
+    else {
+
+        columns = childIsLeaf
                     ? childLevel + ",system,year,genre,gamename"
                     : childLevel;
+    }
 
     QString filter = m_root->getFilter();
     QString conj = "where ";
@@ -59,13 +69,27 @@ QString GameTreeItem::getFillSql() const
 
     filter += conj + " display = 1 ";
 
-    QString sql = "select distinct "
+    QString sql;
+
+    if ((childLevel == "gamename") && (m_gameShowFileName))
+    {   
+        sql = "select distinct "
+                + columns
+                + " from gamemetadata "
+                + filter
+                + " order by romname"
+                + ";";
+    }
+    else 
+    {
+        sql = "select distinct "
                 + columns
                 + " from gamemetadata "
                 + filter
                 + " order by "
                 + childLevel
                 + ";";
+    }
 
     return sql;
 }
@@ -135,6 +159,9 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     }
     else
         systemFilter += ")";
+
+
+//    m_gameShowFileName = gContext->GetSetting("GameShowFileNames").toInt();
 
     //  create a few top level nodes - this could be moved to a config based
     //  approach with multiple roots if/when someone has the time to create
@@ -259,6 +286,8 @@ void GameTree::handleTreeListSelection(int nodeInt, IntVector *)
 
         if (item->isLeaf())
         {
+cerr << "handleTreeListSelection RomCount " << item->getRomInfo()->RomCount() <<  endl;
+
             if (item->getRomInfo()->RomCount() == 1)
                 GameHandler::Launchgame(item->getRomInfo(),NULL);
             else if (item->getRomInfo()->RomCount() > 1)

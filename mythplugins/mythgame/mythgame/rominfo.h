@@ -51,7 +51,7 @@ class RomInfo
     bool FindImage(QString BaseFileName, QString *result);
 
     QString Rompath() const { return rompath; }
-    void setRompath(const QString &lrompath) { romname = lrompath; }
+    void setRompath(const QString &lrompath) { rompath = lrompath; }
 
     QString Romname() const { return romname; }
     void setRomname(const QString &lromname) { romname = lromname; }
@@ -96,6 +96,7 @@ class RomInfo
 
     virtual void setField(QString field, QString data);
     virtual void fillData();
+    virtual void edit_rominfo();
 
   protected:
     QString romname;

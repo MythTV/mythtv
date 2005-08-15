@@ -18,7 +18,7 @@ int romInDB(QString rom, QString gametype)
     QString thequery;
     MSqlQuery query(MSqlQuery::InitCon());
 
-    int romcount = 0;
+    int count = 0;
 
     thequery = QString("SELECT count(*) FROM gamemetadata WHERE gametype = \"%1\" AND romname = \"%2\";")
                         .arg(gametype)
@@ -28,10 +28,10 @@ int romInDB(QString rom, QString gametype)
     if (query.isActive() && query.size() > 0);
     {
         query.next();
-        romcount = query.value(0).toInt();
+        count = query.value(0).toInt();
     };
 
-    return romcount;
+    return count;
 }
 
 
@@ -60,7 +60,6 @@ bool RomInfo::FindImage(QString BaseFileName, QString *result)
     for (QStringList::Iterator i = graphic_formats.begin(); i != graphic_formats.end(); i++)
     {
         *result = BaseFileName + *i;
-        cout << "looking for " << *result << endl;
         if(QFile::exists(*result))
             return true;
     }
@@ -91,6 +90,8 @@ void RomInfo::setField(QString field, QString data)
         gametype = data;
     else if (field == "romcount")
         romcount = data.toInt();
+    else
+        cout << "Error: Invalid field " << field << endl;
 
 }
 
@@ -140,17 +141,17 @@ void RomInfo::fillData()
     {
         query.next();
 
-        system = query.value(0).toString();
-        gamename = query.value(1).toString();
-        genre = query.value(2).toString();
-        year = query.value(3).toInt();
-        romname = query.value(4).toString();
-        favorite = query.value(5).toInt();
-        rompath = query.value(6).toString();
-        country = query.value(7).toString();
-        crc_value = query.value(8).toString();
-        diskcount = query.value(9).toInt();
-        gametype = query.value(10).toString();
+        setSystem(query.value(0).toString());
+        setGamename(query.value(1).toString());
+        setGenre(query.value(2).toString());
+        setYear(query.value(3).toInt());
+        setRomname(query.value(4).toString());
+        setField("favorite",query.value(5).toString());
+        setRompath(query.value(6).toString());
+        setCountry(query.value(7).toString());
+        setCRC_VALUE(query.value(8).toString());
+        setDiskCount(query.value(9).toInt());
+        setGameType(query.value(10).toString());
     }
 
     thequery = "SELECT screenshots FROM gameplayers WHERE playername = \"" + system + "\";";
@@ -160,20 +161,23 @@ void RomInfo::fillData()
     if (query.isActive() && query.size() > 0);
     {
         query.next();
-        QString Image = query.value(0).toString() + "/" + romname;
-        if (FindImage(query.value(0).toString() + "/" + romname, &Image))
-            setImagePath(Image);
-        else
-            setImagePath("");
+        if (query.value(0).toString()) 
+        {
+            QString Image = query.value(0).toString() + "/" + romname;
+            if (FindImage(query.value(0).toString() + "/" + romname, &Image))
+                setImagePath(Image);
+            else
+                setImagePath("");
+        }
     }
 
-    romcount = romInDB(romname,gametype);
+    setRomCount(romInDB(romname,gametype));
 
     // If we have more than one instance of this rom in the DB fill in all
     // systems available to play it.
-    if (romcount > 1) 
+    if (RomCount() > 1) 
     {
-        thequery = "SELECT DISTINCT system FROM gamemetadata WHERE romname = \"" + romname + "\";";
+        thequery = "SELECT DISTINCT system FROM gamemetadata WHERE romname = \"" + Romname() + "\";";
 
         query.exec(thequery);
 
@@ -192,4 +196,8 @@ void RomInfo::fillData()
 
 }
 
+void RomInfo::edit_rominfo()
+{
+    cout << " edit_rominfo() " << endl;
+}
 

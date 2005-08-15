@@ -53,6 +53,7 @@ class GameTreeItem : public QObject
       , m_isFilled(false)
     {
         info_popup = NULL;
+        m_gameShowFileName = gContext->GetSetting("GameShowFileNames").toInt();
     }
 
     ~GameTreeItem()
@@ -83,6 +84,7 @@ class GameTreeItem : public QObject
     RomInfo* m_romInfo;
     unsigned m_depth;
     bool m_isFilled;
+    int m_gameShowFileName;
 };
 
 class GameTree : public MythThemedDialog

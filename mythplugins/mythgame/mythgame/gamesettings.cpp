@@ -57,6 +57,26 @@ static HostCheckBox *GameDeepScan()
     return gc;
 }   
 
+static HostCheckBox *GameRemovalPrompt()
+{
+    HostCheckBox *gc = new HostCheckBox("GameRemovalPrompt");
+    gc->setLabel(QObject::tr("Prompt for removal of deleted rom(s)"));
+    gc->setHelpText(QObject::tr("This enables a prompt for removing"
+                                " deleted roms from the database during a "
+                                " gamescan"));
+    
+    return gc;
+}
+
+static HostCheckBox *GameShowFileNames()
+{  
+    HostCheckBox *gc = new HostCheckBox("GameShowFileNames");
+    gc->setLabel(QObject::tr("Display Files Names in Game Tree"));
+    gc->setHelpText(QObject::tr("Enabling this causes the filenames to be displayed in the game tree rather than the trimmed/looked up gamename"));
+    return gc;
+}   
+
+
 MythGameGeneralSettings::MythGameGeneralSettings()
 {
     VerticalConfigurationGroup *general = new VerticalConfigurationGroup(false);
@@ -64,6 +84,9 @@ MythGameGeneralSettings::MythGameGeneralSettings()
     general->addChild(GameAllTreeLevels());
     general->addChild(GameFavTreeLevels());
     general->addChild(GameDeepScan());
+    general->addChild(GameRemovalPrompt());
+    general->addChild(GameShowFileNames());
+
     addChild(general);
 
 }
@@ -148,7 +171,6 @@ public:
         setHelpText(QObject::tr("Path to any screenshots for this player"));
     };
 };
-
 
 MythGamePlayerSettings::MythGamePlayerSettings()
 {
