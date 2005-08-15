@@ -56,7 +56,6 @@ using namespace std;
 #include "dvbrecorder.h"
 #include "dvbdiseqc.h"
 #include "dvbcam.h"
-#include "dvbsiparser.h"
 
 #if (DVB_API_VERSION_MINOR <= 3 && DVB_API_VERSION_MINOR == 0)
 #    define FE_ATSC       (FE_OFDM+1)
@@ -78,8 +77,7 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     : QObject(NULL, "DVBChannel"), ChannelBase(parent),
       diseqc(NULL), dvbcam(NULL),
       fd_frontend(-1), cardnum(aCardNum), currentTID(-1),
-      first_tune(true), stopTuning(false), siparser(NULL),
-      disable_signal_wait(false), disable_siparser(false)
+      first_tune(true)
 {
     dvbcam = new DVBCam(cardnum);
     bzero(&info, sizeof(info));
@@ -89,13 +87,6 @@ DVBChannel::~DVBChannel()
 {
     Close();
     delete dvbcam;
-}
-
-void *DVBChannel::SpawnSectionReader(void *param)
-{
-    DVBSIParser *siparser = (DVBSIParser *)param;
-    siparser->StartSectionReader();
-    return NULL;
 }
 
 void DVBChannel::Close()
@@ -109,14 +100,6 @@ void DVBChannel::Close()
 
         dvbcam->Stop();
 
-        if (siparser)
-        {
-            siparser->StopSectionReader();
-            pthread_join(siparser_thread, NULL);
-            delete siparser;
-            siparser = NULL;
-        }
-
         if (diseqc)
         {
             delete diseqc;
@@ -125,24 +108,9 @@ void DVBChannel::Close()
     }
 }
 
-void DVBChannel::StopTuning()
-{
-    stopTuning = true;
-}
-
 bool DVBChannel::Open()
 {
     CHANNEL("Opening DVB channel");
-    if (siparser == NULL && !disable_siparser)
-    {
-        // TODO: Rename sections to PMap and have it ONLY pull the ProgramMap
-        siparser = new DVBSIParser(cardnum);
-        pthread_create(&siparser_thread,NULL,SpawnSectionReader, siparser);
-
-        connect(siparser, SIGNAL(UpdatePMT(const PMTObject*)),
-                this, SLOT(SetPMT(const PMTObject*)));
-    }
-
     if (fd_frontend >= 0)
         return true;
 
@@ -204,9 +172,8 @@ bool DVBChannel::TuneMultiplex(uint mplexid)
     CheckOptions();
     CHANNEL(chan_opts.tuning.toString(info.type));
 
-    if (!TuneTransport(chan_opts))
+    if (!TuneTransport(chan_opts, false, 30000))
         return false;
-
 
     CHANNEL(QString("Setting mplexid = %1").arg(mplexid));
     currentTID = mplexid;
@@ -241,18 +208,12 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 
     if (!Tune(chan_opts))
     {
-        ERROR(QString("Tuning for channel #%1 failed.").arg(chan));
+        ERROR(QString("Tuning to frequency for channel %1.").arg(chan));
         return false;
     }
     curchannelname = chan;
 
-    GENERAL(QString("Successfully tuned to channel %1.").arg(chan));
-
-    if (siparser && !chan_opts.pmt.OnAir())
-    {
-        ERROR(QString("Channel #%1 is off air.").arg(chan));
-        return false;
-    }
+    CHANNEL(QString("Tuned to frequency for channel %1.").arg(chan));
 
     inputChannel[currentcapchannel] = curchannelname;
 
@@ -585,25 +546,8 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
     // We are now waiting for a new PMT to forward to Access Control (dvbcam).
     SetPMT(NULL);
 
-    if (!TuneTransport((dvb_channel_t&)(channel), force_reset))
+    if (!TuneTransport((dvb_channel_t&)(channel), force_reset, 30000))
         return false;
-
-    if (siparser)
-    {
-        GENERAL("Multiplex Locked");
-
-        siparser->AddPMT(channel.serviceID);
-
-        // TODO: Pick a more reasonable time here
-        for (int x = 0; x < 3000 ; x++)
-        {
-            if (chan_opts.IsPMTSet())
-                return true;
-            usleep(100);
-        }
-        GENERAL("Timeout Getting PMT");
-        return false;
-    }
 
     CHANNEL("Frequency tuning successful.");
 
@@ -613,17 +557,13 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
 /** \fn DVBChannel::TuneTransport(dvb_channel_t&, bool, int)
  *  \brief Tunes the card to a transport but does not deal with PIDs.
  *
- *   This is used by DVB Channel Scanner, the EIT Parser, and by TVRec.
+ *   This is used internally by DVBChannel.
  *
  *  \param channel Info on transport to tune to
  *  \param all     If true frequency tuning is done even if not strictly needed.
  */
 bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
 {
-
-    if (stopTuning)
-        return false;
-
     DVBTuning& tuning = channel.tuning;
 
     if (fd_frontend < 0)
@@ -672,19 +612,8 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
 #endif
             }
 
-            /* Stop the SIParser.  It will be resumed as soon as a lock is
-               obtained.  For DVB-C/T/S with no Dish Movement it could be
-               immediatly started */
-            if (siparser)
-                siparser->Reset();
-
             if (havetuned == false)
-            {
-                /* Start the SIParser back now that a lock has been obtained */
-                if (siparser)
-                    siparser->FillPMap(channel.sistandard);
                 return true;
-            }
 
             tune = false;
             reset = false;
@@ -692,47 +621,7 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
             CHANNEL("Waiting for frontend event after tune.");
         }
 
-        fe_status_t stat;
-        int timeout = 0;
-        QString status = "Status: ";
-
-        if (!siparser)
-            return true;
-
-        do {
-            if (ioctl(fd_frontend, FE_READ_STATUS, &stat) < 0)
-                perror("FE_READ_STATUS failed");
-            if (fd_frontend < 0)
-                return false;
-            else if (!(timeout % (1000000/TUNER_INTERVAL)))
-            {
-                uint16_t ss;
-                uint16_t snr;
-                uint32_t ber;
-                uint32_t ub;
-                ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &ss);
-                ioctl(fd_frontend, FE_READ_SNR, &snr);
-                ioctl(fd_frontend, FE_READ_BER, &ber);
-                ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &ub);
-                QString msg = QString("DVB signal %1 | snr %2 | ber %3 | unc %4").arg(ss,2,16).arg(snr,2,16).arg(ber,4,16).arg(ub,4,16);
-                GENERAL(msg);
-            }
-
-            if (stat & FE_HAS_LOCK)
-            {
-                status += "LOCK.";
-                GENERAL(status);
-                /* Start the SIParser back now that a lock has been obtained */
-                siparser->FillPMap(channel.sistandard);
-                return true;
-            }
-
-            usleep(TUNER_INTERVAL);
-        } while ((++timeout <= max_tune_timeout_count) && (!stopTuning));
-
-        status += "NO LOCK!";
-        WARNING(status);
-        return false;
+        return true;
     }
 }
 

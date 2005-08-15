@@ -427,10 +427,6 @@ void ScanWizardScanner::scan()
         if (CardUtil::IsDVB(cardid))
             channel = new DVBChannel(device.toInt());
 #endif
-#ifdef DVBCHANNEL_HAS_SIPARSER
-        if (GetDVBChannel())
-            GetDVBChannel()->disable_siparser = true;
-#endif
 #ifdef USING_V4L
         if (nCardType == CardUtil::HDTV)
             channel = new Channel(NULL, device);

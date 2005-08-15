@@ -150,10 +150,6 @@ bool TVRec::Init(void)
 
 #ifdef USING_DVB
         channel = new DVBChannel(videodev.toInt(), this);
-#ifdef DVBCHANNEL_HAS_SIPARSER
-        DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-        dvbc->disable_siparser = true;
-#endif //DVBCHANNEL_HAS_SIPARSER
         channel->Open();
 
         InitChannel(inputname, startchannel);
