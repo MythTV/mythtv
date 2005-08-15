@@ -248,7 +248,7 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 
     GENERAL(QString("Successfully tuned to channel %1.").arg(chan));
 
-    if (!chan_opts.pmt.OnAir())
+    if (siparser && !chan_opts.pmt.OnAir())
     {
         ERROR(QString("Channel #%1 is off air.").arg(chan));
         return false;
@@ -895,6 +895,10 @@ int DVBChannel::GetCardID() const
         return CardUtil::GetCardID(GetDevice());
 }
 
+/** \fn DVBChannel::GetChanID() const
+ *  \brief Returns Channel ID
+ *  \bug This only works if there is only one input on the card.
+ */
 int DVBChannel::GetChanID() const
 {
     int cardid = GetCardID();

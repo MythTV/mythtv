@@ -912,7 +912,9 @@ bool TV::StartRecorder(int maxWait)
         usleep(50);
     if (!recorder->IsRecording() || exitPlayer)
     {
-        VERBOSE(VB_IMPORTANT, "StartRecorder() -- error");
+        if (!exitPlayer)
+            VERBOSE(VB_IMPORTANT, "StartRecorder() -- "
+                    "timed out waiting for recorder to start");
         return false;
     }
 
@@ -1240,6 +1242,14 @@ void TV::RunTV(void)
         stateLock.unlock();
         if (doHandle)
             HandleStateChange();
+
+        if (IsErrored())
+        {
+            VERBOSE(VB_IMPORTANT, "TVPlay: RunTV encountered "
+                    "fatal error, exiting event loop.");
+            runMainLoop = false;
+            continue;
+        }
 
         usleep(1000);
 

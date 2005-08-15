@@ -431,9 +431,6 @@ typedef map<uint16_t, ipack*> pid_ipack_t;
 #define CHANNEL(args...) \
     VERBOSE(VB_CHANNEL, QString("DVB#%1 ").arg(cardnum) << args);
 
-#define RECORD(args...) \
-    VERBOSE(VB_RECORD, QString("DVB#%1 ").arg(cardnum) << args);
-
 #define ERROR_TUNING(args...) \
     VERBOSE(VB_IMPORTANT, QString("DVB ERROR - ")<< args);
 #define WARNING_TUNING(args...) \

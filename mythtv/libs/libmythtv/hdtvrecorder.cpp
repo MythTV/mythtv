@@ -778,14 +778,15 @@ void HDTVRecorder::ProcessVCT(uint /*tsid*/, const VirtualChannelTable *vct)
     }
 
     bool found = false;    
+    VERBOSE(VB_RECORD, QString("Desired channel %1_%2")
+            .arg(StreamData()->DesiredMajorChannel())
+            .arg(StreamData()->DesiredMinorChannel()));
     for (uint i=0; i<vct->ChannelCount(); i++)
     {
         if ((StreamData()->DesiredMajorChannel() == -1 ||
              vct->MajorChannel(i)==(uint)StreamData()->DesiredMajorChannel()) &&
             vct->MinorChannel(i)==(uint)StreamData()->DesiredMinorChannel())
         {
-            VERBOSE(VB_RECORD, QString("***Desired subchannel %1")
-                    .arg(StreamData()->DesiredMinorChannel()));
             if (vct->ProgramNumber(i) != (uint)StreamData()->DesiredProgram())
             {
                 VERBOSE(VB_RECORD, 
@@ -803,10 +804,13 @@ void HDTVRecorder::ProcessVCT(uint /*tsid*/, const VirtualChannelTable *vct)
     if (!found)
     {
         VERBOSE(VB_IMPORTANT, 
-                QString("Desired subchannel %1 not found;"
-                        " using %2 instead")
+                QString("Desired channel %1_%2 not found;"
+                        " using %3_%4 instead.")
+                .arg(StreamData()->DesiredMajorChannel())
                 .arg(StreamData()->DesiredMinorChannel())
+                .arg(vct->MajorChannel(0))
                 .arg(vct->MinorChannel(0)));
+        VERBOSE(VB_IMPORTANT, vct->toString());
         StreamData()->SetDesiredProgram(vct->ProgramNumber(0));
     }
 }
@@ -965,42 +969,4 @@ void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
 #else
     DTVRecorder::ChannelNameChanged(new_chan);
 #endif
-
-    // look up freqid
- 
-    MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("SELECT freqid "
-                               "FROM channel WHERE channum = \"%1\";")
-                              .arg(curChannelName);
-    query.prepare(thequery);
-
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("fetchtuningparamschanid", query);
-    }
-
-    if (query.size() <= 0)
-    {
-        return;
-    }
-    query.next();
-    QString freqid(query.value(0).toString());
-    VERBOSE(VB_RECORD, QString("Setting frequency for startRecording freqid: %1").arg(freqid));
-
-    int desired_channel = -1;
-    int desired_subchannel = DEFAULT_SUBCHANNEL;
-    int pos = freqid.find('-');
-    if (pos != -1) 
-    {
-        desired_channel = -1;
-        desired_subchannel = atoi(freqid.mid(pos+1).ascii());
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, QString("Error: Desired subchannel not "
-                                      "specified in freqid \"%1\", Using %2.")
-                                    .arg(freqid).arg(desired_subchannel));
-    }
-
-    StreamData()->Reset(desired_channel, desired_subchannel);
 }

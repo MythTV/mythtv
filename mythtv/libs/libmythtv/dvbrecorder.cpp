@@ -63,6 +63,23 @@ extern "C" {
 
 const int DVBRecorder::PMT_PID = 0x10;
 
+#define RECORD(args...) \
+    VERBOSE(VB_RECORD, QString("DVB#%1 Rec: ").arg(_card_number_option) << args);
+
+#define RECWARN(args...) \
+    VERBOSE(VB_GENERAL, QString("DVB#%1 Rec: WARNING - ") \
+            .arg(_card_number_option) << args);
+
+#define RECERR(args...) \
+    VERBOSE(VB_IMPORTANT, QString("DVB#%1 Rec: ERROR - ") \
+            .arg(_card_number_option) << args);
+
+#define RECENO(args...) \
+    VERBOSE(VB_IMPORTANT, \
+            QString("DVB#%1 Rec: ERROR - ").arg(_card_number_option) << args << endl\
+            << QString("          (%1) ").arg(errno) << strerror(errno));
+
+
 DVBRecorder::DVBRecorder(DVBChannel* advbchannel): DTVRecorder()
 {
     _stream_fd = -1;
@@ -140,15 +157,13 @@ void DVBRecorder::SetOptionsFromProfile(RecordingProfile*,
 
 void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
 {
+    RECORD("DVBRecorder::ChannelChanged()");
     m_pmt = chan.pmt;
 
     AutoPID();
 
     /* Rev the PMT version since PIDs are changing */
-    if (pmt_version >= 31)
-        pmt_version = 0;
-    else
-        pmt_version++;
+    pmt_version = (pmt_version + 1) & 0x1f;
 
     dvbchannel->SetCAPMT(&m_pmt);
 
@@ -161,23 +176,23 @@ void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
 bool DVBRecorder::Open()
 {
     if (_stream_fd >= 0)
+    {
+        RECWARN("Card already open");
         return true;
+    }
 
     _stream_fd = open(dvbdevice(DVB_DEV_DVR,_card_number_option), O_RDONLY | O_NONBLOCK);
     if (_stream_fd < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("DVB#%1 ERROR - ").arg(_card_number_option)
-                << "Recorder: Failed to open dvb device"
-                << endl << QString("          (%1) ").arg(errno) << strerror(errno));
+        RECENO("Failed to open DVB device");
         return false;
     }
 
     connect(dvbchannel, SIGNAL(ChannelChanged(dvb_channel_t&)),
             this, SLOT(ChannelChanged(dvb_channel_t&)));
 
-    VERBOSE(VB_GENERAL, QString("DVB#%1 Recorder: Card opened successfully (using %2 mode).")
-                        .arg(_card_number_option)
-                        .arg(_record_transport_stream_option ? "TS" : "PS"));
+    RECORD(QString("Card opened successfully (using %1 mode).")
+           .arg(_record_transport_stream_option ? "TS" : "PS"));
 
     dvbchannel->RecorderStarted();
 
@@ -189,7 +204,7 @@ void DVBRecorder::Close()
     if (_stream_fd < 0)
         return;
 
-    VERBOSE(VB_ALL, "Closing DVB recorder");
+    RECORD("Closing DVB recorder");
 
     CloseFilters();
 
@@ -220,11 +235,10 @@ void DVBRecorder::CloseFilters()
 
 void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_type)
 {
-    int cardnum = _card_number_option;
     RECORD(QString("Adding pid %1 (0x%2)").arg(pid).arg((int)pid,0,16));
 
     if (pid < 0x10 || pid > 0x1fff)
-        WARNING(QString("PID value (%1) is outside DVB specification.\n"
+        RECWARN(QString("PID value (%1) is outside DVB specification.\n"
                         "\t\t\tPerhaps this is an ATSC stream?").arg(pid));
 
     struct dmx_pes_filter_params params;
@@ -239,7 +253,7 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_typ
 
     if (fd_tmp < 0)
     {
-        ERRNO(QString("Could not open demux device."));
+        RECENO(QString("Could not open demux device."));
         return;
     }
 
@@ -247,7 +261,7 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_typ
     {
         close(fd_tmp);
 
-        ERRNO(QString("Failed to set demux filter."));
+        RECENO(QString("Failed to set demux filter."));
         return;
     }
 
@@ -262,7 +276,7 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_typ
         ipack* ip = (ipack*)malloc(sizeof(ipack));
         if (ip == NULL)
         {
-            ERROR(QString("Failed to allocate ipack."));
+            RECERR(QString("Failed to allocate ipack."));
             return;
         }
 
@@ -303,9 +317,8 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_typ
     _continuity_count[pid] = 16;
 }
 
-void DVBRecorder::SetDemuxFilters()
+bool DVBRecorder::SetDemuxFilters()
 {
-
     CloseFilters();
 
     _continuity_count.clear();
@@ -373,12 +386,11 @@ void DVBRecorder::SetDemuxFilters()
 
 
     if (_pid_filters.size() == 0 && pid_ipack.size() == 0)
-    {
-        VERBOSE(VB_IMPORTANT, QString("DVB#%1 ERROR - ").arg(_card_number_option)
-                << "No PIDS set, please correct your channel setup.");
-        _error = true;
-        return;
+    {        
+        RECWARN("Recording will not commence until a PID is set.");
+        return false;
     }
+    return true;
 }
 
 /*
@@ -386,8 +398,6 @@ void DVBRecorder::SetDemuxFilters()
  */
 void DVBRecorder::AutoPID()
 {
-    int cardnum = _card_number_option;
-
     isVideo.clear();
 
     RECORD(QString("AutoPID for ServiceID=%1, PCRPID=%2 (0x%3)")
@@ -524,7 +534,6 @@ void DVBRecorder::AutoPID()
 
 void DVBRecorder::StartRecording()
 {
-    int cardnum = _card_number_option;
     if (!Open())
     {
         _error = true;
@@ -552,11 +561,12 @@ void DVBRecorder::StartRecording()
     {
         if (_reset_pid_filters)
         {
-            SetDemuxFilters();
-            if (_error)
-                break;
-            CreatePAT(pat_pkt);
-            CreatePMT(pmt_pkt);
+            RECORD("Resetting Demux Filters");
+            if (SetDemuxFilters())
+            {
+                CreatePAT(pat_pkt);
+                CreatePMT(pmt_pkt);
+            }
             _reset_pid_filters = false;
         }
 
@@ -580,7 +590,7 @@ void DVBRecorder::StartRecording()
 
         if (ret == 0)
         {
-            WARNING("No data from card in 1 second.");
+            RECWARN("No data from card in 1 second.");
         }
         else if (ret == 1 && polls.revents & POLLIN)
         {
@@ -588,7 +598,7 @@ void DVBRecorder::StartRecording()
                 ReadFromDMX();
         }
         else if ((ret < 0) || (ret == 1 && polls.revents & POLLERR))
-            ERRNO("Poll failed while waiting for data.");
+            RECENO("Poll failed while waiting for data.");
     }
 
     Close();
@@ -618,14 +628,14 @@ void DVBRecorder::ReadFromDMX()
 
             if (errno == EAGAIN)
                 break;
-            ERRNO("Error reading from DVB device.");
+            RECENO("Error reading from DVB device.");
             break;
         } else if (readsz == 0)
             break;
 
         if (readsz % MPEG_TS_PKT_SIZE)
         {
-            ERROR("Incomplete packet received.");
+            RECERR("Incomplete packet received.");
             readsz = readsz - (readsz % MPEG_TS_PKT_SIZE);
         }
 
@@ -651,7 +661,7 @@ void DVBRecorder::ReadFromDMX()
 
             if (pktbuf[1] & 0x80)
             {
-                VERBOSE(VB_CHANNEL,"Uncorrectable error in packet, dropped.");
+                RECORD("Packet dropped due to uncorrectable error.");
                 ++_bad_packet_count;
                 continue;
             }
@@ -683,7 +693,6 @@ void DVBRecorder::ReadFromDMX()
 
                 if (_continuity_count[pid] != cc)
                 {
-                    VERBOSE(VB_CHANNEL,"Transport Stream Continuity Error. PID = " << pid );
                     RECORD(QString("PID %1 _continuity_count %2 cc %3")
                            .arg(pid).arg(_continuity_count[pid]).arg(cc));
                     _continuity_count[pid] = cc;

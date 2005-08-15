@@ -55,7 +55,7 @@ private:
 
     void CloseFilters();
     void OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_type);
-    void SetDemuxFilters();
+    bool SetDemuxFilters();
     void AutoPID();
 
     void CreatePAT(uint8_t *ts_packet);

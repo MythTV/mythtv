@@ -81,9 +81,11 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     DVB_IO(FE_READ_UNCORRECTED_BLOCKS, &stats.ub,
            "Warning, can not count Uncorrected Blocks", kDVBSigMon_WaitForUB);
     DVB_IO(FE_READ_STATUS, &stats.status, "Error, can not read status!", 0);
-    AddFlags(newflags);
-    cerr<<"newflags: "<<newflags<<endl;
 #undef DVB_IO
+    AddFlags(newflags);
+    VERBOSE(VB_CHANNEL,
+            QString("DVBSignalMonitor: initial flags 0x%1")
+            .arg(newflags,0,16));
 }
 
 /** \fn DVBSignalMonitor::~DVBSignalMonitor()
