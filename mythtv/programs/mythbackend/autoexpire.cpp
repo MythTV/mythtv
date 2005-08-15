@@ -419,11 +419,17 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
         query.prepare(querystr);
 
+        if (!query.exec() || !query.isActive())
+	{
+            MythContext::DBError("AutoExpire query failed!", query);
+            continue;
+	}
+
         VERBOSE(VB_FILE, QString("Found %1 episodes in recording profile %2 "
                                  "using max expiration")
                                  .arg(query.numRowsAffected())
                                  .arg(maxIter.key()));
-        if (query.exec() && query.isActive() && query.size() > 0)
+        if (query.size() > 0)
         {
             int found = 0;
             while (query.next())
