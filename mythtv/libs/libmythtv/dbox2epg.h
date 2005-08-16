@@ -7,9 +7,13 @@
 #ifndef DBOX2EPG_H_
 #define DBOX2EPG_H_
 
-#include "qhttp.h"
+#include <map>
+using namespace std;
+
+#include <qhttp.h>
 #include <qobject.h>
 #include <qthread.h>
+
 #include "mythcontext.h"
 #include "tv_rec.h"
 #include "dbox2channel.h"

@@ -8,6 +8,9 @@
 #ifndef DBOX2CHANNEL_H
 #define DBOX2CHANNEL_H
 
+#include <map>
+using namespace std;
+
 #include <qstring.h>
 #include <stdint.h>
 #include "tv_rec.h"
