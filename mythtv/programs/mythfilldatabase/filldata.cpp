@@ -2818,7 +2818,8 @@ bool fillData(QValueList<Source> &sourcelist)
                  xmltv_grabber == "tv_grab_de_tvtoday" ||
                  xmltv_grabber == "tv_grab_be_tvb" ||
                  xmltv_grabber == "tv_grab_be_tlm" ||
-                 xmltv_grabber == "tv_grab_is")
+                 xmltv_grabber == "tv_grab_is" ||
+                 xmltv_grabber == "tv_grab_br")
         {
             if (xmltv_grabber == "tv_grab_no")
                 listing_wrap_offset = 6 * 3600;

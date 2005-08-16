@@ -231,6 +231,26 @@
         <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
         <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
 
+        <!-- Categories introduced by tv_grab_br -->
+        <catcolor category="Educativo" color="CornflowerBlue"></catcolor>
+        <catcolor category="Infantil" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Desenho" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Juvenil" color="SlateBlue"></catcolor>
+        <catcolor category="Religião" color="goldenrod"></catcolor>
+        <catcolor category="Esportivo" color="DarkCyan"></catcolor>
+        <catcolor category="Competição" color="DarkCyan"></catcolor>
+        <catcolor category="Futebol" color="DarkCyan"></catcolor>
+        <catcolor category="Cinema" color="Blue"></catcolor>
+        <catcolor category="Drama" color="rosybrown3"></catcolor>
+        <catcolor category="Ação" color="maroon"></catcolor>
+        <catcolor category="Humor" color="DarkOrchid"></catcolor>
+        <catcolor category="Suspense" color="SlateGrey"></catcolor>
+        <catcolor category="Informativo" color="DarkOrange3"></catcolor>
+        <catcolor category="Política" color="DarkOrange3"></catcolor>
+        <catcolor category="Musical" color="turquoise3"></catcolor>
+        <catcolor category="Ecologia" color="ForestGreen"></catcolor>
+        <catcolor category="Novela" color="MediumTurquoise"></catcolor>
+
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
         <recordstatus type="ChannelRecord" image="gg-rs-channel.png"></recordstatus>
@@ -514,6 +534,25 @@
         <catcolor category="社会・報道" color="DarkOrange3"></catcolor>
         <catcolor category="趣味・暮らし" color="goldenrod"></catcolor>
 
+        <!-- Categories introduced by tv_grab_br -->
+        <catcolor category="Educativo" color="CornflowerBlue"></catcolor>
+        <catcolor category="Infantil" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Desenho" color="MediumSlateBlue"></catcolor>
+        <catcolor category="Juvenil" color="SlateBlue"></catcolor>
+        <catcolor category="Religião" color="goldenrod"></catcolor>
+        <catcolor category="Esportivo" color="DarkCyan"></catcolor>
+        <catcolor category="Competição" color="DarkCyan"></catcolor>
+        <catcolor category="Futebol" color="DarkCyan"></catcolor>
+        <catcolor category="Cinema" color="Blue"></catcolor>
+        <catcolor category="Drama" color="rosybrown3"></catcolor>
+        <catcolor category="Ação" color="maroon"></catcolor>
+        <catcolor category="Humor" color="DarkOrchid"></catcolor>
+        <catcolor category="Suspense" color="SlateGrey"></catcolor>
+        <catcolor category="Informativo" color="DarkOrange3"></catcolor>
+        <catcolor category="Política" color="DarkOrange3"></catcolor>
+        <catcolor category="Musical" color="turquoise3"></catcolor>
+        <catcolor category="Ecologia" color="ForestGreen"></catcolor>
+        <catcolor category="Novela" color="MediumTurquoise"></catcolor>
 
         <recordstatus type="SingleRecord" image="gg-rs-single.png"></recordstatus>
         <recordstatus type="TimeslotRecord" image="gg-rs-timeslot.png"></recordstatus>
