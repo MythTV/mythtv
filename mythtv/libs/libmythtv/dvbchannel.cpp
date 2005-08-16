@@ -65,9 +65,6 @@ using namespace std;
 #    define VSB_16        (QAM_AUTO+2)
 #endif
 
-//Timeout between checking for a tuning lock micro seconds
-#define TUNER_INTERVAL 300000
-
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
  *
@@ -562,7 +559,7 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
  *  \param channel Info on transport to tune to
  *  \param all     If true frequency tuning is done even if not strictly needed.
  */
-bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
+bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int)
 {
     DVBTuning& tuning = channel.tuning;
 
@@ -575,8 +572,6 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int timeout)
     bool reset      = false;
     bool havetuned  = false;
     bool tune       = true;
-
-    int max_tune_timeout_count = (timeout*1000)/TUNER_INTERVAL;
 
     if (all == true)
         first_tune = true;
