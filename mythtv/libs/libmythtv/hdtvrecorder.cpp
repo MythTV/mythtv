@@ -803,8 +803,8 @@ void HDTVRecorder::ProcessVCT(uint /*tsid*/, const VirtualChannelTable *vct)
                 // Do a (partial?) reset here if old desired
                 // program is not 0?
                 StreamData()->SetDesiredProgram(vct->ProgramNumber(i));
-                found = true;
             }
+            found = true;
         }
     }
     if (!found)
