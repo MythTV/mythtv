@@ -1,9 +1,5 @@
 // -*- Mode: c++ -*-
 
-#include <iostream>
-#include <cstdio>
-#include <cstdlib>
-#include <cerrno>
 #include <ctime>
 
 #include <fcntl.h>
@@ -24,15 +20,14 @@
 /** \class DummyDTVRecorder
     \brief Outputs a dummy mpeg stream to a RingBuffer
 
-\TODO DummyDTVRecorder does not yet implement pes streams, only ts streams
+\TODO DummyDTVRecorder does not yet implement PS streams, only TS streams
 
 \code
 To create a program stream video try something like:
   convert /tmp/hello_world.png ppm:- | \
           ppmtoy4m -n15 -F30000:1001 -A10:11 -I p -r | \
           mpeg2enc -c -n n -f3 -b8000 -a3 --no-constraints -o /tmp/tmp.es
-          mplex -f3 -b8000 --no-constaints -L48000:1:8 -o /tmp/tmp.ps /tmp/tmp.es
-
+  mplex -f3 -b8000 --no-constaints -L48000:1:8 -o /tmp/tmp.ps /tmp/tmp.es
 
 To convert this to a transport stream try something like:
   vlc /tmp/tmp.es --sout \
@@ -113,7 +108,7 @@ void DummyDTVRecorder::StartRecording(void)
 
         if (len == 0)
         {
-            VERBOSE(VB_IMPORTANT, QString("Restart! Frames seen %1")
+            VERBOSE(VB_RECORD, QString("DummyRec: Restart! Frames seen %1")
                     .arg(_frames_seen_count));
             lseek(_stream_fd, 0, SEEK_SET);
             continue;
@@ -140,16 +135,19 @@ void DummyDTVRecorder::StartRecording(void)
  */
 bool DummyDTVRecorder::Open(void)
 {
-    QString filename = QString("%1dummy%2x%3a%4.%5")
-        .arg(gContext->GetShareDir()+"videos/")
+    SetFrameRate(_desired_frame_rate);
+
+    QString p = gContext->GetThemesParentDir();
+    QString path[] =
+        { p+gContext->GetSetting("Theme", "G.A.N.T.")+"/", p+"default/", };
+    QString filename = QString("dummy%1x%2a%3.%4")
         .arg(_desired_width).arg(_desired_height)
         .arg(_desired_frame_rate, 0, 'f', 2)
         .arg(_tsmode ? "ts" : "pes");
 
-    VERBOSE(VB_IMPORTANT, "Opening: "<<filename);
-
-    SetFrameRate(_desired_frame_rate);
-    _stream_fd = open(filename.ascii(), O_RDONLY);
+    _stream_fd = open(path[0]+filename.ascii(), O_RDONLY);
+    if (_stream_fd < 0)
+        _stream_fd = open(path[1]+filename.ascii(), O_RDONLY);
 
     return _stream_fd >= 0;
 }
@@ -171,7 +169,7 @@ static void delay_to_trigger(const struct timeval &trig, bool &cont)
     usec = max(usec, 0);
     int usec_f = usec / 5000;
     int usec_r = usec % 5000;
-    cerr<<"usec: "<<usec<<" ("<<usec_f<<":"<<usec_r<<")"<<endl;
+    //cerr<<"usec: "<<usec<<" ("<<usec_f<<":"<<usec_r<<")"<<endl;
     usleep(usec_r);
     for (int i=0; i<usec_f && cont; i++)
         usleep(5000);
