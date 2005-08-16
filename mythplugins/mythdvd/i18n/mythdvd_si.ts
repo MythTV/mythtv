@@ -76,7 +76,7 @@ Nimate definirane DVC naprave.</translation>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 Nimate definiranega ukaza DVD predvajalnika.</translation>
     </message>
@@ -292,6 +292,14 @@ Nimate definirane DVD naprave.</translation>
         <source>Display mythdvd menu</source>
         <translation>Prikaži MythDvd menu</translation>
     </message>
+    <message>
+        <source>ISO copy of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for access to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -373,6 +381,10 @@ Nimate definirane DVD naprave.</translation>
     <message>
         <source>0 Process Selected Titles</source>
         <translation>0  Procesiraj izbrane naslove</translation>
+    </message>
+    <message>
+        <source>ISO Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

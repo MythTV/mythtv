@@ -1065,11 +1065,15 @@ No disposa de les taules de MythMusic en la seva Base de Dades.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <source>CD: %1 ~ %2 - %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>CD: %1 ~ %2 - %3</source>
+        <source>Track %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1146,6 +1150,14 @@ No disposa de les taules de MythMusic en la seva Base de Dades.</translation>
     <message>
         <source>Length</source>
         <translation type="unfinished">Duració</translation>
+    </message>
+    <message>
+        <source>Quality: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

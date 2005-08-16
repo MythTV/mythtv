@@ -200,10 +200,6 @@
         <translation>Hvis aktivert vil forhåndsvisningensbildene beholde det opprinnelige lengde/bredde-forholdet. Hvis dette ikke er aktivert, skaleres de for å passe bakgrunnsikonets størrelse.</translation>
     </message>
     <message>
-        <source>General Settings</source>
-        <translation type="obsolete">Generelle innstillinger</translation>
-    </message>
-    <message>
         <source>Video Manager</source>
         <translation>Videobehandler</translation>
     </message>
@@ -245,32 +241,28 @@
         <translation>Det finnes en filmplakat for denne filmen, men Myth kunne ikke laste den ned innenfor en fornuftig tidsramme.</translation>
     </message>
     <message>
-        <source>videos</source>
-        <translation type="obsolete">videoer</translation>
-    </message>
-    <message>
         <source>Video Browser browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>Bla-modus blar i filer</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette gjør at bla-modus viser alle relevante filer i MythVideos startkatalog, selv om de ikke er indeksert.</translation>
     </message>
     <message>
         <source>Video Gallery browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>Videogalleri blar i filer</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dette gjør at videogallerivisningen viser alle relevante filer i MythVideos startkatalog, selv om de ikke er indeksert.</translation>
     </message>
     <message>
         <source>General Settings (1/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Generelle innstillinger (1/2)</translation>
     </message>
     <message>
         <source>General Settings (2/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Generelle innstillinger (2/2)</translation>
     </message>
 </context>
 <context>
@@ -485,7 +477,7 @@
     </message>
     <message>
         <source>Aucune video</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen video</translation>
     </message>
 </context>
 <context>
@@ -600,14 +592,6 @@
         <translation>Filtrer visning</translation>
     </message>
     <message>
-        <source>Plain View</source>
-        <translation type="obsolete">Enkel visning</translation>
-    </message>
-    <message>
-        <source>Folder View</source>
-        <translation type="obsolete">Katalogvisning</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -703,10 +687,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>Forelder-kode:</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation type="obsolete">Ingen filer funnet</translation>
     </message>
     <message>
         <source>Select action</source>

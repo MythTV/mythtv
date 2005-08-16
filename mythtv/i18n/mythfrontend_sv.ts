@@ -308,6 +308,10 @@
         <source>&lt;New rule&gt;</source>
         <translation>&lt;Ny regel&gt;</translation>
     </message>
+    <message>
+        <source>First Episodes (complete example for Data Direct)</source>
+        <translation>Första avsnitt (komplett exempel för Data Direct)</translation>
+    </message>
 </context>
 <context>
     <name>DVBTransportsEditor</name>
@@ -516,7 +520,7 @@
         <source>The theme you are using is missing &apos;file_browser_background&apos; element. 
 
 Returning to previous menu.</source>
-        <translation>Temat du använder saknar &apos;file_browser_background&apos;-elementet.
+        <translation type="obsolete">Temat du använder saknar &apos;file_browser_background&apos;-elementet.
 
 Återvänder till föregående meny.</translation>
     </message>
@@ -528,9 +532,21 @@ Returning to previous menu.</source>
         <source>The theme you are using is missing &apos;file_browser&apos; element. 
 
 Returning to previous menu.</source>
-        <translation>Temat du använder saknar &apos;file_browser&apos;-elementet.
+        <translation type="obsolete">Temat du använder saknar &apos;file_browser&apos;-elementet.
 
 Återvänder till föregående meny.</translation>
+    </message>
+    <message>
+        <source>The theme you are using is missing the &apos;file_browser_background&apos; element. 
+
+Returning to the previous menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The theme you are using is missing the &apos;file_browser&apos; element. 
+
+Returning to the previous menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -561,13 +577,19 @@ Returning to previous menu.</source>
         <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;
 
 Returning to previous menu.</source>
-        <translation>Hittade inte &apos;%1&apos; i tema &apos;%2&apos;
+        <translation type="obsolete">Hittade inte &apos;%1&apos; i tema &apos;%2&apos;
 
 Återvänder till föregående meny.</translation>
     </message>
     <message>
         <source>Missing UI Element</source>
         <translation>UI-element saknas</translation>
+    </message>
+    <message>
+        <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;.
+
+Returning to the previous menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1168,6 +1190,10 @@ Returning to previous menu.</source>
         <source>(Any Station)</source>
         <translation>(Alla kanaler)</translation>
     </message>
+    <message>
+        <source>Premieres</source>
+        <translation>Premiärer</translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -1461,14 +1487,6 @@ Returning to previous menu.</source>
     <message>
         <source>Oldest Show First</source>
         <translation>Äldst program först</translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation>Metod som används för att bestämma vilka inspelningar som raderas först.</translation>
-    </message>
-    <message>
-        <source>Auto-Expire Default</source>
-        <translation>Autoradering påslaget som standard</translation>
     </message>
     <message>
         <source>New Recording Free Disk Space Threshold (in Megabytes)</source>
@@ -2761,7 +2779,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation>Normalt börjar inte inspelning från DVB förrän en startrubrik hittas. Denna inställning avaktiverar detta.</translation>
+        <translation type="obsolete">Normalt börjar inte inspelning från DVB förrän en startrubrik hittas. Denna inställning avaktiverar detta.</translation>
     </message>
     <message>
         <source>Per PID driver buffer size</source>
@@ -3364,10 +3382,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Text-TV</translation>
     </message>
     <message>
-        <source>CC/TXT disabled</source>
-        <translation>Textning/Text-TV avaktiverad</translation>
-    </message>
-    <message>
         <source>minutes</source>
         <translation>minuter</translation>
     </message>
@@ -3633,7 +3647,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
-        <translation>Ett kommando som ska exekveras innan inspelningsservern stängs ner. Returvärdet avgör om nedstängningen ska fortsätta: 0 - ja, 1 - försök senare, 2 - vänta på uppspelningsklient</translation>
+        <translation type="obsolete">Ett kommando som ska exekveras innan inspelningsservern stängs ner. Returvärdet avgör om nedstängningen ska fortsätta: 0 - ja, 1 - försök senare, 2 - vänta på uppspelningsklient</translation>
     </message>
     <message>
         <source>Startup command</source>
@@ -4521,7 +4535,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Re-record programs which have been automatically expired</source>
-        <translation>Återinspela program som har tagits bort automatiskt</translation>
+        <translation type="obsolete">Återinspela program som har tagits bort automatiskt</translation>
     </message>
     <message>
         <source>Scale video as necessary</source>
@@ -5095,7 +5109,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation>Avaktiverar konvertering av transportström (TS) till programström (PS) vilket resulterar i något större filer men minskar risken för bearbetningsfel.</translation>
+        <translation type="obsolete">Avaktiverar konvertering av transportström (TS) till programström (PS) vilket resulterar i något större filer men minskar risken för bearbetningsfel.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
@@ -5783,7 +5797,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>If set, programs that are automatically deleted (expired) will be allowed to be re-recorded if they are shown again.</source>
-        <translation>Tillåt program som tas bort automatiskt av funktionen autoradera att bli återinspelade om de visas igen.</translation>
+        <translation type="obsolete">Tillåt program som tas bort automatiskt av funktionen autoradera att bli återinspelade om de visas igen.</translation>
     </message>
     <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
@@ -5873,7 +5887,7 @@ VARNING: Detta val avaktiverar XvMC-videoutmatning.</translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat</source>
-        <translation>Sätt på LCD-hjärtslag</translation>
+        <translation type="obsolete">Sätt på LCD-hjärtslag</translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information.</source>
@@ -6018,14 +6032,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>Detta är det förvalda värdet för inställningen &apos;Kör Användarjobb #%1&apos; när en ny schemalagd inspelning skapas.</translation>
     </message>
     <message>
-        <source>Auto Expire Enabled</source>
-        <translation>Autoradering aktiverad</translation>
-    </message>
-    <message>
-        <source>When enabled, old programs will be deleted to make space for new ones.</source>
-        <translation>Ta bort gamla program för att skapa utrymme för nya.</translation>
-    </message>
-    <message>
         <source>Extra Disk Space (in Gigabytes)</source>
         <translation>Extra diskutrymme (i Gigabyte)</translation>
     </message>
@@ -6155,7 +6161,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Enables the use of viaXvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
-        <translation>Aktiverar den hårdvaruaccelererade MPEG-avkodning som finns i Via Unichrome chipsetet.  </translation>
+        <translation type="obsolete">Aktiverar den hårdvaruaccelererade MPEG-avkodning som finns i Via Unichrome chipsetet.  </translation>
     </message>
     <message>
         <source>Do you want to fix these problems?</source>
@@ -6295,6 +6301,127 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Program #%1 not found in PAT!</source>
+        <translation>Program #%1 hittades inte i PAT!</translation>
+    </message>
+    <message>
+        <source>CC/TXT enabled</source>
+        <translation>Textning/Text-TV aktiverad</translation>
+    </message>
+    <message>
+        <source>Underscore (5_1)</source>
+        <translation>Understrykning (5_1)</translation>
+    </message>
+    <message>
+        <source>None (51)</source>
+        <translation>Ingen (51)</translation>
+    </message>
+    <message>
+        <source>Minus (5-1)</source>
+        <translation>Minus (5-1)</translation>
+    </message>
+    <message>
+        <source>Zero (501)</source>
+        <translation>Noll (501)</translation>
+    </message>
+    <message>
+        <source>Channel Seperator</source>
+        <translation type="obsolete">Kanalseparator</translation>
+    </message>
+    <message>
+        <source>What to use to separate ATSC major and minor channels.</source>
+        <translation>Tecken som används för att separera ATSC huvud- och underkanaler.</translation>
+    </message>
+    <message>
+        <source>Time Stretch</source>
+        <translation>Tempo</translation>
+    </message>
+    <message>
+        <source>Default time stretch %1</source>
+        <translation>Förvalt tempo %1</translation>
+    </message>
+    <message>
+        <source>Method used to determine which recorded shows to delete first. Set to &apos;None&apos; to disable Auto Expire (not recommended).</source>
+        <translation>Metod som används för att bestämma vilka inspelningar som raderas först. Sätt till &apos;Ingen&apos; för att avaktivera Autoradera (rekommenderas ej).</translation>
+    </message>
+    <message>
+        <source>Auto Expire Default</source>
+        <translation>Autoradering påslaget som standard</translation>
+    </message>
+    <message>
+        <source>Re-Record</source>
+        <translation>Återinspela</translation>
+    </message>
+    <message>
+        <source>V</source>
+        <comment>RecStatusChar rsNeverRecord</comment>
+        <translation>V</translation>
+    </message>
+    <message>
+        <source>Never Record</source>
+        <translation>Spela aldrig in</translation>
+    </message>
+    <message>
+        <source>it was marked to never be recorded.</source>
+        <translation>den manuellt sattes till att inte spela in.</translation>
+    </message>
+    <message>
+        <source>Status: </source>
+        <translation>Status: </translation>
+    </message>
+    <message>
+        <source>Cable-HRC</source>
+        <translation>Kabel-HRC</translation>
+    </message>
+    <message>
+        <source>Channel Separator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk of processing errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 Streaming Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 streaming port on your DBOX2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 HTTP Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 http port on your DBOX2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 Host IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 Host IP is the remote device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the LCD heartbeat.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6806,10 +6933,6 @@ Inga andra detaljer</translation>
         <translation>(REC)</translation>
     </message>
     <message>
-        <source>Auto-Skip Pre-Notify</source>
-        <translation>Meddela innan</translation>
-    </message>
-    <message>
         <source>Audio track</source>
         <translation>Ljudspår</translation>
     </message>
@@ -6923,7 +7046,19 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Next Audio Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Nästa ljudspår</translation>
+    </message>
+    <message>
+        <source>Channel Lock</source>
+        <translation>Kanallås</translation>
+    </message>
+    <message>
+        <source>Signal Lock</source>
+        <translation>Signallås</translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation>Inget lås</translation>
     </message>
 </context>
 <context>

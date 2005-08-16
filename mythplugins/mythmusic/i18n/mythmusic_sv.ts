@@ -861,14 +861,18 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>?</translation>
     </message>
     <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation>Den ordning som trädet för musikval sorteras i. Möjliga värden är:
-* Mellanslagsseparerad lista med &apos;genre&apos;, &apos;splitartist&apos;, &apos;artist&apos;, &apos;album&apos; och &apos;title&apos;
-* &apos;directory&apos; (=katalog), vilket betyder att trädet speglar den faktiska katalogstrukturen.</translation>
-    </message>
-    <message>
         <source>CD: %1 ~ %2 - %3</source>
         <translation>CD: %1 ~ %2 - %3</translation>
+    </message>
+    <message>
+        <source>Track %1</source>
+        <translation>Spår %1</translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation>Den ordning som trädet för musikval sorteras i. Möjliga värden är:
+* Mellanslagsseparerad lista med &apos;genre&apos;, &apos;splitartist&apos;, &apos;splitartist1&apos;, &apos;artist&apos;, &apos;album&apos; och &apos;title&apos;
+* &apos;directory&apos; (=katalog), vilket betyder att trädet speglar den faktiska katalogstrukturen.</translation>
     </message>
 </context>
 <context>
@@ -912,7 +916,7 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Importing CD:
 </source>
-        <translation>Importing CD:
+        <translation>Importerar CD:
 </translation>
     </message>
     <message>
@@ -944,6 +948,14 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Length</source>
         <translation>Längd</translation>
+    </message>
+    <message>
+        <source>Quality: </source>
+        <translation>Kvalitet: </translation>
+    </message>
+    <message>
+        <source>Importing </source>
+        <translation>Importerar </translation>
     </message>
 </context>
 <context>

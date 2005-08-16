@@ -76,7 +76,7 @@ Vous n&apos;avez pas défini de périphérique VCD.</translation>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 Vous n&apos;avez pas défini de commande pour le lecteur DVD.</translation>
     </message>
@@ -292,6 +292,14 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
         <source>Display mythdvd menu</source>
         <translation>Affiche le menu mythdvd</translation>
     </message>
+    <message>
+        <source>ISO copy of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for access to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -373,6 +381,10 @@ Vous n&apos;avez pas défini de périphérique DVD.</translation>
     <message>
         <source>0 Process Selected Titles</source>
         <translation>0 Encoder les titres sélectionnés</translation>
+    </message>
+    <message>
+        <source>ISO Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

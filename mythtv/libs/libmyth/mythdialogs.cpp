@@ -1588,8 +1588,8 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
     if (!theme->LoadTheme(xmldata, window_name, theme_filename))
     {
         QString msg = 
-            QString(tr("Could not locate '%1' in theme '%2'"
-                       "\n\nReturning to previous menu."))
+            QString(tr("Could not locate '%1' in theme '%2'."
+                       "\n\nReturning to the previous menu."))
             .arg(window_name).arg(theme_filename);
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("Missing UI Element"), msg);
@@ -2651,8 +2651,9 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     else
     {
         QString msg = 
-            QString(tr("The theme you are using is missing 'file_browser_background' "
-                       "element. \n\nReturning to previous menu."));
+            QString(tr("The theme you are using is missing the "
+                       "'file_browser_background' "
+                       "element. \n\nReturning to the previous menu."));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("Missing UI Element"), msg);
         done(-1);
@@ -2685,8 +2686,9 @@ MythImageFileDialog::MythImageFileDialog(QString *result,
     else
     { 
         QString msg = 
-            QString(tr("The theme you are using is missing 'file_browser' element. "
-                       "\n\nReturning to previous menu."));
+            QString(tr("The theme you are using is missing the "
+                       "'file_browser' element. "
+                       "\n\nReturning to the previous menu."));
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
                                   tr("Missing UI Element"), msg);
         done(-1);

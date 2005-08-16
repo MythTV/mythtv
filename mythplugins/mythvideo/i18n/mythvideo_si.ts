@@ -197,7 +197,7 @@
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Splošne nastavitve</translation>
+        <translation type="obsolete">Splošne nastavitve</translation>
     </message>
     <message>
         <source>Video Manager</source>
@@ -246,7 +246,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>videos</source>
+        <source>Video Browser browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (1/2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (2/2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -581,14 +601,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Plain View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Folder View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation type="unfinished">Prekliči</translation>
     </message>
@@ -687,7 +699,7 @@
     </message>
     <message>
         <source>No files found</source>
-        <translation>Ni najdenih videov</translation>
+        <translation type="obsolete">Ni najdenih videov</translation>
     </message>
     <message>
         <source>Select action</source>

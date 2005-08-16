@@ -109,7 +109,7 @@
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Configurações Globais</translation>
+        <translation type="obsolete">Configurações Globais</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -245,7 +245,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>videos</source>
+        <source>Video Browser browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (1/2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (2/2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -580,14 +600,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Plain View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Folder View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation type="unfinished">Cancelar</translation>
     </message>
@@ -686,7 +698,7 @@
     </message>
     <message>
         <source>No files found</source>
-        <translation>Não foi encontrado nenhum ficheiro</translation>
+        <translation type="obsolete">Não foi encontrado nenhum ficheiro</translation>
     </message>
     <message>
         <source>Select action</source>

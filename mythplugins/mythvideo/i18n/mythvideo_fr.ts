@@ -105,7 +105,7 @@
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Configuration générale</translation>
+        <translation type="obsolete">Configuration générale</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -246,7 +246,31 @@
     </message>
     <message>
         <source>videos</source>
-        <translation>videos</translation>
+        <translation type="obsolete">videos</translation>
+    </message>
+    <message>
+        <source>Video Browser browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (1/2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (2/2)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -581,11 +605,11 @@
     </message>
     <message>
         <source>Plain View</source>
-        <translation>Vue plane</translation>
+        <translation type="obsolete">Vue plane</translation>
     </message>
     <message>
         <source>Folder View</source>
-        <translation>Vue avec dossiers</translation>
+        <translation type="obsolete">Vue avec dossiers</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -682,7 +706,7 @@
     <name>VideoTree</name>
     <message>
         <source>No files found</source>
-        <translation>Pas de fichier trouvé</translation>
+        <translation type="obsolete">Pas de fichier trouvé</translation>
     </message>
     <message>
         <source>Parental Pin:</source>

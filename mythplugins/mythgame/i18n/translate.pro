@@ -1,12 +1,7 @@
+SOURCES += ../mythgame/gamehandler.cpp
 SOURCES += ../mythgame/gamesettings.cpp
+SOURCES += ../mythgame/gamesettings.h
 SOURCES += ../mythgame/gametree.cpp
-SOURCES += ../mythgame/mamehandler.cpp
-SOURCES += ../mythgame/mamesettingsdlg.cpp
-SOURCES += ../mythgame/neshandler.cpp
-SOURCES += ../mythgame/nessettingsdlg.cpp
-SOURCES += ../mythgame/pcsettingsdlg.cpp
-SOURCES += ../mythgame/sneshandler.cpp
-SOURCES += ../mythgame/snessettingsdlg.cpp
 SOURCES += ./themestrings.h
 
 TRANSLATIONS  = mythgame_it.ts mythgame_es.ts mythgame_ca.ts

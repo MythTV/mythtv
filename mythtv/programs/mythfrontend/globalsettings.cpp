@@ -2180,7 +2180,7 @@ static HostCheckBox *UseXvMcVld()
     HostCheckBox *gc = new HostCheckBox("UseXvMcVld");
     gc->setLabel(QObject::tr("Use hardware XVMC VLD Decoding (incompatible with libmpeg2)"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enables the use of viaXvMC hardware MPEG "
+    gc->setHelpText(QObject::tr("Enables the use of Via XvMC hardware MPEG "
                                 "decoding for the Via Unichrome Chipset.  ")+
                     QObject::tr(
                         "This is incompatible with libmpeg2 decoding, and "
@@ -2534,7 +2534,7 @@ static HostCheckBox *LCDHeartBeatOn()
 {
     HostCheckBox *gc = new HostCheckBox("LCDHeartBeatOn");
     gc->setLabel(QObject::tr("LCD HeartBeat Always On"));
-    gc->setHelpText(QObject::tr("Turn on the LCD heartbeat"));
+    gc->setHelpText(QObject::tr("Turn on the LCD heartbeat."));
     gc->setValue(false);
     return gc;
 }

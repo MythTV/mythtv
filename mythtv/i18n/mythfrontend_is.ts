@@ -520,7 +520,7 @@
         <source>The theme you are using is missing &apos;file_browser_background&apos; element. 
 
 Returning to previous menu.</source>
-        <translation>Þemað sem þú ert með í notkun finnst ekki file_browser_background element. 
+        <translation type="obsolete">Þemað sem þú ert með í notkun finnst ekki file_browser_background element. 
 
 Sný aftur til fyrri valmyndar.</translation>
     </message>
@@ -532,9 +532,21 @@ Sný aftur til fyrri valmyndar.</translation>
         <source>The theme you are using is missing &apos;file_browser&apos; element. 
 
 Returning to previous menu.</source>
-        <translation>Þemað sem þú ert að nota finnst ekki file_browser element. 
+        <translation type="obsolete">Þemað sem þú ert að nota finnst ekki file_browser element. 
 
 Sný aftur til fyrrir valmyndar.</translation>
+    </message>
+    <message>
+        <source>The theme you are using is missing the &apos;file_browser_background&apos; element. 
+
+Returning to the previous menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The theme you are using is missing the &apos;file_browser&apos; element. 
+
+Returning to the previous menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -565,13 +577,19 @@ Sný aftur til fyrrir valmyndar.</translation>
         <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;
 
 Returning to previous menu.</source>
-        <translation>Fann ekki %1 í þema %2 
+        <translation type="obsolete">Fann ekki %1 í þema %2 
 
 Sný aftur til fyrri valmyndar.</translation>
     </message>
     <message>
         <source>Missing UI Element</source>
         <translation>Vantar UI Element</translation>
+    </message>
+    <message>
+        <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;.
+
+Returning to the previous menu.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3633,10 +3651,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Commercial Free</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5102,7 +5116,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Alt</translation>
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
@@ -6055,10 +6069,6 @@ WARNING: Enabling this option will disable XvMC video output.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enables the use of viaXvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Display current time on idle LCD display. </source>
         <translation type="unfinished"></translation>
     </message>
@@ -6104,10 +6114,6 @@ WARNING: Enabling this option will disable XvMC video output.</source>
     </message>
     <message>
         <source>LCD HeartBeat Always On</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Turn on the LCD heartbeat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6352,6 +6358,18 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Auto Expire Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the LCD heartbeat.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

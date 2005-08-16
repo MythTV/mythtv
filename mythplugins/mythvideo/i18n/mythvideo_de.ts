@@ -105,7 +105,7 @@
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Grundeinstellungen</translation>
+        <translation type="obsolete">Grundeinstellungen</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -246,7 +246,27 @@
         <translation>Die Standardansicht für MythVideo. Andere Ansichten können durch drücken der &apos;MENU&apos;-Taste im Popup-Fenster ausgewählt werden.</translation>
     </message>
     <message>
-        <source>videos</source>
+        <source>Video Browser browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (1/2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (2/2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -582,11 +602,11 @@
     </message>
     <message>
         <source>Plain View</source>
-        <translation>Einfache Ansicht</translation>
+        <translation type="obsolete">Einfache Ansicht</translation>
     </message>
     <message>
         <source>Folder View</source>
-        <translation>Verzeichnisansicht</translation>
+        <translation type="obsolete">Verzeichnisansicht</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -687,7 +707,7 @@
     </message>
     <message>
         <source>No files found</source>
-        <translation>Keine Dateien gefunden</translation>
+        <translation type="obsolete">Keine Dateien gefunden</translation>
     </message>
     <message>
         <source>Select action</source>

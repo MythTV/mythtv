@@ -77,7 +77,7 @@ Er is geen VCD-apparaat ingesteld.</translation>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 U heeft geen DVD-afspeelcommando gedefinieerd.
 </translation>
@@ -291,6 +291,14 @@ Er is geen DVD-apparaat ingesteld.
         <source>Display mythdvd menu</source>
         <translation>Toon MythDVD menu</translation>
     </message>
+    <message>
+        <source>ISO copy of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for access to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -372,6 +380,10 @@ Er is geen DVD-apparaat ingesteld.
     <message>
         <source>0 Process Selected Titles</source>
         <translation>0 Verwerk de geselecteerde titels</translation>
+    </message>
+    <message>
+        <source>ISO Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

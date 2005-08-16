@@ -308,6 +308,10 @@
         <source>&lt;New rule&gt;</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>First Episodes (complete example for Data Direct)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DVBTransportsEditor</name>
@@ -557,19 +561,19 @@
 <context>
     <name>MythImageFileDialog</name>
     <message>
-        <source>The theme you are using is missing &apos;file_browser_background&apos; element. 
-
-Returning to previous menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Missing UI Element</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The theme you are using is missing &apos;file_browser&apos; element. 
+        <source>The theme you are using is missing the &apos;file_browser_background&apos; element. 
 
-Returning to previous menu.</source>
+Returning to the previous menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The theme you are using is missing the &apos;file_browser&apos; element. 
+
+Returning to the previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -598,13 +602,13 @@ Returning to previous menu.</source>
 <context>
     <name>MythThemedDialog</name>
     <message>
-        <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;
-
-Returning to previous menu.</source>
+        <source>Missing UI Element</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Missing UI Element</source>
+        <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;.
+
+Returning to the previous menu.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1222,6 +1226,10 @@ Returning to previous menu.</source>
         <source>(Any Station)</source>
         <translation>(Katerakoli postaja)</translation>
     </message>
+    <message>
+        <source>Premieres</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProgramRecPriority</name>
@@ -1550,7 +1558,7 @@ Returning to previous menu.</source>
     </message>
     <message>
         <source>CC/TXT disabled</source>
-        <translation>CC/Teletekst onemogočen</translation>
+        <translation type="obsolete">CC/Teletekst onemogočen</translation>
     </message>
     <message>
         <source>Unable to create AudioOutput.</source>
@@ -2574,7 +2582,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation>V večini primerov bo dvb-zajem izpustil paketke kartice dokler ne bo videna žačetna sekvenca. Ta možnost izklopi to podporo.</translation>
+        <translation type="obsolete">V večini primerov bo dvb-zajem izpustil paketke kartice dokler ne bo videna žačetna sekvenca. Ta možnost izklopi to podporo.</translation>
     </message>
     <message>
         <source>Open DVB card on demand</source>
@@ -3084,11 +3092,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Method used to determine which recorded shows to AutoExpire first.</source>
-        <translation>Metoda, ki je uporabljena za ugotovitev zajema, ki bo najprej samopretekel.</translation>
+        <translation type="obsolete">Metoda, ki je uporabljena za ugotovitev zajema, ki bo najprej samopretekel.</translation>
     </message>
     <message>
         <source>Auto-Expire Default</source>
-        <translation>Privzeti samopretek</translation>
+        <translation type="obsolete">Privzeti samopretek</translation>
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
@@ -3104,7 +3112,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Re-record programs which have been automatically expired</source>
-        <translation>Ponovno snemaj programe, ki so avtomatsko pretekli</translation>
+        <translation type="obsolete">Ponovno snemaj programe, ki so avtomatsko pretekli</translation>
     </message>
     <message>
         <source>If set, programs that are automatically deleted (expired) will be allowed to re-recorded if they are shown again.</source>
@@ -4718,7 +4726,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
-        <translation>Komanda, ki se bo izvršila pred ugasnitvijo backend-a. Vrnjena vrednost pove ali se backend lahko ugasne. 0 - da, 1 - ponovni zagon mirovanja, 2 - ponovni zagon za čakanje frontend-a.</translation>
+        <translation type="obsolete">Komanda, ki se bo izvršila pred ugasnitvijo backend-a. Vrnjena vrednost pove ali se backend lahko ugasne. 0 - da, 1 - ponovni zagon mirovanja, 2 - ponovni zagon za čakanje frontend-a.</translation>
     </message>
     <message>
         <source>Block shutdown before client connected</source>
@@ -5448,7 +5456,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation>Onemogoču promet toka v pretvorbi toka programskega toka. TS snemanje naredi večje datoteke, ampak zmanjša možnost napak.</translation>
+        <translation type="obsolete">Onemogoču promet toka v pretvorbi toka programskega toka. TS snemanje naredi večje datoteke, ampak zmanjša možnost napak.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
@@ -6425,23 +6433,11 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto Expire Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When enabled, old programs will be deleted to make space for new ones.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Extra Disk Space (in Gigabytes)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Extra disk space you want on the recording file system beyond what MythTV requires. This is useful if you use the recording file system for data other than MythTV recordings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If set, programs that are automatically deleted (expired) will be allowed to be re-recorded if they are shown again.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6550,10 +6546,6 @@ WARNING: Enabling this option will disable XvMC video output.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enables the use of viaXvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Display current time on idle LCD display. </source>
         <translation type="unfinished"></translation>
     </message>
@@ -6599,10 +6591,6 @@ WARNING: Enabling this option will disable XvMC video output.</source>
     </message>
     <message>
         <source>LCD HeartBeat Always On</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Turn on the LCD heartbeat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6742,6 +6730,123 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>If this is the master backend server, please run &apos;mythfilldatabase&apos; to populate the database with channel information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC/TXT enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Re-Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>V</source>
+        <comment>RecStatusChar rsNeverRecord</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Never Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>it was marked to never be recorded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status: </source>
+        <translation type="unfinished">Status: </translation>
+    </message>
+    <message>
+        <source>Cable-HRC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Underscore (5_1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None (51)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minus (5-1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zero (501)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Separator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>What to use to separate ATSC major and minor channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time Stretch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default time stretch %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk of processing errors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 Streaming Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 streaming port on your DBOX2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 HTTP Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 http port on your DBOX2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 Host IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 Host IP is the remote device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBOX2 Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Method used to determine which recorded shows to delete first. Set to &apos;None&apos; to disable Auto Expire (not recommended).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Expire Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the LCD heartbeat.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7245,7 +7350,7 @@ Ni ostalih podatkov</translation>
     </message>
     <message>
         <source>Auto-Skip Pre-Notify</source>
-        <translation>Avtomatski izpust - pred opozorilo</translation>
+        <translation type="obsolete">Avtomatski izpust - pred opozorilo</translation>
     </message>
     <message>
         <source>Auto-Skip ON</source>
@@ -7398,6 +7503,18 @@ Ni ostalih podatkov</translation>
     <message>
         <source>Next Audio Track</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished">Ni zaklenjen</translation>
     </message>
 </context>
 <context>

@@ -864,11 +864,19 @@
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation>Sortierreihenfolge in der Musikauswahl. Mögliche Werte sind (durch Leerzeichen getrennt): &apos;genre&apos;, &apos;splitartist&apos;, &apos;artist&apos;, &apos;album&apos;, &apos;title&apos; ODER das Schlüsselwort &apos;directory&apos;. Bei &apos;directory&apos; entspricht die Darstellung der tatsächlichen Verzeichnisstruktur.</translation>
+        <translation type="obsolete">Sortierreihenfolge in der Musikauswahl. Mögliche Werte sind (durch Leerzeichen getrennt): &apos;genre&apos;, &apos;splitartist&apos;, &apos;artist&apos;, &apos;album&apos;, &apos;title&apos; ODER das Schlüsselwort &apos;directory&apos;. Bei &apos;directory&apos; entspricht die Darstellung der tatsächlichen Verzeichnisstruktur.</translation>
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
         <translation>CD: %1 ~ %2 - %3</translation>
+    </message>
+    <message>
+        <source>Track %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -942,6 +950,14 @@
     <message>
         <source>Length</source>
         <translation>Länge</translation>
+    </message>
+    <message>
+        <source>Quality: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

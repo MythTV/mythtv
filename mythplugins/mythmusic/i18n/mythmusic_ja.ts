@@ -1058,11 +1058,19 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation>ミュージックツリーの並べ方。スペース区切りでキーワードを指定してください。使用できるキーワードは genre, splitartist, artist, album, と title です。</translation>
+        <translation type="obsolete">ミュージックツリーの並べ方。スペース区切りでキーワードを指定してください。使用できるキーワードは genre, splitartist, artist, album, と title です。</translation>
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Track %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1138,6 +1146,14 @@ You have no MythMusic tables in your database.</source>
     <message>
         <source>Length</source>
         <translation>時間</translation>
+    </message>
+    <message>
+        <source>Quality: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

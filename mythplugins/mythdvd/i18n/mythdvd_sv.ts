@@ -75,14 +75,6 @@ Du har ingen VCD-enhet definierad.</translation>
     <message>
         <source>
 
-You have no DVD Player command defined.</source>
-        <translation>
-
-Du har inget DVD-avspelningskommando definierat.</translation>
-    </message>
-    <message>
-        <source>
-
 You have no DVD Device defined.</source>
         <translation>
 
@@ -241,10 +233,6 @@ Du har ingen DVD-enhet definierad.</translation>
         <translation>Väntar på tillstånd att börja omkodning</translation>
     </message>
     <message>
-        <source>EMT: </source>
-        <translation type="obsolete">EMT:</translation>
-    </message>
-    <message>
         <source>Transcoding Pass 1 of 2 ~</source>
         <translation>Omkodar pass 1 av 2 ~</translation>
     </message>
@@ -273,10 +261,6 @@ Du har ingen DVD-enhet definierad.</translation>
         <translation>Vid iläggning av DVD</translation>
     </message>
     <message>
-        <source>Display mythdvd menu menu</source>
-        <translation type="obsolete">Visa MythDVD-meny</translation>
-    </message>
-    <message>
         <source>Do nothing</source>
         <translation>Gör ingenting</translation>
     </message>
@@ -295,6 +279,14 @@ Du har ingen DVD-enhet definierad.</translation>
     <message>
         <source>Display mythdvd menu</source>
         <translation>Visa MythDVD-menyn</translation>
+    </message>
+    <message>
+        <source>ISO copy of %1</source>
+        <translation>ISO-kopiering av %1</translation>
+    </message>
+    <message>
+        <source>Waiting for access to DVD</source>
+        <translation>Väntar på åtkomst till DVD</translation>
     </message>
 </context>
 <context>
@@ -377,6 +369,10 @@ Du har ingen DVD-enhet definierad.</translation>
     <message>
         <source>0 Process Selected Titles</source>
         <translation>0 Processa valda titlar</translation>
+    </message>
+    <message>
+        <source>ISO Image</source>
+        <translation>ISO-avbildning</translation>
     </message>
 </context>
 </TS>

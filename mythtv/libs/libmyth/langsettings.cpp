@@ -152,7 +152,9 @@ QStringList LanguageSettings::getLanguages(void)
           << QString::fromUtf8("Suomi")       << "FI"   // Finnish
           << QString::fromUtf8("Hanzi (Traditional)")
               << "ZH_TW"                                // Traditional Chinese
-          << QString::fromUtf8("Eesti")       << "ET";  // Estonian
+          << QString::fromUtf8("Eesti")       << "ET"   // Estonian
+          << QString::fromUtf8("Português Brasileiro")
+              << "PT_BR";                               // Brazilian Portuguese
     return langs;
 }
 

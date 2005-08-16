@@ -967,10 +967,18 @@
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation>Orden for musik-hierarkiet. Mulige værdier er en liste (adskilt af mellemrum) med følgende mulige værdier: genre, splitartist, artist, album, og title ELLER &quot;directory&quot; for at indikere at billedet på skærmen har samme struktur som filsystemet.</translation>
+        <translation type="obsolete">Orden for musik-hierarkiet. Mulige værdier er en liste (adskilt af mellemrum) med følgende mulige værdier: genre, splitartist, artist, album, og title ELLER &quot;directory&quot; for at indikere at billedet på skærmen har samme struktur som filsystemet.</translation>
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1046,6 +1054,14 @@
     </message>
     <message>
         <source>Length</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quality: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Importing </source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -179,6 +179,22 @@
         <source>This command is executed whenever a movie file is selected</source>
         <translation>このコマンドはビデオファイルを選択したときに実行するコマンドです</translation>
     </message>
+    <message>
+        <source>Store thumbnails in image directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recurse into directories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check this to let the slideshow recurse into sub-directories.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>

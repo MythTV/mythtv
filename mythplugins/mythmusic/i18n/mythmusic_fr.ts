@@ -864,11 +864,19 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation>Ordre dans lequel trier l&apos;arborescence de musique. Les valeurs possibles sont une liste séparé d&apos;espaces des valeurs genre, splitartist, artist, album, et title OU le mot clef &quot;directory&quot; qui indique que l&apos;arborescense affichée reflète le système de fichiers.</translation>
+        <translation type="obsolete">Ordre dans lequel trier l&apos;arborescence de musique. Les valeurs possibles sont une liste séparé d&apos;espaces des valeurs genre, splitartist, artist, album, et title OU le mot clef &quot;directory&quot; qui indique que l&apos;arborescense affichée reflète le système de fichiers.</translation>
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
         <translation>CD: %1 ~ %2 - %3</translation>
+    </message>
+    <message>
+        <source>Track %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -944,6 +952,14 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     <message>
         <source>Length</source>
         <translation>Taille</translation>
+    </message>
+    <message>
+        <source>Quality: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

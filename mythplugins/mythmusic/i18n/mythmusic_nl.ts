@@ -977,10 +977,18 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation>Volgorde voor sorteren van muzieklijst. Mogelijke waarden zijn een door spaties gescheiden lijst van genre, splitartist, artist, album en titel OF het sleutelwoord &quot;directory&quot; om aan te geven dat de afgebeelde muzieklijst het bestandssyteem weergeeft.</translation>
+        <translation type="obsolete">Volgorde voor sorteren van muzieklijst. Mogelijke waarden zijn een door spaties gescheiden lijst van genre, splitartist, artist, album en titel OF het sleutelwoord &quot;directory&quot; om aan te geven dat de afgebeelde muzieklijst het bestandssyteem weergeeft.</translation>
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Track %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1058,6 +1066,14 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     <message>
         <source>Length</source>
         <translation>Lengte</translation>
+    </message>
+    <message>
+        <source>Quality: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Importing </source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

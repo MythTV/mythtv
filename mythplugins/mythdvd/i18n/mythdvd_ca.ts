@@ -76,7 +76,7 @@ No hi ha cap dispositiu VCD definit.</translation>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 No hi ha una comanda assignada per a la reproducció de DVD.</translation>
     </message>
@@ -288,6 +288,14 @@ No hi ha un dispositiu de DVD definit.</translation>
         <source>Display mythdvd menu</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>ISO copy of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for access to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -369,6 +377,10 @@ No hi ha un dispositiu de DVD definit.</translation>
     <message>
         <source>0 Process Selected Titles</source>
         <translation>0 Processar els títols escollits</translation>
+    </message>
+    <message>
+        <source>ISO Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -179,6 +179,22 @@
         <source>This command is executed whenever a movie file is selected</source>
         <translation>Detta kommando används för att spela upp videofiler</translation>
     </message>
+    <message>
+        <source>Store thumbnails in image directory</source>
+        <translation>Lagra miniatyrbilder i bildkatalogen</translation>
+    </message>
+    <message>
+        <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
+        <translation>Lagrar miniatyrbilder i &apos;.thumbcache&apos;-kataloger inuti ovanstående katalog. Annars lagras de i hemkatalogen.</translation>
+    </message>
+    <message>
+        <source>Recurse into directories</source>
+        <translation>Läs kataloger rekursivt</translation>
+    </message>
+    <message>
+        <source>Check this to let the slideshow recurse into sub-directories.</source>
+        <translation>Låt bildspelet inkludera underkataloger.</translation>
+    </message>
 </context>
 <context>
     <name>SingleView</name>

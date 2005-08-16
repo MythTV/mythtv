@@ -214,10 +214,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Average Kbps In/Out: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Video</source>
         <translation type="unfinished"></translation>
     </message>
@@ -247,10 +243,6 @@
     </message>
     <message>
         <source>Packets In/Out/Lost/Late: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Average Kbps In/Out:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -291,6 +283,22 @@
     </message>
     <message>
         <source>Dial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playout Delay Min/Avg/Max:            </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets Lost by Peer:                 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Packets Lost by Peer: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playout Delay Min/Avg/Max: </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -457,10 +465,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SIP Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>VXML Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -530,6 +534,30 @@
     </message>
     <message>
         <source>Me</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jitter Buffer (Audio Call)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size of the playout buffer in ms for an audio call. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jitter Buffer (Video Call)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Size of the playout buffer in ms for a video call. This should be bigger than for an audio call because CPU usage causes jitter and to sync video &amp; audio.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>AUDIO Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -105,7 +105,7 @@
     </message>
     <message>
         <source>General Settings</source>
-        <translation>Algemene Instellingen</translation>
+        <translation type="obsolete">Algemene Instellingen</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -247,7 +247,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>videos</source>
+        <source>Video Browser browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Gallery browses files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (1/2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General Settings (2/2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -583,11 +603,11 @@
     </message>
     <message>
         <source>Plain View</source>
-        <translation>Overzicht alle folders</translation>
+        <translation type="obsolete">Overzicht alle folders</translation>
     </message>
     <message>
         <source>Folder View</source>
-        <translation>Gebruik Folders</translation>
+        <translation type="obsolete">Gebruik Folders</translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -688,7 +708,7 @@
     </message>
     <message>
         <source>No files found</source>
-        <translation>Geen bestanden gevonden</translation>
+        <translation type="obsolete">Geen bestanden gevonden</translation>
     </message>
     <message>
         <source>Select action</source>

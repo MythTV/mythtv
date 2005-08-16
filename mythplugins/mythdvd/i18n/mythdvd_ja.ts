@@ -76,7 +76,7 @@ VCDデバイスが設定されていません｡</translation>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation>
+        <translation type="obsolete">
 
 DVDプレイヤーのコマンドが設定されていません｡</translation>
     </message>
@@ -288,6 +288,14 @@ DVDデバイスが設定されていません｡</translation>
         <source>Display mythdvd menu</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>ISO copy of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for access to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -369,6 +377,10 @@ DVDデバイスが設定されていません｡</translation>
     <message>
         <source>0 Process Selected Titles</source>
         <translation>0 プロセス、選択タイトル</translation>
+    </message>
+    <message>
+        <source>ISO Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

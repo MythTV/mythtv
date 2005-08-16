@@ -214,10 +214,6 @@
         <translation>Paket In/Ut/Tappade/Sena:             </translation>
     </message>
     <message>
-        <source>Average Kbps In/Out: </source>
-        <translation>Medel Kbps In/Ut: </translation>
-    </message>
-    <message>
         <source>Video</source>
         <translation>Video</translation>
     </message>
@@ -248,10 +244,6 @@
     <message>
         <source>Packets In/Out/Lost/Late: </source>
         <translation>Paket In/Ut/Tappade/Sena: </translation>
-    </message>
-    <message>
-        <source>Average Kbps In/Out:</source>
-        <translation>Medel Kbps In/Ut:</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -292,6 +284,22 @@
     <message>
         <source>Dial</source>
         <translation>Ring upp</translation>
+    </message>
+    <message>
+        <source>Playout Delay Min/Avg/Max:            </source>
+        <translation>Uppspelningsfördröjning Min/Med/Max:  </translation>
+    </message>
+    <message>
+        <source>Packets Lost by Peer:                 </source>
+        <translation>Paket tappade av motpart:             </translation>
+    </message>
+    <message>
+        <source>Packets Lost by Peer: </source>
+        <translation>Paket tappade av motpart: </translation>
+    </message>
+    <message>
+        <source>Playout Delay Min/Avg/Max: </source>
+        <translation>Uppspelningsfördröjning Min/Med/Max: </translation>
     </message>
 </context>
 <context>
@@ -457,10 +465,6 @@
         <translation>SIP-proxyinställningar</translation>
     </message>
     <message>
-        <source>SIP Settings</source>
-        <translation>SIP-inställningar</translation>
-    </message>
-    <message>
         <source>VXML Settings</source>
         <translation>VXML-inställningar</translation>
     </message>
@@ -531,6 +535,30 @@
     <message>
         <source>Me</source>
         <translation>Jag</translation>
+    </message>
+    <message>
+        <source>Jitter Buffer (Audio Call)</source>
+        <translation>Jitterbuffert (Ljudsamtal)</translation>
+    </message>
+    <message>
+        <source>Size of the playout buffer in ms for an audio call. </source>
+        <translation>Storlek på uppspelningsbufferten i ms för ljudsamtal. </translation>
+    </message>
+    <message>
+        <source>Jitter Buffer (Video Call)</source>
+        <translation>Jitterbuffert (Videosamtal)</translation>
+    </message>
+    <message>
+        <source>Size of the playout buffer in ms for a video call. This should be bigger than for an audio call because CPU usage causes jitter and to sync video &amp; audio.</source>
+        <translation>Storlek på uppspelningsbufferten i ms för videosamtal. Bör vara större än för ljudsamtal eftersom video &amp; ljud måste synkroniseras.</translation>
+    </message>
+    <message>
+        <source>IP Settings</source>
+        <translation>IP-inställningar</translation>
+    </message>
+    <message>
+        <source>AUDIO Settings</source>
+        <translation>Ljudinställningar</translation>
     </message>
 </context>
 </TS>

@@ -9,8 +9,8 @@ trans.files  = mythfrontend_it.qm mythfrontend_es.qm mythfrontend_ca.qm
 trans.files += mythfrontend_nl.qm mythfrontend_fr.qm mythfrontend_de.qm
 trans.files += mythfrontend_dk.qm mythfrontend_pt.qm mythfrontend_sv.qm
 trans.files += mythfrontend_ja.qm mythfrontend_si.qm mythfrontend_fi.qm
-trans.files += mythfrontend_zh_tw.qm
-trans.files += mythfrontend_nb.qm mythfrontend_is.qm
+trans.files += mythfrontend_zh_tw.qm mythfrontend_nb.qm mythfrontend_is.qm
+trans.files += mythfrontend_pt_br.qm
 
 INSTALLS += trans
 

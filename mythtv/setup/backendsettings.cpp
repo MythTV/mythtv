@@ -363,7 +363,7 @@ static GlobalLineEdit *preSDWUCheckCommand()
                     "shutdown. The return value determines if "
                     "the backend can shutdown. 0 - yes, "
                     "1 - restart idleing, "
-                    "2 - reset the backend to wait for frontend"));
+                    "2 - reset the backend to wait for a frontend."));
     return gc;
 };
 

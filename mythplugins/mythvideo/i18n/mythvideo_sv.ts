@@ -93,23 +93,19 @@
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
-        <translation>Om funktionen är aktiverad, kommer alla filer som ligger under den tidigare specifierade katalogen att visas, såvida inte deras filändelse har satts upp för att ignoreras.</translation>
+        <translation>Visa alla filer som ligger under den tidigare specifierade katalogen såvida inte deras filändelse har satts upp för att ignoreras.</translation>
     </message>
     <message>
         <source>Video List browses files</source>
-        <translation>Visa även filer som inte sökts upp i filmhanteraren</translation>
+        <translation>Videolistvyn visar filer som inte sökts upp i videohanteraren</translation>
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation>Om denna funktion är aktiverad kommer videolistvyn att visa alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp under Filmhanteraren.</translation>
+        <translation>Videolistvyn visar alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp i videohanteraren.</translation>
     </message>
     <message>
         <source>Default Player</source>
         <translation>Standardspelare</translation>
-    </message>
-    <message>
-        <source>General Settings</source>
-        <translation>Generella inställningar</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -169,7 +165,7 @@
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation>Katalogen måste existers och användaren som kör MythVideo måste ha skriv/läs-rättigheter till den.</translation>
+        <translation>Katalogen måste existera och användaren som kör MythVideo måste ha skriv/läs-rättigheter till den.</translation>
     </message>
     <message>
         <source>Video Manager</source>
@@ -245,8 +241,28 @@
         <translation>Standardvy för MythVideo. Andra vyer kan nås genom popup-menyn tillgänglig via MENY-knappen.</translation>
     </message>
     <message>
-        <source>videos</source>
-        <translation>filmer</translation>
+        <source>Video Browser browses files</source>
+        <translation>Bläddraren visar filer som inte sökts upp i videohanteraren</translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation>Bläddraren visar alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp i videohanteraren.</translation>
+    </message>
+    <message>
+        <source>Video Gallery browses files</source>
+        <translation>Videogalleriet visar filer som inte sökts upp i videohanteraren</translation>
+    </message>
+    <message>
+        <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
+        <translation>Videogalleriet visar alla relevanta filer som ligger under den tidigare specifierade katalogen och inte bara de filmer som har sökts upp i videohanteraren.</translation>
+    </message>
+    <message>
+        <source>General Settings (1/2)</source>
+        <translation>Generella inställningar (1/2)</translation>
+    </message>
+    <message>
+        <source>General Settings (2/2)</source>
+        <translation>Generella inställningar (2/2)</translation>
     </message>
 </context>
 <context>
@@ -580,14 +596,6 @@
         <translation>Visa detaljer</translation>
     </message>
     <message>
-        <source>Plain View</source>
-        <translation>Vanlig vy</translation>
-    </message>
-    <message>
-        <source>Folder View</source>
-        <translation>Katalogvy</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
     </message>
@@ -683,10 +691,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>PIN-kod (barnlås):</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation>Inga filer funna</translation>
     </message>
     <message>
         <source>Select action</source>

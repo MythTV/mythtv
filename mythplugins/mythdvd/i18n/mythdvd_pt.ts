@@ -343,7 +343,7 @@ You have no VCD Device defined.</source>
         <source>
 
 You have no DVD Player command defined.</source>
-        <translation>
+        <translation type="obsolete">
 
  Não tem nenhum comando definido para tocar DVD.</translation>
     </message>
@@ -431,6 +431,14 @@ You have no DVD Device defined.</source>
         <source>Display mythdvd menu</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>ISO copy of %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for access to DVD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -512,6 +520,10 @@ You have no DVD Device defined.</source>
     <message>
         <source>0 Process Selected Titles</source>
         <translation>0 Processar os Títulos Selecionados</translation>
+    </message>
+    <message>
+        <source>ISO Image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
