@@ -8,7 +8,6 @@
 #define DVBRECORDER_H
 
 #include <vector>
-#include <map>
 using namespace std;
 
 #include "dtvrecorder.h"
@@ -108,7 +107,7 @@ private:
     /// Set when we want to generate a new filter set
     bool            _reset_pid_filters;
     /// Encrypted PID, so we can drop these
-    map<uint,bool>  _encrypted_pid;
+    QMap<uint,bool> _encrypted_pid;
 
     // Statistics
     uint            _continuity_error_count;
