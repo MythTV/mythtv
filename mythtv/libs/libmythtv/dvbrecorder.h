@@ -12,11 +12,15 @@
 using namespace std;
 
 #include "dtvrecorder.h"
+#include "tspacket.h"
 #include "transform.h"
 
 #include "dvbtypes.h"
 #include "dvbchannel.h"
 #include "dvbsiparser.h"
+
+class ProgramAssociationTable;
+class ProgramMapTable;
 
 /** \class DVBRecorder
  *  \brief This is a specialization of DTVRecorder used to
@@ -41,66 +45,84 @@ public:
     void StartRecording(void);
     void Reset(void);
 
-    bool Open();
-    void Close();
+    bool Open(void);
+    void Close(void);
+
+    bool RecordsTransportStream(void) const
+        { return _record_transport_stream_option; }
+
+    bool RecordsProgramStream(void) const
+        { return !_record_transport_stream_option; }
 
 public slots:
     void ChannelChanged(dvb_channel_t& chan);
 
 private:
-    void ReadFromDMX();
+    void ReadFromDMX(void);
     static void ProcessDataPS(unsigned char *buffer, int len, void *priv);
     void LocalProcessDataPS(unsigned char *buffer, int len);
     void LocalProcessDataTS(unsigned char *buffer, int len);
 
-    void CloseFilters();
+    void CloseFilters(void);
     void OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_type);
-    bool SetDemuxFilters();
-    void AutoPID();
+    bool SetDemuxFilters(void);
+    void AutoPID(void);
 
-    void CreatePAT(uint8_t *ts_packet);
-    void CreatePMT(uint8_t *ts_packet);
+    void SetPAT(ProgramAssociationTable*);
+    void SetPMT(ProgramMapTable*);
+
+    void CreatePAT(void);
+    void CreatePMT(void);
+
+    void DebugTSHeader(unsigned char* buffer, int len);
 
     // Options set in SetOption()
-    int  _card_number_option;
-    bool _record_transport_stream_option;
-    bool _hw_decoder_option;
+    int             _card_number_option;
+    bool            _record_transport_stream_option;
+    bool            _hw_decoder_option;
 
     // DVB stuff
     DVBChannel*     dvbchannel;
-    pid_ipack_t     pid_ipack;
-    PMTObject       m_pmt;
-    unsigned char   prvpkt[3];
+
+    // PS recorder stuff
+    int             _ps_rec_audio_id;
+    int             _ps_rec_video_id;
+    unsigned char   _ps_rec_buf[3];
+    pid_ipack_t     _ps_rec_pid_ipack;
+
+    // TS recorder stuff
+    ProgramAssociationTable *_pat;
+    ProgramMapTable         *_pmt;
+    uint            _next_pmt_version;
+    uint            _ts_packets_until_psip_sync;
+    QMap<uint,bool> _payload_start_seen;
+    QMap<uint,bool> _videoPID;
+
+    // Input Misc
+    /// PMT on input side
+    PMTObject       _input_pmt;
+    /// Input filter file descriptors
     vector<int>     _pid_filters;
-    bool            _reset_pid_filters; // set when we want to generate a new filter set
+    /// Input polling structure for _stream_fd
+    struct pollfd   _polls;
+    /// Set when we want to generate a new filter set
+    bool            _reset_pid_filters;
+    /// Encrypted PID, so we can drop these
+    map<uint,bool>  _encrypted_pid;
 
-    // Stream IDs for the PS recorder
-    uint8_t audioid;
-    uint8_t videoid;
+    // Statistics
+    uint            _continuity_error_count;
+    uint            _stream_overflow_count;
+    uint            _bad_packet_count;
+    QMap<uint,int>  _continuity_count;
 
-    uint8_t *pat_pkt;
-    uint8_t *pmt_pkt;
-    static const int PMT_PID;
-    int pat_cc;
-    int pmt_cc;
-    uint8_t pmt_version;
-    int pkts_until_pat_pmt;
-
-    // statistics
-    unsigned int _continuity_error_count;
-    unsigned int _stream_overflow_count;
-    unsigned int _bad_packet_count;
-    map<uint16_t,uint8_t> _continuity_count;
-    map<uint16_t,bool> pusi_seen;
-    map<uint16_t,bool> isVideo;
-
-    // for debugging
-    void DebugTSHeader(unsigned char* buffer, int len);
-    bool data_found; // debugging variable used by transform.c
+    // For debugging
+    bool data_found; ///< debugging variable used by transform.c
     bool keyframe_found;
 
-    // to see when CAM starts working
-    map<uint16_t,bool> scrambled;
+    // Constants
+    static const int PMT_PID;
+    static const int TSPACKETS_BETWEEN_PSIP_SYNC;
 };
 
 #endif

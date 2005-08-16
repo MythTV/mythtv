@@ -17,6 +17,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TS_FEC_PACKET_SIZE 204
 #define TS_PACKET_SIZE 188
 #define NB_PID_MAX 8192
@@ -59,3 +63,7 @@ int mpegts_parse_packet(MpegTSContext *ts, AVPacket *pkt,
                         const uint8_t *buf, int len);
 void mpegts_parse_close(MpegTSContext *ts);
 void mpegts_remove_stream(MpegTSContext *ts, int pid);
+
+#ifdef __cplusplus
+}
+#endif

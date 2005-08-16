@@ -51,22 +51,29 @@
      bbinfo from Brent Beyeler, beyeler@home.com
 */
 
-#include <iostream>
-#include <pthread.h>
+// C includes
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
+#include <ctime>
+#include <fcntl.h>
+#include <pthread.h>
+#include <unistd.h>
+
+// C system includes
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
-#include <ctime>
-#include "videodev_myth.h"
 
+// C++ includes
+#include <iostream>
 using namespace std;
 
+// MythTV system include
+#include "videodev_myth.h"
+
+// MythTV includes
 #include "hdtvrecorder.h"
 #include "RingBuffer.h"
 #include "mythcontext.h"
@@ -77,11 +84,10 @@ using namespace std;
 #include "atsctables.h"
 #include "atscstreamdata.h"
 
-extern "C" {
+// AVLib/FFMPEG includes
 #include "../libavcodec/avcodec.h"
 #include "../libavformat/avformat.h"
 #include "../libavformat/mpegts.h"
-}
 
 #define REPORT_RING_STATS 1
 
