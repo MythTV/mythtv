@@ -49,6 +49,7 @@ bool interrupted = false;
 bool refresh_today = false;
 bool refresh_tomorrow = true;
 bool refresh_second = false;
+bool refresh_all = false;
 bool refresh_tba = true;
 bool dd_grab_all = false;
 bool dddataretrieved = false;
@@ -2829,7 +2830,7 @@ bool fillData(QValueList<Source> &sourcelist)
             if (maxDays == 1)
                 refresh_today = true;
 
-            if (refresh_today)
+            if (refresh_today || refresh_all)
             {
                 if (!quiet)
                     cout << "Refreshing Today's data" << endl;
@@ -2837,7 +2838,7 @@ bool fillData(QValueList<Source> &sourcelist)
                     ++failures;
             }
 
-            if (refresh_tomorrow)
+            if (refresh_tomorrow || refresh_all)
             {
                 if (!quiet)
                     cout << "Refreshing Tomorrow's data" << endl;
@@ -2845,7 +2846,7 @@ bool fillData(QValueList<Source> &sourcelist)
                     ++failures;
             }
 
-            if (refresh_second)
+            if (refresh_second || refresh_all)
             {
                 if (!quiet)
                     cout << "Refreshing data for 2 days from today" << endl;
@@ -2895,6 +2896,10 @@ bool fillData(QValueList<Source> &sourcelist)
 
                 // Check to see if we already downloaded data for this date
                 bool download_needed = false;
+
+                if (refresh_all)
+                    download_needed = true;
+
                 QString date(qCurrentDate.addDays(i).toString());
 
                 if (!chancnt)
@@ -3325,6 +3330,10 @@ int main(int argc, char *argv[])
         {
             refresh_second = true;
         }
+        else if (!strcmp(a.argv()[argpos], "--refresh-all"))
+        {
+            refresh_all = true;
+        }
         else if (!strcmp(a.argv()[argpos], "--dont-refresh-tba"))
         {
             refresh_tba = false;
@@ -3468,8 +3477,10 @@ int main(int argc, char *argv[])
             cout << "   for the grabber to check for future listings\n";
             cout << "--refresh-today\n";
             cout << "--refresh-second\n";
+            cout << "--refresh-all\n";
             cout << "   (Only valid for grabbers: na, se_swedb, no, ee, de_tvtoday)\n";
-            cout << "   Force a refresh today or two days from now, to catch the latest changes\n";
+            cout << "   Force a refresh today or two days (or every day) from now,\n";
+            cout << "   to catch the latest changes\n";
             cout << "--dont-refresh-tomorrow\n";
             cout << "   Tomorrow will be refreshed always unless this argument is used\n";
             cout << "--dont-refresh-tba\n";
@@ -3740,3 +3751,5 @@ int main(int argc, char *argv[])
 
     return FILLDB_EXIT_OK;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
