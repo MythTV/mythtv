@@ -336,6 +336,8 @@ MythContextPrivate::~MythContextPrivate()
         delete eventSock;
     if (m_priv_mutex)
         delete m_priv_mutex;
+    if (screensaver)
+        delete screensaver;
 }
 
 // Apply any user overrides to the screen geometry
