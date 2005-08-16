@@ -4,6 +4,7 @@
      <text>Phone</text>
      <text lang="JA">電話</text>
      <text lang="DE">Telefon</text>
+     <text lang="IS">Sími</text>
      <text lang="FI">Puhelin</text>
      <text lang="NL">Telefoon</text>     
      <text lang="SV">Telefon</text>
@@ -22,6 +23,7 @@
      <text lang="CA">Notícies</text>
      <text lang="ES">Noticias</text>
      <text lang="FR">Nouvelles</text>
+     <text lang="IS">Fréttir</text>
      <text lang="NL">Nieuws</text>
      <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース</text>
@@ -53,6 +55,7 @@
      <text lang="FR">Météo</text>
      <text lang="DE">Wetter</text>
      <text lang="DK">Vejret</text>
+     <text lang="IS">Veðrið</text>
      <text lang="PT">Meteorologia</text>
      <text lang="SV">Väder</text>
      <text lang="JA">天気</text>
@@ -70,6 +73,7 @@
       <text>Web</text>
       <text lang="DE">WWW</text>
       <text lang="FR">Web</text>
+      <text lang="IS">Vefurinn</text>
       <text lang="SV">Webb</text>
       <text lang="JA">ウェブ</text>
       <text lang="FI">Nettiselain</text>
@@ -85,6 +89,7 @@
      <type>RECIPE</type>
      <text>Recipes</text>
      <text lang="SV">Recept</text>
+     <text lang="IS">Uppskriftir</text>
      <text lang="NL">Kookboek</text>     
      <text lang="FR">Recettes</text>
      <text lang="NL">Recepten</text>
@@ -103,6 +108,7 @@
       <text>System Status</text>
       <text lang="DE">Systemstatus</text>
       <text lang="FR">État système</text>
+      <text lang="IS">Staða kerfis</text>
       <text lang="NL">Systeemstatus</text>
       <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>

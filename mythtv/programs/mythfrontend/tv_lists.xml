@@ -4,6 +4,7 @@
       <type>TV_SEARCH_NEW_TITLES</type>
       <text>New Titles</text>
       <text lang="DE">Neue Sendungen</text>
+      <text lang="IS">Nýjir titlar</text>
       <text lang="FR">Nouveaux titres</text>
       <text lang="SV">Nya titlar</text>
       <text lang="JA">新タイトル</text>
@@ -20,6 +21,7 @@
       <type>TV_SEARCH_MOVIES</type>
       <text>Movies</text>
       <text lang="DE">Spielfilme</text>
+      <text lang="IS">Myndir</text>
       <text lang="SV">Filmer</text>
       <text lang="FR">Films</text>
       <text lang="JA">映画</text>
@@ -36,6 +38,7 @@
       <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
       <text lang="DE">Kategorien</text>
+      <text lang="IS">Flokkar</text>
       <text lang="SV">Kategori</text>
       <text lang="FR">Catégories</text>
       <text lang="JA">カテゴリー</text>
@@ -52,6 +55,7 @@
       <type>TV_SEARCH_CHANNELS</type>
       <text>Channels</text>
       <text lang="DE">Sender</text>
+      <text lang="IS">Stöðvar</text>
       <text lang="SV">Kanal</text>
       <text lang="FR">Chaînes</text>
       <text lang="NL">Zender</text>
@@ -72,6 +76,7 @@
       <text lang="FR">Durée</text>
       <text lang="JA">時間</text>
       <text lang="DE">Sendezeit</text>
+      <text lang="IS">Tími</text>
       <text lang="FI">Aika</text>
       <text lang="ZH_TW">時間</text>
       <text lang="SI">Čas</text>

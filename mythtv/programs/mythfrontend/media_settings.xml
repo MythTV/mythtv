@@ -7,6 +7,7 @@
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
      <text lang="DK">Musik indstillinger</text>
+     <text lang="IS">Stillingar tónlistar</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>
      <text lang="SV">Musikinställningar</text>
@@ -28,6 +29,7 @@
        <text lang="FR">Configuration de la vidéo</text>
        <text lang="DE">Videos</text>
        <text lang="DK">Video indstillinger</text>
+       <text lang="IS">Stillingar kvikmynda</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
        <text lang="SV">Videoinställningar</text>
@@ -49,6 +51,7 @@
      <text lang="ES">Configurar DVD</text>
      <text lang="CA">Configurar DVD</text>
      <text lang="FR">Configuration des DVD</text>
+     <text lang="IS">Stillingar DVD</text>
      <text lang="NL">DVD Instellingen</text>
      <text lang="SV">DVD-inställningar</text>
      <text lang="JA">DVD設定</text>
@@ -69,6 +72,7 @@
       <text lang="FR">Configuration des images</text>
       <text lang="DE">Bilder</text>
       <text lang="DK">Billed indstillinger</text>
+      <text lang="IS">Stillingar ljósmynda</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
       <text lang="SV">Galleriinställningar</text>
@@ -90,6 +94,7 @@
      <text lang="DE">Spiele</text>
      <text lang="FR">Configuration des jeux</text>
      <text lang="DK">Spil indstillinger</text>
+     <text lang="IS">Stillingar leikja</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
      <text lang="SV">Spelinställningar</text>
@@ -109,6 +114,7 @@
      <text lang="SV">Radioinställningar</text>
      <text lang="JA">ラジオ設定</text>
      <text lang="DE">Radio</text>
+     <text lang="IS">Stillingar útvarps</text>
      <text lang="FR">Configuration de la radio</text>
      <text lang="FI">Radioasetukset</text>
      <text lang="SI">Radio nastavitve</text>

@@ -8,6 +8,7 @@
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter</text>
      <text lang="DK">Vejr indstililnger</text>
+     <text lang="IS">Stillingar veðurs</text>
      <text lang="NL">"Het Weer" Instellingen</text>
      <text lang="PT">Configurar Meteorologia</text>
      <text lang="SV">Väderinställningar</text>
@@ -29,6 +30,7 @@
      <text lang="ES">Configurar Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
      <text lang="FR">Configuration des nouvelles</text>
+     <text lang="IS">Stillingar frétta</text>
      <text lang="SV">Nyhetsinställningar</text>
      <text lang="JA">ニュース設定</text>
      <text lang="FI">Uutisten Asetukset</text>
@@ -57,6 +59,7 @@
      <text lang="SV">Webb-inställningar</text>
      <text lang="JA">Web設定</text>
      <text lang="FR">Configuration du web</text>
+     <text lang="IS">Stillingar vefs</text>
      <text lang="NL">Web Instellingen</text>     
      <text lang="FI">Nettiasetukset</text>
      <text lang="ZH_TW">互聯網設定</text>
@@ -75,6 +78,7 @@
      <text lang="DE">Rezepte</text>
      <text lang="FR">Configuration des recettes</text>
      <text lang="FI">Reseptiasetukset</text>
+     <text lang="IS">Stillingar uppskrifta</text>
      <text lang="NL">Kookboek Instellingen</text>     
      <text lang="SI">Nastavitve receptov</text>
      <text lang="ET">Retseptide seaded</text>     

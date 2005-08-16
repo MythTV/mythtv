@@ -4,6 +4,7 @@
       <type>TV_SEARCH_TITLES</type>
       <text>Titles</text>
       <text lang="DE">nach Titel</text>
+      <text lang="IS">Titlar</text>
       <text lang="SV">Titel</text>
       <text lang="JA">タイトル</text>
       <text lang="NL">Titels</text>
@@ -20,6 +21,7 @@
       <type>TV_SEARCH_KEYWORDS</type>
       <text>Keywords</text>
       <text lang="DE">nach Inhalt</text>
+      <text lang="IS">Leitarorð</text>
       <text lang="FR">Mots clefs</text>
       <text lang="SV">Nyckelord</text>
       <text lang="NL">Beschrijving</text>      
@@ -40,6 +42,7 @@
       <text lang="FR">Personnes</text>
       <text lang="JA">人</text>
       <text lang="DE">nach Personen</text>
+      <text lang="IS">Manneskjum</text>
       <text lang="FI">Ihmiset</text>
       <text lang="SI">Osebe</text>
       <text lang="ET">Inimesed</text>
@@ -52,6 +55,7 @@
       <text>Advanced</text>
       <text lang="SV">Avancerad</text>
       <text lang="NL">Geavanceer</text>      
+      <text lang="IS">Frekari</text>
       <text lang="FR">Avancée</text>
       <text lang="JA">アドバンスト</text>
       <text lang="DE">Erweiterte Suche</text>

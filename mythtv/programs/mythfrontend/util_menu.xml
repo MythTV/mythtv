@@ -4,6 +4,7 @@
       <type>MUSIC_PLAYLIST</type>
       <text>Music Tools</text>
       <text lang="DE">Musik verwalten</text>
+      <text lang="IS">Tónlistartól</text>
       <text lang="NL">Muziek Beheren</text>
       <text lang="SV">Musikverktyg</text>
       <text lang="FR">Gestionnaire de musiques</text>
@@ -24,6 +25,7 @@
       <text lang="CA">Gestionar vÃ­deos</text>
       <text lang="DK">Film opsÃ¦tning</text>
       <text lang="DE">Videos verwalten</text>
+      <text lang="IS">Kvikmyndatól</text>
       <text lang="PT">Gerir Filmes</text>
       <text lang="SV">Filmhanterare</text>
       <text lang="FR">Gestionnaire de vidéos</text>
@@ -41,6 +43,7 @@
    <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
+      <text lang="IS">Stilla takka</text>
       <text lang="DE">Tastenbelegung ändern</text>
       <text lang="FI">Muokkaa Näppäimiä</text>
       <action>PLUGIN mythcontrols</action>
@@ -56,6 +59,7 @@
       <text lang="FR">Configuration</text>
       <text lang="DE">Konfiguration</text>
       <text lang="DK">Konfiguration</text>
+      <text lang="IS">Stillingar</text>
       <text lang="NL">Instellingen</text>
       <text lang="PT">Configurações</text>
       <text lang="SV">Inställningar</text>

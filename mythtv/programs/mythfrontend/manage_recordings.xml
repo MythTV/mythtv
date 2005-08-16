@@ -10,6 +10,7 @@
       <text lang="FR">Programmer des enregistrements</text>
       <text lang="DE">Aufnahmen planen</text>
       <text lang="DK">Optag udsendelse</text>
+      <text lang="IS">Stilla upptöku</text>
       <text lang="PT">Gravação Programada</text>
       <text lang="SV">Schemalägg inspelningar</text>
       <text lang="JA">録画予約</text>
@@ -25,6 +26,7 @@
       <type>TV_RECPRIORITIES</type>
       <text>Set Priorities</text>
       <text lang="DE">Prioritäten</text>
+      <text lang="IS">Setja forgang</text>
       <text lang="FR">Fixer les priorités</text>
       <text lang="NL">Prioriteiten</text>
       <text lang="SV">Prioriteter</text>
@@ -47,6 +49,7 @@
       <text lang="FR">Gestion des conflits</text>
       <text lang="DE">Aufnahmeplan</text>
       <text lang="DK">Løs optagelseskonflikter</text>
+      <text lang="IS">Komandi upptökur</text>
       <text lang="PT">Resolver Conflitos</text>
       <text lang="SV">Kommande inspelningar</text>
       <text lang="JA">予約衝突修正</text>
@@ -68,6 +71,7 @@
       <text lang="FR">Supprimer des enregistrements</text>
       <text lang="DE">Löschen</text>
       <text lang="DK">Slet optagelser</text>
+      <text lang="IS">Eyða upptöku</text>
       <text lang="PT">Apagar Gravações</text>
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
@@ -85,6 +89,7 @@
       <text lang="SV">Föregående</text>
       <text lang="JA">以前の録画</text>
       <text lang="DE">Alte Aufnahmen</text>
+      <text lang="IS">Fyrri upptökur</text>
       <text lang="NL">Vorige Opnames</text>      
       <text lang="FR">Anciens enregistrements</text>
       <text lang="FI">Aiemmin Nauhoitetut</text>

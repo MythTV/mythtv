@@ -10,6 +10,7 @@
       <text lang="FR">Général</text>
       <text lang="DE">Allgemeines</text>
       <text lang="DK">Generelt</text>
+      <text lang="IS">Almennt</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
       <text lang="JA">一般</text>
@@ -31,6 +32,7 @@
       <text lang="FR">Guide des programmes</text>
       <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
+      <text lang="IS">Dagskrá</text>
       <text lang="PT">Configurações do Guia</text>
       <text lang="SV">Programguide</text>
       <text lang="JA">番組ガイド</text>
@@ -54,6 +56,7 @@
       <text lang="FR">Visionnage</text>
       <text lang="DE">Wiedergabe</text>
       <text lang="DK">Afspilning</text>
+      <text lang="IS">Spilun</text>
       <text lang="PT">Configurações de Leitura</text>
       <text lang="SV">Uppspelning</text>
       <text lang="JA">再生</text>
@@ -75,6 +78,7 @@
       <text lang="FR">Profils d'enregistrement</text>
       <text lang="DE">Aufnahmeprofile</text>
       <text lang="DK">Optagelse</text>
+      <text lang="IS">Upptökur</text>
       <text lang="PT">Configurações de Gravação</text>
       <text lang="SV">Inspelningsprofiler</text>
       <text lang="JA">録画プロフィール</text>
@@ -94,6 +98,7 @@
       <text>Recording Priorities</text>
       <text lang="FR">Priorités d'enregistrement</text>
       <text lang="DE">Prioritäten</text>
+      <text lang="IS">Forgangur</text>
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
       <text lang="FI">Nauhoitusprioriteetit</text>

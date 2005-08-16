@@ -9,6 +9,7 @@
       <text lang="FR">Général</text>
       <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Generelt</text>
+      <text lang="IS">Almennt</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
@@ -30,6 +31,7 @@
       <text lang="FR">Apparence</text>
       <text lang="DE">Erscheinungsbild</text>
       <text lang="DK">Udseende</text>
+      <text lang="IS">Útlit</text>
       <text lang="NL">Uiterlijk</text>
       <text lang="PT">Configurar Aparência</text>
       <text lang="SV">Utseende</text>
@@ -49,6 +51,7 @@
      <text lang="SV">TV</text>
      <text lang="NL">TV</text>     
      <text lang="FR">Configuration TV</text>
+     <text lang="IS">Stillingar sjónvarps</text>
      <text lang="JA">TV設定</text>
      <text lang="FI">TV:n Asetukset</text>
      <text lang="ZH_TW">電視設定</text>
@@ -65,6 +68,7 @@
      <text lang="SV">Media</text>
      <text lang="NL">Media</text>
      <text lang="FR">Configuration multimédia</text>
+     <text lang="IS">Stillingar margmiðlunar</text>
      <text lang="JA">メディア設定</text>
      <text lang="FI">Media</text>
      <text lang="ZH_TW">媒體設定</text>
@@ -81,6 +85,7 @@
      <text lang="DE">Informationszentrale</text>
      <text lang="NL">Informatiecentrale</text>     
      <text lang="FR">Configuration centre d'informations</text>
+     <text lang="IS">Stillingar upplýsinga- miðstöðvar</text>
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォセンター設定</text>
      <text lang="FI">Tiedoteasetukset</text>
@@ -100,6 +105,7 @@
      <text lang="ES">Configurar XBox</text>
      <text lang="FR">Configuration XBox</text>
      <text lang="DE">Xbox</text>
+     <text lang="IS">Stillingar Xbox</text>
      <text lang="NL">Xbox Instellingen</text>
      <text lang="SV">Xbox</text>
      <text lang="JA">XBox設定</text>
@@ -117,6 +123,7 @@
       <text>Phone Settings</text>
       <text lang="FR">Configuration téléphone</text>
       <text lang="DE">Telefon</text>
+      <text lang="IS">Stillingar síma</text>
       <text lang="SV">Telefon</text>
       <text lang="NL">Telefoon Instellingen</text>      
       <text lang="FI">Puhelimen Asetukset</text>

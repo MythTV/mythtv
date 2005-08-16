@@ -10,6 +10,7 @@
       <text lang="FR">Regarder la TV</text>
       <text lang="DE">Fernsehen</text>
       <text lang="DK">Se TV</text>
+      <text lang="IS">Horfa á sjónvarp</text>
       <text lang="PT">Ver TelevisÃ£o</text>
       <text lang="SV">Se på TV</text>
       <text lang="JA">TV放送</text>
@@ -26,6 +27,7 @@
      <text>Media Library</text>
      <text lang="DE">Mediathek</text>
      <text lang="FR">Médiathèque</text>
+     <text lang="IS">Margmiðlunarsafn</text>
      <text lang="NL">Media-Center</text>     
      <text lang="SV">Mediabibliotek</text>
      <text lang="JA">メディアライブラリ</text>
@@ -49,6 +51,7 @@
       <text lang="FR">Gérer les enregistrements</text>
       <text lang="DE">Aufnahmen verwalten</text>
       <text lang="DK">Optag udsendelse</text>
+      <text lang="IS">Upptaka útsendinga</text>
       <text lang="PT">Gravação Programada</text>
       <text lang="SV">Hantera inspelningar</text>
       <text lang="JA">録画予約</text>
@@ -68,6 +71,7 @@
      <text>Information Center</text>
      <text lang="DE">Informationen</text>
      <text lang="FR">Centre d'informations</text>
+     <text lang="IS">Upplýsinga miðstöð</text>
      <text lang="NL">Informatie Centrale</text>
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォメーションセンター</text>
@@ -87,6 +91,7 @@
      <text>Optical Disks</text>
      <text lang="DE">CD/DVD</text>
      <text lang="FR">Disques optiques</text>
+     <text lang="IS">Geisladiskar</text>
      <text lang="NL">DVD-CD media</text>
      <text lang="SV">Optiska diskar</text>
      <text lang="JA">オプティカルディスク</text>
@@ -109,6 +114,7 @@
      <text lang="FR">Configuration</text>
      <text lang="DE">Zubehör / Konfiguration</text>
      <text lang="DK">Konfiguration</text>
+     <text lang="IS">Uppsetning</text>
      <text lang="NL">Beheer</text>
      <text lang="PT">Configurações</text>
      <text lang="SV">Verktyg / Inställningar</text>
