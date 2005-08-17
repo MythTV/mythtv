@@ -4134,6 +4134,67 @@ int NuppelVideoPlayer::getCurrentAudioTrack()
         return 0;
 }
 
+QStringList NuppelVideoPlayer::listAudioTracks()
+{
+    if (decoder)
+        return decoder->listAudioTracks();
+    else
+        return QStringList();
+}
+
+void NuppelVideoPlayer::incCurrentSubtitleTrack()
+{
+    if (decoder)
+        decoder->incCurrentSubtitleTrack();
+}
+
+void NuppelVideoPlayer::decCurrentSubtitleTrack()
+{
+    if (decoder)
+        decoder->decCurrentSubtitleTrack();
+}
+
+bool NuppelVideoPlayer::setCurrentSubtitleTrack(int trackNo)
+{
+    if (trackNo < 0)
+    {
+        cc = false;
+        return false;
+    }
+
+    if (decoder)
+    {
+        if (decoder->setCurrentSubtitleTrack(trackNo))
+        {
+            cc = true;
+        } else {
+            cc = false;
+            return false;
+        }
+    } else
+        return false;
+}
+
+
+int NuppelVideoPlayer::getCurrentSubtitleTrack()
+{
+    if (!cc)
+        return 0;
+
+    if (decoder)
+        return decoder->getCurrentSubtitleTrack() + 1;
+    else
+        return 0;
+}
+
+QStringList NuppelVideoPlayer::listSubtitleTracks()
+{
+    if (decoder)
+        return decoder->listSubtitleTracks();
+    else
+        return QStringList();
+}
+
 // updates new subtitles to the screen and clears old ones
 void NuppelVideoPlayer::DisplaySubtitles()
 {

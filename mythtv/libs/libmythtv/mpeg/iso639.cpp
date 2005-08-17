@@ -5,6 +5,56 @@
 
 /** Note: this file takes a long time to compile. **/
 
+static int createCodeToEnglishNamesMap(QMap<int, QString>& names);
+static int createCode2ToCode3Map(QMap<int, int>& codemap);
+
+static inline int iso639_2toInt(const unsigned char *iso639_2) {
+    return (iso639_2[0]<<16)|(iso639_2[1]<<8)|iso639_2[2];
+}
+static inline int iso639_2toInt(const char *iso639_2) {
+    return iso639_2toInt((const unsigned char*)iso639_2);
+}
+
+static inline int iso639_1toInt(const unsigned char *iso639_1) {
+    return (iso639_1[1]<<8)|iso639_1[1];
+}
+static inline int iso639_1toInt(const char *iso639_1) {
+    return iso639_1toInt((const unsigned char*)iso639_1);
+}
+
+static QMap<int, QString> codes2names;
+static QMap<int, int> codes2codes;
+
+QString iso639_Alpha3_toName(const unsigned char *iso639_2)
+{
+    int alpha3 = iso639_2toInt(iso639_2);
+    
+    if (codes2names.contains(alpha3))
+        return codes2names[alpha3];
+        
+    return "Unknown";
+}
+
+QString iso639_Alpha2_toName(const unsigned char *iso639_1)
+{
+    int alpha2 = iso639_1toInt(iso639_1);
+
+    if (codes2codes.contains(alpha2))
+        return codes2names[codes2codes[alpha2]];
+        
+    return "Unknown";
+}
+
+QString iso639_toName(const unsigned char *iso639)
+{
+    if (strlen((const char *)iso639) == 2)
+        return iso639_Alpha2_toName(iso639);
+    else if (strlen((const char *)iso639) == 3)
+        return iso639_Alpha3_toName(iso639);
+        
+    return "Unknown";
+}
+
 /*
   Generated from
     http://www.loc.gov/standards/iso639-2/ascii_8bits.html
@@ -12,13 +62,12 @@
     cat ISO-639-2_values_8bits.txt | \
       awk -F'|' '{printf "  names[iso639_2toInt(\"%s\")] = QString(\"%s\");\n", $1, $4}'
 */
-QMap<int, QString> codes2names;
-static inline int iso639_2toInt(const unsigned char *iso639_2) {
-    return (iso639_2[0]<<16)|(iso639_2[1]<<8)|iso639_2[2];
-}
-static inline int iso639_2toInt(const char *iso639_2) {
-    return iso639_2toInt((const unsigned char*)iso639_2);
-}
+
+int dummy_createCodeToEnglishNamesMap =
+    createCodeToEnglishNamesMap(codes2names);
+
+int dummy_createCode2ToCode3Map =
+    createCode2ToCode3Map(codes2codes);
 
 static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_2toInt("aar")] = QString("Afar");
@@ -513,6 +562,216 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   return 0;
 }
 
-int dummy_createCodeToEnglishNamesMap =
-    createCodeToEnglishNamesMap(codes2names);
+/*
+  awk script:
+    cat ISO-639-2_values_8bits.txt | \
+      awk -F'|' '{if ($3 != "") printf "  codemap[iso639_1toInt(\"%s\")] = iso639_2toInt(\"%s\");\n", $3, $1}'
+*/
 
+static int createCode2ToCode3Map(QMap<int, int>& codemap) {
+  codemap[iso639_1toInt("aa")] = iso639_2toInt("aar");
+  codemap[iso639_1toInt("ab")] = iso639_2toInt("abk");
+  codemap[iso639_1toInt("af")] = iso639_2toInt("afr");
+  codemap[iso639_1toInt("ak")] = iso639_2toInt("aka");
+  codemap[iso639_1toInt("sq")] = iso639_2toInt("alb");
+  codemap[iso639_1toInt("sq")] = iso639_2toInt("alb");
+  codemap[iso639_1toInt("am")] = iso639_2toInt("amh");
+  codemap[iso639_1toInt("ar")] = iso639_2toInt("ara");
+  codemap[iso639_1toInt("an")] = iso639_2toInt("arg");
+  codemap[iso639_1toInt("hy")] = iso639_2toInt("arm");
+  codemap[iso639_1toInt("hy")] = iso639_2toInt("arm");
+  codemap[iso639_1toInt("as")] = iso639_2toInt("asm");
+  codemap[iso639_1toInt("av")] = iso639_2toInt("ava");
+  codemap[iso639_1toInt("ae")] = iso639_2toInt("ave");
+  codemap[iso639_1toInt("ay")] = iso639_2toInt("aym");
+  codemap[iso639_1toInt("az")] = iso639_2toInt("aze");
+  codemap[iso639_1toInt("ba")] = iso639_2toInt("bak");
+  codemap[iso639_1toInt("bm")] = iso639_2toInt("bam");
+  codemap[iso639_1toInt("eu")] = iso639_2toInt("baq");
+  codemap[iso639_1toInt("eu")] = iso639_2toInt("baq");
+  codemap[iso639_1toInt("be")] = iso639_2toInt("bel");
+  codemap[iso639_1toInt("bn")] = iso639_2toInt("ben");
+  codemap[iso639_1toInt("bh")] = iso639_2toInt("bih");
+  codemap[iso639_1toInt("bi")] = iso639_2toInt("bis");
+  codemap[iso639_1toInt("bs")] = iso639_2toInt("bos");
+  codemap[iso639_1toInt("br")] = iso639_2toInt("bre");
+  codemap[iso639_1toInt("bg")] = iso639_2toInt("bul");
+  codemap[iso639_1toInt("my")] = iso639_2toInt("bur");
+  codemap[iso639_1toInt("my")] = iso639_2toInt("bur");
+  codemap[iso639_1toInt("ca")] = iso639_2toInt("cat");
+  codemap[iso639_1toInt("ch")] = iso639_2toInt("cha");
+  codemap[iso639_1toInt("ce")] = iso639_2toInt("che");
+  codemap[iso639_1toInt("zh")] = iso639_2toInt("chi");
+  codemap[iso639_1toInt("zh")] = iso639_2toInt("chi");
+  codemap[iso639_1toInt("cu")] = iso639_2toInt("chu");
+  codemap[iso639_1toInt("cv")] = iso639_2toInt("chv");
+  codemap[iso639_1toInt("kw")] = iso639_2toInt("cor");
+  codemap[iso639_1toInt("co")] = iso639_2toInt("cos");
+  codemap[iso639_1toInt("cr")] = iso639_2toInt("cre");
+  codemap[iso639_1toInt("cs")] = iso639_2toInt("cze");
+  codemap[iso639_1toInt("cs")] = iso639_2toInt("cze");
+  codemap[iso639_1toInt("da")] = iso639_2toInt("dan");
+  codemap[iso639_1toInt("dv")] = iso639_2toInt("div");
+  codemap[iso639_1toInt("nl")] = iso639_2toInt("dut");
+  codemap[iso639_1toInt("nl")] = iso639_2toInt("dut");
+  codemap[iso639_1toInt("dz")] = iso639_2toInt("dzo");
+  codemap[iso639_1toInt("en")] = iso639_2toInt("eng");
+  codemap[iso639_1toInt("eo")] = iso639_2toInt("epo");
+  codemap[iso639_1toInt("et")] = iso639_2toInt("est");
+  codemap[iso639_1toInt("ee")] = iso639_2toInt("ewe");
+  codemap[iso639_1toInt("fo")] = iso639_2toInt("fao");
+  codemap[iso639_1toInt("fj")] = iso639_2toInt("fij");
+  codemap[iso639_1toInt("fi")] = iso639_2toInt("fin");
+  codemap[iso639_1toInt("fr")] = iso639_2toInt("fre");
+  codemap[iso639_1toInt("fy")] = iso639_2toInt("fry");
+  codemap[iso639_1toInt("ff")] = iso639_2toInt("ful");
+  codemap[iso639_1toInt("ka")] = iso639_2toInt("geo");
+  codemap[iso639_1toInt("ka")] = iso639_2toInt("geo");
+  codemap[iso639_1toInt("de")] = iso639_2toInt("ger");
+  codemap[iso639_1toInt("de")] = iso639_2toInt("ger");
+  codemap[iso639_1toInt("gd")] = iso639_2toInt("gla");
+  codemap[iso639_1toInt("ga")] = iso639_2toInt("gle");
+  codemap[iso639_1toInt("gl")] = iso639_2toInt("glg");
+  codemap[iso639_1toInt("gv")] = iso639_2toInt("glv");
+  codemap[iso639_1toInt("el")] = iso639_2toInt("gre");
+  codemap[iso639_1toInt("el")] = iso639_2toInt("gre");
+  codemap[iso639_1toInt("gn")] = iso639_2toInt("grn");
+  codemap[iso639_1toInt("gu")] = iso639_2toInt("guj");
+  codemap[iso639_1toInt("ht")] = iso639_2toInt("hat");
+  codemap[iso639_1toInt("ha")] = iso639_2toInt("hau");
+  codemap[iso639_1toInt("he")] = iso639_2toInt("heb");
+  codemap[iso639_1toInt("hz")] = iso639_2toInt("her");
+  codemap[iso639_1toInt("hi")] = iso639_2toInt("hin");
+  codemap[iso639_1toInt("ho")] = iso639_2toInt("hmo");
+  codemap[iso639_1toInt("hu")] = iso639_2toInt("hun");
+  codemap[iso639_1toInt("ig")] = iso639_2toInt("ibo");
+  codemap[iso639_1toInt("is")] = iso639_2toInt("ice");
+  codemap[iso639_1toInt("is")] = iso639_2toInt("ice");
+  codemap[iso639_1toInt("io")] = iso639_2toInt("ido");
+  codemap[iso639_1toInt("ii")] = iso639_2toInt("iii");
+  codemap[iso639_1toInt("iu")] = iso639_2toInt("iku");
+  codemap[iso639_1toInt("ie")] = iso639_2toInt("ile");
+  codemap[iso639_1toInt("ia")] = iso639_2toInt("ina");
+  codemap[iso639_1toInt("id")] = iso639_2toInt("ind");
+  codemap[iso639_1toInt("ik")] = iso639_2toInt("ipk");
+  codemap[iso639_1toInt("it")] = iso639_2toInt("ita");
+  codemap[iso639_1toInt("jv")] = iso639_2toInt("jav");
+  codemap[iso639_1toInt("ja")] = iso639_2toInt("jpn");
+  codemap[iso639_1toInt("kl")] = iso639_2toInt("kal");
+  codemap[iso639_1toInt("kn")] = iso639_2toInt("kan");
+  codemap[iso639_1toInt("ks")] = iso639_2toInt("kas");
+  codemap[iso639_1toInt("kr")] = iso639_2toInt("kau");
+  codemap[iso639_1toInt("kk")] = iso639_2toInt("kaz");
+  codemap[iso639_1toInt("km")] = iso639_2toInt("khm");
+  codemap[iso639_1toInt("ki")] = iso639_2toInt("kik");
+  codemap[iso639_1toInt("rw")] = iso639_2toInt("kin");
+  codemap[iso639_1toInt("ky")] = iso639_2toInt("kir");
+  codemap[iso639_1toInt("kv")] = iso639_2toInt("kom");
+  codemap[iso639_1toInt("kg")] = iso639_2toInt("kon");
+  codemap[iso639_1toInt("ko")] = iso639_2toInt("kor");
+  codemap[iso639_1toInt("kj")] = iso639_2toInt("kua");
+  codemap[iso639_1toInt("ku")] = iso639_2toInt("kur");
+  codemap[iso639_1toInt("lo")] = iso639_2toInt("lao");
+  codemap[iso639_1toInt("la")] = iso639_2toInt("lat");
+  codemap[iso639_1toInt("lv")] = iso639_2toInt("lav");
+  codemap[iso639_1toInt("li")] = iso639_2toInt("lim");
+  codemap[iso639_1toInt("ln")] = iso639_2toInt("lin");
+  codemap[iso639_1toInt("lt")] = iso639_2toInt("lit");
+  codemap[iso639_1toInt("lb")] = iso639_2toInt("ltz");
+  codemap[iso639_1toInt("lu")] = iso639_2toInt("lub");
+  codemap[iso639_1toInt("lg")] = iso639_2toInt("lug");
+  codemap[iso639_1toInt("mk")] = iso639_2toInt("mac");
+  codemap[iso639_1toInt("mk")] = iso639_2toInt("mac");
+  codemap[iso639_1toInt("mh")] = iso639_2toInt("mah");
+  codemap[iso639_1toInt("ml")] = iso639_2toInt("mal");
+  codemap[iso639_1toInt("mi")] = iso639_2toInt("mao");
+  codemap[iso639_1toInt("mi")] = iso639_2toInt("mao");
+  codemap[iso639_1toInt("mr")] = iso639_2toInt("mar");
+  codemap[iso639_1toInt("ms")] = iso639_2toInt("may");
+  codemap[iso639_1toInt("ms")] = iso639_2toInt("may");
+  codemap[iso639_1toInt("mg")] = iso639_2toInt("mlg");
+  codemap[iso639_1toInt("mt")] = iso639_2toInt("mlt");
+  codemap[iso639_1toInt("mo")] = iso639_2toInt("mol");
+  codemap[iso639_1toInt("mn")] = iso639_2toInt("mon");
+  codemap[iso639_1toInt("na")] = iso639_2toInt("nau");
+  codemap[iso639_1toInt("nv")] = iso639_2toInt("nav");
+  codemap[iso639_1toInt("nr")] = iso639_2toInt("nbl");
+  codemap[iso639_1toInt("nd")] = iso639_2toInt("nde");
+  codemap[iso639_1toInt("ng")] = iso639_2toInt("ndo");
+  codemap[iso639_1toInt("ne")] = iso639_2toInt("nep");
+  codemap[iso639_1toInt("nn")] = iso639_2toInt("nno");
+  codemap[iso639_1toInt("nb")] = iso639_2toInt("nob");
+  codemap[iso639_1toInt("no")] = iso639_2toInt("nor");
+  codemap[iso639_1toInt("ny")] = iso639_2toInt("nya");
+  codemap[iso639_1toInt("oc")] = iso639_2toInt("oci");
+  codemap[iso639_1toInt("oj")] = iso639_2toInt("oji");
+  codemap[iso639_1toInt("or")] = iso639_2toInt("ori");
+  codemap[iso639_1toInt("om")] = iso639_2toInt("orm");
+  codemap[iso639_1toInt("os")] = iso639_2toInt("oss");
+  codemap[iso639_1toInt("pa")] = iso639_2toInt("pan");
+  codemap[iso639_1toInt("fa")] = iso639_2toInt("per");
+  codemap[iso639_1toInt("fa")] = iso639_2toInt("per");
+  codemap[iso639_1toInt("pi")] = iso639_2toInt("pli");
+  codemap[iso639_1toInt("pl")] = iso639_2toInt("pol");
+  codemap[iso639_1toInt("pt")] = iso639_2toInt("por");
+  codemap[iso639_1toInt("ps")] = iso639_2toInt("pus");
+  codemap[iso639_1toInt("qu")] = iso639_2toInt("que");
+  codemap[iso639_1toInt("rm")] = iso639_2toInt("roh");
+  codemap[iso639_1toInt("ro")] = iso639_2toInt("rum");
+  codemap[iso639_1toInt("rn")] = iso639_2toInt("run");
+  codemap[iso639_1toInt("ru")] = iso639_2toInt("rus");
+  codemap[iso639_1toInt("sg")] = iso639_2toInt("sag");
+  codemap[iso639_1toInt("sa")] = iso639_2toInt("san");
+  codemap[iso639_1toInt("sr")] = iso639_2toInt("scc");
+  codemap[iso639_1toInt("sr")] = iso639_2toInt("scc");
+  codemap[iso639_1toInt("hr")] = iso639_2toInt("scr");
+  codemap[iso639_1toInt("hr")] = iso639_2toInt("scr");
+  codemap[iso639_1toInt("si")] = iso639_2toInt("sin");
+  codemap[iso639_1toInt("sk")] = iso639_2toInt("slo");
+  codemap[iso639_1toInt("sl")] = iso639_2toInt("slv");
+  codemap[iso639_1toInt("se")] = iso639_2toInt("sme");
+  codemap[iso639_1toInt("sm")] = iso639_2toInt("smo");
+  codemap[iso639_1toInt("sn")] = iso639_2toInt("sna");
+  codemap[iso639_1toInt("sd")] = iso639_2toInt("snd");
+  codemap[iso639_1toInt("so")] = iso639_2toInt("som");
+  codemap[iso639_1toInt("st")] = iso639_2toInt("sot");
+  codemap[iso639_1toInt("es")] = iso639_2toInt("spa");
+  codemap[iso639_1toInt("sc")] = iso639_2toInt("srd");
+  codemap[iso639_1toInt("ss")] = iso639_2toInt("ssw");
+  codemap[iso639_1toInt("su")] = iso639_2toInt("sun");
+  codemap[iso639_1toInt("sw")] = iso639_2toInt("swa");
+  codemap[iso639_1toInt("sv")] = iso639_2toInt("swe");
+  codemap[iso639_1toInt("ty")] = iso639_2toInt("tah");
+  codemap[iso639_1toInt("ta")] = iso639_2toInt("tam");
+  codemap[iso639_1toInt("tt")] = iso639_2toInt("tat");
+  codemap[iso639_1toInt("te")] = iso639_2toInt("tel");
+  codemap[iso639_1toInt("tg")] = iso639_2toInt("tgk");
+  codemap[iso639_1toInt("tl")] = iso639_2toInt("tgl");
+  codemap[iso639_1toInt("th")] = iso639_2toInt("tha");
+  codemap[iso639_1toInt("bo")] = iso639_2toInt("tib");
+  codemap[iso639_1toInt("bo")] = iso639_2toInt("tib");
+  codemap[iso639_1toInt("ti")] = iso639_2toInt("tir");
+  codemap[iso639_1toInt("to")] = iso639_2toInt("ton");
+  codemap[iso639_1toInt("tn")] = iso639_2toInt("tsn");
+  codemap[iso639_1toInt("ts")] = iso639_2toInt("tso");
+  codemap[iso639_1toInt("tk")] = iso639_2toInt("tuk");
+  codemap[iso639_1toInt("tr")] = iso639_2toInt("tur");
+  codemap[iso639_1toInt("tw")] = iso639_2toInt("twi");
+  codemap[iso639_1toInt("ug")] = iso639_2toInt("uig");
+  codemap[iso639_1toInt("uk")] = iso639_2toInt("ukr");
+  codemap[iso639_1toInt("ur")] = iso639_2toInt("urd");
+  codemap[iso639_1toInt("uz")] = iso639_2toInt("uzb");
+  codemap[iso639_1toInt("ve")] = iso639_2toInt("ven");
+  codemap[iso639_1toInt("vi")] = iso639_2toInt("vie");
+  codemap[iso639_1toInt("vo")] = iso639_2toInt("vol");
+  codemap[iso639_1toInt("cy")] = iso639_2toInt("wel");
+  codemap[iso639_1toInt("cy")] = iso639_2toInt("wel");
+  codemap[iso639_1toInt("wa")] = iso639_2toInt("wln");
+  codemap[iso639_1toInt("wo")] = iso639_2toInt("wol");
+  codemap[iso639_1toInt("xh")] = iso639_2toInt("xho");
+  codemap[iso639_1toInt("yi")] = iso639_2toInt("yid");
+  codemap[iso639_1toInt("yo")] = iso639_2toInt("yor");
+  codemap[iso639_1toInt("za")] = iso639_2toInt("zha");
+  codemap[iso639_1toInt("zu")] = iso639_2toInt("zul");
+  return 0;
+}

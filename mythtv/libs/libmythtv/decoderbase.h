@@ -69,6 +69,13 @@ class DecoderBase
     virtual void incCurrentAudioTrack(){}
     virtual void decCurrentAudioTrack(){}
     virtual bool setCurrentAudioTrack(int){ return false;}
+    virtual QStringList listAudioTracks() const { return QStringList("Track 1"); }
+
+    const int getCurrentSubtitleTrack() const { return currentSubtitleTrack;}
+    virtual void incCurrentSubtitleTrack(){}
+    virtual void decCurrentSubtitleTrack(){}
+    virtual bool setCurrentSubtitleTrack(int){ return false;}
+    virtual QStringList listSubtitleTracks() const { return QStringList(); }
 
     void setTranscoding(bool value) { transcoding = value; };
                                                           
@@ -121,6 +128,7 @@ class DecoderBase
     bool getrawvideo;
 
     int currentAudioTrack;
+    int currentSubtitleTrack;
     bool errored;
 };
 

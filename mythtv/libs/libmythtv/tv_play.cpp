@@ -129,6 +129,8 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "PLAY", "Play", "Ctrl+P");
     REG_KEY("TV Playback", "NEXTAUDIO", "Switch to the next audio track", "+");
     REG_KEY("TV Playback", "PREVAUDIO", "Switch to the previous audio track", "-");
+    REG_KEY("TV Playback", "NEXTSUBTITLE", "Switch to the next subtitle track", "");
+    REG_KEY("TV Playback", "PREVSUBTITLE", "Switch to the previous subtitle track", "");
     REG_KEY("TV Playback", "SUBCHANNELSEP", "Separator for HDTV subchannels", "_");
     
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
@@ -1792,9 +1794,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
             DoPlay();
         else if (action == "NEXTAUDIO")
             ChangeAudioTrack(1);
-	else if (action == "PREVAUDIO")
+        else if (action == "PREVAUDIO")
             ChangeAudioTrack(-1);
-	else if (action == "PAUSE") 
+        else if (action == "NEXTSUBTITLE")
+            ChangeSubtitleTrack(1);
+        else if (action == "PREVSUBTITLE")
+            ChangeSubtitleTrack(-1);
+        else if (action == "PAUSE") 
             DoPause();
         else if (action == "SPEEDINC")
             ChangeSpeed(1);
@@ -4288,6 +4294,14 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         ChangeAudioTrack(1);
     else if (action == "PREVAUDIO")
         ChangeAudioTrack(-1);
+    else if (action.left(11) == "SELECTAUDIO")
+        SetAudioTrack(action.mid(11).toInt());
+    else if (action == "NEXTSUBTITLE")
+        ChangeSubtitleTrack(1);
+    else if (action == "PREVSUBTITLE")
+        ChangeSubtitleTrack(-1);
+    else if (action.left(14) == "SELECTSUBTITLE")
+        SetSubtitleTrack(action.mid(14).toInt());
     else if (StateIsLiveTV(GetState()))
     {
         if (action == "GUIDE")
@@ -4420,20 +4434,53 @@ void TV::BuildOSDTreeMenu(void)
             item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire ON"),
                                       "TOGGLEAUTOEXPIRE");
     }
+    
+    item = new OSDGenericTree(treeMenu, tr("Select Audio Track"), "NEXTAUDIO");
 
-    if (vbimode == 1)
-        item = new OSDGenericTree(treeMenu, tr("Toggle Teletext"),
-                                  "TOGGLECC");
-    else if (vbimode == 2)
+    const QStringList atracks = activenvp->listAudioTracks();
+    int atrack = activenvp->getCurrentAudioTrack();
+    int i = 1;
+
+    for (QStringList::const_iterator it = atracks.begin(); it != atracks.end(); it++)
     {
-        item = new OSDGenericTree(treeMenu, tr("Closed Captioning"));
-        subitem = new OSDGenericTree(item, tr("Toggle CC"), "TOGGLECC");
-        for (int i = 1; i <= 4; i++)
-            subitem = new OSDGenericTree(item, QString("%1%2").arg(tr("CC")).arg(i),
-                                         QString("DISPCC%1").arg(i));
-        for (int i = 1; i <= 4; i++)
-            subitem = new OSDGenericTree(item, QString("%1%2").arg(tr("TXT")).arg(i),
-                                         QString("DISPTXT%1").arg(i));
+        subitem = new OSDGenericTree(item, *it, "SELECTAUDIO" + QString("%1").arg(i),
+                                     (i == atrack) ? 1 : 0, NULL, "AUDIOGROUP");
+        i++;
+    }
+
+    const QStringList stracks = activenvp->listSubtitleTracks();
+    
+    if (stracks.size() > 0)
+    {
+        item = new OSDGenericTree(treeMenu, tr("Select Subtitles"),
+                                      "TOGGLECC");
+        int strack = activenvp->getCurrentSubtitleTrack();
+        int i = 1;
+
+        subitem = new OSDGenericTree(item, "None", "SELECTSUBTITLE" + QString("%1").arg(0),
+                                     (0 == strack) ? 1 : 0, NULL, "SUBTITLEGROUP");
+
+        for (QStringList::const_iterator it = stracks.begin(); it != stracks.end(); it++)
+        {
+            subitem = new OSDGenericTree(item, *it, "SELECTSUBTITLE" + QString("%1").arg(i),
+                                         (i == strack) ? 1 : 0, NULL, "SUBTITLEGROUP");
+            i++;
+        }
+    } else {
+        if (vbimode == 1)
+            item = new OSDGenericTree(treeMenu, tr("Toggle Teletext"),
+                                      "TOGGLECC");
+        else if (vbimode == 2)
+        {
+            item = new OSDGenericTree(treeMenu, tr("Closed Captioning"));
+            subitem = new OSDGenericTree(item, tr("Toggle CC"), "TOGGLECC");
+            for (int i = 1; i <= 4; i++)
+                subitem = new OSDGenericTree(item, QString("%1%2").arg(tr("CC")).arg(i),
+                                             QString("DISPCC%1").arg(i));
+            for (int i = 1; i <= 4; i++)
+                subitem = new OSDGenericTree(item, QString("%1%2").arg(tr("TXT")).arg(i),
+                                             QString("DISPTXT%1").arg(i));
+        }
     }
 
     int letterbox = nvp->GetLetterbox();
@@ -4513,8 +4560,6 @@ void TV::BuildOSDTreeMenu(void)
                                  (speedX100 == 150) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
 
-    item = new OSDGenericTree(treeMenu, tr("Next Audio Track"), "NEXTAUDIO");
-
     // add sleep items to menu
 
     item = new OSDGenericTree(treeMenu, tr("Sleep"), "TOGGLESLEEPON");
@@ -4540,6 +4585,63 @@ void TV::ChangeAudioTrack(int dir)
             QString msg = QString("%1 %2")
                           .arg(tr("Audio track"))
                           .arg(activenvp->getCurrentAudioTrack());
+
+            if (GetOSD())
+                GetOSD()->SetSettingsText(msg, 3);
+        }
+    }
+}
+
+void TV::SetAudioTrack(int track)
+{
+    if (activenvp)
+    {
+        activenvp->setCurrentAudioTrack(track - 1); 
+
+        if (activenvp->getCurrentAudioTrack())
+        {
+            QString msg = QString("%1 %2")
+                          .arg(tr("Audio track"))
+                          .arg(activenvp->getCurrentAudioTrack());
+
+            if (GetOSD())
+                GetOSD()->SetSettingsText(msg, 3);
+        }
+    }
+}
+
+void TV::ChangeSubtitleTrack(int dir)
+{
+    if (activenvp)
+    {
+        if (dir > 0)
+            activenvp->incCurrentSubtitleTrack(); 
+        else
+            activenvp->decCurrentSubtitleTrack();
+
+        if (activenvp->getCurrentSubtitleTrack())
+        {
+            QString msg = QString("%1 %2")
+                          .arg(tr("Subtitle track"))
+                          .arg(activenvp->getCurrentSubtitleTrack());
+
+            if (GetOSD())
+                GetOSD()->SetSettingsText(msg, 3);
+        }
+    }
+}
+
+void TV::SetSubtitleTrack(int track)
+{
+    if (activenvp)
+    {
+        activenvp->setCurrentSubtitleTrack(track - 1); 
+
+        if (activenvp->getCurrentSubtitleTrack())
+        {
+            QString msg = QString("%1 %2")
+                          .arg(tr("Subtitle track"))
+                          .arg(activenvp->getCurrentSubtitleTrack());
 
             if (GetOSD())
                 GetOSD()->SetSettingsText(msg, 3);

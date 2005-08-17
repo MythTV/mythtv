@@ -90,6 +90,7 @@ HEADERS += scheduledrecording.h
 HEADERS += sr_dialog.h              sr_root.h
 HEADERS += sr_items.h
 HEADERS += signalmonitorvalue.h 
+HEADERS += mpeg/iso639.h
 
 SOURCES += programinfo.cpp          proglist.cpp
 SOURCES += dbcheck.cpp              RingBuffer.cpp
@@ -101,7 +102,7 @@ SOURCES += scheduledrecording.cpp
 SOURCES += sr_dialog.cpp            sr_root.cpp
 SOURCES += sr_items.cpp
 SOURCES += signalmonitorvalue.cpp
-
+SOURCES += mpeg/iso639.cpp
 
 using_frontend {
     # Recording profile stuff
@@ -216,7 +217,7 @@ using_backend {
     SOURCES += mpeg/mpegstreamdata.cpp     mpeg/atscstreamdata.cpp
     SOURCES += mpeg/dvbstreamdata.cpp      mpeg/scanstreamdata.cpp
     SOURCES += mpeg/mpegdescriptors.cpp    mpeg/atscdescriptors.cpp
-    SOURCES += mpeg/dvbdescriptors.cpp     mpeg/atscdescriptorsmap.cpp
+    SOURCES += mpeg/dvbdescriptors.cpp
 
     # Listings downloading classes
     HEADERS += datadirect.h

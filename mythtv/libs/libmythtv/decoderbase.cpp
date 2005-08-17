@@ -24,7 +24,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
 
       hasKeyFrameAdjustTable(false), lowbuffers(false),
       getrawframes(false), getrawvideo(false),
-      currentAudioTrack(-1),
+      currentAudioTrack(-1), currentSubtitleTrack(-1),
       errored(false)
 {
 }

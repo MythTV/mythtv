@@ -202,6 +202,13 @@ class NuppelVideoPlayer
     void decCurrentAudioTrack();
     bool setCurrentAudioTrack(int trackNo);
     int getCurrentAudioTrack();
+    QStringList listAudioTracks();
+
+    void incCurrentSubtitleTrack();
+    void decCurrentSubtitleTrack();
+    bool setCurrentSubtitleTrack(int trackNo);
+    int getCurrentSubtitleTrack();
+    QStringList listSubtitleTracks();
 
     long long CalcMaxFFTime(long long ff);
 

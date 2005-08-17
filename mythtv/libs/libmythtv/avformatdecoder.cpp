@@ -11,6 +11,7 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
+#include "mpeg/iso639.h"
 
 #ifdef USING_XVMC
 #include "videoout_xv.h"
@@ -152,7 +153,8 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       audio_sample_size(-1), audio_sampling_rate(-1), audio_channels(-1),
       do_ac3_passthru(false), wantedAudioStream(-1),
-      audio_check_1st(2), audio_sampling_rate_2nd(0), audio_channels_2nd(0)
+      audio_check_1st(2), audio_sampling_rate_2nd(0), audio_channels_2nd(0),
+      wantedSubtitleStream(-1)
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(prvpkt, 3 * sizeof(char));
@@ -171,56 +173,6 @@ AvFormatDecoder::~AvFormatDecoder()
     delete d;
     if (audioSamples)
         delete [] audioSamples;
-}
-
-// evaluates whether the given language is the subtitle language that is
-// preferred
-//
-// in case there's only one subtitle language available, always returns true
-//
-// if more than one subtitle languages are found, the best one is
-// picked according to the PreferredLanguages setting
-//
-// in case there's no PreferredLanguages setting, or no preferred language
-// is found, the first found subtitle stream is preferred
-bool AvFormatDecoder::IsWantedSubtitleLanguage(const QString &language) 
-{
-    if (!ic)
-        return true;
-
-    // count the subtitle streams
-    int subtitleStreams = 0;
-    AVStream *first = NULL;
-    for (int i = 0; i < ic->nb_streams; i++)
-    {
-        AVStream* st = ic->streams[i];
-        if (st->codec->codec_type == CODEC_TYPE_SUBTITLE) 
-        {
-            if (first == NULL)
-                first = ic->streams[i];
-            ++subtitleStreams;
-        }
-    }
-
-    if (subtitleStreams == 1)
-        return true;
-
-    // go through all preferred languages and pick the best found
-    for (QStringList::iterator l = subtitleLanguagePreferences.begin();
-         l != subtitleLanguagePreferences.end(); ++l) 
-    {
-        for (int i = 0; i < ic->nb_streams; i++)
-        {
-            AVStream* st = ic->streams[i];
-
-            if (st->language == *l)
-                return (language == st->language);
-        }
-    }
-
-    // no preferences at all, or no language that is preferred found --
-    // let's pick the first subtitle stream
-    return (language == first->language);
 }
 
 void AvFormatDecoder::CloseContext()
@@ -640,6 +592,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
         return ret;
 
     autoSelectAudioTrack();
+    autoSelectSubtitleTrack();
 
     ringBuffer->CalcReadAheadThresh(bitrate);
 
@@ -833,6 +786,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     fps = 0;
 
     audioStreams.clear();
+    subtitleStreams.clear();
     do_ac3_passthru = false;
     audio_sample_size = -1;
     audio_sampling_rate = -1;
@@ -979,6 +933,11 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                         <<"id("<<codec_id_string(enc->codec_id)<<") "
                         <<"type("<<codec_type_string(enc->codec_type)<<")");
             }
+        }
+
+        if (enc->codec_type == CODEC_TYPE_SUBTITLE)
+        {
+            subtitleStreams.push_back( i );
         }
 
         if (enc->codec_type == CODEC_TYPE_AUDIO)
@@ -1503,6 +1462,46 @@ bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
     return true;
 }
 
+QStringList AvFormatDecoder::listAudioTracks() const
+{
+    QStringList list;
+    int num_tracks = audioStreams.size();
+    int track;
+    
+    for (track = 0; track < num_tracks; track++)
+    {
+        AVStream *s = ic->streams[audioStreams[track]];
+        
+        if (!s)
+            continue;
+        
+        QString t = QString("%1: ").arg(track + 1);
+        
+        if (strlen(s->language) > 0)
+        {
+            t += iso639_toName((unsigned char *)(s->language));
+            t += " ";
+        }
+        
+        if (s->codec->codec_id == CODEC_ID_MP3 && s->codec->sub_id == 1)
+            t += "MP1 ";
+        else if (s->codec->codec_id == CODEC_ID_MP3 && s->codec->sub_id == 2)
+            t += "MP2 ";
+        else
+        {      
+            t += QString(s->codec->codec->name).upper();
+            t += " ";
+        }
+        
+        t += QString("%1ch").arg(s->codec->channels);
+        
+        list += t;
+    }
+    
+    return list;
+}
+
+
 //
 // This function will select the best audio track
 // available usgin the following rules:
@@ -1615,6 +1614,128 @@ void AvFormatDecoder::SetupAudioStream(void)
                       gContext->GetNumSetting("AC3PassThru", false);
 }
 
+
+void AvFormatDecoder::incCurrentSubtitleTrack()
+{
+    if (subtitleStreams.size())
+    {
+        int tempTrackNo = currentSubtitleTrack;
+        ++tempTrackNo;
+        if (tempTrackNo > (int)(subtitleStreams.size() - 1))
+            tempTrackNo = 0;
+
+        currentSubtitleTrack = tempTrackNo;
+        wantedSubtitleStream = subtitleStreams[currentSubtitleTrack];
+    }
+}
+
+void AvFormatDecoder::decCurrentSubtitleTrack()
+{
+    if (subtitleStreams.size())
+    {
+        int tempTrackNo = currentSubtitleTrack;
+        --tempTrackNo;
+        if (tempTrackNo < 0)
+            tempTrackNo = subtitleStreams.size() - 1;
+
+        currentSubtitleTrack = tempTrackNo;
+        wantedSubtitleStream = subtitleStreams[currentSubtitleTrack];
+    }
+}
+
+bool AvFormatDecoder::setCurrentSubtitleTrack(int trackNo)
+{
+    if (trackNo < 0)
+        trackNo = -1;
+    else if (trackNo >= (int)subtitleStreams.size())
+        return false;
+
+    currentSubtitleTrack = trackNo;
+    if (currentSubtitleTrack < 0)
+        return false;
+
+    wantedSubtitleStream = subtitleStreams[currentSubtitleTrack];
+
+    return true;
+}
+
+QStringList AvFormatDecoder::listSubtitleTracks() const
+{
+    QStringList list;
+    int num_tracks = subtitleStreams.size();
+    int track;
+    
+    for (track = 0; track < num_tracks; track++)
+    {
+        AVStream *s = ic->streams[subtitleStreams[track]];
+        
+        if (!s)
+            continue;
+        
+        QString t = QString("%1: ").arg(track + 1);
+        
+        if (strlen(s->language) > 0)
+        {
+            t += iso639_toName((unsigned char *)(s->language));
+            t += " ";
+        }
+         
+        list += t;
+    }
+    
+    return list;
+}
+
+// in case there's only one subtitle language available, always choose it
+//
+// if more than one subtitle languages are found, the best one is
+// picked according to the PreferredLanguages setting
+//
+// in case there's no PreferredLanguages setting, or no preferred language
+// is found, the first found subtitle stream is chosen
+bool AvFormatDecoder::autoSelectSubtitleTrack()
+{
+    if (!subtitleStreams.size())
+    {
+        currentSubtitleTrack = -1;
+        wantedSubtitleStream = -1;
+        return false;
+    }
+
+    int maxTracks = (subtitleStreams.size() - 1);
+
+    int selectedTrack = -1;
+    
+    // go through all preferred languages and pick the best found
+    for (QStringList::iterator l = subtitleLanguagePreferences.begin();
+         l != subtitleLanguagePreferences.end() && selectedTrack == -1; ++l) 
+    {
+        for (int track = 0; track < maxTracks; track++)
+        {
+            int tempStream = subtitleStreams[track];
+            AVStream* st = ic->streams[tempStream];
+
+            if (st->language == *l)
+            {
+                selectedTrack = track;
+                break;
+            }
+        }
+    }
+    
+    if (selectedTrack == -1)
+    {
+        selectedTrack = 0;
+    }
+
+    currentSubtitleTrack = selectedTrack;
+    wantedSubtitleStream = subtitleStreams[currentSubtitleTrack];
+     
+    return true;
+}
+
+
+
 bool AvFormatDecoder::GetFrame(int onlyvideo)
 {
     AVPacket *pkt = NULL;
@@ -1635,6 +1756,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         currentAudioTrack >= (int)audioStreams.size())
     {
         autoSelectAudioTrack();
+    }
+
+    if ((currentSubtitleTrack == -1 || 
+        currentSubtitleTrack >= (int)subtitleStreams.size()) &&
+        subtitleStreams.size() > 0)
+    {
+        autoSelectSubtitleTrack();
     }
 
     bool skipaudio = (lastvpts == 0);
@@ -1931,7 +2059,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     int gotSubtitles = 0;
                     AVSubtitle subtitle;
 
-                    if (IsWantedSubtitleLanguage(curstream->language))
+                    if (pkt->stream_index == wantedSubtitleStream)
                     {
                         avcodec_decode_subtitle(context, &subtitle, 
                                                 &gotSubtitles, ptr, len);

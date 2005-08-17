@@ -74,7 +74,13 @@ class AvFormatDecoder : public DecoderBase
 
     virtual void incCurrentAudioTrack();
     virtual void decCurrentAudioTrack();
-    virtual bool setCurrentAudioTrack(int trackNo);
+    virtual bool setCurrentAudioTrack(int trackNo);    
+    virtual QStringList listAudioTracks() const;
+
+    virtual void incCurrentSubtitleTrack();
+    virtual void decCurrentSubtitleTrack();
+    virtual bool setCurrentSubtitleTrack(int trackNo);    
+    virtual QStringList listSubtitleTracks() const;
 
     int ScanStreams(bool novideo);
 
@@ -86,6 +92,8 @@ class AvFormatDecoder : public DecoderBase
     /// and if we're doing AC3 passthrough.  This will select the highest stream number
     /// that matches our criteria.
     bool autoSelectAudioTrack();
+
+    bool autoSelectSubtitleTrack();
 
     RingBuffer *getRingBuf(void) { return ringBuffer; }
 
@@ -130,7 +138,6 @@ class AvFormatDecoder : public DecoderBase
     // Update our position map, keyframe distance, and the like.  Called for key frame packets.
     void HandleGopStart(AVPacket *pkt);
 
-    bool IsWantedSubtitleLanguage(const QString &language);    
     class AvFormatDecoderPrivate *d;
 
     AVFormatContext *ic;
@@ -180,6 +187,9 @@ class AvFormatDecoder : public DecoderBase
     int               audio_check_1st;         ///< Used by CheckAudioParams
     int               audio_sampling_rate_2nd; ///< Used by CheckAudioParams
     int               audio_channels_2nd;      ///< Used by CheckAudioParams
+
+    QValueVector<int> subtitleStreams;
+    int wantedSubtitleStream;
 };
 
 #endif

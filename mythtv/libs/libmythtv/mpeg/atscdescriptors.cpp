@@ -4,17 +4,9 @@
 #include <iostream>
 #include "atscdescriptors.h"
 #include "mythcontext.h"
-
-extern QMap<int, QString> codes2names; // defined in atscdecriptorsmap.cpp
+#include "iso639.h"
 
 using namespace std;
-
-static inline int iso639_2toInt(const unsigned char *iso639_2) {
-    return (iso639_2[0]<<16)|(iso639_2[1]<<8)|iso639_2[2];
-}
-static inline int iso639_2toInt(const char *iso639_2) {
-    return iso639_2toInt((const unsigned char*)iso639_2);
-}
 
 QString AudioStreamDescriptor::SampleRateCodeString() const {
     static const char* asd[] = {
@@ -86,10 +78,7 @@ QString AudioStreamDescriptor::toString() const {
 }
 
 QString ISO639LanguageCode::toString() const {
-    QString str = codes2names[iso639_2toInt(_data)];
-    if (str==0)
-        str=QString("Unrecognized Language Code");
-    return str;
+    return iso639_toName(_data);
 }
 
 QString MultipleStringStructure::CompressionTypeString(int i, int j) const {
