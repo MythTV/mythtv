@@ -3444,6 +3444,9 @@ void TVRec::StoreInputChannels(const QMap<int, QString> &inputChannel)
         if (input.isEmpty())
             break;
 
+        if (inputChannel[i].isEmpty())
+            continue;
+
         querystr = QString("UPDATE cardinput set startchan = '%1' "
                            "WHERE cardid = %2 AND inputname = '%3';")
                            .arg(inputChannel[i]).arg(m_capturecardnum)
