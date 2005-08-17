@@ -65,8 +65,10 @@ using namespace std;
 #include "../libavformat/avformat.h"
 #include "../libavformat/mpegts.h"
 
-const int DVBRecorder::PMT_PID = 0x10;
+const int DVBRecorder::PMT_PID = 0x20; ///< PID for rewritten PMT
 const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
+const int DVBRecorder::POLL_INTERVAL        =  50; // msec
+const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
 
 #define RECORD(args...) \
     VERBOSE(VB_RECORD, QString("DVB#%1 Rec: ") \
@@ -562,7 +564,7 @@ void DVBRecorder::StartRecording(void)
     SetPMT(NULL);
     _ts_packets_until_psip_sync = 0;
 
-    int warnings_issued = 0;
+    int poll_timeouts = 0;
     while (_request_recording && !_error)
     {
         if (_reset_pid_filters)
@@ -591,22 +593,23 @@ void DVBRecorder::StartRecording(void)
         int ret;
         do 
         {
-            ret = poll(&_polls, 1, 250);
+            ret = poll(&_polls, 1, POLL_INTERVAL);
         } while ((-1==ret) && ((EAGAIN==errno) || (EINTR==errno)));
 
         if (ret == 0)
         {
-            warnings_issued++;
-            RECWARN(QString("No data from card in %1 milliseconds.")
-                    .arg(250*warnings_issued));
+            poll_timeouts++;
+            if (poll_timeouts > POLL_WARNING_TIMEOUT/POLL_INTERVAL)
+                RECWARN(QString("No data from card in %1 milliseconds.")
+                        .arg(POLL_INTERVAL*poll_timeouts));
         }
         else if (ret == 1 && _polls.revents & POLLIN)
         {
-            if (warnings_issued)
+            if (poll_timeouts > POLL_WARNING_TIMEOUT/POLL_INTERVAL)
             {
-                warnings_issued = 0;
                 RECWARN("Got data from card.");
             }
+            poll_timeouts = 0;
                 
             if (!_request_pause)
                 ReadFromDMX();

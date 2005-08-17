@@ -122,6 +122,8 @@ private:
     // Constants
     static const int PMT_PID;
     static const int TSPACKETS_BETWEEN_PSIP_SYNC;
+    static const int POLL_INTERVAL;
+    static const int POLL_WARNING_TIMEOUT;
 };
 
 #endif
