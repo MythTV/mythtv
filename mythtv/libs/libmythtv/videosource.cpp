@@ -1010,19 +1010,22 @@ class DVBHwDecoder: public CheckBoxSetting, public CCSetting
     };
 };
 
+#if 0
 class DVBRecordTS: public CheckBoxSetting, public CCSetting
 {
   public:
     DVBRecordTS(const CaptureCard& parent)
         : CCSetting(parent, "dvb_recordts")
     {
-        setLabel(QObject::tr("Record in TS format instead of PS."));
+        setLabel(QObject::tr("Store recordings in TS format."));
         setHelpText(
-            QObject::tr("Disables Transport Stream to Program Stream "
-                        "conversion. TS recording results in slightly bigger "
-                        "files, but reduces the risk of processing errors."));
+            QObject::tr("Use Transport Stream format as the storage format "
+                        "as opposed to using the deprecated Program Stream "
+                        "conversion. The conversion loses data, and forces "
+                        "MythTV to disable some tuning safety checks."));
     };
 };
+#endif
 
 class DVBNoSeqStart: public CheckBoxSetting, public CCSetting
 {
@@ -2373,7 +2376,7 @@ class DVBAdvConfigurationWizard: public ConfigurationWizard
         rec->setUseLabel(false);
 
         rec->addChild(new DVBHwDecoder(parent));
-        rec->addChild(new DVBRecordTS(parent));
+        //rec->addChild(new DVBRecordTS(parent));
         rec->addChild(new DVBNoSeqStart(parent));
         rec->addChild(new DVBOnDemand(parent));
         rec->addChild(new DVBPidBufferSize(parent));
