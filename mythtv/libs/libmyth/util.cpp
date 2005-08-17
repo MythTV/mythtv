@@ -622,12 +622,16 @@ bool WriteBlock(QSocket *socket, void *data, uint len)
     qApp->lock();
     if (socket->bytesToWrite() > 0)
         socket->flush();
-    qApp->unlock();
     
     while (socket->bytesToWrite() >= (unsigned) written)
     {
-        usleep(50000);
+        socket->flush();
+        qApp->unlock();
+        usleep(500);
+        qApp->lock();
     }    
+
+    qApp->unlock();
 
     return true;
 }
