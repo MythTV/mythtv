@@ -396,6 +396,8 @@ static HostComboBox *CDWriterDevice()
     args = "cdrecord";
     args += "--scanbus";
 
+
+    //Ask cdrecord for a list of SCSI CD writers
     QProcess proc(args);
 
     if (proc.start())
@@ -435,10 +437,50 @@ static HostComboBox *CDWriterDevice()
             }
         }
     }
+    
+    // Now do the same again, for IDE CD writers
+    args += "-dev=ATA";
+    QProcess proc2(args);
+
+    if (proc2.start())
+    {
+        while (1)
+        {
+            while (proc2.canReadLineStdout())
+                result += proc2.readLineStdout();
+            if (proc2.isRunning())
+            {
+                qApp->processEvents();
+                usleep(10000);
+            }
+            else
+            {
+                if (!proc2.normalExit())
+                    cerr << "Failed to run 'cdrecord -dev=ATA --scanbus'\n";
+                break;
+            }
+        }
+    }
+    else
+        cerr << "Failed to run 'cdrecord --scanbus'\n";
+
+    while (proc2.canReadLineStdout())
+        result += proc2.readLineStdout();
+
+    for (QStringList::Iterator it = result.begin(); it != result.end();
+         ++it)
+    {
+        QString line = *it;
+        if (line.length() > 12)
+        {
+            if (line[10] == ')' && line[12] != '*')
+            {
+                gc->addSelection(line.mid(24, 16), "ATA:" + line.mid(1, 5));
+            }
+        }
+    }
     gc->setLabel(QObject::tr("CD-Writer Device"));
-    gc->setHelpText(QObject::tr("Select the SCSI Device for CD Writing.  If "
-                    "your IDE device is not present, try adding "
-                    "hdd(or hdc/hdb)=ide-scsi to your boot options"));
+    gc->setHelpText(QObject::tr("Select the SCSI or IDE Device for CD Writing."));
     return gc;
 };
 
