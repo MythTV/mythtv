@@ -29,8 +29,12 @@ class EITHelper : public QObject
     void HandleEITs(QMap_Events* events);
 
   private:
+    int GetChanID(int tid_db, const Event &event);
+    void UpdateEITList(int mplexid, const QList_Events *events);
+
     QListList_Events  eitList;      ///< Event Information Tables List
     mutable QMutex    eitList_lock; ///< EIT List lock
+    mutable QMap<uint,uint> srv_to_chanid;
 };
 
 #endif // USING_DVB

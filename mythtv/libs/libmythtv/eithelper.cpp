@@ -5,14 +5,14 @@
 #include "mythdbcon.h"
 #include "scheduledrecording.h"
 
-static int get_chan_id_for_event(int tid_db, const Event &event);
-static void update_eit_list_in_db(int mplexid, const QList_Events *events);
-static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
-                             int chanid, const Event &event);
+static int get_chan_id_from_db(int tid_db, const Event&);
+static uint update_eit_in_db(MSqlQuery&, MSqlQuery&, int, const Event&);
+static uint delete_invalid_programs_in_db(MSqlQuery&, MSqlQuery&, int, const Event&);
+static bool has_program(MSqlQuery&, int, const Event&);
+static bool insert_program(MSqlQuery&, int, const Event&);
 
 void EITHelper::HandleEITs(QMap_Events* eventList)
 {
-    VERBOSE(VB_IMPORTANT, "EITHelper::HandleEITs()");
     QList_Events* events = new QList_Events();
     eitList_lock.lock();
     QMap_Events::Iterator e;
@@ -39,7 +39,6 @@ uint EITHelper::GetListSize(void) const
 
 void EITHelper::ProcessEvents(int mplexid)
 {
-    VERBOSE(VB_IMPORTANT, "EITHelper::ProcessEvents("<<mplexid<<")");
     while (GetListSize())
     {
         eitList_lock.lock();
@@ -47,40 +46,51 @@ void EITHelper::ProcessEvents(int mplexid)
         eitList.pop_front();
         eitList_lock.unlock();
 
-        update_eit_list_in_db(mplexid, events);
+        UpdateEITList(mplexid, events);
 
         events->clear();
         delete events;
     }
 }
 
-void update_eit_list_in_db(int mplexid, const QList_Events *events)
+int EITHelper::GetChanID(int mplexid, const Event &event)
 {
-    MSqlQuery query(MSqlQuery::InitCon());
+    uint srv = (event.ATSC) ? (mplexid << 16) : (event.NetworkID << 16);
+    srv |= event.ServiceID;
+
+    int chanid = srv_to_chanid[srv];
+    if (chanid == 0)
+        srv_to_chanid[srv] = chanid = get_chan_id_from_db(mplexid, event);
+    return chanid;
+}
+
+void EITHelper::UpdateEITList(int mplexid, const QList_Events *events)
+{
+    MSqlQuery query1(MSqlQuery::InitCon());
     MSqlQuery query2(MSqlQuery::InitCon());
-    // All events in list are assumed to be for the same channel here
-    int chanID = get_chan_id_for_event(mplexid, *(events->begin()));
 
-    if (chanID != -1)
+    uint counter = 0;
+    QList_Events::const_iterator e = events->begin();
+    for (; e != events->end(); ++e)
     {
-        uint counter = 0;
-        QList_Events::const_iterator e = events->begin();
-        for (; e != events->end(); ++e)
-            counter += update_eit_in_db(query, query2, chanID, *e);
+        int chanid = get_chan_id_from_db(mplexid, *e);
+        if (chanid <= 0)
+            continue;
+        counter += update_eit_in_db(query1, query2, chanid, *e);
+    }
 
-        if (counter > 0)
-        {
-            VERBOSE(VB_IMPORTANT,
-                    QString("EITHelper: Added %1 scheduler events, running "
-                            "scheduler to check for updates").arg(counter));
-            ScheduledRecording::signalChange(-1);
-            QString msg = QString("Added %1 scheduler events").arg(counter);
-            gContext->LogEntry("DVB/ATSC Guide Scanner", LP_INFO, msg, "");
-        }
+    if (counter > 0)
+    {
+        VERBOSE(VB_SCHEDULE,
+                QString("EITHelper: Added %1 scheduler events, running "
+                        "scheduler to check for updates").arg(counter));
+        ScheduledRecording::signalChange(-1);
+        QString msg = QString("Added %1 scheduler events").arg(counter);
+        gContext->LogEntry("DVB/ATSC Guide Scanner", LP_INFO, msg, "");
     }
 }
 
-static int get_chan_id_for_event(int tid_db, const Event &event)
+static int get_chan_id_from_db(int mplexid, const Event &event)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     // Now figure out the chanid for this
@@ -92,7 +102,7 @@ static int get_chan_id_for_event(int tid_db, const Event &event)
         query.prepare(QString("SELECT chanid, useonairguide FROM channel "
                               "WHERE atscsrcid = %1 AND mplexid = %2")
                       .arg(event.ServiceID)
-                      .arg(tid_db));
+                      .arg(mplexid));
     }
     else
     {
@@ -110,8 +120,10 @@ static int get_chan_id_for_event(int tid_db, const Event &event)
 
     if (query.size() <= 0)
     {
-        VERBOSE(VB_IMPORTANT, "EITHelper: ChanID not found "
-                "so event updates were skipped.");
+        VERBOSE(VB_SIPARSER, QString(
+                    "EITHelper: chanid not found for atscsrcid = %1 "
+                    "and mplexid = %2, \n\t\t\tso event updates were skipped.")
+            .arg(event.ServiceID).arg(mplexid));
         return -1;
     }
 
@@ -122,10 +134,20 @@ static int get_chan_id_for_event(int tid_db, const Event &event)
 }
 
 static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
-                             int ChanID, const Event &event)
+                             int chanid, const Event &event)
+{
+    delete_invalid_programs_in_db(query, query2, chanid, event);
+
+    bool ok = has_program(query, chanid, event);
+    if (!ok)
+        ok = insert_program(query, chanid, event);
+    return (ok) ? 1 : 0;
+}
+
+static uint delete_invalid_programs_in_db(
+    MSqlQuery &query, MSqlQuery &query2, int chanid, const Event &event)
 {
     uint counter = 0;
-
     query.prepare(
         "SELECT starttime, endtime, title "
         "FROM program "
@@ -133,7 +155,7 @@ static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
         "      ( ( starttime>=:STIME AND starttime<:ETIME ) AND NOT "
         "        ( starttime=:STIME AND endtime=:ETIME AND title=:TITLE ) )");
 
-    query.bindValue(":CHANID", ChanID);
+    query.bindValue(":CHANID", chanid);
     query.bindValue(":STIME", event.StartTime.
                     toString(QString("yyyy-MM-dd hh:mm:00")));
     query.bindValue(":ETIME", event.EndTime.
@@ -143,12 +165,18 @@ static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Checking Rescheduled Event", query);
 
+    query2.prepare("DELETE FROM program "
+                   "WHERE chanid=:CHANID AND "
+                   "      starttime=:STARTTIME AND "
+                   "      endtime=:ENDTIME AND "
+                   "      title=:TITLE");
     for (query.first(); query.isValid(); query.next())
     {
+        counter++;
         // New guide data overriding existing
         // Possibly more than one conflict
         VERBOSE(VB_GENERAL, QString("Schedule Change on Channel %1")
-                .arg(ChanID));
+                .arg(chanid));
         VERBOSE(VB_GENERAL, QString("Old: %1 %2 %3")
                 .arg(query.value(0).toString())
                 .arg(query.value(1).toString())
@@ -160,27 +188,24 @@ static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
                      toString(QString("yyyy-MM-dd hh:mm:00")))
                 .arg(event.Event_Name.utf8()));
         // Delete old EPG record.
-        query2.prepare("DELETE FROM program "
-                       "WHERE chanid=:CHANID AND "
-                       "      starttime=:STARTTIME AND "
-                       "      endtime=:ENDTIME AND "
-                       "      title=:TITLE");
-        query2.bindValue(":CHANID", ChanID);
+        query2.bindValue(":CHANID", chanid);
         query2.bindValue(":STARTTIME", query.value(0).toString());
         query2.bindValue(":ENDTIME", query.value(1).toString());
         query2.bindValue(":TITLE", query.value(2).toString());
-        if (!query2.exec())
-            MythContext::DBError("Deleting Rescheduled Event", query2);
-        if (!query2.isActive())
+        if (!query2.exec() || !query2.isActive())
             MythContext::DBError("Deleting Rescheduled Event", query2);
     }
+    return counter;
+}
 
+static bool has_program(MSqlQuery &query, int chanid, const Event &event)
+{
     query.prepare("SELECT 1 FROM program "
                   "WHERE chanid=:CHANID AND "
                   "      starttime=:STARTTIME AND "
                   "      endtime=:ENDTIME AND "
                   "      title=:TITLE");
-    query.bindValue(":CHANID", ChanID);
+    query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", event.StartTime.
                     toString(QString("yyyy-MM-dd hh:mm:00")));
     query.bindValue(":ENDTIME", event.EndTime.
@@ -190,60 +215,63 @@ static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Checking If Event Exists", query);
 
-    if (query.size() <= 0)
-    {
-        counter++;
+    return query.size() > 0;
+}
 
-        query.prepare("REPLACE INTO program (chanid, starttime, "
-                      "endtime, title, description, subtitle, "
-                      "category, stereo, closecaptioned, hdtv, "
-                      "airdate, originalairdate) "
-                      "VALUES (:CHANID, :STARTTIME, "
-                      ":ENDTIME, :TITLE, :DESCRIPTION, :SUBTITLE, "
-                      ":CATEGORY, :STEREO, :CLOSECAPTIONED, :HDTV, "
-                      ":AIRDATE, :ORIGINALAIRDATE);");
-        query.bindValue(":CHANID", ChanID);
-        query.bindValue(":STARTTIME", event.StartTime.
-                        toString(QString("yyyy-MM-dd hh:mm:00")));
-        query.bindValue(":ENDTIME", event.EndTime.
-                        toString(QString("yyyy-MM-dd hh:mm:00")));
-        query.bindValue(":TITLE", event.Event_Name.utf8());
-        query.bindValue(":DESCRIPTION", event.Description.utf8());
-        query.bindValue(":SUBTITLE", event.Event_Subtitle.utf8());
-        query.bindValue(":CATEGORY", event.ContentDescription.utf8());
-        query.bindValue(":STEREO", event.Stereo);
-        query.bindValue(":CLOSECAPTIONED", event.SubTitled);
-        query.bindValue(":HDTV", event.HDTV);
-        query.bindValue(":AIRDATE", event.Year);
-        query.bindValue(":ORIGINALAIRDATE", event.OriginalAirDate.
-                        toString(QString("yyyy-MM-dd")));
+static bool insert_program(MSqlQuery &query, int chanid, const Event &event)
+{
+    query.prepare("REPLACE INTO program (chanid, starttime, "
+                  "endtime, title, description, subtitle, "
+                  "category, stereo, closecaptioned, hdtv, "
+                  "airdate, originalairdate) "
+                  "VALUES (:CHANID, :STARTTIME, "
+                  ":ENDTIME, :TITLE, :DESCRIPTION, :SUBTITLE, "
+                  ":CATEGORY, :STEREO, :CLOSECAPTIONED, :HDTV, "
+                  ":AIRDATE, :ORIGINALAIRDATE);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", event.StartTime.
+                    toString(QString("yyyy-MM-dd hh:mm:00")));
+    query.bindValue(":ENDTIME", event.EndTime.
+                    toString(QString("yyyy-MM-dd hh:mm:00")));
+    query.bindValue(":TITLE", event.Event_Name.utf8());
+    query.bindValue(":DESCRIPTION", event.Description.utf8());
+    query.bindValue(":SUBTITLE", event.Event_Subtitle.utf8());
+    query.bindValue(":CATEGORY", event.ContentDescription.utf8());
+    query.bindValue(":STEREO", event.Stereo);
+    query.bindValue(":CLOSECAPTIONED", event.SubTitled);
+    query.bindValue(":HDTV", event.HDTV);
+    query.bindValue(":AIRDATE", event.Year);
+    query.bindValue(":ORIGINALAIRDATE", event.OriginalAirDate.
+                    toString(QString("yyyy-MM-dd")));
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("Adding Event", query);
+        return false;
+    }
+
+    QValueList<Person>::const_iterator it = event.Credits.begin();
+    for (;it != event.Credits.end(); it++)
+    {
+        query.prepare("INSERT IGNORE INTO people (name) "
+                      "VALUES (:NAME);");
+        query.bindValue(":NAME", (*it).name.utf8());
 
         if (!query.exec() || !query.isActive())
-            MythContext::DBError("Adding Event", query);
+            MythContext::DBError("Adding Event (People)", query);
 
-        QValueList<Person>::const_iterator it = event.Credits.begin();
-        for (;it != event.Credits.end(); it++)
-        {
-            query.prepare("INSERT IGNORE INTO people (name) "
-                          "VALUES (:NAME);");
-            query.bindValue(":NAME", (*it).name.utf8());
+        query.prepare("INSERT INTO credits "
+                      "(person, chanid, starttime, role) "
+                      "SELECT person, :CHANID, :STARTTIME, :ROLE "
+                      "FROM people WHERE people.name=:NAME");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", event.StartTime.
+                        toString(QString("yyyy-MM-dd hh:mm:00")));
+        query.bindValue(":ROLE", (*it).role.utf8());
+        query.bindValue(":NAME", (*it).name.utf8());
 
-            if (!query.exec() || !query.isActive())
-                MythContext::DBError("Adding Event (People)", query);
-
-            query.prepare("INSERT INTO credits "
-                          "(person, chanid, starttime, role) "
-                          "SELECT person, :CHANID, :STARTTIME, :ROLE "
-                          "FROM people WHERE people.name=:NAME");
-            query.bindValue(":CHANID", ChanID);
-            query.bindValue(":STARTTIME", event.StartTime.
-                            toString(QString("yyyy-MM-dd hh:mm:00")));
-            query.bindValue(":ROLE", (*it).role.utf8());
-            query.bindValue(":NAME", (*it).name.utf8());
-
-            if (!query.exec() || !query.isActive())
-                MythContext::DBError("Adding Event (Credits)", query);
-        }
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("Adding Event (Credits)", query);
     }
-    return counter;
+    return true;
 }
