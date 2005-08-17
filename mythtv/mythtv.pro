@@ -14,7 +14,7 @@ include ( settings.pro )
 # Directories
 SUBDIRS += libs filters programs themes i18n
 
-using_frontend {
+using_backend {
     SUBDIRS += setup
 }
 
