@@ -225,9 +225,10 @@ void MythContextPrivate::GetScreenBounds()
 
     QDesktopWidget * desktop = QApplication::desktop();
 
-cout << "Total desktop width=" << desktop->width() <<
-        ", height="     << desktop->height() <<
-        ", numscreens=" << desktop->numScreens() << endl;
+    VERBOSE(VB_IMPORTANT,
+            QString("Total desktop dim: %1x%2, with %3 screen[s].")
+            .arg(desktop->width()).arg(desktop->height())
+            .arg(desktop->numScreens()));
 
     int screen = parent->GetNumSetting("XineramaScreen", 0);
 
@@ -752,10 +753,11 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
             // only inform the user of a failure if WOL is disabled 
             if (sleepTime <= 0)
             {
-                cerr << "Connection timed out.\n";
-                cerr << "You probably should modify the Master Server "
-                     << "settings\nin the setup program and set the proper "
-                     << "IP address.\n";
+                VERBOSE(
+                    VB_IMPORTANT, "Connection timed out.          \n\t\t\t"
+                    "You probably should modify the Master Server \n\t\t\t"
+                    "settings in the setup program and set the    \n\t\t\t"
+                    "proper IP address.");
                 if (d->m_height && d->m_width)
                 {
                     MythPopupBox::showOkPopup(d->mainWindow, 
@@ -1078,7 +1080,7 @@ void MythContext::RemoveCacheDir(const QString &dirname)
     if (!dirname.startsWith(cachedirname))
         return;
 
-    cout << "removing stale cache dir: " << dirname << endl;
+    VERBOSE(VB_IMPORTANT, "Removing stale cache dir: " << dirname);
 
     QDir dir(dirname);
 
@@ -1192,8 +1194,9 @@ void MythContext::CacheThemeImagesDirectory(const QString &dirname,
             {
                 if (!tmpimage->save(destdir + filename, "PNG"))
                 {
-                    cerr << "Couldn't save cache cache image: "
-                         << d->themecachedir + filename << endl;
+                    VERBOSE(VB_IMPORTANT,
+                            QString("Failed to save cached image: %1")
+                            .arg(d->themecachedir + filename));
                 }
              
                 delete tmpimage;
@@ -1423,7 +1426,7 @@ QString MythContext::FindThemeDir(const QString &themename)
     if (dir.exists())
         return testdir;
  
-    cerr << "Could not find theme: " << themename << endl;
+    VERBOSE(VB_IMPORTANT, QString("Could not find theme: %1").arg(themename));
     return "";
 }
 QString MythContext::GetMenuThemeDir(void)
@@ -1443,21 +1446,19 @@ MDBManager *MythContext::GetDBManager(void)
 
 void MythContext::DBError(const QString &where, const QSqlQuery& query) 
 {
-    //if (query.lastError().type())
-    {
-        cerr << "DB Error (" << where << "):" << endl;
-    }
+    QString str = QString("DB Error (%1):\n").arg(where);
 
 #if QT_VERSION >= 0x030200
-    cerr << "Query was:" << endl
-         << query.executedQuery() << endl
-         << DBErrorMessage(query.lastError()) << endl;
+    str += "Query was:\n";
+    str += query.executedQuery() + "\n";
+    str += DBErrorMessage(query.lastError());
 #else
-    cerr << "Your version of Qt is too old to provide proper debugging\n";
-    cerr << "Query was:" << endl
-         << query.lastQuery() << endl
-         << DBErrorMessage(query.lastError()) << endl;
+    str += "Your version of Qt is too old to provide proper debugging\n";
+    str += "Query may have been:\n";
+    str += query.lastQuery() + "\n";
+    str += DBErrorMessage(query.lastError());
 #endif
+    VERBOSE(VB_IMPORTANT, str);
 }
 
 QString MythContext::DBErrorMessage(const QSqlError& err)
@@ -1805,7 +1806,8 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
                 checkFile.setName(filename);
                 if (!checkFile.exists())
                 {
-                    cerr << "Unable to find image file: " << filename << endl;
+                    VERBOSE(VB_IMPORTANT,
+                            "Unable to find image file: " << filename);
                     return NULL;
                 }
             }
@@ -1829,7 +1831,7 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 
         if (!tmpimage.load(filename))
         {
-            cerr << "Error loading image file: " << filename << endl;
+            VERBOSE(VB_IMPORTANT, "Error loading image file: " << filename);
             return NULL;
         }
         QImage tmp2 = tmpimage.smoothScale((int)(tmpimage.width() * wmult),
@@ -1841,7 +1843,7 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
         ret = new QImage(filename);
         if (ret->width() == 0)
         {
-            cerr << "Error loading image file: " << filename << endl;
+            VERBOSE(VB_IMPORTANT, "Error loading image file: " << filename);
             delete ret;
             return NULL;
         }
@@ -1919,7 +1921,8 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
                 checkFile.setName(filename);
                 if (!checkFile.exists())
                 {
-                    cerr << "Unable to find image file: " << filename << endl;
+                    VERBOSE(VB_IMPORTANT,
+                            "Unable to find image file: " << filename);
                     return NULL;
                 }
             }
@@ -1944,7 +1947,7 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
 
         if (!tmpimage.load(filename))
         {
-            cerr << "Error loading image file: " << filename << endl;
+            VERBOSE(VB_IMPORTANT, "Error loading image file: " << filename);
             delete ret;
             return NULL;
         }
@@ -1956,7 +1959,7 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
     {
         if (!ret->load(filename))
         {
-            cerr << "Error loading image file: " << filename << endl;
+            VERBOSE(VB_IMPORTANT, "Error loading image file: " << filename);
             delete ret;
             return NULL;
         }
@@ -2025,7 +2028,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
         while (ok && strlist[0] == "BACKEND_MESSAGE")
         {
             // oops, not for us
-            cerr << "SRSL you shouldn't see this!!";
+            VERBOSE(VB_IMPORTANT, "SRSL you shouldn't see this!!");
             QString message = strlist[1];
             QString extra = strlist[2];
 
@@ -2073,8 +2076,9 @@ void MythContext::EventSocketRead(void)
         }
         else if (prefix != "BACKEND_MESSAGE")
         {
-            cerr << "Received a: " << prefix << " message from the backend\n";
-            cerr << "But I don't know what to do with it.\n";
+            VERBOSE(VB_IMPORTANT,
+                    "Received a: " << prefix << " message from the backend"
+                    "\n\t\t\tBut I don't know what to do with it.");
         }
         else
         {

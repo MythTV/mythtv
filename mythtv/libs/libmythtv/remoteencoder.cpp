@@ -1,6 +1,5 @@
 #include <qapplication.h>
 
-#include <iostream>
 #include <unistd.h>
 
 using namespace std;
@@ -59,7 +58,8 @@ void RemoteEncoder::SendReceiveStringList(QStringList &strlist)
     WriteStringList(controlSock, strlist);
     if (!ReadStringList(controlSock, strlist, true))
     {
-        cerr << "Remote encoder not responding.\n";
+        VERBOSE(VB_IMPORTANT,
+                "RemoteEncoder::SendReceiveStringList(): No response.");
         backendError = true;
     }
 
@@ -71,7 +71,8 @@ QSocketDevice *RemoteEncoder::openControlSocket(const QString &host, short port)
     QSocketDevice *sock = new QSocketDevice(QSocketDevice::Stream);
     if (!connectSocket(sock, host, port))
     {
-        cerr << "Connection timed out.\n";
+        VERBOSE(VB_IMPORTANT,
+                "RemoteEncoder::openControlSocket(): Connection timed out.");
         delete sock;
         sock = NULL;
     }

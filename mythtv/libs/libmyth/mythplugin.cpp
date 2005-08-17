@@ -1,10 +1,13 @@
-#include "mythplugin.h"
-#include <qdict.h>
-#include <qstringlist.h>
-#include <qdir.h>
-#include <iostream>
+// C includes
 #include <dlfcn.h>
 
+// Qt includes
+#include <qstringlist.h>
+#include <qdict.h>
+#include <qdir.h>
+
+// MythTV includes
+#include "mythplugin.h"
 #include "mythcontext.h"
 #include "langsettings.h"
 
@@ -29,7 +32,7 @@ int MythPlugin::init(const char *libversion)
     if (ifunc)
         return ifunc(libversion);
 
-    cerr << dlerror() << endl;
+    VERBOSE(VB_IMPORTANT, QString("MythPlugin::Init() dlerror: %1").arg(dlerror()));
     return -1;
 }
 
@@ -135,7 +138,8 @@ bool MythPluginManager::init_plugin(const QString &plugname)
     if (result == -1)
     {
         m_dict.remove(newname);
-        cerr << "Unable to initialize plugin '" << plugname << "'." << endl;
+        VERBOSE(VB_IMPORTANT, QString("Unable to initialize plugin '%1'.")
+                .arg(plugname));
         return false;
     }
     
@@ -161,8 +165,9 @@ bool MythPluginManager::run_plugin(const QString &plugname)
 
     if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
     {
-        cerr << "Unable to run plugin '" << plugname 
-             << "': not initialized" << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("Unable to run plugin '%1': not initialized")
+                .arg(plugname));
         return false;
     }
 
@@ -176,8 +181,9 @@ bool MythPluginManager::config_plugin(const QString &plugname)
 
     if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
     {
-        cerr << "Unable to run plugin '" << plugname
-             << "': not initialized" << endl;
+        VERBOSE(VB_IMPORTANT,
+                QString("Unable to configure plugin '%1': not initialized")
+                .arg(plugname));
         return false;
     }
 
