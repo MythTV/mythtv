@@ -11,13 +11,6 @@
 
 using namespace std;
 
-#define LCD_KEY_UP    'A'
-#define LCD_KEY_LEFT  'B'
-#define LCD_KEY_DOWN  'C'
-#define LCD_KEY_RIGHT 'D'
-#define LCD_KEY_YES   'E'
-#define LCD_KEY_NO    'F'
-
 enum CHECKED_STATE {CHECKED = 0, UNCHECKED, NOTCHECKABLE };
 
 class LCDMenuItem
@@ -308,7 +301,8 @@ class LCD : public QObject
     bool lcd_heartbeaton;
     int  lcd_popuptime;    
     QString lcd_showmusic_items;
-
+    QString lcd_keystring;
+    
     int (*GetLEDMask)(void);
 };
 

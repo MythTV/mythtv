@@ -2539,6 +2539,19 @@ static HostCheckBox *LCDHeartBeatOn()
     return gc;
 }
 
+static HostLineEdit *LCDKeyString()
+{
+    HostLineEdit *ge = new HostLineEdit("LCDKeyString");
+    ge->setLabel(QObject::tr("LCD Key order"));
+    ge->setValue("ABCDEF");
+    ge->setHelpText(QObject::tr("Enter the 6 Keypad Return Codes for your "
+	    "LCD keypad in the order in which you want the functions "
+	    "up/down/left/right/yes/no to operate. "
+	    "(See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] "
+	    "or the matrix for your display)"));
+    return ge;
+}
+
 static HostCheckBox *LCDEnable()
 {
     HostCheckBox *gc = new HostCheckBox("LCDEnable");
@@ -2576,6 +2589,7 @@ public:
          setRight->addChild(LCDShowGeneric());
          setRight->addChild(LCDBacklightOn());
          setRight->addChild(LCDHeartBeatOn());
+         setRight->addChild(LCDKeyString());
          setHoriz->addChild(setLeft);
          setHoriz->addChild(setRight);
          settings->addChild(setHoriz);

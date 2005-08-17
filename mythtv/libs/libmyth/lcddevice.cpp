@@ -417,17 +417,19 @@ void LCD::handleKeyPress(QString key_pressed)
 {
     int key = 0;
 
-    char mykey = key_pressed.ascii()[0];
-    switch (mykey)
-    {
-        case LCD_KEY_UP: key = Qt::Key_Up; break;
-        case LCD_KEY_DOWN: key = Qt::Key_Down; break;
-        case LCD_KEY_LEFT: key = Qt::Key_Left; break;
-        case LCD_KEY_RIGHT: key = Qt::Key_Right; break;
-        case LCD_KEY_YES: key = Qt::Key_Space; break;
-        case LCD_KEY_NO: key = Qt::Key_Escape; break;
-        default: break;
-    } 
+    QChar mykey = key_pressed.at(0);
+    if (mykey == lcd_keystring.at(0))
+        key = Qt::Key_Up;
+    else if (mykey == lcd_keystring.at(1))
+        key = Qt::Key_Down;
+    else if (mykey == lcd_keystring.at(2))
+        key = Qt::Key_Left;
+    else if (mykey == lcd_keystring.at(3))
+        key = Qt::Key_Right;
+    else if (mykey == lcd_keystring.at(4))
+        key = Qt::Key_Space;
+    else if (mykey == lcd_keystring.at(5))
+        key = Qt::Key_Escape;
 
     QApplication::postEvent(gContext->GetMainWindow(),
                             new ExternalKeycodeEvent(key));
@@ -454,6 +456,7 @@ void LCD::init()
     lcd_heartbeaton=(gContext->GetSetting("LCDHeartBeatOn", "1")=="1");
     aString = gContext->GetSetting("LCDPopupTime", "5");
     lcd_popuptime = aString.toInt() * 1000;
+    lcd_keystring = gContext->GetSetting("LCDKeyString", "ABCDEF");
 
     connected = TRUE;
 
@@ -461,7 +464,8 @@ void LCD::init()
     // indicating that "hello" was succesful
 
     sendToServer("client_set name Myth");
-    sendToServer("client_add_key ABCDEF");   
+    aString = "client_add_key " + lcd_keystring;
+    sendToServer(aString);
  
     // Create all the screens and widgets (when we change activity in the myth 
     // program, we just swap the priorities of the screens to show only the 
