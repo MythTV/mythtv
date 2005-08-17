@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1090";
+const QString currentDatabaseVersion = "1091";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -1988,6 +1988,18 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 	};
 
         if (!performActualUpdate(updates, "1090", dbver))
+            return false;
+    }
+
+    if (dbver == "1090")
+    {
+        const QString updates[] = {
+"DELETE FROM dtv_privatetypes WHERE sitype='dvb' AND networkid=40999 AND private_type='parse_subtitle_list';",
+"INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',40999,'parse_subtitle_list','1070,1308,1041,1306,1307,1030,1016,1131,1068,1069');",
+""
+        };
+
+        if (!performActualUpdate(updates, "1091", dbver))
             return false;
     }
 

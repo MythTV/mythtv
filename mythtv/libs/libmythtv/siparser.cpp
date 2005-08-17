@@ -3059,10 +3059,10 @@ void SIParser::EITFixUpStyle4(Event& event)
         //is this event on a channel we shoud look for a subtitle?
         if(PrivateTypes.ParseSubtitleServiceIDs.contains(event.ServiceID))
         {
-            int pos=event.Description.find(". ");
-            if(pos!=-1 && pos<=40 && (event.Description.length()-(pos+2))>0 )
+            int pos=event.Description.find(QRegExp("[.\?] "));
+            if(pos!=-1 && pos<=55 && (event.Description.length()-(pos+2))>0 )
             {
-                event.Event_Subtitle=event.Description.left(pos);
+                event.Event_Subtitle=event.Description.left(pos+(event.Description[pos]=='?' ? 1 : 0));
                 event.Description=event.Description.mid(pos+2);
             }
         }
