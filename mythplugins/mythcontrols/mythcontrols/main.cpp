@@ -1,3 +1,4 @@
+/* -*- myth -*- */
 /**
  * @file main.cpp
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -37,7 +38,7 @@ using namespace std;
 extern "C" int mythplugin_init(const char *libversion)
 {
     if (!gContext->TestPopupVersion("mythcontrols", libversion,
-				    MYTH_BINARY_VERSION)) return -1;
+                                    MYTH_BINARY_VERSION)) return -1;
     else return 0;
 }
 
@@ -59,16 +60,16 @@ extern "C" int mythplugin_run (void)
     /* if the UI is successfully loaded, just giv'er*/
     if (uiloaded)
     {
-	controls.exec();
-	return 0;    
+        controls.exec();
+        return 0;    
     }
     else
     {
-	MythPopupBox::showOkPopup(window, "Theme Error", "Could not load the "
-				  "keybinding plugin's theme.  Check the "
-				  "console for detailed output.");
+        MythPopupBox::showOkPopup(window, "Theme Error", "Could not load the "
+                                  "keybinding plugin's theme.  Check the "
+                                  "console for detailed output.");
 
-	return -1;
+        return -1;
     }
 }
 

@@ -1,3 +1,4 @@
+/* -*- myth -*- */
 /**
  * @file actionid.h
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -35,7 +36,7 @@
 class ActionID
 {
 
- public:
+public:
 
     /**
      * @brief Create an empty action
@@ -48,7 +49,7 @@ class ActionID
      * @param action The action's name
      */
     inline ActionID(const QString & context, const QString & action)
-	: _context(context), _action(action) {};
+        : _context(context), _action(action) {};
 
     /**
      * @brief Get the context name.
@@ -67,16 +68,18 @@ class ActionID
      * context.
      * @return True if the actions have a common context.
      */
-    inline static bool sameContext(const ActionID &a, const ActionID &b) {
-	return (a.context() == b.context());
+    inline static bool sameContext(const ActionID &a, const ActionID &b)
+    {
+        return (a.context() == b.context());
     }
 
     /**
      * @brief Determine if two actions have the same action name.
      * @return True if the actions have the same action name.
      */
-    inline static bool sameAction(const ActionID &a, const ActionID &b) {
-	return (a.action() == b.action());
+    inline static bool sameAction(const ActionID &a, const ActionID &b)
+    {
+        return (a.action() == b.action());
     }
 
     /**
@@ -84,11 +87,12 @@ class ActionID
      * @return true if the operators are equal, otherwise, false is
      * returned.
      */
-    inline bool operator == (const ActionID &that) const {
-	return (sameAction(*this,that) && sameContext(*this,that));
+    inline bool operator == (const ActionID &that) const
+    {
+        return (sameAction(*this,that) && sameContext(*this,that));
     }
 
- private:
+private:
     QString _context;
     QString _action;
 };

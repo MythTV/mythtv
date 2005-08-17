@@ -1,3 +1,4 @@
+/* -*- myth -*- */
 /**
  * @file actionset.h
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -48,7 +49,7 @@ typedef QValueList<ActionID> ActionList;
 class ActionSet
 {
 
- public:
+public:
 
     /**
      * @brief Create a new, empty set of action bindings.
@@ -66,7 +67,7 @@ class ActionSet
      * again.  There are no duplicate actions in the action set.
      */
     bool addAction(const ActionID &id, const QString & description,
-		   const QString &keys);
+                   const QString &keys);
 
     /**
      * @brief Add a binding.
@@ -90,19 +91,19 @@ class ActionSet
      * @param oldkey The key to be replaced.
      */
     bool replace(const ActionID &id, const QString &newkey,
-		 const QString &oldkey);
+                 const QString &oldkey);
 
     /**
      * @brief Get a list of all contexts in the action set.
      * @return A list of all contexts.
      */
-    QStringList contextStrings(void) const;
+    QStringList * contextStrings(void) const;
 
     /**
      * @brief Get a list of all action in the action set.
      * @return A list of all actions in the action set.
      */
-    QStringList actionStrings(const QString & context_name) const;
+    QStringList * actionStrings(const QString & context_name) const;
 
     /**
      * @brief Get a string containing all the keys in bound to an
@@ -150,8 +151,9 @@ class ActionSet
      * @brief Mark an action as unmodified.
      * @return true if the action was modified, and is set to unmodified.
      */
-    inline bool unmodify(const ActionID & id) {
-	return (_modified.remove(id) > 0);
+    inline bool unmodify(const ActionID & id)
+    {
+        return (_modified.remove(id) > 0);
     }
 
     /**
@@ -166,38 +168,42 @@ class ActionSet
      * @param id The action identifier.
      * @return true if the action has not been modified, otherwise, false.
      */
-    inline bool unmodified(const ActionID &id) const {
-	return (getModified().contains(id) == 0);
+    inline bool unmodified(const ActionID &id) const
+    {
+        return (getModified().contains(id) == 0);
     }
 
- protected:
+protected:
 
     /**
      * @brief Mark an action as modified.
      * @param id The actio identifier.
      */
-    inline void modify(const ActionID &id) {
-	if (unmodified(id)) _modified.push_back(id);
+    inline void modify(const ActionID &id)
+    {
+        if (unmodified(id)) _modified.push_back(id);
     }
 
     /**
      * @brief Get an action by its identifier.
      * @return A pointer to the action.
      */
-    inline Action * action(const ActionID &id) const {
-	return context(id.context()) ?
-	    (*context(id.context()))[id.action()] : NULL;
+    inline Action * action(const ActionID &id) const
+    {
+        return context(id.context()) ?
+            (*context(id.context()))[id.action()] : NULL;
     }
 
     /**
      * @brief Get a context by its identifier.
      * @return A pointer to the context.
      */
-    inline Context * context(const QString & name) const {
-	return this->_contexts[name];
+    inline Context * context(const QString & name) const
+    {
+        return this->_contexts[name];
     }
 
- private:
+private:
 
     QMap<QString, ActionList> _keymap;
     QDict<Context> _contexts;

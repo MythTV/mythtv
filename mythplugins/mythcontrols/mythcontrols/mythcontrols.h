@@ -1,3 +1,4 @@
+/* -*- myth -*- */
 /**
  * @file mythcontrols.h
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -38,7 +39,7 @@ class MythControls : virtual public MythThemedDialog
 
     Q_OBJECT
 
- public:
+public:
     /**
      * @brief Create a new myth controls wizard.
      * @param parent The main myth window.
@@ -72,7 +73,7 @@ class MythControls : virtual public MythThemedDialog
 
     
     
- protected:
+protected:
 
     /**
      * @brief Load up UI.
@@ -98,6 +99,13 @@ class MythControls : virtual public MythThemedDialog
      * the action.
      */
     void refreshKeyInformation();
+
+    /**
+     * @brief Load the appropriate actions into the action list.
+     * @param context The context, from which actions will be
+     * displayed.
+     */
+    void refreshActionList(const QString & context);
 
     /**
      * @brief Load the settings for a particular host.
@@ -128,30 +136,59 @@ class MythControls : virtual public MythThemedDialog
      */
     bool resolveConflict(ActionID *conflict, int level);
 
- private slots:
+    /**
+     * @brief Repaint the context and action button lists
+     */
+    void repaintButtonLists(void);
 
-     /**
-      * @brief Add a key to the currently selected action.
-      */
-     void addKeyToAction(void);
+    /**
+     * @brief Focus a new list and take focus away from the old.
+     * @param focus The list to gain focus
+     * @param unfocus The list to loose focus
+     */
+    void switchListFocus(UIListBtnType *focus, UIListBtnType *unfocus);
 
-     /**
-      * @brief Delete the currently active key.
-      */
-     void deleteKey();
+private slots:
 
-     /**
-      * @brief Save the settings.
-      */
-     inline void save(void) { key_bindings->commitChanges(); }
+/**
+ * @brief Add a key to the currently selected action.
+ */
+void addKeyToAction(void);
 
- private:
+    /**
+     * @brief Delete the currently active key.
+     */
+    void deleteKey();
 
-     UIType *focused;
-     UIListTreeType *control_list;
-     UITextType *description;
-     UITextButtonType * action_buttons[Action::MAX_KEYS];
-     KeyBindings *key_bindings;
+    /**
+     * @brief Save the settings.
+     */
+    inline void save(void) { key_bindings->commitChanges(); }
+
+    /**
+     * @brief Recieves a signal when an item in the context list is
+     * selected.
+     * @param item The selected item.
+     */
+    void contextSelected(UIListBtnTypeItem *item);
+
+    /**
+     * @brief Recieves a signal when an item in the action list is
+     * selected.
+     * @param item The selected item.
+     */
+    void actionSelected(UIListBtnTypeItem *item);
+
+private:
+
+    UIType *focused;
+    UIListBtnType *ContextList;
+    UIListBtnType *ActionList;
+    UITextType *description;
+    UITextButtonType * ActionButtons[Action::MAX_KEYS];
+    KeyBindings *key_bindings;
+    LayerSet *container;
+    QDict<QStringList> m_contexts;
 };
 
 

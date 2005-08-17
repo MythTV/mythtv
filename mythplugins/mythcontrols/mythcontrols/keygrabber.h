@@ -1,3 +1,4 @@
+/* -*- myth -*- */
 /**
  * @file keygrabber.h
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -24,6 +25,7 @@
 #include <mythtv/mythdialogs.h>
 
 
+
 /**
  * @class KeyGrabPopupBox
  * @brief Captures a key.
@@ -35,7 +37,7 @@ class KeyGrabPopupBox : public MythPopupBox
 
     Q_OBJECT
 
- public:
+public:
 
     /**
      * @brief Create a new key grabber.
@@ -48,15 +50,15 @@ class KeyGrabPopupBox : public MythPopupBox
      */
     inline QString getCapturedKey() { return this->captured_key_event; }
 
- public slots:
+public slots:
 
-    /**
-     * @brief Accept the captured keybinding.
-     *
-     * The QString provided in the constructor will be set to the
-     * captured key value.
-     */
-    inline void acceptBinding(void) { done(1); }
+/**
+ * @brief Accept the captured keybinding.
+ *
+ * The QString provided in the constructor will be set to the
+ * captured key value.
+ */
+inline void acceptBinding(void) { done(1); }
 
     /**
      * @brief Reject the captured key binding.
@@ -65,7 +67,7 @@ class KeyGrabPopupBox : public MythPopupBox
      */
     inline void cancel(void) { done(0); }
 
- protected:
+protected:
 
     /**
      * @brief The key press handler.
@@ -79,7 +81,7 @@ class KeyGrabPopupBox : public MythPopupBox
      */
     void keyReleaseEvent(QKeyEvent *e);
 
- private:
+private:
 
     bool is_capturing;
     bool has_captured;
@@ -87,6 +89,7 @@ class KeyGrabPopupBox : public MythPopupBox
     QButton *ok_button;
     QLabel *key_label;
 };
+
 
 
 /**
@@ -97,7 +100,7 @@ class InvalidBindingPopup : public MythPopupBox
 {
     Q_OBJECT;
 
- public:
+public:
 
     /**
      * @brief Create a popup that explains that they are removing a
@@ -111,18 +114,18 @@ class InvalidBindingPopup : public MythPopupBox
      * action.
      */
     InvalidBindingPopup(MythMainWindow *window, const QString &action,
-			const QString &context);
+                        const QString &context);
 
     /**
      * @brief Execute the error popup
      */
     inline int getOption(void) { return ExecPopup(this,SLOT(finish())); }
 
- protected slots:
-    /**
-     * @brief Close the popup.
-     */
-    inline void finish(void) { done(0); }
+protected slots:
+/**
+ * @brief Close the popup.
+ */
+inline void finish(void) { done(0); }
 };
 
 
@@ -135,7 +138,7 @@ class OptionsMenu : public MythPopupBox
 
     Q_OBJECT;
 
- public:
+public:
 
     enum actons { SAVE, CANCEL };
 
@@ -149,12 +152,12 @@ class OptionsMenu : public MythPopupBox
      */
     inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
 
- public slots:
+public slots:
 
-    /**
-     * @brief Slot to connect to when the save button is pressed.
-     */
-    inline void save(void) { done(OptionsMenu::SAVE); }
+/**
+ * @brief Slot to connect to when the save button is pressed.
+ */
+inline void save(void) { done(OptionsMenu::SAVE); }
 
     /**
      * @brief Slot to connect to when the cancel button is pressed.
@@ -172,9 +175,9 @@ class OptionsMenu : public MythPopupBox
 class ActionMenu : public MythPopupBox
 {
 
-        Q_OBJECT;
+    Q_OBJECT;
 
- public:
+public:
 
     enum actons { SET, REMOVE, CANCEL };
 
@@ -188,12 +191,12 @@ class ActionMenu : public MythPopupBox
      */
     inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
 
- public slots:
+public slots:
 
-    /**
-     * @brief Slot to connect to when the set button is pressed.
-     */
-    inline void set(void) { done(ActionMenu::SET); }
+/**
+ * @brief Slot to connect to when the set button is pressed.
+ */
+inline void set(void) { done(ActionMenu::SET); }
 
     /**
      * @brief Slot to connect to when the remove button is pressed.
@@ -216,7 +219,7 @@ class UnsavedMenu : public MythPopupBox
 
     Q_OBJECT;
 
- public:
+public:
 
     enum actons { SAVE, EXIT };
 
@@ -230,12 +233,12 @@ class UnsavedMenu : public MythPopupBox
      */
     inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
 
- public slots:
+public slots:
 
-    /**
-     * @brief Slot to connect to when the save button is pressed.
-     */
-    inline void save(void) { done(UnsavedMenu::SAVE); }
+/**
+ * @brief Slot to connect to when the save button is pressed.
+ */
+inline void save(void) { done(UnsavedMenu::SAVE); }
 
     /**
      * @brief Slot to connect to when the cancel button is pressed.

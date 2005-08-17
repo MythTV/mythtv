@@ -1,3 +1,4 @@
+/* -*- myth -*- */
 /**
  * @file keygrabber.cpp
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -60,14 +61,14 @@ void KeyGrabPopupBox::keyReleaseEvent(QKeyEvent *e)
     /* if we really have a key, then process it */
     if (!key_name.isEmpty() && !key_name.isNull())
     {
-	QString modifiers;
+        QString modifiers;
 
-	/* key modifier strings as defined by the QT docs */
-	if (e->state()&Qt::ShiftButton) modifiers+="Shift+";
-	if (e->state()&Qt::ControlButton) modifiers+="Ctrl+";
-	if (e->state()&Qt::AltButton) modifiers+="Alt+";
-	if (e->state()&Qt::MetaButton) modifiers+="Meta+";
-	key_name = modifiers + key_name;
+        /* key modifier strings as defined by the QT docs */
+        if (e->state()&Qt::ShiftButton) modifiers+="Shift+";
+        if (e->state()&Qt::ControlButton) modifiers+="Ctrl+";
+        if (e->state()&Qt::AltButton) modifiers+="Alt+";
+        if (e->state()&Qt::MetaButton) modifiers+="Meta+";
+        key_name = modifiers + key_name;
     }
 
     this->captured_key_event = key_name;
@@ -93,7 +94,7 @@ InvalidBindingPopup::InvalidBindingPopup(MythMainWindow *window)
     : MythPopupBox(window, "invalidbinding")
 {
     QString warning = "This action is manditory and needs at least one key"
-	" bound to it.  Instead, try rebinding with another key.";
+        " bound to it.  Instead, try rebinding with another key.";
     addLabel("Manditory Action", Large, false);
     addLabel(warning, Small, true);
 }
@@ -101,8 +102,8 @@ InvalidBindingPopup::InvalidBindingPopup(MythMainWindow *window)
 
 
 InvalidBindingPopup::InvalidBindingPopup(MythMainWindow *window,
-					 const QString &action,
-					 const QString &context)
+                                         const QString &action,
+                                         const QString &context)
     : MythPopupBox(window, "invalidbinding")
 {
     QString message = "This kebinding conflicts with ";

@@ -1,3 +1,4 @@
+/* -*- myth -*- */
 /**
  * @file action.cpp
  * @author Micah F. Galizia <mfgalizi@csd.uwo.ca>
@@ -44,7 +45,7 @@ bool Action::hasKey(const QString & key) const
     /* check the keys */
     for (size_t i = 0; i < getKeys().count(); i++)
     {
-	if (getKeys()[i] == key) return true;
+        if (getKeys()[i] == key) return true;
     }
 
     /* the key was not found, so return false */
@@ -58,9 +59,9 @@ bool Action::addKey(const QString & key)
 
     /* dont add empty keys and dont add too many, or duplicates  */
     if ((key.length() == 0) ||
-	(getKeys().size() >= MAX_KEYS) ||
-	(getKeys().contains(key)))
-	return false;
+        (getKeys().size() >= MAX_KEYS) ||
+        (getKeys().contains(key)))
+        return false;
 
     /* add the key */
     this->keys().push_back(key);
@@ -75,14 +76,14 @@ bool Action::replaceKey(const QString & newkey, const QString &oldkey)
     /* make sure that the key list doesn't already have the new key */
     if (getKeys().contains(newkey) == 0)
     {
-	for (size_t i = 0; i < getKeys().size(); i++)
-	{
-	    if (getKeys()[i] == oldkey)
-	    {
-		keys()[i] = newkey;
-		return true;
-	    }
-	}
+        for (size_t i = 0; i < getKeys().size(); i++)
+        {
+            if (getKeys()[i] == oldkey)
+            {
+                keys()[i] = newkey;
+                return true;
+            }
+        }
     }
 
     return false;

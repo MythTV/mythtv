@@ -38,20 +38,29 @@
 
   <container name="controls">
    <area>20,20,780,380</area>
-   <listtreearea name="controltree" draworder="0">
-    <area>0,0,760,360</area>
-    <listsize>0,0,370,360</listsize>
-    <leveloffset>15</leveloffset>
+
+   <listbtnarea name="contextlist" draworder="0">
+    <area>0,0,370,360</area>
     <gradient type="unselected" start="#505050" end="#000000" alpha="100"/>
     <gradient type="selected" start="#52CA38" end="#349838" alpha="255"/>
     <fcnfont name="active" function="active"/>
     <fcnfont name="inactive" function="inactive"/>
-   </listtreearea>
+    <showarrow>no</showarrow>
+   </listbtnarea>
+
+   <listbtnarea name="actionlist" draworder="0">
+    <area>390,0,370,360</area>
+    <gradient type="unselected" start="#505050" end="#000000" alpha="100"/>
+    <gradient type="selected" start="#52CA38" end="#349838" alpha="255"/>
+    <fcnfont name="active" function="active"/>
+    <fcnfont name="inactive" function="inactive"/>
+    <showarrow>no</showarrow>
+   </listbtnarea>
+
   </container>
 
-  <container name="keys">
+  <container name="keys_layer">
    <area>20,400,780,180</area>
-
    <textbutton name="action_one" draworder="0">
     <position>20,20</position>
     <image function="on" filename="kb-button-on.png"/>
