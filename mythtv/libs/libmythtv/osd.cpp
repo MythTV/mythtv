@@ -1814,8 +1814,8 @@ bool OSD::HideAllExcept(const QString &other)
         if (*i && (*i)->Displaying())
         {
             QString name = (*i)->GetName();
-            if (name != "cc_page" && name != "menu" && name != other && 
-                (!oset || !oset->CanShowWith(name)))
+            if (name != "cc_page" && name != "menu" && name != "subtitles" &&
+                name != other && (!oset || !oset->CanShowWith(name)))
             {
                 (*i)->Hide();
                 result = true;
