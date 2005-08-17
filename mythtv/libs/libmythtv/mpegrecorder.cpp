@@ -347,16 +347,23 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         return false;
     }
 
-    struct ivtv_sliced_vbi_format vbifmt;
     if (vbimode) {
+        struct ivtv_sliced_vbi_format vbifmt;
         memset(&vbifmt, 0, sizeof(struct ivtv_sliced_vbi_format));
         vbifmt.service_set = (1==vbimode) ? VBI_TYPE_TELETEXT : VBI_TYPE_CC;
-        if ((ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0) || 
-            (ioctl(chanfd, IVTV_IOC_S_VBI_EMBED, &vbifmt) < 0)) 
+        if (ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0) 
         {
             VERBOSE(VB_IMPORTANT, QString("Can't enable VBI recording"));
             perror("vbi");
         }
+
+        int embedon = 1;
+        if (ioctl(chanfd, IVTV_IOC_S_VBI_EMBED, &embedon) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Can't enable VBI recording"));
+            perror("vbi");
+        }
+
         ioctl(chanfd, IVTV_IOC_G_VBI_MODE, &vbifmt);
         VERBOSE(VB_RECORD, QString("VBI service:%1, packet size:%2, io size:%3").
                 arg(vbifmt.service_set).arg(vbifmt.packet_size).arg(vbifmt.io_size));
