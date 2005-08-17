@@ -15,6 +15,7 @@ using namespace std;
 #include <qobject.h>
 #include <sys/select.h>
 #include <sys/types.h>
+#include <sys/socket.h>
 #include <netdb.h>
 #include <fcntl.h>
 
