@@ -2,11 +2,13 @@
 #include <qsqldatabase.h>
 #include <qfile.h>
 #include <qmap.h>
+#include <qfileinfo.h>
+#include <qregexp.h>
+
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
 #include <iostream>
 #include <fstream>
 using namespace std;
@@ -28,22 +30,23 @@ void usage(char *progname)
     cerr << "Usage: " << progname << " <--chanid <channelid>>\n";
     cerr << "\t<--starttime <starttime>> <--profile <profile>>\n";
     cerr << "\t[options]\n\n";
+    cerr << "\t--mpeg2        or -m: Perform MPEG2 to MPEG2 transcode.\n";
     cerr << "\t--chanid       or -c: Takes a channel id. REQUIRED\n";
     cerr << "\t--starttime    or -s: Takes a starttime for the\n";
-    cerr << "\t\trecording. REQUIRED\n";
+    cerr << "\t                      recording. REQUIRED\n";
     cerr << "\t--infile       or -i: Input file (Alternative to -c and -s)\n";
     cerr << "\t--profile      or -p: Takes a profile number or 'autodetect'\n";
-    cerr << "\t\trecording profile. REQUIRED\n";
+    cerr << "\t                      recording profile. REQUIRED\n";
     cerr << "\t--honorcutlist or -l: Specifies whether to use the cutlist.\n";
     cerr << "\t--allkeys      or -k: Specifies that the output file\n";
-    cerr << "\t\tshould be made entirely of keyframes.\n";
+    cerr << "\t                      should be made entirely of keyframes.\n";
     cerr << "\t--database     or -d: Store status in the db\n";
     cerr << "\t--fifodir      or -f: Directory to write fifos to\n";
-    cerr << "\t\tIf --fifodir is specified, 'audout' and 'vidout'\n";
-    cerr << "\t\twill be created in the specified directory\n";
+    cerr << "\t                      If --fifodir is specified, 'audout' and 'vidout'\n";
+    cerr << "\t                      will be created in the specified directory\n";
     cerr << "\t--fifosync          : Enforce fifo sync\n";
     cerr << "\t--buildindex   or -b: Build a new keyframe index\n";
-    cerr << "\t\t(use only if audio and video fifos are read independantly)\n";
+    cerr << "\t                      (use only if audio and video fifos are read independantly)\n";
     cerr << "\t--showprogress      : Display status info to the stdout\n";
     cerr << "\t--help         or -h: Prints this help statement.\n";
 }
@@ -55,14 +58,14 @@ int main(int argc, char *argv[])
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
     bool useCutlist = false, keyframesonly = false, use_db = false;
-    bool build_index = false, fifosync = false, showprogress = false;
+    bool build_index = false, fifosync = false, showprogress = false, mpeg2 = false;
     QMap<long long, int> deleteMap;
     QMap<long long, long long> posMap;
     srand(time(NULL));
 
     QApplication a(argc, argv, false);
 
-    print_verbose_messages = VB_NONE;
+    print_verbose_messages = VB_IMPORTANT;
 
     //  Load the context
     gContext = NULL;
@@ -205,7 +208,7 @@ int main(int argc, char *argv[])
                             verboseString += " " + *it;
                         }
                         else if (!strcmp(*it,"network"))
-                        {
+                         {
                             print_verbose_messages |= VB_NETWORK;
                             verboseString += " " + *it;
                         }
@@ -308,6 +311,11 @@ int main(int argc, char *argv[])
         {
             showprogress = true;
         }
+        else if (!strcmp(a.argv()[argpos],"-m") ||
+                 !strcmp(a.argv()[argpos],"--mpeg2")) 
+        {
+            mpeg2 = true;
+        }
         else if (!strcmp(a.argv()[argpos],"-h") ||
                  !strcmp(a.argv()[argpos],"--help")) 
         {
@@ -367,6 +375,35 @@ int main(int argc, char *argv[])
 
         infile = pginfo->GetPlaybackURL();
     }
+    else
+    {
+        QFileInfo inf(infile);
+        QString base = inf.baseName();
+        QRegExp r("(\\d*)_(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)_");
+        int pos = r.search(base);
+        if (pos > -1)
+        {
+            
+            chanid = r.cap(1);
+            QDateTime startts(QDate(r.cap(2).toInt(), r.cap(3).toInt(), r.cap(4).toInt()),
+                              QTime(r.cap(5).toInt(), r.cap(6).toInt(), r.cap(7).toInt()));
+            pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
+            
+            if (!pginfo)
+            {
+                VERBOSE(VB_IMPORTANT, QString("Couldn't find a recording on channel %1 "
+                                              "starting at %2 in the database.")
+                                              .arg(chanid).arg(startts.toString()));
+            }
+        }            
+        else
+        {
+            VERBOSE(VB_IMPORTANT, QString("Couldn't deduce channel and start time from %1 ")
+                                          .arg(base));
+        }
+        
+        
+    }
 
     QString tmpfile;
     if (infile.left(7) == "myth://") {
@@ -387,15 +424,6 @@ int main(int argc, char *argv[])
         JobQueue::ChangeJobStatus(jobID, JOB_RUNNING);
     }
 
-    if (found_infile)
-    {
-        MPEG2trans *mpeg2trans = new MPEG2trans(&deleteMap);
-        int err = mpeg2trans->DoTranscode(infile, tmpfile);
-        if (err || mpeg2trans->BuildKeyframeIndex(tmpfile, posMap))
-            return TRANSCODE_EXIT_UNKNOWN_ERROR;
-        UpdatePositionMap(posMap, tmpfile + ".map", NULL);
-        return TRANSCODE_EXIT_OK;
-    }
     Transcode *transcode = new Transcode(pginfo);
 
     VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
@@ -404,35 +432,45 @@ int main(int argc, char *argv[])
     if (showprogress)
         transcode->ShowProgress(true);
     int result = 0;
-    result = transcode->TranscodeFile((char *)infile.ascii(),
-                                   (char *)tmpfile.ascii(),
-                                   profilename, useCutlist, 
-                                   (fifosync || keyframesonly), use_db,
-                                   fifodir);
-    int exitcode = TRANSCODE_EXIT_OK;
-    if (result == REENCODE_MPEG2TRANS)
+    if (!mpeg2)
     {
-        if (useCutlist)
-            pginfo->GetCutList(deleteMap);
-        MPEG2trans *mpeg2trans = new MPEG2trans(&deleteMap);
+        result = transcode->TranscodeFile((char *)infile.ascii(),
+                                          (char *)tmpfile.ascii(),
+                                          profilename, useCutlist, 
+                                          (fifosync || keyframesonly), use_db,
+                                          fifodir);
+    }
+                                              
+    int exitcode = TRANSCODE_EXIT_OK;
+    if ((result == REENCODE_MPEG2TRANS) || mpeg2)
+    {
+        if (!pginfo)
+        {
+            VERBOSE( VB_IMPORTANT, "MPEG2 to MPEG2 transcoding requires a program info entry.");
+            return TRANSCODE_EXIT_NO_RECORDING_DATA;
+        }
+        
+        MPEG2trans *mpeg2trans = new MPEG2trans(pginfo, use_db);
         if (build_index)
         {
-            if (mpeg2trans->BuildKeyframeIndex(infile, posMap))
-                return TRANSCODE_EXIT_UNKNOWN_ERROR;
+            int err = mpeg2trans->BuildKeyframeIndex(infile, posMap);
+            if (err)
+                return err;
             UpdatePositionMap(posMap, NULL, pginfo);
         }
         else
         {
-            int err = mpeg2trans->DoTranscode(infile, tmpfile);
-            if (err || mpeg2trans->BuildKeyframeIndex(tmpfile, posMap))
-                return TRANSCODE_EXIT_UNKNOWN_ERROR;
-            UpdatePositionMap(posMap, tmpfile + ".map", NULL);
-            return TRANSCODE_EXIT_OK;
+            int err = mpeg2trans->DoTranscode(infile, tmpfile, useCutlist);
+            if (err)
+                return err;
+            err = mpeg2trans->BuildKeyframeIndex(tmpfile, posMap);
+            if (err)
+                return err;
+            UpdatePositionMap(posMap, NULL, pginfo);
         }
-        // this is a hack, since the mpeg2 transcoder doesn't return anything
-        // useful yet.
         result = REENCODE_OK;
     }
+    
     if (result == REENCODE_OK)
     {
         if (use_db)
@@ -468,6 +506,7 @@ int main(int argc, char *argv[])
     delete gContext;
     return exitcode;
 }
+
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                        ProgramInfo *pginfo)
 {
