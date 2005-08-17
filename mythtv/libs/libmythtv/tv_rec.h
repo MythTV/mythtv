@@ -182,7 +182,7 @@ class TVRec
 
   private:
     void ResetRecorder(void);
-    void SetChannel();
+    bool SetChannel();
 
     void GetChannelInfo(ChannelBase *chan,  QString &title,
                         QString &subtitle,  QString &desc,

@@ -27,7 +27,7 @@ using namespace std;
 
 class FirewireChannel : public ChannelBase
 {
- public:
+  public:
     FirewireChannel(firewire_options_t firewire_opts, TVRec *parent);
     ~FirewireChannel(void);
 
@@ -44,11 +44,11 @@ class FirewireChannel : public ChannelBase
         { return QString("%1:%2").arg(fw_opts.port).arg(fw_opts.node); }
 
     // Commands
-    void SwitchToInput(const QString &inputname, const QString &chan);
-    void SwitchToInput(int newcapchannel, bool setstarting)
-        { (void)newcapchannel; (void)setstarting; }
+    bool SwitchToInput(const QString &inputname, const QString &chan);
+    bool SwitchToInput(int newcapchannel, bool setstarting)
+        { (void)newcapchannel; (void)setstarting; return false; }
 
-private:
+  private:
     firewire_options_t fw_opts;
     nodeid_t           fwnode;
     raw1394handle_t    fwhandle;

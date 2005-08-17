@@ -229,13 +229,13 @@ void DVBChannel::RecorderStarted()
         emit ChannelChanged(chan_opts);
 }
 
-void DVBChannel::SwitchToInput(const QString &input, const QString &chan)
+bool DVBChannel::SwitchToInput(const QString &input, const QString &chan)
 {
     currentcapchannel = 0;
     if (channelnames.empty())
        channelnames[currentcapchannel] = input;
 
-    SetChannelByString(chan);
+    return SetChannelByString(chan);
 }
 
 /** \fn DVBChannel::GetChannelOptions(const QString&)

@@ -13,7 +13,9 @@
 
 //#define DBOX2_CHANNEL_DEBUG
 
-DBox2Channel::DBox2Channel(TVRec *parent, dbox2_options_t *dbox2_options, int cardid): ChannelBase(parent) {
+DBox2Channel::DBox2Channel(TVRec *parent, dbox2_options_t *dbox2_options, int cardid)
+    : ChannelBase(parent)
+{
     m_dbox2options = dbox2_options;
     m_cardid = cardid;
     m_dbox2channelcount = 0;
@@ -59,11 +61,13 @@ void DBox2Channel::SwitchToLastChannel()
     SetChannelByString(m_lastChannel);
 }
 
-bool DBox2Channel::SetChannelByString(const QString &newChan) {
+bool DBox2Channel::SetChannelByString(const QString &newChan)
+{
     // Delay set channel when list has not yet been retrieved
     if (!m_channelListReady)
     {
-        Log(QString("Channel list not received yet. Will switch to channel %1 later...").arg(newChan));
+        Log(QString("Channel list not received yet. "
+                    "Will switch to channel %1 later...").arg(newChan));
 	m_requestChannel = newChan;
 	return true;
     }
@@ -97,7 +101,9 @@ bool DBox2Channel::SetChannelByString(const QString &newChan) {
     QString channelID = GetChannelID(channelName);
     if (channelID == "")
     {
-        Log(QString("Changing to %1 failed. DBox2 channel ID for name %2 not found!").arg(chan).arg(channelName));
+        Log(QString("Changing to %1 failed. "
+                    "DBox2 channel ID for name %2 not found!")
+            .arg(chan).arg(channelName));
 	QString defaultChannel = GetDefaultChannel();
 	if (defaultChannel != chan) 
 	{  
@@ -115,24 +121,28 @@ bool DBox2Channel::SetChannelByString(const QString &newChan) {
     return true;
 }
 
-bool DBox2Channel::Open() {
+bool DBox2Channel::Open()
+{
     Log(QString("Channel instantiated."));
     return true;
 }
-void DBox2Channel::Close() {
+
+void DBox2Channel::Close()
+{
     Log(QString("Channel destructed."));
 }
     
-void DBox2Channel::SwitchToInput(const QString &input, const QString &chan)
+bool DBox2Channel::SwitchToInput(const QString &input, const QString &chan)
 {
     currentcapchannel = 0;
     if (channelnames.empty())
         channelnames[currentcapchannel] = input;
 
-    SetChannelByString(chan);
+    return SetChannelByString(chan);
 }
 
-void DBox2Channel::LoadChannels() {
+void DBox2Channel::LoadChannels()
+{
     Log(QString("Loading channels..."));
     Log(QString("Reading channel list from %1:%2")
                               .arg(m_dbox2options->host)

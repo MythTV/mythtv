@@ -783,20 +783,28 @@ void TVRec::HandleStateChange(void)
     }
     else if (TRANSITION(kState_None, kState_RecordingOnly))
     {
-        SetChannel();
-        rbuffer = new RingBuffer(outputFilename, true);
-        if (rbuffer->IsOpen())
+        if (SetChannel())
         {
-            StartedRecording();
-            startRecorder = true;
-            SET_NEXT();
+            rbuffer = new RingBuffer(outputFilename, true);
+            if (rbuffer->IsOpen())
+            {
+                StartedRecording();
+                startRecorder = true;
+                SET_NEXT();
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, "TVRec: Failed to open ringbuffer. "
+                        "Aborting new recording.");
+                delete rbuffer;
+                rbuffer = NULL;
+                SET_LAST();
+            }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "TVRec: Failed to open ringbuffer. "
-                    "Aborting new recording.");
-            delete rbuffer;
-            rbuffer = NULL;
+            VERBOSE(VB_IMPORTANT,
+                    "TVRec: Failed to set channel for recording. Aborting.");
             SET_LAST();
         }
     }
@@ -1255,7 +1263,7 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
  *  \brief If successful, sets the channel to the channel needed to record the
  *         "curRecording" program.
  */
-void TVRec::SetChannel()
+bool TVRec::SetChannel()
 {
     bool need_close = false;
     if (channel && !channel->IsOpen())
@@ -1288,13 +1296,18 @@ void TVRec::SetChannel()
     else 
     {
         MythContext::DBError("SetChannel", query);
+        return false;
     }
 
-    if (channel)
-        channel->SwitchToInput(inputname, chanstr);
+    bool ok = true;
 
+    if (channel)
+        ok = channel->SwitchToInput(inputname, chanstr);
+        
     if (need_close)
         CloseChannel();
+
+    return ok;
 }
 
 void TVRec::CreateSIParser(int program_num)

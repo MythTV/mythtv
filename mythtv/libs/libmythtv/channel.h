@@ -34,7 +34,7 @@ class Channel : public ChannelBase
     QString GetDevice(void) const { return device; }
 
     // Commands
-    void SwitchToInput(int newcapchannel, bool setstarting);
+    bool SwitchToInput(int newcapchannel, bool setstarting);
 
     // Picture attributes.
     void SetBrightness(void);

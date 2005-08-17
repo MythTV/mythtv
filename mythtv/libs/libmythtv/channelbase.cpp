@@ -79,30 +79,36 @@ int ChannelBase::GetInputByName(const QString &input) const
     return -1;
 }
 
-void ChannelBase::SwitchToInput(const QString &inputname)
+bool ChannelBase::SwitchToInput(const QString &inputname)
 {
     int input = GetInputByName(inputname);
 
     if (input >= 0)
-        SwitchToInput(input, true);
+        return SwitchToInput(input, true);
     else
         VERBOSE(VB_IMPORTANT, QString("ChannelBase: Could not find input: "
                                       "%1 on card\n").arg(inputname));
+    return false;
 }
 
-void ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
+bool ChannelBase::SwitchToInput(const QString &inputname, const QString &chan)
 {
     int input = GetInputByName(inputname);
 
+    bool ok = false;
     if (input >= 0)
     {
-        SwitchToInput(input, false);
-        SetChannelByString(chan);
+        ok = SwitchToInput(input, false);
+        if (ok)
+            ok = SetChannelByString(chan);
     }
     else
+    {
         VERBOSE(VB_IMPORTANT,
                 QString("ChannelBase: Could not find input: %1 on card when "
                         "setting channel %2\n").arg(inputname).arg(chan));
+    }
+    return ok;
 }
 
 bool ChannelBase::ChangeExternalChannel(const QString &channum)

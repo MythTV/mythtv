@@ -8,9 +8,6 @@
 #ifndef DBOX2CHANNEL_H
 #define DBOX2CHANNEL_H
 
-#include <map>
-using namespace std;
-
 #include <qstring.h>
 #include <stdint.h>
 #include "tv_rec.h"
@@ -28,57 +25,58 @@ typedef struct dbox2channel
 class DBox2Channel : public QObject, public ChannelBase
 {
     Q_OBJECT
-    public:
-        DBox2Channel(TVRec *parent, dbox2_options_t *dbox2_options, int cardid);
-	~DBox2Channel(void);
+  public:
+    DBox2Channel(TVRec *parent, dbox2_options_t *dbox2_options, int cardid);
+    ~DBox2Channel(void);
 
-	bool SetChannelByString(const QString &chan);
-	bool Open();
-	bool IsOpen(void) const { return m_recorderAlive; }
-	void Close();
-	void SwitchToLastChannel();
-	void SwitchToInput(const QString &inputname, const QString &chan);
-	void SwitchToInput(int newcapchannel, bool setstarting)
-	                 { (void)newcapchannel; (void)setstarting; }
+    bool SetChannelByString(const QString &chan);
+    bool Open();
+    bool IsOpen(void) const { return m_recorderAlive; }
+    void Close();
+    void SwitchToLastChannel();
+    bool SwitchToInput(const QString &inputname, const QString &chan);
+    bool SwitchToInput(int newcapchannel, bool setstarting)
+        { (void)newcapchannel; (void)setstarting; return false; }
 
-	QString GetChannelNameFromNumber(const QString&);
-	QString GetChannelNumberFromName(const QString& channelName);
-	QString GetChannelID(const QString&);
-	
-	void RecorderAlive(bool);
+    QString GetChannelNameFromNumber(const QString&);
+    QString GetChannelNumberFromName(const QString& channelName);
+    QString GetChannelID(const QString&);
 
-	int GetFd() { return -1; }
+    void RecorderAlive(bool);
 
-    signals:
-        void ChannelChanged();
-        void ChannelChanging();
+    int GetFd() { return -1; }
 
-    public slots:
-        void HttpChannelChangeDone(bool error);
-        void HttpRequestDone(bool error);
-	void EPGFinished();
+  signals:
+    void ChannelChanged();
+    void ChannelChanging();
 
-    private:
-	void Log(QString string);
-	void LoadChannels();
-	void RequestChannelChange(QString);
-	void ScanNextEPG();
-	QString GetDefaultChannel();
-	dbox2_options_t *m_dbox2options;
-	int m_cardid;
-	bool m_channelListReady;
-	QString m_lastChannel;
-	QString m_requestChannel;
-	DBox2EPG* m_epg;
-	bool m_recorderAlive;
+  public slots:
+    void HttpChannelChangeDone(bool error);
+    void HttpRequestDone(bool error);
+    void EPGFinished();
 
-	QHttp *http;
-	QHttp *httpChanger;
+  private:
+    void Log(QString string);
+    void LoadChannels();
+    void RequestChannelChange(QString);
+    void ScanNextEPG();
+    QString GetDefaultChannel();
 
-	int m_dbox2channelcount;
-	map<int, QString> m_dbox2channelids;
-	map<int, QString> m_dbox2channelnames;
+  private:
+    dbox2_options_t  *m_dbox2options;
+    int               m_cardid;
+    bool              m_channelListReady;
+    QString           m_lastChannel;
+    QString           m_requestChannel;
+    DBox2EPG         *m_epg;
+    bool              m_recorderAlive;
 
+    QHttp            *http;
+    QHttp            *httpChanger;
+
+    int               m_dbox2channelcount;
+    QMap<int,QString> m_dbox2channelids;
+    QMap<int,QString> m_dbox2channelnames;
 };
 
 #endif

@@ -40,7 +40,7 @@ class ChannelBase
     virtual void Close(void) = 0;
     /// \brief Switches to another input on hardware, 
     ///        and sets the channel is setstarting is true.
-    virtual void SwitchToInput(int newcapchannel, bool setstarting) = 0;
+    virtual bool SwitchToInput(int newcapchannel, bool setstarting) = 0;
     virtual bool SetChannelByString(const QString &chan) = 0;
     /// \brief Reports whether channel is already open
     virtual bool IsOpen(void) const = 0;
@@ -77,8 +77,8 @@ class ChannelBase
 
     // Input toggling convenience methods
     virtual void ToggleInputs(void);
-    virtual void SwitchToInput(const QString &input);
-    virtual void SwitchToInput(const QString &input, const QString &chan);
+    virtual bool SwitchToInput(const QString &input);
+    virtual bool SwitchToInput(const QString &input, const QString &chan);
 
     /// Saves current channel as the default channel for the current input.
     virtual void StoreInputChannels(void);

@@ -463,9 +463,10 @@ bool Channel::SetChannelByString(const QString &chan)
     // and return, since the act of changing inputs will change the channel as well.
     if (!inputName.isEmpty())
     {
-        ChannelBase::SwitchToInput(inputName, chan);
-        SetCachedATSCInfo(atsc_chan);
-        return true;
+        bool ok = ChannelBase::SwitchToInput(inputName, chan);
+        if (ok)
+            SetCachedATSCInfo(atsc_chan);
+        return ok;
     }
 
     QString modulation;
@@ -566,10 +567,14 @@ bool Channel::Tune(uint frequency, QString inputname, QString modulation)
         SetFormat("Default");
     int inputnum = GetInputByName(inputname);
 
+    bool ok = true;
     if ((inputnum >= 0) && (GetCurrentInputNum() != inputnum))
-        SwitchToInput(inputnum, false);
+        ok = SwitchToInput(inputnum, false);
     else if (GetCurrentInputNum() < 0)
-        SwitchToInput(0, false);
+        ok = SwitchToInput(0, false);
+
+    if (!ok)
+        return false;
 
     if (usingv4l2)
     {
@@ -723,8 +728,9 @@ bool Channel::TuneMultiplex(uint mplexid)
     return true;
 }
 
-void Channel::SwitchToInput(int newcapchannel, bool setstarting)
+bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
 {
+    bool ok = true;
     bool usingv4l1 = !usingv4l2;
 
     VERBOSE(VB_CHANNEL, QString("Channel(%1)::SwitchToInput(in %2%3)")
@@ -736,11 +742,14 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
     {
         ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel);
         if (ioctlval < 0)
+        {
             VERBOSE(VB_IMPORTANT,
                     QString("Channel(%1)::SwitchToInput(in %2%3): Error %4 "
                             "while setting input (v2): %5").arg(device)
                     .arg(newcapchannel).arg(setstarting?", set ch":"")
                     .arg(ioctlval).arg(strerror(errno)));
+            ok = false;
+        }
 
         VERBOSE(VB_CHANNEL, 
                 QString("Channel(%1)::SwitchToInput() setting video mode to %2")
@@ -758,6 +767,7 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
             // Fall through to try v4l version 1, pcHDTV
             // drivers don't work with VIDIOC_S_STD ioctl.
             usingv4l1 = true;
+            ok = false;
         }
     }
 
@@ -773,28 +783,39 @@ void Channel::SwitchToInput(int newcapchannel, bool setstarting)
                 .arg(device).arg(mode_to_format(videomode_v4l1, 1)));
         ioctlval = ioctl(videofd, VIDIOCSCHAN, &set); // set new settings
         if (ioctlval < 0)
+        {
             VERBOSE(VB_IMPORTANT,
                     QString("Channel(%1)::SwitchToInput(in %2%3): "
                             "Error %4 while setting video mode (v1): %5")
                     .arg(device).arg(newcapchannel)
                     .arg(setstarting ? ", set ch" : "")
                     .arg(ioctlval).arg(strerror(errno)));
+            ok = false;
+        }
         else if (usingv4l2)
+        {
             VERBOSE(VB_IMPORTANT,
                     QString("Channel(%1)::SwitchToInput(in %2%3): "
                             "Setting video mode with v4l version 1 worked")
                     .arg(device).arg(newcapchannel)
                     .arg(setstarting ? ", set ch" : ""));
+            ok = true;
+        }
     }
+
+    if (!ok)
+        return false;
 
     currentcapchannel = newcapchannel;
     curchannelname = "";
 
     if (setstarting && inputTuneTo[currentcapchannel] != "Undefined")
-        TuneTo(inputTuneTo[currentcapchannel], 0);
+        ok = TuneTo(inputTuneTo[currentcapchannel], 0);
 
     if (setstarting && !inputChannel[currentcapchannel].isEmpty())
-        SetChannelByString(inputChannel[currentcapchannel]);
+        ok = SetChannelByString(inputChannel[currentcapchannel]);
+
+    return ok;
 }
 
 unsigned short *Channel::GetV4L1Field(int attrib, struct video_picture &vid_pic)

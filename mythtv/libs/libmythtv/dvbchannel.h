@@ -54,9 +54,9 @@ class DVBChannel : public QObject, public ChannelBase
     bool        IsPMTSet()              const { return chan_opts.IsPMTSet(); }
 
     // Commands
-    void SwitchToInput(const QString &inputname, const QString &chan);
-    void SwitchToInput(int newcapchannel, bool setstarting)
-        { (void)newcapchannel; (void)setstarting; }
+    bool SwitchToInput(const QString &inputname, const QString &chan);
+    bool SwitchToInput(int newcapchannel, bool setstarting)
+        { (void)newcapchannel; (void)setstarting; return false; }
     bool Tune(const dvb_channel_t& channel, bool force_reset=false);
 
     // Set/Get/Command just for SIScan/ScanWizardScanner
