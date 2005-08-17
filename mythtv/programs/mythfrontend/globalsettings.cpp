@@ -2455,6 +2455,15 @@ static HostCheckBox *LCDShowTime()
     return gc;
 }
 
+static HostCheckBox *LCDShowRecStatus()
+{
+    HostCheckBox *gc = new HostCheckBox("LCDShowRecStatus");
+    gc->setLabel(QObject::tr("LCD Displays Recording Status"));
+    gc->setHelpText(QObject::tr("Display current recordings information."));
+    gc->setValue(false);
+    return gc;
+}
+
 static HostCheckBox *LCDShowMenu()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowMenu");
@@ -2585,6 +2594,7 @@ public:
          setLeft->addChild(LCDShowMusic());
          setLeft->addChild(LCDShowMusicItems());
          setLeft->addChild(LCDShowChannel());
+         setRight->addChild(LCDShowRecStatus());
          setRight->addChild(LCDShowVolume());
          setRight->addChild(LCDShowGeneric());
          setRight->addChild(LCDBacklightOn());

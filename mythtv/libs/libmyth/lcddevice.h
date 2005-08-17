@@ -100,7 +100,9 @@ class LCD : public QObject
 
     static bool m_server_unavailable;
     static class LCD * m_lcd;
-
+    
+    void customEvent(QCustomEvent  *e);
+     
   public:
    ~LCD();
 
@@ -190,13 +192,14 @@ class LCD : public QObject
     void outputChannel();          // Longer timer (progress bar)
     void outputGeneric();          // Longer timer (progress bar)
     void outputVolume();
-
+    void outputRecStatus();        
     void scrollMenuText();         // Scroll the menu items if need be
     void beginScrollingMenuText(); // But only after a bit of time has gone by
     void scrollText();             // Scroll the topline text
     void beginScrollingText();     // But only after a bit of time has gone by
     void unPopMenu();              // Remove the Pop Menu display
-        
+    void scrollList();             // display a list line by line
+         
   private:
     void outputCenteredText(QString theScreen, QString theText,
                             QString widget = "topWidget", int row = 1);
@@ -205,18 +208,26 @@ class LCD : public QObject
                         QString widget = "topWidget", int row = 1);
     void outputRightText(QString theScreen, QString theText,
                          QString widget = "topWidget", int row = 1);
+    
+    void outputScrollerText(QString theScreen, QString theText,
+                         QString widget = "scroller", int top = 1, int bottom = 1);
+    
+    QStringList formatScrollerText(const QString &text);
    
+    
     void sendToServer(const QString &someText);
 
-    enum PRIORITY {TOP, URGENT, HIGH, MEDIUM, LOW};
+    enum PRIORITY {TOP, URGENT, HIGH, MEDIUM, LOW, OFF};
     void setPriority(const QString &screen, PRIORITY priority);
 
     void setHeartbeat (const QString &screen, bool onoff);
 
     void init();
-    void assignScrollingText(QString theText, QString theWidget = "topWidget", 
-                             int theRox = 1);
-
+    void assignScrollingText(QString theText, QString theScreen,
+                             QString theWidget = "topWidget", int theRox = 1);
+    void assignScrollingList(QStringList theList, QString theScreen, 
+                             QString theWidget = "topWidget", int theRow = 1);
+                             
     void startTime();
     void startMusic(QString artist, QString album, QString track);
     void startChannel(QString channum, QString title, QString subtitle);
@@ -227,7 +238,7 @@ class LCD : public QObject
     void handleKeyPress(QString key);
     void startVolume(QString app_name);
 
-    unsigned int theMode;
+    QString activeScreen;
 
     QSocket *socket;
     QTimer *LEDTimer;
@@ -241,7 +252,9 @@ class LCD : public QObject
     QTimer *menuPreScrollTimer;
     QTimer *popMenuTimer;
     QTimer *retryTimer;
-
+    QTimer *recStatusTimer;
+    QTimer *scrollListTimer;
+    
     void setWidth(unsigned int);
     void setHeight(unsigned int);
     void setCellWidth(unsigned int);
@@ -254,7 +267,8 @@ class LCD : public QObject
     unsigned int prioHigh;
     unsigned int prioMedium;
     unsigned int prioLow;
-
+    unsigned int prioOff;
+     
     unsigned int lcdWidth;
     unsigned int lcdHeight;
     unsigned int cellWidth;
@@ -273,10 +287,15 @@ class LCD : public QObject
     QString music_time;
 
     QString scrollingText;
-    QString scrollWidget;
+    QString scrollScreen, scrollWidget;
     int scrollRow;
     unsigned int scrollPosition;
     QString timeformat;
+
+    QStringList scrollListItems;
+    QString scrollListScreen, scrollListWidget;
+    int scrollListRow;
+    unsigned int scrollListItem;
         
     unsigned int menuScrollPosition;
     QPtrList<LCDMenuItem> *lcdMenuItems;
@@ -297,6 +316,7 @@ class LCD : public QObject
     bool lcd_showmusic;
     bool lcd_showchannel;
     bool lcd_showvolume;
+    bool lcd_showrecstatus;
     bool lcd_backlighton;
     bool lcd_heartbeaton;
     int  lcd_popuptime;    
@@ -304,6 +324,23 @@ class LCD : public QObject
     QString lcd_keystring;
     
     int (*GetLEDMask)(void);
+
+    // recording status stuff
+    typedef struct
+    {
+        int     id;
+        bool    isRecording;
+        QString channel, title, subTitle;
+        QDateTime startTime, endTime;
+    } TunerStatus;
+
+    void updateRecordingList(void);
+
+    bool isRecording;
+    bool isTimeVisible;
+    int lcdTunerNo;
+
+    QPtrList<TunerStatus> tunerList;
 };
 
 #endif

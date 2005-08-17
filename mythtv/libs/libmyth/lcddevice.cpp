@@ -10,6 +10,8 @@
 #include "lcddevice.h"
 #include "mythcontext.h"
 #include "mythdialogs.h"
+#include "mythdbcon.h"
+#include "../libmythtv/tv.h"
 
 #include <unistd.h>
 #include <cmath>
@@ -29,6 +31,10 @@
 
 #define LCD_VERSION_4 1
 #define LCD_VERSION_5 2
+
+#define LCD_RECSTATUS_TIME  10000
+#define LCD_TIME_TIME       5000
+#define LCD_SCROLLLIST_TIME 2000
 
 LCD::LCD()
    :QObject(NULL, "LCD")
@@ -105,6 +111,16 @@ LCD::LCD()
 
     retryTimer = new QTimer(this);
     connect(retryTimer, SIGNAL(timeout()), this, SLOT(restartConnection()));
+    
+    recStatusTimer = new QTimer(this);
+    connect(recStatusTimer, SIGNAL(timeout()), this, SLOT(outputRecStatus()));
+
+    scrollListTimer = new QTimer(this);
+    connect(scrollListTimer, SIGNAL(timeout()), this, SLOT(scrollList()));
+
+    gContext->addListener(this);
+    
+    isRecording = false;
 }
 
 bool LCD::m_server_unavailable = false;
@@ -139,7 +155,6 @@ void LCD::SetupLCD (void) {
             m_server_unavailable = false;
         }
     }
-  
 }
 
 bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
@@ -269,6 +284,10 @@ void LCD::setPriority(const QString &screen, PRIORITY priority)
     case LOW:
       aString += QString::number (prioLow);
       break;
+    case OFF:
+      aString += QString::number (prioOff);
+      break;
+
     }
 
     sendToServer (aString);
@@ -364,6 +383,7 @@ void LCD::serverSendingData()
             prioHigh = 240;
             prioMedium = 248;
             prioLow = 252;
+            prioOff = 255;
             if (protocolVersion == "0.3") {
                 if (serverVersion.startsWith ("CVS-current")) {
                     // Latest CVS versions of LCDd has priorities switched
@@ -372,6 +392,7 @@ void LCD::serverSendingData()
                     prioHigh = 240;
                     prioMedium = 128;
                     prioLow = 64;
+                    prioOff = 0;
                 }
             }
 
@@ -383,7 +404,6 @@ void LCD::serverSendingData()
             
             tempString = *it;
             setHeight(tempString.toInt());
-
             it++; // the string "cellwid"
             it++; // Cell width in pixels;
 
@@ -452,6 +472,7 @@ void LCD::init()
     lcd_showgeneric=(gContext->GetSetting("LCDShowGeneric", "1")=="1");
     lcd_showvolume=(gContext->GetSetting("LCDShowVolume", "1")=="1");
     lcd_showmenu=(gContext->GetSetting("LCDShowMenu", "1")=="1");
+    lcd_showrecstatus=(gContext->GetSetting("LCDShowRecStatus", "1")=="1");
     lcd_backlighton=(gContext->GetSetting("LCDBacklightOn", "1")=="1");
     lcd_heartbeaton=(gContext->GetSetting("LCDHeartBeatOn", "1")=="1");
     aString = gContext->GetSetting("LCDPopupTime", "5");
@@ -491,10 +512,10 @@ void LCD::init()
     sendToServer("screen_set Menu backlight on");
     sendToServer("widget_add Menu topWidget string");
     for (unsigned int i = 1; i < lcdHeight; i++) {
-         aString = "widget_add Menu menuWidget";
-         aString += QString::number (i);
-         aString += " string";
-         sendToServer(aString);
+        aString = "widget_add Menu menuWidget";
+        aString += QString::number (i);
+        aString += " string";
+        sendToServer(aString);
     }
 
     // The Music Screen
@@ -527,7 +548,7 @@ void LCD::init()
     sendToServer("widget_add Channel topWidget string");
     sendToServer("widget_add Channel botWidget string");
     sendToServer("widget_add Channel progressBar hbar");
-   
+
     // The Generic Screen
 
     sendToServer("screen_add Generic");
@@ -549,8 +570,21 @@ void LCD::init()
     sendToServer("widget_add Volume botWidget string");
     sendToServer("widget_add Volume progressBar hbar");
 
+    // The Recording Status Screen
+
+    sendToServer("screen_add RecStatus");
+    setHeartbeat ("RecStatus", lcd_heartbeaton);
+    setPriority("RecStatus", LOW);
+    sendToServer("screen_set RecStatus backlight on");
+    sendToServer("widget_add RecStatus textWidget1 string");
+    sendToServer("widget_add RecStatus textWidget2 string");
+    sendToServer("widget_add RecStatus textWidget3 string");
+    sendToServer("widget_add RecStatus progressBar hbar");
+    
     lcd_ready = true;
  
+    updateRecordingList();
+    
     switchToTime();    // clock is on by default
     
     // send buffer if there's anything in there
@@ -608,6 +642,7 @@ void LCD::setVersion(const QString &sversion, const QString &pversion)
         prioHigh = 240;
         prioMedium = 248;
         prioLow = 252;
+        prioOff = 0;
     } else {
         pVersion = LCD_VERSION_5;
         prioTop = 252;
@@ -615,6 +650,7 @@ void LCD::setVersion(const QString &sversion, const QString &pversion)
         prioHigh = 240;
         prioMedium = 128;
         prioLow = 64;
+        prioOff = 0;
     }
 }
 
@@ -632,6 +668,7 @@ void LCD::describeServer()
     VERBOSE(VB_GENERAL, QString("lcddevice: - showmusicitems : %1").arg(lcd_showmusic_items));
     VERBOSE(VB_GENERAL, QString("lcddevice: - showtime       : %1").arg(lcd_showtime));
     VERBOSE(VB_GENERAL, QString("lcddevice: - showchannel    : %1").arg(lcd_showchannel));
+    VERBOSE(VB_GENERAL, QString("lcddevice: - showrecstatus  : %1").arg(lcd_showrecstatus));
     VERBOSE(VB_GENERAL, QString("lcddevice: - showgeneric    : %1").arg(lcd_showgeneric));
     VERBOSE(VB_GENERAL, QString("lcddevice: - showvolume     : %1").arg(lcd_showvolume));
     VERBOSE(VB_GENERAL, QString("lcddevice: - showmenu       : %1").arg(lcd_showmenu));
@@ -663,22 +700,31 @@ void LCD::veryBadThings(int anError)
 
 void LCD::scrollText()
 {
-    if (theMode == 0)
-        outputLeftText("Time", scrollingText.mid(scrollPosition, lcdWidth),
-                       scrollWidget, scrollRow);
-    else if (theMode == 1)
-        outputLeftText("Music", scrollingText.mid(scrollPosition, lcdWidth),
-                       scrollWidget, scrollRow);
-    else if (theMode == 2)
-        outputLeftText("Channel", scrollingText.mid(scrollPosition, lcdWidth),
-                       scrollWidget, scrollRow);
-    else if (theMode == 3)
-        outputLeftText("Generic", scrollingText.mid(scrollPosition, lcdWidth),
-                       scrollWidget, scrollRow);
+    if (activeScreen != scrollScreen)
+        return;
 
+    outputLeftText(scrollScreen, scrollingText.mid(scrollPosition, lcdWidth),
+                       scrollWidget, scrollRow);
+    
     scrollPosition++;
     if (scrollPosition >= scrollingText.length())
         scrollPosition = 0;
+}
+
+void LCD::scrollList()
+{
+    if (scrollListItems.count() == 0)
+        return;
+        
+    if (activeScreen != scrollListScreen)
+        return;
+        
+    outputLeftText(scrollListScreen, scrollListItems[scrollListItem], 
+                    scrollListWidget, scrollListRow);
+
+    scrollListItem++;
+    if (scrollListItem >= scrollListItems.count())
+        scrollListItem = 0;
 }
 
 void LCD::stopAll()
@@ -691,13 +737,16 @@ void LCD::stopAll()
 #endif
     if (lcd_ready)
     {
-        setPriority("Music", LOW);
-        setPriority("Channel", LOW);
-        setPriority("Generic", LOW);
-        setPriority("Volume", LOW);
-        setPriority("Menu", LOW);
+        setPriority("Time", OFF);
+        setPriority("Music", OFF);
+        setPriority("Channel", OFF);
+        setPriority("Generic", OFF);
+        setPriority("Volume", OFF);
+        setPriority("Menu", OFF);
+        setPriority("RecStatus", OFF);
     }
 
+    timeTimer->stop();
     preScrollTimer->stop();
     scrollTimer->stop();
     musicTimer->stop();
@@ -706,15 +755,24 @@ void LCD::stopAll()
     popMenuTimer->stop();
     menuScrollTimer->stop();
     menuPreScrollTimer->stop();
+    recStatusTimer->stop();
+    scrollListTimer->stop();
+    
     unPopMenu();
 }
 
 void LCD::startTime()
 {
     setPriority("Time", MEDIUM);
+    setPriority("RecStatus", LOW);
+
     timeTimer->start(1000, FALSE);
     outputTime();
-    theMode = 0;    
+    activeScreen = "Time";
+    isTimeVisible = true;
+    
+    if (lcd_showrecstatus && isRecording)
+        recStatusTimer->start(LCD_TIME_TIME, FALSE);
 }
 
 void LCD::outputText(QPtrList<LCDTextItem> *textItems)
@@ -737,8 +795,8 @@ void LCD::outputText(QPtrList<LCDTextItem> *textItems)
         num.setNum(curItem->getRow());
 
         if (curItem->getScroll())
-            assignScrollingText(curItem->getText(), "textWidget" + num, 
-                                curItem->getRow());
+            assignScrollingText(curItem->getText(), curItem->getScreen(),
+                                "textWidget" + num, curItem->getRow());
         else
         {
             switch (curItem->getAlignment())
@@ -769,10 +827,8 @@ void LCD::outputCenteredText(QString theScreen, QString theText, QString widget,
     QString aString;
     unsigned int x = 0;
     
-    x = (int) (rint((lcdWidth - theText.length()) / 2.0) + 1);
-    // Had a problem where I would get something like this:
-    //    2147483633 = (int) (rint((20 - 51) / 2.0) + 1)
-    // so hense this
+    x = (lcdWidth - theText.length()) / 2 + 1;
+    
     if (x > lcdWidth)
         x = 1;
 
@@ -822,26 +878,20 @@ void LCD::outputRightText(QString theScreen, QString theText, QString widget,
     sendToServer(aString);
 }
 
-void LCD::assignScrollingText(QString theText, QString theWidget, int theRow)
+void LCD::assignScrollingText(QString theText, QString theScreen, 
+                              QString theWidget, int theRow)
 {
     // Have to decide what to do with "top line" text given the size
     // of the LCD (as reported by the server)
     
+    scrollScreen = theScreen;
     scrollWidget = theWidget;
     scrollRow = theRow;
 
     if (theText.length() < lcdWidth)
     {
         // This is trivial, just show the text
-
-        if (theMode == 0)
-            outputCenteredText("Time", theText, theWidget, theRow);
-        else if (theMode == 1)
-            outputCenteredText("Music", theText, theWidget, theRow);
-        else if (theMode == 2)
-            outputCenteredText("Channel", theText, theWidget, theRow);
-        else if (theMode == 3)
-            outputCenteredText("Generic", theText, theWidget, theRow);       
+        outputCenteredText(theScreen, theText, theWidget, theRow);
  
         scrollTimer->stop();
         preScrollTimer->stop();
@@ -849,24 +899,26 @@ void LCD::assignScrollingText(QString theText, QString theWidget, int theRow)
     else
     {
         // Setup for scrolling
-        if (theMode == 0)
-            outputCenteredText("Time", theText.left(lcdWidth), theWidget, 
-                               theRow);
-        else if (theMode == 1)
-            outputCenteredText("Music", theText.left(lcdWidth), theWidget, 
-                               theRow);
-        else if (theMode == 2)
-            outputCenteredText("Channel", theText.left(lcdWidth), theWidget,
-                               theRow);
-        else if (theMode == 3)
-            outputCenteredText("Generic", theText.left(lcdWidth), theWidget, 
-                               theRow);
+        outputCenteredText(theScreen, theText.left(lcdWidth), theWidget, theRow);
 
         scrollingText = theText;
         scrollPosition = 0;
         scrollTimer->stop();
         preScrollTimer->start(2000, TRUE);
     }
+}
+
+void LCD::assignScrollingList(QStringList theList, QString theScreen, 
+                              QString theWidget, int theRow)
+{
+    scrollListScreen = theScreen;
+    scrollListWidget = theWidget;
+    scrollListRow = theRow;
+    scrollListItems = theList;
+    
+    scrollListItem = 0;
+    scrollList();
+    scrollListTimer->start(LCD_SCROLLLIST_TIME, FALSE);
 }
 
 void LCD::startMusic(QString artist, QString album, QString track)
@@ -884,8 +936,8 @@ void LCD::startMusic(QString artist, QString album, QString track)
         aString += " - ";
     } 
     aString += track;
-    theMode = 1;
-    assignScrollingText(aString);
+    activeScreen = "Music";
+    assignScrollingText(aString, "Music");
 }
 
 void LCD::startChannel(QString channum, QString title, QString subtitle)
@@ -894,8 +946,8 @@ void LCD::startChannel(QString channum, QString title, QString subtitle)
     if (lcd_showchannel)
       setPriority("Channel", HIGH);
     aString = channum;
-    theMode = 2;
-    assignScrollingText(aString, "topWidget", 1);
+    activeScreen = "Channel";
+    assignScrollingText(aString, "Channel", "topWidget", 1);
     aString = title;
     if (subtitle.length() > 0)
     {
@@ -903,7 +955,7 @@ void LCD::startChannel(QString channum, QString title, QString subtitle)
         aString += subtitle;
         aString += "'";
     }
-    assignScrollingText(aString, "botWidget", 2);
+    assignScrollingText(aString, "Channel", "botWidget", 2);
     if (lcdHeight > 2)
     {
         progress = 0.0;
@@ -932,7 +984,7 @@ void LCD::startGeneric(QPtrList<LCDTextItem> * textItems)
         return;
 
     genericTimer->start(500, FALSE);
-    theMode = 3;
+    activeScreen = "Generic";
     generic_progress = 0.0;
 
     // Return if there are no more items
@@ -942,8 +994,7 @@ void LCD::startGeneric(QPtrList<LCDTextItem> * textItems)
     // Todo, make scrolling definable in LCDTextItem
     ++it;
 
-    theMode = 3;
-    assignScrollingText(curItem->getText(), "textWidget1", curItem->getRow());
+    assignScrollingText(curItem->getText(), "Generic", "textWidget1", curItem->getRow());
 
     outputGeneric();
 
@@ -1370,7 +1421,7 @@ void LCD::unPopMenu()
 {
     // Stop the scrolling timer
     menuScrollTimer->stop();
-    setPriority("Menu", LOW);
+    setPriority("Menu", OFF);
 }
 
 void LCD::setLevels(int numbLevels, float *values)
@@ -1467,23 +1518,28 @@ void LCD::outputLEDs()
 
 void LCD::outputTime()
 {
+    if (isRecording)
+        outputCenteredText("Time", tr("RECORDING"), "topWidget", 1);
+    else
+        outputCenteredText("Time", "", "topWidget", 1);
+
     QString aString;
     int x, y;
-
+    
     if (lcdHeight < 3)
         y = 2;
     else
         y = (int) rint(lcdHeight / 2) + 1;
-
-    x = (int) rint((lcdWidth - 5) / 2) + 1;
-
+    
+    QString time = QTime::currentTime().toString(timeformat);
+    x = (lcdWidth - time.length()) / 2 + 1;
     aString = "widget_set Time timeWidget ";
     aString += QString::number(x);
     aString += " ";
     aString += QString::number(y);
     aString += " \"";
     if (lcd_showtime) {
-        aString += QTime::currentTime().toString(timeformat).left(8) + "\"";
+        aString += time + "\"";
         if (timeFlash)
         {
             aString = aString.replace(QRegExp(":"), " ");
@@ -1495,6 +1551,175 @@ void LCD::outputTime()
     else
         aString += " \"";
     sendToServer(aString);
+}
+
+// if one or more recordings are taking place we alternate between
+// showing the time and the recording status screen 
+void LCD::outputRecStatus(void)
+{
+    if (!lcd_ready || !isRecording || !lcd_showrecstatus)
+        return;
+
+    int listTime;
+    
+    if (isTimeVisible)
+    {
+        // switch to the rec status screen
+        setPriority("RecStatus", MEDIUM);
+        setPriority("Time", LOW);
+        
+        timeTimer->stop();
+        scrollTimer->stop();
+        scrollListTimer->stop();
+        listTime = LCD_RECSTATUS_TIME;
+        isTimeVisible = false;
+        activeScreen = "RecStatus";
+    }
+    else
+    {
+        // switch to the time screen
+        setPriority("Time", MEDIUM);
+        setPriority("RecStatus", LOW);
+
+        timeTimer->start(1000, FALSE);
+        scrollTimer->stop();
+        scrollListTimer->stop();
+        recStatusTimer->start(LCD_TIME_TIME, FALSE);
+
+        outputTime();
+        activeScreen = "Time";
+        isTimeVisible = true;
+
+        return;
+    }
+    
+    QString aString, status;
+    QStringList list;
+    
+    TunerStatus *tuner = tunerList.at(lcdTunerNo);
+
+    scrollListItems.clear();
+    if (lcdHeight >= 4)
+    {
+        outputCenteredText("RecStatus", tr("RECORDING"), "textWidget1", 1);
+        
+        status = tuner->title;
+        if (tuner->subTitle != "") 
+            status += " (" + tuner->subTitle + ")";
+    
+        list = formatScrollerText(status);
+        assignScrollingList(list, "RecStatus", "textWidget2", 2);
+
+        status = tuner->startTime.toString("hh:mm") + " to " + 
+                tuner->endTime.toString("hh:mm");                        
+        outputCenteredText("RecStatus", status, "textWidget3", 3);
+        
+        int length = tuner->startTime.secsTo(tuner->endTime);
+        int delta = tuner->startTime.secsTo(QDateTime::currentDateTime());
+        double rec_progress = (double) delta / length;
+        
+        aString = "widget_set RecStatus progressBar 1 ";
+        aString += QString::number(lcdHeight);
+        aString += " ";
+        aString += QString::number((int)rint(rec_progress * lcdWidth * 
+                                cellWidth));
+        sendToServer(aString);
+        
+        listTime = list.count() * LCD_SCROLLLIST_TIME * 2;
+    }
+    else
+    {
+        status = tr("RECORDING|");
+        status += tuner->title;
+        if (tuner->subTitle != "") 
+            status += "|(" + tuner->subTitle + ")";
+
+        status += "|" + tuner->startTime.toString("hh:mm") + " to " + 
+                tuner->endTime.toString("hh:mm");                        
+        
+        list = formatScrollerText(status);
+        assignScrollingList(list, "RecStatus", "textWidget1", 1);
+
+        int length = tuner->startTime.secsTo(tuner->endTime);
+        int delta = tuner->startTime.secsTo(QDateTime::currentDateTime());
+        double rec_progress = (double) delta / length;
+        
+        aString = "widget_set RecStatus progressBar 1 ";
+        aString += QString::number(lcdHeight);
+        aString += " ";
+        aString += QString::number((int)rint(rec_progress * lcdWidth * 
+                                cellWidth));
+        sendToServer(aString);
+        
+        listTime = list.count() * LCD_SCROLLLIST_TIME * 2;
+    }
+    
+    recStatusTimer->start(listTime, FALSE);
+    
+    if (lcdTunerNo < (int) tunerList.count() - 1)
+        lcdTunerNo++;
+    else
+        lcdTunerNo = 0;
+}
+
+void LCD::outputScrollerText(QString theScreen, QString theText,
+                             QString widget, int top, int bottom)
+{
+    QString aString; 
+    aString =  "widget_set " + theScreen + " " + widget;
+    aString += " 1 "; 
+    aString += QString::number(top) + " ";
+    aString += QString::number(lcdWidth) + " ";
+    aString += QString::number(bottom);
+    aString += " v 8 \"" + theText + "\"";
+    
+    sendToServer(aString);
+}
+
+QStringList LCD::formatScrollerText(const QString &text)
+{
+    QString separators = " |-_/:('<~";
+    QStringList lines;
+    
+    int lastSplit = 0;
+    QString line = "";
+    
+    for (uint x = 0; x < text.length(); x++)
+    {
+        if (separators.contains(text[x]) > 0)    
+            lastSplit = line.length();
+        
+        line += text[x];
+        if (line.length() > lcdWidth || text[x] == '|')
+        {
+            QString formatedLine;
+            formatedLine.fill(' ', lcdWidth);
+            formatedLine = formatedLine.replace((lcdWidth - lastSplit) / 2,
+                     lastSplit, line.left(lastSplit));  
+                       
+            lines.append(formatedLine);
+            
+            if (line[lastSplit] == ' ' || line[lastSplit] == '|')
+                line = line.mid(lastSplit + 1);
+            else
+                line = line.mid(lastSplit);
+            
+            lastSplit = lcdWidth;             
+        }
+    }
+    
+    // make sure we add the last line
+    QString formatedLine;
+    formatedLine.fill(' ', lcdWidth);
+    formatedLine = formatedLine.replace((lcdWidth - line.length()) / 2,
+                line.length(), line);  
+                
+    lines.append(formatedLine);
+
+//    for (uint x = 0; x < lines.count(); x++)
+//        cout << "*" << lines[x] << "*" << endl;
+        
+    return lines;
 }
 
 void LCD::outputMusic()
@@ -1638,6 +1863,7 @@ void LCD::switchToNothing()
     if (!lcd_ready)
         return;
     stopAll();
+    
 #if LCD_DEVICE_DEBUG > 1
     cout << "lcddevice: switchToNothing " << endl ;
 #endif
@@ -1690,6 +1916,11 @@ void LCD::shutdown()
     sendToServer("widget_del Time topWidget");
     sendToServer("screen_del Time");
     
+    sendToServer("widget_del RecStatus textWidget1");
+    sendToServer("widget_del RecStatus textWidget2");
+    sendToServer("widget_del RecStatus textWidget3");
+    sendToServer("widget_del RecStatus progressBar");
+
     socket->close();
 
     lcd_ready = false;
@@ -1711,5 +1942,117 @@ LCD::~LCD()
     }
     if (lcdMenuItems)
         delete lcdMenuItems;
+        
+    gContext->removeListener(this);     
 }
 
+void LCD::customEvent(QCustomEvent *e)
+{
+    if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
+    {
+        MythEvent *me = (MythEvent *) e;
+       
+        if (me->Message().left(21) == "RECORDING_LIST_CHANGE")
+        {
+            if (lcd_showrecstatus)
+            {    
+                updateRecordingList();
+            
+                if (isRecording)
+                    outputRecStatus();
+                else
+                {
+                    setPriority("Time", MEDIUM);
+                    setPriority("RecStatus", LOW);
+            
+                    timeTimer->start(1000, FALSE);
+            
+                    outputTime();
+                    activeScreen = "Time";
+                    isTimeVisible = true;
+                }    
+            }    
+        }
+    }    
+}
+
+void LCD::updateRecordingList(void)
+{
+    if (!gContext->IsConnectedToMaster())
+    {    
+        VERBOSE(VB_IMPORTANT, "LCD: Cannot get recording status "
+                               "- not connected to master server?");
+        return;
+    }
+    
+    tunerList.clear();
+    isRecording = false;
+
+    QStringList strlist;
+    
+    // are we currently recording
+    QString querytext = QString("SELECT cardid FROM capturecard;");
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.exec(querytext);
+    QString Status = "";
+
+    if (query.isActive() && query.numRowsAffected())
+    {
+        while(query.next())
+        {
+            QString status = "";
+            int cardid = query.value(0).toInt();
+            int state = kState_ChangingState;
+            QString channelName = "";
+            QString title = "";
+            QString subtitle = "";
+            QDateTime dtStart = QDateTime();
+            QDateTime dtEnd = QDateTime();
+
+            QString cmd = QString("QUERY_REMOTEENCODER %1").arg(cardid);
+
+            while (state == kState_ChangingState)
+            {
+                strlist = cmd;
+                strlist << "GET_STATE";
+                gContext->SendReceiveStringList(strlist);
+                VERBOSE(VB_IMPORTANT, 
+                    QString("cardid: %1 state: %2").arg(cardid).arg(strlist[0]));  
+
+                state = strlist[0].toInt();
+                if (state == kState_ChangingState)
+                    usleep(500);
+                    //qApp->processEvents();
+            }
+              
+            if (state == kState_RecordingOnly || state == kState_WatchingRecording)
+            {
+                isRecording = true;
+                
+                strlist = QString("QUERY_RECORDER %1").arg(cardid);
+                strlist << "GET_RECORDING";
+                gContext->SendReceiveStringList(strlist);
+                title = strlist[0];
+                subtitle = strlist[1];
+                channelName = strlist[7];
+                dtStart.setTime_t((uint)atoi(strlist[11].ascii()));
+                dtEnd.setTime_t((uint)atoi(strlist[12].ascii())); 
+            }
+            else
+                continue;
+        
+            TunerStatus *tuner = new TunerStatus;
+            tuner->id = cardid;
+            tuner->isRecording = (state == kState_RecordingOnly || 
+                                  state == kState_WatchingRecording);
+            tuner->channel = channelName;
+            tuner->title = title;
+            tuner->subTitle = subtitle;
+            tuner->startTime = dtStart;
+            tuner->endTime = dtEnd;
+            tunerList.append(tuner); 
+        }        
+    }
+    
+    lcdTunerNo = 0;
+}
