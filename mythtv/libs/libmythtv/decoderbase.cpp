@@ -212,7 +212,7 @@ bool DecoderBase::SyncPositionMap(void)
     if (livetv)
     {
         PosMapFromEnc();
-        VERBOSE(VB_PLAYBACK,
+        VERBOSE(VB_IMPORTANT,
                 QString("SyncPositionMap liveTV, from Encoder: %1 entries")
                 .arg(m_positionMap.size()));
     }

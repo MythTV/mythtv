@@ -715,11 +715,14 @@ bool MpegRecorder::GetPause(void)
     return mainpaused;
 }
 
-void MpegRecorder::WaitForPause(void)
+bool MpegRecorder::WaitForPause(int timeout)
 {
-    if (!mainpaused)
-        if (!pauseWait.wait(1000))
-            cerr << "Waited too long for recorder to pause\n";
+    if (!mainpaused && !pauseWait.wait(timeout))
+    {
+        VERBOSE(VB_IMPORTANT, "Waited too long for recorder to pause");
+        return false;
+    }
+    return true;
 }
 
 bool MpegRecorder::IsRecording(void)

@@ -29,7 +29,7 @@ class MpegRecorder : public RecorderBase
     void Pause(bool clear = true);
     void Unpause(void);
     bool GetPause(void);
-    void WaitForPause(void);
+    bool WaitForPause(int timeout=1000);
     bool IsRecording(void);
     bool IsErrored(void) { return errored; }
 

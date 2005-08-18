@@ -13,18 +13,6 @@
 
 class TSPacket;
 
-/** \class DTVRecorder
- *  \brief This is a specialization of RecorderBase used to
- *         handle DVB and ATSC streams.
- *
- *  This class is an abstract class. If you are using a
- *  pcHDTV card with the bttv drivers, ATSC streams are
- *  handled by the HDTVRecorder. If you are using DVB
- *  drivers DVBRecorder is used. If you are using firewire
- *  cable box input the FirewireRecorder is used.
- *
- *  \sa DVBRecorder, HDTVRecorder, FirewrireRecorder
- */
 class DTVRecorder: public QObject, public RecorderBase
 {
     Q_OBJECT
@@ -33,7 +21,8 @@ class DTVRecorder: public QObject, public RecorderBase
         _first_keyframe(0), _position_within_gop_header(0),
         _keyframe_seen(false), _last_keyframe_seen(0), _last_gop_seen(0),
         _last_seq_seen(0), _stream_fd(-1), _error(false),
-        _request_recording(false), _request_pause(false), _wait_for_keyframe_option(true),
+        _request_recording(false), _request_pause(false),
+        _wait_for_keyframe_option(true),
         _recording(false), _paused(false), _wait_for_keyframe(true),
         _buffer(0), _buffer_size(0),
         _frames_seen_count(0), _frames_written_count(0) {;}
@@ -55,7 +44,7 @@ class DTVRecorder: public QObject, public RecorderBase
     }
     virtual void Unpause(void) { _request_pause = false; }
     virtual bool GetPause(void) { return _paused; }
-    virtual void WaitForPause(void);
+    virtual bool WaitForPause(int timeout = 1000);
 
     long long GetKeyframePosition(long long desired);
     long long GetFramesWritten(void) { return _frames_written_count; }
