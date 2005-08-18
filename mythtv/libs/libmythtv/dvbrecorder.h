@@ -10,6 +10,9 @@
 #include <vector>
 using namespace std;
 
+// Qt includes
+#include <qmutex.h>
+
 #include "dtvrecorder.h"
 #include "tspacket.h"
 #include "transform.h"
@@ -108,6 +111,10 @@ private:
     bool            _reset_pid_filters;
     /// Encrypted PID, so we can drop these
     QMap<uint,bool> _encrypted_pid;
+
+    // locking
+    QMutex          _pid_read_lock;
+    QMutex          _pid_change_lock;
 
     // Statistics
     uint            _continuity_error_count;

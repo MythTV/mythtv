@@ -102,6 +102,9 @@ DVBRecorder::DVBRecorder(DVBChannel* advbchannel)
       _ts_packets_until_psip_sync(0),
       // Input Misc
       _reset_pid_filters(true),
+      // Locking
+      _pid_read_lock(true),
+      _pid_change_lock(true),
       // Statistics
       _continuity_error_count(0), _stream_overflow_count(0),
       _bad_packet_count(0)
@@ -150,6 +153,8 @@ void DVBRecorder::SetOptionsFromProfile(RecordingProfile*,
 
 void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
+    QMutexLocker change_lock(&_pid_change_lock);
     RECORD("DVBRecorder::ChannelChanged()");
     _input_pmt = chan.pmt;
 
@@ -216,6 +221,8 @@ void DVBRecorder::Close(void)
 
 void DVBRecorder::CloseFilters(void)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
+    QMutexLocker change_lock(&_pid_change_lock);
     for(unsigned int i=0; i<_pid_filters.size(); i++)
         if (_pid_filters[i] >= 0)
             close(_pid_filters[i]);
@@ -236,6 +243,8 @@ void DVBRecorder::CloseFilters(void)
 void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
                               dmx_pes_type_t pes_type)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
+    QMutexLocker change_lock(&_pid_change_lock);
     RECORD(QString("Adding pid %1 (0x%2)").arg(pid).arg((int)pid,0,16));
 
     if (pid < 0x10 || pid > 0x1fff)
@@ -320,6 +329,8 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
 
 bool DVBRecorder::SetDemuxFilters(void)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
+    QMutexLocker change_lock(&_pid_change_lock);
     CloseFilters();
 
     _continuity_count.clear();
@@ -403,6 +414,8 @@ bool DVBRecorder::SetDemuxFilters(void)
  */
 void DVBRecorder::AutoPID(void)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
+    QMutexLocker change_lock(&_pid_change_lock);
     _videoPID.clear();
 
     RECORD(QString("AutoPID for ServiceID=%1, PCRPID=%2 (0x%3)")
@@ -659,6 +672,7 @@ void DVBRecorder::ReadFromDMX(void)
         int pkts = readsz / MPEG_TS_PKT_SIZE;
         int curpkt = 0;
 
+        _pid_read_lock.lock();
         while (curpkt < pkts)
         {
             if (data_found == false)
@@ -774,6 +788,7 @@ void DVBRecorder::ReadFromDMX(void)
                                MPEG_TS_PKT_SIZE - 4 - pes_offset, ip);
             }
         }
+        _pid_read_lock.unlock();
     }
 }
 
