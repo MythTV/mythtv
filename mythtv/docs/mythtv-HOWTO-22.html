@@ -1168,8 +1168,29 @@ separate chapters of one consistent video title.</P>
 <P>Then burn the DVD file structure to a DVD with</P>
 <P><CODE>growisofs -Z /dev/scd0 -dvd-video DVD</CODE></P>
 
+<H2><A NAME="ss22.22">22.22</A> <A HREF="mythtv-HOWTO.html#toc22.22">Using the DBoxII within MythTV</A>
+</H2>
 
-<H2><A NAME="MigratingtoDD"></A> <A NAME="ss22.22">22.22</A> <A HREF="mythtv-HOWTO.html#toc22.22">Migrating from XMLTV to DataDirect </A>
+<P>The configuration of the DBoxII for use within MythTV is tricky 
+(as of May 16 2005), that's why it's covered here. Your DBoxII has to be 
+running linux and the Neutrino GUI instead of the stock BetaNova firmware. 
+For further information, please refer to 
+<A HREF="http://www.tuxbox.org">http://www.tuxbox.org</A>. Additionally, you need to enable the SPTS mode in 
+Neutrino.</P>
+<P>1.) Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input", 
+the other values have to be adjusted according to your setup. 
+The default values, except for the "DBOX2 host ip", should work fine.
+2.) Define a new video source. It doesn't need to be configured, 
+you just need to define it. MythTV grabs the EPG from the DBoxII.
+3.) Connect the DBoxII to the newly defined input source in "input connections".
+4.) Since channel scanning is not implemented yet, you need to define channels 
+in the "Channel Editor". Make sure that you use the same value for 
+"Channel Name" as on the DBoxII. You can get a list of available 
+channels from the web interface of Neutrino at http://ip-of-your-box:80/. 
+Associate the channel with your new video source and repeat when needed.</P>
+<P>You may leave the Setup now and proceed as usual.</P>
+
+<H2><A NAME="MigratingtoDD"></A> <A NAME="ss22.23">22.23</A> <A HREF="mythtv-HOWTO.html#toc22.23">Migrating from XMLTV to DataDirect </A>
 </H2>
 
 <P>DataDirect will use different information for your video sources and
@@ -1250,11 +1271,11 @@ $
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<H2><A NAME="ss22.23">22.23</A> <A HREF="mythtv-HOWTO.html#toc22.23">What do the icons on the Watch Recordings screen mean?</A>
+<H2><A NAME="ss22.24">22.24</A> <A HREF="mythtv-HOWTO.html#toc22.24">What do the icons on the Watch Recordings screen mean?</A>
 </H2>
 
 <P>Press "1" or F1 to get a popup.</P>
-<H2><A NAME="ss22.24">22.24</A> <A HREF="mythtv-HOWTO.html#toc22.24">What is the difference between a PVR-250 and a PVR-350</A>
+<H2><A NAME="ss22.25">22.25</A> <A HREF="mythtv-HOWTO.html#toc22.25">What is the difference between a PVR-250 and a PVR-350</A>
 </H2>
 
 <P>This is covered in the hardware section, and extensively covered on the
@@ -1281,7 +1302,7 @@ features, placing a large load on the host CPU.</P>
 <A HREF="mythtv-HOWTO-3.html#PVR-350">considerations</A>
 regarding the way audio is handled.</P>
 
-<H2><A NAME="ss22.25">22.25</A> <A HREF="mythtv-HOWTO.html#toc22.25">Changing channels on an external Set Top Box</A>
+<H2><A NAME="ss22.26">22.26</A> <A HREF="mythtv-HOWTO.html#toc22.26">Changing channels on an external Set Top Box</A>
 </H2>
 
 <P>If you need to use an external Set Top Box (STB), such as for satellite
@@ -1302,7 +1323,7 @@ the Tivo has a direct-connect capability.</LI>
 contrib directory which may work for you.</LI>
 </OL>
 </P>
-<H2><A NAME="ss22.26">22.26</A> <A HREF="mythtv-HOWTO.html#toc22.26">Configuring one machine to flag all commercials</A>
+<H2><A NAME="ss22.27">22.27</A> <A HREF="mythtv-HOWTO.html#toc22.27">Configuring one machine to flag all commercials</A>
 </H2>
 
 <P>Commercial flagging can be CPU intensive.  By default, the backend that

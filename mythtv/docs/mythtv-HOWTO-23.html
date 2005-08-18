@@ -763,7 +763,7 @@ services needed to boot a diskless workstation.</P>
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
-# apt-get install dhcpd atftpd syslinux
+# apt-get install dhcpd3-server atftpd syslinux
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -771,12 +771,151 @@ $ su
 <BLOCKQUOTE><CODE>
 <PRE>
 # mkdir -p /nfsroot/basement
-# debootstrap --exclude=postfix,postfix-tls,pppoeconf,reiser4progs,reiserfsprogs,\
-jfsutils,ppp,pppconfig,xfsprogs,lvm-common,lvm10,lvm2 --arch i386 \
-hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
+# debootstrap --arch i386 hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html</P>
+<P>Once that's done, we'll need to <B>chroot</B> into the newly created
+directory structure for some initial setup.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su 
+# chroot /nfsroot/basement
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Set the hostname that you'd like this machine to display at login and at the
+shell:
+<BLOCKQUOTE><CODE>
+<PRE>
+# echo "basement" > /etc/hostname
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Add the IP address of this host to <CODE>/etc/hosts</CODE>
+<BLOCKQUOTE><CODE>
+<PRE>
+# echo "127.0.0.1 localhost" >> /etc/hosts
+# echo "192.168.10.51 backend-2" >> /etc/hosts
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Create the initial configuration:
+<BLOCKQUOTE><CODE>
+<PRE>
+/usr/sbin/base-config new
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Create a <CODE>xorg.conf</CODE> file:
+<BLOCKQUOTE><CODE>
+<PRE>
+# xorgconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Edit your <CODE>/etc/apt/sources.list</CODE> and look at the bottom of the file. 
+It should end up looking like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+deb http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
+deb-src http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
+
+## Uncomment the following two lines to add software from the 'universe'
+## repository.
+## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
+## team, and may not be under a free licence. Please satisfy yourself as to
+## your rights to use the software. Also, please note that software in
+## universe WILL NOT receive any review or updates from the Ubuntu security
+## team.
+deb http://us.archive.ubuntu.com/ubuntu/ hoary universe
+deb-src http://us.archive.ubuntu.com/ubuntu/ hoary universe
+
+deb http://security.ubuntu.com/ubuntu hoary-security main restricted
+deb-src http://security.ubuntu.com/ubuntu hoary-security main restricted
+
+deb http://security.ubuntu.com/ubuntu hoary-security universe
+deb-src http://security.ubuntu.com/ubuntu hoary-security universe
+
+deb http://archive.ubuntu.com/ubuntu hoary multiverse
+deb-src http://archive.ubuntu.com/ubuntu hoary multiverse
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally, exit out of the <B>chroot</B>:
+<BLOCKQUOTE><CODE>
+<PRE>
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>sudo apt-get install subversion distcc bind9 bind9-doc libqt3c102-mt-mysql
+edit /etc/default/distcc to start it and allow other hosts</P>
+<P>sudo apt-get build-dep mythtv</P>
+<P>sudo apt-get install libqt3c102-mysql</P>
+
+<H3>Configuring DHCP</H3>
+
+<P>edit /etc/default/dhcp3-server.  add interface</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+option domain-name              "local";
+option subnet-mask              255.255.255.0;
+option domain-name-servers 192.168.10.50, 68.87.66.196, 68.87.64.196, 63.240.76.4
+
+# Turn on Dynamic DNS:
+ddns-update-style interim;
+ddns-updates on;
+
+# Don't allow clients to update DNS, make the server do it
+# based on the hostname passed by the DHCP client:
+deny client-updates;
+allow unknown-clients;
+
+allow bootp;
+allow booting;
+
+#option ip-forwarding    false;  # No IP forwarding
+#option mask-supplier    false;  # Don't respond to ICMP Mask req
+
+subnet 192.168.10.0 netmask 255.255.255.0 {
+  option routers        192.168.10.1;
+#  range 192.168.10.100 192.168.10.250;
+}
+
+group {
+  next-server 192.168.10.50;          # IP address of your TFTP server
+  default-lease-time 864000;
+  max-lease-time 864000;
+
+  host basement {
+        hardware ethernet 00:13:20:11:a3:ea;
+        fixed-address 192.168.10.51;
+        filename "/tftpboot/pxelinux.0";
+        option root-path "/nfsroot/basement/";
+        option host-name "basement" ;
+  }
+}
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Editing </H3>
+
+<P>svn co http://svn.mythtv.org/svn/trunk/mythtv
+svn co http://svn.mythtv.org/svn/trunk/mythplugins
+svn co http://svn.mythtv.org/svn/trunk/myththemes</P>
+<P>First time in, it will create .mythtv/mysql.txt, but it's pointing at the wrong
+server (ie, there is none on the frontend).</P>
+<P>Exit out at this point (should be the language selection screen), and edit .mythtv/mysql.txt</P>
+<P>Then restart</P>
+<P>Disable xscreensaver: System->Preferences->ScreenSaver.  Mode: Disable Screen Saver
+Advanced: Power Management Enabled: uncheck</P>
+<P>System->Preferences->Sound uncheck Enable sound server startup</P>
+
 
 <HR>
 Next

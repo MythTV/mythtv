@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-07-15, v0.18.10
+  2005-08-17, v0.18.11
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -38,7 +38,8 @@
            3.1.5.3 DVB capture cards.
            3.1.5.4 HDTV.
            3.1.5.5 Firewire.
-           3.1.5.6 USB Capture Devices.
+           3.1.5.6 DBoxII or other devices running Neutrino
+           3.1.5.7 USB Capture Devices.
         3.1.6 Hardware known NOT to work and other issues
         3.1.7 Sound card
         3.1.8 Video Display Card
@@ -179,6 +180,11 @@
         11.7.5 Scheduling decisions
         11.7.6 Reschedule Higher Priorities
         11.7.7 Controlling Your Schedule
+     11.8 Advanced Recording Options
+        11.8.1 Getting Started
+        11.8.2 How it Works
+        11.8.3 Common Tricks and Tips
+        11.8.4 Working with SQL
 
   12. MythPlugins.
   13. MythWeb.
@@ -300,11 +306,12 @@
            22.21.1.6 Create the menu buttons
            22.21.1.7 Create the final menu video
         22.21.2 Authoring the DVD
-     22.22 Migrating from XMLTV to DataDirect
-     22.23 What do the icons on the Watch Recordings screen mean?
-     22.24 What is the difference between a PVR-250 and a PVR-350
-     22.25 Changing channels on an external Set Top Box
-     22.26 Configuring one machine to flag all commercials
+     22.22 Using the DBoxII within MythTV
+     22.23 Migrating from XMLTV to DataDirect
+     22.24 What do the icons on the Watch Recordings screen mean?
+     22.25 What is the difference between a PVR-250 and a PVR-350
+     22.26 Changing channels on an external Set Top Box
+     22.27 Configuring one machine to flag all commercials
 
   23. Example Configurations.
      23.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder
@@ -320,6 +327,8 @@
      23.4 HDTV with the Air2PC-ATSC-PCI card
      23.5 Diskless Ubuntu
         23.5.1 Backend Configuration
+        23.5.2 Configuring DHCP
+        23.5.3 Editing
 
 
   ______________________________________________________________________
@@ -397,6 +406,7 @@
      schedule a program over the Internet and have it immediately acted
      on by the scheduler.
 
+
   +o  MythPhone, phone and videophone using SIP.
 
   [1m1.2.  QuickStart[0m
@@ -405,7 +415,6 @@
   MythTV.  A mini-distribution removes many of the "general purpose"
   workstation / server software packages that may be installed by
   default if you use one of the big-name OS packages.
-
 
   See http://mysettopbox.tv <http://mysettopbox.tv> if you'd like to
   install a custom version of Knoppix optimized for MythTV.
@@ -521,7 +530,6 @@
 
   Do not be afraid of SGML.  A quick look at the source of this HOWTO
   will show that it is not difficult, so at least try to submit as SGML.
-
   SGML patch files are the easiest.  Run a [1mdiff -u origfile newfile >[0m
   [1mdoc.patch [22mand mail it to the address above.
 
@@ -657,7 +665,6 @@
   choppy or jittery video.  Not all distributions enable DMA at boot
   time. See the Troubleshooting Section for ``instructions'' on how to
   do this.
-
 
   Writing video to disk is sensitive to timing issues; RTjpeg requires
   less CPU with the tradeoff being larger files and needing to write to
@@ -831,7 +838,13 @@
   You may use the Firewire output of the DCT6200 or the SA3250.
 
 
-  [1m3.1.5.6.  USB Capture Devices.[0m
+  [1m3.1.5.6.  DBoxII or other devices running Neutrino[0m
+
+  You may use the Ethernet port of an DBoxII or a similar device to
+  capture MPEG2. Your set top box has to be running the Neutrino GUI.
+
+
+  [1m3.1.5.7.  USB Capture Devices.[0m
 
   The Plextor ConvertX PVR devices are supported through Linux drivers
   available from http://www.plextor.com/english/support/LinuxSDK.htm
@@ -971,7 +984,6 @@
   +o  Radeon 7500. Ports not described. Reported to work, but no details
      reported.
 
-
   [1m3.1.9.2.  Matrox[0m
 
   The standard Matrox driver included with XFree86 does not support TV-
@@ -1037,11 +1049,11 @@
   http://www.probo.com/timr/savage40.html
   <http://www.probo.com/timr/savage40.html> for details.
 
+
   Specific cards:
 
   +o  Savage 2000 AGP. Has Composite and SVideo ports. Does not support
      XVideo.
-
 
   +o  S3 Savage IX 8MB AGP. Has SVideo output. Reported to work.
 
@@ -1104,9 +1116,6 @@
   There are a few ways of installing programs on Linux systems; you can
   either use a pre-compiled package, or install from a tarball after
   satisfying any prerequisites.
-
-
-
       [1mNOTE[22m: you must have the MySQL database software installed on a
   system to store the master database.  This does not necessarily mean
   that MySQL must run on one of the MythTV boxes.
@@ -4577,7 +4586,7 @@
   By using Reschedule Higher Priorities, the scheduler will do a better
   job of recording as many of your shows as possible when left
   unattended. It will also be easy to see that shows have been marked to
-  record at a later time. You can then decide for yourself when you
+  record at a later time.  You can then decide for yourself when you
   would prefer to record the first showing.
 
 
@@ -4645,14 +4654,251 @@
   "Add Override". "Edit Options" will allow you to change the options
   for the existing record rule such as raising the priority so that the
   show will record. These changes would apply to this and all future
-  showings that match this record rule. "Add Override" will allow you to
-  set options that apply to the specific showing without affecting the
-  existing record rule.
+  showings that match this record rule.  "Add Override" will allow you
+  to set options that apply to the specific showing without affecting
+  the existing record rule.
 
   If you return to an override page after an override has already been
   set, you will also see a "Clear override" to undo your changes. This
   option makes it very easy to try out some "what if" attempts when
   deciding on your best strategy in a difficult situation.
+
+
+  [1m11.8.  Advanced Recording Options[0m
+
+  Creating Power Search rules with Custom Record
+
+  MythTV's "Custom Record" feature gives you unlimited control for
+  creating specialized search recording rules to meet your needs. It
+  allows you to choose your criteria to search for matching shows based
+  on any of the information in the program listings, channel
+  information, time functions and more. This goes beyond the
+  capabilities of any other DVR system and it is unlikely that this
+  level of scheduling customization will ever be available in any
+  commercial DVR system.
+
+  [1m11.8.1.  Getting Started[0m
+
+  Go to Schedule Recordings->Custom Record. This page, titled "Power
+  Search Recording Rule Editor", helps you build a database search one
+  clause at a time. Each added clause further limits which showings will
+  be matched in the TV listings data. You can test the search at any
+  time and when you are done, you can save your search as a recording
+  rule.
+
+  To familiarize yourself with how you can create custom rules, create a
+  simple rule to record "Nova" only in primetime.
+
+  The first item at the top of the page allows you to edit an existing
+  rule or create a new rule. Leave it on "<New rule>". Arrow down to the
+  third item which says "Match an exact title". Right and left arrows
+  would allow you to select any of several prefabricated pieces or full
+  examples but leave it on the default for now. Arrow down to "Add this
+  example clause" and press SELECT (Enter or Space on a keyboard). The
+  large text box should now show:
+
+
+            program.title = "Nova"
+
+
+
+  As you have probably guessed, this says that we want to search for all
+  programs with the title "Nova" regardless of the time, day, channel,
+  etc.
+
+  If you do not receive a PBS station that carries "Nova" or would like
+  to use another title, edit the title by pressing the down arrow to
+  highlight the text box and right arrow over the the word "Nova". If
+  you are using a keyboard you can simply delete the four letters and
+  type a different title between the quotes. With a remote control, you
+  can do 'cell phone' style text entry with the number pad. The delete
+  key is the "X" in the grouping for "1", zero is grouped with "9" and
+  "0" acts as the "Caps Lock" key.
+
+  Note: the text box honors many familiar Emacs control keys. It is also
+  possible to cut and paste text into the text box so you can edit with
+  a favorite editor or inset a rule sent in email or from other sources.
+
+  In any case, choose a title that is shown both in primetime and late
+  night or daytime. Next, click the "Test" button. You should see a list
+  of the upcoming episodes for "Nova" just as if you had clicked the
+  Upcoming button for "Nova" elsewhere in MythTV.
+
+  Press ESC to go back to the Custom Record page. Move to the example
+  selector then press the right or left arrows until you find "Only in
+  primetime". Click "Add this example clause". You should now see:
+
+
+                   program.title = "Nova"
+                   AND HOUR(program.starttime) >= 19
+                   AND HOUR(program.starttime) < 23
+
+
+
+  Click "Test". You should now see a shorter list with only the showings
+  that begin between 7PM and 11PM. To create a rule for this, press ESC
+  to go back to the custom page and move to "Rule Name:" then type
+  "Nova" or anything else you would like. This is only a label and will
+  not affect the search results. Once a name has been entered, the
+  "Record" button will light up.  Click this to enter the recording
+  options page. If you named it "Nova" the title will say "Nova (Power
+  Search)". Set whatever options you would like then click "Save these
+  settings". You now have a special rule to record "Nova" but only when
+  it is shown in primetime.
+
+  To remove this, or any other rule, you can go to the "Recording
+  Priorities" page, arrow down to the title, press enter and change the
+  the recording type to "Do not record this program" then "Save these
+  settings".
+
+
+  [1m11.8.2.  How it Works[0m
+
+  MythTV stores TV program information in a database and uses the
+  Structured Query Language (SQL) to access the data. Information about
+  each TV program is stored in the 'program' table and information about
+  each TV station you receive is stored in 'channel'. These two tables
+  are used in the scheduler queries and their fields are available to be
+  used in your rules. The rules you create are stored in 'record'.
+  Normal rules in MythTV simply match the title in the rule with the
+  titles in the 'program' table.
+
+  MythTV also has search rules for "Titles", "Keywords" and "People".
+  These store the key phrase in the rule's description field of the rule
+  and includes these in specialized SQL replacements for the normal
+  title check.  There is also a type called "Power Search" which takes
+  the raw SQL in the description as the replacement for title matching.
+
+  Custom Record is a tool to help you build valid SQL for Power Search
+  rules.  You do not need to be an SQL expert to use Custom Record
+  because the examples are known to work correctly and are usually self-
+  explanatory so you can choose the pieces you need then modify them.
+  Many powerful solutions to unique problems are possible by combining
+  the examples. With some creativity and some knowledge of SQL, the
+  possibilities are limitless.
+
+
+  [1m11.8.3.  Common Tricks and Tips[0m
+
+  The example clauses marked "complete example" are actual rules that
+  have been used to address specific problems. You may find that some of
+  these are useful for you as is or with slight modifications. These
+  show off how powerful custom rules can be but there are also several
+  simple idioms that you may find useful for many of the shows you would
+  like to record.
+
+  Wait for a known title -- If there is a movie that you anticipate will
+  be televised in the coming months but is not yet in the listings, you
+  can select "Match an exact title", edit the movie title, click
+  "Record" then choose "Record one showing of this title". The rule will
+  wait weeks, months or years until this title shows up in your listings
+  then it will record one showing. These rules have no impact on the
+  scheduler throughout the day and only take a tiny fraction of a second
+  when the master backend starts or when the listings are updated.
+
+  Silence series out of season -- "Celebrity Poker Showdown", for
+  example, will have new episodes for a while then long periods where
+  reruns are shown dozens of times per week. By checking the previously
+  shown flag you can create a rule that will only match new episodes.
+  Therefore, your schedule won't be polluted with dozens of entries
+  marked as "Repeat" or "Previously Recorded".
+
+
+              program.title = "Celebrity Poker Showdown"
+              AND program.previouslyshown = 0
+
+  This allows you to keep rules for your favorite shows that are dormant
+  while out of season but will spring back to life when new episodes
+  appear.
+
+  Choose showings on certain days -- Several cable stations will show
+  their highest rated shows a dozen on more times per week. However, the
+  scheduler only needs two or three choices to do a good job of making a
+  flexible choice.
+
+
+              program.title LIKE "Celebrity Fit Club%"
+              AND DAYNAME(program.starttime) = "Sunday"
+
+
+
+  This says to choose any showing of an episode that hasn't been
+  recorded when it appears on Sunday. This prevents all the other show-
+  ings during the week from being listed in the schedule.
+
+  Notice the word "LIKE" and the "%" at the end. This does wildcard
+  matching so that this would match even if the title ended with "2".
+  "III" or ":Revenge of the Snapple Lady". This can be useful where the
+  title may change from one season to the next like "Survivor%", "Big
+  Brother%" or "The Amazing Race%".
+
+
+  [1m11.8.4.  Working with SQL[0m
+
+  As you experiment, it is possible that you may misplace a quote or
+  mistype a word. If there is a mistake when you press "Test" or
+  "Record" you will see an error message returned from the database.
+  This will usually give you a good idea about what needs to be fixed.
+  However, for more subtle MySQL syntax errors, you can find more
+  information in the documentation at http://dev.mysql.com/doc/mysql/en/
+  <http://dev.mysql.com/doc/mysql/en/>. This contains a lot of
+  information that can be useful for Power Search rules such as the
+  "Date and Time Functions". There are many other good resources for SQL
+  on the Web.
+
+  While the example clauses demonstrate how many of the data fields may
+  be used, you can get a more complete list of all the fields that are
+  available by using a MySQL client program:
+
+
+       $ mysql -u mythtv -pmythtv mythconverg
+       mysql> describe program;
+       mysql> describe channel;
+
+
+
+  This will show the names of all of the fields along with their type
+  and default value. Most are easy to understand but a few need some
+  explanation in order to use them effectively with Power Search.
+
+  +o  "program.category_type" holds one of these exact four strings:
+     "movie", "series", "sports" or "tvshow".
+
+  +o  "program.airdate" is a string representing the year of release for
+     movies and may have no meaning for other types of shows.
+
+  +o  "program.stars" is a floating point number from 0.0 to 1.0. On a
+     four star scale, 1.0 would be four stars, 0.75 would be three stars
+     and so on.
+
+  +o  "program.originalairdate" if provided is the date when a show was,
+     or will be, first televised. This may be useful for finding
+     episodes before or after a certain date such as finding just the
+     original series of "Battlestar Galactica".
+
+  +o  "program.previouslyshown" is a field created by myth to try to
+     determine if a showing is more than 14 days after it's original air
+     date or if the show was marked as a repeat and did not have and
+     have a date for the first airing. If this is "0" it usually means
+     that this is a brand new show or a rebroadcast within the first two
+     weeks.
+
+  +o  "program.programid" is the Tribune Media Service database record
+     identifier for each program description. In general, these start
+     with a two letter prefix, MV, EP, SP or SH that correspond to the
+     "program.category_type".  For most, the last four digits are "0000"
+     except EP where the last four digits are the episode number in the
+     series. Note that these are generated by TMS and not the show's
+     producers but they are usually in the same order a the original air
+     dates for the episodes. Detailed information can be found in the
+     Data Direct documentation at http://labs.zap2it.com/
+     <http://labs.zap2it.com/> .
+
+     Finally, if you are doing something very experimental and a field
+     is not giving you the results you had anticipated, you can always
+     check the MythTV source code to see exactly how a field is used.
+     The open source for MythTV is available from http://www.mythtv.org/
+     <http://www.mythtv.org/> .
 
 
   [1m12.  MythPlugins.[0m
@@ -7593,8 +7839,32 @@
   growisofs -Z /dev/scd0 -dvd-video DVD
 
 
+  [1m22.22.  Using the DBoxII within MythTV[0m
 
-  [1m22.22.  Migrating from XMLTV to DataDirect[0m
+  The configuration of the DBoxII for use within MythTV is tricky (as of
+  May 16 2005), that's why it's covered here. Your DBoxII has to be
+  running linux and the Neutrino GUI instead of the stock BetaNova
+  firmware.  For further information, please refer to
+  http://www.tuxbox.org <http://www.tuxbox.org>. Additionally, you need
+  to enable the SPTS mode in Neutrino.
+
+  1.) Add a new "Capture Card" in the setup. The "Card type" is "DBOX2
+  Input", the other values have to be adjusted according to your setup.
+  The default values, except for the "DBOX2 host ip", should work fine.
+  2.) Define a new video source. It doesn't need to be configured, you
+  just need to define it. MythTV grabs the EPG from the DBoxII.  3.)
+  Connect the DBoxII to the newly defined input source in "input
+  connections".  4.) Since channel scanning is not implemented yet, you
+  need to define channels in the "Channel Editor". Make sure that you
+  use the same value for "Channel Name" as on the DBoxII. You can get a
+  list of available channels from the web interface of Neutrino at
+  http://ip-of-your-box:80/.  Associate the channel with your new video
+  source and repeat when needed.
+
+  You may leave the Setup now and proceed as usual.
+
+
+  [1m22.23.  Migrating from XMLTV to DataDirect[0m
 
   DataDirect will use different information for your video sources and
   channels than was used by XMLTV. The following will clear your old
@@ -7627,9 +7897,6 @@
   Complete the configuration as detailed in the section called
   ``Configuring the Zap2It.com DataDirect service'' and in ``Video
   Sources''.
-
-
-
     You [4mmust[24m associate your DataDirect information with the inputs on
   your capture device.  If you created "Cable-DD", then don't forget to
   bind /dev/video0 to Cable-DD in the ``Video Sources'' portion of
@@ -7648,20 +7915,20 @@
   a semicolon.
 
 
-  $ mysql -u root mythconverg
-  mysql>create table channel_temp
-  select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
-  c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
-  c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
-  c.commfree, c.visible, c.outputfilters
-  from channel c
-  left join channel_copy cb on (c.callsign = cb.callsign);
-  mysql>truncate channel;
-  mysql>insert channel select * from channel_temp;
-  mysql>drop table channel_temp;
-  mysql>drop table channel_copy;
-  mysql>exit
-  $
+       $ mysql -u root mythconverg
+       mysql>create table channel_temp
+       select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
+       c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
+       c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
+       c.commfree, c.visible, c.outputfilters
+       from channel c
+       left join channel_copy cb on (c.callsign = cb.callsign);
+       mysql>truncate channel;
+       mysql>insert channel select * from channel_temp;
+       mysql>drop table channel_temp;
+       mysql>drop table channel_copy;
+       mysql>exit
+       $
 
 
 
@@ -7678,11 +7945,11 @@
 
 
 
-  [1m22.23.  What do the icons on the Watch Recordings screen mean?[0m
+  [1m22.24.  What do the icons on the Watch Recordings screen mean?[0m
 
   Press "1" or F1 to get a popup.
 
-  [1m22.24.  What is the difference between a PVR-250 and a PVR-350[0m
+  [1m22.25.  What is the difference between a PVR-250 and a PVR-350[0m
 
   This is covered in the hardware section, and extensively covered on
   the Hauppauge website.  Briefly recapping:
@@ -7712,11 +7979,12 @@
 
   Non-MPEG-2 content will be displayed on the PVR-350 output using
   framebuffer features, placing a large load on the host CPU.
+
   Note that for the PVR-350 there are some ``considerations'' regarding
   the way audio is handled.
 
 
-  [1m22.25.  Changing channels on an external Set Top Box[0m
+  [1m22.26.  Changing channels on an external Set Top Box[0m
 
   If you need to use an external Set Top Box (STB), such as for
   satellite TV or for digital cable you will need some way for MythTV to
@@ -7738,7 +8006,7 @@
   3. Use a firewire connection.  There is a 6200ch.c in the MythTV
      contrib directory which may work for you.
 
-  [1m22.26.  Configuring one machine to flag all commercials[0m
+  [1m22.27.  Configuring one machine to flag all commercials[0m
 
   Commercial flagging can be CPU intensive.  By default, the backend
   that created a recording is the one which will flag commercials.  You
@@ -7815,8 +8083,6 @@
 
   This should create an ivtv directory.  Switch to it and perform the
   following commands:
-
-
        $ cd ivtv/utils
        $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
        $ su
@@ -7835,8 +8101,7 @@
   top of the Makefile in the driver directory is a line like this:
 
 
-
-  KERNELDIR= /lib/modules/$(KERNVER)/build
+       KERNELDIR= /lib/modules/$(KERNVER)/build
 
 
 
@@ -7870,11 +8135,12 @@
   Compile the [1mtest_ioctl [22mprogram:
 
 
-       $ cd ../utils
-       $ make
-       $ su
-       # cp test_ioctl /usr/local/bin
-       # exit
+
+  $ cd ../utils
+  $ make
+  $ su
+  # cp test_ioctl /usr/local/bin
+  # exit
 
 
 
@@ -7917,11 +8183,12 @@
   located on the same key as the tilde " " and not the single quote.
 
 
-       $ su
-       # cd /lib/modules/`uname -r`
-       # pwd
-       /lib/modules/2.4.21-0.16mdk
-       # find . -name "msp3400*" | xargs rm -f
+
+  $ su
+  # cd /lib/modules/`uname -r`
+  # pwd
+  /lib/modules/2.4.21-0.16mdk
+  # find . -name "msp3400*" | xargs rm -f
 
 
 
@@ -7940,6 +8207,7 @@
 
        # modprobe ivtv
        # exit
+
 
 
   Check that the card is being recognized on the PCI bus:
@@ -7977,9 +8245,6 @@
   setup directory on the machine hosting the hardware MPEG-2 card.  When
   you add a new capture card, ensure that you are using the video0
   device.
-
-
-
      [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
   closed-captioning is not available.  Leave the VBI device, audio
   device and audio sampling rate limit at the default values.  Change
@@ -8060,6 +8325,8 @@
   partition type you should stop and look at documentation on how to
   perform these steps.
 
+
+
     [1mBIG FAT WARNING[22m:  Using an incorrect parameter can make your files
   inaccessible, prevent your computer from booting, etc.  Be careful!
 
@@ -8104,44 +8371,44 @@
 
 
 
-  # fdisk /dev/hda
+       # fdisk /dev/hda
 
-  The number of cylinders for this disk is set to 1823.
-  There is nothing wrong with that, but this is larger than 1024,
-  and could in certain setups cause problems with:
-  1) software that runs at boot time (e.g., old versions of LILO)
-  2) booting and partitioning software from other OSs
-     (e.g., DOS FDISK, OS/2 FDISK)
+       The number of cylinders for this disk is set to 1823.
+       There is nothing wrong with that, but this is larger than 1024,
+       and could in certain setups cause problems with:
+       1) software that runs at boot time (e.g., old versions of LILO)
+       2) booting and partitioning software from other OSs
+          (e.g., DOS FDISK, OS/2 FDISK)
 
-  Command (m for help): p
+       Command (m for help): p
 
-  Disk /dev/hda: 15.0 GB, 15000330240 bytes
-  255 heads, 63 sectors/track, 1823 cylinders
-  Units = cylinders of 16065 * 512 = 8225280 bytes
+       Disk /dev/hda: 15.0 GB, 15000330240 bytes
+       255 heads, 63 sectors/track, 1823 cylinders
+       Units = cylinders of 16065 * 512 = 8225280 bytes
 
-     Device Boot    Start       End    Blocks   Id  System
-  /dev/hda1   *         1       764   6136798+  83  Linux
-  /dev/hda2           765      1823   8506417+   5  Extended
-  /dev/hda5           765      1823   8506417   83  Linux
+          Device Boot    Start       End    Blocks   Id  System
+       /dev/hda1   *         1       764   6136798+  83  Linux
+       /dev/hda2           765      1823   8506417+   5  Extended
+       /dev/hda5           765      1823   8506417   83  Linux
 
-  Command (m for help): t
-  Partition number (1-6): 5
-  Hex code (type L to list codes): 8e
+       Command (m for help): t
+       Partition number (1-6): 5
+       Hex code (type L to list codes): 8e
 
-  Command (m for help): p
+       Command (m for help): p
 
-  Disk /dev/hda: 15.0 GB, 15000330240 bytes
-  255 heads, 63 sectors/track, 1823 cylinders
-  Units = cylinders of 16065 * 512 = 8225280 bytes
+       Disk /dev/hda: 15.0 GB, 15000330240 bytes
+       255 heads, 63 sectors/track, 1823 cylinders
+       Units = cylinders of 16065 * 512 = 8225280 bytes
 
-     Device Boot    Start       End    Blocks   Id  System
-  /dev/hda1   *         1       764   6136798+  83  Linux
-  /dev/hda2           765      1823   8506417+   5  Extended
-  /dev/hda5           765      1823   8506417   8e  Linux LVM
+          Device Boot    Start       End    Blocks   Id  System
+       /dev/hda1   *         1       764   6136798+  83  Linux
+       /dev/hda2           765      1823   8506417+   5  Extended
+       /dev/hda5           765      1823   8506417   8e  Linux LVM
 
-  Command (m for help): w
+       Command (m for help): w
 
-  #
+       #
 
 
 
@@ -8157,7 +8424,8 @@
   "VGforMyth" that is allocated in chunks that are a multiple of 64MB
 
 
-       # vgcreate VGforMyth -s 64m /dev/hda5
+
+  # vgcreate VGforMyth -s 64m /dev/hda5
 
 
 
@@ -8165,10 +8433,9 @@
   reiserfs filesystem and mount it:
 
 
-
-  # lvcreate --name video --size 5G VGforMyth
-  # mkreiserfs /dev/VGforMyth/video
-  # mount /dev/VGforMyth/video /var/video
+       # lvcreate --name video --size 5G VGforMyth
+       # mkreiserfs /dev/VGforMyth/video
+       # mount /dev/VGforMyth/video /var/video
 
 
 
@@ -8218,8 +8485,6 @@
 
   Unmount, resize and remount the filesystem.  Technically, you don't
   need to unmount and remount the ReiserFS.
-
-
        # umount /var/video
        # resize_reiserfs /dev/VGforMyth/video
        # mount /dev/VGforMyth/video /var/video
@@ -8280,6 +8545,7 @@
   on a filesystem the size of a typical MythTV partition.
 
 
+
   [1m23.3.2.  Ext3[0m
 
   Ext3 is Ext2 with a journal, so your biggest gain is that in case of a
@@ -8289,8 +8555,7 @@
   There are options available when formatting an Ext3 partition, as in:
 
 
-
-  # mkfs.ext3 -T largefile4 /dev/hdb1
+       # mkfs.ext3 -T largefile4 /dev/hdb1
 
 
 
@@ -8344,6 +8609,7 @@
   potentially leading to dropped frames.
 
 
+
   [1m23.4.  HDTV with the Air2PC-ATSC-PCI card[0m
 
   The Air2PC card has the capability to capture over-the-air HDTV
@@ -8355,11 +8621,12 @@
 
   Download the source to 2.6.11.
 
-  $ su
-  # cd /usr/src
-  # wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
-  # tar -xjf linux-2.6.11.tar.bz2
-  # pushd .
+
+       $ su
+       # cd /usr/src
+       # wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
+       # tar -xjf linux-2.6.11.tar.bz2
+       # pushd .
 
 
 
@@ -8402,9 +8669,10 @@
   this automatically as a part of the [1mgenkernel [22mstep.
 
 
-       # make modules
-       # make
-       # make install modules_install
+
+  # make modules
+  # make
+  # make install modules_install
 
 
 
@@ -8415,11 +8683,10 @@
   card.  At the password prompt, press ENTER.
 
 
-
-  $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
-  $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
-  $ cd dvb-apps
-  $ make
+       $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
+       $ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
+       $ cd dvb-apps
+       $ make
 
 
 
@@ -8523,14 +8790,164 @@
 
 
        $ su
-       # apt-get install dhcpd atftpd syslinux
-
+       # apt-get install dhcpd3-server atftpd syslinux
 
 
        # mkdir -p /nfsroot/basement
-       # debootstrap --exclude=postfix,postfix-tls,pppoeconf,reiser4progs,reiserfsprogs,\
-       jfsutils,ppp,pppconfig,xfsprogs,lvm-common,lvm10,lvm2 --arch i386 \
-       hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
+       # debootstrap --arch i386 hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
+
+
+
+  http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-
+  i386/current/doc/manual/en/apcs03.html
+
+  Once that's done, we'll need to [1mchroot [22minto the newly created
+  directory structure for some initial setup.
+
+
+       $ su
+       # chroot /nfsroot/basement
+
+
+
+  Set the hostname that you'd like this machine to display at login and
+  at the shell:
+
+
+       # echo "basement" > /etc/hostname
+
+
+
+  Add the IP address of this host to /etc/hosts
+
+
+       # echo "127.0.0.1 localhost" >> /etc/hosts
+       # echo "192.168.10.51 backend-2" >> /etc/hosts
+
+
+
+  Create the initial configuration:
+
+
+       /usr/sbin/base-config new
+
+
+
+  Create a xorg.conf file:
+
+
+       # xorgconfig
+
+
+
+  Edit your /etc/apt/sources.list and look at the bottom of the file.
+  It should end up looking like this:
+
+
+
+  deb http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
+  deb-src http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
+
+  ## Uncomment the following two lines to add software from the 'universe'
+  ## repository.
+  ## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
+  ## team, and may not be under a free licence. Please satisfy yourself as to
+  ## your rights to use the software. Also, please note that software in
+  ## universe WILL NOT receive any review or updates from the Ubuntu security
+  ## team.
+  deb http://us.archive.ubuntu.com/ubuntu/ hoary universe
+  deb-src http://us.archive.ubuntu.com/ubuntu/ hoary universe
+
+  deb http://security.ubuntu.com/ubuntu hoary-security main restricted
+  deb-src http://security.ubuntu.com/ubuntu hoary-security main restricted
+
+  deb http://security.ubuntu.com/ubuntu hoary-security universe
+  deb-src http://security.ubuntu.com/ubuntu hoary-security universe
+
+  deb http://archive.ubuntu.com/ubuntu hoary multiverse
+  deb-src http://archive.ubuntu.com/ubuntu hoary multiverse
+
+
+
+  Finally, exit out of the [1mchroot[22m:
+
+
+       # exit
+
+
+
+  sudo apt-get install subversion distcc bind9 bind9-doc libqt3c102-mt-
+  mysql edit /etc/default/distcc to start it and allow other hosts
+
+  sudo apt-get build-dep mythtv
+
+  sudo apt-get install libqt3c102-mysql
+
+
+  [1m23.5.2.  Configuring DHCP[0m
+
+  edit /etc/default/dhcp3-server.  add interface
+
+
+
+  option domain-name              "local";
+  option subnet-mask              255.255.255.0;
+  option domain-name-servers 192.168.10.50, 68.87.66.196, 68.87.64.196, 63.240.76.4
+
+  # Turn on Dynamic DNS:
+  ddns-update-style interim;
+  ddns-updates on;
+
+  # Don't allow clients to update DNS, make the server do it
+  # based on the hostname passed by the DHCP client:
+  deny client-updates;
+  allow unknown-clients;
+
+  allow bootp;
+  allow booting;
+
+  #option ip-forwarding    false;  # No IP forwarding
+  #option mask-supplier    false;  # Don't respond to ICMP Mask req
+
+  subnet 192.168.10.0 netmask 255.255.255.0 {
+    option routers        192.168.10.1;
+  #  range 192.168.10.100 192.168.10.250;
+  }
+
+  group {
+    next-server 192.168.10.50;          # IP address of your TFTP server
+    default-lease-time 864000;
+    max-lease-time 864000;
+
+    host basement {
+          hardware ethernet 00:13:20:11:a3:ea;
+          fixed-address 192.168.10.51;
+          filename "/tftpboot/pxelinux.0";
+          option root-path "/nfsroot/basement/";
+          option host-name "basement" ;
+    }
+  }
+
+
+
+  [1m23.5.3.  Editing[0m
+
+  svn co http://svn.mythtv.org/svn/trunk/mythtv svn co
+  http://svn.mythtv.org/svn/trunk/mythplugins svn co
+  http://svn.mythtv.org/svn/trunk/myththemes
+
+  First time in, it will create .mythtv/mysql.txt, but it's pointing at
+  the wrong server (ie, there is none on the frontend).
+
+  Exit out at this point (should be the language selection screen), and
+  edit .mythtv/mysql.txt
+
+  Then restart
+
+  Disable xscreensaver: System->Preferences->ScreenSaver.  Mode: Disable
+  Screen Saver Advanced: Power Management Enabled: uncheck
+
+  System->Preferences->Sound uncheck Enable sound server startup
 
 
 
