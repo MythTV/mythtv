@@ -194,11 +194,16 @@ class TVRec
                         QString &repeat,    QString &airdate,
                         QString &stars);
 
-    void GetDevices(int cardnum, QString &video, QString &vbi, QString &audio,
-                    int &rate, QString &defaultinput, QString &startchannel,
-                    QString &type, dvb_options_t &dvb_opts,
-		    firewire_options_t &firewire_opts, dbox2_options_t &dbox2_opts,
-                    bool &skip_bt);
+    static bool GetDevices(
+        int                cardid,         QString &videodev,
+        QString            &vbidev,        QString &audiodev,
+        QString            &cardtype,      QString &defaultinput,
+        int                &aud_rate,      bool    &skip_bt,
+        dvb_options_t      &dvb_opts,
+        firewire_options_t &firewire_opts,
+        dbox2_options_t    &dbox2_opts);
+
+    static QString GetStartChannel(int cardid, const QString &defaultinput);
 
     void SetupRecorder(class RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);

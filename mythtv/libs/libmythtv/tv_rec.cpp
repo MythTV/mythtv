@@ -134,12 +134,17 @@ TVRec::TVRec(int capturecardnum)
  */
 bool TVRec::Init(void)
 {
-    QString inputname, startchannel;
+    QString inputname;
 
-    GetDevices(m_capturecardnum, videodev, vbidev, 
-               audiodev, audiosamplerate,
-               inputname, startchannel, cardtype, dvb_options,
-               firewire_options, dbox2_options, skip_btaudio);
+    bool ok = GetDevices(
+        m_capturecardnum, videodev,         vbidev,           audiodev,
+        cardtype,         inputname,        audiosamplerate,  skip_btaudio,
+        dvb_options,      firewire_options, dbox2_options);
+
+    if (!ok)
+        return false;
+
+    QString startchannel = GetStartChannel(m_capturecardnum, inputname);
 
     bool init_run = false;
     if (cardtype == "DVB")
@@ -1559,40 +1564,42 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
             chanid = query.value(2).toString();
             outputFilters = query.value(3).toString();
         }
-     }
+    }
 }
 
-void TVRec::GetDevices(int cardnum, QString &video, QString &vbi, 
-                       QString &audio, int &rate, QString &defaultinput,
-                       QString &startchan, QString &type, 
-                       dvb_options_t &dvb_opts, firewire_options_t &firewire_opts, dbox2_options_t &dbox2_opts,
-                       bool &skip_bt)
+bool TVRec::GetDevices(
+    int      cardnum, QString &video,        QString &vbi,  QString &audio,
+    QString &type,    QString &defaultinput, int     &rate, bool    &skip_bt,
+    dvb_options_t      &dvb_opts,
+    firewire_options_t &firewire_opts,
+    dbox2_options_t    &dbox2_opts)
 {
-    video = "";
-    vbi = "";
-    audio = "";
+    video        = "";
+    vbi          = "";
+    audio        = "";
     defaultinput = "Television";
-    startchan = "3";
-    type = "V4L";
-
+    type         = "V4L";
 
     int testnum = 0;
     QString test;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT videodevice,vbidevice,audiodevice,"
-                  "audioratelimit,defaultinput,cardtype,"
-                  "dvb_hw_decoder, dvb_recordts,"
-                  "dvb_wait_for_seqstart,dvb_dmx_buf_size,"
-                  "dvb_pkt_buf_size, skipbtaudio, dvb_on_demand,"
-                  "firewire_port, firewire_node, firewire_speed,"
-                  "firewire_model, firewire_connection, dbox2_port, dbox2_host, dbox2_httpport "
-                  "FROM capturecard WHERE cardid = :CARDID ;");
+    query.prepare(
+        "SELECT videodevice,      vbidevice,           audiodevice,    "
+        "       audioratelimit,   defaultinput,        cardtype,       "
+        "       skipbtaudio,"
+        "       dvb_hw_decoder,   dvb_recordts,        dvb_wait_for_seqstart,"
+        "       dvb_dmx_buf_size, dvb_pkt_buf_size,    dvb_on_demand,  "
+        "       firewire_port,    firewire_node,       firewire_speed, "
+        "       firewire_model,   firewire_connection,                 "
+        "       dbox2_port,       dbox2_host,          dbox2_httpport  "
+        "FROM capturecard WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardnum);
 
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("getdevices", query);
+        return false;
     }
     else if (query.size() > 0)
     {
@@ -1620,17 +1627,18 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         if (test != QString::null)
             type = QString::fromUtf8(test);
 
-        dvb_opts.hw_decoder = query.value(6).toInt();
-        dvb_opts.recordts = query.value(7).toInt();
-        dvb_opts.wait_for_seqstart = query.value(8).toInt();
-        dvb_opts.dmx_buf_size = query.value(9).toInt();
-        dvb_opts.pkt_buf_size = query.value(10).toInt();
+        skip_bt = query.value(6).toInt();
 
-        skip_bt = query.value(11).toInt();
+        dvb_opts.hw_decoder    = query.value(7).toInt();
+        dvb_opts.recordts      = query.value(8).toInt();
+        dvb_opts.wait_for_seqstart = query.value(9).toInt();
+        dvb_opts.dmx_buf_size  = query.value(10).toInt();
+        dvb_opts.pkt_buf_size  = query.value(11).toInt();
         dvb_opts.dvb_on_demand = query.value(12).toInt();
-        firewire_opts.port = query.value(13).toInt();
-        firewire_opts.node = query.value(14).toInt(); 
-        firewire_opts.speed = query.value(15).toInt();
+
+        firewire_opts.port     = query.value(13).toInt();
+        firewire_opts.node     = query.value(14).toInt(); 
+        firewire_opts.speed    = query.value(15).toInt();
         test = query.value(16).toString();
         if (test != QString::null)
             firewire_opts.model = QString::fromUtf8(test);
@@ -1641,15 +1649,24 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
         test = query.value(19).toString();
         if (test != QString::null)
            dbox2_opts.host = QString::fromUtf8(test);
-
     }
+    return true;
+}
 
-    query.prepare("SELECT if(startchan!='', startchan, '3') "
-                  "FROM capturecard,cardinput WHERE inputname = :INPUTNAME "
-                  "AND capturecard.cardid = :CARDID "
-                  "AND capturecard.cardid = cardinput.cardid;");
+QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
+{
+    QString startchan = QString::null;
+
+    // Get last tuned channel from database, to use as starting channel
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT startchan "
+        "FROM capturecard, cardinput "
+        "WHERE capturecard.cardid = cardinput.cardid AND"
+        "      capturecard.cardid = :CARDID AND "
+        "      inputname          = :INPUTNAME");
+    query.bindValue(":CARDID",    cardid);
     query.bindValue(":INPUTNAME", defaultinput);
-    query.bindValue(":CARDID", cardnum);
 
     if (!query.exec() || !query.isActive())
     {
@@ -1659,10 +1676,80 @@ void TVRec::GetDevices(int cardnum, QString &video, QString &vbi,
     {
         query.next();
 
-        test = query.value(0).toString();
+        QString test = query.value(0).toString();
         if (test != QString::null)
             startchan = QString::fromUtf8(test);
     }
+    if (!startchan.isEmpty())
+        return startchan;
+
+    // If we failed to get the last tuned channel,
+    // get a valid channel on our current input.
+    query.prepare(
+        "SELECT channum "
+        "FROM capturecard, cardinput, channel "
+        "WHERE capturecard.cardid = cardinput.cardid AND "
+        "      channel.sourceid   = cardinput.sourceid AND "
+        "      capturecard.cardid = :CARDID AND "
+        "      inputname          = :INPUTNAME");
+    query.bindValue(":CARDID",    cardid);
+    query.bindValue(":INPUTNAME", defaultinput);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("getstartchan2", query);
+    }
+    else if (query.size() > 0)
+    {
+        query.next();
+            
+        QString test = query.value(0).toString();
+        if (test != QString::null)
+        {
+            VERBOSE(VB_IMPORTANT, "Start channel '"<<startchan<<"' "
+                    "invalid, setting to '"<<QString::fromUtf8(test)<<"'");
+            startchan = QString::fromUtf8(test);
+        }
+    }
+    if (!startchan.isEmpty())
+        return startchan;
+
+    // If we failed to get a channel on our current input,
+    // widen search to any input.
+    query.prepare(
+        "SELECT channum, inputname "
+        "FROM capturecard, cardinput, channel "
+        "WHERE capturecard.cardid = cardinput.cardid AND "
+        "      channel.sourceid   = cardinput.sourceid AND "
+        "      capturecard.cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("getstartchan3", query);
+    }
+    else if (query.size() > 0)
+    {
+        query.next();
+
+        QString test = query.value(0).toString();
+        if (test != QString::null)
+        {
+            VERBOSE(VB_IMPORTANT, "Start channel '"<<startchan<<"' "
+                    "invalid, setting to '"<<QString::fromUtf8(test)<<"'"
+                    "on input '"<<query.value(1).toString()<<"'");
+            startchan = QString::fromUtf8(test);
+        }
+    }
+    if (!startchan.isEmpty())
+        return startchan;
+
+    // If there are no valid channels, just use a random channel
+    startchan = "3";
+    VERBOSE(VB_IMPORTANT, "Problem finding starting "
+            "channel, setting to '"<<startchan<<"'");
+
+    return startchan;
 }
 
 void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
