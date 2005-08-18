@@ -371,6 +371,7 @@ class TV : public QObject
     /// UDPNotify instance which shows messages sent
     /// to the "UDPNotifyPort" in an OSD dialog.
     UDPNotify      *udpnotify;
+    QStringList     lastSignalMsg;
 
     // LCD Info
     QDateTime lastLcdUpdate;

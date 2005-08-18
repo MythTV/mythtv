@@ -712,7 +712,7 @@ void TV::HandleStateChange(void)
                 if (StartPlayer(false))
                     ok = true;
                 else
-                    StopStuff(true, false, true);
+                    StopStuff(true, true, true);
             }
             if (!ok)
             {
@@ -1244,6 +1244,12 @@ void TV::RunTV(void)
         stateLock.unlock();
         if (doHandle)
             HandleStateChange();
+
+        if (GetOSD() && lastSignalMsg.size())
+        {   // set last signal msg, so we get some feedback...
+            UpdateOSDSignal(lastSignalMsg);
+            lastSignalMsg.clear();
+        }
 
         if (IsErrored())
         {
@@ -3102,6 +3108,8 @@ void TV::UpdateOSDInput(void)
  */
 void TV::UpdateOSDSignal(const QStringList& strlist)
 {
+    if (&lastSignalMsg != &strlist)
+        lastSignalMsg = strlist;
     if (!GetOSD())
         return;
 
@@ -3861,11 +3869,21 @@ void TV::customEvent(QCustomEvent *e)
         {
             int cardnum = (QStringList::split(" ", message))[1].toInt();
             QStringList signalList = me->ExtraDataList();
-            if (recorder && (recorder->GetRecorderNumber() == cardnum) &&
-                signalList.size() && GetOSD())
+            bool tc = recorder && (recorder->GetRecorderNumber() == cardnum);
+            if (tc && signalList.size())
             {
                 UpdateOSDSignal(signalList);
             }
+        }
+        else if (message.left(7) == "SKIP_TO")
+        {
+            int cardnum = (QStringList::split(" ", message))[1].toInt();
+            QStringList keyframe = me->ExtraDataList();
+            VERBOSE(VB_IMPORTANT, "Got SKIP_TO message. Keyframe: "
+                    <<stringToLongLong(keyframe[0]));
+            bool tc = recorder && (recorder->GetRecorderNumber() == cardnum);
+            if (tc)
+                cerr<<endl;
         }
         else if (playbackinfo && message.left(14) == "COMMFLAG_START")
         {
@@ -4857,8 +4875,8 @@ void TV::UnpauseLiveTV(void)
         if (activenvp->IsErrored())
         {
             VERBOSE(VB_IMPORTANT,
-                    "TVRec::UnpauseLiveTV(): Unable to reset playing.");
-            errored = true;
+                    "TVPlay::UnpauseLiveTV(): Unable to reset playing.");
+            exitPlayer = true;
             return;
         }
         QString filters = GetFiltersForChannel();

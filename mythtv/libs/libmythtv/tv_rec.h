@@ -220,6 +220,9 @@ class TVRec
 
     bool StartRecorder(bool livetv);
     bool StartRecorderPost(DummyDTVRecorder *dummyrec, bool livetv);
+    bool StartRecorderPostThread(bool livetv);
+    void AbortStartRecorderThread();
+    static void *StartRecorderPostThunk(void*);
     bool CreateRecorderThread();
     
     void HandleStateChange(void);
@@ -247,6 +250,8 @@ class TVRec
     pthread_t event_thread;
     /// Recorder thread, runs RecorderBase::StartRecording()
     pthread_t recorder_thread;
+    /// Thread used to start Recorder after HandleStateChange
+    pthread_t start_recorder_thread;
 
     // Configuration variables from database
     bool    transcodeFirst;
@@ -273,6 +278,10 @@ class TVRec
     TVState internalState;
     TVState desiredNextState;
     bool    changeState;
+    bool    startingRecording;
+    bool    abortRecordingStart;
+    bool    waitingForSignal;
+    bool    waitingForDVBTables;
     bool    frontendReady;
     bool    runMainLoop;
     bool    exitPlayer;
