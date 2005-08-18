@@ -4156,43 +4156,27 @@ void NuppelVideoPlayer::decCurrentSubtitleTrack()
 
 bool NuppelVideoPlayer::setCurrentSubtitleTrack(int trackNo)
 {
-    if (trackNo < 0)
-    {
-        cc = false;
-        return false;
-    }
-
-    if (decoder)
-    {
-        if (decoder->setCurrentSubtitleTrack(trackNo))
-        {
-            cc = true;
-        } else {
-            cc = false;
-            return false;
-        }
-    } else
-        return false;
+    cc = false;
+    if ((trackNo >= 0) && decoder)
+        cc = decoder->setCurrentSubtitleTrack(trackNo);
+    return cc;
 }
 
 
 int NuppelVideoPlayer::getCurrentSubtitleTrack()
 {
-    if (!cc)
-        return 0;
-
-    if (decoder)
-        return decoder->getCurrentSubtitleTrack() + 1;
-    else
-        return 0;
+    int trackNo = 0;
+    if (cc && decoder)
+        trackNo = decoder->getCurrentSubtitleTrack() + 1;
+    return trackNo;
 }
 
 QStringList NuppelVideoPlayer::listSubtitleTracks()
 {
+    QStringList list;
     if (decoder)
-        return decoder->listSubtitleTracks();
-    else
-        return QStringList();
+        list = decoder->listSubtitleTracks();
+    return list;
 }
 
 // updates new subtitles to the screen and clears old ones
