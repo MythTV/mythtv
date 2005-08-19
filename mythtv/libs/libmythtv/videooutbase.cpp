@@ -547,6 +547,14 @@ void VideoOutput::MoveResize(void)
     if (imgw == 1920 && imgh == 1088)
         imgh = 1080; // ATSC 1920x1080
 
+    // Set an appropriate PiP size
+    if (imgh > 1000)
+        (desired_pipw = 368), (desired_piph = 288);
+    else if (imgh > 700)
+        (desired_pipw = 240), (desired_piph = 192);
+    else
+        (desired_pipw = 160), (desired_piph = 128);
+
     // Get display aspect and correct for rounding errors
     displayAspect = GetDisplayAspect();
 
