@@ -112,7 +112,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     if (m_player && m_player->IsRunning() && !allowsecondaryepg)
         videoRect = QRect(0, 0, 1, 1);
 
-    showFavorites = gContext->GetNumSetting("EPGShowFavorites", 0);
+    showFavorites = 1; //gContext->GetNumSetting("EPGShowFavorites", 0);
     gridfilltype = gContext->GetNumSetting("EPGFillType", UIGuideType::Alpha);
     if (gridfilltype < (int)UIGuideType::Alpha)
     { // update old settings to new fill types
@@ -502,21 +502,25 @@ QString GuideGrid::getLastChannel(void)
     unsigned int chanNum = m_currentRow + m_currentStartChannel;
     if (chanNum >= m_channelInfos.size())
         chanNum -= m_channelInfos.size();
+    if (chanNum >= m_channelInfos.size())
+        return "";
 
     if (selectState)
         return m_channelInfos[chanNum].chanstr;
-    return 0;
+    return "";
 }
 
 QString GuideGrid::getLastChannelId(void)
 {
     unsigned int chanNum = m_currentRow + m_currentStartChannel;
-    if (chanNum >= m_channelInfos.size())
+    while (chanNum >= m_channelInfos.size())
         chanNum -= m_channelInfos.size();
+    if (chanNum >= m_channelInfos.size())
+        return "";
 
     if (selectState)
         return QString::number(m_channelInfos[chanNum].chanid);
-    return 0;
+    return "";
 }
 
 void GuideGrid::timeout()
@@ -720,6 +724,9 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     int chanNum = row + m_currentStartChannel;
     if (chanNum >= (int)m_channelInfos.size())
         chanNum -= (int)m_channelInfos.size();
+    if (chanNum >= m_channelInfos.size())
+        return;
+
     if (chanNum < 0)
         chanNum = 0;
 
@@ -1097,7 +1104,9 @@ void GuideGrid::paintChannels(QPainter *p)
         unsigned int chanNumber = y + m_currentStartChannel;
         if (chanNumber >= m_channelInfos.size())
             chanNumber -= m_channelInfos.size();
-  
+        if (chanNumber >= m_channelInfos.size())
+            break;  
+
         chinfo = &(m_channelInfos[chanNumber]);
         if ((y == (unsigned int)2 && scrolltype != 1) || 
             ((signed int)y == m_currentRow && scrolltype == 1))
@@ -1220,6 +1229,8 @@ void GuideGrid::paintInfo(QPainter *p)
     int chanNum = m_currentRow + m_currentStartChannel;
     if (chanNum >= (int)m_channelInfos.size())
         chanNum -= (int)m_channelInfos.size();
+    if (chanNum >= (int)m_channelInfos.size())
+        return;
     if (chanNum < 0)
         chanNum = 0;
 
@@ -1291,6 +1302,8 @@ void GuideGrid::toggleChannelFavorite()
     int chanNum = m_currentRow + m_currentStartChannel;
     if (chanNum >= (int)m_channelInfos.size())
         chanNum -= (int)m_channelInfos.size();
+    if (chanNum >= (int)m_channelInfos.size())
+        return;
     if (chanNum < 0)
         chanNum = 0;
 
@@ -1731,6 +1744,8 @@ void GuideGrid::channelUpdate(void)
     int chanNum = m_currentRow + m_currentStartChannel;
     if (chanNum >= (int)m_channelInfos.size())
         chanNum -= (int)m_channelInfos.size();
+    if (chanNum >= (int)m_channelInfos.size())
+        return;
     if (chanNum < 0)
         chanNum = 0;
 
