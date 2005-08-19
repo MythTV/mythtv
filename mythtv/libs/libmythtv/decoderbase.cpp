@@ -186,26 +186,33 @@ bool DecoderBase::PosMapFromEnc(void)
     return true;
 }
 
+/** \fn DecoderBase::SyncPositionMap()
+ *  \brief Updates the position map used for skipping frames.
+ *
+ *   There are different sources for position maps,
+ *   depending on where we are getting the stream from.
+ *
+ *   positionmap sources:
+ *   live tv:
+ *   1. remote encoder
+ *   2. stream parsing
+ *   decide keyframedist based on samples from remote encoder
+ *
+ *   watching recording:
+ *   1. initial fill from db
+ *   2. incremental from remote encoder, until it finishes recording
+ *   3. then db again (which should be the final time)
+ *   4. stream parsing
+ *   decide keyframedist based on which table in db
+ *
+ *   watching prerecorded:
+ *   1. initial fill from db is all that's needed
+ */
 bool DecoderBase::SyncPositionMap(void)
 {
-    // positionmap sources:
-    // live tv:
-    // 1. remote encoder
-    // 2. stream parsing
-    // decide keyframedist based on samples from remote encoder
-    //
-    // watching recording:
-    // 1. initial fill from db
-    // 2. incremental from remote encoder, until it finishes recording
-    // 3. then db again (which should be the final time)
-    // 4. stream parsing
-    // decide keyframedist based on which table in db
-    //
-    // watching prerecorded:
-    // 1. initial fill from db is all that's needed
-
-    //cerr << "Resyncing position map. posmapStarted = "
-    //     << (int) posmapStarted << endl;
+    VERBOSE(VB_PLAYBACK, "Resyncing position map. posmapStarted = "
+            << (int) posmapStarted << " livetv(" << livetv << ") "
+            << "watchingRec(" << watchingrecording << ")");
 
     unsigned int old_posmap_size = m_positionMap.size();
     
@@ -343,6 +350,9 @@ void DecoderBase::SetPositionMap(void)
 
 bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
 {
+    VERBOSE(VB_PLAYBACK, "DecorderBase::DoRewind("
+            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+
     if (m_positionMap.empty())
         return false;
 
@@ -403,6 +413,9 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
 
 bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
 {
+    VERBOSE(VB_PLAYBACK, "DecorderBase::DoFastForward("
+            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+
     if (desiredFrame < framesPlayed)
         return DoRewind(desiredFrame, doflush);
 
@@ -416,7 +429,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
     if (desiredFrame > last_frame)
     {
         VERBOSE(VB_PLAYBACK, QString("DoFastForward: Not enough info in "
-                                     "positionMap, we need frame %1 but "
+                                     "positionMap,\n\t\t\twe need frame %1 but "
                                      "highest we have is %2")
                                      .arg((long int)desiredFrame)
                                      .arg((long int)last_frame));
@@ -431,7 +444,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
     if (desiredFrame > last_frame)
     {
         VERBOSE(VB_PLAYBACK, QString("DoFastForward: Still Not enough info in "
-                                     "positionMap, we need frame %1 but "
+                                     "positionMap,\n\t\t\twe need frame %1 but "
                                      "highest we have is %2.  Will seek "
                                      "frame-by-frame")
                                      .arg((long int)desiredFrame)
