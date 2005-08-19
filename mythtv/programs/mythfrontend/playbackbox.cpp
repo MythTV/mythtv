@@ -35,6 +35,7 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "remoteutil.h"
 #include "jobqueue.h"
+#include "lcddevice.h"
 
 static int comp_programid(ProgramInfo *a, ProgramInfo *b)
 {
@@ -952,6 +953,11 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     pix.fill(this, pr.topLeft());
     QPainter tmp(&pix);
 
+    LCD *lcddev = LCD::Get();
+    QString tstring, lcdTitle;
+    QPtrList<LCDMenuItem> lcdItems;
+    lcdItems.setAutoDelete(true);
+
     container = theme->GetSet("selector");
 
     ProgramInfo *tempInfo;
@@ -985,11 +991,38 @@ void PlaybackBox::updateShowTitles(QPainter *p)
             for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
             {
                 if (titleList[h] == "")
-                    ltype->SetItemText(cnt, groupDisplayName);
+                    tstring = groupDisplayName;
                 else
-                    ltype->SetItemText(cnt, titleList[h]);
-                h = ++h % titleList.count();
+                    tstring = titleList[h];
+
+                ltype->SetItemText(cnt, tstring);
+                if (lcddev && inTitle)
+                    lcdItems.append(new LCDMenuItem(0, NOTCHECKABLE, tstring));
+
+                h++;
+                h = h % titleList.count();
              }
+        }
+
+        UITextType *typeText = (UITextType *)container->GetType("current");
+        if (typeText)
+        {
+            if (titleList[titleIndex] == "")
+                tstring = groupDisplayName;
+            else
+                tstring = titleList[titleIndex];
+
+            typeText->SetText(tstring);
+            if (lcddev) 
+            {
+                if (inTitle)
+                {
+                    lcdItems.append(new LCDMenuItem(1, NOTCHECKABLE, tstring));
+                    lcdTitle = "Recordings";
+                }
+                else
+                    lcdTitle = " <<" + tstring;
+            }
         }
 
         ltype = (UIListType *)container->GetType("bottomtitles");
@@ -1004,20 +1037,17 @@ void PlaybackBox::updateShowTitles(QPainter *p)
             for (int cnt = 0; cnt < ltype->GetItems(); cnt++)
             {
                 if (titleList[h] == "")
-                    ltype->SetItemText(cnt, groupDisplayName);
+                    tstring = groupDisplayName;
                 else
-                    ltype->SetItemText(cnt, titleList[h]);
-                h = ++h % titleList.count();
-            }
-        }
+                    tstring = titleList[h];
 
-        UITextType *typeText = (UITextType *)container->GetType("current");
-        if (typeText)
-        {
-            if (titleList[titleIndex] == "")
-                typeText->SetText(groupDisplayName);
-            else
-                typeText->SetText(titleList[titleIndex]);
+                ltype->SetItemText(cnt, tstring);
+                if (lcddev && inTitle)
+                    lcdItems.append(new LCDMenuItem(0, NOTCHECKABLE, tstring));
+
+                h++;
+                h = h % titleList.count();
+            }
         }
 
         ltype = (UIListType *)container->GetType("showing");
@@ -1073,6 +1103,14 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                     ltype->SetItemCurrent(cnt);
                 }
 
+                if (lcddev && !inTitle) 
+                {
+                    lcdItems.append(new LCDMenuItem(skip + cnt == progIndex,
+                                    NOTCHECKABLE,
+                                    tempSubTitle.replace('"', "'") +
+                                    " " + tempDate));                       
+                }
+
                 ltype->SetItemText(cnt, 1, tempSubTitle);
                 ltype->SetItemText(cnt, 2, tempDate);
                 ltype->SetItemText(cnt, 3, tempTime);
@@ -1094,6 +1132,9 @@ void PlaybackBox::updateShowTitles(QPainter *p)
             }
         } 
     } 
+
+    if (lcddev && !lcdItems.isEmpty())
+        lcddev->switchToMenu(&lcdItems, lcdTitle);
 
     // DRAW LAYERS
     if (container && type != Delete)
