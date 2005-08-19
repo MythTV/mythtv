@@ -387,6 +387,7 @@ void ScanWizardScanner::scan()
                                        nVideoSource,parent->filename());
             break;
         case CardUtil::ATSC:
+        case CardUtil::HDTV:
             parser = new DVBConfParser(DVBConfParser::ATSC,
                                        nVideoSource,parent->filename());
             break;

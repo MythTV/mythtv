@@ -154,6 +154,9 @@ bool DVBConfParser::parseConfATSC(QStringList& tokens)
     if (i != end) c.name = *i++; else return false;
     if (i != end) c.frequency = (*i++).toInt(); else return false;
     if (i == end || !c.modulation.parseConf(*i++)) return false;
+    // We need the program number in the transport stream,
+    // otherwise we cannot "tune" to the program.
+    if (i != end) c.serviceid = (*i++).toInt(); else return false;
 
     channels.append(c);
 
@@ -393,11 +396,7 @@ void DVBConfParser::processChannels()
     for (unsigned i=0;i<multiplexes.size() ;i++ )
         multiplexes[i].dump();
 */
-    QString standard;
-    if (type == ATSC)
-        standard="atsc"; 
-    else
-        standard="dvb"; 
+    QString standard = (type == ATSC) ? "atsc" : "dvb"; 
     //create the multiplexes
     MSqlQuery query(MSqlQuery::InitCon());
     for (unsigned i=0;i<multiplexes.size() ;i++ )
