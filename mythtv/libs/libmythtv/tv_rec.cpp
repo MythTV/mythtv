@@ -65,7 +65,7 @@ using namespace std;
 #endif
 
 /// Set to 1 to use dummy recorder for better UI feedback
-#define ENABLE_DUMMY_REC 0
+#define ENABLE_DUMMY_REC 1
 
 const int TVRec::kRequestBufferSize = 256*1000;
 
