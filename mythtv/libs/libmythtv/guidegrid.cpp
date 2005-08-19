@@ -112,7 +112,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     if (m_player && m_player->IsRunning() && !allowsecondaryepg)
         videoRect = QRect(0, 0, 1, 1);
 
-    showFavorites = 1; //gContext->GetNumSetting("EPGShowFavorites", 0);
+    showFavorites = gContext->GetNumSetting("EPGShowFavorites", 0);
     gridfilltype = gContext->GetNumSetting("EPGFillType", UIGuideType::Alpha);
     if (gridfilltype < (int)UIGuideType::Alpha)
     { // update old settings to new fill types
