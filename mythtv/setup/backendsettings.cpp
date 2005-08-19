@@ -92,6 +92,10 @@ static GlobalComboBox *TVFormat()
     gc->addSelection("PAL-NC");
     gc->addSelection("PAL-M");
     gc->addSelection("PAL-N");
+    gc->addSelection("PAL-BG");
+    gc->addSelection("PAL-DK");
+    gc->addSelection("PAL-I");
+    gc->addSelection("PAL-60");
     gc->addSelection("NTSC-JP");
     gc->setHelpText(QObject::tr("The TV standard to use for viewing TV."));
     return gc;

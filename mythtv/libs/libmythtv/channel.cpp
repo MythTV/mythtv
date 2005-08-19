@@ -94,6 +94,14 @@ static int format_to_mode(const QString& fmt, int v4l_version)
             return V4L2_STD_ATSC_8_VSB;
         else if (fmt == "PAL")
             return V4L2_STD_PAL;
+        else if (fmt == "PAL-BG")
+            return V4L2_STD_PAL_BG;
+        else if (fmt == "PAL-DK")
+            return V4L2_STD_PAL_DK;
+        else if (fmt == "PAL-I")
+            return V4L2_STD_PAL_I;
+        else if (fmt == "PAL-60")
+            return V4L2_STD_PAL_60;
         else if (fmt == "SECAM")
             return V4L2_STD_SECAM;
         else if (fmt == "PAL-NC")
@@ -114,6 +122,14 @@ static int format_to_mode(const QString& fmt, int v4l_version)
             return VIDEO_MODE_ATSC;
         else if (fmt == "PAL")
             return VIDEO_MODE_PAL;
+        else if (fmt == "PAL-BG")
+            return VIDEO_MODE_PAL;
+        else if (fmt == "PAL-DK")
+            return VIDEO_MODE_PAL;
+        else if (fmt == "PAL-I")
+            return VIDEO_MODE_PAL;
+        else if (fmt == "PAL-60")
+            return VIDEO_MODE_PAL;
         else if (fmt == "SECAM")
             return VIDEO_MODE_SECAM;
         else if (fmt == "PAL-NC")
@@ -130,7 +146,7 @@ static int format_to_mode(const QString& fmt, int v4l_version)
 
 static QString mode_to_format(int mode, int v4l_version)
 {
-        if (v4l_version==2)
+    if (v4l_version==2)
     {
         if (mode == V4L2_STD_NTSC)
             return "NTSC";
@@ -138,6 +154,14 @@ static QString mode_to_format(int mode, int v4l_version)
             return "ATSC";
         else if (mode == V4L2_STD_PAL)
             return "PAL";
+        else if (mode == V4L2_STD_PAL_BG)
+            return "PAL-BG";
+        else if (mode == V4L2_STD_PAL_DK)
+            return "PAL-DK";
+        else if (mode == V4L2_STD_PAL_I)
+            return "PAL-I";
+        else if (mode == V4L2_STD_PAL_60)
+            return "PAL-60";
         else if (mode == V4L2_STD_SECAM)
             return "SECAM";
         else if (mode == V4L2_STD_PAL_Nc)
