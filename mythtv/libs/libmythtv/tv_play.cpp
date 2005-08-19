@@ -132,6 +132,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "NEXTSUBTITLE", "Switch to the next subtitle track", "");
     REG_KEY("TV Playback", "PREVSUBTITLE", "Switch to the previous subtitle track", "");
     REG_KEY("TV Playback", "SUBCHANNELSEP", "Separator for HDTV subchannels", "_");
+    REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
     
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
     REG_KEY("TV Editing", "INVERTMAP", "Invert Begin/End cut points", "I");
@@ -520,8 +521,15 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
 
 }
 
+void TV::setLastProgram(ProgramInfo *rcinfo)
+{
+    lastProgram = rcinfo;
+}
+
 int TV::Playback(ProgramInfo *rcinfo)
 {
+    jumpToProgram = false;
+
     if (internalState != kState_None)
         return 0;
 
@@ -1904,6 +1912,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "CLEAROSD")
         {
             ClearOSD();
+        }
+        else if (action == "JUMPPREV")
+        {
+            nvp->SetBookmark();
+            exitPlayer = true;
+            wantsToQuit = true;
+            jumpToProgram = true;
         }
         else if (action == "ESCAPE")
         {
@@ -4350,6 +4365,13 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             SetAutoCommercialSkip(action.right(1).toInt());
         else if (action == "QUEUETRANSCODE")
             DoQueueTranscode();
+        else if (action == "JUMPPREV")
+        {
+            nvp->SetBookmark();
+            exitPlayer = true;
+            wantsToQuit = true;
+            jumpToProgram = true;
+        }
         else
         {
             cout << "unknown menu action selected: " << action << endl;
@@ -4423,6 +4445,9 @@ void TV::BuildOSDTreeMenu(void)
     }
     else if (StateIsPlaying(internalState))
     {
+        if (lastProgram != NULL)
+            item = new OSDGenericTree(treeMenu, tr("Jump to Previous Recording"), "JUMPPREV");
+
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,

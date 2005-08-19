@@ -127,6 +127,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     popup = NULL;
     curitem = NULL;
     delitem = NULL;
+    lastProgram = NULL;
 
     // titleView controls showing titles in group list 
     titleView = true;
@@ -279,6 +280,9 @@ PlaybackBox::~PlaybackBox(void)
 
     if (conv_rgba_buf)
         delete [] conv_rgba_buf;
+
+    if (lastProgram)
+        delete lastProgram;
 }
 
 void PlaybackBox::setDefaultView(int defaultView)
@@ -1830,6 +1834,8 @@ bool PlaybackBox::play(ProgramInfo *rec)
     state = kKilling; // stop preview playback and don't restart it
     playingSomething = true;
 
+    tv->setLastProgram(lastProgram);
+
     if (tv->Playback(tvrec))
     {
         while (tv->GetState() != kState_None)
@@ -1839,7 +1845,35 @@ bool PlaybackBox::play(ProgramInfo *rec)
             usleep(100000);
             qApp->lock();
         }
+        while (tv->getJumpToProgram())
+        {
+            ProgramInfo *tmpProgram = new ProgramInfo(*lastProgram);
+
+            if (lastProgram)
+                delete lastProgram;
+            lastProgram = new ProgramInfo(*tvrec);
+
+            if (tvrec)
+                delete tvrec;
+            tvrec = tmpProgram;
+
+            if (tv->Playback(tvrec))
+            {
+                while (tv->GetState() != kState_None)
+                {
+                    qApp->unlock();
+                    qApp->processEvents();
+                    usleep(100000);
+                    qApp->lock();
+                }
+            }
+        }
     }
+
+    if (lastProgram)
+        delete lastProgram;
+
+    lastProgram = new ProgramInfo(*rec);
 
     playingSomething = false;
     state = kStarting; // restart playback preview

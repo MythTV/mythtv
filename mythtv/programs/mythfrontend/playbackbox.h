@@ -156,6 +156,7 @@ class PlaybackBox : public MythDialog
     bool connected;
     ProgramInfo *curitem;
     ProgramInfo *delitem;
+    ProgramInfo *lastProgram;
 
     void LoadWindow(QDomElement &);
     XMLParse *theme;

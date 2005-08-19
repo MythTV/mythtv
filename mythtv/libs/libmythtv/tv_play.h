@@ -109,6 +109,10 @@ class TV : public QObject
     OSD *GetOSD(void);
 
     bool IsErrored(void) { return errored; }
+
+    void setLastProgram(ProgramInfo *rcinfo);
+    bool getJumpToProgram(void) { return jumpToProgram; }
+
   public slots:
     void HandleOSDClosed(int osdType);
 
@@ -349,6 +353,8 @@ class TV : public QObject
     ProgramInfo *playbackinfo;  ///< info sent in via Playback()
     QString      inputFilename; ///< playbackinfo->pathname
     int          playbackLen;   ///< initial playbackinfo->CalculateLength()
+    ProgramInfo *lastProgram;   ///< last program played with this player
+    bool         jumpToProgram;
 
     // Video Players
     NuppelVideoPlayer *nvp;
