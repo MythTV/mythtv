@@ -13,8 +13,7 @@
 #include <qstring.h>
 #include <qptrlist.h>
 
-#include <dvdread/dvd_reader.h>
-#include <dvdread/ifo_read.h>
+#include <dvdread/ifo_types.h>
 
 class DVDSubTitle
 {

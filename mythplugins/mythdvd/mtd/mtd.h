@@ -11,15 +11,16 @@
 */
 
 #include <qobject.h>
-#include <qstringlist.h>
 #include <qptrlist.h>
-#include <qtimer.h>
 
 #include "logging.h"
 #include "serversocket.h"
 #include "jobthread.h"
 #include "dvdprobe.h"
 #include "threadevents.h"
+
+class QStringList;
+class QTimer;
 
 class DiscCheckingThread : public QThread
 {

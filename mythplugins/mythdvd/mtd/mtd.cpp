@@ -11,6 +11,7 @@
 #include <qstringlist.h>
 #include <qregexp.h>
 #include <qdir.h>
+#include <qtimer.h>
 
 #include <mythtv/util.h>
 #include <mythtv/mythcontext.h>

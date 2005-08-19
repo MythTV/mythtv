@@ -17,11 +17,11 @@ using namespace std;
 #include "fileobs.h"
 #include "qdir.h"
 
-RipFile::RipFile(const QString &a_base, const QString &an_extension)
+RipFile::RipFile(const QString &a_base, const QString &an_extension,
+        bool auto_remove_bad) : base_name(a_base), extension(an_extension),
+                                   auto_remove_bad_rips(auto_remove_bad)
 {
     filesize = gContext->GetNumSetting("MTDRipSize", 0) * 1024 * 1024;
-    base_name = a_base;
-    extension = an_extension;
     active_file = NULL;
     files.clear();
     files.setAutoDelete(true);
@@ -46,6 +46,7 @@ bool RipFile::open(int mode, bool multiple_files)
 
 void RipFile::close()
 {
+    auto_remove_bad_rips = false;
     if(active_file)
     {
         active_file->close();
@@ -155,7 +156,9 @@ bool RipFile::writeBlocks(unsigned char *the_data, int how_much)
 
 RipFile::~RipFile()
 {
+    if (active_file && auto_remove_bad_rips)
+    {
+        remove();
+    }
     files.clear();
 }
-
-

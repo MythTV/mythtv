@@ -21,6 +21,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 
+#include <dvdread/ifo_read.h>
 
 DVDSubTitle::DVDSubTitle(int subtitle_id, const QString &a_language)
 {

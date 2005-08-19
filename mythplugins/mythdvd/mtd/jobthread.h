@@ -12,12 +12,6 @@
 
 #include <qthread.h>
 #include <qstringlist.h>
-#include <qfile.h>
-#include <qprocess.h>
-#include <dvdread/dvd_reader.h>
-#include <dvdread/ifo_types.h>
-#include <dvdread/ifo_read.h>
-#include <dvdread/nav_read.h>
 
 #include "fileobs.h"
 
@@ -113,14 +107,10 @@ class DVDThread : public JobThread
                           const QString &extension,
                           bool multiple_files);
   
-    RipFile      *ripfile;
     QMutex       *dvd_device_access;
     QString      dvd_device_location;
     QString      destination_file_string;
     int          dvd_title;
-    dvd_reader_t *the_dvd;
-    dvd_file_t   *title;
-    unsigned char video_data[ 1024 * DVD_VIDEO_LB_LEN ];
     QString      rip_name;
 };
 
@@ -216,7 +206,7 @@ class DVDTranscodeThread : public DVDThread
     int          quality;
     QDir         *working_directory;
     QStringList  tc_arguments;
-    QProcess     *tc_process;
+    class QProcess     *tc_process;
     bool         two_pass;
     int          audio_track;
     int          length_in_seconds;
