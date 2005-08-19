@@ -249,12 +249,12 @@ bool ClassicCommDetector::go()
         requiredHeadStart += commDetectLogoSecondsNeeded;
     }
 
-    emit(statusUpdate("Building Detection Buffer"));
+    emit statusUpdate("Building Detection Buffer");
 
     int a = 0;
-    while (a < requiredHeadStart)
+    while (a < requiredHeadStart && stillRecording)
     {
-        emit(breathe());
+        emit breathe();
         if (m_bStop)
             return false;
         sleep(2);
@@ -262,7 +262,7 @@ bool ClassicCommDetector::go()
     }
 
     if (nvp->OpenFile() < 0)
-        return(false);
+        return false;
 
     Init();
 
@@ -272,14 +272,14 @@ bool ClassicCommDetector::go()
     {
         VERBOSE(VB_IMPORTANT,
                 "NVP: Unable to initialize video for FlagCommercials.");
-        return(false);
+        return false;
     }
 
     if ((commDetectMethod & COMM_DETECT_LOGO) &&
         ((nvp->GetLength() == 0) ||
          (nvp->GetLength() > commDetectLogoSecondsNeeded)))
     {
-        emit(statusUpdate("Searching for Logo"));
+        emit statusUpdate("Searching for Logo");
 
         if (showProgress)
         {
@@ -326,7 +326,7 @@ bool ClassicCommDetector::go()
 
     SetVideoParams(aspect);
 
-    emit(breathe());
+    emit breathe();
 
     while (!nvp->GetEof())
     {
@@ -352,7 +352,7 @@ bool ClassicCommDetector::go()
             (((currentFrameNumber % 100) == 0) &&
              (stillRecording)))
         {
-            emit(breathe());
+            emit breathe();
             if (m_bStop)
                 return false;
         }
@@ -389,7 +389,7 @@ bool ClassicCommDetector::go()
 
             if (commBreakMapUpdateRequested || !mapsAreIdentical)
             {
-                emit(gotNewCommercialBreakList());
+                emit gotNewCommercialBreakList();
                 lastSentCommBreakMap = commBreakMap;
             }
 
@@ -399,7 +399,7 @@ bool ClassicCommDetector::go()
 
         while (m_bPaused)
         {
-            emit(breathe());
+            emit breathe();
             sleep(1);
         }
 
@@ -450,12 +450,11 @@ bool ClassicCommDetector::go()
             }
 
             if (myTotalFrames)
-                emit(statusUpdate(QObject::tr("%1% Completed @ %2 fps.")
-                                              .arg(percentage).arg(flagFPS)));
+                emit statusUpdate(QObject::tr("%1% Completed @ %2 fps.")
+                                  .arg(percentage).arg(flagFPS));
             else
-                emit(statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
-                                              .arg((long)currentFrameNumber)
-                                              .arg(flagFPS)));
+                emit statusUpdate(QObject::tr("%1 Frames Completed @ %2 fps.")
+                                  .arg((long)currentFrameNumber).arg(flagFPS));
         }
 
         ProcessFrame(currentFrame, currentFrameNumber);
@@ -2097,9 +2096,9 @@ bool ClassicCommDetector::FrameIsInBreakMap(long long f,
         {
             int type = breakMap[i];
             if ((type == MARK_COMM_END) || (i == f))
-                return(true);
+                return true;
             if (type == MARK_COMM_START)
-                return(false);
+                return false;
         }
 
     for(long long i = f; i >= 0; i--)
@@ -2107,12 +2106,12 @@ bool ClassicCommDetector::FrameIsInBreakMap(long long f,
         {
             int type = breakMap[i];
             if ((type == MARK_COMM_START) || (i == f))
-                return(true);
+                return true;
             if (type == MARK_COMM_END)
-                return(false);
+                return false;
         }
 
-    return(false);
+    return false;
 }
 
 void ClassicCommDetector::DumpMap(QMap<long long, int> &map)
@@ -2510,7 +2509,7 @@ void ClassicCommDetector::SearchForLogo()
         {
             VideoFrame* vf = nvp->GetRawVideoFrame(seekFrame);
 
-            emit(breathe());
+            emit breathe();
 
             if (!fullSpeed)
                 usleep(10000);
