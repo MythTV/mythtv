@@ -203,7 +203,10 @@ static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
 
 bool AvFormatDecoder::DoRewind(long long desiredFrame, bool doflush)
 {
-    if (recordingHasPositionMap)
+    VERBOSE(VB_PLAYBACK, "AvFormatDecoder::DoRewind("
+            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+
+    if (recordingHasPositionMap || livetv)
         return DecoderBase::DoRewind(desiredFrame, doflush);
 
     // avformat-based seeking
@@ -212,7 +215,10 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame, bool doflush)
 
 bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
 {
-    if (recordingHasPositionMap)
+    VERBOSE(VB_IMPORTANT, "AvFormatDecoder::DoFastForward("
+            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+
+    if (recordingHasPositionMap || livetv)
         return DecoderBase::DoFastForward(desiredFrame, doflush);
 
     bool oldrawstate = getrawframes;
@@ -244,9 +250,14 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
     }
 
     // convert framenumber to normalized timestamp
-    long long ts = (long long)(((desiredFrame-frameseekadjust)*AV_TIME_BASE)/(long double)fps);
-    if (av_seek_frame(ic,-1,ts,AVSEEK_FLAG_BACKWARD)<0)
+    long double diff = (max(desiredFrame - frameseekadjust, 0LL)) * AV_TIME_BASE;
+    long long ts = (long long)( diff / fps );
+    if (av_seek_frame(ic, -1, ts, AVSEEK_FLAG_BACKWARD) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, "av_seek_frame(ic, -1, "
+                <<ts<<", 0) -- error");
         return false;
+    }
 
     int64_t adj_cur_dts = st->cur_dts;
     if(ic->start_time != (int64_t)AV_NOPTS_VALUE)
@@ -283,6 +294,9 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
 
 void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
 {
+    VERBOSE(VB_PLAYBACK, "AvFormatDecoder::SeekReset("
+            <<skipFrames<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+
     lastapts = 0;
     lastvpts = 0;
 
@@ -600,7 +614,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
     {
         if ((m_playbackinfo) || livetv || watchingrecording)
         {
-            recordingHasPositionMap = SyncPositionMap();
+            recordingHasPositionMap |= SyncPositionMap();
             if (recordingHasPositionMap && !livetv && !watchingrecording)
             {
                 hasFullPositionMap = true;

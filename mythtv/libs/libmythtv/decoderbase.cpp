@@ -274,6 +274,7 @@ bool DecoderBase::SyncPositionMap(void)
                         .arg((long)totframes).arg(length)
                         .arg(m_positionMap.size()));
     }
+    recordingHasPositionMap |= !m_positionMap.empty();
     return ret_val;
 }
 
