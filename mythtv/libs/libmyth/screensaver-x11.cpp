@@ -129,6 +129,19 @@ void ScreenSaverX11::Reset(void)
     XResetScreenSaver(qt_xdisplay());
     if (d->state.xscreensaverRunning)
         resetSlot();
+
+    int nothing;
+    if (DPMSQueryExtension(qt_xdisplay(), &nothing, &nothing))
+    {
+        BOOL on;
+        CARD16 power_level;
+        if (!d->state.dpmsdisabled) 
+        {
+            DPMSInfo(qt_xdisplay(), &power_level, &on);
+            if (power_level != DPMSModeOn)
+                DPMSForceLevel(qt_xdisplay(), DPMSModeOn);
+        }
+    }
 }
 
 void ScreenSaverX11::resetSlot() 
