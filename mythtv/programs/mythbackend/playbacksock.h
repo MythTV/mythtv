@@ -28,6 +28,9 @@ class PlaybackSock
     bool isLocal(void) { return local; }
     bool wantsEvents(void) { return events; }
 
+    bool getBlockShutdown(void) { return blockshutdown; }
+    void setBlockShutdown(bool value) { blockshutdown = value; }
+
     // all backend<->backend stuff below here
     bool isSlaveBackend(void) { return backend; }
     void setAsSlaveBackend(void) { backend = true; }
@@ -63,7 +66,7 @@ class PlaybackSock
 
     bool local;
     bool events;
-
+    bool blockshutdown;
     bool backend;
 
     QMutex sockLock;

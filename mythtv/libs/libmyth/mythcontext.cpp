@@ -822,6 +822,60 @@ bool MythContext::IsConnectedToMaster(void)
     return d->serverSock;
 }
 
+void MythContext::BlockShutdown(void)
+{
+    QStringList strlist;
+
+    if (d->serverSock == NULL)
+        return;
+    
+    strlist << "BLOCK_SHUTDOWN";
+    WriteStringList(d->serverSock, strlist);
+    ReadStringList(d->serverSock, strlist);
+
+    // wait for the event socket to finish connecting if necessary
+    while (d->eventSock->state() == QSocket::HostLookup ||     
+           d->eventSock->state() == QSocket::Connecting)
+    {
+        qApp->processEvents();
+    }        
+    
+    if (d->eventSock->state() != QSocket::Connected)
+        return;
+
+    strlist.clear();
+    strlist << "BLOCK_SHUTDOWN";
+    WriteStringList(d->eventSock, strlist);
+    ReadStringList(d->eventSock, strlist);
+}
+
+void MythContext::AllowShutdown(void)
+{
+    QStringList strlist;
+    
+    if (d->serverSock == NULL)
+        return;        
+    
+    strlist << "ALLOW_SHUTDOWN";
+    WriteStringList(d->serverSock, strlist);
+    ReadStringList(d->serverSock, strlist);
+    
+    // wait for the eventSocket to finish connecting if necessary
+    while (d->eventSock->state() == QSocket::HostLookup ||     
+           d->eventSock->state() == QSocket::Connecting)
+    {
+        qApp->processEvents();
+    }        
+    
+    if (d->eventSock->state() != QSocket::Connected)
+        return;
+
+    strlist.clear();
+    strlist << "ALLOW_SHUTDOWN";
+    WriteStringList(d->eventSock, strlist);
+    ReadStringList(d->eventSock, strlist);
+}
+
 void MythContext::SetBackend(bool backend)
 {
     d->m_backend = backend;
@@ -2150,7 +2204,7 @@ void MythContext::EventSocketConnected(void)
                          .arg(d->m_localhostname).arg(true);
     QStringList strlist = str;
     WriteStringList(d->eventSock, strlist);
-//    ReadStringList(d->eventSock, strlist);
+    ReadStringList(d->eventSock, strlist);
 }
 
 void MythContext::EventSocketClosed(void)

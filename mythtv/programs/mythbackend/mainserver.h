@@ -126,7 +126,8 @@ class MainServer : public QObject
     void HandleQueryLoad(PlaybackSock *pbs);
     void HandleQueryUptime(PlaybackSock *pbs);
     void HandleQueryMemStats(PlaybackSock *pbs);
-
+    void HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs);
+    
     void SendResponse(QSocket *pbs, QStringList &commands);
 
     void getGuideDataThrough(QDateTime &GuideDataThrough);

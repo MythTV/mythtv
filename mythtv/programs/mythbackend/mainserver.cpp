@@ -494,6 +494,20 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
         else
             HandleSetSetting(tokens, pbs);
     }
+    else if (command == "ALLOW_SHUTDOWN")
+    {
+        if (tokens.size() != 1)
+            VERBOSE(VB_ALL, "Bad ALLOW_SHUTDOWN");
+        else
+            HandleBlockShutdown(false, pbs);
+    }
+    else if (command == "BLOCK_SHUTDOWN")
+    {
+        if (tokens.size() != 1)
+            VERBOSE(VB_ALL, "Bad BLOCK_SHUTDOWN");
+        else
+            HandleBlockShutdown(true, pbs);
+    }
     else if (command == "SHUTDOWN_NOW")
     {
         if (tokens.size() != 1)
@@ -3302,6 +3316,15 @@ void MainServer::HandleBackendRefresh(QSocket *socket)
     SendResponse(socket, retlist);    
 }
 
+void MainServer::HandleBlockShutdown(bool blockShutdown, PlaybackSock *pbs)
+{            
+    pbs->setBlockShutdown(blockShutdown);
+    
+    QSocket *socket = pbs->getSocket();
+    QStringList retlist = "OK";
+    SendResponse(socket, retlist);    
+}
+
 void MainServer::deferredDeleteSlot(void)
 {
     QMutexLocker lock(&deferredDeleteLock);
@@ -3644,7 +3667,8 @@ bool MainServer::isClientConnected()
         for (; !foundClient && (it != playbackList.end()); ++it)
         {
             // we simply ignore slaveBackends!
-            if (!(*it)->isSlaveBackend())
+            // and clients that don't want to block shutdown
+            if (!(*it)->isSlaveBackend() && (*it)->getBlockShutdown())
                 foundClient = true;
         }
     }

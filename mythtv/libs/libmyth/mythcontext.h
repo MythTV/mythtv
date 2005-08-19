@@ -187,6 +187,9 @@ class MythContext : public QObject
     void SetBackend(bool backend);
     bool IsBackend(void);
 
+    void BlockShutdown(void);
+    void AllowShutdown(void);
+    
     QString GetInstallPrefix(void);
     QString GetShareDir(void);
     QString GetLibraryDir(void);
