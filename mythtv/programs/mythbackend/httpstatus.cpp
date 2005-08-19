@@ -50,8 +50,17 @@ void HttpStatus::readClient(void)
 
                 os << "HTTP/1.0 200 Ok\r\n"
                    << "Content-Type: text/xml; charset=\"UTF-8\"\r\n"
-                   << "\r\n"
-                   << doc.toString();
+                   << "\r\n";
+
+                // Work around a memory leak seen in Qt 3.3 when
+                // more than 510 characters are presented to
+                // QTextStream' <<. Use 200 character chunks to
+                // allow plenty of room for Unicode -> UTF8
+                // expansions.
+
+                QString xml(doc.toString());
+                for (unsigned i = 0; i < xml.length(); i += 200)
+                    os << xml.mid(i, 200);
             }
             else
                 PrintStatus( socket, &doc );

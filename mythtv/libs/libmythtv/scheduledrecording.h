@@ -56,6 +56,7 @@ class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog 
     Q_OBJECT
 public:
     ScheduledRecording();
+    ~ScheduledRecording();
     ScheduledRecording(const ScheduledRecording& other);
 
     virtual void load();

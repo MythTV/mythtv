@@ -73,6 +73,13 @@ ScheduledRecording::ScheduledRecording()
     rootGroup = new RootSRGroup(this);
 }
 
+ScheduledRecording::~ScheduledRecording() 
+{
+    // rootGroup is unique among this class' member variables in
+    // that it's not self-managed
+    if (!rootGroup.isNull())
+        delete rootGroup;
+}
 
 void ScheduledRecording::load()
 {
