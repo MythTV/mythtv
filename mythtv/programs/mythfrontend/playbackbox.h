@@ -314,6 +314,8 @@ class PlaybackBox : public MythDialog
     yuv2rgb_fun    conv_yuv2rgba;
     unsigned char *conv_rgba_buf;
     QSize          conv_rgba_size;
+
+    bool everStartedVideo;
 };
 
 #endif
