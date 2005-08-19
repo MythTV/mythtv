@@ -202,6 +202,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
     warplbuff = NULL;
     warprbuff = NULL;
     warpbuffsize = 0;
+    warpfactor = 1;
 
     videosync = NULL;
 

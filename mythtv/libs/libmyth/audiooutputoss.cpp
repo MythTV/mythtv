@@ -26,6 +26,7 @@ AudioOutputOSS::AudioOutputOSS(QString audiodevice, int laudio_bits,
 {
     // our initalisation
     audiofd = -1;
+    mixerfd = -1;
     numbadioctls = 0;
 
     // Set everything up
@@ -262,7 +263,7 @@ inline int AudioOutputOSS::getSpaceOnSoundcard(void)
 
 void AudioOutputOSS::VolumeInit()
 {
-    mixerfd = 0;
+    mixerfd = -1;
     int volume = 0;
 
     QString device = gContext->GetSetting("MixerDevice", "/dev/mixer");
@@ -308,10 +309,10 @@ void AudioOutputOSS::VolumeInit()
 
 void AudioOutputOSS::VolumeCleanup()
 {
-    if (mixerfd)
+    if (mixerfd >= 0)
     {
         close(mixerfd);
-        mixerfd = 0;
+        mixerfd = -1;
     }
 }
 
@@ -320,7 +321,7 @@ int AudioOutputOSS::GetVolumeChannel(int channel)
     int volume=0;
     int tmpVol=0;
 
-    if (!mixerfd)
+    if (mixerfd <= 0)
         return 100;
 
     int ret = ioctl(mixerfd, MIXER_READ(control), &tmpVol);
@@ -356,7 +357,7 @@ void AudioOutputOSS::SetVolumeChannel(int channel, int volume)
     if (volume < 0)
         volume = 0;
 
-    if (mixerfd > 0)
+    if (mixerfd >= 0)
     {
         int tmpVol = 0;
         if (channel == 0) 

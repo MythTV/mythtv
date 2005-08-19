@@ -1873,7 +1873,7 @@ bool PlaybackBox::play(ProgramInfo *rec)
     if (lastProgram)
         delete lastProgram;
 
-    lastProgram = new ProgramInfo(*rec);
+    lastProgram = new ProgramInfo(*tvrec);
 
     playingSomething = false;
     state = kStarting; // restart playback preview
