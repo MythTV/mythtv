@@ -215,7 +215,7 @@ bool AvFormatDecoder::DoRewind(long long desiredFrame, bool doflush)
 
 bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
 {
-    VERBOSE(VB_IMPORTANT, "AvFormatDecoder::DoFastForward("
+    VERBOSE(VB_PLAYBACK, "AvFormatDecoder::DoFastForward("
             <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
 
     if (recordingHasPositionMap || livetv)
@@ -349,7 +349,7 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
 
 void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
 {
-    VERBOSE(VB_IMPORTANT, QString("AvFormatDecoder::Reset(%1, %2)")
+    VERBOSE(VB_PLAYBACK, QString("AvFormatDecoder::Reset(%1, %2)")
             .arg(reset_video_data).arg(seek_reset));
     if (seek_reset)
         SeekReset();
