@@ -66,7 +66,9 @@ Without the stickykeys option selected:
 - Left arrow to rewind the configured number of seconds.  (default is 5)
 - Right arrow to fast forward the configured number of seconds. (default is 30)
 - < starts rewind mode as if stickykeys are selected.
+    If a jump amount is entered, jump to that position.
 - > starts fast forward mode as if stickykeys are selected.
+    If a jump amount is entered, jump that amount from the end.
 
 With the stickykeys option selected:
 

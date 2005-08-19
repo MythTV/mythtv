@@ -182,7 +182,13 @@ class TV : public QObject
     void DoPause(void);
     bool UpdatePosOSD(float time, const QString &mesg, int disptime = 2);
     void DoSeek(float time, const QString &mesg);
-    void DoArbSeek(int dir);
+    enum ArbSeekWhence {
+        ARBSEEK_SET = 0,
+        ARBSEEK_REWIND,
+        ARBSEEK_FORWARD,
+        ARBSEEK_END
+    };
+    void DoArbSeek(ArbSeekWhence whence);
     void NormalSpeed(void);
     void ChangeSpeed(int direction);
     void ChangeTimeStretch(int dir, bool allowEdit = true);

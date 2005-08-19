@@ -1839,7 +1839,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "SEEKFFWD")
         {
             if (channelqueued)
-                DoArbSeek(1);
+                DoArbSeek(ARBSEEK_FORWARD);
             else if (paused)
                 DoSeek(1.001 / frameRate, tr("Forward"));
             else if (!stickykeys)
@@ -1854,7 +1854,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "FFWDSTICKY")
         {
-            if (paused)
+            if (channelqueued)
+                DoArbSeek(ARBSEEK_END);
+            else if (paused)
                 DoSeek(1.0, tr("Forward"));
             else
                 ChangeFFRew(1);
@@ -1862,7 +1864,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         else if (action == "SEEKRWND")
         {
             if (channelqueued)
-                DoArbSeek(-1);
+                DoArbSeek(ARBSEEK_REWIND);
             else if (paused)
                 DoSeek(-1.001 / frameRate, tr("Rewind"));
             else if (!stickykeys)
@@ -1876,7 +1878,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "RWNDSTICKY")
         {
-            if (paused)
+            if (channelqueued)
+                DoArbSeek(ARBSEEK_SET);
+            else if (paused)
                 DoSeek(-1.0, tr("Rewind"));
             else
                 ChangeFFRew(-1);
@@ -2058,7 +2062,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (action == "INFO")
             {
                 if (channelqueued)
-                    DoArbSeek(0);
+                    DoArbSeek(ARBSEEK_SET);
                 else
                     ToggleOSD();
             }
@@ -2121,7 +2125,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (action == "INFO")
             {
                 if (channelqueued)
-                    DoArbSeek(0);
+                    DoArbSeek(ARBSEEK_SET);
                 else
                     DoInfo();
             }
@@ -2450,20 +2454,23 @@ void TV::DoSeek(float time, const QString &mesg)
     }
 }
 
-void TV::DoArbSeek(int dir)
+void TV::DoArbSeek(ArbSeekWhence whence)
 {
     int chan = QueuedChannel().toInt();
     ChannelClear(true);
 
     float time = ((chan / 100) * 3600) + ((chan % 100) * 60);
 
-    if (dir > 0)
+    if (whence == ARBSEEK_FORWARD)
         DoSeek(time, tr("Jump Ahead"));
-    else if (dir < 0)
+    else if (whence == ARBSEEK_REWIND)
         DoSeek(-time, tr("Jump Back"));
     else
     {
-        time -= (activenvp->GetFramesPlayed() - 1) / frameRate;
+        if (whence == ARBSEEK_END)
+            time = (activenvp->CalcMaxFFTime(LONG_MAX) / frameRate) - time;
+        else
+            time = time - (activenvp->GetFramesPlayed() - 1) / frameRate;
         DoSeek(time, tr("Jump To"));
     }
 }
