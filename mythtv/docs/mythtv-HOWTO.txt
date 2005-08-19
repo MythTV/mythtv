@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-08-17, v0.18.11
+  2005-08-19, v0.18.12
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -3337,7 +3337,7 @@
   to fill in some details.  The "Host name" field needs the backend or
   database server's IP address or DNS name, and the User or password
   fields may need to be set to match your database user accounts.  After
-  editing those fields, press enter twice to write these configurations
+  editing those fields, press Enter twice to write these configurations
   on your local machine, and attempt to connect to the database.  If you
   make any mistakes, the screens will pop up again.
 
@@ -4717,7 +4717,8 @@
 
   Note: the text box honors many familiar Emacs control keys. It is also
   possible to cut and paste text into the text box so you can edit with
-  a favorite editor or inset a rule sent in email or from other sources.
+  a favorite editor or insert a rule sent in email or from other
+  sources.
 
   In any case, choose a title that is shown both in primetime and late
   night or daytime. Next, click the "Test" button. You should see a list
@@ -4747,7 +4748,7 @@
   it is shown in primetime.
 
   To remove this, or any other rule, you can go to the "Recording
-  Priorities" page, arrow down to the title, press enter and change the
+  Priorities" page, arrow down to the title, press Enter and change the
   the recording type to "Do not record this program" then "Save these
   settings".
 
@@ -4764,13 +4765,13 @@
   titles in the 'program' table.
 
   MythTV also has search rules for "Titles", "Keywords" and "People".
-  These store the key phrase in the rule's description field of the rule
-  and includes these in specialized SQL replacements for the normal
-  title check.  There is also a type called "Power Search" which takes
-  the raw SQL in the description as the replacement for title matching.
+  These store the key phrase in the description field of the rule and
+  includes them in specialized SQL replacements for the normal title
+  check. There is also a type called "Power Search" which takes the raw
+  SQL in the description as the replacement for title matching.
 
   Custom Record is a tool to help you build valid SQL for Power Search
-  rules.  You do not need to be an SQL expert to use Custom Record
+  rules.  You do not need to be a SQL expert to use Custom Record
   because the examples are known to work correctly and are usually self-
   explanatory so you can choose the pieces you need then modify them.
   Many powerful solutions to unique problems are possible by combining
@@ -4782,7 +4783,7 @@
 
   The example clauses marked "complete example" are actual rules that
   have been used to address specific problems. You may find that some of
-  these are useful for you as is or with slight modifications. These
+  these are useful for you as-is or with slight modifications. These
   show off how powerful custom rules can be but there are also several
   simple idioms that you may find useful for many of the shows you would
   like to record.
@@ -4804,8 +4805,11 @@
   marked as "Repeat" or "Previously Recorded".
 
 
-              program.title = "Celebrity Poker Showdown"
-              AND program.previouslyshown = 0
+
+         program.title = "Celebrity Poker Showdown"
+         AND program.previouslyshown = 0
+
+
 
   This allows you to keep rules for your favorite shows that are dormant
   while out of season but will spring back to life when new episodes
@@ -4864,6 +4868,7 @@
   +o  "program.category_type" holds one of these exact four strings:
      "movie", "series", "sports" or "tvshow".
 
+
   +o  "program.airdate" is a string representing the year of release for
      movies and may have no meaning for other types of shows.
 
@@ -4876,12 +4881,11 @@
      episodes before or after a certain date such as finding just the
      original series of "Battlestar Galactica".
 
-  +o  "program.previouslyshown" is a field created by myth to try to
-     determine if a showing is more than 14 days after it's original air
-     date or if the show was marked as a repeat and did not have and
-     have a date for the first airing. If this is "0" it usually means
-     that this is a brand new show or a rebroadcast within the first two
-     weeks.
+  +o  "program.previouslyshown" is a field created by MythTV to try to
+     determine if a showing is more than 14 days after its original air
+     date or if the show was marked as a repeat and did not have a date
+     for the first airing. If this is "0" it usually means that this is
+     a brand new show or a rebroadcast within the first two weeks.
 
   +o  "program.programid" is the Tribune Media Service database record
      identifier for each program description. In general, these start
@@ -4889,9 +4893,9 @@
      "program.category_type".  For most, the last four digits are "0000"
      except EP where the last four digits are the episode number in the
      series. Note that these are generated by TMS and not the show's
-     producers but they are usually in the same order a the original air
-     dates for the episodes. Detailed information can be found in the
-     Data Direct documentation at http://labs.zap2it.com/
+     producers but they are usually in the same order as the original
+     air dates for the episodes. Detailed information can be found in
+     the Data Direct documentation at http://labs.zap2it.com/
      <http://labs.zap2it.com/> .
 
      Finally, if you are doing something very experimental and a field

@@ -931,7 +931,7 @@ text entry with the number pad. The delete key is the "X" in the grouping
 for "1", zero is grouped with "9" and "0" acts as the "Caps Lock" key.</P>
 <P>Note: the text box honors many familiar Emacs control keys. It is also
 possible to cut and paste text into the text box so you can edit with a
-favorite editor or inset a rule sent in email or from other sources.</P>
+favorite editor or insert a rule sent in email or from other sources.</P>
 <P>In any case, choose a title that is shown both in primetime and late night
 or daytime. Next, click the "Test" button. You should see a list of the
 upcoming episodes for "Nova" just as if you had clicked the Upcoming
@@ -957,7 +957,7 @@ title will say "Nova (Power Search)". Set whatever options you would like
 then click "Save these settings". You now have a special rule to record
 "Nova" but only when it is shown in primetime.</P>
 <P>To remove this, or any other rule, you can go to the "Recording Priorities"
-page, arrow down to the title, press enter and change the the recording type
+page, arrow down to the title, press Enter and change the the recording type
 to "Do not record this program" then "Save these settings".</P>
 
 <H3>How it Works</H3>
@@ -970,12 +970,12 @@ queries and their fields are available to be used in your rules. The rules
 you create are stored in 'record'. Normal rules in MythTV simply match the
 title in the rule with the titles in the 'program' table.</P>
 <P>MythTV also has search rules for "Titles", "Keywords" and "People". These
-store the key phrase in the rule's description field of the rule and
-includes these in specialized SQL replacements for the normal title check.
-There is also a type called "Power Search" which takes the raw SQL in the
-description as the replacement for title matching.</P>
+store the key phrase in the description field of the rule and includes them
+in specialized SQL replacements for the normal title check. There is also a
+type called "Power Search" which takes the raw SQL in the description as the
+replacement for title matching.</P>
 <P>Custom Record is a tool to help you build valid SQL for Power Search rules.
-You do not need to be an SQL expert to use Custom Record because the
+You do not need to be a SQL expert to use Custom Record because the
 examples are known to work correctly and are usually self-explanatory so you
 can choose the pieces you need then modify them.  Many powerful solutions to
 unique problems are possible by combining the examples. With some creativity
@@ -985,7 +985,7 @@ and some knowledge of SQL, the possibilities are limitless.</P>
 
 <P>The example clauses marked "complete example" are actual rules that have
 been used to address specific problems. You may find that some of these
-are useful for you as is or with slight modifications. These show off how
+are useful for you as-is or with slight modifications. These show off how
 powerful custom rules can be but there are also several simple idioms that
 you may find useful for many of the shows you would like to record.</P>
 <P>Wait for a known title -- If there is a movie that you anticipate will be
@@ -1070,9 +1070,9 @@ was, or will be, first televised. This may be useful for finding
 episodes before or after a certain date such as finding just the
 original series of "Battlestar Galactica".
 </LI>
-<LI>"program.previouslyshown" is a field created by myth to try to determine if
-a showing is more than 14 days after it's original air date or if the show
-was marked as a repeat and did not have and have a date for the first
+<LI>"program.previouslyshown" is a field created by MythTV to try to
+determine if a showing is more than 14 days after its original air date or
+if the show was marked as a repeat and did not have a date for the first
 airing. If this is "0" it usually means that this is a brand new show or a
 rebroadcast within the first two weeks.
 </LI>
@@ -1081,7 +1081,7 @@ for each program description. In general, these start with a two letter
 prefix, MV, EP, SP or SH that correspond to the "program.category_type". 
 For most, the last four digits are "0000" except EP where the last four
 digits are the episode number in the series. Note that these are generated
-by TMS and not the show's producers but they are usually in the same order a
+by TMS and not the show's producers but they are usually in the same order as
 the original air dates for the episodes. Detailed information can be found
 in the Data Direct documentation at 
 <A HREF="http://labs.zap2it.com/">http://labs.zap2it.com/</A> .</LI>
