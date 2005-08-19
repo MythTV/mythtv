@@ -104,7 +104,6 @@ class AudioOutputBase : public AudioOutput
     int fragment_size;
     long soundcard_buffer_size;
     QString audiodevice;
-    long total_written;
 
     float audio_stretchfactor;
     AudioOutputSource source;

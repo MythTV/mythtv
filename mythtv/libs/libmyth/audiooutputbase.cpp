@@ -25,7 +25,6 @@ AudioOutputBase::AudioOutputBase(QString audiodevice, int,
     audio_bits = -1;
     audio_channels = -1;
     audio_samplerate = -1;    
-    total_written = 0;
     current_seconds = -1;
     source_bitrate = -1;
     audio_stretchfactor = 1.0;
@@ -161,7 +160,6 @@ void AudioOutputBase::Reconfigure(int laudio_bits, int laudio_channels,
     audiotime = 0;
     effdsp = audio_samplerate * 100;
     gettimeofday(&audiotime_updated, NULL);
-    total_written = 0;
     current_seconds = -1;
     source_bitrate = -1;
 
@@ -263,7 +261,6 @@ void AudioOutputBase::Reset()
     raud = waud = 0;
     audbuf_timecode = 0;
     audiotime = 0;
-    total_written = 0;
     current_seconds = -1;
     was_paused = !pauseaudio;
 
@@ -438,12 +435,12 @@ bool AudioOutputBase::AddSamples(char *buffers[], int samples,
         src_float_to_short_array(src_data.data_out, (short int*)tmp_buff,
                                  src_data.output_frames_gen*audio_channels);
 
-        _AddSamples(tmp_buff, false, src_data.output_frames_gen, timecode);
+        _AddSamples(tmp_buff, true, src_data.output_frames_gen, timecode);
     } 
     else 
     {
         // Call our function to do the work
-        _AddSamples(buffers, true, samples, timecode);
+        _AddSamples(buffers, false, samples, timecode);
     }
 
     return true;
@@ -481,12 +478,12 @@ bool AudioOutputBase::AddSamples(char *buffer, int samples, long long timecode)
         src_float_to_short_array(src_data.data_out, (short int*)tmp_buff, 
                                  src_data.output_frames_gen*audio_channels);
 
-        _AddSamples(tmp_buff, false, src_data.output_frames_gen, timecode);
+        _AddSamples(tmp_buff, true, src_data.output_frames_gen, timecode);
     } 
     else 
     {
         // Call our function to do the work
-        _AddSamples(buffer, false, samples, timecode);
+        _AddSamples(buffer, true, samples, timecode);
     }
 
     return true;
@@ -541,7 +538,7 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
     
     len = WaitForFreeSpace(samples);
 
-    if (!interleaved) 
+    if (interleaved) 
     {
         char *mybuf = (char*)buffer;
         int bdiff = AUDBUFSIZE - org_waud;
@@ -633,6 +630,8 @@ void AudioOutputBase::_AddSamples(void *buffer, bool interleaved, int samples,
     // even with timestretch, timecode is still calculated from original
     // sample count
     audbuf_timecode = timecode + (int)((samples * 100000.0) / effdsp);
+    if (interleaved)
+        dispatchVisual((unsigned char *)buffer, len, timecode, audio_channels, audio_bits);
 
     pthread_mutex_unlock(&audio_buflock);
 }
@@ -778,14 +777,7 @@ void AudioOutputBase::OutputAudioLoop(void)
         Status();
 
         if (GetAudioData(fragment, fragment_size, true))
-        {
             WriteAudio(fragment, fragment_size);
-            dispatchVisual(fragment, fragment_size,
-                           (total_written * 1000) / 
-                           (audio_bytes_per_sample * audio_samplerate),
-                           audio_channels, audio_bits);
-            total_written += fragment_size;
-        }
     }
 
     VERBOSE(VB_AUDIO, "OutputAudioLoop: Stop Event");
