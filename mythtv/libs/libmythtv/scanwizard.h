@@ -34,7 +34,7 @@
 #define SCANWIZARD_H
 
 #include <qsqldatabase.h>
-
+#include <pthread.h>
 #include <mythwizard.h>
 #include "scanwizardhelpers.h"
 #include "settings.h"

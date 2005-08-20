@@ -56,6 +56,12 @@ macx {
     LIBS += `freetype-config --libs`
 }
 
+# OpenBSD ldconfig expects different arguments than the Linux one
+openbsd {
+    setting.extra -= -ldconfig
+    setting.extra += -ldconfig -R
+}
+
 using_xvmc:DEFINES += USING_XVMC
 using_xvmc_vld:DEFINES += USING_XVMC_VLD
 using_xrandr:DEFINES += USING_XRANDR

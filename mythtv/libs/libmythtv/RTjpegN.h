@@ -45,7 +45,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define RTJPEG_SWAP_HALFWORD(a) (a)
 #endif
 
-#ifndef _STDINT_H
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
 

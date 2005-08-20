@@ -4,7 +4,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <time.h>
-#include <sys/soundcard.h>
+
 #include <sys/ioctl.h>
 #include <cerrno>
 #include <cstring>
@@ -12,6 +12,12 @@
 #include <iostream>
 #include <qdatetime.h>
 #include "config.h"
+
+#ifdef HAVE_SYS_SOUNDCARD_H
+    #include <sys/soundcard.h>
+#elif HAVE_SOUNDCARD_H
+    #include <soundcard.h>
+#endif
 
 using namespace std;
 
@@ -231,7 +237,10 @@ void AudioOutputOSS::WriteAudio(unsigned char *aubuf, int size)
 inline int AudioOutputOSS::getBufferedOnSoundcard(void) 
 {
     int soundcard_buffer=0;
+//GREG This is needs to be fixed for sure!
+#ifdef SNDCTL_DSP_GETODELAY
     ioctl(audiofd, SNDCTL_DSP_GETODELAY, &soundcard_buffer); // bytes
+#endif
     return soundcard_buffer;
 }
 

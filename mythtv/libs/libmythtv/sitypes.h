@@ -10,6 +10,11 @@
 #include <qstringlist.h>
 #include <qdatetime.h>
 
+#include "config.h"
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
 /* This file will contain all of the common objects for DVB SI and 
    ATSC PSIP parsing */
 

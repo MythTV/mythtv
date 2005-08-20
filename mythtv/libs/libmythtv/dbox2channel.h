@@ -9,7 +9,11 @@
 #define DBOX2CHANNEL_H
 
 #include <qstring.h>
+
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
 #include "tv_rec.h"
 #include "channelbase.h"
 #include "sitypes.h"

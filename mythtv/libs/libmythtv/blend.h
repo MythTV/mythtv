@@ -5,7 +5,15 @@
 extern "C" {
 #endif
 
+#include "config.h"
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
+#ifdef __OpenBSD__
+#include <i386/types.h>
+#endif
+
 typedef void (*blendregion_ptr) (uint8_t *, uint8_t *, uint8_t *, uint8_t *,
                                  int, uint8_t *, uint8_t *, uint8_t *,
                                  uint8_t *, int, int, int, int, int,

@@ -15,7 +15,11 @@
 #include <fcntl.h>
 #include "../../config.h"
 #ifndef CONFIG_DARWIN
-    #include <sys/soundcard.h>
+    #ifdef HAVE_SYS_SOUNDCARD_H
+        #include <sys/soundcard.h>
+    #elif HAVE_SOUNDCARD_H
+        #include <soundcard.h>
+    #endif
 #endif
 #include <sys/ioctl.h>
 

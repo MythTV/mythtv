@@ -2,6 +2,7 @@
 #define AUDIOOUTPUTNULL
 
 #include <qmutex.h>
+#include <pthread.h>
 
 #include "audiooutputbase.h"
 

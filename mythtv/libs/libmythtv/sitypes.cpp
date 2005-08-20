@@ -28,8 +28,12 @@
  * Or, point your browser to http://www.gnu.org/copyleft/gpl.html
  *
  */
+#include "config.h"
 
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
 #include "sitypes.h"
 
 // Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging

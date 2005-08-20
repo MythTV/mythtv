@@ -33,6 +33,11 @@ using namespace std;
 #include "audiooutput.h"
 #include "DisplayRes.h"
 #include "signalmonitorvalue.h"
+#include "config.h"
+
+#ifndef HAVE_ROUND
+#define round(x) ((int) ((x) + 0.5))
+#endif
 
 const int TV::kInitFFRWSpeed  = 0;
 const int TV::kMuteTimeout    = 800;   
@@ -4583,6 +4588,7 @@ void TV::BuildOSDTreeMenu(void)
     item = new OSDGenericTree(treeMenu, tr("Adjust Audio Sync"), "TOGGLEAUDIOSYNC");
 
     int speedX100 = (int)(round(normal_speed * 100));
+
     item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "TOGGLESTRETCH");
     subitem = new OSDGenericTree(item, tr("Adjust"), "TOGGLESTRETCH");
     subitem = new OSDGenericTree(item, tr("0.5X"), "TOGGLESTRETCH0.5",

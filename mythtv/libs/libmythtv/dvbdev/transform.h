@@ -30,7 +30,10 @@
 #ifndef _TS_TRANSFORM_H_
 #define _TS_TRANSFORM_H_
 
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
 #include <netinet/in.h>
 #include <stdio.h>
 #include <unistd.h>

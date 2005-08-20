@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+#include <pthread.h>
 
 using namespace std;
 #include "audiooutputbase.h"

@@ -22,8 +22,8 @@
 #include <iostream>
 using namespace std;
 
-#ifdef USE_LIRC
 #include <pthread.h>
+#ifdef USE_LIRC
 #include "lirc.h"
 #include "lircevent.h"
 #endif

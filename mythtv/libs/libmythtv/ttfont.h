@@ -8,7 +8,12 @@
 #include <qstring.h>
 #include <qmap.h>
 #include <qcolor.h>
+
+#include "config.h"
+
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
 
 struct Raster_Map;
 class OSDSurface;

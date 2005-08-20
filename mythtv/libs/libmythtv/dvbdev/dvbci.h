@@ -27,7 +27,10 @@
 #ifndef __CI_H
 #define __CI_H
 
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif 
+
 #include <stdio.h>
 
 #include <pthread.h>

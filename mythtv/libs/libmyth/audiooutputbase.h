@@ -2,6 +2,7 @@
 #define AUDIOOUTPUTBASE
 
 #include <iostream>
+#include <pthread.h>
 using namespace std;
 
 #include <qstring.h>

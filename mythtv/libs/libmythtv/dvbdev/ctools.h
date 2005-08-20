@@ -38,7 +38,11 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <libgen.h>
+
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
 #include <netdb.h>
 #include <sys/param.h>
 #include <sys/socket.h>

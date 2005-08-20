@@ -17,8 +17,8 @@ using namespace std;
 #include <sys/statvfs.h>
 #include <sys/sysinfo.h>
 #else
-#include <sys/sysctl.h>
 #include <sys/param.h>
+#include <sys/sysctl.h>
 #include <sys/mount.h>
 #endif
 

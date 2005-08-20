@@ -25,6 +25,7 @@
 #include "videoout_xv.h"
 #include "XvMCSurfaceTypes.h"
 #include "util-x11.h"
+#include "config.h"
 
 extern "C" {
 #define XMD_H 1
@@ -38,6 +39,11 @@ extern "C" {
 
 static QString xvflags2str(int flags);
 static void clear_xv_buffers(VideoBuffers&, int w, int h, int xv_chroma);
+
+#ifndef HAVE_ROUND
+#define round(x) ((int) ((x) + 0.5))
+#endif
+
 
 //#define DEBUG_PAUSE /* enable to debug XvMC pause frame */
 

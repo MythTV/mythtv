@@ -7,7 +7,11 @@
 
 // C includes
 #include <cstdio>
+
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
 #include <unistd.h>
 #include <sys/types.h>
 
