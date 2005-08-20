@@ -499,7 +499,7 @@ bool Channel::SetChannelByString(const QString &chan)
 
     if (!ok)
     {
-        frequency = freqid.toInt(&ok) * 1000 + finetune;
+        frequency = (freqid.toInt(&ok) + finetune) * 1000;
         mplexid = 0;
     }
     bool isFrequency = ok && (frequency > 10000000);
@@ -565,7 +565,7 @@ bool Channel::TuneTo(const QString &channum, int finetune)
         return false;
     }
 
-    int frequency = curList[i].freq * 1000 + finetune;
+    int frequency = (curList[i].freq + finetune) * 1000;
 
     return Tune(frequency);
 }

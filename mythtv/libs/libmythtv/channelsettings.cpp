@@ -87,6 +87,12 @@ public:
     Rank(const ChannelID& id):
         SpinBoxSetting(-99,99,1), CSetting(id, "rank") {
         setLabel(QObject::tr("Rank"));
+        setHelpText(
+            QObject::tr("Number of bonus points to be added to any "
+                        "recording on this channel during scheduling.")+" "+
+            QObject::tr("Use a positive number as the rank if you "
+                        "want this to be a preferred channel, a "
+                        "negative one to deprecate this channel."));
     };
 };
 
@@ -95,6 +101,8 @@ public:
     Icon(const ChannelID& id):
         LineEditSetting(), CSetting(id, "icon") {
         setLabel(QObject::tr("Icon"));
+        setHelpText(QObject::tr("Image file to use as the icon for this "
+                                "channel on various MythTV displays."));
     };
 };
 
@@ -129,6 +137,11 @@ public:
     XmltvID(const ChannelID& id):
         LineEditSetting(), CSetting(id, "xmltvid") {
         setLabel(QObject::tr("XMLTV ID"));
+        setHelpText(QObject::tr(
+                        "ID used by listing services to get an exact "
+                        "correspondance between a channel in your line-up "
+                        "and a channel in their database. Normally this is "
+                        "set automatically when 'mythfilldatabase' is run."));
     };
 };
 
@@ -168,19 +181,29 @@ public:
         Channel Options - Video 4 Linux
  *****************************************************************************/
 
-class Freqid: public LineEditSetting, public CSetting {
-public:
-    Freqid(const ChannelID& id):
-        LineEditSetting(), CSetting(id, "freqid") {
-        setLabel(QObject::tr("Frequency ID"));
+class Freqid: public LineEditSetting, public CSetting
+{
+  public:
+    Freqid(const ChannelID& id)
+        : LineEditSetting(), CSetting(id, "freqid")
+    {
+        setLabel(QObject::tr("Frequency")+" "+QObject::tr("or")+" "+
+                 QObject::tr("Channel"));
+        setHelpText(QObject::tr(
+                        "Specify either the exact frequency in Hertz or "
+                        "a valid channel for your 'TV Format'."));
     };
 };
 
-class Finetune: public SliderSetting, public CSetting {
-public:
-    Finetune(const ChannelID& id):
-        SliderSetting(-200,200,1), CSetting(id, "finetune") {
-        setLabel(QObject::tr("Finetune"));
+class Finetune: public SliderSetting, public CSetting
+{
+  public:
+    Finetune(const ChannelID& id)
+        : SliderSetting(-300,300,1), CSetting(id, "finetune")
+    {
+        setLabel(QObject::tr("Finetune")+" (kHz)");
+        setHelpText(QObject::tr("Value to be added to your desired frequency "
+                                "in Hertz, for 'fine tuning'."));
     };
 };
 
