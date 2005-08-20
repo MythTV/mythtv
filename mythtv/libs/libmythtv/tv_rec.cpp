@@ -1300,7 +1300,7 @@ bool TVRec::StartChannel(bool livetv)
         recorder->ChannelNameChanged(channel->GetCurrentName());
     }
 #endif // USING_V4L
-    SetSignalMonitoringRate(50, 1);
+    SetSignalMonitoringRate(50, livetv);
     int progNum = -1;
     if (signalMonitor)
     {
