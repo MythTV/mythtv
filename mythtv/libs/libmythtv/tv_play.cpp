@@ -1346,12 +1346,19 @@ void TV::RunTV(void)
         }
 
         if ((doing_ff_rew || speed_index) && 
-            activenvp->AtNormalSpeed())
+            activenvp && activenvp->AtNormalSpeed())
         {
             speed_index = 0;
             doing_ff_rew = 0;
             ff_rew_index = kInitFFRWSpeed;
-            UpdatePosOSD(0.0, tr("Play"));
+            UpdatePosOSD(0.0, PlayMesg());
+        }
+
+        if (activenvp && (activenvp->GetNextPlaySpeed() != normal_speed) &&
+            activenvp->AtNormalSpeed())
+        {
+            normal_speed = 1.0;     // got changed in nvp due to close to end of file
+            UpdatePosOSD(0.0, PlayMesg());
         }
 
         if (++updatecheck >= 20)
@@ -2515,7 +2522,7 @@ void TV::ChangeSpeed(int direction)
     {
         case  2: speed = 3.0;      mesg = QString(tr("Speed 3X"));    break;
         case  1: speed = 2.0;      mesg = QString(tr("Speed 2X"));    break;
-        case  0: speed = 1.0;      mesg = QString(tr("Play"));        break;
+        case  0: speed = 1.0;      mesg = PlayMesg();                 break;
         case -1: speed = 1.0 / 3;  mesg = QString(tr("Speed 1/3X"));  break;
         case -2: speed = 1.0 / 8;  mesg = QString(tr("Speed 1/8X"));  break;
         case -3: speed = 1.0 / 16; mesg = QString(tr("Speed 1/16X")); break;
@@ -2523,7 +2530,7 @@ void TV::ChangeSpeed(int direction)
         default: speed_index = old_speed; return; break;
     }
 
-    if (!activenvp->Play(speed, (speed == 1.0)))
+    if (!activenvp->Play((speed_index==0)?normal_speed:speed, speed_index==0))
     {
         speed_index = old_speed;
         return;

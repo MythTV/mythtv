@@ -22,6 +22,8 @@ class RemoteEncoder
     bool IsRecording(void);
     float GetFrameRate(void);
     long long GetFramesWritten(void);
+    /// \brief Return value last returned by GetFramesWritten().
+    long long GetCachedFramesWritten(void) const { return cachedFramesWritten; }
     long long GetFilePosition(void);
     long long GetFreeSpace(long long totalreadpos);
     long long GetFreeDiskSpace();
@@ -89,6 +91,7 @@ class RemoteEncoder
     QString lastchannel;
 
     bool backendError;
+    long long cachedFramesWritten;
 };
 
 #endif

@@ -309,8 +309,6 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     decoder_lock.lock();
     next_play_speed = speed;
     next_normal_speed = normal;
-    if (normal)
-        audio_stretchfactor = speed;
     decoder_lock.unlock();
 
     return true;
@@ -911,8 +909,13 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
             stop = framesPlayed <= keyframedist;
         }
         if (stop)
-            Play(audio_stretchfactor, true, true);
+        {
+            float stretch = (ffrew_skip > 0) ? 1.0f : audio_stretchfactor;
+            Play(stretch, true, true);
+        }
     }
+    else if ((audio_stretchfactor > 1.0f) && IsNearEnd())
+        Play(1.0f, true, true);
 
     return true;
 }
@@ -2469,6 +2472,7 @@ void NuppelVideoPlayer::DoPlay(void)
 
     if (normal_speed && audioOutput)
     {
+        audio_stretchfactor = play_speed;
         audioOutput->SetStretchFactor(play_speed);
 #ifdef USING_DIRECTX
         audioOutput->Reset();
@@ -2553,6 +2557,31 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
     }
 
     return ret;
+}
+
+/** \fn NuppelVideoPlayer::IsNearEnd(long long)
+ *  \brief Returns true iff near end of recording.
+ *  \param margin minimum number of frames we want before being near end,
+ *                defaults to 2 seconds of video.
+ */
+bool NuppelVideoPlayer::IsNearEnd(long long margin)
+{
+    long long framesRead, framesLeft;
+    bool watchingTV = watchingrecording && nvr_enc && nvr_enc->IsValidRecorder();
+    if (!livetv && !watchingTV)
+        return false;
+
+    margin = (margin >= 0) ? margin: (long long) (video_frame_rate*2);
+    margin = (long long) (margin * audio_stretchfactor);
+
+    framesRead = GetDecoder()->GetFramesRead();
+    framesLeft = nvr_enc->GetCachedFramesWritten() - framesRead;
+
+    // if it looks like we are near end, get an updated GetFramesWritten()
+    if (framesLeft < margin)
+        framesLeft = nvr_enc->GetFramesWritten() - framesRead;
+
+    return (framesLeft < margin);
 }
 
 bool NuppelVideoPlayer::DoFastForward(void)

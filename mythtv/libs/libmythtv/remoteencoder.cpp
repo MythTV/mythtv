@@ -10,15 +10,10 @@ using namespace std;
 #include "mythcontext.h"
 
 RemoteEncoder::RemoteEncoder(int num, const QString &host, short port)
+    : recordernum(num),       controlSock(NULL),      remotehost(host),
+      remoteport(port),       lastchannel(""),        backendError(false),
+      cachedFramesWritten(0)
 {
-    recordernum = num;
-    remotehost = host;
-    remoteport = port;
-    backendError = false;
-
-    lastchannel = "";
-
-    controlSock = NULL;
     pthread_mutex_init(&lock, NULL); 
 }
 
@@ -149,9 +144,9 @@ long long RemoteEncoder::GetFramesWritten(void)
 
     SendReceiveStringList(strlist);
 
-    long long retval = decodeLongLong(strlist, 0);
+    cachedFramesWritten = decodeLongLong(strlist, 0);
 
-    return retval;
+    return cachedFramesWritten;
 }
 
 /** \fn RemoteEncoder::GetFilePosition()

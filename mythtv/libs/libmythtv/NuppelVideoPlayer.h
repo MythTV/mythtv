@@ -96,6 +96,8 @@ class NuppelVideoPlayer
     long long GetTotalFrameCount(void) { return totalFrames; }
     long long GetFramesPlayed(void) { return framesPlayed; }
     int GetSecondsBehind(void);
+    float GetAudioStretchFactor(void) const { return audio_stretchfactor; }
+    float GetNextPlaySpeed(void) const { return next_play_speed; }
 
     void SetRecorder(RemoteEncoder *recorder);
 
@@ -211,6 +213,8 @@ class NuppelVideoPlayer
     QStringList listSubtitleTracks();
 
     long long CalcMaxFFTime(long long ff);
+
+    bool IsNearEnd(long long framesRemaining = -1);
 
     bool IsErrored() { return errored; }
     bool InitVideo(void);
