@@ -15,7 +15,12 @@
 
 #include <math.h>
 #include <stdlib.h>
+
+#include "config.h"
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
 #include <inttypes.h>
 
 #include <iostream>

@@ -1,7 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "config.h"
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
+#include <inttypes.h>
+
 #include "goom_core.h"
 #include "goom_tools.h"
 #include "filters.h"

@@ -22,7 +22,11 @@
  * Sample rate convertion for both audio and video.
  */
 
+#include "config.h"
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
