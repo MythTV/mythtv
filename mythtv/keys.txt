@@ -36,6 +36,7 @@ Watching TV or a recording
 - M brings up the electronic program guide (Grid) -- see the EPG section.
 - Page Up to jump back the configured number of minutes.  (default is 10)
 - Page Down to jump ahead the configured number of minutes.  (default is 10)
+- K jumps to the bookmark position.
 - End or 'Z' to skip to next commercial break marker
 - Home or 'Q' to skip back to previous commercial break marker
 - T to toggle close caption support

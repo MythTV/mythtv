@@ -85,6 +85,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "PREVCHAN", "Switch to the previous channel", "H");
     REG_KEY("TV Playback", "JUMPFFWD", "Jump ahead", "PgDown");
     REG_KEY("TV Playback", "JUMPRWND", "Jump back", "PgUp");
+    REG_KEY("TV Playback", "JUMPBKMRK", "Jump to bookmark", "K");
     REG_KEY("TV Playback", "FFWDSTICKY", "Fast Forward (Sticky) or Forward one "
             "frame while paused", ">,.");
     REG_KEY("TV Playback", "RWNDSTICKY", "Rewind (Sticky) or Rewind one frame "
@@ -1914,9 +1915,17 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 DoSeek(jumptime * 60, tr("Jump Ahead"));
             }
         }
+        else if (action == "JUMPBKMRK")
+        {
+            int bookmark = activenvp->GetBookmark();
+            if (bookmark > frameRate)
+                DoSeek((bookmark - activenvp->GetFramesPlayed()) / frameRate,
+                       tr("Jump to Bookmark"));
+        }
         else if (action == "JUMPSTART" && activenvp)
         {
-            DoSeek(-activenvp->GetFramesPlayed(), tr("Jump to Beginning"));
+            DoSeek(-activenvp->GetFramesPlayed() / frameRate,
+                   tr("Jump to Beginning"));
         }
         else if (action == "CLEAROSD")
         {
