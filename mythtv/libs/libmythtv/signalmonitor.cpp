@@ -13,6 +13,7 @@
 #ifdef USING_DVB
 #   include "dvbsignalmonitor.h"
 #   include "dvbchannel.h"
+#   include "videosource.h"
 #endif
 
 /** \class SignalMonitor
@@ -41,7 +42,7 @@ bool SignalMonitor::IsSupported(QString cardtype)
 {
     (void) cardtype;
 #ifdef USING_DVB
-    if (cardtype.upper() == "DVB")
+    if (CardUtil::IsDVBCardType(cardtype))
         return true;
 #endif
 #ifdef USING_V4L
@@ -62,7 +63,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
     SignalMonitor *signalMonitor = NULL;
 
 #ifdef USING_DVB
-    if (cardtype.upper() == "DVB")
+    if (CardUtil::IsDVBCardType(cardtype))
     {
         DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
         if (dvbc)

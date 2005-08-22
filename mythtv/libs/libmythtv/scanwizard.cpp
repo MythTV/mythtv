@@ -659,7 +659,7 @@ void ScanWizardScanner::HandleTuneComplete(void)
 
     scanner->StartScanner();
 #ifdef USE_SIPARSER
-    if (GetDVBChannel())
+    if (scanner->siparser)
     {
         connect(scanner->siparser, SIGNAL(TableLoaded()),
                 this, SLOT(TableLoaded()));

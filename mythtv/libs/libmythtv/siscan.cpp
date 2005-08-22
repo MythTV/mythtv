@@ -81,28 +81,31 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
     init_freq_tables();
 
 #ifdef USE_SIPARSER
-    /* setup boolean values for thread */
-    serviceListReady = false;
-    transportListReady = false;
-
     siparser = NULL;
-    if (GetDVBChannel())
+    if (_cardtype != "HDTV" && _cardtype != "ATSC")
     {
-        VERBOSE(VB_SIPARSER, "Creating SIParser");
-        siparser = new DVBSIParser(GetDVBChannel()->GetCardNum());
-        pthread_create(&siparser_thread, NULL, SpawnSectionReader, siparser);
-        connect(siparser,        SIGNAL(UpdatePMT(const PMTObject*)),
-                GetDVBChannel(), SLOT(SetPMT(const PMTObject*)));
-    }    
-    if (siparser)
-    {
-        VERBOSE(VB_IMPORTANT, "Connecting up SIParser");
-        /* Signals to process tables and do database inserts */
-        connect(siparser, SIGNAL(FindTransportsComplete()),
-                this,     SLOT(TransportTableComplete()));
-        connect(siparser, SIGNAL(FindServicesComplete()),
-                this,     SLOT(ServiceTableComplete()));
-        return;
+        /* setup boolean values for thread */
+        serviceListReady = false;
+        transportListReady = false;
+
+        if (GetDVBChannel())
+        {
+            VERBOSE(VB_SIPARSER, "Creating SIParser");
+            siparser = new DVBSIParser(GetDVBChannel()->GetCardNum());
+            pthread_create(&siparser_thread, NULL, SpawnSectionReader, siparser);
+            connect(siparser,        SIGNAL(UpdatePMT(const PMTObject*)),
+                    GetDVBChannel(), SLOT(SetPMT(const PMTObject*)));
+        }    
+        if (siparser)
+        {
+            VERBOSE(VB_IMPORTANT, "Connecting up SIParser");
+            /* Signals to process tables and do database inserts */
+            connect(siparser, SIGNAL(FindTransportsComplete()),
+                    this,     SLOT(TransportTableComplete()));
+            connect(siparser, SIGNAL(FindServicesComplete()),
+                    this,     SLOT(ServiceTableComplete()));
+            return;
+        }
     }
 #endif // USE_SIPARSER
 

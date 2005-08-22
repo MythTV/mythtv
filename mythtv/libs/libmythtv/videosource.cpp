@@ -60,12 +60,13 @@ bool CardUtil::IsCardTypePresent(const QString &strType)
     return false;
 }
 
-/** \fn CardUtil::GetDVBType(uint, QString&)
+/** \fn CardUtil::GetDVBType(uint, QString&, QString&)
  *  \brief Returns the card type from the video device
  *  \param [in]device video dev to be checked
  *  \return the card type
  */
-enum CardUtil::CARD_TYPES CardUtil::GetDVBType(uint device, QString &name)
+enum CardUtil::CARD_TYPES CardUtil::GetDVBType(
+    uint device, QString &name, QString &card_type)
 {
     CARD_TYPES nRet = ERROR_OPEN;
 #ifdef USING_DVB
@@ -82,16 +83,20 @@ enum CardUtil::CARD_TYPES CardUtil::GetDVBType(uint device, QString &name)
             {
             case FE_QAM:
                 nRet = QAM;
+                card_type = "QAM";
                 break;
             case FE_QPSK:
                 nRet = QPSK;
+                card_type = "QPSK";
                 break;
             case FE_OFDM:
                 nRet = OFDM;
+                card_type = "OFDM";
                 break;
 #if (DVB_API_VERSION_MINOR == 1)
             case FE_ATSC:
                 nRet = ATSC;
+                card_type = "ATSC";
                 break;
 #endif
             }
@@ -143,7 +148,7 @@ enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID, QString &name,
         nRet = HDTV;
 #ifdef USING_DVB
     else if (card_type == "DVB")
-        nRet = GetDVBType(strDevice.toInt(), name);
+        nRet = GetDVBType(strDevice.toInt(), name, card_type);
 #else
     (void)name;
 #endif
@@ -171,6 +176,16 @@ enum CardUtil::CARD_TYPES CardUtil::GetCardType(uint nCardID)
 {
     QString name, card_type;
     return CardUtil::GetCardType(nCardID, name, card_type);
+}
+
+/** \fn CardUtil::IsDVBCardType(const QString)
+ *  \brief Returns true iff the card_type is one of the DVB types.
+ */
+bool CardUtil::IsDVBCardType(const QString card_type)
+{
+    QString ct = card_type.upper();
+    return (ct == "DVB") || (ct == "QAM") || (ct == "QPSK") ||
+        (ct == "OFDM") || (ct == "ATSC");
 }
 
 /** \fn CardUtil::GetVideoDevice(uint, QString&)
@@ -2232,9 +2247,9 @@ QStringList VideoDevice::probeInputs(QString device)
 void DVBConfigurationGroup::probeCard(const QString& cardNumber)
 {
 #ifdef USING_DVB
-    QString name;
+    QString name, card_type;
     bool fEnable=false;
-    switch (CardUtil::GetDVBType(cardNumber.toInt(),name))
+    switch (CardUtil::GetDVBType(cardNumber.toInt(), name, card_type))
     {
         case CardUtil::ERROR_OPEN:
             cardname->setValue(QString("Could not open card #%1!")

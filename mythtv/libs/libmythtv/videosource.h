@@ -59,6 +59,7 @@ class CardUtil
     static CARD_TYPES   GetCardType(uint cardid, QString &name, QString &card_type);
     static CARD_TYPES   GetCardType(uint cardid, QString &name);
     static CARD_TYPES   GetCardType(uint cardid);
+    static bool         IsDVBCardType(const QString card_type);
 
     static bool         GetVideoDevice(uint cardid, QString& device, QString& vbi);
     static bool         GetVideoDevice(uint cardid, QString& device);
@@ -66,7 +67,7 @@ class CardUtil
     static bool         IsDVB(uint cardid);
     static DISEQC_TYPES GetDISEqCType(uint cardid);
 
-    static CARD_TYPES   GetDVBType(uint device, QString &name);
+    static CARD_TYPES   GetDVBType(uint device, QString &name, QString &card_type);
     static QString      GetDefaultInput(uint cardid);
 };
 
