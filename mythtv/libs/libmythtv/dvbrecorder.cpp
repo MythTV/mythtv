@@ -874,6 +874,7 @@ void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
 
 void DVBRecorder::LocalProcessDataTS(unsigned char *buffer, int len)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
     if (_ts_packets_until_psip_sync == 0)
     {
         if (_pat && _pmt)
@@ -901,6 +902,9 @@ void DVBRecorder::Reset(void)
 
 void DVBRecorder::SetPAT(ProgramAssociationTable *new_pat)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
+    QMutexLocker change_lock(&_pid_change_lock);
+
     ProgramAssociationTable *old_pat = _pat;
     _pat = new_pat;
     if (old_pat)
@@ -909,6 +913,9 @@ void DVBRecorder::SetPAT(ProgramAssociationTable *new_pat)
 
 void DVBRecorder::SetPMT(ProgramMapTable *new_pmt)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
+    QMutexLocker change_lock(&_pid_change_lock);
+
     ProgramMapTable *old_pmt = _pmt;
     _pmt = new_pmt;
     if (old_pmt)
@@ -917,6 +924,7 @@ void DVBRecorder::SetPMT(ProgramMapTable *new_pmt)
 
 void DVBRecorder::CreatePAT(void)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
     int next_cc = 0;
     if (_pat)
         next_cc = (_pat->tsheader()->ContinuityCounter() + 1) & 0x0F;
@@ -931,6 +939,7 @@ void DVBRecorder::CreatePAT(void)
 
 void DVBRecorder::CreatePMT(void)
 {
+    QMutexLocker read_lock(&_pid_read_lock);
     int pmt_cc = 0;
     if (_pmt)
         pmt_cc = (_pmt->tsheader()->ContinuityCounter() + 1) & 0x0F;
@@ -1090,6 +1099,4 @@ void DVBRecorder::DebugTSHeader(unsigned char* buffer, int len)
 
     int cardnum = _card_number_option;
     GENERAL(debugmsg);
-
-//TODO
 }
