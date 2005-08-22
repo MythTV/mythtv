@@ -49,9 +49,12 @@ class DVBChannel : public QObject, public ChannelBase
     /// Returns table standard ("dvb" or "atsc")
     QString     GetSIStandard(void)     const { return chan_opts.sistandard; }
     /// Returns the dvb service id if the table standard is "dvb"
-    uint        GetServiceID()          const { return chan_opts.serviceID; }
+    uint        GetServiceID(void)      const { return chan_opts.serviceID; }
     /// Returns true iff SetPMT has been called with a non-NULL value.
-    bool        IsPMTSet()              const { return chan_opts.IsPMTSet(); }
+    bool        IsPMTSet(void)          const { return chan_opts.IsPMTSet(); }
+    /// Returns true iff PMT has video and audio
+    bool HasTelevisionService(void) const
+        { return chan_opts.pmt.HasTelevisionService(); }
 
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan);
@@ -78,8 +81,8 @@ class DVBChannel : public QObject, public ChannelBase
     void ChannelChanged(dvb_channel_t& chan);
 
   private:
-    int  GetCardID() const;
-    int  GetChanID() const;
+    int  GetCardID(void) const;
+    int  GetChanID(void) const;
     bool GetTransportOptions(int mplexid);
     bool GetChannelOptions(const QString &channum);
 

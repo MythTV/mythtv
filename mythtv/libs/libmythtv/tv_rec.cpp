@@ -653,7 +653,12 @@ static bool wait_for_dvb(ChannelBase *channel, int timeout,
         if (dvbc->IsPMTSet())
         {
             VERBOSE(VB_RECORD, "TVRec: DVB Recorder's PMT set.");
-            return true;
+            if (!dvbc->HasTelevisionService())
+            {
+                VERBOSE(VB_IMPORTANT, "TVRec: DVB Recorder's PMT "
+                        "does not have audio and video.");
+            }
+            return dvbc->HasTelevisionService();
         }
     }
     VERBOSE(VB_IMPORTANT, "TVRec: DVB Recorder's PMT NOT SET.");

@@ -444,9 +444,6 @@ class PMTObject
     /// \brief Returns true if the streams are not encrypted ("Free-To-Air")
     bool FTA() const { return !hasCA; }
 
-    /// @deprecated Use HasTelevisionService() instead.
-    bool OnAir() const { return HasTelevisionService(); }
-
   public:
     uint16_t       PCRPID;
     uint16_t       ServiceID;
