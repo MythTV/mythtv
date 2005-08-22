@@ -132,7 +132,9 @@ protected:
 
     SignalMonitorValue signalLock;
     SignalMonitorValue signalStrength;
-    mutable QMutex statusLock;
+
+    QMutex             startStopLock;
+    mutable QMutex     statusLock;
 };
 
 #endif // SIGNALMONITOR_H

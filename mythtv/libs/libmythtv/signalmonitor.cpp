@@ -126,10 +126,13 @@ SignalMonitor::~SignalMonitor()
 void SignalMonitor::Start()
 {
     VERBOSE(VB_CHANNEL, "SignalMonitor::Start() -- begin");
-    if (!running)
-        pthread_create(&monitor_thread, NULL, SpawnMonitorLoop, this);
-    while (!running)
-        usleep(50);
+    {
+        QMutexLocker locker(&startStopLock);
+        if (!running)
+            pthread_create(&monitor_thread, NULL, SpawnMonitorLoop, this);
+        while (!running)
+            usleep(50);
+    }
     VERBOSE(VB_CHANNEL, "SignalMonitor::Start() -- end");
 }
 
@@ -138,11 +141,16 @@ void SignalMonitor::Start()
  */
 void SignalMonitor::Stop()
 {
-    if (running)
+    VERBOSE(VB_CHANNEL, "SignalMonitor::Stop() -- begin");
     {
-        exit = true;
-        pthread_join(monitor_thread, NULL);
+        QMutexLocker locker(&startStopLock);
+        if (running)
+        {
+            exit = true;
+            pthread_join(monitor_thread, NULL);
+        }
     }
+    VERBOSE(VB_CHANNEL, "SignalMonitor::Stop() -- end");
 }
 
 /** \fn SignalMonitor::Kick()
