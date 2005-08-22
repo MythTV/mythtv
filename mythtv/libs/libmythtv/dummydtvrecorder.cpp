@@ -140,7 +140,7 @@ bool DummyDTVRecorder::Open(void)
     QString p = gContext->GetThemesParentDir();
     QString path[] =
         { p+gContext->GetSetting("Theme", "G.A.N.T.")+"/", p+"default/", };
-    QString filename = QString("dummy%1x%2a%3.%4")
+    QString filename = QString("dummy%1x%2p%3.%4")
         .arg(_desired_width).arg(_desired_height)
         .arg(_desired_frame_rate, 0, 'f', 2)
         .arg(_tsmode ? "ts" : "pes");

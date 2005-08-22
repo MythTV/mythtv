@@ -64,8 +64,6 @@ using namespace std;
 #include "dbox2channel.h"
 #endif
 
-/// Set to 1 to use dummy recorder for better UI feedback
-#define ENABLE_DUMMY_REC 1
 #define DVB_TABLE_WAIT 3000 /* msec */
 
 const int TVRec::kRequestBufferSize = 256*1000;
@@ -740,10 +738,18 @@ bool TVRec::StartRecorderPostThread(bool livetv)
         use_dummy = dvbrec->RecordsTransportStream();
 #endif // USING_DVB
     }
-    if (ENABLE_DUMMY_REC && use_dummy)
+    if (use_dummy)
     {
-        dummyrec = new DummyDTVRecorder(
-            true, rbuffer, 1920, 1088, 29.97, 90, 30000000);
+        bool use_xvmc_vld = false;
+#ifdef USING_XVMC_VLD
+        use_xvmc_vld = gContext->GetNumSetting("UseXvMcVld", 1);
+#endif
+        if (use_xvmc_vld)
+            dummyrec = new DummyDTVRecorder(
+                true, rbuffer, 768, 576, 50, 90, 30000000);
+        else
+            dummyrec = new DummyDTVRecorder(
+                true, rbuffer, 1920, 1088, 29.97, 90, 30000000);
     }
 
     startingRecording = true;
