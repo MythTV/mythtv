@@ -66,6 +66,7 @@ using namespace std;
 
 /// Set to 1 to use dummy recorder for better UI feedback
 #define ENABLE_DUMMY_REC 1
+#define DVB_TABLE_WAIT 3000 /* msec */
 
 const int TVRec::kRequestBufferSize = 256*1000;
 
@@ -772,7 +773,7 @@ bool TVRec::StartRecorderPost(DummyDTVRecorder *dummyrec, bool livetv)
         ok = StartChannel(livetv);
 
     if (ok)
-        ok = wait_for_dvb(channel, 1000, abortRecordingStart);
+        ok = wait_for_dvb(channel, DVB_TABLE_WAIT, abortRecordingStart);
 
     if (dummyrec)
         delete dummyrec;
