@@ -2481,6 +2481,9 @@ bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
     QString channelinput = chan->GetCurrentInput();
     QString videoFilters = "";
 
+    if (channelinput.isEmpty())
+        return false;
+
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())
         return true;
