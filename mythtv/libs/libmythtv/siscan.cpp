@@ -55,6 +55,46 @@ static int  create_dtv_multiplex_ofdm(
 void delete_services(int db_mplexid, const ServiceDescriptionTable*);
 #endif // USING_DVB
 
+/** \class SIScan
+ *  \brief Scanning class for cards that support a SignalMonitor class.
+ *
+ *   Currently both SIParser and ScanStreamData are being used in
+ *   this class. The SIParser is being phased out, so that is not
+ *   described here.
+ *
+ *   With ScanStreamData, we call ScanTransport() on each transport 
+ *   and frequency offset in the list of transports. This list is 
+ *   created from a FrequencyTable object.
+ *
+ *   Each ScanTransport() call resets the ScanStreamData and the
+ *   SignalMonitor, then tunes to a new frequency and notes the tuning
+ *   time in the "timer" QTime object.
+ *
+ *   HandleActiveScan is called every time through the event loop
+ *   and is what calls ScanTransport(), as well as checking when
+ *   the current time is "timeoutTune" or "scanTimeout" milliseconds
+ *   ahead of "timer". When the "timeoutTune" is exceeded we check
+ *   to see if we have a signal lock on the channel, if we don't we
+ *   check the next transport. When the larger "scanTimeout" is
+ *   exceeded we do nothing unless "waitingForTables" is still true,
+ *   if so we check if we at least got a PAT and if so we insert
+ *    a channel based on that by calling HandleMPEGDBInsertion().
+ *
+ *   Meanwhile the ScanStreamData() emits several signals. For 
+ *   the UI it emits signal quality signals. For SIScan it emits
+ *   UpdateMGT, UpdateVCT, UpdateNIT, and UpdateSDT signals. We
+ *   connect these to the HandleMGT, HandleVCT, etc. These in
+ *   turn just call HandleATSCDBInsertion() or
+ *   HandleDVBDBInsertion() depending on the type of table.
+ *
+ *   HandleATSCDBInsertion() first checks if we have all the VCTs 
+ *   described in the MGT. If we do we call UpdateVCTinDB() for each
+ *   TVCT and CVCT in the stream. UpdateVCTinDB() inserts the actual
+ *   channels. Then we set "waitingForTables" to false, set the
+ *   scanOffsetIt to 99 and updates the UI to reflect the added channel.
+ *   HandleDVBDBInsertion() and HandleMPEGDBInsertion() are similar.
+ */
+
 /** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
  */
 SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
@@ -328,13 +368,13 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd, bool wait_until_com
     if (wait_until_complete && !hasAll)
         return;
 
-    // Insert TVCTs
+    // Insert Terrestrial VCTs
     tvct_vec_t tvcts = sd->GetAllCachedTVCTs();
     for (uint i = 0; i < tvcts.size(); i++)
         UpdateVCTinDB((*scanIt).mplexid, tvcts[i], true);
     sd->ReturnCachedTVCTTables(tvcts);
 
-    // Insert CVCTs
+    // Insert Cable VCTs
     cvct_vec_t cvcts = sd->GetAllCachedCVCTs();
     for (uint i = 0; i < cvcts.size(); i++)
         UpdateVCTinDB((*scanIt).mplexid, cvcts[i], true);
@@ -515,8 +555,8 @@ void SIScan::HandleActiveScan(void)
                 emit ServiceScanUpdateText(time_out_table_str);
                 SISCAN(time_out_table_str);
             }
+            waitingForTables = false;
         }
-        waitingForTables = false;
     }
     else
     {
