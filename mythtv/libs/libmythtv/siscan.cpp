@@ -222,7 +222,7 @@ bool SIScan::ScanServicesSourceID(int SourceID)
     if (scanMode == TRANSPORT_LIST)
         return false;
 
-    scanIt = scanTransports.end();
+    nextIt = scanTransports.end();
 
     MSqlQuery query(MSqlQuery::InitCon());
     // Run DB query to get transports on sourceid SourceID
@@ -264,14 +264,11 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         scanTransports += item;
     }
 
-    timer = QTime();
     waitingForTables  = false;
-
     transportsScanned = 0;
-    scanOffsetIt      = 0;
     if (scanTransports.size())
     {
-        scanIt        = scanTransports.begin();
+        nextIt        = scanTransports.begin();
         scanMode      = TRANSPORT_LIST;
         return true;
     }
@@ -282,27 +279,27 @@ bool SIScan::ScanServicesSourceID(int SourceID)
 void SIScan::HandleVCT(uint, const VirtualChannelTable*)
 {
     SISCAN(QString("Got a Virtual Channel Table for %1")
-           .arg((*scanIt).FriendlyName));
+           .arg((*current).FriendlyName));
     HandleATSCDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
 }
 
 void SIScan::HandleMGT(const MasterGuideTable*)
 {
-    SISCAN(QString("Got the Master Guide for %1").arg((*scanIt).FriendlyName));
+    SISCAN(QString("Got the Master Guide for %1").arg((*current).FriendlyName));
     HandleATSCDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
 }
 
 void SIScan::HandleSDT(uint, const ServiceDescriptionTable*)
 {
     SISCAN(QString("Got a Service Description Table for %1")
-           .arg((*scanIt).FriendlyName));
+           .arg((*current).FriendlyName));
     HandleDVBDBInsertion(GetDTVSignalMonitor()->GetScanStreamData(), true);
 }
 
 void SIScan::HandleNIT(const NetworkInformationTable*)
 {
     SISCAN(QString("Got a Network Information Table for %1")
-           .arg((*scanIt).FriendlyName));
+           .arg((*current).FriendlyName));
     const ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
     const NetworkInformationTable *nit = sd->GetCachedNIT();
     if (!nit)
@@ -349,7 +346,7 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     const ProgramAssociationTable *pat = sd->GetCachedPAT();
     if (pat)
     {
-        UpdatePATinDB((*scanIt).mplexid, pat, true);
+        UpdatePATinDB((*current).mplexid, pat, true);
         sd->ReturnCachedTable(pat);
     }
 
@@ -358,7 +355,7 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     {
         UpdateScanPercentCompleted();
         waitingForTables = false;
-        scanOffsetIt = 99;
+        nextIt = current.nextTransport();
     }
 }
 
@@ -371,13 +368,13 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd, bool wait_until_com
     // Insert Terrestrial VCTs
     tvct_vec_t tvcts = sd->GetAllCachedTVCTs();
     for (uint i = 0; i < tvcts.size(); i++)
-        UpdateVCTinDB((*scanIt).mplexid, tvcts[i], true);
+        UpdateVCTinDB((*current).mplexid, tvcts[i], true);
     sd->ReturnCachedTVCTTables(tvcts);
 
     // Insert Cable VCTs
     cvct_vec_t cvcts = sd->GetAllCachedCVCTs();
     for (uint i = 0; i < cvcts.size(); i++)
-        UpdateVCTinDB((*scanIt).mplexid, cvcts[i], true);
+        UpdateVCTinDB((*current).mplexid, cvcts[i], true);
     sd->ReturnCachedCVCTTables(cvcts);
 
     // tell UI we are done with these channels
@@ -385,7 +382,7 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd, bool wait_until_com
     {
         UpdateScanPercentCompleted();
         waitingForTables = false;
-        scanOffsetIt = 99;
+        nextIt = current.nextTransport();
     }
 }
 
@@ -399,7 +396,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd, bool)
 
     vector<const ServiceDescriptionTable*> sdts = sd->GetAllCachedSDTs();
     for (uint i = 0; i < sdts.size(); i++)
-        UpdateSDTinDB((*scanIt).mplexid, sdts[i], forceUpdate);
+        UpdateSDTinDB((*current).mplexid, sdts[i], forceUpdate);
     sd->ReturnCachedSDTTables(sdts);
 
     emit ServiceScanUpdateText(tr("Finished processing Transport"));
@@ -408,13 +405,42 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd, bool)
     {
         UpdateScanPercentCompleted();
         waitingForTables = false;
-        scanOffsetIt = 99;
+        nextIt = current.nextTransport();
     }
     else
     {
         emit PctServiceScanComplete(100);
         emit ServiceScanComplete();
     }    
+}
+
+/** \fn SIScan::HandlePostInsertion()
+ *  \brief Insert channels based on any partial tables we do have.
+ *  \return true if we insterted any channels.
+ */
+bool SIScan::HandlePostInsertion(void)
+{
+    DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
+    if (!dtvSigMon)
+        return false;
+
+    const ScanStreamData *sd = dtvSigMon->GetScanStreamData();
+
+    VERBOSE(VB_IMPORTANT, QString("HandlePostInsertion() pat(%1)")
+            .arg(sd->HasCachedPAT()));
+
+    if (sd->GetCachedMGT())
+    {
+        VERBOSE(VB_IMPORTANT, sd->GetCachedMGT()->toString());
+    }
+
+    if (sd->HasCachedPAT())
+    {
+        VERBOSE(VB_IMPORTANT, sd->GetCachedPAT()->toString());
+        HandleMPEGDBInsertion(sd, false);
+        return true;
+    }
+    return false;
 }
 
 DTVSignalMonitor* SIScan::GetDTVSignalMonitor(void)
@@ -515,141 +541,105 @@ void SIScan::RunScanner(void)
     scanner_thread_running = false;
 }
 
-/** \fn SIScan::HandleActiveScan(void)
- *  \brief Handles the TRANSPORT_LIST SIScan mode.
- */
-void SIScan::HandleActiveScan(void)
+// See if we have timed out
+bool SIScan::HasTimedOut(void)
 {
-    QString offset_str = (scanOffsetIt) ?
-        QObject::tr(" offset %2").arg(scanOffsetIt) : "";
+    if (!waitingForTables)
+        return true;
+
+    QString offset_str = current.offset() ?
+        QObject::tr(" offset %2").arg(current.offset()) : "";
     QString cur_chan = QString("%1%2")
-        .arg((*scanIt).FriendlyName).arg(offset_str);
+        .arg((*current).FriendlyName).arg(offset_str);
     QString time_out_table_str =
         QObject::tr("Timeout Scanning %1 -- no tables").arg(cur_chan);
     QString time_out_sig_str =
         QObject::tr("Timeout Scanning %1 -- no signal").arg(cur_chan);
 
-    // handle first transport
-    if (timer.isNull())
-    {
-        timer.start();
-        ScanTransport(*scanIt, scanOffsetIt);
-        return;
+    // have the tables have timed out?
+    if ((scanTimeout > 0) && (timer.elapsed() > scanTimeout))
+    { 
+        emit ServiceScanUpdateText(time_out_table_str);
+        SISCAN(time_out_table_str);
+        return true;
     }
 
-    // See if we have timed out
-    bool timed_out = ((scanTimeout > 0) && (timer.elapsed() > scanTimeout));
-    if (timed_out)
+    // ok the tables haven't timed out, but have we hit the signal timeout?
+    if (timer.elapsed() > (int)(*current).timeoutTune)
     {
-        if (waitingForTables)
-        {
-            DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
-            ScanStreamData *sd = NULL;
-            if (dtvSigMon && (sd = dtvSigMon->GetScanStreamData()) &&
-                sd->HasCachedPAT())
-            {
-                HandleMPEGDBInsertion(sd, false);
-            }
-            else if (scanOffsetIt < (*scanIt).offset_cnt())
-            {
-                emit ServiceScanUpdateText(time_out_table_str);
-                SISCAN(time_out_table_str);
-            }
-            waitingForTables = false;
-        }
+        // If we don't have a signal in SIGNAL_LOCK_TIMEOUT msec, continue..
+        SignalMonitor *sm = GetSignalMonitor();
+        if (NULL == sm || sm->HasSignalLock())
+            return false;
+
+        emit ServiceScanUpdateText(time_out_sig_str);
+        SISCAN(time_out_sig_str);
+
+        return true;
+    }
+    return false;
+}
+
+/** \fn SIScan::HandleActiveScan(void)
+ *  \brief Handles the TRANSPORT_LIST SIScan mode.
+ */
+void SIScan::HandleActiveScan(void)
+{
+    bool do_post_insertion = waitingForTables;
+#ifdef USE_SIPARSER
+    do_post_insertion &= (NULL == siparser);
+#endif // USE_SIPARSER
+
+    if (!HasTimedOut())
+        return;
+    
+    if (0 == nextIt.offset() && nextIt != scanTransports.begin())
+    {
+        // Stop signal monitor for previous transport
+        signalMonitor->Stop();
+
+        if (do_post_insertion)
+            HandlePostInsertion();
+
+        transportsScanned++;
+        UpdateScanPercentCompleted();
+    }
+
+    current = nextIt; // Increment current
+
+    if (current != scanTransports.end())
+    {
+        ScanTransport(current);
+
+        // Increment nextIt
+        nextIt = current;
+        ++nextIt;
     }
     else
-    {
-        if (timer.elapsed() > (int)(*scanIt).timeoutTune)
-        {
-            // If we don't have a signal in SIGNAL_LOCK_TIMEOUT msec, continue..
-            timed_out = false;
-            SignalMonitor *sm = GetSignalMonitor();
-            if (!sm)
-                return; // still waiting
-
-            SignalMonitorList list = SignalMonitorValue::Parse(sm->GetStatusList());
-            for (uint i = 0; i < list.size(); i++)
-            {
-                if (list[i].GetShortName() == "slock")
-                {
-                    timed_out = !list[i].IsGood();
-                    break;
-                }
-            }
-            if (!timed_out)
-                return; // still waiting
-
-            emit ServiceScanUpdateText(time_out_sig_str);
-            SISCAN(time_out_sig_str);
-        }
-        else
-        {
-            return; // still waiting
-        }
-    }
-
-    // Check if we got some tables, but not all...
-#ifdef USE_SIPARSER
-    if (!siparser && GetDTVSignalMonitor())
-#else // if !USE_SIPARSER
-    if (GetDTVSignalMonitor())
-#endif // !USE_SIPARSER
-    {
-        const ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
-        if (timed_out && waitingForTables && sd->GetCachedMGT())
-        {
-            VERBOSE(VB_IMPORTANT, sd->GetCachedMGT()->toString());
-        }
-
-        // Get NIT before we enable SDT in case of UK channel descriptor.
-        GetDTVSignalMonitor()->GetScanStreamData()->RemoveListeningPID(DVB_SDT_PID);
-    }
-
-    // Increment iterator
-    scanOffsetIt++;
-    if (scanIt != scanTransports.end())
-    {
-        if (scanOffsetIt >= (*scanIt).offset_cnt())
-        {
-            // Stop signal monitor for previous transport
-            signalMonitor->Stop();
-
-            transportsScanned++;
-            UpdateScanPercentCompleted();
-            scanOffsetIt=0;
-            scanIt++;
-        }
-    }
-
-    // If we are done emit ServiceScanComplete(), otherwise scan the transport..
-    if ((scanIt == scanTransports.end()) &&
-        (scanOffsetIt >= (*scanIt).offset_cnt()))
     {
         emit ServiceScanComplete();
         scanMode = IDLE;
         scanTransports.clear();
-    }
-    else
-    {
-        ScanTransport(*scanIt, scanOffsetIt);
+        current = nextIt = scanTransports.end();
     }
 }
 
-void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
+void SIScan::ScanTransport(transport_scan_items_it_t transport)
 {
-    QString offset_str = (scanOffsetIt) ?
-        QObject::tr(" offset %2").arg(scanOffsetIt) : "";
+    QString offset_str = (transport.offset()) ?
+        QObject::tr(" offset %2").arg(transport.offset()) : "";
     QString cur_chan = QString("%1%2")
-        .arg((*scanIt).FriendlyName).arg(offset_str);
+        .arg((*current).FriendlyName).arg(offset_str);
     QString tune_msg_str =
         QObject::tr("Tuning to %1 mplexid(%2)")
-        .arg(cur_chan).arg((*scanIt).mplexid);
+        .arg(cur_chan).arg((*current).mplexid);
 
-    if (scanOffsetIt && (scanOffsetIt >= (*scanIt).offset_cnt()) &&
-        item.freq_offset(scanOffsetIt) == item.freq_offset(0))
+    TransportScanItem &item = *transport;
+    const uint freq_offset = item.freq_offset(transport.offset());
+    const uint freq_vis = freq_offset - 1750000; // convert to visual carrier
+    if (transport.offset() && (freq_offset == item.freq_offset(0)))
     {
-        timer.addSecs(-120);
+        waitingForTables = false;
         return; // nothing to do
     }
 
@@ -680,7 +670,7 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
             dvb_channel_t dvbchan;
             dvbchan.sistandard = item.standard;
             dvbchan.tuning     = item.tuning;
-            dvbchan.tuning.params.frequency = item.freq_offset(scanOffsetIt);
+            dvbchan.tuning.params.frequency = freq_offset;
 
 #ifdef USE_SIPARSER
             if (siparser)
@@ -716,17 +706,15 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
 #ifdef USING_V4L
     if (GetChannel())
     {
-        uint freq = item.freq_offset(scanOffsetIt);
         if (item.mplexid >= 0)
             ok = GetChannel()->TuneMultiplex(item.mplexid);
         else 
         {
-            uint f = freq - 1750000; // convert to visual carrier
             QString inputname = ChannelUtil::GetInputName(item.SourceID);
-            if (ok = GetChannel()->Tune(f, inputname, "8vsb"))
+            if (ok = GetChannel()->Tune(freq_vis, inputname, "8vsb"))
             {
                 item.mplexid = ChannelUtil::CreateMultiplex(
-                    item.SourceID, item.standard, f, "8vsb");
+                    item.SourceID, item.standard, freq_vis, "8vsb");
             }
         }
     }
@@ -738,7 +726,7 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
     {
         UpdateScanPercentCompleted();
         SISCAN(QString("Failed to tune %1 mplexid(%2) at offset %3")
-               .arg(item.FriendlyName).arg(item.mplexid).arg(scanOffsetIt));
+               .arg(item.FriendlyName).arg(item.mplexid).arg(transport.offset()));
         return;
     }
 
@@ -747,6 +735,13 @@ void SIScan::ScanTransport(TransportScanItem &item, uint scanOffsetIt)
     {
         GetDTVSignalMonitor()->GetScanStreamData()->Reset();
         GetDTVSignalMonitor()->SetChannel(-1,-1);
+
+        // Get NIT before we enable SDT in case of UK channel descriptor.
+#ifdef USING_SIPARSER
+        if (!siparser)
+#endif // USING_SIPARSER
+            GetDTVSignalMonitor()->GetScanStreamData()->
+                RemoveListeningPID(DVB_SDT_PID);
     }
 
     // Start signal monitor for this channel
@@ -801,7 +796,7 @@ bool SIScan::ScanTransports(int SourceID,
         return false;
 
     scanTransports.clear();
-    scanIt = scanTransports.end();
+    nextIt = scanTransports.end();
 
     freq_table_list_t tables = get_matching_freq_tables(std, modulation, country);
     VERBOSE(VB_SIPARSER, QString("Looked up freq table (%1, %2, %3)")
@@ -833,9 +828,8 @@ bool SIScan::ScanTransports(int SourceID,
     scanTimeout      = (si_std == "dvb") ? DVB_TABLES_TIMEOUT : ATSC_TABLES_TIMEOUT;
     waitingForTables = false;
 
-    scanIt            = scanTransports.begin();
+    nextIt            = scanTransports.begin();
     transportsScanned = 0;
-    scanOffsetIt      = 0;
     scanMode          = TRANSPORT_LIST;
 
     return true;
@@ -844,7 +838,7 @@ bool SIScan::ScanTransports(int SourceID,
 bool SIScan::ScanTransport(int mplexid)
 {
     scanTransports.clear();
-    scanIt = scanTransports.end();
+    nextIt = scanTransports.end();
 
     MSqlQuery query(MSqlQuery::InitCon());
     // Run DB query to get transports on sourceid SourceID
@@ -889,10 +883,9 @@ bool SIScan::ScanTransport(int mplexid)
     waitingForTables  = false;
 
     transportsScanned = 0;
-    scanOffsetIt      = 0;
     if (scanTransports.size())
     {
-        scanIt        = scanTransports.begin();
+        nextIt        = scanTransports.begin();
         scanMode      = TRANSPORT_LIST;
         return true;
     }
@@ -1000,7 +993,7 @@ void SIScan::UpdatePATinDB(int tid_db,
                            bool)
 {
     VERBOSE(VB_SIPARSER, QString("UpdatePATinDB(): mplex: %1:%2")
-            .arg(tid_db).arg((*scanIt).mplexid));
+            .arg(tid_db).arg((*current).mplexid));
 
     int db_mplexid = ChannelUtil::GetBetterMplexID(
         tid_db, pat->TransportStreamID(), 1);
@@ -1013,7 +1006,7 @@ void SIScan::UpdatePATinDB(int tid_db,
     }
 
     int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
-    int freqid         = (*scanIt).friendlyNum;
+    int freqid         = (*current).friendlyNum;
 
     for (uint i = 0; i < pat->ProgramCount(); i++)
     {
@@ -1035,7 +1028,7 @@ void SIScan::UpdatePATinDB(int tid_db,
             .arg(service_name)
             .arg(0).arg(0)
             .arg(chan_num)
-            .arg((*scanIt).FriendlyName).arg(freqid);
+            .arg((*current).FriendlyName).arg(freqid);
 
         if (chanid < 0)
         {   // The service is not in database, add it
@@ -1076,7 +1069,7 @@ void SIScan::UpdateVCTinDB(int tid_db,
     (void) force_update;
 
     VERBOSE(VB_SIPARSER, QString("UpdateVCTinDB(): mplex: %1:%2")
-            .arg(tid_db).arg((*scanIt).mplexid));
+            .arg(tid_db).arg((*current).mplexid));
     int db_mplexid = ChannelUtil::GetBetterMplexID(
         tid_db, vct->TransportStreamID(), 1);
 
@@ -1089,7 +1082,7 @@ void SIScan::UpdateVCTinDB(int tid_db,
 
 /*    bool fta_only     = ignore_encrypted_services(db_mplexid, videodevice);*/
     int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
-    int freqid         = (*scanIt).friendlyNum;
+    int freqid         = (*current).friendlyNum;
 
     for (uint i = 0; i < vct->ChannelCount(); i++)
     {
@@ -1141,7 +1134,7 @@ void SIScan::UpdateVCTinDB(int tid_db,
             .arg(vct->ShortChannelName(i))
             .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i))
             .arg(chan_num)
-            .arg((*scanIt).FriendlyName).arg(freqid);
+            .arg((*current).FriendlyName).arg(freqid);
 
         if (chanid < 0)
         {   // The service is not in database, add it
@@ -1426,7 +1419,7 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
         ignore_encrypted_services(db_mplexid, GetDVBChannel()->GetDevice());
 
     int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
-    int freqid         = (*scanIt).friendlyNum;
+    int freqid         = (*current).friendlyNum;
 
     for (s = SDT.begin() ; s != SDT.end() ; ++s )
     {
@@ -1478,7 +1471,7 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
             .arg(service_name)
             .arg((*s).ChanNum / 10).arg((*s).ChanNum % 10)
             .arg(chan_num)
-            .arg((*scanIt).FriendlyName).arg(freqid);
+            .arg((*current).FriendlyName).arg(freqid);
 
         if (!(*s).ATSCSourceID)
             common_status_info = service_name;
@@ -1702,9 +1695,9 @@ void SIScan::HandleSIParserEvents(void)
         return;
 
     int mplex = -1;
-    if (scanTransports.size() && scanIt != scanTransports.end() &&
-        (*scanIt).mplexid > 0)
-        mplex = (*scanIt).mplexid;
+    if (scanTransports.size() && current != scanTransports.end() &&
+        (*current).mplexid > 0)
+        mplex = (*current).mplexid;
     else if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() > 0)
         mplex = GetDVBChannel()->GetMultiplexID();
 
@@ -1713,7 +1706,7 @@ void SIScan::HandleSIParserEvents(void)
         if (siparser->GetServiceObject(SDT))
         {
             UpdateServicesInDB(mplex, SDT);
-            scanOffsetIt = 99;
+            nextIt = current.nextTransport();
         }
         serviceListReady = false;
         if (scanMode == TRANSPORT_LIST)

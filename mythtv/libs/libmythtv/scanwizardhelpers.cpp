@@ -56,26 +56,27 @@ ScanProgressPopup::ScanProgressPopup(ScanWizardScanner *parent,
 
     if (signalmonitors)
     {
-        HorizontalConfigurationGroup *box = new HorizontalConfigurationGroup();
+        VerticalConfigurationGroup *box = new VerticalConfigurationGroup();
         box->addChild(sta = new TransLabelSetting());
         box->addChild(sl = new TransLabelSetting());
-        sta->setLabel(QObject::tr("Status"));
+        sta->setLabel(tr("Status"));
         sta->setValue(tr("Tuning"));
-        sl->setValue("                           ");
+        sl->setValue("                                  "
+                     "                                  ");
         box->setUseFrame(false);
         addChild(box);
     }
 
     addChild(progressBar = new ScanSignalMeter(PROGRESS_MAX));
     progressBar->setValue(0);
-    progressBar->setLabel(QObject::tr("Scan"));
+    progressBar->setLabel(tr("Scan"));
 
     if (signalmonitors)
     {
         addChild(ss = new ScanSignalMeter(65535));
         addChild(sn = new ScanSignalMeter(65535));
-        ss->setLabel(QObject::tr("Signal Strength"));
-        sn->setLabel(QObject::tr("Signal/Noise"));
+        ss->setLabel(tr("Signal Strength"));
+        sn->setLabel(tr("Signal/Noise"));
     }
 
     TransButtonSetting *cancel = new TransButtonSetting();
@@ -105,7 +106,7 @@ void ScanProgressPopup::signalStrength(int value)
 
 void ScanProgressPopup::dvbLock(int value)
 {
-    sl->setValue(value ? "Locked" : "No Lock");
+    sl->setValue((value) ? tr("Locked") : tr("No Lock"));
 }
 
 void ScanProgressPopup::status(const QString& value)

@@ -34,8 +34,6 @@ class TransportScanItem;
 
 typedef QMap<QString, const FrequencyTable*> freq_table_map_t;
 typedef vector<const FrequencyTable*>        freq_table_list_t;
-typedef QValueList<TransportScanItem>        transport_scan_items_t;
-typedef transport_scan_items_t::iterator     transport_scan_items_it_t;
 
 void init_freq_tables();
 
@@ -161,12 +159,91 @@ class TransportScanItem
     uint      frequency;        ///< Tuning frequency if mplexid == -1
     uint      modulation;       ///< Tuning frequency if mplexid == -1
 #endif
-
-    bool      complete;         ///< Used by old siscan
-    int       offset1;          ///< Used by old siscan
-    int       offset2;          ///< Used by old siscan
-
     QString toString() const;
 };
+
+class transport_scan_items_it_t
+{
+  public:
+    transport_scan_items_it_t() : _offset(0) {}
+    transport_scan_items_it_t(const QValueList<TransportScanItem>::iterator it)
+    {
+        _it = it;
+        _offset = 0;
+    }
+
+    transport_scan_items_it_t& operator++()
+    {
+        _offset++;
+        if ((uint)_offset >= (*_it).offset_cnt())
+        {
+            ++_it;
+            _offset = 0;
+        }
+        return *this;
+    }
+    transport_scan_items_it_t& operator--()
+    {
+        _offset--;
+        if (_offset < 0)
+        {
+            --_it;
+            _offset = (*_it).offset_cnt() - 1;
+        }
+        return *this;
+    }
+
+    transport_scan_items_it_t operator++(int)
+        { transport_scan_items_it_t tmp = *this; return ++tmp; }
+    transport_scan_items_it_t operator--(int)
+        { transport_scan_items_it_t tmp = *this; return --tmp; }
+
+    transport_scan_items_it_t& operator+=(int incr)
+        { for (int i = 0; i < incr; i++) ++(*this); return *this; }
+    transport_scan_items_it_t& operator-=(int incr)
+        { for (int i = 0; i < incr; i++) --(*this); return *this; }
+
+
+    const TransportScanItem& operator*() const { return *_it; }
+    TransportScanItem&       operator*()       { return *_it; }
+
+    uint offset() const { return (uint) _offset; }
+    transport_scan_items_it_t nextTransport() const
+    {
+        transport_scan_items_it_t tmp = _it;
+        return transport_scan_items_it_t(++tmp);
+    }
+  private:
+    QValueList<TransportScanItem>::iterator _it;
+    int _offset;
+
+    friend bool operator==(const transport_scan_items_it_t&,
+                           const transport_scan_items_it_t&);
+    friend bool operator!=(const transport_scan_items_it_t&,
+                           const transport_scan_items_it_t&);
+
+    friend bool operator==(const transport_scan_items_it_t&,
+                           const QValueList<TransportScanItem>::iterator&);
+};
+
+inline bool operator==(const transport_scan_items_it_t& A,
+                       const transport_scan_items_it_t &B)
+{
+    return (A._it == B._it) && (A._offset == B._offset);
+}
+
+inline bool operator!=(const transport_scan_items_it_t &A,
+                       const transport_scan_items_it_t &B)
+{
+    return (A._it != B._it) || (A._offset != B._offset);
+}
+
+inline bool operator==(const transport_scan_items_it_t& A,
+                       const QValueList<TransportScanItem>::iterator& B)
+{
+    return A._it == B && (0 == A.offset());
+}
+
+typedef QValueList<TransportScanItem> transport_scan_items_t;
 
 #endif // FREQUENCY_TABLE_H

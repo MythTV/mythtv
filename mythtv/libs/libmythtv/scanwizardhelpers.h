@@ -595,10 +595,10 @@ class QAMPane : public HorizontalConfigurationGroup
     ScanFec        *pfec;
 };
 
-class ATSCPane : public HorizontalConfigurationGroup
+class ATSCPane : public VerticalConfigurationGroup
 {
   public:
-    ATSCPane() : HorizontalConfigurationGroup(false,false,true,false)
+    ATSCPane() : VerticalConfigurationGroup(false,false,true,false)
     {
         setUseFrame(false);
         addChild(atsc_transport = new ScanATSCTransport());

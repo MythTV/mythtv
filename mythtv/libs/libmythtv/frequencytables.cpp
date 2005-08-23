@@ -8,14 +8,12 @@ static void init_freq_tables(freq_table_map_t&);
 TransportScanItem::TransportScanItem()
     : mplexid(-1),      standard("dvb"),
       FriendlyName(""), SourceID(0),         UseTimer(false),
-      scanning(false),  timeoutTune(DVBT_TUNINGTIMEOUT), complete(false)
+      scanning(false),  timeoutTune(DVBT_TUNINGTIMEOUT)
 { 
     bzero(freq_offsets, sizeof(int)*3);
 #ifdef USING_DVB
     bzero(&tuning, sizeof(DVBTuning));
 #endif
-    complete = false;
-    offset1 = offset2 = 0;
 }
 
 TransportScanItem::TransportScanItem(int sourceid,
@@ -24,15 +22,12 @@ TransportScanItem::TransportScanItem(int sourceid,
                                      int _mplexid)
     : mplexid(_mplexid), standard(std),
       FriendlyName(fn),  SourceID(sourceid), UseTimer(false),
-      scanning(false),   timeoutTune(DVBT_TUNINGTIMEOUT), complete(false)
+      scanning(false),   timeoutTune(DVBT_TUNINGTIMEOUT)
 {
     bzero(freq_offsets, sizeof(int)*3);
 #ifdef USING_DVB
     bzero(&tuning, sizeof(DVBTuning));
 #endif
-    complete = false;
-    offset1 = offset2 = 0;
-
     // set timeout
     timeoutTune = (standard == "dvb") ?
         DVBT_TUNINGTIMEOUT : ATSC_TUNINGTIMEOUT;
@@ -46,15 +41,12 @@ TransportScanItem::TransportScanItem(int sourceid,
                                      const FrequencyTable &ft) :
     mplexid(-1),        standard(std),       FriendlyName(fn),
     friendlyNum(fnum),  SourceID(sourceid),  UseTimer(false),
-    scanning(false), complete(false)
+    scanning(false)
 {
     bzero(freq_offsets, sizeof(int)*3);
 #ifdef USING_DVB
     bzero(&tuning, sizeof(DVBTuning));
 #endif
-    complete = false;
-    offset1 = offset2 = 0;
-
     // set timeout
     timeoutTune = (standard == "dvb") ?
         DVBT_TUNINGTIMEOUT : ATSC_TUNINGTIMEOUT;
@@ -67,8 +59,8 @@ TransportScanItem::TransportScanItem(int sourceid,
     if (standard == "dvb" && dvbft)
     {
         tuning.params.inversion                    = dvbft->inversion;
-        freq_offsets[1] = offset1                  = dvbft->offset1;
-        freq_offsets[2] = offset2                  = dvbft->offset2;
+        freq_offsets[1]                            = dvbft->offset1;
+        freq_offsets[2]                            = dvbft->offset2;
         tuning.params.u.ofdm.bandwidth             = dvbft->bandwidth;
         tuning.params.u.ofdm.code_rate_HP          = dvbft->coderate_hp;
         tuning.params.u.ofdm.code_rate_LP          = dvbft->coderate_lp;
@@ -84,8 +76,8 @@ TransportScanItem::TransportScanItem(int sourceid,
 #endif
         if (dvbft)
         {
-            freq_offsets[1] = offset1              = dvbft->offset1;
-            freq_offsets[2] = offset2              = dvbft->offset2;
+            freq_offsets[1]                        = dvbft->offset1;
+            freq_offsets[2]                        = dvbft->offset2;
         }
     }
 #else
@@ -125,8 +117,8 @@ QString TransportScanItem::toString() const
         .arg(FriendlyName).arg(friendlyNum);
     str += QString("\tmplexid(%1) standard(%2) sourceid(%3)\n")
         .arg(mplexid).arg(standard).arg(SourceID);
-    str += QString("\tUseTimer(%1) scanning(%2) complete(%1)\n")
-        .arg(UseTimer).arg(scanning).arg(complete);
+    str += QString("\tUseTimer(%1) scanning(%2)\n")
+        .arg(UseTimer).arg(scanning);
     str += QString("\ttimeoutTune(%3 msec)\n").arg(timeoutTune);
 #ifdef USING_DVB
 #if (DVB_API_VERSION_MINOR == 1)
@@ -156,13 +148,8 @@ QString TransportScanItem::toString() const
     str += QString("\tfrequency(%1) modulation(%2)")
         .arg(frequency).arg(modulation);
 #endif // USING_DVB
-#if 1
-    str += QString("\toffset1(%1) offset2(%2)\n")
-        .arg(offset1).arg(offset2);
-#else
     str += QString("\t offset[0..2]: %1 %2 %3")
         .arg(freq_offsets[0]).arg(freq_offsets[1]).arg(freq_offsets[2]);
-#endif
     return str;
 }
 

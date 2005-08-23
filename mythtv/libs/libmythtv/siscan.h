@@ -112,8 +112,9 @@ class SIScan : public QObject
     /// \brief Thunk to call RunScanner from pthread
     static void *SpawnScanner(void *param);
 
+    bool HasTimedOut(void);
     void HandleActiveScan(void);
-    void ScanTransport(TransportScanItem &item, uint scanOffsetIt);
+    void ScanTransport(transport_scan_items_it_t transport);
 
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
@@ -132,6 +133,8 @@ class SIScan : public QObject
     void UpdateSDTinDB(int mplexid,
                        const ServiceDescriptionTable*,
                        bool force_update);
+
+    bool HandlePostInsertion(void);
 
     void OptimizeNITFrequencies(NetworkInformationTable *nit);
 
@@ -167,8 +170,8 @@ class SIScan : public QObject
     // Transports List
     int                         transportsScanned;
     transport_scan_items_t      scanTransports;
-    transport_scan_items_it_t   scanIt;
-    uint                        scanOffsetIt;
+    transport_scan_items_it_t   current;
+    transport_scan_items_it_t   nextIt;
     QMap<uint, uint>            dvbChanNums;
 
 #ifdef USE_SIPARSER

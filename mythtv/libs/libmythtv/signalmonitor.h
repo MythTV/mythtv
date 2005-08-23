@@ -79,6 +79,12 @@ public:
     /// \brief Returns milliseconds between signal monitoring events.
     int GetUpdateRate() { return update_rate; }
     virtual QStringList GetStatusList(bool kick = true);
+    /// \brief Returns true iff signalLock.IsGood() returns true
+    bool HasSignalLock(void) const
+    {
+        QMutexLocker locker(&statusLock);
+        return signalLock.IsGood();        
+    }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Sets  // // // // // // // // // // // // // // // // // // // // //
