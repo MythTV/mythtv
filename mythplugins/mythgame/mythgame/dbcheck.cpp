@@ -10,7 +10,7 @@ using namespace std;
 
 #include "gamesettings.h"
 
-const QString currentDatabaseVersion = "1007";
+const QString currentDatabaseVersion = "1008";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -1092,6 +1092,18 @@ bool UpgradeGameDatabaseSchema(void)
         if (!performActualUpdate(updates, "1007", dbver))
             return false;
     }
+
+    if (dbver == "1007")
+    {
+        const QString updates[] = {
+"ALTER TABLE gameplayers MODIFY commandline TEXT NOT NULL default ''; ",
+""
+};
+
+        if (!performActualUpdate(updates, "1008", dbver))
+            return false;
+    }
+
 
     return true;
 }

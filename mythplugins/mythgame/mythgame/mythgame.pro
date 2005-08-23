@@ -15,10 +15,10 @@ INSTALLS += uifiles installfiles
 
 # Input
 HEADERS += gamehandler.h rominfo.h unzip.h gamesettings.h gametree.h
-HEADERS += rom_metadata.h
+HEADERS += rom_metadata.h romedit.h
 
 SOURCES += main.cpp gamehandler.cpp rominfo.cpp gametree.cpp unzip.c
-SOURCES += gamesettings.cpp dbcheck.cpp rom_metadata.cpp
+SOURCES += gamesettings.cpp dbcheck.cpp rom_metadata.cpp romedit.cpp
 
 macx {
     QMAKE_LFLAGS += -flat_namespace -undefined suppress

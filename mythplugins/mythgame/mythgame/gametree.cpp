@@ -286,8 +286,6 @@ void GameTree::handleTreeListSelection(int nodeInt, IntVector *)
 
         if (item->isLeaf())
         {
-cerr << "handleTreeListSelection RomCount " << item->getRomInfo()->RomCount() <<  endl;
-
             if (item->getRomInfo()->RomCount() == 1)
                 GameHandler::Launchgame(item->getRomInfo(),NULL);
             else if (item->getRomInfo()->RomCount() > 1)
@@ -299,7 +297,7 @@ cerr << "handleTreeListSelection RomCount " << item->getRomInfo()->RomCount() <<
 
                 if (val != -1) {
                     QString systemname = getElement(players,val);
-                    if (systemname)
+                    if ((systemname) && (systemname != "Cancel"))
                         GameHandler::Launchgame(item->getRomInfo(),systemname);
                 }
             } 
@@ -327,21 +325,43 @@ void GameTreeItem::showGameInfo(RomInfo *rom)
     info_popup = new MythPopupBox(gContext->GetMainWindow(), "info_popup");
 
     info_popup->addLabel(QObject::tr("Rom Information\n"));
+    info_popup->addLabel(QString("Name: %1").arg(rom->Gamename()));
     info_popup->addLabel(QString("Rom : %1").arg(rom->Romname()));
     info_popup->addLabel(QString("CRC : %1").arg(rom->CRC_VALUE()));
     info_popup->addLabel(QString("Path: %1").arg(rom->Rompath()));
     info_popup->addLabel(QString("Type: %1").arg(rom->GameType()));
+    info_popup->addLabel(QString("Genre: %1").arg(rom->Genre()));
+    info_popup->addLabel(QString("Year: %1").arg(rom->Year()));
+    info_popup->addLabel(QString("Country: %1").arg(rom->Country()));
+    info_popup->addLabel(QString("DiskCount : %1").arg(rom->DiskCount()));
     info_popup->addLabel(QString("Player(s): %1").arg(rom->AllSystems())); 
 
     OKButton = info_popup->addButton(QString("OK"), this,
                               SLOT(closeGameInfo()));
     OKButton->setFocus();
+    info_popup->addButton(QString("EDIT"), this,
+                              SLOT(edit()));
 
     info_popup->ShowPopup(this,SLOT(closeGameInfo()));
 }
 
 void GameTreeItem::closeGameInfo(void)
 {
+    if (!info_popup)
+        return;
+
+    info_popup->hide();
+    delete info_popup;
+    info_popup = NULL;
+}
+
+void GameTreeItem::edit(void)
+{
+    if (m_romInfo)
+    {
+        m_romInfo->edit_rominfo();
+    }
+
     if (!info_popup)
         return;
 

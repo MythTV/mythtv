@@ -216,7 +216,7 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
     QString queryvalues;
 
     QString lastrom = "";
-    QRegExp multiDiskRGXP = QRegExp( ".[0-4].*$", TRUE, FALSE );
+    QRegExp multiDiskRGXP = QRegExp( "[0-4]$", TRUE, FALSE );
     int diskcount = 0;
     QString firstname;
     QString basename;
@@ -280,10 +280,19 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
 
                 if (handler->SpanDisks()) 
                 {
-                    if (RomName.contains(multiDiskRGXP))
                     {
-                        basename = GameName.left(GameName.findRev("."));
+                        basename = GameName.right(1);
+                       
+                       if (basename.contains(multiDiskRGXP))
+                           {
+                           basename = GameName.left(GameName.length() - 1);
 
+                           if (basename.right(1) == ".")
+                               basename = GameName.left(GameName.length() - 2);
+                           }
+                       else
+                           basename = GameName;
+                       
                         if (basename == lastrom)
                         {
                             displayrom = 0;
@@ -299,8 +308,7 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
                             lastrom = basename;
                             diskcount = 1;
                         }
-                        GameName = GameName.left(GameName.findRev("."));
-                           
+                        GameName = basename;                       
                     }
                 }
 
@@ -481,14 +489,15 @@ void GameHandler::Launchgame(RomInfo *romdata, QString systemname)
                 {
                     if (romdata->DiskCount() > 1) 
                     {
-                        QString basename = romdata->Gamename().left(romdata->Gamename().findRev("."));
+			// Chop off the extension, .  and last character of the name which we are assuming is the disk #
+                        QString basename = romdata->Romname().left(romdata->Romname().length() - (romdata->getExtension().length() + 2));
                         QString extension = romdata->getExtension();
                         QString rom;
                         QString diskid[] = { "%d0", "%d1", "%d2", "%d3", "%d4", "%d5", "%d6" };
 
                         for (int disk = 1; disk <= romdata->DiskCount(); disk++)
                         {
-                            rom = QString("\"%1/%2.%3.%4\"")
+                            rom = QString("\"%1/%2%3.%4\"")
                                           .arg(romdata->Rompath())
                                           .arg(basename)
                                           .arg(disk)

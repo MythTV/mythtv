@@ -4,6 +4,7 @@
 #include <mythtv/mythdbcon.h>
 
 #include "rominfo.h"
+#include "romedit.h"
 
 bool operator==(const RomInfo& a, const RomInfo& b)
 {
@@ -12,7 +13,14 @@ bool operator==(const RomInfo& a, const RomInfo& b)
     return false;
 }
 
-// Return the count of how many times this apperas in the db already
+
+void RomInfo::edit_rominfo()
+{
+    RomEditDLG romeditdlg(Romname().latin1());
+    romeditdlg.exec();
+}
+
+// Return the count of how many times this appears in the db already
 int romInDB(QString rom, QString gametype)
 {
     QString thequery;
@@ -194,10 +202,5 @@ void RomInfo::fillData()
     } else 
         allsystems = system;
 
-}
-
-void RomInfo::edit_rominfo()
-{
-    cout << " edit_rominfo() " << endl;
 }
 

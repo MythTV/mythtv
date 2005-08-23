@@ -76,6 +76,7 @@ class GameTreeItem : public QObject
 
   protected slots:
     void closeGameInfo(void);
+    void edit(void);
 
   private:
     QButton *OKButton;
