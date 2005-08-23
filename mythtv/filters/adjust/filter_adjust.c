@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "config.h"
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -16,7 +17,6 @@
 
 #ifdef MMX
 
-#include "config.h"
 #include "dsputil.h"
 #include "i386/mmx.h"
 
