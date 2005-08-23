@@ -35,6 +35,7 @@ class DVBChannel;
 class SignalMonitor;
 class DTVSignalMonitor;
 class DVBSignalMonitor;
+class ProgramAssociationTable;
 class ServiceDescriptionTable;
 class NetworkInformationTable;
 class VirtualChannelTable;
@@ -116,6 +117,11 @@ class SIScan : public QObject
 
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);
+
+    void HandleMPEGDBInsertion(const ScanStreamData *sd, bool wait);
+    void UpdatePATinDB(int mplexid,
+                       const ProgramAssociationTable*,
+                       bool force_update);
 
     void HandleATSCDBInsertion(const ScanStreamData *sd, bool wait);
     void UpdateVCTinDB(int mplexid,

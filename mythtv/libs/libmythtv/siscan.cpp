@@ -304,6 +304,24 @@ void SIScan::HandleNIT(const NetworkInformationTable*)
     emit TransportScanComplete();
 }
 
+void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
+{
+    const ProgramAssociationTable *pat = sd->GetCachedPAT();
+    if (pat)
+    {
+        UpdatePATinDB((*scanIt).mplexid, pat, true);
+        sd->ReturnCachedTable(pat);
+    }
+
+    // tell UI we are done with these channels
+    if (scanMode == TRANSPORT_LIST)
+    {
+        UpdateScanPercentCompleted();
+        waitingForTables = false;
+        scanOffsetIt = 99;
+    }
+}
+
 void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd, bool wait_until_complete)
 {
     bool hasAll = sd->HasCachedAllVCTs();
@@ -327,14 +345,15 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd, bool wait_until_com
     {
         UpdateScanPercentCompleted();
         waitingForTables = false;
+        scanOffsetIt = 99;
     }
 }
 
-void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd, bool wait_until_complete)
+void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd, bool)
 {
-    bool hasAll = sd->HasCachedAllVCTs();
-    if (wait_until_complete && !hasAll)
-        return;
+    //bool hasAll = sd->HasCachedAllSDTs();
+    //if (wait_until_complete && !hasAll)
+    //    return;
 
     emit ServiceScanUpdateText(tr("Updating Services"));
 
@@ -349,6 +368,7 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd, bool wait_until_comp
     {
         UpdateScanPercentCompleted();
         waitingForTables = false;
+        scanOffsetIt = 99;
     }
     else
     {
@@ -481,10 +501,20 @@ void SIScan::HandleActiveScan(void)
     bool timed_out = ((scanTimeout > 0) && (timer.elapsed() > scanTimeout));
     if (timed_out)
     {
-        if (scanOffsetIt < (*scanIt).offset_cnt())
+        if (waitingForTables)
         {
-            emit ServiceScanUpdateText(time_out_table_str);
-            SISCAN(time_out_table_str);
+            DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
+            ScanStreamData *sd = NULL;
+            if (dtvSigMon && (sd = dtvSigMon->GetScanStreamData()) &&
+                sd->HasCachedPAT())
+            {
+                HandleMPEGDBInsertion(sd, false);
+            }
+            else if (scanOffsetIt < (*scanIt).offset_cnt())
+            {
+                emit ServiceScanUpdateText(time_out_table_str);
+                SISCAN(time_out_table_str);
+            }
         }
         waitingForTables = false;
     }
@@ -923,7 +953,81 @@ static uint scan_for_best_freq(const TransportObject& transport,
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
 
-/** \fn UpdateVCTinDB(int, const const VirtualChannelTable*, bool)
+/** \fn UpdatePATinDB(int, const ProgramAssociationTable*, bool)
+ */
+void SIScan::UpdatePATinDB(int tid_db,
+                           const ProgramAssociationTable *pat,
+                           bool)
+{
+    VERBOSE(VB_SIPARSER, QString("UpdatePATinDB(): mplex: %1:%2")
+            .arg(tid_db).arg((*scanIt).mplexid));
+
+    int db_mplexid = ChannelUtil::GetBetterMplexID(
+        tid_db, pat->TransportStreamID(), 1);
+
+    if (db_mplexid == -1)
+    {
+        VERBOSE(VB_IMPORTANT, "VCT: Error determing what transport this "
+                "service table is associated with so failing");
+        return;
+    }
+
+    int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
+    int freqid         = (*scanIt).friendlyNum;
+
+    for (uint i = 0; i < pat->ProgramCount(); i++)
+    {
+        // See if service already in database based on program number
+        int chanid = ChannelUtil::GetChanID(
+            db_mplexid, -1, 0, 0, pat->ProgramNumber(i));
+
+        QString chan_num = ChannelUtil::GetChanNum(chanid);
+        if (chan_num == QString::null || chan_num == "")
+        {
+            chan_num = channelFormat
+                .arg(pat->TransportStreamID())
+                .arg(pat->ProgramNumber(i));
+        }
+
+        QString service_name = QString("Unknown %1").arg(chan_num);
+
+        QString common_status_info = tr("%1 %2-%3 as %4 on %5 (%6)")
+            .arg(service_name)
+            .arg(0).arg(0)
+            .arg(chan_num)
+            .arg((*scanIt).FriendlyName).arg(freqid);
+
+        if (chanid < 0)
+        {   // The service is not in database, add it
+            emit ServiceScanUpdateText(
+                tr("Adding %1").arg(common_status_info));
+            chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
+            ChannelUtil::CreateChannel(
+                db_mplexid, db_source_id, chanid,
+                service_name,
+                chan_num,
+                pat->ProgramNumber(i),
+                0, 0,
+                false, false, false, freqid);
+        }
+        else
+        {   // The service is in database, update it
+            emit ServiceScanUpdateText(
+                tr("Updating %1").arg(common_status_info));
+            ChannelUtil::UpdateChannel(
+                db_mplexid,
+                db_source_id,
+                chanid,
+                service_name,
+                chan_num,
+                pat->ProgramNumber(i),
+                0, 0,
+                freqid);
+        }
+    }    
+}
+
+/** \fn UpdateVCTinDB(int, const VirtualChannelTable*, bool)
  */
 void SIScan::UpdateVCTinDB(int tid_db,
                            const VirtualChannelTable *vct,
