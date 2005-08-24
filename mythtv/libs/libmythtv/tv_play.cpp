@@ -1003,8 +1003,10 @@ void TV::StartOSD()
  */
 void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 {
+    VERBOSE(VB_PLAYBACK, "TV::StopStuff() -- begin");
     if (stopRingBuffers)
     {
+        VERBOSE(VB_PLAYBACK, "TV::StopStuff(): stopping ring buffer[s]");
         if (prbuffer)
         {
             prbuffer->StopReads();
@@ -1022,6 +1024,7 @@ void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 
     if (stopPlayers)
     {
+        VERBOSE(VB_PLAYBACK, "TV::StopStuff(): stopping player[s] (1/2)");
         if (nvp)
             nvp->StopPlaying();
 
@@ -1031,6 +1034,7 @@ void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 
     if (stopRecorders)
     {
+        VERBOSE(VB_PLAYBACK, "TV::StopStuff(): stopping recorder[s]");
         if (recorder)
             recorder->StopLiveTV();
 
@@ -1040,12 +1044,14 @@ void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 
     if (stopPlayers)
     {
+        VERBOSE(VB_PLAYBACK, "TV::StopStuff(): stopping player[s] (2/2)");
         if (nvp)
             TeardownPlayer();
 
         if (pipnvp)
             TeardownPipPlayer();
     }
+    VERBOSE(VB_PLAYBACK, "TV::StopStuff() -- end");
 }
 
 void TV::SetupPlayer(bool isWatchingRecording)

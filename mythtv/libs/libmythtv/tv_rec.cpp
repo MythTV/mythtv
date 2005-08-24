@@ -33,6 +33,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "scheduledrecording.h"
 #include "eitscanner.h"
+#include "videosource.h"
 
 #include "atscstreamdata.h"
 #include "hdtvrecorder.h"
@@ -184,12 +185,7 @@ bool TVRec::Init(void)
             channel->SetChannelByString(startchannel);
         else
             channel->SwitchToInput(inputname, startchannel);
-#else
-        VERBOSE(VB_IMPORTANT, "ERROR: DBOX2 Input configured, "
-                              "but no DBOX2 support compiled in!");
-        VERBOSE(VB_IMPORTANT, "Remove the card from configuration, "
-                              "or recompile MythTV.");
-        exit(-20);
+        init_run = true;
 #endif
     }
     else if ((cardtype == "MPEG") && (videodev.lower().left(5) == "file:"))
@@ -1952,6 +1948,7 @@ void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
 
 void setup_table_monitoring(ChannelBase* channel,
                             DTVSignalMonitor* dtvSignalMonitor,
+                            TVRec *tv_rec,
                             RecorderBase* recorder)
 {
     (void) recorder;
@@ -1959,8 +1956,16 @@ void setup_table_monitoring(ChannelBase* channel,
 
     pid_cache_t pid_cache;
     channel->GetCachedPids(pid_cache);
-#if 0
+#if 1
     int progNum = channel->GetProgramNumber();
+#ifdef USING_DVB
+    if (progNum < 0)
+    {
+        DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+        progNum = dvbc->GetServiceID();
+        VERBOSE(VB_RECORD, "using service id as program number");
+    }
+#endif //USING_DVB
     if (progNum >= 0)
     {
         VERBOSE(VB_RECORD, "mpeg program number: "<<progNum);
@@ -1980,6 +1985,10 @@ void setup_table_monitoring(ChannelBase* channel,
         sd->Reset(progNum);
 
         dtvSignalMonitor->SetProgramNumber(progNum);
+        bool fta = CardUtil::IgnoreEncrypted(
+            tv_rec->GetCaptureCardNum(), channel->GetCurrentInput());
+        dtvSignalMonitor->SetFTAOnly(fta);
+
         dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
 
         return;
@@ -2006,6 +2015,7 @@ void setup_table_monitoring(ChannelBase* channel,
         dtvSignalMonitor->SetStreamData(sd);
         sd->Reset(major, minor);
         dtvSignalMonitor->SetChannel(major, minor);
+        dtvSignalMonitor->SetFTAOnly(true);
 
         VERBOSE(VB_RECORD, "set up table monitoring successfully");
 
@@ -2095,7 +2105,7 @@ void TVRec::SetupSignalMonitor(void)
         // If this is a monitor for Digital TV, initialize table monitors
         DTVSignalMonitor *dtvMon = dynamic_cast<DTVSignalMonitor*>(signalMonitor);
         if (dtvMon)
-            setup_table_monitoring(channel, dtvMon, recorder);
+            setup_table_monitoring(channel, dtvMon, this, recorder);
 
         // Start the monitoring thread
         signalMonitor->Start();
