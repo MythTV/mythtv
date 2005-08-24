@@ -94,6 +94,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     killState = kDone;
     waitToStart = false;
 
+    connected = false;
     rbuffer = NULL;
     nvp = NULL;
 
@@ -3253,6 +3254,8 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
         if (action == "ESCAPE")
             exitWin();
+        else if (!connected)
+            handled = false;
         else if (action == "1" || action == "HELP")
             showIconHelp();
         else if (action == "MENU")
