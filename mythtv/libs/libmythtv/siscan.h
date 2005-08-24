@@ -114,7 +114,9 @@ class SIScan : public QObject
 
     bool HasTimedOut(void);
     void HandleActiveScan(void);
-    void ScanTransport(transport_scan_items_it_t transport);
+    bool Tune(const transport_scan_items_it_t transport);
+    int InsertMultiplex(const transport_scan_items_it_t transport);
+    void ScanTransport(const transport_scan_items_it_t transport);
 
     /// \brief Updates Transport Scan progress bar
     inline void UpdateScanPercentCompleted(void);

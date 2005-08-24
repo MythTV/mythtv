@@ -44,6 +44,7 @@
 #define ATSC_TABLES_TIMEOUT 1500
 /// \brief How long we wait for DVB tables, before giving up
 #define DVB_TABLES_TIMEOUT  40000
+#define SIPARSER_EXTRA_TIME 2000
 
 #ifdef USING_DVB
 static uint scan_for_best_freq(const TransportObject& transport,
@@ -107,7 +108,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
       ignoreAudioOnlyServices(true),
       ignoreEncryptedServices(false),
       forceUpdate(false),
-      scanTimeout(0), /* Set scan timeout off by default */
+      scanTimeout(DVB_TABLES_TIMEOUT),
       channelFormat("%1_%2"),
       // State
       threadExit(false),
@@ -131,7 +132,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
 
         if (GetDVBChannel())
         {
-            VERBOSE(VB_SIPARSER, "Creating SIParser");
+            SISCAN("Creating SIParser");
             siparser = new DVBSIParser(GetDVBChannel()->GetCardNum());
             pthread_create(&siparser_thread, NULL, SpawnSectionReader, siparser);
             connect(siparser,        SIGNAL(UpdatePMT(const PMTObject*)),
@@ -139,7 +140,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
         }    
         if (siparser)
         {
-            VERBOSE(VB_IMPORTANT, "Connecting up SIParser");
+            SISCAN("Connecting up SIParser");
             /* Signals to process tables and do database inserts */
             connect(siparser, SIGNAL(FindTransportsComplete()),
                     this,     SLOT(TransportTableComplete()));
@@ -154,7 +155,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
     DTVSignalMonitor* dtvSigMon = GetDTVSignalMonitor();
     if (dtvSigMon)
     {
-        VERBOSE(VB_SIPARSER, "Connecting up DTVSignalMonitor");
+        SISCAN("Connecting up DTVSignalMonitor");
         MPEGStreamData *data = new ScanStreamData();
 
         // Get NIT before we enable SDT in case of UK channel descriptor.
@@ -195,7 +196,7 @@ void *SIScan::SpawnSectionReader(void *param)
 bool SIScan::ScanTransports(const QString _sistandard)
 {
     (void) _sistandard;
-    VERBOSE(VB_SIPARSER, "ScanTransports()");
+    SISCAN("ScanTransports()");
 #ifdef USE_SIPARSER
     if (siparser)
     {
@@ -264,6 +265,10 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         TransportScanItem item(sourceid, std, fn, mplexid);
         scanTransports += item;
     }
+#ifdef USE_SIPARSER
+    if (siparser)
+        scanTimeout += SIPARSER_EXTRA_TIME;
+#endif
 
     waitingForTables  = false;
     transportsScanned = 0;
@@ -344,6 +349,9 @@ void SIScan::HandleNIT(const NetworkInformationTable*)
 
 void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
 {
+    if ((*current).mplexid <= 0)
+        (*current).mplexid = InsertMultiplex(current);
+
     const ProgramAssociationTable *pat = sd->GetCachedPAT();
     if (pat)
     {
@@ -365,6 +373,9 @@ void SIScan::HandleATSCDBInsertion(const ScanStreamData *sd, bool wait_until_com
     bool hasAll = sd->HasCachedAllVCTs();
     if (wait_until_complete && !hasAll)
         return;
+
+    if ((*current).mplexid <= 0)
+        (*current).mplexid = InsertMultiplex(current);
 
     // Insert Terrestrial VCTs
     tvct_vec_t tvcts = sd->GetAllCachedTVCTs();
@@ -394,6 +405,9 @@ void SIScan::HandleDVBDBInsertion(const ScanStreamData *sd, bool)
     //    return;
 
     emit ServiceScanUpdateText(tr("Updating Services"));
+
+    if ((*current).mplexid <= 0)
+        (*current).mplexid = InsertMultiplex(current);
 
     vector<const ServiceDescriptionTable*> sdts = sd->GetAllCachedSDTs();
     for (uint i = 0; i < sdts.size(); i++)
@@ -427,7 +441,7 @@ bool SIScan::HandlePostInsertion(void)
 
     const ScanStreamData *sd = dtvSigMon->GetScanStreamData();
 
-    VERBOSE(VB_SIPARSER, QString("HandlePostInsertion() pat(%1)")
+    SISCAN(QString("HandlePostInsertion() pat(%1)")
             .arg(sd->HasCachedPAT()));
 
     if (sd->GetCachedMGT())
@@ -478,7 +492,7 @@ Channel *SIScan::GetChannel(void)
 
 bool SIScan::ScanServices(void)
 {
-    VERBOSE(VB_SIPARSER, "SIScan::ScanServices()");
+    SISCAN("SIScan::ScanServices()");
 #ifdef USE_SIPARSER
     // Requests the SDT table for the current transport from sections
     if (siparser)
@@ -558,7 +572,7 @@ bool SIScan::HasTimedOut(void)
         QObject::tr("Timeout Scanning %1 -- no signal").arg(cur_chan);
 
     // have the tables have timed out?
-    if ((scanTimeout > 0) && (timer.elapsed() > scanTimeout))
+    if (timer.elapsed() > scanTimeout)
     { 
         emit ServiceScanUpdateText(time_out_table_str);
         SISCAN(time_out_table_str);
@@ -625,7 +639,66 @@ void SIScan::HandleActiveScan(void)
     }
 }
 
-void SIScan::ScanTransport(transport_scan_items_it_t transport)
+#ifdef USE_SIPARSER
+#define SIP_RESET() do { if (siparser) siparser->Reset(); } while (false)
+#define SIP_PMAP() do { if (ok && siparser) \
+                   siparser->FillPMap(item.standard); } while (false)
+#else // if !USE_SIPARSER
+#define SIP_RESET()
+#define SIP_PMAP()
+#endif // !USE_SIPARSER
+
+bool SIScan::Tune(const transport_scan_items_it_t transport)
+{
+    const TransportScanItem &item = *transport;
+    const uint freq = item.freq_offset(transport.offset());
+    bool ok = false;
+
+#ifdef USING_DVB
+    // Tune to multiplex
+    if (GetDVBChannel())
+    {
+        if (item.mplexid > 0)
+        {
+            SIP_RESET();
+            ok = GetDVBChannel()->TuneMultiplex(item.mplexid);
+            SIP_PMAP();
+        }
+        else
+        {
+            dvb_channel_t dvbchan;
+            dvbchan.sistandard = item.standard;
+            dvbchan.tuning     = item.tuning;
+            dvbchan.tuning.params.frequency = freq;
+
+            SIP_RESET();
+            ok = GetDVBChannel()->Tune(dvbchan, true);
+            SIP_PMAP();
+        }
+    }
+#endif // USING_DVB
+
+#ifdef USING_V4L
+    if (GetChannel())
+    {
+        if (item.mplexid > 0)
+            ok = GetChannel()->TuneMultiplex(item.mplexid);
+        else 
+        {
+            const uint freq_vis = freq - 1750000; // to visual carrier
+            QString inputname = ChannelUtil::GetInputName(item.SourceID);
+            ok = GetChannel()->Tune(freq_vis, inputname, "8vsb");
+        }
+    }
+#endif // USING_V4L
+
+    return ok;
+}
+
+#undef SIP_RESET
+#undef SIP_PMAP
+
+void SIScan::ScanTransport(const transport_scan_items_it_t transport)
 {
     QString offset_str = (transport.offset()) ?
         QObject::tr(" offset %2").arg(transport.offset()) : "";
@@ -635,10 +708,10 @@ void SIScan::ScanTransport(transport_scan_items_it_t transport)
         QObject::tr("Tuning to %1 mplexid(%2)")
         .arg(cur_chan).arg((*current).mplexid);
 
-    TransportScanItem &item = *transport;
-    const uint freq_offset = item.freq_offset(transport.offset());
-    const uint freq_vis = freq_offset - 1750000; // convert to visual carrier
-    if (transport.offset() && (freq_offset == item.freq_offset(0)))
+    const TransportScanItem &item = *transport;
+
+    if (transport.offset() && 
+        (item.freq_offset(transport.offset()) == item.freq_offset(0)))
     {
         waitingForTables = false;
         return; // nothing to do
@@ -647,84 +720,8 @@ void SIScan::ScanTransport(transport_scan_items_it_t transport)
     emit ServiceScanUpdateStatusText(cur_chan);
     SISCAN(tune_msg_str);
 
-    bool ok = false;
-#ifdef USING_DVB
-    // Tune to multiplex
-    if (GetDVBChannel())
-    {
-        if (item.mplexid >= 0)
-        {
-#ifdef USE_SIPARSER
-            if (siparser)
-                siparser->Reset();
-#endif // USE_SIPARSER
-
-            ok = GetDVBChannel()->TuneMultiplex(item.mplexid);
-
-#ifdef USE_SIPARSER
-            if (ok && siparser)
-                siparser->FillPMap(item.standard);
-#endif // USE_SIPARSER
-        }
-        else
-        {
-            dvb_channel_t dvbchan;
-            dvbchan.sistandard = item.standard;
-            dvbchan.tuning     = item.tuning;
-            dvbchan.tuning.params.frequency = freq_offset;
-
-#ifdef USE_SIPARSER
-            if (siparser)
-                siparser->Reset();
-#endif // USE_SIPARSER
-
-            ok = GetDVBChannel()->Tune(dvbchan, true);
-
-#ifdef USE_SIPARSER
-            if (ok && siparser)
-                siparser->FillPMap(item.standard);
-#endif // USE_SIPARSER
-
-            if (ok)
-            {
-                // Try to read the actual values back from the card
-                DVBTuning tuning;
-                bool ok = GetDVBChannel()->GetTuningParams(tuning);
-                if (!ok)
-                    tuning = item.tuning;
-
-                // Write the best info we have to the DB
-                if (FE_OFDM == GetDVBChannel()->GetCardType())
-                    item.mplexid = create_dtv_multiplex_ofdm(item, tuning);
-                else
-                    item.mplexid = ChannelUtil::CreateMultiplex(
-                        item.SourceID, item.standard,
-                        tuning.Frequency(), tuning.ModulationDB());
-            }
-        }
-    }
-#endif // USING_DVB
-#ifdef USING_V4L
-    if (GetChannel())
-    {
-        if (item.mplexid >= 0)
-            ok = GetChannel()->TuneMultiplex(item.mplexid);
-        else 
-        {
-            QString inputname = ChannelUtil::GetInputName(item.SourceID);
-            if (ok = GetChannel()->Tune(freq_vis, inputname, "8vsb"))
-            {
-                item.mplexid = ChannelUtil::CreateMultiplex(
-                    item.SourceID, item.standard, freq_vis, "8vsb");
-            }
-        }
-    }
-#endif
-    ok = (item.mplexid < 0) ? false : ok;
-
-    // If we didn't tune successfully, bail with message
-    if (!ok)
-    {
+    if (!Tune(transport))
+    {   // If we did not tune successfully, bail with message
         UpdateScanPercentCompleted();
         SISCAN(QString("Failed to tune %1 mplexid(%2) at offset %3")
                .arg(item.FriendlyName).arg(item.mplexid).arg(transport.offset()));
@@ -738,9 +735,9 @@ void SIScan::ScanTransport(transport_scan_items_it_t transport)
         GetDTVSignalMonitor()->SetChannel(-1,-1);
 
         // Get NIT before we enable SDT in case of UK channel descriptor.
-#ifdef USING_SIPARSER
+#ifdef USE_SIPARSER
         if (!siparser)
-#endif // USING_SIPARSER
+#endif // USE_SIPARSER
             GetDTVSignalMonitor()->GetScanStreamData()->
                 RemoveListeningPID(DVB_SDT_PID);
     }
@@ -800,7 +797,7 @@ bool SIScan::ScanTransports(int SourceID,
     nextIt = scanTransports.end();
 
     freq_table_list_t tables = get_matching_freq_tables(std, modulation, country);
-    VERBOSE(VB_SIPARSER, QString("Looked up freq table (%1, %2, %3)")
+    SISCAN(QString("Looked up freq table (%1, %2, %3)")
             .arg(std).arg(modulation).arg(country));
 
     freq_table_list_t::iterator it = tables.begin();
@@ -818,7 +815,7 @@ bool SIScan::ScanTransports(int SourceID,
             TransportScanItem item(SourceID, si_std, name, name_num, freq, ft);
             scanTransports += item;
 
-            VERBOSE(VB_SIPARSER, item.toString());
+            SISCAN(item.toString());
 
             name_num++;
             freq += ft.frequencyStep;
@@ -897,6 +894,7 @@ bool SIScan::ScanTransport(int mplexid)
 void SIScan::ServiceTableComplete()
 {
 #ifdef USE_SIPARSER
+    SISCAN("ServiceTableComplete()");
     serviceListReady = true;
 #endif // USE_SIPARSER
 }
@@ -904,6 +902,7 @@ void SIScan::ServiceTableComplete()
 void SIScan::TransportTableComplete()
 {
 #ifdef USE_SIPARSER
+    SISCAN("TransportTableComplete()");
     transportListReady = true;
 #endif // USE_SIPARSER
 }
@@ -993,7 +992,7 @@ void SIScan::UpdatePATinDB(int tid_db,
                            const ProgramAssociationTable *pat,
                            bool)
 {
-    VERBOSE(VB_SIPARSER, QString("UpdatePATinDB(): mplex: %1:%2")
+    SISCAN(QString("UpdatePATinDB(): mplex: %1:%2")
             .arg(tid_db).arg((*current).mplexid));
 
     int db_mplexid = ChannelUtil::GetBetterMplexID(
@@ -1069,8 +1068,8 @@ void SIScan::UpdateVCTinDB(int tid_db,
 {
     (void) force_update;
 
-    VERBOSE(VB_SIPARSER, QString("UpdateVCTinDB(): mplex: %1:%2")
-            .arg(tid_db).arg((*current).mplexid));
+    SISCAN(QString("UpdateVCTinDB(): mplex: %1:%2")
+           .arg(tid_db).arg((*current).mplexid));
     int db_mplexid = ChannelUtil::GetBetterMplexID(
         tid_db, vct->TransportStreamID(), 1);
 
@@ -1689,6 +1688,41 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
 }
 #endif // USE_SIPARSER
 
+int SIScan::InsertMultiplex(const transport_scan_items_it_t transport)
+{
+    int mplexid = -1;
+
+#ifdef USING_DVB
+    if (GetDVBChannel())
+    {
+        // Try to read the actual values back from the card
+        DVBTuning tuning;
+        if (!GetDVBChannel()->GetTuningParams(tuning))
+            tuning = (*transport).tuning;
+
+        // Write the best info we have to the DB
+        if (FE_OFDM == GetDVBChannel()->GetCardType())
+            mplexid = create_dtv_multiplex_ofdm(*transport, tuning);
+        else
+            mplexid = ChannelUtil::CreateMultiplex(
+                (*transport).SourceID, (*transport).standard,
+                tuning.Frequency(), tuning.ModulationDB());
+    }
+#endif // USING_DVB
+
+#ifdef USING_V4L
+    if (GetChannel())
+    {
+        const uint freq = (*transport).freq_offset(transport.offset());
+        const uint freq_vis = freq - 1750000; // convert to visual carrier
+        mplexid = ChannelUtil::CreateMultiplex(
+            (*transport).SourceID, (*transport).standard, freq_vis, "8vsb");
+    }
+#endif // USING_V4L
+
+    return mplexid;
+}
+
 #ifdef USE_SIPARSER
 void SIScan::HandleSIParserEvents(void)
 {
@@ -1699,8 +1733,11 @@ void SIScan::HandleSIParserEvents(void)
     if (current == scanTransports.end())
         return;
 
-    if (serviceListReady && ((*current).mplexid > 0))
+    if (serviceListReady)
     {
+        if ((*current).mplexid <= 0)
+            (*current).mplexid = InsertMultiplex(current);
+
         if (siparser->GetServiceObject(SDT))
         {
             UpdateServicesInDB((*current).mplexid, SDT);
