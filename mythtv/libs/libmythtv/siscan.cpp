@@ -119,6 +119,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
 {
     // Initialize statics
     init_freq_tables();
+    current = scanTransports.end();
 
 #ifdef USE_SIPARSER
     siparser = NULL;
@@ -426,7 +427,7 @@ bool SIScan::HandlePostInsertion(void)
 
     const ScanStreamData *sd = dtvSigMon->GetScanStreamData();
 
-    VERBOSE(VB_IMPORTANT, QString("HandlePostInsertion() pat(%1)")
+    VERBOSE(VB_SIPARSER, QString("HandlePostInsertion() pat(%1)")
             .arg(sd->HasCachedPAT()));
 
     if (sd->GetCachedMGT())
@@ -764,6 +765,8 @@ void SIScan::StopScanner(void)
 {
     threadExit = true;
     SISCAN("Stopping SIScanner");
+    if (scanner_thread_running)
+        pthread_join(scanner_thread, NULL);
 
 #ifdef USE_SIPARSER
     /* Force dvbchannel to exit */
@@ -775,8 +778,6 @@ void SIScan::StopScanner(void)
     }
 #endif // USE_SIPARSER
 
-    if (scanner_thread_running)
-        pthread_join(scanner_thread, NULL);
     if (signalMonitor)
         signalMonitor->Stop();
 }
@@ -1000,7 +1001,7 @@ void SIScan::UpdatePATinDB(int tid_db,
 
     if (db_mplexid == -1)
     {
-        VERBOSE(VB_IMPORTANT, "VCT: Error determing what transport this "
+        VERBOSE(VB_IMPORTANT, "PAT: Error determing what transport this "
                 "service table is associated with so failing");
         return;
     }
@@ -1691,21 +1692,18 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
 #ifdef USE_SIPARSER
 void SIScan::HandleSIParserEvents(void)
 {
+    // if there is no SIParser then we have nothing to do
     if (!siparser)
         return;
+    // ignore events before current is set
+    if (current == scanTransports.end())
+        return;
 
-    int mplex = -1;
-    if (scanTransports.size() && current != scanTransports.end() &&
-        (*current).mplexid > 0)
-        mplex = (*current).mplexid;
-    else if (GetDVBChannel() && GetDVBChannel()->GetMultiplexID() > 0)
-        mplex = GetDVBChannel()->GetMultiplexID();
-
-    if (serviceListReady && (mplex > 0))
+    if (serviceListReady && ((*current).mplexid > 0))
     {
         if (siparser->GetServiceObject(SDT))
         {
-            UpdateServicesInDB(mplex, SDT);
+            UpdateServicesInDB((*current).mplexid, SDT);
             nextIt = current.nextTransport();
         }
         serviceListReady = false;
