@@ -112,9 +112,11 @@ bool DecoderBase::PosMapFromDb(void)
         PosMapEntry e = {it.key(), it.key() * keyframedist, it.data()};
         m_positionMap.push_back(e);
     }
-    VERBOSE(VB_PLAYBACK, QString("Position map filled from DB to: %1")
-            .arg((long int) m_positionMap[m_positionMap.size()-1].index));
-
+    if (!m_positionMap.empty())
+    {
+        VERBOSE(VB_PLAYBACK, QString("Position map filled from DB to: %1")
+                .arg((long int) m_positionMap[m_positionMap.size()-1].index));
+    }
 
     return true;
 }
@@ -180,8 +182,11 @@ bool DecoderBase::PosMapFromEnc(void)
         PosMapEntry e = {it.key(), it.key() * keyframedist, it.data()};
         m_positionMap.push_back(e);
     }
-    VERBOSE(VB_PLAYBACK, QString("Position map filled from Encoder to: %1")
-            .arg((long int) m_positionMap[m_positionMap.size()-1].index));
+    if (!m_positionMap.empty())
+    {
+        VERBOSE(VB_PLAYBACK, QString("Position map filled from Encoder to: %1")
+                .arg((long int) m_positionMap[m_positionMap.size()-1].index));
+    }
 
     return true;
 }
