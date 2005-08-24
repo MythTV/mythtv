@@ -33,6 +33,7 @@ DTVSignalMonitor::DTVSignalMonitor(int capturecardnum,
       matchingSDT(QObject::tr("Matching SDT"),
                   "matching_sdt", 1, true, 0, 1, 0),
       majorChannel(-1), minorChannel(-1), programNumber(-1),
+      ignoreEncrypted(true),
       error("")
 {
 }
@@ -49,8 +50,23 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
     }
     if (flags & kDTVSigMon_WaitForPMT)
     {
+#define DEBUG_PMT 1
+#if DEBUG_PMT
+        static int seenGood = -1;
+        static int matchingGood = -1;
+#endif
         list<<seenPMT.GetName()<<seenPMT.GetStatus();
         list<<matchingPMT.GetName()<<matchingPMT.GetStatus();
+#if DEBUG_PMT
+        if ((seenGood != (int)seenPMT.IsGood()) ||
+            (matchingGood != (int)matchingPMT.IsGood()))
+        {
+            VERBOSE(VB_CHANNEL, "WaitForPMT: seen("<<seenPMT.IsGood()
+                    <<") matching("<<matchingPMT.IsGood()<<")");
+            seenGood = (int)seenPMT.IsGood();
+            matchingGood = (int)matchingPMT.IsGood();
+        }
+#endif
     }
     // atsc tables
     if (flags & kDTVSigMon_WaitForMGT)
@@ -211,19 +227,32 @@ void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
 {
     AddFlags(kDTVSigMon_PMTSeen);
 
+    if (ignoreEncrypted && pmt->IsEncrypted())
+    {
+        VERBOSE(VB_IMPORTANT, "DTVsm: Ignoring encrypted program");
+        return;
+    }
+
     // if PMT contains audio and/or video stream set as matching.
-    for (uint i = 0; i<pmt->StreamCount(); i++)
+    bool hasAudio = false;
+    bool hasVideo = false;
+
+    for (uint i = 0; i < pmt->StreamCount(); i++)
     {
         uint type = pmt->StreamType(i);
-        if ((StreamID::MPEG2Video == type) || (StreamID::MPEG1Video == type) ||
-            (StreamID::MPEG2Audio == type) || (StreamID::MPEG1Audio == type) ||
-            (StreamID::AC3Audio   == type) || (StreamID::AACAudio   == type) ||
-            (StreamID::DTSAudio   == type))
-        {
-            AddFlags(kDTVSigMon_PMTMatch);
-            return;
-        }
+
+        hasVideo |= ((StreamID::MPEG2Video == type) ||
+                     (StreamID::MPEG1Video == type));
+
+        hasAudio |= ((StreamID::MPEG2Audio == type) ||
+                     (StreamID::MPEG1Audio == type) ||
+                     (StreamID::AC3Audio   == type) ||
+                     (StreamID::AACAudio   == type) ||
+                     (StreamID::DTSAudio   == type));
     }
+
+    if (hasVideo && hasAudio)
+        AddFlags(kDTVSigMon_PMTMatch);
 }
 
 void DTVSignalMonitor::SetMGT(const MasterGuideTable* mgt)

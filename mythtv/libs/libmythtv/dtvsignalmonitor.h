@@ -34,6 +34,9 @@ class DTVSignalMonitor: public SignalMonitor
     void SetProgramNumber(int progNum);
     int  GetProgramNumber() const { return programNumber; }
 
+    void SetFTAOnly(bool fta)    { ignoreEncrypted = fta;  }
+    bool GetFTAOnly() const      { return ignoreEncrypted; }
+
     void AddFlags(uint _flags);
     void RemoveFlags(uint _flags);
 
@@ -88,6 +91,7 @@ class DTVSignalMonitor: public SignalMonitor
     int                majorChannel;
     int                minorChannel;
     int                programNumber;
+    bool               ignoreEncrypted;
     QString            error;
 };
 
