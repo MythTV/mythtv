@@ -23,3 +23,4 @@ TRANSLATIONS  = mythmusic_it.ts mythmusic_es.ts mythmusic_ca.ts
 TRANSLATIONS += mythmusic_nl.ts mythmusic_de.ts mythmusic_dk.ts
 TRANSLATIONS += mythmusic_pt.ts mythmusic_sv.ts mythmusic_fr.ts
 TRANSLATIONS += mythmusic_ja.ts mythmusic_si.ts mythmusic_fi.ts
+TRANSLATIONS += mythmusic_nb.ts
