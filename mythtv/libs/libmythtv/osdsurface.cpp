@@ -16,11 +16,11 @@ extern "C" {
 
 OSDSurface::OSDSurface(int w, int h)
 {
-    yuvbuffer = new unsigned char[w * h * 3 / 2];
+    yuvbuffer = new unsigned char[w * (h + 2) * 3 / 2];
     y = yuvbuffer;
     u = yuvbuffer + w * h;
     v = u + w * h / 4;
-    alpha = new unsigned char[w * h];
+    alpha = new unsigned char[w * (h + 2)];
 
     width = w;
     height = h;
@@ -109,6 +109,11 @@ void OSDSurface::ClearUsed(void)
 
         cwidth = drawRect.width();
         uvcwidth = cwidth / 2;
+
+        if (startline < 0) startline = 0;
+        if (endline >= height) endline = height - 1;
+        if (startcol < 0) endcol = 0;
+        if (endcol >= width) endcol = width - 1;
 
         for (int line = startline; line <= endline; line++)
         {
@@ -565,6 +570,11 @@ void OSDSurface::BlendToYV12(unsigned char *yuvptr) const
         endcol = drawRect.right();
         endline = drawRect.bottom();
 
+        if (startline < 0) startline = 0;
+        if (endline >= height) endline = height - 1;
+        if (startcol < 0) endcol = 0;
+        if (endcol >= width) endcol = width - 1;
+
         unsigned char *src, *usrc, *vsrc;
         unsigned char *dest, *udest, *vdest;
         unsigned char *alpha;
@@ -644,14 +654,19 @@ void OSDSurface::BlendToYV12(unsigned char *yuvptr) const
 
 static void BlendToBlack(unsigned char *argbptr, uint width, uint height)
 {
-    for (uint i=0; i<width*height; i++)
+    unsigned int i, argb, a, r, g, b;
+    for (uint i = 0; i < width * height; i++)
     {
-        uint argb = ((uint*)argbptr)[i];
-        uint a = (argb>>24);
-        if (argb && a<250)
+        argb = ((uint*)argbptr)[i];
+        a = (argb >> 24);
+        if (argb && a < 250)
         {
-            uint r = (argb>>16)&0xff, g = (argb>>8)&0xff, b = (argb)&0xff;
-            RGBA_OUT(&argbptr[i*4], (a*r)>>8, (a*g)>>8, (a*b)>>8, 128);
+            r = (argb >> 16) & 0xff;
+            g = (argb >> 8) & 0xff;
+            b = (argb) & 0xff;
+
+            RGBA_OUT(&argbptr[i * 4], (a * r) >> 8, (a * g) >> 8, 
+                     (a * b) >> 8, 128);
         }
     }
 }
@@ -687,6 +702,11 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, uint height,
         startline = drawRect.top();
         endcol = drawRect.right();
         endline = drawRect.bottom();
+
+        if (startline < 0) startline = 0;
+        if (endline >= height) endline = height - 1;
+        if (startcol < 0) endcol = 0;
+        if (endcol >= width) endcol = width - 1;
 
         unsigned char *src, *usrcbase, *vsrcbase, *usrc, *vsrc;
         unsigned char *dest;
@@ -779,6 +799,11 @@ void OSDSurface::DitherToI44(unsigned char *outbuf, bool ifirst,
         startline = drawRect.top();
         endcol = drawRect.right();
         endline = drawRect.bottom();
+
+        if (startline < 0) startline = 0;
+        if (endline >= height) endline = height - 1;
+        if (startcol < 0) endcol = 0;
+        if (endcol >= width) endcol = width - 1;
 
         unsigned char *src;
         unsigned char *dest;

@@ -1310,14 +1310,6 @@ void OSDTypeEditSlider::Draw(OSDSurface *surface, int fade, int maxfade,
     ystart = (ystart / 2) * 2;
     xstart = (xstart / 2) * 2;
 
-    if (height + ystart > surface->height)
-        height = surface->height - ystart - 1;
-    if (width + xstart > surface->width)
-        width = surface->width - xstart - 1;
-
-    if (width == 0 || height == 0)
-        return;
-
     int startline = 0;
     int startcol = 0;
 
@@ -1332,6 +1324,14 @@ void OSDTypeEditSlider::Draw(OSDSurface *surface, int fade, int maxfade,
         startcol = 0 - xstart;
         xstart = 0;
     }
+
+    if (height + ystart > surface->height)
+        height = surface->height - ystart - 1;
+    if (width + xstart > surface->width)
+        width = surface->width - xstart - 1;
+
+    if (width == 0 || height == 0)
+        return;
 
     QRect destRect = QRect(xstart, ystart, width, height);
     surface->AddRect(destRect);
@@ -1574,6 +1574,15 @@ void OSDTypePositionRectangle::Draw(OSDSurface *surface, int fade, int maxfade,
     int yend = rect.bottom() + yoff;
     int xstart = rect.left() + xoff;
     int xend = rect.right() + xoff;
+
+    if (xstart < 0)
+        xstart = 0;
+    if (xend > surface->width)
+        xend = surface->width;
+    if (ystart < 0)
+        ystart = 0;
+    if (yend > surface->height)
+        yend = surface->height;
 
     int height = yend - ystart + 1, width = xend - xstart + 1;
 
