@@ -60,8 +60,6 @@
 #include "dvbsiparser.h"
 #endif // USE_SIPARSER
 
-static bool ignore_encrypted(int cardid, QString input_name);
-
 /// Percentage to set to after the transports have been scanned
 #define TRANSPORT_PCT 6
 /// Percentage to set to after the first tune
@@ -449,7 +447,8 @@ void ScanWizardScanner::scan()
 
         scanner->SetForceUpdate(true);
 
-        bool ftao = ignore_encrypted(parent->captureCard(), channel->GetCurrentInput());
+        bool ftao = CardUtil::IgnoreEncrypted(
+            parent->captureCard(), channel->GetCurrentInput());
         scanner->SetFTAOnly(ftao);
 
         connect(scanner, SIGNAL(ServiceScanComplete(void)),
@@ -709,21 +708,4 @@ void ScanWizardScanner::HandleTuneComplete(void)
     {
         VERBOSE(VB_IMPORTANT, "Failed to handle tune complete.");
     }
-}
-
-static bool ignore_encrypted(int cardid, QString input_name)
-{
-    bool freetoair = true;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        QString("SELECT freetoaironly FROM cardinput "
-                "WHERE cardid='%1' AND inputname='%2'")
-        .arg(cardid).arg(input_name));
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-        freetoair = query.value(0).toBool();
-    }
-    return freetoair;
 }

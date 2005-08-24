@@ -334,6 +334,27 @@ QString CardUtil::GetDefaultInput(uint nCardID)
     return str;
 }
 
+bool CardUtil::IgnoreEncrypted(uint cardid, const QString &input_name)
+{
+    bool freetoair = true;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        QString("SELECT freetoaironly FROM cardinput "
+                "WHERE cardid='%1' AND inputname='%2'")
+        .arg(cardid).arg(input_name));
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        query.next();
+        freetoair = query.value(0).toBool();
+    }
+    //VERBOSE(VB_IMPORTANT,
+    //        QString("CardUtil::IgnoreEncrypted(%1, %2) -> %3")
+    //        .arg(cardid).arg(input_name).arg(freetoair));
+    return freetoair;
+}
+
+
 QString VSSetting::whereClause(void)
 {
     return QString("sourceid = %1").arg(parent.getSourceID());

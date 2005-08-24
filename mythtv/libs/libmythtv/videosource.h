@@ -69,6 +69,8 @@ class CardUtil
 
     static CARD_TYPES   GetDVBType(uint device, QString &name, QString &card_type);
     static QString      GetDefaultInput(uint cardid);
+
+    static bool         IgnoreEncrypted(uint cardid, const QString &inputname);
 };
 
 class VideoSource;
