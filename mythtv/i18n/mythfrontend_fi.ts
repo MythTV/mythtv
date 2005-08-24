@@ -584,13 +584,17 @@ Palaa edelliseen valikkoon.</translation>
         <source>The theme you are using is missing the &apos;file_browser_background&apos; element. 
 
 Returning to the previous menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytetyn teeman &apos;file_browser_background&apos; elementti on hukassa. 
+
+Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>The theme you are using is missing the &apos;file_browser&apos; element. 
 
 Returning to the previous menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytetyn teeman &apos;file_browser&apos; elementti on hukassa. 
+
+Palaa edelliseen valikkoon.</translation>
     </message>
 </context>
 <context>
@@ -633,7 +637,9 @@ Palaa edelliseen valikkoon.</translation>
         <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;.
 
 Returning to the previous menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei löydetty &apos;%1&apos; teemassa &apos;%2.
+
+Palaa edelliseen valikkoon.</translation>
     </message>
 </context>
 <context>
@@ -671,7 +677,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>No, keep it, I changed my mind</source>
-        <translation>Ei . Säilytetään</translation>
+        <translation>Ei. Säilytetään</translation>
     </message>
     <message>
         <source>% used</source>
@@ -1252,7 +1258,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Premieres</source>
-        <translation type="unfinished"></translation>
+        <translation>Ensiesitykset</translation>
     </message>
 </context>
 <context>
@@ -2663,7 +2669,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Hue</source>
-        <translation>Värisävy</translation>
+        <translation>Värikylläisyys</translation>
     </message>
     <message>
         <source>Frequency</source>
@@ -6117,11 +6123,11 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Signal Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Signaalilukko</translation>
     </message>
     <message>
         <source>Signal Power</source>
-        <translation type="unfinished"></translation>
+        <translation>Signaalin Teho</translation>
     </message>
     <message>
         <source>Seen PAT</source>
@@ -6211,11 +6217,11 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Not Listed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei Listattuna</translation>
     </message>
     <message>
         <source>this show does not match the current program listings.</source>
-        <translation type="unfinished"></translation>
+        <translation>ohjelmaa ei löydetty ohjelmaoppaasta.</translation>
     </message>
     <message>
         <source>Scan</source>
@@ -6714,11 +6720,11 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>CC/TXT enabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekstitys Päällä</translation>
     </message>
     <message>
         <source>Re-Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Uudelleennauhoitus</translation>
     </message>
     <message>
         <source>V</source>
@@ -6727,19 +6733,19 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Never Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Älä Koskaan Nauhoita</translation>
     </message>
     <message>
         <source>it was marked to never be recorded.</source>
-        <translation type="unfinished"></translation>
+        <translation>oli merkitty &apos;ei koskaan nauhoitettavaksi&apos;.</translation>
     </message>
     <message>
         <source>Status: </source>
-        <translation type="unfinished">Tila: </translation>
+        <translation>Tila: </translation>
     </message>
     <message>
         <source>Cable-HRC</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaapeli-HRC</translation>
     </message>
     <message>
         <source>Underscore (5_1)</source>
@@ -6759,7 +6765,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Channel Separator</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanavanerotin</translation>
     </message>
     <message>
         <source>What to use to separate ATSC major and minor channels.</source>
@@ -6767,7 +6773,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Time Stretch</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajan Säätö</translation>
     </message>
     <message>
         <source>Default time stretch %1</source>
@@ -6775,7 +6781,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk of processing errors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistaa käytöstä Lähetysvirran (TS) muuntamisen Ohjelmavirraksi (PS). Lähetysvirran nauhoitus aiheuttaa isommat tiedostokoot, mutta vähentää virheitä.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
@@ -6815,7 +6821,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Auto Expire Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Automaattisen Vanhenemisen Metodi (Oletus)</translation>
     </message>
     <message>
         <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
@@ -6823,7 +6829,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat.</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD:n sydänlyönnit päälle.</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
@@ -7096,7 +7102,7 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Hue %1 %</source>
-        <translation>Värisävy %1 %</translation>
+        <translation>Värikylläisyys %1 %</translation>
     </message>
     <message>
         <source>Stopping Transcode</source>
@@ -7188,7 +7194,7 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Hue (REC) %1 %</source>
-        <translation>Värisävy (REC) %1 %</translation>
+        <translation>Värikylläisyys (REC) %1 %</translation>
     </message>
     <message>
         <source>Auto-Skip OFF</source>
@@ -7368,7 +7374,7 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Hue</source>
-        <translation>Värisävy</translation>
+        <translation>Värikylläisyys</translation>
     </message>
     <message>
         <source>Volume</source>
@@ -7488,15 +7494,15 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Channel Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanava Lukittu</translation>
     </message>
     <message>
         <source>Signal Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Signaali Lukittu</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei Lukitusta</translation>
     </message>
 </context>
 <context>

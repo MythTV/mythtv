@@ -529,7 +529,7 @@
     </message>
     <message>
         <source>WNW</source>
-        <translation>luode</translation>
+        <translation type="unfinished">luode</translation>
     </message>
 </context>
 <context>

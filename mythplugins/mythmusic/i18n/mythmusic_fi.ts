@@ -1009,11 +1009,11 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     </message>
     <message>
         <source>Track %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kappale %1</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Musiikkitiedostojen järjestämistapa. Voidaan käyttää välilyönnillä erotettuja arvoja, kuten &quot;genre&quot;, &quot;splitartist&quot;, &quot;artist&quot;, &quot;album&quot;, &quot;title&quot; tai &quot;directory&quot; osoittamaan sitä, että käytetään tiedostojärjestelmän näkemää tapaa.</translation>
     </message>
 </context>
 <context>
@@ -1092,11 +1092,11 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     </message>
     <message>
         <source>Quality: </source>
-        <translation type="unfinished"></translation>
+        <translation>Laatu: </translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation type="unfinished"></translation>
+        <translation>Tuodaan </translation>
     </message>
 </context>
 <context>
