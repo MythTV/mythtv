@@ -998,6 +998,11 @@ static void dvbsub_parse_clut_segment(AVCodecContext *avctx,
 #ifdef DEBUG
         av_log(avctx, AV_LOG_INFO, "clut %d := (%d,%d,%d,%d)\n", entry_id, r, g, b, alpha);
 #endif
+
+        if (alpha == 255)
+        {
+            r = g = b = 0;
+        }
         
         if (depth & 0x80)
             clut->clut4[entry_id] = RGBA(r,g,b,255 - alpha);
