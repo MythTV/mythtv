@@ -389,6 +389,7 @@ class ProgramMapTable : public PSIPTable {
     }
 
     // helper methods
+    bool IsEncrypted(void) const;
     const QString StreamTypeString(unsigned int i) const;
     uint FindPIDs(uint type, vector<uint>& pids) const {
         for (uint i=0; i < StreamCount(); i++) {

@@ -73,6 +73,8 @@ class NetworkNameDescriptor : public MPEGDescriptor
     // for (i=0;i<N;i++){ char 8 uimsbf }
     QString Name() const
         { return dvb_string(_data+2, DescriptorLength()); }
+    QString toString() const
+        { return QString("NetworkNameDescriptor: ")+Name(); }
 };
 
 class LinkageDescriptor : public MPEGDescriptor

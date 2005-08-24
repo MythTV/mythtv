@@ -103,6 +103,32 @@ void ProgramMapTable::AppendStream(
     SetLength(_ptrs[StreamCount()] - pesdata());
 }
 
+bool ProgramMapTable::IsEncrypted(void) const
+{
+    desc_list_t descs = MPEGDescriptor::Parse(
+        ProgramInfo(), ProgramInfoLength());
+    const unsigned char* data = MPEGDescriptor::Find(
+        descs, DescriptorID::conditional_access);
+    return (bool)(data);
+#if 0
+    QMap<uint,uint> encryption_system;
+    if (data)
+    {
+        for (uint i = 0; i < descs.size(); ++i)
+        {
+            MPEGDescriptor mpegdesc(descs[i]);
+            VERBOSE(VB_IMPORTANT, "DTVsm: "<<mpegdesc.toString());
+            if (DescriptorID::conditional_access == mpegdesc.DescriptorTag())
+            {
+                ConditionalAccessDescriptor cad(descs[i]);
+                encryption_system[cad.PID()] = cad.SystemID();
+            }
+        }
+    }
+#endif
+}
+
+
 const QString PSIPTable::toString() const
 {
     QString str;

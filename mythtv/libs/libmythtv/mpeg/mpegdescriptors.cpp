@@ -37,6 +37,10 @@ QString MPEGDescriptor::DescriptorTagString() const
         // MPEG
         case DescriptorID::registration:
             return QString("Registration");
+        case DescriptorID::conditional_access:
+            return QString("Conditional Access");
+        case DescriptorID::ISO_639_language:
+            return QString("ISO-639 Language");
 
         // DVB
         case DescriptorID::network_name:
@@ -154,6 +158,10 @@ QString MPEGDescriptor::DescriptorTagString() const
         case DescriptorID::ECM_repetition_rate:
             return QString("ECM Repetition Rate");
 
+        // private
+        case DescriptorID::dvb_uk_channel_list:
+            return QString("Possibly a DVB UK Channel List");
+
         /// ATSC
         case DescriptorID::atsc_stuffing:
             return QString("ATSC Stuffing");
@@ -184,25 +192,38 @@ QString MPEGDescriptor::DescriptorTagString() const
     }
 }
 
-QString MPEGDescriptor::toString() const {
+QString MPEGDescriptor::toString() const
+{
     QString str;
 
     if (DescriptorID::registration == DescriptorTag())
-    {
         str = RegistrationDescriptor(_data).toString();
-    }
     else if (DescriptorID::audio_stream == DescriptorTag())
-    {
         str = AudioStreamDescriptor(_data).toString();
-    }
     else if (DescriptorID::caption_service == DescriptorTag())
-    {
         str = CaptionServiceDescriptor(_data).toString();
-    }
     else if (DescriptorID::component_name == DescriptorTag())
-    {
         str = ComponentNameDescriptor(_data).toString();
-    }
+    else if (DescriptorID::conditional_access == DescriptorTag())
+        str = ConditionalAccessDescriptor(_data).toString();
+    else if (DescriptorID::network_name == DescriptorTag())
+        str = NetworkNameDescriptor(_data).toString();
+    else if (DescriptorID::linkage == DescriptorTag())
+        str = LinkageDescriptor(_data).toString();
+    else if (DescriptorID::adaptation_field_data == DescriptorTag())
+        str = AdaptationFieldDataDescriptor(_data).toString();
+    else if (DescriptorID::ancillary_data == DescriptorTag())
+        str = AncillaryDataDescriptor(_data).toString();
+    else if (DescriptorID::cable_delivery_system == DescriptorTag())
+        str = CableDeliverySystemDescriptor(_data).toString();
+    else if (DescriptorID::satellite_delivery_system == DescriptorTag())
+        str = SatelliteDeliverySystemDescriptor(_data).toString();
+    else if (DescriptorID::terrestrial_delivery_system == DescriptorTag())
+        str = TerrestrialDeliverySystemDescriptor(_data).toString();
+    else if (DescriptorID::frequency_list == DescriptorTag())
+        str = FrequencyListDescriptor(_data).toString();
+    else if (DescriptorID::service == DescriptorTag())
+        str = ServiceDescriptor(_data).toString();
     else
     {
         str.append(QString("   %1 Descriptor (0x%2)")
@@ -215,3 +236,25 @@ QString MPEGDescriptor::toString() const {
     return str;
 }
 
+
+QString RegistrationDescriptor::toString() const
+{
+    QString fmt = FormatIdentifierString();
+    QString msg = QString("Registration Descriptor: '%1' ").arg(fmt);
+    QString msg2 = "Unknown";
+    if (fmt == "CUEI")
+        msg2 = "SCTE 35 2003, Digital Program Insertion Cueing Message for Cable";
+    else if (fmt == "AC-3")
+        msg2 = "ATSC audio stream A/52";
+    else if (fmt == "GA94")
+        msg2 = "ATSC program ID A/53";
+    else
+        msg2 = "Unknown, see http://www.smpte-ra.org/mpegreg.html";
+    return msg + msg2;
+}
+
+QString  ConditionalAccessDescriptor::toString() const
+{
+    return QString("Conditional Access: sid(0x%1) pid(0x%2) data_size(%3)")
+        .arg(SystemID(),0,16).arg(PID(),0,16).arg(DataSize());
+}

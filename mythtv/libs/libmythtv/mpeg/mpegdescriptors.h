@@ -115,23 +115,35 @@ class RegistrationDescriptor : public MPEGDescriptor
   public:
     RegistrationDescriptor(const unsigned char* data) : MPEGDescriptor(data)
     {
-        assert(0x05 == DescriptorTag());
+        assert(DescriptorID::registration == DescriptorTag());
         if (0x04 != DescriptorLength())
         {
             cerr<<"Registration Descriptor length != 4 !!!!"<<endl;
         }
-        //assert(0x41432d33==formatIdentifier());
     }
-    uint FormatIdentifier() const
+
+    uint FormatIdentifier(void) const
         { return (_data[2]<<24) | (_data[3]<<16) | (_data[4]<<8) | _data[5]; }
-    QString toString() const
+    QString FormatIdentifierString(void) const
     {
-        if (0x41432d33 == FormatIdentifier())
-            return QString("           Registration Descriptor   OK");
-        return QString("           Registration Descriptor   not OK \n"
-                       " format identifier is 0x%1 but should be 0x41432d33")
-            .arg(FormatIdentifier(), 0, 16);
+        return QString("") + QChar(_data[2]) + QChar(_data[3]) +
+            QChar(_data[4]) + QChar(_data[5]);
     }
+    QString toString() const;
+};
+
+class ConditionalAccessDescriptor : public MPEGDescriptor
+{
+  public:
+    ConditionalAccessDescriptor(const unsigned char* data) : MPEGDescriptor(data)
+    {
+        assert(DescriptorID::conditional_access == DescriptorTag());
+    }
+    uint SystemID(void) const { return  _data[2] << 8 | _data[3]; }
+    uint PID(void) const      { return (_data[4] & 0x1F) << 8 | _data[5]; }
+    uint DataSize(void) const { return DescriptorLength() - 4; }
+    const unsigned char* Data(void) const { return _data+6; }
+    QString toString() const;
 };
 
 #endif // _MPEG_DESCRIPTORS_H_
