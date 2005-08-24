@@ -726,21 +726,23 @@ bool TVRec::StartRecorderPostThread(bool livetv)
 {
     // START DUMMY RECORDER
     DummyDTVRecorder *dummyrec = NULL;
-    bool use_dummy = true;
+    bool use_dummy = true, is_atsc = (cardtype == "HDTV");
     if (cardtype == "DVB")
     {
 #ifdef USING_DVB
         DVBRecorder* dvbrec = dynamic_cast<DVBRecorder*>(recorder);
         use_dummy = dvbrec->RecordsTransportStream();
+#if (DVB_API_VERSION_MINOR == 1)
+        int fd_frontend = channel->GetFd();
+        struct dvb_frontend_info info;
+        if (fd_frontend >= 0 && (ioctl(fd_frontend, FE_GET_INFO, &info) >= 0))
+            is_atsc |= (info.type == FE_ATSC);
+#endif
 #endif // USING_DVB
     }
     if (use_dummy)
     {
-        bool use_xvmc_vld = false;
-#ifdef USING_XVMC_VLD
-        use_xvmc_vld = gContext->GetNumSetting("UseXvMcVld", 1);
-#endif
-        if (use_xvmc_vld)
+        if (!is_atsc)
             dummyrec = new DummyDTVRecorder(
                 true, rbuffer, 768, 576, 50, 90, 30000000);
         else
