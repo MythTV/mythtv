@@ -614,7 +614,8 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
 
     if (container)
     {
-        curitem->ToMap(infoMap);
+        if (curitem)
+            curitem->ToMap(infoMap);
         
         if ((playbackPreview == 0) &&
             (generatePreviewPixmap == 0))
@@ -623,7 +624,9 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         container->ClearAllText();
         container->SetText(infoMap);
 
-        int flags = curitem->programflags;
+        int flags = 0;
+        if (curitem)
+            curitem->programflags;
 
         UIImageType *itype;
         itype = (UIImageType *)container->GetType("commflagged");
@@ -1214,7 +1217,7 @@ void PlaybackBox::cursorRight()
         skipUpdate = false;
         update(fullRect);
     }
-    else if (curitem->availableStatus != asAvailable)
+    else if (curitem && curitem->availableStatus != asAvailable)
         showAvailablePopup(curitem);
     else if (arrowAccel)
         showActionsSelected();    
@@ -1615,7 +1618,7 @@ void PlaybackBox::playSelected()
     if (!curitem)
         return;
 
-    if (curitem->availableStatus != asAvailable)
+    if (curitem && curitem->availableStatus != asAvailable)
         showAvailablePopup(curitem);
     else
         play(curitem);
@@ -1763,7 +1766,7 @@ void PlaybackBox::showMenu()
             popup->addButton(tr("Add this Group to Playlist"), this,
                              SLOT(togglePlayListTitle()));
         }
-        else if (curitem->availableStatus == asAvailable)
+        else if (curitem && curitem->availableStatus == asAvailable)
         {
             popup->addButton(tr("Add this recording to Playlist"), this,
                              SLOT(togglePlayListItem()));
@@ -2385,6 +2388,9 @@ void PlaybackBox::showJobPopup()
     if (expectingPopup)
         cancelPopup();
 
+    if (!curitem)
+        return;
+
     backup.begin(this);
     grayOut(&backup);
     backup.end();
@@ -2475,6 +2481,9 @@ void PlaybackBox::showJobPopup()
 
 void PlaybackBox::showActionPopup(ProgramInfo *program)
 {
+    if (!curitem || !program)
+        return;
+
     backup.begin(this);
     grayOut(&backup);
     backup.end();
@@ -2706,6 +2715,9 @@ void PlaybackBox::doEditScheduled()
 
     cancelPopup();
 
+    if (!curitem)
+        return;
+
     if (curitem->availableStatus != asAvailable)
     {
         showAvailablePopup(curitem);
@@ -2727,6 +2739,9 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
         return;
 
     cancelPopup();
+
+    if (!curitem)
+        return;
 
     ProgramInfo *tmpItem = findMatchingProg(curitem);
 
@@ -3254,8 +3269,6 @@ void PlaybackBox::keyPressEvent(QKeyEvent *e)
 
         if (action == "ESCAPE")
             exitWin();
-        else if (!connected)
-            handled = false;
         else if (action == "1" || action == "HELP")
             showIconHelp();
         else if (action == "MENU")
