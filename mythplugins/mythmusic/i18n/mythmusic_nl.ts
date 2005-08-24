@@ -87,7 +87,7 @@
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Het thema dat u gebruikt bevat geen informatie in het music element. Neem contact op met de maker van dit thema en vraag of ze het thema willen aanpassen.&lt;br&gt;&lt;br&gt;Het volgende scherm zal leeg zijn. Ga eruit om terug te gaan naar het menu.</translation>
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Genre: </source>
-        <translation type="unfinished"></translation>
+        <translation>Genre: </translation>
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
@@ -981,15 +981,15 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
+        <translation>CD: %1 ~ %2 - %3</translation>
     </message>
     <message>
         <source>Track %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Track %1</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Volgorde waarin de muziek boom moet worden gesorteerd. Mogelijk waarden zijn een spatie-gescheiden lijst van: genre, splitartist, splitartist1, artist, album, en title OF het woord &quot;directory&quot; om aan te geven dat op het scherm het bestandssysteem moet worden weergegeven.</translation>
     </message>
 </context>
 <context>
@@ -1069,11 +1069,11 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>Quality: </source>
-        <translation type="unfinished"></translation>
+        <translation>Kwaliteit: </translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation type="unfinished"></translation>
+        <translation>Bezig met importeren </translation>
     </message>
 </context>
 <context>
@@ -1096,50 +1096,50 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished">Kies een Compilatie Artiest</translation>
+        <translation>Kies een Compilatie Artiest</translation>
     </message>
 </context>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
         <source>Edit Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Bewerkings datum</translation>
     </message>
     <message>
         <source>Fixed Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaste datum</translation>
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>Dag</translation>
     </message>
     <message>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>Maand</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished">Jaar</translation>
+        <translation>Jaar</translation>
     </message>
     <message>
         <source>Use Current Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Gebruik de huidige datum</translation>
     </message>
     <message>
         <source>+/- Days</source>
-        <translation type="unfinished"></translation>
+        <translation>+/- Dagen</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuleer</translation>
     </message>
     <message>
         <source>Invalid Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Ongeldige datum</translation>
     </message>
 </context>
 <context>
@@ -1202,7 +1202,7 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -1217,7 +1217,7 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>Artist</source>
@@ -1331,7 +1331,7 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
@@ -1347,7 +1347,7 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation>Categrien Van Slimme Speellijsten</translation>
+        <translation>Categorien Van Slimme Speellijsten</translation>
     </message>
     <message>
         <source>New Category</source>

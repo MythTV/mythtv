@@ -98,7 +98,7 @@
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Willekeurig</translation>
     </message>
 </context>
 <context>
@@ -173,27 +173,27 @@
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation type="unfinished"></translation>
+        <translation>Command om video bestanden te spelen</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Dit commando wordt gebruikt om een video bestand te spelen</translation>
     </message>
     <message>
         <source>Store thumbnails in image directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Sla voorbeeld plaatjes op in de image directory</translation>
     </message>
     <message>
         <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als dit is ingevuld, worden de voorbeeld plaatjes opgeslagen in &apos;.thumbcache&apos; directories binnen bovenstaande directory. Als het niet is ingevuld, worden ze bewaard in uw home directory.</translation>
     </message>
     <message>
         <source>Recurse into directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Ga recursief door alle directories</translation>
     </message>
     <message>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zet dit aan zodat de dia-show ook alle subdirectories laat zien.</translation>
     </message>
 </context>
 <context>

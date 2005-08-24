@@ -293,11 +293,11 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>ISO copy of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ISO kopie van %1</translation>
     </message>
     <message>
         <source>Waiting for access to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Aan het wachten op toegang tot de DVD</translation>
     </message>
 </context>
 <context>
@@ -383,7 +383,7 @@ Er is geen DVD-apparaat ingesteld.
     </message>
     <message>
         <source>ISO Image</source>
-        <translation type="unfinished"></translation>
+        <translation>ISO Kopie</translation>
     </message>
 </context>
 </TS>
