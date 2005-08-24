@@ -158,9 +158,10 @@ bool MPEGStreamData::CreatePATSingleProgram(
         }
         VERBOSE(VB_IMPORTANT,
                 QString("Desired program #%1 not found in PAT."
-                        " Substituting program #%2").
-                arg(_desired_program)
-                .arg(pat.FindProgram(_pid_pmt_single_program)));
+                        "Can Not create single program PAT.")
+                .arg(_desired_program));
+        SetPATSingleProgram(NULL);
+        return false;
     }
 
     AddListeningPID(_pid_pmt_single_program);
