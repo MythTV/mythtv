@@ -158,7 +158,7 @@ bool MPEGStreamData::CreatePATSingleProgram(
         }
         VERBOSE(VB_IMPORTANT,
                 QString("Desired program #%1 not found in PAT."
-                        "Can Not create single program PAT.")
+                        "\n\t\t\tCan Not create single program PAT.")
                 .arg(_desired_program));
         SetPATSingleProgram(NULL);
         return false;

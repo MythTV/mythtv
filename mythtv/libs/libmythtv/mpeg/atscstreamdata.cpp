@@ -38,6 +38,7 @@ void ATSCStreamData::SetDesiredChannel(int major, int minor)
     // TODO this should reset only if it can't regen from cached tables.
     _desired_major_channel = major;
     _desired_minor_channel = minor;
+    _desired_program = -1;
 }
 
 void ATSCStreamData::Reset(int desiredMajorChannel, int desiredMinorChannel)

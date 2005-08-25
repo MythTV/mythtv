@@ -218,11 +218,6 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 
     inputChannel[currentcapchannel] = curchannelname;
 
-#if (DVB_API_VERSION_MINOR == 1)
-    if (FE_ATSC == info.type)
-        SetCachedATSCInfo(chan);
-#endif
-
     return true;
 }
 
@@ -283,6 +278,7 @@ bool DVBChannel::GetChannelOptions(const QString& channum)
                           .arg(query.value(3).toInt() >> 8)
                           .arg(query.value(3).toInt() & 0xff));
     }
+    currentProgramNum = chan_opts.serviceID;
 
     int mplexid = query.value(2).toInt();
 

@@ -1948,17 +1948,11 @@ void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
     }
 }
 
-void setup_table_monitoring(ChannelBase* channel,
-                            DTVSignalMonitor* dtvSignalMonitor,
-                            TVRec *tv_rec,
-                            RecorderBase* recorder)
+bool setup_mpeg_table_monitoring(ChannelBase* channel,
+                                 DTVSignalMonitor* dtvSignalMonitor,
+                                 TVRec *tv_rec,
+                                 RecorderBase* recorder)
 {
-    (void) recorder;
-    VERBOSE(VB_RECORD, "setting up table monitoring");
-
-    pid_cache_t pid_cache;
-    channel->GetCachedPids(pid_cache);
-#if 1
     int progNum = channel->GetProgramNumber();
 #ifdef USING_DVB
     if (progNum < 0)
@@ -1993,15 +1987,24 @@ void setup_table_monitoring(ChannelBase* channel,
 
         dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
 
-        return;
+        return true;
     }
-#endif
+    return false;
+}
 
+bool setup_atsc_table_monitoring(ChannelBase* channel,
+                                 DTVSignalMonitor* dtvSignalMonitor,
+                                 TVRec *tv_rec,
+                                 RecorderBase* recorder)
+{
     int major = channel->GetMajorChannel();
     int minor = channel->GetMinorChannel();
     VERBOSE(VB_RECORD, QString("atsc channel: %1_%2").arg(major).arg(minor));
     if (minor > 0)
     {
+        pid_cache_t pid_cache;
+        channel->GetCachedPids(pid_cache);
+
         ATSCStreamData *sd = NULL;
 #ifdef USING_V4L
         HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
@@ -2036,29 +2039,27 @@ void setup_table_monitoring(ChannelBase* channel,
         if (!vctpid_cached)
             dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForMGT);
 
-        return;
+        return true;
     }
+    return false;
+}
 
-#if 0
-    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-    if (dvbc)
+void setup_table_monitoring(ChannelBase* channel,
+                            DTVSignalMonitor* dtvSignalMonitor,
+                            TVRec *tv_rec,
+                            RecorderBase* recorder)
+{
+    (void) recorder;
+    VERBOSE(VB_RECORD, "setting up table monitoring");
+
+    bool done = setup_atsc_table_monitoring(
+        channel, dtvSignalMonitor, tv_rec, recorder);
+
+    if (!done)
     {
-        int serviceid = dvbc->GetServiceID();
-        DVBStreamData *sd = NULL;
-        if (!sd)
-            sd = new DVBStreamData(serviceid, true);
-
-        dtvSignalMonitor->SetStreamData(sd);
-        sd->Reset(serviceid);
-        dtvSignalMonitor->SetService(serviceid);
-
-        VERBOSE(VB_RECORD, "set up table monitoring successfully");
-
-        //dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForSDT);
-
-        return;
+        setup_mpeg_table_monitoring(
+            channel, dtvSignalMonitor, tv_rec, recorder);
     }
-#endif
 }
 
 /** \fn TVRec::SetupSignalMonitor()

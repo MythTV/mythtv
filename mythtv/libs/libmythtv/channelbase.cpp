@@ -309,6 +309,10 @@ void ChannelBase::SetCachedATSCInfo(const QString &chan)
                 QString("ChannelBase(%1)::SetCachedATSCInfo(%2): %3_%4")
                 .arg(GetDevice()).arg(chan)
                 .arg(currentATSCMajorChannel).arg(currentATSCMinorChannel));
+    else if ((-1 == currentATSCMajorChannel) && (-1 == currentProgramNum))
+        VERBOSE(VB_CHANNEL,
+                QString("ChannelBase(%1)::SetCachedATSCInfo(%2): RESET")
+                .arg(GetDevice()).arg(chan));
     else
         VERBOSE(VB_CHANNEL,
                 QString("ChannelBase(%1)::SetCachedATSCInfo(%2): %3-%4")
