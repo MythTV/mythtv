@@ -65,7 +65,7 @@ using namespace std;
 #    define VSB_16        (QAM_AUTO+2)
 #endif
 
-void flush_dvb_events(int fd);
+bool flush_dvb_events(int fd, struct dvb_frontend_event &event);
 bool get_dvb_event(int fd, struct dvb_frontend_event &event, bool block = true);
 QString dvb_event_to_string(const struct dvb_frontend_event &event);
 
@@ -585,7 +585,14 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int)
     {
         if (tune)
         {
-            flush_dvb_events(fd_frontend);
+            struct dvb_frontend_parameters old_params;
+            struct dvb_frontend_event event;
+            bool chk = flush_dvb_events(fd_frontend, event);
+            if (chk)
+                old_params = event.parameters;
+            else
+                chk = (0 == ioctl(fd_frontend, FE_GET_FRONTEND, &old_params));
+
             switch(info.type)
             {
                 case FE_QPSK:
@@ -607,9 +614,12 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int)
                     break;
 #endif
             }
-            struct dvb_frontend_event event;
-            if (get_dvb_event(fd_frontend, event))
-                CHANNEL(dvb_event_to_string(event));
+            if (!chk || (old_params.frequency != tuning.params.frequency))
+            {
+                CHANNEL("Waiting for event");
+                if (get_dvb_event(fd_frontend, event))
+                    CHANNEL(dvb_event_to_string(event));
+            }
 
             if (havetuned == false)
                 return true;
@@ -829,14 +839,19 @@ void DVBChannel::GetCachedPids(pid_cache_t &pid_cache) const
         ChannelBase::GetCachedPids(chanid, pid_cache);
 }
 
-void flush_dvb_events(int fd)
+bool flush_dvb_events(int fd, struct dvb_frontend_event &last_event)
 {
-    struct dvb_frontend_event event;
+    bool have_event = false;
     do
     {
-        if (0 == ioctl(fd, FE_GET_EVENT, &event))
-            VERBOSE(VB_CHANNEL, "DVBEvents: Flushing "<<dvb_event_to_string(event));
+        if (0 == ioctl(fd, FE_GET_EVENT, &last_event))
+        {
+            VERBOSE(VB_CHANNEL, "DVBEvents: Flushing "
+                    <<dvb_event_to_string(last_event));
+            have_event = true;
+        }
     } while (errno != EWOULDBLOCK);
+    return have_event;
 }
 
 bool get_dvb_event(int fd, struct dvb_frontend_event &event, bool block)
