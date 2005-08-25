@@ -65,6 +65,10 @@ using namespace std;
 #    define VSB_16        (QAM_AUTO+2)
 #endif
 
+void flush_dvb_events(int fd);
+bool get_dvb_event(int fd, struct dvb_frontend_event &event, bool block = true);
+QString dvb_event_to_string(const struct dvb_frontend_event &event);
+
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
  *
@@ -585,6 +589,7 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int)
     {
         if (tune)
         {
+            flush_dvb_events(fd_frontend);
             switch(info.type)
             {
                 case FE_QPSK:
@@ -606,6 +611,9 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int)
                     break;
 #endif
             }
+            struct dvb_frontend_event event;
+            if (get_dvb_event(fd_frontend, event))
+                CHANNEL(dvb_event_to_string(event));
 
             if (havetuned == false)
                 return true;
@@ -823,4 +831,63 @@ void DVBChannel::GetCachedPids(pid_cache_t &pid_cache) const
     int chanid = GetChanID();
     if (chanid >= 0)
         ChannelBase::GetCachedPids(chanid, pid_cache);
+}
+
+void flush_dvb_events(int fd)
+{
+    struct dvb_frontend_event event;
+    do
+    {
+        if (0 == ioctl(fd, FE_GET_EVENT, &event))
+            VERBOSE(VB_CHANNEL, "DVBEvents: Flushing "<<dvb_event_to_string(event));
+    } while (errno != EWOULDBLOCK);
+}
+
+bool get_dvb_event(int fd, struct dvb_frontend_event &event, bool block)
+{
+    while (true)
+    {
+        if (0 == ioctl(fd, FE_GET_EVENT, &event))
+            return true;
+        int ret = errno;
+        
+        if (EWOULDBLOCK == ret)
+        {
+            if (!block)
+                return false;
+            usleep(50); // it would be nicer to use select...
+        }
+        else if (EOVERFLOW == ret)
+            VERBOSE(VB_IMPORTANT, "DVBEvents: Oops, we lost some events...");
+        else if (EBADF == ret)
+        {
+            VERBOSE(VB_IMPORTANT, 
+                    "DVBEvents: fd("<<fd<<") is a bad file descriptor" );
+            return false;
+        }
+        else if (EFAULT == ret)
+        {
+            VERBOSE(VB_IMPORTANT, "DVBEvents: &event is a bad pointer");
+            return false;
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "DVBEvents: unknown error... "<<ret);
+            return false; // unknown error...
+        }
+    }    
+}
+
+QString dvb_event_to_string(const struct dvb_frontend_event &event)
+{
+    QString str("");
+    if (FE_HAS_SIGNAL  & event.status) str += "Signal,";
+    if (FE_HAS_CARRIER & event.status) str += "Carrier,";
+    if (FE_HAS_VITERBI & event.status) str += "FEC Stable,";
+    if (FE_HAS_SYNC    & event.status) str += "Sync,";
+    if (FE_HAS_LOCK    & event.status) str += "Lock,";
+    if (FE_TIMEDOUT    & event.status) str += "Timed Out,";
+    if (FE_REINIT      & event.status) str += "Reinit,";
+    return QString("Event Status(%1) frequency(%2 Hz)")
+        .arg(str).arg(event.parameters.frequency);
 }
