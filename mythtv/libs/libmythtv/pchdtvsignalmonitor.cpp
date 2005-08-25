@@ -13,6 +13,9 @@
 #include "mpegtables.h"
 #include "atsctables.h"
 
+#define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
+    "pcHDTVSM("<<channel_dev<<")::"<<FUNC<<": "<<MSG);
+
 /** \fn pcHDTVSignalMonitor::pcHDTVSignalMonitor(int,uint,int)
  *  \brief Initializes signal lock and signal values.
  *
@@ -34,6 +37,7 @@ pcHDTVSignalMonitor::pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
     : DTVSignalMonitor(db_cardnum, _flags, _name),
       usingv4l2(false), dtvMonitorRunning(false), channel(_channel)
 {
+    channel_dev = channel->GetDevice();
     int wait = gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
     int threshold = gContext->GetNumSetting("ATSCCheckSignalThreshold", 65);
 
@@ -59,14 +63,14 @@ pcHDTVSignalMonitor::~pcHDTVSignalMonitor()
  */
 void pcHDTVSignalMonitor::Stop()
 {
-    VERBOSE(VB_CHANNEL, "pcHDTVSignalMonitor::Stop() -- begin");
+    DBG_SM("Stop()", "begin");
     SignalMonitor::Stop();
     if (dtvMonitorRunning)
     {
         dtvMonitorRunning = false;
         pthread_join(table_monitor_thread, NULL);
     }
-    VERBOSE(VB_CHANNEL, "pcHDTVSignalMonitor::Stop() -- end");
+    DBG_SM("Stop()", "end");
 }
 
 void *pcHDTVSignalMonitor::TableMonitorThread(void *param)
@@ -86,7 +90,7 @@ void pcHDTVSignalMonitor::RunTableMonitor()
         return;
     bzero(buffer, buffer_size);
 
-    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- begin ("
+    DBG_SM("RunTableMonitor()", "begin (# of pids "
             <<GetStreamData()->ListeningPIDs().size()<<")");
     while (dtvMonitorRunning && GetStreamData())
     {
@@ -103,7 +107,7 @@ void pcHDTVSignalMonitor::RunTableMonitor()
         if (remainder > 0) // leftover bytes
             memmove(buffer, &(buffer[buffer_size - remainder]), remainder);
     }
-    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- end");
+    DBG_SM("RunTableMonitor()", "end");
 }
 
 #define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \

@@ -6,6 +6,9 @@
 #include "atsctables.h"
 #include "dvbtables.h"
 
+#define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
+    "DTVSM("<<channel_dev<<")::"<<FUNC<<": "<<MSG);
+
 /** \class DTVSignalMonitor
  *  \brief This class is intended to detect the presence of needed tables.
  */
@@ -61,8 +64,8 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
         if ((seenGood != (int)seenPMT.IsGood()) ||
             (matchingGood != (int)matchingPMT.IsGood()))
         {
-            VERBOSE(VB_CHANNEL, "WaitForPMT: seen("<<seenPMT.IsGood()
-                    <<") matching("<<matchingPMT.IsGood()<<")");
+            DBG_SM("GetStatusList", "WaitForPMT seen("<<seenPMT.IsGood()
+                   <<") matching("<<matchingPMT.IsGood()<<")");
             seenGood = (int)seenPMT.IsGood();
             matchingGood = (int)matchingPMT.IsGood();
         }
@@ -130,8 +133,7 @@ void DTVSignalMonitor::UpdateMonitorValues()
 
 void DTVSignalMonitor::SetChannel(int major, int minor)
 {
-    VERBOSE(VB_CHANNEL, QString("DTVSignalMonitor::SetChannel(%1, %2)")
-            .arg(major).arg(minor));
+    DBG_SM(QString("SetChannel(%1, %2)").arg(major).arg(minor), "");
     if (GetATSCStreamData() && (majorChannel != major || minorChannel != minor))
     {
         RemoveFlags(kDTVSigMon_PATSeen | kDTVSigMon_PATMatch |
@@ -146,8 +148,7 @@ void DTVSignalMonitor::SetChannel(int major, int minor)
 
 void DTVSignalMonitor::SetProgramNumber(int progNum)
 {
-    VERBOSE(VB_CHANNEL, QString("DTVSignalMonitor::SetProgramNumber(): %1")
-            .arg(progNum));
+    DBG_SM(QString("SetProgramNumber(%1)").arg(progNum), "");
     if (programNumber != progNum)
     {
         RemoveFlags(kDTVSigMon_PMTSeen | kDTVSigMon_PMTMatch);
@@ -273,9 +274,8 @@ void DTVSignalMonitor::SetVCT(uint, const TerrestrialVirtualChannelTable* tvct)
     if (idx < 0)
         return;
 
-    VERBOSE(VB_CHANNEL, QString(
-                "DTVSignalMonitor::SetVCT(): tvct->ProgramNumber(%1): %2")
-            .arg(idx).arg(tvct->ProgramNumber(idx)));
+    DBG_SM("SetVCT()", QString("tvct->ProgramNumber(idx %1): prog num %2")
+           .arg(idx).arg(tvct->ProgramNumber(idx)));
 
     SetProgramNumber(tvct->ProgramNumber(idx));
     AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_TVCTMatch);
@@ -289,9 +289,8 @@ void DTVSignalMonitor::SetVCT(uint, const CableVirtualChannelTable* cvct)
     if (idx < 0)
         return;
 
-    VERBOSE(VB_CHANNEL, QString(
-                "DTVSignalMonitor::SetVCT(): cvct->ProgramNumber(%1): %2")
-            .arg(idx).arg(cvct->ProgramNumber(idx)));
+    DBG_SM("SetVCT()", QString("cvct->ProgramNumber(idx %1): prog num %2")
+           .arg(idx).arg(cvct->ProgramNumber(idx)));
 
     SetProgramNumber(cvct->ProgramNumber(idx));
     AddFlags(kDTVSigMon_VCTMatch | kDTVSigMon_CVCTMatch);
@@ -299,8 +298,7 @@ void DTVSignalMonitor::SetVCT(uint, const CableVirtualChannelTable* cvct)
 
 void DTVSignalMonitor::SetNIT(const NetworkInformationTable *nit)
 {
-    VERBOSE(VB_CHANNEL, QString("DTVSignalMonitor::SetNIT(): net_id = %1")
-            .arg(nit->NetworkID()));
+    DBG_SM("SetNIT()", QString("net_id = %1").arg(nit->NetworkID()));
     AddFlags(kDTVSigMon_NITSeen);
     if (!GetDVBStreamData())
         return;
@@ -308,9 +306,8 @@ void DTVSignalMonitor::SetNIT(const NetworkInformationTable *nit)
 
 void DTVSignalMonitor::SetSDT(uint, const ServiceDescriptionTable *sdt)
 {
-    VERBOSE(VB_CHANNEL, QString("DTVSignalMonitor::SetSDT(): "
-                                "tsid = %1 orig_net_id = %2")
-            .arg(sdt->TSID()).arg(sdt->OriginalNetworkID()));
+    DBG_SM("SetSDT()", QString("tsid = %1 orig_net_id = %2")
+           .arg(sdt->TSID()).arg(sdt->OriginalNetworkID()));
     AddFlags(kDTVSigMon_SDTSeen);
     if (!GetDVBStreamData())
         return;

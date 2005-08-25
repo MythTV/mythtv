@@ -129,6 +129,7 @@ protected:
 
     pthread_t   monitor_thread;
     int         capturecardnum;
+    QString     channel_dev;
     uint        flags;
     int         update_rate;
     bool        running;

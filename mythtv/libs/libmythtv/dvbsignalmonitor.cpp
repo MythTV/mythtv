@@ -22,6 +22,9 @@
 #include "dvbrecorder.h"
 #include "dvbtypes.h"
 
+#define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
+    "DVBSM("<<channel_dev<<")::"<<FUNC<<": "<<MSG);
+
 static bool fill_frontend_stats(int fd_frontend, dvb_stats_t &stats);
 
 /** \fn DVBSignalMonitor::DVBSignalMonitor(int,int,int)
@@ -50,6 +53,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
           QObject::tr("Uncorrected Blocks"), "ucb", 65535,  false, 0, 65535, 0),
       dtvMonitorRunning(false), channel(_channel)
 {
+    channel_dev = channel->GetDevice();
     // These two values should probably come from the database...
     int wait = 3000; // timeout when waiting on signal
     int threshold = 0; // signal strength threshold in %
@@ -64,8 +68,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     dvb_stats_t stats;
     bzero(&stats, sizeof(stats));
     uint newflags = 0;
-    QString msg = QString("DVBSignalMonitor(%1,%2): %3 (%4)")
-        .arg(capturecardnum).arg(cardnum);
+    QString msg = QString("DVBSignalMonitor(%1)::constructor(%2,%3): %4 (%5)")
+        .arg(channel->GetDevice()).arg(capturecardnum).arg(cardnum);
 
 #define DVB_IO(WHAT,WHERE,ERRMSG,FLAG) \
     if (ioctl(_channel->GetFd(), WHAT, WHERE)) \
@@ -83,9 +87,7 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     DVB_IO(FE_READ_STATUS, &stats.status, "Error, can not read status!", 0);
 #undef DVB_IO
     AddFlags(newflags);
-    VERBOSE(VB_CHANNEL,
-            QString("DVBSignalMonitor: initial flags 0x%1")
-            .arg(newflags,0,16));
+    DBG_SM("constructor()", QString("initial flags 0x%1").arg(newflags,0,16));
 }
 
 /** \fn DVBSignalMonitor::~DVBSignalMonitor()
@@ -101,14 +103,14 @@ DVBSignalMonitor::~DVBSignalMonitor()
  */
 void DVBSignalMonitor::Stop(void)
 {
-    VERBOSE(VB_CHANNEL, "DVBSignalMonitor::Stop() -- begin");
+    DBG_SM("Stop", "begin");
     SignalMonitor::Stop();
     if (dtvMonitorRunning)
     {
         dtvMonitorRunning = false;
         pthread_join(table_monitor_thread, NULL);
     }
-    VERBOSE(VB_CHANNEL, "DVBSignalMonitor::Stop() -- end");
+    DBG_SM("Stop", "end");
 }
 
 QStringList DVBSignalMonitor::GetStatusList(bool kick)
@@ -136,7 +138,7 @@ const int buffer_size = TSPacket::SIZE * 1500;
 
 bool DVBSignalMonitor::AddPIDFilter(uint pid)
 { 
-    VERBOSE(VB_CHANNEL, QString("AddPIDFilter(0x%1)").arg(pid, 0, 16));
+    DBG_SM(QString("AddPIDFilter(0x%1)").arg(pid, 0, 16), "");
     int mux_fd = open(dvbdevice(DVB_DEV_DEMUX, cardnum), O_RDWR | O_NONBLOCK);
     if (mux_fd == -1)
     {
@@ -186,7 +188,7 @@ bool DVBSignalMonitor::AddPIDFilter(uint pid)
 
 bool DVBSignalMonitor::RemovePIDFilter(uint pid)
 {
-    VERBOSE(VB_CHANNEL, QString("RemovePIDFilter(0x%1)").arg(pid, 0, 16));
+    DBG_SM(QString("RemovePIDFilter(0x%1)").arg(pid, 0, 16), "");
     if (filters.find(pid)==filters.end())
         return false;
 
@@ -194,7 +196,8 @@ bool DVBSignalMonitor::RemovePIDFilter(uint pid)
     filters.erase(filters.find(pid));
     int err = close(mux_fd);
     if (err < 0)
-        VERBOSE(VB_IMPORTANT, QString("Failed to close mux (pid %1)").arg(pid));
+        VERBOSE(VB_IMPORTANT, QString("Failed to close mux (pid 0x%1)")
+                .arg(pid, 0, 16));
 
     unsigned char *buffer = buffers[pid];
     buffers.erase(buffers.find(pid));
@@ -262,7 +265,7 @@ void DVBSignalMonitor::RunTableMonitor(void)
         return;
     }
 
-    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- begin ("
+    DBG_SM("RunTableMonitor()", "begin (# of pids "
             <<GetStreamData()->ListeningPIDs().size()<<")");
     while (dtvMonitorRunning && GetStreamData())
     {
@@ -281,7 +284,7 @@ void DVBSignalMonitor::RunTableMonitor(void)
         if (remainder > 0) // leftover bytes
             memmove(buffer, &(buffer[buffer_size - remainder]), remainder);
     }
-    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- shutdown");
+    DBG_SM("RunTableMonitor()", "shutdown");
 
     if (GetStreamData())
     {
@@ -295,7 +298,7 @@ void DVBSignalMonitor::RunTableMonitor(void)
             RemovePIDFilter(*dit);
     }
     close(dvr_fd);
-    VERBOSE(VB_CHANNEL, "RunTableMonitor() -- end");
+    DBG_SM("RunTableMonitor()", "end");
 }
 
 #define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \
@@ -343,7 +346,7 @@ void DVBSignalMonitor::UpdateValues(void)
             EMIT(StatusUncorrectedBlocks, uncorrectedBlocks);
 
         if (wasLocked != signalLock.GetValue())
-            GENERAL((wasLocked ? "Signal Lost" : "Signal Lock"));
+            DBG_SM("UpdateValues()", (wasLocked ? "Signal Lost" : "Signal Lock"));
 
         statusLock.lock();
         bool ok = signalLock.IsGood();

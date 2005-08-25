@@ -16,6 +16,9 @@
 #   include "videosource.h"
 #endif
 
+#define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
+    "SM("<<channel_dev<<")::"<<FUNC<<": "<<MSG);
+
 /** \class SignalMonitor
  *  \brief Signal monitoring base class.
  *
@@ -104,7 +107,7 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
 SignalMonitor::SignalMonitor(int _capturecardnum, uint wait_for_mask,
                              const char *name)
     : QObject(NULL, name),
-      capturecardnum(_capturecardnum), flags(wait_for_mask),
+      capturecardnum(_capturecardnum), channel_dev(""), flags(wait_for_mask),
       update_rate(25), running(false), exit(false), update_done(false),
       notify_frontend(true),
       signalLock(QObject::tr("Signal Lock"), "slock", 1, true, 0, 1, 0),
@@ -126,7 +129,7 @@ SignalMonitor::~SignalMonitor()
  */
 void SignalMonitor::Start()
 {
-    VERBOSE(VB_CHANNEL, "SignalMonitor::Start() -- begin");
+    DBG_SM("Start", "begin");
     {
         QMutexLocker locker(&startStopLock);
         if (!running)
@@ -134,7 +137,7 @@ void SignalMonitor::Start()
         while (!running)
             usleep(50);
     }
-    VERBOSE(VB_CHANNEL, "SignalMonitor::Start() -- end");
+    DBG_SM("Start", "end");
 }
 
 /** \fn SignalMonitor::Stop()
@@ -142,7 +145,7 @@ void SignalMonitor::Start()
  */
 void SignalMonitor::Stop()
 {
-    VERBOSE(VB_CHANNEL, "SignalMonitor::Stop() -- begin");
+    DBG_SM("Stop", "begin");
     {
         QMutexLocker locker(&startStopLock);
         if (running)
@@ -151,7 +154,7 @@ void SignalMonitor::Stop()
             pthread_join(monitor_thread, NULL);
         }
     }
-    VERBOSE(VB_CHANNEL, "SignalMonitor::Stop() -- end");
+    DBG_SM("Stop", "end");
 }
 
 /** \fn SignalMonitor::Kick()
