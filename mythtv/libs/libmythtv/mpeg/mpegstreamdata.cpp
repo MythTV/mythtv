@@ -354,7 +354,9 @@ bool MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
     // Validate PSIP
     if (!psip->IsGood())
     {
-        VERBOSE(VB_RECORD, QString("PSIP packet failed CRC check"));
+        VERBOSE(VB_RECORD, QString("PSIP packet failed CRC check. "
+                                   "pid(0x%1) type(0x%2)")
+                .arg(tspacket->PID(),0,16).arg(psip->TableID(),0,16));
         HT_RETURN(true);
     }
 

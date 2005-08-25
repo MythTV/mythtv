@@ -364,6 +364,8 @@ void SIParser::DelAllPids()
  */
 bool SIParser::FillPMap(SISTANDARD _SIStandard)
 {
+    VERBOSE(VB_SIPARSER, QString("FillPMap(SIS %1)")
+            .arg((SI_STANDARD_ATSC == _SIStandard) ? "atsc":"dvb"));
 
     pmap_lock.lock();
     SIPARSER("Requesting PAT");
@@ -393,6 +395,7 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
  */
 bool SIParser::FillPMap(const QString &si_std)
 {
+    VERBOSE(VB_SIPARSER, QString("FillPMap(str %1)").arg(si_std));
     bool is_atsc = si_std.lower() == "atsc";
     return FillPMap((is_atsc) ? SI_STANDARD_ATSC : SI_STANDARD_DVB);
 }
