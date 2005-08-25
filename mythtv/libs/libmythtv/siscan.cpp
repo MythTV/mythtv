@@ -1000,9 +1000,8 @@ void SIScan::UpdatePATinDB(int tid_db,
 
     if (db_mplexid == -1)
     {
-        VERBOSE(VB_IMPORTANT, "PAT: Error determing what transport this "
-                "service table is associated with so failing");
-        return;
+        VERBOSE(VB_IMPORTANT, "PAT: Warning couldn't find better mplex.");
+        db_mplexid = tid_db;
     }
 
     int db_source_id   = ChannelUtil::GetSourceID(db_mplexid);
