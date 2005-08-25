@@ -45,6 +45,8 @@ enum {
     kDVBSigMon_WaitForUB  = 0x04000000,
 };
 
+inline QString sm_flags_to_string(uint);
+
 class SignalMonitor: virtual public QObject
 {
     Q_OBJECT
@@ -65,10 +67,19 @@ public:
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Flags // // // // // // // // // // // // // // // // // // // // //
 
-    virtual void AddFlags(uint _flags) { flags |= _flags; }
-    virtual void RemoveFlags(uint _flags) { flags &= ~_flags; }
-    bool HasFlags(uint _flags) const { return (flags & _flags) == _flags; }
+    virtual void AddFlags(uint _flags)
+    {
+        VERBOSE(VB_CHANNEL, "SM:    AddFlags: "<<sm_flags_to_string(_flags));
+        flags |= _flags;
+    }
+    virtual void RemoveFlags(uint _flags)
+    {
+        VERBOSE(VB_CHANNEL, "SM: RemoveFlags: "<<sm_flags_to_string(_flags));
+        flags &= ~_flags;
+    }
+    bool HasFlags(uint _flags) const   { return (flags & _flags) == _flags; }
     bool HasAnyFlag(uint _flags) const { return (flags & _flags); }
+    uint GetFlags(void) const          { return flags; }
 
     // // // // // // // // // // // // // // // // // // // // // // // //
     // Gets  // // // // // // // // // // // // // // // // // // // // //
@@ -143,5 +154,69 @@ protected:
     QMutex             startStopLock;
     mutable QMutex     statusLock;
 };
+
+inline QString sm_flags_to_string(uint flags)
+{
+    QString str("Seen(");
+    if (kDTVSigMon_PATSeen    & flags)
+        str += "PAT,";
+    if (kDTVSigMon_PMTSeen    & flags)
+        str += "PMT,";
+    if (kDTVSigMon_MGTSeen    & flags)
+        str += "MGT,";
+    if (kDTVSigMon_VCTSeen    & flags)
+        str += "VCT,";
+    if (kDTVSigMon_TVCTSeen   & flags)
+        str += "TVCT,";
+    if (kDTVSigMon_CVCTSeen   & flags)
+        str += "CVCT,";
+    if (kDTVSigMon_NITSeen    & flags)
+        str += "NIT,";
+    if (kDTVSigMon_SDTSeen    & flags)
+        str += "SDT,";
+
+    str += ") Match(";
+    if (kDTVSigMon_PATMatch   & flags)
+        str += "PAT,";
+    if (kDTVSigMon_PMTMatch   & flags)
+        str += "PMT,";
+    if (kDTVSigMon_MGTMatch   & flags)
+        str += "MGT,";
+    if (kDTVSigMon_VCTMatch   & flags)
+        str += "VCT,";
+    if (kDTVSigMon_TVCTMatch  & flags)
+        str += "TVCT,";
+    if (kDTVSigMon_CVCTMatch  & flags)
+        str += "CVCT,";
+    if (kDTVSigMon_NITMatch   & flags)
+        str += "NIT,";
+    if (kDTVSigMon_SDTMatch   & flags)
+        str += "SDT,";
+
+    str += ") Wait(";
+    if (kDTVSigMon_WaitForPAT & flags)
+        str += "PAT,";
+    if (kDTVSigMon_WaitForPMT & flags)
+        str += "PMT,";
+    if (kDTVSigMon_WaitForMGT & flags)
+        str += "MGT,";
+    if (kDTVSigMon_WaitForVCT & flags)
+        str += "VCT,";
+    if (kDTVSigMon_WaitForNIT & flags)
+        str += "NIT,";
+    if (kDTVSigMon_WaitForSDT & flags)
+        str += "SDT,";
+    if (kDTVSigMon_WaitForSig & flags)
+        str += "Sig,";
+
+    if (kDVBSigMon_WaitForSNR & flags)
+        str += "SNR,";
+    if (kDVBSigMon_WaitForBER & flags)
+        str += "BER,";
+    if (kDVBSigMon_WaitForUB  & flags)
+        str += "UB,";
+    str += ")";
+    return str;
+}
 
 #endif // SIGNALMONITOR_H

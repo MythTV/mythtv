@@ -1323,6 +1323,8 @@ bool TVRec::StartChannel(bool livetv)
                     ((abortRecordingStart) ?
                      "TVRec: StartChannel() -- canceled" :
                      "TVRec: Timed out waiting for lock -- aborting recording"));
+            VERBOSE(VB_IMPORTANT, "SigMon Flags are: "
+                    <<sm_flags_to_string(signalMonitor->GetFlags()));
             SetSignalMonitoringRate(0, 0);
             return false;
         }
@@ -1962,34 +1964,38 @@ bool setup_mpeg_table_monitoring(ChannelBase* channel,
         VERBOSE(VB_RECORD, "using service id as program number");
     }
 #endif //USING_DVB
-    if (progNum >= 0)
+    VERBOSE(VB_RECORD, "mpeg program number: "<<progNum);
+
+    if (progNum < 0)
     {
-        VERBOSE(VB_RECORD, "mpeg program number: "<<progNum);
-        ATSCStreamData *sd = NULL;
-#ifdef USING_V4L
-        HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
-        if (rec)
-        {
-            sd = rec->StreamData();
-            sd->SetCaching(true);
-        }
-#endif //USING_V4L
-        if (!sd)
-            sd = new ATSCStreamData(-1, -1, true);
-        
-        dtvSignalMonitor->SetStreamData(sd);
-        sd->Reset(progNum);
-
-        dtvSignalMonitor->SetProgramNumber(progNum);
-        bool fta = CardUtil::IgnoreEncrypted(
-            tv_rec->GetCaptureCardNum(), channel->GetCurrentInput());
-        dtvSignalMonitor->SetFTAOnly(fta);
-
-        dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
-
-        return true;
+        VERBOSE(VB_RECORD, "Failing to set up MPEG table monitoring.");
+        return false;
     }
-    return false;
+
+    ATSCStreamData *sd = NULL;
+#ifdef USING_V4L
+    HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
+    if (rec)
+    {
+        sd = rec->StreamData();
+        sd->SetCaching(true);
+    }
+#endif //USING_V4L
+    if (!sd)
+        sd = new ATSCStreamData(-1, -1, true);
+        
+    dtvSignalMonitor->SetStreamData(sd);
+    sd->Reset(progNum);
+
+    dtvSignalMonitor->SetProgramNumber(progNum);
+    bool fta = CardUtil::IgnoreEncrypted(
+        tv_rec->GetCaptureCardNum(), channel->GetCurrentInput());
+    dtvSignalMonitor->SetFTAOnly(fta);
+
+    dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
+
+    VERBOSE(VB_RECORD, "Successfully set up MPEG table monitoring.");
+    return true;
 }
 
 bool setup_atsc_table_monitoring(ChannelBase* channel,
@@ -1997,51 +2003,55 @@ bool setup_atsc_table_monitoring(ChannelBase* channel,
                                  TVRec *tv_rec,
                                  RecorderBase* recorder)
 {
+    (void)tv_rec;
     int major = channel->GetMajorChannel();
     int minor = channel->GetMinorChannel();
-    VERBOSE(VB_RECORD, QString("atsc channel: %1_%2").arg(major).arg(minor));
-    if (minor > 0)
+    if (minor <= 0)
     {
-        pid_cache_t pid_cache;
-        channel->GetCachedPids(pid_cache);
+        VERBOSE(VB_RECORD, QString("Not ATSC channel: major(%1) minor(%2).")
+                .arg(major).arg(minor));
+        return false;
+    }   
 
-        ATSCStreamData *sd = NULL;
+    VERBOSE(VB_RECORD, QString("ATSC channel: %1_%2").arg(major).arg(minor));
+
+    pid_cache_t pid_cache;
+    channel->GetCachedPids(pid_cache);
+
+    ATSCStreamData *sd = NULL;
 #ifdef USING_V4L
-        HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
-        if (rec)
-        {
-            sd = rec->StreamData();
-            sd->SetCaching(true);
-        }
-#endif // USING_V4L
-        if (!sd)
-            sd = new ATSCStreamData(major, minor, true);
-
-        dtvSignalMonitor->SetStreamData(sd);
-        sd->Reset(major, minor);
-        dtvSignalMonitor->SetChannel(major, minor);
-        dtvSignalMonitor->SetFTAOnly(true);
-
-        VERBOSE(VB_RECORD, "set up table monitoring successfully");
-
-        pid_cache_t::const_iterator it = pid_cache.begin();
-        bool vctpid_cached = false;
-        for (; it != pid_cache.end(); ++it)
-        {
-            if ((it->second == TableID::TVCT) ||
-                (it->second == TableID::CVCT))
-            {
-                vctpid_cached = true;
-                dtvSignalMonitor->GetATSCStreamData()->
-                    AddListeningPID(it->first);
-            }
-        }
-        if (!vctpid_cached)
-            dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForMGT);
-
-        return true;
+    HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
+    if (rec)
+    {
+        sd = rec->StreamData();
+        sd->SetCaching(true);
     }
-    return false;
+#endif // USING_V4L
+    if (!sd)
+        sd = new ATSCStreamData(major, minor, true);
+
+    dtvSignalMonitor->SetStreamData(sd);
+    sd->Reset(major, minor);
+    dtvSignalMonitor->SetChannel(major, minor);
+    dtvSignalMonitor->SetFTAOnly(true);
+
+    VERBOSE(VB_RECORD, "Set up ATSC table monitoring successfully.");
+
+    pid_cache_t::const_iterator it = pid_cache.begin();
+    bool vctpid_cached = false;
+    for (; it != pid_cache.end(); ++it)
+    {
+        if ((it->second == TableID::TVCT) || (it->second == TableID::CVCT))
+        {
+            vctpid_cached = true;
+            dtvSignalMonitor->GetATSCStreamData()->
+                AddListeningPID(it->first);
+        }
+    }
+    if (!vctpid_cached)
+        dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForMGT);
+
+    return true;
 }
 
 void setup_table_monitoring(ChannelBase* channel,
@@ -2049,8 +2059,7 @@ void setup_table_monitoring(ChannelBase* channel,
                             TVRec *tv_rec,
                             RecorderBase* recorder)
 {
-    (void) recorder;
-    VERBOSE(VB_RECORD, "setting up table monitoring");
+    VERBOSE(VB_RECORD, "Setting up table monitoring.");
 
     bool done = setup_atsc_table_monitoring(
         channel, dtvSignalMonitor, tv_rec, recorder);
