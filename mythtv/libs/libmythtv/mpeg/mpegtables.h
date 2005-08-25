@@ -44,7 +44,30 @@ class StreamID
         // other
         PrivSec        = 0x05,
         PrivData       = 0x06,
+
+        // special id's, not actually ID's but can be used in FindPIDs
+        AnyMask        = 0xFFFF0000,
+        AnyVideo       = 0xFFFF0001,
+        AnyAudio       = 0xFFFF0002,
     };
+    /// Returns true iff video is an MPEG1/2/3, H264 or open cable video stream.
+    static bool IsVideo(uint type)
+    {
+        return ((StreamID::MPEG1Video == type) ||
+                (StreamID::MPEG2Video == type) ||
+                (StreamID::MPEG4Video == type) ||
+                (StreamID::H264Video  == type) || 
+                (StreamID::OpenCableVideo == type));
+    }
+    /// Returns true iff audio is MPEG1/2, AAC, AC3 or DTS audio stream.
+    static bool IsAudio(uint type)
+    {
+        return ((StreamID::MPEG1Audio == type) ||
+                (StreamID::MPEG2Audio == type) ||
+                (StreamID::AACAudio   == type) ||
+                (StreamID::AC3Audio   == type) ||
+                (StreamID::DTSAudio   == type)); 
+    }
 };
 
 enum
@@ -68,7 +91,8 @@ enum
 class TableID
 {
   public:
-    enum {
+    enum
+    {
         PAT      = 0x00, // always on pid 0x00
         CAT      = 0x01, // always on pid 0x01
         PMT      = 0x02,
@@ -127,38 +151,41 @@ class TableID
  *  \brief A PSIP table is a special type of PES packet containing an
  *         MPEG, ATSC, or DVB table.
  */
-class PSIPTable : public PESPacket {
+class PSIPTable : public PESPacket
+{
   private:
     // creates non-clone version, for View
-    PSIPTable(const PESPacket& pkt, bool) :
-        PESPacket(reinterpret_cast<const TSPacket*>(pkt.tsheader()), false) { ; }
+    PSIPTable(const PESPacket& pkt, bool)
+        : PESPacket(reinterpret_cast<const TSPacket*>(pkt.tsheader()), false)
+        { ; }
   public:
-    PSIPTable(const PSIPTable& table) : PESPacket(table) { 
+    PSIPTable(const PSIPTable& table) : PESPacket(table)
+    { 
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     }
-    PSIPTable(const PESPacket& table) : PESPacket(table) { 
+    PSIPTable(const PESPacket& table) : PESPacket(table)
+    { 
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     }
-    PSIPTable(const TSPacket& table) : PESPacket(table) { 
+    PSIPTable(const TSPacket& table) : PESPacket(table)
+    { 
         // section_syntax_ind   1       1.0       8   should always be 1
         // private_indicator    1       1.1       9   should always be 1
     }
 
 
-    static const PSIPTable View(const TSPacket& tspacket) {
-        return PSIPTable(PESPacket::View(tspacket), false);
-    }
+    static const PSIPTable View(const TSPacket& tspacket)
+        { return PSIPTable(PESPacket::View(tspacket), false); }
 
-    static PSIPTable View(TSPacket& tspacket) {
-        return PSIPTable(PESPacket::View(tspacket), false);
-    }
+    static PSIPTable View(TSPacket& tspacket)
+        { return PSIPTable(PESPacket::View(tspacket), false); }
 
     // Section            Bits   Start Byte sbit
     // -----------------------------------------
     // table_id             8       1.0       0
-    unsigned int TableID() const { return StreamID(); }
+    uint TableID(void) const { return StreamID(); }
 
     // section_syntax_ind   1       2.0       8   should always be 1
     // private_indicator    1       2.1       9   should always be 1
@@ -167,63 +194,63 @@ class PSIPTable : public PESPacket {
     // section_length      12       2.4      12   always less than 0xFFE
     // adds 3 to the total section length to account for 3 bytes
     // before the end of the section length field.
-    unsigned int SectionLength() const { return Length() + 3; }
+    uint SectionLength(void) const { return Length() + 3; }
 
     // table_id_extension  16       4.0      24   table dependent
-    unsigned int TableIDExtension() const {
-        return (pesdata()[4]<<8) | pesdata()[5];
-    }
+    uint TableIDExtension(void) const
+        { return (pesdata()[4]<<8) | pesdata()[5]; }
 
     // reserved             2       6.0      40
 
     // version_number       5       6.2      42
     // incremented modulo 32 when table info changes
-    unsigned int Version() const { return (pesdata()[6]>>2) & 0x1f; }
+    uint Version(void) const { return (pesdata()[6]>>2) & 0x1f; }
 
     // current_next_ind     1       6.7      47
     // if 0 this table is not yet valid, but will be the next psip
     // table with the same sectionNumber(), tableIDExtension() and
     // tableID() to become valid.
-    bool IsCurrent() const { return bool(pesdata()[6]&1); }
+    bool IsCurrent(void) const { return bool(pesdata()[6]&1); }
 
     // section_number       8       7.0      48
-    unsigned int Section() const { return pesdata()[7]; }
+    uint Section(void) const { return pesdata()[7]; }
 
     // last_section_number  8       8.0      56
-    unsigned int LastSection() const { return pesdata()[8]; }
+    uint LastSection(void) const { return pesdata()[8]; }
 
     // this is only for real ATSC PSIP tables, not similar MPEG2 tables
     // protocol_version     8       9.0      64   should always be 0 for now
-    unsigned int ProtocolVersion() const { return pesdata()[9]; }
+    uint ProtocolVersion(void) const { return pesdata()[9]; }
 
     // PSIP_table_data      x       9.0      72 (incl. protocolVersion)
-    const unsigned char* psipdata() const { return pesdata()+PSIP_OFFSET; }
-    unsigned char* psipdata() { return pesdata()+PSIP_OFFSET; }
+    const unsigned char* psipdata(void) const
+        { return pesdata() + PSIP_OFFSET; }
+    unsigned char* psipdata(void)
+        { return pesdata() + PSIP_OFFSET; }
 
     // sets
-    void SetTableID(unsigned int id) { SetStreamID(id); }
+    void SetTableID(uint id) { SetStreamID(id); }
     // subtracts 3 from total section length to account for 3 bytes
     // before the end of the section length field.
-    void SetSectionLength(unsigned int length) { SetLength(length-3); }
-    void SetTableIDExtension(unsigned int len) {
+    void SetSectionLength(uint length) { SetLength(length-3); }
+    void SetTableIDExtension(uint len)
+    {
         pesdata()[4] = (len>>8) & 0xff;
         pesdata()[5] = len & 0xff;
     }
-    void SetVersionNumber(unsigned int ver) {
-        pesdata()[6] = ((ver&0x1f)<<2) | (pesdata()[6] & 0x83);
-    }
-    void SetCurrent(bool cur) {
-        pesdata()[6] = (pesdata()[6]&(0xff-0x80)) | (cur ? 0x80:0);
-    }
-    void SetSection(unsigned int num) { pesdata()[7] = num; }
-    void SetLastSection(unsigned int num) { pesdata()[8] = num; }
+    void SetVersionNumber(uint ver)
+        { pesdata()[6] = ((ver & 0x1f)<<2) | (pesdata()[6] & 0x83); }
+    void SetCurrent(bool cur)
+        { pesdata()[6] = (pesdata()[6]&(0xff-0x80)) | (cur ? 0x80:0); }
+    void SetSection(uint num) { pesdata()[7] = num; }
+    void SetLastSection(uint num) { pesdata()[8] = num; }
 
     // only for real ATSC PSIP tables, not similar MPEG2 tables
     //void setProtocolVersion(int ver) { pesdata()[7] = ver; }
 
-    const QString toString() const;
+    const QString toString(void) const;
 
-    static const unsigned int PSIP_OFFSET=9; // general PSIP header offset
+    static const uint PSIP_OFFSET = 9; // general PSIP header offset
 };
 
 /** \class ProgramAssociationTable
@@ -246,10 +273,13 @@ class PSIPTable : public PESPacket {
 
 extern const unsigned char init_patheader[9];
 
-class ProgramAssociationTable : public PSIPTable {
-    static ProgramAssociationTable* CreateBlank() {
+class ProgramAssociationTable : public PSIPTable
+{
+    static ProgramAssociationTable* CreateBlank(void)
+    {
         TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
-        memcpy(tspacket->data()+tspacket->AFCOffset(), init_patheader, PSIP_OFFSET);
+        memcpy(tspacket->data() + tspacket->AFCOffset(),
+               init_patheader, PSIP_OFFSET);
         PSIPTable psip = PSIPTable::View(*tspacket);
         psip.SetLength(PSIP_OFFSET);
         ProgramAssociationTable *pat = new ProgramAssociationTable(psip);
@@ -257,7 +287,8 @@ class ProgramAssociationTable : public PSIPTable {
         return pat;
     }
   public:
-    ProgramAssociationTable(const PSIPTable &table) : PSIPTable(table) {
+    ProgramAssociationTable(const PSIPTable &table) : PSIPTable(table)
+    {
         assert(TableID::PAT == TableID());
     }
 
@@ -266,47 +297,46 @@ class ProgramAssociationTable : public PSIPTable {
                                            const vector<uint>& pnum,
                                            const vector<uint>& pid);
 
-    unsigned int TransportStreamID() const {
-        return TableIDExtension();
+    uint TransportStreamID(void) const { return TableIDExtension(); }
+
+    uint ProgramCount(void) const
+        { return (SectionLength()-PSIP_OFFSET-3)>>2; }
+
+    uint ProgramNumber(uint i) const
+        { return (psipdata()[(i<<2)] << 8) | psipdata()[(i<<2) + 1]; }
+
+    uint ProgramPID(uint i) const
+    {
+        return (((psipdata()[(i<<2) + 2] & 0x1f) << 8) |
+                psipdata()[(i<<2) + 3]);
     }
 
-    unsigned int ProgramCount() const {
-        return (SectionLength()-PSIP_OFFSET-3)>>2;
-    }
-
-    unsigned int ProgramNumber(unsigned int i) const {
-        return (psipdata()[(i<<2)] << 8) | psipdata()[(i<<2)+1];
-    }
-
-    unsigned int ProgramPID(unsigned int i) const {
-        return (psipdata()[(i<<2)+2]&0x1f) << 8 | psipdata()[(i<<2)+3];
-    }
-
-    void SetTranportStreamID(unsigned int gtsid) {
-        SetTableIDExtension(gtsid);
-    }
+    void SetTranportStreamID(uint gtsid) { SetTableIDExtension(gtsid); }
 
     // helper function
-    unsigned int FindPID(unsigned int progNum) const {
-        for (unsigned int i=0; i<ProgramCount(); i++)
+    uint FindPID(uint progNum) const
+    {
+        for (uint i = 0; i < ProgramCount(); i++)
             if (progNum==ProgramNumber(i))
                 return ProgramPID(i);
         return 0;
     }
-    unsigned int FindAnyPID() const {
-        for (unsigned int i=0; i<ProgramCount(); i++)
+    uint FindAnyPID(void) const
+    {
+        for (uint i = 0; i < ProgramCount(); i++)
             if (0!=ProgramNumber(i))
                 return ProgramPID(i);
         return 0;
     }
-    unsigned int FindProgram(unsigned int pid) const {
-        for (unsigned int i=0; i<ProgramCount(); i++)
+    uint FindProgram(uint pid) const
+    {
+        for (uint i = 0; i < ProgramCount(); i++)
             if (pid==ProgramPID(i))
                 return ProgramNumber(i);
         return 0;
     }
 
-    const QString toString() const;
+    const QString toString(void) const;
 };
 
 extern const unsigned char DEFAULT_PMT_HEADER[9];
@@ -316,13 +346,16 @@ extern const unsigned char DEFAULT_PMT_HEADER[9];
  *         to various PID's which describe the multimedia contents of the
  *         program.
  */
-class ProgramMapTable : public PSIPTable {
-    static const unsigned int pmt_header=4; // minimum PMT header offset
+class ProgramMapTable : public PSIPTable
+{
+    static const uint pmt_header = 4; // minimum PMT header offset
     mutable vector<unsigned char*> _ptrs; // used to parse
 
-    static ProgramMapTable* CreateBlank() {
+    static ProgramMapTable* CreateBlank(void)
+    {
         TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
-        memcpy(tspacket->data()+tspacket->AFCOffset(), DEFAULT_PMT_HEADER, PSIP_OFFSET);
+        memcpy(tspacket->data() + tspacket->AFCOffset(),
+               DEFAULT_PMT_HEADER, PSIP_OFFSET);
         PSIPTable psip = PSIPTable::View(*tspacket);
         psip.SetLength(PSIP_OFFSET);
         ProgramMapTable *pmt = new ProgramMapTable(psip);
@@ -330,8 +363,8 @@ class ProgramMapTable : public PSIPTable {
         return pmt;
     }
   public:
-    ProgramMapTable(const PSIPTable& table) :
-        PSIPTable(table) {
+    ProgramMapTable(const PSIPTable& table) : PSIPTable(table)
+    {
         assert(TableID::PMT == TableID());
         Parse();
     }
@@ -341,101 +374,97 @@ class ProgramMapTable : public PSIPTable {
                                    vector<uint> pids, vector<uint> types);
         
     /// stream that contrains program clock reference.
-    unsigned int PCRPID() const {
-        return ((psipdata()[0] << 8) | psipdata()[1]) & 0x1fff;
-    }
+    uint PCRPID(void) const
+        { return ((psipdata()[0] << 8) | psipdata()[1]) & 0x1fff; }
 
-    unsigned int ProgramNumber() const { return TableIDExtension(); }
+    uint ProgramNumber(void) const
+        { return TableIDExtension(); }
 
-    unsigned int ProgramInfoLength() const {
-        return ((psipdata()[2]<<8) | psipdata()[3]) & 0x0fff;
-    }
+    uint ProgramInfoLength(void) const
+        { return ((psipdata()[2]<<8) | psipdata()[3]) & 0x0fff; }
 
-    const unsigned char* ProgramInfo() const { return pesdata()+13; }
+    const unsigned char* ProgramInfo(void) const
+        { return pesdata() + 13; }
 
-    unsigned int StreamType(unsigned int i) const { return _ptrs[i][0]; }
+    uint StreamType(uint i) const
+        { return _ptrs[i][0]; }
 
-    unsigned int StreamPID(unsigned int i) const {
-        return ((_ptrs[i][1] << 8) | _ptrs[i][2]) & 0x1fff;
-    }
+    uint StreamPID(uint i) const
+        { return ((_ptrs[i][1] << 8) | _ptrs[i][2]) & 0x1fff; }
 
-    unsigned int StreamInfoLength(unsigned int i) const {
-        return ((_ptrs[i][3] << 8) | _ptrs[i][4]) & 0x0fff;
-    }
+    uint StreamInfoLength(uint i) const
+        { return ((_ptrs[i][3] << 8) | _ptrs[i][4]) & 0x0fff; }
 
-    const unsigned char* StreamInfo(unsigned int i) const {
-        return _ptrs[i]+5;
-    }
+    const unsigned char* StreamInfo(uint i) const
+        { return _ptrs[i] + 5; }
 
-    unsigned int StreamCount() const {
-        return (_ptrs.size()) ? _ptrs.size()-1 : 0;
-    }
+    uint StreamCount(void) const
+        { return (_ptrs.size()) ? _ptrs.size()-1 : 0; }
 
     // sets
-    void SetPCRPID(unsigned int pid) {
+    void SetPCRPID(uint pid)
+    {
         psipdata()[0] = ((pid >> 8) & 0x1F) | (psipdata()[0] & 0xE0);
         psipdata()[1] = (pid & 0xFF);
     }
 
-    void SetProgramNumber(unsigned int num) { SetTableIDExtension(num); }
+    void SetProgramNumber(uint num) { SetTableIDExtension(num); }
 
-    void SetStreamPID(unsigned int i, unsigned int pid) {
+    void SetStreamPID(uint i, uint pid)
+    {
         _ptrs[i][1] = ((pid>>8) & 0x1f) | (_ptrs[i][1] & 0xe0);
         _ptrs[i][2] = pid & 0xff;
     }
 
-    void SetStreamType(unsigned int i, unsigned int type) {
-        _ptrs[i][0] = type;
-    }
+    void SetStreamType(uint i, uint type)
+        { _ptrs[i][0] = type; }
 
     // helper methods
+    /// Returns true iff PMT contains CA descriptor.
     bool IsEncrypted(void) const;
-    const QString StreamTypeString(unsigned int i) const;
-    uint FindPIDs(uint type, vector<uint>& pids) const {
-        for (uint i=0; i < StreamCount(); i++) {
-            if (type == StreamType(i)) {
-                pids.push_back(StreamPID(i));
-            }
-        }
-        return pids.size();
-    }
+    /// Returns a string representation of type at stream index i
+    const QString StreamTypeString(uint i) const;
+    uint FindPIDs(uint type, vector<uint>& pids) const;
+    uint FindPIDs(uint type, vector<uint>& pids, vector<uint>& types) const;
 
-    unsigned int FindPID(unsigned int pid) const {
-        for (unsigned int i=0; i<StreamCount(); i++) {
-            if (pid==StreamPID(i)) {
+    /// \brief Locates stream index of pid.
+    /// \return stream index if successful, -1 otherwise
+    int FindPID(uint pid) const
+    {
+        for (uint i = 0; i < StreamCount(); i++)
+            if (pid == StreamPID(i))
                 return i;
-            }
-        }
-        return static_cast<unsigned int>(-1);
+        return -1;
     }
 
-    void RemoveAllStreams() {
+    void RemoveAllStreams(void)
+    {
         memset(psipdata(), 0xff, pmt_header);
         SetProgramInfoLength(0);
         _ptrs.clear();
     }
-    void AppendStream(unsigned int pid, unsigned int type,
-                      unsigned char* streamInfo=0, unsigned int infoLength=0);
+    void AppendStream(uint pid, uint type, unsigned char* si = 0, uint il = 0);
 
-    void Parse() const;
-    const QString toString() const;
+    void Parse(void) const;
+    const QString toString(void) const;
     // unsafe sets
   private:
-    void SetStreamInfoLength(unsigned int i, unsigned int length) {
-        _ptrs[i][3] = ((length>>8) & 0x0f) |
-            (_ptrs[i][3] & 0xf0);
+    void SetStreamInfoLength(uint i, uint length)
+    {
+        _ptrs[i][3] = ((length>>8) & 0x0f) | (_ptrs[i][3] & 0xf0);
         _ptrs[i][4] = length & 0xff;
     }
 
-    void SetStreamProgramInfo(unsigned int i, unsigned char* streamInfo,
-                              unsigned int infoLength) {
+    void SetStreamProgramInfo(uint i, unsigned char* streamInfo,
+                              uint infoLength)
+    {
         SetStreamInfoLength(i, infoLength);
-        memcpy(_ptrs[i]+5, streamInfo, infoLength);
+        memcpy(_ptrs[i] + 5, streamInfo, infoLength);
     }
 
-    void SetProgramInfoLength(unsigned int length) {
-        psipdata()[2] = ((length<<8) & 0x0f) |
-            (psipdata()[2] & 0xf0);
+    void SetProgramInfoLength(uint length)
+    {
+        psipdata()[2] = ((length<<8) & 0x0f) | (psipdata()[2] & 0xf0);
         psipdata()[3] = length & 0xff;
     }
 };
@@ -449,34 +478,35 @@ class ProgramMapTable : public PSIPTable {
  *   currently just passed through the MythTV recorders to the recorded
  *   stream.
  */
-class AdaptationFieldControl {
+class AdaptationFieldControl
+{
   public:
     AdaptationFieldControl(const unsigned char* packet) : _data(packet) { ; }
 
     /** adaptation header length
      * (after which is payload data)         8   0.0
      */
-    unsigned int Length() const { return _data[0]; }
+    uint Length(void) const             { return _data[0]; }
 
     /** discontinuity_indicator
      *  (time base may change)               1   1.0
      */
-    bool Discontinuity() const { return _data[1]&0x80; }
+    bool Discontinuity(void) const      { return _data[1] & 0x80; }
     // random_access_indicator (?)           1   1.1
-    bool RandomAccess() const { return bool(_data[1]&0x40); }
+    bool RandomAccess(void) const       { return bool(_data[1] & 0x40); }
     // elementary_stream_priority_indicator  1   1.2
-    bool Priority() const { return bool(_data[1]&0x20); }
+    bool Priority(void) const           { return bool(_data[1] & 0x20); }
 
 // Each of the following extends the adaptation header.  In order:
 
     /** PCR flag (we have PCR data)          1   1.3
      *  (adds 6 bytes after adaptation header)
      */
-    bool PCR() const { return bool(_data[1]&0x10); }
+    bool PCR(void) const                { return bool(_data[1] & 0x10); }
     /** OPCR flag (we have OPCR data)        1   1.4
      *  (adds 6 bytes) ((Original) Program Clock Reference; used to time output)
      */
-    bool OPCR() const { return bool(_data[1]&0x08); }
+    bool OPCR(void) const               { return bool(_data[1] & 0x08); }
     /** splicing_point_flag                  1   1.5
      *  (adds 1 byte) (we have splice point data)
      *  Splice data is packets until a good splice point for
@@ -484,22 +514,21 @@ class AdaptationFieldControl {
      *  might be a good way to recognize potential commercials
      *  for flagging.
      */
-    bool SplicingPoint() const { return bool(_data[1]&0x04); }
+    bool SplicingPoint(void) const      { return bool(_data[1] & 0x04); }
     //  transport_private_data_flag          1   1.6
     // (adds 1 byte)
-    bool PrivateTransportData() const { return bool(_data[1]&0x02); }
+    bool PrivateTransportData(void) const { return bool(_data[1] & 0x02); }
     // adaptation_field_extension_flag       1   1.7
-    bool FieldExtension() const { return bool(_data[1]&0x1); }
+    bool FieldExtension(void) const     { return bool(_data[1] & 0x1); }
     // extension length                      8   2.0
-    // (adds extensionLength() bytes)
-    unsigned int ExtensionLength() const { return _data[2]; }
+    uint ExtensionLength(void) const    { return _data[2]; }
     // ltw flag                              1   3.0
     // (adds 2 bytes)
-    bool LTW() const { return bool(_data[3]&0x80); }
+    bool LTW(void) const                { return bool(_data[3] & 0x80); }
     // piecewise_rate_flag (adds 3 bytes)    1   3.1
-    bool PiecewiseRate() const { return bool(_data[3]&0x40); }
+    bool PiecewiseRate(void) const      { return bool(_data[3] & 0x40); }
     // seamless_splice_flag (adds 5 bytes)   1   3.2
-    bool SeamlessSplice() const { return bool(_data[3]&0x20); }
+    bool SeamlessSplice(void) const     { return bool(_data[3] & 0x20); }
     // unused flags                          5   3.3
 
   private:

@@ -128,6 +128,74 @@ bool ProgramMapTable::IsEncrypted(void) const
 #endif
 }
 
+/** \fn ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
+ *  \brief Finds all pids matching type.
+ *  \param pids vector pids will be added to
+ *  \return number of pids in list
+ */
+uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
+{
+    if ((StreamID::AnyMask & type) != StreamID::AnyMask)
+    {
+        for (uint i=0; i < StreamCount(); i++)
+            if (type == StreamType(i))
+                pids.push_back(StreamPID(i));
+    }
+    else if (StreamID::AnyVideo == type)
+    {
+        for (uint i=0; i < StreamCount(); i++)
+            if (StreamID::IsVideo(StreamType(i)))
+                pids.push_back(StreamPID(i));
+    }
+    else if (StreamID::AnyAudio == type)
+    {
+        for (uint i=0; i < StreamCount(); i++)
+            if (StreamID::IsAudio(StreamType(i)))
+                pids.push_back(StreamPID(i));
+    }
+
+    return pids.size();
+}
+
+/** \fn ProgramMapTable::FindPIDs(uint, vector<uint>&, vector<uint>&) const
+ *  \brief Finds all pids w/types, matching type (useful for AnyVideo/AnyAudio).
+ *  \param pids vector pids will be added to
+ *  \param type vector types will be added to
+ *  \return number of items in pids and types lists.
+ */
+uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
+                               vector<uint>& types) const
+{
+    if ((StreamID::AnyMask & type) != StreamID::AnyMask)
+    {
+        for (uint i=0; i < StreamCount(); i++)
+            if (type == StreamType(i))
+            {
+                pids.push_back(StreamPID(i));
+                types.push_back(StreamType(i));
+            }
+    }
+    else if (StreamID::AnyVideo == type)
+    {
+        for (uint i=0; i < StreamCount(); i++)
+            if (StreamID::IsVideo(StreamType(i)))
+            {
+                pids.push_back(StreamPID(i));
+                types.push_back(StreamType(i));
+            }
+    }
+    else if (StreamID::AnyAudio == type)
+    {
+        for (uint i=0; i < StreamCount(); i++)
+            if (StreamID::IsAudio(StreamType(i)))
+            {
+                pids.push_back(StreamPID(i));
+                types.push_back(StreamType(i));
+            }
+    }
+
+    return pids.size();
+}
 
 const QString PSIPTable::toString() const
 {

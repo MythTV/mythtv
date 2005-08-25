@@ -209,45 +209,33 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     }
     pmt.Parse();
 
-    vector<uint> videoPIDs, audioAC3, audioMPEG;
+    vector<uint> videoPIDs, audioPIDs;
+    vector<uint> videoTypes, audioTypess;
     vector<uint> pids, types;
 
     // Video
-    pmt.FindPIDs(StreamID::MPEG2Video, videoPIDs);
-    if (videoPIDs.size() < 1) 
+    if (pmt.FindPIDs(StreamID::AnyVideo, videoPIDs, videoTypes) < 1) 
     {
         VERBOSE(VB_RECORD,
                 "No video found old PMT, can not construct new PMT");
         return false;
     }
-    _pid_video_single_program = videoPIDs[0];
-    pids.push_back(_pid_video_single_program);
-    types.push_back(StreamID::MPEG2Video);
-
-    // Audio
-    pmt.FindPIDs(StreamID::AC3Audio,   audioAC3);
-    pmt.FindPIDs(StreamID::MPEG2Audio, audioMPEG);
-
-    if (audioAC3.size() + audioMPEG.size() < 1)
+    if (videoPIDs.size() > 1)
     {
         VERBOSE(VB_RECORD,
-                "No audio found in old PMT, can not construct new PMT");
-        return false;
+                "Warning: More than one video stream in old PMT, "
+                "only using first one in new PMT");
     }
 
-    for (uint i = 0; i < audioAC3.size(); i++)
-    {
-        AddAudioPID(audioAC3[i]);
-        pids.push_back(audioAC3[i]);
-        types.push_back(StreamID::AC3Audio);
-    }
-    for (uint i = 0; i < audioMPEG.size(); i++)
-    {
-        AddAudioPID(audioMPEG[i]);
-        pids.push_back(audioMPEG[i]);
-        types.push_back(StreamID::MPEG2Audio);
-    }
-    
+    _pid_video_single_program = videoPIDs[0];
+    pids.push_back(videoPIDs[0]);
+    types.push_back(videoTypes[0]);
+
+    // Audio
+    pmt.FindPIDs(StreamID::AnyAudio, pids, types);
+    for (uint i = 1; i < audioPIDs.size(); i++)
+        AddAudioPID(audioPIDs[i]);
+
     // Timebase
     int pcrpidIndex = pmt.FindPID(pmt.PCRPID());
     if (pcrpidIndex < 0)

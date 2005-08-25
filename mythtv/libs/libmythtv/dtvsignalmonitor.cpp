@@ -239,16 +239,8 @@ void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
 
     for (uint i = 0; i < pmt->StreamCount(); i++)
     {
-        uint type = pmt->StreamType(i);
-
-        hasVideo |= ((StreamID::MPEG2Video == type) ||
-                     (StreamID::MPEG1Video == type));
-
-        hasAudio |= ((StreamID::MPEG2Audio == type) ||
-                     (StreamID::MPEG1Audio == type) ||
-                     (StreamID::AC3Audio   == type) ||
-                     (StreamID::AACAudio   == type) ||
-                     (StreamID::DTSAudio   == type));
+        hasVideo |= StreamID::IsVideo(pmt->StreamType(i));
+        hasAudio |= StreamID::IsAudio(pmt->StreamType(i));
     }
 
     if (hasVideo && hasAudio)
