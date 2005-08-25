@@ -67,6 +67,13 @@
 
 const QString ScanWizardScanner::strTitle(QObject::tr("Scanning"));
 
+void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
+{
+    ScannerEvent* e = new ScannerEvent(type);
+    e->intValue(val);
+    QApplication::postEvent(dest, e);
+}
+
 DVBChannel *ScanWizardScanner::GetDVBChannel()
 {
 #ifdef USING_DVB
@@ -190,26 +197,6 @@ void ScanWizardScanner::transportScanComplete()
     QApplication::postEvent(this, e);
 }
 
-bool ScanWizardScanner::TransportScanComplete()
-{
-    if (scanner->ScanServicesSourceID(nVideoSource))
-    {
-        VERBOSE(VB_SIPARSER, "ScanServicesSourceID() succeeded");
-        ScannerEvent* e = new ScannerEvent(ScannerEvent::ServicePct);
-        e->intValue(TRANSPORT_PCT);
-        QApplication::postEvent(this, e);
-        return true;
-    }
-    else
-    {
-        VERBOSE(VB_SIPARSER, "ScanServicesSourceID() failed");
-        ScannerEvent* e = new ScannerEvent(ScannerEvent::TuneComplete);
-        e->intValue(ScannerEvent::ERROR_TUNE);
-        QApplication::postEvent(this, e);
-        return false;
-    }
-}
-
 void *ScanWizardScanner::SpawnTune(void *param)
 {
     bool ok = false;
@@ -331,11 +318,10 @@ void ScanWizardScanner::cancelScan()
 
 void ScanWizardScanner::scan()
 {
-    VERBOSE(VB_SIPARSER,
-            QString("ScanWizardScanner::scan(): "
-                    "type(%1) src(%2) transport(%3) card(%4)")
-            .arg(parent->scanType()).arg(parent->videoSource())
-            .arg(parent->transport()).arg(parent->captureCard()));
+    SISCAN(QString("ScanWizardScanner::scan(): "
+                   "type(%1) src(%2) transport(%3) card(%4)")
+           .arg(parent->scanType()).arg(parent->videoSource())
+           .arg(parent->transport()).arg(parent->captureCard()));
 
     tunerthread_running = false;
 
@@ -636,23 +622,23 @@ void ScanWizard::pageSelected(const QString& strTitle)
 
 void ScanWizardScanner::HandleTuneComplete(void)
 {
-    VERBOSE(VB_SIPARSER, "ScannerEvent::HandleTuneComplete()");
+    SISCAN("ScanWizardScanner::HandleTuneComplete()");
 
     if (!scanner)
     {
-        VERBOSE(VB_SIPARSER, "ScannerEvent::HandleTuneComplete(): "
-                "Waiting for scan to start");
+        SISCAN("ScanWizardScanner::HandleTuneComplete(): "
+               "Waiting for scan to start.");
         QTime t = QTime::currentTime();
         while (!scanner && t.elapsed() < 500)
             usleep(250);
         if (!scanner)
         {
-            VERBOSE(VB_SIPARSER, "ScannerEvent::HandleTuneComplete(): "
-                    "scan() did not start scanner! Aborting");
+            SISCAN("ScanWizardScanner::HandleTuneComplete(): "
+                   "scan() did not start scanner! Aborting.");
             return;
         }
-        VERBOSE(VB_SIPARSER, "ScannerEvent::HandleTuneComplete(): "
-                "scan() has started scanner");
+        SISCAN("ScanWizardScanner::HandleTuneComplete(): "
+               "scan() has started scanner.");
         usleep(5000);
     }
 
@@ -682,7 +668,7 @@ void ScanWizardScanner::HandleTuneComplete(void)
     if ((nScanType == ScanTypeSetting::FullScan_ATSC) ||
         (nScanType == ScanTypeSetting::FullScan_OFDM))
     {
-        cerr<<"ScanTransports("<<std<<", "<<mod<<", "<<country<<")"<<endl;
+        SISCAN("ScanTransports("<<std<<", "<<mod<<", "<<country<<")");
         scanner->SetChannelFormat(parent->paneATSC->atscFormat());
         ok = scanner->ScanTransports(nVideoSource, std, mod, country);
     }
@@ -690,17 +676,20 @@ void ScanWizardScanner::HandleTuneComplete(void)
              (nScanType == ScanTypeSetting::FullTunedScan_QPSK) ||
              (nScanType == ScanTypeSetting::FullTunedScan_QAM))
     {
-        cerr<<"ScanTransports()"<<endl;
+        SISCAN("ScanTransports()");
         ok = scanner->ScanTransports("dvb");
     }
     else if (nScanType == ScanTypeSetting::FullTransportScan)
     {
-        cerr<<"TransportScanComplete()"<<endl;
-        ok = TransportScanComplete();
+        SISCAN("ScanServicesSourceID("<<nVideoSource<<")");
+        ok = scanner->ScanServicesSourceID(nVideoSource);
+        post_event(this,
+                   (ok) ? ScannerEvent::ServicePct : ScannerEvent::TuneComplete,
+                   (ok) ? TRANSPORT_PCT            : ScannerEvent::ERROR_TUNE);
     }
     else if (nScanType == ScanTypeSetting::TransportScan)
     {
-        cerr<<"ScanTransport("<<parent->transport()<<")"<<endl;
+        SISCAN("ScanTransport("<<parent->transport()<<")");
         ok = scanner->ScanTransport(parent->transport());
     }
 
