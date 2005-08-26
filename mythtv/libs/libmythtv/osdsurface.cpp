@@ -652,10 +652,10 @@ void OSDSurface::BlendToYV12(unsigned char *yuvptr) const
     }
 }
 
-static void BlendToBlack(unsigned char *argbptr, uint width, uint height)
+static void BlendToBlack(unsigned char *argbptr, uint width, uint outheight)
 {
     unsigned int i, argb, a, r, g, b;
-    for (uint i = 0; i < width * height; i++)
+    for (i = 0; i < width * outheight; i++)
     {
         argb = ((uint*)argbptr)[i];
         a = (argb >> 24);
@@ -679,17 +679,17 @@ static void BlendToBlack(unsigned char *argbptr, uint width, uint height)
  *        efficient by integrating it into the process.
  *
  *  \param stride         Length of each line in output buffer in bytes
- *  \param height         Number of lines in output buffer
+ *  \param outheight      Number of lines in output buffer
  *  \param blend_to_black Uses Alpha to blend buffer to black
  */
-void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, uint height,
-                             bool blend_to_black) const
+void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, 
+                             uint outheight, bool blend_to_black) const
 {
     const OSDSurface *surface = this;
     blendtoargb_8_fun blender = blendtoargb_8_init(surface);
     const unsigned char *cm = surface->cm;
 
-    bzero(argbptr, stride * height);
+    bzero(argbptr, stride * outheight);
 
     QMemArray<QRect> rects = surface->usedRegions.rects();
     QMemArray<QRect>::Iterator it = rects.begin();
@@ -759,7 +759,7 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, uint height,
         }
     }
     if (blend_to_black)
-        BlendToBlack(argbptr, stride>>2, height);
+        BlendToBlack(argbptr, stride>>2, outheight);
 }
 
 /** \fn OSDSurface::DitherToI44(unsigned char*,bool,uint,uint) const
@@ -771,10 +771,10 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, uint height,
  *  \param outbuf Output buffer
  *  \param ifirst If true output buffer is AI44, otherwise it is IA44
  *  \param stride Length of each line in output buffer in bytes
- *  \param height Number of lines in output buffer
+ *  \param outheight Number of lines in output buffer
  */
 void OSDSurface::DitherToI44(unsigned char *outbuf, bool ifirst,
-                             uint stride, uint height) const
+                             uint stride, uint outheight) const
 {
     const OSDSurface *surface = this;
     int ashift = ifirst ? 0 : 4;
@@ -786,7 +786,7 @@ void OSDSurface::DitherToI44(unsigned char *outbuf, bool ifirst,
     dithertoia44_8_fun ditherer = dithertoia44_8_init(surface);
     dither8_context *dcontext = init_dithertoia44_8_context(ifirst);
 
-    bzero(outbuf, stride * height);
+    bzero(outbuf, stride * outheight);
 
     QMemArray<QRect> rects = surface->usedRegions.rects();
     QMemArray<QRect>::Iterator it = rects.begin();
@@ -866,14 +866,14 @@ void OSDSurface::DitherToI44(unsigned char *outbuf, bool ifirst,
  *
  *  \param outbuf Output buffer
  *  \param stride Length of each line in output buffer in bytes
- *  \param height Number of lines in output buffer
+ *  \param outheight Number of lines in output buffer
  *  \sa DitherToI44(unsigned char*,bool,uint,uint) const,
  *      DitherToAI44(unsigned char*,uint,uint) const.
  */
 void OSDSurface::DitherToIA44(unsigned char* outbuf,
-                              uint stride, uint height) const
+                              uint stride, uint outheight) const
 {
-    DitherToI44(outbuf, false, stride, height);
+    DitherToI44(outbuf, false, stride, outheight);
 }
 
 /** \fn OSDSurface::DitherToAI44(unsigned char*,bool,uint,uint) const
@@ -881,12 +881,12 @@ void OSDSurface::DitherToIA44(unsigned char* outbuf,
  *
  *  \param outbuf Output buffer
  *  \param stride Length of each line in output buffer in bytes
- *  \param height Number of lines in output buffer
+ *  \param outheight Number of lines in output buffer
  *  \sa DitherToI44(unsigned char*,bool,uint,uint) const,
  *      DitherToIA44(unsigned char*,uint,uint) const.
  */
 void OSDSurface::DitherToAI44(unsigned char* outbuf,
-                              uint stride, uint height) const
+                              uint stride, uint outheight) const
 {
-    DitherToI44(outbuf, true, stride, height);
+    DitherToI44(outbuf, true, stride, outheight);
 }
