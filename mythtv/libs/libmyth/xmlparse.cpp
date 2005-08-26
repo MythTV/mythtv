@@ -663,6 +663,54 @@ void XMLParse::parseRepeatedImage(LayerSet *container, QDomElement &element)
     container->bumpUpLayers(order.toInt());
 }
 
+bool XMLParse::parseDefaultCategoryColors(QMap<QString, QString> &catColors)
+{
+    QString catColorFile = gContext->GetThemesParentDir() + "default/categories.xml";
+    
+    QDomDocument doc;
+    QFile f(catColorFile);
+    
+    if (!f.open(IO_ReadOnly))
+    {
+        cerr << "Error: Unable to open " << catColorFile << endl;
+        return false;
+    }
+    
+    QString errorMsg;
+    int errorLine = 0;
+    int errorColumn = 0;
+    
+    if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
+    {
+        cerr << "Error parsing: " << catColorFile << endl;
+        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
+        cerr << errorMsg << endl;
+        f.close();
+        
+        return false;
+    }
+    
+    f.close();
+        
+    QDomElement element = doc.documentElement();
+    for (QDomNode child = element.firstChild(); !child.isNull(); 
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull() && info.tagName() == "catcolor")
+        {
+            QString cat = "";
+            QString col = "";
+            cat = info.attribute("category");
+            col = info.attribute("color");
+            
+            catColors[cat] = col;
+        }
+    }
+    
+    return true;
+}
+
 void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
 {
     int context = -1;
@@ -693,6 +741,11 @@ void XMLParse::parseGuideGrid(LayerSet *container, QDomElement &element)
     {
         cerr << "Guide needs an order\n";
         return;
+    }
+
+    if (!parseDefaultCategoryColors(catColors))
+    {
+        //cerr << "No default category colors to parse." << endl;
     }
 
     for (QDomNode child = element.firstChild(); !child.isNull();
