@@ -28,6 +28,7 @@ PlaybackSock::PlaybackSock(MainServer *parent, RefSocket *lsock,
     expectingreply = false;
 
     disconnected = false;
+    blockshutdown = true;
 
     if (hostname == localhostname)
         local = true;
