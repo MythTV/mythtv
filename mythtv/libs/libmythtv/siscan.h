@@ -26,7 +26,9 @@ typedef QValueList<QList_Events*> QListList_Events;
 #endif // USING_SIPARSER
 
 #define SISCAN(args...) \
-    VERBOSE(VB_SIPARSER, QString("SIScan(%1): ").arg(channel->GetDevice()) << args);
+    if (channel) VERBOSE(VB_SIPARSER, QString("SIScan(%1): ") \
+                         .arg(channel->GetDevice()) << args); \
+    else VERBOSE(VB_SIPARSER, QString("SIScan(u): ") << args);
 
 class MSqlQuery;
 class ChannelBase;
