@@ -5545,6 +5545,10 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
     check_marker(gb, "before time_increment_resolution");
     
     s->avctx->time_base.den = get_bits(gb, 16);
+    if(!s->avctx->time_base.den){
+        av_log(s->avctx, AV_LOG_ERROR, "time_base.den==0\n");
+        return -1;
+    }
     
     s->time_increment_bits = av_log2(s->avctx->time_base.den - 1) + 1;
     if (s->time_increment_bits < 1)
@@ -5749,13 +5753,11 @@ static int decode_user_data(MpegEncContext *s, GetBitContext *gb){
     int ver, build, ver2, ver3;
     char last;
 
-    buf[0]= show_bits(gb, 8);
-    for(i=1; i<256; i++){
-        buf[i]= show_bits(gb, 16)&0xFF;
-        if(buf[i]==0) break;
-        skip_bits(gb, 8);
+    for(i=0; i<255; i++){
+        if(show_bits(gb, 23) == 0) break;
+        buf[i]= get_bits(gb, 8);
     }
-    buf[255]=0;
+    buf[i]=0;
 
     /* divx detection */
     e=sscanf(buf, "DivX%dBuild%d%c", &ver, &build, &last);
@@ -5768,17 +5770,19 @@ static int decode_user_data(MpegEncContext *s, GetBitContext *gb){
     }
     
     /* ffmpeg detection */
-    e=sscanf(buf, "FFmpeg%d.%d.%db%d", &ver, &ver2, &ver3, &build);
+    e=sscanf(buf, "FFmpe%*[^b]b%d", &build)+3;
     if(e!=4)
         e=sscanf(buf, "FFmpeg v%d.%d.%d / libavcodec build: %d", &ver, &ver2, &ver3, &build); 
     if(e!=4){
+        e=sscanf(buf, "Lavc%d.%d.%d", &ver, &ver2, &ver3)+1;
+        build= (ver<<16) + (ver2<<8) + ver3;
+    }
+    if(e!=4){
         if(strcmp(buf, "ffmpeg")==0){
-            s->ffmpeg_version= 0x000406;
             s->lavc_build= 4600;
         }
     }
     if(e==4){
-        s->ffmpeg_version= ver*256*256 + ver2*256 + ver3;
         s->lavc_build= build;
     }
     
@@ -5807,10 +5811,6 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
     else
         s->decode_mb= ff_mpeg4_decode_mb;
 
-    if(s->avctx->time_base.den==0){
-        s->avctx->time_base.den=1;
-//        fprintf(stderr, "time_increment_resolution is illegal\n");
-    }
     time_incr=0;
     while (get_bits1(gb) != 0) 
         time_incr++;
@@ -5862,7 +5862,10 @@ static int decode_vop_header(MpegEncContext *s, GetBitContext *gb){
     }
 //av_log(s->avctx, AV_LOG_DEBUG, "last nonb %Ld last_base %d time %Ld pp %d pb %d t %d ppf %d pbf %d\n", s->last_non_b_time, s->last_time_base, s->time, s->pp_time, s->pb_time, s->t_frame, s->pp_field_time, s->pb_field_time);
     
-    s->current_picture_ptr->pts= (s->time + s->avctx->time_base.num/2) / s->avctx->time_base.num;
+    if(s->avctx->time_base.num)
+        s->current_picture_ptr->pts= (s->time + s->avctx->time_base.num/2) / s->avctx->time_base.num;
+    else
+        s->current_picture_ptr->pts= AV_NOPTS_VALUE;
     if(s->avctx->debug&FF_DEBUG_PTS)
         av_log(s->avctx, AV_LOG_DEBUG, "MPEG4 PTS: %Ld\n", s->current_picture_ptr->pts);
 

@@ -34,6 +34,7 @@ processor_flags=""
 tune="generic"
 powerpc_perf="no"
 mmx="default"
+iwmmxt="default"
 altivec="default"
 mmi="default"
 audio_oss="default"
@@ -106,6 +107,7 @@ echo "  --disable-distcc         disable distributed compilation (distcc)"
 #echo "  --enable-faad            enable faad support via libfaad [default=no]"
 #echo "  --enable-faadbin         build faad support with runtime linking [default=no]"
 #echo "  --enable-faac            enable faac support via libfaac [default=no]"
+#echo "  --enable-libgsm          enable gsm support via libgsm [default=no]"
 #echo "  --enable-xvid            enable xvid support via xvidcore [default=no]"
 #echo "  --enable-x264            enable H.264 encoding via x264 [default=no]"
 #echo "  --enable-mingw32         enable mingw32 native/cross windows compile"
@@ -134,6 +136,7 @@ echo "  --arch=CPU               equivalent to \"--cpu=CPU --tune=CPU\""
 #echo "  --powerpc-perf-enable    enable performance report on PPC (requires enabling PMC)"
 echo "  --enable-proc-opt        enable processor specific compilation"
 echo "  --disable-mmx            disable mmx usage"
+echo "  --disable-iwmmxt         disable iwmmxt usage"
 echo "  --disable-altivec        disable AltiVec usage"
 echo "Advanced features (experts only):"
 echo "  --disable-audio-oss      disable OSS audio support"
@@ -163,6 +166,7 @@ echo "  --disable-backend        disable backend  [breaks dependency checking]"
 #echo "  --enable-codec=codec     enables codec"
 #echo "  --disable-codec=codec    disables codec"
 #echo "  --disable-encoders       disables all encoders"
+#echo "  --disable-decoders       disables all decoders"
 echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
 echo "  --disable-joystick-menu  disable joystick menu"
 echo "  --disable-firewire       disable support for FireWire cable boxes"
@@ -304,6 +308,7 @@ dv1394="no"
 dc1394="no"
 network="yes"
 zlib="yes"
+libgsm="no"
 mp3lame="no"
 libogg="no"
 vorbis="no"
@@ -462,7 +467,7 @@ SHFLAGS="-dynamiclib"
 extralibs=""
 darwin="yes"
 strip="strip -x"
-LDFLAGS="-Wl,-d,-search_paths_first"
+LDFLAGS="-Wl,-search_paths_first"
 FFSLDFLAGS=-Wl,-bind_at_load
 ;;
 MINGW32*)
@@ -583,9 +588,9 @@ for opt do
   case "$opt" in
   --compile-type=*) compile_type=`echo $opt | cut -d '=' -f 2`
   ;;  
-  --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`
+  --prefix=*) prefix=`echo $opt | cut -d '=' -f 2`; force_prefix=yes
   ;;
-  --libdir=*) libdir=`echo $opt | cut -d '=' -f 2`
+  --libdir=*) libdir=`echo $opt | cut -d '=' -f 2`; force_prefix=yes
   ;;
   --mandir=*) mandir=`echo $opt | cut -d '=' -f 2`
   ;;
@@ -593,7 +598,7 @@ for opt do
   ;;
   --cross-prefix=*) cross_prefix=`echo $opt | cut -d '=' -f 2`
   ;;
-  --cc=*) cc=`echo $opt | cut -d '=' -f 2`
+  --cc=*) cc=`echo $opt | cut -d '=' -f 2-`
   ;;
   --make=*) make=`echo $opt | cut -d '=' -f 2`
   ;;
@@ -621,6 +626,8 @@ for opt do
   ;;
   --disable-mmx) mmx="no"
   ;;
+  --disable-iwmmxt) iwmmxt="no"
+  ;;
   --disable-altivec) altivec="no"
   ;;
   --enable-gprof) gprof="yes"
@@ -647,13 +654,15 @@ for opt do
   ;;
   --disable-a52) a52="no"
   ;;
-  --enable-a52bin) a52bin="yes" ; extralibs="$ldl $extralibs"
+  --enable-a52bin) a52bin="yes"
   ;;
   --enable-dts) dts="yes" ; extralibs="$extralibs -ldts"
   ;;
   --disable-pp) pp="no"
   ;;
   --enable-shared-pp) shared_pp="yes"
+  ;;
+  --enable-libgsm) libgsm="yes"
   ;;
 #  --enable-mp3lame) mp3lame="yes"
 #  ;;
@@ -718,6 +727,8 @@ for opt do
   --disable-codec=*) CODEC_LIST="`echo $CODEC_LIST | sed -e \"s#${opt#--disable-codec=}##\"`"
   ;;
   --disable-encoders) CODEC_LIST="`echo $CODEC_LIST | sed 's/[-_a-zA-Z0-9]*encoder//g'`"
+  ;;
+   --disable-decoders) CODEC_LIST="`echo $CODEC_LIST | sed 's/[-_a-zA-Z0-9]*decoder//g'`"
   ;;
   --enable-ivtv) ivtv="yes"
   ;;
@@ -961,6 +972,20 @@ if test x"$mmx" = x"default"; then
         if expr "$processor_flags" : ".*mmx" > /dev/null ; then
             mmx="yes"
         fi
+    fi
+fi
+
+# check iwmmxt support
+if test $iwmmxt = "default" -a $cpu = "armv4l"; then
+    cat > $TMPC << EOF
+        int main(void) {
+        __asm__ __volatile__ ("wunpckelub wr6, wr4");
+        }
+EOF
+
+    iwmmxt=no
+    if ${cross_prefix}${cc} -o $TMPO $TMPC 2> /dev/null ; then
+        iwmmxt=yes
     fi
 fi
 
@@ -1311,13 +1336,11 @@ if test "$mingw32" = "yes" ; then
     dc1394="no"
     ffserver="no"
     network="no"
-    LIBPREF=""
-    LIBSUF=".lib"
     SLIBPREF=""
     SLIBSUF=".dll"
     EXESUF=".exe"
-    prefix="/c/Program Files/FFmpeg"
-    bindir="$prefix"
+    if test "$force_prefix" != yes; then prefix="/c/Program Files/FFmpeg"; fi
+    if test "$force_libdir" != yes; then bindir="$prefix"; fi
     CONFIG_DEFINES="$CONFIG_DEFINES _WIN32"
 fi
 
@@ -1574,7 +1597,7 @@ return 0;
 EOF
 
 builtin_vector=no
-if $cc -o $TMPO $TMPC 2> /dev/null ; then
+if $cc -msse -o $TMPO $TMPC 2> /dev/null ; then
   builtin_vector=yes
 fi
 
@@ -1615,6 +1638,10 @@ if test "$vhook" = "default" ; then
   vhook="$dlopen"
 fi
 
+if test "$vhook" = "yes" -o "$a52bin" = "yes" -o "$faadbin" = "yes"; then
+  extralibs="$extralibs $ldl"
+fi
+
 ##########################################
 # imlib probe
 
@@ -1625,7 +1652,7 @@ int main( void ) { return (int) imlib_load_font("foo"); }
 EOF
 
 imlib2=no
-if $cc -o $TMPE $TMPC -lImlib2 -lm > /dev/null 2>&1  ; then
+if $cc $CFLAGS $LDFLAGS -o $TMPE $TMPC -lImlib2 -lm > /dev/null 2>&1  ; then
 imlib2=yes
 fi
 
@@ -1994,6 +2021,9 @@ if test $cpu = "x86" -o $cpu = "x86_64"; then
 echo "MMX enabled      $mmx"
 echo "Vector Builtins  $builtin_vector"
 fi
+if test $cpu = "armv4l"; then
+echo "IWMMXT enabled   $iwmmxt"
+fi
 if test $cpu = "mips"; then
 echo "MMI enabled      $mmi"
 fi
@@ -2002,6 +2032,7 @@ echo "AltiVec enabled  $altivec"
 fi
 #echo "gprof enabled    $gprof"
 #echo "zlib enabled     $zlib"
+#echo "libgsm enabled   $libgsm"
 #echo "mp3lame enabled  $mp3lame"
 #echo "libogg enabled   $libogg"
 #echo "vorbis enabled   $vorbis"
@@ -2196,6 +2227,10 @@ fi
 #  echo "TARGET_BUILTIN_VECTOR=yes" >> $MYTH_CONFIG_MAK
 #  echo "#define HAVE_BUILTIN_VECTOR 1" >> $TMPH
 #fi
+if test "$iwmmxt" = "yes" ; then
+  echo "TARGET_IWMMXT=yes" >> $MYTH_CONFIG_MAK
+  echo "#define HAVE_IWMMXT 1" >> $TMPH
+fi
 if test "$mmi" = "yes" ; then
   echo "TARGET_MMI=yes" >> $MYTH_CONFIG_MAK
   echo "#define HAVE_MMI 1" >> $TMPH
@@ -2259,7 +2294,6 @@ echo "#define SIZEOF_LONG $_sizeof_long" >> $TMPH
 if test "$vhook" = "yes" ; then
   echo "BUILD_VHOOK=yes" >> $MYTH_CONFIG_MAK
   echo "#define HAVE_VHOOK 1" >> $TMPH
-  extralibs="$extralibs $ldl"
 fi
 if test "$lshared" = "yes" ; then
   echo "BUILD_SHARED=yes" >> $MYTH_CONFIG_MAK
@@ -2384,6 +2418,11 @@ fi
 if test "$zlib" = "yes" ; then
   echo "#define CONFIG_ZLIB 1" >> $TMPH
   echo "CONFIG_ZLIB=yes" >> $MYTH_CONFIG_MAK
+fi
+
+if test "$libgsm" = "yes" ; then
+  echo "#define CONFIG_LIBGSM 1" >> $TMPH
+  echo "CONFIG_LIBGSM=yes" >> config.mak
 fi
 
 if test "$mp3lame" = "yes" ; then

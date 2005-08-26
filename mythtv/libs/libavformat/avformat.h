@@ -5,11 +5,11 @@
 extern "C" {
 #endif
 
-#define LIBAVFORMAT_BUILD       4629
+#define LIBAVFORMAT_VERSION_INT ((49<<16)+(1<<8)+0)
+#define LIBAVFORMAT_VERSION     49.1.0
+#define LIBAVFORMAT_BUILD       LIBAVFORMAT_VERSION_INT
 
-#define LIBAVFORMAT_VERSION_INT FFMPEG_VERSION_INT
-#define LIBAVFORMAT_VERSION     FFMPEG_VERSION
-#define LIBAVFORMAT_IDENT	"FFmpeg" FFMPEG_VERSION "b" AV_STRINGIFY(LIBAVFORMAT_BUILD)
+#define LIBAVFORMAT_IDENT       "Lavf" AV_STRINGIFY(LIBAVFORMAT_VERSION)
 
 #include <time.h>
 #include <stdio.h>  /* FILE */
@@ -229,6 +229,13 @@ typedef struct AVStream {
     int codec_info_nb_frames;
     /* encoding: PTS generation when outputing stream */
     AVFrac pts;
+
+    /**
+     * this is the fundamental unit of time (in seconds) in terms
+     * of which frame timestamps are represented. for fixed-fps content,
+     * timebase should be 1/framerate and timestamp increments should be
+     * identically 1.
+     */
     AVRational time_base;
     int pts_wrap_bits; /* number of bits in pts (used for wrapping control) */
     /* ffmpeg.c private use */
@@ -248,7 +255,7 @@ typedef struct AVStream {
     char language[4]; /* ISO 639 3-letter language code (empty string if undefined) */
 
     /* av_read_frame() support */
-    int need_parsing;
+    int need_parsing;                  ///< 1->full parsing needed, 2->only parse headers dont repack
     struct AVCodecParserContext *parser;
 
     int64_t cur_dts;
@@ -339,6 +346,8 @@ typedef struct AVFormatContext {
     /* number of times to loop output in formats that support it */
     int loop_output;
     
+    int flags;
+#define AVFMT_FLAG_GENPTS       0x0001 ///< generate pts if missing even if it requires parsing future frames
 } AVFormatContext;
 
 typedef struct AVPacketList {
@@ -601,19 +610,20 @@ AVFormatContext *av_alloc_format_context(void);
 #define AVERROR_NOTSUPP     (-7)  /* operation not supported */
  
 int av_find_stream_info(AVFormatContext *ic);
-void av_estimate_timings(AVFormatContext *ic);
 int av_read_packet(AVFormatContext *s, AVPacket *pkt);
 int av_read_frame(AVFormatContext *s, AVPacket *pkt);
-void av_read_frame_flush(AVFormatContext *s);
 int av_seek_frame(AVFormatContext *s, int stream_index, int64_t timestamp, int flags);
 int av_read_play(AVFormatContext *s);
 int av_read_pause(AVFormatContext *s);
 void av_close_input_file(AVFormatContext *s);
 AVStream *av_new_stream(AVFormatContext *s, int id);
-AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
-void av_remove_stream(AVFormatContext *s, int id, int remove_ts);
 void av_set_pts_info(AVStream *s, int pts_wrap_bits,
                      int pts_num, int pts_den);
+
+void av_estimate_timings(AVFormatContext *ic);
+void av_read_frame_flush(AVFormatContext *s);
+AVStream *av_add_stream(AVFormatContext *s, AVStream *st, int id);
+void av_remove_stream(AVFormatContext *s, int id, int remove_ts);
 
 #define AVSEEK_FLAG_BACKWARD 1 ///< seek backward
 #define AVSEEK_FLAG_BYTE     2 ///< seeking based on position in bytes

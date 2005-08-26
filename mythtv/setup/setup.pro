@@ -9,10 +9,11 @@ target.path = $${PREFIX}/bin
 INCLUDEPATH += ../libs/libmythtv ../libs ../libs/libmyth
 
 LIBS += -L../libs/libmyth -L../libs/libmythtv -L../libs/libavcodec
-LIBS += -L../libs/libavformat
+LIBS += -L../libs/libavformat -L../libs/libavutil
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
-LIBS += -lmythavcodec-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
+LIBS += -lmythavcodec-$$LIBVERSION -lmythavutil-$$LIBVERSION
+LIBS += -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
 LIBS += `freetype-config --libs`
 
@@ -26,9 +27,10 @@ TARGETDEPS += ../libs/libmyth/libmyth-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libs/libmythtv/libmythtv-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libs/libavcodec/libmythavcodec-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 TARGETDEPS += ../libs/libavformat/libmythavformat-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
+TARGETDEPS += ../libs/libavutil/libmythavutil-$${LIBVERSION}.$${QMAKE_EXTENSION_SHLIB}
 
 DEPENDPATH += ../libs/libmythtv ../libs/libmyth ../libs/libavcodec
-DEPENDPATH += ../libs/libavformat
+DEPENDPATH += ../libs/libavformat ../libs/libavutil
 
 INCLUDEPATH += ../libs/libmythtv/dvbdev
 

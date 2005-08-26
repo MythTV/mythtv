@@ -1450,7 +1450,7 @@ static int dvbsub_decode(AVCodecContext *avctx,
         return -1;
     }
 
-    return 0;
+    return buf_size;
 }
 
 

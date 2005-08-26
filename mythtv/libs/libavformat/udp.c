@@ -28,6 +28,11 @@
 #endif
 #include <netdb.h>
 
+#ifndef IPV6_ADD_MEMBERSHIP
+#define IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
+#define IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
+#endif
+
 typedef struct {
     int udp_fd;
     int ttl;
@@ -160,24 +165,26 @@ int udp_ipv6_set_local(URLContext *h) {
     socklen_t addrlen;
     char sbuf[NI_MAXSERV];
     char hbuf[NI_MAXHOST];
-    struct addrinfo *res0 = NULL;
-    int family;
+    struct addrinfo *res0 = NULL, *res = NULL;
                 
     if (s->local_port != 0) {       
         res0 = udp_ipv6_resolve_host(0, s->local_port, SOCK_DGRAM, AF_UNSPEC, AI_PASSIVE);
         if (res0 == 0)
             goto fail;
-        family = res0->ai_family;
+        for (res = res0; res; res=res->ai_next) {		
+            udp_fd = socket(res->ai_family, SOCK_DGRAM, 0);
+            if (udp_fd > 0) break;
+            perror("socket");
+        }
     } else {
-        family = s->dest_addr.ss_family;
+        udp_fd = socket(s->dest_addr.ss_family, SOCK_DGRAM, 0);
+        if (udp_fd < 0) 
+            perror("socket");
     }
-    
-    udp_fd = socket(family, SOCK_DGRAM, 0);
-    if (udp_fd < 0) {
-        perror("socket");
+
+    if (udp_fd < 0)
         goto fail;
-    }
-   
+       
     if (s->local_port != 0) {
         if (bind(udp_fd, res0->ai_addr, res0->ai_addrlen) < 0) {
             perror("bind");

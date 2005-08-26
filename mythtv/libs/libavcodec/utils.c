@@ -31,24 +31,6 @@
 #include <stdarg.h>
 #include <limits.h>
 
-const uint8_t ff_sqrt_tab[128]={
-        0, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5,
-        5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9,
-        9, 9, 9, 9,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11
-};
-
-const uint8_t ff_log2_tab[256]={
-        0,0,1,1,2,2,2,2,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-        5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-        6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
-        7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
-};
-
 const uint8_t ff_reverse[256]={
 0x00,0x80,0x40,0xC0,0x20,0xA0,0x60,0xE0,0x10,0x90,0x50,0xD0,0x30,0xB0,0x70,0xF0,
 0x08,0x88,0x48,0xC8,0x28,0xA8,0x68,0xE8,0x18,0x98,0x58,0xD8,0x38,0xB8,0x78,0xF8,
@@ -67,6 +49,8 @@ const uint8_t ff_reverse[256]={
 0x07,0x87,0x47,0xC7,0x27,0xA7,0x67,0xE7,0x17,0x97,0x57,0xD7,0x37,0xB7,0x77,0xF7,
 0x0F,0x8F,0x4F,0xCF,0x2F,0xAF,0x6F,0xEF,0x1F,0x9F,0x5F,0xDF,0x3F,0xBF,0x7F,0xFF,
 };
+
+static int volatile entangled_thread_counter=0;
 
 void avcodec_default_free_buffers(AVCodecContext *s);
 
@@ -157,6 +141,17 @@ void av_free_static(void)
         av_freep(&array_static[--last_static]);
     }
     av_freep(&array_static);
+}
+
+/**
+ * Call av_free_static automatically before it's too late
+ */
+
+static void do_free() __attribute__ ((destructor));
+
+static void do_free()
+{
+    av_free_static();
 }
 
 /**
@@ -522,10 +517,16 @@ AVFrame *avcodec_alloc_frame(void){
 
 int avcodec_open(AVCodecContext *avctx, AVCodec *codec)
 {
-    int ret;
+    int ret= -1;
+
+    entangled_thread_counter++;
+    if(entangled_thread_counter != 1){
+        av_log(avctx, AV_LOG_ERROR, "insufficient thread locking around avcodec_open/close()\n");
+        goto end;
+    }
 
     if(avctx->codec)
-        return -1;
+        goto end;
 
     avctx->codec = codec;
     avctx->codec_id = codec->id;
@@ -533,7 +534,7 @@ int avcodec_open(AVCodecContext *avctx, AVCodec *codec)
     if (codec->priv_data_size > 0) {
         avctx->priv_data = av_mallocz(codec->priv_data_size);
         if (!avctx->priv_data) 
-            return -ENOMEM;
+            goto end;
     } else {
         avctx->priv_data = NULL;
     }
@@ -545,15 +546,18 @@ int avcodec_open(AVCodecContext *avctx, AVCodec *codec)
 
     if((avctx->coded_width||avctx->coded_height) && avcodec_check_dimensions(avctx,avctx->coded_width,avctx->coded_height)){
         av_freep(&avctx->priv_data);
-        return -1;
+        goto end;
     }
 
     ret = avctx->codec->init(avctx);
     if (ret < 0) {
         av_freep(&avctx->priv_data);
-        return ret;
+        goto end;
     }
-    return 0;
+    ret=0;
+end:
+    entangled_thread_counter--;
+    return ret;
 }
 
 int avcodec_encode_audio(AVCodecContext *avctx, uint8_t *buf, int buf_size, 
@@ -670,11 +674,19 @@ int avcodec_decode_subtitle(AVCodecContext *avctx, AVSubtitle *sub,
 
 int avcodec_close(AVCodecContext *avctx)
 {
+    entangled_thread_counter++;
+    if(entangled_thread_counter != 1){
+        av_log(avctx, AV_LOG_ERROR, "insufficient thread locking around avcodec_open/close()\n");
+        entangled_thread_counter--;
+        return -1;
+    }
+
     if (avctx->codec->close)
         avctx->codec->close(avctx);
     avcodec_default_free_buffers(avctx);
     av_freep(&avctx->priv_data);
     avctx->codec = NULL;
+    entangled_thread_counter--;
     return 0;
 }
 
@@ -917,79 +929,6 @@ char av_get_pict_type_char(int pict_type){
     case SP_TYPE:return 'p'; 
     default:     return '?';
     }
-}
-
-int av_reduce(int *dst_nom, int *dst_den, int64_t nom, int64_t den, int64_t max){
-    AVRational a0={0,1}, a1={1,0};
-    int sign= (nom<0) ^ (den<0);
-    int64_t gcd= ff_gcd(ABS(nom), ABS(den));
-
-    nom = ABS(nom)/gcd;
-    den = ABS(den)/gcd;
-    if(nom<=max && den<=max){
-        a1= (AVRational){nom, den};
-        den=0;
-    }
-    
-    while(den){
-        int64_t x       = nom / den;
-        int64_t next_den= nom - den*x;
-        int64_t a2n= x*a1.num + a0.num;
-        int64_t a2d= x*a1.den + a0.den;
-
-        if(a2n > max || a2d > max) break;
-
-        a0= a1;
-        a1= (AVRational){a2n, a2d};
-        nom= den;
-        den= next_den;
-    }
-    assert(ff_gcd(a1.num, a1.den) == 1);
-    
-    *dst_nom = sign ? -a1.num : a1.num;
-    *dst_den = a1.den;
-    
-    return den==0;
-}
-
-int64_t av_rescale_rnd(int64_t a, int64_t b, int64_t c, enum AVRounding rnd){
-    AVInteger ai;
-    int64_t r=0;
-    assert(c > 0);
-    assert(b >=0);
-    assert(rnd >=0 && rnd<=5 && rnd!=4);
-    
-    if(a<0 && a != INT64_MIN) return -av_rescale_rnd(-a, b, c, rnd ^ ((rnd>>1)&1)); 
-    
-    if(rnd==AV_ROUND_NEAR_INF) r= c/2;
-    else if(rnd&1)             r= c-1;
-
-    if(b<=INT_MAX && c<=INT_MAX){
-        if(a<=INT_MAX)
-            return (a * b + r)/c;
-        else
-            return a/c*b + (a%c*b + r)/c;
-    }
-    
-    ai= av_mul_i(av_int2i(a), av_int2i(b));
-    ai= av_add_i(ai, av_int2i(r));
-    
-    return av_i2int(av_div_i(ai, av_int2i(c)));
-}
-
-int64_t av_rescale(int64_t a, int64_t b, int64_t c){
-    return av_rescale_rnd(a, b, c, AV_ROUND_NEAR_INF);
-}
-
-int64_t av_rescale_q(int64_t a, AVRational bq, AVRational cq){
-    int64_t b= bq.num * (int64_t)cq.den;
-    int64_t c= cq.num * (int64_t)bq.den;
-    return av_rescale_rnd(a, b, c, AV_ROUND_NEAR_INF);
-}
-
-int64_t ff_gcd(int64_t a, int64_t b){
-    if(b) return ff_gcd(b, a%b);
-    else  return a;
 }
 
 /* av_log API */

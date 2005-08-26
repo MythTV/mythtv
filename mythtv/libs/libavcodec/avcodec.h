@@ -11,21 +11,21 @@
 extern "C" {
 #endif
 
-#include "common.h"
-#include "rational.h"
+#include "avutil.h"
 #include <sys/types.h> /* size_t */
 
+//FIXME the following 2 really dont belong in here
 #define FFMPEG_VERSION_INT     0x000409
 #define FFMPEG_VERSION         "CVS"
-#define LIBAVCODEC_BUILD       4758
-
-
-#define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
-#define LIBAVCODEC_VERSION     FFMPEG_VERSION
 
 #define AV_STRINGIFY(s)	AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
-#define LIBAVCODEC_IDENT	"FFmpeg" LIBAVCODEC_VERSION "b" AV_STRINGIFY(LIBAVCODEC_BUILD)
+
+#define LIBAVCODEC_VERSION_INT ((49<<16)+(0<<8)+2)
+#define LIBAVCODEC_VERSION     49.0.2
+#define LIBAVCODEC_BUILD       LIBAVCODEC_VERSION_INT
+
+#define LIBAVCODEC_IDENT       "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
 
 #define AV_NOPTS_VALUE int64_t_C(0x8000000000000000)
 #define AV_TIME_BASE 1000000
@@ -186,7 +186,6 @@ enum CodecID {
     CODEC_ID_MPEG2TS= 0x20000, /* _FAKE_ codec to indicate a raw MPEG2 transport
                          stream (only used by libavformat) */
 };
-const char *codec_id_string(enum CodecID codec_id);
 
 /* CODEC_ID_MP3LAME is absolete */
 #define CODEC_ID_MP3LAME CODEC_ID_MP3
@@ -198,7 +197,6 @@ enum CodecType {
     CODEC_TYPE_DATA,
     CODEC_TYPE_SUBTITLE,
 };
-const char *codec_type_string(enum CodecType codec_type);
 
 /**
  * Pixel format. Notes: 
@@ -279,14 +277,6 @@ enum Motion_Est_ID {
     ME_PHODS,
     ME_EPZS,
     ME_X1
-};
-
-enum AVRounding {
-    AV_ROUND_ZERO     = 0, ///< round toward zero
-    AV_ROUND_INF      = 1, ///< round away from zero
-    AV_ROUND_DOWN     = 2, ///< round toward -infinity
-    AV_ROUND_UP       = 3, ///< round toward +infinity
-    AV_ROUND_NEAR_INF = 5, ///< round to nearest and halfway cases away from zero
 };
 
 enum AVDiscard{
@@ -743,14 +733,17 @@ typedef struct AVCodecContext {
     void *extradata;
     int extradata_size;
     
-    /* video only */
     /**
-     * time base in which the timestamps are specified.
+     * this is the fundamental unit of time (in seconds) in terms
+     * of which frame timestamps are represented. for fixed-fps content,
+     * timebase should be 1/framerate and timestamp increments should be
+     * identically 1.
      * - encoding: MUST be set by user
      * - decoding: set by lavc.
      */
     AVRational time_base;
     
+    /* video only */
     /**
      * picture width / height.
      * - encoding: MUST be set by user. 
@@ -1903,7 +1896,9 @@ typedef struct AVCodec {
     int (*decode)(AVCodecContext *, void *outdata, int *outdata_size,
                   uint8_t *buf, int buf_size);
     int capabilities;
+#if LIBAVCODEC_VERSION_INT < ((50<<16)+(0<<8)+0)
     void *dummy; // FIXME remove next time we break binary compatibility
+#endif
     struct AVCodec *next;
     void (*flush)(AVCodecContext *);
     const AVRational *supported_framerates; ///array of supported framerates, or NULL if any, array is terminated by {0,0}
@@ -2318,30 +2313,6 @@ void avcodec_default_free_buffers(AVCodecContext *s);
  */
 char av_get_pict_type_char(int pict_type);
 
-/**
- * reduce a fraction.
- * this is usefull for framerate calculations
- * @param max the maximum allowed for dst_nom & dst_den
- * @return 1 if exact, 0 otherwise
- */
-int av_reduce(int *dst_nom, int *dst_den, int64_t nom, int64_t den, int64_t max);
-
-/**
- * rescale a 64bit integer with rounding to nearest.
- * a simple a*b/c isn't possible as it can overflow
- */
-int64_t av_rescale(int64_t a, int64_t b, int64_t c);
-
-/**
- * rescale a 64bit integer with specified rounding.
- * a simple a*b/c isn't possible as it can overflow
- */
-int64_t av_rescale_rnd(int64_t a, int64_t b, int64_t c, enum AVRounding);
-
-/**
- * rescale a 64bit integer by 2 rational numbers.
- */
-int64_t av_rescale_q(int64_t a, AVRational bq, AVRational cq);
 
 /* frame parsing */
 typedef struct AVCodecParserContext {
@@ -2367,6 +2338,9 @@ typedef struct AVCodecParserContext {
     int64_t cur_frame_offset[AV_PARSER_PTS_NB];
     int64_t cur_frame_pts[AV_PARSER_PTS_NB];
     int64_t cur_frame_dts[AV_PARSER_PTS_NB];
+    
+    int flags;
+#define PARSER_FLAG_COMPLETE_FRAMES           0x0001
 } AVCodecParserContext;
 
 typedef struct AVCodecParser {
@@ -2465,6 +2439,9 @@ extern void av_log_set_callback(void (*)(void*, int, const char*, va_list));
 #endif
 
 extern unsigned int av_xiphlacing(unsigned char *s, unsigned int v);
+
+const char *codec_id_string(enum CodecID codec_id);
+const char *codec_type_string(enum CodecType codec_type);
 
 #ifdef __cplusplus
 }

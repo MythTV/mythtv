@@ -348,6 +348,8 @@ typedef struct H264Context{
     uint8_t field_scan[16];
     const uint8_t *zigzag_scan_q0;
     const uint8_t *field_scan_q0;
+    
+    int x264_build;
 }H264Context;
 
 static VLC coeff_token_vlc[4];
@@ -1205,6 +1207,7 @@ static inline void pred_direct_motion(H264Context * const h, int *mb_type){
     const int b4_xy = 4*s->mb_x + 4*s->mb_y*h->b_stride;
     const int mb_type_col = h->ref_list[1][0].mb_type[mb_xy];
     const int16_t (*l1mv0)[2] = (const int16_t (*)[2]) &h->ref_list[1][0].motion_val[0][b4_xy];
+    const int16_t (*l1mv1)[2] = (const int16_t (*)[2]) &h->ref_list[1][0].motion_val[1][b4_xy];
     const int8_t *l1ref0 = &h->ref_list[1][0].ref_index[0][b8_xy];
     const int8_t *l1ref1 = &h->ref_list[1][0].ref_index[1][b8_xy];
     const int is_b8x8 = IS_8X8(*mb_type);
@@ -1273,8 +1276,10 @@ static inline void pred_direct_motion(H264Context * const h, int *mb_type){
         if(IS_16X16(*mb_type)){
             fill_rectangle(&h->ref_cache[0][scan8[0]], 4, 4, 8, ref[0], 1);
             fill_rectangle(&h->ref_cache[1][scan8[0]], 4, 4, 8, ref[1], 1);
-            if(!IS_INTRA(mb_type_col) && l1ref0[0] == 0 &&
-                ABS(l1mv0[0][0]) <= 1 && ABS(l1mv0[0][1]) <= 1){
+            if(!IS_INTRA(mb_type_col) 
+               && (   (l1ref0[0] == 0 && ABS(l1mv0[0][0]) <= 1 && ABS(l1mv0[0][1]) <= 1)
+                   || (l1ref0[0]  < 0 && l1ref1[0] == 0 && ABS(l1mv1[0][0]) <= 1 && ABS(l1mv1[0][1]) <= 1
+                       && (h->x264_build>33 || !h->x264_build)))){
                 if(ref[0] > 0)
                     fill_rectangle(&h->mv_cache[0][scan8[0]], 4, 4, 8, pack16to32(mv[0][0],mv[0][1]), 4);
                 else
@@ -1302,9 +1307,12 @@ static inline void pred_direct_motion(H264Context * const h, int *mb_type){
                 fill_rectangle(&h->ref_cache[1][scan8[i8*4]], 2, 2, 8, ref[1], 1);
     
                 /* col_zero_flag */
-                if(!IS_INTRA(mb_type_col) && l1ref0[x8 + y8*h->b8_stride] == 0){
+                if(!IS_INTRA(mb_type_col) && (   l1ref0[x8 + y8*h->b8_stride] == 0 
+                                              || (l1ref0[x8 + y8*h->b8_stride] < 0 && l1ref1[x8 + y8*h->b8_stride] == 0 
+                                                  && (h->x264_build>33 || !h->x264_build)))){
+                    const int16_t (*l1mv)[2]= l1ref0[x8 + y8*h->b8_stride] == 0 ? l1mv0 : l1mv1;
                     for(i4=0; i4<4; i4++){
-                        const int16_t *mv_col = l1mv0[x8*2 + (i4&1) + (y8*2 + (i4>>1))*h->b_stride];
+                        const int16_t *mv_col = l1mv[x8*2 + (i4&1) + (y8*2 + (i4>>1))*h->b_stride];
                         if(ABS(mv_col[0]) <= 1 && ABS(mv_col[1]) <= 1){
                             if(ref[0] == 0)
                                 *(uint32_t*)h->mv_cache[0][scan8[i8*4+i4]] = 0;
@@ -1326,7 +1334,7 @@ static inline void pred_direct_motion(H264Context * const h, int *mb_type){
                 const int ref0 = l1ref0[0] >= 0 ? h->map_col_to_list0[0][l1ref0[0]]
                                                 : h->map_col_to_list0[1][l1ref1[0]];
                 const int dist_scale_factor = h->dist_scale_factor[ref0];
-                const int16_t *mv_col = l1mv0[0];
+                const int16_t *mv_col = l1ref0[0] >= 0 ? l1mv0[0] : l1mv1[0];
                 int mv_l0[2];
                 mv_l0[0] = (dist_scale_factor * mv_col[0] + 128) >> 8;
                 mv_l0[1] = (dist_scale_factor * mv_col[1] + 128) >> 8;
@@ -1339,7 +1347,8 @@ static inline void pred_direct_motion(H264Context * const h, int *mb_type){
                 const int x8 = i8&1;
                 const int y8 = i8>>1;
                 int ref0, dist_scale_factor;
-    
+                const int16_t (*l1mv)[2]= l1mv0;
+
                 if(is_b8x8 && !IS_DIRECT(h->sub_mb_type[i8]))
                     continue;
                 h->sub_mb_type[i8] = sub_mb_type;
@@ -1354,14 +1363,16 @@ static inline void pred_direct_motion(H264Context * const h, int *mb_type){
                 ref0 = l1ref0[x8 + y8*h->b8_stride];
                 if(ref0 >= 0)
                     ref0 = h->map_col_to_list0[0][ref0];
-                else
+                else{
                     ref0 = h->map_col_to_list0[1][l1ref1[x8 + y8*h->b8_stride]];
+                    l1mv= l1mv1;
+                }
                 dist_scale_factor = h->dist_scale_factor[ref0];
     
                 fill_rectangle(&h->ref_cache[0][scan8[i8*4]], 2, 2, 8, ref0, 1);
                 fill_rectangle(&h->ref_cache[1][scan8[i8*4]], 2, 2, 8, 0, 1);
                 for(i4=0; i4<4; i4++){
-                    const int16_t *mv_col = l1mv0[x8*2 + (i4&1) + (y8*2 + (i4>>1))*h->b_stride];
+                    const int16_t *mv_col = l1mv[x8*2 + (i4&1) + (y8*2 + (i4>>1))*h->b_stride];
                     int16_t *mv_l0 = h->mv_cache[0][scan8[i8*4+i4]];
                     mv_l0[0] = (dist_scale_factor * mv_col[0] + 128) >> 8;
                     mv_l0[1] = (dist_scale_factor * mv_col[1] + 128) >> 8;
@@ -2316,7 +2327,7 @@ static void pred8x8_plane_c(uint8_t *src, int stride){
     const int l0 = ((has_topleft ? SRC(-1,-1) : SRC(-1,0)) \
                      + 2*SRC(-1,0) + SRC(-1,1) + 2) >> 2; \
     PL(1) PL(2) PL(3) PL(4) PL(5) PL(6) \
-    const int l7 = (SRC(-1,6) + 3*SRC(-1,7) + 2) >> 2
+    const int l7 attribute_unused = (SRC(-1,6) + 3*SRC(-1,7) + 2) >> 2
 
 #define PT(x) \
     const int t##x = (SRC(x-1,-1) + 2*SRC(x,-1) + SRC(x+1,-1) + 2) >> 2;
@@ -2324,7 +2335,7 @@ static void pred8x8_plane_c(uint8_t *src, int stride){
     const int t0 = ((has_topleft ? SRC(-1,-1) : SRC(0,-1)) \
                      + 2*SRC(0,-1) + SRC(1,-1) + 2) >> 2; \
     PT(1) PT(2) PT(3) PT(4) PT(5) PT(6) \
-    const int t7 = ((has_topright ? SRC(8,-1) : SRC(7,-1)) \
+    const int t7 attribute_unused = ((has_topright ? SRC(8,-1) : SRC(7,-1)) \
                      + 2*SRC(7,-1) + SRC(6,-1) + 2) >> 2
 
 #define PTR(x) \
@@ -3108,7 +3119,7 @@ b= t;
     if(deblock_top){
         XCHG(*(uint64_t*)(h->top_borders[0][s->mb_x]+0), *(uint64_t*)(src_y +1), temp64, xchg);
         XCHG(*(uint64_t*)(h->top_borders[0][s->mb_x]+8), *(uint64_t*)(src_y +9), temp64, 1);
-        if(s->mb_x < s->mb_width){
+        if(s->mb_x+1 < s->mb_width){
             XCHG(*(uint64_t*)(h->top_borders[0][s->mb_x+1]), *(uint64_t*)(src_y +17), temp64, 1);
         }
     }
@@ -5352,6 +5363,8 @@ static int decode_cabac_mb_dqp( H264Context *h) {
         else
             ctx = 3;
         val++;
+        if(val > 52) //prevent infinite loop
+            return INT_MIN;
     }
 
     if( val&0x01 )
@@ -6177,7 +6190,7 @@ static void filter_mb_edgev( H264Context *h, uint8_t *pix, int stride, int bS[4]
     }
 }
 static void filter_mb_edgecv( H264Context *h, uint8_t *pix, int stride, int bS[4], int qp ) {
-    int i, d;
+    int i;
     const int index_a = clip( qp + h->slice_alpha_c0_offset, 0, 51 );
     const int alpha = alpha_table[index_a];
     const int beta  = beta_table[clip( qp + h->slice_beta_offset, 0, 51 )];
@@ -6407,7 +6420,7 @@ static void filter_mb_edgeh( H264Context *h, uint8_t *pix, int stride, int bS[4]
 }
 
 static void filter_mb_edgech( H264Context *h, uint8_t *pix, int stride, int bS[4], int qp ) {
-    int i, d;
+    int i;
     const int index_a = clip( qp + h->slice_alpha_c0_offset, 0, 51 );
     const int alpha = alpha_table[index_a];
     const int beta  = beta_table[clip( qp + h->slice_beta_offset, 0, 51 )];
@@ -6537,7 +6550,7 @@ static void filter_mb( H264Context *h, int mb_x, int mb_y, uint8_t *img_y, uint8
                     bS[0] = bS[1] = bS[2] = bS[3] = 3;
                 } else {
                     // TODO
-                    assert(0);
+                    av_log(h->s.avctx, AV_LOG_ERROR, "both non intra (TODO)\n");
                 }
                 /* Filter edge */
                 // Do not use s->qscale as luma quantizer because it has not the same
@@ -6558,7 +6571,7 @@ static void filter_mb( H264Context *h, int mb_x, int mb_y, uint8_t *img_y, uint8
                     bS[0] = bS[1] = bS[2] = bS[3] = 3;
                 } else {
                     // TODO
-                    assert(0);
+                    av_log(h->s.avctx, AV_LOG_ERROR, "both non intra (TODO)\n");
                 }
                 /* Filter edge */
                 // Do not use s->qscale as luma quantizer because it has not the same
@@ -6690,7 +6703,7 @@ static int decode_slice(H264Context *h){
 
                 if(ret>=0) ret = decode_mb_cabac(h);
 
-                hl_decode_mb(h);
+                if(ret>=0) hl_decode_mb(h);
                 s->mb_y--;
             }
             eos = get_cabac_terminate( &h->cabac );
@@ -6821,6 +6834,64 @@ static int decode_slice(H264Context *h){
     }
 #endif
     return -1; //not reached
+}
+
+static int decode_unregistered_user_data(H264Context *h, int size){
+    MpegEncContext * const s = &h->s;
+    uint8_t user_data[16+256];
+    int e, build, i;
+    
+    if(size<16)
+        return -1;
+    
+    for(i=0; i<sizeof(user_data)-1 && i<size; i++){
+        user_data[i]= get_bits(&s->gb, 8);
+    }
+    
+    user_data[i]= 0;
+    e= sscanf(user_data+16, "x264 - core %d"/*%s - H.264/MPEG-4 AVC codec - Copyleft 2005 - http://www.videolan.org/x264.html*/, &build);
+    if(e==1 && build>=0)
+        h->x264_build= build;
+        
+    if(s->avctx->debug & FF_DEBUG_BUGS)
+        av_log(s->avctx, AV_LOG_DEBUG, "user data:\"%s\"\n", user_data+16);
+
+    for(; i<size; i++)
+        skip_bits(&s->gb, 8);
+    
+    return 0;
+}
+
+static int decode_sei(H264Context *h){
+    MpegEncContext * const s = &h->s;
+    
+    while(get_bits_count(&s->gb) + 16 < s->gb.size_in_bits){
+        int size, type;
+        
+        type=0;
+        do{
+            type+= show_bits(&s->gb, 8);
+        }while(get_bits(&s->gb, 8) == 255);
+        
+        size=0;
+        do{
+            size+= show_bits(&s->gb, 8);
+        }while(get_bits(&s->gb, 8) == 255);
+        
+        switch(type){
+        case 5:
+            if(decode_unregistered_user_data(h, size) < 0);
+                return -1;
+            break;
+        default:
+            skip_bits(&s->gb, 8*size);
+        }
+        
+        //FIXME check bits here
+        align_get_bits(&s->gb);
+    }
+
+    return 0;
 }
 
 static inline void decode_hrd_parameters(H264Context *h, SPS *sps){
@@ -7250,7 +7321,7 @@ static int decode_nal_units(H264Context *h, uint8_t *buf, int buf_size){
 
         buf_index += consumed;
 
-        if(  (s->hurry_up == 1 && h->nal_ref_idc  == 0)
+        if(  (s->hurry_up == 1 && h->nal_ref_idc  == 0) //FIXME dont discard SEI id
            ||(avctx->skip_frame >= AVDISCARD_NONREF && h->nal_ref_idc  == 0))
             continue;
         
@@ -7301,6 +7372,8 @@ static int decode_nal_units(H264Context *h, uint8_t *buf, int buf_size){
                 decode_slice(h);
             break;
         case NAL_SEI:
+            init_get_bits(&s->gb, ptr, bit_length);
+            decode_sei(h);
             break;
         case NAL_SPS:
             init_get_bits(&s->gb, ptr, bit_length);

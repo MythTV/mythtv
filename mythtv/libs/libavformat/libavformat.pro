@@ -9,7 +9,7 @@ INSTALLS = target
 
 VERSION = 0.18.0 
 
-INCLUDEPATH += ../ ../../ ../libavcodec ../libmythtv
+INCLUDEPATH += ../ ../../ ../libavcodec ../libavutil ../libmythtv
 
 DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
 

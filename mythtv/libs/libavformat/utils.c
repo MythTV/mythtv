@@ -1021,6 +1021,8 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 			av_log(s, AV_LOG_ERROR,
                                "Parser not found for Codec Id: %d !\n",
                                st->codec->codec_id);
+                    }else if(st->need_parsing == 2){
+                        st->parser->flags |= PARSER_FLAG_COMPLETE_FRAMES;
                     }
 		}
 	    }
@@ -1050,16 +1052,66 @@ static int av_read_frame_internal(AVFormatContext *s, AVPacket *pkt)
 int av_read_frame(AVFormatContext *s, AVPacket *pkt)
 {
     AVPacketList *pktl;
+    int eof=0;
+    const int genpts= s->flags & AVFMT_FLAG_GENPTS;
 
-    pktl = s->packet_buffer;
-    if (pktl) {
-        /* read packet from packet buffer, if there is data */
-        *pkt = pktl->pkt;
-        s->packet_buffer = pktl->next;
-        av_free(pktl);
-        return 0;
-    } else {
-        return av_read_frame_internal(s, pkt);
+    for(;;){
+        pktl = s->packet_buffer;
+        if (pktl) {
+            AVPacket *next_pkt= &pktl->pkt;
+            AVStream *st= s->streams[ next_pkt->stream_index ];
+
+            if(genpts && next_pkt->dts != AV_NOPTS_VALUE){
+                while(pktl && next_pkt->pts == AV_NOPTS_VALUE){
+                    if(   pktl->pkt.stream_index == next_pkt->stream_index
+                       && next_pkt->dts < pktl->pkt.dts
+                       && pktl->pkt.pts != pktl->pkt.dts //not b frame
+                       /*&& pktl->pkt.dts != AV_NOPTS_VALUE*/){
+                        next_pkt->pts= pktl->pkt.dts;
+                    }
+                    pktl= pktl->next;
+                }
+                pktl = s->packet_buffer;
+            }
+
+            if(   next_pkt->pts != AV_NOPTS_VALUE
+               || next_pkt->dts == AV_NOPTS_VALUE
+               || !genpts || eof){
+                /* read packet from packet buffer, if there is data */
+                *pkt = *next_pkt;
+                s->packet_buffer = pktl->next;
+                av_free(pktl);
+                return 0;
+            }
+        }
+        if(genpts){
+            AVPacketList **plast_pktl= &s->packet_buffer;
+            int ret= av_read_frame_internal(s, pkt);
+            if(ret<0){
+                if(pktl && ret != -EAGAIN){
+                    eof=1;
+                    continue;
+                }else
+                    return ret;
+            }
+
+            /* duplicate the packet */
+            if (av_dup_packet(pkt) < 0)
+                return AVERROR_NOMEM;
+
+            while(*plast_pktl) plast_pktl= &(*plast_pktl)->next; //FIXME maybe maintain pointer to the last?
+
+            pktl = av_mallocz(sizeof(AVPacketList));
+           if (!pktl)
+                return AVERROR_NOMEM;
+
+            /* add the packet in the buffered packet list */
+            *plast_pktl = pktl;
+            pktl->pkt= *pkt;
+        }else{
+            assert(!s->packet_buffer);
+            return av_read_frame_internal(s, pkt);
+        }
     }
 }
 
@@ -1680,7 +1732,7 @@ static void av_estimate_timings_from_pts(AVFormatContext *ic)
     AVPacket pkt1, *pkt = &pkt1;
     AVStream *st;
     int read_size, i, ret;
-    int64_t start_time, end_time, end_time1;
+    int64_t end_time;
     int64_t filesize, offset, duration;
     
     /* free previous packet */
@@ -1921,6 +1973,9 @@ int av_find_stream_info(AVFormatContext *ic)
         //only for the split stuff
         if (!st->parser) {
             st->parser = av_parser_init(st->codec->codec_id);
+            if(st->need_parsing == 2 && st->parser){
+                st->parser->flags |= PARSER_FLAG_COMPLETE_FRAMES;
+            }
         }
     }
 
@@ -2383,25 +2438,53 @@ int av_write_header(AVFormatContext *s)
     int ret, i;
     AVStream *st;
 
+    // some sanity checks
+    for(i=0;i<s->nb_streams;i++) {
+        st = s->streams[i];
+
+        switch (st->codec->codec_type) {
+        case CODEC_TYPE_AUDIO:
+            if(st->codec->sample_rate<=0){
+                av_log(s, AV_LOG_ERROR, "sample rate not set\n");
+                return -1;
+            }
+            break;
+        case CODEC_TYPE_VIDEO:
+            if(st->codec->time_base.num<=0 || st->codec->time_base.den<=0){ //FIXME audio too?
+                av_log(s, AV_LOG_ERROR, "time base not set\n");
+                return -1;
+            }
+            if(st->codec->width<=0 || st->codec->height<=0){
+                av_log(s, AV_LOG_ERROR, "dimensions not set\n");
+                return -1;
+            }
+            break;
+        }
+    }
+
     ret = s->oformat->write_header(s);
     if (ret < 0)
         return ret;
 
     /* init PTS generation */
     for(i=0;i<s->nb_streams;i++) {
+        int64_t den = AV_NOPTS_VALUE;
         st = s->streams[i];
 
         switch (st->codec->codec_type) {
         case CODEC_TYPE_AUDIO:
-            av_frac_init(&st->pts, 0, 0, 
-                         (int64_t)st->time_base.num * st->codec->sample_rate);
+            den = (int64_t)st->time_base.num * st->codec->sample_rate;
             break;
         case CODEC_TYPE_VIDEO:
-            av_frac_init(&st->pts, 0, 0, 
-                         (int64_t)st->time_base.num * st->codec->time_base.den);
+            den = (int64_t)st->time_base.num * st->codec->time_base.den;
             break;
         default:
             break;
+        }
+        if (den != AV_NOPTS_VALUE) {
+            if (den <= 0)
+                return AVERROR_INVALIDDATA;
+            av_frac_init(&st->pts, 0, 0, den);
         }
     }
     return 0;

@@ -7,7 +7,7 @@
 	and it would mean (C / MMX2 / MMX / 3DNOW) versions 
 */
 
-#include "../common.h"
+#include "common.h"
 
 static uint64_t __attribute__((aligned(8))) attribute_used magicF2W= 0x43c0000043c00000LL;
 static uint64_t __attribute__((aligned(8))) attribute_used wm1010= 0xFFFF0000FFFF0000LL;
