@@ -4,10 +4,8 @@
   #define MM_ALTIVEC 0x0001
 #endif
 
-#ifdef i386
-  #ifdef MMX
-    #include "i386/mmx.h"
-  #endif
+#ifdef MMX
+  #include "i386/mmx.h"
 #else
   #define emms()    ;
 

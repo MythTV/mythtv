@@ -34,53 +34,52 @@ typedef struct LBFilter
     TF_STRUCT;
 } LBFilter;
 
-
-#ifdef i386
+#ifdef MMX
 
 void linearBlendMMX(unsigned char *src, int stride)
 {
 //  src += 4 * stride;
     asm volatile(
-       "leal (%0, %1), %%eax                           \n\t"
-       "leal (%%eax, %1, 4), %%edx                     \n\t"
+       "lea (%0, %1), %%"REG_a"                        \n\t"
+       "lea (%%"REG_a", %1, 4), %%"REG_d"              \n\t"
 
        "movq (%0), %%mm0                               \n\t" // L0
-       "movq (%%eax, %1), %%mm1                        \n\t" // L2
+       "movq (%%"REG_a", %1), %%mm1                    \n\t" // L2
        PAVGB(%%mm1, %%mm0)                                   // L0+L2
-       "movq (%%eax), %%mm2                            \n\t" // L1
+       "movq (%%"REG_a"), %%mm2                            \n\t" // L1
        PAVGB(%%mm2, %%mm0)
        "movq %%mm0, (%0)                               \n\t"
-       "movq (%%eax, %1, 2), %%mm0                     \n\t" // L3
+       "movq (%%"REG_a", %1, 2), %%mm0                     \n\t" // L3
        PAVGB(%%mm0, %%mm2)                                   // L1+L3
        PAVGB(%%mm1, %%mm2)                                   // 2L2 + L1 + L3
-       "movq %%mm2, (%%eax)                            \n\t"
+       "movq %%mm2, (%%"REG_a")                            \n\t"
        "movq (%0, %1, 4), %%mm2                        \n\t" // L4
        PAVGB(%%mm2, %%mm1)                                   // L2+L4
        PAVGB(%%mm0, %%mm1)                                   // 2L3 + L2 + L4
-       "movq %%mm1, (%%eax, %1)                        \n\t"
-       "movq (%%edx), %%mm1                            \n\t" // L5
+       "movq %%mm1, (%%"REG_a", %1)                        \n\t"
+       "movq (%%"REG_d"), %%mm1                            \n\t" // L5
        PAVGB(%%mm1, %%mm0)                                   // L3+L5
        PAVGB(%%mm2, %%mm0)                                   // 2L4 + L3 + L5
-       "movq %%mm0, (%%eax, %1, 2)                     \n\t"
-       "movq (%%edx, %1), %%mm0                        \n\t" // L6
+       "movq %%mm0, (%%"REG_a", %1, 2)                     \n\t"
+       "movq (%%"REG_d", %1), %%mm0                        \n\t" // L6
        PAVGB(%%mm0, %%mm2)                                   // L4+L6
        PAVGB(%%mm1, %%mm2)                                   // 2L5 + L4 + L6
        "movq %%mm2, (%0, %1, 4)                        \n\t"
-       "movq (%%edx, %1, 2), %%mm2                     \n\t" // L7
+       "movq (%%"REG_d", %1, 2), %%mm2                     \n\t" // L7
        PAVGB(%%mm2, %%mm1)                                   // L5+L7
        PAVGB(%%mm0, %%mm1)                                   // 2L6 + L5 + L7
-       "movq %%mm1, (%%edx)                            \n\t"
+       "movq %%mm1, (%%"REG_d")                            \n\t"
        "movq (%0, %1, 8), %%mm1                        \n\t" // L8
        PAVGB(%%mm1, %%mm0)                                   // L6+L8
        PAVGB(%%mm2, %%mm0)                                   // 2L7 + L6 + L8
-       "movq %%mm0, (%%edx, %1)                        \n\t"
-       "movq (%%edx, %1, 4), %%mm0                     \n\t" // L9
+       "movq %%mm0, (%%"REG_d", %1)                        \n\t"
+       "movq (%%"REG_d", %1, 4), %%mm0                     \n\t" // L9
        PAVGB(%%mm0, %%mm2)                                   // L7+L9
        PAVGB(%%mm1, %%mm2)                                   // 2L8 + L7 + L9
-       "movq %%mm2, (%%edx, %1, 2)                     \n\t"
+       "movq %%mm2, (%%"REG_d", %1, 2)                     \n\t"
 
-       : : "r" (src), "r" (stride)
-       : "%eax", "%edx"
+       : : "r" (src), "r" ((long)stride)
+       : "%"REG_a, "%"REG_d
     );
 }
 
@@ -88,46 +87,46 @@ void linearBlend3DNow(unsigned char *src, int stride)
 {
 //  src += 4 * stride;
     asm volatile(
-       "leal (%0, %1), %%eax                           \n\t"
-       "leal (%%eax, %1, 4), %%edx                     \n\t"
+       "lea (%0, %1), %%"REG_a"                           \n\t"
+       "lea (%%"REG_a", %1, 4), %%"REG_d"                     \n\t"
 
        "movq (%0), %%mm0                               \n\t" // L0
-       "movq (%%eax, %1), %%mm1                        \n\t" // L2
+       "movq (%%"REG_a", %1), %%mm1                        \n\t" // L2
        PAVGUSB(%%mm1, %%mm0)                                 // L0+L2
-       "movq (%%eax), %%mm2                            \n\t" // L1
+       "movq (%%"REG_a"), %%mm2                            \n\t" // L1
        PAVGUSB(%%mm2, %%mm0)
        "movq %%mm0, (%0)                               \n\t"
-       "movq (%%eax, %1, 2), %%mm0                     \n\t" // L3
+       "movq (%%"REG_a", %1, 2), %%mm0                     \n\t" // L3
        PAVGUSB(%%mm0, %%mm2)                                 // L1+L3
        PAVGUSB(%%mm1, %%mm2)                                 // 2L2 + L1 + L3
-       "movq %%mm2, (%%eax)                            \n\t"
+       "movq %%mm2, (%%"REG_a")                            \n\t"
        "movq (%0, %1, 4), %%mm2                        \n\t" // L4
        PAVGUSB(%%mm2, %%mm1)                                 // L2+L4
        PAVGUSB(%%mm0, %%mm1)                                 // 2L3 + L2 + L4
-       "movq %%mm1, (%%eax, %1)                        \n\t"
-       "movq (%%edx), %%mm1                            \n\t" // L5
+       "movq %%mm1, (%%"REG_a", %1)                        \n\t"
+       "movq (%%"REG_d"), %%mm1                            \n\t" // L5
        PAVGUSB(%%mm1, %%mm0)                                 // L3+L5
        PAVGUSB(%%mm2, %%mm0)                                 // 2L4 + L3 + L5
-       "movq %%mm0, (%%eax, %1, 2)                     \n\t"
-       "movq (%%edx, %1), %%mm0                        \n\t" // L6
+       "movq %%mm0, (%%"REG_a", %1, 2)                     \n\t"
+       "movq (%%"REG_d", %1), %%mm0                        \n\t" // L6
        PAVGUSB(%%mm0, %%mm2)                                 // L4+L6
        PAVGUSB(%%mm1, %%mm2)                                 // 2L5 + L4 + L6
        "movq %%mm2, (%0, %1, 4)                        \n\t"
-       "movq (%%edx, %1, 2), %%mm2                     \n\t" // L7
+       "movq (%%"REG_d", %1, 2), %%mm2                     \n\t" // L7
        PAVGUSB(%%mm2, %%mm1)                                 // L5+L7
        PAVGUSB(%%mm0, %%mm1)                                 // 2L6 + L5 + L7
-       "movq %%mm1, (%%edx)                            \n\t"
+       "movq %%mm1, (%%"REG_d")                            \n\t"
        "movq (%0, %1, 8), %%mm1                        \n\t" // L8
        PAVGUSB(%%mm1, %%mm0)                                 // L6+L8
        PAVGUSB(%%mm2, %%mm0)                                 // 2L7 + L6 + L8
-       "movq %%mm0, (%%edx, %1)                        \n\t"
-       "movq (%%edx, %1, 4), %%mm0                     \n\t" // L9
+       "movq %%mm0, (%%"REG_d", %1)                        \n\t"
+       "movq (%%"REG_d", %1, 4), %%mm0                     \n\t" // L9
        PAVGUSB(%%mm0, %%mm2)                                 // L7+L9
        PAVGUSB(%%mm1, %%mm2)                                 // 2L8 + L7 + L9
-       "movq %%mm2, (%%edx, %1, 2)                     \n\t"
+       "movq %%mm2, (%%"REG_d", %1, 2)                     \n\t"
 
-       : : "r" (src), "r" (stride)
-       : "%eax", "%edx"
+       : : "r" (src), "r" ((long)stride)
+       : "%"REG_a, "%"REG_d
     );
 }
 
@@ -357,8 +356,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
     filter->filter = &linearBlendFilter;
     filter->subfilter = &linearBlend;    /* Default, non accellerated */
     filter->mm_flags = mm_support();
-//#ifdef MMX
-#if defined(MMX) && defined(i386)
+#ifdef MMX
     if (filter->mm_flags & MM_MMXEXT)
         filter->subfilter = &linearBlendMMX;
     else if (filter->mm_flags & MM_3DNOW)
