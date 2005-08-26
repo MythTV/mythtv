@@ -34,6 +34,7 @@
 #if (QT_VERSION >= 0x030300)
 #include <qlocale.h>
 #endif
+#include <unistd.h>
 
 #include "mythcontext.h"
 #include "siscan.h"

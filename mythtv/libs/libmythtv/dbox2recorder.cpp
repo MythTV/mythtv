@@ -18,6 +18,7 @@ using namespace std;
 #include <sys/socket.h>
 #include <netdb.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 #define DEBUG_DBOX2_TS 
 //#define DEBUG_DBOX2_PMT 

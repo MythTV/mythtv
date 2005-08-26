@@ -3,6 +3,7 @@
 // C includes
 #include <cstdio>
 #include <pthread.h>
+#include <unistd.h>
 
 // Qt includes
 #include <qmutex.h>
