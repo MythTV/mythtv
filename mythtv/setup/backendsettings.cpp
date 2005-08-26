@@ -163,7 +163,7 @@ static HostSlider *MaxBufferFill()
 static GlobalCheckBox *SaveTranscoding()
 {
     GlobalCheckBox *gc = new GlobalCheckBox("SaveTranscoding");
-    gc->setLabel(QObject::tr("Save original files after transcoding"));
+    gc->setLabel(QObject::tr("Save original files after transcoding (globally)"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("When set and the transcoder is active, the "
                     "original nuv files will be renamed to nuv.old once the "
