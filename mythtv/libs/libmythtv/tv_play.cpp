@@ -4479,10 +4479,10 @@ void TV::BuildOSDTreeMenu(void)
     }
     else if (StateIsPlaying(internalState))
     {
-        if (lastProgram != NULL)
-            item = new OSDGenericTree(treeMenu, tr("Jump to Previous Recording"), "JUMPPREV");
-
         item = new OSDGenericTree(treeMenu, tr("Edit Recording"), "TOGGLEEDIT");
+
+        if (lastProgram != NULL)
+            item = new OSDGenericTree(treeMenu, tr("Previous Recording"), "JUMPPREV");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
                                    playbackinfo->chanid, playbackinfo->startts))
