@@ -6,28 +6,39 @@ freq_table_map_t frequencies;
 static void init_freq_tables(freq_table_map_t&);
 
 TransportScanItem::TransportScanItem()
-    : mplexid(-1),      standard("dvb"),
-      FriendlyName(""), SourceID(0),         UseTimer(false),
-      scanning(false),  timeoutTune(DVBT_TUNINGTIMEOUT)
+    : mplexid(-1),        standard("dvb"),      FriendlyName(""),
+      friendlyNum(0),     SourceID(0),          UseTimer(false),
+      scanning(false)
 { 
     bzero(freq_offsets, sizeof(int)*3);
+
 #ifdef USING_DVB
     bzero(&tuning, sizeof(DVBTuning));
+#else
+    frequency  = 0;
+    modulation = 0;
 #endif
+
+    timeoutTune = DVBT_TUNINGTIMEOUT;
 }
 
 TransportScanItem::TransportScanItem(int sourceid,
                                      const QString &std,
                                      const QString &fn,
                                      int _mplexid)
-    : mplexid(_mplexid), standard(std),
-      FriendlyName(fn),  SourceID(sourceid), UseTimer(false),
-      scanning(false),   timeoutTune(DVBT_TUNINGTIMEOUT)
+    : mplexid(_mplexid),  standard(std),        FriendlyName(fn),
+      friendlyNum(0),     SourceID(sourceid),   UseTimer(false),
+      scanning(false)
 {
     bzero(freq_offsets, sizeof(int)*3);
+
 #ifdef USING_DVB
     bzero(&tuning, sizeof(DVBTuning));
+#else
+    frequency  = 0;
+    modulation = 0;
 #endif
+
     // set timeout
     timeoutTune = (standard == "dvb") ?
         DVBT_TUNINGTIMEOUT : ATSC_TUNINGTIMEOUT;
@@ -38,10 +49,10 @@ TransportScanItem::TransportScanItem(int sourceid,
                                      const QString &fn,
                                      uint fnum,
                                      uint freq,
-                                     const FrequencyTable &ft) :
-    mplexid(-1),        standard(std),       FriendlyName(fn),
-    friendlyNum(fnum),  SourceID(sourceid),  UseTimer(false),
-    scanning(false)
+                                     const FrequencyTable &ft)
+    : mplexid(-1),        standard(std),        FriendlyName(fn),
+      friendlyNum(fnum),  SourceID(sourceid),   UseTimer(false),
+      scanning(false)
 {
     bzero(freq_offsets, sizeof(int)*3);
 #ifdef USING_DVB

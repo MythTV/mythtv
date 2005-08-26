@@ -1017,9 +1017,8 @@ void SIScan::UpdatePATinDB(int tid_db,
         QString chan_num = ChannelUtil::GetChanNum(chanid);
         if (chan_num == QString::null || chan_num == "")
         {
-            chan_num = channelFormat
-                .arg(pat->TransportStreamID())
-                .arg(pat->ProgramNumber(i));
+            chan_num = QString("%1#%2")
+                .arg((freqid) ? freqid : db_mplexid).arg(i);
         }
 
         QString service_name = QString("Unknown %1").arg(chan_num);
