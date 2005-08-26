@@ -59,7 +59,7 @@ class MythListButton : public MythUIType
   signals:
     void itemSelected(MythListButtonItem* item);
 
-  private:
+  protected:
     void Init();
     void LoadPixmap(MythImage **pix, const QString& fileName);
 
@@ -67,6 +67,18 @@ class MythListButton : public MythUIType
     void RemoveItem(MythListButtonItem *item);
 
     void SetPositionArrowStates(void);
+
+    /* methods for subclasses to override */
+    virtual uint ItemWidth() const { return m_contentsRect.width(); }
+    virtual QRect CalculateContentsRect(const QRect &arrowsRect) const;
+    virtual void LoadArrowPixmaps(MythImage **prevReg, MythImage **prevAct,
+                                  MythImage **nextReg, MythImage **nextAct);
+
+    virtual void CalculateVisibleItems(void);
+    virtual const QRect PlaceArrows(const QSize &arrowSize);
+    virtual QPoint GetButtonPosition(uint i) const;
+
+    /**/
 
     int m_order;
     QRect m_rect;
@@ -117,6 +129,30 @@ class MythListButton : public MythUIType
     int m_textFlags;
 
     friend class MythListButtonItem;
+};
+
+class MythHorizListButton : public MythListButton
+{
+  public:
+    MythHorizListButton(MythUIType *parent, const char *name, 
+                             const QRect &area, bool showArrow = true, 
+                             bool showScrollArrows = false,
+                             uint horizontalItems = 3);
+
+  protected:
+    inline void CalculateVisibleItems(void) { return; }
+
+    void LoadArrowPixmaps(MythImage **PrevReg, MythImage **PrevAct,
+                          MythImage **NextReg, MythImage **NextAct);
+
+    const QRect PlaceArrows(const QSize & arrowSize);
+
+    QRect CalculateContentsRect(const QRect & arrowsRect) const;
+    inline uint ItemWidth(void) const { return m_itemWidth; }
+    QPoint GetButtonPosition(uint i) const;
+
+  private:
+    int m_itemWidth;
 };
 
 class MythListButtonItem

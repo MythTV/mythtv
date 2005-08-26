@@ -115,6 +115,8 @@ void MythListButton::SetTextFlags(int flags)
 void MythListButton::SetActive(bool active)
 {
     m_active = active;
+    if (m_initialized)
+        SetPositionArrowStates();
 }
 
 void MythListButton::Reset()
@@ -562,8 +564,6 @@ void MythListButton::Init()
 
     m_initialized = true;
 
-    MythPainter *painter = GetMythPainter();
-
     QFontMetrics fm(m_fontActive->face);
     QSize sz1 = fm.size(Qt::SingleLine, "XXXXX");
     fm = QFontMetrics(m_fontInactive->face);
@@ -577,23 +577,14 @@ void MythListButton::Init()
         m_downArrow = new MythUIStateType(this, "downscrollarrow");
 
         MythImage *upReg, *upAct, *downReg, *downAct;
-        LoadPixmap(&upReg, "uparrow-reg");
-        LoadPixmap(&upAct, "uparrow-sel");
-        LoadPixmap(&downReg, "dnarrow-reg");
-        LoadPixmap(&downAct, "dnarrow-sel");
+        LoadArrowPixmaps(&upReg, &upAct, &downReg, &downAct);
 
         m_upArrow->AddImage(MythUIStateType::Off, upReg);
         m_upArrow->AddImage(MythUIStateType::Full, upAct);
         m_downArrow->AddImage(MythUIStateType::Off, downReg);
         m_downArrow->AddImage(MythUIStateType::Full, downAct);
 
-        m_upArrow->SetPosition(QPoint(0, 
-                                      m_Area.height() - upAct->height() - 1));
-        m_downArrow->SetPosition(QPoint(upAct->width() + m_itemMargin,
-                                        m_Area.height() - upAct->height() - 1));
-
-        arrowsRect = QRect(0, m_Area.height() - upAct->height() - 1,
-                           m_Area.width(), upAct->height());
+        arrowsRect = PlaceArrows(upAct->size());
 
         upAct->DownRef();
         upReg->DownRef();
@@ -602,18 +593,10 @@ void MythListButton::Init()
     }
     else 
         arrowsRect = QRect(0, 0, 0, 0);
-        
-    m_contentsRect = QRect(0, 0, m_Area.width(), m_Area.height() -
-                           arrowsRect.height() - 2 * m_itemMargin);
+ 
+    m_contentsRect = CalculateContentsRect(arrowsRect);
 
-    m_itemsVisible = 0;
-    int y = 0;
-
-    while (y <= m_contentsRect.height() - m_itemHeight) 
-    {
-        y += m_itemHeight + m_itemSpacing;
-        m_itemsVisible++;
-    }
+    CalculateVisibleItems();
 
     MythImage *itemRegPix, *itemSelActPix, *itemSelInactPix;
     MythImage *arrowPix, *checkNonePix, *checkHalfPix, *checkFullPix;
@@ -621,126 +604,16 @@ void MythListButton::Init()
     LoadPixmap(&checkNonePix, "check-empty");
     LoadPixmap(&checkHalfPix, "check-half");
     LoadPixmap(&checkFullPix, "check-full");
-    
+
     LoadPixmap(&arrowPix, "arrow");
 
-    QImage img(m_Area.width(), m_itemHeight, 32);
-    img.setAlphaBuffer(true);
-
-    for (int y = 0; y < img.height(); y++)
-    {
-        for (int x = 0; x < img.width(); x++)
-        {
-            uint *p = (uint *)img.scanLine(y) + x;
-            *p = qRgba(0, 0, 0, m_itemRegAlpha);
-        }
-    }
-
-    qApp->lock();
-
-    {
-        float rstep = float(m_itemRegEnd.red() - m_itemRegBeg.red()) / 
-                      float(m_itemHeight);
-        float gstep = float(m_itemRegEnd.green() - m_itemRegBeg.green()) / 
-                      float(m_itemHeight);
-        float bstep = float(m_itemRegEnd.blue() - m_itemRegBeg.blue()) / 
-                      float(m_itemHeight);
-
-        QPixmap itemRegPmap = QPixmap(img);
-        QPainter p(&itemRegPmap);
-
-        float r = m_itemRegBeg.red();
-        float g = m_itemRegBeg.green();
-        float b = m_itemRegBeg.blue();
-        for (int y = 0; y < img.height(); y++) 
-        {
-            QColor c((int)r, (int)g, (int)b);
-            p.setPen(c);
-            p.drawLine(0, y, img.width(), y);
-            r += rstep;
-            g += gstep;
-            b += bstep;
-        }
-        p.setPen(black);
-        p.drawLine(0, 0, 0, img.height() - 1);
-        p.drawLine(0, 0, img.width() - 1, 0);
-        p.drawLine(0, img.height() - 1, img.width() - 1, img.height() - 1);
-        p.drawLine(img.width() - 1, 0, img.width() - 1, img.height() - 1);
-        p.end();
-
-        itemRegPix = painter->GetFormatImage();
-        itemRegPix->Assign(itemRegPmap.convertToImage());
-    }   
-
-    {
-        float rstep = float(m_itemSelEnd.red() - m_itemSelBeg.red()) /
-                      float(m_itemHeight);
-        float gstep = float(m_itemSelEnd.green() - m_itemSelBeg.green()) / 
-                      float(m_itemHeight);
-        float bstep = float(m_itemSelEnd.blue() - m_itemSelBeg.blue()) /
-                      float(m_itemHeight);
-
-        QPixmap itemSelInactPmap = QPixmap(img);
-        QPainter p(&itemSelInactPmap);
-
-        float r = m_itemSelBeg.red();
-        float g = m_itemSelBeg.green();
-        float b = m_itemSelBeg.blue();
-        for (int y = 0; y < img.height(); y++) 
-        {
-            QColor c((int)r, (int)g, (int)b);
-            p.setPen(c);
-            p.drawLine(0, y, img.width(), y);
-            r += rstep;
-            g += gstep;
-            b += bstep;
-        }
-        p.setPen(black);
-        p.drawLine(0, 0, 0, img.height() - 1);
-        p.drawLine(0, 0, img.width() - 1, 0);
-        p.drawLine(0, img.height() - 1, img.width() - 1, img.height() - 1);
-        p.drawLine(img.width() - 1, 0, img.width() - 1, img.height() - 1);
-        p.end();
-
-        itemSelInactPix = painter->GetFormatImage();
-        itemSelInactPix->Assign(itemSelInactPmap.convertToImage());
-
-        for (int y = 0; y < img.height(); y++)
-        {
-            for (int x = 0; x < img.width(); x++)
-            {
-                uint *p = (uint *)img.scanLine(y) + x;
-                *p = qRgba(0, 0, 0, 255);
-            }
-        }
-        
-        QPixmap itemSelActPmap = QPixmap(img);
-        p.begin(&itemSelActPmap);
-
-        r = m_itemSelBeg.red();
-        g = m_itemSelBeg.green();
-        b = m_itemSelBeg.blue();
-        for (int y = 0; y < img.height(); y++) 
-        {
-            QColor c((int)r, (int)g, (int)b);
-            p.setPen(c);
-            p.drawLine(0, y, img.width(), y);
-            r += rstep;
-            g += gstep;
-            b += bstep;
-        }
-        p.setPen(black);
-        p.drawLine(0, 0, 0, img.height() - 1);
-        p.drawLine(0, 0, img.width() - 1, 0);
-        p.drawLine(0, img.height() - 1, img.width() - 1, img.height() - 1);
-        p.drawLine(img.width() - 1, 0, img.width() - 1, img.height() - 1);
-        p.end();
-
-        itemSelActPix = painter->GetFormatImage();
-        itemSelActPix->Assign(itemSelActPmap.convertToImage());
-    }
-
-    qApp->unlock();
+    QSize gradsize(ItemWidth(), m_itemHeight);
+    itemRegPix = MythImage::Gradient(gradsize, m_itemRegBeg, m_itemRegEnd,
+                                     m_itemRegAlpha);
+    itemSelActPix = MythImage::Gradient(gradsize, m_itemSelBeg, m_itemSelEnd,
+                                        m_itemSelAlpha);
+    itemSelInactPix = MythImage::Gradient(gradsize, m_itemSelBeg, m_itemSelEnd,
+                                          m_itemRegAlpha);
 
     for (int i = 0; i < (int)m_itemsVisible; i++)
     {
@@ -763,7 +636,7 @@ void MythListButton::Init()
         button->SetFont(MythUIButton::Normal, *m_fontActive);
         button->SetFont(MythUIButton::Disabled, *m_fontInactive);
 
-        button->SetPosition(0, i * (m_itemHeight + m_itemSpacing));
+        button->SetPosition(GetButtonPosition(i));
         m_ButtonList.push_back(button);
     }
 
@@ -778,11 +651,108 @@ void MythListButton::Init()
     SetPositionArrowStates();
 }
 
+QPoint MythListButton::GetButtonPosition(uint i) const
+{
+    return QPoint(0, i * (m_itemHeight + m_itemSpacing));
+}
+
 void MythListButton::LoadPixmap(MythImage **pix, const QString& fileName)
 {
     QString file = "lb-" + fileName + ".png";
     QImage *p = gContext->LoadScaleImage(file);
     *pix = MythImage::FromQImage(&p);
+}
+
+void MythListButton::LoadArrowPixmaps(MythImage **PrevReg, MythImage **PrevAct,
+                                      MythImage **NextReg, MythImage **NextAct)
+{
+    LoadPixmap(PrevReg, "uparrow-reg");
+    LoadPixmap(PrevAct, "uparrow-sel");
+    LoadPixmap(NextReg, "dnarrow-reg");
+    LoadPixmap(NextAct, "dnarrow-sel");
+}
+
+const QRect MythListButton::PlaceArrows(const QSize &arrowSize)
+{
+    int y = m_Area.height() - arrowSize.height() - 1;
+    m_upArrow->SetPosition(QPoint(0, y));
+    m_downArrow->SetPosition(QPoint(arrowSize.width() + m_itemMargin, y));
+
+    return QRect(0, y, m_Area.width(), arrowSize.height());
+}
+
+QRect MythListButton::CalculateContentsRect(const QRect &arrowsRect) const
+{
+    return QRect(0, 0, GetArea().width(), GetArea().height() -
+                 arrowsRect.height() - 2 * m_itemMargin);
+}
+
+void MythListButton::CalculateVisibleItems(void)
+{
+    int y = 0;
+    m_itemsVisible = 0;
+    while (y <= m_contentsRect.height() - m_itemHeight) 
+    {
+        y += m_itemHeight + m_itemSpacing;
+        m_itemsVisible++;
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+MythHorizListButton::MythHorizListButton(MythUIType *parent,
+                                         const char *name, const QRect &area,
+                                         bool showArrow, bool showScrollArrows,
+                                         uint horizontalItems)
+    : MythListButton(parent, name, area, showArrow, showScrollArrows)
+{
+    m_itemsVisible = horizontalItems;
+}
+
+const QRect MythHorizListButton::PlaceArrows(const QSize &arrowSize)
+{
+    int x = GetArea().width() - arrowSize.width() - 1;
+    int ytop = GetArea().height() / 2 - m_itemMargin / 2 - arrowSize.height();
+    int ybottom = GetArea().height() / 2 + m_itemMargin / 2;
+
+    m_upArrow->SetPosition(QPoint(x, ybottom));
+    m_downArrow->SetPosition(QPoint(x, ytop));
+
+    /* rightmost rectangle (full height) */
+    QRect arrowsRect(x, 0, arrowSize.width() + 1, m_Area.height());
+
+    /* now calculate the item width */
+    int dx = GetArea().width() - arrowSize.width() - 1 - 2 * m_itemMargin -
+             (m_itemsVisible - 1) * m_itemSpacing;
+ 
+    /* set the item width */
+    m_itemWidth = dx / m_itemsVisible;
+
+    return QRect(x, 0, arrowSize.width() + 1, m_Area.height());
+}
+
+QRect MythHorizListButton::CalculateContentsRect(const QRect &arrowsRect) const
+{
+    return QRect(0, 0,
+                 GetArea().width() - arrowsRect.width() - 2 * m_itemMargin,
+                 GetArea().height());
+}
+
+QPoint MythHorizListButton::GetButtonPosition(uint i) const
+{
+    return QPoint(i * (ItemWidth() + m_itemSpacing),
+                  GetArea().height() / 2 - m_itemHeight / 2);
+}
+
+void MythHorizListButton::LoadArrowPixmaps(MythImage **PrevReg,
+                                           MythImage **PrevAct,
+                                           MythImage **NextReg,
+                                           MythImage **NextAct)
+{
+    LoadPixmap(PrevReg, "ltarrow-reg");
+    LoadPixmap(PrevAct, "ltarrow-sel");
+    LoadPixmap(NextReg, "rtarrow-reg");
+    LoadPixmap(NextAct, "rtarrow-sel");
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -308,12 +308,12 @@ void MythUIType::SetArea(const QRect &rect)
     SetRedraw();
 }
 
-QRect MythUIType::GetArea(void)
+QRect MythUIType::GetArea(void) const
 {
     return m_Area;
 }
 
-QRect MythUIType::GetDirtyArea(void)
+QRect MythUIType::GetDirtyArea(void) const
 {
     return m_DirtyRect;
 }

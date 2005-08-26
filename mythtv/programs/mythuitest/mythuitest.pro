@@ -31,7 +31,7 @@ DEPENDPATH += ../../libs/libmythui ../../libs/libmyth
 QMAKE_CLEAN += $(TARGET)
 
 # Input
-HEADERS = test1.h
+HEADERS = test1.h btnlisttest.h
 
-SOURCES = main.cpp test1.cpp
+SOURCES = main.cpp test1.cpp btnlisttest.cpp
 

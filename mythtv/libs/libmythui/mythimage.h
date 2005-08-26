@@ -28,6 +28,15 @@ class MythImage : public QImage
 
     bool Load(const QString &filename);
 
+    /**
+     * @brief Create a gradient image.
+     * @param size The size of the image.
+     * @param begin The beginning colour.
+     * @param end The ending colour.
+     * @return A MythImage filled with a gradient.
+     */
+    static MythImage *Gradient(const QSize & size, const QColor &begin, const QColor &end, uint alpha);
+
   protected:
     virtual ~MythImage();
 

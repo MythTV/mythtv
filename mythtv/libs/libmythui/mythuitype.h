@@ -45,9 +45,9 @@ class MythUIType : public QObject
     virtual void SetPosition(int x, int y);
     virtual void SetPosition(const QPoint &pos);
     virtual void SetArea(const QRect &rect);
-    virtual QRect GetArea(void);
+    virtual QRect GetArea(void) const;
 
-    virtual QRect GetDirtyArea(void);
+    virtual QRect GetDirtyArea(void) const;
 
     QString cutDown(const QString &data, QFont *font,
                     bool multiline = false, int overload_width = -1,
