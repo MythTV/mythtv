@@ -39,6 +39,7 @@ inc.files = avcodec.h i386/mmx.h
 INSTALLS += inc
 
 LIBS += $$LOCAL_LIBDIR_X11
+LIBS += -L../libavutil -lmythavutil-$$LIBVERSION
 
 contains( CONFIG_AASC_DECODER, yes ) {
     SOURCES += aasc.c

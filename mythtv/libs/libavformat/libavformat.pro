@@ -55,7 +55,7 @@ inc.files = avformat.h avio.h rtp.h rtsp.h rtspcodes.h
 
 INSTALLS += inc
 
-LIBS += -L../libavcodec -lmythavcodec-$$LIBVERSION
+LIBS += -L../libavcodec -lmythavcodec-$$LIBVERSION -L../libavutil -lmythavutil-$$LIBVERSION
 
 macx {
     LIBS               += -lz

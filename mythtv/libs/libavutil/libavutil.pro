@@ -4,6 +4,7 @@ include ( ../../settings.pro )
 TEMPLATE = lib
 TARGET = mythavutil-$$LIBVERSION
 CONFIG += thread dll warn_off
+CONFIG -= qt
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
