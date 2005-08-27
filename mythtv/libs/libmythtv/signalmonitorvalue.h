@@ -110,6 +110,14 @@ class SignalMonitorValue
     // variable for initializing constants after translator installed
     static bool run_static_init;
 
+    QString toString() const
+    {
+        QString str = (QString::null == noSpaceName) ? "(null)" : noSpaceName;
+        return QString("Name(%1) Val(%2) thr(%3%4) range(%5,%6) timeout(%7 ms) %8 set")
+            .arg(str).arg(value).arg( (high_threshold) ? "<=" : ">=" )
+            .arg(threshold).arg(minval).arg(maxval)
+            .arg(timeout).arg( (set) ? "is" : "is NOT" );
+    }
   private:
     SignalMonitorValue() {}
     SignalMonitorValue(const QString& _name, const QString& _noSpaceName,

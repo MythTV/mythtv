@@ -1323,8 +1323,20 @@ bool TVRec::StartChannel(bool livetv)
                     ((abortRecordingStart) ?
                      "TVRec: StartChannel() -- canceled" :
                      "TVRec: Timed out waiting for lock -- aborting recording"));
-            VERBOSE(VB_IMPORTANT, "SigMon Flags are: "
+
+            // BEGIN DEBUG CODE
+            VERBOSE(VB_CHANNEL, "SigMon Flags are: "
                     <<sm_flags_to_string(signalMonitor->GetFlags()));
+            if (print_verbose_messages & VB_CHANNEL)
+            {
+                QStringList l = signalMonitor->GetStatusList();
+                SignalMonitorList sl = SignalMonitorValue::Parse(l);
+                
+                for (uint i = 0; i < sl.size(); ++i)
+                    VERBOSE(VB_CHANNEL, "SML["<<i<<"]: "<<sl.at(i).toString());
+            }
+            // END DEBUG CODE
+
             SetSignalMonitoringRate(0, 0);
             return false;
         }
