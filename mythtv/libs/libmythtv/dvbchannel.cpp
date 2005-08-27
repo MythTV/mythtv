@@ -57,6 +57,9 @@ using namespace std;
 #include "dvbdiseqc.h"
 #include "dvbcam.h"
 
+#define USE_BROKEN_DVB_DRIVER_HACK 1
+#define DVB_GET_EVENT_TIMEOUT 500 /* ms */
+
 #if (DVB_API_VERSION_MINOR <= 3 && DVB_API_VERSION_MINOR == 0)
 #    define FE_ATSC       (FE_OFDM+1)
 #    define FE_CAN_8VSB   0x200000
@@ -66,7 +69,8 @@ using namespace std;
 #endif
 
 bool flush_dvb_events(int fd, struct dvb_frontend_event &event);
-bool get_dvb_event(int fd, struct dvb_frontend_event &event, bool block = true);
+bool get_dvb_event(int fd, struct dvb_frontend_event &event,
+                   bool block = true, int timeout = -1);
 QString dvb_event_to_string(const struct dvb_frontend_event &event);
 
 /** \class DVBChannel
@@ -617,7 +621,7 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int)
             if (!chk || (old_params.frequency != tuning.params.frequency))
             {
                 CHANNEL("Waiting for event");
-                if (get_dvb_event(fd_frontend, event))
+                if (get_dvb_event(fd_frontend, event, DVB_GET_EVENT_TIMEOUT))
                     CHANNEL(dvb_event_to_string(event));
             }
 
@@ -854,9 +858,13 @@ bool flush_dvb_events(int fd, struct dvb_frontend_event &last_event)
     return have_event;
 }
 
-bool get_dvb_event(int fd, struct dvb_frontend_event &event, bool block)
+bool get_dvb_event(int fd, struct dvb_frontend_event &event,
+                   bool block, int timeout)
 {
-    while (true)
+    QTime timer;
+    timer.start();
+    
+    while ((timeout <= 0) || (timer.elapsed() < timeout))
     {
         if (0 == ioctl(fd, FE_GET_EVENT, &event))
             return true;
@@ -869,7 +877,9 @@ bool get_dvb_event(int fd, struct dvb_frontend_event &event, bool block)
             usleep(50); // it would be nicer to use select...
         }
         else if (EOVERFLOW == ret)
+        {
             VERBOSE(VB_IMPORTANT, "DVBEvents: Oops, we lost some events...");
+        }
         else if (EBADF == ret)
         {
             VERBOSE(VB_IMPORTANT, 
@@ -886,7 +896,39 @@ bool get_dvb_event(int fd, struct dvb_frontend_event &event, bool block)
             VERBOSE(VB_IMPORTANT, "DVBEvents: unknown error... "<<ret);
             return false; // unknown error...
         }
-    }    
+    }
+
+#if USE_BROKEN_DVB_DRIVER_HACK
+    if (timer.elapsed() >= timeout)
+    {
+        VERBOSE(
+            VB_IMPORTANT, "\n"
+            "*****************************************************************"
+            "\n"
+            " WARNING!! MythTV timeout out waiting for a required DVB event!\n"
+            " Most likely you are using a broken driver and should upgrade to\n"
+            " to the latest DVB driver immediately. This bug in your driver\n"
+            " will result in lost recordings and reduced functionality, and\n"
+            " indicates a DVB driver unsuitable for production use.\n"
+            "*****************************************************************"
+            "\n");
+
+        fe_status_t tmp_stat;
+        if (ioctl(fd, FE_READ_STATUS, &tmp_stat))
+        {
+            if (tmp_stat & FE_HAS_LOCK)
+            {
+                VERBOSE(VB_IMPORTANT, "MythTV HACK for BROKEN DVB drivers "
+                        "appears to have worked. Please upgrade DVB drivers.");
+                return true;
+            }
+        }
+        VERBOSE(VB_IMPORTANT, "MythTV HACK for BROKEN DVB drivers "
+                "FAILED! Upgrade your DVB drivers.");
+    }
+#endif // USE_BROKEN_DVB_DRIVER_HACK
+
+    return false;
 }
 
 QString dvb_event_to_string(const struct dvb_frontend_event &event)
