@@ -103,6 +103,28 @@ void ProgramMapTable::AppendStream(
     SetLength(_ptrs[StreamCount()] - pesdata());
 }
 
+/** \fn ProgramMapTable::IsAudio(uint) const
+ *  \brief Returns true iff the stream at index i is an audio stream.
+ *
+ *   This of course returns true if StreamID::IsAudio() is true, but
+ *   if also returns true if there is an AC3 stream in a private
+ *   data stream as described by an AC3 descriptor.
+ *  \param i index of stream
+ */
+bool ProgramMapTable::IsAudio(uint i) const
+{
+    if (StreamID::IsAudio(StreamType(i)))
+        return true;
+    if (StreamID::PrivData == StreamType(i))
+    {
+        desc_list_t list = MPEGDescriptor::
+            Parse(StreamInfo(i), StreamInfoLength(i));
+        if (MPEGDescriptor::Find(list, DescriptorID::AC3))
+            return true;
+    }
+    return false;
+}
+
 bool ProgramMapTable::IsEncrypted(void) const
 {
     desc_list_t descs = MPEGDescriptor::Parse(
@@ -144,13 +166,13 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
     else if (StreamID::AnyVideo == type)
     {
         for (uint i=0; i < StreamCount(); i++)
-            if (StreamID::IsVideo(StreamType(i)))
+            if (IsVideo(i))
                 pids.push_back(StreamPID(i));
     }
     else if (StreamID::AnyAudio == type)
     {
         for (uint i=0; i < StreamCount(); i++)
-            if (StreamID::IsAudio(StreamType(i)))
+            if (IsAudio(i))
                 pids.push_back(StreamPID(i));
     }
 
@@ -178,7 +200,7 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
     else if (StreamID::AnyVideo == type)
     {
         for (uint i=0; i < StreamCount(); i++)
-            if (StreamID::IsVideo(StreamType(i)))
+            if (IsVideo(i))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));
@@ -187,7 +209,7 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
     else if (StreamID::AnyAudio == type)
     {
         for (uint i=0; i < StreamCount(); i++)
-            if (StreamID::IsAudio(StreamType(i)))
+            if (IsAudio(i))
             {
                 pids.push_back(StreamPID(i));
                 types.push_back(StreamType(i));

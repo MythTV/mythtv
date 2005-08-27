@@ -66,7 +66,7 @@ class StreamID
                 (StreamID::MPEG2Audio == type) ||
                 (StreamID::AACAudio   == type) ||
                 (StreamID::AC3Audio   == type) ||
-                (StreamID::DTSAudio   == type)); 
+                (StreamID::DTSAudio   == type));
     }
 };
 
@@ -420,6 +420,9 @@ class ProgramMapTable : public PSIPTable
         { _ptrs[i][0] = type; }
 
     // helper methods
+    /// Returns true iff StreamID::IsVideo(StreamType(i)) returns true.
+    bool IsVideo(uint i) const { return StreamID::IsVideo(StreamType(i)); }
+    bool IsAudio(uint i) const;
     /// Returns true iff PMT contains CA descriptor.
     bool IsEncrypted(void) const;
     /// Returns a string representation of type at stream index i

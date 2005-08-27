@@ -235,13 +235,13 @@ void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
     }
 
     // if PMT contains audio and/or video stream set as matching.
-    bool hasAudio = false;
-    bool hasVideo = false;
+    uint hasAudio = 0;
+    uint hasVideo = 0;
 
     for (uint i = 0; i < pmt->StreamCount(); i++)
     {
-        hasVideo |= StreamID::IsVideo(pmt->StreamType(i));
-        hasAudio |= StreamID::IsAudio(pmt->StreamType(i));
+        hasVideo += pmt->IsVideo(i);
+        hasAudio += pmt->IsAudio(i);
     }
 
     if (hasVideo && hasAudio)
