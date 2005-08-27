@@ -114,7 +114,7 @@ class SignalMonitorValue
     {
         QString str = (QString::null == noSpaceName) ? "(null)" : noSpaceName;
         return QString("Name(%1) Val(%2) thr(%3%4) range(%5,%6) timeout(%7 ms) %8 set")
-            .arg(str).arg(value).arg( (high_threshold) ? "<=" : ">=" )
+            .arg(str).arg(value).arg( (high_threshold) ? ">=" : "<=" )
             .arg(threshold).arg(minval).arg(maxval)
             .arg(timeout).arg( (set) ? "is" : "is NOT" );
     }
