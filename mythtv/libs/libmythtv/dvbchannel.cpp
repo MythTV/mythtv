@@ -86,6 +86,11 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
 {
     dvbcam = new DVBCam(cardnum);
     bzero(&info, sizeof(info));
+
+    QString device_name("");
+    QString dummy("");
+    CardUtil::GetDVBType(aCardNum, device_name, dummy);
+    CHANNEL("Device Name: '"<<device_name<<"'");
 }
 
 DVBChannel::~DVBChannel()
