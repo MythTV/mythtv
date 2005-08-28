@@ -11,7 +11,7 @@ using namespace std;
 #include "programinfo.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
-#include "mpeg/iso639.h"
+#include "iso639.h"
 
 #ifdef USING_XVMC
 #include "videoout_xv.h"
