@@ -2,12 +2,15 @@
 
 #include <qmap.h>
 #include <qstring.h>
+#include <qstringlist.h>
 
 extern QMap<int, QString> iso639_key_to_english_name;
 extern QMap<int, int>     iso639_str2_to_str3;
 
 /// Converts a 2 or 3 character iso639 string to a language name in English.
 QString iso639_toName(const unsigned char *iso639);
+
+QStringList iso639_get_language_list(void);
 
 static inline QString iso639_key_to_str3(int code)
 {

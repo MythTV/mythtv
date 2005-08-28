@@ -1,6 +1,7 @@
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "util.h"
+#include "iso639.h"
 
 #include "siparser.h"
 #include <qdatetime.h>
@@ -65,13 +66,10 @@ SIParser::SIParser()
 
     // Get a list of wanted languages and set up their priorities
     // (Lowest number wins)
-    QStringList PreferredLanguages =
-        QStringList::split(",",
-                           gContext->GetSetting("PreferredLanguages", ""));
+    QStringList langPref = iso639_get_language_list();
     QStringList::Iterator plit;
     int prio = 1;
-    for (plit = PreferredLanguages.begin();
-         plit != PreferredLanguages.end(); ++plit)
+    for (plit = langPref.begin(); plit != langPref.end(); ++plit)
     {
         SIPARSER(QString("Added preferred language %1 with priority %2")
                  .arg(*plit).arg(prio));

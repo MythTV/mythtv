@@ -2262,6 +2262,10 @@ QFont MythContext::GetSmallFont(void)
                  QFont::Bold);
 }
 
+/** \fn MythContext::GetLanguage()
+ *  \brief Returns two character ISO-639 language descriptor for UI language.
+ *  \sa iso639_get_language_list()
+ */
 QString MythContext::GetLanguage(void)
 {
     if (d->language == QString::null || d->language == "")

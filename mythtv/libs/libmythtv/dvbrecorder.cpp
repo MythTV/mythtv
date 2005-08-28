@@ -52,6 +52,7 @@ using namespace std;
 #include "RingBuffer.h"
 #include "programinfo.h"
 #include "mpegtables.h"
+#include "iso639.h"
 
 // MythTV DVB includes
 #include "transform.h"
@@ -423,9 +424,7 @@ void DVBRecorder::AutoPID(void)
            .arg(((uint)_input_pmt.PCRPID),0,16));
 
     // Wanted languages:
-    QStringList Languages =
-        QStringList::split(",",
-                           gContext->GetSetting("PreferredLanguages", ""));
+    //QStringList Languages = iso639_get_language_list();
 
     // Wanted stream types:
     QValueList<ES_Type> StreamTypes;
@@ -507,9 +506,9 @@ void DVBRecorder::AutoPID(void)
             }
         }
 
-        if (Languages.isEmpty() // No specific language wanted
-            || (*es).Language.isEmpty() // Component has no language
-            || Languages.contains((*es).Language)) // This language is wanted!
+        //if (Languages.isEmpty() // No specific language wanted
+        //    || (*es).Language.isEmpty() // Component has no language
+        //    || Languages.contains((*es).Language)) // This language is wanted!
         {
             (*es).Record = true;
             flagged[(*es).Type] = true;

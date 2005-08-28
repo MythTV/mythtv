@@ -1,16 +1,43 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
-#include <qstring.h>
-#include <qmap.h>
+
 #include "iso639.h"
+#include "mythcontext.h"
 
 QMap<int, QString> iso639_key_to_english_name;
 QMap<int, int> iso639_str2_to_str3;
+static QStringList languages;
 
 /* Note: this file takes a long time to compile. **/
 
 static int createCodeToEnglishNamesMap(QMap<int, QString>& names);
 static int createCode2ToCode3Map(QMap<int, int>& codemap);
+
+/** \fn QStringList iso639_get_language_list()
+ *  \brief Returns list of three character ISO-639 language
+ *         descriptors, starting with the most preferred.
+ *  \sa MythContext::GetLanguage()
+ */
+QStringList iso639_get_language_list(void)
+{
+    if (languages.empty())
+    {
+        for (uint i = 0; true; i++)
+        {
+            QString q = QString("ISO639Language%1").arg(i);
+            QString lang = gContext->GetSetting(q, "").lower();
+            if (lang == "")
+                break;
+            languages << lang;
+        }
+        if (languages.empty())
+        {
+            int key = iso639_str2_to_key(gContext->GetLanguage());
+            languages << QString(iso639_key_to_str3(key));
+        }
+    }
+    return languages;
+}
 
 QString iso639_Alpha3_toName(const unsigned char *iso639_2)
 {
