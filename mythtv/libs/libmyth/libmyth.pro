@@ -21,7 +21,7 @@ HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
 HEADERS += dbsettings.h screensaver-null.h output.h visual.h
 HEADERS += langsettings.h audiooutputnull.h
 HEADERS += DisplayResScreen.h util-x11.h mythdeque.h qmdcodec.h
-HEADERS += exitcodes.h iso639.h
+HEADERS += exitcodes.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
@@ -32,7 +32,7 @@ SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
-SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp iso639.cpp
+SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp
 
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../..
