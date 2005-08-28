@@ -623,7 +623,10 @@ bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int)
                     break;
 #endif
             }
-            if (!chk || (old_params.frequency != tuning.params.frequency))
+            bool frequency_unchanged =
+                ((old_params.frequency + 500000) > tuning.params.frequency) &&
+                (old_params.frequency < (tuning.params.frequency + 500000));
+            if (!chk || !frequency_unchanged)
             {
                 CHANNEL("Waiting for event");
                 if (get_dvb_event(fd_frontend, event, DVB_GET_EVENT_TIMEOUT))
