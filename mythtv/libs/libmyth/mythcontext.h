@@ -161,7 +161,7 @@ class MythPrivRequest
     void *m_data;
 };
 
-#define MYTH_BINARY_VERSION "0.19.20050712-1"
+#define MYTH_BINARY_VERSION "0.19.20050828-1"
 #define MYTH_PROTO_VERSION "18"
 
 extern int print_verbose_messages;
@@ -278,6 +278,7 @@ class MythContext : public QObject
     QFont GetSmallFont();
 
     QString GetLanguage(void);
+    QStringList GetLanguageList(void);
 
     void ThemeWidget(QWidget *widget);
 

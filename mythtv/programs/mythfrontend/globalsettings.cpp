@@ -3,6 +3,7 @@
 #include "mythdbcon.h"
 #include "dbsettings.h"
 #include "langsettings.h"
+#include "iso639.h"
 #include "globalsettings.h"
 #include "recordingprofile.h"
 #include "scheduledrecording.h"
@@ -2019,6 +2020,36 @@ static HostComboBox *MythLanguage()
     return gc;
 }
 
+void ISO639_fill_selections(SelectSetting *widget)
+{
+    widget->clearSelections();
+
+    QMap<int,QString>::iterator it = iso639_key_to_english_name.begin();
+    QMap<int,QString>::iterator ite = iso639_key_to_english_name.end();
+    
+    for (; it != ite; ++it)
+    {
+        QString desc = (*it);
+        int idx = desc.find(";");
+        if (idx > 0)
+            desc = desc.left(idx);
+        widget->addSelection(desc, iso639_key_to_str3(it.key()));
+    }
+}
+
+static HostComboBox *ISO639PreferredLanguage(uint i)
+{
+    HostComboBox *gc = new HostComboBox(QString("ISO639Language%1").arg(i));
+    gc->setLabel(QObject::tr("Guide Language #%1").arg(i+1));
+    // We should try to get language from "MythLanguage"
+    // then use code 2 to code 3 map in iso639.h
+    ISO639_fill_selections(gc);
+    gc->setHelpText(
+        QObject::tr("Your #%1 preferred language for "
+                    "Program Guide Data and captions.").arg(i+1));
+    return gc;
+}
+
 static HostCheckBox *EnableXbox()
 {
     HostCheckBox *gc = new HostCheckBox("EnableXbox");
@@ -3124,6 +3155,8 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* dates = new VerticalConfigurationGroup(false);
     dates->setLabel(QObject::tr("Localization"));
     dates->addChild(MythLanguage());
+    dates->addChild(ISO639PreferredLanguage(0));
+    dates->addChild(ISO639PreferredLanguage(1));
     dates->addChild(MythDateFormat());
     dates->addChild(MythShortDateFormat());
     dates->addChild(MythTimeFormat());

@@ -423,9 +423,7 @@ void DVBRecorder::AutoPID(void)
            .arg(((uint)_input_pmt.PCRPID),0,16));
 
     // Wanted languages:
-    QStringList Languages =
-        QStringList::split(",",
-                           gContext->GetSetting("PreferredLanguages", ""));
+    QStringList Languages = gContext->GetLanguageList();
 
     // Wanted stream types:
     QValueList<ES_Type> StreamTypes;

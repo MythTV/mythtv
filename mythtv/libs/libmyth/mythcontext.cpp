@@ -31,6 +31,7 @@
 #include "dbsettings.h"
 #include "langsettings.h"
 #include "mythdbcon.h"
+#include "iso639.h"
 
 // These defines provide portability for different
 // plugin file names.
@@ -108,6 +109,7 @@ class MythContextPrivate
     QMap<QString, QImage> imageCache;
 
     QString language;
+    QStringList languages;
 
     MythMainWindow *mainWindow;
 
@@ -2262,12 +2264,39 @@ QFont MythContext::GetSmallFont(void)
                  QFont::Bold);
 }
 
+/** \fn MythContext::GetLanguage(void)
+ *  \brief Returns 2 character ISO-639 language descriptor for UI language.
+ */
 QString MythContext::GetLanguage(void)
 {
     if (d->language == QString::null || d->language == "")
         d->language = GetSetting("Language", "EN").lower();
 
     return d->language;
+}
+/** \fn QStringList MythContext::GetLanguageList(void)
+ *  \brief Returns list of 3 character ISO-639 language descriptors,
+ *         starting with the most preferred.
+ */
+QStringList MythContext::GetLanguageList(void)
+{
+    if (d->languages.empty())
+    {
+        for (uint i = 0; true; i++)
+        {
+            QString q = QString("ISO639Language%1").arg(i);
+            QString lang = GetSetting(q, "").lower();
+            if (lang == "")
+                break;
+            d->languages << lang;
+        }
+        if (d->languages.empty())
+        {
+            int key = iso639_str2_to_key(GetLanguage());
+            d->languages << QString(iso639_key_to_str3(key));
+        }
+    }
+    return d->languages;
 }
 
 void MythContext::SetMainWindow(MythMainWindow *mainwin)
