@@ -56,12 +56,12 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     channel_dev = channel->GetDevice();
     // These two values should probably come from the database...
     int wait = 3000; // timeout when waiting on signal
-    int threshold = 0; // signal strength threshold in %
+    int threshold = -32768; // signal strength threshold in %
 
     signalLock.SetTimeout(wait);
     signalStrength.SetTimeout(wait);
     signalStrength.SetThreshold(threshold);
-    signalStrength.SetMax(65535);
+    signalStrength.SetRange(-32768, 32767);
 
     table_monitor_thread = PTHREAD_CREATE_JOINABLE;
 
@@ -328,6 +328,7 @@ void DVBSignalMonitor::UpdateValues(void)
         signalLock.SetValue(locked);
         signalStrength.SetValue((int) stats.ss);
         signalToNoise.SetValue((int) stats.snr);
+        // BER and UB are actually uint32 values, but we clamp them at 64K.
         bitErrorRate.SetValue(stats.ber);
         uncorrectedBlocks.SetValue(stats.ub);
         statusLock.unlock();

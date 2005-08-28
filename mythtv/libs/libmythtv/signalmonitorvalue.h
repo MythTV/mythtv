@@ -67,7 +67,7 @@ class SignalMonitorValue
     void SetValue(int _value)
     {
         set = true;
-        value = _value;
+        value = min(max(_value,minval),maxval);
     }
 
     void SetMin(int _min) { minval = _min; }
@@ -113,10 +113,12 @@ class SignalMonitorValue
     QString toString() const
     {
         QString str = (QString::null == noSpaceName) ? "(null)" : noSpaceName;
-        return QString("Name(%1) Val(%2) thr(%3%4) range(%5,%6) timeout(%7 ms) %8 set")
+        return QString("Name(%1) Val(%2) thr(%3%4) range(%5,%6) "
+                       "timeout(%7 ms) %8 set. %9 good.")
             .arg(str).arg(value).arg( (high_threshold) ? ">=" : "<=" )
             .arg(threshold).arg(minval).arg(maxval)
-            .arg(timeout).arg( (set) ? "is" : "is NOT" );
+            .arg(timeout).arg( (set) ? "is" : "is NOT" )
+            .arg( (IsGood()) ? "Is" : "Is NOT" );
     }
   private:
     SignalMonitorValue() {}

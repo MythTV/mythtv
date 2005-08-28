@@ -93,8 +93,8 @@ bool SignalMonitorValue::Set(const QString& _name, const QString& _longString)
         return false;
 
     noSpaceName = vals[0];
-    SetValue(vals[1].toInt());
     SetRange(vals[3].toInt(), vals[4].toInt());
+    SetValue(vals[1].toInt());
     SetThreshold(vals[2].toInt(), (bool) vals[6].toInt());
     SetTimeout(vals[5].toInt());
 
