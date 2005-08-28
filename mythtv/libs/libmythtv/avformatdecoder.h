@@ -174,6 +174,8 @@ class AvFormatDecoder : public DecoderBase
 
     int maxkeyframedist;
 
+    QStringList subtitleLanguagePreferences;
+
     // Audio
     short int        *audioSamples;
     int               audio_sample_size;

@@ -1,5 +1,7 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2003-2004, Daniel Thor Kristjansson
+#include <qstring.h>
+#include <qmap.h>
 #include "iso639.h"
 
 QMap<int, QString> iso639_key_to_english_name;

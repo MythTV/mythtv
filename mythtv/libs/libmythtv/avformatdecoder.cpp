@@ -160,6 +160,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
     bzero(prvpkt, 3 * sizeof(char));
     bzero(audioSamples, AVCODEC_MAX_AUDIO_FRAME_SIZE * sizeof(short int));
 
+    subtitleLanguagePreferences = QStringList::split(
+        ",", gContext->GetSetting("PreferredLanguages", ""));
+    
     bool debug = (bool)(print_verbose_messages & VB_LIBAV);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
 }
@@ -1700,9 +1703,9 @@ QStringList AvFormatDecoder::listSubtitleTracks() const
 // in case there's only one subtitle language available, always choose it
 //
 // if more than one subtitle languages are found, the best one is
-// picked according to the ISO639Language[0..] settings
+// picked according to the PreferredLanguages setting
 //
-// in case there are no ISOLanguage[0..] settings, or no preferred language
+// in case there's no PreferredLanguages setting, or no preferred language
 // is found, the first found subtitle stream is chosen
 bool AvFormatDecoder::autoSelectSubtitleTrack()
 {
@@ -1718,9 +1721,8 @@ bool AvFormatDecoder::autoSelectSubtitleTrack()
     int selectedTrack = -1;
     
     // go through all preferred languages and pick the best found
-    QStringList langPref = gContext->GetLanguageList();
-    QStringList::iterator l = langPref.begin();
-    for (; l != langPref.end() && selectedTrack == -1; ++l)
+    for (QStringList::iterator l = subtitleLanguagePreferences.begin();
+         l != subtitleLanguagePreferences.end() && selectedTrack == -1; ++l) 
     {
         for (int track = 0; track < maxTracks; track++)
         {

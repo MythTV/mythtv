@@ -65,10 +65,13 @@ SIParser::SIParser()
 
     // Get a list of wanted languages and set up their priorities
     // (Lowest number wins)
-    QStringList prefLang = gContext->GetLanguageList();
+    QStringList PreferredLanguages =
+        QStringList::split(",",
+                           gContext->GetSetting("PreferredLanguages", ""));
     QStringList::Iterator plit;
     int prio = 1;
-    for (plit = prefLang.begin(); plit != prefLang.end(); ++plit)
+    for (plit = PreferredLanguages.begin();
+         plit != PreferredLanguages.end(); ++plit)
     {
         SIPARSER(QString("Added preferred language %1 with priority %2")
                  .arg(*plit).arg(prio));
