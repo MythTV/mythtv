@@ -247,9 +247,11 @@ void DTVRecorder::HandleKeyframe(void)
 
     if (!_position_map.contains(frameNum))
     {
+#if 0
         VERBOSE(VB_RECORD, "DTV: pm#"
                 <<_position_map.size()<<"["<<frameNum<<"]: "
                 <<startpos<<" cr("<<curRecording<<")");
+#endif
         _position_map_delta[frameNum] = startpos;
         _position_map[frameNum] = startpos;
 

@@ -1,12 +1,8 @@
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
 #include <unistd.h>
 #include <pthread.h>
-
-#include <iostream>
-using namespace std;
 
 #include <qapplication.h>
 #include <qregexp.h>
@@ -503,11 +499,9 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
         .replace("<sign>", chansign)
         .replace("<name>", channame);
     
-    QString message = QObject::tr("MythTV wants to record \"%1\" on %2"
-                                  " in %3 seconds. Do you want to:")
-                                 .arg(title)
-                                 .arg(channel)
-                                 .arg(" %d ");
+    QString message = QObject::tr(
+        "MythTV wants to record \"%1\" on %2 in %3 seconds. Do you want to:")
+        .arg(title).arg(channel).arg(" %d ");
     
     while (!GetOSD())
     {
@@ -524,7 +518,6 @@ void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
 
     dialogname = "allowrecordingbox";
     GetOSD()->NewDialogBox(dialogname, message, options, timeuntil); 
-
 }
 
 void TV::setLastProgram(ProgramInfo *rcinfo)
@@ -567,7 +560,9 @@ int TV::PlayFromRecorder(int recordernum)
 
     if (recorder)
     {
-        cerr << "PlayFromRecorder (" << recordernum << ") : recorder already exists!";
+        VERBOSE(VB_IMPORTANT,
+                QString("TV::PlayFromRecorder(%1): Recorder already exists!")
+                .arg(recordernum));
         return -1;
     }
 
@@ -790,8 +785,8 @@ void TV::HandleStateChange(void)
                 recorder = RemoteGetExistingRecorder(playbackinfo);
                 if (!recorder || !recorder->IsValidRecorder())
                 {
-                    cerr << "ERROR: couldn't find recorder for in-progress "
-                         << "recording\n";
+                    VERBOSE(VB_IMPORTANT, "ERROR: couldn't find "
+                            "recorder for in-progress recording");
                     desiredNextState = kState_WatchingPreRecorded;
                     DeleteRecorder();
                 }
@@ -3157,7 +3152,9 @@ void TV::UpdateOSDInput(void)
  */
 void TV::UpdateOSDSignal(const QStringList& strlist)
 {
-    if (&lastSignalMsg != &strlist)
+    QMutexLocker locker(&osdlock);
+
+    if (!GetOSD() && (&lastSignalMsg != &strlist))
         lastSignalMsg = strlist;
     if (!GetOSD())
         return;
@@ -3931,8 +3928,7 @@ void TV::customEvent(QCustomEvent *e)
             VERBOSE(VB_IMPORTANT, "Got SKIP_TO message. Keyframe: "
                     <<stringToLongLong(keyframe[0]));
             bool tc = recorder && (recorder->GetRecorderNumber() == cardnum);
-            if (tc)
-                cerr<<endl;
+            (void)tc;
         }
         else if (playbackinfo && message.left(14) == "COMMFLAG_START")
         {
