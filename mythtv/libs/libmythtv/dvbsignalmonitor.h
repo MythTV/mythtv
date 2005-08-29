@@ -40,7 +40,6 @@ private:
     bool AddPIDFilter(uint pid);
     bool RemovePIDFilter(uint pid);
 
-    int                cardnum;
     SignalMonitorValue signalToNoise;
     SignalMonitorValue bitErrorRate;
     SignalMonitorValue uncorrectedBlocks;

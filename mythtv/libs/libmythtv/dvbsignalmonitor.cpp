@@ -34,17 +34,17 @@ static bool fill_frontend_stats(int fd_frontend, dvb_stats_t &stats);
  *   signal monitoring. The timeout is set to 3 seconds,
  *   and the signal threshold is initialized to 0%.
  *
- *  \param capturecardnum Recorder number to monitor,
- *                        if this is less than 0, SIGNAL events will not be
- *                        sent to the frontend even if SetNotifyFrontend(true)
- *                        is called.
- *  \param cardnum DVB card number.
- *  \param channel DVBChannel for card.
+ *  \param db_cardnum Recorder number to monitor,
+ *                    if this is less than 0, SIGNAL events will not be
+ *                    sent to the frontend even if SetNotifyFrontend(true)
+ *                    is called.
+ *  \param _channel DVBChannel for card
+ *  \param _flags   Flags to start with
+ *  \param _name    Name for Qt signal debugging
  */
 DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
                                    uint _flags, const char *_name)
     : DTVSignalMonitor(db_cardnum, _flags, _name),
-      cardnum(_channel->GetCardNum()),
       signalToNoise(
           QObject::tr("Signal To Noise"), "snr", -32768,  true, -32768, 32767, 0),
       bitErrorRate(
@@ -68,8 +68,8 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     dvb_stats_t stats;
     bzero(&stats, sizeof(stats));
     uint newflags = 0;
-    QString msg = QString("DVBSignalMonitor(%1)::constructor(%2,%3): %4 (%5)")
-        .arg(channel->GetDevice()).arg(capturecardnum).arg(cardnum);
+    QString msg = QString("DVBSignalMonitor(%1)::constructor(%2,%3): %4")
+        .arg(channel->GetDevice()).arg(capturecardnum);
 
 #define DVB_IO(WHAT,WHERE,ERRMSG,FLAG) \
     if (ioctl(_channel->GetFd(), WHAT, WHERE)) \
@@ -139,12 +139,14 @@ const int buffer_size = TSPacket::SIZE * 1500;
 bool DVBSignalMonitor::AddPIDFilter(uint pid)
 { 
     DBG_SM(QString("AddPIDFilter(0x%1)").arg(pid, 0, 16), "");
-    int mux_fd = open(dvbdevice(DVB_DEV_DEMUX, cardnum), O_RDWR | O_NONBLOCK);
+
+    QString demux_fname = dvbdevice(DVB_DEV_DEMUX, channel->GetCardNum());
+    int mux_fd = open(demux_fname.ascii(), O_RDWR | O_NONBLOCK);
     if (mux_fd == -1)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Failed to open demux device %1 for filter on pid %2")
-                .arg(dvbdevice(DVB_DEV_DEMUX, cardnum)).arg(pid));
+                .arg(demux_fname).arg(pid));
         return false;
     }
 
@@ -255,13 +257,13 @@ void DVBSignalMonitor::RunTableMonitor(void)
         return;
     bzero(buffer, buffer_size);
 
-    int dvr_fd = open(dvbdevice(DVB_DEV_DVR, cardnum), O_RDONLY | O_NONBLOCK);
+    QString dvr_fname = dvbdevice(DVB_DEV_DVR, channel->GetCardNum());
+    int dvr_fd = open(dvr_fname.ascii(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("Failed to open DVR device %1 : %2")
-                .arg(dvbdevice(DVB_DEV_DVR, cardnum))
-                .arg(strerror(errno)));
+                .arg(dvr_fname).arg(strerror(errno)));
         return;
     }
 
