@@ -216,13 +216,13 @@ EOF
         my $name = $format;
         $name =~ s/(?<!%)(?:%([$keys]))/$fields{$1}/g;
         $name =~ s/%%/%/g;
-    # Some basic cleanup for illegal characters, etc.
-        $name =~ s/(?:[\/\\\:\*\?\<\>\|\-]+\s*)+(?=[^\d\s\/\\\:\*\?\<\>\|\-])/- /sg;
-        $name =~ tr/\/\\:*?<>|/-/;
+    # Some basic cleanup for illegal (windows) filename characters, etc.
+        $name =~ tr/\ \t\r\n/ /s;
         $name =~ tr/"/'/s;
-        $name =~ tr/\s/ /s;
-        $name =~ s/^[\-\s]+//s;
-        $name =~ s/[\-\s]+$//s;
+        $name =~ s/(?:[\-\/\\:*?<>|]+\s*)+(?=[^\d\s])/- /sg;
+        $name =~ tr/\/\\:*?<>|/-/;
+        $name =~ s/^[\-\ ]+//s;
+        $name =~ s/[\-\ ]+$//s;
     # Get a shell-safe version of the filename (yes, I know it's not needed in this case, but I'm anal about such things)
         my $safe_file = $file;
         $safe_file =~ s/'/'\\''/sg;
