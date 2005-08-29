@@ -2700,8 +2700,10 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                              int cardid, QString channelorder,
                              int channeldirection, QString &chanid)
 {
+    bool isNum = true;
+    channum.toULong(&isNum);
 
-    if (channum[0].isLetter() && channelorder == "channum + 0")
+    if (!isNum && channelorder == "channum + 0")
     {
         VERBOSE(VB_IMPORTANT, QString(
                 "Your channel ordering method \"channel number (numeric)\"\n"
@@ -2709,7 +2711,7 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
                 "\t\t\tConsider switching to order by \"database order\" or \n"
                 "\t\t\t\"channel number (alpha)\" in the general settings section\n"
                 "\t\t\tof the frontend setup\n").arg(channum));
-        channelorder = "channum";
+        channel->SetChannelOrdering(channelorder = "channum");
     }
 
     MSqlQuery query(MSqlQuery::InitCon());
