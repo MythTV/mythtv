@@ -1969,15 +1969,8 @@ bool setup_mpeg_table_monitoring(ChannelBase* channel,
                                  TVRec *tv_rec,
                                  RecorderBase* recorder)
 {
+    ATSCStreamData *sd = NULL;
     int progNum = channel->GetProgramNumber();
-#ifdef USING_DVB
-    if (progNum < 0)
-    {
-        DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-        progNum = dvbc->GetServiceID();
-        VERBOSE(VB_RECORD, "using service id as program number");
-    }
-#endif //USING_DVB
     VERBOSE(VB_RECORD, "mpeg program number: "<<progNum);
 
     if (progNum < 0)
@@ -1986,7 +1979,6 @@ bool setup_mpeg_table_monitoring(ChannelBase* channel,
         return false;
     }
 
-    ATSCStreamData *sd = NULL;
 #ifdef USING_V4L
     HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
     if (rec)
@@ -1994,10 +1986,21 @@ bool setup_mpeg_table_monitoring(ChannelBase* channel,
         sd = rec->StreamData();
         sd->SetCaching(true);
     }
-#endif //USING_V4L
+#endif // USING_V4L
+
     if (!sd)
         sd = new ATSCStreamData(-1, -1, true);
-        
+
+#ifdef USING_DVB
+    // Some DVB devices munge the PMT so the CRC check fails  we need to
+    // tell the stream data class to not check the CRC on these devices.
+    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+    if (dvbc)
+    {
+        sd->SetIgnoreCRCforPMT(dvbc->HasCRCBug());
+    }
+#endif // USING_DVB
+
     dtvSignalMonitor->SetStreamData(sd);
     sd->Reset(progNum);
 

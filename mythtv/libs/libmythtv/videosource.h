@@ -68,6 +68,7 @@ class CardUtil
     static DISEQC_TYPES GetDISEqCType(uint cardid);
 
     static CARD_TYPES   GetDVBType(uint device, QString &name, QString &card_type);
+    static bool         HasDVBCRCBug(uint device);
     static QString      GetDefaultInput(uint cardid);
 
     static bool         IgnoreEncrypted(uint cardid, const QString &inputname);

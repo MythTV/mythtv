@@ -55,6 +55,8 @@ class DVBChannel : public QObject, public ChannelBase
     /// Returns true iff PMT has video and audio
     bool HasTelevisionService(void) const
         { return chan_opts.pmt.HasTelevisionService(); }
+    /// Returns true iff we have a faulty DVB driver that munges PMT
+    bool HasCRCBug(void)                const { return has_crc_bug; }
 
     // Commands
     bool SwitchToInput(const QString &inputname, const QString &chan);
@@ -101,12 +103,13 @@ class DVBChannel : public QObject, public ChannelBase
     DVBDiSEqC*        diseqc; ///< Used to send commands to external devices
     DVBCam*           dvbcam; ///< Used to decrypt encrypted streams
 
-    dvb_frontend_info info;   ///< Contains info on tuning hardware
+    dvb_frontend_info info;        ///< Contains info on tuning hardware
     dvb_channel_t     chan_opts;   ///< Tuning options sent to tuning hardware
     DVBTuning         prev_tuning; ///< Last tuning options sent to hardware
 
     volatile int      fd_frontend; ///< File descriptor for tuning hardware
     int               cardnum;     ///< DVB Card number
+    bool              has_crc_bug; ///< true iff our driver munges PMT
     int               currentTID;  ///< Stores mplexid from database
 
     bool              first_tune;  ///< Used to force hardware reset

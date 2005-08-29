@@ -80,13 +80,15 @@ QString dvb_event_to_string(const struct dvb_frontend_event &event);
  */
 DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     : QObject(NULL, "DVBChannel"), ChannelBase(parent),
-      diseqc(NULL), dvbcam(NULL),
-      fd_frontend(-1), cardnum(aCardNum), currentTID(-1),
-      first_tune(true)
+      diseqc(NULL),    dvbcam(NULL),
+      fd_frontend(-1), cardnum(aCardNum), has_crc_bug(false),
+      currentTID(-1),  first_tune(true)
 {
     dvbcam = new DVBCam(cardnum);
     bzero(&info, sizeof(info));
+    has_crc_bug = CardUtil::HasDVBCRCBug(aCardNum);
 
+    // print device name so that we can detect driver specific bugs...
     QString device_name("");
     QString dummy("");
     CardUtil::GetDVBType(aCardNum, device_name, dummy);

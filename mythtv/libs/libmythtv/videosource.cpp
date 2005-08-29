@@ -110,6 +110,18 @@ enum CardUtil::CARD_TYPES CardUtil::GetDVBType(
     return nRet;
 }
 
+/** \fn CardUtil::HasDVBCRCBug(uint)
+ *  \brief Returns true iff the device munges PMT tables, so that they fail a CRC check.
+ *  \param [in]device video dev to be checked
+ *  \return true iff the device munges PMT tables, so that they fail a CRC check.
+ */
+bool CardUtil::HasDVBCRCBug(uint device)
+{
+    QString name(""), type("");
+    GetDVBType(device, name, type);
+    return (name == "VLSI VES1x93 DVB-S") || (name == "Philips TDA10046H DVB-T");
+}
+
 /** \fn CardUtil::GetCardType(uint, QString&, QString&)
  *  \brief Returns the card type from the video device
  *  \param [in]nVideoDev video dev to be checked
