@@ -218,11 +218,11 @@ EOF
         $name =~ s/%%/%/g;
     # Some basic cleanup for illegal characters, etc.
         $name =~ s/(?:[\/\\\:\*\?\<\>\|\-]+\s*)+(?=[^\d\s\/\\\:\*\?\<\>\|\-])/- /sg;
-        $name =~ tr/\/\\:*?<>|//;
+        $name =~ tr/\/\\:*?<>|/-/;
         $name =~ tr/"/'/s;
-        $name =~ s/\s+/ /s;
-        $name =~ s/^\s+//s;
-        $name =~ s/\s+$//s;
+        $name =~ tr/\s/ /s;
+        $name =~ s/^[\-\s]+//s;
+        $name =~ s/[\-\s]+$//s;
     # Get a shell-safe version of the filename (yes, I know it's not needed in this case, but I'm anal about such things)
         my $safe_file = $file;
         $safe_file =~ s/'/'\\''/sg;
