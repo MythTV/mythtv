@@ -218,6 +218,7 @@ EOF
         $name =~ s/%%/%/g;
     # Some basic cleanup for illegal characters, etc.
         $name =~ s/(?:[\/\\\:\*\?\<\>\|\-]+\s*)+(?=[^\d\s\/\\\:\*\?\<\>\|\-])/- /sg;
+        $name =~ tr/[\/\\\:\*\?\<\>\|]+//;
         $name =~ tr/"/'/s;
         $name =~ s/\s+/ /s;
         $name =~ s/^\s+//s;
