@@ -23,14 +23,15 @@ class ChannelBase;
 class DVBChannel;
 class DummyDTVRecorder;
 
+/// Used to request ProgramInfo for channel browsing.
 typedef enum
 {
-    BROWSE_SAME,
-    BROWSE_UP,
-    BROWSE_DOWN,
-    BROWSE_LEFT,
-    BROWSE_RIGHT,
-    BROWSE_FAVORITE
+    BROWSE_SAME,    ///< Fetch browse information on current channel and time
+    BROWSE_UP,      ///< Fetch information on previous channel
+    BROWSE_DOWN,    ///< Fetch information on next channel
+    BROWSE_LEFT,    ///< Fetch information on current channel in the past
+    BROWSE_RIGHT,   ///< Fetch information on current channel in the future
+    BROWSE_FAVORITE ///< Fetch information on the next favorite channel
 } BrowseDirections;
 
 typedef struct _dvb_options_t

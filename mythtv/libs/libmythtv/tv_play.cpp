@@ -38,6 +38,7 @@
 const int TV::kInitFFRWSpeed  = 0;
 const int TV::kMuteTimeout    = 800;   
 const int TV::kLCDTimeout     = 30000;
+const int TV::kBrowseTimeout  = 30000;
 const int TV::kChannelKeysMax = 6;
 
 void TV::InitKeys(void)
@@ -3262,75 +3263,84 @@ void TV::ShowLCDChannelInfo(void)
     }
 }
 
+static void format_time(int seconds, QString &tMin, QString &tHrsMin)
+{
+    int minutes     = seconds / 60;
+    int hours       = minutes / 60;
+    int min         = minutes % 60;
+
+    tMin = QString("%1 %2").arg(minutes).arg(TV::tr("minutes"));
+    tHrsMin.sprintf("%d:%02d", hours, min);
+}
+
+/** \fn TV::GetNextProgram(RemoteEncoder*,int,QMap<QString, QString>&)
+ *  \brief Fetches information on the desired program from the backend.
+ *  \param enc RemoteEncoder to query, if null query the activerecorder.
+ *  \param direction BrowseDirection to get information on.
+ */
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
                         QMap<QString, QString> &infoMap)
 {
-    if (!enc)
-        enc = activerecorder;
+    QString title, subtitle, desc, category, endtime, callsign, iconpath;
+    QString lenM, lenHM;
 
-    QString title, subtitle, description, category, starttime, endtime;
-    QString callsign, iconpath, channum, chanid, seriesid, programid;
+    QString starttime = infoMap["dbstarttime"];
+    QString chanid    = infoMap["chanid"];
+    QString channum   = infoMap["channum"];
+    QString seriesid  = infoMap["seriesid"];
+    QString programid = infoMap["programid"];
 
-    starttime = infoMap["dbstarttime"];
-    chanid = infoMap["chanid"];
-    channum = infoMap["channum"];
-    seriesid = infoMap["seriesid"];
-    programid = infoMap["programid"];
+    GetNextProgram(enc, direction,
+                   title,     subtitle, desc,      category,
+                   starttime, endtime,  callsign,  iconpath,
+                   channum,   chanid,   seriesid,  programid);
 
-    enc->GetNextProgram(direction,
-                        title, subtitle, description, category, starttime,
-                        endtime, callsign, iconpath, channum, chanid,
-                        seriesid, programid);
-    
-          
-    QString tmFmt = gContext->GetSetting("TimeFormat");
-    QString dtFmt = gContext->GetSetting("ShortDateFormat");
-    QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
-    QDateTime endts = QDateTime::fromString(endtime, Qt::ISODate);
-    QString length;
-    int hours, minutes, seconds;
+    QString timeFmt = gContext->GetSetting("TimeFormat");
+    QString dateFmt = gContext->GetSetting("ShortDateFormat");
+    QDateTime begts = QDateTime::fromString(starttime, Qt::ISODate);
+    QDateTime endts = QDateTime::fromString(endtime,   Qt::ISODate);
+    format_time(begts.secsTo(endts), lenM, lenHM);
 
     infoMap["dbstarttime"] = starttime;
-    infoMap["dbendtime"] = endtime;
-    infoMap["title"] = title;
-    infoMap["subtitle"] = subtitle;
-    infoMap["description"] = description;
-    infoMap["category"] = category;
-    infoMap["callsign"] = callsign;
-    infoMap["starttime"] = startts.toString(tmFmt);
-    infoMap["startdate"] = startts.toString(dtFmt);
-    infoMap["endtime"] = endts.toString(tmFmt);
-    infoMap["enddate"] = endts.toString(dtFmt);
-    infoMap["channum"] = channum;
-    infoMap["chanid"] = chanid;
-    infoMap["iconpath"] = iconpath;
-    infoMap["seriesid"] = seriesid;
-    infoMap["programid"] = programid;
-
-    seconds = startts.secsTo(endts);
-    minutes = seconds / 60;
-    infoMap["lenmins"] = QString("%1 %2").arg(minutes).arg(tr("minutes"));
-    hours   = minutes / 60;
-    minutes = minutes % 60;
-    length.sprintf("%d:%02d", hours, minutes);
-    infoMap["lentime"] = length;
-    
+    infoMap["dbendtime"]   = endtime;
+    infoMap["title"]       = title;
+    infoMap["subtitle"]    = subtitle;
+    infoMap["description"] = desc;
+    infoMap["category"]    = category;
+    infoMap["callsign"]    = callsign;
+    infoMap["starttime"]   = begts.toString(timeFmt);
+    infoMap["startdate"]   = begts.toString(dateFmt);
+    infoMap["endtime"]     = endts.toString(timeFmt);
+    infoMap["enddate"]     = endts.toString(dateFmt);
+    infoMap["channum"]     = channum;
+    infoMap["chanid"]      = chanid;
+    infoMap["iconpath"]    = iconpath;
+    infoMap["seriesid"]    = seriesid;
+    infoMap["programid"]   = programid;
+    infoMap["lenmins"]     = lenM;
+    infoMap["lentime"]     = lenHM;
 }
 
+/** \fn TV::GetNextProgram(RemoteEncoder*,int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
+ *  \brief Fetches information on the desired program from the backend.
+ *  \param enc RemoteEncoder to query, if null query the activerecorder.
+ *  \param direction BrowseDirection to get information on.
+ */
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
-                        QString &title, QString &subtitle, 
-                        QString &desc, QString &category, QString &starttime, 
-                        QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid)
+                        QString &title,     QString &subtitle,
+                        QString &desc,      QString &category,
+                        QString &starttime, QString &endtime,
+                        QString &callsign,  QString &iconpath,
+                        QString &channame,  QString &chanid,
+                        QString &seriesid,  QString &programid)
 {
     if (!enc)
         enc = activerecorder;
 
     enc->GetNextProgram(direction,
-                        title, subtitle, desc, category, starttime, endtime, 
-                        callsign, iconpath, channelname, chanid,
-                        seriesid, programid);
+                        title,     subtitle,  desc,      category,
+                        starttime, endtime,   callsign,  iconpath,
+                        channame,  chanid,    seriesid,  programid);
 }
 
 void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
@@ -3380,27 +3390,17 @@ void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
         infoMap["endtime"] = endts.toString(tmFmt);
         infoMap["enddate"] = endts.toString(dtFmt);
     }
+    QString lenM(""), lenHM("");
+    if ((starttime != "") && (endtime != ""))
+        format_time(startts.secsTo(endts), lenM, lenHM);
 
     infoMap["channum"]   = channum;
     infoMap["chanid"]    = chanid;
     infoMap["iconpath"]  = iconpath;
     infoMap["seriesid"]  = seriesid;
     infoMap["programid"] = programid;
-    
-    if ("" == starttime || "" == endtime)
-        infoMap["lenmins"] = infoMap["lentime"] = "";
-    else
-    {
-        QString length;
-        int hours, minutes, seconds;
-        seconds = startts.secsTo(endts);
-        minutes = seconds / 60;
-        infoMap["lenmins"] = QString("%1 %2").arg(minutes).arg(tr("minutes"));
-        hours   = minutes / 60;
-        minutes = minutes % 60;
-        length.sprintf("%d:%02d", hours, minutes);
-        infoMap["lentime"] = length;
-    }
+    infoMap["lenmins"]   = lenM;
+    infoMap["lentime"]   = lenHM;
 
     bool ok;
     double fstars = stars.toFloat(&ok);
@@ -3970,6 +3970,9 @@ void TV::customEvent(QCustomEvent *e)
     }
 }
 
+/** \fn TV::BrowseStart()
+ *  \brief Begins channel browsing.
+ */
 void TV::BrowseStart(void)
 {
     if (activenvp != nvp)
@@ -4001,9 +4004,13 @@ void TV::BrowseStart(void)
     
     BrowseDispInfo(BROWSE_SAME);
 
-    browseTimer->start(30000, true);
+    browseTimer->start(kBrowseTimeout, true);
 }
 
+/** \fn TV::BrowseEnd(bool)
+ *  \brief Ends channel browsing. Changing the channel if change is true.
+ *  \param change, iff true we call ChangeChannelByString(const QString&)
+ */
 void TV::BrowseEnd(bool change)
 {
     if (!browsemode || !GetOSD())
@@ -4021,47 +4028,46 @@ void TV::BrowseEnd(bool change)
     browsemode = false;
 }
 
+/** \fn TV::BrowseDispInfo(int)
+ *  \brief Fetches browse info from backend and sends it to the OSD.
+ *  \param direction BrowseDirection to get information on.
+ */
 void TV::BrowseDispInfo(int direction)
 {
     if (!browsemode)
         BrowseStart();
-    QDateTime curtime = QDateTime::currentDateTime();
-    QDateTime maxtime = curtime.addSecs(60 * 60 * 4);
-    QDateTime lastprogtime =
-                  QDateTime::fromString(browsestarttime, Qt::ISODate);
+
     QMap<QString, QString> infoMap;
+    QDateTime curtime  = QDateTime::currentDateTime();
+    QDateTime maxtime  = curtime.addSecs(60 * 60 * 4);
+    QDateTime lasttime = QDateTime::fromString(browsestarttime, Qt::ISODate);
 
     if (paused || !GetOSD())
         return;
 
-    browseTimer->changeInterval(30000);
-    
-    
-    if (lastprogtime < curtime)
+    browseTimer->changeInterval(kBrowseTimeout);
+
+    if (lasttime < curtime)
         browsestarttime = curtime.toString(Qt::ISODate);
-        //browsestarttime = curtime.toString("yyyyMMddhhmm") + "00";
-    
-    
-    if ((lastprogtime > maxtime) &&
-        (direction == BROWSE_RIGHT))
+
+    if ((lasttime > maxtime) && (direction == BROWSE_RIGHT))
         return;
 
-    infoMap["channum"] = browsechannum;
     infoMap["dbstarttime"] = browsestarttime;
-    infoMap["chanid"] = browsechanid;
+    infoMap["channum"]     = browsechannum;
+    infoMap["chanid"]      = browsechanid;
     
     GetNextProgram(activerecorder, direction, infoMap);
     
     browsechannum = infoMap["channum"];
-    browsechanid = infoMap["chanid"];
+    browsechanid  = infoMap["chanid"];
 
-    if ((direction == BROWSE_LEFT) ||
-        (direction == BROWSE_RIGHT))
+    if ((direction == BROWSE_LEFT) || (direction == BROWSE_RIGHT))
         browsestarttime = infoMap["dbstarttime"];
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
-    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(browsechanid,
-                                                                  startts);
+    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
+        browsechanid, startts);
     
     if (program_info)
         program_info->ToMap(infoMap);

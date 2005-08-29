@@ -411,6 +411,7 @@ class TV : public QObject
     static const int kInitFFRWSpeed; ///< 1x, default to normal speed
     static const int kMuteTimeout;   ///< Channel changing mute timeout in msec
     static const int kLCDTimeout;    ///< Timeout for updating LCD info in msec
+    static const int kBrowseTimeout; ///< Timeout for browse mode exit in msec
     static const int kChannelKeysMax;///< When to start discarding early keys
 };
 
