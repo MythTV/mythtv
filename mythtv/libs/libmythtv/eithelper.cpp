@@ -220,29 +220,36 @@ static bool has_program(MSqlQuery &query, int chanid, const Event &event)
 
 static bool insert_program(MSqlQuery &query, int chanid, const Event &event)
 {
-    query.prepare("REPLACE INTO program (chanid, starttime, "
-                  "endtime, title, description, subtitle, "
-                  "category, stereo, closecaptioned, hdtv, "
-                  "airdate, originalairdate) "
-                  "VALUES (:CHANID, :STARTTIME, "
-                  ":ENDTIME, :TITLE, :DESCRIPTION, :SUBTITLE, "
-                  ":CATEGORY, :STEREO, :CLOSECAPTIONED, :HDTV, "
-                  ":AIRDATE, :ORIGINALAIRDATE);");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", event.StartTime.
-                    toString(QString("yyyy-MM-dd hh:mm:00")));
-    query.bindValue(":ENDTIME", event.EndTime.
-                    toString(QString("yyyy-MM-dd hh:mm:00")));
-    query.bindValue(":TITLE", event.Event_Name.utf8());
+    query.prepare("REPLACE INTO program ("
+                  "  chanid,         starttime,  endtime,    title, "
+                  "  description,    subtitle,   category,   stereo, "
+                  "  closecaptioned, hdtv,       airdate,    originalairdate, "
+                  "  partnumber,     parttotal,  category_type) "
+                  "VALUES ("
+                  "  :CHANID,        :STARTTIME, :ENDTIME,   :TITLE, "
+                  "  :DESCRIPTION,   :SUBTITLE,  :CATEGORY,  :STEREO, "
+                  "  :CC,            :HDTV,      :AIRDATE,   :ORIGAIRDATE, "
+                  "  :PARTNUMBER,    :PARTTOTAL, :CATTYPE)");
+
+    QString begTime = event.StartTime.toString(QString("yyyy-MM-dd hh:mm:00"));
+    QString endTime = event.EndTime.toString(  QString("yyyy-MM-dd hh:mm:00"));
+    QString airDate = event.OriginalAirDate.toString(QString("yyyy-MM-dd"));
+
+    query.bindValue(":CHANID",      chanid);
+    query.bindValue(":STARTTIME",   begTime);
+    query.bindValue(":ENDTIME",     endTime);
+    query.bindValue(":TITLE",       event.Event_Name.utf8());
     query.bindValue(":DESCRIPTION", event.Description.utf8());
-    query.bindValue(":SUBTITLE", event.Event_Subtitle.utf8());
-    query.bindValue(":CATEGORY", event.ContentDescription.utf8());
-    query.bindValue(":STEREO", event.Stereo);
-    query.bindValue(":CLOSECAPTIONED", event.SubTitled);
-    query.bindValue(":HDTV", event.HDTV);
-    query.bindValue(":AIRDATE", event.Year);
-    query.bindValue(":ORIGINALAIRDATE", event.OriginalAirDate.
-                    toString(QString("yyyy-MM-dd")));
+    query.bindValue(":SUBTITLE",    event.Event_Subtitle.utf8());
+    query.bindValue(":CATEGORY",    event.ContentDescription.utf8());
+    query.bindValue(":STEREO",      event.Stereo);
+    query.bindValue(":CC",          event.SubTitled);
+    query.bindValue(":HDTV",        event.HDTV);
+    query.bindValue(":AIRDATE",     event.Year);
+    query.bindValue(":ORIGAIRDATE", airDate);
+    query.bindValue(":PARTNUMBER",  event.PartNumber);
+    query.bindValue(":PARTTOTAL",   event.PartTotal);
+    query.bindValue(":CATTYPE",     event.CategoryType.utf8());
 
     if (!query.exec() || !query.isActive())
     {

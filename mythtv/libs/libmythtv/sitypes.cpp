@@ -238,20 +238,22 @@ void Event::Reset()
 
 void Event::clearEventValues()
 {
-    SourcePID = 0;
+    SourcePID    = 0;
     LanguageCode = "";
-    Event_Name = "";
-    Description = "";
-    EventID = 0;
+    Event_Name   = "";
+    Description  = "";
+    EventID      = 0;
     ETM_Location = 0;
-    Event_Subtitle = "";
+    Event_Subtitle     = "";
     ContentDescription = "";
-    Year = "";
-    SubTitled = false;
-    Stereo = false;
-    HDTV = false;
-    ATSC = false;
-    //PreviouslyShown = false;
+    Year         = "";
+    SubTitled    = false;
+    Stereo       = false;
+    HDTV         = false;
+    ATSC         = false;
+    PartNumber   = 0;
+    PartTotal    = 0;
+    CategoryType = "";
     OriginalAirDate = QDate();
     Credits.clear();
 }

@@ -162,7 +162,7 @@ class SIParser : public QObject
     QString ProcessDescHuffmanTextLarge      (uint8_t *buf, uint sz);
 
     // DVB EIT Table Descriptor processors
-    QString ProcessContentDescriptor         (uint8_t *buf, int sz);
+    void ProcessContentDescriptor            (uint8_t *buf, int sz, Event &e);
     void ProcessShortEventDescriptor         (uint8_t *buf, int sz, Event &e);
     void ProcessExtendedEventDescriptor      (uint8_t *buf, int sz, Event &e);
     void ProcessComponentDescriptor          (uint8_t *buf, int sz, Event &e);

@@ -1433,9 +1433,8 @@ if (e.ServiceID == EIT_DEBUG_SID) {
                     break;
 
                 case 0x54:
-                    e.ContentDescription =
-                            ProcessContentDescriptor(
-                                &buffer[des_pos],buffer[des_pos+1]+2);
+                    ProcessContentDescriptor(
+                        &buffer[des_pos],buffer[des_pos+1]+2,e);
                     break;
 
                 default:            
@@ -1952,13 +1951,24 @@ TransportObject SIParser::ParseDescCable(uint8_t *buffer, int)
  *  \TODO Add all types, possibly just lookup from a big 
  *        array that is an include file?
  */
-QString SIParser::ProcessContentDescriptor(uint8_t *buf, int)
+void SIParser::ProcessContentDescriptor(uint8_t *buf, int, Event& e)
 {
     uint8_t content = buf[2];
     if (content)
-        return m_mapCategories[content];
-    else
-        return QString();
+    {
+        e.ContentDescription = m_mapCategories[content];
+        switch (content)
+        {
+        case 0x10 ... 0x1f:
+            e.CategoryType = "movie";
+            break;
+        case 0x40 ... 0x4f:
+            e.CategoryType = "sports";
+            break;
+        default:
+            e.CategoryType = "tvshow";
+        }     
+    }
 }
 
 /**
@@ -2906,6 +2916,10 @@ void SIParser::EITFixUpStyle1(Event &event)
 
 }
 
+/** \fn SIParser::EITFixUpStyle2(Event&)
+ *  \brief This function does some regexps on Guide data to get
+ *         more powerful guide. Use this for the United Kingdom.
+ */
 void SIParser::EITFixUpStyle2(Event &event)
 {
     int16_t position = event.Description.find("New Series");
@@ -2922,12 +2936,19 @@ void SIParser::EITFixUpStyle2(Event &event)
     event.Description = event.Description.replace("New Series","");
 
 
-    position = event.Description.find(':');
-    if (position != -1)
+    //This is trying to catch the case where the subtitle is in the main title
+    //but avoid cases where it isn't a subtitle e.g cd:uk
+    if (((position = event.Event_Name.find(":")) != -1) && 
+        (event.Description.find(":") == -1) && 
+        (event.Event_Name[position+1].upper()==event.Event_Name[position+1]))
+    {
+        event.Event_Subtitle = event.Event_Name.mid(position+1);
+        event.Event_Name = event.Event_Name.left(position);
+    }
+    else if ((position = event.Description.find(":")) != -1)
     {
         event.Event_Subtitle = event.Description.left(position);
-        event.Description = event.Description.right(
-            event.Description.length()-position-2);
+        event.Description = event.Description.mid(position+1);
         if ((event.Event_Subtitle.length() > 0) &&
             (event.Description.length() > 0) &&
             (event.Event_Subtitle.length() > event.Description.length()))
@@ -2939,24 +2960,142 @@ void SIParser::EITFixUpStyle2(Event &event)
     }
 
     if (event.Event_Name.endsWith("...") && 
-        event.Event_Subtitle.startsWith("..."))
+        event.Event_Subtitle.startsWith(".."))
     {
         //try and make the subtitle
-        QString Full = event.Event_Name.left(event.Event_Name.length()-3)+" "+
-            event.Event_Subtitle.right(event.Event_Subtitle.length()-3);
-        if ((position = Full.find(":")) != -1)
+        QString Full = event.Event_Name.left(event.Event_Name.length()-3)+" ";
+
+        if (event.Event_Subtitle.startsWith("..."))
+            Full += event.Event_Subtitle.mid(3);
+        else
+            Full += event.Event_Subtitle.mid(2);
+        if (((position = Full.find(":")) != -1) ||
+            ((position = Full.find(".")) != -1))
         {
            event.Event_Name = Full.left(position);
-           event.Event_Subtitle = Full.right(Full.length()-position-2);
+           event.Event_Subtitle = Full.mid(position+1);
         }
-        else if ((position = Full.find(".")) != -1)
+        else
         {
-           event.Event_Name = Full.left(position);
-           event.Event_Subtitle = Full.right(Full.length()-position-2);
+           event.Event_Name = Full;
+           event.Event_Subtitle="";
         }
     }
+    else if (event.Event_Subtitle.endsWith("...") && 
+        event.Description.startsWith("..."))
+    {
+         QString Full = event.Event_Subtitle.left(event.Event_Subtitle.length()
+                        -3)+" "+ event.Description.mid(3);
+        if (((position = Full.find(":")) != -1) ||
+            ((position = Full.find(".")) != -1))
+        {
+           event.Event_Subtitle = Full.left(position);
+           event.Description = Full.mid(position+1);
+        }
+    }
+    else if (event.Event_Name.endsWith("...") &&
+        event.Description.startsWith("...") && event.Event_Subtitle.isEmpty())
+    {
+        QString Full = event.Event_Name.left(event.Event_Name.length()
+                        -3)+" "+ event.Description.mid(3);
+        if (((position = Full.find(":")) != -1) ||
+            ((position = Full.find(".")) != -1))
+        {
+           event.Event_Name = Full.left(position);
+           event.Description = Full.mid(position+1);
+        }
+    }
+
+    //Work out the episode numbers (if any)
+    bool series = false;
+    QRegExp rx("^\\s*(\\d{1,2})/(\\d{1,2})\\.");
+    QRegExp rx1("\\((Part|Pt)\\s+(\\d{1,2})\\s+of\\s+(\\d{1,2})\\)");
+    if ((position = rx.search(event.Event_Name)) != -1)
+    {
+        event.PartNumber=rx.cap(1).toUInt();
+        event.PartTotal=rx.cap(2).toUInt();
+        //Remove from the title
+        event.Event_Name=event.Event_Name.mid(position+rx.cap(0).length());
+        //but add it to the description
+        event.Description+=rx.cap(0);
+        series=true;
+    }
+    else if ((position = rx.search(event.Event_Subtitle)) != -1)
+    {
+        event.PartNumber=rx.cap(1).toUInt();
+        event.PartTotal=rx.cap(2).toUInt();
+        //Remove from the sub title
+        event.Event_Subtitle=event.Event_Subtitle.mid(position+rx.cap(0).length());
+        //but add it to the description
+        event.Description+=rx.cap(0);
+        series=true;
+    }
+    else if ((position = rx.search(event.Description)) != -1)
+    {
+        event.PartNumber=rx.cap(1).toUInt();
+        event.PartTotal=rx.cap(2).toUInt();
+        //Don't cut it from the description
+        //event.Description=event.Description.left(position)+
+        //                  event.Description.mid(position+rx.cap(0).length());
+        series=true;
+    }
+    else if ((position = rx1.search(event.Description)) != -1)
+    {
+        event.PartNumber=rx1.cap(2).toUInt();
+        event.PartTotal=rx1.cap(3).toUInt();
+        //Don't cut it from the description
+        //event.Description=event.Description.left(position)+
+        //                  event.Description.mid(position+rx1.cap(0).length());
+        series=true;
+    }
+    if (series)
+        event.CategoryType="series";
+    //Work out the closed captions and Audio descriptions  (if any)
+    rx.setPattern("\\[(AD)(,(S)){,1}(,SL){,1}\\]|"
+               "\\[(S)(,AD){,1}(,SL){,1}\\]|"
+               "\\[(SL)(,AD){,1}(,(S)){,1}\\]");
+    if ((position = rx.search(event.Description)) != -1)
+    {
+        //Enumerate throught and see if we have subtitles, don't modify
+        //the description as we might destroy other useful information
+        QStringList captures = rx.capturedTexts();
+        QStringList::Iterator i = captures.begin();
+        QStringList::Iterator end = captures.end();
+        while (i!=end)
+            if (*(i++) == "S")
+                 event.SubTitled = true;
+    }
+    else if ((position = rx.search(event.Event_Subtitle)) != -1)
+    {
+        QStringList captures = rx.capturedTexts();
+        QStringList::Iterator i = captures.begin();
+        QStringList::Iterator end = captures.end();
+        while (i!=end)
+            if (*(i++) == "S")
+                 event.SubTitled = true;
+        //We do remove [AD,S] from the subtitle as it probably shouldn't be
+        //there.
+        QString Temp = event.Event_Subtitle;
+        event.Event_Subtitle = Temp.left(position)+Temp.mid(position+rx.cap(0).length());
+    }
+    //Work out the year (if any)
+    rx.setPattern("[\\[\\(]([\\d]{4})[\\)\\]]");
+    if ((position = rx.search(event.Description)) != -1)
+    {
+        event.Description=event.Description.left(position)+
+                          event.Description.mid(position+rx.cap(0).length());
+        event.Year=rx.cap(1);
+    }
+
+    event.Event_Name = event.Event_Name.stripWhiteSpace();
+    event.Event_Subtitle = event.Event_Subtitle.stripWhiteSpace();
+    event.Description = event.Description.stripWhiteSpace();
 }
 
+/** \fn SIParser::EITFixUpStyle3(Event&)
+ *  \brief This function does some regexps on Guide data to get
+ *         more powerful guide. Use this for PBS channels.
+ */
 void SIParser::EITFixUpStyle3(Event &event)
 {
     /* Used for PBS ATSC Subtitles are seperated by a colon */
@@ -2969,6 +3108,10 @@ void SIParser::EITFixUpStyle3(Event &event)
     }
 }
 
+/** \fn SIParser::EITFixUpStyle4(Event&)
+ *  \brief This function does some regexps on Guide data to get
+ *         more powerful guide. Use this in Sweden (ComHem DVB).
+ */
 void SIParser::EITFixUpStyle4(Event &event)
 {
     // Used for swedish dvb cable provider ComHem

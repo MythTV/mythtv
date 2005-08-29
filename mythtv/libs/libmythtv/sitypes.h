@@ -322,37 +322,43 @@ public:
     QString name;
 };
 
+/** Used to hold information captured from EIT and ETT tables. */
 class Event
 {
 //TODO: Int conversion
-public:
+  public:
     Event() { Reset(); }
 
     void Reset();
     void clearEventValues();
 
-    uint16_t SourcePID;    /* Used in ATSC for Checking for ETT PID being filtered */
-    QDateTime StartTime;
-    QDateTime EndTime;
-    uint16_t TransportID;
-    uint16_t NetworkID;
-    QString LanguageCode;
-    uint16_t ServiceID;    /* NOT the Virtual Channel Number used by ATSC */
-    QString Event_Name;
-    QString Event_Subtitle;
-    QString Description;
-    uint16_t EventID;
-    QString ContentDescription;
-    QString Year;
+    uint16_t    SourcePID;    ///< Used in ATSC for Checking for ETT PID being filtered
+    QDateTime   StartTime;
+    QDateTime   EndTime;
+    uint16_t    TransportID;
+    uint16_t    NetworkID;
+    QString     LanguageCode;
+    uint16_t    ServiceID;    ///< NOT the Virtual Channel Number used by ATSC
+    QString     Event_Name;
+    QString     Event_Subtitle;
+    QString     Description;
+    uint16_t    EventID;
+    QString     ContentDescription;
+    QString     Year;
     QStringList Actors;
-    bool Stereo;
-    bool HDTV;
-    bool SubTitled;
-    int ETM_Location;    /* Used to flag still waiting ETTs for ATSC */
-    bool ATSC;
-    //bool PreviouslyShown;
-    QDate OriginalAirDate;
+    bool        Stereo;
+    bool        HDTV;
+    bool        SubTitled;
+    int         ETM_Location; ///< Used to flag still waiting ETTs for ATSC
+    bool        ATSC;
+    QDate       OriginalAirDate;
     QValueList<Person> Credits;
+    /// Episode number in series.
+    unsigned    PartNumber;
+    /// Number of episodes in series.
+    unsigned    PartTotal;
+    /// One of these four strings: "movie", "series", "sports" or "tvshow"
+    QString     CategoryType;
 };
 
 // DVB TransportObject - Used with NIT Scanning
