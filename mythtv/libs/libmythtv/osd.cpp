@@ -1,8 +1,13 @@
-#include <qstring.h>
-#include <stdlib.h>
-#include <stdio.h>
+// C headers
 #include <unistd.h>
-#include <string.h>
+
+// C++ headers
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+// Qt headers
+#include <qstring.h>
 #include <qimage.h>
 #include <qpixmap.h>
 #include <qbitmap.h>
@@ -11,11 +16,7 @@
 #include <qcolor.h>
 #include <qregexp.h>
 
-#include <iostream>
-#include <algorithm>
-#include <cassert>
-using namespace std;
-
+// MythTV headers
 #include "ttfont.h"
 #include "osd.h"
 #include "osdtypes.h"
@@ -60,15 +61,15 @@ OSD::OSD(int width, int height, int frint,
 
     if (themepath == "")
     {
-        cerr << "Couldn't find OSD theme: " << osdtheme << endl;
+        VERBOSE(VB_IMPORTANT, "Couldn't find OSD theme: " << osdtheme);
     }
     else
     {
         themepath += "/";
         if (!LoadTheme())
         {
-            cerr << "Couldn't load OSD theme: " << osdtheme << " at " 
-                 << themepath << endl;
+            VERBOSE(VB_IMPORTANT, "Couldn't load OSD theme: " << osdtheme
+                    << " at " << themepath);
         }
     }
 
@@ -307,8 +308,8 @@ TTFFont *OSD::LoadFont(QString name, int size)
     if (font->isValid())
         return font;
    
-    cerr << "Unable to find font: " << name << endl;
-    cerr << "No OSD will be displayed.\n";
+    VERBOSE(VB_IMPORTANT, QString("Unable to find font: %1\n\t\t\t"
+                                  "No OSD will be displayed.").arg(name));
 
     delete font;
     return NULL;
@@ -341,7 +342,7 @@ void OSD::parseFont(QDomElement &element)
     name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Font needs a name\n";
+        VERBOSE(VB_IMPORTANT, "Font needs a name");
         return;
     }
 
@@ -393,7 +394,8 @@ void OSD::parseFont(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag " << info.tagName() << " in font\n";
+                VERBOSE(VB_IMPORTANT, "Unknown tag "
+                        << info.tagName() << " in font");
                 continue;
             }
         }
@@ -402,7 +404,7 @@ void OSD::parseFont(QDomElement &element)
     TTFFont *font = GetFont(name);
     if (font)
     {
-        cerr << "Error: already have a font called: " << name << endl;
+        VERBOSE(VB_IMPORTANT, "Error: already have a font called: " << name);
         return;
     }
 
@@ -419,12 +421,16 @@ void OSD::parseFont(QDomElement &element)
             size = sizeBig;
     }
     
-    assert(size > 0);
+    if (size <= 0)
+    {
+        VERBOSE(VB_IMPORTANT, "Error: font size specified as: " << size);
+        size = 10;
+    }
 
     font = LoadFont(fontfile, size);
     if (!font)
     {
-        cerr << "Couldn't load font: " << fontfile << endl;
+        VERBOSE(VB_IMPORTANT, "Couldn't load font: " << fontfile);
         return;
     }
 
@@ -449,7 +455,7 @@ void OSD::parseBox(OSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Box needs a name\n";
+        VERBOSE(VB_IMPORTANT, "Box needs a name");
         return;
     }
 
@@ -468,7 +474,7 @@ void OSD::parseBox(OSDSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in box: " << info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, "Unknown tag in box: " << info.tagName());
                 return;
             }
         }
@@ -483,7 +489,7 @@ void OSD::parseImage(OSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Image needs a name\n";
+        VERBOSE(VB_IMPORTANT, "Image needs a name");
         return;
     }
     
@@ -514,7 +520,8 @@ void OSD::parseImage(OSDSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in image\n";
+                VERBOSE(VB_IMPORTANT, QString("Unknown: %1 in image")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -543,7 +550,7 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Text area needs a name\n";
+        VERBOSE(VB_IMPORTANT, "Text area needs a name");
         return;
     }
 
@@ -599,7 +606,8 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in textarea: " << info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, "Unknown tag in textarea: "
+                        << info.tagName());
                 return;
             }                   
         }
@@ -608,7 +616,8 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     TTFFont *ttffont = GetFont(font);
     if (!ttffont)
     {
-        cerr << "Unknown font: " << font << " in textarea: " << name << endl;
+        VERBOSE(VB_IMPORTANT, "Unknown font: " << font
+                << " in textarea: " << name);
         return;
     }
 
@@ -623,8 +632,8 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
         ttffont = GetFont(altfont);
         if (!ttffont)
         {
-            cerr << "Unknown altfont: " << altfont << " in textarea: "
-                 << name << endl;
+            VERBOSE(VB_IMPORTANT, "Unknown altfont: " << altfont
+                    << " in textarea: " << name);
         }
         else
             text->SetAltFont(ttffont);
@@ -648,7 +657,8 @@ void OSD::parseTextArea(OSDSet *container, QDomElement &element)
     {
         if (scrollx == 0 && scrolly == 0)
         {
-            cerr << "Text area set as scrolling, but no movement\n";
+            VERBOSE(VB_IMPORTANT,
+                    "Text area set as scrolling, but no movement");
             scrollx = -5;
         }
 
@@ -665,14 +675,14 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Slider needs a name\n";
+        VERBOSE(VB_IMPORTANT, "Slider needs a name");
         return;
     }
 
     QString type = element.attribute("type", "");
     if (type.isNull() || type.isEmpty())
     {
-        cerr << "Slider needs a type";
+        VERBOSE(VB_IMPORTANT, "Slider needs a type");
         return;
     }
 
@@ -697,7 +707,8 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in image\n";
+                VERBOSE(VB_IMPORTANT, QString("Unknown: %1 in image")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -705,7 +716,7 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
 
     if (filename == "")
     {
-        cerr << "Slider needs a filename\n";
+        VERBOSE(VB_IMPORTANT, "Slider needs a filename");
         return;
     }
 
@@ -713,29 +724,28 @@ void OSD::parseSlider(OSDSet *container, QDomElement &element)
 
     if (type.lower() == "fill")
     {
-        OSDTypeFillSlider *slider = new OSDTypeFillSlider(name, filename, area,
-                                                          wmult, hmult);
+        OSDTypeFillSlider *slider = new OSDTypeFillSlider(
+            name, filename, area, wmult, hmult);
         container->AddType(slider);
     }
     else if (type.lower() == "edit")
     {
         if (altfilename == "")
         {
-            cerr << "Edit slider needs an altfilename\n";
+            VERBOSE(VB_IMPORTANT, "Edit slider needs an altfilename");
             return;
         }
 
         altfilename = themepath + altfilename;
 
-        OSDTypeEditSlider *tes = new OSDTypeEditSlider(name, filename, 
-                                                       altfilename, area,
-                                                       wmult, hmult);
+        OSDTypeEditSlider *tes = new OSDTypeEditSlider(
+            name, filename, altfilename, area, wmult, hmult);
         container->AddType(tes);
     }
     else if (type.lower() == "position")
     {
-        OSDTypePosSlider *pos = new OSDTypePosSlider(name, filename, area,
-                                                     wmult, hmult);
+        OSDTypePosSlider *pos = new OSDTypePosSlider(
+            name, filename, area, wmult, hmult);
         container->AddType(pos);
     }
 }
@@ -747,13 +757,14 @@ void OSD::parseEditArrow(OSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "editarrow needs a name\n";
+        VERBOSE(VB_IMPORTANT, "editarrow needs a name");
         return;
     }
 
     if (name != "left" && name != "right")
     {
-        cerr << "editarrow name needs to be either 'left' or 'right'\n";
+        VERBOSE(VB_IMPORTANT, "editarrow name needs "
+                "to be either 'left' or 'right'");
         return;
     }
 
@@ -777,7 +788,8 @@ void OSD::parseEditArrow(OSDSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in editarrow: " << info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, "Unknown tag in editarrow: "
+                        << info.tagName());
                 return;
             }
         }
@@ -785,7 +797,7 @@ void OSD::parseEditArrow(OSDSet *container, QDomElement &element)
 
     if (filename == "")
     {
-        cerr << "editarrow needs a filename\n";
+        VERBOSE(VB_IMPORTANT, "editarrow needs a filename");
         return;
     }
 
@@ -795,8 +807,8 @@ void OSD::parseEditArrow(OSDSet *container, QDomElement &element)
 
     filename = themepath + filename;
 
-    OSDTypeImage *image = new OSDTypeImage(setname, filename, QPoint(0, 0),
-                                           wmult, hmult);
+    OSDTypeImage *image = new OSDTypeImage(
+        setname, filename, QPoint(0, 0), wmult, hmult);
 
     if (name == "left")
         editarrowleft = image;
@@ -809,7 +821,7 @@ void OSD::parsePositionRects(OSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "positionsrects needs a name\n";
+        VERBOSE(VB_IMPORTANT, "positionsrects needs a name");
         return;
     }
 
@@ -830,7 +842,8 @@ void OSD::parsePositionRects(OSDSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in editarrow: " << info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, "Unknown tag in editarrow: "
+                        << info.tagName());
                 return;
             }
         }
@@ -844,7 +857,7 @@ void OSD::parsePositionImage(OSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "positionimage needs a name\n";
+        VERBOSE(VB_IMPORTANT, "positionimage needs a name");
         return;
     }
 
@@ -877,7 +890,8 @@ void OSD::parsePositionImage(OSDSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown: " << info.tagName() << " in positionimage\n";
+                VERBOSE(VB_IMPORTANT, QString("Unknown: %1 in positionimage")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -913,7 +927,7 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "listtree needs a name\n";
+        VERBOSE(VB_IMPORTANT, "listtree needs a name");
         return;
     }
 
@@ -949,8 +963,8 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
                     fontInactive = fontName;
                 else 
                 {
-                    cerr << "Unknown font function for listtree area: "
-                         << fontFcn << endl;
+                    VERBOSE(VB_IMPORTANT, "Unknown font function "
+                            "for listtree area: " << fontFcn);
                     return;
                 }
             }
@@ -980,19 +994,23 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
                 }
                 else 
                 {
-                    cerr << "Unknown type for gradient in listtree area\n";
+                    VERBOSE(VB_IMPORTANT,
+                            "Unknown type for gradient in listtree area");
                     return;
                 }
 
                 if (!grSelectedBeg.isValid() || !grSelectedEnd.isValid() ||
                     !grUnselectedBeg.isValid() || !grUnselectedEnd.isValid()) 
                 {
-                    cerr << "Unknown color for gradient in listtree area\n";
+                    VERBOSE(VB_IMPORTANT,
+                            "Unknown color for gradient in listtree area");
                     return;
                 }
 
-                if (grSelectedAlpha > 255 || grUnselectedAlpha > 255) {
-                    cerr << "Incorrect alpha for gradient in listtree area\n";
+                if (grSelectedAlpha > 255 || grUnselectedAlpha > 255)
+                {
+                    VERBOSE(VB_IMPORTANT,
+                            "Incorrect alpha for gradient in listtree area");
                     return;
                 }
             }
@@ -1004,8 +1022,8 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
             }
             else
             {
-                cerr << "Unknown tag in listtree area: "
-                     << info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, "Unknown tag in listtree area: "
+                     << info.tagName());
                 return;
             }
         }
@@ -1014,19 +1032,20 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
     TTFFont *fpActive = GetFont(fontActive);
     if (!fpActive)
     {
-        cerr << "Unknown font: " << fontActive << " in listtree\n";
+        VERBOSE(VB_IMPORTANT, "Unknown font: " << fontActive << " in listtree");
         return;
     }
 
     TTFFont *fpInactive = GetFont(fontInactive);
     if (!fpInactive)
     {
-        cerr << "Unknown font: " << fontInactive << " in listtree\n";
+        VERBOSE(VB_IMPORTANT, "Unknown font: "
+                << fontInactive << " in listtree");
         return;
     }
 
-    OSDListTreeType *lb = new OSDListTreeType(name, area, listsize, leveloffset,
-                                              wmult, hmult);
+    OSDListTreeType *lb = new OSDListTreeType(
+        name, area, listsize, leveloffset, wmult, hmult);
     lb->SetFontActive(fpActive);
     lb->SetFontInactive(fpInactive);
     lb->SetItemRegColor(grUnselectedBeg, grUnselectedEnd, grUnselectedAlpha);
@@ -1042,14 +1061,14 @@ void OSD::parseContainer(QDomElement &element)
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
-        cerr << "Container needs a name\n";
+        VERBOSE(VB_IMPORTANT, "Container needs a name");
         return;
     }
 
     OSDSet *container = GetSet(name);
     if (container) 
     {
-        cerr << "Container: " << name << " already exists\n";
+        VERBOSE(VB_IMPORTANT, "Container: " << name << " already exists");
         return;
     }
 
@@ -1116,7 +1135,8 @@ void OSD::parseContainer(QDomElement &element)
             }
             else
             {
-                cerr << "Unknown container child: " << info.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, QString("Unknown container child: %1")
+                        .arg(info.tagName()));
                 return;
             }
         }
@@ -1132,7 +1152,7 @@ bool OSD::LoadTheme(void)
 
     if (!f.open(IO_ReadOnly))
     {
-        cerr << "OSD::LoadTheme(): Can't open: " << themefile << endl;
+        VERBOSE(VB_IMPORTANT, "OSD::LoadTheme(): Can't open: " << themefile);
         return false; 
     }
 
@@ -1142,9 +1162,9 @@ bool OSD::LoadTheme(void)
 
     if (!doc.setContent(&f, false, &errorMsg, &errorLine, &errorColumn))
     { 
-        cerr << "Error parsing: " << themefile << endl;
-        cerr << "at line: " << errorLine << "  column: " << errorColumn << endl;
-        cerr << errorMsg << endl;
+        VERBOSE(VB_IMPORTANT, QString("Error parsing: %1\n\t\t\t"
+                                      "at line: %2  column: %3\n\t\t\t%4")
+                .arg(themefile).arg(errorLine).arg(errorColumn).arg(errorMsg));
         f.close();
         return false;
     }
@@ -1178,7 +1198,7 @@ bool OSD::LoadTheme(void)
             }
             else
             {
-                cerr << "Unknown element: " << e.tagName() << endl;
+                VERBOSE(VB_IMPORTANT, "Unknown element: " << e.tagName());
                 continue;
             }
         }
@@ -1554,14 +1574,14 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     OSDSet *container = GetSet(name);
     if (container)
     {
-        cerr << "dialog: " << name << " already exists.\n";
+        VERBOSE(VB_IMPORTANT, "dialog: " << name << " already exists.");
         return;
     }       
 
     OSDSet *base = GetSet("basedialog");
     if (!base)
     {
-        cerr << "couldn't find base dialog\n";
+        VERBOSE(VB_IMPORTANT, "couldn't find base dialog");
         return;
     }
 
@@ -1595,7 +1615,7 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         text = (OSDTypeText *)container->GetType(name);
         if (!text)
         {
-            cerr << "Couldn't find: " << name << endl;
+            VERBOSE(VB_IMPORTANT, "Couldn't find: " << name);
             return;
         }
 
@@ -1607,7 +1627,8 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         dynamic_cast<OSDTypePositionIndicator*>(container->GetType("selector"));
     if (!opr)
     {
-        cerr << "Need a positionindicator named 'selector' in the basedialog\n";
+        VERBOSE(VB_IMPORTANT,
+                "Need a positionindicator named 'selector' in the basedialog");
         return;
     }
 
