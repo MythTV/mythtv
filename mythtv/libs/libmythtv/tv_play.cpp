@@ -490,7 +490,7 @@ void TV::FinishRecording(void)
 
 void TV::AskAllowRecording(const QStringList &messages, int timeuntil)
 {
-    if (StateIsLiveTV(GetState()))
+    if (!StateIsLiveTV(GetState()))
        return;
 
     QString title = messages[0];
