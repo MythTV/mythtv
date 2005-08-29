@@ -448,6 +448,11 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
     }
 
+    // If CheckChannel filled in the inputName then we need to change inputs
+    // and return, since the act of changing inputs will change the channel as well.
+    if (!inputName.isEmpty())
+        return ChannelBase::SwitchToInput(inputName, chan);
+
     SetCachedATSCInfo("");
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -482,16 +487,6 @@ bool Channel::SetChannelByString(const QString &chan)
     uint mplexid      = query.value(6).toInt();
     QString atsc_chan = (atscsrcid < 256) ?
         chan : QString("%1_%2").arg(atscsrcid >> 8).arg(atscsrcid & 0xff);
-
-    // If CheckChannel filled in the inputName then we need to change inputs
-    // and return, since the act of changing inputs will change the channel as well.
-    if (!inputName.isEmpty())
-    {
-        bool ok = ChannelBase::SwitchToInput(inputName, chan);
-        if (ok)
-            SetCachedATSCInfo(atsc_chan);
-        return ok;
-    }
 
     QString modulation;
     int frequency = ChannelUtil::GetTuningParams(mplexid, modulation);
