@@ -113,6 +113,7 @@ extern "C" {
 int mythplugin_init(const char *libversion);
 int mythplugin_run(void);
 int mythplugin_config(void);
+void mythplugin_destroy(void);
 }
 
 
@@ -292,5 +293,11 @@ int mythplugin_config(void)
     settings.exec();
 
     return 0;
+}
+
+void mythplugin_destroy(void)
+{
+    delete sipStack;
+    sipStack = NULL;
 }
 

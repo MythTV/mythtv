@@ -65,6 +65,15 @@ MythPluginType MythPlugin::type(void)
     return kPluginType_Module;
 }
 
+void MythPlugin::destroy(void)
+{
+    typedef void (*PluginDestFunc)();
+    PluginDestFunc rfunc = (PluginDestFunc)QLibrary::resolve("mythplugin_destroy");
+
+    if (rfunc)
+        rfunc();
+}
+
 int MythPlugin::setupMenuPlugin(void)
 {
     typedef int (*PluginSetup)();
@@ -191,6 +200,22 @@ bool MythPluginManager::config_plugin(const QString &plugname)
     return true;
 }
 
+bool MythPluginManager::destroy_plugin(const QString &plugname)
+{
+    QString newname = gContext->FindPlugin(plugname);
+
+    if (m_dict.find(newname) == 0 && init_plugin(plugname) == false)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Unable to destroy plugin '%1': not initialized")
+                .arg(plugname));
+        return false;
+    }
+
+    m_dict[newname]->destroy();
+    return true;
+}
+
 MythPlugin *MythPluginManager::GetPlugin(const QString &plugname)
 {
     QString newname = gContext->FindPlugin(plugname);
@@ -232,5 +257,20 @@ void MythPluginManager::orderMenuPlugins(void)
         if (iter.data()->isEnabled())
             menuPluginList.append(iter.data());
     }
+}
+
+void MythPluginManager::DestroyAllPlugins(void)
+{
+    QDictIterator<MythPlugin> it(m_dict);
+    for (; it.current(); ++it)
+    {
+        MythPlugin *plugin = it.current();
+        plugin->destroy();
+    }
+
+    m_dict.clear();
+    moduleMap.clear();
+    menuPluginMap.clear();
+    menuPluginList.clear();
 }
 

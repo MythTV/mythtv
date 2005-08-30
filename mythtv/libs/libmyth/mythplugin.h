@@ -34,6 +34,10 @@ class MythPlugin : public QLibrary
     // If such a function doesn't exist, it's a main module plugin.
     MythPluginType type(void);
 
+    // This method will call the mythplugin_destroy() function of the library,
+    // if such a function exists.
+    void destroy(void);
+
     bool isEnabled() { return enabled; }
     void setEnabled(bool enable) { enabled = enable; }
 
@@ -63,11 +67,13 @@ class MythPluginManager
     bool init_plugin(const QString &plugname);
     bool run_plugin(const QString &plugname);
     bool config_plugin(const QString &plugname);
-    void unload_plugin(const QString &plugname);
+    bool destroy_plugin(const QString &plugname);
 
     MythPlugin *GetPlugin(const QString &plugname);
     MythPlugin *GetMenuPlugin(const QString &plugname);
     MythPlugin *GetMenuPluginAt(int pos);
+
+    void DestroyAllPlugins();
      
   private:
     QDict<MythPlugin> m_dict;

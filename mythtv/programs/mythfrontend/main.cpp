@@ -1110,6 +1110,8 @@ int main(int argc, char **argv)
     if (exitstatus == HALT)
         haltnow();
 
+    pmanager->DestroyAllPlugins();
+
 #ifndef _WIN32
     if (mon)
     {
@@ -1124,7 +1126,7 @@ int main(int argc, char **argv)
         gContext->addPrivRequest(MythPrivRequest::MythExit, NULL);
         pthread_join(priv_thread, &value);
     }
-
+    
     delete mainWindow;
     delete gContext;
     return FRONTEND_EXIT_OK;
