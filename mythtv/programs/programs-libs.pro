@@ -1,8 +1,8 @@
 INCLUDEPATH += ../../libs/ ../../libs/libmyth ../../libs/libmythtv  ../..
 INCLUDEPATH += ../../libs/libavutil ../../libs/libavformat ../../libs/libavcodec
 
-LIBS = -L../../libs/libmyth -L../../libs/libmythtv $${LIBS}
-LIBS = -L../../libs/libavutil -L../../libs/libavcodec -L../../libs/libavformat $${LIBS}
+LIBS += -L../../libs/libmyth -L../../libs/libmythtv
+LIBS += -L../../libs/libavutil -L../../libs/libavcodec -L../../libs/libavformat
 
 LIBS += -lmythtv-$$LIBVERSION -lmythavformat-$$LIBVERSION
 LIBS += -lmythavutil-$$LIBVERSION -lmythavcodec-$$LIBVERSION 
