@@ -9,7 +9,7 @@ TEMPLATE = app
 TARGET = mythuitest
 CONFIG += thread opengl
 
-LIBS += -lmythui-$$LIBVERSION -lmyth-$$LIBVERSION
+LIBS += -lmythui-$$LIBVERSION -lmyth-$$LIBVERSION $$EXTRA_LIBS
 
 isEmpty(QMAKE_EXTENSION_SHLIB) {
   QMAKE_EXTENSION_SHLIB=so
