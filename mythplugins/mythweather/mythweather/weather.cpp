@@ -32,7 +32,6 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
-#include <mythtv/inetcomms.h>
 #include <mythtv/httpcomms.h>
 
 
@@ -2422,28 +2421,18 @@ float Weather::GetFloat(QString tag)
 
 bool Weather::GetWeatherData()
 {
-    
-    
-    QUrl weatherDataURL("http://www.msnbc.com/m/chnk/d/weather_d_src.asp?acid=" + locale);
 
-    INETComms *weatherData = new INETComms(weatherDataURL);
+    QString weatherDataURL = "http://www.msnbc.com/m/chnk/d/weather_d_src.asp?acid=" + locale;
 
-    VERBOSE(VB_NETWORK, QString("Grabbing weather from: %1").arg(weatherDataURL.toString()));
+    VERBOSE(VB_NETWORK, QString("Grabbing weather from: %1").arg(weatherDataURL));
 
-    while (!weatherData->isDone())
-    {
-        qApp->processEvents();
-        if (stopProcessing)
-            return false;
-
-    }
-    
     LayerSet *container = theme->GetSet("weatherpages");
     if (container)
         SetText(container, "updatetime", updated);
 
 
-    httpData = weatherData->getData();
+    httpData = HttpComms::getHttp(weatherDataURL, weatherTimeoutInt, 3, 3);
+
     if (httpData.find("this.swAcid = \"\";") != -1 ||
         httpData.find("<html>") != -1 ||
         httpData.find("Microsoft VBScript runtime") != -1 ||
@@ -2460,9 +2449,6 @@ bool Weather::GetWeatherData()
         return false;
     }
 
-    delete weatherData;
-    weatherData = NULL;
-
      // try to get some animated radar maps
      if (wantAnimated && GetAnimatedRadarMap())
          return true;
@@ -2476,51 +2462,26 @@ bool Weather::GetWeatherData()
 
 bool Weather::GetStaticRadarMap()
 {
-    QUrl weatherMapLink1URL(QString("http://www.weather.com/weather/map/%1"
+    QString weatherMapLink1URL = QString("http://www.weather.com/weather/map/%1"
                                     "?from=LAPmaps&setcookie=1 HTTP/1.1\n"
                                     "Connection: close\nHost: www.weather.com\n\n\n")
-                                    .arg(locale));
+                                    .arg(locale);
 
-    INETComms *weatherMapLink1 = new INETComms(weatherMapLink1URL);
-
-    while (!weatherMapLink1->isDone())
-    {
-        qApp->processEvents();
-        if (stopProcessing)
-            return false;
-    }
-
-    QString tempData = "";
-    tempData = weatherMapLink1->getData();
-
-    delete weatherMapLink1;
-    weatherMapLink1 = NULL;
+    QString tempData = HttpComms::getHttp(weatherMapLink1URL, weatherTimeoutInt, 3, 3);
 
     QString mapLoc = parseData(tempData, "if (isMinNS4) var mapNURL = \"", "\";");
     if (mapLoc == "<NULL>")
         return true;
      
-    QUrl weatherMapLink2URL("http://www.weather.com/" + mapLoc); 
+    QString weatherMapLink2URL = "http://www.weather.com/" + mapLoc;
      
     if (debug)
         cerr << "MythWeather: Grabbing Weather Map Link (part 2) From: " 
-             << weatherMapLink2URL.toString() << endl;
+             << weatherMapLink2URL << endl;
     
-    VERBOSE(VB_NETWORK, QString("Grabbing weather map(2) from: %1").arg(weatherMapLink2URL.toString()));
+    VERBOSE(VB_NETWORK, QString("Grabbing weather map(2) from: %1").arg(weatherMapLink2URL));
               
-    INETComms *weatherMapLink2 = new INETComms(weatherMapLink2URL);
-    while (!weatherMapLink2->isDone())
-    {
-        qApp->processEvents();
-        if (stopProcessing)
-            return false;
-
-    }
-
-    QString tempData2 = weatherMapLink2->getData();
-
-    delete weatherMapLink2;
-    weatherMapLink2 = NULL;
+    QString tempData2 = HttpComms::getHttp(weatherMapLink2URL, weatherTimeoutInt, 3, 3);
 
     QString imageLoc = parseData(tempData2, "<IMG NAME=\"mapImg\" SRC=\"http://image.weather.com", "\"");
     if (imageLoc == "<NULL>")
