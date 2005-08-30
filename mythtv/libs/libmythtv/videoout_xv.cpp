@@ -253,6 +253,10 @@ int VideoOutputXv::GetRefreshRate(void)
     double rate = (double)((double)(dot_clock * 1000.0) /
                            (double)(mode_line.htotal * mode_line.vtotal));
 
+    // Assume 60Hz if we can't otherwise determine it.
+    if (rate == 0)
+        rate = 60;
+
     rate = 1000000.0 / rate;
 
     return (int)rate;
