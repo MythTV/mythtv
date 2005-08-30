@@ -210,7 +210,7 @@ class transport_scan_items_it_t
     uint offset() const { return (uint) _offset; }
     transport_scan_items_it_t nextTransport() const
     {
-        transport_scan_items_it_t tmp = _it;
+        QValueList<TransportScanItem>::iterator tmp = _it;
         return transport_scan_items_it_t(++tmp);
     }
   private:
