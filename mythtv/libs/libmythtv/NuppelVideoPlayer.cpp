@@ -211,6 +211,14 @@ NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
 
     osdHasSubtitles = false;
     osdSubtitlesExpireAt = -1;
+
+    for (int j = 0; j < TCTYPESMAX; j++)
+    {
+        tc_wrap[j] = tc_lastval[j] = 0;
+    }
+
+    tc_diff_estimate = 0;
+    tc_avcheck_framecounter = 0;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -798,6 +806,7 @@ VideoFrame *NuppelVideoPlayer::GetNextVideoFrame(bool allow_unsafe)
 void NuppelVideoPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
                                               long long timecode)
 {
+    WrapTimecode(timecode, TC_VIDEO);
     buffer->timecode = timecode;
 
     videoOutput->ReleaseFrame(buffer);
@@ -821,6 +830,8 @@ void NuppelVideoPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 void NuppelVideoPlayer::AddTextData(char *buffer, int len,
                                     long long timecode, char type)
 {
+    WrapTimecode(timecode, TC_CC);
+
     if (cc)
     {
         if (!tbuffer_numfree())
@@ -2183,8 +2194,48 @@ void NuppelVideoPlayer::SetTranscoding(bool value)
         GetDecoder()->setTranscoding(value);
 };
 
+void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type) 
+{
+    timecode += tc_wrap[tc_type];
+
+    // wrapped
+    if (timecode < tc_lastval[tc_type] - 10000)
+    {
+        timecode -= tc_wrap[tc_type];
+        tc_wrap[tc_type] = tc_lastval[tc_type];
+        timecode += tc_wrap[tc_type];
+    }
+
+    tc_lastval[tc_type] = timecode;
+
+    // This really doesn't work right
+    if (tc_type == TC_AUDIO)
+    {
+        tc_avcheck_framecounter++;
+        if (tc_avcheck_framecounter == 30)
+        {
+            // something's terribly, terribly wrong.
+            if (tc_lastval[TC_AUDIO] < tc_lastval[TC_VIDEO] - 10000000 ||
+                tc_lastval[TC_VIDEO] < tc_lastval[TC_AUDIO] - 10000000)
+            {
+                long long newaudio;
+                newaudio = tc_lastval[TC_VIDEO] - tc_diff_estimate;
+                tc_wrap[TC_AUDIO] = newaudio - timecode;
+                timecode = newaudio;
+                tc_lastval[TC_AUDIO] = timecode;
+                VERBOSE(VB_IMPORTANT, "Guessing at new AV sync values");
+            }
+
+            tc_diff_estimate = tc_lastval[TC_VIDEO] - tc_lastval[TC_AUDIO];
+            tc_avcheck_framecounter = 0;
+        }
+    }
+}
+
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {
+    WrapTimecode(timecode, TC_AUDIO);
+
     if (audioOutput)
     {
         if (usevideotimebase)
@@ -2252,6 +2303,8 @@ void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
                                      int samples, long long timecode)
 {
+    WrapTimecode(timecode, TC_AUDIO);
+
     if (audioOutput)
     {
         char *buffers[] = {(char *)lbuffer, (char *)rbuffer};
@@ -2646,6 +2699,12 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
 
     wtxt = 0;
     rtxt = 0;
+
+    for (int j = 0; j < TCTYPESMAX; j++)
+    {
+        tc_wrap[j] = tc_lastval[j] = 0;
+    }
+    tc_avcheck_framecounter = 0;
 
     setPrebuffering(true);
     if (audioOutput)
@@ -4350,6 +4409,7 @@ void NuppelVideoPlayer::ClearSubtitles()
 }
 
 // adds a new subtitle to be shown
+// FIXME: Need to fix subtitles to use a 64bit timestamp
 void NuppelVideoPlayer::AddSubtitle(const AVSubtitle &subtitle) 
 {
     subtitleLock.lock();

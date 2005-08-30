@@ -318,6 +318,18 @@ class NuppelVideoPlayer
     // Returns the stream decoder currently in use.
     const DecoderBase *GetDecoder() const { return decoder; }
 
+    // timecode types
+    enum TCTypes
+    {
+        TC_VIDEO = 0,
+        TC_AUDIO,
+        TC_SUB,
+        TC_CC
+    };
+#define TCTYPESMAX 4
+
+    void WrapTimecode(long long &timecode, TCTypes tc_type);
+
   private:
     QString filename;
 
@@ -514,6 +526,11 @@ class NuppelVideoPlayer
     QMutex subtitleLock;
     bool osdHasSubtitles;
     long long osdSubtitlesExpireAt;
+
+    long long tc_wrap[TCTYPESMAX];
+    long long tc_lastval[TCTYPESMAX];
+    long long tc_diff_estimate;
+    int tc_avcheck_framecounter;
 };
 
 #endif
