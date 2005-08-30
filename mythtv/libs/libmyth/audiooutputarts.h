@@ -5,7 +5,7 @@
 
 #define ARTS_PCM_NEW_HW_PARAMS_API
 #define ARTS_PCM_NEW_SW_PARAMS_API
-#include <artsc/artsc.h>
+#include <artsc.h>
 
 using namespace std;
 

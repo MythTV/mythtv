@@ -1770,7 +1770,7 @@ fi
 if test x"$audio_arts" = x"default" -o x"$audio_arts" = x"yes" ; then
 
 cat > $TMPC << EOF
-#include <artsc/artsc.h>
+#include <artsc.h>
 int main(void) { return (int) ARTS_P_BUFFER_SIZE; }
 EOF
 
