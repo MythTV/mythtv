@@ -24,7 +24,8 @@ our %depend_order = (
         'freetype',
         'lame',
         'mysqlclient',
-        'qt-mt'
+        'qt-mt',
+        'dvdnav'
       ],
   'mythplugins'
   =>  [
@@ -43,6 +44,13 @@ our %depend = (
   {
     'url'
     =>  'http://unc.dl.sf.net/sourceforge/freetype/freetype-2.1.9.tar.gz',
+  },
+
+  'dvdnav'
+  =>
+  {
+    'url'
+    =>  'http://umn.dl.sourceforge.net/sourceforge/dvd/libdvdnav-0.1.10.tar.gz',
   },
   
   'lame'
