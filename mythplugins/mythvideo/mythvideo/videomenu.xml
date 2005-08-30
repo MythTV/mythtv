@@ -13,6 +13,7 @@
      <text lang="NL">Blader door videos</text>
      <text lang="JA">ビデオブラウズ</text>
      <text lang="SI">Iskanje filmov</text>
+     <text lang="FI">Selaa Videoita</text>
      <action>BROWSER</action>
    </button>
 
@@ -29,6 +30,7 @@
      <text lang="NL">Video Verkenner</text>
      <text lang="JA">ビデオリスト</text>
      <text lang="SI">Seznam filmov</text>
+     <text lang="FI">Videolistaus</text>
      <action>LISTING</action>
    </button>
 
@@ -38,6 +40,7 @@
      <text lang="FR">Gallerie vidéo</text>
      <text lang="DE">Galerie</text>
      <text lang="SI">Galerija filmov</text>
+     <text lang="FI">Videogalleria</text>
    <action>GALLERY</action>
    </button>
 
@@ -54,6 +57,7 @@
      <text lang="NL">Video's Beheren</text>
      <text lang="JA">ビデオマネージャー</text>
      <text lang="SI">Upravitelj filmov</text>
+     <text lang="FI">Videohallinta</text>
      <action>MANAGER</action>
    </button>
 

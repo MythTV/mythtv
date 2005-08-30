@@ -11,5 +11,6 @@
       <text lang="FR">Ripper un DVD</text>
       <text lang="NL">DVD Rip</text>
       <text lang="JA">DVDリッピング</text>
+      <text lang="FI">Kopioi DVD</text>
       <action>DVD_RIP</action>
    </button>

@@ -14,6 +14,7 @@
       <text lang="JA">全般設定</text>
       <text lang="IT">Generale</text>
       <text lang="SI">Splošne nastavitve</text>
+      <text lang="FI">Yleiset Asetukset</text>
       <action>SETTINGS_GENERAL</action>
    </button>
 
@@ -31,6 +32,7 @@
       <text lang="JA">プレイヤー設定</text>
       <text lang="IT">Player</text>
       <text lang="SI">Nastavitve predvajalnika</text>
+      <text lang="FI">Toistoasetukset</text>
       <action>SETTINGS_PLAYER</action>
    </button>
 
@@ -47,6 +49,7 @@
       <text lang="JA">ファイルタイプ</text>
       <text lang="IT">Tipi di file</text>
       <text lang="SI">Tipi datotek</text>
+      <text lang="FI">Tiedostotyypit</text>
       <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 

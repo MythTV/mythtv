@@ -13,6 +13,7 @@
       <text lang="NL">DVD Afspelen</text>
       <text lang="JA">DVD再生</text>
       <text lang="NB">Spill av DVD</text>
+      <text lang="FI">Toista DVD</text>
       <action>DVD_PLAY</action>
    </button>
 

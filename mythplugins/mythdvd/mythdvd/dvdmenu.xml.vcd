@@ -7,6 +7,7 @@
       <text lang="DE">VCD abspielen</text>
       <text lang="NL">VCD Afspelen</text>
       <text lang="JA">VCD再生</text>
+      <text lang="FI">Toista VCD</text>
       <action>VCD_PLAY</action>
    </button>
 
