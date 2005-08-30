@@ -39,6 +39,7 @@ const int TV::kInitFFRWSpeed  = 0;
 const int TV::kMuteTimeout    = 800;   
 const int TV::kLCDTimeout     = 30000;
 const int TV::kBrowseTimeout  = 30000;
+const int TV::kSMExitTimeout  = 2000;
 const int TV::kChannelKeysMax = 6;
 
 void TV::InitKeys(void)
@@ -222,6 +223,8 @@ TV::TV(void)
 {
     lastLcdUpdate = QDateTime::currentDateTime();
     lastLcdUpdate.addYears(-1); // make last LCD update last year..
+    lastSignalMsgTime = QTime::currentTime();
+    lastSignalMsgTime.addMSecs(-2 * kSMExitTimeout);
 
     sleep_times.push_back(SleepTimerInfo(QObject::tr("Off"),       0));
     sleep_times.push_back(SleepTimerInfo(QObject::tr("30m"),   30*60));
@@ -371,6 +374,7 @@ bool TV::Init(bool createWindow)
 
 TV::~TV(void)
 {
+    QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal from continuing.
     gContext->removeListener(this);
 
     runMainLoop = false;
@@ -1152,6 +1156,7 @@ void TV::TeardownPlayer(void)
 {
     if (nvp)
     {
+        QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal using osd...
         // Stop the player's video sync method.  Do so from this
         // main thread to work around a potential OpenGL bug.
         VideoSync *vs = nvp->getVideoSync();
@@ -1949,7 +1954,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "ESCAPE")
         {
-            if (GetOSD() && ClearOSD())
+            if (StateIsLiveTV(internalState) &&
+                (lastSignalMsgTime.elapsed() < kSMExitTimeout))
+                ClearOSD();
+            else if (GetOSD() && ClearOSD())
                 return;
 
             NormalSpeed();
@@ -3234,6 +3242,7 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     infoMap["description"] = sigDesc;
     GetOSD()->ClearAllText("program_info");
     GetOSD()->SetText("program_info", infoMap, osd_display_time);
+    lastSignalMsgTime.start();
 }
 
 void TV::UpdateLCD(void)

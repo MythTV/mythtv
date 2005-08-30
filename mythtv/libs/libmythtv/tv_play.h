@@ -384,6 +384,7 @@ class TV : public QObject
     /// to the "UDPNotifyPort" in an OSD dialog.
     UDPNotify      *udpnotify;
     QStringList     lastSignalMsg;
+    QTime           lastSignalMsgTime;
     QMutex          osdlock;
 
     // LCD Info
@@ -412,6 +413,8 @@ class TV : public QObject
     static const int kMuteTimeout;   ///< Channel changing mute timeout in msec
     static const int kLCDTimeout;    ///< Timeout for updating LCD info in msec
     static const int kBrowseTimeout; ///< Timeout for browse mode exit in msec
+    /// Timeout after last Signal Monitor message for ignoring OSD when exiting.
+    static const int kSMExitTimeout;
     static const int kChannelKeysMax;///< When to start discarding early keys
 };
 

@@ -812,14 +812,20 @@ bool TVRec::StartRecorderPost(DummyDTVRecorder *dummyrec, bool livetv)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "StartRecorderPost() -- failed");
-        if (livetv)
+        QString common("TVRec: StartRecorderPost(): ");
+        if (abortRecordingStart)
+            VERBOSE(VB_IMPORTANT, common + "canceled");
+        else
         {
-            QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
-            MythEvent me(message);
-            gContext->dispatch(me);
+            VERBOSE(VB_IMPORTANT, common + "aborting recording");
+            if (livetv)
+            {
+                QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
+                MythEvent me(message);
+                gContext->dispatch(me);
+            }
         }
-        else if (rbuffer)
+        if (!livetv && rbuffer)
         {
             delete rbuffer;
             rbuffer = NULL;
@@ -876,6 +882,9 @@ bool TVRec::StartRecorderPost(DummyDTVRecorder *dummyrec, bool livetv)
  */
 void TVRec::HandleStateChange(void)
 {
+    if (startingRecording)
+        AbortStartRecorderThread();
+
     QMutexLocker lock(&stateChangeLock);
 
     TVState nextState = internalState;
@@ -897,6 +906,7 @@ void TVRec::HandleStateChange(void)
     {
         VERBOSE(VB_IMPORTANT, "TVRec::HandleStateChange(): "
                 "Null transition" + transMsg);
+        changeState = false;
         return;
     }
 
@@ -907,9 +917,6 @@ void TVRec::HandleStateChange(void)
         errored = true;
         return;
     }
-
-    if (startingRecording)
-        AbortStartRecorderThread();
 
     // Handle different state transitions
     if (TRANSITION(kState_None, kState_WatchingLiveTV))
