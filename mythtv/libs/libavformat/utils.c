@@ -809,6 +809,11 @@ static int64_t lsb2full(int64_t lsb, int64_t last_ts, int lsb_bits){
     return  ((lsb - delta)&mask) + delta;
 }
 
+static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits){
+    int64_t mask = (lsb_bits < 64) ? (1LL<<lsb_bits)-1 : -1LL;
+    return  ((lsb - base_ts)&mask);
+}
+
 static void compute_pkt_fields(AVFormatContext *s, AVStream *st, 
                                AVCodecParserContext *pc, AVPacket *pkt)
 {
@@ -821,7 +826,18 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
         if(pkt->dts != AV_NOPTS_VALUE)
             pkt->dts= lsb2full(pkt->dts, st->cur_dts, st->pts_wrap_bits);
     }
-*/    
+*/
+
+    if(s->start_time != AV_NOPTS_VALUE){
+        int64_t st1 = av_rescale(s->start_time,
+                st->time_base.den,
+                AV_TIME_BASE * (int64_t)st->time_base.num);
+        if(pkt->pts != AV_NOPTS_VALUE)
+            pkt->pts= lsb3full(pkt->pts, st1, st->pts_wrap_bits);
+        if(pkt->dts != AV_NOPTS_VALUE)
+            pkt->dts= lsb3full(pkt->dts, st1, st->pts_wrap_bits);
+    }
+   
     if (pkt->duration == 0) {
         compute_frame_duration(&num, &den, st, pc, pkt);
         if (den && num) {
@@ -1587,6 +1603,14 @@ int av_seek_frame(AVFormatContext *s, int stream_index, int64_t timestamp, int f
         st= s->streams[stream_index];
        /* timestamp for default must be expressed in AV_TIME_BASE units */
         timestamp = av_rescale(timestamp, st->time_base.den, AV_TIME_BASE * (int64_t)st->time_base.num);
+        // compensate for start time adjust
+        if(s->start_time != AV_NOPTS_VALUE){
+            int64_t st1 = av_rescale(s->start_time,
+                    st->time_base.den,
+                    AV_TIME_BASE * (int64_t)st->time_base.num);
+            if(timestamp != AV_NOPTS_VALUE)
+                timestamp= lsb3full(timestamp, -st1, st->pts_wrap_bits);
+        }
     }
     st= s->streams[stream_index];
 
@@ -1743,6 +1767,8 @@ static void av_estimate_timings_from_pts(AVFormatContext *ic)
     /* flush packet queue */
     flush_packet_queue(ic);
 
+    memset(&pkt1, 0, sizeof(pkt1));
+
     for(i=0;i<ic->nb_streams;i++) {
         st = ic->streams[i];
         if (st->parser) {
@@ -1812,7 +1838,7 @@ static void av_estimate_timings_from_pts(AVFormatContext *ic)
         st = ic->streams[pkt->stream_index];
         if (pkt->pts != AV_NOPTS_VALUE) {
             end_time = pkt->pts;
-            duration = end_time - st->start_time;
+            duration = lsb3full(end_time,st->start_time,st->pts_wrap_bits);
             if (duration > 0) {
                 if (st->duration == AV_NOPTS_VALUE ||
                     st->duration < duration)
@@ -1862,7 +1888,6 @@ void av_estimate_timings(AVFormatContext *ic)
     }
     av_update_stream_timings(ic);
 
-#if 0
     {
         int i;
         AVStream *st;
@@ -1877,7 +1902,6 @@ void av_estimate_timings(AVFormatContext *ic)
                (double)ic->duration / AV_TIME_BASE,
                ic->bit_rate / 1000);
     }
-#endif
 }
 
 static int has_codec_parameters(AVCodecContext *enc)
