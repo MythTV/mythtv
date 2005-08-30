@@ -2209,8 +2209,11 @@ void MythContext::EventSocketConnected(void)
 
 void MythContext::EventSocketClosed(void)
 {
-            VERBOSE(VB_IMPORTANT, QString("Event socket closed. "
-                    "No connection to the backend."));
+    VERBOSE(VB_IMPORTANT, QString("Event socket closed. "
+            "No connection to the backend."));
+
+    delete d->serverSock;
+    d->serverSock = NULL;
 }
 
 void MythContext::addListener(QObject *obj)
