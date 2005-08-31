@@ -229,7 +229,8 @@ bool PlaybackSock::EncoderIsRecording(int capturecardnum, const ProgramInfo *pgi
     return ret;
 }
 
-int PlaybackSock::StartRecording(int capturecardnum, const ProgramInfo *pginfo)
+RecStatusType PlaybackSock::StartRecording(int capturecardnum, 
+                                           const ProgramInfo *pginfo)
 {
     QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);
     strlist << "START_RECORDING";
@@ -237,8 +238,7 @@ int PlaybackSock::StartRecording(int capturecardnum, const ProgramInfo *pginfo)
 
     SendReceiveStringList(strlist);
 
-    int ret = strlist[0].toInt();
-    return ret;
+    return RecStatusType(strlist[0].toInt());
 }
 
 void PlaybackSock::RecordPending(int capturecardnum, const ProgramInfo *pginfo,

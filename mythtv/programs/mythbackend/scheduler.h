@@ -1,7 +1,6 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
-class ProgramInfo;
 class EncoderLink;
 class MainServer;
 
@@ -13,6 +12,7 @@ class MainServer;
 #include <qobject.h>
 
 #include "scheduledrecording.h"
+#include "programinfo.h"
 
 using namespace std;
 
@@ -50,6 +50,9 @@ class Scheduler : public QObject
     bool HasConflicts(void) { return hasconflicts; }
 
     void SetMainServer(MainServer *ms);
+
+    void SlaveConnected(ProgramList &slavelist);
+    void SlaveDisconnected(int cardid);
 
   protected:
     void RunScheduler(void);

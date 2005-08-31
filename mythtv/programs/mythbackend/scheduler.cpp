@@ -375,8 +375,11 @@ void Scheduler::UpdateRecStatus(ProgramInfo *pginfo)
         ProgramInfo *p = *dreciter;
         if (p->IsSameProgramTimeslot(*pginfo))
         {
-            p->recstatus = pginfo->recstatus;
-            ScheduledRecording::signalChange(0);
+            if (p->recstatus != pginfo->recstatus)
+            {
+                p->recstatus = pginfo->recstatus;
+                p->AddHistory(true);
+            }
             return;
         }
     }
@@ -398,8 +401,7 @@ bool Scheduler::ReactivateRecording(ProgramInfo *pginfo)
         if (p->recordid == pginfo->recordid &&
             p->IsSameProgramTimeslot(*pginfo))
         {
-            if (p->recstatus != rsRecorded &&
-                p->recstatus != rsRecording &&
+            if (p->recstatus != rsRecording &&
                 p->recstatus != rsWillRecord)
             {
                 p->reactivate = 1;
@@ -410,6 +412,82 @@ bool Scheduler::ReactivateRecording(ProgramInfo *pginfo)
     }
 
     return false;
+}
+
+void Scheduler::SlaveConnected(ProgramList &slavelist)
+{
+    QMutexLocker lockit(reclist_lock);
+
+    ProgramInfo *sp;
+    for (sp = slavelist.first(); sp; sp = slavelist.next())
+    {
+        bool found = false;
+
+        RecIter ri = reclist.begin();
+        for ( ; ri != reclist.end(); ri++)
+        {
+            ProgramInfo *rp = *ri;
+
+            if (sp->inputid &&
+                sp->startts == rp->startts &&
+                sp->chansign == rp->chansign &&
+                sp->title == rp->title)
+            {
+                if (sp->cardid == rp->cardid)
+                {
+                    found = true;
+                    rp->recstatus = rsRecording;
+                    rp->AddHistory(false);
+                    VERBOSE(VB_ALL, QString("setting %1/%2/\"%3\" as "
+                                            "recording")
+                            .arg(sp->cardid).arg(sp->chansign).arg(sp->title));
+                }
+                else
+                {
+                    VERBOSE(VB_ALL, QString("%1/%2/\"%3\" is already "
+                                            "recording on card %4")
+                            .arg(sp->cardid).arg(sp->chansign).arg(sp->title)
+                            .arg(rp->cardid));
+                }
+            }
+            else if (sp->cardid == rp->cardid &&
+                     rp->recstatus == rsRecording)
+            {
+                rp->recstatus = rsAborted;
+                rp->AddHistory(false);
+                VERBOSE(VB_ALL, QString("setting %1/%2/\"%3\" as aborted")
+                        .arg(rp->cardid).arg(rp->chansign).arg(rp->title));
+            }
+        }
+
+        if (sp->inputid && !found)
+        {
+            reclist.push_back(new ProgramInfo(*sp));
+            sp->AddHistory(false);
+            VERBOSE(VB_ALL, QString("adding %1/%2/\"%3\" as recording")
+                    .arg(sp->cardid).arg(sp->chansign).arg(sp->title));
+        }
+    }
+}
+
+void Scheduler::SlaveDisconnected(int cardid)
+{
+    QMutexLocker lockit(reclist_lock);
+
+    RecIter ri = reclist.begin();
+    for ( ; ri != reclist.end(); ri++)
+    {
+        ProgramInfo *rp = *ri;
+
+        if (rp->cardid == cardid &&
+            rp->recstatus == rsRecording)
+        {
+            rp->recstatus = rsAborted;
+            rp->AddHistory(false);
+            VERBOSE(VB_ALL, QString("setting %1/%2/\"%3\" as aborted")
+                    .arg(rp->cardid).arg(rp->chansign).arg(rp->title));
+        }
+    }
 }
 
 void Scheduler::PruneOldRecords(void)
@@ -429,7 +507,10 @@ void Scheduler::PruneOldRecords(void)
         else
         {
             if (p->recstatus == rsRecording && p->recendts < schedTime)
+            {
                 p->recstatus = rsRecorded;
+                p->oldrecstatus = p->recstatus;
+            }
             dreciter++;
         }
     }
@@ -718,6 +799,10 @@ void Scheduler::PruneRedundants(void)
             p->cardid = 0;
             p->inputid = 0;
         }
+        if (p->recstatus != rsWillRecord &&
+            p->oldrecstatus == rsAborted)
+            p->recstatus = p->oldrecstatus;
+        p->reactivate = 0;
 
         // Check for redundant against last non-deleted
         if (lastp == NULL || lastp->recordid != p->recordid ||
@@ -783,7 +868,10 @@ void Scheduler::getAllPending(RecList *retList)
     {
         ProgramInfo *p = *i;
         if (p->recstatus == rsRecording && p->recendts < now)
+        {
             p->recstatus = rsRecorded;
+            p->oldrecstatus = p->recstatus;
+        }
         retList->push_back(new ProgramInfo(*p));
     }
     retList->sort(comp_timechannel);
@@ -805,7 +893,10 @@ void Scheduler::getAllPending(QStringList &strList)
     {
         ProgramInfo *p = *i;
         if (p->recstatus == rsRecording && p->recendts < now)
+        {
             p->recstatus = rsRecorded;
+            p->oldrecstatus = p->recstatus;
+        }
         retList->push_back(new ProgramInfo(*p));
     }
     retList->sort(comp_timechannel);
@@ -879,6 +970,17 @@ void Scheduler::RunScheduler(void)
 
     struct timeval fillstart, fillend;
     float matchTime, placeTime;
+
+    // Mark anything that was recording as aborted.  We'll fix it up.
+    // if possible, after the slaves connect and we start scheduling.
+    MSqlQuery query(MSqlQuery::SchedCon());
+    query.prepare("UPDATE oldrecorded SET recstatus = :RSABORTED "
+                  "  WHERE recstatus = :RSRECORDING");
+    query.bindValue(":RSABORTED", rsAborted);
+    query.bindValue(":RSRECORDING", rsRecording);
+    query.exec();
+    if (!query.isActive())
+        MythContext::DBError("UpdateAborted", query);
 
     // wait for slaves to connect
     sleep(2);
@@ -987,7 +1089,7 @@ void Scheduler::RunScheduler(void)
       }
 
         for ( ; startIter != reclist.end(); startIter++)
-            if ((*startIter)->spread < 1)
+            if ((*startIter)->recstatus != (*startIter)->oldrecstatus)
                 break;
 
         curtime = QDateTime::currentDateTime();
@@ -1001,12 +1103,9 @@ void Scheduler::RunScheduler(void)
 
             if (nextRecording->recstatus != rsWillRecord)
             {
-                if (nextRecording->spread < 1 &&
+                if (nextRecording->recstatus != nextRecording->oldrecstatus &&
                     nextRecording->recstartts <= curtime)
-                {
                     nextRecording->AddHistory(false);
-                    nextRecording->spread = 1;
-                }
                 continue;
             }
 
@@ -1026,7 +1125,6 @@ void Scheduler::RunScheduler(void)
                 QMutexLocker lockit(reclist_lock);
                 nextRecording->recstatus = rsTunerBusy;
                 nextRecording->AddHistory(true);
-                nextRecording->spread = 1;
                 statuschanged = true;
                 continue;
             }
@@ -1049,7 +1147,6 @@ void Scheduler::RunScheduler(void)
                 QMutexLocker lockit(reclist_lock);
                 nextRecording->recstatus = rsLowDiskSpace;
                 nextRecording->AddHistory(true);
-                nextRecording->spread = 1;
                 statuschanged = true;
                 continue;
             }
@@ -1068,7 +1165,6 @@ void Scheduler::RunScheduler(void)
                 QMutexLocker lockit(reclist_lock);
                 nextRecording->recstatus = rsTunerBusy;
                 nextRecording->AddHistory(true);
-                nextRecording->spread = 1;
                 statuschanged = true;
                 continue;
             }
@@ -1108,24 +1204,12 @@ void Scheduler::RunScheduler(void)
 
             QMutexLocker lockit(reclist_lock);
 
-            int retval = nexttv->StartRecording(nextRecording);
-            if (retval > 0)
-            {
+            nextRecording->recstatus = nexttv->StartRecording(nextRecording);
+            nextRecording->AddHistory(false);
+            if (nextRecording->recstatus == rsRecording)
                 msg = "Started recording";
-                nextRecording->recstatus = rsRecording;
-                //nextRecording->AddHistory(false);
-                nextRecording->spread = 1;
-            }
             else
-            {
                 msg = "Canceled recording"; 
-                if (retval < 0)
-                    nextRecording->recstatus = rsTunerBusy;
-                else
-                    nextRecording->recstatus = rsCancelled;
-                nextRecording->AddHistory(true);
-                nextRecording->spread = 1;
-            }
             statuschanged = true;
 
             msg += QString(" \"%1\" on channel: %2 on cardid: %3, "
@@ -1739,7 +1823,8 @@ void Scheduler::AddNewRecords(void) {
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid, program.category_type, "
 "program.airdate, program.stars, program.originalairdate, record.inactive, "
-"record.parentid, ") + progfindid + ", record.tsdefault " + QString(
+"record.parentid, ") + progfindid + ", record.tsdefault, "
+"oldrecstatus.recstatus " + QString(
 "FROM recordmatch "
 
 " INNER JOIN record ON (recordmatch.recordid = record.recordid) "
@@ -1749,6 +1834,10 @@ void Scheduler::AddNewRecords(void) {
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 " INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
 " INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
+" LEFT JOIN oldrecorded as oldrecstatus ON "
+"  ( oldrecstatus.station = channel.callsign AND "
+"    oldrecstatus.starttime = program.starttime AND "
+"    oldrecstatus.title = program.title ) "
 " LEFT JOIN oldrecorded ON "
 "  ( "
 "    record.dupmethod > 1 AND "
@@ -1833,7 +1922,12 @@ void Scheduler::AddNewRecords(void) {
             continue;
 
         ProgramInfo *p = new ProgramInfo;
-        p->recstatus = rsUnknown;
+        p->oldrecstatus = RecStatusType(result.value(37).toInt());
+        if (p->oldrecstatus == rsUnknown ||
+            p->oldrecstatus == rsAborted)
+            p->recstatus = rsUnknown;
+        else
+            p->recstatus = p->oldrecstatus;
         p->chanid = result.value(0).toString();
         p->sourceid = result.value(1).toInt();
         p->startts = result.value(2).toDateTime();
@@ -1908,10 +2002,15 @@ void Scheduler::AddNewRecords(void) {
             ProgramInfo *r = *rec;
             if (p->IsSameTimeslot(*r))
             {
-                if (r->reactivate > 0)
+                if (r->reactivate > 0 && r->reactivate <= 2)
                 {
-                    r->reactivate = 2;
+                    p->recstatus = rsUnknown;
                     p->reactivate = -1;
+                    r->reactivate = 2;
+                }
+                else if (r->recstatus == rsAborted)
+                {
+                    r->reactivate = 3;
                 }
                 else
                 {

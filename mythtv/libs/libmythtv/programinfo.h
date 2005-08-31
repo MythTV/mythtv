@@ -62,8 +62,8 @@ enum RecStatusType {
     rsTunerBusy = -8,
     rsLowDiskSpace = -7,
     rsCancelled = -6,
-    rsDeleted = -5,
-    rsStopped = -4,
+    //rsUnused = -5,
+    rsAborted = -4,
     rsRecorded = -3,
     rsRecording = -2,
     rsWillRecord = -1,
@@ -115,7 +115,8 @@ class ProgramInfo
     // Serializers
     void Save() const;
     void ToStringList(QStringList &list) const;
-    void ToMap(QMap<QString, QString> &progMap) const;
+    void ToMap(QMap<QString, QString> &progMap, 
+               bool showrerecord = false) const;
 
     // Used for scheduling recordings
     int IsProgramRecurring(void) const;
@@ -265,6 +266,7 @@ class ProgramInfo
     int startCol;
 
     RecStatusType recstatus;
+    RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;
     int numconflicts;
     int conflictpriority;

@@ -57,7 +57,7 @@ class EncoderLink
                             bool try_to_use_cache = false);
     bool MatchesRecording(const ProgramInfo *rec);
     void RecordPending(const ProgramInfo *rec, int secsleft);
-    int StartRecording(const ProgramInfo *rec);
+    RecStatusType StartRecording(const ProgramInfo *rec);
     void StopRecording(void);
     void FinishRecording(void);
     void FrontendReady(void);

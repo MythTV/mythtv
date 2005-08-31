@@ -9,10 +9,10 @@
 #include <qmap.h>
 #include <qstringlist.h>
 
+#include "programinfo.h"
 #include "tv.h"
 
 class QSocket;
-class ProgramInfo;
 class RingBuffer;
 class NuppelVideoRecorder;
 class RecorderBase;
@@ -69,7 +69,7 @@ class TVRec
     bool Init(void);
 
     void RecordPending(const ProgramInfo *rcinfo, int secsleft);
-    int StartRecording(const ProgramInfo *rcinfo);
+    RecStatusType StartRecording(const ProgramInfo *rcinfo);
 
     void StopRecording(void);
     /// \brief Tells TVRec to finush the current recording as soon as possible.

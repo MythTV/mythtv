@@ -298,9 +298,13 @@ ProgramInfo *TVRec::GetRecording(void)
     ProgramInfo *tmppginfo = NULL;
 
     if (curRecording && !changeState)
+    {
         tmppginfo = new ProgramInfo(*curRecording);
+        tmppginfo->recstatus = rsRecording;
+    }
     else
         tmppginfo = new ProgramInfo();
+    tmppginfo->cardid = m_capturecardnum;
 
     return tmppginfo;
 }
@@ -337,9 +341,9 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft)
  *  \sa EncoderLink::StartRecording(const ProgramInfo*)
  *      RecordPending(const ProgramInfo*, int), StopRecording()
  */
-int TVRec::StartRecording(const ProgramInfo *rcinfo)
+RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 {
-    int retval = 0;
+    RecStatusType retval = rsAborted;
 
     recordPending = false;
     askAllowRecording = false;
@@ -408,7 +412,7 @@ int TVRec::StartRecording(const ProgramInfo *rcinfo)
         }
         
         ChangeState(kState_RecordingOnly);
-        retval = 1;
+        retval = rsRecording;
     }
     else if (!cancelNextRecording)
     {
@@ -426,7 +430,7 @@ int TVRec::StartRecording(const ProgramInfo *rcinfo)
                     .arg(curRecording->endts.toString()));
         }
 
-        retval = -1;
+        retval = rsTunerBusy;
     }
 
     if (cancelNextRecording)

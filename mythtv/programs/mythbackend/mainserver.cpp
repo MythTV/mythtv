@@ -744,6 +744,20 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         pbs->setAsSlaveBackend();
         pbs->setIP(commands[3]);
 
+        if (m_sched)
+        {
+            ProgramInfo pinfo;
+            ProgramList slavelist;
+            QStringList::Iterator sit = slist.at(1);
+            while (sit != slist.end())
+            {
+                if (!pinfo.FromStringList(slist, sit))
+                    break;
+                slavelist.append(new ProgramInfo(pinfo));
+            }
+            m_sched->SlaveConnected(slavelist);
+        }
+
         QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
         for (; iter != encoderList->end(); ++iter)
         {
@@ -1438,7 +1452,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             if (num > 0)
             {
                 (*encoderList)[num]->StopRecording();
-                pginfo->recstatus = rsStopped;
+                pginfo->recstatus = rsRecorded;
                 if (m_sched)
                     m_sched->UpdateRecStatus(pginfo);
             }
@@ -1458,7 +1472,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
             // recording has stopped and the status should be updated.
             // Continue so that the master can try to update the endtime
             // of the file is in a shared directory.
-            pginfo->recstatus = rsStopped;
+            pginfo->recstatus = rsRecorded;
             if (m_sched)
                 m_sched->UpdateRecStatus(pginfo);
         }
@@ -1486,7 +1500,7 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
 
             if (ismaster)
             {
-                pginfo->recstatus = rsStopped;
+                pginfo->recstatus = rsRecorded;
                 if (m_sched)
                     m_sched->UpdateRecStatus(pginfo);
             }
@@ -1624,7 +1638,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
             if (num > 0)
             {
                 (*encoderList)[num]->StopRecording();
-                pginfo->recstatus = rsDeleted;
+                pginfo->recstatus = rsRecorded;
                 if (m_sched)
                     m_sched->UpdateRecStatus(pginfo);
             }
@@ -1664,7 +1678,7 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
             if (ismaster)
             {
-                pginfo->recstatus = rsDeleted;
+                pginfo->recstatus = rsRecorded;
                 if (m_sched)
                     m_sched->UpdateRecStatus(pginfo);
             }
@@ -2724,7 +2738,7 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
         ProgramInfo *pginfo = new ProgramInfo();
         pginfo->FromStringList(slist, 2);
  
-        retlist << QString::number((int)enc->StartRecording(pginfo));
+        retlist << QString::number(enc->StartRecording(pginfo));
 
         delete pginfo;
     }
@@ -3376,7 +3390,11 @@ void MainServer::endConnection(RefSocket *socket)
                 {
                     EncoderLink *elink = iter.data();
                     if (elink->GetSocket() == pbs)
+                    {
                         elink->SetSocket(NULL);
+                        if (m_sched)
+                            m_sched->SlaveDisconnected(elink->GetCardID());
+                    }
                 }
                 if (m_sched)
                     m_sched->Reschedule(0);
@@ -3638,6 +3656,17 @@ void MainServer::reconnectTimeout(void)
     masterServerSock->Lock();
 
     QStringList strlist = str;
+
+    QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
+    for (; iter != encoderList->end(); ++iter)
+    {
+        EncoderLink *elink = iter.data();
+        elink->CancelNextRecording();
+        ProgramInfo *pinfo = elink->GetRecording();
+        pinfo->ToStringList(strlist);
+        delete pinfo;
+    }
+
     WriteStringList(masterServerSock, strlist);
     ReadStringList(masterServerSock, strlist);
 

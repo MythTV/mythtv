@@ -628,7 +628,7 @@ void PreviousBox::updateInfo(QPainter *p)
         if (container)
         {  
             QMap<QString, QString> infoMap;
-            pi->ToMap(infoMap);
+            pi->ToMap(infoMap, true);
             container->ClearAllText();
             container->SetText(infoMap);
         }

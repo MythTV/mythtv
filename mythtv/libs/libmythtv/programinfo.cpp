@@ -83,6 +83,7 @@ ProgramInfo::ProgramInfo(void)
 
 
     recstatus = rsUnknown;
+    oldrecstatus = rsUnknown;
     savedrecstatus = rsUnknown;
     numconflicts = 0;
     conflictpriority = -1000;
@@ -171,6 +172,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     availableStatus = other.availableStatus;
 
     recstatus = other.recstatus;
+    oldrecstatus = other.oldrecstatus;
     savedrecstatus = other.savedrecstatus;
     numconflicts = other.numconflicts;
     conflictpriority = other.conflictpriority;
@@ -393,11 +395,13 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     return true;
 }
 
-/** \fn ProgramInfo::ToMap(QMap<QString, QString> &progMap) const
+/** \fn ProgramInfo::ToMap(QMap<QString, QString> &progMap,
+ *                         bool showrerecord) const
  *  \brief Converts ProgramInfo into QString QMap containing each field
  *         in ProgramInfo converted into lockalized strings.
  */
-void ProgramInfo::ToMap(QMap<QString, QString> &progMap) const
+void ProgramInfo::ToMap(QMap<QString, QString> &progMap, 
+                        bool showrerecord) const
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
@@ -510,7 +514,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap) const
         {
             progMap["rec_str"] += " -- ";
         }
-        if (recstatus == rsRecorded && !duplicate)
+        if (showrerecord && recstatus == rsRecorded && !duplicate)
             progMap["rec_str"] += QObject::tr("Re-Record");
         else
             progMap["rec_str"] += RecStatusText();
@@ -2154,11 +2158,11 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
  */
 void ProgramInfo::AddHistory(bool resched)
 {
-    bool dup = (recstatus == rsRecording || 
-                recstatus == rsRecorded ||
+    bool dup = (recstatus == rsRecorded ||
                 recstatus == rsNeverRecord);
     RecStatusType rs = (recstatus == rsCurrentRecording) ?
         rsPreviousRecording : recstatus;
+    oldrecstatus = recstatus;
 
     MSqlQuery result(MSqlQuery::InitCon());
 
@@ -2359,10 +2363,8 @@ QString ProgramInfo::RecStatusChar(void) const
 {
     switch (recstatus)
     {
-    case rsDeleted:
-        return QObject::tr("D", "RecStatusChar rsDeleted");
-    case rsStopped:
-        return QObject::tr("S", "RecStatusChar rsStopped");
+    case rsAborted:
+        return QObject::tr("A", "RecStatusChar rsAborted");
     case rsRecorded:
         return QObject::tr("R", "RecStatusChar rsRecorded");
     case rsRecording:
@@ -2413,10 +2415,8 @@ QString ProgramInfo::RecStatusText(void) const
     {
         switch (recstatus)
         {
-        case rsDeleted:
-            return QObject::tr("Deleted");
-        case rsStopped:
-            return QObject::tr("Stopped");
+        case rsAborted:
+            return QObject::tr("Aborted");
         case rsRecorded:
             return QObject::tr("Recorded");
         case rsRecording:
@@ -2480,12 +2480,8 @@ QString ProgramInfo::RecStatusDesc(void) const
         case rsRecorded:
             message = QObject::tr("This showing was recorded.");
             break;
-        case rsStopped:
-            message = QObject::tr("This showing was recorded but was stopped "
-                                   "before recording was completed.");
-            break;
-        case rsDeleted:
-            message = QObject::tr("This showing was recorded but was deleted "
+        case rsAborted:
+            message = QObject::tr("This showing was recorded but was aborted "
                                    "before recording was completed.");
             break;
         default:
@@ -3025,7 +3021,7 @@ void ProgramInfo::ShowRecordingDialog(void)
 
     if (recstartts < now && recendts > now)
     {
-        if (recstatus == rsStopped || recstatus == rsDeleted)
+        if (recstatus != rsRecording)
         {
             diag.AddButton(QObject::tr("Reactivate"));
             react = button++;

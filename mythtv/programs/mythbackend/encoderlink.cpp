@@ -396,9 +396,9 @@ bool EncoderLink::HasEnoughFreeSpace(const ProgramInfo *rec, bool try_to_use_cac
  *          -1 if TVRec is busy doing something else, 0 otherwise.
  *  \sa RecordPending(const ProgramInfo*, int), StopRecording()
  */
-int EncoderLink::StartRecording(const ProgramInfo *rec)
+RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
 {
-    int retval = 0;
+    RecStatusType retval = rsAborted;
 
     endRecordingTime = rec->recendts;
     startRecordingTime = rec->recstartts;
@@ -414,7 +414,7 @@ int EncoderLink::StartRecording(const ProgramInfo *rec)
                         "but the backend is not there anymore\n")
                 .arg(m_capturecardnum));
 
-    if (!retval)
+    if (retval != rsRecording)
     {
         endRecordingTime = QDateTime::currentDateTime().addDays(-2);
         startRecordingTime = endRecordingTime;
