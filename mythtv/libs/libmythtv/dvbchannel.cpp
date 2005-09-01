@@ -554,7 +554,7 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
     // We are now waiting for a new PMT to forward to Access Control (dvbcam).
     SetPMT(NULL);
 
-    if (!TuneTransport((dvb_channel_t&)(channel), force_reset, 30000))
+    if (!TuneTransport(channel, force_reset, 30000))
         return false;
 
     CHANNEL("Frequency tuning successful.");
@@ -570,9 +570,9 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
  *  \param channel Info on transport to tune to
  *  \param all     If true frequency tuning is done even if not strictly needed.
  */
-bool DVBChannel::TuneTransport(dvb_channel_t& channel, bool all, int)
+bool DVBChannel::TuneTransport(const dvb_channel_t& channel, bool all, int)
 {
-    DVBTuning& tuning = channel.tuning;
+    DVBTuning tuning = channel.tuning;
 
     if (fd_frontend < 0)
     {

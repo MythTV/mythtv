@@ -92,7 +92,7 @@ class DVBChannel : public QObject, public ChannelBase
     bool CheckModulation(fe_modulation_t modulation) const;
     bool CheckCodeRate(fe_code_rate_t rate) const;
 
-    bool TuneTransport(dvb_channel_t&, bool, int);
+    bool TuneTransport(const dvb_channel_t&, bool, int);
     bool TuneQPSK(DVBTuning& tuning, bool reset, bool& havetuned);
     bool TuneATSC(DVBTuning& tuning, bool reset, bool& havetuned);
     bool TuneQAM( DVBTuning& tuning, bool reset, bool& havetuned);
