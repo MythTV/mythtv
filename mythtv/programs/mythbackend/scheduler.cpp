@@ -1680,10 +1680,6 @@ void Scheduler::UpdateMatches(int recordid) {
 "      ((record.type = %7) " // weekslotrecord
 "       OR"
 "       ((TO_DAYS(record.startdate) = TO_DAYS(program.starttime)) " // date matches
-"        AND "
-"        (TIME_TO_SEC(record.endtime) = TIME_TO_SEC(program.endtime)) "
-"        AND "
-"        (TO_DAYS(record.enddate) = TO_DAYS(program.endtime)) "
 "        )"
 "       )"
 "      )"
