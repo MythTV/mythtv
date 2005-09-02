@@ -2828,7 +2828,10 @@ bool fillData(QValueList<Source> &sourcelist)
             QDate qCurrentDate = QDate::currentDate();
 
             if (maxDays == 1)
+            {
                 refresh_today = true;
+                refresh_tomorrow = false;
+            }
 
             if (refresh_today || refresh_all)
             {
