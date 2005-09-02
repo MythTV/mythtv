@@ -2026,6 +2026,8 @@ void Scheduler::AddNewRecords(void) {
         // Check for rsCurrentRecording and rsPreviousRecording
         if (p->rectype == kDontRecord)
             p->recstatus = rsDontRecord;
+        else if (result.value(15).toInt() && !p->reactivate)
+            p->recstatus = rsPreviousRecording;
         else if (p->rectype != kSingleRecord &&
                  p->rectype != kOverrideRecord &&
                  !p->reactivate &&
@@ -2033,9 +2035,6 @@ void Scheduler::AddNewRecords(void) {
         {
             if (p->dupin == kDupsNewEpi && p->repeat)
                 p->recstatus = rsRepeat;
-
-            if (result.value(15).toInt())
-                p->recstatus = rsPreviousRecording;
 
             if (((p->dupin & kDupsInOldRecorded) || (p->dupin == kDupsNewEpi)) &&
                 result.value(10).toInt())
