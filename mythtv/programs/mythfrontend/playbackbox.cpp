@@ -626,7 +626,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
 
         int flags = 0;
         if (curitem)
-            curitem->programflags;
+            flags = curitem->programflags;
 
         UIImageType *itype;
         itype = (UIImageType *)container->GetType("commflagged");
