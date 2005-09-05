@@ -385,6 +385,33 @@ void Scheduler::UpdateRecStatus(ProgramInfo *pginfo)
     }
 }
 
+void Scheduler::UpdateRecStatus(int cardid, const QString &chanid, 
+                                const QDateTime &startts, 
+                                RecStatusType recstatus)
+{
+    VERBOSE(VB_ALL, QString("Received U_R_S: %1 %2 %3 %4")
+            .arg(cardid).arg(chanid).arg(startts.toString(Qt::ISODate)).arg(recstatus));
+
+    QMutexLocker lockit(reclist_lock);
+
+    RecIter dreciter = reclist.begin();
+    for (; dreciter != reclist.end(); ++dreciter)
+    {
+        ProgramInfo *p = *dreciter;
+        if (p->cardid == cardid &&
+            p->chanid == chanid &&
+            p->startts == startts)
+        {
+            if (p->recstatus != recstatus)
+            {
+                p->recstatus = recstatus;
+                p->AddHistory(true);
+            }
+            return;
+        }
+    }
+}
+
 bool Scheduler::ReactivateRecording(ProgramInfo *pginfo)
 {
     QDateTime now = QDateTime::currentDateTime();
@@ -506,11 +533,6 @@ void Scheduler::PruneOldRecords(void)
         }
         else
         {
-            if (p->recstatus == rsRecording && p->recendts < schedTime)
-            {
-                p->recstatus = rsRecorded;
-                p->oldrecstatus = p->recstatus;
-            }
             dreciter++;
         }
     }
@@ -867,11 +889,6 @@ void Scheduler::getAllPending(RecList *retList)
     for (; i != reclist.end(); i++)
     {
         ProgramInfo *p = *i;
-        if (p->recstatus == rsRecording && p->recendts < now)
-        {
-            p->recstatus = rsRecorded;
-            p->oldrecstatus = p->recstatus;
-        }
         retList->push_back(new ProgramInfo(*p));
     }
     retList->sort(comp_timechannel);
@@ -892,11 +909,6 @@ void Scheduler::getAllPending(QStringList &strList)
     for (; i != reclist.end(); i++)
     {
         ProgramInfo *p = *i;
-        if (p->recstatus == rsRecording && p->recendts < now)
-        {
-            p->recstatus = rsRecorded;
-            p->oldrecstatus = p->recstatus;
-        }
         retList->push_back(new ProgramInfo(*p));
     }
     retList->sort(comp_timechannel);

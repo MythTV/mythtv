@@ -584,8 +584,13 @@ void MainServer::customEvent(QCustomEvent *e)
         if (me->Message().left(11) == "AUTO_EXPIRE")
         {
             QStringList tokens = QStringList::split(" ", me->Message());
-            QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
+            if (tokens.size() != 3)
+            {
+                VERBOSE(VB_ALL, "Bad AUTO_EXPIRE message");
+                return;
+            }
 
+            QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
             ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(tokens[1],
                                                                      startts);
             if (pinfo)
@@ -604,11 +609,38 @@ void MainServer::customEvent(QCustomEvent *e)
 
         if (me->Message().left(21) == "RESCHEDULE_RECORDINGS")
         {
-            QStringList tokens = QStringList::split(" ", me->Message());
-            int recordid = tokens[1].toInt();
             if (m_sched)
             {
+                QStringList tokens = QStringList::split(" ", me->Message());
+                if (tokens.size() != 2)
+                {
+                    VERBOSE(VB_ALL, "Bad RESCHEDULE_RECORDINGS message");
+                    return;
+                }
+
+                int recordid = tokens[1].toInt();
                 m_sched->Reschedule(recordid);
+                return;
+            }
+        }
+
+        if (me->Message().left(23) == "UPDATE_RECORDING_STATUS")
+        {
+            if (m_sched)
+            {
+                QStringList tokens = QStringList::split(" ", me->Message());
+                if (tokens.size() != 5)
+                {
+                    VERBOSE(VB_ALL, "Bad UPDATE_RECORDING_STATUS message");
+                    return;
+                }
+
+                int cardid = tokens[1].toInt();
+                QString chanid = tokens[2];
+                QDateTime startts = QDateTime::fromString(tokens[3], 
+                                                          Qt::ISODate);
+                RecStatusType recstatus = RecStatusType(tokens[4].toInt());
+                m_sched->UpdateRecStatus(cardid, chanid, startts, recstatus);
                 return;
             }
         }

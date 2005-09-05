@@ -32,6 +32,8 @@ class Scheduler : public QObject
     void FillEncoderFreeSpaceCache(void);
 
     void UpdateRecStatus(ProgramInfo *pginfo);
+    void UpdateRecStatus(int cardid, const QString &chanid, 
+                         const QDateTime &startts, RecStatusType recstatus);
     bool ReactivateRecording(ProgramInfo *pginfo);
 
     RecList *getAllPending(void) { return &reclist; }

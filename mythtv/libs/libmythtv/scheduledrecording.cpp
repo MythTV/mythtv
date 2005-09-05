@@ -451,8 +451,7 @@ void ScheduledRecording::signalChange(int recordid)
 
 void ScheduledRecording::doneRecording(ProgramInfo& proginfo) 
 {
-    if (getRecordingType() == kFindOneRecord)
-        remove();
+    proginfo.recstatus = rsRecorded;
 
     QString msg;
   
@@ -464,8 +463,15 @@ void ScheduledRecording::doneRecording(ProgramInfo& proginfo)
     gContext->LogEntry("scheduler", LP_NOTICE, "Finished recording", 
                        msg);
 
-    proginfo.recstatus = rsRecorded;
-    proginfo.AddHistory();
+    MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4")
+                 .arg(proginfo.cardid)
+                 .arg(proginfo.chanid)
+                 .arg(proginfo.startts.toString(Qt::ISODate))
+                 .arg(proginfo.recstatus));
+    gContext->dispatch(me);
+
+    if (getRecordingType() == kFindOneRecord)
+        remove();
 }
 
 void ScheduledRecording::runProgList(void)
