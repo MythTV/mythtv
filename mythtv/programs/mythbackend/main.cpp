@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <cerrno>
 
+#include "mythconfig.h"
 #ifdef CONFIG_DARWIN
     #include <sys/aio.h>    // O_SYNC
 #endif
@@ -18,7 +19,6 @@
 #include <fstream>
 using namespace std;
 
-#include "mythconfig.h"
 #include "tv.h"
 #include "autoexpire.h"
 #include "scheduler.h"
