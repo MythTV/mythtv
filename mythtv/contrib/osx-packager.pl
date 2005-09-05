@@ -158,7 +158,7 @@ our %depend = (
   =>
   {
     'url'
-    =>  'http://unc.dl.sf.net/sourceforge/libexif/libexif-0.5.12.tar.gz',
+    =>  'http://unc.dl.sf.net/sourceforge/libexif/libexif-0.6.12.tar.gz',
     'conf'
     =>  [
           '--disable-nls',
