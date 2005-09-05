@@ -19,6 +19,7 @@ using namespace std;
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <netinet/in.h>    // For sockaddr_in on OS X
 
 #define DEBUG_DBOX2_TS 
 //#define DEBUG_DBOX2_PMT 
