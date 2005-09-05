@@ -14,12 +14,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "../../config.h"
-#ifndef CONFIG_DARWIN
-    #ifdef HAVE_SYS_SOUNDCARD_H
-        #include <sys/soundcard.h>
-    #elif HAVE_SOUNDCARD_H
-        #include <soundcard.h>
-    #endif
+#ifdef HAVE_SYS_SOUNDCARD_H
+    #include <sys/soundcard.h>
+#elif HAVE_SOUNDCARD_H
+    #include <soundcard.h>
 #endif
 #include <sys/ioctl.h>
 
@@ -858,7 +856,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             if (audiodevice.right(4) == audiooutputdevice.right(4) &&
                 (cardtype == "V4L" || cardtype == "MJPEG")) //they match
             {
-#ifdef CONFIG_DARWIN
+#if !defined(HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SOUNDCARD_H)
                 VERBOSE(VB_ALL, QString("Audio device files are not "
                                         "supported on this Unix."));
 #else
