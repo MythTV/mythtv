@@ -5,12 +5,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "mythconfig.h"
-#ifndef CONFIG_DARWIN
-    #ifdef HAVE_SYS_SOUNDCARD_H
-        #include <sys/soundcard.h>
-    #elif HAVE_SOUNDCARD_H
-        #include <soundcard.h>
-    #endif
+#ifdef HAVE_SYS_SOUNDCARD_H
+    #include <sys/soundcard.h>
+#elif HAVE_SOUNDCARD_H
+    #include <soundcard.h>
 #endif
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -614,7 +612,7 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
     int frag, blocksize = 4096;
     int tmp;
 
-#ifdef CONFIG_DARWIN
+#if !defined (HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SOUNDCARD_H)
     VERBOSE(VB_IMPORTANT, QString("NVR::AudioInit() This Unix doesn't support"
                                   " device files for audio access. Skipping"));
     return 1;
@@ -2076,7 +2074,7 @@ void *NuppelVideoRecorder::VbiThread(void *param)
 
 void NuppelVideoRecorder::doAudioThread(void)
 {
-#ifdef CONFIG_DARWIN
+#if !defined (HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SOUNDCARD_H)
     VERBOSE(VB_IMPORTANT,
             QString("NVR::doAudioThread() This Unix doesn't support"
                     " device files for audio access. Skipping"));
