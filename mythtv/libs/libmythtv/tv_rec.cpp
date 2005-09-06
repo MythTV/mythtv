@@ -548,7 +548,7 @@ bool TVRec::CreateRecorderThread()
     while (!recorder->IsRecording() && !recorder->IsErrored())
         usleep(50);
     if (recorder->IsRecording())
-        VERBOSE(VB_IMPORTANT, "Recorder to started");
+        VERBOSE(VB_IMPORTANT, "Recorder started");
     else
         VERBOSE(VB_IMPORTANT, "Error encountered starting recorder");
     return recorder->IsRecording();
