@@ -309,38 +309,51 @@ char *DVBHierarchy::stringLookup[] =
     "a"  //HIERARCHY_AUTO
 };
 
-bool DVBTuning::equal_qpsk(const DVBTuning& other) const
+bool equal_qpsk(const struct dvb_frontend_parameters &p,
+                const struct dvb_frontend_parameters &op, uint range)
 {
-    return params.frequency       == other.params.frequency           &&
-        params.inversion          == other.params.inversion           &&
-        params.u.qpsk.symbol_rate == other.params.u.qpsk.symbol_rate  &&
-        params.u.qpsk.fec_inner   == other.params.u.qpsk.fec_inner;
+    return
+        p.frequency + range  >= op.frequency           &&
+        p.frequency          <= op.frequency + range   &&
+        p.inversion          == op.inversion           &&
+        p.u.qpsk.symbol_rate == op.u.qpsk.symbol_rate  &&
+        p.u.qpsk.fec_inner   == op.u.qpsk.fec_inner;
 }
 
-bool DVBTuning::equal_atsc(const DVBTuning& other) const
+bool equal_atsc(const struct dvb_frontend_parameters &p,
+                const struct dvb_frontend_parameters &op, uint range)
 {
 #if (DVB_API_VERSION_MINOR == 1)
-    return params.frequency     == other.params.frequency             &&
-        params.u.vsb.modulation == other.params.u.vsb.modulation;
+    return
+        p.frequency + range  >= op.frequency           &&
+        p.frequency          <= op.frequency + range   &&
+        p.u.vsb.modulation   == op.u.vsb.modulation;
 #else
-    return params.frequency     == other.params.frequency;
+    return
+        p.frequency + range  >= op.frequency           &&
+        p.frequency          <= op.frequency + range;
 #endif
 }
 
-bool DVBTuning::equal_qam(const DVBTuning& other) const
+bool equal_qam(const struct dvb_frontend_parameters &p,
+               const struct dvb_frontend_parameters &op, uint range)
 {
-    return params.frequency      == other.params.frequency            &&
-        params.inversion         == other.params.inversion            &&
-        params.u.qam.symbol_rate == other.params.u.qam.symbol_rate    &&
-        params.u.qam.fec_inner   == other.params.u.qam.fec_inner      &&
-        params.u.qam.modulation  == other.params.u.qam.modulation;
+    return
+        p.frequency + range  >= op.frequency            &&
+        p.frequency          <= op.frequency + range    &&
+        p.inversion          == op.inversion            &&
+        p.u.qam.symbol_rate  == op.u.qam.symbol_rate    &&
+        p.u.qam.fec_inner    == op.u.qam.fec_inner      &&
+        p.u.qam.modulation   == op.u.qam.modulation;
 }
 
-bool DVBTuning::equal_ofdm(const DVBTuning& other) const
+bool equal_ofdm(const struct dvb_frontend_parameters &p,
+                const struct dvb_frontend_parameters &op,
+                uint range)
 {
-    const struct dvb_frontend_parameters &p = params;
-    const struct dvb_frontend_parameters &op = other.params;
-    return p.frequency                 == op.frequency                &&
+    return 
+        p.frequency + range            >= op.frequency                &&
+        p.frequency                    <= op.frequency + range        &&
         p.inversion                    == op.inversion                &&
         p.u.ofdm.bandwidth             == op.u.ofdm.bandwidth         &&
         p.u.ofdm.code_rate_HP          == op.u.ofdm.code_rate_HP      &&
@@ -351,17 +364,19 @@ bool DVBTuning::equal_ofdm(const DVBTuning& other) const
         p.u.ofdm.hierarchy_information == op.u.ofdm.hierarchy_information;
 }
 
-bool DVBTuning::equal(fe_type_t type, const DVBTuning& other) const
+bool equal_type(const struct dvb_frontend_parameters &p,
+                const struct dvb_frontend_parameters &op,
+                fe_type_t type, uint freq_range)
 {
     if (FE_QAM == type)
-        return equal_qam(other);
+        return equal_qam(p, op, freq_range);
     if (FE_OFDM == type)
-        return equal_ofdm(other);
+        return equal_ofdm(p, op, freq_range);
     if (FE_QPSK == type)
-        return equal_qpsk(other);
+        return equal_qpsk(p, op, freq_range);
 #if (DVB_API_VERSION_MINOR == 1)
     if (FE_ATSC == type)
-        return equal_atsc(other);
+        return equal_atsc(p, op, freq_range);
 #endif
     return false;
 }
@@ -983,4 +998,44 @@ static QString coderate(fe_code_rate_t coderate)
         case FEC_8_9:  return "8/9";
         default:       return "Auto";
     }
+}
+
+QString toString(const fe_type_t type)
+{
+    if (FE_QPSK == type)
+        return "QPSK";
+    else if (FE_QAM == type)
+        return "QAM";
+    else if (FE_OFDM == type)
+        return "OFDM";
+    else if (FE_ATSC == type)
+        return "ATSC";
+    return "Unknown";
+}
+
+QString toString(const struct dvb_frontend_parameters &params,
+                 const fe_type_t type)
+{
+    return QString("freq(%1) type(%2)")
+        .arg(params.frequency).arg(toString(type));
+}
+
+QString toString(fe_status status)
+{
+    QString str("");
+    if (FE_HAS_SIGNAL  & status) str += "Signal,";
+    if (FE_HAS_CARRIER & status) str += "Carrier,";
+    if (FE_HAS_VITERBI & status) str += "FEC Stable,";
+    if (FE_HAS_SYNC    & status) str += "Sync,";
+    if (FE_HAS_LOCK    & status) str += "Lock,";
+    if (FE_TIMEDOUT    & status) str += "Timed Out,";
+    if (FE_REINIT      & status) str += "Reinit,";
+    return str;
+}
+
+QString toString(const struct dvb_frontend_event &event,
+                 const fe_type_t type)
+{
+    return QString("Event status(%1) %2")
+        .arg(toString(event.status)).arg(toString(event.parameters, type));
 }

@@ -57,9 +57,6 @@ using namespace std;
 #include "dvbdiseqc.h"
 #include "dvbcam.h"
 
-#define USE_BROKEN_DVB_DRIVER_HACK 1
-#define DVB_GET_EVENT_TIMEOUT 500 /* ms */
-
 #if (DVB_API_VERSION_MINOR <= 3 && DVB_API_VERSION_MINOR == 0)
 #    define FE_ATSC       (FE_OFDM+1)
 #    define FE_CAN_8VSB   0x200000
@@ -68,10 +65,8 @@ using namespace std;
 #    define VSB_16        (QAM_AUTO+2)
 #endif
 
-bool flush_dvb_events(int fd, struct dvb_frontend_event &event);
-bool get_dvb_event(int fd, struct dvb_frontend_event &event,
-                   bool block = true, int timeout = -1);
-QString dvb_event_to_string(const struct dvb_frontend_event &event);
+static bool wait_for_backend(int fd);
+static bool handle_diseq(int fd, const DVBTuning&, DVBDiSEqC*, bool reset);
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
@@ -184,7 +179,7 @@ bool DVBChannel::TuneMultiplex(uint mplexid)
     CheckOptions();
     CHANNEL(chan_opts.tuning.toString(info.type));
 
-    if (!TuneTransport(chan_opts, false, 30000))
+    if (!Tune(chan_opts))
         return false;
 
     CHANNEL(QString("Setting mplexid = %1").arg(mplexid));
@@ -545,107 +540,52 @@ void DVBChannel::SetCAPMT(const PMTObject *pmt)
  */
 bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
 {
+    bool reset = (force_reset || first_tune);
+    bool has_diseq = FE_QPSK == info.type;
+
     if (fd_frontend < 0)
     {
-        ERROR("Card not open!");
+        ERROR("DVBChannel::Tune: Card not open!");
         return false;
     }
 
     // We are now waiting for a new PMT to forward to Access Control (dvbcam).
     SetPMT(NULL);
 
-    if (!TuneTransport(channel, force_reset, 30000))
-        return false;
-
-    CHANNEL("Frequency tuning successful.");
-
-    return true;
-}
-
-/** \fn DVBChannel::TuneTransport(dvb_channel_t&, bool, int)
- *  \brief Tunes the card to a transport but does not deal with PIDs.
- *
- *   This is used internally by DVBChannel.
- *
- *  \param channel Info on transport to tune to
- *  \param all     If true frequency tuning is done even if not strictly needed.
- */
-bool DVBChannel::TuneTransport(const dvb_channel_t& channel, bool all, int)
-{
-    DVBTuning tuning = channel.tuning;
-
-    if (fd_frontend < 0)
+    // Send DisEq commands to external hardware if we need to,
+    // and handle tuning the old way.
+    if (has_diseq)
     {
-        ERROR("Card not open!");
+        if (handle_diseq(fd_frontend, channel.tuning, diseqc, reset))
+        {
+            first_tune = false;
+            return true;
+        }
+        
+        ERROR("DVBChannel::Tune: Failed to transmit DisEq commands");
         return false;
     }
 
-    bool reset      = false;
-    bool havetuned  = false;
-    bool tune       = true;
+    CHANNEL("Old Params: "<<toString(prev_tuning.params, info.type));
+    CHANNEL("New Params: "<<toString(channel.tuning.params, info.type));
 
-    if (all == true)
-        first_tune = true;
-    if (first_tune)
+    if (reset || !prev_tuning.equal(info.type, channel.tuning, 500000))
     {
-        reset      = true;
+        if (ioctl(fd_frontend, FE_SET_FRONTEND, &channel.tuning.params) < 0)
+        {
+            ERRNO("DVBChannel::Tune: "
+                  "Setting Frontend tuning parameters failed.");
+            return false;
+        }
+        wait_for_backend(fd_frontend);
+
+        prev_tuning.params = channel.tuning.params;
         first_tune = false;
     }
 
-    while (true)
-    {
-        if (tune)
-        {
-            struct dvb_frontend_parameters old_params;
-            struct dvb_frontend_event event;
-            bool chk = flush_dvb_events(fd_frontend, event);
-            if (chk)
-                old_params = event.parameters;
-            else
-                chk = (0 == ioctl(fd_frontend, FE_GET_FRONTEND, &old_params));
+    CHANNEL("DVBChannel::Tune: Frequency tuning successful.");
 
-            switch(info.type)
-            {
-                case FE_QPSK:
-                    if (!TuneQPSK(tuning, reset, havetuned))
-                        return false;
-                    break;
-                case FE_QAM:
-                    if (!TuneQAM(tuning, reset, havetuned))
-                        return false;
-                    break;
-                case FE_OFDM:
-                    if (!TuneOFDM(tuning, reset, havetuned))
-                        return false;
-                    break;
-#if (DVB_API_VERSION_MINOR == 1)
-                case FE_ATSC:
-                    if (!TuneATSC(tuning, reset, havetuned))
-                        return false;
-                    break;
-#endif
-            }
-            bool frequency_unchanged =
-                ((old_params.frequency + 500000) > tuning.params.frequency) &&
-                (old_params.frequency < (tuning.params.frequency + 500000));
-            if (!chk || !frequency_unchanged)
-            {
-                CHANNEL("Waiting for event");
-                if (get_dvb_event(fd_frontend, event, DVB_GET_EVENT_TIMEOUT))
-                    CHANNEL(dvb_event_to_string(event));
-            }
-
-            if (havetuned == false)
-                return true;
-
-            tune = false;
-            reset = false;
-
-            CHANNEL("Waiting for frontend event after tune.");
-        }
-
-        return true;
-    }
+    return true;
 }
 
 /** \fn DVBChannel::GetTuningParams(DVBTuning& tuning) const
@@ -665,134 +605,6 @@ bool DVBChannel::GetTuningParams(DVBTuning& tuning) const
         ERRNO("Getting Frontend tuning parameters failed.");
         return false;
     }
-    return true;
-}
-
-bool DVBChannel::TuneQPSK(DVBTuning& tuning, bool reset, bool& havetuned)
-{
-    int frequency = tuning.params.frequency;
-    if (tuning.params.frequency >= tuning.lnb_lof_switch)
-    {
-        tuning.params.frequency = abs((int)tuning.params.frequency - 
-                                      (int)tuning.lnb_lof_hi);
-        tuning.tone = SEC_TONE_ON;
-    }
-    else
-    {
-        tuning.params.frequency = abs((int)tuning.params.frequency - 
-                                      (int)tuning.lnb_lof_lo);
-        tuning.tone = SEC_TONE_OFF;
-    }
-
-    if (diseqc)
-        if (!diseqc->Set(tuning, reset, havetuned))
-            return false;
-
-    if (reset ||
-        prev_tuning.params.frequency != tuning.params.frequency ||
-        prev_tuning.params.inversion != tuning.params.inversion ||
-        prev_tuning.params.u.qpsk.symbol_rate != tuning.params.u.qpsk.symbol_rate ||
-        prev_tuning.params.u.qpsk.fec_inner   != tuning.params.u.qpsk.fec_inner)
-    {
-        if (ioctl(fd_frontend, FE_SET_FRONTEND, &tuning.params) < 0)
-        {
-            ERRNO("Setting Frontend failed.");
-            return false;
-        }
-
-        prev_tuning.params.frequency = tuning.params.frequency;
-        prev_tuning.params.inversion = tuning.params.inversion;
-        prev_tuning.params.u.qpsk.symbol_rate = tuning.params.u.qpsk.symbol_rate;
-        prev_tuning.params.u.qpsk.fec_inner   = tuning.params.u.qpsk.fec_inner;
-        havetuned = true;
-    }
-
-    tuning.params.frequency = frequency;
-
-    return true;
-}
-
-bool DVBChannel::TuneATSC(DVBTuning& tuning, bool reset, bool& havetuned)
-{
-#if (DVB_API_VERSION_MINOR == 1)
-    if (reset ||
-        prev_tuning.params.frequency != tuning.params.frequency ||
-        prev_tuning.params.u.vsb.modulation != tuning.params.u.vsb.modulation)
-    {
-        if (ioctl(fd_frontend, FE_SET_FRONTEND, &tuning.params) < 0)
-        {
-            ERRNO("Setting Frontend failed.");
-            return false;
-        }
-        prev_tuning.params.frequency = tuning.params.frequency;
-        prev_tuning.params.u.vsb.modulation  = tuning.params.u.vsb.modulation;
-        havetuned = true;
-    }
-#else
-    (void)tuning;
-    (void)reset;
-    (void)havetuned;
-#endif
-    return true;
-}
-
-bool DVBChannel::TuneQAM(DVBTuning& tuning, bool reset, bool& havetuned)
-{
-    if (reset ||
-        prev_tuning.params.frequency != tuning.params.frequency ||
-        prev_tuning.params.inversion != tuning.params.inversion ||
-        prev_tuning.params.u.qam.symbol_rate != tuning.params.u.qam.symbol_rate ||
-        prev_tuning.params.u.qam.fec_inner   != tuning.params.u.qam.fec_inner   ||
-        prev_tuning.params.u.qam.modulation  != tuning.params.u.qam.modulation)
-    {
-        if (ioctl(fd_frontend, FE_SET_FRONTEND, &tuning.params) < 0)
-        {
-            ERRNO("Setting Frontend failed.");
-            return false;
-        }
-
-        prev_tuning.params.frequency = tuning.params.frequency;
-        prev_tuning.params.inversion = tuning.params.inversion;
-        prev_tuning.params.u.qam.symbol_rate = tuning.params.u.qam.symbol_rate;
-        prev_tuning.params.u.qam.fec_inner   = tuning.params.u.qam.fec_inner;
-        prev_tuning.params.u.qam.modulation  = tuning.params.u.qam.modulation;
-        havetuned = true;
-    }
-
-    return true;
-}
-
-bool DVBChannel::TuneOFDM(DVBTuning& tuning, bool reset, bool& havetuned)
-{
-    if (reset ||
-        prev_tuning.params.frequency != tuning.params.frequency ||
-        prev_tuning.params.inversion != tuning.params.inversion ||
-        prev_tuning.params.u.ofdm.bandwidth != tuning.params.u.ofdm.bandwidth ||
-        prev_tuning.params.u.ofdm.code_rate_HP != tuning.params.u.ofdm.code_rate_HP ||
-        prev_tuning.params.u.ofdm.code_rate_LP != tuning.params.u.ofdm.code_rate_LP ||
-        prev_tuning.params.u.ofdm.constellation != tuning.params.u.ofdm.constellation ||
-        prev_tuning.params.u.ofdm.transmission_mode != tuning.params.u.ofdm.transmission_mode ||
-        prev_tuning.params.u.ofdm.guard_interval != tuning.params.u.ofdm.guard_interval ||
-        prev_tuning.params.u.ofdm.hierarchy_information != tuning.params.u.ofdm.hierarchy_information)
-    {
-        if (ioctl(fd_frontend, FE_SET_FRONTEND, &tuning.params) < 0)
-        {
-            ERRNO("Setting Frontend failed.");
-            return false;
-        }
-
-        prev_tuning.params.frequency = tuning.params.frequency;
-        prev_tuning.params.inversion = tuning.params.inversion;
-        prev_tuning.params.u.ofdm.bandwidth = tuning.params.u.ofdm.bandwidth;
-        prev_tuning.params.u.ofdm.code_rate_HP = tuning.params.u.ofdm.code_rate_HP;
-        prev_tuning.params.u.ofdm.code_rate_LP = tuning.params.u.ofdm.code_rate_LP;
-        prev_tuning.params.u.ofdm.constellation = tuning.params.u.ofdm.constellation;
-        prev_tuning.params.u.ofdm.transmission_mode = tuning.params.u.ofdm.transmission_mode;
-        prev_tuning.params.u.ofdm.guard_interval = tuning.params.u.ofdm.guard_interval;
-        prev_tuning.params.u.ofdm.hierarchy_information = tuning.params.u.ofdm.hierarchy_information;
-        havetuned = true;
-    }
-
     return true;
 }
 
@@ -853,104 +665,68 @@ void DVBChannel::GetCachedPids(pid_cache_t &pid_cache) const
         ChannelBase::GetCachedPids(chanid, pid_cache);
 }
 
-bool flush_dvb_events(int fd, struct dvb_frontend_event &last_event)
+/** \fn wait_for_backend(int)
+ *  \brief Waits for backend to get tune message.
+ *
+ *   With linux 2.6.12 or later this should block
+ *   until the backend is tuned to the proper frequency.
+ *
+ *   With earlier kernels the usleep(2000) may save us.
+ *
+ *   Waiting for DVB events has been tried, but this fails
+ *   with several DVB cards. They either don't send the
+ *   required events or delete them from the event queue
+ *   before we can read the event.
+ *
+ *   Using a FE_GET_FRONTEND has also been tried, but returns
+ *   the old data until a 2 sec timeout elapses on at least 
+ *   one DVB card.
+ *
+ *   We do not block until we have a lock, the signal
+ *   monitor does that.
+ */
+static bool wait_for_backend(int fd)
 {
-    bool have_event = false;
-    do
-    {
-        if (0 == ioctl(fd, FE_GET_EVENT, &last_event))
-        {
-            VERBOSE(VB_CHANNEL, "DVBEvents: Flushing "
-                    <<dvb_event_to_string(last_event));
-            have_event = true;
-        }
-    } while (errno != EWOULDBLOCK);
-    return have_event;
+    fe_status_t status;
+
+    usleep(2000); // yield for 2 ms
+    ioctl(fd, FE_READ_STATUS, &status);
+    VERBOSE(VB_CHANNEL, toString(status));
+
+    return true;
 }
 
-bool get_dvb_event(int fd, struct dvb_frontend_event &event,
-                   bool block, int timeout)
+/** \fn handle_diseq(int, const DVBTuning&, DVBDiSEqC*, bool)
+ *  \brief Sends DisEq commands to external hardware.
+ *
+ */
+static bool handle_diseq(int fd_frontend, const DVBTuning &ctuning,
+                         DVBDiSEqC *diseqc, bool force_reset)
 {
-    QTime timer;
-    timer.start();
-    
-    while ((timeout <= 0) || (timer.elapsed() < timeout))
+    bool havetuned = false;
+    DVBTuning tuning = ctuning;
+    uint freq = ctuning.params.frequency;
+
+    for (uint i = 0; i < 64 && !havetuned; i++)
     {
-        if (0 == ioctl(fd, FE_GET_EVENT, &event))
-            return true;
-        int ret = errno;
-        
-        if (EWOULDBLOCK == ret)
+        bool tone   = freq >= tuning.lnb_lof_switch;
+        uint lnb_hi = (uint) abs((int)freq - (int)tuning.lnb_lof_hi);
+        uint lnb_lo = (uint) abs((int)freq - (int)tuning.lnb_lof_lo);
+
+        tuning.tone = (tone) ? SEC_TONE_ON : SEC_TONE_OFF;
+        tuning.params.frequency = (tone) ? lnb_hi : lnb_lo;
+
+        if (diseqc && !diseqc->Set(tuning, force_reset, havetuned))
+            return false;
+
+        if (ioctl(fd_frontend, FE_SET_FRONTEND, &tuning.params) < 0)
         {
-            if (!block)
-                return false;
-            usleep(50); // it would be nicer to use select...
-        }
-        else if (EOVERFLOW == ret)
-        {
-            VERBOSE(VB_IMPORTANT, "DVBEvents: Oops, we lost some events...");
-        }
-        else if (EBADF == ret)
-        {
-            VERBOSE(VB_IMPORTANT, 
-                    "DVBEvents: fd("<<fd<<") is a bad file descriptor" );
+            VERBOSE(VB_CHANNEL, "dvbchannel.c: handle_diseq: "
+                  "Setting Frontend tuning parameters failed.");
             return false;
         }
-        else if (EFAULT == ret)
-        {
-            VERBOSE(VB_IMPORTANT, "DVBEvents: &event is a bad pointer");
-            return false;
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, "DVBEvents: unknown error... "<<ret);
-            return false; // unknown error...
-        }
+        wait_for_backend(fd_frontend);
     }
 
-#if USE_BROKEN_DVB_DRIVER_HACK
-    if (timer.elapsed() >= timeout)
-    {
-        VERBOSE(
-            VB_IMPORTANT, "\n"
-            "*****************************************************************"
-            "\n"
-            " WARNING!! MythTV timeout out waiting for a required DVB event!\n"
-            " Most likely you are using a broken driver and should upgrade to\n"
-            " to the latest DVB driver immediately. This bug in your driver\n"
-            " will result in lost recordings and reduced functionality, and\n"
-            " indicates a DVB driver unsuitable for production use.\n"
-            "*****************************************************************"
-            "\n");
-
-        fe_status_t tmp_stat;
-        if (ioctl(fd, FE_READ_STATUS, &tmp_stat))
-        {
-            if (tmp_stat & FE_HAS_LOCK)
-            {
-                VERBOSE(VB_IMPORTANT, "MythTV HACK for BROKEN DVB drivers "
-                        "appears to have worked. Please upgrade DVB drivers.");
-                return true;
-            }
-        }
-        VERBOSE(VB_IMPORTANT, "MythTV HACK for BROKEN DVB drivers "
-                "FAILED! Upgrade your DVB drivers.");
-    }
-#endif // USE_BROKEN_DVB_DRIVER_HACK
-
-    return false;
-}
-
-QString dvb_event_to_string(const struct dvb_frontend_event &event)
-{
-    QString str("");
-    if (FE_HAS_SIGNAL  & event.status) str += "Signal,";
-    if (FE_HAS_CARRIER & event.status) str += "Carrier,";
-    if (FE_HAS_VITERBI & event.status) str += "FEC Stable,";
-    if (FE_HAS_SYNC    & event.status) str += "Sync,";
-    if (FE_HAS_LOCK    & event.status) str += "Lock,";
-    if (FE_TIMEDOUT    & event.status) str += "Timed Out,";
-    if (FE_REINIT      & event.status) str += "Reinit,";
-    return QString("Event Status(%1) frequency(%2 Hz)")
-        .arg(str).arg(event.parameters.frequency);
+    return havetuned;
 }

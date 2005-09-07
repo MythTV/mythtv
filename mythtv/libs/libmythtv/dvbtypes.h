@@ -40,6 +40,11 @@ using namespace std;
 #define MAX_SECTION_SIZE 4096
 #define DMX_DONT_FILTER 0x2000
 
+QString toString(const fe_type_t);
+QString toString(const struct dvb_frontend_parameters&, const fe_type_t);
+QString toString(fe_status);
+QString toString(const struct dvb_frontend_event&, const fe_type_t);
+
 //The following are a set of helper classes to allow easy translation
 //between the actual dvb enums and db strings.
 
@@ -265,6 +270,23 @@ typedef vector<uint16_t> dvb_pid_t;
 // of the pmt and or the pmtcache
 typedef vector<uint16_t> dvb_caid_t;
 
+extern bool equal_qpsk(
+    const struct dvb_frontend_parameters &p,
+    const struct dvb_frontend_parameters &op, uint range);
+extern bool equal_atsc(
+    const struct dvb_frontend_parameters &p,
+    const struct dvb_frontend_parameters &op, uint range);
+extern bool equal_qam(
+    const struct dvb_frontend_parameters &p,
+    const struct dvb_frontend_parameters &op, uint range);
+extern bool equal_ofdm(
+    const struct dvb_frontend_parameters &p,
+    const struct dvb_frontend_parameters &op, uint range);
+extern bool equal_type(
+    const struct dvb_frontend_parameters &p,
+    const struct dvb_frontend_parameters &op,
+    fe_type_t type, uint freq_range);
+
 class DVBTuning
 {
   public:
@@ -286,11 +308,16 @@ class DVBTuning
     unsigned int        lnb_lof_hi;
     unsigned int        lnb_lof_lo;
 
-    bool equal_qpsk(const DVBTuning& other) const;
-    bool equal_atsc(const DVBTuning& other) const;
-    bool equal_qam( const DVBTuning& other) const;
-    bool equal_ofdm(const DVBTuning& other) const;
-    bool equal(fe_type_t type, const DVBTuning& other) const;
+    bool equalQPSK(const DVBTuning& other, uint range = 0) const
+        { return equal_qpsk(params, other.params, range);  }
+    bool equalATSC(const DVBTuning& other, uint range = 0) const
+        { return equal_atsc(params, other.params, range);  }
+    bool equalQAM( const DVBTuning& other, uint range = 0) const
+        { return equal_qam(params, other.params, range);   }
+    bool equalOFDM(const DVBTuning& other, uint range = 0) const
+        { return equal_ofdm(params, other.params, range);  }
+    bool equal(fe_type_t type, const DVBTuning& other, uint range = 0) const
+        { return equal_type(params, other.params, type, range); }
 
     // Helper functions to get the paramaters as DB friendly strings
     char InversionChar() const;
