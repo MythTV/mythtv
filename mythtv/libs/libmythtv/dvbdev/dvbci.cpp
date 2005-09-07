@@ -1379,6 +1379,23 @@ void cCiCaPmt::AddElementaryStream(int type, int pid)
   capmt[length++] = 0x00;
 }
 
+/** \fn cCiCaPmt::AddCaDescriptor(int, int, int, uint8_t*)
+ *  \brief Inserts an Access Control (CA) Descriptor into a PMT.
+ *
+ *   The format of ca_pmt is:
+<code>
+ca_pmt_list_management
+<program header>
+if (program descriptors > 0)
+        CPCI_OK_DESCRAMBLING
+<program descriptors>
+for each stream
+        <stream header>
+        if (stream descriptors > 0)
+                CPCI_OK_DESCRAMBLING
+        <stream descriptors>
+</code>
+ */
 void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len, uint8_t *data)
 {
   if (!infoLengthPos)
@@ -1393,7 +1410,9 @@ void cCiCaPmt::AddCaDescriptor(int ca_system_id, int ca_pid, int data_len, uint8
     return;
   }
 
-  capmt[length++] = CPCI_OK_DESCRAMBLING; // ca_pmt_cmd_id
+  // We are either at start of program descriptors or stream descriptors.
+  if (infoLengthPos + 2 == length)
+    capmt[length++] = CPCI_OK_DESCRAMBLING; // ca_pmt_cmd_id
 
   capmt[length++] = 0x09;           // CA descriptor tag
   capmt[length++] = 4 + data_len;   // descriptor length
