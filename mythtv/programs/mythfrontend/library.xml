@@ -80,6 +80,7 @@
      <text lang="SI">Poslušanje radia</text>
      <text lang="ET">Kuula raadiot</text>
      <text lang="NB">Hør på radio</text>
+     <text lang="DK">Hør radio</text>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>

@@ -120,6 +120,7 @@
      <text lang="SI">Radio nastavitve</text>
      <text lang="ET">Raadio seaded</text>
      <text lang="NB">Radioinnstillinger</text>
+     <text lang="DK">Radioindstillinger</text>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>

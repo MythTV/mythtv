@@ -39,6 +39,7 @@
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
       <text lang="NL">Toetsen instellen</text>
+      <text lang="NL">Tangenter</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>
@@ -53,7 +54,7 @@
      <text lang="DK">TV indstillinger</text>
      <text lang="NL">TV Instellingen</text>
      <text lang="PT">Configurar Televisão</text>
-     <text lang="SV">TV-inställningar</text>
+     <text lang="SV">TV</text>
      <text lang="JA">TV設定</text>
      <text lang="SI">TV nastavitve</text>
      <text lang="ET">TV seaded</text>
@@ -69,7 +70,7 @@
      <text lang="DK">Musik indstillinger</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>
-     <text lang="SV">Musikinställningar</text>
+     <text lang="SV">Musik</text>
      <text lang="JA">ミュージック設定</text>
      <text lang="SI">Glasbene nastavitve</text>
      <text lang="ET">Muusika seaded</text>
@@ -86,7 +87,7 @@
        <text lang="DK">Video indstillinger</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
-       <text lang="SV">Videoinställningar</text>
+       <text lang="SV">Video</text>
        <text lang="JA">ビデオ設定</text>
        <text lang="SI">Video nastavitve</text>
        <text lang="ET">Video seaded</text>
@@ -102,7 +103,7 @@
      <text lang="ES">Configurar DVD</text>
      <text lang="CA">Configurar DVD</text>
      <text lang="NL">DVD Instellingen</text>
-     <text lang="SV">DVD-inställningar</text>
+     <text lang="SV">DVD</text>
      <text lang="JA">DVD設定</text>
      <text lang="SI">DVD nastavitve</text>
      <text lang="ET">DVD seaded</text>
@@ -116,6 +117,7 @@
       <text lang="DE">Radio</text>
       <text lang="SI">Radio nastavitve</text>
       <text lang="ET">Raadio seaded</text>
+      <text lang="SV">Radio</text>
       <action>CONFIGPLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -129,7 +131,7 @@
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
-      <text lang="SV">Galleriinställningar</text>
+      <text lang="SV">Galleri</text>
       <text lang="JA">イメージ設定</text>
       <text lang="SI">Nastavitve slik</text>
       <text lang="ET">Galerii seaded</text>
@@ -146,7 +148,7 @@
      <text lang="DK">Spil indstillinger</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
-     <text lang="SV">Spelinställningar</text>
+     <text lang="SV">Spel</text>
      <text lang="JA">ゲーム設定</text>
      <text lang="SI">Nastavitve iger</text>
      <text lang="ET">Mängude seaded</text>
@@ -163,7 +165,7 @@
      <text lang="DK">Vejr indstililnger</text>
      <text lang="NL">"Het Weer" Instellingen</text>
      <text lang="PT">Configurar Meteorologia</text>
-     <text lang="SV">Väderinställningar</text>
+     <text lang="SV">Väder</text>
      <text lang="JA">天気設定</text>
      <text lang="SI">Nastavitve vremena</text>
      <text lang="ET">Ilmateate seaded</text>
@@ -178,7 +180,7 @@
      <text lang="CA">Configurar Notícies</text>
      <text lang="ES">Configurar Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
-     <text lang="SV">Nyhetsinställningar</text>
+     <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース設定</text>
      <text lang="SI">Nastavitve novic</text>
      <text lang="ET">Uudiste seaded</text>
@@ -190,7 +192,7 @@
      <type>SETTINGS_WEBPAGE</type>
      <text>Web Settings</text>
      <text lang="DE">WWW</text>
-     <text lang="SV">Webb-inställningar</text>
+     <text lang="SV">Webb</text>
      <text lang="JA">Web設定</text>
      <text lang="SI">Nastavitve spleta</text>
      <text lang="ET">Veebi seaded</text>
@@ -204,6 +206,7 @@
       <text lang="DE">Rezepte</text>
       <text lang="SI">Nastavitve receptov</text>
       <text lang="ET">Retseptide seaded</text>
+      <text lang="SV">Recept</text>
       <action>CONFIGPLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -214,6 +217,7 @@
       <text lang="DE">Telefon</text>
       <text lang="SI">Nastavitve telefona</text>
       <text lang="ET">Telefoni seaded</text>
+      <text lang="SV">Telefon</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -226,7 +230,7 @@
      <text lang="ES">Configurar XBox</text>
      <text lang="DE">Xbox</text>
      <text lang="NL">Xbox Instellingen</text>
-     <text lang="SV">Xbox-inställningar</text>
+     <text lang="SV">Xbox</text>
      <text lang="JA">XBox設定</text>
      <text lang="SI">Nastavitve Xbox</text>
      <text lang="ET">Xbox-i seaded</text>

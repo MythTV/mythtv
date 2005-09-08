@@ -58,6 +58,7 @@
      <text lang="SI">TV nastavitve</text>
      <text lang="ET">TV seaded</text>
      <text lang="NB">TV</text>
+     <text lang="DK">TV</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -75,6 +76,7 @@
      <text lang="SI">Media nastavitve</text>
      <text lang="ET">Andmekandja seaded</text>
      <text lang="NB">Media</text>
+     <text lang="DK">Media</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
    </button>
@@ -93,6 +95,7 @@
      <text lang="SI">Nastavitve info centra</text>
      <text lang="ET">Infokeskuse seaded</text>
      <text lang="NB">Informasjonssenter</text>
+     <text lang="DK">Informationscenter</text>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends> 
    </button>
@@ -114,6 +117,7 @@
      <text lang="SI">Xbox nastavitve</text>
      <text lang="ET">Xbox-i seaded</text>
      <text lang="NB">X-Box</text>
+     <text lang="DK">X-Box</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
@@ -130,6 +134,7 @@
       <text lang="SI">Nastavitve telefona</text>
       <text lang="ET">Telefoni seaded</text>
       <text lang="NB">Telefon</text>
+      <text lang="DK">Telefon</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

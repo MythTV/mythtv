@@ -38,6 +38,7 @@
      <text lang="SI">Nastavitve novic</text>
      <text lang="ET">Uudiste seaded</text>
      <text lang="NB">Innstillinger for nyheter</text>
+     <text lang="DK">Nyheds indstillinger</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -66,6 +67,7 @@
      <text lang="SI">Spletne nastavitve</text>
      <text lang="ET">Veebi seaded</text>
      <text lang="NB">Innstilinger for nettleser</text>
+     <text lang="DK">Web instillinger</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -83,6 +85,7 @@
      <text lang="SI">Nastavitve receptov</text>
      <text lang="ET">Retseptide seaded</text>     
      <text lang="NB">Innstillinger for oppskrifter</text>
+     <text lang="DK">Opskrifts indstillinger</text>
      <alttext lang="DE">Rezepte</alttext>
      <alttext lang="ET">Retseptid</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>

@@ -12,6 +12,7 @@
      <text lang="SI">1. Splošno</text>
      <text lang="ET">1. Üldine</text>
      <text lang="NB">1 Generelt</text>
+     <text lang="DK">1. Generelt</text>
      <action>GENERAL</action>
    </button>
 
@@ -27,6 +28,7 @@
      <text lang="SI">2. Kartice za zajem</text>
      <text lang="ET">2. TV-kaardid</text>
      <text lang="NB">2 TV-kort</text>
+     <text lang="DK">2. TV-kort</text>
      <action>CAPTURE CARDS</action>
    </button>
 
@@ -42,6 +44,7 @@
      <text lang="SI">3. Video viri</text>
      <text lang="ET">3. Videosisendid</text>
      <text lang="NB">3 Videokilder</text>
+     <text lang="DK">3. Videokilder</text>
      <action>VIDEO SOURCES</action>
    </button>
 
@@ -57,6 +60,7 @@
      <text lang="SI">4. Vhodne povezave</text>
      <text lang="ET">4. Sisendite ühendused</text>
      <text lang="NB">4 Inndata</text>
+     <text lang="DK">4. Indgange</text>
      <action>CARD INPUTS</action>
    </button>
 
@@ -71,6 +75,7 @@
      <text lang="SI">5. Urejanje kanalov</text>
      <text lang="ET">5. Kanaliredaktor</text>
      <text lang="NB">5 Kanalredigerer</text>
+     <text lang="DK">5. Kanal opsætning</text>
      <action>CHANNEL EDITOR</action>
    </button>
 

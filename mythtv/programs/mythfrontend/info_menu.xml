@@ -12,6 +12,7 @@
      <text lang="SI">Telefon</text>
      <text lang="ET">Telefon</text>
      <text lang="NB">Telefon</text>
+     <text lang="DK">Telefon</text>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
@@ -32,6 +33,7 @@
      <text lang="SI">Novice</text>
      <text lang="ET">Uudised</text>
      <text lang="NB">Nyheter</text>
+     <text lang="DK">Nyheder</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -81,6 +83,7 @@
       <text lang="SI">Splet</text>
       <text lang="ET">Veeb</text>
       <text lang="NB">Nettleser</text>
+      <text lang="DK">Web</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -99,6 +102,7 @@
      <text lang="SI">Recepti</text> 
      <text lang="ET">Retseptid</text>
      <text lang="NB">Oppskrifter</text>
+     <text lang="DK">Opskrifter</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -117,6 +121,7 @@
       <text lang="SI">Status sistema</text>
       <text lang="ET">Süsteemi olek</text>
       <text lang="NB">Systemstatus</text>
+      <text lang="DK">Systemstatus</text>
       <action>TV_STATUS</action>
    </button>
 

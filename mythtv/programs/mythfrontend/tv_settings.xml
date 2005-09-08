@@ -106,6 +106,7 @@
       <text lang="SI">Snemalne prioritete</text>
       <text lang="ET">Salvestamisprioriteedid</text>
       <text lang="NB">Opptaksprioriteter</text>
+      <text lang="DK">Optagelselssprioriteter</text>
       <alttext lang="DE">Prioritäten</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
       <action>MENU recpriorities_settings.xml</action>

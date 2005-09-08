@@ -36,6 +36,7 @@
       <text lang="SI">Nastavitve prioritet</text>
       <text lang="ET">Muuda prioriteete</text>
       <text lang="NB">Sett prioriteter</text>
+      <text lang="DK">Prioriteter</text>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -48,7 +49,7 @@
       <text lang="NL">Geplande Opnames</text>
       <text lang="FR">Gestion des conflits</text>
       <text lang="DE">Aufnahmeplan</text>
-      <text lang="DK">Løs optagelseskonflikter</text>
+      <text lang="DK">Planlagte optagelser</text>
       <text lang="IS">Komandi upptökur</text>
       <text lang="PT">Resolver Conflitos</text>
       <text lang="SV">Kommande inspelningar</text>
@@ -97,6 +98,7 @@
       <text lang="SI">Že posneto</text>
       <text lang="ET">Varem salvestatud</text>
       <text lang="NB">Tatt opp tidligere</text>
+      <text lang="NB">Tidligere optagelser</text>
       <action>TV_PREVIOUS</action>
    </button>
 

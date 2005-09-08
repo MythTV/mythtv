@@ -87,6 +87,7 @@
       <text lang="SI">Iskanje besed</text>
       <text lang="ET">Otsi sõnu</text>
       <text lang="NB">Søk etter ord</text>
+      <text lang="DK">Søg ord</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoek</alttext>
@@ -96,6 +97,7 @@
       <alttext lang="SI">Iskanje</alttext>
       <alttext lang="ET">Sõnad</alttext>
       <alttext lang="NB">Søk</alttext>
+      <alttext lang="DK">Søg</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -112,6 +114,7 @@
       <text lang="SI">Iskanje seznamov</text>
       <text lang="ET">Otsi nimekirju</text>
       <text lang="NB">Søk i lister</text>
+      <text lang="DK">Søg i lister</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="IS">Listar</alttext>
@@ -121,6 +124,7 @@
       <alttext lang="SI">Seznami</alttext>
       <alttext lang="ET">Nimekirjad</alttext>
       <alttext lang="NB">Lister</alttext>
+      <alttext lang="DK">Lister</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -169,6 +173,7 @@
       <text lang="SI">Poljubna snemanja</text>
       <text lang="ET">Kohandatud salvestamine</text>
       <text lang="NB">Egendefinert opptak</text>
+      <text lang="DK">Brugerstyret optagelse</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 

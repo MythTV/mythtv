@@ -14,6 +14,7 @@
       <text lang="SI">Glasbena orodja</text>
       <text lang="ET">Muusikatööriistad</text>
       <text lang="NB">Musikkverktøy</text>
+      <text lang="DK">Musik tools</text>
       <action>PLUGIN mythmusic</action>
       <depends>mythmusic</depends>	
    </button>
@@ -23,7 +24,7 @@
       <text>Video Manager</text>
       <text lang="ES">Gestionar vÃ­deos</text>
       <text lang="CA">Gestionar vÃ­deos</text>
-      <text lang="DK">Film opsÃ¦tning</text>
+      <text lang="DK">Film opsætning</text>
       <text lang="DE">Videos verwalten</text>
       <text lang="IS">Kvikmyndatól</text>
       <text lang="PT">Gerir Filmes</text>
@@ -46,6 +47,7 @@
       <text lang="IS">Stilla takka</text>
       <text lang="DE">Tastenbelegung ändern</text>
       <text lang="FI">Muokkaa Näppäimiä</text>
+      <text lang="DK">Ændre tasteinstillinger</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>
