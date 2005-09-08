@@ -169,10 +169,8 @@ using_frontend {
     using_xvmc_vld:DEFINES += USING_XVMC_VLD
 
     # Misc. frontend
-    HEADERS += channeleditor.h          channelsettings.h
     HEADERS += guidegrid.h              infostructs.h
     HEADERS += progfind.h               ttfont.h
-    SOURCES += channeleditor.cpp        channelsettings.cpp
     SOURCES += guidegrid.cpp            infostructs.cpp
     SOURCES += progfind.cpp             ttfont.cpp
 
@@ -296,3 +294,9 @@ using_backend {
 
     DEFINES += USING_BACKEND
 }
+
+# Files used by frontend and backend.
+using_frontend:HEADERS *= channeleditor.h   channelsettings.h
+using_frontend:SOURCES *= channeleditor.cpp channelsettings.cpp
+using_backend:HEADERS  *= channeleditor.h   channelsettings.h
+using_backend:SOURCES  *= channeleditor.cpp channelsettings.cpp
