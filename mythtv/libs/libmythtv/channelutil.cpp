@@ -1,5 +1,7 @@
 // -*- Mode: c++ -*-
 
+#include <qregexp.h>
+
 #include "channelutil.h"
 #include "mythdbcon.h"
 #include "dvbtables.h"
@@ -594,7 +596,7 @@ int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
     MSqlQuery query(MSqlQuery::DDCon());
 
     uint desired_chanid = 0;
-    int chansep = chan_num.find("_");
+    int chansep = chan_num.find(QRegExp("\\D"));
     if (chansep > 0)
     {
         desired_chanid =
@@ -634,7 +636,8 @@ int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
         VERBOSE(VB_IMPORTANT, "Error getting chanid for new channel.");
         return -1;
     }
-    return query.value(0).toInt() + 1;
+    uint max_db_val = query.value(0).toInt() + 1;    
+    return max(max_db_val, desired_chanid = sourceid * 1000 + 1);
 }
 
 bool ChannelUtil::CreateChannel(uint db_sourceid,
@@ -718,7 +721,9 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     query.bindValue(":SERVICEID", service_id);
     query.bindValue(":ATSCSRCID", atsc_src_id);
     query.bindValue(":USEOAG",    use_on_air_guide);
-    query.bindValue(":VISIBLE",   !(hidden || hidden_in_guide));
+    query.bindValue(":VISIBLE",   !hidden);
+    (void) hidden_in_guide; // MythTV can't hide the channel in just the guide.
+
     if (freqid > 0)
         query.bindValue(":FREQID",    freqid);
     query.bindValue(":TVFORMAT", (atsc_major_channel > 0) ? "atsc" : "dvb");

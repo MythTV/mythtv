@@ -1150,7 +1150,7 @@ void SIScan::UpdateVCTinDB(int tid_db,
                     chan_num,
                     vct->ProgramNumber(i),
                     vct->MajorChannel(i), vct->MinorChannel(i),
-                    true,
+                    !vct->IsHiddenInGuide(i) /* use on air guide */,
                     vct->IsHidden(i), vct->IsHiddenInGuide(i),
                     freqid);
             }
