@@ -715,7 +715,7 @@ static uint tuned_frequency(const DVBTuning &tuning, fe_type_t type,
  */
 static bool wait_for_backend(int fd, int timeout_ms)
 {
-    struct timeval select_timeout = { 0, (timeout_ms) % 1000 };
+    struct timeval select_timeout = { 0, (timeout_ms) * 1000 };
     fd_set fd_select_set;
     FD_ZERO(    &fd_select_set);
     FD_SET (fd, &fd_select_set);
