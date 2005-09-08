@@ -42,6 +42,9 @@ using namespace std;
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/poll.h>
+#include <sys/select.h>
+#include <sys/time.h>
+#include <sys/types.h>
 
 #include "RingBuffer.h"
 #include "recorderbase.h"
@@ -65,8 +68,10 @@ using namespace std;
 #    define VSB_16        (QAM_AUTO+2)
 #endif
 
-static bool wait_for_backend(int fd);
-static bool handle_diseq(int fd, const DVBTuning&, DVBDiSEqC*, bool reset);
+static uint tuned_frequency(const DVBTuning&, fe_type_t, fe_sec_tone_mode_t *);
+static void drain_dvb_events(int fd);
+static bool wait_for_backend(int fd, int timeout_ms);
+static bool handle_diseq(const DVBTuning&, DVBDiSEqC*, bool reset);
 
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
@@ -367,14 +372,7 @@ void DVBChannel::CheckOptions()
         t.params.inversion = INVERSION_OFF;
     }
 
-    unsigned int frequency;
-    if (info.type == FE_QPSK)
-        if (t.Frequency() > t.lnb_lof_switch)
-            frequency = abs((int)t.Frequency() - (int)t.lnb_lof_hi);
-        else
-            frequency = abs((int)t.Frequency() - (int)t.lnb_lof_lo);
-    else
-        frequency = t.Frequency();
+    uint frequency = tuned_frequency(t, info.type, NULL);
 
     if ((info.frequency_min > 0 && info.frequency_max > 0) &&
        (frequency < info.frequency_min || frequency > info.frequency_max))
@@ -541,7 +539,8 @@ void DVBChannel::SetCAPMT(const PMTObject *pmt)
 bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
 {
     bool reset = (force_reset || first_tune);
-    bool has_diseq = FE_QPSK == info.type;
+    bool has_diseq = (FE_QPSK == info.type) && diseqc;
+    struct dvb_frontend_parameters params = channel.tuning.params;
 
     if (fd_frontend < 0)
     {
@@ -552,16 +551,12 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
     // We are now waiting for a new PMT to forward to Access Control (dvbcam).
     SetPMT(NULL);
 
-    // Send DisEq commands to external hardware if we need to,
-    // and handle tuning the old way.
-    if (has_diseq)
+    // Remove any events in queue before tuning.
+    drain_dvb_events(fd_frontend);
+
+    // Send DisEq commands to external hardware if we need to.
+    if (has_diseq && !handle_diseq(channel.tuning, diseqc, reset))
     {
-        if (handle_diseq(fd_frontend, channel.tuning, diseqc, reset))
-        {
-            first_tune = false;
-            return true;
-        }
-        
         ERROR("DVBChannel::Tune: Failed to transmit DisEq commands");
         return false;
     }
@@ -571,15 +566,18 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
 
     if (reset || !prev_tuning.equal(info.type, channel.tuning, 500000))
     {
-        if (ioctl(fd_frontend, FE_SET_FRONTEND, &channel.tuning.params) < 0)
+        // Adjust for Satelite recievers which offset the frequency.
+        params.frequency = tuned_frequency(channel.tuning, info.type, NULL);
+
+        if (ioctl(fd_frontend, FE_SET_FRONTEND, &params) < 0)
         {
             ERRNO("DVBChannel::Tune: "
                   "Setting Frontend tuning parameters failed.");
             return false;
         }
-        wait_for_backend(fd_frontend);
+        wait_for_backend(fd_frontend, 5000);
 
-        prev_tuning.params = channel.tuning.params;
+        prev_tuning.params = params;
         first_tune = false;
     }
 
@@ -665,13 +663,40 @@ void DVBChannel::GetCachedPids(pid_cache_t &pid_cache) const
         ChannelBase::GetCachedPids(chanid, pid_cache);
 }
 
-/** \fn wait_for_backend(int)
+/** \fn drain_dvb_events(int)
+ *  \brief Reads all the events off the queue, so we can use select
+ *         in wait_for_backend(int,int).
+ */
+static void drain_dvb_events(int fd)
+{
+    struct dvb_frontend_event event;
+    while (ioctl(fd, FE_GET_EVENT, &event) == 0);
+}
+
+static uint tuned_frequency(const DVBTuning &tuning, fe_type_t type,
+                            fe_sec_tone_mode_t *p_tone)
+{
+    if (FE_QPSK != type)
+        return tuning.Frequency();
+
+    uint freq   = tuning.Frequency();
+    bool tone   = freq >= tuning.lnb_lof_switch;
+    uint lnb_hi = (uint) abs((int)freq - (int)tuning.lnb_lof_hi);
+    uint lnb_lo = (uint) abs((int)freq - (int)tuning.lnb_lof_lo);
+
+    if (p_tone)
+        *p_tone = (tone) ? SEC_TONE_ON : SEC_TONE_OFF;
+
+    return (tone) ? lnb_hi : lnb_lo;
+}
+
+/** \fn wait_for_backend(int,int)
  *  \brief Waits for backend to get tune message.
  *
  *   With linux 2.6.12 or later this should block
  *   until the backend is tuned to the proper frequency.
  *
- *   With earlier kernels the usleep(2000) may save us.
+ *   With earlier kernels sleeping for timeout_ms may save us.
  *
  *   Waiting for DVB events has been tried, but this fails
  *   with several DVB cards. They either don't send the
@@ -684,49 +709,52 @@ void DVBChannel::GetCachedPids(pid_cache_t &pid_cache) const
  *
  *   We do not block until we have a lock, the signal
  *   monitor does that.
+ *
+ *  \param fd         frontend file descriptor
+ *  \param timeout_ms timeout before FE_READ_STATUS in milliseconds
  */
-static bool wait_for_backend(int fd)
+static bool wait_for_backend(int fd, int timeout_ms)
 {
+    struct timeval select_timeout = { 0, (timeout_ms) % 1000 };
+    fd_set fd_select_set;
+    FD_ZERO(    &fd_select_set);
+    FD_SET (fd, &fd_select_set);
+
+    // Try to wait for some output like an event, unfortunately
+    // this fails on several DVB cards, so we have a timeout.
+    select(fd+1, &fd_select_set, NULL, NULL, &select_timeout);
+
+    // This is supposed to work on all cards, post 2.6.12...
     fe_status_t status;
+    if (ioctl(fd, FE_READ_STATUS, &status) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, QString("dvbchannel.cpp:wait_for_backend: "
+                                      "Failed to get status, error: %1")
+                .arg(strerror(errno)));
+        return false;
+    }
 
-    usleep(2000); // yield for 2 ms
-    ioctl(fd, FE_READ_STATUS, &status);
-    VERBOSE(VB_CHANNEL, toString(status));
-
+    VERBOSE(VB_CHANNEL, QString("dvbchannel.cpp:wait_for_backend: Status: %1")
+            .arg(toString(status)));
     return true;
 }
 
-/** \fn handle_diseq(int, const DVBTuning&, DVBDiSEqC*, bool)
+/** \fn handle_diseq(const DVBTuning&, DVBDiSEqC*, bool)
  *  \brief Sends DisEq commands to external hardware.
  *
  */
-static bool handle_diseq(int fd_frontend, const DVBTuning &ctuning,
-                         DVBDiSEqC *diseqc, bool force_reset)
+static bool handle_diseq(const DVBTuning &ct, DVBDiSEqC *diseqc, bool reset)
 {
-    bool havetuned = false;
-    DVBTuning tuning = ctuning;
-    uint freq = ctuning.params.frequency;
+    if (!diseqc)
+        return false;
 
-    for (uint i = 0; i < 64 && !havetuned; i++)
-    {
-        bool tone   = freq >= tuning.lnb_lof_switch;
-        uint lnb_hi = (uint) abs((int)freq - (int)tuning.lnb_lof_hi);
-        uint lnb_lo = (uint) abs((int)freq - (int)tuning.lnb_lof_lo);
+    bool tuned  = false;
+    DVBTuning t = ct;
+    t.params.frequency = tuned_frequency(ct, FE_QPSK, &t.tone);
 
-        tuning.tone = (tone) ? SEC_TONE_ON : SEC_TONE_OFF;
-        tuning.params.frequency = (tone) ? lnb_hi : lnb_lo;
-
-        if (diseqc && !diseqc->Set(tuning, force_reset, havetuned))
+    for (uint i = 0; i < 64 && !tuned; i++)
+        if (!diseqc->Set(t, reset, tuned))
             return false;
-
-        if (ioctl(fd_frontend, FE_SET_FRONTEND, &tuning.params) < 0)
-        {
-            VERBOSE(VB_CHANNEL, "dvbchannel.c: handle_diseq: "
-                  "Setting Frontend tuning parameters failed.");
-            return false;
-        }
-        wait_for_backend(fd_frontend);
-    }
-
-    return havetuned;
+        
+    return true;
 }
