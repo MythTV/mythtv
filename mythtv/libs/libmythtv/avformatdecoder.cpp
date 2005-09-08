@@ -830,6 +830,15 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 #ifdef USING_XVMC
                 if (!using_null_videoout && xvmc_stream_type(enc->codec_id))
                 {
+                    // HACK -- begin
+                    // Force MPEG2 decoder on MPEG1 streams.
+                    // Needed for broken transmitters which mark
+                    // MPEG2 streams as MPEG1 streams, and should
+                    // be harmless for unbroken ones.
+                    if (CODEC_ID_MPEG1VIDEO == enc->codec_id)
+                        enc->codec_id = CODEC_ID_MPEG2VIDEO;
+                    // HACK -- end
+
                     MythCodecID mcid;
                     mcid = VideoOutputXv::GetBestSupportedCodec(
                         /* disp dim     */ enc->width, enc->height,
