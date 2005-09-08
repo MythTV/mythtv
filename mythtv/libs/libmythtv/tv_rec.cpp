@@ -96,7 +96,7 @@ const int TVRec::kRequestBufferSize = 256*1000;
 TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
     : rbuffer(NULL), recorder(NULL), channel(NULL), signalMonitor(NULL),
-      scanner(NULL), dvbsiparser(NULL),
+      scanner(NULL), dvbsiparser(NULL), dummyRecorder(NULL),
       // Configuration variables from database
       transcodeFirst(false), earlyCommFlag(false), runJobOnHostOnly(false),
       audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
@@ -703,7 +703,7 @@ bool TVRec::StartRecorder(bool livetv)
         if (livetv && SignalMonitor::IsSupported(cardtype))
             ok = StartRecorderPostThread(livetv);
         else
-            ok = StartRecorderPost(NULL, livetv);
+            ok = StartRecorderPost(livetv);
     }
     return ok;
 }
@@ -711,54 +711,29 @@ bool TVRec::StartRecorder(bool livetv)
 class srp
 {
   public:
-    srp(TVRec *_rec, DummyDTVRecorder *_dummyrec, bool _livetv)
-        : rec(_rec), dummyrec(_dummyrec), livetv(_livetv) { ; }
+    srp(TVRec *_rec, bool _livetv) : rec(_rec), livetv(_livetv) { ; }
     TVRec *rec;
-    DummyDTVRecorder *dummyrec;
     bool livetv;
 };
 
 void *TVRec::StartRecorderPostThunk(void *param)
 {
     srp *p = (srp*) param;
-    p->rec->StartRecorderPost(p->dummyrec, p->livetv);
+    p->rec->StartRecorderPost(p->livetv);
     delete p;
     return NULL;
 }
 
 bool TVRec::StartRecorderPostThread(bool livetv)
 {
-    // START DUMMY RECORDER
-    DummyDTVRecorder *dummyrec = NULL;
-    bool use_dummy = true, is_atsc = (cardtype == "HDTV");
-    if (cardtype == "DVB")
-    {
-#ifdef USING_DVB
-        DVBRecorder* dvbrec = dynamic_cast<DVBRecorder*>(recorder);
-        use_dummy = dvbrec->RecordsTransportStream();
-#if (DVB_API_VERSION_MINOR == 1)
-        int fd_frontend = channel->GetFd();
-        struct dvb_frontend_info info;
-        if (fd_frontend >= 0 && (ioctl(fd_frontend, FE_GET_INFO, &info) >= 0))
-            is_atsc |= (info.type == FE_ATSC);
-#endif
-#endif // USING_DVB
-    }
-    if (use_dummy)
-    {
-        if (!is_atsc)
-            dummyrec = new DummyDTVRecorder(
-                true, rbuffer, 768, 576, 50, 90, 30000000);
-        else
-            dummyrec = new DummyDTVRecorder(
-                true, rbuffer, 1920, 1088, 29.97, 90, 30000000);
-    }
-
     startingRecording = true;
 
+    if (dummyRecorder && livetv)
+        dummyRecorder->StartRecordingThread();
+
     // Handle rest in a seperate thread
-    srp *x = new srp(this, dummyrec, livetv);
-    pthread_create(&start_recorder_thread, NULL, StartRecorderPostThunk, x);
+    pthread_create(&start_recorder_thread, NULL,
+                   StartRecorderPostThunk, new srp(this, livetv));
     return true;
 }
 
@@ -778,7 +753,7 @@ void TVRec::AbortStartRecorderThread()
             "Abort starting recording -- end");
 }
 
-bool TVRec::StartRecorderPost(DummyDTVRecorder *dummyrec, bool livetv)
+bool TVRec::StartRecorderPost(bool livetv)
 {
     recorder->SetRecording(curRecording);
     bool ok = true;
@@ -788,8 +763,8 @@ bool TVRec::StartRecorderPost(DummyDTVRecorder *dummyrec, bool livetv)
     if (ok)
         ok = wait_for_dvb(channel, DVB_TABLE_WAIT, abortRecordingStart);
 
-    if (dummyrec)
-        delete dummyrec;
+    if (dummyRecorder)
+        dummyRecorder->StopRecordingThread();
 
     if (ok && !CreateRecorderThread())
     {
@@ -1037,6 +1012,7 @@ void TVRec::SetOption(RecordingProfile &profile, const QString &name)
  */
 void TVRec::SetupRecorder(RecordingProfile &profile)
 {
+    bool use_dummy = SignalMonitor::IsSupported(cardtype), is_atsc = false;
     if (cardtype == "MPEG")
     {
 #ifdef USING_IVTV
@@ -1062,6 +1038,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
         recorder->Initialize();
+        is_atsc = true;
 #else
         VERBOSE(VB_IMPORTANT, "V4L HDTV Recorder requested, but MythTV was "
                 "compiled without V4L support.");
@@ -1122,6 +1099,16 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOption("expire_data_days",
                        gContext->GetNumSetting("DVBMonitorRetention", 3));
         recorder->Initialize();
+
+        DVBRecorder* dvbrec = dynamic_cast<DVBRecorder*>(recorder);
+        use_dummy &= dvbrec->RecordsTransportStream();
+
+#if (DVB_API_VERSION_MINOR == 1)
+        struct dvb_frontend_info info;
+        int fd_frontend = channel->GetFd();
+        if (fd_frontend >= 0 && (ioctl(fd_frontend, FE_GET_INFO, &info) >= 0))
+            is_atsc = (info.type == FE_ATSC);
+#endif // if (DVB_API_VERSION_MINOR == 1)
 #else
         VERBOSE(VB_IMPORTANT, "DVB Recorder requested, but MythTV was "
                 "compiled without DVB support.");
@@ -1146,6 +1133,16 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
                 "compiled without V4L support.");
         errored = true;
 #endif // USING_V4L
+    }
+
+    if (use_dummy)
+    {
+        if (!is_atsc)
+            dummyRecorder = new DummyDTVRecorder(
+                true, rbuffer, 768, 576, 50, 90, 30000000, false);
+        else
+            dummyRecorder = new DummyDTVRecorder(
+                true, rbuffer, 1920, 1088, 29.97, 90, 30000000, false);
     }
 }
 
@@ -1193,6 +1190,12 @@ void TVRec::TeardownRecorder(bool killFile)
         recorder_thread = static_cast<pthread_t>(0);
         delete recorder;
         recorder = NULL;
+    }
+
+    if (dummyRecorder)
+    {
+        delete dummyRecorder;
+        dummyRecorder = NULL;
     }
 
     if (rbuffer)
@@ -1588,6 +1591,8 @@ void TVRec::RunTV(void)
                 else
 #endif // USING_DVB
                 {
+                    if (dummyRecorder)
+                        dummyRecorder->StopRecordingThread();
                     recorder->Unpause();
                     UnpauseRingBuffer();
                 }
@@ -1601,6 +1606,8 @@ void TVRec::RunTV(void)
             DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
             if (dvbc->IsPMTSet())
             {
+                if (dummyRecorder)
+                    dummyRecorder->StopRecordingThread();
                 recorder->Unpause();
                 recorder->Open();
                 UnpauseRingBuffer();
@@ -3387,6 +3394,8 @@ void TVRec::Unpause(void)
 
     if (SignalMonitor::IsSupported(cardtype))
     {
+        if (dummyRecorder)
+            dummyRecorder->StartRecordingThread();
         SetSignalMonitoringRate(50, 1);
         waitingForSignal = true;
         waitingForDVBTables = false;

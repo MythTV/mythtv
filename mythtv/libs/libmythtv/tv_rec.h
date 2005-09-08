@@ -220,7 +220,7 @@ class TVRec
     void TeardownSIParser(void);
 
     bool StartRecorder(bool livetv);
-    bool StartRecorderPost(DummyDTVRecorder *dummyrec, bool livetv);
+    bool StartRecorderPost(bool livetv);
     bool StartRecorderPostThread(bool livetv);
     void AbortStartRecorderThread();
     static void *StartRecorderPostThunk(void*);
@@ -245,6 +245,7 @@ class TVRec
     SignalMonitor *signalMonitor;
     EITScanner    *scanner;
     DVBSIParser   *dvbsiparser;
+    DummyDTVRecorder *dummyRecorder;
 
     // Various threads
     /// Event processing thread, runs RunTV().
