@@ -2232,141 +2232,126 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
     }
 }
 
+/** \fn NuppelVideoPlayer::AddAudioData(char*,int,long long)
+ *  \brief Sends audio to AudioOuput::AddSamples(char*,int,long long)
+ *
+ *   This uses point sampling filter to resample audio if we are
+ *   using video as the timebase rather than the audio as the
+ *   timebase. This causes ringing artifacts, but hopefully not
+ *   too much of it.
+ */
 void NuppelVideoPlayer::AddAudioData(char *buffer, int len, long long timecode)
 {
     WrapTimecode(timecode, TC_AUDIO);
 
-    if (audioOutput)
+    int samplesize = (audio_channels * audio_bits) / 8; // bytes per sample
+    if ((samplesize <= 0) || !audioOutput)
+        return;
+
+    int samples = len / samplesize;
+
+    // If there is no warping, just send it to the audioOutput.
+    if (!usevideotimebase)
     {
-        if (usevideotimebase)
-        {
-            int samples;
-            short int * newbuffer;
-            float incount = 0;
-            int outcount;
-            int samplesize;
-            int newsamples;
-            int newlen;
-
-            samplesize = audio_channels * audio_bits / 8;
-            samples = len / samplesize;
-            newsamples = (int)(samples / warpfactor);
-            newlen = newsamples * samplesize;
-
-            // We use the left warp buffer to store the new data.
-            // If it isn't big enough it is resized.
-            if ((warpbuffsize < newlen) || (! warplbuff))
-            {
-                if (warprbuff)
-                {
-                    // Make sure this isn't allocated since we're only
-                    // resizing 1 buffer.
-                    free(warprbuff);
-                    warprbuff = NULL;
-                }
-
-                newbuffer = (short int *)realloc(warplbuff, newlen);
-                if (!newbuffer)
-                {
-                    VERBOSE(VB_IMPORTANT, "NVP::AddAudioData: Error, could "
-                            "not allocate warped audio buffer!");
-                    return;
-                }
-                warplbuff = newbuffer;
-                warpbuffsize = newlen;
-            }
-            else
-                newbuffer = warplbuff;
-
-            for (incount = 0, outcount = 0;
-                 (incount < samples) && (outcount < newsamples);
-                 outcount++, incount += warpfactor)
-            {
-                memcpy(((char *)newbuffer) + (outcount * samplesize),
-                       buffer + (((int)incount) * samplesize), samplesize);
-            }
-
-            samples = outcount;
-            if (!audioOutput->AddSamples((char *)newbuffer, samples, timecode))
-               VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
-        }
-        else
-        {
-            if (!audioOutput->AddSamples(buffer, len /
-                                         (audio_channels * audio_bits / 8),
-                                         timecode))
-                VERBOSE(VB_IMPORTANT, "Audio buffer overflow, audio data lost!");
-        }
+        if (!audioOutput->AddSamples(buffer, samples, timecode))
+            VERBOSE(VB_IMPORTANT, "NVP::AddAudioData():p1: "
+                    "Audio buffer overflow, audio data lost!");
+        return;
     }
+
+    // If we need warping, do it...
+    int newsamples = (int)(samples / warpfactor);
+    int newlen     = newsamples * samplesize;
+
+    // We resize the buffers if they aren't big enough
+    if ((warpbuffsize < newlen) || (!warplbuff))
+    {
+        warplbuff = (short int*) realloc(warplbuff, newlen);
+        warprbuff = (short int*) realloc(warprbuff, newlen);
+        warpbuffsize = newlen;
+    }
+
+    // Resample...
+    float incount  = 0.0f;
+    int   outcount = 0;
+    while ((incount < samples) && (outcount < newsamples))
+    {
+        char *out_ptr = ((char*)warplbuff) + (outcount * samplesize);
+        char *in_ptr  = buffer + (((int)incount) * samplesize);
+        memcpy(out_ptr, in_ptr, samplesize);
+
+        outcount += 1;
+        incount  += warpfactor;
+    }
+    samples = outcount;
+
+    // Send new warped audio to audioOutput
+    if (!audioOutput->AddSamples((char*)warplbuff, samples, timecode))
+        VERBOSE(VB_IMPORTANT,"NVP::AddAudioData():p2: "
+                "Audio buffer overflow, audio data lost!");
 }
 
+/** \fn NuppelVideoPlayer::AddAudioData(short int*,short int*,int,long long)
+ *  \brief Sends audio to AudioOuput::AddSamples(char *buffers[],int,long long)
+ *
+ *   This uses point sampling filter to resample audio if we are
+ *   using video as the timebase rather than the audio as the
+ *   timebase. This causes ringing artifacts, but hopefully not
+ *   too much of it.
+ */
 void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
                                      int samples, long long timecode)
 {
+    char *buffers[2];
+
     WrapTimecode(timecode, TC_AUDIO);
 
-    if (audioOutput)
+    if (!audioOutput)
+        return;
+
+    // If there is no warping, just send it to the audioOutput.
+    if (!usevideotimebase)
     {
-        char *buffers[] = {(char *)lbuffer, (char *)rbuffer};
-        if (usevideotimebase)
-        {
-            short int *newlbuffer;
-            short int *newrbuffer;
-            float incount = 0;
-            int outcount;
-            int newlen;
-            int newsamples;
-
-            newsamples = (int)(samples / warpfactor);
-            newlen = newsamples * sizeof(short int);
-
-            // We resize the buffers if they aren't big enough
-            if ((warpbuffsize < newlen) || (!warplbuff) || (!warprbuff))
-            {
-                newlbuffer = (short int *)realloc(warplbuff, newlen);
-                if (!newlbuffer)
-                {
-                    VERBOSE(VB_IMPORTANT, "NVP::AddAudioData: Error, could "
-                            "not allocate left warped audio buffer!");
-                    return;
-                }
-                warplbuff = newlbuffer;
-
-                newrbuffer = (short int *)realloc(warprbuff, newlen);
-                if (!newrbuffer)
-                {
-                    VERBOSE(VB_IMPORTANT, "NVP::AddAudioData: Error, could "
-                            "not allocate right warped audio buffer!");
-                    return;
-                }
-                warprbuff = newrbuffer;
-
-                warpbuffsize = newlen;
-            }
-            else
-            {
-                newlbuffer = warplbuff;
-                newrbuffer = warprbuff;
-            }
-
-            buffers[0] = (char *)newlbuffer;
-            buffers[1] = (char *)newrbuffer;
-
-            for (incount = 0, outcount = 0;
-                 (incount < samples) && (outcount < newsamples);
-                 outcount++, incount += warpfactor)
-            {
-                newlbuffer[outcount] = lbuffer[(int)incount];
-                newrbuffer[outcount] = rbuffer[(int)incount];
-            }
-
-            samples = outcount;
-        }
-
+        buffers[0] = (char*) lbuffer;
+        buffers[1] = (char*) rbuffer;
         if (!audioOutput->AddSamples(buffers, samples, timecode))
-            VERBOSE(VB_IMPORTANT, "NVP::AddAudioData: Error, audio "
-                    "buffer overflow, audio data lost!");
+            VERBOSE(VB_IMPORTANT, "NVP::AddAudioData():p3: "
+                    "Audio buffer overflow, audio data lost!");
+        return;
     }
+
+    // If we need warping, do it...
+    int samplesize = sizeof(short int);
+    int newsamples = (int)(samples / warpfactor);
+    int newlen     = newsamples * samplesize;
+
+    // We resize the buffers if they aren't big enough
+    if ((warpbuffsize < newlen) || (!warplbuff) || (!warprbuff))
+    {
+        warplbuff = (short int*) realloc(warplbuff, newlen);
+        warprbuff = (short int*) realloc(warprbuff, newlen);
+        warpbuffsize = newlen;
+    }
+
+    // Resample...
+    float incount  = 0.0f;
+    uint  outcount = 0;
+    while ((incount < samples) && (outcount < newsamples))
+    {
+        warplbuff[outcount] = lbuffer[(uint)round(incount)];
+        warprbuff[outcount] = rbuffer[(uint)round(incount)];
+
+        outcount += 1;
+        incount  += warpfactor;
+    }
+    samples = outcount;
+
+    // Send new warped audio to audioOutput
+    buffers[0] = (char*) warplbuff;
+    buffers[1] = (char*) warprbuff;
+    if (!audioOutput->AddSamples(buffers, samples, timecode))
+        VERBOSE(VB_IMPORTANT, "NVP::AddAudioData():p4: "
+                "Audio buffer overflow, audio data lost!");
 }
 
 void NuppelVideoPlayer::SetBookmark(void)
