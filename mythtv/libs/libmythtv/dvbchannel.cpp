@@ -575,7 +575,7 @@ bool DVBChannel::Tune(const dvb_channel_t& channel, bool force_reset)
                   "Setting Frontend tuning parameters failed.");
             return false;
         }
-        wait_for_backend(fd_frontend, 5000);
+        wait_for_backend(fd_frontend, 5 /* msec */);
 
         prev_tuning.params = params;
         first_tune = false;
@@ -715,7 +715,7 @@ static uint tuned_frequency(const DVBTuning &tuning, fe_type_t type,
  */
 static bool wait_for_backend(int fd, int timeout_ms)
 {
-    struct timeval select_timeout = { 0, (timeout_ms) * 1000 };
+    struct timeval select_timeout = { 0, (timeout_ms % 1000) * 1000 /*usec*/};
     fd_set fd_select_set;
     FD_ZERO(    &fd_select_set);
     FD_SET (fd, &fd_select_set);
