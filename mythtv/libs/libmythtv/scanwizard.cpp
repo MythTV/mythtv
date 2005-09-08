@@ -690,8 +690,8 @@ void ScanWizardScanner::HandleTuneComplete(void)
     }
     else if (nScanType == ScanTypeSetting::TransportScan)
     {
-        SISCAN("ScanTransport("<<parent->transport()<<")");
-        ok = scanner->ScanTransport(parent->transport());
+        SISCAN("ScanTransport("<<nTransportToTuneTo<<")");
+        ok = scanner->ScanTransport(nTransportToTuneTo);
     }
 
     if (!ok)
