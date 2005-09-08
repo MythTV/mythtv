@@ -1729,7 +1729,7 @@ void SIScan::HandleSIParserEvents(void)
     if (!siparser)
         return;
     // ignore events before current is set
-    if (current == scanTransports.end())
+    if ((scanMode == TRANSPORT_LIST) && (current == scanTransports.end()))
         return;
 
     if (serviceListReady)
