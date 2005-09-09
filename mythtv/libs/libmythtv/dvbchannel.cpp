@@ -60,14 +60,6 @@ using namespace std;
 #include "dvbdiseqc.h"
 #include "dvbcam.h"
 
-#if (DVB_API_VERSION_MINOR <= 3 && DVB_API_VERSION_MINOR == 0)
-#    define FE_ATSC       (FE_OFDM+1)
-#    define FE_CAN_8VSB   0x200000
-#    define FE_CAN_16VSB  0x400000
-#    define VSB_8         (QAM_AUTO+1)
-#    define VSB_16        (QAM_AUTO+2)
-#endif
-
 static uint tuned_frequency(const DVBTuning&, fe_type_t, fe_sec_tone_mode_t *);
 static void drain_dvb_events(int fd);
 static bool wait_for_backend(int fd, int timeout_ms);
