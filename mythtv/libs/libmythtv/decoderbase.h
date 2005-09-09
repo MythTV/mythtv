@@ -31,7 +31,6 @@ class DecoderBase
     virtual void setWatchingRecording(bool mode);
     virtual bool GetFrame(int onlyvideo) = 0;
     NuppelVideoPlayer *GetNVP() { return m_parent; }
-    const NuppelVideoPlayer *GetNVP() const { return m_parent; }
     
     virtual bool DoRewind(long long desiredFrame, bool doflush = true);
     virtual bool DoFastForward(long long desiredFrame, bool doflush = true);
@@ -41,18 +40,18 @@ class DecoderBase
                                  long timecodeOffset) = 0;
     virtual void ClearStoredData(void) { return; };
     virtual void SetRawAudioState(bool state) { getrawframes = state; }
-    virtual bool GetRawAudioState(void) { return getrawframes; }
+    virtual bool GetRawAudioState(void) const { return getrawframes; }
     virtual void SetRawVideoState(bool state) { getrawvideo = state; }
-    virtual bool GetRawVideoState(void) { return getrawvideo; }
+    virtual bool GetRawVideoState(void) const { return getrawvideo; }
 
     virtual long UpdateStoredFrameNum(long frame) = 0;
 
-    virtual QString GetEncodingType(void) = 0;
+    virtual QString GetEncodingType(void) const = 0;
 
     virtual void UpdateFramesPlayed(void);
-    long long GetFramesRead(void) { return framesRead; };
+    long long GetFramesRead(void) const { return framesRead; };
 
-    virtual MythCodecID GetVideoCodecID() { return kCodec_NONE; }
+    virtual MythCodecID GetVideoCodecID() const { return kCodec_NONE; }
     virtual bool SyncPositionMap(void);
     virtual bool PosMapFromDb(void);
     virtual bool PosMapFromEnc(void);

@@ -268,17 +268,12 @@ bool NuppelVideoPlayer::Play(float speed, bool normal, bool unpauseaudio)
     return true;
 }
 
-bool NuppelVideoPlayer::GetPause(void)
+bool NuppelVideoPlayer::GetPause(void) const
 {
     return (actuallypaused &&
             (ringBuffer == NULL || ringBuffer->isPaused()) &&
             (audioOutput == NULL || audioOutput->GetPause()) &&
             GetVideoPause());
-}
-
-inline bool NuppelVideoPlayer::GetVideoPause(void)
-{
-    return video_actually_paused;
 }
 
 void NuppelVideoPlayer::PauseVideo(bool wait)
@@ -302,7 +297,7 @@ void NuppelVideoPlayer::UnpauseVideo(void)
     pausevideo = false;
 }
 
-void NuppelVideoPlayer::setPrebuffering(bool prebuffer)
+void NuppelVideoPlayer::SetPrebuffering(bool prebuffer)
 {
     prebuffering_lock.lock();
 
@@ -810,7 +805,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
         if (!videoOutput->EnoughFreeFrames() && !unsafe)
         {
             //cout << "waiting for video buffer to drain.\n";
-            setPrebuffering(false);
+            SetPrebuffering(false);
             if (!videoOutput->WaitForAvailable(10))
             {
                 if (++videobuf_retries >= 200)
@@ -843,7 +838,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 #endif
     {
         if (videoOutput->EnoughDecodedFrames())
-            setPrebuffering(false);
+            SetPrebuffering(false);
     }
 
     if (ffrew_skip != 1)
@@ -1569,7 +1564,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     if (!videoOutput->EnoughPrebufferedFrames())
     {
         VERBOSE(VB_GENERAL, "prebuffering pause");
-        setPrebuffering(true);
+        SetPrebuffering(true);
         return;
     }
 
@@ -2319,7 +2314,7 @@ void NuppelVideoPlayer::ClearBookmark(void)
     osd->SetSettingsText(QObject::tr("Position Cleared"), 1);
 }
 
-long long NuppelVideoPlayer::GetBookmark(void)
+long long NuppelVideoPlayer::GetBookmark(void) const
 {
     if (!m_playbackinfo)
         return 0;
@@ -2504,7 +2499,7 @@ bool NuppelVideoPlayer::DoRewind(void)
     return true;
 }
 
-long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
+long long NuppelVideoPlayer::CalcMaxFFTime(long long ff) const
 {
     long long maxtime = (long long)(1.0 * video_frame_rate);
     if (livetv || (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
@@ -2540,12 +2535,12 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff)
     return ret;
 }
 
-/** \fn NuppelVideoPlayer::IsNearEnd(long long)
+/** \fn NuppelVideoPlayer::IsNearEnd(long long) const
  *  \brief Returns true iff near end of recording.
  *  \param margin minimum number of frames we want before being near end,
  *                defaults to 2 seconds of video.
  */
-bool NuppelVideoPlayer::IsNearEnd(long long margin)
+bool NuppelVideoPlayer::IsNearEnd(long long margin) const
 {
     long long framesRead, framesLeft;
     bool watchingTV = watchingrecording && nvr_enc && nvr_enc->IsValidRecorder();
@@ -2602,7 +2597,8 @@ void NuppelVideoPlayer::JumpToFrame(long long frame)
     GetDecoder()->setExactSeeks(exactstore);
 }
 
-int NuppelVideoPlayer::SkipTooCloseToEnd(int frames)
+#if 0
+bool NuppelVideoPlayer::IsSkipTooCloseToEnd(int frames) const
 {
     if ((livetv) ||
         (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
@@ -2616,7 +2612,16 @@ int NuppelVideoPlayer::SkipTooCloseToEnd(int frames)
     }
     return 0;
 }
+#endif
 
+/** \fn NuppelVideoPlayer::ClearAfterSeek(void)
+ *  \brief This is to support seeking...
+ *
+ *   It can be very dangerous as it removes all frames from
+ *   the videoOutput, so you can't restart playback immediately.
+ *
+ *   Note: caller should not hold any locks
+ */
 void NuppelVideoPlayer::ClearAfterSeek(void)
 {
     videoOutput->ClearAfterSeek();
@@ -2634,7 +2639,7 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
     }
     tc_avcheck_framecounter = 0;
 
-    setPrebuffering(true);
+    SetPrebuffering(true);
     if (audioOutput)
         audioOutput->Reset();
 
@@ -2948,7 +2953,7 @@ bool NuppelVideoPlayer::DoKeypress(QKeyEvent *e)
     return retval;
 }
 
-int NuppelVideoPlayer::GetLetterbox(void)
+int NuppelVideoPlayer::GetLetterbox(void) const
 {
     if (videoOutput)
         return videoOutput->GetLetterbox();
@@ -3237,7 +3242,7 @@ void NuppelVideoPlayer::HandleArbSeek(bool right)
     UpdateEditSlider();
 }
 
-bool NuppelVideoPlayer::IsInDelete(long long testframe)
+bool NuppelVideoPlayer::IsInDelete(long long testframe) const
 {
     long long startpos = 0;
     long long endpos = 0;
@@ -3245,7 +3250,7 @@ bool NuppelVideoPlayer::IsInDelete(long long testframe)
     bool indelete = false;
     bool ret = false;
 
-    QMap<long long, int>::Iterator i;
+    QMap<long long, int>::const_iterator i;
     for (i = deleteMap.begin(); i != deleteMap.end(); ++i)
     {
         if (ret)
@@ -3398,8 +3403,23 @@ bool NuppelVideoPlayer::FrameIsInMap(long long frameNumber,
     return false;
 }
 
-char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen, int &vw,
-                                       int &vh, float &ar)
+/** \fn NuppelVideoPlayer::GetScreenGrab(int,int&,int&,int&,float&)
+ *  \brief Returns a one RGB frame grab from a video.
+ *
+ *   User is responsible for deleting the buffer with delete[].
+ *   This also tries to skip any commercial breaks for a more
+ *   useful screen grab for previews.
+ *
+ *   Warning: Don't use this on something you're playing!
+ *
+ *  \param secondsin [in]  Seconds to seek into the buffer
+ *  \param bufflen   [out] Size of buffer returned in bytes
+ *  \param vw        [out] Width of buffer returned
+ *  \param vh        [out] Height of buffer returned
+ *  \param ar        [out] Aspect of buffer returned
+ */
+char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
+                                       int &vw, int &vh, float &ar)
 {
     using_null_videoout = true;
 
@@ -3516,12 +3536,12 @@ VideoFrame* NuppelVideoPlayer::GetRawVideoFrame(long long frameNumber)
     return videoOutput->GetLastDecodedFrame();
 }
 
-QString NuppelVideoPlayer::GetEncodingType(void)
+QString NuppelVideoPlayer::GetEncodingType(void) const
 {
     return GetDecoder()->GetEncodingType();
 }
 
-bool NuppelVideoPlayer::GetRawAudioState(void)
+bool NuppelVideoPlayer::GetRawAudioState(void) const
 {
     return GetDecoder()->GetRawAudioState();
 }
@@ -3746,7 +3766,7 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
     return true;
 }
 
-int NuppelVideoPlayer::GetStatusbarPos(void)
+int NuppelVideoPlayer::GetStatusbarPos(void) const
 {
     double spos = 0.0;
 
@@ -3764,7 +3784,7 @@ int NuppelVideoPlayer::GetStatusbarPos(void)
     return((int)spos);
 }
 
-int NuppelVideoPlayer::GetSecondsBehind(void)
+int NuppelVideoPlayer::GetSecondsBehind(void) const
 {
     if (!nvr_enc)
         return 0;
@@ -3780,7 +3800,7 @@ int NuppelVideoPlayer::GetSecondsBehind(void)
     return (int)((float)(written - played) / video_frame_rate);
 }
 
-int NuppelVideoPlayer::calcSliderPos(QString &desc)
+int NuppelVideoPlayer::calcSliderPos(QString &desc) const
 {
     float ret;
 
@@ -4143,7 +4163,7 @@ bool NuppelVideoPlayer::setCurrentAudioTrack(int trackNo)
 }
 
 
-int NuppelVideoPlayer::getCurrentAudioTrack()
+int NuppelVideoPlayer::getCurrentAudioTrack() const
 {
     if (GetDecoder())
         return GetDecoder()->getCurrentAudioTrack() + 1;
@@ -4151,7 +4171,7 @@ int NuppelVideoPlayer::getCurrentAudioTrack()
         return 0;
 }
 
-QStringList NuppelVideoPlayer::listAudioTracks()
+QStringList NuppelVideoPlayer::listAudioTracks() const
 {
     if (decoder)
         return decoder->listAudioTracks();
@@ -4180,7 +4200,7 @@ bool NuppelVideoPlayer::setCurrentSubtitleTrack(int trackNo)
 }
 
 
-int NuppelVideoPlayer::getCurrentSubtitleTrack()
+int NuppelVideoPlayer::getCurrentSubtitleTrack() const
 {
     int trackNo = 0;
     if (cc && decoder)
@@ -4188,7 +4208,7 @@ int NuppelVideoPlayer::getCurrentSubtitleTrack()
     return trackNo;
 }
 
-QStringList NuppelVideoPlayer::listSubtitleTracks()
+QStringList NuppelVideoPlayer::listSubtitleTracks() const
 {
     QStringList list;
     if (decoder)

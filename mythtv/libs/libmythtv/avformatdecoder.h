@@ -57,20 +57,20 @@ class AvFormatDecoder : public DecoderBase
     void SetRawAudioState(bool state) { (void)state; }
 
     /// This is a No-op for this class.
-    bool GetRawAudioState(void) { return false; }
+    bool GetRawAudioState(void) const { return false; }
 
     /// This is a No-op for this class.
     void SetRawVideoState(bool state) { (void)state; }
 
     /// This is a No-op for this class.
-    bool GetRawVideoState(void) { return false; }
+    bool GetRawVideoState(void) const { return false; }
 
     /// This is a No-op for this class.
     long UpdateStoredFrameNum(long frame) { (void)frame; return 0;}
 
-    QString GetEncodingType(void) { return QString("MPEG-2"); }
+    QString GetEncodingType(void) const { return QString("MPEG-2"); }
 
-    MythCodecID GetVideoCodecID() { return video_codec_id; }
+    MythCodecID GetVideoCodecID() const { return video_codec_id; }
 
     virtual void incCurrentAudioTrack();
     virtual void decCurrentAudioTrack();

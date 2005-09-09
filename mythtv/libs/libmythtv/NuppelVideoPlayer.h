@@ -42,205 +42,201 @@ struct TextContainer
 
 typedef  void (*StatusCallback)(int, void*);
 
+/// Timecode types
+enum TCTypes
+{
+    TC_VIDEO = 0,
+    TC_AUDIO,
+    TC_SUB,
+    TC_CC
+};
+#define TCTYPESMAX 4
+
 class NuppelVideoPlayer
 {
  public:
     NuppelVideoPlayer(const ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
 
-    void SetParentWidget(QWidget *widget) { parentWidget = widget; }
+    // Initialization
+    void ForceVideoOutputType(VideoOutputType type);
+    bool InitVideo(void);
+    int  OpenFile(bool skipDsp = false);
 
-    void SetAsPIP(void) { disableaudio = using_null_videoout = true; }
-    void SetNoAudio(void) { disableaudio = true; }
-    void SetNullVideo(void) { using_null_videoout = true; }
+    // Windowing stuff
+    void EmbedInWidget(WId wid, int x, int y, int w, int h);
+    void StopEmbedding(void);
+    void ExposeEvent(void);
 
-    void SetAudioDevice(QString device) { audiodevice = device; }
-    void SetFileName(QString lfilename) { filename = lfilename; }
-
-    void SetExactSeeks(bool exact) { exactseeks = exact; }
+    // Sets
+    void SetParentWidget(QWidget *widget)     { parentWidget = widget; }
+    void SetAsPIP(void)                       { SetNoAudio(); SetNullVideo(); }
+    void SetNoAudio(void)                     { disableaudio = true; }
+    void SetNullVideo(void)                   { using_null_videoout = true; }
+    void SetAudioDevice(QString device)       { audiodevice = device; }
+    void SetFileName(QString lfilename)       { filename = lfilename; }
+    void SetExactSeeks(bool exact)            { exactseeks = exact; }
     void SetAutoCommercialSkip(int autoskip);
-    void SetCommercialSkipMethod(int method) { commercialskipmethod = method; }
+    void SetCommercialSkipMethod(int m)       { commercialskipmethod = m; }
     void SetCommBreakMap(QMap<long long, int> &newMap);
+    void SetRingBuffer(RingBuffer *rbuf)      { ringBuffer = rbuf; }
+    void SetAudioSampleRate(int rate)         { audio_samplerate = rate; }
+    void SetAudioStretchFactor(float factor)  { audio_stretchfactor = factor; }
+    void SetLength(int len)                   { totalLength = len; }
+    void SetAudioOutput (AudioOutput *ao)     { audioOutput = ao; }
+    void SetVideoFilters(QString &filters)    { videoFilterList = filters; }
+    void SetFramesPlayed(long long played)    { framesPlayed = played; }
+    void SetEof(void)                         { eof = true; }
+    void SetPipPlayer(NuppelVideoPlayer *pip)
+        { setpipplayer = pip; needsetpipplayer = true; }
+    void SetRecorder(RemoteEncoder *recorder);
 
-    int OpenFile(bool skipDsp = false);
+    void SetTranscoding(bool value);
+    void SetWatchingRecording(bool mode);
+    void SetBookmark(void);
+    void SetKeyframeDistance(int keyframedistance);
+    void SetVideoParams(int w, int h, double fps, int keydist,
+                        float a = 1.33333, FrameScanType scan = kScan_Ignore,
+                        bool reinit = false);
+    void SetAudioParams(int bits, int channels, int samplerate);
+    void SetEffDsp(int dsprate);
+    void SetFileLength(int total, int frames);
+    void Zoom(int direction);
+    void ClearBookmark(void);
+
+    // Toggle Sets
+    void ToggleLetterbox(int letterboxMode = -1);
+
+    // Gets
+    int     GetVideoWidth(void) const         { return video_width; }
+    int     GetVideoHeight(void) const        { return video_height; }
+    float   GetVideoAspect(void) const        { return video_aspect; }
+    float   GetFrameRate(void) const          { return video_frame_rate; }
+
+    int     GetSecondsBehind(void) const;
+    int     GetLetterbox(void) const;
+    int     GetFFRewSkip(void) const          { return ffrew_skip; }
+    float   GetAudioStretchFactor(void) const { return audio_stretchfactor; }
+    float   GetNextPlaySpeed(void) const      { return next_play_speed; }
+    int     GetLength(void) const             { return totalLength; }
+    long long GetTotalFrameCount(void) const  { return totalFrames; }
+    long long GetFramesPlayed(void) const     { return framesPlayed; }
+    long long GetBookmark(void) const;
+    QString   GetEncodingType(void) const;
+
+    // Bool Gets
+    bool    GetRawAudioState(void) const;
+    bool    GetLimitKeyRepeat(void) const     { return limitKeyRepeat; }
+    bool    GetEof(void) const                { return eof; }
+    bool    PipPlayerSet(void) const          { return !needsetpipplayer; }
+    bool    IsErrored(void) const             { return errored; }
+    bool    IsPlaying(void) const             { return playing; }
+    bool    AtNormalSpeed(void) const         { return next_normal_speed; }
+    bool    IsDecoderThreadAlive(void) const  { return decoder_thread_alive; }
+    bool    IsNearEnd(long long framesRemaining = -1) const;
+
+    // Complicated gets
+    long long CalcMaxFFTime(long long ff) const;
+    int       calcSliderPos(QString &desc) const;
+
+    /// Non-const gets
+    OSD         *GetOSD(void)                 { return osd; }
+    VideoOutput *getVideoOutput(void)         { return videoOutput; }
+    AudioOutput *getAudioOutput(void)         { return audioOutput; }
+    VideoSync   *getVideoSync(void)           { return videosync; }
+    char        *GetScreenGrab(int secondsin, int &buflen,
+                               int &vw, int &vh, float &ar);
+
+    // Start/Reset/Stop playing
     void StartPlaying(void);
+    void ResetPlaying(void);
     void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
 
-    bool IsPlaying(void) { return playing; }
-    bool IsDecoderThreadAlive(void) { return decoder_thread_alive; }
-
-    void SetRingBuffer(RingBuffer *rbuf) { ringBuffer = rbuf; }
-
-    void SetAudioSampleRate(int rate) { audio_samplerate = rate; }
-
-    void SetAudioStretchFactor(float factor) { audio_stretchfactor = factor; }
-
+    // Pause stuff
     void Pause(bool waitvideo = true);
     bool Play(float speed = 1.0, bool normal = true,
               bool unpauseaudio = true);
-    bool GetPause(void);
-    int GetFFRewSkip(void) { return ffrew_skip; }
-    bool AtNormalSpeed(void) { return next_normal_speed; }
+    bool GetPause(void) const;
 
+    // Seek stuff
     bool FastForward(float seconds);
     bool Rewind(float seconds);
-
-    void SkipCommercials(int direction);
-
-    void ResetPlaying(void);
-
-    int GetVideoWidth(void) { return video_width; }
-    int GetVideoHeight(void) { return video_height; }
-    float GetVideoAspect(void) { return video_aspect; }
-    float GetFrameRate(void) { return video_frame_rate; }
-    long long GetTotalFrameCount(void) { return totalFrames; }
-    long long GetFramesPlayed(void) { return framesPlayed; }
-    int GetSecondsBehind(void);
-    float GetAudioStretchFactor(void) const { return audio_stretchfactor; }
-    float GetNextPlaySpeed(void) const { return next_play_speed; }
-
-    void SetRecorder(RemoteEncoder *recorder);
-
-    OSD *GetOSD(void) { return osd; }
-
-    // don't use this on something you're playing
-    char *GetScreenGrab(int secondsin, int &buflen, int &vw, int &vh, float &ar);
-
-    void SetLength(int len) { totalLength = len; }
-    int GetLength(void) { return totalLength; }
-
-    QString GetEncodingType(void);
-    void SetAudioOutput (AudioOutput *ao) { audioOutput = ao; }
-    void FlushTxtBuffers(void) { rtxt = wtxt; }
-    bool WriteStoredData(RingBuffer *outRingBuffer, bool writevideo,
-                         long timecodeOffset);
-    long UpdateStoredFrameNum(long curFrameNum);
-    void InitForTranscode(bool copyaudio, bool copyvideo);
-    bool TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
-                               int *did_ff, bool *is_key, bool honorCutList);
-    void TranscodeWriteText(void (*func)(void *, unsigned char *, int, int, int), void *ptr);
-
-    int FlagCommercials(bool showPercentage, bool fullSpeed,
-                        bool inJobQueue);
     bool RebuildSeekTable(bool showPercentage = true, StatusCallback cb = NULL,
                           void* cbData = NULL);
 
-    VideoFrame *GetCurrentFrame(int &w, int &h);
-    void ReleaseCurrentFrame(VideoFrame *frame);
+    // Commercial stuff
+    void SkipCommercials(int direction);
+    int FlagCommercials(bool showPercentage, bool fullSpeed,
+                        bool inJobQueue);
 
-    void SetPipPlayer(NuppelVideoPlayer *pip)
-        { setpipplayer = pip; needsetpipplayer = true; }
-    bool PipPlayerSet(void) const { return !needsetpipplayer; }
+    // Transcode stuff
+    void InitForTranscode(bool copyaudio, bool copyvideo);
+    bool TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
+                               int *did_ff, bool *is_key, bool honorCutList);
+    void TranscodeWriteText(
+        void (*func)(void *, unsigned char *, int, int, int), void *ptr);
+    bool WriteStoredData(
+        RingBuffer *outRingBuffer, bool writevideo, long timecodeOffset);
+    long UpdateStoredFrameNum(long curFrameNum);
 
-    void SetVideoFilters(QString &filters) { videoFilterList = filters; }
-    void SetTranscoding(bool value);
-
-    void SetWatchingRecording(bool mode);
-    void SetBookmark(void);
-    void ClearBookmark(void);
-    long long GetBookmark(void);
-
+    // Closed caption and teletext stuff
     void ToggleCC(char mode, int arg);
+    void FlushTxtBuffers(void) { rtxt = wtxt; }
 
-    // edit mode stuff
+    // Edit mode stuff
     bool EnableEdit(void);
     bool DoKeypress(QKeyEvent *e);
-    bool GetEditMode(void) { return editmode; }
+    bool GetEditMode(void) const { return editmode; }
 
-    void EmbedInWidget(WId wid, int x, int y, int w, int h);
-    void StopEmbedding(void);
-
-    // decoder stuff..
-    void ForceVideoOutputType(VideoOutputType type);
-
-    void SetKeyframeDistance(int keyframedistance);
-    void SetVideoParams(int width, int height, double fps,
-                        int keyframedistance, float aspect = 1.33333,
-                        FrameScanType scan = kScan_Ignore, bool reinit = false);
-    void SetAudioParams(int bps, int channels, int samplerate);
-    void SetEffDsp(int dsprate);
-    void SetFileLength(int total, int frames);
-
+    // Decoder stuff..
     VideoFrame *GetNextVideoFrame(bool allow_unsafe = true);
+    VideoFrame *GetRawVideoFrame(long long frameNumber = -1);
+    VideoFrame *GetCurrentFrame(int &w, int &h);
     void ReleaseNextVideoFrame(VideoFrame *buffer, long long timecode);
     void ReleaseNextVideoFrame(void)
         { videoOutput->ReleaseFrame(GetNextVideoFrame(false)); }
+    void ReleaseCurrentFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(void);
-
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
-    bool GetRawAudioState(void);
+    // Reinit
+    void    ReinitOSD(void);
+    void    ReinitVideo(void);
+    QString ReinitAudio(void);
+
+    // Add data
     void AddAudioData(char *buffer, int len, long long timecode);
     void AddAudioData(short int *lbuffer, short int *rbuffer, int samples,
                       long long timecode);
-
     void AddTextData(char *buffer, int len, long long timecode, char type);
-
-    void SetEof(void) { eof = 1; }
-    int GetEof(void) { return eof; }
-    void SetFramesPlayed(long long played) { framesPlayed = played; }
-
-    VideoOutput *getVideoOutput(void) { return videoOutput; }
-    AudioOutput *getAudioOutput(void) { return audioOutput; }
-
-    VideoSync *getVideoSync() const { return videosync; }
-
-    void StopVideoSync(void);
-
-    int calcSliderPos(QString &desc);
-
-    bool GetLimitKeyRepeat(void) { return limitKeyRepeat; }
-
-    void ReinitOSD(void);
-    void ReinitVideo(void);
-    QString ReinitAudio(void);
-
-    void ToggleLetterbox(int letterboxMode = -1);
-    void Zoom(int direction);
-    int GetLetterbox(void);
-
-    void ExposeEvent(void);
-
-    void incCurrentAudioTrack();
-    void decCurrentAudioTrack();
-    bool setCurrentAudioTrack(int trackNo);
-    int getCurrentAudioTrack();
-    QStringList listAudioTracks();
-
-    void incCurrentSubtitleTrack();
-    void decCurrentSubtitleTrack();
-    bool setCurrentSubtitleTrack(int trackNo);
-    int getCurrentSubtitleTrack();
-    QStringList listSubtitleTracks();
-
-    long long CalcMaxFFTime(long long ff);
-
-    bool IsNearEnd(long long framesRemaining = -1);
-
-    bool IsErrored() { return errored; }
-    bool InitVideo(void);
-    VideoFrame* GetRawVideoFrame(long long frameNumber = -1);
-    
-    long long GetAudioTimecodeOffset() { return audio_timecode_offset; }
-    long long AdjustAudioTimecodeOffset(long long v) { 
-        audio_timecode_offset += v;
-        return audio_timecode_offset; 
-    }
-
-    long long ResetAudioTimecodeOffset() { 
-        audio_timecode_offset = 0;
-        return audio_timecode_offset; 
-    }
-
-    long long ResyncAudioTimecodeOffset() { 
-        audio_timecode_offset = (long long)0x8000000000000000LL;
-        return 0; 
-    }
-
     void AddSubtitle(const AVSubtitle& subtitle);
 
- protected:
+    // Audio Track Selection
+    void incCurrentAudioTrack(void);
+    void decCurrentAudioTrack(void);
+    bool setCurrentAudioTrack(int trackNo);
+    int  getCurrentAudioTrack(void) const;
+    QStringList listAudioTracks(void) const;
+
+    // Subtitle Track Selection
+    void incCurrentSubtitleTrack(void);
+    void decCurrentSubtitleTrack(void);
+    bool setCurrentSubtitleTrack(int trackNo);
+    int  getCurrentSubtitleTrack(void) const;
+    QStringList listSubtitleTracks(void) const;
+
+    // Time Code adjustment stuff
+    long long AdjustAudioTimecodeOffset(long long v)
+        { audio_timecode_offset += v;  return audio_timecode_offset; }
+    long long ResetAudioTimecodeOffset(void)
+        { audio_timecode_offset = 0LL; return audio_timecode_offset; }
+    long long ResyncAudioTimecodeOffset(void)
+        { audio_timecode_offset = 0x8000LL << 12; return 0L; }
+    long long GetAudioTimecodeOffset(void) const 
+        { return audio_timecode_offset; }
+ 
+  protected:
     void DisplayPauseFrame(void);
     void DisplayNormalFrame(void);
     void OutputVideoLoop(void);
@@ -248,91 +244,90 @@ class NuppelVideoPlayer
 
     static void *kickoffOutputVideoLoop(void *player);
 
- private:
+  private:
+    // Private initialization stuff
     void InitFilters(void);
+    FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
+                                  float fps, int video_height);
 
-    bool GetVideoPause(void);
+    // Private Sets
+    void SetPrebuffering(bool prebuffer);
+
+    // Private Gets
+    int  GetStatusbarPos(void) const;
+    bool IsInDelete(long long testframe) const;
+
+    // Private pausing stuff
     void PauseVideo(bool wait = true);
     void UnpauseVideo(void);
+    bool GetVideoPause(void) const { return video_actually_paused; }
 
-    void setPrebuffering(bool prebuffer);
-
+    // Private decoder stuff
+    void  SetDecoder(DecoderBase *dec);
+    /// Returns the stream decoder currently in use.
+    DecoderBase *GetDecoder(void) { return decoder; }
+    /// Returns the stream decoder currently in use.
+    const DecoderBase *GetDecoder(void) const { return decoder; }
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
     bool GetFrame(int onlyvideo, bool unsafe = false);
 
-    void DoPause();
-    void DoPlay();
-    bool DoFastForward();
-    bool DoRewind();
+    // These actually execute commands requested by public members
+    void DoPause(void);
+    void DoPlay(void);
+    bool DoFastForward(void);
+    bool DoRewind(void);
 
-    void ClearAfterSeek(); // caller should not hold any locks
-
-    int GetStatusbarPos(void);
-
-    int SkipTooCloseToEnd(int frames);
-    void SkipCommercialsByBlanks(void);
-    bool DoSkipCommercials(int direction);
-    void AutoCommercialSkip(void);
+    // Private seeking stuff
+    void ClearAfterSeek(void);
     bool FrameIsInMap(long long frameNumber, QMap<long long, int> &breakMap);
-
     void JumpToFrame(long long frame);
     void JumpToNetFrame(long long net) { JumpToFrame(framesPlayed + net); }
 
-    int tbuffer_numvalid(void); // number of valid slots in the text buffer
-    int tbuffer_numfree(void); // number of free slots in the text buffer
+    // Private commercial skipping
+    void SkipCommercialsByBlanks(void);
+    bool DoSkipCommercials(int direction);
+    void AutoCommercialSkip(void);
 
-    void ShowText(void);
-    void ResetCC(void);
-    void UpdateCC(unsigned char *inpos);
-
-    void UpdateTimeDisplay(void);
-    void UpdateSeekAmount(bool up);
-    void UpdateEditSlider(void);
-    void AddMark(long long frames, int type);
-    void DeleteMark(long long frames);
-    void ReverseMark(long long frames);
-    void HandleSelect(void);
-    void HandleResponse(void);
-    void HandleArbSeek(bool right);
-    bool IsInDelete(long long testframe);
+    // Private edit stuff
     void SaveCutList(void);
     void LoadCutList(void);
     void LoadCommBreakList(void);
     void DisableEdit(void);
+
+    void AddMark(long long frames, int type);
+    void DeleteMark(long long frames);
+    void ReverseMark(long long frames);
+
     void SetDeleteIter(void);
     void SetBlankIter(void);
     void SetCommBreakIter(void);
 
+    void HandleArbSeek(bool right);
+    void HandleSelect(void);
+    void HandleResponse(void);
+
+    void UpdateTimeDisplay(void);
+    void UpdateSeekAmount(bool up);
+    void UpdateEditSlider(void);
+
+    // Private A/V Sync Stuff
     float WarpFactor(void);
+    void  WrapTimecode(long long &timecode, TCTypes tc_type);
+    void  InitAVSync(void);
+    void  AVSync(void);
+    void  ShutdownAVSync(void);
 
-    FrameScanType detectInterlace(FrameScanType newScan, FrameScanType scan,
-                                  float fps, int video_height);
+    // Private closed caption and teletext stuff
+    int   tbuffer_numvalid(void); // number of valid slots in the text buffer
+    int   tbuffer_numfree(void); // number of free slots in the text buffer
+    void  ShowText(void);
+    void  ResetCC(void);
+    void  UpdateCC(unsigned char *inpos);
 
-    void DisplaySubtitles();
-    void ClearSubtitles();
-
-    void SetDecoder(DecoderBase *dec);
-    // Returns the stream decoder currently in use.
-    DecoderBase *GetDecoder() { return decoder; }
-    // Returns the stream decoder currently in use.
-    const DecoderBase *GetDecoder() const { return decoder; }
-
-    // timecode types
-    enum TCTypes
-    {
-        TC_VIDEO = 0,
-        TC_AUDIO,
-        TC_SUB,
-        TC_CC
-    };
-#define TCTYPESMAX 4
-
-  private:
-    void WrapTimecode(long long &timecode, TCTypes tc_type);
-    void InitAVSync(void);
-    void AVSync(void);
-    void ShutdownAVSync(void);
+    // Private subtitle stuff
+    void  DisplaySubtitles(void);
+    void  ClearSubtitles(void);
 
   private:
     VideoOutputType forceVideoOutput;
@@ -371,7 +366,7 @@ class NuppelVideoPlayer
     bool     disableaudio;
     bool     transcoding;
     bool     hasFullPositionMap;
-    bool     limitKeyRepeat;
+    mutable bool     limitKeyRepeat;
     bool     errored;
     int      m_DeintSetting;
 

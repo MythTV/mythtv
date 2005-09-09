@@ -53,7 +53,7 @@ class NuppelDecoder : public DecoderBase
 
     long UpdateStoredFrameNum(long framenumber);
 
-    QString GetEncodingType(void);
+    QString GetEncodingType(void) const;
 
   private:
     inline bool NuppelDecoder::ReadFileheader(struct rtfileheader *fileheader);

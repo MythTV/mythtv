@@ -42,13 +42,13 @@ class IvtvDecoder : public DecoderBase
     void WriteStoredData(RingBuffer *rb, bool storevid, long timecodeOffset)
                            { (void)rb; (void)storevid; (void)timecodeOffset;}
     void SetRawAudioState(bool state) { (void)state; }
-    bool GetRawAudioState(void) { return false; }
+    bool GetRawAudioState(void) const { return false; }
     void SetRawVideoState(bool state) { (void)state; }
-    bool GetRawVideoState(void) { return false; }
+    bool GetRawVideoState(void) const { return false; }
 
     long UpdateStoredFrameNum(long frame) { (void)frame; return 0; }
 
-    QString GetEncodingType(void) { return QString("MPEG-2"); }
+    QString GetEncodingType(void) const { return QString("MPEG-2"); }
 
     void UpdateFramesPlayed(void);
 

@@ -103,7 +103,7 @@ bool NuppelDecoder::CanHandle(char testbuf[2048])
     return false;
 }
 
-QString NuppelDecoder::GetEncodingType(void)
+QString NuppelDecoder::GetEncodingType(void) const
 {
     QString value = "Unknown";
     if (mpa_codec)
