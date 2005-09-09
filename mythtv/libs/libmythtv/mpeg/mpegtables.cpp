@@ -288,12 +288,24 @@ const QString ProgramMapTable::toString() const
     return str;
 }
 
-const char *nameStream(unsigned int streamID)
+const char *StreamID::toString(unsigned int streamID)
 {
-    // valid for some ATSC stuff too
+    // valid for some ATSC/DVB stuff too
     char* retval = "unknown";
-    if (StreamID::MPEG2Video==streamID) return "video-mp2";
-    else if (StreamID::MPEG1Video==streamID) return "video-mp1";
+
+    // video
+    if (StreamID::MPEG2Video==streamID)
+        return "video-mpeg2";
+    else if (StreamID::MPEG1Video==streamID)
+        return "video-mpeg1";
+    else if (StreamID::MPEG4Video==streamID)
+        return "video-mpeg4";
+    else if (StreamID::H264Video==streamID)
+        return "video-h264";
+    else if (StreamID::OpenCableVideo==streamID)
+        return "video-opencable";
+
+    // audio
     else if (StreamID::AC3Audio==streamID)
         return "audio-ac3";  // EIT, PMT
     else if (StreamID::MPEG2Audio==streamID)
@@ -304,6 +316,13 @@ const char *nameStream(unsigned int streamID)
         return "audio-aac"; // EIT, PMT
     else if (StreamID::DTSAudio==streamID)
         return "audio-dts"; // EIT, PMT
+
+    // other
+    else if (StreamID::PrivSec==streamID)
+        return "private-sec";
+    else if (StreamID::PrivData==streamID)
+        return "private-data";
+
     else switch (streamID) {
         case (TableID::STUFFING):
             retval="stuffing"; break; // optionally in any
@@ -324,6 +343,6 @@ const char *nameStream(unsigned int streamID)
 
 const QString ProgramMapTable::StreamTypeString(unsigned int i) const
 {
-    return QString( nameStream(StreamType(i)) );
+    return QString( StreamID::toString(StreamType(i)) );
 }
 

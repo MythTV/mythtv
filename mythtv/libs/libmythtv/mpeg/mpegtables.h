@@ -68,6 +68,7 @@ class StreamID
                 (StreamID::AC3Audio   == type) ||
                 (StreamID::DTSAudio   == type));
     }
+    static const char* toString(uint streamID);
 };
 
 enum
