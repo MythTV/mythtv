@@ -31,53 +31,16 @@
 
 int XVMC_VLD_field_start(MpegEncContext* s, AVCodecContext* avctx)
 {
-    xvmc_render_state_t*    render;
-    XvMCMpegControl     binfo;
-    XvMCQMatrix      qmatrix;
-    int          i;
+    xvmc_render_state_t *render;
+    XvMCMpegControl      binfo;
+    XvMCQMatrix          qmatrix;
+    int                  i;
 
-    memset(&binfo, 0, sizeof(binfo));
-    memset(&qmatrix, 0, sizeof(qmatrix));
+    XVMC_field_start(s, avctx);
 
-    render = (xvmc_render_state_t *)s->current_picture.data[2];
-    assert(render != NULL);
-
-    render->picture_structure = s->picture_structure;
-    if (render->picture_structure == PICT_FRAME)
-        render->flags = XVMC_FRAME_PICTURE;
-    else if (render->picture_structure == PICT_TOP_FIELD)
-        render->flags = XVMC_TOP_FIELD;
-    else if (render->picture_structure == PICT_BOTTOM_FIELD)
-        render->flags = XVMC_BOTTOM_FIELD;
-
-    if (!s->first_field)
-        render->flags |= XVMC_SECOND_FIELD;
-
-    render->p_future_surface = NULL;
-    render->p_past_surface = NULL;
-
-    render->pict_type = s->pict_type; // for later frame dropping use
-
-    switch(s->pict_type)
-    {
-    case  I_TYPE:
-        // no prediction from other frames
-        break;
-
-    case  B_TYPE:
-        render->p_past_surface = findPastSurface(s, render);
-        render->p_future_surface = findFutureSurface(s);
-        if (!render->p_past_surface)
-            av_log(avctx, AV_LOG_ERROR, "error: decoding B frame and past frame is null!");
-        else if (!render->p_future_surface)
-            av_log(avctx, AV_LOG_ERROR, "error: decoding B frame and future frame is null!");
-        break;
-    case  P_TYPE:
-        render->p_past_surface = findPastSurface(s, render);
-        if (!render->p_past_surface)
-            av_log(avctx, AV_LOG_ERROR, "error: decoding P frame and past frame is null!");
-        break;
-    }
+    render = (xvmc_render_state_t*) s->current_picture.data[2];
+    bzero(&binfo, sizeof(binfo));
+    bzero(&qmatrix, sizeof(qmatrix));
 
     for (i = 0; i < 64; i++)
     {
