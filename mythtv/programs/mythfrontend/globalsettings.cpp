@@ -515,6 +515,7 @@ static GlobalComboBox *AutoExpireMethod()
     bc->setLabel(QObject::tr("Auto Expire Method"));
     bc->addSelection(QObject::tr("None"), "0");
     bc->addSelection(QObject::tr("Oldest Show First"), "1");
+    bc->addSelection(QObject::tr("Lowest Priority First"), "2");
     bc->setHelpText(QObject::tr("Method used to determine which recorded "
                                 "shows to delete first. Set to 'None' to "
                                 "disable Auto Expire (not recommended)."));

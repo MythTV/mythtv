@@ -708,7 +708,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                   "channel.callsign,channel.name,channel.commfree, "
                   "channel.outputfilters,seriesid,programid,filesize, "
                   "lastmodified,stars,previouslyshown,originalairdate, "
-                  "hostname,recordid,transcoder,timestretch "
+                  "hostname,recordid,transcoder,timestretch, "
+                  "recorded.recpriority "
                   "FROM recorded "
                   "LEFT JOIN channel "
                   "ON recorded.chanid = channel.chanid "
@@ -769,6 +770,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         proginfo->programflags = proginfo->getProgramFlags();
 
         proginfo->timestretch = query.value(21).toString().toFloat();
+        proginfo->recpriority = query.value(22).toInt();
 
         return proginfo;
     }
@@ -1232,11 +1234,11 @@ void ProgramInfo::StartedRecording(void)
                   " subtitle,description,hostname,category,recgroup,"
                   " autoexpire,recordid,seriesid,programid,stars,"
                   " previouslyshown,originalairdate,findid,transcoder,"
-                  " timestretch)"
+                  " timestretch,recpriority)"
                   " VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
                   " :HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
                   " :SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE,"
-                  " :FINDID,:TRANSCODER,:TIMESTRETCH);");
+                  " :FINDID,:TRANSCODER,:TIMESTRETCH,:RECPRIORITY);");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTS", starts);
     query.bindValue(":ENDS", ends);
@@ -1256,6 +1258,7 @@ void ProgramInfo::StartedRecording(void)
     query.bindValue(":ORIGAIRDATE", originalAirDate);
     query.bindValue(":TRANSCODER", record->GetTranscoder());
     query.bindValue(":TIMESTRETCH", timestretch);
+    query.bindValue(":RECPRIORITY", record->getRecPriority());
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("WriteRecordedToDB", query);

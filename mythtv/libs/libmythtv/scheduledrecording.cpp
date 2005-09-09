@@ -621,6 +621,10 @@ void ScheduledRecording::setEnd(const QDateTime& end) {
     endDate->setValue(end.date());
 }
 
+int ScheduledRecording::getRecPriority(void) const {
+    return recpriority->getValue().toInt();
+}
+
 void ScheduledRecording::setRecPriority(int newrecpriority) {
     recpriority->setValue(newrecpriority);
 }
@@ -787,6 +791,4 @@ void ScheduledRecording::makeOverride(void)
     recgroup->setChanged();
 }
 
-
-
-
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

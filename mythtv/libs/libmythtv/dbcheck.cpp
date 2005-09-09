@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1092";
+const QString currentDatabaseVersion = "1094";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2045,6 +2045,42 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
             return false;
     }
 
+    if (dbver == "1092")
+    {
+        const QString updates[] = {
+            "ALTER TABLE recorded ADD COLUMN recpriority INT NOT NULL DEFAULT 0;",
+            ""
+        };
+        
+        if (!performActualUpdate(updates, "1093", dbver))
+            return false;
+    }
+
+    if (dbver == "1093")
+    {
+        MSqlQuery recordids(MSqlQuery::InitCon());
+        recordids.prepare("SELECT recordid,recpriority FROM record;");
+        if (!recordids.exec())
+            return false;
+
+        if (recordids.isActive() && recordids.size() > 0)
+        {
+            MSqlQuery update(MSqlQuery::InitCon());
+            while (recordids.next())
+            {
+                update.prepare(QString(
+                    "UPDATE recorded SET recpriority = %1 WHERE recordid = %2;")
+                    .arg(recordids.value(1).toInt())
+                    .arg(recordids.value(0).toInt()));
+                if (!update.exec())
+                    return false;
+            }
+        }
+
+        if (!UpdateDBVersionNumber("1094"))
+            return false;
+    }
+
 // Drop xvmc_buffer_settings at some point
 // Drop dead DVB tables eventually, too   
     
@@ -2534,3 +2570,4 @@ bool InitializeDatabase(void)
     return true;
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

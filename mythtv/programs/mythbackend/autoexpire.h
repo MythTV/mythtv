@@ -34,7 +34,7 @@ class AutoExpire : public QObject
   private:
     void ExpireEpisodesOverMax(void);
 
-    void FillOldestFirst(void);
+    void FillDBOrdered(int expMethod);
     void SendDeleteMessages(size_t, size_t);
     void ClearExpireList(void);
     void Sleep();

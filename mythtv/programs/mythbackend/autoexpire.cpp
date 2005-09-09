@@ -473,8 +473,8 @@ void AutoExpire::FillExpireList(void)
 
     switch(expMethod)
     {
-        case 1: FillOldestFirst(); break;
-
+        case 1:
+        case 2: FillDBOrdered(expMethod); break;
         // default falls through so list is empty so no AutoExpire
     }
 }
@@ -495,9 +495,12 @@ void AutoExpire::PrintExpireList(void)
         if (first->subtitle != "")
             title += ": \"" + first->subtitle + "\"";
 
-        cout << title.local8Bit().leftJustify(40, ' ', true) << " "
+        cout << title.local8Bit().leftJustify(39, ' ', true) << " "
+             << QString("%1").arg(first->filesize / 1024 / 1024).local8Bit()
+                .rightJustify(5, ' ', true) << "MiB  "
              << first->startts.toString().local8Bit().leftJustify(24, ' ', true)
-             << "  " << first->filesize / 1024 / 1024 << " MBytes"
+             << " [" << QString("%1").arg(first->recpriority).local8Bit()
+                .rightJustify(3, ' ', true) << "]"
              << endl;
     }
 }
@@ -515,21 +518,38 @@ void AutoExpire::ClearExpireList(void)
     }
 }
 
-/** \fn AutoExpire::FillOldestFirst()
- *  \brief Creates a list of programs to delete, with the oldest file listed first.
+/** \fn AutoExpire::FillDBOrdered(int)
+ *  \brief Creates a list of programs to delete using the database to 
+ *         order list.
  */
-void AutoExpire::FillOldestFirst(void)
+void AutoExpire::FillDBOrdered(int expMethod)
 {
     QString fileprefix = gContext->GetFilePrefix();
 
+    QString orderby;
+
+    switch (expMethod)
+    {
+        default:
+        case 1: // Oldest first
+            orderby = "starttime ASC";
+            break;
+        case 2: // Lowest priority first
+            orderby = "recorded.recpriority ASC, starttime ASC";
+            break;
+    }
+
     MSqlQuery query(MSqlQuery::InitCon());
     QString querystr = QString(
-               "SELECT recorded.chanid,starttime,endtime,title,subtitle, "
-               "description,hostname,channum,name,callsign,seriesid,programid "
+               "SELECT recorded.chanid, starttime,   endtime,     "
+               "       title,           subtitle,    description, "
+               "       hostname,        channum,     name,        "
+               "       callsign,        seriesid,    programid,   "
+               "       recorded.recpriority "
                "FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
                "WHERE autoexpire > 0 "
-               "ORDER BY autoexpire DESC, starttime ASC");
+               "ORDER BY autoexpire DESC, %1").arg(orderby);
 
     query.prepare(querystr);
 
@@ -567,6 +587,7 @@ void AutoExpire::FillOldestFirst(void)
 
         proginfo->seriesid = query.value(10).toString();
         proginfo->programid = query.value(11).toString();
+        proginfo->recpriority = query.value(12).toInt();
 
         proginfo->pathname = proginfo->GetRecordFilename(fileprefix);
 

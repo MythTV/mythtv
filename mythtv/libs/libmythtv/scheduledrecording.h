@@ -85,6 +85,7 @@ public:
 
     void setStart(const QDateTime& start);
     void setEnd(const QDateTime& end);
+    int getRecPriority(void) const;
     void setRecPriority(int recpriority);
     void setRecGroup(const QString& recgroup);
 
