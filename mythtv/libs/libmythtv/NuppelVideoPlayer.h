@@ -163,6 +163,8 @@ class NuppelVideoPlayer
 
     VideoFrame *GetNextVideoFrame(bool allow_unsafe = true);
     void ReleaseNextVideoFrame(VideoFrame *buffer, long long timecode);
+    void ReleaseNextVideoFrame(void)
+        { videoOutput->ReleaseFrame(GetNextVideoFrame(false)); }
     void DiscardVideoFrame(VideoFrame *buffer);
     void DiscardVideoFrames(void);
 

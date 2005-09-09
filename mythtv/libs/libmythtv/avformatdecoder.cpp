@@ -33,8 +33,8 @@ void align_dimensions(AVCodecContext *avctx, int &width, int &height)
     // minimum buffer alignment
     avcodec_align_dimensions(avctx, &width, &height);
     // minimum MPEG alignment
-    width  = ((width  + 15) >> 4) << 4;
-    height = ((height + 15) >> 4) << 4;
+    width  = (width  + 15) & (~0xf);
+    height = (height + 15) & (~0xf);
 }
 
 class AvFormatDecoderPrivate
@@ -339,6 +339,8 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
     while (skipFrames > 0)
     {
         GetFrame(0);
+        GetNVP()->ReleaseNextVideoFrame();
+
         if (ateof)
             break;
         skipFrames--;
