@@ -64,161 +64,107 @@ int isnan(double);
 #endif
 
 NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
-    : decoder_lock(true)
+    : forceVideoOutput(kVideoOutput_Default),
+      decoder(NULL), videoOutput(NULL), nvr_enc(NULL), m_playbackinfo(NULL),
+      // Window stuff
+      parentWidget(NULL), embedid(0), embx(-1), emby(-1), embw(-1), embh(-1),
+      // State
+      eof(false),                   m_double_framerate(false),
+      m_can_double(false),          paused(false),
+      pausevideo(false),            actuallypaused(false),
+      video_actually_paused(false), playing(false),
+      decoder_thread_alive(true),   killplayer(false),
+      killvideo(false),             livetv(false),
+      watchingrecording(false),     editmode(false),
+      resetvideo(false),            using_null_videoout(false),
+      disableaudio(false),          transcoding(false),
+      hasFullPositionMap(false),    limitKeyRepeat(false),
+      errored(false),
+      m_DeintSetting(0),
+      // Bookmark stuff
+      bookmarkseek(0),              previewFromBookmark(false),
+      // Seek
+      fftime(0),                    seekamountpos(4),
+      seekamount(30),               exactseeks(false),
+      // Playback misc.
+      videobuf_retries(0),          framesPlayed(0),
+      totalFrames(0),               totalLength(0),
+      rewindtime(0),
+      // Input Video Attributes
+      video_width(0), video_height(0), video_size(0),
+      video_frame_rate(29.97f), video_aspect(4.0f / 3.0f),
+      m_scan(kScan_Detect), keyframedist(30),
+      // RingBuffer stuff
+      filename("output.nuv"), weMadeBuffer(false), ringBuffer(NULL),
+      // Prebuffering (RingBuffer) control
+      prebuffering(false), prebuffer_tries(0),
+      // Support for analog captions and teletext
+      vbimode(' '), cc(false), vbipagenr(0x888<<16), ccmode(CC_CC1),
+      wtxt(0), rtxt(0), text_size(0), ccline(""), cccol(0), ccrow(0),
+      // Support for captions, teletext, etc. decoded by libav
+      osdHasSubtitles(false),       osdSubtitlesExpireAt(-1),
+      // OSD stuff
+      osd(NULL),                    timedisplay(NULL),
+      dialogname(""),               dialogtype(0),
+      // Audio stuff
+      audioOutput(NULL),            audiodevice("/dev/dsp"),
+      audio_channels(2),            audio_bits(-1),
+      audio_samplerate(44100),      audio_stretchfactor(1.0f),
+      // Picture-in-Picture
+      pipplayer(NULL), setpipplayer(NULL), needsetpipplayer(false),
+      // Filters
+      videoFilterList(""),
+      postfilt_width(0),            postfilt_height(0),
+      videoFilters(NULL),           FiltMan(new FilterManager()),
+      // Commercial filtering
+      skipcommercials(0),           autocommercialskip(0),
+      commercialskipmethod(0),      commrewindamount(0),
+      commnotifyamount(0),          lastCommSkipDirection(0),
+      lastCommSkipTime(0/*1970*/),  lastCommSkipStart(0),
+      deleteframe(0),
+      hasdeletetable(false),        hasblanktable(false),
+      hascommbreaktable(false),
+      deleteIter(deleteMap.end()),  blankIter(blankMap.end()),
+      commBreakIter(commBreakMap.end()),
+      // Playback (output) speed control
+      decoder_lock(true),
+      next_play_speed(1.0f),        next_normal_speed(true),
+      play_speed(1.0f),             normal_speed(true),
+      frame_interval(30),           ffrew_skip(1),
+      // Audio and video synchronization stuff
+      videosync(NULL),              delay(0),
+      vsynctol(30/4),               avsync_delay(0),
+      avsync_adjustment(0),         avsync_avg(0),
+      avsync_oldavg(0),             refreshrate(0),
+      lastaudiotime(0),             audio_timecode_offset(0),
+      lastsync(false),
+      // Audio warping stuff
+      usevideotimebase(false), 
+      warpfactor(1.0f),             warpfactor_avg(1.0f),
+      warplbuff(NULL),              warprbuff(NULL),
+      warpbuffsize(0),
+      // Time Code stuff
+      prevtc(0),
+      tc_avcheck_framecounter(0),   tc_diff_estimate(0),
+      // Debugging variables
+      output_jmeter(NULL)
 {
-    m_playbackinfo = NULL;
-    parentWidget = NULL;
-
     if (info)
         m_playbackinfo = new ProgramInfo(*info);
 
-    playing = false;
-    decoder_thread_alive = true;
-    filename = "output.nuv";
-
-    prebuffering_lock.lock();
-    prebuffering = false;
-    prebuffer_tries = 0;
-    prebuffering_wait.wakeAll();
-    prebuffering_lock.unlock();
-
-    vbimode = ' ';
-    QString mypage = gContext->GetSetting("VBIpageNr", "888");
-    bool valid = false;
-    if (mypage)
-        vbipagenr = mypage.toInt(&valid, 16) << 16;
-    else
-        vbipagenr = 0x08880000;
-    video_height = 0;
-    video_width = 0;
-    video_size = 0;
-    text_size = 0;
-    video_aspect = 1.33333;
-    m_scan = kScan_Detect;
-    m_double_framerate = false;
-    m_can_double = false;
-    video_frame_rate = 29.97;
-    prevtc = 0;
-
-    forceVideoOutput = kVideoOutput_Default;
-    decoder = NULL;
-    transcoding = false;
-
-    bookmarkseek = 0;
-
-    eof = 0;
-
-    keyframedist = 30;
-
-    wtxt = rtxt = 0;
-
-    embedid = 0;
-    embx = emby = embw = embh = -1;
-
-    nvr_enc = NULL;
-
-    paused = false;
-    actuallypaused = false;
-    video_actually_paused = false;
-
-    audiodevice = "/dev/dsp";
-    audioOutput = NULL;
-
-    ringBuffer = NULL;
-    weMadeBuffer = false;
-    osd = NULL;
-
-    audio_bits = -1;
-    audio_channels = 2;
-    audio_samplerate = 44100;
-
-    audio_stretchfactor = 1.0;
-
-    editmode = false;
-    resetvideo = false;
-
-    hasFullPositionMap = false;
-
-    framesPlayed = 0;
-    totalLength = 0;
-    totalFrames = 0;
-    play_speed = 1.0;
-    normal_speed = true;
-    ffrew_skip = 1;
-    next_play_speed = 1.0;
-    next_normal_speed = true;
-    videobuf_retries = 0;
-
-    using_null_videoout = disableaudio = false;
-
-    setpipplayer = pipplayer = NULL;
-    needsetpipplayer = false;
-
-    videoFilterList = "";
-    videoFilters = NULL;
-    FiltMan = new FilterManager;
-
-    videoOutput = NULL;
-    watchingrecording = false;
-
-    exactseeks = false;
-
-    autocommercialskip = 0;
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
-    lastCommSkipDirection = 0;
-    lastCommSkipStart = 0;
+    m_DeintSetting   = gContext->GetNumSetting("Deinterlace", 0);
 
-    m_DeintSetting = gContext->GetNumSetting("Deinterlace", 0);
+    bzero(&txtbuffers, sizeof(txtbuffers));
+    bzero(&tc_lastval, sizeof(tc_lastval));
+    bzero(&tc_wrap,    sizeof(tc_wrap));
 
-    timedisplay = NULL;
-    seekamount = 30;
-    seekamountpos = 4;
-    deleteframe = 0;
-    hasdeletetable = false;
-    hascommbreaktable = false;
-
-    dialogname = "";
-
-    for (int i = 0; i <= MAXTBUFFER; i++)
-    {
-        txtbuffers[i].len = 0;
-        txtbuffers[i].timecode = 0;
-        txtbuffers[i].type = 0;
-        txtbuffers[i].buffer = NULL;
-    }
-
-    killvideo = false;
-    pausevideo = false;
-
-    cc = false;
-    ccmode = CC_CC1;
-    ccline = "";
-    cccol = 0;
-    ccrow = 0;
-
-    limitKeyRepeat = false;
-
-    warplbuff = NULL;
-    warprbuff = NULL;
-    warpbuffsize = 0;
-    warpfactor = 1;
-
-    videosync = NULL;
-
-    errored = false;
-    audio_timecode_offset = 0;
-
-    osdHasSubtitles = false;
-    osdSubtitlesExpireAt = -1;
-
-    for (int j = 0; j < TCTYPESMAX; j++)
-    {
-        tc_wrap[j] = tc_lastval[j] = 0;
-    }
-
-    tc_diff_estimate = 0;
-    tc_avcheck_framecounter = 0;
+    // Get VBI page number
+    QString mypage = gContext->GetSetting("VBIpageNr", "888");
+    bool valid = false;
+    uint tmp = mypage.toInt(&valid, 16) << 16;
+    vbipagenr = (valid) ? tmp : vbipagenr;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -723,7 +669,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     GetDecoder()->setRecorder(nvr_enc);
     GetDecoder()->setTranscoding(transcoding);
 
-    eof = 0;
+    eof = false;
     text_size = 8 * (sizeof(teletextsubtitle) + VT_WIDTH);
 
     int ret;
@@ -1661,9 +1607,6 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     avsync_delay = 0;
     avsync_avg = 0;
     avsync_oldavg = 0;
-
-    delay_clipping = false;
-
     refreshrate = 0;
     lastsync = false;
 
@@ -2124,7 +2067,7 @@ void NuppelVideoPlayer::StartPlaying(void)
         {
             ++deleteIter;
             if (deleteIter.key() == totalFrames)
-                eof = 1;
+                eof = true;
             else
             {
                 PauseVideo();
@@ -2335,7 +2278,7 @@ void NuppelVideoPlayer::AddAudioData(short int *lbuffer, short int *rbuffer,
 
     // Resample...
     float incount  = 0.0f;
-    uint  outcount = 0;
+    int   outcount = 0;
     while ((incount < samples) && (outcount < newsamples))
     {
         warplbuff[outcount] = lbuffer[(uint)round(incount)];
@@ -3984,7 +3927,7 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
 
             if (commBreakIter.key() == totalFrames)
             {
-                eof = 1;
+                eof = true;
             }
             else
             {

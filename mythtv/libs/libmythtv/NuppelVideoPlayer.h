@@ -35,9 +35,9 @@ struct AVSubtitle;
 struct TextContainer
 {
     int timecode;
-    char type;
     int len;
     unsigned char *buffer;
+    char type;
 };
 
 typedef  void (*StatusCallback)(int, void*);
@@ -128,9 +128,9 @@ class NuppelVideoPlayer
     VideoFrame *GetCurrentFrame(int &w, int &h);
     void ReleaseCurrentFrame(VideoFrame *frame);
 
-    void SetPipPlayer(NuppelVideoPlayer *pip) { setpipplayer = pip;
-                                                needsetpipplayer = true; }
-    bool PipPlayerSet(void) { return !needsetpipplayer; }
+    void SetPipPlayer(NuppelVideoPlayer *pip)
+        { setpipplayer = pip; needsetpipplayer = true; }
+    bool PipPlayerSet(void) const { return !needsetpipplayer; }
 
     void SetVideoFilters(QString &filters) { videoFilterList = filters; }
     void SetTranscoding(bool value);
@@ -246,8 +246,6 @@ class NuppelVideoPlayer
 
     static void *kickoffOutputVideoLoop(void *player);
 
-    VideoOutputType forceVideoOutput;
-
  private:
     void InitFilters(void);
 
@@ -328,209 +326,217 @@ class NuppelVideoPlayer
     };
 #define TCTYPESMAX 4
 
-    void WrapTimecode(long long &timecode, TCTypes tc_type);
-
   private:
-    QString filename;
-
-    /* rtjpeg_plugin stuff */
-    int eof;
-    int video_width;
-    int video_height;
-    int postfilt_width;
-    int postfilt_height;
-    int video_size;
-    double video_frame_rate;
-    float video_aspect;
-    FrameScanType m_scan;
-    bool m_double_framerate;
-    bool m_can_double;
-
-    int filesize;
-    int startpos;
-
-    char vbimode;
-    int vbipagenr;
-    int text_size;
-
-    /* Video circular buffer */
-    bool prebuffering;  /* don't play until done prebuffering */
-    int prebuffer_tries;/* how often have we tried waiting? */
-    QMutex prebuffering_lock;
-    QWaitCondition prebuffering_wait;
-
-    /* Text circular buffer */
-    int wtxt;          /* next slot to write */
-    int rtxt;          /* next slot to read */
-    struct TextContainer txtbuffers[MAXTBUFFER+1];
-
-    QMutex text_buflock;  /* adjustments to rtxt and wtxt can only
-                             be made while holding this lock */
-
-    /* Audio stuff */
-    QString audiodevice;
-
-    int audio_channels;
-    int audio_bits;
-    int audio_samplerate;
-    float audio_stretchfactor;
-
-    AudioOutput *audioOutput;
-
-    bool paused, pausevideo;
-    bool actuallypaused, video_actually_paused;
-    QWaitCondition decoderThreadPaused, videoThreadPaused;
-
-    bool cc;
-    unsigned char ccmode;
-
-    bool playing;
-    bool decoder_thread_alive;
-
-    RingBuffer *ringBuffer;
-    bool weMadeBuffer;
-    bool killplayer;
-    bool killvideo;
-
-    long long framesPlayed;
-
-    bool livetv;
-    bool watchingrecording;
-    bool editmode;
-    bool resetvideo;
-
-    long long rewindtime, fftime;
-    RemoteEncoder *nvr_enc;
-
-    int totalLength;
-    long long totalFrames;
-
-    OSD *osd;
-
-    bool using_null_videoout;
-    bool disableaudio;
-
-    NuppelVideoPlayer *pipplayer;
-    NuppelVideoPlayer *setpipplayer;
-    bool needsetpipplayer;
-
-    QString videoFilterList;
-    FilterChain *videoFilters;
-    FilterManager *FiltMan;
-
-    int keyframedist;
-
-    bool exactseeks;
-
-    VideoOutput *videoOutput;
-
-    int seekamount;
-    int seekamountpos;
-    OSDSet *timedisplay;
-
-    bool transcoding;
-
-    QMap<long long, int> deleteMap;
-    QMap<long long, int>::Iterator deleteIter;
-    QMap<long long, int> blankMap;
-    QMap<long long, int>::Iterator blankIter;
-    QMap<long long, int> commBreakMap;
-    QMap<long long, int>::Iterator commBreakIter;
-    QMutex commBreakMapLock;
-    QString dialogname;
-    int dialogtype;
-    long long deleteframe;
-    bool hasdeletetable;
-    bool hasblanktable;
-    bool hascommbreaktable;
-    bool hasFullPositionMap;
-
-    WId embedid;
-    int embx, emby, embw, embh;
-
-    ProgramInfo *m_playbackinfo;
-
-    long long bookmarkseek;
-    bool previewFromBookmark;
-    
-    int skipcommercials;
-    int autocommercialskip;
-    int commercialskipmethod;
-    int commrewindamount;
-    int commnotifyamount;
-    int lastCommSkipDirection;
-    long long lastCommSkipStart;
-    time_t lastCommSkipTime;
-
-    QString ccline;
-    int cccol;
-    int ccrow;
-
-    DecoderBase *decoder;
-
-    /* avsync stuff */
-    long long lastaudiotime;
-    int delay;
-    int avsync_delay;
-    int avsync_adjustment;
-    int avsync_avg;
-    int avsync_oldavg;
-    int refreshrate;
-    long long audio_timecode_offset;
-
-    QMutex decoder_lock;
-    int frame_interval; // always adjusted for play_speed
-    float play_speed;
-    bool normal_speed;
-    int ffrew_skip;
-    float next_play_speed;
-    bool next_normal_speed;
-    int videobuf_retries;
-
-    float warpfactor;
-    float warpfactor_avg;
-    int vsynctol;
-    short int *warplbuff;
-    short int *warprbuff;
-    int warpbuffsize;
- 
-    int prevtc;
-
-    bool delay_clipping;
-    struct timeval nexttrigger, now;
-    VideoSync *videosync;
-
-    bool lastsync;
-
-    Jitterometer *output_jmeter;
-
+    void WrapTimecode(long long &timecode, TCTypes tc_type);
     void InitAVSync(void);
     void AVSync(void);
     void ShutdownAVSync(void);
 
-    bool usevideotimebase;
+  private:
+    VideoOutputType forceVideoOutput;
 
-    bool limitKeyRepeat;
+    DecoderBase   *decoder;
+    VideoOutput   *videoOutput;
+    RemoteEncoder *nvr_enc;
+    ProgramInfo   *m_playbackinfo;
 
+    // Window stuff
     QWidget *parentWidget;
+    WId embedid;
+    int embx, emby, embw, embh;
 
-    QMutex vidExitLock;
 
-    QMutex videofiltersLock;
+    // State
+    QWaitCondition decoderThreadPaused;
+    QWaitCondition videoThreadPaused;
+    QMutex   vidExitLock;
+    bool     eof;             ///< At end of file/ringbuffer
+    bool     m_double_framerate;///< Output fps is double Video (input) rate
+    bool     m_can_double;    ///< VideoOutput capable of doubling frame rate
+    bool     paused;
+    bool     pausevideo;
+    bool     actuallypaused;
+    bool     video_actually_paused;
+    bool     playing;
+    bool     decoder_thread_alive;
+    bool     killplayer;
+    bool     killvideo;
+    bool     livetv;
+    bool     watchingrecording;
+    bool     editmode;
+    bool     resetvideo;
+    bool     using_null_videoout;
+    bool     disableaudio;
+    bool     transcoding;
+    bool     hasFullPositionMap;
+    bool     limitKeyRepeat;
+    bool     errored;
+    int      m_DeintSetting;
 
-    bool errored;
+    // Bookmark stuff
+    long long bookmarkseek;
+    bool      previewFromBookmark;
 
-    int m_DeintSetting;
+    // Seek
+    /// If fftime>0, number of frames to seek forward.
+    /// If fftime<0, number of frames to seek backward.
+    long long fftime;
+    /// 1..9 == keyframe..10 minutes. 0 == cut point
+    int       seekamountpos;
+    /// Seekable frame increment when not using exact seeks.
+    /// Usually equal to keyframedist.
+    int      seekamount;
+    /// Iff true we ignore seek amount and try to seek to an
+    /// exact frame ignoring key frame restrictions.
+    bool     exactseeks;
 
-    MythDeque<AVSubtitle> nonDisplayedSubtitles;
-    QMutex subtitleLock;
-    bool osdHasSubtitles;
+    // Playback misc.
+    /// How often we have tried to wait for a video output buffer and failed
+    int       videobuf_retries;
+    long long framesPlayed;
+    long long totalFrames;
+    long long totalLength;
+    long long rewindtime;
+
+    // -- end state stuff -- 
+
+
+    // Input Video Attributes
+    int      video_width;     ///< Video (input) width
+    int      video_height;    ///< Video (input) height
+    int      video_size;      ///< Video (input) buffer size in bytes
+    double   video_frame_rate;///< Video (input) Frame Rate (often inaccurate)
+    float    video_aspect;    ///< Video (input) Apect Ratio
+    /// Video (input) Scan Type (interlaced, progressive, detect, ignore...)
+    FrameScanType m_scan;
+    /// Video (input) Number of frames between key frames (often inaccurate)
+    int keyframedist;
+
+    // RingBuffer stuff
+    QString    filename;        ///< Filename if we create our own ringbuf
+    bool       weMadeBuffer;    ///< Iff true, we can delete ringBuffer
+    RingBuffer *ringBuffer;     ///< Pointer to the RingBuffer we read from
+    
+    // Prebuffering (RingBuffer) control
+    QWaitCondition prebuffering_wait;///< QWaitContition used by prebuffering
+    QMutex     prebuffering_lock;///< Mutex used to control access to prebuf
+    bool       prebuffering;    ///< Iff true, don't play until done prebuf
+    int        prebuffer_tries; ///< Number of times prebuf wait attempted
+
+    // Support for analog captions and teletext
+    // (i.e. Vertical Blanking Interval (VBI) encoded data.)
+    int      vbimode;         ///< VBI decoder to use
+    bool     cc;              ///< true iff vbimode == 2 (NTSC Line 21 CC)
+    int      vbipagenr;       ///< VBI page to display when in PAL vbimode
+    int      ccmode;          ///< VBI text to display when in NTSC vbimode
+
+    int      wtxt;            ///< Write position for VBI text
+    int      rtxt;            ///< Read position for VBI text
+    QMutex   text_buflock;    ///< Lock for rtxt and wtxt VBI text positions
+    int      text_size;       ///< Maximum size of a text buffer
+    struct TextContainer txtbuffers[MAXTBUFFER+1]; ///< VBI text buffers
+
+    QString  ccline;
+    int      cccol;
+    int      ccrow;
+
+    // Support for captions, teletext, etc. decoded by libav
+    QMutex    subtitleLock;
+    bool      osdHasSubtitles;
     long long osdSubtitlesExpireAt;
+    MythDeque<AVSubtitle> nonDisplayedSubtitles;
 
-    long long tc_wrap[TCTYPESMAX];
-    long long tc_lastval[TCTYPESMAX];
-    long long tc_diff_estimate;
-    int tc_avcheck_framecounter;
+    // OSD stuff
+    OSD      *osd;
+    OSDSet   *timedisplay;
+    QString   dialogname;
+    int       dialogtype;
+
+    // Audio stuff
+    AudioOutput *audioOutput;
+    QString  audiodevice;
+    int      audio_channels;
+    int      audio_bits;
+    int      audio_samplerate;
+    float    audio_stretchfactor;
+
+    // Picture-in-Picture
+    NuppelVideoPlayer *pipplayer;
+    NuppelVideoPlayer *setpipplayer;
+    bool needsetpipplayer;
+
+    // Filters
+    QMutex   videofiltersLock;
+    QString  videoFilterList;
+    int      postfilt_width;  ///< Post-Filter (output) width
+    int      postfilt_height; ///< Post-Filter (output) height
+    FilterChain   *videoFilters;
+    FilterManager *FiltMan;
+
+    // Commercial filtering
+    QMutex     commBreakMapLock;
+    int        skipcommercials;
+    int        autocommercialskip;
+    int        commercialskipmethod;
+    int        commrewindamount;
+    int        commnotifyamount;
+    int        lastCommSkipDirection;
+    time_t     lastCommSkipTime;
+    long long  lastCommSkipStart;
+
+    long long  deleteframe;
+    bool       hasdeletetable;
+    bool       hasblanktable;
+    bool       hascommbreaktable;
+    QMap<long long, int> deleteMap;
+    QMap<long long, int> blankMap;
+    QMap<long long, int> commBreakMap;
+    QMap<long long, int>::Iterator deleteIter;
+    QMap<long long, int>::Iterator blankIter;
+    QMap<long long, int>::Iterator commBreakIter;
+
+    // Playback (output) speed control
+    /// Lock for next_play_speed and next_normal_speed
+    QMutex     decoder_lock;
+    float      next_play_speed;
+    bool       next_normal_speed;
+
+    float      play_speed;    
+    bool       normal_speed;  
+    int        frame_interval;///< always adjusted for play_speed
+
+    int        ffrew_skip;    
+
+    // Audio and video synchronization stuff
+    VideoSync *videosync;
+    int        delay;
+    int        vsynctol;
+    int        avsync_delay;
+    int        avsync_adjustment;
+    int        avsync_avg;
+    int        avsync_oldavg;
+    int        refreshrate;
+    long long  lastaudiotime;
+    long long  audio_timecode_offset;
+    bool       lastsync;
+
+    // Audio warping stuff
+    bool       usevideotimebase;
+    float      warpfactor;
+    float      warpfactor_avg;
+    short int *warplbuff;
+    short int *warprbuff;
+    int        warpbuffsize;
+ 
+    // Time Code stuff
+    int        prevtc;        ///< 32 bit timecode if last VideoFrame shown
+    int        tc_avcheck_framecounter;
+    long long  tc_wrap[TCTYPESMAX];
+    long long  tc_lastval[TCTYPESMAX];
+    long long  tc_diff_estimate;
+
+    // Debugging variables
+    Jitterometer *output_jmeter;
 };
 
 #endif
