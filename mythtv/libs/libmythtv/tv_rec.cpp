@@ -2247,7 +2247,7 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
             else if (0 == oldrate)
                 signalMonitor->SetNotifyFrontend(false);
         }
-        else
+        else if (0 != notifyFrontend)
         {
             // send status to frontend, since this may be used in tuning.
             // if this is a card capable of signal monitoring, send error
