@@ -6,35 +6,32 @@
 #include "atsctables.h"
 #include "dvbtables.h"
 
+#undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
-    "DTVSM("<<channel_dev<<")::"<<FUNC<<": "<<MSG);
+    "DTVSM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
 /** \class DTVSignalMonitor
  *  \brief This class is intended to detect the presence of needed tables.
  */
 
-DTVSignalMonitor::DTVSignalMonitor(int capturecardnum,
+DTVSignalMonitor::DTVSignalMonitor(int db_cardnum,
+                                   ChannelBase *_channel,
                                    uint wait_for_mask,
                                    const char *name)
-    : SignalMonitor(capturecardnum, wait_for_mask, name), stream_data(NULL),
-      seenPAT(QObject::tr("Seen PAT"), "seen_pat", 1, true, 0, 1, 0),
-      seenPMT(QObject::tr("Seen PMT"), "seen_pmt", 1, true, 0, 1, 0),
-      seenMGT(QObject::tr("Seen MGT"), "seen_mgt", 1, true, 0, 1, 0),
-      seenVCT(QObject::tr("Seen VCT"), "seen_vct", 1, true, 0, 1, 0),
-      seenNIT(QObject::tr("Seen NIT"), "seen_nit", 1, true, 0, 1, 0),
-      seenSDT(QObject::tr("Seen SDT"), "seen_sdt", 1, true, 0, 1, 0),
-      matchingPAT(QObject::tr("Matching PAT"),
-                  "matching_pat", 1, true, 0, 1, 0),
-      matchingPMT(QObject::tr("Matching PMT"),
-                  "matching_pmt", 1, true, 0, 1, 0),
-      matchingMGT(QObject::tr("Matching MGT"),
-                  "matching_mgt", 1, true, 0, 1, 0),
-      matchingVCT(QObject::tr("Matching VCT"),
-                  "matching_vct", 1, true, 0, 1, 0),
-      matchingNIT(QObject::tr("Matching NIT"),
-                  "matching_nit", 1, true, 0, 1, 0),
-      matchingSDT(QObject::tr("Matching SDT"),
-                  "matching_sdt", 1, true, 0, 1, 0),
+    : SignalMonitor(db_cardnum, _channel, wait_for_mask, name),
+      stream_data(NULL),
+      seenPAT(tr("Seen")+" PAT", "seen_pat", 1, true, 0, 1, 0),
+      seenPMT(tr("Seen")+" PMT", "seen_pmt", 1, true, 0, 1, 0),
+      seenMGT(tr("Seen")+" MGT", "seen_mgt", 1, true, 0, 1, 0),
+      seenVCT(tr("Seen")+" VCT", "seen_vct", 1, true, 0, 1, 0),
+      seenNIT(tr("Seen")+" NIT", "seen_nit", 1, true, 0, 1, 0),
+      seenSDT(tr("Seen")+" SDT", "seen_sdt", 1, true, 0, 1, 0),
+      matchingPAT(tr("Matching")+" PAT", "matching_pat", 1, true, 0, 1, 0),
+      matchingPMT(tr("Matching")+" PMT", "matching_pmt", 1, true, 0, 1, 0),
+      matchingMGT(tr("Matching")+" MGT", "matching_mgt", 1, true, 0, 1, 0),
+      matchingVCT(tr("Matching")+" VCT", "matching_vct", 1, true, 0, 1, 0),
+      matchingNIT(tr("Matching")+" NIT", "matching_nit", 1, true, 0, 1, 0),
+      matchingSDT(tr("Matching")+" SDT", "matching_sdt", 1, true, 0, 1, 0),
       majorChannel(-1), minorChannel(-1), programNumber(-1),
       ignoreEncrypted(true),
       error("")
@@ -44,7 +41,7 @@ DTVSignalMonitor::DTVSignalMonitor(int capturecardnum,
 QStringList DTVSignalMonitor::GetStatusList(bool kick)
 {
     QStringList list = SignalMonitor::GetStatusList(kick);
-    statusLock.lock();
+    QMutexLocker locker(&statusLock);
     // mpeg tables
     if (flags & kDTVSigMon_WaitForPAT)
     {
@@ -97,7 +94,6 @@ QStringList DTVSignalMonitor::GetStatusList(bool kick)
     {
         list<<"error"<<error;
     }
-    statusLock.unlock();
     return list;
 }
 
@@ -115,7 +111,7 @@ void DTVSignalMonitor::RemoveFlags(uint _flags)
 
 void DTVSignalMonitor::UpdateMonitorValues()
 {
-    statusLock.lock();
+    QMutexLocker locker(&statusLock);
     seenPAT.SetValue(    (flags & kDTVSigMon_PATSeen)  ? 1 : 0);
     seenPMT.SetValue(    (flags & kDTVSigMon_PMTSeen)  ? 1 : 0);
     seenMGT.SetValue(    (flags & kDTVSigMon_MGTSeen)  ? 1 : 0);
@@ -128,7 +124,6 @@ void DTVSignalMonitor::UpdateMonitorValues()
     matchingVCT.SetValue((flags & kDTVSigMon_VCTMatch) ? 1 : 0);
     matchingNIT.SetValue((flags & kDTVSigMon_NITMatch) ? 1 : 0);
     matchingSDT.SetValue((flags & kDTVSigMon_SDTMatch) ? 1 : 0);
-    statusLock.unlock();
 }
 
 void DTVSignalMonitor::SetChannel(int major, int minor)
@@ -207,20 +202,19 @@ void DTVSignalMonitor::SetPAT(const ProgramAssociationTable *pat)
         AddFlags(kDTVSigMon_PATMatch);
         GetStreamData()->AddListeningPID(pmt_pid);
     }
-    else if (programNumber >= 0 && pat->ProgramCount() == 1)
-    {
-        QString errStr = QObject::tr("Program #%1 not found in PAT!").arg(programNumber);
-        VERBOSE(VB_IMPORTANT, errStr<<endl<<pat->toString()<<endl);
-        VERBOSE(VB_IMPORTANT, "But there is only one program in the PAT, "
-                "so we'll just use it");
-        SetProgramNumber(pat->ProgramNumber(0));
-        AddFlags(kDTVSigMon_PATMatch);
-        GetStreamData()->AddListeningPID(pat->ProgramPID(0));
-    }
     else if (programNumber >= 0)
     {
-        error = QObject::tr("Program #%1 not found in PAT!").arg(programNumber);
-        VERBOSE(VB_IMPORTANT, error<<endl<<pat->toString()<<endl);
+        QString errStr = QString("Program #%1 not found in PAT!")
+            .arg(programNumber);
+        VERBOSE(VB_IMPORTANT, errStr<<endl<<pat->toString()<<endl);
+        if (pat->ProgramCount() == 1)
+        {
+            VERBOSE(VB_IMPORTANT, "But there is only one program "
+                    "in the PAT, so we'll just use it");
+            SetProgramNumber(pat->ProgramNumber(0));
+            AddFlags(kDTVSigMon_PATMatch);
+            GetStreamData()->AddListeningPID(pat->ProgramPID(0));
+        }
     }
 }
 

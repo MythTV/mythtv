@@ -22,10 +22,9 @@
 #include "dvbrecorder.h"
 #include "dvbtypes.h"
 
+#undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
-    "DVBSM("<<channel_dev<<")::"<<FUNC<<": "<<MSG);
-
-static bool fill_frontend_stats(int fd_frontend, dvb_stats_t &stats);
+    "DVBSM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
 /** \fn DVBSignalMonitor::DVBSignalMonitor(int,int,int)
  *  \brief Initializes signal lock and signal values.
@@ -44,16 +43,15 @@ static bool fill_frontend_stats(int fd_frontend, dvb_stats_t &stats);
  */
 DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
                                    uint _flags, const char *_name)
-    : DTVSignalMonitor(db_cardnum, _flags, _name),
-      signalToNoise(
-          QObject::tr("Signal To Noise"), "snr", -32768,  true, -32768, 32767, 0),
-      bitErrorRate(
-          QObject::tr("Bit Error Rate"), "ber", 65535, false, 0, 65535, 0),
-      uncorrectedBlocks(
-          QObject::tr("Uncorrected Blocks"), "ucb", 65535,  false, 0, 65535, 0),
-      dtvMonitorRunning(false), channel(_channel)
+    : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
+      signalToNoise    (tr("Signal To Noise"),    "snr",
+                        -32768, true, -32768, 32767, 0),
+      bitErrorRate     (tr("Bit Error Rate"),     "ber",
+                        65535,  false,     0, 65535, 0),
+      uncorrectedBlocks(tr("Uncorrected Blocks"), "ucb",
+                        65535,  false,     0, 65535, 0),
+      dtvMonitorRunning(false)
 {
-    channel_dev = channel->GetDevice();
     // These two values should probably come from the database...
     int wait = 3000; // timeout when waiting on signal
     int threshold = -32768; // signal strength threshold in %
@@ -62,8 +60,6 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     signalStrength.SetTimeout(wait);
     signalStrength.SetThreshold(threshold);
     signalStrength.SetRange(-32768, 32767);
-
-    table_monitor_thread = PTHREAD_CREATE_JOINABLE;
 
     dvb_stats_t stats;
     bzero(&stats, sizeof(stats));
@@ -96,6 +92,14 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 DVBSignalMonitor::~DVBSignalMonitor()
 {
     Stop();
+}
+
+/** \fn DVBSignalMonitor::GetDVBCardNum(void)
+ *  \brief Returns DVB Card Number from DVBChannel.
+ */
+int DVBSignalMonitor::GetDVBCardNum(void) const
+{
+    return dynamic_cast<DVBChannel*>(channel)->GetCardNum();
 }
 
 /** \fn DVBSignalMonitor::Stop()
@@ -140,7 +144,7 @@ bool DVBSignalMonitor::AddPIDFilter(uint pid)
 { 
     DBG_SM(QString("AddPIDFilter(0x%1)").arg(pid, 0, 16), "");
 
-    QString demux_fname = dvbdevice(DVB_DEV_DEMUX, channel->GetCardNum());
+    QString demux_fname = dvbdevice(DVB_DEV_DEMUX, GetDVBCardNum());
     int mux_fd = open(demux_fname.ascii(), O_RDWR | O_NONBLOCK);
     if (mux_fd == -1)
     {
@@ -257,7 +261,7 @@ void DVBSignalMonitor::RunTableMonitor(void)
         return;
     bzero(buffer, buffer_size);
 
-    QString dvr_fname = dvbdevice(DVB_DEV_DVR, channel->GetCardNum());
+    QString dvr_fname = dvbdevice(DVB_DEV_DVR, GetDVBCardNum());
     int dvr_fd = open(dvr_fname.ascii(), O_RDONLY | O_NONBLOCK);
     if (dvr_fd < 0)
     {
@@ -273,7 +277,8 @@ void DVBSignalMonitor::RunTableMonitor(void)
     {
         UpdateFiltersFromStreamData();
 
-        long long len = read(dvr_fd, &(buffer[remainder]), buffer_size - remainder);
+        long long len = read(
+            dvr_fd, &(buffer[remainder]), buffer_size - remainder);
 
         if ((0 == len) || (-1 == len))
         {
@@ -303,101 +308,110 @@ void DVBSignalMonitor::RunTableMonitor(void)
     DBG_SM("RunTableMonitor()", "end");
 }
 
+/** \fn DVBSignalMonitor::UpdateValues()
+ *  \brief Fills in frontend stats and emits status Qt signals.
+ *
+ *   This function uses five ioctl's FE_READ_SNR, FE_READ_SIGNAL_STRENGTH
+ *   FE_READ_BER, FE_READ_UNCORRECTED_BLOCKS, and FE_READ_STATUS to obtain
+ *   statistics from the frontend.
+ *
+ *   This is automatically called by MonitorLoop(), after Start()
+ *   has been used to start the signal monitoring thread.
+ */
+void DVBSignalMonitor::UpdateValues(void)
+{
+    if (dtvMonitorRunning)
+    {
+        EmitDVBSignals();
+        // TODO dtv signals...
+        update_done = true;
+        return;
+    }
+
+    bool wasLocked = false, isLocked = false;
+    dvb_stats_t stats;
+    bzero(&stats, sizeof(stats));
+
+    // Get info from card
+    int fd_frontend = channel->GetFd();
+    ioctl(fd_frontend, FE_READ_STATUS, &stats.status);
+    if (HasFlags(kDTVSigMon_WaitForSig))
+        ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &stats.ss);
+    if (HasFlags(kDVBSigMon_WaitForSNR))
+        ioctl(fd_frontend, FE_READ_SNR, &stats.snr);
+    if (HasFlags(kDVBSigMon_WaitForBER))
+        ioctl(fd_frontend, FE_READ_BER, &stats.ber);
+    if (HasFlags(kDVBSigMon_WaitForUB))
+        ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &stats.ub);
+
+    // Set SignalMonitorValues from info from card.
+    {
+        QMutexLocker locker(&statusLock);
+
+        // BER and UB are actually uint32 values, but we 
+        // clamp them at 64K. This is because these values
+        // are acutally cumulative, but we don't try to 
+        // normalize these to a time period.
+
+        wasLocked = signalLock.IsGood();
+        signalLock.SetValue((stats.status & FE_HAS_LOCK) ? 1 : 0);
+        isLocked = signalLock.IsGood();
+
+        if (HasFlags(kDTVSigMon_WaitForSig))
+            signalStrength.SetValue((int) stats.ss);
+        if (HasFlags(kDVBSigMon_WaitForSNR))
+            signalToNoise.SetValue((int) stats.snr);
+        if (HasFlags(kDVBSigMon_WaitForBER))
+            bitErrorRate.SetValue(stats.ber);
+        if (HasFlags(kDVBSigMon_WaitForUB))
+            uncorrectedBlocks.SetValue(stats.ub);
+    }
+
+    // Debug output
+    if (wasLocked != isLocked)
+        DBG_SM("UpdateValues", "Signal "<<(isLocked ? "Locked" : "Lost"));
+
+    EmitDVBSignals();
+
+    // Start table monitoring if we are waiting on any table
+    // and we have a lock.
+    if (isLocked && GetStreamData() &&
+        HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
+                   kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
+                   kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
+    {
+        pthread_create(&table_monitor_thread, NULL,
+                       TableMonitorThread, this);
+        DBG_SM("UpdateValues", "Waiting for table monitor to start");
+        while (!dtvMonitorRunning)
+            usleep(50);
+        DBG_SM("UpdateValues", "Table monitor started");
+    }
+
+    update_done = true;
+}
+
 #define EMIT(SIGNAL_FUNC, SIGNAL_VAL) \
     do { statusLock.lock(); \
          SignalMonitorValue val = SIGNAL_VAL; \
          statusLock.unlock(); \
          emit SIGNAL_FUNC(val); } while (false)
 
-/** \fn DVBSignalMonitor::UpdateValues()
- *  \brief Fills in frontend stats and emits status Qt signals.
- *
- *   This uses fill_frontend_stats(int,dvb_stats_t&)
- *   to actually collect the signal values. It is automatically
- *   called by MonitorLoop(), after Start() has been used to start
- *   the signal monitoring thread.
+/** \fn DVBSignalMonitor::EmitDVBSignals(void)
+ *  \brief Emits signals for lock, signal strength, etc.
  */
-void DVBSignalMonitor::UpdateValues(void)
+void DVBSignalMonitor::EmitDVBSignals(void)
 {
-    dvb_stats_t stats;
-
-    if (!dtvMonitorRunning && fill_frontend_stats(channel->GetFd(), stats))
-    {
-        statusLock.lock();
-        int wasLocked = signalLock.GetValue();
-        int locked = (stats.status & FE_HAS_LOCK) ? 1 : 0;
-        signalLock.SetValue(locked);
-        signalStrength.SetValue((int) stats.ss);
-        signalToNoise.SetValue((int) stats.snr);
-        // BER and UB are actually uint32 values, but we clamp them at 64K.
-        bitErrorRate.SetValue(stats.ber);
-        uncorrectedBlocks.SetValue(stats.ub);
-        statusLock.unlock();
-
-        //cerr<<"locked("<<locked<<") slock("<<signalLock.IsGood()<<")"<<endl;
-        
-        EMIT(StatusSignalLock, signalLock);
-
-        if (HasFlags(kDTVSigMon_WaitForSig))
-            EMIT(StatusSignalStrength, signalStrength);
-        if (HasFlags(kDVBSigMon_WaitForSNR))
-            EMIT(StatusSignalToNoise, signalToNoise);
-        if (HasFlags(kDVBSigMon_WaitForBER))
-            EMIT(StatusBitErrorRate, bitErrorRate);
-        if (HasFlags(kDVBSigMon_WaitForUB))
-            EMIT(StatusUncorrectedBlocks, uncorrectedBlocks);
-
-        if (wasLocked != signalLock.GetValue())
-            DBG_SM("UpdateValues()", (wasLocked ? "Signal Lost" : "Signal Lock"));
-
-        statusLock.lock();
-        bool ok = signalLock.IsGood();
-        statusLock.unlock();
-        if (ok && GetStreamData() &&
-            HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
-                       kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
-                       kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
-        {
-            pthread_create(&table_monitor_thread, NULL,
-                           TableMonitorThread, this);
-            while (!dtvMonitorRunning)
-                usleep(50);
-        }
-    }
-    else
-    {
-        // TODO dtv signals...
-    }
-
-    update_done = true;
+    // Emit signals..
+    EMIT(StatusSignalLock, signalLock); 
+    if (HasFlags(kDTVSigMon_WaitForSig))
+        EMIT(StatusSignalStrength, signalStrength);
+    if (HasFlags(kDVBSigMon_WaitForSNR))
+        EMIT(StatusSignalToNoise, signalToNoise);
+    if (HasFlags(kDVBSigMon_WaitForBER))
+        EMIT(StatusBitErrorRate, bitErrorRate);
+    if (HasFlags(kDVBSigMon_WaitForUB))
+        EMIT(StatusUncorrectedBlocks, uncorrectedBlocks);
 }
+
 #undef EMIT
-
-/** \fn fill_frontend_stats(int,dvb_stats_t&)
- *  \brief Returns signal statistics for the frontend file descriptor.
- *
- *   This function uses five ioctl's FE_READ_SNR, FE_READ_SIGNAL_STRENGTH
- *   FE_READ_BER, FE_READ_UNCORRECTED_BLOCKS, and FE_READ_STATUS to obtain
- *   statistics from the frontend.
- *
- *  \param fd_frontend File descriptor for DVB frontend device.
- *  \param stats Used to return the statistics collected.
- *  \return true if successful, false if there is an error.
- */
-static bool fill_frontend_stats(int fd_frontend, dvb_stats_t& stats)
-{
-    if (fd_frontend < 0)
-        return false;
-
-    stats.snr=0;
-    ioctl(fd_frontend, FE_READ_SNR, &stats.snr);
-    stats.ss=0;
-    ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &stats.ss);
-    stats.ber=0;
-    ioctl(fd_frontend, FE_READ_BER, &stats.ber);
-    stats.ub=0;
-    ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &stats.ub);
-    ioctl(fd_frontend, FE_READ_STATUS, &stats.status);
-
-    return true;
-}

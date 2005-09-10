@@ -1,14 +1,14 @@
 // -*- Mode: c++ -*-
 // Copyright (c) 2005, Daniel Thor Kristjansson
 
+// C headers
 #include <sys/types.h>
 #include <signal.h>
 #include <unistd.h>
 
+// MythTV headers
 #include "mythcontext.h"
 #include "signalmonitor.h"
-#include "pchdtvsignalmonitor.h"
-#include "channel.h"
 
 #ifdef USING_DVB
 #   include "dvbsignalmonitor.h"
@@ -16,8 +16,14 @@
 #   include "videosource.h"
 #endif
 
+#ifdef USING_V4L
+#   include "pchdtvsignalmonitor.h"
+#   include "channel.h"
+#endif
+
+#undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
-    "SM("<<channel_dev<<")::"<<FUNC<<": "<<MSG);
+    "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
 /** \class SignalMonitor
  *  \brief Signal monitoring base class.
@@ -98,20 +104,24 @@ SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
  *   Start() must be called to actually begin continuous
  *   signal monitoring.
  *
- *  \param capturecardnum recorder number to monitor,
+ *  \param db_cardnum Recorder number to monitor,
  *         if this is less than 0, SIGNAL events will not be
  *         sent to the frontend even if SetNotifyFrontend(true)
  *         is called.
+ *  \param _channel ChannelBase class for our monitoring
  *  \param wait_for_mask SignalMonitorFlags to start with.
  */
-SignalMonitor::SignalMonitor(int _capturecardnum, uint wait_for_mask,
-                             const char *name)
-    : QObject(NULL, name),
-      capturecardnum(_capturecardnum), channel_dev(""), flags(wait_for_mask),
-      update_rate(25), running(false), exit(false), update_done(false),
+SignalMonitor::SignalMonitor(int _capturecardnum, ChannelBase *_channel,
+                             uint wait_for_mask,  const char *name)
+    : QObject(NULL, name),             channel(_channel),
+      capturecardnum(_capturecardnum), flags(wait_for_mask),
+      update_rate(25),                 running(false),
+      exit(false),                     update_done(false),
       notify_frontend(true),
-      signalLock(QObject::tr("Signal Lock"), "slock", 1, true, 0, 1, 0),
-      signalStrength(QObject::tr("Signal Power"), "signal", 0, true, 0, 100, 0),
+      signalLock    (QObject::tr("Signal Lock"),  "slock",
+                     1, true, 0,   1, 0),
+      signalStrength(QObject::tr("Signal Power"), "signal",
+                     0, true, 0, 100, 0),
       statusLock(true)
 {
 }

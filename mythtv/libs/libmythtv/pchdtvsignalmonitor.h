@@ -31,7 +31,6 @@ private:
     bool      usingv4l2;
     bool      dtvMonitorRunning;
     pthread_t table_monitor_thread;
-    Channel  *channel;
 };
 
 #endif // PCHDTVSIGNALMONITOR_H

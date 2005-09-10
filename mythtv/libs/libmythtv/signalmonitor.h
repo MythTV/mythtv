@@ -4,12 +4,19 @@
 #ifndef SIGNALMONITOR_H
 #define SIGNALMONITOR_H
 
-#include "signalmonitorvalue.h"
+// C headers
 #include <pthread.h>
+
+// Qt headers
 #include <qobject.h>
 #include <qmutex.h>
 
-class ChannelBase;
+// MythTV headers
+#include "signalmonitorvalue.h"
+#include "channelbase.h"
+
+#define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
+    "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
 enum {
     kDTVSigMon_PATSeen    = 0x00000001, ///< maps program numbers to PMT pids
@@ -50,7 +57,7 @@ inline QString sm_flags_to_string(uint);
 class SignalMonitor: virtual public QObject
 {
     Q_OBJECT
-public:
+  public:
     static bool IsSupported(QString cardtype);
     static SignalMonitor *Init(QString cardtype, int db_cardnum,
                                ChannelBase *channel);
@@ -69,12 +76,12 @@ public:
 
     virtual void AddFlags(uint _flags)
     {
-        VERBOSE(VB_CHANNEL, "SM:    AddFlags: "<<sm_flags_to_string(_flags));
+        DBG_SM("AddFlags", sm_flags_to_string(_flags));
         flags |= _flags;
     }
     virtual void RemoveFlags(uint _flags)
     {
-        VERBOSE(VB_CHANNEL, "SM: RemoveFlags: "<<sm_flags_to_string(_flags));
+        DBG_SM("RemoveFlags", sm_flags_to_string(_flags));
         flags &= ~_flags;
     }
     bool HasFlags(uint _flags) const   { return (flags & _flags) == _flags; }
@@ -115,7 +122,7 @@ public:
      */
     void SetUpdateRate(int msec) { update_rate = msec; }
 
-signals:
+  signals:
     /** \brief Signal to be sent as true when it is safe to begin
      *   or continue recording, and false if it may not be safe.
      *
@@ -128,9 +135,9 @@ signals:
      *   Note: Signals are only sent once the monitoring thread has been started.
      */
     void StatusSignalStrength(const SignalMonitorValue&);
-protected:
-    SignalMonitor(int capturecardnum, uint wait_for_mask,
-                  const char *name = "SignalMonitor");
+  protected:
+    SignalMonitor(int db_cardnum, ChannelBase *_channel,
+                  uint wait_for_mask, const char *name = "SignalMonitor");
     
     static void* SpawnMonitorLoop(void*);
     virtual void MonitorLoop();
@@ -138,15 +145,15 @@ protected:
     /// \brief This should be overriden to actually do signal monitoring.
     virtual void UpdateValues() { ; }
 
-    pthread_t   monitor_thread;
-    int         capturecardnum;
-    QString     channel_dev;
-    uint        flags;
-    int         update_rate;
-    bool        running;
-    bool        exit;
-    bool        update_done;
-    bool        notify_frontend;
+    pthread_t    monitor_thread;
+    ChannelBase *channel;
+    int          capturecardnum;
+    uint         flags;
+    int          update_rate;
+    bool         running;
+    bool         exit;
+    bool         update_done;
+    bool         notify_frontend;
 
     SignalMonitorValue signalLock;
     SignalMonitorValue signalStrength;

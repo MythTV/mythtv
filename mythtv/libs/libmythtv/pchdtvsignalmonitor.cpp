@@ -13,8 +13,9 @@
 #include "mpegtables.h"
 #include "atsctables.h"
 
+#undef DBG_SM
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
-    "pcHDTVSM("<<channel_dev<<")::"<<FUNC<<": "<<MSG);
+    "pcHDTVSM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
 /** \fn pcHDTVSignalMonitor::pcHDTVSignalMonitor(int,uint,int)
  *  \brief Initializes signal lock and signal values.
@@ -34,18 +35,15 @@
  */
 pcHDTVSignalMonitor::pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
                                          uint _flags, const char *_name)
-    : DTVSignalMonitor(db_cardnum, _flags, _name),
-      usingv4l2(false), dtvMonitorRunning(false), channel(_channel)
+    : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
+      usingv4l2(false), dtvMonitorRunning(false)
 {
-    channel_dev = channel->GetDevice();
-    int wait = gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
+    int wait      = gContext->GetNumSetting("ATSCCheckSignalWait", 5000);
     int threshold = gContext->GetNumSetting("ATSCCheckSignalThreshold", 65);
 
     signalLock.SetTimeout(wait);
     signalStrength.SetTimeout(wait);
     signalStrength.SetThreshold(threshold);
-
-    table_monitor_thread = PTHREAD_CREATE_JOINABLE;
 
     struct v4l2_capability vcap;
     bzero(&vcap, sizeof(vcap));
@@ -94,7 +92,8 @@ void pcHDTVSignalMonitor::RunTableMonitor()
             <<GetStreamData()->ListeningPIDs().size()<<")");
     while (dtvMonitorRunning && GetStreamData())
     {
-        long long len = read(channel->GetFd(), &(buffer[remainder]), buffer_size - remainder);
+        long long len = read(
+            channel->GetFd(), &(buffer[remainder]), buffer_size - remainder);
 
         if ((0 == len) || (-1 == len))
         {
@@ -125,39 +124,41 @@ void pcHDTVSignalMonitor::RunTableMonitor()
  */
 void pcHDTVSignalMonitor::UpdateValues()
 {
-    if (!dtvMonitorRunning)
+    if (dtvMonitorRunning)
     {
-        int sig = GetSignal(channel->GetFd(), channel->GetCurrentInputNum(),
-                            usingv4l2);
+        EMIT(StatusSignalLock, signalLock);
+        EMIT(StatusSignalStrength, signalStrength);
+        // TODO dtv signals...
+        update_done = true;
+        return;
+    }
 
-        statusLock.lock();
+    bool isLocked = false;
+    int sig = GetSignal(
+        channel->GetFd(), channel->GetCurrentInputNum(), usingv4l2);
+
+    {
+        QMutexLocker locker(&statusLock);
         signalStrength.SetValue(sig);
         signalLock.SetValue(signalStrength.IsGood());
-        statusLock.unlock();
-
-        statusLock.lock();
-        bool ok = signalLock.IsGood();
-        statusLock.unlock();
-
-        if (ok && GetStreamData() &&
-            HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
-                       kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
-                       kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
-        {
-            pthread_create(&table_monitor_thread, NULL,
-                           TableMonitorThread, this);
-            while (!dtvMonitorRunning)
-                usleep(50);
-        }
+        isLocked = signalLock.IsGood();
     }
-    else
+
+    if (isLocked && GetStreamData() &&
+        HasAnyFlag(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT |
+                   kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
+                   kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT))
     {
-        // TODO dtv signals...
+        pthread_create(&table_monitor_thread, NULL,
+                       TableMonitorThread, this);
+        DBG_SM("UpdateValues", "Waiting for table monitor to start");
+        while (!dtvMonitorRunning)
+            usleep(50);
+        DBG_SM("UpdateValues", "Table monitor started");
     }
 
     EMIT(StatusSignalLock, signalLock);
     EMIT(StatusSignalStrength, signalStrength);
-
     update_done = true;
 }
 

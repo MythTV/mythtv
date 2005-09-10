@@ -15,7 +15,7 @@ typedef QMap<uint,unsigned char*> BufferMap;
 class DVBSignalMonitor: public DTVSignalMonitor
 {
     Q_OBJECT
-public:
+  public:
     DVBSignalMonitor(int db_cardnum, DVBChannel* _channel, uint _flags = 0,
                      const char *_name = "DVBSignalMonitor");
     virtual ~DVBSignalMonitor();
@@ -24,32 +24,36 @@ public:
     void Stop(void);
 
     bool UpdateFiltersFromStreamData(void);
-signals:
+  signals:
     void StatusSignalToNoise(const SignalMonitorValue&);
     void StatusBitErrorRate(const SignalMonitorValue&);
     void StatusUncorrectedBlocks(const SignalMonitorValue&);
 
-private:
+  private:
     DVBSignalMonitor(void);
     DVBSignalMonitor(const DVBSignalMonitor&);
 
     virtual void UpdateValues(void);
+    void EmitDVBSignals(void);
 
     static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);
     bool AddPIDFilter(uint pid);
     bool RemovePIDFilter(uint pid);
 
+    int GetDVBCardNum(void) const;
+
+  private:
     SignalMonitorValue signalToNoise;
     SignalMonitorValue bitErrorRate;
     SignalMonitorValue uncorrectedBlocks;
+
     bool               dtvMonitorRunning;
     pthread_t          table_monitor_thread;
-    DVBChannel*        channel;
 
-    FilterMap          filters;
-    BufferMap          buffers;
-    RemainderMap       remainders;
+    FilterMap          filters; ///< PID filters for table monitoring
+    BufferMap          buffers; ///< Stream buffers for table monitoring
+    RemainderMap       remainders;///< buffers remainders for table monitoring
 };
 
 #endif // DVBSIGNALMONITOR_H

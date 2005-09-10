@@ -22,7 +22,9 @@ class DTVSignalMonitor: public SignalMonitor
 {
     Q_OBJECT
   public:
-    DTVSignalMonitor(int capturecardnum, uint wait_for_mask,
+    DTVSignalMonitor(int db_cardnum,
+                     ChannelBase *_channel,
+                     uint wait_for_mask,
                      const char *name = "DTVSignalMonitor");
 
     virtual QStringList GetStatusList(bool kick = true);
