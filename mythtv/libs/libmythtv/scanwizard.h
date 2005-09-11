@@ -44,7 +44,15 @@ class QPSKPane;
 class ATSCPane;
 class QAMPane;
 class SIScan;
+class ChannelBase;
+class Channel;
 class DVBChannel;
+class ScanWizard;
+class ScanWizardScanner;
+class ScanOptionalConfig;
+class ScanCountry;
+class SignalMonitorValue;
+class AnalogScan;
 
 class VideoSourceSetting: public ComboBoxSetting
 {

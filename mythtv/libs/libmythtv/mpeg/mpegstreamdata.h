@@ -11,6 +11,7 @@ class ProgramMapTable;
 class HDTVRecorder;
 class PSIPTable;
 class RingBuffer;
+class PESPacket;
 
 class MPEGStreamData {
   public:
