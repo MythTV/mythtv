@@ -868,7 +868,7 @@ static HostCheckBox *PersistentBrowseMode()
     HostCheckBox *gc = new HostCheckBox("PersistentBrowseMode");
     gc->setLabel(QObject::tr("Always use Browse mode when changing channels "
                  "in LiveTV"));
-    gc->setValue(false);
+    gc->setValue(true);
     gc->setHelpText(QObject::tr("If enabled, Browse mode will "
                     "automatically be activated whenever you use Channel "
                     "UP/DOWN while watching Live TV."));
