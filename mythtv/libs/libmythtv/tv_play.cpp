@@ -770,13 +770,10 @@ void TV::HandleStateChange(void)
                 if (!checkFile.exists())
                     tmpFilename = inputFilename;
             }
-            
-            prbuffer = new RingBuffer(tmpFilename, false);
         }
         else
         {
             tmpFilename = inputFilename;
-            
         }
 
         prbuffer = new RingBuffer(tmpFilename, false);
