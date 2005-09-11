@@ -1115,9 +1115,10 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
                 if (lcddev && !inTitle) 
                 {
+                    QString lcdSubTitle = tempSubTitle;
                     lcdItems.append(new LCDMenuItem(skip + cnt == progIndex,
                                     NOTCHECKABLE,
-                                    tempSubTitle.replace('"', "'") +
+                                    lcdSubTitle.replace('"', "'") +
                                     " " + tempDate));                       
                 }
 

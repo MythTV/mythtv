@@ -953,7 +953,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                        "FROM recorded "
                        "LEFT JOIN record ON recorded.recordid = record.recordid "
                        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
-                       "WHERE recorded.deletepending = 0 "
+                       "WHERE (recorded.deletepending = 0 OR "
+                              "DATE_ADD(recorded.lastmodified, "
+                                       "INTERVAL 5 MINUTE) <= NOW()) "
                        "ORDER BY recorded.starttime";
 
     if (type == "Delete")
