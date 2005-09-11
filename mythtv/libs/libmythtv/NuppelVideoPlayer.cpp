@@ -177,7 +177,8 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     if (weMadeBuffer)
         delete ringBuffer;
 
-    ClearSubtitles();
+    if (osdHasSubtitles || nonDisplayedSubtitles.size() > 0)
+        ClearSubtitles();
 
     if (osd)
         delete osd;
