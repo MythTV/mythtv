@@ -955,7 +955,8 @@ QString JobQueue::JobText(int jobType)
 
     if (jobType & JOB_USERJOB)
     {
-        QString settingName = QString("UserJobDesc%1").arg(jobType >> 8);
+        QString settingName =
+            QString("UserJobDesc%1").arg(UserJobTypeToIndex(jobType));
         return gContext->GetSetting(settingName, settingName);
     }
 
@@ -1070,25 +1071,17 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
             thisJob.args = query.value(10).toString();
             thisJob.comment = query.value(11).toString();
 
-            if (thisJob.type & JOB_USERJOB)
+            if ((thisJob.type & JOB_USERJOB) &&
+                (UserJobTypeToIndex(thisJob.type) == 0))
             {
-                int userJobNumber = 1;
-                int jobType = thisJob.type;
-
-                jobType = jobType >> 8;
-                while (jobType != 0x01 && userJobNumber < 5)
-                {
-                    jobType = jobType >> 1;
-                    userJobNumber++;
-                }
-
-                if (userJobNumber >= 5)
-                    thisJob.type = JOB_NONE;
-                else
-                    thisJob.type = userJobNumber << 8;
+                thisJob.type = JOB_NONE;
+                VERBOSE(VB_JOBQUEUE,
+                    QString("JobQueue::GetJobsInQueue: Unknown Job Type: %1")
+                        .arg(thisJob.type)); 
             }
 
-            jobs[jobCount++] = thisJob;
+            if (thisJob.type != JOB_NONE)
+                jobs[jobCount++] = thisJob;
         }
     }
 
@@ -1138,21 +1131,21 @@ bool JobQueue::AllowedToRun(JobQueueEntry job)
         (job.hostname != m_hostname))
         return false;
 
-    switch (job.type)
+    if (job.type & JOB_USERJOB)
     {
-        case JOB_TRANSCODE:  allowSetting = "JobAllowTranscode";
-                             break;
-        case JOB_COMMFLAG:   allowSetting = "JobAllowCommFlag";
-                             break;
-        case JOB_USERJOB1:   allowSetting = "JobAllowUserJob1";
-                             break;
-        case JOB_USERJOB2:   allowSetting = "JobAllowUserJob2";
-                             break;
-        case JOB_USERJOB3:   allowSetting = "JobAllowUserJob3";
-                             break;
-        case JOB_USERJOB4:   allowSetting = "JobAllowUserJob4";
-                             break;
-        default:             return false;
+        allowSetting =
+            QString("JobAllowUserJob%1").arg(UserJobTypeToIndex(job.type));
+    }
+    else
+    {
+        switch (job.type)
+        {
+            case JOB_TRANSCODE:  allowSetting = "JobAllowTranscode";
+                                 break;
+            case JOB_COMMFLAG:   allowSetting = "JobAllowCommFlag";
+                                 break;
+            default:             return false;
+        }
     }
 
     if (gContext->GetNumSetting(allowSetting, 1))
@@ -1443,7 +1436,8 @@ QString JobQueue::GetJobDescription(int jobType)
     else if (!(jobType & JOB_USERJOB))
         return "Unknown Job";
 
-    QString descSetting = QString("UserJobDesc%1").arg(jobType >> 8);
+    QString descSetting =
+        QString("UserJobDesc%1").arg(UserJobTypeToIndex(jobType));
 
     return gContext->GetSetting(descSetting, "Unknown Job");
 }
@@ -1460,7 +1454,8 @@ QString JobQueue::GetJobCommand(int jobType, ProgramInfo *tmpInfo)
     else if (!(jobType & JOB_USERJOB))
         return "";
 
-    QString commandSetting = QString("UserJob%1").arg(jobType >> 8);
+    QString commandSetting =
+        QString("UserJob%1").arg(UserJobTypeToIndex(jobType));
 
     command = gContext->GetSetting(commandSetting, "");
 
@@ -1890,6 +1885,25 @@ void JobQueue::DoUserJobThread(void)
     runningJobDescs.erase(key);
     runningJobCommands.erase(key);
     controlFlagsLock.unlock();
+}
+
+int JobQueue::UserJobTypeToIndex(int jobType)
+{
+    if (jobType & JOB_USERJOB)
+    {
+        int x = ((jobType & JOB_USERJOB)>> 8);
+        int bits = 1;
+        while ((x != 0) && ((x & 0x01) == 0))
+        {
+            bits++;
+            x = x >> 1;
+        }
+        if( bits > 4 )
+            return JOB_NONE;
+
+        return bits;
+    }
+    return JOB_NONE;
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

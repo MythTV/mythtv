@@ -137,6 +137,7 @@ class JobQueue : public QObject
     static int GetJobFlags(int jobID);
     static int GetJobStatus(int jobID);
     static int GetJobStatus(int jobType, QString chanid, QDateTime starttime);
+    static int UserJobTypeToIndex(int JobType);
 
     static bool DeleteAllJobs(QString chanid, QDateTime starttime);
 
