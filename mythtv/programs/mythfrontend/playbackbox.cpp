@@ -254,7 +254,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     connect(freeSpaceTimer, SIGNAL(timeout()), this, 
             SLOT(setUpdateFreeSpace()));
 
-    if (recGroupPassword != "")
+    if ((recGroupPassword != "") ||
+        (gContext->GetNumSetting("QueryInitialFilter", 0)))
         showRecGroupChooser();
 
     // Initialize yuv2rgba conversion stuff
@@ -3749,14 +3750,15 @@ void PlaybackBox::showRecGroupChooser(void)
     grayOut(&backup);
     backup.end();
 
-    QLabel *label = choosePopup->addLabel(tr("Recording Group View"),
+    QLabel *label = choosePopup->addLabel(tr("Select Group Filter"),
                                   MythPopupBox::Large, false);
     label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
 
     QStringList groups;
     
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT DISTINCT recgroup from recorded;");
+    query.prepare("SELECT DISTINCT recgroup, COUNT(title) "
+                  "FROM recorded GROUP BY recgroup;");
     query.exec();
 
     QString tmpType = recGroupType[recGroup];
@@ -3766,42 +3768,6 @@ void PlaybackBox::showRecGroupChooser(void)
 
     if ((recGroup == "Default") || (recGroup == "All Programs"))
         groups += tr(recGroup);
-    else
-        groups += recGroup;
-
-    if (query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            QString key = QString::fromUtf8(query.value(0).toString());
-
-            if (key != recGroup)
-            {
-                if (key == "Default")
-                    groups += tr("Default");
-                else
-                    groups += key;
-                recGroupType[key] = "recgroup";
-            }
-        }
-    }
-
-    query.prepare("SELECT DISTINCT category from recorded;");
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        while (query.next())
-        {
-            QString key = QString::fromUtf8(query.value(0).toString());
-
-            if ((key != recGroup) && (key != ""))
-            {
-                groups += key;
-                if (!recGroupType.contains(key))
-                    recGroupType[key] = "category";
-            }
-        }
-    }
 
     if (recGroup != "All Programs")
     {
@@ -3809,35 +3775,64 @@ void PlaybackBox::showRecGroupChooser(void)
         recGroupType["All Programs"] = "recgroup";
     }
 
-    QGridLayout *grid = new QGridLayout(1, 2, (int)(10 * wmult));
+    if (query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            QString key =
+                QString::fromUtf8(QString("%1 [%2 items]")
+                                  .arg(query.value(0).toString())
+                                  .arg(query.value(1).toString()));
 
-    label = new QLabel(tr("Group"), choosePopup);
-    label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
-    label->setBackgroundOrigin(ParentOrigin);
-    label->setPaletteForegroundColor(popupForeground);
-    grid->addWidget(label, 0, 0, Qt::AlignLeft);
+            if (key != recGroup)
+            {
+                if (key == "Default")
+                    groups += tr("Default");
+                else
+                    groups += key;
+                recGroupType[query.value(0).toString()] = "recgroup";
+            }
+        }
+    }
 
-    chooseComboBox = new MythComboBox(false, choosePopup);
-    chooseComboBox->insertStringList(groups);
-    chooseComboBox->setAcceptOnSelect(true);
-    grid->addWidget(chooseComboBox, 0, 1, Qt::AlignLeft);
+    query.prepare("SELECT DISTINCT category, COUNT(title) "
+                   "FROM recorded GROUP BY category;");
 
-    choosePopup->addLayout(grid);
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            QString key =
+                QString::fromUtf8(QString("%1 [%2 items]")
+                                  .arg(query.value(0).toString())
+                                  .arg(query.value(1).toString()));
 
-    connect(chooseComboBox, SIGNAL(accepted(int)), this,
+            if ((key != recGroup) && (key != ""))
+            {
+                groups += key;
+                if (!recGroupType.contains(key))
+                    recGroupType[query.value(0).toString()] = "category";
+            }
+        }
+    }
+
+    chooseListBox = new MythListBox(choosePopup);
+    chooseListBox->insertStringList(groups);
+
+    choosePopup->addWidget(chooseListBox);
+
+    connect(chooseListBox, SIGNAL(accepted(int)), this,
             SLOT(chooseSetViewGroup()));
-    connect(chooseComboBox, SIGNAL(activated(int)), this,
-            SLOT(chooseComboBoxChanged()));
-    connect(chooseComboBox, SIGNAL(highlighted(int)), this,
-            SLOT(chooseComboBoxChanged()));
+    connect(chooseListBox, SIGNAL(highlighted(int)), this,
+            SLOT(chooseListBoxChanged()));
 
     chooseGroupPassword = getRecGroupPassword(recGroup);
 
-    chooseComboBox->setFocus();
+    chooseListBox->setFocus();
     choosePopup->ExecPopup();
 
-    delete chooseComboBox;
-    chooseComboBox = NULL;
+    delete chooseListBox;
+    chooseListBox = NULL;
 
     backup.begin(this);
     backup.drawPixmap(0, 0, myBackground);
@@ -3854,11 +3849,12 @@ void PlaybackBox::showRecGroupChooser(void)
 
 void PlaybackBox::chooseSetViewGroup(void)
 {
-    if (!chooseComboBox)
+    if (!chooseListBox)
         return;
 
-    recGroup = chooseComboBox->currentText();
     recGroupPassword = chooseGroupPassword;
+    recGroup =
+        chooseListBox->currentText().section('[', 0, 0).simplifyWhiteSpace();
 
     if (groupnameAsAllProg)
         groupDisplayName = recGroup;
@@ -3907,12 +3903,13 @@ void PlaybackBox::chooseSetViewGroup(void)
     choosePopup->done(0);
 }
 
-void PlaybackBox::chooseComboBoxChanged(void)
+void PlaybackBox::chooseListBoxChanged(void)
 {
-    if (!chooseComboBox)
+    if (!chooseListBox)
         return;
 
-    QString newGroup = chooseComboBox->currentText();
+    QString newGroup =
+        chooseListBox->currentText().section('[', 0, 0).simplifyWhiteSpace();
 
     if (newGroup == tr("Default"))
         newGroup = "Default";

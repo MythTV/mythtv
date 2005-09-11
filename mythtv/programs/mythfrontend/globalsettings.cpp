@@ -259,6 +259,17 @@ static HostComboBox *DisplayRecGroup()
     return gc;
 }
 
+static HostCheckBox *QueryInitialFilter()
+{
+    HostCheckBox *gc = new HostCheckBox("QueryInitialFilter");
+    gc->setLabel(QObject::tr("Always prompt for initial group filter"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Always prompt the user for the initial filter "
+                    "to apply when entering the Watch Recordings screen."));
+
+    return gc;
+}
+
 static HostCheckBox *RememberRecGroup()
 {
     HostCheckBox *gc = new HostCheckBox("RememberRecGroup");
@@ -2977,6 +2988,7 @@ PlaybackSettings::PlaybackSettings()
     pbox2->setLabel(QObject::tr("View Recordings (Recording Groups)"));
     pbox2->addChild(AllRecGroupPassword());
     pbox2->addChild(DisplayRecGroup());
+    pbox2->addChild(QueryInitialFilter());
     pbox2->addChild(RememberRecGroup());
     pbox2->addChild(UseGroupNameAsAllPrograms());
     pbox2->addChild(DefaultView());

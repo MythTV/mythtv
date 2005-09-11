@@ -92,7 +92,7 @@ class PlaybackBox : public MythDialog
 
     void setUpdateFreeSpace() { updateFreeSpace = true; }
 
-    void chooseComboBoxChanged(void);
+    void chooseListBoxChanged(void);
     void chooseSetViewGroup(void);
     void chooseSetGroupView(void);
     void changeComboBoxChanged(void);
