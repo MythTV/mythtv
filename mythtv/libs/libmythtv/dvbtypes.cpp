@@ -180,10 +180,8 @@ DVBParamHelper<fe_modulation_t>::Table DVBModulation::parseTable[] =
    {"qam_128",QAM_128},
    {"qam_256",QAM_256},
    {"qpsk",QPSK},
-#if (DVB_API_VERSION_MINOR == 1)
    {"8vsb",VSB_8},
    {"16vsb",VSB_16},
-#endif
    {NULL,QAM_AUTO},
 };
 
@@ -323,16 +321,13 @@ bool equal_qpsk(const struct dvb_frontend_parameters &p,
 bool equal_atsc(const struct dvb_frontend_parameters &p,
                 const struct dvb_frontend_parameters &op, uint range)
 {
-#if (DVB_API_VERSION_MINOR == 1)
-    return
-        p.frequency + range  >= op.frequency           &&
-        p.frequency          <= op.frequency + range   &&
-        p.u.vsb.modulation   == op.u.vsb.modulation;
-#else
-    return
+    bool ok =
         p.frequency + range  >= op.frequency           &&
         p.frequency          <= op.frequency + range;
-#endif
+#ifdef USE_ATSC
+    ok &= (p.u.vsb.modulation == op.u.vsb.modulation);
+#endif // USE_ATSC
+    return ok;
 }
 
 bool equal_qam(const struct dvb_frontend_parameters &p,
@@ -374,10 +369,8 @@ bool equal_type(const struct dvb_frontend_parameters &p,
         return equal_ofdm(p, op, freq_range);
     if (FE_QPSK == type)
         return equal_qpsk(p, op, freq_range);
-#if (DVB_API_VERSION_MINOR == 1)
     if (FE_ATSC == type)
         return equal_atsc(p, op, freq_range);
-#endif
     return false;
 }
 
@@ -446,11 +439,11 @@ QString DVBTuning::ConstellationDB() const
 
 QString DVBTuning::ModulationDB() const
 {
-#if (DVB_API_VERSION_MINOR == 1)
-    return mod2dbstr(params.u.vsb.modulation);
-#else
-    return mod2dbstr((fe_modulation)0);
-#endif
+    fe_modulation mod = QAM_AUTO;
+#ifdef USE_ATSC
+    mod = params.u.vsb.modulation;
+#endif // USE_ATSC
+    return mod2dbstr(mod);
 }
 
 QString DVBTuning::InversionString() const
@@ -573,14 +566,12 @@ QString DVBTuning::toString(fe_type_t type) const
             .arg(InversionString())
             .arg(QAMInnerFECString());
     }
-#if (DVB_API_VERSION_MINOR == 1)
     else if (FE_ATSC == type)
     {
         msg = QString("Frequency: %1 Modulation: %2")
             .arg(Frequency())
             .arg(ModulationString());
     }
-#endif
     else if (FE_OFDM == type)
     {
         msg = QString("Frequency: %1 BW: %2 HP: %3 LP: %4"
@@ -599,10 +590,12 @@ QString DVBTuning::toString(fe_type_t type) const
 
 bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
 {
-    bool ok = true;
+    (void) frequency;
+    (void) modulation;
 
+#ifdef USE_ATSC
+    bool ok = false;
     params.frequency = frequency.toInt();
-#if (DVB_API_VERSION_MINOR == 1)
     dvb_vsb_parameters& p = params.u.vsb;
 
     p.modulation = parseModulation(modulation, ok);
@@ -611,10 +604,12 @@ bool DVBTuning::parseATSC(const QString& frequency, const QString modulation)
         WARNING_TUNING(QString("Invalid modulationulation parameter '%1', "
                                "falling back to '8-VSB'.").arg(modulation));
         p.modulation = VSB_8;
+        ok = true;
     }
-#endif
-
-    return true;
+    return ok;
+#else // if !USE_ATSC
+    return false;
+#endif //!USE_ATSC
 }
 
 bool DVBTuning::parseOFDM(const TransportObject &transport)
@@ -885,19 +880,15 @@ fe_modulation DVBTuning::parseModulation(const QString &mod, bool &ok)
     else if (modulation ==  "qam_64") return QAM_64;
     else if (modulation ==  "qam_32") return QAM_32;
     else if (modulation ==  "qam_16") return QAM_16;
-#if (DVB_API_VERSION_MINOR == 1)
     else if (modulation ==    "8vsb") return VSB_8;
     else if (modulation ==   "16vsb") return VSB_16;
-#endif
     else if (modulation == "qam-256") return QAM_256;
     else if (modulation == "qam-128") return QAM_128;
     else if (modulation ==  "qam-64") return QAM_64;
     else if (modulation ==  "qam-32") return QAM_32;
     else if (modulation ==  "qam-16") return QAM_16;
-#if (DVB_API_VERSION_MINOR == 1)
     else if (modulation ==   "8-vsb") return VSB_8;
     else if (modulation ==  "16-vsb") return VSB_16;
-#endif
 
     ok = false;
 
@@ -933,10 +924,8 @@ bool dvb_channel_t::Parse(
             frequency,       inversion,     bandwidth,    hp_code_rate,
             lp_code_rate,    constellation, trans_mode,   guard_interval,
             hierarchy);
-#if (DVB_API_VERSION_MINOR == 1)
     else if (FE_ATSC == type)
         ok = tuning.parseATSC(frequency, modulation);
-#endif
         
     sistandard = _sistandard;
         
@@ -955,10 +944,8 @@ static QString mod2str(fe_modulation mod)
         case QAM_64:   return  "QAM-64";
         case QAM_32:   return  "QAM-32";
         case QAM_16:   return  "QAM-16";
-#if (DVB_API_VERSION_MINOR == 1)
         case VSB_8:    return   "8-VSB";
         case VSB_16:   return  "16-VSB";
-#endif
         default:      return "auto";
     }
     return "Unknown";
@@ -975,10 +962,8 @@ static QString mod2dbstr(fe_modulation mod)
         case QAM_64:   return "qam_64";
         case QAM_128:  return "qam_128";
         case QAM_256:  return "qam_256";
-#if (DVB_API_VERSION_MINOR == 1)
         case VSB_8:    return "8vsb";
         case VSB_16:   return "16vsb";
-#endif
         default:       return "auto";
     }
 }

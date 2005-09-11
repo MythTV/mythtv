@@ -32,7 +32,10 @@ using namespace std;
 #include <linux/dvb/frontend.h>
 #include <linux/dvb/dmx.h>
 
-#if (DVB_API_VERSION_MINOR <= 3 && DVB_API_VERSION_MINOR == 0)
+#if (DVB_API_VERSION >= 3 && DVB_API_VERSION_MINOR >= 1)
+#    define USE_ATSC
+#else
+#warning DVB API version < 3.1, ATSC over DVB will not be supported.
 #    define FE_ATSC       (FE_OFDM+1)
 #    define FE_CAN_8VSB   0x200000
 #    define FE_CAN_16VSB  0x400000
