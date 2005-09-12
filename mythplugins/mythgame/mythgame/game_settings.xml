@@ -40,4 +40,20 @@
       <action>SEARCH_FOR_GAMES</action>
    </button>
 
+   <button>
+      <type>GAME_SETTINGS_GENERAL</type>
+      <text>Clear Game Data</text>
+      <text lang="IT">Impostazioni generali</text>
+      <text lang="ES">Opciones Generales</text>
+      <text lang="CA">Opcions Generals</text>
+      <text lang="DE">Grundeinstellungen</text>
+      <text lang="DK">Generelle indstillinger</text>
+      <text lang="NL">Algemeen</text>
+      <text lang="PT">Configurações Gerais</text>
+      <text lang="SV">Generella inställningar</text>
+      <text lang="SI">Splošne nastavitve</text>
+      <action>CLEAR_GAME_DATA</action>
+   </button>
+
+
 </mythmenu>

@@ -13,11 +13,54 @@ class MythMainWindow;
 class GameHandler;
 class QObject;
 
+enum GameFound
+{
+    inNone,
+    inFileSystem,
+    inDatabase,
+    inBoth   
+};
+
+class GameScan
+{
+public:
+    GameScan(QString lromname = "", QString lromfullpath = "", 
+             int lfoundloc = 0, QString lgamename = "", 
+             QString lrompath = "" )
+            {
+                romname = lromname;
+                romfullpath = lromfullpath;
+                foundloc = lfoundloc; 
+                gamename = lgamename;
+                rompath = lrompath;
+            }
+
+
+    QString Rom() const { return romname; }
+    QString RomFullPath() const { return romfullpath; }
+    int FoundLoc() const { return foundloc; }
+    void setLoc( int lfoundloc) { foundloc = lfoundloc; } 
+    QString GameName() const { return gamename; }
+    QString RomPath() const { return rompath; } 
+
+private:
+    QString romname;
+    QString romfullpath;
+    int foundloc;
+    QString gamename;
+    QString rompath;
+};
+
+typedef QMap <QString, GameScan> GameDataMap;
+
 class GameHandler
 {
   public:
-    GameHandler() {  }
-    virtual ~GameHandler();
+    GameHandler()
+    {
+        m_RemoveAll = false;
+        m_KeepAll = false;
+    }
 
     static void updateSettings(GameHandler*);
     static GameHandler* getHandler(uint i);
@@ -28,10 +71,15 @@ class GameHandler
                              QString* Genre, int* Year, QString* Country,
                              QString* CRC32);
 
+    void promptForRemoval(QString filename, QString RomPath );
+    void UpdateGameDB(GameHandler *handler);
+    void VerifyGameDB(GameHandler *handler);
+
+    static void clearAllGameData(void); 
+
     static int buildFileCount(QString directory, GameHandler *handler);
     void buildFileList(QString directory, GameHandler *handler, 
-                              MSqlQuery *query, MythProgressDialog *pdial, 
-                              int indepth, int* filecount);
+                              MythProgressDialog *pdial, int* filecount);
 
     void processGames(GameHandler *);
     static void processAllGames(void);
@@ -64,6 +112,10 @@ class GameHandler
     uint gameplayerid;
     QString gametype;
     QStringList validextensions;
+
+    GameDataMap m_GameMap;
+    bool m_RemoveAll;
+    bool m_KeepAll;
 
   private:
     static GameHandler* newInstance;

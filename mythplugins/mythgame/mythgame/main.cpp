@@ -42,6 +42,11 @@ void GameCallback(void *data, QString &selection)
     {
         GameHandler::processAllGames();
     }
+    if (sel == "clear_game_data")
+    {
+        GameHandler::clearAllGameData();
+    }
+
 }
 
 void runMenu(QString which_menu)
