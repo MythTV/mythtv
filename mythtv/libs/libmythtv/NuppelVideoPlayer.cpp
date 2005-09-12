@@ -593,7 +593,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     {
         if (!ringBuffer)
         {
-            VERBOSE(VB_IMPORTANT, "NVP::OpenFile() Warning, old player exited"
+            VERBOSE(VB_IMPORTANT, "NVP::OpenFile() Warning, old player exited "
                     "before new ring buffer created");
             ringBuffer = new RingBuffer(filename, false);
             weMadeBuffer = true;
