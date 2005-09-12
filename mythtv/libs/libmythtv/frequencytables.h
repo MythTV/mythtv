@@ -16,10 +16,6 @@ using namespace std;
 #ifdef USING_DVB
 #include "dvbchannel.h"
 #include "dvbtypes.h"
-#if (DVB_API_VERSION_MINOR <= 3 && DVB_API_VERSION_MINOR == 0)
-#    define VSB_8         (QAM_AUTO+1)
-#    define VSB_16        (QAM_AUTO+2)
-#endif
 #else // if ! USING_DVB
 #define QAM_64   3
 #define QAM_128  4

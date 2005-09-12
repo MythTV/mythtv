@@ -39,8 +39,8 @@ using namespace std;
 #    define FE_ATSC       (FE_OFDM+1)
 #    define FE_CAN_8VSB   0x200000
 #    define FE_CAN_16VSB  0x400000
-#    define VSB_8         (QAM_AUTO+1)
-#    define VSB_16        (QAM_AUTO+2)
+#    define VSB_8         (fe_modulation)(QAM_AUTO+1)
+#    define VSB_16        (fe_modulation)(QAM_AUTO+2)
 #endif
 
 #include "transform.h"
