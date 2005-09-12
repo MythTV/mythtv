@@ -29,6 +29,8 @@
 //#include <assert.h>
 
 extern const uint8_t ff_h263_loop_filter_strength[32];
+extern void ff_idct_xvid_mmx(short *block);
+extern void ff_idct_xvid_mmx2(short *block);
 
 int mm_flags; /* multimedia extension flags */
 
@@ -1080,7 +1082,8 @@ static int hf_noise16_mmx(uint8_t * pix1, int line_size, int h) {
       return tmp + hf_noise8_mmx(pix+8, line_size, h);
 }
 
-static int nsse16_mmx(MpegEncContext *c, uint8_t * pix1, uint8_t * pix2, int line_size, int h) {
+static int nsse16_mmx(void *p, uint8_t * pix1, uint8_t * pix2, int line_size, int h) {
+    MpegEncContext *c = p;
     int score1= sse16_mmx(c, pix1, pix2, line_size, h);
     int score2= hf_noise16_mmx(pix1, line_size, h) - hf_noise16_mmx(pix2, line_size, h);
 
@@ -1088,7 +1091,8 @@ static int nsse16_mmx(MpegEncContext *c, uint8_t * pix1, uint8_t * pix2, int lin
     else  return score1 + ABS(score2)*8;
 }
 
-static int nsse8_mmx(MpegEncContext *c, uint8_t * pix1, uint8_t * pix2, int line_size, int h) {
+static int nsse8_mmx(void *p, uint8_t * pix1, uint8_t * pix2, int line_size, int h) {
+    MpegEncContext *c = p;
     int score1= sse8_mmx(c, pix1, pix2, line_size, h);
     int score2= hf_noise8_mmx(pix1, line_size, h) - hf_noise8_mmx(pix2, line_size, h);
 
@@ -2455,6 +2459,28 @@ static void ff_vp3_idct_add_mmx(uint8_t *dest, int line_size, DCTELEM *block)
     ff_vp3_idct_mmx(block);
     add_pixels_clamped_mmx(block, dest, line_size);
 }
+#ifdef CONFIG_GPL
+static void ff_idct_xvid_mmx_put(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    ff_idct_xvid_mmx (block);
+    put_pixels_clamped_mmx(block, dest, line_size);
+}
+static void ff_idct_xvid_mmx_add(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    ff_idct_xvid_mmx (block);
+    add_pixels_clamped_mmx(block, dest, line_size);
+}
+static void ff_idct_xvid_mmx2_put(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    ff_idct_xvid_mmx2 (block);
+    put_pixels_clamped_mmx(block, dest, line_size);
+}
+static void ff_idct_xvid_mmx2_add(uint8_t *dest, int line_size, DCTELEM *block)
+{
+    ff_idct_xvid_mmx2 (block);
+    add_pixels_clamped_mmx(block, dest, line_size);
+}
+#endif
     
 void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
 {
@@ -2527,6 +2553,18 @@ void dsputil_init_mmx(DSPContext* c, AVCodecContext *avctx)
                     c->idct    = ff_vp3_idct_mmx;
                     c->idct_permutation_type= FF_PARTTRANS_IDCT_PERM;
                 }
+#ifdef CONFIG_GPL
+            }else if(idct_algo==FF_IDCT_XVIDMMX){
+                if(mm_flags & MM_MMXEXT){
+                    c->idct_put= ff_idct_xvid_mmx2_put;
+                    c->idct_add= ff_idct_xvid_mmx2_add;
+                    c->idct    = ff_idct_xvid_mmx2;
+                }else{
+                    c->idct_put= ff_idct_xvid_mmx_put;
+                    c->idct_add= ff_idct_xvid_mmx_add;
+                    c->idct    = ff_idct_xvid_mmx;
+                }
+#endif
             }
         }
 

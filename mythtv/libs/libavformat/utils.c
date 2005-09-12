@@ -715,6 +715,23 @@ static int get_audio_frame_size(AVCodecContext *enc, int size)
         /* specific hack for pcm codecs because no frame size is
            provided */
         switch(enc->codec_id) {
+        case CODEC_ID_PCM_S32LE:
+        case CODEC_ID_PCM_S32BE:
+        case CODEC_ID_PCM_U32LE:
+        case CODEC_ID_PCM_U32BE:
+            if (enc->channels == 0)
+                return -1;
+            frame_size = size / (4 * enc->channels);
+            break;
+        case CODEC_ID_PCM_S24LE:
+        case CODEC_ID_PCM_S24BE:
+        case CODEC_ID_PCM_U24LE:
+        case CODEC_ID_PCM_U24BE:
+        case CODEC_ID_PCM_S24DAUD:
+            if (enc->channels == 0)
+                return -1;
+            frame_size = size / (3 * enc->channels);
+            break;
         case CODEC_ID_PCM_S16LE:
         case CODEC_ID_PCM_S16BE:
         case CODEC_ID_PCM_U16LE:
@@ -1075,7 +1092,6 @@ int av_read_frame(AVFormatContext *s, AVPacket *pkt)
         pktl = s->packet_buffer;
         if (pktl) {
             AVPacket *next_pkt= &pktl->pkt;
-            AVStream *st= s->streams[ next_pkt->stream_index ];
 
             if(genpts && next_pkt->dts != AV_NOPTS_VALUE){
                 while(pktl && next_pkt->pts == AV_NOPTS_VALUE){

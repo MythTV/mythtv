@@ -4547,7 +4547,7 @@ static int h263p_decode_umotion(MpegEncContext * s, int pred)
    
    code = (sign) ? (pred - code) : (pred + code);
 #ifdef DEBUG
-   fprintf(stderr,"H.263+ UMV Motion = %d\n", code);
+   av_log( s->avctx, AV_LOG_DEBUG,"H.263+ UMV Motion = %d\n", code);
 #endif
    return code;   
 
@@ -4894,11 +4894,11 @@ static inline int mpeg4_decode_block(MpegEncContext * s, DCTELEM * block,
                             }
                             if(s->error_resilience > FF_ER_COMPLIANT){
                                 if(abs_level <= rl->max_level[last][run]*2){
-                                    fprintf(stderr, "illegal 3. esc, esc 1 encoding possible\n");
+                                    av_log(s->avctx, AV_LOG_ERROR, "illegal 3. esc, esc 1 encoding possible\n");
                                     return -1;
                                 }
                                 if(run1 >= 0 && abs_level <= rl->max_level[last][run1]){
-                                    fprintf(stderr, "illegal 3. esc, esc 2 encoding possible\n");
+                                    av_log(s->avctx, AV_LOG_ERROR, "illegal 3. esc, esc 2 encoding possible\n");
                                     return -1;
                                 }
                             }

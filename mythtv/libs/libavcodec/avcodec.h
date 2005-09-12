@@ -21,8 +21,8 @@ extern "C" {
 #define AV_STRINGIFY(s)	AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVCODEC_VERSION_INT ((49<<16)+(0<<8)+2)
-#define LIBAVCODEC_VERSION     49.0.2
+#define LIBAVCODEC_VERSION_INT ((50<<16)+(0<<8)+0)
+#define LIBAVCODEC_VERSION     50.0.0
 #define LIBAVCODEC_BUILD       LIBAVCODEC_VERSION_INT
 
 #define LIBAVCODEC_IDENT       "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
@@ -122,6 +122,15 @@ enum CodecID {
     CODEC_ID_PCM_U8,
     CODEC_ID_PCM_MULAW,
     CODEC_ID_PCM_ALAW,
+    CODEC_ID_PCM_S32LE,
+    CODEC_ID_PCM_S32BE,
+    CODEC_ID_PCM_U32LE,
+    CODEC_ID_PCM_U32BE,
+    CODEC_ID_PCM_S24LE,
+    CODEC_ID_PCM_S24BE,
+    CODEC_ID_PCM_U24LE,
+    CODEC_ID_PCM_U24BE,
+    CODEC_ID_PCM_S24DAUD,
 
     /* various adpcm codecs */
     CODEC_ID_ADPCM_IMA_QT= 0x11000,
@@ -673,6 +682,7 @@ struct AVCLASS {
 					or AVFormatContext, which begin with an AVClass.
 					Needed because av_log is in libavcodec and has no visibility
 					of AVIn/OutputFormat */
+    struct AVOption *option;
 };
 
 /**
@@ -996,7 +1006,7 @@ typedef struct AVCodecContext {
      * - decoding: set by user
      */
     int error_resilience;
-#define FF_ER_CAREFULL        1
+#define FF_ER_CAREFUL         1
 #define FF_ER_COMPLIANT       2
 #define FF_ER_AGGRESSIVE      3
 #define FF_ER_VERY_AGGRESSIVE 4
@@ -1203,6 +1213,7 @@ typedef struct AVCodecContext {
 #define FF_IDCT_H264         11
 #define FF_IDCT_VP3          12
 #define FF_IDCT_IPP          13
+#define FF_IDCT_XVIDMMX      14
 
     /**
      * slice count.
@@ -1846,42 +1857,6 @@ typedef struct AVCodecContext {
     int xvmc_vld_hwslice;
 } AVCodecContext;
 
-
-/**
- * AVOption.
- */
-typedef struct AVOption {
-    /** options' name */
-    const char *name; /* if name is NULL, it indicates a link to next */
-    /** short English text help or const struct AVOption* subpointer */
-    const char *help; //	const struct AVOption* sub;
-    /** offset to context structure where the parsed value should be stored */
-    int offset;
-    /** options' type */
-    int type;
-#define FF_OPT_TYPE_BOOL 1      ///< boolean - true,1,on  (or simply presence)
-#define FF_OPT_TYPE_DOUBLE 2    ///< double
-#define FF_OPT_TYPE_INT 3       ///< integer
-#define FF_OPT_TYPE_STRING 4    ///< string (finished with \0)
-#define FF_OPT_TYPE_MASK 0x1f	///< mask for types - upper bits are various flags
-//#define FF_OPT_TYPE_EXPERT 0x20 // flag for expert option
-#define FF_OPT_TYPE_FLAG (FF_OPT_TYPE_BOOL | 0x40)
-#define FF_OPT_TYPE_RCOVERRIDE (FF_OPT_TYPE_STRING | 0x80)
-    /** min value  (min == max   ->  no limits) */
-    double min;
-    /** maximum value for double/int */
-    double max;
-    /** default boo [0,1]l/double/int value */
-    double defval;
-    /**
-     * default string value (with optional semicolon delimited extra option-list
-     * i.e.   option1;option2;option3
-     * defval might select other then first argument as default
-     */
-    const char *defstr;
-#define FF_OPT_MAX_DEPTH 10
-} AVOption;
-
 /**
  * AVCodec.
  */
@@ -2106,6 +2081,15 @@ extern AVCodec libgsm_decoder;
 extern AVCodec name ## _decoder; \
 extern AVCodec name ## _encoder
 
+PCM_CODEC(CODEC_ID_PCM_S32LE, pcm_s32le);
+PCM_CODEC(CODEC_ID_PCM_S32BE, pcm_s32be);
+PCM_CODEC(CODEC_ID_PCM_U32LE, pcm_u32le);
+PCM_CODEC(CODEC_ID_PCM_U32BE, pcm_u32be);
+PCM_CODEC(CODEC_ID_PCM_S24LE, pcm_s24le);
+PCM_CODEC(CODEC_ID_PCM_S24BE, pcm_s24be);
+PCM_CODEC(CODEC_ID_PCM_U24LE, pcm_u24le);
+PCM_CODEC(CODEC_ID_PCM_U24BE, pcm_u24be);
+PCM_CODEC(CODEC_ID_PCM_S24DAUD, pcm_s24daud);
 PCM_CODEC(CODEC_ID_PCM_S16LE, pcm_s16le);
 PCM_CODEC(CODEC_ID_PCM_S16BE, pcm_s16be);
 PCM_CODEC(CODEC_ID_PCM_U16LE, pcm_u16le);

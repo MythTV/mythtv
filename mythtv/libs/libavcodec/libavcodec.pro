@@ -31,10 +31,10 @@ SOURCES += mpeg12.c mpegaudiodec.c pcm.c simple_idct.c ratecontrol.c adpcm.c
 SOURCES += eval.c error_resilience.c fft.c mdct.c raw.c golomb.c cabac.c
 SOURCES += dpcm.c adx.c faandct.c parser.c g726.c vp3dsp.c 
 SOURCES += h264idct.c rangecoder.c pnm.c h263.c msmpeg4.c h263dec.c dvdsub.c 
-SOURCES += dvbsub.c dvbsubdec.c
+SOURCES += dvbsub.c dvbsubdec.c opt.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
-inc.files = avcodec.h i386/mmx.h
+inc.files = avcodec.h i386/mmx.h opt.h
 
 INSTALLS += inc
 
@@ -365,7 +365,7 @@ contains( TARGET_MMX, yes ) {
     SOURCES += i386/fdct_mmx.c i386/cputest.c i386/dsputil_mmx.c
     SOURCES += i386/mpegvideo_mmx.c i386/idct_mmx.c i386/motion_est_mmx.c
     SOURCES += i386/simple_idct_mmx.c i386/fft_sse.c i386/vp3dsp_mmx.c
-    SOURCES += i386/vp3dsp_sse2.c
+    SOURCES += i386/vp3dsp_sse2.c i386/idct_mmx_xvid.c
 #    contains( TARGET_BUILTIN_VECTOR, yes ) {
 #        QMAKE_CFLAGS_RELEASE += -msse
 #        QMAKE_CFLAGS_DEBUG += -msse
