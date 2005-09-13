@@ -53,7 +53,7 @@ bool onlyDumpDBCommercialBreakList = false;
 int jobID = -1;
 int lastCmd = -1;
 
-void BuildVideoMarkup(QString& filename)
+int BuildVideoMarkup(QString& filename)
 {
     program_info = new ProgramInfo;
     program_info->recstartts = QDateTime::currentDateTime().addSecs( -180 * 60);
@@ -62,13 +62,20 @@ void BuildVideoMarkup(QString& filename)
     program_info->pathname = filename;
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
+    if (!tmprbuf)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Unable to create RingBuffer for %1").arg(filename));
+        delete program_info;
+        return COMMFLAG_EXIT_NO_RINGBUFFER;
+    }
 
     if (!MSqlQuery::testDBConnection())
     {
         VERBOSE(VB_IMPORTANT, "Unable to open DB connection for commercial flagging.");
         delete tmprbuf;
         delete program_info;
-        return;
+        return COMMFLAG_EXIT_DB_ERROR;
     }
 
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(program_info);
@@ -81,6 +88,8 @@ void BuildVideoMarkup(QString& filename)
     delete nvp;
     delete tmprbuf;
     delete program_info;
+
+    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
 int QueueCommFlagJob(QString chanid, QString starttime)
@@ -429,6 +438,13 @@ int FlagCommercials(QString chanid, QString starttime)
     filename = program_info->GetPlaybackURL();
 
     RingBuffer *tmprbuf = new RingBuffer(filename, false);
+    if (!tmprbuf)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Unable to create RingBuffer for %1").arg(filename));
+        delete program_info;
+        return COMMFLAG_EXIT_NO_RINGBUFFER;
+    }
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -458,15 +474,19 @@ int FlagCommercials(QString chanid, QString starttime)
     if ((stillRecording) &&
         (program_info->recendts > QDateTime::currentDateTime()))
     {
-        nvp->SetWatchingRecording(true);
         gContext->ConnectToMasterServer();
 
         recorder = RemoteGetExistingRecorder(program_info);
         if (recorder && (recorder->GetRecorderNumber() != -1))
+        {
             nvp->SetRecorder(recorder);
+            nvp->SetWatchingRecording(true);
+        }
         else
-            cerr << "Unable to find active recorder for this recording, "
-                 << "flagging info may be negatively affected." << endl;
+        {
+            VERBOSE(VB_IMPORTANT, "Unable to find active recorder for this "
+                    "recording, realtime flagging will not be enabled.");
+        }
     }
 
     breaksFound = DoFlagCommercials(showPercentage, fullSpeed, inJobQueue,
@@ -487,6 +507,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv, false);
     int argpos = 1;
     bool isVideo = false;
+    int result = COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 
     QString filename;
 
@@ -902,11 +923,11 @@ int main(int argc, char *argv[])
 
     if (isVideo)
     {
-        BuildVideoMarkup(filename);
+        result = BuildVideoMarkup(filename);
     }
     else if (!chanid.isEmpty() && !starttime.isEmpty())
     {
-        FlagCommercials(chanid, starttime);
+        result = FlagCommercials(chanid, starttime);
     }
     else
     {
@@ -1008,7 +1029,7 @@ int main(int argc, char *argv[])
     cerr << "\nFinished commercial break flagging at "
          << ctime(&time_now) << "\n";
 
-    return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
+    return result;
 }
 
 

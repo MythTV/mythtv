@@ -597,8 +597,16 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
     {
         if (!ringBuffer)
         {
-            VERBOSE(VB_IMPORTANT, "NVP::OpenFile() Warning, old player exited "
-                    "before new ring buffer created");
+            QString msg;
+
+            if (m_playbackinfo)
+                msg = QString("m_playbackinfo filename is %1")
+                               .arg(m_playbackinfo->GetRecordBasename());
+
+            VERBOSE(VB_IMPORTANT, QString("NVP::OpenFile() Warning, old player "
+                    "exited before new ring buffer created.  RingBuffer will "
+                    "use filename %1. %2").arg(filename).arg(msg));
+
             ringBuffer = new RingBuffer(filename, false);
             weMadeBuffer = true;
             livetv = false;
