@@ -142,11 +142,12 @@ class ProgramInfo
     void ForgetHistory(void);
 
     // Used to update database with recording info
-    void StartedRecording(void);
+    void StartedRecording(const QString &basename);
     void FinishedRecording(bool prematurestop);
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
 
     // Quick gets
+    QString CreateRecordBasename(void) const;
     QString GetRecordBasename(void) const;
     QString GetRecordFilename(const QString &prefix) const;
     QString GetPlaybackURL(QString playbackHost = "") const;

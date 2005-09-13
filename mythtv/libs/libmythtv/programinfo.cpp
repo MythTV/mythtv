@@ -1165,18 +1165,50 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
     return false;
 }
 
+/** \fn ProgramInfo::CreateRecordBasename(void) const
+ *  \brief Returns a filename for a recording based on the
+ *         recording channel and date.
+ */
+QString ProgramInfo::CreateRecordBasename(void) const
+{
+    QString starts = recstartts.toString("yyyyMMddhhmm00");
+
+    QString retval = QString("%1_%2.nuv").arg(chanid)
+                             .arg(starts);
+    
+    return retval;
+}               
+
 /** \fn ProgramInfo::GetRecordBasename(void) const
  *  \brief Returns a filename for a recording based on the
  *         recording channel and date.
  */
 QString ProgramInfo::GetRecordBasename(void) const
 {
-    QString starts = recstartts.toString("yyyyMMddhhmm00");
-    QString ends = recendts.toString("yyyyMMddhhmm00");
+    QString retval = "";
 
-    QString retval = QString("%1_%2_%3.nuv").arg(chanid)
-                             .arg(starts).arg(ends);
-    
+    if (!pathname.isEmpty())
+        retval = pathname.section('/', -1);
+    else
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare("SELECT basename FROM recorded "
+                      "WHERE chanid = :CHANID AND "
+                      "      starttime = :STARTTIME;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", startts);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("GetRecordBasename", query);
+        else if (query.size() < 1)
+            VERBOSE(VB_ALL, QString("GetRecordBasename found no entry"));
+        else
+        {
+            query.next();
+            retval = query.value(0).toString();
+        }
+    }
+
     return retval;
 }               
 
@@ -1223,13 +1255,13 @@ QString ProgramInfo::GetPlaybackURL(QString playbackHost) const
     return tmpURL;
 }
 
-/** \fn ProgramInfo::StartedRecording()
+/** \fn ProgramInfo::StartedRecording(const QString&)
  *  \brief Inserts this ProgramInfo into the database as an existing recording.
  *  
  *  This method, of course, only works if a recording has been scheduled
  *  and started.
  */
-void ProgramInfo::StartedRecording(void)
+void ProgramInfo::StartedRecording(const QString &basename)
 {
     if (record == NULL) {
         record = new ScheduledRecording();
@@ -1244,11 +1276,12 @@ void ProgramInfo::StartedRecording(void)
                   " subtitle,description,hostname,category,recgroup,"
                   " autoexpire,recordid,seriesid,programid,stars,"
                   " previouslyshown,originalairdate,findid,transcoder,"
-                  " timestretch,recpriority)"
+                  " timestretch,recpriority,basename)"
                   " VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
                   " :HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
                   " :SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE,"
-                  " :FINDID,:TRANSCODER,:TIMESTRETCH,:RECPRIORITY);");
+                  " :FINDID,:TRANSCODER,:TIMESTRETCH,:RECPRIORITY,"
+                  " :BASENAME);");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTS", starts);
     query.bindValue(":ENDS", ends);
@@ -1269,6 +1302,7 @@ void ProgramInfo::StartedRecording(void)
     query.bindValue(":TRANSCODER", record->GetTranscoder());
     query.bindValue(":TIMESTRETCH", timestretch);
     query.bindValue(":RECPRIORITY", record->getRecPriority());
+    query.bindValue(":BASENAME", basename);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("WriteRecordedToDB", query);
@@ -1314,6 +1348,19 @@ void ProgramInfo::StartedRecording(void)
  */
 void ProgramInfo::FinishedRecording(bool prematurestop)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE recorded SET endtime = :ENDTIME "
+                  "WHERE chanid = :CHANID AND "
+                  "    starttime = :STARTTIME ");
+    query.bindValue(":ENDTIME", recendts);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    query.exec();
+
+    if (!query.isActive())
+        MythContext::DBError("FinishedRecording update", query);
+
     GetProgramRecordingStatus();
     if (!prematurestop)
         record->doneRecording(*this);

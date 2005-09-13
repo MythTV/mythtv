@@ -949,7 +949,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                        "record.recordid,outputfilters,"
                        "recorded.seriesid,recorded.programid,recorded.filesize, "
                        "recorded.lastmodified, recorded.findid, "
-                       "recorded.originalairdate, recorded.timestretch "
+                       "recorded.originalairdate, recorded.timestretch, "
+                       "recorded.basename "
                        "FROM recorded "
                        "LEFT JOIN record ON recorded.recordid = record.recordid "
                        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -1016,6 +1017,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             }
 
             proginfo->timestretch = query.value(27).toString().toFloat();
+            QString basename = query.value(28).toString();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
                 proginfo->hostname = gContext->GetHostName();
@@ -1048,7 +1050,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
             proginfo->recgroup = query.value(16).toString();
 
-            QString lpath = proginfo->GetRecordFilename(fileprefix);
+            QString lpath = fileprefix + "/" + basename;
             PlaybackSock *slave = NULL;
             QFile checkFile(lpath);
 
@@ -1063,7 +1065,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                     proginfo->pathname = lpath;
                 else
                     proginfo->pathname = QString("myth://") + ip + ":" + port
-                                         + "/" + proginfo->GetRecordBasename();
+                                         + "/" + basename;
 
                 if (proginfo->filesize == 0)
                 {
@@ -1110,7 +1112,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                         p->pathname = QString("myth://") +
                                       backendIpMap[p->hostname] + ":" +
                                       backendPortMap[p->hostname] + "/" +
-                                      p->GetRecordBasename();
+                                      basename;
                     }
                 }
             }
@@ -1539,88 +1541,13 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         }
     }
 
-    if (QDateTime::currentDateTime() > pginfo->recendts)
-    { //don't update filename if in overrecord
-        if (pbssock)
-        {
-            QStringList outputlist = QString::number(recnum);
-            SendResponse(pbssock, outputlist);
-        }
-        delete pginfo;
-        return;
-    }
-
-    // Set the recorded end time to the current time
-    // (we're stopping the recording so it'll never get to its originally 
-    // intended end time)
-
-    QDateTime now(QDateTime::currentDateTime());
-
-    QString startts = pginfo->recstartts.toString("yyyyMMddhhmm") + "00";
-    QString recendts = pginfo->recendts.toString("yyyyMMddhhmm") + "00";
-    QString newendts = now.toString("yyyyMMddhhmm") + "00";
-
-    QString fileprefix = gContext->GetFilePrefix();
-    QString oldfilename = pginfo->GetRecordFilename(fileprefix);
-    pginfo->recendts = now;
-    QString newfilename = pginfo->GetRecordFilename(fileprefix);
-    QFile checkFile(oldfilename);
-
-    VERBOSE(VB_RECORD, QString("Host %1 renaming %2 to %3")
-                               .arg(gContext->GetHostName())
-                               .arg(oldfilename).arg(newfilename));
-    bool renamed = false;
-    if (checkFile.exists())
-    {
-        if (QDir::root().rename(oldfilename, newfilename, TRUE))
-            renamed = true;
-        else
-            VERBOSE(VB_IMPORTANT, QString("Could not rename: %1 to %2")
-                                          .arg(oldfilename).arg(newfilename));
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, QString("Host %1: file %1 does not exist.")
-                                      .arg(gContext->GetHostName())
-                                      .arg(oldfilename));
-    }
-
-    if(renamed)
-    {
-        VERBOSE(VB_RECORD, QString("Host %1 updating endtime to %2")
-                                   .arg(gContext->GetHostName())
-                                   .arg(newendts));
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("UPDATE recorded SET starttime = :NEWSTARTTIME, "
-                      "endtime = :NEWENDTIME WHERE chanid = :CHANID AND "
-                      "title = :TITLE AND starttime = :STARTTIME AND "
-                      "endtime = :ENDTIME;");
-        query.bindValue(":NEWSTARTTIME", startts);
-        query.bindValue(":NEWENDTIME", newendts);
-        query.bindValue(":CHANID", pginfo->chanid);
-        query.bindValue(":TITLE", pginfo->title.utf8());
-        query.bindValue(":STARTTIME", startts);
-        query.bindValue(":ENDTIME", recendts);
-
-        query.exec();
-
-        if (!query.isActive())
-        {
-            MythContext::DBError("Stop recording program update", query);
-            QDir::root().rename(newfilename, oldfilename, TRUE);
-        }
-    }
-
     if (pbssock)
     {
         QStringList outputlist = QString::number(recnum);
         SendResponse(pbssock, outputlist);
     }
 
-    int jobTypes;
-
-    jobTypes = pginfo->GetAutoRunJobs();
+    int jobTypes = pginfo->GetAutoRunJobs();
 
     if (pginfo->chancommfree)
         jobTypes = jobTypes & (~JOB_COMMFLAG);

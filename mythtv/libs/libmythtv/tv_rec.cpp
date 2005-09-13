@@ -398,7 +398,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     if (internalState == kState_None)
     {
-        outputFilename = rcinfo->GetRecordFilename(recprefix);
+        outputFilename = recprefix + "/" + rcinfo->CreateRecordBasename();
         recordEndTime = rcinfo->recendts;
         curRecording = new ProgramInfo(*rcinfo);
 
@@ -516,7 +516,7 @@ void TVRec::StartedRecording(void)
     if (!curRecording)
         return;
 
-    curRecording->StartedRecording();
+    curRecording->StartedRecording(outputFilename.section("/", -1));
 
     if (curRecording->chancommfree != 0)
         curRecording->SetCommFlagged(COMM_FLAG_COMMFREE);
@@ -536,6 +536,11 @@ void TVRec::FinishedRecording(void)
 {
     if (!curRecording)
         return;
+
+    curRecording->recendts = QDateTime::currentDateTime().addSecs(30);
+    curRecording->recendts.setTime(QTime(
+        curRecording->recendts.time().hour(),
+        curRecording->recendts.time().minute()));
 
     curRecording->FinishedRecording(prematurelystopped);
 }
