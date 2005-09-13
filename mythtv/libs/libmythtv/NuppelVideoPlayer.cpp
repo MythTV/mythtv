@@ -57,6 +57,10 @@ extern "C" {
 #undef GetFileSize
 #endif
 
+#ifndef HAVE_ROUND
+#define round(x) ((int) ((x) + 0.5))
+#endif
+
 #ifdef CONFIG_DARWIN
 extern "C" {
 int isnan(double);

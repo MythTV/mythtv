@@ -24,6 +24,7 @@
  * @author Michael Niedermayer <michaelni@gmx.at>
  */
  
+#include "dsputil.h"
 #include "avcodec.h"
 #include "opt.h"
  
