@@ -323,7 +323,18 @@ const char *StreamID::toString(unsigned int streamID)
     else if (StreamID::PrivData==streamID)
         return "private-data";
 
-    else switch (streamID) {
+    // DSMCC Object Carousel
+    else if (StreamID::DSMCC_A==streamID)
+	return "dsmcc-a encap";
+    else if (StreamID::DSMCC_B==streamID)
+	return "dsmcc-b std data";
+    else if (StreamID::DSMCC_C==streamID)
+	return "dsmcc-c NPD data";
+    else if (StreamID::DSMCC_D==streamID)
+	return "dsmcc-d data";
+
+    else switch (streamID)
+    {
         case (TableID::STUFFING):
             retval="stuffing"; break; // optionally in any
         case (TableID::CAPTION):
@@ -345,4 +356,3 @@ const QString ProgramMapTable::StreamTypeString(unsigned int i) const
 {
     return QString( StreamID::toString(StreamType(i)) );
 }
-

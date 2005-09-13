@@ -45,6 +45,12 @@ class StreamID
         PrivSec        = 0x05,
         PrivData       = 0x06,
 
+        // DSM-CC Object Carousel
+        DSMCC_A        = 0x0A,      // Multi-protocol Encapsulation
+        DSMCC_B        = 0x0B,      // Std DSMCC Data
+        DSMCC_C        = 0x0C,      // NPT DSMCC Data
+        DSMCC_D        = 0x0D,      // Any DSMCC Data
+
         // special id's, not actually ID's but can be used in FindPIDs
         AnyMask        = 0xFFFF0000,
         AnyVideo       = 0xFFFF0001,
@@ -67,6 +73,14 @@ class StreamID
                 (StreamID::AACAudio   == type) ||
                 (StreamID::AC3Audio   == type) ||
                 (StreamID::DTSAudio   == type));
+    }
+    /// Returns true iff stream contains DSMCC Object Carousel
+    static bool IsObjectCarousel(uint type)
+    {
+        return ((StreamID::DSMCC_A == type) ||
+                (StreamID::DSMCC_B == type) ||
+                (StreamID::DSMCC_C == type) ||
+                (StreamID::DSMCC_D == type));
     }
     static const char* toString(uint streamID);
 };
