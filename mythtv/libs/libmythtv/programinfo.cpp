@@ -1169,12 +1169,12 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
  *  \brief Returns a filename for a recording based on the
  *         recording channel and date.
  */
-QString ProgramInfo::CreateRecordBasename(void) const
+QString ProgramInfo::CreateRecordBasename(const QString &ext) const
 {
     QString starts = recstartts.toString("yyyyMMddhhmm00");
 
-    QString retval = QString("%1_%2.nuv").arg(chanid)
-                             .arg(starts);
+    QString retval = QString("%1_%2.%3").arg(chanid)
+                             .arg(starts).arg(ext);
     
     return retval;
 }               

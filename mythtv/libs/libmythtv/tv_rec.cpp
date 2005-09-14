@@ -149,6 +149,8 @@ bool TVRec::Init(void)
 
     QString startchannel = GetStartChannel(m_capturecardnum, inputname);
 
+    fileextension = "mpg";
+
     bool init_run = false;
     if (cardtype == "DVB")
     {
@@ -202,6 +204,8 @@ bool TVRec::Init(void)
         CloseChannel();
         init_run = true;
 #endif
+        if (cardtype != "HDTV" && cardtype != "MPEG")
+            fileextension = "nuv";
     }
 
     if (!init_run)
@@ -398,7 +402,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     if (internalState == kState_None)
     {
-        outputFilename = recprefix + "/" + rcinfo->CreateRecordBasename();
+        outputFilename = recprefix + "/" + rcinfo->CreateRecordBasename(fileextension);
         recordEndTime = rcinfo->recendts;
         curRecording = new ProgramInfo(*rcinfo);
 

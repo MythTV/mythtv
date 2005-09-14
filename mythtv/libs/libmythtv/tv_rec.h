@@ -320,6 +320,7 @@ class TVRec
     QString  vbidev;
     QString  audiodev;
     QString  cardtype;
+    QString  fileextension;
     int      audiosamplerate;
     bool     skip_btaudio;
 

@@ -147,7 +147,7 @@ class ProgramInfo
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
 
     // Quick gets
-    QString CreateRecordBasename(void) const;
+    QString CreateRecordBasename(const QString &ext) const;
     QString GetRecordBasename(void) const;
     QString GetRecordFilename(const QString &prefix) const;
     QString GetPlaybackURL(QString playbackHost = "") const;
