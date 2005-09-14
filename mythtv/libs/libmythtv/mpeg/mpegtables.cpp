@@ -131,7 +131,14 @@ bool ProgramMapTable::IsEncrypted(void) const
         ProgramInfo(), ProgramInfoLength());
     const unsigned char* data = MPEGDescriptor::Find(
         descs, DescriptorID::conditional_access);
-    return (bool)(data);
+
+    if (data)
+    {
+        ConditionalAccessDescriptor ca(data);
+        return 0x0 != ca.SystemID(); // System ID of 0 == no encrytion
+    }
+
+    return false;
 #if 0
     QMap<uint,uint> encryption_system;
     if (data)
