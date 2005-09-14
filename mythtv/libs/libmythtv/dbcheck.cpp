@@ -1956,20 +1956,20 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
     if (dbver == "1086")
     {
         const QString updates[] = {
-            "CREATE TABLE IF NOT EXISTS xvmc_buffer_settings ( "
-            "  id int(11) NOT NULL auto_increment, "
-            "  description varchar(255) NOT NULL default '',"
-            "  osd_num int(11) NOT NULL default '0',"
-            "  osd_res_num int(11) NOT NULL default '0',"
-            "  min_surf int(11) NOT NULL default '0',"
-            "  max_surf int(11) NOT NULL default '0',"
-            "  decode_num int(11) NOT NULL default '0',"
-            "  agressive int(11) NOT NULL default '1',"
-            "  PRIMARY KEY  (id) );",
-            "INSERT INTO xvmc_buffer_settings VALUES (1,'Default / nVidia',2,2,8,16,8,1);",
-            "INSERT INTO xvmc_buffer_settings VALUES (2,'VLD (More decode buffers)',2,2,8,16,16,1);",
-            ""
-        }; 
+"CREATE TABLE IF NOT EXISTS xvmc_buffer_settings ( "
+"  id int(11) NOT NULL auto_increment, "
+"  description varchar(255) NOT NULL default '',"
+"  osd_num int(11) NOT NULL default '0',"
+"  osd_res_num int(11) NOT NULL default '0',"
+"  min_surf int(11) NOT NULL default '0',"
+"  max_surf int(11) NOT NULL default '0',"
+"  decode_num int(11) NOT NULL default '0',"
+"  agressive int(11) NOT NULL default '1',"
+"  PRIMARY KEY  (id) );",
+"INSERT INTO xvmc_buffer_settings VALUES (1,'Default / nVidia',2,2,8,16,8,1);",
+"INSERT INTO xvmc_buffer_settings VALUES (2,'VLD (More decode buffers)',2,2,8,16,16,1);",
+""
+}; 
         
         if (!performActualUpdate(updates, "1087", dbver))
             return false;
@@ -1990,18 +1990,18 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
     if (dbver == "1088")
     {
         const QString updates[] = {
-            "ALTER TABLE oldrecorded ADD COLUMN station VARCHAR(20) NOT NULL DEFAULT '';",
-            "UPDATE oldrecorded SET station=chanid;",
-            "ALTER TABLE oldrecorded ADD rectype INT(10) UNSIGNED NOT NULL DEFAULT 0;",
-            "UPDATE oldrecorded SET rectype=1;",
-            "ALTER TABLE oldrecorded ADD duplicate TINYINT(1) NOT NULL DEFAULT 0;",
-            "UPDATE oldrecorded SET duplicate=1;",
-            "ALTER TABLE oldrecorded ADD recstatus INT NOT NULL DEFAULT 0;",
-            "UPDATE oldrecorded SET recstatus=-3;",
-            "ALTER TABLE oldrecorded DROP PRIMARY KEY;",
-            "ALTER TABLE oldrecorded ADD PRIMARY KEY (station,starttime,title);",
-            ""
-        }; 
+"ALTER TABLE oldrecorded ADD COLUMN station VARCHAR(20) NOT NULL DEFAULT '';",
+"UPDATE oldrecorded SET station=chanid;",
+"ALTER TABLE oldrecorded ADD rectype INT(10) UNSIGNED NOT NULL DEFAULT 0;",
+"UPDATE oldrecorded SET rectype=1;",
+"ALTER TABLE oldrecorded ADD duplicate TINYINT(1) NOT NULL DEFAULT 0;",
+"UPDATE oldrecorded SET duplicate=1;",
+"ALTER TABLE oldrecorded ADD recstatus INT NOT NULL DEFAULT 0;",
+"UPDATE oldrecorded SET recstatus=-3;",
+"ALTER TABLE oldrecorded DROP PRIMARY KEY;",
+"ALTER TABLE oldrecorded ADD PRIMARY KEY (station,starttime,title);",
+""
+}; 
         
         if (!performActualUpdate(updates, "1089", dbver))
             return false;
@@ -2010,12 +2010,12 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
     if (dbver == "1089")
     {
         const QString updates[] = {
-	    "INSERT INTO profilegroups SET name = 'DBOX2 Input', cardtype = 'DBOX2', is_default = 1;",
-	    "ALTER TABLE capturecard ADD COLUMN dbox2_port INT UNSIGNED NOT NULL DEFAULT 31338;",
-	    "ALTER TABLE capturecard ADD COLUMN dbox2_httpport INT UNSIGNED NOT NULL DEFAULT 80;",
-	    "ALTER TABLE capturecard ADD COLUMN dbox2_host varchar(32) NULL;",
-	    ""
-	};
+"INSERT INTO profilegroups SET name = 'DBOX2 Input', cardtype = 'DBOX2', is_default = 1;",
+"ALTER TABLE capturecard ADD COLUMN dbox2_port INT UNSIGNED NOT NULL DEFAULT 31338;",
+"ALTER TABLE capturecard ADD COLUMN dbox2_httpport INT UNSIGNED NOT NULL DEFAULT 80;",
+"ALTER TABLE capturecard ADD COLUMN dbox2_host varchar(32) NULL;",
+""
+};
 
         if (!performActualUpdate(updates, "1090", dbver))
             return false;
@@ -2027,7 +2027,7 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 "DELETE FROM dtv_privatetypes WHERE sitype='dvb' AND networkid=40999 AND private_type='parse_subtitle_list';",
 "INSERT INTO dtv_privatetypes (sitype,networkid,private_type,private_value) VALUES ('dvb',40999,'parse_subtitle_list','1070,1308,1041,1306,1307,1030,1016,1131,1068,1069');",
 ""
-        };
+};
 
         if (!performActualUpdate(updates, "1091", dbver))
             return false;
@@ -2036,10 +2036,10 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
     if (dbver == "1091")
     {
         const QString updates[] = {
-            "ALTER TABLE capturecard CHANGE dvb_recordts dvb_recordts INT DEFAULT '1';",
-            "UPDATE capturecard SET dvb_recordts=1;",
-            ""
-        };
+"ALTER TABLE capturecard CHANGE dvb_recordts dvb_recordts INT DEFAULT '1';",
+"UPDATE capturecard SET dvb_recordts=1;",
+""
+};
 
         if (!performActualUpdate(updates, "1092", dbver))
             return false;
@@ -2048,9 +2048,9 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
     if (dbver == "1092")
     {
         const QString updates[] = {
-            "ALTER TABLE recorded ADD COLUMN recpriority INT NOT NULL DEFAULT 0;",
-            ""
-        };
+"ALTER TABLE recorded ADD COLUMN recpriority INT NOT NULL DEFAULT 0;",
+""
+};
         
         if (!performActualUpdate(updates, "1093", dbver))
             return false;
@@ -2079,15 +2079,17 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 
         if (!UpdateDBVersionNumber("1094"))
             return false;
+
+        dbver = "1094";
     }
 
     if (dbver == "1094")
     {
         const QString updates[] = {
-            "ALTER TABLE recorded ADD COLUMN basename varchar(128) NOT NULL DEFAULT '';",
-            "UPDATE recorded SET basename = CONCAT(chanid, '_', DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv');",
-            ""
-        };
+"ALTER TABLE recorded ADD COLUMN basename varchar(128) NOT NULL DEFAULT '';",
+"UPDATE recorded SET basename = CONCAT(chanid, '_', DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv');",
+""
+};
 
         if (!performActualUpdate(updates, "1095", dbver))
             return false;
