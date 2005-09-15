@@ -181,8 +181,7 @@ bool EncoderLink::MatchesRecording(const ProgramInfo *rec)
         if (tvrec)
         {
             if (tvrec->chanid == rec->chanid && 
-                tvrec->recstartts == rec->recstartts &&
-                tvrec->recendts == rec->recendts)
+                tvrec->recstartts == rec->recstartts)
             {
                 retval = true;
             }

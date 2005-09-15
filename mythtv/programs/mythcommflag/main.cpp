@@ -284,7 +284,7 @@ void incomingCustomEvent(QCustomEvent* e)
                               .arg(chanid).arg(starttime);
 
             if ((program_info->chanid == chanid) &&
-                (program_info->startts == startts))
+                (program_info->recstartts == startts))
             {
                 commDetector->requestCommBreakMapUpdate();
                 message += "Requested CommDetector to generate new break list.";
@@ -308,7 +308,7 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
     if (inJobQueue)
     {
         jobID = JobQueue::GetJobID(JOB_COMMFLAG, program_info->chanid,
-                                   program_info->startts);
+                                   program_info->recstartts);
 
         if (jobID != -1)
             VERBOSE(VB_COMMFLAG,
@@ -356,7 +356,7 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
             fstream outputstream(outputfilename, ios::app | ios::out );
             outputstream << "commercialBreakListFor: " << program_info->title
                          << " on " << program_info->chanid << " @ "
-                         << program_info->startts.toString(Qt::ISODate) << endl;
+                         << program_info->recstartts.toString(Qt::ISODate) << endl;
             streamOutCommercialBreakList(outputstream, commBreakList);
         }
     }
@@ -398,14 +398,14 @@ int FlagCommercials(QString chanid, QString starttime)
             fstream output(outputfilename, ios::app | ios::out );
             output << "commercialBreakListFor: " << program_info->title
                    << " on " << program_info->chanid << " @ "
-                   << program_info->startts.toString(Qt::ISODate) << endl;
+                   << program_info->recstartts.toString(Qt::ISODate) << endl;
             streamOutCommercialBreakList(output, commBreakList);
         }
         else
         {
             cout << "commercialBreakListFor: " << program_info->title
                  << " on " << program_info->chanid << " @ "
-                 << program_info->startts.toString(Qt::ISODate) << endl;
+                 << program_info->recstartts.toString(Qt::ISODate) << endl;
             streamOutCommercialBreakList(cout, commBreakList);
         }
         delete program_info;
@@ -953,8 +953,7 @@ int main(int argc, char *argv[])
                 QDateTime startts =
                     QDateTime::fromString(recordedquery.value(1).toString(),
                                           Qt::ISODate);
-                starttime = startts.toString("yyyyMMddhhmm");
-                starttime += "00";
+                starttime = startts.toString("yyyyMMddhhmmss");
 
                 chanid = recordedquery.value(0).toString();
 

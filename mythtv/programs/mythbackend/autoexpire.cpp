@@ -545,7 +545,7 @@ void AutoExpire::FillDBOrdered(int expMethod)
                "       title,           subtitle,    description, "
                "       hostname,        channum,     name,        "
                "       callsign,        seriesid,    programid,   "
-               "       recorded.recpriority "
+               "       recorded.recpriority, progstart, progend "
                "FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
                "WHERE autoexpire > 0 "
@@ -561,12 +561,10 @@ void AutoExpire::FillDBOrdered(int expMethod)
         ProgramInfo *proginfo = new ProgramInfo;
 
         proginfo->chanid = query.value(0).toString();
-        proginfo->startts = QDateTime::fromString(query.value(1).toString(),
-                                                  Qt::ISODate);
-        proginfo->endts = QDateTime::fromString(query.value(2).toString(),
-                                                Qt::ISODate);
-        proginfo->recstartts = proginfo->startts;
-        proginfo->recendts = proginfo->endts;
+        proginfo->startts = query.value(13).toDateTime();
+        proginfo->endts = query.value(14).toDateTime();
+        proginfo->recstartts = query.value(1).toDateTime();
+        proginfo->recendts = query.value(2).toDateTime();
         proginfo->title = QString::fromUtf8(query.value(3).toString());
         proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
         proginfo->description = QString::fromUtf8(query.value(5).toString());

@@ -302,8 +302,6 @@ class PlaybackBox : public MythDialog
     QDateTime previewStartts;
     QString previewChanid;
     int listOrder;
-    int overrectime;
-    int underrectime;
 
     bool playingSomething;
     bool titleView;

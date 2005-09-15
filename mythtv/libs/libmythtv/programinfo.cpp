@@ -692,7 +692,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
                                                  const QDateTime &dtime)
 {
-    return GetProgramFromRecorded(channel, dtime.toString("yyyyMMddhhmm00"));
+    return GetProgramFromRecorded(channel, dtime.toString("yyyyMMddhhmmss"));
 }
 
 /** \fn ProgramInfo::GetProgramFromRecorded(const QString&, const QString&)
@@ -709,7 +709,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                   "channel.outputfilters,seriesid,programid,filesize, "
                   "lastmodified,stars,previouslyshown,originalairdate, "
                   "hostname,recordid,transcoder,timestretch, "
-                  "recorded.recpriority "
+                  "recorded.recpriority,progstart,progend "
                   "FROM recorded "
                   "LEFT JOIN channel "
                   "ON recorded.chanid = channel.chanid "
@@ -724,12 +724,10 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
 
         ProgramInfo *proginfo = new ProgramInfo;
         proginfo->chanid = query.value(0).toString();
-        proginfo->startts = QDateTime::fromString(query.value(1).toString(),
-                                                  Qt::ISODate);
-        proginfo->endts = QDateTime::fromString(query.value(2).toString(),
-                                                Qt::ISODate);
-        proginfo->recstartts = proginfo->startts;
-        proginfo->recendts = proginfo->endts;
+        proginfo->startts = query.value(23).toDateTime();
+        proginfo->endts = query.value(24).toDateTime();
+        proginfo->recstartts = query.value(1).toDateTime();
+        proginfo->recendts = query.value(2).toDateTime();
         proginfo->title = QString::fromUtf8(query.value(3).toString());
         proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
         proginfo->description = QString::fromUtf8(query.value(5).toString());
@@ -999,7 +997,7 @@ void ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
                   " WHERE chanid = :CHANID"
                   " AND starttime = :START ;");
     query.bindValue(":RECGROUP", newrecgroup.utf8());
-    query.bindValue(":START", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":START", recstartts);
     query.bindValue(":CHANID", chanid);
 
     if (!query.exec())
@@ -1171,7 +1169,7 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
  */
 QString ProgramInfo::CreateRecordBasename(const QString &ext) const
 {
-    QString starts = recstartts.toString("yyyyMMddhhmm00");
+    QString starts = recstartts.toString("yyyyMMddhhmmss");
 
     QString retval = QString("%1_%2.%3").arg(chanid)
                              .arg(starts).arg(ext);
@@ -1196,7 +1194,7 @@ QString ProgramInfo::GetRecordBasename(void) const
                       "WHERE chanid = :CHANID AND "
                       "      starttime = :STARTTIME;");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", startts);
+        query.bindValue(":STARTTIME", recstartts);
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("GetRecordBasename", query);
@@ -1268,23 +1266,20 @@ void ProgramInfo::StartedRecording(const QString &basename)
         record->loadByProgram(this);
     }
 
-    QString starts = recstartts.toString("yyyyMMddhhmm00");
-    QString ends = recendts.toString("yyyyMMddhhmm00");
-
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO recorded (chanid,starttime,endtime,title,"
                   " subtitle,description,hostname,category,recgroup,"
                   " autoexpire,recordid,seriesid,programid,stars,"
                   " previouslyshown,originalairdate,findid,transcoder,"
-                  " timestretch,recpriority,basename)"
+                  " timestretch,recpriority,basename,progstart,progend)"
                   " VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
                   " :HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
                   " :SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE,"
                   " :FINDID,:TRANSCODER,:TIMESTRETCH,:RECPRIORITY,"
-                  " :BASENAME);");
+                  " :BASENAME,:PROGSTART,:PROGEND);");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTS", starts);
-    query.bindValue(":ENDS", ends);
+    query.bindValue(":STARTS", recstartts);
+    query.bindValue(":ENDS", recendts);
     query.bindValue(":TITLE", title.utf8());
     query.bindValue(":SUBTITLE", subtitle.utf8());
     query.bindValue(":DESC", description.utf8());
@@ -1303,6 +1298,8 @@ void ProgramInfo::StartedRecording(const QString &basename)
     query.bindValue(":TIMESTRETCH", timestretch);
     query.bindValue(":RECPRIORITY", record->getRecPriority());
     query.bindValue(":BASENAME", basename);
+    query.bindValue(":PROGSTART", startts);
+    query.bindValue(":PROGEND", endts);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("WriteRecordedToDB", query);
@@ -1310,32 +1307,32 @@ void ProgramInfo::StartedRecording(const QString &basename)
     query.prepare("DELETE FROM recordedmarkup WHERE chanid = :CHANID"
                   " AND starttime = :START;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":START", starts);
+    query.bindValue(":START", recstartts);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Clear markup on record", query);
 
-    query.prepare("INSERT INTO recordedcredits"
+    query.prepare("REPLACE INTO recordedcredits"
                  " SELECT * FROM credits"
                  " WHERE chanid = :CHANID AND starttime = :START;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":START", starts);
+    query.bindValue(":START", startts);
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Copy program credits on record", query);
 
-    query.prepare("INSERT INTO recordedprogram"
+    query.prepare("REPLACE INTO recordedprogram"
                  " SELECT * from program"
                  " WHERE chanid = :CHANID AND starttime = :START;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":START", starts);
+    query.bindValue(":START", startts);
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Copy program data on record", query);
 
-    query.prepare("INSERT INTO recordedrating"
+    query.prepare("REPLACE INTO recordedrating"
                  " SELECT * from programrating"
                  " WHERE chanid = :CHANID AND starttime = :START;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":START", starts);
+    query.bindValue(":START", startts);
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Copy program ratings on record", query);    
 }
@@ -1379,7 +1376,7 @@ void ProgramInfo::SetFilesize(long long fsize)
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":FILESIZE", longLongToString(fsize));
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
     
     if (!query.exec() || !query.isActive())
         MythContext::DBError("File size update", 
@@ -1397,7 +1394,7 @@ long long ProgramInfo::GetFilesize(void)
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
     
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -1443,7 +1440,7 @@ void ProgramInfo::SetBookmark(long long pos) const
                     " WHERE chanid = :CHANID"
                     " AND starttime = :STARTTIME ;");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+        query.bindValue(":STARTTIME", recstartts);
     }
         
     if (pos > 0)
@@ -1491,7 +1488,7 @@ long long ProgramInfo::GetBookmark(void) const
                     " WHERE chanid = :CHANID"
                     " AND starttime = :STARTTIME ;");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+        query.bindValue(":STARTTIME", recstartts);
     }
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -1517,7 +1514,7 @@ bool ProgramInfo::IsEditing(void) const
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -1542,7 +1539,7 @@ void ProgramInfo::SetEditing(bool edit) const
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":EDIT", edit);
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
    
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Edit status update", 
@@ -1562,7 +1559,7 @@ void ProgramInfo::SetDeleteFlag(bool deleteFlag) const
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (deleteFlag)
         query.bindValue(":DELETEFLAG", 1);
@@ -1585,7 +1582,7 @@ bool ProgramInfo::IsCommFlagged(void) const
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -1610,7 +1607,7 @@ void ProgramInfo::SetCommFlagged(int flag) const
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":FLAG", flag);
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
     
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Commercial Flagged status update",
@@ -1630,7 +1627,7 @@ bool ProgramInfo::IsCommProcessing(void) const
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -1655,7 +1652,7 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":PRESERVE", preserveEpisode);
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("PreserveEpisode update", query);
@@ -1675,7 +1672,7 @@ void ProgramInfo::SetAutoExpire(bool autoExpire) const
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":AUTOEXPIRE", autoExpire);
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if(!query.exec() || !query.isActive())
         MythContext::DBError("AutoExpire update",
@@ -1693,7 +1690,7 @@ bool ProgramInfo::GetAutoExpireFromRecorded(void) const
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -1715,7 +1712,7 @@ bool ProgramInfo::GetPreserveEpisodeFromRecorded(void) const
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -1758,7 +1755,7 @@ void ProgramInfo::GetCutList(QMap<long long, int> &delMap) const
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -1825,7 +1822,7 @@ void ProgramInfo::SetCutList(QMap<long long, int> &delMap) const
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CUTLIST", cutdata);
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("cutlist update", 
@@ -1882,7 +1879,7 @@ void ProgramInfo::ClearMarkupMap(int type, long long min_frame,
                       " AND STARTTIME = :STARTTIME"
                       + comp + ";");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+        query.bindValue(":STARTTIME", recstartts);
     }
     query.bindValue(":TYPE", type);
     
@@ -1905,7 +1902,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks,
                       " WHERE chanid = :CHANID"
                       " AND starttime = :STARTTIME ;");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+        query.bindValue(":STARTTIME", recstartts);
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("SetMarkupMap checking record table",
@@ -1948,7 +1945,7 @@ void ProgramInfo::SetMarkupMap(QMap<long long, int> &marks,
                           " (chanid, starttime, mark, type)"
                           " VALUES ( :CHANID , :STARTTIME , :MARK , :TYPE );");
             query.bindValue(":CHANID", chanid);
-            query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+            query.bindValue(":STARTTIME", recstartts);
         }
         query.bindValue(":MARK", frame_str);
         query.bindValue(":TYPE", mark_type);
@@ -1983,7 +1980,7 @@ void ProgramInfo::GetMarkupMap(QMap<long long, int> &marks,
                       " AND type = :TYPE"
                       " ORDER BY mark;");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+        query.bindValue(":STARTTIME", recstartts);
     }
     query.bindValue(":TYPE", type);
 
@@ -2037,7 +2034,7 @@ void ProgramInfo::GetPositionMap(QMap<long long, long long> &posMap,
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE ;");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+        query.bindValue(":STARTTIME", recstartts);
     }
     query.bindValue(":TYPE", type);
 
@@ -2067,7 +2064,7 @@ void ProgramInfo::ClearPositionMap(int type) const
                       " AND starttime = :STARTTIME"
                       " AND type = :TYPE ;");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+        query.bindValue(":STARTTIME", recstartts);
     }
     query.bindValue(":TYPE", type);
                                
@@ -2113,7 +2110,7 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
                       " AND type = :TYPE"
                       + comp + ";");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+        query.bindValue(":STARTTIME", recstartts);
     }
     query.bindValue(":TYPE", type);
     
@@ -2155,7 +2152,7 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
                           " VALUES"
                           " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");
             query.bindValue(":CHANID", chanid);
-            query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+            query.bindValue(":STARTTIME", recstartts);
         }
         query.bindValue(":MARK", frame_str);
         query.bindValue(":TYPE", type);
@@ -2201,7 +2198,7 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
                           " VALUES"
                           " ( :CHANID , :STARTTIME , :MARK , :TYPE , :OFFSET );");
             query.bindValue(":CHANID", chanid);
-            query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+            query.bindValue(":STARTTIME", recstartts);
         }
         query.bindValue(":MARK", frame_str);
         query.bindValue(":TYPE", type);
@@ -2770,7 +2767,7 @@ void ProgramInfo::showDetails(void) const
                           " AND starttime = :STARTTIME ;");
 
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
+        query.bindValue(":STARTTIME", startts);
 
         if (query.exec() && query.isActive() && query.size() > 0)
         {
@@ -2785,7 +2782,7 @@ void ProgramInfo::showDetails(void) const
             epinum = query.value(7).toString();
         }
 
-        if (filesize>0)
+        if (filesize > 0)
             query.prepare("SELECT rating FROM recordedrating"
                           " WHERE chanid = :CHANID"
                           " AND starttime = :STARTTIME ;");
@@ -2795,7 +2792,7 @@ void ProgramInfo::showDetails(void) const
                           " AND starttime = :STARTTIME ;");
 
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
+        query.bindValue(":STARTTIME", startts);
         
         if (query.exec() && query.isActive() && query.size() > 0)
         {
@@ -2908,7 +2905,7 @@ void ProgramInfo::showDetails(void) const
                           " AND credits.starttime = :STARTTIME"
                           " ORDER BY role;");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", startts.toString(Qt::ISODate));
+        query.bindValue(":STARTTIME", startts);
 
         if (query.exec() && query.isActive() && query.size() > 0)
         {
@@ -3042,7 +3039,7 @@ int ProgramInfo::getProgramFlags(void) const
                   "editing, bookmark FROM recorded WHERE "
                   "chanid = :CHANID AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", recstartts);
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {

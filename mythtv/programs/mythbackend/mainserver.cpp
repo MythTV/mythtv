@@ -936,6 +936,22 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
 
     QString fs_db_name = "";
 
+    QDateTime rectime = QDateTime::currentDateTime().addSecs(
+                            -gContext->GetNumSetting("RecordOverTime"));
+    RecIter ri;
+    RecList schedList;
+    if (m_sched)
+        m_sched->getAllPending(&schedList);
+    for (ri = schedList.begin(); ri != schedList.end(); )
+    {
+        if ((*ri)->recstatus == rsRecording)
+            ri++;
+        else
+        {
+            delete (*ri);
+            ri = schedList.erase(ri);
+        }
+    }
 
     QString ip = gContext->GetSetting("BackendServerIP");
     QString port = gContext->GetSetting("BackendServerPort");
@@ -950,7 +966,8 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                        "recorded.seriesid,recorded.programid,recorded.filesize, "
                        "recorded.lastmodified, recorded.findid, "
                        "recorded.originalairdate, recorded.timestretch, "
-                       "recorded.basename "
+                       "recorded.basename, recorded.progstart, "
+                       "recorded.progend "
                        "FROM recorded "
                        "LEFT JOIN record ON recorded.recordid = record.recordid "
                        "LEFT JOIN channel ON recorded.chanid = channel.chanid "
@@ -981,12 +998,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             ProgramInfo *proginfo = new ProgramInfo;
 
             proginfo->chanid = query.value(0).toString();
-            proginfo->startts = QDateTime::fromString(query.value(1).toString(),
-                                                      Qt::ISODate);
-            proginfo->endts = QDateTime::fromString(query.value(2).toString(),
-                                                    Qt::ISODate);
-            proginfo->recstartts = proginfo->startts;
-            proginfo->recendts = proginfo->endts;
+            proginfo->startts = query.value(29).toDateTime();
+            proginfo->endts = query.value(30).toDateTime();
+            proginfo->recstartts = query.value(1).toDateTime();
+            proginfo->recendts = query.value(2).toDateTime();
             proginfo->title = QString::fromUtf8(query.value(3).toString());
             proginfo->subtitle = QString::fromUtf8(query.value(4).toString());
             proginfo->description = QString::fromUtf8(query.value(5).toString());
@@ -1049,6 +1064,20 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->category = QString::fromUtf8(query.value(15).toString());
 
             proginfo->recgroup = query.value(16).toString();
+
+            proginfo->recstatus = rsRecorded;
+            if (proginfo->recendts > rectime)
+            {
+                for (ri = schedList.begin(); ri != schedList.end(); ri++)
+                {
+                    if (proginfo->chanid == (*ri)->chanid &&
+                        proginfo->recstartts == (*ri)->recstartts)
+                    {
+                        proginfo->recstatus = rsRecording;
+                        break;
+                    }
+                }
+            }
 
             QString lpath = fileprefix + "/" + basename;
             PlaybackSock *slave = NULL;
@@ -1127,6 +1156,9 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     }
     else
         outputlist << "0";
+
+    for (ri = schedList.begin(); ri != schedList.end(); ri++)
+        delete (*ri);
 
     SendResponse(pbssock, outputlist);
 }
@@ -1344,12 +1376,10 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("DELETE FROM recorded WHERE chanid = :CHANID AND "
-                  "title = :TITLE AND starttime = :STARTTIME AND "
-                  "endtime = :ENDTIME;");
+                  "title = :TITLE AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", ds->chanid);
     query.bindValue(":TITLE", ds->title.utf8());
-    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
-    query.bindValue(":ENDTIME", ds->recendts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", ds->recstartts);
     query.exec();
 
     if (!query.isActive())
@@ -1363,7 +1393,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     query.prepare("DELETE FROM recordedrating "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", pginfo->startts);
     query.exec();
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Recorded program delete recordedrating",
@@ -1372,7 +1402,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     query.prepare("DELETE FROM recordedprogram "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", pginfo->startts);
     query.exec();
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Recorded program delete recordedprogram",
@@ -1381,7 +1411,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     query.prepare("DELETE FROM recordedcredits "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", pginfo->startts);
     query.exec();
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Recorded program delete recordedcredits",
@@ -1399,7 +1429,7 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
     query.prepare("DELETE FROM recordedmarkup "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
     query.bindValue(":CHANID", ds->chanid);
-    query.bindValue(":STARTTIME", ds->recstartts.toString("yyyyMMddhhmm00"));
+    query.bindValue(":STARTTIME", ds->recstartts);
     query.exec();
 
     if (!query.isActive())

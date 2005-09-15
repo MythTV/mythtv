@@ -180,9 +180,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
 
     showDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     showTimeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    overrectime = gContext->GetNumSetting("RecordOverTime", 0);
-    underrectime = gContext->GetNumSetting("RecordPreRoll", 0);
-
     
     bgTransBackup = gContext->LoadScalePixmap("trans-backup.png");
 
@@ -954,7 +951,6 @@ void PlaybackBox::updateShowTitles(QPainter *p)
     QString tempDate;
     QString tempTime;
     QString tempSize;
-    int tempCurrent = 0;
 
     QString match;
     QRect pr = listRect;
@@ -1086,9 +1082,6 @@ void PlaybackBox::updateShowTitles(QPainter *p)
 
                 tempInfo = plist->at(skip+cnt);
 
-                tempCurrent = RemoteGetRecordingStatus(tempInfo, overrectime,
-                                                     underrectime);
-
                 if ((titleList[titleIndex] == "") || (!(titleView)))
                     tempSubTitle = tempInfo->title; 
                 else
@@ -1102,8 +1095,8 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                         tempInfo->subtitle + "\"";
                 }
 
-                tempDate = (tempInfo->startts).toString(showDateFormat);
-                tempTime = (tempInfo->startts).toString(showTimeFormat);
+                tempDate = (tempInfo->recstartts).toString(showDateFormat);
+                tempTime = (tempInfo->recstartts).toString(showTimeFormat);
 
                 long long size = tempInfo->filesize;
                 tempSize.sprintf("%0.2f GB", size / 1024.0 / 1024.0 / 1024.0);
@@ -1127,14 +1120,12 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 ltype->SetItemText(cnt, 2, tempDate);
                 ltype->SetItemText(cnt, 3, tempTime);
                 ltype->SetItemText(cnt, 4, tempSize);
-                if (tempCurrent == 1)
+                if (tempInfo->recstatus == rsRecording)
                     ltype->EnableForcedFont(cnt, "recording");
-                else if (tempCurrent > 1)
-                    ltype->EnableForcedFont(cnt, "recording"); // FIXME: change to overunderrecording, fall back to recording. 
 
                 QString key;
                 key = tempInfo->chanid + "_" +
-                      tempInfo->startts.toString(Qt::ISODate);
+                      tempInfo->recstartts.toString(Qt::ISODate);
 
                 if (playList.grep(key).count())
                     ltype->EnableForcedFont(cnt, "tagged");
@@ -1299,7 +1290,7 @@ bool PlaybackBox::FillList()
     if (p)
     {
         oldchanid = p->chanid;
-        oldstartts = p->startts;
+        oldstartts = p->recstartts;
         oldprogramid = p->programid;
         oldoriginalAirDate = p->originalAirDate;
     }
@@ -1309,7 +1300,7 @@ bool PlaybackBox::FillList()
     for (unsigned int i = 0; i < progLists[""].count(); i++)
     {
         p = progLists[""].at(i);
-        asKey = p->chanid + ":" + p->startts.toString(Qt::ISODate);
+        asKey = p->chanid + ":" + p->recstartts.toString(Qt::ISODate);
         asCache[asKey] = p->availableStatus;
     }
 
@@ -1344,7 +1335,7 @@ bool PlaybackBox::FillList()
                 if ((titleView) || (useCategories) || (useRecGroups))
                     progLists[""].prepend(p);
 
-                asKey = p->chanid + ":" + p->startts.toString(Qt::ISODate);
+                asKey = p->chanid + ":" + p->recstartts.toString(Qt::ISODate);
                 if (asCache.contains(asKey))
                     p->availableStatus = asCache[asKey];
                 else
@@ -1463,19 +1454,19 @@ bool PlaybackBox::FillList()
             }
             else if (listOrder == 0 || type == Delete)
             {
-                if (oldstartts > p->startts)
+                if (oldstartts > p->recstartts)
                     break;
             }
             else
             {
-                if (oldstartts < p->startts)
+                if (oldstartts < p->recstartts)
                     break;
             }
 
             progIndex = i;
 
             if (oldchanid == p->chanid &&
-                oldstartts == p->startts)
+                oldstartts == p->recstartts)
                 break;
         }
     }
@@ -2208,22 +2199,22 @@ void PlaybackBox::showPlaylistJobPopup()
         tmpItem = findMatchingProg(*it);
         if (tmpItem) {
             if (!JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
-                                       tmpItem->chanid, tmpItem->startts))
+                                       tmpItem->chanid, tmpItem->recstartts))
                 isTranscoding = false;
             if (!JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG,
-                                       tmpItem->chanid, tmpItem->startts))
+                                       tmpItem->chanid, tmpItem->recstartts))
                 isFlagging = false;
             if (!JobQueue::IsJobQueuedOrRunning(JOB_USERJOB1,
-                                       tmpItem->chanid, tmpItem->startts))
+                                       tmpItem->chanid, tmpItem->recstartts))
                 isRunningUserJob1 = false;
             if (!JobQueue::IsJobQueuedOrRunning(JOB_USERJOB2,
-                                       tmpItem->chanid, tmpItem->startts))
+                                       tmpItem->chanid, tmpItem->recstartts))
                 isRunningUserJob2 = false;
             if (!JobQueue::IsJobQueuedOrRunning(JOB_USERJOB3,
-                                       tmpItem->chanid, tmpItem->startts))
+                                       tmpItem->chanid, tmpItem->recstartts))
                 isRunningUserJob3 = false;
             if (!JobQueue::IsJobQueuedOrRunning(JOB_USERJOB4,
-                                       tmpItem->chanid, tmpItem->startts))
+                                       tmpItem->chanid, tmpItem->recstartts))
                 isRunningUserJob4 = false;
             if (!isTranscoding && !isFlagging && !isRunningUserJob1 &&
                 !isRunningUserJob2 && !isRunningUserJob3 && !isRunningUserJob4)
@@ -2408,7 +2399,7 @@ void PlaybackBox::showJobPopup()
     QString command = "";
 
     if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE, curitem->chanid,
-                                                  curitem->startts))
+                                                  curitem->recstartts))
         jobButton = popup->addButton(tr("Stop Transcoding"), this,
                          SLOT(doBeginTranscoding()));
     else
@@ -2416,7 +2407,7 @@ void PlaybackBox::showJobPopup()
                          SLOT(doBeginTranscoding()));
 
     if (JobQueue::IsJobQueuedOrRunning(JOB_COMMFLAG, curitem->chanid,
-                                                  curitem->startts))
+                                                  curitem->recstartts))
         popup->addButton(tr("Stop Commercial Flagging"), this,
                          SLOT(doBeginFlagging()));
     else
@@ -2428,7 +2419,7 @@ void PlaybackBox::showJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc1", tr("User Job") + " #1");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB1, curitem->chanid,
-                                   curitem->startts))
+                                   curitem->recstartts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob1()));
         else
@@ -2441,7 +2432,7 @@ void PlaybackBox::showJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc2", tr("User Job") + " #2");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB2, curitem->chanid,
-                                   curitem->startts))
+                                   curitem->recstartts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob2()));
         else
@@ -2454,7 +2445,7 @@ void PlaybackBox::showJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc3", tr("User Job") + " #3");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB3, curitem->chanid,
-                                   curitem->startts))
+                                   curitem->recstartts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob3()));
         else
@@ -2467,7 +2458,7 @@ void PlaybackBox::showJobPopup()
         jobTitle = gContext->GetSetting("UserJobDesc4", tr("User Job") + " #4");
 
         if (JobQueue::IsJobQueuedOrRunning(JOB_USERJOB4, curitem->chanid,
-                                   curitem->startts))
+                                   curitem->recstartts))
             popup->addButton(tr("Stop") + " " + jobTitle, this,
                              SLOT(doBeginUserJob4()));
         else
@@ -2510,7 +2501,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 
     QString key;
     key = curitem->chanid + "_" +
-         curitem->startts.toString(Qt::ISODate);
+         curitem->recstartts.toString(Qt::ISODate);
 
     if (playList.grep(key).count())
         popup->addButton(tr("Remove from Playlist"), this,
@@ -2519,7 +2510,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
         popup->addButton(tr("Add to Playlist"), this,
                          SLOT(togglePlayListItem()));
 
-    if (RemoteGetRecordingStatus(program, overrectime, underrectime) > 0)
+    if (program->recstatus == rsRecording)
         popup->addButton(tr("Stop Recording"), this, SLOT(askStop()));
 
     // Remove this check and the auto expire buttons if a third button is added
@@ -2553,12 +2544,12 @@ void PlaybackBox::initPopup(MythPopupBox *popup, ProgramInfo *program,
 {
     killPlayerSafe();
 
-    QDateTime startts = program->startts;
-    QDateTime endts = program->endts;
+    QDateTime recstartts = program->recstartts;
+    QDateTime recendts = program->recendts;
 
-    QString timedate = startts.date().toString(dateformat) + QString(", ") +
-                       startts.time().toString(timeformat) + QString(" - ") +
-                       endts.time().toString(timeformat);
+    QString timedate = recstartts.date().toString(dateformat) + QString(", ") +
+                       recstartts.time().toString(timeformat) + QString(" - ") +
+                       recendts.time().toString(timeformat);
 
     QString descrip = program->description;
     descrip = cutDownString(descrip, &defaultMediumFont, (int)(width() / 2));
@@ -2748,10 +2739,10 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
     ProgramInfo *tmpItem = findMatchingProg(curitem);
 
     if (JobQueue::IsJobQueuedOrRunning(jobType, curitem->chanid,
-                               curitem->startts))
+                               curitem->recstartts))
     {
         JobQueue::ChangeJobCmds(jobType, curitem->chanid,
-                                curitem->startts, JOB_STOP);
+                                curitem->recstartts, JOB_STOP);
         if ((jobType & JOB_COMMFLAG) && (tmpItem))
         {
             tmpItem->programflags &= ~FL_EDITING;
@@ -2762,7 +2753,7 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
         if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
             jobHost = curitem->hostname;
 
-        JobQueue::QueueJob(jobType, curitem->chanid, curitem->startts,
+        JobQueue::QueueJob(jobType, curitem->chanid, curitem->recstartts,
                            "", "", jobHost, jobFlags);
     }
 }
@@ -2813,13 +2804,13 @@ void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
         tmpItem = findMatchingProg(*it);
         if (tmpItem && 
             (!JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
-                                    tmpItem->startts))) {
+                                    tmpItem->recstartts))) {
             QString jobHost = "";
             if (gContext->GetNumSetting("JobsRunOnRecordingHost", 0))
                 jobHost = gContext->GetHostName();
 
             JobQueue::QueueJob(jobType, tmpItem->chanid,
-                               tmpItem->startts, "", "", jobHost, jobFlags);
+                               tmpItem->recstartts, "", "", jobHost, jobFlags);
         }
     }
 }
@@ -2839,11 +2830,11 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
         tmpItem = findMatchingProg(*it);
         if (tmpItem &&
             (JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
-                                tmpItem->startts)))
+                                tmpItem->recstartts)))
         {
 cout << "stop job " << jobType << ": job is queued or running\n";
             JobQueue::ChangeJobCmds(jobType, tmpItem->chanid,
-                                     tmpItem->startts, JOB_STOP);
+                                     tmpItem->recstartts, JOB_STOP);
             if ((jobType & JOB_COMMFLAG) && (tmpItem))
             {
                 tmpItem->programflags &= ~FL_EDITING;
@@ -3043,7 +3034,7 @@ ProgramInfo *PlaybackBox::findMatchingProg(ProgramInfo *pginfo)
 
     for (p = l->first(); p; p = l->next())
     {
-        if (p->startts == pginfo->startts &&
+        if (p->recstartts == pginfo->recstartts &&
             p->chanid == pginfo->chanid)
             return p;
     }
@@ -3066,14 +3057,14 @@ ProgramInfo *PlaybackBox::findMatchingProg(QString key)
         return NULL;
 }
 
-ProgramInfo *PlaybackBox::findMatchingProg(QString chanid, QString startts)
+ProgramInfo *PlaybackBox::findMatchingProg(QString chanid, QString recstartts)
 {
     ProgramInfo *p;
     ProgramList *l = &progLists[""];
 
     for (p = l->first(); p; p = l->next())
     {
-        if (p->startts.toString(Qt::ISODate) == startts &&
+        if (p->recstartts.toString(Qt::ISODate) == recstartts &&
             p->chanid == chanid)
             return p;
     }
@@ -3227,7 +3218,7 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
         return;
     }
 
-    key  = pginfo->chanid + "_" + pginfo->startts.toString(Qt::ISODate);
+    key  = pginfo->chanid + "_" + pginfo->recstartts.toString(Qt::ISODate);
 
     if (playList.grep(key).count())
     {
@@ -3399,7 +3390,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     previewLastModified = getPreviewLastModified(pginfo);
     if (previewLastModified <  pginfo->lastmodified &&
-        previewLastModified >= pginfo->endts &&
+        previewLastModified >= pginfo->recendts &&
         !pginfo->IsEditing() && 
         !pginfo->IsCommProcessing())
     {
@@ -3408,7 +3399,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     }
 
     // Check and see if we've already tried this one.
-    if (pginfo->startts == previewStartts &&
+    if (pginfo->recstartts == previewStartts &&
         pginfo->chanid == previewChanid &&
         previewLastModified == previewFilets)
     {
@@ -3432,7 +3423,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     previewPixmap = gContext->LoadScalePixmap(filename);
     if (previewPixmap)
     {
-        previewStartts = pginfo->startts;
+        previewStartts = pginfo->recstartts;
         previewChanid = pginfo->chanid;
         previewFilets = previewLastModified;
         retpixmap = *previewPixmap;
@@ -3455,7 +3446,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         if (previewPixmap)
         {
             retpixmap = *previewPixmap;
-            previewStartts = pginfo->startts;
+            previewStartts = pginfo->recstartts;
             previewChanid = pginfo->chanid;
             previewFilets = previewLastModified;
             return retpixmap;
@@ -3487,7 +3478,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     }
 
     retpixmap = *previewPixmap;
-    previewStartts = pginfo->startts;
+    previewStartts = pginfo->recstartts;
     previewChanid = pginfo->chanid;
     previewFilets = previewLastModified;
 

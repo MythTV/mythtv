@@ -95,7 +95,7 @@ void JobQueue::customEvent(QCustomEvent *e)
             }
 
             key = QString("%1_%2").arg(chanid)
-                          .arg(starttime.toString("yyyyMMddhhmm00"));
+                          .arg(starttime.toString("yyyyMMddhhmmss"));
 
 
             msg = QString("Job Queue: Received message '%1'")
@@ -503,7 +503,7 @@ bool JobQueue::QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes)
 bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime, 
                         QString args, QString comment, QString host, int flags)
 {
-    QString startts = starttime.toString("yyyyMMddhhmm00");
+    QString startts = starttime.toString("yyyyMMddhhmmss");
 
     int tmpStatus = JOB_UNKNOWN;
     int tmpCmd = JOB_UNKNOWN;
@@ -608,7 +608,7 @@ bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime,
 
 int JobQueue::GetJobID(int jobType, QString chanid, QDateTime starttime)
 {
-    QString startts = starttime.toString("yyyyMMddhhmm00");
+    QString startts = starttime.toString("yyyyMMddhhmmss");
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("SELECT id FROM jobqueue "
@@ -704,7 +704,7 @@ bool JobQueue::StopJob(int jobID)
 bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
 {
     QString key = QString("%1_%2").arg(chanid)
-                          .arg(starttime.toString("yyyyMMddhhmm00"));
+                          .arg(starttime.toString("yyyyMMddhhmmss"));
     MSqlQuery query(MSqlQuery::InitCon());
     QString message;
 
@@ -1079,7 +1079,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
             thisJob.type = query.value(4).toInt();
             thisJob.status = query.value(7).toInt();
             thisJob.statustime = query.value(8).toDateTime();
-            thisJob.startts = thisJob.starttime.toString("yyyyMMddhhmm00");
+            thisJob.startts = thisJob.starttime.toString("yyyyMMddhhmmss");
 
             if ((query.value(12).toDateTime() > QDateTime::currentDateTime()) &&
                 ((!commflagWhileRecording) ||
@@ -1406,11 +1406,11 @@ void JobQueue::CleanupOldJobsInQueue()
 void JobQueue::ProcessJob(int id, int jobType, QString chanid,
                           QDateTime starttime)
 {
-    QString startts = starttime.toString("yyyyMMddhhmm00");
+    QString startts = starttime.toString("yyyyMMddhhmmss");
     QString name = QString("jobqueue%1%2").arg(id).arg(rand());
 
     QString key = QString("%1_%2").arg(chanid)
-                          .arg(starttime.toString("yyyyMMddhhmm00"));
+                          .arg(starttime.toString("yyyyMMddhhmmss"));
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -1534,13 +1534,13 @@ QString JobQueue::GetJobCommand(int jobType, ProgramInfo *tmpInfo)
         command.replace(QRegExp("%RECGROUP%"), tmpInfo->recgroup);
         command.replace(QRegExp("%CHANID%"), tmpInfo->chanid);
         command.replace(QRegExp("%STARTTIME%"),
-                        tmpInfo->startts.toString("yyyyMMddhhmm00"));
+                        tmpInfo->recstartts.toString("yyyyMMddhhmmss"));
         command.replace(QRegExp("%ENDTIME%"),
-                        tmpInfo->endts.toString("yyyyMMddhhmm00"));
+                        tmpInfo->recendts.toString("yyyyMMddhhmmss"));
         command.replace(QRegExp("%STARTTIMEISO%"),
-                        tmpInfo->startts.toString(Qt::ISODate));
+                        tmpInfo->recstartts.toString(Qt::ISODate));
         command.replace(QRegExp("%ENDTIMEISO%"),
-                        tmpInfo->endts.toString(Qt::ISODate));
+                        tmpInfo->recendts.toString(Qt::ISODate));
     }
 
     return command;
@@ -1565,8 +1565,8 @@ void JobQueue::DoTranscodeThread(void)
     QString logDesc = QString("\"%1\" recorded from channel %2 at %3")
                           .arg(program_info->title.local8Bit())
                           .arg(program_info->chanid)
-                          .arg(program_info->startts.toString());
-    QString startts = program_info->startts.toString("yyyyMMddhhmm00");
+                          .arg(program_info->recstartts.toString());
+    QString startts = program_info->recstartts.toString("yyyyMMddhhmmss");
     
     key = QString("%1_%2")
                   .arg(program_info->chanid)
@@ -1754,11 +1754,11 @@ void JobQueue::DoFlagCommercialsThread(void)
     QString logDesc = QString("\"%1\" recorded from channel %2 at %3")
                           .arg(program_info->title.local8Bit())
                           .arg(program_info->chanid)
-                          .arg(program_info->startts.toString());
+                          .arg(program_info->recstartts.toString());
     
     key = QString("%1_%2")
                   .arg(program_info->chanid)
-                  .arg(program_info->startts.toString("yyyyMMddhhmm00"));
+                  .arg(program_info->recstartts.toString("yyyyMMddhhmmss"));
     int jobID = runningJobIDs[key];
     bool stillRecording = !!(GetJobFlags(jobID) & JOB_LIVE_REC);
 
@@ -1796,7 +1796,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         QString("mythcommflag -j -V %1 --chanid %2 --starttime %3 --force")
                 .arg(print_verbose_messages)
                 .arg(program_info->chanid)
-                .arg(program_info->startts.toString("yyyyMMddhhmm00"));
+                .arg(program_info->recstartts.toString("yyyyMMddhhmmss"));
 
     if (stillRecording)
         cmd += " -l";
@@ -1896,7 +1896,7 @@ void JobQueue::DoUserJobThread(void)
     
     key = QString("%1_%2")
                   .arg(program_info->chanid)
-                  .arg(program_info->startts.toString("yyyyMMddhhmm00"));
+                  .arg(program_info->recstartts.toString("yyyyMMddhhmmss"));
     int jobID = runningJobIDs[key];
     QString jobDesc = runningJobDescs[key];
 
@@ -1909,7 +1909,7 @@ void JobQueue::DoUserJobThread(void)
                           .arg(jobDesc)
                           .arg(program_info->title)
                           .arg(program_info->chanid)
-                          .arg(program_info->startts.toString());
+                          .arg(program_info->recstartts.toString());
     VERBOSE(VB_JOBQUEUE, msg.local8Bit());
     gContext->LogEntry("jobqueue", LP_NOTICE,
                        QString("Job \"%1\" Started").arg(jobDesc), msg);
@@ -1934,7 +1934,7 @@ void JobQueue::DoUserJobThread(void)
                   .arg(jobDesc)
                   .arg(program_info->title)
                   .arg(program_info->chanid)
-                  .arg(program_info->startts.toString());
+                  .arg(program_info->recstartts.toString());
     VERBOSE(VB_JOBQUEUE, msg.local8Bit());
 
     gContext->LogEntry("jobqueue", LP_NOTICE,
