@@ -531,6 +531,14 @@ int main(int argc, char *argv[])
 
     QString binname = finfo.baseName();
 
+    gContext = NULL;
+    gContext = new MythContext(MYTH_BINARY_VERSION);
+    if(!gContext->Init(false))
+    {
+        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        return COMMFLAG_EXIT_NO_MYTHCONTEXT;
+    }
+
     print_verbose_messages = VB_IMPORTANT;
     verboseString = "important";
 
@@ -567,13 +575,25 @@ int main(int argc, char *argv[])
         {
             QDir fullfile(a.argv()[++argpos]);
 
-            chanid = fullfile.dirName();
-            chanid.replace(QRegExp("_[^_]*$"), "");
-            chanid.replace(QRegExp("_[^_]*$"), "");
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT chanid, starttime FROM recorded "
+                          "WHERE basename = :BASENAME ;");
+            query.bindValue(":BASENAME", fullfile.dirName());
 
-            starttime = fullfile.dirName();
-            starttime.replace(QRegExp("_[^_]*$"), "");
-            starttime.replace(QRegExp("^[^_]*_"), "");
+            if (query.exec() && query.isActive() && query.size() > 0)
+            {
+                query.next();
+
+                chanid = query.value(0).toString();
+                starttime =
+                    query.value(1).toDateTime().toString("yyyyMMddhhmmss");
+            }
+            else
+            {
+                cerr << "mythcommflag: ERROR: Unable to find DB info for "
+                     << fullfile.dirName() << endl;
+                return COMMFLAG_EXIT_NO_PROGRAM_DATA;
+            }
         }
         else if (!strcmp(a.argv()[argpos],"--video"))
         {
@@ -837,14 +857,6 @@ int main(int argc, char *argv[])
         }
 
         ++argpos;
-    }
-
-    gContext = NULL;
-    gContext = new MythContext(MYTH_BINARY_VERSION);
-    if(!gContext->Init(false))
-    {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
-        return COMMFLAG_EXIT_NO_MYTHCONTEXT;
     }
 
     if ((chanid.isEmpty() && !starttime.isEmpty()) ||

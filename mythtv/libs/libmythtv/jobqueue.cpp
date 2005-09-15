@@ -1541,6 +1541,14 @@ QString JobQueue::GetJobCommand(int jobType, ProgramInfo *tmpInfo)
                         tmpInfo->recstartts.toString(Qt::ISODate));
         command.replace(QRegExp("%ENDTIMEISO%"),
                         tmpInfo->recendts.toString(Qt::ISODate));
+        command.replace(QRegExp("%PROGSTART%"),
+                        tmpInfo->startts.toString("yyyyMMddhhmmss"));
+        command.replace(QRegExp("%PROGEND%"),
+                        tmpInfo->endts.toString("yyyyMMddhhmmss"));
+        command.replace(QRegExp("%PROGSTARTISO%"),
+                        tmpInfo->startts.toString(Qt::ISODate));
+        command.replace(QRegExp("%PROGENDISO%"),
+                        tmpInfo->endts.toString(Qt::ISODate));
     }
 
     return command;
