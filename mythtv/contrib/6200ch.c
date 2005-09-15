@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <unistd.h> // for usleep
 
 // Motorola DCT-6200 IDs
 // Note: there are at least three different vendor IDs for the 6200
