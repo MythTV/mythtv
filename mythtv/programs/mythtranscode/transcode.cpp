@@ -304,7 +304,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     if (chkTranscodeDB)
     {
         jobID = JobQueue::GetJobID(JOB_TRANSCODE, m_proginfo->chanid,
-                                   m_proginfo->startts);
+                                   m_proginfo->recstartts);
 
         if (jobID < 0)
         {
