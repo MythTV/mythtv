@@ -594,6 +594,20 @@ static void load_recording_profile(
     VERBOSE(VB_RECORD, msg);
 }
 
+static void init_jobs(ProgramInfo *curRecording,
+                      int &autoRunJobs)
+{
+    JobQueue::ClearJobMask(autoRunJobs);
+
+    if (!curRecording)
+        return;
+
+    JobQueue::AddJobsToMask(curRecording->GetAutoRunJobs(), autoRunJobs);
+
+    if (curRecording->chancommfree)
+        JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
+}
+
 static void enable_auto_transcode(RecordingProfile &profile,
                                   ProgramInfo *curRecording,
                                   int &autoRunJobs)
@@ -601,17 +615,12 @@ static void enable_auto_transcode(RecordingProfile &profile,
     if (!curRecording)
         return;
 
-    JobQueue::AddJobsToMask(curRecording->GetAutoRunJobs(), autoRunJobs);
-
     // Make sure transcoding is OFF if the profile does not allow
     // AutoTranscoding.
     Setting *profileAutoTranscode = profile.byName("autotranscode");
     if ((!profileAutoTranscode) ||
         (profileAutoTranscode->getValue().toInt() == 0))
         JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, autoRunJobs);
-
-    if (curRecording->chancommfree)
-        JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
 }
 
 static void enable_realtime_commflag(ProgramInfo *curRecording,
@@ -683,7 +692,8 @@ bool TVRec::StartRecorder(bool livetv)
     RecordingProfile profile;
     load_recording_profile(profile, profileName, curRecording, m_capturecardnum);
 
-    JobQueue::ClearJobMask(autoRunJobs);
+    init_jobs(curRecording, autoRunJobs);
+
     if (!livetv)
         enable_auto_transcode(profile, curRecording, autoRunJobs);
 
@@ -1226,9 +1236,7 @@ void TVRec::TeardownRecorder(bool killFile)
     if (curRecording)
     {
         if (autoRunJobs && !killFile && !prematurelystopped)
-            JobQueue::QueueJobs(
-                autoRunJobs, curRecording->chanid, curRecording->recstartts,
-                "", "", (runJobOnHostOnly) ? gContext->GetHostName() : "");
+            JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
 
         delete curRecording;
         curRecording = NULL;

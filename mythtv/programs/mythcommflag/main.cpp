@@ -39,13 +39,13 @@ bool fullSpeed = true;
 bool rebuildSeekTable = false;
 bool beNice = true;
 bool inJobQueue = false;
-bool stillRecording = false;
 bool copyToCutlist = false;
 bool watchingRecording = false;
 CommDetectorBase* commDetector = NULL;
 RemoteEncoder* recorder = NULL;
 ProgramInfo* program_info = NULL;
 int commDetectMethod = -1;
+int recorderNum = -1;
 bool dontSubmitCommbreakListToDB =  false;
 QString outputfilename;
 bool onlyDumpDBCommercialBreakList = false;
@@ -264,7 +264,7 @@ void incomingCustomEvent(QCustomEvent* e)
                               "DONE_RECORDING event for card %1.  ")
                               .arg(cardnum);
 
-            if (cardnum == recorder->GetRecorderNumber())
+            if (recorderNum != -1 && cardnum == recorderNum)
             {
                 commDetector->recordingFinished(filelen);
                 watchingRecording = false;
@@ -312,7 +312,7 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
 
         if (jobID != -1)
             VERBOSE(VB_COMMFLAG,
-                QString("mythcommflag: Processing JobID %1").arg(jobID));
+                QString("mythcommflag processing JobID %1").arg(jobID));
         else
             VERBOSE(VB_COMMFLAG, "mythcommflag: Unable to determine jobID");
     }
@@ -336,10 +336,10 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
     RemoteSendMessage(message);
 
 
-    int result = commDetector->go();
+    bool result = commDetector->go();
     int comms_found = 0;
 
-    if (result >= 0)
+    if (result)
     {
         QMap<long long, int> commBreakList;
         commDetector->getCommercialBreakList(commBreakList);
@@ -471,7 +471,7 @@ int FlagCommercials(QString chanid, QString starttime)
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
 
-    if ((stillRecording) &&
+    if ((watchingRecording) &&
         (program_info->recendts > QDateTime::currentDateTime()))
     {
         gContext->ConnectToMasterServer();
@@ -479,11 +479,18 @@ int FlagCommercials(QString chanid, QString starttime)
         recorder = RemoteGetExistingRecorder(program_info);
         if (recorder && (recorder->GetRecorderNumber() != -1))
         {
+            recorderNum =  recorder->GetRecorderNumber();
             nvp->SetRecorder(recorder);
             nvp->SetWatchingRecording(true);
+
+            VERBOSE(VB_COMMFLAG, QString("mythcommflag will flag recording "
+                    "currently in progress on cardid %1").arg(recorderNum));
         }
         else
         {
+            recorderNum = -1;
+            watchingRecording = false;
+
             VERBOSE(VB_IMPORTANT, "Unable to find active recorder for this "
                     "recording, realtime flagging will not be enabled.");
         }
@@ -594,7 +601,7 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(a.argv()[argpos], "-l"))
         {
-            stillRecording = true;
+            watchingRecording = true;
         }
         else if (!strcmp(a.argv()[argpos], "--all"))
         {

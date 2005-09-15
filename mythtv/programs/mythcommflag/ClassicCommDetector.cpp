@@ -49,7 +49,8 @@ ClassicCommDetector::ClassicCommDetector(int commDetectMethod_in,
         fullSpeed(fullSpeed_in),
         nvp(nvp_in),
         recordingStartedAt(recordingStartedAt_in),
-        recordingStopsAt(recordingStopsAt_in)
+        recordingStopsAt(recordingStopsAt_in),
+        framesProcessed(0)
 {
 
     edgeMask = NULL;
@@ -296,6 +297,10 @@ bool ClassicCommDetector::go()
             cerr.flush();
         }
     }
+
+    emit breathe();
+    if (m_bStop)
+        return false;
 
     QTime flagTime;
     flagTime.start();
@@ -2510,6 +2515,8 @@ void ClassicCommDetector::SearchForLogo()
             VideoFrame* vf = nvp->GetRawVideoFrame(seekFrame);
 
             emit breathe();
+            if (m_bStop)
+                return;
 
             if (!fullSpeed)
                 usleep(10000);

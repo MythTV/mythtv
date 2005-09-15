@@ -1547,22 +1547,6 @@ void MainServer::DoHandleStopRecording(ProgramInfo *pginfo, PlaybackSock *pbs)
         SendResponse(pbssock, outputlist);
     }
 
-    int jobTypes = pginfo->GetAutoRunJobs();
-
-    if (pginfo->chancommfree)
-        jobTypes = jobTypes & (~JOB_COMMFLAG);
-
-    if (jobTypes)
-    {
-        QString jobHost = "";
-
-        if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
-            jobHost = pginfo->hostname;
-
-        JobQueue::QueueJobs(jobTypes, pginfo->chanid,
-                            pginfo->recstartts, "", "", jobHost);
-    }
-
     delete pginfo;
 }
 

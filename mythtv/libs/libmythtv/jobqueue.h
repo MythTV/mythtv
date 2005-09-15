@@ -100,6 +100,7 @@ class JobQueue : public QObject
     ~JobQueue(void);
     void customEvent(QCustomEvent *e);
 
+    static bool QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes = JOB_NONE);
     static bool QueueJob(int jobType, QString chanid,
                          QDateTime starttime, QString args = "",
                          QString comment = "", QString host = "",

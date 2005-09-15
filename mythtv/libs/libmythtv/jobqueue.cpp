@@ -473,6 +473,33 @@ void JobQueue::ProcessQueue(void)
     }
 }
 
+bool JobQueue::QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes)
+{
+    if (!pinfo)
+        return false;
+
+    if (jobTypes == JOB_NONE)
+        jobTypes = pinfo->GetAutoRunJobs();
+
+    if (pinfo->chancommfree)
+        jobTypes &= (~JOB_COMMFLAG);
+
+    if (jobTypes != JOB_NONE)
+    {
+        QString jobHost = "";
+
+        if (gContext->GetNumSetting("JobsRunOnRecordHost", 0))
+            jobHost = pinfo->hostname;
+
+        return JobQueue::QueueJobs(jobTypes, pinfo->chanid, pinfo->recstartts,
+                                   "", "", jobHost);
+    }
+    else
+        return false;
+
+    return true;
+}
+
 bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime, 
                         QString args, QString comment, QString host, int flags)
 {
@@ -697,14 +724,11 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
 
     query.prepare("UPDATE jobqueue SET cmds = :CMD "
                   "WHERE chanid = :CHANID AND starttime = :STARTTIME "
-                  "AND status IN (:STARTING,:RUNNING,:PAUSED,:STOPPING);");
+                  "AND status <> :CANCELLED;");
     query.bindValue(":CMD", JOB_STOP);
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", starttime);
-    query.bindValue(":STARTING", JOB_STARTING);
-    query.bindValue(":RUNNING", JOB_RUNNING);
-    query.bindValue(":PAUSED", JOB_PAUSED);
-    query.bindValue(":STOPPING", JOB_STOPPING);
+    query.bindValue(":CANCELLED", JOB_CANCELLED);
 
     if (!query.exec())
     {
@@ -755,7 +779,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
         totalSlept++;
     }
 
-    if (totalSlept < maxSleep)
+    if (totalSlept <= maxSleep)
     {
         query.prepare("DELETE FROM jobqueue "
                       "WHERE chanid = :CHANID AND starttime = :STARTTIME;");
@@ -766,6 +790,45 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
 
         if (!query.isActive())
             MythContext::DBError("Delete All Jobs", query);
+    }
+    else
+    {
+        query.prepare("SELECT id, type, status, comment FROM jobqueue "
+                      "WHERE chanid = :CHANID AND starttime = :STARTTIME "
+                      "AND status <> :CANCELLED ORDER BY id;");
+
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", starttime);
+        query.bindValue(":CANCELLED", JOB_CANCELLED);
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("Error in JobQueue::DeleteAllJobs(), Unable "
+                                 "to query list of Jobs left in Queue.", query);
+            return 0;
+        }
+
+        VERBOSE(VB_IMPORTANT,
+                QString( "JobQueue::DeleteAllJobs: ERROR: There are Jobs "
+                         "left in the JobQueue that are still running for "
+                         "chanid %1 @ %2.").arg(chanid)
+                         .arg(starttime.toString("yyyyMMddhhmm00")));
+
+        if (query.numRowsAffected() > 0)
+        {
+            while (query.next())
+            {
+                VERBOSE(VB_IMPORTANT,
+                        QString("Job ID %1: '%2' with status '%3' and "
+                                "comment '%4'")
+                                .arg(query.value(0).toInt())
+                                .arg(JobText(query.value(1).toInt()))
+                                .arg(StatusText(query.value(2).toInt()))
+                                .arg(query.value(3).toString()));
+            }
+        }
+
+        return false;
     }
 
     return true;
