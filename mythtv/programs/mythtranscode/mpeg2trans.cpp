@@ -263,7 +263,8 @@ int MPEG2trans::DoTranscode(QString &infile, QString &tmpfile, bool useCutlist)
     int jobID = -1;
     if (chkTranscodeDB)
     {
-        jobID = JobQueue::GetJobID(JOB_TRANSCODE, m_pginfo->chanid, m_pginfo->startts);
+        jobID = JobQueue::GetJobID(JOB_TRANSCODE, m_pginfo->chanid,
+			m_pginfo->recstartts);
 
         if (jobID < 0)
         {
@@ -617,3 +618,5 @@ int MPEG2trans::BuildKeyframeIndex(QString &file, PositionMap &posMap)
 
     return TRANSCODE_EXIT_OK;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

@@ -420,7 +420,7 @@ int main(int argc, char *argv[])
     if (use_db)
     {
         jobID = JobQueue::GetJobID(JOB_TRANSCODE, pginfo->chanid,
-                                   pginfo->startts);
+                                   pginfo->recstartts);
         JobQueue::ChangeJobStatus(jobID, JOB_RUNNING);
     }
 
