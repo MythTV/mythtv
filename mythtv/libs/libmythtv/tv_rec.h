@@ -222,8 +222,10 @@ class TVRec
     bool StartRecorderPostThread(bool livetv);
     void AbortStartRecorderThread();
     static void *StartRecorderPostThunk(void*);
-    bool CreateRecorderThread();
-    
+    bool CreateRecorderThread(void);
+    void StartDummyRecorder(void);
+    void StopDummyRecorder(void);
+
     void HandleStateChange(void);
     void ChangeState(TVState nextState);
     bool StateIsRecording(TVState state);
