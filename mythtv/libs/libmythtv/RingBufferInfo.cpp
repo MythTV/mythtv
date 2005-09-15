@@ -21,6 +21,7 @@ const uint RingBufferInfo::kRequestBufferSize = 256*1024; /* 32 KB */
  */
 void RingBufferInfo::SetDataSocket(QSocket *sock)
 {
+    GetLock(false);
     if ((IsAlive() && sock) || (!IsAlive() && !sock))
         return;
 
@@ -34,9 +35,20 @@ void RingBufferInfo::SetDataSocket(QSocket *sock)
         SetAlive(false);
         if (ringBuffer)
             ringBuffer->StopReads();
-        lock.lock();
-        lock.unlock();
     }
+    ReturnLock();
+}
+
+/** \fn RingBufferInfo::GetDataSocket(void)
+ *  \brief Returns RingBuffer data socket, for A/V streaming.
+ *  \sa SetDataSocket(QSocket*)
+ */
+QSocket *RingBufferInfo::GetDataSocket(void)
+{
+    GetLock(false);
+    QSocket *sock = dataSocket;
+    ReturnLock();
+    return sock;
 }
 
 void RingBufferInfo::SetRingBuffer(RingBuffer *rb)
@@ -72,11 +84,13 @@ int RingBufferInfo::RequestBlock(uint size)
     int tot = 0;
     int ret = 0;
 
-    lock.lock();
+    GetLock(true);
 
     if (!IsAlive() || !ringBuffer)
     {
-        lock.unlock();
+        ReturnLock();
+        VERBOSE(VB_IMPORTANT, "RingBufferInfo::RequestBlock("
+                <<size<<") err");
         return -1;
     }
 
@@ -106,7 +120,7 @@ int RingBufferInfo::RequestBlock(uint size)
         if (ret < (int)request)
             break; // we hit eof
     }
-    lock.unlock();
+    ReturnLock();
 
     if (ret < 0)
         tot = -1;
@@ -124,14 +138,19 @@ int RingBufferInfo::RequestBlock(uint size)
  *  \return new position if seek is successful, -1 otherwise.
  */
 long long RingBufferInfo::Seek(long long curpos, long long pos, int whence)
-{
-    Pause();
-    if (!ringBuffer || !IsAlive())
+{ 
+    GetLock(false);
+    bool err = !ringBuffer || !IsAlive();
+    ReturnLock();
+
+    if (err)
     {
-        Unpause();
+        VERBOSE(VB_IMPORTANT, "RingBufferInfo::Seek("
+                <<curpos<<", "<<pos<<", "<<whence<<") err");
         return -1;
     }
 
+    Pause();
     if (whence == SEEK_CUR)
     {
         long long realpos = ringBuffer->GetTotalReadPosition();
@@ -143,22 +162,41 @@ long long RingBufferInfo::Seek(long long curpos, long long pos, int whence)
     return ret;
 }
 
-/** \fn RingBufferInfo::Pause()
- *  \brief Calls RingBuffer::StartReads()
+/** \fn RingBufferInfo::Pause(void)
+ *  \brief Calls RingBuffer::StopReads(void)
  */
 void RingBufferInfo::Pause(void)
 {
-    lock.lock();
+    GetLock(false);
+    paused++;
     if (ringBuffer)
         ringBuffer->StopReads();
+    ReturnLock();
 }
 
-/** \fn RingBufferInfo::Unpause()
- *  \brief Calls RingBuffer::StopReads()
+/** \fn RingBufferInfo::Unpause(void)
+ *  \brief Calls RingBuffer::StartReads(void)
  */
 void RingBufferInfo::Unpause(void)
 {
-    if (ringBuffer)
+    GetLock(false);
+    if (IsPaused() && ringBuffer)
         ringBuffer->StartReads();
+    paused--;
+    if (paused < 0)
+        paused = 0;
+    ReturnLock();
+}
+
+void RingBufferInfo::GetLock(bool requireUnpaused)
+{
+    lock.lock();
+    while (requireUnpaused && IsPaused())
+        unpausedWait.wait(&lock);
+}
+
+void RingBufferInfo::ReturnLock(void)
+{
     lock.unlock();
+    unpausedWait.wakeAll();
 }

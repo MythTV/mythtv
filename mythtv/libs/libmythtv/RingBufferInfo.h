@@ -15,7 +15,8 @@ class RingBufferInfo
         fileextension("nuv"),
         // Data Socket stuff for streaming
         dataSocket(NULL),      requestBuffer(NULL),
-        live(false),           lock(false)
+        live(false),           paused(false),
+        lock(false)
     {
         requestBuffer = new char[kRequestBufferSize+64];
     }
@@ -36,12 +37,13 @@ class RingBufferInfo
     void SetAlive(bool live);
 
     // Gets
-    QSocket *GetDataSocket(void)      { return dataSocket;    }
+    QSocket *GetDataSocket(void);
     RingBuffer *GetRingBuffer(void)   { return ringBuffer;    }
     QString GetFilename(void) const   { return filename;      }
     QString GetUIFilename(void) const { return filename.section("/", -1); }
     QString GetFileExtension() const  { return fileextension; }
     bool IsAlive(void) const          { return live;          }
+    bool IsPaused(void) const         { return paused > 0;    }
 
     // Commands
     void UnlinkRingBufferFile(void)
@@ -68,6 +70,8 @@ class RingBufferInfo
     QSocket       *dataSocket;
     char          *requestBuffer;
     bool           live;
+    int            paused;
+    QWaitCondition unpausedWait;
     QMutex         lock;
 
 
