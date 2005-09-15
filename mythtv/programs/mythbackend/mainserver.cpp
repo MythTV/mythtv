@@ -824,7 +824,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         EncoderLink *enc = iter.data();
 
-        enc->SetReadThreadSock(socket);
+        enc->SetReadThreadSocket(socket);
 
         if (enc->IsLocal())
         {
@@ -2656,8 +2656,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "DONE_RINGBUF")
     {
-        enc->SetReadThreadSock(NULL);
-
+        enc->SetReadThreadSocket(NULL);
         retlist << "OK";
     }
     else

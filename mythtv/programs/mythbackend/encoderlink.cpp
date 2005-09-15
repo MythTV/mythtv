@@ -935,17 +935,17 @@ QString EncoderLink::GetInputName()
     return inputname;
 }
 
-/** \fn EncoderLink::SetReadThreadSock(QSocket*)
+/** \fn EncoderLink::SetReadThreadSocket(QSocket*)
  *  \brief Sets RingBuffer streaming socket.
  *         <b>This only works on local recorders.</b>
  *  \param rsock socket to use.
- *  \sa GetReadThreadSocket(), RequestRingBufferBlock(int)
+ *  \sa GetReadThreadSocket(), RequestRingBufferBlock(uint)
  */
-void EncoderLink::SetReadThreadSock(QSocket *rsock)
+void EncoderLink::SetReadThreadSocket(QSocket *rsock)
 {
     if (local)
     {
-        tv->SetReadThreadSock(rsock);
+        tv->SetReadThreadSocket(rsock);
         return;
     }
 
@@ -956,7 +956,7 @@ void EncoderLink::SetReadThreadSock(QSocket *rsock)
  *  \brief Returns RingBuffer streaming socket.
  *         <b>This only works on local recorders.</b>
  *  \return socket if it exists, NULL otherwise.
- *  \sa SetReadThreadSock(QSocket*), RequestRingBufferBlock(int)
+ *  \sa SetReadThreadSock(QSocket*), RequestRingBufferBlock(uint)
  */
 QSocket *EncoderLink::GetReadThreadSocket(void)
 {
@@ -967,7 +967,7 @@ QSocket *EncoderLink::GetReadThreadSocket(void)
     return NULL;
 }
 
-/** \fn EncoderLink::RequestRingBufferBlock(int)
+/** \fn EncoderLink::RequestRingBufferBlock(uint)
  *  \brief Tells TVRec to stream A/V data if it is available.
  *         <b>This only works on local recorders.</b>
  *
@@ -975,7 +975,7 @@ QSocket *EncoderLink::GetReadThreadSocket(void)
  *              bytes of data will be returned if it is available.
  *  \return -1 if request does not succeed, amount of data sent otherwise.
  */
-int EncoderLink::RequestRingBufferBlock(int size)
+int EncoderLink::RequestRingBufferBlock(uint size)
 {
     if (local)
         return tv->RequestRingBufferBlock(size);

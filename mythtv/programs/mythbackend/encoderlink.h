@@ -102,10 +102,10 @@ class EncoderLink
                         QString &repeat, QString &airdate, QString &stars);
     QString GetInputName();
 
-    void SetReadThreadSock(QSocket *rsock);
+    void SetReadThreadSocket(QSocket *rsock);
     QSocket *GetReadThreadSocket(void);
 
-    int RequestRingBufferBlock(int size);
+    int RequestRingBufferBlock(uint size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
     char *GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,

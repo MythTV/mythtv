@@ -13,7 +13,7 @@
 #include "tv.h"
 
 class QSocket;
-class RingBuffer;
+class RingBufferInfo;
 class NuppelVideoRecorder;
 class RecorderBase;
 class EITScanner;
@@ -165,11 +165,9 @@ class TVRec
     void GetInputName(QString &inputname);
 
     QSocket *GetReadThreadSocket(void);
-    void SetReadThreadSock(QSocket *sock);
+    void SetReadThreadSocket(QSocket *sock);
 
-    void UnpauseRingBuffer(void);
-    void PauseClearRingBuffer(void);
-    int RequestRingBufferBlock(int size);
+    int RequestRingBufferBlock(uint size);
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
     /// \brief Returns the caputure card number
@@ -239,7 +237,7 @@ class TVRec
     void SetOption(RecordingProfile &profile, const QString &name);
 
     // Various components TVRec coordinates
-    RingBuffer    *rbuffer;
+    RingBufferInfo *rbi;
     RecorderBase  *recorder;
     ChannelBase   *channel;
     SignalMonitor *signalMonitor;
@@ -308,24 +306,13 @@ class TVRec
     bool         recordPending;
     bool         cancelNextRecording;
 
-    // RingBuffer info
-    QString  outputFilename;
-    char    *requestBuffer;
-    QSocket *readthreadSock;
-    QMutex   readthreadLock;
-    bool     readthreadlive;
-
     // Current recorder info
     QString  videodev;
     QString  vbidev;
     QString  audiodev;
     QString  cardtype;
-    QString  fileextension;
     int      audiosamplerate;
     bool     skip_btaudio;
-
-    // class constants
-    static const int kRequestBufferSize;
 };
 
 #endif

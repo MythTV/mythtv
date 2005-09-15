@@ -34,6 +34,7 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "eitscanner.h"
 #include "videosource.h"
+#include "RingBufferInfo.h"
 
 #include "atscstreamdata.h"
 #include "hdtvrecorder.h"
@@ -67,8 +68,6 @@ using namespace std;
 
 #define DVB_TABLE_WAIT 3000 /* msec */
 
-const int TVRec::kRequestBufferSize = 256*1000;
-
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
  *
@@ -95,7 +94,7 @@ const int TVRec::kRequestBufferSize = 256*1000;
  */
 TVRec::TVRec(int capturecardnum)
        // Various components TVRec coordinates
-    : rbuffer(NULL), recorder(NULL), channel(NULL), signalMonitor(NULL),
+    : rbi(NULL), recorder(NULL), channel(NULL), signalMonitor(NULL),
       scanner(NULL), dvbsiparser(NULL), dummyRecorder(NULL),
       // Configuration variables from database
       transcodeFirst(false), earlyCommFlag(false), runJobOnHostOnly(false),
@@ -119,9 +118,6 @@ TVRec::TVRec(int capturecardnum)
       askAllowRecording(false), autoRunJobs(JOB_NONE),
       // Pending recording info
       pendingRecording(NULL), recordPending(false), cancelNextRecording(false),
-      // RingBuffer info
-      outputFilename(""), requestBuffer(NULL), readthreadSock(NULL),
-      readthreadLock(false), readthreadlive(false),
       // Current recorder info
       videodev(""), vbidev(""), audiodev(""), cardtype(""),
       audiosamplerate(-1), skip_btaudio(false)
@@ -149,7 +145,8 @@ bool TVRec::Init(void)
 
     QString startchannel = GetStartChannel(m_capturecardnum, inputname);
 
-    fileextension = "mpg";
+    rbi = new RingBufferInfo();
+    rbi->SetFileExtension("mpg");
 
     bool init_run = false;
     if (cardtype == "DVB")
@@ -205,7 +202,7 @@ bool TVRec::Init(void)
         init_run = true;
 #endif
         if (cardtype != "HDTV" && cardtype != "MPEG")
-            fileextension = "nuv";
+            rbi->SetFileExtension("nuv");
     }
 
     if (!init_run)
@@ -235,15 +232,6 @@ bool TVRec::Init(void)
     liveTVRingBufLoc  = gContext->GetSetting("LiveBufferDir");
     recprefix         = gContext->GetSetting("RecordFilePrefix");
 
-    requestBuffer = new char[kRequestBufferSize+64];
-    if (!requestBuffer)
-    {
-        VERBOSE(VB_IMPORTANT,
-                "TVRec: Error, failed to allocate requestBuffer.");
-        errored = true;
-        return false;
-    }
-
     pthread_create(&event_thread, NULL, EventThread, this);
 
     while (!runMainLoop)
@@ -269,8 +257,8 @@ TVRec::~TVRec(void)
 
     if (channel)
         delete channel;
-    if (rbuffer)
-        delete rbuffer;
+    if (rbi)
+        delete rbi;
     if (recorder)
         delete recorder;
 }
@@ -402,7 +390,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     if (internalState == kState_None)
     {
-        outputFilename = recprefix + "/" + rcinfo->CreateRecordBasename(fileextension);
+        QString fn = rcinfo->CreateRecordBasename(rbi->GetFileExtension());
+        rbi->SetFilename(recprefix, fn);
         recordEndTime = rcinfo->recendts;
         curRecording = new ProgramInfo(*rcinfo);
 
@@ -520,7 +509,7 @@ void TVRec::StartedRecording(void)
     if (!curRecording)
         return;
 
-    curRecording->StartedRecording(outputFilename.section("/", -1));
+    curRecording->StartedRecording(rbi->GetUIFilename());
 
     if (curRecording->chancommfree != 0)
         curRecording->SetCommFlagged(COMM_FLAG_COMMFREE);
@@ -707,10 +696,9 @@ bool TVRec::StartRecorder(bool livetv)
             MythEvent me(message);
             gContext->dispatch(me);
         }
-        else if (rbuffer)
+        else
         {
-            delete rbuffer;
-            rbuffer = NULL;
+            rbi->SetRingBuffer(NULL);
         }
         prematurelystopped = true;
         TeardownRecorder(true);
@@ -823,10 +811,9 @@ bool TVRec::StartRecorderPost(bool livetv)
                 gContext->dispatch(me);
             }
         }
-        if (!livetv && rbuffer)
+        if (!livetv)
         {
-            delete rbuffer;
-            rbuffer = NULL;
+            rbi->SetRingBuffer(NULL);
         }
 
         prematurelystopped = true;
@@ -935,8 +922,8 @@ void TVRec::HandleStateChange(void)
     {
         if (SetChannel())
         {
-            rbuffer = new RingBuffer(outputFilename, true);
-            if (rbuffer->IsOpen())
+            rbi->SetRingBuffer(new RingBuffer(rbi->GetFilename(), true));
+            if (rbi->GetRingBuffer()->IsOpen())
             {
                 StartedRecording();
                 startRecorder = true;
@@ -946,8 +933,7 @@ void TVRec::HandleStateChange(void)
             {
                 VERBOSE(VB_IMPORTANT, "TVRec: Failed to open ringbuffer. "
                         "Aborting new recording.");
-                delete rbuffer;
-                rbuffer = NULL;
+                rbi->SetRingBuffer(NULL);
                 SET_LAST();
             }
         }
@@ -1036,7 +1022,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     {
 #ifdef USING_IVTV
         recorder = new MpegRecorder();
-        recorder->SetRingBuffer(rbuffer);
+        recorder->SetRingBuffer(rbi->GetRingBuffer());
 
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
@@ -1050,9 +1036,9 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     else if (cardtype == "HDTV")
     {
 #ifdef USING_V4L
-        rbuffer->SetWriteBufferSize(4*1024*1024);
+        rbi->GetRingBuffer()->SetWriteBufferSize(4*1024*1024);
         recorder = new HDTVRecorder();
-        recorder->SetRingBuffer(rbuffer);
+        recorder->SetRingBuffer(rbi->GetRingBuffer());
 
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
@@ -1068,7 +1054,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     {
 #ifdef USING_FIREWIRE
         recorder = new FirewireRecorder();
-        recorder->SetRingBuffer(rbuffer);
+        recorder->SetRingBuffer(rbi->GetRingBuffer());
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
         recorder->SetOption("port", firewire_options.port);
         recorder->SetOption("node", firewire_options.node);
@@ -1090,7 +1076,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
                                   .arg(dbox2_options.port)
 	                          .arg(dbox2_options.httpport));
         recorder = new DBox2Recorder(dynamic_cast<DBox2Channel*>(channel), m_capturecardnum);
-        recorder->SetRingBuffer(rbuffer);
+        recorder->SetRingBuffer(rbi->GetRingBuffer());
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
         recorder->SetOption("port", dbox2_options.port);
         recorder->SetOption("host", dbox2_options.host);
@@ -1103,7 +1089,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     {
 #ifdef USING_DVB
         recorder = new DVBRecorder(dynamic_cast<DVBChannel*>(channel));
-        recorder->SetRingBuffer(rbuffer);
+        recorder->SetRingBuffer(rbi->GetRingBuffer());
 
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
 
@@ -1141,7 +1127,7 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
 
         recorder = new NuppelVideoRecorder(channel);
 
-        recorder->SetRingBuffer(rbuffer);
+        recorder->SetRingBuffer(rbi->GetRingBuffer());
 
         recorder->SetOption("skipbtaudio", skip_btaudio);
         recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
@@ -1158,10 +1144,12 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
     {
         if (!is_atsc)
             dummyRecorder = new DummyDTVRecorder(
-                true, rbuffer, 768, 576, 50, 90, 30000000, false);
+                true, rbi->GetRingBuffer(), 768, 576, 50,
+                90, 30000000, false);
         else
             dummyRecorder = new DummyDTVRecorder(
-                true, rbuffer, 1920, 1088, 29.97, 90, 30000000, false);
+                true, rbi->GetRingBuffer(), 1920, 1088, 29.97,
+                90, 30000000, false);
     }
 }
 
@@ -1172,8 +1160,8 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
  *   We then wait for "recorder_threa to exit, and finally we delete 
  *   "recorder".
  *
- *   If a "rbuffer" exists, RingBuffer::StopReads() is called, and then
- *   we delete "rbuffer".
+ *   If a RingBuffer instance exists, RingBuffer::StopReads() is called,
+ *   and then we delete the RingBuffer instance.
  *
  *   If killfile is true, the recording is deleted.
  *
@@ -1217,21 +1205,15 @@ void TVRec::TeardownRecorder(bool killFile)
         dummyRecorder = NULL;
     }
 
-    if (rbuffer)
+    if (rbi->GetRingBuffer())
     {
-        rbuffer->StopReads();
-        readthreadLock.lock();
-        readthreadlive = false;
-        readthreadLock.unlock();
-        delete rbuffer;
-        rbuffer = NULL;
+        rbi->GetRingBuffer()->StopReads();
+        rbi->SetAlive(false);
+        rbi->SetRingBuffer(NULL);
     }
 
     if (killFile)
-    {
-        unlink(outputFilename.ascii());
-        outputFilename = "";
-    }
+        rbi->UnlinkRingBufferFile();
 
     if (curRecording)
     {
@@ -1611,7 +1593,7 @@ void TVRec::RunTV(void)
                     if (dummyRecorder)
                         dummyRecorder->StopRecordingThread();
                     recorder->Unpause();
-                    UnpauseRingBuffer();
+                    rbi->Unpause();
                 }
                 waitingForSignal = false;
                 continue;
@@ -1627,7 +1609,7 @@ void TVRec::RunTV(void)
                     dummyRecorder->StopRecordingThread();
                 recorder->Unpause();
                 recorder->Open();
-                UnpauseRingBuffer();
+                rbi->Unpause();
                 waitingForDVBTables = false;
             }
         }
@@ -2968,8 +2950,8 @@ long long TVRec::GetFilePosition(void)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (rbuffer)
-        return rbuffer->GetTotalWritePosition();
+    if (rbi->GetRingBuffer())
+        return rbi->GetRingBuffer()->GetTotalWritePosition();
     return -1;
 }
 
@@ -3004,9 +2986,13 @@ long long TVRec::GetFreeSpace(long long totalreadpos)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (rbuffer)
-        return totalreadpos + rbuffer->GetFileSize() - 
-               rbuffer->GetTotalWritePosition() - rbuffer->GetSmudgeSize();
+    if (rbi->GetRingBuffer())
+    {
+        return totalreadpos + 
+            rbi->GetRingBuffer()->GetFileSize() - 
+            rbi->GetRingBuffer()->GetTotalWritePosition() -
+            rbi->GetRingBuffer()->GetSmudgeSize();
+    }
 
     return -1;
 }
@@ -3061,7 +3047,7 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (rbuffer)
+    if (rbi->GetRingBuffer())
     {
         VERBOSE(VB_ALL, "TVRec: Attempting to setup "
                 "multiple ringbuffers on one connection.");
@@ -3072,23 +3058,22 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
     filesize = liveTVRingBufSize;
     fillamount = liveTVRingBufFill;
 
-    outputFilename = path = QString("%1/ringbuf%2.nuv")
-        .arg(liveTVRingBufLoc).arg(m_capturecardnum);
+    rbi->SetFilename(liveTVRingBufLoc, m_capturecardnum);
+    path = rbi->GetFilename();
 
     filesize = filesize * 1024 * 1024 * 1024;
     fillamount = fillamount * 1024 * 1024;
 
-    rbuffer = new RingBuffer(path, filesize, fillamount);
-    if (rbuffer->IsOpen())
+    rbi->SetRingBuffer(new RingBuffer(path, filesize, fillamount));
+    if (rbi->GetRingBuffer()->IsOpen())
     {
-        rbuffer->SetWriteBufferMinWriteSize(1);
+        rbi->GetRingBuffer()->SetWriteBufferMinWriteSize(1);
         return true;
     }
     else
     {
         VERBOSE(VB_IMPORTANT, "TVRec: Failed to open RingBuffer file.");
-        delete rbuffer;
-        rbuffer = NULL;
+        rbi->SetRingBuffer(NULL);
         return false;
     }
 }
@@ -3124,7 +3109,7 @@ void TVRec::StopLiveTV(void)
         TeardownSignalMonitor();
         TeardownRecorder(true);
         VERBOSE(VB_RECORD, "StopLiveTV()::closeRecorder -- end rbuffer("
-                <<rbuffer<<")");
+                <<rbi->GetRingBuffer()<<")");
     }
 }
 
@@ -3384,14 +3369,14 @@ void TVRec::Pause(void)
     if (recorder)
         recorder->WaitForPause();
 
-    PauseClearRingBuffer();
+    rbi->Pause();
 
-    if (!rbuffer)
+    if (!rbi->GetRingBuffer())
     {
-        UnpauseRingBuffer();
+        rbi->Unpause();
         return;
     }
-    rbuffer->Reset();
+    rbi->GetRingBuffer()->Reset();
 }
 
 /** \fn TVRec::Unpause()
@@ -3420,7 +3405,7 @@ void TVRec::Unpause(void)
     else if (recorder)
     {
         recorder->Unpause();
-        UnpauseRingBuffer();
+        rbi->Unpause();
     }
 }
 
@@ -3574,32 +3559,10 @@ void TVRec::GetChannelInfo(QString &title,       QString &subtitle,
  */
 void TVRec::GetInputName(QString &inputname)
 {
-    QMutexLocker lock(&stateChangeLock);
-
     if (!channel)
         return;
 
     inputname = channel->GetCurrentInput();
-}
-
-/** \fn TVRec::UnpauseRingBuffer()
- *  \brief Calls RingBuffer::StartReads()
- */
-void TVRec::UnpauseRingBuffer(void)
-{
-    if (rbuffer)
-        rbuffer->StartReads();
-    readthreadLock.unlock();
-}
-
-/** \fn TVRec::PauseClearRingBuffer()
- *  \brief Calls RingBuffer::StopReads()
- */
-void TVRec::PauseClearRingBuffer(void)
-{
-    readthreadLock.lock();
-    if (rbuffer)
-        rbuffer->StopReads();
 }
 
 /** \fn TVRec::SeekRingBuffer(long long, long long, int)
@@ -3614,64 +3577,29 @@ void TVRec::PauseClearRingBuffer(void)
 long long TVRec::SeekRingBuffer(long long curpos, long long pos, int whence)
 {
     QMutexLocker lock(&stateChangeLock);
-
-    PauseClearRingBuffer();
-
-    if (!rbuffer || !readthreadlive)
-    {
-        UnpauseRingBuffer();
-        return -1;
-    }
-
-    if (whence == SEEK_CUR)
-    {
-        long long realpos = rbuffer->GetTotalReadPosition();
-
-        pos = pos + curpos - realpos;
-    }
-
-    long long ret = rbuffer->Seek(pos, whence);
-
-    UnpauseRingBuffer();
-    return ret;
+    return rbi->Seek(curpos, pos, whence);
 }
 
-/** \fn TVRec::GetReadThreadSocket()
+/** \fn TVRec::GetReadThreadSocket(void)
  *  \brief Returns RingBuffer data socket, for A/V streaming.
- *  \sa SetReadThreadSock(QSocket*)
+ *  \sa SetReadThreadSock(QSocket*), RequestRingBufferBlock(uint)
  */
 QSocket *TVRec::GetReadThreadSocket(void)
 {
-    return readthreadSock;
+    return rbi->GetDataSocket();
 }
 
-/** \fn TVRec::GetReadThreadSocket()
+/** \fn TVRec::SetReadThreadSocket(QSocket*)
  *  \brief Sets RingBuffer data socket, for A/V streaming.
- *  \sa GetReadThreadSocket()
+ *  \sa GetReadThreadSocket(void), RequestRingBufferBlock(uint)
  */
-void TVRec::SetReadThreadSock(QSocket *sock)
+void TVRec::SetReadThreadSocket(QSocket *sock)
 {
     QMutexLocker lock(&stateChangeLock);
-
-    if ((readthreadlive && sock) || (!readthreadlive && !sock))
-        return;
-
-    if (sock)
-    {
-        readthreadSock = sock;
-        readthreadlive = true;
-    }
-    else
-    {
-        readthreadlive = false;
-        if (rbuffer)
-            rbuffer->StopReads();
-        readthreadLock.lock();
-        readthreadLock.unlock();
-    }
+    rbi->SetDataSocket(sock);
 }
 
-/** \fn TVRec::RequestRingBufferBlock(int)
+/** \fn TVRec::RequestRingBufferBlock(uint)
  *  \brief Tells ring buffer to send data on the read thread sock, if the
  *         ring buffer thread is alive and the ringbuffer isn't paused.
  *
@@ -3679,51 +3607,9 @@ void TVRec::SetReadThreadSock(QSocket *sock)
  *              bytes of data will be returned if it is available.
  *  \return -1 if request does not succeed, amount of data sent otherwise.
  */
-int TVRec::RequestRingBufferBlock(int size)
+int TVRec::RequestRingBufferBlock(uint size)
 {
-    int tot = 0;
-    int ret = 0;
-
-    readthreadLock.lock();
-
-    if (!readthreadlive || !rbuffer)
-    {
-        readthreadLock.unlock();
-        return -1;
-    }
-
-    QTime t;
-    t.start();
-    while (tot < size &&
-           !rbuffer->GetStopReads() &&
-           readthreadlive &&
-           t.elapsed() < 100 /*STREAMED_FILE_READ_TIMEOUT*/)
-    {
-        int request = size - tot;
-
-        request = min(request, kRequestBufferSize);
- 
-        ret = rbuffer->Read(requestBuffer, request);
-        
-        if (rbuffer->GetStopReads() || ret <= 0)
-            break;
-        
-        if (!WriteBlock(readthreadSock->socketDevice(), requestBuffer, ret))
-        {
-            tot = -1;
-            break;
-        }
-
-        tot += ret;
-        if (ret < request)
-            break; // we hit eof
-    }
-    readthreadLock.unlock();
-
-    if (ret < 0)
-        tot = -1;
-
-    return tot;
+    return rbi->RequestBlock(size);
 }
 
 /** \fn  TVRec::RetrieveInputChannels(QMap<int,QString>&,QMap<int,QString>&,QMap<int,QString>&,QMap<int,QString>&)
