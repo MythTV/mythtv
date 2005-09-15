@@ -422,7 +422,8 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
                 if ((iter = m_GameMap.find(RomName)) != m_GameMap.end())
                 {
                     // If it's both on disk and in the database we're done with it.
-                    iter.data().setLoc(inBoth);
+                    //iter.data().setLoc(inBoth);
+                    m_GameMap.remove(iter);
                 }
                 else
                 {
@@ -600,7 +601,10 @@ void GameHandler::processGames(GameHandler *handler)
         int filecount = 0;
         buildFileList(handler->SystemRomPath(),handler,&pdial, &filecount);
         VerifyGameDB(handler);
-        UpdateGameDB(handler);
+
+	// If we still have some games in the list then update the database
+        if (!m_GameMap.empty())
+            UpdateGameDB(handler);
     }
 
     pdial.Close();
@@ -617,6 +621,11 @@ void GameHandler::processAllGames(void)
         handler->processGames(handler);
         handler = handlers->next();
     }
+
+    // Maybe add some flag or check here to see if we have to bother?
+    // Or maybe only update counts for specific gametypes/players?
+    // We shouldn't need to update counts and display values for ALL
+    // games in the system unless an element of that gametype changed.
     UpdateGameCounts();
 }
 
