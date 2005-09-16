@@ -3485,9 +3485,9 @@ int main(int argc, char *argv[])
             cout << "   Force a refresh today or two days (or every day) from now,\n";
             cout << "   to catch the latest changes\n";
             cout << "--dont-refresh-tomorrow\n";
-            cout << "   Tomorrow will be refreshed always unless this argument is used\n";
+            cout << "   Tomorrow will always be refreshed unless this argument is used\n";
             cout << "--dont-refresh-tba\n";
-            cout << "   \"To be announced\" progs will be refreshed always\n";
+            cout << "   \"To be announced\" programs will always be refreshed \n";
             cout << "   unless this argument is used\n";
             cout << "\n";
             cout << "--export-icon-map [<filename>]\n";
