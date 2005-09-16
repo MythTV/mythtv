@@ -339,6 +339,10 @@ bool UpgradeTVDatabaseSchema(void)
     if (dbver == currentDatabaseVersion)
         return true;
 
+    VERBOSE(VB_IMPORTANT, QString("Current Schema Version: %1").arg(dbver));
+    VERBOSE(VB_IMPORTANT, QString("Newest Schema Version : %1")
+                                  .arg(currentDatabaseVersion));
+
     MSqlQuery lockquery(MSqlQuery::InitCon());
 
     lockquery.prepare("CREATE TABLE IF NOT EXISTS "
