@@ -512,6 +512,8 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
 {
     if (pginfo)
     {
+        pginfo->ClearPositionMap(MARK_KEYFRAME);
+        pginfo->ClearPositionMap(MARK_GOP_START);
         pginfo->SetPositionMap(posMap, MARK_GOP_BYFRAME);
     }
     else if (mapfile)

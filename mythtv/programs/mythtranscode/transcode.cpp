@@ -799,9 +799,13 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
 
     if (! fifow)
     {
-      nvr->WriteSeekTable();
-      if (!kfa_table->isEmpty())
-          nvr->WriteKeyFrameAdjustTable(kfa_table);
+        m_proginfo->ClearPositionMap(MARK_KEYFRAME);
+        m_proginfo->ClearPositionMap(MARK_GOP_START);
+        m_proginfo->ClearPositionMap(MARK_GOP_BYFRAME);
+
+        nvr->WriteSeekTable();
+        if (!kfa_table->isEmpty())
+            nvr->WriteKeyFrameAdjustTable(kfa_table);
     } else {
         fifow->FIFODrain();
     }

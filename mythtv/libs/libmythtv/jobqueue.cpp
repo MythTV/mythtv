@@ -1569,6 +1569,39 @@ void *JobQueue::TranscodeThread(void *param)
     return NULL;
 }
 
+QString JobQueue::PrettyPrint(off_t bytes)
+{
+    // Pretty print "bytes" as KB, MB, GB, TB, etc., subject to the desired
+    // number of units
+    static const struct {
+        const char      *suffix;
+        unsigned int    max;
+        int         precision;
+    } pptab[] = {
+        { "bytes", 9999, 0 },
+        { "kB", 999, 0 },
+        { "MB", 999, 1 },
+        { "GB", 999, 1 },
+        { "TB", 999, 1 },
+        { "PB", 999, 1 },
+        { "EB", 999, 1 },
+        { "ZB", 999, 1 },
+        { "YB", 0, 0 },
+    };
+    unsigned int    ii;
+    float           fbytes = bytes;
+
+    ii = 0;
+    while (pptab[ii].max && fbytes > pptab[ii].max) {
+        fbytes /= 1024;
+        ii++;
+    }
+
+    return QString("%1 %2")
+        .arg(fbytes, 0, 'f', pptab[ii].precision)
+        .arg(pptab[ii].suffix);
+}
+
 void JobQueue::DoTranscodeThread(void)
 {
     if (!m_pginfo)
@@ -1576,10 +1609,8 @@ void JobQueue::DoTranscodeThread(void)
 
     ProgramInfo *program_info = new ProgramInfo(*m_pginfo);
     int controlTranscoding = JOB_RUN;
-    QString logDesc = QString("\"%1\" recorded from channel %2 at %3")
-                          .arg(program_info->title.local8Bit())
-                          .arg(program_info->chanid)
-                          .arg(program_info->recstartts.toString());
+    QString subtitle = program_info->subtitle.isEmpty() ? "" :
+                           QString(" \"%1\"").arg(program_info->subtitle);
     
     QString key = GetJobQueueKey(program_info);
     int jobID = runningJobIDs[key];
@@ -1640,19 +1671,33 @@ void JobQueue::DoTranscodeThread(void)
     int retrylimit = 3;
     while (retry)
     {
-        QString statusText;
+        off_t origfilesize, filesize;
+        struct stat st;
 
         retry = false;
+
         ChangeJobStatus(jobID, JOB_STARTING);
 
-        statusText = StatusText(GetJobStatus(jobID));
-        msg = QString("\"%1\" transcode of %2: %3.")
-                      .arg(transcoderName)
-                      .arg(logDesc)
-                      .arg(statusText);
-        VERBOSE(VB_GENERAL, msg);
-        gContext->LogEntry("transcode", LP_NOTICE,
-                           QString("Transcode %1").arg(statusText), msg);
+        QString statusText = StatusText(GetJobStatus(jobID));
+        QString fileprefix = gContext->GetFilePrefix();
+        QString filename = program_info->GetRecordFilename(fileprefix);
+
+        origfilesize = 0;
+        filesize = 0;
+
+        if (stat(filename.ascii(), &st) == 0)
+            origfilesize = st.st_size;
+
+        QString msg = QString("Transcode %1").arg(statusText);
+
+        QString details = QString("%1%2: %3 (%4)")
+                            .arg(program_info->title.local8Bit())
+                            .arg(subtitle.local8Bit())
+                            .arg(PrettyPrint(origfilesize))
+                            .arg(transcoderName);
+
+        VERBOSE(VB_GENERAL, QString("%1 for %2").arg(msg).arg(details));
+        gContext->LogEntry("transcode", LP_NOTICE, msg, details);
 
         VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'")
                                      .arg(command));
@@ -1661,18 +1706,13 @@ void JobQueue::DoTranscodeThread(void)
 
         int status = GetJobStatus(jobID);
 
-        QString fileprefix = gContext->GetFilePrefix();
-        QString filename = program_info->GetRecordFilename(fileprefix);
         if (status == JOB_STOPPING)
         {
             QString tmpfile = filename;
-            QString query;
             tmpfile += ".tmp";
-            // Get new filesize
-            struct stat st;
-            long long filesize = 0;
+            // Get filesizes
             if (stat(tmpfile.ascii(), &st) == 0)
-            filesize = st.st_size;
+                filesize = st.st_size;
             // To save the original file...
             QString oldfile = filename;
             oldfile += ".old";
@@ -1680,42 +1720,44 @@ void JobQueue::DoTranscodeThread(void)
             rename (tmpfile, filename);
             if (!gContext->GetNumSetting("SaveTranscoding", 0))
                 unlink(oldfile);
+
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("DELETE FROM recordedmarkup "
+                          "WHERE chanid = :CHANID AND starttime = :STARTTIME "
+                          "AND type not in ( :KEYFRAME, :GOP_BYFRAME ) ;");
+            query.bindValue(":CHANID", program_info->chanid);
+            query.bindValue(":STARTTIME", program_info->recstartts);
+            query.bindValue(":KEYFRAME", MARK_KEYFRAME);
+            query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
+            query.exec();
+
+            if (!query.isActive())
+                MythContext::DBError("Error in JobQueue::DoTranscodeThread()",
+                                      query);
+
             if (useCutlist)
             {
-                MSqlQuery query(MSqlQuery::InitCon());
-                QString querystr;
-                querystr = QString("DELETE FROM recordedmarkup WHERE "
-                                "chanid = '%1' AND starttime = '%2';")
-                                .arg(program_info->chanid)
-                                .arg(program_info->recstartts.toString());
-                query.prepare(querystr);
+                query.prepare("UPDATE recorded "
+                              "SET cutlist = NULL, bookmark = NULL "
+                              "WHERE chanid = :CHANID "
+                              "AND starttime = :STARTTIME ;");
+                query.bindValue(":CHANID", program_info->chanid);
+                query.bindValue(":STARTTIME", program_info->recstartts);
                 query.exec();
 
-                querystr = QString("UPDATE recorded SET cutlist = NULL, "
-                                "bookmark = NULL, "
-                                "starttime = starttime WHERE "
-                                "chanid = '%1' AND starttime = '%2';")
-                                .arg(program_info->chanid)
-                                .arg(program_info->recstartts.toString());
-                query.prepare(querystr);
-                query.exec();
+                if (!query.isActive())
+                    MythContext::DBError(
+                        "Error in JobQueue::DoTranscodeThread()", query);
 
                 program_info->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
-            } else {
-                MSqlQuery query(MSqlQuery::InitCon());
-                QString querystr;
-                querystr = QString("DELETE FROM recordedmarkup WHERE "
-                                "chanid = '%1' AND starttime = '%2' "
-                                "AND type = '%3';")
-                                .arg(program_info->chanid)
-                                .arg(program_info->recstartts.toString())
-                                .arg(MARK_KEYFRAME);
-                query.prepare(querystr);
-                query.exec();
             }
             if (filesize > 0)
                 program_info->SetFilesize(filesize);
-            ChangeJobStatus(jobID, JOB_FINISHED);
+            QString comment = QString("%1: %2 => %3")
+                                    .arg(transcoderName)
+                                    .arg(PrettyPrint(origfilesize))
+                                    .arg(PrettyPrint(filesize));
+            ChangeJobStatus(jobID, JOB_FINISHED, comment);
         } else {
             // transcode didn't finish delete partial transcode
             filename += ".tmp";
@@ -1729,17 +1771,35 @@ void JobQueue::DoTranscodeThread(void)
             {
                 retry = true;
                 retrylimit--;
-            } else // Unrecoerable error
+            } else // Unrecoverable error
                 ChangeJobStatus(jobID, JOB_ERRORED);
         }
+
         statusText = StatusText(GetJobStatus(jobID));
-        msg = QString("\"%1\" transcode of %2: %3.")
-                      .arg(transcoderName)
-                      .arg(logDesc)
-                      .arg(statusText);
-        VERBOSE(VB_GENERAL, msg);
-        gContext->LogEntry("transcode", LP_NOTICE,
-                           QString("Transcode %1").arg(statusText), msg);
+
+        msg = QString("Transcode %1").arg(statusText);
+
+        if (filesize > 0)
+        {
+            details = QString("%1%2: %3 (%4)")
+                            .arg(program_info->title)
+                            .arg(subtitle)
+                            .arg(PrettyPrint(filesize))
+                            .arg(transcoderName);
+        }
+        else
+        {
+            details = QString("%1%2").arg(program_info->title).arg(subtitle);
+        }
+
+        VERBOSE(VB_GENERAL, QString("%1 for %2%3: %4 => %5 (%6)")
+                            .arg(msg)
+                            .arg(program_info->title)
+                            .arg(subtitle)
+                            .arg(PrettyPrint(origfilesize))
+                            .arg(PrettyPrint(filesize))
+                            .arg(transcoderName));
+        gContext->LogEntry("transcode", LP_NOTICE, msg, details);
     }
     controlFlagsLock.lock();
     runningJobIDs.erase(key);
@@ -1764,8 +1824,11 @@ void JobQueue::DoFlagCommercialsThread(void)
 
     ProgramInfo *program_info = new ProgramInfo(*m_pginfo);
     int controlFlagging = JOB_RUN;
-    QString logDesc = QString("\"%1\" recorded from channel %2 at %3")
+    QString subtitle = program_info->subtitle.isEmpty() ? "" :
+                           QString(" \"%1\"").arg(program_info->subtitle);
+    QString logDesc = QString("%1%2 recorded from channel %2 at %3")
                           .arg(program_info->title.local8Bit())
+                          .arg(subtitle.local8Bit())
                           .arg(program_info->chanid)
                           .arg(program_info->recstartts.toString());
     
@@ -1796,11 +1859,9 @@ void JobQueue::DoFlagCommercialsThread(void)
     jobControlFlags[key] = &controlFlagging;
     controlFlagsLock.unlock();
 
-    QString msg = QString("Starting Commercial Flagging for %1.")
-                          .arg(logDesc);
-    VERBOSE(VB_GENERAL, msg);
-    gContext->LogEntry("commflag", LP_NOTICE, "Commercial Flagging Starting",
-                       msg);
+    QString msg = "Commercial Flagging Starting";
+    VERBOSE(VB_GENERAL, QString("%1 for %2").arg(msg).arg(logDesc));
+    gContext->LogEntry("commflag", LP_NOTICE, msg, logDesc);
 
     int breaksFound = 0;
     QString cmd =
@@ -1866,13 +1927,13 @@ void JobQueue::DoFlagCommercialsThread(void)
     }
     else
     {
-        msg = QString("Finished Commercial Flagging for %1. "
-                      "Found %2 commercial break(s).")
-                      .arg(logDesc)
-                      .arg(breaksFound);
+        msg = "Commercial Flagging Finished";
 
-        gContext->LogEntry("commflag", LP_NOTICE,
-                           "Commercial Flagging Finished", msg);
+        QString details = QString("%1: %2 commercial break(s)")
+                                .arg(logDesc)
+                                .arg(breaksFound);
+
+        gContext->LogEntry("commflag", LP_NOTICE, msg, details);
 
         msg = QString("Finished, %1 break(s) found.").arg(breaksFound);
         ChangeJobStatus(jobID, JOB_FINISHED, msg);

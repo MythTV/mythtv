@@ -1109,7 +1109,7 @@ void Scheduler::RunScheduler(void)
         RecIter recIter = startIter;
         for ( ; recIter != reclist.end(); recIter++)
         {
-            QString msg;
+            QString msg, details;
 
             nextRecording = *recIter;
 
@@ -1224,14 +1224,19 @@ void Scheduler::RunScheduler(void)
                 msg = "Canceled recording"; 
             statuschanged = true;
 
-            msg += QString(" \"%1\" on channel: %2 on cardid: %3, "
-                           "sourceid %4").arg(nextRecording->title)
+            QString subtitle = nextRecording->subtitle.isEmpty() ? "" :
+                QString(" \"%1\"").arg(nextRecording->subtitle);
+
+            details = QString("%1%2: "
+                "channel %3 on cardid %4, sourceid %5")
+                .arg(nextRecording->title)
+                .arg(subtitle)
                 .arg(nextRecording->chanid)
                 .arg(nextRecording->cardid)
                 .arg(nextRecording->sourceid);
-            VERBOSE(VB_GENERAL, msg.local8Bit());
-            gContext->LogEntry("scheduler", LP_NOTICE, "Schedule Change", 
-                               msg);
+            VERBOSE(VB_GENERAL,
+                QString("%1 %2").arg(msg).arg(details).local8Bit());
+            gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
         }
 
         if (statuschanged)
@@ -2254,3 +2259,4 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
     }
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

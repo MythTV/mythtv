@@ -179,6 +179,7 @@ class JobQueue : public QObject
     QString GetJobCommand(int jobType, ProgramInfo *tmpInfo);
 
     static void *TranscodeThread(void *param);
+    static QString PrettyPrint(off_t bytes);
     void DoTranscodeThread(void);
 
     static void *FlagCommercialsThread(void *param);

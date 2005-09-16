@@ -453,15 +453,16 @@ void ScheduledRecording::doneRecording(ProgramInfo& proginfo)
 {
     proginfo.recstatus = rsRecorded;
 
-    QString msg;
-  
-    msg = QString("Finished recording %1 on channel: %2")
-                  .arg(proginfo.title)
-                  .arg(proginfo.chanid);
+    QString msg = "Finished recording";
+    QString subtitle = proginfo.subtitle.isEmpty() ? "" :
+                                    QString(" \"%1\"").arg(proginfo.subtitle);
+    QString details = QString("%1%2: channel %3")
+                                    .arg(proginfo.title)
+                                    .arg(subtitle)
+                                    .arg(proginfo.chanid);
 
-    VERBOSE(VB_GENERAL, msg.local8Bit());
-    gContext->LogEntry("scheduler", LP_NOTICE, "Finished recording", 
-                       msg);
+    VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details).local8Bit());
+    gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
     MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4")
                  .arg(proginfo.cardid)
