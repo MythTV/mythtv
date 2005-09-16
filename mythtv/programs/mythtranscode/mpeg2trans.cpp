@@ -264,7 +264,7 @@ int MPEG2trans::DoTranscode(QString &infile, QString &tmpfile, bool useCutlist)
     if (chkTranscodeDB)
     {
         jobID = JobQueue::GetJobID(JOB_TRANSCODE, m_pginfo->chanid,
-			m_pginfo->recstartts);
+                                   m_pginfo->recstartts);
 
         if (jobID < 0)
         {
@@ -301,12 +301,17 @@ int MPEG2trans::DoTranscode(QString &infile, QString &tmpfile, bool useCutlist)
     if (posMap.empty())
     {
         // no MARK_GOP_BYFRAME entries in the recordedmarkup table
-        // trying MARK_GOP_START
-        m_pginfo->GetPositionMap(posMap, MARK_GOP_START);
-        if (posMap.empty())
-        {
-            VERBOSE(VB_IMPORTANT, QString("No position map found, this is bad"));
-        }
+        // recordings from some setups have MARK_GOP_START entries
+        // in the recordedmarkup table.  These are sequentially
+        // numbered, not frame numbers.  We can't use them here.
+        // Regenerate the position map with MARK_GOP_BYFRAME
+
+        VERBOSE(VB_IMPORTANT, QString("Rebulding position map."));
+        if (BuildKeyframeIndex(infile, posMap) == TRANSCODE_EXIT_OK)
+            m_pginfo->SetPositionMap(posMap, MARK_GOP_BYFRAME);
+        else
+            VERBOSE(VB_IMPORTANT,
+                QString("No position map and cound't rebuild it, this is bad"));
     }
 
     if (useCutlist)
