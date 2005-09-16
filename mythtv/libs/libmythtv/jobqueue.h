@@ -171,6 +171,10 @@ class JobQueue : public QObject
 
     void StartChildJob(void *(*start_routine)(void *), ProgramInfo *tmpInfo);
 
+    static QString GetJobQueueKey(QString chanid, QString startts);
+    static QString GetJobQueueKey(QString chanid, QDateTime starttime);
+    static QString GetJobQueueKey(ProgramInfo *pginfo);
+
     QString GetJobDescription(int jobType);
     QString GetJobCommand(int jobType, ProgramInfo *tmpInfo);
 
