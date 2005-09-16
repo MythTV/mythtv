@@ -99,7 +99,7 @@ TVRec::TVRec(int capturecardnum)
       audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
       overRecordCategory(""),
       liveTVRingBufSize(0), liveTVRingBufFill(0), liveTVRingBufLoc(""),
-      recprefix(""), channel_timeout(3000),
+      recprefix(""), signal_timeout(1000), channel_timeout(3000),
       // Configuration variables from setup rutines
       m_capturecardnum(capturecardnum), ispip(false),
       // State variables
@@ -137,7 +137,7 @@ bool TVRec::Init(void)
     bool ok = GetDevices(
         m_capturecardnum, videodev,         vbidev,           audiodev,
         cardtype,         inputname,        audiosamplerate,  skip_btaudio,
-        channel_timeout,  signal_timeout,
+        signal_timeout,   channel_timeout,
         dvb_options,      firewire_options, dbox2_options);
 
     if (!ok)
