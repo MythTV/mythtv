@@ -66,8 +66,6 @@ using namespace std;
 #include "dbox2channel.h"
 #endif
 
-#define DVB_TABLE_WAIT 3000 /* msec */
-
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
  *
@@ -101,7 +99,7 @@ TVRec::TVRec(int capturecardnum)
       audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
       overRecordCategory(""),
       liveTVRingBufSize(0), liveTVRingBufFill(0), liveTVRingBufLoc(""),
-      recprefix(""),
+      recprefix(""), channel_timeout(3000),
       // Configuration variables from setup rutines
       m_capturecardnum(capturecardnum), ispip(false),
       // State variables
@@ -139,6 +137,7 @@ bool TVRec::Init(void)
     bool ok = GetDevices(
         m_capturecardnum, videodev,         vbidev,           audiodev,
         cardtype,         inputname,        audiosamplerate,  skip_btaudio,
+        channel_timeout,  signal_timeout,
         dvb_options,      firewire_options, dbox2_options);
 
     if (!ok)
@@ -769,7 +768,8 @@ bool TVRec::StartRecorderPost(bool livetv)
         ok = StartChannel(livetv);
 
     if (ok)
-        ok = wait_for_dvb(channel, DVB_TABLE_WAIT, abortRecordingStart);
+        ok = wait_for_dvb(channel, channel_timeout - signal_timeout,
+                          abortRecordingStart);
 
     if (dummyRecorder)
         dummyRecorder->StopRecordingThread();
@@ -1822,6 +1822,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
 bool TVRec::GetDevices(
     int      cardnum, QString &video,        QString &vbi,  QString &audio,
     QString &type,    QString &defaultinput, int     &rate, bool    &skip_bt,
+    uint &sig_timeout, uint &chan_timeout, 
     dvb_options_t      &dvb_opts,
     firewire_options_t &firewire_opts,
     dbox2_options_t    &dbox2_opts)
@@ -1844,7 +1845,8 @@ bool TVRec::GetDevices(
         "       dvb_dmx_buf_size, dvb_pkt_buf_size,    dvb_on_demand,  "
         "       firewire_port,    firewire_node,       firewire_speed, "
         "       firewire_model,   firewire_connection,                 "
-        "       dbox2_port,       dbox2_host,          dbox2_httpport  "
+        "       dbox2_port,       dbox2_host,          dbox2_httpport, "
+        "       signal_timeout,   channel_timeout                      "
         "FROM capturecard WHERE cardid = :CARDID");
     query.bindValue(":CARDID", cardnum);
 
@@ -1901,6 +1903,12 @@ bool TVRec::GetDevices(
         test = query.value(19).toString();
         if (test != QString::null)
            dbox2_opts.host = QString::fromUtf8(test);
+
+        sig_timeout  = (uint) max(query.value(21).toInt(), 0);
+        chan_timeout = (uint) max(query.value(22).toInt(), 0);
+        // We should have at least 100 ms to acquire tables...
+        if (((int)chan_timeout - (int)sig_timeout) < 100)
+            chan_timeout = sig_timeout + 250;
     }
     return true;
 }

@@ -109,23 +109,17 @@ class DVBFrequencyTable : public FrequencyTable
 class TransportScanItem
 {
   public:
-    enum
-    {
-        DVBT_TUNINGTIMEOUT = 1000,
-        ATSC_TUNINGTIMEOUT = 500,
-    };
-
-  public:
     TransportScanItem();
     TransportScanItem(int sourceid, const QString &std,
-                      const QString &name, int mplexid);
+                      const QString &name, int mplexid,
+                      uint tuneTimeout);
     TransportScanItem(int sourceid,           /* source id in DB */
                       const QString &std,     /* atsc/dvb */
                       const QString &strFmt,  /* fmt for info shown to user  */
                       uint freqNum,
                       uint frequency,         /* center frequency to use     */
-                      const FrequencyTable&); /* freq table to get info from */
-
+                      const FrequencyTable&,  /* freq table to get info from */
+                      uint tuneTimeout);
 
     uint offset_cnt() const
         { return (freq_offsets[2]) ? 3 : ((freq_offsets[1]) ? 2 : 1); }

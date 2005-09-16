@@ -328,6 +328,18 @@ void ScanWizardScanner::scan()
 
     nScanType = parent->scanType();
     nVideoSource = parent->videoSource();
+    uint signal_timeout  = 1000;
+    uint channel_timeout = 40000;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(QString("SELECT signal_timeout, channel_timeout "
+                          "WHERE cardid=%1").arg(parent->captureCard()));
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        signal_timeout  = (uint) max(query.value(0).toInt(), 250);
+        channel_timeout = (uint) max(query.value(0).toInt(), 500);
+    }
+ 
     if (nScanType == ScanTypeSetting::FullScan_Analog)
     {
 #ifdef USING_V4L
@@ -430,7 +442,8 @@ void ScanWizardScanner::scan()
             return;
         }
 
-        scanner = new SIScan(card_type, channel, parent->videoSource());
+        scanner = new SIScan(card_type, channel, parent->videoSource(),
+                             signal_timeout, channel_timeout);
 
         scanner->SetForceUpdate(true);
 

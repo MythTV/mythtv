@@ -56,7 +56,8 @@ class SIScan : public QObject
 {
     Q_OBJECT
   public:
-    SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID);
+    SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
+           uint signal_timeout, uint channel_timeout);
     ~SIScan();
 
     void StartScanner(void);
@@ -76,7 +77,6 @@ class SIScan : public QObject
     void SetFTAOnly(bool _fFTAOnly)   { ignoreEncryptedServices = _fFTAOnly; }
     void SetTVOnly(bool _tvOnly)      { ignoreAudioOnlyServices = _tvOnly;   }
     void SetForceUpdate(bool _force)  { forceUpdate             = _force;    }
-    void SetScanTimeout(int _timeout) { scanTimeout             = _timeout;  }
     void SetChannelFormat(const QString _fmt) { channelFormat   = _fmt; }
 
     SignalMonitor    *GetSignalMonitor(void) { return signalMonitor; }
@@ -158,12 +158,13 @@ class SIScan : public QObject
     SignalMonitor    *signalMonitor;
     int               sourceID;
     SCANMODE          scanMode;
+    uint              signalTimeout;
+    uint              channelTimeout;
 
     // Settable
     bool              ignoreAudioOnlyServices;
     bool              ignoreEncryptedServices;
     bool              forceUpdate;
-    int               scanTimeout;
     QString           channelFormat;
 
     // State

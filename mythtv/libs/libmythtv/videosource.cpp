@@ -983,6 +983,38 @@ class AudioDevice: public PathSetting, public CCSetting
     };
 };
 
+class SignalTimeout: public SpinBoxSetting, public CCSetting
+{
+  public:
+    SignalTimeout(const CaptureCard& parent, int start_val)
+      : SpinBoxSetting(start_val,60000,250),
+        CCSetting(parent, "signal_timeout")
+    {
+        setLabel(QObject::tr("Signal Timeout (msec)"));
+        setHelpText(QObject::tr(
+                        "Maximum time MythTV waits for any signal when "
+                        "scanning for channels, or when when making "
+                        "recording. This does set the time at which "
+                        "point a recording would be abandoned, see "
+                        "Channel Timeout for that value."));
+    };
+};
+
+class ChannelTimeout: public SpinBoxSetting, public CCSetting
+{
+  public:
+    ChannelTimeout(const CaptureCard& parent, int start_val)
+      : SpinBoxSetting(start_val,65000,250),
+        CCSetting(parent, "channel_timeout")
+    {
+        setLabel(QObject::tr("Channel Timeout (msec)"));
+        setHelpText(QObject::tr(
+                        "Maximum time MythTV waits for a channel to finish "
+                        "tuning before abandoning a timed recording or "
+                        "issuing a warning in LiveTV."));
+    };
+};
+
 class AudioRateLimit: public ComboBoxSetting, public CCSetting
 {
   public:
@@ -1350,8 +1382,12 @@ class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
 
         VideoDevice *atsc_device = new VideoDevice(parent, 32);
         TunerCardInput *atsc_input = new TunerCardInput(parent);
+        SignalTimeout *signal_timeout = new SignalTimeout(parent, 500);
+        ChannelTimeout *channel_timeout = new ChannelTimeout(parent, 2000);
         addChild(atsc_device);
         addChild(atsc_input);
+        addChild(signal_timeout);
+        addChild(channel_timeout);
         connect(atsc_device, SIGNAL(valueChanged(const QString&)),
                 atsc_input, SLOT(fillSelections(const QString&)));
         atsc_input->fillSelections(atsc_device->getValue());
@@ -1398,8 +1434,10 @@ void CaptureCard::fillSelections(SelectSetting* setting)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT cardtype, videodevice, cardid, "
-                  " firewire_port, firewire_node, dbox2_port, dbox2_host, dbox2_httpport "
-                  " FROM capturecard WHERE hostname = :HOSTNAME ;");
+                  "       firewire_port, firewire_node, "
+                  "       dbox2_port, dbox2_host, dbox2_httpport "
+                  "FROM capturecard "
+                  "WHERE hostname = :HOSTNAME ;");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -1415,12 +1453,14 @@ void CaptureCard::fillSelections(SelectSetting* setting)
                              query.value(4).toString() + "]",
                              query.value(2).toString());
             } 
-            else if(query.value(0).toString() == "DBOX2") {
-                     setting->addSelection("[ " + query.value(0).toString() + " " + 
-					   "Host IP: " + query.value(6).toString() +  ", " +
-					   "Streaming-Port: " + query.value(5).toString() + ", " +
-					   "Http-Port: " + query.value(7).toString() + 
-					   "] ", query.value(2).toString());
+            else if(query.value(0).toString() == "DBOX2")
+            {
+                setting->addSelection(
+                    "[ " + query.value(0).toString() + " " + 
+                    "Host IP: " + query.value(6).toString() +  ", " +
+                    "Streaming-Port: " + query.value(5).toString() + ", " +
+                    "Http-Port: " + query.value(7).toString() + 
+                    "] ", query.value(2).toString());
 	    }
             else 
             {
@@ -2297,19 +2337,35 @@ void DVBConfigurationGroup::probeCard(const QString& cardNumber)
         case CardUtil::QPSK:
             cardtype->setValue("DVB-S");
             cardname->setValue(name);
+            signal_timeout->setValue(60000);
+            channel_timeout->setValue(62500);
             fEnable = true;
             break;
         case CardUtil::QAM:
             cardtype->setValue("DVB-C");
             cardname->setValue(name);
+            signal_timeout->setValue(500);
+            channel_timeout->setValue(3000);
             break;
         case CardUtil::OFDM:
             cardtype->setValue("DVB-T");
             cardname->setValue(name);
+            if (name.find("usb") >= 0)
+            {
+                signal_timeout->setValue(40000);
+                channel_timeout->setValue(42500);
+            }
+            else
+            {
+                signal_timeout->setValue(500);
+                channel_timeout->setValue(3000);
+            }
             break;
         case CardUtil::ATSC:
             cardtype->setValue("ATSC");
             cardname->setValue(name);
+            signal_timeout->setValue(500);
+            channel_timeout->setValue(3000);
             break;
         default:
             fEnable = false;
@@ -2357,10 +2413,14 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent):
 
     defaultinput = new DVBDefaultInput(parent);
     diseqctype = new DVBDiseqcType(parent);
+    signal_timeout = new SignalTimeout(parent, 500);
+    channel_timeout = new ChannelTimeout(parent, 3000);
 
     addChild(cardnum);
     addChild(cardname);
     addChild(cardtype);
+    addChild(signal_timeout);
+    addChild(channel_timeout);
 
     addChild(new DVBAudioDevice(parent));
     addChild(new DVBVbiDevice(parent));

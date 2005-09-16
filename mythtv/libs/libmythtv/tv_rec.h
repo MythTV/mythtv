@@ -198,9 +198,11 @@ class TVRec
         QString            &vbidev,        QString &audiodev,
         QString            &cardtype,      QString &defaultinput,
         int                &aud_rate,      bool    &skip_bt,
+        uint               &sig_timeout,   uint    &chan_timeout,
         dvb_options_t      &dvb_opts,
         firewire_options_t &firewire_opts,
         dbox2_options_t    &dbox2_opts);
+
 
     static QString GetStartChannel(int cardid, const QString &defaultinput);
 
@@ -267,6 +269,8 @@ class TVRec
     int     liveTVRingBufFill;
     QString liveTVRingBufLoc;
     QString recprefix;
+    uint    signal_timeout;
+    uint    channel_timeout;
 
     // Configuration variables from setup routines
     int     m_capturecardnum;

@@ -8,7 +8,7 @@ static void init_freq_tables(freq_table_map_t&);
 TransportScanItem::TransportScanItem()
     : mplexid(-1),        standard("dvb"),      FriendlyName(""),
       friendlyNum(0),     SourceID(0),          UseTimer(false),
-      scanning(false)
+      scanning(false),    timeoutTune(1000)
 { 
     bzero(freq_offsets, sizeof(int)*3);
 
@@ -18,17 +18,16 @@ TransportScanItem::TransportScanItem()
     frequency  = 0;
     modulation = 0;
 #endif
-
-    timeoutTune = DVBT_TUNINGTIMEOUT;
 }
 
 TransportScanItem::TransportScanItem(int sourceid,
                                      const QString &std,
                                      const QString &fn,
-                                     int _mplexid)
+                                     int _mplexid,
+                                     uint tuneTO)
     : mplexid(_mplexid),  standard(std),        FriendlyName(fn),
       friendlyNum(0),     SourceID(sourceid),   UseTimer(false),
-      scanning(false)
+      scanning(false),    timeoutTune(tuneTO)
 {
     bzero(freq_offsets, sizeof(int)*3);
 
@@ -38,10 +37,6 @@ TransportScanItem::TransportScanItem(int sourceid,
     frequency  = 0;
     modulation = 0;
 #endif
-
-    // set timeout
-    timeoutTune = (standard == "dvb") ?
-        DVBT_TUNINGTIMEOUT : ATSC_TUNINGTIMEOUT;
 }
 
 TransportScanItem::TransportScanItem(int sourceid,
@@ -49,20 +44,16 @@ TransportScanItem::TransportScanItem(int sourceid,
                                      const QString &fn,
                                      uint fnum,
                                      uint freq,
-                                     const FrequencyTable &ft)
+                                     const FrequencyTable &ft,
+                                     uint tuneTO)
     : mplexid(-1),        standard(std),        FriendlyName(fn),
       friendlyNum(fnum),  SourceID(sourceid),   UseTimer(false),
-      scanning(false)
+      scanning(false),    timeoutTune(tuneTO)
 {
     bzero(freq_offsets, sizeof(int)*3);
 #ifdef USING_DVB
     bzero(&tuning, sizeof(DVBTuning));
-#endif
-    // set timeout
-    timeoutTune = (standard == "dvb") ?
-        DVBT_TUNINGTIMEOUT : ATSC_TUNINGTIMEOUT;
 
-#ifdef USING_DVB
     // setup tuning params
     tuning.params.frequency                    = freq;
     const DVBFrequencyTable *dvbft =

@@ -14,6 +14,9 @@
 #include "dvbchannel.h"
 #endif
 
+class SignalTimeout;
+class ChannelTimeout;
+
 /** \class CardUtil
  *  \brief Collection of helper utilities for capture card DB use
  */
@@ -370,6 +373,8 @@ private:
     DVBCardType* cardtype;
     DVBDiseqcType* diseqctype;
     TransButtonSetting *advcfg;
+    SignalTimeout* signal_timeout;
+    ChannelTimeout* channel_timeout;
 };
 
 class CaptureCardGroup: public VerticalConfigurationGroup,

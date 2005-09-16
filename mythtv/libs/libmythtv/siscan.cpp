@@ -41,16 +41,9 @@
 #include "dvbsiparser.h"
 #endif // USE_SIPARSER
 
-/// \brief How long we wait for ATSC tables, before giving up
-#define ATSC_TABLES_TIMEOUT 1500
-/// \brief How long we wait for DVB tables, before giving up
-#define DVB_TABLES_TIMEOUT  40000
-#define SIPARSER_EXTRA_TIME 2000
+#define SIPARSER_EXTRA_TIME 2000 /**< milliseconds to add for SIParser scan */
 
 #ifdef USING_DVB
-static uint scan_for_best_freq(const TransportObject& transport,
-                               DVBChannel* channel,
-                               dvb_channel_t& chan_opts);
 static bool ignore_encrypted_services(int db_mplexid, QString videodevice);
 static int  create_dtv_multiplex_ofdm(
     const TransportScanItem& item, const DVBTuning& tuning);
@@ -74,10 +67,10 @@ void delete_services(int db_mplexid, const ServiceDescriptionTable*);
  *
  *   HandleActiveScan is called every time through the event loop
  *   and is what calls ScanTransport(), as well as checking when
- *   the current time is "timeoutTune" or "scanTimeout" milliseconds
+ *   the current time is "timeoutTune" or "channelTimeout" milliseconds
  *   ahead of "timer". When the "timeoutTune" is exceeded we check
  *   to see if we have a signal lock on the channel, if we don't we
- *   check the next transport. When the larger "scanTimeout" is
+ *   check the next transport. When the larger "channelTimeout" is
  *   exceeded we do nothing unless "waitingForTables" is still true,
  *   if so we check if we at least got a PAT and if so we insert
  *    a channel based on that by calling HandleMPEGDBInsertion().
@@ -97,19 +90,21 @@ void delete_services(int db_mplexid, const ServiceDescriptionTable*);
  *   HandleDVBDBInsertion() and HandleMPEGDBInsertion() are similar.
  */
 
-/** \fn SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
+/** \fn SIScan(QString,ChannelBase*,int,uint,uint)
  */
-SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
+SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
+               uint signal_timeout, uint channel_timeout)
     : // Set in constructor
       channel(_channel),
       signalMonitor(SignalMonitor::Init(_cardtype, -1, _channel)),
       sourceID(_sourceID),
       scanMode(IDLE),
+      signalTimeout(signal_timeout),
+      channelTimeout(channel_timeout),
       // Settable
       ignoreAudioOnlyServices(true),
       ignoreEncryptedServices(false),
       forceUpdate(false),
-      scanTimeout(DVB_TABLES_TIMEOUT),
       channelFormat("%1_%2"),
       // State
       threadExit(false),
@@ -147,6 +142,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID)
                     this,     SLOT(TransportTableComplete()));
             connect(siparser, SIGNAL(FindServicesComplete()),
                     this,     SLOT(ServiceTableComplete()));
+            channelTimeout += SIPARSER_EXTRA_TIME;
             return;
         }
     }
@@ -248,28 +244,21 @@ bool SIScan::ScanServicesSourceID(int SourceID)
         return false;
     }
 
-    scanTimeout = DVB_TABLES_TIMEOUT;
     while (query.next())
     {
         int sourceid = query.value(0).toInt();
         int mplexid  = query.value(1).toInt();
         QString std  = query.value(2).toString();
         int tsid     = query.value(3).toInt();
-        scanTimeout = (std == "atsc") ?
-            ATSC_TABLES_TIMEOUT : DVB_TABLES_TIMEOUT;
 
         QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
             QString("Multiplex #%1").arg(mplexid);
 
         SISCAN("Adding "+fn);
 
-        TransportScanItem item(sourceid, std, fn, mplexid);
+        TransportScanItem item(sourceid, std, fn, mplexid, signalTimeout);
         scanTransports += item;
     }
-#ifdef USE_SIPARSER
-    if (siparser)
-        scanTimeout += SIPARSER_EXTRA_TIME;
-#endif
 
     waitingForTables  = false;
     transportsScanned = 0;
@@ -573,7 +562,7 @@ bool SIScan::HasTimedOut(void)
         QObject::tr("Timeout Scanning %1 -- no signal").arg(cur_chan);
 
     // have the tables have timed out?
-    if (timer.elapsed() > scanTimeout)
+    if (timer.elapsed() > (int)channelTimeout)
     { 
         emit ServiceScanUpdateText(time_out_table_str);
         SISCAN(time_out_table_str);
@@ -583,7 +572,7 @@ bool SIScan::HasTimedOut(void)
     // ok the tables haven't timed out, but have we hit the signal timeout?
     if (timer.elapsed() > (int)(*current).timeoutTune)
     {
-        // If we don't have a signal in SIGNAL_LOCK_TIMEOUT msec, continue..
+        // If we don't have a signal in timeoutTune msec, continue..
         SignalMonitor *sm = GetSignalMonitor();
         if (NULL == sm || sm->HasSignalLock())
             return false;
@@ -813,7 +802,8 @@ bool SIScan::ScanTransports(int SourceID,
             if (strNameFormat.length() >= 2)
                 name = strNameFormat.arg(name_num);
 
-            TransportScanItem item(SourceID, si_std, name, name_num, freq, ft);
+            TransportScanItem item(SourceID, si_std, name, name_num,
+                                   freq, ft, signalTimeout);
             scanTransports += item;
 
             SISCAN(item.toString());
@@ -824,7 +814,6 @@ bool SIScan::ScanTransports(int SourceID,
     }
 
     timer = QTime();
-    scanTimeout      = (si_std == "dvb") ? DVB_TABLES_TIMEOUT : ATSC_TABLES_TIMEOUT;
     waitingForTables = false;
 
     nextIt            = scanTransports.begin();
@@ -859,22 +848,19 @@ bool SIScan::ScanTransport(int mplexid)
         return false;
     }
 
-    scanTimeout = DVB_TABLES_TIMEOUT;
     while (query.next())
     {
         int sourceid = query.value(0).toInt();
         int mplexid  = query.value(1).toInt();
         QString std  = query.value(2).toString();
         int tsid     = query.value(3).toInt();
-        scanTimeout = (std == "atsc") ?
-            ATSC_TABLES_TIMEOUT : DVB_TABLES_TIMEOUT;
 
         QString fn = (tsid) ? QString("Transport ID %1").arg(tsid) :
             QString("Multiplex #%1").arg(mplexid);
         
         SISCAN("Adding "+fn);
 
-        TransportScanItem item(sourceid, std, fn, mplexid);
+        TransportScanItem item(sourceid, std, fn, mplexid, signalTimeout);
         scanTransports += item;
     }
 
@@ -943,43 +929,6 @@ void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
     }
 #endif // USING_DVB
 }
-
-// ///////////////////// Static helper methods /////////////////////
-// ///////////////////// Static helper methods /////////////////////
-// ///////////////////// Static helper methods /////////////////////
-// ///////////////////// Static helper methods /////////////////////
-// ///////////////////// Static helper methods /////////////////////
-
-#ifdef USING_DVB
-static uint scan_for_best_freq(const TransportObject& transport,
-                               DVBChannel *dvbc,
-                               dvb_channel_t& chan_opts)
-{
-    uint init_freq = chan_opts.tuning.params.frequency;
-    // Start off with the main frequency,
-    // then try the other ones in the list
-    QValueList<unsigned>::const_iterator fit = transport.frequencies.begin();
-    bool first_it = true;
-    do
-    {
-        if (!first_it)
-        {
-            chan_opts.tuning.params.frequency = *fit;
-            fit++;
-        }
-        first_it = false;
-
-        if (dvbc->Tune(chan_opts, true))
-        {
-            return chan_opts.tuning.params.frequency;
-            break;
-        }
-    }
-    while (fit != transport.frequencies.end());
-
-    return init_freq;
-}
-#endif // USING_DVB
 
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
@@ -1569,7 +1518,7 @@ void SIScan::CheckNIT(NITObject& NIT)
 
 #if 0 // disable for now
         //Start off with the main frequency,
-        if (GetDVBChannel()->TuneTransport(chan_opts, true, scanTimeout))
+        if (GetDVBChannel()->TuneTransport(chan_opts, true, channelTimeout))
         {
 //             cerr << "Tuned to main frequency "<< transport.Frequency << "\n";
             continue;
@@ -1582,7 +1531,7 @@ void SIScan::CheckNIT(NITObject& NIT)
             unsigned nfrequency = *f;
             chan_opts.tuning.params.frequency = nfrequency;
 //            cerr << "CheckNIT " << nfrequency << "\n";
-            if (GetDVBChannel()->TuneTransport(chan_opts, true, scanTimeout))
+            if (GetDVBChannel()->TuneTransport(chan_opts, true, channelTimeout))
             {
 //                cerr << "Tuned frequency "<< nfrequency << "\n";
                 transport.Frequency = nfrequency;
