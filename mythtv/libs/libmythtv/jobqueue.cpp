@@ -1826,7 +1826,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     int controlFlagging = JOB_RUN;
     QString subtitle = program_info->subtitle.isEmpty() ? "" :
                            QString(" \"%1\"").arg(program_info->subtitle);
-    QString logDesc = QString("%1%2 recorded from channel %2 at %3")
+    QString logDesc = QString("%1%2 recorded from channel %3 at %4")
                           .arg(program_info->title.local8Bit())
                           .arg(subtitle.local8Bit())
                           .arg(program_info->chanid)
