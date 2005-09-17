@@ -983,10 +983,10 @@ void PlaybackBox::updateShowTitles(QPainter *p)
         curitem = NULL;
     }
 
-    if (container && titleList.count() > 1)
+    if (container && titleList.count() >= 1)
     {
         UIListType *ltype = (UIListType *)container->GetType("toptitles");
-        if (ltype)
+        if (ltype && titleList.count() > 1)
         {
             ltype->ResetList();
             ltype->SetActive(inTitle);
@@ -1010,9 +1010,13 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 h = h % titleList.count();
              }
         }
+        else if (ltype)
+        {
+            ltype->ResetList();
+        }
 
         UITextType *typeText = (UITextType *)container->GetType("current");
-        if (typeText)
+        if (typeText && titleList.count() > 1)
         {
             if (titleList[titleIndex] == "")
                 tstring = groupDisplayName;
@@ -1031,9 +1035,13 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                     lcdTitle = " <<" + tstring;
             }
         }
+        else if (typeText)
+        {
+            typeText->SetText("");
+        }
 
         ltype = (UIListType *)container->GetType("bottomtitles");
-        if (ltype)
+        if (ltype && titleList.count() > 1)
         {
             ltype->ResetList();
             ltype->SetActive(inTitle);
@@ -1056,9 +1064,13 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 h = h % titleList.count();
             }
         }
+        else if (ltype)
+        {
+            ltype->ResetList();
+        }
 
         ltype = (UIListType *)container->GetType("showing");
-        if (ltype)
+        if (ltype && titleList.count() > 1)
         {
             ltype->ResetList();
             ltype->SetActive(!inTitle);
@@ -1134,6 +1146,10 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                     ltype->EnableForcedFont(cnt, "inactive");
             }
         } 
+        else if (ltype)
+        {
+            ltype->ResetList();
+        }
     } 
 
     if (lcddev && !lcdItems.isEmpty())
