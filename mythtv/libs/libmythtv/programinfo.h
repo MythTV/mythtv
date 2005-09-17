@@ -171,7 +171,6 @@ class ProgramInfo
     long long GetBookmark(void) const;
     bool IsEditing(void) const;
     bool IsCommFlagged(void) const;
-    bool IsCommProcessing(void) const;
     bool GetAutoExpireFromRecorded(void) const;
     bool GetPreserveEpisodeFromRecorded(void) const;
     bool UsesMaxEpisodes(void) const;

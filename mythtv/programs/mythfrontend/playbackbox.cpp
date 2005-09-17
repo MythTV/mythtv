@@ -3408,7 +3408,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     if (previewLastModified <  pginfo->lastmodified &&
         previewLastModified >= pginfo->recendts &&
         !pginfo->IsEditing() && 
-        !pginfo->IsCommProcessing())
+        !JobQueue::IsJobRunning(JOB_COMMFLAG, pginfo))
     {
         RemoteGeneratePreviewPixmap(pginfo);
         previewLastModified = getPreviewLastModified(pginfo);

@@ -498,7 +498,8 @@ bool JobQueue::QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes)
 }
 
 bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime, 
-                        QString args, QString comment, QString host, int flags)
+                        QString args, QString comment, QString host,
+                        int flags, int status)
 {
     int tmpStatus = JOB_UNKNOWN;
     int tmpCmd = JOB_UNKNOWN;
@@ -546,6 +547,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
     }
     if (! (tmpStatus & JOB_DONE) && (tmpCmd & JOB_STOP))
         return false;
+
     query.prepare("INSERT jobqueue (chanid, starttime, inserttime, type, "
                          "status, statustime, hostname, args, comment, flags) "
                      "VALUES (:CHANID, :STARTTIME, now(), :JOBTYPE, :STATUS, "
@@ -554,7 +556,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", starttime);
     query.bindValue(":JOBTYPE", jobType);
-    query.bindValue(":STATUS", JOB_QUEUED);
+    query.bindValue(":STATUS", status);
     query.bindValue(":HOST", host);
     query.bindValue(":ARGS", args);
     query.bindValue(":COMMENT", comment);
@@ -991,6 +993,11 @@ bool JobQueue::IsJobRunning(int jobType, QString chanid, QDateTime starttime)
     return false;
 }
 
+bool JobQueue::IsJobRunning(int jobType, ProgramInfo *pginfo)
+{
+    return JobQueue::IsJobRunning(jobType, pginfo->chanid, pginfo->recstartts);
+}
+
 bool JobQueue::IsJobQueuedOrRunning(int jobType, QString chanid,
                                     QDateTime starttime)
 {
@@ -1314,7 +1321,7 @@ int JobQueue::GetJobStatus(int jobType, QString chanid, QDateTime startts)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     
-    query.prepare("SELECT status,cmds FROM jobqueue WHERE type = :TYPE "
+    query.prepare("SELECT status FROM jobqueue WHERE type = :TYPE "
                   "AND chanid = :CHANID AND starttime = :STARTTIME;");
 
     query.bindValue(":TYPE", jobType);
@@ -1335,7 +1342,6 @@ int JobQueue::GetJobStatus(int jobType, QString chanid, QDateTime startts)
         return tmpStatus;
     }
     return JOB_UNKNOWN;
-
 }
 
 void JobQueue::RecoverQueue(bool justOld)

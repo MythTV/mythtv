@@ -303,8 +303,6 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
                                             program_info->recstartts,
                                             program_info->recendts);
 
-    jobID = -1;
-
     if (inJobQueue)
     {
         jobID = JobQueue::GetJobID(JOB_COMMFLAG, program_info->chanid,
@@ -420,19 +418,17 @@ int FlagCommercials(QString chanid, QString starttime)
              << starttime.leftJustify(14, ' ', true) << "  "
              << program_info->title.leftJustify(41, ' ', true) << "  ";
         cerr.flush();
+    }
 
-        if ((!force) && (program_info->IsCommProcessing()))
+    if (!force && JobQueue::IsJobRunning(JOB_COMMFLAG, program_info))
+    {
+        if (!quiet)
         {
             cerr << "IN USE\n";
             cerr << "                        "
                     "(the program is already being flagged elsewhere)\n";
-            return COMMFLAG_EXIT_IN_USE;
         }
-    }
-    else
-    {
-        if ((!force) && (program_info->IsCommProcessing()))
-            return COMMFLAG_EXIT_IN_USE;
+        return COMMFLAG_EXIT_IN_USE;
     }
 
     filename = program_info->GetPlaybackURL();
@@ -496,8 +492,32 @@ int FlagCommercials(QString chanid, QString starttime)
         nvp->SetWatchingRecording(watchingRecording);
     }
 
+    int fakeJobID = -1;
+    if (!inJobQueue)
+    {
+        JobQueue::QueueJob(JOB_COMMFLAG, program_info->chanid,
+                           program_info->recstartts, "", "",
+                           gContext->GetHostName(), JOB_EXTERNAL,
+                           JOB_RUNNING);
+        fakeJobID = JobQueue::GetJobID(JOB_COMMFLAG, program_info->chanid,
+                                       program_info->recstartts);
+        jobID = fakeJobID;
+        VERBOSE(VB_COMMFLAG,
+            QString("Not in JobQueue, creating fake Job ID %1").arg(jobID));
+    }
+    else
+        jobID = -1;
+
+
     breaksFound = DoFlagCommercials(showPercentage, fullSpeed, inJobQueue,
                                     nvp, commDetectMethod);
+
+    if (fakeJobID >= 0)
+    {
+        jobID = -1;
+        JobQueue::ChangeJobStatus(fakeJobID, JOB_FINISHED,
+            QObject::tr("Finished, %1 break(s) found.").arg(breaksFound));
+    }
 
     if (!quiet)
         cerr << breaksFound << "\n";

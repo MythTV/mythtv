@@ -1614,30 +1614,6 @@ void ProgramInfo::SetCommFlagged(int flag) const
                              query);
 }
 
-/** \fn ProgramInfo::IsCommProcessing() const
- *  \brief Returns true if commercial flagging has been started
- *         but not completed according to "commflagged" field in
- *         "recorded" table.
- */
-bool ProgramInfo::IsCommProcessing(void) const
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    
-    query.prepare("SELECT commflagged FROM recorded"
-                  " WHERE chanid = :CHANID"
-                  " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", recstartts);
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-        return (query.value(0).toInt() == COMM_FLAG_PROCESSING);
-    }
-
-    return false;
-}
-
 /** \fn ProgramInfo::SetPreserveEpisode(bool) const
  *  \brief Set "preserve" field in "recorded" table to "preserveEpisode".
  *  \param preserveEpisode value to set preserve field to.

@@ -49,9 +49,10 @@ enum JobCmds {
 };
 
 enum JobFlags {
-    JOB_REG_FLAGS    = 0x0000,
+    JOB_NO_FLAGS     = 0x0000,
     JOB_USE_CUTLIST  = 0x0001,
-    JOB_LIVE_REC     = 0x0002
+    JOB_LIVE_REC     = 0x0002,
+    JOB_EXTERNAL     = 0x0004
 };
 
 enum JobLists {
@@ -104,7 +105,7 @@ class JobQueue : public QObject
     static bool QueueJob(int jobType, QString chanid,
                          QDateTime starttime, QString args = "",
                          QString comment = "", QString host = "",
-                         int flags = 0);
+                         int flags = 0, int status = JOB_QUEUED);
     static bool QueueJobs(int jobTypes, QString chanid,
                          QDateTime starttime, QString args = "",
                          QString comment = "", QString host = "");
@@ -129,6 +130,7 @@ class JobQueue : public QObject
                                      QDateTime starttime);
     static bool IsJobRunning(int jobType, QString chanid,
                              QDateTime starttime);
+    static bool IsJobRunning(int jobType, ProgramInfo *pginfo);
     static bool IsJobQueued(int jobType, QString chanid, QDateTime starttime);
     static bool PauseJob(int jobID);
     static bool ResumeJob(int jobID);

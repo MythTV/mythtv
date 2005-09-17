@@ -323,7 +323,8 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     QDateTime statustime = curtime;
     if (honorCutList && m_proginfo)
     {
-        if (m_proginfo->IsEditing() || m_proginfo->IsCommProcessing())
+        if ((m_proginfo->IsEditing()) ||
+            (JobQueue::IsJobRunning(JOB_COMMFLAG, m_proginfo)))
         {
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, cutlist changed");
             return REENCODE_CUTLIST_CHANGE;
