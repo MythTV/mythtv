@@ -471,8 +471,7 @@ int FlagCommercials(QString chanid, QString starttime)
         return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
     }
 
-    if ((watchingRecording) &&
-        (program_info->recendts > QDateTime::currentDateTime()))
+    if (program_info->recendts > QDateTime::currentDateTime())
     {
         gContext->ConnectToMasterServer();
 
@@ -480,8 +479,8 @@ int FlagCommercials(QString chanid, QString starttime)
         if (recorder && (recorder->GetRecorderNumber() != -1))
         {
             recorderNum =  recorder->GetRecorderNumber();
+            watchingRecording = true;
             nvp->SetRecorder(recorder);
-            nvp->SetWatchingRecording(true);
 
             VERBOSE(VB_COMMFLAG, QString("mythcommflag will flag recording "
                     "currently in progress on cardid %1").arg(recorderNum));
@@ -494,6 +493,7 @@ int FlagCommercials(QString chanid, QString starttime)
             VERBOSE(VB_IMPORTANT, "Unable to find active recorder for this "
                     "recording, realtime flagging will not be enabled.");
         }
+        nvp->SetWatchingRecording(watchingRecording);
     }
 
     breaksFound = DoFlagCommercials(showPercentage, fullSpeed, inJobQueue,
@@ -617,11 +617,18 @@ int main(int argc, char *argv[])
         }
         else if (!strcmp(a.argv()[argpos], "-j"))
         {
+            int jobID = QString(a.argv()[++argpos]).toInt();
+            int jobType = JOB_NONE;
+
+            if ( !JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
+            {
+                cerr << "mythcommflag: ERROR: Unable to find DB info for "
+                     << "JobQueue ID# " << jobID << endl;
+                return COMMFLAG_EXIT_NO_PROGRAM_DATA;
+            }
+
             inJobQueue = true;
-        }
-        else if (!strcmp(a.argv()[argpos], "-l"))
-        {
-            watchingRecording = true;
+            force = true;
         }
         else if (!strcmp(a.argv()[argpos], "--all"))
         {
@@ -817,10 +824,9 @@ int main(int argc, char *argv[])
                     "-s OR --starttime starttime  Flag recording with given starttime\n"
                     "-f OR --file filename        Flag recording with specific filename\n"
                     "--video filename             Rebuild the seektable for a video (non-recording) file\n"
-                    "--sleep                      Give up some CPU time after processing\n"
+                    "--sleep                      Give up some CPU time after processing each frame\n"
                     "--rebuild                    Do not flag commercials, just rebuild seektable\n"
                     "--gencutlist                 Copy the commercial skip list to the cutlist\n"
-                    "                             each frame.\n"
                     "-v OR --verbose debug-level  Prints more information\n"
                     "                             Accepts any combination (separated by comma)\n" 
                     "                             of all,none,quiet,record,playback,\n"

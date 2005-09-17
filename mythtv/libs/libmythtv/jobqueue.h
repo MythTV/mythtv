@@ -113,6 +113,8 @@ class JobQueue : public QObject
                         QDateTime starttime);
     static bool GetJobInfoFromID(int jobID, int &jobType,
                                  QString &chanid, QDateTime &starttime);
+    static bool GetJobInfoFromID(int jobID, int &jobType,
+                                 QString &chanid, QString &starttime);
 
     static bool ChangeJobCmds(int jobID, int newCmds);
     static bool ChangeJobCmds(int jobType, QString chanid,

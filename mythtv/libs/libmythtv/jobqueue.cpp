@@ -659,6 +659,18 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
     return false;
 }
 
+bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid, 
+                                QString &starttime)
+{
+    QDateTime tmpStarttime;
+    bool result = JobQueue::GetJobInfoFromID(jobID, jobType, chanid,
+                                             tmpStarttime);
+    if (result)
+        starttime = tmpStarttime.toString("yyyyMMddhhmmss");
+
+    return result;
+}
+
 bool JobQueue::PauseJob(int jobID)
 {
     QString message = QString("GLOBAL_JOB PAUSE ID %1").arg(jobID);
@@ -1834,7 +1846,6 @@ void JobQueue::DoFlagCommercialsThread(void)
     
     QString key = GetJobQueueKey(program_info);
     int jobID = runningJobIDs[key];
-    bool stillRecording = !!(GetJobFlags(jobID) & JOB_LIVE_REC);
 
     childThreadStarted = true;
 
@@ -1864,14 +1875,8 @@ void JobQueue::DoFlagCommercialsThread(void)
     gContext->LogEntry("commflag", LP_NOTICE, msg, logDesc);
 
     int breaksFound = 0;
-    QString cmd =
-        QString("mythcommflag -j -V %1 --chanid %2 --starttime %3 --force")
-                .arg(print_verbose_messages)
-                .arg(program_info->chanid)
-                .arg(program_info->recstartts.toString("yyyyMMddhhmmss"));
-
-    if (stillRecording)
-        cmd += " -l";
+    QString cmd = QString("mythcommflag -j %1 -V %2")
+                          .arg(jobID).arg(print_verbose_messages);
 
     VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'").arg(cmd));
 
