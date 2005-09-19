@@ -2823,7 +2823,7 @@ void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
                                     tmpItem->recstartts))) {
             QString jobHost = "";
             if (gContext->GetNumSetting("JobsRunOnRecordingHost", 0))
-                jobHost = gContext->GetHostName();
+                jobHost = tmpItem->hostname;
 
             JobQueue::QueueJob(jobType, tmpItem->chanid,
                                tmpItem->recstartts, "", "", jobHost, jobFlags);
