@@ -24,7 +24,11 @@ map<Display*, XErrorVectorType>   error_map;
 map<Display*, XErrorCallbackType> error_handler_map;
 #endif // Q_WS_X11
 
-int GetNumberOfXineramaScreens()
+/** \fn GetNumberOfXineramaScreens(void)
+ *  \brief Returns number of Xinerama screens if Xinerama
+ *         is available, or 0 if it is not available.
+ */
+int GetNumberOfXineramaScreens(void)
 {
     int nr_xinerama_screens = 0;
 
@@ -37,8 +41,6 @@ int GetNumberOfXineramaScreens()
         XFree(XineramaQueryScreens(d, &nr_xinerama_screens));
     XCloseDisplay(d);
     X11U;
-#else
-    nr_xinerama_screens = QApplication::desktop()->numScreens();
 #endif // Q_WS_X11
 
     return nr_xinerama_screens;

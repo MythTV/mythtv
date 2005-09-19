@@ -31,6 +31,7 @@
 #include "dbsettings.h"
 #include "langsettings.h"
 #include "mythdbcon.h"
+#include "util-x11.h"
 
 // These defines provide portability for different
 // plugin file names.
@@ -230,7 +231,9 @@ void MythContextPrivate::GetScreenBounds()
             .arg(desktop->width()).arg(desktop->height())
             .arg(desktop->numScreens()));
 
-    int screen = parent->GetNumSetting("XineramaScreen", 0);
+    int screen = desktop->primaryScreen();
+    if (GetNumberOfXineramaScreens())
+        screen = parent->GetNumSetting("XineramaScreen", 0);
 
     if (screen == -1)       // Special case - span all screens
     {
@@ -248,9 +251,10 @@ void MythContextPrivate::GetScreenBounds()
     {
         if (screen < 0 || screen >= desktop->numScreens())
         {
-            VERBOSE(VB_ALL, QString("Xinerama screen %1 was specified,"
-                                    " but only %2 available?")
-                            .arg(screen).arg(desktop->numScreens()));
+            VERBOSE(VB_IMPORTANT, QString(
+                        "Xinerama screen %1 was specified,"
+                        " but only %2 available, so using screen 0.")
+                    .arg(screen).arg(desktop->numScreens()));
             screen = 0;
         }
 
