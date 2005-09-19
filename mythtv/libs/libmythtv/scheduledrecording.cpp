@@ -464,13 +464,6 @@ void ScheduledRecording::doneRecording(ProgramInfo& proginfo)
     VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details).local8Bit());
     gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
-    MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4")
-                 .arg(proginfo.cardid)
-                 .arg(proginfo.chanid)
-                 .arg(proginfo.startts.toString(Qt::ISODate))
-                 .arg(proginfo.recstatus));
-    gContext->dispatch(me);
-
     if (getRecordingType() == kFindOneRecord)
         remove();
 }

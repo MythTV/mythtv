@@ -944,23 +944,6 @@ void ProgramInfo::ApplyRecordStateChange(RecordingType newstate)
     record->save();
 }
 
-/** \fn ProgramInfo::ApplyRecordTimeChange(const QDateTime&, const QDateTime&)
- *  \brief Sets start and end times of "record", creating "record" if it
- *         does not exist.
- *  \param newstartts New start time.
- *  \param newendts   New end time.
- */
-void ProgramInfo::ApplyRecordTimeChange(const QDateTime &newstartts, 
-                                        const QDateTime &newendts)
-{
-    GetProgramRecordingStatus();
-    if (record->getRecordingType() != kNotRecording) 
-    {
-        record->setStart(newstartts);
-        record->setEnd(newendts);
-    }
-}
-
 /** \fn ProgramInfo::ApplyRecordRecPriorityChange(int)
  *  \brief Sets recording priority of "record", creating "record" if it
  *         does not exist.
@@ -1362,6 +1345,29 @@ void ProgramInfo::FinishedRecording(bool prematurestop)
     if (!prematurestop)
         record->doneRecording(*this);
 }
+
+/** \fn ProgramInfo::UpdateRecordingEnd(void) 
+ *  \brief Update information in the recorded table when the end-time
+ *  of a recording is changed.
+ */
+void ProgramInfo::UpdateRecordingEnd(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE recorded SET endtime = :ENDTIME, "
+                  "    recordid = :RECORDID "
+                  "WHERE chanid = :CHANID AND "
+                  "    starttime = :STARTTIME ");
+    query.bindValue(":ENDTIME", recendts);
+    query.bindValue(":RECORDID", recordid);
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+
+    query.exec();
+
+    if (!query.isActive())
+        MythContext::DBError("FinishedRecording update", query);
+}
+
 
 /** \fn ProgramInfo::SetFilesize(long long)
  *  \brief Sets recording file size in database, and sets "filesize" field.

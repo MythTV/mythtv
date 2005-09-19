@@ -627,7 +627,7 @@ void MainServer::customEvent(QCustomEvent *e)
             if (m_sched)
             {
                 QStringList tokens = QStringList::split(" ", me->Message());
-                if (tokens.size() != 5)
+                if (tokens.size() != 6)
                 {
                     VERBOSE(VB_ALL, "Bad UPDATE_RECORDING_STATUS message");
                     return;
@@ -638,7 +638,10 @@ void MainServer::customEvent(QCustomEvent *e)
                 QDateTime startts = QDateTime::fromString(tokens[3], 
                                                           Qt::ISODate);
                 RecStatusType recstatus = RecStatusType(tokens[4].toInt());
-                m_sched->UpdateRecStatus(cardid, chanid, startts, recstatus);
+                QDateTime recendts = QDateTime::fromString(tokens[5], 
+                                                           Qt::ISODate);
+                m_sched->UpdateRecStatus(cardid, chanid, startts, 
+                                         recstatus, recendts);
                 return;
             }
         }

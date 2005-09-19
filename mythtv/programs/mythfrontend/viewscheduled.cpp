@@ -260,9 +260,10 @@ void ViewScheduled::FillList(void)
     ProgramInfo *p = recList.first();
     while (p)
     {
-        if (p->recendts >= now && (showAll || p->recstatus <= rsWillRecord || 
-                                   (p->recstatus > rsEarlierShowing && 
-                                    p->recstatus != rsRepeat)))
+        if ((p->recendts >= now || p->endts >= now) && 
+            (showAll || p->recstatus <= rsWillRecord || 
+             (p->recstatus > rsEarlierShowing && 
+              p->recstatus != rsRepeat)))
             p = recList.next();
         else
         {

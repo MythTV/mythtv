@@ -33,7 +33,8 @@ class Scheduler : public QObject
 
     void UpdateRecStatus(ProgramInfo *pginfo);
     void UpdateRecStatus(int cardid, const QString &chanid, 
-                         const QDateTime &startts, RecStatusType recstatus);
+                         const QDateTime &startts, RecStatusType recstatus, 
+                         const QDateTime &recendts);
     bool ReactivateRecording(ProgramInfo *pginfo);
 
     RecList *getAllPending(void) { return &reclist; }
@@ -83,6 +84,7 @@ class Scheduler : public QObject
     void MoveHigherRecords(void);
     void PruneRedundants(void);
 
+    bool ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp);
 
     void findAllScheduledPrograms(list<ProgramInfo *> &proglist);
     bool CheckShutdownServer(int prerollseconds, QDateTime &idleSince,

@@ -328,7 +328,7 @@ void Scheduler::PrintList(bool onlyFutureRecordings)
         ProgramInfo *first = (*i);
 
         if (onlyFutureRecordings &&
-            (first->recendts < now ||
+            ((first->recendts < now && first->endts < now) ||
              (first->recstartts < now && !Recording(first))))
             continue;
 
@@ -387,11 +387,9 @@ void Scheduler::UpdateRecStatus(ProgramInfo *pginfo)
 
 void Scheduler::UpdateRecStatus(int cardid, const QString &chanid, 
                                 const QDateTime &startts, 
-                                RecStatusType recstatus)
+                                RecStatusType recstatus, 
+                                const QDateTime &recendts)
 {
-    VERBOSE(VB_ALL, QString("Received U_R_S: %1 %2 %3 %4")
-            .arg(cardid).arg(chanid).arg(startts.toString(Qt::ISODate)).arg(recstatus));
-
     QMutexLocker lockit(reclist_lock);
 
     RecIter dreciter = reclist.begin();
@@ -402,6 +400,8 @@ void Scheduler::UpdateRecStatus(int cardid, const QString &chanid,
             p->chanid == chanid &&
             p->startts == startts)
         {
+            p->recendts = recendts;
+
             if (p->recstatus != recstatus)
             {
                 p->recstatus = recstatus;
@@ -410,6 +410,31 @@ void Scheduler::UpdateRecStatus(int cardid, const QString &chanid,
             return;
         }
     }
+}
+
+bool Scheduler::ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp)
+{
+    RecordingType oldrectype = oldp->rectype;
+    int oldrecordid = oldp->recordid;
+    QDateTime oldrecendts = oldp->recendts;
+
+    oldp->rectype = newp->rectype;
+    oldp->recordid = newp->recordid;
+    oldp->recendts = newp->recendts;
+
+    EncoderLink *tv = (*m_tvList)[oldp->cardid];
+    RecStatusType rs = tv->StartRecording(oldp);
+    if (rs != rsRecording)
+    {
+        VERBOSE(VB_IMPORTANT, QString("Failed to change end time on "
+                                      "card %1 to %2")
+                .arg(oldp->cardid).arg(oldp->recendts.toString()));
+        oldp->rectype = oldrectype;
+        oldp->recordid = oldrecordid;
+        oldp->recendts = oldrecendts;
+    }
+
+    return rs == rsRecording;
 }
 
 bool Scheduler::ReactivateRecording(ProgramInfo *pginfo)
@@ -465,14 +490,14 @@ void Scheduler::SlaveConnected(ProgramList &slavelist)
                     found = true;
                     rp->recstatus = rsRecording;
                     rp->AddHistory(false);
-                    VERBOSE(VB_ALL, QString("setting %1/%2/\"%3\" as "
-                                            "recording")
+                    VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as "
+                                                  "recording")
                             .arg(sp->cardid).arg(sp->chansign).arg(sp->title));
                 }
                 else
                 {
-                    VERBOSE(VB_ALL, QString("%1/%2/\"%3\" is already "
-                                            "recording on card %4")
+                    VERBOSE(VB_IMPORTANT, QString("%1/%2/\"%3\" is already "
+                                                  "recording on card %4")
                             .arg(sp->cardid).arg(sp->chansign).arg(sp->title)
                             .arg(rp->cardid));
                 }
@@ -482,7 +507,7 @@ void Scheduler::SlaveConnected(ProgramList &slavelist)
             {
                 rp->recstatus = rsAborted;
                 rp->AddHistory(false);
-                VERBOSE(VB_ALL, QString("setting %1/%2/\"%3\" as aborted")
+                VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as aborted")
                         .arg(rp->cardid).arg(rp->chansign).arg(rp->title));
             }
         }
@@ -491,7 +516,7 @@ void Scheduler::SlaveConnected(ProgramList &slavelist)
         {
             reclist.push_back(new ProgramInfo(*sp));
             sp->AddHistory(false);
-            VERBOSE(VB_ALL, QString("adding %1/%2/\"%3\" as recording")
+            VERBOSE(VB_IMPORTANT, QString("adding %1/%2/\"%3\" as recording")
                     .arg(sp->cardid).arg(sp->chansign).arg(sp->title));
         }
     }
@@ -511,7 +536,7 @@ void Scheduler::SlaveDisconnected(int cardid)
         {
             rp->recstatus = rsAborted;
             rp->AddHistory(false);
-            VERBOSE(VB_ALL, QString("setting %1/%2/\"%3\" as aborted")
+            VERBOSE(VB_IMPORTANT, QString("setting %1/%2/\"%3\" as aborted")
                     .arg(rp->cardid).arg(rp->chansign).arg(rp->title));
         }
     }
@@ -2027,6 +2052,12 @@ void Scheduler::AddNewRecords(void) {
                 }
                 else
                 {
+                    if (r->recstatus == rsRecording &&
+                        r->inputid == p->inputid &&
+                        r->recendts != p->recendts &&
+                        (r->recordid == p->recordid ||
+                         p->rectype == kOverrideRecord))
+                        ChangeRecordingEnd(r, p);
                     delete p;
                     p = NULL;
                 }

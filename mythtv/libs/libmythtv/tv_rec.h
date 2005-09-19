@@ -281,6 +281,7 @@ class TVRec
 
     // State variables
     QMutex  stateChangeLock;
+    QMutex  endTimeLock;
     TVState internalState;
     TVState desiredNextState;
     bool    changeState;

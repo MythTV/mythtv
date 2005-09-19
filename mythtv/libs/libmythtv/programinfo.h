@@ -133,8 +133,6 @@ class ProgramInfo
     RecordingType GetProgramRecordingStatus(void);
     QString GetProgramRecordingProfile(void);
     void ApplyRecordStateChange(RecordingType newstate);
-    void ApplyRecordTimeChange(const QDateTime &newstartts,
-                               const QDateTime &newendts);
     void ApplyRecordRecPriorityChange(int);
     void ToggleRecord(void);
     void AddHistory(bool resched = true);
@@ -144,6 +142,7 @@ class ProgramInfo
     // Used to update database with recording info
     void StartedRecording(const QString &basename);
     void FinishedRecording(bool prematurestop);
+    void UpdateRecordingEnd(void);
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
 
     // Quick gets

@@ -104,6 +104,7 @@ TVRec::TVRec(int capturecardnum)
       m_capturecardnum(capturecardnum), ispip(false),
       // State variables
       stateChangeLock(true),
+      endTimeLock(false),
       internalState(kState_None), desiredNextState(kState_None),
       changeState(false),
       startingRecording(false), abortRecordingStart(false),
@@ -337,6 +338,39 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 {
     RecStatusType retval = rsAborted;
 
+    // We need to do this check early so we don't cancel an overrecord
+    // that we're trying to extend.
+    endTimeLock.lock();
+    if (!changeState &&
+        StateIsRecording(internalState) &&
+        curRecording->title == rcinfo->title &&
+        curRecording->chanid == rcinfo->chanid &&
+        curRecording->startts == rcinfo->startts)
+    {
+        curRecording->rectype = rcinfo->rectype;
+        curRecording->recordid = rcinfo->recordid;
+        curRecording->recendts = rcinfo->recendts;
+        curRecording->UpdateRecordingEnd();
+        MythEvent me("RECORDING_LIST_CHANGE");
+        gContext->dispatch(me);
+
+        recordEndTime = curRecording->recendts;
+        inoverrecord = (recordEndTime < QDateTime::currentDateTime());
+        VERBOSE(VB_IMPORTANT,
+                QString("updating recording: %1 %2 %3 %4")
+                .arg(curRecording->title)
+                .arg(curRecording->chanid)
+                .arg(curRecording->recstartts.toString())
+                .arg(curRecording->recendts.toString()));
+        if (cancelNextRecording)
+            cancelNextRecording = false;
+        endTimeLock.unlock();
+
+        retval = rsRecording;
+        return retval;
+    }
+    endTimeLock.unlock();
+
     recordPending = false;
     askAllowRecording = false;
 
@@ -409,9 +443,11 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     }
     else if (!cancelNextRecording)
     {
-        VERBOSE(VB_IMPORTANT, QString("Wanted to record: \n%1 %2 %3")
-                .arg(rcinfo->title).arg(rcinfo->chanid)
-                .arg(rcinfo->startts.toString()));
+        VERBOSE(VB_IMPORTANT, QString("Wanted to record: %1 %2 %3 %4")
+                .arg(rcinfo->title)
+                .arg(rcinfo->chanid)
+                .arg(rcinfo->recstartts.toString())
+                .arg(rcinfo->recendts.toString()));
         VERBOSE(VB_IMPORTANT, QString("But the current state is: %1")
                 .arg(StateToString(internalState)));
         if (curRecording)
@@ -419,8 +455,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             VERBOSE(VB_IMPORTANT,
                     QString("currently recording: %1 %2 %3 %4")
                     .arg(curRecording->title).arg(curRecording->chanid)
-                    .arg(curRecording->startts.toString())
-                    .arg(curRecording->endts.toString()));
+                    .arg(curRecording->recstartts.toString())
+                    .arg(curRecording->recendts.toString()));
         }
 
         retval = rsTunerBusy;
@@ -530,10 +566,19 @@ void TVRec::FinishedRecording(void)
     if (!curRecording)
         return;
 
+    curRecording->recstatus = rsRecorded;
     curRecording->recendts = QDateTime::currentDateTime().addSecs(30);
     curRecording->recendts.setTime(QTime(
         curRecording->recendts.time().hour(),
         curRecording->recendts.time().minute()));
+
+    MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
+                 .arg(curRecording->cardid)
+                 .arg(curRecording->chanid)
+                 .arg(curRecording->startts.toString(Qt::ISODate))
+                 .arg(curRecording->recstatus)
+                 .arg(curRecording->recendts.toString(Qt::ISODate)));
+    gContext->dispatch(me);
 
     curRecording->FinishedRecording(prematurelystopped);
 }
@@ -1677,6 +1722,7 @@ void TVRec::RunTV(void)
 
         if (StateIsRecording(internalState))
         {
+            endTimeLock.lock();
             if (QDateTime::currentDateTime() > recordEndTime || finishRecording)
             {
                 if (!inoverrecord && overrecordseconds > 0)
@@ -1693,6 +1739,7 @@ void TVRec::RunTV(void)
                 }
                 finishRecording = false;
             }
+            endTimeLock.unlock();
         }
 
         if (exitPlayer)
