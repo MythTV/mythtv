@@ -3,6 +3,7 @@
 #include <vector>
 #include <qglobal.h> // for Q_WS_X11 define
 
+#include "config.h" // for CONFIG_DARWIN
 #include "mythcontext.h"
 
 QMutex x11_lock;
@@ -41,8 +42,12 @@ int GetNumberOfXineramaScreens(void)
         XFree(XineramaQueryScreens(d, &nr_xinerama_screens));
     XCloseDisplay(d);
     X11U;
-#endif // Q_WS_X11
-
+#else // if !Q_WS_X11
+#if CONFIG_DARWIN
+    // Mac OS X when not using X11 server supports Xinerama.
+    nr_xinerama_screens = QApplication::desktop()->numScreens();
+#endif // CONFIG_DARWIN
+#endif // !Q_WS_X11
     return nr_xinerama_screens;
 }
 
