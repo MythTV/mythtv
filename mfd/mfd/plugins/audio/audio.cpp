@@ -558,7 +558,11 @@ bool AudioPlugin::playUrl(QUrl url, int collection_id)
                 int daap_server_type = which_container->getServerType();
                 metadata_server->unlockMetadata();
 
-                if (daap_server_type == MST_daap_itunes49)
+                if (daap_server_type == MST_daap_itunes50)
+                {
+                    input = new DaapInput(this, url, DAAP_SERVER_ITUNES50);
+                }
+                else if (daap_server_type == MST_daap_itunes49)
                 {
                     input = new DaapInput(this, url, DAAP_SERVER_ITUNES49);
                 }
