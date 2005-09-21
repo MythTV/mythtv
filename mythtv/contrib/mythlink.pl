@@ -24,8 +24,8 @@
 # Some variables we'll use here
     our ($dest, $format, $usage, $underscores);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
-    our ($db_host, $db_user, $db_name, $db_pass, $video_dir);
-    our ($hostname, $dbh, $sh);
+    our ($db_host, $db_user, $db_name, $db_pass, $video_dir, @files);
+    our ($hostname, $dbh, $sh, $sh2, $q, $q2);
 
 # Default filename format
     $dformat = '%T %- %Y-%m-%d, %g-%i %A %- %S';
@@ -198,7 +198,7 @@ EOF
     }
 
 # Find the directory where the recordings are located
-    $q = "SELECT data FROM settings WHERE value='RecordFilePrefix' AND hostname=?";
+    $q = 'SELECT data FROM settings WHERE value="RecordFilePrefix" AND hostname=?';
     $sh = $dbh->prepare($q);
         $sh->execute($hostname) or die "Could not execute ($q):  $!\n\n";
     ($video_dir) = $sh->fetchrow_array;
@@ -225,25 +225,49 @@ EOF
         unlink $file or die "Couldn't remove old symlink $file:  $!\n";
     }
 
-# Prepare a database query
-    $sh = $dbh->prepare('SELECT title, subtitle, description, recgroup, category, originalairdate FROM recorded WHERE chanid=? AND starttime=? AND endtime=?');
+# Load the files
+    opendir(DIR, $video_dir) or die "Can't open $video_dir:  $!\n\n";
+    @files = grep /\.(?:mpg|nuv)$/, readdir(DIR);
+    closedir DIR;
+
+# Prepare a database queries
+    $q  = 'SELECT * FROM recorded WHERE basename=?';
+    $q2 = 'SELECT * FROM recorded WHERE chanid=? AND starttime=?';
+
+    $sh  = $dbh->prepare($q);
+    $sh2 = $dbh->prepare($q2);
 
 # Create symlinks for the files on this machine
-    foreach my $file (<$video_dir/*.nuv>) {
+    foreach my $file (@files) {
         next if ($file =~ /^ringbuf/);
-    # Pull out the various parts that make up the filename
-        my ($channel,
-            $syear, $smonth, $sday, $shour, $sminute, $ssecond,
-            $eyear, $emonth, $eday, $ehour, $eminute, $esecond) = $file =~/^$video_dir\/([a-z0-9]+)_(....)(..)(..)(..)(..)(..)_(....)(..)(..)(..)(..)(..)\.nuv$/i;
-    # Found a bad filename?
-        unless ($channel) {
-            print "Unknown filename format:  $file\n";
+    # Info hash
+        my %info;
+    # New db format? (no errors, since this query will break with mythtv < .19)
+        $sh->execute($file);
+        %info = %{$sh->fetchrow_hashref};
+    # Nope
+        unless ($info{'chanid'}) {
+        # Pull out the various parts that make up the filename
+            my ($channel, $starttime) = $file =~/^(\d+)_(\d{14})[_\.]/i;
+        # Found a bad filename?
+            unless ($channel) {
+                print "Unknown filename format:  $file\n";
+                next;
+            }
+        # Execute the query
+            $sh2->execute($channel, $starttime)
+                or die "Could not execute ($q2):  $!\n\n";
+            %info = %{$sh2->fetchrow_hashref};
+        }
+    # Unknown file - someday we should report this
+        unless ($info{'chanid'}) {
+            print STDERR "Unknown file:  $file\n";
             next;
         }
-    # Query the desired info about this recording
-        $sh->execute($channel, "$syear$smonth$sday$shour$sminute$ssecond", "$eyear$emonth$eday$ehour$eminute$esecond")
-            or die "Could not execute ($q):  $!\n\n";
         my ($title, $subtitle, $description, $recgroup, $category, $oad) = $sh->fetchrow_array;
+    # Default times
+        my ($syear, $smonth, $sday, $shour, $sminute, $ssecond) = $info{'starttime'} =~ /(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/;
+        my ($eyear, $emonth, $eday, $ehour, $eminute, $esecond) = $info{'endtime'}   =~ /(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/;
     # Format some fields we may be parsing below
         # Start time
         my $meridian = ($shour > 12) ? 'AM' : 'PM';
@@ -263,17 +287,16 @@ EOF
         elsif ($ethour < 1) {
             $ethour = 12;
         }
-        # Original airdate
-        # Handle NULL values for original airdate.
-        $oad ||= '0000-00-00';
-        my ($oyear, $omonth, $oday) = split(/\-/, $oad, 3);
+    # Original airdate
+        $info{'originalairdate'} ||= '0000-00-00';
+        my ($oyear, $omonth, $oday) = split(/\-/, $info{'originalairdate'}, 3);
     # Build a list of name format options
         my %fields;
-        ($fields{'T'} = ($title       or '')) =~ s/%/%%/g;
-        ($fields{'S'} = ($subtitle    or '')) =~ s/%/%%/g;
-        ($fields{'R'} = ($description or '')) =~ s/%/%%/g;
-        ($fields{'C'} = ($category    or '')) =~ s/%/%%/g;
-        ($fields{'U'} = ($recgroup    or '')) =~ s/%/%%/g;
+        ($fields{'T'} = ($info{'title'}       or '')) =~ s/%/%%/g;
+        ($fields{'S'} = ($info{'subtitle'}    or '')) =~ s/%/%%/g;
+        ($fields{'R'} = ($info{'description'} or '')) =~ s/%/%%/g;
+        ($fields{'C'} = ($info{'category'}    or '')) =~ s/%/%%/g;
+        ($fields{'U'} = ($info{'recgroup'}    or '')) =~ s/%/%%/g;
     # Start time
         $fields{'y'} = substr($syear, 2);   # year, 2 digits
         $fields{'Y'} = $syear;              # year, 4 digits
@@ -347,10 +370,11 @@ EOF
             $name .= ".$count";
         }
     # Create the link
-        symlink $file, "$dest/$name$suffix"
+        symlink "$video_dir/$file", "$dest/$name$suffix"
             or die "Can't create symlink $dest/$name$suffix:  $!\n";
         print "$dest/$name$suffix\n";
     }
 
     $sh->finish;
+    $sh2->finish;
 
