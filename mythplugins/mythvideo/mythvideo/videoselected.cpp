@@ -188,7 +188,7 @@ void VideoSelected::updatePlayWait(QPainter *p)
     while (parentItem->ChildID() > 0 && playing_time.elapsed() > 10000)
     {
         childItem->setID(parentItem->ChildID());
-        childItem = video_list->getVideoListMetadata(parentItem->ChildID());
+        childItem->fillDataFromID();
 
         if (parentItem->ChildID() > 0)
         {
