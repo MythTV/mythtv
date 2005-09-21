@@ -3707,7 +3707,7 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
 
     ClearAfterSeek();
 
-    QTime flagTime;
+    MythTimer flagTime;
     flagTime.start();
 
     GetFrame(-1,true);

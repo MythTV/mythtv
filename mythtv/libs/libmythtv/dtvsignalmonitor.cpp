@@ -359,7 +359,7 @@ bool DTVSignalMonitor::WaitForLock(int timeout)
     if (timeout < 0)
         return false;
 
-    QTime t;
+    MythTimer t;
     t.start();
     while (t.elapsed()<timeout && running)
     {

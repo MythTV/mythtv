@@ -813,7 +813,7 @@ bool SIScan::ScanTransports(int SourceID,
         }
     }
 
-    timer = QTime();
+    timer.start();
     waitingForTables = false;
 
     nextIt            = scanTransports.begin();
@@ -864,7 +864,7 @@ bool SIScan::ScanTransport(int mplexid)
         scanTransports += item;
     }
 
-    timer = QTime();
+    timer.start();
     waitingForTables  = false;
 
     transportsScanned = 0;

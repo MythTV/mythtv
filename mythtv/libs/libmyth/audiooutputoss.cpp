@@ -23,6 +23,7 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "audiooutputoss.h"
+#include "util.h"
 
 AudioOutputOSS::AudioOutputOSS(QString audiodevice, int laudio_bits, 
                                int laudio_channels, int laudio_samplerate,
@@ -48,7 +49,7 @@ bool AudioOutputOSS::OpenDevice()
 {
     numbadioctls = 0;
 
-    QTime timer;
+    MythTimer timer;
     timer.start();
 
     VERBOSE(VB_GENERAL, QString("Opening OSS audio device '%1'.")

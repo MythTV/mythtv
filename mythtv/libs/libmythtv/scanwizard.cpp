@@ -642,7 +642,8 @@ void ScanWizardScanner::HandleTuneComplete(void)
     {
         SISCAN("ScanWizardScanner::HandleTuneComplete(): "
                "Waiting for scan to start.");
-        QTime t = QTime::currentTime();
+        MythTimer t;
+        t.start();
         while (!scanner && t.elapsed() < 500)
             usleep(250);
         if (!scanner)

@@ -16,6 +16,27 @@ class QImage;
 class QPainter;
 class QFont;
 
+class MythTimer
+{
+  public:
+    MythTimer() {}
+
+    void start() { m_timer.start(); }
+    int restart() { int ret = elapsed(); 
+                    m_timer.restart(); 
+                    return ret; 
+                  }
+    int elapsed() { int ret = m_timer.elapsed();
+                    if (ret > 86300000) { ret = 0;  m_timer.restart(); }
+                    return ret;
+                  }
+
+    void addMSecs(int ms) { m_timer.addMSecs(ms); }
+
+  private:
+    QTime m_timer;
+};
+
 QString SocDevErrStr(int error);
 
 // QSockectDevice (frontend)

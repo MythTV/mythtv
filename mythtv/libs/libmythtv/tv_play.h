@@ -12,6 +12,7 @@
 
 #include "mythdeque.h"
 #include "tv.h"
+#include "util.h"
 
 #include <qobject.h>
 
@@ -384,7 +385,7 @@ class TV : public QObject
     /// to the "UDPNotifyPort" in an OSD dialog.
     UDPNotify      *udpnotify;
     QStringList     lastSignalMsg;
-    QTime           lastSignalMsgTime;
+    MythTimer       lastSignalMsgTime;
     QMutex          osdlock;
 
     // LCD Info

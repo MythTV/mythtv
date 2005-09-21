@@ -145,7 +145,7 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
     int btw = payload.length();
     int written = 0;
     
-    QTime timer;
+    MythTimer timer;
     timer.start();
 
     while (btw > 0)
@@ -202,7 +202,7 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
         return false;
     }    
 
-    QTime timer;
+    MythTimer timer;
     timer.start();
     int elapsed = 0;
 

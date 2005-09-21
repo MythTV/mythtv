@@ -223,7 +223,7 @@ TV::TV(void)
 {
     lastLcdUpdate = QDateTime::currentDateTime();
     lastLcdUpdate.addYears(-1); // make last LCD update last year..
-    lastSignalMsgTime = QTime::currentTime();
+    lastSignalMsgTime.start();
     lastSignalMsgTime.addMSecs(-2 * kSMExitTimeout);
 
     sleep_times.push_back(SleepTimerInfo(QObject::tr("Off"),       0));
@@ -919,7 +919,7 @@ void TV::ForceNextStateNone()
 bool TV::StartRecorder(int maxWait)
 {
     maxWait = (maxWait <= 0) ? 20000 : maxWait;
-    QTime t;
+    MythTimer t;
     t.start();
     while (!recorder->IsRecording() && !exitPlayer && t.elapsed() < maxWait)
         usleep(50);
@@ -949,7 +949,7 @@ bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
 #ifdef USING_VALGRIND
     maxWait = (1<<30);
 #endif // USING_VALGRIND
-    QTime t;
+    MythTimer t;
     t.start();
     while (!nvp->IsPlaying() && nvp->IsDecoderThreadAlive() &&
            (t.elapsed() < maxWait))

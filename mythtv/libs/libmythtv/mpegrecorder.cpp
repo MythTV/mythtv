@@ -407,7 +407,7 @@ void MpegRecorder::StartRecording(void)
     unsigned char *buffer = new unsigned char[bufferSize + 1];
     int ret;
 
-    QTime elapsedTimer;
+    MythTimer elapsedTimer;
     float elapsed;
 
     if (deviceIsMpegFile)

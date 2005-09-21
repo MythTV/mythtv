@@ -11,7 +11,6 @@
 #include "mythcontext.h"
 #include "mythdialogs.h"
 #include "mythdbcon.h"
-#include "../libmythtv/tv.h"
 
 #include <unistd.h>
 #include <cmath>
@@ -1978,6 +1977,9 @@ void LCD::customEvent(QCustomEvent *e)
 
 void LCD::updateRecordingList(void)
 {
+    return;
+/* Disabled due to threading issue, the backend cannot be queried in a custom Event */
+#if 0
     if (!gContext->IsConnectedToMaster())
     {    
         VERBOSE(VB_IMPORTANT, "LCD: Cannot get recording status "
@@ -2055,4 +2057,5 @@ void LCD::updateRecordingList(void)
     }
     
     lcdTunerNo = 0;
+#endif
 }

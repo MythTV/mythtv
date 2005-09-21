@@ -94,7 +94,7 @@ int RingBufferInfo::RequestBlock(uint size)
         return -1;
     }
 
-    QTime t;
+    MythTimer t;
     t.start();
     while (tot < (int)size &&
            !ringBuffer->GetStopReads() &&

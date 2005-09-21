@@ -14,6 +14,8 @@ using namespace std;
 
 #include "mythcontext.h"
 #include "audiooutputjack.h"
+#include "util.h"
+
 extern "C"
 {
 #include "bio2jack.h"
@@ -43,7 +45,7 @@ AudioOutputJACK::~AudioOutputJACK()
 
 bool AudioOutputJACK::OpenDevice()
 {
-    QTime timer;
+    MythTimer timer;
     timer.start();
 
     unsigned long jack_port_flags=JackPortIsPhysical;

@@ -269,7 +269,7 @@ bool SignalMonitor::WaitForLock(int timeout)
     if (timeout<0)
         return false;
 
-    QTime t;
+    MythTimer t;
     t.start();
     if (running)
     {

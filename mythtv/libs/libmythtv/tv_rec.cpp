@@ -397,7 +397,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         MythEvent me(message);
         gContext->dispatch(me);
 
-        QTime timer;
+        MythTimer timer;
         timer.start();
 
         while (internalState != kState_None && timer.elapsed() < 10000)
@@ -695,7 +695,7 @@ static bool wait_for_dvb(ChannelBase *channel, int timeout,
         return true;
 
     VERBOSE(VB_RECORD, "TVRec: DVB Recorder waiting for PMT.");
-    QTime t;
+    MythTimer t;
     t.start();
     while (t.elapsed() < timeout && !abortRecordingStart)
     {
@@ -1345,7 +1345,7 @@ static int get_max_timeout(SignalMonitor *signalMonitor, bool livetv)
 static bool wait_for_good_signal(SignalMonitor *signalMonitor, int timeout,
                                  bool &abortRecordingStart)
 {
-    QTime t;
+    MythTimer t;
     t.start();
     while (true)
     {

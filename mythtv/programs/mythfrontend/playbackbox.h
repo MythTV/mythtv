@@ -224,10 +224,10 @@ class PlaybackBox : public MythDialog
     { kNvpToPlay, kNvpToStop, kDone } killStateType;
      
     killStateType killState;
-    QTime killTimeout;
+    MythTimer killTimeout;
 
-    QTime nvpTimeout;    
-    QTime waitToStartPreviewTimer;
+    MythTimer nvpTimeout;    
+    MythTimer waitToStartPreviewTimer;
     bool waitToStart;
  
     QDateTime lastUpdateTime;

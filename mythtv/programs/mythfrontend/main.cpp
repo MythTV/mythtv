@@ -242,7 +242,7 @@ void startTV(void)
 {
     TV *tv = new TV();
 
-    QTime timer;
+    MythTimer timer;
     timer.start();
 
     if (!tv->Init())

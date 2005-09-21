@@ -228,7 +228,7 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
             m_programInfos[y][x] = NULL;
     }
 
-    //QTime clock = QTime::currentTime();
+    //MythTimer clock = QTime::currentTime();
     //clock.start();
     fillTimeInfos();
     //int filltime = clock.elapsed();
