@@ -22,47 +22,31 @@
     use File::Path;
 
 # Some variables we'll use here
-    our ($dest, $format, $usage);
+    our ($dest, $format, $usage, $underscores);
+    our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
     our ($db_host, $db_user, $db_name, $db_pass, $video_dir);
     our ($hostname, $dbh, $sh);
 
 # Default filename format
-    $dformat = '%T - %Y-%m-%d, %g-%i %A - %S';
+    $dformat = '%T %- %Y-%m-%d, %g-%i %A %- %S';
 # Default separator character
-    $dseparator_char = '-';
+    $dseparator = '-';
 # Default replacement character
-    $dreplacement_char = '-';
-# Default space character
-    $dspace_char = ' ';
+    $dreplacement = '-';
 
 # Provide default values for GetOptions
-    $format = $dformat;
-    $separator_char = $dseparator_char;
-    $replacement_char = $dreplacement_char;
-    $space_char = $dspace_char;
+    $format      = $dformat;
+    $separator   = $dseparator;
+    $replacement = $dreplacement;
 
 # Load the destination directory, if one was specified
     GetOptions('dest|destination|path=s'    => \$dest,
                'format=s'                   => \$format,
-               'sepchar|separator-char=s'   => \$separator_char,
-               'repchar|replacement-char=s' => \$replacement_char,
-               'space|space-char=s'         => \$space_char,
+               'separator=s'                => \$separator,
+               'replacement=s'              => \$replacement,
                'usage|help|h'               => \$usage,
+               'underscores'                => \$underscores
               );
-
-# Check the separator, replacement, and space characters for illegal characters
-    if ($separator_char =~ /(?:[\/\\:*?<>|"])/) {
-      print "Illegal separator character specified.  Using default.\n";
-      $separator_char = $dseparator_char;
-    }
-    if ($replacement_char =~ /(?:[\/\\:*?<>|"])/) {
-      print "Illegal replacement character specified.  Using default.\n";
-      $replacement_char = $dreplacement_char;
-    }
-    if ($space_char =~ /(?:[\/\\:*?<>|"])/) {
-      print "Illegal space character specified.  Using default.\n";
-      $space_char = $dspace_char;
-    }
 
 # Print usage
     if ($usage) {
@@ -112,28 +96,30 @@ options:
 
     * A suffix of .mpg or .nuv will be added where appropriate.
 
---separator-char
+--separator
 
-    The character used to separate sections of the link name.  Specifying the
-    separator character allows trailing separators to be removed from the link
-    name and multiple separators caused by missing data to be consolidated.
-    Indicate the separator character in the format string using either a
-    literal character or the '%p' specifier.
+    The string used to separate sections of the link name.  Specifying the
+    separator allows trailing separators to be removed from the link name and
+    multiple separators caused by missing data to be consolidated. Indicate the
+    separator character in the format string using either a literal character
+    or the \%- specifier.
 
-    default:  '$dseparator_char'
+    default:  '$dseparator'
 
---replacement-char
+--replacement
 
     Characters in the link name which are not legal on some filesystems will
     be replaced with the given character
 
-    default:  '$dreplacement_char'
+    illegal characters:  \\ : * ? < > | "
 
---space-char
+    default:  '$dreplacement'
 
-    Use the specified character instead of space in the link name
+--underscores
 
-    default:  '$dspace_char'
+    Replace whitespace in filenames with underscore characters.
+
+    default:  No underscores
 
 --help
 
@@ -142,6 +128,20 @@ options:
 EOF
         exit;
     }
+
+# Check the separator and replacement characters for illegal characters
+    if ($separator =~ /(?:[\/\\:*?<>|"])/) {
+        die "The separator cannot contain any of the following characters:  /\\:*?<>|\"\n";
+    }
+    elsif ($replacement =~ /(?:[\/\\:*?<>|"])/) {
+        die "The replacement cannot contain any of the following characters:  /\\:*?<>|\"\n";
+    }
+
+# Escape where necessary
+    our $safe_sep = $separator;
+        $safe_sep =~ s/([^\w\s])/\\$1/sg;
+    our $safe_rep = $replacement;
+        $safe_rep =~ s/([^\w\s])/\\$1/sg;
 
 # Get the hostname of this machine
     $hostname = `hostname`;
@@ -274,8 +274,7 @@ EOF
         ($fields{'R'} = ($description or '')) =~ s/%/%%/g;
         ($fields{'C'} = ($category    or '')) =~ s/%/%%/g;
         ($fields{'U'} = ($recgroup    or '')) =~ s/%/%%/g;
-        $fields{'p'} = $separator_char;     # separator character
-        # Start time
+    # Start time
         $fields{'y'} = substr($syear, 2);   # year, 2 digits
         $fields{'Y'} = $syear;              # year, 4 digits
         $fields{'n'} = int($smonth);        # month
@@ -290,7 +289,7 @@ EOF
         $fields{'s'} = $ssecond;            # seconds
         $fields{'a'} = lc($meridian);       # am/pm
         $fields{'A'} = $meridian;           # AM/PM
-        # End time
+    # End time
         $fields{'ey'} = substr($eyear, 2);  # year, 2 digits
         $fields{'eY'} = $eyear;             # year, 4 digits
         $fields{'en'} = int($emonth);       # month
@@ -305,25 +304,33 @@ EOF
         $fields{'es'} = $esecond;           # seconds
         $fields{'ea'} = lc($emeridian);     # am/pm
         $fields{'eA'} = $emeridian;         # AM/PM
-        # Original Airdate
+    # Original Airdate
         $fields{'oy'} = substr($oyear, 2);  # year, 2 digits
         $fields{'oY'} = $oyear;             # year, 4 digits
         $fields{'on'} = int($omonth);       # month
         $fields{'om'} = $omonth;            # month, leading zero
         $fields{'oj'} = int($oday);         # day of month
         $fields{'od'} = $oday;              # day of month, leading zero
+    # Literals
+        $fields{'%'}  = '%';
+        ($fields{'-'}  = $separator) =~ s/%/%%/g;
     # Make the substitution
-        my $keys = join('', sort keys %fields);
+        my $keys = join('|', sort keys %fields);
         my $name = $format;
-        $name =~ s/(?<!%)(?:%([eo]?)([$keys]))/$fields{$1.$2}/g;
+        $name =~ s/(?<!%)(?:%($keys))/$fields{$1}/g;
         $name =~ s/%%/%/g;
     # Some basic cleanup for illegal (windows) filename characters, etc.
-        $name =~ s/(?:[\/\\\:\*\?\<\>\|$replacement_char])+/$replacement_char/sg;
+        $name =~ tr/\ \t\r\n/ /s;
         $name =~ tr/"/'/s;
-        $name =~ s/[\s$space_char]+/$space_char/sg;
-        $name =~ s/($space_char*)(?:$separator_char+($space_char*))+/$1$separator_char$2/sg;
-        $name =~ s/^$space_char+//s;
-        $name =~ s/$space_char*$separator_char+$space_char*$//s;
+        $name =~ s/(?:[\/\\:*?<>|]+\s*)+(?=[^\d\s])/$replacement /sg;
+        $name =~ s/[\/\\:*?<>|]/$replacement/sg;
+        $name =~ s/(?:(?:$safe_sep)+\s*)+(?=[^\d\s])/$separator /sg;
+        $name =~ s/^($safe_sep|$safe_rep|\ )+//s;
+        $name =~ s/($safe_sep|$safe_rep|\ )+$//s;
+    # Underscores?
+        if ($underscores) {
+            $name =~ tr/ /_/s;
+        }
     # Get a shell-safe version of the filename (yes, I know it's not needed in this case, but I'm anal about such things)
         my $safe_file = $file;
         $safe_file =~ s/'/'\\''/sg;
