@@ -23,7 +23,10 @@ void RingBufferInfo::SetDataSocket(QSocket *sock)
 {
     GetLock(false);
     if ((IsAlive() && sock) || (!IsAlive() && !sock))
+    {
+        ReturnLock();
         return;
+    }
 
     if (sock)
     {

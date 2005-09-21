@@ -221,8 +221,6 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
             socket->close();
             return false;
         }
-        
-        usleep(500);
     }
 
     QCString sizestr(8 + 1);
@@ -264,7 +262,6 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
             btr -= sret;
             if (btr > 0)
             {
-                usleep(500);
                 timer.start();
             }    
         }
@@ -355,8 +352,6 @@ bool WriteBlock(QSocketDevice *socket, void *data, uint len)
         {
             zerocnt = 0;
             written += (uint) sret;
-            if (written < len)
-                usleep(500);
         }
         else if (sret < 0 && socket->error() != QSocketDevice::NoError)
         {
@@ -660,7 +655,6 @@ int ReadBlock(QSocket *socket, void *data, uint maxlen)
                         QString("ReadBlock: Error, EOF %1").arg(read));
                 break; 
             }
-            usleep(500);
             qApp->processEvents();
         }
     }
