@@ -1862,6 +1862,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (len > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
+            if (framesRead == 0 && !(pkt->flags & PKT_FLAG_KEY))
+            {
+                av_free_packet(pkt);
+                continue;
+            }
+
             framesRead++;
             if (exitafterdecoded)
                 gotvideo = 1;

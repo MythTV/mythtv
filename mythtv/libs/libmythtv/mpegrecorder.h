@@ -44,7 +44,6 @@ class MpegRecorder : public RecorderBase
     bool SetupRecording();
     void FinishRecording();
 
-    bool PacketHasHeader(unsigned char *buf, int len, unsigned int startcode);
     void ProcessData(unsigned char *buffer, int len);
 
     bool OpenMpegFileAsInput(void);
@@ -71,8 +70,6 @@ class MpegRecorder : public RecorderBase
     int chanfd;
     int readfd;
 
-    AVFormatContext *ic;
-
     int keyframedist;
     bool gopset;
 
@@ -83,5 +80,7 @@ class MpegRecorder : public RecorderBase
     static const int audRateL2[];
     static const char* streamType[];
     static const char* aspectRatio[];
+
+    unsigned int leftovers;
 };
 #endif

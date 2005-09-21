@@ -1359,7 +1359,7 @@ void TV::RunTV(void)
         }
 
         if (activenvp && (activenvp->GetNextPlaySpeed() != normal_speed) &&
-            activenvp->AtNormalSpeed())
+            activenvp->AtNormalSpeed() && !activenvp->PlayingSlowForPrebuffer())
         {
             normal_speed = 1.0;     // got changed in nvp due to close to end of file
             UpdatePosOSD(0.0, PlayMesg());

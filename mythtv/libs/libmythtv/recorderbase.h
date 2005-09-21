@@ -224,6 +224,7 @@ class RecorderBase
     QString        curChannelName;
 
     QWaitCondition pauseWait;
+    QWaitCondition unpauseWait;
 };
 
 #endif

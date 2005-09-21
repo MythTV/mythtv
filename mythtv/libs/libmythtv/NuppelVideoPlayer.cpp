@@ -141,7 +141,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
       avsync_adjustment(0),         avsync_avg(0),
       avsync_oldavg(0),             refreshrate(0),
       lastaudiotime(0),             audio_timecode_offset(0),
-      lastsync(false),
+      lastsync(false),              m_playing_slower(false),
+      m_stored_audio_stretchfactor(1.0),
       // Audio warping stuff
       usevideotimebase(false), 
       warpfactor(1.0f),             warpfactor_avg(1.0f),
@@ -850,7 +851,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
     if (forceVideoOutput != kVideoOutput_IVTV)
 #endif
     {
-        if (videoOutput->EnoughDecodedFrames())
+        if (videoOutput->EnoughPrebufferedFrames())
             SetPrebuffering(false);
     }
 
@@ -1546,7 +1547,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
 {
     video_actually_paused = false;
     resetvideo = false;
-    
+
     prebuffering_lock.lock();
     if (prebuffering)
     {
@@ -1578,7 +1579,22 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     {
         VERBOSE(VB_GENERAL, "prebuffering pause");
         SetPrebuffering(true);
+
+        if (!m_playing_slower)
+        {
+            m_stored_audio_stretchfactor = GetAudioStretchFactor();
+            Play(m_stored_audio_stretchfactor * 0.8, true);
+            m_playing_slower = true;
+            VERBOSE(VB_GENERAL, "playing slower due to falling behind...");
+        }
         return;
+    }
+
+    if (m_playing_slower && videoOutput->EnoughDecodedFrames())
+    {
+        Play(m_stored_audio_stretchfactor, true);
+        m_playing_slower = false;
+        VERBOSE(VB_GENERAL, "playing at normal speed from falling behind...");
     }
 
     prebuffering_lock.lock();

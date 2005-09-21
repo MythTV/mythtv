@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <cstdio>
 #include <cstdlib>
+#include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -31,7 +32,6 @@ using namespace std;
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
-#include "../libavformat/avformat.h"
 }
 
 const int MpegRecorder::audRateL1[] = { 32, 64, 96, 128, 160, 192, 224, 
@@ -76,7 +76,7 @@ MpegRecorder::MpegRecorder()
     audvolume = 80;
 
     deviceIsMpegFile = false;
-    bufferSize = 256000;
+    bufferSize = 4096;
 }
 
 MpegRecorder::~MpegRecorder()
@@ -369,7 +369,7 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
                 arg(vbifmt.service_set).arg(vbifmt.packet_size).arg(vbifmt.io_size));
     }
 
-    readfd = open(videodevice.ascii(), O_RDWR);
+    readfd = open(videodevice.ascii(), O_RDWR | O_NONBLOCK);
     if (readfd < 0)
     {
         cerr << "Can't open video device: " << videodevice << endl;
@@ -410,6 +410,9 @@ void MpegRecorder::StartRecording(void)
     MythTimer elapsedTimer;
     float elapsed;
 
+    struct timeval tv;
+    fd_set rdset;
+
     if (deviceIsMpegFile)
         elapsedTimer.start();
 
@@ -419,14 +422,7 @@ void MpegRecorder::StartRecording(void)
         {
             mainpaused = true;
             pauseWait.wakeAll();
-
-            if ((!deviceIsMpegFile) &&
-                (readfd >= 0))
-            {
-                close(readfd);
-                readfd = -1;
-            }
-            usleep(50);
+            unpauseWait.wait(100);
             continue;
         }
 
@@ -442,6 +438,24 @@ void MpegRecorder::StartRecording(void)
 
         if (readfd < 0)
             readfd = open(videodevice.ascii(), O_RDWR);
+
+        tv.tv_sec = 5;
+        tv.tv_usec = 0;
+        FD_ZERO(&rdset);
+        FD_SET(readfd, &rdset);
+
+        switch (select(readfd + 1, &rdset, NULL, NULL, &tv))
+        {
+            case -1:
+                if (errno == EINTR)
+                    continue;
+                perror("select");
+                continue;
+            case 0:
+                printf("select timeout\n");
+                continue;
+           default: break;
+        }
 
         ret = read(readfd, buffer, bufferSize);
 
@@ -459,7 +473,7 @@ void MpegRecorder::StartRecording(void)
                 continue;
             }
         }
-        else if (ret < 0)
+        else if (ret < 0 && errno != EAGAIN)
         {
             cerr << "error reading from: " << videodevice << endl;
             perror("read");
@@ -480,72 +494,9 @@ int MpegRecorder::GetVideoFd(void)
     return chanfd;
 }
 
-// start common code to the dvbrecorder class.
-
-static int mpg_write_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    (void)opaque;
-    (void)buf;
-    (void)buf_size;
-    return 0;
-}
-
-static int mpg_read_packet(void *opaque, uint8_t *buf, int buf_size)
-{
-    (void)opaque;
-    (void)buf;
-    (void)buf_size;
-    return 0;
-}
-
-static offset_t mpg_seek_packet(void *opaque, int64_t offset, int whence)
-{
-    (void)opaque;
-    (void)offset;
-    (void)whence;
-    return 0;
-}
-
 bool MpegRecorder::SetupRecording(void)
 {
-    AVInputFormat *fmt = &mpegps_demux;
-    fmt->flags |= AVFMT_NOFILE;
-
-    ic = av_alloc_format_context();
-    if (!ic)
-    {
-        cerr << "Couldn't allocate context\n";
-        return false;
-    }
-
-    QString filename = "blah.mpg";
-    char *cfilename = (char *)filename.ascii();
-    AVFormatParameters params;
-
-    ic->pb.buffer_size = bufferSize + 1;
-    ic->pb.buffer = NULL;
-    ic->pb.buf_ptr = NULL;
-    ic->pb.write_flag = 0;
-    ic->pb.buf_end = NULL;
-    ic->pb.opaque = this;
-    ic->pb.read_packet = mpg_read_packet;
-    ic->pb.write_packet = mpg_write_packet;
-    ic->pb.seek = mpg_seek_packet;
-    ic->pb.pos = 0;
-    ic->pb.must_flush = 0;
-    ic->pb.eof_reached = 0;
-    ic->pb.is_streamed = 0;
-    ic->pb.max_packet_size = 0;
-
-    int err = av_open_input_file(&ic, cfilename, fmt, 0, &params);
-    if (err < 0)
-    {
-        cerr << "Couldn't initialize decocder\n";
-        return false;
-    }    
-
-    ic->build_index = 0;
-
+    leftovers = 0xFFFFFFFF;
     return true;
 }
 
@@ -576,62 +527,26 @@ void MpegRecorder::Initialize(void)
 #define SLICE_MIN     0x00000101
 #define SLICE_MAX     0x000001af
 
-bool MpegRecorder::PacketHasHeader(unsigned char *buf, int len,
-                                   unsigned int startcode)
+void MpegRecorder::ProcessData(unsigned char *buffer, int len)
 {
-    unsigned char *bufptr = buf;
-    unsigned int state = 0xFFFFFFFF, v = 0;
+    unsigned char *bufptr = buffer;
+    unsigned int state = leftovers, v = 0;
 
-    while (bufptr < buf + len)
+    while (bufptr < buffer + len)
     {
         v = *bufptr++;
         if (state == 0x000001)
         {
             state = ((state << 8) | v) & 0xFFFFFF;
-            if (state >= SLICE_MIN && state <= SLICE_MAX)
-                return false;
-            if (state == startcode)
-                return true;
-        }
-        state = ((state << 8) | v) & 0xFFFFFF;
-    }
-
-    return false;
-}
-
-void MpegRecorder::ProcessData(unsigned char *buffer, int len)
-{
-    AVPacket pkt;
-
-    ic->pb.buffer = buffer;
-    ic->pb.buf_ptr = ic->pb.buffer;
-    ic->pb.buf_end = ic->pb.buffer + len;
-    ic->pb.eof_reached = 0;
-    ic->pb.pos = len;
-
-    while (ic->pb.eof_reached == 0)
-    {
-        if (av_read_packet(ic, &pkt) < 0)
-            break;
-        
-        if (pkt.stream_index > ic->nb_streams)
-        {
-            cerr << "bad stream\n";
-            av_free_packet(&pkt);
-            continue;
-        }
-
-        AVStream *curstream = ic->streams[pkt.stream_index];
-        if (pkt.size > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO)
-        {
-            if (PacketHasHeader(pkt.data, pkt.size, PICTURE_START))
+            
+            if (state == PICTURE_START)
             {
                 framesWritten++;
             }
 
-            if (PacketHasHeader(pkt.data, pkt.size, GOP_START))
+            if (state == GOP_START)
             {
-                int frameNum = framesWritten - 1;
+                long long frameNum = framesWritten;
 
                 if (!gopset && frameNum > 0)
                 {
@@ -640,7 +555,7 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 }
 
                 long long startpos = ringBuffer->GetFileWritePosition();
-                startpos += pkt.pos;
+                startpos += bufptr - buffer - 4;
 
                 long long keyCount = frameNum / keyframedist;
 
@@ -649,11 +564,10 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                     positionMapDelta[keyCount] = startpos;
                     positionMap[keyCount] = startpos;
 
-                    if (curRecording &&
-                        ((positionMapDelta.size() % 30) == 0))
+                    if (curRecording && ((positionMapDelta.size() % 30) == 0))
                     {
                         curRecording->SetPositionMapDelta(positionMapDelta,
-                                MARK_GOP_START);
+                                                          MARK_GOP_START);
                         curRecording->SetFilesize(startpos);
                         positionMapDelta.clear();
                     }
@@ -661,8 +575,10 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
             }
         }
 
-        av_free_packet(&pkt);
+        state = ((state << 8) | v) & 0xFFFFFF;
     }
+
+    leftovers = state;
 
     ringBuffer->Write(buffer, len);
 }
@@ -675,19 +591,9 @@ void MpegRecorder::StopRecording(void)
 void MpegRecorder::Reset(void)
 {
     errored = false;
-    AVPacketList *pktl = NULL;
-    while ((pktl = ic->packet_buffer))
-    {
-        ic->packet_buffer = pktl->next;
-        av_free_packet(&pktl->pkt);
-        av_free(pktl);
-    }
-
-    ic->pb.pos = 0;
-    ic->pb.buf_ptr = ic->pb.buffer;
-    ic->pb.buf_end = ic->pb.buffer;
-
     framesWritten = 0;
+
+    leftovers = 0xFFFFFFFF;
 
     positionMap.clear();
     positionMapDelta.clear();
@@ -708,6 +614,7 @@ void MpegRecorder::Pause(bool clear)
 void MpegRecorder::Unpause(void)
 {
     paused = false;
+    unpauseWait.wakeAll();
 }
 
 bool MpegRecorder::GetPause(void)

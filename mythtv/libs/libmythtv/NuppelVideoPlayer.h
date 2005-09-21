@@ -134,6 +134,7 @@ class NuppelVideoPlayer
     bool    AtNormalSpeed(void) const         { return next_normal_speed; }
     bool    IsDecoderThreadAlive(void) const  { return decoder_thread_alive; }
     bool    IsNearEnd(long long framesRemaining = -1) const;
+    bool    PlayingSlowForPrebuffer(void) const { return m_playing_slower; }
 
     // Complicated gets
     long long CalcMaxFFTime(long long ff) const;
@@ -516,6 +517,8 @@ class NuppelVideoPlayer
     long long  lastaudiotime;
     long long  audio_timecode_offset;
     bool       lastsync;
+    bool       m_playing_slower;
+    float      m_stored_audio_stretchfactor;
 
     // Audio warping stuff
     bool       usevideotimebase;
