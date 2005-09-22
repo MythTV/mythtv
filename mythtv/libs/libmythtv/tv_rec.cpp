@@ -1391,25 +1391,29 @@ bool TVRec::StartChannel(bool livetv)
         }
     }
 #endif // USING_V4L
-    SetSignalMonitoringRate(50, livetv);
     int progNum = -1;
-    if (signalMonitor)
+
+    if (SignalMonitor::IsSupported(cardtype))
     {
-        int timeout = get_max_timeout(signalMonitor, livetv);
-        bool ok = wait_for_good_signal(
-            signalMonitor, timeout, abortRecordingStart);
-        if (!ok)
+        SetSignalMonitoringRate(50, livetv);
+        if (signalMonitor)
         {
-            VERBOSE(VB_IMPORTANT,
-                    ((abortRecordingStart) ?
-                     "TVRec: StartChannel() -- canceled" :
-                     "TVRec: Timed out waiting for lock -- aborting recording"));
-            SetSignalMonitoringRate(0, 0);
-            return false;
+            int timeout = get_max_timeout(signalMonitor, livetv);
+            bool ok = wait_for_good_signal(signalMonitor, timeout, 
+                                           abortRecordingStart);
+            if (!ok)
+            {
+                VERBOSE(VB_IMPORTANT,
+                        ((abortRecordingStart) ?
+                         "TVRec: StartChannel() -- canceled" :
+                         "TVRec: Timed out waiting for lock -- aborting recording"));
+                SetSignalMonitoringRate(0, 0);
+                return false;
+            }
+            progNum = get_program_number(signalMonitor);
         }
-        progNum = get_program_number(signalMonitor);
+        SetSignalMonitoringRate(0, 0);
     }
-    SetSignalMonitoringRate(0, 0);
 
     SetVideoFiltersForChannel(channel, channel->GetCurrentName());
 #ifdef USING_DVB
