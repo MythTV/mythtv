@@ -31,6 +31,7 @@ class OSDListTreeType;
 class OSDGenericTree;
 
 typedef QValueVector<QString> str_vec_t;
+typedef QMap<QString, QString> InfoMap;
 
 class TV : public QObject
 {
@@ -76,21 +77,25 @@ class TV : public QObject
     bool IsSwitchingCards(void) { return switchingCards; }
 
     void GetNextProgram(RemoteEncoder *enc, int direction,
-                        QMap<QString, QString> &infoMap);
+                        InfoMap &infoMap);
     void GetNextProgram(RemoteEncoder *enc, int direction,
-                        QString &title, QString &subtitle,
-                        QString &desc, QString &category, QString &starttime,
-                        QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid);
+                        QString &title,     QString &subtitle,
+                        QString &desc,      QString &category,
+                        QString &starttime, QString &endtime,
+                        QString &callsign,  QString &iconpath,
+                        QString &channame,  QString &chanid,
+                        QString &seriesid,  QString &programid);
 
-    void GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap);
-    void GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle,
-                        QString &desc, QString &category, QString &starttime,
-                        QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid, QString &outFilters, 
-                        QString &repeat, QString &airdate, QString &stars);
+    void GetChannelInfo(RemoteEncoder *enc, InfoMap &infoMap);
+    void GetChannelInfo(RemoteEncoder *enc, QString &title,
+                        QString &subtitle,  QString &desc,
+                        QString &category,  QString &starttime,
+                        QString &endtime,   QString &callsign,
+                        QString &iconpath,  QString &channelname,
+                        QString &chanid,    QString &seriesid,
+                        QString &programid, QString &outFilters, 
+                        QString &repeat,    QString &airdate,
+                        QString &stars);
 
     // for the guidegrid to use
     void EmbedOutput(WId wid, int x, int y, int w, int h);
@@ -386,6 +391,8 @@ class TV : public QObject
     UDPNotify      *udpnotify;
     QStringList     lastSignalMsg;
     MythTimer       lastSignalMsgTime;
+    InfoMap         lastSignalUIInfo;
+    MythTimer       lastSignalUIInfoTime;
     QMutex          osdlock;
 
     // LCD Info

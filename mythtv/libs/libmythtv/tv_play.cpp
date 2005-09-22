@@ -42,6 +42,8 @@ const int TV::kBrowseTimeout  = 30000;
 const int TV::kSMExitTimeout  = 2000;
 const int TV::kChannelKeysMax = 6;
 
+#define DEBUG_ACTIONS 0 /**< set to 1 to debug actions */
+
 void TV::InitKeys(void)
 {
     REG_KEY("TV Frontend", "PAGEUP", "Page Up", "3");
@@ -215,7 +217,7 @@ TV::TV(void)
       // RingBuffers
       prbuffer(NULL), piprbuffer(NULL), activerbuffer(NULL),
       // OSD info
-      dialogname(""), treeMenu(NULL), udpnotify(NULL),
+      dialogname(""), treeMenu(NULL), udpnotify(NULL), osdlock(true),
       // LCD Info
       lcdTitle(""), lcdSubtitle(""), lcdCallsign(""),
       // Window info (GUI is optional, transcoding, preview img, etc)
@@ -701,6 +703,7 @@ void TV::HandleStateChange(void)
         long long smudge = 0;
         QString name = "";
 
+        lastSignalUIInfo.clear();
         recorder->Setup();
         if (!recorder->SetupRingBuffer(name, filesize, smudge))
         {
@@ -931,6 +934,9 @@ bool TV::StartRecorder(int maxWait)
         return false;
     }
 
+    VERBOSE(VB_RECORD, "TV::StartRecorder: took "<<t.elapsed()
+            <<" ms to start recorder.");
+
     frameRate = recorder->GetFrameRate();
     return true;
 }
@@ -954,6 +960,9 @@ bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
     while (!nvp->IsPlaying() && nvp->IsDecoderThreadAlive() &&
            (t.elapsed() < maxWait))
         usleep(50);
+
+    VERBOSE(VB_RECORD, "TV::StartPlayer: took "<<t.elapsed()
+            <<" ms to start player.");
 
     if (nvp->IsPlaying())
     {
@@ -1184,6 +1193,12 @@ void TV::TeardownPlayer(void)
         delete prbuffer;
         prbuffer = activerbuffer = NULL;
     }
+
+    if (piprbuffer)
+    {
+        delete piprbuffer;
+        piprbuffer = NULL;
+    }
 }
 
 void TV::TeardownPipPlayer(void)
@@ -1263,18 +1278,14 @@ void TV::RunTV(void)
         if (doHandle)
             HandleStateChange();
 
-        if (GetOSD() && lastSignalMsg.size())
-        {   // set last signal msg, so we get some feedback...
-            UpdateOSDSignal(lastSignalMsg);
-            lastSignalMsg.clear();
-        }
-
-        if (IsErrored())
+        if (osdlock.tryLock())
         {
-            VERBOSE(VB_IMPORTANT, "TVPlay: RunTV encountered "
-                    "fatal error, exiting event loop.");
-            runMainLoop = false;
-            continue;
+            if (lastSignalMsg.size())
+            {   // set last signal msg, so we get some feedback...
+                UpdateOSDSignal(lastSignalMsg);
+                lastSignalMsg.clear();
+            }
+            osdlock.unlock();
         }
 
         usleep(1000);
@@ -1316,7 +1327,7 @@ void TV::RunTV(void)
         if ((recorder && recorder->GetErrorStatus()) || IsErrored())
         {
             exitPlayer = true;
-            wantsToQuit = true;
+            wantsToQuit = false;
         }
 
         if (StateIsPlaying(internalState))
@@ -1458,6 +1469,10 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 
 void TV::ProcessKeypress(QKeyEvent *e)
 {
+#if DEBUG_ACTIONS
+    VERBOSE(VB_IMPORTANT, "TV::ProcessKeypress()");
+#endif // DEBUG_ACTIONS
+
     bool was_doing_ff_rew = false;
     bool redisplayBrowseInfo = false;
 
@@ -1792,12 +1807,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 handled = false;
         }
     }
-   
-#if 0 /* set to 1 to debug actions */
+
+#if DEBUG_ACTIONS
     for (uint i = 0; i < actions.size(); ++i)
         VERBOSE(VB_IMPORTANT, QString("handled(%1) actions[%2](%3)")
                 .arg(handled).arg(i).arg(actions[i]));
-#endif
+#endif // DEBUG_ACTIONS
+
     if (handled)
         return;
 
@@ -2413,7 +2429,7 @@ void TV::DoInfo(void)
     oset = GetOSD()->GetSet("status");
     if ((oset) && (oset->Displaying()) && !prbuffer->isDVD())
     {
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
         playbackinfo->ToMap(infoMap);
         GetOSD()->HideSet("status");
         GetOSD()->ClearAllText("program_info");
@@ -2822,6 +2838,10 @@ QString TV::QueuedChannel(void)
     return channelKeys.stripWhiteSpace();
 }
 
+/** \fn TV::ChannelClear(bool)
+ *  \brief Clear channel key buffer of input keys.
+ *  \param hideosd, if true hides "channel_number" OSDSet.
+ */
 void TV::ChannelClear(bool hideosd)
 {
     if (lookForChannel)
@@ -2865,7 +2885,7 @@ void TV::ChannelKey(char key)
 
     if (activenvp == nvp && GetOSD())
     {
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
 
         infoMap["channum"] = channelKeys;
         infoMap["callsign"] = "";
@@ -3022,7 +3042,7 @@ void TV::PreviousChannel(void)
     {
         GetOSD()->HideSet("program_info");
 
-        QMap<QString, QString> infoMap;
+        InfoMap infoMap;
 
         infoMap["channum"] = prevChan[i];
         infoMap["callsign"] = "";
@@ -3092,7 +3112,7 @@ void TV::ToggleOSD(void)
 }
 
 static void GetProgramInfo(NuppelVideoPlayer *activenvp,
-                           QMap<QString,QString> &infoMap)
+                           InfoMap &infoMap)
 {
     ProgramInfo *progInfo = NULL;
     QDateTime now = QDateTime::currentDateTime(), cur, prev;
@@ -3121,7 +3141,7 @@ static void GetProgramInfo(NuppelVideoPlayer *activenvp,
 
 void TV::UpdateOSD(void)
 {
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
 
     // Collect channel info
     GetChannelInfo(activerecorder, infoMap);
@@ -3160,16 +3180,27 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
 {
     QMutexLocker locker(&osdlock);
 
-    if (!GetOSD() && (&lastSignalMsg != &strlist))
-        lastSignalMsg = strlist;
     if (!GetOSD())
+    {
+        if (&lastSignalMsg != &strlist)
+            lastSignalMsg = strlist;
         return;
+    }
 
     SignalMonitorList slist = SignalMonitorValue::Parse(strlist);
 
-    QMap<QString, QString> infoMap;
-    infoMap["name"] = "signalmonitor";
-    infoMap["title"] = "Signal Monitor";
+    InfoMap infoMap = lastSignalUIInfo;
+    if (lastSignalUIInfoTime.elapsed() > 5000 || infoMap["callsign"].isEmpty())
+    {
+        //lastSignalUIInfo["name"]  = "signalmonitor";
+        //lastSignalUIInfo["title"] = "Signal Monitor";
+        lastSignalUIInfo.clear();
+        GetChannelInfo(activerecorder, lastSignalUIInfo);
+        GetProgramInfo(activenvp, lastSignalUIInfo);
+        infoMap = lastSignalUIInfo;
+        lastSignalUIInfoTime.start();
+    }
+
     int i = 0;
     SignalMonitorList::const_iterator it;
     for (it = slist.begin(); it != slist.end(); ++it)
@@ -3183,62 +3214,60 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt("");
     for (it = slist.begin(); it != slist.end(); ++it)
     {
-        if ("error" != it->GetShortName() && "message" != it->GetShortName())
+        if ("error" == it->GetShortName() || "message" == it->GetShortName())
+            continue;
+
+        infoMap[it->GetShortName()] = QString::number(it->GetValue());
+        if ("signal" == it->GetShortName())
         {
-            infoMap[it->GetShortName()] = QString::number(it->GetValue());
-            if ("signal" == it->GetShortName())
-            {
-                int val = it->GetNormalizedValue(0, 100);
-                infoMap["signal"] = QString::number(val);
-            }
-            else if ("seen_pat" == it->GetShortName())
-                pat = it->IsGood() ? "a" : " ";
-            else if ("matching_pat" == it->GetShortName())
-                pat = it->IsGood() ? "A" : pat;
-            else if ("seen_pmt" == it->GetShortName())
-                pmt = it->IsGood() ? "m" : " ";
-            else if ("matching_pmt" == it->GetShortName())
-                pmt = it->IsGood() ? "M" : pmt;
-            else if ("seen_mgt" == it->GetShortName())
-                mgt = it->IsGood() ? "g" : " ";
-            else if ("matching_mgt" == it->GetShortName())
-                mgt = it->IsGood() ? "G" : mgt;
-            else if ("seen_vct" == it->GetShortName())
-                vct = it->IsGood() ? "v" : " ";
-            else if ("matching_vct" == it->GetShortName())
-                vct = it->IsGood() ? "V" : vct;
-            else if ("seen_nit" == it->GetShortName())
-                nit = it->IsGood() ? "n" : " ";
-            else if ("matching_nit" == it->GetShortName())
-                nit = it->IsGood() ? "N" : nit;
-            else if ("seen_sdt" == it->GetShortName())
-                sdt = it->IsGood() ? "s" : " ";
-            else if ("matching_sdt" == it->GetShortName())
-                sdt = it->IsGood() ? "S" : sdt;
+            int val = it->GetNormalizedValue(0, 100);
+            infoMap["signal"] = QString::number(val);
         }
+        else if ("seen_pat" == it->GetShortName())
+            pat = it->IsGood() ? "a" : " ";
+        else if ("matching_pat" == it->GetShortName())
+            pat = it->IsGood() ? "A" : pat;
+        else if ("seen_pmt" == it->GetShortName())
+            pmt = it->IsGood() ? "m" : " ";
+        else if ("matching_pmt" == it->GetShortName())
+            pmt = it->IsGood() ? "M" : pmt;
+        else if ("seen_mgt" == it->GetShortName())
+            mgt = it->IsGood() ? "g" : " ";
+        else if ("matching_mgt" == it->GetShortName())
+            mgt = it->IsGood() ? "G" : mgt;
+        else if ("seen_vct" == it->GetShortName())
+            vct = it->IsGood() ? "v" : " ";
+        else if ("matching_vct" == it->GetShortName())
+            vct = it->IsGood() ? "V" : vct;
+        else if ("seen_nit" == it->GetShortName())
+            nit = it->IsGood() ? "n" : " ";
+        else if ("matching_nit" == it->GetShortName())
+            nit = it->IsGood() ? "N" : nit;
+        else if ("seen_sdt" == it->GetShortName())
+            sdt = it->IsGood() ? "s" : " ";
+        else if ("matching_sdt" == it->GetShortName())
+            sdt = it->IsGood() ? "S" : sdt;
     }
 
+    bool    allGood = SignalMonitorValue::AllGood(slist);
     QString slock   = ("1" == infoMap["slock"]) ? "L" : "l";
-    bool allGood    = SignalMonitorValue::AllGood(slist);
+    QString lockMsg = (slock=="L") ? tr("Partial Lock") : tr("No Lock");
+    QString sigMsg  = allGood ? tr("Lock") : lockMsg;
     QString sigDesc = QString("Signal %1\% (%2%3%4%5%6%7%8) %9")
-        .arg(infoMap["signal"])
-        .arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct).arg(nit).arg(sdt)
-        .arg(allGood ? tr("Channel Lock") :
-             ((slock=="L") ? tr("Signal Lock") : tr("No Lock")));
+        .arg(infoMap["signal"]).arg(slock).arg(pat).arg(pmt)
+        .arg(mgt).arg(vct).arg(nit).arg(sdt).arg(sigMsg);
+
     //GetOSD()->ClearAllText("signal_info");
     //GetOSD()->SetText("signal_info", infoMap, -1);
 
-    // Channel info
-    GetChannelInfo(activerecorder, infoMap);
-
     GetOSD()->ClearAllText("channel_number");
     GetOSD()->SetText("channel_number", infoMap, osd_display_time);
- 
-    // Use program info to present signal info
-    GetProgramInfo(activenvp, infoMap);
+
     infoMap["description"] = sigDesc;
     GetOSD()->ClearAllText("program_info");
     GetOSD()->SetText("program_info", infoMap, osd_display_time);
+
+    lastSignalMsg.clear();
     lastSignalMsgTime.start();
 }
 
@@ -3279,13 +3308,13 @@ static void format_time(int seconds, QString &tMin, QString &tHrsMin)
     tHrsMin.sprintf("%d:%02d", hours, min);
 }
 
-/** \fn TV::GetNextProgram(RemoteEncoder*,int,QMap<QString, QString>&)
+/** \fn TV::GetNextProgram(RemoteEncoder*,int,InfoMap&)
  *  \brief Fetches information on the desired program from the backend.
  *  \param enc RemoteEncoder to query, if null query the activerecorder.
  *  \param direction BrowseDirection to get information on.
  */
 void TV::GetNextProgram(RemoteEncoder *enc, int direction,
-                        QMap<QString, QString> &infoMap)
+                        InfoMap &infoMap)
 {
     QString title, subtitle, desc, category, endtime, callsign, iconpath;
     QString lenM, lenHM;
@@ -3349,7 +3378,7 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
                         channame,  chanid,    seriesid,  programid);
 }
 
-void TV::GetChannelInfo(RemoteEncoder *enc, QMap<QString, QString> &infoMap)
+void TV::GetChannelInfo(RemoteEncoder *enc, InfoMap &infoMap)
 {
     if (!enc)
         enc = activerecorder;
@@ -4043,7 +4072,7 @@ void TV::BrowseDispInfo(int direction)
     if (!browsemode)
         BrowseStart();
 
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
     QDateTime curtime  = QDateTime::currentDateTime();
     QDateTime maxtime  = curtime.addSecs(60 * 60 * 4);
     QDateTime lasttime = QDateTime::fromString(browsestarttime, Qt::ISODate);
@@ -4116,7 +4145,7 @@ void TV::ToggleRecord(void)
         return;
     }
 
-    QMap<QString, QString> infoMap;
+    InfoMap infoMap;
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
 
     ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(browsechanid,
@@ -4944,6 +4973,7 @@ void TV::UnpauseLiveTV(void)
         {
             VERBOSE(VB_IMPORTANT,
                     "TVPlay::UnpauseLiveTV(): Unable to reset playing.");
+            wantsToQuit = false;
             exitPlayer = true;
             return;
         }
@@ -4957,5 +4987,11 @@ void TV::UnpauseLiveTV(void)
         UpdateOSD();
         UpdateLCD();
         AddPreviousChannel();
+    }
+
+    {
+        QMutexLocker locker(&osdlock);
+        lastSignalMsg.clear();
+        lastSignalUIInfo.clear();
     }
 }
