@@ -24,8 +24,8 @@
 # Some variables we'll use here
     our ($dest, $format, $usage, $underscores);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
-    our ($db_host, $db_user, $db_name, $db_pass, $video_dir, @files);
-    our ($hostname, $dbh, $sh, $sh2, $sh3, $q, $q2, $q3, $count);
+    our ($db_host, $db_user, $db_name, $db_pass, $video_dir);
+    our ($hostname, $dbh, $sh, $sh2, $q, $q2, $count);
 
 # Default filename format
     $dformat = '%T %- %Y-%m-%d, %g-%i %A %- %S';
@@ -229,54 +229,21 @@ EOF
         }
     }
 
-# Load the files
-    opendir(DIR, $video_dir) or die "Can't open $video_dir:  $!\n\n";
-    @files = grep /\.(?:mpg|nuv)$/, readdir(DIR);
-    closedir DIR;
-
 # Prepare a database queries
-    $q  = 'SELECT * FROM recorded WHERE basename=?';
-    $q2 = 'SELECT * FROM recorded WHERE chanid=? AND starttime=?';
-
+    $q  = 'SELECT * FROM recorded';
     $sh  = $dbh->prepare($q);
-    $sh2 = $dbh->prepare($q2);
+    $sh->execute() or die "Couldn't execute $q:  $!\n";
 
 # Only if we're renaming files
     unless ($dest) {
-        $q3  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=?';
-        $sh3 = $dbh->prepare($q3);
+        $q2  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=?';
+        $sh2 = $dbh->prepare($q2);
     }
 
 # Create symlinks for the files on this machine
-    foreach my $file (@files) {
-        next if ($file =~ /^ringbuf/);
-    # Info hash
-        my %info;
-    # New db format? (no errors, since this query will break with mythtv < .19)
-        $sh->execute($file);
-        %info = %{$sh->fetchrow_hashref};
-    # Nope
-        unless ($info{'chanid'}) {
-        # Incorrect db version?
-            die "You must use --link for mythtv < 0.19\n" unless ($dest);
-        # Pull out the various parts that make up the filename
-            my ($channel, $starttime) = $file =~/^(\d+)_(\d{14})[_\.]/i;
-        # Found a bad filename?
-            unless ($channel) {
-                print "Unknown filename format:  $file\n";
-                next;
-            }
-        # Execute the query
-            $sh2->execute($channel, $starttime)
-                or die "Could not execute ($q2):  $!\n\n";
-            %info = %{$sh2->fetchrow_hashref};
-        }
-    # Unknown file - someday we should report this
-        unless ($info{'chanid'}) {
-            print STDERR "Unknown file:  $file\n";
-            next;
-        }
-        my ($title, $subtitle, $description, $recgroup, $category, $oad) = $sh->fetchrow_array;
+    while (my $ref = $sh->fetchrow_hashref()) {
+        my %info = %{$ref};
+        die "This script requires mythtv >= 0.19\n" unless ($info{'basename'});
     # Default times
         my ($syear, $smonth, $sday, $shour, $sminute, $ssecond) = $info{'starttime'} =~ /(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/;
         my ($eyear, $emonth, $eday, $ehour, $eminute, $esecond) = $info{'endtime'}   =~ /(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/;
@@ -368,7 +335,7 @@ EOF
             $name =~ tr/ /_/s;
         }
     # Get a shell-safe version of the filename (yes, I know it's not needed in this case, but I'm anal about such things)
-        my $safe_file = $file;
+        my $safe_file = $info{'basename'};
         $safe_file =~ s/'/'\\''/sg;
         $safe_file = "'$safe_file'";
     # Figure out the suffix
@@ -386,13 +353,13 @@ EOF
             }
             $name .= $suffix;
         # Create the link
-            symlink "$video_dir/$file", "$dest/$name"
+            symlink "$video_dir/".$info{'basename'}, "$dest/$name"
                 or die "Can't create symlink $dest/$name:  $!\n";
             print "$dest/$name\n";
         }
     # Rename the file
         else {
-            if ($file ne $name.$suffix) {
+            if ($info{'basename'} ne $name.$suffix) {
             # Check for duplicates
                 if (-e "$video_dir/$name$suffix") {
                     $count = 2;
@@ -403,20 +370,19 @@ EOF
                 }
                 $name .= $suffix;
             # Update the database
-                my $rows = $sh3->execute($name, $info{'chanid'}, $info{'starttime'});
-                die "Couldn't update basename in database for $file:  ($q3)\n" unless ($rows == 1);
-                my $ret = rename "$video_dir/$file", "$video_dir/$name";
+                my $rows = $sh2->execute($name, $info{'chanid'}, $info{'starttime'});
+                die "Couldn't update basename in database for ".$info{'basename'}.":  ($q2)\n" unless ($rows == 1);
+                my $ret = rename "$video_dir/".$info{'basename'}, "$video_dir/$name";
             # Rename failed -- Move the database back to how it was (man, do I miss transactions)
                 if (!$ret) {
-                    $rows = $sh3->execute($file, $info{'chanid'}, $info{'starttime'});
-                    die "Couldn't restore original basename in database for $file:  ($q3)\n" unless ($rows == 1);
+                    $rows = $sh2->execute($info{'basename'}, $info{'chanid'}, $info{'starttime'});
+                    die "Couldn't restore original basename in database for ".$info{'basename'}.":  ($q2)\n" unless ($rows == 1);
                 }
-                print "$file\t-> $name\n";
+                print $info{'basename'}."\t-> $name\n";
             }
         }
     }
 
     $sh->finish;
-    $sh2->finish;
-    $sh3->finish if ($sh3);
+    $sh2->finish if ($sh2);
 
