@@ -285,4 +285,19 @@ class ContentIdentifierDescriptor : public MPEGDescriptor {
     //   content_identifier                  v   4.0
 };
 
+/**
+ *  \brief Provides the long channel name for the virtual channel containing
+ *         this descriptor.
+ * 
+ *   See ATSC A/65B section 6.9.5.
+ *   When used, this descriptor must be in the Virtual Channel Table.
+ */
+class ExtendedChannelNameDescriptor : public MPEGDescriptor
+{
+  public:
+    ExtendedChannelNameDescriptor(const unsigned char *data);
+    MultipleStringStructure LongChannelName(void) const;
+    QString LongChannelNameString(void) const;
+};
+
 #endif

@@ -157,6 +157,22 @@ bool ProgramMapTable::IsEncrypted(void) const
 #endif
 }
 
+bool ProgramMapTable::IsStillPicture(void) const
+{
+    static const unsigned char STILL_PICTURE_FLAG = 0x01;
+    
+    for (uint i = 0; i < StreamCount(); i++)
+    {
+        if (IsVideo(i))
+        {
+            return StreamInfoLength(i) > 2 &&
+                   (StreamInfo(i)[2] & STILL_PICTURE_FLAG);
+        }
+    }
+    return false;
+}
+
+
 /** \fn ProgramMapTable::FindPIDs(uint type, vector<uint>& pids) const
  *  \brief Finds all pids matching type.
  *  \param pids vector pids will be added to

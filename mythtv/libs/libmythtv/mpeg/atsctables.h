@@ -284,6 +284,7 @@ class VirtualChannelTable : public PSIPTable
     // CRC_32                  32
     void Parse() const;
     int Find(int major, int minor) const;
+    QString GetExtendedChannelName(uint idx) const;
   protected:
     mutable vector<unsigned char*> _ptrs;
 };

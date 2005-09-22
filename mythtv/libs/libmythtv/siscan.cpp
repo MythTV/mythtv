@@ -161,6 +161,8 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
         dtvSigMon->SetStreamData(data);
         dtvSigMon->AddFlags(kDTVSigMon_WaitForMGT | kDTVSigMon_WaitForVCT |
                             kDTVSigMon_WaitForNIT | kDTVSigMon_WaitForSDT);
+        connect(data, SIGNAL(UpdatePAT(const ProgramAssociationTable*)),
+                this, SLOT(  HandlePAT(const ProgramAssociationTable*)));
         connect(data, SIGNAL(UpdateMGT(const MasterGuideTable*)),
                 this, SLOT(  HandleMGT(const MasterGuideTable*)));
         connect(data, SIGNAL(UpdateVCT(uint, const VirtualChannelTable*)),
@@ -272,6 +274,16 @@ bool SIScan::ScanServicesSourceID(int SourceID)
     return false;
 }
 
+void SIScan::HandlePAT(const ProgramAssociationTable *pat)
+{
+    SISCAN(QString("Got a Program Association Table for %1")
+           .arg((*current).FriendlyName));
+    // Add pmts to list, so we can do MPEG scan properly.
+    ScanStreamData *sd = GetDTVSignalMonitor()->GetScanStreamData();
+    for (uint i = 0; i < pat->ProgramCount(); i++)
+        sd->AddListeningPID(pat->ProgramPID(i));
+}
+
 void SIScan::HandleVCT(uint, const VirtualChannelTable*)
 {
     SISCAN(QString("Got a Virtual Channel Table for %1")
@@ -345,7 +357,13 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     const ProgramAssociationTable *pat = sd->GetCachedPAT();
     if (pat)
     {
-        UpdatePATinDB((*current).mplexid, pat, true);
+        PMTMap pmt_map;
+        pmt_vec_t pmt_vector = sd->GetCachedPMTs();
+        pmt_vec_t::iterator mi = pmt_vector.begin();
+        for (;mi != pmt_vector.end(); ++mi)
+            pmt_map[(*mi)->tsheader()->PID()] = *mi;
+        UpdatePATinDB((*current).mplexid, pat, pmt_map, true);
+        sd->ReturnCachedTables(pmt_vector);
         sd->ReturnCachedTable(pat);
     }
 
@@ -936,10 +954,11 @@ void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
 
-/** \fn UpdatePATinDB(int, const ProgramAssociationTable*, bool)
+/** \fn UpdatePATinDB(int,const ProgramAssociationTable*,const PMTMap&,bool)
  */
 void SIScan::UpdatePATinDB(int tid_db,
                            const ProgramAssociationTable *pat,
+                           const PMTMap &pmt_map,
                            bool)
 {
     SISCAN(QString("UpdatePATinDB(): mplex: %1:%2")
@@ -959,6 +978,21 @@ void SIScan::UpdatePATinDB(int tid_db,
 
     for (uint i = 0; i < pat->ProgramCount(); i++)
     {
+        const ProgramMapTable *pmt = pmt_map[pat->ProgramPID(i)];
+        VERBOSE(VB_SIPARSER,
+                QString("UpdatePATinDB(): Prog %1 PID %2: PMT @")
+                .arg(pat->ProgramNumber(i))
+                .arg(pat->ProgramPID(i))<<pmt);
+
+        // ignore all services without PMT, and
+        // ignore services we have decided to ignore
+        if (!pmt)
+            continue;
+        else if (ignoreAudioOnlyServices && pmt->IsStillPicture())
+            continue;
+        else if (ignoreEncryptedServices && pmt->IsEncrypted())
+            continue;
+        
         // See if service already in database based on program number
         int chanid = ChannelUtil::GetChanID(
             db_mplexid, -1, 0, 0, pat->ProgramNumber(i));
@@ -969,8 +1003,14 @@ void SIScan::UpdatePATinDB(int tid_db,
             chan_num = QString("%1#%2")
                 .arg((freqid) ? freqid : db_mplexid).arg(i);
         }
+        
+        QString callsign = ChannelUtil::GetCallsign(chanid);
+        if (callsign == QString::null || callsign == "")
+            callsign = tr("C%1", "Synthesized callsign").arg(chan_num);
 
-        QString service_name = QString("Unknown %1").arg(chan_num);
+        QString service_name = ChannelUtil::GetServiceName(chanid);
+        if (service_name == QString::null || service_name == "")
+            service_name = callsign;
 
         QString common_status_info = tr("%1 %2-%3 as %4 on %5 (%6)")
             .arg(service_name)
@@ -985,6 +1025,7 @@ void SIScan::UpdatePATinDB(int tid_db,
             chanid = ChannelUtil::CreateChanID(db_source_id, chan_num);
             ChannelUtil::CreateChannel(
                 db_mplexid, db_source_id, chanid,
+                callsign,
                 service_name,
                 chan_num,
                 pat->ProgramNumber(i),
@@ -999,6 +1040,7 @@ void SIScan::UpdatePATinDB(int tid_db,
                 db_mplexid,
                 db_source_id,
                 chanid,
+                callsign,
                 service_name,
                 chan_num,
                 pat->ProgramNumber(i),
@@ -1078,6 +1120,11 @@ void SIScan::UpdateVCTinDB(int tid_db,
                 .arg(vct->MinorChannel(i));
         }
 
+        // try to find an extended channel name, fallback to short name.
+        QString longName = vct->GetExtendedChannelName(i);
+        if (longName.isEmpty())
+            longName = vct->ShortChannelName(i);
+
         QString common_status_info = tr("%1 %2-%3 as %4 on %5 (%6)")
             .arg(vct->ShortChannelName(i))
             .arg(vct->MajorChannel(i)).arg(vct->MinorChannel(i))
@@ -1096,6 +1143,7 @@ void SIScan::UpdateVCTinDB(int tid_db,
                     db_source_id,
                     chanid,
                     vct->ShortChannelName(i),
+                    longName,
                     chan_num,
                     vct->ProgramNumber(i),
                     vct->MajorChannel(i), vct->MinorChannel(i),
@@ -1113,6 +1161,7 @@ void SIScan::UpdateVCTinDB(int tid_db,
                 db_source_id,
                 chanid,
                 vct->ShortChannelName(i),
+                longName,
                 chan_num,
                 vct->ProgramNumber(i),
                 vct->MajorChannel(i), vct->MinorChannel(i),
@@ -1232,6 +1281,7 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
                 ChannelUtil::CreateChannel(
                     db_mplexid, db_source_id, chanid,
                     service_name,
+                    service_name,
                     chan_num,
                     sdt->ServiceID(i),
                     0, 0,
@@ -1247,6 +1297,7 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
                 db_mplexid,
                 db_source_id,
                 chanid,
+                service_name,
                 service_name,
                 chan_num,
                 sdt->ServiceID(i),
@@ -1436,6 +1487,7 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
                 db_source_id,
                 chanid,
                 (*s).ServiceName,
+                (*s).ServiceName,
                 chan_num,
                 (*s).ServiceID,
                 atsc_major, atsc_minor,
@@ -1451,6 +1503,7 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
                 db_mplexid,
                 db_source_id,
                 chanid,
+                (*s).ServiceName,
                 (*s).ServiceName,
                 chan_num,
                 (*s).ServiceID,

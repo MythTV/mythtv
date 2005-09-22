@@ -442,14 +442,14 @@ int ChannelUtil::GetTuningParams(int mplexid, QString &modulation)
     return query.value(0).toInt(); 
 }
 
-QString ChannelUtil::GetChanNum(int chan_id)
+QString ChannelUtil::GetChannelStringField(int chan_id, const QString &field)
 {
     if (chan_id < 0)
         return QString::null;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(QString("SELECT channum FROM channel "
-                          "WHERE chanid=%1").arg(chan_id));
+    query.prepare(QString("SELECT %1 FROM channel "
+            "WHERE chanid=%2").arg(field).arg(chan_id));
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("Selecting channel/dtv_multiplex 1", query);
@@ -460,6 +460,21 @@ QString ChannelUtil::GetChanNum(int chan_id)
 
     query.next();
     return query.value(0).toString();
+}
+
+QString ChannelUtil::GetChanNum(int chan_id)
+{
+    return GetChannelStringField(chan_id, QString("channum"));
+}
+
+QString ChannelUtil::GetCallsign(int chan_id)
+{
+    return GetChannelStringField(chan_id, QString("callsign"));
+}
+
+QString ChannelUtil::GetServiceName(int chan_id)
+{
+    return GetChannelStringField(chan_id, QString("name"));
 }
 
 int ChannelUtil::GetSourceID(int db_mplexid)
@@ -666,8 +681,8 @@ bool ChannelUtil::CreateChannel(uint db_sourceid,
     query.bindValue(":CHANID",    new_channel_id);
     query.bindValue(":CHANNUM",   chan_num);
     query.bindValue(":SOURCEID",  db_sourceid);
-    query.bindValue(":CALLSIGN",  callsign);
-    query.bindValue(":NAME",      service_name);
+    query.bindValue(":CALLSIGN",  callsign.utf8());
+    query.bindValue(":NAME",      service_name.utf8());
     query.bindValue(":XMLTVID",   xmltvid);
     query.bindValue(":FREQID",    freqid);
     query.bindValue(":TVFORMAT",  tvformat);
@@ -684,6 +699,7 @@ bool ChannelUtil::CreateChannel(uint db_sourceid,
 bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 uint db_sourceid,
                                 uint new_channel_id,
+                                const QString &callsign,
                                 const QString &service_name,
                                 const QString &chan_num,
                                 uint service_id,
@@ -714,7 +730,7 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     query.bindValue(":CHANID",    new_channel_id);
     query.bindValue(":CHANNUM",   chanNum);
     query.bindValue(":SOURCEID",  db_sourceid);
-    query.bindValue(":CALLSIGN",  service_name.utf8());
+    query.bindValue(":CALLSIGN",  callsign.utf8());
     query.bindValue(":NAME",      service_name.utf8());
 
     query.bindValue(":MPLEXID",   db_mplexid);
@@ -739,6 +755,7 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
 bool ChannelUtil::UpdateChannel(uint db_mplexid,
                                 uint source_id,
                                 uint channel_id,
+                                const QString &callsign,
                                 const QString &service_name,
                                 const QString &chan_num,
                                 uint service_id,
@@ -761,7 +778,7 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     query.bindValue(":MPLEXID",   db_mplexid);
     query.bindValue(":SERVICEID", service_id);
     query.bindValue(":ATSCSRCID", atsc_src_id);
-    query.bindValue(":CALLSIGN",  service_name.utf8());
+    query.bindValue(":CALLSIGN",  callsign.utf8());
     query.bindValue(":NAME",      service_name.utf8());
     query.bindValue(":SOURCEID",  source_id);
     query.bindValue(":CHANID",    channel_id);

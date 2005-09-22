@@ -225,3 +225,41 @@ QString MultipleStringStructure::Huffman2(
     return QString("TODO huffman 2");
 }
 
+/** \fn ExtendedChannelNameDescriptor::ExtendedChannelNameDescriptor(const unsigned char*)
+ *  \brief Creates a new ExtendedChannelNameDescriptor.
+ * 
+ *  \param data the raw data representing this descriptor
+ */
+ExtendedChannelNameDescriptor::ExtendedChannelNameDescriptor(
+    const unsigned char *data) : MPEGDescriptor(data)
+{
+    assert(DescriptorTag() == DescriptorID::extended_channel_name);
+}
+
+/** \fn ExtendedChannelNameDescriptor::LongChannelName(void) const
+ *  \brief Returns a MultipleStringStructure representing the
+ *          long name of the associated channel.
+ */
+MultipleStringStructure ExtendedChannelNameDescriptor::LongChannelName(
+    void) const
+{
+    return MultipleStringStructure(_data + 2);
+}
+
+/** \fn ExtendedChannelNameDescriptor::LongChannelNameString(void) const
+ *  \brief Convenience function that returns a QString comprising a
+ *         concatenation of all the segments in the LongChannelName() value.
+ */
+QString ExtendedChannelNameDescriptor::LongChannelNameString(void) const
+{
+    QString str;
+    MultipleStringStructure mstr = LongChannelName();
+
+    for (int i = 0; i < mstr.StringCount(); i++)
+    {
+        for (uint j = 0; j < mstr.SegmentCount(i); j++)
+            str.append(mstr.CompressedString(i,j));
+    }
+    
+    return str;
+}

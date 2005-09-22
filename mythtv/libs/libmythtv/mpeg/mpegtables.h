@@ -440,6 +440,8 @@ class ProgramMapTable : public PSIPTable
     bool IsAudio(uint i) const;
     /// Returns true iff PMT contains CA descriptor.
     bool IsEncrypted(void) const;
+    /// Returns true iff PMT contains a still-picture video stream
+    bool IsStillPicture(void) const;
     /// Returns a string representation of type at stream index i
     const QString StreamTypeString(uint i) const;
     uint FindPIDs(uint type, vector<uint>& pids) const;

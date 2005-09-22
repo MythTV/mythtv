@@ -55,6 +55,7 @@ class ChannelUtil
     static bool    CreateChannel(uint db_mplexid,
                                  uint db_sourceid,
                                  uint new_channel_id,
+                                 const QString &callsign,
                                  const QString &service_name,
                                  const QString &chan_num,
                                  uint service_id,
@@ -67,6 +68,7 @@ class ChannelUtil
     static bool    UpdateChannel(uint db_mplexid,
                                  uint source_id,
                                  uint channel_id,
+                                 const QString &callsign,
                                  const QString &service_name,
                                  const QString &chan_num,
                                  uint service_id,
@@ -81,11 +83,28 @@ class ChannelUtil
     static int     GetServiceVersion(int mplexid);
 
     // Misc
+    /**
+     * \brief Returns the channel-number string of the given channel.
+     * \param chanid primary key for channel record
+     */
     static QString GetChanNum(int chanid);
+    /**
+     * \brief Returns the callsign of the given channel.
+     * \param chanid primary key for channel record
+     */
+    static QString GetCallsign(int chanid);
+    /**
+     * \brief Returns the service name of the given channel.
+     * \param chanid primary key for channel record
+     */
+    static QString GetServiceName(int chanid);
     static int     GetSourceID(int mplexid);
     static QString GetInputName(int sourceid);
     static QString GetDTVPrivateType(uint networkid, const QString &key,
                                      const QString sitype = "dvb");
+
+  private:
+      static QString GetChannelStringField(int chanid, const QString &field);
 };
 
 #endif // CHANUTIL_H

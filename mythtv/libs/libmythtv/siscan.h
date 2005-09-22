@@ -38,6 +38,7 @@ class SignalMonitor;
 class DTVSignalMonitor;
 class DVBSignalMonitor;
 class ProgramAssociationTable;
+class ProgramMapTable;
 class ServiceDescriptionTable;
 class NetworkInformationTable;
 class VirtualChannelTable;
@@ -51,6 +52,9 @@ typedef enum
     IDLE,           ///< Don't do anything
     TRANSPORT_LIST, ///< Actively scan for channels
 } SCANMODE;
+
+/// PMTs by PID
+typedef QMap<uint, const ProgramMapTable *> PMTMap;
 
 class SIScan : public QObject
 {
@@ -99,6 +103,7 @@ class SIScan : public QObject
     void TransportScanComplete(void);
 
   private slots:
+    void HandlePAT(const ProgramAssociationTable*);
     void HandleVCT(uint tsid, const VirtualChannelTable*);
     void HandleMGT(const MasterGuideTable*);
     void HandleSDT(uint tsid, const ServiceDescriptionTable*);
@@ -126,6 +131,7 @@ class SIScan : public QObject
     void HandleMPEGDBInsertion(const ScanStreamData *sd, bool wait);
     void UpdatePATinDB(int mplexid,
                        const ProgramAssociationTable*,
+                       const PMTMap &,
                        bool force_update);
 
     void HandleATSCDBInsertion(const ScanStreamData *sd, bool wait);
