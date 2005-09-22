@@ -64,6 +64,8 @@ class DTVSignalMonitor: public SignalMonitor
     /// Returns the scan stream data if it exists
     const ScanStreamData *GetScanStreamData() const;
 
+    bool IsAllGood(void) const;
+
     bool WaitForLock(int timeout=-1);
 
   private slots:

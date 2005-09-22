@@ -1343,11 +1343,11 @@ static bool wait_for_good_signal(SignalMonitor *signalMonitor, int timeout,
     t.start();
     while (true)
     {
-        QStringList slist = signalMonitor->GetStatusList(false);
-        SignalMonitorList list = SignalMonitorValue::Parse(slist);
-        if (SignalMonitorValue::AllGood(list))
+        if (signalMonitor->IsAllGood())
             return true;
 
+        QStringList slist = signalMonitor->GetStatusList(false);
+        SignalMonitorList list = SignalMonitorValue::Parse(slist);
         if ((t.elapsed() > timeout) || abortRecordingStart)
         {
             // BEGIN DEBUG CODE
@@ -1654,9 +1654,7 @@ void TVRec::RunTV(void)
         }
         if (waitingForSignal)
         {
-            QStringList slist = signalMonitor->GetStatusList(false);
-            SignalMonitorList list = SignalMonitorValue::Parse(slist);
-            if (SignalMonitorValue::AllGood(list))
+            if (signalMonitor->IsAllGood())
             {
                 VERBOSE(VB_IMPORTANT, "Got good signal");
                 int progNum = get_program_number(signalMonitor);

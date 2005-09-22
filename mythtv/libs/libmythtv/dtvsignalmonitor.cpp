@@ -266,7 +266,12 @@ void DTVSignalMonitor::SetVCT(uint, const TerrestrialVirtualChannelTable* tvct)
     int idx = tvct->Find(majorChannel, minorChannel);
 
     if (idx < 0)
+    {
+        VERBOSE(VB_IMPORTANT, "Could not find channel "
+                <<majorChannel<<"_"<<minorChannel<<" in TVCT");
+        VERBOSE(VB_IMPORTANT, endl<<tvct->toString());
         return;
+    }
 
     DBG_SM("SetVCT()", QString("tvct->ProgramNumber(idx %1): prog num %2")
            .arg(idx).arg(tvct->ProgramNumber(idx)));
@@ -281,7 +286,12 @@ void DTVSignalMonitor::SetVCT(uint, const CableVirtualChannelTable* cvct)
     int idx = cvct->Find(majorChannel, minorChannel);
 
     if (idx < 0)
+    {
+        VERBOSE(VB_IMPORTANT, "Could not find channel "
+                <<majorChannel<<"_"<<minorChannel<<" in CVCT");
+        VERBOSE(VB_IMPORTANT, endl<<cvct->toString());
         return;
+    }
 
     DBG_SM("SetVCT()", QString("cvct->ProgramNumber(idx %1): prog num %2")
            .arg(idx).arg(cvct->ProgramNumber(idx)));
@@ -339,6 +349,27 @@ const DVBStreamData *DTVSignalMonitor::GetDVBStreamData() const
 const ScanStreamData *DTVSignalMonitor::GetScanStreamData() const
 {
     return dynamic_cast<const ScanStreamData*>(stream_data);
+}
+
+bool DTVSignalMonitor::IsAllGood(void) const
+{
+    QMutexLocker locker(&statusLock);
+    if (!SignalMonitor::IsAllGood())
+        return false;
+    if ((flags & kDTVSigMon_WaitForPAT) && !matchingPAT.IsGood())
+            return false;
+    if ((flags & kDTVSigMon_WaitForPMT) && !matchingPMT.IsGood())
+            return false;
+    if ((flags & kDTVSigMon_WaitForMGT) && !matchingMGT.IsGood())
+            return false;
+    if ((flags & kDTVSigMon_WaitForVCT) && !matchingMGT.IsGood())
+            return false;
+    if ((flags & kDTVSigMon_WaitForNIT) && !matchingNIT.IsGood())
+            return false;
+    if ((flags & kDTVSigMon_WaitForSDT) && !matchingSDT.IsGood())
+            return false;
+
+    return true;
 }
 
 /** \fn  SignalMonitor::WaitForLock(int)
