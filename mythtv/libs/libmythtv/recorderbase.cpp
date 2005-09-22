@@ -12,7 +12,7 @@ RecorderBase::RecorderBase(void)
     : ringBuffer(NULL), weMadeBuffer(true), codec("rtjpeg"),
       audiodevice("/dev/dsp"), videodevice("/dev/video"), vbidevice("/dev/vbi"),
       vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
-      curRecording(NULL), curChannelName("")
+      curRecording(NULL), request_pause(false), paused(false)
 {
 }
 
@@ -99,18 +99,53 @@ void RecorderBase::SetOption(const QString &name, int value)
             .arg(name).arg(value));
 }
 
-void RecorderBase::ChannelNameChanged(const QString& new_name)
-{
-    curChannelName = new_name;
-}
-
-QString RecorderBase::GetCurChannelName() const
-{
-    return curChannelName;
-}
-
 void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
 {
     SetOption(name, profile->byName(name)->getValue().toInt());
 }
 
+/** \fn WaitForPause(int)
+ *  \brief WaitForPause blocks until StartRecording() is actually paused,
+ *         or timeout milliseconds elapse.
+ *  \param timeout number of milliseconds to wait defaults to 1000.
+ *  \return true iff pause happened within timeout period.
+ */
+bool RecorderBase::WaitForPause(int timeout)
+{
+    MythTimer t;
+    t.start();
+
+    while (true)
+    {
+        int wait = timeout - t.elapsed();
+
+        if (wait <= 0)
+            return IsPaused();
+        else if (IsPaused())
+            return true;
+
+        pauseWait.wait(wait);
+    }
+}
+
+/** \fn RecorderBase::PauseAndWait(int)
+ *  \brief If request_pause is true Paused and blocks up to timeout 
+ *         milliseconds.
+ *  \param timeout number of milliseconds to wait defaults to 100.
+ *  \return true if recorder is paused.
+ */
+bool RecorderBase::PauseAndWait(int timeout)
+{
+    if (request_pause)
+    {
+        if (!paused)
+        {
+            paused = true;
+            pauseWait.wakeAll();
+        }
+        unpauseWait.wait(timeout);
+    }
+    if (!request_pause)
+        paused = false;
+    return paused;
+}

@@ -109,9 +109,10 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
 
     recording = false;
 
-    paused = false;
-    pausewritethread = false;   
- 
+    writepaused = false;
+    audiopaused = false;
+    mainpaused = false;
+
     keyframedist = KEYFRAMEDIST;
 
     audiobytes = 0;
@@ -390,27 +391,19 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 void NuppelVideoRecorder::Pause(bool clear)
 {
     cleartimeonpause = clear;
-    actuallypaused = audiopaused = mainpaused = false;
-    paused = true;
-    pausewritethread = true;
+    writepaused = audiopaused = mainpaused = false;
+    request_pause = true;
 }
 
 void NuppelVideoRecorder::Unpause(void)
 {
-    pausewritethread = false;
-    paused = false;
+    request_pause = false;
+    unpauseWait.wakeAll();
 }
 
-bool NuppelVideoRecorder::GetPause(void)
+bool NuppelVideoRecorder::IsPaused(void)
 {
-    return (audiopaused && mainpaused && actuallypaused);
-}
-
-bool NuppelVideoRecorder::WaitForPause(int)
-{
-    while (!GetPause())
-        usleep(5000);
-    return true;
+    return (audiopaused && mainpaused && writepaused);
 }
 
 void NuppelVideoRecorder::SetVideoFilters(QString &filters)
@@ -1106,14 +1099,16 @@ void NuppelVideoRecorder::StartRecording(void)
 
     while (encoding) 
     {
-        if (paused)
+        if (request_pause)
         {
            mainpaused = true;
-           usleep(50);
+           pauseWait.wakeAll();
+           unpauseWait.wait(100);
            if (cleartimeonpause)
                gettimeofday(&stm, &tzone);
            continue;
         }
+        mainpaused = false;
 
         frame = 0;
         mm.frame = 0;
@@ -1337,14 +1332,16 @@ void NuppelVideoRecorder::DoV4L2(void)
 
     while (encoding) {
 again:
-        if (paused)
+        if (request_pause)
         {
             mainpaused = true;
-            usleep(50);
+            pauseWait.wakeAll();
+            unpauseWait.wait(100);
             if (cleartimeonpause)
                 gettimeofday(&stm, &tzone);
             continue;
         }
+        mainpaused = false;
 
         tv.tv_sec = 5;
         tv.tv_usec = 0;
@@ -1384,7 +1381,7 @@ again:
 
         frame = vbuf.index;
 
-        if (!paused)
+        if (!request_pause)
         {
             if (vfmt.fmt.pix.pixelformat == V4L2_PIX_FMT_YUYV)
             {
@@ -1557,14 +1554,17 @@ void NuppelVideoRecorder::DoMJPEG(void)
 
     while (encoding)
     {
-        if (paused)
+        if (request_pause)
         {
            mainpaused = true;
-           usleep(50);
+           pauseWait.wakeAll();
+           unpauseWait.wait(100);
            if (cleartimeonpause)
                gettimeofday(&stm, &tzone);
            continue;
         }
+        mainpaused = false;
+
         if (ioctl(fd, MJPIOC_SYNC, &bsync) < 0)
             encoding = false;
 
@@ -2154,13 +2154,15 @@ void NuppelVideoRecorder::doAudioThread(void)
     audiopaused = false;
     while (childrenLive) 
     {
-        if (paused)
+        if (request_pause)
         {
             audiopaused = true;
-            usleep(50);
+            pauseWait.wakeAll();
+            unpauseWait.wait(100);
             act = act_audio_buffer;
             continue;
         }
+        audiopaused = false;
 
         if (audio_buffer_size != (lastread = read(afd, buffer,
                                                   audio_buffer_size))) 
@@ -3124,9 +3126,9 @@ void NuppelVideoRecorder::doVbiThread(void)
 
     while (childrenLive) 
     {
-        if (paused)
+        if (request_pause)
         {
-            usleep(50);
+            unpauseWait.wait(100);
             continue;
         }
 
@@ -3185,15 +3187,17 @@ void NuppelVideoRecorder::doVbiThread(void)
 
 void NuppelVideoRecorder::doWriteThread(void)
 {
-    actuallypaused = false;
+    writepaused = false;
     while (childrenLive && !IsErrored())
     {
-        if (pausewritethread)
+        if (request_pause)
         {
-            actuallypaused = true;
-            usleep(50);
+            writepaused = true;
+            pauseWait.wakeAll();
+            unpauseWait.wait(100);
             continue;
         }
+        writepaused = false;
     
         enum 
         { ACTION_NONE, 

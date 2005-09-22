@@ -80,7 +80,7 @@ class DVBChannel : public QObject, public ChannelBase
 
     // Messages from DVBChannel
   signals:
-    void ChannelChanged(dvb_channel_t& chan);
+    void UpdatePMTObject(const PMTObject *);
 
   private:
     int  GetCardID(void) const;

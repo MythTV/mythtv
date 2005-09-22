@@ -200,6 +200,17 @@ bool HDTVRecorder::Open()
     return (_stream_fd>0);
 }
 
+void HDTVRecorder::SetStreamData(ATSCStreamData *stream_data)
+{
+    if (stream_data == _atsc_stream_data)
+        return;
+
+    ATSCStreamData *old_data = _atsc_stream_data;
+    _atsc_stream_data = stream_data;
+    if (old_data)
+        delete old_data;
+}
+
 bool readchan(int chanfd, unsigned char* buffer, int dlen) {
     int len = read(chanfd, buffer, dlen); // read next byte
     if (dlen != len)
@@ -409,7 +420,7 @@ int HDTVRecorder::ringbuf_read(unsigned char *buffer, size_t count)
     {
         usleep(50000);
 
-        if (_request_pause || dev_error || dev_eof)
+        if (request_pause || dev_error || dev_eof)
             return 0;
 
         pthread_mutex_lock(&ringbuf.lock);
@@ -556,7 +567,7 @@ void HDTVRecorder::StartRecording(void)
         pause = ringbuf.paused;
         pthread_mutex_unlock(&ringbuf.lock);
 
-        if (_request_pause)
+        if (request_pause)
         {
             pthread_mutex_lock(&ringbuf.lock);
             ringbuf.request_pause = true;
@@ -602,28 +613,20 @@ void HDTVRecorder::StartRecording(void)
 
 void HDTVRecorder::StopRecording(void)
 {
-    bool            run;
-    int             idx;
-
-    _request_pause = true;
-    for (idx = 0; idx < 400; ++idx)
-    {
-        if (GetPause())
-            break;
-        pauseWait.wait(500);
-    }
+    Pause();
+    bool ok = WaitForPause(200000);
 
     _request_recording = false;
 
     pthread_mutex_lock(&ringbuf.lock);
-    run = ringbuf.run;
+    bool run = ringbuf.run;
     ringbuf.run = false;
     pthread_mutex_unlock(&ringbuf.lock);
 
     if (run)
         pthread_join(ringbuf.thread, NULL);
 
-    if (idx == 400)
+    if (!ok)
     {
         // Better to have a memory leak, then a segfault?
         VERBOSE(VB_IMPORTANT, "DTV ringbuffer not cleaned up!\n");
@@ -640,26 +643,16 @@ void HDTVRecorder::Pause(bool /*clear*/)
     pthread_mutex_lock(&ringbuf.lock);
     ringbuf.paused = false;
     pthread_mutex_unlock(&ringbuf.lock);
-    _request_pause = true;
+    request_pause = true;
 }
 
-bool HDTVRecorder::GetPause(void)
+bool HDTVRecorder::IsPaused(void)
 {
-    bool paused;
-
     pthread_mutex_lock(&ringbuf.lock);
-    paused = ringbuf.paused;
+    bool paused = ringbuf.paused;
     pthread_mutex_unlock(&ringbuf.lock);
 
     return paused;
-}
-
-void HDTVRecorder::WaitForPause(void)
-{
-    if (!GetPause())
-        if (!pauseWait.wait(1000))
-            VERBOSE(VB_IMPORTANT,
-                    QString("Waited too long for recorder to pause"));
 }
 
 int HDTVRecorder::ResyncStream(unsigned char *buffer, int curr_pos, int len)
@@ -961,18 +954,4 @@ void HDTVRecorder::Reset(void)
     }
 
     StreamData()->Reset();
-}
-
-void HDTVRecorder::ChannelNameChanged(const QString& new_chan)
-{
-    if (!_atsc_stream_data && !_buffer) 
-        return;
-
-    _wait_for_keyframe = _wait_for_keyframe_option;
-
-#if FAKE_VIDEO
-    RecorderBase::ChannelNameChanged("51");
-#else
-    DTVRecorder::ChannelNameChanged(new_chan);
-#endif
 }

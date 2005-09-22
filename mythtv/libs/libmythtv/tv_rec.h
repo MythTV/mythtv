@@ -180,7 +180,6 @@ class TVRec
     static void *RecorderThread(void *param);
 
   private:
-    void ResetRecorder(void);
     bool SetChannel();
 
     void GetChannelInfo(ChannelBase *chan,  QString &title,

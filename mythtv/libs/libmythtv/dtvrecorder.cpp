@@ -22,7 +22,7 @@ using namespace std;
  *  drivers DVBRecorder is used. If you are using firewire
  *  cable box input the FirewireRecorder is used.
  *
- *  \sa DVBRecorder, HDTVRecorder, FirewrireRecorder, DBox2Recorder
+ *  \sa DVBRecorder, HDTVRecorder, FirewireRecorder, DBox2Recorder
  */
 
 /** \fn DTVRecorder::SetOption(const QString&,int)
@@ -52,17 +52,6 @@ void DTVRecorder::SetOption(const QString &name, int value)
             VERBOSE(VB_IMPORTANT, "Error: could not allocate "
                     "new packet buffer.");
     }
-}
-
-// documented in recorderbase.h
-bool DTVRecorder::WaitForPause(int timeout)
-{
-    if (!_paused && !pauseWait.wait(timeout))
-    {
-        VERBOSE(VB_IMPORTANT, "Waited too long for recorder to pause");
-        return false;
-    }
-    return true;
 }
 
 /** \fn DTVRecorder::FinishRecording()

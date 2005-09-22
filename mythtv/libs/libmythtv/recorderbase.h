@@ -49,14 +49,6 @@ class RecorderBase
      */
     void SetRecording(ProgramInfo *pginfo);
 
-    /** \brief Changes the name of the channel currently being recorded.
-     *
-     *   This method is useful for LiveTV, when we have changed the channel
-     *   being recorded.
-     *  \sa GetCurChannelName()
-     */
-    virtual void ChannelNameChanged(const QString& new_name);
-
     /** \brief Tells recorder to use an externally created ringbuffer.
      *
      *   If this an external RingBuffer is set, it should be before any
@@ -124,24 +116,6 @@ class RecorderBase
      */
     virtual void Reset(void) = 0;   
 
-    /** \brief Pause tells StartRecording() to pause, it should not block.
-     *  \param clear if true any generated timecodes should be reset.
-     *  \sa Unpause(), WaitForPause()
-     */
-    virtual void Pause(bool clear = true) = 0;
-
-    /// \brief Unpause tells StartRecording() to unpause, it should not block.
-    virtual void Unpause(void) = 0;
-    virtual bool GetPause(void) = 0;
-
-    /** \fn WaitForPause(int)
-     *  \brief WaitForPause blocks until StartRecording() is actually paused,
-     *         or timeout seconds elapse.
-     *  \param timeout number of milliseconds to wait defaults to 1000.
-     *  \return true iff pause happened within timeout period.
-     */
-    virtual bool WaitForPause(int timeout=1000) = 0;
-
     /// \brief Tells whether the StartRecorder() loop is running.
     virtual bool IsRecording(void) = 0;
 
@@ -188,6 +162,20 @@ class RecorderBase
      */
     virtual long long GetKeyframePosition(long long desired) = 0;
 
+    /** \brief Pause tells StartRecording() to pause, it should not block.
+     *  \param clear if true any generated timecodes should be reset.
+     *  \sa Unpause(), WaitForPause()
+     */
+    virtual void Pause(bool clear = true)
+        { (void) clear; request_pause = true; }
+
+    /// \brief Unpause tells StartRecording() to unpause, it should not block.
+    virtual void Unpause(void)
+        { request_pause = false; unpauseWait.wakeAll(); }
+    /// \brief Returns true iff recorder is paused.
+    virtual bool IsPaused(void) const { return paused; }
+    virtual bool WaitForPause(int timeout = 1000);
+
     /** \brief Returns an approximation of the frame rate.
      *
      *  \bug This can be off by at least half, our non-frame grabber based
@@ -196,16 +184,12 @@ class RecorderBase
      */
     double GetFrameRate(void) { return video_frame_rate; }
 
-    /** \brief Returns the name of the channel currently being recorded.
-     *  \sa ChannelNameChanged(const QString&)
-     */
-    QString GetCurChannelName() const;
-
   protected:
     /** \brief Convenience function used to set integer options.
      *  \sa SetOption(const QString&, const QString&)
      */
     void SetIntOption(RecordingProfile *profile, const QString &name);
+    virtual bool PauseAndWait(int timeout = 100);
 
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
@@ -221,8 +205,9 @@ class RecorderBase
     double         video_frame_rate;
 
     ProgramInfo   *curRecording;
-    QString        curChannelName;
 
+    bool           request_pause;
+    bool           paused;
     QWaitCondition pauseWait;
     QWaitCondition unpauseWait;
 };

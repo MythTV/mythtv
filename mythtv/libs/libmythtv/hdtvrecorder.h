@@ -47,17 +47,15 @@ class HDTVRecorder : public DTVRecorder
     void StartRecording(void);
     void StopRecording(void);
 
-    void Pause(bool /*clear*/);
-    bool GetPause(void);
-    void WaitForPause(void);
+    void Pause(bool clear = false);
+    bool IsPaused(void);
+
     void Reset(void);
 
     bool Open(void);
 
-    void ChannelNameChanged(const QString& new_freqid);
-
-    ATSCStreamData* StreamData() { return _atsc_stream_data; }
-    const ATSCStreamData* StreamData() const { return _atsc_stream_data; }
+    void SetStreamData(ATSCStreamData*);
+    ATSCStreamData* StreamData(void) { return _atsc_stream_data; }
 
   private:
     int ProcessData(unsigned char *buffer, int len);

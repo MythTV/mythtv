@@ -295,20 +295,13 @@ void DBox2Recorder::StartRecording(void) {
     {
         if(_request_abort) 
   	    break;
-        else if(_request_pause) 
-        {
-            if(!_paused) 
-	        _paused = true;
-            pauseWait.wakeAll();
-            usleep(2000);
+
+        bool was_paused = request_pause || paused;
+        if (PauseAndWait())
             continue;
-	}
-        else if(!_request_pause && _paused) 
-        {
-            _paused = false;
-            VERBOSE(VB_IMPORTANT, QString("DBOX#%1: Starting input...").arg(m_cardid));
+        if (was_paused)
             lastpacket = time(NULL);
-        }
+
 	if (m_lastPIDRequestID >= 0 || m_lastInfoRequestID >= 0) 
 	{
 	    if (time(NULL) - lastShown >= 1) 

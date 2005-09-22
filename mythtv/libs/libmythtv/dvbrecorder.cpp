@@ -152,12 +152,12 @@ void DVBRecorder::SetOptionsFromProfile(RecordingProfile*,
     DTVRecorder::SetOption("tvformat", gContext->GetSetting("TVFormat"));
 }
 
-void DVBRecorder::ChannelChanged(dvb_channel_t& chan)
+void DVBRecorder::SetPMTObject(const PMTObject *_pmt)
 {
     QMutexLocker read_lock(&_pid_read_lock);
     QMutexLocker change_lock(&_pid_change_lock);
-    RECORD("DVBRecorder::ChannelChanged()");
-    _input_pmt = chan.pmt;
+    RECORD("SetPMTObject()");
+    _input_pmt = *_pmt;
 
     AutoPID();
 
@@ -193,8 +193,8 @@ bool DVBRecorder::Open(void)
     _polls.events = POLLIN;
     _polls.revents = 0;
 
-    connect(dvbchannel, SIGNAL(ChannelChanged(dvb_channel_t&)),
-            this, SLOT(ChannelChanged(dvb_channel_t&)));
+    connect(dvbchannel, SIGNAL(UpdatePMTObject(const PMTObject *)),
+            this, SLOT(SetPMTObject(const PMTObject *)));
 
     RECORD(QString("Card opened successfully (using %1 mode).")
            .arg(_record_transport_stream_option ? "TS" : "PS"));
@@ -576,9 +576,19 @@ void DVBRecorder::StartRecording(void)
     SetPMT(NULL);
     _ts_packets_until_psip_sync = 0;
 
-    int poll_timeouts = 0;
+    MythTimer t;
+    t.start();
     while (_request_recording && !_error)
     {
+        if (PauseAndWait())
+            continue;
+
+        if (_stream_fd < 0)
+        {
+            usleep(50);
+            continue;
+        }
+
         if (_reset_pid_filters)
         {
             RECORD("Resetting Demux Filters");
@@ -590,41 +600,27 @@ void DVBRecorder::StartRecording(void)
             _reset_pid_filters = false;
         }
 
-        if (_request_pause)
-        {
-            _paused = true;
-            pauseWait.wakeAll();
-            usleep(50);
-            continue;
-        }
-        else if (_paused)
-        {
-            _paused = false;
-        }
-
         int ret;
-        do 
-        {
+        do
             ret = poll(&_polls, 1, POLL_INTERVAL);
-        } while ((-1==ret) && ((EAGAIN==errno) || (EINTR==errno)));
+        while (!request_pause && (_stream_fd >= 0) &&
+               ((-1 == ret) && ((EAGAIN == errno) || (EINTR == errno))));
 
-        if (ret == 0)
+        if (request_pause || _stream_fd < 0)
+            continue;
+
+        if (ret == 0 && t.elapsed() > POLL_WARNING_TIMEOUT)
         {
-            poll_timeouts++;
-            if (poll_timeouts > POLL_WARNING_TIMEOUT/POLL_INTERVAL)
-                RECWARN(QString("No data from card in %1 milliseconds.")
-                        .arg(POLL_INTERVAL*poll_timeouts));
+            RECWARN(QString("No data from card in %1 milliseconds.")
+                    .arg(POLL_INTERVAL));
         }
         else if (ret == 1 && _polls.revents & POLLIN)
         {
-            if (poll_timeouts > POLL_WARNING_TIMEOUT/POLL_INTERVAL)
-            {
-                RECWARN("Got data from card.");
-            }
-            poll_timeouts = 0;
-                
-            if (!_request_pause)
-                ReadFromDMX();
+            if (t.restart() > POLL_WARNING_TIMEOUT)
+                RECWARN(QString("Got data from card after %1 ms.")
+                        .arg(POLL_WARNING_TIMEOUT));
+
+            ReadFromDMX();
         }
         else if ((ret < 0) || (ret == 1 && _polls.revents & POLLERR))
             RECENO("Poll failed while waiting for data.");

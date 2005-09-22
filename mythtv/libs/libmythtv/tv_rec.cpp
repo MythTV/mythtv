@@ -1167,12 +1167,6 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
             is_atsc = (info.type == FE_ATSC);
 #endif // if (DVB_API_VERSION_MINOR == 1)
 
-        dynamic_cast<DVBChannel*>(channel)->SetPMT(NULL);
-        QObject::connect(dynamic_cast<DVBChannel*>(channel),
-                         SIGNAL(ChannelChanged(dvb_channel_t&)),
-                         dynamic_cast<DVBRecorder*>(recorder),
-                         SLOT(ChannelChanged(dvb_channel_t&)));
-
 #else
         VERBOSE(VB_IMPORTANT, "DVB Recorder requested, but MythTV was "
                 "compiled without DVB support.");
@@ -1395,7 +1389,6 @@ bool TVRec::StartChannel(bool livetv)
             hdtvRec->StreamData()->Reset(channel->GetMajorChannel(),
                                          channel->GetMinorChannel());
         }
-        recorder->ChannelNameChanged(channel->GetCurrentName());
     }
 #endif // USING_V4L
     SetSignalMonitoringRate(50, livetv);
@@ -3225,19 +3218,6 @@ void TVRec::PauseRecorder(void)
     recorder->Pause();
 } 
 
-/** \fn TVRec::ResetRecorder(void)
- *  \brief This does an recorder->Reset() and also assures that the 
- *         any signal monitor or channel object is also properly
- *         taken care of.
- *
- *   You must pause both the NuppelVideoRecorder and RingBuffer before
- *   calling this method.
- */
-void TVRec::ResetRecorder(void)
-{
-    recorder->Reset();
-}
-
 /** \fn TVRec::ToggleInputs(void)
  *  \brief Toggles between inputs on current capture card.
  *
@@ -3501,11 +3481,7 @@ void TVRec::Unpause(void)
     QMutexLocker lock(&stateChangeLock);
 
     if (recorder)
-    {
-        if (channel)
-            recorder->ChannelNameChanged(channel->GetCurrentName());
-        ResetRecorder();
-    }
+        recorder->Reset();
 
     if (SignalMonitor::IsSupported(cardtype))
     {

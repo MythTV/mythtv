@@ -46,6 +46,7 @@ class FirewireRecorder : public DTVRecorder
     void SetOption(const QString &name, int value);
     QString FirewireSpeedString(int speed);
 
+    bool PauseAndWait(int timeout = 100);
   private:
     int fwport, fwchannel, fwspeed, fwbandwidth, fwfd, fwconnection;
     int fwoplug, fwiplug;

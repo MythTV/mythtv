@@ -50,8 +50,6 @@ MpegRecorder::MpegRecorder()
             : RecorderBase()
 {
     errored = false;
-    paused = false;
-    mainpaused = false;
     recording = false;
 
     framesWritten = 0;
@@ -418,13 +416,8 @@ void MpegRecorder::StartRecording(void)
 
     while (encoding)
     {
-        if (paused)
-        {
-            mainpaused = true;
-            pauseWait.wakeAll();
-            unpauseWait.wait(100);
+        if (PauseAndWait(100))
             continue;
-        }
 
         if ((deviceIsMpegFile) && (framesWritten))
         {
@@ -607,29 +600,8 @@ void MpegRecorder::Reset(void)
 void MpegRecorder::Pause(bool clear)
 {
     cleartimeonpause = clear;
-    mainpaused = false;
-    paused = true;
-}
-
-void MpegRecorder::Unpause(void)
-{
     paused = false;
-    unpauseWait.wakeAll();
-}
-
-bool MpegRecorder::GetPause(void)
-{
-    return mainpaused;
-}
-
-bool MpegRecorder::WaitForPause(int timeout)
-{
-    if (!mainpaused && !pauseWait.wait(timeout))
-    {
-        VERBOSE(VB_IMPORTANT, "Waited too long for recorder to pause");
-        return false;
-    }
-    return true;
+    request_pause = true;
 }
 
 bool MpegRecorder::IsRecording(void)

@@ -61,8 +61,7 @@ class NuppelVideoRecorder : public RecorderBase
     
     void Pause(bool clear = true);
     void Unpause(void);
-    bool GetPause(void); 
-    bool WaitForPause(int timeout=-1);
+    bool IsPaused(void); 
  
     bool IsRecording(void);
     bool IsErrored(void);
@@ -214,9 +213,7 @@ class NuppelVideoRecorder : public RecorderBase
     long long framesWritten;
 
     bool livetv;
-    bool paused;
-    bool pausewritethread;
-    bool actuallypaused;
+    bool writepaused;
     bool audiopaused;
     bool mainpaused;
 

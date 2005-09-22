@@ -21,9 +21,9 @@ class DTVRecorder: public QObject, public RecorderBase
         _first_keyframe(0), _position_within_gop_header(0),
         _keyframe_seen(false), _last_keyframe_seen(0), _last_gop_seen(0),
         _last_seq_seen(0), _stream_fd(-1), _error(false),
-        _request_recording(false), _request_pause(false),
+        _request_recording(false),
         _wait_for_keyframe_option(true),
-        _recording(false), _paused(false), _wait_for_keyframe(true),
+        _recording(false), _wait_for_keyframe(true),
         _buffer(0), _buffer_size(0),
         _frames_seen_count(0), _frames_written_count(0) {;}
 
@@ -36,15 +36,6 @@ class DTVRecorder: public QObject, public RecorderBase
     virtual void StopRecording(void) { _request_recording = false; }
     bool IsRecording(void) { return _recording; }
     bool IsErrored(void) { return _error; }
-
-    void Pause(bool /*clear*/)
-    {
-        _paused = false;
-        _request_pause = true;
-    }
-    virtual void Unpause(void) { _request_pause = false; }
-    virtual bool GetPause(void) { return _paused; }
-    virtual bool WaitForPause(int timeout = 1000);
 
     long long GetKeyframePosition(long long desired);
     long long GetFramesWritten(void) { return _frames_written_count; }
@@ -73,11 +64,10 @@ class DTVRecorder: public QObject, public RecorderBase
 
     // API call is requesting action
     bool _request_recording;
-    bool _request_pause; // Pause recording: for channel changes, and to stop recording
-    bool _wait_for_keyframe_option; // Wait for the a GOP/SEQ-start before sending data
-    // recording or pause is actually being performed
+    /// Wait for the a GOP/SEQ-start before sending data
+    bool _wait_for_keyframe_option;
+    /// True iff recording is actually being performed
     bool _recording;
-    bool _paused;
     bool _wait_for_keyframe;
 
     // packet buffer

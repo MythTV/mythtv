@@ -228,7 +228,7 @@ bool DVBChannel::SetChannelByString(const QString &chan)
 void DVBChannel::RecorderStarted()
 {
     if (chan_opts.IsPMTSet())
-        emit ChannelChanged(chan_opts);
+        emit UpdatePMTObject(&chan_opts.pmt);
 }
 
 bool DVBChannel::SwitchToInput(const QString &input, const QString &chan)
@@ -482,7 +482,7 @@ bool DVBChannel::CheckModulation(fe_modulation_t modulation) const
 
 /** \fn DVBChannel::SetPMT(const PMTObject*)
  *  \brief Sets our PMT to a copy of the PMTObject, and emits
- *         a ChannelChanged(dvb_channel_t&) signal.
+ *         a UpdatePMTObject(const PMTObject*) signal.
  */
 void DVBChannel::SetPMT(const PMTObject *pmt)
 {
@@ -496,7 +496,7 @@ void DVBChannel::SetPMT(const PMTObject *pmt)
     chan_opts.SetPMT(pmt);
     // Send the PMT to recorder (needs to be cleaned up some)
     if (pmt)
-        emit ChannelChanged(chan_opts);
+        emit UpdatePMTObject(&chan_opts.pmt);
 }
 
 /** \fn DVBChannel::SetCAPMT(const PMTObject*)

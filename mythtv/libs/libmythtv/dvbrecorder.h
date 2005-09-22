@@ -33,7 +33,7 @@ class ProgramMapTable;
 class DVBRecorder: public DTVRecorder
 {
     Q_OBJECT
-public:
+  public:
     DVBRecorder(DVBChannel* dvbchannel);
    ~DVBRecorder();
 
@@ -56,10 +56,10 @@ public:
     bool RecordsProgramStream(void) const
         { return !_record_transport_stream_option; }
 
-public slots:
-    void ChannelChanged(dvb_channel_t& chan);
+  public slots:
+    void SetPMTObject(const PMTObject*);
 
-private:
+  private:
     void ReadFromDMX(void);
     static void ProcessDataPS(unsigned char *buffer, int len, void *priv);
     void LocalProcessDataPS(unsigned char *buffer, int len);

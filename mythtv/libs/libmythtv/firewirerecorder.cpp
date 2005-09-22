@@ -147,22 +147,8 @@ void FirewireRecorder::StartRecording(void) {
     iec61883_mpeg2_recv_start(fwmpeg,fwchannel);
     lastpacket = time(NULL);
     while(_request_recording) {
-       if(_request_pause) {
-            if(!_paused) {
-                 // stop mpeg
-                 iec61883_mpeg2_recv_stop(fwmpeg);
-                  _paused = true;
-            }
-            pauseWait.wakeAll();
-
-            usleep(1000);
-            continue;
-
-       } else if(!_request_pause && _paused) {
-            _paused = false;
-            iec61883_mpeg2_recv_start(fwmpeg,fwchannel);
-            lastpacket = time(NULL);
-       }
+       if (PauseAndWait())
+           continue;
 
        if(time(NULL) - lastpacket > FIREWIRE_TIMEOUT) {
             VERBOSE(VB_IMPORTANT, QString("Firewire: No Input in %1 seconds [P:%2 N:%3] (time)").arg(FIREWIRE_TIMEOUT).arg(fwport).arg(fwnode));
@@ -255,4 +241,25 @@ QString FirewireRecorder::FirewireSpeedString (int speed) {
         default:
                return(QString("Invalid (%1)").arg(speed));
      }
+}
+
+// documented in recorderbase.cpp
+bool FirewireRecorder::PauseAndWait(int timeout)
+{
+    if (request_pause)
+    {
+        if (!paused)
+        {
+            iec61883_mpeg2_recv_stop(fwmpeg);
+            paused = true;
+            pauseWait.wakeAll();
+        }
+        unpauseWait.wait(timeout);
+    }
+    if (!request_pause && paused)
+    {
+        iec61883_mpeg2_recv_start(fwmpeg, fwchannel);
+        paused = false;
+    }
+    return paused;
 }
