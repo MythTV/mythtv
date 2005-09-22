@@ -76,7 +76,7 @@ class ChannelBase
     virtual bool SetChannelByDirection(ChannelChangeDirection);
 
     // Input toggling convenience methods
-    virtual void ToggleInputs(void);
+    virtual bool ToggleInputs(void);
     virtual bool SwitchToInput(const QString &input);
     virtual bool SwitchToInput(const QString &input, const QString &chan);
 

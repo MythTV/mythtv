@@ -49,8 +49,9 @@ bool ChannelBase::SetChannelByDirection(ChannelChangeDirection dir)
     return fTune;
 }
 
-void ChannelBase::ToggleInputs(void)
+bool ChannelBase::ToggleInputs(void)
 {
+    bool ok = true;
     int newcapchannel = currentcapchannel;
 
     if (capchannels > 0)
@@ -60,8 +61,9 @@ void ChannelBase::ToggleInputs(void)
             newcapchannel = (newcapchannel + 1) % capchannels;
         } while (inputTuneTo[newcapchannel].isEmpty());
 
-        SwitchToInput(newcapchannel, true);
+        ok = SwitchToInput(newcapchannel, true);
     }
+    return ok;
 }
 
 QString ChannelBase::GetInputByNum(int capchannel) const
