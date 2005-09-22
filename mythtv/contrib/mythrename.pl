@@ -7,10 +7,10 @@
 # license: GPL
 # author:  Chris Petersen (based on the ideas in mythlink.sh from Dale Gass)
 #
-# mythlink.pl
+# mythrename.pl (formerly mythlink.pl)
 #
-#   Creates symlinks to more human-readable versions of mythtv recording
-#   filenames.  See --help for instructions.
+#   Renames mythtv recordings to more human-readable filenames.
+#   See --help for instructions.
 #
 #   Automatically detects database settings from mysql.txt, and loads
 #   the mythtv recording directory from the database (code from nuvexport).
@@ -25,7 +25,7 @@
     our ($dest, $format, $usage, $underscores);
     our ($dformat, $dseparator, $dreplacement, $separator, $replacement);
     our ($db_host, $db_user, $db_name, $db_pass, $video_dir, @files);
-    our ($hostname, $dbh, $sh, $sh2, $q, $q2);
+    our ($hostname, $dbh, $sh, $sh2, $sh3, $q, $q2, $q3, $count);
 
 # Default filename format
     $dformat = '%T %- %Y-%m-%d, %g-%i %A %- %S';
@@ -39,13 +39,13 @@
     $separator   = $dseparator;
     $replacement = $dreplacement;
 
-# Load the destination directory, if one was specified
-    GetOptions('dest|destination|path=s'    => \$dest,
-               'format=s'                   => \$format,
-               'separator=s'                => \$separator,
-               'replacement=s'              => \$replacement,
-               'usage|help|h'               => \$usage,
-               'underscores'                => \$underscores
+# Load the cli options
+    GetOptions('link|dest|destination|path:s' => \$dest,
+               'format=s'                     => \$format,
+               'separator=s'                  => \$separator,
+               'replacement=s'                => \$replacement,
+               'usage|help|h'                 => \$usage,
+               'underscores'                  => \$underscores
               );
 
 # Print usage
@@ -55,10 +55,12 @@ $0 usage:
 
 options:
 
---dest
+--link [destination directory]
 
-    By default, links will be created in the show_names directory inside of the
-    current mythtv data directory on this machine.  eg:
+    If you would like mythrename.pl to work like the old mythlink.pl, specify
+    --link and an optional pathname. If no pathname is given, links will be
+    created in the show_names directory inside of the current mythtv data
+    directory on this machine.  eg:
 
     /var/video/show_names/
 
@@ -70,8 +72,8 @@ options:
     \%S = subtitle (aka episode name)
     \%R = description
     \%C = category (as reported by grabber)
+    \%c = chanid
     \%U = recording group
-    \%p = separator character
     \%y = year, 2 digits
     \%Y = year, 4 digits
     \%n = month
@@ -86,6 +88,7 @@ options:
     \%s = seconds
     \%a = am/pm
     \%A = AM/PM
+    \%- = separator character
 
     * For end time, prepend an "e" to the appropriate time/date format code
       above; i.e. "\%eG" gives the 24-hour hour for the end time.
@@ -207,22 +210,23 @@ EOF
     die "Recordings directory $video_dir doesn't exist!\n\n" unless (-d $video_dir);
     $video_dir =~ s/\/+$//;
 
-# Double-check the destination
-    $dest ||= "$video_dir/show_names";
-    print "Destination directory:  $dest\n";
-
-# Create nonexistent paths
-    unless (-e $dest) {
-        mkpath($dest, 0, 0755) or die "Failed to create $dest:  $!\n";
-    }
-
-# Bad paths
-    die "$dest is not a directory.\n" unless (-d $dest);
-
-# Delete any old links
-    foreach my $file (<$dest/*>) {
-        next unless (-l $file);
-        unlink $file or die "Couldn't remove old symlink $file:  $!\n";
+# Link destination
+    if (defined($dest)) {
+    # Double-check the destination
+        $dest ||= "$video_dir/show_names";
+    # Alert the user
+        print "Link destination directory:  $dest\n";
+    # Create nonexistent paths
+        unless (-e $dest) {
+            mkpath($dest, 0, 0755) or die "Failed to create $dest:  $!\n";
+        }
+    # Bad path
+        die "$dest is not a directory.\n" unless (-d $dest);
+    # Delete any old links
+        foreach my $file (<$dest/*>) {
+            next unless (-l $file);
+            unlink $file or die "Couldn't remove old symlink $file:  $!\n";
+        }
     }
 
 # Load the files
@@ -237,6 +241,12 @@ EOF
     $sh  = $dbh->prepare($q);
     $sh2 = $dbh->prepare($q2);
 
+# Only if we're renaming files
+    unless ($dest) {
+        $q3  = 'UPDATE recorded SET basename=? WHERE chanid=? AND starttime=?';
+        $sh3 = $dbh->prepare($q3);
+    }
+
 # Create symlinks for the files on this machine
     foreach my $file (@files) {
         next if ($file =~ /^ringbuf/);
@@ -247,6 +257,8 @@ EOF
         %info = %{$sh->fetchrow_hashref};
     # Nope
         unless ($info{'chanid'}) {
+        # Incorrect db version?
+            die "You must use --link for mythtv < 0.19\n" unless ($dest);
         # Pull out the various parts that make up the filename
             my ($channel, $starttime) = $file =~/^(\d+)_(\d{14})[_\.]/i;
         # Found a bad filename?
@@ -297,6 +309,7 @@ EOF
         ($fields{'R'} = ($info{'description'} or '')) =~ s/%/%%/g;
         ($fields{'C'} = ($info{'category'}    or '')) =~ s/%/%%/g;
         ($fields{'U'} = ($info{'recgroup'}    or '')) =~ s/%/%%/g;
+        $fields{'c'}  = $info{'chanid'};
     # Start time
         $fields{'y'} = substr($syear, 2);   # year, 2 digits
         $fields{'Y'} = $syear;              # year, 4 digits
@@ -361,20 +374,49 @@ EOF
     # Figure out the suffix
         my $out    = `file $safe_file 2>/dev/null`;
         my $suffix = ($out =~ /mpe?g/i) ? '.mpg' : '.nuv';
-    # Check for duplicates
-        if (-e "$dest/$name$suffix") {
-            my $count = 2;
-            while (-e "$dest/$name.$count$suffix") {
-                $count++;
+    # Link destination
+        if ($dest) {
+        # Check for duplicates
+            if (-e "$dest/$name$suffix") {
+                $count = 2;
+                while (-e "$dest/$name.$count$suffix") {
+                    $count++;
+                }
+                $name .= ".$count";
             }
-            $name .= ".$count";
+            $name .= $suffix;
+        # Create the link
+            symlink "$video_dir/$file", "$dest/$name"
+                or die "Can't create symlink $dest/$name:  $!\n";
+            print "$dest/$name\n";
         }
-    # Create the link
-        symlink "$video_dir/$file", "$dest/$name$suffix"
-            or die "Can't create symlink $dest/$name$suffix:  $!\n";
-        print "$dest/$name$suffix\n";
+    # Rename the file
+        else {
+            if ($file ne $name.$suffix) {
+            # Check for duplicates
+                if (-e "$video_dir/$name$suffix") {
+                    $count = 2;
+                    while (-e "$video_dir/$name.$count$suffix") {
+                        $count++;
+                    }
+                    $name .= ".$count";
+                }
+                $name .= $suffix;
+            # Update the database
+                my $rows = $sh3->execute($name, $info{'chanid'}, $info{'starttime'});
+                die "Couldn't update basename in database for $file:  ($q3)\n" unless ($rows == 1);
+                my $ret = rename "$video_dir/$file", "$video_dir/$name";
+            # Rename failed -- Move the database back to how it was (man, do I miss transactions)
+                if (!$ret) {
+                    $rows = $sh3->execute($file, $info{'chanid'}, $info{'starttime'});
+                    die "Couldn't restore original basename in database for $file:  ($q3)\n" unless ($rows == 1);
+                }
+                print "$file\t-> $name\n";
+            }
+        }
     }
 
     $sh->finish;
     $sh2->finish;
+    $sh3->finish if ($sh3);
 
