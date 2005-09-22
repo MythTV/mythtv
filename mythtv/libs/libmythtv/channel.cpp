@@ -771,19 +771,22 @@ bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
         }
 
         VERBOSE(VB_CHANNEL, 
-                QString("Channel(%1)::SwitchToInput() setting video mode to %2")
+                QString("Channel(%1)::SwitchToInput() "
+                        "setting video mode to %2")
                 .arg(device).arg(mode_to_format(videomode_v4l2, 2)));
         ioctlval = ioctl(videofd, VIDIOC_S_STD, &videomode_v4l2);
         if (ioctlval < 0)
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Channel(%1)::SwitchToInput(in %2%3): Error %4 "
-                            "while setting video mode (v2), \"%5\", trying v4l v1")
+                            "while setting video mode '%5' (v2), \"%6\", "
+                            "trying v4l v1")
                     .arg(device).arg(newcapchannel)
                     .arg(setstarting ? ", set ch" : "")
-                    .arg(ioctlval).arg(strerror(errno)));
+                    .arg(ioctlval).arg(mode_to_format(videomode_v4l2, 2))
+                    .arg(strerror(errno)));
 
-            // Fall through to try v4l version 1, pcHDTV
+            // Fall through to try v4l version 1, pcHDTV 1.4 (for HD-2000)
             // drivers don't work with VIDIOC_S_STD ioctl.
             usingv4l1 = true;
             ok = false;
@@ -798,17 +801,19 @@ bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
         set.channel = newcapchannel;
         set.norm = videomode_v4l1;
         VERBOSE(VB_CHANNEL, 
-                QString("Channel(%1)::SwitchToInput() setting video mode to %2")
+                QString("Channel(%1)::SwitchToInput() "
+                        "setting video mode to %2")
                 .arg(device).arg(mode_to_format(videomode_v4l1, 1)));
         ioctlval = ioctl(videofd, VIDIOCSCHAN, &set); // set new settings
         if (ioctlval < 0)
         {
             VERBOSE(VB_IMPORTANT,
                     QString("Channel(%1)::SwitchToInput(in %2%3): "
-                            "Error %4 while setting video mode (v1): %5")
+                            "Error %4 while setting video mode '%5' (v1): %6")
                     .arg(device).arg(newcapchannel)
                     .arg(setstarting ? ", set ch" : "")
-                    .arg(ioctlval).arg(strerror(errno)));
+                    .arg(ioctlval).arg(mode_to_format(videomode_v4l1, 1))
+                    .arg(strerror(errno)));
             ok = false;
         }
         else if (usingv4l2)
@@ -823,7 +828,31 @@ bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
     }
 
     if (!ok)
-        return false;
+    {
+        // Try to set ATSC mode if NTSC fails
+        if (mode_to_format(videomode_v4l1, 1) != "NTSC")
+            return false;
+
+        int v1 = videomode_v4l1, v2 = videomode_v4l2;
+        videomode_v4l1 = VIDEO_MODE_ATSC;
+        videomode_v4l2 = V4L2_STD_ATSC_8_VSB;
+        ok = SwitchToInput(newcapchannel, setstarting);
+        videomode_v4l1 = v1;
+        videomode_v4l2 = v2;
+
+        // ATSC mode didn't work either, oh well
+        if (!ok)
+            return false;
+
+        // Warn user, but keep going...
+        QString msg = QString(
+            "Channel(%1)::SwitchToInput(in %2%3):\n"
+            "\t\t\tRequested NTSC mode failed, but only ATSC succeeded.\n"
+            "\t\t\tYou must should the video mode to ATSC!")
+            .arg(device).arg(newcapchannel)
+            .arg(setstarting ? ", set ch" : "");
+        VERBOSE(VB_IMPORTANT, msg);
+    }
 
     currentcapchannel = newcapchannel;
     curchannelname = "";
