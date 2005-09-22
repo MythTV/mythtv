@@ -35,7 +35,7 @@ EITScanner::~EITScanner()
     delete eitHelper;
 }
 
-void EITScanner::ChannelChanged(dvb_channel_t&)
+void EITScanner::SetPMTObject(const PMTObject *)
 {
     eitHelper->ClearList();
 }
@@ -81,8 +81,8 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser)
     channel = _channel;
     connect(parser,    SIGNAL(EventsReady(QMap_Events*)),
             eitHelper, SLOT(HandleEITs(QMap_Events*)));
-    connect(channel,   SIGNAL(ChannelChanged(dvb_channel_t&)),
-            this,      SLOT(ChannelChanged(dvb_channel_t&)));
+    connect(channel,   SIGNAL(UpdatePMTObject(const PMTObject *)),
+            this,      SLOT(SetPMTObject(const PMTObject *)));
 }
 
 /** \fn EITScanner::StopPassiveScan()
