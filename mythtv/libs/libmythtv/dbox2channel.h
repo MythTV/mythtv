@@ -30,7 +30,7 @@ class DBox2Channel : public QObject, public ChannelBase
 {
     Q_OBJECT
   public:
-    DBox2Channel(TVRec *parent, dbox2_options_t *dbox2_options, int cardid);
+    DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options, int cardid);
     ~DBox2Channel(void);
 
     bool SetChannelByString(const QString &chan);
@@ -67,7 +67,7 @@ class DBox2Channel : public QObject, public ChannelBase
     QString GetDefaultChannel();
 
   private:
-    dbox2_options_t  *m_dbox2options;
+    DBox2DBOptions   *m_dbox2options;
     int               m_cardid;
     bool              m_channelListReady;
     QString           m_lastChannel;

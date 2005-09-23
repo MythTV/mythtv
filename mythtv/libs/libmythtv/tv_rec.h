@@ -15,13 +15,22 @@
 class QSocket;
 class RingBufferInfo;
 class NuppelVideoRecorder;
-class RecorderBase;
 class EITScanner;
 class DVBSIParser;
-class SignalMonitor;
-class ChannelBase;
-class DVBChannel;
 class DummyDTVRecorder;
+class RecordingProfile;
+
+class RecorderBase;
+class DVBRecorder;
+class HDTVRecorder;
+
+class SignalMonitor;
+class DTVSignalMonitor;
+
+class ChannelBase;
+class DBox2Channel;
+class DVBChannel;
+class Channel;
 
 /// Used to request ProgramInfo for channel browsing.
 typedef enum
@@ -34,31 +43,65 @@ typedef enum
     BROWSE_FAVORITE ///< Fetch information on the next favorite channel
 } BrowseDirections;
 
-typedef struct _dvb_options_t
+class GeneralDBOptions
 {
+  public:
+    GeneralDBOptions() :
+        videodev(""),         vbidev(""),
+        audiodev(""),         defaultinput("Television"),
+        cardtype("V4L"),
+        audiosamplerate(-1),  skip_btaudio(false),
+        signal_timeout(1000), channel_timeout(3000) {;}
+  
+    QString videodev;
+    QString vbidev;
+    QString audiodev;
+    QString defaultinput;
+    QString cardtype;
+    int     audiosamplerate;
+    bool    skip_btaudio;
+    uint    signal_timeout;
+    uint    channel_timeout;
+    bool    wait_for_seqstart;
+};
+
+class DVBDBOptions
+{
+  public:
+    DVBDBOptions() :
+        hw_decoder(0),        recordts(1),
+        dmx_buf_size(4*1024), pkt_buf_size(16*1024),
+        dvb_on_demand(false) {;}
+
     int hw_decoder;
     int recordts;
-    int wait_for_seqstart;
     int dmx_buf_size;
     int pkt_buf_size;
     bool dvb_on_demand;
-} dvb_options_t;
+};
 
-typedef struct _firewire_options_t
+class FireWireDBOptions
 {
+  public:
+    FireWireDBOptions() :
+        port(-1), node(-1), speed(-1), connection(-1), model("") {;}
+        
     int port;
     int node;
     int speed;
     int connection;
     QString model;
-} firewire_options_t;
+};
 
-typedef struct _dbox2_options_t
+class DBox2DBOptions
 {
+  public:
+    DBox2DBOptions() : port(-1), httpport(-1), host("") {;}
+
     int port;
     int httpport;
     QString host;
-} dbox2_options_t;
+};
 
 class TVRec
 {
@@ -72,7 +115,7 @@ class TVRec
     RecStatusType StartRecording(const ProgramInfo *rcinfo);
 
     void StopRecording(void);
-    /// \brief Tells TVRec to finush the current recording as soon as possible.
+    /// \brief Tells TVRec to finish the current recording as soon as possible.
     void FinishRecording(void) { finishRecording = true; }
     /// \brief Tells TVRec that the frontend's TV class is ready for messages.
     void FrontendReady(void) { frontendReady = true; }
@@ -133,12 +176,15 @@ class TVRec
     void SpawnLiveTV(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
-    void ToggleInputs(void);
     void ToggleChannelFavorite(void);
+
+    void ToggleInputs(void);
     void ChangeChannel(ChannelChangeDirection dir);
     void SetChannel(QString name);
+
     void Pause(void);
     void Unpause(void);
+
     int SetSignalMonitoringRate(int msec, int notifyFrontend = 1);
     int ChangeColour(bool direction);
     int ChangeContrast(bool direction);
@@ -171,7 +217,7 @@ class TVRec
     long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
     /// \brief Returns the caputure card number
-    int GetCaptureCardNum(void) { return m_capturecardnum; }
+    int GetCaptureCardNum(void) { return cardid; }
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void) { return errored; }
   protected:
@@ -192,28 +238,30 @@ class TVRec
                         QString &repeat,    QString &airdate,
                         QString &stars);
 
-    static bool GetDevices(
-        int                cardid,         QString &videodev,
-        QString            &vbidev,        QString &audiodev,
-        QString            &cardtype,      QString &defaultinput,
-        int                &aud_rate,      bool    &skip_bt,
-        uint               &sig_timeout,   uint    &chan_timeout,
-        dvb_options_t      &dvb_opts,
-        firewire_options_t &firewire_opts,
-        dbox2_options_t    &dbox2_opts);
+    static bool GetDevices(int cardid,
+                           GeneralDBOptions   &general_opts,
+                           DVBDBOptions       &dvb_opts,
+                           FireWireDBOptions  &firewire_opts,
+                           DBox2DBOptions     &dbox2_opts);
 
 
     static QString GetStartChannel(int cardid, const QString &defaultinput);
 
-    void SetupRecorder(class RecordingProfile& profile);
+    bool SetupRecorder(RecordingProfile& profile);
     void TeardownRecorder(bool killFile = false);
+    HDTVRecorder *GetHDTVRecorder(void);
+    DVBRecorder  *GetDVBRecorder(void);
     
     void InitChannel(const QString &inputname, const QString &startchannel);
     bool StartChannel(bool livetv);
     void CloseChannel(void);
+    DBox2Channel *GetDBox2Channel(void);
+    DVBChannel   *GetDVBChannel(void);
+    Channel      *GetV4LChannel(void);
 
     void SetupSignalMonitor(void);
     void TeardownSignalMonitor(void);
+    DTVSignalMonitor *GetDTVSignalMonitor(void);
 
     void CreateSIParser(int num);
     void TeardownSIParser(void);
@@ -240,12 +288,12 @@ class TVRec
     void SetOption(RecordingProfile &profile, const QString &name);
 
     // Various components TVRec coordinates
-    RingBufferInfo *rbi;
-    RecorderBase  *recorder;
-    ChannelBase   *channel;
-    SignalMonitor *signalMonitor;
-    EITScanner    *scanner;
-    DVBSIParser   *dvbsiparser;
+    RingBufferInfo   *rbi;
+    RecorderBase     *recorder;
+    ChannelBase      *channel;
+    SignalMonitor    *signalMonitor;
+    EITScanner       *scanner;
+    DVBSIParser      *dvbsiparser;
     DummyDTVRecorder *dummyRecorder;
 
     // Various threads
@@ -268,19 +316,19 @@ class TVRec
     int     liveTVRingBufFill;
     QString liveTVRingBufLoc;
     QString recprefix;
-    uint    signal_timeout;
-    uint    channel_timeout;
 
     // Configuration variables from setup routines
-    int     m_capturecardnum;
-    bool    ispip;
-    dvb_options_t dvb_options;
-    firewire_options_t firewire_options;
-    dbox2_options_t dbox2_options;
+    int               cardid;
+    bool              ispip;
+
+    // Configuration variables from database, based on cardid
+    GeneralDBOptions  genOpt;
+    DVBDBOptions      dvbOpt;
+    FireWireDBOptions fwOpt;
+    DBox2DBOptions    dboxOpt;
 
     // State variables
     QMutex  stateChangeLock;
-    QMutex  endTimeLock;
     TVState internalState;
     TVState desiredNextState;
     bool    changeState;
@@ -305,20 +353,13 @@ class TVRec
     QString      profileName;
     bool         askAllowRecording;
     int          autoRunJobs;
+    QMutex       endTimeLock;
 
     // Pending recording info
     ProgramInfo *pendingRecording;
     QDateTime    recordPendingStart;
     bool         recordPending;
     bool         cancelNextRecording;
-
-    // Current recorder info
-    QString  videodev;
-    QString  vbidev;
-    QString  audiodev;
-    QString  cardtype;
-    int      audiosamplerate;
-    bool     skip_btaudio;
 };
 
 #endif

@@ -28,7 +28,7 @@ using namespace std;
 class FirewireChannel : public ChannelBase
 {
   public:
-    FirewireChannel(firewire_options_t firewire_opts, TVRec *parent);
+    FirewireChannel(FireWireDBOptions firewire_opts, TVRec *parent);
     ~FirewireChannel(void);
 
     bool Open(void);
@@ -49,7 +49,7 @@ class FirewireChannel : public ChannelBase
         { (void)newcapchannel; (void)setstarting; return false; }
 
   private:
-    firewire_options_t fw_opts;
+    FireWireDBOptions  fw_opts;
     nodeid_t           fwnode;
     raw1394handle_t    fwhandle;
     bool               isopen;

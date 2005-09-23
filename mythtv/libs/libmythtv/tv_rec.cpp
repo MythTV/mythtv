@@ -64,6 +64,9 @@ using namespace std;
 #include "dbox2channel.h"
 #endif
 
+#define LOC QString("TVRec(%1): ").arg(cardid)
+#define LOC_ERR QString("TVRec(%1) Error: ").arg(cardid)
+
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
  *
@@ -97,12 +100,11 @@ TVRec::TVRec(int capturecardnum)
       audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
       overRecordCategory(""),
       liveTVRingBufSize(0), liveTVRingBufFill(0), liveTVRingBufLoc(""),
-      recprefix(""), signal_timeout(1000), channel_timeout(3000),
+      recprefix(""),
       // Configuration variables from setup rutines
-      m_capturecardnum(capturecardnum), ispip(false),
+      cardid(capturecardnum), ispip(false),
       // State variables
       stateChangeLock(true),
-      endTimeLock(false),
       internalState(kState_None), desiredNextState(kState_None),
       changeState(false),
       startingRecording(false), abortRecordingStart(false),
@@ -114,11 +116,9 @@ TVRec::TVRec(int capturecardnum)
       // Current recording info
       curRecording(NULL), profileName(""),
       askAllowRecording(false), autoRunJobs(JOB_NONE),
+      endTimeLock(false),
       // Pending recording info
-      pendingRecording(NULL), recordPending(false), cancelNextRecording(false),
-      // Current recorder info
-      videodev(""), vbidev(""), audiodev(""), cardtype(""),
-      audiosamplerate(-1), skip_btaudio(false)
+      pendingRecording(NULL), recordPending(false), cancelNextRecording(false)
 {
     event_thread    = PTHREAD_CREATE_JOINABLE;
     recorder_thread = static_cast<pthread_t>(0);
@@ -131,62 +131,53 @@ TVRec::TVRec(int capturecardnum)
  */
 bool TVRec::Init(void)
 {
-    QString inputname;
-
-    bool ok = GetDevices(
-        m_capturecardnum, videodev,         vbidev,           audiodev,
-        cardtype,         inputname,        audiosamplerate,  skip_btaudio,
-        signal_timeout,   channel_timeout,
-        dvb_options,      firewire_options, dbox2_options);
+    bool ok = GetDevices(cardid, genOpt, dvbOpt, fwOpt, dboxOpt);
 
     if (!ok)
         return false;
 
-    QString startchannel = GetStartChannel(m_capturecardnum, inputname);
+    QString startchannel = GetStartChannel(cardid, genOpt.defaultinput);
 
     rbi = new RingBufferInfo();
     rbi->SetFileExtension("mpg");
 
     bool init_run = false;
-    if (cardtype == "DVB")
+    if (genOpt.cardtype == "DVB")
     {
 #ifdef USING_DVB_EIT
         scanner = new EITScanner();
 #endif // USING_DVB_EIT
 
 #ifdef USING_DVB
-        channel = new DVBChannel(videodev.toInt(), this);
+        channel = new DVBChannel(genOpt.videodev.toInt(), this);
         channel->Open();
-
-        InitChannel(inputname, startchannel);
+        InitChannel(genOpt.defaultinput, startchannel);
         StartChannel(false);
         usleep(500);    // Give DVBCam some breathing room
         CloseChannel(); // Close the channel if in dvb_on_demand mode
         init_run = true;
 #endif
     }
-    else if (cardtype == "FIREWIRE")
+    else if (genOpt.cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
-        channel = new FirewireChannel(firewire_options, this);
+        channel = new FirewireChannel(fwOpt, this);
         channel->Open();
-        InitChannel(inputname, startchannel);
+        InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
 #endif
     }
-    else if (cardtype == "DBOX2")
+    else if (genOpt.cardtype == "DBOX2")
     {
 #ifdef USING_DBOX2
-        channel = new DBox2Channel(this, &dbox2_options, m_capturecardnum);
+        channel = new DBox2Channel(this, &dboxOpt, cardid);
         channel->Open();
-        if (inputname.isEmpty())
-            channel->SetChannelByString(startchannel);
-        else
-            channel->SwitchToInput(inputname, startchannel);
+        InitChannel(genOpt.defaultinput, startchannel);
         init_run = true;
 #endif
     }
-    else if ((cardtype == "MPEG") && (videodev.lower().left(5) == "file:"))
+    else if (genOpt.cardtype == "MPEG" &&
+             genOpt.videodev.lower().left(5) == "file:")
     {
         // No need to initialize channel..
         init_run = true;
@@ -194,26 +185,27 @@ bool TVRec::Init(void)
     else // "V4L" or "MPEG", ie, analog TV, or "HDTV"
     {
 #ifdef USING_V4L
-        channel = new Channel(this, videodev);
+        channel = new Channel(this, genOpt.videodev);
         channel->Open();
-        InitChannel(inputname, startchannel);
+        InitChannel(genOpt.defaultinput, startchannel);
         CloseChannel();
         init_run = true;
 #endif
-        if (cardtype != "HDTV" && cardtype != "MPEG")
+        if (genOpt.cardtype != "HDTV" && genOpt.cardtype != "MPEG")
             rbi->SetFileExtension("nuv");
     }
 
     if (!init_run)
     {
         QString msg = QString(
-            "ERROR: %1 card configured on video device %2, \n"
+            "%1 card configured on video device %2, \n"
             "but MythTV was not compiled with %2 support. \n"
             "\n"
             "Recompile MythTV with %3 support or remove the card \n"
             "from the configuration and restart MythTV.")
-            .arg(cardtype).arg(videodev).arg(cardtype).arg(cardtype);
-        VERBOSE(VB_IMPORTANT, msg);
+            .arg(genOpt.cardtype).arg(genOpt.videodev)
+            .arg(genOpt.cardtype).arg(genOpt.cardtype);
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
         errored = true;
         return false;
     }
@@ -295,7 +287,7 @@ ProgramInfo *TVRec::GetRecording(void)
     }
     else
         tmppginfo = new ProgramInfo();
-    tmppginfo->cardid = m_capturecardnum;
+    tmppginfo->cardid = cardid;
 
     return tmppginfo;
 }
@@ -334,6 +326,8 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft)
  */
 RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 {
+    QString msg("");
+
     RecStatusType retval = rsAborted;
 
     // We need to do this check early so we don't cancel an overrecord
@@ -354,14 +348,14 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
         recordEndTime = curRecording->recendts;
         inoverrecord = (recordEndTime < QDateTime::currentDateTime());
-        VERBOSE(VB_IMPORTANT,
-                QString("updating recording: %1 %2 %3 %4")
-                .arg(curRecording->title)
-                .arg(curRecording->chanid)
-                .arg(curRecording->recstartts.toString())
-                .arg(curRecording->recendts.toString()));
-        if (cancelNextRecording)
-            cancelNextRecording = false;
+
+        msg = QString("updating recording: %1 %2 %3 %4")
+            .arg(curRecording->title).arg(curRecording->chanid)
+            .arg(curRecording->recstartts.toString())
+            .arg(curRecording->recendts.toString());
+        VERBOSE(VB_RECORD, LOC + msg);
+
+        cancelNextRecording = false;
         endTimeLock.unlock();
 
         retval = rsRecording;
@@ -382,16 +376,15 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     if (changeState)
     {
-        VERBOSE(VB_RECORD, "backend still changing state, waiting..");
+        VERBOSE(VB_RECORD, LOC + "backend still changing state, waiting..");
         while (changeState)
             usleep(50);
-        VERBOSE(VB_RECORD, "changing state finished, starting now");
+        VERBOSE(VB_RECORD, LOC + "changing state finished, starting now");
     }
 
     if (internalState == kState_WatchingLiveTV && !cancelNextRecording)
     {
-        QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
-
+        QString message = QString("QUIT_LIVETV %1").arg(cardid);
         MythEvent me(message);
         gContext->dispatch(me);
 
@@ -433,9 +426,9 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         if (curRecording->category == overRecordCategory)
         {
             overrecordseconds = overRecordSecCat;
-            QString msg = QString("Show category '%1', desired postroll %2")
+            msg = QString("Show category '%1', desired postroll %2")
                 .arg(curRecording->category).arg(overrecordseconds);
-            VERBOSE(VB_RECORD, msg);
+            VERBOSE(VB_RECORD, LOC + msg);
         }
         
         ChangeState(kState_RecordingOnly);
@@ -443,7 +436,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     }
     else if (!cancelNextRecording)
     {
-        QString msg = QString("Wanted to record: %1 %2 %3 %4\n"
+        msg = QString("Wanted to record: %1 %2 %3 %4\n"
             "\t\t\tBut the current state is: %1")
               .arg(rcinfo->title).arg(rcinfo->chanid)
               .arg(rcinfo->recstartts.toString())
@@ -454,7 +447,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
                 .arg(curRecording->title).arg(curRecording->chanid)
                 .arg(curRecording->recstartts.toString())
                 .arg(curRecording->recendts.toString());
-        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, LOC + msg);
 
         retval = rsTunerBusy;
     }
@@ -490,7 +483,7 @@ bool TVRec::StateIsRecording(TVState state)
 }
 
 /** \fn TVRec::StateIsPlaying(TVState)
- *  \brief Returns "state == kState_RecordingPreRecorded"
+ *  \brief Returns true if we are in any state associated with a player.
  *  \param state TVState to check.
  */
 bool TVRec::StateIsPlaying(TVState state)
@@ -508,7 +501,8 @@ TVState TVRec::RemoveRecording(TVState state)
     if (StateIsRecording(state))
         return kState_None;
 
-    VERBOSE(VB_IMPORTANT, QString("Unknown state in RemoveRecording: %1")
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("Unknown state in RemoveRecording: %1")
             .arg(StateToString(state)));
     return kState_Error;
 }
@@ -526,8 +520,10 @@ TVState TVRec::RemovePlaying(TVState state)
             return kState_None;
         return kState_RecordingOnly;
     }
-    VERBOSE(VB_IMPORTANT, QString("Unknown state in RemovePlaying: %1")
-            .arg(StateToString(state)));
+
+    QString msg = "Unknown state in RemovePlaying: %1";
+    VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(StateToString(state)));
+
     return kState_Error;
 }
 
@@ -583,13 +579,13 @@ bool TVRec::CreateRecorderThread()
 {
     pthread_create(&recorder_thread, NULL, TVRec::RecorderThread, recorder);
 
-    VERBOSE(VB_IMPORTANT, "Waiting for recorder to start");
+    VERBOSE(VB_IMPORTANT, LOC + "Waiting for recorder to start");
     while (!recorder->IsRecording() && !recorder->IsErrored())
         usleep(50);
     if (recorder->IsRecording())
-        VERBOSE(VB_IMPORTANT, "Recorder started");
+        VERBOSE(VB_IMPORTANT, LOC + "Recorder started");
     else
-        VERBOSE(VB_IMPORTANT, "Error encountered starting recorder");
+        VERBOSE(VB_IMPORTANT, LOC + "Error encountered starting recorder");
     return recorder->IsRecording();
 }
 
@@ -597,7 +593,7 @@ static void load_recording_profile(
     RecordingProfile &profile,
     QString &profileName,
     ProgramInfo *curRecording,
-    int m_capturecardnum)
+    int cardid)
 {
     if (curRecording)
     {
@@ -605,23 +601,22 @@ static void load_recording_profile(
             GetScheduledRecording()->getProfileName();
         bool foundProf = false;
         if (profileName != NULL)
-            foundProf = profile.loadByCard(profileName,
-                                           m_capturecardnum);
+            foundProf = profile.loadByCard(profileName, cardid);
 
         if (!foundProf)
         {
             profileName = QString("Default");
-            profile.loadByCard(profileName, m_capturecardnum);
+            profile.loadByCard(profileName, cardid);
         }
     }
     else
     {
         profileName = "Live TV";
-        profile.loadByCard(profileName, m_capturecardnum);
+        profile.loadByCard(profileName, cardid);
     }
 
     QString msg = QString("Using profile '%1' to record").arg(profileName);
-    VERBOSE(VB_RECORD, msg);
+    VERBOSE(VB_RECORD, LOC + msg);
 }
 
 static void init_jobs(ProgramInfo *curRecording,
@@ -720,20 +715,20 @@ bool TVRec::StartRecorder(bool livetv)
     prematurelystopped = false;
 
     RecordingProfile profile;
-    load_recording_profile(profile, profileName, curRecording, m_capturecardnum);
+    load_recording_profile(profile, profileName, curRecording, cardid);
 
     init_jobs(curRecording, autoRunJobs);
 
     if (!livetv)
         enable_auto_transcode(profile, curRecording, autoRunJobs);
 
-    SetupRecorder(profile);
-    if (IsErrored() || recorder->IsErrored())
+    ok = SetupRecorder(profile);
+    if (!ok || IsErrored() || recorder->IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, "TVRec: Error setting up recorder -- aborting");
+        VERBOSE(VB_IMPORTANT, LOC + "Error setting up recorder -- aborting");
         if (livetv)
         {
-            QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
+            QString message = QString("QUIT_LIVETV %1").arg(cardid);
             MythEvent me(message);
             gContext->dispatch(me);
         }
@@ -748,7 +743,7 @@ bool TVRec::StartRecorder(bool livetv)
  
     if (ok)
     {
-        if (livetv && SignalMonitor::IsSupported(cardtype))
+        if (livetv && SignalMonitor::IsSupported(genOpt.cardtype))
             ok = StartRecorderPostThread(livetv);
         else
             ok = StartRecorderPost(livetv);
@@ -787,7 +782,7 @@ bool TVRec::StartRecorderPostThread(bool livetv)
 
 void TVRec::AbortStartRecorderThread()
 {
-    VERBOSE(VB_IMPORTANT, "TVRec::HandleStateChange() "
+    VERBOSE(VB_IMPORTANT, LOC + "HandleStateChange() "
             "Abort starting recording -- begin");
 
     abortRecordingStart = true;
@@ -797,7 +792,7 @@ void TVRec::AbortStartRecorderThread()
 
     abortRecordingStart = false;
 
-    VERBOSE(VB_IMPORTANT, "TVRec::HandleStateChange() "
+    VERBOSE(VB_IMPORTANT, LOC + "HandleStateChange() "
             "Abort starting recording -- end");
 }
 
@@ -809,7 +804,8 @@ bool TVRec::StartRecorderPost(bool livetv)
         ok = StartChannel(livetv);
 
     if (ok)
-        ok = wait_for_dvb(channel, channel_timeout - signal_timeout,
+        ok = wait_for_dvb(channel,
+                          genOpt.channel_timeout - genOpt.signal_timeout,
                           abortRecordingStart);
 
     if (dummyRecorder)
@@ -817,7 +813,7 @@ bool TVRec::StartRecorderPost(bool livetv)
 
     if (ok && !CreateRecorderThread())
     {
-        VERBOSE(VB_IMPORTANT, "TVRec: Failed to start recorder thread -- "
+        VERBOSE(VB_IMPORTANT, LOC + "Failed to start recorder thread -- "
                 "aborting recording");
         ok = false;
     }
@@ -840,7 +836,7 @@ bool TVRec::StartRecorderPost(bool livetv)
     }
     else
     {
-        QString common("TVRec: StartRecorderPost(): ");
+        QString common(LOC + "StartRecorderPost(): ");
         if (abortRecordingStart)
             VERBOSE(VB_IMPORTANT, common + "canceled");
         else
@@ -848,7 +844,7 @@ bool TVRec::StartRecorderPost(bool livetv)
             VERBOSE(VB_IMPORTANT, common + "aborting recording");
             if (livetv)
             {
-                QString message = QString("QUIT_LIVETV %1").arg(m_capturecardnum);
+                QString message = QString("QUIT_LIVETV %1").arg(cardid);
                 MythEvent me(message);
                 gContext->dispatch(me);
             }
@@ -860,11 +856,11 @@ bool TVRec::StartRecorderPost(bool livetv)
 
         prematurelystopped = true;
 
-        VERBOSE(VB_RECORD, "StartRecorderPost()::closeRecorder -- begin");
+        VERBOSE(VB_RECORD, common + "closeRecorder -- begin");
         TeardownSignalMonitor();
         TeardownRecorder(true);
         CloseChannel();
-        VERBOSE(VB_RECORD, "StartRecorderPost()::closeRecorder -- end");
+        VERBOSE(VB_RECORD, common + "closeRecorder -- end");
 
         stateChangeLock.lock();
         internalState = kState_None;
@@ -911,7 +907,7 @@ void TVRec::HandleStateChange(void)
 
     if (desiredNextState == internalState)
     {
-        VERBOSE(VB_IMPORTANT, "TVRec::HandleStateChange(): "
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
                 "Null transition" + transMsg);
         changeState = false;
         return;
@@ -919,8 +915,8 @@ void TVRec::HandleStateChange(void)
 
     if (desiredNextState == kState_Error)
     {
-        VERBOSE(VB_IMPORTANT, "TVRec::HandleStateChange(): "
-                "Error, attempting to set to an error state.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
+                "Attempting to set to an error state.");
         errored = true;
         return;
     }
@@ -933,7 +929,7 @@ void TVRec::HandleStateChange(void)
             StopDummyRecorder();
             recorder->Unpause();
             rbi->Unpause();
-            if (!dvb_options.dvb_on_demand)
+            if (!dvbOpt.dvb_on_demand)
             {
                 CreateSIParser(-1);
                 usleep(500);    // Give DVBCam some breathing room
@@ -944,7 +940,7 @@ void TVRec::HandleStateChange(void)
             StopDummyRecorder();
             recorder->Unpause();
             rbi->Unpause();
-            if (dvb_options.dvb_on_demand)
+            if (dvbOpt.dvb_on_demand)
                 TeardownSIParser();
         }
     }
@@ -977,7 +973,7 @@ void TVRec::HandleStateChange(void)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, "TVRec: Failed to open ringbuffer. "
+                VERBOSE(VB_IMPORTANT, LOC + "Failed to open ringbuffer. "
                         "Aborting new recording.");
                 rbi->SetRingBuffer(NULL);
                 SET_LAST();
@@ -985,8 +981,8 @@ void TVRec::HandleStateChange(void)
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    "TVRec: Failed to set channel for recording. Aborting.");
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "Failed to set channel for recording. Aborting.");
             SET_LAST();
         }
     }
@@ -1002,7 +998,7 @@ void TVRec::HandleStateChange(void)
     waitingForDVBTables = false;
 
     QString msg = (changed) ? "Changing from" : "Unknown state transition:";
-    VERBOSE(VB_IMPORTANT, msg + transMsg);
+    VERBOSE(VB_IMPORTANT, LOC + msg + transMsg);
  
     // Handle starting the recorder
     bool livetv = (nextState == kState_WatchingLiveTV);
@@ -1012,11 +1008,11 @@ void TVRec::HandleStateChange(void)
     // Handle closing the recorder
     if (closeRecorder)
     {
-        VERBOSE(VB_RECORD, "HandleStateChange()::closeRecorder -- begin");
+        VERBOSE(VB_RECORD, LOC + "HandleStateChange()::closeRecorder -- beg");
         TeardownSignalMonitor();
         TeardownRecorder(killRecordingFile);
         CloseChannel();
-        VERBOSE(VB_RECORD, "HandleStateChange()::closeRecorder -- end");
+        VERBOSE(VB_RECORD, LOC + "HandleStateChange()::closeRecorder -- end");
     }
 
     // update internal state variable
@@ -1060,102 +1056,61 @@ void TVRec::SetOption(RecordingProfile &profile, const QString &name)
  *  if the card type is "DVB" a DVBRecorder is started,
  *  otherwise a NuppelVideoRecorder is started.
  *
- *  If there is any error, "errored" will be set.
+ *  If there is any this will return false.
  * \sa IsErrored()
  */
-void TVRec::SetupRecorder(RecordingProfile &profile)
+bool TVRec::SetupRecorder(RecordingProfile &profile)
 {
-    bool use_dummy = SignalMonitor::IsSupported(cardtype), is_atsc = false;
-    if (cardtype == "MPEG")
+    bool use_dummy = SignalMonitor::IsSupported(genOpt.cardtype);
+    bool is_atsc   = false;
+    recorder = NULL;
+    if (genOpt.cardtype == "MPEG")
     {
 #ifdef USING_IVTV
         recorder = new MpegRecorder();
-        recorder->SetRingBuffer(rbi->GetRingBuffer());
-
-        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
-
-        recorder->Initialize();
-#else
-        VERBOSE(VB_IMPORTANT, "MPEG Recorder requested, but MythTV was "
-                "compiled without ivtv driver support.");
-        errored = true;
-#endif
+#endif // USING_IVTV
     }
-    else if (cardtype == "HDTV")
+    else if (genOpt.cardtype == "HDTV")
     {
 #ifdef USING_V4L
-        rbi->GetRingBuffer()->SetWriteBufferSize(4*1024*1024);
         recorder = new HDTVRecorder();
-        recorder->SetRingBuffer(rbi->GetRingBuffer());
-
-        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
-
-        recorder->Initialize();
+        rbi->GetRingBuffer()->SetWriteBufferSize(4*1024*1024);
+        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         is_atsc = true;
-#else
-        VERBOSE(VB_IMPORTANT, "V4L HDTV Recorder requested, but MythTV was "
-                "compiled without V4L support.");
-        errored = true;
 #endif // USING_V4L
     }
-    else if (cardtype == "FIREWIRE")
+    else if (genOpt.cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
         recorder = new FirewireRecorder();
-        recorder->SetRingBuffer(rbi->GetRingBuffer());
-        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
-        recorder->SetOption("port", firewire_options.port);
-        recorder->SetOption("node", firewire_options.node);
-        recorder->SetOption("speed", firewire_options.speed);
-        recorder->SetOption("model", firewire_options.model);
-        recorder->SetOption("connection", firewire_options.connection);
-        recorder->Initialize();
-#else
-        VERBOSE(VB_IMPORTANT, "FireWire Recorder requested, but MythTV was "
-                "compiled without firewire support.");
-        errored = true;
-#endif
+        recorder->SetOption("port",       fwOpt.port);
+        recorder->SetOption("node",       fwOpt.node);
+        recorder->SetOption("speed",      fwOpt.speed);
+        recorder->SetOption("model",      fwOpt.model);
+        recorder->SetOption("connection", fwOpt.connection);
+#endif // USING_FIREWIRE
     }
-    else if (cardtype == "DBOX2")
+    else if (genOpt.cardtype == "DBOX2")
     {
 #ifdef USING_DBOX2
-        VERBOSE(VB_GENERAL,QString("TVRec::SetupRecorder() Initializing DBOX2 on Host: %1, Streaming-Port: %2, Http-Port: %3")
-                                  .arg(dbox2_options.host)
-                                  .arg(dbox2_options.port)
-	                          .arg(dbox2_options.httpport));
-        recorder = new DBox2Recorder(dynamic_cast<DBox2Channel*>(channel), m_capturecardnum);
-        recorder->SetRingBuffer(rbi->GetRingBuffer());
-        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
-        recorder->SetOption("port", dbox2_options.port);
-        recorder->SetOption("host", dbox2_options.host);
-        recorder->SetOption("httpport", dbox2_options.httpport);
-        recorder->Initialize();
-#endif
-        return;
+        recorder = new DBox2Recorder(GetDBox2Channel(), cardid);
+        recorder->SetOption("port",     dboxOpt.port);
+        recorder->SetOption("host",     dboxOpt.host);
+        recorder->SetOption("httpport", dboxOpt.httpport);
+#endif // USING_DBOX2
     }
-    else if (cardtype == "DVB")
+    else if (genOpt.cardtype == "DVB")
     {
 #ifdef USING_DVB
-        recorder = new DVBRecorder(dynamic_cast<DVBChannel*>(channel));
-        recorder->SetRingBuffer(rbi->GetRingBuffer());
+        recorder = new DVBRecorder(GetDVBChannel());
+        recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
+        recorder->SetOption("hw_decoder",        dvbOpt.hw_decoder);
+        recorder->SetOption("recordts",          dvbOpt.recordts);
+        recorder->SetOption("dmx_buf_size",      dvbOpt.dmx_buf_size);
+        recorder->SetOption("pkt_buf_size",      dvbOpt.pkt_buf_size);
+        recorder->SetOption("dvb_on_demand",     dvbOpt.dvb_on_demand);
 
-        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
-
-        recorder->SetOption("dvb_on_demand", dvb_options.dvb_on_demand);
-        recorder->SetOption("hw_decoder", dvb_options.hw_decoder);
-        recorder->SetOption("recordts", dvb_options.recordts);
-        recorder->SetOption("wait_for_seqstart", dvb_options.wait_for_seqstart);
-        recorder->SetOption("dmx_buf_size", dvb_options.dmx_buf_size);
-        recorder->SetOption("pkt_buf_size", dvb_options.pkt_buf_size);
-        recorder->SetOption("signal_monitor_interval", 
-                       gContext->GetNumSetting("DVBMonitorInterval", 0));
-        recorder->SetOption("expire_data_days",
-                       gContext->GetNumSetting("DVBMonitorRetention", 3));
-        recorder->Initialize();
-
-        DVBRecorder* dvbrec = dynamic_cast<DVBRecorder*>(recorder);
-        use_dummy &= dvbrec->RecordsTransportStream();
-
+        use_dummy &= GetDVBRecorder()->RecordsTransportStream();
 #if (DVB_API_VERSION_MINOR == 1)
         struct dvb_frontend_info info;
         int fd_frontend = channel->GetFd();
@@ -1163,29 +1118,14 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
             is_atsc = (info.type == FE_ATSC);
 #endif // if (DVB_API_VERSION_MINOR == 1)
 
-#else
-        VERBOSE(VB_IMPORTANT, "DVB Recorder requested, but MythTV was "
-                "compiled without DVB support.");
-        errored = true;
-#endif
+#endif // USING_DVB
     }
     else
     {
 #ifdef USING_V4L
         // V4L/MJPEG/GO7007 from here on
-
         recorder = new NuppelVideoRecorder(channel);
-
-        recorder->SetRingBuffer(rbi->GetRingBuffer());
-
-        recorder->SetOption("skipbtaudio", skip_btaudio);
-        recorder->SetOptionsFromProfile(&profile, videodev, audiodev, vbidev, ispip);
- 
-        recorder->Initialize();
-#else
-        VERBOSE(VB_IMPORTANT, "V4L Recorder requested, but MythTV was "
-                "compiled without V4L support.");
-        errored = true;
+        recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
 #endif // USING_V4L
     }
 
@@ -1200,6 +1140,21 @@ void TVRec::SetupRecorder(RecordingProfile &profile)
                 true, rbi->GetRingBuffer(), 1920, 1088, 29.97,
                 90, 30000000, false);
     }
+
+    if (recorder)
+    {
+        recorder->SetRingBuffer(rbi->GetRingBuffer());
+        recorder->SetOptionsFromProfile(
+            &profile, genOpt.videodev, genOpt.audiodev, genOpt.vbidev, ispip);
+        recorder->Initialize();
+        return true;
+    }
+
+    QString msg = "Need %1 recorder, but compiled without %2 support!";
+    msg = msg.arg(genOpt.cardtype).arg(genOpt.cardtype);
+    VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+
+    return false;
 }
 
 /** \fn TVRec::TeardownRecorder(bool)
@@ -1233,8 +1188,8 @@ void TVRec::TeardownRecorder(bool killFile)
     {
         filelen = (int)(((float)recorder->GetFramesWritten() / frameRate));
 
-        QString message = QString("DONE_RECORDING %1 %2").arg(m_capturecardnum)
-                                                         .arg(filelen);
+        QString message = QString("DONE_RECORDING %1 %2")
+            .arg(cardid).arg(filelen);
         MythEvent me(message);
         gContext->dispatch(me);
 
@@ -1277,13 +1232,35 @@ void TVRec::TeardownRecorder(bool killFile)
     gContext->dispatch(me);
 }    
 
+DVBRecorder *TVRec::GetDVBRecorder(void)
+{
+#ifdef USING_DVB
+    return dynamic_cast<DVBRecorder*>(recorder);
+#else // if !USING_DVB
+    return NULL;
+#endif // !USING_DVB
+}
+
+HDTVRecorder *TVRec::GetHDTVRecorder(void)
+{
+#ifdef USING_V4L
+    return dynamic_cast<HDTVRecorder*>(recorder);
+#else // if !USING_V4L
+    return NULL;
+#endif // USING_V4L
+}
+
+/** \fn TVRec::InitChannel(const QString&, const QString&)
+ *  \brief Performs ChannelBase instance init from database and 
+ *         tuner hardware (requires that channel be open).
+ */
 void TVRec::InitChannel(const QString &inputname, const QString &startchannel)
 {
     if (!channel)
         return;
 
 #ifdef USING_V4L
-    Channel *chan = dynamic_cast<Channel*>(channel);
+    Channel *chan = GetV4LChannel();
     if (chan)
     {
         chan->SetFormat(gContext->GetSetting("TVFormat"));
@@ -1305,13 +1282,12 @@ void TVRec::CloseChannel(void)
         return;
 
 #ifdef USING_DVB
-    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-    if (dvbc)
+    if (GetDVBChannel())
     {
-        if (dvb_options.dvb_on_demand)
+        if (dvbOpt.dvb_on_demand)
         {
             TeardownSIParser();
-            dvbc->Close();
+            GetDVBChannel()->Close();
         }
         return;
     }
@@ -1319,6 +1295,34 @@ void TVRec::CloseChannel(void)
 
     channel->Close();
 }
+
+DBox2Channel *TVRec::GetDBox2Channel(void)
+{
+#ifdef USING_DBOX2
+    return dynamic_cast<DBox2Channel*>(channel);
+#else
+    return NULL;
+#endif // USING_DBOX2
+}
+
+DVBChannel *TVRec::GetDVBChannel(void)
+{
+#ifdef USING_DVB
+    return dynamic_cast<DVBChannel*>(channel);
+#else
+    return NULL;
+#endif // USING_DVB
+}
+
+Channel *TVRec::GetV4LChannel(void)
+{
+#ifdef USING_V4L
+    return dynamic_cast<Channel*>(channel);
+#else
+    return NULL;
+#endif // USING_V4L
+}
+
 
 static int get_max_timeout(SignalMonitor *signalMonitor, bool livetv)
 {
@@ -1389,7 +1393,7 @@ bool TVRec::StartChannel(bool livetv)
 #endif // USING_V4L
     int progNum = -1;
 
-    if (SignalMonitor::IsSupported(cardtype))
+    if (SignalMonitor::IsSupported(genOpt.cardtype))
     {
         SetSignalMonitoringRate(50, livetv);
         if (signalMonitor)
@@ -1399,10 +1403,10 @@ bool TVRec::StartChannel(bool livetv)
                                            abortRecordingStart);
             if (!ok)
             {
-                VERBOSE(VB_IMPORTANT,
+                VERBOSE(VB_IMPORTANT, LOC +
                         ((abortRecordingStart) ?
-                         "TVRec: StartChannel() -- canceled" :
-                         "TVRec: Timed out waiting for lock -- aborting recording"));
+                         "StartChannel() -- canceled" :
+                         "Timed out waiting for lock -- aborting recording"));
                 SetSignalMonitoringRate(0, 0);
                 return false;
             }
@@ -1477,7 +1481,7 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
     return retbuf;
 #else // USING_FRONTEND
     QString msg = "Error: backend compiled without USING_FRONTEND !!!!";
-    VERBOSE(VB_IMPORTANT, msg);
+    VERBOSE(VB_IMPORTANT, LOC + msg);
     return NULL;
 #endif // USING_FRONTEND
 }
@@ -1535,13 +1539,12 @@ void TVRec::CreateSIParser(int program_num)
 {
     (void) program_num;
 #ifdef USING_DVB
-    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
+    DVBChannel *dvbc = GetDVBChannel();
     if (dvbc)
     {
         int service_id = dvbc->GetServiceID();
 
-        VERBOSE(VB_CHANNEL,
-                QString("prog_num(%1) vs. dvbc->srv_id(%2)")
+        VERBOSE(VB_RECORD, LOC + QString("prog_num(%1) vs. dvbc->srv_id(%2)")
                 .arg(program_num).arg(service_id));
 
         if (!dvbsiparser)
@@ -1556,7 +1559,7 @@ void TVRec::CreateSIParser(int program_num)
             (program_num >= 0) ? program_num : service_id);
 
 #ifdef USING_DVB_EIT
-        if (!dvb_options.dvb_on_demand)
+        if (!dvbOpt.dvb_on_demand)
             scanner->StartPassiveScan(dvbc, dvbsiparser);
 #endif // USING_DVB_EIT
     }
@@ -1605,13 +1608,13 @@ void *TVRec::RecorderThread(void *param)
  */
 void TVRec::StartDummyRecorder(void)
 {
-    VERBOSE(VB_RECORD, "TVRec::StartDummyRecorder() -- begin");
+    VERBOSE(VB_RECORD, LOC + "StartDummyRecorder() -- begin");
     if (dummyRecorder)
     {
         dummyRecorder->StartRecordingThread();
         rbi->Unpause();
     }
-    VERBOSE(VB_RECORD, "TVRec::StartDummyRecorder() -- end");
+    VERBOSE(VB_RECORD, LOC + "StartDummyRecorder() -- end");
 }
 
 /** \fn TVRec::StopDummyRecorder(void)
@@ -1620,13 +1623,13 @@ void TVRec::StartDummyRecorder(void)
  */
 void TVRec::StopDummyRecorder(void)
 {
-    VERBOSE(VB_RECORD, "TVRec::StopDummyRecorder() -- begin");
+    VERBOSE(VB_RECORD, LOC + "StopDummyRecorder() -- begin");
     if (dummyRecorder)
     {
         dummyRecorder->StopRecordingThread();
         rbi->Pause();
     }
-    VERBOSE(VB_RECORD, "TVRec::StopDummyRecorder() -- end");
+    VERBOSE(VB_RECORD, LOC + "StopDummyRecorder() -- end");
 }
 
 /** \fn TVRec::RunTV()
@@ -1646,8 +1649,8 @@ void TVRec::RunTV(void)
             HandleStateChange();
         if (IsErrored())
         {
-            VERBOSE(VB_IMPORTANT, "TVRec: RunTV encountered "
-                    "fatal error, exiting event thread.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "RunTV encountered fatal error, exiting event thread.");
             runMainLoop = false;
             return;
         }
@@ -1655,11 +1658,11 @@ void TVRec::RunTV(void)
         {
             if (signalMonitor->IsAllGood())
             {
-                VERBOSE(VB_IMPORTANT, "Got good signal");
+                VERBOSE(VB_IMPORTANT, LOC + "Got good signal");
                 int progNum = get_program_number(signalMonitor);
                 SetSignalMonitoringRate(0, 0);
 #ifdef USING_DVB
-                if (cardtype == "DVB")
+                if (genOpt.cardtype == "DVB")
                 {
                     DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
                     dvbc->SetPMT(NULL);
@@ -1680,8 +1683,7 @@ void TVRec::RunTV(void)
 #ifdef USING_DVB
         if (waitingForDVBTables)
         {
-            DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-            if (dvbc->IsPMTSet())
+            if (GetDVBChannel()->IsPMTSet())
             {
                 StopDummyRecorder();
                 recorder->Unpause();
@@ -1701,8 +1703,8 @@ void TVRec::RunTV(void)
             int timeuntil = QDateTime::currentDateTime()
                                 .secsTo(recordPendingStart);
 
-            QString query = QString("ASK_RECORDING %1 %2").arg(m_capturecardnum)
-                                                          .arg(timeuntil);
+            QString query = QString("ASK_RECORDING %1 %2")
+                .arg(cardid).arg(timeuntil);
             QStringList messages;
             messages << pendingRecording->title
                     << pendingRecording->chanstr
@@ -1726,7 +1728,7 @@ void TVRec::RunTV(void)
                     QString msg = QString(
                         "Switching to overrecord for %1 more seconds")
                         .arg(overrecordseconds);
-                    VERBOSE(VB_RECORD, msg);
+                    VERBOSE(VB_RECORD, LOC + msg);
                 }
                 else
                 {
@@ -1740,13 +1742,9 @@ void TVRec::RunTV(void)
         if (exitPlayer)
         {
             if (internalState == kState_WatchingLiveTV)
-            {
                 ChangeState(kState_None);
-            }
             else if (StateIsPlaying(internalState))
-            {
                 ChangeState(RemovePlaying(internalState));
-            }
             exitPlayer = false;
         }
     }
@@ -1811,7 +1809,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":CHANNAME", channelname);
     query.bindValue(":CURTIME", curtimestr);
-    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":CARDID", cardid);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -1849,7 +1847,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
             "      capturecard.cardid   = :CARDID        AND "
             "      capturecard.hostname = :HOSTNAME");
         query.bindValue(":CHANNUM", channelname);
-        query.bindValue(":CARDID", m_capturecardnum);
+        query.bindValue(":CARDID", cardid);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
 
         if (query.exec() && query.isActive() && query.size() > 0)
@@ -1864,20 +1862,12 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     }
 }
 
-bool TVRec::GetDevices(
-    int      cardid,   QString &video,        QString &vbi,  QString &audio,
-    QString &type,     QString &defaultinput, int     &rate, bool    &skip_bt,
-    uint &sig_timeout, uint &chan_timeout, 
-    dvb_options_t      &dvb_opts,
-    firewire_options_t &firewire_opts,
-    dbox2_options_t    &dbox2_opts)
+bool TVRec::GetDevices(int cardid,
+                       GeneralDBOptions  &gen_opts,
+                       DVBDBOptions      &dvb_opts,
+                       FireWireDBOptions &firewire_opts,
+                       DBox2DBOptions    &dbox2_opts)
 {
-    video        = "";
-    vbi          = "";
-    audio        = "";
-    defaultinput = "Television";
-    type         = "V4L";
-
     int testnum = 0;
     QString test;
 
@@ -1907,31 +1897,31 @@ bool TVRec::GetDevices(
 
         test = query.value(0).toString();
         if (test != QString::null)
-            video = QString::fromUtf8(test);
+            gen_opts.videodev = QString::fromUtf8(test);
         test = query.value(1).toString();
         if (test != QString::null)
-            vbi = QString::fromUtf8(test);
+            gen_opts.vbidev = QString::fromUtf8(test);
         test = query.value(2).toString();
         if (test != QString::null)
-            audio = QString::fromUtf8(test);
+            gen_opts.audiodev = QString::fromUtf8(test);
         testnum = query.value(3).toInt();
         if (testnum > 0)
-            rate = testnum;
+            gen_opts.audiosamplerate = testnum;
         else
-            rate = -1;
+            gen_opts.audiosamplerate = -1;
 
         test = query.value(4).toString();
         if (test != QString::null)
-            defaultinput = QString::fromUtf8(test);
+            gen_opts.defaultinput = QString::fromUtf8(test);
         test = query.value(5).toString();
         if (test != QString::null)
-            type = QString::fromUtf8(test);
+            gen_opts.cardtype = QString::fromUtf8(test);
 
-        skip_bt = query.value(6).toInt();
+        gen_opts.skip_btaudio = query.value(6).toInt();
 
         dvb_opts.hw_decoder    = query.value(7).toInt();
         dvb_opts.recordts      = query.value(8).toInt();
-        dvb_opts.wait_for_seqstart = query.value(9).toInt();
+        gen_opts.wait_for_seqstart = query.value(9).toInt();
         dvb_opts.dmx_buf_size  = query.value(10).toInt();
         dvb_opts.pkt_buf_size  = query.value(11).toInt();
         dvb_opts.dvb_on_demand = query.value(12).toInt();
@@ -1950,17 +1940,21 @@ bool TVRec::GetDevices(
         if (test != QString::null)
            dbox2_opts.host = QString::fromUtf8(test);
 
-        sig_timeout  = (uint) max(query.value(21).toInt(), 0);
-        chan_timeout = (uint) max(query.value(22).toInt(), 0);
+        gen_opts.signal_timeout  = (uint) max(query.value(21).toInt(), 0);
+        gen_opts.channel_timeout = (uint) max(query.value(22).toInt(), 0);
+
         // We should have at least 100 ms to acquire tables...
-        if (((int)chan_timeout - (int)sig_timeout) < 100)
-            chan_timeout = sig_timeout + 250;
+        int table_timeout = ((int)gen_opts.channel_timeout - 
+                             (int)gen_opts.signal_timeout);
+        if (table_timeout < 100)
+            gen_opts.channel_timeout = gen_opts.signal_timeout + 2500;
     }
     return true;
 }
 
 QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
 {
+    QString msg("");
     QString startchan = QString::null;
 
     // Get last tuned channel from database, to use as starting channel
@@ -1978,10 +1972,8 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
     {
         MythContext::DBError("getstartchan", query);
     }
-    else if (query.size() > 0)
+    else if (query.next())
     {
-        query.next();
-
         QString test = query.value(0).toString();
         if (test != QString::null)
             startchan = QString::fromUtf8(test);
@@ -2005,15 +1997,13 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
     {
         MythContext::DBError("getstartchan2", query);
     }
-    else if (query.size() > 0)
+    else if (query.next())
     {
-        query.next();
-            
         QString test = query.value(0).toString();
         if (test != QString::null)
         {
-            VERBOSE(VB_IMPORTANT, "Start channel '"<<startchan<<"' "
-                    "invalid, setting to '"<<QString::fromUtf8(test)<<"'");
+            msg = "Start channel '%1' invalid, setting to '%2' instead.";
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(startchan).arg(test));
             startchan = QString::fromUtf8(test);
         }
     }
@@ -2041,20 +2031,20 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
         QString test = query.value(0).toString();
         if (test != QString::null)
         {
-            VERBOSE(VB_IMPORTANT, "Start channel '"<<startchan<<"' "
-                    "invalid, setting to '"<<QString::fromUtf8(test)<<"'"
-                    "on input '"<<query.value(1).toString()<<"'");
+            msg = QString("Start channel '%1' invalid, setting "
+                          "to '%2' on input %3 instead.")
+                .arg(startchan).arg(test).arg(query.value(1).toString());
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
             startchan = QString::fromUtf8(test);
         }
     }
-    if (!startchan.isEmpty())
-        return startchan;
-
-    // If there are no valid channels, just use a random channel
-    startchan = "3";
-    VERBOSE(VB_IMPORTANT, "Problem finding starting "
-            "channel, setting to '"<<startchan<<"'");
-
+    if (startchan.isEmpty())
+    {
+        // If there are no valid channels, just use a random channel
+        startchan = "3";
+        msg = "Problem finding starting channel, setting to default of '%1'.";
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(startchan));
+    }
     return startchan;
 }
 
@@ -2217,7 +2207,7 @@ void setup_table_monitoring(ChannelBase* channel,
  */
 void TVRec::SetupSignalMonitor(void)
 {
-    VERBOSE(VB_RECORD, "SetupSignalMonitor()");
+    VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor()");
     // if it already exists, there no need to initialize it
     if (signalMonitor)
         return;
@@ -2229,31 +2219,30 @@ void TVRec::SetupSignalMonitor(void)
     // make sure statics are initialized
     SignalMonitorValue::Init();
 
-    if (SignalMonitor::IsSupported(cardtype) && channel->Open())
+    if (SignalMonitor::IsSupported(genOpt.cardtype) && channel->Open())
     {
 #ifdef USING_DVB
-        VERBOSE(VB_RECORD, "SetupSignalMonitor() -- DVB hack begin");
+        VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor() -- DVB hack begin");
         TeardownSIParser();
-        DVBRecorder *rec = dynamic_cast<DVBRecorder*>(recorder);
-        if (rec)
-            rec->Close();
-        VERBOSE(VB_RECORD, "SetupSignalMonitor() -- DVB hack end");
+        if (GetDVBRecorder())
+            GetDVBRecorder()->Close();
+        VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor() -- DVB hack end");
 #endif
 
         // TODO reset the tuner hardware
         //channel->SwitchToInput(channel->GetCurrentInputNum(), true);
 
         signalMonitor =
-            SignalMonitor::Init(cardtype, GetCaptureCardNum(), channel);
+            SignalMonitor::Init(genOpt.cardtype, GetCaptureCardNum(), channel);
     }
     
     if (signalMonitor)
     {
-        VERBOSE(VB_RECORD, "signal monitor successfully created");
+        VERBOSE(VB_RECORD, LOC + "Signal monitor successfully created");
         // If this is a monitor for Digital TV, initialize table monitors
-        DTVSignalMonitor *dtvMon = dynamic_cast<DTVSignalMonitor*>(signalMonitor);
-        if (dtvMon)
-            setup_table_monitoring(channel, dtvMon, this, recorder);
+        if (GetDTVSignalMonitor())
+            setup_table_monitoring(channel, GetDTVSignalMonitor(),
+                                   this, recorder);
 
         // Start the monitoring thread
         signalMonitor->Start();
@@ -2269,27 +2258,30 @@ void TVRec::TeardownSignalMonitor()
     if (!signalMonitor)
         return;
 
-    VERBOSE(VB_RECORD, "TeardownSignalMonitor() -- begin");
+    VERBOSE(VB_RECORD, LOC + "TeardownSignalMonitor() -- begin");
 
     // If this is a DTV signal monitor, save any pids we know about.
-    DTVSignalMonitor *dtvMon = dynamic_cast<DTVSignalMonitor*>(signalMonitor);
-    if (channel && dtvMon)
+    DTVSignalMonitor *dtvMon = GetDTVSignalMonitor();
+    if (dtvMon)
     {
-        pid_cache_t pid_cache;
-        GetPidsToCache(dtvMon, pid_cache);
-        if (pid_cache.size())
-            channel->SaveCachedPids(pid_cache);
-    }
+        if (channel)
+        {
+            pid_cache_t pid_cache;
+            GetPidsToCache(dtvMon, pid_cache);
+            if (pid_cache.size())
+                channel->SaveCachedPids(pid_cache);
+        }
 
 #ifdef USING_DVB
-    if (cardtype == "DVB" && dtvMon && dtvMon->GetATSCStreamData())
-    {
-        dtvMon->Stop();
-        ATSCStreamData *sd = dtvMon->GetATSCStreamData();
-        dtvMon->SetStreamData(NULL);
-        delete sd;
-    }
+        if (genOpt.cardtype == "DVB" && dtvMon->GetATSCStreamData())
+        {
+            dtvMon->Stop();
+            ATSCStreamData *sd = dtvMon->GetATSCStreamData();
+            dtvMon->SetStreamData(NULL);
+            delete sd;
+        }
 #endif // USING_DVB
+    }
 
     if (signalMonitor)
     {
@@ -2297,7 +2289,7 @@ void TVRec::TeardownSignalMonitor()
         signalMonitor = NULL;
     }
 
-    VERBOSE(VB_RECORD, "TeardownSignalMonitor() -- end");
+    VERBOSE(VB_RECORD, LOC + "TeardownSignalMonitor() -- end");
 }
 
 /** \fn TVRec::SetSignalMonitoringRate(int,int)
@@ -2321,8 +2313,9 @@ void TVRec::TeardownSignalMonitor()
  */
 int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
 {
-    VERBOSE(VB_RECORD, "SetSignalMonitoringRate("<<rate<<", "
-            <<notifyFrontend<<")");
+    QString msg = "SetSignalMonitoringRate(%1, %2)";
+    VERBOSE(VB_RECORD, LOC + msg.arg(rate).arg(notifyFrontend));
+
     int oldrate = 0; 
     if (signalMonitor)
         oldrate = signalMonitor->GetUpdateRate();
@@ -2353,16 +2346,21 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
             // send status to frontend, since this may be used in tuning.
             // if this is a card capable of signal monitoring, send error
             // otherwise send an signal lock message.
-            bool useMonitor = SignalMonitor::IsSupported(cardtype);
+            bool useMonitor = SignalMonitor::IsSupported(genOpt.cardtype);
             QStringList slist = useMonitor ?
                 SignalMonitorValue::ERROR_NO_CHANNEL :
                 SignalMonitorValue::SIGNAL_LOCK;
             
-            MythEvent me(QString("SIGNAL %1").arg(m_capturecardnum), slist);
+            MythEvent me(QString("SIGNAL %1").arg(cardid), slist);
             gContext->dispatch(me);
         }
     }
     return oldrate;
+}
+
+DTVSignalMonitor *TVRec::GetDTVSignalMonitor(void)
+{
+    return dynamic_cast<DTVSignalMonitor*>(signalMonitor);
 }
 
 /** \fn TVRec::ShouldSwitchToAnotherCard(QString)
@@ -2378,6 +2376,7 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
  */
 bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
 {
+    QString msg("");
     MSqlQuery query(MSqlQuery::InitCon());
 
     if (!query.isConnected())
@@ -2409,7 +2408,7 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":CHANNUM", channelname);
     query.bindValue(":CALLSIGN", callsign);
-    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -2417,8 +2416,8 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
     }
     else if (query.size() > 0)
     {
-        VERBOSE(VB_CHANNEL, QString("Found channel (%1) on current card(%2).")
-                            .arg(channelname).arg(m_capturecardnum) );
+        msg = "Found channel (%1) on current card(%2).";
+        VERBOSE(VB_RECORD, LOC + msg.arg(channelname).arg(cardid));
         return false;
     }
 
@@ -2435,25 +2434,22 @@ bool TVRec::ShouldSwitchToAnotherCard(QString chanid)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":CHANNUM", channelname);
     query.bindValue(":CALLSIGN", callsign);
-    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":CARDID", cardid);
 
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("ShouldSwitchToAnotherCard", query);
     }
-    else if (query.size() > 0)
+    else if (query.next())
     {
-        query.next();
-        QString channelname = query.value(0).toString();
-        QString capturecardnum = query.value(1).toString();
-        VERBOSE(VB_CHANNEL, QString("Found channel (%1) on different card(%2).")
-                            .arg(channelname).arg(capturecardnum) );
-
+        msg = QString("Found channel (%1) on different card(%2).")
+            .arg(query.value(0).toString()).arg(query.value(1).toString());
+        VERBOSE(VB_RECORD, LOC + msg);
         return true;
     }
 
-    VERBOSE( VB_CHANNEL, QString("Did not find channel id(%1) on any card.")
-                         .arg(chanid));
+    msg = QString("Did not find channel(%1) on any card.").arg(channelname);
+    VERBOSE(VB_RECORD, LOC + msg);
     return false;
 }
 
@@ -2504,7 +2500,7 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":CHANNUM", channum);
     query.bindValue(":INPUT", channelinput);
-    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":CARDID", cardid);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
@@ -2515,10 +2511,11 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
     {
         return true;
     }
+
     QString msg = QString(
         "Failed to find channel(%1) on current input (%2) of card (%3).")
-        .arg(channum).arg(channelinput).arg(m_capturecardnum);
-    VERBOSE(VB_RECORD, msg);
+        .arg(channum).arg(channelinput).arg(cardid);
+    VERBOSE(VB_RECORD, LOC + msg);
 
     // We didn't find it on the current input let's widen the search
     query.prepare(
@@ -2530,7 +2527,7 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
         "      capturecard.cardid   = :CARDID            AND "
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":CHANNUM", channum);
-    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":CARDID", cardid);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
@@ -2545,16 +2542,15 @@ bool TVRec::CheckChannel(ChannelBase *chan, const QString &channum,
             inputName = QString::fromUtf8(test);
 
         msg = QString("Found channel(%1) on another input (%2) of card (%3).")
-            .arg(channum).arg(inputName).arg(m_capturecardnum);
-        VERBOSE(VB_RECORD, msg);
+            .arg(channum).arg(inputName).arg(cardid);
+        VERBOSE(VB_RECORD, LOC + msg);
 
         return true;
     }
 
-    msg = QString(
-        "Failed to find channel(%1) on any input of card (%2).")
-        .arg(channum).arg(m_capturecardnum);
-    VERBOSE(VB_RECORD, msg);
+    msg = QString("Failed to find channel(%1) on any input of card (%2).")
+        .arg(channum).arg(cardid);
+    VERBOSE(VB_RECORD, LOC + msg);
 
     query.prepare("SELECT NULL FROM channel");
 
@@ -2609,7 +2605,7 @@ bool TVRec::CheckChannelPrefix(QString name, bool &unique)
         "      capturecard.hostname = '%4'")
         .arg(name)
         .arg(channelinput)
-        .arg(m_capturecardnum)
+        .arg(cardid)
         .arg(gContext->GetHostName());
 
     query.prepare(querystr);
@@ -2667,7 +2663,7 @@ bool TVRec::SetVideoFiltersForChannel(ChannelBase *chan, const QString &channum)
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":CHANNUM", channum);
     query.bindValue(":INPUT", channelinput);
-    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":CARDID", cardid);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
@@ -2724,7 +2720,7 @@ int TVRec::GetChannelValue(const QString &channel_field, ChannelBase *chan,
         .arg(channel_field));
     query.bindValue(":CHANNUM", channum);
     query.bindValue(":INPUT", channelinput);
-    query.bindValue(":CARDID", m_capturecardnum);
+    query.bindValue(":CARDID", cardid);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
@@ -2759,7 +2755,7 @@ void TVRec::SetChannelValue(QString &field_name, int value, ChannelBase *chan,
         "      capturecard.cardid   = '%3'               AND "
         "      capturecard.hostname = '%4'")
         .arg(channum).arg(channelinput)
-        .arg(m_capturecardnum)
+        .arg(cardid)
         .arg(gContext->GetHostName());
 
     query.prepare(querystr);
@@ -2792,7 +2788,7 @@ QString TVRec::GetNextChannel(ChannelBase *chan, int channeldirection)
     QString channum = chan->GetCurrentName();
     QString chanid = "";
 
-    DoGetNextChannel(channum, chan->GetCurrentInput(), m_capturecardnum,
+    DoGetNextChannel(channum, chan->GetCurrentInput(), cardid,
                      chan->GetOrdering(), channeldirection, chanid);
 
     return channum;
@@ -2808,7 +2804,7 @@ QString TVRec::GetNextRelativeChanID(QString channum, int channeldirection)
         return chanid;
 
     DoGetNextChannel(channum_out, channel->GetCurrentInput(), 
-                     m_capturecardnum, channel->GetOrdering(),
+                     cardid, channel->GetOrdering(),
                      channeldirection, chanid);
 
     return chanid;
@@ -2823,7 +2819,7 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
 
     if (!isNum && channelorder == "channum + 0")
     {
-        VERBOSE(VB_IMPORTANT,
+        VERBOSE(VB_IMPORTANT, LOC +
                 "Your channel ordering method \"channel number (numeric)\"\n"
                 "\t\t\twill not work with channels like: "<<channum<<"    \n"
                 "\t\t\tConsider switching to order by \"database order\"  \n"
@@ -2863,7 +2859,7 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
             "\t\t\tcardid %2, input '%3'\n"
             "\t\t\tin setup is wrong\n")
             .arg(channum).arg(cardid).arg(channelinput);
-        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, LOC + msg);
 
         querystr = QString(
             "SELECT %1 "
@@ -2888,7 +2884,7 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
 
     if (id == QString::null) 
     {
-        VERBOSE(VB_IMPORTANT, 
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Couldn't find any channels in the database,\n"
                 "\t\t\tplease make sure your inputs are associated\n"
                 "\t\t\tproperly with your cards.");
@@ -3107,13 +3103,13 @@ long long TVRec::GetFreeSpace(long long totalreadpos)
 long long TVRec::GetMaxBitrate()
 {
     long long bitrate;
-    if (cardtype == "MPEG")
+    if (genOpt.cardtype == "MPEG")
         bitrate = 10080000LL; // use DVD max bit rate
-    else if (cardtype == "HDTV")
+    else if (genOpt.cardtype == "HDTV")
         bitrate = 19400000LL; // 1080i
-    else if (cardtype == "FIREWIRE")
+    else if (genOpt.cardtype == "FIREWIRE")
         bitrate = 19400000LL; // 1080i
-    else if (cardtype == "DVB")
+    else if (genOpt.cardtype == "DVB")
         bitrate = 19400000LL; // 1080i
     else // frame grabber
         bitrate = 10080000LL; // use DVD max bit rate, probably too big
@@ -3151,8 +3147,8 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
 
     if (rbi->GetRingBuffer())
     {
-        VERBOSE(VB_ALL, "TVRec: Attempting to setup "
-                "multiple ringbuffers on one connection.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can not create RingBuffer.\n\t\t\t"
+                "A RingBuffer already exists for LiveTV on this recorder");
         return false;
     }
 
@@ -3160,7 +3156,7 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
     filesize = liveTVRingBufSize;
     fillamount = liveTVRingBufFill;
 
-    rbi->SetFilename(liveTVRingBufLoc, m_capturecardnum);
+    rbi->SetFilename(liveTVRingBufLoc, cardid);
     path = rbi->GetFilename();
 
     filesize = filesize * 1024 * 1024 * 1024;
@@ -3174,7 +3170,7 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "TVRec: Failed to open RingBuffer file.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open RingBuffer file.");
         rbi->SetRingBuffer(NULL);
         return false;
     }
@@ -3207,10 +3203,10 @@ void TVRec::StopLiveTV(void)
     }
     if (GetState() == kState_None)
     {
-        VERBOSE(VB_RECORD, "StopLiveTV()::closeRecorder -- begin");
+        VERBOSE(VB_RECORD, LOC + "StopLiveTV()::closeRecorder -- begin");
         TeardownSignalMonitor();
         TeardownRecorder(true);
-        VERBOSE(VB_RECORD, "StopLiveTV()::closeRecorder -- end rbuffer("
+        VERBOSE(VB_RECORD, LOC + "StopLiveTV()::closeRecorder -- end rbuffer("
                 <<rbi->GetRingBuffer()<<")");
     }
 }
@@ -3226,7 +3222,7 @@ void TVRec::PauseRecorder(void)
 
     if (!recorder)
     {
-        VERBOSE(VB_IMPORTANT, "TVRec::PauseRecorder() "
+        VERBOSE(VB_IMPORTANT, LOC + "PauseRecorder() "
                 "called with no recorder");
         return;
     }
@@ -3292,7 +3288,7 @@ void TVRec::ToggleChannelFavorite(void)
         "      cardinput.cardid     = capturecard.cardid AND "
         "      capturecard.cardid   = '%3'               AND "
         "      capturecard.hostname = '%4'")
-        .arg(channum).arg(channelinput).arg(m_capturecardnum)
+        .arg(channum).arg(channelinput).arg(cardid)
         .arg(gContext->GetHostName());
 
     query.prepare(querystr);
@@ -3307,7 +3303,7 @@ void TVRec::ToggleChannelFavorite(void)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, QString(
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
                 "Channel: \'%1\' was not found in the database.\n"
                 "\t\t\tMost likely, your DefaultTVChannel setting is wrong.\n"
                 "\t\t\tCould not toggle favorite.").arg(channum));
@@ -3338,7 +3334,7 @@ void TVRec::ToggleChannelFavorite(void)
 
         query.prepare(querystr);
         query.exec();
-        VERBOSE(VB_RECORD, "Removing Favorite.");
+        VERBOSE(VB_RECORD, LOC + "Removing Favorite.");
     }
     else
     {
@@ -3348,7 +3344,7 @@ void TVRec::ToggleChannelFavorite(void)
 
         query.prepare(querystr);
         query.exec();
-        VERBOSE(VB_RECORD, "Adding Favorite.");
+        VERBOSE(VB_RECORD, LOC + "Adding Favorite.");
     }
 }
 
@@ -3435,7 +3431,7 @@ void TVRec::SetChannel(QString name)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    VERBOSE(VB_RECORD, QString("TVRec::SetChannel(%1)").arg(name));
+    VERBOSE(VB_RECORD, LOC + QString("SetChannel(%1)").arg(name));
     Pause();
     if (channel)
     {
@@ -3444,7 +3440,7 @@ void TVRec::SetChannel(QString name)
 
         if (!channel->SetChannelByString(chan))
         {
-            VERBOSE(VB_IMPORTANT, "SetChannelByString() failed");
+            VERBOSE(VB_IMPORTANT, LOC + "SetChannelByString() failed");
             channel->SetChannelByString(prevchan);
         }
     }
@@ -3458,7 +3454,7 @@ void TVRec::SetChannel(QString name)
  */
 void TVRec::Pause(void)
 {
-    VERBOSE(VB_RECORD, "TVRec::Pause() -- begin");
+    VERBOSE(VB_RECORD, LOC + "Pause() -- begin");
     QMutexLocker lock(&stateChangeLock);
 
     bool rbi_pause = true;
@@ -3485,7 +3481,7 @@ void TVRec::Pause(void)
     if (rbi->GetRingBuffer())
         rbi->GetRingBuffer()->Reset();
 
-    VERBOSE(VB_RECORD, "TVRec::Pause() -- end");
+    VERBOSE(VB_RECORD, LOC + "Pause() -- end");
 }
 
 /** \fn TVRec::Unpause()
@@ -3494,13 +3490,13 @@ void TVRec::Pause(void)
  */
 void TVRec::Unpause(void)
 {
-    VERBOSE(VB_RECORD, "TVRec::Unpause() -- begin");
+    VERBOSE(VB_RECORD, LOC + "Unpause() -- begin");
     QMutexLocker lock(&stateChangeLock);
 
     if (recorder)
         recorder->Reset();
 
-    if (SignalMonitor::IsSupported(cardtype))
+    if (SignalMonitor::IsSupported(genOpt.cardtype))
     {
         StartDummyRecorder();
         SetSignalMonitoringRate(50, 1);
@@ -3513,7 +3509,7 @@ void TVRec::Unpause(void)
         rbi->Unpause();
     }
 
-    VERBOSE(VB_RECORD, "TVRec::Unpause() -- end");
+    VERBOSE(VB_RECORD, LOC + "Unpause() -- end");
 }
 
 /** \fn TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
@@ -3744,7 +3740,7 @@ void TVRec::RetrieveInputChannels(QMap<int, QString> &inputChannel,
         "FROM capturecard, cardinput "
         "WHERE capturecard.cardid = %1 AND "
         "      capturecard.cardid = cardinput.cardid")
-        .arg(m_capturecardnum);
+        .arg(cardid);
 
     query.prepare(querystr);
 
@@ -3754,9 +3750,10 @@ void TVRec::RetrieveInputChannels(QMap<int, QString> &inputChannel,
     }
     else if (!query.size())
     {
-        VERBOSE(VB_IMPORTANT, "Error getting inputs for the capturecard.\n"
-                "\t\t\tPerhaps you have forgotten to bind video sources "
-                "to your card's inputs?");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                "Error getting inputs for the capturecard.      \n"
+                "\t\t\tPerhaps you have forgotten to bind video \n"
+                "\t\t\tsources to your card's inputs?");
     }
     else
     {
@@ -3802,7 +3799,7 @@ void TVRec::StoreInputChannels(const QMap<int, QString> &inputChannel)
             "UPDATE cardinput "
             "SET startchan = '%1' "
             "WHERE cardid = %2 AND inputname = '%3'")
-            .arg(inputChannel[i]).arg(m_capturecardnum).arg(input);
+            .arg(inputChannel[i]).arg(cardid).arg(input);
 
         query.prepare(querystr);
 

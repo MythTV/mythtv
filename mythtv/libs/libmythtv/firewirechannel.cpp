@@ -12,7 +12,7 @@
 class TVRec;
 
 
-FirewireChannel::FirewireChannel(firewire_options_t firewire_opts, TVRec *parent)
+FirewireChannel::FirewireChannel(FireWireDBOptions firewire_opts, TVRec *parent)
     : ChannelBase(parent),fw_opts(firewire_opts)
 {
 	

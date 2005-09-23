@@ -13,7 +13,8 @@
 
 //#define DBOX2_CHANNEL_DEBUG
 
-DBox2Channel::DBox2Channel(TVRec *parent, dbox2_options_t *dbox2_options, int cardid)
+DBox2Channel::DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options,
+                           int cardid)
     : ChannelBase(parent)
 {
     m_dbox2options = dbox2_options;

@@ -26,7 +26,8 @@ class DBox2EPG : public QObject, public QThread
     public:
         DBox2EPG();
         ~DBox2EPG();
-	void Init(dbox2_options_t* dbox2_options, int cardid, DBox2Channel* channel);
+	void Init(DBox2DBOptions* dbox2_options, int cardid, 
+                  DBox2Channel* channel);
 	void RequestEPG(const QString& channelNumber);
 	void ScheduleRequestEPG(const QString& channelNumber);
 	void Shutdown();
@@ -45,7 +46,7 @@ class DBox2EPG : public QObject, public QThread
 	void run();
 
         QHttp* http;
-	dbox2_options_t* m_dbox2options;
+	DBox2DBOptions* m_dbox2options;
 	DBox2Channel* m_dbox2channel;
 	int m_cardid;
 	int m_channelCount;

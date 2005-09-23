@@ -31,7 +31,8 @@ DBox2EPG::~DBox2EPG()
     delete http;
 }
 
-void DBox2EPG::Init(dbox2_options_t* dbox2_options, int cardid, DBox2Channel* channel)
+void DBox2EPG::Init(DBox2DBOptions* dbox2_options, int cardid,
+                    DBox2Channel* channel)
 {
     m_dbox2options = dbox2_options;
     http->setHost(m_dbox2options->host, m_dbox2options->httpport);
