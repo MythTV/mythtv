@@ -1580,7 +1580,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         VERBOSE(VB_GENERAL, "prebuffering pause");
         SetPrebuffering(true);
 
-        if (!m_playing_slower)
+        if (!m_playing_slower && audio_channels <= 2)
         {
             m_stored_audio_stretchfactor = GetAudioStretchFactor();
             Play(m_stored_audio_stretchfactor * 0.8, true);
