@@ -224,8 +224,8 @@ void Channel::SetFormat(const QString &format)
     else
         fmt = format;
 
-    videomode_v4l1 = format_to_mode(fmt, 1);
-    videomode_v4l2 = format_to_mode(fmt, 2);
+    videomode_v4l1 = format_to_mode(fmt.upper(), 1);
+    videomode_v4l2 = format_to_mode(fmt.upper(), 2);
  
     if (usingv4l2)
     {

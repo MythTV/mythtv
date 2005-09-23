@@ -685,7 +685,7 @@ bool ChannelUtil::CreateChannel(uint db_sourceid,
     query.bindValue(":NAME",      service_name.utf8());
     query.bindValue(":XMLTVID",   xmltvid);
     query.bindValue(":FREQID",    freqid);
-    query.bindValue(":TVFORMAT",  tvformat);
+    query.bindValue(":TVFORMAT",  tvformat.upper().utf8());
     query.bindValue(":ATSCSRCID", atsc_src_id);
        
     if (!query.exec())
@@ -742,7 +742,9 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
 
     if (freqid > 0)
         query.bindValue(":FREQID",    freqid);
-    query.bindValue(":TVFORMAT", (atsc_major_channel > 0) ? "atsc" : "dvb");
+
+    QString tvformat = (atsc_major_channel > 0) ? "ATSC" : "Default";
+    query.bindValue(":TVFORMAT", tvformat);
 
     if (!query.exec() || !query.isActive())
     {
@@ -787,7 +789,7 @@ bool ChannelUtil::UpdateChannel(uint db_mplexid,
     if (freqid > 0)
         query.bindValue(":FREQID",    freqid);
     if (atsc_major_channel > 0)
-        query.bindValue(":TVFORMAT",  "atsc");
+        query.bindValue(":TVFORMAT",  "ATSC");
 
     if (!query.exec() || !query.isActive())
     {
