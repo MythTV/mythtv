@@ -1536,7 +1536,7 @@ void TVRec::CreateSIParser(int program_num)
     (void) program_num;
 #ifdef USING_DVB
     DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-    if (!dvbsiparser && dvbc)
+    if (dvbc)
     {
         int service_id = dvbc->GetServiceID();
 
@@ -1544,18 +1544,23 @@ void TVRec::CreateSIParser(int program_num)
                 QString("prog_num(%1) vs. dvbc->srv_id(%2)")
                 .arg(program_num).arg(service_id));
 
-        dvbsiparser = new DVBSIParser(dvbc->GetCardNum(), true);
-        QObject::connect(dvbsiparser, SIGNAL(UpdatePMT(const PMTObject*)),
-                         dvbc, SLOT(SetPMT(const PMTObject*)));
+        if (!dvbsiparser)
+        {
+            dvbsiparser = new DVBSIParser(dvbc->GetCardNum(), true);
+            QObject::connect(dvbsiparser, SIGNAL(UpdatePMT(const PMTObject*)),
+                             dvbc, SLOT(SetPMT(const PMTObject*)));
+        }
+
         dvbsiparser->ReinitSIParser(
             dvbc->GetSIStandard(),
             (program_num >= 0) ? program_num : service_id);
+
+#ifdef USING_DVB_EIT
+        if (!dvb_options.dvb_on_demand)
+            scanner->StartPassiveScan(dvbc, dvbsiparser);
+#endif // USING_DVB_EIT
     }
 #endif // USING_DVB
-#ifdef USING_DVB_EIT
-    if (dvbc && dvbsiparser && !dvb_options.dvb_on_demand)
-        scanner->StartPassiveScan(dvbc, dvbsiparser);
-#endif // USING_DVB_EIT
 }
 
 void TVRec::TeardownSIParser(void)
@@ -2069,6 +2074,24 @@ void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
     }
 }
 
+bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const ChannelBase* channel)
+{
+    pid_cache_t pid_cache;
+    channel->GetCachedPids(pid_cache);
+    pid_cache_t::const_iterator it = pid_cache.begin();
+    bool vctpid_cached = false;
+    for (; it != pid_cache.end(); ++it)
+    {
+        if ((it->second == TableID::TVCT) ||
+            (it->second == TableID::CVCT))
+        {
+            vctpid_cached = true;
+            dtvMon->GetATSCStreamData()->AddListeningPID(it->first);
+        }
+    }
+    return vctpid_cached;
+}
+
 bool setup_mpeg_table_monitoring(ChannelBase* channel,
                                  DTVSignalMonitor* dtvSignalMonitor,
                                  TVRec *tv_rec,
@@ -2159,18 +2182,9 @@ bool setup_atsc_table_monitoring(ChannelBase* channel,
 
     VERBOSE(VB_RECORD, "Set up ATSC table monitoring successfully.");
 
-    pid_cache_t::const_iterator it = pid_cache.begin();
-    bool vctpid_cached = false;
-    for (; it != pid_cache.end(); ++it)
-    {
-        if ((it->second == TableID::TVCT) || (it->second == TableID::CVCT))
-        {
-            vctpid_cached = true;
-            dtvSignalMonitor->GetATSCStreamData()->
-                AddListeningPID(it->first);
-        }
-    }
-    if (!vctpid_cached)
+    // Try to get pid of VCT from cache and
+    // require MGT if we don't have VCT pid.
+    if (!ApplyCachedPids(dtvSignalMonitor, channel))
         dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForMGT);
 
     return true;
@@ -2980,13 +2994,8 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
  */
 bool TVRec::IsReallyRecording(void)
 {
-    if (recorder && recorder->IsRecording())
-        return true;
-
-    if (startingRecording && (internalState == kState_WatchingLiveTV))
-        return true;
-
-    return false;
+    return ((recorder && recorder->IsRecording()) ||
+            (dummyRecorder && dummyRecorder->IsRecording()));
 }
 
 /** \fn TVRec::IsBusy()
