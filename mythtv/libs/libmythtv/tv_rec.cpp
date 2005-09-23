@@ -437,7 +437,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     else if (!cancelNextRecording)
     {
         msg = QString("Wanted to record: %1 %2 %3 %4\n"
-            "\t\t\tBut the current state is: %1")
+            "\t\t\tBut the current state is: %5")
               .arg(rcinfo->title).arg(rcinfo->chanid)
               .arg(rcinfo->recstartts.toString())
               .arg(rcinfo->recendts.toString())
