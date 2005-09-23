@@ -612,7 +612,7 @@ void DVBRecorder::StartRecording(void)
         if (ret == 0 && t.elapsed() > POLL_WARNING_TIMEOUT)
         {
             RECWARN(QString("No data from card in %1 milliseconds.")
-                    .arg(POLL_INTERVAL));
+                    .arg(t.elapsed()));
         }
         else if (ret == 1 && _polls.revents & POLLIN)
         {
