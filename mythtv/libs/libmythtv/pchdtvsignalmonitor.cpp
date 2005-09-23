@@ -124,6 +124,9 @@ void pcHDTVSignalMonitor::RunTableMonitor()
  */
 void pcHDTVSignalMonitor::UpdateValues()
 {
+    if (!running || exit)
+        return;
+
     if (dtvMonitorRunning)
     {
         EMIT(StatusSignalLock, signalLock);

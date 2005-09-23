@@ -320,6 +320,9 @@ void DVBSignalMonitor::RunTableMonitor(void)
  */
 void DVBSignalMonitor::UpdateValues(void)
 {
+    if (!running || exit)
+        return;
+
     if (dtvMonitorRunning)
     {
         EmitDVBSignals();
