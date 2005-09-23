@@ -3053,7 +3053,7 @@ void ProgramInfo::ShowRecordingDialog(void)
 
     DialogBox diag(gContext->GetMainWindow(), message);
     int button = 1, ok = -1, react = -1, stop = -1, addov = -1, forget = -1,
-        clearov = -1, ednorm = -1, edcust = -1;
+        clearov = -1, edend = -1, ednorm = -1, edcust = -1;
 
     diag.AddButton(QObject::tr("OK"));
     ok = button++;
@@ -3080,7 +3080,7 @@ void ProgramInfo::ShowRecordingDialog(void)
                 diag.AddButton(QObject::tr("Don't record"));
                 addov = button++;
             }
-            if (rectype != kFindOneRecord &&
+            if (recstatus != rsRecording && rectype != kFindOneRecord &&
                 !((findid == 0 || !IsFindApplicable()) &&
                   catType == "series" &&
                   programid.contains(QRegExp("0000$"))) &&
@@ -3096,13 +3096,21 @@ void ProgramInfo::ShowRecordingDialog(void)
 
         if (rectype != kOverrideRecord && rectype != kDontRecord)
         {
-            diag.AddButton(QObject::tr("Edit Options"));
-            ednorm = button++;
-
-            if (rectype != kSingleRecord && rectype != kFindOneRecord)
+            if (recstatus == rsRecording)
             {
-                diag.AddButton(QObject::tr("Add Override"));
-                edcust = button++;
+                diag.AddButton(QObject::tr("Change Ending Time"));
+                edend = button++;
+            }
+            else
+            {
+                diag.AddButton(QObject::tr("Edit Options"));
+                ednorm = button++;
+
+                if (rectype != kSingleRecord && rectype != kFindOneRecord)
+                {
+                    diag.AddButton(QObject::tr("Add Override"));
+                    edcust = button++;
+                }
             }
         }
 
@@ -3110,9 +3118,11 @@ void ProgramInfo::ShowRecordingDialog(void)
         {
             diag.AddButton(QObject::tr("Edit Override"));
             ednorm = button++;
-
-            diag.AddButton(QObject::tr("Clear Override"));
-            clearov = button++;
+            if (recstatus != rsRecording)
+            {
+                diag.AddButton(QObject::tr("Clear Override"));
+                clearov = button++;
+            }
         }
     }
 
@@ -3140,6 +3150,17 @@ void ProgramInfo::ShowRecordingDialog(void)
     }
     else if (ret == clearov)
         ApplyRecordStateChange(kNotRecording);
+    else if (ret == edend)
+    {
+        GetProgramRecordingStatus();
+        if (rectype != kSingleRecord && rectype != kOverrideRecord &&
+            rectype != kFindOneRecord)
+        {
+            record->makeOverride();
+            record->setRecordingType(kOverrideRecord);
+        }
+        record->exec();
+    }
     else if (ret == ednorm)
     {
         GetProgramRecordingStatus();
