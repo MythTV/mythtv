@@ -3073,6 +3073,38 @@ int ProgramInfo::getProgramFlags(void) const
     return flags;
 }
 
+/** \fn ProgramInfo::GetChannel(const ProgramInfo*,QString&,QString&) const
+ *  \brief Returns the channel and input needed to record the program.
+ *  \return true on success, false on failure
+ */
+bool ProgramInfo::GetChannel(QString &channum, QString &input) const
+{
+    channum = input = QString::null;
+    MSqlQuery query(MSqlQuery::InitCon());   
+
+    query.prepare("SELECT channel.channum, cardinput.inputname "
+                  "FROM channel, capturecard, cardinput "
+                  "WHERE channel.chanid     = :CHANID            AND "
+                  "      cardinput.cardid   = capturecard.cardid AND "
+                  "      cardinput.sourceid = :SOURCEID          AND "
+                  "      capturecard.cardid = :CARDID");
+    query.bindValue(":CHANID",   chanid);
+    query.bindValue(":SOURCEID", sourceid);
+    query.bindValue(":CARDID",   cardid);
+
+    if (query.exec() && query.isActive() && query.next())
+    {
+        channum = query.value(0).toString();
+        input   = query.value(1).toString();
+        return true;
+    } 
+    else 
+    {
+        MythContext::DBError("GetChannel(ProgInfo...)", query);
+        return false;
+    }
+}
+
 void ProgramInfo::ShowRecordingDialog(void)
 {
     QDateTime now = QDateTime::currentDateTime();

@@ -962,7 +962,17 @@ void TVRec::HandleStateChange(void)
     }
     else if (TRANSITION(kState_None, kState_RecordingOnly))
     {
-        if (SetChannel())
+        bool ok = true;
+        QString channum, input;
+        if (channel)
+        {
+            ok = curRecording->GetChannel(channum, input);
+            channel->Open();
+            if (ok)
+                ok = channel->SwitchToInput(input, channum);
+            CloseChannel();
+        }
+        if (ok)
         {
             rbi->SetRingBuffer(new RingBuffer(rbi->GetFilename(), true));
             if (rbi->GetRingBuffer()->IsOpen())
@@ -1484,55 +1494,6 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
     VERBOSE(VB_IMPORTANT, LOC + msg);
     return NULL;
 #endif // USING_FRONTEND
-}
-
-/** \fn TVRec::SetChannel(bool)
- *  \brief If successful, sets the channel to the channel needed to record the
- *         "curRecording" program.
- */
-bool TVRec::SetChannel()
-{
-    bool need_close = false;
-    if (channel && !channel->IsOpen())
-    {
-        channel->Open();
-        need_close = true;
-    }
-
-    QString inputname = "";
-    QString chanstr = "";
- 
-    MSqlQuery query(MSqlQuery::InitCon());   
-    query.prepare("SELECT channel.channum, cardinput.inputname "
-                  "FROM channel, capturecard, cardinput "
-                  "WHERE channel.chanid     = :CHANID            AND "
-                  "      cardinput.cardid   = capturecard.cardid AND "
-                  "      cardinput.sourceid = :SOURCEID          AND "
-                  "      capturecard.cardid = :CARDID");
-    query.bindValue(":CHANID",   curRecording->chanid);
-    query.bindValue(":SOURCEID", curRecording->sourceid);
-    query.bindValue(":CARDID",   curRecording->cardid);
-
-    if (query.exec() && query.isActive() && query.next())
-    {
-        chanstr = query.value(0).toString();
-        inputname = query.value(1).toString();
-    } 
-    else 
-    {
-        MythContext::DBError("SetChannel", query);
-        return false;
-    }
-
-    bool ok = true;
-
-    if (channel)
-        ok = channel->SwitchToInput(inputname, chanstr);
-        
-    if (need_close)
-        CloseChannel();
-
-    return ok;
 }
 
 void TVRec::CreateSIParser(int program_num)
@@ -2082,119 +2043,86 @@ bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const ChannelBase* channel)
     return vctpid_cached;
 }
 
-bool setup_mpeg_table_monitoring(ChannelBase* channel,
-                                 DTVSignalMonitor* dtvSignalMonitor,
-                                 TVRec *tv_rec,
-                                 RecorderBase* recorder)
+/** \fn bool TVRec::SetupDTVSignalMonitor(void)
+ *  \brief Tells DTVSignalMonitor what channel to look for.
+ *
+ *   If the major and minor channels are set we tell the signal
+ *   monitor to look for those in the VCT.
+ *
+ *   Otherwise, we tell the signal monitor to look for the MPEG
+ *   program number in the PAT.
+ *
+ *   This method also grabs the ATSCStreamData() from the recorder
+ *   if possible, or creates one if needed.
+ */
+bool TVRec::SetupDTVSignalMonitor(void)
 {
+    VERBOSE(VB_RECORD, LOC + "Setting up table monitoring.");
+
+    DTVSignalMonitor *sm = GetDTVSignalMonitor();
     ATSCStreamData *sd = NULL;
-    int progNum = channel->GetProgramNumber();
-    VERBOSE(VB_RECORD, "mpeg program number: "<<progNum);
-
-    if (progNum < 0)
-    {
-        VERBOSE(VB_RECORD, "Failing to set up MPEG table monitoring.");
-        return false;
-    }
-
 #ifdef USING_V4L
-    HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
-    if (rec)
+    if (GetHDTVRecorder())
     {
-        sd = rec->StreamData();
+        sd = GetHDTVRecorder()->StreamData();
         sd->SetCaching(true);
     }
 #endif // USING_V4L
-
     if (!sd)
         sd = new ATSCStreamData(-1, -1, true);
 
-#ifdef USING_DVB
-    // Some DVB devices munge the PMT so the CRC check fails  we need to
-    // tell the stream data class to not check the CRC on these devices.
-    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-    if (dvbc)
-    {
-        sd->SetIgnoreCRCforPMT(dvbc->HasCRCBug());
-    }
-#endif // USING_DVB
-
-    dtvSignalMonitor->SetStreamData(sd);
-    sd->Reset(progNum);
-
-    dtvSignalMonitor->SetProgramNumber(progNum);
-    bool fta = CardUtil::IgnoreEncrypted(
-        tv_rec->GetCaptureCardNum(), channel->GetCurrentInput());
-    dtvSignalMonitor->SetFTAOnly(fta);
-
-    dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
-
-    VERBOSE(VB_RECORD, "Successfully set up MPEG table monitoring.");
-    return true;
-}
-
-bool setup_atsc_table_monitoring(ChannelBase* channel,
-                                 DTVSignalMonitor* dtvSignalMonitor,
-                                 TVRec *tv_rec,
-                                 RecorderBase* recorder)
-{
-    (void)tv_rec;
+    // Check if this is an ATSC Channel
     int major = channel->GetMajorChannel();
     int minor = channel->GetMinorChannel();
-    if (minor <= 0)
+    if (minor > 0)
     {
-        VERBOSE(VB_RECORD, QString("Not ATSC channel: major(%1) minor(%2).")
-                .arg(major).arg(minor));
-        return false;
-    }   
+        QString msg = QString("ATSC channel: %1_%2").arg(major).arg(minor);
+        VERBOSE(VB_RECORD, LOC + msg);
 
-    VERBOSE(VB_RECORD, QString("ATSC channel: %1_%2").arg(major).arg(minor));
+        sm->SetStreamData(sd);
+        sd->Reset(major, minor);
+        sm->SetChannel(major, minor);
+        sm->SetFTAOnly(true);
 
-    pid_cache_t pid_cache;
-    channel->GetCachedPids(pid_cache);
+        // Try to get pid of VCT from cache and
+        // require MGT if we don't have VCT pid.
+        if (!ApplyCachedPids(sm, channel))
+            sm->AddFlags(kDTVSigMon_WaitForMGT);
 
-    ATSCStreamData *sd = NULL;
-#ifdef USING_V4L
-    HDTVRecorder *rec = dynamic_cast<HDTVRecorder*>(recorder);
-    if (rec)
-    {
-        sd = rec->StreamData();
-        sd->SetCaching(true);
+        VERBOSE(VB_RECORD, LOC + "Successfully set up ATSC table monitoring.");
+        return true;
     }
-#endif // USING_V4L
-    if (!sd)
-        sd = new ATSCStreamData(major, minor, true);
 
-    dtvSignalMonitor->SetStreamData(sd);
-    sd->Reset(major, minor);
-    dtvSignalMonitor->SetChannel(major, minor);
-    dtvSignalMonitor->SetFTAOnly(true);
-
-    VERBOSE(VB_RECORD, "Set up ATSC table monitoring successfully.");
-
-    // Try to get pid of VCT from cache and
-    // require MGT if we don't have VCT pid.
-    if (!ApplyCachedPids(dtvSignalMonitor, channel))
-        dtvSignalMonitor->AddFlags(kDTVSigMon_WaitForMGT);
-
-    return true;
-}
-
-void setup_table_monitoring(ChannelBase* channel,
-                            DTVSignalMonitor* dtvSignalMonitor,
-                            TVRec *tv_rec,
-                            RecorderBase* recorder)
-{
-    VERBOSE(VB_RECORD, "Setting up table monitoring.");
-
-    bool done = setup_atsc_table_monitoring(
-        channel, dtvSignalMonitor, tv_rec, recorder);
-
-    if (!done)
+    // Check if this is an MPEG Channel
+    int progNum = channel->GetProgramNumber();
+    if (progNum >= 0)
     {
-        setup_mpeg_table_monitoring(
-            channel, dtvSignalMonitor, tv_rec, recorder);
+        QString msg = QString("MPEG program number: %1").arg(progNum);
+        VERBOSE(VB_RECORD, LOC + msg);
+
+#ifdef USING_DVB
+        // Some DVB devices munge the PMT so the CRC check fails  we need to
+        // tell the stream data class to not check the CRC on these devices.
+        if (GetDVBChannel())
+            sd->SetIgnoreCRCforPMT(GetDVBChannel()->HasCRCBug());
+#endif // USING_DVB
+
+        bool fta = CardUtil::IgnoreEncrypted(
+            GetCaptureCardNum(), channel->GetCurrentInput());
+
+        sm->SetStreamData(sd);
+        sd->Reset(progNum);
+        sm->SetProgramNumber(progNum);
+        sm->SetFTAOnly(fta);
+        sm->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
+
+        VERBOSE(VB_RECORD, LOC + "Successfully set up MPEG table monitoring.");
+        return true;
     }
+
+    QString msg = "No valid DTV info, ATSC maj(%1) min(%2), MPEG pn(%3)";
+    VERBOSE(VB_RECORD, LOC_ERR + msg.arg(major).arg(minor).arg(progNum));
+    return false;
 }
 
 /** \fn TVRec::SetupSignalMonitor()
@@ -2241,8 +2169,7 @@ void TVRec::SetupSignalMonitor(void)
         VERBOSE(VB_RECORD, LOC + "Signal monitor successfully created");
         // If this is a monitor for Digital TV, initialize table monitors
         if (GetDTVSignalMonitor())
-            setup_table_monitoring(channel, GetDTVSignalMonitor(),
-                                   this, recorder);
+            SetupDTVSignalMonitor();
 
         // Start the monitoring thread
         signalMonitor->Start();

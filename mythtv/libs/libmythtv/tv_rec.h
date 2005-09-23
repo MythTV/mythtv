@@ -226,8 +226,6 @@ class TVRec
     static void *RecorderThread(void *param);
 
   private:
-    bool SetChannel();
-
     void GetChannelInfo(ChannelBase *chan,  QString &title,
                         QString &subtitle,  QString &desc,
                         QString &category,  QString &starttime, 
@@ -260,6 +258,7 @@ class TVRec
     Channel      *GetV4LChannel(void);
 
     void SetupSignalMonitor(void);
+    bool SetupDTVSignalMonitor(void);
     void TeardownSignalMonitor(void);
     DTVSignalMonitor *GetDTVSignalMonitor(void);
 

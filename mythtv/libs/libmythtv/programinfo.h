@@ -175,6 +175,7 @@ class ProgramInfo
     bool GetPreserveEpisodeFromRecorded(void) const;
     bool UsesMaxEpisodes(void) const;
     int getProgramFlags(void) const;
+    bool GetChannel(QString &channum, QString &input) const;
 
     // DB sets
     void SetFilesize(long long fsize);
