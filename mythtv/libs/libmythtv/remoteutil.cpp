@@ -166,17 +166,6 @@ bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
     return result;
 }
 
-bool RemoteReactivateRecording(ProgramInfo *pginfo)
-{
-    QStringList strlist = QString("REACTIVATE_RECORDING");
-    pginfo->ToStringList(strlist);
-
-    if (!gContext->SendReceiveStringList(strlist))
-        return false;
-
-    return strlist[0].toInt();
-}
-
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist)
 {
     QStringList strlist = QString("QUERY_GETALLSCHEDULED");

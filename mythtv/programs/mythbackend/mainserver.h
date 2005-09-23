@@ -79,7 +79,6 @@ class MainServer : public QObject
     void DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
                                  bool forceMetadataDelete);
     void HandleForgetRecording(QStringList &slist, PlaybackSock *pbs);
-    void HandleReactivateRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleRescheduleRecordings(int recordid, PlaybackSock *pbs);
     void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);

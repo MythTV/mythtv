@@ -62,7 +62,7 @@ enum RecStatusType {
     rsTunerBusy = -8,
     rsLowDiskSpace = -7,
     rsCancelled = -6,
-    //rsUnused = -5,
+    rsMissed = -5,
     rsAborted = -4,
     rsRecorded = -3,
     rsRecording = -2,
@@ -135,6 +135,7 @@ class ProgramInfo
     void ApplyRecordStateChange(RecordingType newstate);
     void ApplyRecordRecPriorityChange(int);
     void ToggleRecord(void);
+    void ReactivateRecording(void);
     void AddHistory(bool resched = true);
     void DeleteHistory(void);
     void ForgetHistory(void);

@@ -28,7 +28,6 @@ bool RemoteCheckFile(ProgramInfo *pginfo);
 void RemoteStopRecording(ProgramInfo *pginfo);
 bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
                            bool forceMetadataDelete = false);
-bool RemoteReactivateRecording(ProgramInfo *pginfo);
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);
 vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo);
 void RemoteSendMessage(const QString &message);

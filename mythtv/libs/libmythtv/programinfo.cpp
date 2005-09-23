@@ -2192,6 +2192,28 @@ void ProgramInfo::SetPositionMapDelta(QMap<long long, long long> &posMap,
     }
 }
 
+/** \fn ProgramInfo::ReactivateRecording(void)
+ *  \brief Asks the scheduler to restart this recording if possible.
+ */
+void ProgramInfo::ReactivateRecording(void)
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    result.prepare("UPDATE oldrecorded SET reactivate = 1 "
+                   "WHERE station = :STATION AND "
+                   "  starttime = :STARTTIME AND "
+                   "  title = :TITLE;");
+    result.bindValue(":STARTTIME", startts);
+    result.bindValue(":TITLE", title.utf8());
+    result.bindValue(":STATION", chansign);
+
+    result.exec();
+    if (!result.isActive())
+        MythContext::DBError("ReactivateRecording", result);
+
+    ScheduledRecording::signalChange(0);
+}
+
 /** \fn ProgramInfo::AddHistory(bool resched)
  *  \brief Adds recording history, creating "record" it if necessary.
  */
@@ -2202,16 +2224,18 @@ void ProgramInfo::AddHistory(bool resched)
     RecStatusType rs = (recstatus == rsCurrentRecording) ?
         rsPreviousRecording : recstatus;
     oldrecstatus = recstatus;
+    if (dup)
+        reactivate = false;
 
     MSqlQuery result(MSqlQuery::InitCon());
 
     result.prepare("REPLACE INTO oldrecorded (chanid,starttime,"
                    "endtime,title,subtitle,description,category,"
                    "seriesid,programid,findid,recordid,station,"
-                   "rectype,recstatus,duplicate) "
+                   "rectype,recstatus,duplicate,reactivate) "
                    "VALUES(:CHANID,:START,:END,:TITLE,:SUBTITLE,:DESC,"
                    ":CATEGORY,:SERIESID,:PROGRAMID,:FINDID,:RECORDID,"
-                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE);");
+                   ":STATION,:RECTYPE,:RECSTATUS,:DUPLICATE,:REACTIVATE);");
     result.bindValue(":CHANID", chanid);
     result.bindValue(":START", startts.toString(Qt::ISODate));
     result.bindValue(":END", endts.toString(Qt::ISODate));
@@ -2227,6 +2251,7 @@ void ProgramInfo::AddHistory(bool resched)
     result.bindValue(":RECTYPE", rectype);
     result.bindValue(":RECSTATUS", rs);
     result.bindValue(":DUPLICATE", dup);
+    result.bindValue(":REACTIVATE", reactivate);
 
     result.exec();
     if (!result.isActive())
@@ -2422,6 +2447,8 @@ QString ProgramInfo::RecStatusChar(void) const
         return QObject::tr("T", "RecStatusChar rsTooManyRecordings");
     case rsCancelled:
         return QObject::tr("c", "RecStatusChar rsCancelled");
+    case rsMissed:
+        return QObject::tr("M", "RecStatusChar rsMissed");
     case rsConflict:
         return QObject::tr("C", "RecStatusChar rsConflict");
     case rsLaterShowing:
@@ -2474,6 +2501,8 @@ QString ProgramInfo::RecStatusText(void) const
             return QObject::tr("Max Recordings");
         case rsCancelled:
             return QObject::tr("Manual Cancel");
+        case rsMissed:
+            return QObject::tr("Missed");
         case rsConflict:
             return QObject::tr("Conflicting");
         case rsLaterShowing:
@@ -2523,6 +2552,20 @@ QString ProgramInfo::RecStatusDesc(void) const
             message = QObject::tr("This showing was recorded but was aborted "
                                    "before recording was completed.");
             break;
+        case rsMissed:
+            message += QObject::tr("This showing was not recorded because it "
+                                   "was scheduled after it would have ended.");
+            break;
+        case rsCancelled:
+            message += QObject::tr("This showing was not recorded because it "
+                                   "was manually cancelled.");
+            break;
+        case rsLowDiskSpace:
+            message += QObject::tr("there wasn't enough disk space available.");
+            break;
+        case rsTunerBusy:
+            message += QObject::tr("the tuner card was already being used.");
+            break;
         default:
             message = QObject::tr("The status of this showing is unknown.");
             break;
@@ -2558,9 +2601,6 @@ QString ProgramInfo::RecStatusDesc(void) const
             message += QObject::tr("too many recordings of this program have "
                                    "already been recorded.");
             break;
-        case rsCancelled:
-            message += QObject::tr("it was manually cancelled.");
-            break;
         case rsConflict:
             message += QObject::tr("another program with a higher priority "
                                    "will be recorded.");
@@ -2574,12 +2614,6 @@ QString ProgramInfo::RecStatusDesc(void) const
             break;            
         case rsInactive:
             message += QObject::tr("this recording schedule is inactive.");
-            break;
-        case rsLowDiskSpace:
-            message += QObject::tr("there wasn't enough disk space available.");
-            break;
-        case rsTunerBusy:
-            message += QObject::tr("the tuner card was already being used.");
             break;
         case rsNotListed:
             message += QObject::tr("this show does not match the current "
@@ -3129,7 +3163,7 @@ void ProgramInfo::ShowRecordingDialog(void)
     int ret = diag.exec();
 
     if (ret == react)
-        RemoteReactivateRecording(this);
+        ReactivateRecording();
     else if (ret == stop)
     {
         ProgramInfo *p = GetProgramFromRecorded(chanid, recstartts);
@@ -3299,12 +3333,12 @@ void ProgramInfo::ShowNotRecordingDialog(void)
     int ret = diag.exec();
 
     if (ret == react)
-        RemoteReactivateRecording(this);
+        ReactivateRecording();
     else if (ret == addov)
     {
         ApplyRecordStateChange(kOverrideRecord);
         if (recstartts < now)
-            RemoteReactivateRecording(this);
+            ReactivateRecording();
     }
     else if (ret == forget)
         ForgetHistory();
@@ -3390,29 +3424,16 @@ bool ProgramList::FromProgram(const QString sql, ProgramList &schedList)
         "    channel.name, program.previouslyshown, channel.commfree, "
         "    channel.outputfilters, program.seriesid, program.programid, "
         "    program.airdate, program.stars, program.originalairdate, "
-        "    program.category_type, oldrecorded.starttime IS NOT NULL "
+        "    program.category_type, oldrecstatus.recordid, "
+        "    oldrecstatus.rectype, oldrecstatus.recstatus, "
+        "    oldrecstatus.findid "
         "FROM program "
         "LEFT JOIN channel ON program.chanid = channel.chanid "
-        "LEFT JOIN oldrecorded ON "
-        "    oldrecorded.recstatus = -3 AND "
-        "    program.title = oldrecorded.title "
-        "     AND "
-        "     ( "
-        "      (program.programid <> '' AND NOT "
-        "       (program.category_type = 'series' AND "
-        "        program.programid LIKE '%0000') "
-        "       AND program.programid = oldrecorded.programid) "
-        "      OR "
-        "      ( "
-        "       (program.programid = '' OR oldrecorded.programid = '') "
-        "       AND "
-        "       ((program.subtitle <> '' "
-        "          AND program.subtitle = oldrecorded.subtitle)) "
-        "       AND "
-        "       ((program.description <> '' "
-        "          AND program.description = oldrecorded.description)) "
-        "      ) "
-        "   ) ") + sql;
+        "LEFT JOIN oldrecorded AS oldrecstatus ON "
+        "    program.title = oldrecstatus.title AND "
+        "    channel.callsign = oldrecstatus.station AND "
+        "    program.starttime = oldrecstatus.starttime "
+        ) + sql;
 
     if (!sql.contains(" GROUP BY "))
         querystr += " GROUP BY program.starttime, channel.channum, "
@@ -3471,8 +3492,10 @@ bool ProgramList::FromProgram(const QString sql, ProgramList &schedList)
             p->hasAirDate = true;
         }
         p->catType = query.value(18).toString();
-        p->duplicate = query.value(19).toInt();
-        //cout << p->duplicate << " " << query.value(1).toString() << " " << p->title << endl;
+        p->recordid = query.value(19).toInt();
+        p->rectype = RecordingType(query.value(20).toInt());
+        p->recstatus = RecStatusType(query.value(21).toInt());
+        p->findid = query.value(22).toInt();
 
         ProgramInfo *s;
         for (s = schedList.first(); s; s = schedList.next())

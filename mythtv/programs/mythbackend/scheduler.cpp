@@ -437,35 +437,6 @@ bool Scheduler::ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp)
     return rs == rsRecording;
 }
 
-bool Scheduler::ReactivateRecording(ProgramInfo *pginfo)
-{
-    QDateTime now = QDateTime::currentDateTime();
-
-    if (pginfo->recstartts >= now || pginfo->recendts <= now)
-        return false;
-
-    QMutexLocker lockit(reclist_lock);
-
-    RecIter dreciter = reclist.begin();
-    for (; dreciter != reclist.end(); ++dreciter)
-    {
-        ProgramInfo *p = *dreciter;
-        if (p->recordid == pginfo->recordid &&
-            p->IsSameProgramTimeslot(*pginfo))
-        {
-            if (p->recstatus != rsRecording &&
-                p->recstatus != rsWillRecord)
-            {
-                p->reactivate = 1;
-                Reschedule(0);
-            }
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void Scheduler::SlaveConnected(ProgramList &slavelist)
 {
     QMutexLocker lockit(reclist_lock);
@@ -544,21 +515,16 @@ void Scheduler::SlaveDisconnected(int cardid)
 
 void Scheduler::PruneOldRecords(void)
 {
-    QDateTime deltime = schedTime.addDays(-1);
-
     RecIter dreciter = reclist.begin();
     while (dreciter != reclist.end())
     {
         ProgramInfo *p = *dreciter;
-        if (p->recendts < deltime ||
-            (p->recstartts > schedTime && p->recstatus >= rsWillRecord))
+        if (p->recstatus == rsRecording)
+            dreciter++;
+        else
         {
             delete p;
             dreciter = reclist.erase(dreciter);
-        }
-        else
-        {
-            dreciter++;
         }
     }
 }
@@ -835,21 +801,34 @@ void Scheduler::PruneRedundants(void)
     {
         ProgramInfo *p = *i;
 
+        // Delete anything that has already passed since we can't
+        // change history, can we?
+        if (p->recstatus != rsRecording &&
+            p->endts < schedTime &&
+            p->recendts < schedTime)
+        {
+            delete p;
+            i = reclist.erase(i);
+            continue;
+        }
+
         // Check for rsConflict
         if (p->recstatus == rsUnknown)
         {
             p->recstatus = rsConflict;
             hasconflicts = true;
         }
-        if (p->recstatus > rsWillRecord)
+        
+        // Restore the old status for some select cases that won't record.
+        if ((p->recstatus != rsWillRecord && p->oldrecstatus == rsAborted) ||
+            (p->recstatus == rsMissed && p->oldrecstatus != rsUnknown))
+            p->recstatus = p->oldrecstatus;
+
+        if (!Recording(p))
         {
             p->cardid = 0;
             p->inputid = 0;
         }
-        if (p->recstatus != rsWillRecord &&
-            p->oldrecstatus == rsAborted)
-            p->recstatus = p->oldrecstatus;
-        p->reactivate = 0;
 
         // Check for redundant against last non-deleted
         if (lastp == NULL || lastp->recordid != p->recordid ||
@@ -1763,8 +1742,8 @@ void Scheduler::UpdateMatches(int recordid) {
     VERBOSE(VB_SCHEDULE, " +-- Done.");
 }
 
-void Scheduler::AddNewRecords(void) {
-
+void Scheduler::AddNewRecords(void) 
+{
     struct timeval dbstart, dbend;
 
     QMap<RecordingType, int> recTypeRecPriorityMap;
@@ -1862,7 +1841,8 @@ void Scheduler::AddNewRecords(void) {
 "program.seriesid, program.programid, program.category_type, "
 "program.airdate, program.stars, program.originalairdate, record.inactive, "
 "record.parentid, ") + progfindid + ", record.tsdefault, "
-"oldrecstatus.recstatus " + QString(
+"oldrecstatus.recstatus, oldrecstatus.reactivate " 
++ QString(
 "FROM recordmatch "
 
 " INNER JOIN record ON (recordmatch.recordid = record.recordid) "
@@ -1951,21 +1931,19 @@ void Scheduler::AddNewRecords(void) {
 
     while (result.next())
     {
-        // Don't bother if card isn't on-line of end time has already passed
+        // Don't bother if the tuner card isn't on-line
         int cardid = result.value(24).toInt();
         if (threadrunning && !cardMap.contains(cardid))
             continue;
-        QDateTime recendts = result.value(19).toDateTime();
-        if (recendts < schedTime)
-            continue;
 
         ProgramInfo *p = new ProgramInfo;
+        p->reactivate = result.value(38).toInt();
         p->oldrecstatus = RecStatusType(result.value(37).toInt());
-        if (p->oldrecstatus == rsUnknown ||
-            p->oldrecstatus == rsAborted)
+        if (p->oldrecstatus == rsAborted || p->reactivate)
             p->recstatus = rsUnknown;
         else
             p->recstatus = p->oldrecstatus;
+
         p->chanid = result.value(0).toString();
         p->sourceid = result.value(1).toInt();
         p->startts = result.value(2).toDateTime();
@@ -1984,7 +1962,7 @@ void Scheduler::AddNewRecords(void) {
         p->recordid = result.value(17).toInt();
 
         p->recstartts = result.value(18).toDateTime();
-        p->recendts = recendts;
+        p->recendts = result.value(19).toDateTime();
         p->repeat = result.value(20).toInt();
         p->recgroup = result.value(21).toString();
         p->chancommfree = result.value(23).toInt();
@@ -2028,39 +2006,24 @@ void Scheduler::AddNewRecords(void) {
         p->schedulerid = 
             p->startts.toString() + "_" + p->chanid;
 
-        // would save many queries to create and populate a
-        // ScheduledRecording and put it in the proginfo at the
-        // same time, since it will be loaded later anyway with
-        // multiple queries
-
-        // Chedk if already in reclist and don't bother if so
+        // Chedk to see if the program is currently recording and if
+        // the end time was changed.  Ideally, checking for a new end
+        // time should be done after PruneOverlaps, but that would
+        // complicate the list handling.  Do it here unless it becomes
+        // problematic.
         RecIter rec = reclist.begin();
         for ( ; rec != reclist.end(); rec++)
         {
             ProgramInfo *r = *rec;
             if (p->IsSameTimeslot(*r))
             {
-                if (r->reactivate > 0 && r->reactivate <= 2)
-                {
-                    p->recstatus = rsUnknown;
-                    p->reactivate = -1;
-                    r->reactivate = 2;
-                }
-                else if (r->recstatus == rsAborted)
-                {
-                    r->reactivate = 3;
-                }
-                else
-                {
-                    if (r->recstatus == rsRecording &&
-                        r->inputid == p->inputid &&
-                        r->recendts != p->recendts &&
-                        (r->recordid == p->recordid ||
-                         p->rectype == kOverrideRecord))
-                        ChangeRecordingEnd(r, p);
-                    delete p;
-                    p = NULL;
-                }
+                if (r->inputid == p->inputid &&
+                    r->recendts != p->recendts &&
+                    (r->recordid == p->recordid ||
+                     p->rectype == kOverrideRecord))
+                    ChangeRecordingEnd(r, p);
+                delete p;
+                p = NULL;
                 break;
             }
         }
@@ -2096,24 +2059,16 @@ void Scheduler::AddNewRecords(void) {
         if (inactive)
             p->recstatus = rsInactive;
 
+        // Mark anything that has already passed as missed.  If it
+        // survives PruneOverlaps, it will get deleted or have its old
+        // status restored in PruneRedundants.
+        if (p->recendts < schedTime)
+            p->recstatus = rsMissed;
+
         tmpList.push_back(p);
     }
 
     VERBOSE(VB_SCHEDULE, " +-- Cleanup...");
-    // Delete existing programs that were reactivated
-    RecIter rec = reclist.begin();
-    while (rec != reclist.end())
-    {
-        ProgramInfo *r = *rec;
-        if (r->reactivate < 2)
-            rec++;
-        else
-        {
-            delete r;
-            rec = reclist.erase(rec);
-        }
-    }
-
     RecIter tmp = tmpList.begin();
     for ( ; tmp != tmpList.end(); tmp++)
         reclist.push_back(*tmp);

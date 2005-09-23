@@ -344,10 +344,6 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     {
         HandleDeleteRecording(listline, pbs, true);
     }
-    else if (command == "REACTIVATE_RECORDING")
-    {
-        HandleReactivateRecording(listline, pbs);
-    }
     else if (command == "RESCHEDULE_RECORDINGS")
     {
         if (tokens.size() != 2)
@@ -1730,25 +1726,6 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
     }
 
     delete pginfo;
-}
-
-void MainServer::HandleReactivateRecording(QStringList &slist, PlaybackSock *pbs)
-{
-    ProgramInfo pginfo;
-    pginfo.FromStringList(slist, 1);
-
-    QStringList result;
-    if (m_sched)
-        result = QString::number(m_sched->ReactivateRecording(&pginfo));
-    else
-        result = QString::number(0);
-
-    if (pbs)
-    {
-        QSocket *pbssock = pbs->getSocket();
-        if (pbssock)
-            SendResponse(pbssock, result);
-    }
 }
 
 void MainServer::HandleRescheduleRecordings(int recordid, PlaybackSock *pbs)
