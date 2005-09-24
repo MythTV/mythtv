@@ -40,7 +40,6 @@ void usage(char *progname)
     cerr << "\t--honorcutlist or -l: Specifies whether to use the cutlist.\n";
     cerr << "\t--allkeys      or -k: Specifies that the output file\n";
     cerr << "\t                      should be made entirely of keyframes.\n";
-    cerr << "\t--database     or -d: Store status in the db\n";
     cerr << "\t--fifodir      or -f: Directory to write fifos to\n";
     cerr << "\t                      If --fifodir is specified, 'audout' and 'vidout'\n";
     cerr << "\t                      will be created in the specified directory\n";
@@ -57,7 +56,8 @@ int main(int argc, char *argv[])
     QString chanid, starttime, infile;
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
-    bool useCutlist = false, keyframesonly = false, use_db = false;
+    int jobID = -1;
+    bool useCutlist = false, keyframesonly = false;
     bool build_index = false, fifosync = false, showprogress = false, mpeg2 = false;
     QMap<long long, int> deleteMap;
     QMap<long long, long long> posMap;
@@ -114,6 +114,22 @@ int main(int argc, char *argv[])
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
         } 
+        else if (!strcmp(a.argv()[argpos], "-j"))
+        { 
+            QDateTime startts;
+            jobID = QString(a.argv()[++argpos]).toInt();
+            int jobType = JOB_NONE;
+            
+            if ( !JobQueue::GetJobInfoFromID(jobID, jobType, chanid, startts))
+            {
+                cerr << "mythtranscode: ERROR: Unable to find DB info for "
+                     << "JobQueue ID# " << jobID << endl;
+                return TRANSCODE_EXIT_NO_RECORDING_DATA;
+            }
+            starttime = startts.toString(Qt::ISODate);
+            found_starttime = 1;
+            found_chanid = 1;
+        }
         else if (!strcmp(a.argv()[argpos],"-i") ||
                  !strcmp(a.argv()[argpos],"--infile")) 
         {
@@ -245,7 +261,7 @@ int main(int argc, char *argv[])
             } 
             else 
             {
-                cerr << "Missing argument to -c/--chanid option\n";
+                cerr << "Missing argument to -p/--profile option\n";
                 usage(a.argv()[0]);
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
@@ -277,11 +293,6 @@ int main(int argc, char *argv[])
                  !strcmp(a.argv()[argpos],"--allkeys")) 
         {
             keyframesonly = true;
-        }
-        else if (!strcmp(a.argv()[argpos],"-d") ||
-                 !strcmp(a.argv()[argpos],"--database"))
-        {
-            use_db = true;
         }
         else if (!strcmp(a.argv()[argpos],"-b") ||
                  !strcmp(a.argv()[argpos],"--buildindex"))
@@ -330,14 +341,14 @@ int main(int argc, char *argv[])
          cerr << "Must specify -i OR -c AND -s options!\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
-    if (found_infile && (use_db || build_index))
+    if (found_infile && ((jobID >= 0) || build_index))
     {
-         cerr << "Can't specify --database or --buildindex with --infile\n";
+         cerr << "Can't specify -j or --buildindex with --infile\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
-    if (use_db && build_index)
+    if ((jobID >= 0) && build_index)
     {
-         cerr << "Can't specify both --database and --buildindex\n";
+         cerr << "Can't specify both -j and --buildindex\n";
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
     if (keyframesonly && fifodir != NULL)
@@ -416,13 +427,8 @@ int main(int argc, char *argv[])
 
     tmpfile = infile + ".tmp";
 
-    int jobID = -1;
-    if (use_db)
-    {
-        jobID = JobQueue::GetJobID(JOB_TRANSCODE, pginfo->chanid,
-                                   pginfo->recstartts);
+    if (jobID >= 0)
         JobQueue::ChangeJobStatus(jobID, JOB_RUNNING);
-    }
 
     Transcode *transcode = new Transcode(pginfo);
 
@@ -437,8 +443,10 @@ int main(int argc, char *argv[])
         result = transcode->TranscodeFile((char *)infile.ascii(),
                                           (char *)tmpfile.ascii(),
                                           profilename, useCutlist, 
-                                          (fifosync || keyframesonly), use_db,
+                                          (fifosync || keyframesonly), jobID,
                                           fifodir);
+        if ((result == REENCODE_OK) && (jobID >= 0))
+            JobQueue::ChangeJobArgs(jobID, "RENAME_TO_NUV");
     }
                                               
     int exitcode = TRANSCODE_EXIT_OK;
@@ -450,7 +458,7 @@ int main(int argc, char *argv[])
             return TRANSCODE_EXIT_NO_RECORDING_DATA;
         }
         
-        MPEG2trans *mpeg2trans = new MPEG2trans(pginfo, use_db);
+        MPEG2trans *mpeg2trans = new MPEG2trans(pginfo, jobID);
         if (build_index)
         {
             int err = mpeg2trans->BuildKeyframeIndex(infile, posMap);
@@ -473,13 +481,13 @@ int main(int argc, char *argv[])
     
     if (result == REENCODE_OK)
     {
-        if (use_db)
+        if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_STOPPING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 done").arg(infile));
     } 
     else if (result == REENCODE_CUTLIST_CHANGE)
     {
-        if (use_db)
+        if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_RETRY);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 aborted because of "
                                     "cutlist update").arg(infile));
@@ -487,7 +495,7 @@ int main(int argc, char *argv[])
     }
     else if (result == REENCODE_STOPPED)
     {
-        if (use_db)
+        if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_ABORTING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 stopped because of "
                                     "stop command").arg(infile));
@@ -495,7 +503,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        if (use_db)
+        if (jobID >= 0)
             JobQueue::ChangeJobStatus(jobID, JOB_ERRORING);
         VERBOSE(VB_GENERAL, QString("Transcoding %1 failed").arg(infile));
         exitcode = TRANSCODE_EXIT_UNKNOWN_ERROR;
@@ -526,3 +534,5 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
         fclose(mapfh);
     }
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

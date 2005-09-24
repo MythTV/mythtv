@@ -1146,7 +1146,7 @@ bool ProgramInfo::IsSameProgramTimeslot(const ProgramInfo &other) const
     return false;
 }
 
-/** \fn ProgramInfo::CreateRecordBasename(void) const
+/** \fn ProgramInfo::CreateRecordBasename(const QString &ext) const
  *  \brief Returns a filename for a recording based on the
  *         recording channel and date.
  */
@@ -1158,6 +1158,29 @@ QString ProgramInfo::CreateRecordBasename(const QString &ext) const
                              .arg(starts).arg(ext);
     
     return retval;
+}               
+
+/** \fn ProgramInfo::SetRecordBasename(QString basename) const
+ *  \brief Sets a recording's basename in the database.
+ */
+bool ProgramInfo::SetRecordBasename(QString basename)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE recorded "
+                  "SET basename = :BASENAME "
+                  "WHERE chanid = :CHANID AND "
+                  "      starttime = :STARTTIME;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":BASENAME", basename);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("SetRecordBasename", query);
+        return false;
+    }
+    
+    return true;
 }               
 
 /** \fn ProgramInfo::GetRecordBasename(void) const
@@ -1223,6 +1246,13 @@ QString ProgramInfo::GetPlaybackURL(QString playbackHost) const
     if (playbackHost == m_hostname)
     {
         QFile checkFile(tmpURL);
+
+        if (checkFile.exists())
+            return tmpURL;
+
+        tmpURL = GetRecordFilename(gContext->GetSettingOnHost(
+                                               "RecordFilePrefix", m_hostname));
+        checkFile.setName(tmpURL);
 
         if (checkFile.exists())
             return tmpURL;

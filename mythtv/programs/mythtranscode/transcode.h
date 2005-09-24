@@ -18,13 +18,12 @@
 class Transcode : public QObject
 {
   public:
-     Transcode(ProgramInfo *pginfo);
-     ~Transcode();
-     int TranscodeFile(char *inputname, char *outputname,
-                              QString profileName,
-                              bool honorCutList, bool framecontrol,
-                              bool chkTranscodeDB, QString fifodir);
-     void ShowProgress(bool val) { showprogress = val; }
+    Transcode(ProgramInfo *pginfo);
+    ~Transcode();
+    int TranscodeFile(char *inputname, char *outputname, QString profileName,
+                      bool honorCutList, bool framecontrol, int jobID,
+                      QString fifodir);
+    void ShowProgress(bool val) { showprogress = val; }
   private:
     bool GetProfile(QString profileName, QString encodingType);
     void ReencoderAddKFA(long curframe, long lastkey, long num_keyframes);
@@ -40,3 +39,4 @@ class Transcode : public QObject
     bool showprogress;
 };
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

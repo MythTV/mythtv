@@ -295,26 +295,13 @@ void TranscodeWriteText(void *ptr, unsigned char *buf, int len, int timecode, in
 int Transcode::TranscodeFile(char *inputname, char *outputname,
                               QString profileName,
                               bool honorCutList, bool framecontrol,
-                              bool chkTranscodeDB, QString fifodir)
+                              int jobID, QString fifodir)
 { 
     int audioframesize;
     int audioFrame = 0;
 
-    int jobID = -1;
-    if (chkTranscodeDB)
-    {
-        jobID = JobQueue::GetJobID(JOB_TRANSCODE, m_proginfo->chanid,
-                                   m_proginfo->recstartts);
-
-        if (jobID < 0)
-        {
-            VERBOSE(VB_IMPORTANT, "ERROR, Transcode called from JobQueue but "
-                                  "no jobID found!");
-            return REENCODE_ERROR;
-        }
-
+    if (jobID >= 0)
         JobQueue::ChangeJobComment(jobID, "0% " + QObject::tr("Completed"));
-    }
 
     nvp = new NuppelVideoPlayer(m_proginfo);
     nvp->SetNullVideo();
@@ -776,7 +763,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                 return REENCODE_CUTLIST_CHANGE;
             }
 
-            if (chkTranscodeDB)
+            if (jobID >= 0)
             {
                 if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
                 {
@@ -791,7 +778,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
                                            QObject::tr("Completed"));
             }
             curtime = QDateTime::currentDateTime();
-            curtime = curtime.addSecs(60);
+            curtime = curtime.addSecs(20);
         }
 
         curFrameNum++;
@@ -813,4 +800,6 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
     delete newFrame;
     return REENCODE_OK;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
 

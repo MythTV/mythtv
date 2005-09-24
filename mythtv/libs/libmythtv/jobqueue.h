@@ -126,6 +126,8 @@ class JobQueue : public QObject
     static bool ChangeJobHost(int jobID, QString newHostname);
     static bool ChangeJobComment(int jobID,
                                  QString comment = "");
+    static bool ChangeJobArgs(int jobID,
+                              QString args = "");
     static bool IsJobQueuedOrRunning(int jobType, QString chanid,
                                      QDateTime starttime);
     static bool IsJobRunning(int jobType, QString chanid,
@@ -142,6 +144,7 @@ class JobQueue : public QObject
     static int GetJobFlags(int jobID);
     static int GetJobStatus(int jobID);
     static int GetJobStatus(int jobType, QString chanid, QDateTime starttime);
+    static QString GetJobArgs(int jobID);
     static int UserJobTypeToIndex(int JobType);
 
     static bool DeleteAllJobs(QString chanid, QDateTime starttime);

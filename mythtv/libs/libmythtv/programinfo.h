@@ -148,6 +148,7 @@ class ProgramInfo
 
     // Quick gets
     QString CreateRecordBasename(const QString &ext) const;
+    bool SetRecordBasename(QString basename);
     QString GetRecordBasename(void) const;
     QString GetRecordFilename(const QString &prefix) const;
     QString GetPlaybackURL(QString playbackHost = "") const;

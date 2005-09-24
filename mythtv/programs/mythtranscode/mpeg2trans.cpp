@@ -26,11 +26,10 @@ typedef PositionMap::iterator PositionMapIterator;
 
 //#define MPEG2trans_DEBUG
 
-MPEG2trans::MPEG2trans(ProgramInfo *pginfo, bool use_db)
+MPEG2trans::MPEG2trans(ProgramInfo *pginfo, int jobID)
 {
     m_pginfo = pginfo;
-
-    chkTranscodeDB = use_db;
+    m_jobID = jobID;
 
     inputFC = NULL;
     outputFC = NULL;
@@ -260,23 +259,8 @@ int MPEG2trans::DoTranscode(QString &infile, QString &tmpfile, bool useCutlist)
 
     int ret;
 
-    int jobID = -1;
-    if (chkTranscodeDB)
-    {
-        jobID = JobQueue::GetJobID(JOB_TRANSCODE, m_pginfo->chanid,
-                                   m_pginfo->recstartts);
-
-        if (jobID < 0)
-        {
-            VERBOSE(VB_IMPORTANT, "ERROR, Transcode called from JobQueue but "
-                                  "no jobID found!");
-            return TRANSCODE_EXIT_INVALID_CMDLINE;
-        }
-
-        JobQueue::ChangeJobComment(jobID, "0% " + QObject::tr("Completed"));
-    }
-    
-
+    if (m_jobID >= 0)
+        JobQueue::ChangeJobComment(m_jobID, "0% " + QObject::tr("Completed"));
         
     QString clText("will NOT be");
     if (useCutlist)
@@ -521,17 +505,19 @@ int MPEG2trans::DoTranscode(QString &infile, QString &tmpfile, bool useCutlist)
                 if (new_percentage != percentage)
                 {
                     percentage = new_percentage;
-                    if (chkTranscodeDB)
+                    if (m_jobID >= 0)
                     {
-                        if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
+                        if (JobQueue::GetJobCmd(m_jobID) == JOB_STOP)
                         {
                             unlink(tmpfile.ascii());
                             /* should probably clean up here */
-                            VERBOSE(VB_IMPORTANT, "Transcoding STOPped by JobQueue");
+                            VERBOSE(VB_IMPORTANT,
+                                "Transcoding STOPped by JobQueue");
                             return TRANSCODE_EXIT_STOPPED;
                         }
-                        JobQueue::ChangeJobComment(jobID, QString("%1% ").arg(percentage) +
-                                                          QObject::tr("Completed"));
+                        JobQueue::ChangeJobComment(m_jobID,
+                            QString("%1% ").arg(percentage) +
+                            QObject::tr("Completed"));
                     }
                     else
                         cerr << "Percent complete: " <<  percentage << "%\r" << flush;
@@ -563,17 +549,17 @@ int MPEG2trans::DoTranscode(QString &infile, QString &tmpfile, bool useCutlist)
 
 int MPEG2trans::BuildKeyframeIndex(QString &file, PositionMap &posMap)
 {
-    int jobID = -1;
-    if (chkTranscodeDB)
+    if (m_jobID >= 0)
     {
-        if (JobQueue::GetJobCmd(jobID) == JOB_STOP)
+        if (JobQueue::GetJobCmd(m_jobID) == JOB_STOP)
         {
             unlink(file.ascii());
             /* should probably clean up here */
             VERBOSE(VB_IMPORTANT, "Transcoding STOPped by JobQueue");
             return TRANSCODE_EXIT_STOPPED;
         }
-        JobQueue::ChangeJobComment(jobID, QString(QObject::tr("Generating Keyframe Index")));
+        JobQueue::ChangeJobComment(m_jobID,
+            QString(QObject::tr("Generating Keyframe Index")));
     }
     else
         VERBOSE(VB_IMPORTANT, "Generating Keyframe Index");
@@ -616,8 +602,9 @@ int MPEG2trans::BuildKeyframeIndex(QString &file, PositionMap &posMap)
     av_close_input_file(inputFC);
     inputFC = NULL;
 
-    if (chkTranscodeDB)
-        JobQueue::ChangeJobComment(jobID, QString(QObject::tr("Transcode Completed")));
+    if (m_jobID >= 0)
+        JobQueue::ChangeJobComment(m_jobID,
+            QString(QObject::tr("Transcode Completed")));
     else
         VERBOSE(VB_IMPORTANT, "Transcode Completed");
 

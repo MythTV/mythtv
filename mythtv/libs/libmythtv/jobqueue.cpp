@@ -982,6 +982,30 @@ bool JobQueue::ChangeJobComment(int jobID, QString comment)
     return true;
 }
 
+bool JobQueue::ChangeJobArgs(int jobID, QString args)
+{
+    if (jobID < 0)
+        return false;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE jobqueue SET args = :ARGS "
+                  "WHERE id = :ID;");
+
+    query.bindValue(":ARGS", args);
+    query.bindValue(":ID", jobID);
+
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Error in JobQueue::ChangeJobArgs()", query);
+        return false;
+    }
+
+    return true;
+}
+
 bool JobQueue::IsJobRunning(int jobType, QString chanid, QDateTime starttime)
 {
     int tmpStatus = GetJobStatus(jobType, chanid, starttime);
@@ -1267,6 +1291,30 @@ int JobQueue::GetJobCmd(int jobID)
     }
 
     return JOB_UNKNOWN;
+}
+
+QString JobQueue::GetJobArgs(int jobID)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT args FROM jobqueue WHERE id = :ID;");
+
+    query.bindValue(":ID", jobID);
+
+    query.exec();
+
+    if (!query.isActive())
+    {
+        MythContext::DBError("Error in JobQueue::GetJobArgs()", query);
+        return false;
+    }
+    else
+    {
+        if ((query.numRowsAffected() > 0) && query.next())
+            return query.value(0).toString();
+    }
+
+    return QString("");
 }
 
 int JobQueue::GetJobFlags(int jobID)
@@ -1651,11 +1699,10 @@ void JobQueue::DoTranscodeThread(void)
     QString profilearg = transcoder == RecordingProfile::TranscoderAutodetect ?
                             "autodetect" :
                             QString::number(transcoder);
-    QString command = QString("%1 -V %2 -c %3 -s %4 -p %5 -d %6")
+    QString command = QString("%1 -j %2 -V %3 -p %4 %5")
                       .arg(path.ascii())
+                      .arg(jobID)
                       .arg(print_verbose_messages)
-                      .arg(program_info->chanid)
-                      .arg(program_info->recstartts.toString(Qt::ISODate))
                       .arg(profilearg.ascii())
                       .arg(useCutlist ? "-l" : "");
 
@@ -1733,9 +1780,22 @@ void JobQueue::DoTranscodeThread(void)
                 filesize = st.st_size;
             // To save the original file...
             QString oldfile = filename;
+            QString newfile = filename;
+            QString jobArgs = GetJobArgs(jobID);
             oldfile += ".old";
+
+            if ((jobArgs == "RENAME_TO_NUV") &&
+                (filename.contains(QRegExp("mpg$"))))
+            {
+                QString newbase = program_info->GetRecordBasename();
+
+                newfile.replace(QRegExp("mpg$"), "nuv");
+                newbase.replace(QRegExp("mpg$"), "nuv");
+                program_info->SetRecordBasename(newbase);
+            }
+
             rename (filename, oldfile);
-            rename (tmpfile, filename);
+            rename (tmpfile, newfile);
             if (!gContext->GetNumSetting("SaveTranscoding", 0))
                 unlink(oldfile);
 

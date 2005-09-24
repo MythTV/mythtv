@@ -9,7 +9,7 @@
 class MPEG2trans
 {
     public:
-        MPEG2trans(ProgramInfo *pginfo, bool use_db);
+        MPEG2trans(ProgramInfo *pginfo, int jobID);
         ~MPEG2trans();
 
         int DoTranscode(QString &infile, QString &tmpfile, bool useCutlist);
@@ -26,9 +26,11 @@ class MPEG2trans
         bool chkTranscodeDB;
 
         ProgramInfo *m_pginfo;
+        int m_jobID;
 
         AVFormatContext *inputFC;
         AVFormatContext *outputFC;
 };
 
 #endif
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
