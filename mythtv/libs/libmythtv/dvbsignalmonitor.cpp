@@ -326,7 +326,10 @@ void DVBSignalMonitor::UpdateValues(void)
     if (dtvMonitorRunning)
     {
         EmitDVBSignals();
+        if (IsAllGood())
+            emit AllGood();
         // TODO dtv signals...
+
         update_done = true;
         return;
     }
@@ -375,6 +378,8 @@ void DVBSignalMonitor::UpdateValues(void)
         DBG_SM("UpdateValues", "Signal "<<(isLocked ? "Locked" : "Lost"));
 
     EmitDVBSignals();
+    if (IsAllGood())
+        emit AllGood();
 
     // Start table monitoring if we are waiting on any table
     // and we have a lock.

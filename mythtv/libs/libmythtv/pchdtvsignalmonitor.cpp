@@ -131,6 +131,8 @@ void pcHDTVSignalMonitor::UpdateValues()
     {
         EMIT(StatusSignalLock, signalLock);
         EMIT(StatusSignalStrength, signalStrength);
+        if (IsAllGood())
+            emit AllGood();
         // TODO dtv signals...
         update_done = true;
         return;
@@ -162,6 +164,9 @@ void pcHDTVSignalMonitor::UpdateValues()
 
     EMIT(StatusSignalLock, signalLock);
     EMIT(StatusSignalStrength, signalStrength);
+    if (IsAllGood())
+        emit AllGood();
+
     update_done = true;
 }
 

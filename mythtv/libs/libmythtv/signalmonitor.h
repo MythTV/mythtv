@@ -133,11 +133,17 @@ class SignalMonitor: virtual public QObject
      */
     void StatusSignalLock(const SignalMonitorValue&);
 
-    /** \brief Signal to be sent as with an actual signal value.
+    /** \brief Signal to be sent with an actual signal value.
      *
      *   Note: Signals are only sent once the monitoring thread has been started.
      */
     void StatusSignalStrength(const SignalMonitorValue&);
+
+    /** \brief Signal to be sent when you have a lock on all values.
+     *
+     *   Note: Signals are only sent once the monitoring thread has been started.
+     */
+    void AllGood(void);
   protected:
     SignalMonitor(int db_cardnum, ChannelBase *_channel,
                   uint wait_for_mask, const char *name = "SignalMonitor");
