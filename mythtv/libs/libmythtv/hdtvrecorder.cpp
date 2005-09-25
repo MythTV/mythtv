@@ -297,6 +297,7 @@ void HDTVRecorder::fill_ringbuffer(void)
             pthread_mutex_unlock(&ringbuf.lock);
 
             pauseWait.wakeAll();
+            emit RecorderPaused();
 
             usleep(1000);
             continue;
