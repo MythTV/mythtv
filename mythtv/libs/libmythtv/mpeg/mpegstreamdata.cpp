@@ -298,14 +298,14 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
                     new ProgramAssociationTable(psip);
                 CachePAT(pat);
                 emit UpdatePAT(pat);
-                if (CreatePATSingleProgram(*pat))
+                if ((_desired_program >= 0) && CreatePATSingleProgram(*pat))
                     emit UpdatePATSingleProgram(PATSingleProgram());
             }
             else
             {
                 ProgramAssociationTable pat(psip);
                 emit UpdatePAT(&pat);
-                if (CreatePATSingleProgram(pat))
+                if ((_desired_program >= 0) && CreatePATSingleProgram(pat))
                     emit UpdatePATSingleProgram(PATSingleProgram());
             }
             return true;
