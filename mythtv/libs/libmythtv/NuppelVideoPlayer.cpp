@@ -851,7 +851,11 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
     if (forceVideoOutput != kVideoOutput_IVTV)
 #endif
     {
+#if FAST_RESTART
         if (videoOutput->EnoughPrebufferedFrames())
+#else
+        if (videoOutput->EnoughDecodedFrames())
+#endif
             SetPrebuffering(false);
     }
 
@@ -1579,7 +1583,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     {
         VERBOSE(VB_GENERAL, "prebuffering pause");
         SetPrebuffering(true);
-
+#if FAST_RESTART
         if (!m_playing_slower && audio_channels <= 2)
         {
             m_stored_audio_stretchfactor = GetAudioStretchFactor();
@@ -1587,15 +1591,18 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
             m_playing_slower = true;
             VERBOSE(VB_GENERAL, "playing slower due to falling behind...");
         }
+#endif
         return;
     }
 
+#ifdef FAST_RESTART
     if (m_playing_slower && videoOutput->EnoughDecodedFrames())
     {
         Play(m_stored_audio_stretchfactor, true);
         m_playing_slower = false;
         VERBOSE(VB_GENERAL, "playing at normal speed from falling behind...");
     }
+#endif
 
     prebuffering_lock.lock();
     prebuffer_tries = 0;
