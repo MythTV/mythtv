@@ -129,7 +129,7 @@ class ProgramInfo
     // Used to query and set ScheduledRecording info
     ScheduledRecording* GetScheduledRecording(void);
     int getRecordID(void);
-    int GetAutoRunJobs(void);
+    int GetAutoRunJobs(void) const;
     RecordingType GetProgramRecordingStatus(void);
     QString GetProgramRecordingProfile(void);
     void ApplyRecordStateChange(RecordingType newstate);
@@ -303,7 +303,7 @@ class ProgramInfo
 
   private:
     bool ignoreBookmark;
-    class ScheduledRecording* record;
+    mutable class ScheduledRecording* record;
 };
 
 /** \class ProgramList

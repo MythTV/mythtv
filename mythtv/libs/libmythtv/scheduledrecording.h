@@ -65,7 +65,7 @@ public:
                                      const char* widgetName=0);    
     
     void makeOverride(void);
-    ProgramInfo* getProgramInfo() { return m_pginfo; }
+    const ProgramInfo* getProgramInfo() const { return m_pginfo; }
     RootSRGroup* getRootGroup() { return rootGroup; }
 
     RecordingType getRecordingType(void) const;
@@ -93,7 +93,7 @@ public:
     virtual void save();
 
     virtual void loadByID(int id);
-    virtual void loadByProgram(ProgramInfo* proginfo);
+    virtual void loadByProgram(const ProgramInfo* proginfo);
     virtual void loadBySearch(RecSearchType lsearch,
                               QString textname, QString forwhat);
     virtual void modifyPowerSearchByID(int rid,
@@ -170,7 +170,7 @@ protected slots:
 
 protected:
     virtual void setDefault(bool haschannel);
-    virtual void setProgram(ProgramInfo *proginfo);
+    virtual void setProgram(const ProgramInfo *proginfo);
     void fetchChannelInfo();
     
     class ID: virtual public IntegerSetting,
@@ -224,7 +224,7 @@ protected:
     SRTimeStretch* timestretchid;
     class SRParentId* parentid;
     
-    ProgramInfo* m_pginfo;
+    const ProgramInfo* m_pginfo;
     QGuardedPtr<RootSRGroup> rootGroup;
     QGuardedPtr<RecOptDialog> m_dialog;
     QString chanstr;

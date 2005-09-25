@@ -105,7 +105,7 @@ void ScheduledRecording::load()
 
 
 
-void ScheduledRecording::loadByProgram(ProgramInfo* proginfo) 
+void ScheduledRecording::loadByProgram(const ProgramInfo* proginfo) 
 {
     m_pginfo = proginfo;
     
@@ -718,7 +718,7 @@ void ScheduledRecording::setDefault(bool haschannel)
     timestretchid->setValue(QString::number(1.0f, 'f', 2));
 }
 
-void ScheduledRecording::setProgram(ProgramInfo *proginfo)
+void ScheduledRecording::setProgram(const ProgramInfo *proginfo)
 {
     m_pginfo = proginfo;
     if (proginfo)

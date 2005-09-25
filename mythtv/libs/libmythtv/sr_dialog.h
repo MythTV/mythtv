@@ -23,7 +23,7 @@ class RecOptDialog : public MythDialog
     
     protected:
         QPixmap myBackground;
-        ProgramInfo *program;
+        const ProgramInfo *program;
         ScheduledRecording* schedRec;
 
         XMLParse* theme;

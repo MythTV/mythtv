@@ -870,7 +870,7 @@ QString ProgramInfo::GetProgramRecordingProfile(void)
  *  \brief Returns a bitmap of which jobs are attached to this ProgramInfo.
  *  \sa JobTypes, getProgramFlags()
  */
-int ProgramInfo::GetAutoRunJobs(void)
+int ProgramInfo::GetAutoRunJobs(void) const
 {
     if (record == NULL) 
     {
