@@ -224,7 +224,9 @@ bool DVBChannel::SetChannelByString(const QString &chan)
     return true;
 }
 
-// TODO: Look at better communication with recorder so that only PMAP needs tobe passed
+/** \fn DVBChannel::RecorderStarted()
+ *  \brief Emits an UpdatePMTObject() signal if DVBChannel has a PMT.
+ */
 void DVBChannel::RecorderStarted()
 {
     if (chan_opts.IsPMTSet())
