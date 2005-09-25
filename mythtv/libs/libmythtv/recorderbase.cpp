@@ -142,6 +142,7 @@ bool RecorderBase::PauseAndWait(int timeout)
         {
             paused = true;
             pauseWait.wakeAll();
+            emit RecorderPaused();
         }
         unpauseWait.wait(timeout);
     }

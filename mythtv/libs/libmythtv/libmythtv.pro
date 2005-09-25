@@ -83,7 +83,8 @@ SOURCES += minilzo.cpp              RTjpegN.cpp
 
 # Misc. needed by backend/frontend
 HEADERS += programinfo.h            proglist.h
-HEADERS += dbcheck.h                RingBuffer.h  ThreadedFileWriter.h
+HEADERS += RingBuffer.h             ThreadedFileWriter.h
+HEADERS += dbcheck.h                
 HEADERS += remoteutil.h             tv.h
 HEADERS += recordingtypes.h         jobqueue.h
 HEADERS += filtermanager.h          recordingprofile.h
@@ -95,7 +96,8 @@ HEADERS += signalmonitorvalue.h
 HEADERS += mpeg/iso639.h
 
 SOURCES += programinfo.cpp          proglist.cpp
-SOURCES += dbcheck.cpp              RingBuffer.cpp  ThreadedFileWriter.cpp
+SOURCES += RingBuffer.cpp           ThreadedFileWriter.cpp
+SOURCES += dbcheck.cpp              
 SOURCES += remoteutil.cpp           tv.cpp
 SOURCES += recordingtypes.cpp       jobqueue.cpp
 SOURCES += filtermanager.cpp        recordingprofile.cpp

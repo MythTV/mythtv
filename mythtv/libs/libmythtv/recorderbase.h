@@ -25,8 +25,9 @@ class RecordingProfile;
  *
  *  \sa TVRec
  */
-class RecorderBase
+class RecorderBase : public QObject
 {
+    Q_OBJECT
   public:
     RecorderBase();
     virtual ~RecorderBase();
@@ -111,8 +112,8 @@ class RecorderBase
 
     /** \brief Reset the recorder to the startup state.
      *
-     *   This is used after Pause(bool),WaitForPause() and after the RingBuffer's
-     *   StopReads() method has been called.
+     *   This is used after Pause(bool), WaitForPause() and 
+     *   after the RingBuffer's StopReads() method has been called.
      */
     virtual void Reset(void) = 0;   
 
@@ -183,6 +184,9 @@ class RecorderBase
      *       a 720p recording at 60fps will report a frame-rate of 25fps.
      */
     double GetFrameRate(void) { return video_frame_rate; }
+
+  signals:
+    void RecorderPaused(void);
 
   protected:
     /** \brief Convenience function used to set integer options.

@@ -1103,6 +1103,9 @@ void NuppelVideoRecorder::StartRecording(void)
         {
            mainpaused = true;
            pauseWait.wakeAll();
+           if (IsPaused())
+               emit RecorderPaused();
+
            unpauseWait.wait(100);
            if (cleartimeonpause)
                gettimeofday(&stm, &tzone);
@@ -1336,6 +1339,9 @@ again:
         {
             mainpaused = true;
             pauseWait.wakeAll();
+            if (IsPaused())
+                emit RecorderPaused();
+
             unpauseWait.wait(100);
             if (cleartimeonpause)
                 gettimeofday(&stm, &tzone);
@@ -1558,6 +1564,9 @@ void NuppelVideoRecorder::DoMJPEG(void)
         {
            mainpaused = true;
            pauseWait.wakeAll();
+           if (IsPaused())
+               emit RecorderPaused();
+
            unpauseWait.wait(100);
            if (cleartimeonpause)
                gettimeofday(&stm, &tzone);
@@ -2158,6 +2167,9 @@ void NuppelVideoRecorder::doAudioThread(void)
         {
             audiopaused = true;
             pauseWait.wakeAll();
+            if (IsPaused())
+                emit RecorderPaused();
+
             unpauseWait.wait(100);
             act = act_audio_buffer;
             continue;
@@ -3194,6 +3206,9 @@ void NuppelVideoRecorder::doWriteThread(void)
         {
             writepaused = true;
             pauseWait.wakeAll();
+            if (IsPaused())
+                emit RecorderPaused();
+
             unpauseWait.wait(100);
             continue;
         }

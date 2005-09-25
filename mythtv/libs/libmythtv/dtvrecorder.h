@@ -13,7 +13,7 @@
 
 class TSPacket;
 
-class DTVRecorder: public QObject, public RecorderBase
+class DTVRecorder: public RecorderBase
 {
     Q_OBJECT
   public:
