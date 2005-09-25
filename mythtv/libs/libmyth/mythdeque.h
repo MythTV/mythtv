@@ -19,7 +19,7 @@ class MythDeque : public deque<T>
     T dequeue()
     {
         if (deque<T>::empty())
-            return (T)(NULL);
+            return (T)(0);
         T item = deque<T>::front();
         deque<T>::pop_front();
         return item;
