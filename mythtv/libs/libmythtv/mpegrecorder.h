@@ -80,5 +80,6 @@ class MpegRecorder : public RecorderBase
     static const char* aspectRatio[];
 
     unsigned int leftovers;
+    long long lastpackheaderpos;
 };
 #endif

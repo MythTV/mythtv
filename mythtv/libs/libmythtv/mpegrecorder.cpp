@@ -515,6 +515,7 @@ void MpegRecorder::Initialize(void)
 {
 }
 
+#define PACK_HEADER   0x000001BA
 #define GOP_START     0x000001B8
 #define PICTURE_START 0x00000100
 #define SLICE_MIN     0x00000101
@@ -537,6 +538,13 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 framesWritten++;
             }
 
+            if (state == PACK_HEADER)
+            {
+                long long startpos = ringBuffer->GetFileWritePosition();
+                startpos += bufptr - buffer - 4;
+                lastpackheaderpos = startpos;
+            }
+
             if (state == GOP_START)
             {
                 long long frameNum = framesWritten;
@@ -547,9 +555,7 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                     gopset = true;
                 }
 
-                long long startpos = ringBuffer->GetFileWritePosition();
-                startpos += bufptr - buffer - 4;
-
+                long long startpos = lastpackheaderpos;
                 long long keyCount = frameNum / keyframedist;
 
                 if (!positionMap.contains(keyCount))
