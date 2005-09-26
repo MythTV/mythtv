@@ -334,6 +334,9 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         return false;
     }
 
+    if (ivtvcodec.framerate)
+        keyframedist = 12;
+
     struct v4l2_control ctrl;
     ctrl.id = V4L2_CID_AUDIO_VOLUME;
     ctrl.value = 65536 / 100 *audvolume;
@@ -490,6 +493,8 @@ int MpegRecorder::GetVideoFd(void)
 bool MpegRecorder::SetupRecording(void)
 {
     leftovers = 0xFFFFFFFF;
+    numgops = 0;
+    lastseqstart = 0;
     return true;
 }
 
@@ -517,7 +522,7 @@ void MpegRecorder::Initialize(void)
 
 #define PACK_HEADER   0x000001BA
 #define GOP_START     0x000001B8
-#define PICTURE_START 0x00000100
+#define SEQ_START     0x000001B3
 #define SLICE_MIN     0x00000101
 #define SLICE_MAX     0x000001af
 
@@ -533,11 +538,6 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
         {
             state = ((state << 8) | v) & 0xFFFFFF;
             
-            if (state == PICTURE_START)
-            {
-                framesWritten++;
-            }
-
             if (state == PACK_HEADER)
             {
                 long long startpos = ringBuffer->GetFileWritePosition();
@@ -545,29 +545,26 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 lastpackheaderpos = startpos;
             }
 
-            if (state == GOP_START)
+            if (state == SEQ_START)
             {
-                long long frameNum = framesWritten;
+                lastseqstart = lastpackheaderpos;
+            }
 
-                if (!gopset && frameNum > 0)
+            if (state == GOP_START && lastseqstart == lastpackheaderpos)
+            {
+                framesWritten = numgops * keyframedist;
+                numgops++;
+
+                if (!positionMap.contains(numgops))
                 {
-                    keyframedist = frameNum;
-                    gopset = true;
-                }
-
-                long long startpos = lastpackheaderpos;
-                long long keyCount = frameNum / keyframedist;
-
-                if (!positionMap.contains(keyCount))
-                {
-                    positionMapDelta[keyCount] = startpos;
-                    positionMap[keyCount] = startpos;
+                    positionMapDelta[numgops] = lastpackheaderpos;
+                    positionMap[numgops] = lastpackheaderpos;
 
                     if (curRecording && ((positionMapDelta.size() % 30) == 0))
                     {
                         curRecording->SetPositionMapDelta(positionMapDelta,
                                                           MARK_GOP_START);
-                        curRecording->SetFilesize(startpos);
+                        curRecording->SetFilesize(lastpackheaderpos);
                         positionMapDelta.clear();
                     }
                 }
@@ -591,6 +588,8 @@ void MpegRecorder::Reset(void)
 {
     errored = false;
     framesWritten = 0;
+    numgops = 0;
+    lastseqstart = 0;
 
     leftovers = 0xFFFFFFFF;
 

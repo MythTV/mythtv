@@ -81,5 +81,7 @@ class MpegRecorder : public RecorderBase
 
     unsigned int leftovers;
     long long lastpackheaderpos;
+    long long lastseqstart;
+    long long numgops;
 };
 #endif
