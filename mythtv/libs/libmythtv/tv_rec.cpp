@@ -239,18 +239,37 @@ TVRec::~TVRec(void)
     runMainLoop = false;
     pthread_join(event_thread, NULL);
 
+    TeardownSignalMonitor();
     TeardownSIParser();
 #ifdef USING_DVB_EIT
     if (scanner)
-        delete scanner;
+    {
+        scanner->deleteLater();
+        scanner = NULL;
+    }
 #endif // USING_DVB_EIT
 
-    if (channel)
+    if (GetDVBChannel())
+        GetDVBChannel()->deleteLater();
+    else if (GetDBox2Channel())
+        GetDBox2Channel()->deleteLater();
+    else if (channel)
         delete channel;
+    channel = NULL;
+
     if (rbi)
+    {
         delete rbi;
-    if (recorder)
-        delete recorder;
+        rbi = NULL;
+    }
+
+    TeardownRecorder(true);
+
+    if (dummyRecorder)
+    {
+        dummyRecorder->deleteLater();
+        dummyRecorder = NULL;
+    }
 }
 
 /** \fn TVRec::GetState()
@@ -1201,13 +1220,13 @@ void TVRec::TeardownRecorder(bool killFile)
         if (recorder_thread)
             pthread_join(recorder_thread, NULL);
         recorder_thread = static_cast<pthread_t>(0);
-        delete recorder;
+        recorder->deleteLater();
         recorder = NULL;
     }
 
     if (dummyRecorder)
     {
-        delete dummyRecorder;
+        dummyRecorder->deleteLater();
         dummyRecorder = NULL;
     }
 
@@ -1528,7 +1547,7 @@ void TVRec::TeardownSIParser(void)
 #ifdef USING_DVB
     if (dvbsiparser)
     {
-        delete dvbsiparser;
+        dvbsiparser->deleteLater();
         dvbsiparser = NULL;
     }
 #endif // USING_DVB
@@ -2204,7 +2223,7 @@ void TVRec::TeardownSignalMonitor()
 
     if (signalMonitor)
     {
-        delete signalMonitor;
+        signalMonitor->deleteLater();
         signalMonitor = NULL;
     }
 
