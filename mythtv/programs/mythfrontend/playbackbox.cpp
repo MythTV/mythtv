@@ -3999,22 +3999,20 @@ void PlaybackBox::showRecGroupChanger(void)
 
     QStringList groups;
 
-
-    if (delitem->recgroup == "Default")
-        groups += tr("Default");
-    else
+    if (delitem && (delitem->recgroup != "Default"))
         groups += delitem->recgroup;
 
+    groups += tr("Default");
+
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT DISTINCT recgroup from recorded");
+    query.prepare(
+        "SELECT DISTINCT recgroup FROM recorded WHERE recgroup <> 'Default' "
+        "ORDER BY recgroup");
 
     if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())
-            if (query.value(0).toString() != delitem->recgroup)
-                if (query.value(0).toString() == "Default")
-                    groups += tr("Default");
-                else
-                    groups += query.value(0).toString();
+            if (!delitem || (query.value(0).toString() != delitem->recgroup))
+                groups += query.value(0).toString();
 
     chooseComboBox = new MythComboBox(false, choosePopup);
     chooseComboBox->insertStringList(groups);
@@ -4038,7 +4036,10 @@ void PlaybackBox::showRecGroupChanger(void)
     connect(chooseComboBox, SIGNAL(highlighted(int)), this,
             SLOT(changeComboBoxChanged()));
 
-    chooseLineEdit->setText(delitem->recgroup);
+    if (delitem && (delitem->recgroup != "Default"))
+        chooseLineEdit->setText(delitem->recgroup);
+    else
+        chooseLineEdit->setText(tr("Default"));
 
     chooseComboBox->setFocus();
     choosePopup->ExecPopup();
