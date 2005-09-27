@@ -170,8 +170,11 @@ NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
 {
-    if (weMadeBuffer)
+    if (weMadeBuffer && ringBuffer)
+    {
         delete ringBuffer;
+        ringBuffer = NULL;
+    }
     if (rtjc)
         delete rtjc;
     if (mp3buf)
