@@ -41,7 +41,7 @@
  *  is also possible with this class if their specs are ever known.
  *
  */
-SIParser::SIParser()
+SIParser::SIParser(const char *name) : QObject(NULL, name)
 {
     ThreadRunning = false;
     standardChange = false;
@@ -79,6 +79,12 @@ SIParser::SIParser()
 
 SIParser::~SIParser()
 {
+}
+
+void SIParser::deleteLater(void)
+{
+    disconnect(); // disconnect signals we may be sending...
+    QObject::deleteLater();
 }
 
 /* Resets all trackers, and closes all section filters */

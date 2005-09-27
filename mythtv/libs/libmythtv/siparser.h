@@ -69,7 +69,7 @@ class SIParser : public QObject
 {
     Q_OBJECT
   public:
-    SIParser();
+    SIParser(const char *name = "SIParser");
     ~SIParser();
 
     int Start(void);
@@ -103,6 +103,9 @@ class SIParser : public QObject
 
     void ParseTable(uint8_t* buffer, int size, uint16_t pid);
     void CheckTrackers(void);
+
+  public slots:
+    virtual void deleteLater(void);
 
   signals:
     void FindTransportsComplete(void);

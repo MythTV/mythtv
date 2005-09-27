@@ -34,6 +34,8 @@
 
 #include <qobject.h>
 #include <qvaluelist.h>
+#include <qmutex.h>
+
 #include "dvbtypes.h"
 #include "siparser.h"
 
@@ -74,6 +76,9 @@ public:
     void StartSectionReader();
     void StopSectionReader();
 
+public slots:
+    void deleteLater(void);
+
 private:
     /// System information thread thunk, runs DVBSIParser::StartSectionReader()
     static void *SystemInfoThread(void *param);
@@ -84,7 +89,7 @@ private:
     bool                               exitSectionThread;
     bool                               sectionThreadRunning;
     bool                               selfStartedThread;
-    pthread_mutex_t                    poll_lock;
+    QMutex                             pollLock;
     pthread_t                          siparser_thread;
 
     /* Filter / fd management */
