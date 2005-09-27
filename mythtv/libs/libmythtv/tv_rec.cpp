@@ -111,11 +111,10 @@ TVRec::TVRec(int capturecardnum)
       waitingForSignal(false), waitingForDVBTables(false),
       frontendReady(false), runMainLoop(false), exitPlayer(false),
       finishRecording(false), paused(false), prematurelystopped(false),
-      inoverrecord(false), errored(false),
-      frameRate(-1.0f), overrecordseconds(0), 
+      askAllowRecording(false), errored(false),
       // Current recording info
-      curRecording(NULL),
-      askAllowRecording(false), autoRunJobs(JOB_NONE),
+      curRecording(NULL), autoRunJobs(JOB_NONE),
+      inoverrecord(false), overrecordseconds(0),
       endTimeLock(false),
       // Pending recording info
       pendingRecording(NULL), cancelNextRecording(false)
@@ -532,12 +531,12 @@ TVState TVRec::RemovePlaying(TVState state)
     return kState_Error;
 }
 
-/** \fn TVRec::StartedRecording()
+/** \fn TVRec::StartedRecording(ProgramInfo *curRecording)
  *  \brief Inserts a "curRecording" into the database, and issues a
  *         "RECORDING_LIST_CHANGE" event.
  *  \sa ProgramInfo::StartedRecording()
  */
-void TVRec::StartedRecording(void)
+void TVRec::StartedRecording(ProgramInfo *curRecording)
 {
     if (!curRecording)
         return;
@@ -551,14 +550,14 @@ void TVRec::StartedRecording(void)
     gContext->dispatch(me);
 }
 
-/** \fn TVRec::FinishedRecording()
+/** \fn TVRec::FinishedRecording(ProgramInfo *curRecording)
  *  \brief If not a premature stop, adds program to history of recorded 
  *         programs. If the recording type is kFindOneRecord this find
  *         is removed.
  *  \sa ProgramInfo::FinishedRecording(bool prematurestop)
  *  \param prematurestop If true, we only fetch the recording status.
  */
-void TVRec::FinishedRecording(void)
+void TVRec::FinishedRecording(ProgramInfo *curRecording)
 {
     if (!curRecording)
         return;
@@ -822,8 +821,6 @@ bool TVRec::StartRecorderPost(bool livetv)
             channel->SetFd(recorder->GetVideoFd());
 #endif // USING_V4L
 
-        frameRate = recorder->GetFrameRate();
-
         // Start up real-time comm flag if we can
         if (!livetv)
             enable_realtime_commflag(
@@ -973,7 +970,7 @@ void TVRec::HandleStateChange(void)
             rbi->SetRingBuffer(new RingBuffer(rbi->GetFilename(), true));
             if (rbi->GetRingBuffer()->IsOpen())
             {
-                StartedRecording();
+                StartedRecording(curRecording);
                 startRecorder = true;
                 SET_NEXT();
             }
@@ -994,7 +991,7 @@ void TVRec::HandleStateChange(void)
     }
     else if (TRANSITION(kState_RecordingOnly, kState_None))
     {
-        FinishedRecording();
+        FinishedRecording(curRecording);
         closeRecorder = true;
         inoverrecord = false;
 
@@ -1167,7 +1164,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
  *  \brief Tears down the recorder.
  *  
  *   If a "recorder" exists, RecorderBase::StopRecording() is called.
- *   We then wait for "recorder_threa to exit, and finally we delete 
+ *   We then wait for "recorder_thread" to exit, and finally we delete 
  *   "recorder".
  *
  *   If a RingBuffer instance exists, RingBuffer::StopReads() is called,
@@ -1190,7 +1187,9 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (recorder)
     {
-        filelen = (int)(((float)recorder->GetFramesWritten() / frameRate));
+        // This is a bad way to calculate this, the framerate
+        // may not be constant if using a DTV based recorder.
+        filelen = (int)((float)GetFramesWritten() / GetFramerate());
 
         QString message = QString("DONE_RECORDING %1 %2")
             .arg(cardid).arg(filelen);
@@ -2933,14 +2932,18 @@ bool TVRec::IsBusy(void)
 }
 
 /** \fn TVRec::GetFramerate()
- *  \brief Returns recordering frame rate set by recorder.
+ *  \brief Returns recordering frame rate from the recorder.
  *  \sa RemoteEncoder::GetFrameRate(), EncoderLink::GetFramerate(void),
  *      RecorderBase::GetFrameRate()
  *  \return Frames per second if query succeeds -1 otherwise.
  */
 float TVRec::GetFramerate(void)
 {
-    return frameRate;
+    QMutexLocker lock(&stateChangeLock);
+
+    if (recorder)
+        return recorder->GetFrameRate();
+    return -1.0f;
 }
 
 /** \fn TVRec::GetFramesWritten()

@@ -281,8 +281,8 @@ class TVRec
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
 
-    void StartedRecording(void);
-    void FinishedRecording(void);
+    void StartedRecording(ProgramInfo*);
+    void FinishedRecording(ProgramInfo*);
 
     void SetOption(RecordingProfile &profile, const QString &name);
 
@@ -341,16 +341,15 @@ class TVRec
     bool    finishRecording;
     bool    paused;
     bool    prematurelystopped;
-    bool    inoverrecord;
+    bool    askAllowRecording;
     bool    errored;
-    float   frameRate;
-    int     overrecordseconds;
 
     // Current recording info
     ProgramInfo *curRecording;
     QDateTime    recordEndTime;
-    bool         askAllowRecording;
     int          autoRunJobs;
+    bool         inoverrecord;
+    int          overrecordseconds;
     QMutex       endTimeLock;
 
     // Pending recording info
