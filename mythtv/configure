@@ -2086,6 +2086,7 @@ if test x"$backend" = x"yes" ; then
   fi
   echo "FireWire support $firewire_cable_box"
   echo "DVB support      $dvb [$dvb_path]"
+  echo "DBox2 support    $dbox2_dvb_box"
 fi
 
 if test x"$frontend" = x"yes" ; then
