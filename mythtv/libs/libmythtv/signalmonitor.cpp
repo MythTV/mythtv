@@ -134,6 +134,16 @@ SignalMonitor::~SignalMonitor()
     Stop();
 }
 
+/** \fn SignalMonitor::deleteLater(void)
+ *  \brief Safer alternative to just deleting signal monitor directly.
+ */
+void SignalMonitor::deleteLater(void)
+{
+    disconnect(); // disconnect signals we may be sending...
+    Stop();
+    QObject::deleteLater();
+}
+
 /** \fn SignalMonitor::Start()
  *  \brief Start signal monitoring thread.
  */

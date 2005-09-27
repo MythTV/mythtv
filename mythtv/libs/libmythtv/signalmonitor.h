@@ -125,6 +125,9 @@ class SignalMonitor: virtual public QObject
      */
     void SetUpdateRate(int msec) { update_rate = msec; }
 
+  public slots:
+    virtual void deleteLater(void);
+
   signals:
     /** \brief Signal to be sent as true when it is safe to begin
      *   or continue recording, and false if it may not be safe.

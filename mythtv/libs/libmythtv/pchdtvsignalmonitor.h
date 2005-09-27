@@ -10,14 +10,18 @@ class Channel;
 
 class pcHDTVSignalMonitor: public DTVSignalMonitor
 {
-public:
+  public:
     pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
                         uint _flags = kDTVSigMon_WaitForSig,
                         const char *_name = "pcHDTVSignalMonitor");
     ~pcHDTVSignalMonitor();
 
     void Stop();
-private:
+
+  public slots:
+    void deleteLater(void);
+
+  private:
     pcHDTVSignalMonitor();
     pcHDTVSignalMonitor(const pcHDTVSignalMonitor&);
 

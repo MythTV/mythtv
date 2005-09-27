@@ -94,6 +94,13 @@ DVBSignalMonitor::~DVBSignalMonitor()
     Stop();
 }
 
+void DVBSignalMonitor::deleteLater(void)
+{
+    disconnect(); // disconnect signals we may be sending...
+    Stop();
+    DTVSignalMonitor::deleteLater();
+}
+
 /** \fn DVBSignalMonitor::GetDVBCardNum(void)
  *  \brief Returns DVB Card Number from DVBChannel.
  */

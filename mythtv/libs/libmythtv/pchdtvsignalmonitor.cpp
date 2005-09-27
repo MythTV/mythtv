@@ -56,6 +56,13 @@ pcHDTVSignalMonitor::~pcHDTVSignalMonitor()
     Stop();
 }
 
+void pcHDTVSignalMonitor::deleteLater(void)
+{
+    disconnect(); // disconnect signals we may be sending...
+    Stop();
+    DTVSignalMonitor::deleteLater();
+}
+
 /** \fn pcHDTVSignalMonitor::Stop()
  *  \brief Stops signal monitoring and table monitoring threads.
  */

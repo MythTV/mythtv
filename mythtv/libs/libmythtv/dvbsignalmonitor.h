@@ -24,6 +24,10 @@ class DVBSignalMonitor: public DTVSignalMonitor
     void Stop(void);
 
     bool UpdateFiltersFromStreamData(void);
+
+  public slots:
+    void deleteLater(void);
+
   signals:
     void StatusSignalToNoise(const SignalMonitorValue&);
     void StatusBitErrorRate(const SignalMonitorValue&);
