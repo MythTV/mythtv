@@ -90,7 +90,26 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
 DVBChannel::~DVBChannel()
 {
     Close();
-    delete dvbcam;
+    if (dvbcam)
+    {
+        delete dvbcam;
+        dvbcam = NULL;
+    }
+}
+
+/** \fn DVBChannel::deleteLater(void)
+ *  \brief Safer alternative to just deleting DVBChannel directly.
+ */
+void DVBChannel::deleteLater(void)
+{
+    disconnect(); // disconnect signals we may be sending...
+    Close();
+    if (dvbcam)
+    {
+        delete dvbcam;
+        dvbcam = NULL;
+    }
+    QObject::deleteLater();
 }
 
 void DVBChannel::Close()

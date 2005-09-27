@@ -31,7 +31,7 @@ class DBox2Channel : public QObject, public ChannelBase
     Q_OBJECT
   public:
     DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options, int cardid);
-    ~DBox2Channel(void);
+    ~DBox2Channel(void) { TeardownAll(); }
 
     bool SetChannelByString(const QString &chan);
     bool Open();
@@ -46,8 +46,6 @@ class DBox2Channel : public QObject, public ChannelBase
     QString GetChannelNumberFromName(const QString& channelName);
     QString GetChannelID(const QString&);
 
-    void RecorderAlive(bool);
-
     int GetFd() { return -1; }
 
   signals:
@@ -58,8 +56,11 @@ class DBox2Channel : public QObject, public ChannelBase
     void HttpChannelChangeDone(bool error);
     void HttpRequestDone(bool error);
     void EPGFinished();
+    void RecorderAlive(bool);
+    void deleteLater(void);
 
   private:
+    void TeardownAll(void);
     void Log(QString string);
     void LoadChannels();
     void RequestChannelChange(QString);

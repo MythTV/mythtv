@@ -15,45 +15,66 @@
 
 DBox2Channel::DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options,
                            int cardid)
-    : ChannelBase(parent)
+    : QObject(NULL, "DBox2Channel"), ChannelBase(parent),
+      m_dbox2options(dbox2_options), m_cardid(cardid),
+      m_channelListReady(false),     m_lastChannel("1"),
+      m_requestChannel(""),          m_epg(new DBox2EPG()),
+      m_recorderAlive(false),
+      http(new QHttp()),             httpChanger(new QHttp()),
+      m_dbox2channelcount(0)
 {
-    m_dbox2options = dbox2_options;
-    m_cardid = cardid;
-    m_dbox2channelcount = 0;
-    m_lastChannel = "1";
-    m_requestChannel = "";
-    m_channelListReady = false;
     capchannels = 1;
     channelnames[0] = "DBOX2";
-    // Create EPG
-    m_epg = new DBox2EPG();
-    m_recorderAlive = false;
-    // Create http
-    http = new QHttp();
-    httpChanger = new QHttp();
-    // Connect signals
-    connect (http, SIGNAL(done(bool)), this, SLOT(HttpRequestDone(bool)));
-    connect (httpChanger, SIGNAL(done(bool)), this, SLOT(HttpChannelChangeDone(bool)));
-    connect (m_epg, SIGNAL(EPGFinished()), this, SLOT(EPGFinished()));
+
+    connect(http,        SIGNAL(           done(bool)),
+            this,        SLOT(  HttpRequestDone(bool)));
+    connect(httpChanger, SIGNAL(                 done(bool)),
+            this,        SLOT(  HttpChannelChangeDone(bool)));
+    connect(m_epg,       SIGNAL(EPGFinished()),
+            this,        SLOT(  EPGFinished()));
+
     // Load channel names and ids from the dbox
     LoadChannels();
 }
 
-DBox2Channel::~DBox2Channel(void)
-{   
+void DBox2Channel::deleteLater(void)
+{
+    TeardownAll();
+    QObject::deleteLater();
+}
+
+void DBox2Channel::TeardownAll(void)
+{
+    disconnect(); // disconnect signals we may be sending...
+
     // Shutdown EPG
-    disconnect (m_epg, SIGNAL(EPGFinished()), this, SLOT(EPGFinished()));
-    m_epg->Shutdown();
-    delete m_epg;
+    if (m_epg)
+    {
+        m_epg->Shutdown();
+        m_epg->disconnect();
+        m_epg->deleteLater();
+        m_epg = NULL;
+    }
+
     // Abort pending channel changes
-    httpChanger->abort();
-    httpChanger->closeConnection();
-    disconnect (httpChanger, SIGNAL(done(bool)), this, SLOT(httpChannelChangeDone(bool)));
+    if (httpChanger)
+    {
+        httpChanger->abort();
+        httpChanger->closeConnection();
+        httpChanger->disconnect();
+        httpChanger->deleteLater();
+        httpChanger = NULL;
+    }
+
     // Abort pending channel list requests
-    http->abort();
-    http->closeConnection();
-    disconnect (http, SIGNAL(done(bool)), this, SLOT(httpRequestDone(bool)));
-    delete http;
+    if (http)
+    {
+        http->abort();
+        http->closeConnection();
+        http->disconnect();
+        http->deleteLater();
+        http = NULL;
+    }
 }
 
 void DBox2Channel::SwitchToLastChannel() 

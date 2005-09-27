@@ -77,6 +77,7 @@ class DVBChannel : public QObject, public ChannelBase
   public slots:
     void RecorderStarted();
     void SetPMT(const PMTObject *pmt);
+    void deleteLater(void);
 
     // Messages from DVBChannel
   signals:
