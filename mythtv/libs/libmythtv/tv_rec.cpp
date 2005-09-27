@@ -2752,15 +2752,15 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
     QString querystr = QString(
         "SELECT %1 "
         "FROM channel,capturecard,cardinput "
-        "WHERE channel.channum      = '%2'               AND "
+        "WHERE channel.channum      = :CHANNUM           AND "
         "      channel.sourceid     = cardinput.sourceid AND "
         "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = '%3'               AND "
-        "      capturecard.hostname = '%4'")
-        .arg(channelorder).arg(channum).arg(cardid)
-        .arg(gContext->GetHostName());
-
+        "      capturecard.cardid   = :CARDID            AND "
+        "      capturecard.hostname = :HOSTNAME").arg(channelorder);
     query.prepare(querystr);
+    query.bindValue(":CHANNUM",  channum);
+    query.bindValue(":CARDID",   cardid);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     QString id = QString::null;
 
@@ -2785,14 +2785,13 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
             "FROM channel, capturecard, cardinput "
             "WHERE channel.sourceid     = cardinput.sourceid AND "
             "      cardinput.cardid     = capturecard.cardid AND "
-            "      capturecard.cardid   = '%2'               AND "
-            "      capturecard.hostname = '%3' "
-            "ORDER BY %4 "
-            "LIMIT 1")
-            .arg(channelorder).arg(cardid).arg(gContext->GetHostName())
-            .arg(channelorder);
-       
+            "      capturecard.cardid   = :CARDID            AND "
+            "      capturecard.hostname = :HOSTNAME "
+            "ORDER BY %2 "
+            "LIMIT 1").arg(channelorder).arg(channelorder);
         query.prepare(querystr);
+        query.bindValue(":CARDID",   cardid);
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
 
         if (query.exec() && query.isActive() && query.size() > 0)
         {
@@ -2835,11 +2834,10 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
 
     QString wherepart = QString(
         "cardinput.cardid     = capturecard.cardid AND "
-        "capturecard.cardid   = '%1' AND "
-        "capturecard.hostname = '%2' AND "
-        "channel.visible      = 1    AND "
-        "cardinput.sourceid = channel.sourceid ")
-        .arg(cardid).arg(gContext->GetHostName());
+        "capturecard.cardid   = :CARDID            AND "
+        "capturecard.hostname = :HOSTNAME          AND "
+        "channel.visible      = 1                  AND "
+        "cardinput.sourceid = channel.sourceid ");
 
     querystr = QString(
         "SELECT channel.channum, channel.chanid "
@@ -2853,6 +2851,8 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
         .arg(wherepart).arg(channelorder).arg(ordering);
 
     query.prepare(querystr);
+    query.bindValue(":CARDID",   cardid);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
     if (!query.exec() || !query.isActive())
     {
