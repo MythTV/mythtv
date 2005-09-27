@@ -31,7 +31,12 @@ class DummyDTVRecorder: public DTVRecorder
 
     void StartRecordingThread(void);
     void StopRecordingThread(void);
+
+  public slots:
+    void DummyDTVRecorder::deleteLater(void);
+
   private:
+    void Close(void);
     int ProcessData(unsigned char *buffer, int len);
     void FinishRecording(void);
     static void *RecordingThread(void*);
@@ -45,7 +50,6 @@ class DummyDTVRecorder: public DTVRecorder
     uint       _non_buf_frames;
 
     // Internal
-    int       _stream_data;
     uint      _packets_in_frame;
     pthread_t _rec_thread;
     struct timeval _next_frame_time;

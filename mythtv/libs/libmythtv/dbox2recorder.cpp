@@ -114,52 +114,85 @@ typedef struct  ts_packet_{
  */
 
 DBox2Recorder::DBox2Recorder(DBox2Channel* channel, int cardid)
+    : DTVRecorder("DBox2Recorder"), m_cardid(cardid),
+      // MPEG stuff
+      m_patPacket(new uint8_t[TSPacket::SIZE]), pat_cc(0), pkts_until_pat(0),
+      m_pidPAT(0x0), m_pidCount(0), m_pmtPID(-1), m_ac3PID(-1),
+      m_sectionID(-1),
+      // ptr to DBox2Channel
+      m_channel(channel),
+      // Connection relevant members
+      port(-1), httpPort(-1), ip(""), isOpen(false), http(new QHttp()),
+      m_lastPIDRequestID(-1), m_lastInfoRequestID(-1), lastpacket(0),
+      // Buffer info
+      bufferSize(1024 * 1024),
+      // video info
+      m_videoWidth(-1), m_videoHeight(-1), m_videoFormat(""),
+      // Other state
+      _request_abort(false)
 {
-    m_cardid = cardid;
-    m_channel = channel;
-    VERBOSE(VB_GENERAL,QString("DBOX#%1: Instantiating recorder.").arg(m_cardid));
-    // Initialize DBOX2 connection relevant members
-    httpPort = -1;
-    ip = "";
-    port = -1;
+    VERBOSE(VB_RECORD, QString("DBOX#%1: Instantiating recorder.")
+            .arg(m_cardid));
+
+    for (uint i = 0; i < DBOX_MAX_PID_COUNT; ++i)
+        m_pids[i] = -1;
+
     // Initialize buffers to 1MB
-    bufferSize = 1024 * 1024;
-    initStream(&transportStream);
-    // Status relevant members
-    isOpen = false;
-    // Instantiate HTTP 
-    http = new QHttp();
-    m_lastPIDRequestID = -1;
-    m_lastInfoRequestID = -1;
-    // Initialize members for injecting PAT and PMT
-    m_pidPAT = 0x00;
-    m_patPacket = new uint8_t[188];
-    m_pidCount = 0;
-    pat_cc = 0x00;
-    m_sectionID = -1;
-    // Inter-object signalling
-    connect (http, SIGNAL(requestFinished(int,bool)), this, SLOT(httpRequestFinished(int,bool)));
-    connect (m_channel, SIGNAL(ChannelChanged()), this, SLOT(ChannelChanged()));
-    connect (m_channel, SIGNAL(ChannelChanging()), this, SLOT(ChannelChanging()));
-    m_channel->RecorderAlive(true);
+    transportStream.socket = -1;
+    transportStream.buffer =  new uint8_t[bufferSize];
+    transportStream.bufferIndex = 0;
+
+    // Inter-object signaling
+    connect (http,      SIGNAL(requestFinished    (int,bool)),
+             this,      SLOT(  httpRequestFinished(int,bool)));
+    connect (m_channel, SIGNAL(ChannelChanged()),
+             this,      SLOT(  ChannelChanged()));
+    connect (m_channel, SIGNAL(ChannelChanging()),
+             this,      SLOT(  ChannelChanging()));
+
+    connect (this,      SIGNAL(RecorderAlive(bool)),
+             m_channel, SLOT(  RecorderAlive(bool)));
+
+    emit RecorderAlive(true);
 }
 
-DBox2Recorder::~DBox2Recorder() 
+void DBox2Recorder::deleteLater(void)
 {
-    m_channel->RecorderAlive(false);
+    TeardownAll();
+    DTVRecorder::deleteLater();
+}
+
+void DBox2Recorder::TeardownAll(void)
+{
+    VERBOSE(VB_RECORD, QString("DBOX#%1: Shutting down recorder.")
+            .arg(m_cardid));
+
+    emit RecorderAlive(false);
+
+    disconnect(); // disconnect signals we may be sending...
+
     // Abort any pending http operation
-    http->abort();
-    http->closeConnection();
-    // Disconnect signals
-    disconnect (m_channel, SIGNAL(ChannelChanging()), this, SLOT(ChannelChanging()));
-    disconnect (m_channel, SIGNAL(ChannelChanged()), this, SLOT(ChannelChanged()));
-    disconnect (http, SIGNAL(requestFinished(int,bool)), this, SLOT(httpRequestFinished(int,bool)));
-    VERBOSE(VB_GENERAL,QString("DBOX#%1: Shutting down recorder.").arg(m_cardid));
+    if (http)
+    {
+        http->abort();
+        http->closeConnection();
+        disconnect(http,      SIGNAL(requestFinished    (int,bool)),
+                   this,      SLOT(  httpRequestFinished(int,bool)));
+    }
+
     Close();
-    VERBOSE(VB_GENERAL,QString("DBOX#%1: Freeing buffers...").arg(m_cardid));
-    free(transportStream.buffer);
-    VERBOSE(VB_GENERAL,QString("DBOX#%1: Done.").arg(m_cardid));
-    delete http;
+
+    if (transportStream.buffer)
+    {
+        delete [] transportStream.buffer;
+        transportStream.buffer = NULL;
+    }
+
+    if (http)
+    {
+        delete http;
+        http = NULL;
+    }
 }
 
 void DBox2Recorder::Close() 
@@ -167,22 +200,24 @@ void DBox2Recorder::Close()
     if (!isOpen)
         return;
 
-    VERBOSE(VB_GENERAL,QString("DBOX#%1: Closing all connections...").arg(m_cardid));
+    VERBOSE(VB_RECORD, QString("DBOX#%1: Closing all connections...")
+            .arg(m_cardid));
+
     // Close all sockets
     if (transportStream.socket > 0)
-      close(transportStream.socket);
-    transportStream.socket = -1;
+    {
+        close(transportStream.socket);
+        transportStream.socket = -1;
+    }
     isOpen = false;
 }
 
-
 bool DBox2Recorder::Open() 
 {
-  
     if (isOpen) 
         Close();
 
-    m_channel->RecorderAlive(true);
+    emit RecorderAlive(true);
     return RequestStream();
 }
 
@@ -450,16 +485,6 @@ void DBox2Recorder::httpRequestFinished ( int id, bool error )
 	RequestStream();
     }
 
-}
-
-/*
- *
- */
-
-void DBox2Recorder::initStream(stream_meta* stream) {
-    stream->socket = -1;
-    stream->buffer = (uint8_t*) malloc(bufferSize);
-    stream->bufferIndex = 0;
 }
 
 /*

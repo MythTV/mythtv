@@ -8,8 +8,9 @@ using namespace std;
 #include "programinfo.h"
 #include "recordingprofile.h"
 
-RecorderBase::RecorderBase(void)
-    : ringBuffer(NULL), weMadeBuffer(true), codec("rtjpeg"),
+RecorderBase::RecorderBase(const char *name)
+    : QObject(NULL, name),
+      ringBuffer(NULL), weMadeBuffer(true), codec("rtjpeg"),
       audiodevice("/dev/dsp"), videodevice("/dev/video"), vbidevice("/dev/vbi"),
       vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
       curRecording(NULL), request_pause(false), paused(false)
@@ -22,6 +23,25 @@ RecorderBase::~RecorderBase(void)
         delete ringBuffer;
     if (curRecording)
         delete curRecording;
+}
+
+/** \fn RecorderBase::deleteLater(void)
+ *  \brief Safer alternative to just deleting recorder directly.
+ */
+void RecorderBase::deleteLater(void)
+{
+    disconnect(); // disconnect signals we may be sending...
+    if (weMadeBuffer && ringBuffer)
+    {
+        delete ringBuffer;
+        ringBuffer = NULL;
+    }
+    if (curRecording)
+    {
+        delete curRecording;
+        curRecording = NULL;
+    }
+    QObject::deleteLater();
 }
 
 void RecorderBase::SetRingBuffer(RingBuffer *rbuf)

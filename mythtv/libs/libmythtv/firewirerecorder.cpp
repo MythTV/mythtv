@@ -33,37 +33,10 @@ int read_tspacket (unsigned char *tspacket, int len, unsigned int dropped, void 
      return 1;
 }
 
-
-FirewireRecorder::FirewireRecorder() {
-
-    isopen = false;
-    fwchannel = -1;
-    fwbandwidth = -1;
-    fwport = -1;
-    fwnode = 0;
-    fwspeed = -1;
-    fwhandle = NULL;
-    fwmpeg = NULL;
-    fwfd = -1;
-    fwoplug = -1;
-    fwiplug = -1;
-    fwconnection = FIREWIRE_CONNECTION_P2P;
-}
-
-FirewireRecorder::~FirewireRecorder() {
-
-    if(isopen) {
-        VERBOSE(VB_GENERAL,QString("Firewire: releasing iec61883_mpeg2 object"));
-        iec61883_mpeg2_close(fwmpeg);
-        if(fwconnection == FIREWIRE_CONNECTION_P2P && fwchannel > -1) {
-              VERBOSE(VB_GENERAL,QString("Firewire: disconnecting channel %1").arg(fwchannel));
-	      iec61883_cmp_disconnect (fwhandle, fwnode | 0xffc0, fwoplug,
-                   raw1394_get_local_id (fwhandle), fwiplug, fwchannel, fwbandwidth);
-        }
-        VERBOSE(VB_GENERAL,QString("Firewire: releasing raw1394 handle"));
-        raw1394_destroy_handle(fwhandle);
-    }    
-    isopen = false;
+void FirewireRecorder::deleteLater(void)
+{
+    Close();
+    DTVRecorder::deleteLater();
 }
 
 bool FirewireRecorder::Open() {
@@ -127,6 +100,28 @@ bool FirewireRecorder::Open() {
      isopen = true;
      fwfd = raw1394_get_fd(fwhandle); 
      return true;
+}
+
+void FirewireRecorder::Close(void)
+{
+    if (!isopen)
+        return;
+
+    isopen = false;
+
+    VERBOSE(VB_RECORD, "Firewire: releasing iec61883_mpeg2 object");
+    iec61883_mpeg2_close(fwmpeg);
+
+    if (fwconnection == FIREWIRE_CONNECTION_P2P && fwchannel > -1)
+    {
+        VERBOSE(VB_RECORD, "Firewire: disconnecting channel " << fwchannel);
+        iec61883_cmp_disconnect(fwhandle, fwnode | 0xffc0, fwoplug,
+                                raw1394_get_local_id (fwhandle),
+                                fwiplug, fwchannel, fwbandwidth);
+    }
+
+    VERBOSE(VB_RECORD, "Firewire: releasing raw1394 handle");
+    raw1394_destroy_handle(fwhandle);
 }
 
 void FirewireRecorder::StartRecording(void) {

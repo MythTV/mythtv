@@ -90,7 +90,7 @@ const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
             << QString("          (%1) ").arg(errno) << strerror(errno));
 
 DVBRecorder::DVBRecorder(DVBChannel* advbchannel)
-    : DTVRecorder(),
+    : DTVRecorder("DVBRecorder"),
       // Options set in SetOption()
       _card_number_option(0), _record_transport_stream_option(false),
       _hw_decoder_option(false),

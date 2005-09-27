@@ -15,6 +15,7 @@
 #include "mpeg/tspacket.h"
 
 #define DBOX2_TIMEOUT 15
+#define DBOX_MAX_PID_COUNT 32
 #define PAT_TID   0x00
 #define PMT_TID   0x02
 #define STREAM_TYPE_VIDEO_MPEG1     0x01
@@ -43,7 +44,7 @@ class DBox2Recorder : public DTVRecorder
     public:
 
         DBox2Recorder(DBox2Channel *channel, int cardid);
-        ~DBox2Recorder();
+        ~DBox2Recorder() { TeardownAll(); }
 
 	void StartRecording(void);
 	bool Open(void); 
@@ -56,13 +57,18 @@ class DBox2Recorder : public DTVRecorder
 	void SetOption(const QString &name, const QString &value);
 	void SetOption(const QString &name, int value);
 	
+    signals:
+        void RecorderAlive(bool);
+
     public slots:
         void httpRequestFinished ( int id, bool error );
 	void ChannelChanged();
 	void ChannelChanging();
+        void deleteLater(void);
     
     private:
 	// Methods
+        void TeardownAll(void);
 	void ChannelChanged(dbox2_channel_t& chan);
 	void CreatePAT(uint8_t *ts_packet);
 	int  getPMTSectionID(uint8_t* buffer, int pmtPID);
@@ -80,7 +86,7 @@ class DBox2Recorder : public DTVRecorder
 	int pat_cc;
 	int pkts_until_pat;
 	int m_pidPAT;
-	int m_pids[10];
+	int m_pids[DBOX_MAX_PID_COUNT];
 	int m_pidCount;
 	int m_pmtPID;
 	int m_ac3PID;

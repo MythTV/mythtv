@@ -49,7 +49,7 @@ DummyDTVRecorder::DummyDTVRecorder(bool tsmode, RingBuffer *rbuffer,
       _desired_width(desired_width), _desired_height(desired_height),
       _desired_frame_rate(desired_frame_rate), _desired_bitrate(bitrate),
       _non_buf_frames(max(non_buf_frames,(uint)1)),
-      _stream_data(-1), _packets_in_frame(0)
+      _packets_in_frame(0)
 {
     gettimeofday(&_next_frame_time, NULL);
 
@@ -67,10 +67,24 @@ DummyDTVRecorder::DummyDTVRecorder(bool tsmode, RingBuffer *rbuffer,
 DummyDTVRecorder::~DummyDTVRecorder()
 {
     StopRecordingThread();
-    if (_stream_data >= 0)
-        close(_stream_fd);
+    Close();
     if (_buffer)
+    {
         delete [] _buffer;
+        _buffer = NULL;
+    }
+}
+
+void DummyDTVRecorder::deleteLater(void)
+{
+    StopRecordingThread();
+    Close();
+    if (_buffer)
+    {
+        delete [] _buffer;
+        _buffer = NULL;
+    }
+    DTVRecorder::deleteLater();
 }
 
 /** \fn DummyDTVRecorder::SetDesiredAttributes(uint,uint,double)
@@ -126,7 +140,7 @@ void DummyDTVRecorder::StartRecording(void)
     VERBOSE(VB_RECORD, QString("DummyDTVRecorder::StartRecording -- end"));
 }
 
-/** \fn DummyDTVRecorder::Open()
+/** \fn DummyDTVRecorder::Open(void)
  *  \brief Opens a video file matching the desired resolution and frame rate.
  *
  *  \TODO DummyDTVRecorder::Open() should pick the closest matching file for
@@ -150,6 +164,15 @@ bool DummyDTVRecorder::Open(void)
         _stream_fd = open(path[1]+filename.ascii(), O_RDONLY);
 
     return _stream_fd >= 0;
+}
+
+void DummyDTVRecorder::Close(void)
+{
+    if (_stream_fd >= 0)
+    {
+        close(_stream_fd);
+        _stream_fd = -1;
+    }
 }
 
 static void set_trigger(struct timeval &trig, int udelay)

@@ -29,7 +29,7 @@ class RecorderBase : public QObject
 {
     Q_OBJECT
   public:
-    RecorderBase();
+    RecorderBase(const char *name = "RecorderBase");
     virtual ~RecorderBase();
 
     /// \brief Sets the video frame rate.
@@ -184,6 +184,9 @@ class RecorderBase : public QObject
      *       a 720p recording at 60fps will report a frame-rate of 25fps.
      */
     double GetFrameRate(void) { return video_frame_rate; }
+
+  public slots:
+    virtual void deleteLater(void);
 
   signals:
     void RecorderPaused(void);

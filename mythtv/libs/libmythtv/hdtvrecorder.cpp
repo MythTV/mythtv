@@ -109,7 +109,7 @@ using namespace std;
 #endif
 
 HDTVRecorder::HDTVRecorder()
-    : DTVRecorder(), _atsc_stream_data(0), _resync_count(0)
+    : DTVRecorder("HDTVRecorder"), _atsc_stream_data(0), _resync_count(0)
 {
     _atsc_stream_data = new ATSCStreamData(-1, DEFAULT_SUBCHANNEL);
     connect(_atsc_stream_data, SIGNAL(UpdatePATSingleProgram(
@@ -138,20 +138,39 @@ HDTVRecorder::HDTVRecorder()
     loop = random() % (report_loops / 2);
 }
 
-HDTVRecorder::~HDTVRecorder()
+void HDTVRecorder::TeardownAll(void)
 {
-    if (_stream_fd >= 0)
-        close(_stream_fd);
-    if (_atsc_stream_data)
-        delete _atsc_stream_data;
-    if (_buffer)
-        delete[] _buffer;
-
     // Make SURE that the ringbuffer thread is cleaned up
     StopRecording();
 
+    if (_stream_fd >= 0)
+    {
+        close(_stream_fd);
+        _stream_fd = -1;
+    }
+    if (_atsc_stream_data)
+    {
+        delete _atsc_stream_data;
+        _atsc_stream_data = NULL;
+    }
+    if (_buffer)
+    {
+        delete[] _buffer;
+        _buffer = NULL;
+    }
+}
+
+HDTVRecorder::~HDTVRecorder()
+{
+    TeardownAll();
     pthread_mutex_destroy(&ringbuf.lock);
     pthread_mutex_destroy(&ringbuf.lock_stats);
+}
+
+void HDTVRecorder::deleteLater(void)
+{
+    TeardownAll();
+    DTVRecorder::deleteLater();
 }
 
 void HDTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,

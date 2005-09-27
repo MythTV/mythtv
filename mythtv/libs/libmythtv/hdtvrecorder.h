@@ -57,7 +57,11 @@ class HDTVRecorder : public DTVRecorder
     void SetStreamData(ATSCStreamData*);
     ATSCStreamData* StreamData(void) { return _atsc_stream_data; }
 
+  public slots:
+    void deleteLater(void);
+
   private:
+    void TeardownAll(void);
     int ProcessData(unsigned char *buffer, int len);
     bool ProcessTSPacket(const TSPacket& tspacket);
     void HandleVideo(const TSPacket* tspacket);

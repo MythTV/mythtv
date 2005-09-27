@@ -31,8 +31,14 @@ class FirewireRecorder : public DTVRecorder
 {
   public:
 
-    FirewireRecorder();
-    ~FirewireRecorder();
+    FirewireRecorder() :
+        DTVRecorder("FirewireRecorder"),
+        fwport(-1),     fwchannel(-1), fwspeed(-1),   fwbandwidth(-1),
+        fwfd(-1),       fwconnection(FIREWIRE_CONNECTION_P2P),
+        fwoplug(-1),    fwiplug(-1),   fwmodel(""),   fwnode(0),
+        fwhandle(NULL), fwmpeg(NULL),  isopen(false), lastpacket(0) {;}
+        
+    ~FirewireRecorder() { Close(); }
 
     void StartRecording(void);
     bool Open(void); 
@@ -47,7 +53,12 @@ class FirewireRecorder : public DTVRecorder
     QString FirewireSpeedString(int speed);
 
     bool PauseAndWait(int timeout = 100);
+
+  public slots:
+    void deleteLater(void);
+        
   private:
+    void Close(void);
     int fwport, fwchannel, fwspeed, fwbandwidth, fwfd, fwconnection;
     int fwoplug, fwiplug;
     QString fwmodel;
