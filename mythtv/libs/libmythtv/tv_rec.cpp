@@ -247,11 +247,17 @@ TVRec::~TVRec(void)
     }
 #endif // USING_DVB_EIT
 
+#ifdef USING_DVB
     if (GetDVBChannel())
         GetDVBChannel()->deleteLater();
-    else if (GetDBox2Channel())
+    else
+#endif // USING_DVB
+#ifdef USING_DBOX2
+    if (GetDBox2Channel())
         GetDBox2Channel()->deleteLater();
-    else if (channel)
+    else
+#endif // USING_DBOX2
+    if (channel)
         delete channel;
     channel = NULL;
 
