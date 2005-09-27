@@ -89,9 +89,8 @@ HEADERS += remoteutil.h             tv.h
 HEADERS += recordingtypes.h         jobqueue.h
 HEADERS += filtermanager.h          recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
-HEADERS += scheduledrecording.h
 HEADERS += sr_dialog.h              sr_root.h
-HEADERS += sr_items.h
+HEADERS += sr_items.h               scheduledrecording.h
 HEADERS += signalmonitorvalue.h 
 HEADERS += mpeg/iso639.h
 
@@ -102,9 +101,8 @@ SOURCES += remoteutil.cpp           tv.cpp
 SOURCES += recordingtypes.cpp       jobqueue.cpp
 SOURCES += filtermanager.cpp        recordingprofile.cpp
 SOURCES += remoteencoder.cpp        videosource.cpp
-SOURCES += scheduledrecording.cpp
 SOURCES += sr_dialog.cpp            sr_root.cpp
-SOURCES += sr_items.cpp
+SOURCES += sr_items.cpp             scheduledrecording.cpp
 SOURCES += signalmonitorvalue.cpp
 SOURCES += mpeg/iso639.cpp
 

@@ -150,6 +150,8 @@ bool TVRec::Init(void)
         channel = new DVBChannel(genOpt.videodev.toInt(), this);
         channel->Open();
         InitChannel(genOpt.defaultinput, startchannel);
+        connect(GetDVBChannel(), SIGNAL(UpdatePMTObject(const PMTObject*)),
+                this, SLOT(SetPMTObject(const PMTObject*)));
         StartChannel(false);
         usleep(500);    // Give DVBCam some breathing room
         CloseChannel(); // Close the channel if in dvb_on_demand mode
@@ -234,8 +236,22 @@ bool TVRec::Init(void)
  */
 TVRec::~TVRec(void)
 {
-    ClearFlags(kFlagRunMainLoop);
-    pthread_join(event_thread, NULL);
+    TeardownAll();
+}
+
+void TVRec::deleteLater(void)
+{
+    TeardownAll();
+    QObject::deleteLater();
+}
+
+void TVRec::TeardownAll(void)
+{
+    if (HasFlags(kFlagRunMainLoop))
+    {
+        ClearFlags(kFlagRunMainLoop);
+        pthread_join(event_thread, NULL);
+    }
 
     TeardownSignalMonitor();
     TeardownSIParser();
@@ -1164,6 +1180,8 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOptionsFromProfile(
             &profile, genOpt.videodev, genOpt.audiodev, genOpt.vbidev, ispip);
         recorder->Initialize();
+        connect(recorder, SIGNAL(RecorderPaused(void)),
+                this,     SLOT  (RecorderPaused(void)));
         return true;
     }
 
@@ -2213,6 +2231,9 @@ void TVRec::SetupSignalMonitor(void)
         if (GetDTVSignalMonitor())
             SetupDTVSignalMonitor();
 
+        connect(signalMonitor, SIGNAL(AllGood(void)),
+                this, SLOT(SignalMonitorAllGood(void)));
+
         // Start the monitoring thread
         signalMonitor->Start();
     }
@@ -2309,19 +2330,6 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
                 signalMonitor->SetNotifyFrontend(notifyFrontend);
             else if (0 == oldrate)
                 signalMonitor->SetNotifyFrontend(false);
-        }
-        else if (0 != notifyFrontend)
-        {
-            // send status to frontend, since this may be used in tuning.
-            // if this is a card capable of signal monitoring, send error
-            // otherwise send an signal lock message.
-            bool useMonitor = SignalMonitor::IsSupported(genOpt.cardtype);
-            QStringList slist = useMonitor ?
-                SignalMonitorValue::ERROR_NO_CHANNEL :
-                SignalMonitorValue::SIGNAL_LOCK;
-            
-            MythEvent me(QString("SIGNAL %1").arg(cardid), slist);
-            gContext->dispatch(me);
         }
     }
     return oldrate;

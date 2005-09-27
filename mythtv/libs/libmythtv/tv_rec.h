@@ -33,6 +33,8 @@ class DBox2Channel;
 class DVBChannel;
 class Channel;
 
+class PMTObject;
+
 /// Used to request ProgramInfo for channel browsing.
 typedef enum
 {
@@ -104,8 +106,9 @@ class DBox2DBOptions
     QString host;
 };
 
-class TVRec
+class TVRec : public QObject
 {
+    Q_OBJECT
   public:
     TVRec(int capturecardnum);
    ~TVRec(void);
@@ -222,6 +225,14 @@ class TVRec
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
+  public slots:
+    void RecorderPaused()
+        { QMutexLocker lock(&stateChangeLock); triggerEventLoop.wakeAll(); }
+    void SignalMonitorAllGood() { triggerEventLoop.wakeAll(); }
+    void SetPMTObject(const PMTObject*) 
+        { QMutexLocker lock(&stateChangeLock); triggerEventLoop.wakeAll(); }
+    void deleteLater(void);
+
   protected:
     void RunTV(void);
     bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
@@ -229,6 +240,8 @@ class TVRec
     static void *RecorderThread(void *param);
 
   private:
+    void TeardownAll(void);
+
     void GetChannelInfo(ChannelBase *chan,  QString &title,
                         QString &subtitle,  QString &desc,
                         QString &category,  QString &starttime, 
