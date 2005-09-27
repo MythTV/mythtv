@@ -349,7 +349,6 @@ class TVRec
     // Current recording info
     ProgramInfo *curRecording;
     QDateTime    recordEndTime;
-    QString      profileName;
     bool         askAllowRecording;
     int          autoRunJobs;
     QMutex       endTimeLock;
@@ -357,7 +356,6 @@ class TVRec
     // Pending recording info
     ProgramInfo *pendingRecording;
     QDateTime    recordPendingStart;
-    bool         recordPending;
     bool         cancelNextRecording;
 };
 

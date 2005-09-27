@@ -114,11 +114,11 @@ TVRec::TVRec(int capturecardnum)
       inoverrecord(false), errored(false),
       frameRate(-1.0f), overrecordseconds(0), 
       // Current recording info
-      curRecording(NULL), profileName(""),
+      curRecording(NULL),
       askAllowRecording(false), autoRunJobs(JOB_NONE),
       endTimeLock(false),
       // Pending recording info
-      pendingRecording(NULL), recordPending(false), cancelNextRecording(false)
+      pendingRecording(NULL), cancelNextRecording(false)
 {
     event_thread    = PTHREAD_CREATE_JOINABLE;
     recorder_thread = static_cast<pthread_t>(0);
@@ -306,12 +306,12 @@ ProgramInfo *TVRec::GetRecording(void)
  */
 void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft)
 {
+    QMutexLocker lock(&stateChangeLock);
     if (pendingRecording)
         delete pendingRecording;
 
     pendingRecording = new ProgramInfo(*rcinfo);
     recordPendingStart = QDateTime::currentDateTime().addSecs(secsleft);
-    recordPending = true;
     askAllowRecording = true;
 }
 
@@ -363,7 +363,12 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     }
     endTimeLock.unlock();
 
-    recordPending = false;
+    if (pendingRecording)
+    {
+        delete pendingRecording;
+        pendingRecording = NULL;
+    }
+
     askAllowRecording = false;
 
     if (inoverrecord)
@@ -590,30 +595,21 @@ bool TVRec::CreateRecorderThread()
 }
 
 static void load_recording_profile(
-    RecordingProfile &profile,
-    QString &profileName,
-    ProgramInfo *curRecording,
-    int cardid)
+    RecordingProfile &profile, ProgramInfo *rec, int cardid)
 {
-    if (curRecording)
-    {
-        profileName = curRecording->
-            GetScheduledRecording()->getProfileName();
-        bool foundProf = false;
-        if (profileName != NULL)
-            foundProf = profile.loadByCard(profileName, cardid);
+    QString profileName = "Live TV";
+    bool done = false;
 
-        if (!foundProf)
-        {
-            profileName = QString("Default");
-            profile.loadByCard(profileName, cardid);
-        }
-    }
-    else
+    if (rec)
     {
-        profileName = "Live TV";
-        profile.loadByCard(profileName, cardid);
+        profileName = rec->GetScheduledRecording()->getProfileName();
+        if (!profileName.isEmpty())
+            done = profile.loadByCard(profileName, cardid);
+        profileName = (done) ? profileName : QString("Default");
     }
+
+    if (!done)
+        profile.loadByCard(profileName, cardid);
 
     QString msg = QString("Using profile '%1' to record").arg(profileName);
     VERBOSE(VB_RECORD, LOC + msg);
@@ -715,7 +711,7 @@ bool TVRec::StartRecorder(bool livetv)
     prematurelystopped = false;
 
     RecordingProfile profile;
-    load_recording_profile(profile, profileName, curRecording, cardid);
+    load_recording_profile(profile, curRecording, cardid);
 
     init_jobs(curRecording, autoRunJobs);
 
@@ -1188,8 +1184,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
  */
 void TVRec::TeardownRecorder(bool killFile)
 {
-    QString oldProfileName = profileName;
-
     int filelen = -1;
 
     ispip = false;
@@ -1204,7 +1198,6 @@ void TVRec::TeardownRecorder(bool killFile)
         gContext->dispatch(me);
 
         recorder->StopRecording();
-        profileName = "";
 
         if (recorder_thread)
             pthread_join(recorder_thread, NULL);
@@ -1657,20 +1650,20 @@ void TVRec::RunTV(void)
 
         usleep(1000);
 
-        if (recordPending && askAllowRecording && frontendReady)
+        if (pendingRecording && askAllowRecording && frontendReady)
         {
             askAllowRecording = false;
 
             int timeuntil = QDateTime::currentDateTime()
-                                .secsTo(recordPendingStart);
+                .secsTo(recordPendingStart);
 
             QString query = QString("ASK_RECORDING %1 %2")
                 .arg(cardid).arg(timeuntil);
             QStringList messages;
             messages << pendingRecording->title
-                    << pendingRecording->chanstr
-                    << pendingRecording->chansign
-                    << pendingRecording->channame;
+                     << pendingRecording->chanstr
+                     << pendingRecording->chansign
+                     << pendingRecording->channame;
             
             MythEvent me(query, messages);
 
@@ -2930,10 +2923,10 @@ bool TVRec::IsBusy(void)
 {
     bool retval = (GetState() != kState_None);
 
-    if (recordPending && 
-        QDateTime::currentDateTime().secsTo(recordPendingStart) <= 5)
+    if (pendingRecording)
     {
-        retval = true;
+        int timeLeft = QDateTime::currentDateTime().secsTo(recordPendingStart);
+        retval |= (timeLeft <= 5);
     }
 
     return retval;
