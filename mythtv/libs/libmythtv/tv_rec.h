@@ -8,6 +8,7 @@
 #include <qptrlist.h>
 #include <qmap.h>
 #include <qstringlist.h>
+#include <qwaitcondition.h>
 
 #include "programinfo.h"
 #include "tv.h"
@@ -116,13 +117,13 @@ class TVRec
 
     void StopRecording(void);
     /// \brief Tells TVRec to finish the current recording as soon as possible.
-    void FinishRecording(void) { finishRecording = true; }
+    void FinishRecording(void)  { SetFlags(kFlagFinishRecording); }
     /// \brief Tells TVRec that the frontend's TV class is ready for messages.
-    void FrontendReady(void) { frontendReady = true; }
+    void FrontendReady(void)    { SetFlags(kFlagFrontendReady); }
     /** \brief Tells TVRec to cancel the upcoming recording.
      *  \sa RecordPending(const ProgramInfo*,int),
      *      TV::AskAllowRecording(const QStringList&,int) */
-    void CancelNextRecording(void) { cancelNextRecording = true; }
+    void CancelNextRecording(void) { SetFlags(kFlagCancelNextRecording); }
     ProgramInfo *GetRecording(void);
 
     char *GetScreenGrab(const ProgramInfo *pginfo, const QString &filename, 
@@ -131,9 +132,9 @@ class TVRec
                         float &video_aspect);
 
     /// \brief Returns true if event loop has not been told to shut down
-    bool IsRunning(void) { return runMainLoop; }
+    bool IsRunning(void)  const { return HasFlags(kFlagRunMainLoop); }
     /// \brief Tells TVRec to stop event loop
-    void Stop(void) { runMainLoop = false; }
+    void Stop(void)             { ClearFlags(kFlagRunMainLoop); }
 
     TVState GetState(void);
     /// \brief Returns "state == kState_RecordingPreRecorded"
@@ -219,7 +220,8 @@ class TVRec
     /// \brief Returns the caputure card number
     int GetCaptureCardNum(void) { return cardid; }
     /// \brief Returns true is "errored" is true, false otherwise.
-    bool IsErrored(void) { return errored; }
+    bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
+
   protected:
     void RunTV(void);
     static void *EventThread(void *param);
@@ -264,6 +266,11 @@ class TVRec
 
     void CreateSIParser(int num);
     void TeardownSIParser(void);
+
+    bool HasFlags(uint f) const { return (stateFlags & f) == f; }
+    void SetFlags(uint f);
+    void ClearFlags(uint f);
+    static QString FlagToString(uint);
 
     bool StartRecorder(bool livetv);
     bool StartRecorderPost(bool livetv);
@@ -335,14 +342,10 @@ class TVRec
     bool    abortRecordingStart;
     bool    waitingForSignal;
     bool    waitingForDVBTables;
-    bool    frontendReady;
-    bool    runMainLoop;
-    bool    exitPlayer;
-    bool    finishRecording;
-    bool    paused;
     bool    prematurelystopped;
-    bool    askAllowRecording;
-    bool    errored;
+    uint           stateFlags;
+    QWaitCondition triggerEventLoop;
+    QWaitCondition triggerEventSleep;
 
     // Current recording info
     ProgramInfo *curRecording;
@@ -355,7 +358,15 @@ class TVRec
     // Pending recording info
     ProgramInfo *pendingRecording;
     QDateTime    recordPendingStart;
-    bool         cancelNextRecording;
+
+    // General State flags
+    static const uint kFlagFrontendReady        = 0x00000001;
+    static const uint kFlagRunMainLoop          = 0x00000002;
+    static const uint kFlagExitPlayer           = 0x00000004;
+    static const uint kFlagFinishRecording      = 0x00000008;
+    static const uint kFlagErrored              = 0x00000010;
+    static const uint kFlagCancelNextRecording  = 0x00000020;
+    static const uint kFlagAskAllowRecording    = 0x00000040;
 };
 
 #endif

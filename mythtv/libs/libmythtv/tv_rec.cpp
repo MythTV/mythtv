@@ -109,15 +109,13 @@ TVRec::TVRec(int capturecardnum)
       changeState(false),
       startingRecording(false), abortRecordingStart(false),
       waitingForSignal(false), waitingForDVBTables(false),
-      frontendReady(false), runMainLoop(false), exitPlayer(false),
-      finishRecording(false), paused(false), prematurelystopped(false),
-      askAllowRecording(false), errored(false),
+      prematurelystopped(false), stateFlags(0),
       // Current recording info
       curRecording(NULL), autoRunJobs(JOB_NONE),
       inoverrecord(false), overrecordseconds(0),
       endTimeLock(false),
       // Pending recording info
-      pendingRecording(NULL), cancelNextRecording(false)
+      pendingRecording(NULL)
 {
     event_thread    = PTHREAD_CREATE_JOINABLE;
     recorder_thread = static_cast<pthread_t>(0);
@@ -205,7 +203,7 @@ bool TVRec::Init(void)
             .arg(genOpt.cardtype).arg(genOpt.videodev)
             .arg(genOpt.cardtype).arg(genOpt.cardtype);
         VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
-        errored = true;
+        SetFlags(kFlagErrored);
         return false;
     }
 
@@ -224,7 +222,7 @@ bool TVRec::Init(void)
 
     pthread_create(&event_thread, NULL, EventThread, this);
 
-    while (!runMainLoop)
+    while (!HasFlags(kFlagRunMainLoop))
         usleep(50);
 
     return true;
@@ -236,7 +234,7 @@ bool TVRec::Init(void)
  */
 TVRec::~TVRec(void)
 {
-    runMainLoop = false;
+    ClearFlags(kFlagRunMainLoop);
     pthread_join(event_thread, NULL);
 
     TeardownSignalMonitor();
@@ -330,7 +328,7 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft)
 
     pendingRecording = new ProgramInfo(*rcinfo);
     recordPendingStart = QDateTime::currentDateTime().addSecs(secsleft);
-    askAllowRecording = true;
+    SetFlags(kFlagAskAllowRecording);
 }
 
 /** \fn TVRec::StartRecording(const ProgramInfo*)
@@ -373,7 +371,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             .arg(curRecording->recendts.toString());
         VERBOSE(VB_RECORD, LOC + msg);
 
-        cancelNextRecording = false;
+        ClearFlags(kFlagCancelNextRecording);
         endTimeLock.unlock();
 
         retval = rsRecording;
@@ -387,7 +385,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         pendingRecording = NULL;
     }
 
-    askAllowRecording = false;
+    ClearFlags(kFlagAskAllowRecording);
 
     if (inoverrecord)
     {
@@ -405,7 +403,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         VERBOSE(VB_RECORD, LOC + "changing state finished, starting now");
     }
 
-    if (internalState == kState_WatchingLiveTV && !cancelNextRecording)
+    if (internalState == kState_WatchingLiveTV && 
+        !HasFlags(kFlagCancelNextRecording))
     {
         QString message = QString("QUIT_LIVETV %1").arg(cardid);
         MythEvent me(message);
@@ -431,7 +430,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         // Try harder
         if (internalState != kState_None)
         {
-            exitPlayer = true;
+            SetFlags(kFlagExitPlayer);
             timer.restart();
             while (internalState != kState_None && timer.elapsed() < 5000)
                 usleep(100);
@@ -457,7 +456,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         ChangeState(kState_RecordingOnly);
         retval = rsRecording;
     }
-    else if (!cancelNextRecording)
+    else if (!HasFlags(kFlagCancelNextRecording))
     {
         msg = QString("Wanted to record: %1 %2 %3 %4\n"
             "\t\t\tBut the current state is: %5")
@@ -475,7 +474,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         retval = rsTunerBusy;
     }
 
-    cancelNextRecording = false;
+    ClearFlags(kFlagCancelNextRecording);
 
     return retval;
 }
@@ -514,7 +513,7 @@ bool TVRec::StateIsPlaying(TVState state)
     return (state == kState_WatchingPreRecorded);
 }
 
-/** \fn TVRec::RemovePlaying(TVState)
+/** \fn TVRec::RemoveRecording(TVState)
  *  \brief If "state" is kState_RecordingOnly, returns a kState_None,
  *         otherwise returns kState_Error.
  *  \param state TVState to check.
@@ -553,7 +552,8 @@ TVState TVRec::RemovePlaying(TVState state)
 /** \fn TVRec::StartedRecording(ProgramInfo *curRecording)
  *  \brief Inserts a "curRecording" into the database, and issues a
  *         "RECORDING_LIST_CHANGE" event.
- *  \sa ProgramInfo::StartedRecording()
+ *  \param curRecording Recording to add to database.
+ *  \sa ProgramInfo::StartedRecording(const QString&)
  */
 void TVRec::StartedRecording(ProgramInfo *curRecording)
 {
@@ -904,9 +904,8 @@ void TVRec::HandleStateChange(void)
 
     TVState nextState = internalState;
 
-    frontendReady = false;
-    askAllowRecording = true;
-    cancelNextRecording = false;
+    ClearFlags(kFlagFrontendReady | kFlagCancelNextRecording);
+    SetFlags(kFlagAskAllowRecording);
 
     bool changed = false;
     bool startRecorder = false;
@@ -929,7 +928,7 @@ void TVRec::HandleStateChange(void)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
                 "Attempting to set to an error state.");
-        errored = true;
+        SetFlags(kFlagErrored);
         return;
     }
 
@@ -1054,6 +1053,7 @@ void TVRec::ChangeState(TVState nextState)
 
     desiredNextState = nextState;
     changeState = true;
+    triggerEventLoop.wakeAll();
 }
 
 /** \fn TVRec::SetOption(RecordingProfile&, const QString&)
@@ -1609,21 +1609,23 @@ void TVRec::StopDummyRecorder(void)
  */
 void TVRec::RunTV(void)
 { 
-    paused = false;
+    SetFlags(kFlagRunMainLoop);
+    ClearFlags(kFlagExitPlayer | kFlagFinishRecording);
 
-    runMainLoop = true;
-    exitPlayer = false;
-    finishRecording = false;
-
-    while (runMainLoop)
+    while (HasFlags(kFlagRunMainLoop))
     {
+        bool doSleep = true;
+
+        // If there is a state change queued up, do it...
         if (changeState)
             HandleStateChange();
+
+        // Quick exit on fatal errors.
         if (IsErrored())
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "RunTV encountered fatal error, exiting event thread.");
-            runMainLoop = false;
+            ClearFlags(kFlagRunMainLoop);
             return;
         }
         if (waitingForSignal)
@@ -1666,11 +1668,12 @@ void TVRec::RunTV(void)
         }
 #endif // USING_DVB
 
-        usleep(1000);
-
-        if (pendingRecording && askAllowRecording && frontendReady)
+        // If we have a pending recording and AskAllowRecording is set
+        // and the frontend is ready send an ASK_RECORDING query to frontend.
+        if (pendingRecording &&
+            HasFlags(kFlagAskAllowRecording | kFlagFrontendReady))
         {
-            askAllowRecording = false;
+            ClearFlags(kFlagAskAllowRecording);
 
             int timeuntil = QDateTime::currentDateTime()
                 .secsTo(recordPendingStart);
@@ -1688,10 +1691,15 @@ void TVRec::RunTV(void)
             gContext->dispatch(me);
         }
 
+        // If we are recording a program, check if the recording is
+        // over or someone has asked us to finish the recording.
+        // If so, then we enter overrecord if overrecordseconds > 0
+        // otherwise we queue up the state change to kState_None.
         if (StateIsRecording(internalState))
         {
             endTimeLock.lock();
-            if (QDateTime::currentDateTime() > recordEndTime || finishRecording)
+            if (QDateTime::currentDateTime() > recordEndTime ||
+                HasFlags(kFlagFinishRecording))
             {
                 if (!inoverrecord && overrecordseconds > 0)
                 {
@@ -1705,19 +1713,31 @@ void TVRec::RunTV(void)
                 else
                 {
                     ChangeState(RemoveRecording(internalState));
+                    doSleep = false;
                 }
-                finishRecording = false;
+                ClearFlags(kFlagFinishRecording);
             }
             endTimeLock.unlock();
         }
 
-        if (exitPlayer)
+        // Check for ExitPlayer flag, and if set change to a non-watching
+        // state (either kState_RecordingOnly or kState_None).
+        if (HasFlags(kFlagExitPlayer))
         {
             if (internalState == kState_WatchingLiveTV)
                 ChangeState(kState_None);
             else if (StateIsPlaying(internalState))
                 ChangeState(RemovePlaying(internalState));
-            exitPlayer = false;
+            ClearFlags(kFlagExitPlayer);
+            doSleep = false;
+        }
+
+        // We should be no more than a few thousand milliseconds,
+        // as the end recording code does not have a trigger...
+        if (doSleep)
+        {
+            triggerEventSleep.wakeAll();
+            triggerEventLoop.wait(25 /* ms */);
         }
     }
   
@@ -3066,7 +3086,7 @@ long long TVRec::GetMaxBitrate()
  */
 void TVRec::StopPlaying(void)
 {
-    exitPlayer = true;
+    SetFlags(kFlagExitPlayer);
 }
 
 /** \fn TVRec::SetupRingBuffer(QString&,long long&,long long&,bool)
@@ -3751,3 +3771,45 @@ void TVRec::StoreInputChannels(const QMap<int, QString> &inputChannel)
 
 }
 
+void TVRec::SetFlags(uint f)
+{
+    QMutexLocker lock(&stateChangeLock);
+    stateFlags |= f;
+    VERBOSE(VB_RECORD, LOC + QString("SetFlags(%1) -> %2")
+            .arg(FlagToString(f)).arg(FlagToString(stateFlags)));
+    triggerEventLoop.wakeAll();
+}
+
+void TVRec::ClearFlags(uint f)
+{
+    QMutexLocker lock(&stateChangeLock);
+    stateFlags &= ~f;
+    VERBOSE(VB_RECORD, LOC + QString("ClearFlags(%1) -> %2")
+            .arg(FlagToString(f)).arg(FlagToString(stateFlags)));
+    triggerEventLoop.wakeAll();
+}
+
+QString TVRec::FlagToString(uint f)
+{
+    QString msg("");
+
+    if (kFlagFrontendReady & f)
+        msg += "FrontendReady";
+    if (kFlagRunMainLoop & f)
+        msg += "RunMainLoop,";
+    if (kFlagExitPlayer & f)
+        msg += "ExitPlayer,";
+    if (kFlagFinishRecording & f)
+        msg += "FinishRecording,";
+    if (kFlagErrored & f)
+        msg += "Errored,";
+    if (kFlagCancelNextRecording & f)
+        msg += "CancelNextRecording,";
+    if (kFlagAskAllowRecording & f)
+        msg += "AskAllowRecording,";
+
+    if (msg.isEmpty())
+        msg = QString("0x%1").arg(f,0,16);
+
+    return msg;
+}
