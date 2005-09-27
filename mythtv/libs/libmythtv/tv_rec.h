@@ -224,6 +224,7 @@ class TVRec
 
   protected:
     void RunTV(void);
+    bool WaitForEventThreadSleep(bool wake = true, ulong time = ULONG_MAX);
     static void *EventThread(void *param);
     static void *RecorderThread(void *param);
 
@@ -353,7 +354,6 @@ class TVRec
     int          autoRunJobs;
     bool         inoverrecord;
     int          overrecordseconds;
-    QMutex       endTimeLock;
 
     // Pending recording info
     ProgramInfo *pendingRecording;

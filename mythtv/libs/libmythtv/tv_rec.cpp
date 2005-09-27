@@ -113,7 +113,6 @@ TVRec::TVRec(int capturecardnum)
       // Current recording info
       curRecording(NULL), autoRunJobs(JOB_NONE),
       inoverrecord(false), overrecordseconds(0),
-      endTimeLock(false),
       // Pending recording info
       pendingRecording(NULL)
 {
@@ -128,6 +127,8 @@ TVRec::TVRec(int capturecardnum)
  */
 bool TVRec::Init(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     bool ok = GetDevices(cardid, genOpt, dvbOpt, fwOpt, dboxOpt);
 
     if (!ok)
@@ -222,8 +223,7 @@ bool TVRec::Init(void)
 
     pthread_create(&event_thread, NULL, EventThread, this);
 
-    while (!HasFlags(kFlagRunMainLoop))
-        usleep(50);
+    WaitForEventThreadSleep();
 
     return true;
 }
@@ -342,15 +342,17 @@ void TVRec::RecordPending(const ProgramInfo *rcinfo, int secsleft)
  */
 RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 {
+    QMutexLocker lock(&stateChangeLock);
     QString msg("");
 
     RecStatusType retval = rsAborted;
 
+    // Flush out any pending state changes
+    WaitForEventThreadSleep();
+
     // We need to do this check early so we don't cancel an overrecord
     // that we're trying to extend.
-    endTimeLock.lock();
-    if (!changeState &&
-        StateIsRecording(internalState) &&
+    if (curRecording &&
         curRecording->title == rcinfo->title &&
         curRecording->chanid == rcinfo->chanid &&
         curRecording->startts == rcinfo->startts)
@@ -372,12 +374,10 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         VERBOSE(VB_RECORD, LOC + msg);
 
         ClearFlags(kFlagCancelNextRecording);
-        endTimeLock.unlock();
 
         retval = rsRecording;
         return retval;
     }
-    endTimeLock.unlock();
 
     if (pendingRecording)
     {
@@ -388,20 +388,11 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     ClearFlags(kFlagAskAllowRecording);
 
     if (inoverrecord)
-    {
         ChangeState(kState_None);
 
-        while (changeState)
-            usleep(50);
-    }
-
-    if (changeState)
-    {
-        VERBOSE(VB_RECORD, LOC + "backend still changing state, waiting..");
-        while (changeState)
-            usleep(50);
-        VERBOSE(VB_RECORD, LOC + "changing state finished, starting now");
-    }
+    // Flush out events...
+    WaitForEventThreadSleep();
+    inoverrecord = false;
 
     if (internalState == kState_WatchingLiveTV && 
         !HasFlags(kFlagCancelNextRecording))
@@ -413,8 +404,9 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         MythTimer timer;
         timer.start();
 
-        while (internalState != kState_None && timer.elapsed() < 10000)
-            usleep(100);
+        // Wait at least 10 seconds for response
+        while ((internalState != kState_None) && timer.elapsed() < 10000)
+            WaitForEventThreadSleep(false, max(10000 - timer.elapsed(), 100));
 
         // Try again
         if (internalState != kState_None)
@@ -422,18 +414,17 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             gContext->dispatch(me);
 
             timer.restart();
-
-            while (internalState != kState_None && timer.elapsed() < 10000)
-                usleep(100);
+            // Wait at least 10 seconds for response
+            while ((internalState != kState_None) && timer.elapsed() < 10000)
+                WaitForEventThreadSleep(
+                    false, max(10000 - timer.elapsed(), 100));
         }
 
         // Try harder
         if (internalState != kState_None)
         {
             SetFlags(kFlagExitPlayer);
-            timer.restart();
-            while (internalState != kState_None && timer.elapsed() < 5000)
-                usleep(100);
+            WaitForEventThreadSleep();
         }
     }
 
@@ -485,13 +476,12 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
  */
 void TVRec::StopRecording(void)
 {
-    if (StateIsRecording(internalState))
+    if (StateIsRecording(GetState()))
     {
-        ChangeState(RemoveRecording(internalState));
-        prematurelystopped = false;
-
-        while (changeState)
-            usleep(50);
+        QMutexLocker lock(&stateChangeLock);
+        ChangeState(RemoveRecording(GetState()));
+        // wait for state change to take effect
+        WaitForEventThreadSleep();
     }
 }
 
@@ -898,14 +888,13 @@ bool TVRec::StartRecorderPost(bool livetv)
 void TVRec::HandleStateChange(void)
 {
     if (startingRecording)
+    {
+        stateChangeLock.unlock();
         AbortStartRecorderThread();
-
-    QMutexLocker lock(&stateChangeLock);
+        stateChangeLock.lock();
+    }
 
     TVState nextState = internalState;
-
-    ClearFlags(kFlagFrontendReady | kFlagCancelNextRecording);
-    SetFlags(kFlagAskAllowRecording);
 
     bool changed = false;
     bool startRecorder = false;
@@ -1609,6 +1598,7 @@ void TVRec::StopDummyRecorder(void)
  */
 void TVRec::RunTV(void)
 { 
+    QMutexLocker lock(&stateChangeLock);
     SetFlags(kFlagRunMainLoop);
     ClearFlags(kFlagExitPlayer | kFlagFinishRecording);
 
@@ -1618,7 +1608,11 @@ void TVRec::RunTV(void)
 
         // If there is a state change queued up, do it...
         if (changeState)
+        {
             HandleStateChange();
+            ClearFlags(kFlagFrontendReady | kFlagCancelNextRecording);
+            SetFlags(kFlagAskAllowRecording);
+        }
 
         // Quick exit on fatal errors.
         if (IsErrored())
@@ -1697,7 +1691,6 @@ void TVRec::RunTV(void)
         // otherwise we queue up the state change to kState_None.
         if (StateIsRecording(internalState))
         {
-            endTimeLock.lock();
             if (QDateTime::currentDateTime() > recordEndTime ||
                 HasFlags(kFlagFinishRecording))
             {
@@ -1717,7 +1710,6 @@ void TVRec::RunTV(void)
                 }
                 ClearFlags(kFlagFinishRecording);
             }
-            endTimeLock.unlock();
         }
 
         // Check for ExitPlayer flag, and if set change to a non-watching
@@ -1737,7 +1729,9 @@ void TVRec::RunTV(void)
         if (doSleep)
         {
             triggerEventSleep.wakeAll();
+            lock.mutex()->unlock();
             triggerEventLoop.wait(25 /* ms */);
+            lock.mutex()->lock();
         }
     }
   
@@ -1746,6 +1740,17 @@ void TVRec::RunTV(void)
         ChangeState(kState_None);
         HandleStateChange();
     }
+}
+
+bool TVRec::WaitForEventThreadSleep(bool wake, unsigned long time)
+{
+    if (wake)
+        triggerEventLoop.wakeAll();
+
+    stateChangeLock.unlock();
+    bool ok = triggerEventSleep.wait(time);
+    stateChangeLock.lock();
+    return ok;
 }
 
 void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
@@ -2959,6 +2964,8 @@ bool TVRec::IsReallyRecording(void)
  */
 bool TVRec::IsBusy(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+
     bool retval = (GetState() != kState_None);
 
     if (pendingRecording)
@@ -3144,10 +3151,11 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
  */
 void TVRec::SpawnLiveTV(void)
 {
+    QMutexLocker lock(&stateChangeLock);
+    // Change to WatchingLiveTV
     ChangeState(kState_WatchingLiveTV);
-
-    while (changeState)
-        usleep(50);
+    // Wait for state change to take effect
+    WaitForEventThreadSleep();
 }
 
 /** \fn TVRec::StopLiveTV()
@@ -3158,10 +3166,10 @@ void TVRec::StopLiveTV(void)
 {
     if (GetState() != kState_None)
     {
+        QMutexLocker lock(&stateChangeLock);
         ChangeState(kState_None);
-        
-        while (changeState)
-            usleep(50);
+        // Wait for state change to take effect...
+        WaitForEventThreadSleep();
     }
     if (GetState() == kState_None)
     {
@@ -3793,6 +3801,7 @@ QString TVRec::FlagToString(uint f)
 {
     QString msg("");
 
+    // General flags
     if (kFlagFrontendReady & f)
         msg += "FrontendReady";
     if (kFlagRunMainLoop & f)
