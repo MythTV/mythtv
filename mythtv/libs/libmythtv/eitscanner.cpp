@@ -4,6 +4,7 @@
 #error USING_DVB must be defined to compile eitscanner.cpp
 #endif
 
+#include "tv_rec.h"
 #include "dvbchannel.h"
 #include "dvbsiparser.h"
 #include "dvbtypes.h"
@@ -21,18 +22,32 @@
 EITScanner::EITScanner()
     : QObject(NULL, "EITScanner"),
       channel(NULL), parser(NULL), eitHelper(new EITHelper()),
-      exitThread(false)
+      exitThread(false), rec(NULL), activeScan(false)
 {
     pthread_create(&eventThread, NULL, SpawnEventLoop, this);
 }
 
-EITScanner::~EITScanner()
+void EITScanner::TeardownAll(void)
 {
-    StopPassiveScan();
-    exitThread = true;
-    pthread_join(eventThread, NULL);
+    StopActiveScan();
+    if (!exitThread)
+    {
+        exitThread = true;
+        exitThreadCond.wakeAll();
+        pthread_join(eventThread, NULL);
+    }
 
-    delete eitHelper;
+    if (eitHelper)
+    {
+        eitHelper->deleteLater();
+        eitHelper = NULL;
+    }
+}
+
+void EITScanner::deleteLater(void)
+{
+    TeardownAll();
+    QObject::deleteLater();
 }
 
 void EITScanner::SetPMTObject(const PMTObject *)
@@ -59,14 +74,26 @@ void EITScanner::RunEventLoop(void)
     exitThread = false;
     while (!exitThread)
     {
-        usleep(2000); // 2 ms
-
-        if (channel && !exitThread)
+        if (channel)
         {
             int mplex = channel->GetMultiplexID();
             if ((mplex > 0) && parser && eitHelper->GetListSize())
                 eitHelper->ProcessEvents(mplex);
         }
+
+        if (activeScan && (QDateTime::currentDateTime() > activeScanNextTrig))
+        {
+            if (activeScanNextChan == activeScanChannels.end())
+                activeScanNextChan = activeScanChannels.begin();
+
+            rec->SetChannel(*activeScanNextChan);
+
+            activeScanNextTrig = QDateTime::currentDateTime()
+                .addSecs(activeScanTrigTime);
+            activeScanNextChan++;
+        }
+
+        exitThreadCond.wait(200); // sleep up to 200 ms.
     }
 }
 
@@ -95,4 +122,49 @@ void EITScanner::StopPassiveScan(void)
 
     channel = NULL;
     parser  = NULL;
+}
+
+void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
+{
+    rec = _rec;
+
+    if (!activeScanChannels.size())
+    {
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "SELECT channum "
+            "FROM channel, cardinput, capturecard "
+            "WHERE cardinput.sourceid = channel.sourceid AND "
+            "      capturecard.cardid = cardinput.cardid AND "
+            "      cardinput.cardid   = :CARDID "
+            "ORDER BY cardinput.sourceid, atscsrcid");
+        query.bindValue(":CARDID", rec->GetCaptureCardNum());
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("EITScanner::StartActiveScan", query);
+            return;
+        }
+
+        while (query.next())
+            activeScanChannels << query.value(0).toString();
+        activeScanNextChan = activeScanChannels.begin();
+    }
+
+    VERBOSE(VB_SIPARSER, "StartActiveScan called with "<<
+            activeScanChannels.size()<<" channels");
+
+    if (activeScanChannels.size())
+    {
+        activeScanNextTrig = QDateTime::currentDateTime();
+        activeScanTrigTime = max_seconds_per_source;
+        activeScan = true;
+    }
+}
+
+void EITScanner::StopActiveScan()
+{
+    activeScan = false;
+    rec = NULL;
+    StopPassiveScan();
 }

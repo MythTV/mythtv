@@ -7,7 +7,11 @@
 
 // Qt includes
 #include <qobject.h>
+#include <qdatetime.h>
+#include <qstringlist.h>
+#include <qwaitcondition.h>
 
+class TVRec;
 class DVBChannel;
 class DVBSIParser;
 class EITHelper;
@@ -19,15 +23,20 @@ class EITScanner : public QObject
     Q_OBJECT
   public:
     EITScanner();
-    ~EITScanner();
+    ~EITScanner() { TeardownAll(); }
 
     void StartPassiveScan(DVBChannel*, DVBSIParser*);
     void StopPassiveScan(void);
 
+    void StartActiveScan(TVRec*, uint max_seconds_per_source);
+    void StopActiveScan(void);        
+
   public slots:
     void SetPMTObject(const PMTObject*);
+    void deleteLater(void);
 
   private:
+    void TeardownAll(void);
     void RunEventLoop(void);
     static void *SpawnEventLoop(void*);
 
@@ -36,6 +45,14 @@ class EITScanner : public QObject
     EITHelper       *eitHelper;
     pthread_t        eventThread;
     bool             exitThread;
+    QWaitCondition   exitThreadCond;
+
+    TVRec           *rec;
+    bool             activeScan;
+    QDateTime        activeScanNextTrig;
+    uint             activeScanTrigTime;
+    QStringList      activeScanChannels;
+    QStringList::iterator activeScanNextChan;
 };
 
 #endif // EITSCANNER_H
