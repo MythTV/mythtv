@@ -1410,7 +1410,8 @@ int RingBuffer::Write(const void *buf, int count)
 
 void RingBuffer::Sync(void)
 {
-    tfw->Sync();
+    if (tfw)
+        tfw->Sync();
 }
 
 long long RingBuffer::GetFileWritePosition(void)
