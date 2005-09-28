@@ -3731,7 +3731,7 @@ QString TVRec::FlagToString(uint f)
 
     // General flags
     if (kFlagFrontendReady & f)
-        msg += "FrontendReady";
+        msg += "FrontendReady,";
     if (kFlagRunMainLoop & f)
         msg += "RunMainLoop,";
     if (kFlagExitPlayer & f)
