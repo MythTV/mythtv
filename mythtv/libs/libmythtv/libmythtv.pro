@@ -195,10 +195,10 @@ using_backend {
     SOURCES += siscan.cpp                  frequencytables.cpp
 
     # TVRec & Recorder base classes
-    HEADERS += tv_rec.h                    RingBufferInfo.h
+    HEADERS += tv_rec.h
     HEADERS += recorderbase.h
     HEADERS += dtvrecorder.h               dummydtvrecorder.h
-    SOURCES += tv_rec.cpp                  RingBufferInfo.cpp
+    SOURCES += tv_rec.cpp
     SOURCES += recorderbase.cpp
     SOURCES += dtvrecorder.cpp             dummydtvrecorder.cpp
 

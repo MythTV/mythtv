@@ -15,7 +15,7 @@
 #include "tv.h"
 
 class QSocket;
-class RingBufferInfo;
+class RingBuffer;
 class NuppelVideoRecorder;
 class EITScanner;
 class DVBSIParser;
@@ -263,6 +263,7 @@ class TVRec : public QObject
     static void *RecorderThread(void *param);
 
   private:
+    void SetRingBuffer(RingBuffer*);
     void TeardownAll(void);
 
     void GetChannelInfo(ChannelBase *chan,  QString &title,
@@ -329,7 +330,6 @@ class TVRec : public QObject
     void SetOption(RecordingProfile &profile, const QString &name);
 
     // Various components TVRec coordinates
-    RingBufferInfo   *rbi;
     RecorderBase     *recorder;
     ChannelBase      *channel;
     SignalMonitor    *signalMonitor;
@@ -389,6 +389,18 @@ class TVRec : public QObject
     ProgramInfo *pendingRecording;
     QDateTime    recordPendingStart;
 
+    // RingBuffer info
+    RingBuffer    *ringBuffer;
+    QString        rbFileName;
+    QString        rbFileExt;
+
+    // Data Socket stuff for streaming
+    QSocket       *rbStreamingSock;
+    char          *rbStreamingBuffer;
+    bool           rbStreamingLive;
+
+    static const uint kStreamedFileReadTimeout;
+    static const uint kRequestBufferSize;
     static const uint kEITScanTimeout;
 
     // General State flags
