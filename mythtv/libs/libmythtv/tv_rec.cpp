@@ -3364,7 +3364,9 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     }
 
     // Request a recorder, unless this is for an EIT Scan
-    if (!(request.flags & kFlagEITScan))
+    if (request.flags & kFlagEITScan)
+        ClearFlags(kFlagNeedToStartRecorder);
+    else
         SetFlags(kFlagNeedToStartRecorder);
 }
 
@@ -3526,7 +3528,7 @@ void TVRec::TuningNewRecorder(void)
         ClearFlags(kFlagDummyRecorderRunning); 
     }
 
-    if (!SetupRecorder(profile))
+    if (!rbi->GetRingBuffer() || !SetupRecorder(profile))
     {
         VERBOSE(VB_IMPORTANT, LOC + QString(
                     "Failed to start recorder!\n"
