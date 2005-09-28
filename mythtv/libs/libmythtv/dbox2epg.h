@@ -7,9 +7,7 @@
 #ifndef DBOX2EPG_H_
 #define DBOX2EPG_H_
 
-#include <map>
-using namespace std;
-
+#include <qmap.h>
 #include <qhttp.h>
 #include <qobject.h>
 #include <qthread.h>
@@ -23,43 +21,54 @@ class DBox2Channel;
 class DBox2EPG : public QObject, public QThread
 {
     Q_OBJECT
-    public:
-        DBox2EPG();
-        ~DBox2EPG();
-	void Init(DBox2DBOptions* dbox2_options, int cardid, 
-                  DBox2Channel* channel);
-	void RequestEPG(const QString& channelNumber);
-	void ScheduleRequestEPG(const QString& channelNumber);
-	void Shutdown();
+  public:
+    DBox2EPG();
+    ~DBox2EPG();
+    void TeardownAll(void);
 
-    public slots:
-        void httpRequestFinished(int requestID, bool error);
+    void Init(DBox2DBOptions* dbox2_options, int cardid, 
+              DBox2Channel* channel);
+    void RequestEPG(const QString& channelNumber);
+    void ScheduleRequestEPG(const QString& channelNumber);
+    void Shutdown();
 
-    signals:
-        void EPGFinished();
+  public slots:
+    void httpRequestFinished(int requestID, bool error);
+    void deleteLater(void);
 
-    private:
-	bool ReadChannels(int cardid);
-	void UpdateDataBase(QString* chanID, QDateTime* startTime, QDateTime* endTime, QString* title, QString *description, QString *category);
-	QString DBox2EPG::ParseNextLine(QByteArray buffer, int* index, int size);
-	QString GetChannelID(const QString& channelnumber) ;
-	bool UseOnAirGuide(uint chanid);
-	void run();
+  signals:
+    void EPGFinished();
 
-        QHttp* http;
-	DBox2DBOptions* m_dbox2options;
-	DBox2Channel* m_dbox2channel;
-	int m_cardid;
-	int m_channelCount;
-	int m_channelIndex;
-	map<int, QString> m_channelnumbers;
-	bool m_isRunning;
-	bool m_inProgress;
-	bool m_pendingRequest;
-	QString m_requestedChannel;
-	QString m_currentEPGRequestChannel;
-	int m_currentEPGRequestID;
+  private:
+    void UpdateDB(uint chanid,
+                  const QDateTime &startTime,
+                  const QDateTime &endTime,
+                  const QString &title,
+                  const QString &description,
+                  const QString &category);
 
+    static QString ParseNextLine(
+        const QByteArray &buffer, int &pos, int size);
+    static bool UseOnAirGuide(uint chanid);
+
+    int  GetChannelID(const QString& channelnumber);
+    void run();
+
+    QHttp             *http;
+    DBox2DBOptions    *m_dbox2options;
+    DBox2Channel      *m_dbox2channel;
+    QMap<int,QString>  m_channelnumbers;
+
+    int     m_cardid;
+    int     m_channelCount;
+    int     m_channelIndex;
+    bool    m_isRunning;
+    bool    m_inProgress;
+    bool    m_pendingRequest;
+    QString m_requestedChannel;
+
+    QString m_currentEPGRequestChannel;
+    int     m_currentEPGRequestID;
 };
 
 
