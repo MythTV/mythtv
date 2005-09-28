@@ -432,8 +432,11 @@ class TVRec : public QObject
 
     static const uint kFlagDummyRecorderRunning = 0x10000000;
     static const uint kFlagRecorderRunning      = 0x20000000;
-    static const uint kFlagAnyRecRunning        = 0xF0000000;
-    static const uint kFlagAnyRunning           = 0xFF000000;
+    static const uint kFlagAnyRecRunning        = 0x30000000;
+    static const uint kFlagAnyRunning           = 0x3F000000;
+
+    // Tuning state
+    static const uint kFlagRingBufferReset      = 0x40000000;
 };
 
 #endif

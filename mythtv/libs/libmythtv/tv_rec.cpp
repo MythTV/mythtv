@@ -67,7 +67,7 @@ using namespace std;
 #define LOC QString("TVRec(%1): ").arg(cardid)
 #define LOC_ERR QString("TVRec(%1) Error: ").arg(cardid)
 
-/// How many seconds after entering kState_Null should we start EIT Scanner
+/// How many seconds after entering kState_None should we start EIT Scanner
 const uint TVRec::kEITScanTimeout = 30;
 
 /** \class TVRec
@@ -2802,8 +2802,11 @@ int TVRec::ChangeHue(bool direction)
 void TVRec::SetChannel(QString name)
 {
     QMutexLocker lock(&stateChangeLock);
+    ClearFlags(kFlagRingBufferReset);
     tuningRequests.enqueue(TuningRequest(kFlagLiveTV, name));
-    WaitForEventThreadSleep();
+    // Wait for RingBuffer reset
+    while (!HasFlags(kFlagRingBufferReset))
+        WaitForEventThreadSleep();
 }
 
 /** \fn TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
@@ -3145,6 +3148,7 @@ void TVRec::HandleTuning(void)
         ClearFlags(kFlagWaitingForRecPause);
         if (rbi->GetRingBuffer())
             rbi->GetRingBuffer()->Reset();
+        SetFlags(kFlagRingBufferReset);
         TuningFrequency(lastTuningRequest);
     }
 
@@ -3195,6 +3199,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
             GetDVBRecorder()->Close();
         if (rbi->GetRingBuffer())
             rbi->GetRingBuffer()->Reset();
+        SetFlags(kFlagRingBufferReset);
     }
     ClearFlags(kFlagWaitingForSIParser | kFlagSIParserRunning);
     // At this point the SIParser is shut down, the 
@@ -3295,9 +3300,12 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to set channel to " << channum
-                << "\n\t\t\tReverting to null state");
-        ChangeState(kState_None);
+        VERBOSE(VB_IMPORTANT, LOC + "Failed to set channel to "
+                << channum << ". Reverting to kState_None");
+        if (kState_None != internalState)
+            ChangeState(kState_None);
+        else
+            tuningRequests.enqueue(TuningRequest(kFlagKillRec));
         return;
     }
 
