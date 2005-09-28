@@ -487,6 +487,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     ClearFlags(kFlagCancelNextRecording);
 
+    WaitForEventThreadSleep();
+
     return retval;
 }
 
@@ -2801,7 +2803,7 @@ void TVRec::SetChannel(QString name)
 {
     QMutexLocker lock(&stateChangeLock);
     tuningRequests.enqueue(TuningRequest(kFlagLiveTV, name));
-    triggerEventLoop.wakeAll();
+    WaitForEventThreadSleep();
 }
 
 /** \fn TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
@@ -3111,8 +3113,6 @@ void TVRec::StoreInputChannels(const QMap<int, QString> &inputChannel)
  */
 void TVRec::HandleTuning(void)
 {
-    QMutexLocker lock(&stateChangeLock);
-
     if (tuningRequests.size())
     {
         const TuningRequest *request = &tuningRequests.front();
@@ -3529,14 +3529,21 @@ void TVRec::TuningNewRecorder(void)
         return;
     }
 
-    SetFlags(kFlagRecorderRunning);
     recorder->SetRecording(lastTuningRequest.program);
     if (GetV4LChannel())
         CloseChannel();
     pthread_create(&recorder_thread, NULL, TVRec::RecorderThread, recorder);
+
+    // Wait for recorder to start.
+    stateChangeLock.unlock();
+    while (!recorder->IsRecording() && !recorder->IsErrored())
+        usleep(5 * 1000);
+    stateChangeLock.lock();
+
     if (GetV4LChannel())
         channel->SetFd(recorder->GetVideoFd());
 
+    SetFlags(kFlagRecorderRunning);
     if (lastTuningRequest.flags & kFlagRecording)
         StartedRecording(lastTuningRequest.program);
 

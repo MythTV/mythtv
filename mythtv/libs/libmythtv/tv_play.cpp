@@ -1226,6 +1226,10 @@ void *TV::EventThread(void *param)
     return NULL;
 }
 
+#define END_TIME(X) \
+    if (t.elapsed() > 200) \
+        VERBOSE(VB_RECORD, "Took "<<t.elapsed()<<" ms to "<<X<<"!")
+
 void TV::RunTV(void)
 { 
     paused = false;
@@ -1270,13 +1274,17 @@ void TV::RunTV(void)
     runMainLoop = true;
     exitPlayer = false;
 
+    MythTimer t;
+
     while (runMainLoop)
     {
         stateLock.lock();
         bool doHandle = nextStates.size() > 0;
         stateLock.unlock();
+        t.start();
         if (doHandle)
             HandleStateChange();
+        END_TIME("handle state change"); t.start();
 
         if (osdlock.tryLock())
         {
@@ -1287,8 +1295,7 @@ void TV::RunTV(void)
             }
             osdlock.unlock();
         }
-
-        usleep(1000);
+        END_TIME("update signal OSD"); t.start();
 
         if (getRecorderPlaybackInfo)
         {
@@ -1309,26 +1316,26 @@ void TV::RunTV(void)
 
             getRecorderPlaybackInfo = false;
         }
+        END_TIME("get playback info"); t.start();
 
-        if (nvp)
-        {
-            if (keyList.count() > 0)
-            { 
-                keyListLock.lock();
-                keypressed = keyList.first();
-                keyList.removeFirst();
-                keyListLock.unlock();
+        if (nvp && (keyList.count() > 0))
+        { 
+            keyListLock.lock();
+            keypressed = keyList.first();
+            keyList.removeFirst();
+            keyListLock.unlock();
 
-                ProcessKeypress(keypressed);
-                delete keypressed;
-            }
+            ProcessKeypress(keypressed);
+            delete keypressed;
         }
+        END_TIME("processing keys"); t.start();
 
         if ((recorder && recorder->GetErrorStatus()) || IsErrored())
         {
             exitPlayer = true;
             wantsToQuit = false;
         }
+        END_TIME("handle state change"); t.start();
 
         if (StateIsPlaying(internalState))
         {
@@ -1347,6 +1354,7 @@ void TV::RunTV(void)
                 VERBOSE(VB_PLAYBACK, ">> Player timeout");
             }
         }
+        END_TIME("abort playback"); t.start();
 
         if (exitPlayer)
         {
@@ -1359,6 +1367,7 @@ void TV::RunTV(void)
             ChangeState(kState_None);
             exitPlayer = false;
         }
+        END_TIME("exit player"); t.start();
 
         if ((doing_ff_rew || speed_index) && 
             activenvp && activenvp->AtNormalSpeed())
@@ -1368,6 +1377,7 @@ void TV::RunTV(void)
             ff_rew_index = kInitFFRWSpeed;
             UpdatePosOSD(0.0, PlayMesg());
         }
+        END_TIME("change playback speed"); t.start();
 
         if (activenvp && (activenvp->GetNextPlaySpeed() != normal_speed) &&
             activenvp->AtNormalSpeed() && !activenvp->PlayingSlowForPrebuffer())
@@ -1375,6 +1385,7 @@ void TV::RunTV(void)
             normal_speed = 1.0;     // got changed in nvp due to close to end of file
             UpdatePosOSD(0.0, PlayMesg());
         }
+        END_TIME("update playback speed OSD"); t.start();
 
         if (++updatecheck >= 20)
         {
@@ -1391,6 +1402,7 @@ void TV::RunTV(void)
 
             updatecheck = 0;
         }
+        END_TIME("handle state change"); t.start();
 
         if (channelqueued && GetOSD())
         {
@@ -1403,6 +1415,7 @@ void TV::RunTV(void)
                     ChannelClear();
             }
         }
+        END_TIME("update channel change OSD"); t.start();
 
         if (class LCD * lcd = LCD::Get())
         {
@@ -1425,6 +1438,9 @@ void TV::RunTV(void)
 
             lastLcdUpdate = QDateTime::currentDateTime();
         }
+        END_TIME("update OSD");
+
+        usleep(1000); // yield...
     }
   
     if (!IsErrored() && (GetState() != kState_None))
