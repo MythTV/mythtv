@@ -201,6 +201,7 @@ TV::TV(void)
       // Channel changing state variables
       channelqueued(false), channelKeys(""), lookForChannel(false),
       lastCC(""), lastCCDir(0), muteTimer(new QTimer(this)),
+      lockTimerOn(false), lockTimeout(3000),
       // previous channel functionality state variables
       prevChanKeyCnt(0), prevChanTimer(new QTimer(this)),
       // channel browsing state variables
@@ -715,6 +716,7 @@ void TV::HandleStateChange(void)
         }
         else
         {
+            lockTimerOn = false;
             prbuffer = new RingBuffer(name, filesize, smudge, recorder);
 
             SET_NEXT();
@@ -738,6 +740,11 @@ void TV::HandleStateChange(void)
                 DeleteRecorder();
 
                 SET_LAST();
+            }
+            else
+            {
+                lockTimer.start();
+                lockTimerOn = true;
             }
         }
     }
@@ -937,6 +944,19 @@ bool TV::StartRecorder(int maxWait)
     VERBOSE(VB_RECORD, "TV::StartRecorder: took "<<t.elapsed()
             <<" ms to start recorder.");
 
+    // Get timeout for this recorder
+    lockTimeout = 3000;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT channel_timeout "
+                  "FROM capturecard "
+                  "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", recorder->GetRecorderNumber());
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Getting timeout", query);
+    else if (query.next())
+        lockTimeout = max(query.value(0).toInt(), 500);
+
+    // Cache starting frame rate for this recorder
     frameRate = recorder->GetFrameRate();
     return true;
 }
@@ -1170,6 +1190,7 @@ void TV::TeardownPlayer(void)
             vs->Stop();
         pthread_join(decode, NULL);
         delete nvp;
+        nvp = NULL;
     }
 
     if (udpnotify)
@@ -1285,6 +1306,7 @@ void TV::RunTV(void)
                 UpdateOSDSignal(lastSignalMsg);
                 lastSignalMsg.clear();
             }
+            UpdateOSDTimeoutMessage();
             osdlock.unlock();
         }
 
@@ -1710,6 +1732,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
                         StopLiveTV();
                     else if (result == 3)
                         recorder->CancelNextRecording();
+                }
+                else if (dialogname == "channel_timed_out")
+                {
+                    lockTimerOn = false;
                 }
 
                 while (GetOSD()->DialogShowing(dialogname))
@@ -3266,6 +3292,56 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
 
     lastSignalMsg.clear();
     lastSignalMsgTime.start();
+
+    // Turn of lock timer since we have a signal lock now...
+    if (allGood)
+        lockTimerOn = false;
+}
+
+void TV::UpdateOSDTimeoutMessage(void)
+{
+    QString dlg_name("channel_timed_out");
+    bool timed_out = lockTimerOn && (lockTimer.elapsed() > (int)lockTimeout);
+    OSD *osd = GetOSD();
+
+    if (!osd)
+    {
+        if (timed_out)
+        {
+            VERBOSE(VB_IMPORTANT, "Error: You have no OSD, "
+                    "but tuning has already taken too long.");
+        }
+        return;
+    }
+
+    if (!timed_out)
+    {
+        if (osd->DialogShowing(dlg_name))
+            osd->TurnDialogOff(dlg_name);
+        return;
+    }
+
+    if (osd->DialogShowing(dlg_name))
+        return;
+
+    // create dialog...
+    static QString chan_up   = GET_KEY("TV Playback", "CHANNELUP");
+    static QString chan_down = GET_KEY("TV Playback", "CHANNELDOWN");
+    static QString tog_in    = GET_KEY("TV Playback", "TOGGLEINPUTS");
+    static QString tog_cards = GET_KEY("TV Playback", "SWITCHCARDS");
+
+    QString message = tr(
+        "You should have gotten a channel lock by now. "
+        "You can continue to wait for a signal, or you "
+        "can change the channels with %1 or %2, change "
+        "input's (%3), capture cards (%4), etc.")
+        .arg(chan_up).arg(chan_down).arg(tog_in).arg(tog_cards);
+
+    QStringList options;
+    options += tr("OK");
+
+    dialogname = dlg_name;
+    osd->NewDialogBox(dialogname, message, options, 0);
 }
 
 void TV::UpdateLCD(void)
@@ -4943,6 +5019,7 @@ void TV::ShowNoRecorderDialog(void)
 void TV::PauseLiveTV(void)
 {
     VERBOSE(VB_PLAYBACK, "PauseLiveTV()");
+    lockTimerOn = false;
 
     if (activenvp)
         activenvp->Pause(false);
@@ -4991,4 +5068,7 @@ void TV::UnpauseLiveTV(void)
         lastSignalMsg.clear();
         lastSignalUIInfo.clear();
     }
+
+    lockTimer.start();
+    lockTimerOn = true;
 }

@@ -216,6 +216,7 @@ class TV : public QObject
     void UpdateOSD(void);
     void UpdateOSDInput(void);
     void UpdateOSDSignal(const QStringList& strlist);
+    void UpdateOSDTimeoutMessage(void);
 
     void LoadMenu(void);
 
@@ -345,6 +346,11 @@ class TV : public QObject
     QString lastCC;         ///< Last channel
     int     lastCCDir;      ///< Last channel changing direction
     QTimer *muteTimer;      ///< For temp. audio muting during channel changes
+
+    // Channel changing timeout notification variables
+    QTime   lockTimer;
+    bool    lockTimerOn;
+    uint    lockTimeout;
 
     // Previous channel functionality state variables
     str_vec_t prevChan;       ///< Previous channels

@@ -59,6 +59,7 @@ class ExitToMainMenuEvent : public QCustomEvent
 };
 
 #define REG_KEY(a, b, c, d) gContext->GetMainWindow()->RegisterKey(a, b, c, d)
+#define GET_KEY(a, b) gContext->GetMainWindow()->GetKey(a, b)
 #define REG_JUMP(a, b, c, d) gContext->GetMainWindow()->RegisterJump(a, b, c, d)
 #define REG_MEDIA_HANDLER(a, b, c, d, e) gContext->GetMainWindow()->RegisterMediaHandler(a, b, c, d, e)
 #define REG_MEDIAPLAYER(a,b,c) gContext->GetMainWindow()->RegisterMediaPlugin(a, b, c)
@@ -90,6 +91,7 @@ class MythMainWindow : public QDialog
 		 const QString &key);
     void RegisterKey(const QString &context, const QString &action,
                      const QString &description, const QString &key);
+    QString GetKey(const QString &context, const QString &action) const;
 
     void ClearJump(const QString &destination);
     void BindJump(const QString &destination, const QString &key);

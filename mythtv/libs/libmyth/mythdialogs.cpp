@@ -538,6 +538,28 @@ void MythMainWindow::RegisterKey(const QString &context, const QString &action,
     BindKey(context, action, keybind);
 }
 
+QString MythMainWindow::GetKey(const QString &context,
+                               const QString &action) const
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (!query.isConnected())
+        return "?";
+
+    query.prepare("SELECT keylist "
+                  "FROM keybindings "
+                  "WHERE context  = :CONTEXT AND "
+                  "      action   = :ACTION  AND "
+                  "      hostname = :HOSTNAME");
+    query.bindValue(":CONTEXT", context);
+    query.bindValue(":ACTION", action);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+
+    if (!query.exec() || !query.isActive() || !query.next())
+        return "?";
+
+    return query.value(0).toString();
+}
+
 void MythMainWindow::ClearJump(const QString &destination)
 {
     /* make sure that the jump point exists (using [] would add it)*/
