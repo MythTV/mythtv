@@ -31,6 +31,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
 
 MPEGStreamData::~MPEGStreamData()
 {
+    Reset(-1);
     SetPATSingleProgram(0);
     SetPMTSingleProgram(0);
 }
