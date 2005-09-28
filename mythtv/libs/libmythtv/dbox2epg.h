@@ -43,6 +43,7 @@ class DBox2EPG : public QObject, public QThread
 	void UpdateDataBase(QString* chanID, QDateTime* startTime, QDateTime* endTime, QString* title, QString *description, QString *category);
 	QString DBox2EPG::ParseNextLine(QByteArray buffer, int* index, int size);
 	QString GetChannelID(const QString& channelnumber) ;
+	bool UseOnAirGuide(uint chanid);
 	void run();
 
         QHttp* http;

@@ -68,8 +68,20 @@ void DBox2EPG::run()
         // Wait before processing
 	usleep(waitTime);
 
-	RequestEPG(m_requestedChannel);
-	m_pendingRequest = false;
+        uint chanid = (uint) GetChannelID(m_requestedChannel).toInt();
+
+	// Only grab the EPG for this channel if useonairguide is set to 1
+	if (UseOnAirGuide(chanid))
+        {
+            RequestEPG(m_requestedChannel);
+            m_pendingRequest = false;
+        }
+	else
+        {
+            VERBOSE(VB_RECORD, QString("DBOXEPG#%1: EPG disabled for %1.")
+                    .arg(m_cardid).arg(m_requestedChannel));
+            EPGFinished();
+        }
     }
 #ifdef DEBUG_DBOX2EPG
     VERBOSE(VB_IMPORTANT, QString("DBOXEPG#%1: Exiting Thread....").arg(m_cardid));
@@ -246,3 +258,23 @@ QString DBox2EPG::GetChannelID(const QString& channelnumber)
     return "";
 }
 
+/** \fn DBox2EPG::UseOnAirGuide(uint)
+ *  \brief Returns use on air guide status of channel
+ *  \param chanid Channel ID of channel.
+ */
+bool DBox2EPG::UseOnAirGuide(uint chanid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare(
+        "SELECT useonairguide "
+        "FROM channel "
+        "WHERE chanid = :CHANID");
+
+    query.bindValue(":CHANID", chanid);
+
+    if (query.exec() && query.isActive() && query.next())
+        return (bool) query.value(0).toInt();
+
+    return false;
+}
