@@ -47,7 +47,8 @@ class RingBufferInfo
 
     // Commands
     void UnlinkRingBufferFile(void)
-        { unlink(GetFilename().ascii()); SetFilename(""); }
+        { if (!GetFilename().isEmpty()) unlink(GetFilename().ascii());
+          SetFilename(""); }
     int  RequestBlock(uint size);
     long long Seek(long long curpos, long long pos, int whence);
 

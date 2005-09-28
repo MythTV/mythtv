@@ -67,6 +67,9 @@ using namespace std;
 #define LOC QString("TVRec(%1): ").arg(cardid)
 #define LOC_ERR QString("TVRec(%1) Error: ").arg(cardid)
 
+/// How many seconds after entering kState_Null should we start EIT Scanner
+const uint TVRec::kEITScanTimeout = 30;
+
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
  *
@@ -106,10 +109,7 @@ TVRec::TVRec(int capturecardnum)
       // State variables
       stateChangeLock(true),
       internalState(kState_None), desiredNextState(kState_None),
-      changeState(false),
-      startingRecording(false), abortRecordingStart(false),
-      waitingForSignal(false), waitingForDVBTables(false),
-      prematurelystopped(false), stateFlags(0),
+      changeState(false), stateFlags(0), lastTuningRequest(0),
       // Current recording info
       curRecording(NULL), autoRunJobs(JOB_NONE),
       inoverrecord(false), overrecordseconds(0),
@@ -152,8 +152,6 @@ bool TVRec::Init(void)
         InitChannel(genOpt.defaultinput, startchannel);
         connect(GetDVBChannel(), SIGNAL(UpdatePMTObject(const PMTObject*)),
                 this, SLOT(SetPMTObject(const PMTObject*)));
-        StartChannel(false);
-        usleep(500);    // Give DVBCam some breathing room
         CloseChannel(); // Close the channel if in dvb_on_demand mode
         init_run = true;
 #endif
@@ -607,292 +605,7 @@ void TVRec::FinishedRecording(ProgramInfo *curRecording)
                  .arg(curRecording->recendts.toString(Qt::ISODate)));
     gContext->dispatch(me);
 
-    curRecording->FinishedRecording(prematurelystopped);
-}
-
-bool TVRec::CreateRecorderThread()
-{
-    pthread_create(&recorder_thread, NULL, TVRec::RecorderThread, recorder);
-
-    VERBOSE(VB_IMPORTANT, LOC + "Waiting for recorder to start");
-    while (!recorder->IsRecording() && !recorder->IsErrored())
-        usleep(50);
-    if (recorder->IsRecording())
-        VERBOSE(VB_IMPORTANT, LOC + "Recorder started");
-    else
-        VERBOSE(VB_IMPORTANT, LOC + "Error encountered starting recorder");
-    return recorder->IsRecording();
-}
-
-static void load_recording_profile(
-    RecordingProfile &profile, ProgramInfo *rec, int cardid)
-{
-    QString profileName = "Live TV";
-    bool done = false;
-
-    if (rec)
-    {
-        profileName = rec->GetScheduledRecording()->getProfileName();
-        if (!profileName.isEmpty())
-            done = profile.loadByCard(profileName, cardid);
-        profileName = (done) ? profileName : QString("Default");
-    }
-
-    if (!done)
-        profile.loadByCard(profileName, cardid);
-
-    QString msg = QString("Using profile '%1' to record").arg(profileName);
-    VERBOSE(VB_RECORD, LOC + msg);
-}
-
-static void init_jobs(ProgramInfo *curRecording,
-                      int &autoRunJobs)
-{
-    JobQueue::ClearJobMask(autoRunJobs);
-
-    if (!curRecording)
-        return;
-
-    JobQueue::AddJobsToMask(curRecording->GetAutoRunJobs(), autoRunJobs);
-
-    if (curRecording->chancommfree)
-        JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
-}
-
-static void enable_auto_transcode(RecordingProfile &profile,
-                                  ProgramInfo *curRecording,
-                                  int &autoRunJobs)
-{
-    if (!curRecording)
-        return;
-
-    // Make sure transcoding is OFF if the profile does not allow
-    // AutoTranscoding.
-    Setting *profileAutoTranscode = profile.byName("autotranscode");
-    if ((!profileAutoTranscode) ||
-        (profileAutoTranscode->getValue().toInt() == 0))
-        JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, autoRunJobs);
-}
-
-static void enable_realtime_commflag(ProgramInfo *curRecording,
-                                     int &autoRunJobs,
-                                     bool runJobOnHostOnly,
-                                     bool transcodeFirst,
-                                     bool earlyCommFlag)
-{
-    if (!curRecording)
-        return;
-
-    bool autocommflag = JobQueue::JobIsInMask(JOB_COMMFLAG, autoRunJobs) &&
-        earlyCommFlag;
-    bool commflagfirst = JobQueue::JobIsNotInMask(JOB_TRANSCODE, autoRunJobs) ||
-        !transcodeFirst;
-
-    if (autocommflag && commflagfirst)
-    {
-        JobQueue::QueueJob(
-            JOB_COMMFLAG, curRecording->chanid,
-            curRecording->recstartts, "", "",
-            (runJobOnHostOnly) ? gContext->GetHostName() : "",
-            JOB_LIVE_REC);
-
-        JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
-    }
-}
-
-static bool wait_for_dvb(ChannelBase *channel, int timeout,
-                         bool &abortRecordingStart)
-{
-    (void) channel;
-    (void) timeout;
-    (void) abortRecordingStart;
-#ifdef USING_DVB
-    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-    if (!dvbc)
-        return true;
-
-    VERBOSE(VB_RECORD, "TVRec: DVB Recorder waiting for PMT.");
-    MythTimer t;
-    t.start();
-    while (t.elapsed() < timeout && !abortRecordingStart)
-    {
-        usleep(50);
-        if (dvbc->IsPMTSet())
-        {
-            VERBOSE(VB_RECORD, "TVRec: DVB Recorder's PMT set.");
-            if (!dvbc->HasTelevisionService())
-            {
-                VERBOSE(VB_IMPORTANT, "TVRec: DVB Recorder's PMT "
-                        "does not have audio and video.");
-            }
-            return dvbc->HasTelevisionService();
-        }
-    }
-    VERBOSE(VB_IMPORTANT, "TVRec: DVB Recorder's PMT NOT SET.");
-    return false;
-#else // if !USING_DVB
-    return true;
-#endif // !USING_DVB
-}
-
-bool TVRec::StartRecorder(bool livetv)
-{
-    bool ok = true;
-    prematurelystopped = false;
-
-    RecordingProfile profile;
-    load_recording_profile(profile, curRecording, cardid);
-
-    init_jobs(curRecording, autoRunJobs);
-
-    if (!livetv)
-        enable_auto_transcode(profile, curRecording, autoRunJobs);
-
-    ok = SetupRecorder(profile);
-    if (!ok || IsErrored() || recorder->IsErrored())
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Error setting up recorder -- aborting");
-        if (livetv)
-        {
-            QString message = QString("QUIT_LIVETV %1").arg(cardid);
-            MythEvent me(message);
-            gContext->dispatch(me);
-        }
-        else
-        {
-            rbi->SetRingBuffer(NULL);
-        }
-        prematurelystopped = true;
-        TeardownRecorder(true);
-        ok = false;
-    }
- 
-    if (ok)
-    {
-        if (livetv && SignalMonitor::IsSupported(genOpt.cardtype))
-            ok = StartRecorderPostThread(livetv);
-        else
-            ok = StartRecorderPost(livetv);
-    }
-    return ok;
-}
-
-class srp
-{
-  public:
-    srp(TVRec *_rec, bool _livetv) : rec(_rec), livetv(_livetv) { ; }
-    TVRec *rec;
-    bool livetv;
-};
-
-void *TVRec::StartRecorderPostThunk(void *param)
-{
-    srp *p = (srp*) param;
-    p->rec->StartRecorderPost(p->livetv);
-    delete p;
-    return NULL;
-}
-
-bool TVRec::StartRecorderPostThread(bool livetv)
-{
-    startingRecording = true;
-
-    if (dummyRecorder && livetv)
-        dummyRecorder->StartRecordingThread();
-
-    // Handle rest in a seperate thread
-    pthread_create(&start_recorder_thread, NULL,
-                   StartRecorderPostThunk, new srp(this, livetv));
-    return true;
-}
-
-void TVRec::AbortStartRecorderThread()
-{
-    VERBOSE(VB_IMPORTANT, LOC + "HandleStateChange() "
-            "Abort starting recording -- begin");
-
-    abortRecordingStart = true;
-
-    while (startingRecording)
-        usleep(200);
-
-    abortRecordingStart = false;
-
-    VERBOSE(VB_IMPORTANT, LOC + "HandleStateChange() "
-            "Abort starting recording -- end");
-}
-
-bool TVRec::StartRecorderPost(bool livetv)
-{
-    recorder->SetRecording(curRecording);
-    bool ok = true;
-    if (channel)
-        ok = StartChannel(livetv);
-
-    if (ok)
-        ok = wait_for_dvb(channel,
-                          genOpt.channel_timeout - genOpt.signal_timeout,
-                          abortRecordingStart);
-
-    if (dummyRecorder)
-        dummyRecorder->StopRecordingThread();
-
-    if (ok && !CreateRecorderThread())
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "Failed to start recorder thread -- "
-                "aborting recording");
-        ok = false;
-    }
-
-    if (ok && !abortRecordingStart)
-    {
-#ifdef USING_V4L
-        // Evil
-        if (dynamic_cast<Channel*>(channel))
-            channel->SetFd(recorder->GetVideoFd());
-#endif // USING_V4L
-
-        // Start up real-time comm flag if we can
-        if (!livetv)
-            enable_realtime_commflag(
-                curRecording, autoRunJobs, runJobOnHostOnly,
-                transcodeFirst, earlyCommFlag);
-    }
-    else
-    {
-        QString common(LOC + "StartRecorderPost(): ");
-        if (abortRecordingStart)
-            VERBOSE(VB_IMPORTANT, common + "canceled");
-        else
-        {
-            VERBOSE(VB_IMPORTANT, common + "aborting recording");
-            if (livetv)
-            {
-                QString message = QString("QUIT_LIVETV %1").arg(cardid);
-                MythEvent me(message);
-                gContext->dispatch(me);
-            }
-        }
-        if (!livetv)
-        {
-            rbi->SetRingBuffer(NULL);
-        }
-
-        prematurelystopped = true;
-
-        VERBOSE(VB_RECORD, common + "closeRecorder -- begin");
-        TeardownSignalMonitor();
-        TeardownRecorder(true);
-        CloseChannel();
-        VERBOSE(VB_RECORD, common + "closeRecorder -- end");
-
-        stateChangeLock.lock();
-        internalState = kState_None;
-        stateChangeLock.unlock();
-    }
-
-    startingRecording = false;
-    return ok;
+    curRecording->FinishedRecording(false);
 }
 
 #define TRANSITION(ASTATE,BSTATE) \
@@ -909,19 +622,9 @@ bool TVRec::StartRecorderPost(bool livetv)
  */
 void TVRec::HandleStateChange(void)
 {
-    if (startingRecording)
-    {
-        stateChangeLock.unlock();
-        AbortStartRecorderThread();
-        stateChangeLock.lock();
-    }
-
     TVState nextState = internalState;
 
     bool changed = false;
-    bool startRecorder = false;
-    bool closeRecorder = false;
-    bool killRecordingFile = false;
 
     QString transMsg = QString(" %1 to %2")
         .arg(StateToString(nextState))
@@ -935,121 +638,50 @@ void TVRec::HandleStateChange(void)
         return;
     }
 
-    if (desiredNextState == kState_Error)
+    // Make sure EIT scan is stopped before any tuning,
+    // to avoid race condition with it's tuning requests.
+    if (HasFlags(kFlagEITScannerRunning))
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
-                "Attempting to set to an error state.");
-        SetFlags(kFlagErrored);
-        return;
-    }
-
-    if (desiredNextState == kState_None)
-    {
-        if (waitingForSignal)
-        {
-            SetSignalMonitoringRate(0, 0);
-            StopDummyRecorder();
-            recorder->Unpause();
-            rbi->Unpause();
-            if (!dvbOpt.dvb_on_demand)
-            {
-                CreateSIParser(-1);
-                usleep(500);    // Give DVBCam some breathing room
-            }
-        }
-        if (waitingForDVBTables)
-        {
-            StopDummyRecorder();
-            recorder->Unpause();
-            rbi->Unpause();
-            if (dvbOpt.dvb_on_demand)
-                TeardownSIParser();
-        }
+#ifdef USING_DVB_EIT
+        scanner->StopActiveScan();
+#endif // USING_DVB_EIT
+        ClearFlags(kFlagEITScannerRunning);
     }
 
     // Handle different state transitions
     if (TRANSITION(kState_None, kState_WatchingLiveTV))
     {
-        startRecorder = true;
+        tuningRequests.enqueue(TuningRequest(kFlagLiveTV));
         SET_NEXT();
     }
     else if (TRANSITION(kState_WatchingLiveTV, kState_None))
     {
-        if (!waitingForSignal && channel)
-            channel->StoreInputChannels();
-
-        closeRecorder = true;
-        killRecordingFile = true;
+        tuningRequests.enqueue(TuningRequest(kFlagKillRec));
         SET_NEXT();
     }
     else if (TRANSITION(kState_None, kState_RecordingOnly))
     {
-        bool ok = true;
-        QString channum, input;
-        if (channel)
-        {
-            ok = curRecording->GetChannel(channum, input);
-            channel->Open();
-            if (ok)
-                ok = channel->SwitchToInput(input, channum);
-            CloseChannel();
-        }
-        if (ok)
-        {
-            rbi->SetRingBuffer(new RingBuffer(rbi->GetFilename(), true));
-            if (rbi->GetRingBuffer()->IsOpen())
-            {
-                StartedRecording(curRecording);
-                startRecorder = true;
-                SET_NEXT();
-            }
-            else
-            {
-                VERBOSE(VB_IMPORTANT, LOC + "Failed to open ringbuffer. "
-                        "Aborting new recording.");
-                rbi->SetRingBuffer(NULL);
-                SET_LAST();
-            }
-        }
-        else
-        {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    "Failed to set channel for recording. Aborting.");
-            SET_LAST();
-        }
+        tuningRequests.enqueue(TuningRequest(kFlagRecording, curRecording));
+        SET_NEXT();
     }
     else if (TRANSITION(kState_RecordingOnly, kState_None))
     {
-        FinishedRecording(curRecording);
-        closeRecorder = true;
-        inoverrecord = false;
-
+        tuningRequests.enqueue(TuningRequest(kFlagCloseRec));
         SET_NEXT();
     }
-    waitingForSignal    = false;
-    waitingForDVBTables = false;
 
     QString msg = (changed) ? "Changing from" : "Unknown state transition:";
     VERBOSE(VB_IMPORTANT, LOC + msg + transMsg);
  
-    // Handle starting the recorder
-    bool livetv = (nextState == kState_WatchingLiveTV);
-    if (startRecorder && !StartRecorder(livetv))
-        SET_LAST();
-
-    // Handle closing the recorder
-    if (closeRecorder)
-    {
-        VERBOSE(VB_RECORD, LOC + "HandleStateChange()::closeRecorder -- beg");
-        TeardownSignalMonitor();
-        TeardownRecorder(killRecordingFile);
-        CloseChannel();
-        VERBOSE(VB_RECORD, LOC + "HandleStateChange()::closeRecorder -- end");
-    }
-
     // update internal state variable
     internalState = nextState;
     changeState = false;
+
+    eitScanStartTime = QDateTime::currentDateTime();
+    if ((internalState == kState_None) && (genOpt.cardtype == "DVB"))
+        eitScanStartTime = eitScanStartTime.addSecs(kEITScanTimeout);
+    else
+        eitScanStartTime = eitScanStartTime.addYears(1);
 }
 #undef TRANSITION
 #undef SET_NEXT
@@ -1094,8 +726,6 @@ void TVRec::SetOption(RecordingProfile &profile, const QString &name)
  */
 bool TVRec::SetupRecorder(RecordingProfile &profile)
 {
-    bool use_dummy = SignalMonitor::IsSupported(genOpt.cardtype);
-    bool is_atsc   = false;
     recorder = NULL;
     if (genOpt.cardtype == "MPEG")
     {
@@ -1109,7 +739,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder = new HDTVRecorder();
         rbi->GetRingBuffer()->SetWriteBufferSize(4*1024*1024);
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
-        is_atsc = true;
 #endif // USING_V4L
     }
     else if (genOpt.cardtype == "FIREWIRE")
@@ -1142,15 +771,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOption("dmx_buf_size",      dvbOpt.dmx_buf_size);
         recorder->SetOption("pkt_buf_size",      dvbOpt.pkt_buf_size);
         recorder->SetOption("dvb_on_demand",     dvbOpt.dvb_on_demand);
-
-        use_dummy &= GetDVBRecorder()->RecordsTransportStream();
-#if (DVB_API_VERSION_MINOR == 1)
-        struct dvb_frontend_info info;
-        int fd_frontend = channel->GetFd();
-        if (fd_frontend >= 0 && (ioctl(fd_frontend, FE_GET_INFO, &info) >= 0))
-            is_atsc = (info.type == FE_ATSC);
-#endif // if (DVB_API_VERSION_MINOR == 1)
-
 #endif // USING_DVB
     }
     else
@@ -1160,18 +780,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder = new NuppelVideoRecorder(channel);
         recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
 #endif // USING_V4L
-    }
-
-    if (use_dummy)
-    {
-        if (!is_atsc)
-            dummyRecorder = new DummyDTVRecorder(
-                true, rbi->GetRingBuffer(), 768, 576, 50,
-                90, 30000000, false);
-        else
-            dummyRecorder = new DummyDTVRecorder(
-                true, rbi->GetRingBuffer(), 1920, 1088, 29.97,
-                90, 30000000, false);
     }
 
     if (recorder)
@@ -1237,12 +845,6 @@ void TVRec::TeardownRecorder(bool killFile)
         recorder = NULL;
     }
 
-    if (dummyRecorder)
-    {
-        dummyRecorder->deleteLater();
-        dummyRecorder = NULL;
-    }
-
     if (rbi->GetRingBuffer())
     {
         rbi->GetRingBuffer()->StopReads();
@@ -1255,7 +857,7 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (curRecording)
     {
-        if (autoRunJobs && !killFile && !prematurelystopped)
+        if (autoRunJobs && !killFile)
             JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
 
         delete curRecording;
@@ -1357,121 +959,6 @@ Channel *TVRec::GetV4LChannel(void)
 #endif // USING_V4L
 }
 
-
-static int get_max_timeout(SignalMonitor *signalMonitor, bool livetv)
-{
-    int timeout = 2000000000;
-    if (!livetv)
-    {
-        QStringList slist = signalMonitor->GetStatusList(false);
-        SignalMonitorList list = SignalMonitorValue::Parse(slist);
-        timeout = SignalMonitorValue::MaxWait(list);
-    }
-    return timeout;
-}
-
-static bool wait_for_good_signal(SignalMonitor *signalMonitor, int timeout,
-                                 bool &abortRecordingStart)
-{
-    MythTimer t;
-    t.start();
-    while (true)
-    {
-        if (signalMonitor->IsAllGood())
-            return true;
-
-        QStringList slist = signalMonitor->GetStatusList(false);
-        SignalMonitorList list = SignalMonitorValue::Parse(slist);
-        if ((t.elapsed() > timeout) || abortRecordingStart)
-        {
-            // BEGIN DEBUG CODE
-            if (print_verbose_messages & VB_CHANNEL)
-            {
-                QString flagStr = sm_flags_to_string(signalMonitor->GetFlags());
-                VERBOSE(VB_CHANNEL, "SigMon Flags are: "<<flagStr);
-                for (uint i = 0; i < list.size(); ++i)
-                {
-                    VERBOSE(VB_CHANNEL, "SML["<<i<<"]: "
-                            <<list.at(i).toString());
-                }
-            }
-            // END DEBUG CODE
-            return false;
-        }
-
-        usleep(20 * 1000);
-    }
-}
-
-static int get_program_number(SignalMonitor *sm)
-{
-    int progNum = -1;
-    DTVSignalMonitor* dtvSigMon = dynamic_cast<DTVSignalMonitor*>(sm);
-    if (dtvSigMon)
-        progNum = dtvSigMon->GetProgramNumber();
-    return progNum;
-}
-
-bool TVRec::StartChannel(bool livetv)
-{
-#ifdef USING_V4L
-    if (recorder)
-    {
-        HDTVRecorder *hdtvRec = dynamic_cast<HDTVRecorder*>(recorder);
-        if (hdtvRec)
-        {
-            hdtvRec->StreamData()->Reset(channel->GetMajorChannel(),
-                                         channel->GetMinorChannel());
-        }
-    }
-#endif // USING_V4L
-    int progNum = -1;
-
-    if (SignalMonitor::IsSupported(genOpt.cardtype))
-    {
-        SetSignalMonitoringRate(50, livetv);
-        if (signalMonitor)
-        {
-            int timeout = get_max_timeout(signalMonitor, livetv);
-            bool ok = wait_for_good_signal(signalMonitor, timeout, 
-                                           abortRecordingStart);
-            if (!ok)
-            {
-                VERBOSE(VB_IMPORTANT, LOC +
-                        ((abortRecordingStart) ?
-                         "StartChannel() -- canceled" :
-                         "Timed out waiting for lock -- aborting recording"));
-                SetSignalMonitoringRate(0, 0);
-                return false;
-            }
-            progNum = get_program_number(signalMonitor);
-        }
-        SetSignalMonitoringRate(0, 0);
-    }
-
-    SetVideoFiltersForChannel(channel, channel->GetCurrentName());
-#ifdef USING_DVB
-    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-    if (dvbc && recorder)
-    {
-        dvbc->SetPMT(NULL);
-        CreateSIParser(progNum);
-    }
-#endif // USING_DVB
-#ifdef USING_V4L
-    if (dynamic_cast<Channel*>(channel) && channel->Open())
-    {
-        channel->SetBrightness();
-        channel->SetContrast();
-        channel->SetColour();
-        channel->SetHue();
-        CloseChannel();
-    }
-#endif // USING_V4L
-
-    return true;
-}
-
 /** \fn TVRec::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *
@@ -1544,7 +1031,7 @@ void TVRec::CreateSIParser(int program_num)
             (program_num >= 0) ? program_num : service_id);
 
 #ifdef USING_DVB_EIT
-        if (!dvbOpt.dvb_on_demand)
+        if (scanner && (GetState() == kState_None))
             scanner->StartPassiveScan(dvbc, dvbsiparser);
 #endif // USING_DVB_EIT
     }
@@ -1587,36 +1074,6 @@ void *TVRec::RecorderThread(void *param)
     return NULL;
 }
 
-/** \fn TVRec::StartDummyRecorder(void)
- *  \brief Unpauses the RingBuffer and tells the dummy recorder to 
- *         begin stuffing bits into the Ringbuffer.
- */
-void TVRec::StartDummyRecorder(void)
-{
-    VERBOSE(VB_RECORD, LOC + "StartDummyRecorder() -- begin");
-    if (dummyRecorder)
-    {
-        dummyRecorder->StartRecordingThread();
-        rbi->Unpause();
-    }
-    VERBOSE(VB_RECORD, LOC + "StartDummyRecorder() -- end");
-}
-
-/** \fn TVRec::StopDummyRecorder(void)
- *  \brief Tells the dummy recorder to stop stuffing bits into the
- *         RingBuffer and then pauses the RingBuffer.
- */
-void TVRec::StopDummyRecorder(void)
-{
-    VERBOSE(VB_RECORD, LOC + "StopDummyRecorder() -- begin");
-    if (dummyRecorder)
-    {
-        dummyRecorder->StopRecordingThread();
-        rbi->Pause();
-    }
-    VERBOSE(VB_RECORD, LOC + "StopDummyRecorder() -- end");
-}
-
 /** \fn TVRec::RunTV()
  *  \brief Event handling method, contains event loop.
  */
@@ -1625,6 +1082,7 @@ void TVRec::RunTV(void)
     QMutexLocker lock(&stateChangeLock);
     SetFlags(kFlagRunMainLoop);
     ClearFlags(kFlagExitPlayer | kFlagFinishRecording);
+    eitScanStartTime = QDateTime::currentDateTime().addSecs(kEITScanTimeout);
 
     while (HasFlags(kFlagRunMainLoop))
     {
@@ -1646,45 +1104,9 @@ void TVRec::RunTV(void)
             ClearFlags(kFlagRunMainLoop);
             return;
         }
-        if (waitingForSignal)
-        {
-            if (signalMonitor->IsAllGood())
-            {
-                VERBOSE(VB_IMPORTANT, LOC + "Got good signal");
-                int progNum = get_program_number(signalMonitor);
-                SetSignalMonitoringRate(0, 0);
-#ifdef USING_DVB
-                if (genOpt.cardtype == "DVB")
-                {
-                    DVBChannel *dvbc = dynamic_cast<DVBChannel*>(channel);
-                    dvbc->SetPMT(NULL);
-                    CreateSIParser(progNum);
-                    waitingForDVBTables = true;
-                }
-                else
-#endif // USING_DVB
-                {
-                    StopDummyRecorder();
-                    recorder->Unpause();
-                    rbi->Unpause();
-                }
-                waitingForSignal = false;
-                continue;
-            }
-        }
-#ifdef USING_DVB
-        if (waitingForDVBTables)
-        {
-            if (GetDVBChannel()->IsPMTSet())
-            {
-                StopDummyRecorder();
-                recorder->Unpause();
-                recorder->Open();
-                rbi->Unpause();
-                waitingForDVBTables = false;
-            }
-        }
-#endif // USING_DVB
+
+        // Handle any tuning events..
+        HandleTuning();
 
         // If we have a pending recording and AskAllowRecording is set
         // and the frontend is ready send an ASK_RECORDING query to frontend.
@@ -1748,13 +1170,22 @@ void TVRec::RunTV(void)
             doSleep = false;
         }
 
+#ifdef USING_DVB_EIT
+        if (scanner && QDateTime::currentDateTime() > eitScanStartTime)
+        {
+            scanner->StartActiveScan(this, 60 /* max seconds per source */);
+            SetFlags(kFlagEITScannerRunning);
+            eitScanStartTime = QDateTime::currentDateTime().addYears(1);
+        }
+#endif // USING_DVB_EIT
+
         // We should be no more than a few thousand milliseconds,
         // as the end recording code does not have a trigger...
-        if (doSleep)
+        if (doSleep && tuningRequests.empty())
         {
             triggerEventSleep.wakeAll();
             lock.mutex()->unlock();
-            triggerEventLoop.wait(25 /* ms */);
+            triggerEventLoop.wait(30000 /* ms */);
             lock.mutex()->lock();
         }
     }
@@ -2209,19 +1640,10 @@ void TVRec::SetupSignalMonitor(void)
 
     if (SignalMonitor::IsSupported(genOpt.cardtype) && channel->Open())
     {
-#ifdef USING_DVB
-        VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor() -- DVB hack begin");
-        TeardownSIParser();
-        if (GetDVBRecorder())
-            GetDVBRecorder()->Close();
-        VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor() -- DVB hack end");
-#endif
-
         // TODO reset the tuner hardware
         //channel->SwitchToInput(channel->GetCurrentInputNum(), true);
 
-        signalMonitor =
-            SignalMonitor::Init(genOpt.cardtype, GetCaptureCardNum(), channel);
+        signalMonitor = SignalMonitor::Init(genOpt.cardtype, cardid, channel);
     }
     
     if (signalMonitor)
@@ -3185,14 +2607,10 @@ void TVRec::StopLiveTV(void)
         // Wait for state change to take effect...
         WaitForEventThreadSleep();
     }
-    if (GetState() == kState_None)
-    {
-        VERBOSE(VB_RECORD, LOC + "StopLiveTV()::closeRecorder -- begin");
-        TeardownSignalMonitor();
-        TeardownRecorder(true);
-        VERBOSE(VB_RECORD, LOC + "StopLiveTV()::closeRecorder -- end rbuffer("
-                <<rbi->GetRingBuffer()<<")");
-    }
+
+    // Tell tuner it is safe to shut down ring buffer.
+    tuningRequests.enqueue(TuningRequest(kFlagKillRingBuffer));
+    triggerEventLoop.wakeAll();
 }
 
 /** \fn TVRec::PauseRecorder()
@@ -3213,38 +2631,6 @@ void TVRec::PauseRecorder(void)
 
     recorder->Pause();
 } 
-
-/** \fn TVRec::ToggleInputs(void)
- *  \brief Toggles between inputs on current capture card.
- *
- *   You must call PauseRecorder() before calling this.
- */
-void TVRec::ToggleInputs(void)
-{
-    QMutexLocker lock(&stateChangeLock);
-
-    Pause();
-    if (channel)
-        channel->ToggleInputs();
-    Unpause();
-}
-
-/** \fn TVRec::ChangeChannel(ChannelChangeDirection)
- *  \brief Changes to a channel in the 'dir' channel change direction.
- *
- *   You must call PauseRecorder() before calling this.
- *
- *  \param dir channel change direction \sa ChannelChangeDirection.
- */
-void TVRec::ChangeChannel(ChannelChangeDirection dir)
-{
-    QMutexLocker lock(&stateChangeLock);
-
-    Pause();
-    if (channel)
-        channel->SetChannelByDirection(dir);
-    Unpause();
-}
 
 /** \fn TVRec::ToggleChannelFavorite()
  *  \brief Toggles whether the current channel should be on our favorites list.
@@ -3414,86 +2800,8 @@ int TVRec::ChangeHue(bool direction)
 void TVRec::SetChannel(QString name)
 {
     QMutexLocker lock(&stateChangeLock);
-
-    VERBOSE(VB_RECORD, LOC + QString("SetChannel(%1)").arg(name));
-    Pause();
-    if (channel)
-    {
-        QString chan = name.stripWhiteSpace();
-        QString prevchan = channel->GetCurrentName();
-
-        if (!channel->SetChannelByString(chan))
-        {
-            VERBOSE(VB_IMPORTANT, LOC + "SetChannelByString() failed");
-            channel->SetChannelByString(prevchan);
-        }
-    }
-    Unpause();
-}
-
-/** \fn TVRec::Pause()
- *  \brief Waits for recorder pause and then resets the pauses and
- *         resets ring buffer.
- *  \sa PauseRecorder(), Unpause()
- */
-void TVRec::Pause(void)
-{
-    VERBOSE(VB_RECORD, LOC + "Pause() -- begin");
-    QMutexLocker lock(&stateChangeLock);
-
-    bool rbi_pause = true;
-    if (waitingForSignal)
-    {
-        waitingForSignal = false;
-        SetSignalMonitoringRate(0, 0);
-        StopDummyRecorder();
-        rbi_pause = false;
-    }
-    if (waitingForDVBTables)
-    {
-        waitingForDVBTables = false;
-        StopDummyRecorder();
-        rbi_pause = false;
-    }
-
-    if (recorder)
-        recorder->WaitForPause();
-
-    if (rbi_pause)
-        rbi->Pause();
-
-    if (rbi->GetRingBuffer())
-        rbi->GetRingBuffer()->Reset();
-
-    VERBOSE(VB_RECORD, LOC + "Pause() -- end");
-}
-
-/** \fn TVRec::Unpause()
- *  \brief unpauses recorder and ring buffer.
- *  \sa Pause()
- */
-void TVRec::Unpause(void)
-{
-    VERBOSE(VB_RECORD, LOC + "Unpause() -- begin");
-    QMutexLocker lock(&stateChangeLock);
-
-    if (recorder)
-        recorder->Reset();
-
-    if (SignalMonitor::IsSupported(genOpt.cardtype))
-    {
-        StartDummyRecorder();
-        SetSignalMonitoringRate(50, 1);
-        waitingForSignal = true;
-        waitingForDVBTables = false;
-    }
-    else if (recorder)
-    {
-        recorder->Unpause();
-        rbi->Unpause();
-    }
-
-    VERBOSE(VB_RECORD, LOC + "Unpause() -- end");
+    tuningRequests.enqueue(TuningRequest(kFlagLiveTV, name));
+    triggerEventLoop.wakeAll();
 }
 
 /** \fn TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
@@ -3700,6 +3008,7 @@ void TVRec::SetReadThreadSocket(QSocket *sock)
  */
 int TVRec::RequestRingBufferBlock(uint size)
 {
+    QMutexLocker lock(&stateChangeLock);
     return rbi->RequestBlock(size);
 }
 
@@ -3793,6 +3102,476 @@ void TVRec::StoreInputChannels(const QMap<int, QString> &inputChannel)
 
 }
 
+/** \fn TVRec::HandleTuning(void)
+ *  \brief Handles all tuning events.
+ *
+ *   This method pops tuning events off the tuningState queue
+ *   and does what needs to be done, mostly by calling one of
+ *   the Tuning... methods.
+ */
+void TVRec::HandleTuning(void)
+{
+    QMutexLocker lock(&stateChangeLock);
+
+    if (tuningRequests.size())
+    {
+        const TuningRequest *request = &tuningRequests.front();
+        if ((request->flags & kFlagLiveTV) && !request->channel.isEmpty() &&
+            (GetState() == kState_None))
+        {
+            tuningRequests.front().flags &= ~kFlagLiveTV;
+            tuningRequests.front().flags |= kFlagEITScan;
+        }
+        VERBOSE(VB_RECORD, LOC + "Request: "<<request->toString());
+        TuningShutdowns(*request);
+
+        // Now we start new stuff
+        if (request->flags & (kFlagRecording|kFlagLiveTV|kFlagEITScan))
+        {
+            if (!recorder || genOpt.cardtype == "DVB")
+                TuningFrequency(*request);
+            else
+                SetFlags(kFlagWaitingForRecPause);
+        }
+
+        lastTuningRequest = tuningRequests.dequeue();
+    }
+
+    if (HasFlags(kFlagWaitingForRecPause))
+    {
+        if (!recorder->IsPaused())
+            return;
+
+        ClearFlags(kFlagWaitingForRecPause);
+        if (rbi->GetRingBuffer())
+            rbi->GetRingBuffer()->Reset();
+        TuningFrequency(lastTuningRequest);
+    }
+
+    if (HasFlags(kFlagWaitingForSignal))
+    {
+        if (!TuningSignalCheck())
+            return;
+    }
+
+    if (HasFlags(kFlagWaitingForSIParser))
+    {
+        if (!TuningPMTCheck())
+            return;
+    }
+
+    if (HasFlags(kFlagNeedToStartRecorder))
+    { 
+        if (recorder)
+            TuningRestartRecorder();
+        else
+            TuningNewRecorder();
+
+        // If we got this far it is safe to set a new starting channel...
+        channel->StoreInputChannels();
+    }
+}
+
+/** \fn TuningShutdowns(const TuningRequest&)
+ *  \brief This shuts down anything that needs to be shut down 
+ *         before handling the passed in tuning request.
+ */
+void TVRec::TuningShutdowns(const TuningRequest &request)
+{
+#ifdef USING_DVB
+    if (!(request.flags & kFlagEITScan) && HasFlags(kFlagEITScannerRunning))
+    {
+#ifdef USING_DVB_EIT
+        scanner->StopActiveScan();
+#endif // USING_DVB_EIT
+        ClearFlags(kFlagEITScannerRunning);
+    }
+
+    if (HasFlags(kFlagSIParserRunning))
+    {
+        TeardownSIParser();
+
+        if (recorder)
+            GetDVBRecorder()->Close();
+        if (rbi->GetRingBuffer())
+            rbi->GetRingBuffer()->Reset();
+    }
+    ClearFlags(kFlagWaitingForSIParser | kFlagSIParserRunning);
+    // At this point the SIParser is shut down, the 
+    // recorder is closed, and the ringbuffer reset.
+
+#endif // USING_DVB
+
+    if (HasFlags(kFlagSignalMonitorRunning))
+        SetSignalMonitoringRate(0, 0);
+    ClearFlags(kFlagWaitingForSignal | kFlagSignalMonitorRunning);
+    // At this point any waits are canceled.
+
+    if ((request.flags & kFlagNoRec))
+    {
+        if (HasFlags(kFlagDummyRecorderRunning))
+        {
+            dummyRecorder->StopRecordingThread();
+            ClearFlags(kFlagDummyRecorderRunning);
+        }
+
+        if (request.flags & kFlagCloseRec)
+            FinishedRecording(lastTuningRequest.program);
+
+        if (HasFlags(kFlagRecorderRunning))
+        {
+            TeardownRecorder(request.flags & kFlagKillRec);
+            ClearFlags(kFlagRecorderRunning);
+        }
+        ClearFlags(kFlagPendingActions);
+        // At this point the recorders are shut down
+
+        CloseChannel();
+        // At this point the channel is shut down
+    }
+
+    if (((request.flags & kFlagKillRingBuffer) || lastTuningRequest.program) &&
+        rbi->GetRingBuffer())
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Tearing down RingBuffer");
+        rbi->GetRingBuffer()->StopReads();
+        rbi->SetAlive(false);
+        rbi->SetRingBuffer(NULL);
+        // At this point the ringbuffer is shut down
+    }
+}
+
+/** \fn TVRec::TuningFrequency(const TuningRequest&)
+ *  \brief Performs initial tuning required for any tuning event.
+ *
+ *   This figures out the channel name, and possibly the 
+ *   input name we need to pass to "channel" and then calls
+ *   channel appropriately.
+ *
+ *   Then it adds any filters and sets any video capture attributes
+ *   that need to be set.
+ *
+ *   The signal monitoring is started if possible. If it is started
+ *   the kFlagWaitForSignal flag is set.
+ *
+ *   The kFlagNeedToStartRecorder flag is ald set if this isn't
+ *   an EIT scan so that the recorder is started or restarted a
+ *   appropriate.
+ */
+void TVRec::TuningFrequency(const TuningRequest &request)
+{
+    QString channum, input;
+    if (request.program)
+        request.program->GetChannel(channum, input);
+    else
+    {
+        channum = request.channel;
+        input   = request.input;
+
+        // If this is Live TV startup, we need a channel...
+        if (channum.isEmpty() && (request.flags & kFlagLiveTV))
+        {
+            input   = genOpt.defaultinput;
+            channum = GetStartChannel(cardid, input);
+        }
+    }
+    bool ok = false;
+    channel->Open();
+    if (!channum.isEmpty())
+    {
+        if (channum.find("NextChannel") >= 0)
+        {
+            int dir = channum.right(channum.length() - 12).toInt();
+            channum = GetNextChannel(channel, dir);
+        }
+
+        if (!input.isEmpty())
+            ok = channel->SwitchToInput(input, channum);
+        else if (channum.find("ToggleInputs") >= 0)
+            ok = channel->ToggleInputs();
+        else
+            ok = channel->SetChannelByString(channum);
+    }
+
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Failed to set channel to " << channum
+                << "\n\t\t\tReverting to null state");
+        ChangeState(kState_None);
+        return;
+    }
+
+    // Setup for framebuffer capture devices..
+    SetVideoFiltersForChannel(channel, channel->GetCurrentName());
+#ifdef USING_V4L
+    if (GetV4LChannel())
+    {
+        channel->SetBrightness();
+        channel->SetContrast();
+        channel->SetColour();
+        channel->SetHue();
+    }
+#endif // USING_V4L
+
+    // Start dummy recorder for devices capable of signal monitoring.
+    bool use_sm = SignalMonitor::IsSupported(genOpt.cardtype);
+    bool livetv = request.flags & kFlagLiveTV;
+    if (use_sm && !dummyRecorder && livetv)
+    {
+        bool is_atsc = genOpt.cardtype == "HDTV";
+#if (DVB_API_VERSION_MINOR == 1)
+        if (genOpt.cardtype == "DVB")
+        {
+            struct dvb_frontend_info info;
+            int fd = channel->GetFd();
+            if (fd >= 0 && (ioctl(fd, FE_GET_INFO, &info) >= 0))
+                is_atsc = (info.type == FE_ATSC);
+        }
+#endif // if (DVB_API_VERSION_MINOR == 1)
+
+        if (!is_atsc)
+            dummyRecorder = new DummyDTVRecorder(
+                true, rbi->GetRingBuffer(), 768, 576, 50,
+                90, 30000000, false);
+        else
+            dummyRecorder = new DummyDTVRecorder(
+                true, rbi->GetRingBuffer(), 1920, 1088, 29.97,
+                90, 30000000, false);
+    }
+
+    // Start signal monitoring for devices capable of monitoring
+    if (use_sm)
+    {
+        VERBOSE(VB_RECORD, LOC + "Starting Signal Monitor");
+        SetSignalMonitoringRate(50, livetv);
+        if (signalMonitor)
+        {
+            SetFlags(kFlagWaitingForSignal | kFlagSignalMonitorRunning);
+        }
+        if (dummyRecorder && rbi->GetRingBuffer())
+        {
+            dummyRecorder->StartRecordingThread();
+            SetFlags(kFlagDummyRecorderRunning);
+        }
+    }
+
+    // Request a recorder, unless this is for an EIT Scan
+    if (!(request.flags & kFlagEITScan))
+        SetFlags(kFlagNeedToStartRecorder);
+}
+
+/** \fn TVRec::TuningSignalCheck(void)
+ *  \brief This checks if we have a channel lock.
+ *
+ *   If we have a channel lock this shuts down the signal monitoring.
+ *
+ *   If this is a DVB recorder the we start the SIParser and add a
+ *   kFlagWaitingForSIParser flag to the tuning state.
+ *
+ *  \return true iff we have a complete lock
+ */
+bool TVRec::TuningSignalCheck(void)
+{
+    if (!signalMonitor->IsAllGood())
+        return false;
+
+    VERBOSE(VB_RECORD, LOC + "Got good signal");
+
+    // grab useful data from DTV signal monitor before we kill it...
+    int programNum = -1;
+    ATSCStreamData *streamData = NULL;
+    if (GetDTVSignalMonitor())
+    {
+        programNum = GetDTVSignalMonitor()->GetProgramNumber();
+        streamData = GetDTVSignalMonitor()->GetATSCStreamData();
+        VERBOSE(VB_IMPORTANT, "MPEG program num("<<programNum<<")");
+    }
+
+    // shut down signal monitoring
+    SetSignalMonitoringRate(0, 0);
+    ClearFlags(kFlagWaitingForSignal | kFlagSignalMonitorRunning);
+
+    // tell recorder/siparser about useful DTV monitor info..
+#ifdef USING_DVB
+    if (GetDVBChannel())
+    {
+        GetDVBChannel()->SetPMT(NULL);
+        CreateSIParser(programNum);
+        SetFlags(kFlagWaitingForSIParser | kFlagSIParserRunning);
+    }
+#endif // USING_DVB
+
+#ifdef USING_V4L
+    if (GetHDTVRecorder())
+        GetHDTVRecorder()->SetStreamData(streamData);
+#endif // USING_V4L
+
+    return true;
+}
+
+/** \fn TVRec::TuningPMTCheck(void)
+ *  \brief Clears the kFlagWaitingForSIParser flag
+ *         when the SIParser has a PMT.
+ *
+ *  \return true if we have a PMT, or we don't need it.
+ */
+bool TVRec::TuningPMTCheck(void)
+{
+#ifdef USING_DVB
+    if (!GetDVBChannel()->IsPMTSet())
+        return false;
+#endif // USING_DVB
+    VERBOSE(VB_RECORD, LOC + "Got SIParser PMT");
+    ClearFlags(kFlagWaitingForSIParser);
+    return true;
+}
+
+static void load_recording_profile(
+    RecordingProfile &profile, ProgramInfo *rec, int cardid)
+{
+    QString profileName = "Live TV";
+    bool done = false;
+
+    if (rec)
+    {
+        profileName = rec->GetScheduledRecording()->getProfileName();
+        if (!profileName.isEmpty())
+            done = profile.loadByCard(profileName, cardid);
+        profileName = (done) ? profileName : QString("Default");
+    }
+
+    if (!done)
+        profile.loadByCard(profileName, cardid);
+
+    QString msg = QString("Using profile '%1' to record").arg(profileName);
+    VERBOSE(VB_RECORD, LOC + msg);
+}
+
+static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
+                      bool on_host, bool transcode_bfr_comm, bool on_line_comm)
+{
+    if (!rec)
+        return 0; // no jobs for Live TV recordings..
+
+    int jobs = 0; // start with no jobs
+
+    // grab standard jobs flags from program info
+    JobQueue::AddJobsToMask(rec->GetAutoRunJobs(), jobs);
+
+        // disable commercial flagging on PBS, BBC, etc.
+    if (rec->chancommfree)
+        JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, jobs);
+
+    // disable transcoding if the profile does not allow auto transcoding
+    const Setting *autoTrans = profile.byName("autotranscode");
+    if ((!autoTrans) || (autoTrans->getValue().toInt() == 0))
+        JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, jobs);
+
+    // is commercial flagging enabled, and is on-line comm flagging enabled?
+    bool rt = JobQueue::JobIsInMask(JOB_COMMFLAG, jobs) && on_line_comm;
+    // also, we either need transcoding to be disabled or 
+    // we need to be allowed to commercial flag before transcoding?
+    rt &= JobQueue::JobIsNotInMask(JOB_TRANSCODE, jobs) ||
+        !transcode_bfr_comm;
+    if (rt)
+    {
+        // queue up real-time (i.e. on-line) commercial flagging.
+        QString host = (on_host) ? gContext->GetHostName() : "";
+        JobQueue::QueueJob(JOB_COMMFLAG,
+                           rec->chanid, rec->recstartts, "", "",
+                           host, JOB_LIVE_REC);
+
+        // don't do regular comm flagging, we won't need it.
+        JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, jobs);
+    }
+
+    return jobs;
+}
+
+/** \fn TVRec::TuningNewRecorder(void)
+ *  \brief Creates a recorder instance.
+ */
+void TVRec::TuningNewRecorder(void)
+{
+    VERBOSE(VB_RECORD, LOC + "Starting Recorder");
+    RecordingProfile profile;
+    ProgramInfo *rec = lastTuningRequest.program;
+
+    load_recording_profile(profile, rec, cardid);
+
+    if (lastTuningRequest.flags & kFlagRecording)
+    {
+        rbi->SetRingBuffer(new RingBuffer(rbi->GetFilename(), true));
+        if (!rbi->GetRingBuffer()->IsOpen())
+        {
+            QString msg = "RingBuffer '%1' not open...";
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(rbi->GetFilename()));
+            ClearFlags(kFlagPendingActions);
+            ChangeState(kState_None);
+            return;
+        }
+    }
+
+    if (HasFlags(kFlagDummyRecorderRunning))
+    {
+        dummyRecorder->StopRecordingThread();
+        ClearFlags(kFlagDummyRecorderRunning); 
+    }
+
+    if (!SetupRecorder(profile))
+    {
+        VERBOSE(VB_IMPORTANT, LOC + QString(
+                    "Failed to start recorder!\n"
+                    "\t\t\tTuning request was %1\n"
+                    "\t\t\tReverting to null state.")
+                .arg(lastTuningRequest.toString()));
+        ChangeState(kState_None);
+        return;
+    }
+
+    SetFlags(kFlagRecorderRunning);
+    recorder->SetRecording(lastTuningRequest.program);
+    if (GetV4LChannel())
+        CloseChannel();
+    pthread_create(&recorder_thread, NULL, TVRec::RecorderThread, recorder);
+    if (GetV4LChannel())
+        channel->SetFd(recorder->GetVideoFd());
+
+    if (lastTuningRequest.flags & kFlagRecording)
+        StartedRecording(lastTuningRequest.program);
+
+    autoRunJobs = init_jobs(rec, profile, runJobOnHostOnly,
+                            transcodeFirst, earlyCommFlag);
+
+    ClearFlags(kFlagNeedToStartRecorder);
+}
+
+/** \fn TVRec::TuningRestartRecorder(void)
+ *  \brief Restarts a stopped recorder or unpauses a paused recorder.
+ */
+void TVRec::TuningRestartRecorder(void)
+{
+    VERBOSE(VB_RECORD, LOC + "Restarting Recorder");
+    if (HasFlags(kFlagDummyRecorderRunning))
+    {
+        dummyRecorder->StopRecordingThread();
+        ClearFlags(kFlagDummyRecorderRunning);
+    }
+    recorder->Reset();
+
+    // Set file descriptor of channel from recorder for V4L
+    channel->SetFd(recorder->GetVideoFd());
+
+    recorder->Unpause();
+
+#ifdef USING_DVB
+    if (GetDVBRecorder())
+        GetDVBRecorder()->Open();
+#endif // USING_DVB
+
+    ClearFlags(kFlagNeedToStartRecorder);
+}
+
 void TVRec::SetFlags(uint f)
 {
     QMutexLocker lock(&stateChangeLock);
@@ -3831,8 +3610,72 @@ QString TVRec::FlagToString(uint f)
     if (kFlagAskAllowRecording & f)
         msg += "AskAllowRecording,";
 
+    // Tuning flags
+    if ((kFlagRec & f) == kFlagRec)
+        msg += "REC,";
+    else
+    {
+        if (kFlagLiveTV & f)
+            msg += "LiveTV,";
+        if (kFlagRecording & f)
+            msg += "Recording,";
+    }
+    if ((kFlagNoRec & f) == kFlagNoRec)
+        msg += "NOREC,";
+    else
+    {
+        if (kFlagEITScan & f)
+            msg += "EITScan,";
+        if (kFlagCloseRec & f)
+            msg += "CloseRec,";
+        if (kFlagKillRec & f)
+            msg += "KillRec,";
+    }
+    if ((kFlagPendingActions & f) == kFlagPendingActions)
+        msg += "PENDINGACTIONS,";
+    else
+    {
+        if (kFlagWaitingForRecPause & f)
+            msg += "WaitingForRecPause,";
+        if (kFlagWaitingForSignal & f)
+            msg += "WaitingForSignal,";
+        if (kFlagWaitingForSIParser & f)
+            msg += "WaitingForSIParser,";
+        if (kFlagNeedToStartRecorder & f)
+            msg += "NeedToStartRecorder,";
+        if (kFlagKillRingBuffer & f)
+            msg += "KillRingBuffer,";
+    }
+    if ((kFlagAnyRunning & f) == kFlagAnyRunning)
+        msg += "ANYRUNNING,";
+    else
+    {
+        if (kFlagSignalMonitorRunning & f)
+            msg += "SignalMonitorRunning,";
+        if (kFlagSIParserRunning & f)
+            msg += "SIParserRunning,";
+        if (kFlagEITScannerRunning & f)
+            msg += "EITScannerRunning,";
+        if ((kFlagAnyRecRunning & f) == kFlagAnyRecRunning)
+            msg += "ANYRECRUNNING,";
+        else
+        {
+            if (kFlagDummyRecorderRunning & f)
+                msg += "DummyRecorderRunning,";
+            if (kFlagRecorderRunning & f)
+                msg += "RecorderRunning,";
+        }
+    }
+
     if (msg.isEmpty())
         msg = QString("0x%1").arg(f,0,16);
 
     return msg;
+}
+
+QString TuningRequest::toString(void) const
+{
+    return QString("Program(%1) channel(%2) input(%3) flags(%4)")
+        .arg((program != 0) ? "yes" : "no").arg(channel).arg(input)
+        .arg(TVRec::FlagToString(flags));
 }

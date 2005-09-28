@@ -10,6 +10,7 @@
 #include <qstringlist.h>
 #include <qwaitcondition.h>
 
+#include "mythdeque.h"
 #include "programinfo.h"
 #include "tv.h"
 
@@ -106,8 +107,30 @@ class DBox2DBOptions
     QString host;
 };
 
+class TuningRequest
+{
+  public:
+    TuningRequest(uint f) :
+        flags(f), program(NULL), channel(QString::null),
+        input(QString::null) {;}
+    TuningRequest(uint f, ProgramInfo *p) :
+        flags(f), program(p), channel(QString::null), input(QString::null) {;}
+    TuningRequest(uint f, QString ch, QString in = QString::null) :
+        flags(f), program(NULL), channel(ch), input(in) {;}
+
+    QString toString(void) const;
+
+  public:
+    uint         flags;
+    ProgramInfo *program;
+    QString      channel;
+    QString      input;
+};
+typedef MythDeque<TuningRequest> TuningQueue;
+
 class TVRec : public QObject
 {
+    friend class TuningRequest;
     Q_OBJECT
   public:
     TVRec(int capturecardnum);
@@ -182,12 +205,12 @@ class TVRec : public QObject
     void PauseRecorder(void);
     void ToggleChannelFavorite(void);
 
-    void ToggleInputs(void);
-    void ChangeChannel(ChannelChangeDirection dir);
+    /// Toggles between inputs on current capture card.
+    void ToggleInputs(void)     { SetChannel("ToggleInputs"); }
+    /// Changes to a channel in the 'dir' channel change direction.
+    void ChangeChannel(ChannelChangeDirection dir)
+        { SetChannel(QString("NextChannel %1").arg((int)dir)); }
     void SetChannel(QString name);
-
-    void Pause(void);
-    void Unpause(void);
 
     int SetSignalMonitoringRate(int msec, int notifyFrontend = 1);
     int ChangeColour(bool direction);
@@ -267,7 +290,6 @@ class TVRec : public QObject
     DVBRecorder  *GetDVBRecorder(void);
     
     void InitChannel(const QString &inputname, const QString &startchannel);
-    bool StartChannel(bool livetv);
     void CloseChannel(void);
     DBox2Channel *GetDBox2Channel(void);
     DVBChannel   *GetDVBChannel(void);
@@ -286,14 +308,13 @@ class TVRec : public QObject
     void ClearFlags(uint f);
     static QString FlagToString(uint);
 
-    bool StartRecorder(bool livetv);
-    bool StartRecorderPost(bool livetv);
-    bool StartRecorderPostThread(bool livetv);
-    void AbortStartRecorderThread();
-    static void *StartRecorderPostThunk(void*);
-    bool CreateRecorderThread(void);
-    void StartDummyRecorder(void);
-    void StopDummyRecorder(void);
+    void HandleTuning(void);
+    void TuningShutdowns(const TuningRequest&);
+    void TuningFrequency(const TuningRequest&);
+    bool TuningSignalCheck(void);
+    bool TuningPMTCheck(void);
+    void TuningNewRecorder(void);
+    void TuningRestartRecorder(void);
 
     void HandleStateChange(void);
     void ChangeState(TVState nextState);
@@ -321,8 +342,6 @@ class TVRec : public QObject
     pthread_t event_thread;
     /// Recorder thread, runs RecorderBase::StartRecording()
     pthread_t recorder_thread;
-    /// Thread used to start Recorder after HandleStateChange
-    pthread_t start_recorder_thread;
 
     // Configuration variables from database
     bool    transcodeFirst;
@@ -352,12 +371,10 @@ class TVRec : public QObject
     TVState internalState;
     TVState desiredNextState;
     bool    changeState;
-    bool    startingRecording;
-    bool    abortRecordingStart;
-    bool    waitingForSignal;
-    bool    waitingForDVBTables;
-    bool    prematurelystopped;
     uint           stateFlags;
+    TuningQueue    tuningRequests;
+    TuningRequest  lastTuningRequest;
+    QDateTime      eitScanStartTime;
     QWaitCondition triggerEventLoop;
     QWaitCondition triggerEventSleep;
 
@@ -372,6 +389,8 @@ class TVRec : public QObject
     ProgramInfo *pendingRecording;
     QDateTime    recordPendingStart;
 
+    static const uint kEITScanTimeout;
+
     // General State flags
     static const uint kFlagFrontendReady        = 0x00000001;
     static const uint kFlagRunMainLoop          = 0x00000002;
@@ -380,6 +399,41 @@ class TVRec : public QObject
     static const uint kFlagErrored              = 0x00000010;
     static const uint kFlagCancelNextRecording  = 0x00000020;
     static const uint kFlagAskAllowRecording    = 0x00000040;
+
+    // Tuning flags
+    /// final result desired is LiveTV recording
+    static const uint kFlagLiveTV               = 0x00000100;
+    /// final result desired is a timed recording
+    static const uint kFlagRecording            = 0x00000200;
+    static const uint kFlagRec                  = 0x00000F00;
+
+    // Non-recording Commands
+    /// final result desired is an EIT Scan
+    static const uint kFlagEITScan              = 0x00001000;
+    /// close recorder, keep recording
+    static const uint kFlagCloseRec             = 0x00002000;
+    /// close recorder, discard recording
+    static const uint kFlagKillRec              = 0x00004000;
+    static const uint kFlagNoRec                = 0x0000F000;
+
+    static const uint kFlagKillRingBuffer       = 0x00010000;
+
+    // Waiting stuff
+    static const uint kFlagWaitingForRecPause   = 0x00100000;
+    static const uint kFlagWaitingForSignal     = 0x00200000;
+    static const uint kFlagWaitingForSIParser   = 0x00400000;
+    static const uint kFlagNeedToStartRecorder  = 0x00800000;
+    static const uint kFlagPendingActions       = 0x00F00000;
+
+    // Running stuff
+    static const uint kFlagSignalMonitorRunning = 0x01000000;
+    static const uint kFlagSIParserRunning      = 0x02000000;
+    static const uint kFlagEITScannerRunning    = 0x04000000;
+
+    static const uint kFlagDummyRecorderRunning = 0x10000000;
+    static const uint kFlagRecorderRunning      = 0x20000000;
+    static const uint kFlagAnyRecRunning        = 0xF0000000;
+    static const uint kFlagAnyRunning           = 0xFF000000;
 };
 
 #endif
