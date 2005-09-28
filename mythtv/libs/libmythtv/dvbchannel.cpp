@@ -206,23 +206,25 @@ bool DVBChannel::TuneMultiplex(uint mplexid)
 
 bool DVBChannel::SetChannelByString(const QString &chan)
 {
+    QString func = QString("SetChannelByString(%1)").arg(chan);
+    CHANNEL(func);
     if (fd_frontend < 0)
+    {
+        ERROR(func + QString(": not open"));
         return false;
+    }
 
     if (curchannelname == chan && !first_tune)
+    {
+        CHANNEL(func + ": already on channel");
         return true;
-
-#if (DVB_API_VERSION_MINOR == 1)
-    if (FE_ATSC == info.type)
-        SetCachedATSCInfo("");
-#endif
-
-    CHANNEL(QString("Trying to tune to channel %1.").arg(chan));
+    }
 
     if (GetChannelOptions(chan) == false)
     {
         ERROR(QString("Failed to get channel options for channel %1.")
               .arg(chan));
+        
         return false;
     }
 
@@ -270,6 +272,12 @@ bool DVBChannel::GetChannelOptions(const QString& channum)
 
     int cardid = GetCardID();
 
+    // Reset Channel data
+    inputChannel[currentcapchannel] = "";
+    currentATSCMajorChannel = currentATSCMinorChannel = -1;
+    currentProgramNum = -1;
+    chan_opts.serviceID = 0;
+
     QString thequery =
         QString("SELECT chanid, serviceid, mplexid, atscsrcid "
                 "FROM channel, cardinput, capturecard "
@@ -287,22 +295,23 @@ bool DVBChannel::GetChannelOptions(const QString& channum)
         MythContext::DBError("GetChannelOptions - ChanID", query);
         return false;
     }
-    if (query.size() <= 0)
+
+    if (query.next())
+    {
+        // TODO: Fix structs to be more useful to new DB structure
+        currentProgramNum = chan_opts.serviceID = query.value(1).toInt();
+        if (query.value(3).toInt() > 256)
+        {
+            currentATSCMajorChannel = query.value(3).toInt() >> 8;
+            currentATSCMinorChannel = query.value(3).toInt() & 0xff;
+            currentProgramNum = -1;
+        }
+    }
+    else
     {
         ERROR("Unable to find channel in database.");
         return false;
     }
-
-    query.next();
-    // TODO: Fix structs to be more useful to new DB structure
-    chan_opts.serviceID = query.value(1).toInt();
-    if (query.value(3).toInt() > 256)
-    {
-        SetCachedATSCInfo(QString("%1_%2")
-                          .arg(query.value(3).toInt() >> 8)
-                          .arg(query.value(3).toInt() & 0xff));
-    }
-    currentProgramNum = chan_opts.serviceID;
 
     int mplexid = query.value(2).toInt();
 
