@@ -86,7 +86,8 @@ void EITScanner::RunEventLoop(void)
             if (activeScanNextChan == activeScanChannels.end())
                 activeScanNextChan = activeScanChannels.begin();
 
-            rec->SetChannel(*activeScanNextChan);
+            if (!(*activeScanNextChan).isEmpty())
+                rec->SetChannel(*activeScanNextChan);
 
             activeScanNextTrig = QDateTime::currentDateTime()
                 .addSecs(activeScanTrigTime);
@@ -136,6 +137,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
             "FROM channel, cardinput, capturecard "
             "WHERE cardinput.sourceid = channel.sourceid AND "
             "      capturecard.cardid = cardinput.cardid AND "
+            "      channel.mplexid      IS NOT NULL      AND "
             "      cardinput.cardid   = :CARDID "
             "ORDER BY cardinput.sourceid, atscsrcid");
         query.bindValue(":CARDID", rec->GetCaptureCardNum());

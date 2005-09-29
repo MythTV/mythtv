@@ -3344,7 +3344,6 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
             TeardownRecorder(request.flags & kFlagKillRec);
             ClearFlags(kFlagRecorderRunning);
         }
-        ClearFlags(kFlagPendingActions);
         // At this point the recorders are shut down
 
         CloseChannel();
@@ -3360,6 +3359,9 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         SetRingBuffer(NULL);
         // At this point the ringbuffer is shut down
     }
+
+    // Clear pending actions from last request
+    ClearFlags(kFlagPendingActions);
 }
 
 /** \fn TVRec::TuningFrequency(const TuningRequest&)
@@ -3480,10 +3482,8 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         }
     }
 
-    // Request a recorder, unless this is for an EIT Scan
-    if (request.flags & kFlagEITScan)
-        ClearFlags(kFlagNeedToStartRecorder);
-    else
+    // Request a recorder, if the command is a recording command
+    if (request.flags & kFlagRec)
         SetFlags(kFlagNeedToStartRecorder);
 }
 
@@ -3511,7 +3511,7 @@ bool TVRec::TuningSignalCheck(void)
     {
         programNum = GetDTVSignalMonitor()->GetProgramNumber();
         streamData = GetDTVSignalMonitor()->GetATSCStreamData();
-        VERBOSE(VB_IMPORTANT, "MPEG program num("<<programNum<<")");
+        VERBOSE(VB_RECORD, LOC + "MPEG program num("<<programNum<<")");
     }
 
     // shut down signal monitoring
@@ -3646,12 +3646,21 @@ void TVRec::TuningNewRecorder(void)
         ClearFlags(kFlagDummyRecorderRunning); 
     }
 
-    if (!ringBuffer || !SetupRecorder(profile))
+    if (!ringBuffer)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                    "Failed to start recorder!  ringBuffer is NULL\n"
+                    "\t\t\t\t Tuning request was %1\n")
+                .arg(lastTuningRequest.toString()));
+        ChangeState(kState_None);
+        return;
+    }
+
+    if (!SetupRecorder(profile))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
                     "Failed to start recorder!\n"
-                    "\t\t\tTuning request was %1\n"
-                    "\t\t\tReverting to null state.")
+                    "\t\t\t\t Tuning request was %1\n")
                 .arg(lastTuningRequest.toString()));
         ChangeState(kState_None);
         return;
