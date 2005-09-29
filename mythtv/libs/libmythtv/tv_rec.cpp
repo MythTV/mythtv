@@ -2154,47 +2154,24 @@ int TVRec::GetChannelValue(const QString &channel_field, ChannelBase *chan,
 void TVRec::SetChannelValue(QString &field_name, int value, ChannelBase *chan,
                             const QString &channum)
 {
-    if (!chan)
+    int sourceid = GetChannelValue("sourceid", chan, channum);
+    if (sourceid < 0)
         return;
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())
         return;
 
-    QString channelinput = chan->GetCurrentInput();
+    query.prepare(
+        QString("UPDATE channel SET channel.%1=:VALUE "
+                "WHERE channel.channum  = :CHANNUM AND "
+                "      channel.sourceid = :SOURCEID").arg(field_name));
 
-    // Only mysql 4.x can do multi table updates so we need two steps to get 
-    // the sourceid from the table join.
-    QString querystr = QString(
-        "SELECT channel.sourceid "
-        "FROM channel, cardinput, capturecard "
-        "WHERE channel.channum      = '%1'               AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.inputname  = '%2'               AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = '%3'               AND "
-        "      capturecard.hostname = '%4'")
-        .arg(channum).arg(channelinput)
-        .arg(cardid)
-        .arg(gContext->GetHostName());
+    query.bindValue(":VALUE",    value);
+    query.bindValue(":CHANNUM",  channum);
+    query.bindValue(":SOURCEID", sourceid);
 
-    query.prepare(querystr);
-    int sourceid = -1;
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("setchannelvalue", query);
-    else if (query.next())
-        sourceid = query.value(0).toInt();
-
-    if (sourceid != -1)
-    {
-        querystr = QString("UPDATE channel SET channel.%1='%2' "
-                           "WHERE channel.channum  = '%3' AND "
-                           "      channel.sourceid = '%4'")
-            .arg(field_name).arg(value).arg(channum).arg(sourceid);
-        query.prepare(querystr);
-        query.exec();
-    }
+    query.exec();
 }
 
 QString TVRec::GetNextChannel(ChannelBase *chan, int channeldirection)
@@ -2665,34 +2642,9 @@ void TVRec::ToggleChannelFavorite(void)
 
     // Get current channel id...
     QString channum = channel->GetCurrentName();
-    QString channelinput = channel->GetCurrentInput();
 
-
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    QString querystr = QString(
-        "SELECT channel.chanid "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.channum      = '%1'               AND "
-        "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.inputname  = '%2'               AND "
-        "      cardinput.cardid     = capturecard.cardid AND "
-        "      capturecard.cardid   = '%3'               AND "
-        "      capturecard.hostname = '%4'")
-        .arg(channum).arg(channelinput).arg(cardid)
-        .arg(gContext->GetHostName());
-
-    query.prepare(querystr);
-
-    QString chanid = QString::null;
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-
-        chanid = query.value(0).toString();
-    }
-    else
+    int chanid = GetChannelValue("chanid", channel, channum);
+    if (chanid < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
                 "Channel: \'%1\' was not found in the database.\n"
@@ -2702,13 +2654,13 @@ void TVRec::ToggleChannelFavorite(void)
     }
 
     // Check if favorite exists for that chanid...
-    querystr = QString(
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
         "SELECT favorites.favid "
         "FROM favorites "
-        "WHERE favorites.chanid = '%1' "
-        "LIMIT 1").arg(chanid);
-
-    query.prepare(querystr);
+        "WHERE favorites.chanid = :CHANID "
+        "LIMIT 1");
+    query.bindValue(":CHANID", chanid);
 
     if (!query.exec() || !query.isActive())
     {
@@ -2719,21 +2671,18 @@ void TVRec::ToggleChannelFavorite(void)
         // We have a favorites record...Remove it to toggle...
         query.next();
         QString favid = query.value(0).toString();
-
-        querystr = QString("DELETE FROM favorites "
-                           "WHERE favid = '%1'").arg(favid);
-
-        query.prepare(querystr);
+        query.prepare(
+            QString("DELETE FROM favorites "
+                    "WHERE favid = '%1'").arg(favid));
         query.exec();
         VERBOSE(VB_RECORD, LOC + "Removing Favorite.");
     }
     else
     {
         // We have no favorites record...Add one to toggle...
-        querystr = QString(
-            "INSERT INTO favorites (chanid) VALUES ('%1')").arg(chanid);
-
-        query.prepare(querystr);
+        query.prepare(
+            QString("INSERT INTO favorites (chanid) "
+                    "VALUES ('%1')").arg(chanid));
         query.exec();
         VERBOSE(VB_RECORD, LOC + "Adding Favorite.");
     }
