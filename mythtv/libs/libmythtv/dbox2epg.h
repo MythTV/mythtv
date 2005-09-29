@@ -36,9 +36,6 @@ class DBox2EPG : public QObject, public QThread
     void httpRequestFinished(int requestID, bool error);
     void deleteLater(void);
 
-  signals:
-    void EPGFinished();
-
   private:
     void UpdateDB(uint chanid,
                   const QDateTime &startTime,

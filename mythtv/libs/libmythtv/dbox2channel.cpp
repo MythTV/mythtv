@@ -30,8 +30,6 @@ DBox2Channel::DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options,
             this,        SLOT(  HttpRequestDone(bool)));
     connect(httpChanger, SIGNAL(                 done(bool)),
             this,        SLOT(  HttpChannelChangeDone(bool)));
-    connect(m_epg,       SIGNAL(EPGFinished()),
-            this,        SLOT(  EPGFinished()));
 
     // Load channel names and ids from the dbox
     LoadChannels();
@@ -138,7 +136,7 @@ bool DBox2Channel::SetChannelByString(const QString &newChan)
     Log(QString("Channel ID for %1 is %2.").arg(chan).arg(channelID));
 
     // Request channel change
-    ChannelChanging();
+    emit ChannelChanging();
     RequestChannelChange(channelID);
     return true;
 }
@@ -248,7 +246,7 @@ void DBox2Channel::HttpChannelChangeDone(bool error)
     {
         Log(QString("Changing channel succeeded..."));
 	// Send signal to record that channel has changed.
-	ChannelChanged();
+	emit ChannelChanged();
 	// Request EPG for this channel if recorder is not alive
 	if (!m_recorderAlive)
 	  m_epg->ScheduleRequestEPG(curchannelname);
@@ -345,7 +343,7 @@ void DBox2Channel::RecorderAlive(bool alive)
     else  
     {
 	Log("Recorder now offline. Reactivating EPG scan");
-	ScanNextEPG();
+        SetChannelByDirection(CHANNEL_DIRECTION_UP);
     }
 }
 
@@ -357,11 +355,6 @@ void DBox2Channel::EPGFinished()
     else  
     {
 	Log("EPG finished. Recorder still offline. Continuing EPG scan");
-	ScanNextEPG();
+        SetChannelByDirection(CHANNEL_DIRECTION_UP);
     }
-}
-
-void DBox2Channel::ScanNextEPG()
-{
-    SetChannelByDirection(CHANNEL_DIRECTION_UP);
 }

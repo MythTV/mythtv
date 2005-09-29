@@ -112,7 +112,7 @@ void DBox2EPG::run()
         {
             VERBOSE(VB_RECORD, LOC + QString("EPG disabled for %1.")
                     .arg(m_requestedChannel));
-            EPGFinished();
+            m_dbox2channel->EPGFinished();
         }
     }
     VERBOSE(VB_RECORD, LOC + "Exiting Thread....");
@@ -206,7 +206,7 @@ void DBox2EPG::httpRequestFinished(int requestID, bool error)
     if (error) 
     {
         VERBOSE(VB_RECORD, LOC + "Reading EPG failed.");
-	EPGFinished();
+        m_dbox2channel->EPGFinished();
         return;
     }
 
@@ -267,7 +267,7 @@ void DBox2EPG::httpRequestFinished(int requestID, bool error)
             QString("Got %2 shows for channel %3.")
             .arg(showCount).arg(m_currentEPGRequestChannel));
 
-    EPGFinished();
+    m_dbox2channel->EPGFinished();
 }
 
 QString DBox2EPG::ParseNextLine(const QByteArray &buf, int &pos, int size)

@@ -21,11 +21,6 @@
 
 class DBox2EPG;
 
-typedef struct dbox2channel
-{
-    pthread_mutex_t lock;
-} dbox2_channel_t;
-
 class DBox2Channel : public QObject, public ChannelBase
 {
     Q_OBJECT
@@ -46,7 +41,7 @@ class DBox2Channel : public QObject, public ChannelBase
     QString GetChannelNumberFromName(const QString& channelName);
     QString GetChannelID(const QString&);
 
-    int GetFd() { return -1; }
+    void EPGFinished();
 
   signals:
     void ChannelChanged();
@@ -55,7 +50,6 @@ class DBox2Channel : public QObject, public ChannelBase
   public slots:
     void HttpChannelChangeDone(bool error);
     void HttpRequestDone(bool error);
-    void EPGFinished();
     void RecorderAlive(bool);
     void deleteLater(void);
 
@@ -64,7 +58,6 @@ class DBox2Channel : public QObject, public ChannelBase
     void Log(QString string);
     void LoadChannels();
     void RequestChannelChange(QString);
-    void ScanNextEPG();
     QString GetDefaultChannel();
 
   private:

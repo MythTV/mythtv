@@ -69,7 +69,6 @@ class DBox2Recorder : public DTVRecorder
     private:
 	// Methods
         void TeardownAll(void);
-	void ChannelChanged(dbox2_channel_t& chan);
 	void CreatePAT(uint8_t *ts_packet);
 	int  getPMTSectionID(uint8_t* buffer, int pmtPID);
 	void updatePMTSectionID(uint8_t* buffer, int pmtPID);
