@@ -1691,9 +1691,6 @@ void JobQueue::DoTranscodeThread(void)
     jobControlFlags[key] = &controlTranscoding;
     controlFlagsLock.unlock();
 
-    /////////////////////////////
-    // DO TRANSCODE STUFF HERE //
-    /////////////////////////////
     QString path = "mythtranscode";
     int transcoder = program_info->transcoder;
     QString profilearg = transcoder == RecordingProfile::TranscoderAutodetect ?
@@ -1800,21 +1797,23 @@ void JobQueue::DoTranscodeThread(void)
                 unlink(oldfile);
 
             MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("DELETE FROM recordedmarkup "
-                          "WHERE chanid = :CHANID AND starttime = :STARTTIME "
-                          "AND type not in ( :KEYFRAME, :GOP_BYFRAME ) ;");
-            query.bindValue(":CHANID", program_info->chanid);
-            query.bindValue(":STARTTIME", program_info->recstartts);
-            query.bindValue(":KEYFRAME", MARK_KEYFRAME);
-            query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
-            query.exec();
-
-            if (!query.isActive())
-                MythContext::DBError("Error in JobQueue::DoTranscodeThread()",
-                                      query);
 
             if (useCutlist)
             {
+                query.prepare("DELETE FROM recordedmarkup "
+                              "WHERE chanid = :CHANID "
+                              "AND starttime = :STARTTIME "
+                              "AND type not in ( :KEYFRAME, :GOP_BYFRAME ) ;");
+                query.bindValue(":CHANID", program_info->chanid);
+                query.bindValue(":STARTTIME", program_info->recstartts);
+                query.bindValue(":KEYFRAME", MARK_KEYFRAME);
+                query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
+                query.exec();
+
+                if (!query.isActive())
+                    MythContext::DBError(
+                        "Error in JobQueue::DoTranscodeThread()", query);
+
                 query.prepare("UPDATE recorded "
                               "SET cutlist = NULL, bookmark = NULL "
                               "WHERE chanid = :CHANID "
@@ -1829,6 +1828,26 @@ void JobQueue::DoTranscodeThread(void)
 
                 program_info->SetCommFlagged(COMM_FLAG_NOT_FLAGGED);
             }
+            else
+            {
+                query.prepare("DELETE FROM recordedmarkup "
+                              "WHERE chanid = :CHANID "
+                              "AND starttime = :STARTTIME "
+                              "AND type not in ( :KEYFRAME, :GOP_BYFRAME, "
+                              "    :COMM_START, :COMM_END) ;");
+                query.bindValue(":CHANID", program_info->chanid);
+                query.bindValue(":STARTTIME", program_info->recstartts);
+                query.bindValue(":KEYFRAME", MARK_KEYFRAME);
+                query.bindValue(":GOP_BYFRAME", MARK_GOP_BYFRAME);
+                query.bindValue(":COMM_START", MARK_COMM_START);
+                query.bindValue(":COMM_END", MARK_COMM_END);
+                query.exec();
+
+                if (!query.isActive())
+                    MythContext::DBError(
+                        "Error in JobQueue::DoTranscodeThread()", query);
+            }
+
             if (filesize > 0)
                 program_info->SetFilesize(filesize);
             QString comment = QString("%1: %2 => %3")
