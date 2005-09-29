@@ -28,7 +28,7 @@
 #include "jobqueue.h"
 #include "audiooutput.h"
 #include "DisplayRes.h"
-#include "signalmonitorvalue.h"
+#include "signalmonitor.h"
 #include "config.h"
 
 #ifndef HAVE_ROUND
@@ -945,15 +945,16 @@ bool TV::StartRecorder(int maxWait)
             <<" ms to start recorder.");
 
     // Get timeout for this recorder
-    lockTimeout = 3000;
+    lockTimeout = 0xffffffff;
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT channel_timeout "
+    query.prepare("SELECT channel_timeout, cardtype "
                   "FROM capturecard "
                   "WHERE cardid = :CARDID");
     query.bindValue(":CARDID", recorder->GetRecorderNumber());
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Getting timeout", query);
-    else if (query.next())
+    else if (query.next() &&
+             SignalMonitor::IsSupported(query.value(1).toString()))
         lockTimeout = max(query.value(0).toInt(), 500);
 
     // Cache starting frame rate for this recorder
