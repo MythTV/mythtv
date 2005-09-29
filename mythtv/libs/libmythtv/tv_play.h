@@ -341,6 +341,7 @@ class TV : public QObject
     // Channel changing state variables
     bool    channelqueued;  ///< If true info is queued up for a channel change
     QString channelKeys;    ///< Channel key presses queued up so far...
+    QString inputKeys;      ///< Input key presses queued up so far...
     bool    lookForChannel; ///< If true try to find recorder for channel
     QString channelid;      ///< Non-numeric Channel Name
     QString lastCC;         ///< Last channel

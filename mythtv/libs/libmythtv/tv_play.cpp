@@ -1853,7 +1853,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         if (action == "TOGGLECC")
         {
             bool valid = false;
-            int page = QueuedChannel().toInt(&valid, 16) << 16;
+            int page = inputKeys.toInt(&valid, 16) << 16;
             if (!valid)
                 page = 0;
             ChannelClear();
@@ -2528,10 +2528,10 @@ void TV::DoSeek(float time, const QString &mesg)
 
 void TV::DoArbSeek(ArbSeekWhence whence)
 {
-    int chan = QueuedChannel().toInt();
+    int seek = inputKeys.toInt();
     ChannelClear(true);
 
-    float time = ((chan / 100) * 3600) + ((chan % 100) * 60);
+    float time = ((seek / 100) * 3600) + ((seek % 100) * 60);
 
     if (whence == ARBSEEK_FORWARD)
         DoSeek(time, tr("Jump Ahead"));
@@ -2855,13 +2855,9 @@ QString TV::QueuedChannel(void)
         return "";
 
     // strip initial zeros.
-    for (uint i = 0; i < channelKeys.length(); i++)
-    {
-        if (channelKeys[i] == '0')
-            channelKeys[i] = ' ';
-        else
-            break;
-    }
+    int nzi = channelKeys.find(QRegExp("([1-9]|\\w)"));
+    if (nzi > 0)
+        channelKeys = channelKeys.right(channelKeys.length() - nzi);
 
     return channelKeys.stripWhiteSpace();
 }
@@ -2881,15 +2877,17 @@ void TV::ChannelClear(bool hideosd)
     channelqueued = false;
 
     channelKeys = "";
+    inputKeys = "";
     channelid = "";
 }
 
 void TV::ChannelKey(char key)
 {
-    channelKeys = channelKeys.append(key).right(kChannelKeysMax);
-    channelqueued = true;
+    static char *spacers[4] = { "_", "-", "#", NULL };
 
-    bool unique = false;
+    channelKeys   = channelKeys.append(key).right(kChannelKeysMax);
+    inputKeys     = inputKeys.append(key).right(kChannelKeysMax);
+    channelqueued = true;
 
     /* 
      * Always use smartChannelChange when channel numbers are entered in
@@ -2898,30 +2896,38 @@ void TV::ChannelKey(char key)
      * the only way to enter a channel number to browse without waiting for the
      * OSD to fadeout after entering numbers.
      */
-    if (StateIsLiveTV(GetState()) &&
-        (smartChannelChange || browsemode))
+    bool do_smart = (smartChannelChange || browsemode);
+    QString chan = QueuedChannel();
+    if (StateIsLiveTV(GetState()) && !chan.isEmpty() && do_smart)
     {
-        int nzi = channelKeys.find("([1-9]|\\w)");
-        if (nzi >= 0)
+        // Look for channel in line-up
+        bool unique = false;
+        bool ok = activerecorder->CheckChannelPrefix(chan, unique);
+
+        // If pure channel not in line-up, try adding a spacer
+        QString mod = chan;
+        for (uint i=0; (spacers[i] != NULL) && !ok; ++i)
         {
-            uint idx = (uint)(channelKeys.length() - nzi);
-            QString chan = channelKeys.right(idx).stripWhiteSpace();
-            if (!activerecorder->CheckChannelPrefix(chan, unique))
-                channelKeys = key;
+            mod = chan.left(chan.length()-1) + spacers[i] + chan.right(1);
+            ok = activerecorder->CheckChannelPrefix(mod, unique);
         }
+
+        // Use valid channel if it is there, otherwise reset...
+        channelKeys = (ok) ? mod : QString("%1").arg(key);
+        do_smart &= unique;
     }
 
     if (activenvp == nvp && GetOSD())
     {
         InfoMap infoMap;
 
-        infoMap["channum"] = channelKeys;
+        infoMap["channum"] = (do_smart) ? channelKeys : inputKeys;
         infoMap["callsign"] = "";
         GetOSD()->ClearAllText("channel_number");
         GetOSD()->SetText("channel_number", infoMap, 2);
     }
 
-    if (unique)
+    if (do_smart)
         ChannelCommit();
 }
 
