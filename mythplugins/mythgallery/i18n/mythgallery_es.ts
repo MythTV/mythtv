@@ -3,47 +3,47 @@
     <name>GLSingleView</name>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Carpeta: </translation>
     </message>
     <message>
         <source>Created: </source>
-        <translation type="unfinished">Creado:</translation>
+        <translation>Creado: </translation>
     </message>
     <message>
         <source>Modified: </source>
-        <translation type="unfinished">Modificado:</translation>
+        <translation>Modificado: </translation>
     </message>
     <message>
         <source>Bytes</source>
-        <translation type="unfinished">Bytes</translation>
+        <translation>Bytes</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished">Ancho</translation>
+        <translation>Ancho</translation>
     </message>
     <message>
         <source>pixels</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished">Alto</translation>
+        <translation>Alto</translation>
     </message>
     <message>
         <source>Pixel Count</source>
-        <translation type="unfinished">Número de Píxels</translation>
+        <translation>Número de Píxels</translation>
     </message>
     <message>
         <source>megapixels</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Rotation Angle</source>
-        <translation type="unfinished">Angulo de rotación</translation>
+        <translation>Ángulo de rotación</translation>
     </message>
     <message>
         <source>degrees</source>
-        <translation type="unfinished">grados</translation>
+        <translation>grados</translation>
     </message>
 </context>
 <context>
@@ -70,35 +70,35 @@
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Sorry: OpenGL support not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Perdone: El soporte OpenGL no está disponible</translation>
     </message>
     <message>
         <source>SlideShow</source>
-        <translation type="unfinished"></translation>
+        <translation>Presentación</translation>
     </message>
     <message>
         <source>Rotate CW</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotar AR</translation>
     </message>
     <message>
         <source>Rotate CCW</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotar CAR</translation>
     </message>
     <message>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes</translation>
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Aleatorio</translation>
     </message>
 </context>
 <context>
@@ -149,51 +149,51 @@
     </message>
     <message>
         <source>Use OpenGL transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar transiciones OpenGL</translation>
     </message>
     <message>
         <source>Check this to enable OpenGL based slideshow transitions</source>
-        <translation type="unfinished"></translation>
+        <translation>Active esto para habilitar transiciones basadas en OpenGL</translation>
     </message>
     <message>
         <source>Type of OpenGL transition</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de transición OpenGL</translation>
     </message>
     <message>
         <source>This is the type of OpenGL transition used between pictures in slideshow mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>El tipo de transición OpenGL a usar entre imágenes.</translation>
     </message>
     <message>
         <source>Gallery Directory does not exist or is unreadable.</source>
-        <translation type="unfinished"></translation>
+        <translation>El directorio de la galería no existe o no es leíble.</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Command run to display movie files</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando a ejecutar para mostrar películas</translation>
     </message>
     <message>
         <source>This command is executed whenever a movie file is selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Este comando se ejecuta cuando una película es seleccionada</translation>
     </message>
     <message>
         <source>Store thumbnails in image directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar miniaturas en directorio de la imágen</translation>
     </message>
     <message>
         <source>If set, thumbnails are stored in &apos;.thumbcache&apos; directories within the above directory. If cleared, they are stored in your home directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado, las miniaturas se guardan en directorios &apos;.thumbcache&apos; del directorio de arriba. Si no, se guardan en su directorio de inicio.</translation>
     </message>
     <message>
         <source>Recurse into directories</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrar en directorios</translation>
     </message>
     <message>
         <source>Check this to let the slideshow recurse into sub-directories.</source>
-        <translation type="unfinished"></translation>
+        <translation>Active esto para permitir a la presentación entrar en subdirectorios.</translation>
     </message>
 </context>
 <context>
@@ -240,7 +240,7 @@
     </message>
     <message>
         <source>Folder: </source>
-        <translation type="unfinished"></translation>
+        <translation>Carpeta:</translation>
     </message>
 </context>
 </TS>

@@ -97,7 +97,7 @@
     </message>
     <message>
         <source>Video List browses files</source>
-        <translation>la Lista de Vídeos lista ficheros</translation>
+        <translation>La Lista de Vídeos lista ficheros</translation>
     </message>
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
@@ -137,136 +137,137 @@
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
-        <translation type="unfinished"></translation>
+        <translation>Los ficheros nuevos son listados por defecto</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado, los nuevos ficheros serán marcados como listables y aparecerán en el menú &apos;Navegación&apos;.</translation>
     </message>
     <message>
         <source>New category</source>
-        <translation type="unfinished"></translation>
+        <translation>Nueva categoría</translation>
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este PIN es usado para controlar el nivel de control de acceso. Si desea usar esta función, ajustar el valor a  todos los números le hará la vida mucho más fácil.</translation>
     </message>
     <message>
         <source>Command to search for movie listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando para buscar listados de películas</translation>
     </message>
     <message>
         <source>This command must be executable by the user running MythVideo.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este comando debe ser ejecutable para el usuario corriendo MythVideo.</translation>
     </message>
     <message>
         <source>Command to search for movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando para buscar posters</translation>
     </message>
     <message>
         <source>Command to extract data for movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Comando para extraer datos de películas</translation>
     </message>
     <message>
         <source>Directory that holds movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Directorio que guarda los posters</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>El directorio debe existir, y el usuario que ejecuta MythVideo necesita tener permisos de lectura/escritura.</translation>
     </message>
     <message>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Gestor Vídeos</translation>
     </message>
     <message>
         <source>Could not retrieve poster</source>
-        <translation type="unfinished"></translation>
+        <translation>No se descargó el poster</translation>
     </message>
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Un poster existe para esta película pero Myhn no ha podido descargarlo en un tiempo razonable.
+</translation>
     </message>
     <message>
         <source>Default View</source>
-        <translation type="unfinished"></translation>
+        <translation>Vista por defecto</translation>
     </message>
     <message>
         <source>Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Galería</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Navegador</translation>
     </message>
     <message>
         <source>Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Listado</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Control Acceso Agresivo</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Este es el comando usado para cualquier fichero cuya extensión no esté específicamente definida. También puede entrar el nombre de uno de los plugins internos como &apos;Internal&apos;.</translation>
     </message>
     <message>
         <source>Rows to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filas a mostrar</translation>
     </message>
     <message>
         <source>Columns to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Columnas a mostrar</translation>
     </message>
     <message>
         <source>Show title below thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar título debajo de miniaturas</translation>
     </message>
     <message>
         <source>If set, the additional text will make the thumbnails smaller.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado, el texto adicional hará las miniaturas más pequeñas.</translation>
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Mantener relación de aspecto de las miniaturas</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado, las miniaturas mantendrán la relación de aspecto original. Si no está activado, se escalarán para ajustarse al tamaño del icono de fondo.</translation>
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Galería de Vídeos</translation>
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
-        <translation type="unfinished"></translation>
+        <translation>La vista por defecto de MythVideo. Otras vistas pueden ser seleccionadas por el menú emergente de la tecla MENU.</translation>
     </message>
     <message>
         <source>Video Browser browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>El Navegador lista ficheros</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Browser screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado, el Navegador mostrará ficheros aunque no hayan sido escaneados.</translation>
     </message>
     <message>
         <source>Video Gallery browses files</source>
-        <translation type="unfinished"></translation>
+        <translation>La Galería lista ficheros</translation>
     </message>
     <message>
         <source>If set, this will cause the Video Gallery screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado, la Galería mostrará ficheros aunque no hayan sido escaneados.</translation>
     </message>
     <message>
         <source>General Settings (1/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración General (1/2)</translation>
     </message>
     <message>
         <source>General Settings (2/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración General (2/2)</translation>
     </message>
 </context>
 <context>
@@ -389,59 +390,59 @@
     </message>
     <message>
         <source>Browsable:</source>
-        <translation type="unfinished"></translation>
+        <translation>Listable:</translation>
     </message>
     <message>
         <source>IMDB Num.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Núm. IMDB:</translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>PL </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Categoría:</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar lista vídeos</translation>
     </message>
     <message>
         <source>Category :</source>
-        <translation type="unfinished"></translation>
+        <translation>Categoría :</translation>
     </message>
     <message>
         <source>Genre :</source>
-        <translation type="unfinished"></translation>
+        <translation>Género :</translation>
     </message>
     <message>
         <source>Country :</source>
-        <translation type="unfinished"></translation>
+        <translation>País :</translation>
     </message>
     <message>
         <source>Year :</source>
-        <translation type="unfinished"></translation>
+        <translation>Año :</translation>
     </message>
     <message>
         <source>Runtime :</source>
-        <translation type="unfinished"></translation>
+        <translation>Duración :</translation>
     </message>
     <message>
         <source>User Rating :</source>
-        <translation type="unfinished"></translation>
+        <translation>Puntuación :</translation>
     </message>
     <message>
         <source>Browse :</source>
-        <translation type="unfinished"></translation>
+        <translation>Listar :</translation>
     </message>
     <message>
         <source>Sort by :</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordenar :</translation>
     </message>
     <message>
         <source>Aucune video</source>
@@ -449,43 +450,43 @@
     </message>
     <message>
         <source>SELECT: Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>ENTER: Editar</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Parental</source>
-        <translation type="unfinished"></translation>
+        <translation>Control</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Acceso</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Año</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Duración</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Puntuación</translation>
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - Menú acción</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Arriba/Abajo, Página Arriba/Abajo: Navegar   MENU: Opciones   INFO: Menú acciones</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproducir fichero después:</translation>
     </message>
 </context>
 <context>
@@ -508,111 +509,111 @@
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver este Vídeo</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver Info Completa</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>
     <name>VideoDialog</name>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar a Vista Navegador</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar a Vista Galería</translation>
     </message>
     <message>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar a Vista Lista</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccione acción</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>PIN Acceso:</translation>
     </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
     <message>
         <source>Result of this filter : %1 video(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultado de este filtro : %1 vídeo(s)</translation>
     </message>
     <message>
         <source>Result of this filter : No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultado de este filtro: Ninguno</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Desconocido</translation>
+        <translation>Desconocido</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minutos</translation>
+        <translation>minutos</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Todos</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar por defecto</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished">Hecho</translation>
+        <translation>Hecho</translation>
     </message>
 </context>
 <context>
     <name>VideoGallery</name>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtro</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver este Vídeo</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver Info Completa</translation>
     </message>
     <message>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver Detalles</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation type="unfinished">Especificar manualmente el IMDB#</translation>
+        <translation>Especificar manualmente el IMDB#</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -644,50 +645,50 @@
     </message>
     <message>
         <source>delete failed</source>
-        <translation type="unfinished"></translation>
+        <translation>borrado fallido</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccione acción:</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar Metadatos</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscar IMDB</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar Metadatos</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
-        <translation type="unfinished"></translation>
+        <translation>No listar</translation>
     </message>
     <message>
         <source>Remove Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar Vídeo</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Borrar este fichero?</translation>
     </message>
 </context>
 <context>
     <name>VideoSelected</name>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished">Clasificación no disponible.</translation>
+        <translation>Clasificación no disponible.</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished">minutos</translation>
+        <translation>minutos</translation>
     </message>
 </context>
 <context>
@@ -702,35 +703,35 @@
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccione acción</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver este Vídeo</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver Info Completa</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrar</translation>
     </message>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar a Vista Navegador</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar a Vista Galería</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>

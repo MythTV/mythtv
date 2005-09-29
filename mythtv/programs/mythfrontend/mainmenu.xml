@@ -10,15 +10,11 @@
       <text lang="FR">Regarder la TV</text>
       <text lang="DE">Fernsehen</text>
       <text lang="DK">Se TV</text>
-      <text lang="IS">Horfa á sjónvarp</text>
       <text lang="PT">Ver TelevisÃ£o</text>
       <text lang="SV">Se på TV</text>
       <text lang="JA">TV放送</text>
       <text lang="FI">Katso TV:tä</text>
       <text lang="ZH_TW">觀看電視</text>
-      <text lang="SI">Glej TV</text>
-      <text lang="ET">Vaata telerit</text>
-      <text lang="NB">Se på TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -27,18 +23,13 @@
      <text>Media Library</text>
      <text lang="DE">Mediathek</text>
      <text lang="FR">Médiathèque</text>
-     <text lang="IS">Margmiðlunarsafn</text>
      <text lang="NL">Media-Center</text>     
      <text lang="SV">Mediabibliotek</text>
      <text lang="JA">メディアライブラリ</text>
      <text lang="FI">Mediakirjasto</text>
      <text lang="ZH_TW">媒體館</text>
-     <text lang="SI">Media</text>
-     <text lang="ET">Meediakataloog</text>
-     <text lang="NB">Mediebibliotek</text>
-     <text lang="DK">Mediabibliotek</text>
+     <text lang="ES">Mediateca</text>
      <alttext lang="SV">Bibliotek</alttext>
-     <alttext lang="ET">Kataloog</alttext>
      <action>MENU library.xml</action>
    </button>
    
@@ -52,18 +43,14 @@
       <text lang="FR">Gérer les enregistrements</text>
       <text lang="DE">Aufnahmen verwalten</text>
       <text lang="DK">Optag udsendelse</text>
-      <text lang="IS">Upptaka útsendinga</text>
       <text lang="PT">Gravação Programada</text>
       <text lang="SV">Hantera inspelningar</text>
       <text lang="JA">録画予約</text>
       <text lang="FI">Hallitse Nauhoituksia</text>
       <text lang="ZH_TW">管理電視錄影</text>
-      <text lang="SI">Urejanje snemanj</text>
-      <text lang="ET">Halda salvestusi</text>
-      <text lang="NB">Behandle opptak</text>
       <alttext lang="DE">Verwaltung</alttext>
       <alttext lang="SV">Hantera</alttext>
-      <alttext lang="ET">Salvestused</alttext>
+      <alttext lang="ES">Programar</alttext>
       <action>MENU manage_recordings.xml</action>
    </button>
 
@@ -72,19 +59,15 @@
      <text>Information Center</text>
      <text lang="DE">Informationen</text>
      <text lang="FR">Centre d'informations</text>
-     <text lang="IS">Upplýsinga miðstöð</text>
      <text lang="NL">Informatie Centrale</text>
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォメーションセンター</text>
      <text lang="FI">Tiedotepalvelu</text>
      <text lang="ZH_TW">資訊中心</text>
-     <text lang="SI">Info center</text>
-     <text lang="ET">Infokeskus</text>
-     <text lang="NB">Informasjonssenter</text>
-     <text lang="DK">Informationscenter</text>
+     <text lang="ES">Centro de Información</text>
+     <alttext lang="ES">Información</alttext>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
-     <alttext lang="ET">Info</alttext>
      <action>MENU info_menu.xml</action>
    </button>
 
@@ -93,40 +76,45 @@
      <text>Optical Disks</text>
      <text lang="DE">CD/DVD</text>
      <text lang="FR">Disques optiques</text>
-     <text lang="IS">Geisladiskar</text>
      <text lang="NL">DVD-CD media</text>
      <text lang="SV">Optiska diskar</text>
      <text lang="JA">オプティカルディスク</text>
      <text lang="FI">DVD ja CD</text>
      <text lang="ZH_TW">光碟</text>
-     <text lang="SI">CD/DVD</text>
-     <text lang="ET">DVD ja CD</text>
-     <text lang="NB">CD-/DVD-stasjoner</text>
-     <text lang="DK">CD/DVD</text>
+     <text lang="ES">CD/DVD</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
     
+   <button>
+     <type>PHONE</type>
+     <text>Phone</text>
+     <text lang="JA">電話</text>
+     <text lang="DE">Telefon</text>
+     <text lang="FI">Puhelin</text>
+     <text lang="NL">Telefoon</text>     
+     <text lang="SV">Telefon</text>
+     <text lang="FR">Téléphone</text>
+     <text lang="ES">Teléfono</text>
+     <action>PLUGIN mythphone</action>
+     <depends>mythphone</depends>
+   </button>
    
    <button>
      <type>MENU_UTILITIES_SETUP</type>
      <text>Utilities / Setup</text>
      <text lang="IT">Impostazioni</text>
-     <text lang="ES">Configurar</text>
+     <text lang="ES">Configuración</text>
      <text lang="CA">Configurar</text>
      <text lang="FR">Configuration</text>
      <text lang="DE">Zubehör / Konfiguration</text>
      <text lang="DK">Konfiguration</text>
-     <text lang="IS">Uppsetning</text>
      <text lang="NL">Beheer</text>
      <text lang="PT">Configurações</text>
      <text lang="SV">Verktyg / Inställningar</text>
      <text lang="JA">設定</text>
      <text lang="FI">Oheis/Asetukset</text>
      <text lang="ZH_TW">工具/設定</text>
-     <text lang="SI">Nastavitve</text>
-     <text lang="ET">Utiliidid / seaded</text>
-     <text lang="NB">Verktøy/Oppsett</text>
      <alttext lang="DE">Verschiedenes</alttext>
      <alttext lang="SV">Inställningar</alttext>
      <action>MENU util_menu.xml</action>
@@ -138,7 +126,6 @@
      <text lang="SV">Avstängning</text>
      <text lang="NL">Uitschakelen</text>
      <text lang="DE">Beenden</text>
-     <text lang="ET">Seiska</text>
      <action>SHUTDOWN</action>
    </button> -->
 

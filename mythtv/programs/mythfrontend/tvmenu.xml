@@ -10,15 +10,11 @@
       <text lang="FR">Regarder la TV</text>
       <text lang="DE">Fernsehen</text>
       <text lang="DK">Se TV</text>
-      <text lang="IS">Horfa á sjónvarp</text>
       <text lang="PT">Ver Televisão</text>
       <text lang="SV">Se på TV</text>
       <text lang="JA">TVを見る</text>
       <text lang="FI">Katso Televisiota</text>
       <text lang="ZH_TW">觀看電視</text>
-      <text lang="SI">Gledanje TV</text>
-      <text lang="ET">Vaata telerit</text>
-      <text lang="NB">Se på TV</text>
       <action>TV_WATCH_LIVE</action>
    </button>
 
@@ -32,15 +28,11 @@
       <text lang="FR">Programmer des enregistrements</text>
       <text lang="DE">Aufnahmen planen</text>
       <text lang="DK">Optag udsendelse</text>
-      <text lang="IS">Stilla upptöku</text>
       <text lang="PT">Gravação Programada</text>
       <text lang="SV">Schemalägg inspelningar</text>
       <text lang="JA">録画予約</text>
       <text lang="FI">Ajasta Nauhoituksia</text>
       <text lang="ZH_TW">預設錄影</text>
-      <text lang="SI">Plan snemanj</text>
-      <text lang="ET">Planeeri salvestamisi</text>
-      <text lang="NB">Planlegg opptak</text>
       <alttext>Schedule</alttext>
       <alttext lang="FR">Programmation</alttext>
       <alttext lang="ES">Temporizadores</alttext>
@@ -53,9 +45,6 @@
       <alttext lang="IT">Programmazione</alttext>
       <alttext lang="DE">Planung</alttext>
       <alttext lang="ZH_TW">預錄</alttext>
-      <alttext lang="SI">Plan</alttext>
-      <alttext lang="ET">Planeerimine</alttext>
-      <alttext lang="NB">Planlegg</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -69,16 +58,11 @@
       <text lang="FR">Visionner des enregistrements</text>
       <text lang="DE">Aufnahmen ansehen</text>
       <text lang="DK">Afspil optagelser</text>
-      <text lang="IS">Horfa á upptöku</text>
       <text lang="PT">Ver Gravações</text>
       <text lang="SV">Titta på inspelningar</text>
       <text lang="JA">録画再生</text>
       <text lang="FI">Katso Nauhoitukset</text>
       <text lang="ZH_TW">觀看預錄節目</text>
-      <text lang="SI">Predvajanje snemanj</text>
-      <text lang="ET">Vaata salvestusi</text>
-      <text lang="NB">Se på opptak</text>
-      <alttext lang="ET">Salvestused</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -92,16 +76,11 @@
       <text lang="FR">Supprimer des enregistrements</text>
       <text lang="DE">Aufnahmen löschen</text>
       <text lang="DK">Slet optagelser</text>
-      <text lang="IS">Eyða upptöku</text>
       <text lang="PT">Apagar Gravações</text>
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
       <text lang="FI">Poista Nauhoituksia</text>
       <text lang="ZH_TW">刪除錄影</text>
-      <text lang="SI">Brisanje snemanj</text>
-      <text lang="ET">Kustuta salvestusi</text>
-      <text lang="NB">Slett opptak</text>
-      <alttext lang="ET">Kustuta</alttext>
       <action>TV_DELETE</action>
    </button> 
 
@@ -115,7 +94,6 @@
       <text lang="DE">TV direkt</text>
       <text lang="SV">TV direkt</text>
       <text lang="JA">パススルーモード</text>
-      <text lang="ET">TV läbilase</text>
       <action>EXECTV xawtv -f -device %s -dspdev %s -vbidev %s</action>
    </button>
 -->
@@ -124,16 +102,13 @@
       <type>TV_STATUS</type>
       <text>System Status</text>
       <text lang="DE">Systemstatus</text>
-      <text lang="IS">Staða kerfis</text>
       <text lang="NL">Systeemstatus</text>
       <text lang="FR">État système</text>
       <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>
       <text lang="FI">Systeemin Tila</text>
       <text lang="ZH_TW">系統狀態</text>
-      <text lang="SI">Status sistema</text>
-      <text lang="ET">Süsteemi olek</text>
-      <text lang="NB">Systemstatus</text>
+      <text lang="ES">Estado Sistema</text>
       <action>TV_STATUS</action>
    </button>
 

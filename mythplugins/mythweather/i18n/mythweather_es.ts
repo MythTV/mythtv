@@ -46,7 +46,7 @@
     </message>
     <message>
         <source>Light Rain</source>
-        <translation>Liega lluvia</translation>
+        <translation>Ligera lluvia</translation>
     </message>
     <message>
         <source>Showers</source>
@@ -106,7 +106,7 @@
     </message>
     <message>
         <source>Few Snow Showers</source>
-        <translation>Lgunos chubascos de nieve</translation>
+        <translation>Algunos chubascos de nieve</translation>
     </message>
     <message>
         <source>Cloudy/Wind</source>
@@ -342,7 +342,7 @@
     </message>
     <message>
         <source>AM Light Snow/Wind</source>
-        <translation>Nevadas dèbiles matinales/viento</translation>
+        <translation>Nevadas débiles matinales/viento</translation>
     </message>
     <message>
         <source>PM Light Rain/Wind</source>
@@ -354,7 +354,7 @@
     </message>
     <message>
         <source>PM Light Snow/Wind</source>
-        <translation>Nevadas dèbiles por la tarde/viento</translation>
+        <translation>Nevadas débiles por la tarde/viento</translation>
     </message>
     <message>
         <source>Heavy Rain/Wind</source>
@@ -406,7 +406,7 @@
     </message>
     <message>
         <source>AM Light Rain/Wind</source>
-        <translation>Lluvia dèbil por la mañana/viento</translation>
+        <translation>Lluvia débil por la mañana/viento</translation>
     </message>
     <message>
         <source>AM Rain/Wind</source>
@@ -560,7 +560,7 @@
     </message>
     <message>
         <source>Visibility</source>
-        <translation>Visibilidat</translation>
+        <translation>Visibilidad</translation>
     </message>
     <message>
         <source>Wind Chill</source>
@@ -592,11 +592,11 @@
     </message>
     <message>
         <source>Forecast for</source>
-        <translation>Previsió per al</translation>
+        <translation>Previsión para</translation>
     </message>
     <message>
         <source>doppler radar</source>
-        <translation>Imagen del radar</translation>
+        <translation>Imágen del radar</translation>
     </message>
     <message>
         <source>Map Unavailable</source>
@@ -636,15 +636,15 @@
     </message>
     <message>
         <source>COLD</source>
-        <translation type="unfinished"></translation>
+        <translation>FRIO</translation>
     </message>
     <message>
         <source>COLDEST</source>
-        <translation type="unfinished"></translation>
+        <translation>MÁS FRIO</translation>
     </message>
     <message>
         <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
+        <translation>TEMPERATURA NUBES</translation>
     </message>
 </context>
 <context>
@@ -891,11 +891,11 @@
     </message>
     <message>
         <source>Imperial (Fahrenheit, in, etc)</source>
-        <translation></translation>
+        <translation>Imperial (Fahrenheit, in, etc)</translation>
     </message>
     <message>
         <source>Metric (Celsius, kPa, etc)</source>
-        <translation></translation>
+        <translation>Métrico (Celsius, kPa, etc)</translation>
     </message>
     <message>
         <source> F</source>
@@ -919,21 +919,23 @@
     </message>
     <message>
         <source>doppler radar</source>
-        <translation type="unfinished">Imagen del radar</translation>
+        <translation>Imagen del radar</translation>
     </message>
     <message>
         <source>satellite image</source>
-        <translation type="unfinished"></translation>
+        <translation>imágen satélite</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to try again without animated radar maps.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth no ha podido descargar los datos meteorológicos en el tiempo permitido (%1 segundos).
+Pulse OK para reintentarlo con un tiempo de espera mayor. Pulse Cancelar para probar de nuevo sin mapas.</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).
 Press OK to try again with a larger timeout value. Press Cancel to abort.</source>
-        <translation type="unfinished"></translation>
+        <translation>Myth no ha podido descargar los datos meteorológicos en el tiempo permitido (%1 segundos).
+Pulse OK para reintentarlo con un tiempo de espera mayor. Pulse Cancelar para abortar.</translation>
     </message>
 </context>
 </TS>

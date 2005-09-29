@@ -178,7 +178,7 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
     <message>
         <source>Transcode AC3 Audio</source>
-        <translation>Trascodificar audio AC3</translation>
+        <translation>Recodificar audio AC3</translation>
     </message>
     <message>
         <source>If set, the MTD (Myth Transcoding Daemon) will, by default, preserve AC3 (Dolby Digital) audio in transcoded files. </source>
@@ -234,67 +234,67 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
     <message>
         <source>Transcode of %1</source>
-        <translation>Trascodificación de %1</translation>
+        <translation>Recodificación de %1</translation>
     </message>
     <message>
         <source>Waiting for Permission to Start Transcoding</source>
-        <translation>Esperando autorización para iniciar la trascodificación</translation>
+        <translation>Esperando autorización para iniciar la recodificación</translation>
     </message>
     <message>
         <source>Transcoding Pass 1 of 2 ~</source>
-        <translation>Trascodificando, paso 1 de 2 ~ </translation>
+        <translation>Recodificando, paso 1 de 2 ~ </translation>
     </message>
     <message>
         <source>Transcoding Pass 2 of 2 ~</source>
-        <translation>Trascodificando, paso 2 de 2 ~ </translation>
+        <translation>Recodificando, paso 2 de 2 ~ </translation>
     </message>
     <message>
         <source>Transcoding ~</source>
-        <translation>Trascodificando ~ </translation>
+        <translation>Recodificando ~ </translation>
     </message>
     <message>
         <source>Transcode is thinking </source>
-        <translation>El trascodificador está pensando</translation>
+        <translation>El recodificador está pensando</translation>
     </message>
     <message>
         <source>Simultaneous Transcode Jobs</source>
-        <translation>Tareas de trascodificación simultáneas</translation>
+        <translation>Tareas de recodificación simultáneas</translation>
     </message>
     <message>
         <source>This determines the number of simultaneous transcode jobs. If set at 1 (the default), there will only be one active job at a time.</source>
-        <translation>Determina el número de tareas simultáneas de trascodificación. Si se define 1 (por defecto) habrá sólo una.</translation>
+        <translation>Determina el número de tareas simultáneas de recodificación. Si se define 1 (por defecto) habrá sólo una.</translation>
     </message>
     <message>
         <source>On DVD insertion</source>
-        <translation type="unfinished"></translation>
+        <translation>Al insertar DVD</translation>
     </message>
     <message>
         <source>Do nothing</source>
-        <translation type="unfinished"></translation>
+        <translation>No hacer nada</translation>
     </message>
     <message>
         <source>Play DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproducir DVD</translation>
     </message>
     <message>
         <source>Rip DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Ripear DVD</translation>
     </message>
     <message>
         <source>Media Monitoring should be turned on to allow this feature (Setup -&gt; General -&gt; CD/DVD Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation>El Monitor de Medios debe estar activado para permitir esta función (Configuración -&gt; General -&gt; Monitor CD/DVD</translation>
     </message>
     <message>
         <source>Display mythdvd menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar menú mythdvd</translation>
     </message>
     <message>
         <source>ISO copy of %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Copia ISO de %1</translation>
     </message>
     <message>
         <source>Waiting for access to DVD</source>
-        <translation type="unfinished"></translation>
+        <translation>Esperando por acceso a DVD</translation>
     </message>
 </context>
 <context>
@@ -345,7 +345,7 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
     <message>
         <source>0:00:00</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -380,7 +380,7 @@ No tiene definido dispositivo de para deproducir DVD.</translation>
     </message>
     <message>
         <source>ISO Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Imágen ISO</translation>
     </message>
 </context>
 </TS>

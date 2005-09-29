@@ -4,17 +4,13 @@
       <type>TV_SEARCH_NEW_TITLES</type>
       <text>New Titles</text>
       <text lang="DE">Neue Sendungen</text>
-      <text lang="IS">Nýjir titlar</text>
       <text lang="FR">Nouveaux titres</text>
       <text lang="SV">Nya titlar</text>
       <text lang="JA">新タイトル</text>
       <text lang="NL">Nieuwe Titels</text>
       <text lang="FI">Uudet Ohjelmat</text>
       <text lang="ZH_TW">新標題</text>
-      <text lang="SI">Novi naslovi</text>
-      <text lang="ET">Uued pealkirjad</text>
-      <text lang="NB">Nye titler</text>
-      <text lang="DK">Nye titler</text>
+      <text lang="ES">Títulos Nuevos</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -22,17 +18,13 @@
       <type>TV_SEARCH_MOVIES</type>
       <text>Movies</text>
       <text lang="DE">Spielfilme</text>
-      <text lang="IS">Myndir</text>
       <text lang="SV">Filmer</text>
       <text lang="FR">Films</text>
       <text lang="JA">映画</text>
       <text lang="NL">Films</text>
       <text lang="FI">Elokuvat</text>
       <text lang="ZH_TW">電影</text>
-      <text lang="SI">Filmi</text>
-      <text lang="ET">Filmid</text>
-      <text lang="NB">Filmer</text>
-      <text lang="DK">Film</text>
+      <text lang="ES">Películas</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -40,17 +32,13 @@
       <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
       <text lang="DE">Kategorien</text>
-      <text lang="IS">Flokkar</text>
       <text lang="SV">Kategori</text>
       <text lang="FR">Catégories</text>
       <text lang="JA">カテゴリー</text>
       <text lang="NL">Categorie</text>
       <text lang="FI">Kategoriat</text>
       <text lang="ZH_TW">種類</text>
-      <text lang="SI">Kategorije</text>
-      <text lang="ET">Kategooriad</text>
-      <text lang="NB">Kategories</text>
-      <text lang="DK">Kategorier</text>
+      <text lang="ES">Categorías</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -58,17 +46,13 @@
       <type>TV_SEARCH_CHANNELS</type>
       <text>Channels</text>
       <text lang="DE">Sender</text>
-      <text lang="IS">Stöðvar</text>
       <text lang="SV">Kanal</text>
       <text lang="FR">Chaînes</text>
       <text lang="NL">Zender</text>
       <text lang="JA">チャンネル</text>
       <text lang="FI">Kanavat</text>
       <text lang="ZH_TW">電視台</text>
-      <text lang="SI">Kanali</text>
-      <text lang="ET">Kanalid</text>
-      <text lang="NB">Kanaler</text>
-      <text lang="DK">Kanaler</text>
+      <text lang="ES">Canales</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -80,13 +64,9 @@
       <text lang="FR">Durée</text>
       <text lang="JA">時間</text>
       <text lang="DE">Sendezeit</text>
-      <text lang="IS">Tími</text>
       <text lang="FI">Aika</text>
       <text lang="ZH_TW">時間</text>
-      <text lang="SI">Čas</text>
-      <text lang="ET">Aeg</text>
-      <text lang="NB">Tid</text>
-      <text lang="DK">Tid</text>
+      <text lang="ES">Hora</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 

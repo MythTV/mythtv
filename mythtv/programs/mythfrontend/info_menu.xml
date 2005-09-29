@@ -1,21 +1,4 @@
 <mythmenu name="INFO">
-   <button>
-     <type>PHONE</type>
-     <text>Phone</text>
-     <text lang="JA">電話</text>
-     <text lang="DE">Telefon</text>
-     <text lang="IS">Sími</text>
-     <text lang="FI">Puhelin</text>
-     <text lang="NL">Telefoon</text>     
-     <text lang="SV">Telefon</text>
-     <text lang="FR">Téléphone</text>
-     <text lang="SI">Telefon</text>
-     <text lang="ET">Telefon</text>
-     <text lang="NB">Telefon</text>
-     <text lang="DK">Telefon</text>
-     <action>PLUGIN mythphone</action>
-     <depends>mythphone</depends>
-   </button>
 
    <button>
      <type>NEWS</type>
@@ -24,16 +7,11 @@
      <text lang="CA">Notícies</text>
      <text lang="ES">Noticias</text>
      <text lang="FR">Nouvelles</text>
-     <text lang="IS">Fréttir</text>
      <text lang="NL">Nieuws</text>
      <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース</text>
      <text lang="FI">Uutiset</text>
      <text lang="ZH_TW">網上新聞</text>
-     <text lang="SI">Novice</text>
-     <text lang="ET">Uudised</text>
-     <text lang="NB">Nyheter</text>
-     <text lang="DK">Nyheder</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -41,8 +19,6 @@
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
      <text lang="FI">Elokuvien Ajat</text>
-     <text lang="SI">Čas filmov</text>
-     <text lang="ET">Filmide ajad</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -57,15 +33,11 @@
      <text lang="FR">Météo</text>
      <text lang="DE">Wetter</text>
      <text lang="DK">Vejret</text>
-     <text lang="IS">Veðrið</text>
      <text lang="PT">Meteorologia</text>
      <text lang="SV">Väder</text>
      <text lang="JA">天気</text>
      <text lang="FI">Säätiedotus</text>
      <text lang="ZH_TW">天氣報告</text>
-     <text lang="SI">Vreme</text>
-     <text lang="ET">Ilmateade</text>
-     <text lang="NB">Været</text>
      <action>PLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -75,15 +47,11 @@
       <text>Web</text>
       <text lang="DE">WWW</text>
       <text lang="FR">Web</text>
-      <text lang="IS">Vefurinn</text>
       <text lang="SV">Webb</text>
       <text lang="JA">ウェブ</text>
       <text lang="FI">Nettiselain</text>
       <text lang="ZH_TW">互聯網</text>
-      <text lang="SI">Splet</text>
-      <text lang="ET">Veeb</text>
-      <text lang="NB">Nettleser</text>
-      <text lang="DK">Web</text>
+      <text lang="ES">Web</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -92,17 +60,13 @@
      <type>RECIPE</type>
      <text>Recipes</text>
      <text lang="SV">Recept</text>
-     <text lang="IS">Uppskriftir</text>
      <text lang="NL">Kookboek</text>     
      <text lang="FR">Recettes</text>
      <text lang="NL">Recepten</text>
      <text lang="JA">レシピ</text>
      <text lang="DE">Rezepte</text>
      <text lang="FI">Reseptit</text>
-     <text lang="SI">Recepti</text> 
-     <text lang="ET">Retseptid</text>
-     <text lang="NB">Oppskrifter</text>
-     <text lang="DK">Opskrifter</text>
+     <text lang="ES">Recetas</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -112,16 +76,12 @@
       <text>System Status</text>
       <text lang="DE">Systemstatus</text>
       <text lang="FR">État système</text>
-      <text lang="IS">Staða kerfis</text>
       <text lang="NL">Systeemstatus</text>
       <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>
       <text lang="FI">Systeemin Tila</text>
       <text lang="ZH_TW">系統狀態</text>
-      <text lang="SI">Status sistema</text>
-      <text lang="ET">Süsteemi olek</text>
-      <text lang="NB">Systemstatus</text>
-      <text lang="DK">Systemstatus</text>
+      <text lang="ES">Estado Sistema</text>          
       <action>TV_STATUS</action>
    </button>
 
