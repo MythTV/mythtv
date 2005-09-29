@@ -941,7 +941,7 @@ bool TV::StartRecorder(int maxWait)
         return false;
     }
 
-    VERBOSE(VB_RECORD, "TV::StartRecorder: took "<<t.elapsed()
+    VERBOSE(VB_PLAYBACK, "TV::StartRecorder: took "<<t.elapsed()
             <<" ms to start recorder.");
 
     // Get timeout for this recorder
@@ -956,6 +956,10 @@ bool TV::StartRecorder(int maxWait)
     else if (query.next() &&
              SignalMonitor::IsSupported(query.value(1).toString()))
         lockTimeout = max(query.value(0).toInt(), 500);
+
+    VERBOSE(VB_PLAYBACK, "TV::StartRecorder: " +
+            QString("Set lock timeout to %1 ms for rec #%2")
+            .arg(lockTimeout).arg(recorder->GetRecorderNumber()));
 
     // Cache starting frame rate for this recorder
     frameRate = recorder->GetFrameRate();
@@ -982,7 +986,7 @@ bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
            (t.elapsed() < maxWait))
         usleep(50);
 
-    VERBOSE(VB_RECORD, "TV::StartPlayer: took "<<t.elapsed()
+    VERBOSE(VB_PLAYBACK, "TV::StartPlayer: took "<<t.elapsed()
             <<" ms to start player.");
 
     if (nvp->IsPlaying())
@@ -3302,7 +3306,7 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
 void TV::UpdateOSDTimeoutMessage(void)
 {
     QString dlg_name("channel_timed_out");
-    bool timed_out = lockTimerOn && (lockTimer.elapsed() > (int)lockTimeout);
+    bool timed_out = lockTimerOn && ((uint)lockTimer.elapsed() > lockTimeout);
     OSD *osd = GetOSD();
 
     if (!osd)
@@ -5070,6 +5074,10 @@ void TV::UnpauseLiveTV(void)
         lastSignalUIInfo.clear();
     }
 
-    lockTimer.start();
-    lockTimerOn = true;
+    lockTimerOn = false;
+    if (lockTimeout < 0xffffffff)
+    {
+        lockTimer.start();
+        lockTimerOn = true;
+    }
 }
