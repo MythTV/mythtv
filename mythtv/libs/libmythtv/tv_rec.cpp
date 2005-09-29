@@ -925,12 +925,17 @@ void TVRec::InitChannel(const QString &inputname, const QString &startchannel)
     }
 #endif // USING_V4L
 
-    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
     if (inputname.isEmpty())
         channel->SetChannelByString(startchannel);
     else
         channel->SwitchToInput(inputname, startchannel);
+
+    // Set channel ordering, and check validity...
+    QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
     channel->SetChannelOrdering(chanorder);
+    QString channum_out(startchannel), chanid("");
+    DoGetNextChannel(channum_out, channel->GetCurrentInput(), cardid,
+                     channel->GetOrdering(), BROWSE_SAME, chanid);
 }
 
 void TVRec::CloseChannel(void)
@@ -2216,13 +2221,19 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
 
     if (!isNum && channelorder == "channum + 0")
     {
-        VERBOSE(VB_IMPORTANT, LOC +
-                "Your channel ordering method \"channel number (numeric)\"\n"
-                "\t\t\twill not work with channels like: "<<channum<<"    \n"
-                "\t\t\tConsider switching to order by \"database order\"  \n"
-                "\t\t\tor \"channel number (alpha)\" in the general       \n"
-                "\t\t\tsettings section of the frontend setup             \n");
-        channel->SetChannelOrdering(channelorder = "channum");
+        bool is_atsc = GetChannelValue("atscsrcid", channel, channum) > 0;
+        channelorder = (is_atsc) ? "atscsrcid" : "channum";
+        channel->SetChannelOrdering(channelorder);
+        if (!is_atsc)
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "Your channel ordering method \"channel number (numeric)\"\n"
+                    "\t\t\twill not work with channels like: "<<channum<<"    \n"
+                    "\t\t\tConsider switching to order by \"database order\"  \n"
+                    "\t\t\tor \"channel number (alpha)\" in the general       \n"
+                    "\t\t\tsettings section of the frontend setup             \n"
+                    "\t\t\tSwitched to "<<channelorder<<" order.");
+        }
     }
 
     MSqlQuery query(MSqlQuery::InitCon());

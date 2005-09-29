@@ -788,6 +788,7 @@ static HostComboBox *ChannelOrdering()
     gc->addSelection(QObject::tr("channel number (alpha)"), "channum");
     gc->addSelection(QObject::tr("database order"), "chanid");
     gc->addSelection(QObject::tr("channel name"), "callsign");
+    gc->addSelection(QObject::tr("ATSC channel"), "atscsrcid");
     return gc;
 }
 
