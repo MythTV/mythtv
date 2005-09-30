@@ -3475,7 +3475,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
     if (!hasFullPositionMap)
     {
         VERBOSE(VB_IMPORTANT, "NVP: Does not have position map.\n" +
-                QString("\t\t\tRun 'mythcommflag --rebuild '%1' to fix")
+                QString("\t\t\tRun 'mythcommflag --file %1 --rebuild' to fix")
                 .arg(m_playbackinfo->GetRecordBasename()));
         return NULL;
     }
