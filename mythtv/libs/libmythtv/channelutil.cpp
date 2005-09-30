@@ -712,10 +712,8 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;
     query.bindValue(":TVFORMAT", tvformat);
 
-    query.bindValue(":ICON", icon);
-
-    if (!xmltvid.isEmpty())
-        query.bindValue(":XMLTVID",   xmltvid);
+    query.bindValue(":ICON",      icon);
+    query.bindValue(":XMLTVID",   xmltvid);
 
     if (!query.exec() || !query.isActive())
     {
