@@ -128,8 +128,6 @@ TVRec::TVRec(int capturecardnum)
       ringBuffer(NULL), rbFileName(""), rbFileExt("mpg"),
       rbStreamingSock(NULL), rbStreamingBuffer(NULL), rbStreamingLive(false)
 {
-    event_thread    = PTHREAD_CREATE_JOINABLE;
-    recorder_thread = static_cast<pthread_t>(0);
 }
 
 /** \fn TVRec::Init()
@@ -683,7 +681,8 @@ void TVRec::HandleStateChange(void)
     }
     else if (TRANSITION(kState_RecordingOnly, kState_None))
     {
-        tuningRequests.enqueue(TuningRequest(kFlagCloseRec));
+        tuningRequests.enqueue(
+            TuningRequest(kFlagCloseRec|kFlagKillRingBuffer));
         SET_NEXT();
     }
 
@@ -805,6 +804,15 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOptionsFromProfile(
             &profile, genOpt.videodev, genOpt.audiodev, genOpt.vbidev, ispip);
         recorder->Initialize();
+
+        if (recorder->IsErrored())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to initialize recorder!");
+            recorder->deleteLater();
+            recorder = NULL;
+            return false;
+        }
+
         connect(recorder, SIGNAL(RecorderPaused(void)),
                 this,     SLOT  (RecorderPaused(void)));
         return true;
@@ -842,7 +850,7 @@ void TVRec::TeardownRecorder(bool killFile)
 
     ispip = false;
 
-    if (recorder)
+    if (recorder && HasFlags(kFlagRecorderRunning))
     {
         // This is a bad way to calculate this, the framerate
         // may not be constant if using a DTV based recorder.
@@ -854,20 +862,18 @@ void TVRec::TeardownRecorder(bool killFile)
         gContext->dispatch(me);
 
         recorder->StopRecording();
+        pthread_join(recorder_thread, NULL);
+    }
+    ClearFlags(kFlagRecorderRunning);
 
-        if (recorder_thread)
-            pthread_join(recorder_thread, NULL);
-        recorder_thread = static_cast<pthread_t>(0);
+    if (recorder)
+    {
         recorder->deleteLater();
         recorder = NULL;
     }
 
     if (ringBuffer)
-    {
         ringBuffer->StopReads();
-        rbStreamingLive = false;
-        SetRingBuffer(NULL);
-    }
 
     if (killFile)
     {
@@ -2561,9 +2567,20 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
 
     if (ringBuffer)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can not create RingBuffer.\n\t\t\t"
-                "A RingBuffer already exists for LiveTV on this recorder");
-        return false;
+        // If we are in state none, assume frontend crashed in LiveTV...
+        if (GetState() == kState_None)
+        {
+            stateChangeLock.unlock();
+            StopLiveTV();
+            WaitForEventThreadSleep();
+            stateChangeLock.lock();
+        }
+        if (ringBuffer)
+        {
+            VERBOSE(VB_IMPORTANT, "A RingBuffer already on this recorder...\n"
+                    "\t\t\tIs someone watich 'Live TV' on this recorder?");
+            return false;
+        }
     }
 
     ispip = pip;
@@ -3023,6 +3040,10 @@ void TVRec::SetReadThreadSocket(QSocket *sock)
 
     if ((rbStreamingLive && sock) || (!rbStreamingLive && !sock))
     {
+        VERBOSE(VB_IMPORTANT, LOC +
+                "Not setting streaming socket live("<<rbStreamingLive<<")\n"
+                "\t\t\tnew sock("<<sock<<") old sock("<<rbStreamingSock<<")");
+        
         return;
     }
 
@@ -3310,11 +3331,14 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         // At this point the channel is shut down
     }
 
-    if (((request.flags & kFlagKillRingBuffer) || lastTuningRequest.program) &&
-        ringBuffer)
+    if (ringBuffer && (request.flags & kFlagKillRingBuffer))
     {
+        if (lastTuningRequest.flags & kFlagLiveTV)
+        {
+            VERBOSE(VB_RECORD, LOC + "Stopping LiveTV RingBuffer reads");
+            ringBuffer->StopReads();
+        }
         VERBOSE(VB_RECORD, LOC + "Tearing down RingBuffer");
-        ringBuffer->StopReads();
         rbStreamingLive = false;
         SetRingBuffer(NULL);
         // At this point the ringbuffer is shut down
@@ -3610,8 +3634,15 @@ void TVRec::TuningNewRecorder(void)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
                     "Failed to start recorder!  ringBuffer is NULL\n"
-                    "\t\t\t\t Tuning request was %1\n")
+                    "\t\t\t\t  Tuning request was %1\n")
                 .arg(lastTuningRequest.toString()));
+
+        if (HasFlags(kFlagLiveTV))
+        {
+            QString message = QString("QUIT_LIVETV %1").arg(cardid);
+            MythEvent me(message);
+            gContext->dispatch(me);
+        }
         ChangeState(kState_None);
         return;
     }
@@ -3620,8 +3651,16 @@ void TVRec::TuningNewRecorder(void)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
                     "Failed to start recorder!\n"
-                    "\t\t\t\t Tuning request was %1\n")
+                    "\t\t\t\t  Tuning request was %1\n")
                 .arg(lastTuningRequest.toString()));
+
+        if (HasFlags(kFlagLiveTV))
+        {
+            QString message = QString("QUIT_LIVETV %1").arg(cardid);
+            MythEvent me(message);
+            gContext->dispatch(me);
+        }
+        TeardownRecorder(true);
         ChangeState(kState_None);
         return;
     }
@@ -3770,6 +3809,8 @@ QString TVRec::FlagToString(uint f)
                 msg += "RecorderRunning,";
         }
     }
+    if (kFlagRingBufferReset & f)
+        msg += "FlagRingBufferReset,";
 
     if (msg.isEmpty())
         msg = QString("0x%1").arg(f,0,16);
