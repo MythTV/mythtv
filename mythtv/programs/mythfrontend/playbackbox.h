@@ -9,6 +9,7 @@
 #include "xmlparse.h"
 #include "programinfo.h"
 #include "yuv2rgb.h"
+#include "jobqueue.h"
 
 #include <pthread.h>
 
@@ -92,34 +93,38 @@ class PlaybackBox : public MythDialog
 
     void setUpdateFreeSpace() { updateFreeSpace = true; }
 
-    void chooseListBoxChanged(void);
-    void chooseSetViewGroup(void);
-    void chooseSetGroupView(void);
-    void changeComboBoxChanged(void);
-    void changeSetRecGroup(void);
-    void changeRecGroupPassword();
-    void changeOldPasswordChanged(const QString &newText);
+    void initRecGroupPopup(QString title, QString name);
+    void closeRecGroupPopup(bool refreshList = true);
+    void setGroupFilter(void);
+    void recGroupChangerListBoxChanged(void);
+    void recGroupChooserListBoxChanged(void);
+    void setRecGroup(void);
+    void setRecGroupPassword();
+    void recGroupOldPasswordChanged(const QString &newText);
+
     void doJobQueueJob(int jobType, int jobFlags = 0);
-    void doBeginTranscoding();
-    void doBeginFlagging();
-    void doBeginUserJob1();
-    void doBeginUserJob2();
-    void doBeginUserJob3();
-    void doBeginUserJob4();
     void doPlaylistJobQueueJob(int jobType, int jobFlags = 0);
     void stopPlaylistJobQueueJob(int jobType);
-    void doPlaylistBeginTranscoding();
-    void stopPlaylistTranscoding();
-    void doPlaylistBeginFlagging();
-    void stopPlaylistFlagging();
-    void doPlaylistBeginUserJob1();
-    void stopPlaylistUserJob1();
-    void doPlaylistBeginUserJob2();
-    void stopPlaylistUserJob2();
-    void doPlaylistBeginUserJob3();
-    void stopPlaylistUserJob3();
-    void doPlaylistBeginUserJob4();
-    void stopPlaylistUserJob4();
+    void doBeginFlagging();
+    void doBeginTranscoding()         {   doJobQueueJob(JOB_TRANSCODE,
+                                                        JOB_USE_CUTLIST);      }
+    void doBeginUserJob1()            {   doJobQueueJob(JOB_USERJOB1);         }
+    void doBeginUserJob2()            {   doJobQueueJob(JOB_USERJOB2);         }
+    void doBeginUserJob3()            {   doJobQueueJob(JOB_USERJOB3);         }
+    void doBeginUserJob4()            {   doJobQueueJob(JOB_USERJOB4);         }
+    void doPlaylistBeginTranscoding() {   doPlaylistJobQueueJob(JOB_TRANSCODE,
+                                                             JOB_USE_CUTLIST); }
+    void stopPlaylistTranscoding()    { stopPlaylistJobQueueJob(JOB_TRANSCODE);}
+    void doPlaylistBeginFlagging()    {   doPlaylistJobQueueJob(JOB_COMMFLAG); }
+    void stopPlaylistFlagging()       { stopPlaylistJobQueueJob(JOB_COMMFLAG); }
+    void doPlaylistBeginUserJob1()    {   doPlaylistJobQueueJob(JOB_USERJOB1); }
+    void stopPlaylistUserJob1()       { stopPlaylistJobQueueJob(JOB_USERJOB1); }
+    void doPlaylistBeginUserJob2()    {   doPlaylistJobQueueJob(JOB_USERJOB2); }
+    void stopPlaylistUserJob2()       { stopPlaylistJobQueueJob(JOB_USERJOB2); }
+    void doPlaylistBeginUserJob3()    {   doPlaylistJobQueueJob(JOB_USERJOB3); }
+    void stopPlaylistUserJob3()       { stopPlaylistJobQueueJob(JOB_USERJOB3); }
+    void doPlaylistBeginUserJob4()    {   doPlaylistJobQueueJob(JOB_USERJOB4); }
+    void stopPlaylistUserJob4()       { stopPlaylistJobQueueJob(JOB_USERJOB4); }
     void doClearPlaylist();
     void doPlaylistDelete();
     void doPlaylistChangeRecGroup();
@@ -140,7 +145,7 @@ class PlaybackBox : public MythDialog
     QDateTime getPreviewLastModified(ProgramInfo *);
     QPixmap getPixmap(ProgramInfo *);
     QPainter backup;
-    bool play(ProgramInfo *);
+    bool play(ProgramInfo *rec, bool inPlaylist = false);
     void stop(ProgramInfo *);
     void remove(ProgramInfo *);
     void expire(ProgramInfo *);
@@ -173,7 +178,6 @@ class PlaybackBox : public MythDialog
     int progIndex;
     QStringList titleList;
     QStringList playList;
-    bool onPlaylist;
     QMap<QString, ProgramList> progLists;
 
     ProgramInfo *findMatchingProg(ProgramInfo *);
@@ -273,7 +277,6 @@ class PlaybackBox : public MythDialog
     QColor popupHighlight;
 
     bool expectingPopup;
-
     bool updateFreeSpace;
     QTimer *freeSpaceTimer;
     int freeSpaceTotal;
@@ -286,15 +289,14 @@ class PlaybackBox : public MythDialog
     QMap <QString, QString> recGroupType;
     QMap <QString, QString> recGroupPwCache;
 
-    MythPopupBox *choosePopup;
-    MythListBox *chooseListBox;
-    MythComboBox *chooseComboBox;
-    MythLineEdit *chooseLineEdit;
-    MythLineEdit *chooseOldPassword;
-    MythLineEdit *chooseNewPassword;
-    MythPushButton *chooseOkButton;
-    MythPushButton *chooseDeleteButton;
-    QString chooseGroupPassword;
+    int recGroupLastItem;
+    MythPopupBox *recGroupPopup;
+    MythListBox *recGroupListBox;
+    MythLineEdit *recGroupLineEdit;
+    MythLineEdit *recGroupOldPassword;
+    MythLineEdit *recGroupNewPassword;
+    MythPushButton *recGroupOkButton;
+    QString recGroupChooserPassword;
     bool groupnameAsAllProg;
     QPixmap *previewPixmap;
     QDateTime previewLastModified;

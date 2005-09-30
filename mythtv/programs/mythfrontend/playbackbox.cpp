@@ -34,7 +34,6 @@ using namespace std;
 #include "programinfo.h"
 #include "scheduledrecording.h"
 #include "remoteutil.h"
-#include "jobqueue.h"
 #include "lcddevice.h"
 
 static int comp_programid(ProgramInfo *a, ProgramInfo *b)
@@ -107,7 +106,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     progIndex = 0;
     titleIndex = 0;
     playList.clear();
-    onPlaylist = false;
 
     skipUpdate = false;
     skipCnt = 0;
@@ -129,6 +127,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     curitem = NULL;
     delitem = NULL;
     lastProgram = NULL;
+
+    recGroupPopup = NULL;
 
     // titleView controls showing titles in group list 
     titleView = true;
@@ -1600,7 +1600,6 @@ void PlaybackBox::playSelectedPlaylist(bool random)
     bool playNext = true;
     int i = 0;
    
-    onPlaylist = true;
     while (randomList.count() && playNext)
     {
         if (random)
@@ -1612,12 +1611,11 @@ void PlaybackBox::playSelectedPlaylist(bool random)
         {
             ProgramInfo *rec = new ProgramInfo(*tmpItem);
             if (rec->availableStatus == asAvailable)
-                playNext = play(rec);
+                playNext = play(rec, true);
             delete rec;
         }
         randomList.remove(it);
     }
-    onPlaylist = false;
 }
 
 void PlaybackBox::playSelected()
@@ -1805,7 +1803,7 @@ void PlaybackBox::showActionsSelected()
         showActions(curitem);
 }
 
-bool PlaybackBox::play(ProgramInfo *rec)
+bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
 {
     bool playCompleted = false;
 
@@ -1905,7 +1903,7 @@ bool PlaybackBox::play(ProgramInfo *rec)
         doremove = true;
     }
     else if (tv->getEndOfRecording() &&
-             !onPlaylist &&
+             !inPlaylist &&
              gContext->GetNumSetting("EndOfRecordingExitPrompt"))
     {
         doprompt = true;
@@ -2774,35 +2772,10 @@ void PlaybackBox::doJobQueueJob(int jobType, int jobFlags)
     }
 }
 
-void PlaybackBox::doBeginTranscoding()
-{
-    doJobQueueJob(JOB_TRANSCODE, JOB_USE_CUTLIST);
-}
-
 void PlaybackBox::doBeginFlagging()
 {
     doJobQueueJob(JOB_COMMFLAG);
     update(listRect);
-}
-
-void PlaybackBox::doBeginUserJob1()
-{
-    doJobQueueJob(JOB_USERJOB1);
-}
-
-void PlaybackBox::doBeginUserJob2()
-{
-    doJobQueueJob(JOB_USERJOB2);
-}
-
-void PlaybackBox::doBeginUserJob3()
-{
-    doJobQueueJob(JOB_USERJOB3);
-}
-
-void PlaybackBox::doBeginUserJob4()
-{
-    doJobQueueJob(JOB_USERJOB4);
 }
 
 void PlaybackBox::doPlaylistJobQueueJob(int jobType, int jobFlags)
@@ -2859,66 +2832,6 @@ cout << "stop job " << jobType << ": job is queued or running\n";
         } else 
 cout << "stop job tmpItem == NULL\n";
     }
-}
-
-void PlaybackBox::doPlaylistBeginTranscoding()
-{
-    doPlaylistJobQueueJob(JOB_TRANSCODE, JOB_USE_CUTLIST);
-}
-
-void PlaybackBox::stopPlaylistTranscoding()
-{
-    stopPlaylistJobQueueJob(JOB_TRANSCODE);
-}
-
-void PlaybackBox::doPlaylistBeginFlagging()
-{
-    doPlaylistJobQueueJob(JOB_COMMFLAG);
-}
-
-void PlaybackBox::stopPlaylistFlagging()
-{
-    stopPlaylistJobQueueJob(JOB_COMMFLAG);
-}
-
-void PlaybackBox::doPlaylistBeginUserJob1()
-{
-    doPlaylistJobQueueJob(JOB_USERJOB1);
-}
-
-void PlaybackBox::stopPlaylistUserJob1()
-{
-    stopPlaylistJobQueueJob(JOB_USERJOB1);
-}
-
-void PlaybackBox::doPlaylistBeginUserJob2()
-{
-    doPlaylistJobQueueJob(JOB_USERJOB1);
-}
-
-void PlaybackBox::stopPlaylistUserJob2()
-{
-    stopPlaylistJobQueueJob(JOB_USERJOB2);
-}
-
-void PlaybackBox::doPlaylistBeginUserJob3()
-{
-    doPlaylistJobQueueJob(JOB_USERJOB1);
-}
-
-void PlaybackBox::stopPlaylistUserJob3()
-{
-    stopPlaylistJobQueueJob(JOB_USERJOB3);
-}
-
-void PlaybackBox::doPlaylistBeginUserJob4()
-{
-    doPlaylistJobQueueJob(JOB_USERJOB1);
-}
-
-void PlaybackBox::stopPlaylistUserJob4()
-{
-    stopPlaylistJobQueueJob(JOB_USERJOB4);
 }
 
 void PlaybackBox::askDelete(void)
@@ -3672,6 +3585,62 @@ void PlaybackBox::showIconHelp(void)
     setActiveWindow();
 }
 
+void PlaybackBox::initRecGroupPopup(QString title, QString name)
+{
+    if (recGroupPopup)
+        closeRecGroupPopup();
+
+    recGroupPopup = new MythPopupBox(gContext->GetMainWindow(), true,
+                                     popupForeground, popupBackground,
+                                     popupHighlight, name);
+
+    QLabel *label = recGroupPopup->addLabel(title, MythPopupBox::Large, false);
+    label->setAlignment(Qt::AlignCenter);
+
+    killPlayerSafe();
+
+    backup.begin(this);
+    grayOut(&backup);
+    backup.end();
+}
+
+void PlaybackBox::closeRecGroupPopup(bool refreshList)
+{
+    if (!recGroupPopup)
+        return;
+
+    recGroupPopup->hide();
+    delete recGroupPopup;
+
+    recGroupPopup = NULL;
+    recGroupLineEdit = NULL;
+    recGroupListBox = NULL;
+    recGroupOldPassword = NULL;
+    recGroupNewPassword = NULL;
+    recGroupOkButton = NULL;
+
+    backup.begin(this);
+    backup.drawPixmap(0, 0, myBackground);
+    backup.end();
+
+    if (refreshList)
+        connected = FillList();
+
+    skipUpdate = false;
+    skipCnt = 2;
+    update(fullRect);
+
+    state = kChanging;
+
+    setActiveWindow();
+
+    if (delitem)
+    {
+        delete delitem;
+        delitem = NULL;
+    }
+}
+
 void PlaybackBox::showViewChanger(void)
 {
     if (!expectingPopup)
@@ -3679,16 +3648,7 @@ void PlaybackBox::showViewChanger(void)
 
     cancelPopup();
 
-
-    MythPopupBox tmpPopup(gContext->GetMainWindow(),
-                                              true, popupForeground,
-                                              popupBackground, popupHighlight,
-                                              "change group view");
-    choosePopup = &tmpPopup;
-
-    QLabel *label = choosePopup->addLabel(tr("Change Group View"),
-                                  MythPopupBox::Large, false);
-    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+    initRecGroupPopup(tr("Change Group View"), "showViewChanger");
 
     QStringList views;
 
@@ -3700,107 +3660,86 @@ void PlaybackBox::showViewChanger(void)
     views += tr("Show Categories and Recording Groups");
     views += tr("Show Recording Groups only");
 
-    chooseComboBox = new MythComboBox(false, choosePopup);
-    chooseComboBox->insertStringList(views);
-    chooseComboBox->setAcceptOnSelect(true);
-    choosePopup->addWidget(chooseComboBox);
+    MythComboBox *recGroupComboBox = new MythComboBox(false, recGroupPopup);
+    recGroupComboBox->insertStringList(views);
+    recGroupComboBox->setAcceptOnSelect(true);
+    recGroupPopup->addWidget(recGroupComboBox);
 
-    connect(chooseComboBox, SIGNAL(accepted(int)), this,
-            SLOT(chooseSetGroupView()));
+    recGroupComboBox->setFocus();
 
-    chooseComboBox->setFocus();
-    choosePopup->ExecPopup();
+    connect(recGroupComboBox, SIGNAL(accepted(int)), recGroupPopup,
+            SLOT(accept()));
 
-    delete chooseComboBox;
-    chooseComboBox = NULL;
+    int result = recGroupPopup->ExecPopup();
 
-    skipUpdate = false;
-    skipCnt = 2;
-    update(fullRect);
+    if (result == MythDialog::Accepted)
+        setDefaultView(recGroupComboBox->currentItem());
 
-    setActiveWindow();
-}
+    delete recGroupComboBox;
 
-void PlaybackBox::chooseSetGroupView(void)
-{
-    if (!chooseComboBox)
-        return;
-
-    setDefaultView(chooseComboBox->currentItem());
-
-    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
-    titleIndex = 0;
-    progIndex = 0;
-    playList.clear();
-
-    connected = FillList();
-    skipUpdate = false;
-    update(fullRect);
-    choosePopup->done(0);
+    closeRecGroupPopup(result == MythDialog::Accepted);
 }
 
 void PlaybackBox::showRecGroupChooser(void)
 {
-    if (expectingPopup)
-        cancelPopup();
+    if (!expectingPopup)
+        return;
 
-    MythPopupBox tmpPopup(gContext->GetMainWindow(),
-                                              true, popupForeground,
-                                              popupBackground, popupHighlight,
-                                              "choose recgroup view");
-    choosePopup = &tmpPopup;
+    cancelPopup();
 
-    timer->stop();
-    playingVideo = false;
-
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
-
-    QLabel *label = choosePopup->addLabel(tr("Select Group Filter"),
-                                  MythPopupBox::Large, false);
-    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+    initRecGroupPopup(tr("Select Group Filter"), "showRecGroupChooser");
 
     QStringList groups;
     
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT DISTINCT recgroup, COUNT(title) "
-                  "FROM recorded GROUP BY recgroup;");
-    query.exec();
+    query.prepare(
+        "SELECT recgroup, COUNT(title) FROM recorded GROUP BY recgroup;");
 
-    QString tmpType = recGroupType[recGroup];
+    QString itemStr;
+    QString dispGroup;
+    int items;
+    int totalItems = 0;
+
     recGroupType.clear();
 
-    recGroupType[recGroup] = tmpType;
+    recGroupListBox = new MythListBox(recGroupPopup);
 
-    if ((recGroup == "Default") || (recGroup == "All Programs"))
-        groups += tr(recGroup);
-
-    if (recGroup != "All Programs")
-    {
-        groups += tr("All Programs");
-        recGroupType["All Programs"] = "recgroup";
-    }
-
-    if (query.isActive() && query.size() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
-            QString key =
-                QString::fromUtf8(QString("%1 [%2 items]")
-                                  .arg(query.value(0).toString())
-                                  .arg(query.value(1).toString()));
+            dispGroup = query.value(0).toString();
+            items = query.value(1).toInt();
 
-            if (key != recGroup)
-            {
-                if (key == "Default")
-                    groups += tr("Default");
-                else
-                    groups += key;
-                recGroupType[query.value(0).toString()] = "recgroup";
-            }
+            if (items == 1)
+                itemStr = tr("item");
+            else
+                itemStr = tr("items");
+
+            if (dispGroup == "Default")
+                dispGroup = tr("Default");
+
+            groups += QString::fromUtf8(QString("%1 [%2 %3]").arg(dispGroup)
+                                                .arg(items).arg(itemStr));
+
+            recGroupType[query.value(0).toString()] = "recgroup";
+            totalItems += items;
         }
     }
+
+    if (totalItems == 1)
+        itemStr = tr("item");
+    else
+        itemStr = tr("items");
+
+    recGroupListBox->insertItem(QString("%1 [%2 %3]").arg(tr("All Programs"))
+                                        .arg(totalItems).arg(itemStr));
+    recGroupType["All Programs"] = "recgroup";
+
+    recGroupListBox->insertItem(QString("------- %1 -------")
+                                        .arg(tr("Groups")));
+    groups.sort();
+    recGroupListBox->insertStringList(groups);
 
     query.prepare("SELECT DISTINCT category, COUNT(title) "
                    "FROM recorded GROUP BY category;");
@@ -3809,59 +3748,81 @@ void PlaybackBox::showRecGroupChooser(void)
     {
         while (query.next())
         {
-            QString key =
-                QString::fromUtf8(QString("%1 [%2 items]")
-                                  .arg(query.value(0).toString())
-                                  .arg(query.value(1).toString()));
+            dispGroup = query.value(0).toString();
+            items = query.value(1).toInt();
 
-            if ((key != recGroup) && (key != ""))
+            if (items == 1)
+                itemStr = tr("item");
+            else
+                itemStr = tr("items");
+
+            if (!recGroupType.contains(dispGroup))
             {
-                groups += key;
-                if (!recGroupType.contains(key))
-                    recGroupType[query.value(0).toString()] = "category";
+                groups += QString::fromUtf8(QString("%1 [%2 %3]").arg(dispGroup)
+                                                    .arg(items).arg(itemStr));
+
+                recGroupType[dispGroup] = "category";
             }
         }
     }
 
-    chooseListBox = new MythListBox(choosePopup);
-    chooseListBox->insertStringList(groups);
+    recGroupListBox->insertItem(QString("------- %1 -------")
+                                .arg(tr("Categories")));
+    groups.sort();
+    recGroupListBox->insertStringList(groups);
 
-    choosePopup->addWidget(chooseListBox);
+    recGroupPopup->addWidget(recGroupListBox);
+    recGroupListBox->setFocus();
 
-    connect(chooseListBox, SIGNAL(accepted(int)), this,
-            SLOT(chooseSetViewGroup()));
-    connect(chooseListBox, SIGNAL(highlighted(int)), this,
-            SLOT(chooseListBoxChanged()));
+    if (recGroup == "All Programs")
+        dispGroup = tr("All Programs");
+    else if (recGroup == "Default")
+        dispGroup = tr("Default");
+    else
+        dispGroup = recGroup;
 
-    chooseGroupPassword = getRecGroupPassword(recGroup);
+    recGroupListBox->setCurrentItem(
+        recGroupListBox->index(recGroupListBox->findItem(dispGroup)));
+    recGroupLastItem = recGroupListBox->currentItem();
 
-    chooseListBox->setFocus();
-    choosePopup->ExecPopup();
+    connect(recGroupListBox, SIGNAL(accepted(int)), recGroupPopup,
+            SLOT(accept()));
+    connect(recGroupListBox, SIGNAL(currentChanged(QListBoxItem *)), this,
+            SLOT(recGroupChooserListBoxChanged()));
 
-    delete chooseListBox;
-    chooseListBox = NULL;
+    int result = recGroupPopup->ExecPopup();
+    
+    if (result == MythDialog::Accepted)
+        setGroupFilter();
 
-    backup.begin(this);
-    backup.drawPixmap(0, 0, myBackground);
-    backup.end();
-
-    skipUpdate = false;
-    skipCnt = 2;
-    update(fullRect);
-
-    setActiveWindow();
-
-    timer->start(500);
+    closeRecGroupPopup(result == MythDialog::Accepted);
 }
 
-void PlaybackBox::chooseSetViewGroup(void)
+void PlaybackBox::recGroupChooserListBoxChanged(void)
 {
-    if (!chooseListBox)
+    if (!recGroupListBox)
         return;
 
-    recGroupPassword = chooseGroupPassword;
+    QString item = 
+        recGroupListBox->currentText().section('[', 0, 0).simplifyWhiteSpace();
+
+    if (item.left(5) == "-----")
+    {
+        int thisItem = recGroupListBox->currentItem();
+        if ((recGroupLastItem > thisItem) &&
+            (thisItem > 0))
+            recGroupListBox->setCurrentItem(thisItem - 1);
+        else if ((thisItem > recGroupLastItem) &&
+                 ((unsigned int)thisItem < (recGroupListBox->count() - 1)))
+            recGroupListBox->setCurrentItem(thisItem + 1);
+    }
+    recGroupLastItem = recGroupListBox->currentItem();
+}
+
+void PlaybackBox::setGroupFilter(void)
+{
     recGroup =
-        chooseListBox->currentText().section('[', 0, 0).simplifyWhiteSpace();
+        recGroupListBox->currentText().section('[', 0, 0).simplifyWhiteSpace();
 
     if (groupnameAsAllProg)
         groupDisplayName = recGroup;
@@ -3870,6 +3831,8 @@ void PlaybackBox::chooseSetViewGroup(void)
         recGroup = "Default";
     if (recGroup == tr("All Programs"))
         recGroup = "All Programs";
+
+    recGroupPassword = getRecGroupPassword(recGroup);
 
     if (recGroupPassword != "" )
     {
@@ -3889,8 +3852,6 @@ void PlaybackBox::chooseSetViewGroup(void)
     } else
         curGroupPassword = "";
 
-    chooseGroupPassword = "";
-
     if (gContext->GetNumSetting("RememberRecGroup",1))
         gContext->SaveSetting("DisplayRecGroup", recGroup);
 
@@ -3898,32 +3859,6 @@ void PlaybackBox::chooseSetViewGroup(void)
         gContext->SaveSetting("DisplayRecGroupIsCategory", 0);
     else
         gContext->SaveSetting("DisplayRecGroupIsCategory", 1);
-
-    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
-    titleIndex = 0;
-    progIndex = 0;
-    playList.clear();
-
-    connected = FillList();
-    skipUpdate = false;
-    update(fullRect);
-    choosePopup->done(0);
-}
-
-void PlaybackBox::chooseListBoxChanged(void)
-{
-    if (!chooseListBox)
-        return;
-
-    QString newGroup =
-        chooseListBox->currentText().section('[', 0, 0).simplifyWhiteSpace();
-
-    if (newGroup == tr("Default"))
-        newGroup = "Default";
-    if (newGroup == tr("All Programs"))
-        newGroup = "All Programs";
-
-    chooseGroupPassword = getRecGroupPassword(newGroup);
 }
 
 QString PlaybackBox::getRecGroupPassword(QString group)
@@ -3970,13 +3905,15 @@ void PlaybackBox::fillRecGroupPasswordCache(void)
 
 void PlaybackBox::doPlaylistChangeRecGroup(void)
 {
-    // This is needed to signal the RecGroup changer that we are taking
-    // action on the entire playlist.  Since the same function can be
-    // called with a playlist built but targeted against a single item
-    // checking the existance of a playlist is not enough
-    onPlaylist = true;
+    // If delitem is not NULL, then the Recording Group changer will operate
+    // on just that recording, otherwise it operates on the items in theplaylist
+    if (delitem)
+    {
+        delete delitem;
+        delitem = NULL;
+    }
+
     showRecGroupChanger();
-    onPlaylist = false;
 }
 
 void PlaybackBox::showRecGroupChanger(void)
@@ -3986,122 +3923,111 @@ void PlaybackBox::showRecGroupChanger(void)
 
     cancelPopup();
 
-    MythPopupBox tmpPopup(gContext->GetMainWindow(),
-                                              true, popupForeground,
-                                              popupBackground, popupHighlight,
-                                              "change recgroup view");
-    choosePopup = &tmpPopup;
-
-
-    QLabel *label = choosePopup->addLabel(tr("Change Recording Group"),
-                                  MythPopupBox::Large, false);
-    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
-
-    QStringList groups;
-
-    if (delitem && (delitem->recgroup != "Default"))
-        groups += delitem->recgroup;
-
-    groups += tr("Default");
+    initRecGroupPopup(tr("Change Recording Group"), "showRecGroupChanger");
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT DISTINCT recgroup FROM recorded WHERE recgroup <> 'Default' "
-        "ORDER BY recgroup");
+        "SELECT recgroup, COUNT(title) FROM recorded GROUP BY recgroup");
+
+    QStringList groups;
+    QString itemStr;
+    QString dispGroup;
 
     if (query.exec() && query.isActive() && query.size() > 0)
+    {
         while (query.next())
-            if (!delitem || (query.value(0).toString() != delitem->recgroup))
-                groups += query.value(0).toString();
+        {
+            if (query.value(1).toInt() == 1)
+                itemStr = tr("item");
+            else
+                itemStr = tr("items");
 
-    chooseComboBox = new MythComboBox(false, choosePopup);
-    chooseComboBox->insertStringList(groups);
-    choosePopup->addWidget(chooseComboBox);
+            if (query.value(0).toString() == "Default")
+                dispGroup = tr("Default");
+            else
+                dispGroup = query.value(0).toString();
 
-    chooseLineEdit = new MythLineEdit(choosePopup);
-    chooseLineEdit->setText("");
-    chooseLineEdit->selectAll();
-    choosePopup->addWidget(chooseLineEdit);
+            groups += QString::fromUtf8(QString("%1 [%2 %3]")
+                                        .arg(dispGroup)
+                                        .arg(query.value(1).toInt())
+                                        .arg(itemStr));
+        }
+    }
+    groups.sort();
 
-    chooseOkButton = new MythPushButton(choosePopup);
-    chooseOkButton->setText(tr("OK"));
-    chooseOkButton->setEnabled(true);
-    choosePopup->addWidget(chooseOkButton);
+    recGroupListBox = new MythListBox(recGroupPopup);
+    recGroupListBox->insertStringList(groups);
+    recGroupPopup->addWidget(recGroupListBox);
 
-    connect(chooseOkButton, SIGNAL(clicked()), this,
-            SLOT(changeSetRecGroup()));
-    connect(chooseOkButton, SIGNAL(clicked()), choosePopup, SLOT(accept()));
-    connect(chooseComboBox, SIGNAL(activated(int)), this,
-            SLOT(changeComboBoxChanged()));
-    connect(chooseComboBox, SIGNAL(highlighted(int)), this,
-            SLOT(changeComboBoxChanged()));
+    recGroupLineEdit = new MythLineEdit(recGroupPopup);
+    recGroupLineEdit->setText("");
+    recGroupLineEdit->selectAll();
+    recGroupPopup->addWidget(recGroupLineEdit);
 
     if (delitem && (delitem->recgroup != "Default"))
-        chooseLineEdit->setText(delitem->recgroup);
-    else
-        chooseLineEdit->setText(tr("Default"));
-
-    chooseComboBox->setFocus();
-    choosePopup->ExecPopup();
-
-    delete chooseLineEdit;
-    chooseLineEdit = NULL;
-    delete chooseOkButton;
-    chooseOkButton = NULL;
-    delete chooseComboBox;
-    chooseComboBox = NULL;
-
-    if (delitem)
-        delete delitem;
-    delitem = NULL;
-}
-
-void PlaybackBox::changeSetRecGroup(void)
-{
-    if (!chooseComboBox || !chooseLineEdit)
-        return;
-
-    QString newRecGroup = chooseLineEdit->text();
-
-    if (newRecGroup == "" ) 
-        return;
-
-    if (newRecGroup == tr("Default"))
-        newRecGroup = "Default";
-
-    if (onPlaylist)
     {
-        ProgramInfo *tmpItem;
-        QStringList::Iterator it;
-
-        for (it = playList.begin(); it != playList.end(); ++it )
-        {
-            tmpItem = findMatchingProg(*it);
-            if (tmpItem)
-                tmpItem->ApplyRecordRecGroupChange(newRecGroup);
-        }
-        playList.clear();
-    } else {
-        delitem->ApplyRecordRecGroupChange(newRecGroup);
+        recGroupLineEdit->setText(delitem->recgroup);
+        recGroupListBox->setCurrentItem(
+            recGroupListBox->index(recGroupListBox->findItem(delitem->recgroup)));
     }
-    
-    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
-    titleIndex = 0;
-    progIndex = 0;
+    else
+    {
+        recGroupLineEdit->setText(tr("Default"));
+        recGroupListBox->setCurrentItem(
+            recGroupListBox->index(recGroupListBox->findItem(tr("Default"))));
+    }
 
-    connected = FillList();
-    skipUpdate = false;
-    update(fullRect);
+    recGroupListBox->setFocus();
+
+    connect(recGroupLineEdit, SIGNAL(returnPressed()), recGroupPopup,
+            SLOT(accept()));
+    connect(recGroupListBox, SIGNAL(accepted(int)), recGroupPopup,
+            SLOT(accept()));
+    connect(recGroupListBox, SIGNAL(currentChanged(QListBoxItem *)), this,
+            SLOT(recGroupChangerListBoxChanged()));
+
+    int result = recGroupPopup->ExecPopup();
+
+    if (result == MythDialog::Accepted)
+        setRecGroup();
+
+    closeRecGroupPopup(result == MythDialog::Accepted);
 }
 
-void PlaybackBox::changeComboBoxChanged(void)
+void PlaybackBox::setRecGroup(void)
 {
-    if (!chooseComboBox || !chooseLineEdit)
+    QString newRecGroup = recGroupLineEdit->text();
+
+    if (newRecGroup != "" )
+    {
+        if (newRecGroup == tr("Default"))
+            newRecGroup = "Default";
+
+        if (delitem)
+        {
+            delitem->ApplyRecordRecGroupChange(newRecGroup);
+        } else if (playList.count() > 0) {
+            QStringList::Iterator it;
+            ProgramInfo *tmpItem;
+
+            for (it = playList.begin(); it != playList.end(); ++it )
+            {
+                tmpItem = findMatchingProg(*it);
+                if (tmpItem)
+                    tmpItem->ApplyRecordRecGroupChange(newRecGroup);
+            }
+            playList.clear();
+        }
+    }
+}
+
+void PlaybackBox::recGroupChangerListBoxChanged(void)
+{
+    if (!recGroupPopup || !recGroupListBox || !recGroupLineEdit)
         return;
 
-    QString newGroup = chooseComboBox->currentText();
-
-    chooseLineEdit->setText(newGroup);
+    recGroupLineEdit->setText(
+        recGroupListBox->currentText().section('[', 0, 0).simplifyWhiteSpace());
 }
 
 void PlaybackBox::showRecGroupPasswordChanger(void)
@@ -4111,113 +4037,82 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
 
     cancelPopup();
 
-    MythPopupBox tmpPopup(gContext->GetMainWindow(),
-                                              true, popupForeground,
-                                              popupBackground, popupHighlight,
-                                              "change recgroup password");
-    choosePopup = &tmpPopup;
-
-    timer->stop();
-    playingVideo = false;
-
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
-
-    QLabel *label = choosePopup->addLabel(tr("Change Recording Group Password"),
-                                  MythPopupBox::Large, false);
-    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+    initRecGroupPopup(tr("Change Recording Group Password"),
+                      "showRecGroupPasswordChanger");
 
     QGridLayout *grid = new QGridLayout(3, 2, (int)(10 * wmult));
 
-    label = new QLabel(tr("Recording Group:"), choosePopup);
+    QLabel *label = new QLabel(tr("Recording Group:"), recGroupPopup);
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
     label->setPaletteForegroundColor(popupForeground);
     grid->addWidget(label, 0, 0, Qt::AlignLeft);
 
     if ((recGroup == "Default") || (recGroup == "All Programs"))
-        label = new QLabel(tr(recGroup), choosePopup);
+        label = new QLabel(tr(recGroup), recGroupPopup);
     else
-        label = new QLabel(recGroup, choosePopup);
+        label = new QLabel(recGroup, recGroupPopup);
 
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
     label->setPaletteForegroundColor(popupForeground);
     grid->addWidget(label, 0, 1, Qt::AlignLeft);
 
-    label = new QLabel(tr("Old Password:"), choosePopup);
+    label = new QLabel(tr("Old Password:"), recGroupPopup);
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
     label->setPaletteForegroundColor(popupForeground);
     grid->addWidget(label, 1, 0, Qt::AlignLeft);
 
-    chooseOldPassword = new MythLineEdit(choosePopup);
-    chooseOldPassword->setText("");
-    chooseOldPassword->selectAll();
-    grid->addWidget(chooseOldPassword, 1, 1, Qt::AlignLeft);
+    recGroupOldPassword = new MythLineEdit(recGroupPopup);
+    recGroupOldPassword->setText("");
+    recGroupOldPassword->selectAll();
+    grid->addWidget(recGroupOldPassword, 1, 1, Qt::AlignLeft);
 
-    label = new QLabel(tr("New Password:"), choosePopup);
+    label = new QLabel(tr("New Password:"), recGroupPopup);
     label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
     label->setBackgroundOrigin(ParentOrigin);
     label->setPaletteForegroundColor(popupForeground);
     grid->addWidget(label, 2, 0, Qt::AlignLeft);
 
-    chooseNewPassword = new MythLineEdit(choosePopup);
-    chooseNewPassword->setText("");
-    chooseNewPassword->selectAll();
-    grid->addWidget(chooseNewPassword, 2, 1, Qt::AlignLeft);
+    recGroupNewPassword = new MythLineEdit(recGroupPopup);
+    recGroupNewPassword->setText("");
+    recGroupNewPassword->selectAll();
+    grid->addWidget(recGroupNewPassword, 2, 1, Qt::AlignLeft);
 
-    choosePopup->addLayout(grid);
+    recGroupPopup->addLayout(grid);
 
-    chooseOkButton = new MythPushButton(choosePopup);
-    chooseOkButton->setText(tr("OK"));
-    choosePopup->addWidget(chooseOkButton);
+    recGroupOkButton = new MythPushButton(recGroupPopup);
+    recGroupOkButton->setText(tr("OK"));
+    recGroupPopup->addWidget(recGroupOkButton);
 
-    connect(chooseOldPassword, SIGNAL(textChanged(const QString &)), this,
-            SLOT(changeOldPasswordChanged(const QString &)));
-    connect(chooseOkButton, SIGNAL(clicked()), this,
-            SLOT(changeRecGroupPassword()));
-    connect(chooseOkButton, SIGNAL(clicked()), choosePopup, SLOT(accept()));
+    recGroupChooserPassword = getRecGroupPassword(recGroup);
 
-    chooseGroupPassword = getRecGroupPassword(recGroup);
-
-    chooseOldPassword->setEchoMode(QLineEdit::Password);
-    chooseNewPassword->setEchoMode(QLineEdit::Password);
+    recGroupOldPassword->setEchoMode(QLineEdit::Password);
+    recGroupNewPassword->setEchoMode(QLineEdit::Password);
 
     if (recGroupPassword == "" )
-        chooseOkButton->setEnabled(true);
+        recGroupOkButton->setEnabled(true);
     else
-        chooseOkButton->setEnabled(false);
+        recGroupOkButton->setEnabled(false);
 
-    chooseOldPassword->setFocus();
-    choosePopup->ExecPopup();
+    recGroupOldPassword->setFocus();
 
-    delete chooseOldPassword;
-    chooseOldPassword = NULL;
-    delete chooseNewPassword;
-    chooseNewPassword = NULL;
-    delete chooseOkButton;
-    chooseOkButton = NULL;
+    connect(recGroupOldPassword, SIGNAL(textChanged(const QString &)), this,
+            SLOT(recGroupOldPasswordChanged(const QString &)));
+    connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
-    backup.begin(this);
-    backup.drawPixmap(0, 0, myBackground);
-    backup.end();
+    if (recGroupPopup->ExecPopup() == MythDialog::Accepted)
+        setRecGroupPassword();
 
-    skipUpdate = false;
-    skipCnt = 2;
-    update(fullRect);
-
-    setActiveWindow();
-
-    timer->start(500);
+    closeRecGroupPopup(false);
 }
 
-void PlaybackBox::changeRecGroupPassword(void)
+void PlaybackBox::setRecGroupPassword(void)
 {
-    QString newPassword = chooseNewPassword->text();
+    QString newPassword = recGroupNewPassword->text();
 
-    if (chooseOldPassword->text() != recGroupPassword)
+    if (recGroupOldPassword->text() != recGroupPassword)
         return;
 
     if (recGroup == "All Programs")
@@ -4247,10 +4142,10 @@ void PlaybackBox::changeRecGroupPassword(void)
     }
 }
 
-void PlaybackBox::changeOldPasswordChanged(const QString &newText)
+void PlaybackBox::recGroupOldPasswordChanged(const QString &newText)
 {
-    if (newText == recGroupPassword)
-        chooseOkButton->setEnabled(true);
+    if (newText == recGroupChooserPassword)
+        recGroupOkButton->setEnabled(true);
     else
-        chooseOkButton->setEnabled(false);
+        recGroupOkButton->setEnabled(false);
 }
