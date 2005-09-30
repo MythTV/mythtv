@@ -129,6 +129,13 @@ void DVBChannel::Close()
             diseqc = NULL;
         }
     }
+
+    // Reset Channel data
+    inputChannel[currentcapchannel] = "";
+    currentATSCMajorChannel = -1;
+    currentATSCMinorChannel = -1;
+    currentProgramNum       = -1;
+    chan_opts.serviceID     = 0;
 }
 
 bool DVBChannel::Open()
