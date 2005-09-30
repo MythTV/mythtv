@@ -3174,7 +3174,8 @@ void PlaybackBox::timeout(void)
     if (titleList.count() <= 1)
         return;
 
-    update(videoRect);
+    if (playbackPreview)
+        update(videoRect);
 }
 
 void PlaybackBox::keyPressEvent(QKeyEvent *e)
