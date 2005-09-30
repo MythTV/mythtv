@@ -2027,9 +2027,6 @@ int av_find_stream_info(AVFormatContext *ic)
     count = 0;
     read_size = 0;
     ppktl = &ic->packet_buffer;
-    if (!ppktl)
-        return AVERROR_INVALIDDATA; // fixes Jack Hide's SEGFAULT
-
     for(;;) {
         /* check if one codec still needs to be handled */
         for(i=0;i<ic->nb_streams;i++) {
