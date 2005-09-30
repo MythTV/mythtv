@@ -42,16 +42,7 @@ class ChannelUtil
 
     // Channel/Service Stuff
     static int     CreateChanID(uint sourceid, const QString &chan_num);
-    static bool    CreateChannel(uint db_sourceid,
-                                 uint new_channel_id,
-                                 const QString &callsign,
-                                 const QString &service_name,
-                                 const QString &chan_num,
-                                 uint atsc_major_channel,
-                                 uint atsc_minor_channel,
-                                 int  freqid,
-                                 const QString &xmltvid,
-                                 const QString &tvformat);
+
     static bool    CreateChannel(uint db_mplexid,
                                  uint db_sourceid,
                                  uint new_channel_id,
@@ -64,7 +55,11 @@ class ChannelUtil
                                  bool use_on_air_guide,
                                  bool hidden,
                                  bool hidden_in_guide,
-                                 int  freqid);
+                                 int  freqid,
+                                 QString icon    = "",
+                                 QString format  = "Default",
+                                 QString xmltvid = "");
+
     static bool    UpdateChannel(uint db_mplexid,
                                  uint source_id,
                                  uint channel_id,

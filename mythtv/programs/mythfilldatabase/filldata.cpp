@@ -32,6 +32,8 @@
 #include "libmythtv/channelutil.h"
 #include "libmyth/mythdbcon.h"
 #include "libmythtv/programinfo.h"
+#include "libmythtv/frequencytables.h"
+#include "libmythtv/channelutil.h"
 
 using namespace std;
 
@@ -741,6 +743,38 @@ void ResetIconMap(bool reset_icons)
 
 } // namespace
 
+void get_atsc_stuff(QString channum, int sourceid, int freqid,
+                    int &major, int &minor, long long &freq)
+{
+    major = freqid;
+    minor = 0;
+
+    int chansep = channum.find(QRegExp("\\D"));
+    if (chansep < 0)
+        return;
+
+    major = channum.left(chansep).toInt();
+    minor = channum.right(channum.length() - (chansep + 1)).toInt();
+
+    freq = get_center_frequency("atsc", "vsb8", "us", freqid);
+    cerr<<"centre_freq: "<<freq<<endl;
+
+    // Check if this is connected to an HDTV card.
+    MSqlQuery query(MSqlQuery::DDCon());
+    query.prepare(
+        "SELECT cardtype "
+        "FROM capturecard, cardinput "
+        "WHERE cardinput.cardid = capturecard.cardid AND "
+        "      sourceid         = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+
+    if (query.exec() && query.isActive() && query.next() &&
+        query.value(0).toString() == "HDTV")
+    {
+        freq -= 1750000; // convert to visual carrier freq.
+    }
+}
+
 // DataDirect stuff
 void DataDirectStationUpdate(Source source)
 {
@@ -834,17 +868,36 @@ void DataDirectStationUpdate(Source source)
                 continue; // go on to next channel without xmltv
             }
 
-            // The channel doesn't exist in the DB, insert it...            
-            int chanid = ChannelUtil::CreateChanID(source.id, channum);
+            // The channel doesn't exist in the DB, insert it...
+            int mplexid = -1, majorC, minorC, chanid;
+            long long freq;
+            get_atsc_stuff(channum, source.id, freqid,
+                           majorC, minorC, freq);
+
+            if (minorC > 0 && freq >= 0)
+            {
+                mplexid = ChannelUtil::CreateMultiplex(
+                    source.id, "atsc", freq, "8vsb");
+            }
+
+            if ((mplexid > 0) || (minorC == 0))
+                chanid = ChannelUtil::CreateChanID(source.id, channum);
+
             if (chanid > 0)
             {
+                QString icon   = "";
+                int  serviceid = 0;
+                bool oag       = false; // use on air guide
+                bool hidden    = false;
+                bool hidden_in_guide = false;
+
                 ChannelUtil::CreateChannel(
-                    source.id, chanid,
-                    callsign,  name,
-                    channum,
-                    major,     minor.toInt(),
-                    freqid,    xmltvid,
-                    tvformat);
+                    mplexid,   source.id, chanid, 
+                    callsign,  name,      channum,
+                    serviceid, majorC,    minorC,
+                    oag,       hidden,    hidden_in_guide,
+                    freqid,    icon,      tvformat,
+                    xmltvid);
             }
         }
     }
@@ -2061,7 +2114,11 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
         }
         else
         {
-            if (interactive)
+            int major, minor, freqid = (*i).freqid.toInt();
+            long long freq;
+            get_atsc_stuff((*i).chanstr, id, freqid, major, minor, freq);
+
+            if (interactive && ((minor == 0) || (freq > 0)))
             {
                 cout << "### " << endl;
                 cout << "### New channel found" << endl;
@@ -2070,47 +2127,34 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 cout << "### callsign = " << (*i).callsign.local8Bit() << endl;
                 cout << "### channum  = " << (*i).chanstr.local8Bit()  << endl;
                 if (channel_preset)
-                    cout << "### freqid   = " << (*i).freqid.local8Bit() << endl;
+                    cout << "### freqid   = " << freqid                << endl;
                 cout << "### finetune = " << (*i).finetune.local8Bit() << endl;
                 cout << "### tvformat = " << (*i).tvformat.local8Bit() << endl;
                 cout << "### icon     = " << localfile.local8Bit()     << endl;
                 cout << "### " << endl;
 
-                unsigned int chanid = promptForChannelUpdates(i,0);
+                uint chanid = promptForChannelUpdates(i,0);
 
                 if ((*i).callsign == "")
                     (*i).callsign = QString::number(chanid);
 
-                if (chanid > 0)
-                {
-                    MSqlQuery subquery(MSqlQuery::InitCon());
-                    subquery.prepare("INSERT INTO channel (chanid,name"
-                                     ",callsign,channum,finetune,icon"
-                                     ",xmltvid,sourceid,freqid,tvformat) "
-                                     "VALUES(:CHANID,:NAME,:CALLSIGN,:CHANNUM,"
-                                     ":FINE,:ICON,:XMLTVID,:SOURCEID,:FREQID,"
-                                     ":TVFORMAT);");
-                    subquery.bindValue(":CHANID", chanid);
-                    subquery.bindValue(":NAME", (*i).name.utf8());
-                    subquery.bindValue(":CALLSIGN", (*i).callsign.utf8());
-                    subquery.bindValue(":CHANNUM", (*i).chanstr);
-                    subquery.bindValue(":FINE", (*i).finetune.toInt());
-                    subquery.bindValue(":ICON", localfile);
-                    subquery.bindValue(":XMLTVID", (*i).xmltvid);
-                    subquery.bindValue(":SOURCEID", id);
-                    subquery.bindValue(":FREQID", (*i).freqid);
-                    subquery.bindValue(":TVFORMAT", (*i).tvformat);
+                int mplexid = 0;
+                if ((chanid > 0) && (minor > 0))
+                    mplexid = ChannelUtil::CreateMultiplex(id,   "atsc",
+                                                           freq, "8vsb");
 
-                    if (!subquery.exec())
-                    {
-                        MythContext::DBError("Channel insert", subquery);
-                    }
-                    else
-                    {
-                        cout << "### " << endl;
-                        cout << "### Channel inserted" << endl;
-                        cout << "### " << endl;
-                    }
+                if (((mplexid > 0) || ((minor == 0) && (chanid > 0))) &&
+                    ChannelUtil::CreateChannel(
+                        mplexid,          id,               chanid,
+                        (*i).callsign,    (*i).name,        (*i).chanstr,
+                        0 /*service id*/, major,            minor,
+                        false /*use on air guide*/, false /*hidden*/,
+                        false /*hidden in guide*/,
+                        freqid,           localfile,        (*i).tvformat))
+                {
+                    cout << "### " << endl;
+                    cout << "### Channel inserted" << endl;
+                    cout << "### " << endl;
                 }
                 else
                 {
@@ -2119,52 +2163,33 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                     cout << "### " << endl;
                 }
             }
-            else if (!non_us_updating)
+            else if (!non_us_updating && ((minor == 0) || (freq > 0)))
             {
-                // Make up a chanid if automatically adding one.
-                // Must be unique, nothing else matters, nobody else knows.
                 // We only do this if we are not asked to skip it with the
                 // --updating flag.
-
-                int chanid = id * 1000 + atoi((*i).chanstr.ascii());
-
-                while(1)
+                int mplexid, chanid;
+                if (minor > 0)
                 {
-                    querystr.sprintf("SELECT channum FROM channel WHERE "
-                                     "chanid = %d;", chanid);
-                    if (!query.exec(querystr))
-                        break;
-
-                    if (query.isActive() && query.numRowsAffected() > 0)
-                        chanid++;
-                    else
-                        break;
+                    mplexid = ChannelUtil::CreateMultiplex(
+                        id, "atsc", freq, "8vsb");
                 }
+
+                if ((mplexid > 0) || (minor == 0))
+                    chanid = ChannelUtil::CreateChanID(id, (*i).chanstr);
 
                 if ((*i).callsign == "")
                     (*i).callsign = QString::number(chanid);
 
-                MSqlQuery subquery(MSqlQuery::InitCon());
-                subquery.prepare("INSERT INTO channel (chanid,name"
-                                 ",callsign,channum,finetune,icon"
-                                 ",xmltvid,sourceid,freqid,tvformat) "
-                                 "VALUES(:CHANID,:NAME,:CALLSIGN,:CHANNUM,"
-                                 ":FINE,:ICON,:XMLTVID,:SOURCEID,:FREQID,"
-                                 ":TVFORMAT);");
-                subquery.bindValue(":CHANID", chanid);
-                subquery.bindValue(":NAME", (*i).name.utf8());
-                subquery.bindValue(":CALLSIGN", (*i).callsign.utf8());
-                subquery.bindValue(":CHANNUM", (*i).chanstr);
-                subquery.bindValue(":FINE", (*i).finetune.toInt());
-                subquery.bindValue(":ICON", localfile);
-                subquery.bindValue(":XMLTVID", (*i).xmltvid);
-                subquery.bindValue(":SOURCEID", id);
-                subquery.bindValue(":FREQID", (*i).freqid);
-                subquery.bindValue(":TVFORMAT", (*i).tvformat);
-
-                if (!subquery.exec())
-                    MythContext::DBError("channel insert", subquery);
-
+                if (chanid > 0)
+                {
+                    ChannelUtil::CreateChannel(
+                        mplexid,          id,        chanid, 
+                        (*i).callsign,    (*i).name, (*i).chanstr,
+                        0 /*service id*/, major,     minor,
+                        false /*use on air guide*/,  false /*hidden*/,
+                        false /*hidden in guide*/,
+                        freqid,      localfile, (*i).tvformat);
+                }
             }
         }
     }

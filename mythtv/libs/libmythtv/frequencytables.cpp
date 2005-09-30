@@ -155,7 +155,7 @@ QString TransportScanItem::toString() const
     return str;
 }
 
-void init_freq_tables()
+bool init_freq_tables()
 {
     static bool statics_initialized = false;
     static QMutex statics_lock;
@@ -166,7 +166,10 @@ void init_freq_tables()
         statics_initialized = true;
     }
     statics_lock.unlock();
+
+    return true;
 }
+bool just_here_to_force_init = init_freq_tables();
 
 freq_table_list_t get_matching_freq_tables(
     QString format, QString modulation, QString country)
@@ -187,6 +190,26 @@ freq_table_list_t get_matching_freq_tables(
     }
 
     return list;
+}
+
+long long get_center_frequency(
+    QString format, QString modulation, QString country, int freqid)
+{
+    freq_table_list_t list =
+        get_matching_freq_tables(format, modulation, country);
+
+    for (uint i = 0; i < list.size(); ++i)
+    {
+        int min_freqid = list[i]->name_offset;
+        int max_freqid = min_freqid +
+            ((list[i]->frequencyEnd - list[i]->frequencyStart) /
+             list[i]->frequencyStep);
+
+        if ((min_freqid <= freqid) && (freqid <= max_freqid))
+            return list[i]->frequencyStart +
+                list[i]->frequencyStep * (freqid - min_freqid);
+    }
+    return -1;
 }
 
 static void init_freq_tables(freq_table_map_t &fmap)

@@ -31,10 +31,13 @@ class TransportScanItem;
 typedef QMap<QString, const FrequencyTable*> freq_table_map_t;
 typedef vector<const FrequencyTable*>        freq_table_list_t;
 
-void init_freq_tables();
+bool init_freq_tables();
 
 freq_table_list_t get_matching_freq_tables(
     QString format, QString modulation, QString country);
+
+long long get_center_frequency(
+    QString format, QString modulation, QString country, int freqid);
 
 class FrequencyTable
 {

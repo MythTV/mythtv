@@ -655,47 +655,6 @@ int ChannelUtil::CreateChanID(uint sourceid, const QString &chan_num)
     return max(max_db_val, desired_chanid = sourceid * 1000 + 1);
 }
 
-bool ChannelUtil::CreateChannel(uint db_sourceid,
-                                uint new_channel_id,
-                                const QString &callsign,
-                                const QString &service_name,
-                                const QString &chan_num,
-                                uint atsc_major_channel,
-                                uint atsc_minor_channel,
-                                int  freqid,
-                                const QString &xmltvid,
-                                const QString &tvformat)
-{
-    uint atsc_src_id = (atsc_major_channel << 8) | (atsc_minor_channel & 0xff);
-
-    MSqlQuery query(MSqlQuery::DDCon());
-    query.prepare(
-        "INSERT INTO channel "
-        "       (chanid,    channum,   sourceid, "
-        "        callsign,  name,      xmltvid, "
-        "        freqid,    tvformat,  atscsrcid) "
-        "VALUES (:CHANID,   :CHANNUM,  :SOURCEID, "
-        "        :CALLSIGN, :NAME,     :XMLTVID, "
-        "        :FREQID,   :TVFORMAT, :ATSCSRCID)");
-
-    query.bindValue(":CHANID",    new_channel_id);
-    query.bindValue(":CHANNUM",   chan_num);
-    query.bindValue(":SOURCEID",  db_sourceid);
-    query.bindValue(":CALLSIGN",  callsign.utf8());
-    query.bindValue(":NAME",      service_name.utf8());
-    query.bindValue(":XMLTVID",   xmltvid);
-    query.bindValue(":FREQID",    freqid);
-    query.bindValue(":TVFORMAT",  tvformat.upper().utf8());
-    query.bindValue(":ATSCSRCID", atsc_src_id);
-       
-    if (!query.exec())
-    {
-        MythContext::DBError("Inserting new channel", query);
-        return false;
-    }
-    return true;
-}
-
 bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 uint db_sourceid,
                                 uint new_channel_id,
@@ -708,7 +667,10 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
                                 bool use_on_air_guide,
                                 bool hidden,
                                 bool hidden_in_guide,
-                                int  freqid)
+                                int  freqid,
+                                QString icon,
+                                QString format,
+                                QString xmltvid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -719,13 +681,15 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
 
     query.prepare(
         "INSERT INTO channel "
-        "  (chanid,        channum,    sourceid,   callsign, "
+        "  (chanid,        channum,    sourceid,   callsign,  "
         "   name,          mplexid,    serviceid,  atscsrcid, "
-        "   useonairguide, visible,    freqid,     tvformat) "
+        "   useonairguide, visible,    freqid,     tvformat,  "
+        "   icon,          xmltvid) "
         "VALUES "
-        "  (:CHANID,       :CHANNUM,   :SOURCEID,  :CALLSIGN, "
+        "  (:CHANID,       :CHANNUM,   :SOURCEID,  :CALLSIGN,  "
         "   :NAME,         :MPLEXID,   :SERVICEID, :ATSCSRCID, "
-        "   :USEOAG,       :VISIBLE,   :FREQID,    :TVFORMAT)");
+        "   :USEOAG,       :VISIBLE,   :FREQID,    :TVFORMAT,  "
+        "   :ICON,         :XMLTVID)");
 
     query.bindValue(":CHANID",    new_channel_id);
     query.bindValue(":CHANNUM",   chanNum);
@@ -733,7 +697,9 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     query.bindValue(":CALLSIGN",  callsign.utf8());
     query.bindValue(":NAME",      service_name.utf8());
 
-    query.bindValue(":MPLEXID",   db_mplexid);
+    if (db_mplexid > 0)
+        query.bindValue(":MPLEXID",   db_mplexid);
+
     query.bindValue(":SERVICEID", service_id);
     query.bindValue(":ATSCSRCID", atsc_src_id);
     query.bindValue(":USEOAG",    use_on_air_guide);
@@ -743,8 +709,13 @@ bool ChannelUtil::CreateChannel(uint db_mplexid,
     if (freqid > 0)
         query.bindValue(":FREQID",    freqid);
 
-    QString tvformat = (atsc_major_channel > 0) ? "ATSC" : "Default";
+    QString tvformat = (atsc_minor_channel > 0) ? "ATSC" : format;
     query.bindValue(":TVFORMAT", tvformat);
+
+    query.bindValue(":ICON", icon);
+
+    if (!xmltvid.isEmpty())
+        query.bindValue(":XMLTVID",   xmltvid);
 
     if (!query.exec() || !query.isActive())
     {
