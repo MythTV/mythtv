@@ -3304,8 +3304,8 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     lastSignalMsg.clear();
     lastSignalMsgTime.start();
 
-    // Turn of lock timer since we have a signal lock now...
-    if (allGood)
+    // Turn off lock timer if we have an "All Good" or good PMT
+    if (allGood || (pmt == "M"))
         lockTimerOn = false;
 }
 
