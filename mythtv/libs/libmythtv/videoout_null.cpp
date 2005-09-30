@@ -88,6 +88,9 @@ bool VideoOutputNull::Init(int width, int height, float aspect,
                            WId winid, int winx, int winy, int winw, 
                            int winh, WId embedid)
 {
+    if ((width <= 0) || (height <= 0))
+        return false;
+
     vbuffers.Init(kNumBuffers, true, kNeedFreeFrames, 
                   kPrebufferFramesNormal, kPrebufferFramesSmall, 
                   kKeepPrebuffer);

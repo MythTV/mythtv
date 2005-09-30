@@ -3457,14 +3457,35 @@ bool NuppelVideoPlayer::FrameIsInMap(long long frameNumber,
 char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
                                        int &vw, int &vh, float &ar)
 {
+    long long      number    = 0;
+    long long      oldnumber = 0;
+    unsigned char *data      = NULL;
+    unsigned char *outputbuf = NULL;
+    VideoFrame    *frame     = NULL;
+    AVPicture      orig;
+    AVPicture      retbuf;
+    bzero(&orig,   sizeof(AVPicture));
+    bzero(&retbuf, sizeof(AVPicture));
+
     using_null_videoout = true;
 
     if (OpenFile() < 0)
         return NULL;
-    if (!GetDecoder())
-        return NULL;
+
     if (!hasFullPositionMap)
+    {
+        VERBOSE(VB_IMPORTANT, "NVP: Does not have position map.\n" +
+                QString("\t\t\tRun 'mythcommflag --rebuild '%1' to fix")
+                .arg(m_playbackinfo->GetRecordBasename()));
         return NULL;
+    }
+
+    if ((video_width <= 0) || (video_height <= 0))
+    {
+        VERBOSE(VB_IMPORTANT, QString("NVP: Video Resolution invalid %1x%2")
+            .arg(video_width).arg(video_height));
+        return NULL;
+    }
 
     if (!InitVideo())
     {
@@ -3477,7 +3498,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
 
     ClearAfterSeek();
 
-    long long number = (int)(secondsin * video_frame_rate);
+    number = (int)(secondsin * video_frame_rate);
     if (number >= totalFrames)
         number = totalFrames / 2;
 
@@ -3489,7 +3510,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
             number = bookmarkseek;
     }
 
-    long long oldnumber = number;
+    oldnumber = number;
     LoadCutList();
 
     commBreakMapLock.lock();
@@ -3515,9 +3536,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
 
     GetFrame(1, true);
 
-    VideoFrame *frame = videoOutput->GetLastDecodedFrame();
-
-    if (!frame)
+    if (!(frame = videoOutput->GetLastDecodedFrame()))
     {
         bufflen = 0;
         vw = vh = 0;
@@ -3525,9 +3544,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
         return NULL;
     }
 
-    unsigned char *data = frame->buf;
-
-    if (!data)
+    if (!(data = frame->buf))
     {
         bufflen = 0;
         vw = vh = 0;
@@ -3535,14 +3552,13 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
         return NULL;
     }
 
-    AVPicture orig, retbuf;
     avpicture_fill(&orig, data, PIX_FMT_YUV420P, video_width, video_height);
 
     avpicture_deinterlace(&orig, &orig, PIX_FMT_YUV420P, video_width,
                           video_height);
 
     bufflen = video_width * video_height * 4;
-    unsigned char *outputbuf = new unsigned char[bufflen];
+    outputbuf = new unsigned char[bufflen];
 
     avpicture_fill(&retbuf, outputbuf, PIX_FMT_RGBA32, video_width,
                    video_height);
