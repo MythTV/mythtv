@@ -415,9 +415,9 @@ int main(int argc, char **argv)
                     "-d or --daemon                 Runs mythbackend as a daemon" << endl <<
                     "-v or --verbose debug-level    Prints more information" << endl <<
                     "                               Accepts any combination (separated by comma)" << endl << 
-                    "                               of all,none,quiet,record,playback,channel," << endl <<
-                    "                               osd,file,schedule,network,commflag,audio," << endl <<
-                    "                               libav,jobqueue" << endl <<
+                    "                               of all,none,important,quiet,record,playback," << endl <<
+                    "                               channel,osd,file,schedule,network,commflag," << endl <<
+                    "                               audio,libav,jobqueue,siparser" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
                     "--printsched                   Upcoming scheduled programs" << endl <<
                     "--testsched                    Test run scheduler (ignore existing schedule)" << endl <<
