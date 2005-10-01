@@ -11,6 +11,7 @@ class MpegRecorder : public RecorderBase
   public:
     MpegRecorder();
    ~MpegRecorder();
+    void TeardownAll(void);
 
     void SetOption(const QString &opt, int value);
     void SetOption(const QString &name, const QString &value);
@@ -37,6 +38,9 @@ class MpegRecorder : public RecorderBase
     int GetVideoFd(void);
 
     long long GetKeyframePosition(long long desired);
+
+  public slots:
+    void deleteLater(void);
 
   private:
     bool SetupRecording();

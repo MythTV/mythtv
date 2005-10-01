@@ -868,6 +868,8 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (recorder)
     {
+        if (GetV4LChannel())
+            channel->SetFd(-1);
         recorder->deleteLater();
         recorder = NULL;
     }

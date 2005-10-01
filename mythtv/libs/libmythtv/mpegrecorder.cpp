@@ -79,10 +79,27 @@ MpegRecorder::MpegRecorder()
 
 MpegRecorder::~MpegRecorder()
 {
+    TeardownAll();
+}
+
+void MpegRecorder::deleteLater(void)
+{
+    TeardownAll();
+    RecorderBase::deleteLater();
+}
+
+void MpegRecorder::TeardownAll(void)
+{
     if (chanfd >= 0)
+    {
         close(chanfd);
+        chanfd = -1;
+    }
     if (readfd >= 0)
+    {
         close(readfd);
+        readfd = -1;
+    }
 }
 
 void MpegRecorder::SetOption(const QString &opt, int value)

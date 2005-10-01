@@ -93,6 +93,9 @@ class NuppelVideoRecorder : public RecorderBase
     void WriteAudio(unsigned char *buf, int fnum, int timecode);
     void WriteText(unsigned char *buf, int len, int timecode, int pagenr);
 
+ public slots:
+    void deleteLater(void);
+
  protected:
     static void *WriteThread(void *param);
     static void *AudioThread(void *param);

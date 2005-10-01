@@ -226,6 +226,16 @@ NuppelVideoRecorder::~NuppelVideoRecorder(void)
         delete FiltMan;
 }
 
+void NuppelVideoRecorder::deleteLater(void)
+{
+    if (fd >= 0)
+    {
+        close(fd);
+        fd = -1;
+    }
+    RecorderBase::deleteLater();
+}
+
 void NuppelVideoRecorder::SetOption(const QString &opt, int value)
 {
     if (opt == "width")
