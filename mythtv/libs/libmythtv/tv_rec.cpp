@@ -3461,6 +3461,9 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         }
         if (dummyRecorder && ringBuffer)
         {
+            if (ringBuffer)
+                ringBuffer->Reset();
+            SetFlags(kFlagRingBufferReset);
             dummyRecorder->StartRecordingThread();
             SetFlags(kFlagDummyRecorderRunning);
         }
