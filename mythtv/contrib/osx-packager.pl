@@ -11,10 +11,6 @@ use Cwd ();
 
 ### Configuration settings (stuff that might change more often)
 
-#our @components = ( 'mythweather', 'mythnews', 'mythgame',
-#                    'mythgallery', 'mythvideo', 'mythdvd' );
-
-# added by Bas to download themes and all plugins
 our @components = ( 'myththemes', 'mythplugins' );
 
 
