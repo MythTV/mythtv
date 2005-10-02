@@ -14,6 +14,7 @@
 // MythTV headers
 #include "signalmonitorvalue.h"
 #include "channelbase.h"
+#include "videosource.h"
 
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "SM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
@@ -58,7 +59,8 @@ class SignalMonitor: virtual public QObject
 {
     Q_OBJECT
   public:
-    static bool IsSupported(QString cardtype);
+    /// Returns true iff the card type supports signal monitoring.
+    static inline bool IsSupported(QString cardtype);
     static SignalMonitor *Init(QString cardtype, int db_cardnum,
                                ChannelBase *channel);
     virtual ~SignalMonitor();
@@ -237,5 +239,16 @@ inline QString sm_flags_to_string(uint flags)
     str += ")";
     return str;
 }
+
+inline bool SignalMonitor::IsSupported(QString cardtype)
+{
+    if (CardUtil::IsDVBCardType(cardtype))
+        return true;
+    if (cardtype.upper() == "HDTV")
+        return true;
+
+    return false;
+}
+
 
 #endif // SIGNALMONITOR_H

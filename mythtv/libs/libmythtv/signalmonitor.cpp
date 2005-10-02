@@ -13,7 +13,6 @@
 #ifdef USING_DVB
 #   include "dvbsignalmonitor.h"
 #   include "dvbchannel.h"
-#   include "videosource.h"
 #endif
 
 #ifdef USING_V4L
@@ -45,21 +44,6 @@ void ALRMhandler(int /*sig*/)
 {
      cerr<<"SignalMonitor: Got SIGALRM"<<endl;
      signal(SIGINT, ALRMhandler);
-}
-
-bool SignalMonitor::IsSupported(QString cardtype)
-{
-    (void) cardtype;
-#ifdef USING_DVB
-    if (CardUtil::IsDVBCardType(cardtype))
-        return true;
-#endif
-#ifdef USING_V4L
-    if (cardtype.upper() == "HDTV")
-        return true;
-#endif
-
-    return false;
 }
 
 SignalMonitor *SignalMonitor::Init(QString cardtype, int db_cardnum,
