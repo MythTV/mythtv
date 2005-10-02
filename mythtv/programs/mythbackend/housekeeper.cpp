@@ -165,12 +165,18 @@ void HouseKeeper::RunHouseKeeping(void)
             }
 
             if (wantToRun("JobQueueCleanup", 1, 0, 24))
+            {
                 JobQueue::CleanupOldJobsInQueue();
+                updateLastrun("JobQueueCleanup");
+            }
         }
 
         dbTag = QString("JobQueueRecover-%1").arg(gContext->GetHostName());
         if (wantToRun(dbTag, 1, 0, 24))
+        {
             JobQueue::RecoverOldJobsInQueue();
+            updateLastrun(dbTag);
+        }
 
         sleep(300);
     }
