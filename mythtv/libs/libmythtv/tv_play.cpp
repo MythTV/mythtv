@@ -139,6 +139,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "PREVSUBTITLE", "Switch to the previous subtitle track", "");
     REG_KEY("TV Playback", "SUBCHANNELSEP", "Separator for HDTV subchannels", "_");
     REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
+    REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
     
     REG_KEY("TV Editing", "CLEARMAP", "Clear editing cut points", "C,Q,Home");
     REG_KEY("TV Editing", "INVERTMAP", "Invert Begin/End cut points", "I");
@@ -182,7 +183,7 @@ TV::TV(void)
       exitPlayer(false), paused(false), errored(false),
       stretchAdjustment(false),
       audiosyncAdjustment(false), audiosyncBaseline(0),
-      editmode(false), zoomMode(false),
+      editmode(false), zoomMode(false), sigMonMode(false),
       update_osd_pos(false), endOfRecording(false), requestDelete(false),
       doSmartForward(false), switchingCards(false), lastRecorderNum(-1),
       queuedTranscode(false), getRecorderPlaybackInfo(false),
@@ -1992,6 +1993,20 @@ void TV::ProcessKeypress(QKeyEvent *e)
             exitPlayer = true;
             wantsToQuit = true;
             jumpToProgram = true;
+        }
+        else if (action == "SIGNALMON")
+        {
+            if ((GetState() == kState_WatchingLiveTV) && activerecorder)
+            {
+                int rate   = sigMonMode ? 0 : 100;
+                int notify = sigMonMode ? 0 : 1;
+
+                PauseLiveTV();
+                activerecorder->SetSignalMonitoringRate(rate,notify);
+                UnpauseLiveTV();
+
+                sigMonMode = !sigMonMode;
+            }
         }
         else if (action == "ESCAPE")
         {
@@ -5041,6 +5056,18 @@ void TV::PauseLiveTV(void)
     activerecorder->PauseRecorder();
     if (activerbuffer)
         activerbuffer->Reset();
+
+    osdlock.lock();
+    lastSignalMsg.clear();
+    lastSignalUIInfo.clear();
+    osdlock.unlock();
+
+    lockTimerOn = false;
+    if (lockTimeout < 0xffffffff)
+    {
+        lockTimer.start();
+        lockTimerOn = true;
+    }
 }
 
 /** \fn TV::UnpauseLiveTV()
@@ -5072,18 +5099,5 @@ void TV::UnpauseLiveTV(void)
         UpdateOSD();
         UpdateLCD();
         AddPreviousChannel();
-    }
-
-    {
-        QMutexLocker locker(&osdlock);
-        lastSignalMsg.clear();
-        lastSignalUIInfo.clear();
-    }
-
-    lockTimerOn = false;
-    if (lockTimeout < 0xffffffff)
-    {
-        lockTimer.start();
-        lockTimerOn = true;
     }
 }

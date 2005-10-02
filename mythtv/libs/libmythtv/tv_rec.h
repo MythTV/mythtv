@@ -401,7 +401,9 @@ class TVRec : public QObject
 
     static const uint kStreamedFileReadTimeout;
     static const uint kRequestBufferSize;
-    static const uint kEITScanTimeout;
+    static const uint kEITScanStartTimeout;
+    static const uint kEITScanTransportTimeout;
+    static const uint kSignalMonitoringRate;
 
     // General State flags
     static const uint kFlagFrontendReady        = 0x00000001;
@@ -426,8 +428,10 @@ class TVRec : public QObject
     static const uint kFlagCloseRec             = 0x00002000;
     /// close recorder, discard recording
     static const uint kFlagKillRec              = 0x00004000;
-    static const uint kFlagNoRec                = 0x0000F000;
+    /// antenna adjusting mode (livetv - recorder).
+    static const uint kFlagAntennaAdjust        = 0x00008000;
 
+    static const uint kFlagNoRec                = 0x0000F000;
     static const uint kFlagKillRingBuffer       = 0x00010000;
 
     // Waiting stuff

@@ -67,8 +67,6 @@ using namespace std;
 #define LOC QString("TVRec(%1): ").arg(cardid)
 #define LOC_ERR QString("TVRec(%1) Error: ").arg(cardid)
 
-/// How many seconds after entering kState_None should we start EIT Scanner
-const uint TVRec::kEITScanTimeout = 30;
 /** Milliseconds to wait for whole amount of data requested to be
  *  sent in RequestBlock if we have not hit the end of the file.
  */
@@ -78,6 +76,15 @@ const uint TVRec::kStreamedFileReadTimeout = 100; /* msec */
  *  waiting for the disk read in LiveTV mode.
  */
 const uint TVRec::kRequestBufferSize = 256*1024; /* 256 KB */
+
+/// How many seconds after entering kState_None should we start EIT Scanner
+const uint TVRec::kEITScanStartTimeout = 60; /* 1 minute */
+
+/// How many seconds should EIT Scanner spend on each transport
+const uint TVRec::kEITScanTransportTimeout = 5*60; /* 5 minutes */
+
+/// How many milliseconds the signal monitor should wait between checks
+const uint TVRec::kSignalMonitoringRate = 50; /* msec */
 
 /** \class TVRec
  *  \brief This is the coordinating class of the \ref recorder_subsystem.
@@ -695,7 +702,7 @@ void TVRec::HandleStateChange(void)
 
     eitScanStartTime = QDateTime::currentDateTime();
     if ((internalState == kState_None) && (genOpt.cardtype == "DVB"))
-        eitScanStartTime = eitScanStartTime.addSecs(kEITScanTimeout);
+        eitScanStartTime = eitScanStartTime.addSecs(kEITScanStartTimeout);
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
 }
@@ -1116,7 +1123,8 @@ void TVRec::RunTV(void)
     QMutexLocker lock(&stateChangeLock);
     SetFlags(kFlagRunMainLoop);
     ClearFlags(kFlagExitPlayer | kFlagFinishRecording);
-    eitScanStartTime = QDateTime::currentDateTime().addSecs(kEITScanTimeout);
+    eitScanStartTime = QDateTime::currentDateTime()
+        .addSecs(kEITScanStartTimeout);
 
     while (HasFlags(kFlagRunMainLoop))
     {
@@ -1207,7 +1215,7 @@ void TVRec::RunTV(void)
 #ifdef USING_DVB_EIT
         if (scanner && QDateTime::currentDateTime() > eitScanStartTime)
         {
-            scanner->StartActiveScan(this, 60 /* max seconds per source */);
+            scanner->StartActiveScan(this, kEITScanTransportTimeout);
             SetFlags(kFlagEITScannerRunning);
             eitScanStartTime = QDateTime::currentDateTime().addYears(1);
         }
@@ -1741,54 +1749,51 @@ void TVRec::TeardownSignalMonitor()
 /** \fn TVRec::SetSignalMonitoringRate(int,int)
  *  \brief Sets the signal monitoring rate.
  *
- *  This will actually call SetupSignalMonitor() and 
- *  TeardownSignalMonitor(bool) as needed, so it can
- *  be used directly, without worrying about the 
- *  SignalMonitor instance.
- *
- *  \sa EncoderLink::SetSignalMonitoringRate(int,bool),
+ *  \sa EncoderLink::SetSignalMonitoringRate(int,int),
  *      RemoteEncoder::SetSignalMonitoringRate(int,int)
  *  \param rate           The update rate to use in milliseconds,
- *                        use 0 to disable, -1 to leave the same.
+ *                        use 0 to disable signal monitoring.
  *  \param notifyFrontend If 1, SIGNAL messages will be sent to
- *                        the frontend using this recorder, if 0
- *                        they will not be sent, if -1 then messages
- *                        will be sent if they were already being
- *                        sent.
- *  \return Previous update rate
+ *                        the frontend using this recorder.
+ *  \return 1 if it signal monitoring is turned on, 0 otherwise.
  */
 int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
 {
     QString msg = "SetSignalMonitoringRate(%1, %2)";
     VERBOSE(VB_RECORD, LOC + msg.arg(rate).arg(notifyFrontend));
 
-    int oldrate = 0; 
-    if (signalMonitor)
-        oldrate = signalMonitor->GetUpdateRate();
+    QMutexLocker lock(&stateChangeLock);
 
-    if (rate == 0)
+    if (!SignalMonitor::IsSupported(genOpt.cardtype))
     {
-        TeardownSignalMonitor();
+        VERBOSE(VB_IMPORTANT, LOC + "Signal Monitoring is not"
+                "supported by your hardware.");
+        return 0;
     }
-    else if (rate < 0)
+
+    if (GetState() != kState_WatchingLiveTV)
     {
-        if (signalMonitor && notifyFrontend >= 0)
-            signalMonitor->SetNotifyFrontend(notifyFrontend);
+        VERBOSE(VB_IMPORTANT, LOC + "Signal can only "
+                "be monitored in LiveTV Mode.");
+        return 0;
+    }
+
+    ClearFlags(kFlagRingBufferReset);
+    if (rate > 0)
+    {
+        tuningRequests.enqueue(TuningRequest(kFlagKillRec));
+        tuningRequests.enqueue(TuningRequest(kFlagAntennaAdjust,
+                                             channel->GetCurrentName()));
     }
     else
     {
-        SetupSignalMonitor();
-        
-        if (signalMonitor)
-        {
-            signalMonitor->SetUpdateRate(rate);
-            if (notifyFrontend >= 0)
-                signalMonitor->SetNotifyFrontend(notifyFrontend);
-            else if (0 == oldrate)
-                signalMonitor->SetNotifyFrontend(false);
-        }
+        tuningRequests.enqueue(TuningRequest(kFlagLiveTV));
     }
-    return oldrate;
+    // Wait for RingBuffer reset
+    while (!HasFlags(kFlagRingBufferReset))
+        WaitForEventThreadSleep();
+
+    return 1;
 }
 
 DTVSignalMonitor *TVRec::GetDTVSignalMonitor(void)
@@ -3228,7 +3233,8 @@ void TVRec::HandleTuning(void)
         TuningShutdowns(*request);
 
         // Now we start new stuff
-        if (request->flags & (kFlagRecording|kFlagLiveTV|kFlagEITScan))
+        if (request->flags & (kFlagRecording|kFlagLiveTV|
+                              kFlagEITScan|kFlagAntennaAdjust))
         {
             if (!recorder || genOpt.cardtype == "DVB")
                 TuningFrequency(*request);
@@ -3307,8 +3313,11 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 #endif // USING_DVB
 
     if (HasFlags(kFlagSignalMonitorRunning))
-        SetSignalMonitoringRate(0, 0);
-    ClearFlags(kFlagWaitingForSignal | kFlagSignalMonitorRunning);
+    {
+        TeardownSignalMonitor();
+        ClearFlags(kFlagSignalMonitorRunning);
+    }
+    ClearFlags(kFlagWaitingForSignal);
     // At this point any waits are canceled.
 
     if ((request.flags & kFlagNoRec))
@@ -3429,7 +3438,8 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     // Start dummy recorder for devices capable of signal monitoring.
     bool use_sm = SignalMonitor::IsSupported(genOpt.cardtype);
     bool livetv = request.flags & kFlagLiveTV;
-    if (use_sm && !dummyRecorder && livetv)
+    bool antadj = request.flags & kFlagAntennaAdjust;
+    if (use_sm && !dummyRecorder && (livetv || antadj))
     {
         bool is_atsc = genOpt.cardtype == "HDTV";
 #if (DVB_API_VERSION_MINOR == 1)
@@ -3456,15 +3466,19 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     if (use_sm)
     {
         VERBOSE(VB_RECORD, LOC + "Starting Signal Monitor");
-        SetSignalMonitoringRate(50, livetv);
+        SetupSignalMonitor();
         if (signalMonitor)
         {
-            SetFlags(kFlagWaitingForSignal | kFlagSignalMonitorRunning);
+            signalMonitor->SetUpdateRate(kSignalMonitoringRate);
+            signalMonitor->SetNotifyFrontend(true);
+            SetFlags(kFlagSignalMonitorRunning);
+            if (request.flags & kFlagRec)
+                SetFlags(kFlagWaitingForSignal);
         }
         if (dummyRecorder && ringBuffer)
         {
-            if (ringBuffer)
-                ringBuffer->Reset();
+            ringBuffer->Reset();
+            ringBuffer->StartReads();
             SetFlags(kFlagRingBufferReset);
             dummyRecorder->StartRecordingThread();
             SetFlags(kFlagDummyRecorderRunning);
@@ -3504,7 +3518,7 @@ bool TVRec::TuningSignalCheck(void)
     }
 
     // shut down signal monitoring
-    SetSignalMonitoringRate(0, 0);
+    TeardownSignalMonitor();
     ClearFlags(kFlagWaitingForSignal | kFlagSignalMonitorRunning);
 
     // tell recorder/siparser about useful DTV monitor info..
@@ -3778,6 +3792,8 @@ QString TVRec::FlagToString(uint f)
             msg += "CloseRec,";
         if (kFlagKillRec & f)
             msg += "KillRec,";
+        if (kFlagAntennaAdjust & f)
+            msg += "AntennaAdjust,";
     }
     if ((kFlagPendingActions & f) == kFlagPendingActions)
         msg += "PENDINGACTIONS,";
@@ -3815,7 +3831,7 @@ QString TVRec::FlagToString(uint f)
         }
     }
     if (kFlagRingBufferReset & f)
-        msg += "FlagRingBufferReset,";
+        msg += "RingBufferReset,";
 
     if (msg.isEmpty())
         msg = QString("0x%1").arg(f,0,16);

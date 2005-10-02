@@ -300,6 +300,7 @@ class TV : public QObject
     long long audiosyncBaseline;
     bool editmode;          ///< Are we in video editing mode
     bool zoomMode;
+    bool sigMonMode;     ///< Are we in signal monitoring mode?
     bool update_osd_pos; ///< Redisplay osd?
     bool endOfRecording; ///< !nvp->IsPlaying() && StateIsPlaying(internalState)
     bool requestDelete;  ///< User wants last video deleted
