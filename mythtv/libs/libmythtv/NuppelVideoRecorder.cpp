@@ -406,6 +406,10 @@ void NuppelVideoRecorder::Pause(bool clear)
     cleartimeonpause = clear;
     writepaused = audiopaused = mainpaused = false;
     request_pause = true;
+
+    // The wakeAll is to make sure [write|audio|main]paused are
+    // set immediately, even if we were already paused previously.
+    unpauseWait.wakeAll();
 }
 
 void NuppelVideoRecorder::Unpause(void)
@@ -414,7 +418,7 @@ void NuppelVideoRecorder::Unpause(void)
     unpauseWait.wakeAll();
 }
 
-bool NuppelVideoRecorder::IsPaused(void)
+bool NuppelVideoRecorder::IsPaused(void) const
 {
     return (audiopaused && mainpaused && writepaused);
 }

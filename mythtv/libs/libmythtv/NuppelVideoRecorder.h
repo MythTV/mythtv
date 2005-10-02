@@ -61,7 +61,7 @@ class NuppelVideoRecorder : public RecorderBase
     
     void Pause(bool clear = true);
     void Unpause(void);
-    bool IsPaused(void); 
+    bool IsPaused(void) const;
  
     bool IsRecording(void);
     bool IsErrored(void);
