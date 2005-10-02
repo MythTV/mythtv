@@ -68,6 +68,10 @@ bool CardUtil::IsCardTypePresent(const QString &strType)
 enum CardUtil::CARD_TYPES CardUtil::GetDVBType(
     uint device, QString &name, QString &card_type)
 {
+    (void)device;
+    (void)name;
+    (void)card_type;
+
     CARD_TYPES nRet = ERROR_OPEN;
 #ifdef USING_DVB
     int fd_frontend = open(dvbdevice(DVB_DEV_FRONTEND, device),
@@ -103,9 +107,6 @@ enum CardUtil::CARD_TYPES CardUtil::GetDVBType(
         }
         close(fd_frontend);
     } 
-#else
-    (void)device;
-    (void)name;
 #endif
     return nRet;
 }
