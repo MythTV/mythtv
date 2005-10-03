@@ -22,7 +22,8 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
     : QObject(NULL, "MPEGStreamData"), _have_pmt_CRC_bug(false),
       _pat_version(-1), _cache_tables(cacheTables), _cache_lock(true),
       _cached_pat(NULL), _desired_program(desiredProgram),
-      _pat_single_program(NULL), _pmt_single_program(NULL)
+      _pat_single_program(NULL), _pmt_single_program(NULL),
+      _pmt_single_program_num_video(1)
 {
     AddListeningPID(MPEG_PAT_PID);
 
@@ -215,10 +216,11 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     vector<uint> pids, types;
 
     // Video
-    if (pmt.FindPIDs(StreamID::AnyVideo, videoPIDs, videoTypes) < 1) 
+    uint video_cnt = pmt.FindPIDs(StreamID::AnyVideo, videoPIDs, videoTypes);
+    if (video_cnt < _pmt_single_program_num_video) 
     {
-        VERBOSE(VB_RECORD,
-                "No video found old PMT, can not construct new PMT");
+        VERBOSE(VB_RECORD, "Only "<<video_cnt<<" streams seen in PMT, but "
+                <<_pmt_single_program_num_video<<" are required.");
         return false;
     }
     if (videoPIDs.size() > 1)
