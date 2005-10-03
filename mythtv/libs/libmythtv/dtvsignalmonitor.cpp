@@ -222,7 +222,7 @@ void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
 {
     AddFlags(kDTVSigMon_PMTSeen);
 
-    if (pmt->ProgramNumber() != programNumber)
+    if (pmt->ProgramNumber() != (uint)programNumber)
         return; // We are not the PMT you are looking for.
 
     if (ignoreEncrypted && pmt->IsEncrypted())
