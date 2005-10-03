@@ -3511,7 +3511,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             }
 
             SetFlags(kFlagSignalMonitorRunning);
-            if (request.flags & kFlagRec)
+            if (request.flags & kFlagRec|kFlagEITScan)
                 SetFlags(kFlagWaitingForSignal);
         }
         if (dummyRecorder && ringBuffer)
