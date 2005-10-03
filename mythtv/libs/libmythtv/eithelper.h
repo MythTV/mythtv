@@ -11,9 +11,10 @@
 // MythTV includes
 #include "dvbtypes.h"
 #include "sitypes.h"
+#include "mythdeque.h"
 
-typedef QValueList<Event> QList_Events;
-typedef QValueList<QList_Events*> QListList_Events;
+typedef MythDeque<Event*>                  QList_Events;
+typedef MythDeque<QList_Events*>           QListList_Events;
 
 class EITHelper : public QObject
 {
@@ -29,12 +30,15 @@ class EITHelper : public QObject
     void HandleEITs(QMap_Events* events);
 
   private:
-    int GetChanID(int tid_db, const Event &event);
-    void UpdateEITList(int mplexid, const QList_Events *events);
+    int GetChanID(int tid_db, const Event &event) const;
+    static void UpdateEITList(int mplexid, const QList_Events &events);
 
     QListList_Events  eitList;      ///< Event Information Tables List
     mutable QMutex    eitList_lock; ///< EIT List lock
     mutable QMap<uint,uint> srv_to_chanid;
+
+    /// Maximum number of DB inserts per ProcessEvents call.
+    static const uint kChunkSize;
 };
 
 #endif // USING_DVB

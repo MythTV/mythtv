@@ -35,6 +35,7 @@
 #endif
 
 #include "sitypes.h"
+#include <qdeepcopy.h>
 
 // Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging
 // #define EIT_DEBUG_SID 1602
@@ -214,6 +215,21 @@ Descriptor::~Descriptor()
         delete[] Data;
 }
 
+void ElementaryPIDObject::deepCopy(const ElementaryPIDObject &e)
+{
+    Type        = e.Type;
+    Orig_Type   = e.Orig_Type;
+    PID         = e.PID;
+    Description = QDeepCopy<QString>(e.Description);
+    Language    = QDeepCopy<QString>(e.Language);
+    CA          = QDeepCopy<CAList>(e.CA);
+    Record      = e.Record;
+
+    Descriptors.clear();
+    DescriptorList::const_iterator dit;
+    for (dit = e.Descriptors.begin(); dit != e.Descriptors.end(); ++dit)
+        Descriptors.append(Descriptor(*dit));
+}
 
 void ElementaryPIDObject::Reset()
 {
@@ -234,6 +250,41 @@ void Event::Reset()
     NetworkID = 0;
     ATSC = false;
     clearEventValues();
+}
+
+void Event::deepCopy(const Event &e)
+{
+    SourcePID       = e.SourcePID;
+    TransportID     = e.TransportID;
+    NetworkID       = e.NetworkID;
+    ServiceID       = e.ServiceID;
+    EventID         = e.EventID;
+    StartTime       = e.StartTime;
+    EndTime         = e.EndTime;
+    OriginalAirDate = e.OriginalAirDate;
+    Stereo          = e.Stereo;
+    HDTV            = e.HDTV;
+    SubTitled       = e.SubTitled;
+    ETM_Location    = e.ETM_Location;
+    ATSC            = e.ATSC;
+    PartNumber      = e.PartNumber;
+    PartTotal       = e.PartTotal;
+
+    // QString is not thread safe, so we must make deep copies
+    LanguageCode       = QDeepCopy<QString>(e.LanguageCode);
+    Event_Name         = QDeepCopy<QString>(e.Event_Name);
+    Event_Subtitle     = QDeepCopy<QString>(e.Event_Subtitle);
+    Description        = QDeepCopy<QString>(e.Description);
+    ContentDescription = QDeepCopy<QString>(e.ContentDescription);
+    Year               = QDeepCopy<QString>(e.Year);
+    CategoryType       = QDeepCopy<QString>(e.CategoryType);
+    Actors             = QDeepCopy<QStringList>(e.Actors);
+
+    Credits.clear();
+    QValueList<Person>::const_iterator pit = e.Credits.begin();
+    for (; pit != e.Credits.end(); ++pit)
+        Credits.push_back(Person(QDeepCopy<QString>((*pit).role),
+                                 QDeepCopy<QString>((*pit).name)));
 }
 
 void Event::clearEventValues()
@@ -334,20 +385,21 @@ void PMTObject::deepCopy(const PMTObject &other)
     ServiceID   = other.ServiceID;
     PMTPID      = other.PMTPID;
 
-    CA.clear();
-    CAList::const_iterator cit;
-    for (cit = other.CA.begin(); cit!=other.CA.end(); ++cit)
-        CA.append(*cit);
+    CA          = QDeepCopy<CAList>(other.CA);
 
     Descriptors.clear();
     DescriptorList::const_iterator dit;
     for (dit = other.Descriptors.begin(); dit!=other.Descriptors.end(); ++dit)
-        Descriptors.append(*dit);
+        Descriptors.append(Descriptor(*dit));
 
     Components.clear();
     QValueList<ElementaryPIDObject>::const_iterator eit;
     for (eit = other.Components.begin(); eit!=other.Components.end(); ++eit)
-        Components.append(*eit);
+    {
+        ElementaryPIDObject obj;
+        obj.deepCopy(*eit);
+        Components.append(obj);
+    }
 
     hasCA       = other.hasCA;
     hasAudio    = other.hasAudio;

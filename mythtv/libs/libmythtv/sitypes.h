@@ -299,6 +299,7 @@ class ElementaryPIDObject
 {
 public:
     ElementaryPIDObject() { Reset(); }
+    void deepCopy(const ElementaryPIDObject&);
     void Reset();
 
     ES_Type Type;
@@ -328,37 +329,41 @@ class Event
 //TODO: Int conversion
   public:
     Event() { Reset(); }
+    void deepCopy(const Event&);
 
     void Reset();
     void clearEventValues();
 
-    uint16_t    SourcePID;    ///< Used in ATSC for Checking for ETT PID being filtered
+    /// Used in ATSC for Checking for ETT PID being filtered
+    uint    SourcePID;
+    uint    TransportID;
+    uint    NetworkID;
+    uint    ServiceID;    ///< NOT the Virtual Channel Number used by ATSC
+    uint    EventID;
+    bool    Stereo;
+    bool    HDTV;
+    bool    SubTitled;
+    int     ETM_Location; ///< Used to flag still waiting ETTs for ATSC
+    bool    ATSC;
+    uint    PartNumber;   ///< Episode number in series.
+    uint    PartTotal;    ///< Number of episodes in series.
+
+
     QDateTime   StartTime;
     QDateTime   EndTime;
-    uint16_t    TransportID;
-    uint16_t    NetworkID;
+    QDate       OriginalAirDate;
+
     QString     LanguageCode;
-    uint16_t    ServiceID;    ///< NOT the Virtual Channel Number used by ATSC
     QString     Event_Name;
     QString     Event_Subtitle;
     QString     Description;
-    uint16_t    EventID;
     QString     ContentDescription;
     QString     Year;
-    QStringList Actors;
-    bool        Stereo;
-    bool        HDTV;
-    bool        SubTitled;
-    int         ETM_Location; ///< Used to flag still waiting ETTs for ATSC
-    bool        ATSC;
-    QDate       OriginalAirDate;
-    QValueList<Person> Credits;
-    /// Episode number in series.
-    unsigned    PartNumber;
-    /// Number of episodes in series.
-    unsigned    PartTotal;
     /// One of these four strings: "movie", "series", "sports" or "tvshow"
     QString     CategoryType;
+    QStringList Actors;
+
+    QValueList<Person> Credits;
 };
 
 // DVB TransportObject - Used with NIT Scanning

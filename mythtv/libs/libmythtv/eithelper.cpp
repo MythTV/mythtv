@@ -5,6 +5,8 @@
 #include "mythdbcon.h"
 #include "scheduledrecording.h"
 
+const uint EITHelper::kChunkSize = 20;
+
 static int get_chan_id_from_db(int tid_db, const Event&);
 static uint update_eit_in_db(MSqlQuery&, MSqlQuery&, int, const Event&);
 static uint delete_invalid_programs_in_db(MSqlQuery&, MSqlQuery&, int, const Event&);
@@ -14,46 +16,83 @@ static bool insert_program(MSqlQuery&, int, const Event&);
 void EITHelper::HandleEITs(QMap_Events* eventList)
 {
     QList_Events* events = new QList_Events();
+    QMap_Events::const_iterator it = eventList->begin();
+    for (; it != eventList->end(); ++it)
+    {
+        Event *event = new Event();
+        event->deepCopy((*it));
+        events->push_back(event);
+    }
+
     eitList_lock.lock();
-    QMap_Events::Iterator e;
-    for (e = eventList->begin() ; e != eventList->end() ; ++e)
-        events->append(*e);
-    eitList.append(events);
+    eitList.push_back(events);
     eitList_lock.unlock();
 }
 
 void EITHelper::ClearList(void)
 {
-    eitList_lock.lock();
-    eitList.clear();
-    eitList_lock.unlock();
+    QMutexLocker locker(&eitList_lock);
+
+    while (eitList.size())
+    {
+        QList_Events *events = eitList.front();
+        eitList.pop_front();
+
+        eitList_lock.unlock();
+        QList_Events::iterator it = events->begin();
+        for (; it != events->end(); ++it)
+            delete *it;
+        delete events;
+        eitList_lock.lock();
+    }
 }
 
 uint EITHelper::GetListSize(void) const
 {
-    eitList_lock.lock();
-    uint size = eitList.size();
-    eitList_lock.unlock();
-    return size;
+    QMutexLocker locker(&eitList_lock);
+    return eitList.size();
 }
 
 void EITHelper::ProcessEvents(int mplexid)
 {
-    while (GetListSize())
+    QMutexLocker locker(&eitList_lock);
+
+    if (!eitList.size())
+        return;
+    
+    if (eitList.front()->size() <= kChunkSize)
     {
-        eitList_lock.lock();
-        QList_Events *events = eitList.first();
+        QList_Events *events = eitList.front();
         eitList.pop_front();
+
         eitList_lock.unlock();
-
-        UpdateEITList(mplexid, events);
-
-        events->clear();
+        UpdateEITList(mplexid, *events);
+        QList_Events::iterator it = events->begin();
+        for (; it != events->end(); ++it)
+            delete *it;
         delete events;
+        eitList_lock.lock();
+    }
+    else
+    {
+        QList_Events *events = eitList.front();
+        QList_Events  subset;
+
+        QList_Events::iterator subset_end = events->begin();
+        for (uint i = 0; i < kChunkSize; ++i) ++subset_end;
+        subset.insert(subset.end(), events->begin(), subset_end);
+        events->erase(events->begin(), subset_end);
+        
+        eitList_lock.unlock();
+        UpdateEITList(mplexid, subset);
+        QList_Events::iterator it = subset.begin();
+        for (; it != subset.end(); ++it)
+            delete *it;
+        eitList_lock.lock();
     }
 }
 
-int EITHelper::GetChanID(int mplexid, const Event &event)
+int EITHelper::GetChanID(int mplexid, const Event &event) const
 {
     uint srv = (event.ATSC) ? (mplexid << 16) : (event.NetworkID << 16);
     srv |= event.ServiceID;
@@ -64,19 +103,19 @@ int EITHelper::GetChanID(int mplexid, const Event &event)
     return chanid;
 }
 
-void EITHelper::UpdateEITList(int mplexid, const QList_Events *events)
+void EITHelper::UpdateEITList(int mplexid, const QList_Events &events)
 {
     MSqlQuery query1(MSqlQuery::InitCon());
     MSqlQuery query2(MSqlQuery::InitCon());
 
     uint counter = 0;
-    QList_Events::const_iterator e = events->begin();
-    for (; e != events->end(); ++e)
+    QList_Events::const_iterator e = events.begin();
+    for (; e != events.end(); ++e)
     {
-        int chanid = get_chan_id_from_db(mplexid, *e);
+        int chanid = get_chan_id_from_db(mplexid, **e);
         if (chanid <= 0)
             continue;
-        counter += update_eit_in_db(query1, query2, chanid, *e);
+        counter += update_eit_in_db(query1, query2, chanid, **e);
     }
 
     if (counter > 0)

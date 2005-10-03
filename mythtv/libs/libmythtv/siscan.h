@@ -20,11 +20,6 @@
 #include "dvbtypes.h"
 #endif // USING_DVB
 
-#ifdef USE_SIPARSER
-typedef QValueList<Event> QList_Events;
-typedef QValueList<QList_Events*> QListList_Events;
-#endif // USING_SIPARSER
-
 #define SISCAN(args...) \
     if (channel) VERBOSE(VB_SIPARSER, QString("SIScan(%1): ") \
                          .arg(channel->GetDevice()) << args); \
