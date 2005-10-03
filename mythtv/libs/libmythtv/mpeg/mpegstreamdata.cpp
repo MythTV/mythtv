@@ -22,8 +22,8 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
     : QObject(NULL, "MPEGStreamData"), _have_pmt_CRC_bug(false),
       _pat_version(-1), _cache_tables(cacheTables), _cache_lock(true),
       _cached_pat(NULL), _desired_program(desiredProgram),
-      _pat_single_program(NULL), _pmt_single_program(NULL),
-      _pmt_single_program_num_video(1)
+      _pmt_single_program_num_video(1),
+      _pat_single_program(NULL), _pmt_single_program(NULL)
 {
     AddListeningPID(MPEG_PAT_PID);
 
@@ -230,9 +230,12 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
                 "only using first one in new PMT");
     }
 
-    _pid_video_single_program = videoPIDs[0];
-    pids.push_back(videoPIDs[0]);
-    types.push_back(videoTypes[0]);
+    if (videoPIDs.size() > 0)
+    {
+        _pid_video_single_program = videoPIDs[0];
+        pids.push_back(videoPIDs[0]);
+        types.push_back(videoTypes[0]);
+    }
 
     // Audio
     pmt.FindPIDs(StreamID::AnyAudio, pids, types);
