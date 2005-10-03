@@ -2362,10 +2362,8 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
     {
         MythContext::DBError("getnextchannel", query);
     }
-    else if (query.size() > 0)
+    else if (query.next())
     {
-        query.next();
-
         channum = query.value(0).toString();
         chanid = query.value(1).toString();
     }
@@ -2390,21 +2388,24 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
             .arg(wherepart).arg(channelorder).arg(ordering);
 
         query.prepare(querystr);
+        query.bindValue(":CARDID",   cardid);
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
  
         if (!query.exec() || !query.isActive())
         {
             MythContext::DBError("getnextchannel", query);
         }
-        else if (query.size() > 0)
-        { 
-            query.next();
-
+        else if (query.next())
+        {
             channum = query.value(0).toString();
             chanid = query.value(1).toString();
         }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, "getnextchannel, query failed: "<<querystr);
+            chanid = id; // just stay on same channel
+        }
     }
-
-    return;
 }
 
 /** \fn TVRec::IsReallyRecording()
