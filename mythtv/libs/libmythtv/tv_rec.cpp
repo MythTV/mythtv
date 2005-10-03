@@ -1223,8 +1223,12 @@ void TVRec::RunTV(void)
 
         // We should be no more than a few thousand milliseconds,
         // as the end recording code does not have a trigger...
+        // NOTE: If you change anything here, make sure that
+        // WaitforEventThreadSleep() will still work...
         if (doSleep && tuningRequests.empty())
         {
+            // yield to give WaitForEventThreadSleep a chance to do enter wait
+            usleep(50);
             triggerEventSleep.wakeAll();
             lock.mutex()->unlock();
             triggerEventLoop.wait(30000 /* ms */);
@@ -1241,12 +1245,25 @@ void TVRec::RunTV(void)
 
 bool TVRec::WaitForEventThreadSleep(bool wake, unsigned long time)
 {
-    if (wake)
-        triggerEventLoop.wakeAll();
+    bool ok = false;
+    MythTimer t;
+    t.start();
+    while (!ok && ((unsigned long) t.elapsed()) < time)
+    {
+        if (wake)
+            triggerEventLoop.wakeAll();
 
-    stateChangeLock.unlock();
-    bool ok = triggerEventSleep.wait(time);
-    stateChangeLock.lock();
+        stateChangeLock.unlock();
+        // It is possible for triggerEventSleep.wakeAll() to be sent
+        // before we enter wait so we only wait 100 ms so we can try
+        // again a few times before 15 second timeout on frontend...
+        ok = triggerEventSleep.wait(100);
+        stateChangeLock.lock();
+
+        // In case we missed trigger, check sleep state ourselves.
+        // But only do this if we are sending wake events.
+        ok |= (wake && tuningRequests.empty() && !changeState);
+    }
     return ok;
 }
 
