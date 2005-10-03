@@ -3360,7 +3360,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         if (lastTuningRequest.flags & kFlagLiveTV)
         {
             VERBOSE(VB_RECORD, LOC + "Stopping LiveTV RingBuffer reads");
-            ringBuffer->StopReads();
+            if (ringBuffer)
+                ringBuffer->StopReads();
         }
         VERBOSE(VB_RECORD, LOC + "Tearing down RingBuffer");
         rbStreamingLive = false;
