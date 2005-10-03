@@ -1072,7 +1072,7 @@ void TVRec::CreateSIParser(int program_num)
             (program_num >= 0) ? program_num : service_id);
 
 #ifdef USING_DVB_EIT
-        if (scanner && (GetState() == kState_None))
+        if (scanner)
             scanner->StartPassiveScan(dvbc, dvbsiparser);
 #endif // USING_DVB_EIT
     }
@@ -1615,6 +1615,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sm->SetStreamData(sd);
         sd->Reset(major, minor);
         sm->SetChannel(major, minor);
+        sd->SetVideoStreamsRequired(1);
         sm->SetFTAOnly(true);
 
         // Try to get pid of VCT from cache and
@@ -1646,6 +1647,7 @@ bool TVRec::SetupDTVSignalMonitor(void)
         sm->SetStreamData(sd);
         sd->Reset(progNum);
         sm->SetProgramNumber(progNum);
+        sd->SetVideoStreamsRequired(1);
         sm->SetFTAOnly(fta);
         sm->AddFlags(kDTVSigMon_WaitForPAT | kDTVSigMon_WaitForPMT);
 
@@ -2795,21 +2797,38 @@ int TVRec::ChangeHue(bool direction)
     return ret;
 }
 
-/** \fn TVRec::SetChannel(QString name)
+/** \fn TVRec::SetChannel(QString,uint)
  *  \brief Changes to a named channel on the current tuner.
  *
  *   You must call PauseRecorder() before calling this.
  *
  *  \param name channel to change to.
  */
-void TVRec::SetChannel(QString name)
+void TVRec::SetChannel(QString name, uint requestType)
 {
     QMutexLocker lock(&stateChangeLock);
-    ClearFlags(kFlagRingBufferReset);
-    tuningRequests.enqueue(TuningRequest(kFlagLiveTV, name));
-    // Wait for RingBuffer reset
-    while (!HasFlags(kFlagRingBufferReset))
+
+    // Detect tuning request type if needed
+    if (requestType & kFlagDetect)
+    {
         WaitForEventThreadSleep();
+        requestType = lastTuningRequest.flags & (kFlagRec | kFlagNoRec);
+    }
+
+    // Clear the RingBuffer reset flag, in case we wait for a reset below
+    ClearFlags(kFlagRingBufferReset);
+
+    // Actually add the tuning request to the queue, and
+    // then wait for it to start tuning
+    tuningRequests.enqueue(TuningRequest(requestType, name));
+    WaitForEventThreadSleep();
+
+    // If we are using a recorder, wait for a RingBuffer reset
+    if (requestType & kFlagRec)
+    {
+        while (!HasFlags(kFlagRingBufferReset))
+            WaitForEventThreadSleep();
+    }
 }
 
 /** \fn TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
@@ -3223,12 +3242,6 @@ void TVRec::HandleTuning(void)
     if (tuningRequests.size())
     {
         const TuningRequest *request = &tuningRequests.front();
-        if ((request->flags & kFlagLiveTV) && !request->channel.isEmpty() &&
-            (GetState() == kState_None))
-        {
-            tuningRequests.front().flags &= ~kFlagLiveTV;
-            tuningRequests.front().flags |= kFlagEITScan;
-        }
         VERBOSE(VB_RECORD, LOC + "Request: "<<request->toString());
         TuningShutdowns(*request);
 
@@ -3471,6 +3484,13 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         {
             signalMonitor->SetUpdateRate(kSignalMonitoringRate);
             signalMonitor->SetNotifyFrontend(true);
+
+            if (request.flags & kFlagEITScan)
+            {
+                GetDTVSignalMonitor()->GetStreamData()->
+                    SetVideoStreamsRequired(0);
+            }
+
             SetFlags(kFlagSignalMonitorRunning);
             if (request.flags & kFlagRec)
                 SetFlags(kFlagWaitingForSignal);

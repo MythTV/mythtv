@@ -85,9 +85,9 @@ void EITScanner::RunEventLoop(void)
         {
             if (activeScanNextChan == activeScanChannels.end())
                 activeScanNextChan = activeScanChannels.begin();
-
+ 
             if (!(*activeScanNextChan).isEmpty())
-                rec->SetChannel(*activeScanNextChan);
+                rec->SetChannel(*activeScanNextChan, TVRec::kFlagEITScan);
 
             activeScanNextTrig = QDateTime::currentDateTime()
                 .addSecs(activeScanTrigTime);

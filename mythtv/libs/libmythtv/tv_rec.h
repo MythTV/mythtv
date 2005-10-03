@@ -210,7 +210,7 @@ class TVRec : public QObject
     /// Changes to a channel in the 'dir' channel change direction.
     void ChangeChannel(ChannelChangeDirection dir)
         { SetChannel(QString("NextChannel %1").arg((int)dir)); }
-    void SetChannel(QString name);
+    void SetChannel(QString name, uint requestType = kFlagDetect);
 
     int SetSignalMonitoringRate(int msec, int notifyFrontend = 1);
     int ChangeColour(bool direction);
@@ -399,6 +399,7 @@ class TVRec : public QObject
     char          *rbStreamingBuffer;
     bool           rbStreamingLive;
 
+  public:
     static const uint kStreamedFileReadTimeout;
     static const uint kRequestBufferSize;
     static const uint kEITScanStartTimeout;
@@ -453,6 +454,7 @@ class TVRec : public QObject
 
     // Tuning state
     static const uint kFlagRingBufferReset      = 0x40000000;
+    static const uint kFlagDetect               = 0x80000000;
 };
 
 #endif
