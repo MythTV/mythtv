@@ -1764,7 +1764,24 @@ void JobQueue::DoTranscodeThread(void)
         VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'")
                                      .arg(command));
 
-        myth_system(command.ascii());
+        int result = myth_system(command.ascii());
+
+        if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
+            (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
+        {
+            msg = QString("Transcoding ERRORED for %1, unable to find "
+                          "mythtranscode, check your PATH and backend logs.")
+                          .arg(details);
+
+            gContext->LogEntry("transcode", LP_WARNING,
+                               "Transcoding Errored", msg);
+
+            ChangeJobStatus(jobID, JOB_ERRORED,
+                "ERROR: Unable to find mythtranscode, check backend logs.");
+
+            retry = false;
+            break;
+        }
 
         int status = GetJobStatus(jobID);
 
@@ -1968,17 +1985,18 @@ void JobQueue::DoFlagCommercialsThread(void)
     breaksFound = myth_system(cmd.ascii());
 
     controlFlagsLock.lock();
-    if (breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR)
+    if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
+        (breaksFound == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
     {
         msg = QString("Commercial Flagging ERRORED for %1, unable to find "
-                      "mythcommflag, check your PATH.")
+                      "mythcommflag, check your PATH and backend logs.")
                       .arg(logDesc);
 
         gContext->LogEntry("commflag", LP_WARNING,
                            "Commercial Flagging Errored", msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
-                        "ERROR: Unable to find mythcommflag.");
+            "ERROR: Unable to find mythcommflag, check backend logs.");
     }
     else if ((*(jobControlFlags[key]) == JOB_STOP) ||
              (breaksFound >= COMMFLAG_EXIT_START))
@@ -2082,23 +2100,39 @@ void JobQueue::DoUserJobThread(void)
         default: break;
     }
 
-    VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'")
+    VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'")
                                  .arg(runningJobCommands[key]));
 
-    myth_system(runningJobCommands[key].ascii());
+    int result = myth_system(runningJobCommands[key].ascii());
 
-    msg = QString("Finished \"%1\" for \"%2\" recorded from "
-                  "channel %3 at %4.")
-                  .arg(jobDesc)
-                  .arg(program_info->title)
-                  .arg(program_info->chanid)
-                  .arg(program_info->recstartts.toString());
-    VERBOSE(VB_JOBQUEUE, msg.local8Bit());
+    if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
+        (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
+    {
+        msg = QString("User Job '%1' ERRORED, unable to find "
+                      "executable, check your PATH and backend logs.")
+                      .arg(runningJobCommands[key]);
 
-    gContext->LogEntry("jobqueue", LP_NOTICE,
-                       QString("Job \"%1\" Finished").arg(jobDesc), msg);
+        gContext->LogEntry("jobqueue", LP_WARNING,
+                           "User Job Errored", msg);
 
-    ChangeJobStatus(jobID, JOB_FINISHED, "Successfully Completed.");
+        ChangeJobStatus(jobID, JOB_ERRORED,
+            "ERROR: Unable to find executable, check backend logs.");
+    }
+    else
+    {
+        msg = QString("Finished \"%1\" for \"%2\" recorded from "
+                      "channel %3 at %4.")
+                      .arg(jobDesc)
+                      .arg(program_info->title)
+                      .arg(program_info->chanid)
+                      .arg(program_info->recstartts.toString());
+        VERBOSE(VB_JOBQUEUE, msg.local8Bit());
+
+        gContext->LogEntry("jobqueue", LP_NOTICE,
+                           QString("Job \"%1\" Finished").arg(jobDesc), msg);
+
+        ChangeJobStatus(jobID, JOB_FINISHED, "Successfully Completed.");
+    }
 
     controlFlagsLock.lock();
     runningJobIDs.erase(key);
