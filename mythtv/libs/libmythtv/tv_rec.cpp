@@ -4,6 +4,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <pthread.h>
+#include <sched.h> // for sched_yield
 
 // C++ headers
 #include <iostream>
@@ -1227,11 +1228,11 @@ void TVRec::RunTV(void)
         // WaitforEventThreadSleep() will still work...
         if (doSleep && tuningRequests.empty())
         {
-            // yield to give WaitForEventThreadSleep a chance to do enter wait
-            usleep(50);
             triggerEventSleep.wakeAll();
             lock.mutex()->unlock();
-            triggerEventLoop.wait(30000 /* ms */);
+            sched_yield();
+            triggerEventSleep.wakeAll();
+            triggerEventLoop.wait(1000 /* ms */);
             lock.mutex()->lock();
         }
     }
