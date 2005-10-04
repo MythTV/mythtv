@@ -25,6 +25,10 @@ EITScanner::EITScanner()
       exitThread(false), rec(NULL), activeScan(false)
 {
     pthread_create(&eventThread, NULL, SpawnEventLoop, this);
+
+    // Lower scheduling priority, to avoid problems with recordings.
+    struct sched_param sp = {19 /* very low priority */};
+    pthread_setschedparam(eventThread, SCHED_OTHER, &sp);
 }
 
 void EITScanner::TeardownAll(void)

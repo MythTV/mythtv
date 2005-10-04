@@ -51,6 +51,10 @@ Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList)
     {
         pthread_t scthread;
         pthread_create(&scthread, NULL, SchedulerThread, this);
+
+        // Lower scheduling priority, to avoid problems with recordings.
+        struct sched_param sp = {9 /* lower than normal */};
+        pthread_setschedparam(scthread, SCHED_OTHER, &sp);
     }
 }
 
