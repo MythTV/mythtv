@@ -234,7 +234,7 @@ void VideoManager::updateBackground(void)
 }
 
 // Copy movie poster to appropriate directory and return full pathname to it
-QString VideoManager::GetMoviePoster(QString movieNum)
+QString VideoManager::GetMoviePoster(const QString& movieNum)
 {
     QString movieFile = curitem->Filename().section('.', 0, -2);
     QStringList images = QImage::inputFormatList();
@@ -348,44 +348,63 @@ QString VideoManager::GetMoviePoster(QString movieNum)
     return localfile;
 }
 
-void VideoManager::copyFinished(QNetworkOperation* op) {
-   QString state, operation;
-   switch(op->operation()) {
-      case QNetworkProtocol::OpMkDir: operation = "MkDir"; break;
-      case QNetworkProtocol::OpRemove: operation = "Remove"; break; 
-      case QNetworkProtocol::OpRename: operation = "Rename"; break; 
-      case QNetworkProtocol::OpGet: operation = "Get"; break;
-      case QNetworkProtocol::OpPut: operation = "Put"; break; 
-      default: operation = "Uknown"; break;
+void VideoManager::copyFinished(QNetworkOperation* op) 
+{
+    QString state, operation;
+    switch(op->operation()) 
+    {
+        case QNetworkProtocol::OpMkDir: 
+            operation = "MkDir"; 
+            break;
+        case QNetworkProtocol::OpRemove: 
+            operation = "Remove"; 
+            break; 
+        case QNetworkProtocol::OpRename: 
+            operation = "Rename"; 
+            break; 
+        case QNetworkProtocol::OpGet: 
+            operation = "Get"; 
+            break;
+        case QNetworkProtocol::OpPut: 
+            operation = "Put"; 
+            break; 
+        default: 
+            operation = "Uknown"; 
+            break;
+    }
+   
+    switch(op->state()) 
+    {
+        case QNetworkProtocol::StWaiting:
+            state = "The operation is in the QNetworkProtocol's queue waiting to be prcessed.";
+            break;
+        case QNetworkProtocol::StInProgress:
+            state = "The operation is being processed.";
+            break;
+        case QNetworkProtocol::StDone:
+            state = "The operation has been processed succesfully.";
+            iscopycomplete = true;
+            iscopysuccess = true;
+            break;
+        case QNetworkProtocol::StFailed:
+            state = "The operation has been processed but an error occurred.";
+            iscopycomplete = true;
+            break;
+        case QNetworkProtocol::StStopped:
+            state = "The operation has been processed but has been stopped before it finished, and is waiting to be processed.";
+            break;
+        default: 
+            state = "Unknown";
+            break;
    }
-   switch(op->state()) {
-      case QNetworkProtocol::StWaiting:
-         state = "The operation is in the QNetworkProtocol's queue waiting to be prcessed.";
-         break;
-      case QNetworkProtocol::StInProgress:
-         state = "The operation is being processed.";
-         break;
-      case QNetworkProtocol::StDone:
-         state = "The operation has been processed succesfully.";
-         iscopycomplete = true;
-         iscopysuccess = true;
-         break;
-      case QNetworkProtocol::StFailed:
-         state = "The operation has been processed but an error occurred.";
-         iscopycomplete = true;
-         break;
-      case QNetworkProtocol::StStopped:
-         state = "The operation has been processed but has been stopped before it finished, and is waiting to be processed.";
-         break;
-      default: state = "Unknown"; break;
-   }
+   
    VERBOSE(VB_ALL, QString("%1: %2: %3")
            .arg(operation)
            .arg(state)
            .arg(op->protocolDetail()) );
 }
 
-void VideoManager::GetMovieData(QString movieNum)
+void VideoManager::GetMovieData(const QString& movieNum)
 {
     QStringList args = QStringList::split(' ',
               gContext->GetSetting("MovieDataCommandLine", 
@@ -398,14 +417,18 @@ void VideoManager::GetMovieData(QString movieNum)
     // parse results
     QMap<QString,QString> data;
     QStringList lines = QStringList::split('\n', results);
-    if (lines.size() > 0) {
-        for (QStringList::Iterator it = lines.begin();it != lines.end(); ++it) {
+    if (lines.size() > 0) 
+    {
+        for (QStringList::Iterator it = lines.begin();it != lines.end(); ++it) 
+        {
             if ( (*it).at(0) == '#')  // treat lines beg w/ # as a comment
                 continue; 
+            
             QString name = (*it).section(':', 0, 0);
             QString vale = (*it).section(':', 1);
             data[name] = vale;
         }
+        
         // set known values 
         curitem->setTitle(data["Title"]);
         curitem->setYear(data["Year"].toInt());
@@ -414,47 +437,59 @@ void VideoManager::GetMovieData(QString movieNum)
         curitem->setUserRating(data["UserRating"].toFloat());
         curitem->setRating(data["MovieRating"]);
         curitem->setLength(data["Runtime"].toInt());
-    //movieGenres
-    movieGenres.clear();
-    QString genres = data["Genres"];
-    int indice ;
-    QString genre;
-    while (genres!= ""){
-        indice = genres.find(",");
-        if (indice == -1){
-            genre = genres;
-            genres = "";
-        } else {
-            genre = genres.left(indice);
-            genres = genres.right(genres.length()-indice -1);
+        
+        //movieGenres
+        movieGenres.clear();
+        QString genres = data["Genres"];
+        int indice ;
+        QString genre;
+        while (genres!= "")
+        {
+            indice = genres.find(",");
+            if (indice == -1)
+            {
+                genre = genres;
+                genres = "";
+            } else 
+            {
+                genre = genres.left(indice);
+                genres = genres.right(genres.length()-indice -1);
+            }
+            movieGenres.append(genre.stripWhiteSpace());
         }
-        movieGenres.append(genre.stripWhiteSpace());
-    }
-    curitem->setGenres(movieGenres);
-    //movieCountries
-    movieCountries.clear();
-    QString countries = data["Countries"];
-    QString country;
-    while (countries!= ""){
-        indice = countries.find(",");
-        if (indice == -1){
-            country = countries;
-            countries = "";
-        } else {
-            country = countries.left(indice);
-            countries = countries.right(countries.length()-indice -1);
+        curitem->setGenres(movieGenres);
+        
+        //movieCountries
+        movieCountries.clear();
+        QString countries = data["Countries"];
+        QString country;
+        while (countries!= "")
+        {
+            indice = countries.find(",");
+            if (indice == -1)
+            {
+                country = countries;
+                countries = "";
+            } 
+            else 
+            {
+                country = countries.left(indice);
+                countries = countries.right(countries.length()-indice -1);
+            }
+            country.stripWhiteSpace();
+    
+            movieCountries.append(country.stripWhiteSpace());
         }
-        country.stripWhiteSpace();
-
-        movieCountries.append(country.stripWhiteSpace());
-    }
-    curitem->setCountries(movieCountries);
+            
+        curitem->setCountries(movieCountries);
     
         curitem->setInetRef(movieNumber);
         QString movieCoverFile = "";
         movieCoverFile = GetMoviePoster(movieNumber);
         curitem->setCoverFile(movieCoverFile);
-    } else {
+    } 
+    else 
+    {
         ResetCurrentItem();
     }
 
@@ -465,7 +500,7 @@ void VideoManager::GetMovieData(QString movieNum)
 // Execute an external command and return results in string
 //   probably should make this routing async vs polling like this
 //   but it would require a lot more code restructuring
-QString VideoManager::executeExternal(QStringList args, QString purpose) 
+QString VideoManager::executeExternal(const QStringList& args, const QString& purpose) 
 {
     QString ret = "";
     QString err = "";
@@ -476,83 +511,116 @@ QString VideoManager::executeExternal(QStringList args, QString purpose)
 
     QString cmd = args[0];
     QFileInfo info(cmd);
-    if (!info.exists()) {
+    
+    if (!info.exists()) 
+    {
        err = QString("\"%1\" failed: does not exist").arg(cmd.local8Bit());
-    } else if (!info.isExecutable()) {
+    } 
+    else if (!info.isExecutable()) 
+    {
        err = QString("\"%1\" failed: not executable").arg(cmd.local8Bit());
-    } else if (proc.start()) {
-        while (true) {
-           while (proc.canReadLineStdout() || proc.canReadLineStderr()) {
-              if (proc.canReadLineStdout()) {
-                ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
-              } 
-              if (proc.canReadLineStderr()) {
-                 if (err == "") err = cmd + ": ";
-                 err += QString::fromLocal8Bit(proc.readLineStderr(),-1) + "\n";
-              }
-           }
-           if (proc.isRunning()) {
-              qApp->processEvents();
-              usleep(10000);
-           } else {
-              if (!proc.normalExit()) {
-                 err = QString("\"%1\" failed: Process exited abnormally")
-                     .arg(cmd.local8Bit());
-              } 
-              break;
-           }
-       }
-    } else {
-       err = QString("\"%1\" failed: Could not start process")
-        .arg(cmd.local8Bit());
+    } 
+    else if (proc.start()) 
+    {
+        while (true) 
+        {
+            while (proc.canReadLineStdout() || proc.canReadLineStderr()) 
+            {
+                if (proc.canReadLineStdout()) 
+                {
+                    ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
+                } 
+              
+                if (proc.canReadLineStderr()) 
+                {
+                    if (err == "") 
+                    {
+                        err = cmd + ": ";
+                    }                    
+                 
+                    err += QString::fromLocal8Bit(proc.readLineStderr(),-1) + "\n";
+                }
+            }
+           
+            if (proc.isRunning()) 
+            {
+                qApp->processEvents();
+                usleep(10000);
+            } 
+            else 
+            {
+                if (!proc.normalExit()) 
+                {
+                    err = QString("\"%1\" failed: Process exited abnormally")
+                                  .arg(cmd.local8Bit());
+                } 
+                
+                break;
+            }
+        }
+    } 
+    else 
+    {
+        err = QString("\"%1\" failed: Could not start process")
+                      .arg(cmd.local8Bit());
     }
 
-    while (proc.canReadLineStdout() || proc.canReadLineStderr()) {
-        if (proc.canReadLineStdout()) {
+    while (proc.canReadLineStdout() || proc.canReadLineStderr()) 
+    {
+        if (proc.canReadLineStdout()) 
+        {
             ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
         }
-        if (proc.canReadLineStderr()) {
-           if (err == "") err = cmd + ": ";
-           err += QString::fromLocal8Bit(proc.readLineStderr(), -1) + "\n";
+        
+        if (proc.canReadLineStderr()) 
+        {
+            if (err == "") 
+            {
+                err = cmd + ": ";
+            }                
+           
+            err += QString::fromLocal8Bit(proc.readLineStderr(), -1) + "\n";
         }
     }
 
     if (err != "")
     {
-        if (purpose == "")
-            purpose = "Command";
+        QString tempPurpose(purpose);
+        
+        if (tempPurpose == "")
+            tempPurpose = "Command";
 
         cerr << err << endl;
         MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-        QObject::tr(purpose + " failed"), QObject::tr(err + "\n\nCheck VideoManager Settings"));
+        QObject::tr(tempPurpose + " failed"), QObject::tr(err + "\n\nCheck VideoManager Settings"));
         ret = "#ERROR";
     }
+    
     VERBOSE(VB_ALL, ret); 
     return ret;
 }
 
 // Obtain a movie listing via popular website(s) and populates movieList 
 //   returns: number of possible matches returned, -1 for error
-int VideoManager::GetMovieListing(QString movieName)
+int VideoManager::GetMovieListing(const QString& movieName)
 {
     QStringList args = QStringList::split(' ', 
               gContext->GetSetting("MovieListCommandLine", 
               gContext->GetShareDir() + "mythvideo/scripts/imdb.pl -M tv=no;video=no"));
+    
     args += movieName;
 
     // execute external command to obtain list of possible movie matches 
     QString results = executeExternal(args, "Movie Search");
-/* let error parse as 0 hits, so user gets chance to enter one in manually 
-    if (results == "#ERROR") {
-        return -1;
-    }
-*/
 
     // parse results
     movieList.clear();
+    
     int count = 0;
     QStringList lines = QStringList::split('\n', results);
-    for (QStringList::Iterator it = lines.begin();it != lines.end(); ++it) {
+    
+    for (QStringList::Iterator it = lines.begin();it != lines.end(); ++it) 
+    {
         if ( (*it).at(0) == '#')  // treat lines beg w/ # as a comment
             continue; 
         movieList.push_back(*it);
@@ -560,13 +628,16 @@ int VideoManager::GetMovieListing(QString movieName)
     }
 
     // if only a single match, assume this is it
-    if (count == 1) {
+    if (count == 1) 
+    {
         movieNumber = movieList[0].section(':', 0, 0);
     }
 
-    if (count > 0) {
+    if (count > 0) 
+    {
         movieList.push_back(""); // visual separator - can't get selected
     }
+    
     movieList.push_back("manual:Manually Enter IMDB #");
     movieList.push_back("reset:Reset Entry");
     movieList.push_back("cancel:Cancel");

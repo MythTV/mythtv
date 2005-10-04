@@ -92,12 +92,12 @@ class VideoManager : public MythDialog
 
     void RefreshMovieList();
     QString ratingCountry;
-    void GetMovieData(QString);
-    int GetMovieListing(QString);
-    QString GetMoviePoster(QString);
+    void GetMovieData(const QString& );
+    int GetMovieListing(const QString& );
+    QString GetMoviePoster(const QString& );
     QStringList movieList;
     QString curIMDBNum;
-    QString executeExternal(QStringList args, QString purpose = "");
+    QString executeExternal(const QStringList& args, const QString& purpose = QString(""));
 
     void updateBackground(void);
     void updateList(QPainter *);

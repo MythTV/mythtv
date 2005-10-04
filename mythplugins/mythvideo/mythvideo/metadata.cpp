@@ -1,4 +1,6 @@
 #include <qfile.h>
+#include <qdir.h>
+#include <qfileinfo.h>
 #include <cmath>
 #include <iostream>
 #include <mythtv/mythdbcon.h>
@@ -22,65 +24,57 @@ bool operator!=(const Metadata& a, const Metadata& b)
     return false;
 }
 
-void Metadata::setField(QString field, QString data)
+
+bool Metadata::removeDir(const QString& dirName)
 {
-    if (field == "title")
-        title = data;
-    else if (field == "director")
-        director = data;
-    else if (field == "plot")
-        plot = data;
-    else if (field == "rating")
-        rating = data;
-    else if (field == "year")
-        year = data.toInt();
-    else if (field == "userrating")
+    QDir d(dirName);
+
+    const QFileInfoList *contents = d.entryInfoList();
+    if (!contents)
     {
-        userrating = data.toFloat();
-        if (isnan(userrating)) 
-            userrating = 0.0;
-        if (userrating < -10.0 || userrating >= 10.0)
-            userrating = 0.0;
+        return d.rmdir(dirName);
     }
-    else if (field == "length")
-        length = data.toInt();
-    else if (field == "showlevel")
-        showlevel = data.toInt();
-    else if (field == "coverfile")
-        coverfile = data;
-    else if (field == "inetref")
-        inetref = data;
-    else if (field == "childid")
-        childID = data.toUInt();
-    else if (field == "browse")
+
+    const QFileInfoListIterator it(*contents);
+    QFileInfo *fi;
+
+    while ((fi = it.current()) != 0)
     {
-        bool browse_setting = false;
-        bool ok;
-        int browse_int_setting = data.toUInt(&ok);
-        if(!ok)
+        if (fi->fileName() == "." ||
+            fi->fileName() == "..")
         {
-            cerr << "metadata.o: Problems setting the browse flag from this data: " << data << endl;
+            continue;
+        }
+        if (fi->isDir())
+        {
+            QString fileName = fi->fileName();
+            if (!removeDir(fileName))
+                return false;
         }
         else
         {
-            if(browse_int_setting)
-            {
-                browse_setting = true;
-            }
+            if (!QFile(fi->fileName()).remove())
+                return false;
         }
-        browse = browse_setting;
     }
-    else if (field == "playcommand")
-    {
-        playcommand = data;
-    }
+    return d.rmdir(dirName);
 }
 
 bool Metadata::Remove()
 {
-    QFile videofile;
-    videofile.setName(filename);
-    bool isremoved = videofile.remove();
+    bool isremoved = false;
+    QFileInfo fi(filename);
+    if (fi.isDir())
+    {
+        isremoved = removeDir(filename);
+    }
+    else
+    {
+        QFile videofile;
+        videofile.setName(filename);
+        isremoved = videofile.remove();
+    }
+    
     if (isremoved)
     {
         MSqlQuery query(MSqlQuery::InitCon());
@@ -239,7 +233,7 @@ bool Metadata::fillDataFromID()
         playcommand = query.value(13).toString();
         category = query.value(14).toString();
 
-    // Genres
+        // Genres
         fillGenres();
     
         //Countries
@@ -400,7 +394,7 @@ void Metadata::updateDatabase()
     if (inetref == "")
         inetref = "00000000";
 
-    int idCategory = getIdCategory();
+    int idCategory = getCategoryID();
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("UPDATE videometadata SET title = :TITLE, "
@@ -436,7 +430,11 @@ void Metadata::updateDatabase()
     updateCountries();
 }
 
-int Metadata::getIdCategory()
+
+
+
+
+int Metadata::lookupCategoryID()
 {
     int idcategory = 0;
     if (category != "")
@@ -472,26 +470,36 @@ int Metadata::getIdCategory()
             }
         }
     }
-    return idcategory;
     
+    return idcategory;
 }
 
-void Metadata::setIdCategory(int id)
+
+
+
+void Metadata::setCategoryID(int id)
 {
     if (id==0)
+    {
         category = "";
+        categoryID = id;            
+    }                    
     else 
     {
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT category FROM videocategory"
-                      " WHERE intid = :ID;");
-        query.bindValue(":ID", id);
-
-        if (query.exec() && query.isActive() && query.size()>0)
+        if (categoryID != id)
         {
-            query.next();
-            category = QString::fromUtf8(query.value(0).toString());
-        }
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT category FROM videocategory"
+                          " WHERE intid = :ID;");
+            query.bindValue(":ID", id);
+
+            if (query.exec() && query.isActive() && query.size()>0)
+            {
+                query.next();
+                category = QString::fromUtf8(query.value(0).toString());
+                categoryID = id;
+            }
+        }            
     }
 }
 

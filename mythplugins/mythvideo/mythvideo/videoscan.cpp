@@ -170,6 +170,7 @@ void VideoScanner::buildFileList(const QString &directory,
     QFileInfoListIterator it(*list);
     QFileInfo *fi;
     QRegExp r;
+    QString video_ts("VIDEO_TS");
     
     while ((fi = it.current()) != 0)
     {
@@ -191,7 +192,16 @@ void VideoScanner::buildFileList(const QString &directory,
         
         QString filename = fi->absFilePath();
         if (fi->isDir())
-            buildFileList(filename, imageExtensions);
+        {
+            if (fi->fileName() == video_ts )
+            {
+                filename = fi->dirPath(true);
+                if (!filename.isEmpty())
+                    m_VideoFiles[filename] = kFileSystem;
+            }
+            else
+                buildFileList(filename, imageExtensions);
+        }
         else
         {
             r.setPattern("^" + fi->extension() + "$");

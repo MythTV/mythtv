@@ -8,7 +8,7 @@ using namespace std;
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
 
-const QString currentDatabaseVersion = "1005";
+const QString currentDatabaseVersion = "1006";
 
 static void UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -179,5 +179,15 @@ void UpgradeVideoDatabaseSchema(void)
         performActualUpdate(updates, "1005", dbver);
     }
 
+    if (dbver == "1005")
+    {
+        const QString updates[] = {
+"INSERT INTO videotypes (extension, playcommand, f_ignore, use_default) "
+"VALUES (\"VIDEO_TS\", \"mplayer -fs -zoom -quiet -vo xv -dvd-device %s dvd://1\", 0, 1);",
+"INSERT INTO videotypes (extension, playcommand, f_ignore, use_default) "
+"VALUES (\"iso\", \"mplayer -fs -zoom -quiet -vo xv -dvd-device %s dvd://1\", 0, 1);",
+""
+    };
+        performActualUpdate(updates, "1006", dbver);
+    }
 }
-

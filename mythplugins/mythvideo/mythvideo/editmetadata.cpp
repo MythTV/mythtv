@@ -77,7 +77,7 @@ void EditMetadataDialog::fillWidgets()
                 category_select->addItem(a_query.value(0).toInt(), cat);
             }
         }
-        category_select->setToItem(working_metadata->getIdCategory());
+        category_select->setToItem(working_metadata->getCategoryID());
     }
     
     if(level_select)
@@ -312,7 +312,7 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
                     if (ok)
                     {
                         working_metadata->setCategory(category);
-                        int id = working_metadata->getIdCategory();
+                        int id = working_metadata->getCategoryID();
                         category_select->addItem(id, category);
                         category_select->setToItem(id);
                     }
@@ -373,7 +373,7 @@ void EditMetadataDialog::setTitle(QString new_title)
 
 void EditMetadataDialog::setCategory(int new_category)
 {
-    working_metadata->setIdCategory(new_category);
+    working_metadata->setCategoryID(new_category);
 }
 
 void EditMetadataDialog::setPlayer(QString new_command)
