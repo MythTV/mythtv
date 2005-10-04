@@ -2324,6 +2324,15 @@ Run the setup program:
 $ mythtv-setup
 </verb></tscreen>
 
+<p><figure loc="here">
+<eps file="stop.eps" height="1cm">
+<img src="stop.png">
+<caption>
+<bf>NOTE</bf>:  You must shut down any running mythbackend applications
+before running mythtv-setup. Not doing so will cause problems.
+</caption>
+</figure>
+
 The backend setup program will start and offer you a number of choices.  It
 is <em>strongly</em> recommended that you go through them in order.
 
