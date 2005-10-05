@@ -275,6 +275,7 @@ void DVBSignalMonitor::RunTableMonitor(void)
         VERBOSE(VB_IMPORTANT,
                 QString("Failed to open DVR device %1 : %2")
                 .arg(dvr_fname).arg(strerror(errno)));
+        delete[] buffer;
         return;
     }
 
@@ -311,7 +312,9 @@ void DVBSignalMonitor::RunTableMonitor(void)
         for (; dit != del_pids.end(); ++dit)
             RemovePIDFilter(*dit);
     }
+
     close(dvr_fd);
+    delete[] buffer;
     DBG_SM("RunTableMonitor()", "end");
 }
 
