@@ -282,7 +282,10 @@ bool MPEGStreamData::IsRedundant(const PSIPTable &psip) const
         return (version == VersionPATSingleProgram());
 
     if (TableID::PMT == table_id)
-        return VersionPMT(psip.tsheader()->PID()) == version;
+    {
+        int cver = VersionPMT(psip.tsheader()->PID(), psip.TableIDExtension());
+        return version == cver;
+    }
 
     return false;
 }
@@ -318,7 +321,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::PMT:
         {
-            SetVersionPMT(pid, psip.Version());
+            SetVersionPMT(pid, psip.Version(), psip.TableIDExtension());
             if (_cache_tables)
             {
                 ProgramMapTable *pmt = new ProgramMapTable(psip);

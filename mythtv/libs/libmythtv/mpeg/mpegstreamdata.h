@@ -21,6 +21,8 @@ typedef QMap<const PSIPTable*, int>    psip_refcnt_map_t;
 typedef vector<const ProgramMapTable*> pmt_vec_t;
 typedef QMap<uint, ProgramMapTable*>   pmt_cache_t;
 
+#define ENCODE_PID_PROG(pid, prog) (pid << 16 | (prog & 0xffff))
+
 class MPEGStreamData : public QObject
 {
     Q_OBJECT
@@ -42,7 +44,7 @@ class MPEGStreamData : public QObject
 
     // Listening
     virtual void AddListeningPID(uint pid)  { _pids_listening[pid] = true; }
-    virtual void AddNotListeningPID(uint pid) { _pids_notlistening[pid] = true; }
+    virtual void AddNotListeningPID(uint pid){_pids_notlistening[pid] = true;}
     virtual void AddWritingPID(uint pid)    { _pids_writing[pid] = true;   }
     virtual void AddAudioPID(uint pid)      { _pids_audio[pid] = true;     }
 
@@ -60,10 +62,11 @@ class MPEGStreamData : public QObject
         { return _pids_listening; }
 
     // Table versions
-    virtual void SetVersionPAT(int version)         { _pat_version = version;  }
-    virtual int  VersionPAT(void) const             { return _pat_version;     }
-    virtual void SetVersionPMT(uint pid, int ver)   { _pmt_version[pid] = ver; }
-    virtual inline int VersionPMT(uint pid) const;
+    virtual void SetVersionPAT(int version) { _pat_version = version;  }
+    virtual int  VersionPAT(void) const     { return _pat_version;     }
+    virtual void SetVersionPMT(uint pid, uint prog_num, int ver)
+        { _pmt_version[ENCODE_PID_PROG(pid, prog_num)] = ver; }
+    virtual inline int VersionPMT(uint pid, uint prog_num) const;
 
     // Caching
     virtual bool HasCachedPAT(void) const;
@@ -199,9 +202,10 @@ inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket*)
     //AdaptationFieldControl afc(tspacket.data()+4);
 }
 
-inline int MPEGStreamData::VersionPMT(uint pid) const
+inline int MPEGStreamData::VersionPMT(uint pid, uint prog_num) const
 {
-    const QMap<uint, int>::const_iterator it = _pmt_version.find(pid);
+    const QMap<uint, int>::const_iterator it =
+        _pmt_version.find(ENCODE_PID_PROG(pid, prog_num));
     return (it == _pmt_version.end()) ? -1 : *it;
 }
 
