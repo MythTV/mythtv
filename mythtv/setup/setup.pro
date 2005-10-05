@@ -36,7 +36,7 @@ INCLUDEPATH += ../libs/libmythtv/dvbdev
 
 # Input
 HEADERS += backendsettings.h
-SOURCES += main.cpp backendsettings.cpp checksetup.cpp
+SOURCES += backendsettings.cpp checksetup.cpp main.cpp
 
 menu.path = $${PREFIX}/share/mythtv/
 menu.files += setup.xml
