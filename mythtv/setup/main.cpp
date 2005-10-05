@@ -305,36 +305,19 @@ int main(int argc, char *argv[])
     LanguageSettings::prompt();
     LanguageSettings::load("mythfrontend");
 
-
-    DialogBox *dia;
-    dia = new DialogBox(mainWindow,
-                        QObject::tr("Would you like to clear all "
-                                   "capture card settings before starting "
-                                   "configuration?"));
-    dia->AddButton(QObject::tr("No, leave my card settings alone"));
-    dia->AddButton(QObject::tr("Yes, delete my card settings"));
-    if (dia->exec() == 2)
-        clearCardDB();
-    delete dia;
-    
-    // Give the user time to realize the first dialog is gone
-    // before we bring up a similar-looking one
-    usleep(750000);
-
-    dia = new DialogBox(mainWindow,
-                        QObject::tr("Would you like to clear all "
-                                   "program data and channel settings before "
-                                   "starting configuration? This will not "
-                                   "affect any existing recordings."));
-    dia->AddButton(QObject::tr("No, leave my channel settings alone"));
-    dia->AddButton(QObject::tr("Yes, delete my channel settings"));
-    if (dia->exec() == 2)
-        clearAllDB();
-    delete dia;
+    ClearDialog clr;
+    if (clr.exec() == QDialog::Accepted)
+    {
+        if (clr.IsClearCardsSet())
+            clearCardDB();
+        if (clr.IsClearChannelsSet())
+            clearAllDB();
+    }
 
     REG_KEY("qt", "DELETE", "Delete", "D");
     REG_KEY("qt", "EDIT", "Edit", "E");
 
+    DialogBox *dia = NULL;
     bool haveProblems = false;
     do
     {
