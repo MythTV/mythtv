@@ -167,12 +167,20 @@ static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
 }
 
 static QDateTime schedTime;
-static bool schedCardsFirst;
 
-static bool comp_common(ProgramInfo *a, ProgramInfo *b)
+static bool comp_priority(ProgramInfo *a, ProgramInfo *b)
 {
+    int arec = (a->recstatus != rsRecording);
+    int brec = (b->recstatus != rsRecording);
+
+    if (arec != brec)
+        return arec < brec;
+
     if (a->recpriority != b->recpriority)
         return a->recpriority > b->recpriority;
+
+    if (a->recpriority2 != b->recpriority2)
+        return a->recpriority2 > b->recpriority2;
 
     int apast = (a->recstartts < schedTime.addSecs(-30) && !a->reactivate);
     int bpast = (b->recstartts < schedTime.addSecs(-30) && !b->reactivate);
@@ -200,28 +208,6 @@ static bool comp_common(ProgramInfo *a, ProgramInfo *b)
     return a->recordid < b->recordid;
 }
 
-static bool comp_priority(ProgramInfo *a, ProgramInfo *b)
-{
-    int arec = (a->recstatus != rsRecording);
-    int brec = (b->recstatus != rsRecording);
-
-    if (arec != brec)
-        return arec < brec;
-
-    return comp_common(a, b);
-}
-
-static bool comp_retry(ProgramInfo *a, ProgramInfo *b)
-{
-    if (a->conflictpriority != b->conflictpriority)
-        return a->conflictpriority < b->conflictpriority;
-
-    if (a->numconflicts != b->numconflicts)
-        return a->numconflicts < b->numconflicts;
-
-    return comp_common(a, b);
-}
-
 static bool comp_timechannel(ProgramInfo *a, ProgramInfo *b)
 {
     if (a->recstartts != b->recstartts)
@@ -244,7 +230,6 @@ bool Scheduler::FillRecordList(void)
 {
     QMutexLocker lockit(reclist_lock);
 
-    schedCardsFirst = (bool)gContext->GetNumSetting("SchedCardsFirst");
     schedMoveHigher = (bool)gContext->GetNumSetting("SchedMoveHigher");
     schedTime = QDateTime::currentDateTime();
 
@@ -264,16 +249,8 @@ bool Scheduler::FillRecordList(void)
     reclist.sort(comp_priority);
     VERBOSE(VB_SCHEDULE, "BuildListMaps...");
     BuildListMaps();
-
     VERBOSE(VB_SCHEDULE, "SchedNewRecords...");
     SchedNewRecords();
-
-    VERBOSE(VB_SCHEDULE, "Sort retrylist...");
-    retrylist.sort(comp_retry);
-    VERBOSE(VB_SCHEDULE, "MoveHigherRecords...");
-    MoveHigherRecords();
-    retrylist.clear();
-
     VERBOSE(VB_SCHEDULE, "ClearListMaps...");
     ClearListMaps();
 
@@ -600,9 +577,6 @@ bool Scheduler::FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &j)
         if (p->inputid == q->inputid && p->shareable)
             continue;
 
-        p->numconflicts++;
-        if (q->recpriority > p->conflictpriority)
-            p->conflictpriority = q->recpriority;
         return true;
     }
 
@@ -689,19 +663,15 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p)
         p->rectype == kFindWeeklyRecord)
         showinglist = recordidlistmap[p->recordid];
 
+    p->recstatus = rsLaterShowing;
+
     RecIter j = showinglist.begin();
     for ( ; j != showinglist.end(); j++)
     {
         ProgramInfo *q = *j;
         if (q == p)
-            break;
-    }
+            continue;
 
-    p->recstatus = rsLaterShowing;
-
-    for (j++; j != showinglist.end(); j++)
-    {
-        ProgramInfo *q = *j;
         if (q->recstatus != rsEarlierShowing &&
             q->recstatus != rsLaterShowing)
             continue;
@@ -735,36 +705,37 @@ void Scheduler::SchedNewRecords(void)
     VERBOSE(VB_SCHEDULE, "Scheduling:");
 
     RecIter i = reclist.begin();
-    for ( ; i != reclist.end(); i++)
+    while (i != reclist.end())
     {
         ProgramInfo *p = *i;
-        if (p->recstatus == rsRecording || p->recstatus == rsWillRecord)
+        if (p->recstatus == rsRecording)
             MarkOtherShowings(p);
-
-        if (p->recstatus != rsUnknown)
-            continue;
-
-        RecList &cardlist = cardlistmap[p->cardid];
-        RecIter k = cardlist.begin();
-        if (!FindNextConflict(cardlist, p, k))
+        else if (p->recstatus == rsUnknown)
         {
-            p->recstatus = rsWillRecord;
-            MarkOtherShowings(p);
-            PrintRec(p, "  +");
+            RecList &cardlist = cardlistmap[p->cardid];
+            RecIter k = cardlist.begin();
+            if (!FindNextConflict(cardlist, p, k))
+            {
+                p->recstatus = rsWillRecord;
+                MarkOtherShowings(p);
+                PrintRec(p, "  +");
+            }
+            else
+                retrylist.push_front(p);
         }
-        else
+
+        int lastpri = p->recpriority;
+        i++;
+        if (i == reclist.end() || lastpri != (*i)->recpriority)
         {
-            for (k++; !FindNextConflict(cardlist, p, k); k++)
-                ;
-            retrylist.push_back(p);
+            MoveHigherRecords();
+            retrylist.clear();
         }
     }
 }
 
 void Scheduler::MoveHigherRecords(void)
 {
-    VERBOSE(VB_SCHEDULE, "Retrying:");
-
     RecIter i = retrylist.begin();
     for ( ; i != retrylist.end(); i++)
     {
@@ -1831,8 +1802,7 @@ void Scheduler::AddNewRecords(void)
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.endtime IS NOT NULL AS oldrecduplicate, program.category, "
-"record.recpriority + channel.recpriority + "
-"cardinput.preference, "
+"record.recpriority, "
 "record.dupin, "
 "recorded.endtime IS NOT NULL AND recorded.endtime < NOW() AS recduplicate, "
 "oldfind.findid IS NOT NULL AS findduplicate, "
@@ -1845,7 +1815,8 @@ void Scheduler::AddNewRecords(void)
 "program.seriesid, program.programid, program.category_type, "
 "program.airdate, program.stars, program.originalairdate, record.inactive, "
 "record.parentid, ") + progfindid + ", record.tsdefault, "
-"oldrecstatus.recstatus, oldrecstatus.reactivate " 
+"oldrecstatus.recstatus, oldrecstatus.reactivate, " 
+"channel.recpriority + cardinput.preference "
 + QString(
 "FROM recordmatch "
 
@@ -1960,6 +1931,7 @@ void Scheduler::AddNewRecords(void)
         p->channame = QString::fromUtf8(result.value(9).toString());
         p->category = QString::fromUtf8(result.value(11).toString());
         p->recpriority = result.value(12).toInt();
+        p->recpriority2 = result.value(39).toInt();
         p->dupin = RecordingDupInType(result.value(13).toInt());
         p->dupmethod = RecordingDupMethodType(result.value(22).toInt());
         p->rectype = RecordingType(result.value(16).toInt());

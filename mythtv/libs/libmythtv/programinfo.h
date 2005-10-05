@@ -270,10 +270,7 @@ class ProgramInfo
     RecStatusType recstatus;
     RecStatusType oldrecstatus;
     RecStatusType savedrecstatus;
-    int numconflicts;
-    int conflictpriority;
-    /// \brief 0 = not requested, 1 = requested pending
-    ///        2 = requested replaced, -1 = reactivated.
+    int recpriority2;
     int reactivate;
 
     int recordid;

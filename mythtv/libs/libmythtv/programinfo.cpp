@@ -85,8 +85,7 @@ ProgramInfo::ProgramInfo(void)
     recstatus = rsUnknown;
     oldrecstatus = rsUnknown;
     savedrecstatus = rsUnknown;
-    numconflicts = 0;
-    conflictpriority = -1000;
+    recpriority2 = 0;
     reactivate = false;
     recordid = 0;
     parentid = 0;
@@ -174,8 +173,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     recstatus = other.recstatus;
     oldrecstatus = other.oldrecstatus;
     savedrecstatus = other.savedrecstatus;
-    numconflicts = other.numconflicts;
-    conflictpriority = other.conflictpriority;
+    recpriority2 = other.recpriority2;
     reactivate = other.reactivate;
     recordid = other.recordid;
     parentid = other.parentid;
