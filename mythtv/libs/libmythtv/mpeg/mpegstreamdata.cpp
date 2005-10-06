@@ -290,10 +290,7 @@ bool MPEGStreamData::IsRedundant(const PSIPTable &psip) const
         return (version == VersionPATSingleProgram());
 
     if (TableID::PMT == table_id)
-    {
-        int cver = VersionPMT(psip.tsheader()->PID(), psip.TableIDExtension());
-        return version == cver;
-    }
+        return version == VersionPMT(psip.TableIDExtension());
 
     return false;
 }
@@ -329,12 +326,12 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
         }
         case TableID::PMT:
         {
-            SetVersionPMT(pid, psip.Version(), psip.TableIDExtension());
+            SetVersionPMT(psip.TableIDExtension(), psip.Version());
             if (_cache_tables)
             {
                 ProgramMapTable *pmt = new ProgramMapTable(psip);
-                CachePMT(pid, pmt);
-                emit UpdatePMT(pid, pmt);
+                CachePMT(pmt->ProgramNumber(), pmt);
+                emit UpdatePMT(pmt->ProgramNumber(), pmt);
                 if (pid == _pid_pmt_single_program)
                 {
                     if (CreatePMTSingleProgram(*pmt))
@@ -344,7 +341,7 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
             else
             {
                 ProgramMapTable pmt(psip);
-                emit UpdatePMT(pid, &pmt);
+                emit UpdatePMT(pmt.ProgramNumber(), &pmt);
                 if (pid == _pid_pmt_single_program)
                 {
                     if (CreatePMTSingleProgram(pmt))
@@ -545,32 +542,31 @@ bool MPEGStreamData::HasAllPMTsCached(void) const
 
 const ProgramAssociationTable *MPEGStreamData::GetCachedPAT(void) const
 {
-    _cache_lock.lock();
+    QMutexLocker locker(&_cache_lock);
+
     const ProgramAssociationTable *pat = _cached_pat;
     IncrementRefCnt(pat);
-    _cache_lock.unlock();
 
     return pat;
 }
 
-const ProgramMapTable *MPEGStreamData::GetCachedPMT(uint pid) const
+const ProgramMapTable *MPEGStreamData::GetCachedPMT(uint program_num) const
 {
+    QMutexLocker locker(&_cache_lock);
     ProgramMapTable *pmt = NULL;
 
-    _cache_lock.lock();
-    pmt_cache_t::const_iterator it = _cached_pmts.find(pid);
+    pmt_cache_t::const_iterator it = _cached_pmts.find(program_num);
     if (it != _cached_pmts.end())
         IncrementRefCnt(pmt = *it);
-    _cache_lock.unlock();
 
     return pmt;
 }
 
-vector<const ProgramMapTable*> MPEGStreamData::GetCachedPMTs(void) const
+pmt_vec_t MPEGStreamData::GetCachedPMTs(void) const
 {
+    QMutexLocker locker(&_cache_lock);
     vector<const ProgramMapTable*> pmts;
 
-    _cache_lock.lock();
     pmt_cache_t::const_iterator it = _cached_pmts.begin();
     for (; it != _cached_pmts.end(); ++it)
     {
@@ -578,14 +574,41 @@ vector<const ProgramMapTable*> MPEGStreamData::GetCachedPMTs(void) const
         IncrementRefCnt(pmt);
         pmts.push_back(pmt);
     }
-    _cache_lock.unlock();
+
+    return pmts;
+}
+
+pmt_map_t MPEGStreamData::GetCachedPMTMap(void) const
+{
+    QMutexLocker locker(&_cache_lock);
+    pmt_map_t pmts;
+
+    pmt_cache_t::const_iterator it = _cached_pmts.begin();
+    for (; it != _cached_pmts.end(); ++it)
+    {
+        ProgramMapTable* pmt = *it;
+        IncrementRefCnt(pmt);
+        pmts[pmt->ProgramNumber()] = pmt;
+    }
 
     return pmts;
 }
 
 void MPEGStreamData::ReturnCachedTable(const PSIPTable *psip) const
 {
-    // TODO
+    QMutexLocker locker(&_cache_lock);
+
+    int val = _cached_ref_cnt[psip] - 1;
+    _cached_ref_cnt[psip] = val;
+
+    // if ref <= 0 and table was slated for deletion, delete it.
+    if (val <= 0)
+    {
+        psip_refcnt_map_t::iterator it;
+        it = _cached_slated_for_deletion.find(psip);
+        if (it != _cached_slated_for_deletion.end())
+            DeleteCachedTable((PSIPTable*)psip);
+    }
 }
 
 void MPEGStreamData::ReturnCachedTables(pmt_vec_t &pmts) const
@@ -595,30 +618,63 @@ void MPEGStreamData::ReturnCachedTables(pmt_vec_t &pmts) const
     pmts.clear();
 }
 
+void MPEGStreamData::ReturnCachedTables(pmt_map_t &pmts) const
+{
+    for (pmt_map_t::iterator it = pmts.begin(); it != pmts.end(); ++it)
+        ReturnCachedTable(*it);
+    pmts.clear();
+}
+
 void MPEGStreamData::IncrementRefCnt(const PSIPTable *psip) const
 {
-    // TODO
+    QMutexLocker locker(&_cache_lock);
+    _cached_ref_cnt[psip] = _cached_ref_cnt[psip] + 1;
 }
 
 void MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
 {
-    // TODO
+    if (!psip)
+        return;
+
+    QMutexLocker locker(&_cache_lock);
+    if (!_cached_ref_cnt[psip])
+    {
+        if (psip == _cached_pat)
+        {
+            _cached_pat = NULL;
+            delete psip;
+        }
+        else if ((TableID::PMT == psip->TableID()) &&
+                 _cached_pmts[psip->TableIDExtension()])
+        {
+            _cached_pmts[psip->TableIDExtension()] = NULL;
+            delete psip;
+        }
+        psip_refcnt_map_t::iterator it;
+        it = _cached_slated_for_deletion.find(psip);
+        if (it != _cached_slated_for_deletion.end())
+            _cached_slated_for_deletion.erase(it);
+    }
+    else
+    {
+        _cached_slated_for_deletion[psip] = 1;
+    }
 }
 
 void MPEGStreamData::CachePAT(ProgramAssociationTable *pat)
 {
-    _cache_lock.lock();
+    QMutexLocker locker(&_cache_lock);
+
     DeleteCachedTable(_cached_pat);
     _cached_pat = pat;
-    _cache_lock.unlock();
 }
 
-void MPEGStreamData::CachePMT(uint pid, ProgramMapTable *pmt)
+void MPEGStreamData::CachePMT(uint program_num, ProgramMapTable *pmt)
 {
-    _cache_lock.lock();
-    pmt_cache_t::iterator it = _cached_pmts.find(pid);
+    QMutexLocker locker(&_cache_lock);
+
+    pmt_cache_t::iterator it = _cached_pmts.find(program_num);
     if (it != _cached_pmts.end())
         DeleteCachedTable(*it);
-    _cached_pmts[pid] = pmt;
-    _cache_lock.unlock();
+    _cached_pmts[program_num] = pmt;
 }

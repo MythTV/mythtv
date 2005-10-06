@@ -19,9 +19,8 @@ class PESPacket;
 typedef QMap<unsigned int, PESPacket*> pid_pes_map_t;
 typedef QMap<const PSIPTable*, int>    psip_refcnt_map_t;
 typedef vector<const ProgramMapTable*> pmt_vec_t;
+typedef QMap<uint, const ProgramMapTable*> pmt_map_t;
 typedef QMap<uint, ProgramMapTable*>   pmt_cache_t;
-
-#define ENCODE_PID_PROG(pid, prog) (pid << 16 | (prog & 0xffff))
 
 class MPEGStreamData : public QObject
 {
@@ -49,7 +48,8 @@ class MPEGStreamData : public QObject
     virtual void AddAudioPID(uint pid)      { _pids_audio[pid] = true;     }
 
     virtual void RemoveListeningPID(uint pid) { _pids_listening.erase(pid);  }
-    virtual void RemoveNotListeningPID(uint pid) { _pids_notlistening.erase(pid); }
+    virtual void RemoveNotListeningPID(uint pid)
+        { _pids_notlistening.erase(pid); }
     virtual void RemoveWritingPID(uint pid) { _pids_writing.erase(pid);    }
     virtual void RemoveAudioPID(uint pid)   { _pids_audio.erase(pid);      }
 
@@ -64,25 +64,27 @@ class MPEGStreamData : public QObject
     // Table versions
     virtual void SetVersionPAT(int version) { _pat_version = version;  }
     virtual int  VersionPAT(void) const     { return _pat_version;     }
-    virtual void SetVersionPMT(uint pid, uint prog_num, int ver)
-        { _pmt_version[ENCODE_PID_PROG(pid, prog_num)] = ver; }
-    virtual inline int VersionPMT(uint pid, uint prog_num) const;
+    virtual void SetVersionPMT(uint program_num, int ver)
+        { _pmt_version[program_num] = ver; }
+    virtual inline int VersionPMT(uint program_num) const;
 
     // Caching
     virtual bool HasCachedPAT(void) const;
-    virtual bool HasCachedPMT(uint pid) const;
+    virtual bool HasCachedPMT(uint program_num) const;
     virtual bool HasAllPMTsCached(void) const;
 
     virtual const ProgramAssociationTable *GetCachedPAT(void) const;
-    virtual const ProgramMapTable *GetCachedPMT(uint pid) const;
+    virtual const ProgramMapTable *GetCachedPMT(uint program_num) const;
     virtual pmt_vec_t GetCachedPMTs(void) const;
+    virtual pmt_map_t GetCachedPMTMap(void) const;
 
     virtual void ReturnCachedTable(const PSIPTable *psip) const;
     virtual void ReturnCachedTables(pmt_vec_t&) const;
+    virtual void ReturnCachedTables(pmt_map_t&) const;
 
   signals:
     void UpdatePAT(const ProgramAssociationTable*);
-    void UpdatePMT(uint pid, const ProgramMapTable*);
+    void UpdatePMT(uint program_num, const ProgramMapTable*);
 
   public:
     // Single program stuff, sets
@@ -141,7 +143,7 @@ class MPEGStreamData : public QObject
     void IncrementRefCnt(const PSIPTable *psip) const;
     void DeleteCachedTable(PSIPTable *psip) const;
     void CachePAT(ProgramAssociationTable *pat);
-    void CachePMT(uint pid, ProgramMapTable *pmt);
+    void CachePMT(uint program_num, ProgramMapTable *pmt);
 
   protected:
     bool                      _have_pmt_CRC_bug;
@@ -160,12 +162,12 @@ class MPEGStreamData : public QObject
     pid_pes_map_t             _partial_pes_packet_cache;
 
     // Caching
-    bool                      _cache_tables;
-    mutable QMutex            _cache_lock;
-    ProgramAssociationTable  *_cached_pat;
-    pmt_cache_t               _cached_pmts;
-    mutable psip_refcnt_map_t _cached_delete_not_yet_returned;
-    mutable psip_refcnt_map_t _cached_delete_slated_for_deletion;
+    bool                             _cache_tables;
+    mutable QMutex                   _cache_lock;
+    mutable ProgramAssociationTable *_cached_pat;
+    mutable pmt_cache_t              _cached_pmts;
+    mutable psip_refcnt_map_t        _cached_ref_cnt;
+    mutable psip_refcnt_map_t        _cached_slated_for_deletion;
 
     // Single program variables
     int                       _desired_program;
@@ -209,10 +211,9 @@ inline void MPEGStreamData::HandleAdaptationFieldControl(const TSPacket*)
     //AdaptationFieldControl afc(tspacket.data()+4);
 }
 
-inline int MPEGStreamData::VersionPMT(uint pid, uint prog_num) const
+inline int MPEGStreamData::VersionPMT(uint prog_num) const
 {
-    const QMap<uint, int>::const_iterator it =
-        _pmt_version.find(ENCODE_PID_PROG(pid, prog_num));
+    const QMap<uint, int>::const_iterator it = _pmt_version.find(prog_num);
     return (it == _pmt_version.end()) ? -1 : *it;
 }
 

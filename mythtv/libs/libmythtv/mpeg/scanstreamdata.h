@@ -25,6 +25,7 @@ class ScanStreamData : public ATSCStreamData
 
     void ReturnCachedTable(const PSIPTable *psip) const;
     void ReturnCachedTables(pmt_vec_t&) const;
+    void ReturnCachedTables(pmt_map_t&) const;
 
     // DVB
     const NetworkInformationTable *GetCachedNIT(bool current = true) const

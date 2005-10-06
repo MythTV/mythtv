@@ -357,13 +357,9 @@ void SIScan::HandleMPEGDBInsertion(const ScanStreamData *sd, bool)
     const ProgramAssociationTable *pat = sd->GetCachedPAT();
     if (pat)
     {
-        PMTMap pmt_map;
-        pmt_vec_t pmt_vector = sd->GetCachedPMTs();
-        pmt_vec_t::iterator mi = pmt_vector.begin();
-        for (;mi != pmt_vector.end(); ++mi)
-            pmt_map[(*mi)->tsheader()->PID()] = *mi;
+        pmt_map_t pmt_map = sd->GetCachedPMTMap();
         UpdatePATinDB((*current).mplexid, pat, pmt_map, true);
-        sd->ReturnCachedTables(pmt_vector);
+        sd->ReturnCachedTables(pmt_map);
         sd->ReturnCachedTable(pat);
     }
 
@@ -954,11 +950,11 @@ void SIScan::OptimizeNITFrequencies(NetworkInformationTable *nit)
 // ///////////////////// DB STUFF /////////////////////
 // ///////////////////// DB STUFF /////////////////////
 
-/** \fn UpdatePATinDB(int,const ProgramAssociationTable*,const PMTMap&,bool)
+/** \fn UpdatePATinDB(int,const ProgramAssociationTable*,const pmt_map_t&,bool)
  */
 void SIScan::UpdatePATinDB(int tid_db,
                            const ProgramAssociationTable *pat,
-                           const PMTMap &pmt_map,
+                           const pmt_map_t &pmt_map,
                            bool)
 {
     SISCAN(QString("UpdatePATinDB(): mplex: %1:%2")
@@ -978,7 +974,7 @@ void SIScan::UpdatePATinDB(int tid_db,
 
     for (uint i = 0; i < pat->ProgramCount(); i++)
     {
-        const ProgramMapTable *pmt = pmt_map[pat->ProgramPID(i)];
+        const ProgramMapTable *pmt = pmt_map[pat->ProgramNumber(i)];
         VERBOSE(VB_SIPARSER,
                 QString("UpdatePATinDB(): Prog %1 PID %2: PMT @")
                 .arg(pat->ProgramNumber(i))

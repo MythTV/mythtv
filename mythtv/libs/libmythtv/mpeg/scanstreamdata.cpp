@@ -63,3 +63,9 @@ void ScanStreamData::ReturnCachedTables(pmt_vec_t &x) const
     ATSCStreamData::ReturnCachedTables(x);
     dvb.ReturnCachedTables(x);
 }
+
+void ScanStreamData::ReturnCachedTables(pmt_map_t &x) const
+{
+    ATSCStreamData::ReturnCachedTables(x);
+    dvb.ReturnCachedTables(x);
+}
