@@ -29,6 +29,7 @@
 #include "audiooutput.h"
 #include "DisplayRes.h"
 #include "signalmonitor.h"
+#include "scheduledrecording.h"
 #include "config.h"
 
 #ifndef HAVE_ROUND
@@ -4221,26 +4222,84 @@ void TV::ToggleRecord(void)
         QString outFilters, repeat, airdate, stars;
 
         GetChannelInfo(activerecorder, title, subtitle, desc, category, 
-                       starttime, endtime, callsign, iconpath, channum, chanid,
-                       seriesid, programid, outFilters, repeat, airdate, stars);
+                       starttime, endtime, callsign, iconpath, channum,
+                       chanid, seriesid, programid, outFilters, repeat,
+                       airdate, stars);
 
-        QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
-
-        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(chanid,
-                                                                      startts);
-
-        if (program_info)
+        if (starttime > "")
         {
-            program_info->ToggleRecord();
+            QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
 
-            QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(title);
+            ProgramInfo *program_info = 
+                    ProgramInfo::GetProgramAtDateTime(chanid, startts);
+
+            if (program_info)
+            {
+                program_info->ToggleRecord();
+
+                QString msg = QString("%1 \"%2\"")
+                                      .arg(tr("Record")).arg(title);
+
+                if (activenvp == nvp && GetOSD())
+                    GetOSD()->SetSettingsText(msg, 3);
+
+                delete program_info;
+            }
+        }
+        else
+        {
+            VERBOSE(VB_GENERAL, "Creating a manual recording");
+
+            QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+            QString channelFormat =
+                    gContext->GetSetting("ChannelFormat", "<num> <sign>");
+
+            ProgramInfo p;
+
+            p.chanid = chanid;
+
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT chanid, channum, callsign, name "
+                          "FROM channel WHERE chanid=:CHANID");
+            query.bindValue(":CHANID", p.chanid);
+
+            query.exec();
+
+            if (query.isActive() && query.numRowsAffected()) 
+            {
+                query.next();
+                p.chanstr = query.value(1).toString();
+                p.chansign = QString::fromUtf8(query.value(2).toString());
+                p.channame = QString::fromUtf8(query.value(3).toString());
+            }
+            else
+            {
+                MythContext::DBError("ToggleRecord channel info", query);
+                return;
+            }
+
+            p.startts = QDateTime::currentDateTime();
+            QTime tmptime = p.startts.time();
+            tmptime = tmptime.addSecs(-(tmptime.second()));
+            p.startts.setTime(tmptime);
+            p.endts = p.startts.addSecs(3600);
+
+            p.title = p.ChannelText(channelFormat) + " - " + 
+                      p.startts.toString(timeformat) +
+                      " (" + tr("Manual Record") + ")";
+
+            ScheduledRecording record;
+            record.loadByProgram(&p);
+            record.setSearchType(kManualSearch);
+            record.setRecordingType(kSingleRecord);
+            record.save();
+
+            QString msg = QString("%1 \"%2\"")
+                                  .arg(tr("Record")).arg(p.title);
 
             if (activenvp == nvp && GetOSD())
                 GetOSD()->SetSettingsText(msg, 3);
-
-            delete program_info;
         }
-
         return;
     }
 
