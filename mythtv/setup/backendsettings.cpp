@@ -734,7 +734,7 @@ class ClearCards:
     {
         setLabel(QObject::tr("Clear Cards"));
         setHelpText(QObject::tr(
-                        "Would you like to clear all capture card "
+                        "Would you like to clear all capture card\n"
                         "settings before starting configuration?")+" ");
     };
 };
