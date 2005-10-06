@@ -285,7 +285,7 @@ const QString ProgramMapTable::toString() const
         .arg(Version()).arg(tsheader()->PID(), 0, 16)
         .arg(ProgramNumber());
 
-    if (0 != ProgramInfoLength())
+    if (0 != StreamCount())
     {
         vector<const unsigned char*> desc = 
             MPEGDescriptor::Parse(ProgramInfo(), ProgramInfoLength());

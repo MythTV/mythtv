@@ -241,8 +241,11 @@ void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
         hasAudio += pmt->IsAudio(i);
     }
 
-    if (hasVideo && hasAudio)
+    if ((hasVideo >= GetStreamData()->GetVideoStreamsRequired()) &&
+        (hasAudio >= GetStreamData()->GetAudioStreamsRequired()))
+    {
         AddFlags(kDTVSigMon_PMTMatch);
+    }
 }
 
 void DTVSignalMonitor::SetMGT(const MasterGuideTable* mgt)

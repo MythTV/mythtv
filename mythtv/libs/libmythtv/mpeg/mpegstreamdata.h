@@ -90,7 +90,13 @@ class MPEGStreamData : public QObject
     inline void SetPATSingleProgram(ProgramAssociationTable*);
     inline void SetPMTSingleProgram(ProgramMapTable*);
     void SetVideoStreamsRequired(uint num)
-        { _pmt_single_program_num_video = num; }
+        { _pmt_single_program_num_video = num;  }
+    uint GetVideoStreamsRequired() const
+        { return _pmt_single_program_num_video; }
+    void SetAudioStreamsRequired(uint num)
+        { _pmt_single_program_num_audio = num;  }
+    uint GetAudioStreamsRequired() const
+        { return _pmt_single_program_num_audio; }
 
     // Single program stuff, gets
     int DesiredProgram(void) const          { return _desired_program; }
@@ -166,6 +172,7 @@ class MPEGStreamData : public QObject
     uint                      _pid_video_single_program;
     uint                      _pid_pmt_single_program;
     uint                      _pmt_single_program_num_video;
+    uint                      _pmt_single_program_num_audio;
     ProgramAssociationTable  *_pat_single_program;
     ProgramMapTable          *_pmt_single_program;
 };

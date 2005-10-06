@@ -1752,7 +1752,8 @@ void TVRec::TeardownSignalMonitor()
             dtvMon->Stop();
             ATSCStreamData *sd = dtvMon->GetATSCStreamData();
             dtvMon->SetStreamData(NULL);
-            delete sd;
+            sd->deleteLater();
+            sd = NULL;
         }
 #endif // USING_DVB
     }

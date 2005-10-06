@@ -23,6 +23,7 @@ MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
       _pat_version(-1), _cache_tables(cacheTables), _cache_lock(true),
       _cached_pat(NULL), _desired_program(desiredProgram),
       _pmt_single_program_num_video(1),
+      _pmt_single_program_num_audio(0),
       _pat_single_program(NULL), _pmt_single_program(NULL)
 {
     AddListeningPID(MPEG_PAT_PID);
@@ -219,8 +220,8 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     uint video_cnt = pmt.FindPIDs(StreamID::AnyVideo, videoPIDs, videoTypes);
     if (video_cnt < _pmt_single_program_num_video) 
     {
-        VERBOSE(VB_RECORD, "Only "<<video_cnt<<" streams seen in PMT, but "
-                <<_pmt_single_program_num_video<<" are required.");
+        VERBOSE(VB_RECORD, "Only "<<video_cnt<<" video streams seen in PMT, "
+                "but "<<_pmt_single_program_num_video<<" are required.");
         return false;
     }
     if (videoPIDs.size() > 1)
@@ -238,6 +239,13 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
     }
 
     // Audio
+    if (audioPIDs.size() < _pmt_single_program_num_audio)
+    {
+        VERBOSE(VB_RECORD, "Only "<<audioPIDs.size()
+                <<" audio streams seen in PMT, but "
+                <<_pmt_single_program_num_audio<<" are required.");
+        return false;
+    }
     pmt.FindPIDs(StreamID::AnyAudio, pids, types);
     for (uint i = 1; i < audioPIDs.size(); i++)
         AddAudioPID(audioPIDs[i]);
@@ -260,8 +268,8 @@ bool MPEGStreamData::CreatePMTSingleProgram(const ProgramMapTable& pmt)
                pmt.PCRPID(), pmt.Version(), pids, types);
 
     // Set Continuity Header
-    pmt2->tsheader()->SetContinuityCounter(pmt.tsheader()->ContinuityCounter());
-
+    uint cc_cnt = pmt.tsheader()->ContinuityCounter();
+    pmt2->tsheader()->SetContinuityCounter(cc_cnt);
     SetPMTSingleProgram(pmt2);
 
     VERBOSE(VB_RECORD, "PMT for output stream");
