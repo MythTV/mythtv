@@ -30,6 +30,9 @@ class ThreadedFileWriter
     unsigned BufUsed();  /* # of bytes queued for write by the write thread */
     unsigned BufFree();  /* # of bytes that can be written, without blocking */
 
+    // allow DiskLoop() to flush buffer completely ignoring low watermark
+    void Flush(void);
+
   protected:
     static void *boot_writer(void *);
     void DiskLoop(); /* The thread that actually calls write(). */
@@ -38,9 +41,6 @@ class ThreadedFileWriter
     void SyncLoop(); /* The thread that calls sync(). */
 
   private:
-    // allow DiskLoop() to flush buffer completely ignoring low watermark
-    void Flush(void);
-
     const char     *filename;
     int             flags;
     mode_t          mode;

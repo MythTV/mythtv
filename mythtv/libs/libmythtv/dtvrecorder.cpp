@@ -60,8 +60,7 @@ void DTVRecorder::SetOption(const QString &name, int value)
  */
 void DTVRecorder::FinishRecording(void)
 {
-    // stealth call to flush
-    (ringBuffer->Seek(0, SEEK_CUR), ringBuffer->Sync());
+    ringBuffer->WriterFlush();
 
     if (curRecording)
     {

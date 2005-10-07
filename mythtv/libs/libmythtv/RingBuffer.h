@@ -32,6 +32,7 @@ class RingBuffer
 
     long long Seek(long long pos, int whence);
     long long WriterSeek(long long pos, int whence);
+    void WriterFlush(void);
 
     void SetWriteBufferSize(int newSize);
     void SetWriteBufferMinWriteSize(int newMinSize);

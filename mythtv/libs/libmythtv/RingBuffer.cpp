@@ -1521,6 +1521,15 @@ long long RingBuffer::WriterSeek(long long pos, int whence)
     return ret;
 }
 
+void RingBuffer::WriterFlush(void)
+{
+    if (tfw)
+    {
+        tfw->Flush();
+        tfw->Sync();
+    }
+}
+
 void RingBuffer::SetWriteBufferSize(int newSize)
 {
     tfw->SetWriteBufferSize(newSize);

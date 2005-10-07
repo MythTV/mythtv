@@ -517,6 +517,8 @@ bool MpegRecorder::SetupRecording(void)
 
 void MpegRecorder::FinishRecording(void)
 {
+    ringBuffer->WriterFlush();
+
     if (curRecording)
     {
         curRecording->SetFilesize(ringBuffer->GetRealFileSize());
