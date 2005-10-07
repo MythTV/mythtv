@@ -1813,6 +1813,13 @@ void JobQueue::DoTranscodeThread(void)
             if (!gContext->GetNumSetting("SaveTranscoding", 0))
                 unlink(oldfile);
 
+            oldfile = filename + ".png";
+            newfile += ".png";
+
+            QFile checkFile(oldfile);
+            if ((oldfile != newfile) && (checkFile.exists()))
+                rename(oldfile, newfile);
+
             MSqlQuery query(MSqlQuery::InitCon());
 
             if (useCutlist)
