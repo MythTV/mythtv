@@ -1761,7 +1761,7 @@ void JobQueue::DoTranscodeThread(void)
         VERBOSE(VB_GENERAL, QString("%1 for %2").arg(msg).arg(details));
         gContext->LogEntry("transcode", LP_NOTICE, msg, details);
 
-        VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'")
+        VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'")
                                      .arg(command));
 
         int result = myth_system(command.ascii());
@@ -1872,6 +1872,9 @@ void JobQueue::DoTranscodeThread(void)
                                     .arg(PrettyPrint(origfilesize))
                                     .arg(PrettyPrint(filesize));
             ChangeJobStatus(jobID, JOB_FINISHED, comment);
+
+            MythEvent me("RECORDING_LIST_CHANGE");
+            gContext->dispatch(me);
         } else {
             // transcode didn't finish delete partial transcode
             filename += ".tmp";
@@ -1980,7 +1983,7 @@ void JobQueue::DoFlagCommercialsThread(void)
     QString cmd = QString("mythcommflag -j %1 -V %2")
                           .arg(jobID).arg(print_verbose_messages);
 
-    VERBOSE(VB_JOBQUEUE, QString("JobQueue running app: '%1'").arg(cmd));
+    VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'").arg(cmd));
 
     breaksFound = myth_system(cmd.ascii());
 
@@ -2045,6 +2048,9 @@ void JobQueue::DoFlagCommercialsThread(void)
 
         msg = QString("Finished, %1 break(s) found.").arg(breaksFound);
         ChangeJobStatus(jobID, JOB_FINISHED, msg);
+
+        MythEvent me("RECORDING_LIST_CHANGE");
+        gContext->dispatch(me);
     }
     VERBOSE(VB_GENERAL, msg);
 
@@ -2132,6 +2138,9 @@ void JobQueue::DoUserJobThread(void)
                            QString("Job \"%1\" Finished").arg(jobDesc), msg);
 
         ChangeJobStatus(jobID, JOB_FINISHED, "Successfully Completed.");
+
+        MythEvent me("RECORDING_LIST_CHANGE");
+        gContext->dispatch(me);
     }
 
     controlFlagsLock.lock();
