@@ -349,7 +349,7 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB)
 
             // send auto expire message to backend's event thread.
             MythEvent me(QString("AUTO_EXPIRE %1 %2").arg((*it)->chanid)
-                         .arg((*it)->startts.toString(Qt::ISODate)));
+                         .arg((*it)->recstartts.toString(Qt::ISODate)));
             gContext->dispatch(me);
 
             availFreeKB += ((*it)->filesize/1024); // add size to avail size
