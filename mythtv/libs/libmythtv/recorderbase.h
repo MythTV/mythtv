@@ -178,6 +178,9 @@ class RecorderBase : public QObject
     virtual long long GetKeyframePosition(long long desired) = 0;
 
     /** \brief Pause tells StartRecording() to pause, it should not block.
+     *
+     *   Once paused the recorder calls tvrec->RecorderPaused().
+     *
      *  \param clear if true any generated timecodes should be reset.
      *  \sa Unpause(), WaitForPause()
      */
@@ -201,9 +204,6 @@ class RecorderBase : public QObject
 
   public slots:
     virtual void deleteLater(void);
-
-  signals:
-    void RecorderPaused(void);
 
   protected:
     /** \brief Convenience function used to set integer options.

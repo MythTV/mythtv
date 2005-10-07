@@ -821,8 +821,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
             return false;
         }
 
-        connect(recorder, SIGNAL(RecorderPaused(void)),
-                this,     SLOT  (RecorderPaused(void)));
         return true;
     }
 

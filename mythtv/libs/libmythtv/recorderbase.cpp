@@ -2,7 +2,7 @@
 using namespace std;
 
 #include "recorderbase.h"
-
+#include "tv_rec.h"
 #include "mythcontext.h"
 #include "RingBuffer.h"
 #include "programinfo.h"
@@ -163,7 +163,8 @@ bool RecorderBase::PauseAndWait(int timeout)
         {
             paused = true;
             pauseWait.wakeAll();
-            emit RecorderPaused();
+            if (tvrec)
+                tvrec->RecorderPaused();
         }
         unpauseWait.wait(timeout);
     }

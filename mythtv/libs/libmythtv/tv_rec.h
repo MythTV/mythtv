@@ -249,9 +249,10 @@ class TVRec : public QObject
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
     void RingBufferChanged(void);
-  public slots:
     void RecorderPaused()
         { QMutexLocker lock(&stateChangeLock); triggerEventLoop.wakeAll(); }
+
+  public slots:
     void SignalMonitorAllGood() { triggerEventLoop.wakeAll(); }
     void SetPMTObject(const PMTObject*) 
         { QMutexLocker lock(&stateChangeLock); triggerEventLoop.wakeAll(); }

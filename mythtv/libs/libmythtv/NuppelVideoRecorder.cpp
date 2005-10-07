@@ -1120,8 +1120,8 @@ void NuppelVideoRecorder::StartRecording(void)
         {
            mainpaused = true;
            pauseWait.wakeAll();
-           if (IsPaused())
-               emit RecorderPaused();
+           if (IsPaused() && tvrec)
+               tvrec->RecorderPaused();
 
            unpauseWait.wait(100);
            if (cleartimeonpause)
@@ -1356,8 +1356,8 @@ again:
         {
             mainpaused = true;
             pauseWait.wakeAll();
-            if (IsPaused())
-                emit RecorderPaused();
+            if (IsPaused() && tvrec)
+                tvrec->RecorderPaused();
 
             unpauseWait.wait(100);
             if (cleartimeonpause)
@@ -1581,8 +1581,8 @@ void NuppelVideoRecorder::DoMJPEG(void)
         {
            mainpaused = true;
            pauseWait.wakeAll();
-           if (IsPaused())
-               emit RecorderPaused();
+           if (IsPaused() && tvrec)
+               tvrec->RecorderPaused();
 
            unpauseWait.wait(100);
            if (cleartimeonpause)
@@ -2184,8 +2184,8 @@ void NuppelVideoRecorder::doAudioThread(void)
         {
             audiopaused = true;
             pauseWait.wakeAll();
-            if (IsPaused())
-                emit RecorderPaused();
+            if (IsPaused() && tvrec)
+                tvrec->RecorderPaused();
 
             unpauseWait.wait(100);
             act = act_audio_buffer;
@@ -3223,8 +3223,8 @@ void NuppelVideoRecorder::doWriteThread(void)
         {
             writepaused = true;
             pauseWait.wakeAll();
-            if (IsPaused())
-                emit RecorderPaused();
+            if (IsPaused() && tvrec)
+                tvrec->RecorderPaused();
 
             unpauseWait.wait(100);
             continue;

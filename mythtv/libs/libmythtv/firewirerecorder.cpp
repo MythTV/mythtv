@@ -248,7 +248,8 @@ bool FirewireRecorder::PauseAndWait(int timeout)
             iec61883_mpeg2_recv_stop(fwmpeg);
             paused = true;
             pauseWait.wakeAll();
-            emit RecorderPaused();
+            if (tvrec)
+                tvrec->RecorderPaused();
         }
         unpauseWait.wait(timeout);
     }
