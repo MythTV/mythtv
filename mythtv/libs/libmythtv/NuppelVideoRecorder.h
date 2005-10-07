@@ -43,7 +43,7 @@ class FilterChain;
 class NuppelVideoRecorder : public RecorderBase
 {
  public:
-    NuppelVideoRecorder(ChannelBase *channel);
+    NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
    ~NuppelVideoRecorder();
 
     void SetOption(const QString &name, int value);
@@ -76,6 +76,8 @@ class NuppelVideoRecorder : public RecorderBase
     void SetTranscoding(bool value) { transcoding = value; };
 
     long long GetKeyframePosition(long long desired);
+
+    void SetNextRecording(const ProgramInfo*, RingBuffer*);
 
     // reencode stuff
     void StreamAllocate(void);

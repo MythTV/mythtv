@@ -14,6 +14,7 @@ class DummyDTVRecorder: public DTVRecorder
 {
   public:
     DummyDTVRecorder::DummyDTVRecorder(
+        TVRec *rec,
         bool tsmode = true,        RingBuffer *rbuffer = NULL,
         uint desired_width = 1920, uint desired_height = 1088,
         double desired_frame_rate = 29.97, uint bits_per_sec = 20000000,

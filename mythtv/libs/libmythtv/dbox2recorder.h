@@ -42,8 +42,7 @@ class DBox2Recorder : public DTVRecorder
 {
     Q_OBJECT
     public:
-
-        DBox2Recorder(DBox2Channel *channel, int cardid);
+        DBox2Recorder(TVRec *rec, DBox2Channel *channel);
         ~DBox2Recorder() { TeardownAll(); }
 
 	void StartRecording(void);

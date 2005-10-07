@@ -83,6 +83,7 @@ using namespace std;
 #include "mpegtables.h"
 #include "atsctables.h"
 #include "atscstreamdata.h"
+#include "tv_rec.h"
 
 // AVLib/FFMPEG includes
 #include "../libavcodec/avcodec.h"
@@ -108,8 +109,8 @@ using namespace std;
         };
 #endif
 
-HDTVRecorder::HDTVRecorder()
-    : DTVRecorder("HDTVRecorder"), _atsc_stream_data(0), _resync_count(0)
+HDTVRecorder::HDTVRecorder(TVRec *rec)
+    : DTVRecorder(rec, "HDTVRecorder"), _atsc_stream_data(0), _resync_count(0)
 {
     _atsc_stream_data = new ATSCStreamData(-1, DEFAULT_SUBCHANNEL);
     connect(_atsc_stream_data, SIGNAL(UpdatePATSingleProgram(

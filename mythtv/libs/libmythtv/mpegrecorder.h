@@ -9,7 +9,7 @@ struct AVPacket;
 class MpegRecorder : public RecorderBase
 {
   public:
-    MpegRecorder();
+    MpegRecorder(TVRec*);
    ~MpegRecorder();
     void TeardownAll(void);
 
@@ -39,12 +39,16 @@ class MpegRecorder : public RecorderBase
 
     long long GetKeyframePosition(long long desired);
 
+    void SetNextRecording(const ProgramInfo*, RingBuffer*);
+
   public slots:
     void deleteLater(void);
 
   private:
     bool SetupRecording();
     void FinishRecording();
+    void HandleKeyframe(void);
+    void SavePositionMap(bool force);
 
     void ProcessData(unsigned char *buffer, int len);
 
@@ -75,6 +79,7 @@ class MpegRecorder : public RecorderBase
     int keyframedist;
     bool gopset;
 
+    QMutex                     positionMapLock;
     QMap<long long, long long> positionMap;
     QMap<long long, long long> positionMapDelta;
 

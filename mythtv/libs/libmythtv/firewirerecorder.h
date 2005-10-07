@@ -30,9 +30,8 @@
 class FirewireRecorder : public DTVRecorder
 {
   public:
-
-    FirewireRecorder() :
-        DTVRecorder("FirewireRecorder"),
+    FirewireRecorder(TVRec *rec) :
+        DTVRecorder(rec, "FirewireRecorder"),
         fwport(-1),     fwchannel(-1), fwspeed(-1),   fwbandwidth(-1),
         fwfd(-1),       fwconnection(FIREWIRE_CONNECTION_P2P),
         fwoplug(-1),    fwiplug(-1),   fwmodel(""),   fwnode(0),

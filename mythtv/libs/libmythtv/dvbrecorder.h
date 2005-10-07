@@ -34,7 +34,7 @@ class DVBRecorder: public DTVRecorder
 {
     Q_OBJECT
   public:
-    DVBRecorder(DVBChannel* dvbchannel);
+    DVBRecorder(TVRec *rec, DVBChannel* dvbchannel);
    ~DVBRecorder();
 
     void SetOption(const QString &name, int value);

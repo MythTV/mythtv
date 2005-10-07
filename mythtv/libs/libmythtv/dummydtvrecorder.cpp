@@ -39,13 +39,14 @@ OR, convert it to a ps or pes stream and use the following
 \endcode
  */
 
-DummyDTVRecorder::DummyDTVRecorder(bool tsmode, RingBuffer *rbuffer,
+DummyDTVRecorder::DummyDTVRecorder(TVRec *rec,
+                                   bool tsmode, RingBuffer *rbuffer,
                                    uint desired_width, uint desired_height,
                                    double desired_frame_rate,
                                    uint non_buf_frames,
                                    uint bitrate,
                                    bool autoStart)
-    : _tsmode(tsmode),
+    : DTVRecorder(rec, "DummyDTVRecorder"), _tsmode(tsmode),
       _desired_width(desired_width), _desired_height(desired_height),
       _desired_frame_rate(desired_frame_rate), _desired_bitrate(bitrate),
       _non_buf_frames(max(non_buf_frames,(uint)1)),

@@ -325,7 +325,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         statustime = statustime.addSecs(5);
     }
     // Input setup
-    nvr = new NuppelVideoRecorder(NULL);
+    nvr = new NuppelVideoRecorder(NULL, NULL);
     inRingBuffer = new RingBuffer(inputname, false, false);
     nvp->SetRingBuffer(inRingBuffer);
 

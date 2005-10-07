@@ -36,7 +36,7 @@ class HDTVRecorder : public DTVRecorder
   public:
     enum {report_loops = 20000};
 
-    HDTVRecorder();
+    HDTVRecorder(TVRec *rec);
    ~HDTVRecorder();
 
     void SetOptionsFromProfile(RecordingProfile *profile,

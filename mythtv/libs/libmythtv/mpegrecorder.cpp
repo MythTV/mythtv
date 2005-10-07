@@ -29,6 +29,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "programinfo.h"
 #include "recordingprofile.h"
+#include "tv_rec.h"
 
 extern "C" {
 #include "../libavcodec/avcodec.h"
@@ -46,8 +47,8 @@ const char* MpegRecorder::streamType[] = { "MPEG-2 PS", "MPEG-2 TS",
 const char* MpegRecorder::aspectRatio[] = { "Square", "4:3", "16:9", 
                                             "2.21:1", 0 };
 
-MpegRecorder::MpegRecorder()
-            : RecorderBase()
+MpegRecorder::MpegRecorder(TVRec *rec) :
+    RecorderBase(rec, "MpegRecorder")
 {
     errored = false;
     recording = false;
@@ -522,12 +523,11 @@ void MpegRecorder::FinishRecording(void)
     if (curRecording)
     {
         curRecording->SetFilesize(ringBuffer->GetRealFileSize());
-        if (positionMapDelta.size())
-        {
-            curRecording->SetPositionMapDelta(positionMapDelta, MARK_GOP_START);
-            positionMapDelta.clear();
-        }
+        SavePositionMap(true);
     }
+    positionMapLock.lock();
+    positionMap.clear();
+    positionMapLock.unlock();
 }
 
 void MpegRecorder::SetVideoFilters(QString &filters)
@@ -573,20 +573,7 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
             {
                 framesWritten = numgops * keyframedist;
                 numgops++;
-
-                if (!positionMap.contains(numgops))
-                {
-                    positionMapDelta[numgops] = lastpackheaderpos;
-                    positionMap[numgops] = lastpackheaderpos;
-
-                    if (curRecording && ((positionMapDelta.size() % 30) == 0))
-                    {
-                        curRecording->SetPositionMapDelta(positionMapDelta,
-                                                          MARK_GOP_START);
-                        curRecording->SetFilesize(lastpackheaderpos);
-                        positionMapDelta.clear();
-                    }
-                }
+                HandleKeyframe();
             }
         }
 
@@ -640,10 +627,98 @@ long long MpegRecorder::GetFramesWritten(void)
 
 long long MpegRecorder::GetKeyframePosition(long long desired)
 {
+    QMutexLocker locker(&positionMapLock);
     long long ret = -1;
 
     if (positionMap.find(desired) != positionMap.end())
         ret = positionMap[desired];
 
     return ret;
+}
+
+// documented in recorderbase.h
+void MpegRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
+{
+    // First we do some of the time consuming stuff we can do now
+    SavePositionMap(true);
+    ringBuffer->WriterFlush();
+
+    // Then we set the next info
+    {
+        QMutexLocker locker(&nextRingBufferLock);
+        nextRecording = NULL;
+        if (progInf)
+            nextRecording = new ProgramInfo(*progInf);
+        nextRingBuffer = rb;
+    }
+}
+
+/** \fn MpegRecorder::HandleKeyframe()
+ *  \brief This save the current frame to the position maps
+ *         and handles ringbuffer switching.
+ */
+void MpegRecorder::HandleKeyframe(void)
+{
+    // Add key frame to position map
+    bool save_map = false;
+    positionMapLock.lock();
+    if (!positionMap.contains(numgops))
+    {
+        positionMapDelta[numgops] = lastpackheaderpos;
+        positionMap[numgops]      = lastpackheaderpos;
+        save_map = true;
+    }
+    positionMapLock.unlock();
+    // Save the position map delta, but don't force a save.
+    if (save_map)
+        SavePositionMap(false);
+
+    // Perform ringbuffer switch if needed.
+    nextRingBufferLock.lock();
+    bool rb_changed = false;
+    if (nextRingBuffer)
+    {
+        FinishRecording();
+        Reset();
+
+        if (weMadeBuffer && ringBuffer)
+            delete ringBuffer;
+        SetRingBuffer(nextRingBuffer);
+        nextRingBuffer = NULL;
+
+        ProgramInfo *oldrec = curRecording;
+        curRecording        = nextRecording;
+        nextRecording       = NULL;
+        if (oldrec)
+            delete oldrec;
+        rb_changed = true;
+    }
+    nextRingBufferLock.unlock();
+    if (rb_changed && tvrec)
+        tvrec->RingBufferChanged();
+}
+
+/** \fn MpegRecorder::SavePositionMap(bool)
+ *  \brief This saves the postition map delta to the database if force
+ *         is true or there are 30 frames in the map or there are five
+ *         frames in the map with less than 30 frames in the non-delta
+ *         position map.
+ *  \param force If true this forces a DB sync.
+ */
+void MpegRecorder::SavePositionMap(bool force)
+{
+    QMutexLocker locker(&positionMapLock);
+
+    // save on every 5th key frame if in the first few frames of a recording
+    force |= (positionMap.size() < 30) && (positionMap.size()%5 == 1);
+    // save every 30th key frame later on
+    force |= positionMapDelta.size() >= 30;
+
+    if (curRecording && force)
+    {
+        curRecording->SetPositionMapDelta(positionMapDelta,
+                                          MARK_GOP_START);
+        curRecording->SetFilesize(lastpackheaderpos);
+        positionMapDelta.clear();
+    }
 }

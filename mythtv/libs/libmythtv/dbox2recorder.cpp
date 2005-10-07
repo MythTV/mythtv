@@ -113,8 +113,8 @@ typedef struct  ts_packet_{
  *
  */
 
-DBox2Recorder::DBox2Recorder(DBox2Channel* channel, int cardid)
-    : DTVRecorder("DBox2Recorder"), m_cardid(cardid),
+DBox2Recorder::DBox2Recorder(TVRec *rec, DBox2Channel *channel)
+    : DTVRecorder(rec, "DBox2Recorder"), m_cardid(rec->GetCaptureCardNum()),
       // MPEG stuff
       m_patPacket(new uint8_t[TSPacket::SIZE]), pat_cc(0), pkts_until_pat(0),
       m_pidPAT(0x0), m_pidCount(0), m_pmtPID(-1), m_ac3PID(-1),

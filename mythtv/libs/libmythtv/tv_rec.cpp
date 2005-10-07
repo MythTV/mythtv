@@ -754,13 +754,13 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     if (genOpt.cardtype == "MPEG")
     {
 #ifdef USING_IVTV
-        recorder = new MpegRecorder();
+        recorder = new MpegRecorder(this);
 #endif // USING_IVTV
     }
     else if (genOpt.cardtype == "HDTV")
     {
 #ifdef USING_V4L
-        recorder = new HDTVRecorder();
+        recorder = new HDTVRecorder(this);
         ringBuffer->SetWriteBufferSize(4*1024*1024);
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
 #endif // USING_V4L
@@ -768,7 +768,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     else if (genOpt.cardtype == "FIREWIRE")
     {
 #ifdef USING_FIREWIRE
-        recorder = new FirewireRecorder();
+        recorder = new FirewireRecorder(this);
         recorder->SetOption("port",       fwOpt.port);
         recorder->SetOption("node",       fwOpt.node);
         recorder->SetOption("speed",      fwOpt.speed);
@@ -779,7 +779,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     else if (genOpt.cardtype == "DBOX2")
     {
 #ifdef USING_DBOX2
-        recorder = new DBox2Recorder(GetDBox2Channel(), cardid);
+        recorder = new DBox2Recorder(this, GetDBox2Channel());
         recorder->SetOption("port",     dboxOpt.port);
         recorder->SetOption("host",     dboxOpt.host);
         recorder->SetOption("httpport", dboxOpt.httpport);
@@ -788,7 +788,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     else if (genOpt.cardtype == "DVB")
     {
 #ifdef USING_DVB
-        recorder = new DVBRecorder(GetDVBChannel());
+        recorder = new DVBRecorder(this, GetDVBChannel());
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         recorder->SetOption("hw_decoder",        dvbOpt.hw_decoder);
         recorder->SetOption("recordts",          dvbOpt.recordts);
@@ -801,7 +801,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     {
 #ifdef USING_V4L
         // V4L/MJPEG/GO7007 from here on
-        recorder = new NuppelVideoRecorder(channel);
+        recorder = new NuppelVideoRecorder(this, channel);
         recorder->SetOption("skipbtaudio", genOpt.skip_btaudio);
 #endif // USING_V4L
     }
@@ -1180,6 +1180,20 @@ void TVRec::RunTV(void)
         // otherwise we queue up the state change to kState_None.
         if (StateIsRecording(internalState))
         {
+#if 0
+            // This is debugging code for ProgramInfo/RingBuffer
+            // switching code. It will only work once per startup
+            // of mythbackend.
+            QDateTime switchTime = curRecording->recstartts.addSecs(15);
+            static bool rbSwitched = false;
+            if ((QDateTime::currentDateTime() > switchTime) && !rbSwitched)
+            {
+                RingBuffer *rb = new RingBuffer("/video/mythtv/x.mpg", true);
+                VERBOSE(VB_IMPORTANT, LOC +"Switching RingBuffer soon");
+                recorder->SetNextRecording(curRecording, rb);
+                rbSwitched = true;
+            }
+#endif
             if (QDateTime::currentDateTime() > recordEndTime ||
                 HasFlags(kFlagFinishRecording))
             {
@@ -3250,6 +3264,11 @@ void TVRec::StoreInputChannels(const QMap<int, QString> &inputChannel)
 
 }
 
+void TVRec::RingBufferChanged(void)
+{
+    VERBOSE(VB_IMPORTANT, LOC + "RingBufferChanged()");
+}
+
 /** \fn TVRec::HandleTuning(void)
  *  \brief Handles all tuning events.
  *
@@ -3488,11 +3507,11 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
         if (!is_atsc)
             dummyRecorder = new DummyDTVRecorder(
-                true, ringBuffer, 768, 576, 50,
+                this, true, ringBuffer, 768, 576, 50,
                 90, 30000000, false);
         else
             dummyRecorder = new DummyDTVRecorder(
-                true, ringBuffer, 1920, 1088, 29.97,
+                this, true, ringBuffer, 1920, 1088, 29.97,
                 90, 30000000, false);
     }
 

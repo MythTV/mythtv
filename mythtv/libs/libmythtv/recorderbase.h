@@ -2,6 +2,7 @@
 #ifndef RECORDERBASE_H_
 #define RECORDERBASE_H_
 
+#include <qmutex.h>
 #include <qstring.h>
 #include <qmap.h>
 #include <qsqldatabase.h>
@@ -9,6 +10,7 @@
 
 #include <pthread.h>
 
+class TVRec;
 class RingBuffer;
 class ProgramInfo;
 class RecordingProfile;
@@ -29,7 +31,7 @@ class RecorderBase : public QObject
 {
     Q_OBJECT
   public:
-    RecorderBase(const char *name = "RecorderBase");
+    RecorderBase(TVRec *rec, const char *name = "RecorderBase");
     virtual ~RecorderBase();
 
     /// \brief Sets the video frame rate.
@@ -91,6 +93,18 @@ class RecorderBase : public QObject
                                        const QString &videodev, 
                                        const QString &audiodev,
                                        const QString &vbidev, int ispip) = 0;
+
+    /** \brief Sets next recording info, to be applied as soon as practical.
+     *
+     *   This should not lose any frames on the switchover, and should
+     *   initialize the RingBuffer stream with headers as appropriate.
+     *
+     *   The switch does not have to happen immediately,
+     *   but should happen soon. (i.e. it can wait for a key frame..)
+     *
+     *   This calls TVRec::RingBufferChanged() when the switch happens.
+     */
+    virtual void SetNextRecording(const ProgramInfo*, RingBuffer*) = 0;
 
     /** \brief This is called between SetOptionsFromProfile() and
      *         StartRecording() to initialize any devices, etc.
@@ -198,6 +212,7 @@ class RecorderBase : public QObject
     void SetIntOption(RecordingProfile *profile, const QString &name);
     virtual bool PauseAndWait(int timeout = 100);
 
+    TVRec         *tvrec;
     RingBuffer    *ringBuffer;
     bool           weMadeBuffer;
 
@@ -213,10 +228,16 @@ class RecorderBase : public QObject
 
     ProgramInfo   *curRecording;
 
+    // For handling pausing
     bool           request_pause;
     bool           paused;
     QWaitCondition pauseWait;
     QWaitCondition unpauseWait;
+
+    // For RingBuffer switching
+    QMutex         nextRingBufferLock;
+    RingBuffer    *nextRingBuffer;
+    ProgramInfo   *nextRecording;
 };
 
 #endif

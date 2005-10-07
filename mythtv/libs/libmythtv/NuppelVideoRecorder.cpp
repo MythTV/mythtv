@@ -55,8 +55,8 @@ extern pthread_mutex_t avcodeclock;
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
-NuppelVideoRecorder::NuppelVideoRecorder(ChannelBase *channel)
-                   : RecorderBase()
+NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
+                   : RecorderBase(rec, "NuppelVideoRecorder")
 {
     channelObj = channel;
 
@@ -3333,6 +3333,11 @@ long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
         ret = positionMap[desired];
 
     return ret;
+}
+
+void NuppelVideoRecorder::SetNextRecording(const ProgramInfo*, RingBuffer*)
+{
+    // TODO
 }
 
 void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync, 

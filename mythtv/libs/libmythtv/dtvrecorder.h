@@ -17,8 +17,8 @@ class DTVRecorder: public RecorderBase
 {
     Q_OBJECT
   public:
-    DTVRecorder::DTVRecorder(const char *name = "DTVRecorder") : 
-        RecorderBase(name),
+    DTVRecorder::DTVRecorder(TVRec *rec, const char *name = "DTVRecorder") : 
+        RecorderBase(rec, name),
         _first_keyframe(0), _position_within_gop_header(0),
         _keyframe_seen(false), _last_keyframe_seen(0), _last_gop_seen(0),
         _last_seq_seen(0), _stream_fd(-1), _error(false),
@@ -45,11 +45,14 @@ class DTVRecorder: public RecorderBase
     void Initialize(void) {;}
     int GetVideoFd(void) { return _stream_fd; }
 
+    virtual void SetNextRecording(const ProgramInfo*, RingBuffer*);
+
     virtual void Reset();
   protected:
     void FinishRecording(void);
     void FindKeyframes(const TSPacket* tspacket);
     void HandleKeyframe();
+    void SavePositionMap(bool force);
 
     // used for scanning pes header for group of pictures header
     int _first_keyframe;
@@ -80,6 +83,7 @@ class DTVRecorder: public RecorderBase
     long long _frames_written_count;
 
     // position maps for seeking
+    QMutex                     _position_map_lock;
     QMap<long long, long long> _position_map;
     QMap<long long, long long> _position_map_delta;
 };

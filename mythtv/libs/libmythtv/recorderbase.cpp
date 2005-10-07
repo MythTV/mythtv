@@ -8,12 +8,13 @@ using namespace std;
 #include "programinfo.h"
 #include "recordingprofile.h"
 
-RecorderBase::RecorderBase(const char *name)
+RecorderBase::RecorderBase(TVRec *rec, const char *name)
     : QObject(NULL, name),
-      ringBuffer(NULL), weMadeBuffer(true), codec("rtjpeg"),
+      tvrec(rec), ringBuffer(NULL), weMadeBuffer(true), codec("rtjpeg"),
       audiodevice("/dev/dsp"), videodevice("/dev/video"), vbidevice("/dev/vbi"),
       vbimode(0), ntsc(true), ntsc_framerate(true), video_frame_rate(29.97),
-      curRecording(NULL), request_pause(false), paused(false)
+      curRecording(NULL), request_pause(false), paused(false),
+      nextRingBuffer(NULL), nextRecording(NULL)
 {
 }
 

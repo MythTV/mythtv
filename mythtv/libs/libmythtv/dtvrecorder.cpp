@@ -11,6 +11,7 @@ using namespace std;
 #include "programinfo.h"
 #include "tspacket.h"
 #include "dtvrecorder.h"
+#include "tv_rec.h"
 
 /** \class DTVRecorder
  *  \brief This is a specialization of RecorderBase used to
@@ -65,18 +66,17 @@ void DTVRecorder::FinishRecording(void)
     if (curRecording)
     {
         curRecording->SetFilesize(ringBuffer->GetRealFileSize());
-        if (_position_map_delta.size())
-        {
-            curRecording->SetPositionMapDelta(_position_map_delta,
-                                              MARK_GOP_BYFRAME);
-            _position_map_delta.clear();
-        }
+        SavePositionMap(true);
     }
+    _position_map_lock.lock();
+    _position_map.clear();
+    _position_map_lock.unlock();
 }
 
 // documented in recorderbase.h
 long long DTVRecorder::GetKeyframePosition(long long desired)
 {
+    QMutexLocker locker(&_position_map_lock);
     long long ret = -1;
 
     if (_position_map.find(desired) != _position_map.end())
@@ -210,14 +210,27 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
 #undef DEBUG_FIND_KEY_FRAMES
 }
 
+// documented in recorderbase.h
+void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
+{
+    // First we do some of the time consuming stuff we can do now
+    SavePositionMap(true);
+    ringBuffer->WriterFlush();
+
+    // Then we set the next info
+    nextRingBufferLock.lock();
+
+    nextRecording = NULL;
+    if (progInf)
+        nextRecording = new ProgramInfo(*progInf);
+
+    nextRingBuffer = rb;
+    nextRingBufferLock.unlock();
+}
+
 /** \fn DTVRecorder::HandleKeyframe()
- *  \brief This save the current frame to the position maps.
- *
- *   This looks up the ringBuffer->GetFileWritePosition()
- *   and saves it to both the _position_map and _position_map_delta
- *   then it saves the _position_map_delta to the database
- *   every few 30 key frames, or every 5th key frame when
- *   the first 30 key frames are saved.
+ *  \brief This save the current frame to the position maps
+ *         and handles ringbuffer switching.
  */
 void DTVRecorder::HandleKeyframe(void)
 {
@@ -231,26 +244,68 @@ void DTVRecorder::HandleKeyframe(void)
             _first_keyframe = (frameNum > 0) ? frameNum : 1;
     }
 
-    long long startpos = ringBuffer->GetFileWritePosition();
-
+    // Add key frame to position map
+    bool save_map = false;
+    _position_map_lock.lock();
     if (!_position_map.contains(frameNum))
     {
-#if 0
-        VERBOSE(VB_RECORD, "DTV: pm#"
-                <<_position_map.size()<<"["<<frameNum<<"]: "
-                <<startpos<<" cr("<<curRecording<<")");
-#endif
+        long long startpos = ringBuffer->GetFileWritePosition();
         _position_map_delta[frameNum] = startpos;
-        _position_map[frameNum] = startpos;
+        _position_map[frameNum]       = startpos;
+        save_map = true;
+    }
+    _position_map_lock.unlock();
+    // Save the position map delta, but don't force a save.
+    if (save_map)
+        SavePositionMap(false);
 
-        if (curRecording &&
-            (((_position_map.size() < 30) && (_position_map.size()%5 == 1)) ||
-             (_position_map_delta.size() >= 30)))
-        {
-            curRecording->SetPositionMapDelta(_position_map_delta, 
-                                              MARK_GOP_BYFRAME);
-            curRecording->SetFilesize(startpos);
-            _position_map_delta.clear();
-        }
+
+    // Perform ringbuffer switch if needed.
+    nextRingBufferLock.lock();
+    bool rb_changed = false;
+    if (nextRingBuffer)
+    {
+        FinishRecording();
+        Reset();
+
+        if (weMadeBuffer && ringBuffer)
+            delete ringBuffer;
+        SetRingBuffer(nextRingBuffer);
+        nextRingBuffer = NULL;
+
+        ProgramInfo *oldrec = curRecording;
+        curRecording        = nextRecording;
+        nextRecording       = NULL;
+        if (oldrec)
+            delete oldrec;
+        rb_changed = true;
+    }
+    nextRingBufferLock.unlock();
+    if (rb_changed && tvrec)
+        tvrec->RingBufferChanged();
+}
+
+/** \fn DTVRecorder::SavePositionMap(bool)
+ *  \brief This saves the postition map delta to the database if force
+ *         is true or there are 30 frames in the map or there are five
+ *         frames in the map with less than 30 frames in the non-delta
+ *         position map.
+ *  \param force If true this forces a DB sync.
+ */
+void DTVRecorder::SavePositionMap(bool force)
+{
+    QMutexLocker locker(&_position_map_lock);
+
+    // save on every 5th key frame if in the first few frames of a recording
+    force |= (_position_map.size() < 30) && (_position_map.size()%5 == 1);
+    // save every 30th key frame later on
+    force |= _position_map_delta.size() >= 30;
+
+    if (curRecording && force)
+    {
+        curRecording->SetPositionMapDelta(_position_map_delta, 
+                                          MARK_GOP_BYFRAME);
+        curRecording->SetFilesize(ringBuffer->GetFileWritePosition());
+        _position_map_delta.clear();
     }
 }

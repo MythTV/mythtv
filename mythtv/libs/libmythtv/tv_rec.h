@@ -248,6 +248,7 @@ class TVRec : public QObject
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
+    void RingBufferChanged(void);
   public slots:
     void RecorderPaused()
         { QMutexLocker lock(&stateChangeLock); triggerEventLoop.wakeAll(); }
