@@ -3529,6 +3529,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
     commBreakMapLock.unlock();
 
     GetFrame(1, true);
+    DiscardVideoFrame(videoOutput->GetLastDecodedFrame());
 
     fftime = number;
     DoFastForward();
@@ -3543,6 +3544,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
         ar = 0;
         return NULL;
     }
+    DiscardVideoFrame(videoOutput->GetLastDecodedFrame());
 
     if (!(data = frame->buf))
     {
@@ -3573,10 +3575,15 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
     return (char *)outputbuf;
 }
 
+/** \fn NuppelVideoPlayer::GetRawVideoFrame(long long)
+ *  \brief Returns a specific frame from the video.
+ *
+ *   NOTE: You must call DiscardVideoFrame(VideoFrame*) on
+ *         the frame returned, as this marks the frame as
+ *         being used and hence unavailable for decoding.
+ */
 VideoFrame* NuppelVideoPlayer::GetRawVideoFrame(long long frameNumber)
 {
-    //todo: let GetScreenGrab() above here use this method to get its framedata.
-
     if (frameNumber >= 0)
     {
         JumpToFrame(frameNumber);

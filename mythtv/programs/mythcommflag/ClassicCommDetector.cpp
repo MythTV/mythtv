@@ -359,7 +359,10 @@ bool ClassicCommDetector::go()
         {
             emit breathe();
             if (m_bStop)
+            {
+                nvp->DiscardVideoFrame(currentFrame);
                 return false;
+            }
         }
 
         if ((sendCommBreakMapUpdates) &&
@@ -490,6 +493,8 @@ bool ClassicCommDetector::go()
             if (usecSleep > 0)
                 usleep(usecSleep);
         }
+
+        nvp->DiscardVideoFrame(currentFrame);
     }
 
     if (showProgress)
@@ -2505,7 +2510,7 @@ void ClassicCommDetector::SearchForLogo()
         memset(edgeCounts, 0, sizeof(EdgeMaskEntry) * width * height);
         memset(edgeMask, 0, sizeof(EdgeMaskEntry) * width * height);
 
-        nvp->GetRawVideoFrame(0);
+        nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
 
         loops = 0;
         seekFrame = seekIncrement;
@@ -2525,6 +2530,8 @@ void ClassicCommDetector::SearchForLogo()
 
             seekFrame += seekIncrement;
             loops++;
+
+            nvp->DiscardVideoFrame(vf);
         }
 
         VERBOSE(VB_COMMFLAG, "Analyzing edge data");
@@ -2655,7 +2662,7 @@ void ClassicCommDetector::SearchForLogo()
     if (!logoInfoAvailable)
         VERBOSE(VB_COMMFLAG, "No suitable logo area found.");
 
-    nvp->GetRawVideoFrame(0);
+    nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
 }
 
 void ClassicCommDetector::CleanupFrameInfo(void)
