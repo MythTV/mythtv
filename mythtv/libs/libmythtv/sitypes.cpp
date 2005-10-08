@@ -306,6 +306,7 @@ void Event::clearEventValues()
     PartTotal    = 0;
     CategoryType = "";
     OriginalAirDate = QDate();
+    Actors.clear();
     Credits.clear();
 }
 
