@@ -4,15 +4,20 @@
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
+// C includes
+#include <pthread.h>
+#include <sys/select.h>
+
+// C++ includes
 #include <iostream>
 using namespace std;
 
-#include <pthread.h>
-#include "RingBuffer.h"
-#include "mythcontext.h"
+// MythTV includes
 #include "firewirerecorder.h"
-#include "mpeg/tspacket.h"
-#include <sys/select.h>
+#include "mythcontext.h"
+#include "RingBuffer.h"
+#include "tspacket.h"
+#include "tv_rec.h"
 
 // callback function for libiec61883
 int read_tspacket (unsigned char *tspacket, int len, unsigned int dropped, void *callback_data) {
