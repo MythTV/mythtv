@@ -29,12 +29,12 @@ typedef struct OggContext {
 } OggContext ;
 
 
-#ifdef CONFIG_ENCODERS
+#ifdef CONFIG_MUXERS
 static int ogg_write_header(AVFormatContext *avfcontext) 
 {
     OggContext *context = avfcontext->priv_data;
     ogg_packet *op= &context->op;    
-    int n, i;
+    int n;
 
     ogg_stream_init(&context->os, 31415);
     
@@ -44,7 +44,7 @@ static int ogg_write_header(AVFormatContext *avfcontext)
         int headers_len = codec->extradata_size;
         uint8_t *header_start[3];
         int header_len[3];
-        int i, j, hdr_type;
+        int i, j;
         
         av_set_pts_info(avfcontext->streams[n], 60, 1, AV_TIME_BASE);
 
@@ -149,7 +149,7 @@ static AVOutputFormat ogg_oformat = {
     ogg_write_packet,
     ogg_write_trailer,
 } ;
-#endif //CONFIG_ENCODERS
+#endif //CONFIG_MUXERS
 
 #if 0
 static int next_packet(AVFormatContext *avfcontext, ogg_packet *op) {
@@ -267,7 +267,7 @@ static AVInputFormat ogg_iformat = {
 #endif
 
 int libogg_init(void) {
-#ifdef CONFIG_ENCODERS
+#ifdef CONFIG_MUXERS
     av_register_output_format(&ogg_oformat) ;
 #endif
 /*     av_register_input_format(&ogg_iformat); */

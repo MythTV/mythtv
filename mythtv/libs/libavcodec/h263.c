@@ -2396,7 +2396,7 @@ static void mpeg4_encode_vol_header(MpegEncContext * s, int vo_number, int vol_n
     if(!(s->flags & CODEC_FLAG_BITEXACT)){
         put_bits(&s->pb, 16, 0);
         put_bits(&s->pb, 16, 0x1B2);	/* user_data */
-	put_string(&s->pb, LIBAVCODEC_IDENT, 0);
+	ff_put_string(&s->pb, LIBAVCODEC_IDENT, 0);
     }
 }
 
@@ -5010,6 +5010,7 @@ int h263_decode_picture_header(MpegEncContext *s)
     i = get_bits(&s->gb, 8); /* picture timestamp */
     if( (s->picture_number&~0xFF)+i < s->picture_number)
         i+= 256;
+    s->current_picture_ptr->pts=
     s->picture_number= (s->picture_number&~0xFF) + i;
 
     /* PTYPE starts here */    

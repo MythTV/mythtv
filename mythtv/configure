@@ -167,6 +167,8 @@ echo "  --disable-backend        disable backend  [breaks dependency checking]"
 #echo "  --disable-codec=codec    disables codec"
 #echo "  --disable-encoders       disables all encoders"
 #echo "  --disable-decoders       disables all decoders"
+#echo "  --disable-muxers         disables all muxers"
+#echo "  --disable-demuxers       disables all demuxers"
 echo "  --disable-lirc           disable lirc support (Infrared Remotes)"
 echo "  --disable-joystick-menu  disable joystick menu"
 echo "  --disable-firewire       disable support for FireWire cable boxes"
@@ -285,7 +287,7 @@ case "$cpu" in
   "Power Macintosh"|ppc)
     cpu="powerpc"
   ;;
-  mips)
+  mips|mipsel)
     cpu="mips"
   ;;
   sun4u|sparc64)
@@ -296,6 +298,18 @@ case "$cpu" in
   ;;
   sh4)
     cpu="sh4"
+  ;;
+  parisc|parisc64)
+    cpu="parisc"
+  ;;
+  s390|s390x)
+    cpu="s390"
+  ;;
+  m68k)
+    cpu="m68k"
+  ;;
+  ia64)
+    cpu="ia64"
   ;;
   *)
     cpu="unknown"
@@ -360,6 +374,8 @@ sunmlib="no"
 pthreads="no"
 gpl="yes"
 memalignhack="no"
+muxers="yes"
+demuxers="yes"
 
 # OS specific
 targetos=`uname -s`
@@ -410,7 +426,7 @@ dv1394="no"
 make="gmake"
 LDFLAGS="$LDFLAGS -export-dynamic"
 case `uname -r` in
-2.*) extralibs="-lossaudio"
+2.*) extralibs="$extralibs -lossaudio"
 ;;
 esac
 ;;
@@ -730,6 +746,10 @@ for opt do
   ;;
    --disable-decoders) CODEC_LIST="`echo $CODEC_LIST | sed 's/[-_a-zA-Z0-9]*decoder//g'`"
   ;;
+  --disable-muxers) muxers="no"
+  ;;
+  --disable-demuxers) demuxers="no"
+  ;;
   --enable-ivtv) ivtv="yes"
   ;;
   --disable-ivtv) ivtv="no"
@@ -817,6 +837,11 @@ for opt do
   --enable-backend) backend="yes"
   ;;
   --disable-backend) backend="no"
+  ;;
+  *)
+  echo "Unknown option \"$opt\"."
+  echo "See $0 --help for available options."
+  exit 1
   ;;
   esac
 done
@@ -2207,6 +2232,18 @@ elif test "$cpu" = "mips" ; then
 elif test "$cpu" = "sh4" ; then
   echo "TARGET_ARCH_SH4=yes" >> $MYTH_CONFIG_MAK
   echo "#define ARCH_SH4 1" >> $TMPH
+elif test "$cpu" = "parisc" ; then
+  echo "TARGET_ARCH_PARISC=yes" >> config.mak
+  echo "#define ARCH_PARISC 1" >> $TMPH
+elif test "$cpu" = "s390" ; then
+  echo "TARGET_ARCH_S390=yes" >> config.mak
+  echo "#define ARCH_S390 1" >> $TMPH
+elif test "$cpu" = "m68k" ; then
+  echo "TARGET_ARCH_M68K=yes" >> config.mak
+  echo "#define ARCH_M68K 1" >> $TMPH
+elif test "$cpu" = "ia64" ; then
+  echo "TARGET_ARCH_IA64=yes" >> config.mak
+  echo "#define ARCH_IA64 1" >> $TMPH
 fi
 echo "#define TUNECPU $TUNECPU" >> $TMPH
 if test "$bigendian" = "yes" ; then
@@ -2308,6 +2345,18 @@ echo "CONFIG_ENCODERS=yes" >> $MYTH_CONFIG_MAK
 # if you do not want to use decoders, disable that.
 echo "#define CONFIG_DECODERS 1" >> $TMPH
 echo "CONFIG_DECODERS=yes" >> $MYTH_CONFIG_MAK
+
+# muxers
+if test "$muxers" = "yes" ; then
+  echo "#define CONFIG_MUXERS 1" >> $TMPH
+  echo "CONFIG_MUXERS=yes" >> config.mak
+fi
+
+# demuxers
+if test "$demuxers" = "yes" ; then
+  echo "#define CONFIG_DEMUXERS 1" >> $TMPH
+  echo "CONFIG_DEMUXERS=yes" >> config.mak
+fi
 
 # AC3
 if test "$a52" = "yes" ; then
