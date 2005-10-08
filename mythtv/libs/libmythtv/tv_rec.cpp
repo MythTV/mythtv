@@ -428,11 +428,18 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     ClearFlags(kFlagAskAllowRecording);
 
     if (inoverrecord)
+    {
         ChangeState(kState_None);
-
-    // Flush out events...
-    WaitForEventThreadSleep();
-    inoverrecord = false;
+        // Flush out state change events
+        while (internalState != kState_None)
+            WaitForEventThreadSleep(false);
+        inoverrecord = false;
+    }
+    else
+    {
+        // Flush out flag changing events...
+        WaitForEventThreadSleep();
+    }
 
     if (internalState == kState_WatchingLiveTV && 
         !HasFlags(kFlagCancelNextRecording))
