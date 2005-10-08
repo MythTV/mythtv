@@ -549,7 +549,7 @@ esac
 # From mplayer configure. We need TARGET_OS available
 # to the Makefile, so it can distinguish between flavors
 # of AltiVec on PowerPC
-TARGET_OS=`( uname -s ) 2>&1`
+TARGET_OS=`uname -s 2>&1`
   case "$TARGET_OS" in
   Linux|FreeBSD|NetBSD|BSD/OS|OpenBSD|SunOS|QNX|Darwin|GNU|BeOS)
     ;;
