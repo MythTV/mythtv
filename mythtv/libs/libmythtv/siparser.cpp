@@ -41,24 +41,31 @@
  *  is also possible with this class if their specs are ever known.
  *
  */
-SIParser::SIParser(const char *name) : QObject(NULL, name)
+SIParser::SIParser(const char *name) :
+    QObject(NULL, name),
+    PAT_ready(false),               PMT_ready(false),
+    // Common Variables
+    SIStandard(SI_STANDARD_AUTO),
+    CurrentTransport(0),            RequestedServiceID(0),
+    RequestedTransportID(0),        NITPID(0),
+    // Mutex Locks
+    pmap_lock(false),
+    // State variables
+    ThreadRunning(false),           exitParserThread(false),
+    ParserInReset(false),           standardChange(false),
+    PrivateTypesLoaded(false)
 {
-    ThreadRunning = false;
-    standardChange = false;
-    SIStandard = SI_STANDARD_AUTO;
-
     /* Set the PrivateTypes to default values */
-    PrivateTypesLoaded = false;
     PrivateTypes.reset();
 
     /* Initialize the Table Handlers */
-    Table[PAT] = new PATHandler();
-    Table[PMT] = new PMTHandler();
-    Table[MGT] = new MGTHandler();
-    Table[STT] = new STTHandler();
-    Table[EVENTS] = new EventHandler();
+    Table[PAT]      = new PATHandler();
+    Table[PMT]      = new PMTHandler();
+    Table[MGT]      = new MGTHandler();
+    Table[STT]      = new STTHandler();
+    Table[EVENTS]   = new EventHandler();
     Table[SERVICES] = new ServiceHandler();
-    Table[NETWORK] = new NetworkHandler();
+    Table[NETWORK]  = new NetworkHandler();
 
     InitializeCategories();
 
@@ -79,6 +86,13 @@ SIParser::SIParser(const char *name) : QObject(NULL, name)
 
 SIParser::~SIParser()
 {
+    pmap_lock.lock();
+    for (uint i = 0; i < NumHandlers; ++i)
+    {
+        if (Table[i])
+            delete Table[i];
+    }
+    pmap_lock.unlock();
 }
 
 void SIParser::deleteLater(void)
