@@ -3,6 +3,7 @@
 #include "backendsettings.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/settings.h"
+#include <unistd.h>
 
 
 static HostLineEdit *LocalServerIP()
