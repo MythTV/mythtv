@@ -125,7 +125,7 @@ bool checkChannelPresets(QString *probs)
         MSqlQuery channelExists(MSqlQuery::InitCon());
         QString   channelQuery;
         channelQuery = QString("SELECT chanid FROM channel"
-                               " WHERE channum=\"%1\" AND sourceid=%2;")
+                               " WHERE channum='%1' AND sourceid=%2;")
                               .arg(startchan).arg(sourceid);
         channelExists.prepare(channelQuery);
 

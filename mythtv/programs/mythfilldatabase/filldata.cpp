@@ -223,49 +223,51 @@ unsigned int ELFHash(const char *s)
 void clearDataByChannel(int chanid, QDateTime from, QDateTime to) 
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString querystr;
 
-    querystr.sprintf("DELETE FROM program "
-                     "WHERE starttime >= '%s' AND starttime < '%s' "
-                     "AND chanid = %d;",
-                     from.toString("yyyyMMddhhmmss").ascii(),
-                     to.toString("yyyyMMddhhmmss").ascii(),
-                     chanid);
-    query.exec(querystr);
+    query.prepare("DELETE FROM program "
+                  "WHERE starttime >= :FROM AND starttime < :TO "
+                  "AND chanid = :CHANID ;");
+    query.bindValue(":FROM", from);
+    query.bindValue(":TO", to);
+    query.bindValue(":CHANID", chanid);
+    query.exec();
 
-    querystr.sprintf("DELETE FROM programrating WHERE starttime >= '%s' "
-                     " AND starttime < '%s' AND chanid = %d;",
-                     from.toString("yyyyMMddhhmmss").ascii(),
-                     to.toString("yyyyMMddhhmmss").ascii(),
-                     chanid);
-    query.exec(querystr);
+    query.prepare("DELETE FROM programrating "
+                  "WHERE starttime >= :FROM AND starttime < :TO "
+                  "AND chanid = :CHANID ;");
+    query.bindValue(":FROM", from);
+    query.bindValue(":TO", to);
+    query.bindValue(":CHANID", chanid);
+    query.exec();
 
-    querystr.sprintf("DELETE FROM credits WHERE starttime >= '%s' "
-                     "AND starttime < '%s' AND chanid = %d;",
-                     from.toString("yyyyMMddhhmmss").ascii(),
-                     to.toString("yyyyMMddhhmmss").ascii(),
-                     chanid);
-    query.exec(querystr);
+    query.prepare("DELETE FROM credits "
+                  "WHERE starttime >= :FROM AND starttime < :TO "
+                  "AND chanid = :CHANID ;");
+    query.bindValue(":FROM", from);
+    query.bindValue(":TO", to);
+    query.bindValue(":CHANID", chanid);
+    query.exec();
 
-    querystr.sprintf("DELETE FROM programgenres WHERE starttime >= '%s' "
-                     "AND starttime < '%s' AND chanid = %d;",
-                     from.toString("yyyyMMddhhmmss").ascii(),
-                     to.toString("yyyyMMddhhmmss").ascii(),
-                     chanid);
-    query.exec(querystr);
+    query.prepare("DELETE FROM programgenres "
+                  "WHERE starttime >= :FROM AND starttime < :TO "
+                  "AND chanid = :CHANID ;");
+    query.bindValue(":FROM", from);
+    query.bindValue(":TO", to);
+    query.bindValue(":CHANID", chanid);
+    query.exec();
 }
 
 void clearDataBySource(int sourceid, QDateTime from, QDateTime to) 
 {
-    QString querystr= QString("SELECT chanid FROM channel WHERE "
-                              "sourceid = \"%0\";").arg(sourceid);
-
     MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT chanid FROM channel WHERE "
+                  "sourceid = :SOURCE ;");
+    query.bindValue(":SOURCE", sourceid);
 
-    if (!query.exec(querystr))
+    if (!query.exec())
         MythContext::DBError("Selecting channels per source", query);
         
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
@@ -342,7 +344,7 @@ void UpdateSourceIcons(int sourceid)
     if (!query.exec())
         MythContext::DBError("Looking for icons to fetch", query);
 
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
@@ -563,7 +565,7 @@ void ImportIconMap(const QString &filename)
                                 "WHERE value = :STUBNAME");
                         qc.bindValue(":STUBNAME", st);
                         qc.exec();
-                        if (qc.isActive() && qc.numRowsAffected() > 0)
+                        if (qc.isActive() && qc.size() > 0)
                         {
                             qc.first();
                             if (qc.value(0).toInt() != 0)
@@ -627,9 +629,9 @@ void ExportIconMap(const QString &filename)
         QDomElement roote = iconmap.createElement(IM_DOC_TAG);
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.exec("SELECT * FROM callsignnetworkmap ORDER BY callsign");
+        query.exec("SELECT * FROM callsignnetworkmap ORDER BY callsign;");
 
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             while (query.next())
             {
@@ -651,8 +653,8 @@ void ExportIconMap(const QString &filename)
             }
         }
 
-        query.exec("SELECT * FROM networkiconmap ORDER BY network");
-        if (query.isActive() && query.numRowsAffected() > 0)
+        query.exec("SELECT * FROM networkiconmap ORDER BY network;");
+        if (query.isActive() && query.size() > 0)
         {
             while (query.next())
             {
@@ -679,7 +681,7 @@ void ExportIconMap(const QString &filename)
                 "LIKE :URLMAP");
         query.bindValue(":URLMAP", QString(BASEURLMAP_START) + "%");
         query.exec();
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             QRegExp baseax("\\.([^\\.]+)$");
             while (query.next())
@@ -801,7 +803,7 @@ void DataDirectStationUpdate(Source source)
     if (!no_xmltvid_q.exec())
         MythContext::DBError("Selecting new channels", no_xmltvid_q);
 
-    if (no_xmltvid_q.isActive() && no_xmltvid_q.numRowsAffected() > 0)
+    if (no_xmltvid_q.isActive() && no_xmltvid_q.size() > 0)
     {
         while (no_xmltvid_q.next())
         {
@@ -1983,17 +1985,17 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
         if ((*i).old_xmltvid != "")
         {
-            querystr.sprintf("SELECT xmltvid FROM channel WHERE xmltvid = \"%s\"",
+            querystr.sprintf("SELECT xmltvid FROM channel WHERE xmltvid = '%s'",
                              (*i).old_xmltvid.ascii());
             query.exec(querystr);
 
-            if (query.isActive() && query.numRowsAffected() > 0)
+            if (query.isActive() && query.size() > 0)
             {
                 if (!quiet)
                     cout << "Converting old xmltvid (" << (*i).old_xmltvid << ") to new ("
                          << (*i).xmltvid << ")\n";
 
-                query.exec(QString("UPDATE channel SET xmltvid = '%1' WHERE xmltvid = '%2'")
+                query.exec(QString("UPDATE channel SET xmltvid = '%1' WHERE xmltvid = '%2';")
                             .arg((*i).xmltvid)
                             .arg((*i).old_xmltvid));
 
@@ -2004,11 +2006,11 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
 
         querystr.sprintf("SELECT chanid,name,callsign,channum,finetune,"
                          "icon,freqid,tvformat FROM channel WHERE "
-                         "xmltvid = \"%s\" AND sourceid = %d;", 
+                         "xmltvid = '%s' AND sourceid = %d;", 
                          (*i).xmltvid.ascii(), id); 
 
         query.exec(querystr);
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.next();
 
@@ -2247,7 +2249,7 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
 
         query.exec();
 
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.next();
             chanid = query.value(0).toInt();
@@ -2267,9 +2269,6 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
         QValueList<ProgInfo>::iterator i = sortlist->begin();
         for (; i != sortlist->end(); i++)
         {
-            QString startstr = (*i).start.toString(Qt::ISODate);
-            QString endstr = (*i).end.toString(Qt::ISODate);
-
             query.prepare("SELECT * FROM program WHERE "
                           "chanid=:CHANID AND "
                           "starttime=:START AND "
@@ -2295,8 +2294,8 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                           "syndicatedepisodenumber=:SYNDICATEDEPISODENUMBER AND "
                           "programid=:PROGRAMID;");
             query.bindValue(":CHANID", chanid);
-            query.bindValue(":START", startstr);
-            query.bindValue(":END", endstr);
+            query.bindValue(":START", (*i).start);
+            query.bindValue(":END", (*i).end);
             query.bindValue(":TITLE", (*i).title.utf8());
             query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
             query.bindValue(":DESC", (*i).desc.utf8());
@@ -2319,7 +2318,7 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
             query.bindValue(":PROGRAMID", (*i).programid);
             query.exec();
 
-            if (query.isActive() && query.numRowsAffected() > 0)
+            if (query.isActive() && query.size() > 0)
             {
                 unchanged++;
                 continue;
@@ -2329,11 +2328,11 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                           "chanid=:CHANID AND starttime>=:START AND "
                           "starttime<:END;");
             query.bindValue(":CHANID", chanid);
-            query.bindValue(":START", startstr);
-            query.bindValue(":END", endstr);
+            query.bindValue(":START", (*i).start);
+            query.bindValue(":END", (*i).end);
             query.exec();
 
-            if (query.isActive() && query.numRowsAffected() > 0)
+            if (query.isActive() && query.size() > 0)
             {
                 if (!quiet)
                 {
@@ -2349,7 +2348,8 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                     cerr << "inserting new program    : "
                          << (*i).channel.local8Bit() << " "
                          << (*i).title.local8Bit() << " "
-                         << startstr << " - " << endstr << endl << endl;
+                         << (*i).start.toString() << " - " 
+                         << (*i).end.toString() << endl << endl;
                 }
 
                 MSqlQuery subquery(MSqlQuery::InitCon());
@@ -2357,8 +2357,8 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                                  "chanid=:CHANID AND starttime>=:START "
                                  "AND starttime<:END;");
                 subquery.bindValue(":CHANID", chanid);
-                subquery.bindValue(":START", startstr);
-                subquery.bindValue(":END", endstr);
+                subquery.bindValue(":START", (*i).start);
+                subquery.bindValue(":END", (*i).end);
 
                 subquery.exec();
 
@@ -2366,8 +2366,8 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                                  "chanid=:CHANID AND starttime>=:START "
                                  "AND starttime<:END;");
                 subquery.bindValue(":CHANID", chanid);
-                subquery.bindValue(":START", startstr);
-                subquery.bindValue(":END", endstr);
+                subquery.bindValue(":START", (*i).start);
+                subquery.bindValue(":END", (*i).end);
 
                 subquery.exec();
 
@@ -2375,8 +2375,8 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                                  "chanid=:CHANID AND starttime>=:START "
                                  "AND starttime<:END;");
                 subquery.bindValue(":CHANID", chanid);
-                subquery.bindValue(":START", startstr);
-                subquery.bindValue(":END", endstr);
+                subquery.bindValue(":START", (*i).start);
+                subquery.bindValue(":END", (*i).end);
 
                 subquery.exec();
             }
@@ -2394,8 +2394,8 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                           ":ORIGINALAIRDATE,:SHOWTYPE,:COLORCODE,:SYNDICATEDEPISODENUMBER,"
                           ":PROGRAMID);");
             query.bindValue(":CHANID", chanid);
-            query.bindValue(":STARTTIME", startstr);
-            query.bindValue(":ENDTIME", endstr);
+            query.bindValue(":STARTTIME", (*i).start);
+            query.bindValue(":ENDTIME", (*i).end);
             query.bindValue(":TITLE", (*i).title.utf8());
             query.bindValue(":SUBTITLE", (*i).subtitle.utf8());
             query.bindValue(":DESCRIPTION", (*i).desc.utf8());
@@ -2431,7 +2431,7 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                               "system,rating) VALUES (:CHANID, :START, :SYS, "
                               ":RATING);");
                 query.bindValue(":CHANID", chanid);
-                query.bindValue(":START", startstr);
+                query.bindValue(":START", (*i).start);
                 query.bindValue(":SYS", (*j).system.utf8());
                 query.bindValue(":RATING", (*j).rating.utf8());
 
@@ -2451,7 +2451,7 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                     MythContext::DBError("person lookup", query);
 
                 int personid = -1;
-                if (query.isActive() && query.numRowsAffected() > 0)
+                if (query.isActive() && query.size() > 0)
                 {
                     query.next();
                     personid = query.value(0).toInt();
@@ -2471,7 +2471,7 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                     if (!query.exec())
                        MythContext::DBError("person lookup", query);
 
-                    if (query.isActive() && query.numRowsAffected() > 0)
+                    if (query.isActive() && query.size() > 0)
                     {
                         query.next();
                         personid = query.value(0).toInt();
@@ -2488,7 +2488,7 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                               "role,person) VALUES "
                               "(:CHANID, :START, :ROLE, :PERSON);");
                 query.bindValue(":CHANID", chanid);
-                query.bindValue(":START", startstr);
+                query.bindValue(":START", (*i).start);
                 query.bindValue(":ROLE", (*k).role.utf8());
                 query.bindValue(":PERSON", personid);
                 if (!query.exec())
@@ -2500,9 +2500,9 @@ void handlePrograms(int id, QMap<QString, QValueList<ProgInfo> > *proglist)
                                   "WHERE chanid = :CHANID AND "
                                   "starttime = :START2 and person = :PERSON");
                     query.bindValue(":ROLE", (*k).role.utf8());
-                    query.bindValue(":START", startstr);
+                    query.bindValue(":START", (*i).start);
                     query.bindValue(":CHANID", chanid);
-                    query.bindValue(":START2", startstr);
+                    query.bindValue(":START2", (*i).start);
                     query.bindValue(":PERSON", personid);
 
                     if (!query.exec())
@@ -2802,7 +2802,7 @@ bool fillData(QValueList<Source> &sourcelist)
     QDateTime GuideDataBefore, GuideDataAfter;
 
     query.exec(QString("SELECT MAX(endtime) FROM program;"));
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         query.next();
 
@@ -2937,7 +2937,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                            .arg((*it).id);
                     MSqlQuery qchan(MSqlQuery::InitCon());
                     qchan.exec(qstr);
-                    if (qchan.isActive() && qchan.numRowsAffected() > 0) 
+                    if (qchan.isActive() && qchan.size() > 0) 
                     {
                         qchan.next();
                         chancnt = qchan.value(0).toInt();
@@ -2954,7 +2954,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                  "AND starttime >= DATE_ADD(CURRENT_DATE(), "
                                  "    INTERVAL '%d 18' DAY_HOUR) "
                                  "AND starttime < DATE_ADD(CURRENT_DATE(), "
-                                 "    INTERVAL %d DAY)",
+                                 "    INTERVAL '%d' DAY)",
                                  (*it).id, i, i+1);
                 MSqlQuery query(MSqlQuery::InitCon());
                 query.exec(querystr);
@@ -2963,7 +2963,7 @@ bool fillData(QValueList<Source> &sourcelist)
                 {
                     // We also need to get this day's data if there's only a 
                     // suspiciously small amount in the DB.
-                    if (!query.numRowsAffected() ||
+                    if (!query.size() ||
                         (query.next() && query.value(0).toInt() < chancnt * 4))
                     {
                         download_needed = true;
@@ -2983,7 +2983,7 @@ bool fillData(QValueList<Source> &sourcelist)
                                  "AND starttime >= DATE_ADD(CURRENT_DATE(), "
                                  "    INTERVAL '%d 12' DAY_HOUR) "
                                  "AND starttime < DATE_ADD(CURRENT_DATE(), "
-                                 "    INTERVAL %d DAY) "
+                                 "    INTERVAL '%d' DAY) "
                                  "AND category = 'TBA'",
                                  (*it).id, i, i+1);
                     MSqlQuery query(MSqlQuery::InitCon());
@@ -2991,7 +2991,7 @@ bool fillData(QValueList<Source> &sourcelist)
 
                     if (query.isActive()) 
                     {
-                        if (query.numRowsAffected() || 
+                        if (query.size() || 
                             (query.next() && query.value(0).toInt() >= 1)) 
                         {
                             download_needed = true;
@@ -3035,7 +3035,7 @@ bool fillData(QValueList<Source> &sourcelist)
     }
 
     query.exec(QString("SELECT MAX(endtime) FROM program;"));
-    if (query.isActive() && query.numRowsAffected() > 0)
+    if (query.isActive() && query.size() > 0)
     {
         query.next();
 
@@ -3151,7 +3151,7 @@ int fix_end_times(void)
     MSqlQuery query1(MSqlQuery::InitCon()), query2(MSqlQuery::InitCon());
 
     querystr = "SELECT chanid, starttime, endtime FROM program "
-               "WHERE (DATE_FORMAT(endtime,\"%H%i\") = \"0000\") "
+               "WHERE (DATE_FORMAT(endtime,'%H%i') = '0000') "
                "ORDER BY chanid, starttime;";
 
     if (!query1.exec(querystr))
@@ -3167,8 +3167,8 @@ int fix_end_times(void)
         endtime = query1.value(2).toString();
 
         querystr = QString("SELECT chanid, starttime, endtime FROM program "
-                           "WHERE (DATE_FORMAT(starttime, \"%%Y-%%m-%%d\") = "
-                           "\"%1\") AND chanid = \"%2\" "
+                           "WHERE (DATE_FORMAT(starttime, '%%Y-%%m-%%d') = "
+                           "'%1') AND chanid = '%2' "
                            "ORDER BY starttime LIMIT 1;")
                            .arg(endtime.left(10))
                            .arg(chanid);
@@ -3183,9 +3183,9 @@ int fix_end_times(void)
         {
             count++;
             endtime = query2.value(1).toString();
-            querystr = QString("UPDATE program SET starttime = \"%1\", "
-                               "endtime = \"%2\" WHERE (chanid = \"%3\" AND "
-                               "starttime = \"%4\");")
+            querystr = QString("UPDATE program SET starttime = '%1', "
+                               "endtime = '%2' WHERE (chanid = '%3' AND "
+                               "starttime = '%4');")
                                .arg(starttime)
                                .arg(endtime)
                                .arg(chanid)
@@ -3586,7 +3586,7 @@ int main(int argc, char *argv[])
                            .arg(status));
 
         query.exec(QString("SELECT MAX(endtime) FROM program;"));
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.next();
 
@@ -3605,7 +3605,7 @@ int main(int argc, char *argv[])
                           .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm")));
 
         query.exec(QString("SELECT MAX(endtime) FROM program;"));
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.next();
 
@@ -3643,7 +3643,7 @@ int main(int argc, char *argv[])
         
         if (sourcequery.isActive())
         {
-             if (sourcequery.numRowsAffected() > 0)
+             if (sourcequery.size() > 0)
              {
                   while (sourcequery.next())
                   {
@@ -3705,7 +3705,7 @@ int main(int argc, char *argv[])
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.exec("SELECT sourceid FROM videosource ORDER BY sourceid;");
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             while (query.next())
             {
@@ -3762,7 +3762,7 @@ int main(int argc, char *argv[])
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.exec( "SELECT count(previouslyshown) FROM program WHERE previouslyshown = 1;");
-        if (query.isActive() && query.numRowsAffected() > 0)
+        if (query.isActive() && query.size() > 0)
         {
             query.next();
             if (query.value(0).toInt() != 0)

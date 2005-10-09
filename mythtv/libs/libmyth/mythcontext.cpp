@@ -1570,7 +1570,7 @@ void MythContext::SaveSettingOnHost(const QString &key, const QString &newValue,
         if (!query.exec() || !query.isActive())
                 MythContext::DBError("Clear setting", query);
 
-        query.prepare("INSERT settings ( value, data, hostname ) "
+        query.prepare("INSERT INTO settings ( value, data, hostname ) "
                       "VALUES ( :VALUE, :DATA, :HOSTNAME );");
         query.bindValue(":VALUE", key);
         query.bindValue(":DATA", newValue);

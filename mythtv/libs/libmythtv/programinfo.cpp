@@ -626,8 +626,8 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
         "WHERE program.chanid = '%1' AND program.starttime < '%2' AND "
         "    program.endtime > '%3' ")
         .arg(channel)
-        .arg(dtime.toString("yyyyMMddhhmm50"))
-        .arg(dtime.toString("yyyyMMddhhmm50"));
+        .arg(dtime.toString("yyyy-MM-ddThh:mm:50"))
+        .arg(dtime.toString("yyyy-MM-ddThh:mm:50"));
 
     schedList.FromScheduler();
     progList.FromProgram(querystr, schedList);
@@ -639,14 +639,13 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     else
     {
         ProgramInfo *p = new ProgramInfo;
-        QString querystr = QString("SELECT chanid, channum, callsign, name, "
-                                   "commfree, outputfilters "
-                                   "FROM channel "
-                                   "WHERE chanid = \"%1\";")
-                                   .arg(channel);
 
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(querystr);
+        query.prepare("SELECT chanid, channum, callsign, name, "
+                      "commfree, outputfilters "
+                      "FROM channel "
+                      "WHERE chanid = :CHANID ;");
+        query.bindValue(":CHANID", channel);
 
         if (!query.exec() || !query.isActive())
         {
@@ -690,7 +689,7 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
 ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
                                                  const QDateTime &dtime)
 {
-    return GetProgramFromRecorded(channel, dtime.toString("yyyyMMddhhmmss"));
+    return GetProgramFromRecorded(channel, dtime.toString(Qt::ISODate));
 }
 
 /** \fn ProgramInfo::GetProgramFromRecorded(const QString&, const QString&)
@@ -1744,7 +1743,7 @@ bool ProgramInfo::UsesMaxEpisodes(void) const
                   "recordid = :RECID ;");
     query.bindValue(":RECID", recordid);
 
-    if (query.exec() && query.isActive() && query.numRowsAffected() > 0)
+    if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
         return query.value(0).toInt();
@@ -2733,7 +2732,7 @@ void ProgramInfo::Save(void) const
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
     query.bindValue(":CHANID", chanid.toInt());
-    query.bindValue(":STARTTIME", startts.toString("yyyyMMddhhmmss"));
+    query.bindValue(":STARTTIME", startts);
     if (!query.exec())
         MythContext::DBError("Saving program", 
                              query);
@@ -2743,8 +2742,8 @@ void ProgramInfo::Save(void) const
                   " stars) VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
                   " :SUBTITLE,:DESCRIPTION,:CATEGORY,:AIRDATE,:STARS);");
     query.bindValue(":CHANID", chanid.toInt());
-    query.bindValue(":STARTTIME", startts.toString("yyyyMMddhhmmss"));
-    query.bindValue(":ENDTIME", endts.toString("yyyyMMddhhmmss"));
+    query.bindValue(":STARTTIME", startts);
+    query.bindValue(":ENDTIME", endts);
     query.bindValue(":TITLE", title.utf8());
     query.bindValue(":SUBTITLE", subtitle.utf8());
     query.bindValue(":DESCRIPTION", description.utf8());

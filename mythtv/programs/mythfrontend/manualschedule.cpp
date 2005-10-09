@@ -298,7 +298,7 @@ void ManualSchedule::recordClicked(void)
 
     query.exec();
 
-    if (query.isActive() && query.numRowsAffected()) 
+    if (query.isActive() && query.size()) 
     {
         query.next();
         p.chanstr = query.value(1).toString();

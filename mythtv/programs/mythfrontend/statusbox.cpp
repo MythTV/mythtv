@@ -637,7 +637,7 @@ void StatusBox::doListingsStatus()
     query.prepare("SELECT max(endtime) FROM program;");
     query.exec();
 
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         query.next();
         GuideDataThrough = QDateTime::fromString(query.value(0).toString(),
@@ -715,7 +715,7 @@ void StatusBox::doTunerStatus()
     contentDetail.clear();
     contentFont.clear();
 
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while(query.next())
         {

@@ -3517,7 +3517,7 @@ QString MainServer::LocalFilePath(QUrl &url)
                             "WHERE icon LIKE '%%1';").arg(file);
         query.prepare(querytext);
 
-        if (query.exec() && query.isActive() && query.numRowsAffected())
+        if (query.exec() && query.isActive() && query.size())
         {
             query.next();
             lpath = query.value(0).toString();

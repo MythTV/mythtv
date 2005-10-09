@@ -76,15 +76,13 @@ public:
     {
         MSqlQuery query(MSqlQuery::InitCon());
 
-        QString querystr = QString(
-        "SELECT DISTINCT videosource.name, videosource.sourceid "
-        "FROM cardinput, videosource, capturecard "
-        "WHERE cardinput.sourceid=videosource.sourceid "
-        "AND cardinput.cardid=capturecard.cardid "
-        "AND capturecard.cardtype in (\"DVB\") "
-        "AND capturecard.hostname=\"%1\"").arg(gContext->GetHostName());
-
-        query.prepare(querystr);
+        query.prepare("SELECT DISTINCT videosource.name, videosource.sourceid "
+                      "FROM cardinput, videosource, capturecard "
+                      "WHERE cardinput.sourceid=videosource.sourceid "
+                      "AND cardinput.cardid=capturecard.cardid "
+                      "AND capturecard.cardtype in ('DVB') "
+                      "AND capturecard.hostname=:HOSTNAME");
+        query.bindValue(":HOSTNAME", gContext->GetHostName());
 
         if (query.exec() && query.isActive() && query.size() > 0)
             while(query.next())
@@ -117,17 +115,16 @@ void DVBTransportsEditor::videoSource(const QString& str )
 
     bool fEnable = false;
 
-    QString querystr = QString(
-        "SELECT count(cardtype) "
-        "FROM cardinput, videosource, capturecard "
-        "WHERE cardinput.sourceid=videosource.sourceid "
-        "AND cardinput.cardid=capturecard.cardid "
-        "AND capturecard.cardtype in (\"DVB\") "
-        "AND videosource.sourceid = %1 "
-        "AND capturecard.hostname=\"%2\"").arg(str).arg(gContext->GetHostName());
+    query.prepare("SELECT count(cardtype) "
+                  "FROM cardinput, videosource, capturecard "
+                  "WHERE cardinput.sourceid=videosource.sourceid "
+                  "AND cardinput.cardid=capturecard.cardid "
+                  "AND capturecard.cardtype in ('DVB') "
+                  "AND videosource.sourceid = :SOURCEID "
+                  "AND capturecard.hostname = :HOSTNAME");
+    query.bindValue(":SOURCEID", str);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
     
-    query.prepare(querystr);
-
     if (query.exec() && query.isActive() && query.size() > 0)
     {
          query.next();
@@ -167,16 +164,14 @@ void DVBTransportsEditor::del() {
     if (val == 0) 
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        QString querystr = QString("DELETE FROM dtv_multiplex "
-                                   "WHERE mplexid ='%1'").arg(m_nID);
-        query.prepare(querystr);
+        query.prepare("DELETE FROM dtv_multiplex WHERE mplexid = :MPLEX");
+        query.bindValue(":MPLEX", m_nID);
 
         if (!query.exec() || !query.isActive())
             MythContext::DBError("TransportEditor Delete DVBTransport", query);
 
-        querystr = QString("DELETE FROM channel "
-                                   "WHERE mplexid ='%1'").arg(m_nID);
-        query.prepare(querystr);
+        query.prepare("DELETE FROM channel WHERE mplexid = :MPLEX");
+        query.bindValue(":MPLEX", m_nID);
         if (!query.exec() || !query.isActive())
             MythContext::DBError("TransportEditor Delete associated channels", query);
         m_list->fillSelections();

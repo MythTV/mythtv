@@ -358,11 +358,10 @@ int Channel::GetChanID() const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare(
-        QString(
-            "SELECT chanid FROM channel "
-            "WHERE channum = \"%1\" AND channel.sourceid = \"%2\"")
-        .arg(curchannelname).arg(sourceid[currentcapchannel]));
+    query.prepare("SELECT chanid FROM channel "
+                  "WHERE channum = :CHANNUM AND channel.sourceid = :SOURCEID ;");
+    query.bindValue(":CHANNUM", curchannelname);
+    query.bindValue(":SOURCEID", sourceid[currentcapchannel]);
 
     if (!query.exec() || !query.isActive())
     {

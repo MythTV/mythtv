@@ -43,7 +43,7 @@ public:
             if (query.size())
                 return;
 
-            querystr = QString("INSERT INTO %1 SET %2=%3")
+            querystr = QString("INSERT INTO %1 (%2) VALUES ('%3')")
                              .arg(table).arg(field).arg(getValue());
             query.prepare(querystr);
 

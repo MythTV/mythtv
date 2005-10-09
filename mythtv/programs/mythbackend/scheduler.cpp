@@ -111,7 +111,7 @@ void Scheduler::verifyCards(void)
             subquery.prepare(thequery);
             subquery.exec();
             
-            if (!subquery.isActive() || subquery.numRowsAffected() <= 0)
+            if (!subquery.isActive() || subquery.size() <= 0)
                 cerr << query.value(1).toString() << " is defined, but isn't "
                      << "attached to a cardinput.\n";
         }
@@ -1418,7 +1418,7 @@ void Scheduler::UpdateManuals(int recordid)
                   "FROM record WHERE recordid = :RECORDID");
     query.bindValue(":RECORDID", recordid);
     query.exec();
-    if (!query.isActive() || query.numRowsAffected() != 1)
+    if (!query.isActive() || query.size() != 1)
     {
         MythContext::DBError("UpdateManuals", query);
         return;
@@ -1708,7 +1708,7 @@ void Scheduler::UpdateMatches(int recordid) {
         }
 
         VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec.")
-                .arg(result.numRowsAffected())
+                .arg(result.size())
                 .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
                       (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
 
@@ -1766,7 +1766,7 @@ void Scheduler::AddNewRecords(void)
 
             epicnt.exec();
 
-            if (epicnt.isActive() && epicnt.numRowsAffected() > 0)
+            if (epicnt.isActive() && epicnt.size() > 0)
             {
                 epicnt.next();
 

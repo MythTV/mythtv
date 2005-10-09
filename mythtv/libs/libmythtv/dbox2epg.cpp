@@ -165,7 +165,7 @@ void DBox2EPG::UpdateDB(uint chanid,
                   "      starttime = :STARTTIME");
 
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", startTime.toString("yyyyMMddhhmmss"));
+    query.bindValue(":STARTTIME", startTime);
 
     if (!query.exec())
         MythContext::DBError("Deleting old program", query);
@@ -181,8 +181,8 @@ void DBox2EPG::UpdateDB(uint chanid,
                   "     :CATEGORY,:AIRDATE,   :STARS)");
 
     query.bindValue(":CHANID",      chanid);
-    query.bindValue(":STARTTIME",   startTime.toString("yyyyMMddhhmmss"));
-    query.bindValue(":ENDTIME",     endTime.toString("yyyyMMddhhmmss"));
+    query.bindValue(":STARTTIME",   startTime);
+    query.bindValue(":ENDTIME",     endTime);
     query.bindValue(":TITLE",       title.utf8());
     query.bindValue(":SUBTITLE",    "");
     query.bindValue(":DESCRIPTION", description.utf8());

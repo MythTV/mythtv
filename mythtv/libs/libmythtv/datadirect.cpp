@@ -382,21 +382,19 @@ bool DDStructureParser::characters(const QString& pchars)
 void DataDirectProcessor::updateStationViewTable() 
 {
     MSqlQuery query(MSqlQuery::DDCon());
-    QString querystr;
    
     if (!query.exec("TRUNCATE TABLE dd_v_station;")) 
         MythContext::DBError("Truncating temporary table dd_v_station", query);
 
-    querystr = QString("INSERT INTO dd_v_station (stationid, callsign, "
-                       "stationname, affiliate, fccchannelnumber, channel, "
-                       "channelMinor) "
-                       "SELECT dd_station.stationid, callsign, stationname, "
-                       "affiliate, fccchannelnumber, channel, channelMinor "
-                       "FROM dd_station, dd_lineupmap WHERE "
-                       " ( (dd_station.stationid = dd_lineupmap.stationid) AND "
-                       "   ( dd_lineupmap.lineupid = \"%0\") );")
-                      .arg(getLineup());
-    query.prepare(querystr);
+    query.prepare("INSERT INTO dd_v_station (stationid, callsign, "
+                  "    stationname, affiliate, fccchannelnumber, channel, "
+                  "    channelMinor) "
+                  "SELECT dd_station.stationid, callsign, stationname, "
+                  "    affiliate, fccchannelnumber, channel, channelMinor "
+                  "FROM dd_station, dd_lineupmap WHERE "
+                  "    ( (dd_station.stationid = dd_lineupmap.stationid) AND "
+                  "    ( dd_lineupmap.lineupid = :LINEUP) );");
+    query.bindValue(":LINEUP", getLineup());
 
     if (!query.exec())
         MythContext::DBError("Populating temporary table dd_v_station", query);
@@ -405,29 +403,28 @@ void DataDirectProcessor::updateStationViewTable()
 void DataDirectProcessor::updateProgramViewTable(int sourceid) 
 {
     MSqlQuery query(MSqlQuery::DDCon());
-    QString querystr;
    
     if (!query.exec("TRUNCATE TABLE dd_v_program;"))
         MythContext::DBError("Truncating temporary table dd_v_program", query);
 
-    querystr = QString("INSERT INTO dd_v_program (chanid, starttime, endtime, "
-                       "title, subtitle, description, airdate, stars, "
-                       "previouslyshown, stereo, subtitled, hdtv, "
-                       "closecaptioned, partnumber, parttotal, seriesid, "
-                       "originalairdate, showtype, category_type, colorcode, "
-                       "syndicatedepisodenumber, tvrating, mpaarating, "
-                       "programid) "
-                       "SELECT chanid, scheduletime, endtime, title, "
-                       "subtitle, description, year, stars, repeat, stereo, "
-                       "subtitled, hdtv, closecaptioned, partnumber, "
-                       "parttotal, seriesid, originalairdate, showtype, "
-                       "category_type, colorcode, syndicatedepisodenumber, "
-                       "tvrating, mpaarating, dd_program.programid "
-                       "FROM channel, dd_schedule, dd_program WHERE "
-                       " ( (dd_schedule.programid = dd_program.programid) AND "
-                       "   (channel.xmltvid = dd_schedule.stationid) AND "
-                       "   (channel.sourceid = %0 ));").arg(sourceid);
-    query.prepare(querystr);
+    query.prepare("INSERT INTO dd_v_program (chanid, starttime, endtime, "
+                  "title, subtitle, description, airdate, stars, "
+                  "previouslyshown, stereo, subtitled, hdtv, "
+                  "closecaptioned, partnumber, parttotal, seriesid, "
+                  "originalairdate, showtype, category_type, colorcode, "
+                  "syndicatedepisodenumber, tvrating, mpaarating, "
+                  "programid) "
+                  "SELECT chanid, scheduletime, endtime, title, "
+                  "subtitle, description, year, stars, repeat, stereo, "
+                  "subtitled, hdtv, closecaptioned, partnumber, "
+                  "parttotal, seriesid, originalairdate, showtype, "
+                  "category_type, colorcode, syndicatedepisodenumber, "
+                  "tvrating, mpaarating, dd_program.programid "
+                  "FROM channel, dd_schedule, dd_program WHERE "
+                  " ( (dd_schedule.programid = dd_program.programid) AND "
+                  "   (channel.xmltvid = dd_schedule.stationid) AND "
+                  "   (channel.sourceid = :SOURCEID ));");
+    query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec())
         MythContext::DBError("Populating temporary table dd_v_program", query);

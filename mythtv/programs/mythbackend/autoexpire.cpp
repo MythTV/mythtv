@@ -402,7 +402,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
     {
         VERBOSE(VB_FILE, QString("Found %1 record profiles using max episode "
                                  "expiration")
-                                 .arg(query.numRowsAffected()));
+                                 .arg(query.size()));
         while (query.next())
         {
             VERBOSE(VB_FILE, QString(" - %1").arg(query.value(2).toString()));
@@ -427,7 +427,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
         VERBOSE(VB_FILE, QString("Found %1 episodes in recording profile %2 "
                                  "using max expiration")
-                                 .arg(query.numRowsAffected())
+                                 .arg(query.size())
                                  .arg(maxIter.key()));
         if (query.size() > 0)
         {

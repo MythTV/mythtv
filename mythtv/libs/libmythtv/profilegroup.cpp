@@ -199,11 +199,10 @@ void ProfileGroupEditor::open(int id) {
                         skip = true;
                 if (! skip)
                 {
-                    
-                    querystr = QString("INSERT INTO recordingprofiles SET "
-                                    "name = '%1', profilegroup = %2")
-                                    .arg(availProfiles[i]).arg(profileID);
-                    result.prepare(querystr);
+                    result.prepare("INSERT INTO recordingprofiles "
+                                   "(name, profilegroup) VALUES (:NAME, :PROFID);");
+                    result.bindValue(":NAME", availProfiles[i]);
+                    result.bindValue(":PROFID", profileID);
                     result.exec();
                 }
             }

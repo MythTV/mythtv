@@ -984,7 +984,7 @@ int main(int argc, char *argv[])
                                    .arg(allStart).arg(allEnd);
         recordedquery.exec(querystr);
 
-        if ((recordedquery.isActive()) && (recordedquery.numRowsAffected() > 0))
+        if ((recordedquery.isActive()) && (recordedquery.size() > 0))
         {
             while (recordedquery.next())
             {
@@ -1020,7 +1020,7 @@ int main(int argc, char *argv[])
                                         .arg(starttime);
                     markupquery.exec(markupstr);
                     if ((markupquery.isActive()) &&
-                        (markupquery.numRowsAffected() > 0))
+                        (markupquery.size() > 0))
                     {
                         if (markupquery.next())
                         {

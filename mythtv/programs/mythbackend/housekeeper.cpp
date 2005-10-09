@@ -57,9 +57,8 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
     MSqlQuery result(MSqlQuery::InitCon());
     if (result.isConnected())
     {
-        QString query = QString("SELECT lastrun FROM housekeeping WHERE "
-                                "tag = \"%1\";").arg(dbTag);
-        result.prepare(query);
+        result.prepare("SELECT lastrun FROM housekeeping WHERE tag = :TAG ;");
+        result.bindValue(":TAG", dbTag);
 
         if (result.exec() && result.isActive() && result.size() > 0)
         {
@@ -75,9 +74,9 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
         }
         else
         {
-            query = QString("INSERT INTO housekeeping(tag,lastrun) "
-                            "values(\"%1\",now())").arg(dbTag);
-            result.prepare(query);
+            result.prepare("INSERT INTO housekeeping(tag,lastrun) "
+                           "values(:TAG ,now());");
+            result.bindValue(":TAG", dbTag);
             result.exec();
 
             runOK = true;
@@ -92,13 +91,13 @@ void HouseKeeper::updateLastrun(const QString &dbTag)
     MSqlQuery result(MSqlQuery::InitCon());
     if (result.isConnected())
     {
-        QString query = QString("DELETE FROM housekeeping WHERE "
-                                "tag = \"%1\";").arg(dbTag);
-        result.prepare(query);
+        result.prepare("DELETE FROM housekeeping WHERE tag = :TAG ;");
+        result.bindValue(":TAG", dbTag);
         result.exec();
-        query = QString("INSERT INTO housekeeping(tag,lastrun) "
-                        "values(\"%1\",now())").arg(dbTag);
-        result.prepare(query);
+
+        result.prepare("INSERT INTO housekeeping(tag,lastrun) "
+                       "values(:TAG ,now()) ;");
+        result.bindValue(":TAG", dbTag);
         result.exec();
     }
 }
@@ -195,17 +194,13 @@ void HouseKeeper::flushLogs()
     MSqlQuery result(MSqlQuery::InitCon());
     if (result.isConnected())
     {
-        QString dstring = days.toString(QString("yyyy-MM-dd hh:mm:ss"));
-        QString query = QString("DELETE FROM mythlog WHERE "
-                                "acknowledged=1 and logdate<\"%1\";")
-                                .arg(dstring);
-        result.prepare(query);
+        result.prepare("DELETE FROM mythlog WHERE "
+                       "acknowledged=1 and logdate < :DAYS ;");
+        result.bindValue(":DAYS", days);
         result.exec();
 
-        dstring = max.toString(QString("yyyy-MM-dd hh:mm:ss"));
-        query = QString("DELETE FROM mythlog WHERE logdate<\"%1\";")
-                                .arg(dstring);
-        result.prepare(query);
+        result.prepare("DELETE FROM mythlog WHERE logdate< :MAX ;");
+        result.bindValue(":MAX", max);
         result.exec();
     }
 }

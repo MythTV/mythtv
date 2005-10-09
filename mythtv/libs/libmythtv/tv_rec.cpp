@@ -1316,9 +1316,6 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
     if (!chan)
         return;
 
-    QString curtimestr = QDateTime::currentDateTime()
-        .toString("yyyyMMddhhmmss");
-
     channelname = chan->GetCurrentName();
     QString channelinput = chan->GetCurrentInput();
  
@@ -1339,7 +1336,7 @@ void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
         "      capturecard.cardid   = :CARDID        AND "
         "      capturecard.hostname = :HOSTNAME");
     query.bindValue(":CHANNAME", channelname);
-    query.bindValue(":CURTIME", curtimestr);
+    query.bindValue(":CURTIME", QDateTime::currentDateTime());
     query.bindValue(":CARDID", cardid);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
 

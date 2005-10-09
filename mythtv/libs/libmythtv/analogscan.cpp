@@ -114,9 +114,9 @@ bool AnalogScan::scan()
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString thequery = QString("SELECT freqtable FROM videosource WHERE "
-                               "sourceid = \"%1\";").arg(sourceid);
-    query.prepare(thequery);
+    query.prepare("SELECT freqtable FROM videosource WHERE "
+                  "sourceid = :SOURCEID ;");
+    query.bindValue(":SOURCEID", sourceid);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("analog scan freqtable", query);

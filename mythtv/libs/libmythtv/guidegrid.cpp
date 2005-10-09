@@ -733,11 +733,11 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
     m_programs[row] = proglist = new ProgramList();
 
     QString querystr = QString(
-        "WHERE program.chanid = %1 AND program.endtime >= %2 "
-        "    AND program.starttime <= %3 AND program.manualid = 0 ")
+        "WHERE program.chanid = '%1' AND program.endtime >= '%2' "
+        "    AND program.starttime <= '%3' AND program.manualid = 0 ")
         .arg(m_channelInfos[chanNum].chanid)
-        .arg(m_currentStartTime.toString("yyyyMMddhhmm00"))
-        .arg(m_currentEndTime.toString("yyyyMMddhhmm00"));
+        .arg(m_currentStartTime.toString("yyyy-MM-ddThh:mm:00"))
+        .arg(m_currentEndTime.toString("yyyy-MM-ddThh:mm:00"));
 
     proglist->FromProgram(querystr, m_recList);
 

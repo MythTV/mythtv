@@ -1005,7 +1005,7 @@ void ProgLister::powerEdit()
     query.prepare(querystr);
     query.exec();
 
-    if (query.isActive() && query.numRowsAffected())
+    if (query.isActive() && query.size())
     {
         while (query.next())
         {
@@ -1079,41 +1079,41 @@ QString ProgLister::powerStringToSQL(QString &qphrase)
         return str;
     }
     if (field[0])
-        str += QString("program.title LIKE \"\%%1\%\" ")
+        str += QString("program.title LIKE '\%%1\%' ")
                        .arg(field[0]);
     if (field[1])
     {
         if (str > "")
             str += "AND ";
-        str += QString("program.subtitle LIKE \"\%%1\%\" ")
+        str += QString("program.subtitle LIKE '\%%1\%' ")
                        .arg(field[1]);
     }
     if (field[2])
     {
         if (str > "")
             str += "AND ";
-        str += QString("program.description LIKE \"\%%1\%\" ")
+        str += QString("program.description LIKE '\%%1\%' ")
                        .arg(field[2]);
     }
     if (field[3])
     {
         if (str > "")
             str += "AND ";
-        str += QString("program.category_type=\"%1\" ")
+        str += QString("program.category_type='%1' ")
                        .arg(field[3]);
     }
     if (field[4])
     {
         if (str > "")
             str += "AND ";
-        str += QString("program.category=\"%1\" ")
+        str += QString("program.category='%1' ")
                        .arg(field[4]);
     }
     if (field[5])
     {
         if (str > "")
             str += "AND ";
-        str += QString("channel.callsign=\"%1\" ")
+        str += QString("channel.callsign='%1' ")
                        .arg(field[5]);
     }
     return str;
@@ -1378,14 +1378,14 @@ void ProgLister::fillItemList(void)
         return;
 
     QString where;
-    QString startstr = startTime.toString("yyyyMMddhhmm50");
+    QString startstr = startTime.toString("yyyy-MM-ddThh:mm:50");
     QString qphrase = viewList[curView].utf8();
     qphrase.replace("\'", "\\\'");
 
     if (type == plTitle) // per title listings
     {
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND program.title = '%2' ")
                         .arg(startstr).arg(qphrase);
     }
@@ -1394,7 +1394,7 @@ void ProgLister::fillItemList(void)
         where = QString("LEFT JOIN oldprogram ON "
                         "  oldprogram.oldtitle = program.title "
                         "WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND oldprogram.oldtitle IS NULL "
                         "  AND program.manualid = 0 ")
                         .arg(startstr);
@@ -1422,20 +1422,20 @@ void ProgLister::fillItemList(void)
         else
         {
             where += "  AND (program.category_type <> 'movie' ";
-            where += "  OR program.airdate >= YEAR(NOW() - INTERVAL 2 YEAR)) ";
+            where += "  OR program.airdate >= YEAR(NOW() - INTERVAL '2' YEAR)) ";
         }
     }
     else if (type == plTitleSearch) // keyword search
     {
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND program.title LIKE '\%%2\%' ")
                         .arg(startstr).arg(qphrase);
     }
     else if (type == plKeywordSearch) // keyword search
     {
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND (program.title LIKE '\%%2\%' "
                         "    OR program.subtitle LIKE '\%%3\%' "
                         "    OR program.description LIKE '\%%4\%') ")
@@ -1445,7 +1445,7 @@ void ProgLister::fillItemList(void)
     else if (type == plPeopleSearch) // people search
     {
         where = QString(", people, credits WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND people.name LIKE '%2' "
                         "  AND credits.person = people.person "
                         "  AND program.chanid = credits.chanid "
@@ -1455,7 +1455,7 @@ void ProgLister::fillItemList(void)
     else if (type == plPowerSearch) // complex search
     {
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND ( %2 ) ")
                         .arg(startstr).arg(powerStringToSQL(qphrase));
     }
@@ -1463,28 +1463,28 @@ void ProgLister::fillItemList(void)
     {
         qphrase.remove(QRegExp("^\\s*AND\\s+", false));
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND ( %2 ) ")
                         .arg(startstr).arg(qphrase);
     }
     else if (type == plChannel) // list by channel
     {
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND channel.chanid = '%2' ")
                         .arg(startstr).arg(qphrase);
     }
     else if (type == plCategory) // list by category
     {
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND program.category = '\%2' ")
                         .arg(startstr).arg(qphrase);
     }
     else if (type == plMovies) // list movies
     {
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > %1 "
+                        "  AND program.endtime > '%1' "
                         "  AND program.category_type = 'movie' "
                         "  AND program.stars >= '\%2' ")
                         .arg(startstr).arg(qphrase);
@@ -1492,12 +1492,12 @@ void ProgLister::fillItemList(void)
     else if (type == plTime) // list by time
     {
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.starttime >= %1 ")
-                        .arg(searchTime.toString("yyyyMMddhh0000"));
+                        "  AND program.starttime >= '%1' ")
+                        .arg(searchTime.toString("yyyy-MM-ddThh:00:00"));
         if (titleSort)
-            where += QString("  AND program.starttime < DATE_ADD(%1, "
-                             "INTERVAL 1 HOUR) ")
-                             .arg(searchTime.toString("yyyyMMddhh0000"));
+            where += QString("  AND program.starttime < DATE_ADD('%1', "
+                             "INTERVAL '1' HOUR) ")
+                             .arg(searchTime.toString("yyyy-MM-ddThh:00:00"));
     }
 
     if (titleSort && type == plTitle)

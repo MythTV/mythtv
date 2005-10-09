@@ -1087,7 +1087,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
         "WHERE program.title = '%1' "
         "    AND program.endtime > %2 ")
         .arg(progTitle.utf8().replace("'", "\\'"))
-        .arg(progStart.toString("yyyyMMddhhmm50"));
+        .arg(progStart.toString("yyyy-MM-ddThh:mm:50"));
 
     showData.FromProgram(querystr, schedList);
 
@@ -1217,8 +1217,8 @@ QString ProgFinder::whereClauseGetSearchData(int charNum)
                            "title NOT REGEXP '^[A-Z0-9]' AND "
                            "title NOT REGEXP '^The [A-Z0-9]' AND "
                            "title NOT REGEXP '^A [A-Z0-9]' AND "
-                           "starttime > %1 ) ORDER BY title;")
-                           .arg(progStart.toString("yyyyMMddhhmm50"));
+                           "starttime > '%1' ) ORDER BY title;")
+                           .arg(progStart.toString("yyyy-MM-ddThh:mm:50"));
     }
     else
     {
@@ -1226,12 +1226,12 @@ QString ProgFinder::whereClauseGetSearchData(int charNum)
                            "FROM program "
                            "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' "
                            "OR title LIKE 'A %3%' ) "
-                           "AND starttime > %4 "
+                           "AND starttime > '%4' "
                            "ORDER BY title;")
                            .arg(searchData[charNum])
                            .arg(searchData[charNum])
                            .arg(searchData[charNum])
-                           .arg(progStart.toString("yyyyMMddhhmm50"));
+                           .arg(progStart.toString("yyyy-MM-ddThh:mm:50"));
     }
 
     return thequery;
@@ -1446,8 +1446,8 @@ QString JaProgFinder::whereClauseGetSearchData(int charNum)
         break;
     }
 
-    thequery += QString("AND starttime > %1 ORDER BY title_pronounce;")
-                       .arg(progStart.toString("yyyyMMddhhmm50"));
+    thequery += QString("AND starttime > '%1' ORDER BY title_pronounce;")
+                       .arg(progStart.toString("yyyy-MM-ddThh:mm:50"));
     return thequery;
 }
 

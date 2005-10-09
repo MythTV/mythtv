@@ -24,7 +24,7 @@ class SimpleSRSetting: public SimpleDBStorage
             QString value = getValue();
             value.replace(QRegExp("\""), QString("\\\""));
 
-            return QString("recordid = %1, %2 = \"%3\"")
+            return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());
@@ -54,7 +54,7 @@ class SRSetting: public ManagedListSetting
             QString value = getValue();
             value.replace(QRegExp("\""), QString("\\\""));
 
-            return QString("recordid = %1, %2 = \"%3\"")
+            return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());
@@ -84,7 +84,7 @@ class SRSelectSetting : public SelectManagedListSetting
             QString value = getValue();
             value.replace(QRegExp("\""), QString("\\\""));
 
-            return QString("recordid = %1, %2 = \"%3\"")
+            return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());
@@ -114,7 +114,7 @@ class SRBoolSetting : public BoolManagedListSetting
             QString value = getValue();
             value.replace(QRegExp("\""), QString("\\\""));
 
-            return QString("recordid = %1, %2 = \"%3\"")
+            return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());
@@ -146,7 +146,7 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
             QString value = getValue();
             value.replace(QRegExp("\""), QString("\\\""));
 
-            return QString("recordid = %1, %2 = \"%3\"")
+            return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
                 .arg(getColumn())
                 .arg(value.utf8());

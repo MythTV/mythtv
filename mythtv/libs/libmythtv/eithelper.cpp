@@ -192,7 +192,7 @@ static uint delete_invalid_programs_in_db(
         "FROM program "
         "WHERE chanid=:CHANID AND "
         "      ( ( starttime>=:STIME AND starttime<:ETIME ) AND NOT "
-        "        ( starttime=:STIME AND endtime=:ETIME AND title=:TITLE ) )");
+        "        ( starttime=:STIME AND endtime=:ETIME AND title=:TITLE ) );");
 
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STIME", event.StartTime.
@@ -239,16 +239,14 @@ static uint delete_invalid_programs_in_db(
 
 static bool has_program(MSqlQuery &query, int chanid, const Event &event)
 {
-    query.prepare("SELECT 1 FROM program "
+    query.prepare("SELECT * FROM program "
                   "WHERE chanid=:CHANID AND "
                   "      starttime=:STARTTIME AND "
                   "      endtime=:ENDTIME AND "
-                  "      title=:TITLE");
+                  "      title=:TITLE LIMIT 1");
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", event.StartTime.
-                    toString(QString("yyyy-MM-dd hh:mm:00")));
-    query.bindValue(":ENDTIME", event.EndTime.
-                    toString(QString("yyyy-MM-dd hh:mm:00")));
+    query.bindValue(":STARTTIME", event.StartTime.toString("yyyy-MM-ddThh:mm:00"));
+    query.bindValue(":ENDTIME", event.EndTime.toString("yyyy-MM-ddThh:mm:00"));
     query.bindValue(":TITLE", event.Event_Name.utf8());
 
     if (!query.exec() || !query.isActive())
@@ -270,8 +268,8 @@ static bool insert_program(MSqlQuery &query, int chanid, const Event &event)
                   "  :CC,            :HDTV,      :AIRDATE,   :ORIGAIRDATE, "
                   "  :PARTNUMBER,    :PARTTOTAL, :CATTYPE)");
 
-    QString begTime = event.StartTime.toString(QString("yyyy-MM-dd hh:mm:00"));
-    QString endTime = event.EndTime.toString(  QString("yyyy-MM-dd hh:mm:00"));
+    QString begTime = event.StartTime.toString(QString("yyyy-MM-ddThh:mm:00"));
+    QString endTime = event.EndTime.toString(  QString("yyyy-MM-ddThh:mm:00"));
     QString airDate = event.OriginalAirDate.toString(QString("yyyy-MM-dd"));
 
     query.bindValue(":CHANID",      chanid);

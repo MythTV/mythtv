@@ -309,15 +309,16 @@ void ChannelOptionsCommon::sourceChanged(const QString& str)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString queryStr = QString("SELECT count(cardtype) "
-       "FROM capturecard,videosource,cardinput "
-       "WHERE cardinput.sourceid=videosource.sourceid "
-       "AND cardinput.cardid=capturecard.cardid "
-       "AND capturecard.cardtype in (\"DVB\") "
-       "AND videosource.sourceid=\"%1\" "
-       "AND capturecard.hostname=\"%2\"").arg(str).arg(gContext->GetHostName());
+    query.prepare("SELECT count(cardtype) "
+                  "FROM capturecard, videosource, cardinput "
+                  "WHERE cardinput.sourceid = videosource.sourceid "
+                  "AND cardinput.cardid = capturecard.cardid "
+                  "AND capturecard.cardtype in ('DVB') "
+                  "AND videosource.sourceid = :SOURCEID "
+                  "AND capturecard.hostname = :HOSTNAME");
+    query.bindValue(":SOURCEID", str);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
 
-    query.prepare(queryStr);
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();

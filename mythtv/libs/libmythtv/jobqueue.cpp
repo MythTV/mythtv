@@ -548,10 +548,10 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
     if (! (tmpStatus & JOB_DONE) && (tmpCmd & JOB_STOP))
         return false;
 
-    query.prepare("INSERT jobqueue (chanid, starttime, inserttime, type, "
-                         "status, statustime, hostname, args, comment, flags) "
-                     "VALUES (:CHANID, :STARTTIME, now(), :JOBTYPE, :STATUS, "
-                         "now(), :HOST, :ARGS, :COMMENT, :FLAGS);");
+    query.prepare("INSERT INTO jobqueue (chanid, starttime, inserttime, type, "
+                  "status, statustime, hostname, args, comment, flags) "
+                  "VALUES (:CHANID, :STARTTIME, now(), :JOBTYPE, :STATUS, "
+                  "now(), :HOST, :ARGS, :COMMENT, :FLAGS);");
 
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", starttime);
@@ -623,7 +623,7 @@ int JobQueue::GetJobID(int jobType, QString chanid, QDateTime starttime)
     }
     else
     {
-        if ((query.numRowsAffected() > 0) && query.next())
+        if ((query.size() > 0) && query.next())
             return query.value(0).toInt();
     }
 
@@ -649,7 +649,7 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
     }
     else
     {
-        if ((query.numRowsAffected() > 0) && query.next())
+        if ((query.size() > 0) && query.next())
         {
             jobType = query.value(0).toInt();
             chanid = query.value(1).toString();
@@ -769,7 +769,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
             return false;
         }
 
-        if (query.numRowsAffected() == 0)
+        if (query.size() == 0)
         {
             jobsAreRunning = false;
             break;
@@ -777,7 +777,7 @@ bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
         else if ((totalSlept % 5) == 0)
         {
             message = QString("JobQueue: Waiting on %1 jobs still running for "
-                              "chanid %2 @ %3").arg(query.numRowsAffected())
+                              "chanid %2 @ %3").arg(query.size())
                               .arg(chanid).arg(starttime.toString());
             VERBOSE(VB_JOBQUEUE, message);
         }
@@ -1286,7 +1286,7 @@ int JobQueue::GetJobCmd(int jobID)
     }
     else
     {
-        if ((query.numRowsAffected() > 0) && query.next())
+        if ((query.size() > 0) && query.next())
             return query.value(0).toInt();
     }
 
@@ -1334,7 +1334,7 @@ int JobQueue::GetJobFlags(int jobID)
     }
     else
     {
-        if ((query.numRowsAffected() > 0) && query.next())
+        if ((query.size() > 0) && query.next())
             return query.value(0).toInt();
     }
 
@@ -1358,7 +1358,7 @@ int JobQueue::GetJobStatus(int jobID)
     }
     else
     {
-        if ((query.numRowsAffected() > 0) && query.next())
+        if ((query.size() > 0) && query.next())
             return query.value(0).toInt();
     }
 
@@ -1383,7 +1383,7 @@ int JobQueue::GetJobStatus(int jobType, QString chanid, QDateTime startts)
         MythContext::DBError("Error in JobQueue::GetJobStatus()", query);
         return false;
     }
-    if (query.numRowsAffected() > 0 && query.next())
+    if (query.size() > 0 && query.next())
     {
         int tmpStatus;
         tmpStatus = query.value(0).toInt();

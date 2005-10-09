@@ -1263,7 +1263,7 @@ void TV::RunTV(void)
     {
         MSqlQuery query(MSqlQuery::InitCon()); 
         query.prepare("SELECT keylist FROM keybindings WHERE "
-                      "context = \"TV Playback\" AND action = \"GUIDE\" AND "
+                      "context = 'TV Playback' AND action = 'GUIDE' AND "
                       "hostname = :HOSTNAME ;");
         query.bindValue(":HOSTNAME", gContext->GetHostName());
 
