@@ -1810,16 +1810,19 @@ void Scheduler::AddNewRecords(void)
     QString progfindid = QString(
 "(CASE record.type "
 "  WHEN %1 "
+"   THEN record.findid "
+"  WHEN %2 "
 "   THEN to_days(date_sub(program.starttime, interval "
 "                time_format(record.findtime, '%H:%i') hour_minute)) "
-"  WHEN %2 "
+"  WHEN %3 "
 "   THEN floor((to_days(date_sub(program.starttime, interval "
 "               time_format(record.findtime, '%H:%i') hour_minute)) - "
 "               record.findday)/7) * 7 + record.findday "
-"  WHEN %3 "
+"  WHEN %4 "
 "   THEN record.findid "
 "  ELSE 0 "
 " END) ")
+        .arg(kFindOneRecord)
         .arg(kFindDailyRecord)
         .arg(kFindWeeklyRecord)
         .arg(kOverrideRecord);

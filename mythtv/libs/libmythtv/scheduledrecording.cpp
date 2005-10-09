@@ -464,8 +464,8 @@ void ScheduledRecording::doneRecording(ProgramInfo& proginfo)
     VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details).local8Bit());
     gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
 
-    if (getRecordingType() == kFindOneRecord)
-        remove();
+    //if (getRecordingType() == kFindOneRecord)
+    //    remove();
 }
 
 void ScheduledRecording::runProgList(void)
@@ -738,8 +738,14 @@ void ScheduledRecording::setProgram(const ProgramInfo *proginfo)
         {
             findday->setValue((proginfo->startts.date().dayOfWeek() + 1) % 7);
             findtime->setValue(proginfo->startts.time());
+
+            QDate epoch = QDate::QDate (1970, 1, 1);
+            findid->setValue(epoch.daysTo(proginfo->startts.date()) + 719528);
         }
-        findid->setValue(proginfo->findid);
+        else
+        {
+            findid->setValue(proginfo->findid);
+        }
         category->setValue(proginfo->category);
         
         fetchChannelInfo();

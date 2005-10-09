@@ -1349,8 +1349,7 @@ void ProgramInfo::StartedRecording(const QString &basename)
 
 /** \fn ProgramInfo::FinishedRecording(bool prematurestop) 
  *  \brief If not a premature stop, adds program to history of recorded 
- *         programs. If the recording type is kFindOneRecord this find
- *         is removed.
+ *         programs.
  *  \param prematurestop If true, we only fetch the recording status.
  */
 void ProgramInfo::FinishedRecording(bool prematurestop)
@@ -3325,7 +3324,6 @@ void ProgramInfo::ShowNotRecordingDialog(void)
     if (recendts > now)
     {
         if ((rectype != kSingleRecord && 
-             rectype != kFindOneRecord &&
              rectype != kOverrideRecord) &&
             (recstatus == rsDontRecord ||
              recstatus == rsPreviousRecording ||

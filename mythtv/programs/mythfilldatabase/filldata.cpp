@@ -2753,44 +2753,71 @@ void clearOldDBEntries(void)
             cout << "Keeping 7 days of data." << endl;
     }
 
-    querystr.sprintf("DELETE FROM oldprogram WHERE airdate < "
-                     "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");
-    query.exec(querystr);
+    query.prepare("DELETE FROM oldprogram WHERE airdate < "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL 320 DAY);");
+    query.exec();
 
-    querystr.sprintf("REPLACE INTO oldprogram (oldtitle,airdate) "
-                     "SELECT title,starttime FROM program "
-                     "WHERE starttime < NOW() AND manualid = 0 "
-                     "GROUP BY title;");
-    query.exec(querystr);
+    query.prepare("REPLACE INTO oldprogram (oldtitle,airdate) "
+                  "SELECT title,starttime FROM program "
+                  "WHERE starttime < NOW() AND manualid = 0 "
+                  "GROUP BY title;");
+    query.exec();
 
-    querystr.sprintf("DELETE FROM program WHERE starttime <= "
-                     "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
-    query.exec(querystr);
+    query.prepare("DELETE FROM program WHERE starttime <= "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
+    query.bindValue(":OFFSET", offset);
+    query.exec();
 
-    querystr.sprintf("DELETE FROM programrating WHERE starttime <= "
-                     "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
-    query.exec(querystr);
+    query.prepare("DELETE FROM programrating WHERE starttime <= "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
+    query.bindValue(":OFFSET", offset);
+    query.exec();
 
-    querystr.sprintf("DELETE FROM programgenres WHERE starttime <= "
-                     "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
-    query.exec(querystr);
+    query.prepare("DELETE FROM programgenres WHERE starttime <= "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
+    query.bindValue(":OFFSET", offset);
+    query.exec();
 
-    querystr.sprintf("DELETE FROM credits WHERE starttime <= "
-                     "DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);", offset);
-    query.exec(querystr);
+    query.prepare("DELETE FROM credits WHERE starttime <= "
+                  "DATE_SUB(CURRENT_DATE, INTERVAL :OFFSET DAY);");
+    query.bindValue(":OFFSET", offset);
+    query.exec();
 
-    querystr.sprintf("DELETE FROM record WHERE (type = %d "
-                     "OR type = %d OR type = %d) AND enddate < NOW();",
-                     kSingleRecord, kOverrideRecord, kDontRecord);
-    query.exec(querystr);
+    query.prepare("DELETE FROM record WHERE (type = :SINGLE "
+                  "OR type = :OVERRIDE OR type = :DONTRECORD) "
+                  "AND enddate < NOW();");
+    query.bindValue(":SINGLE", kSingleRecord);
+    query.bindValue(":OVERRIDE", kOverrideRecord);
+    query.bindValue(":DONTRECORD", kDontRecord);
+    query.exec();
 
-    int cleanOldRecorded = gContext->GetNumSetting( "CleanOldRecorded", 60);
+    MSqlQuery findq(MSqlQuery::InitCon());
+    findq.prepare("SELECT record.recordid FROM record "
+                  "LEFT JOIN oldfind ON oldfind.recordid = record.recordid "
+                  "WHERE type = :FINDONE AND oldfind.findid IS NOT NULL;");
+    findq.bindValue(":FINDONE", kFindOneRecord);
+    findq.exec();
+        
+    if (findq.isActive() && findq.size() > 0)
+    {
+        while (findq.next())
+        {
+            query.prepare("DELETE FROM record WHERE recordid = :RECORDID;");
+            query.bindValue(":RECORDID", findq.value(0).toInt());
+            query.exec();
+        }
+    }
+    query.prepare("DELETE FROM oldfind WHERE findid < TO_DAYS(NOW()) - 14;");
+    query.exec();
 
-    querystr.sprintf("DELETE FROM oldrecorded WHERE "
-                     "recstatus <> %d AND duplicate = 0 AND "
-                     "endtime < DATE_SUB(CURRENT_DATE, INTERVAL %d DAY);",
-                     rsRecorded, cleanOldRecorded);
-    query.exec(querystr);
+    int cleanOldRecorded = gContext->GetNumSetting( "CleanOldRecorded", 21);
+
+    query.prepare("DELETE FROM oldrecorded WHERE "
+                  "recstatus <> :RECORDED AND duplicate = 0 AND "
+                  "endtime < DATE_SUB(CURRENT_DATE, INTERVAL :CLEAN DAY);");
+    query.bindValue(":RECORDED", rsRecorded);
+    query.bindValue(":CLEAN", cleanOldRecorded);
+    query.exec();
 }
 
 bool fillData(QValueList<Source> &sourcelist)
