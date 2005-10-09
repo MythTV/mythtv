@@ -2313,7 +2313,7 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         else if (action == "SELECT")
         {
             if (class LCD * lcddev = LCD::Get())
-                lcddev->stopAll();
+                lcddev->switchToTime();
 
             lastbutton = activebutton;
             activebutton = NULL;
