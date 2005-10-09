@@ -423,6 +423,24 @@ RecStatusType EncoderLink::StartRecording(const ProgramInfo *rec)
     return retval;
 }
 
+/** \fn EncoderLink::GetRecording()
+ *  \brief Returns TVRec's current recording.
+ *
+ *   Caller is responsible for deleting the ProgramInfo when done with it.
+ *  \return Returns TVRec's current recording if it succeeds, NULL otherwise.
+ */
+ProgramInfo *EncoderLink::GetRecording(void)
+{
+    ProgramInfo *info = NULL;
+
+    if (local)
+        info = tv->GetRecording();
+    else if (sock)
+        info = sock->GetRecording(m_capturecardnum);
+
+    return info;
+}
+
 /** \fn EncoderLink::StopRecording()
  *  \brief Tells TVRec to stop recording immediately.
  *         <b>This only works on local recorders.</b>
@@ -585,20 +603,6 @@ void EncoderLink::CancelNextRecording(void)
         tv->CancelNextRecording();
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: CancelNextRecording");
-}
-
-/** \fn EncoderLink::GetRecording()
- *  \brief Returns TVRec's current recording.
- *         <b>This only works on local recorders.</b>
- *  \return Returns TVRec's current recording if it succeeds, NULL otherwise.
- */
-ProgramInfo *EncoderLink::GetRecording(void)
-{
-    if (local)
-        return tv->GetRecording();
-
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetRecording");
-    return NULL;
 }
 
 /** \fn EncoderLink::StopPlaying()

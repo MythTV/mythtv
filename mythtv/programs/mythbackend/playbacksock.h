@@ -9,6 +9,7 @@
 
 class RefSocket;
 class MainServer;
+class ProgramInfo;
 
 class PlaybackSock
 {
@@ -53,6 +54,7 @@ class PlaybackSock
     bool IsBusy(int capturecardnum);
     int GetEncoderState(int capturecardnum);
     long long GetMaxBitrate(int capturecardnum);
+    ProgramInfo *GetRecording(int capturecardnum);
     bool EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo);
     RecStatusType StartRecording(int capturecardnum, 
                                  const ProgramInfo *pginfo);

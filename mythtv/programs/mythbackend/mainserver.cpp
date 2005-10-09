@@ -2338,6 +2338,12 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         long long value = enc->GetMaxBitrate();
         encodeLongLong(retlist, value);
     }
+    else if (command == "GET_CURRENT_RECORDING")
+    {
+        ProgramInfo *info = enc->GetRecording();
+        info->ToStringList(retlist);
+        delete info;
+    }
     else if (command == "GET_KEYFRAME_POS")
     {
         long long desired = decodeLongLong(slist, 2);
@@ -2719,6 +2725,12 @@ void MainServer::HandleRemoteEncoder(QStringList &slist, QStringList &commands,
     {
         long long value = enc->GetMaxBitrate();
         encodeLongLong(retlist, value);
+    }
+    else if (command == "GET_CURRENT_RECORDING")
+    {
+        ProgramInfo *info = enc->GetRecording();
+        info->ToStringList(retlist);
+        delete info;
     }
 
     SendResponse(pbssock, retlist);

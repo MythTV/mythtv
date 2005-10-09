@@ -217,6 +217,26 @@ long long PlaybackSock::GetMaxBitrate(int capturecardnum)
     return ret;
 }
 
+/** \fn *PlaybackSock::GetRecording(int)
+ *  \brief Returns the ProgramInfo being used by any current recording.
+ *
+ *   Caller is responsible for deleting the ProgramInfo when done with it.
+ *  \param capturecardnum cardid of recorder
+ */
+ProgramInfo *PlaybackSock::GetRecording(int capturecardnum)
+{
+    QStringList strlist = QString("QUERY_REMOTEENCODER %1")
+        .arg(capturecardnum);
+
+    strlist << "GET_CURRENT_RECORDING";
+
+    SendReceiveStringList(strlist);
+
+    ProgramInfo *info = new ProgramInfo();
+    info->FromStringList(strlist, 0);
+    return info;
+}
+
 bool PlaybackSock::EncoderIsRecording(int capturecardnum, const ProgramInfo *pginfo)
 {
     QStringList strlist = QString("QUERY_REMOTEENCODER %1").arg(capturecardnum);

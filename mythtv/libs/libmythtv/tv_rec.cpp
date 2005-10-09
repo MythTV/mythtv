@@ -129,7 +129,6 @@ TVRec::TVRec(int capturecardnum)
       changeState(false), stateFlags(0), lastTuningRequest(0),
       // Current recording info
       curRecording(NULL), autoRunJobs(JOB_NONE),
-      inoverrecord(false), overrecordseconds(0),
       // Pending recording info
       pendingRecording(NULL),
       // RingBuffer info
@@ -397,15 +396,15 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         curRecording->chanid == rcinfo->chanid &&
         curRecording->startts == rcinfo->startts)
     {
-        curRecording->rectype = rcinfo->rectype;
+        int post_roll_seconds  = curRecording->recendts.secsTo(recordEndTime);
+        curRecording->rectype  = rcinfo->rectype;
         curRecording->recordid = rcinfo->recordid;
         curRecording->recendts = rcinfo->recendts;
         curRecording->UpdateRecordingEnd();
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
 
-        recordEndTime = curRecording->recendts;
-        inoverrecord = (recordEndTime < QDateTime::currentDateTime());
+        recordEndTime = curRecording->recendts.addSecs(post_roll_seconds);
 
         msg = QString("updating recording: %1 %2 %3 %4")
             .arg(curRecording->title).arg(curRecording->chanid)
@@ -427,20 +426,17 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     ClearFlags(kFlagAskAllowRecording);
 
-    if (inoverrecord)
+    // If in post-roll, end recording
+    if ((GetState() == kState_RecordingOnly) &&
+        (QDateTime::currentDateTime() >= recordEndTime))
     {
         ChangeState(kState_None);
-        // Flush out state change events
-        while (internalState != kState_None)
-            WaitForEventThreadSleep(false);
-        inoverrecord = false;
-    }
-    else
-    {
-        // Flush out flag changing events...
-        WaitForEventThreadSleep();
     }
 
+    // Flush out events...
+    WaitForEventThreadSleep();
+
+    // Request tuner from Live TV instance
     if (internalState == kState_WatchingLiveTV && 
         !HasFlags(kFlagCancelNextRecording))
     {
@@ -477,21 +473,19 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     if (internalState == kState_None)
     {
+        // Figure out new ringbuffer backing file name.
         QString rbBaseName = rcinfo->CreateRecordBasename(rbFileExt);
         rbFileName = QString("%1/%2").arg(recprefix).arg(rbBaseName);
-        recordEndTime = rcinfo->recendts;
-        curRecording = new ProgramInfo(*rcinfo);
 
-        overrecordseconds = overRecordSecNrml;
-        if (curRecording->category == overRecordCategory)
-        {
-            overrecordseconds = overRecordSecCat;
-            msg = QString("Show category '%1', desired postroll %2")
-                .arg(curRecording->category).arg(overrecordseconds);
-            VERBOSE(VB_RECORD, LOC + msg);
-        }
-        
+        // Add post-roll to new recording end time.
+        bool spcat = (rcinfo->category == overRecordCategory);
+        int secs = (spcat) ? overRecordSecCat : overRecordSecNrml;
+        recordEndTime = rcinfo->recendts.addSecs(secs);
+
+        // Tell event loop to begin recording.
+        curRecording = new ProgramInfo(*rcinfo);
         ChangeState(kState_RecordingOnly);
+
         retval = rsRecording;
     }
     else if (!HasFlags(kFlagCancelNextRecording))
@@ -502,7 +496,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
               .arg(rcinfo->recstartts.toString())
               .arg(rcinfo->recendts.toString())
               .arg(StateToString(internalState));
-        if (curRecording)
+        if (curRecording && internalState == kState_RecordingOnly)
             msg += QString("\t\t\tCurrently recording: %1 %2 %3 %4")
                 .arg(curRecording->title).arg(curRecording->chanid)
                 .arg(curRecording->recstartts.toString())
@@ -1181,14 +1175,20 @@ void TVRec::RunTV(void)
 
         // If we are recording a program, check if the recording is
         // over or someone has asked us to finish the recording.
-        // If so, then we enter overrecord if overrecordseconds > 0
-        // otherwise we queue up the state change to kState_None.
-        if (StateIsRecording(internalState))
+        if (GetState() == kState_RecordingOnly &&
+            (QDateTime::currentDateTime() > recordEndTime ||
+             HasFlags(kFlagFinishRecording)))
         {
+            ChangeState(kState_None);
+            doSleep = false;
+            ClearFlags(kFlagFinishRecording);
+        }
+
 #if 0
-            // This is debugging code for ProgramInfo/RingBuffer
-            // switching code. It will only work once per startup
-            // of mythbackend.
+        // This is debugging code for ProgramInfo/RingBuffer switching code.
+        // It will only work once per startup of mythbackend.
+        if (GetState() == kState_RecordingOnly)
+        {
             QDateTime switchTime = curRecording->recstartts.addSecs(15);
             static bool rbSwitched = false;
             if ((QDateTime::currentDateTime() > switchTime) && !rbSwitched)
@@ -1198,27 +1198,8 @@ void TVRec::RunTV(void)
                 recorder->SetNextRecording(curRecording, rb);
                 rbSwitched = true;
             }
-#endif
-            if (QDateTime::currentDateTime() > recordEndTime ||
-                HasFlags(kFlagFinishRecording))
-            {
-                if (!inoverrecord && overrecordseconds > 0)
-                {
-                    recordEndTime = recordEndTime.addSecs(overrecordseconds);
-                    inoverrecord = true;
-                    QString msg = QString(
-                        "Switching to overrecord for %1 more seconds")
-                        .arg(overrecordseconds);
-                    VERBOSE(VB_RECORD, LOC + msg);
-                }
-                else
-                {
-                    ChangeState(RemoveRecording(internalState));
-                    doSleep = false;
-                }
-                ClearFlags(kFlagFinishRecording);
-            }
         }
+#endif
 
         // Check for ExitPlayer flag, and if set change to a non-watching
         // state (either kState_RecordingOnly or kState_None).

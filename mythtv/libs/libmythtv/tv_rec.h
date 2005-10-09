@@ -384,7 +384,6 @@ class TVRec : public QObject
     ProgramInfo *curRecording;
     QDateTime    recordEndTime;
     int          autoRunJobs;
-    bool         inoverrecord;
     int          overrecordseconds;
 
     // Pending recording info
