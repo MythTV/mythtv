@@ -3513,7 +3513,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         if (signalMonitor)
         {
             signalMonitor->SetUpdateRate(kSignalMonitoringRate);
-            signalMonitor->SetNotifyFrontend(true);
+            signalMonitor->SetNotifyFrontend(request.flags & kFlagLiveTV);
 
             if (request.flags & kFlagEITScan)
             {
