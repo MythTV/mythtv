@@ -1,6 +1,7 @@
 /**
  *  FirewireChannel
  *  Copyright (c) 2005 by Jim Westfall
+ *  SA3250HD support Copyright (c) 2005 by Matt Porter
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
@@ -24,6 +25,15 @@ using namespace std;
         AVC1394_SUBUNIT_ID_0 | AVC1394_6200_COMMAND_CHANNEL | \
         AVC1394_6200_OPERAND_SET
 
+// SA3250HD defines
+#define AVC1394_SA3250_COMMAND_CHANNEL		0x000007c00
+#define AVC1394_SA3250_OPERAND_KEY_PRESS	0xe7
+#define AVC1394_SA3250_OPERAND_KEY_RELEASE	0x67
+
+#define SA3250_CMD0 (AVC1394_CTYPE_CONTROL | AVC1394_SUBUNIT_TYPE_PANEL | \
+                     AVC1394_SUBUNIT_ID_0 | AVC1394_SA3250_COMMAND_CHANNEL)
+#define SA3250_CMD1 (0x04 << 24)
+#define SA3250_CMD2 0xff000000
 
 class FirewireChannel : public ChannelBase
 {

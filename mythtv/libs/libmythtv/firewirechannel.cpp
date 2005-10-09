@@ -1,6 +1,7 @@
 /**
  *  FirewireChannel
  *  Copyright (c) 2005 by Jim Westfall
+ *  SA3250HD support Copyright (c) 2005 by Matt Porter
  *  Distributed as part of MythTV under GPL v2 and later.
  */
 
@@ -23,7 +24,7 @@ FirewireChannel::FirewireChannel(FireWireDBOptions firewire_opts, TVRec *parent)
 
     if (externalChanger[currentcapchannel].isEmpty())
     {
-        if (fw_opts.model == "DCT-6200")
+        if ((fw_opts.model == "DCT-6200") || (fw_opts.model == "SA3250HD"))
         {
             if ((fwhandle = raw1394_new_handle_on_port(fw_opts.port)) == NULL)
             {
@@ -40,7 +41,7 @@ FirewireChannel::FirewireChannel(FireWireDBOptions firewire_opts, TVRec *parent)
         else
         {
             VERBOSE(VB_IMPORTANT, "FireWireChannel: internal channel "
-                    "changer only supported by DCT-6200 models");
+                    "changer only supported by DCT-6200 and SA3250HD models");
         }
     }
 }
@@ -58,7 +59,7 @@ bool FirewireChannel::SetChannelByString(const QString &chan)
 {
      int dig[3];
      int channel = chan.toInt();
-     quadlet_t cmd[2];
+     quadlet_t cmd[3];
 
      inputChannel[currentcapchannel] = chan;
      curchannelname = chan;
@@ -86,6 +87,34 @@ bool FirewireChannel::SetChannelByString(const QString &chan)
                 usleep(500000);
             }
          }
+	 else if (isopen && fw_opts.model == "SA3250HD")
+	 {
+	    dig[2] |= 0x30;
+	    dig[1] |= 0x30;
+	    dig[0] |= 0x30;
+
+	    cmd[0] = SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_PRESS;
+	    cmd[1] = SA3250_CMD1 | (dig[0] << 16) | (dig[1] << 8) | dig[2];
+	    cmd[2] = SA3250_CMD2;
+            VERBOSE(VB_GENERAL, QString("FireWireChannel: channel:%1%2%3 "
+                                        "cmds: 0x%4, 0x%5, 0x%6")
+                    .arg(dig[0] & 0xf).arg(dig[1] & 0xf)
+                    .arg(dig[2] & 0xf).arg(cmd[0], 0, 16)
+                    .arg(cmd[1], 0, 16)
+                    .arg(cmd[2], 0, 16));
+
+	    avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1);
+
+	    cmd[0] = SA3250_CMD0 | AVC1394_SA3250_OPERAND_KEY_RELEASE;
+            VERBOSE(VB_GENERAL, QString("FireWireChannel: channel:%1%2%3 "
+                                        "cmds: 0x%4, 0x%5, 0x%6")
+                    .arg(dig[0] & 0xf).arg(dig[1] & 0xf)
+                    .arg(dig[2] & 0xf).arg(cmd[0], 0, 16)
+                    .arg(cmd[1], 0, 16)
+                    .arg(cmd[2], 0, 16));
+
+	    avc1394_transaction_block(fwhandle, fw_opts.node, cmd, 3, 1);
+	 }
          else
          {
              VERBOSE(VB_IMPORTANT, "FireWireChannel: internal channel "

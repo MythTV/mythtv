@@ -1,0 +1,25 @@
+sa3250ch is a small program that changes channels on a Scientific Atlanta
+SA3250HD cable box via a 1394 (aka. Firewire) connection. It is based off
+of 6200ch by Stacey Son (mythdev@son.org).
+
+To use this with mythtv do the following:
+
+(1) Make sure you have 1394/Firewire drivers installed in your kernel.
+
+(2) Install libraw1394, librom1394 and libavc1394.
+
+(3) Compile and install "sa3250ch":
+
+      # cc -o sa3250ch sa3250ch.c -lrom1394 -lavc1394 -lraw1394
+      # cp sa3250ch /usr/local/bin
+
+(4) Connect a 1394/Firewire cable from your computer to your SA3250HD and test:
+
+      # sa3250ch <your_favorite_channel_number>
+
+(5) Configure Mythtv to use the channel changer by running the "setup" program and adding to "/usr/local/bin/sa3250ch" to the "External channel change command" field under "Connect source to Input".
+
+I'm curious if this works for anybody on other SciAtl boxes when the proper
+model IDs are added.
+
+Matt Porter <mporter@kernel.crashing.org>
