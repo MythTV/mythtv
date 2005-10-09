@@ -137,11 +137,12 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare(
-            "SELECT channum "
+            "SELECT channum, mplexid "
             "FROM channel, cardinput, capturecard "
             "WHERE cardinput.sourceid = channel.sourceid AND "
             "      capturecard.cardid = cardinput.cardid AND "
             "      channel.mplexid      IS NOT NULL      AND "
+            "      useonairguide      = 1                AND "
             "      cardinput.cardid   = :CARDID "
             "ORDER BY cardinput.sourceid, atscsrcid");
         query.bindValue(":CARDID", rec->GetCaptureCardNum());
@@ -152,8 +153,32 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
             return;
         }
 
+        // TODO make scan work with cards with multiple inputs
+        QMap<uint, MythDeque<QString> > chanByMplex;
         while (query.next())
-            activeScanChannels << query.value(0).toString();
+        {
+            uint mplexid = query.value(1).toUInt();
+            QString channum = query.value(0).toString();
+            chanByMplex[mplexid].push_back(channum);
+        }
+
+        // This creates a list of channels that visit each multiplex 
+        // as often and as soon as possible, but still ensures that
+        // each channel is visited individually.
+        QValueList<uint> keyList = chanByMplex.keys();
+        QValueList<uint>::iterator curMplex = keyList.begin();
+        int i = 0;
+        while (i < query.size())
+        {
+            if (chanByMplex[*curMplex].size() != 0)
+            {
+                activeScanChannels << chanByMplex[*curMplex].front();
+                chanByMplex[*curMplex].pop_front();
+                i++;
+            }
+            if (++curMplex == keyList.end())
+                curMplex = keyList.begin();
+        }
         activeScanNextChan = activeScanChannels.begin();
     }
 
