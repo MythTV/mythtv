@@ -826,7 +826,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
                                                  bool test_surface)
 {
     (void)width, (void)height, (void)osd_width, (void)osd_height;
-    (void)stream_type, (void)xvmc_chroma;
+    (void)stream_type, (void)xvmc_chroma, (void)test_surface;
 #ifdef USING_XVMC
     Display *disp;
     X11S(disp = XOpenDisplay(NULL));

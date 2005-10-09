@@ -53,7 +53,7 @@ int pp(VideoFilter *vf, VideoFrame *frame)
     pp_postprocess( tf->src, tf->srcStride,
                     tf->dst, tf->dstStride,
                     frame->width, frame->height,
-                    frame->qscale_table, frame->qstride,
+                    (signed char *)(frame->qscale_table), frame->qstride,
                     tf->mode, tf->context, PP_FORMAT_420);
 
     TF_END(tf, "PostProcess: ");

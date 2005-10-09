@@ -869,7 +869,7 @@ void DataDirectStationUpdate(Source source)
             }
 
             // The channel doesn't exist in the DB, insert it...
-            int mplexid = -1, majorC, minorC, chanid;
+            int mplexid = -1, majorC, minorC, chanid = 0;
             long long freq;
             get_atsc_stuff(channum, source.id, freqid,
                            majorC, minorC, freq);
@@ -2167,7 +2167,7 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
             {
                 // We only do this if we are not asked to skip it with the
                 // --updating flag.
-                int mplexid, chanid;
+                int mplexid = 0, chanid = 0;
                 if (minor > 0)
                 {
                     mplexid = ChannelUtil::CreateMultiplex(
