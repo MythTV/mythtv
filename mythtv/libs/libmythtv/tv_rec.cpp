@@ -3481,18 +3481,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         return;
     }
 
-    // Setup for framebuffer capture devices..
-    SetVideoFiltersForChannel(channel, channel->GetCurrentName());
-#ifdef USING_V4L
-    if (GetV4LChannel())
-    {
-        channel->SetBrightness();
-        channel->SetContrast();
-        channel->SetColour();
-        channel->SetHue();
-    }
-#endif // USING_V4L
-
     // Start dummy recorder for devices capable of signal monitoring.
     bool use_sm = SignalMonitor::IsSupported(genOpt.cardtype);
     bool livetv = request.flags & kFlagLiveTV;
@@ -3750,8 +3738,25 @@ void TVRec::TuningNewRecorder(void)
     }
 
     recorder->SetRecording(lastTuningRequest.program);
+
+    // Setup for framebuffer capture devices..
+    if (channel)
+        SetVideoFiltersForChannel(channel, channel->GetCurrentName());
+
     if (GetV4LChannel())
+    {
+#ifdef USING_V4L 
+        if (channel)
+        {
+            channel->SetBrightness();
+            channel->SetContrast();
+            channel->SetColour();
+            channel->SetHue();
+        }
+#endif
         CloseChannel();
+    }
+
     pthread_create(&recorder_thread, NULL, TVRec::RecorderThread, recorder);
 
     // Wait for recorder to start.
