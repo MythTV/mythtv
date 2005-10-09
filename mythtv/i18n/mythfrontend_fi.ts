@@ -314,6 +314,32 @@
     </message>
 </context>
 <context>
+    <name>DTVSignalMonitor</name>
+    <message>
+        <source>Seen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVBSignalMonitor</name>
+    <message>
+        <source>Signal To Noise</source>
+        <translation type="unfinished">Kohinasuhde</translation>
+    </message>
+    <message>
+        <source>Bit Error Rate</source>
+        <translation type="unfinished">Virhetaajuus</translation>
+    </message>
+    <message>
+        <source>Uncorrected Blocks</source>
+        <translation type="unfinished">Korjaamattomia Jaksoja</translation>
+    </message>
+</context>
+<context>
     <name>DVBTransportsEditor</name>
     <message>
         <source>DVB Transport Editor</source>
@@ -785,7 +811,7 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Recording Group View</source>
-        <translation>Nauhoituksen Ryhmä</translation>
+        <translation type="obsolete">Nauhoituksen Ryhmä</translation>
     </message>
     <message>
         <source>OK</source>
@@ -977,7 +1003,7 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Group</source>
-        <translation>Ryhmä</translation>
+        <translation type="obsolete">Ryhmä</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -1022,6 +1048,26 @@ Palaa edelliseen valikkoon.</translation>
     <message>
         <source>Show Recording Groups only</source>
         <translation>Vain Nauhoitusryhmät</translation>
+    </message>
+    <message>
+        <source>Select Group Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Categories</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1624,7 +1670,7 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
-        <translation>Haluttu kieli.</translation>
+        <translation type="obsolete">Haluttu kieli.</translation>
     </message>
     <message>
         <source>Setup Pin Code</source>
@@ -2453,11 +2499,11 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Deleted</source>
-        <translation>Poistettu</translation>
+        <translation type="obsolete">Poistettu</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation>Pysäytetty</translation>
+        <translation type="obsolete">Pysäytetty</translation>
     </message>
     <message>
         <source>Recorded</source>
@@ -2497,11 +2543,11 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation>Tämä ohjelma nauhoitettiin, mutta perutettiin ennenkuin nauhoitus oli saatu päätökseen.</translation>
+        <translation type="obsolete">Tämä ohjelma nauhoitettiin, mutta perutettiin ennenkuin nauhoitus oli saatu päätökseen.</translation>
     </message>
     <message>
         <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation>Tämä ohjelma nauhoitettiin, mutta poistettiin ennenkuin nauhoitus oli saatu päätökseen.</translation>
+        <translation type="obsolete">Tämä ohjelma nauhoitettiin, mutta poistettiin ennenkuin nauhoitus oli saatu päätökseen.</translation>
     </message>
     <message>
         <source>The status of this showing is unknown.</source>
@@ -2533,7 +2579,7 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>it was manually cancelled.</source>
-        <translation>se oli peruttu manuaalisesti.</translation>
+        <translation type="obsolete">se oli peruttu manuaalisesti.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -2649,7 +2695,7 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Frequency ID</source>
-        <translation>Taajuus ID</translation>
+        <translation type="obsolete">Taajuus ID</translation>
     </message>
     <message>
         <source>Finetune</source>
@@ -2850,11 +2896,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation>Signaali/Kohina</translation>
+        <translation type="obsolete">Signaali/Kohina</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation>Signaalin Voimakkuus</translation>
+        <translation type="obsolete">Signaalin Voimakkuus</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -2958,7 +3004,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Status</source>
-        <translation>Tila</translation>
+        <translation type="obsolete">Tila</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
@@ -3102,7 +3148,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Save original files after transcoding</source>
-        <translation>Tallenna alkuperäiset tiedostot jälkikäsittelyn jälkeen</translation>
+        <translation type="obsolete">Tallenna alkuperäiset tiedostot jälkikäsittelyn jälkeen</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
@@ -3610,7 +3656,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>LCD Displays Time</source>
-        <translation>LCD Näyttää Aikaa</translation>
+        <translation type="obsolete">LCD Näyttää Aikaa</translation>
     </message>
     <message>
         <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
@@ -3618,7 +3664,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>LCD Displays Menus</source>
-        <translation>LCD Näyttää Valikon</translation>
+        <translation type="obsolete">LCD Näyttää Valikon</translation>
     </message>
     <message>
         <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
@@ -3626,7 +3672,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>LCD Displays Music Artist and Title</source>
-        <translation>LCD Tulostaa Artistin ja Laulun Nimen</translation>
+        <translation type="obsolete">LCD Tulostaa Artistin ja Laulun Nimen</translation>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
@@ -3634,7 +3680,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>LCD Displays Channel Information</source>
-        <translation>LCD Näyttää Kanavatietoja</translation>
+        <translation type="obsolete">LCD Näyttää Kanavatietoja</translation>
     </message>
     <message>
         <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
@@ -3642,7 +3688,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>LCD Displays Volume Information</source>
-        <translation>LCD Näyttää Äänenvoimakkuuden</translation>
+        <translation type="obsolete">LCD Näyttää Äänenvoimakkuuden</translation>
     </message>
     <message>
         <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
@@ -3650,7 +3696,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>LCD Displays Generic Information</source>
-        <translation>LCD Näyttää Yleisiä Tietoja</translation>
+        <translation type="obsolete">LCD Näyttää Yleisiä Tietoja</translation>
     </message>
     <message>
         <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
@@ -4431,7 +4477,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>LCD Backlight Always On</source>
-        <translation>LCD Taustavalo Aina Päällä</translation>
+        <translation type="obsolete">LCD Taustavalo Aina Päällä</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
@@ -5187,15 +5233,15 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation>Poistetaanko kaikki korttitiedot ennenkuin siirrytään asetuksiin?</translation>
+        <translation type="obsolete">Poistetaanko kaikki korttitiedot ennenkuin siirrytään asetuksiin?</translation>
     </message>
     <message>
         <source>No, leave my card settings alone</source>
-        <translation>Ei, jätä korttitiedot</translation>
+        <translation type="obsolete">Ei, jätä korttitiedot</translation>
     </message>
     <message>
         <source>Yes, delete my card settings</source>
-        <translation>Kyllä, poista korttitiedot</translation>
+        <translation type="obsolete">Kyllä, poista korttitiedot</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
@@ -5331,15 +5377,15 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation>Poistetaanko kaikki kanavapaikkojen tiedot ennenkuin siirrytään asetuksiin? Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
+        <translation type="obsolete">Poistetaanko kaikki kanavapaikkojen tiedot ennenkuin siirrytään asetuksiin? Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>No, leave my channel settings alone</source>
-        <translation>Ei, jätä kanavatiedot</translation>
+        <translation type="obsolete">Ei, jätä kanavatiedot</translation>
     </message>
     <message>
         <source>Yes, delete my channel settings</source>
-        <translation>Kyllä, poista kanavatiedot</translation>
+        <translation type="obsolete">Kyllä, poista kanavatiedot</translation>
     </message>
     <message>
         <source>Scan for channels(s)</source>
@@ -5487,7 +5533,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
-        <translation>Nauhoita TS PS:n sijasta.</translation>
+        <translation type="obsolete">Nauhoita TS PS:n sijasta.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
@@ -5641,12 +5687,12 @@ Myth will now exit.</translation>
     <message>
         <source>D</source>
         <comment>RecStatusChar rsDeleted</comment>
-        <translation>D</translation>
+        <translation type="obsolete">D</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecStatusChar rsStopped</comment>
-        <translation>S</translation>
+        <translation type="obsolete">S</translation>
     </message>
     <message>
         <source>R</source>
@@ -6130,68 +6176,16 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
         <translation>Signaalin Teho</translation>
     </message>
     <message>
-        <source>Seen PAT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen PMT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen MGT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen VCT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen NIT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen SDT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching PAT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching PMT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching MGT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching VCT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching NIT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching SDT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Program #%1 not found in PAT!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Signal To Noise</source>
-        <translation>Kohinasuhde</translation>
+        <translation type="obsolete">Kohinasuhde</translation>
     </message>
     <message>
         <source>Bit Error Rate</source>
-        <translation>Virhetaajuus</translation>
+        <translation type="obsolete">Virhetaajuus</translation>
     </message>
     <message>
         <source>Uncorrected Blocks</source>
-        <translation>Korjaamattomia Jaksoja</translation>
+        <translation type="obsolete">Korjaamattomia Jaksoja</translation>
     </message>
     <message>
         <source>Failed to Reinit Video.</source>
@@ -6225,7 +6219,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation>Selaa</translation>
+        <translation type="obsolete">Selaa</translation>
     </message>
     <message>
         <source>ATSC Channel %1</source>
@@ -6534,7 +6528,7 @@ WARNING: Enabling this option will disable XvMC video output.</source>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic.</source>
-        <translation>MythMusic näyttää esittäjän ja kappaleen nimen.</translation>
+        <translation type="obsolete">MythMusic näyttää esittäjän ja kappaleen nimen.</translation>
     </message>
     <message>
         <source>Items</source>
@@ -6554,23 +6548,23 @@ WARNING: Enabling this option will disable XvMC video output.</source>
     </message>
     <message>
         <source>Display tuned channel information.</source>
-        <translation>Näyttää kanavatietoja.</translation>
+        <translation type="obsolete">Näyttää kanavatietoja.</translation>
     </message>
     <message>
         <source>Display volume level information.</source>
-        <translation>Näyttää äänenvoimakkuuden.</translation>
+        <translation type="obsolete">Näyttää äänenvoimakkuuden.</translation>
     </message>
     <message>
         <source>Display generic information.</source>
-        <translation>Näyttää yleisiä tietoja.</translation>
+        <translation type="obsolete">Näyttää yleisiä tietoja.</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently.</source>
-        <translation>Taustavalo jatkuvasti päällä.</translation>
+        <translation type="obsolete">Taustavalo jatkuvasti päällä.</translation>
     </message>
     <message>
         <source>LCD HeartBeat Always On</source>
-        <translation>LCD:n sydänlyönnit aina päällä</translation>
+        <translation type="obsolete">LCD:n sydänlyönnit aina päällä</translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat</source>
@@ -6781,7 +6775,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk of processing errors.</source>
-        <translation>Poistaa käytöstä Lähetysvirran (TS) muuntamisen Ohjelmavirraksi (PS). Lähetysvirran nauhoitus aiheuttaa isommat tiedostokoot, mutta vähentää virheitä.</translation>
+        <translation type="obsolete">Poistaa käytöstä Lähetysvirran (TS) muuntamisen Ohjelmavirraksi (PS). Lähetysvirran nauhoitus aiheuttaa isommat tiedostokoot, mutta vähentää virheitä.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
@@ -6835,6 +6829,230 @@ Myth lopetetaan.</translation>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Number of bonus points to be added to any recording on this channel during scheduling.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a positive number as the rank if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image file to use as the icon for this channel on various MythTV displays.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation type="unfinished">tai</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecStatusChar rsAborted</comment>
+        <translation type="unfinished">A</translation>
+    </message>
+    <message>
+        <source>M</source>
+        <comment>RecStatusChar rsMissed</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation type="unfinished">Keskeytetty</translation>
+    </message>
+    <message>
+        <source>Missed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was recorded but was aborted before recording was completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was not recorded because it was scheduled after it would have ended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was not recorded because it was manually cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Ending Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period (5.1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store recordings in TS format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt for initial group filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lowest Priority First</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred language for the user interface.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide Language #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your #%1 preferred language for Program Guide Data and captions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Recording Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display current recordings information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Menus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Music Artist and Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display playing artist and song title in MythMusic on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Channel Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display tuned channel information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Volume Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display volume level information on LCD display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Generic Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display generic information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backlight Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the backlight permanently on the LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HeartBeat Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Key order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save original files after transcoding (globally)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card
+settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program data and channel settings before starting 
+configuration? This will not affect any existing recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV has detected that the backend is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing existing card inputs, deleting anything,or scanning for channels may not work.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -6856,6 +7074,30 @@ Myth lopetetaan.</translation>
     <message>
         <source>Cancel</source>
         <translation>Peruuta</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Tila</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished">Selaa</translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation type="unfinished">Signaalin Voimakkuus</translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation type="unfinished">Signaali/Kohina</translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished">Ei Lukitusta</translation>
     </message>
 </context>
 <context>
@@ -7490,19 +7732,59 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Next Audio Track</source>
-        <translation>Seuraava Ääniraita</translation>
+        <translation type="obsolete">Seuraava Ääniraita</translation>
     </message>
     <message>
         <source>Channel Lock</source>
-        <translation>Kanava Lukittu</translation>
+        <translation type="obsolete">Kanava Lukittu</translation>
     </message>
     <message>
         <source>Signal Lock</source>
-        <translation>Signaali Lukittu</translation>
+        <translation type="obsolete">Signaali Lukittu</translation>
     </message>
     <message>
         <source>No Lock</source>
         <translation>Ei Lukitusta</translation>
+    </message>
+    <message>
+        <source>Jump to Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Partial Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change input&apos;s (%3), capture cards (%4), etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
+        <translation type="unfinished">Manuaalinen Nauhoitus</translation>
+    </message>
+    <message>
+        <source>Previous Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Audio Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle track</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

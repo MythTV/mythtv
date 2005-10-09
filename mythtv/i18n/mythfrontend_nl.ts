@@ -315,6 +315,32 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     </message>
 </context>
 <context>
+    <name>DTVSignalMonitor</name>
+    <message>
+        <source>Seen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVBSignalMonitor</name>
+    <message>
+        <source>Signal To Noise</source>
+        <translation type="unfinished">Signaal-Ruis verhouding</translation>
+    </message>
+    <message>
+        <source>Bit Error Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uncorrected Blocks</source>
+        <translation type="unfinished">Niet gecorrigeerde blokken.</translation>
+    </message>
+</context>
+<context>
     <name>DVBTransportsEditor</name>
     <message>
         <source>DVB Transport Editor</source>
@@ -762,7 +788,7 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>Recording Group View</source>
-        <translation>Groepsweergave</translation>
+        <translation type="obsolete">Groepsweergave</translation>
     </message>
     <message>
         <source>OK</source>
@@ -954,7 +980,7 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>Group</source>
-        <translation>Groep</translation>
+        <translation type="obsolete">Groep</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -999,6 +1025,26 @@ Terug naar het vorige menu.</translation>
     <message>
         <source>Show Recording Groups only</source>
         <translation>Laat alleen Opname groepen zien</translation>
+    </message>
+    <message>
+        <source>Select Group Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Categories</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1600,7 +1646,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Your preferred language.</source>
-        <translation>De taal van uw keuze.</translation>
+        <translation type="obsolete">De taal van uw keuze.</translation>
     </message>
     <message>
         <source>Setup Pin Code</source>
@@ -2430,11 +2476,11 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Deleted</source>
-        <translation>Gewist</translation>
+        <translation type="obsolete">Gewist</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation>Gestopt</translation>
+        <translation type="obsolete">Gestopt</translation>
     </message>
     <message>
         <source>Recorded</source>
@@ -2474,11 +2520,11 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation>Deze uitzending werd opgenomen maar gestopt voordat ze afgelopen was.</translation>
+        <translation type="obsolete">Deze uitzending werd opgenomen maar gestopt voordat ze afgelopen was.</translation>
     </message>
     <message>
         <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation>Deze uitzending werd opgenomen maar was verwijderd voordat ze afgelopen was.</translation>
+        <translation type="obsolete">Deze uitzending werd opgenomen maar was verwijderd voordat ze afgelopen was.</translation>
     </message>
     <message>
         <source>The status of this showing is unknown.</source>
@@ -2510,7 +2556,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>it was manually cancelled.</source>
-        <translation>ze handmating onderbroken is.</translation>
+        <translation type="obsolete">ze handmating onderbroken is.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -2626,7 +2672,7 @@ Opmerking: Niet te laag zetten.</translation>
     </message>
     <message>
         <source>Frequency ID</source>
-        <translation>Frequentie ID</translation>
+        <translation type="obsolete">Frequentie ID</translation>
     </message>
     <message>
         <source>Finetune</source>
@@ -2830,11 +2876,11 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation>Signaal/Ruis</translation>
+        <translation type="obsolete">Signaal/Ruis</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation>Signaalsterkte</translation>
+        <translation type="obsolete">Signaalsterkte</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -2930,7 +2976,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Status</source>
-        <translation>Status</translation>
+        <translation type="obsolete">Status</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
@@ -3076,7 +3122,7 @@ Als u een antenne heeft, gebruik dan een &quot;-bcast&quot; frequentie.</transla
     </message>
     <message>
         <source>Save original files after transcoding</source>
-        <translation>Bewaar originele bestanden na transcode</translation>
+        <translation type="obsolete">Bewaar originele bestanden na transcode</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
@@ -3581,7 +3627,7 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>LCD Displays Time</source>
-        <translation>LCD toont Tijd</translation>
+        <translation type="obsolete">LCD toont Tijd</translation>
     </message>
     <message>
         <source>Display current time on idle LCD display. Need to restart mythfrontend to (de)activate it.</source>
@@ -3589,7 +3635,7 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>LCD Displays Menus</source>
-        <translation>LCD toont Menu</translation>
+        <translation type="obsolete">LCD toont Menu</translation>
     </message>
     <message>
         <source>Display selected menu on LCD display. Need to restart mythfrontend to (de)activate it.</source>
@@ -3597,7 +3643,7 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>LCD Displays Music Artist and Title</source>
-        <translation>LCD toont Muziek Artiest en Titel</translation>
+        <translation type="obsolete">LCD toont Muziek Artiest en Titel</translation>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic. Need to restart mythfrontend to (de)activate it.</source>
@@ -3605,7 +3651,7 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>LCD Displays Channel Information</source>
-        <translation>LCD toont Zenderinformatie</translation>
+        <translation type="obsolete">LCD toont Zenderinformatie</translation>
     </message>
     <message>
         <source>Display tuned channel information. Need to restart mythfrontend to (de)activate it.</source>
@@ -3613,7 +3659,7 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>LCD Displays Volume Information</source>
-        <translation>LCD toont Volume Informatie</translation>
+        <translation type="obsolete">LCD toont Volume Informatie</translation>
     </message>
     <message>
         <source>Display volume level information. Need to restart mythfrontend to (de)activate it.</source>
@@ -3621,7 +3667,7 @@ Best in te schakelen wanneer u interlaced video wil encoderen.</translation>
     </message>
     <message>
         <source>LCD Displays Generic Information</source>
-        <translation>LCD toont Algemene Informatie</translation>
+        <translation type="obsolete">LCD toont Algemene Informatie</translation>
     </message>
     <message>
         <source>Display generic information. Need to restart mythfrontend to (de)activate it.</source>
@@ -4351,7 +4397,7 @@ Wanneer &quot;Bureaublad Stijl&quot; wordt geselecteerd zal MythTV de huidige in
     </message>
     <message>
         <source>LCD Backlight Always On</source>
-        <translation>Achtergrondlicht LCD altijd aan</translation>
+        <translation type="obsolete">Achtergrondlicht LCD altijd aan</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently. Need to restart mythfrontend to (de)activate it.</source>
@@ -5098,15 +5144,15 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation>Wil u alle TV-kaart instellingen verwijderen vooraleer te starten met de configuratie?</translation>
+        <translation type="obsolete">Wil u alle TV-kaart instellingen verwijderen vooraleer te starten met de configuratie?</translation>
     </message>
     <message>
         <source>No, leave my card settings alone</source>
-        <translation>Nee, laat mijn TV-kaart instellingen met rust</translation>
+        <translation type="obsolete">Nee, laat mijn TV-kaart instellingen met rust</translation>
     </message>
     <message>
         <source>Yes, delete my card settings</source>
-        <translation>Ja, verwijder mijn TV-kaart instellingen</translation>
+        <translation type="obsolete">Ja, verwijder mijn TV-kaart instellingen</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
@@ -5242,15 +5288,15 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation>Wil u alle programmadata en zenderinstellingen wissen voordat u de configuratie start? Dit heeft geen invloed op reeds opgenomen programma s.</translation>
+        <translation type="obsolete">Wil u alle programmadata en zenderinstellingen wissen voordat u de configuratie start? Dit heeft geen invloed op reeds opgenomen programma s.</translation>
     </message>
     <message>
         <source>No, leave my channel settings alone</source>
-        <translation>Nee, laat mijn zenderinstellingen met rust</translation>
+        <translation type="obsolete">Nee, laat mijn zenderinstellingen met rust</translation>
     </message>
     <message>
         <source>Yes, delete my channel settings</source>
-        <translation>Ja, verwijder mijn zenderinstellingen</translation>
+        <translation type="obsolete">Ja, verwijder mijn zenderinstellingen</translation>
     </message>
     <message>
         <source>Scan for channels(s)</source>
@@ -5398,7 +5444,7 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
-        <translation>Neem op in TS formaat i.p.v. PS.</translation>
+        <translation type="obsolete">Neem op in TS formaat i.p.v. PS.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
@@ -5560,12 +5606,12 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     <message>
         <source>D</source>
         <comment>RecStatusChar rsDeleted</comment>
-        <translation>D</translation>
+        <translation type="obsolete">D</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecStatusChar rsStopped</comment>
-        <translation>S</translation>
+        <translation type="obsolete">S</translation>
     </message>
     <message>
         <source>R</source>
@@ -6116,68 +6162,12 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat het op Auto staan,
         <translation>Signaal Sterkte</translation>
     </message>
     <message>
-        <source>Seen PAT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen PMT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen MGT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen VCT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen NIT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Seen SDT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching PAT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching PMT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching MGT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching VCT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching NIT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Matching SDT</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Program #%1 not found in PAT!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Signal To Noise</source>
-        <translation>Signaal-Ruis verhouding</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Signaal-Ruis verhouding</translation>
     </message>
     <message>
         <source>Uncorrected Blocks</source>
-        <translation>Niet gecorrigeerde blokken.</translation>
+        <translation type="obsolete">Niet gecorrigeerde blokken.</translation>
     </message>
     <message>
         <source>Failed to Reinit Video.</source>
@@ -6211,7 +6201,7 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat het op Auto staan,
     </message>
     <message>
         <source>Scan</source>
-        <translation>Zoek</translation>
+        <translation type="obsolete">Zoek</translation>
     </message>
     <message>
         <source>ATSC Channel %1</source>
@@ -6517,7 +6507,7 @@ WAARSCHUWING: Dit inschakelen zal de XvMC video uitgang uitschakelen.</translati
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic.</source>
-        <translation>Laat de artiest en titel van het liedje zien in MythMusic</translation>
+        <translation type="obsolete">Laat de artiest en titel van het liedje zien in MythMusic</translation>
     </message>
     <message>
         <source>Items</source>
@@ -6537,23 +6527,23 @@ WAARSCHUWING: Dit inschakelen zal de XvMC video uitgang uitschakelen.</translati
     </message>
     <message>
         <source>Display tuned channel information.</source>
-        <translation>Laat informatie zien over het geselecteerde kanaal</translation>
+        <translation type="obsolete">Laat informatie zien over het geselecteerde kanaal</translation>
     </message>
     <message>
         <source>Display volume level information.</source>
-        <translation>Laat volume informatie zien.</translation>
+        <translation type="obsolete">Laat volume informatie zien.</translation>
     </message>
     <message>
         <source>Display generic information.</source>
-        <translation>Laat algemene informatie zien.</translation>
+        <translation type="obsolete">Laat algemene informatie zien.</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently.</source>
-        <translation>Zet de verlichting permanent aan.</translation>
+        <translation type="obsolete">Zet de verlichting permanent aan.</translation>
     </message>
     <message>
         <source>LCD HeartBeat Always On</source>
-        <translation>Zet de LCD hartslag altijd aan</translation>
+        <translation type="obsolete">Zet de LCD hartslag altijd aan</translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information.</source>
@@ -6760,7 +6750,7 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk of processing errors.</source>
-        <translation>Schakelt de conversie van Transport Stream naar Program Stream uit. TS opnames leveren iets grotere bestanden op, maar reduceren het risico op fouten.</translation>
+        <translation type="obsolete">Schakelt de conversie van Transport Stream naar Program Stream uit. TS opnames leveren iets grotere bestanden op, maar reduceren het risico op fouten.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
@@ -6814,6 +6804,230 @@ Myth zal nu afsluiten.</translation>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
         <translation>Een command dat moet worden uitgevoerd voordat de backend uitschakeld. De teruggeven waarde bepaald of de backend uit mag schakelen. 0 - Ja, 1 - opnieuw starten, 2 - laat de backend wachten op een frontend.</translation>
     </message>
+    <message>
+        <source>Number of bonus points to be added to any recording on this channel during scheduling.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a positive number as the rank if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image file to use as the icon for this channel on various MythTV displays.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation type="unfinished">of</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecStatusChar rsAborted</comment>
+        <translation type="unfinished">A</translation>
+    </message>
+    <message>
+        <source>M</source>
+        <comment>RecStatusChar rsMissed</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation type="unfinished">Afgebroken</translation>
+    </message>
+    <message>
+        <source>Missed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was recorded but was aborted before recording was completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was not recorded because it was scheduled after it would have ended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was not recorded because it was manually cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Ending Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period (5.1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store recordings in TS format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt for initial group filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lowest Priority First</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred language for the user interface.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide Language #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your #%1 preferred language for Program Guide Data and captions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Recording Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display current recordings information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Menus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Music Artist and Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display playing artist and song title in MythMusic on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Channel Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display tuned channel information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Volume Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display volume level information on LCD display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Generic Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display generic information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backlight Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the backlight permanently on the LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HeartBeat Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Key order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save original files after transcoding (globally)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card
+settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program data and channel settings before starting 
+configuration? This will not affect any existing recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV has detected that the backend is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing existing card inputs, deleting anything,or scanning for channels may not work.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -6835,6 +7049,30 @@ Myth zal nu afsluiten.</translation>
     <message>
         <source>Cancel</source>
         <translation>Annuleer</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished">Zoek</translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation type="unfinished">Signaalsterkte</translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation type="unfinished">Signaal/Ruis</translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished">Niet Vastzetten</translation>
     </message>
 </context>
 <context>
@@ -7467,19 +7705,59 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>Next Audio Track</source>
-        <translation>Volgende Audio Track</translation>
+        <translation type="obsolete">Volgende Audio Track</translation>
     </message>
     <message>
         <source>Channel Lock</source>
-        <translation>Kanaal Vastzetten</translation>
+        <translation type="obsolete">Kanaal Vastzetten</translation>
     </message>
     <message>
         <source>Signal Lock</source>
-        <translation>Signaal Vastzetten</translation>
+        <translation type="obsolete">Signaal Vastzetten</translation>
     </message>
     <message>
         <source>No Lock</source>
         <translation>Niet Vastzetten</translation>
+    </message>
+    <message>
+        <source>Jump to Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Partial Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change input&apos;s (%3), capture cards (%4), etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
+        <translation type="unfinished">Handmatig opnemen</translation>
+    </message>
+    <message>
+        <source>Previous Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Audio Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle track</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

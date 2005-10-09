@@ -314,6 +314,32 @@
     </message>
 </context>
 <context>
+    <name>DTVSignalMonitor</name>
+    <message>
+        <source>Seen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVBSignalMonitor</name>
+    <message>
+        <source>Signal To Noise</source>
+        <translation type="unfinished">Signal-till-brus</translation>
+    </message>
+    <message>
+        <source>Bit Error Rate</source>
+        <translation type="unfinished">Bitfelsfrekvens</translation>
+    </message>
+    <message>
+        <source>Uncorrected Blocks</source>
+        <translation type="unfinished">Okorrigerade block</translation>
+    </message>
+</context>
+<context>
     <name>DVBTransportsEditor</name>
     <message>
         <source>DVB Transport Editor</source>
@@ -735,7 +761,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Recording Group View</source>
-        <translation>Inspelningsgruppsvy</translation>
+        <translation type="obsolete">Inspelningsgruppsvy</translation>
     </message>
     <message>
         <source>OK</source>
@@ -911,7 +937,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Group</source>
-        <translation>Grupp</translation>
+        <translation type="obsolete">Grupp</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -956,6 +982,26 @@ Returning to the previous menu.</source>
     <message>
         <source>Show Recording Groups only</source>
         <translation>Visa endast inspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Select Group Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Categories</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1518,7 +1564,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Your preferred language.</source>
-        <translation>Det språk som skall användas.</translation>
+        <translation type="obsolete">Det språk som skall användas.</translation>
     </message>
     <message>
         <source>Setup Pin Code</source>
@@ -2320,11 +2366,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Deleted</source>
-        <translation>Borttagen</translation>
+        <translation type="obsolete">Borttagen</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation>Stoppad</translation>
+        <translation type="obsolete">Stoppad</translation>
     </message>
     <message>
         <source>Recorded</source>
@@ -2364,11 +2410,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation>Denna visning spelades in men stoppades innan den var färdiginspelad.</translation>
+        <translation type="obsolete">Denna visning spelades in men stoppades innan den var färdiginspelad.</translation>
     </message>
     <message>
         <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation>Denna visning spelades in men togs bort innan inspelningen var slutförd.</translation>
+        <translation type="obsolete">Denna visning spelades in men togs bort innan inspelningen var slutförd.</translation>
     </message>
     <message>
         <source>The status of this showing is unknown.</source>
@@ -2400,7 +2446,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>it was manually cancelled.</source>
-        <translation>den avbröts manuellt.</translation>
+        <translation type="obsolete">den avbröts manuellt.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -2508,7 +2554,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Frequency ID</source>
-        <translation>Frekvens-ID</translation>
+        <translation type="obsolete">Frekvens-ID</translation>
     </message>
     <message>
         <source>Finetune</source>
@@ -2691,11 +2737,11 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation>Signal/Brus</translation>
+        <translation type="obsolete">Signal/Brus</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation>Signalstyrka</translation>
+        <translation type="obsolete">Signalstyrka</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -2791,7 +2837,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>Status</translation>
+        <translation type="obsolete">Status</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
@@ -2935,7 +2981,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Save original files after transcoding</source>
-        <translation>Behåll originalfilerna efter omkodning</translation>
+        <translation type="obsolete">Behåll originalfilerna efter omkodning</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
@@ -3415,27 +3461,27 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>LCD Displays Time</source>
-        <translation>LCD visar klocka</translation>
+        <translation type="obsolete">LCD visar klocka</translation>
     </message>
     <message>
         <source>LCD Displays Menus</source>
-        <translation>LCD visar menyer</translation>
+        <translation type="obsolete">LCD visar menyer</translation>
     </message>
     <message>
         <source>LCD Displays Music Artist and Title</source>
-        <translation>LCD visar låtinformation</translation>
+        <translation type="obsolete">LCD visar låtinformation</translation>
     </message>
     <message>
         <source>LCD Displays Channel Information</source>
-        <translation>LCD visar kanalinformation</translation>
+        <translation type="obsolete">LCD visar kanalinformation</translation>
     </message>
     <message>
         <source>LCD Displays Volume Information</source>
-        <translation>LCD visar volyminformation</translation>
+        <translation type="obsolete">LCD visar volyminformation</translation>
     </message>
     <message>
         <source>LCD Displays Generic Information</source>
-        <translation>LCD visar allmän information</translation>
+        <translation type="obsolete">LCD visar allmän information</translation>
     </message>
     <message>
         <source>LCD device display</source>
@@ -4115,7 +4161,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>LCD Backlight Always On</source>
-        <translation>LCD-bakgrundsbelysning alltid på</translation>
+        <translation type="obsolete">LCD-bakgrundsbelysning alltid på</translation>
     </message>
     <message>
         <source>Directed By</source>
@@ -4797,15 +4843,15 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation>Vill du rensa alla TV-kortsinställningar innan konfigurationen fortsätter?</translation>
+        <translation type="obsolete">Vill du rensa alla TV-kortsinställningar innan konfigurationen fortsätter?</translation>
     </message>
     <message>
         <source>No, leave my card settings alone</source>
-        <translation>Nej, lämna mina TV-kortsinställningar som de är</translation>
+        <translation type="obsolete">Nej, lämna mina TV-kortsinställningar som de är</translation>
     </message>
     <message>
         <source>Yes, delete my card settings</source>
-        <translation>Ja, ta bort mina TV-kortsinställningar</translation>
+        <translation type="obsolete">Ja, ta bort mina TV-kortsinställningar</translation>
     </message>
     <message>
         <source>Use custom identifier for frontend preferences</source>
@@ -4937,15 +4983,15 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation>Vill du rensa alla program och kanalinställningar innan konfigurationen fortsätter? Detta kommer inte att påverka befintliga inspelningar.</translation>
+        <translation type="obsolete">Vill du rensa alla program och kanalinställningar innan konfigurationen fortsätter? Detta kommer inte att påverka befintliga inspelningar.</translation>
     </message>
     <message>
         <source>No, leave my channel settings alone</source>
-        <translation>Nej, lämna mina kanalinställningar som de är</translation>
+        <translation type="obsolete">Nej, lämna mina kanalinställningar som de är</translation>
     </message>
     <message>
         <source>Yes, delete my channel settings</source>
-        <translation>Ja, ta bort mina kanalinställningar</translation>
+        <translation type="obsolete">Ja, ta bort mina kanalinställningar</translation>
     </message>
     <message>
         <source>Record one showing of this title</source>
@@ -5105,7 +5151,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
-        <translation>Spela in i TS-format i stället för PS.</translation>
+        <translation type="obsolete">Spela in i TS-format i stället för PS.</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
@@ -5239,12 +5285,12 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>D</source>
         <comment>RecStatusChar rsDeleted</comment>
-        <translation>B</translation>
+        <translation type="obsolete">B</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecStatusChar rsStopped</comment>
-        <translation>a</translation>
+        <translation type="obsolete">a</translation>
     </message>
     <message>
         <source>R</source>
@@ -5847,7 +5893,7 @@ VARNING: Detta val avaktiverar XvMC-videoutmatning.</translation>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic.</source>
-        <translation>Visa aktuell artist och låt från MythMusic.</translation>
+        <translation type="obsolete">Visa aktuell artist och låt från MythMusic.</translation>
     </message>
     <message>
         <source>Items</source>
@@ -5867,23 +5913,23 @@ VARNING: Detta val avaktiverar XvMC-videoutmatning.</translation>
     </message>
     <message>
         <source>Display tuned channel information.</source>
-        <translation>Visa information om vald kanal.</translation>
+        <translation type="obsolete">Visa information om vald kanal.</translation>
     </message>
     <message>
         <source>Display volume level information.</source>
-        <translation>Visa volymnivå.</translation>
+        <translation type="obsolete">Visa volymnivå.</translation>
     </message>
     <message>
         <source>Display generic information.</source>
-        <translation>Visa generell information.</translation>
+        <translation type="obsolete">Visa generell information.</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently.</source>
-        <translation>Sätt på bakgrundsbelysningen permanent.</translation>
+        <translation type="obsolete">Sätt på bakgrundsbelysningen permanent.</translation>
     </message>
     <message>
         <source>LCD HeartBeat Always On</source>
-        <translation>LCD-hjärtslag alltid på</translation>
+        <translation type="obsolete">LCD-hjärtslag alltid på</translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat</source>
@@ -5977,15 +6023,15 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Signal To Noise</source>
-        <translation>Signal-till-brus</translation>
+        <translation type="obsolete">Signal-till-brus</translation>
     </message>
     <message>
         <source>Bit Error Rate</source>
-        <translation>Bitfelsfrekvens</translation>
+        <translation type="obsolete">Bitfelsfrekvens</translation>
     </message>
     <message>
         <source>Uncorrected Blocks</source>
-        <translation>Okorrigerade block</translation>
+        <translation type="obsolete">Okorrigerade block</translation>
     </message>
     <message>
         <source>Enable auto-transcode after recording</source>
@@ -6189,7 +6235,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation>Sökning</translation>
+        <translation type="obsolete">Sökning</translation>
     </message>
     <message>
         <source>Path</source>
@@ -6249,51 +6295,51 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Seen PAT</source>
-        <translation>PAT sedd</translation>
+        <translation type="obsolete">PAT sedd</translation>
     </message>
     <message>
         <source>Seen PMT</source>
-        <translation>PMT sedd</translation>
+        <translation type="obsolete">PMT sedd</translation>
     </message>
     <message>
         <source>Seen MGT</source>
-        <translation>MGT sedd</translation>
+        <translation type="obsolete">MGT sedd</translation>
     </message>
     <message>
         <source>Seen VCT</source>
-        <translation>VCT sedd</translation>
+        <translation type="obsolete">VCT sedd</translation>
     </message>
     <message>
         <source>Seen NIT</source>
-        <translation>NIT sedd</translation>
+        <translation type="obsolete">NIT sedd</translation>
     </message>
     <message>
         <source>Seen SDT</source>
-        <translation>SDT sedd</translation>
+        <translation type="obsolete">SDT sedd</translation>
     </message>
     <message>
         <source>Matching PAT</source>
-        <translation>Matchande PAT</translation>
+        <translation type="obsolete">Matchande PAT</translation>
     </message>
     <message>
         <source>Matching PMT</source>
-        <translation>Matchande PMT</translation>
+        <translation type="obsolete">Matchande PMT</translation>
     </message>
     <message>
         <source>Matching MGT</source>
-        <translation>Matchande MGT</translation>
+        <translation type="obsolete">Matchande MGT</translation>
     </message>
     <message>
         <source>Matching VCT</source>
-        <translation>Matchande VCT</translation>
+        <translation type="obsolete">Matchande VCT</translation>
     </message>
     <message>
         <source>Matching NIT</source>
-        <translation>Matchande NIT</translation>
+        <translation type="obsolete">Matchande NIT</translation>
     </message>
     <message>
         <source>Matching SDT</source>
-        <translation>Matchande SDT</translation>
+        <translation type="obsolete">Matchande SDT</translation>
     </message>
     <message>
         <source>Allow Transcoding jobs</source>
@@ -6301,7 +6347,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Program #%1 not found in PAT!</source>
-        <translation>Program #%1 hittades inte i PAT!</translation>
+        <translation type="obsolete">Program #%1 hittades inte i PAT!</translation>
     </message>
     <message>
         <source>CC/TXT enabled</source>
@@ -6377,10 +6423,6 @@ Myth kommer nu att avslutas.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk of processing errors.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6424,6 +6466,230 @@ Myth kommer nu att avslutas.</translation>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Number of bonus points to be added to any recording on this channel during scheduling.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a positive number as the rank if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image file to use as the icon for this channel on various MythTV displays.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation type="unfinished">eller</translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecStatusChar rsAborted</comment>
+        <translation type="unfinished">A</translation>
+    </message>
+    <message>
+        <source>M</source>
+        <comment>RecStatusChar rsMissed</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation type="unfinished">Avbruten</translation>
+    </message>
+    <message>
+        <source>Missed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was recorded but was aborted before recording was completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was not recorded because it was scheduled after it would have ended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was not recorded because it was manually cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Ending Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period (5.1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store recordings in TS format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt for initial group filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lowest Priority First</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred language for the user interface.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide Language #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your #%1 preferred language for Program Guide Data and captions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Recording Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display current recordings information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Menus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Music Artist and Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display playing artist and song title in MythMusic on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Channel Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display tuned channel information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Volume Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display volume level information on LCD display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Generic Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display generic information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backlight Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the backlight permanently on the LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HeartBeat Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Key order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save original files after transcoding (globally)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card
+settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program data and channel settings before starting 
+configuration? This will not affect any existing recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV has detected that the backend is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing existing card inputs, deleting anything,or scanning for channels may not work.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -6445,6 +6711,30 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished">Sökning</translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation type="unfinished">Signalstyrka</translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation type="unfinished">Signal/Brus</translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="unfinished">Inget lås</translation>
     </message>
 </context>
 <context>
@@ -7046,19 +7336,59 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Next Audio Track</source>
-        <translation>Nästa ljudspår</translation>
+        <translation type="obsolete">Nästa ljudspår</translation>
     </message>
     <message>
         <source>Channel Lock</source>
-        <translation>Kanallås</translation>
+        <translation type="obsolete">Kanallås</translation>
     </message>
     <message>
         <source>Signal Lock</source>
-        <translation>Signallås</translation>
+        <translation type="obsolete">Signallås</translation>
     </message>
     <message>
         <source>No Lock</source>
         <translation>Inget lås</translation>
+    </message>
+    <message>
+        <source>Jump to Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Partial Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change input&apos;s (%3), capture cards (%4), etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished">OK</translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
+        <translation type="unfinished">Manuell inspelning</translation>
+    </message>
+    <message>
+        <source>Previous Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Audio Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle track</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

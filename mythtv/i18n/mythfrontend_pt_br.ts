@@ -314,6 +314,32 @@
     </message>
 </context>
 <context>
+    <name>DTVSignalMonitor</name>
+    <message>
+        <source>Seen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVBSignalMonitor</name>
+    <message>
+        <source>Signal To Noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bit Error Rate</source>
+        <translation type="unfinished">Taxa de Erro Bit</translation>
+    </message>
+    <message>
+        <source>Uncorrected Blocks</source>
+        <translation type="unfinished">Blocos Incorretos</translation>
+    </message>
+</context>
+<context>
     <name>DVBTransportsEditor</name>
     <message>
         <source>DVB Transport Editor</source>
@@ -905,7 +931,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Recording Group View</source>
-        <translation type="unfinished">Modo de Exibição do Grupo de Gravação</translation>
+        <translation type="obsolete">Modo de Exibição do Grupo de Gravação</translation>
     </message>
     <message>
         <source>Default</source>
@@ -913,7 +939,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Group</source>
-        <translation type="unfinished">Grupo</translation>
+        <translation type="obsolete">Grupo</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -938,6 +964,26 @@ Returning to the previous menu.</source>
     <message>
         <source>New Password:</source>
         <translation type="unfinished">Nova Senha:</translation>
+    </message>
+    <message>
+        <source>Select Group Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Categories</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1512,7 +1558,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Frequency ID</source>
-        <translation type="unfinished">ID de frequência</translation>
+        <translation type="obsolete">ID de frequência</translation>
     </message>
     <message>
         <source>Finetune</source>
@@ -1552,63 +1598,59 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Seen PAT</source>
-        <translation type="unfinished">Visto em PAT</translation>
+        <translation type="obsolete">Visto em PAT</translation>
     </message>
     <message>
         <source>Seen PMT</source>
-        <translation type="unfinished">Visto em PMT</translation>
+        <translation type="obsolete">Visto em PMT</translation>
     </message>
     <message>
         <source>Seen MGT</source>
-        <translation type="unfinished">Visto em MGT</translation>
+        <translation type="obsolete">Visto em MGT</translation>
     </message>
     <message>
         <source>Seen VCT</source>
-        <translation type="unfinished">Visto em VCT</translation>
+        <translation type="obsolete">Visto em VCT</translation>
     </message>
     <message>
         <source>Seen NIT</source>
-        <translation type="unfinished">Visto em NIT</translation>
+        <translation type="obsolete">Visto em NIT</translation>
     </message>
     <message>
         <source>Seen SDT</source>
-        <translation type="unfinished">Visto em SDT</translation>
+        <translation type="obsolete">Visto em SDT</translation>
     </message>
     <message>
         <source>Matching PAT</source>
-        <translation type="unfinished">Parâmetros PAT</translation>
+        <translation type="obsolete">Parâmetros PAT</translation>
     </message>
     <message>
         <source>Matching PMT</source>
-        <translation type="unfinished">Parâmetros PMT</translation>
+        <translation type="obsolete">Parâmetros PMT</translation>
     </message>
     <message>
         <source>Matching MGT</source>
-        <translation type="unfinished">Parâmetros MGT</translation>
+        <translation type="obsolete">Parâmetros MGT</translation>
     </message>
     <message>
         <source>Matching VCT</source>
-        <translation type="unfinished">Parâmetros VCT</translation>
+        <translation type="obsolete">Parâmetros VCT</translation>
     </message>
     <message>
         <source>Matching NIT</source>
-        <translation type="unfinished">Parâmetros NIT</translation>
+        <translation type="obsolete">Parâmetros NIT</translation>
     </message>
     <message>
         <source>Matching SDT</source>
-        <translation type="unfinished">Parâmetros SDT</translation>
-    </message>
-    <message>
-        <source>Signal To Noise</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Parâmetros SDT</translation>
     </message>
     <message>
         <source>Bit Error Rate</source>
-        <translation type="unfinished">Taxa de Erro Bit</translation>
+        <translation type="obsolete">Taxa de Erro Bit</translation>
     </message>
     <message>
         <source>Uncorrected Blocks</source>
-        <translation type="unfinished">Blocos Incorretos</translation>
+        <translation type="obsolete">Blocos Incorretos</translation>
     </message>
     <message>
         <source>This section lists each transport that MythTV currently knows about. The display fields are Frequency, SymbolRate, NetworkID, and TransportID </source>
@@ -2106,12 +2148,12 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     <message>
         <source>D</source>
         <comment>RecStatusChar rsDeleted</comment>
-        <translation type="unfinished">D</translation>
+        <translation type="obsolete">D</translation>
     </message>
     <message>
         <source>S</source>
         <comment>RecStatusChar rsStopped</comment>
-        <translation type="unfinished">S</translation>
+        <translation type="obsolete">S</translation>
     </message>
     <message>
         <source>R</source>
@@ -2185,11 +2227,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Deleted</source>
-        <translation type="unfinished">Removido</translation>
+        <translation type="obsolete">Removido</translation>
     </message>
     <message>
         <source>Stopped</source>
-        <translation type="unfinished">Parado</translation>
+        <translation type="obsolete">Parado</translation>
     </message>
     <message>
         <source>Recorded</source>
@@ -2268,14 +2310,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished">Esta exibição foi gravada.</translation>
     </message>
     <message>
-        <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The status of this showing is unknown.</source>
         <translation type="unfinished">O status desta exibição é desconhecido.</translation>
     </message>
@@ -2309,7 +2343,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>it was manually cancelled.</source>
-        <translation type="unfinished">foi manualmente cancelado.</translation>
+        <translation type="obsolete">foi manualmente cancelado.</translation>
     </message>
     <message>
         <source>another program with a higher priority will be recorded.</source>
@@ -2480,19 +2514,19 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Status</translation>
+        <translation type="obsolete">Status</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation type="unfinished">Varrer</translation>
+        <translation type="obsolete">Varrer</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation type="unfinished">Força do Sinal</translation>
+        <translation type="obsolete">Força do Sinal</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation type="unfinished">Sinal/Barulho</translation>
+        <translation type="obsolete">Sinal/Barulho</translation>
     </message>
     <message>
         <source>ATSC Channel %1</source>
@@ -3274,7 +3308,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
-        <translation type="unfinished">Gravar no formato TS em vez de PS</translation>
+        <translation type="obsolete">Gravar no formato TS em vez de PS</translation>
     </message>
     <message>
         <source>Wait for SEQ start header.</source>
@@ -4931,10 +4965,6 @@ WARNING: Enabling this option will disable XvMC video output.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Your preferred language.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable Xbox Hardware</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5219,15 +5249,7 @@ WARNING: Enabling this option will disable XvMC video output.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LCD Displays Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Display current time on idle LCD display. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LCD Displays Menus</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5240,14 +5262,6 @@ WARNING: Enabling this option will disable XvMC video output.</source>
     </message>
     <message>
         <source>The time (in seconds) that the menu will remain visible after navigation.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LCD Displays Music Artist and Title</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display playing artist and song title in MythMusic.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5264,42 +5278,6 @@ WARNING: Enabling this option will disable XvMC video output.</source>
     </message>
     <message>
         <source>Which items to show when playing music.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LCD Displays Channel Information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display tuned channel information.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LCD Displays Volume Information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display volume level information.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LCD Displays Generic Information</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display generic information.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LCD Backlight Always On</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Turn on the backlight permanently.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>LCD HeartBeat Always On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5854,10 +5832,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save original files after transcoding</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6198,30 +6172,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No, leave my card settings alone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes, delete my card settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No, leave my channel settings alone</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes, delete my channel settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Do you want to fix these problems?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6239,10 +6189,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>If this is the master backend server, please run &apos;mythfilldatabase&apos; to populate the database with channel information.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Program #%1 not found in PAT!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6315,10 +6261,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk of processing errors.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6362,6 +6304,230 @@ Myth will now exit.</source>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Number of bonus points to be added to any recording on this channel during scheduling.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use a positive number as the rank if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image file to use as the icon for this channel on various MythTV displays.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>or</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>A</source>
+        <comment>RecStatusChar rsAborted</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>M</source>
+        <comment>RecStatusChar rsMissed</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Aborted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Missed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was recorded but was aborted before recording was completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was not recorded because it was scheduled after it would have ended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This showing was not recorded because it was manually cancelled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Ending Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period (5.1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Signal Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store recordings in TS format.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt for initial group filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lowest Priority First</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your preferred language for the user interface.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Guide Language #%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your #%1 preferred language for Program Guide Data and captions.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Recording Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display current recordings information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Menus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Music Artist and Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display playing artist and song title in MythMusic on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Channel Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display tuned channel information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Volume Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display volume level information on LCD display</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Generic Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display generic information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backlight Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on the backlight permanently on the LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>HeartBeat Always On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LCD Key order</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save original files after transcoding (globally)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all capture card
+settings before starting configuration?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to clear all program data and channel settings before starting 
+configuration? This will not affect any existing recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>WARNING</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV has detected that the backend is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Changing existing card inputs, deleting anything,or scanning for channels may not work.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -6382,6 +6548,30 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished">Varrer</translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation type="unfinished">Força do Sinal</translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation type="unfinished">Sinal/Barulho</translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Lock</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6979,19 +7169,47 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Channel Lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Signal Lock</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No Lock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Next Audio Track</source>
+        <source>Jump to Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Partial Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change input&apos;s (%3), capture cards (%4), etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manual Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Audio Track</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Subtitles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtitle track</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
