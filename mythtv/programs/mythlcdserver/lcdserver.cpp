@@ -54,9 +54,9 @@
 #include <qregexp.h>
 #include <qdir.h>
 #include <qapplication.h>
-#include <mythtv/util.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/lcddevice.h>
+#include "util.h"
+#include "mythcontext.h"
+#include "lcddevice.h"
 
 #include "lcdserver.h"
 
