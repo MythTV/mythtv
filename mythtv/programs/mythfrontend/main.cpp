@@ -423,6 +423,7 @@ void TVMenuCallback(void *data, QString &selection)
         LCD::SetupLCD ();
         if(class LCD * lcd = LCD::Get()) {
             lcd->setupLEDs(RemoteGetRecordingMask);
+            lcd->resetServer();
         }
     } 
     else if (sel == "settings recording") 

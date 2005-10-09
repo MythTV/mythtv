@@ -6,7 +6,7 @@ TEMPLATE = subdirs
 # Directories
 using_frontend {
     SUBDIRS += mythepg mythprogfind mythtv mythfrontend mythcommflag mythlcd 
-    SUBDIRS += mythtvosd mythjobqueue mythuitest
+    SUBDIRS += mythtvosd mythjobqueue mythuitest mythlcdserver
 }
 
 using_backend {

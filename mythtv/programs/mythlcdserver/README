@@ -1,0 +1,61 @@
+WHAT IS MYTHLCDSERVER
+=====================
+
+mythlcdserver controls an LCD device taking commands from
+one or more myth client(s) and sending the requests to the
+LCDProc server.
+
+PREREQUISITES 
+=============
+
+You should already have setup LCDProc 0.4.5 or later.
+
+COMMAND LINE PARAMETERS
+=======================
+
+-p or --port number           A port number to listen on (default is 6545)
+                              If no port is given the server will try to get
+                              the port from the "LCDServerPort" database setting.  
+
+-d or --daemon                Runs lcd server as a daemon
+
+-n or --nodaemon              Does not run lcd server as a daemon (default)
+
+-m or --startupmessage  msg   Message to show at startup
+                              The message will be shown for a set period of time or
+                              until a client connects to the server. You can use the
+                              '|' character to split the message into lines.
+                              eg. "Please Wait|MythTV is starting" will show
+                              |     Please Wait    |    
+                              | MythTV is starting |
+                              on the LCD
+
+-t or --messagetime time      Maximum length of time to show the startup message 
+                              (default 30 seconds) 
+
+-l or --logfile filename      Writes STDERR and STDOUT messages to filename
+
+-v or --verbose debug-level   Prints more information
+                              Accepts any combination (separated by comma) 
+                              of all,none,important,general,network 
+                              (default important)
+
+-x or --debuglevel level      Control how much debug messages to show
+                              level is a number between 0 and 10 (default 0)
+
+DATABASE SETTINGS
+=================
+
+LCDServerPort  -  port the LCDServer listens for connections (default is 6545)
+LCDServerHost  -  host where LCDServer is located (default is localhost)
+
+LCDPort        -  port to talk to LCDProc on (default is 13666)                           
+LCDHost        -  host where LCDProc is located (default is localhost)
+  
+
+TODO
+====
+
+Better docs :-)
+ 
+ 

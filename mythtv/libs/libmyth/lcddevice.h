@@ -101,8 +101,6 @@ class LCD : public QObject
     static bool m_server_unavailable;
     static class LCD * m_lcd;
     
-    void customEvent(QCustomEvent  *e);
-     
   public:
    ~LCD();
 
@@ -166,148 +164,54 @@ class LCD : public QObject
     // up without having to actual destroy the LCD object
     void switchToNothing();
         
-    // If you want to be pleasant, call shutdown()before deleting your LCD 
+    // If you want to be pleasant, call shutdown() before deleting your LCD 
     // device
     void shutdown();
     
     // outputText spins through the ptr list and outputs the text according to 
     // the params set in the LCDTextItem object
     // gContext->LCDsetGenericProgress(percent_heard) for an example
-    void outputText(QPtrList<LCDTextItem> *textItems);
+//    void outputText(QPtrList<LCDTextItem> *textItems);
 
-    void setupLEDs(int(*LedMaskFunc)(void)) { GetLEDMask = LedMaskFunc; }
+    void setupLEDs(int(*LedMaskFunc)(void));
 
     void stopAll(void);
-
+    
+    uint getLCDHeight(void) { return lcd_height; }
+    uint getLCDWidth(void) { return lcd_width; }
+    
+    void resetServer(void); // tell the mythlcdserver to reload its settings
+    
   private slots: 
     void veryBadThings(int);       // Communication Errors
     void serverSendingData();      // Data coming back from LCDd
 
     void restartConnection();      // Try to re-establish the connection to 
-                                   // LCDd every 10 seconds
-
-    void outputTime();             // Fire from a timer
-    void outputLEDs();             // Fire from a timer
-    void outputMusic();            // Short timer (equalizer)
-    void outputChannel();          // Longer timer (progress bar)
-    void outputGeneric();          // Longer timer (progress bar)
-    void outputVolume();
-    void outputRecStatus();        
-    void scrollMenuText();         // Scroll the menu items if need be
-    void beginScrollingMenuText(); // But only after a bit of time has gone by
-    void scrollText();             // Scroll the topline text
-    void beginScrollingText();     // But only after a bit of time has gone by
-    void unPopMenu();              // Remove the Pop Menu display
-    void scrollList();             // display a list line by line
+                                   // LCDServer every 10 seconds
+    void outputLEDs(); 
          
   private:
-    void outputCenteredText(QString theScreen, QString theText,
-                            QString widget = "topWidget", int row = 1);
-
-    void outputLeftText(QString theScreen, QString theText,
-                        QString widget = "topWidget", int row = 1);
-    void outputRightText(QString theScreen, QString theText,
-                         QString widget = "topWidget", int row = 1);
-    
-    void outputScrollerText(QString theScreen, QString theText,
-                         QString widget = "scroller", int top = 1, int bottom = 1);
-    
-    QStringList formatScrollerText(const QString &text);
-   
-    
     void sendToServer(const QString &someText);
-
-    enum PRIORITY {TOP, URGENT, HIGH, MEDIUM, LOW, OFF};
-    void setPriority(const QString &screen, PRIORITY priority);
-
-    void setHeartbeat (const QString &screen, bool onoff);
-
     void init();
-    void assignScrollingText(QString theText, QString theScreen,
-                             QString theWidget = "topWidget", int theRox = 1);
-    void assignScrollingList(QStringList theList, QString theScreen, 
-                             QString theWidget = "topWidget", int theRow = 1);
-                             
-    void startTime();
-    void startMusic(QString artist, QString album, QString track);
-    void startChannel(QString channum, QString title, QString subtitle);
-    void startGeneric(QPtrList<LCDTextItem> * textItems);
-    void startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name,
-                   bool popMenu);
-
     void handleKeyPress(QString key);
-    void startVolume(QString app_name);
-
-    QString activeScreen;
-
+    QString quotedString(const QString &s);
+    
     QSocket *socket;
-    QTimer *LEDTimer;
-    QTimer *timeTimer;
-    QTimer *musicTimer;
-    QTimer *channelTimer;
-    QTimer *genericTimer;
-    QTimer *scrollTimer;
-    QTimer *preScrollTimer;
-    QTimer *menuScrollTimer;
-    QTimer *menuPreScrollTimer;
-    QTimer *popMenuTimer;
     QTimer *retryTimer;
-    QTimer *recStatusTimer;
-    QTimer *scrollListTimer;
+    QTimer *LEDTimer;
     
-    void setWidth(unsigned int);
-    void setHeight(unsigned int);
-    void setCellWidth(unsigned int);
-    void setCellHeight(unsigned int);
-    void setVersion(const QString &, const QString &);
     void describeServer();
-    
-    unsigned int prioTop;
-    unsigned int prioUrgent;
-    unsigned int prioHigh;
-    unsigned int prioMedium;
-    unsigned int prioLow;
-    unsigned int prioOff;
-     
-    unsigned int lcdWidth;
-    unsigned int lcdHeight;
-    unsigned int cellWidth;
-    unsigned int cellHeight;
-
-    QString serverVersion;
-    QString protocolVersion;
-    int pVersion;
-        
-    float EQlevels[10];
-    float progress;
-    float generic_progress;
-    float volume_level;
-
-    float music_progress;
-    QString music_time;
-
-    QString scrollingText;
-    QString scrollScreen, scrollWidget;
-    int scrollRow;
-    unsigned int scrollPosition;
-    QString timeformat;
-
-    QStringList scrollListItems;
-    QString scrollListScreen, scrollListWidget;
-    int scrollListRow;
-    unsigned int scrollListItem;
-        
-    unsigned int menuScrollPosition;
-    QPtrList<LCDMenuItem> *lcdMenuItems;
 
     bool connected;
-    bool timeFlash;
 
     QString send_buffer;
     QString last_command;
     QString hostname;
     unsigned int port;
 
+    int  lcd_width;
+    int  lcd_height;
+    
     bool lcd_ready;
 
     bool lcd_showtime;
@@ -324,23 +228,6 @@ class LCD : public QObject
     QString lcd_keystring;
     
     int (*GetLEDMask)(void);
-
-    // recording status stuff
-    typedef struct
-    {
-        int     id;
-        bool    isRecording;
-        QString channel, title, subTitle;
-        QDateTime startTime, endTime;
-    } TunerStatus;
-
-    void updateRecordingList(void);
-
-    bool isRecording;
-    bool isTimeVisible;
-    int lcdTunerNo;
-
-    QPtrList<TunerStatus> tunerList;
 };
 
 #endif

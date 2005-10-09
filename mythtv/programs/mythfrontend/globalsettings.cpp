@@ -2494,7 +2494,7 @@ public:
 static HostCheckBox *LCDShowTime()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowTime");
-    gc->setLabel(QObject::tr("LCD Displays Time"));
+    gc->setLabel(QObject::tr("Display Time"));
     gc->setHelpText(QObject::tr("Display current time on idle LCD display. "));
     gc->setValue(true);
     return gc;
@@ -2503,8 +2503,9 @@ static HostCheckBox *LCDShowTime()
 static HostCheckBox *LCDShowRecStatus()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowRecStatus");
-    gc->setLabel(QObject::tr("LCD Displays Recording Status"));
-    gc->setHelpText(QObject::tr("Display current recordings information."));
+    gc->setLabel(QObject::tr("Display Recording Status"));
+    gc->setHelpText(QObject::tr("Display current recordings information on "
+                                "LCD display."));
     gc->setValue(false);
     return gc;
 }
@@ -2512,7 +2513,7 @@ static HostCheckBox *LCDShowRecStatus()
 static HostCheckBox *LCDShowMenu()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowMenu");
-    gc->setLabel(QObject::tr("LCD Displays Menus"));
+    gc->setLabel(QObject::tr("Display Menus"));
     gc->setHelpText(QObject::tr("Display selected menu on LCD display. "));
     gc->setValue(true);
     return gc;
@@ -2531,9 +2532,9 @@ static HostSpinBox *LCDPopupTime()
 static HostCheckBox *LCDShowMusic()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowMusic");
-    gc->setLabel(QObject::tr("LCD Displays Music Artist and Title"));
+    gc->setLabel(QObject::tr("Display Music Artist and Title"));
     gc->setHelpText(QObject::tr("Display playing artist and song title in "
-                    "MythMusic."));
+                    "MythMusic on LCD display."));
     gc->setValue(true);
     return gc;
 }
@@ -2551,8 +2552,8 @@ static HostComboBox *LCDShowMusicItems()
 static HostCheckBox *LCDShowChannel()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowChannel");
-    gc->setLabel(QObject::tr("LCD Displays Channel Information"));
-    gc->setHelpText(QObject::tr("Display tuned channel information."));
+    gc->setLabel(QObject::tr("Display Channel Information"));
+    gc->setHelpText(QObject::tr("Display tuned channel information on LCD display."));
     gc->setValue(true);
     return gc;
 }
@@ -2560,8 +2561,9 @@ static HostCheckBox *LCDShowChannel()
 static HostCheckBox *LCDShowVolume()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowVolume");
-    gc->setLabel(QObject::tr("LCD Displays Volume Information"));
-    gc->setHelpText(QObject::tr("Display volume level information."));
+    gc->setLabel(QObject::tr("Display Volume Information"));
+    gc->setHelpText(QObject::tr("Display volume level information "
+                                "on LCD display"));
     gc->setValue(true);
     return gc;
 }
@@ -2569,8 +2571,8 @@ static HostCheckBox *LCDShowVolume()
 static HostCheckBox *LCDShowGeneric()
 {
     HostCheckBox *gc = new HostCheckBox("LCDShowGeneric");
-    gc->setLabel(QObject::tr("LCD Displays Generic Information"));
-    gc->setHelpText(QObject::tr("Display generic information."));
+    gc->setLabel(QObject::tr("Display Generic Information"));
+    gc->setHelpText(QObject::tr("Display generic information on LCD display."));
     gc->setValue(true);
     return gc;
 }
@@ -2578,8 +2580,9 @@ static HostCheckBox *LCDShowGeneric()
 static HostCheckBox *LCDBacklightOn()
 {
     HostCheckBox *gc = new HostCheckBox("LCDBacklightOn");
-    gc->setLabel(QObject::tr("LCD Backlight Always On"));
-    gc->setHelpText(QObject::tr("Turn on the backlight permanently."));
+    gc->setLabel(QObject::tr("Backlight Always On"));
+    gc->setHelpText(QObject::tr("Turn on the backlight permanently "
+                                "on the LCD display."));
     gc->setValue(true);
     return gc;
 }
@@ -2587,7 +2590,7 @@ static HostCheckBox *LCDBacklightOn()
 static HostCheckBox *LCDHeartBeatOn()
 {
     HostCheckBox *gc = new HostCheckBox("LCDHeartBeatOn");
-    gc->setLabel(QObject::tr("LCD HeartBeat Always On"));
+    gc->setLabel(QObject::tr("HeartBeat Always On"));
     gc->setHelpText(QObject::tr("Turn on the LCD heartbeat."));
     gc->setValue(false);
     return gc;
