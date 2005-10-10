@@ -3721,19 +3721,16 @@ void TVRec::TuningNewRecorder(void)
     if (channel)
         SetVideoFiltersForChannel(channel, channel->GetCurrentName());
 
+#ifdef USING_V4L 
     if (GetV4LChannel())
     {
-#ifdef USING_V4L 
-        if (channel)
-        {
-            channel->SetBrightness();
-            channel->SetContrast();
-            channel->SetColour();
-            channel->SetHue();
-        }
-#endif
+        channel->SetBrightness();
+        channel->SetContrast();
+        channel->SetColour();
+        channel->SetHue();
         CloseChannel();
     }
+#endif
 
     pthread_create(&recorder_thread, NULL, TVRec::RecorderThread, recorder);
 
