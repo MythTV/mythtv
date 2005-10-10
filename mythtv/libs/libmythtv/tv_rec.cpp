@@ -426,15 +426,16 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     ClearFlags(kFlagAskAllowRecording);
 
-    // If in post-roll, end recording
-    if ((GetState() == kState_RecordingOnly) &&
-        (QDateTime::currentDateTime() >= recordEndTime))
-    {
-        ChangeState(kState_None);
-    }
-
     // Flush out events...
     WaitForEventThreadSleep();
+
+    // If in post-roll, end recording
+    if (GetState() == kState_RecordingOnly)
+    {
+        stateChangeLock.unlock();
+        StopRecording();
+        stateChangeLock.lock();
+    }
 
     // Request tuner from Live TV instance
     if (internalState == kState_WatchingLiveTV && 
@@ -497,7 +498,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
               .arg(rcinfo->recendts.toString())
               .arg(StateToString(internalState));
         if (curRecording && internalState == kState_RecordingOnly)
-            msg += QString("\t\t\tCurrently recording: %1 %2 %3 %4")
+            msg += QString("\n\t\t\tCurrently recording: %1 %2 %3 %4")
                 .arg(curRecording->title).arg(curRecording->chanid)
                 .arg(curRecording->recstartts.toString())
                 .arg(curRecording->recendts.toString());

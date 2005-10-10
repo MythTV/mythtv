@@ -1206,44 +1206,14 @@ void Scheduler::RunScheduler(void)
                 .arg(nextRecording->cardid)
                 .arg(nextRecording->sourceid);
 
-            ProgramInfo *rec = nexttv->GetRecording();
+            nextRecording->recstatus = nexttv->StartRecording(nextRecording);
+            nextRecording->AddHistory(false);
+            statuschanged = true;
 
-            if (rec->title   == nextRecording->title   &&
-                rec->chanid  == nextRecording->chanid  &&
-                rec->startts == nextRecording->startts &&
-                rec->endts   == nextRecording->endts)
-            {
-                // If the master backend is restarted after the
-                // slave backend has started recording the
-                // program, this can be triggered.
-                VERBOSE(VB_GENERAL, "Already recording "<<details);
-                nextRecording->recstartts = rec->recstartts;
-                nextRecording->recendts   = rec->recendts;
-                nextRecording->recstatus  = rsRecording;
-            }
-            else
-            {
-                // Allow for clock drift between backends.
-                if ((nexttv->GetState() == kState_RecordingOnly) &&
-                    (rec->recendts <= curtime.addSecs(5)))
-                {
-                    // Use the master backend's time to stop recording.
-                    // If it should have already stopped recording 
-                    // according to the master backend's clock, stop it.
-                    // (this stops post-roll as well, but this is ok.)
-                    nexttv->StopRecording();
-                }
-
-                RecStatusType recstat = nexttv->StartRecording(nextRecording);
-                nextRecording->recstatus = recstat;
-                nextRecording->AddHistory(false);
-                statuschanged = true;
-
-                msg = (recstat == rsRecording) ? "Started" : "Canceled"; 
-                VERBOSE(VB_GENERAL, msg << " recording: " << details);
-                gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
-            }
-            delete rec;
+            bool is_rec = (nextRecording->recstatus == rsRecording);
+            msg = is_rec ? "Started recording" : "Canceled recording"; 
+            VERBOSE(VB_GENERAL, msg << ": " << details);
+            gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
         }
 
         if (statuschanged)
