@@ -1571,6 +1571,7 @@ void GetPidsToCache(DTVSignalMonitor *dtvMon, pid_cache_t &pid_cache)
         pid_cache_item_t item(mgt->TablePID(i), mgt->TableType(i));
         pid_cache.push_back(item);
     }
+    dtvMon->GetATSCStreamData()->ReturnCachedTable(mgt);
 }
 
 bool ApplyCachedPids(DTVSignalMonitor *dtvMon, const ChannelBase* channel)

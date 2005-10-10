@@ -15,6 +15,8 @@ extern "C" {
 #include "../libavformat/mpegts.h"
 }
 
+unsigned char *pes_alloc(uint size);
+void pes_free(unsigned char *ptr);
 inline unsigned int pes_length(const unsigned char* pesbuf)
     { return (pesbuf[2] & 0x0f) << 8 | pesbuf[3]; }
 
@@ -54,41 +56,42 @@ class PESPacket
         InitPESPacket(const_cast<TSPacket&>(*tspacket));
         _fullbuffer = const_cast<unsigned char*>(tspacket->data());
     }
+
   private:
     //const PESPacket& operator=(const PESPacket& pkt);
     PESPacket& operator=(const PESPacket& pkt);
+
   public:
     // may be modified
     PESPacket(const PESPacket& pkt)
+        : _pesdata(0),
+          _ccLast(pkt._ccLast), _cnt(pkt._cnt),
+          _allocSize((pkt._allocSize) ? pkt._allocSize : 188),
+          _badPacket(pkt._badPacket)
     { // clone
-        _allocSize = pkt._allocSize;
-        _fullbuffer = new unsigned char[_allocSize+188];
-        memcpy(_fullbuffer, pkt._fullbuffer, _allocSize+188);
+        _fullbuffer = pes_alloc(_allocSize);
+        memcpy(_fullbuffer, pkt._fullbuffer, _allocSize);
         _pesdata = _fullbuffer + (pkt._pesdata - pkt._fullbuffer);
-        _ccLast = pkt._ccLast;
-        _cnt = pkt._cnt;
-        _badPacket = pkt._badPacket;
     }
 
     // may be modified
     PESPacket(const TSPacket& tspacket)
+        : _ccLast(tspacket.ContinuityCounter()), _cnt(1)
     { // clone
         InitPESPacket(const_cast<TSPacket&>(tspacket));
 
-        int len = (4*1024) - 188;
-        int offset = _pesdata - tspacket.data();
-        _allocSize=((len+offset)/188)*188+188;
-        _fullbuffer = new unsigned char[_allocSize+188];
-        _pesdata = _fullbuffer + offset;
+        int len     = (4*1024) - 256; /* ~4KB */
+        int offset  = _pesdata - tspacket.data();
+        _allocSize  = ((len+offset+187)/188)*188; /* make it multiple of 188 */
+        _fullbuffer = pes_alloc(_allocSize);
+        _pesdata    = _fullbuffer + offset;
         memcpy(_fullbuffer, tspacket.data(), 188);
-        _ccLast = tspacket.ContinuityCounter();
-        _cnt = 1;
     }
 
     virtual ~PESPacket()
     {
         if (IsClone())
-            delete[] _fullbuffer;
+            pes_free(_fullbuffer);
         _fullbuffer = 0;
         _pesdata = 0;
     }
@@ -171,13 +174,13 @@ class PESPacket
   protected:
     void Finalize() { SetCRC(CalcCRC()); }
 
-    unsigned char *_pesdata;
-    unsigned char *_fullbuffer;
+    unsigned char *_pesdata;    ///< Pointer to PES data in full buffer
+    unsigned char *_fullbuffer; ///< Pointer to allocated data
   private:
-    unsigned int _ccLast;
-    unsigned int _cnt;
-    unsigned int _allocSize;
-    bool _badPacket;
+    uint _ccLast;       ///< Continuity counter of last inserted TS Packet
+    uint _cnt;          ///< Number of tspackets contained in PES Packet
+    uint _allocSize;    ///< number of bytes we allocated
+    bool _badPacket;    ///< true if a CRC is not good yet
 };
 
 #endif // _PES_PACKET_H_

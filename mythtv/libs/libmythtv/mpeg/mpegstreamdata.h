@@ -141,7 +141,7 @@ class MPEGStreamData : public QObject
 
     // Caching
     void IncrementRefCnt(const PSIPTable *psip) const;
-    void DeleteCachedTable(PSIPTable *psip) const;
+    virtual void DeleteCachedTable(PSIPTable *psip) const;
     void CachePAT(ProgramAssociationTable *pat);
     void CachePMT(uint program_num, ProgramMapTable *pmt);
 

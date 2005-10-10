@@ -448,15 +448,19 @@ bool SIScan::HandlePostInsertion(void)
     SISCAN(QString("HandlePostInsertion() pat(%1)")
             .arg(sd->HasCachedPAT()));
 
-    if (sd->GetCachedMGT())
+    const MasterGuideTable *mgt = sd->GetCachedMGT();
+    if (mgt)
     {
-        VERBOSE(VB_IMPORTANT, sd->GetCachedMGT()->toString());
+        VERBOSE(VB_IMPORTANT, mgt->toString());
+        sd->ReturnCachedTable(mgt);
     }
 
-    if (sd->HasCachedPAT())
+    const ProgramAssociationTable *pat = sd->GetCachedPAT();
+    if (pat)
     {
-        VERBOSE(VB_IMPORTANT, sd->GetCachedPAT()->toString());
+        VERBOSE(VB_IMPORTANT, pat->toString());
         HandleMPEGDBInsertion(sd, false);
+        sd->ReturnCachedTable(pat);
         return true;
     }
     return false;

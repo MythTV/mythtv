@@ -40,6 +40,7 @@ class ATSCStreamData : public MPEGStreamData
     ATSCStreamData(int desiredMajorChannel,
                    int desiredMinorChannel,
                    bool cacheTables = false);
+   ~ATSCStreamData();
 
     void Reset(int desiredMajorChannel = -1, int desiredMinorChannel = -1);
     void SetDesiredChannel(int major, int minor);
@@ -121,6 +122,7 @@ class ATSCStreamData : public MPEGStreamData
     void CacheMGT(MasterGuideTable*);
     void CacheTVCT(uint pid, TerrestrialVirtualChannelTable*);
     void CacheCVCT(uint pid, CableVirtualChannelTable*);
+    virtual void DeleteCachedTable(PSIPTable *psip) const;
 
   private:
     uint            _GPS_UTC_offset;
@@ -131,10 +133,9 @@ class ATSCStreamData : public MPEGStreamData
     QMap<uint, int> _ett_version;
 
     // Caching
-    MasterGuideTable *_cached_mgt;
-    tvct_cache_t      _cached_tvcts; // pid->tvct
-    cvct_cache_t      _cached_cvcts; // pid->cvct
-    pid_tsid_vec_t    _cached_pid_tsids;
+    mutable MasterGuideTable *_cached_mgt;
+    mutable tvct_cache_t      _cached_tvcts; // pid->tvct
+    mutable cvct_cache_t      _cached_cvcts; // pid->cvct
 
     // Single program variables
     int _desired_major_channel;

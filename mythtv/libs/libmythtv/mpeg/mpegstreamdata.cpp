@@ -36,6 +36,11 @@ MPEGStreamData::~MPEGStreamData()
     Reset(-1);
     SetPATSingleProgram(0);
     SetPMTSingleProgram(0);
+
+    // Delete any cached tables that haven't been returned
+    psip_refcnt_map_t::iterator it = _cached_slated_for_deletion.begin();
+    for (; it != _cached_slated_for_deletion.end(); ++it)
+        delete it.key();
 }
 
 void MPEGStreamData::Reset(int desiredProgram)
@@ -59,7 +64,7 @@ void MPEGStreamData::Reset(int desiredProgram)
     _pmt_version.clear();
 
     {
-        _cache_lock.lock();
+        QMutexLocker locker(&_cache_lock);
 
         DeleteCachedTable(_cached_pat);
         _cached_pat = NULL;
@@ -68,8 +73,6 @@ void MPEGStreamData::Reset(int desiredProgram)
         for (; it != _cached_pmts.end(); ++it)
             DeleteCachedTable(*it);
         _cached_pmts.clear();
-
-        _cache_lock.unlock();
     }
 
     AddListeningPID(MPEG_PAT_PID);
@@ -78,9 +81,9 @@ void MPEGStreamData::Reset(int desiredProgram)
 void MPEGStreamData::DeletePartialPES(uint pid)
 {
     pid_pes_map_t::iterator it = _partial_pes_packet_cache.find(pid);
-    PESPacket *pkt = *it;
-    if (pkt)
+    if (it != _partial_pes_packet_cache.end())
     {
+        PESPacket *pkt = *it;
         _partial_pes_packet_cache.erase(it);
         delete pkt;
     }
@@ -637,28 +640,32 @@ void MPEGStreamData::DeleteCachedTable(PSIPTable *psip) const
         return;
 
     QMutexLocker locker(&_cache_lock);
-    if (!_cached_ref_cnt[psip])
+    if (_cached_ref_cnt[psip] > 0)
+    {
+        _cached_slated_for_deletion[psip] = 1;
+        return;
+    }
+    else if (TableID::PMT == psip->TableID())
     {
         if (psip == _cached_pat)
-        {
             _cached_pat = NULL;
-            delete psip;
-        }
-        else if ((TableID::PMT == psip->TableID()) &&
-                 _cached_pmts[psip->TableIDExtension()])
-        {
-            _cached_pmts[psip->TableIDExtension()] = NULL;
-            delete psip;
-        }
-        psip_refcnt_map_t::iterator it;
-        it = _cached_slated_for_deletion.find(psip);
-        if (it != _cached_slated_for_deletion.end())
-            _cached_slated_for_deletion.erase(it);
+        delete psip;
+    }
+    else if ((TableID::PMT == psip->TableID()) &&
+             _cached_pmts[psip->TableIDExtension()])
+    {
+        _cached_pmts[psip->TableIDExtension()] = NULL;
+        delete psip;
     }
     else
     {
-        _cached_slated_for_deletion[psip] = 1;
+        _cached_slated_for_deletion[psip] = 2;
+        return;
     }
+    psip_refcnt_map_t::iterator it;
+    it = _cached_slated_for_deletion.find(psip);
+    if (it != _cached_slated_for_deletion.end())
+        _cached_slated_for_deletion.erase(it);
 }
 
 void MPEGStreamData::CachePAT(ProgramAssociationTable *pat)
