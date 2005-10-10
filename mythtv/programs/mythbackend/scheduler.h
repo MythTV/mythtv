@@ -69,7 +69,8 @@ class Scheduler : public QObject
     void PruneOldRecords(void);
     void AddNewRecords(void);
     void AddNotListed(void);
-    void BuildNewRecordsQueries(int recordid, QStringList &from, QStringList &where);
+    void BuildNewRecordsQueries(int recordid, QStringList &from, QStringList &where,
+                                MSqlBindings &bindings);
     void PruneOverlaps(void);
     void BuildListMaps(void);
     void ClearListMaps(void);

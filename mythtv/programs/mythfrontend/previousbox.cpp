@@ -465,7 +465,8 @@ void PreviousBox::fillItemList(void)
         return;
 
     ProgramInfo *s;
-    itemList.FromOldRecorded("");
+    MSqlBindings bindings;
+    itemList.FromOldRecorded("", bindings);
 
     vector<ProgramInfo *> sortedList;
     while (itemList.count())

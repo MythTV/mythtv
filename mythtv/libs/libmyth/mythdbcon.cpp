@@ -2,6 +2,9 @@
 
 #include "mythdbcon.h"
 
+#include <qsqldriver.h>
+#include <qregexp.h>
+#include <qvaluevector.h>
 
 MSqlDatabase::MSqlDatabase(const QString &name)
 {
@@ -14,6 +17,7 @@ MSqlDatabase::MSqlDatabase(const QString &name)
                "Unable to init db connection.");
         return;
     }
+    m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
 }
 
 MSqlDatabase::~MSqlDatabase()
@@ -97,15 +101,25 @@ bool MSqlDatabase::KickDatabase()
     // with no intervention).
     // mdz, 2003/08/11
 
+    if (m_lastDBKick.secsTo(QDateTime::currentDateTime()) < 30)
+    {
+        return true;
+    }
+
     QString query("SELECT NULL;");
     for (unsigned int i = 0 ; i < 2 ; ++i, usleep(50000))
     {
         QSqlQuery result = m_db->exec(query); // don't convert to MSqlQuery
         if (result.isActive())
+        {
+            m_lastDBKick = QDateTime::currentDateTime();
             return true;
+        }
         else
             MythContext::DBError("KickDatabase", result);
     }
+
+    m_lastDBKick = QDateTime::currentDateTime().addSecs(-60);
 
     return false;
 }
@@ -314,4 +328,65 @@ bool MSqlQuery::testDBConnection()
     return query.isConnected();
 }
 
+void MSqlQuery::bindValues(MSqlBindings &bindings)
+{
+    MSqlBindings::Iterator it;
+    for (it = bindings.begin(); it != bindings.end(); ++it)
+    {
+        bindValue(it.key(), it.data());
+    }
+}
+
+void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom)
+{
+    MSqlBindings::Iterator it;
+    for (it = addfrom.begin(); it != addfrom.end(); ++it)
+    {
+        output.insert(it.key(), it.data());
+    }
+}
+
+struct Holder {
+    Holder( const QString& hldr = QString::null, int pos = -1 ): holderName( hldr ), holderPos( pos ) {}
+    bool operator==( const Holder& h ) const { return h.holderPos == holderPos && h.holderName == holderName; }
+    bool operator!=( const Holder& h ) const { return h.holderPos != holderPos || h.holderName != holderName; }
+    QString holderName;
+    int     holderPos;
+};
+
+void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings)
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    QString q = query;
+    QRegExp rx(QString::fromLatin1("'[^']*'|:([a-zA-Z0-9_]+)"));
+
+    QValueVector<Holder> holders;
+
+    int i = 0;
+    while ((i = rx.search(q, i)) != -1) 
+    {
+        if (!rx.cap(1).isEmpty())
+            holders.append(Holder(rx.cap(0), i));
+        i += rx.matchedLength();
+    }
+
+    q = query;
+    QVariant val;
+    QString holder;
+
+    for (i = (int)holders.count() - 1; i >= 0; --i)
+    {
+        holder = holders[(uint)i].holderName;
+        val = bindings[holder];
+        QSqlField f("", val.type());
+        if (val.isNull())
+            f.setNull();
+        else
+            f.setValue(val);
+
+        query = query.replace((uint)holders[(uint)i].holderPos, holder.length(),
+                              result.driver()->formatValue(&f));
+    }
+}
 

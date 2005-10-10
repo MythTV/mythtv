@@ -109,6 +109,8 @@ class ProgLister : public MythDialog
     void fillItemList(void);
     void LoadWindow(QDomElement &);
 
+    void updateKeywordInDB(const QString &text);
+
     void createPopup(void);
     void deletePopup(void);
 
@@ -131,7 +133,8 @@ class ProgLister : public MythDialog
     MythComboBox *powerStation;
     MythPushButton *powerOkButton;
 
-    QString powerStringToSQL(QString &qphrase);
+    void powerStringToSQL(const QString &qphrase, QString &output, 
+                          MSqlBindings &bindings);
 };
 
 #endif

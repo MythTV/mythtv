@@ -946,11 +946,13 @@ void ProgFinder::selectSearchData()
     inFill = true;
     QString thequery;
     QString data;
+    MSqlBindings bindings;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    thequery = whereClauseGetSearchData(curSearch);
+    whereClauseGetSearchData(curSearch, thequery, bindings);
 
     query.prepare(thequery);
+    query.bindValues(bindings);
     query.exec();
     
     int rows = query.size();
@@ -1083,13 +1085,13 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
 
     schedList.FromScheduler();
 
-    QString querystr = QString(
-        "WHERE program.title = '%1' "
-        "    AND program.endtime > '%2' ")
-        .arg(progTitle.utf8().replace("'", "\\'"))
-        .arg(progStart.toString("yyyy-MM-ddThh:mm:50"));
+    MSqlBindings bindings;
+    QString querystr = "WHERE program.title = :TITLE "
+                       "  AND program.endtime > :ENDTIME ";
+    bindings[":TITLE"] = progTitle.utf8();
+    bindings[":ENDTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
 
-    showData.FromProgram(querystr, schedList);
+    showData.FromProgram(querystr, bindings, schedList);
 
     showCount = showData.count();
     if (showCount < showsPerListing)
@@ -1115,11 +1117,13 @@ void ProgFinder::getSearchData(int charNum)
     int startPlace = 0;
     QString thequery;
     QString data;
+    MSqlBindings bindings;
 
-    thequery = whereClauseGetSearchData(charNum);
+    whereClauseGetSearchData(charNum, thequery, bindings);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(thequery);
+    query.bindValues(bindings);
     query.exec();
 
     int rows = query.size();
@@ -1206,35 +1210,36 @@ void ProgFinder::fillSearchData(void)
     searchData[curLabel] = '@';
 }
 
-QString ProgFinder::whereClauseGetSearchData(int charNum)
+void ProgFinder::whereClauseGetSearchData(int charNum, QString &where,
+                                          MSqlBindings &bindings)
 {
     QDateTime progStart = QDateTime::currentDateTime();
-    QString thequery;
 
     if (searchData[charNum].contains('@'))
     {
-        thequery = QString("SELECT DISTINCT title FROM program WHERE ( "
-                           "title NOT REGEXP '^[A-Z0-9]' AND "
-                           "title NOT REGEXP '^The [A-Z0-9]' AND "
-                           "title NOT REGEXP '^A [A-Z0-9]' AND "
-                           "starttime > '%1' ) ORDER BY title;")
-                           .arg(progStart.toString("yyyy-MM-ddThh:mm:50"));
+        where = "SELECT DISTINCT title FROM program WHERE ( "
+                   "title NOT REGEXP '^[A-Z0-9]' AND "
+                   "title NOT REGEXP '^The [A-Z0-9]' AND "
+                   "title NOT REGEXP '^A [A-Z0-9]' AND "
+                   "starttime > :STARTTIME ) ORDER BY title;";
+        bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
     }
     else
     {
-        thequery = QString("SELECT DISTINCT title "
-                           "FROM program "
-                           "WHERE ( title LIKE '%1%' OR title LIKE 'The %2%' "
-                           "OR title LIKE 'A %3%' ) "
-                           "AND starttime > '%4' "
-                           "ORDER BY title;")
-                           .arg(searchData[charNum])
-                           .arg(searchData[charNum])
-                           .arg(searchData[charNum])
-                           .arg(progStart.toString("yyyy-MM-ddThh:mm:50"));
+        QString one = searchData[charNum] + "%";
+        QString two = QString("The ") + one;
+        QString three = QString("A ") + one;
+        where = "SELECT DISTINCT title "
+                "FROM program "
+                "WHERE ( title LIKE :ONE OR title LIKE :TWO "
+                "        OR title LIKE :THREE ) "
+                "AND starttime > :STARTTIME "
+                "ORDER BY title;";
+        bindings[":ONE"] = one.utf8();
+        bindings[":TWO"] = two.utf8();
+        bindings[":THREE"] = three.utf8();
+        bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
     }
-
-    return thequery;
 }
 
 bool ProgFinder::formatSelectedData(QString& data)
@@ -1400,55 +1405,54 @@ void JaProgFinder::fillSearchData()
 // we hope japanese HIRAGANA and alphabets, numerics is inserted
 // these character must required ZENKAKU
 // because query work not fine, if mysql's default charset latin1
-QString JaProgFinder::whereClauseGetSearchData(int charNum)
+void JaProgFinder::whereClauseGetSearchData(int charNum, QString &where,
+                                            MSqlBindings &bindings)
 {
     QDateTime progStart = QDateTime::currentDateTime();
-    QString thequery;
 
-    thequery = QString("SELECT DISTINCT title FROM program ");
+    where = "SELECT DISTINCT title FROM program ";
 
     switch (charNum) {
     case 0:
-        thequery += QString("WHERE ( title_pronounce >= 'あ' AND title_pronounce <= 'お') ");
+        where += "WHERE ( title_pronounce >= 'あ' AND title_pronounce <= 'お') ";
         break;
     case 1:
-        thequery += QString("WHERE ( title_pronounce >= 'か' AND title_pronounce <= 'ご') ");
+        where += "WHERE ( title_pronounce >= 'か' AND title_pronounce <= 'ご') ";
         break;
     case 2:
-        thequery += QString("WHERE ( title_pronounce >= 'さ' AND title_pronounce <= 'そ') ");
+        where += "WHERE ( title_pronounce >= 'さ' AND title_pronounce <= 'そ') ";
         break;
     case 3:
-        thequery += QString("WHERE ( title_pronounce >= 'た' AND title_pronounce <= 'ど') ");
+        where += "WHERE ( title_pronounce >= 'た' AND title_pronounce <= 'ど') ";
         break;
     case 4:
-        thequery += QString("WHERE ( title_pronounce >= 'な' AND title_pronounce <= 'の') ");
+        where += "WHERE ( title_pronounce >= 'な' AND title_pronounce <= 'の') ";
         break;
     case 5:
-        thequery += QString("WHERE ( title_pronounce >= 'は' AND title_pronounce <= 'ぽ') ");
+        where += "WHERE ( title_pronounce >= 'は' AND title_pronounce <= 'ぽ') ";
         break;
     case 6:
-        thequery += QString("WHERE ( title_pronounce >= 'ま' AND title_pronounce <= 'も') ");
+        where += "WHERE ( title_pronounce >= 'ま' AND title_pronounce <= 'も') ";
         break;
     case 7:
-        thequery += QString("WHERE ( title_pronounce >= 'や' AND title_pronounce <= 'よ') ");
+        where += "WHERE ( title_pronounce >= 'や' AND title_pronounce <= 'よ') ";
         break;
     case 8:
-        thequery += QString("WHERE ( title_pronounce >= 'ら' AND title_pronounce <= 'ろ') ");
+        where += "WHERE ( title_pronounce >= 'ら' AND title_pronounce <= 'ろ') ";
         break;
     case 9:
-        thequery += QString("WHERE ( title_pronounce >= 'わ' AND title_pronounce <= 'ん') ");
+        where += "WHERE ( title_pronounce >= 'わ' AND title_pronounce <= 'ん') ";
         break;
     case 10:
-        thequery += QString("WHERE ( title_pronounce >= 'Ａ' AND title_pronounce <= 'ｚ') ");
+        where += "WHERE ( title_pronounce >= 'Ａ' AND title_pronounce <= 'ｚ') ";
         break;
     case 11:
-        thequery += QString("WHERE ( title_pronounce >= '０' AND title_pronounce <= '９') ");
+        where += "WHERE ( title_pronounce >= '０' AND title_pronounce <= '９') ";
         break;
     }
 
-    thequery += QString("AND starttime > '%1' ORDER BY title_pronounce;")
-                       .arg(progStart.toString("yyyy-MM-ddThh:mm:50"));
-    return thequery;
+    where += "AND starttime > :STARTTIME ORDER BY title_pronounce;";
+    bindings[":STARTTIME"] = progStart.toString("yyyy-MM-ddThh:mm:50");
 }
 
 

@@ -2,8 +2,8 @@
 #define PROGRAMINFO_H_
 
 #include "recordingtypes.h"
+#include "mythdbcon.h"
 
-#include <qsqldatabase.h>
 #include <qstring.h>
 #include <qdatetime.h>
 #include <qmap.h>
@@ -324,23 +324,14 @@ class ProgramList: public QPtrList<ProgramInfo> {
         return FromScheduler(dummyConflicts);
     };
 
-    bool FromProgram(const QString sql,
+    bool FromProgram(const QString &sql, MSqlBindings &bindings,
                      ProgramList &schedList);
-    bool FromProgram(const QString sql) {
+    bool FromProgram(const QString &sql, MSqlBindings &bindings) {
         ProgramList dummySched;
-        return FromProgram(sql, dummySched);
+        return FromProgram(sql, bindings, dummySched);
     }
 
-    bool FromOldRecorded(const QString sql);
-
-    bool FromRecorded(const QString sql,
-                      ProgramList &schedList);
-    bool FromRecorded(const QString sql) {
-        ProgramList dummySched;
-        return FromRecorded(sql, dummySched);
-    }
-
-    bool FromRecord(const QString sql);
+    bool FromOldRecorded(const QString &sql, MSqlBindings &bindings);
 
     typedef int (*CompareFunc)(ProgramInfo *p1, ProgramInfo *p2);
     void Sort(CompareFunc func) {

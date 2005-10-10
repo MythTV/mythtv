@@ -30,6 +30,7 @@ class MSqlDatabase
   private:
     QString m_name;
     QSqlDatabase *m_db;
+    QDateTime m_lastDBKick;
 };
 
 /// \brief DB connection pool, used by MSqlQuery. Do not use directly.
@@ -65,6 +66,15 @@ typedef struct _MSqlQueryInfo
     bool returnConnection;
 } MSqlQueryInfo;
 
+/// \brief typedef for a map of string -> string bindings for generic queries.
+typedef QMap<QString, QVariant> MSqlBindings;
+
+/// \brief Add the entries in addfrom to the map in output
+void MSqlAddMoreBindings(MSqlBindings &output, MSqlBindings &addfrom);
+
+/// \brief Given a partial query string and a bindings object, escape the string
+void MSqlEscapeAsAQuery(QString &query, MSqlBindings &bindings);
+
 /** \brief QSqlQuery wrapper that fetches a DB connection from the connection pool.
  *
  *   Myth & database connections
@@ -97,6 +107,9 @@ class MSqlQuery : public QSqlQuery
 
     /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
     bool prepare(const QString &query);
+
+    /// \brief Add all the bindings in the passed in bindings
+    void bindValues(MSqlBindings &bindings);
 
     /// \brief Checks DB connection + login (login info via Mythcontext)
     static bool testDBConnection();

@@ -62,7 +62,8 @@ class ProgFinder : public MythDialog
     virtual bool formatSelectedData(QString &data);
     virtual bool formatSelectedData(QString &data, int charNum);
     virtual void restoreSelectedData(QString &data);
-    virtual QString whereClauseGetSearchData(int canNum);
+    virtual void whereClauseGetSearchData(int canNum, QString &where, 
+                                          MSqlBindings &bindings);
 
     void LoadWindow(QDomElement &);
     void parseContainer(QDomElement &);
@@ -132,7 +133,8 @@ class JaProgFinder : public ProgFinder
     virtual bool formatSelectedData(QString &data);
     virtual bool formatSelectedData(QString &data, int charNum);
     virtual void restoreSelectedData(QString &data);
-    virtual QString whereClauseGetSearchData(int canNum);
+    virtual void whereClauseGetSearchData(int canNum, QString &where,
+                                          MSqlBindings &bindings);
 
   private:
     static const char* searchChars[];

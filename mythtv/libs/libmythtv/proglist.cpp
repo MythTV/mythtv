@@ -452,6 +452,40 @@ void ProgLister::chooseListBoxChanged(void)
     }
 }
 
+void ProgLister::updateKeywordInDB(const QString &text)
+{
+    int oldview = chooseListBox->currentItem() - 1;
+    int newview = viewList.findIndex(text);
+
+    QString qphrase = NULL;
+
+    if (newview < 0 || newview != oldview)
+    {
+        if (oldview >= 0)
+        {
+            qphrase = viewList[oldview].utf8();
+
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("DELETE FROM keyword "
+                          "WHERE phrase = :PHRASE AND searchtype = :TYPE;");
+            query.bindValue(":PHRASE", qphrase);
+            query.bindValue(":TYPE", searchtype);
+            query.exec();
+        }
+        if (newview < 0)
+        {
+            qphrase = text.utf8();
+
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("REPLACE INTO keyword (phrase, searchtype)"
+                          "VALUES(:PHRASE, :TYPE );");
+            query.bindValue(":PHRASE", qphrase);
+            query.bindValue(":TYPE", searchtype);
+            query.exec();
+        }
+    }
+}
+
 void ProgLister::setViewFromEdit(void)
 {
     if (!choosePopup || !chooseListBox || !chooseLineEdit)
@@ -462,40 +496,8 @@ void ProgLister::setViewFromEdit(void)
     if (text.stripWhiteSpace().length() == 0)
         return;
 
-    int oldview = chooseListBox->currentItem() - 1;
-    int newview = viewList.findIndex(text);
-
-    QString querystr = NULL;
-    QString qphrase = NULL;
-
-    if (newview < 0 || newview != oldview)
-    {
-        if (oldview >= 0)
-        {
-            qphrase = viewList[oldview].utf8();
-            qphrase.replace("\'", "\\\'");
-
-            MSqlQuery query(MSqlQuery::InitCon());
-            querystr = QString("DELETE FROM keyword "
-                               "WHERE phrase = '%1' AND searchtype = '%2';")
-                               .arg(qphrase).arg(searchtype);
-            query.prepare(querystr);
-            query.exec();
-        }
-        if (newview < 0)
-        {
-            qphrase = text.utf8();
-            qphrase.replace("\'", "\\\'");
-
-            MSqlQuery query(MSqlQuery::InitCon());
-            querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
-                               "VALUES('%1','%2');")
-                               .arg(qphrase).arg(searchtype);
-            query.prepare(querystr);
-            query.exec();
-        }
-    }
-
+    updateKeywordInDB(text);
+  
     choosePopup->done(0);
 
     fillViewList(text);
@@ -526,39 +528,8 @@ void ProgLister::setViewFromPowerEdit()
     if (text == ":::::")
         return;
 
-    int oldview = chooseListBox->currentItem() - 1;
-    int newview = viewList.findIndex(text);
+    updateKeywordInDB(text);
 
-    QString querystr = NULL;
-    QString qphrase = NULL;
-
-    if (newview < 0 || newview != oldview)
-    {
-        if (oldview >= 0)
-        {
-            qphrase = viewList[oldview].utf8();
-            qphrase.replace("\'", "\\\'");
-
-            MSqlQuery query(MSqlQuery::InitCon());
-            querystr = QString("DELETE FROM keyword "
-                               "WHERE phrase = '%1' AND searchtype = '%2';")
-                               .arg(qphrase).arg(searchtype);
-            query.prepare(querystr);
-            query.exec();
-        }
-        if (newview < 0)
-        {
-            qphrase = text.utf8();
-            qphrase.replace("\'", "\\\'");
-
-            MSqlQuery query(MSqlQuery::InitCon());
-            querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
-                               "VALUES('%1','%2');")
-                               .arg(qphrase).arg(searchtype);
-            query.prepare(querystr);
-            query.exec();
-        }
-    }
     powerPopup->done(0);
 
     fillViewList(text);
@@ -593,15 +564,19 @@ void ProgLister::addSearchRecord(void)
         VERBOSE(VB_IMPORTANT, "Unknown search in ProgLister");
         return;
     }
+
     if (searchtype == kPowerSearch)
     {
         if (text == "" || text == ":::::")
             return;
 
-        what = powerStringToSQL(text);
+        MSqlBindings bindings;
+        powerStringToSQL(text.utf8(), what, bindings);
 
         if (what == "")
             return;
+
+        MSqlEscapeAsAQuery(what, bindings);
     }
 
 
@@ -625,13 +600,12 @@ void ProgLister::deleteKeyword(void)
 
     QString text = viewList[view];
     QString qphrase = text.utf8();
-    qphrase.replace("\'", "\\\'");
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString querystr = QString("DELETE FROM keyword "
-                               "WHERE phrase = '%1' AND searchtype = '%2';")
-                               .arg(qphrase).arg(searchtype);
-    query.prepare(querystr);
+    query.prepare("DELETE FROM keyword "
+                  "WHERE phrase = :PHRASE AND searchtype = :TYPE;");
+    query.bindValue(":PHRASE", qphrase);
+    query.bindValue(":TYPE", searchtype);
     query.exec();
 
     chooseListBox->removeItem(view + 1);
@@ -972,8 +946,7 @@ void ProgLister::powerEdit()
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString querystr = "SELECT category FROM program GROUP BY category;";
-    query.prepare(querystr);
+    query.prepare("SELECT category FROM program GROUP BY category;");
     query.exec();
 
     if (query.isActive() && query.size())
@@ -997,12 +970,11 @@ void ProgLister::powerEdit()
     stationList.clear();
     stationList << "";
 
-    querystr = "SELECT channel.chanid, channel.channum, "
-               "channel.callsign, channel.name FROM channel "
-               "WHERE channel.visible = 1 "
-               "GROUP BY callsign "
-               "ORDER BY " + channelOrdering + ";";
-    query.prepare(querystr);
+    query.prepare(QString("SELECT channel.chanid, channel.channum, "
+                  "channel.callsign, channel.name FROM channel "
+                  "WHERE channel.visible = 1 "
+                  "GROUP BY callsign "
+                  "ORDER BY ") + channelOrdering + ";");
     query.exec();
 
     if (query.isActive() && query.size())
@@ -1065,58 +1037,74 @@ void ProgLister::powerEdit()
     powerPopup = NULL;
 }
 
-QString ProgLister::powerStringToSQL(QString &qphrase)
+void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
+                                  MSqlBindings &bindings)
 {
-    QString str = "";
+    output = "";
+    QString curfield;
 
-    qphrase.replace("\"","\\\"");
-    QStringList field = QStringList::split( ":", qphrase, true);
+    QStringList field = QStringList::split(":", qphrase, true);
 
-    if ( field.count() != 6)
+    if (field.count() != 6)
     {
         VERBOSE(VB_IMPORTANT, QString("Error. PowerSearch %1 has %2 fields")
                 .arg(qphrase).arg(field.count()));
-        return str;
+        return;
     }
+
     if (field[0])
-        str += QString("program.title LIKE '\%%1\%' ")
-                       .arg(field[0]);
+    {
+        curfield = "%" + field[0] + "%";
+        output += "program.title LIKE :POWERTITLE ";
+        bindings[":POWERTITLE"] = curfield;
+    }
+
     if (field[1])
     {
-        if (str > "")
-            str += "AND ";
-        str += QString("program.subtitle LIKE '\%%1\%' ")
-                       .arg(field[1]);
+        if (output > "")
+            output += "AND ";
+
+        curfield = "%" + field[1] + "%";
+        output += "program.subtitle LIKE :POWERSUB ";
+        bindings[":POWERSUB"] = curfield;
     }
+
     if (field[2])
     {
-        if (str > "")
-            str += "AND ";
-        str += QString("program.description LIKE '\%%1\%' ")
-                       .arg(field[2]);
+        if (output > "")
+            output += "AND ";
+
+        curfield = "%" + field[2] + "%";
+        output += "program.description LIKE :POWERDESC ";
+        bindings[":POWERDESC"] = curfield;
     }
+
     if (field[3])
     {
-        if (str > "")
-            str += "AND ";
-        str += QString("program.category_type='%1' ")
-                       .arg(field[3]);
+        if (output > "")
+            output += "AND ";
+
+        output += "program.category_type = :POWERCATTYPE ";
+        bindings[":POWERCATTYPE"] = field[3];
     }
+
     if (field[4])
     {
-        if (str > "")
-            str += "AND ";
-        str += QString("program.category='%1' ")
-                       .arg(field[4]);
+        if (output > "")
+            output += "AND ";
+
+        output += "program.category = :POWERCAT ";
+        bindings[":POWERCAT"] = field[4];
     }
+
     if (field[5])
     {
-        if (str > "")
-            str += "AND ";
-        str += QString("channel.callsign='%1' ")
-                       .arg(field[5]);
+        if (output > "")
+            output += "AND ";
+
+        output += "channel.callsign = :POWERCALLSIGN ";
+        bindings[":POWERCALLSIGN"] = field[5];
     }
-    return str;
 }
 
 void ProgLister::quickRecord()
@@ -1178,12 +1166,11 @@ void ProgLister::fillViewList(const QString &view)
     if (type == plChannel) // list by channel
     {
         MSqlQuery query(MSqlQuery::InitCon()); 
-        QString querystr = "SELECT channel.chanid, channel.channum, "
-            "channel.callsign, channel.name FROM channel "
-            "WHERE channel.visible = 1 "
-            "GROUP BY channum, callsign "
-            "ORDER BY " + channelOrdering + ";";
-        query.prepare(querystr);
+        query.prepare(QString("SELECT channel.chanid, channel.channum, "
+                      "channel.callsign, channel.name FROM channel "
+                      "WHERE channel.visible = 1 "
+                      "GROUP BY channum, callsign "
+                      "ORDER BY ") + channelOrdering + ";");
         query.exec();
 
         if (query.isActive() && query.size())
@@ -1210,8 +1197,7 @@ void ProgLister::fillViewList(const QString &view)
     else if (type == plCategory) // list by category
     {
         MSqlQuery query(MSqlQuery::InitCon()); 
-        QString querystr = "SELECT category FROM program GROUP BY category;";
-        query.prepare(querystr);
+        query.prepare("SELECT category FROM program GROUP BY category;");
         query.exec();
 
         if (query.isActive() && query.size())
@@ -1233,10 +1219,9 @@ void ProgLister::fillViewList(const QString &view)
              type == plPeopleSearch || type == plPowerSearch)
     {
         MSqlQuery query(MSqlQuery::InitCon()); 
-        QString querystr = QString("SELECT phrase FROM keyword "
-                                   "WHERE searchtype = '%1';")
-                                   .arg(searchtype);
-        query.prepare(querystr);
+        query.prepare("SELECT phrase FROM keyword "
+                      "WHERE searchtype = :SEARCHTYPE;");
+        query.bindValue(":SEARCHTYPE", searchtype);
         query.exec();
 
         if (query.isActive() && query.size())
@@ -1258,13 +1243,12 @@ void ProgLister::fillViewList(const QString &view)
             if (curView < 0)
             {
                 QString qphrase = view.utf8();
-                qphrase.replace("\'", "\\\'");
 
                 MSqlQuery query(MSqlQuery::InitCon()); 
-                querystr = QString("REPLACE INTO keyword (phrase, searchtype)"
-                                   "VALUES('%1','%2');")
-                                    .arg(qphrase).arg(searchtype);
-                query.prepare(querystr);
+                query.prepare("REPLACE INTO keyword (phrase, searchtype)"
+                              "VALUES(:VIEW, :SEARCHTYPE );");
+                query.bindValue(":VIEW", qphrase);
+                query.bindValue(":SEARCHTYPE", searchtype);
                 query.exec();
 
                 viewList << qphrase;
@@ -1381,22 +1365,26 @@ void ProgLister::fillItemList(void)
     QString startstr = startTime.toString("yyyy-MM-ddThh:mm:50");
     QString qphrase = viewList[curView].utf8();
 
+    MSqlBindings bindings;
+    bindings[":PGILSTART"] = startstr;
+    bindings[":PGILPHRASE"] = qphrase;
+    bindings[":PGILLIKEPHRASE"] = QString("%") + qphrase + "%";
+    bindings[":PGILMATCHPHRASE"] = QString("%") + qphrase;
+
     if (type == plTitle) // per title listings
     {
-        where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND program.title = '%2' ")
-                        .arg(startstr).arg(qphrase);
+        where = "WHERE channel.visible = 1 "
+                "  AND program.endtime > :PGILSTART "
+                "  AND program.title = :PGILPHRASE ";
     }
     else if (type == plNewListings) // what's new list
     {
-        where = QString("LEFT JOIN oldprogram ON "
-                        "  oldprogram.oldtitle = program.title "
-                        "WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND oldprogram.oldtitle IS NULL "
-                        "  AND program.manualid = 0 ")
-                        .arg(startstr);
+        where = "LEFT JOIN oldprogram ON "
+                "  oldprogram.oldtitle = program.title "
+                "WHERE channel.visible = 1 "
+                "  AND program.endtime > :PGILSTART "
+                "  AND oldprogram.oldtitle IS NULL "
+                "  AND program.manualid = 0 ";
 
         if (qphrase == "premieres")
         {
@@ -1426,77 +1414,77 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plTitleSearch) // keyword search
     {
-        where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND program.title LIKE '\%%2\%' ")
-                        .arg(startstr).arg(qphrase);
+        where = "WHERE channel.visible = 1 "
+                "  AND program.endtime > :PGILSTART "
+                "  AND program.title LIKE :PGILLIKEPHRASE ";
     }
     else if (type == plKeywordSearch) // keyword search
     {
-        where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND (program.title LIKE '\%%2\%' "
-                        "    OR program.subtitle LIKE '\%%3\%' "
-                        "    OR program.description LIKE '\%%4\%') ")
-                        .arg(startstr).arg(qphrase).arg(qphrase).arg(qphrase);
-
+        where = "WHERE channel.visible = 1 "
+                "  AND program.endtime > :PGILSTART "
+                "  AND (program.title LIKE :PGILLIKEPHRASE "
+                "    OR program.subtitle LIKE :PGILLIKEPHRASE "
+                "    OR program.description LIKE :PGILLIKEPHRASE ) ";
     }
     else if (type == plPeopleSearch) // people search
     {
-        where = QString(", people, credits WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND people.name LIKE '%2' "
-                        "  AND credits.person = people.person "
-                        "  AND program.chanid = credits.chanid "
-                        "  AND program.starttime = credits.starttime")
-                        .arg(startstr).arg(qphrase);
+        where = ", people, credits WHERE channel.visible = 1 "
+                "  AND program.endtime > :PGILSTART "
+                "  AND people.name LIKE :PGILPHRASE "
+                "  AND credits.person = people.person "
+                "  AND program.chanid = credits.chanid "
+                "  AND program.starttime = credits.starttime";
     }
     else if (type == plPowerSearch) // complex search
     {
-        where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND ( %2 ) ")
-                        .arg(startstr).arg(powerStringToSQL(qphrase));
+        QString powerWhere;
+        MSqlBindings powerBindings;
+
+        powerStringToSQL(qphrase, powerWhere, powerBindings);
+
+        if (powerWhere != "")
+        {
+            where = QString("WHERE channel.visible = 1 "
+                    "  AND program.endtime > :PGILSTART "
+                    "  AND ( ") + powerWhere + " ) ";
+            MSqlAddMoreBindings(bindings, powerBindings);
+        }
     }
     else if (type == plSQLSearch) // complex search
     {
         qphrase.remove(QRegExp("^\\s*AND\\s+", false));
         where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND ( %2 ) ")
-                        .arg(startstr).arg(qphrase);
+                        "  AND program.endtime > :PGILSTART "
+                        "  AND ( %1 ) ").arg(qphrase);
     }
     else if (type == plChannel) // list by channel
     {
-        where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND channel.chanid = '%2' ")
-                        .arg(startstr).arg(qphrase);
+        where = "WHERE channel.visible = 1 "
+                "  AND program.endtime > :PGILSTART "
+                "  AND channel.chanid = :PGILPHRASE ";
     }
     else if (type == plCategory) // list by category
     {
-        where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND program.category = '\%2' ")
-                        .arg(startstr).arg(qphrase);
+        where = "WHERE channel.visible = 1 "
+                "  AND program.endtime > :PGILSTART "
+                "  AND program.category = :PGILMATCHPHRASE ";
     }
     else if (type == plMovies) // list movies
     {
-        where = QString("WHERE channel.visible = 1 "
-                        "  AND program.endtime > '%1' "
-                        "  AND program.category_type = 'movie' "
-                        "  AND program.stars >= '\%2' ")
-                        .arg(startstr).arg(qphrase);
+        where = "WHERE channel.visible = 1 "
+                "  AND program.endtime > :PGILSTART "
+                "  AND program.category_type = 'movie' "
+                "  AND program.stars >= :PGILMATCHPHRASE ";
     }
     else if (type == plTime) // list by time
     {
-        where = QString("WHERE channel.visible = 1 "
-                        "  AND program.starttime >= '%1' ")
-                        .arg(searchTime.toString("yyyy-MM-ddThh:00:00"));
+        bindings["PGILSEARCHTIME"] = searchTime.toString("yyyy-MM-ddThh:00:00");
+
+        where = "WHERE channel.visible = 1 "
+                "  AND program.starttime >= :PGILSEARCHTIME ";
         if (titleSort)
-            where += QString("  AND program.starttime < DATE_ADD('%1', "
-                             "INTERVAL '1' HOUR) ")
-                             .arg(searchTime.toString("yyyy-MM-ddThh:00:00"));
+            where += "  AND program.starttime < DATE_ADD(:PGILSEARCHTIME, "
+                     "INTERVAL '1' HOUR) ";
     }
 
     if (titleSort && type == plTitle)
@@ -1505,7 +1493,7 @@ void ProgLister::fillItemList(void)
         where += " GROUP BY title ";
 
     schedList.FromScheduler();
-    itemList.FromProgram(where, schedList);
+    itemList.FromProgram(where, bindings, schedList);
 
     if (titleSort || reverseSort)
     {
@@ -1743,3 +1731,4 @@ void ProgLister::customEvent(QCustomEvent *e)
 
     allowEvents = true;
 }
+

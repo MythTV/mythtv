@@ -105,10 +105,9 @@ void Scheduler::verifyCards(void)
             source = query.value(0).toInt();
             MSqlQuery subquery(MSqlQuery::SchedCon());
 
-            thequery = QString("SELECT cardinputid FROM cardinput WHERE "
-                               "sourceid = %1 ORDER BY cardinputid;")
-                              .arg(source);
-            subquery.prepare(thequery);
+            subquery.prepare("SELECT cardinputid FROM cardinput WHERE "
+                             "sourceid = :SOURCEID ORDER BY cardinputid;");
+            subquery.bindValue(":SOURCEID", source);
             subquery.exec();
             
             if (!subquery.isActive() || subquery.size() <= 0)
@@ -1511,7 +1510,8 @@ void Scheduler::UpdateManuals(int recordid)
 }
 
 void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from, 
-                                       QStringList &where)
+                                       QStringList &where, 
+                                       MSqlBindings &bindings)
 {
     MSqlQuery result(MSqlQuery::SchedCon());
     QString query;
@@ -1530,10 +1530,11 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         return;
     }
 
+    int count = 0;
     while (result.next())
     {
-        qphrase = result.value(3).toString();
-        // qphrase.replace("\'", "\\\'");
+        QString prefix = QString(":NR%1").arg(count);
+        qphrase = QString::fromUtf8(result.value(3).toString());
 
         RecSearchType searchtype = RecSearchType(result.value(1).toInt());
 
@@ -1544,51 +1545,51 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
             continue;
         }
 
+        QString bindrecid = prefix + "RECID";
+        QString bindphrase = prefix + "PHRASE";
+        QString bindlikephrase = prefix + "LIKEPHRASE";
+
+        bindings[bindrecid] = result.value(0).toString();
+        bindings[bindphrase] = qphrase.utf8();
+        bindings[bindlikephrase] = QString(QString("%") + qphrase + "%").utf8();
+
         switch (searchtype)
         {
         case kPowerSearch:
             qphrase.remove(QRegExp("^\\s*AND\\s+", false));
             from << result.value(2).toString();
-            where << QString("record.recordid = %1 AND "
-                             "program.manualid = 0 AND ( %2 )")
-                .arg(result.value(0).toString())
-                .arg(qphrase);
+            where << (QString("record.recordid = ") + bindrecid +
+                      QString(" AND program.manualid = 0 AND ( %2 )")
+                      .arg(qphrase));
             break;
         case kTitleSearch:
             from << "";
-            where << QString("record.recordid = %1 AND "
-                             "program.manualid = 0 AND "
-                             "program.title LIKE '\%%2\%'")
-                .arg(result.value(0).toString())
-                .arg(qphrase);
+            where << (QString("record.recordid = ") + bindrecid + " AND "
+                      "program.manualid = 0 AND "
+                      "program.title LIKE " + bindlikephrase);
             break;
         case kKeywordSearch:
             from << "";
-            where << QString("record.recordid = %1 AND "
-                             "program.manualid = 0 AND "
-                             "(program.title LIKE '\%%2\%' OR "
-                             " program.subtitle LIKE '\%%3\%' OR "
-                             " program.description LIKE '\%%4\%')")
-                .arg(result.value(0).toString())
-                .arg(qphrase).arg(qphrase).arg(qphrase);
+            where << (QString("record.recordid = ") + bindrecid +
+                      " AND program.manualid = 0"
+                      " AND (program.title LIKE " + bindlikephrase +
+                      " OR program.subtitle LIKE " + bindlikephrase +
+                      " OR program.description LIKE " + bindlikephrase + ")");
             break;
         case kPeopleSearch:
             from << ", people, credits";
-            where << QString("record.recordid = %1 AND "
-                             "program.manualid = 0 AND "
-                             "people.name LIKE '%2' AND "
-                             "credits.person = people.person AND "
-                             "program.chanid = credits.chanid AND "
-                             "program.starttime = credits.starttime")
-                .arg(result.value(0).toString())
-                .arg(qphrase);
+            where << (QString("record.recordid = ") + bindrecid + " AND "
+                      "program.manualid = 0 AND "
+                      "people.name LIKE " + bindphrase + " AND "
+                      "credits.person = people.person AND "
+                      "program.chanid = credits.chanid AND "
+                      "program.starttime = credits.starttime");
             break;
         case kManualSearch:
             UpdateManuals(result.value(0).toInt());
             from << "";
-            where << QString("record.recordid = %1 AND "
-                             "program.manualid = record.recordid ")
-                .arg(result.value(0).toString());
+            where << (QString("record.recordid = ") + bindrecid + " AND "
+                              "program.manualid = record.recordid ");
             break;
         default:
             VERBOSE(VB_IMPORTANT, QString("Unknown RecSearchType "
@@ -1597,16 +1598,19 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
                                          .arg(result.value(0).toString()));
             break;
         }
+
+        count++;
     }
 
     if (recordid == -1 || from.count() == 0)
     {
         from << "";
-        where << QString("record.search = %1 AND "
-                         "(record.recordid = %2 OR %3 = -1) AND "
-                         "program.manualid = 0 AND "
-                         "program.title = record.title ")
-            .arg(kNoSearch).arg(recordid).arg(recordid);
+        where << "record.search = :NRST AND "
+                 "(record.recordid = :NRRECORDID OR :NRRECORDID = -1) AND "
+                 "program.manualid = 0 AND "
+                 "program.title = record.title ";
+        bindings[":NRST"] = kNoSearch;
+        bindings[":NRRECORDID"] = recordid;
     }
 }
 
@@ -1638,8 +1642,9 @@ void Scheduler::UpdateMatches(int recordid) {
 
     unsigned clause;
     QStringList fromclauses, whereclauses;
+    MSqlBindings bindings;
 
-    BuildNewRecordsQueries(recordid, fromclauses, whereclauses);
+    BuildNewRecordsQueries(recordid, fromclauses, whereclauses, bindings);
 
     if (print_verbose_messages & VB_SCHEDULE)
     {
@@ -1697,6 +1702,7 @@ void Scheduler::UpdateMatches(int recordid) {
         gettimeofday(&dbstart, NULL);
         MSqlQuery result(MSqlQuery::SchedCon());
         result.prepare(query);
+        result.bindValues(bindings);
         result.exec();
         gettimeofday(&dbend, NULL);
 

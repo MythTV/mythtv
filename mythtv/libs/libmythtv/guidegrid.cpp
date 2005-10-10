@@ -732,14 +732,16 @@ void GuideGrid::fillProgramRowInfos(unsigned int row)
 
     m_programs[row] = proglist = new ProgramList();
 
-    QString querystr = QString(
-        "WHERE program.chanid = '%1' AND program.endtime >= '%2' "
-        "    AND program.starttime <= '%3' AND program.manualid = 0 ")
-        .arg(m_channelInfos[chanNum].chanid)
-        .arg(m_currentStartTime.toString("yyyy-MM-ddThh:mm:00"))
-        .arg(m_currentEndTime.toString("yyyy-MM-ddThh:mm:00"));
+    MSqlBindings bindings;
+    QString querystr = "WHERE program.chanid = :CHANID "
+                       "  AND program.endtime >= :STARTTS "
+                       "  AND program.starttime <= :ENDTS "
+                       "  AND program.manualid = 0 ";
+    bindings[":CHANID"] = m_channelInfos[chanNum].chanid;
+    bindings[":STARTTS"] = m_currentStartTime.toString("yyyy-MM-ddThh:mm:00");
+    bindings[":ENDTS"] = m_currentEndTime.toString("yyyy-MM-ddThh:mm:00");
 
-    proglist->FromProgram(querystr, m_recList);
+    proglist->FromProgram(querystr, bindings, m_recList);
 
     QDateTime ts = m_currentStartTime;
 
@@ -1295,7 +1297,6 @@ void GuideGrid::generateListings()
 
 void GuideGrid::toggleChannelFavorite()
 {
-    QString thequery;
     MSqlQuery query(MSqlQuery::InitCon());
 
     // Get current channel id, and make sure it exists...
@@ -1312,19 +1313,15 @@ void GuideGrid::toggleChannelFavorite()
 
     if (favid > 0) 
     {
-        thequery = QString("DELETE FROM favorites WHERE favid = '%1'")
-                           .arg(favid);
-
-        query.prepare(thequery);
+        query.prepare("DELETE FROM favorites WHERE favid = :FAVID ;");
+        query.bindValue(":FAVID", favid);
         query.exec(); 
     }
     else
     {
         // We have no favorites record...Add one to toggle...
-        thequery = QString("INSERT INTO favorites (chanid) VALUES ('%1')")
-                           .arg(chanid);
-
-        query.prepare(thequery);
+        query.prepare("INSERT INTO favorites (chanid) VALUES (:FAVID);");
+        query.bindValue(":FAVID", chanid);
         query.exec(); 
     }
 

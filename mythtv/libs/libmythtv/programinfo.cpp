@@ -622,15 +622,15 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
     ProgramList schedList;
     ProgramList progList;
 
-    QString querystr = QString(
-        "WHERE program.chanid = '%1' AND program.starttime < '%2' AND "
-        "    program.endtime > '%3' ")
-        .arg(channel)
-        .arg(dtime.toString("yyyy-MM-ddThh:mm:50"))
-        .arg(dtime.toString("yyyy-MM-ddThh:mm:50"));
+    MSqlBindings bindings;
+    QString querystr = "WHERE program.chanid = :CHANID "
+                       "  AND program.starttime < :STARTTS "
+                       "  AND program.endtime > :STARTTS ";
+    bindings[":CHANID"] = channel;
+    bindings[":STARTTS"] = dtime.toString("yyyy-MM-ddThh:mm:50");
 
     schedList.FromScheduler();
-    progList.FromProgram(querystr, schedList);
+    progList.FromProgram(querystr, bindings, schedList);
 
     if (!progList.isEmpty())
     {
@@ -3470,7 +3470,8 @@ bool ProgramList::FromScheduler(bool &hasConflicts)
     return result;
 }
 
-bool ProgramList::FromProgram(const QString sql, ProgramList &schedList)
+bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
+                              ProgramList &schedList)
 {
     clear();
 
@@ -3496,13 +3497,14 @@ bool ProgramList::FromProgram(const QString sql, ProgramList &schedList)
         querystr += " GROUP BY program.starttime, channel.channum, "
             "  channel.callsign, program.title ";
     if (!sql.contains(" ORDER BY "))
-        querystr += QString(" ORDER BY program.starttime, %2 ")
-            .arg(gContext->GetSetting("ChannelOrdering", "channum+0"));
+        querystr += QString(" ORDER BY program.starttime, ") + 
+                    gContext->GetSetting("ChannelOrdering", "channum+0") + " ";
     if (!sql.contains(" LIMIT "))
         querystr += " LIMIT 1000 ";
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(querystr);
+    query.bindValues(bindings);
     
     if (!query.exec() || !query.isActive())
     {
@@ -3579,7 +3581,7 @@ bool ProgramList::FromProgram(const QString sql, ProgramList &schedList)
     return true;
 }
 
-bool ProgramList::FromOldRecorded(const QString sql)
+bool ProgramList::FromOldRecorded(const QString &sql, MSqlBindings &bindings)
 {
     clear();
     MSqlQuery query(MSqlQuery::InitCon());
@@ -3592,7 +3594,8 @@ bool ProgramList::FromOldRecorded(const QString sql)
                   " FROM oldrecorded "
                   " LEFT JOIN channel ON oldrecorded.chanid = channel.chanid "
                   + sql);
-    
+    query.bindValues(bindings);
+
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("ProgramList::FromOldRecorded", 
@@ -3630,26 +3633,6 @@ bool ProgramList::FromOldRecorded(const QString sql)
     }
 
     return true;
-}
-
-/** \fn ProgramList::FromRecorded(const QString, ProgramList&)
- *  \brief <b>Stub.</b>
- *  \deprecated
- */
-bool ProgramList::FromRecorded(const QString, ProgramList&)
-{
-    clear();
-    return false;
-}
-
-/** \fn ProgramList::FromRecord(const QString)
- *  \brief <b>Stub.</b>
- *  \deprecated
- */
-bool ProgramList::FromRecord(const QString)
-{
-    clear();
-    return false;
 }
 
 int ProgramList::compareItems(QPtrCollection::Item item1,
