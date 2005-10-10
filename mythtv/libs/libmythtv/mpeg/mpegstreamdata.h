@@ -36,7 +36,7 @@ class MPEGStreamData : public QObject
     void SetIgnoreCRCforPMT(bool pmtCRCbug) { _have_pmt_CRC_bug = pmtCRCbug; }
     virtual bool IsRedundant(const PSIPTable&) const;
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
-    virtual bool HandleTSTables(const TSPacket* tspacket);
+    virtual void HandleTSTables(const TSPacket* tspacket);
     virtual bool ProcessTSPacket(const TSPacket& tspacket);
     virtual int  ProcessData(unsigned char *buffer, int len);
     inline  void HandleAdaptationFieldControl(const TSPacket* tspacket);
@@ -128,7 +128,7 @@ class MPEGStreamData : public QObject
 
   protected:
     // Table processing -- for internal use
-    PSIPTable* AssemblePSIP(const TSPacket* tspacket);
+    PSIPTable* AssemblePSIP(const TSPacket* tspacket, bool& moreTablePackets);
     bool AssemblePSIP(PSIPTable& psip, TSPacket* tspacket);
     void SavePartialPES(uint pid, PESPacket* packet);
     PESPacket* GetPartialPES(uint pid)

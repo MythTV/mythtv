@@ -31,15 +31,13 @@ class PESPacket
     void InitPESPacket(TSPacket& tspacket)
     {
         if (tspacket.PayloadStart())
-        {
-            _pesdata = tspacket.data() + tspacket.AFCOffset() + 
-                tspacket.StartOfFieldPointer();
-        }
+            _psiOffset = tspacket.AFCOffset() + tspacket.StartOfFieldPointer();
         else
         {
             cerr<<"Started PESPacket, but !payloadStart()"<<endl;
-            _pesdata = tspacket.data() + tspacket.AFCOffset();
+            _psiOffset = tspacket.AFCOffset();
         }
+        _pesdata = tspacket.data() + tspacket.AFCOffset();
 
         _badPacket = true;
         if ((_pesdata - tspacket.data()) < (188-3-4))
@@ -65,6 +63,7 @@ class PESPacket
     // may be modified
     PESPacket(const PESPacket& pkt)
         : _pesdata(0),
+          _psiOffset(pkt._psiOffset),
           _ccLast(pkt._ccLast), _cnt(pkt._cnt),
           _allocSize((pkt._allocSize) ? pkt._allocSize : 188),
           _badPacket(pkt._badPacket)
@@ -78,13 +77,13 @@ class PESPacket
     PESPacket(const TSPacket& tspacket)
         : _ccLast(tspacket.ContinuityCounter()), _cnt(1)
     { // clone
-        InitPESPacket(const_cast<TSPacket&>(tspacket));
+        InitPESPacket(const_cast<TSPacket&>(tspacket)); // sets _psiOffset
 
         int len     = (4*1024) - 256; /* ~4KB */
-        int offset  = _pesdata - tspacket.data();
-        _allocSize  = ((len+offset+187)/188)*188; /* make it multiple of 188 */
+        /* make alloc size multiple of 188 */
+        _allocSize  = ((len+_psiOffset+187)/188)*188;
         _fullbuffer = pes_alloc(_allocSize);
-        _pesdata    = _fullbuffer + offset;
+        _pesdata    = _fullbuffer + _psiOffset;
         memcpy(_fullbuffer, tspacket.data(), 188);
     }
 
@@ -118,6 +117,10 @@ class PESPacket
     unsigned int StreamID() const { return _pesdata[1]; }
     unsigned int Length() const
         { return (pesdata()[2] & 0x0f) << 8 | pesdata()[3]; }
+
+    unsigned int TSSizeInBuffer() const
+        { return (_cnt * TSPacket::PAYLOAD_SIZE) + TSPacket::HEADER_SIZE; }
+    unsigned int PSIOffset() const { return _psiOffset; }
 
     const unsigned char* pesdata() const { return _pesdata; }
     unsigned char* pesdata() { return _pesdata; }
@@ -156,6 +159,12 @@ class PESPacket
         _pesdata[Length()+3] = (crc & 0x000000ff);
     }
 
+    void SetPSIOffset(unsigned int offset)
+    {
+        _psiOffset = offset;
+        _pesdata = _fullbuffer + _psiOffset;
+    }
+
     bool VerifyCRC() const { return CalcCRC() == CRC(); }
 
     /*
@@ -177,6 +186,7 @@ class PESPacket
     unsigned char *_pesdata;    ///< Pointer to PES data in full buffer
     unsigned char *_fullbuffer; ///< Pointer to allocated data
   private:
+    uint _psiOffset;    ///< AFCOffset + StartOfFieldPointer
     uint _ccLast;       ///< Continuity counter of last inserted TS Packet
     uint _cnt;          ///< Number of tspackets contained in PES Packet
     uint _allocSize;    ///< number of bytes we allocated

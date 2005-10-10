@@ -92,50 +92,111 @@ void MPEGStreamData::DeletePartialPES(uint pid)
 /** \fn MPEGStreamData::AssemblePSIP(const TSPacket* tspacket)
  *  \brief PES packet assembler.
  *
- *   This only assembles PES packets when new PES packets
- *   start in their own TSPacket. This is always true of
- *   ATSC & DVB tables, but not true of Audio and Video
- *   PES packets.
+ *   This is not a general purpose TS->PES packet converter,
+ *   it is only designed to work with MPEG tables which comply
+ *   with certain restrictions that simplify the conversion.
+ *
+ *   DVB TSPackets may contain multiple segments of the PSI
+ *   stream.  (see ISO 13818-1 section 2.4.3.3, particularly
+ *   the definition of payload_unit_start_indicator, which
+ *   indicates there is at least one segment start, but not
+ *   limited to only one segment start.)
+ *
+ *   PSI stuffing bytes are 0xFF and will complete the
+ *   remaining portion of the TSPacket.  (Section 2.4.4)
+ *
+ *   \note This method makes the assumption that AddTSPacket
+ *   correctly handles duplicate packets.
  */
-PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket)
+PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
+                                        bool &moreTablePackets)
 {
-    if (tspacket->PayloadStart())
-    {
-        const int offset = tspacket->AFCOffset() +
-            tspacket->StartOfFieldPointer();
-        if (offset>181)
-        {
-            VERBOSE(VB_IMPORTANT, "Error: offset>181, pes length & "
-                    "current can not be queried");
-            return 0;
-        }
-        const unsigned char* pesdata = tspacket->data() + offset;
-        const int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
-        const PESPacket pes = PESPacket::View(*tspacket);
-        if ((pes_length + offset)>188)
-        {
-            if (!bool(pes.pesdata()[6]&1)/*current*/)
-                return 0; // we only care about current psip packets for now
-            SavePartialPES(tspacket->PID(), new PESPacket(*tspacket));
-            return 0;
-        }
-        return new PSIPTable(*tspacket); // must be complete packet
-    }
+    moreTablePackets = true;
 
     PESPacket* partial = GetPartialPES(tspacket->PID());
-    if (partial)
+    if (partial && partial->AddTSPacket(tspacket))
     {
-        if (partial->AddTSPacket(tspacket))
+        PSIPTable* psip = new PSIPTable(*partial);
+
+        // Advance to the next packet
+        uint packetStart = partial->PSIOffset() + psip->SectionLength();
+        if (packetStart < partial->TSSizeInBuffer())
         {
-            PSIPTable* psip = new PSIPTable(*partial);
-            DeletePartialPES(tspacket->PID());
-            return psip;
+            if (partial->pesdata()[psip->SectionLength() + 1] != 0xff)
+            {
+                // If the next section starts in the new tspacket
+                // create a new partial packet to prevent overflow
+                if ((partial->TSSizeInBuffer() > TSPacket::SIZE) &&
+                    (packetStart >
+                     partial->TSSizeInBuffer() - TSPacket::PAYLOAD_SIZE))
+                {
+                    // Saving will handle deleting the old one
+                    SavePartialPES(tspacket->PID(),
+                                   new PESPacket(*tspacket));
+                }
+                else
+                {
+                    partial->SetPSIOffset(partial->PSIOffset() +
+                                          psip->SectionLength());
+                }
+                return psip;
+            }
         }
+
+        moreTablePackets = false;
+        DeletePartialPES(tspacket->PID());
+        return psip;
+    }
+    else if (partial)
+    {    
+        moreTablePackets = false;
         return 0; // partial packet is not yet complete.
     }
-    // We didn't see this PES packet's start, so this must be the
-    // tail end of something we missed. Ignore it.
-    return 0;
+
+    if (!tspacket->PayloadStart())
+    {
+        // We didn't see this PES packet's start, so this must be the
+        // tail end of something we missed. Ignore it.
+        moreTablePackets = false;
+        return 0;
+    }
+
+    const int offset = tspacket->AFCOffset() + tspacket->StartOfFieldPointer();
+    if (offset>181)
+    {
+        VERBOSE(VB_IMPORTANT, "Error: offset>181, pes length & "
+                "current can not be queried");
+        return 0;
+    }
+
+    const unsigned char* pesdata = tspacket->data() + offset;
+    const int pes_length = (pesdata[2] & 0x0f) << 8 | pesdata[3];
+    const PESPacket pes = PESPacket::View(*tspacket);
+    if ((pes_length + offset)>188)
+    {
+        SavePartialPES(tspacket->PID(), new PESPacket(*tspacket));
+        moreTablePackets = false;
+        return 0;
+    }
+
+    PSIPTable *psip = new PSIPTable(*tspacket); // must be complete packet
+
+    // There might be another section after this one in the 
+    // current packet. We need room before the end of the 
+    // packet, and it must not be packet stuffing.
+    if ((offset + psip->SectionLength() < TSPacket::SIZE) &&
+        (pesdata[psip->SectionLength() + 1] != 0xff))
+    {
+        // This isn't sutffing, so we need to put this 
+        // on as a partial packet.
+        PESPacket *pesp = new PESPacket(*tspacket);
+        pesp->SetPSIOffset(offset + psip->SectionLength());
+        SavePartialPES(tspacket->PID(), pesp);
+        return psip;
+    }
+
+    moreTablePackets = false;
+    return psip;
 }
 
 bool MPEGStreamData::CreatePATSingleProgram(
@@ -357,16 +418,20 @@ bool MPEGStreamData::HandleTables(uint pid, const PSIPTable &psip)
     return false;
 }
 
+
+#define DONE_WITH_PES_PACKET() { if (psip) delete psip; \
+    if (morePSIPPackets) goto HAS_ANOTHER_PES; else return; }
+
 /** \fn MPEGStreamData::HandleTSTables(const TSPacket*)
  *  \brief Assembles PSIP packets and processes them.
  */
-bool MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
+void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
 {
-#define HT_RETURN(HANDLED) { delete psip; return HANDLED; }
+    bool morePSIPPackets;
+  HAS_ANOTHER_PES:
     // Assemble PSIP
-    PSIPTable *psip = AssemblePSIP(tspacket);
-    if (!psip)
-        return true;
+    PSIPTable *psip = AssemblePSIP(tspacket, morePSIPPackets);
+    DONE_WITH_PES_PACKET();
 
     // Validate PSIP
     // but don't validate PMT if our driver has the PMT CRC bug.
@@ -376,24 +441,24 @@ bool MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         VERBOSE(VB_RECORD, QString("PSIP packet failed CRC check. "
                                    "pid(0x%1) type(0x%2)")
                 .arg(tspacket->PID(),0,16).arg(psip->TableID(),0,16));
-        HT_RETURN(true);
+        DONE_WITH_PES_PACKET();
     }
 
     if (!psip->IsCurrent()) // we don't cache the next table, for now
-        HT_RETURN(true);
+        DONE_WITH_PES_PACKET();
 
     if (1!=tspacket->AdaptationFieldControl())
     { // payload only, ATSC req.
         VERBOSE(VB_RECORD,
                 "PSIP packet has Adaptation Field Control, not ATSC compiant");
-        HT_RETURN(true);
+        DONE_WITH_PES_PACKET();
     }
 
     if (tspacket->ScramplingControl())
     { // scrambled! ATSC, DVB require tables not to be scrambled
         VERBOSE(VB_RECORD,
                 "PSIP packet is scrambled, not ATSC/DVB compiant");
-        HT_RETURN(true);
+        DONE_WITH_PES_PACKET();
     }
 
     // Don't decode redundant packets,
@@ -405,13 +470,13 @@ bool MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
         if (TableID::PMT == psip->TableID() &&
             tspacket->PID() == _pid_pmt_single_program)
             emit UpdatePMTSingleProgram(PMTSingleProgram());
-        HT_RETURN(true); // already parsed this table, toss it.
+        DONE_WITH_PES_PACKET(); // already parsed this table, toss it.
     }
 
-    bool handled = HandleTables(tspacket->PID(), *psip);
-    HT_RETURN(handled);
-#undef HT_RETURN
+    HandleTables(tspacket->PID(), *psip);
+    DONE_WITH_PES_PACKET();
 }
+#undef DONE_WITH_PES_PACKET
 
 int MPEGStreamData::ProcessData(unsigned char *buffer, int len)
 {
