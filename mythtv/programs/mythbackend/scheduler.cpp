@@ -795,8 +795,9 @@ void Scheduler::PruneRedundants(void)
         }
         
         // Restore the old status for some select cases that won't record.
-        if ((p->recstatus != rsWillRecord && p->oldrecstatus == rsAborted) ||
-            (p->recstatus == rsMissed && p->oldrecstatus != rsUnknown))
+        if (p->recstatus != rsWillRecord && 
+            p->oldrecstatus != rsUnknown &&
+            !p->reactivate)
             p->recstatus = p->oldrecstatus;
 
         if (!Recording(p))
