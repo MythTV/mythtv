@@ -2114,7 +2114,10 @@ void Scheduler::AddNotListed(void) {
 
         // Don't bother if the end time has already passed
         if (p->recendts < schedTime)
+        {
+            delete p;
             continue;
+        }
 
         p->title = QString::fromUtf8(result.value(9).toString());
         p->subtitle = QString::fromUtf8(result.value(10).toString());
