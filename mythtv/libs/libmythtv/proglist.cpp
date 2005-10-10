@@ -1380,7 +1380,6 @@ void ProgLister::fillItemList(void)
     QString where;
     QString startstr = startTime.toString("yyyy-MM-ddThh:mm:50");
     QString qphrase = viewList[curView].utf8();
-    qphrase.replace("\'", "\\\'");
 
     if (type == plTitle) // per title listings
     {

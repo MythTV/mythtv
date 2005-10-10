@@ -1562,7 +1562,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
     while (result.next())
     {
         qphrase = result.value(3).toString();
-        qphrase.replace("\'", "\\\'");
+        // qphrase.replace("\'", "\\\'");
 
         RecSearchType searchtype = RecSearchType(result.value(1).toInt());
 

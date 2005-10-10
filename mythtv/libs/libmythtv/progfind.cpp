@@ -1085,7 +1085,7 @@ void ProgFinder::selectShowData(QString progTitle, int newCurShow)
 
     QString querystr = QString(
         "WHERE program.title = '%1' "
-        "    AND program.endtime > %2 ")
+        "    AND program.endtime > '%2' ")
         .arg(progTitle.utf8().replace("'", "\\'"))
         .arg(progStart.toString("yyyy-MM-ddThh:mm:50"));
 

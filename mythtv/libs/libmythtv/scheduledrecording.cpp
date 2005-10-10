@@ -463,9 +463,6 @@ void ScheduledRecording::doneRecording(ProgramInfo& proginfo)
 
     VERBOSE(VB_GENERAL, QString("%1 %2").arg(msg).arg(details).local8Bit());
     gContext->LogEntry("scheduler", LP_NOTICE, msg, details);
-
-    //if (getRecordingType() == kFindOneRecord)
-    //    remove();
 }
 
 void ScheduledRecording::runProgList(void)

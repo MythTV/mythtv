@@ -65,9 +65,9 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
                    "WHERE search = :SEARCH ORDER BY title;");
     result.bindValue(":SEARCH", kPowerSearch);
 
-    if (result.exec() && result.isActive() && result.size() > 0)
+    if (result.exec() && result.isActive())
     {
-        while (result.next()) 
+        while (result.next())
         {
             QString trimTitle = QString::fromUtf8(result.value(1).toString());
             trimTitle.remove(QRegExp(" \\(.*\\)$"));
@@ -78,7 +78,7 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
         }
     }
     else
-        MythContext::DBError("Get power searc rules query", result);
+        MythContext::DBError("Get power search rules query", result);
 
     hbox->addWidget(m_rule);
 
@@ -99,48 +99,48 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_clause->setBackgroundOrigin(WindowOrigin);
 
     m_clause->insertItem(tr("Match an exact title"));
-    m_csql << "program.title = 'Nova' ";
+    m_csql << "program.title = \"Nova\" ";
 
     m_clause->insertItem(tr("Match an exact episode"));
-    m_csql << QString("program.title = 'Seinfeld' \n"
-                      "AND program.subtitle = 'The Soup' ");
+    m_csql << QString("program.title = \"Seinfeld\" \n"
+                      "AND program.subtitle = \"The Soup\" ");
 
     m_clause->insertItem(tr("Match words in the title"));
-    m_csql << "program.title LIKE '%Junkyard%' ";
+    m_csql << "program.title LIKE \"%Junkyard%\" ";
 
     m_clause->insertItem(tr("Match in any descriptive field"));
-    m_csql << QString("(program.title LIKE '%Japan%' \n"
-                      "     OR program.subtitle LIKE '%Japan%' \n"
-                      "     OR program.description LIKE '%Japan%') ");
+    m_csql << QString("(program.title LIKE \"%Japan%\" \n"
+                      "     OR program.subtitle LIKE \"%Japan%\" \n"
+                      "     OR program.description LIKE \"%Japan%\") ");
 
     m_clause->insertItem(tr("Limit by category"));
-    m_csql << "program.category = 'Reality' ";
+    m_csql << "program.category = \"Reality\" ";
 
     m_clause->insertItem(tr("New episodes only"));
     m_csql << "program.previouslyshown = 0 ";
 
     m_clause->insertItem(tr("Exclude unidentified episodes (Data Direct)"));
-    m_csql << QString("NOT (program.category_type = 'series' \n"
-                      "     AND program.programid LIKE '%0000') ");
+    m_csql << QString("NOT (program.category_type = \"series\" \n"
+                      "     AND program.programid LIKE \"%0000\") ");
 
     m_clause->insertItem(tr("Exclude unidentified episodes (XMLTV)"));
-    m_csql << "NOT (program.subtitle = '' AND program.description = '') ";
+    m_csql << "NOT (program.subtitle = \"\" AND program.description = \"\") ";
 
     m_clause->insertItem(QString(tr("Category type") +
-            " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')"));
-    m_csql << "program.category_type = 'sports' ";
+            " (\"movie\", \"series\", \"sports\" " + tr("or") + " \"tvshow\")"));
+    m_csql << "program.category_type = \"sports\" ";
 
     m_clause->insertItem(tr("Limit movies by the year of release"));
-    m_csql << "program.category_type = 'movie' AND airdate >= 2000 ";
+    m_csql << "program.category_type = \"movie\" AND airdate >= 2000 ";
 
     m_clause->insertItem(tr("Minimum star rating (0.0 to 1.0 for movies only)"));
     m_csql << "program.stars >= 0.75 ";
 
     m_clause->insertItem(tr("Exclude one station"));
-    m_csql << "channel.callsign != 'GOLF' ";
+    m_csql << "channel.callsign != \"GOLF\" ";
 
     m_clause->insertItem(tr("Match related callsigns"));
-    m_csql << "channel.callsign LIKE 'HBO%' ";
+    m_csql << "channel.callsign LIKE \"HBO%\" ";
 
     m_clause->insertItem(tr("Only channels from a specific video source"));
     m_csql << "channel.sourceid = 2 ";
@@ -152,7 +152,7 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_csql << "program.hdtv > 0 ";
 
     m_clause->insertItem(tr("Anytime on a specific day of the week"));
-    m_csql << "DAYNAME(program.starttime) = 'Tuesday' ";
+    m_csql << "DAYNAME(program.starttime) = \"Tuesday\" ";
 
     m_clause->insertItem(tr("Only on weekdays (Monday through Friday)"));
     m_csql << "WEEKDAY(program.starttime) < 5 ";
@@ -169,28 +169,28 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
                       "      OR HOUR(program.starttime) >= 23) ");
 
     m_clause->insertItem(tr("Multiple sports teams (complete example)"));
-    m_csql << QString("program.title LIKE 'MLB%Baseball' \n"
-              "AND program.subtitle REGEXP '(Giants|Yankees|Cubs)' ");
+    m_csql << QString("program.title LIKE \"NBA B%\" \n"
+              "AND program.subtitle REGEXP \"(Rockets|Cavaliers|Lakers)\" ");
 
     m_clause->insertItem(tr("Sci-fi B-movies (complete example)"));
-    m_csql << QString("program.category_type='movie' \n"
-              "AND program.category='Science fiction' \n"
+    m_csql << QString("program.category_type=\"movie\" \n"
+              "AND program.category=\"Science fiction\" \n"
               "AND program.stars <= 0.5 AND airdate < 1970 ");
 
     m_clause->insertItem(tr("SportsCenter Overnight (complete example - use FindDaily)"));
-    m_csql << QString("program.title = 'SportsCenter' \n"
+    m_csql << QString("program.title = \"SportsCenter\" \n"
               "AND HOUR(program.starttime) >= 2 \n"
               "AND HOUR(program.starttime) <= 6 ");
 
     m_clause->insertItem(tr("Movie of the Week (complete example - use FindWeekly)"));
-    m_csql << QString("program.category_type='movie' \n"
+    m_csql << QString("program.category_type=\"movie\" \n"
               "AND program.stars >= 1.0 AND airdate >= 1965 \n"
-              "AND DAYNAME(program.starttime) = 'Friday' \n"
+              "AND DAYNAME(program.starttime) = \"Friday\" \n"
               "AND HOUR(program.starttime) >= 12 ");
 
     m_clause->insertItem(tr("First Episodes (complete example for Data Direct)"));
     m_csql << QString("program.previouslyshown = 0 \n"
-              "AND program.programid LIKE 'EP%0001' \n"
+              "AND program.programid LIKE \"EP%0001\" \n"
               "AND DAYOFYEAR(program.originalairdate) = \n"
               "    DAYOFYEAR(program.starttime) ");
 
@@ -342,7 +342,7 @@ void CustomRecord::recordClicked(void)
     ScheduledRecording record;
 
     int cur_recid = m_recid[m_rule->currentItem()].toInt();
-    cerr << cur_recid << endl; 
+
     if (cur_recid > 0)
         record.modifyPowerSearchByID(cur_recid, m_title->text(),
                                      m_description->text());
@@ -368,7 +368,6 @@ bool CustomRecord::checkSyntax(void)
     QString msg = "";
 
     QString desc = m_description->text();
-    desc.replace("\'", "\\\'");
 
     if (desc.contains(QRegExp("^\\s*AND\\s", false)))
     {
@@ -377,8 +376,8 @@ bool CustomRecord::checkSyntax(void)
     else
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(QString("SELECT NULL FROM program,channel WHERE\n%1")
-                              .arg(desc));
+        query.prepare("SELECT NULL FROM program,channel WHERE\n:DESC");
+        query.bindValue(":DESC", desc);
 
         if (query.exec() && query.isActive())
         {
