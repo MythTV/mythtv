@@ -431,7 +431,8 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
   HAS_ANOTHER_PES:
     // Assemble PSIP
     PSIPTable *psip = AssemblePSIP(tspacket, morePSIPPackets);
-    DONE_WITH_PES_PACKET();
+    if (!psip)
+       return;
 
     // Validate PSIP
     // but don't validate PMT if our driver has the PMT CRC bug.
