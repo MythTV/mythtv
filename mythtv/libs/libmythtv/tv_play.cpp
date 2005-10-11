@@ -549,9 +549,9 @@ int TV::Playback(ProgramInfo *rcinfo)
 
     int overrecordseconds = gContext->GetNumSetting("RecordOverTime");
     QDateTime curtime = QDateTime::currentDateTime();
-    QDateTime endts = rcinfo->endts.addSecs(overrecordseconds);
+    QDateTime recendts = rcinfo->recendts.addSecs(overrecordseconds);
 
-    if (curtime < endts && !rcinfo->isVideo)
+    if (curtime < recendts && !rcinfo->isVideo)
         ChangeState(kState_WatchingRecording);
     else
         ChangeState(kState_WatchingPreRecorded);
