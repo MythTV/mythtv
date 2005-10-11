@@ -376,8 +376,8 @@ bool CustomRecord::checkSyntax(void)
     else
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT NULL FROM program,channel WHERE\n:DESC");
-        query.bindValue(":DESC", desc);
+        query.prepare(QString("SELECT NULL FROM program,channel WHERE\n%1") 
+                              .arg(desc));
 
         if (query.exec() && query.isActive())
         {
