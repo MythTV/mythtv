@@ -600,10 +600,9 @@ int main(int argc, char *argv[])
                           "WHERE basename = :BASENAME ;");
             query.bindValue(":BASENAME", fullfile.dirName());
 
-            if (query.exec() && query.isActive() && query.size() > 0)
+            if (query.exec() && query.isActive() && query.size() > 0 &&
+                query.next())
             {
-                query.next();
-
                 chanid = query.value(0).toString();
                 starttime =
                     query.value(1).toDateTime().toString("yyyyMMddhhmmss");
@@ -976,24 +975,25 @@ int main(int argc, char *argv[])
     }
     else
     {
-        MSqlQuery recordedquery(MSqlQuery::InitCon());
-        QString querystr = QString("SELECT chanid, starttime "
-                                   "FROM recorded "
-                                   "WHERE starttime >= %1 and endtime <= %2 "
-                                   "ORDER BY starttime;")
-                                   .arg(allStart).arg(allEnd);
-        recordedquery.exec(querystr);
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "SELECT chanid, starttime "
+                "FROM recorded "
+                "WHERE starttime >= :STARTTIME AND endtime <= :ENDTIME "
+                "ORDER BY starttime;");
+        query.bindValue(":STARTTIME", allStart);
+        query.bindValue(":ENDTIME", allEnd);
 
-        if ((recordedquery.isActive()) && (recordedquery.size() > 0))
+        if (query.exec() && query.isActive() && query.size() > 0)
         {
-            while (recordedquery.next())
+            while (query.next())
             {
-                QDateTime startts =
-                    QDateTime::fromString(recordedquery.value(1).toString(),
+                QDateTime m_starttime =
+                    QDateTime::fromString(query.value(1).toString(),
                                           Qt::ISODate);
-                starttime = startts.toString("yyyyMMddhhmmss");
+                starttime = m_starttime.toString("yyyyMMddhhmmss");
 
-                chanid = recordedquery.value(0).toString();
+                chanid = query.value(0).toString();
 
                 if ( allRecorded )
                 {
@@ -1002,30 +1002,28 @@ int main(int argc, char *argv[])
                 else
                 {
                     // check to see if this show is already marked
-                    MSqlQuery markupquery(MSqlQuery::InitCon());
-                    QString markupstr;
-                   
-                    markupstr = QString("SELECT commflagged, count(rm.type) "
-                                        "FROM recorded r "
-                                        "LEFT JOIN recordedmarkup rm ON "
-                                            "( r.chanid = rm.chanid AND "
-                                              "r.starttime = rm.starttime AND "
-                                              "type in (%1,%2)) "
-                                        "WHERE r.chanid = %3 AND "
-                                            "r.starttime = %4 "
-                                        "GROUP BY COMMFLAGGED;")
-                                        .arg(MARK_COMM_START)
-                                        .arg(MARK_COMM_END)
-                                        .arg(chanid)
-                                        .arg(starttime);
-                    markupquery.exec(markupstr);
-                    if ((markupquery.isActive()) &&
-                        (markupquery.size() > 0))
+                    MSqlQuery mark_query(MSqlQuery::InitCon());
+                    mark_query.prepare("SELECT commflagged, count(rm.type) "
+                                       "FROM recorded r "
+                                       "LEFT JOIN recordedmarkup rm ON "
+                                           "( r.chanid = rm.chanid AND "
+                                             "r.starttime = rm.starttime AND "
+                                             "type in (:MARK_START,:MARK_END)) "
+                                        "WHERE r.chanid = :CHANID AND "
+                                            "r.starttime = :STARTTIME "
+                                        "GROUP BY COMMFLAGGED;");
+                    mark_query.bindValue(":MARK_START", MARK_COMM_START);
+                    mark_query.bindValue(":MARK_END", MARK_COMM_END);
+                    mark_query.bindValue(":CHANID", chanid);
+                    mark_query.bindValue(":STARTTIME", m_starttime);
+
+                    if (mark_query.exec() && mark_query.isActive() &&
+                        mark_query.size() > 0)
                     {
-                        if (markupquery.next())
+                        if (mark_query.next())
                         {
-                            int flagStatus = markupquery.value(0).toInt();
-                            int marksFound = markupquery.value(1).toInt();
+                            int flagStatus = mark_query.value(0).toInt();
+                            int marksFound = mark_query.value(1).toInt();
 
                             QString flagStatusStr = "UNKNOWN";
                             switch (flagStatus) {
@@ -1061,7 +1059,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            MythContext::DBError("Querying recorded programs", recordedquery);
+            MythContext::DBError("Querying recorded programs", query);
             return COMMFLAG_EXIT_DB_ERROR;
         }
     }
