@@ -3314,7 +3314,8 @@ void TVRec::HandleTuning(void)
             TuningNewRecorder();
 
         // If we got this far it is safe to set a new starting channel...
-        channel->StoreInputChannels();
+        if (channel)
+            channel->StoreInputChannels();
     }
 }
 
@@ -3432,8 +3433,12 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         }
     }
     bool ok = false;
-    channel->Open();
-    if (!channum.isEmpty())
+    if (channel)
+        channel->Open();
+    else
+        ok = true;
+
+    if (channel && !channum.isEmpty())
     {
         if (channum.find("NextChannel") >= 0)
         {
