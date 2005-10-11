@@ -368,7 +368,7 @@ bool DTVSignalMonitor::IsAllGood(void) const
             return false;
     if ((flags & kDTVSigMon_WaitForMGT) && !matchingMGT.IsGood())
             return false;
-    if ((flags & kDTVSigMon_WaitForVCT) && !matchingMGT.IsGood())
+    if ((flags & kDTVSigMon_WaitForVCT) && !matchingVCT.IsGood())
             return false;
     if ((flags & kDTVSigMon_WaitForNIT) && !matchingNIT.IsGood())
             return false;
