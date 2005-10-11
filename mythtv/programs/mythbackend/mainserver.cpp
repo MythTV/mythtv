@@ -832,9 +832,9 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             QString cardtype;
 
             MSqlQuery query(MSqlQuery::InitCon());
-            querytext = QString("SELECT audiodevice,cardtype FROM capturecard "
-                                "WHERE cardid=%1;").arg(recnum);
-            query.prepare(querytext);
+            query.prepare("SELECT audiodevice,cardtype FROM capturecard "
+                          "WHERE cardid = :CARDID ;");
+            query.bindValue(":CARDID", recnum);
 
             if (query.exec() && query.isActive() && query.size())
             {
@@ -844,7 +844,7 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
             }
 
             query.prepare("SELECT data FROM settings WHERE "
-                               "value ='AudioOutputDevice';");
+                          "value ='AudioOutputDevice';");
 
             if (query.exec() && query.isActive() && query.size())
             {
@@ -3525,9 +3525,8 @@ QString MainServer::LocalFilePath(QUrl &url)
         lpath = "";
 
         MSqlQuery query(MSqlQuery::InitCon());
-        querytext = QString("SELECT icon FROM channel "
-                            "WHERE icon LIKE '%%1';").arg(file);
-        query.prepare(querytext);
+        query.prepare("SELECT icon FROM channel WHERE icon LIKE :FILENAME ;");
+        query.bindValue(":FILENAME", QString("%") + file);
 
         if (query.exec() && query.isActive() && query.size())
         {

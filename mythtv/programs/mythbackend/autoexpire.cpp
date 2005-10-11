@@ -391,12 +391,11 @@ void AutoExpire::ExpireEpisodesOverMax(void)
     QMap<QString, int>::Iterator maxIter;
 
     QString fileprefix = gContext->GetFilePrefix();
-    QString querystr = "SELECT recordid, maxepisodes, title "
-                       "FROM record WHERE maxepisodes > 0 "
-                       "ORDER BY recordid ASC, maxepisodes DESC";
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(querystr);
+    query.prepare("SELECT recordid, maxepisodes, title "
+                  "FROM record WHERE maxepisodes > 0 "
+                  "ORDER BY recordid ASC, maxepisodes DESC");
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -412,18 +411,16 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
     for (maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); maxIter++)
     {
-        querystr = QString( "SELECT chanid, starttime, title FROM recorded "
-                            "WHERE recordid = %1 AND preserve = 0 "
-                            "ORDER BY starttime DESC;")
-                            .arg(maxIter.key());
-
-        query.prepare(querystr);
+        query.prepare("SELECT chanid, starttime, title FROM recorded "
+                      "WHERE recordid = :RECID AND preserve = 0 "
+                      "ORDER BY starttime DESC;");
+        query.bindValue(":RECID", maxIter.key());
 
         if (!query.exec() || !query.isActive())
-	{
+        {
             MythContext::DBError("AutoExpire query failed!", query);
             continue;
-	}
+        }
 
         VERBOSE(VB_FILE, QString("Found %1 episodes in recording profile %2 "
                                  "using max expiration")
