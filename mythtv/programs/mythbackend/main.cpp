@@ -222,6 +222,7 @@ int main(int argc, char **argv)
     bool testsched = false;
     bool resched = false;
     bool nosched = false;
+    bool nojobqueue = false;
     bool printexpire = false;
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -389,6 +390,10 @@ int main(int argc, char **argv)
         {
             nosched = true;
         } 
+        else if (!strcmp(a.argv()[argpos],"--nojobqueue"))
+        {
+            nojobqueue = true;
+        } 
         else if (!strcmp(a.argv()[argpos],"--printexpire"))
         {
             printexpire = true;
@@ -423,6 +428,7 @@ int main(int argc, char **argv)
                     "--testsched                    Test run scheduler (ignore existing schedule)" << endl <<
                     "--resched                      Force the scheduler to update" << endl <<
                     "--nosched                      Do not perform any scheduling" << endl <<
+                    "--nojobqueue                   Do not start the JobQueue" << endl <<
                     "--version                      Version information" << endl;
             return BACKEND_EXIT_INVALID_CMDLINE;
         }
@@ -564,6 +570,10 @@ int main(int argc, char **argv)
         gContext->LogEntry("mythbackend", LP_INFO,
                            "MythBackend started as a slave backend", "");
     }
+
+    if (nojobqueue)
+        cerr << "******** The JobQueue has been DISABLED with "
+                "the --nojobqueue option ********\n";
  
     bool fatal_error = false;
     bool runsched = setupTVs(ismaster, fatal_error);
@@ -579,7 +589,8 @@ int main(int argc, char **argv)
 
     housekeeping = new HouseKeeper(true, ismaster);
 
-    jobqueue = new JobQueue(ismaster);
+    if (!nojobqueue)
+        jobqueue = new JobQueue(ismaster);
 
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
