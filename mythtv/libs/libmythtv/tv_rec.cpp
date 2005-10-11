@@ -2372,17 +2372,18 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
     querystr = QString(
         "SELECT channel.channum, channel.chanid "
         "FROM channel, capturecard, cardinput%1 "
-        "WHERE channel.%2 %3 '%4' %5 AND "
-        "      %6 "
-        "ORDER BY channel.%7 %8 "
+        "WHERE channel.%2 %3 :ID %4 AND "
+        "      %5 "
+        "ORDER BY channel.%6 %7 "
         "LIMIT 1")
         .arg(fromfavorites).arg(channelorder)
-        .arg(comp).arg(id).arg(wherefavorites)
+        .arg(comp).arg(wherefavorites)
         .arg(wherepart).arg(channelorder).arg(ordering);
 
     query.prepare(querystr);
     query.bindValue(":CARDID",   cardid);
     query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":ID",       id);
 
     if (!query.exec() || !query.isActive())
     {
@@ -2405,18 +2406,19 @@ void TVRec::DoGetNextChannel(QString &channum, QString channelinput,
         querystr = QString(
             "SELECT channel.channum, channel.chanid "
             "FROM channel, capturecard, cardinput%1 "
-            "WHERE channel.%2 %3 '%4' %5 AND "
-            "      %6 "
-            "ORDER BY channel.%7 %8 "
+            "WHERE channel.%2 %3 :ID %4 AND "
+            "      %5 "
+            "ORDER BY channel.%6 %7 "
             "LIMIT 1")
             .arg(fromfavorites).arg(channelorder)
-            .arg(comp).arg(id).arg(wherefavorites)
+            .arg(comp).arg(wherefavorites)
             .arg(wherepart).arg(channelorder).arg(ordering);
 
         query.prepare(querystr);
         query.bindValue(":CARDID",   cardid);
         query.bindValue(":HOSTNAME", gContext->GetHostName());
- 
+        query.bindValue(":ID",       id); 
+
         if (!query.exec() || !query.isActive())
         {
             MythContext::DBError("getnextchannel", query);
