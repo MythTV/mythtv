@@ -114,7 +114,7 @@ class NuppelVideoRecorder : public RecorderBase
     void InitFilters(void);   
     void ResizeVideoBuffers(void);
 
-    int MJPEGInit(void);
+    bool MJPEGInit(void);
  
     int SpawnChildren(void);
     void KillChildren(void);

@@ -3713,6 +3713,9 @@ void TVRec::TuningNewRecorder(void)
         return;
     }
 
+    if (channel && genOpt.cardtype == "MJPEG")
+        channel->Close(); // Needed because of NVR::MJPEGInit()
+
     if (!SetupRecorder(profile))
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
@@ -3730,6 +3733,9 @@ void TVRec::TuningNewRecorder(void)
         ChangeState(kState_None);
         return;
     }
+
+    if (channel && genOpt.cardtype == "MJPEG")
+        channel->Open(); // Needed because of NVR::MJPEGInit()
 
     recorder->SetRecording(lastTuningRequest.program);
 

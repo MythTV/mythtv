@@ -55,6 +55,9 @@ extern pthread_mutex_t avcodeclock;
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
+#define LOC QString("NVR(%1): ").arg(videodevice)
+#define LOC_ERR QString("NVR(%1) Error: ").arg(videodevice)
+
 NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
                    : RecorderBase(rec, "NuppelVideoRecorder")
 {
@@ -568,9 +571,7 @@ void NuppelVideoRecorder::Initialize(void)
         codec = "mjpeg";
         hardware_encode = true;
 
-        if (MJPEGInit() != 0)
-            VERBOSE(VB_IMPORTANT, QString("NVR: Could not detect max width for hardware MJPEG card, ").
-                    append(QString("falling back to default: %1").arg(hmjpg_maxw)));
+        MJPEGInit();
  
         w = hmjpg_maxw / hmjpg_hdecimation;
 
@@ -709,29 +710,43 @@ int NuppelVideoRecorder::AudioInit(bool skipdevice)
     return 0; 
 }
 
-int NuppelVideoRecorder::MJPEGInit(void)
+/** \fn NuppelVideoRecorder::MJPEGInit(void)
+ *  \brief Determines MJPEG capture resolution.
+ *
+ *   This function requires an file descriptor for the device, which
+ *   means Channel can not be open when NVR::Initialize() is called.
+ *   It is safe for the recorder to be open.
+ *
+ *  \return true on success
+ */
+bool NuppelVideoRecorder::MJPEGInit(void)
 {
-    fd = open(videodevice.ascii(), O_RDWR);
-    if (fd < 0)
+    bool we_opened_fd = false;
+    int init_fd = fd;
+    if (init_fd < 0)
     {
-        VERBOSE(VB_IMPORTANT, QString("NVR: Can't open video device: %1").
-                arg(videodevice));
-        perror("open video:");
-        return 1;
+        init_fd = open(videodevice.ascii(), O_RDWR);
+        we_opened_fd = true;
+
+        if (init_fd < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't open video device" + ENO);
+            return false;
+        }
     }
 
     struct video_capability vc;
+    bzero(&vc, sizeof(vc));
+    int ret = ioctl(init_fd, VIDIOCGCAP, &vc);
 
-    memset(&vc, 0, sizeof(vc));
+    if (ret < 0)
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Can't query V4L capabilities" + ENO);
 
-    if (ioctl(fd, VIDIOCGCAP, &vc) < 0)
-    {
-        perror("VIDIOCGCAP:");
-        close(fd);
-        return 1;
-    }
+    if (we_opened_fd)
+        close(init_fd);
 
-    close(fd);
+    if (ret < 0)
+        return false;
 
     if (vc.maxwidth != 768 && vc.maxwidth != 640)
         vc.maxwidth = 720;
@@ -744,16 +759,11 @@ int NuppelVideoRecorder::MJPEGInit(void)
             hmjpg_maxw = 704;
         else
             hmjpg_maxw = 640;
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT, 
-                QString("Video device %1 does not appear to have hardware "
-                        "MJPEG capture capabilities.").arg(videodevice));
-        return 1;
+        return true;
     }
 
-    return 0; 
+    VERBOSE(VB_IMPORTANT, LOC_ERR + "MJPEG not supported by device");
+    return false;
 }
 
 void NuppelVideoRecorder::InitFilters(void)
