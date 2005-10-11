@@ -61,8 +61,11 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
     signalStrength.SetThreshold(threshold);
     signalStrength.SetRange(-32768, 32767);
 
-    dvb_stats_t stats;
-    bzero(&stats, sizeof(stats));
+    int16_t  sig = 0, snr     = 0;
+    uint32_t ber = 0, ublocks = 0;
+    fe_status_t  status;
+    bzero(&status, sizeof(status));
+
     uint newflags = 0;
     QString msg = QString("DVBSignalMonitor(%1)::constructor(%2,%3): %4")
         .arg(channel->GetDevice()).arg(capturecardnum);
@@ -72,15 +75,15 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
         VERBOSE(VB_IMPORTANT, msg.arg(ERRMSG).arg(strerror(errno))); \
     else newflags |= FLAG;
 
-    DVB_IO(FE_READ_SIGNAL_STRENGTH, &stats.ss,
+    DVB_IO(FE_READ_SIGNAL_STRENGTH, &sig,
            "Warning, can not measure Signal Strength", kDTVSigMon_WaitForSig);
-    DVB_IO(FE_READ_SNR, &stats.snr,
+    DVB_IO(FE_READ_SNR, &snr,
            "Warning, can not measure S/N", kDVBSigMon_WaitForSNR);
-    DVB_IO(FE_READ_BER, &stats.ber,
+    DVB_IO(FE_READ_BER, &ber,
            "Warning, can not measure Bit Error Rate", kDVBSigMon_WaitForBER);
-    DVB_IO(FE_READ_UNCORRECTED_BLOCKS, &stats.ub,
+    DVB_IO(FE_READ_UNCORRECTED_BLOCKS, &ublocks,
            "Warning, can not count Uncorrected Blocks", kDVBSigMon_WaitForUB);
-    DVB_IO(FE_READ_STATUS, &stats.status, "Error, can not read status!", 0);
+    DVB_IO(FE_READ_STATUS, &status, "Error, can not read status!", 0);
 #undef DVB_IO
     AddFlags(newflags);
     DBG_SM("constructor()", QString("initial flags 0x%1").arg(newflags,0,16));
@@ -345,20 +348,22 @@ void DVBSignalMonitor::UpdateValues(void)
     }
 
     bool wasLocked = false, isLocked = false;
-    dvb_stats_t stats;
-    bzero(&stats, sizeof(stats));
+    int16_t  sig = 0, snr     = 0;
+    uint32_t ber = 0, ublocks = 0;
+    fe_status_t  status;
+    bzero(&status, sizeof(status));
 
     // Get info from card
     int fd_frontend = channel->GetFd();
-    ioctl(fd_frontend, FE_READ_STATUS, &stats.status);
+    ioctl(fd_frontend, FE_READ_STATUS, &status);
     if (HasFlags(kDTVSigMon_WaitForSig))
-        ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &stats.ss);
+        ioctl(fd_frontend, FE_READ_SIGNAL_STRENGTH, &sig);
     if (HasFlags(kDVBSigMon_WaitForSNR))
-        ioctl(fd_frontend, FE_READ_SNR, &stats.snr);
+        ioctl(fd_frontend, FE_READ_SNR, &snr);
     if (HasFlags(kDVBSigMon_WaitForBER))
-        ioctl(fd_frontend, FE_READ_BER, &stats.ber);
+        ioctl(fd_frontend, FE_READ_BER, &ber);
     if (HasFlags(kDVBSigMon_WaitForUB))
-        ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &stats.ub);
+        ioctl(fd_frontend, FE_READ_UNCORRECTED_BLOCKS, &ublocks);
 
     // Set SignalMonitorValues from info from card.
     {
@@ -370,17 +375,17 @@ void DVBSignalMonitor::UpdateValues(void)
         // normalize these to a time period.
 
         wasLocked = signalLock.IsGood();
-        signalLock.SetValue((stats.status & FE_HAS_LOCK) ? 1 : 0);
+        signalLock.SetValue((status & FE_HAS_LOCK) ? 1 : 0);
         isLocked = signalLock.IsGood();
 
         if (HasFlags(kDTVSigMon_WaitForSig))
-            signalStrength.SetValue((int) stats.ss);
+            signalStrength.SetValue(sig);
         if (HasFlags(kDVBSigMon_WaitForSNR))
-            signalToNoise.SetValue((int) stats.snr);
+            signalToNoise.SetValue(snr);
         if (HasFlags(kDVBSigMon_WaitForBER))
-            bitErrorRate.SetValue(stats.ber);
+            bitErrorRate.SetValue(ber);
         if (HasFlags(kDVBSigMon_WaitForUB))
-            uncorrectedBlocks.SetValue(stats.ub);
+            uncorrectedBlocks.SetValue(ublocks);
     }
 
     // Debug output

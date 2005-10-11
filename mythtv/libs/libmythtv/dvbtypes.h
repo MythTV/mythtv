@@ -441,16 +441,6 @@ class dvb_channel_t
     mutable QMutex  lock;
 };
 
-typedef struct dvbstats
-{
-    uint32_t snr;
-    uint32_t ss;
-    uint32_t ber;
-    uint32_t ub;
-
-    fe_status_t  status;
-} dvb_stats_t;
-
 typedef map<uint16_t, ipack*> pid_ipack_t;
 
 #define ERROR(args...) \

@@ -298,7 +298,7 @@ class TVRec : public QObject
     DVBChannel   *GetDVBChannel(void);
     Channel      *GetV4LChannel(void);
 
-    void SetupSignalMonitor(void);
+    void SetupSignalMonitor(bool enable_table_monitoring, bool notify);
     bool SetupDTVSignalMonitor(void);
     void TeardownSignalMonitor(void);
     DTVSignalMonitor *GetDTVSignalMonitor(void);

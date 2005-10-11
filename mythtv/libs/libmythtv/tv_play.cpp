@@ -2006,7 +2006,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 activerecorder->SetSignalMonitoringRate(rate,notify);
                 UnpauseLiveTV();
 
-                sigMonMode = !sigMonMode;
+                lockTimerOn = false;
+                sigMonMode  = !sigMonMode;
             }
         }
         else if (action == "ESCAPE")
@@ -3261,6 +3262,9 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
         if ("message" == it->GetShortName())
             infoMap[QString("message%1").arg(i++)] = it->GetName();
 
+    int   sig = 100;
+    float snr  = 70000.0f, Usnr = 0.0f;
+    uint  ber  = 0xffffffff;
     QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt("");
     for (it = slist.begin(); it != slist.end(); ++it)
     {
@@ -3270,9 +3274,16 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
         infoMap[it->GetShortName()] = QString::number(it->GetValue());
         if ("signal" == it->GetShortName())
         {
-            int val = it->GetNormalizedValue(0, 100);
-            infoMap["signal"] = QString::number(val);
+            sig = it->GetNormalizedValue(0, 100);
+            infoMap["signal"] = QString::number(sig);
         }
+        else if ("snr" == it->GetShortName())
+        {
+            snr = it->GetValue();
+            Usnr = (uint) it->GetValue();
+        }
+        else if ("ber" == it->GetShortName())
+            ber = it->GetValue();
         else if ("seen_pat" == it->GetShortName())
             pat = it->IsGood() ? "a" : " ";
         else if ("matching_pat" == it->GetShortName())
@@ -3303,9 +3314,18 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     QString slock   = ("1" == infoMap["slock"]) ? "L" : "l";
     QString lockMsg = (slock=="L") ? tr("Partial Lock") : tr("No Lock");
     QString sigMsg  = allGood ? tr("Lock") : lockMsg;
-    QString sigDesc = QString("Signal %1\% (%2%3%4%5%6%7%8) %9")
-        .arg(infoMap["signal"]).arg(slock).arg(pat).arg(pmt)
-        .arg(mgt).arg(vct).arg(nit).arg(sdt).arg(sigMsg);
+
+    QString sigDesc = tr("Signal %1\%").arg(sig);
+    if (sig != 0 && sig != 100);
+    else if (snr < 32766.0f)
+        sigDesc = tr("S/N %1 dB")
+            .arg(log10f((snr < -16384) ? Usnr: snr), 4, 'f', 1);
+    else if (ber < 65535)
+        sigDesc = tr("Bit Errors %1").arg(ber, 4);
+
+    sigDesc = sigDesc + QString(" (%1%2%3%4%5%6%7) %8")
+        .arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct)
+        .arg(nit).arg(sdt).arg(sigMsg);
 
     //GetOSD()->ClearAllText("signal_info");
     //GetOSD()->SetText("signal_info", infoMap, -1);

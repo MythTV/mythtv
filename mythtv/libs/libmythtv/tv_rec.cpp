@@ -1677,17 +1677,22 @@ bool TVRec::SetupDTVSignalMonitor(void)
     return false;
 }
 
-/** \fn TVRec::SetupSignalMonitor()
+/** \fn TVRec::SetupSignalMonitor(bool,bool)
  *  \brief This creates a SignalMonitor instance if one is needed and
  *         begins signal monitoring.
  *
  *   If the channel exists and the cardtype is "DVB" or "HDTV" a 
  *   SignalMonitor instance is created and SignalMonitor::Start()
  *   is called to start the signal monitoring thread.
+ *
+ *  \param tablemon If set we enable table monitoring
+ *  \param notify   If set we notify the frontend of the signal values
  */
-void TVRec::SetupSignalMonitor(void)
+void TVRec::SetupSignalMonitor(bool tablemon, bool notify)
 {
-    VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor()");
+    VERBOSE(VB_RECORD, LOC + "SetupSignalMonitor("
+            <<tablemon<<", "<<notify<<")");
+
     // if it already exists, there no need to initialize it
     if (signalMonitor)
         return;
@@ -1711,11 +1716,14 @@ void TVRec::SetupSignalMonitor(void)
     {
         VERBOSE(VB_RECORD, LOC + "Signal monitor successfully created");
         // If this is a monitor for Digital TV, initialize table monitors
-        if (GetDTVSignalMonitor())
+        if (GetDTVSignalMonitor() && tablemon)
             SetupDTVSignalMonitor();
 
         connect(signalMonitor, SIGNAL(AllGood(void)),
                 this, SLOT(SignalMonitorAllGood(void)));
+
+        signalMonitor->SetUpdateRate(kSignalMonitoringRate);
+        signalMonitor->SetNotifyFrontend(notify);
 
         // Start the monitoring thread
         signalMonitor->Start();
@@ -3497,12 +3505,10 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     if (use_sm)
     {
         VERBOSE(VB_RECORD, LOC + "Starting Signal Monitor");
-        SetupSignalMonitor();
+        SetupSignalMonitor(!antadj, livetv | antadj);
+
         if (signalMonitor)
         {
-            signalMonitor->SetUpdateRate(kSignalMonitoringRate);
-            signalMonitor->SetNotifyFrontend(request.flags & kFlagLiveTV);
-
             if (request.flags & kFlagEITScan)
             {
                 GetDTVSignalMonitor()->GetStreamData()->
@@ -3510,9 +3516,10 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             }
 
             SetFlags(kFlagSignalMonitorRunning);
-            if (request.flags & kFlagRec|kFlagEITScan)
+            if (!(request.flags & kFlagAntennaAdjust))
                 SetFlags(kFlagWaitingForSignal);
         }
+
         if (dummyRecorder && ringBuffer)
         {
             ringBuffer->Reset();
