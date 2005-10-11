@@ -1388,11 +1388,16 @@ void ProgLister::fillItemList(void)
 
         if (qphrase == "premieres")
         {
-            where += "  AND program.previouslyshown = 0 ";
-            where += "  AND (program.category = 'Special' ";
-            where += "    OR program.programid LIKE 'EP%0001') ";
-            where += "  AND DAYOFYEAR(program.originalairdate) = "; 
-            where += "      DAYOFYEAR(program.starttime) ";
+            where += "  AND ( ";
+            where += "    ( program.previouslyshown = 0 ";
+            where += "      AND (program.category = 'Special' ";
+            where += "        OR program.programid LIKE 'EP%0001') ";
+            where += "      AND DAYOFYEAR(program.originalairdate) = "; 
+            where += "          DAYOFYEAR(program.starttime)) ";
+            where += "    OR (program.category_type='movie' ";
+            where += "      AND program.stars >= 0.75 ";
+            where += "      AND program.airdate >= YEAR(NOW()) - 1) ";
+            where += "  ) ";
         }
         else if (qphrase == "movies")
         {
@@ -1409,7 +1414,7 @@ void ProgLister::fillItemList(void)
         else
         {
             where += "  AND (program.category_type <> 'movie' ";
-            where += "  OR program.airdate >= YEAR(NOW() - INTERVAL '2' YEAR)) ";
+            where += "  OR program.airdate >= YEAR(NOW()) - 3) ";
         }
     }
     else if (type == plTitleSearch) // keyword search
