@@ -172,6 +172,7 @@ bool AudioOutputCA::RenderAudio(unsigned char *aubuf,
 {
     if (pauseaudio || killaudio)
     {
+        audio_actually_paused = true;
         return false;
     }
     
