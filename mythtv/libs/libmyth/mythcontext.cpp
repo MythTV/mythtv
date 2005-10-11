@@ -48,6 +48,15 @@ QMutex MythContext::verbose_mutex(true);
 
 int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
 
+// Verbose helper function for ENO macro
+QString safe_eno_to_string(int errnum)
+{
+    char buf[256];
+    strerror_r(errnum, buf, 256);
+    return QString(buf);
+}
+
+
 class MythContextPrivate
 {
   public:

@@ -12,7 +12,9 @@
 #include <qsocketdevice.h>
 #include <qstringlist.h>
 #include <qnetwork.h> 
+#include <qdeepcopy.h>
 
+#include <cerrno>
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -120,20 +122,29 @@ do { \
 
 #endif // DEBUG
 
+/// This can be appended to the VERBOSE args with either
+/// "+" (with QStrings) or "<<" (with c strings). It uses
+/// a thread safe version of strerror to produce the
+/// string representation of errno and puts it on the 
+/// next line in the verbose output.
+#define ENO QString("\n\t\t\teno: ") + safe_eno_to_string(errno)
+/// Verbose helper function for ENO macro
+QString safe_eno_to_string(int errnum);
+
 class MythEvent : public QCustomEvent
 {
   public:
     enum Type { MythEventMessage = (User + 1000) };
 
-    MythEvent(const QString &lmessage) : QCustomEvent(MythEventMessage)
+    MythEvent(const QString lmessage) : QCustomEvent(MythEventMessage)
     {
-        message = lmessage;
+        message = QDeepCopy<QString>(lmessage);
         extradata = "empty";
     }
-    MythEvent(const QString &lmessage, const QStringList &lextradata)
+    MythEvent(const QString lmessage, const QStringList &lextradata)
            : QCustomEvent(MythEventMessage)
     {
-        message = lmessage;
+        message = QDeepCopy<QString>(lmessage);
         extradata = lextradata;
     }
     
@@ -165,7 +176,11 @@ class MythPrivRequest
 /// Including changes in the libmythtv class methods used by plug-ins.
 #define MYTH_BINARY_VERSION "0.19.20050712-1"
 
-/// Increment this whenever the MythTV network protocol changes.
+/** \brief Increment this whenever the MythTV network protocol changes.
+ *
+ *   You must also update this value in
+ *   mythplugins/mythweb/includes/mythbackend.php
+ */
 #define MYTH_PROTO_VERSION "19"
 
 extern int print_verbose_messages;
