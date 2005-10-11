@@ -23,6 +23,7 @@ class SimpleSRSetting: public SimpleDBStorage
         {
             QString value = getValue();
             value.replace(QChar('\''), "''");
+            value.replace("\\", "\\\\");
 
             return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
@@ -53,6 +54,7 @@ class SRSetting: public ManagedListSetting
         virtual QString setClause(void) {
             QString value = getValue();
             value.replace(QChar('\''), "''");
+            value.replace("\\", "\\\\");
 
             return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
@@ -83,6 +85,7 @@ class SRSelectSetting : public SelectManagedListSetting
         virtual QString setClause(void) {
             QString value = getValue();
             value.replace(QChar('\''), "''");
+            value.replace("\\", "\\\\");
 
             return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
@@ -113,6 +116,7 @@ class SRBoolSetting : public BoolManagedListSetting
         virtual QString setClause(void) {
             QString value = getValue();
             value.replace(QChar('\''), "''");
+            value.replace("\\", "\\\\");
 
             return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
@@ -145,6 +149,7 @@ class SRBoundedIntegerSetting : public BoundedIntegerManagedListSetting
         {
             QString value = getValue();
             value.replace(QChar('\''), "''");
+            value.replace("\\", "\\\\");
 
             return QString("recordid = %1, %2 = '%3'")
                 .arg(parent->getRecordID())
