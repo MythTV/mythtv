@@ -1472,7 +1472,7 @@ void ProgLister::fillItemList(void)
     {
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
-                "  AND program.category = :PGILMATCHPHRASE ";
+                "  AND program.category = :PGILPHRASE ";
     }
     else if (type == plMovies) // list movies
     {
@@ -1483,8 +1483,7 @@ void ProgLister::fillItemList(void)
     }
     else if (type == plTime) // list by time
     {
-        bindings["PGILSEARCHTIME"] = searchTime.toString("yyyy-MM-ddThh:00:00");
-
+        bindings[":PGILSEARCHTIME"] = searchTime.toString("yyyy-MM-dd hh:00:00");
         where = "WHERE channel.visible = 1 "
                 "  AND program.starttime >= :PGILSEARCHTIME ";
         if (titleSort)
