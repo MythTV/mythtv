@@ -1369,7 +1369,6 @@ void ProgLister::fillItemList(void)
     bindings[":PGILSTART"] = startstr;
     bindings[":PGILPHRASE"] = qphrase;
     bindings[":PGILLIKEPHRASE"] = QString("%") + qphrase + "%";
-    bindings[":PGILMATCHPHRASE"] = QString("%") + qphrase;
 
     if (type == plTitle) // per title listings
     {
@@ -1479,7 +1478,7 @@ void ProgLister::fillItemList(void)
         where = "WHERE channel.visible = 1 "
                 "  AND program.endtime > :PGILSTART "
                 "  AND program.category_type = 'movie' "
-                "  AND program.stars >= :PGILMATCHPHRASE ";
+                "  AND program.stars >= :PGILPHRASE ";
     }
     else if (type == plTime) // list by time
     {
