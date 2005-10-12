@@ -157,7 +157,6 @@ class VideoOutputXv : public VideoOutput
     MythCodecID          myth_codec_id;
     VOSType              video_output_subtype;
     DisplayRes          *display_res;
-    float                display_aspect;
     QMutex               global_lock;
 
     // Basic X11 info

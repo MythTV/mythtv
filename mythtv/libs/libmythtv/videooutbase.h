@@ -275,58 +275,81 @@ class VideoOutput
 
     void AspectSet(float aspect);
 
-    int XJ_width, XJ_height;
-    float XJ_aspect;
-    float videoAspect;
-
+    /// Physical width of playback window in millimeters, used to compute display_aspect
     int w_mm;
+    /// Physical height of playback window in millimeters, used to compute display_aspect
     int h_mm;
+    /// Physical aspect ratio of playback window
+    float display_aspect;
 
+    /// Physical width according to database. (deprecated?)
     int myth_dsw;
+    /// Physical height according to database. (deprecated?)
     int myth_dsh;
 
-    int img_xoff, img_yoff;
-    float img_hscanf, img_vscanf;
+
+    /// Width of video in pixels
+    int XJ_width;
+    /// Height of video window in pixels
+    int XJ_height;
+    /// Aspect ratio of video
+    float videoAspect;
+
+    /// Normally this is the same as videoAspect, but may not be
+    /// if the user has toggled to a different "letterbox" mode.
+    float XJ_aspect;
+
+    /// letterboxMode to use to modify XJ_aspect
+    int letterbox;
+
+    /// Horizontal video displacement
+    int img_xoff;
+    /// Vertical video displacement
+    int img_yoff;
+    /// Horizontal Overscan/Underscan percentage
+    float img_hscanf;
+    /// Vertical Overscan/Underscan percentage
+    float img_vscanf;
 
     int imgx, imgy, imgw, imgh;
     int dispxoff, dispyoff, dispwoff, disphoff;
 
     int dispx, dispy, dispw, disph;
     int olddispx, olddispy, olddispw, olddisph;
-    bool embedding;
 
+    // Picture settings
     int brightness, contrast, colour, hue;
 
-    int letterbox;
-
-    int PIPLocation;
-
+    // Zoom
     int ZoomedIn;
     int ZoomedUp;
     int ZoomedRight;
 
-    VideoBuffers vbuffers;
-
-    bool needrepaint;
-
+    // Picture-in-Picture
+    int PIPLocation;
     int desired_piph;
     int desired_pipw;
-
-    int piph_in, piph_out;
-    int pipw_in, pipw_out;
-    unsigned char *piptmpbuf;
-
+    int piph_in;
+    int pipw_in;
+    int piph_out;
+    int pipw_out;
+    unsigned char      *piptmpbuf;
     ImgReSampleContext *pipscontext;
 
-    bool allowpreviewepg;
-
-    bool m_deinterlacing;
-    QString m_deintfiltername;
+    // Deinterlacing
+    bool           m_deinterlacing;
+    QString        m_deintfiltername;
     FilterManager *m_deintFiltMan;
-    FilterChain *m_deintFilter;
+    FilterChain   *m_deintFilter;
+    bool           m_deinterlaceBeforeOSD;;
 
-    bool m_deinterlaceBeforeOSD;;
+    /// VideoBuffers instance used to track video output buffers.
+    VideoBuffers vbuffers;
 
+    // Various state variables
+    bool embedding;
+    bool needrepaint;
+    bool allowpreviewepg;
     long long framesPlayed;
 
     bool errored;

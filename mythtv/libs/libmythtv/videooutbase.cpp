@@ -88,7 +88,8 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_i
  *     {
  *         frame = vo->GetNextFreeFrame(); // remove frame from "available"
  *         av_lib_process(frame);   // do something to fill it.
- *         // call DrawSlice()      // if you need piecemeal processing by VideoOutput
+ *         // call DrawSlice()      // if you need piecemeal processing
+ *                                  // by VideoOutput use DrawSlice
  *         vo->ReleaseFrame(frame); // enqueues frame in "used" queue
  *     }
  * }
@@ -107,23 +108,28 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_i
  *         // tells show what frame to be show, do other last minute stuff
  *         vo->PrepareFrame(frame, scan);
  *         // here you wait until it's time to show the frame
- *         // Show blits the last prepared frame to the screen as quickly as possible
+ *         // Show blits the last prepared frame to the screen
+ *         // as quickly as possible.
  *         vo->Show(scan);
- *         // remove frame from the head of "used", vo must get it into "available" eventually.
+ *         // remove frame from the head of "used",
+ *         // vo must get it into "available" eventually.
  *         vo->DoneDisplayingFrame();
  *     }
  * }
  * delete vo;
  * \endcode
  *
- * Note: Show() may be called multiple times between PrepareFrame() and DoneDisplayingFrame().
- * But if a frame is ever removed from available via GetNextFreeFrame(), you must either call
- * DoneDisplayFrame() on it or call DiscardFrame(VideoFrame*) on it.
+ *  Note: Show() may be called multiple times between PrepareFrame() and
+ *        DoneDisplayingFrame(). But if a frame is ever removed from
+ *        available via GetNextFreeFrame(), you must either call
+ *        DoneDisplayFrame() or call DiscardFrame(VideoFrame*) on it.
  *
- * Note: ProcessFrame() may be called multiple times on a frame, to update an OSD for example.
+ *  Note: ProcessFrame() may be called multiple times on a frame, to
+ *        update an OSD for example.
  *
- * The VideoBuffers class handles the buffer tracking, see it for more details on
- * the states a buffer can take before it becomes available for reuse.
+ *  The VideoBuffers class handles the buffer tracking,
+ *  see it for more details on the states a buffer can 
+ *  take before it becomes available for reuse.
  *
  * \see VideoBuffers, NuppelVideoPlayer
  */
@@ -133,40 +139,55 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_i
  * \brief This constructor for VideoOutput must be followed by an 
  *        Init(int,int,float,WId,int,int,int,int,WId) call.
  */
-VideoOutput::VideoOutput()
+VideoOutput::VideoOutput() :
+
+    // Physical dimensions
+    w_mm(400),                h_mm(300),                display_aspect(1.3333),
+    myth_dsw(0),              myth_dsh(0),
+
+    // Pixel dimensions
+    XJ_width(640),            XJ_height(480),           videoAspect(1.3333),
+
+    // Aspect override
+    XJ_aspect(1.3333),        letterbox(kLetterbox_Off),
+
+    // Screen settings
+    img_xoff(0),              img_yoff(0),
+    img_hscanf(0.0f),         img_vscanf(0.0f),
+
+    imgx(0),     imgy(0),     imgw(0),     imgh(0),
+    dispxoff(0), dispyoff(0), dispwoff(0), disphoff(0),
+
+    dispx(0),    dispy(0),    dispw(0),    disph(0),
+    olddispx(0), olddispy(0), olddispw(0), olddisph(0),
+
+    // Picture settings
+    brightness(0),            contrast(0),
+    colour(0),                hue(0),
+
+    // Zoom
+    ZoomedIn(0),              ZoomedUp(0),              ZoomedRight(0),
+
+    // Picture-in-Picture stuff
+    PIPLocation(0),
+    desired_piph(128),        desired_pipw(160),
+    piph_in(-1),              pipw_in(-1),
+    piph_out(-1),             pipw_out(-1),
+    piptmpbuf(NULL),          pipscontext(NULL),
+
+    // Deinterlacing
+    m_deinterlacing(false),   m_deintfiltername("linearblend"),
+    m_deintFiltMan(NULL),     m_deintFilter(NULL),
+    m_deinterlaceBeforeOSD(true),
+
+    // Various state variables
+    embedding(false),         needrepaint(false),
+    allowpreviewepg(true),    framesPlayed(0),
+
+    errored(false)
 {
-    letterbox = kLetterbox_Off;
-
-    framesPlayed = 0;
-
-    needrepaint = false;
-
-    ZoomedIn = 0;
-    ZoomedUp = 0;
-    ZoomedRight = 0;
-
-    piptmpbuf = NULL;
-    pipscontext = NULL;
-
-    piph_in = piph_out = -1;
-    pipw_in = pipw_out = -1;
-
-    desired_piph = 128;
-    desired_pipw = 160;
-
-    allowpreviewepg = true;
-
-    w_mm = 400;
-    h_mm = 300;
-
     myth_dsw = gContext->GetNumSetting("DisplaySizeWidth", 0);
     myth_dsh = gContext->GetNumSetting("DisplaySizeHeight", 0);
-
-    m_deinterlacing = false;
-    m_deintFiltMan = NULL;
-    m_deintFilter = NULL;
-    m_deinterlaceBeforeOSD = true;
-    errored = false;
 }
 
 /**

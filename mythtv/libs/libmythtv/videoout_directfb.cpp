@@ -477,15 +477,9 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     //display video output
     DFBCHECK(data->videoLayer->SetOpacity(data->videoLayer, 0xff));
 
-    if (myth_dsw != 0)
-        w_mm = myth_dsw;
-    else
-        w_mm = data->screen_width;
-
-    if (myth_dsh != 0)
-        h_mm = myth_dsh;
-    else
-        h_mm = data->screen_height;
+    w_mm = (myth_dsw != 0) ? myth_dsw : data->screen_width;
+    h_mm = (myth_dsh != 0) ? myth_dsh : data->screen_height;
+    display_aspect = ((float)w_mm) / ((float)h_mm);
 
     XJ_started = true;
     return true;

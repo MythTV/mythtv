@@ -88,7 +88,7 @@ static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
 VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     : VideoOutput(),
       myth_codec_id(codec_id), video_output_subtype(XVUnknown),
-      display_res(NULL), display_aspect(1.0), global_lock(true),
+      display_res(NULL), global_lock(true),
 
       XJ_root(0),  XJ_win(0), XJ_curwin(0), XJ_gc(0), XJ_screen(NULL),
       XJ_disp(NULL), XJ_screen_num(0), XJ_white(0), XJ_black(0), XJ_depth(0),
@@ -307,11 +307,8 @@ void VideoOutputXv::ResizeForVideo(uint width, uint height)
 
 /** 
  * \fn VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
- * Initialized Display Measurements based on database settings and
- * actual screen parameters.
- *
- * \todo display measurements are broken for Xinerama screens, and 
- * non-fullscreen display.
+ * \brief Init display measurements based on database settings and
+ *        actual screen parameters.
  */
 void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
 {
@@ -339,45 +336,62 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
                                     XJ_screeny, XJ_screenheight, hmult);
     }
 
-    // TODO these calculations are not quite right
+    // Fetch pixel width and height of the display
+    int xbase, ybase, w, h;
+    gContext->GetScreenBounds(xbase, ybase, w, h);
+
+    // Determine window dimensions in pixels
+    int window_w = w, window_h = h;
+    if (gContext->GetNumSetting("GuiSizeForTV", 0))
+        gContext->GetResolutionSetting("Gui", window_w,  window_h);
+    else
+        gContext->GetScreenBounds(xbase, ybase, window_w, window_h);
+    window_w = (window_w) ? window_w : w;
+    window_h = (window_h) ? window_h : h;
+    float pixel_aspect = ((float)w) / ((float)h);
+
+    VERBOSE(VB_PLAYBACK, "Window pixel dimensions: "<<window_w<<"x"<<window_h
+            <<" Screen pixel dimensions: "<<w<<"x"<<h);
+
+    // Determine if we are using Xinerama
     int event_base, error_base;
     bool usingXinerama = false;
     X11S(usingXinerama = 
          (XineramaQueryExtension(XJ_disp, &event_base, &error_base) &&
           XineramaIsActive(XJ_disp)));
-    if (w_mm == 0 || h_mm == 0)
-    {
-        w_mm = (int)(300 * XJ_aspect);
-        h_mm = 300;
-        display_aspect = XJ_aspect;
 
-        VERBOSE(VB_GENERAL,QString("Physical size of display unknown, using DisplaySize %1 %2").arg(w_mm).arg(h_mm));
-    }
-    else if (gContext->GetNumSetting("GuiSizeForTV", 0) || usingXinerama)
-    {
-        int w = DisplayWidth(XJ_disp, XJ_screen_num);
-        int h = DisplayHeight(XJ_disp, XJ_screen_num);
+    // If the dimensions are invalid, assume square pixels and 17" screen.
+    // Only print warning if this isn't Xinerama, we will fix Xinerama later.
+    if ((!h_mm || !w_mm) && !usingXinerama)
+        VERBOSE(VB_GENERAL, "Physical size of display unknown."
+                "\n\t\t\tAssuming 17\" monitor with square pixels.");
+    h_mm = (h_mm) ? h_mm : 300;
+    w_mm = (w_mm) ? w_mm : (int) round(h_mm * pixel_aspect);
 
-        int gui_w = w, gui_h = h;
+    // If we are using Xinerama the display dimensions can not be trusted.
+    // We need to use the Xinerama monitor aspect ratio from the DB to set
+    // the physical screen width. This assumes the height is correct, which
+    // is more or less true in the typical side-by-side monitor setup.
+    if (usingXinerama)
+        w_mm = (int) round(h_mm * gContext->GetFloatSetting(
+                               "XineramaMonitorAspectRatio", pixel_aspect));
 
-        if (gContext->GetNumSetting("GuiSizeForTV", 0))
-            gContext->GetResolutionSetting("Gui", gui_w,  gui_h);
-        else    // usingXinerama
-        {
-            int xbase, ybase;
-            gContext->GetScreenBounds(xbase,ybase,gui_w,gui_h);
-        }
+    VERBOSE(VB_PLAYBACK, "Estimated display dimensions "<<w_mm<<"x"<<h_mm<<
+            " mm. Aspect: "<<(((float)w_mm) / ((float)h_mm)));
 
-        if (gui_w)
-            w_mm = w_mm * gui_w / w;
-        if (gui_h)
-            h_mm = h_mm * gui_h / h;
+    // We must now scale the display measurements to our window size.
+    // If we are running fullscreen this is a no-op.
+    w_mm = (w_mm * window_w) / w;
+    h_mm = (h_mm * window_h) / h;
 
-        display_aspect = (float)w_mm/h_mm;
-    }
-    else
-        display_aspect = (float)w_mm/h_mm;
+    // Now that we know the physical monitor size, we can
+    // calculate the display aspect ratio pretty simply...
+    display_aspect = ((float)w_mm) / ((float)h_mm);
 
+    VERBOSE(VB_PLAYBACK, "Estimated window dimensions "<<w_mm<<"x"<<h_mm
+            <<" mm. Aspect: "<<display_aspect);
+
+    // If we are using XRandR, use the aspect ratio from it instead...
     if (display_res)
         display_aspect = display_res->GetAspectRatio();
 }

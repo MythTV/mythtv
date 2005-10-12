@@ -1175,6 +1175,20 @@ static HostComboBox *XineramaScreen()
     return gc;
 }
 
+
+static HostComboBox *XineramaMonitorAspectRatio()
+{
+    HostComboBox *gc = new HostComboBox("XineramaMonitorAspectRatio");
+    gc->setLabel(QObject::tr("Monitor Aspect Ratio"));
+    gc->addSelection(QObject::tr("4:3"),   "1.3333");
+    gc->addSelection(QObject::tr("16:9"),  "1.7777");
+    gc->addSelection(QObject::tr("16:10"), "1.6");
+    gc->setHelpText(QObject::tr(
+                        "The aspect ratio of a Xinerama display can not be"
+                        "queried from the display, so you must specify it."));
+    return gc;
+}
+
 static HostComboBox *AspectOverride()
 {
     HostComboBox *gc = new HostComboBox("AspectOverride");
@@ -3153,7 +3167,10 @@ AppearanceSettings::AppearanceSettings()
     VerticalConfigurationGroup* screen = new VerticalConfigurationGroup(false);
     screen->setLabel(QObject::tr("Screen settings"));
     if (GetNumberOfXineramaScreens())
+    {
         screen->addChild(XineramaScreen());
+        screen->addChild(XineramaMonitorAspectRatio());
+    }
     screen->addChild(GuiWidth());
     screen->addChild(GuiHeight());
 //    screen->addChild(DisplaySizeHeight());
