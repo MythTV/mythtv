@@ -3973,9 +3973,18 @@ void PlaybackBox::showRecGroupChanger(void)
     }
     else
     {
-        recGroupLineEdit->setText(tr("Default"));
-        recGroupListBox->setCurrentItem(
-            recGroupListBox->index(recGroupListBox->findItem(tr("Default"))));
+        if (recGroup == "Default")
+        {
+            recGroupLineEdit->setText(tr("Default"));
+            recGroupListBox->setCurrentItem(recGroupListBox->index(
+                                     recGroupListBox->findItem(tr("Default"))));
+        }
+        else
+        {
+            recGroupLineEdit->setText(recGroup);
+            recGroupListBox->setCurrentItem(recGroupListBox->index(
+                                     recGroupListBox->findItem(recGroup)));
+        }
     }
 
     recGroupListBox->setFocus();
