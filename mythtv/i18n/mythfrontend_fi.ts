@@ -328,15 +328,15 @@
     <name>DVBSignalMonitor</name>
     <message>
         <source>Signal To Noise</source>
-        <translation type="unfinished">Kohinasuhde</translation>
+        <translation>Kohinasuhde</translation>
     </message>
     <message>
         <source>Bit Error Rate</source>
-        <translation type="unfinished">Virhetaajuus</translation>
+        <translation>Virhetaajuus</translation>
     </message>
     <message>
         <source>Uncorrected Blocks</source>
-        <translation type="unfinished">Korjaamattomia Jaksoja</translation>
+        <translation>Korjaamattomia Jaksoja</translation>
     </message>
 </context>
 <context>
@@ -440,7 +440,7 @@
     </message>
     <message>
         <source>Flag Commercials</source>
-        <translation>Merkkaa Mainokset</translation>
+        <translation>Merkitse Mainokset</translation>
     </message>
     <message>
         <source>Unknown Job</source>
@@ -1051,23 +1051,23 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Select Group Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Ryhmän Suodin</translation>
     </message>
     <message>
         <source>item</source>
-        <translation type="unfinished"></translation>
+        <translation>valinta</translation>
     </message>
     <message>
         <source>items</source>
-        <translation type="unfinished"></translation>
+        <translation>valinnat</translation>
     </message>
     <message>
         <source>Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Ryhmät</translation>
     </message>
     <message>
         <source>Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategoriat</translation>
     </message>
 </context>
 <context>
@@ -4133,7 +4133,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>This determines the method used by MythTV to detect when commercials start and end.  You must have &apos;Automatically Flag Commercials&apos; enabled to use anything other than &apos;Blank Frame&apos;.</source>
-        <translation>etodi jolla MythTV havaitsee mainosten alkamisen ja loppumisen. &apos;Merkkaa Mainokset Automaattisesti&apos; on oltava asetettuna, jos aiotaan käyttää muuta tapaa kuin &apos;tyhjä ruutu&apos;.</translation>
+        <translation>Metodi, jolla MythTV havaitsee mainosten alkamisen ja loppumisen. &apos;Merkitse Mainokset Automaattisesti&apos; on oltava asetettuna, jos aiotaan käyttää muuta tapaa kuin &apos;tyhjä ruutu&apos;.</translation>
     </message>
     <message>
         <source>CPU Usage</source>
@@ -4653,11 +4653,11 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Commercial Flag new recordings</source>
-        <translation>Merkkaa Mainokset Uusiin Nauhoituksiin</translation>
+        <translation>Merkitse Mainokset Uusiin Nauhoituksiin</translation>
     </message>
     <message>
         <source>Do not Commercial Flag new recordings</source>
-        <translation>Älä Merkkaa Mainoksia Uusiin Nauhoituksiin</translation>
+        <translation>Älä Merkitse Mainoksia Uusiin Nauhoituksiin</translation>
     </message>
     <message>
         <source>Run &apos;%1&apos;</source>
@@ -6223,7 +6223,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>ATSC Channel %1</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC Kanava %1</translation>
     </message>
     <message>
         <source>Failed to probe the card</source>
@@ -6259,7 +6259,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Location of the channels.conf file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sijainti channels.conf-tiedostolle.</translation>
     </message>
     <message>
         <source>Scan Type</source>
@@ -6375,7 +6375,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Commercial Flag New Recordings</source>
-        <translation>Merkkaa Mainokset Uusiin Nauhoituksiin</translation>
+        <translation>Merkitse Mainokset Uusiin Nauhoituksiin</translation>
     </message>
     <message>
         <source>Default Auto Transcode setting</source>
@@ -6544,7 +6544,7 @@ WARNING: Enabling this option will disable XvMC video output.</source>
     </message>
     <message>
         <source>Which items to show when playing music.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mitä tietoja näytetään, kun musiikkia toistetaan.</translation>
     </message>
     <message>
         <source>Display tuned channel information.</source>
@@ -6771,7 +6771,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Default time stretch %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletus Ajan Säätö %1X</translation>
     </message>
     <message>
         <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk of processing errors.</source>
@@ -6847,11 +6847,11 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>or</source>
-        <translation type="unfinished">tai</translation>
+        <translation>tai</translation>
     </message>
     <message>
         <source>Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanava</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
@@ -6873,27 +6873,27 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Aborted</source>
-        <translation type="unfinished">Keskeytetty</translation>
+        <translation>Keskeytetty</translation>
     </message>
     <message>
         <source>Missed</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei Saatavilla</translation>
     </message>
     <message>
         <source>This showing was recorded but was aborted before recording was completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajastettu nauhoitus keskeytettiin, ennenkuin ohjelma saatiin taltioitua.</translation>
     </message>
     <message>
         <source>This showing was not recorded because it was scheduled after it would have ended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajastettua nauhoitusta ei taltioitu, koska se oli ajastettu ohjelman loppumisen jälkeiseksi.</translation>
     </message>
     <message>
         <source>This showing was not recorded because it was manually cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajastettua nauhoitusta ei tehty, koska käyttäjä peruutti taltioinnin.</translation>
     </message>
     <message>
         <source>Change Ending Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuta Lopetusaikaa</translation>
     </message>
     <message>
         <source>Period (5.1)</source>
@@ -6901,7 +6901,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Signal Timeout (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Signaalin Odotusaika (msec)</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
@@ -6909,7 +6909,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Channel Timeout (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Virityksen Odotusaika (msec)</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
@@ -6917,7 +6917,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Store recordings in TS format.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenna nauhoitukset TS-formaatissa.</translation>
     </message>
     <message>
         <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
@@ -6925,7 +6925,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Kysy aina lähtökohtaista ryhmäsuodinta</translation>
     </message>
     <message>
         <source>Always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
@@ -6933,19 +6933,19 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Lowest Priority First</source>
-        <translation type="unfinished"></translation>
+        <translation>Alhaisin Prioriteetti Ensin</translation>
     </message>
     <message>
         <source>ATSC channel</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC Kanava</translation>
     </message>
     <message>
         <source>Your preferred language for the user interface.</source>
-        <translation type="unfinished"></translation>
+        <translation>Graafisen käyttöympäristön kieli.</translation>
     </message>
     <message>
         <source>Guide Language #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Oppaan Ja Kuvatekstin Kieli #%1</translation>
     </message>
     <message>
         <source>Your #%1 preferred language for Program Guide Data and captions.</source>
@@ -6953,67 +6953,67 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Display Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Esitä Aika</translation>
     </message>
     <message>
         <source>Display Recording Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Esitä Nauhoitusten Tila</translation>
     </message>
     <message>
         <source>Display current recordings information on LCD display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esitä LCD:llä tietoja nykyisistä nauhoituksista.</translation>
     </message>
     <message>
         <source>Display Menus</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Valikot</translation>
     </message>
     <message>
         <source>Display Music Artist and Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä Kappaleen Esittäjä ja Nimike</translation>
     </message>
     <message>
         <source>Display playing artist and song title in MythMusic on LCD display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esitä LCD:llä MythMusic:ssa soivan kappaleen nimike ja esittäjä.</translation>
     </message>
     <message>
         <source>Display Channel Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Esitä Kanavatietoja</translation>
     </message>
     <message>
         <source>Display tuned channel information on LCD display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esitä kanavakohtaisia tietoja LCD:llä.</translation>
     </message>
     <message>
         <source>Display Volume Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Esitä Äänenvoimakkuus</translation>
     </message>
     <message>
         <source>Display volume level information on LCD display</source>
-        <translation type="unfinished"></translation>
+        <translation>Esitä äänentasoon liittyvää tietoa LCD:llä</translation>
     </message>
     <message>
         <source>Display Generic Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Esitä Yleisiä Viestejä</translation>
     </message>
     <message>
         <source>Display generic information on LCD display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ilmoita yleisiä viestejä LCD-näytöllä.</translation>
     </message>
     <message>
         <source>Backlight Always On</source>
-        <translation type="unfinished"></translation>
+        <translation>Pidä Taustavalo Aina Päällä</translation>
     </message>
     <message>
         <source>Turn on the backlight permanently on the LCD display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Laittaa LCD-taustavalon pysyvästi päälle.</translation>
     </message>
     <message>
         <source>HeartBeat Always On</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD:n Sydänlyönnit Aina Päällä</translation>
     </message>
     <message>
         <source>LCD Key order</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD-Näppäinten Asetus</translation>
     </message>
     <message>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
@@ -7021,37 +7021,39 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Save original files after transcoding (globally)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tallenna alkuperäiset tiedostot jälkikäsittelystä (yleisesti)</translation>
     </message>
     <message>
         <source>Clear Cards</source>
-        <translation type="unfinished"></translation>
+        <translation>Alusta Kortit</translation>
     </message>
     <message>
         <source>Would you like to clear all capture card
 settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
+        <translation>Alustetaanko kaikki tv-korttitiedot,
+ennenkuin siirrytään asetuksiin?</translation>
     </message>
     <message>
         <source>Clear Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Tyhjennä Kanavatiedot</translation>
     </message>
     <message>
         <source>Would you like to clear all program data and channel settings before starting 
 configuration? This will not affect any existing recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alustetaanko kaikki kanavapaikkojen tiedot, ennenkuin siirrytään asetuksiin?
+Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>WARNING</source>
-        <translation type="unfinished"></translation>
+        <translation>VAROITUS</translation>
     </message>
     <message>
         <source>MythTV has detected that the backend is running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Huomattiin, että mythtv:n taustamoduli (backend) on käynnissä.</translation>
     </message>
     <message>
         <source>Changing existing card inputs, deleting anything,or scanning for channels may not work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Olemassaolevien asetusten, kuten sisääntulojen ja kanavaviritysten, muuttaminen ei ole suositeltavaa.</translation>
     </message>
 </context>
 <context>
@@ -7077,27 +7079,27 @@ configuration? This will not affect any existing recordings.</source>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Tila</translation>
+        <translation>Tila</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation type="unfinished">Selaa</translation>
+        <translation>Selaa</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation type="unfinished">Signaalin Voimakkuus</translation>
+        <translation>Signaalin Voimakkuus</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation type="unfinished">Signaali/Kohina</translation>
+        <translation>Signaali/Kohina</translation>
     </message>
     <message>
         <source>Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>Lukittu</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation type="unfinished">Ei Lukitusta</translation>
+        <translation>Ei Lukitusta</translation>
     </message>
 </context>
 <context>
@@ -7748,43 +7750,43 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Jump to Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Hyppää Kirjanmerkkiin</translation>
     </message>
     <message>
         <source>Partial Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Osittainen Lukko</translation>
     </message>
     <message>
         <source>Lock</source>
-        <translation type="unfinished"></translation>
+        <translation>Lukko</translation>
     </message>
     <message>
         <source>You should have gotten a channel lock by now. You can continue to wait for a signal, or you can change the channels with %1 or %2, change input&apos;s (%3), capture cards (%4), etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanavan olisi pitänyt virittäytyä jo. Signaalia voidaan vielä odottaa, tai voidaan vaihtaa kanavaa (%1 tai %2), sisääntuloa (%3), TV-korttia (%4), jne.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation type="unfinished">Manuaalinen Nauhoitus</translation>
+        <translation>Manuaalinen Nauhoitus</translation>
     </message>
     <message>
         <source>Previous Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Edellinen Nauhoitus</translation>
     </message>
     <message>
         <source>Select Audio Track</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Ääniraita</translation>
     </message>
     <message>
         <source>Select Subtitles</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse Tekstitys</translation>
     </message>
     <message>
         <source>Subtitle track</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekstitysvaihtoehto</translation>
     </message>
 </context>
 <context>
@@ -7835,11 +7837,11 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation>Prioriteetti</translation>
+        <translation>Ohjelma</translation>
     </message>
     <message>
         <source>Final Priority</source>
-        <translation>Lop. Prioriteetti</translation>
+        <translation>Prioriteetti</translation>
     </message>
     <message>
         <source>Record Type:</source>

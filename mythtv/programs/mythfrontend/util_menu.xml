@@ -1,18 +1,18 @@
 <mythmenu name="UTIL">
 
    <button>
-      <type>MUSIC_PLAYLIST</type>
-      <text>Music Tools</text>
-      <text lang="DE">Musik verwalten</text>
-      <text lang="NL">Muziek Beheren</text>
-      <text lang="SV">Musikverktyg</text>
-      <text lang="FR">Gestionnaire de musiques</text>
-      <text lang="JA">ミュージックツール</text>
-      <text lang="FI">Musiikkityökalut</text>
-      <text lang="ZH_TW">音樂工具</text>
-      <text lang="ES">Gestionar Música</text>
-      <action>PLUGIN mythmusic</action>
-      <depends>mythmusic</depends>	
+     <type>MUSIC_PLAYLIST</type>
+     <text>Music Tools</text>
+     <text lang="DE">Musik verwalten</text>
+     <text lang="NL">Muziek Beheren</text>
+     <text lang="SV">Musikverktyg</text>
+     <text lang="FR">Gestionnaire de musiques</text>
+     <text lang="JA">ミュージックツール</text>
+     <text lang="FI">Musiikkityökalut</text>
+     <text lang="ZH_TW">音樂工具</text>
+     <text lang="ES">Gestionar Música</text>
+     <action>PLUGIN mythmusic</action>
+     <depends>mythmusic</depends>	
    </button>
    
    <button>
@@ -31,6 +31,17 @@
      <text lang="ZH_TW">電影工具</text>     
      <action>JUMP Video Manager</action>
      <depends>mythvideo</depends>
+   </button>
+   
+   <button>
+     <type>SETUP_KEYS</type>
+     <text>Edit Keys</text>
+     <text lang="FI">Muokkaa Näppäimiä</text>
+     <text lang="IS">Stilla takka</text>
+     <text lang="DE">Tastenbelegung ändern</text>
+     <text lang="DK">Ændre tasteinstillinger</text>
+     <action>PLUGIN mythcontrols</action>
+     <depends>mythcontrols</depends>	
    </button>
    
    <button>
