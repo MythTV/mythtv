@@ -1129,8 +1129,6 @@ void TVRec::RunTV(void)
 
     while (HasFlags(kFlagRunMainLoop))
     {
-        bool doSleep = true;
-
         // If there is a state change queued up, do it...
         if (changeState)
         {
@@ -1181,7 +1179,6 @@ void TVRec::RunTV(void)
              HasFlags(kFlagFinishRecording)))
         {
             ChangeState(kState_None);
-            doSleep = false;
             ClearFlags(kFlagFinishRecording);
         }
 
@@ -1211,7 +1208,6 @@ void TVRec::RunTV(void)
             else if (StateIsPlaying(internalState))
                 ChangeState(RemovePlaying(internalState));
             ClearFlags(kFlagExitPlayer);
-            doSleep = false;
         }
 
 #ifdef USING_DVB_EIT
@@ -1227,7 +1223,7 @@ void TVRec::RunTV(void)
         // as the end recording code does not have a trigger...
         // NOTE: If you change anything here, make sure that
         // WaitforEventThreadSleep() will still work...
-        if (doSleep && tuningRequests.empty() && !changeState)
+        if (tuningRequests.empty() && !changeState)
         {
             triggerEventSleep.wakeAll();
             lock.mutex()->unlock();
