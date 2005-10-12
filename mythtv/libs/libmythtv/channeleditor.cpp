@@ -244,7 +244,7 @@ ChannelEditor::ChannelEditor():
     buttonScan = new TransButtonSetting();
     buttonScan->setLabel(QObject::tr("Scan for channels(s)"));
     buttonScan->setHelpText(QObject::tr("This button will scan for digital channels."));
-#ifdef USING_DVB
+
     buttonAdvanced = new TransButtonSetting();
     buttonAdvanced->setLabel(QObject::tr("Advanced"));
     buttonAdvanced->setHelpText(QObject::tr("Advanced editing options for digital channels"));
@@ -253,9 +253,6 @@ ChannelEditor::ChannelEditor():
     h->addChild(buttonScan);
     h->addChild(buttonAdvanced);
     addChild(h);
-#else
-    addChild(buttonScan);
-#endif
 
     connect(source, SIGNAL(valueChanged(const QString&)),
             list, SLOT(setSourceID(const QString&)));
@@ -266,23 +263,26 @@ ChannelEditor::ChannelEditor():
     connect(list, SIGNAL(accepted(int)), this, SLOT(edit(int)));
     connect(list, SIGNAL(menuButtonPressed(int)), this, SLOT(menu(int)));
     connect(buttonScan, SIGNAL(pressed()), this, SLOT(scan()));
-#ifdef USING_DVB
     connect(buttonAdvanced, SIGNAL(pressed()), this, SLOT(advanced()));
-#endif
 }
 
-int ChannelEditor::exec() {
-#ifdef USING_DVB
-    // Make sure we have dvb card installed
-    if (!CardUtil::IsCardTypePresent(CardUtil::DVB))
-        buttonAdvanced->setEnabled(false);
-#endif
+MythDialog* ChannelEditor::dialogWidget(MythMainWindow* parent,
+                                        const char* widgetName)
+{
+    dialog = ConfigurationDialog::dialogWidget(parent, widgetName);
+    connect(dialog, SIGNAL(editButtonPressed()),   this, SLOT(edit()));
+    connect(dialog, SIGNAL(deleteButtonPressed()), this, SLOT(del()));
+    return dialog;
+}
 
+int ChannelEditor::exec()
+{
     while (ConfigurationDialog::exec() == QDialog::Accepted)  {}
     return QDialog::Rejected;
 }
 
-void ChannelEditor::edit() {
+void ChannelEditor::edit()
+{
     id = list->getValue().toInt();
     ChannelWizard cw(id);
     cw.exec();
@@ -291,17 +291,20 @@ void ChannelEditor::edit() {
     list->setFocus();
 }
 
-void ChannelEditor::edit(int /*iSelected*/) {
-    id = list->getValue().toInt();
+void ChannelEditor::edit(int /*iSelected*/)
+{ 
     edit();
 }
 
-void ChannelEditor::del() {
-    int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(), "",
-                                             tr("Are you sure you would like to"
-                                             " delete this channel?"), 
-                                             tr("Yes, delete the channel"), 
-                                             tr("No, don't"), 2);
+void ChannelEditor::del()
+{
+    id = list->getValue().toInt();
+
+    int val = MythPopupBox::show2ButtonPopup(
+        gContext->GetMainWindow(), "",
+        tr("Are you sure you would like to delete this channel?"),
+        tr("Yes, delete the channel"),
+        tr("No, don't"), 2);
 
     if (val == 0) 
     {
@@ -315,11 +318,13 @@ void ChannelEditor::del() {
     }
 }
 
-void ChannelEditor::menu(int /*iSelected*/) {
+void ChannelEditor::menu(int /*iSelected*/)
+{
     id = list->getValue().toInt();
-    if (id == 0) {
+    if (id == 0)
        edit();
-    } else {
+    else
+    {
         int val = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
                                                  "",
                                                  tr("Channel Menu"),
@@ -351,11 +356,9 @@ void ChannelEditor::scan()
 
 void ChannelEditor::advanced()
 {
-#ifdef USING_DVB
     DVBTransportsEditor advancedDialog;
     advancedDialog.exec();
     list->fillSelections();
     list->setFocus();
-#endif
 }
 

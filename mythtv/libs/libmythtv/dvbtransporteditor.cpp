@@ -30,9 +30,6 @@
  */
 
 #include "dvbtransporteditor.h"
-#include "dvbtypes.h"
-#include "dvbdev.h"
-
 
 void DVBTransportList::fillSelections(void)
 {

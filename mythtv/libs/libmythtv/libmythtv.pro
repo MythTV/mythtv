@@ -185,8 +185,10 @@ using_backend {
     # Channel stuff
     HEADERS += channelbase.h               channelutil.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
+    HEADERS += dvbtransporteditor.h
     SOURCES += channelbase.cpp             channelutil.cpp
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
+    SOURCES += dvbtransporteditor.cpp
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
@@ -277,8 +279,8 @@ using_backend {
         SOURCES += dvbrecorder.cpp
 
         # Misc
-        HEADERS += dvbtransporteditor.h   dvbconfparser.h   dvbdev/dvbci.h
-        SOURCES += dvbtransporteditor.cpp dvbconfparser.cpp dvbdev/dvbci.cpp
+        HEADERS += dvbconfparser.h        dvbdev/dvbci.h
+        SOURCES += dvbconfparser.cpp      dvbdev/dvbci.cpp
 
         DEFINES += USING_DVB
         using_dvb_eit {

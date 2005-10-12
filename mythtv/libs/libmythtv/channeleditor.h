@@ -14,6 +14,8 @@ public:
     ChannelEditor();
     virtual int exec();
 
+    MythDialog* dialogWidget(MythMainWindow *parent, const char* name);
+
 public slots:
     void menu(int);
     void del();
