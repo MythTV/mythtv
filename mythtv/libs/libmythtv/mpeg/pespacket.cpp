@@ -4,6 +4,11 @@
 #include "mpegtables.h"
 #include "mythcontext.h"
 
+#include <vector>
+#include <map>
+
+using namespace std;
+
 static inline uint calcOffset(uint cnt)
 {
     return (cnt * TSPacket::PAYLOAD_SIZE) + TSPacket::HEADER_SIZE;
