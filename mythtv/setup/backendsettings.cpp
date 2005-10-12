@@ -783,7 +783,7 @@ ClearDialog::ClearDialog()
     backendLabel->setLabel(
         QObject::tr("WARNING") + ": " +
         QObject::tr("MythTV has detected that the backend is running.")+"\n\n"+
-        QObject::tr("Changing existing card inputs, deleting anything,"
+        QObject::tr("Changing existing card inputs, deleting anything, "
                     "or scanning for channels may not work."));
 
     if (is_backend_running())
