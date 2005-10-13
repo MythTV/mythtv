@@ -1951,6 +1951,7 @@ void CaptureCardEditor::load()
 {
     clearSelections();
     addSelection(QObject::tr("(New capture card)"), "0");
+    addSelection(QObject::tr("(Delete all capture cards)"), "-1");
     CaptureCard::fillSelections(this);
 }
 
@@ -1990,10 +1991,31 @@ void CaptureCardEditor::menu(void)
 
 void CaptureCardEditor::edit(void)
 {
-    CaptureCard cc;
-    if (getValue().toInt() != 0)
-        cc.loadByID(getValue().toInt());
-    cc.exec();
+    const int cardid = getValue().toInt();
+    if (-1 == cardid)
+    {
+        int val = MythPopupBox::show2ButtonPopup(
+            gContext->GetMainWindow(), "",
+            tr("Are you sure you want to delete "
+               "ALL capture cards?"),
+            tr("Yes, delete capture cards"),
+            tr("No, don't"), 2);
+
+        if (0 == val)
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.exec("TRUNCATE TABLE capturecard;");
+            query.exec("TRUNCATE TABLE cardinput;");
+            load();
+        }
+    }
+    else
+    {
+        CaptureCard cc;
+        if (cardid)
+            cc.loadByID(cardid);
+        cc.exec();
+    }
 }
 
 void CaptureCardEditor::del(void)
@@ -2041,6 +2063,7 @@ int VideoSourceEditor::exec() {
 void VideoSourceEditor::load() {
     clearSelections();
     addSelection(QObject::tr("(New video source)"), "0");
+    addSelection(QObject::tr("Delete all video sources)"), "-1");
     VideoSource::fillSelections(this);
 }
 
@@ -2070,11 +2093,38 @@ void VideoSourceEditor::menu()
 
 void VideoSourceEditor::edit() 
 {
-    VideoSource vs;
-    if (getValue().toInt() != 0)
-        vs.loadByID(getValue().toInt());
+    const int sourceid = getValue().toInt();
+    if (-1 == sourceid)
+    {
+        int val = MythPopupBox::show2ButtonPopup(
+            gContext->GetMainWindow(), "",
+            tr("Are you sure you want to delete "
+               "ALL video sources?"),
+            tr("Yes, delete video sources"),
+            tr("No, don't"), 2);
 
-    vs.exec();
+        if (0 == val)
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.exec("TRUNCATE TABLE channel;");
+            query.exec("TRUNCATE TABLE program;");
+            query.exec("TRUNCATE TABLE videosource;");
+            query.exec("TRUNCATE TABLE credits;");
+            query.exec("TRUNCATE TABLE programrating;");
+            query.exec("TRUNCATE TABLE programgenres;");
+            query.exec("TRUNCATE TABLE dtv_multiplex;");
+            query.exec("TRUNCATE TABLE cardinput;");
+            load();
+        }
+
+    }
+    else
+    {
+        VideoSource vs;
+        if (sourceid)
+            vs.loadByID(sourceid);
+        vs.exec();
+    }
 }
 
 void VideoSourceEditor::del() 

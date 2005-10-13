@@ -29,28 +29,7 @@
 #include "checksetup.h"
 
 using namespace std;
-
-void clearCardDB(void)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.exec("TRUNCATE TABLE capturecard;");
-    query.exec("TRUNCATE TABLE cardinput;");
-}
-
-void clearAllDB(void)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-
-    query.exec("TRUNCATE TABLE channel;");
-    query.exec("TRUNCATE TABLE program;");
-    query.exec("TRUNCATE TABLE videosource;");
-    query.exec("TRUNCATE TABLE credits;");
-    query.exec("TRUNCATE TABLE programrating;");
-    query.exec("TRUNCATE TABLE programgenres;");
-    query.exec("TRUNCATE TABLE dtv_multiplex;");
-    query.exec("TRUNCATE TABLE cardinput;");
-}
+bool is_backend_running(void);
 
 void SetupMenuCallback(void* data, QString& selection) {
     (void)data;
@@ -305,13 +284,22 @@ int main(int argc, char *argv[])
     LanguageSettings::prompt();
     LanguageSettings::load("mythfrontend");
 
-    ClearDialog clr;
-    if (clr.exec() == QDialog::Accepted)
+    QString warn = 
+        QObject::tr("WARNING") + ": " +
+        QObject::tr("MythTV has detected that the backend is running.")+"\n\n"+
+        QObject::tr("Changing existing card inputs, deleting anything, "
+                    "or scanning for channels may not work.");
+
+    if (is_backend_running())
     {
-        if (clr.IsClearCardsSet())
-            clearCardDB();
-        if (clr.IsClearChannelsSet())
-            clearAllDB();
+        int val = MythPopupBox::show2ButtonPopup(
+            gContext->GetMainWindow(), QObject::tr("WARNING"),
+            warn,
+            QObject::tr("Continue"),
+            QObject::tr("Exit"), 1);
+        cerr<<"val: "<<val<<endl;
+        if (1 == val)
+            return 0;
     }
 
     REG_KEY("qt", "DELETE", "Delete", "D");
@@ -362,4 +350,22 @@ int main(int argc, char *argv[])
     delete dia;
 
     return 0;
+}
+
+bool is_backend_running(void)
+{
+    QString tmp_file = "/tmp/backendrunning";
+    myth_system("ps -ae | grep mythbackend > " + tmp_file,
+                MYTH_SYSTEM_DONT_BLOCK_LIRC |
+                MYTH_SYSTEM_DONT_BLOCK_JOYSTICK_MENU);
+
+    FILE *fptr = fopen(tmp_file, "r");
+    if (!fptr)
+        return false;
+    char buf[1024];
+    int read_bytes = fread(buf, 1, 1024, fptr);
+    fclose(fptr);
+    unlink(tmp_file);
+
+    return read_bytes != 0;
 }
