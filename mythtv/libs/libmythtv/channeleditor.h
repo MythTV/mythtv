@@ -22,14 +22,14 @@ public slots:
     void edit();
     void edit(int);
     void scan();
-    void advanced();
+    void transportEditor();
 
 private:
     ChannelListSetting* list;
     int id;
 
     TransButtonSetting *buttonScan;
-    TransButtonSetting *buttonAdvanced;
+    TransButtonSetting *buttonTransportEditor;
 };
 
 class ChannelID;

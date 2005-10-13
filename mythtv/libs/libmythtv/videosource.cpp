@@ -1,37 +1,58 @@
-#include "config.h"
-#include "videosource.h"
-#include "libmyth/mythwidgets.h"
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "datadirect.h"
+// -*- Mode: c++ -*-
 
+// Standard C headers
+#include <cstdio>
+#include <cstdlib>
+#include <cerrno>
+
+// Standard UNIX C headers
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+// C++ headers
+#include <iostream>
+
+// Qt headers
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qcursor.h>
 #include <qlayout.h>
 #include <qfile.h>
 #include <qmap.h>
-#include <iostream>
+
+// MythTV headers
+#include "libmyth/mythconfig.h"
+#include "libmyth/mythwidgets.h"
+#include "libmyth/mythcontext.h"
+#include "libmyth/mythdbcon.h"
+#include "videosource.h"
+#include "datadirect.h"
 
 #ifdef USING_DVB
 #include <linux/dvb/frontend.h>
 #include "dvbdev.h"
 #endif
 
-#include <unistd.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
 #if defined(CONFIG_VIDEO4LINUX)
 #include "videodev_myth.h"
 #endif
 
 const QString CardUtil::DVB = "DVB";
+
+class RecorderOptions: public ConfigurationWizard
+{
+  public:
+    RecorderOptions(CaptureCard& parent);
+};
+
+class DVBDiseqcConfigurationWizard: public ConfigurationWizard
+{
+  public:
+    DVBDiseqcConfigurationWizard();
+};
 
 /** \fn CardUtil::IsCardTypePresent(const QString&)
  *  \brief Returns true if the card type is present
@@ -1124,11 +1145,16 @@ class DVBHwDecoder: public CheckBoxSetting, public CCSetting
     DVBHwDecoder(const CaptureCard& parent)
         : CCSetting(parent, "dvb_hw_decoder")
     {
-        setLabel(QObject::tr("Use hardware MPEG decoder"));
+        setLabel(QObject::tr("Using hardware MPEG decoder"));
         setHelpText(
-            QObject::tr("If your DVB card has a built in MPEG decoder "
-                        "you can activate it here. (Only for full featured "
-                        "cards & certain USB devices)."));
+            QObject::tr("This reduces the complexity of the stream that "
+                        "MythTV records so that it can be fed directly to "
+                        "a hardware MPEG decoder.") + " " +
+            QObject::tr("Specifically, MythTV will record only one audio "
+                        "and one subtitle stream.") + " " +
+            QObject::tr("You will want to also set preferred languages in "
+                        "the frontend's "
+                        "Utilities/Setup:Setup:TV Settings:General(page 3)."));
     };
 };
 
@@ -2421,7 +2447,8 @@ void DVBConfigurationGroup::probeCard(const QString& cardNumber)
 #endif
 }
 
-void DVBDefaultInput::fillSelections(const QString& type) {
+void DVBDefaultInput::fillSelections(const QString& type)
+{
     clearSelections();
 
     QStringList inputs = VideoDevice::fillDVBInputs(type.toInt());
@@ -2431,7 +2458,8 @@ void DVBDefaultInput::fillSelections(const QString& type) {
 
 }
 
-void TunerCardInput::fillSelections(const QString& device) {
+void TunerCardInput::fillSelections(const QString& device)
+{
     clearSelections();
 
     if (device == QString::null || device == "")
@@ -2443,12 +2471,10 @@ void TunerCardInput::fillSelections(const QString& device) {
         addSelection(*i);
 }
 
-DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent):
-                       parent(a_parent) {
+DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
+    : parent(a_parent)
+{
     setUseLabel(false);
-
-    advcfg = new TransButtonSetting();
-    advcfg->setLabel(QObject::tr("Advanced Configuration"));
 
     DVBCardNum* cardnum = new DVBCardNum(parent);
     cardname = new DVBCardName();
@@ -2469,15 +2495,29 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent):
     addChild(new DVBVbiDevice(parent));
     addChild(diseqctype);
     addChild(defaultinput);
+
+    buttonDisEqC = new TransButtonSetting();
+    buttonDisEqC->setLabel(tr("DisEqC"));
+
+    buttonRecOpt = new TransButtonSetting();
+    buttonRecOpt->setLabel(tr("Recording Options"));    
+
+    HorizontalConfigurationGroup *advcfg = 
+        new HorizontalConfigurationGroup(false, false, true, true);
+    advcfg->addChild(buttonDisEqC);
+    advcfg->addChild(buttonRecOpt);
     addChild(advcfg);
 
-    connect(cardnum, SIGNAL(valueChanged(const QString&)),
-            this, SLOT(probeCard(const QString&)));
-    connect(cardnum, SIGNAL(valueChanged(const QString&)),
-            &parent, SLOT(setDvbCard(const QString&)));
-    connect(diseqctype, SIGNAL(valueChanged(const QString&)),
+    connect(cardnum,      SIGNAL(valueChanged(const QString&)),
+            this,         SLOT(  probeCard   (const QString&)));
+    connect(cardnum,      SIGNAL(valueChanged(const QString&)),
+            &parent,      SLOT(  setDvbCard  (const QString&)));
+    connect(diseqctype,   SIGNAL(valueChanged(const QString&)),
             defaultinput, SLOT(fillSelections(const QString&)));
-    connect(advcfg, SIGNAL(pressed()), &parent, SLOT(execDVBConfigMenu()));
+    connect(buttonRecOpt, SIGNAL(pressed()),
+            &parent,      SLOT(  recorderOptionsPanel()));
+    connect(buttonDisEqC, SIGNAL(pressed()),
+            &parent,      SLOT(  disEqCPanel()));
 
     defaultinput->setEnabled(false);
     diseqctype->setEnabled(false);
@@ -2487,54 +2527,41 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent):
     defaultinput->fillSelections(diseqctype->getValue());
 }
 
-void CaptureCard::execDVBConfigMenu() {
+void CaptureCard::recorderOptionsPanel()
+{
     if (getCardID() == 0)
     {
-        int val = MythPopupBox::show2ButtonPopup(
-            gContext->GetMainWindow(),
-            "",
-            tr("You have to save the current card before configuring it"
-               ", would you like to do this now?"),
-            tr("Yes, save now"),
-            tr("No, don't"),
-            2);
-
-        if (val != 0)
-            return;
         save();
         load();
     }
-
-    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
-                             tr("Advanced Configuration"));
-
-    QButton *button;
-    button = popup->addButton(tr("Recording Options"), this, 
-                              SLOT(execAdvConfigWiz()));
-    button->setFocus();
-    button = popup->addButton(tr("Diseqc"), this, SLOT(execDiseqcWiz()));
-    popup->ExecPopup();
-    delete popup;
+    RecorderOptions acw(*this);
+    acw.exec();
 }
 
-class DVBAdvConfigurationWizard: public ConfigurationWizard
+void CaptureCard::disEqCPanel()
 {
-  public:
-    DVBAdvConfigurationWizard(CaptureCard& parent)
+    if (getCardID() == 0)
     {
-        VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
-        rec->setLabel(QObject::tr("Recorder Options"));
-        rec->setUseLabel(false);
-
-        rec->addChild(new DVBHwDecoder(parent));
-        //rec->addChild(new DVBRecordTS(parent));
-        rec->addChild(new DVBNoSeqStart(parent));
-        rec->addChild(new DVBOnDemand(parent));
-        rec->addChild(new DVBPidBufferSize(parent));
-        rec->addChild(new DVBBufferSize(parent));
-        addChild(rec);
+        save();
+        load();
     }
-};
+    DVBDiseqcConfigurationWizard diseqcWiz;
+    diseqcWiz.exec();
+}
+
+RecorderOptions::RecorderOptions(CaptureCard& parent)
+{
+    VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
+    rec->setLabel(QObject::tr("Recorder Options"));
+    rec->setUseLabel(false);
+
+    rec->addChild(new DVBHwDecoder(parent));
+    rec->addChild(new DVBNoSeqStart(parent));
+    rec->addChild(new DVBOnDemand(parent));
+    rec->addChild(new DVBPidBufferSize(parent));
+    rec->addChild(new DVBBufferSize(parent));
+    addChild(rec);
+}
 
 static GlobalLineEdit *DiseqcLatitude()
 {
@@ -2562,29 +2589,13 @@ static GlobalLineEdit *DiseqcLongitude()
     return gc;
 };
 
-class DVBDiseqcConfigurationWizard: public ConfigurationWizard
+DVBDiseqcConfigurationWizard::DVBDiseqcConfigurationWizard()
 {
-  public:
-    DVBDiseqcConfigurationWizard()
-    {
-        VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
-        rec->setLabel(QObject::tr("Diseqc Options"));
-        rec->setUseLabel(false);
+    VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
+    rec->setLabel(QObject::tr("Diseqc Options"));
+    rec->setUseLabel(false);
 
-        rec->addChild(DiseqcLatitude());
-        rec->addChild(DiseqcLongitude());
-        addChild(rec);
-    }
-};
-
-void CaptureCard::execAdvConfigWiz()
-{
-    DVBAdvConfigurationWizard acw(*this);
-    acw.exec();
-}
-
-void CaptureCard::execDiseqcWiz()
-{
-    DVBDiseqcConfigurationWizard diseqcWiz;
-    diseqcWiz.exec();
+    rec->addChild(DiseqcLatitude());
+    rec->addChild(DiseqcLongitude());
+    addChild(rec);
 }

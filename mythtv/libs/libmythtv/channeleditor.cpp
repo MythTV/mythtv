@@ -224,7 +224,8 @@ public:
 };
 
 ChannelEditor::ChannelEditor():
-    VerticalConfigurationGroup(), ConfigurationDialog() {
+    VerticalConfigurationGroup(), ConfigurationDialog()
+{
 
     setLabel(tr("Channels"));
     addChild(list = new ChannelListSetting());
@@ -242,16 +243,21 @@ ChannelEditor::ChannelEditor():
     addChild(hide);
 
     buttonScan = new TransButtonSetting();
-    buttonScan->setLabel(QObject::tr("Scan for channels(s)"));
-    buttonScan->setHelpText(QObject::tr("This button will scan for digital channels."));
+    buttonScan->setLabel(QObject::tr("Channel Scanner"));
+    buttonScan->setHelpText(QObject::tr("Starts the channel scanner."));
 
-    buttonAdvanced = new TransButtonSetting();
-    buttonAdvanced->setLabel(QObject::tr("Advanced"));
-    buttonAdvanced->setHelpText(QObject::tr("Advanced editing options for digital channels"));
+    buttonTransportEditor = new TransButtonSetting();
+    buttonTransportEditor->setLabel(QObject::tr("Transport Editor"));
+    buttonTransportEditor->setHelpText(
+        QObject::tr("Allows you to edit the transports directly") + " " +
+        QObject::tr("This is rarely required unless you are using "
+                    "a satelite dish and must enter an initial "
+                    "frequency to for the channel scanner to try."));
 
-    HorizontalConfigurationGroup *h = new HorizontalConfigurationGroup(false, false);
+    HorizontalConfigurationGroup *h = 
+        new HorizontalConfigurationGroup(false, false);
     h->addChild(buttonScan);
-    h->addChild(buttonAdvanced);
+    h->addChild(buttonTransportEditor);
     addChild(h);
 
     connect(source, SIGNAL(valueChanged(const QString&)),
@@ -263,7 +269,8 @@ ChannelEditor::ChannelEditor():
     connect(list, SIGNAL(accepted(int)), this, SLOT(edit(int)));
     connect(list, SIGNAL(menuButtonPressed(int)), this, SLOT(menu(int)));
     connect(buttonScan, SIGNAL(pressed()), this, SLOT(scan()));
-    connect(buttonAdvanced, SIGNAL(pressed()), this, SLOT(advanced()));
+    connect(buttonTransportEditor, SIGNAL(pressed()),
+            this, SLOT(transportEditor()));
 }
 
 MythDialog* ChannelEditor::dialogWidget(MythMainWindow* parent,
@@ -354,7 +361,7 @@ void ChannelEditor::scan()
 #endif
 }
 
-void ChannelEditor::advanced()
+void ChannelEditor::transportEditor()
 {
     DVBTransportsEditor advancedDialog;
     advancedDialog.exec();

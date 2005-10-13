@@ -379,7 +379,8 @@ private:
     DVBCardName* cardname;
     DVBCardType* cardtype;
     DVBDiseqcType* diseqctype;
-    TransButtonSetting *advcfg;
+    TransButtonSetting *buttonDisEqC;
+    TransButtonSetting *buttonRecOpt;
     SignalTimeout* signal_timeout;
     ChannelTimeout* channel_timeout;
 };
@@ -414,9 +415,8 @@ public:
     };
 
 public slots:
-    void execDVBConfigMenu();
-    void execDiseqcWiz();
-    void execAdvConfigWiz();
+    void disEqCPanel();
+    void recorderOptionsPanel();
     void setDvbCard(const QString& card) { dvbCard = card; };
 
 private:
