@@ -34,6 +34,7 @@
 #include "libmythtv/programinfo.h"
 #include "libmythtv/frequencytables.h"
 #include "libmythtv/channelutil.h"
+#include "libmythtv/videosource.h"
 
 using namespace std;
 
@@ -823,7 +824,8 @@ void DataDirectStationUpdate(Source source)
                 major = channum.toInt();
                 atscsrcid = (major << 8) | minor.toInt();
                 tvformat = "atsc";
-                channum += "_" + minor; // default channum number
+                // default channum number
+                channum += SourceUtil::GetChannelSeparator(source.id) + minor;
             }
             else
             {
@@ -937,7 +939,8 @@ void DataDirectStationUpdate(Source source)
             if (minor != "")
             {
                 atscsrcid = (channel.toInt() << 8) | minor.toInt();
-                channel += "_" + minor; // default channel number
+                // default channel number
+                channel += SourceUtil::GetChannelSeparator(source.id) + minor;
             }
             else
             {

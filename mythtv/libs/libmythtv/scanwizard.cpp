@@ -611,7 +611,7 @@ void ScanWizard::captureCard(const QString& str)
     {
         nCaptureCard = nNewCaptureCard;
         nCardType = CardUtil::GetCardType(nCaptureCard);
-        QString fmt = (nCardType == CardUtil::HDTV) ? "%1_%2" : "%1%2";
+        QString fmt = SourceUtil::GetChannelFormat(videoSource());
         paneATSC->SetDefaultFormat(fmt);
         emit cardTypeChanged(QString::number(nCardType));
     }

@@ -271,11 +271,11 @@ class ScanATSCChannelFormat: public ComboBoxSetting, public TransientStorage
   public:
     ScanATSCChannelFormat()
     {
-        addSelection(QObject::tr("Underscore (5_1)"), "%1_%2", false);
-        addSelection(QObject::tr("None (51)"),        "%1%2",  true);
-        addSelection(QObject::tr("Minus (5-1)"),      "%1-%2", false);
-        addSelection(QObject::tr("Zero (501)"),       "%10%2", false);
-        addSelection(QObject::tr("Period (5.1)"), "%1.%2", false);
+        addSelection(QObject::tr("(5_1) Underscore"), "%1_%2", true);
+        addSelection(QObject::tr("(5-1) Minus"),      "%1-%2", false);
+        addSelection(QObject::tr("(5.1) Period"),     "%1.%2", false);
+        addSelection(QObject::tr("(501) Zero"),       "%10%2", false);
+        addSelection(QObject::tr("(51) None"),        "%1%2",  false);
         setLabel(QObject::tr("Channel Separator"));
         setHelpText(QObject::tr("What to use to separate ATSC major "
                                 "and minor channels."));

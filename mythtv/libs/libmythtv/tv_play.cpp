@@ -2900,7 +2900,7 @@ void TV::ChannelClear(bool hideosd)
 
 void TV::ChannelKey(char key)
 {
-    static char *spacers[4] = { "_", "-", "#", NULL };
+    static char *spacers[5] = { "_", "-", "#", ".", NULL };
 
     channelKeys   = channelKeys.append(key).right(kChannelKeysMax);
     inputKeys     = inputKeys.append(key).right(kChannelKeysMax);

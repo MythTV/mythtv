@@ -77,7 +77,7 @@ class ScanWizard: public ConfigurationWizard
     void cardTypeChanged(const QString&);
 
   protected:
-    int videoSource()  const { return page1->videoSource->getValue().toInt(); }
+    uint videoSource() const { return page1->videoSource->getValue().toInt(); }
     int transport()    const
         { return page1->scanConfig->transport->getValue().toInt(); }
     QString country()  const { return page1->scanConfig->country->getValue(); }
@@ -146,7 +146,7 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
     SIScan            *scanner;
 
     int                nScanType;
-    int                nVideoSource;
+    uint               nVideoSource;
 
     // tranport info
     uint               frequency;

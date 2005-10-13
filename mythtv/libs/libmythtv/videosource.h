@@ -77,6 +77,13 @@ class CardUtil
     static bool         IgnoreEncrypted(uint cardid, const QString &inputname);
 };
 
+class SourceUtil
+{
+  public:
+    static QString GetChannelSeparator(uint sourceid);
+    static QString GetChannelFormat(uint sourceid);
+};
+
 class VideoSource;
 class VSSetting: public SimpleDBStorage {
 protected:
