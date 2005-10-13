@@ -390,7 +390,7 @@ int main(int argc, char *argv[])
     {
         QFileInfo inf(infile);
         QString base = inf.baseName();
-        QRegExp r("(\\d*)_(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)_");
+        QRegExp r("(\\d*)_(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)(\\d\\d)");
         int pos = r.search(base);
         if (pos > -1)
         {
