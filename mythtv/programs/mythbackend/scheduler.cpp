@@ -584,22 +584,22 @@ bool Scheduler::FindNextConflict(RecList &cardlist, ProgramInfo *p, RecIter &j)
 
 void Scheduler::MarkOtherShowings(ProgramInfo *p)
 {
-    RecList &showinglist = titlelistmap[p->title];
+    RecList *showinglist = &titlelistmap[p->title];
 
-    MarkShowingsList(showinglist, p);
+    MarkShowingsList(*showinglist, p);
 
     if (p->rectype == kFindOneRecord || 
         p->rectype == kFindDailyRecord ||
         p->rectype == kFindWeeklyRecord)
     {
-        showinglist = recordidlistmap[p->recordid];
-        MarkShowingsList(showinglist, p);
+        showinglist = &recordidlistmap[p->recordid];
+        MarkShowingsList(*showinglist, p);
     }
 
     if (p->rectype == kOverrideRecord && p->findid > 0)
     {
-        showinglist = recordidlistmap[p->parentid];
-        MarkShowingsList(showinglist, p);
+        showinglist = &recordidlistmap[p->parentid];
+        MarkShowingsList(*showinglist, p);
     }
 }
 
@@ -655,17 +655,17 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p)
     if (p->recstatus == rsRecording)
         return false;
 
-    RecList &showinglist = titlelistmap[p->title];
+    RecList *showinglist = &titlelistmap[p->title];
 
     if (p->rectype == kFindOneRecord || 
         p->rectype == kFindDailyRecord ||
         p->rectype == kFindWeeklyRecord)
-        showinglist = recordidlistmap[p->recordid];
+        showinglist = &recordidlistmap[p->recordid];
 
     p->recstatus = rsLaterShowing;
 
-    RecIter j = showinglist.begin();
-    for ( ; j != showinglist.end(); j++)
+    RecIter j = showinglist->begin();
+    for ( ; j != showinglist->end(); j++)
     {
         ProgramInfo *q = *j;
         if (q == p)
