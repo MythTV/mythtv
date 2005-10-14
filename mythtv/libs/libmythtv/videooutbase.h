@@ -327,6 +327,7 @@ class VideoOutput
 
     // Picture-in-Picture
     int PIPLocation;
+    int desired_pipsize; ///< percentage of full window to use for PiP
     int desired_piph;
     int desired_pipw;
     int piph_in;

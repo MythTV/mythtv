@@ -169,7 +169,7 @@ VideoOutput::VideoOutput() :
     ZoomedIn(0),              ZoomedUp(0),              ZoomedRight(0),
 
     // Picture-in-Picture stuff
-    PIPLocation(0),
+    PIPLocation(0),           desired_pipsize(26),
     desired_piph(128),        desired_pipw(160),
     piph_in(-1),              pipw_in(-1),
     piph_out(-1),             pipw_out(-1),
@@ -567,14 +567,6 @@ void VideoOutput::MoveResize(void)
     dispwoff = dispw; disphoff = disph;
     if (imgw == 1920 && imgh == 1088)
         imgh = 1080; // ATSC 1920x1080
-
-    // Set an appropriate PiP size
-    if (imgh > 1000)
-        (desired_pipw = 368), (desired_piph = 288);
-    else if (imgh > 700)
-        (desired_pipw = 240), (desired_piph = 192);
-    else
-        (desired_pipw = 160), (desired_piph = 128);
 
     // Get display aspect and correct for rounding errors
     displayAspect = GetDisplayAspect();
@@ -1039,12 +1031,24 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     int pipw, piph;
 
     VideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
+    float pipVideoAspect = pipplayer->GetVideoAspect();
 
-    if (!pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
+    // If PiP is not initialized to values we like, silently ignore the frame.
+    if ((videoAspect <= 0) || (pipVideoAspect <= 0) || 
+        (frame->height <= 0) || (frame->width <= 0) ||
+        !pipimage || !pipimage->buf || pipimage->codec != FMT_YV12)
     {
         pipplayer->ReleaseCurrentFrame(pipimage);
         return;
     }
+
+    desired_piph = (frame->height * desired_pipsize) / 100;
+    desired_piph -= desired_piph % 2;
+
+    // adjust for non-square pixels
+    float pixelAdj = (GetDisplayAspect() * XJ_height) / XJ_width;
+    desired_pipw = (int) (desired_piph * pipVideoAspect * pixelAdj);
+    desired_pipw -= desired_pipw % 2;
 
     int xoff;
     int yoff;
