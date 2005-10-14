@@ -2063,7 +2063,7 @@ int VideoSourceEditor::exec() {
 void VideoSourceEditor::load() {
     clearSelections();
     addSelection(QObject::tr("(New video source)"), "0");
-    addSelection(QObject::tr("Delete all video sources)"), "-1");
+    addSelection(QObject::tr("(Delete all video sources)"), "-1");
     VideoSource::fillSelections(this);
 }
 

@@ -66,27 +66,27 @@
     <name>CaptureCard</name>
     <message>
         <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation>U moet de huidige TV-kaart opslaan voor u deze kunt configureren, wilt u dit nu doen?</translation>
+        <translation type="obsolete">U moet de huidige TV-kaart opslaan voor u deze kunt configureren, wilt u dit nu doen?</translation>
     </message>
     <message>
         <source>Yes, save now</source>
-        <translation>Ja, nu bewaren</translation>
+        <translation type="obsolete">Ja, nu bewaren</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Nee, niet doen</translation>
+        <translation type="obsolete">Nee, niet doen</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
-        <translation>Geavanceerde Configuratie</translation>
+        <translation type="obsolete">Geavanceerde Configuratie</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation>Opname Opties</translation>
+        <translation type="obsolete">Opname Opties</translation>
     </message>
     <message>
         <source>Diseqc</source>
-        <translation>Diseqc</translation>
+        <translation type="obsolete">Diseqc</translation>
     </message>
 </context>
 <context>
@@ -118,6 +118,14 @@
     <message>
         <source>No, don&apos;t</source>
         <translation>Nee, niet doen</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL capture cards?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete capture cards</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -323,6 +331,17 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     <message>
         <source>Matching</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVBConfigurationGroup</name>
+    <message>
+        <source>DisEqC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
+        <translation type="unfinished">Opname Opties</translation>
     </message>
 </context>
 <context>
@@ -2884,7 +2903,7 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Advanced Configuration</source>
-        <translation>Geavanceerde Configuratie</translation>
+        <translation type="obsolete">Geavanceerde Configuratie</translation>
     </message>
     <message>
         <source>XMLTV listings grabber</source>
@@ -5300,19 +5319,19 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Scan for channels(s)</source>
-        <translation>Scan naar zender(s)</translation>
+        <translation type="obsolete">Scan naar zender(s)</translation>
     </message>
     <message>
         <source>This button will scan for digital channels.</source>
-        <translation>Deze knop start het scannen naar digitale zenders.</translation>
+        <translation type="obsolete">Deze knop start het scannen naar digitale zenders.</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation>Geavanceerd</translation>
+        <translation type="obsolete">Geavanceerd</translation>
     </message>
     <message>
         <source>Advanced editing options for digital channels</source>
-        <translation>Geavanceerde opties voor digitale zenders</translation>
+        <translation type="obsolete">Geavanceerde opties voor digitale zenders</translation>
     </message>
     <message>
         <source>Use on air guide</source>
@@ -5902,11 +5921,11 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat het op Auto staan,
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
-        <translation>Gebruik hardware MPEG decoder</translation>
+        <translation type="obsolete">Gebruik hardware MPEG decoder</translation>
     </message>
     <message>
         <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation>Als uw DVB-kaart een ingebouwde MPEG decoder heeft kan u deze hier activeren. (Enkel voor high-end kaarten en sommige USB-apparaten)</translation>
+        <translation type="obsolete">Als uw DVB-kaart een ingebouwde MPEG decoder heeft kan u deze hier activeren. (Enkel voor high-end kaarten en sommige USB-apparaten)</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
@@ -6718,19 +6737,19 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Underscore (5_1)</source>
-        <translation>Underscore (5_1)</translation>
+        <translation type="obsolete">Underscore (5_1)</translation>
     </message>
     <message>
         <source>None (51)</source>
-        <translation>Geen (51)</translation>
+        <translation type="obsolete">Geen (51)</translation>
     </message>
     <message>
         <source>Minus (5-1)</source>
-        <translation>Min (5-1)</translation>
+        <translation type="obsolete">Min (5-1)</translation>
     </message>
     <message>
         <source>Zero (501)</source>
-        <translation>Nul (501)</translation>
+        <translation type="obsolete">Nul (501)</translation>
     </message>
     <message>
         <source>Channel Separator</source>
@@ -6871,10 +6890,6 @@ Myth zal nu afsluiten.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Period (5.1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Signal Timeout (msec)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6963,10 +6978,6 @@ Myth zal nu afsluiten.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display volume level information on LCD display</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Display Generic Information</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6999,24 +7010,6 @@ Myth zal nu afsluiten.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Clear Cards</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Would you like to clear all capture card
-settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Clear Channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Would you like to clear all program data and channel settings before starting 
-configuration? This will not affect any existing recordings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>WARNING</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7025,7 +7018,103 @@ configuration? This will not affect any existing recordings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Changing existing card inputs, deleting anything,or scanning for channels may not work.</source>
+        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Scanner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts the channel scanner.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows you to edit the transports directly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is rarely required unless you are using a satelite dish and must enter an initial frequency to for the channel scanner to try.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(5_1) Underscore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(5-1) Minus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(5.1) Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(501) Zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(51) None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Using hardware MPEG decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This reduces the complexity of the stream that MythTV records so that it can be fed directly to a hardware MPEG decoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specifically, MythTV will record only one audio and one subtitle stream.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Delete all capture cards)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4:3</source>
+        <translation type="unfinished">4:3</translation>
+    </message>
+    <message>
+        <source>16:9</source>
+        <translation type="unfinished">16:9</translation>
+    </message>
+    <message>
+        <source>16:10</source>
+        <translation type="unfinished">16:10</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Delete all video sources)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display volume level information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The aspect ratio of a Xinerama display can not be queried from the display, so you must specify it.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7759,6 +7848,18 @@ Geen verdere details</translation>
         <source>Subtitle track</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Signal %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S/N %1 dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bit Errors %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -7940,6 +8041,14 @@ Geen verdere details</translation>
     <message>
         <source>No, don&apos;t</source>
         <translation>Nee, niet doen</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL video sources?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete video sources</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

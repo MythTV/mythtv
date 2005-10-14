@@ -66,27 +66,27 @@
     <name>CaptureCard</name>
     <message>
         <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation>Kortet må lagres før det kan konfigureres. Skal dette gjøres nå?</translation>
+        <translation type="obsolete">Kortet må lagres før det kan konfigureres. Skal dette gjøres nå?</translation>
     </message>
     <message>
         <source>Yes, save now</source>
-        <translation>Ja, lagre nå</translation>
+        <translation type="obsolete">Ja, lagre nå</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Nei, ikke lagre nå</translation>
+        <translation type="obsolete">Nei, ikke lagre nå</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
-        <translation>Avansert konfigurasjon</translation>
+        <translation type="obsolete">Avansert konfigurasjon</translation>
     </message>
     <message>
         <source>Recording Options</source>
-        <translation>Innstillinger for opptak</translation>
+        <translation type="obsolete">Innstillinger for opptak</translation>
     </message>
     <message>
         <source>Diseqc</source>
-        <translation>DISEqC</translation>
+        <translation type="obsolete">DISEqC</translation>
     </message>
 </context>
 <context>
@@ -118,6 +118,14 @@
     <message>
         <source>Capture cards</source>
         <translation>TV-kort</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL capture cards?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete capture cards</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -321,6 +329,17 @@
     </message>
     <message>
         <source>Matching</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DVBConfigurationGroup</name>
+    <message>
+        <source>DisEqC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Options</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1474,19 +1493,19 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>Scan for channels(s)</source>
-        <translation>Søk etter kanaler (s)</translation>
+        <translation type="obsolete">Søk etter kanaler (s)</translation>
     </message>
     <message>
         <source>This button will scan for digital channels.</source>
-        <translation>Dette knappen vil søke etter digitale kanaler.</translation>
+        <translation type="obsolete">Dette knappen vil søke etter digitale kanaler.</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation>Avansert</translation>
+        <translation type="obsolete">Avansert</translation>
     </message>
     <message>
         <source>Advanced editing options for digital channels</source>
-        <translation>Avanserte innstillinger for digitale kanaler</translation>
+        <translation type="obsolete">Avanserte innstillinger for digitale kanaler</translation>
     </message>
     <message>
         <source>[Not Selected]</source>
@@ -3124,11 +3143,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
-        <translation>Bruk maskinvare MPEG-dekoder</translation>
+        <translation type="obsolete">Bruk maskinvare MPEG-dekoder</translation>
     </message>
     <message>
         <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation>Hvis DVB-kortet har en innebygget MPEG-dekoder kan den aktiveres her. (Bare for fullfunksjonskort og noen USB-enheter.)</translation>
+        <translation type="obsolete">Hvis DVB-kortet har en innebygget MPEG-dekoder kan den aktiveres her. (Bare for fullfunksjonskort og noen USB-enheter.)</translation>
     </message>
     <message>
         <source>Record in TS format instead of PS.</source>
@@ -3364,7 +3383,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Advanced Configuration</source>
-        <translation>Avansert konfigurasjon</translation>
+        <translation type="obsolete">Avansert konfigurasjon</translation>
     </message>
     <message>
         <source>Recorder Options</source>
@@ -5873,19 +5892,19 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Underscore (5_1)</source>
-        <translation>Understrek (5_1)</translation>
+        <translation type="obsolete">Understrek (5_1)</translation>
     </message>
     <message>
         <source>None (51)</source>
-        <translation>Ingen (51)</translation>
+        <translation type="obsolete">Ingen (51)</translation>
     </message>
     <message>
         <source>Minus (5-1)</source>
-        <translation>Bindestrek (5-1)</translation>
+        <translation type="obsolete">Bindestrek (5-1)</translation>
     </message>
     <message>
         <source>Zero (501)</source>
-        <translation>Null (501)</translation>
+        <translation type="obsolete">Null (501)</translation>
     </message>
     <message>
         <source>Channel Separator</source>
@@ -6468,10 +6487,6 @@ Myth vil nå avsluttes.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Period (5.1)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Signal Timeout (msec)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6560,10 +6575,6 @@ Myth vil nå avsluttes.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display volume level information on LCD display</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Display Generic Information</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6596,24 +6607,6 @@ Myth vil nå avsluttes.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Clear Cards</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Would you like to clear all capture card
-settings before starting configuration?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Clear Channels</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Would you like to clear all program data and channel settings before starting 
-configuration? This will not affect any existing recordings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>WARNING</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6622,7 +6615,103 @@ configuration? This will not affect any existing recordings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Changing existing card inputs, deleting anything,or scanning for channels may not work.</source>
+        <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Channel Scanner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starts the channel scanner.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transport Editor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows you to edit the transports directly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is rarely required unless you are using a satelite dish and must enter an initial frequency to for the channel scanner to try.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(5_1) Underscore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(5-1) Minus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(5.1) Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(501) Zero</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(51) None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Using hardware MPEG decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This reduces the complexity of the stream that MythTV records so that it can be fed directly to a hardware MPEG decoder.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Specifically, MythTV will record only one audio and one subtitle stream.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Delete all capture cards)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>4:3</source>
+        <translation type="unfinished">4:3</translation>
+    </message>
+    <message>
+        <source>16:9</source>
+        <translation type="unfinished">16:9</translation>
+    </message>
+    <message>
+        <source>16:10</source>
+        <translation type="unfinished">16:10</translation>
+    </message>
+    <message>
+        <source>Continue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(Delete all video sources)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display volume level information on LCD display.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The aspect ratio of a Xinerama display can not be queried from the display, so you must specify it.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7325,6 +7414,18 @@ Ingen flere detaljer</translation>
         <source>Subtitle track</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Signal %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S/N %1 dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bit Errors %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -7506,6 +7607,14 @@ Ingen flere detaljer</translation>
     <message>
         <source>Video sources</source>
         <translation>Videokilder</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL video sources?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete video sources</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

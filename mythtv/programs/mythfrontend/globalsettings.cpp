@@ -1184,7 +1184,7 @@ static HostComboBox *XineramaMonitorAspectRatio()
     gc->addSelection(QObject::tr("16:9"),  "1.7777");
     gc->addSelection(QObject::tr("16:10"), "1.6");
     gc->setHelpText(QObject::tr(
-                        "The aspect ratio of a Xinerama display can not be"
+                        "The aspect ratio of a Xinerama display can not be "
                         "queried from the display, so you must specify it."));
     return gc;
 }
@@ -2577,7 +2577,7 @@ static HostCheckBox *LCDShowVolume()
     HostCheckBox *gc = new HostCheckBox("LCDShowVolume");
     gc->setLabel(QObject::tr("Display Volume Information"));
     gc->setHelpText(QObject::tr("Display volume level information "
-                                "on LCD display"));
+                                "on LCD display."));
     gc->setValue(true);
     return gc;
 }
