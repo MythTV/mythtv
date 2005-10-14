@@ -297,7 +297,6 @@ int main(int argc, char *argv[])
             warn,
             QObject::tr("Continue"),
             QObject::tr("Exit"), 1);
-        cerr<<"val: "<<val<<endl;
         if (1 == val)
             return 0;
     }

@@ -582,7 +582,7 @@ void ScanWizardScanner::scan()
     }
 }
 
-ScanWizard::ScanWizard()
+ScanWizard::ScanWizard(int sourceid)
     : nVideoDev(-1), nCardType(CardUtil::ERROR_PROBE), nCaptureCard(-1)
 {
     paneQAM = new QAMPane();
@@ -590,7 +590,7 @@ ScanWizard::ScanWizard()
     paneQPSK = new QPSKPane();
     paneATSC = new ATSCPane();
 
-    page1 = new ScanWizardScanType(this);
+    page1 = new ScanWizardScanType(this, sourceid);
     ScanWizardScanner *page2 = new ScanWizardScanner(this);
 
     connect(this,  SIGNAL(scan()),

@@ -30,6 +30,7 @@
 #include "libmyth/mythdbcon.h"
 #include "videosource.h"
 #include "datadirect.h"
+#include "scanwizard.h"
 
 #ifdef USING_DVB
 #include <linux/dvb/frontend.h>
@@ -430,6 +431,18 @@ QString SourceUtil::GetChannelFormat(uint sourceid)
     return QString("%1") + GetChannelSeparator(sourceid) + QString("%2");
 }
 
+uint SourceUtil::GetChannelCount(uint sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT sum(1) "
+                  "FROM channel "
+                  "WHERE sourceid = :SOURCEID");
+    query.bindValue(":SOURCEID", sourceid);
+    if (query.exec() && query.isActive() && query.next())
+        return query.value(0).toUInt();
+    return 0;
+}
+
 QString VSSetting::whereClause(void)
 {
     return QString("sourceid = %1").arg(parent.getSourceID());
@@ -577,30 +590,28 @@ void DataDirect_config::load()
 DataDirect_config::DataDirect_config(const VideoSource& _parent, int _source)
   : parent(_parent) 
 {
-    cerr << "new DataDirect_config source == " << _source << endl;
     source = _source;
     setUseLabel(false);
     setUseFrame(false);
 
-//    setLabel(QObject::tr("DataDirect configuration"));
+    HorizontalConfigurationGroup *lp =
+        new HorizontalConfigurationGroup(false, false, true, true);
 
-    HorizontalConfigurationGroup *lp = new HorizontalConfigurationGroup(false,
-                                                                        false);
-
-    lp->addChild((userid = new DataDirectUserID(parent)));
-    lp->addChild((password = new DataDirectPassword(parent)));
-
+    lp->addChild(userid   = new DataDirectUserID(parent));
+    lp->addChild(password = new DataDirectPassword(parent));
+    lp->addChild(button   = new DataDirectButton());
     addChild(lp);
 
-    addChild((button = new DataDirectButton()));
-    addChild((lineupselector = new DataDirectLineupSelector(parent)));
+    addChild(lineupselector = new DataDirectLineupSelector(parent));
+
     connect(button, SIGNAL(pressed()),
-            this, SLOT(fillDataDirectLineupSelector()));
+            this,   SLOT(fillDataDirectLineupSelector()));
 }
 
 void DataDirect_config::fillDataDirectLineupSelector(void)
 {
-    lineupselector->fillSelections(userid->getValue(), password->getValue(), source);
+    lineupselector->fillSelections(
+        userid->getValue(), password->getValue(), source);
 }
 
 void RegionSelector::fillSelections()
@@ -1559,19 +1570,23 @@ CardType::CardType(const CaptureCard& parent)
 
 void CardType::fillSelections(SelectSetting* setting)
 {
-    setting->addSelection(QObject::tr("Standard V4L capture card"), "V4L");
-    setting->addSelection(QObject::tr("MJPEG capture card (Matrox G200, DC10)"),
-                          "MJPEG");
-    setting->addSelection(QObject::tr("MPEG-2 Encoder card (PVR-x50, PVR-500)"),
-                          "MPEG");
-    setting->addSelection(QObject::tr("pcHDTV capture card (HD-2000, HD-3000)"),
-                          "HDTV");
-    setting->addSelection(QObject::tr("Digital Video Broadcast card (DVB)"), 
-                          "DVB");
-    setting->addSelection(QObject::tr("FireWire Input"),
-                          "FIREWIRE");
-    setting->addSelection(QObject::tr("USB Mpeg-4 Encoder (Plextor ConvertX, etc)"), "GO7007");
-    setting->addSelection(QObject::tr("DBOX2 Input"), "DBOX2");
+    setting->addSelection(
+        QObject::tr("Analog V4L capture card"), "V4L");
+    setting->addSelection(
+        QObject::tr("MJPEG capture card (Matrox G200, DC10)"), "MJPEG");
+    setting->addSelection(
+        QObject::tr("MPEG-2 encoder card (PVR-x50, PVR-500)"), "MPEG");
+    setting->addSelection(
+        QObject::tr("DVB DTV capture card (v3.x)"), "DVB");
+    setting->addSelection(
+        QObject::tr("pcHDTV DTV capture card (w/V4L drivers)"), "HDTV");
+    setting->addSelection(
+        QObject::tr("FireWire cable box"), "FIREWIRE");
+    setting->addSelection(
+        QObject::tr("USB MPEG-4 encoder box (Plextor ConvertX, etc)"),
+        "GO7007");
+    setting->addSelection(
+        QObject::tr("DBox2 TCP/IP cable box"), "DBOX2");
 }
 
 class CardID: public SelectLabelSetting, public CISetting {
@@ -1722,16 +1737,36 @@ class PresetTuner: public LineEditSetting, public CISetting {
     };
 };
 
-class StartingChannel: public LineEditSetting, public CISetting {
-  public:
-    StartingChannel(const CardInput& parent):
-        CISetting(parent, "startchan") {
-        setLabel(QObject::tr("Starting channel"));
-        setValue("3");
-        setHelpText(QObject::tr("LiveTV will change to the above channel when "
-                    "the input is first selected."));
-    };
-};
+void StartingChannel::SetSourceID(const QString &sourceid)
+{
+    const QString oldvalue = getValue();
+    //VERBOSE(VB_IMPORTANT, "StartingChannel::SetSourceID("<<sourceid<<"): "
+    //        <<QString("old value was '%1'").arg(oldvalue));
+
+    clearSelections();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT channum "
+        "FROM channel "
+        "WHERE sourceid = :SOURCEID"
+        "ORDER BY atscsrcid, channum");
+    query.bindValue(":SOURCEID", sourceid);
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while(query.next())
+        {
+            const QString channum = query.value(0).toString();
+            addSelection(channum, channum, oldvalue == channum);
+            //VERBOSE(VB_IMPORTANT, "Adding '"<<channum<<"'");
+        }
+    }
+    else if (!oldvalue.isEmpty())
+    {
+        addSelection(oldvalue, oldvalue, true);
+        //VERBOSE(VB_IMPORTANT, "Adding '"<<oldvalue<<"'");
+    }
+}
 
 class InputPreference: public SpinBoxSetting, public CISetting {
   public:
@@ -1756,8 +1791,10 @@ class DVBLNBChooser: public ComboBoxSetting {
         addSelection("DBS");
         addSelection("Universal - 1");
         addSelection("Custom");
-        setHelpText("Select the LNB Settings for DVB-S cards. "
-                    "For DVB-C and DVB-T you don't need to set these values. ");
+        setHelpText(
+            QObject::tr("Select the LNB Settings for DVB-S cards.") + " " +
+            QObject::tr("For DVB-C and DVB-T you don't need to "
+                        "set these values."));
     };
     void save() {};
     void load() {};
@@ -1765,77 +1802,111 @@ class DVBLNBChooser: public ComboBoxSetting {
 private:
 };
 
-class CardInput: public ConfigurationWizard
+CardInput::CardInput(bool isDVBcard)
 {
-  public:
-    CardInput(int DVB = 0)
-    {
-        addChild(id = new ID());
+    addChild(id = new ID());
 
-        ConfigurationGroup *group = new VerticalConfigurationGroup(false);
-        group->setLabel(QObject::tr("Connect source to input"));
-        group->addChild(cardid = new CardID(*this));
-        group->addChild(inputname = new InputName(*this));
-        group->addChild(sourceid = new SourceID(*this));
-        group->addChild(new InputPreference(*this));
-        if (!DVB)
-        {
-            group->addChild(new ExternalChannelCommand(*this));
-            group->addChild(new PresetTuner(*this));
-        }
-        group->addChild(new StartingChannel(*this));
+    ConfigurationGroup *group =
+        new VerticalConfigurationGroup(false, false, true, true);
+
+    group->setLabel(QObject::tr("Connect source to input"));
+    group->addChild(cardid = new CardID(*this));
+    group->addChild(inputname = new InputName(*this));
+    group->addChild(sourceid = new SourceID(*this));
+    if (!isDVBcard)
+    {
+        group->addChild(new ExternalChannelCommand(*this));
+        group->addChild(new PresetTuner(*this));
+    }
+
+    TransButtonSetting *scan = new TransButtonSetting();
+    scan->setLabel(tr("Scan for channels"));
+    scan->setHelpText(
+        tr("Use channel scanner to find channels for this input."));
+
+    TransButtonSetting *srcfetch = new TransButtonSetting();
+    srcfetch->setLabel(tr("Fetch channels from listings source"));
+    srcfetch->setHelpText(
+        tr("This uses the listings data source to "
+           "provide the channels for this input.") + " " +
+        tr("This can take a long time to run."));
+
+    ConfigurationGroup *sgrp =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    sgrp->addChild(scan);
+    sgrp->addChild(srcfetch);
+    group->addChild(sgrp);
+
+    startchan = new StartingChannel(*this);
+    group->addChild(startchan);
+    group->addChild(new InputPreference(*this));
+
 #ifdef USING_DVB
-        if (DVB)
-        {
-           group->addChild(diseqcpos = new DiseqcPos(*this));
-           group->addChild(diseqcport = new DiseqcPort(*this));
-           group->addChild(lnblofswitch = new LNBLofSwitch(*this));
-           group->addChild(lnblofhi = new LNBLofHi(*this));
-           group->addChild(lnbloflo = new LNBLofLo(*this));
-           group->addChild(new FreeToAir(*this));
-        }
-#endif
-        addChild(group);
-    };
-
-    int getInputID(void) const { return id->intValue(); };
-
-    void loadByID(int id);
-    void loadByInput(int cardid, QString input);
-    QString getSourceName(void) const { return sourceid->getSelectionLabel(); };
-
-    void fillDiseqcSettingsInput(QString _pos, QString _port);
-
-    virtual void save();
-
-private:
-    class ID: virtual public IntegerSetting,
-              public AutoIncrementStorage
+    if (isDVBcard)
     {
-      public:
-        ID():
-            AutoIncrementStorage("cardinput", "cardid") {
-            setVisible(false);
-            setName("CardInputID");
-        };
-        virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
-                                      const char* widgetName = 0) {
-            (void)cg; (void)parent; (void)widgetName;
-            return NULL;
-        };
-    };
+        group->addChild(diseqcpos = new DiseqcPos(*this));
+        group->addChild(diseqcport = new DiseqcPort(*this));
+        group->addChild(lnblofswitch = new LNBLofSwitch(*this));
+        group->addChild(lnblofhi = new LNBLofHi(*this));
+        group->addChild(lnbloflo = new LNBLofLo(*this));
+        group->addChild(new FreeToAir(*this));
+    }
+#endif
 
-    ID* id;
-    CardID* cardid;
-    InputName* inputname;
-    SourceID* sourceid;
-    DVBLNBChooser *lnbsettings;
-    DiseqcPos* diseqcpos;
-    DiseqcPort* diseqcport;
-    LNBLofSwitch *lnblofswitch;
-    LNBLofLo *lnbloflo;
-    LNBLofHi *lnblofhi;
-};
+    addChild(group);
+
+    setName("CardInput");
+    connect(scan,     SIGNAL(pressed()), SLOT(channelScanner()));
+    connect(srcfetch, SIGNAL(pressed()), SLOT(sourceFetch()));
+    connect(sourceid, SIGNAL(valueChanged(const QString&)),
+            startchan,SLOT(  SetSourceID (const QString&)));
+}
+
+QString CardInput::getSourceName(void) const
+{
+    return sourceid->getSelectionLabel();
+}
+
+void CardInput::channelScanner(void)
+{
+    uint srcid = sourceid->getValue().toUInt();
+
+#ifdef USING_BACKEND
+    uint num_channels_before = SourceUtil::GetChannelCount(srcid);
+
+    ScanWizard scanwizard(srcid);
+    scanwizard.exec(false,true);
+
+    if (SourceUtil::GetChannelCount(srcid))
+        startchan->SetSourceID(QString::number(srcid));        
+    if (num_channels_before)
+    {
+        startchan->load();
+        startchan->save();
+    }
+#else
+    VERBOSE(VB_IMPORTANT, "You must compile the backend "
+            "to be able to scan for channels");
+#endif
+    
+}
+
+void CardInput::sourceFetch(void)
+{
+    uint srcid = sourceid->getValue().toUInt();
+
+    uint num_channels_before = SourceUtil::GetChannelCount(srcid);
+
+    myth_system("mythfilldatabase --refresh-today --dont-refresh-tomorrow");
+
+    if (SourceUtil::GetChannelCount(srcid))
+        startchan->SetSourceID(QString::number(srcid));        
+    if (num_channels_before)
+    {
+        startchan->load();
+        startchan->save();
+    }
+}
 
 QString CISetting::whereClause(void) 
 {
@@ -2192,7 +2263,7 @@ void CardInputEditor::load()
                 for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
                 {
                     // IS DVB Check for CardInput class
-                    CardInput* cardinput = new CardInput(1);
+                    CardInput* cardinput = new CardInput(true);
                     cardinput->loadByInput(cardid, (*it).input);
 
                     cardinput->fillDiseqcSettingsInput((*it).position,(*it).port);
@@ -2215,7 +2286,7 @@ void CardInputEditor::load()
                 for (QStringList::iterator i = inputs.begin();
                      i != inputs.end(); ++i)
                 { 
-                    CardInput* cardinput = new CardInput();
+                    CardInput* cardinput = new CardInput(false);
                     cardinput->loadByInput(cardid, *i);   
                     cardinputs.push_back(cardinput);
                     QString index = QString::number(cardinputs.size()-1);
@@ -2237,7 +2308,7 @@ void CardInputEditor::load()
                 for (QStringList::iterator i = inputs.begin();
                      i != inputs.end(); ++i)
                 { 
-                    CardInput* cardinput = new CardInput();
+                    CardInput* cardinput = new CardInput(false);
                     cardinput->loadByInput(cardid, *i);   
                     cardinputs.push_back(cardinput);
                     QString index = QString::number(cardinputs.size()-1);
@@ -2260,7 +2331,7 @@ void CardInputEditor::load()
                 for (QStringList::iterator i = inputs.begin(); 
                      i != inputs.end(); ++i)
                 {
-                    CardInput* cardinput = new CardInput();
+                    CardInput* cardinput = new CardInput(false);
                     cardinput->loadByInput(cardid, *i);
                     cardinputs.push_back(cardinput);
                     QString index = QString::number(cardinputs.size()-1);

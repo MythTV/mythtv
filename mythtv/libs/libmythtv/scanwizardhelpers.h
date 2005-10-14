@@ -116,9 +116,12 @@ class ScannerEvent : public QCustomEvent
 class VideoSourceSetting: public ComboBoxSetting
 {
   public:
-    VideoSourceSetting() { setLabel(QObject::tr("Video Source")); }
+    VideoSourceSetting(int srcid) : sourceid(srcid)
+        { setLabel(QObject::tr("Video Source")); }
     virtual void load();
     virtual void save() {}
+  private:
+    int sourceid;
 };
 
 class TransportSetting : public ComboBoxSetting
@@ -229,7 +232,7 @@ class ScanWizardScanType: public VerticalConfigurationGroup
     Q_OBJECT
     friend class ScanWizard;
   public:
-    ScanWizardScanType(ScanWizard *_parent);
+    ScanWizardScanType(ScanWizard *_parent, int sourceid);
 
   protected:
     ScanWizard *parent;

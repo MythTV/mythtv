@@ -64,7 +64,7 @@ class ScanWizard: public ConfigurationWizard
     friend class ScanWizardScanner;
     friend class ScanOptionalConfig;
   public:
-    ScanWizard();
+    ScanWizard(int sourceid = -1);
 
     MythDialog* dialogWidget(MythMainWindow *parent, const char *widgetName);
 

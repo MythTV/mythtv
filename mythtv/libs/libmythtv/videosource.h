@@ -82,6 +82,7 @@ class SourceUtil
   public:
     static QString GetChannelSeparator(uint sourceid);
     static QString GetChannelFormat(uint sourceid);
+    static uint    GetChannelCount(uint sourceid);
 };
 
 class VideoSource;
@@ -155,24 +156,25 @@ public:
 class DataDirectUserID;
 class DataDirectPassword;
 
-class DataDirect_config: public VerticalConfigurationGroup {
+class DataDirect_config: public VerticalConfigurationGroup
+{
     Q_OBJECT
-public:
+  public:
     DataDirect_config(const VideoSource& _parent, int _source = DD_ZAP2IT); 
 
-    virtual void load();
+    virtual void load(void);
 
     QString getLineupID(void) const { return lineupselector->getValue(); };
 
-protected slots:
-    void fillDataDirectLineupSelector();
+  protected slots:
+    void fillDataDirectLineupSelector(void);
 
-protected:
-    const VideoSource& parent;
-    DataDirectUserID* userid;
-    DataDirectPassword* password;
-    DataDirectLineupSelector* lineupselector;
-    DataDirectButton* button;
+  protected:
+    const VideoSource        &parent;
+    DataDirectUserID         *userid;
+    DataDirectPassword       *password;
+    DataDirectButton         *button;
+    DataDirectLineupSelector *lineupselector;
     QString lastloadeduserid;
     QString lastloadedpassword;
     int source;
@@ -519,6 +521,84 @@ public:
 
 protected:
     vector<CardInput*> cardinputs;
+};
+
+class StartingChannel : public ComboBoxSetting, public CISetting
+{
+    Q_OBJECT
+  public:
+    StartingChannel(const CardInput &parent) :
+        ComboBoxSetting(true, 1), CISetting(parent, "startchan")
+    {
+        setLabel(QObject::tr("Starting channel"));
+        setHelpText(QObject::tr("Starting LiveTV channel.") + " " +
+                    QObject::tr("This is updated on every successful "
+                                "channel change."));
+    }
+  public slots:
+    void SetSourceID(const QString &sourceid);
+};
+
+class CardID;
+class InputName;
+class SourceID;
+class DVBLNBChooser;
+class DiseqcPos;
+class DiseqcPort;
+class LNBLofSwitch;
+class LNBLofLo;
+class LNBLofHi;
+
+class CardInput: public ConfigurationWizard
+{
+    Q_OBJECT
+  public:
+    CardInput(bool is_dvb_card);
+
+    int getInputID(void) const { return id->intValue(); };
+
+    void loadByID(int id);
+    void loadByInput(int cardid, QString input);
+    QString getSourceName(void) const;
+
+    void fillDiseqcSettingsInput(QString _pos, QString _port);
+
+    virtual void save();
+
+  public slots:
+    void channelScanner();
+    void sourceFetch();
+
+  private:
+    class ID: virtual public IntegerSetting,
+              public AutoIncrementStorage
+    {
+      public:
+        ID():
+            AutoIncrementStorage("cardinput", "cardid")
+        {
+            setVisible(false);
+            setName("CardInputID");
+        };
+        virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent,
+                                      const char* widgetName = 0)
+        {
+            (void)cg; (void)parent; (void)widgetName;
+            return NULL;
+        };
+    };
+
+    ID              *id;
+    CardID          *cardid;
+    InputName       *inputname;
+    SourceID        *sourceid;
+    DVBLNBChooser   *lnbsettings;
+    DiseqcPos       *diseqcpos;
+    DiseqcPort      *diseqcport;
+    LNBLofSwitch    *lnblofswitch;
+    LNBLofLo        *lnbloflo;
+    LNBLofHi        *lnblofhi;
+    StartingChannel *startchan;
 };
 
 #endif

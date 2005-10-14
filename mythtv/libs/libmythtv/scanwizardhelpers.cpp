@@ -140,11 +140,21 @@ void VideoSourceSetting::load()
     if (!query.exec() || !query.isActive() || query.size() <= 0)
         return;
 
-
+    int which = 0, i = 0;
     while (query.next())
     {
         addSelection(query.value(0).toString(),
                      query.value(1).toString());
+
+        if (sourceid == query.value(1).toInt())
+            which = i;
+        i++;
+    }
+
+    if (sourceid > -1)
+    {
+        setValue(which);
+        setEnabled(false);
     }
 }
 
@@ -359,12 +369,13 @@ void ScanOptionalConfig::triggerChanged(const QString& value)
     TriggeredConfigurationGroup::triggerChanged(value);
 }
 
-ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent) : parent(_parent)
+ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent, int sourceid)
+    : parent(_parent)
 {
     setLabel(tr("Scan Type"));
     setUseLabel(false);
 
-    videoSource = new VideoSourceSetting();
+    videoSource = new VideoSourceSetting(sourceid);
     capturecard = new CaptureCardSetting();
 
     HorizontalConfigurationGroup *h1 =
