@@ -79,12 +79,6 @@ DVBChannel::DVBChannel(int aCardNum, TVRec *parent)
     dvbcam = new DVBCam(cardnum);
     bzero(&info, sizeof(info));
     has_crc_bug = CardUtil::HasDVBCRCBug(aCardNum);
-
-    // print device name so that we can detect driver specific bugs...
-    QString device_name("");
-    QString dummy("");
-    CardUtil::GetDVBType(aCardNum, device_name, dummy);
-    CHANNEL("Device Name: '"<<device_name<<"'");
 }
 
 DVBChannel::~DVBChannel()
@@ -154,7 +148,7 @@ bool DVBChannel::Open()
         return false;
     }
 
-    GENERAL(QString("Using DVB card %1, with frontend %2.")
+    GENERAL(QString("Using DVB card %1, with frontend '%2'.")
             .arg(cardnum).arg(info.name));
 
     // Turn on the power to the LNB

@@ -288,10 +288,16 @@ static void init_freq_tables(freq_table_map_t &fmap)
         "QAM-256 HRC T-%1", 7,   8175000,  50750000, 6000000, QAM_256);
 
     // USA Cable, QAM 256
+//#define DEBUG_CABLE_SCAN
+#ifdef DEBUG_CABLE_SCAN
+    fmap["atsc_qam256_us0"] = new FrequencyTable(
+        "QAM-256 Channel %1", 117, 771000000, 801000000, 6000000, QAM_256);
+#else
     fmap["atsc_qam256_us0"] = new FrequencyTable(
         "QAM-256 Channel %1",   1, 75000000, 801000000, 6000000, QAM_256);
     fmap["atsc_qam256_us1"] = new FrequencyTable(
         "QAM-256 Channel T-%1", 7, 10000000,  52000000, 6000000, QAM_256);
+#endif
 
     // USA Cable, QAM 128
     fmap["atsc_qam128_us0"] = new FrequencyTable(

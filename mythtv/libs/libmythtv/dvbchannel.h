@@ -41,7 +41,10 @@ class DVBChannel : public QObject, public ChannelBase
     int  GetFd(void)                    const { return fd_frontend; }
 
     QString GetDevice(void) const { return QString::number(GetCardNum()); }
-    int  GetCardNum(void)               const { return cardnum; };
+    /// Returns DVB device number, used to construct filenames for DVB devices
+    int     GetCardNum(void)            const { return cardnum; };
+    /// Returns frontend name as reported by driver
+    QString GetFrontendName(void)       const { return info.name; }
     const dvb_channel_t& GetCurrentChannel() const
         { return chan_opts; };
     bool GetTuningParams(DVBTuning &tuning) const;
