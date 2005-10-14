@@ -26,7 +26,7 @@
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "DVBSM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
-/** \fn DVBSignalMonitor::DVBSignalMonitor(int,int,int)
+/** \fn DVBSignalMonitor::DVBSignalMonitor(int,DVBChannel*,uint,const char*)
  *  \brief Initializes signal lock and signal values.
  *
  *   Start() must be called to actually begin continuous
@@ -112,7 +112,7 @@ int DVBSignalMonitor::GetDVBCardNum(void) const
     return dynamic_cast<DVBChannel*>(channel)->GetCardNum();
 }
 
-/** \fn DVBSignalMonitor::Stop()
+/** \fn DVBSignalMonitor::Stop(void)
  *  \brief Stop signal monitoring and table monitoring threads.
  */
 void DVBSignalMonitor::Stop(void)
