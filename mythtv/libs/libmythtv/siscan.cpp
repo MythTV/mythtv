@@ -105,6 +105,7 @@ SIScan::SIScan(QString _cardtype, ChannelBase* _channel, int _sourceID,
       ignoreAudioOnlyServices(true),
       ignoreEncryptedServices(false),
       forceUpdate(false),
+      renameChannels(false),
       channelFormat("%1_%2"),
       // State
       threadExit(false),
@@ -998,7 +999,7 @@ void SIScan::UpdatePATinDB(int tid_db,
             db_mplexid, -1, 0, 0, pat->ProgramNumber(i));
 
         QString chan_num = ChannelUtil::GetChanNum(chanid);
-        if (chan_num == QString::null || chan_num == "")
+        if (chan_num.isEmpty() || renameChannels)
         {
             chan_num = QString("%1#%2")
                 .arg((freqid) ? freqid : db_mplexid).arg(i);
@@ -1113,7 +1114,7 @@ void SIScan::UpdateVCTinDB(int tid_db,
             vct->ProgramNumber(i));
 
         QString chan_num = ChannelUtil::GetChanNum(chanid);
-        if (chan_num == QString::null || chan_num == "")
+        if (chan_num.isEmpty() || renameChannels)
         {
             chan_num = channelFormat
                 .arg(vct->MajorChannel(i))
@@ -1292,6 +1293,9 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
         else if (force_update || (desc && have_uk_chan_num))
         {   // The service is in database & we have good info, update it
             emit ServiceScanUpdateText(tr("Updating %1").arg(service_name));
+
+            if (!renameChannels)
+                chan_num = ChannelUtil::GetChanNum(chanid);
 
             ChannelUtil::UpdateChannel(
                 db_mplexid,
@@ -1498,6 +1502,9 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
         else if ((*s).ATSCSourceID)
         {   // The service is in database & we have good info, update it
             emit ServiceScanUpdateText(tr("Updating %1").arg(service_name));
+
+            if (!renameChannels)
+                chan_num = ChannelUtil::GetChanNum(chanid);
 
             ChannelUtil::UpdateChannel(
                 db_mplexid,

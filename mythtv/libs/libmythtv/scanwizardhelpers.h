@@ -285,6 +285,19 @@ class ScanATSCChannelFormat: public ComboBoxSetting, public TransientStorage
     }
 };
 
+class ScanOldChannelTreatment: public ComboBoxSetting, public TransientStorage
+{
+  public:
+    ScanOldChannelTreatment()
+    {
+        addSelection(QObject::tr("Minimal Updates"),    "minimal");
+        addSelection(QObject::tr("Rename to Match"),    "rename");
+        addSelection(QObject::tr("Delete"),             "delete");
+        setLabel(QObject::tr("Existing Channel Treatment"));
+        setHelpText(QObject::tr("How to treat existing channels."));
+    }
+};
+
 class ScanFrequency: public LineEditSetting, public TransientStorage
 {
   public:
@@ -607,10 +620,15 @@ class ATSCPane : public VerticalConfigurationGroup
         setUseFrame(false);
         addChild(atsc_transport = new ScanATSCTransport());
         addChild(atsc_format = new ScanATSCChannelFormat());
+        addChild(old_channel_treatment = new ScanOldChannelTreatment());
     }
 
-    QString atscTransport() { return atsc_transport->getValue(); }
-    QString atscFormat()    { return atsc_format->getValue();    }
+    QString atscTransport(void) const { return atsc_transport->getValue(); }
+    QString atscFormat(void)    const { return atsc_format->getValue();    }
+    bool DoDeleteChannels(void) const
+        { return old_channel_treatment->getValue() == "delete"; }
+    bool DoRenameChannels(void) const
+        { return old_channel_treatment->getValue() == "rename"; }
 
     void SetDefaultFormat(QString d)
     {
@@ -619,8 +637,9 @@ class ATSCPane : public VerticalConfigurationGroup
     }
 
   protected:
-    ScanATSCTransport *atsc_transport;
-    ScanATSCChannelFormat *atsc_format;
+    ScanATSCTransport       *atsc_transport;
+    ScanATSCChannelFormat   *atsc_format;
+    ScanOldChannelTreatment *old_channel_treatment;
 };
 
 class ErrorPane : public HorizontalConfigurationGroup

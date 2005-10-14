@@ -76,6 +76,7 @@ class SIScan : public QObject
     void SetFTAOnly(bool _fFTAOnly)   { ignoreEncryptedServices = _fFTAOnly; }
     void SetTVOnly(bool _tvOnly)      { ignoreAudioOnlyServices = _tvOnly;   }
     void SetForceUpdate(bool _force)  { forceUpdate             = _force;    }
+    void SetRenameChannels(bool _r)   { renameChannels          = _r; }
     void SetChannelFormat(const QString _fmt) { channelFormat   = _fmt; }
 
     SignalMonitor    *GetSignalMonitor(void) { return signalMonitor; }
@@ -166,6 +167,7 @@ class SIScan : public QObject
     bool              ignoreAudioOnlyServices;
     bool              ignoreEncryptedServices;
     bool              forceUpdate;
+    bool              renameChannels;
     QString           channelFormat;
 
     // State

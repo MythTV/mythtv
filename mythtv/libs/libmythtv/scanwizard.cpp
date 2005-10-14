@@ -685,6 +685,15 @@ void ScanWizardScanner::HandleTuneComplete(void)
     {
         SISCAN("ScanTransports("<<std<<", "<<mod<<", "<<country<<")");
         scanner->SetChannelFormat(parent->paneATSC->atscFormat());
+        if (parent->paneATSC->DoDeleteChannels())
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("DELETE FROM channel "
+                          "WHERE sourceid = :SOURCEID");
+            query.bindValue(":SOURCEID", nVideoSource);
+            query.exec();
+        }
+        scanner->SetRenameChannels(parent->paneATSC->DoRenameChannels());
         ok = scanner->ScanTransports(nVideoSource, std, mod, country);
     }
     else if ((nScanType == ScanTypeSetting::FullTunedScan_OFDM) ||
@@ -692,11 +701,13 @@ void ScanWizardScanner::HandleTuneComplete(void)
              (nScanType == ScanTypeSetting::FullTunedScan_QAM))
     {
         SISCAN("ScanTransports()");
+        scanner->SetRenameChannels(false);
         ok = scanner->ScanTransports("dvb");
     }
     else if (nScanType == ScanTypeSetting::FullTransportScan)
     {
         SISCAN("ScanServicesSourceID("<<nVideoSource<<")");
+        scanner->SetRenameChannels(false);
         ok = scanner->ScanServicesSourceID(nVideoSource);
         post_event(this,
                    (ok) ? ScannerEvent::ServicePct : ScannerEvent::TuneComplete,
@@ -705,6 +716,7 @@ void ScanWizardScanner::HandleTuneComplete(void)
     else if (nScanType == ScanTypeSetting::TransportScan)
     {
         SISCAN("ScanTransport("<<nTransportToTuneTo<<")");
+        scanner->SetRenameChannels(false);
         ok = scanner->ScanTransport(nTransportToTuneTo);
     }
 
