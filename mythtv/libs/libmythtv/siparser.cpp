@@ -139,7 +139,7 @@ void SIParser::CheckTrackers()
 
     pmap_lock.lock();
 
-    /* Check Dependencys and update if necessary */
+    /* Check Dependencies and update if necessary */
     for (int x = 0 ; x < NumHandlers ; x++)
     {
         if (Table[x]->Complete())
@@ -2443,7 +2443,7 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
 #ifdef EIT_DEBUG_SID
         VERBOSE(VB_SIPARSER,
                 QString("[%1][%2]: %3\t%4 - %5")
-                .arg(source_id).arg(event_id)
+                .arg(atsc_src_id).arg(event_id)
                 .arg(e.Event_Name.ascii(), 20)
                 .arg(e.StartTime.toString("MM/dd hh:mm"))
                 .arg(e.EndTime.toString("hh:mm")));
@@ -2942,20 +2942,24 @@ void SIParser::EITFixUpStyle1(Event &event)
  */
 void SIParser::EITFixUpStyle2(Event &event)
 {
+    const uint16_t SUBTITLE_PCT = 50; //% of description to allow subtitle up to
     int16_t position = event.Description.find("New Series");
     if (position != -1)
     {
         //Do something here
     }
     //BBC three case (could add another record here ?)
-    event.Description = event.Description.replace(" Then 60 Seconds.","");
-    event.Description =
-        event.Description.replace(" Followed by 60 Seconds.","");
-    event.Description = event.Description.replace("Brand New Series - ","");
-    event.Description = event.Description.replace("Brand New Series","");
-    event.Description = event.Description.replace("New Series","");
+    QRegExp rx("\\s*(Then|Followed by) 60 Seconds\\.");
+    rx.setCaseSensitive(false);
+    event.Description = event.Description.replace(rx,"");
 
+    rx.setPattern("\\s*(Brand New|New) Series\\s*[:\\.\\-]");
+    event.Description = event.Description.replace(rx,"");
 
+    rx.setPattern("^[tT]4:");
+    event.Event_Name = event.Event_Name.replace(rx,"");
+
+    QRegExp terminatesWith("[\\!\\?]");
     //This is trying to catch the case where the subtitle is in the main title
     //but avoid cases where it isn't a subtitle e.g cd:uk
     if (((position = event.Event_Name.find(":")) != -1) && 
@@ -2967,31 +2971,36 @@ void SIParser::EITFixUpStyle2(Event &event)
     }
     else if ((position = event.Description.find(":")) != -1)
     {
-        event.Event_Subtitle = event.Description.left(position);
-        event.Description = event.Description.mid(position+1);
-        if ((event.Event_Subtitle.length() > 0) &&
-            (event.Description.length() > 0) &&
-            (event.Event_Subtitle.length() > event.Description.length()))
+        // if the subtitle is less than 50% of the description use it.
+        if ((position*100)/event.Description.length() < SUBTITLE_PCT)
         {
-            QString Temp = event.Event_Subtitle;
-            event.Event_Subtitle = event.Description;
-            event.Description = Temp;
+            event.Event_Subtitle = event.Description.left(position);
+            event.Description = event.Description.mid(position+1);
+        }
+    }
+    else if ((position = event.Description.find(terminatesWith)) != -1)
+    {
+        if ((position*100)/event.Description.length() < SUBTITLE_PCT)
+        {
+            event.Event_Subtitle = event.Description.left(position+1);
+            event.Description = event.Description.mid(position+2);
         }
     }
 
+    QRegExp endsWith("\\.+$");
+    QRegExp startsWith("^\\.+");
+    terminatesWith.setPattern("[:\\!\\.\\?]");
     if (event.Event_Name.endsWith("...") && 
         event.Event_Subtitle.startsWith(".."))
     {
         //try and make the subtitle
-        QString Full = event.Event_Name.left(event.Event_Name.length()-3)+" ";
+        QString Full = event.Event_Name.replace(endsWith,"")+" "+
+                       event.Event_Subtitle.replace(startsWith,"");
 
-        if (event.Event_Subtitle.startsWith("..."))
-            Full += event.Event_Subtitle.mid(3);
-        else
-            Full += event.Event_Subtitle.mid(2);
-        if (((position = Full.find(":")) != -1) ||
-            ((position = Full.find(".")) != -1))
+        if ((position = Full.find(terminatesWith)) != -1)
         {
+           if (Full[position] == '!' || Full[position] == '?')
+               position++;
            event.Event_Name = Full.left(position);
            event.Event_Subtitle = Full.mid(position+1);
         }
@@ -3004,11 +3013,12 @@ void SIParser::EITFixUpStyle2(Event &event)
     else if (event.Event_Subtitle.endsWith("...") && 
         event.Description.startsWith("..."))
     {
-         QString Full = event.Event_Subtitle.left(event.Event_Subtitle.length()
-                        -3)+" "+ event.Description.mid(3);
-        if (((position = Full.find(":")) != -1) ||
-            ((position = Full.find(".")) != -1))
+        QString Full = event.Event_Subtitle.replace(endsWith,"")+" "+
+                       event.Description.replace(startsWith,"");
+        if ((position = Full.find(terminatesWith)) != -1)
         {
+           if (Full[position] == '!' || Full[position] == '?')
+               position++;
            event.Event_Subtitle = Full.left(position);
            event.Description = Full.mid(position+1);
         }
@@ -3016,11 +3026,12 @@ void SIParser::EITFixUpStyle2(Event &event)
     else if (event.Event_Name.endsWith("...") &&
         event.Description.startsWith("...") && event.Event_Subtitle.isEmpty())
     {
-        QString Full = event.Event_Name.left(event.Event_Name.length()
-                        -3)+" "+ event.Description.mid(3);
-        if (((position = Full.find(":")) != -1) ||
-            ((position = Full.find(".")) != -1))
+        QString Full = event.Event_Name.replace(endsWith,"")+" "+ 
+                       event.Description.replace(startsWith,"");
+        if ((position = Full.find(terminatesWith)) != -1)
         {
+           if (Full[position] == '!' || Full[position] == '?')
+               position++;
            event.Event_Name = Full.left(position);
            event.Description = Full.mid(position+1);
         }
@@ -3028,8 +3039,9 @@ void SIParser::EITFixUpStyle2(Event &event)
 
     //Work out the episode numbers (if any)
     bool series = false;
-    QRegExp rx("^\\s*(\\d{1,2})/(\\d{1,2})\\.");
+    rx.setPattern("^\\s*(\\d{1,2})/(\\d{1,2})\\.");
     QRegExp rx1("\\((Part|Pt)\\s+(\\d{1,2})\\s+of\\s+(\\d{1,2})\\)");
+    rx1.setCaseSensitive(false);
     if ((position = rx.search(event.Event_Name)) != -1)
     {
         event.PartNumber=rx.cap(1).toUInt();
@@ -3327,7 +3339,7 @@ void SIParser::EITFixUpStyle4(Event &event)
 
 void SIParser::InitializeCategories()
 {
-    m_mapCategories[0x10] = tr("Movies");
+    m_mapCategories[0x10] = tr("Movie");
     m_mapCategories[0x11] = tr("Movie") + " - " +
         tr("Detective/Thriller");
     m_mapCategories[0x12] = tr("Movie")+ " - " +
@@ -3343,7 +3355,7 @@ void SIParser::InitializeCategories()
     m_mapCategories[0x17] = tr("Movie")+ " - " +
         tr("Serious/Classical/Religious/Historical Movie/Drama");
     m_mapCategories[0x18] = tr("Movie")+ " - " +
-        tr("Adult Movie");
+        tr("Adult", "Adult Movie");
     
     m_mapCategories[0x20] = tr("News");
     m_mapCategories[0x21] = tr("News/weather report");
