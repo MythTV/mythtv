@@ -5,7 +5,7 @@
 
 #include "settings.h"
 
-
+class SourceSetting;
 class ChannelListSetting;
 class ChannelEditor: public VerticalConfigurationGroup,
                      public ConfigurationDialog {
@@ -23,11 +23,12 @@ public slots:
     void edit(int);
     void scan();
     void transportEditor();
+    void deleteChannels();
 
 private:
-    ChannelListSetting* list;
-    int id;
-
+    int                 id;
+    SourceSetting      *source;
+    ChannelListSetting *list;
     TransButtonSetting *buttonScan;
     TransButtonSetting *buttonTransportEditor;
 };

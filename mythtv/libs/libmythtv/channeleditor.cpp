@@ -230,16 +230,26 @@ ChannelEditor::ChannelEditor():
     setLabel(tr("Channels"));
     addChild(list = new ChannelListSetting());
 
-    SortMode* sort = new SortMode();
-    SourceSetting* source = new SourceSetting();
-    NoChanNumHide* hide = new NoChanNumHide();
+    SortMode           *sort   = new SortMode();
+    source                     = new SourceSetting();
+    TransButtonSetting *del    = new TransButtonSetting();
+    NoChanNumHide      *hide   = new NoChanNumHide();
+
+    del->setLabel(tr("Delete Channels"));
+    del->setHelpText(
+        tr("Delete all channels on currently selected source[s]."));
+
+    HorizontalConfigurationGroup *src =
+        new HorizontalConfigurationGroup(false, false, true, true);
+    src->addChild(source);
+    src->addChild(del);
 
     sort->setValue(sort->getValueIndex(list->getSortMode()));
     source->setValue(source->getValueIndex(list->getSourceID()));
     hide->setValue(list->getHideMode());
 
     addChild(sort);
-    addChild(source);
+    addChild(src);
     addChild(hide);
 
     buttonScan = new TransButtonSetting();
@@ -266,11 +276,45 @@ ChannelEditor::ChannelEditor():
             list, SLOT(setSortMode(const QString&)));
     connect(hide, SIGNAL(valueChanged(bool)),
             list, SLOT(setHideMode(bool)));
-    connect(list, SIGNAL(accepted(int)), this, SLOT(edit(int)));
-    connect(list, SIGNAL(menuButtonPressed(int)), this, SLOT(menu(int)));
-    connect(buttonScan, SIGNAL(pressed()), this, SLOT(scan()));
+    connect(list, SIGNAL(accepted(int)),
+            this, SLOT(edit(int)));
+    connect(list, SIGNAL(menuButtonPressed(int)),
+            this, SLOT(menu(int)));
+    connect(buttonScan, SIGNAL(pressed()),
+            this, SLOT(scan()));
     connect(buttonTransportEditor, SIGNAL(pressed()),
             this, SLOT(transportEditor()));
+    connect(del,  SIGNAL(pressed()),
+            this, SLOT(deleteChannels()));
+}
+
+void ChannelEditor::deleteChannels(void)
+{
+    const QString currentSourceID = source->getValue();
+
+    int val = MythPopupBox::show2ButtonPopup(
+        gContext->GetMainWindow(), "",
+        tr("Are you sure you would like to delete these channels?"),
+        tr("Yes, delete the channels"),
+        tr("No, don't"), 2);
+
+    if (val != 0) 
+        return;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if ((currentSourceID == "") || (currentSourceID == "Unassigned"))
+    {
+        query.prepare("TRUNCATE TABLE channel");
+    }
+    else
+    {
+        query.prepare("DELETE FROM channel "
+                      "WHERE sourceid = :SOURCEID");
+        query.bindValue(":SOURCEID", currentSourceID);
+    }
+    query.exec();
+
+    list->fillSelections();
 }
 
 MythDialog* ChannelEditor::dialogWidget(MythMainWindow* parent,
