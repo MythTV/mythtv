@@ -31,7 +31,11 @@ using namespace std;
 #define O_LARGEFILE 0
 #endif
 
-#define READ_TEST_SIZE 204
+#define PNG_MIN_SIZE   20 /* header plus one empty chunk */
+#define NUV_MIN_SIZE  204 /* header size? */
+#define MPEG_MIN_SIZE 376 /* 2 TS packets */
+#define READ_TEST_SIZE 20 /* should be minimum of the above file sizes */
+
 #define OPEN_READ_ATTEMPTS 5
 
 #define DVD_BLOCK_SIZE 2048
