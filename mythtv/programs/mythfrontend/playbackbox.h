@@ -1,8 +1,11 @@
+// -*- Mode: c++ -*-
 #ifndef PLAYBACKBOX_H_
 #define PLAYBACKBOX_H_
 
 #include <qdatetime.h>
 #include <qdom.h>
+#include <qmutex.h>
+
 #include "mythwidgets.h"
 #include "mythdialogs.h"
 #include "uitypes.h"
@@ -20,11 +23,13 @@ class NuppelVideoPlayer;
 class RingBuffer;
 class QTimer;
 class ProgramInfo;
+class PreviewGenerator;
 
 class LayerSet;
 
 class PlaybackBox : public MythDialog
 {
+    friend class PreviewGenerator;
     Q_OBJECT
   public:
     typedef enum { Play, Delete } BoxType;
@@ -133,9 +138,14 @@ class PlaybackBox : public MythDialog
     void playSelectedPlaylist(bool random);
     void doPlayList(void);
     void showViewChanger(void);
+
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
+
+    void SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
+    bool IsGeneratingPreview(const QString &fn) const;
+    void previewReady(const ProgramInfo *pginfo);
 
   private:
     bool FillList(void);
@@ -317,6 +327,9 @@ class PlaybackBox : public MythDialog
     QSize          conv_rgba_size;
 
     bool everStartedVideo;
+
+    mutable QMutex previewGeneratorLock;
+    QMap<QString, PreviewGenerator*> previewGenerator;
 };
 
 #endif

@@ -82,6 +82,52 @@ static int comp_originalAirDate(ProgramInfo *a, ProgramInfo *b)
         return 1;
 }
 
+class PreviewGenerator
+{
+  public:
+    PreviewGenerator(PlaybackBox *box, const ProgramInfo *pginfo)
+        : programInfo(*pginfo), playbackBox(box)
+    {
+        pthread_create(&previewThread, NULL, PreviewRun, this);
+    }
+
+   ~PreviewGenerator()
+    {
+        QMutexLocker locker(&previewLock);
+        const QString filename = programInfo.pathname + ".png";
+        if (playbackBox)
+            playbackBox->SetPreviewGenerator(filename, NULL);
+    }
+
+    void SetPlaybackBox(PlaybackBox *box)
+    {
+        QMutexLocker locker(&previewLock);
+        playbackBox = box;
+    }
+
+    static void *PreviewGenerator::PreviewRun(void *param)
+    {
+        PreviewGenerator *gen = (PreviewGenerator*) param;
+
+        RemoteGeneratePreviewPixmap(&(gen->programInfo));
+
+        {
+            QString fn = gen->programInfo.pathname + ".png";
+            QMutexLocker locker(&(gen->previewLock));
+            if (gen->playbackBox)
+                gen->playbackBox->previewReady(&(gen->programInfo));
+        }
+        delete gen;
+        return NULL;
+    }
+
+  private:
+    QMutex             previewLock;
+    pthread_t          previewThread;
+    ProgramInfo        programInfo;
+    PlaybackBox       *playbackBox;
+};
+
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
                          const char *name)
            : MythDialog(parent, name)
@@ -282,6 +328,13 @@ PlaybackBox::~PlaybackBox(void)
 
     if (lastProgram)
         delete lastProgram;
+
+    QMap<QString, PreviewGenerator*>::iterator it = previewGenerator.begin();
+    for (;it != previewGenerator.end(); ++it)
+    {
+        if (*it)
+            (*it)->SetPlaybackBox(NULL);
+    }
 }
 
 void PlaybackBox::setDefaultView(int defaultView)
@@ -3308,6 +3361,60 @@ QDateTime PlaybackBox::getPreviewLastModified(ProgramInfo *pginfo)
     return retfinfo.lastModified();
 }
 
+/** \fn PlaybackBox::SetPreviewGenerator(const QString&, PreviewGenerator*)
+ *  \brief Sets the PreviewGenerator for a specific file.
+ */
+void PlaybackBox::SetPreviewGenerator(const QString &fn, PreviewGenerator *g)
+{
+    QMutexLocker locker(&previewGeneratorLock);
+    if (g)
+        previewGenerator[fn] = g;
+    else
+        previewGenerator.erase(fn);
+}
+
+/** \fn PlaybackBox::IsGeneratingPreview(const QString&) const
+ *  \brief Returns true if we have already started a
+ *         PreviewGenerator to create this file.
+ */
+bool PlaybackBox::IsGeneratingPreview(const QString &fn) const
+{
+    QMap<QString, PreviewGenerator*>::const_iterator it;
+    QMutexLocker locker(&previewGeneratorLock);
+
+    if ((it = previewGenerator.find(fn)) == previewGenerator.end())
+        return false;
+    return *it;
+}
+
+/** \fn PlaybackBox::previewReady(const ProgramInfo*)
+ *  \brief Callback used by PreviewGenerator to tell us a preview
+ *         we requested has been returned from the backend.
+ *  \param pginfo ProgramInfo describing the preview.
+ */
+void PlaybackBox::previewReady(const ProgramInfo *pginfo)
+{
+    // If we are still displaying this preview update it.
+    if (pginfo->recstartts  == previewStartts &&
+        pginfo->chanid      == previewChanid  &&
+        previewLastModified == previewFilets)
+    {
+        QPixmap *pix = previewPixmap;
+
+        // lock QApplication so that we don't remove pixmap
+        // from under a running paint event.
+        qApp->lock();
+        previewPixmap = NULL;
+        qApp->unlock();
+
+        // ask for repaint
+        update();
+        
+        // delete the old blank pixmap
+        delete pix;
+    }
+}
+
 QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 {
     QPixmap retpixmap;
@@ -3315,8 +3422,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
     if (!generatePreviewPixmap || !pginfo)
         return retpixmap;
         
-    QString filename = pginfo->pathname;
-    filename += ".png";
+    QString filename = pginfo->pathname + ".png";
 
     previewLastModified = getPreviewLastModified(pginfo);
     if (previewLastModified <  pginfo->lastmodified &&
@@ -3368,22 +3474,9 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     QImage *image = gContext->CacheRemotePixmap(filename, refreshPixmap);
 
-    if (!image)
-    {
-        RemoteGeneratePreviewPixmap(pginfo);
-
-        previewPixmap = gContext->LoadScalePixmap(filename);
-        if (previewPixmap)
-        {
-            retpixmap = *previewPixmap;
-            previewStartts = pginfo->recstartts;
-            previewChanid = pginfo->chanid;
-            previewFilets = previewLastModified;
-            return retpixmap;
-        }
-
-        image = gContext->CacheRemotePixmap(filename, refreshPixmap);
-    }
+    // If the image is not available remotely either, we need to generate it.
+    if (!image && !IsGeneratingPreview(filename))
+        SetPreviewGenerator(filename, new PreviewGenerator(this, pginfo));
 
     if (image)
     {
