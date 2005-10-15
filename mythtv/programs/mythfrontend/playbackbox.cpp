@@ -89,6 +89,7 @@ class PreviewGenerator
         : programInfo(*pginfo), playbackBox(box)
     {
         pthread_create(&previewThread, NULL, PreviewRun, this);
+        pthread_detach(previewThread);
     }
 
    ~PreviewGenerator()
