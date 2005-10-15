@@ -1,7 +1,7 @@
   Installing and using MythTV
   Robert Kulagowski, mailto:rkulagow@rocketmail.com
   <mailto:rkulagow@rocketmail.com>
-  2005-08-19, v0.18.12
+  2005-10-14, v0.18.13
 
   Initially, installation of MythTV seems like a huge task.  There are
   lots of dependencies, and various distributions seem to do the same
@@ -22,7 +22,7 @@
      1.5 Document conventions
      1.6 Mailing lists / getting help
      1.7 IRC
-     1.8 Bugzilla
+     1.8 Bug database
      1.9 Contributing to this document
 
   2. Introduction.
@@ -242,11 +242,12 @@
      21.3 Installing
         21.3.1 When trying to run setup, you get an error like this: "./setup: error while loading shared libraries:"
      21.4 Using
-        21.4.1 MySQL not connecting correctly
-        21.4.2 MySQL database is corrupt
-        21.4.3 Using a MPEG-2 encoder card and the video appears "jittery"
-        21.4.4 Using a MPEG-2 encoder card and the video is jumping up and down
-        21.4.5 Screen goes blank but returns when mouse is moved or keyboard is used
+        21.4.1 No programs are displayed in "Watch Recordings"
+        21.4.2 MySQL not connecting correctly
+        21.4.3 MySQL database is corrupt
+        21.4.4 Using a MPEG-2 encoder card and the video appears "jittery"
+        21.4.5 Using a MPEG-2 encoder card and the video is jumping up and down
+        21.4.6 Screen goes blank but returns when mouse is moved or keyboard is used
      21.5 Miscellaneous
         21.5.1 mythfilldatabase failing
         21.5.2 Fast CPU, choppy or jittery video
@@ -314,21 +315,21 @@
      22.27 Configuring one machine to flag all commercials
 
   23. Example Configurations.
-     23.1 Hauppauge PVR-250/350 hardware MPEG-2 encoder
-     23.2 Logical Volume Manager (LVM)
-        23.2.1 ReiserFS
-        23.2.2 ext2 or ext3
-     23.3 Advanced Partition Formatting
-        23.3.1 Ext2
-        23.3.2 Ext3
-        23.3.3 ReiserFS
-        23.3.4 JFS
-        23.3.5 XFS
-     23.4 HDTV with the Air2PC-ATSC-PCI card
-     23.5 Diskless Ubuntu
-        23.5.1 Backend Configuration
-        23.5.2 Configuring DHCP
-        23.5.3 Editing
+     23.1 Logical Volume Manager (LVM)
+        23.1.1 ReiserFS
+        23.1.2 ext2 or ext3
+        23.1.3 xfs
+     23.2 Advanced Partition Formatting
+        23.2.1 Ext2
+        23.2.2 Ext3
+        23.2.3 ReiserFS
+        23.2.4 JFS
+        23.2.5 XFS
+     23.3 HDTV with the Air2PC-ATSC-PCI card
+     23.4 Diskless Ubuntu
+        23.4.1 Backend Configuration
+        23.4.2 Configuring DHCP
+        23.4.3 Editing
 
 
   ______________________________________________________________________
@@ -341,8 +342,8 @@
   the MythTV application!  I can not give you personalized installation
   support.  If you are having issues installing MythTV you should
   examine the archives, or post your question to the MythTV-users
-  mailing list.  If you send me "Does MythTV work with 'X'"? messages I
-  will simply delete your mail.
+  mailing list.  If you send me "Does MythTV work with 'X'"? messages -
+  I will simply delete your mail.
 
   [1m1.1.  What is MythTV?[0m
 
@@ -405,7 +406,6 @@
      change keybindings and more.  With proper security, you may even
      schedule a program over the Internet and have it immediately acted
      on by the scheduler.
-
 
   +o  MythPhone, phone and videophone using SIP.
 
@@ -503,10 +503,11 @@
   seems to be ignoring you.
 
 
-  [1m1.8.  Bugzilla[0m
+  [1m1.8.  Bug database[0m
 
   If you feel you need to contribute to a bug database, use the MythTV
-  Bugzilla at http://www.mythtv.org/bugs/ <http://www.mythtv.org/bugs/>.
+  bug ticketing system at http://cvs.mythtv.org/trac
+  <http://cvs.mythtv.org/trac>.
 
 
   [1m1.9.  Contributing to this document[0m
@@ -528,8 +529,10 @@
   on the linuxdoc format itself, or look at the mythtv-HOWTO.sgml file
   as an example.
 
+
   Do not be afraid of SGML.  A quick look at the source of this HOWTO
   will show that it is not difficult, so at least try to submit as SGML.
+
   SGML patch files are the easiest.  Run a [1mdiff -u origfile newfile >[0m
   [1mdoc.patch [22mand mail it to the address above.
 
@@ -659,8 +662,6 @@
   megabytes/hour for MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7
   GB/hour for ATSC HDTV.
 
-
-
          [1mNOTE[22m:  You [4mmust[24m use DMA for hard drive access to prevent
   choppy or jittery video.  Not all distributions enable DMA at boot
   time. See the Troubleshooting Section for ``instructions'' on how to
@@ -761,7 +762,7 @@
   "Freestyle" or Yuan M600 cards will allow you to use dedicated
   hardware encoders rather than your CPU. (The PVR-350 can
   simultaneously be used as an output device.) Using the on-board MPEG-2
-  encoder drastically reduces the CPU requirements for encoding.
+  encoder greatly reduces the CPU requirements for encoding.
 
   [1mNOTE[22m:  Motherboards with the Via chipset are notoriously bad with DMA
   and have caused numerous issues with ivtv, including hard locks.  See
@@ -788,10 +789,8 @@
   +o  A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
      80% CPU.
 
-     See the ``Hauppauge PVR-250/350 hardware MPEG-2 encoder.'' section
-     for information on installing a PVR-250 on Mandrake 9.1.  The
-     information contained in the section will also apply to other
-     MPEG-2 encoder cards supported by the IVTV driver.
+
+
   [1m3.1.5.3.  DVB capture cards.[0m
 
   DVB is a video standard primarily found in Europe.  MythTV supports
@@ -1439,7 +1438,7 @@
        deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
 
        # Christian Marillat's packages (mplayer, lame)
-       deb ftp://ftp.nerim.net/debian-marillat/ unstable main
+       deb ftp://ftp.nerim.net/debian-marillat/ sarge main
 
 
 
@@ -1914,13 +1913,25 @@
 
   [1m5.4.  Manually building MythTV[0m
 
-  Unpack MythTV
+  If you are going to use [1msubversion[22m, execute the following instructions
+  to obtain the latest version of MythTV:
+
+
+       $ mkdir mythtv
+       $ cd mythtv
+       $ svn co http://svn.mythtv.org/svn/trunk/mythtv
+       $ svn co http://svn.mythtv.org/svn/trunk/mythplugins
+       $ svn co http://svn.mythtv.org/svn/trunk/myththemes
+       $ cd mythtv
 
 
 
-  $ tar -xjf mythtv-0.18.1.tar.bz2
-  $ cd mythtv-0.18.1
-  $ ./configure
+  If you are using the tarball, then unpack it:
+
+
+       $ tar -xjf mythtv-0.18.1.tar.bz2
+       $ cd mythtv-0.18.1
+       $ ./configure
 
 
 
@@ -2021,6 +2032,7 @@
   need to run as root.
 
 
+
   [1m5.4.2.  Frontend-only configuration[0m
 
   Since MythTV uses a client/server architecture, multiple frontend
@@ -2034,7 +2046,6 @@
   You do NOT need the MySQL server installed on your remote frontend
 
   You do NOT need XMLTV installed on your remote frontend
-
 
   You do NOT need to run the MythTV setup program on your frontend
   machine
@@ -2095,11 +2106,10 @@
   If this is happening to you, try running the following commands.
 
 
-
-  $ su
-  # chkconfig --level 35 mysql on
-  # /etc/rc.d/init.d/mysql start
-  # exit
+       $ su
+       # chkconfig --level 35 mysql on
+       # /etc/rc.d/init.d/mysql start
+       # exit
 
 
 
@@ -2143,7 +2153,6 @@
 
 
        $ mysql -u root < mc.sql
-
 
 
   [1m6.2.2.  Debian 3.0[0m
@@ -2207,6 +2216,7 @@
        $ mysql -u root mythconverg
        mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
        mysql> flush privileges;
+
 
 
   [1m7.  Configuring Sound.[0m
@@ -2273,7 +2283,6 @@
   of you who do not wish to install ALSA you must do this:
 
   To configure sound to work with MythTV, select
-
 
   RedHat Menu>Sound &
   Video>Volume Control
@@ -2388,6 +2397,7 @@
   <http://www.kernel.org/pub/linux/kernel/v2.4/>.
 
 
+
   [1m8.2.1.  Obtaining the kernel[0m
 
   Install using urpmi.
@@ -2449,21 +2459,21 @@
 
   Once the configuration step is complete:
 
-
-       $ make
-       $ su
-       # make install
-       # chmod 666 /dev/lircd
+  $ make
+  $ su
+  # make install
+  # chmod 666 /dev/lircd
 
 
 
   At this point, if you're using a serial receiver, check that there's a
   lirc device in /dev:
 
-  $ ls -l /dev/li*
-  lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
-  srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
-  prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
+
+       $ ls -l /dev/li*
+       lr-xr-xr-x    1 root     root            5 Jan 27 09:00 /dev/lirc -> ttyS0
+       srw-rw-rw-    1 root     root            0 Jan 27 15:01 /dev/lircd=
+       prw-r--r--    1 root     root            0 Jan 27 09:00 /dev/lircm|
 
 
 
@@ -2506,7 +2516,7 @@
   pipe:
 
 
-       # mknod /dev/lirc c 61 0
+  # mknod /dev/lirc c 61 0
 
 
 
@@ -2517,6 +2527,7 @@
   The second option is to post your issue to the [4mlirc[24m list, not the
   mythtv-users list.  The lirc programmers will be the ones that can
   assist you best.
+
   The third option is to dispense with lirc altogether by purchasing an
   IR keyboard (various options exist, although Chicony appears to work
   for some people) and a learning remote control.  The IR keyboard
@@ -2575,6 +2586,7 @@
 
 
        $ irrecord myremote
+
 
 
   Follow the on-screen directions to train your remote and define keys.
@@ -2637,7 +2649,7 @@
   or
 
 
-  $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
+       $ cp lircrc.example.pinnaclestudiopctv ~/.lircrc
 
 
 
@@ -2680,17 +2692,18 @@
   The lircrc.example file has this:
 
 
-       begin
-           prog = irxevent
-           button = ChannelUp
-           config = Key Up CurrentWindow
-       end
 
-       begin
-           prog = irxevent
-           button = ChannelDown
-           config = Key Down CurrentWindow
-       end
+  begin
+      prog = irxevent
+      button = ChannelUp
+      config = Key Up CurrentWindow
+  end
+
+  begin
+      prog = irxevent
+      button = ChannelDown
+      config = Key Down CurrentWindow
+  end
 
 
 
@@ -2698,9 +2711,8 @@
   buttons for the Pinnacle Studio PCTV as:
 
 
-
-            channel+                 0x0000000000000017
-            channel-                 0x000000000000001C
+                 channel+                 0x0000000000000017
+                 channel-                 0x000000000000001C
 
 
 
@@ -2742,6 +2754,7 @@
   experiment and see which value works best for you.
 
 
+
   [1m8.7.  Configuring lirc for use with an IR blaster[0m
 
   Lirc has support for various IR transmitters. A popular model is the
@@ -2761,6 +2774,7 @@
 
 
        $ make
+
 
 
   Please note: unlike the Pinnacle receiver above you will be compiling
@@ -2803,15 +2817,15 @@
 
 
 
-       # cd /etc/rc.d
-       # cat >> rc.local
-       echo "Starting lircd"
-       setserial /dev/ttySx uart none        # (if required)
-       modprobe lirc_sir
-       /usr/local/sbin/lircd
-       ^D
-       # exit
-       $
+  # cd /etc/rc.d
+  # cat >> rc.local
+  echo "Starting lircd"
+  setserial /dev/ttySx uart none        # (if required)
+  modprobe lirc_sir
+  /usr/local/sbin/lircd
+  ^D
+  # exit
+  $
 
 
 
@@ -2826,10 +2840,11 @@
   being received. If everything is configured correctly you should see
   something similar to the following:
 
-  $ irw
-  0000000000007ff0 00 1 gi-motorola-dct2000
-  000000000000bff8 00 2 gi-motorola-dct2000
-  000000000000f7f0 00 ENTER gi-motorola-dct2000
+
+       $ irw
+       0000000000007ff0 00 1 gi-motorola-dct2000
+       000000000000bff8 00 2 gi-motorola-dct2000
+       000000000000f7f0 00 ENTER gi-motorola-dct2000
 
 
 
@@ -2864,6 +2879,7 @@
   See contrib/channel.pl for the actual file.  Copy it to
   /usr/local/bin/
 
+
   The last statement within the perl script is the lirc rc command. This
   is the command that transmits the code to your cable/DSS box. Make
   sure to have the IRDA device within a few feet of the box.
@@ -2886,6 +2902,8 @@
        $ su -
        # apt-get install libqt3c102-mt-mysql
        # exit
+
+
 
   [1m9.1.  Configuring the Master backend system[0m
 
@@ -2935,13 +2953,12 @@
   system.  See ``Advanced Backend Configurations'' for information on
   configuring multiple backend systems in various ways.
 
-  Because MythTV now uses a database to store all configuration
-  variables, part of the bootstrap of MythTV is to indicate the location
-  of the MySQL database server. If the frontend, backend and MySQL
-  database server are all going to be running on the same box, you can
-  continue to the next step.  If not, you'll need to change the Host
-  Name in the "Database Configuration" screen of the mythfrontend
-  program.
+  Because MythTV uses a database to store all configuration variables,
+  part of the bootstrap of MythTV is to indicate the location of the
+  MySQL database server. If the frontend, backend and MySQL database
+  server are all going to be running on the same box, you can continue
+  to the next step.  If not, you'll need to change the Host Name in the
+  "Database Configuration" screen of the mythfrontend program.
 
 
 
@@ -2979,6 +2996,7 @@
   choices.
 
   1. General
+
 
   2. Capture Cards
 
@@ -3120,12 +3138,10 @@
   it has two PVR-150's on a single PCI card.  For example, if you have a
   single PVR-500 card, it will appear as /dev/video0 and /dev/video1.
   Each /dev/video device will have a Tuner 0 and Tuner 1 input, so you
-  would choose Tuner 0 for [1mboth [22mdevices.
-
-
-  Once you're done, press RETURN to go back to the Input Connections
-  screen.  You would then finish associating the video sources to any
-  other hardware devices you have available.
+  would choose Tuner 0 for [1mboth [22mdevices.  Once you're done, press RETURN
+  to go back to the Input Connections screen.  You would then finish
+  associating the video sources to any other hardware devices you have
+  available.
 
 
 
@@ -3159,26 +3175,27 @@
   established.
 
 
-       From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
-       --02:58:01--
-       http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
-                  => -'
-       Resolving datadirect.webservices.zap2it.com... 206.18.98.160
-       Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
-       connected.
-       HTTP request sent, awaiting response... 401 Unauthorized
-       Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
-       connected.
-       HTTP request sent, awaiting response... 200 OK
-       Length: unspecified [text/xml]
 
-           [    <=>                              ] 114,125       63.57K/s
+  From : Sun Jun 13 05:00:00 2004 To : Mon Jun 14 05:00:00 2004 (UTC)
+  --02:58:01--
+  http://datadirect.webservices.zap2it.com/tvlistings/xtvdService
+             => -'
+  Resolving datadirect.webservices.zap2it.com... 206.18.98.160
+  Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+  connected.
+  HTTP request sent, awaiting response... 401 Unauthorized
+  Connecting to datadirect.webservices.zap2it.com[206.18.98.160]:80...
+  connected.
+  HTTP request sent, awaiting response... 200 OK
+  Length: unspecified [text/xml]
 
-       02:58:03 (63.53 KB/s) - -' saved [114125]
+      [    <=>                              ] 114,125       63.57K/s
 
-       Your subscription expires on 08/20/2004 12:00:00 AM
-       Grab complete.  Actual data from Sun Jun 13 05:00:00 2004 to Mon Jun 14
-       00:00:00 2004 (UTC)
+  02:58:03 (63.53 KB/s) - -' saved [114125]
+
+  Your subscription expires on 08/20/2004 12:00:00 AM
+  Grab complete.  Actual data from Sun Jun 13 05:00:00 2004 to Mon Jun 14
+  00:00:00 2004 (UTC)
 
 
 
@@ -3197,24 +3214,23 @@
   As of MythTV v0.18.1, the available options are:
 
 
-
-  $ mythbackend --help
-  Valid options are:
-  -h or --help                   List valid command line parameters
-  -l or --logfile filename       Writes STDERR and STDOUT messages to filename
-  -p or --pidfile filename       Write PID of mythbackend to filename
-  -d or --daemon                 Runs mythbackend as a daemon
-  -v or --verbose debug-level    Prints more information
-                                 Accepts any combination (separated by comma)
-                                 of all,none,quiet,record,playback,channel,
-                                 osd,file,schedule,network,commflag,audio,
-                                 libav,jobqueue
-  --printexpire                  List of auto-expire programs
-  --printsched                   Upcoming scheduled programs
-  --testsched                    Test run scheduler (ignore existing schedule)
-  --resched                      Force the scheduler to update
-  --nosched                      Do not perform any scheduling
-  --version                      Version information
+       $ mythbackend --help
+       Valid options are:
+       -h or --help                   List valid command line parameters
+       -l or --logfile filename       Writes STDERR and STDOUT messages to filename
+       -p or --pidfile filename       Write PID of mythbackend to filename
+       -d or --daemon                 Runs mythbackend as a daemon
+       -v or --verbose debug-level    Prints more information
+                                      Accepts any combination (separated by comma)
+                                      of all,none,quiet,record,playback,channel,
+                                      osd,file,schedule,network,commflag,audio,
+                                      libav,jobqueue
+       --printexpire                  List of auto-expire programs
+       --printsched                   Upcoming scheduled programs
+       --testsched                    Test run scheduler (ignore existing schedule)
+       --resched                      Force the scheduler to update
+       --nosched                      Do not perform any scheduling
+       --version                      Version information
 
 
 
@@ -3223,8 +3239,6 @@
   process.  For example, you may add this to your rc.local file, or you
   can follow the steps outlined in the section called ``Automatically
   starting mythbackend at system boot time''.
-
-
   [1m9.3.  Configuring a non-master backend[0m
 
   Ensure that you've granted access to the master MySQL database for
@@ -3232,6 +3246,16 @@
   to the MySQL database for multiple systems'' and that you have the
   correct IP address for the database server in the "Database
   Configuration" screen of the setup application on this slave backend.
+
+
+
+             [1mNOTE[22m: Slave backends [1mmust not [22mrun a local MySQL
+  daemon.  By default, they will connect to their local daemon rather
+  than the central database, causing unexpected behavior such as empty
+  "Watch Recordings" lists and a failure to locate the Video Sources
+  defined on the master backend.  Modify the
+  /usr/local/share/mythtv/mysql.txt file on all slave backends to ensure
+  that the DBHostName has the address of the MySQL server.
 
   Make sure that the IP addresses on the General setup screen are
   accurate.  If the slave backend can't communicate with the master
@@ -3257,6 +3281,7 @@
   depending on any number of factors, most of which you can't control.
   It's best to just let the program run to completion.  [1mmythfilldatabase[0m
   [1m--help [22mwill give a full listing of the options available.
+
   [1mmythfilldatabase --manual [22mis another option; the manual option will
   allow you to fine tune channel frequencies and specify which channels
   will be added to the database.  If you are not using the tv_grab_na
@@ -3269,6 +3294,7 @@
   [1mmythfilldatabase --xawchannels [22mis an option if you have used [1mxawtv [22mto
   fine-tune your channels and would like to import the fine tuning
   offsets into MythTV.
+
 
   [1mmythfilldatabase --refresh-today [22mwill only pull guide data for today
   (in case of late-breaking changes to the schedule).
@@ -3321,8 +3347,7 @@
   database and grab any new icons with the command:
 
 
-
-  $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
+       $ mythfilldatabase --import-icon-map iconmap.xml --update-icon-map
 
 
 
@@ -3378,7 +3403,6 @@
   This set of screens is mostly concerned with how MythTV will look on
   your system.  From here, you can choose different themes and set the
   resolution of your system.
-
 
 
   [1m10.3.  Program Guide[0m
@@ -3508,7 +3532,6 @@
   distracting to watch than linearblend or no filter at all. It accepts
   one or two integer parameters separated by a colon.
 
-
   The first parameter is the filter threshold and defaults to 12.
   Adjacent lines differing by more than the threshold value are
   filtered. The second option defaults to 0.  If set to a non-zero
@@ -3527,7 +3550,6 @@
   signals with a video mode that has 540 pixels vertically.  The
   advantage over other deinterlacing filters is that scenes with motion
   never show combing or ghosting.
-
   o The "adjust" filter
 
   This filter adjusts the digital values for luma and chroma to ensure
@@ -3640,7 +3662,6 @@
   +o  MJPEG - Zoran-based cards; see http://mjpeg.sourceforge.net
      <http://mjpeg.sourceforge.net>
 
-
   +o  MPEG-2 - iTVC15/16 based cards (Hauppauge PVR-250/PVR-350); see
      http://ivtv.sourceforge.net <http://ivtv.sourceforge.net>
 
@@ -3723,7 +3744,6 @@
   See the ``What capture resolution should I use? How does video work?''
   section for more information.
 
-
   [1m10.6.  Xbox Frontends[0m
 
   MythTV is able to control the LED on the Xbox to indicate backend
@@ -3767,7 +3787,6 @@
   backend to determine if the status has changed.
 
 
-
   [1m11.  Using MythTV.[0m
 
 
@@ -3785,6 +3804,7 @@
   The keys.txt file describes what the various keyboard commands are.
   If you have loaded mythweb, you may change the default keys to your
   liking.
+
 
   [1m11.1.1.  mythfrontend[0m
 
@@ -3828,6 +3848,27 @@
   [1m11.1.5.  Playback Recording Zoom Mode[0m
 
 
+             Left     Move video to Left
+            Right     Move video to Right
+               Up     Move video Up
+             Down     Move video Down
+           PageUp     Zoom In
+  PageDown            Zoom Out
+  Space/Enter         Exit Zoom mode leaving picture at current size and position
+              ESC     Exit Zoom mode and return to original size
+
+
+  [1m11.1.6.  If you have two or more tuner cards[0m
+
+
+  V           toggle Picture-in-picture on or off
+  B           toggles the window focus (lets you change channels on the PiP window)
+  N           swaps the two channels by changing channels on both cards
+
+
+  [1m11.1.7.  Watching a recording only[0m
+
+
 
   Up or down          keys change the channel
           num pad     Type a number to enter a channel number or jump amount (HHMM format)
@@ -3850,7 +3891,7 @@
                 U     increase the play speed
                 J     decrease the play speed
                 A     Adjust time stretch (speed up or slow down normal play of audio and video
-                W     cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan), 16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal)
+                W     cycle through zoom and fill modes: 4:3 aspect ratio, 16:9, 4:3 Zoom  (like Pan and Scan), 16:9 Zoom, and 16:9 Stretch (eliminates black  sidebars in TV signal)
                F8     toggle the sleep timer 30m->1hr->1hr30m->2hr->Off
            CTRL-B     Jump to the beginning of the recording / ringbuffer
                 +     Switch between audio streams
@@ -3885,25 +3926,11 @@
             Right     advance 1 frame
                 >     advance 1 second
 
-  [1m11.1.6.  If you have two or more tuner cards[0m
+  [1m11.1.8.  EPG[0m
 
 
-  V           toggle Picture-in-picture on or off
-  B           toggles the window focus (lets you change channels on the PiP window)
-  N           swaps the two channels by changing channels on both cards
+  [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
 
-
-
-             Left     Move video to Left
-            Right     Move video to Right
-               Up     Move video Up
-             Down     Move video Down
-           PageUp     Zoom In
-  PageDown            Zoom Out
-  Space/Enter         Exit Zoom mode leaving picture at current size and position
-              ESC     Exit Zoom mode and return to original size
-
-  [1m11.1.7.  Watching a recording only[0m
 
 
       Space/Enter     set a bookmark at that point. Next time you start the recording, you will automatically jump forward to this point and clear the bookmark.
@@ -3924,9 +3951,6 @@
                 I     Inverts the cutlist
 
 
-  [1m11.1.8.  EPG[0m
-
-
            Arrows     are used to move the highlighted program point around
        A, D, S, W     perform the same as left, right, down and up
   PageUp/PageDown     move the channel list up or down a page
@@ -3944,9 +3968,6 @@
            / or 4     toggle the guide listing between all channels and filtered "favorites"
 
 
-  [1m11.1.9.  Setting Program or Channel Recording Priorities[0m
-
-
                    Right     increases priority value
                     Left     decreases priority value
                        1     sorts by title
@@ -3954,8 +3975,6 @@
          Home/End            toggle sort priority
                        I     edit recording options
                      ESC     commits changes and exits
-
-
 
   [1m11.1.10.  Viewing Scheduled Recordings/Resolving Conflicts[0m
 
@@ -3978,8 +3997,8 @@
   [1m11.1.12.  Recording Profiles Setup Screen[0m
 
 
-  D           on a custom profile group displays a popup to delete the group
 
+  D           on a custom profile group displays a popup to delete the group
 
   [1m11.1.13.  Recording Groups[0m
 
@@ -4016,14 +4035,6 @@
   more keys then you can access all of the features.  With only 16 keys
   most features are usable.
 
-
-  [1m11.2.  Using themes with MythTV[0m
-
-  MythTV is "themeable", meaning that the visual appearance of the
-  program can be modified by the user without re-compiling or altering
-  the program functionality.  Download the MythThemes tarball from the
-  website and untar it:
-
       REMOTE CONTROL     LIRC KEYSTROKE     FUNCTION
                0 - 9     0 - 9              channel selection, EPG navigation, ff/rew speed setting (with stickykeys)
           Left Arrow     Left               scroll left, rewind
@@ -4037,13 +4048,24 @@
          Other key 1     i                  Information
          Other key 2     c                  Change tuner card input
 
-       $ tar -xjf myththemes-0.18.1.tar.bz2
-       $ cd ~/myththemes-0.18.1
-       $ qmake myththemes.pro
-       $ su -
-       # make install
-       # exit
-       $
+
+
+  [1m11.2.  Using themes with MythTV[0m
+
+  MythTV is "themeable", meaning that the visual appearance of the
+  program can be modified by the user without re-compiling or altering
+  the program functionality.  Download the MythThemes tarball from the
+  website and untar it:
+
+
+
+  $ tar -xjf myththemes-0.18.1.tar.bz2
+  $ cd ~/myththemes-0.18.1
+  $ qmake myththemes.pro
+  $ su -
+  # make install
+  # exit
+  $
 
 
 
@@ -4167,6 +4189,7 @@
 
   Shutdown/Wakeup Options:
 
+
   +o  "Idle timeout (secs)" is the time the server waits while idle until
      a shutdown occurs.
 
@@ -4232,6 +4255,7 @@
      wakeup all Slave backend systems.
 
 
+
   [1m11.6.2.1.  Using WOL to wake your Master backend.[0m
 
   To use WOL to wake your Master backend you will need a WOL capable
@@ -4282,25 +4306,25 @@
   and add the following to /etc/services:
 
 
-
-  mythwake        $PORT/tcp
+       mythwake        $PORT/tcp
 
 
 
   Finally, /usr/local/bin/mythwake looks like:
 
 
-       #! /bin/bash
-       #this should be a command to wake your server
-       WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
-       #first we need to delete all wake jobs in queue
-       for JOB in atq | cut -f 1 ; do
-           atrm $JOB;
-       done
-       #now we read the date from 'nc'
-       read date;
-       #now set the atjob
-       echo -e "$WAKECMD" | at $date ;
+
+  #! /bin/bash
+  #this should be a command to wake your server
+  WAKECMD="#!/bin/sh\n /usr/local/bin/wakeMBE"
+  #first we need to delete all wake jobs in queue
+  for JOB in atq | cut -f 1 ; do
+      atrm $JOB;
+  done
+  #now we read the date from 'nc'
+  read date;
+  #now set the atjob
+  echo -e "$WAKECMD" | at $date ;
 
 
 
@@ -4351,6 +4375,7 @@
   would be best if you haven't express your preference. Further, the
   "Upcoming Recordings" page allows you make specific decisions about
   what you really do and don't want to record.
+
 
 
   [1m11.7.1.  Record Types[0m
@@ -4412,6 +4437,7 @@
   [1m11.7.2.  Duplicates[0m
 
   Singles will record without regard to duplicate matching.
+
 
   The standard recurring methods of All, Channel, Weekly and Daily use
   the descriptive information in the TV listings to try to record only
@@ -4549,6 +4575,7 @@
      Weekly, Find Weekly, Record Daily, Find Daily, Channel and finally
      All. This only applies if the priorities are the same.
 
+
   +o  If both start times have passed, later start time beats earlier
      start time -- This attempts to miss the least amount of time.
 
@@ -4676,6 +4703,8 @@
   capabilities of any other DVR system and it is unlikely that this
   level of scheduling customization will ever be available in any
   commercial DVR system.
+
+
 
   [1m11.8.1.  Getting Started[0m
 
@@ -6163,7 +6192,32 @@
 
   [1m21.4.  Using[0m
 
-  [1m21.4.1.  MySQL not connecting correctly[0m
+  [1m21.4.1.  No programs are displayed in "Watch Recordings"[0m
+
+  This situation occurs most often with a system that acts as a frontend
+  and a slave backend. MythTV supports system-global and user-specific
+  configuration files, with user-configuration files taking precedence.
+  99% of the configuration for MythTV is in the MySQL database, but
+  MythTV still needs to know where the MySQL server is running.  This
+  information is in the mysql.txt file.  By default, it will be
+  installed to /usr/local/share/mythtv, but a copy placed into ~/.mythtv
+  will over-ride the global configuration.
+
+  You must ensure that there aren't multiple, conflicting versions of
+  this file on your system!
+
+
+       $ locate mysql.txt
+       /usr/local/share/mythtv/mysql.txt
+       /home/mythtv/.mythtv/mysql.txt
+       $
+
+
+
+  As you can see, in this example there are two mysql.txt files.  If
+  they are not identical, then there may be unintended consequences.
+
+  [1m21.4.2.  MySQL not connecting correctly[0m
 
   Your [1mMySQL [22minstallation may have networking turned off.  Check that
   /etc/mysql/my.cnf [4mdoes[24m [4mnot[24m contain skip-networking.  If it does,
@@ -6172,7 +6226,7 @@
   [1mMySQL[22m.
 
 
-  [1m21.4.2.  MySQL database is corrupt[0m
+  [1m21.4.3.  MySQL database is corrupt[0m
 
   If you have reason to believe that your MySQL database is corrupt,
   execute the following commands to attempt to repair it.
@@ -6184,9 +6238,9 @@
   mysqlcheck -r -umythtv -p<password> mythconverg
 
 
-  [1m21.4.3.  Using a MPEG-2 encoder card and the video appears "jittery"[0m
+  [1m21.4.4.  Using a MPEG-2 encoder card and the video appears "jittery"[0m
 
-  [1m21.4.4.  Using a MPEG-2 encoder card and the video is jumping up and[0m
+  [1m21.4.5.  Using a MPEG-2 encoder card and the video is jumping up and[0m
   [1mdown[0m
 
   This is a different problem than the one discussed in the previous
@@ -6199,7 +6253,7 @@
   [1mLive TV [22moptions to 480 or 576 from their defaults.
 
 
-  [1m21.4.5.  Screen goes blank but returns when mouse is moved or keyboard[0m
+  [1m21.4.6.  Screen goes blank but returns when mouse is moved or keyboard[0m
   [1mis used[0m
 
   This is due to DPMS, the Display Power Management System, which is
@@ -6218,17 +6272,17 @@
   for:
 
 
-  Section "ServerFlags"
-      #DontZap # disable <Ctrl><Alt><BS> (server abort)
-      #DontZoom # disable <Ctrl><Alt><KP_+>/<KP_-> (resolution switching)
-      AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
+       Section "ServerFlags"
+           #DontZap # disable <Ctrl><Alt><BS> (server abort)
+           #DontZoom # disable <Ctrl><Alt><KP_+>/<KP_-> (resolution switching)
+           AllowMouseOpenFail # allows the server to start up even if the mouse doesn't work
 
-      Option "blank time" "0"
-      Option "standby time" "0"
-      Option "suspend time" "0"
-      Option "off time" "0"
-      Option "NoPM" "1"
-  EndSection
+           Option "blank time" "0"
+           Option "standby time" "0"
+           Option "suspend time" "0"
+           Option "off time" "0"
+           Option "NoPM" "1"
+       EndSection
 
 
 
@@ -6252,23 +6306,24 @@
   Finally, check:
 
 
-       Section "Monitor"
-           Identifier "monitor1"
-           VendorName "Plug'n Play"
-           HorizSync 30-85
-           VertRefresh 50-160
 
-           # Sony Vaio C1(X,XS,VE,VN)?
-           # 1024x480 @ 85.6 Hz, 48 kHz hsync
-           ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
+  Section "Monitor"
+      Identifier "monitor1"
+      VendorName "Plug'n Play"
+      HorizSync 30-85
+      VertRefresh 50-160
 
-           # TV fullscreen mode or DVD fullscreen output.
-           # 768x576 @ 79 Hz, 50 kHz hsync
-           ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+      # Sony Vaio C1(X,XS,VE,VN)?
+      # 1024x480 @ 85.6 Hz, 48 kHz hsync
+      ModeLine "1024x480"    65.00 1024 1032 1176 1344   480  488  494  563 -hsync -vsync
 
-           # 768x576 @ 100 Hz, 61.6 kHz hsync
-           ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
-       EndSection
+      # TV fullscreen mode or DVD fullscreen output.
+      # 768x576 @ 79 Hz, 50 kHz hsync
+      ModeLine "768x576"     50.00  768  832  846 1000   576  590  595  630
+
+      # 768x576 @ 100 Hz, 61.6 kHz hsync
+      ModeLine "768x576"     63.07  768  800  960 1024   576  578  590  616
+  EndSection
 
 
 
@@ -6279,6 +6334,7 @@
 
 
        $ xset -dpms
+
 
 
   Using xset +dpms will turn it back on.
@@ -6341,7 +6397,7 @@
   program to check and enable DMA.
 
 
-  # hdparm -d /dev/hd?
+       # hdparm -d /dev/hd?
 
 
 
@@ -6377,8 +6433,7 @@
 
       [1mNOTE[22m:  the following instructions do not apply to PVR-250/350
   encoders; the MPEG-2 file will have the audio embedded in the stream
-  so it is not accessible using /dev/dsp.  See ``this'' in the PVR-250
-  ``section'' for more information.
+  so it is not accessible using /dev/dsp.
 
   Audio appears to be one of the bigger issues that users run into on
   the mailing list.  If the audio isn't configured correctly, then
@@ -6507,6 +6562,7 @@
   in that case.
 
 
+
   [1m21.5.9.  PVR-250 card doesn't show inputs in the setup screen.[0m
 
   See message http://www.mythtv.org/pipermail/mythtv-
@@ -6533,7 +6589,6 @@
   [1m21.5.12.  Mythweb is showing a db_open error when I connect to it[0m
 
   Find your php.ini file. Make sure you've got a line in it like this:
-
 
   extension=mysql.so
 
@@ -6569,6 +6624,7 @@
   to view a program, try switching back to the shell and look for error
   messages there, or, if you're running from a startup script, check the
   log file.
+
 
 
   [1m21.5.17.  Poor performance with NVidia cards and XvMC[0m
@@ -6659,6 +6715,8 @@
        ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
        -i vidout -vcodec mpeg4 -b 2000 -acodec mp3 -ab 128 out.avi
 
+
+
   Or to play directly using mplayer (again 1.0PRE1 or later is needed):
 
 
@@ -6684,6 +6742,7 @@
   MythTV is not dependent on any particular window manager.  If you wish
   to run a lightweight window manager, the configfiles/ directory has an
   example of a .twmrc and .fvwmrc file you may use.
+
 
 
   [1m22.3.  What capture resolution should I use?  How does video work?[0m
@@ -6721,7 +6780,6 @@
 
   +o  352x480 (ReplayTV "Standard" quality)
 
-
   +o  320x480
 
   +o  544x240
@@ -6750,6 +6808,7 @@
   If you'd like to read more on this, go to the vcdhelp website at
   http://www.vcdhelp.com/forum/userguides/94382.php
   <http://www.vcdhelp.com/forum/userguides/94382.php>.
+
 
 
   [1m22.4.  MythTV GUI and X Display Sizes[0m
@@ -6815,7 +6874,6 @@
   screen.  This is called "overscan". Underscan is fitting the entire
   image inside the screen. Underscan is useful for computer monitors so
   that toolbars and scrollbars at the edges can be seen.
-
   For best results, match the X display area as close as possible to the
   edges of the physical screen. This can only be adjusted by your tv-out
   device or by the settings for the television set. Many sets have these
@@ -6873,6 +6931,7 @@
 
   This assumes that you will be moving your data to newer / bigger
   hardware and don't want to lose your programs.
+
 
   The first step is to create a database backup as demonstrated in an
   earlier section.
@@ -6937,7 +6996,6 @@
   that will allow you to use the btaudio module is the MSP34xx.
   However, having a MSP34xx is no guarantee that you will be able to use
   the btaudio module.
-
   As of 2003-03-31, this is the current list of cards and their status:
   Works with btaudio:
 
@@ -7004,8 +7062,6 @@
        1 row in set (0.00 sec)
        mysql> delete from channel where chanid = 1015;
 
-
-
   Old program data will be removed over the course of a week. However,
   you may want to immediately delete any current program listings for
   the channel that has been removed:
@@ -7034,8 +7090,7 @@
   add something like:
 
 
-
-  masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
+       masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
 
 
 
@@ -7068,12 +7123,11 @@
 
   The following also works with blackbox:
 
-
-       $ cat > .xinitrc
-       xset -dpms s off &
-       irxevent &
-       mythfrontend &
-       blackbox
+  $ cat > .xinitrc
+  xset -dpms s off &
+  irxevent &
+  mythfrontend &
+  blackbox
 
 
 
@@ -7096,7 +7150,6 @@
   Mike Thomson (mailto:linux@m-thomson.net <mailto:linux@m-thomson.net>)
   and Stu Tomlinson (mailto:stu@nosnilmot.com
   <mailto:stu@nosnilmot.com>).
-
 
   Copy the files from the MythTV contrib directory or from Mike's web
   site (http://m-thomson.net/mythtv/ <http://m-thomson.net/mythtv/>) as
@@ -7130,10 +7183,11 @@
   runlevels 3, 4 or 5:
 
 
-       $ su
-       # chkconfig --level 345 mythbackend on
-       # exit
-       $
+
+  $ su
+  # chkconfig --level 345 mythbackend on
+  # exit
+  $
 
 
 
@@ -7153,15 +7207,14 @@
   follows:
 
 
-
-  $ su
-  # mkdir /var/log/mythtv
-  # chown root:mythtv /var/log/mythtv
-  # chmod 0775 /var/log/mythtv
-  # exit
-  $ ls -ld /var/log/mythtv
-  drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
-  $
+       $ su
+       # mkdir /var/log/mythtv
+       # chown root:mythtv /var/log/mythtv
+       # chmod 0775 /var/log/mythtv
+       # exit
+       $ ls -ld /var/log/mythtv
+       drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+       $
 
 
 
@@ -7189,10 +7242,11 @@
   may add it by typing:
 
 
-       $ cd contrib
-       $ su
-       # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
-       # exit
+
+  $ cd contrib
+  $ su
+  # cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
+  # exit
 
 
 
@@ -7210,6 +7264,7 @@
   you don't get the results you expect, check that you're not asking
   msec to add missing permissions to the files or directories you
   created.
+
   [1m22.12.2.  Gentoo[0m
 
   The portage file for MythTV has scripts that will allow you to run
@@ -7243,7 +7298,6 @@
   backend [4mmust[24m have a capture device defined, but shouldn't imply that
   the capture device in the Master backend must be the first capture
   card defined in the database.
-
   One example of an advanced configuration is the round-robin scheme.
   Rather than defining all of the cards on the master, you could first
   go into setup on the master to define globals such as the general
@@ -7337,7 +7391,6 @@
   with the new as soon as it is no longer in use.
 
 
-
   [1m22.15.  Changing your hostname[0m
 
   If you need to change the name of the computers used with MythTV
@@ -7371,7 +7424,6 @@
   distributions, refer to the documentation, such as the
 
   hostname(1)
-
 
 
   To alter the hostname in the current session, run:
@@ -7434,7 +7486,7 @@
   otherwise start them from terminal consoles.
 
 
-       # /etc/init.d/mythbackend start
+  # /etc/init.d/mythbackend start
 
 
 
@@ -7456,7 +7508,6 @@
 
   The ReplayTV runs VxWorks, a Real Time Operating System from Wind
   River Systems.
-
 
   [1m22.18.  Can a wireless connection be used between the frontend and the[0m
   [1mbackend?[0m
@@ -7495,21 +7546,21 @@
 
 
 
-       #!/bin/sh
+  #!/bin/sh
 
-       mkfifo aud0
-       mkfifo vid0
-       mkfifo dvdmpg
+  mkfifo aud0
+  mkfifo vid0
+  mkfifo dvdmpg
 
-       mpeg2desc -a0 < $1 > aud0 &
-       mpeg2desc -v0 < $1 > vid0 &
-       mplex -f 8 -V -o dvdmpg aud0 vid0 &
-       dvdauthor -o $2 -f dvdmpg
-       dvdauthor -o $2 -T
+  mpeg2desc -a0 < $1 > aud0 &
+  mpeg2desc -v0 < $1 > vid0 &
+  mplex -f 8 -V -o dvdmpg aud0 vid0 &
+  dvdauthor -o $2 -f dvdmpg
+  dvdauthor -o $2 -T
 
-       rm aud0
-       rm vid0
-       rm dvdmpg
+  rm aud0
+  rm vid0
+  rm dvdmpg
 
 
 
@@ -7522,6 +7573,8 @@
        TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
        mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
        driveropts=burnfree -dao -v tsize="$TSIZE"s -
+
+
 
   [1m22.20.  Burning a MythTV recording to a DVD (alternate version)[0m
 
@@ -7556,7 +7609,6 @@
   4. Save the raw video stream and audio: File-> Save -> Save Raw Video
   Stream.  Save the file as 1.m2v.  When that's done, go to Audio ->
   Save Audio.  Save the file as 1.mp2
-
   5. Repeat steps 2 & 3 until you have saved all the segments you wish
   to keep.
 
@@ -7586,7 +7638,6 @@
   The steps above create a DVD that starts playing the video
   automatically. If you want to burn a DVD with menus and multiple video
   titles, see the next section.
-
 
 
   [1m22.21.  Creating a DVD with Menus[0m
@@ -7649,11 +7700,10 @@
   For PAL Video
 
 
-
-  width: 720
-  height: 576
-  x-axis: 75dpi
-  y-axis: 80dpi
+       width: 720
+       height: 576
+       x-axis: 75dpi
+       y-axis: 80dpi
 
 
 
@@ -7713,7 +7763,6 @@
   and make sure that "Save Background Color" and "Save Resolution" are
   selected.
 
-
   Select the bottom layer and change the Opacity to 0%.  Now save the
   image as menu1.png.
 
@@ -7749,6 +7798,7 @@
 
 
   Then create the final menu with
+
 
   spumux menu.xml < menu.mpg > menu_final.mpg
 
@@ -8044,278 +8094,7 @@
 
   [1m23.  Example Configurations.[0m
 
-  This section contains configurations which you may find useful.
-
-  [1m23.1.  Hauppauge PVR-250/350 hardware MPEG-2 encoder[0m
-
-
-
-       [1mNOTE[22m:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
-  NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER
-  ASSISTANCE, SEE THE IVTV MAILING LIST.
-  https://lists.sourceforge.net/lists/listinfo/ivtv-devel
-  <https://lists.sourceforge.net/lists/listinfo/ivtv-devel>  SEE THE
-  IVTV FAQ IF YOU HAVE QUESTIONS OR ISSUES.
-  http://ivtv.sourceforge.net/ <http://ivtv.sourceforge.net/> These
-  instructions work for Mandrake 9.1 on a backend machine which is
-  hosting a single PVR-250 capture card.
-
-  Install the Mandrake kernel source.  If you are using a different
-  Mandrake kernel level (i.e. not 2.4.21-0.16mdk as in the example
-  below, then alter the [1murpmi [22mcommand appropriately.)
-
-
-       $ uname -a
-       Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-       unknown GNU/Linux
-
-       $ su
-       # urpmi kernel-source
-
-
-
-             [1mNOTE[22m:  You do not need to recompile your kernel.
-  Download the latest IVTV driver from Sourceforge.  Check
-  http://sourceforge.net/projects/ivtv/
-  <http://sourceforge.net/projects/ivtv/> for the current version.
-  Right now (2004-01-21), it's 0.1.9.  Untar the file.
-
-
-       $ tar -xzf ivtv-0.1.9.tar.gz
-
-
-
-  This should create an ivtv directory.  Switch to it and perform the
-  following commands:
-       $ cd ivtv/utils
-       $ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
-       $ su
-       # ./ivtvfwextract.pl pvr250_17_21288.exe
-       # exit
-       $ cd ../driver
-
-
-
-  The [1mivtvfwextract [22mprogram extracts the firmware required for the card.
-  You may want to go to the Hauppauge website and download the latest
-  Windows driver if the [1mwget [22mcommand fails.
-
-  ivtv also needs to know how your kernel was compiled.  The default
-  Makefile is not configured for the way Mandrake "does things".  At the
-  top of the Makefile in the driver directory is a line like this:
-
-
-       KERNELDIR= /lib/modules/$(KERNVER)/build
-
-
-
-  edit it so that it looks like:
-
-
-       KERNELDIR= /usr/src/linux
-
-
-
-     [1mNOTE[22m:  If you are running a distribution / kernel which is using
-  the new version of i2c (version 2.8.x, found in the latest Mandrake
-  and Cooker) you will need to make the following edit. Look for
-
-
-       # uncomment if you use i2c 2.8.0+
-       #CFLAGS += -DNEW_I2C
-
-
-
-  and remove the "#" from the line containing CFLAGS.
-
-  Next, compile the driver:
-
-
-       $ cd ~/ivtv/driver
-       $ make
-
-
-
-  Compile the [1mtest_ioctl [22mprogram:
-
-
-
-  $ cd ../utils
-  $ make
-  $ su
-  # cp test_ioctl /usr/local/bin
-  # exit
-
-
-
-     [1mNOTE[22m: You may get warnings about i2c during the compile.  Ignore
-  them if they look something like this: #warning Using temporary hack
-  for missing I2C driver-ID for saa7114
-
-  However, if you get an actual compile error where the compile doesn't
-  finish and the error looks like: saa7115.c:1117: error: unknown field
-  'inc_use' specified in initializer then you didn't uncomment CFLAGS as
-  specified ``above''.
-
-  Add the following to /etc/modules.conf:
-
-
-
-        [1mNOTE[22m:  You do not need to add the last line "add above..."
-  if you will not be using the IR remote that came with the card.
-
-
-       alias char-major-81     videodev
-       alias char-major-81-0   ivtv
-       alias char-major-61 lirc_i2c
-       options ivtv debug=1
-       options tuner type=2
-       options msp3400 once=1 simple=1
-       add below ivtv msp3400 saa7115 tuner
-       add above ivtv lirc_dev lirc_i2c
-
-
-
-          [1mNOTE[22m:  You must specify the tuner type manually.  See
-  ~/ivtv/driver/tuner.h for a listing of tuners.  In the above example,
-  tuner type=2 is a Phillips NTSC.  Use an appropriate tuner type for
-  your system and video standard.  The debug=1 parameter on the ivtv
-  line actually means less debugging output will be printed.  At this
-  point we need to ensure that there are no other versions of msp3400.o
-  that would be loaded instead of the version that is created by ivtv.
-  Note that in the command below we are using the backtick, usually
-  located on the same key as the tilde " " and not the single quote.
-
-
-
-  $ su
-  # cd /lib/modules/`uname -r`
-  # pwd
-  /lib/modules/2.4.21-0.16mdk
-  # find . -name "msp3400*" | xargs rm -f
-
-
-
-  Next, copy the files that were compiled in the driver directory into
-  the appropriate modules directory:
-
-
-       $ su
-       # make install
-       # depmod -ae
-
-
-
-  Finally, load the ivtv driver:
-
-
-       # modprobe ivtv
-       # exit
-
-
-
-  Check that the card is being recognized on the PCI bus:
-
-
-       $ lspci -v
-       <snip>
-
-       00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-       Encoder (rev 01)
-               Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-               Flags: bus master, medium devsel, latency 32, IRQ 11
-               Memory at d0000000 (32-bit, prefetchable) [size=64M]
-               Capabilities: <available only to root>
-
-
-
-  If you don't see your card on the PCI bus, make sure that it's been
-  installed in a bus-master slot.  For some motherboards, only the PCI
-  slots closest to the AGP slot are bus-mastering.
-
-  Check that the ivtv driver has created a new video device:
-
-
-       $ ls -l /dev/v4l/vi*
-       crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
-       crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
-       crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
-
-
-
-  In this case, the ivtv device is video0.
-
-  You can now add this card available to MythTV.  Go into your mythtv
-  setup directory on the machine hosting the hardware MPEG-2 card.  When
-  you add a new capture card, ensure that you are using the video0
-  device.
-     [1mNOTE[22m:  As of 2003-04-25 the ivtv driver does not support VBI, so
-  closed-captioning is not available.  Leave the VBI device, audio
-  device and audio sampling rate limit at the default values.  Change
-  the default input to an appropriate setting for your configuration.
-  Change the card type to "Hardware MPEG Encoder Card" and press ENTER.
-
-  The remaining setup is just like a standard V4L card; define a video
-  source if you have not already done so, and assign the video source to
-  a video card input on the Input Connections screen.
-
-  Some people report issues with the ivtv module not being loaded when
-  required by MythTV.  To get around this, you can [1mmodprobe [22mthe ivtv
-  driver before using it.  The simplest technique is to add the [1mmodprobe[0m
-  command to /etc/rc.d/rc.local:
-
-
-       # echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
-
-
-
-                       [1mNOTE[22m:  some people complain
-  that their PVR-250/350 card is not capturing audio.  The most likely
-  source for this is that your system is not loading the correct
-  msp3400.o file; ivtv uses a custom msp3400.c, and if the resulting
-  module isn't loaded you will not get sound.  Switch to your
-  /lib/modules directory and rename the existing msp3400.o file, then
-  copy the msp3400.o from the ivtv driver directory and re-run [1mdepmod[22m.
-  If that still doesn't work, then check the ivtv mailing list for more
-  information.  You may wish to perform an [1mupdatedb [22mas root and then do
-  a locate msp3400 to find all the msp3400.o.gz files that may be on
-  your system.  For example, Mandrake has a msp3400.o.gz in the 3rdparty
-  subdirectory which will take precedence over the custom version
-  created by ivtv.  You can check if you have the correct msp3400 loaded
-  by typing (as root): modinfo msp3400 | grep "parm: *standard".  If you
-  don't get a line that says: "parm:        standard int", then you're
-  not loading the correct msp3400.  Check to ensure that you're loading
-  the correct msp3400 module.
-
-
-
-       # modinfo msp3400
-       filename:    /lib/modules/2.4.22-9mdk/kernel/drivers/media/video/msp3400.o
-
-
-
-  Check that the path is correct for your kernel version, and that the
-  driver being loaded is in /media/video and not some other directory.
-
-
-
-     [1mNOTE[22m:  Some people report "ghosting" issues with their PVR-250s,
-  where there is a faint copy of whatever is on the screen appearing to
-  the right of the image.  If you have this issue, it's fairly obvious.
-  This is a firmware issue, apparently.  There are two ways around this:
-
-  1. Run at 720x480 resolution
-
-  2. Turn off DNR
-
-  To turn off DNR, add the following to your rc.local:
-
-
-       /path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
-
-
-
-  [1m23.2.  Logical Volume Manager (LVM)[0m
+  [1m23.1.  Logical Volume Manager (LVM)[0m
 
   LVM greatly increases the flexibility you have in managing your
   storage than traditional physical partitions. This section will
@@ -8481,7 +8260,7 @@
   you've got more space.
 
 
-  [1m23.2.1.  ReiserFS[0m
+  [1m23.1.1.  ReiserFS[0m
 
   Make the logical volume used for video bigger:
 
@@ -8495,7 +8274,7 @@
 
 
 
-  [1m23.2.2.  ext2 or ext3[0m
+  [1m23.1.2.  ext2 or ext3[0m
 
   LVM comes with a program called [1me2fsadm[22m.
 
@@ -8509,7 +8288,17 @@
 
 
 
-  [1m23.3.  Advanced Partition Formatting[0m
+  [1m23.1.3.  xfs[0m
+
+  XFS does not need to be unmounted to extend the size:
+
+
+       # lvextend --size +50G /dev/VGforMyth/video
+       # xfs_growfs /dev/VGforMyth/video
+
+
+
+  [1m23.2.  Advanced Partition Formatting[0m
 
   The partitions that your distribution sets up for you may not be
   optimized for large files. Using LVM in conjunction with the following
@@ -8539,7 +8328,8 @@
   list.
 
 
-  [1m23.3.1.  Ext2[0m
+
+  [1m23.2.1.  Ext2[0m
 
   Ext2 was the defacto standard Linux filesystem for many years.  It is
   stable, provides good I/O performance and can quickly delete large
@@ -8549,8 +8339,7 @@
   on a filesystem the size of a typical MythTV partition.
 
 
-
-  [1m23.3.2.  Ext3[0m
+  [1m23.2.2.  Ext3[0m
 
   Ext3 is Ext2 with a journal, so your biggest gain is that in case of a
   crash and reboot you won't have to wait very long for your partition
@@ -8576,7 +8365,7 @@
   You can check on your filesystem using the [1mdumpe2fs [22mprogram. See the
   man page for details.
 
-  [1m23.3.3.  ReiserFS[0m
+  [1m23.2.3.  ReiserFS[0m
 
   The Reiser filesystem is another journaling filesystem commonly
   distributed with Linux.  It is known to be an extremely efficient
@@ -8587,7 +8376,7 @@
   files.
 
 
-  [1m23.3.4.  JFS[0m
+  [1m23.2.4.  JFS[0m
 
   JFS (Journaling File System) is a journaling filesystem originally
   developed by IBM for AIX which was later released as open source.
@@ -8598,7 +8387,7 @@
   as 10 gigabytes.
 
 
-  [1m23.3.5.  XFS[0m
+  [1m23.2.5.  XFS[0m
 
   XFS is a journaling file system originally developed by SGI for Irix,
   and later released as open source.  While not a part of the default
@@ -8613,8 +8402,7 @@
   potentially leading to dropped frames.
 
 
-
-  [1m23.4.  HDTV with the Air2PC-ATSC-PCI card[0m
+  [1m23.3.  HDTV with the Air2PC-ATSC-PCI card[0m
 
   The Air2PC card has the capability to capture over-the-air HDTV
   signals (8VSB).  The Air2PC card is installed as a DVB device and is
@@ -8668,15 +8456,13 @@
 
   Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2
   PCI.
-
   Exit menuconfig, then compile modules and the kernel.  (Gentoo will do
   this automatically as a part of the [1mgenkernel [22mstep.
 
 
-
-  # make modules
-  # make
-  # make install modules_install
+       # make modules
+       # make
+       # make install modules_install
 
 
 
@@ -8728,10 +8514,11 @@
   [1mdmesg[22m, you should see something like this:
 
 
-       drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
-       drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
-       DVB: registering new adapter (SkyStar2).
-       DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
+
+  drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
+  drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
+  DVB: registering new adapter (SkyStar2).
+  DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
 
 
 
@@ -8772,7 +8559,7 @@
 
   For HDTV you do not need to use the Advanced configuration.
 
-  [1m23.5.  Diskless Ubuntu[0m
+  [1m23.4.  Diskless Ubuntu[0m
 
   (This information is a work in progress - 2005-07-15.)
 
@@ -8786,7 +8573,8 @@
   remote and a HD44780 16x2 Vacuum Fluorescent Display.
 
 
-  [1m23.5.1.  Backend Configuration[0m
+
+  [1m23.4.1.  Backend Configuration[0m
 
   The backend machine needs to provide the support software for the
   services needed to boot a diskless workstation.
@@ -8795,6 +8583,7 @@
 
        $ su
        # apt-get install dhcpd3-server atftpd syslinux
+
 
 
        # mkdir -p /nfsroot/basement
@@ -8843,33 +8632,32 @@
        # xorgconfig
 
 
-
   Edit your /etc/apt/sources.list and look at the bottom of the file.
   It should end up looking like this:
 
 
 
-  deb http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
-  deb-src http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
+       deb http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
+       deb-src http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
 
-  ## Uncomment the following two lines to add software from the 'universe'
-  ## repository.
-  ## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
-  ## team, and may not be under a free licence. Please satisfy yourself as to
-  ## your rights to use the software. Also, please note that software in
-  ## universe WILL NOT receive any review or updates from the Ubuntu security
-  ## team.
-  deb http://us.archive.ubuntu.com/ubuntu/ hoary universe
-  deb-src http://us.archive.ubuntu.com/ubuntu/ hoary universe
+       ## Uncomment the following two lines to add software from the 'universe'
+       ## repository.
+       ## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
+       ## team, and may not be under a free licence. Please satisfy yourself as to
+       ## your rights to use the software. Also, please note that software in
+       ## universe WILL NOT receive any review or updates from the Ubuntu security
+       ## team.
+       deb http://us.archive.ubuntu.com/ubuntu/ hoary universe
+       deb-src http://us.archive.ubuntu.com/ubuntu/ hoary universe
 
-  deb http://security.ubuntu.com/ubuntu hoary-security main restricted
-  deb-src http://security.ubuntu.com/ubuntu hoary-security main restricted
+       deb http://security.ubuntu.com/ubuntu hoary-security main restricted
+       deb-src http://security.ubuntu.com/ubuntu hoary-security main restricted
 
-  deb http://security.ubuntu.com/ubuntu hoary-security universe
-  deb-src http://security.ubuntu.com/ubuntu hoary-security universe
+       deb http://security.ubuntu.com/ubuntu hoary-security universe
+       deb-src http://security.ubuntu.com/ubuntu hoary-security universe
 
-  deb http://archive.ubuntu.com/ubuntu hoary multiverse
-  deb-src http://archive.ubuntu.com/ubuntu hoary multiverse
+       deb http://archive.ubuntu.com/ubuntu hoary multiverse
+       deb-src http://archive.ubuntu.com/ubuntu hoary multiverse
 
 
 
@@ -8888,7 +8676,7 @@
   sudo apt-get install libqt3c102-mysql
 
 
-  [1m23.5.2.  Configuring DHCP[0m
+  [1m23.4.2.  Configuring DHCP[0m
 
   edit /etc/default/dhcp3-server.  add interface
 
@@ -8934,7 +8722,7 @@
 
 
 
-  [1m23.5.3.  Editing[0m
+  [1m23.4.3.  Editing[0m
 
   svn co http://svn.mythtv.org/svn/trunk/mythtv svn co
   http://svn.mythtv.org/svn/trunk/mythplugins svn co

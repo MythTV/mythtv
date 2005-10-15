@@ -178,6 +178,29 @@ section on modifying
 <H2><A NAME="ss21.4">21.4</A> <A HREF="mythtv-HOWTO.html#toc21.4">Using</A>
 </H2>
 
+<H3>No programs are displayed in "Watch Recordings"</H3>
+
+<P>This situation occurs most often with a system that acts as a frontend
+and a slave backend. MythTV supports system-global and user-specific
+configuration files, with user-configuration files taking precedence.  99%
+of the configuration for MythTV is in the MySQL database, but MythTV still
+needs to know where the MySQL server is running.  This information is in the
+<CODE>mysql.txt</CODE> file.  By default, it will be installed to
+<CODE>/usr/local/share/mythtv</CODE>, but a copy placed into <CODE>~/.mythtv</CODE>
+will over-ride the global configuration.</P>
+<P>You must ensure that there aren't multiple, conflicting versions of this
+file on your system!
+<BLOCKQUOTE><CODE>
+<PRE>
+$ locate mysql.txt
+/usr/local/share/mythtv/mysql.txt
+/home/mythtv/.mythtv/mysql.txt
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>As you can see, in this example there are two <CODE>mysql.txt</CODE> files.  If
+they are not identical, then there may be unintended consequences.</P>
 <H3>MySQL not connecting correctly</H3>
 
 <P>Your <B>MySQL</B> installation may have networking turned off. 
@@ -379,9 +402,7 @@ reboot your setting will be preserved.</P>
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  the following instructions do not apply to PVR-250/350
 encoders; the MPEG-2 file will have the audio embedded in the stream so it
-is not accessible using <CODE>/dev/dsp</CODE>.  See 
-<A HREF="mythtv-HOWTO-23.html#troubleshooting_pvraudio">this</A> in the PVR-250 
-<A HREF="mythtv-HOWTO-23.html#pvr250">section</A> for more information.</CAPTION>
+is not accessible using <CODE>/dev/dsp</CODE>. </CAPTION>
 </FIGURE>
 </P>
 <P>Audio appears to be one of the bigger issues that users run into on the

@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-08-19, v0.18.12
+<date>2005-10-14, v0.18.13
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -21,7 +21,7 @@ necessary.
 the MythTV application!  I can not give you personalized installation
 support.  If you are having issues installing MythTV you should examine the
 archives, or post your question to the MythTV-users mailing list.  If you
-send me "Does MythTV work with 'X'"? messages I will simply delete your mail.
+send me "Does MythTV work with 'X'"? messages - I will simply delete your mail.
 </caption>
 </figure>
 <sect1>What is MythTV?
@@ -163,10 +163,10 @@ seems to be ignoring you.
 </caption>
 </figure>
 
-<sect1>Bugzilla
-<p>If you feel you need to contribute to a bug database, use the MythTV
-Bugzilla at <url url="http://www.mythtv.org/bugs/"
-name="http://www.mythtv.org/bugs/">.
+<sect1>Bug database
+<p>If you feel you need to contribute to a bug database, use the MythTV bug
+ticketing system at <url url="http://cvs.mythtv.org/trac"
+name="http://cvs.mythtv.org/trac">.
    
 <sect1>Contributing to this document
 <p>Contributions to the HOWTO are welcome, especially if you find a
@@ -399,7 +399,7 @@ name="http://ivtv.sourceforge.net/"> such as the Hauppauge
 PVR-150/250/350/500, Avermedia M179, Hauppauge "Freestyle" or Yuan M600
 cards will allow you to use dedicated hardware encoders rather than your
 CPU. (The PVR-350 can simultaneously be used as an output device.) Using the
-on-board MPEG-2 encoder drastically reduces the CPU requirements for
+on-board MPEG-2 encoder greatly reduces the CPU requirements for
 encoding.
 
 <bf>NOTE</bf>:  Motherboards with the Via chipset are notoriously bad with
@@ -423,10 +423,6 @@ for Live TV at 416x480.
 <item>A Celeron 450 (no SSE) can decode a 480x480 16Mbps MPEG-2 file with
 80% CPU.
 </itemize>
-See the <ref id="pvr250" name="Hauppauge PVR-250/350 hardware MPEG-2
-encoder."> section for information on installing a PVR-250 on Mandrake 9.1. 
-The information contained in the section will also apply to other MPEG-2
-encoder cards supported by the IVTV driver.
 
 <sect3>DVB capture cards.
 <p>DVB is a video standard primarily found in Europe.  MythTV supports DVB;
@@ -1000,7 +996,7 @@ deb http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
 deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
 
 # Christian Marillat's packages (mplayer, lame)
-deb ftp://ftp.nerim.net/debian-marillat/ unstable main
+deb ftp://ftp.nerim.net/debian-marillat/ sarge main
 </verb></tscreen>
 and executing:
 <tscreen><verb>
@@ -1410,7 +1406,19 @@ simplest thing is to immediately start using DataDirect.
 
 <label id="manually_building_mythtv">
 <sect1>Manually building MythTV
-<p>Unpack MythTV
+<p>If you are going to use <bf>subversion</bf>, execute the following
+instructions to obtain the latest version of MythTV:
+
+<tscreen><verb>
+$ mkdir mythtv
+$ cd mythtv
+$ svn co http://svn.mythtv.org/svn/trunk/mythtv
+$ svn co http://svn.mythtv.org/svn/trunk/mythplugins
+$ svn co http://svn.mythtv.org/svn/trunk/myththemes
+$ cd mythtv
+</verb></tscreen>
+
+If you are using the tarball, then unpack it:
 <tscreen><verb>
 $ tar -xjf mythtv-0.18.1.tar.bz2
 $ cd mythtv-0.18.1
@@ -2297,7 +2305,7 @@ information on configuring multiple backend systems in various ways.
 </caption>
 </figure>
 
-Because MythTV now uses a database to store all configuration variables,
+Because MythTV uses a database to store all configuration variables,
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
@@ -2468,8 +2476,6 @@ single PVR-500 card, it will appear as <tt>/dev/video0</tt> and
 and Tuner 1 input, so you would choose Tuner 0 for <bf>both</bf> devices.
 </caption>
 </figure>
-
-
 Once you're done, press RETURN to go back to the Input Connections screen. 
 You would then finish associating the video sources to any other hardware
 devices you have available.
@@ -2570,6 +2576,19 @@ name="Modifying access to the MySQL database for multiple systems"> and that
 you have the correct IP address for the database server in the "Database
 Configuration" screen of the setup application on this slave backend.
 
+<figure loc="here">
+<eps file="stop.eps" height="1cm">
+<img src="stop.png">
+<caption><bf>NOTE</bf>: Slave backends <bf>must not</bf> run a local MySQL
+daemon.  By default, they will connect to their local daemon rather than the
+central database, causing unexpected behavior such as empty "Watch
+Recordings" lists and a failure to locate the Video Sources defined on the
+master backend.  Modify the <tt>/usr/local/share/mythtv/mysql.txt</tt> file
+on all slave backends to ensure that the <tt>DBHostName</tt> has the address
+of the MySQL server.
+</caption>
+</figure>
+ 
 Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
 address misconfiguration then MythTV will not function properly.
@@ -3126,8 +3145,9 @@ F	        | rotate between the various Picture Adjustments (Colour, Hue, etc.)&n
 U       	| increase the play speed						     @  
 J       	| decrease the play speed						     @  
 A		| Adjust time stretch (speed up or slow down normal play of audio and video  @
-W       	| cycle through 4:3 aspect ratio, 16:9, 4:3 Zoom (like Pan and Scan),&nbsp;
-                  16:9 Zoom, and 16:9 Stretch (eliminates black sidebars in TV signal) @
+W       	| cycle through zoom and fill modes: 4:3 aspect ratio, 16:9, 4:3 Zoom &nbsp;
+                  (like Pan and Scan), 16:9 Zoom, and 16:9 Stretch (eliminates black &nbsp; 
+                  sidebars in TV signal)                                                     @
 F8		| toggle the sleep timer 30m->1hr->1hr30m->2hr->Off @
 CTRL-B		| Jump to the beginning of the recording / ringbuffer @
 +		| Switch between audio streams @
@@ -3606,7 +3626,7 @@ command" with the "Wakeup time format" suitable for that tool.
 <p>If your MySQL server and your Master backend are not on the same machine,
 you can have the Master backend wake your MySQL server using WOL. You will
 find the settings for this in the second page of the setup program,
-or at the end of mysql.txt.  The meanings are the same as
+or at the end of <tt>mysql.txt</tt>.  The meanings are the same as
 discussed in "The WakeOnLan settings" above.
 
 <sect2>Tips/Tricks:
@@ -5198,6 +5218,27 @@ intents and purposes your computer will have crashed.
 section on modifying <ref id="modifying_ld.so.conf" name="/etc/ld.so.conf">.
 
 <sect1>Using
+<sect2>No programs are displayed in "Watch Recordings"
+<p>This situation occurs most often with a system that acts as a frontend
+and a slave backend. MythTV supports system-global and user-specific
+configuration files, with user-configuration files taking precedence.  99%
+of the configuration for MythTV is in the MySQL database, but MythTV still
+needs to know where the MySQL server is running.  This information is in the
+<tt>mysql.txt</tt> file.  By default, it will be installed to
+<tt>/usr/local/share/mythtv</tt>, but a copy placed into <tt>~/.mythtv</tt>
+will over-ride the global configuration.
+
+You must ensure that there aren't multiple, conflicting versions of this
+file on your system!
+<tscreen><verb>
+$ locate mysql.txt
+/usr/local/share/mythtv/mysql.txt
+/home/mythtv/.mythtv/mysql.txt
+$
+</verb></tscreen>
+
+As you can see, in this example there are two <tt>mysql.txt</tt> files.  If
+they are not identical, then there may be unintended consequences.
 <sect2>MySQL not connecting correctly
 <p>Your <bf>MySQL</bf> installation may have networking turned off. 
 Check that <tt>/etc/mysql/my.cnf</tt> <em>does not</em> contain
@@ -5383,9 +5424,7 @@ reboot your setting will be preserved.
 <img src="stop.png">
 <caption><bf>NOTE</bf>:  the following instructions do not apply to PVR-250/350
 encoders; the MPEG-2 file will have the audio embedded in the stream so it
-is not accessible using <tt>/dev/dsp</tt>.  See <ref
-id="troubleshooting_pvraudio" name="this"> in the PVR-250 <ref id="pvr250"
-name="section"> for more information.
+is not accessible using <tt>/dev/dsp</tt>.  
 </caption>
 </figure>
 
@@ -6852,283 +6891,6 @@ queue, otherwise new jobs will be added to the queue and your programs won't
 be flagged until you run manually run <bf>mythjobqueue</bf>.
 
 <sect>Example Configurations.
-<p>This section contains configurations which you may find useful.
-<sect1>Hauppauge PVR-250/350 hardware MPEG-2 encoder <label id="pvr250">
-<p><figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
-NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
-SEE THE IVTV MAILING LIST.  <url
-url="https://lists.sourceforge.net/lists/listinfo/ivtv-devel"
-name="https://lists.sourceforge.net/lists/listinfo/ivtv-devel">  SEE THE
-IVTV FAQ IF YOU HAVE QUESTIONS OR ISSUES.  <url
-url="http://ivtv.sourceforge.net/"
-name="http://ivtv.sourceforge.net/">
-</caption>
-</figure>
-These instructions work for Mandrake 9.1 on a backend machine which is
-hosting a single PVR-250 capture card.
-
-Install the Mandrake kernel source.  If you are using a different Mandrake
-kernel level (i.e. not 2.4.21-0.16mdk as in the example below, then alter the
-<bf>urpmi</bf> command appropriately.)
-<tscreen><verb>
-$ uname -a
-Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-unknown GNU/Linux
-
-$ su
-# urpmi kernel-source
-</verb></tscreen>
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  You do not need to recompile your kernel.
-</caption>
-</figure>
-Download the latest IVTV driver from Sourceforge.  Check <url
-url="http://sourceforge.net/projects/ivtv/"
-name="http://sourceforge.net/projects/ivtv/"> for the current version. 
-Right now (2004-01-21), it's 0.1.9.  Untar the file.
-<tscreen><verb>
-$ tar -xzf ivtv-0.1.9.tar.gz
-</verb></tscreen>
-
-This should create an ivtv directory.  Switch to it and perform the
-following commands:
-<tscreen><verb>
-$ cd ivtv/utils
-$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
-$ su
-# ./ivtvfwextract.pl pvr250_17_21288.exe
-# exit
-$ cd ../driver
-</verb></tscreen>
-
-The <bf>ivtvfwextract</bf> program extracts the firmware required for the
-card.  You may want to go to the Hauppauge website and download the latest
-Windows driver if the <bf>wget</bf> command fails.
-
-ivtv also needs to know how your kernel was compiled.  The default Makefile
-is not configured for the way Mandrake "does things".  At the top of the
-Makefile in the <tt>driver</tt> directory is a line like this:
-<tscreen><verb>
-KERNELDIR= /lib/modules/$(KERNVER)/build
-</verb></tscreen>
-edit it so that it looks like:
-<tscreen><verb>
-KERNELDIR= /usr/src/linux
-</verb></tscreen>
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  If you are running a distribution / kernel which is using
-the new version of i2c (version 2.8.x, found in the latest Mandrake and
-Cooker) you will need to make the following edit. Look for<label id="i2c">
-</caption>
-</figure>
-<tscreen><verb>
-# uncomment if you use i2c 2.8.0+
-#CFLAGS += -DNEW_I2C
-</verb></tscreen>
-and remove the "#" from the line containing <tt>CFLAGS</tt>.
-
-Next, compile the driver:
-<tscreen><verb>
-$ cd ~/ivtv/driver
-$ make
-</verb></tscreen>
-
-Compile the <bf>test_ioctl</bf> program:
-<tscreen><verb>
-$ cd ../utils
-$ make
-$ su
-# cp test_ioctl /usr/local/bin
-# exit
-</verb></tscreen>
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>: You may get warnings about i2c during the compile.  Ignore
-them if they look something like this:
-</caption>
-</figure>
-<tt>#warning Using temporary hack for missing I2C driver-ID for saa7114</tt>
-
-However, if you get an actual compile error where the compile doesn't finish
-and the error looks like:
-<tt>saa7115.c:1117: error: unknown field 'inc_use' specified in
-initializer</tt>
-then you didn't uncomment CFLAGS as specified <ref id="i2c" name="above">.
-
-Add the following to <tt>/etc/modules.conf</tt>:
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  You do not need to add the last line "<tt>add above...</tt>"
-if you will not be using the IR remote that came with the card.
-</caption>
-</figure>
-<tscreen><verb>
-alias char-major-81     videodev
-alias char-major-81-0   ivtv
-alias char-major-61 lirc_i2c
-options ivtv debug=1
-options tuner type=2
-options msp3400 once=1 simple=1
-add below ivtv msp3400 saa7115 tuner
-add above ivtv lirc_dev lirc_i2c
-</verb></tscreen>
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  You must specify the tuner type manually.  See
-<tt>~/ivtv/driver/tuner.h</tt> for a listing of tuners.  In the above
-example, <tt>tuner type=2</tt> is a Phillips NTSC.  Use an appropriate tuner
-type for your system and video standard.  The <tt>debug=1</tt> parameter on
-the ivtv line actually means less debugging output will be printed.
-</caption>
-</figure>
-At this point we need to ensure that there are no other versions of
-<tt>msp3400.o</tt> that would be loaded instead of the version that is
-created by ivtv.  Note that in the command below we are using the backtick,
-usually located on the same key as the tilde "~" and not the single quote.
-<tscreen><verb>
-$ su
-# cd /lib/modules/`uname -r`
-# pwd
-/lib/modules/2.4.21-0.16mdk
-# find . -name "msp3400*" | xargs rm -f
-</verb></tscreen>
-
-Next, copy the files that were compiled in the driver directory into the
-appropriate modules directory:
-<tscreen><verb>
-$ su
-# make install
-# depmod -ae
-</verb></tscreen>
-
-Finally, load the ivtv driver:
-<tscreen><verb>
-# modprobe ivtv
-# exit
-</verb></tscreen>
-
-Check that the card is being recognized on the PCI bus:
-<tscreen><verb>
-$ lspci -v
-<snip>
-
-00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-Encoder (rev 01)
-        Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-        Flags: bus master, medium devsel, latency 32, IRQ 11
-        Memory at d0000000 (32-bit, prefetchable) [size=64M]
-        Capabilities: <available only to root>
-</verb></tscreen>
-
-If you don't see your card on the PCI bus, make sure that it's been
-installed in a bus-master slot.  For some motherboards, only the PCI slots
-closest to the AGP slot are bus-mastering.
-
-Check that the ivtv driver has created a new video device:
-<tscreen><verb>
-$ ls -l /dev/v4l/vi*
-crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
-crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
-crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
-</verb></tscreen>
-
-In this case, the ivtv device is <tt>video0</tt>.
-
-You can now add this card available to MythTV.  Go into your mythtv setup
-directory on the machine hosting the hardware MPEG-2 card.
-When you add a new capture card, ensure that you are using the
-<tt>video0</tt> device.  
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  As of 2003-04-25 the ivtv driver does not support VBI, so
-closed-captioning is not available.
-</caption>
-</figure>
-Leave the VBI device, audio device and audio sampling rate limit at the
-default values.  Change the default input to an appropriate setting for your
-configuration.  Change the card type to "Hardware MPEG Encoder Card" and
-press ENTER.
-
-The remaining setup is just like a standard V4L card; define a video source
-if you have not already done so, and assign the video source to a video card
-input on the Input Connections screen.
-
-Some people report issues with the ivtv module not being loaded when
-required by MythTV.  To get around this, you can <bf>modprobe</bf> the ivtv driver
-before using it.  The simplest technique is to add the <bf>modprobe</bf>
-command to <tt>/etc/rc.d/rc.local</tt>:
-<tscreen><verb>
-# echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
-</verb></tscreen>
-
-<label id="troubleshooting_pvraudio">
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  some people complain
-that their PVR-250/350 card is not capturing audio.  The most likely source
-for this is that your system is not loading the correct msp3400.o file; ivtv
-uses a custom msp3400.c, and if the resulting module isn't loaded you will
-not get sound.  Switch to your <tt>/lib/modules</tt> directory and rename
-the existing msp3400.o file, then copy the <tt>msp3400.o</tt> from the ivtv
-driver directory and re-run <bf>depmod</bf>.  If that still doesn't work,
-then check the ivtv mailing list for more information.  You may wish to
-perform an <bf>updatedb</bf> as root and then do a <tt>locate msp3400</tt>
-to find all the <tt>msp3400.o.gz</tt> files that may be on your system.  For
-example, Mandrake has a <tt>msp3400.o.gz</tt> in the <tt>3rdparty</tt>
-subdirectory which will take precedence over the custom version created by
-ivtv.  You can check if you have the correct msp3400 loaded by typing (as
-root): <tt>modinfo msp3400 | grep "parm: *standard"</tt>.  If you don't get
-a line that says: "parm:        standard int", then you're not loading the
-correct msp3400.
-</caption>
-</figure>
-Check to ensure that you're loading the correct msp3400 module.
-<tscreen><verb> 
-# modinfo msp3400
-filename:    /lib/modules/2.4.22-9mdk/kernel/drivers/media/video/msp3400.o
-</verb></tscreen>
-
-Check that the path is correct for your kernel version, and that the driver
-being loaded is in <tt>/media/video</tt> and not some other directory.
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  Some people report "ghosting" issues with their PVR-250s,
-where there is a faint copy of whatever is on the screen appearing to the
-right of the image.  If you have this issue, it's fairly obvious.  This is a
-firmware issue, apparently.  There are two ways around this:
-</caption>
-</figure>
-<enum>
-<item>Run at 720x480 resolution
-<item>Turn off DNR
-</enum>
-
-To turn off DNR, add the following to your <tt>rc.local</tt>:
-<tscreen><verb>
-/path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
-</verb></tscreen>
-
 <sect1>Logical Volume Manager (LVM) <label id="LVM">
 <!-- Contributed by Martin Smith martin at spamcop.net -->
 <p>LVM greatly increases the flexibility you have in managing your storage
@@ -7308,7 +7070,12 @@ unmounted during this procedure.
 # e2fsadm --size +50G /dev/VGforMyth/video
 # mount /dev/VGforMyth/video /var/video
 </verb></tscreen>
-
+<sect2>xfs
+<p>XFS does not need to be unmounted to extend the size:
+<tscreen><verb>
+# lvextend --size +50G /dev/VGforMyth/video
+# xfs_growfs /dev/VGforMyth/video
+</verb></tscreen>
 <sect1>Advanced Partition Formatting <label
 id="advancedpartitionformatting">
 <p>The partitions that your distribution sets up for you may not be
@@ -7757,6 +7524,12 @@ v0.18.09, 2005-07-14.  Start diskless ubuntu.  Backticks on table names in mysql
 v0.18.10, 2005-07-15.  Escape backticks in the mysqldump example, otherwise bash complains.
 v0.18.11, 2005-08-17.  Refine diskless Ubuntu.  Add Bruce's Advanced Scheduling text.
 v0.18.12, 2005-08-19.  Tweaks to Bruce's stuff.
+v0.18.13, 2005-10-14.  Updates from users.  Update bugzilla entry to point
+at trac.  Get rid of PVR-250 example install - it's not necessary anymore
+and way out of date.  Specifically mention how multiple mysql.txt files are
+bad if they're all saying different things.
+
+
 -->
 
 <!--

@@ -224,7 +224,21 @@ simplest thing is to immediately start using DataDirect.</P>
 <H2><A NAME="ss5.4">5.4</A> <A HREF="mythtv-HOWTO.html#toc5.4">Manually building MythTV</A>
 </H2>
 
-<P>Unpack MythTV
+<P>If you are going to use <B>subversion</B>, execute the following
+instructions to obtain the latest version of MythTV:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mkdir mythtv
+$ cd mythtv
+$ svn co http://svn.mythtv.org/svn/trunk/mythtv
+$ svn co http://svn.mythtv.org/svn/trunk/mythplugins
+$ svn co http://svn.mythtv.org/svn/trunk/myththemes
+$ cd mythtv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you are using the tarball, then unpack it:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ tar -xjf mythtv-0.18.1.tar.bz2

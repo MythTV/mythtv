@@ -13,320 +13,7 @@ Next
 <HR>
 <H2><A NAME="s23">23.</A> <A HREF="mythtv-HOWTO.html#toc23">Example Configurations.</A></H2>
 
-<P>This section contains configurations which you may find useful.</P>
-<H2><A NAME="pvr250"></A> <A NAME="ss23.1">23.1</A> <A HREF="mythtv-HOWTO.html#toc23.1">Hauppauge PVR-250/350 hardware MPEG-2 encoder </A>
-</H2>
-
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  THE FOLLOWING DOCUMENTATION IS PROVIDED AS-IS AND IS
-NOT GUARANTEED TO WORK WITH YOUR DISTRIBUTION.  FOR IVTV DRIVER ASSISTANCE,
-SEE THE IVTV MAILING LIST.  
-<A HREF="https://lists.sourceforge.net/lists/listinfo/ivtv-devel">https://lists.sourceforge.net/lists/listinfo/ivtv-devel</A>  SEE THE
-IVTV FAQ IF YOU HAVE QUESTIONS OR ISSUES.  
-<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A></CAPTION>
-</FIGURE>
-
-These instructions work for Mandrake 9.1 on a backend machine which is
-hosting a single PVR-250 capture card.</P>
-<P>Install the Mandrake kernel source.  If you are using a different Mandrake
-kernel level (i.e. not 2.4.21-0.16mdk as in the example below, then alter the
-<B>urpmi</B> command appropriately.)
-<BLOCKQUOTE><CODE>
-<PRE>
-$ uname -a
-Linux pvr 2.4.21-0.16mdk #1 Fri Apr 11 06:51:54 CEST 2003 i686 unknown
-unknown GNU/Linux
-
-$ su
-# urpmi kernel-source
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  You do not need to recompile your kernel.</CAPTION>
-</FIGURE>
-
-Download the latest IVTV driver from Sourceforge.  Check 
-<A HREF="http://sourceforge.net/projects/ivtv/">http://sourceforge.net/projects/ivtv/</A> for the current version. 
-Right now (2004-01-21), it's 0.1.9.  Untar the file.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ tar -xzf ivtv-0.1.9.tar.gz
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>This should create an ivtv directory.  Switch to it and perform the
-following commands:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd ivtv/utils
-$ wget http://hauppauge.lightpath.net/software/pvr250/pvr250_17_21288.exe
-$ su
-# ./ivtvfwextract.pl pvr250_17_21288.exe
-# exit
-$ cd ../driver
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>The <B>ivtvfwextract</B> program extracts the firmware required for the
-card.  You may want to go to the Hauppauge website and download the latest
-Windows driver if the <B>wget</B> command fails.</P>
-<P>ivtv also needs to know how your kernel was compiled.  The default Makefile
-is not configured for the way Mandrake "does things".  At the top of the
-Makefile in the <CODE>driver</CODE> directory is a line like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-KERNELDIR= /lib/modules/$(KERNVER)/build
-</PRE>
-</CODE></BLOCKQUOTE>
-
-edit it so that it looks like:
-<BLOCKQUOTE><CODE>
-<PRE>
-KERNELDIR= /usr/src/linux
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  If you are running a distribution / kernel which is using
-the new version of i2c (version 2.8.x, found in the latest Mandrake and
-Cooker) you will need to make the following edit. Look for
-<A NAME="i2c"></A> </CAPTION>
-</FIGURE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-# uncomment if you use i2c 2.8.0+
-#CFLAGS += -DNEW_I2C
-</PRE>
-</CODE></BLOCKQUOTE>
-
-and remove the "#" from the line containing <CODE>CFLAGS</CODE>.</P>
-<P>Next, compile the driver:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd ~/ivtv/driver
-$ make
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Compile the <B>test_ioctl</B> program:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd ../utils
-$ make
-$ su
-# cp test_ioctl /usr/local/bin
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: You may get warnings about i2c during the compile.  Ignore
-them if they look something like this:</CAPTION>
-</FIGURE>
-
-<CODE>#warning Using temporary hack for missing I2C driver-ID for saa7114</CODE></P>
-<P>However, if you get an actual compile error where the compile doesn't finish
-and the error looks like:
-<CODE>saa7115.c:1117: error: unknown field 'inc_use' specified in
-initializer</CODE>
-then you didn't uncomment CFLAGS as specified 
-<A HREF="#i2c">above</A>.</P>
-<P>Add the following to <CODE>/etc/modules.conf</CODE>:</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  You do not need to add the last line "<CODE>add above...</CODE>"
-if you will not be using the IR remote that came with the card.</CAPTION>
-</FIGURE>
-
-<BLOCKQUOTE><CODE>
-<PRE>
-alias char-major-81     videodev
-alias char-major-81-0   ivtv
-alias char-major-61 lirc_i2c
-options ivtv debug=1
-options tuner type=2
-options msp3400 once=1 simple=1
-add below ivtv msp3400 saa7115 tuner
-add above ivtv lirc_dev lirc_i2c
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  You must specify the tuner type manually.  See
-<CODE>~/ivtv/driver/tuner.h</CODE> for a listing of tuners.  In the above
-example, <CODE>tuner type=2</CODE> is a Phillips NTSC.  Use an appropriate tuner
-type for your system and video standard.  The <CODE>debug=1</CODE> parameter on
-the ivtv line actually means less debugging output will be printed.</CAPTION>
-</FIGURE>
-
-At this point we need to ensure that there are no other versions of
-<CODE>msp3400.o</CODE> that would be loaded instead of the version that is
-created by ivtv.  Note that in the command below we are using the backtick,
-usually located on the same key as the tilde "&nbsp;" and not the single quote.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# cd /lib/modules/`uname -r`
-# pwd
-/lib/modules/2.4.21-0.16mdk
-# find . -name "msp3400*" | xargs rm -f
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Next, copy the files that were compiled in the driver directory into the
-appropriate modules directory:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# make install
-# depmod -ae
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Finally, load the ivtv driver:
-<BLOCKQUOTE><CODE>
-<PRE>
-# modprobe ivtv
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Check that the card is being recognized on the PCI bus:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ lspci -v
-&lt;snip>
-
-00:0c.0 Multimedia video controller: Internext Compression Inc iTVC15 MPEG-2
-Encoder (rev 01)
-        Subsystem: Hauppauge computer works Inc.: Unknown device 4801
-        Flags: bus master, medium devsel, latency 32, IRQ 11
-        Memory at d0000000 (32-bit, prefetchable) [size=64M]
-        Capabilities: &lt;available only to root>
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you don't see your card on the PCI bus, make sure that it's been
-installed in a bus-master slot.  For some motherboards, only the PCI slots
-closest to the AGP slot are bus-mastering.</P>
-<P>Check that the ivtv driver has created a new video device:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ ls -l /dev/v4l/vi*
-crw-------    1 mythtv   sys       81, 224 Dec 31  1969 vbi0
-crw-------    1 mythtv   sys       81,   0 Dec 31  1969 video0
-crw-------    1 mythtv   sys       81,  32 Dec 31  1969 video32
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>In this case, the ivtv device is <CODE>video0</CODE>.</P>
-<P>You can now add this card available to MythTV.  Go into your mythtv setup
-directory on the machine hosting the hardware MPEG-2 card.
-When you add a new capture card, ensure that you are using the
-<CODE>video0</CODE> device.  </P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  As of 2003-04-25 the ivtv driver does not support VBI, so
-closed-captioning is not available.</CAPTION>
-</FIGURE>
-
-Leave the VBI device, audio device and audio sampling rate limit at the
-default values.  Change the default input to an appropriate setting for your
-configuration.  Change the card type to "Hardware MPEG Encoder Card" and
-press ENTER.</P>
-<P>The remaining setup is just like a standard V4L card; define a video source
-if you have not already done so, and assign the video source to a video card
-input on the Input Connections screen.</P>
-<P>Some people report issues with the ivtv module not being loaded when
-required by MythTV.  To get around this, you can <B>modprobe</B> the ivtv driver
-before using it.  The simplest technique is to add the <B>modprobe</B>
-command to <CODE>/etc/rc.d/rc.local</CODE>:
-<BLOCKQUOTE><CODE>
-<PRE>
-# echo "/sbin/modprobe ivtv" >> /etc/rc.d/rc.local
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>
-<A NAME="troubleshooting_pvraudio"></A> </P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  some people complain
-that their PVR-250/350 card is not capturing audio.  The most likely source
-for this is that your system is not loading the correct msp3400.o file; ivtv
-uses a custom msp3400.c, and if the resulting module isn't loaded you will
-not get sound.  Switch to your <CODE>/lib/modules</CODE> directory and rename
-the existing msp3400.o file, then copy the <CODE>msp3400.o</CODE> from the ivtv
-driver directory and re-run <B>depmod</B>.  If that still doesn't work,
-then check the ivtv mailing list for more information.  You may wish to
-perform an <B>updatedb</B> as root and then do a <CODE>locate msp3400</CODE>
-to find all the <CODE>msp3400.o.gz</CODE> files that may be on your system.  For
-example, Mandrake has a <CODE>msp3400.o.gz</CODE> in the <CODE>3rdparty</CODE>
-subdirectory which will take precedence over the custom version created by
-ivtv.  You can check if you have the correct msp3400 loaded by typing (as
-root): <CODE>modinfo msp3400 | grep "parm: *standard"</CODE>.  If you don't get
-a line that says: "parm:        standard int", then you're not loading the
-correct msp3400.</CAPTION>
-</FIGURE>
-
-Check to ensure that you're loading the correct msp3400 module.
-<BLOCKQUOTE><CODE>
-<PRE>
- 
-# modinfo msp3400
-filename:    /lib/modules/2.4.22-9mdk/kernel/drivers/media/video/msp3400.o
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Check that the path is correct for your kernel version, and that the driver
-being loaded is in <CODE>/media/video</CODE> and not some other directory.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  Some people report "ghosting" issues with their PVR-250s,
-where there is a faint copy of whatever is on the screen appearing to the
-right of the image.  If you have this issue, it's fairly obvious.  This is a
-firmware issue, apparently.  There are two ways around this:</CAPTION>
-</FIGURE>
-
-<OL>
-<LI>Run at 720x480 resolution</LI>
-<LI>Turn off DNR</LI>
-</OL>
-</P>
-<P>To turn off DNR, add the following to your <CODE>rc.local</CODE>:
-<BLOCKQUOTE><CODE>
-<PRE>
-/path/to/ivtv/utils/test_ioctl --set-codec-params=dnr_mode=0,dnr_temporal=0
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-
-<H2><A NAME="LVM"></A> <A NAME="ss23.2">23.2</A> <A HREF="mythtv-HOWTO.html#toc23.2">Logical Volume Manager (LVM) </A>
+<H2><A NAME="LVM"></A> <A NAME="ss23.1">23.1</A> <A HREF="mythtv-HOWTO.html#toc23.1">Logical Volume Manager (LVM) </A>
 </H2>
 
 <P>LVM greatly increases the flexibility you have in managing your storage
@@ -508,8 +195,17 @@ unmounted during this procedure.
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<H3>xfs</H3>
 
-<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">Advanced Partition Formatting </A>
+<P>XFS does not need to be unmounted to extend the size:
+<BLOCKQUOTE><CODE>
+<PRE>
+# lvextend --size +50G /dev/VGforMyth/video
+# xfs_growfs /dev/VGforMyth/video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss23.2">23.2</A> <A HREF="mythtv-HOWTO.html#toc23.2">Advanced Partition Formatting </A>
 </H2>
 
 <P>The partitions that your distribution sets up for you may not be
@@ -596,7 +292,7 @@ higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
 issues if you do not have the spare CPU capacity to handle XFS, potentially
 leading to dropped frames.</P>
 
-<H2><A NAME="ss23.4">23.4</A> <A HREF="mythtv-HOWTO.html#toc23.4">HDTV with the Air2PC-ATSC-PCI card</A>
+<H2><A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">HDTV with the Air2PC-ATSC-PCI card</A>
 </H2>
 
 <P>The Air2PC card has the capability to capture over-the-air HDTV signals
@@ -743,7 +439,7 @@ cables, etc.</P>
 is time to configure MythTV. Start the setup program, and in the Capture
 Cards section change the card type to "Digital Video Broadcast".</P>
 <P>For HDTV you do not need to use the Advanced configuration. </P>
-<H2><A NAME="ss23.5">23.5</A> <A HREF="mythtv-HOWTO.html#toc23.5">Diskless Ubuntu</A>
+<H2><A NAME="ss23.4">23.4</A> <A HREF="mythtv-HOWTO.html#toc23.4">Diskless Ubuntu</A>
 </H2>
 
 <P>(This information is a work in progress - 2005-07-15.)</P>

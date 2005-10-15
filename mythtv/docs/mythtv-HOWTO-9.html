@@ -84,7 +84,7 @@ at least until you become more familiar with the MythTV system.  See
 information on configuring multiple backend systems in various ways.</CAPTION>
 </FIGURE>
 </P>
-<P>Because MythTV now uses a database to store all configuration variables,
+<P>Because MythTV uses a database to store all configuration variables,
 part of the bootstrap of MythTV is to indicate the location of the MySQL
 database server. If the frontend, backend and MySQL database server are all
 going to be running on the same box, you can continue to the next step.  If
@@ -241,9 +241,8 @@ single PVR-500 card, it will appear as <CODE>/dev/video0</CODE> and
 <CODE>/dev/video1</CODE>.  Each <CODE>/dev/video</CODE> device will have a Tuner 0
 and Tuner 1 input, so you would choose Tuner 0 for <B>both</B> devices.</CAPTION>
 </FIGURE>
-</P>
 
-<P>Once you're done, press RETURN to go back to the Input Connections screen. 
+Once you're done, press RETURN to go back to the Input Connections screen. 
 You would then finish associating the video sources to any other hardware
 devices you have available.</P>
 <P>
@@ -350,6 +349,19 @@ backends as discussed in the section titled
 <A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> and that
 you have the correct IP address for the database server in the "Database
 Configuration" screen of the setup application on this slave backend.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: Slave backends <B>must not</B> run a local MySQL
+daemon.  By default, they will connect to their local daemon rather than the
+central database, causing unexpected behavior such as empty "Watch
+Recordings" lists and a failure to locate the Video Sources defined on the
+master backend.  Modify the <CODE>/usr/local/share/mythtv/mysql.txt</CODE> file
+on all slave backends to ensure that the <CODE>DBHostName</CODE> has the address
+of the MySQL server.</CAPTION>
+</FIGURE>
+</P>
 <P>Make sure that the IP addresses on the General setup screen are accurate. 
 If the slave backend can't communicate with the master backend due to IP
 address misconfiguration then MythTV will not function properly.</P>
