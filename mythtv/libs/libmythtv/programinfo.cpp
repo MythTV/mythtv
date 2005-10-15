@@ -501,7 +501,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     if (rectype != kNotRecording)
     {
         if (recendts > timeNow && recstatus <= rsWillRecord || 
-            recstatus == rsConflict)
+            recstatus == rsConflict || recstatus == rsLaterShowing)
         {
             if (recpriority >= 0)       
                 progMap["rec_str"] += QString(" +%1 ").arg(recpriority);
