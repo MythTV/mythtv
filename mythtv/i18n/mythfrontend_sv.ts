@@ -154,6 +154,22 @@
         <source>Delete..</source>
         <translation>Ta bort..</translation>
     </message>
+    <message>
+        <source>Delete Channels</source>
+        <translation>Ta bort kanaler</translation>
+    </message>
+    <message>
+        <source>Delete all channels on currently selected source[s].</source>
+        <translation>Ta bort alla kanaler på markerade källor.</translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete these channels?</source>
+        <translation>Är du säker på att du vill ta bort dessa kanaler?</translation>
+    </message>
+    <message>
+        <source>Yes, delete the channels</source>
+        <translation>Ja, ta bort kanalerna</translation>
+    </message>
 </context>
 <context>
     <name>ChannelRecPriority</name>

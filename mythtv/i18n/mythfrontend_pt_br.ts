@@ -125,6 +125,29 @@
     </message>
 </context>
 <context>
+    <name>CardInput</name>
+    <message>
+        <source>Scan for channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use channel scanner to find channels for this input.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fetch channels from listings source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This uses the listings data source to provide the channels for this input.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This can take a long time to run.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ChannelEditor</name>
     <message>
         <source>Channels</source>
@@ -153,6 +176,22 @@
     <message>
         <source>Delete..</source>
         <translation type="unfinished">Remover..</translation>
+    </message>
+    <message>
+        <source>Delete Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete all channels on currently selected source[s].</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you would like to delete these channels?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete the channels</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3427,7 +3466,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Standard V4L capture card</source>
-        <translation type="unfinished">Cartão de Captura V4L padrão</translation>
+        <translation type="obsolete">Cartão de Captura V4L padrão</translation>
     </message>
     <message>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
@@ -3435,23 +3474,19 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>MPEG-2 Encoder card (PVR-x50, PVR-500)</source>
-        <translation type="unfinished">Cartão Codificador MPEG-2 (PVR-x50, PVR-500)</translation>
+        <translation type="obsolete">Cartão Codificador MPEG-2 (PVR-x50, PVR-500)</translation>
     </message>
     <message>
         <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation type="unfinished">Cartão de Captura pcHDTV (HD-2000, HD-3000)</translation>
+        <translation type="obsolete">Cartão de Captura pcHDTV (HD-2000, HD-3000)</translation>
     </message>
     <message>
         <source>Digital Video Broadcast card (DVB)</source>
-        <translation type="unfinished">Cartão de Transmissão de Vídeo Digital (DVB)</translation>
-    </message>
-    <message>
-        <source>FireWire Input</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Cartão de Transmissão de Vídeo Digital (DVB)</translation>
     </message>
     <message>
         <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation type="unfinished">Codificador USB Mpeg-4 (Plextor ConvertX, etc)</translation>
+        <translation type="obsolete">Codificador USB Mpeg-4 (Plextor ConvertX, etc)</translation>
     </message>
     <message>
         <source>Capture device</source>
@@ -3524,10 +3559,6 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     <message>
         <source>Starting channel</source>
         <translation type="unfinished">Iniciando canal</translation>
-    </message>
-    <message>
-        <source>LiveTV will change to the above channel when the input is first selected.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Input preference</source>
@@ -6284,10 +6315,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>DBOX2 Input</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
         <translation type="unfinished"></translation>
     </message>
@@ -6591,6 +6618,70 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>The aspect ratio of a Xinerama display can not be queried from the display, so you must specify it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimal Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename to Match</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Existing Channel Treatment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How to treat existing channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Analog V4L capture card</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MPEG-2 encoder card (PVR-x50, PVR-500)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DVB DTV capture card (v3.x)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pcHDTV DTV capture card (w/V4L drivers)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FireWire cable box</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>USB MPEG-4 encoder box (Plextor ConvertX, etc)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DBox2 TCP/IP cable box</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the LNB Settings for DVB-S cards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For DVB-C and DVB-T you don&apos;t need to set these values.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Starting LiveTV channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This is updated on every successful channel change.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
