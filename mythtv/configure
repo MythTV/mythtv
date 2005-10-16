@@ -44,8 +44,8 @@ audio_jack="default"
 ivtv="yes"
 ivtv_header="no"
 dvb="no"
-dvb_path="/usr/src/linux/include"
-dvb_eit="no"
+dvb_path="/usr/include"
+dvb_eit="default"
 lirc="yes"
 joystick_menu="yes"
 firewire_cable_box="yes"
@@ -69,11 +69,6 @@ v4l="no"
 valgrind="no"
 frontend="yes"
 backend="no"
-
-KERNEL_RELEASE=`uname -r 2>/dev/null`
-if test x"$KERNEL_RELEASE" != x"" ; then
-    dvb_path="/usr/src/linux-$KERNEL_RELEASE/include"
-fi
 
 if test x"$CC" != x"" ; then
     cc="$CC"
@@ -1883,16 +1878,29 @@ fi
 if test x"$dvb" = x"yes" ; then
     dvb="no"
     if test -f "$dvb_path"/linux/dvb/frontend.h ; then
-        if test -f "$dvb_path"/linux/timer.h ; then
-            echo "Warning: DVB location points into kernel (ok if kernel >= 2.6.11)"
+        if test -f "$dvb_path"/../MAINTAINERS ; then
+            echo "Warning: DVB location in kernel. May not compile."
         fi
         dvb="yes"
     else
-        echo "DVB location does not contain linux/dvb/frontend.h [$dvb_path]"
+        dvb_path="/usr/src/linux/include"
+        KERNEL_RELEASE=`uname -r 2>/dev/null`
+        if test x"$KERNEL_RELEASE" != x"" ; then
+            dvb_path="/usr/src/linux-$KERNEL_RELEASE/include"
+        fi
+
+        if test -f "$dvb_path"/linux/dvb/frontend.h ; then
+            if test -f "$dvb_path"/../MAINTAINERS ; then
+                echo "Warning: DVB location in kernel. May not compile."
+            fi
+            dvb="yes"
+        else
+            echo "DVB location needs to have linux/dvb/frontend.h [$dvb_path]"
+        fi
     fi
 fi
 
-if test x"$dvb_eit" = x"yes" ; then
+if test x"$dvb_eit" = x"default" ; then
     dvb_eit="no"
     if test x"$dvb" = x"yes" ; then
         dvb_eit="yes"
