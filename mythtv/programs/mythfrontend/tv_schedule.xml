@@ -10,21 +10,29 @@
       <text lang="FR">Guide des programmes</text>
       <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
+      <text lang="IS">Dagskrá sjónvarps</text>
       <text lang="PT">Guia de Programação</text>
       <text lang="SV">Programguide</text>
       <text lang="JA">番組ガイド</text>
       <text lang="FI">Ohjelmaopas</text>
       <text lang="ZH_TW">節目表</text>
+      <text lang="SI">Programski vodič</text>
+      <text lang="ET">Telekava</text>
+      <text lang="NB">Programoversikt</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
-      <alttext lang="ES">Guía</alttext>
+      <alttext lang="ES">Parilla</alttext>
       <alttext lang="CA">Guia</alttext>
       <alttext lang="DE">EPG</alttext>
       <alttext lang="DK">Guide</alttext>
+      <alttext lang="DK">Dagskrá</alttext>
       <alttext lang="NL">Gids</alttext>
       <alttext lang="SV">Guide</alttext>
       <alttext lang="JA">ガイド</alttext>
       <alttext lang="ZH_TW">節目</alttext>
+      <alttext lang="SI">Vodič</alttext>
+      <alttext lang="ET">Kava</alttext>
+      <alttext lang="NB">Oversikt</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -38,22 +46,30 @@
       <text lang="FR">Recherche d'émission</text>
       <text lang="DE">Alphabetische Suche</text>
       <text lang="DK">Program Finder</text>
+      <text lang="IS">Dagsskrár leit</text>
       <text lang="PT">Procurar Programa</text>
       <text lang="SV">Programletaren</text>
       <text lang="JA">番組検索</text>
       <text lang="FI">Ohjelman Etsintä</text>
       <text lang="ZH_TW">搜尋節目</text>
+      <text lang="SI">Iskalec programov</text>
+      <text lang="ET">Programmiotsija</text>
+      <text lang="NB">Programfinner</text>
       <alttext>Finder</alttext>
       <alttext lang="FR">Recherche</alttext>
       <alttext lang="ES">Buscar</alttext>
       <alttext lang="CA">Cercar</alttext>
       <alttext lang="DE">ABC Suche</alttext>
       <alttext lang="DK">Finder</alttext>
+      <alttext lang="IS">Leit</alttext>
       <alttext lang="NL">Zoek A-Z</alttext>
       <alttext lang="PT">Procurar</alttext>
       <alttext lang="SV">Letaren</alttext>
       <alttext lang="JA">検索</alttext>
       <alttext lang="ZH_TW">搜尋</alttext>
+      <alttext lang="SI">Iskalec</alttext>
+      <alttext lang="ET">Otsija</alttext>
+      <alttext lang="NB">Finner</alttext>
       <action>TV_PROGFIND</action>
    </button>
 
@@ -62,18 +78,26 @@
       <text>Search Words</text>
       <text lang="FR">Recherche textuelle</text>
       <text lang="DE">Volltextsuche</text>
+      <text lang="IS">Leita að orðum</text>
       <text lang="SV">Sök ord</text>
       <text lang="NL">Zoek Woorden</text>
       <text lang="JA">単語検索</text>
       <text lang="FI">Etsi Sanoista</text>
       <text lang="ZH_TW">關鍵字</text>
-      <text lang="ES">Buscar Palabras</text>
+      <text lang="SI">Iskanje besed</text>
+      <text lang="ET">Otsi sõnu</text>
+      <text lang="NB">Søk etter ord</text>
+      <text lang="DK">Søg ord</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoek</alttext>
       <alttext lang="SV">Ord</alttext>
+      <alttext lang="IS">Orð</alttext>
       <alttext lang="DE">Wörter</alttext>
-      <alttext lang="ES">Palabras</alttext>
+      <alttext lang="SI">Iskanje</alttext>
+      <alttext lang="ET">Sõnad</alttext>
+      <alttext lang="NB">Søk</alttext>
+      <alttext lang="DK">Søg</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -85,14 +109,22 @@
       <text lang="FR">Listes de recherches</text>
       <text lang="JA">リスト検索</text>
       <text lang="DE">Listensuche</text>
+      <text lang="IS">Listaleit</text>
       <text lang="FI">Etsi Oppaasta</text>
-      <text lang="ES">Buscar Listas</text>
+      <text lang="SI">Iskanje seznamov</text>
+      <text lang="ET">Otsi nimekirju</text>
+      <text lang="NB">Søk i lister</text>
+      <text lang="DK">Søg i lister</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
+      <alttext lang="IS">Listar</alttext>
       <alttext lang="SV">Listor</alttext>
       <alttext lang="FR">Listes</alttext>
       <alttext lang="NL">Lijsten</alttext>
-      <alttext lang="ES">Listas</alttext>
+      <alttext lang="SI">Seznami</alttext>
+      <alttext lang="ET">Nimekirjad</alttext>
+      <alttext lang="NB">Lister</alttext>
+      <alttext lang="DK">Lister</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -111,6 +143,8 @@
       <text lang="SV">Omedelbar inspelning</text>
       <text lang="JA">簡単録画</text>
       <text lang="FI">Välitön Nauhoitus</text>
+      <text lang="ET">Kohene salvestamine</text>
+      <text lang="NB">Øyeblikkelig opptak</text>
       <alttext>Instant Record</alttext>
       <alttext lang="FR">Enreg. manuel</alttext>
       <alttext lang="ES">Grab. inst.</alttext>
@@ -120,6 +154,7 @@
       <alttext lang="PT">Gravar Agora</alttext>
       <alttext lang="SV">Omedelbar</alttext>
       <alttext lang="JA">簡単録画</alttext>
+      <alttext lang="NB">Ta opp nå</alttext>
       <action>TV_MANUAL</action>
    </button>
 -->
@@ -132,19 +167,24 @@
       <text lang="JA">カスタム録画</text>
       <text lang="FR">Enregistrement avancé</text>
       <text lang="DE">freie Planung</text>
+      <text lang="IS">Sérsniðin upptaka</text>
       <text lang="NL">Opname op maat</text>
       <text lang="FI">Edistyneet Valinnat</text>
-      <text lang="ES">Avanzada</text>
+      <text lang="SI">Poljubna snemanja</text>
+      <text lang="ET">Kohandatud salvestamine</text>
+      <text lang="NB">Egendefinert opptak</text>
+      <text lang="DK">Brugerstyret optagelse</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
    <button>
       <type>TV_MANUAL_SCHEDULE</type>
       <text>Manual Schedule</text>
-      <text lang="ES">Programación Manual</text>
+      <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="DE">Manuelle Aufnahme</text>
       <text lang="DK">Manuel programmering</text>
+      <text lang="IS">Handvirk upptaka</text>
       <text lang="FR">Programmation manuelle</text>
       <text lang="NL">Manuele Opname</text>
       <text lang="PT">Gravação Manual</text>
@@ -152,17 +192,24 @@
       <text lang="JA">手動予約</text>
       <text lang="FI">Manuaalinen Ajastus</text>
       <text lang="ZH_TW">手動預錄</text>
+      <text lang="SI">Ročno planiranje</text>
+      <text lang="ET">Käsitsi salvestamine</text>
+      <text lang="NB">Manuelt opptak</text>
       <alttext>Man. Sched.</alttext>
-      <alttext lang="ES">Manual</alttext>
+      <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
       <alttext lang="DE">Manuell</alttext>
       <alttext lang="FR">Prog. Man.</alttext>
       <alttext lang="DK">Manuel prog.</alttext>
+      <alttext lang="IS">Handvirk tímasetning.</alttext>
       <alttext lang="NL">Manueel</alttext>
       <alttext lang="PT">Manual</alttext>
       <alttext lang="SV">Manuell</alttext>
       <alttext lang="JA">手動</alttext>
       <alttext lang="ZH_TW">手動預錄</alttext>
+      <alttext lang="SI">Roč. snem.</alttext>
+      <alttext lang="ET">Käsitsi</alttext>
+      <alttext lang="NB">Manuelt</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 

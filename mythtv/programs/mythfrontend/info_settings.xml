@@ -8,12 +8,16 @@
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter</text>
      <text lang="DK">Vejr indstililnger</text>
+     <text lang="IS">Stillingar veðurs</text>
      <text lang="NL">"Het Weer" Instellingen</text>
      <text lang="PT">Configurar Meteorologia</text>
      <text lang="SV">Väderinställningar</text>
      <text lang="JA">天気設定</text>
      <text lang="FI">Sään Asetukset</text>
      <text lang="ZH_TW">天氣報告設定</text>
+     <text lang="SI">Nastavitve vremena</text>
+     <text lang="ET">Ilmateate seaded</text>
+     <text lang="NB">Innstillinger for vær</text>
      <action>CONFIGPLUGIN mythweather</action>
      <depends>mythweather</depends>
    </button>
@@ -26,10 +30,15 @@
      <text lang="ES">Configurar Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
      <text lang="FR">Configuration des nouvelles</text>
+     <text lang="IS">Stillingar frétta</text>
      <text lang="SV">Nyhetsinställningar</text>
      <text lang="JA">ニュース設定</text>
      <text lang="FI">Uutisten Asetukset</text>
      <text lang="ZH_TW">網上新聞設定</text>
+     <text lang="SI">Nastavitve novic</text>
+     <text lang="ET">Uudiste seaded</text>
+     <text lang="NB">Innstillinger for nyheter</text>
+     <text lang="DK">Nyheds indstillinger</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -38,6 +47,8 @@
      <type>SETTINGS_MOVIETIME</type>
      <text>Movie Time Settings</text>
      <text lang="FI">Elokuvien Aika-asetukset</text>
+     <text lang="SI">Nastavitve čas filmov</text>
+     <text lang="ET">Filmiaegade seaded</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -49,10 +60,14 @@
      <text lang="SV">Webb-inställningar</text>
      <text lang="JA">Web設定</text>
      <text lang="FR">Configuration du web</text>
+     <text lang="IS">Stillingar vefs</text>
      <text lang="NL">Web Instellingen</text>     
      <text lang="FI">Nettiasetukset</text>
      <text lang="ZH_TW">互聯網設定</text>
-     <text lang="ES">Configurar Web</text>
+     <text lang="SI">Spletne nastavitve</text>
+     <text lang="ET">Veebi seaded</text>
+     <text lang="NB">Innstilinger for nettleser</text>
+     <text lang="DK">Web instillinger</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -65,9 +80,14 @@
      <text lang="DE">Rezepte</text>
      <text lang="FR">Configuration des recettes</text>
      <text lang="FI">Reseptiasetukset</text>
+     <text lang="IS">Stillingar uppskrifta</text>
      <text lang="NL">Kookboek Instellingen</text>     
-     <text lang="ES">Configurar Recetas</text>
+     <text lang="SI">Nastavitve receptov</text>
+     <text lang="ET">Retseptide seaded</text>     
+     <text lang="NB">Innstillinger for oppskrifter</text>
+     <text lang="DK">Opskrifts indstillinger</text>
      <alttext lang="DE">Rezepte</alttext>
+     <alttext lang="ET">Retseptid</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>
      <depends>mythrecipe</depends>
    </button>

@@ -1,65 +1,77 @@
 <mythmenu name="UTIL">
 
    <button>
-     <type>MUSIC_PLAYLIST</type>
-     <text>Music Tools</text>
-     <text lang="DE">Musik verwalten</text>
-     <text lang="NL">Muziek Beheren</text>
-     <text lang="SV">Musikverktyg</text>
-     <text lang="FR">Gestionnaire de musiques</text>
-     <text lang="JA">ミュージックツール</text>
-     <text lang="FI">Musiikkityökalut</text>
-     <text lang="ZH_TW">音樂工具</text>
-     <text lang="ES">Gestionar Música</text>
-     <action>PLUGIN mythmusic</action>
-     <depends>mythmusic</depends>	
+      <type>MUSIC_PLAYLIST</type>
+      <text>Music Tools</text>
+      <text lang="DE">Musik verwalten</text>
+      <text lang="IS">Tónlistartól</text>
+      <text lang="NL">Muziek Beheren</text>
+      <text lang="SV">Musikverktyg</text>
+      <text lang="FR">Gestionnaire de musiques</text>
+      <text lang="JA">ミュージックツール</text>
+      <text lang="FI">Musiikkityökalut</text>
+      <text lang="ZH_TW">音樂工具</text>
+      <text lang="SI">Glasbena orodja</text>
+      <text lang="ET">Muusikatööriistad</text>
+      <text lang="NB">Musikkverktøy</text>
+      <text lang="DK">Musik tools</text>
+      <action>PLUGIN mythmusic</action>
+      <depends>mythmusic</depends>	
    </button>
-   
+
    <button>
-     <type>VIDEO_MANAGER</type>
-     <text>Video Manager</text>
-     <text lang="ES">Gestionar Vídeos</text>
-     <text lang="CA">Gestionar Vídeos</text>
-     <text lang="DK">Film opsÃ¦tning</text>
-     <text lang="DE">Videos verwalten</text>
-     <text lang="PT">Gerir Filmes</text>
-     <text lang="SV">Filmhanterare</text>
-     <text lang="FR">Gestionnaire de vidéos</text>
-     <text lang="NL">Video's Beheren</text>
-     <text lang="JA">ビデオマネージャー</text>
-     <text lang="FI">Videonhallinta</text>
-     <text lang="ZH_TW">電影工具</text>     
-     <action>JUMP Video Manager</action>
-     <depends>mythvideo</depends>
+      <type>VIDEO_MANAGER</type>
+      <text>Video Manager</text>
+      <text lang="ES">Gestionar vÃ­deos</text>
+      <text lang="CA">Gestionar vÃ­deos</text>
+      <text lang="DK">Film opsætning</text>
+      <text lang="DE">Videos verwalten</text>
+      <text lang="IS">Kvikmyndatól</text>
+      <text lang="PT">Gerir Filmes</text>
+      <text lang="SV">Filmhanterare</text>
+      <text lang="FR">Gestionnaire de vidéos</text>
+      <text lang="NL">Video's Beheren</text>
+      <text lang="JA">ビデオマネージャー</text>
+      <text lang="FI">Videonhallinta</text>
+      <text lang="ZH_TW">電影工具</text>
+      <text lang="SI">Video manager</text>
+      <text lang="ET">Videohaldus</text>
+      <text lang="NB">Videobehandler</text>
+      <action>JUMP Video Manager</action>
+      <depends>mythvideo</depends>
    </button>
-   
+    
    <button>
-     <type>SETUP_KEYS</type>
-     <text>Edit Keys</text>
-     <text lang="FI">Muokkaa Näppäimiä</text>
-     <text lang="IS">Stilla takka</text>
-     <text lang="DE">Tastenbelegung ändern</text>
-     <text lang="DK">Ændre tasteinstillinger</text>
-     <action>PLUGIN mythcontrols</action>
-     <depends>mythcontrols</depends>	
+      <type>SETUP_KEYS</type>
+      <text>Edit Keys</text>
+      <text lang="IS">Stilla takka</text>
+      <text lang="DE">Tastenbelegung ändern</text>
+      <text lang="FI">Muokkaa Näppäimiä</text>
+      <text lang="DK">Ændre tasteinstillinger</text>
+      <action>PLUGIN mythcontrols</action>
+      <depends>mythcontrols</depends>	
    </button>
-   
+      
    <button>
-     <type>SETUP_MENU</type>
-     <text>Setup</text>
-     <text lang="IT">Impostazioni</text>
-     <text lang="ES">Configurar</text>
-     <text lang="CA">Configurar</text>
-     <text lang="FR">Configuration</text>
-     <text lang="DE">Konfiguration</text>
-     <text lang="DK">Konfiguration</text>
-     <text lang="NL">Instellingen</text>
-     <text lang="PT">Configurações</text>
-     <text lang="SV">Inställningar</text>
-     <text lang="JA">設定</text>
-     <text lang="FI">Asetukset</text>
-     <text lang="ZH_TW">設定</text>
-     <action>MENU main_settings.xml</action>
+      <type>SETUP_MENU</type>
+      <text>Setup</text>
+      <text lang="IT">Impostazioni</text>
+      <text lang="ES">Configurar</text>
+      <text lang="CA">Configurar</text>
+      <text lang="FR">Configuration</text>
+      <text lang="DE">Konfiguration</text>
+      <text lang="DK">Konfiguration</text>
+      <text lang="IS">Stillingar</text>
+      <text lang="NL">Instellingen</text>
+      <text lang="PT">Configurações</text>
+      <text lang="SV">Inställningar</text>
+      <text lang="JA">設定</text>
+      <text lang="FI">Asetukset</text>
+      <text lang="ZH_TW">設定</text>
+      <text lang="SI">Nastavitve</text>
+      <text lang="ET">Seaded</text>
+      <text lang="NB">Innstillinger</text>
+      <action>MENU main_settings.xml</action>
    </button>
 
 </mythmenu>

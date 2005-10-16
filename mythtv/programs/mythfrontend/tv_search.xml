@@ -4,13 +4,17 @@
       <type>TV_SEARCH_TITLES</type>
       <text>Titles</text>
       <text lang="DE">nach Titel</text>
+      <text lang="IS">Titlar</text>
       <text lang="SV">Titel</text>
       <text lang="JA">タイトル</text>
       <text lang="NL">Titels</text>
       <text lang="FR">Titres</text>
       <text lang="FI">Nimikkeet</text>
       <text lang="ZH_TW">標題</text>
-      <text lang="ES">Títulos</text>
+      <text lang="SI">Naslovi</text>
+      <text lang="ET">Pealkirjad</text>
+      <text lang="NB">Titler</text>
+      <text lang="DK">Titler</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -18,13 +22,17 @@
       <type>TV_SEARCH_KEYWORDS</type>
       <text>Keywords</text>
       <text lang="DE">nach Inhalt</text>
+      <text lang="IS">Leitarorð</text>
       <text lang="FR">Mots clefs</text>
       <text lang="SV">Nyckelord</text>
       <text lang="NL">Beschrijving</text>      
       <text lang="JA">キーワード</text>
       <text lang="FI">Avainsanat</text>
       <text lang="ZH_TW">關鍵字</text>
-      <text lang="ES">Claves</text>
+      <text lang="SI">Ključne besede</text>
+      <text lang="ET">Võtmesõnad</text>
+      <text lang="NB">Nøkkelord</text>
+      <text lang="DK">Nøgleord</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -36,8 +44,12 @@
       <text lang="FR">Personnes</text>
       <text lang="JA">人</text>
       <text lang="DE">nach Personen</text>
+      <text lang="IS">Manneskjum</text>
       <text lang="FI">Ihmiset</text>
-      <text lang="ES">Personas</text>
+      <text lang="SI">Osebe</text>
+      <text lang="ET">Inimesed</text>
+      <text lang="NB">Personer</text>
+      <text lang="DK">Personer</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -46,12 +58,17 @@
       <text>Advanced</text>
       <text lang="SV">Avancerad</text>
       <text lang="NL">Geavanceer</text>      
+      <text lang="IS">Frekari</text>
       <text lang="FR">Avancée</text>
       <text lang="JA">アドバンスト</text>
       <text lang="DE">Erweiterte Suche</text>
       <text lang="FI">Lisävalinnat</text>
-      <text lang="ES">Avanzada</text>
+      <text lang="SI">Napredno</text>
+      <text lang="ET">Muud valikud</text>
+      <text lang="NB">Avansert</text>
+      <text lang="DK">Super Søgning</text>
       <alttext lang="DE">Erweitert</alttext>
+      <alttext lang="ET">Muud</alttext>
       <action>TV_SEARCH_POWER</action>
    </button>
 

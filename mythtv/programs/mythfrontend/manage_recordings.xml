@@ -10,11 +10,15 @@
       <text lang="FR">Programmer des enregistrements</text>
       <text lang="DE">Aufnahmen planen</text>
       <text lang="DK">Optag udsendelse</text>
+      <text lang="IS">Stilla upptöku</text>
       <text lang="PT">Gravação Programada</text>
       <text lang="SV">Schemalägg inspelningar</text>
       <text lang="JA">録画予約</text>
       <text lang="FI">Ajasta Nauhoituksia</text>
       <text lang="ZH_TW">預設錄影</text>
+      <text lang="SI">Planiranje snemanj</text>
+      <text lang="ET">Planeeri salvestamisi</text>
+      <text lang="NB">Planlegg opptak</text>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -22,13 +26,17 @@
       <type>TV_RECPRIORITIES</type>
       <text>Set Priorities</text>
       <text lang="DE">Prioritäten</text>
+      <text lang="IS">Setja forgang</text>
       <text lang="FR">Fixer les priorités</text>
       <text lang="NL">Prioriteiten</text>
       <text lang="SV">Prioriteter</text>
       <text lang="JA">録画優先順位</text>
       <text lang="FI">Aseta Prioriteetteja</text>
       <text lang="ZH_TW">錄影優先次序</text>
-      <text lang="ES">Fijar Prioridades</text>
+      <text lang="SI">Nastavitve prioritet</text>
+      <text lang="ET">Muuda prioriteete</text>
+      <text lang="NB">Sett prioriteter</text>
+      <text lang="DK">Prioriteter</text>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -41,12 +49,16 @@
       <text lang="NL">Geplande Opnames</text>
       <text lang="FR">Gestion des conflits</text>
       <text lang="DE">Aufnahmeplan</text>
-      <text lang="DK">Løs optagelseskonflikter</text>
+      <text lang="DK">Planlagte optagelser</text>
+      <text lang="IS">Komandi upptökur</text>
       <text lang="PT">Resolver Conflitos</text>
       <text lang="SV">Kommande inspelningar</text>
       <text lang="JA">予約衝突修正</text>
       <text lang="FI">Tulevat Nauhoitukset</text>
       <text lang="ZH_TW">修正預設錄影衝突</text>
+      <text lang="SI">Prihajajoča snemanja</text>
+      <text lang="ET">Tulevased salvestamised</text>
+      <text lang="NB">Planlagte opptak</text>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
@@ -60,11 +72,15 @@
       <text lang="FR">Supprimer des enregistrements</text>
       <text lang="DE">Löschen</text>
       <text lang="DK">Slet optagelser</text>
+      <text lang="IS">Eyða upptöku</text>
       <text lang="PT">Apagar Gravações</text>
       <text lang="SV">Radera inspelningar</text>
       <text lang="JA">録画削除</text>
       <text lang="FI">Poista Nauhoituksia</text>
       <text lang="ZH_TW">刪除錄影</text>
+      <text lang="SI">Brisanje snemanj</text>
+      <text lang="ET">Kustuta salvestusi</text>
+      <text lang="NB">Slett opptak</text>
       <action>TV_DELETE</action>
    </button>
 
@@ -74,11 +90,15 @@
       <text lang="SV">Föregående</text>
       <text lang="JA">以前の録画</text>
       <text lang="DE">Alte Aufnahmen</text>
+      <text lang="IS">Fyrri upptökur</text>
       <text lang="NL">Vorige Opnames</text>      
       <text lang="FR">Anciens enregistrements</text>
       <text lang="FI">Aiemmin Nauhoitetut</text>
       <text lang="ZH_TW">以前的錄影</text>
-      <text lang="ES">Grabados Anteriormente</text>
+      <text lang="SI">Že posneto</text>
+      <text lang="ET">Varem salvestatud</text>
+      <text lang="NB">Tatt opp tidligere</text>
+      <text lang="NB">Tidligere optagelser</text>
       <action>TV_PREVIOUS</action>
    </button>
 

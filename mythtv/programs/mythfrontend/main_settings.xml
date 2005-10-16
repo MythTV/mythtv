@@ -4,17 +4,21 @@
       <type>SETTINGS_GENERAL</type>
       <text>General</text>
       <text lang="IT">Generale</text>
-      <text lang="ES">Configurar General</text>
+      <text lang="ES">General</text>
       <text lang="CA">General</text>
       <text lang="FR">Général</text>
       <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Generelt</text>
+      <text lang="IS">Almennt</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generellt</text>
       <text lang="JA">全般</text>
       <text lang="FI">Yleiset</text>
       <text lang="ZH_TW">一般設定</text>
+      <text lang="SI">Splošno</text>
+      <text lang="ET">Üldine</text>
+      <text lang="NB">Generelt</text>
       <action>SETTINGS MAINGENERAL</action>
    </button>
 
@@ -22,17 +26,21 @@
       <type>SETTINGS_APPEARANCE</type>
       <text>Appearance</text>
       <text lang="IT">Aspetto</text>
-      <text lang="ES">Configurar Aspecto</text>
+      <text lang="ES">Aspecto</text>
       <text lang="CA">Aspecte</text>
       <text lang="FR">Apparence</text>
       <text lang="DE">Erscheinungsbild</text>
       <text lang="DK">Udseende</text>
+      <text lang="IS">Útlit</text>
       <text lang="NL">Uiterlijk</text>
       <text lang="PT">Configurar Aparência</text>
       <text lang="SV">Utseende</text>
       <text lang="JA">画面表示</text>
       <text lang="FI">Näkymä</text>
       <text lang="ZH_TW">外觀設定</text>
+      <text lang="SI">Vzgled</text>
+      <text lang="ET">Kujundus</text>
+      <text lang="NB">Utseende</text>
       <action>SETTINGS APPEARANCE</action>
    </button>
 
@@ -43,10 +51,14 @@
      <text lang="SV">TV</text>
      <text lang="NL">TV</text>     
      <text lang="FR">Configuration TV</text>
+     <text lang="IS">Stillingar sjónvarps</text>
      <text lang="JA">TV設定</text>
      <text lang="FI">TV:n Asetukset</text>
      <text lang="ZH_TW">電視設定</text>
-     <text lang="ES">Configurar TV</text>
+     <text lang="SI">TV nastavitve</text>
+     <text lang="ET">TV seaded</text>
+     <text lang="NB">TV</text>
+     <text lang="DK">TV</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -57,10 +69,14 @@
      <text lang="SV">Media</text>
      <text lang="NL">Media</text>
      <text lang="FR">Configuration multimédia</text>
+     <text lang="IS">Stillingar margmiðlunar</text>
      <text lang="JA">メディア設定</text>
      <text lang="FI">Media</text>
      <text lang="ZH_TW">媒體設定</text>
-     <text lang="ES">Configurar Medios</text>
+     <text lang="SI">Media nastavitve</text>
+     <text lang="ET">Andmekandja seaded</text>
+     <text lang="NB">Media</text>
+     <text lang="DK">Media</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
    </button>
@@ -71,11 +87,15 @@
      <text lang="DE">Informationszentrale</text>
      <text lang="NL">Informatiecentrale</text>     
      <text lang="FR">Configuration centre d'informations</text>
+     <text lang="IS">Stillingar upplýsinga- miðstöðvar</text>
      <text lang="SV">Informationscenter</text>
      <text lang="JA">インフォセンター設定</text>
      <text lang="FI">Tiedoteasetukset</text>
      <text lang="ZH_TW">資訊中心設定</text>
-     <text lang="ES">Configurar Información</text>
+     <text lang="SI">Nastavitve info centra</text>
+     <text lang="ET">Infokeskuse seaded</text>
+     <text lang="NB">Informasjonssenter</text>
+     <text lang="DK">Informationscenter</text>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends> 
    </button>
@@ -88,11 +108,16 @@
      <text lang="ES">Configurar XBox</text>
      <text lang="FR">Configuration XBox</text>
      <text lang="DE">Xbox</text>
+     <text lang="IS">Stillingar Xbox</text>
      <text lang="NL">Xbox Instellingen</text>
      <text lang="SV">Xbox</text>
      <text lang="JA">XBox設定</text>
      <text lang="FI">Xbox Asetukset</text>
      <text lang="ZH_TW">XBox設定</text>
+     <text lang="SI">Xbox nastavitve</text>
+     <text lang="ET">Xbox-i seaded</text>
+     <text lang="NB">X-Box</text>
+     <text lang="DK">X-Box</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>
@@ -102,10 +127,14 @@
       <text>Phone Settings</text>
       <text lang="FR">Configuration téléphone</text>
       <text lang="DE">Telefon</text>
+      <text lang="IS">Stillingar síma</text>
       <text lang="SV">Telefon</text>
       <text lang="NL">Telefoon Instellingen</text>      
       <text lang="FI">Puhelimen Asetukset</text>
-      <text lang="ES">Configurar Teléfono</text>
+      <text lang="SI">Nastavitve telefona</text>
+      <text lang="ET">Telefoni seaded</text>
+      <text lang="NB">Telefon</text>
+      <text lang="DK">Telefon</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

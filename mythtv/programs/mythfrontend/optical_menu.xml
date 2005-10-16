@@ -5,6 +5,7 @@
       <text>Play DVD</text>
       <text lang="DK">Afspil DVD</text>
       <text lang="PT">Tocar DVD</text>
+      <text lang="IS">Spila DVD</text>
       <text lang="DE">DVD abspielen</text>
       <text lang="SV">Spela DVD</text>
       <text lang="ES">Ver DVD</text>
@@ -14,6 +15,9 @@
       <text lang="JA">DVD再生</text>
       <text lang="FI">Toista DVD</text>
       <text lang="ZH_TW">播放DVD</text>
+      <text lang="SI">Predvajaj DVD</text>
+      <text lang="ET">Näita DVD-d</text>
+      <text lang="NB">Se på DVD</text>
       <action>JUMP Play DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -24,6 +28,7 @@
       <text lang="DK">Afspil VCD</text>
       <text lang="PT">Tocar VCD</text>
       <text lang="DE">VCD abspielen</text>
+      <text lang="IS">Spila VCD</text>
       <text lang="SV">Spela VCD</text>
       <text lang="ES">Ver VCD</text>
       <text lang="CA">Veure VCD</text>
@@ -32,6 +37,9 @@
       <text lang="JA">VCD再生</text>
       <text lang="FI">Toista VCD</text>
       <text lang="ZH_TW">播放VCD</text>
+      <text lang="SI">Predvajaj VCD</text>
+      <text lang="ET">Näita VCD-d</text>
+      <text lang="NB">Se på VCD</text>
       <action>JUMP Play VCD</action>
       <depends>mythdvd</depends>
    </button>
@@ -44,6 +52,7 @@
       <text lang="CA">Importar DVD</text>
       <text lang="DE">DVD importieren</text>
       <text lang="DK">Importér DVD</text>
+      <text lang="IS">Hlaða inn DVD</text>
       <text lang="NL">DVD Importeren</text>
       <text lang="PT">Ler do DVD</text>
       <text lang="SV">Importera DVD</text>
@@ -51,6 +60,9 @@
       <text lang="JA">DVD取込</text>
       <text lang="FI">Tuo DVD</text>
       <text lang="ZH_TW">輸入DVD</text>
+      <text lang="SI">Ripanje DVD</text>
+      <text lang="ET">DVD rippimine</text>
+      <text lang="NB">Importer DVD</text>
       <action>JUMP Rip DVD</action>
       <depends>mythdvd</depends>
    </button>
@@ -63,6 +75,7 @@
       <text lang="CA">Importar CD</text>
       <text lang="DE">CD importieren</text>
       <text lang="DK">Importér CD</text>
+      <text lang="IS">Hlaða inn hljóðdisk</text>
       <text lang="NL">CD Importeren</text>
       <text lang="PT">Ler do CD</text>
       <text lang="SV">Importera CD</text>
@@ -70,6 +83,9 @@
       <text lang="JA">CD取込</text>
       <text lang="FI">Tuo CD</text>
       <text lang="ZH_TW">輸入音樂CD</text>
+      <text lang="SI">Ripanje CD</text>
+      <text lang="ET">CD rippimine</text>
+      <text lang="NB">Importer CD</text>
       <action>JUMP Rip CD</action>
       <depends>mythmusic</depends>
    </button>

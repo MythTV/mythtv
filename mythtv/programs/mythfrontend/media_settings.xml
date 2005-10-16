@@ -7,12 +7,16 @@
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
      <text lang="DK">Musik indstillinger</text>
+     <text lang="IS">Stillingar tónlistar</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>
      <text lang="SV">Musikinställningar</text>
      <text lang="JA">ミュージック設定</text>
      <text lang="FI">Musiikkiasetukset</text>
      <text lang="ZH_TW">音樂設定</text>
+     <text lang="SI">Glasbene nastavitve</text>
+     <text lang="ET">Muusika seaded</text>
+     <text lang="NB">Musikkinnstillinger</text>
      <action>CONFIGPLUGIN mythmusic</action>
      <depends>mythmusic</depends>
    </button>
@@ -20,17 +24,21 @@
    <button>
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>
-       <text lang="ES">Configurar Vídeos</text>
+       <text lang="ES">Configurar Videos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="FR">Configuration de la vidéo</text>
        <text lang="DE">Videos</text>
        <text lang="DK">Video indstillinger</text>
+       <text lang="IS">Stillingar kvikmynda</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
        <text lang="SV">Videoinställningar</text>
        <text lang="JA">ビデオ設定</text>
        <text lang="FI">Videoasetukset</text>
        <text lang="ZH_TW">電影設定</text>
+       <text lang="SI">Video nastavitve</text>
+       <text lang="ET">Video seaded</text>
+       <text lang="NB">Videoinnstillinger</text>
        <action>CONFIGPLUGIN mythvideo</action>
        <depends>mythvideo</depends>
    </button>
@@ -43,11 +51,15 @@
      <text lang="ES">Configurar DVD</text>
      <text lang="CA">Configurar DVD</text>
      <text lang="FR">Configuration des DVD</text>
+     <text lang="IS">Stillingar DVD</text>
      <text lang="NL">DVD Instellingen</text>
      <text lang="SV">DVD-inställningar</text>
      <text lang="JA">DVD設定</text>
      <text lang="FI">DVD Asetukset</text>
      <text lang="ZH_TW">DVD設定</text>
+     <text lang="SI">DVD nastavitve</text>
+     <text lang="ET">DVD seaded</text>
+     <text lang="NB">DVD-innstillinger</text>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -60,12 +72,16 @@
       <text lang="FR">Configuration des images</text>
       <text lang="DE">Bilder</text>
       <text lang="DK">Billed indstillinger</text>
+      <text lang="IS">Stillingar ljósmynda</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
       <text lang="SV">Galleriinställningar</text>
       <text lang="JA">イメージ設定</text>
       <text lang="FI">Kuva-asetukset</text>
       <text lang="ZH_TW">照相館設定</text>
+      <text lang="SI">Nastavitve slik</text>
+      <text lang="ET">Galerii seaded</text>
+      <text lang="NB">Bildeinnstillinger</text>
       <action>CONFIGPLUGIN mythgallery</action>
       <depends>mythgallery</depends>
    </button>
@@ -78,12 +94,16 @@
      <text lang="DE">Spiele</text>
      <text lang="FR">Configuration des jeux</text>
      <text lang="DK">Spil indstillinger</text>
+     <text lang="IS">Stillingar leikja</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
      <text lang="SV">Spelinställningar</text>
      <text lang="JA">ゲーム設定</text>
      <text lang="FI">Peliasetukset</text>
      <text lang="ZH_TW">遊戲設定</text>
+     <text lang="SI">Nastavitve iger</text>
+     <text lang="ET">Mängude seaded</text>
+     <text lang="NB">Spillinnstillinger</text>
      <action>CONFIGPLUGIN mythgame</action>
      <depends>mythgame</depends>
    </button>
@@ -94,9 +114,13 @@
      <text lang="SV">Radioinställningar</text>
      <text lang="JA">ラジオ設定</text>
      <text lang="DE">Radio</text>
+     <text lang="IS">Stillingar útvarps</text>
      <text lang="FR">Configuration de la radio</text>
      <text lang="FI">Radioasetukset</text>
-     <text lang="ES">Configurar Radio</text>
+     <text lang="SI">Radio nastavitve</text>
+     <text lang="ET">Raadio seaded</text>
+     <text lang="NB">Radioinnstillinger</text>
+     <text lang="DK">Radioindstillinger</text>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>
