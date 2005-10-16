@@ -148,18 +148,29 @@ static bool comp_overlap(ProgramInfo *a, ProgramInfo *b)
     return a->recordid < b->recordid;
 }
 
-static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
+static bool comp_redundant(ProgramInfo *a, ProgramInfo *b)
 {
-    if (a->recstartts != b->recstartts)
-        return a->recstartts < b->recstartts;
-    if (a->recendts != b->recendts)
-        return a->recendts < b->recendts;
+    if (a->startts != b->startts)
+        return a->startts < b->startts;
+    if (a->endts != b->endts)
+        return a->endts < b->endts;
 
     // Note: the PruneRedundants logic depends on the following
     if (a->title != b->title)
         return a->title < b->title;
     if (a->recordid != b->recordid)
         return a->recordid < b->recordid;
+    if (a->chansign != b->chansign)
+        return a->chansign < b->chansign;
+    return a->recstatus < b->recstatus;
+}
+
+static bool comp_recstart(ProgramInfo *a, ProgramInfo *b)
+{
+    if (a->recstartts != b->recstartts)
+        return a->recstartts < b->recstartts;
+    if (a->recendts != b->recendts)
+        return a->recendts < b->recendts;
     if (a->chansign != b->chansign)
         return a->chansign < b->chansign;
     return a->recstatus < b->recstatus;
@@ -254,9 +265,12 @@ bool Scheduler::FillRecordList(void)
     ClearListMaps();
 
     VERBOSE(VB_SCHEDULE, "Sort by time...");
-    reclist.sort(comp_recstart);
+    reclist.sort(comp_redundant);
     VERBOSE(VB_SCHEDULE, "PruneRedundants...");
     PruneRedundants();
+
+    VERBOSE(VB_SCHEDULE, "Sort by time...");
+    reclist.sort(comp_recstart);
 
     return hasconflicts;
 }
@@ -674,14 +688,16 @@ bool Scheduler::TryAnotherShowing(ProgramInfo *p)
         if (q->recstatus != rsEarlierShowing &&
             q->recstatus != rsLaterShowing)
             continue;
-        if (!p->IsSameProgram(*q))
-            continue;
-        if ((p->rectype == kSingleRecord || 
-             p->rectype == kOverrideRecord) && 
-            !p->IsSameTimeslot(*q))
-            continue;
-        if (q->recstartts < schedTime && p->recstartts >= schedTime)
-            continue;
+        if (!p->IsSameTimeslot(*q))
+        {
+            if (!p->IsSameProgram(*q))
+                continue;
+            if ((p->rectype == kSingleRecord || 
+                 p->rectype == kOverrideRecord))
+                continue;
+            if (q->recstartts < schedTime && p->recstartts >= schedTime)
+                continue;
+        }
 
         RecList &cardlist = cardlistmap[q->cardid];
         RecIter k = cardlist.begin();
@@ -1891,6 +1907,7 @@ void Scheduler::AddNewRecords(void)
 " LEFT JOIN oldfind ON "
 "  (oldfind.recordid = recordmatch.recordid AND "
 "   oldfind.findid = ") + progfindid + QString(") "
+" ORDER BY record.recordid DESC "
 );
 
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
