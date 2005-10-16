@@ -2697,13 +2697,13 @@ void TV::DoQueueTranscode(void)
             stop = true;
         else if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
                                         playbackinfo->chanid,
-                                        playbackinfo->startts))
+                                        playbackinfo->recstartts))
             stop = true;
         if (stop)
         {
             JobQueue::ChangeJobCmds(JOB_TRANSCODE,
                                     playbackinfo->chanid,
-                                    playbackinfo->startts, JOB_STOP);
+                                    playbackinfo->recstartts, JOB_STOP);
             queuedTranscode = false;
             if (activenvp == nvp && GetOSD())
                 GetOSD()->SetSettingsText(tr("Stopping Transcode"), 3);
@@ -2716,7 +2716,7 @@ void TV::DoQueueTranscode(void)
                 jobHost = playbackinfo->hostname;
 
             if (JobQueue::QueueJob(JOB_TRANSCODE,
-                               playbackinfo->chanid, playbackinfo->startts,
+                               playbackinfo->chanid, playbackinfo->recstartts,
                                jobHost, "", "", JOB_USE_CUTLIST))
             {
                 queuedTranscode = true;
