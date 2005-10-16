@@ -30,6 +30,7 @@ class QSqlDatabase;
 class QSqlQuery;
 class QSqlError;
 class QSocket;
+class QSocketDevice;
 class MythMainWindow;
 class MythPluginManager;
 class MediaMonitor;
@@ -174,7 +175,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20050712-1"
+#define MYTH_BINARY_VERSION "0.19.20051014-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -201,7 +202,9 @@ class MythContext : public QObject
     QString GetHostName(void);
 
     bool ConnectToMasterServer(void);
-    bool ConnectServer(const QString &hostname, int port);
+    QSocketDevice *ConnectServer(QSocket *eventSocket,
+                                 const QString &hostname,
+                                 int port);
     bool IsConnectedToMaster(void);
     void SetBackend(bool backend);
     bool IsBackend(void);

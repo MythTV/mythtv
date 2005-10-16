@@ -35,6 +35,7 @@ using namespace std;
 #include "scheduledrecording.h"
 #include "remoteutil.h"
 #include "lcddevice.h"
+#include "previewgenerator.h"
 
 static int comp_programid(ProgramInfo *a, ProgramInfo *b)
 {
@@ -81,53 +82,6 @@ static int comp_originalAirDate(ProgramInfo *a, ProgramInfo *b)
     else
         return 1;
 }
-
-class PreviewGenerator
-{
-  public:
-    PreviewGenerator(PlaybackBox *box, const ProgramInfo *pginfo)
-        : programInfo(*pginfo), playbackBox(box)
-    {
-        pthread_create(&previewThread, NULL, PreviewRun, this);
-        pthread_detach(previewThread);
-    }
-
-   ~PreviewGenerator()
-    {
-        QMutexLocker locker(&previewLock);
-        const QString filename = programInfo.pathname + ".png";
-        if (playbackBox)
-            playbackBox->SetPreviewGenerator(filename, NULL);
-    }
-
-    void SetPlaybackBox(PlaybackBox *box)
-    {
-        QMutexLocker locker(&previewLock);
-        playbackBox = box;
-    }
-
-    static void *PreviewGenerator::PreviewRun(void *param)
-    {
-        PreviewGenerator *gen = (PreviewGenerator*) param;
-
-        RemoteGeneratePreviewPixmap(&(gen->programInfo));
-
-        {
-            QString fn = gen->programInfo.pathname + ".png";
-            QMutexLocker locker(&(gen->previewLock));
-            if (gen->playbackBox)
-                gen->playbackBox->previewReady(&(gen->programInfo));
-        }
-        delete gen;
-        return NULL;
-    }
-
-  private:
-    QMutex             previewLock;
-    pthread_t          previewThread;
-    ProgramInfo        programInfo;
-    PlaybackBox       *playbackBox;
-};
 
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
                          const char *name)
@@ -334,7 +288,7 @@ PlaybackBox::~PlaybackBox(void)
     for (;it != previewGenerator.end(); ++it)
     {
         if (*it)
-            (*it)->SetPlaybackBox(NULL);
+            (*it)->disconnect();
     }
 }
 
@@ -3369,7 +3323,14 @@ void PlaybackBox::SetPreviewGenerator(const QString &fn, PreviewGenerator *g)
 {
     QMutexLocker locker(&previewGeneratorLock);
     if (g)
+    {
         previewGenerator[fn] = g;
+        connect(g,    SIGNAL(previewThreadDone(const QString&)),
+                this, SLOT(  previewThreadDone(const QString&)));
+        connect(g,    SIGNAL(previewReady(const ProgramInfo*)),
+                this, SLOT(  previewReady(const ProgramInfo*)));
+        g->Start();
+    }
     else
         previewGenerator.erase(fn);
 }
@@ -3400,11 +3361,10 @@ void PlaybackBox::previewReady(const ProgramInfo *pginfo)
         pginfo->chanid      == previewChanid  &&
         previewLastModified == previewFilets)
     {
-        QPixmap *pix = previewPixmap;
-
         // lock QApplication so that we don't remove pixmap
         // from under a running paint event.
         qApp->lock();
+        QPixmap *pix = previewPixmap;
         previewPixmap = NULL;
         qApp->unlock();
 
@@ -3478,7 +3438,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     // If the image is not available remotely either, we need to generate it.
     if (!image && !IsGeneratingPreview(filename))
-        SetPreviewGenerator(filename, new PreviewGenerator(this, pginfo));
+        SetPreviewGenerator(filename, new PreviewGenerator(pginfo));
 
     if (image)
     {

@@ -736,14 +736,16 @@ bool MythContext::ConnectToMasterServer(void)
 {
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
-    return ConnectServer(server, port);
+    if (!d->serverSock)
+        d->serverSock = ConnectServer(d->eventSock, server, port);
+    return (bool) (d->serverSock);
 }
 
-bool MythContext::ConnectServer(const QString &hostname, int port)
+QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
+                                          const QString &hostname,
+                                          int port)
 {
-    if (d->serverSock)
-        return true;
-
+    QSocketDevice *serverSock = NULL;
     int cnt = 0;
 
     int sleepTime = GetNumSetting("WOLbackendReconnectWaitTime", 0);
@@ -756,12 +758,12 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
                                     .arg(hostname).arg(port).arg(cnt+1)
                                     .arg(maxConnTry));
 
-        d->serverSock = new QSocketDevice(QSocketDevice::Stream);
+        serverSock = new QSocketDevice(QSocketDevice::Stream);
 
-        if (!connectSocket(d->serverSock, hostname, port))
+        if (!connectSocket(serverSock, hostname, port))
         {
-            delete d->serverSock;
-            d->serverSock = NULL;
+            delete serverSock;
+            serverSock = NULL;
         
             // only inform the user of a failure if WOL is disabled 
             if (sleepTime <= 0)
@@ -807,27 +809,28 @@ bool MythContext::ConnectServer(const QString &hostname, int port)
     while (cnt <= maxConnTry);
 
 #ifdef IGNORE_PROTO_VER_MISMATCH
-    if (!CheckProtoVersion(d->serverSock))
+    if (!CheckProtoVersion(serverSock))
     {
-        delete d->serverSock;
-        d->serverSock = NULL;
+        delete serverSock;
+        serverSock = NULL;
         return false;
     }
 #endif
 
-    if (d->serverSock)
+    if (serverSock)
     {
         // called with the lock
         QString str = QString("ANN Playback %1 %2")
             .arg(d->m_localhostname).arg(false);
         QStringList strlist = str;
-        WriteStringList(d->serverSock, strlist);
-        ReadStringList(d->serverSock, strlist, true);
+        WriteStringList(serverSock, strlist);
+        ReadStringList(serverSock, strlist, true);
 
-        if (d->eventSock->state() == QSocket::Idle)    
-            d->eventSock->connectToHost(hostname, port);
+        if (eventSock &&
+            eventSock->state() == QSocket::Idle)    
+            eventSock->connectToHost(hostname, port);
     }
-    return (bool)(d->serverSock);
+    return serverSock;
 }
 
 bool MythContext::IsConnectedToMaster(void)

@@ -299,6 +299,10 @@ using_backend {
 
 # Files used by frontend and backend.
 using_frontend:HEADERS *= channeleditor.h   channelsettings.h
+using_frontend:HEADERS *= previewgenerator.h
 using_frontend:SOURCES *= channeleditor.cpp channelsettings.cpp
+using_frontend:SOURCES *= previewgenerator.cpp
 using_backend:HEADERS  *= channeleditor.h   channelsettings.h
+using_backend:HEADERS  *= previewgenerator.h
 using_backend:SOURCES  *= channeleditor.cpp channelsettings.cpp
+using_backend:SOURCES  *= previewgenerator.cpp

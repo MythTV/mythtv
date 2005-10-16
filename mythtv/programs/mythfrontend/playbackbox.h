@@ -29,7 +29,6 @@ class LayerSet;
 
 class PlaybackBox : public MythDialog
 {
-    friend class PreviewGenerator;
     Q_OBJECT
   public:
     typedef enum { Play, Delete } BoxType;
@@ -139,13 +138,16 @@ class PlaybackBox : public MythDialog
     void doPlayList(void);
     void showViewChanger(void);
 
+    void previewThreadDone(const QString &fn)
+        { SetPreviewGenerator(fn, NULL); }
+    void previewReady(const ProgramInfo *pginfo);
+
   protected:
     void paintEvent(QPaintEvent *);
     void keyPressEvent(QKeyEvent *e);
 
     void SetPreviewGenerator(const QString &fn, PreviewGenerator *g);
     bool IsGeneratingPreview(const QString &fn) const;
-    void previewReady(const ProgramInfo *pginfo);
 
   private:
     bool FillList(void);
