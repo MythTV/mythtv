@@ -262,8 +262,8 @@ void ViewScheduled::FillList(void)
     {
         if ((p->recendts >= now || p->endts >= now) && 
             (showAll || p->recstatus <= rsWillRecord || 
-             (p->recstatus > rsEarlierShowing && 
-              p->recstatus != rsRepeat)))
+             p->recstatus == rsDontRecord ||
+             (p->recstatus > rsEarlierShowing && p->recstatus != rsRepeat)))
             p = recList.next();
         else
         {
@@ -355,8 +355,9 @@ void ViewScheduled::updateList(QPainter *p)
                     ltype->EnableForcedFont(i, "conflictingrecording");
                 else if (p->recstatus == rsWillRecord)
                     ltype->EnableForcedFont(i, "record");
-                else if (p->recstatus <= rsEarlierShowing ||
-                         p->recstatus == rsRepeat)
+                else if (p->recstatus == rsRepeat ||
+                         (p->recstatus != rsDontRecord &&
+                          p->recstatus <= rsEarlierShowing))
                     ltype->EnableForcedFont(i, "disabledrecording"); 
             }
         }
