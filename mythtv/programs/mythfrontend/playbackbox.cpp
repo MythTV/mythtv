@@ -3777,10 +3777,11 @@ void PlaybackBox::showViewChanger(void)
 
 void PlaybackBox::showRecGroupChooser(void)
 {
-    if (!expectingPopup)
-        return;
-
-    cancelPopup();
+    // This is contrary to other code because the option to display this
+    // box when starting the Playbackbox means expectingPopup will not be
+    // set, nor is there a popup to be canceled as is normally the case
+    if (expectingPopup)
+       cancelPopup();
 
     initRecGroupPopup(tr("Select Group Filter"), "showRecGroupChooser");
 
