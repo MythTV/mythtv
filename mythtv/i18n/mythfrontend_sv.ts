@@ -63,33 +63,6 @@
     </message>
 </context>
 <context>
-    <name>CaptureCard</name>
-    <message>
-        <source>You have to save the current card before configuring it, would you like to do this now?</source>
-        <translation type="obsolete">Du måste spara det nuvarande kortet innan du kan konfigurera det, vill du göra det nu?</translation>
-    </message>
-    <message>
-        <source>Yes, save now</source>
-        <translation type="obsolete">Ja, spara nu</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">Nej, låt bli</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Avancerad konfiguration</translation>
-    </message>
-    <message>
-        <source>Recording Options</source>
-        <translation type="obsolete">Inspelningsinställningar</translation>
-    </message>
-    <message>
-        <source>Diseqc</source>
-        <translation type="obsolete">DiSEqC</translation>
-    </message>
-</context>
-<context>
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture cards</source>
@@ -126,6 +99,29 @@
     <message>
         <source>Yes, delete capture cards</source>
         <translation>Ja, ta bort TV-kort</translation>
+    </message>
+</context>
+<context>
+    <name>CardInput</name>
+    <message>
+        <source>Scan for channels</source>
+        <translation>Sök efter kanaler</translation>
+    </message>
+    <message>
+        <source>Use channel scanner to find channels for this input.</source>
+        <translation>Använd kanalsökare för att hitta kanaler för denna ingång.</translation>
+    </message>
+    <message>
+        <source>Fetch channels from listings source</source>
+        <translation>Hämta kanaler från listkälla</translation>
+    </message>
+    <message>
+        <source>This uses the listings data source to provide the channels for this input.</source>
+        <translation>Använd programlistkällan för att hämta kanalerna för denna ingång.</translation>
+    </message>
+    <message>
+        <source>This can take a long time to run.</source>
+        <translation>Detta kan ta lång tid att köra.</translation>
     </message>
 </context>
 <context>
@@ -325,11 +321,11 @@
     <name>DTVSignalMonitor</name>
     <message>
         <source>Seen</source>
-        <translation type="unfinished"></translation>
+        <translation>Sedd</translation>
     </message>
     <message>
         <source>Matching</source>
-        <translation type="unfinished"></translation>
+        <translation>Matchar</translation>
     </message>
 </context>
 <context>
@@ -562,24 +558,8 @@
 <context>
     <name>MythImageFileDialog</name>
     <message>
-        <source>The theme you are using is missing &apos;file_browser_background&apos; element. 
-
-Returning to previous menu.</source>
-        <translation type="obsolete">Temat du använder saknar &apos;file_browser_background&apos;-elementet.
-
-Återvänder till föregående meny.</translation>
-    </message>
-    <message>
         <source>Missing UI Element</source>
         <translation>UI-element saknas</translation>
-    </message>
-    <message>
-        <source>The theme you are using is missing &apos;file_browser&apos; element. 
-
-Returning to previous menu.</source>
-        <translation type="obsolete">Temat du använder saknar &apos;file_browser&apos;-elementet.
-
-Återvänder till föregående meny.</translation>
     </message>
     <message>
         <source>The theme you are using is missing the &apos;file_browser_background&apos; element. 
@@ -622,14 +602,6 @@ Returning to the previous menu.</source>
 </context>
 <context>
     <name>MythThemedDialog</name>
-    <message>
-        <source>Could not locate &apos;%1&apos; in theme &apos;%2&apos;
-
-Returning to previous menu.</source>
-        <translation type="obsolete">Hittade inte &apos;%1&apos; i tema &apos;%2&apos;
-
-Återvänder till föregående meny.</translation>
-    </message>
     <message>
         <source>Missing UI Element</source>
         <translation>UI-element saknas</translation>
@@ -783,10 +755,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Edit Recording Schedule</source>
         <translation>Ändra inspelningsschema</translation>
-    </message>
-    <message>
-        <source>Recording Group View</source>
-        <translation type="obsolete">Inspelningsgruppsvy</translation>
     </message>
     <message>
         <source>OK</source>
@@ -959,10 +927,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Save it so I can watch it again</source>
         <translation>Spara så att jag kan se den igen</translation>
-    </message>
-    <message>
-        <source>Group</source>
-        <translation type="obsolete">Grupp</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -1586,10 +1550,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Language</source>
         <translation>Språk</translation>
-    </message>
-    <message>
-        <source>Your preferred language.</source>
-        <translation type="obsolete">Det språk som skall användas.</translation>
     </message>
     <message>
         <source>Setup Pin Code</source>
@@ -2390,14 +2350,6 @@ Returning to the previous menu.</source>
         <translation>Inställningar för hårdvaruavkodning</translation>
     </message>
     <message>
-        <source>Deleted</source>
-        <translation type="obsolete">Borttagen</translation>
-    </message>
-    <message>
-        <source>Stopped</source>
-        <translation type="obsolete">Stoppad</translation>
-    </message>
-    <message>
         <source>Recorded</source>
         <translation>Inspelad</translation>
     </message>
@@ -2434,14 +2386,6 @@ Returning to the previous menu.</source>
         <translation>Denna visning spelades in.</translation>
     </message>
     <message>
-        <source>This showing was recorded but was stopped before recording was completed.</source>
-        <translation type="obsolete">Denna visning spelades in men stoppades innan den var färdiginspelad.</translation>
-    </message>
-    <message>
-        <source>This showing was recorded but was deleted before recording was completed.</source>
-        <translation type="obsolete">Denna visning spelades in men togs bort innan inspelningen var slutförd.</translation>
-    </message>
-    <message>
         <source>The status of this showing is unknown.</source>
         <translation>Statusen för denna visning är okänd.</translation>
     </message>
@@ -2468,10 +2412,6 @@ Returning to the previous menu.</source>
     <message>
         <source>too many recordings of this program have already been recorded.</source>
         <translation>för många inspelningar av detta program redan gjorts.</translation>
-    </message>
-    <message>
-        <source>it was manually cancelled.</source>
-        <translation type="obsolete">den avbröts manuellt.</translation>
     </message>
     <message>
         <source>there wasn&apos;t enough disk space available.</source>
@@ -2576,10 +2516,6 @@ Returning to the previous menu.</source>
     <message>
         <source>XMLTV ID</source>
         <translation>XMLTV-ID</translation>
-    </message>
-    <message>
-        <source>Frequency ID</source>
-        <translation type="obsolete">Frekvens-ID</translation>
     </message>
     <message>
         <source>Finetune</source>
@@ -2737,16 +2673,8 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Ändra korttypen till lämplig typ för det TV-kort du konfigurerar.</translation>
     </message>
     <message>
-        <source>Standard V4L capture card</source>
-        <translation>Standard V4L TV-kort</translation>
-    </message>
-    <message>
         <source>MJPEG capture card (Matrox G200, DC10)</source>
         <translation>MJPEG TV-kort (Matrox G200, DC10)</translation>
-    </message>
-    <message>
-        <source>Digital Video Broadcast card (DVB)</source>
-        <translation>Digital Video Broadcast-kort (DVB)</translation>
     </message>
     <message>
         <source>(New capture card)</source>
@@ -2759,18 +2687,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>ERROR, No inputs found</source>
         <translation>FEL, inga ingångar hittade</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation type="obsolete">Signal/Brus</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation type="obsolete">Signalstyrka</translation>
-    </message>
-    <message>
-        <source>Advanced Configuration</source>
-        <translation type="obsolete">Avancerad konfiguration</translation>
     </message>
     <message>
         <source>XMLTV listings grabber</source>
@@ -2849,20 +2765,12 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Kortnamn</translation>
     </message>
     <message>
-        <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
-        <translation type="obsolete">Normalt börjar inte inspelning från DVB förrän en startrubrik hittas. Denna inställning avaktiverar detta.</translation>
-    </message>
-    <message>
         <source>Per PID driver buffer size</source>
         <translation>Bufferstorlek per PID</translation>
     </message>
     <message>
         <source>Packet buffer</source>
         <translation>Paketbuffer</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation type="obsolete">Status</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
@@ -2903,10 +2811,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Starting channel</source>
         <translation>Startkanal</translation>
-    </message>
-    <message>
-        <source>LiveTV will change to the above channel when the input is first selected.</source>
-        <translation>TV-läge kommer att ändra till denna kanal när denna ingång väljs.</translation>
     </message>
     <message>
         <source>Connect source to input</source>
@@ -3003,10 +2907,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
         <translation>Hur full TV-lägesbufferten tillåts växa innan pausningen upphävs.</translation>
-    </message>
-    <message>
-        <source>Save original files after transcoding</source>
-        <translation type="obsolete">Behåll originalfilerna efter omkodning</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
@@ -3485,30 +3385,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Knapptryckningsprogram</translation>
     </message>
     <message>
-        <source>LCD Displays Time</source>
-        <translation type="obsolete">LCD visar klocka</translation>
-    </message>
-    <message>
-        <source>LCD Displays Menus</source>
-        <translation type="obsolete">LCD visar menyer</translation>
-    </message>
-    <message>
-        <source>LCD Displays Music Artist and Title</source>
-        <translation type="obsolete">LCD visar låtinformation</translation>
-    </message>
-    <message>
-        <source>LCD Displays Channel Information</source>
-        <translation type="obsolete">LCD visar kanalinformation</translation>
-    </message>
-    <message>
-        <source>LCD Displays Volume Information</source>
-        <translation type="obsolete">LCD visar volyminformation</translation>
-    </message>
-    <message>
-        <source>LCD Displays Generic Information</source>
-        <translation type="obsolete">LCD visar allmän information</translation>
-    </message>
-    <message>
         <source>LCD device display</source>
         <translation>LCD-display</translation>
     </message>
@@ -3715,10 +3591,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Video Mode Settings</source>
         <translation>Videolägesinställningar</translation>
-    </message>
-    <message>
-        <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for frontend</source>
-        <translation type="obsolete">Ett kommando som ska exekveras innan inspelningsservern stängs ner. Returvärdet avgör om nedstängningen ska fortsätta: 0 - ja, 1 - försök senare, 2 - vänta på uppspelningsklient</translation>
     </message>
     <message>
         <source>Startup command</source>
@@ -3942,7 +3814,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>If set, MythTV will act like a commercial begins this many seconds early.  This can be useful when commercial notification is used in place of automatic skipping.</source>
-        <translation type="unfinished">Meddela om reklam så här många sekunder innan då &quot;Meddela, men hoppa inte&quot; används.</translation>
+        <translation>Meddela om reklam så här många sekunder innan då &quot;Meddela, men hoppa inte&quot; används.</translation>
     </message>
     <message>
         <source>When enabled, any newly recorded programs will be marked as eligible for Auto-Expiration. Existing recordings will keep their current value.</source>
@@ -4183,10 +4055,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>This starts the program guide immediately upon starting to watch Live TV.</source>
         <translation>Detta visar programguiden direkt när TV-läget startas.</translation>
-    </message>
-    <message>
-        <source>LCD Backlight Always On</source>
-        <translation type="obsolete">LCD-bakgrundsbelysning alltid på</translation>
     </message>
     <message>
         <source>Directed By</source>
@@ -4605,10 +4473,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Avancerad sökning</translation>
     </message>
     <message>
-        <source>Re-record programs which have been automatically expired</source>
-        <translation type="obsolete">Återinspela program som har tagits bort automatiskt</translation>
-    </message>
-    <message>
         <source>Scale video as necessary</source>
         <translation>Skala video vid behov</translation>
     </message>
@@ -4867,18 +4731,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>och inspelningsservern</translation>
     </message>
     <message>
-        <source>Would you like to clear all capture card settings before starting configuration?</source>
-        <translation type="obsolete">Vill du rensa alla TV-kortsinställningar innan konfigurationen fortsätter?</translation>
-    </message>
-    <message>
-        <source>No, leave my card settings alone</source>
-        <translation type="obsolete">Nej, lämna mina TV-kortsinställningar som de är</translation>
-    </message>
-    <message>
-        <source>Yes, delete my card settings</source>
-        <translation type="obsolete">Ja, ta bort mina TV-kortsinställningar</translation>
-    </message>
-    <message>
         <source>Use custom identifier for frontend preferences</source>
         <translation>Använd egen id för uppspelningsklientinställningar</translation>
     </message>
@@ -5007,18 +4859,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Inspelningsvärd</translation>
     </message>
     <message>
-        <source>Would you like to clear all program data and channel settings before starting configuration? This will not affect any existing recordings.</source>
-        <translation type="obsolete">Vill du rensa alla program och kanalinställningar innan konfigurationen fortsätter? Detta kommer inte att påverka befintliga inspelningar.</translation>
-    </message>
-    <message>
-        <source>No, leave my channel settings alone</source>
-        <translation type="obsolete">Nej, lämna mina kanalinställningar som de är</translation>
-    </message>
-    <message>
-        <source>Yes, delete my channel settings</source>
-        <translation type="obsolete">Ja, ta bort mina kanalinställningar</translation>
-    </message>
-    <message>
         <source>Record one showing of this title</source>
         <translation>Spela in en visning av denna titel</translation>
     </message>
@@ -5099,10 +4939,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Spela in en visning av denna titel varje dag</translation>
     </message>
     <message>
-        <source>pcHDTV capture card (HD-2000, HD-3000)</source>
-        <translation>pcHDTV-kort (HD-2000, HD-3000)</translation>
-    </message>
-    <message>
         <source>4/3</source>
         <translation>4/3</translation>
     </message>
@@ -5135,22 +4971,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Använd libmpeg2 för avkodning</translation>
     </message>
     <message>
-        <source>Scan for channels(s)</source>
-        <translation type="obsolete">Sök efter kanaler</translation>
-    </message>
-    <message>
-        <source>This button will scan for digital channels.</source>
-        <translation type="obsolete">Denna knapp söker efter digitala kanaler.</translation>
-    </message>
-    <message>
-        <source>Advanced</source>
-        <translation type="obsolete">Avancerat</translation>
-    </message>
-    <message>
-        <source>Advanced editing options for digital channels</source>
-        <translation type="obsolete">Avancerade inställningar för digitala kanaler</translation>
-    </message>
-    <message>
         <source>Use on air guide</source>
         <translation>Använd programguide</translation>
     </message>
@@ -5173,14 +4993,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>This recording schedule is active</source>
         <translation>Detta inspelningsschema är aktivt</translation>
-    </message>
-    <message>
-        <source>Record in TS format instead of PS.</source>
-        <translation type="obsolete">Spela in i TS-format i stället för PS.</translation>
-    </message>
-    <message>
-        <source>Disables Transport Stream to Program Stream conversion. TS recording results in slightly bigger files, but reduces the risk for processing errors.</source>
-        <translation type="obsolete">Avaktiverar konvertering av transportström (TS) till programström (PS) vilket resulterar i något större filer men minskar risken för bearbetningsfel.</translation>
     </message>
     <message>
         <source>DiSEqC Input Type: (DVB-S)</source>
@@ -5308,16 +5120,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Ö</translation>
     </message>
     <message>
-        <source>D</source>
-        <comment>RecStatusChar rsDeleted</comment>
-        <translation type="obsolete">B</translation>
-    </message>
-    <message>
-        <source>S</source>
-        <comment>RecStatusChar rsStopped</comment>
-        <translation type="obsolete">a</translation>
-    </message>
-    <message>
         <source>R</source>
         <comment>RecStatusChar rsRecorded</comment>
         <translation>I</translation>
@@ -5420,10 +5222,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>Only MPEG2TS is supported at this time.</source>
         <translation>För närvarande stöds endast MPEG2TS.</translation>
-    </message>
-    <message>
-        <source>FireWire Input</source>
-        <translation>Firewire-ingång</translation>
     </message>
     <message>
         <source>Allow channel jumping in guide</source>
@@ -5555,10 +5353,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Broadcast</translation>
     </message>
     <message>
-        <source>USB Mpeg-4 Encoder (Plextor ConvertX, etc)</source>
-        <translation>USB MPEG4-kodare (Plextor ConvertX, etc)</translation>
-    </message>
-    <message>
         <source>Original Air date</source>
         <translation>Ursprungligt visningsdatum</translation>
     </message>
@@ -5581,14 +5375,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>ATSC transport, cable or terrestrial</source>
         <translation>ATSC-transport, kabel eller marksänt</translation>
-    </message>
-    <message>
-        <source>Use hardware MPEG decoder</source>
-        <translation type="obsolete">Använd MPEG-hårdvaruavkodare</translation>
-    </message>
-    <message>
-        <source>If your DVB card has a built in MPEG decoder you can activate it here. (Only for full featured cards &amp; certain USB devices).</source>
-        <translation type="obsolete">Använd ditt DVB-korts inbyggda MPEG-avkodare. (Endast för fullutrustade kort &amp; vissa USB-enheter).</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
@@ -5787,7 +5573,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>c</source>
         <comment>RecStatusChar rsCancelled</comment>
-        <translation>A</translation>
+        <translation>a</translation>
     </message>
     <message>
         <source>N</source>
@@ -5867,10 +5653,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Använd namnet på det använda visningsfiltret i stället för termen &quot;Alla program&quot; i uppspelningsmenyn.</translation>
     </message>
     <message>
-        <source>If set, programs that are automatically deleted (expired) will be allowed to be re-recorded if they are shown again.</source>
-        <translation type="obsolete">Tillåt program som tas bort automatiskt av funktionen autoradera att bli återinspelade om de visas igen.</translation>
-    </message>
-    <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
 WARNING: Enabling this option will disable XvMC video output.</source>
         <translation>Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2, vilket kan vara snabbare.
@@ -5917,10 +5699,6 @@ VARNING: Detta val avaktiverar XvMC-videoutmatning.</translation>
         <translation>Visa vald meny på LCD-display.</translation>
     </message>
     <message>
-        <source>Display playing artist and song title in MythMusic.</source>
-        <translation type="obsolete">Visa aktuell artist och låt från MythMusic.</translation>
-    </message>
-    <message>
         <source>Items</source>
         <translation>Saker</translation>
     </message>
@@ -5935,30 +5713,6 @@ VARNING: Detta val avaktiverar XvMC-videoutmatning.</translation>
     <message>
         <source>Which items to show when playing music.</source>
         <translation>Vad som ska visas när musik spelas.</translation>
-    </message>
-    <message>
-        <source>Display tuned channel information.</source>
-        <translation type="obsolete">Visa information om vald kanal.</translation>
-    </message>
-    <message>
-        <source>Display volume level information.</source>
-        <translation type="obsolete">Visa volymnivå.</translation>
-    </message>
-    <message>
-        <source>Display generic information.</source>
-        <translation type="obsolete">Visa generell information.</translation>
-    </message>
-    <message>
-        <source>Turn on the backlight permanently.</source>
-        <translation type="obsolete">Sätt på bakgrundsbelysningen permanent.</translation>
-    </message>
-    <message>
-        <source>LCD HeartBeat Always On</source>
-        <translation type="obsolete">LCD-hjärtslag alltid på</translation>
-    </message>
-    <message>
-        <source>Turn on the LCD heartbeat</source>
-        <translation type="obsolete">Sätt på LCD-hjärtslag</translation>
     </message>
     <message>
         <source>Use an LCD display to view MythTV status information.</source>
@@ -6035,28 +5789,12 @@ Myth kommer nu att avslutas.</translation>
         <translation>Fel vid kanalbyte</translation>
     </message>
     <message>
-        <source>MPEG-2 Encoder card (PVR-x50, PVR-500)</source>
-        <translation>MPEG-2 TV-kort (PVR-x50, PVR-500)</translation>
-    </message>
-    <message>
         <source>Fast forward/rewind reposition amount</source>
         <translation>Ompositionering efter snabbspolning</translation>
     </message>
     <message>
         <source>When exiting sticky keys fast forward/rewind mode, reposition this many 1/100th seconds before resuming normal playback. This compensates for the reaction time between seeing where to resume playback and actually exiting seeking.</source>
         <translation>När snabbspolning framåt/bakåt m h a &quot;klistriga tangenter&quot; används är det svårt att stoppa på exakt rätt ställe. Denna funktion hoppar framåt/bakåt en bit vid stopp för att kompensera för detta (hundradels sekunder).</translation>
-    </message>
-    <message>
-        <source>Signal To Noise</source>
-        <translation type="obsolete">Signal-till-brus</translation>
-    </message>
-    <message>
-        <source>Bit Error Rate</source>
-        <translation type="obsolete">Bitfelsfrekvens</translation>
-    </message>
-    <message>
-        <source>Uncorrected Blocks</source>
-        <translation type="obsolete">Okorrigerade block</translation>
     </message>
     <message>
         <source>Enable auto-transcode after recording</source>
@@ -6231,10 +5969,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>Detta är inkompatibelt med libmpeg2-avkodning och stängs därför av om libmpeg2-avkodning väljs.</translation>
     </message>
     <message>
-        <source>Enables the use of viaXvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
-        <translation type="obsolete">Aktiverar den hårdvaruaccelererade MPEG-avkodning som finns i Via Unichrome chipsetet.  </translation>
-    </message>
-    <message>
         <source>Do you want to fix these problems?</source>
         <translation>Vill du rätta till dessa problem?</translation>
     </message>
@@ -6257,10 +5991,6 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>Card</source>
         <translation>Kort</translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation type="obsolete">Sökning</translation>
     </message>
     <message>
         <source>Path</source>
@@ -6319,84 +6049,12 @@ Myth kommer nu att avslutas.</translation>
         <translation>Signalstyrka</translation>
     </message>
     <message>
-        <source>Seen PAT</source>
-        <translation type="obsolete">PAT sedd</translation>
-    </message>
-    <message>
-        <source>Seen PMT</source>
-        <translation type="obsolete">PMT sedd</translation>
-    </message>
-    <message>
-        <source>Seen MGT</source>
-        <translation type="obsolete">MGT sedd</translation>
-    </message>
-    <message>
-        <source>Seen VCT</source>
-        <translation type="obsolete">VCT sedd</translation>
-    </message>
-    <message>
-        <source>Seen NIT</source>
-        <translation type="obsolete">NIT sedd</translation>
-    </message>
-    <message>
-        <source>Seen SDT</source>
-        <translation type="obsolete">SDT sedd</translation>
-    </message>
-    <message>
-        <source>Matching PAT</source>
-        <translation type="obsolete">Matchande PAT</translation>
-    </message>
-    <message>
-        <source>Matching PMT</source>
-        <translation type="obsolete">Matchande PMT</translation>
-    </message>
-    <message>
-        <source>Matching MGT</source>
-        <translation type="obsolete">Matchande MGT</translation>
-    </message>
-    <message>
-        <source>Matching VCT</source>
-        <translation type="obsolete">Matchande VCT</translation>
-    </message>
-    <message>
-        <source>Matching NIT</source>
-        <translation type="obsolete">Matchande NIT</translation>
-    </message>
-    <message>
-        <source>Matching SDT</source>
-        <translation type="obsolete">Matchande SDT</translation>
-    </message>
-    <message>
         <source>Allow Transcoding jobs</source>
         <translation>Tillåt omkodningsjobb</translation>
     </message>
     <message>
-        <source>Program #%1 not found in PAT!</source>
-        <translation type="obsolete">Program #%1 hittades inte i PAT!</translation>
-    </message>
-    <message>
         <source>CC/TXT enabled</source>
         <translation>Textning/Text-TV aktiverad</translation>
-    </message>
-    <message>
-        <source>Underscore (5_1)</source>
-        <translation type="obsolete">Understrykning (5_1)</translation>
-    </message>
-    <message>
-        <source>None (51)</source>
-        <translation type="obsolete">Ingen (51)</translation>
-    </message>
-    <message>
-        <source>Minus (5-1)</source>
-        <translation type="obsolete">Minus (5-1)</translation>
-    </message>
-    <message>
-        <source>Zero (501)</source>
-        <translation type="obsolete">Noll (501)</translation>
-    </message>
-    <message>
-        <source>Channel Seperator</source>
-        <translation type="obsolete">Kanalseparator</translation>
     </message>
     <message>
         <source>What to use to separate ATSC major and minor channels.</source>
@@ -6449,63 +6107,59 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
-        <translation type="unfinished"></translation>
+        <translation>Normalt slänger dvb-inspelningen bort paket från kortet tills en sekvensstartsrubrik ses. Detta val stänger av denna finess.</translation>
     </message>
     <message>
         <source>DBOX2 Streaming Port</source>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2 direktuppspelningsport</translation>
     </message>
     <message>
         <source>DBOX2 streaming port on your DBOX2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Direktuppspelningsport på din DBOX2.</translation>
     </message>
     <message>
         <source>DBOX2 HTTP Port</source>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2 HTTP-port</translation>
     </message>
     <message>
         <source>DBOX2 http port on your DBOX2.</source>
-        <translation type="unfinished"></translation>
+        <translation>HTTP-port på din DBOX2.</translation>
     </message>
     <message>
         <source>DBOX2 Host IP</source>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2 Värd-IP</translation>
     </message>
     <message>
         <source>DBOX2 Host IP is the remote device.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>DBOX2 Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Värddator-IP för fjärrenheten.</translation>
     </message>
     <message>
         <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiverar användning av den hårdvaruacceleration för MPEG-avkodning som finns i Via Unichrome chipsetet.  </translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat.</source>
-        <translation type="unfinished"></translation>
+        <translation>Slå på LCD-hjärtslag.</translation>
     </message>
     <message>
         <source>A command executed before the backend would shutdown. The return value determines if the backend can shutdown. 0 - yes, 1 - restart idleing, 2 - reset the backend to wait for a frontend.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ett kommando som ska exekveras innan inspelningsservern stängs ner. Returvärdet avgör om nedstängningen ska fortsätta: 0 - ja, 1 - försök senare, 2 - vänta på uppspelningsklient.</translation>
     </message>
     <message>
         <source>Number of bonus points to be added to any recording on this channel during scheduling.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal bonuspoäng att lägga till alla inspelningar på denna kanal vid schemaläggning.</translation>
     </message>
     <message>
         <source>Use a positive number as the rank if you want this to be a preferred channel, a negative one to deprecate this channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd ett positivt tal som rangordning för ge denna kanal högre prioritet, ett negativt tal för att ge den lägre prioritet.</translation>
     </message>
     <message>
         <source>Image file to use as the icon for this channel on various MythTV displays.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildfil att använda som ikon för denna kanal.</translation>
     </message>
     <message>
         <source>ID used by listing services to get an exact correspondance between a channel in your line-up and a channel in their database. Normally this is set automatically when &apos;mythfilldatabase&apos; is run.</source>
-        <translation type="unfinished"></translation>
+        <translation>ID som används av programlistetjänster för att få en exakt överensstämmelse mellan en kanal på ditt system och en kanal i deras databas. Sätts vanligtvis automatiskt när &apos;mythfilldatabase&apos; körs.</translation>
     </message>
     <message>
         <source>or</source>
@@ -6517,21 +6171,21 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Specify either the exact frequency in Hertz or a valid channel for your &apos;TV Format&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange antingen en exakt frekvens i Hertz eller en giltig kanal för ditt &apos;TV-format&apos;.</translation>
     </message>
     <message>
         <source>Value to be added to your desired frequency in Hertz, for &apos;fine tuning&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Värde i Hertz som läggs till din önskade frekvens för &apos;fininställning&apos;.</translation>
     </message>
     <message>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
-        <translation type="unfinished">A</translation>
+        <translation>A</translation>
     </message>
     <message>
         <source>M</source>
         <comment>RecStatusChar rsMissed</comment>
-        <translation type="unfinished"></translation>
+        <translation>m</translation>
     </message>
     <message>
         <source>Aborted</source>
@@ -6543,15 +6197,15 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>This showing was recorded but was aborted before recording was completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna visning spelades in men avbröts innan inspelningen var klar.</translation>
     </message>
     <message>
         <source>This showing was not recorded because it was scheduled after it would have ended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna visning spelades inte in eftersom den schemalades efter dess sluttid.</translation>
     </message>
     <message>
         <source>This showing was not recorded because it was manually cancelled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna visning spelades inte in eftersom den avbröts manuellt.</translation>
     </message>
     <message>
         <source>Change Ending Time</source>
@@ -6559,19 +6213,19 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Signal Timeout (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsgräns för signal (msek)</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximal tid MythTV väntar på signal vid kanalsökning eller inspelning. Se även Tidsgräns för kanal.</translation>
     </message>
     <message>
         <source>Channel Timeout (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsgräns för kanal (msek)</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximal tid MythTV väntar på att en kanal ska ställas in innan en inspelning överges eller en varning visas i TV-läge.</translation>
     </message>
     <message>
         <source>Store recordings in TS format.</source>
@@ -6579,15 +6233,15 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Use Transport Stream format as the storage format as opposed to using the deprecated Program Stream conversion. The conversion loses data, and forces MythTV to disable some tuning safety checks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd transportströmsformat (TS) som lagringsformat i stället för konvertering till programström (PS). Konverteringen tappar data och tvingar MythTV att stänga av en del kanalbytessäkerhetskontroller.</translation>
     </message>
     <message>
         <source>Always prompt for initial group filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Fråga alltid efter första gruppfilter</translation>
     </message>
     <message>
         <source>Always prompt the user for the initial filter to apply when entering the Watch Recordings screen.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fråga alltid vilket filter som ska användas när användaren går in i menyn &apos;Titta på inspelningar&apos;.</translation>
     </message>
     <message>
         <source>Lowest Priority First</source>
@@ -6595,19 +6249,19 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>ATSC channel</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC-kanal</translation>
     </message>
     <message>
         <source>Your preferred language for the user interface.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det språk som skall användas i användargränsnittet.</translation>
     </message>
     <message>
         <source>Guide Language #%1</source>
-        <translation type="unfinished"></translation>
+        <translation>Programguide-språk #%1</translation>
     </message>
     <message>
         <source>Your #%1 preferred language for Program Guide Data and captions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det språk som ska användas i programguiden och undertexter.</translation>
     </message>
     <message>
         <source>Display Time</source>
@@ -6646,10 +6300,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>Visa volyminformation</translation>
     </message>
     <message>
-        <source>Display volume level information on LCD display</source>
-        <translation type="obsolete">Visa information om aktuell volym på LCD-displayen.</translation>
-    </message>
-    <message>
         <source>Display Generic Information</source>
         <translation>Visa generell information</translation>
     </message>
@@ -6667,27 +6317,19 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>HeartBeat Always On</source>
-        <translation type="unfinished"></translation>
+        <translation>Hjärtslag alltid på</translation>
     </message>
     <message>
         <source>LCD Key order</source>
-        <translation type="unfinished"></translation>
+        <translation>LCD tangentordning</translation>
     </message>
     <message>
         <source>Enter the 6 Keypad Return Codes for your LCD keypad in the order in which you want the functions up/down/left/right/yes/no to operate. (See lcdproc/server/drivers/hd44780.c/keyMapMatrix[] or the matrix for your display)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ange de 6 tangentkoderna för ditt LCD-tangentbord i den ordning du vill ha funktionerna upp/ner/vänster/höger/ja/nej. (Se lcdproc/server/drivers/hd44780.c/keyMapMatrix[] eller matrisen för din display)</translation>
     </message>
     <message>
         <source>Save original files after transcoding (globally)</source>
         <translation>Spara originalfiler efter omkodning (globalt)</translation>
-    </message>
-    <message>
-        <source>Clear Cards</source>
-        <translation type="obsolete">Rensa TV-kort</translation>
-    </message>
-    <message>
-        <source>Clear Channels</source>
-        <translation type="obsolete">Rensa kanaler</translation>
     </message>
     <message>
         <source>WARNING</source>
@@ -6699,7 +6341,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Att ändra existerande kanalingångar, ta bort något eller söka efter kanaler kanske inte fungerar.</translation>
     </message>
     <message>
         <source>Channel Scanner</source>
@@ -6715,31 +6357,31 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Allows you to edit the transports directly</source>
-        <translation type="unfinished"></translation>
+        <translation>Direkt ändring av transporter</translation>
     </message>
     <message>
         <source>This is rarely required unless you are using a satelite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="unfinished"></translation>
+        <translation>Används sällan såvida du inte använder en parabolantenn och måste ange en initial frekvens för kanalsökaren att pröva.</translation>
     </message>
     <message>
         <source>(5_1) Underscore</source>
-        <translation type="unfinished"></translation>
+        <translation>(5_1) Understrykning</translation>
     </message>
     <message>
         <source>(5-1) Minus</source>
-        <translation type="unfinished"></translation>
+        <translation>(5-1) Minus</translation>
     </message>
     <message>
         <source>(5.1) Period</source>
-        <translation type="unfinished"></translation>
+        <translation>(5.1) Punkt</translation>
     </message>
     <message>
         <source>(501) Zero</source>
-        <translation type="unfinished"></translation>
+        <translation>(501) Noll</translation>
     </message>
     <message>
         <source>(51) None</source>
-        <translation type="unfinished"></translation>
+        <translation>(51) Ingen</translation>
     </message>
     <message>
         <source>Using hardware MPEG decoder</source>
@@ -6747,15 +6389,15 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>This reduces the complexity of the stream that MythTV records so that it can be fed directly to a hardware MPEG decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reducera komplexiteten på den ström MythTV spelar in så att den kan matas in direkt i en hårdvaruavkodare.</translation>
     </message>
     <message>
         <source>Specifically, MythTV will record only one audio and one subtitle stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Specifikt kommer MythTV bara att spela in en ljud- och en undertextström.</translation>
     </message>
     <message>
         <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
-        <translation type="unfinished"></translation>
+        <translation>Du vill också ange språk i uppspelningsklientens inställningar (Generellt, sida 3).</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
@@ -6778,10 +6420,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>16:10</translation>
     </message>
     <message>
-        <source>The aspect ratio of a Xinerama display can not bequeried from the display, so you must specify it.</source>
-        <translation type="obsolete">Bildaspekten kan inte hämtas automatiskt från en Xinerama-enhet, så den måste specificeras manuellt.</translation>
-    </message>
-    <message>
         <source>Continue</source>
         <translation>Fortsätt</translation>
     </message>
@@ -6800,6 +6438,70 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>The aspect ratio of a Xinerama display can not be queried from the display, so you must specify it.</source>
         <translation>Bildaspekten kan inte hämtas från en Xinerama-enhet, så den måste specificeras manuellt.</translation>
+    </message>
+    <message>
+        <source>Analog V4L capture card</source>
+        <translation>Analogt V4L TV-kort</translation>
+    </message>
+    <message>
+        <source>MPEG-2 encoder card (PVR-x50, PVR-500)</source>
+        <translation>MPEG-2 TV-kort (PVR-x50, PVR-500)</translation>
+    </message>
+    <message>
+        <source>DVB DTV capture card (v3.x)</source>
+        <translation>DVB DTV-kort (v3.x)</translation>
+    </message>
+    <message>
+        <source>pcHDTV DTV capture card (w/V4L drivers)</source>
+        <translation>pcHDTV DTV-kort (w/V4L drivrutiner)</translation>
+    </message>
+    <message>
+        <source>FireWire cable box</source>
+        <translation>FireWire kabelbox</translation>
+    </message>
+    <message>
+        <source>USB MPEG-4 encoder box (Plextor ConvertX, etc)</source>
+        <translation>USB MPEG-4 TV-kort (Plextor ConvertX, etc)</translation>
+    </message>
+    <message>
+        <source>DBox2 TCP/IP cable box</source>
+        <translation>DBox2 TCP/IP kabelbox</translation>
+    </message>
+    <message>
+        <source>Select the LNB Settings for DVB-S cards.</source>
+        <translation>Välj LNB-inställningar för DVB-S-kort.</translation>
+    </message>
+    <message>
+        <source>For DVB-C and DVB-T you don&apos;t need to set these values.</source>
+        <translation>För DVB-C och DVB-T behöver du inte dessa värden.</translation>
+    </message>
+    <message>
+        <source>Starting LiveTV channel.</source>
+        <translation>Förvald kanal för TV-läge.</translation>
+    </message>
+    <message>
+        <source>This is updated on every successful channel change.</source>
+        <translation>Detta uppdateras vid varje lyckat kanalbyte.</translation>
+    </message>
+    <message>
+        <source>Minimal Updates</source>
+        <translation>Minimala uppdateringar</translation>
+    </message>
+    <message>
+        <source>Rename to Match</source>
+        <translation>Döp om för att matcha</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Radera</translation>
+    </message>
+    <message>
+        <source>Existing Channel Treatment</source>
+        <translation>Hantering av existerande kanal</translation>
+    </message>
+    <message>
+        <source>How to treat existing channels.</source>
+        <translation>Hur existerande kanaler ska hanteras.</translation>
     </message>
 </context>
 <context>
@@ -7444,18 +7146,6 @@ Inga andra detaljer</translation>
     <message>
         <source>Audio Resync</source>
         <translation>Ljudåtersynk</translation>
-    </message>
-    <message>
-        <source>Next Audio Track</source>
-        <translation type="obsolete">Nästa ljudspår</translation>
-    </message>
-    <message>
-        <source>Channel Lock</source>
-        <translation type="obsolete">Kanallås</translation>
-    </message>
-    <message>
-        <source>Signal Lock</source>
-        <translation type="obsolete">Signallås</translation>
     </message>
     <message>
         <source>No Lock</source>
