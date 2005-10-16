@@ -45,6 +45,13 @@ using namespace std;
 #include "jobqueue.h"
 #include "autoexpire.h"
 
+/** Milliseconds to wait for an existing thread from
+ *  process request thread pool.
+ */
+#define PRT_TIMEOUT 10
+/** Number of threads in process request thread pool at startup. */
+#define PRT_STARTUP_THREAD_COUNT 5
+
 class ProcessRequestThread : public QThread
 {
   public:
@@ -111,7 +118,7 @@ MainServer::MainServer(bool master, int port, int statusport,
     encoderList = tvList;
     AutoExpire::Update(encoderList, true);
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < PRT_STARTUP_THREAD_COUNT; i++)
     {
         ProcessRequestThread *prt = new ProcessRequestThread(this);
         prt->start();
@@ -199,6 +206,8 @@ void MainServer::readSocket(void)
     // will be set to false after processed by worker thread.
     //socket->SetInProcess(true);
 
+    MythTimer t;
+    t.start();
     ProcessRequestThread *prt = NULL;
     while (!prt)
     {
@@ -210,11 +219,24 @@ void MainServer::readSocket(void)
         }
         threadPoolLock.unlock();
 
+        if (t.elapsed() > PRT_TIMEOUT)
+            break;
+
         if (!prt)
         {
-            VERBOSE(VB_ALL, "waiting for a thread..");
-            usleep(50);
+            VERBOSE(VB_ALL, "Waiting for a process request thread..");
+            usleep(1000); /* 1 millisecond */
         }
+    }
+
+    if (!prt)
+    {
+        threadPoolLock.lock();
+        VERBOSE(VB_ALL, "Adding a new process request thread");
+        prt = new ProcessRequestThread(this);
+        prt->start();
+        usleep(50000); /* Wait 50 milliseconds for start to actually run. */
+        threadPoolLock.unlock();
     }
 
     prt->setup(socket);
