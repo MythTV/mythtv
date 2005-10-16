@@ -607,8 +607,6 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
     autoSelectAudioTrack();
     autoSelectSubtitleTrack();
 
-    ringBuffer->CalcReadAheadThresh(bitrate);
-
     // Try to get a position map from the recorder if we don't have one yet.
     if (!recordingHasPositionMap)
     {
@@ -976,7 +974,12 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     }
 
     if (bitrate > 0)
+    {
         bitrate /= 1000;
+        if (ringBuffer)
+            ringBuffer->CalcReadAheadThresh(bitrate);
+    }
+
 
     // Select a new track at the next opportunity.
     currentAudioTrack = -1;
