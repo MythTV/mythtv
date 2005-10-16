@@ -3410,9 +3410,10 @@ void PlaybackBox::previewReady(const ProgramInfo *pginfo)
 
         // ask for repaint
         update();
-        
+
         // delete the old blank pixmap
-        delete pix;
+        if (pix)
+            delete pix;
     }
 }
 
