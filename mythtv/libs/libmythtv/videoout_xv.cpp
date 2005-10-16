@@ -112,7 +112,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     // to a singleton instance of the DisplayRes class
     if (gContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes();
-        
+
     xvmcBuffers.OSDNum    = 2;
     xvmcBuffers.OSDResNum = 2;
     xvmcBuffers.MinSurf   = 8;
@@ -830,17 +830,18 @@ bool VideoOutputXv::InitXlib()
     return ok;
 }
 
-/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint, uint,uint, uint,int, bool)
+/** \fn VideoOutputXv::GetBestSupportedCodec(uint,uint,uint,uint,uint,int,bool)
  *
- * \return MythCodecID for the best supported codec on the main display.
+ *  \return MythCodecID for the best supported codec on the main display.
  */
-MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
-                                                 uint osd_width, uint osd_height,
-                                                 uint stream_type, int xvmc_chroma,
-                                                 bool test_surface)
+MythCodecID VideoOutputXv::GetBestSupportedCodec(
+    uint width,       uint height,
+    uint osd_width,   uint osd_height,
+    uint stream_type, int xvmc_chroma,    bool test_surface)
 {
     (void)width, (void)height, (void)osd_width, (void)osd_height;
     (void)stream_type, (void)xvmc_chroma, (void)test_surface;
+
 #ifdef USING_XVMC
     Display *disp;
     X11S(disp = XOpenDisplay(NULL));
@@ -848,13 +849,12 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
     // Disable features based on environment and DB values.
     bool use_xvmc_vld = false, use_xvmc_idct = false, use_xvmc = false;
     bool use_xv = true, use_shm = true;
-#ifdef USING_XVMC_VLD
-    use_xvmc_vld = use_xvmc = gContext->GetNumSetting("UseXvMcVld", 1);
-#endif
-    if (!use_xvmc)
-        use_xvmc_idct = use_xvmc = gContext->GetNumSetting("UseXVMC", 1);
-    else if (!use_xvmc_idct)
-        use_xvmc_idct = gContext->GetNumSetting("UseXVMC", 1);
+
+    QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
+    if (dec == "xvmc")
+        use_xvmc_idct = use_xvmc = true;
+    else if (dec == "xvmc-vld")
+        use_xvmc_vld = use_xvmc = true;
 
     SetFromEnv(use_xvmc_vld, use_xvmc_idct, use_xvmc, use_xv, use_shm);
     SetFromHW(disp, use_xvmc, use_xv, use_shm);
@@ -913,15 +913,15 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(uint width, uint height,
                 "\t\t\tYou may also wish to verify that\n"
                 "\t\t\t/etc/X11/XvMCConfig contains the correct\n"
                 "\t\t\tvendor's XvMC library.\n"
-#endif
+#endif // USING_XVMCW
             );
         ret = (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
     }
 
     return ret;
-#else
+#else // if !USING_XVMC
     return (MythCodecID)(kCodec_MPEG1 + (stream_type-1));
-#endif
+#endif // !USING_XVMC
 }
 
 #define XV_INIT_FATAL_ERROR_TEST(test,msg) \

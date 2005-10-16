@@ -830,15 +830,35 @@ static HostSpinBox *YScanDisplacement()
     return gs;
 };
 
-static HostCheckBox *UseMPEG2Dec()
+static HostComboBox *PreferredMPEG2Decoder()
 {
-    HostCheckBox *gc = new HostCheckBox("UseMPEG2Dec");
-    gc->setLabel(QObject::tr("Use libmpeg2 for decoding"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, libmpeg2 will be used instead "
-                    "of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. "
-                    "This can be faster.\nWARNING: Enabling this option "
-                    "will disable XvMC video output."));
+    HostComboBox *gc = new HostComboBox("PreferredMPEG2Decoder", false);
+
+    gc->setLabel(QObject::tr("Preferred MPEG2 Decoder"));
+    gc->addSelection(QObject::tr("Standard"), "ffmpeg");
+    gc->addSelection(QObject::tr("libmpeg2"), "libmpeg2");
+#ifdef USING_XVMC
+    gc->addSelection(QObject::tr("Standard XvMC"), "xvmc");
+#endif // USING_XVMC
+#ifdef USING_XVMC_VLD
+    gc->addSelection(QObject::tr("VIA XvMC"), "xvmc-vld");
+#endif // USING_XVMC_VLD    
+    gc->setHelpText(
+        QObject::tr("Decoder to use to play back MPEG2 video.") + " " +
+        QObject::tr("Standard will use ffmpeg library.") + " " +
+        QObject::tr("libmpeg2 will use mpeg2 library; "
+                    "this is faster on some AMD processors.")
+#ifdef USING_XVMC
+        + " " +
+        QObject::tr("Standard XvMC will use XvMC API 1.0 to "
+                    "play back video; this is fast, but does not "
+                    "work well with HDTV sized frames.")
+#endif // USING_XVMC
+#ifdef USING_XVMC_VLD
+        + " " +
+        QObject::tr("VIA XvMC will use the VIA VLD XvMC extension.")
+#endif // USING_XVMC_VLD
+        );
     return gc;
 }
 
@@ -2210,51 +2230,20 @@ static HostCheckBox *UseOpenGLVSync()
     HostCheckBox *gc = new HostCheckBox("UseOpenGLVSync");
     gc->setLabel(QObject::tr("Enable OpenGL vertical sync for timing"));
     gc->setValue(false);
-    gc->setHelpText(QObject::tr("If it is supported by your hardware/drivers, "
-                    "MythTV will use OpenGL vertical syncing for video timing, reducing "
-                    "frame jitter."));
+    gc->setHelpText(QObject::tr(
+                        "If it is supported by your hardware/drivers, "
+                        "MythTV will use OpenGL vertical syncing for "
+                        "video timing, reducing frame jitter."));
     return gc;
 }
-#endif
-
-#ifdef USING_XVMC
-static HostCheckBox *UseXVMC()
-{
-    HostCheckBox *gc = new HostCheckBox("UseXVMC");
-    gc->setLabel(QObject::tr("Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr(
-                        "This enables the hardware accelerated MPEG decoding "
-                        "available with many popular video output cards.  ")+
-                    QObject::tr(
-                        "This is incompatible with libmpeg2 decoding, and "
-                        "will be disabled if libmpeg2 decoding is selected."));
-    return gc;
-};
-#endif
-
-#ifdef USING_XVMC_VLD
-static HostCheckBox *UseXvMcVld()
-{
-    HostCheckBox *gc = new HostCheckBox("UseXvMcVld");
-    gc->setLabel(QObject::tr("Use hardware XVMC VLD Decoding (incompatible with libmpeg2)"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("Enables the use of Via XvMC hardware MPEG "
-                                "decoding for the Via Unichrome Chipset.  ")+
-                    QObject::tr(
-                        "This is incompatible with libmpeg2 decoding, and "
-                        "will be disabled if libmpeg2 decoding is selected."));
-    return gc;
-};
 #endif
 
 class HwDecSettings: public  VerticalConfigurationGroup,
                      public TriggeredConfigurationGroup {
 public:
-     HwDecSettings(HostCheckBox *use_mpeg):
+     HwDecSettings():
          VerticalConfigurationGroup(false),
          TriggeredConfigurationGroup(false) {
-         (void)use_mpeg;
          setLabel(QObject::tr("Hardware Decoding Settings"));
          setUseLabel(false);
 
@@ -2269,23 +2258,6 @@ public:
          addTarget("1", settings);
 
          addTarget("0", new VerticalConfigurationGroup(true));
-
-#ifdef USING_OPENGL_VSYNC
-         HostCheckBox *use_opengl_vsync = UseOpenGLVSync();
-         addChild(use_opengl_vsync);
-#endif
-#ifdef USING_XVMC
-         HostCheckBox *use_xvmc = UseXVMC();
-         addChild(use_xvmc);
-         connect(use_mpeg, SIGNAL(valueChanged(const QString&)),
-                 use_xvmc, SLOT(enableOnUnset(const QString&)));
-#endif
-#ifdef USING_XVMC_VLD
-         HostCheckBox *use_xvmc_vld = UseXvMcVld();
-         addChild(UseXvMcVld());
-         connect(use_mpeg, SIGNAL(valueChanged(const QString&)),
-                 use_xvmc_vld, SLOT(enableOnUnset(const QString&)));
-#endif
     };
 };
 
@@ -2968,8 +2940,10 @@ PlaybackSettings::PlaybackSettings()
     general->setLabel(QObject::tr("General playback"));
     general->addChild(new DeinterlaceSettings());
     general->addChild(CustomFilters());
-    HostCheckBox *use_mpeg = UseMPEG2Dec();
-    general->addChild(use_mpeg);
+    general->addChild(PreferredMPEG2Decoder());
+#ifdef USING_OPENGL_VSYNC
+    general->addChild(UseOpenGLVSync());
+#endif // USING_OPENGL_VSYNC
     general->addChild(RealtimePriority());
     general->addChild(UseVideoTimebase());
     general->addChild(DecodeExtraAudio());
@@ -3012,7 +2986,7 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(DefaultView());
     addChild(pbox2);
 
-    addChild(new HwDecSettings(use_mpeg));
+    addChild(new HwDecSettings());
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
     seek->setLabel(QObject::tr("Seeking"));

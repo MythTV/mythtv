@@ -61,7 +61,8 @@ class AvFormatDecoderPrivate
 bool AvFormatDecoderPrivate::InitMPEG2()
 {
     DestroyMPEG2();
-    if (gContext->GetNumSetting("UseMPEG2Dec", 0))
+    QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
+    if (dec == "libmpeg2")
     {
         mpeg2dec = mpeg2_init();
         if (mpeg2dec)
