@@ -414,7 +414,10 @@ class TV : public QObject
     MythDialog *myWindow;   ///< Our MythDialog window, if it exists
     WId   embedWinID;       ///< Window ID when embedded in another widget
     QRect embedBounds;      ///< Bounds when embedded in another widget
-    QRect saved_gui_bounds; ///< Prior GUI window bounds, for after player is done
+    ///< player bounds, for after doLoadMenu() returns to normal playing.
+    QRect player_bounds;
+    ///< Prior GUI window bounds, for doLoadMenu() and player exit().
+    QRect saved_gui_bounds;
 
     // Various threads
     /// Event processing thread, runs RunTV().

@@ -298,7 +298,8 @@ bool TV::Init(bool createWindow)
         bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
         bool switchMode = gContext->GetNumSetting("UseVideoModes", 0);
 
-        saved_gui_bounds = QRect(mainWindow->geometry().topLeft(), mainWindow->size());
+        saved_gui_bounds = QRect(mainWindow->geometry().topLeft(),
+                                 mainWindow->size());
 
         // adjust for window manager wierdness.
         {
@@ -322,7 +323,7 @@ bool TV::Init(bool createWindow)
             fullscreen |= (0 == gui_width && 0 == gui_height);
         }
 
-        QRect player_bounds = saved_gui_bounds;
+        player_bounds = saved_gui_bounds;
         if (fullscreen)
         {
             int xbase, width, ybase, height;
@@ -398,7 +399,8 @@ TV::~TV(void)
         mwnd->resize(saved_gui_bounds.size());
         mwnd->setFixedSize(saved_gui_bounds.size());
         mwnd->show();
-        mwnd->move(saved_gui_bounds.topLeft());
+        if (!gContext->GetNumSetting("GuiSizeForTV", 0))
+            mwnd->move(saved_gui_bounds.topLeft());
     }
     if (recorderPlaybackInfo)
         delete recorderPlaybackInfo;
@@ -2949,7 +2951,7 @@ void TV::ChannelKey(char key)
         }
 
         // Use valid channel if it is there, otherwise reset...
-        channelKeys = (ok) ? mod : QString("%1").arg(key);
+        channelKeys = (ok) ? mod : chan.right(1);
         do_smart &= unique;
     }
 
@@ -3653,24 +3655,22 @@ void TV::StopEmbeddingOutput(void)
 
 void TV::doLoadMenu(void)
 {
-    QString dummy;
-    QString channame = "3";
-
-    bool fullscreen = !gContext->GetNumSetting("GuiSizeForTV", 0);
-    MythMainWindow* mwnd = gContext->GetMainWindow();
-    
-    if (fullscreen)
+    if (!activerecorder)
     {
-        int xbase, ybase, screenwidth, screenheight;
-        float wmult, hmult;
-        gContext->GetScreenSettings(xbase, screenwidth, wmult,
-                                    ybase, screenheight, hmult);
-        mwnd->setGeometry(xbase, ybase, screenwidth, screenheight);
-        mwnd->setFixedSize(QSize(screenwidth, screenheight));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "doLoadMenu(): no active recorder.");
+        return;
     }
 
-    if (activerecorder)
-        channame = activerecorder->GetCurrentChannel();
+    MythMainWindow *mwnd = gContext->GetMainWindow();
+    bool using_gui_size_for_tv = gContext->GetNumSetting("GuiSizeForTV", 0);
+    if (!using_gui_size_for_tv)
+    {
+        mwnd->setGeometry(saved_gui_bounds.left(), saved_gui_bounds.top(),
+                          saved_gui_bounds.width(), saved_gui_bounds.height());
+        mwnd->setFixedSize(saved_gui_bounds.size());
+    }
+
+    QString channame = activerecorder->GetCurrentChannel();
 
     bool allowsecondary = true;
 
@@ -3679,24 +3679,16 @@ void TV::doLoadMenu(void)
 
     QString chanid = RunProgramGuide(channame, true, this, allowsecondary);
 
-    if (channame != "" && chanid != "")
-    {
-        channelKeys = channame.left(4);
-        channelid = chanid;
-        channelqueued = true; 
-    }
-
     StopEmbeddingOutput();
 
-    if (fullscreen) 
+    if (!using_gui_size_for_tv)
     {
-        int xbase, ybase, screenwidth, screenheight;
-        float wmult, hmult;
-        gContext->GetScreenSettings(xbase, screenwidth, wmult,
-                                    ybase, screenheight, hmult);
-        mwnd->setGeometry(xbase, ybase, screenwidth, screenheight);
-        mwnd->setFixedSize(QSize(screenwidth, screenheight));
+        mwnd->setGeometry(player_bounds.left(), player_bounds.top(),
+                          player_bounds.width(), player_bounds.height());
+        mwnd->setFixedSize(player_bounds.size());
     }
+
+    EPGChannelUpdate(chanid, channame);
 
     menurunning = false;
 }
@@ -4013,7 +4005,7 @@ void TV::EPGChannelUpdate(QString chanid, QString chanstr)
 {
     if (chanid != "" && chanstr != "")
     {
-        channelKeys = chanstr.left(4);
+        channelKeys = chanstr;
         channelid = chanid;
         channelqueued = true; 
     }
