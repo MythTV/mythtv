@@ -185,10 +185,8 @@ using_backend {
     # Channel stuff
     HEADERS += channelbase.h               channelutil.h
     HEADERS += signalmonitor.h             dtvsignalmonitor.h
-    HEADERS += dvbtransporteditor.h
     SOURCES += channelbase.cpp             channelutil.cpp
     SOURCES += signalmonitor.cpp           dtvsignalmonitor.cpp
-    SOURCES += dvbtransporteditor.cpp
 
     # Channel scanner stuff
     HEADERS += scanwizard.h                scanwizardhelpers.h
@@ -298,11 +296,11 @@ using_backend {
 }
 
 # Files used by frontend and backend.
-using_frontend:HEADERS *= channeleditor.h   channelsettings.h
-using_frontend:HEADERS *= previewgenerator.h
-using_frontend:SOURCES *= channeleditor.cpp channelsettings.cpp
-using_frontend:SOURCES *= previewgenerator.cpp
-using_backend:HEADERS  *= channeleditor.h   channelsettings.h
-using_backend:HEADERS  *= previewgenerator.h
-using_backend:SOURCES  *= channeleditor.cpp channelsettings.cpp
-using_backend:SOURCES  *= previewgenerator.cpp
+using_frontend:HEADERS *= channeleditor.h      channelsettings.h
+using_frontend:HEADERS *= previewgenerator.h   dvbtransporteditor.h
+using_frontend:SOURCES *= channeleditor.cpp    channelsettings.cpp
+using_frontend:SOURCES *= previewgenerator.cpp dvbtransporteditor.cpp
+using_backend:HEADERS  *= channeleditor.h      channelsettings.h
+using_backend:HEADERS  *= previewgenerator.h   dvbtransporteditor.h
+using_backend:SOURCES  *= channeleditor.cpp    channelsettings.cpp
+using_backend:SOURCES  *= previewgenerator.cpp dvbtransporteditor.cpp
