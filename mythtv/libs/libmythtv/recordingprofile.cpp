@@ -410,6 +410,22 @@ public:
     };
 };
 
+class EncodingThreadCount: public CodecParam, public SliderSetting {
+public:
+    EncodingThreadCount(const RecordingProfile& parent):
+        CodecParam(parent, "encodingthreadcount"),
+        SliderSetting(1,8,1) {
+
+        setLabel(QObject::tr("Number of threads"));
+        setValue(1);
+        setHelpText(
+            QObject::tr("Threads to use for software encoding.") + " " +
+            QObject::tr("Set to a value less than or equal to the "
+                        "number of processors on the backend that "
+                        "will be doing the encoding."));
+    };
+};
+
 class MPEG2bitrate: public CodecParam, public SliderSetting {
 public:
     MPEG2bitrate(const RecordingProfile& parent):
@@ -553,11 +569,14 @@ public:
         inter->addChild(new MPEG4OptionIDCT(parent));
         inter->addChild(new MPEG4OptionIME(parent));
         params->addChild(inter);
+#ifdef HAVE_PTHREADS
+        params->addChild(new EncodingThreadCount(parent));
+#endif
         addTarget("MPEG-4", params);
 
         // We'll eventually want to add MPEG2 software encoding params here
         params = new VerticalConfigurationGroup(false);
-        params->setLabel(QObject::tr("MPEG-4 Parameters"));
+        params->setLabel(QObject::tr("MPEG-2 Parameters"));
         params->addChild(new MPEG4bitrate(parent));
         params->addChild(new MPEG4MaxQuality(parent));
         params->addChild(new MPEG4MinQuality(parent));
@@ -565,6 +584,9 @@ public:
         params->addChild(new MPEG4ScaleBitrate(parent));
         params->addChild(new MPEG4OptionVHQ(parent));
         params->addChild(new MPEG4Option4MV(parent));
+#ifdef HAVE_PTHREADS
+        params->addChild(new EncodingThreadCount(parent));
+#endif
         addTarget("MPEG-2", params);
 
         params = new VerticalConfigurationGroup();

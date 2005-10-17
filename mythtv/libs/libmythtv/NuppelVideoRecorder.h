@@ -246,6 +246,8 @@ class NuppelVideoRecorder : public RecorderBase
     int qualdiff;
     int mp4opts;
     int mb_decision;
+    /// Number of threads to use for MPEG-2 and MPEG-4 encoding
+    int encoding_thread_count;
 
     QString videoFilterList;
     FilterChain *videoFilters;

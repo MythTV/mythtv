@@ -725,7 +725,9 @@ for opt do
   ;;
   --enable-sunmlib) sunmlib="yes"
   ;;
-  --enable-pthreads) pthreads="yes"
+  --enable-ffmpeg-pthreads) pthreads="yes"
+  ;;
+  --disable-ffmpeg-pthreads) pthreads="no"
   ;;
   --enable-gpl) gpl="yes"
   ;;

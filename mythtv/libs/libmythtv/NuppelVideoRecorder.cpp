@@ -141,6 +141,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
     qualdiff = 3;
     mp4opts = 0;
     mb_decision = FF_MB_DECISION_SIMPLE;
+    encoding_thread_count = 1;
 
     oldtc = 0;
     startnum = 0;
@@ -261,6 +262,8 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
         minquality = value;
     else if (opt == "mpeg4qualdiff")
         qualdiff = value;
+    else if (opt == "encodingthreadcount")
+        encoding_thread_count = value;
     else if (opt == "mpeg4optionvhq")
     {
         if (value)
@@ -337,6 +340,7 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         SetIntOption(profile, "mpeg4maxquality");
         SetIntOption(profile, "mpeg4minquality");
         SetIntOption(profile, "mpeg4qualdiff");
+        SetIntOption(profile, "encodingthreadcount");
         SetIntOption(profile, "mpeg4optionvhq");
         SetIntOption(profile, "mpeg4option4mv");
     }
@@ -532,11 +536,21 @@ bool NuppelVideoRecorder::SetupAVCodec(void)
     if (codec.lower() == "huffyuv" || codec.lower() == "mjpeg")
         mpa_ctx->strict_std_compliance = FF_COMPLIANCE_INOFFICIAL;
 
-    pthread_mutex_lock(&avcodeclock); 
+    pthread_mutex_lock(&avcodeclock);
+
+#ifdef HAVE_PTHREADS
+    if ((encoding_thread_count > 1) &&
+        avcodec_thread_init(mpa_ctx, encoding_thread_count))
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "FFMPEG couldn't start threading...");
+    }
+#endif
+
     if (avcodec_open(mpa_ctx, mpa_codec) < 0)
     {
         pthread_mutex_unlock(&avcodeclock);
-        VERBOSE(VB_IMPORTANT, QString("NVR: Unable to open FFMPEG/%1 codec").arg(codec));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Unable to open FFMPEG/%1 codec").arg(codec));
         return false;
     }
 
@@ -1668,6 +1682,10 @@ void NuppelVideoRecorder::KillChildren(void)
     pthread_join(audio_tid, NULL);
     if (vbimode)
         pthread_join(vbi_tid, NULL);
+#ifdef HAVE_PTHREADS
+    if (useavcodec && encoding_thread_count > 1)
+        avcodec_thread_free(mpa_ctx); 
+#endif
 }
 
 void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
