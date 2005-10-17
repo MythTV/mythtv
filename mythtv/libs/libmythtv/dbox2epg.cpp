@@ -99,6 +99,7 @@ void DBox2EPG::run()
 
         int chanid = GetChannelID(m_requestedChannel);
 
+        // if channel id is invalid, do not request epg
         if (chanid < 0)
             continue;
 
@@ -290,16 +291,26 @@ int DBox2EPG::GetChannelID(const QString& channum)
 
     query.prepare(
         "SELECT chanid "
-        "FROM channel "
-        "WHERE cardid  = :CARDID AND "
-        "      channum = :CHANNUM");
+        "FROM channel, cardinput "
+        "WHERE cardid  = :CARDID  AND "
+        "      channum = :CHANNUM AND "
+        "      channel.sourceid = cardinput.sourceid");
 
     query.bindValue(":CARDID",  m_cardid);
     query.bindValue(":CHANNUM", channum);
 
-    if (query.exec() && query.isActive() && query.next())
-        return query.value(0).toInt();
+    if (query.exec() && query.isActive())
+    {
+        if (query.next())
+            return query.value(0).toInt();
 
+        VERBOSE(VB_IMPORTANT, QString("DBox2EPG::GetChannelID(): channum "
+                                      "'%1' not found in DB").arg(channum));
+    }
+    else
+    {
+        MythContext::DBError("DBox2EPG::GetChannelID()", query);
+    }
     return -1;
 }
 
@@ -318,8 +329,17 @@ bool DBox2EPG::UseOnAirGuide(uint chanid)
 
     query.bindValue(":CHANID", chanid);
 
-    if (query.exec() && query.isActive() && query.next())
-        return (bool) query.value(0).toInt();
+    if (query.exec() && query.isActive())
+    {
+        if (query.next())
+            return (bool) query.value(0).toInt();
 
+        VERBOSE(VB_IMPORTANT, QString("DBox2EPG::UseOnAirGuide(): chanid "
+                                      "'%1' not found in DB").arg(chanid));
+    }
+    else
+    {
+        MythContext::DBError("DBox2EPG::UseOnAirGuide()", query);
+    }
     return false;
 }
