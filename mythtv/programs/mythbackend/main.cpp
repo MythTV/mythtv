@@ -223,6 +223,7 @@ int main(int argc, char **argv)
     bool resched = false;
     bool nosched = false;
     bool nojobqueue = false;
+    bool noexpirer = false;
     bool printexpire = false;
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
@@ -394,6 +395,10 @@ int main(int argc, char **argv)
         {
             nojobqueue = true;
         } 
+        else if (!strcmp(a.argv()[argpos],"--noautoexpire"))
+        {
+            noexpirer = true;
+        } 
         else if (!strcmp(a.argv()[argpos],"--printexpire"))
         {
             printexpire = true;
@@ -429,6 +434,7 @@ int main(int argc, char **argv)
                     "--resched                      Force the scheduler to update" << endl <<
                     "--nosched                      Do not perform any scheduling" << endl <<
                     "--nojobqueue                   Do not start the JobQueue" << endl <<
+                    "--noautoexpire                 Do not start the AutoExpire thread" << endl <<
                     "--version                      Version information" << endl;
             return BACKEND_EXIT_INVALID_CMDLINE;
         }
@@ -561,8 +567,8 @@ int main(int argc, char **argv)
         ismaster = true;
 
         if (nosched)
-            cerr << "******** The Scheduler has been DISABLED with "
-                    "the --nosched option ********\n";
+            cerr << "********** The Scheduler has been DISABLED with "
+                    "the --nosched option **********\n";
     }
     else
     {
@@ -571,10 +577,6 @@ int main(int argc, char **argv)
                            "MythBackend started as a slave backend", "");
     }
 
-    if (nojobqueue)
-        cerr << "******** The JobQueue has been DISABLED with "
-                "the --nojobqueue option ********\n";
- 
     bool fatal_error = false;
     bool runsched = setupTVs(ismaster, fatal_error);
     if (fatal_error)
@@ -585,11 +587,18 @@ int main(int argc, char **argv)
         sched = new Scheduler(true, &tvList);
     }
 
-    expirer = new AutoExpire(true, ismaster);
+    if (noexpirer)
+        cerr << "********* Auto-Expire has been DISABLED with "
+                "the --noautoexpire option *********\n";
+    else
+        expirer = new AutoExpire(true, ismaster);
 
     housekeeping = new HouseKeeper(true, ismaster);
 
-    if (!nojobqueue)
+    if (nojobqueue)
+        cerr << "********* The JobQueue has been DISABLED with "
+                "the --nojobqueue option *********\n";
+    else
         jobqueue = new JobQueue(ismaster);
 
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
