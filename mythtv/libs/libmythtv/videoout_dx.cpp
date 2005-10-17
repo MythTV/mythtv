@@ -82,12 +82,6 @@ VideoOutputDX::~VideoOutputDX()
     Exit();
 }
 
-void VideoOutputDX::AspectChanged(float aspect)
-{
-    VideoOutput::AspectChanged(aspect);
-    MoveResize();
-}
-
 void VideoOutputDX::Zoom(int direction)
 {
     VideoOutput::Zoom(direction);

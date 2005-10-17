@@ -162,30 +162,27 @@ VideoOutputXv::~VideoOutputXv()
 // this is documented in videooutbase.cpp
 void VideoOutputXv::Zoom(int direction)
 {
-    global_lock.lock();
-
+    QMutexLocker locker(&global_lock);
     VideoOutput::Zoom(direction);
     MoveResize();
-
-    global_lock.unlock();
 }
 
 //#define KILLER_DEBUG
+// documented in videooutbase.cpp
 void VideoOutputXv::InputChanged(int width, int height, float aspect)
 {
-    VERBOSE(VB_PLAYBACK, "InputChanged()");
-    global_lock.lock();
+    VERBOSE(VB_PLAYBACK, "InputChanged("<<width<<", "<<height
+            <<", "<<aspect<<")");
+    QMutexLocker locker(&global_lock);
 
-    bool change = ((width != XJ_width) || (height != XJ_height));
+    bool res_changed = (width != XJ_width) || (height != XJ_height);
 
     VideoOutput::InputChanged(width, height, aspect);
 
-    if (!change)
+    if (!res_changed)
     {
         if (VideoOutputSubType() == XVideo)
             clear_xv_buffers(vbuffers, XJ_width, XJ_height, xv_chroma);
-
-        global_lock.unlock();
         return;
     }
 
@@ -217,8 +214,6 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
                 "Failed to recreate buffers");
         errored = true;
     }
-
-    global_lock.unlock();
 }
 
 /**
@@ -402,9 +397,11 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
  *
  * \return port number if it succeeds, else -1.
  */
-int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root, MythCodecID mcodecid,
+int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
+                                      MythCodecID mcodecid,
                                       uint width, uint height,
-                                      int xvmc_chroma, XvMCSurfaceInfo* xvmc_surf_info)
+                                      int xvmc_chroma,
+                                      XvMCSurfaceInfo* xvmc_surf_info)
 {
     uint neededFlags[] = { XvInputMask,
                            XvInputMask,
@@ -1508,11 +1505,11 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
 
 void VideoOutputXv::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
-    global_lock.lock();
+    QMutexLocker locker(&global_lock);
+
     if (embedding)
     {
         MoveResize();
-        global_lock.unlock();
         return;
     }
 
@@ -1528,8 +1525,6 @@ void VideoOutputXv::EmbedInWidget(WId wid, int x, int y, int w, int h)
         X11S(XGetWindowAttributes(XJ_disp, wid, &attr));
         display_res->SwitchToCustomGUI(attr.width, attr.height);
     }
-
-    global_lock.unlock();
 }
 
 void VideoOutputXv::StopEmbedding(void)
@@ -1537,15 +1532,14 @@ void VideoOutputXv::StopEmbedding(void)
     if (!embedding)
         return;
 
-    global_lock.lock();
+    QMutexLocker locker(&global_lock);
+
     XJ_curwin = XJ_win;
     VideoOutput::StopEmbedding();
 
     // Switch back to resolution for full screen video
     if (display_res)
         display_res->SwitchToVideo(XJ_width, XJ_height);
-
-    global_lock.unlock();
 }
 
 VideoFrame *VideoOutputXv::GetNextFreeFrame(bool /*allow_unsafe*/)
@@ -1801,10 +1795,14 @@ void VideoOutputXv::PrepareFrameXv(VideoFrame *frame)
     if (!frame)
         frame = vbuffers.GetScratchFrame();
 
-    global_lock.lock(); vbuffers.LockFrame(frame, "PrepareFrameXv");
-    framesPlayed = frame->frameNumber + 1;
-    XvImage *image = (XvImage*) xv_buffers[frame->buf];
-    vbuffers.UnlockFrame(frame, "PrepareFrameXv"); global_lock.unlock();
+    XvImage *image = NULL;
+    {
+        QMutexLocker locker(&global_lock);
+        vbuffers.LockFrame(frame, "PrepareFrameXv");
+        framesPlayed = frame->frameNumber + 1;
+        image        = (XvImage*) xv_buffers[frame->buf];
+        vbuffers.UnlockFrame(frame, "PrepareFrameXv");
+    }
 
     if (image && (GUID_YV12_PLANAR == xv_chroma))
     {
@@ -1906,18 +1904,17 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
     img_convert(&image_in, non_xv_av_format, &image_out, PIX_FMT_YUV420P,
                 dispw, disph);
 
-    global_lock.lock();
- 
-    X11L;
-    if (XShm == video_output_subtype)
-        XShmPutImage(XJ_disp, XJ_curwin, XJ_gc, XJ_non_xv_image,
-                     0, 0, 0, 0, dispw, disph, False);
-    else
-        XPutImage(XJ_disp, XJ_curwin, XJ_gc, XJ_non_xv_image, 
-                  0, 0, 0, 0, dispw, disph);
-    X11U;
-
-    global_lock.unlock();
+    {
+        QMutexLocker locker(&global_lock);
+        X11L;
+        if (XShm == video_output_subtype)
+            XShmPutImage(XJ_disp, XJ_curwin, XJ_gc, XJ_non_xv_image,
+                         0, 0, 0, 0, dispw, disph, False);
+        else
+            XPutImage(XJ_disp, XJ_curwin, XJ_gc, XJ_non_xv_image, 
+                      0, 0, 0, 0, dispw, disph);
+        X11U;
+    }
 
     delete [] sbuf;
 }
@@ -2123,16 +2120,15 @@ void VideoOutputXv::ShowXVideo(FrameScanType scan)
     }
 
     vbuffers.UnlockFrame(frame, "ShowXVideo");
-    global_lock.lock();
-    vbuffers.LockFrame(frame, "ShowXVideo");
-
-    X11S(XvShmPutImage(XJ_disp, xv_port, XJ_curwin,
-                       XJ_gc, image, imgx, src_y, imgw,
-                       (3 != field) ? (imgh/2) : imgh,
-                       dispxoff, dest_y, dispwoff, disphoff, False));
-
-    vbuffers.UnlockFrame(frame, "ShowXVideo");
-    global_lock.unlock();
+    {
+        QMutexLocker locker(&global_lock);
+        vbuffers.LockFrame(frame, "ShowXVideo");
+        X11S(XvShmPutImage(XJ_disp, xv_port, XJ_curwin,
+                           XJ_gc, image, imgx, src_y, imgw,
+                           (3 != field) ? (imgh/2) : imgh,
+                           dispxoff, dest_y, dispwoff, disphoff, False));
+        vbuffers.UnlockFrame(frame, "ShowXVideo");
+    }
 }
 
 // this is documented in videooutbase.cpp
@@ -2280,19 +2276,11 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
 #endif // USING_XVMC
 }
 
-void VideoOutputXv::AspectChanged(float aspect)
+// documented in videooutbase.cpp
+void VideoOutputXv::VideoAspectRatioChanged(float aspect)
 {
-    global_lock.lock();
-
-    VideoOutput::AspectChanged(aspect);
-    MoveResize();
-
-    global_lock.unlock();
-}
-
-float VideoOutputXv::GetDisplayAspect(void)
-{
-    return display_aspect;
+    QMutexLocker locker(&global_lock);
+    VideoOutput::VideoAspectRatioChanged(aspect);
 }
 
 void VideoOutputXv::UpdatePauseFrame(void)

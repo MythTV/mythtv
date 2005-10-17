@@ -18,7 +18,6 @@ class VideoOutputDX : public VideoOutput
     void Show(FrameScanType );
 
     void InputChanged(int width, int height, float aspect);
-    void AspectChanged(float aspect);
     void Zoom(int direction);
 
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
@@ -36,7 +35,7 @@ class VideoOutputDX : public VideoOutput
     void MoveResize(void);
     int ChangePictureAttribute(int attribute, int newValue);
  
-    float GetDisplayAspect(void) { return ((float) dispw)/disph; }
+    float GetDisplayAspect(void) const { return ((float) dispw)/disph; }
     
     void WaitForVSync(void);
 

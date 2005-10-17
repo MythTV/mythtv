@@ -165,7 +165,7 @@ class VideoOutputQuartzView
     virtual void Show(void);
 
     virtual void InputChanged(int width, int height, float aspect);
-    virtual void AspectChanged(float aspect);
+    virtual void VideoAspectRatioChanged(float aspect);
     virtual void Zoom(int direction);
 
     virtual void EmbedChanged(bool embedded);
@@ -589,7 +589,7 @@ void VideoOutputQuartzView::InputChanged(int width, int height, float aspect)
     Begin();
 }
 
-void VideoOutputQuartzView::AspectChanged(float aspect)
+void VideoOutputQuartzView::VideoAspectRatioChanged(float aspect)
 {
     (void)aspect;
 
@@ -1202,23 +1202,21 @@ VideoOutputQuartz::~VideoOutputQuartz()
     delete data;
 }
 
-void VideoOutputQuartz::AspectChanged(float aspect)
+void VideoOutputQuartz::VideoAspectRatioChanged(float aspect)
 {
     VERBOSE(VB_PLAYBACK,
-            QString("VideoOutputQuartz::AspectChanged(aspect=%1) [was %2]")
-                   .arg(aspect).arg(data->srcAspect));
+            QString("VideoOutputQuartz::VideoAspectRatioChanged"
+                    "(aspect=%1) [was %2]")
+            .arg(aspect).arg(data->srcAspect));
 
-    VideoOutput::AspectChanged(aspect);
-    MoveResize();
+    VideoOutput::VideoAspectRatioChanged(aspect);
 
     data->srcAspect = aspect;
-    data->srcMode = letterbox;
-    for (VideoOutputQuartzView *view = data->views.first();
-         view;
-         view = data->views.next())
-    {
-        view->AspectChanged(aspect);
-    }
+    data->srcMode   = letterbox;
+
+    VideoOutputQuartzView *view = NULL;
+    for (view = data->views.first(); view; view = data->views.next())
+        view->VideoAspectRatioChanged(aspect);
 }
 
 void VideoOutputQuartz::Zoom(int direction)

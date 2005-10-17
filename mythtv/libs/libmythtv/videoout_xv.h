@@ -71,12 +71,11 @@ class VideoOutputXv : public VideoOutput
 
     void InputChanged(int width, int height, float aspect);
     void Zoom(int direction);
-    void AspectChanged(float aspect);
+    void VideoAspectRatioChanged(float aspect);
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);
     int GetRefreshRate(void);
     void DrawUnusedRects(bool sync = true);
-    float GetDisplayAspect(void);
     void UpdatePauseFrame(void);
     int ChangePictureAttribute(int attributeType, int newValue);
 

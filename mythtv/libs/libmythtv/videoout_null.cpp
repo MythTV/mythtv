@@ -29,12 +29,6 @@ VideoOutputNull::~VideoOutputNull()
     Exit();
 }
 
-void VideoOutputNull::AspectChanged(float aspect)
-{
-    VideoOutput::AspectChanged(aspect);
-    MoveResize();
-}
-
 void VideoOutputNull::Zoom(int direction)
 {
     VideoOutput::Zoom(direction);

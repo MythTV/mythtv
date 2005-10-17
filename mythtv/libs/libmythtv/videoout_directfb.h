@@ -25,10 +25,8 @@ class VideoOutputDirectfb: public VideoOutput
     void Show(FrameScanType);
 
     void InputChanged(int width, int height, float aspect);
-    void AspectChanged(float aspect);
     void Zoom(int direction);
 
-    float GetDisplayAspect(void);
     void MoveResize();
 
     int GetRefreshRate(void);

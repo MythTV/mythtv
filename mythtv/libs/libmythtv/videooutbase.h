@@ -137,7 +137,7 @@ class VideoOutput
     virtual void Show(FrameScanType) = 0;
 
     virtual void InputChanged(int width, int height, float aspect);
-    virtual void AspectChanged(float aspect);
+    virtual void VideoAspectRatioChanged(float aspect);
 
     virtual void EmbedInWidget(WId wid, int x, int y, int w, int h);
     virtual void StopEmbedding(void);
@@ -155,7 +155,7 @@ class VideoOutput
     virtual void DrawUnusedRects(bool sync = true) = 0;
 
     /// \brief Returns current display aspect ratio.
-    virtual float GetDisplayAspect(void) { return 4.0/3; }
+    virtual float GetDisplayAspect(void) const { return display_aspect; }
 
     /// \brief Returns current letterboxing mode
     /// \sa ToggleLetterbox(int)
@@ -273,7 +273,7 @@ class VideoOutput
     void DoPipResize(int pipwidth, int pipheight);
     void ShutdownPipResize(void);
 
-    void AspectSet(float aspect);
+    void SetVideoAspectRatio(float aspect);
 
     /// Physical width of playback window in millimeters, used to compute display_aspect
     int w_mm;

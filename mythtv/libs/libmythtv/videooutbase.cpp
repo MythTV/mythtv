@@ -217,7 +217,7 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 
     XJ_width = width;
     XJ_height = height;
-    AspectSet(aspect);
+    SetVideoAspectRatio(aspect);
     
     QString HorizScanMode = gContext->GetSetting("HorizScanMode", "overscan");
     QString VertScanMode = gContext->GetSetting("VertScanMode", "overscan");
@@ -253,17 +253,16 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
     if (imgw == 1920 && imgh == 1088)
         imgh = 1080; // ATSC 1920x1080
 
-    brightness = gContext->GetNumSettingOnHost("PlaybackBrightness", 
-                                               gContext->GetHostName(), 50);
-    contrast = gContext->GetNumSettingOnHost("PlaybackContrast", 
-                                             gContext->GetHostName(), 50);
-    colour = gContext->GetNumSettingOnHost("PlaybackColour", 
-                                           gContext->GetHostName(), 50);
-    hue = gContext->GetNumSettingOnHost("PlaybackHue", 
-                                        gContext->GetHostName(), 0);
-
-    letterbox = gContext->GetNumSetting("AspectOverride", 0);
-    AspectSet(aspect);
+    brightness = gContext->GetNumSettingOnHost(
+        "PlaybackBrightness", gContext->GetHostName(), 50);
+    contrast   = gContext->GetNumSettingOnHost(
+        "PlaybackContrast",   gContext->GetHostName(), 50);
+    colour     = gContext->GetNumSettingOnHost(
+        "PlaybackColour",     gContext->GetHostName(), 50);
+    hue        = gContext->GetNumSettingOnHost(
+        "PlaybackHue",        gContext->GetHostName(), 0);
+    letterbox  = gContext->GetNumSettingOnHost(
+        "AspectOverride",     gContext->GetHostName(), kLetterbox_Off);
 
     embedding = false;
 
@@ -368,14 +367,14 @@ bool VideoOutput::ApproveDeintFilter(const QString& filtername) const
 }
 
 /**
- * \fn VideoOutput::AspectSet(float aspect)
+ * \fn VideoOutput::SetVideoAspectRatio(float aspect)
  * \brief Sets VideoOutput::videoAspect to aspect, and sets 
  *        VideoOutput::XJ_aspect the letterbox type, unless
  *        the letterbox type is kLetterbox_Fill.
  * 
- * \param aspect aspect ratio to use
+ * \param aspect video aspect ratio to use
  */
-void VideoOutput::AspectSet(float aspect)
+void VideoOutput::SetVideoAspectRatio(float aspect)
 {
     videoAspect = aspect;
     XJ_aspect = aspect;
@@ -399,13 +398,15 @@ void VideoOutput::AspectSet(float aspect)
 }
 
 /**
- * \fn VideoOutput::AspectChanged(float aspect)
- * \brief Calls AspectSet(float aspect).
- * \param aspect aspect ratio to use
+ * \fn VideoOutput::VideoAspectRatioChanged(float aspect)
+ * \brief Calls SetVideoAspectRatio(float aspect),
+ *        then calls MoveResize() to apply changes.
+ * \param aspect video aspect ratio to use
  */
-void VideoOutput::AspectChanged(float aspect)
+void VideoOutput::VideoAspectRatioChanged(float aspect)
 {
-    AspectSet(aspect);
+    SetVideoAspectRatio(aspect);
+    MoveResize();
 }
 
 /**
@@ -418,7 +419,7 @@ void VideoOutput::InputChanged(int width, int height, float aspect)
 {
     XJ_width = width;
     XJ_height = height;
-    AspectSet(aspect);
+    SetVideoAspectRatio(aspect);
     
     DiscardFrames();
 }
@@ -887,7 +888,7 @@ void VideoOutput::ToggleLetterbox(int letterboxMode)
         letterbox = letterboxMode;
     }
 
-    AspectChanged(videoAspect);
+    SetVideoAspectRatio(videoAspect);
 }
 
 /**

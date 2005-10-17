@@ -333,6 +333,8 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     DFBCHECKFAIL(data->primaryLayer->GetConfiguration(data->primaryLayer, &conf), false);
     data->screen_width = conf.width;
     data->screen_height = conf.height;
+    display_aspect = ((float)(conf.width)) / ((float)(conf.height));
+
 
     //determine output card capacities
     DFBCHECKFAIL(data->dfb->GetCardCapabilities(data->dfb, &(data->cardCapabilities)), false);
@@ -485,11 +487,6 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     return true;
 }
 
-float VideoOutputDirectfb::GetDisplayAspect(void)
-{
-    return (float)data->screen_width / (float)data->screen_height;
-}
-
 void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer, FrameScanType)
 {
     if (!buffer)
@@ -639,12 +636,6 @@ void VideoOutputDirectfb::InputChanged(int width, int height, float aspect)
     pauseFrame.size   = vbuffers.GetScratchFrame()->size;
     pauseFrame.buf    = new unsigned char[pauseFrame.size];
     pauseFrame.frameNumber = vbuffers.GetScratchFrame()->frameNumber;
-}
-
-void VideoOutputDirectfb::AspectChanged(float aspect)
-{
-    VideoOutput::AspectChanged(aspect);
-    MoveResize();
 }
 
 void VideoOutputDirectfb::Zoom(int direction)
