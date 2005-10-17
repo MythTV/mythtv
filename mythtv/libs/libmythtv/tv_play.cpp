@@ -44,6 +44,8 @@ const int TV::kSMExitTimeout  = 2000;
 const int TV::kChannelKeysMax = 6;
 
 #define DEBUG_ACTIONS 0 /**< set to 1 to debug actions */
+#define LOC QString("TV: ")
+#define LOC_ERR QString("TV Error: ")
 
 void TV::InitKeys(void)
 {
@@ -203,7 +205,7 @@ TV::TV(void)
       // Channel changing state variables
       channelqueued(false), channelKeys(""), lookForChannel(false),
       lastCC(""), lastCCDir(0), muteTimer(new QTimer(this)),
-      lockTimerOn(false), lockTimeout(3000),
+      lockTimerOn(false),
       // previous channel functionality state variables
       prevChanKeyCnt(0), prevChanTimer(new QTimer(this)),
       // channel browsing state variables
@@ -257,8 +259,8 @@ bool TV::Init(bool createWindow)
     MSqlQuery query(MSqlQuery::InitCon());
     if (!query.isConnected())
     {
-        VERBOSE(VB_IMPORTANT, "TV::Init(): Error, could "
-                "not open DB connection in player");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Init(): Could not open DB connection in player");
         errored = true;
         return false;
     }
@@ -442,7 +444,7 @@ bool TV::RequestNextRecorder(bool showDialogs)
     if (lookForChannel)
     {
         QStringList reclist;
-        GetValidRecorderList(channelid, reclist);
+        GetValidRecorderList(channelid.toUInt(), reclist);
         testrec = RemoteRequestFreeRecorderFromList(reclist);
         lookForChannel = false;
         channelqueued = true;
@@ -570,13 +572,13 @@ int TV::PlayFromRecorder(int recordernum)
 
     if (recorder)
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("TV::PlayFromRecorder(%1): Recorder already exists!")
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("PlayFromRecorder(%1): Recorder already exists!")
                 .arg(recordernum));
         return -1;
     }
 
-    recorder = RemoteGetExistingRecorder(recordernum);
+    activerecorder = recorder = RemoteGetExistingRecorder(recordernum);
     if (!recorder)
         return -1;
 
@@ -670,8 +672,8 @@ void TV::HandleStateChange(void)
 {
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, "
-                "called after fatal error detected.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
+                "Called after fatal error detected.");
         return;
     }
 
@@ -681,20 +683,20 @@ void TV::HandleStateChange(void)
     TVState nextState = internalState;
     if (!nextStates.size())
     {
-        VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Warning, "
+        VERBOSE(VB_IMPORTANT, LOC + "HandleStateChange() Warning, "
                 "called with no state to change to.");
         stateLock.unlock();
         return;
     }
     TVState desiredNextState = nextStates.dequeue();    
-    VERBOSE(VB_GENERAL, QString("Attempting to change from %1 to %2")
+    VERBOSE(VB_GENERAL, LOC + QString("Attempting to change from %1 to %2")
             .arg(StateToString(nextState))
             .arg(StateToString(desiredNextState)));
 
     if (desiredNextState == kState_Error)
     {
-        VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, "
-                "attempting to set to an error state!");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
+                "Attempting to set to an error state!");
         errored = true;
         stateLock.unlock();
         return;
@@ -707,11 +709,12 @@ void TV::HandleStateChange(void)
         QString name = "";
 
         lastSignalUIInfo.clear();
+        activerecorder = recorder;
         recorder->Setup();
         if (!recorder->SetupRingBuffer(name, filesize, smudge))
         {
-            VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, "
-                    "failed to start RingBuffer on backend. Aborting.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
+                    "Failed to start RingBuffer on backend. Aborting.");
             DeleteRecorder();
 
             SET_LAST();
@@ -737,7 +740,8 @@ void TV::HandleStateChange(void)
             }
             if (!ok)
             {
-                VERBOSE(VB_IMPORTANT, "LiveTV not successfully started");
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "LiveTV not successfully started");
                 gContext->RestoreScreensaver();
                 DeleteRecorder();
 
@@ -796,17 +800,17 @@ void TV::HandleStateChange(void)
     
             if (desiredNextState == kState_WatchingRecording)
             {
-                recorder = RemoteGetExistingRecorder(playbackinfo);
+                activerecorder = recorder =
+                    RemoteGetExistingRecorder(playbackinfo);
                 if (!recorder || !recorder->IsValidRecorder())
                 {
-                    VERBOSE(VB_IMPORTANT, "ERROR: couldn't find "
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Couldn't find "
                             "recorder for in-progress recording");
                     desiredNextState = kState_WatchingPreRecorded;
                     DeleteRecorder();
                 }
                 else
                 {
-                    activerecorder = recorder;
                     recorder->Setup();
                 }
             }
@@ -848,7 +852,8 @@ void TV::HandleStateChange(void)
     if (kState_None != nextState &&
         activenvp && !activenvp->IsDecoderThreadAlive())
     {
-        VERBOSE(VB_IMPORTANT, "Error, decoder not alive, and trying to play..");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Decoder not alive, and trying to play..");
         if (nextState == kState_WatchingLiveTV)
         {
             StopStuff(true, true, true);
@@ -861,13 +866,14 @@ void TV::HandleStateChange(void)
     // Print state changed message...
     if (!changed)
     {
-        VERBOSE(VB_IMPORTANT, QString("Unknown state transition: %1 to %2")
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Unknown state transition: %1 to %2")
                 .arg(StateToString(internalState))
                 .arg(StateToString(desiredNextState)));
     }
     else if (internalState != nextState)
     {
-        VERBOSE(VB_GENERAL, QString("Changing from %1 to %2")
+        VERBOSE(VB_GENERAL, LOC + QString("Changing from %1 to %2")
                 .arg(StateToString(internalState))
                 .arg(StateToString(nextState)));
     }
@@ -922,6 +928,26 @@ void TV::ForceNextStateNone()
     stateLock.unlock();
 }
 
+uint TV::GetLockTimeout(uint cardid)
+{
+    uint timeout = 0xffffffff;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT channel_timeout, cardtype "
+                  "FROM capturecard "
+                  "WHERE cardid = :CARDID");
+    query.bindValue(":CARDID", cardid);
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("Getting timeout", query);
+    else if (query.next() &&
+             SignalMonitor::IsSupported(query.value(1).toString()))
+        timeout = max(query.value(0).toInt(), 500);
+
+    VERBOSE(VB_PLAYBACK, LOC + "GetLockTimeout(%1): " +
+            QString("Set lock timeout to %2 ms")
+            .arg(cardid).arg(timeout));
+
+    return timeout;
+}
 
 /** \fn TV::StartRecorder(int)
  *  \brief Starts recorder, must be called before StartPlayer().
@@ -938,30 +964,17 @@ bool TV::StartRecorder(int maxWait)
     if (!recorder->IsRecording() || exitPlayer)
     {
         if (!exitPlayer)
-            VERBOSE(VB_IMPORTANT, "StartRecorder() -- "
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "StartRecorder() -- "
                     "timed out waiting for recorder to start");
         return false;
     }
 
-    VERBOSE(VB_PLAYBACK, "TV::StartRecorder: took "<<t.elapsed()
+    VERBOSE(VB_PLAYBACK, LOC + "StartRecorder(): took "<<t.elapsed()
             <<" ms to start recorder.");
 
     // Get timeout for this recorder
-    lockTimeout = 0xffffffff;
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT channel_timeout, cardtype "
-                  "FROM capturecard "
-                  "WHERE cardid = :CARDID");
-    query.bindValue(":CARDID", recorder->GetRecorderNumber());
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("Getting timeout", query);
-    else if (query.next() &&
-             SignalMonitor::IsSupported(query.value(1).toString()))
-        lockTimeout = max(query.value(0).toInt(), 500);
-
-    VERBOSE(VB_PLAYBACK, "TV::StartRecorder: " +
-            QString("Set lock timeout to %1 ms for rec #%2")
-            .arg(lockTimeout).arg(recorder->GetRecorderNumber()));
+    lockTimeout[recorder->GetRecorderNumber()] =
+        GetLockTimeout(recorder->GetRecorderNumber());
 
     // Cache starting frame rate for this recorder
     frameRate = recorder->GetFrameRate();
@@ -988,19 +1001,18 @@ bool TV::StartPlayer(bool isWatchingRecording, int maxWait)
            (t.elapsed() < maxWait))
         usleep(50);
 
-    VERBOSE(VB_PLAYBACK, "TV::StartPlayer: took "<<t.elapsed()
+    VERBOSE(VB_PLAYBACK, LOC + "StartPlayer(): took "<<t.elapsed()
             <<" ms to start player.");
 
     if (nvp->IsPlaying())
     {
         activenvp = nvp;
         activerbuffer = prbuffer;
-        activerecorder = recorder;
         StartOSD();
         return true;
     }
-    VERBOSE(VB_IMPORTANT,
-            QString("TV::StartPlayer: Error, NVP is not playing after %1 msec")
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("StartPlayer(): NVP is not playing after %1 msec")
             .arg(maxWait));
     return false;
 }
@@ -1036,10 +1048,10 @@ void TV::StartOSD()
  */
 void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 {
-    VERBOSE(VB_PLAYBACK, "TV::StopStuff() -- begin");
+    VERBOSE(VB_PLAYBACK, LOC + "StopStuff() -- begin");
     if (stopRingBuffers)
     {
-        VERBOSE(VB_PLAYBACK, "TV::StopStuff(): stopping ring buffer[s]");
+        VERBOSE(VB_PLAYBACK, LOC + "StopStuff(): stopping ring buffer[s]");
         if (prbuffer)
         {
             prbuffer->StopReads();
@@ -1057,7 +1069,7 @@ void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 
     if (stopPlayers)
     {
-        VERBOSE(VB_PLAYBACK, "TV::StopStuff(): stopping player[s] (1/2)");
+        VERBOSE(VB_PLAYBACK, LOC + "StopStuff(): stopping player[s] (1/2)");
         if (nvp)
             nvp->StopPlaying();
 
@@ -1067,7 +1079,7 @@ void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 
     if (stopRecorders)
     {
-        VERBOSE(VB_PLAYBACK, "TV::StopStuff(): stopping recorder[s]");
+        VERBOSE(VB_PLAYBACK, LOC + "StopStuff(): stopping recorder[s]");
         if (recorder)
             recorder->StopLiveTV();
 
@@ -1077,21 +1089,21 @@ void TV::StopStuff(bool stopRingBuffers, bool stopPlayers, bool stopRecorders)
 
     if (stopPlayers)
     {
-        VERBOSE(VB_PLAYBACK, "TV::StopStuff(): stopping player[s] (2/2)");
+        VERBOSE(VB_PLAYBACK, LOC + "StopStuff(): stopping player[s] (2/2)");
         if (nvp)
             TeardownPlayer();
 
         if (pipnvp)
             TeardownPipPlayer();
     }
-    VERBOSE(VB_PLAYBACK, "TV::StopStuff() -- end");
+    VERBOSE(VB_PLAYBACK, LOC + "StopStuff() -- end");
 }
 
 void TV::SetupPlayer(bool isWatchingRecording)
 {
     if (nvp)
     {
-        VERBOSE(VB_IMPORTANT,
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Attempting to setup a player, but it already exists.");
         return;
     }
@@ -1161,7 +1173,8 @@ QString TV::GetFiltersForChannel()
         filters += chanFilters.mid(1);
     }
     
-    VERBOSE(VB_CHANNEL, QString("Output filters for this channel are: '%1'").arg(filters));
+    VERBOSE(VB_CHANNEL, LOC +
+            QString("Output filters for this channel are: '%1'").arg(filters));
     return filters;
 }
 
@@ -1169,7 +1182,7 @@ void TV::SetupPipPlayer(void)
 {
     if (pipnvp)
     {
-        VERBOSE(VB_IMPORTANT,
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Attempting to setup a PiP player, but it already exists.");
         return;
     }
@@ -1237,6 +1250,9 @@ void TV::TeardownPipPlayer(void)
         delete pipnvp;
     }
     pipnvp = NULL;
+
+    if (activerecorder == piprecorder)
+        activerecorder = recorder;
 
     if (piprecorder)
         delete piprecorder;
@@ -1361,7 +1377,7 @@ void TV::RunTV(void)
 #ifdef USING_VALGRIND
             while (!nvp->IsPlaying())
             {
-                VERBOSE(VB_IMPORTANT, "Waiting for Valgrind...");
+                VERBOSE(VB_IMPORTANT, LOC + "Waiting for Valgrind...");
                 sleep(1);
             }
 #endif // USING_VALGRIND
@@ -1370,7 +1386,7 @@ void TV::RunTV(void)
             {
                 ChangeState(RemovePlaying(internalState));
                 endOfRecording = true;
-                VERBOSE(VB_PLAYBACK, ">> Player timeout");
+                VERBOSE(VB_PLAYBACK, LOC_ERR + "nvp->IsPlaying() timed out");
             }
         }
 
@@ -1496,7 +1512,7 @@ bool TV::eventFilter(QObject *o, QEvent *e)
 void TV::ProcessKeypress(QKeyEvent *e)
 {
 #if DEBUG_ACTIONS
-    VERBOSE(VB_IMPORTANT, "TV::ProcessKeypress()");
+    VERBOSE(VB_IMPORTANT, LOC + "ProcessKeypress()");
 #endif // DEBUG_ACTIONS
 
     bool was_doing_ff_rew = false;
@@ -1840,7 +1856,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
 #if DEBUG_ACTIONS
     for (uint i = 0; i < actions.size(); ++i)
-        VERBOSE(VB_IMPORTANT, QString("handled(%1) actions[%2](%3)")
+        VERBOSE(VB_IMPORTANT, LOC + QString("handled(%1) actions[%2](%3)")
                 .arg(handled).arg(i).arg(actions[i]));
 #endif // DEBUG_ACTIONS
 
@@ -2301,7 +2317,7 @@ void TV::TogglePIPView(void)
         piprecorder->Setup();
         if (!piprecorder->SetupRingBuffer(name, filesize, smudge, true))
         {
-            VERBOSE(VB_IMPORTANT, "TV::HandleStateChange() Error, failed "
+            VERBOSE(VB_IMPORTANT, LOC + "HandleStateChange() Error, failed "
                     "to start RingBuffer for PiP on backend. Aborting.");
             delete testrec;
             piprecorder = NULL;
@@ -2309,6 +2325,10 @@ void TV::TogglePIPView(void)
         }
 
         piprbuffer = new RingBuffer(name, filesize, smudge, piprecorder);
+
+        // Get timeout for this recorder
+        lockTimeout[piprecorder->GetRecorderNumber()] =
+            GetLockTimeout(piprecorder->GetRecorderNumber());
 
         piprecorder->SpawnLiveTV();
 
@@ -2811,9 +2831,8 @@ void TV::ChangeChannel(int direction, bool force)
         int behind = activenvp->GetSecondsBehind();
         if (behind > bufferedChannelThreshold)
         {
-            VERBOSE(VB_GENERAL, QString("Channel change requested when the "
-                                        "user is %1 seconds behind.")
-                                        .arg(behind));
+            VERBOSE(VB_GENERAL, LOC + "Channel change requested when the "
+                    "we is " << behind << " seconds behind Live TV.");
 
             if (!paused)
                 nvp->Pause();
@@ -2976,7 +2995,7 @@ void TV::ChangeChannelByString(QString &name, bool force)
     {
         RemoteEncoder *testrec = NULL;
         QStringList reclist;
-        GetValidRecorderList(channelid, reclist);
+        GetValidRecorderList(channelid.toUInt(), reclist);
         testrec = RemoteRequestFreeRecorderFromList(reclist);
         if (!testrec || !testrec->IsValidRecorder())
         {
@@ -3012,9 +3031,8 @@ void TV::ChangeChannelByString(QString &name, bool force)
         int behind = activenvp->GetSecondsBehind();
         if (behind > bufferedChannelThreshold)
         {
-            VERBOSE(VB_GENERAL, QString("Channel change requested when the "
-                                        "user is %1 seconds behind.")
-                                        .arg(behind));
+            VERBOSE(VB_GENERAL, LOC + "Channel change requested when the "
+                    "we is " << behind << " seconds behind Live TV.");
 
             if (!paused)
                 nvp->Pause();
@@ -3348,14 +3366,19 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
 void TV::UpdateOSDTimeoutMessage(void)
 {
     QString dlg_name("channel_timed_out");
-    bool timed_out = lockTimerOn && ((uint)lockTimer.elapsed() > lockTimeout);
+    bool timed_out = false;
+    if (activerecorder)
+    {
+        uint timeout = lockTimeout[activerecorder->GetRecorderNumber()];
+        timed_out = lockTimerOn && ((uint)lockTimer.elapsed() > timeout);
+    }
     OSD *osd = GetOSD();
 
     if (!osd)
     {
         if (timed_out)
         {
-            VERBOSE(VB_IMPORTANT, "Error: You have no OSD, "
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "You have no OSD, "
                     "but tuning has already taken too long.");
         }
         return;
@@ -4080,7 +4103,7 @@ void TV::customEvent(QCustomEvent *e)
         {
             int cardnum = (QStringList::split(" ", message))[1].toInt();
             QStringList keyframe = me->ExtraDataList();
-            VERBOSE(VB_IMPORTANT, "Got SKIP_TO message. Keyframe: "
+            VERBOSE(VB_IMPORTANT, LOC + "Got SKIP_TO message. Keyframe: "
                     <<stringToLongLong(keyframe[0]));
             bool tc = recorder && (recorder->GetRecorderNumber() == cardnum);
             (void)tc;
@@ -4130,9 +4153,6 @@ void TV::customEvent(QCustomEvent *e)
  */
 void TV::BrowseStart(void)
 {
-    if (activenvp != nvp)
-        return;
-
     if (paused || !GetOSD())
         return;
 
@@ -4268,7 +4288,7 @@ void TV::ToggleRecord(void)
         }
         else
         {
-            VERBOSE(VB_GENERAL, "Creating a manual recording");
+            VERBOSE(VB_GENERAL, LOC + "Creating a manual recording");
 
             QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
             QString channelFormat =
@@ -4600,7 +4620,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
             PreviousChannel();
         else
         {
-            cout << "unknown menu action selected: " << action << endl;
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Unknown menu action selected: " + action);
             hidetree = false;
         }
     }
@@ -4623,13 +4644,15 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         }
         else
         {
-            cout << "unknown menu action selected: " << action << endl;
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Unknown menu action selected: " + action);
             hidetree = false;
         }
     }
     else
     {
-        cout << "unknown menu action selected: " << action << endl;
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Unknown menu action selected: " + action);
         hidetree = false;
     }
 
@@ -5014,91 +5037,101 @@ void TV::SetManualZoom(bool zoomON)
 
 void TV::ToggleSleepTimer(const QString time)
 {
-    const int minute(60*1000);
-    int mins(0);
+    const int minute = 60*1000; /* milliseconds in a minute */
+    int mins = 0;
 
-    if (sleepTimer)
+    if (!sleepTimer)
     {
-        if (time == "TOGGLESLEEPON")
-        {
-            if (sleepTimer->isActive())
-                sleepTimer->stop();
-            else
-            {
-                mins = 60;
-                sleepTimer->start(mins *minute);
-            }
-        }
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "No sleep timer?");
+        return;
+    }
+
+    if (time == "TOGGLESLEEPON")
+    {
+        if (sleepTimer->isActive())
+            sleepTimer->stop();
         else
         {
-            if (time.length() > 11)
-            {
-                bool intRead = false;
-                mins = time.right(time.length() - 11).toInt(&intRead);
-
-                if (intRead)
-                {
-                    // catch 120 -> 240 mins
-                    if (mins < 30)
-                    {
-                        mins *= 10;
-                    }
-                }
-                else
-                {
-                    mins = 0;
-                    cout << "Invalid time " << time << endl;
-                }
-            }
-            else
-            {
-                cout << "Invalid time string " << time << endl;
-            }
-
-            if (sleepTimer->isActive())
-            {
-                sleepTimer->stop();
-            }
-
-            if (mins)
-                sleepTimer->start(mins * minute);
-        }
-               
-        // display OSD
-        if (GetOSD() && !browsemode)
-        {
-            QString out;
-
-            if (mins != 0)
-                out = tr("Sleep") + " " + QString::number(mins);
-            else
-                out = tr("Sleep") + " " + sleep_times[0].dispString;
-
-            GetOSD()->SetSettingsText(out, 3);
+            mins = 60;
+            sleepTimer->start(mins *minute);
         }
     }
     else
     {
-        cout << "No sleep timer?";
+        if (time.length() > 11)
+        {
+            bool intRead = false;
+            mins = time.right(time.length() - 11).toInt(&intRead);
+
+            if (intRead)
+            {
+                // catch 120 -> 240 mins
+                if (mins < 30)
+                {
+                    mins *= 10;
+                }
+            }
+            else
+            {
+                mins = 0;
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid time "<<time);
+            }
+        }
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid time string "<<time);
+        }
+
+        if (sleepTimer->isActive())
+        {
+            sleepTimer->stop();
+        }
+
+        if (mins)
+            sleepTimer->start(mins * minute);
+    }
+               
+    // display OSD
+    if (GetOSD() && !browsemode)
+    {
+        QString out;
+
+        if (mins != 0)
+            out = tr("Sleep") + " " + QString::number(mins);
+        else
+            out = tr("Sleep") + " " + sleep_times[0].dispString;
+
+        GetOSD()->SetSettingsText(out, 3);
     }
 }
 
-void TV::GetValidRecorderList (const QString & chanid, QStringList & reclist)
+/** \fn TV::GetValidRecorderList(uint chanid, QStringList&)
+ *  \brief Returns list of the recorders that have chanid in their sources.
+ *  \param [in] chanid  Channel ID of channel we are querying recorders for
+ *  \param [out]reclist List of cardid's for recorders with channel.
+ */
+void TV::GetValidRecorderList(uint chanid, QStringList &reclist)
 {
     reclist.clear();
     // Query the database to determine which source is being used currently.
     // set the EPG so that it only displays the channels of the current source
     MSqlQuery query(MSqlQuery::InitCon());
     // We want to get the current source id for this recorder
-    QString queryChanid = "SELECT I.cardid FROM channel C LEFT JOIN "
-                          "cardinput I ON C.sourceid = I.sourceid "
-                          "WHERE C.chanid = " + chanid + ";";
-    query.prepare(queryChanid);
-    query.exec();
-    if (query.isActive() && query.size() > 0) {
-        while (query.next ()) {
+    query.prepare(
+        "SELECT cardinput.cardid "
+        "FROM channel "
+        "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
+        "WHERE channel.chanid = :CHANID");
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("GetValidRecorderList", query);
+    }
+    else
+    {
+        while (query.next())
             reclist << query.value(0).toString();
-        }
     }
 }
 
@@ -5123,7 +5156,7 @@ void TV::ShowNoRecorderDialog(void)
  */
 void TV::PauseLiveTV(void)
 {
-    VERBOSE(VB_PLAYBACK, "PauseLiveTV()");
+    VERBOSE(VB_PLAYBACK, LOC + "PauseLiveTV()");
     lockTimerOn = false;
 
     if (activenvp)
@@ -5142,7 +5175,8 @@ void TV::PauseLiveTV(void)
     osdlock.unlock();
 
     lockTimerOn = false;
-    if (lockTimeout < 0xffffffff)
+    uint timeout = lockTimeout[activerecorder->GetRecorderNumber()];
+    if (timeout < 0xffffffff)
     {
         lockTimer.start();
         lockTimerOn = true;
@@ -5155,15 +5189,15 @@ void TV::PauseLiveTV(void)
  */
 void TV::UnpauseLiveTV(void)
 {
-    VERBOSE(VB_PLAYBACK, "UnpauseLiveTV()");
+    VERBOSE(VB_PLAYBACK, LOC + "UnpauseLiveTV()");
 
     if (activenvp)
     {
         activenvp->ResetPlaying();
         if (activenvp->IsErrored())
         {
-            VERBOSE(VB_IMPORTANT,
-                    "TVPlay::UnpauseLiveTV(): Unable to reset playing.");
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "UnpauseLiveTV(): Unable to reset playing.");
             wantsToQuit = false;
             exitPlayer = true;
             return;

@@ -101,7 +101,7 @@ class TV : public QObject
     void EmbedOutput(WId wid, int x, int y, int w, int h);
     void StopEmbeddingOutput(void);
     void EPGChannelUpdate(QString chanid, QString chanstr);
-    void GetValidRecorderList(const QString & channum, QStringList & reclist);
+    static void GetValidRecorderList(uint chanid, QStringList &reclist);
    
     bool getRequestDelete(void) { return requestDelete; }
     bool getEndOfRecording(void) { return endOfRecording; }
@@ -144,6 +144,7 @@ class TV : public QObject
     bool RequestNextRecorder(bool showDialogs);
     void DeleteRecorder();
 
+    static uint GetLockTimeout(uint cardid);
     bool StartRecorder(int maxWait=-1);
     bool StartPlayer(bool isWatchingRecording, int maxWait=-1);
     void StartOSD(void);
@@ -352,7 +353,7 @@ class TV : public QObject
     // Channel changing timeout notification variables
     QTime   lockTimer;
     bool    lockTimerOn;
-    uint    lockTimeout;
+    QMap<uint,uint> lockTimeout;
 
     // Previous channel functionality state variables
     str_vec_t prevChan;       ///< Previous channels
