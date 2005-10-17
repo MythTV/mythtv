@@ -7536,11 +7536,11 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Mute On</source>
-        <translation>Ääni Päälle</translation>
+        <translation>Ääni Pois</translation>
     </message>
     <message>
         <source>Mute Off</source>
-        <translation>Ääni Pois</translation>
+        <translation>Ääni Päälle</translation>
     </message>
     <message>
         <source>Hue %1 %</source>
