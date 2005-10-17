@@ -981,9 +981,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             ringBuffer->CalcReadAheadThresh(bitrate);
     }
 
-
     // Select a new track at the next opportunity.
     currentAudioTrack = -1;
+    currentSubtitleTrack = -1;
 
     if (GetNVP()->IsErrored())
         scanerror = -1;
