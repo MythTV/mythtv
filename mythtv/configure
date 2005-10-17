@@ -1405,6 +1405,37 @@ fi
 
 fi
 
+# "CPU_CLIP" test for SRC / libsamplerate
+# test positive wrap
+cat > $TMPC << EOF
+int main(){
+    float f = (1<<(sizeof(short)*8))>>1;
+    short s = (short)f;
+    if ( s == --f )
+        return(0);
+    return(1);
+}
+EOF
+
+if $cc $CFLAGS $ECFLAGS -o $TMPE $TMPC 2>/dev/null ; then
+$TMPE && cpuclipspositive="yes"
+fi
+
+# test negative wrap
+cat > $TMPC << EOF
+int main(){
+    float f = -((1<<(sizeof(short)*8))>>1) - 1;
+    short s = (short)f;
+    if ( s == ++f)
+        return(0);
+    return(1);
+}
+EOF
+
+if $cc $CFLAGS $ECFLAGS -o $TMPE $TMPC 2>/dev/null ; then
+$TMPE && cpuclipsnegative="yes"
+fi
+
 # test for distcc
 if test x"$distcc" = x"yes"; then
     if test x"`distcc --version 2> /dev/null`" = x""; then
@@ -2277,6 +2308,16 @@ if test "$mmx" = "yes" ; then
   echo "TARGET_MMX=yes" >> $MYTH_CONFIG_MAK
   echo "#define HAVE_MMX 1" >> $TMPH
   echo "#define __CPU__ 586" >> $TMPH
+fi
+if test "$cpuclipspositive" = "yes"; then
+  echo "#define CPU_CLIPS_POSITIVE 1" >> $TMPH
+else
+  echo "#define CPU_CLIPS_POSITIVE 0" >> $TMPH
+fi
+if test "$cpuclipsnegative" = "yes"; then
+  echo "#define CPU_CLIPS_NEGATIVE 1" >> $TMPH
+else
+  echo "#define CPU_CLIPS_NEGATIVE 0" >> $TMPH
 fi
 #if test "$builtin_vector" = "yes" ; then
 #  echo "TARGET_BUILTIN_VECTOR=yes" >> $MYTH_CONFIG_MAK
