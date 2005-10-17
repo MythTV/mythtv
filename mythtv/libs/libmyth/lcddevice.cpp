@@ -12,6 +12,7 @@
 #include "mythdialogs.h"
 
 #include <unistd.h>
+#include <sys/wait.h>	// For WIFEXITED on Mac OS X
 #include <cmath>
 
 #include <qapplication.h>
