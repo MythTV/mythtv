@@ -8,10 +8,13 @@
 	device
 */
 
+#ifdef MFD_RTSP_SUPPORT
+
 #include <iostream>
 using namespace std;
 
 #include <qapplication.h>
+
 
 #include <liveMedia.hh>
 #include <GroupsockHelper.hh>
@@ -386,3 +389,5 @@ RtspIn::~RtspIn()
         rtp_incoming_buffer = NULL;
     }
 }
+
+#endif // MFD_RTSP_SUPPORT

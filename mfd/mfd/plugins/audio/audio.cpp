@@ -1530,6 +1530,7 @@ void AudioPlugin::nameSpeakers(int which_one, int socket_identifier)
 
 void AudioPlugin::useSpeakers(int which_one, bool turn_on)
 {
+#ifdef MFD_RTSP_SUPPORT
     maop_mutex.lock();
 
         QPtrListIterator<MaopInstance> it( maop_instances );
@@ -1565,6 +1566,7 @@ void AudioPlugin::useSpeakers(int which_one, bool turn_on)
     maop_mutex.unlock();
     
     listSpeakers();
+#endif // MFD_RTSP_SUPPORT
 }
 
 AudioPlugin::~AudioPlugin()

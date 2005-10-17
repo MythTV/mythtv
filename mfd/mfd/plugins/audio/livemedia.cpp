@@ -14,11 +14,11 @@
 using namespace std;
 
 #include <mythtv/audiooutput.h>
+#include "livemedia.h"
+#ifdef MFD_RTSP_SUPPORT
 #include <SimpleRTPSink.hh>
 #include <uLawAudioFilter.hh>
 #include <GroupsockHelper.hh>
-#include "livemedia.h"
-#ifdef MFD_RTSP_SUPPORT
 
 UniversalPCMSource* UniversalPCMSource::createNew(UsageEnvironment& env, AudioOutput& ao)
 {
@@ -193,4 +193,4 @@ LiveSubsession::~LiveSubsession()
 {
 }
 
-#endif
+#endif // MFD_RTSP_SUPPORT
