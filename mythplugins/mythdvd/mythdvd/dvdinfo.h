@@ -10,6 +10,8 @@
 #ifndef DVDINFO_H_
 #define DVDINFO_H_
 
+#include <stdint.h>
+
 #include <qstring.h>
 #include <qptrlist.h>
 
