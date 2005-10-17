@@ -39,7 +39,7 @@
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
       <text lang="NL">Toetsen instellen</text>
-      <text lang="NL">Tangenter</text>
+      <text lang="SV">Knappar</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>

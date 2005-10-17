@@ -179,6 +179,7 @@
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
       <text lang="DE">Tastenbelegung Ã¤ndern</text>
+      <text lang="SV">Ã^Ændra knappar</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>
