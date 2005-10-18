@@ -642,8 +642,18 @@ if test "$gallery" = "yes" ; then
         echo "#define EXIF_SUPPORT 1" >> ./mythgallery/mythgallery/config.h
         echo "LIBS += -lexif" >> ./mythgallery/mythgallery/config.pro
 
-        if `pkg-config --atleast-version 0.6.9 libexif` ; then
-            echo "#define NEW_LIB_EXIF 1" >> ./mythgallery/mythgallery/config.h
+        if test x`which pkg-config 2>/dev/null` != x"" ; then
+            if `pkg-config --atleast-version 0.6.9 libexif` ; then
+                echo "#define NEW_LIB_EXIF 1" >> \
+                    ./mythgallery/mythgallery/config.h
+            fi
+        else
+            echo
+            echo "Could not determine libexif version, if it is greater than"
+            echo "or equal to 0.6.9 you may need to add this line: "
+            echo "#define NEW_LIB_EXIF 1"
+            echo "to mythgallery/mythgallery/config.h"
+            echo
         fi
     fi
 
