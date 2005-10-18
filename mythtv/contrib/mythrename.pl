@@ -339,7 +339,7 @@ EOF
         $safe_file =~ s/'/'\\''/sg;
         $safe_file = "'$safe_file'";
     # Figure out the suffix
-        my $out    = `file $safe_file 2>/dev/null`;
+        my $out    = `file -b $safe_file 2>/dev/null`;
         my $suffix = ($out =~ /mpe?g/i) ? '.mpg' : '.nuv';
     # Link destination
         if ($dest) {
