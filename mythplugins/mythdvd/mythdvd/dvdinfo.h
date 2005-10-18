@@ -10,13 +10,15 @@
 #ifndef DVDINFO_H_
 #define DVDINFO_H_
 
-#include <stdint.h>
-
-#include <qstring.h>
-#include <qptrlist.h>
-
+// C headers
+extern "C" { /* needed for inttypes.h by glibc 2.3.5 */
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_read.h>
+}
+
+// Qt headers
+#include <qstring.h>
+#include <qptrlist.h>
 
 class DVDSubTitleInfo
 {

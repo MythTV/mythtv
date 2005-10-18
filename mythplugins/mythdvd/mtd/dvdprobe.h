@@ -10,10 +10,14 @@
 #ifndef DVDPROBE_H_
 #define DVDPROBE_H_
 
+// C headers
+extern "C" { /* needed for inttypes.h by glibc 2.3.5 */
+#include <dvdread/ifo_types.h>
+}
+
+// Qt headers
 #include <qstring.h>
 #include <qptrlist.h>
-
-#include <dvdread/ifo_types.h>
 
 class DVDSubTitle
 {
