@@ -67,6 +67,9 @@ int isnan(double);
 }
 #endif
 
+#define LOC QString("NVP: ")
+#define LOC_ERR QString("NVP, Error: ")
+
 NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
     : forceVideoOutput(kVideoOutput_Default),
       decoder(NULL), videoOutput(NULL), nvr_enc(NULL), m_playbackinfo(NULL),
@@ -1230,18 +1233,19 @@ void NuppelVideoPlayer::UpdateCC(unsigned char *inpos)
     }
 }
 
-
-#define MAXWARPDIFF 0.0005 // Max amount the warpfactor can change in 1 frame
-#define WARPMULTIPLIER 1000000000 // How much do we multiply the warp by when
-                                  //storing it in an integer
-#define WARPAVLEN (video_frame_rate * 600) // How long to average the warp over
-#define WARPCLIP    0.1 // How much we allow the warp to deviate from 1
-                        // (normal speed)
-#define MAXDIVERGE  3   // Maximum number of frames of A/V divergence allowed
-                        // before dropping or extending video frames to
-                        // compensate
-#define DIVERGELIMIT 30 // A/V divergence above this amount is clipped
-                        // to avoid bad stream data causing huge pauses
+/// Max amount the warpfactor can change in 1 frame.
+#define MAXWARPDIFF 0.0005f
+/// How much dwe multiply the warp by when storing it in an integer.
+#define WARPMULTIPLIER 1000000000
+/// How long to average the warp over.
+#define WARPAVLEN (video_frame_rate * 600)
+/** How much we allow the warp to deviate from 1.0 (normal speed). */
+#define WARPCLIP    0.1f
+/** Number of frames of A/V divergence allowed adjustments are made. */
+#define MAXDIVERGE  3.0f
+/** A/V divergence above this amount is clipped to avoid a bad stream 
+ *  causing large playback glitches. */
+#define DIVERGELIMIT 30.0f
 
 float NuppelVideoPlayer::WarpFactor(void)
 {
@@ -1330,49 +1334,64 @@ void NuppelVideoPlayer::InitAVSync(void)
 
 void NuppelVideoPlayer::AVSync(void)
 {
-    float           diverge;
+    float diverge = 0.0f;
 
     VideoFrame *buffer = videoOutput->GetLastShownFrame();
     if (!buffer)
     {
-        VERBOSE(VB_IMPORTANT, "No video buffer");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "AVSync: No video buffer");
+        return;
+    }
+    if (videoOutput->IsErrored())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "AVSync: "
+                "Unknown error in videoOutput, aborting playback.");
+        errored = true;
         return;
     }
 
+    // The warp calculation is only valid at "normal_speed" playback.
     if (normal_speed)
+    {
         diverge = WarpFactor();
-    else
-        diverge = 0;
+        // If we are WAY out of sync, we can't really adjust this much
+        // so just adjust by DIVERGELIMIT and hope lip-sync remains.
+        diverge = max(diverge, -DIVERGELIMIT);
+        diverge = min(diverge, +DIVERGELIMIT);
+    }
 
-    // If video is way ahead of audio, drop some frames until we're
-    // close again.
+    FrameScanType ps = (m_double_framerate) ? kScan_Interlaced : kScan_Ignore;
     if (diverge < -MAXDIVERGE)
     {
-        if (diverge < -DIVERGELIMIT)
-            diverge = -DIVERGELIMIT;
+        // If video is way ahead of audio, adjust for it...
+        QString dbg = QString("Video is %1 frames ahead of audio, ")
+            .arg(-diverge);
 
-        VERBOSE(VB_PLAYBACK, QString("A/V diverged by %1 frames, dropping "
-            "frame to keep audio in sync").arg(diverge));
+        // Reset A/V Sync
         lastsync = true;
+ 
+        if (buffer && !using_null_videoout &&
+            (videoOutput->hasMCAcceleration()   ||
+             videoOutput->hasIDCTAcceleration() ||
+             videoOutput->hasVLDAcceleration()))
+        {
+            // If we are using hardware decoding, so we've already done the
+            // decoding; display the frame, but don't wait for A/V Sync.
+            videoOutput->PrepareFrame(buffer, ps);
+            videoOutput->Show(m_scan);
+            VERBOSE(VB_PLAYBACK, LOC + dbg + "skipping A/V wait.");
+        }
+        else
+        {
+            // If we are using software decoding, skip this frame altogether.
+            VERBOSE(VB_PLAYBACK, LOC + dbg + "dropping frame.");
+        }
     }
     else if (!using_null_videoout)
     {
-        if (videoOutput->IsErrored())
-        {   // this check prevents calling prepareframe
-            VERBOSE(VB_IMPORTANT, "NVP: Error condition detected "
-                    "in videoOutput before PrepareFrame(), aborting playback.");
-            errored = true;
-            return;
-        }
-
         // if we get here, we're actually going to do video output
         if (buffer)
-        {
-            if (m_double_framerate)
-                videoOutput->PrepareFrame(buffer, kScan_Interlaced);
-            else
-                videoOutput->PrepareFrame(buffer, kScan_Ignore);
-        }
+            videoOutput->PrepareFrame(buffer, ps);
 
         videosync->WaitForFrame(avsync_adjustment);
         if (!resetvideo)
@@ -1417,15 +1436,14 @@ void NuppelVideoPlayer::AVSync(void)
 
     if (diverge > MAXDIVERGE)
     {
-        if (diverge > DIVERGELIMIT)
-            diverge = DIVERGELIMIT;
+        // If audio is way ahead of video, adjust for it...
+        // by cutting the frame rate in half for the length of this frame
 
-        // Audio is way ahead of the video - cut the frame rate to
-        // half speed until it is within normal range
-        VERBOSE(VB_PLAYBACK, QString("A/V diverged by %1 frames, extending "
-            "frame to keep audio in sync").arg(diverge));
         avsync_adjustment = frame_interval;
         lastsync = true;
+        VERBOSE(VB_PLAYBACK, LOC + 
+                QString("Audio is %1 frames ahead of video,\n"
+                        "\t\t\tdoubling video frame interval.").arg(diverge));
     }
 
     if (audioOutput && normal_speed)
