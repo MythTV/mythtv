@@ -116,12 +116,14 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     if (gContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes();
 
+#ifdef USING_XVMC
     xvmcBuffers.OSDNum    = XVMC_OSD_NUM;
     xvmcBuffers.OSDResNum = XVMC_OSD_RES_NUM;
     xvmcBuffers.MinSurf   = XVMC_MIN_SURF_NUM;
     xvmcBuffers.MaxSurf   = XVMC_MAX_SURF_NUM;
     xvmcBuffers.NumDecode = XVMC_MIN_SURF_NUM;
     xvmcBuffers.Agressive = AGGRESSIVE_BUFFER_MANAGEMENT;
+#endif // USING_XVMC
 }
 
 VideoOutputXv::~VideoOutputXv()
