@@ -8,6 +8,9 @@ using namespace std;
 #include "programinfo.h"
 #include "recordingprofile.h"
 
+#define LOC QString("RecorderBase(%1): ").arg(videodevice)
+#define LOC_ERR QString("RecorderBase(%1) Error: ").arg(videodevice)
+
 RecorderBase::RecorderBase(TVRec *rec, const char *name)
     : QObject(NULL, name),
       tvrec(rec), ringBuffer(NULL), weMadeBuffer(true), codec("rtjpeg"),
@@ -122,7 +125,12 @@ void RecorderBase::SetOption(const QString &name, int value)
 
 void RecorderBase::SetIntOption(RecordingProfile *profile, const QString &name)
 {
-    SetOption(name, profile->byName(name)->getValue().toInt());
+    const Setting *setting = profile->byName(name);
+    if (setting)
+        SetOption(name, setting->getValue().toInt());
+    else
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                    "SetIntOption(...%1): Option not in profile.").arg(name));
 }
 
 /** \fn WaitForPause(int)
