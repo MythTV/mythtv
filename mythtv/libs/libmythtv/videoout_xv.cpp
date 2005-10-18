@@ -48,11 +48,14 @@ static void clear_xv_buffers(VideoBuffers&, int w, int h, int xv_chroma);
 //#define DEBUG_PAUSE /* enable to debug XvMC pause frame */
 
 #ifdef USING_XVMC
-/*#   define AGGRESSIVE_BUFFER_MANAGEMENT
-#   define XVMC_OSD_NUM       2
-#   define XVMC_OSD_RES_NUM   2
-#   define XVMC_MIN_SURF_NUM  8
-#   define XVMC_MAX_SURF_NUM 16*/
+#   define AGGRESSIVE_BUFFER_MANAGEMENT 0
+#   define XVMC_OSD_NUM       1 /**< 1 for display */
+#   define XVMC_OSD_RES_NUM   XVMC_OSD_NUM+1 /**< +1 for blending */
+#   define XVMC_PRE_NUM       1 /**< allow for one I/P frame before us */
+#   define XVMC_POST_NUM      1 /**< allow for one I/P frame after us */
+#   define XVMC_SHOW_NUM      1 /**< allow for one B frame to be displayed */
+#   define XVMC_MIN_SURF_NUM  8 /**< minumum number of XvMC surfaces to get */
+#   define XVMC_MAX_SURF_NUM 16 /**< maximum number of XvMC surfaces to get */
 
     static inline xvmc_render_state_t *GetRender(VideoFrame *frame);
 
@@ -113,12 +116,12 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     if (gContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes();
 
-    xvmcBuffers.OSDNum    = 2;
-    xvmcBuffers.OSDResNum = 2;
-    xvmcBuffers.MinSurf   = 8;
-    xvmcBuffers.MaxSurf   = 16;
-    xvmcBuffers.NumDecode = 8;
-    xvmcBuffers.Agressive = 1;
+    xvmcBuffers.OSDNum    = XVMC_OSD_NUM;
+    xvmcBuffers.OSDResNum = XVMC_OSD_RES_NUM;
+    xvmcBuffers.MinSurf   = XVMC_MIN_SURF_NUM;
+    xvmcBuffers.MaxSurf   = XVMC_MAX_SURF_NUM;
+    xvmcBuffers.NumDecode = XVMC_MIN_SURF_NUM;
+    xvmcBuffers.Agressive = AGGRESSIVE_BUFFER_MANAGEMENT;
 }
 
 VideoOutputXv::~VideoOutputXv()
@@ -591,11 +594,23 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
         if (vld)
             xvmcBuffers.NumDecode = 16;
 
-        vbuffers.Init( xvmcBuffers.NumDecode, false /*extra_for_pause*/,
-                       1 + xvmcBuffers.OSDResNum /*need_free*/,
-                       5 - xvmcBuffers.OSDResNum /*needprebuffer_normal*/,
-                       5 - xvmcBuffers.OSDResNum /*needprebuffer_small*/,
-                       1 /*keepprebuffer*/, true /*use_frame_locking*/);
+        int needprebuf = xvmcBuffers.NumDecode - XVMC_OSD_RES_NUM
+            - XVMC_PRE_NUM - XVMC_POST_NUM - XVMC_SHOW_NUM;
+        int needed_bfr_display = 1; //max(needprebuf / 3, 1);
+        //cerr<<"want to pre-buffer:  "<<needprebuf<<endl;
+        //cerr<<"need before display: "<<needed_bfr_display<<endl;
+        vbuffers.Init(xvmcBuffers.NumDecode,
+                      false
+                      /* create an extra frame for pause? */,
+                      XVMC_OSD_RES_NUM
+                      /* # of frames we do not try to fill with data */,
+                      needprebuf
+                      /* # of frames we try to keep full of data */,
+                      needprebuf
+                      /* same as above */,
+                      needed_bfr_display
+                      /* frames needed before we try to display a frame */,
+                      true /*use_frame_locking*/);
         
         
         done = InitXvMC(mcodecid);
