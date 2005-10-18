@@ -253,6 +253,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
             SLOT(setUpdateFreeSpace()));
 
     if ((recGroupPassword != "") ||
+        (titleList.count() <= 1) ||
         (gContext->GetNumSetting("QueryInitialFilter", 0)))
         showRecGroupChooser();
 
