@@ -873,7 +873,8 @@ void VideoOutput::Zoom(int direction)
 /**
  * \fn VideoOutput::ToggleLetterbox(int)
  * \brief Sets up letterboxing for various standard video frame and
- *        monitor dimentions. These are actually applied in MoveResize().
+ *        monitor dimensions, then calls VideoAspectRatioChanged(float)
+ *        to apply them.
  * \sa Zoom(int), 
  */
 void VideoOutput::ToggleLetterbox(int letterboxMode)
@@ -888,7 +889,7 @@ void VideoOutput::ToggleLetterbox(int letterboxMode)
         letterbox = letterboxMode;
     }
 
-    SetVideoAspectRatio(videoAspect);
+    VideoAspectRatioChanged(videoAspect);
 }
 
 /**
