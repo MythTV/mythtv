@@ -2907,8 +2907,24 @@ void ProgramInfo::showDetails(void) const
     msg += "\n";
 
     if (category != "")
+    {
         msg += QObject::tr("Category") + ":  " +
-               qApp->translate("Category", category) + "\n";
+               qApp->translate("Category", category);
+
+        query.prepare("SELECT genre FROM programgenres "
+                      "WHERE chanid = :CHANID AND starttime = :STARTTIME "
+                      "AND relevance > 0 ORDER BY relevance;");
+
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", startts);
+        
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            while (query.next())
+                msg += ", " + query.value(0).toString();
+        }
+        msg += "\n";
+    }
 
     if (category_type  != "")
     {
