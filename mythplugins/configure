@@ -435,6 +435,8 @@ if $cc -o $TMPE $TMPC 2> /dev/null ; then
   _stdint_h=yes
 fi
 
+rm -f $TMPC $TMPE
+
 ###########################################################
 #                                                         #
 #  Top level mythplugin.pro file creation                 #
