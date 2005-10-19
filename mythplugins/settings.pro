@@ -1,4 +1,3 @@
-include ( $${PREFIX}/include/mythtv/mythconfig.mak )
 CONFIG += $$CCONFIG
 
 LIBVERSION = 0.18

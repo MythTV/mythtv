@@ -1,3 +1,4 @@
+include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 
 INCLUDEPATH += /usr/include/kde

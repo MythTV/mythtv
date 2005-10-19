@@ -1,3 +1,4 @@
+include ( ../../mythconfig.mak )
 include ( ../../settings.pro )
 
 TEMPLATE = app
