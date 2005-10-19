@@ -647,13 +647,23 @@ for opt do
   ;;
   --disable-v4l) v4l="no"
   ;;
+  --enable-audio-oss)  audio_oss="yes"
+  ;;
   --disable-audio-oss) audio_oss="no"
+  ;;
+  --enable-audio-alsa)  audio_alsa="yes"
   ;;
   --disable-audio-alsa) audio_alsa="no"
   ;;
+  --enable-audio-arts)  audio_arts="yes"
+  ;;
   --disable-audio-arts) audio_arts="no"
   ;;
+  --enable-audio-jack)  audio_jack="yes"
+  ;;
   --disable-audio-jack) audio_jack="no"
+  ;;
+  --enable-audio-beos)  audio_beos="yes"
   ;;
   --disable-audio-beos) audio_beos="no"
   ;;
