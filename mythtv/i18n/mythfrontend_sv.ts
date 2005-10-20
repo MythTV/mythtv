@@ -6277,7 +6277,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Your #%1 preferred language for Program Guide Data and captions.</source>
-        <translation>Det språk som ska användas i programguiden och undertexter.</translation>
+        <translation>Det språk (#%1) som ska användas i programguiden och undertexter.</translation>
     </message>
     <message>
         <source>Display Time</source>
