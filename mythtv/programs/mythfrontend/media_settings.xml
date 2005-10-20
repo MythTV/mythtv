@@ -1,4 +1,5 @@
 <mythmenu name="MEDIA_SETUP">
+
    <button>
      <type>SETTINGS_MUSIC</type>
      <text>Music Settings</text>
@@ -10,7 +11,7 @@
      <text lang="IS">Stillingar tónlistar</text>
      <text lang="NL">Muziek Instellingen</text>
      <text lang="PT">Configurar Música</text>
-     <text lang="SV">Musikinställningar</text>
+     <text lang="SV">Musik</text>
      <text lang="JA">ミュージック設定</text>
      <text lang="FI">Musiikkiasetukset</text>
      <text lang="ZH_TW">音樂設定</text>
@@ -32,7 +33,7 @@
        <text lang="IS">Stillingar kvikmynda</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
-       <text lang="SV">Videoinställningar</text>
+       <text lang="SV">Video</text>
        <text lang="JA">ビデオ設定</text>
        <text lang="FI">Videoasetukset</text>
        <text lang="ZH_TW">電影設定</text>
@@ -53,7 +54,7 @@
      <text lang="FR">Configuration des DVD</text>
      <text lang="IS">Stillingar DVD</text>
      <text lang="NL">DVD Instellingen</text>
-     <text lang="SV">DVD-inställningar</text>
+     <text lang="SV">DVD</text>
      <text lang="JA">DVD設定</text>
      <text lang="FI">DVD Asetukset</text>
      <text lang="ZH_TW">DVD設定</text>
@@ -75,7 +76,7 @@
       <text lang="IS">Stillingar ljósmynda</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
-      <text lang="SV">Galleriinställningar</text>
+      <text lang="SV">Bilder</text>
       <text lang="JA">イメージ設定</text>
       <text lang="FI">Kuva-asetukset</text>
       <text lang="ZH_TW">照相館設定</text>
@@ -97,7 +98,7 @@
      <text lang="IS">Stillingar leikja</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
-     <text lang="SV">Spelinställningar</text>
+     <text lang="SV">Spel</text>
      <text lang="JA">ゲーム設定</text>
      <text lang="FI">Peliasetukset</text>
      <text lang="ZH_TW">遊戲設定</text>
@@ -111,7 +112,7 @@
    <button>
      <type>SETTINGS_FM</type>
      <text>Radio Settings</text>
-     <text lang="SV">Radioinställningar</text>
+     <text lang="SV">Radio</text>
      <text lang="JA">ラジオ設定</text>
      <text lang="DE">Radio</text>
      <text lang="IS">Stillingar útvarps</text>

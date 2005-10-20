@@ -1,4 +1,5 @@
 <mythmenu name="SETUP">
+
    <button>
       <type>SETTINGS_GENERAL</type>
       <text>General</text>
@@ -39,7 +40,7 @@
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
       <text lang="NL">Toetsen instellen</text>
-      <text lang="SV">Knappar</text>
+      <text lang="SV">Ändra knappar</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>
@@ -131,7 +132,7 @@
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
-      <text lang="SV">Galleri</text>
+      <text lang="SV">Bilder</text>
       <text lang="JA">イメージ設定</text>
       <text lang="SI">Nastavitve slik</text>
       <text lang="ET">Galerii seaded</text>
@@ -223,6 +224,17 @@
    </button>
 
    <button>
+     <type>SETTINGS_MOVIETIME</type>
+     <text>Movie Time Settings</text>
+     <text lang="FI">Elokuvien Aika-asetukset</text>
+     <text lang="SI">Nastavitve čas filmov</text>
+     <text lang="ET">Filmiaegade seaded</text>
+     <text lang="SV">Biotider</text>
+     <action>CONFIGPLUGIN mythmovietime</action>
+     <depends>mythmovietime</depends>
+   </button>
+
+   <button>
      <type>SETTINGS_XBOX</type>
      <text>Xbox Settings</text>
      <text lang="PT">Configurar XBox</text>
@@ -230,7 +242,7 @@
      <text lang="ES">Configurar XBox</text>
      <text lang="DE">Xbox</text>
      <text lang="NL">Xbox Instellingen</text>
-     <text lang="SV">Xbox</text>
+     <text lang="SV">XBox</text>
      <text lang="JA">XBox設定</text>
      <text lang="SI">Nastavitve Xbox</text>
      <text lang="ET">Xbox-i seaded</text>

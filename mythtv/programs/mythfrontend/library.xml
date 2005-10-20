@@ -19,6 +19,7 @@
       <text lang="SI">Gledanje snemanj</text>
       <text lang="ET">Vaata salvestusi</text>
       <text lang="NB">Se på opptak</text>
+      <alttext lang="SV">Inspelningar</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -40,6 +41,7 @@
      <text lang="SI">Gledanje filmov</text>
      <text lang="ET">Vaata videot</text>
      <text lang="NB">Se på videoer</text>
+     <alttext lang="SV">Filmer</alttext>
      <action>JUMP MythVideo</action>
      <depends>mythvideo</depends>
    </button>
@@ -70,7 +72,7 @@
    <button>
      <type>FM</type>
      <text>Listen to the radio</text>
-     <text lang="SV">Lyssna pÃ¥ radio</text>
+     <text lang="SV">Lyssna på radio</text>
      <text lang="NL">Radio Luisteren</text>
      <text lang="JA">ラジオ放送</text>
      <text lang="DE">Radio hören</text>
@@ -81,6 +83,7 @@
      <text lang="ET">Kuula raadiot</text>
      <text lang="NB">Hør på radio</text>
      <text lang="DK">Hør radio</text>
+     <alttext lang="SV">Radio</alttext>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>
@@ -97,7 +100,7 @@
      <text lang="DK">Billeder</text>
      <text lang="IS">Ljósmyndir</text>
      <text lang="PT">Fotos</text>
-     <text lang="SV">Bildgalleri</text>
+     <text lang="SV">Bilder</text>
      <text lang="JA">イメージ</text>
      <text lang="FI">Kuvagalleria</text>
      <text lang="ZH_TW">照相館</text>
@@ -120,7 +123,7 @@
      <text lang="DK">Spil</text>
      <text lang="IS">Spila leiki</text>
      <text lang="PT">Jogos</text>
-     <text lang="SV">Spela spel</text>
+     <text lang="SV">Spel</text>
      <text lang="JA">ゲーム</text>
      <text lang="FI">Pelit</text>
      <text lang="ZH_TW">遊戲</text>

@@ -17,6 +17,7 @@
       <text lang="ET">Vaata salvestusi</text>
       <alttext lang="DE">Wiedergabe</alttext>
       <alttext lang="ET">Salvestused</alttext>
+      <alttext lang="SV">Inspelningar</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -37,6 +38,7 @@
       <text lang="ZH_TW">修正預設錄影衝突</text>
       <text lang="SI">Prihajajoča snemanja</text>
       <text lang="ET">Tulevased salvestamised</text>
+      <alttext lang="SV">Kommande</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
@@ -119,4 +121,5 @@
      <text lang="ET">Seiska</text>
      <action>SHUTDOWN</action>
    </button> -->
+
 </mythmenu>

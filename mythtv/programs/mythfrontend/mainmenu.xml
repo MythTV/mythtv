@@ -106,8 +106,7 @@
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
-    
-   
+
    <button>
      <type>MENU_UTILITIES_SETUP</type>
      <text>Utilities / Setup</text>

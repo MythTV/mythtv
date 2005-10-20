@@ -53,7 +53,7 @@
       <alttext lang="DK">Finder</alttext>
       <alttext lang="NL">Zoeker</alttext>
       <alttext lang="PT">Procurar</alttext>
-      <alttext lang="SV">Sökaren</alttext>
+      <alttext lang="SV">Letaren</alttext>
       <alttext lang="JA">検索</alttext>
       <alttext lang="SI">Iskalec</alttext>
       <alttext lang="ET">Otsija</alttext>
@@ -175,6 +175,7 @@
       <text lang="FI">Tulevat Nauhoitukset</text>
       <text lang="ZH_TW">修正預設錄影衝突</text>
       <text lang="SI">Prihajajoča snemanja</text>
+      <alttext lang="SV">Kommande</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 

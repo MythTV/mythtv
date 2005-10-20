@@ -66,6 +66,7 @@
       <text lang="ET">Vaata salvestusi</text>
       <alttext lang="DE">Wiedergabe</alttext>
       <alttext lang="ET">Salvestused</alttext>
+      <alttext lang="SV">Inspelningar</alttext>
       <action>TV_WATCH_RECORDING</action>
    </button>
 
@@ -86,6 +87,7 @@
       <text lang="ET">Kustuta salvestusi</text>
       <alttext lang="DE">Löschen</alttext>
       <alttext lang="ET">Kustuta</alttext>
+      <alttext lang="SV">Radera</alttext>
       <action>TV_DELETE</action>
    </button> 
 
@@ -124,6 +126,5 @@
       <text lang="ET">Süsteemi olek</text>
       <action>TV_STATUS</action>
    </button>
-
 
 </mythmenu>

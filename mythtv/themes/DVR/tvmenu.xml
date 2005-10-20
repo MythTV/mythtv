@@ -35,6 +35,7 @@
       <text lang="ET">Kustuta salvestusi</text>
       <alttext lang="DE">Löschen</alttext>
       <alttext lang="ET">Kustuta</alttext>
+      <alttext lang="SV">Radera</alttext>
       <action>TV_DELETE</action>
    </button> 
 
@@ -73,6 +74,5 @@
       <text lang="ET">Süsteemi olek</text>
       <action>TV_STATUS</action>
    </button>
-
 
 </mythmenu>

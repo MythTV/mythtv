@@ -110,7 +110,7 @@
      <text lang="DE">Xbox</text>
      <text lang="IS">Stillingar Xbox</text>
      <text lang="NL">Xbox Instellingen</text>
-     <text lang="SV">Xbox</text>
+     <text lang="SV">XBox</text>
      <text lang="JA">XBox設定</text>
      <text lang="FI">Xbox Asetukset</text>
      <text lang="ZH_TW">XBox設定</text>
@@ -122,7 +122,7 @@
      <dependssetting>EnableXbox</dependssetting>
    </button>
     
-    <button>
+   <button>
       <type>PHONE</type>
       <text>Phone Settings</text>
       <text lang="FR">Configuration téléphone</text>
@@ -138,4 +138,5 @@
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
+
 </mythmenu>

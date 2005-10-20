@@ -48,7 +48,7 @@
       <text lang="DE">Tastenbelegung ändern</text>
       <text lang="FI">Muokkaa Näppäimiä</text>
       <text lang="DK">Ændre tasteinstillinger</text>
-      <text lang="SV">�^�ndra knappar</text>
+      <text lang="SV">Ändra knappar</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>

@@ -67,6 +67,7 @@
       <text lang="DE">Radio</text>
       <text lang="SI">Radio</text>
       <text lang="ET">Raadio</text>
+      <text lang="SV">Radio</text>
       <action>PLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -82,7 +83,7 @@
      <text lang="DE">Bilder</text>
      <text lang="DK">Billeder</text>
      <text lang="PT">Fotos</text>
-     <text lang="SV">Galleri</text>
+     <text lang="SV">Bilder</text>
      <text lang="JA">イメージ</text>
      <text lang="SI">Slike</text>
      <text lang="ET">Galerii</text>
@@ -161,6 +162,7 @@
       <text lang="DE">Telefon</text>
       <text lang="SI">Telefon</text>
       <text lang="ET">Telefon</text>
+      <text lang="SV">Telefon</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -171,8 +173,20 @@
       <text lang="DE">Rezepte</text>
       <text lang="SI">Recepti</text>
       <text lang="ET">Retseptid</text>
+      <text lang="SV">Recept</text>
       <action>PLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
+   </button>
+
+   <button>
+     <type>MOVIETIMES</type>
+     <text>Movie Times</text>
+     <text lang="FI">Elokuvien Ajat</text>
+     <text lang="SI">Čas filmov</text>
+     <text lang="ET">Filmide ajad</text>
+     <text lang="SV">Biotider</text>
+     <action>PLUGIN mythmovietime</action>
+     <depends>mythmovietime</depends>
    </button>
 
    <button>
@@ -201,4 +215,5 @@
      <text lang="ET">Seiska</text>
      <action>SHUTDOWN</action>
    </button> -->
+
 </mythmenu>

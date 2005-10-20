@@ -11,7 +11,7 @@
      <text lang="IS">Stillingar veðurs</text>
      <text lang="NL">"Het Weer" Instellingen</text>
      <text lang="PT">Configurar Meteorologia</text>
-     <text lang="SV">Väderinställningar</text>
+     <text lang="SV">Väder</text>
      <text lang="JA">天気設定</text>
      <text lang="FI">Sään Asetukset</text>
      <text lang="ZH_TW">天氣報告設定</text>
@@ -31,7 +31,7 @@
      <text lang="NL">Nieuws Instellingen</text>
      <text lang="FR">Configuration des nouvelles</text>
      <text lang="IS">Stillingar frétta</text>
-     <text lang="SV">Nyhetsinställningar</text>
+     <text lang="SV">Nyheter</text>
      <text lang="JA">ニュース設定</text>
      <text lang="FI">Uutisten Asetukset</text>
      <text lang="ZH_TW">網上新聞設定</text>
@@ -49,6 +49,7 @@
      <text lang="FI">Elokuvien Aika-asetukset</text>
      <text lang="SI">Nastavitve čas filmov</text>
      <text lang="ET">Filmiaegade seaded</text>
+     <text lang="SV">Biotider</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -57,7 +58,7 @@
      <type>SETTINGS_WEBPAGE</type>
      <text>Web Settings</text>
      <text lang="DE">WWW</text>
-     <text lang="SV">Webb-inställningar</text>
+     <text lang="SV">Webb</text>
      <text lang="JA">Web設定</text>
      <text lang="FR">Configuration du web</text>
      <text lang="IS">Stillingar vefs</text>
@@ -75,7 +76,7 @@
    <button>
      <type>SETTINGS_RECIPE</type>
      <text>Recipe Settings</text>
-     <text lang="SV">ReceptinstÃ¤llningar</text>
+     <text lang="SV">Recept</text>
      <text lang="JA">レシピ設定</text>
      <text lang="DE">Rezepte</text>
      <text lang="FR">Configuration des recettes</text>

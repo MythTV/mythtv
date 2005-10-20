@@ -19,6 +19,7 @@
       <text lang="SI">Planiranje snemanj</text>
       <text lang="ET">Planeeri salvestamisi</text>
       <text lang="NB">Planlegg opptak</text>
+      <alttext lang="SV">Schemalägg</alttext>
       <action>MENU tv_schedule.xml</action>
    </button>
 
@@ -59,6 +60,7 @@
       <text lang="SI">Prihajajoča snemanja</text>
       <text lang="ET">Tulevased salvestamised</text>
       <text lang="NB">Planlagte opptak</text>
+      <alttext lang="SV">Kommande</alttext>
       <action>TV_FIX_CONFLICTS</action>
    </button>
 
@@ -81,6 +83,7 @@
       <text lang="SI">Brisanje snemanj</text>
       <text lang="ET">Kustuta salvestusi</text>
       <text lang="NB">Slett opptak</text>
+      <alttext lang="SV">Radera</alttext>
       <action>TV_DELETE</action>
    </button>
 

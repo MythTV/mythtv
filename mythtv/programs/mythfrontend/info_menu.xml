@@ -1,4 +1,5 @@
 <mythmenu name="INFO">
+
    <button>
      <type>PHONE</type>
      <text>Phone</text>
@@ -37,12 +38,14 @@
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
-    <button>
+
+   <button>
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
      <text lang="FI">Elokuvien Ajat</text>
      <text lang="SI">Čas filmov</text>
      <text lang="ET">Filmide ajad</text>
+     <text lang="SV">Biotider</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
