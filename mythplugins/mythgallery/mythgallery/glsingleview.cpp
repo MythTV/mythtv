@@ -614,6 +614,7 @@ void GLSingleView::registerEffects()
 {
     m_effectMap.insert("none", &GLSingleView::effectNone);
     m_effectMap.insert("blend (gl)", &GLSingleView::effectBlend);
+    m_effectMap.insert("zoom blend (gl)", &GLSingleView::effectZoomBlend);
     m_effectMap.insert("fade (gl)", &GLSingleView::effectFade);
     m_effectMap.insert("rotate (gl)", &GLSingleView::effectRotate);
     m_effectMap.insert("bend (gl)", &GLSingleView::effectBend);
@@ -690,6 +691,69 @@ void GLSingleView::effectBlend()
         glVertex3f(1, -1, 0);
         glVertex3f(1, 1, 0);
         glVertex3f(-1, 1, 0);
+    }
+    glEnd();
+    
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+    glRotatef(tb.angle, 0.0, 0.0, 1.0);
+
+    glBindTexture(GL_TEXTURE_2D, tb.tex);
+    glBegin(GL_QUADS);
+    {
+        glColor4f(1.0, 1.0, 1.0, 1.0/(100.0)*(float)m_i);
+        glTexCoord2f(0, 0);
+        glVertex3f(-tb.cx, -tb.cy, 0);
+        
+        glTexCoord2f(1, 0);
+        glVertex3f(tb.cx, -tb.cy, 0);
+                 
+        glTexCoord2f(1, 1);
+        glVertex3f(tb.cx, tb.cy, 0);
+        
+        glTexCoord2f(0, 1);
+        glVertex3f(-tb.cx, tb.cy, 0);
+    }
+    glEnd();
+
+    m_i++;
+}
+
+void GLSingleView::effectZoomBlend()
+{
+    if (m_i > 100) {
+        paintTexture();
+        m_effectRunning = false;
+        m_tmout = -1;
+        return;
+    }
+
+    int a = (m_curr == 0) ? 1 : 0;
+    int b =  m_curr;
+    float zf = 0.75;
+
+    TexItem& ta = m_texItem[a];
+    TexItem& tb = m_texItem[b];
+    
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+    glRotatef(ta.angle, 0.0, 0.0, 1.0);
+	float t=1.0/(100.00)*(float)m_i;
+    glBindTexture(GL_TEXTURE_2D, ta.tex);
+    glBegin(GL_QUADS);
+    {
+        glColor4f(1.0, 1.0, 1.0, 1.0-t);
+        glTexCoord2f(0, 0);
+        glVertex3f(-ta.cx*(1.0+zf*t), -ta.cy*(1.0+zf*t), 0);
+        
+        glTexCoord2f(1, 0);
+        glVertex3f(ta.cx*(1.0+zf*t), -ta.cy*(1.0+zf*t), 0);
+                 
+        glTexCoord2f(1, 1);
+        glVertex3f(ta.cx*(1.0+zf*t), ta.cy*(1.0+zf*t), 0);
+        
+        glTexCoord2f(0, 1);
+        glVertex3f(-ta.cx*(1.0+zf*t), ta.cy*(1.0+zf*t), 0);
     }
     glEnd();
     

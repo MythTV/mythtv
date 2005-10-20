@@ -126,6 +126,7 @@ private:
 
     void effectNone();
     void effectBlend();
+    void effectZoomBlend();
     void effectFade();
     void effectRotate();
     void effectBend();

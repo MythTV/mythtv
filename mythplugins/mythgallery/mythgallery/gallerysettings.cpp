@@ -68,6 +68,7 @@ static HostComboBox *SlideshowOpenGLTransition()
     gc->setLabel(QObject::tr("Type of OpenGL transition"));
     gc->addSelection("none");
     gc->addSelection("blend (gl)");
+    gc->addSelection("zoom blend (gl)");
     gc->addSelection("fade (gl)");
     gc->addSelection("rotate (gl)");
     gc->addSelection("bend (gl)");
