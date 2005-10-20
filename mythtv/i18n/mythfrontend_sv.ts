@@ -4984,7 +4984,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
-        <translation>Använd libmpeg2 för avkodning</translation>
+        <translation type="obsolete">Använd libmpeg2 för avkodning</translation>
     </message>
     <message>
         <source>Use on air guide</source>
@@ -5576,11 +5576,11 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)</source>
-        <translation>Använd XvMC MPEG-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
+        <translation type="obsolete">Använd XvMC MPEG-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
     </message>
     <message>
         <source>Use hardware XVMC VLD Decoding (incompatible with libmpeg2)</source>
-        <translation>Använd XvMC VLD-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
+        <translation type="obsolete">Använd XvMC VLD-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
     </message>
     <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems.</source>
@@ -5671,7 +5671,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
 WARNING: Enabling this option will disable XvMC video output.</source>
-        <translation>Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2, vilket kan vara snabbare.
+        <translation type="obsolete">Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2, vilket kan vara snabbare.
 VARNING: Detta val avaktiverar XvMC-videoutmatning.</translation>
     </message>
     <message>
@@ -5978,11 +5978,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>This enables the hardware accelerated MPEG decoding available with many popular video output cards.  </source>
-        <translation>Aktiverar den hårdvaruaccelererade MPEG-avkodning som finns för många populära grafikkort.  </translation>
+        <translation type="obsolete">Aktiverar den hårdvaruaccelererade MPEG-avkodning som finns för många populära grafikkort.  </translation>
     </message>
     <message>
         <source>This is incompatible with libmpeg2 decoding, and will be disabled if libmpeg2 decoding is selected.</source>
-        <translation>Detta är inkompatibelt med libmpeg2-avkodning och stängs därför av om libmpeg2-avkodning väljs.</translation>
+        <translation type="obsolete">Detta är inkompatibelt med libmpeg2-avkodning och stängs därför av om libmpeg2-avkodning väljs.</translation>
     </message>
     <message>
         <source>Do you want to fix these problems?</source>
@@ -6151,7 +6151,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
-        <translation>Aktiverar användning av den hårdvaruacceleration för MPEG-avkodning som finns i Via Unichrome chipsetet.  </translation>
+        <translation type="obsolete">Aktiverar användning av den hårdvaruacceleration för MPEG-avkodning som finns i Via Unichrome chipsetet.  </translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat.</source>
@@ -6518,6 +6518,58 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>How to treat existing channels.</source>
         <translation>Hur existerande kanaler ska hanteras.</translation>
+    </message>
+    <message>
+        <source>Number of threads</source>
+        <translation>Antal trådar</translation>
+    </message>
+    <message>
+        <source>Threads to use for software encoding.</source>
+        <translation>Antalet trådar att använda för mjukvarukodning.</translation>
+    </message>
+    <message>
+        <source>Set to a value less than or equal to the number of processors on the backend that will be doing the encoding.</source>
+        <translation>Sätt till ett värde lika med eller mindre än antalet processorer på inspelningsservern som kommer att göra kodningen.</translation>
+    </message>
+    <message>
+        <source>MPEG-2 Parameters</source>
+        <translation>MPEG2-parametrar</translation>
+    </message>
+    <message>
+        <source>Preferred MPEG2 Decoder</source>
+        <translation>Föredragen MPEG2-avkodare</translation>
+    </message>
+    <message>
+        <source>libmpeg2</source>
+        <translation>libmpeg2</translation>
+    </message>
+    <message>
+        <source>Standard XvMC</source>
+        <translation>Standard XvMC</translation>
+    </message>
+    <message>
+        <source>VIA XvMC</source>
+        <translation>VIA XvMC</translation>
+    </message>
+    <message>
+        <source>Decoder to use to play back MPEG2 video.</source>
+        <translation>Avkodare för att spela upp MPEG2-video.</translation>
+    </message>
+    <message>
+        <source>Standard will use ffmpeg library.</source>
+        <translation>Standard använder ffmpeg-biblioteket.</translation>
+    </message>
+    <message>
+        <source>libmpeg2 will use mpeg2 library; this is faster on some AMD processors.</source>
+        <translation>libmpeg2 använder mpeg2-biblioteket som är snabbare på vissa AMD-processorer.</translation>
+    </message>
+    <message>
+        <source>Standard XvMC will use XvMC API 1.0 to play back video; this is fast, but does not work well with HDTV sized frames.</source>
+        <translation>Standard XvMC använder XvMC API 1.0 för uppspelning. Detta är snabbt, men fungerar inte bra med HDTV-material.</translation>
+    </message>
+    <message>
+        <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
+        <translation>VIA XvMC använder sig av VIA VLD XvMC.</translation>
     </message>
 </context>
 <context>

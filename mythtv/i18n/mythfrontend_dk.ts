@@ -5261,7 +5261,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
-        <translation>Brug libmpeg2 til dekodning</translation>
+        <translation type="obsolete">Brug libmpeg2 til dekodning</translation>
     </message>
     <message>
         <source>4/3</source>
@@ -6058,11 +6058,6 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
-WARNING: Enabling this option will disable XvMC video output.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Aggressive Sound card Buffering</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6112,22 +6107,6 @@ WARNING: Enabling this option will disable XvMC video output.</source>
     </message>
     <message>
         <source>If it is supported by your hardware/drivers, MythTV will use OpenGL vertical syncing for video timing, reducing frame jitter.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This enables the hardware accelerated MPEG decoding available with many popular video output cards.  </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This is incompatible with libmpeg2 decoding, and will be disabled if libmpeg2 decoding is selected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Use hardware XVMC VLD Decoding (incompatible with libmpeg2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6372,10 +6351,6 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Auto Expire Default</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6742,6 +6717,58 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>This is updated on every successful channel change.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of threads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threads to use for software encoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set to a value less than or equal to the number of processors on the backend that will be doing the encoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MPEG-2 Parameters</source>
+        <translation type="unfinished">MPEG-2 parametre</translation>
+    </message>
+    <message>
+        <source>Preferred MPEG2 Decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>libmpeg2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard XvMC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VIA XvMC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decoder to use to play back MPEG2 video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard will use ffmpeg library.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>libmpeg2 will use mpeg2 library; this is faster on some AMD processors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard XvMC will use XvMC API 1.0 to play back video; this is fast, but does not work well with HDTV sized frames.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -5566,7 +5566,7 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     </message>
     <message>
         <source>Use libmpeg2 for decoding</source>
-        <translation>Gebruik libmpeg2 voor het decoderen</translation>
+        <translation type="obsolete">Gebruik libmpeg2 voor het decoderen</translation>
     </message>
     <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster. Not available when XvMC is used.</source>
@@ -6484,7 +6484,7 @@ De meeste kaarten kunnen dit automatisch detecteren, dus laat het op Auto staan,
     <message>
         <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
 WARNING: Enabling this option will disable XvMC video output.</source>
-        <translation>Als dit is ingeschakeld, zal libmpeg2 gebruikt worden in plaats van ffmpeg om MPEG-1 en MPEG-2 te decoderen. Dit kan sneller zijn.
+        <translation type="obsolete">Als dit is ingeschakeld, zal libmpeg2 gebruikt worden in plaats van ffmpeg om MPEG-1 en MPEG-2 te decoderen. Dit kan sneller zijn.
 WAARSCHUWING: Dit inschakelen zal de XvMC video uitgang uitschakelen.</translation>
     </message>
     <message>
@@ -6541,19 +6541,19 @@ WAARSCHUWING: Dit inschakelen zal de XvMC video uitgang uitschakelen.</translati
     </message>
     <message>
         <source>Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)</source>
-        <translation>Gebruik hardwarematige MPEG decodering (kan niet worden gebruikt met libmpeg2)</translation>
+        <translation type="obsolete">Gebruik hardwarematige MPEG decodering (kan niet worden gebruikt met libmpeg2)</translation>
     </message>
     <message>
         <source>This enables the hardware accelerated MPEG decoding available with many popular video output cards.  </source>
-        <translation>Dit schakelt hardwarematige MPEG decodering in voor de meeste populaire video kaarten.  </translation>
+        <translation type="obsolete">Dit schakelt hardwarematige MPEG decodering in voor de meeste populaire video kaarten.  </translation>
     </message>
     <message>
         <source>This is incompatible with libmpeg2 decoding, and will be disabled if libmpeg2 decoding is selected.</source>
-        <translation>Dit kan niet worden gebruikt met libmpeg2 decodering en zal worden uitgeschakeld als libmpeg2 decodering is ingeschakeld.</translation>
+        <translation type="obsolete">Dit kan niet worden gebruikt met libmpeg2 decodering en zal worden uitgeschakeld als libmpeg2 decodering is ingeschakeld.</translation>
     </message>
     <message>
         <source>Use hardware XVMC VLD Decoding (incompatible with libmpeg2)</source>
-        <translation>Gebruik hardwarematige XVMC VLD Decodering (kan niet worden gebruikt met libmpeg2)</translation>
+        <translation type="obsolete">Gebruik hardwarematige XVMC VLD Decodering (kan niet worden gebruikt met libmpeg2)</translation>
     </message>
     <message>
         <source>Display current time on idle LCD display. </source>
@@ -6852,7 +6852,7 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
-        <translation>Schakelt het gebruik van Via XvMC hardwarematige MPEG decodering voor de Via Unichrome Hardware in.</translation>
+        <translation type="obsolete">Schakelt het gebruik van Via XvMC hardwarematige MPEG decodering voor de Via Unichrome Hardware in.</translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat.</source>
@@ -7218,6 +7218,58 @@ Myth zal nu afsluiten.</translation>
     </message>
     <message>
         <source>This is updated on every successful channel change.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number of threads</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Threads to use for software encoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set to a value less than or equal to the number of processors on the backend that will be doing the encoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MPEG-2 Parameters</source>
+        <translation type="unfinished">MPEG-2 Parameters</translation>
+    </message>
+    <message>
+        <source>Preferred MPEG2 Decoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>libmpeg2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard XvMC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VIA XvMC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decoder to use to play back MPEG2 video.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard will use ffmpeg library.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>libmpeg2 will use mpeg2 library; this is faster on some AMD processors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard XvMC will use XvMC API 1.0 to play back video; this is fast, but does not work well with HDTV sized frames.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
