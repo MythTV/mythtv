@@ -2661,28 +2661,37 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
         }
         else 
         {
-            QPtrListIterator<GenericTree> an_it =
-                parent->getFirstChildIterator(visual_order);
+            // add max of lcd height menu items either side of the selected node
+            // let the lcdserver figure out which ones to display
             GenericTree *lnode;
+            QPtrList<GenericTree> *nodes = parent->getAllChildren(visual_order);
+
             QPtrList<LCDMenuItem> menuItems;
             menuItems.setAutoDelete(true);
-            bool selected;
 
-            while ((lnode = an_it.current()) != 0)
+            bool selected;
+            int pos = current_node->getPosition();
+
+            if (pos > lcddev->getLCDHeight())
+                lnode = nodes->at(pos - lcddev->getLCDHeight());
+            else
+                lnode = nodes->first();
+
+            uint count = 0;
+
+            while ((lnode = nodes->current()) != 0 && count < lcddev->getLCDHeight() * 2)
             {
                 if (lnode == current_node)
-                {
                     selected = true;
-                }
-                else 
-                {
+                else
                     selected = false;
-                }
+
                 menuItems.append(new LCDMenuItem(selected, NOTCHECKABLE,
                                                     lnode->getString()));
-                ++an_it;
+                nodes->next();
+                ++count;
             }
- 
+
             QString title;
             title = (parent->getParent()) ? "<< " : "   ";
             title += (current_node->childCount () > 0) ? " >> " : "  ";
