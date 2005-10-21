@@ -686,7 +686,7 @@ void GLSingleView::effectBlend()
 
     glBegin(GL_QUADS);
     {
-        glColor4f(0.2, 0.2, 0.2, 1.0/(100.0)*(float)m_i);
+        glColor4f(0.0, 0.0, 0.0, 1.0/(100.0)*(float)m_i);
         glVertex3f(-1, -1, 0);
         glVertex3f(1, -1, 0);
         glVertex3f(1, 1, 0);
