@@ -384,15 +384,15 @@ void VideoOutput::SetVideoAspectRatio(float aspect)
     {
         default:
         case kLetterbox_Off:
-        case kLetterbox_Fill:           XJ_aspect = videoAspect;
+        case kLetterbox_Fill:
+        case kLetterbox_16_9_Stretch:   XJ_aspect = videoAspect;
                                         break;
 
         case kLetterbox_4_3:
         case kLetterbox_4_3_Zoom:       XJ_aspect = (4.0 / 3);
                                         break;
         case kLetterbox_16_9:
-        case kLetterbox_16_9_Zoom:
-        case kLetterbox_16_9_Stretch:   XJ_aspect = (16.0 / 9);
+        case kLetterbox_16_9_Zoom:      XJ_aspect = (16.0 / 9);
                                         break;
     }
 }
@@ -1047,16 +1047,26 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
     desired_piph = (frame->height * desired_pipsize) / 100;
     desired_piph -= desired_piph % 2;
 
+    // adjust for letterbox modes...
+    int letterXadj = 0;
+    int letterYadj = 0;
+    float letterAdj = 1.0f;
+    if (letterbox != kLetterbox_Off)
+    {
+        letterXadj = (int) (max(-dispxoff, 0) * ((float)imgw / dispw));
+        letterYadj = (int) (max(-dispyoff, 0) * ((float)imgh / disph));
+        letterAdj  = videoAspect / XJ_aspect;
+    }
+
     // adjust for non-square pixels
     float pixelAdj = (GetDisplayAspect() * XJ_height) / XJ_width;
-    desired_pipw = (int) (desired_piph * pipVideoAspect * pixelAdj);
+
+    // set width and height
+    desired_pipw =(int)(desired_piph * pipVideoAspect * pixelAdj * letterAdj);
     desired_pipw -= desired_pipw % 2;
 
-    int xoff;
-    int yoff;
-
+    // Scale the image if we have to...
     unsigned char *pipbuf = pipimage->buf;
-
     if (pipw != desired_pipw || piph != desired_piph)
     {
         DoPipResize(pipw, piph);
@@ -1079,33 +1089,39 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         }
     }
 
+
+    // Figure out where to put the Picture-in-Picture window
+    int xoff = 0;
+    int yoff = 0;
     switch (PIPLocation)
     {
         default:
         case kPIPTopLeft:
-                xoff = 30;
-                yoff = 40;
+                xoff = 30 + letterXadj;
+                yoff = 40 + letterYadj;
                 break;
         case kPIPBottomLeft:
-                xoff = 30;
-                yoff = frame->height - piph - 40;
+                xoff = 30 + letterXadj;
+                yoff = frame->height - piph - 40 - letterYadj;
                 break;
         case kPIPTopRight:
-                xoff = frame->width - pipw - 30;
-                yoff = 40;
+                xoff = frame->width  - pipw - 30 - letterXadj;
+                yoff = 40 + letterYadj;
                 break;
         case kPIPBottomRight:
-                xoff = frame->width - pipw - 30;
-                yoff = frame->height - piph - 40;
+                xoff = frame->width  - pipw - 30 - letterXadj;
+                yoff = frame->height - piph - 40 - letterYadj;
                 break;
     }
 
+    // Copy Y (intensity values)
     for (int i = 0; i < piph; i++)
     {
         memcpy(frame->buf + (i + yoff) * frame->width + xoff,
                pipbuf + i * pipw, pipw);
     }
 
+    // Copy U & V (half plane chroma values)
     xoff /= 2;
     yoff /= 2;
 
@@ -1123,6 +1139,7 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         memcpy(vptr + (i + yoff) * vidw + xoff, pipvptr + i * pipw, pipw);
     }
 
+    // we're done with the frame, release it
     pipplayer->ReleaseCurrentFrame(pipimage);
 }
 
