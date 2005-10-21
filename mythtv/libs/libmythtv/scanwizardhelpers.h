@@ -253,19 +253,41 @@ class LogList: public ListBoxSetting, public TransientStorage
     int n;
 };
 
-class ScanATSCTransport: public ComboBoxSetting, public TransientStorage
+class ScanFrequencyTable: public ComboBoxSetting, public TransientStorage
 {
   public:
-    ScanATSCTransport()
+    ScanFrequencyTable()
     {
-        addSelection(QObject::tr("Terrestrial"),        "vsb8",   true);
-        addSelection(QObject::tr("Cable")+" (QAM-256)", "qam256", false);
-        addSelection(QObject::tr("Cable-HRC")+" (QAM-256)", "qam256hrc", false);
-        //addSelection(QObject::tr("Cable")+" (QAM-128)", "qam128", false);
-        //addSelection(QObject::tr("Cable")+" (QAM-64)",  "qam64",  false);
+        addSelection(QObject::tr("Broadcast"),        "us",            true);
+        addSelection(QObject::tr("Cable")    +" 78+", "uscablehigh",   false);
+        addSelection(QObject::tr("Cable HRC")+" 78+", "uscablehrchigh",false);
+        addSelection(QObject::tr("Cable"),            "uscable",       false);
+        addSelection(QObject::tr("Cable HRC"),        "ushrc",         false);
 
-        setLabel(QObject::tr("ATSC Transport"));
-        setHelpText(QObject::tr("ATSC transport, cable or terrestrial"));
+        setLabel(QObject::tr("Frequency Table"));
+        setHelpText(QObject::tr("Frequency table to use.") + " " +
+                    QObject::tr("The option of scanning only at channel 78 "
+                                "and above is provided because most "
+                                "digital channels are in that range."));
+    }
+};
+
+class ScanATSCModulation: public ComboBoxSetting, public TransientStorage
+{
+  public:
+    ScanATSCModulation()
+    {
+        addSelection(QObject::tr("Terrestrial")+" (8-VSB)","vsb8",  true);
+        addSelection(QObject::tr("Cable") + " (QAM-256)", "qam256", false);
+        addSelection(QObject::tr("Cable") + " (QAM-128)", "qam128", false);
+        addSelection(QObject::tr("Cable") + " (QAM-64)",  "qam64",  false);
+
+        setLabel(QObject::tr("ATSC Modulation"));
+        setHelpText(
+            QObject::tr("ATSC modulation, 8-VSB, QAM-256, etc.") + " " +
+            QObject::tr("Most cable systems in the United States use "
+                        "QAM-256 or QAM-64, but some mixed systems "
+                        "may use 8-VSB for over-the-air channels."));
     }
 };
 
@@ -617,14 +639,18 @@ class ATSCPane : public VerticalConfigurationGroup
   public:
     ATSCPane() : VerticalConfigurationGroup(false,false,true,false)
     {
-        setUseFrame(false);
-        addChild(atsc_transport = new ScanATSCTransport());
-        addChild(atsc_format = new ScanATSCChannelFormat());
+        HorizontalConfigurationGroup *hg =
+            new HorizontalConfigurationGroup(false,false,true,true);
+        hg->addChild(atsc_table        = new ScanFrequencyTable());
+        hg->addChild(atsc_modulation   = new ScanATSCModulation());
+        addChild(hg);
+        addChild(atsc_format           = new ScanATSCChannelFormat());
         addChild(old_channel_treatment = new ScanOldChannelTreatment());
     }
 
-    QString atscTransport(void) const { return atsc_transport->getValue(); }
-    QString atscFormat(void)    const { return atsc_format->getValue();    }
+    QString atscFreqTable(void)  const { return atsc_table->getValue();      }
+    QString atscModulation(void) const { return atsc_modulation->getValue(); }
+    QString atscFormat(void)     const { return atsc_format->getValue();     }
     bool DoDeleteChannels(void) const
         { return old_channel_treatment->getValue() == "delete"; }
     bool DoRenameChannels(void) const
@@ -637,7 +663,8 @@ class ATSCPane : public VerticalConfigurationGroup
     }
 
   protected:
-    ScanATSCTransport       *atsc_transport;
+    ScanFrequencyTable      *atsc_table;
+    ScanATSCModulation      *atsc_modulation;
     ScanATSCChannelFormat   *atsc_format;
     ScanOldChannelTreatment *old_channel_treatment;
 };

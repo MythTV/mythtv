@@ -675,8 +675,8 @@ void ScanWizardScanner::HandleTuneComplete(void)
     if (nScanType == ScanTypeSetting::FullScan_ATSC)
     {
         std     = "atsc";
-        mod     = parent->paneATSC->atscTransport();
-        country = "us";
+        mod     = parent->paneATSC->atscModulation();
+        country = parent->paneATSC->atscFreqTable();
     }
 
     bool ok = false;
@@ -689,6 +689,10 @@ void ScanWizardScanner::HandleTuneComplete(void)
         {
             MSqlQuery query(MSqlQuery::InitCon());
             query.prepare("DELETE FROM channel "
+                          "WHERE sourceid = :SOURCEID");
+            query.bindValue(":SOURCEID", nVideoSource);
+            query.exec();
+            query.prepare("DELETE FROM dtv_multiplex "
                           "WHERE sourceid = :SOURCEID");
             query.bindValue(":SOURCEID", nVideoSource);
             query.exec();
