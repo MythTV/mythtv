@@ -3458,6 +3458,74 @@ bool UIManagedTreeListType::moveDown(bool do_refresh)
     return false;
 }
 
+bool UIManagedTreeListType::jumpToLetter(QString letter)
+{
+    if (!current_node)
+    {
+        return false;
+    }
+
+    //
+    //  Move the active node to the node whose string value
+    //  starts with the given letter
+    //
+
+    letter = letter.lower();
+
+    GenericTree *new_node = current_node->nextSibling(1, visual_order);
+    while (new_node)
+    {
+        if (new_node->getString().left(1).lower() == letter)
+            break;
+
+        new_node = new_node->nextSibling(1, visual_order);
+    }
+
+    // if new_node is NULL, we reached the end of the list. wrap to the
+    // beginning and try again
+    if (!new_node)
+    {
+        new_node = current_node->getParent()->getChildAt(0, visual_order);
+
+        while (new_node)
+        {
+            // we're back at the current_node, which means there are no
+            // matching nodes
+            if (new_node == current_node)
+            {
+                new_node = NULL;
+                break;
+            }
+
+            if (new_node->getString().left(1).lower() == letter)
+                break;
+
+            new_node = new_node->nextSibling(1, visual_order);
+        }
+    }
+
+    if (new_node)
+    {
+        current_node = new_node;
+        if (show_whole_tree)
+        {
+            for(int i = active_bin; i <= bins; i++)
+            {
+                emit requestUpdate(screen_corners[i]);
+            }
+        }
+        else
+        {
+            refresh();
+        }
+
+        emit nodeEntered(current_node->getInt(), current_node->getAttributes());
+        current_node->becomeSelectedChild();
+        return true;
+    }
+    return false;
+}
+
 int UIManagedTreeListType::calculateEntriesInBin(int bin_number)
 {
     //

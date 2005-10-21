@@ -823,6 +823,7 @@ class UIManagedTreeListType : public UIType
     bool    pushDown();
     bool    moveUp(bool do_refresh = true);
     bool    moveDown(bool do_refresh = true);
+    bool    jumpToLetter(QString letter);
     bool    pageUp();
     bool    pageDown();
     bool    nextActive(bool wrap_around, bool traverse_up_down);
