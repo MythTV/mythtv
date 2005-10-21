@@ -391,19 +391,26 @@ bool CardUtil::IgnoreEncrypted(uint cardid, const QString &input_name)
 
 bool CardUtil::hasV4L2(int videofd)
 {
+    (void) videofd;
+#ifdef USING_V4L
     struct v4l2_capability vcap;
     bzero(&vcap, sizeof(vcap));
 
     return ((ioctl(videofd, VIDIOC_QUERYCAP, &vcap) >= 0) &&
             (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE));
+#else // if !USING_V4L
+    return false;
+#endif // !USING_V4L
 }
 
 InputNames CardUtil::probeV4LInputs(int videofd, bool &ok)
 {
-#ifdef USING_V4L
+    (void) videofd;
+
     InputNames list;
     ok = false;
 
+#ifdef USING_V4L
     bool usingv4l2 = hasV4L2(videofd);
 
     // V4L v2 query
@@ -455,9 +462,9 @@ InputNames CardUtil::probeV4LInputs(int videofd, bool &ok)
         list[0] = "Television";
 
     ok = true;
-#else
+#else // if !USING_V4L
     list[-1] += QObject::tr("ERROR, Compile with V4L support to query inputs");
-#endif
+#endif // !USING_V4L
     return list;
 }
 
