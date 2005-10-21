@@ -1266,7 +1266,8 @@ void PlaybackBox::cursorDown(bool page, bool newview)
                 progIndex = progCount - 1;
 
             skipUpdate = false;
-            update(fullRect);
+            update(listRect);
+            update(infoRect);
         }
     }
 }
@@ -1296,7 +1297,8 @@ void PlaybackBox::cursorUp(bool page, bool newview)
                 progIndex = 0;
 
             skipUpdate = false;
-            update(fullRect);
+            update(listRect);
+            update(infoRect);
         }
     }
 }
@@ -1748,10 +1750,6 @@ void PlaybackBox::showMenu()
     timer->stop();
     playingVideo = false;
 
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
-
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
                              popupHighlight, "menu popup");
@@ -1833,8 +1831,6 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
             showAvailablePopup(tmpItem);
         }
 
-        skipUpdate = false;
-        update(fullRect);
         return false;
     }
 
@@ -1899,8 +1895,6 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     state = kStarting; // restart playback preview
     setEnabled(true);
 
-    update(fullRect);
-
     bool doremove = false;
     bool doprompt = false;
 
@@ -1932,8 +1926,6 @@ bool PlaybackBox::play(ProgramInfo *rec, bool inPlaylist)
     delete tvrec;
 
     connected = FillList();
-    skipUpdate = false;
-    update(fullRect);
 
     return playCompleted;
 }
@@ -1989,10 +1981,6 @@ void PlaybackBox::showActions(ProgramInfo *toExp)
 void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 {
     updateFreeSpace = true;
-
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
 
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
@@ -2125,10 +2113,6 @@ void PlaybackBox::showPlaylistPopup()
     if (expectingPopup)
        cancelPopup();
 
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
-
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
                              popupHighlight, "playlist popup");
@@ -2186,10 +2170,6 @@ void PlaybackBox::showPlaylistJobPopup()
     if (expectingPopup)
        cancelPopup();
 
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
-    
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
                              popupHighlight, "playlist popup");
@@ -2316,10 +2296,6 @@ void PlaybackBox::showPlayFromPopup()
     if (expectingPopup)
         cancelPopup();
 
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
-
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
                              popupHighlight, "playfrom popup");
@@ -2340,10 +2316,6 @@ void PlaybackBox::showStoragePopup()
 {
     if (expectingPopup)
         cancelPopup();
-
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
 
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
@@ -2377,10 +2349,6 @@ void PlaybackBox::showRecordingPopup()
     if (expectingPopup)
         cancelPopup();
 
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
-
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
                              popupHighlight, "recording popup");
@@ -2406,10 +2374,6 @@ void PlaybackBox::showJobPopup()
 
     if (!curitem)
         return;
-
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
 
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
@@ -2499,10 +2463,6 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
 {
     if (!curitem || !program)
         return;
-
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
 
     popup = new MythPopupBox(gContext->GetMainWindow(), graphicPopup,
                              popupForeground, popupBackground,
@@ -2598,16 +2558,11 @@ void PlaybackBox::cancelPopup(void)
     popup->hide();
     expectingPopup = false;
 
-    backup.begin(this);
-    backup.drawPixmap(0, 0, myBackground);
-    backup.end();
-
     delete popup;
     popup = NULL;
 
     skipUpdate = false;
     skipCnt = 2;
-    update(fullRect);
 
     setActiveWindow();
 }
@@ -2745,7 +2700,6 @@ void PlaybackBox::doEditScheduled()
         record.exec();
     
         connected = FillList();
-        update(fullRect);
     }
 }    
 
@@ -2883,7 +2837,6 @@ void PlaybackBox::doPlaylistDelete(void)
     }
 
     connected = FillList();
-    update(fullRect);
     playList.clear();
 }
 
@@ -3072,8 +3025,6 @@ void PlaybackBox::toggleTitleView(void)
 
     playList.clear();
     connected = FillList();      
-    skipUpdate = false;
-    update(fullRect);
 }
 
 void PlaybackBox::promptEndOfRecording(ProgramInfo *rec)
@@ -3138,9 +3089,6 @@ void PlaybackBox::togglePlayListItem(void)
 
     if (!inTitle)
         cursorDown();
-
-    skipUpdate = false;
-    update(fullRect);
 }
 
 void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
@@ -3616,10 +3564,6 @@ void PlaybackBox::showIconHelp(void)
 
     killPlayerSafe();
 
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
-
     iconhelp->addLayout(grid);
 
     QButton *button = iconhelp->addButton(tr("Ok"));
@@ -3629,15 +3573,10 @@ void PlaybackBox::showIconHelp(void)
 
     delete iconhelp;
 
-    backup.begin(this);
-    backup.drawPixmap(0, 0, myBackground);
-    backup.end();
-
     state = kChanging;
 
     skipUpdate = false;
     skipCnt = 2;
-    update(fullRect);
 
     setActiveWindow();
 }
@@ -3656,9 +3595,6 @@ void PlaybackBox::initRecGroupPopup(QString title, QString name)
 
     killPlayerSafe();
 
-    backup.begin(this);
-    grayOut(&backup);
-    backup.end();
 }
 
 void PlaybackBox::closeRecGroupPopup(bool refreshList)
@@ -3676,16 +3612,11 @@ void PlaybackBox::closeRecGroupPopup(bool refreshList)
     recGroupNewPassword = NULL;
     recGroupOkButton = NULL;
 
-    backup.begin(this);
-    backup.drawPixmap(0, 0, myBackground);
-    backup.end();
-
     if (refreshList)
         connected = FillList();
 
     skipUpdate = false;
     skipCnt = 2;
-    update(fullRect);
 
     state = kChanging;
 
