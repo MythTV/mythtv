@@ -2672,10 +2672,13 @@ void TVRec::StopLiveTV(void)
     triggerEventLoop.wakeAll();
 }
 
-/** \fn TVRec::PauseRecorder()
- *  \brief Tells recorder to pause, used for channel and input changes.
- *  \sa EncoderLink::PauseRecorder(), RemoteEncoder::PauseRecorder(),
- *      RecorderBase::Pause()
+/** \fn TVRec::PauseRecorder(void)
+ *  \brief Tells "recorder" to pause, used for channel and input changes.
+ *
+ *   When the RecorderBase instance has paused it calls RecorderPaused(void)
+ *
+ *  \sa EncoderLink::PauseRecorder(void), RemoteEncoder::PauseRecorder(void),
+ *      RecorderBase::Pause(void)
  */
 void TVRec::PauseRecorder(void)
 {
@@ -2690,6 +2693,17 @@ void TVRec::PauseRecorder(void)
 
     recorder->Pause();
 } 
+
+/** \fn TVRec::RecorderPaused(void)
+ *  \brief This is a callback, called by the "recorder" instance when
+ *         it has actually paused.
+ *  \sa PauseRecorder(void)
+ */
+void TVRec::RecorderPaused(void)
+{
+    QMutexLocker lock(&stateChangeLock);
+    triggerEventLoop.wakeAll();
+}
 
 /** \fn TVRec::ToggleChannelFavorite()
  *  \brief Toggles whether the current channel should be on our favorites list.
@@ -3342,6 +3356,7 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
     if (HasFlags(kFlagSIParserRunning))
     {
         TeardownSIParser();
+        ClearFlags(kFlagSIParserRunning);
 
         if (recorder)
             GetDVBRecorder()->Close();
@@ -3349,7 +3364,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
             ringBuffer->Reset();
         SetFlags(kFlagRingBufferReset);
     }
-    ClearFlags(kFlagWaitingForSIParser | kFlagSIParserRunning);
+    if (HasFlags(kFlagWaitingForSIParser))
+        ClearFlags(kFlagWaitingForSIParser);
     // At this point the SIParser is shut down, the 
     // recorder is closed, and the ringbuffer reset.
 
@@ -3360,7 +3376,9 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         TeardownSignalMonitor();
         ClearFlags(kFlagSignalMonitorRunning);
     }
-    ClearFlags(kFlagWaitingForSignal);
+    if (HasFlags(kFlagWaitingForSignal))
+        ClearFlags(kFlagWaitingForSignal);
+
     // At this point any waits are canceled.
 
     if ((request.flags & kFlagNoRec))
@@ -3786,6 +3804,7 @@ void TVRec::TuningRestartRecorder(void)
     // Set file descriptor of channel from recorder for V4L
     channel->SetFd(recorder->GetVideoFd());
 
+    // Some recorders unpause on Reset, others do not...
     recorder->Unpause();
 
 #ifdef USING_DVB
