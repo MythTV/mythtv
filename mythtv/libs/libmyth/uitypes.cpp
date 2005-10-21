@@ -458,6 +458,9 @@ void UIBarType::LoadImage(int loc, QString myFile)
 
 void UIBarType::Draw(QPainter *dr, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+  
   if (m_context == context || m_context == -1)
   {
     if (drawlayer == m_order)
@@ -610,6 +613,9 @@ void UIGuideType::SetJustification(int jst)
 
 void UIGuideType::Draw(QPainter *dr, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     if ((m_context != context && m_context != -1) || drawlayer != m_order)
         return;
 
@@ -1008,6 +1014,9 @@ UIListType::~UIListType()
 
 void UIListType::Draw(QPainter *dr, int drawlayer, int context)
 {
+  if (hidden)
+     return;
+
   if (m_context == context || m_context == -1)
   {
     if (drawlayer == m_order)
@@ -1338,10 +1347,17 @@ void UIImageType::LoadImage()
     int pathStart = m_filename.findRev('/');
     bool bFound = false;
     
-    // look in theme directory first including any sub directory
-    file = themeDir + m_filename;
+    // Given a full path?
+    file = m_filename;
     bFound = QFile::exists(file);
- 
+
+    // look in theme directory first including any sub directory
+    if (!bFound)
+    {
+        file = themeDir + m_filename;
+        bFound = QFile::exists(file);
+    } 
+    
     if (!bFound && pathStart > 0)
     {
         // look in theme directory minus any sub directories
@@ -1366,13 +1382,6 @@ void UIImageType::LoadImage()
     if (!bFound)
     {
         file = "/tmp/" + m_filename;
-        bFound = QFile::exists(file);
-    }
-
-    // Given a full path?
-    if (!bFound)
-    {
-        file = m_filename;
         bFound = QFile::exists(file);
     }
     
@@ -1801,6 +1810,9 @@ UIRepeatedImageType::UIRepeatedImageType(const QString &name, const QString &fil
 
 void UIRepeatedImageType::Draw(QPainter *p, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     if (m_context == context || m_context == -1)
     {
         if (drawlayer == m_order)
@@ -2292,6 +2304,9 @@ void UIMultiTextType::clearTexts()
 
 void UIMultiTextType::Draw(QPainter *dr, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     if (m_context == context || m_context == -1)
     {
 
@@ -2475,6 +2490,9 @@ UIStatusBarType::~UIStatusBarType()
 
 void UIStatusBarType::Draw(QPainter *dr, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     if (m_context == context || m_context == -1)
     {
         if (drawlayer == m_order)
@@ -2624,6 +2642,9 @@ void UIManagedTreeListType::drawText(QPainter *p,
 
 void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     //  Do nothing if context is wrong;
 
     if (m_context != context)
@@ -3802,6 +3823,9 @@ UIPushButtonType::UIPushButtonType(const QString &name, QPixmap on, QPixmap off,
 
 void UIPushButtonType::Draw(QPainter *p, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     if (context != m_context)
     {
         if (m_context != -1)
@@ -3902,6 +3926,9 @@ UITextButtonType::UITextButtonType(const QString &name, QPixmap on, QPixmap off,
 
 void UITextButtonType::Draw(QPainter *p, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     if (context != m_context)
     {
         if (m_context != -1)
@@ -4017,6 +4044,9 @@ UICheckBoxType::UICheckBoxType(const QString &name,
 
 void UICheckBoxType::Draw(QPainter *p, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     if (context != m_context)
     {
         if (m_context != -1)
@@ -4024,9 +4054,12 @@ void UICheckBoxType::Draw(QPainter *p, int drawlayer, int context)
             return;
         }
     }
+    
     if (drawlayer != m_order)
     {
+        return;
     }
+    
     if (has_focus)
     {
         if (checked)
@@ -4123,6 +4156,9 @@ UISelectorType::UISelectorType(const QString &name,
 
 void UISelectorType::Draw(QPainter *p, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     if (context != m_context)
     {
         if (m_context != -1)
@@ -4195,6 +4231,35 @@ void UISelectorType::setToItem(int which_item)
         }
     }
 }
+
+void UISelectorType::setToItem(const QString &which_item)
+{
+    for (uint i = 0; i < my_data.count(); i++)
+    {
+        if (my_data.at(i)->getString() == which_item)
+        {
+            current_data = my_data.at(i);
+            refresh();
+        }
+    }
+}
+
+QString UISelectorType::getCurrentString() 
+{
+    if (current_data)
+        return current_data->getString();
+    else
+        return "";    
+}
+
+int UISelectorType::getCurrentInt() 
+{
+    if (current_data)
+        return current_data->getInt();
+    else
+        return -1;    
+}
+
 
 void UISelectorType::push(bool up_or_down)
 {
@@ -4313,6 +4378,9 @@ UIKeyType *UIKeyboardType::GetKey(const QString &action)
 
 void UIKeyboardType::Draw(QPainter *dr, int drawlayer, int context)
 {
+    if (hidden)
+        return;
+
     if (m_context == context || m_context == -1)
     {
         if (drawlayer == m_order)

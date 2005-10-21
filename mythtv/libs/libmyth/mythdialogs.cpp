@@ -1672,9 +1672,11 @@ bool MythThemedDialog::buildFocusList()
         for (; i != all_ui_type_objects->end(); i++)
         {
             UIType *type = (*i);
-            if (type->canTakeFocus())
+            if (type->canTakeFocus() && !type->isHidden())
             {
-                focus_taking_widgets.append(type);
+                if (context == -1 || type->GetContext() == -1 || 
+                        context == type->GetContext())
+                    focus_taking_widgets.append(type);
             }
         }
         ++another_it;

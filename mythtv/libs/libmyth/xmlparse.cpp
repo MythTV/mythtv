@@ -2948,6 +2948,7 @@ void XMLParse::parseBlackHole(LayerSet *container, QDomElement &element)
 
 void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
 {
+    int context = -1;
     QRect   area = QRect(0,0,0,0);
     QString fontActive;
     QString fontInactive;
@@ -2986,6 +2987,10 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
             {
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
+            }
+            else if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
             }
             else if (info.tagName() == "fcnfont")
             {
@@ -3085,6 +3090,8 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
     l->SetSpacing((int)(spacing*hmult));
     l->SetMargin((int)(margin*wmult));
     l->SetParent(container);
+    l->SetContext(context);
+    l->calculateScreenArea();
 
     container->AddType(l);
     container->bumpUpLayers(0);
@@ -3092,6 +3099,7 @@ void XMLParse::parseListBtnArea(LayerSet *container, QDomElement &element)
 
 void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
 {
+    int     context = -1;
     QRect   area = QRect(0,0,0,0);
     QRect   listsize = QRect(0,0,0,0);
     int     leveloffset = 0;
@@ -3132,6 +3140,10 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
             {
                 area = parseRect(getFirstText(info));
                 normalizeRect(area);
+            }
+            else if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
             }
             else if (info.tagName() == "listsize")
             {
@@ -3242,7 +3254,8 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
     l->SetMargin((int)(margin*wmult));
     l->SetParent(container);
     l->calculateScreenArea();
-
+    l->SetContext(context);
+    
     container->AddType(l);
     container->bumpUpLayers(0);
 }

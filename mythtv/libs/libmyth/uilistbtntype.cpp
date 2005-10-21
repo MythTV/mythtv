@@ -143,7 +143,8 @@ UIListTreeType::UIListTreeType(const QString &name, const QRect &area,
 
     m_active = NULL;
     m_inactive = NULL;
-
+    takes_focus = true;
+ 
     SetItemRegColor(Qt::black,QColor(80,80,80),100);
     SetItemSelColor(QColor(82,202,56),QColor(52,152,56),255);
 
@@ -286,12 +287,19 @@ UIListGenericTree *UIListTreeType::GetCurrentPosition(void)
     return currentpos;
 }
 
-void UIListTreeType::Draw(QPainter *p, int order, int blah)
+void UIListTreeType::Draw(QPainter *p, int order, int context)
 {
     if (hidden)
     {
         return;
     }
+    
+    if (m_context != -1 && m_context != context)
+        return;
+    
+    if (m_order != order)
+        return;
+
     QPtrListIterator<UIListBtnType> it(listLevels);
     UIListBtnType *child;
 
@@ -323,14 +331,17 @@ void UIListTreeType::Draw(QPainter *p, int order, int blah)
 
         if (child->GetArea().right() + offset > m_totalarea.left())
         {
-            child->Draw(p, order, blah, list_tree_active);
+            child->Draw(p, order, context, list_tree_active);
         }
         ++it;
     }
 }
 
-void UIListTreeType::DrawRegion(QPainter *p, QRect &area, int order, int blah)
+void UIListTreeType::DrawRegion(QPainter *p, QRect &area, int order, int context)
 {
+    if (m_context != -1 && m_context != context)
+        return;
+
     QPtrListIterator<UIListBtnType> it(listLevels);
     UIListBtnType *child;
 
@@ -362,7 +373,7 @@ void UIListTreeType::DrawRegion(QPainter *p, QRect &area, int order, int blah)
             drawRect == area)
         {
             child->SetDrawOffset(0 - child->GetArea().x());
-            child->Draw(p, order, blah, list_tree_active);
+            child->Draw(p, order, context, list_tree_active);
             child->SetDrawOffset(offset);
         }
 
@@ -804,6 +815,18 @@ int UIListTreeType::getNumbItemsVisible()
     return (int) currentlevel->GetNumbItemsVisible();
 }
 
+bool UIListTreeType::takeFocus()
+{
+    setActive(true);
+    return UIType::takeFocus();
+}
+
+void UIListTreeType::looseFocus()
+{
+    setActive(false);
+    UIType::looseFocus();
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
@@ -818,6 +841,7 @@ UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
 
     m_active           = false;
     m_visible          = true;
+    takes_focus        = true;
     m_showUpArrow      = false;
     m_showDnArrow      = false;
 
@@ -1399,26 +1423,29 @@ bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
 }
 
 
-void UIListBtnType::Draw(QPainter *p, int order, int blah)
+void UIListBtnType::Draw(QPainter *p, int order, int context)
 {
     //
     //  Just call the other Draw() function. Tried to accomplish the same
     //  goal with default parameters, but that broke MythGallery (?)
     //
 
-    Draw(p, order, blah, true);
+    Draw(p, order, context, true);
 }
 
 
-void UIListBtnType::Draw(QPainter *p, int order, int, bool active_on)
+void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
 {
-    if (!m_visible)
+    if (!m_visible || hidden)
         return;
 
     if (!m_initialized)
         Init();
 
     if (m_order != order)
+        return;
+
+    if (m_context != -1 && m_context != context)
         return;
 
     fontProp* font = m_active ? m_fontActive : m_fontInactive;
@@ -1637,6 +1664,26 @@ void UIListBtnType::LoadPixmap(QPixmap& pix, const QString& fileName)
         pix = *p;
         delete p;
     }
+}
+
+void UIListBtnType::calculateScreenArea()
+{
+    QRect r = m_rect; 
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+}
+
+bool UIListBtnType::takeFocus()
+{
+    SetActive(true);
+    return UIType::takeFocus();
+}
+
+void UIListBtnType::looseFocus()
+{
+    SetActive(false);
+    UIType::looseFocus();
 }
 
 //////////////////////////////////////////////////////////////////////////////

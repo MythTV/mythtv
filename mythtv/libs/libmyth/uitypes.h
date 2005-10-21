@@ -113,7 +113,8 @@ class UIType : public QObject
 
     bool    isShown(){return !hidden;}
     bool    isHidden(){return hidden;}
-
+    bool    isFocused(){return has_focus;}
+    
   public slots:
 
     virtual bool takeFocus();
@@ -510,6 +511,8 @@ class UIAnimatedImageType : public UIType
     bool IsPaused() { return !timer.isActive(); }
     void NextImage();
     void PreviousImage();
+    void GotoFirstImage() { m_currentimage = 1; }
+     
     virtual void Draw(QPainter *, int, int);
 
   public slots:
@@ -964,7 +967,8 @@ class UICheckBoxType : public UIType
     void    Draw(QPainter *, int drawlayer, int context);
     void    setPosition(QPoint pos){m_displaypos = pos;}
     void    calculateScreenArea();
-
+    bool    getState(){return checked;}
+     
   public slots:
 
     void    push();
@@ -1031,7 +1035,9 @@ class UISelectorType : public UIPushButtonType
     void    calculateScreenArea();
     void    addItem(int an_int, const QString &a_string);
     void    setFont(fontProp *font) { m_font = font; }
-
+    QString getCurrentString();
+    int     getCurrentInt();
+    
   public slots:
 
     void push(bool up_or_down);
@@ -1039,7 +1045,8 @@ class UISelectorType : public UIPushButtonType
     void activate(){push(true);}
     void cleanOut(){current_data = NULL; my_data.clear();}
     void setToItem(int which_item);
-
+    void setToItem(const QString &which_item);
+     
   signals:
 
     void    pushed(int);

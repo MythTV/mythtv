@@ -85,8 +85,8 @@ class UIListTreeType : public UIType
 
     UIListGenericTree *GetCurrentPosition(void);
 
-    void Draw(QPainter *p, int order, int);
-    void DrawRegion(QPainter *p, QRect &area, int order, int);
+    void Draw(QPainter *p, int order, int context);
+    void DrawRegion(QPainter *p, QRect &area, int order, int context);
 
     void Redraw(void);
     void RedrawCurrent(void);
@@ -118,6 +118,10 @@ class UIListTreeType : public UIType
     void itemSelected(UIListTreeType *parent, UIListGenericTree *item);
     void itemEntered(UIListTreeType *parent, UIListGenericTree *item);
 
+  public slots:
+    bool takeFocus();
+    void looseFocus();
+      
   private:
     void FillLevelFromTree(UIListGenericTree *item, UIListBtnType *list);
     void ClearLevel(UIListBtnType *list);
@@ -170,11 +174,12 @@ class UIListBtnType : public UIType
     void  SetItemRegColor(const QColor& beg, const QColor& end, uint alpha);
     void  SetItemSelColor(const QColor& beg, const QColor& end, uint alpha);
     
-    void  Draw(QPainter *p, int order, int);
-    void  Draw(QPainter *p, int order, int, bool active_on);
+    void  Draw(QPainter *p, int order, int context);
+    void  Draw(QPainter *p, int order, int context, bool active_on);
     void  SetActive(bool active);
     void  Reset();
-
+    void  calculateScreenArea();
+     
     void  SetItemCurrent(UIListBtnTypeItem* item);
     void  SetItemCurrent(int pos);
     UIListBtnTypeItem* GetItemCurrent();
@@ -204,6 +209,10 @@ class UIListBtnType : public UIType
 
     QRect GetArea(void) { return m_rect; }
     uint   GetNumbItemsVisible(){ return m_itemsVisible; }
+  
+  public slots:
+    bool takeFocus();
+    void looseFocus();
 
   private:
     void  Init();
