@@ -394,6 +394,8 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
                 music_tree_list->pageUp();
             else if (action == "PAGEDOWN")
                 music_tree_list->pageDown();
+            else if (action.left(4) == "JUMP")
+                music_tree_list->jumpToLetter(action.mid(4));
             else
                 handled = false;
         }
