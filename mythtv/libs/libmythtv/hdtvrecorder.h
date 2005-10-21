@@ -48,7 +48,7 @@ class HDTVRecorder : public DTVRecorder
     void StopRecording(void);
 
     void Pause(bool clear = false);
-    bool IsPaused(void);
+    bool IsPaused(void) const;
 
     void Reset(void);
 
@@ -89,8 +89,9 @@ class HDTVRecorder : public DTVRecorder
     // Data for managing the device ringbuffer
     struct {
         pthread_t        thread;
-        pthread_mutex_t  lock;
-        pthread_mutex_t  lock_stats;
+        mutable pthread_mutex_t lock;
+        mutable pthread_mutex_t lock_stats;
+
         bool             run;
         bool             eof;
         bool             error;

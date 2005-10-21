@@ -298,6 +298,10 @@ void HDTVRecorder::fill_ringbuffer(void)
     size_t    read_size;
     bool      run, request_pause, paused;
 
+    pthread_mutex_lock(&ringbuf.lock);
+    ringbuf.run = true;
+    pthread_mutex_unlock(&ringbuf.lock);
+
     for (;;)
     {
         pthread_mutex_lock(&ringbuf.lock);
@@ -417,8 +421,6 @@ void HDTVRecorder::fill_ringbuffer(void)
 
     close(_stream_fd);
     _stream_fd = -1;
-
-    pthread_exit(reinterpret_cast<void *>(0));
 }
 
 /* read count bytes from ring into buffer */
@@ -561,7 +563,6 @@ void HDTVRecorder::StartRecording(void)
     ringbuf.avg_cnt = 0;
     ringbuf.request_pause = false;
     ringbuf.paused = false;
-    ringbuf.run = true;
     ringbuf.error = false;
     ringbuf.eof = false;
 
@@ -610,6 +611,7 @@ void HDTVRecorder::StartRecording(void)
 
         if (dev_error)
         {
+            VERBOSE(VB_IMPORTANT, "HDTV: device error detected");
             _error = true;
             break;
         }
@@ -635,8 +637,15 @@ void HDTVRecorder::StartRecording(void)
 
 void HDTVRecorder::StopRecording(void)
 {
-    Pause();
-    bool ok = WaitForPause(200000);
+    TVRec *rec = tvrec;
+    tvrec = NULL; // don't notify of pause..
+
+    bool ok = true;
+    if (!IsPaused())
+    {
+        Pause();
+        ok = WaitForPause(250);
+    }
 
     _request_recording = false;
 
@@ -658,6 +667,7 @@ void HDTVRecorder::StopRecording(void)
         delete[] ringbuf.buffer;
         ringbuf.buffer = 0;
     }
+    tvrec = rec;
 }
 
 void HDTVRecorder::Pause(bool /*clear*/)
@@ -668,7 +678,7 @@ void HDTVRecorder::Pause(bool /*clear*/)
     request_pause = true;
 }
 
-bool HDTVRecorder::IsPaused(void)
+bool HDTVRecorder::IsPaused(void) const
 {
     pthread_mutex_lock(&ringbuf.lock);
     bool paused = ringbuf.paused;
@@ -929,8 +939,10 @@ int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 
 void HDTVRecorder::Reset(void)
 {
+    VERBOSE(VB_RECORD, "HDTVRecorder::Reset(void)");
     DTVRecorder::Reset();
 
+    _error = false;
     _resync_count = 0;
     _ts_stats.Reset();
 
@@ -941,8 +953,11 @@ void HDTVRecorder::Reset(void)
 
     if (_stream_fd >= 0) 
     {
-        Pause(true);
-        WaitForPause();
+        if (!IsPaused())
+        {
+            Pause();
+            WaitForPause();
+        }
         int ret = close(_stream_fd);
         if (ret < 0) 
         {
@@ -974,6 +989,4 @@ void HDTVRecorder::Reset(void)
         }
         Unpause();
     }
-
-    StreamData()->Reset();
 }
