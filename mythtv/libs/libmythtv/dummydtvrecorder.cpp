@@ -24,7 +24,13 @@
 
 \code
 To create a program stream video try something like:
-  convert /tmp/hello_world.png ppm:- | \
+  convert /tmp/1920x1088.png ppm:- | \
+          ppmtoy4m -n15 -F30000:1001 -A1:1 -I p -r | \
+          mpeg2enc -c -n n -f3 -b8000 -a3 --no-constraints -o /tmp/tmp.es
+  mplex -f3 -b8000 --no-constaints -L48000:1:8 -o /tmp/tmp.ps /tmp/tmp.es
+
+OR, for an SDTV stream
+  convert /tmp/640x480.png ppm:- | \
           ppmtoy4m -n15 -F30000:1001 -A10:11 -I p -r | \
           mpeg2enc -c -n n -f3 -b8000 -a3 --no-constraints -o /tmp/tmp.es
   mplex -f3 -b8000 --no-constaints -L48000:1:8 -o /tmp/tmp.ps /tmp/tmp.es
