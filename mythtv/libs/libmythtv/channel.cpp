@@ -31,7 +31,7 @@ Channel::Channel(TVRec *parent, const QString &videodevice)
     : ChannelBase(parent), device(videodevice), videofd(-1),
       curList(NULL), totalChannels(0), usingv4l2(false),
       videomode_v4l1(VIDEO_MODE_NTSC), videomode_v4l2(V4L2_STD_NTSC),
-      currentFormat(""), defaultFreqTable(1)
+      is_dtv(false), currentFormat(""), defaultFreqTable(1)
 {
 }
 
@@ -57,15 +57,7 @@ bool Channel::Open(void)
          return false;
     }
 
-    struct v4l2_capability vcap;
-    memset(&vcap, 0, sizeof(vcap));
-    if (ioctl(videofd, VIDIOC_QUERYCAP, &vcap) < 0)
-        usingv4l2 = false;
-    else
-    {
-        if (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE)
-            usingv4l2 = true;
-    }
+    usingv4l2 = CardUtil::hasV4L2(videofd);
 
     return true;
 }
@@ -226,7 +218,9 @@ void Channel::SetFormat(const QString &format)
 
     videomode_v4l1 = format_to_mode(fmt.upper(), 1);
     videomode_v4l2 = format_to_mode(fmt.upper(), 2);
- 
+    is_dtv = (fmt.upper() == "ATSC");
+
+    channelnames.clear();
     if (usingv4l2)
     {
         struct v4l2_input vin;
@@ -251,13 +245,16 @@ void Channel::SetFormat(const QString &format)
     }
     else
     {
+        // get tuner info
         struct video_tuner tuner;
         bzero(&tuner, sizeof(tuner));
-
         ioctl(videofd, VIDIOCGTUNER, &tuner);
+
+        // set tuner video mode
         tuner.mode = videomode_v4l1;
         ioctl(videofd, VIDIOCSTUNER, &tuner);
 
+        // get the number of inputs in video mode
         struct video_capability vidcap;
         bzero(&vidcap, sizeof(vidcap));
         ioctl(videofd, VIDIOCGCAP, &vidcap);
@@ -280,7 +277,28 @@ void Channel::SetFormat(const QString &format)
             externalChanger[i] = "";
             sourceid[i] = "";
         }
+    }
 
+    // Create an input on single input cards that don't advertise input
+    if (channelnames.empty())
+    {
+        int i = 0;
+        channelnames[i]    = "Television";
+        inputChannel[i]    = "";
+        inputTuneTo[i]     = "";
+        externalChanger[i] = "";
+        sourceid[i]        = "";
+        capchannels        = 1;
+    }
+
+    QMap<int, QString>::const_iterator it = channelnames.begin();
+    for (; it != channelnames.end(); ++it)
+        VERBOSE(VB_IMPORTANT, QString("Input #%1: '%2'")
+                .arg(it.key()).arg(*it));
+
+
+    if (!usingv4l2)
+    {
         struct video_channel vc;
         bzero(&vc, sizeof(vc));
 
@@ -565,7 +583,7 @@ bool Channel::TuneTo(const QString &channum, int finetune)
 }
 
 /** \fn Channel::Tune(uint frequency, QString inputname, QString modulation)
- *  \brief Tunes to a specifix frequency (Hz) on a particular input, using
+ *  \brief Tunes to a specific frequency (Hz) on a particular input, using
  *         the specified modulation.
  *
  *  Note: This function always uses modulator zero.
@@ -581,8 +599,13 @@ bool Channel::Tune(uint frequency, QString inputname, QString modulation)
             .arg(device).arg(frequency).arg(inputname).arg(modulation));
     int ioctlval = 0;
 
+    if (modulation == "8vsb")
+        SetFormat(currentFormat = "ATSC");
     if (currentFormat == "")
         SetFormat("Default");
+    if (is_dtv)
+        modulation = "digital";
+
     int inputnum = GetInputByName(inputname);
 
     bool ok = true;
@@ -594,6 +617,21 @@ bool Channel::Tune(uint frequency, QString inputname, QString modulation)
     if (!ok)
         return false;
 
+    // If the frequency is a center frequency and not
+    // a visual carrier frequency, convert it.
+    int offset = frequency % 1000000;
+    offset = (offset > 500000) ? 1000000 - offset : offset;
+    bool is_visual_carrier = (offset > 150000) && (offset < 350000);
+    if (!is_visual_carrier && currentFormat == "ATSC")
+    {
+        VERBOSE(VB_CHANNEL,  QString("Channel(%1): ").arg(device) +
+                QString("Converting frequency from center frequency "
+                        "(%1 Hz) to visual carrier frequency (%2 Hz).")
+                .arg(frequency).arg(frequency - 1750000));
+        frequency -= 1750000; // convert to visual carrier
+    }        
+
+    // Video4Linux version 2 tuning
     if (usingv4l2)
     {
         bool isTunerCapLow = false;
@@ -611,19 +649,19 @@ bool Channel::Tune(uint frequency, QString inputname, QString modulation)
         struct v4l2_frequency vf;
         bzero(&vf, sizeof(vf));
 
+        vf.tuner = 0; // use first tuner
         vf.frequency = (isTunerCapLow) ?
             ((int)(frequency / 62.5)) : (frequency / 62500);
 
-        if (modulation.lower() != "analog")
+        if (modulation.lower() == "digital")
         {
-/*
+            VERBOSE(VB_CHANNEL, "using digital modulation");
             vf.type = V4L2_TUNER_DIGITAL_TV;
             if (ioctl(videofd, VIDIOC_S_FREQUENCY, &vf)>=0)
                 return true;
-*/
+            VERBOSE(VB_CHANNEL, "digital modulation failed");
         }
 
-        vf.tuner = 0; // use first tuner
         vf.type = V4L2_TUNER_ANALOG_TV;
 
         ioctlval = ioctl(videofd, VIDIOC_S_FREQUENCY, &vf);
@@ -647,6 +685,7 @@ bool Channel::Tune(uint frequency, QString inputname, QString modulation)
         return true;
     }
 
+    // Video4Linux version 1 tuning
     uint freq = frequency / 62500;
     ioctlval = ioctl(videofd, VIDIOCSFREQ, &freq);
     if (ioctlval < 0)
@@ -738,9 +777,8 @@ bool Channel::TuneMultiplex(uint mplexid)
     uint    frequency  = query.value(0).toInt();
     QString inputname  = query.value(1).toString();
     QString modulation = query.value(2).toString();
-    (void) modulation; // we don't actually use this yet.
 
-    if (!Tune(frequency, inputname))
+    if (!Tune(frequency, inputname, modulation))
         return false;
 
     return true;
@@ -888,7 +926,7 @@ unsigned short *Channel::GetV4L1Field(int attrib, struct video_picture &vid_pic)
 
 void Channel::SetColourAttribute(int attrib, const char *name)
 {
-    if (!pParent)
+    if (!pParent || is_dtv)
         return;
 
     QString field_name = name;
@@ -986,7 +1024,7 @@ void Channel::SetHue(void)
 
 int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
 {
-    if (!pParent)
+    if (!pParent || is_dtv)
         return -1;
 
     int newvalue;    // The int should have ample space to avoid overflow

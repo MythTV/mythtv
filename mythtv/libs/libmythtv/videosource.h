@@ -17,6 +17,8 @@
 class SignalTimeout;
 class ChannelTimeout;
 
+typedef QMap<int,QString> InputNames;
+
 /** \class CardUtil
  *  \brief Collection of helper utilities for capture card DB use
  */
@@ -75,6 +77,9 @@ class CardUtil
     static QString      GetDefaultInput(uint cardid);
 
     static bool         IgnoreEncrypted(uint cardid, const QString &inputname);
+
+    static bool         hasV4L2(int videofd);
+    static InputNames   probeV4LInputs(int videofd, bool &ok);
 };
 
 class SourceUtil
@@ -339,19 +344,6 @@ class DVBDiseqcInputList
     QString position;
 };
 
-class DVBDefaultInput: public ComboBoxSetting, public CCSetting {
-    Q_OBJECT
-public:
-
-    DVBDefaultInput(const CaptureCard& parent):
-        CCSetting(parent,"defaultinput") {
-        setLabel(QObject::tr("Default input"));
-    };
-
-public slots:
-    void fillSelections(const QString& type);
-};
-
 class CardType: public ComboBoxSetting, public CCSetting {
 public:
     CardType(const CaptureCard& parent);
@@ -377,7 +369,7 @@ public slots:
 private:
     CaptureCard& parent;
 
-    DVBDefaultInput* defaultinput;
+    TunerCardInput* defaultinput;
     DVBCardName* cardname;
     DVBCardType* cardtype;
     DVBDiseqcType* diseqctype;

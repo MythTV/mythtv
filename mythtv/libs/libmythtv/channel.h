@@ -83,6 +83,7 @@ class Channel : public ChannelBase
     bool        usingv4l2;      ///< Set to true if tuner accepts v4l2 commands
     int         videomode_v4l1; ///< Current video mode if 'usingv4l2' is false
     v4l2_std_id videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
+    bool        is_dtv;         ///< Set if 'currentFormat' is a DTV format
 
     QString     currentFormat;
 

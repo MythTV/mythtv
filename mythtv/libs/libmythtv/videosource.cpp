@@ -389,6 +389,78 @@ bool CardUtil::IgnoreEncrypted(uint cardid, const QString &input_name)
     return freetoair;
 }
 
+bool CardUtil::hasV4L2(int videofd)
+{
+    struct v4l2_capability vcap;
+    bzero(&vcap, sizeof(vcap));
+
+    return ((ioctl(videofd, VIDIOC_QUERYCAP, &vcap) >= 0) &&
+            (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE));
+}
+
+InputNames CardUtil::probeV4LInputs(int videofd, bool &ok)
+{
+#ifdef USING_V4L
+    InputNames list;
+    ok = false;
+
+    bool usingv4l2 = hasV4L2(videofd);
+
+    // V4L v2 query
+    struct v4l2_input vin;
+    bzero(&vin, sizeof(vin));
+    while (usingv4l2 && (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0))
+    {
+        QString input((char *)vin.name);
+        list[vin.index] = input;
+        vin.index++;
+    }
+    if (vin.index)
+    {
+        ok = true;
+        return list;
+    }
+
+    // V4L v1 query
+    struct video_capability vidcap;
+    bzero(&vidcap, sizeof(vidcap));
+    if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0)
+    {
+        QString msg = QObject::tr("Could not query inputs.");
+        VERBOSE(VB_IMPORTANT, msg + ENO);
+        list[-1] = msg;
+        vidcap.channels = 0;
+    }
+
+    for (int i = 0; i < vidcap.channels; i++)
+    {
+        struct video_channel test;
+        bzero(&test, sizeof(test));
+        test.channel = i;
+
+        if (ioctl(videofd, VIDIOCGCHAN, &test) != 0)
+        {
+            VERBOSE(VB_IMPORTANT,
+                    QString("Could detemine name of input #%1"
+                            "\n\t\t\tNot adding it to the list.")
+                    .arg(test.channel) + ENO);
+            continue;
+        }
+
+        list[i] = test.name;
+    }
+
+    // Create an input on single input cards that don't advertise input
+    if (!list.size())
+        list[0] = "Television";
+
+    ok = true;
+#else
+    list[-1] += QObject::tr("ERROR, Compile with V4L support to query inputs");
+#endif
+    return list;
+}
+
 QString SourceUtil::GetChannelSeparator(uint sourceid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1022,6 +1094,8 @@ class VideoDevice: public PathSetting, public CCSetting
     }
 
     static QStringList probeInputs(QString device);
+    static QStringList probeDVBInputs(int diseq_type);
+
     static QStringList fillDVBInputs(int dvb_diseqc_type);
     static QValueList<DVBDiseqcInputList> fillDVBInputsDiseqc(int dvb_diseqc_type);
   private:
@@ -1460,7 +1534,7 @@ class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
     {
         setUseLabel(false);
 
-        VideoDevice *atsc_device = new VideoDevice(parent, 32);
+        VideoDevice *atsc_device = new VideoDevice(parent, 0, 64);
         TunerCardInput *atsc_input = new TunerCardInput(parent);
         SignalTimeout *signal_timeout = new SignalTimeout(parent, 500);
         ChannelTimeout *channel_timeout = new ChannelTimeout(parent, 2000);
@@ -2355,73 +2429,42 @@ CardInputEditor::~CardInputEditor() {
     }
 }
 
-QStringList VideoDevice::fillDVBInputs(int dvb_diseqc_type) {
-    QValueList<DVBDiseqcInputList> dvbinput;
-    QStringList inputs;
-
-    dvbinput = fillDVBInputsDiseqc(dvb_diseqc_type);
-
-    QValueList<DVBDiseqcInputList>::iterator it;
-    for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
-        inputs += (*it).input;
-
-    return inputs;
-}
-
-QValueList<DVBDiseqcInputList> VideoDevice::fillDVBInputsDiseqc(int dvb_diseqc_type) {
+QValueList<DVBDiseqcInputList>
+VideoDevice::fillDVBInputsDiseqc(int dvb_diseqc_type)
+{
     QValueList<DVBDiseqcInputList> list;
 
+    QString stxt = "DiSEqC Switch Input %1";
+    QString mtxt = "DiSEqC v1.2 Motor Position %1";
+    QString itxt = "DiSEqC v1.3 Input %1";
+
+    uint i;
     switch (dvb_diseqc_type)
     {
         case 1: case 2: case 3:
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 1"),
-                                           QString("0"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 2"),
-                                           QString("1"), QString("")));
+            for (i = 0; i < 2; ++i)
+                list.append(DVBDiseqcInputList(
+                                stxt.arg(i+1), QString::number(i), ""));
             break;
         case 4: case 5:
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 1"),
-                                           QString("0"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 2"),
-                                           QString("1"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 3"),
-                                           QString("2"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 4"),
-                                           QString("3"), QString("")));
+            for (i = 0; i < 4; ++i)
+                list.append(DVBDiseqcInputList(
+                                stxt.arg(i+1), QString::number(i), ""));
             break;
         case 6:
-            for (int x=1;x<50;x++)
+            for (i = 1; i < 50; ++i)
                 list.append(DVBDiseqcInputList(
-                                QString("DiSEqC v1.2 Motor Position %1")
-                                .arg(x), QString(""), QString("%1").arg(x)));
+                                mtxt.arg(i), "", QString::number(i)));
             break;
         case 7:
-            for (int x=1;x<20;x++)
+            for (i = 1; i < 20; ++i)
                 list.append(DVBDiseqcInputList(
-                                QString("DiSEqC v1.3 Input %1")
-                                .arg(x), QString(""), QString("%1").arg(x)));
+                                itxt.arg(i), "", QString::number(i)));
             break;
         case 8:
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  1"),
-                                           QString("0"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  2"),
-                                           QString("1"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  3"),
-                                           QString("2"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  4"),
-                                           QString("3"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  5"),
-                                           QString("4"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  6"),
-                                           QString("5"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  7"),
-                                           QString("6"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  8"),
-                                           QString("7"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input  9"),
-                                           QString("8"), QString("")));
-            list.append(DVBDiseqcInputList(QString("DiSEqC Switch Input 10"),
-                                           QString("9"), QString("")));
+            for (i = 0; i < 10; ++i)
+                list.append(DVBDiseqcInputList(
+                                stxt.arg(i+1,2), QString::number(i), ""));
             break;
         default:
             list.append(DVBDiseqcInputList(
@@ -2433,77 +2476,55 @@ QValueList<DVBDiseqcInputList> VideoDevice::fillDVBInputsDiseqc(int dvb_diseqc_t
 
 QStringList VideoDevice::probeInputs(QString device)
 {
-    (void) device;
-    QStringList ret;
+    bool is_dvb = false;
+    int diseq_type = device.toInt(&is_dvb);
 
-#ifdef USING_V4L
+    if (is_dvb)
+    {
+        return probeDVBInputs(diseq_type);
+    }
+
+    bool ok;
+    QStringList ret;
     int videofd = open(device.ascii(), O_RDWR);
-    if (videofd < 0) {
-        cerr << "Couldn't open " << device << " to probe its inputs.\n";
+    if (videofd < 0)
+    {
+        ret += QObject::tr("Could not open '%1' "
+                           "to probe its inputs.").arg(device);
+        return ret;
+    }
+    InputNames list = CardUtil::probeV4LInputs(videofd, ok);
+    close(videofd);
+
+    if (!ok)
+    {
+        ret += list[-1];
         return ret;
     }
 
-    bool usingv4l2 = false;
-
-    struct v4l2_capability vcap;
-    memset(&vcap, 0, sizeof(vcap));
-    if (ioctl(videofd, VIDIOC_QUERYCAP, &vcap) < 0)
-         usingv4l2 = false;
-    else
+    InputNames::iterator it;
+    for (it = list.begin(); it != list.end(); ++it)
     {
-        if (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE)
-            usingv4l2 = true;
+        if (it.key() >= 0)
+            ret += *it;
     }
 
-    if (usingv4l2)
-    {
-        struct v4l2_input vin;
-        memset(&vin, 0, sizeof(vin));
-        vin.index = 0;
+    return ret;
+}
 
-        while (ioctl(videofd, VIDIOC_ENUMINPUT, &vin) >= 0) {
-            QString input((char *)vin.name);
+QStringList VideoDevice::probeDVBInputs(int diseq_type)
+{
+    QStringList ret;
+#ifdef USING_DVB
+    QValueList<DVBDiseqcInputList> dvbinput;
+    dvbinput = fillDVBInputsDiseqc(diseq_type);
 
-            ret += input;
-
-            vin.index++;
-        }
-    }
-    else
-    {
-        struct video_capability vidcap;
-        memset(&vidcap, 0, sizeof(vidcap));
-        if (ioctl(videofd, VIDIOCGCAP, &vidcap) != 0)
-        {
-            perror("VIDIOCGCAP");
-            vidcap.channels = 0;
-        }
-
-        for (int i = 0; i < vidcap.channels; i++)
-        {
-            struct video_channel test;
-            memset(&test, 0, sizeof(test));
-            test.channel = i;
-
-            if (ioctl(videofd, VIDIOCGCHAN, &test) != 0)
-            {
-                perror("ioctl(VIDIOCGCHAN)");
-                continue;
-            }
-
-            ret += test.name;
-        }
-    }
-
-    if (ret.size() == 0)
-        ret += QObject::tr("ERROR, No inputs found");
-
-    close(videofd);
-
+    QValueList<DVBDiseqcInputList>::iterator it;
+    for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
+        ret += (*it).input;
 #else
-    ret += QObject::tr("ERROR, V4L support unavailable on this OS");
+    ret += QObject::tr("ERROR, Compile with DVB support to query inputs");
 #endif
-
     return ret;
 }
 
@@ -2568,17 +2589,6 @@ void DVBConfigurationGroup::probeCard(const QString& cardNumber)
 #endif
 }
 
-void DVBDefaultInput::fillSelections(const QString& type)
-{
-    clearSelections();
-
-    QStringList inputs = VideoDevice::fillDVBInputs(type.toInt());
-
-    for(QStringList::iterator i = inputs.begin(); i != inputs.end(); ++i)
-        addSelection(*i);
-
-}
-
 void TunerCardInput::fillSelections(const QString& device)
 {
     clearSelections();
@@ -2601,7 +2611,7 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
     cardname = new DVBCardName();
     cardtype = new DVBCardType();
 
-    defaultinput = new DVBDefaultInput(parent);
+    defaultinput = new TunerCardInput(parent);
     diseqctype = new DVBDiseqcType(parent);
     signal_timeout = new SignalTimeout(parent, 500);
     channel_timeout = new ChannelTimeout(parent, 3000);
