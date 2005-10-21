@@ -45,10 +45,7 @@ pcHDTVSignalMonitor::pcHDTVSignalMonitor(int db_cardnum, Channel *_channel,
     signalStrength.SetTimeout(wait);
     signalStrength.SetThreshold(threshold);
 
-    struct v4l2_capability vcap;
-    bzero(&vcap, sizeof(vcap));
-    usingv4l2 = (ioctl(channel->GetFd(), VIDIOC_QUERYCAP, &vcap) >= 0) &&
-        (vcap.capabilities & V4L2_CAP_VIDEO_CAPTURE);
+    usingv4l2 = CardUtil::hasV4L2(channel->GetFd());
 }
 
 pcHDTVSignalMonitor::~pcHDTVSignalMonitor()
