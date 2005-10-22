@@ -217,8 +217,7 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
 
     XJ_width = width;
     XJ_height = height;
-    SetVideoAspectRatio(aspect);
-    
+
     QString HorizScanMode = gContext->GetSetting("HorizScanMode", "overscan");
     QString VertScanMode = gContext->GetSetting("VertScanMode", "overscan");
 
@@ -263,6 +262,8 @@ bool VideoOutput::Init(int width, int height, float aspect, WId winid,
         "PlaybackHue",        gContext->GetHostName(), 0);
     letterbox  = gContext->GetNumSettingOnHost(
         "AspectOverride",     gContext->GetHostName(), kLetterbox_Off);
+
+    VideoAspectRatioChanged(aspect); // apply aspect ratio and letterbox mode
 
     embedding = false;
 
