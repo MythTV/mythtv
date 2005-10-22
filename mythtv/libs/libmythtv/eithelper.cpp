@@ -3,7 +3,6 @@
 // MythTV includes
 #include "eithelper.h"
 #include "mythdbcon.h"
-#include "scheduledrecording.h"
 
 const uint EITHelper::kChunkSize = 20;
 
@@ -120,12 +119,8 @@ void EITHelper::UpdateEITList(int mplexid, const QList_Events &events)
 
     if (counter > 0)
     {
-        VERBOSE(VB_SCHEDULE,
-                QString("EITHelper: Added %1 scheduler events, running "
-                        "scheduler to check for updates").arg(counter));
-        ScheduledRecording::signalChange(-1);
-        QString msg = QString("Added %1 scheduler events").arg(counter);
-        gContext->LogEntry("DVB/ATSC Guide Scanner", LP_INFO, msg, "");
+        VERBOSE(VB_SCHEDULE, QString("EITHelper: Added %1 events in this pass")
+                .arg(counter));
     }
 }
 
