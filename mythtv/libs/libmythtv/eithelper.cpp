@@ -52,20 +52,30 @@ uint EITHelper::GetListSize(void) const
     return eitList.size();
 }
 
-void EITHelper::ProcessEvents(int mplexid)
+/** \fn EITHelper::ProcessEvents(int)
+ *  \brief Inserts events in EIT list.
+ *
+ *  NOTE: This currently takes a mplexid key for the dtv_multiplex table,
+ *        but it should just take a sourceid key for the channel table.
+ *
+ *  \param mplexid multiplex we are inserting events for.
+ *  \return Returns number of events inserted into DB.
+ */
+uint EITHelper::ProcessEvents(int mplexid)
 {
     QMutexLocker locker(&eitList_lock);
 
     if (!eitList.size())
-        return;
-    
+        return 0;
+
+    uint insertCount = 0;
     if (eitList.front()->size() <= kChunkSize)
     {
         QList_Events *events = eitList.front();
         eitList.pop_front();
 
         eitList_lock.unlock();
-        UpdateEITList(mplexid, *events);
+        insertCount += UpdateEITList(mplexid, *events);
         QList_Events::iterator it = events->begin();
         for (; it != events->end(); ++it)
             delete *it;
@@ -83,12 +93,19 @@ void EITHelper::ProcessEvents(int mplexid)
         events->erase(events->begin(), subset_end);
         
         eitList_lock.unlock();
-        UpdateEITList(mplexid, subset);
+        insertCount += UpdateEITList(mplexid, subset);
         QList_Events::iterator it = subset.begin();
         for (; it != subset.end(); ++it)
             delete *it;
         eitList_lock.lock();
     }
+
+    if (insertCount != 0)
+    {
+        VERBOSE(VB_SCHEDULE, QString ("EITHelper: Added %1 events")
+                .arg(insertCount));
+    }
+    return insertCount;
 }
 
 int EITHelper::GetChanID(int mplexid, const Event &event) const
@@ -102,7 +119,7 @@ int EITHelper::GetChanID(int mplexid, const Event &event) const
     return chanid;
 }
 
-void EITHelper::UpdateEITList(int mplexid, const QList_Events &events)
+uint EITHelper::UpdateEITList(int mplexid, const QList_Events &events)
 {
     MSqlQuery query1(MSqlQuery::InitCon());
     MSqlQuery query2(MSqlQuery::InitCon());
@@ -116,12 +133,7 @@ void EITHelper::UpdateEITList(int mplexid, const QList_Events &events)
             continue;
         counter += update_eit_in_db(query1, query2, chanid, **e);
     }
-
-    if (counter > 0)
-    {
-        VERBOSE(VB_SCHEDULE, QString("EITHelper: Added %1 events in this pass")
-                .arg(counter));
-    }
+    return counter;
 }
 
 static int get_chan_id_from_db(int mplexid, const Event &event)
