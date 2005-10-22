@@ -1440,12 +1440,7 @@ void TV::RunTV(void)
         {
             OSDSet *set = GetOSD()->GetSet("channel_number");
             if ((set && !set->Displaying()) || !set)
-            {
-                if (StateIsLiveTV(GetState()))
-                    ChannelCommit();
-                else
-                    ChannelClear();
-            }
+                ChannelCommit();
         }
 
         if (class LCD * lcd = LCD::Get())
@@ -2934,9 +2929,10 @@ void TV::ChannelKey(char key)
      * the only way to enter a channel number to browse without waiting for the
      * OSD to fadeout after entering numbers.
      */
-    bool do_smart = (smartChannelChange || browsemode);
+    bool do_smart = StateIsLiveTV(GetState()) &&
+        (smartChannelChange || browsemode);
     QString chan = QueuedChannel();
-    if (StateIsLiveTV(GetState()) && !chan.isEmpty() && do_smart)
+    if (!chan.isEmpty() && do_smart)
     {
         // Look for channel in line-up
         bool unique = false;
@@ -2973,6 +2969,12 @@ void TV::ChannelCommit(void)
 {
     if (!channelqueued)
         return;
+
+    if (!StateIsLiveTV(GetState()))
+    {
+        ChannelClear(); 
+ 	return; 
+    }
 
     QString chan = QueuedChannel();
 
