@@ -2326,9 +2326,9 @@ void PlaybackBox::showStoragePopup()
     QButton *storageButton;
 
     if (delitem && delitem->GetAutoExpireFromRecorded())
-        storageButton = popup->addButton(tr("Don't Auto Expire"), this, SLOT(noAutoExpire()));
+        storageButton = popup->addButton(tr("Disable Auto Expire"), this, SLOT(noAutoExpire()));
     else
-        storageButton = popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
+        storageButton = popup->addButton(tr("Enable Auto Expire"), this, SLOT(doAutoExpire()));
 
     if (delitem && delitem->UsesMaxEpisodes())
     {
@@ -2507,10 +2507,10 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
         popup->addButton(tr("Storage Options"), this, SLOT(showStoragePopup()));
     } else {
         if (delitem && delitem->GetAutoExpireFromRecorded())
-            popup->addButton(tr("Don't Auto Expire"), this,
+            popup->addButton(tr("Disable Auto Expire"), this,
                              SLOT(noAutoExpire()));
         else
-            popup->addButton(tr("Auto Expire"), this, SLOT(doAutoExpire()));
+            popup->addButton(tr("Enable Auto Expire"), this, SLOT(doAutoExpire()));
     }
 
     popup->addButton(tr("Recording Options"), this, SLOT(showRecordingPopup()));
