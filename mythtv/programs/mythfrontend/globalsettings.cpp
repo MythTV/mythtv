@@ -1255,7 +1255,7 @@ static HostSpinBox *GuiHeight()
 
 static HostSpinBox *GuiOffsetX()
 {
-    HostSpinBox *gs = new HostSpinBox("GuiOffsetX", -1600, 1600, 8, true);
+    HostSpinBox *gs = new HostSpinBox("GuiOffsetX", -3840, 3840, 32, true);
     gs->setLabel(QObject::tr("GUI X offset"));
     gs->setValue(0);
     gs->setHelpText(QObject::tr("The horizontal offset the GUI will be "
