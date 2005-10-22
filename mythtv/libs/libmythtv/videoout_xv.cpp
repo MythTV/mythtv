@@ -48,15 +48,6 @@ static void clear_xv_buffers(VideoBuffers&, int w, int h, int xv_chroma);
 //#define DEBUG_PAUSE /* enable to debug XvMC pause frame */
 
 #ifdef USING_XVMC
-#   define AGGRESSIVE_BUFFER_MANAGEMENT 0
-#   define XVMC_OSD_NUM       1 /**< 1 for display */
-#   define XVMC_OSD_RES_NUM   XVMC_OSD_NUM+1 /**< +1 for blending */
-#   define XVMC_PRE_NUM       1 /**< allow for one I/P frame before us */
-#   define XVMC_POST_NUM      1 /**< allow for one I/P frame after us */
-#   define XVMC_SHOW_NUM      1 /**< allow for one B frame to be displayed */
-#   define XVMC_MIN_SURF_NUM  8 /**< minumum number of XvMC surfaces to get */
-#   define XVMC_MAX_SURF_NUM 16 /**< maximum number of XvMC surfaces to get */
-
     static inline xvmc_render_state_t *GetRender(VideoFrame *frame);
 
 #   if defined(USING_XVMCW) || defined(USING_XVMC_VLD)
@@ -75,6 +66,85 @@ static void clear_xv_buffers(VideoBuffers&, int w, int h, int xv_chroma);
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
                        bool &useXV, bool &useShm);
 static void SetFromHW(Display *d, bool &useXvMC, bool &useXV, bool& useShm);
+
+class XvMCBufferSettings
+{
+  public:
+    XvMCBufferSettings() :
+        num_xvmc_surf(1),
+        needed_for_display(1),
+        min_num_xvmc_surfaces(8),
+        max_num_xvmc_surfaces(16),
+        num_xvmc_surfaces(min_num_xvmc_surfaces),
+        aggressive(false) {}
+
+    void SetOSDNum(uint val)
+    {
+        num_xvmc_surf = val;
+    }
+
+    void SetNumSurf(uint val)
+    {
+        num_xvmc_surfaces = min(max(val, min_num_xvmc_surfaces),
+                                max_num_xvmc_surfaces);
+    }
+
+    /// Returns number of XvMC OSD surfaces to allocate
+    uint GetOSDNum(void)    const { return num_xvmc_surf; }
+
+    /// Returns number of frames we want decoded before we
+    /// try to display a frame.
+    uint GetNeededBeforeDisplay(void)
+        const { return needed_for_display; }
+
+    /// Returns minumum number of XvMC surfaces we need
+    uint GetMinSurf(void) const { return min_num_xvmc_surfaces; }
+
+    /// Returns maximum number of XvMC surfaces should try to get
+    uint GetMaxSurf(void) const { return max_num_xvmc_surfaces; }
+
+    /// Returns number of XvMC surfaces we actually allocate
+    uint GetNumSurf(void) const { return num_xvmc_surfaces; }
+
+    /// Returns number of frames we want to try to prebuffer
+    uint GetPreBufferGoal(void) const
+    {
+        uint reserved = GetFrameReserve() + XVMC_PRE_NUM +
+            XVMC_POST_NUM + XVMC_SHOW_NUM;
+        return num_xvmc_surfaces - reserved;
+    }
+
+    /// Returns number of frames reserved for the OSD blending process
+    /// and for video display. This is the HARD reserve.
+    uint GetFrameReserve(void) const
+        { return num_xvmc_surf + XVMC_SHOW_NUM; }
+
+    /// Returns true if we should be aggressive in freeing buffers
+    bool IsAggressive(void)  const { return aggressive; }
+
+  private:
+    /// Number of XvMC OSD surface to allocate
+    uint num_xvmc_surf;
+    /// Frames needed before we try to display a frame, a larger
+    /// number here ensures that we don't lose A/V Sync when a 
+    /// frame takes longer than one frame interval to decode.
+    uint needed_for_display;
+    /// Minumum number of XvMC surfaces to get
+    uint min_num_xvmc_surfaces;
+    /// Maximum number of XvMC surfaces to get
+    uint max_num_xvmc_surfaces;
+    /// Number of XvMC surfaces we got
+    uint num_xvmc_surfaces;
+    /// Use aggressive buffer management
+    bool aggressive;
+
+    /// Allow for one I/P frame before us
+    static const uint XVMC_PRE_NUM  = 1;
+    /// Allow for one I/P frame after us
+    static const uint XVMC_POST_NUM = 1;
+    /// Allow for one B frame to be displayed
+    static const uint XVMC_SHOW_NUM = 1;
+};
 
 /** \class  VideoOutputXv
  * Supports common video output methods used with %X11 Servers.
@@ -101,12 +171,14 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       XJ_non_xv_image(0), non_xv_frames_shown(0), non_xv_show_frame(1),
       non_xv_fps(0), non_xv_av_format(PIX_FMT_NB), non_xv_stop_time(0),
 
+#ifdef USING_XVMC
+      xvmc_buf_attr(new XvMCBufferSettings()),
+      xvmc_chroma(XVMC_CHROMA_FORMAT_420), xvmc_ctx(NULL),
+      xvmc_osd_lock(false),
+#endif
+
       xv_port(-1), xv_colorkey(0), xv_draw_colorkey(false), xv_chroma(0),
       xv_color_conv_buf(NULL)
-#ifdef USING_XVMC
-      , xvmc_chroma(XVMC_CHROMA_FORMAT_420), xvmc_ctx(NULL),
-      xvmc_osd_lock(false)
-#endif
 {
     VERBOSE(VB_PLAYBACK, "VideoOutputXv()");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
@@ -115,15 +187,6 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
     // to a singleton instance of the DisplayRes class
     if (gContext->GetNumSetting("UseVideoModes", 0))
         display_res = DisplayRes::GetDisplayRes();
-
-#ifdef USING_XVMC
-    xvmcBuffers.OSDNum    = XVMC_OSD_NUM;
-    xvmcBuffers.OSDResNum = XVMC_OSD_RES_NUM;
-    xvmcBuffers.MinSurf   = XVMC_MIN_SURF_NUM;
-    xvmcBuffers.MaxSurf   = XVMC_MAX_SURF_NUM;
-    xvmcBuffers.NumDecode = XVMC_MIN_SURF_NUM;
-    xvmcBuffers.Agressive = AGGRESSIVE_BUFFER_MANAGEMENT;
-#endif // USING_XVMC
 }
 
 VideoOutputXv::~VideoOutputXv()
@@ -594,24 +657,14 @@ bool VideoOutputXv::InitVideoBuffers(MythCodecID mcodecid,
         myth2av_codecid(myth_codec_id, vld, idct, mc);
 
         if (vld)
-            xvmcBuffers.NumDecode = 16;
+            xvmc_buf_attr->SetNumSurf(16);
 
-        int needprebuf = xvmcBuffers.NumDecode - XVMC_OSD_RES_NUM
-            - XVMC_PRE_NUM - XVMC_POST_NUM - XVMC_SHOW_NUM;
-        int needed_bfr_display = 1; //max(needprebuf / 3, 1);
-        //cerr<<"want to pre-buffer:  "<<needprebuf<<endl;
-        //cerr<<"need before display: "<<needed_bfr_display<<endl;
-        vbuffers.Init(xvmcBuffers.NumDecode,
-                      false
-                      /* create an extra frame for pause? */,
-                      XVMC_OSD_RES_NUM
-                      /* # of frames we do not try to fill with data */,
-                      needprebuf
-                      /* # of frames we try to keep full of data */,
-                      needprebuf
-                      /* same as above */,
-                      needed_bfr_display
-                      /* frames needed before we try to display a frame */,
+        vbuffers.Init(xvmc_buf_attr->GetNumSurf(),
+                      false /* create an extra frame for pause? */,
+                      xvmc_buf_attr->GetFrameReserve(),
+                      xvmc_buf_attr->GetPreBufferGoal(),
+                      xvmc_buf_attr->GetPreBufferGoal(),
+                      xvmc_buf_attr->GetNeededBeforeDisplay(),
                       true /*use_frame_locking*/);
         
         
@@ -1177,8 +1230,8 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
         return false;
 
     bool createBlocks = !(XVMC_VLD == (xvmc_surf_info.mc_type & XVMC_VLD));
-    xvmc_surfs = CreateXvMCSurfaces(xvmcBuffers.MaxSurf, createBlocks);
-    if (xvmc_surfs.size() < xvmcBuffers.MinSurf)
+    xvmc_surfs = CreateXvMCSurfaces(xvmc_buf_attr->GetMaxSurf(), createBlocks);
+    if (xvmc_surfs.size() < xvmc_buf_attr->GetMinSurf())
     {
         VERBOSE(VB_IMPORTANT, "Unable to create XvMC Surfaces");
         DeleteBuffers(XVideoMC, false);
@@ -1195,7 +1248,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
     }
 
     xvmc_osd_lock.lock();
-    for (uint i=0; i < xvmcBuffers.OSDNum; i++)
+    for (uint i=0; i < xvmc_buf_attr->GetOSDNum(); i++)
     {
         XvMCOSD *xvmc_osd =
             new XvMCOSD(XJ_disp, xv_port, xvmc_surf_info.surface_type_id,
@@ -2428,10 +2481,17 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
         return;
     }
 
+    if (!xvmc_buf_attr->GetOSDNum())
+    {
+        vbuffers.UnlockFrame(frame, "ProcessFrameXvMC");
+        return;
+    }
+
     VideoFrame * old_osdframe = vbuffers.GetOSDFrame(frame);
     if (old_osdframe)
     {
-        QString a = DebugString(old_osdframe, true), b = DebugString(frame, true);
+        QString a = DebugString(old_osdframe, true);
+        QString b = DebugString(frame, true);
         VERBOSE(VB_IMPORTANT, QString("ProcessFrameXvMC: Warning, %1 is still "
                                       "marked as the OSD frame of %2.")
                 .arg(a).arg(b));
@@ -2510,7 +2570,7 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
 #ifdef USING_XVMC
 XvMCOSD* VideoOutputXv::GetAvailableOSD()
 {
-    if (xvmcBuffers.OSDNum > 1)
+    if (xvmc_buf_attr->GetOSDNum() > 1)
     {
         XvMCOSD *val = NULL;
         xvmc_osd_lock.lock();
@@ -2524,21 +2584,28 @@ XvMCOSD* VideoOutputXv::GetAvailableOSD()
         xvmc_osd_lock.unlock();
         return val;
     }
-    xvmc_osd_lock.lock();
-    return xvmc_osd_available.head();
+    else if (xvmc_buf_attr->GetOSDNum() > 0)
+    {
+        xvmc_osd_lock.lock();
+        return xvmc_osd_available.head();
+    }
+    return NULL;
 }
 #endif // USING_XVMC
 
 #ifdef USING_XVMC
 void VideoOutputXv::ReturnAvailableOSD(XvMCOSD *avail)
 {
-    if (xvmcBuffers.OSDNum > 1)
+    if (xvmc_buf_attr->GetOSDNum() > 1)
     {
         xvmc_osd_lock.lock();
         xvmc_osd_available.push_front(avail);
         xvmc_osd_lock.unlock();
     }
-    xvmc_osd_lock.unlock();
+    else if (xvmc_buf_attr->GetOSDNum() > 0)
+    {
+        xvmc_osd_lock.unlock();
+    }
 }
 #endif // USING_XVMC
 
@@ -2663,7 +2730,7 @@ void VideoOutputXv::CheckDisplayedFramesForAvailability(void)
 #ifdef USING_XVMC
     frame_queue_t::iterator it;
 
-    if ( xvmcBuffers.Agressive )
+    if (xvmc_buf_attr->IsAggressive())
     {
         it = vbuffers.begin_lock(kVideoBuffer_displayed);
         for (;it != vbuffers.end(kVideoBuffer_displayed); ++it)

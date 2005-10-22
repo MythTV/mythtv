@@ -16,19 +16,8 @@
 #undef HAVE_AV_CONFIG_H
 #include "../libavcodec/avcodec.h"
 
-class XvMCBufferSettings
-{
-    public:
-        XvMCBufferSettings() { OSDNum = OSDResNum = 2; MinSurf = 8; MaxSurf = 16; NumDecode = 8; Agressive = 1; }
-        unsigned int OSDNum;
-        unsigned int OSDResNum;
-        unsigned int MinSurf;
-        unsigned int MaxSurf;
-        unsigned int NumDecode;
-        unsigned int Agressive;
-};
-
 #ifdef USING_XVMC
+class XvMCBufferSettings;
 class XvMCOSD;
 #include "XvMCSurfaceTypes.h"
 #include "../libavcodec/xvmc_render.h"
@@ -150,7 +139,6 @@ class VideoOutputXv : public VideoOutput
     XvMCOSD* GetAvailableOSD();
     void ReturnAvailableOSD(XvMCOSD*);
 #endif // USING_XVMC
-    XvMCBufferSettings xvmcBuffers;
 
     // Misc.
     MythCodecID          myth_codec_id;
@@ -187,16 +175,9 @@ class VideoOutputXv : public VideoOutput
     int                  non_xv_av_format;
     time_t               non_xv_stop_time;
 
-    // Basic Xv drawing info
-    int                  xv_port;
-    int                  xv_colorkey;
-    bool                 xv_draw_colorkey;
-    int                  xv_chroma;
-    unsigned char       *xv_color_conv_buf;
-    buffer_map_t         xv_buffers;
-
 #ifdef USING_XVMC 
     // Basic XvMC drawing info
+    XvMCBufferSettings  *xvmc_buf_attr;
     XvMCSurfaceInfo      xvmc_surf_info;
     int                  xvmc_chroma;
     XvMCContext         *xvmc_ctx;
@@ -207,6 +188,14 @@ class VideoOutputXv : public VideoOutput
     MythDeque<XvMCOSD*>  xvmc_osd_available;
     friend class XvMCOSD;
 #endif // USING_XVMC
+
+    // Basic Xv drawing info
+    int                  xv_port;
+    int                  xv_colorkey;
+    bool                 xv_draw_colorkey;
+    int                  xv_chroma;
+    unsigned char       *xv_color_conv_buf;
+    buffer_map_t         xv_buffers;
 };
 
 CodecID myth2av_codecid(MythCodecID codec_id,
