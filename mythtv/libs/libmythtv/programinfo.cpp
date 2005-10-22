@@ -986,6 +986,33 @@ void ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
     recgroup = newrecgroup;
 }
 
+/** \fn ProgramInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
+ *  \brief Sets the recording title and subtitle, both in this ProgramInfo
+ *         and in the database.
+ *  \param newTitle New recording title.
+ *  \param newSubtitle New recording subtitle
+ */
+void ProgramInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded"
+                  " SET title = :TITLE, subtitle = :SUBTITLE"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :START ;");
+    query.bindValue(":TITLE", newTitle.utf8());
+    query.bindValue(":SUBTITLE", newSubtitle.utf8());
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":START", recstartts.toString("yyyyMMddhhmm00"));
+
+    if (!query.exec())
+        MythContext::DBError("RecTitle update", query);
+
+    title = newTitle;
+    subtitle = newSubtitle;
+}
+
+
 /** \fn ProgramInfo::ToggleRecord()
  *  \brief Cycles through recording types.
  *

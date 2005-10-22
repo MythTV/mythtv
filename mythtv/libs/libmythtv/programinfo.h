@@ -145,6 +145,8 @@ class ProgramInfo
     void FinishedRecording(bool prematurestop);
     void UpdateRecordingEnd(void);
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
+    void ApplyRecordRecTitleChange(const QString &newTitle,
+                                   const QString &newSubtitle);
 
     // Quick gets
     QString CreateRecordBasename(const QString &ext) const;

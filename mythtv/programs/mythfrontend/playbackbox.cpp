@@ -2358,6 +2358,9 @@ void PlaybackBox::showRecordingPopup()
     QButton *changeButton = popup->addButton(tr("Change Recording Group"), this,
                      SLOT(showRecGroupChanger()));
 
+    popup->addButton(tr("Change Recording Title"), this,
+                     SLOT(showRecTitleChanger()));
+
     popup->addButton(tr("Edit Recording Schedule"), this,
                      SLOT(doEditScheduled()));
     
@@ -3992,6 +3995,43 @@ void PlaybackBox::showRecGroupChanger(void)
     closeRecGroupPopup(result == MythDialog::Accepted);
 }
 
+void PlaybackBox::showRecTitleChanger()
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    initRecGroupPopup(tr("Change Recording Title"), "showRecTitleChanger");
+
+    recGroupPopup->addLabel(tr("Title"));
+    recGroupLineEdit = new MythLineEdit(recGroupPopup);
+    recGroupLineEdit->setText(delitem->title);
+    recGroupLineEdit->selectAll();
+    recGroupPopup->addWidget(recGroupLineEdit);
+
+    recGroupPopup->addLabel(tr("Subtitle"));
+    recGroupLineEdit1 = new MythLineEdit(recGroupPopup);
+    recGroupLineEdit1->setText(delitem->subtitle);
+    recGroupLineEdit1->selectAll();
+    recGroupPopup->addWidget(recGroupLineEdit1);
+
+    recGroupLineEdit->setFocus();
+
+    connect(recGroupLineEdit, SIGNAL(returnPressed()), recGroupPopup, SLOT(accept()));
+    connect(recGroupLineEdit1, SIGNAL(returnPressed()), recGroupPopup, SLOT(accept()));
+
+    int result = recGroupPopup->ExecPopup();
+
+    if (result == MythDialog::Accepted)
+        setRecTitle();
+
+    closeRecGroupPopup(result == MythDialog::Accepted);
+
+    delete delitem;
+    delitem = NULL;
+}
+
 void PlaybackBox::setRecGroup(void)
 {
     QString newRecGroup = recGroupLineEdit->text();
@@ -4017,6 +4057,25 @@ void PlaybackBox::setRecGroup(void)
             playList.clear();
         }
     }
+}
+
+void PlaybackBox::setRecTitle()
+{
+    QString newRecTitle = recGroupLineEdit->text();
+    QString newRecSubtitle = recGroupLineEdit1->text();
+
+    if (newRecTitle == "")
+        return;
+
+    delitem->ApplyRecordRecTitleChange(newRecTitle, newRecSubtitle);
+
+    inTitle = gContext->GetNumSetting("PlaybackBoxStartInTitle", 0);
+    titleIndex = 0;
+    progIndex = 0;
+
+    connected = FillList();
+    skipUpdate = false;
+    update(fullRect);
 }
 
 void PlaybackBox::recGroupChangerListBoxChanged(void)
