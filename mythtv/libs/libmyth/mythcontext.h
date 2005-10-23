@@ -37,10 +37,13 @@ class MediaMonitor;
 class MythMediaDevice;
 class DisplayRes;
 class MDBManager;
+class MythContextPrivate;
 
+/// These are the various VERBOSITY flags, used to select which
+/// messages we want printed to the console.
 enum VerboseMask {
-    VB_IMPORTANT = 0x0001,
-    VB_GENERAL   = 0x0002,
+    VB_IMPORTANT = 0x0001, ///< Errors or other very important messages
+    VB_GENERAL   = 0x0002, ///< General info, printed out by default
     VB_RECORD    = 0x0004,
     VB_PLAYBACK  = 0x0008,
     VB_CHANNEL   = 0x0010,
@@ -57,7 +60,13 @@ enum VerboseMask {
     VB_ALL       = 0xffff
 };
 
-enum LogPriorities {
+/// This global variable is set at startup with the flags 
+/// of the verbose messages we want to see.
+extern int print_verbose_messages;
+
+/// These are the database logging priorities used for filterig the logs.
+enum LogPriorities
+{
     LP_EMERG     = 0,
     LP_ALERT     = 1,
     LP_CRITICAL  = 2,
@@ -68,23 +77,24 @@ enum LogPriorities {
     LP_DEBUG     = 7
 };
 
-struct DatabaseParams {
-    QString dbHostName;         // database server
-    QString dbUserName;         // DB user name 
-    QString dbPassword;         // DB password
-    QString dbName;             // database name
-    QString dbType;             // database type (MySQL, Postgres, etc.)
+/// Structure containing the basic Database parameters
+struct DatabaseParams
+{
+    QString dbHostName;         ///< database server
+    QString dbUserName;         ///< DB user name 
+    QString dbPassword;         ///< DB password
+    QString dbName;             ///< database name
+    QString dbType;             ///< database type (MySQL, Postgres, etc.)
     
-    bool    localEnabled;       // true if localHostName is not default
-    QString localHostName;      // name used for loading/saving settings
+    bool    localEnabled;       ///< true if localHostName is not default
+    QString localHostName;      ///< name used for loading/saving settings
     
-    bool    wolEnabled;         // true if wake-on-lan params are used
-    int     wolReconnect;       // seconds to wait for reconnect
-    int     wolRetry;           // times to retry
-    QString wolCommand;         // command to use for wake-on-lan
+    bool    wolEnabled;         ///< true if wake-on-lan params are used
+    int     wolReconnect;       ///< seconds to wait for reconnect
+    int     wolRetry;           ///< times to retry to reconnect
+    QString wolCommand;         ///< command to use for wake-on-lan
 };
     
-
 // The verbose_mutex lock is a recursive lock so it is possible (while
 // not recommended) to use a VERBOSE macro within another VERBOSE macro.
 // But waiting for another thread to do something is not safe within a 
@@ -129,9 +139,18 @@ do { \
 /// string representation of errno and puts it on the 
 /// next line in the verbose output.
 #define ENO QString("\n\t\t\teno: ") + safe_eno_to_string(errno)
+
 /// Verbose helper function for ENO macro
 QString safe_eno_to_string(int errnum);
 
+/** \class MythEvent
+ *  \brief This class is used as a container for messages.
+ *
+ *   MythEvents can be dispatched to all listeners by calling
+ *   gContext->dispatch(MythEvent&) or gContext->dispatchNow(MythEvent&).
+ *   The former is much preferred as it uses QApplication::postEvent()
+ *   while the latter uses the blocking QApplication::sendEvent().
+ */
 class MythEvent : public QCustomEvent
 {
   public:
@@ -161,21 +180,31 @@ class MythEvent : public QCustomEvent
     QStringList extradata;
 };
 
-class MythPrivRequest 
+/** \class MythPrivRequest
+ *  \brief Container for requests that require privledge escalation.
+ *
+ *   Currently this is used for just one thing, increasing the
+ *   priority of the video output thread to a real-time priority.
+ *   These requests are made by calling gContext->addPrivRequest().
+ *
+ *  \sa NuppelVideoPlayer::StartPlaying(void)
+ *  \sa MythContext:addPrivRequest(MythPrivRequest::Type, void*)
+ */
+class MythPrivRequest
 {
- public:
+  public:
     typedef enum { MythRealtime, MythExit, PrivEnd } Type;
     MythPrivRequest(Type t, void *data) : m_type(t), m_data(data) {}
     Type getType() const { return m_type; }
     void *getData() const { return m_data; }
- private:
+  private:
     Type m_type;
     void *m_data;
 };
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20051014-1"
+#define MYTH_BINARY_VERSION "0.19.20051023-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -184,10 +213,16 @@ class MythPrivRequest
  */
 #define MYTH_PROTO_VERSION "19"
 
-extern int print_verbose_messages;
-
-class MythContextPrivate;
-
+/** \class MythContext
+ *  \brief This class contains the runtime context for MythTV.
+ *
+ *   This class can be used to query for and set global and host
+ *   settings, and is used to communicate between the frontends
+ *   and backends. It also contains helper functions for theming
+ *   and for getting system defaults, parsing the command line, etc.
+ *   It also contains support for database error printing, and
+ *   database message logging.
+ */
 class MythContext : public QObject
 {
     Q_OBJECT
@@ -292,6 +327,8 @@ class MythContext : public QObject
                              const QString &defaultval = "");
     int GetNumSettingOnHost(const QString &key, const QString &host,
                             int defaultval = 0);
+    double GetFloatSettingOnHost(const QString &key, const QString &host,
+                                 double defaultval = 0.0);
 
     void SetSetting(const QString &key, const QString &newValue);
 
@@ -369,6 +406,7 @@ class MythContext : public QObject
     QString app_binary_version;
 };
 
+/// This global variable contains the MythContext instance for the application
 extern MythContext *gContext;
 
 #endif

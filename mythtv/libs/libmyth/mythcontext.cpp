@@ -1703,6 +1703,15 @@ int MythContext::GetNumSettingOnHost(const QString &key, const QString &host,
     return retval.toInt();
 }
 
+double MythContext::GetFloatSettingOnHost(
+    const QString &key, const QString &host, double defaultval)
+{
+    QString val = QString::number(defaultval);
+    QString retval = GetSettingOnHost(key, host, val);
+
+    return retval.toDouble();
+}
+
 void MythContext::SetPalette(QWidget *widget)
 {
     QPalette pal = widget->palette();
