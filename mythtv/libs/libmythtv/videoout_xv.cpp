@@ -27,6 +27,9 @@
 #include "util-x11.h"
 #include "config.h"
 
+#define LOC QString("VideoOutputXv: ")
+#define LOC_ERR QString("VideoOutputXv Error: ")
+
 extern "C" {
 #define XMD_H 1
 #include <X11/extensions/xf86vmode.h>
@@ -180,7 +183,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
       xv_port(-1), xv_colorkey(0), xv_draw_colorkey(false), xv_chroma(0),
       xv_color_conv_buf(NULL)
 {
-    VERBOSE(VB_PLAYBACK, "VideoOutputXv()");
+    VERBOSE(VB_PLAYBACK, LOC + "ctor");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
 
     // If using custom display resolutions, display_res will point
@@ -191,7 +194,7 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 
 VideoOutputXv::~VideoOutputXv()
 {
-    VERBOSE(VB_PLAYBACK, "~VideoOutputXv()");
+    VERBOSE(VB_PLAYBACK, LOC + "dtor");
     if (XJ_started) 
     {
         X11L;
@@ -235,12 +238,12 @@ void VideoOutputXv::Zoom(int direction)
     MoveResize();
 }
 
-//#define KILLER_DEBUG
 // documented in videooutbase.cpp
 void VideoOutputXv::InputChanged(int width, int height, float aspect)
 {
-    VERBOSE(VB_PLAYBACK, "InputChanged("<<width<<", "<<height
-            <<", "<<aspect<<")");
+    VERBOSE(VB_PLAYBACK, LOC + QString("InputChanged(%1,%2,%3)")
+            .arg(width).arg(height).arg(aspect));
+
     QMutexLocker locker(&global_lock);
 
     bool res_changed = (width != XJ_width) || (height != XJ_height);
@@ -259,26 +262,9 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
     bool ok = CreateBuffers(VideoOutputSubType());
     MoveResize();
 
-#ifdef KILLER_DEBUG
-    // to make sure NVP reports error
-    static int kill_buf_dbg = 0;
-    kill_buf_dbg++;
-    if (3 == kill_buf_dbg)
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Killed Buffers -- you should see an error dialog")
-                .arg(kill_buf_dbg));
-        ok = false;
-        DeleteBuffers(VideoOutputSubType(), false);
-    }
-    else
-        VERBOSE(VB_IMPORTANT, QString("Kill Buffers dbg %1 != 3")
-                .arg(kill_buf_dbg));
-#endif
-
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, "VideoOutputXv::InputChanged(): "
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "InputChanged(): "
                 "Failed to recreate buffers");
         errored = true;
     }
@@ -305,11 +291,12 @@ int VideoOutputXv::GetRefreshRate(void)
     int dot_clock;
 
     int ret = False;
-    X11S(ret = XF86VidModeGetModeLine(XJ_disp, XJ_screen_num, &dot_clock, &mode_line));
+    X11S(ret = XF86VidModeGetModeLine(XJ_disp, XJ_screen_num,
+                                      &dot_clock, &mode_line));
     if (!ret)
     {
-        VERBOSE(VB_IMPORTANT, "VideoOutputXv::GetRefreshRate() -- "
-                "failed to query mode line");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetRefreshRate(): "
+                "X11 ModeLine query failed");
         return -1;
     }
 
@@ -413,8 +400,10 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     window_h = (window_h) ? window_h : h;
     float pixel_aspect = ((float)w) / ((float)h);
 
-    VERBOSE(VB_PLAYBACK, "Window pixel dimensions: "<<window_w<<"x"<<window_h
-            <<" Screen pixel dimensions: "<<w<<"x"<<h);
+    VERBOSE(VB_PLAYBACK, LOC + QString(
+                "Window pixel dimensions: %1x%2"
+                "\n\t\t\tScreen pixel dimensions: %1x%2")
+            .arg(window_w).arg(window_h).arg(w).arg(h));
 
     // Determine if we are using Xinerama
     int event_base, error_base;
@@ -426,8 +415,11 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     // If the dimensions are invalid, assume square pixels and 17" screen.
     // Only print warning if this isn't Xinerama, we will fix Xinerama later.
     if ((!h_mm || !w_mm) && !usingXinerama)
-        VERBOSE(VB_GENERAL, "Physical size of display unknown."
+    {
+        VERBOSE(VB_GENERAL, LOC + "Physical size of display unknown."
                 "\n\t\t\tAssuming 17\" monitor with square pixels.");
+    }
+
     h_mm = (h_mm) ? h_mm : 300;
     w_mm = (w_mm) ? w_mm : (int) round(h_mm * pixel_aspect);
 
@@ -436,11 +428,16 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     // the physical screen width. This assumes the height is correct, which
     // is more or less true in the typical side-by-side monitor setup.
     if (usingXinerama)
-        w_mm = (int) round(h_mm * gContext->GetFloatSetting(
-                               "XineramaMonitorAspectRatio", pixel_aspect));
+    {
+        float displayAspect = gContext->GetFloatSettingOnHost(
+            "XineramaMonitorAspectRatio",
+            gContext->GetHostName(), pixel_aspect);
+        w_mm = (int) round(h_mm * displayAspect);
+    }
 
-    VERBOSE(VB_PLAYBACK, "Estimated display dimensions "<<w_mm<<"x"<<h_mm<<
-            " mm. Aspect: "<<(((float)w_mm) / ((float)h_mm)));
+    VERBOSE(VB_PLAYBACK, LOC + QString("Estimated display dimensions: "
+                                       "%1x%2 mm Aspect: %3")
+            .arg(w_mm).arg(h_mm).arg(((float)w_mm) / ((float)h_mm)));
 
     // We must now scale the display measurements to our window size.
     // If we are running fullscreen this is a no-op.
@@ -451,8 +448,9 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     // calculate the display aspect ratio pretty simply...
     display_aspect = ((float)w_mm) / ((float)h_mm);
 
-    VERBOSE(VB_PLAYBACK, "Estimated window dimensions "<<w_mm<<"x"<<h_mm
-            <<" mm. Aspect: "<<display_aspect);
+    VERBOSE(VB_PLAYBACK, LOC + QString("Estimated window dimensions: "
+                                       "%1x%2 mm Aspect: %3")
+            .arg(w_mm).arg(h_mm).arg(display_aspect));
 
     // If we are using XRandR, use the aspect ratio from it instead...
     if (display_res)
@@ -498,8 +496,9 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
     X11S(ret = XvQueryAdaptors(disp, root, &p_num_adaptors, &ai));
     if (Success != ret) 
     {
-        VERBOSE(VB_IMPORTANT, "XVideo supported, but no free Xv ports "
-                "found. You may need to reload video driver.");
+        VERBOSE(VB_IMPORTANT, LOC +
+                "XVideo supported, but no free Xv ports found."
+                "\n\t\t\tYou may need to reload video driver.");
         return -1;
     }
 
@@ -530,14 +529,15 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
 
     for (uint j = begin; j < end; ++j)
     {
-        VERBOSE(VB_PLAYBACK, QString("@ j=%1 Looking for flag[s]: %2")
+        VERBOSE(VB_PLAYBACK, LOC + QString("@ j=%1 Looking for flag[s]: %2")
                 .arg(j).arg(xvflags2str(neededFlags[j])));
+
         for (uint i = 0; i < p_num_adaptors && (port == -1); ++i) 
         {
-            bool hasNF = (ai[i].type & neededFlags[j]) == neededFlags[j];
-            VERBOSE(VB_PLAYBACK, QString("Adaptor: %1 has flag[s]: %2")
+            VERBOSE(VB_PLAYBACK, LOC + QString("Adaptor: %1 has flag[s]: %2")
                     .arg(i).arg(xvflags2str(ai[i].type)));
-            if (!hasNF)
+
+            if ((ai[i].type & neededFlags[j]) != neededFlags[j])
                 continue;
             
             const XvPortID firstPort = ai[i].base_id;
@@ -581,12 +581,12 @@ int VideoOutputXv::GrabSuitableXvPort(Display* disp, Window root,
         }
         if (port != -1)
         {
-            VERBOSE(VB_PLAYBACK, msg[j].arg(port));
+            VERBOSE(VB_PLAYBACK, LOC + msg[j].arg(port));
             break;
         }
     }
     if (port == -1)
-        VERBOSE(VB_PLAYBACK, "No suitible XVideo port found");
+        VERBOSE(VB_PLAYBACK, LOC + "No suitible XVideo port found");
 
     // free list of Xv ports
     if (ai)
@@ -721,7 +721,8 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
                                  &xvmc_surf_info);
     if (xv_port == -1)
     {
-        VERBOSE(VB_IMPORTANT, "Could not find suitable XvMC surface.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Could not find suitable XvMC surface.");
         return false;
     }
 
@@ -747,7 +748,8 @@ bool VideoOutputXv::InitXvMC(MythCodecID mcodecid)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT, "Failed to create XvMC Buffers.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create XvMC Buffers.");
+
         xvmc_osd_lock.lock();
         for (uint i=0; i<xvmc_osd_available.size(); i++)
             delete xvmc_osd_available[i];
@@ -777,7 +779,8 @@ bool VideoOutputXv::InitXVideo()
                                  XJ_width, XJ_height);
     if (xv_port == -1)
     {
-        VERBOSE(VB_IMPORTANT, "Could not find suitable XVideo surface.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Could not find suitable XVideo surface.");
         return false;
     }
 
@@ -813,7 +816,8 @@ bool VideoOutputXv::InitXVideo()
 
     if (!foundimageformat)
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't find the proper XVideo image format.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Couldn't find the proper XVideo image format.");
         X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
         xv_port = -1;
     }
@@ -825,7 +829,7 @@ bool VideoOutputXv::InitXVideo()
     vector<XErrorEvent> errs = UninstallXErrorHandler(XJ_disp);
     if (!ok || errs.size())
     {
-        VERBOSE(VB_IMPORTANT, "Failed to create XVideo Buffers.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create XVideo Buffers.");
         DeleteBuffers(XVideo, false);
         X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
         xv_port = -1;
@@ -849,14 +853,16 @@ bool VideoOutputXv::InitXShm()
 {
     InstallXErrorHandler(XJ_disp);
 
-    VERBOSE(VB_IMPORTANT, "Falling back to X shared memory.");
-    VERBOSE(VB_IMPORTANT, "      *** May be slow ***");
+    VERBOSE(VB_IMPORTANT, LOC +
+            "Falling back to X shared memory video output."
+            "\n\t\t\t      *** May be slow ***");
+
     bool ok = CreateBuffers(XShm);
 
     vector<XErrorEvent> errs = UninstallXErrorHandler(XJ_disp);
     if (!ok || errs.size())
     {
-        VERBOSE(VB_IMPORTANT, "Failed to allocate X shared memory.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate X shared memory.");
         PrintXErrors(XJ_disp, errs);
         DeleteBuffers(XShm, false);
         ok = false;
@@ -879,14 +885,16 @@ bool VideoOutputXv::InitXlib()
 { 
     InstallXErrorHandler(XJ_disp);
 
-    VERBOSE(VB_IMPORTANT, "Falling back to X11 network display.");
-    VERBOSE(VB_IMPORTANT, "    *** May be very slow ***");
+    VERBOSE(VB_IMPORTANT, LOC +
+            "Falling back to X11 video output over a network socket."
+            "\n\t\t\t      *** May be very slow ***");
+
     bool ok = CreateBuffers(Xlib);
 
     vector<XErrorEvent> errs = UninstallXErrorHandler(XJ_disp);
     if (!ok || errs.size())
     {
-        VERBOSE(VB_IMPORTANT, "Failed to create X buffers.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create X buffers.");
         PrintXErrors(XJ_disp, errs);
         DeleteBuffers(Xlib, false);
         ok = false;
@@ -970,7 +978,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, "Could not open XvMC port...\n"
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open XvMC port...\n"
                 "\n"
                 "\t\t\tYou may wish to verify that your DISPLAY\n"
                 "\t\t\tenvironment variable does not use an external\n"
@@ -995,7 +1003,7 @@ MythCodecID VideoOutputXv::GetBestSupportedCodec(
 do { \
     if (test) \
     { \
-        VERBOSE(VB_IMPORTANT, msg << " Exiting playback."); \
+        VERBOSE(VB_IMPORTANT, LOC_ERR + msg << " Exiting playback."); \
         errored = true; \
         return false; \
     } \
@@ -1120,8 +1128,9 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
                                               default_colorkey));
                 if (ret == Success)
                 {
-                    VERBOSE(VB_PLAYBACK, "0 is the only bad color key for "
-                            "MythTV, using "<<default_colorkey<<" instead.");
+                    VERBOSE(VB_PLAYBACK, LOC +
+                            "0,0,0 is the only bad color key for MythTV, "
+                            "using "<<default_colorkey<<" instead.");
                     xv_colorkey = default_colorkey;
                 }
                 ret = Success;
@@ -1129,9 +1138,10 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 
             if (ret != Success)
             {
-                VERBOSE(VB_IMPORTANT,
-                        "Couldn't get the color key color, and we need it.\n"
-                        "You likely won't get any video.");
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Couldn't get the color key color, probably due to"
+                        "\n\t\ta driver bug. You likely won't get any video,"
+                        "\n\t\t\tbut we'll try anyway.");
                 xv_colorkey = 0;
             }
         }
@@ -1196,8 +1206,10 @@ XvMCContext* VideoOutputXv::CreateXvMCContext(
                                  XVMC_DIRECT, ctx));
     if (ret != Success)
     {
-        VERBOSE(VB_IMPORTANT, QString("Unable to create XvMC Context, "
-                "status(%1): %2").arg(ret).arg(ErrorStringXvMC(ret)));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Unable to create XvMC Context, status(%1): %2")
+                .arg(ret).arg(ErrorStringXvMC(ret)));
+
         delete ctx;
         ctx = NULL;
     }
@@ -1233,7 +1245,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
     xvmc_surfs = CreateXvMCSurfaces(xvmc_buf_attr->GetMaxSurf(), createBlocks);
     if (xvmc_surfs.size() < xvmc_buf_attr->GetMinSurf())
     {
-        VERBOSE(VB_IMPORTANT, "Unable to create XvMC Surfaces");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create XvMC Surfaces");
         DeleteBuffers(XVideoMC, false);
         return false;
     }
@@ -1242,7 +1254,7 @@ bool VideoOutputXv::CreateXvMCBuffers(void)
                                      &xvmc_surf_info, xvmc_surfs);
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, "Unable to create XvMC Buffers");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Unable to create XvMC Buffers");
         DeleteBuffers(XVideoMC, false);
         return false;
     }
@@ -1395,14 +1407,15 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
             }
             else
             { 
-                VERBOSE(VB_IMPORTANT, "CreateXvShmImages() shmget() failed: "
-                        <<strerror(errno));
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "CreateXvShmImages(): shmget() failed." + ENO);
                 break;
             }
         }
         else
         {
-            VERBOSE(VB_IMPORTANT, "CreateXvShmImages() XvShmCreateImage()");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateXvShmImages(): "
+                    "XvShmCreateImage() failed to create image.");
             break;
         }
     }
@@ -1451,7 +1464,7 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
 
             if (!XJ_non_xv_image)
             {
-                VERBOSE(VB_IMPORTANT, "XCreateImage failed: "
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "XCreateImage failed: "
                         <<"XJ_disp("<<XJ_disp<<") visual("<<visual<<") "<<endl
                         <<"                        "
                         <<"XJ_depth("<<XJ_depth<<") "
@@ -1471,10 +1484,12 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
         }
         if (PIX_FMT_NB == non_xv_av_format)
         {
-            VERBOSE(VB_IMPORTANT, "Non XVideo mode only supports "
-                    <<"16, 24, and 32 bit per pixel displays\n"
-                    <<"                        "
-                    <<"But you have a "<<(XJ_depth*8)<<" bpp display");
+            QString msg = QString(
+                "Non XVideo modes only support displays with 16,\n\t\t\t"
+                "24, or 32 bits per pixel. But you have a %1 bpp display.")
+                .arg(XJ_depth*8);
+            
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
         }
         else
             ok = vbuffers.CreateBuffers(XJ_width, XJ_height);
@@ -1676,7 +1691,7 @@ void VideoOutputXv::DiscardFrame(VideoFrame *frame)
 
 void VideoOutputXv::ClearAfterSeek(void)
 {
-    VERBOSE(VB_PLAYBACK, "ClearAfterSeek()");    
+    VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek()");
     DiscardFrames();
 #ifdef USING_XVMC
     if (VideoOutputSubType() > XVideo)
@@ -1713,7 +1728,7 @@ void VideoOutputXv::DiscardFrames(void)
 
     {
         vbuffers.begin_lock(kVideoBuffer_displayed); // Lock X
-        VERBOSE(VB_PLAYBACK, QString("VideoOutputXv::DiscardFrames() 1: %1")
+        VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 1: %1")
                 .arg(vbuffers.GetStatus()));
         vbuffers.end_lock(); // Lock X
     }
@@ -1733,7 +1748,7 @@ void VideoOutputXv::DiscardFrames(void)
             //GetRender(*it)->p_past_surface   = NULL;
             //GetRender(*it)->p_future_surface = NULL;
         }
-        VERBOSE(VB_PLAYBACK, QString("VideoOutputXv::DiscardFrames() 2: %1")
+        VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 2: %1")
                 .arg(vbuffers.GetStatus()));
 #if 0
         // Remove inheritence of all frames not in displayed or pause
@@ -1745,7 +1760,7 @@ void VideoOutputXv::DiscardFrames(void)
             vbuffers.RemoveInheritence(*it);
 #endif
 
-        VERBOSE(VB_PLAYBACK, QString("VideoOutputXv::DiscardFrames() 3: %1")
+        VERBOSE(VB_PLAYBACK, LOC + QString("DiscardFrames() 3: %1")
                 .arg(vbuffers.GetStatus()));
         // create discard frame list
         DQ_COPY(discards, kVideoBuffer_used);
@@ -1772,8 +1787,8 @@ void VideoOutputXv::DiscardFrames(void)
             //GetRender(*it)->p_future_surface = NULL;
         }
 
-        VERBOSE(VB_PLAYBACK,
-                QString("VideoOutputXv::DiscardFrames() 4: %1 -- done() ")
+        VERBOSE(VB_PLAYBACK, LOC +
+                QString("DiscardFrames() 4: %1 -- done() ")
                 .arg(vbuffers.GetStatus()));
         
         vbuffers.end_lock(); // Lock Z
@@ -1924,7 +1939,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
         if (non_xv_fps < 25)
         {
             non_xv_show_frame = 120 / non_xv_frames_shown + 1;
-            VERBOSE(VB_IMPORTANT, 
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "\n"
                     "***\n"
                     "* Your system is not capable of displaying the\n"
                     "* full framerate at "
@@ -1941,7 +1956,7 @@ void VideoOutputXv::PrepareFrameMem(VideoFrame *buffer, FrameScanType /*scan*/)
 
     if (!XJ_non_xv_image)
     {
-        VERBOSE(VB_IMPORTANT, "ERROR: XJ_non_xv_image == NULL");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "XJ_non_xv_image == NULL");
         return;
     }
 
@@ -1994,8 +2009,7 @@ void VideoOutputXv::PrepareFrame(VideoFrame *buffer, FrameScanType scan)
 {
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, "VideoOutputXv::PrepareFrame() called "
-                "while IsErrored is true.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() in PrepareFrame()");
         return;
     }
 
@@ -2094,7 +2108,7 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
     {
         frame = vbuffers.head(kVideoBuffer_pause);
 #ifdef DEBUG_PAUSE
-        VERBOSE(VB_PLAYBACK, QString("use pause frame: %1 ShowXvMC")
+        VERBOSE(VB_PLAYBACK, LOC + QString("use pause frame: %1 ShowXvMC")
                 .arg(DebugString(frame)));
 #endif // DEBUG_PAUSE
         using_pause_frame = true;
@@ -2105,7 +2119,7 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
 
     if (!frame)
     {
-        VERBOSE(VB_PLAYBACK, "ShowXvMC -- called with no frame to show");
+        VERBOSE(VB_PLAYBACK, LOC + "ShowXvMC(): No frame to show");
         return;
     }
 
@@ -2130,7 +2144,7 @@ void VideoOutputXv::ShowXvMC(FrameScanType scan)
     VideoFrame *osdframe = vbuffers.GetOSDFrame(frame);
     if (osdframe && !vbuffers.TryLockFrame(osdframe, "ShowXvMC -- osd"))
     {
-        VERBOSE(VB_IMPORTANT, "ShowXvMC() -- unable to get OSD lock");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "ShowXvMC(): Unable to get OSD lock");
         vbuffers.safeEnqueue(kVideoBuffer_displayed, osdframe);
         osdframe = NULL;
     }
@@ -2206,8 +2220,7 @@ void VideoOutputXv::Show(FrameScanType scan)
 {
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, "VideoOutputXv::Show() "
-                "called while IsErrored is true.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() is true in Show()");
         return;
     }
 
@@ -2299,7 +2312,7 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
                                     render->slice_datalen, 
                                     render->slice_code));
         if (Success != status)
-            VERBOSE(VB_PLAYBACK, "XvMCPutSlice, error: "<<status);
+            VERBOSE(VB_PLAYBACK, LOC_ERR + "XvMCPutSlice: "<<status);
 
 #if 0
         // TODO are these three lines really needed???
@@ -2332,8 +2345,8 @@ void VideoOutputXv::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
                                (XvMCBlockArray *)frame->priv[0]));
 
         if (Success != status)
-            VERBOSE(VB_PLAYBACK, 
-                    QString("XvMCRenderSurface, error: %1 (%2)")
+            VERBOSE(VB_PLAYBACK, LOC_ERR +
+                    QString("XvMCRenderSurface: %1 (%2)")
                     .arg(ErrorStringXvMC(status)).arg(status));
         else
             FlushSurface(frame);
@@ -2390,8 +2403,8 @@ void VideoOutputXv::UpdatePauseFrame(void)
     {
         if (vbuffers.size(kVideoBuffer_pause)>1)
         {
-            VERBOSE(VB_PLAYBACK, QString("UpdatePauseFrame -- Error, pause "
-                                         "buffer size>1, size = %1")
+            VERBOSE(VB_PLAYBACK, LOC_ERR + "UpdatePauseFrame(): "
+                    "Pause buffer size>1 check, " + QString("size = %1")
                     .arg(vbuffers.size(kVideoBuffer_pause)));
             while (vbuffers.size(kVideoBuffer_pause))
                 DiscardFrame(vbuffers.dequeue(kVideoBuffer_pause));
@@ -2404,21 +2417,23 @@ void VideoOutputXv::UpdatePauseFrame(void)
                 while (vbuffers.size(kVideoBuffer_pause))
                     DiscardFrame(vbuffers.dequeue(kVideoBuffer_pause));
                 vbuffers.safeEnqueue(kVideoBuffer_pause, frame);
-                VERBOSE(VB_PLAYBACK,
-                        "UpdatePauseFrame -- XvMC using new pause frame");
+                VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame(): "
+                        "XvMC using NEW pause frame");
             }
             else
-                VERBOSE(VB_PLAYBACK,
-                        "UpdatePauseFrame -- XvMC using old pause frame");
+                VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame(): "
+                        "XvMC using OLD pause frame");
             return;
         }
 
-        frame_queue_t::iterator it = vbuffers.begin_lock(kVideoBuffer_displayed);
-        VERBOSE(VB_PLAYBACK, "UpdatePauseFrame -- XvMC");
+        frame_queue_t::iterator it =
+            vbuffers.begin_lock(kVideoBuffer_displayed);
+
+        VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame -- XvMC");
         if (vbuffers.size(kVideoBuffer_displayed))
         {
-            VERBOSE(VB_PLAYBACK,
-                    "UpdatePauseFrame -- XvMC found a pause frame in display");
+            VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame -- XvMC: "
+                    "\n\t\t\tFound a pause frame in display");
 
             VideoFrame *frame = vbuffers.tail(kVideoBuffer_displayed);
             if (vbuffers.GetOSDParent(frame))
@@ -2429,8 +2444,8 @@ void VideoOutputXv::UpdatePauseFrame(void)
 
         if (1 != vbuffers.size(kVideoBuffer_pause))
         {
-            VERBOSE(VB_PLAYBACK,
-                    "UpdatePauseFrame -- XvMC did NOT find a pause frame");
+            VERBOSE(VB_PLAYBACK, LOC + "UpdatePauseFrame -- XvMC: "
+                    "\n\t\t\tDid NOT find a pause frame");
         }
     }
 #endif
@@ -2455,29 +2470,31 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
         if (vbuffers.size(kVideoBuffer_pause))
         {
             frame = vbuffers.head(kVideoBuffer_pause);
-            success = vbuffers.TryLockFrame(frame, "ProcessFrameXvMC -- reuse");
+            success = vbuffers.TryLockFrame(
+                frame, "ProcessFrameXvMC -- reuse");
         }
         vbuffers.end_lock();
 
         if (success)
         {
 #ifdef DEBUG_PAUSE
-            VERBOSE(VB_PLAYBACK, QString("use pause frame: %1 ProcessFrameXvMC")
-                    .arg(DebugString(frame)));
+            VERBOSE(VB_PLAYBACK, LOC + "ProcessFrameXvMC: " +
+                    QString("Use pause frame: %1").arg(DebugString(frame)));
 #endif // DEBUG_PAUSE
             vbuffers.SetOSDFrame(frame, NULL);
         }
         else
         {
-            VERBOSE(VB_IMPORTANT,
-                    "ProcessFrameXvMC tried to reuse frame but failed");
+            VERBOSE(VB_IMPORTANT, LOC + "ProcessFrameXvMC: "
+                    "Tried to reuse frame but failed");
             frame = NULL;
         }
     }
 
     if (!frame)
     {
-        VERBOSE(VB_IMPORTANT, "ProcessFrameXvMC -- called with no frame");
+        VERBOSE(VB_IMPORTANT, LOC + "ProcessFrameXvMC: "
+                "Called without frame");
         return;
     }
 
@@ -2490,11 +2507,11 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
     VideoFrame * old_osdframe = vbuffers.GetOSDFrame(frame);
     if (old_osdframe)
     {
-        QString a = DebugString(old_osdframe, true);
-        QString b = DebugString(frame, true);
-        VERBOSE(VB_IMPORTANT, QString("ProcessFrameXvMC: Warning, %1 is still "
-                                      "marked as the OSD frame of %2.")
-                .arg(a).arg(b));
+        VERBOSE(VB_IMPORTANT, LOC + "ProcessFrameXvMC:\n\t\t\t" +
+                QString("Warning, %1 is still marked as the OSD frame of %2.")
+                .arg(DebugString(old_osdframe, true))
+                .arg(DebugString(frame, true)));
+
         vbuffers.SetOSDFrame(frame, NULL);
     }
 
@@ -2536,15 +2553,16 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
                 // Check for error condition..
                 if (frame == osdframe)
                 {
-                    VERBOSE(VB_IMPORTANT,
-                            QString("ProcessFrameXvMC: Error, %1 %2")
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            QString("ProcessFrameXvMC: %1 %2")
                             .arg(DebugString(frame, true))
                             .arg(vbuffers.GetStatus()));
                     osdframe = NULL;
                 }
             }
 
-            if (osdframe && vbuffers.TryLockFrame(osdframe, "ProcessFrameXvMC -- OSD"))
+            if (osdframe && vbuffers.TryLockFrame(
+                    osdframe, "ProcessFrameXvMC -- OSD"))
             {
                 vbuffers.SetOSDFrame(osdframe, NULL);
                 xvmc_osd->CompositeOSD(frame, osdframe);
@@ -2553,7 +2571,8 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
             }
             else
             {
-                VERBOSE(VB_IMPORTANT, "ProcessFrameXvMC -- Failed to get OSD lock");
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "ProcessFrameXvMC: "
+                        "Failed to get OSD lock");
                 DiscardFrame(osdframe);
             }
         }
@@ -2658,8 +2677,7 @@ void VideoOutputXv::ProcessFrame(VideoFrame *frame, OSD *osd,
 {
     if (IsErrored())
     {
-        VERBOSE(VB_IMPORTANT, "VideoOutputXv::ProcessFrame() called "
-                "while IsErrored is true.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "IsErrored() in ProcessFrame()");
         return;
     }
 
@@ -2778,14 +2796,22 @@ void VideoOutputXv::CheckDisplayedFramesForAvailability(void)
             frame_queue_t children = vbuffers.Children(pframe);
             if (!children.empty())
             {
-                VERBOSE(VB_PLAYBACK, "Frame "<<DebugString(pframe, true)<<" w/children: "
-                        <<" "<<DebugString(children)<<" is being held for later discarding.");
+                VERBOSE(VB_PLAYBACK, LOC + QString(
+                            "Frame %1 w/children: %2 is being held for later "
+                            "discarding.")
+                        .arg(DebugString(pframe, true))
+                        .arg(DebugString(children)));
+
                 frame_queue_t::iterator cit;
                 for (cit = children.begin(); cit != children.end(); ++cit)
+                {
                     if (vbuffers.contains(kVideoBuffer_avail, *cit))
-                        VERBOSE(VB_IMPORTANT, "ERROR: child     "
-                                <<DebugString(*cit)
-                                <<" is already in available");
+                    {
+                        VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                                    "Child     %1 was already marked "
+                                    "as available.").arg(DebugString(*cit)));
+                    }
+                }
             }
             else
             {
@@ -2818,7 +2844,8 @@ bool VideoOutputXv::IsDisplaying(VideoFrame* frame)
         if (Success == res)
             return (status & XVMC_DISPLAYING);
         else
-            VERBOSE(VB_PLAYBACK, QString("Error#2 XvMCGetSurfaceStatus %1").arg(res));
+            VERBOSE(VB_PLAYBACK, LOC_ERR + "IsDisplaying(): " +
+                    QString("XvMCGetSurfaceStatus %1").arg(res));
     }
 #endif // USING_XVMC
     return false;
@@ -2839,7 +2866,8 @@ bool VideoOutputXv::IsRendering(VideoFrame* frame)
         if (Success == res)
             return (status & XVMC_RENDERING);
         else
-            VERBOSE(VB_PLAYBACK, QString("Error#1 XvMCGetSurfaceStatus %1").arg(res));
+            VERBOSE(VB_PLAYBACK, LOC_ERR + "IsRendering(): " +
+                    QString("XvMCGetSurfaceStatus %1").arg(res));
     }
 #endif // USING_XVMC
     return false;
@@ -2867,8 +2895,8 @@ void VideoOutputXv::SyncSurface(VideoFrame* frame, int past_future)
             X11S(res = XvMCGetSurfaceStatus(disp, surf, &status));
 
             if (res != Success)
-                VERBOSE(VB_PLAYBACK,
-                        QString("Error#3 XvMCGetSurfaceStatus %1").arg(res));
+                VERBOSE(VB_PLAYBACK, LOC_ERR + "SyncSurface(): " +
+                        QString("XvMCGetSurfaceStatus %1").arg(res));
             if (status & XVMC_RENDERING)
             {
                 X11S(XvMCFlushSurface(disp, surf));
@@ -2906,7 +2934,7 @@ static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
     if (getenv("NO_XVMC"))
         useXvVLD = useXvIDCT = useXvMC = false;
     if (getenv("NO_XV"))
-         useXvVLD = useXvIDCT = useXvMC = useXVideo = false;
+        useXvVLD = useXvIDCT = useXvMC = useXVideo = false;
     if (getenv("NO_SHM"))
         useXVideo = useShm = false;
 }
@@ -2921,7 +2949,7 @@ static void SetFromHW(Display *d, bool &useXvMC, bool &useXVideo, bool &useShm)
         X11S(ret = XvMCQueryExtension(d, &mc_event, &mc_err));
         if (True != ret)
         {
-            VERBOSE(VB_IMPORTANT, "XvMC output requested, "
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "XvMC output requested, "
                     "but is not supported by display.");
             useXvMC = false;
         }
@@ -2929,9 +2957,9 @@ static void SetFromHW(Display *d, bool &useXvMC, bool &useXVideo, bool &useShm)
         int mc_ver, mc_rel;
         X11S(ret = XvMCQueryVersion(d, &mc_ver, &mc_rel));
         if (Success == ret)
-            VERBOSE(VB_PLAYBACK, "XvMC version: "<<mc_ver<<"."<<mc_rel);
+            VERBOSE(VB_PLAYBACK, LOC + "XvMC version: "<<mc_ver<<"."<<mc_rel);
 #else // !USING_XVMC
-        VERBOSE(VB_IMPORTANT, "XvMC output requested, "
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "XvMC output requested, "
                 "but is not compiled into MythTV.");
         useXvMC = false;
 #endif // USING_XVMC
@@ -2945,7 +2973,7 @@ static void SetFromHW(Display *d, bool &useXvMC, bool &useXVideo, bool &useShm)
                                     &p_req, &p_event, &p_err));
         if (Success != ret)
         {
-            VERBOSE(VB_IMPORTANT, "XVideo output requested, "
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "XVideo output requested, "
                     "but is not supported by display.");
             useXVideo = false;
             useXvMC = false;
