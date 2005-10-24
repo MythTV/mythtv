@@ -550,8 +550,14 @@ void VideoOutput::GetVisibleSize(int &xoff, int &yoff, int &width, int &height)
     }
 }
 
+void VideoOutput::GetOSDSize(int &width, int &height)
+{
+    width  = XJ_width;
+    height = XJ_height;
+}
+
 /**
- * \fn VideoOutput::MoveResize()
+ * \fn VideoOutput::MoveResize(void)
  * \brief performs all the calculations for video framing and any resizing.
  *
  * \sa Zoom(int), ToggleLetterbox(int)
@@ -1151,6 +1157,8 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
  *
  *  If the destination format is either IA44 or AI44 the osd is
  *  converted to greyscale.
+ *
+ * \return 1 if changed, 0 otherwise
  */ 
 int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
                             int revision)

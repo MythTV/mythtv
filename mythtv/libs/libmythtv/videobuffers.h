@@ -107,11 +107,11 @@ class VideoBuffers
     uint size() const { return numbuffers; }
     uint allocSize() const { return buffers.size(); }
     
-    void LockFrame(const VideoFrame *, const QString& owner);
-    void LockFrames(vector<const VideoFrame*>&, const QString& owner);
-    bool TryLockFrame(const VideoFrame *, const QString& owner);
-    void UnlockFrame(const VideoFrame *, const QString& owner);
-    void UnlockFrames(vector<const VideoFrame*>&, const QString& owner);
+    void LockFrame(const VideoFrame *, const char* owner);
+    void LockFrames(vector<const VideoFrame*>&, const char* owner);
+    bool TryLockFrame(const VideoFrame *, const char* owner);
+    void UnlockFrame(const VideoFrame *, const char* owner);
+    void UnlockFrames(vector<const VideoFrame*>&, const char* owner);
 
     void AddInheritence(const VideoFrame *frame);
     void RemoveInheritence(const VideoFrame *frame);

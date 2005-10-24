@@ -1,9 +1,6 @@
 #include "osdsurface.h"
 #include "dithertable.h"
 
-#include <iostream>
-using namespace std;
-
 #ifdef MMX
 
 extern "C" {
@@ -681,15 +678,18 @@ static void BlendToBlack(unsigned char *argbptr, uint width, uint outheight)
  *  \param stride         Length of each line in output buffer in bytes
  *  \param outheight      Number of lines in output buffer
  *  \param blend_to_black Uses Alpha to blend buffer to black
+ *  \param threshold      Alpha threshold above which to perform blending
  */
 void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride, 
-                             uint outheight, bool blend_to_black) const
+                             uint outheight, bool blend_to_black,
+                             uint threshold) const
 {
     const OSDSurface *surface = this;
     blendtoargb_8_fun blender = blendtoargb_8_init(surface);
     const unsigned char *cm = surface->cm;
 
-    bzero(argbptr, stride * outheight);
+    if (blend_to_black)
+        bzero(argbptr, stride * outheight);
 
     QMemArray<QRect> rects = surface->usedRegions.rects();
     QMemArray<QRect>::Iterator it = rects.begin();
@@ -697,16 +697,10 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride,
     {
         QRect drawRect = *it;
 
-        int startcol, startline, endcol, endline;
-        startcol = drawRect.left();
-        startline = drawRect.top();
-        endcol = drawRect.right();
-        endline = drawRect.bottom();
-
-        if (startline < 0) startline = 0;
-        if (endline >= height) endline = height - 1;
-        if (startcol < 0) endcol = 0;
-        if (endcol >= width) endcol = width - 1;
+        int startcol  = std::max(drawRect.left(),   0);
+        int startline = std::max(drawRect.top(),    0);
+        int endcol    = std::min(drawRect.right(),  width  - 1);
+        int endline   = std::min(drawRect.bottom(), height - 1);
 
         unsigned char *src, *usrcbase, *vsrcbase, *usrc, *vsrc;
         unsigned char *dest;
@@ -735,9 +729,9 @@ void OSDSurface::BlendToARGB(unsigned char *argbptr, uint stride,
                 usrc = usrcbase + x / 2;
                 vsrc = vsrcbase + x / 2;
 
-                if (x + 8 >= endcol)
+                if (((x + 8) >= endcol) || threshold)
                 {
-                    if (*alpha != 0)
+                    if (*alpha > threshold)
                     {
                         YUV_TO_RGB1(*usrc, *vsrc);
                         YUV_TO_RGB2(r, g, b, *src);

@@ -395,12 +395,14 @@ void NuppelVideoPlayer::ReinitOSD(void)
 {
     if (osd)
     {
-        int dispx = 0, dispy = 0;
-        int dispw = video_width, disph = video_height;
+        int dispx     = 0,           dispy      = 0;
+        int dispw     = video_width, disph      = video_height;
+        int osd_width = video_width, osd_height = video_height;
 
         videoOutput->GetVisibleSize(dispx, dispy, dispw, disph);
+        videoOutput->GetOSDSize(osd_width, osd_height);
 
-        osd->Reinit(video_width, video_height, frame_interval,
+        osd->Reinit(osd_width, osd_height, frame_interval,
                     dispx, dispy, dispw, disph);
     }
 }
@@ -1902,9 +1904,14 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     if (!using_null_videoout)
     {
-        int dispx = 0, dispy = 0, dispw = video_width, disph = video_height;
+        int dispx     = 0,           dispy      = 0;
+        int dispw     = video_width, disph      = video_height;
+        int osd_width = video_width, osd_height = video_height;
+
         videoOutput->GetVisibleSize(dispx, dispy, dispw, disph);
-        osd = new OSD(video_width, video_height, frame_interval,
+        videoOutput->GetOSDSize(osd_width, osd_height);
+
+        osd = new OSD(osd_width, osd_height, frame_interval,
                       dispx, dispy, dispw, disph);
 
         if (kCodec_NORMAL_END < GetDecoder()->GetVideoCodecID() &&

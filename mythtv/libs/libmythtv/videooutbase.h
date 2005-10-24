@@ -147,11 +147,15 @@ class VideoOutput
  
     virtual void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
     virtual void GetVisibleSize(int &xoff, int &yoff, int &width, int &height);
+    virtual void GetOSDSize(int &width, int &height);
 
     virtual int GetRefreshRate(void) = 0;
 
     virtual void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
+    /// \brief Draws non-video portions of the screen
+    /// \param sync if set any queued up draws are sent immediately to the
+    ///             graphics context and we block until they have completed.
     virtual void DrawUnusedRects(bool sync = true) = 0;
 
     /// \brief Returns current display aspect ratio.

@@ -5,6 +5,7 @@
 #include <cmath>
 #include <ctime>
 #include <cerrno>
+#include <malloc.h>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -149,6 +150,36 @@ class XvMCBufferSettings
     static const uint XVMC_SHOW_NUM = 1;
 };
 
+class ChromaKeyOSD
+{
+  public:
+    ChromaKeyOSD(VideoOutputXv *vo) :
+        videoOutput(vo), current(-1), revision(-1)
+    {
+        bzero(vf,        2 * sizeof(VideoFrame));
+        bzero(img,       2 * sizeof(XImage*));
+        bzero(shm_infos, 2 * sizeof(XShmSegmentInfo));
+    }
+
+    bool ProcessOSD(OSD *osd);
+    void AllocImage(int i);
+    void FreeImage(int i);
+    void Clear(int i);
+    void Reset(void) { current = -1; revision = -1; }
+
+    XImage *GetImage() { return (current < 0) ? NULL : img[current]; }
+
+  private:
+    void Reinit(int i);
+
+    VideoOutputXv   *videoOutput;
+    int              current;
+    int              revision;
+    VideoFrame       vf[2];
+    XImage          *img[2];
+    XShmSegmentInfo  shm_infos[2];
+};
+
 /** \class  VideoOutputXv
  * Supports common video output methods used with %X11 Servers.
  *
@@ -181,7 +212,9 @@ VideoOutputXv::VideoOutputXv(MythCodecID codec_id)
 #endif
 
       xv_port(-1), xv_colorkey(0), xv_draw_colorkey(false), xv_chroma(0),
-      xv_color_conv_buf(NULL)
+      xv_color_conv_buf(NULL),
+
+      chroma_osd(NULL)
 {
     VERBOSE(VB_PLAYBACK, LOC + "ctor");
     bzero(&av_pause_frame, sizeof(av_pause_frame));
@@ -238,6 +271,18 @@ void VideoOutputXv::Zoom(int direction)
     MoveResize();
 }
 
+// this is documented in videooutbase.cpp
+void VideoOutputXv::MoveResize(void)
+{
+    QMutexLocker locker(&global_lock);
+    VideoOutput::MoveResize();
+    if (chroma_osd)
+    {
+        chroma_osd->Reset();
+        needrepaint = true;
+    }
+}
+
 // documented in videooutbase.cpp
 void VideoOutputXv::InputChanged(int width, int height, float aspect)
 {
@@ -268,6 +313,17 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
                 "Failed to recreate buffers");
         errored = true;
     }
+}
+
+void VideoOutputXv::GetOSDSize(int &width, int &height)
+{
+    if (chroma_osd)
+    {
+        width  = dispw;
+        height = disph;
+        return;
+    }
+    VideoOutput::GetOSDSize(width, height);
 }
 
 /**
@@ -1053,10 +1109,20 @@ bool VideoOutputXv::Init(
     xv = shm = !vld && !idct;
     SetFromEnv(vld, idct, mc, xv, shm);
     SetFromHW(XJ_disp, mc, xv, shm);
+    bool use_chroma_key_osd = gContext->GetNumSettingOnHost(
+        "UseChromaKeyOSD", gContext->GetHostName(), 0);
+    use_chroma_key_osd &= (xv || vld || idct || mc);
 
     // Set embedding window id
     if (embedid > 0)
         XJ_curwin = XJ_win = embedid;
+
+    // create chroma key osd structure if needed
+    if (use_chroma_key_osd)
+    {
+        chroma_osd = new ChromaKeyOSD(this);
+        xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
+    }
 
     // Create video buffers
     bool ok = InitVideoBuffers(myth_codec_id, xv, shm);
@@ -1139,9 +1205,10 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
             if (ret != Success)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "Couldn't get the color key color, probably due to"
-                        "\n\t\ta driver bug. You likely won't get any video,"
-                        "\n\t\t\tbut we'll try anyway.");
+                        "Couldn't get the color key color,"
+                        "\n\t\t\tprobably due to a driver bug."
+                        "\n\t\t\tYou might not get any video, "
+                        "but we'll try anyway.");
                 xv_colorkey = 0;
             }
         }
@@ -1400,7 +1467,8 @@ vector<unsigned char*> VideoOutputXv::CreateShmImages(uint num, bool use_xv)
                 XSync(XJ_disp, False); // needed for FreeBSD?
                 X11U;
 
-                // mark for delete immediately - it won't be removed until detach
+                // Mark for delete immediately.
+                // It won't actually be removed until after we detach it.
                 shmctl(XJ_shm_infos[i].shmid, IPC_RMID, 0);
 
                 bufs.push_back((unsigned char*) XJ_shm_infos[i].shmaddr);
@@ -2235,16 +2303,24 @@ void VideoOutputXv::Show(FrameScanType scan)
     X11S(XSync(XJ_disp, False));
 }
 
-/**
- * \fn VideoOutputXv::DrawUnusedRects(bool sync)
- *  
- *  
- */
 void VideoOutputXv::DrawUnusedRects(bool sync)
 {
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
     int boboff = (int)round(((double)disphoff) / 456 - 0.00001);
     boboff = (m_deinterlacing && m_deintfiltername == "bobdeint") ? boboff : 0;
+
+    if (chroma_osd && chroma_osd->GetImage() && needrepaint)
+    {
+        X11L;
+        XShmPutImage(XJ_disp, XJ_curwin, XJ_gc, chroma_osd->GetImage(),
+                     0, 0, 0, 0, dispw, disph, False);
+        if (sync)
+            XSync(XJ_disp, false);
+        X11U;
+
+        needrepaint = false;
+        return;
+    }
 
     X11L;
 
@@ -2495,6 +2571,14 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
     {
         VERBOSE(VB_IMPORTANT, LOC + "ProcessFrameXvMC: "
                 "Called without frame");
+        return;
+    }
+
+    if (chroma_osd)
+    {
+        QMutexLocker locker(&global_lock);
+        needrepaint |= chroma_osd->ProcessOSD(osd);
+        vbuffers.UnlockFrame(frame, "ProcessFrameXvMC");
         return;
     }
 
@@ -3118,4 +3202,148 @@ static void clear_xv_buffers(VideoBuffers &vbuffers,
                    width * height / 2);
         }
     }
+}
+
+void ChromaKeyOSD::AllocImage(int i)
+{
+    X11L;
+    XImage *shm_img =
+        XShmCreateImage(videoOutput->XJ_disp,
+                        DefaultVisual(videoOutput->XJ_disp,
+                                      videoOutput->XJ_screen_num),
+                        videoOutput->XJ_depth, ZPixmap, 0,
+                        &shm_infos[i],
+                        videoOutput->dispw, videoOutput->disph);
+    uint size = shm_img->bytes_per_line * shm_img->height + 64;
+    X11U;
+
+    if (shm_img)
+    {
+        shm_infos[i].shmid = shmget(IPC_PRIVATE, size, IPC_CREAT|0777);
+        if (shm_infos[i].shmid >= 0)
+        {
+            shm_infos[i].shmaddr = (char*) shmat(shm_infos[i].shmid, 0, 0);
+
+            shm_img->data = shm_infos[i].shmaddr;
+            shm_infos[i].readOnly = False;
+
+            X11L;
+            XShmAttach(videoOutput->XJ_disp, &shm_infos[i]);
+            XSync(videoOutput->XJ_disp, False); // needed for FreeBSD?
+            X11U;
+
+            // Mark for delete immediately.
+            // It won't actually be removed until after we detach it.
+            shmctl(shm_infos[i].shmid, IPC_RMID, 0);
+        }
+    }
+
+    img[i] = shm_img;
+    bzero((vf+i), sizeof(VideoFrame));
+    vf[i].buf = (unsigned char*) shm_infos[i].shmaddr;
+    vf[i].codec  = FMT_ARGB32;
+    vf[i].height = videoOutput->disph;
+    vf[i].width  = videoOutput->dispw;
+    vf[i].bpp    = 32;
+}
+
+void ChromaKeyOSD::FreeImage(int i)
+{
+    if (!img[i])
+        return;
+
+    X11L;
+    XShmDetach(videoOutput->XJ_disp, &(shm_infos[i]));
+    XFree(img[i]);
+    img[i] = NULL;
+    X11U;
+
+    if (shm_infos[i].shmaddr)
+        shmdt(shm_infos[i].shmaddr);
+    if (shm_infos[i].shmid > 0)
+        shmctl(shm_infos[0].shmid, IPC_RMID, 0);
+
+    bzero((shm_infos+i), sizeof(XShmSegmentInfo));
+    bzero((vf+i),        sizeof(VideoFrame));
+}
+
+void ChromaKeyOSD::Reinit(int i)
+{
+    // Make sure the buffer is the right size...
+    bool resolution_changed = ((vf[i].height != videoOutput->disph) ||
+                               (vf[i].width  != videoOutput->dispw));
+    if (resolution_changed)
+    {
+        FreeImage(i);
+        AllocImage(i);
+    }
+
+    uint key = videoOutput->xv_colorkey;
+    uint bpl = img[i]->bytes_per_line;
+
+    // create chroma key line
+    char *cln = (char*) memalign(128, bpl);
+    bzero(cln, bpl);
+    int j = videoOutput->dispxoff - videoOutput->dispx;
+    for (; j < videoOutput->dispxoff + videoOutput->dispwoff; ++j)
+        ((uint*)cln)[j] = key;
+
+    // boboff assumes the smallest interlaced resolution is 480 lines - 5%
+    int boboff = (int)round(((double)videoOutput->disphoff) / 456 - 0.00001);
+    boboff = (videoOutput->m_deinterlacing &&
+              videoOutput->m_deintfiltername == "bobdeint") ? boboff : 0;
+
+    // calculate beginning and end of chromakey
+    int cstart = min(max(videoOutput->dispyoff + boboff,0),
+                     videoOutput->disph);
+    int cend   = min(max(videoOutput->dispyoff + videoOutput->disphoff,0),
+                     videoOutput->disph);
+
+    // Paint with borders and chromakey
+    char *buf = shm_infos[i].shmaddr;
+    int dispy = max(videoOutput->dispy,0);
+    //cerr<<"cstart: "<<cstart<<" cend: "<<cend;
+    //cerr<<" dispy: "<<dispy<<" disph: "<<videoOutput->disph<<endl;
+    if (cstart > dispy)
+        bzero(buf + (dispy * bpl), (cstart - dispy) * bpl);
+    for (j = cstart; j < cend; ++j)
+        memcpy(buf + (j*bpl), cln, bpl);
+    if (cend < videoOutput->disph)
+        bzero(buf + (cend * bpl), (videoOutput->disph - cend) * bpl);
+
+    free(cln);
+}
+
+/** \fn ChromaKeyOSD::ProcessOSD(OSD*)
+ * 
+ *  \return true if we need a repaint, false otherwise
+ */
+bool ChromaKeyOSD::ProcessOSD(OSD *osd)
+{
+    OSDSurface *osdsurf = NULL;
+    if (osd)
+        osdsurf = osd->Display();
+
+    int next = (current+1) & 0x1;
+    if (!osdsurf && current >= 0)
+    {
+        Reset();
+        return true;
+    }
+    else if (!osdsurf || (revision == osdsurf->GetRevision()))
+        return false;
+
+    // first create a blank frame with the chroma key
+    Reinit(next);
+
+    // then blend the OSD onto it
+    unsigned char *buf = (unsigned char*) shm_infos[next].shmaddr;
+    osdsurf->BlendToARGB(buf, img[next]->bytes_per_line, vf[next].height,
+                         false/*blend_to_black*/, 16);
+
+    // then set it as the current OSD image
+    revision = osdsurf->GetRevision();
+    current  = next;
+
+    return true;
 }

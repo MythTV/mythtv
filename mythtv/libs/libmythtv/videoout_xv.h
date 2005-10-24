@@ -33,6 +33,7 @@ class XvMCSurfaceInfo;
 #endif // !USING_XVMC
 
 class NuppelVideoPlayer;
+class ChromaKeyOSD;
 
 typedef enum VideoOutputSubType {
     XVUnknown = 0, Xlib, XShm, XVideo, XVideoMC, XVideoIDCT, XVideoVLD,
@@ -40,6 +41,7 @@ typedef enum VideoOutputSubType {
 
 class VideoOutputXv : public VideoOutput
 {
+    friend class ChromaKeyOSD;
   public:
     VideoOutputXv(MythCodecID av_codec_id);
    ~VideoOutputXv();
@@ -58,15 +60,18 @@ class VideoOutputXv : public VideoOutput
 
     void ClearAfterSeek(void);
 
+    void MoveResize(void);
     void InputChanged(int width, int height, float aspect);
     void Zoom(int direction);
     void VideoAspectRatioChanged(float aspect);
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
     void StopEmbedding(void);
-    int GetRefreshRate(void);
     void DrawUnusedRects(bool sync = true);
     void UpdatePauseFrame(void);
     int ChangePictureAttribute(int attributeType, int newValue);
+
+    int  GetRefreshRate(void);
+    void GetOSDSize(int &width, int &height);
 
     virtual bool hasMCAcceleration(void) const
         { return XVideoMC <= VideoOutputSubType(); }
@@ -196,6 +201,9 @@ class VideoOutputXv : public VideoOutput
     int                  xv_chroma;
     unsigned char       *xv_color_conv_buf;
     buffer_map_t         xv_buffers;
+
+    // Chromakey OSD info
+    ChromaKeyOSD        *chroma_osd;
 };
 
 CodecID myth2av_codecid(MythCodecID codec_id,

@@ -655,7 +655,7 @@ void VideoBuffers::ClearAfterSeek(void)
     global_lock.unlock();
 }
 
-void VideoBuffers::LockFrame(const VideoFrame *frame, const QString &owner)
+void VideoBuffers::LockFrame(const VideoFrame *frame, const char* owner)
 {
     if (!use_frame_locks)
         return;
@@ -684,7 +684,8 @@ void VideoBuffers::LockFrame(const VideoFrame *frame, const QString &owner)
     mutex->lock();
 }
 
-void VideoBuffers::LockFrames(vector<const VideoFrame*>& vec, const QString& owner)
+void VideoBuffers::LockFrames(vector<const VideoFrame*>& vec,
+                              const char* owner)
 {
     if (!use_frame_locks)
         return;
@@ -718,7 +719,7 @@ void VideoBuffers::LockFrames(vector<const VideoFrame*>& vec, const QString& own
     while (!ok);
 }
 
-bool VideoBuffers::TryLockFrame(const VideoFrame *frame, const QString &owner)
+bool VideoBuffers::TryLockFrame(const VideoFrame *frame, const char* owner)
 {
     if (!use_frame_locks)
         return true;
@@ -756,7 +757,7 @@ bool VideoBuffers::TryLockFrame(const VideoFrame *frame, const QString &owner)
     return ok;
 }
 
-void VideoBuffers::UnlockFrame(const VideoFrame *frame, const QString &owner)
+void VideoBuffers::UnlockFrame(const VideoFrame *frame, const char* owner)
 {
     if (!use_frame_locks)
         return;
@@ -779,7 +780,8 @@ void VideoBuffers::UnlockFrame(const VideoFrame *frame, const QString &owner)
     frame_lock.unlock();
 }
 
-void VideoBuffers::UnlockFrames(vector<const VideoFrame*>& vec, const QString& owner)
+void VideoBuffers::UnlockFrames(vector<const VideoFrame*>& vec,
+                                const char* owner)
 {
     if (!use_frame_locks)
         return;
