@@ -1091,7 +1091,7 @@ void NuppelVideoRecorder::StartRecording(void)
 
     if (ioctl(fd, VIDIOCGMBUF, &vm) < 0)
     {
-        perror("VIDOCGMBUF:");
+        perror("VIDIOCGMBUF:");
         KillChildren();
         errored = true;
         return;
