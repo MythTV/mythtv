@@ -175,7 +175,7 @@ echo "  --enable-dvb             enable DVB support (must supply header director
 echo "  --dvb-path=HDRLOC        location of directory containing"
 echo "                           'linux/dvb/frontend.h', not the"
 echo "                           directory with frontend.h [$dvb_path]"
-echo "  --enable-dvb-eit         enable DVB EIT support (--enable-dvb is required)"
+echo "  --disable-dvb-eit        disable DVB EIT support (--enable-dvb is required)"
 echo "  --disable-x11            disable X11 support"
 echo "  --x11-path=X11LOC	 location of X11 include files [$x11_include_path-path]"
 echo "  --disable-xrandr         disable X11 resolution switching"
