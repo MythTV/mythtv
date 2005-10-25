@@ -1135,7 +1135,9 @@ bool VideoOutputXv::Init(
     if (use_chroma_key_osd)
     {
         chroma_osd = new ChromaKeyOSD(this);
+#ifdef USING_XVMC
         xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
+#endif // USING_XVMC
     }
 
     // Create video buffers
