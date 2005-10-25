@@ -28,6 +28,7 @@ aac="no"          # compile fails w/libfaad v2.0
 transcode="no"    # need to check for more stuff?
 vcdsupport="no"   # no config detection rutine
 exif="detect"
+newexif="detect"
 festival="no"     # no config detection/setup rutine
 
 targetos=`uname -s`
@@ -66,6 +67,7 @@ MythDVD related options:
 MythGallery related options:
   --enable-mythgallery     build the mythgallery plugin [$gallery]
   --enable-exif            enable reading of EXIF headers [$exif]
+  --enable-new-exif        use libexif > version 0.6.9 [$newexif]
 
 MythGame related options:
   --enable-mythgame        build the mythgame plugin [$game]
@@ -161,6 +163,11 @@ for opt do
   --disable-vcd) vcdsupport="no"
   ;;
   --enable-exif) exif="yes"
+  ;;
+  --enable-new-exif)  newexif="yes"
+                      exif="yes"
+  ;;
+  --disable-new-exif) newexif="no"
   ;;
   --disable-exif) exif="no"
   ;;
@@ -662,12 +669,16 @@ if test "$gallery" = "yes" ; then
                     ./mythgallery/mythgallery/config.h
             fi
         else
-            echo
-            echo "Could not determine libexif version, if it is greater than"
-            echo "or equal to 0.6.9 you may need to add this line: "
-            echo "#define NEW_LIB_EXIF 1"
-            echo "to mythgallery/mythgallery/config.h"
-            echo
+            if test x"$newexif" = x"yes" ; then
+		echo "#define NEW_LIB_EXIF 1" >> \
+                    ./mythgallery/mythgallery/config.h
+            else
+                echo
+                echo "Could not determine libexif version, if it is greater"
+                echo "than or equal to 0.6.9 you need to add"
+                echo "--enable-new-exif to the configure flags"
+                echo
+            fi
         fi
     fi
 
