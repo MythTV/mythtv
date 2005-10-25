@@ -1,0 +1,157 @@
+<!--
+
+    This is a myth style theme file for mythwelcome
+
+    (c) 2005 by a whole bunch of people associated with MythTV
+
+-->
+<mythuitheme>
+ 
+    <window name="welcome_screen">
+    
+        <!--
+
+            First, define all the fonts we need on this screen
+
+        -->
+       <font name="title" face="Arial">
+           <color>#ffff00</color>
+           <dropcolor>#000000</dropcolor>
+           <size>24</size>
+           <shadow>3,3</shadow>
+           <bold>yes</bold>
+       </font>
+
+       <font name="time" face="Arial">
+            <color>#9999cc</color>
+            <size>18</size>
+            <bold>yes</bold>
+       </font>
+
+       <font name="label" face="Arial">
+            <color>#ffff00</color>
+            <dropcolor>#000000</dropcolor>
+            <size>18</size>
+            <shadow>3,3</shadow>
+            <bold>yes</bold>
+       </font>
+
+       <font name="info" face="Arial">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>yes</bold>
+       </font>
+        
+       <font name="warning" face="Arial">
+            <color>#ff0000</color>
+            <dropcolor>#000000</dropcolor>
+            <size>16</size>
+            <shadow>2,2</shadow>
+            <bold>yes</bold>
+       </font>
+
+       <font name="buttons" face="Arial">
+            <color>#ffff00</color>
+            <size>14</size>
+            <bold>yes</bold>
+       </font>
+
+       <container name="main_display">
+            <area>0,0,800,600</area>
+
+            <textarea name="title" draworder="0" align="center">
+                <multiline>no</multiline>
+                <font>title</font>
+                <area>50,10,700,40</area>
+                <value>Welcome to MythTV</value>
+            </textarea>
+
+            <!-- 
+                time
+            -->
+            <textarea name="time_text" draworder="0" align="right">
+                <multiline>no</multiline>
+                <font>time</font>
+                <area>670,20,110,30</area>
+                <value></value>
+            </textarea>
+
+            <textarea name="date_text" draworder="0" align="left">
+                <multiline>yes</multiline>
+                <font>time</font>
+                <area>20,20,190,70</area>
+                <value></value>
+            </textarea>
+            
+            <!-- 
+                current myth status
+            -->
+
+            <textarea name="status_text" draworder="1" align="center">
+                <multiline>yes</multiline>
+                <font>info</font>
+                <area>20,70,760,60</area>
+                <value>MythTV is idle and will shutdown shortly.</value>
+            </textarea>
+
+            <!-- 
+                current recordings status
+            -->
+            
+            <textarea name="recording_label" draworder="1" align="center">
+                <font>label</font>
+                <area>20,130,760,30</area>
+                <value>Current Recording(s)</value>
+            </textarea>
+
+            <textarea name="recording_text" draworder="1" align="hcenter">
+                <multiline>yes</multiline>
+                <font>info</font>
+                <area>20,165,760,150</area>
+                <value>Retrieving Recording Status ...</value>
+            </textarea>
+
+            <!-- 
+                next scheduled recording status
+            -->
+            
+            <textarea name="scheduled_label" draworder="1" align="center">
+                <font>label</font>
+                <area>20,320,760,30</area>
+                <value>Next Scheduled Recording(s)</value>
+            </textarea>
+
+            <textarea name="scheduled_text" draworder="1" align="hcenter">
+                <multiline>yes</multiline>
+                <font>info</font>
+                <area>20,355,760,120</area>
+                <value>Retrieving Scheduled Recordings ...</value>
+            </textarea>
+
+            <!-- 
+                scheduled recordings conflict warning
+            -->
+            
+            <textarea name="conflicts_text" draworder="1" align="center">
+                <font>warning</font>
+                <area>20,490,760,30</area>
+                <value>WARNING: There are conflicting scheduled recordings!</value>
+            </textarea>
+
+            <!-- 
+                start frontend button
+            -->
+                     
+            <textbutton name="startfrontend_button" draworder="1">
+                <position>81,535</position>
+                <font>buttons</font>
+                <image function="on" filename="mw_text_button_on.png"></image>
+                <image function="off" filename="mw_text_button_off.png"></image>
+                <image function="pushed" filename="mw_text_button_pushed.png"></image>
+            </textbutton>
+        
+	   </container>
+    
+    </window>
+    
+</mythuitheme>

@@ -1,0 +1,304 @@
+REALLY-QUICK START
+==================
+If you're in a desperate hurry:
+
+Run mythwelcome --setup and edit the settings to suit your setup.
+
+Change your system startup to run mythwelcome instead of mythfrontend.
+
+Change the Shutdown/Wakeup Options in mythtv-setup to call the mythshutdown
+program.
+
+And if you start wondering why it doesn't work, come back and read the
+rest of the file. 8)
+
+WHAT IS MYTHWELCOME
+===================
+
+MythWelcome is a Myth themed application that shows a welcome/status 
+information screen that will be shown whenever the frontend is not 
+running ie. when an automatic startup has occurred to record a program. 
+It shows some information about what the backend is currently doing 
+(idle, recording, commercial flagging, transcoding or locked by a user etc.). 
+It also shows what the backend is recording, what the next scheduled recording 
+is and shows a warning if there are any schedule conflicts. There is also a 
+push button to start the frontend.
+
+It is useful if you want to setup a dedicated MythTV system that you
+don't want to run 24/7 but you want to automatically wake up to record
+just like a normal video recorder and shutdown again when it is idle.
+
+Mythwelcome will also prevent the backend from shutting down the system
+if it is busy commercial flagging, downloading EPG data, transcoding or
+shutdown has been locked by a user.
+
+PREREQUISITES 
+=============
+
+You should have already installed and have a working nvram-wakeup
+setup including modifying your bootloader menu to add a Poweroff
+menu option if your bios requires a reboot when setting the wakeup
+time in the bios.
+
+ 
+Mythwelcome/Mythshutdown Settings
+=================================
+
+Like most of MythTV Mythwelcome and Mythshutdown store their settings
+in the myth database. All of the settings are settable from the GUI.
+There are two separate settings pages. One is shown by starting
+mythwelcome with the -s/--setup parameter or by pressing the 
+'SHOWSETTINGS' key (defaults to F11 key). You will probably only ever
+set these options once when you first setup Mythwelcome.
+
+nvram-wakeup command -  command to set wakeup time in bios
+                        
+                        if you are really lucky nvram-wakeup will be able 
+                        to recognize your M/B automatically 
+                        "/usr/sbin/nvram-wakeup"
+
+                        if you need to explicitly set the info-writer use 
+                        something like this
+                        "/usr/sbin/nvram-wakeup -A -I aopen_ax37"
+
+                        if you need to use a custom config file use something 
+                        like this
+                        "/usr/sbin/nvram-wakeup -A -C /etc/nvram-wakeup.conf"
+
+nvram-wakeup restart  - command to set which bootloader menu option to use
+command                 after next reboot. This command is run if your bios 
+                        requires you to reboot to allow nvram-wakeup settings 
+                        to take effect.
+
+                        older versions of grub require something like this
+                        "echo 'savedefault --default=1 --once quit' | /sbin/grub"
+                        
+                        newer versions of grub can use something like this
+                        "grub-set-default 1"
+                        
+                        lilo users should use something like this
+                        "lilo -R PowerOff"       
+                        
+Poweroff Command      - The command mythshutdown should use to poweroff the computer.
+
+Reboot Command        - The command mythshutdown should use to reboot the computer.
+                        Used when your BIOS requires a reboot to allow nvram-wakeup 
+                        settings to take effect. 
+
+Start XTerm Command   - This is the command to use to open an XTerm window. 
+                        Leave blank to disable this feature.
+                        Tip: If the default font size is too small to see on your
+                        TV change the default setting to:
+                        'xterm -fa Courier -fs 14' to change the font style and size.   
+
+The second set of settings are available by pressing 'i/INFO' key and allow you
+to setup the daily wakeup/shutdown periods and control whether to automatically
+start the mythfrontend when mythwelcome is started and it is determined that it
+was started manually.
+
+Period 1 Start Time  - These setting determine a period of time that the system
+Period 1 End Time      should always wake up for. Set both times to 00:00 to
+                       disable this feature. 
+
+Period 2 Start Time  - Second wakeup/shutdown period settings.                   
+Period 2 End Time    
+
+Automatically Start  - Normally when mythwelcome starts up it checks to see whether
+Mythfrontend           the system was started to record something or because of a 
+                       wakeup/shutdown period. If not it will automatically start the
+                       frontend. You can disable this feature by unchecking this option.   
+
+ 
+MYTHBACKEND SETUP OPTIONS
+=========================
+
+The mythbackend needs to co-operate with mythwelcome to work
+as intended. It does this by calling the helper program 'mythshutdown'
+to check whether it is safe to shutdown, to set the time to wake up
+for the next scheduled recording and to do the actual shutdown. 
+
+You should run mythtv-setup and on the Shutdown/Wakeup Options page set
+the following settings:  
+
+    Block shutdown before
+    client connected:           should be checked 
+    Idletimeout (secs):         any value greater that 0
+    Wakeup time format:         yyyy-MM-ddThh:mm
+    Set wakeup time command:    mythshutdown --setwakeup $time
+    Server Halt command:        mythshutdown --shutdown
+    Pre shutdown check command: mythshutdown --check  
+
+Because 'mythshutdown --shutdown' needs to run grub/lilo, reboot, poweroff 
+and nvram-wakeup all of which require root privileges if you don't run the mythbackend 
+as root you will have to use sudo to give mythshutdown root privileges and change the
+Server Halt command to 'sudo  mythshutdown --shutdown'.
+
+You will have to restart the backend for the new settings to take effect.
+
+BOOTLOADER SETUP
+================
+
+If your motherboard/bios requires a reboot after changing the startup time
+in the bios with nvram-wakeup you should configure grub/lilo with a special 
+menu boot option to reboot and immediately shutdown.
+
+Grub Users Only
+---------------
+Simply add the following menu boot option to your grub.conf file:
+
+    title=PowerOff
+        savedefault 0
+        halt
+
+You should change the '0' to the menu item number you want to boot 
+normally by default. Also add 'default saved' towards the top of the file.
+
+set the nvram-wakeup restart command to '/sbin/grub-set-default 1'
+the 1 should be the menu item number of the PowerOff menu item you added
+above starting from 0.
+
+Lilo Users Only
+---------------
+As part of nvram-wakeup you can download some kernel images
+that do nothing but shutdown the system. (see 
+http://sourceforge.net/project/showfiles.php?group_id=35022&package_id=91149)
+
+Add a boot option to the lilo.conf file such as:
+
+    image=/boot/bzimage.poweroff
+    label=PowerOff
+    
+change the nvram-wakeup restart command to 'lilo -R PowerOff'   
+
+See the nvram-wakeup documentation for more info on how to setup lilo.
+
+
+MYTHSHUTDOWN PROGRAM
+====================
+
+The mythshutdown command line utility is a multi-purpose helper program used by 
+both mythbackend and mythwelcome. The program needs to be configured to 
+work properly by editing the settings in the GUI. (See 'Mythwelcome/Mythshutdown
+Settings' above). 
+
+The program can be run with the following parameters:
+
+-l/--lock
+    this will prevent mythbackend from shutting down the system even if 
+    it is idle. It is useful if you want to do some maintenance on the system 
+    and don't want the backend to shutdown the computer.
+    
+-u/--unlock
+    allows the backend to shutdown when idle
+    
+-c/--check
+    returns 0 safe to shutdown or 1 not safe to shutdown
+    this is usually called by the backend as the 'Pre-Shutdown Check command'.
+    will return 1 if shutdown is locked, mythcommflag is running, mythtranscode
+    is running, mythfilldatabase is running or we are in or about to start a
+    daily wakeup/shutdown period. 
+    
+-w/--setwakeup "yyyy-MM-ddThh:mm"
+    sets the time the next scheduled recording is to start. Does not set the 
+    time in the bios. Usually called by the backend's 'Set wakeup time command'.
+    
+-q/--shutdown
+    does all the hard work of determining when the next wakeup should be.
+    calls nvram-wakeup to set the time in the bios and calls grub/lilo to reboot
+    the system if required. Usually called by the backend's 'Server Halt 
+    command'. You probably need to run this with root privileges.
+        
+-s/--status
+    returns a value indicating what programs are running that will prevent
+    the backend from shutting down. The value is an OR'd flag of the following
+    values:
+    
+    0 - Idle                - free to shutdown 
+    1 - Transcoding         - mythtranscode is running
+    2 - Commercial Flagging - mythcommflag is running
+    4 - Grabbing EPG data   - mythfilldatabase is running
+    8 - not currently used 
+   16 - Locked              - shutdown has been locked by a user   
+   32 - not currently used  -  
+   64 - In wakeup period    - In a daily wakeup/shutdown period
+  128 - About to start wake - Less than 15 minutes to next wakeup period
+        up period
+      
+    used by mythwelcome to display a status message to the user and
+    by 'mythshutdown --check' itself to determin if it is safe to shutdown.
+    
+-v/--verbose
+    By default mythshutdown is silent and does not produce any output on the
+    console. This is by design because it is called often by mythwelcome and
+    mythbackend. You can add this parameter to make mythwelcome output some
+    messages to the console.
+    
+-d/--debug
+    Add this parameter to show more debug messages                
+     
+ALLOW A USER TO RUN THE MYTHSHUTDOWN PROGRAM WITH ROOT PRIVILEGES
+=================================================================
+
+Because you would normally run mythwelcome and the mythshutdown script as
+a normal user without root privileges you will need to setup sudo to allow 
+you to run the mythshutdown --shutdown as the root user to allow it to 
+run reboot, poweroff, grub/lilo and nvram-wakeup.  
+
+add the following line to your '/etc/sudoers' file: 
+
+mythtv localhost = NOPASSWD: /usr/bin/mythshutdown
+
+Change mythtv to the user you use to run mythwelcome and the mythshutdown program.
+You may also have to change the path to mythshutdown to suit your setup. 
+
+
+DAILY WAKEUP/SHUTDOWN PERIODS
+=============================
+
+You can optionally set one or two periods in a day that you would like your
+Myth system to wake up for. The periods are set on the mythwelcome
+settings screen (press i/INFO key). The mythshutdown program will wakeup
+the system and prevent it shutting down during these periods even if it is idle.
+
+Note: currently the settings do not handle periods that cross midnight. For
+example you cannot define a period of 19.00 to 01.00.
+
+
+POPUP MENU
+==========
+
+If you press the m/MENU key mythwelcome will display a popup menu with the 
+following options.
+
+Lock Shutdown        -  Prevents the system from shutting down even if it is idle.
+
+Unlock Shutdown      -  Allows the system to shutdown when it is idle.
+
+Run Mythfilldatabase -  Force mythfilldatabase to run now.
+
+Shutdown Now         -  Force the system to shutdown even if it is not idle or is
+                        in a wakeup/shutdown period. Will not shutdown if the backend
+                        is recording or is about to start recording. Requires sudo to
+                        be setup properly to allow mythwelcome to call the mythshutdown
+                        program with root privileges. See above.    
+                        
+Exit                 -  Exit the mythwelcome application.
+
+Cancel               -  Cancel the popup menu.                                     
+
+START XTERM
+===========
+
+There is an hidden feature that allows you to start an xterm from the mythwelcome
+screen. Useful if you need to do some trouble shooting. You can access it by 
+pressing the F12 key (default key binding). You can change the command that will
+be used to start the xterm on the Mythshutdown settings page (F11 key).
+
+TODO
+====
+
+Make the wakeup/shutdown periods a little more flexible by allowing periods to cross
+midnight.
+
+ 
+                      
