@@ -1202,7 +1202,7 @@ class DVBCardNum: public SpinBoxSetting, public CCSetting
 {
   public:
     DVBCardNum(const CaptureCard& parent)
-      : SpinBoxSetting(0,3,1), CCSetting(parent, "videodevice")
+      : SpinBoxSetting(0,7,1), CCSetting(parent, "videodevice")
     {
         setLabel(QObject::tr("DVB Card Number"));
         setHelpText(
@@ -1218,7 +1218,7 @@ class DVBCardType: public LabelSetting, public TransientStorage
   public:
     DVBCardType()
     {
-        setLabel(QObject::tr("Card Type"));
+        setLabel(QObject::tr("Subtype"));
     };
 };
 
@@ -1227,7 +1227,7 @@ class DVBCardName: public LabelSetting, public TransientStorage
   public:
     DVBCardName()
     {
-        setLabel(QObject::tr("Card Name"));
+        setLabel(QObject::tr("Frontend ID"));
     };
 };
 
@@ -1350,7 +1350,7 @@ class FirewireModel: public ComboBoxSetting, public CCSetting
     FirewireModel(const CaptureCard& parent)
       : CCSetting(parent, "firewire_model")
     {
-        setLabel(QObject::tr("Firewire Model"));
+        setLabel(QObject::tr("Cable box model"));
         addSelection(QObject::tr("Other"));
         addSelection("DCT-6200");
         addSelection("SA3250HD");
@@ -1365,7 +1365,7 @@ class FirewireConnection: public ComboBoxSetting, public CCSetting
       public:
        FirewireConnection(const CaptureCard& parent):
        CCSetting(parent, "firewire_connection") {
-            setLabel(QObject::tr("Firewire Connection Type"));
+            setLabel(QObject::tr("Connection Type"));
             addSelection(QObject::tr("Point to Point"),"0");
             addSelection(QObject::tr("Broadcast"),"1");
         }
@@ -1378,7 +1378,7 @@ class FirewirePort: public LineEditSetting, public CCSetting
       : CCSetting(parent, "firewire_port")
     {
         setValue("0");
-        setLabel(QObject::tr("Firewire Port"));
+        setLabel(QObject::tr("IEEE-1394 Port"));
         setHelpText(QObject::tr("Firewire port on your firewire card."));
     }
 };
@@ -1390,7 +1390,7 @@ class FirewireNode: public LineEditSetting, public CCSetting
       : CCSetting(parent, "firewire_node")
     {
         setValue("2");
-        setLabel(QObject::tr("Firewire Node"));
+        setLabel(QObject::tr("Node"));
         setHelpText(QObject::tr("Firewire node is the remote device."));
     }
 };
@@ -1401,7 +1401,7 @@ class FirewireSpeed: public ComboBoxSetting, public CCSetting
     FirewireSpeed(const CaptureCard& parent)
       : CCSetting(parent, "firewire_speed")
     {
-        setLabel(QObject::tr("Firewire Speed"));
+        setLabel(QObject::tr("Speed"));
         addSelection(QObject::tr("100Mbps"),"0");
         addSelection(QObject::tr("200Mbps"),"1");
         addSelection(QObject::tr("400Mbps"),"2");
@@ -1426,11 +1426,17 @@ class FirewireConfigurationGroup: public VerticalConfigurationGroup
     FirewireConfigurationGroup(CaptureCard& a_parent):
         parent(a_parent) {
         setUseLabel(false);
-        addChild(new FirewireModel(parent));
-        addChild(new FirewireConnection(parent));
-        addChild(new FirewirePort(parent));
-        addChild(new FirewireNode(parent));
-        addChild(new FirewireSpeed(parent));
+        HorizontalConfigurationGroup *hg0 =
+            new HorizontalConfigurationGroup(false, false, true, true);
+        hg0->addChild(new FirewireModel(parent));
+        hg0->addChild(new FirewireConnection(parent));
+        addChild(hg0);
+        HorizontalConfigurationGroup *hg1 =
+            new HorizontalConfigurationGroup(false, false, true, true);
+        hg1->addChild(new FirewirePort(parent));
+        hg1->addChild(new FirewireNode(parent));
+        hg1->addChild(new FirewireSpeed(parent));
+        addChild(hg1);
    	addChild(new FirewireInput(parent));
     };
   private:
@@ -1546,9 +1552,9 @@ class pcHDTVConfigurationGroup: public VerticalConfigurationGroup
         SignalTimeout *signal_timeout = new SignalTimeout(parent, 500);
         ChannelTimeout *channel_timeout = new ChannelTimeout(parent, 2000);
         addChild(atsc_device);
-        addChild(atsc_input);
         addChild(signal_timeout);
         addChild(channel_timeout);
+        addChild(atsc_input);
         connect(atsc_device, SIGNAL(valueChanged(const QString&)),
                 atsc_input, SLOT(fillSelections(const QString&)));
         atsc_input->fillSelections(atsc_device->getValue());
@@ -2624,10 +2630,17 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
     channel_timeout = new ChannelTimeout(parent, 3000);
 
     addChild(cardnum);
-    addChild(cardname);
-    addChild(cardtype);
-    addChild(signal_timeout);
-    addChild(channel_timeout);
+    HorizontalConfigurationGroup *hg0 = 
+        new HorizontalConfigurationGroup(false, false, true, true);
+    hg0->addChild(cardname);
+    hg0->addChild(cardtype);
+    addChild(hg0);
+
+    HorizontalConfigurationGroup *hg1 = 
+        new HorizontalConfigurationGroup(false, false, true, true);
+    hg1->addChild(signal_timeout);
+    hg1->addChild(channel_timeout);
+    addChild(hg1);
 
     addChild(new DVBAudioDevice(parent));
     addChild(new DVBVbiDevice(parent));
