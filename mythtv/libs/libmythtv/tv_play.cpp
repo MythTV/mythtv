@@ -174,7 +174,8 @@ TV::TV(void)
       // Configuration variables from database
       baseFilters(""), fftime(0), rewtime(0),
       jumptime(0), usePicControls(false), smartChannelChange(false),
-      MuteIndividualChannels(false), arrowAccel(false), osd_display_time(0),
+      MuteIndividualChannels(false), arrowAccel(false),
+      osd_general_timeout(2), osd_prog_info_timeout(3),
       autoCommercialSkip(false), tryUnflaggedSkip(false),
       smartForward(false), stickykeys(0),
       ff_rew_repos(1.0f), ff_rew_reverse(false),
@@ -274,7 +275,8 @@ bool TV::Init(bool createWindow)
     MuteIndividualChannels=gContext->GetNumSetting("IndividualMuteControl", 0);
     arrowAccel           = gContext->GetNumSetting("UseArrowAccels", 1);
     persistentbrowsemode = gContext->GetNumSetting("PersistentBrowseMode", 0);
-    osd_display_time     = gContext->GetNumSetting("OSDDisplayTime");
+    osd_general_timeout  = gContext->GetNumSetting("OSDGeneralTimeout", 2);
+    osd_prog_info_timeout= gContext->GetNumSetting("OSDProgramInfoTimeout", 3);
     autoCommercialSkip   = gContext->GetNumSetting("AutoCommercialSkip", 0);
     tryUnflaggedSkip     = gContext->GetNumSetting("TryUnflaggedSkip", 0);
     smartForward         = gContext->GetNumSetting("SmartForward", 0);
@@ -1410,14 +1412,16 @@ void TV::RunTV(void)
             speed_index = 0;
             doing_ff_rew = 0;
             ff_rew_index = kInitFFRWSpeed;
-            UpdatePosOSD(0.0, PlayMesg());
+            UpdatePosOSD(0.0, PlayMesg(), osd_general_timeout);
         }
 
         if (activenvp && (activenvp->GetNextPlaySpeed() != normal_speed) &&
-            activenvp->AtNormalSpeed() && !activenvp->PlayingSlowForPrebuffer())
+            activenvp->AtNormalSpeed() &&
+            !activenvp->PlayingSlowForPrebuffer())
         {
-            normal_speed = 1.0;     // got changed in nvp due to close to end of file
-            UpdatePosOSD(0.0, PlayMesg());
+            // got changed in nvp due to close to end of file
+            normal_speed = 1.0f;
+            UpdatePosOSD(0.0, PlayMesg(), osd_general_timeout);
         }
 
         if (++updatecheck >= 20)
@@ -1966,7 +1970,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (prbuffer->isDVD())
             {
                 prbuffer->prevTrack();
-                UpdatePosOSD(0.0, tr("Previous Chapter"));
+                UpdatePosOSD(0.0, tr("Previous Chapter"), osd_general_timeout);
             }
             else
             {
@@ -1978,7 +1982,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (prbuffer->isDVD())
             {
                 prbuffer->nextTrack();
-                UpdatePosOSD(0.0, tr("Next Chapter"));
+                UpdatePosOSD(0.0, tr("Next Chapter"), osd_general_timeout);
             }
             else
             {
@@ -2120,7 +2124,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (!handled)
             {
                 float time = StopFFRew();
-                UpdatePosOSD(time, PlayMesg());
+                UpdatePosOSD(time, PlayMesg(), osd_general_timeout);
                 handled = true;
             }
         }
@@ -2128,7 +2132,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         if (speed_index)
         {
             NormalSpeed();
-            UpdatePosOSD(0.0, PlayMesg());
+            UpdatePosOSD(0.0, PlayMesg(), osd_general_timeout);
             handled = true;
         }
     }
@@ -2263,7 +2267,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (prbuffer->isDVD())
                 {
                     prbuffer->prevTrack();
-                    UpdatePosOSD(0.0, tr("Previous Chapter"));
+                    UpdatePosOSD(0.0, tr("Previous Chapter"),
+                                 osd_general_timeout);
                 }
                 else
                 {
@@ -2275,7 +2280,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (prbuffer->isDVD())
                 {
                     prbuffer->nextTrack();
-                    UpdatePosOSD(0.0, tr("Next Chapter"));
+                    UpdatePosOSD(0.0, tr("Next Chapter"), osd_general_timeout);
                 }
                 else
                 {
@@ -2426,7 +2431,7 @@ void TV::DoPlay(void)
     if (activenvp != nvp)
         return;
 
-    UpdatePosOSD(time, PlayMesg());
+    UpdatePosOSD(time, PlayMesg(), osd_general_timeout);
 
     gContext->DisableScreensaver();
 }
@@ -2474,7 +2479,7 @@ void TV::DoPause(void)
     }
     else
     {
-        UpdatePosOSD(time, PlayMesg());
+        UpdatePosOSD(time, PlayMesg(), osd_general_timeout);
         gContext->DisableScreensaver();
     }
 }
@@ -2495,14 +2500,15 @@ void TV::DoInfo(void)
         playbackinfo->ToMap(infoMap);
         GetOSD()->HideSet("status");
         GetOSD()->ClearAllText("program_info");
-        GetOSD()->SetText("program_info", infoMap, osd_display_time);
+        GetOSD()->SetText("program_info", infoMap, osd_prog_info_timeout);
     }
     else
     {
         QString desc = "";
         int pos = nvp->calcSliderPos(desc);
         GetOSD()->HideSet("program_info");
-        GetOSD()->StartPause(pos, false, tr("Position"), desc, osd_display_time);
+        GetOSD()->StartPause(pos, false, tr("Position"), desc,
+                             osd_prog_info_timeout);
         update_osd_pos = true;
     }
 }
@@ -2551,7 +2557,7 @@ void TV::DoSeek(float time, const QString &mesg)
 
     NormalSpeed();
     time += StopFFRew();
-    UpdatePosOSD(time, mesg);
+    UpdatePosOSD(time, mesg, osd_general_timeout);
 
     if (activenvp->GetLimitKeyRepeat())
     {
@@ -2622,7 +2628,7 @@ void TV::ChangeSpeed(int direction)
     }
 
     paused = false;
-    UpdatePosOSD(time, mesg);
+    UpdatePosOSD(time, mesg, osd_general_timeout);
 }
 
 float TV::StopFFRew(void)
@@ -2666,7 +2672,7 @@ void TV::ChangeFFRew(int direction)
         else
         {
             float time = StopFFRew();
-            UpdatePosOSD(time, PlayMesg());
+            UpdatePosOSD(time, PlayMesg(), osd_general_timeout);
         }
     }
     else
@@ -3226,9 +3232,9 @@ void TV::UpdateOSD(void)
     {
         // Clear previous osd and add new info
         GetOSD()->ClearAllText("program_info");
-        GetOSD()->SetText("program_info", infoMap, osd_display_time);
+        GetOSD()->SetText("program_info", infoMap, osd_prog_info_timeout);
         GetOSD()->ClearAllText("channel_number");
-        GetOSD()->SetText("channel_number", infoMap, osd_display_time);
+        GetOSD()->SetText("channel_number", infoMap, osd_prog_info_timeout);
     }
 }
 
@@ -3353,11 +3359,11 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
     //GetOSD()->SetText("signal_info", infoMap, -1);
 
     GetOSD()->ClearAllText("channel_number");
-    GetOSD()->SetText("channel_number", infoMap, osd_display_time);
+    GetOSD()->SetText("channel_number", infoMap, osd_prog_info_timeout);
 
     infoMap["description"] = sigDesc;
     GetOSD()->ClearAllText("program_info");
-    GetOSD()->SetText("program_info", infoMap, osd_display_time);
+    GetOSD()->SetText("program_info", infoMap, osd_prog_info_timeout);
 
     lastSignalMsg.clear();
     lastSignalMsgTime.start();

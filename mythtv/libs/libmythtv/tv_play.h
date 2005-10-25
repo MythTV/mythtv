@@ -187,7 +187,7 @@ class TV : public QObject
     void DoInfo(void);
     void DoPlay(void);
     void DoPause(void);
-    bool UpdatePosOSD(float time, const QString &mesg, int disptime = 2);
+    bool UpdatePosOSD(float time, const QString &mesg, int disptime);
     void DoSeek(float time, const QString &mesg);
     enum ArbSeekWhence {
         ARBSEEK_SET = 0,
@@ -270,7 +270,8 @@ class TV : public QObject
     bool    smartChannelChange;
     bool    MuteIndividualChannels;
     bool    arrowAccel;
-    int     osd_display_time;
+    int     osd_general_timeout;
+    int     osd_prog_info_timeout;
 
     int     autoCommercialSkip;
     bool    tryUnflaggedSkip;

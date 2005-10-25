@@ -150,9 +150,9 @@ static HostComboBox *DeinterlaceFilter()
     gc->addSelection(QObject::tr("Kernel (less motion blur)"), "kerneldeint");
     gc->addSelection(QObject::tr("Bob (2x framerate)"), "bobdeint");
     gc->addSelection(QObject::tr("One field"), "onefield");
-    gc->setHelpText(QObject::tr("Deinterlace algorithm. "
-                                "'Kernel' require SSE. 'Bob' requires "
-                                "Xv or XvMC video out."));
+    gc->setHelpText(QObject::tr("Deinterlace algorithm.") + " " +
+                    QObject::tr("'Kernel' requires SSE CPU support.") + " " +
+                    QObject::tr("'Bob' requires XVideo or XvMC video out."));
     return gc;
 }
 
@@ -685,13 +685,26 @@ static HostCheckBox *FFRewReverse()
     return gc; 
 }
 
-static HostSpinBox *OSDDisplayTime()
+static HostSpinBox *OSDGeneralTimeout()
 {
-    HostSpinBox *gs = new HostSpinBox("OSDDisplayTime", 0, 30, 1);
-    gs->setLabel(QObject::tr("Number of seconds for OSD information"));
+    HostSpinBox *gs = new HostSpinBox("OSDGeneralTimeout", 1, 30, 1);
+    gs->setLabel(QObject::tr("General OSD time-out (sec)"));
+    gs->setValue(2);
+    gs->setHelpText(QObject::tr(
+                        "How many seconds an on-screen display "
+                        "will be active after it is first activated."));
+    return gs;
+}
+
+static HostSpinBox *OSDProgramInfoTimeout()
+{
+    HostSpinBox *gs = new HostSpinBox("OSDProgramInfoTimeout", 1, 30, 1);
+    gs->setLabel(QObject::tr("Program Info OSD time-out"));
     gs->setValue(3);
-    gs->setHelpText(QObject::tr("How long the program information remains on "
-                    "the On Screen Display after a channel change."));
+    gs->setHelpText(QObject::tr(
+                        "How many seconds the on-screen display "
+                        "will display the program information "
+                        "after it is first displayed."));
     return gs;
 }
 
@@ -3019,7 +3032,8 @@ PlaybackSettings::PlaybackSettings()
     VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
     osd->setLabel(QObject::tr("On-screen display"));
     osd->addChild(OSDTheme());
-    osd->addChild(OSDDisplayTime());
+    osd->addChild(OSDGeneralTimeout());
+    osd->addChild(OSDProgramInfoTimeout());
     osd->addChild(OSDFont());
     osd->addChild(OSDCCFont());
     osd->addChild(OSDThemeFontSizeType());
