@@ -129,6 +129,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     bool isplaying;
     bool lcd_volume_visible;
 
+    bool menufilters;
+
     MainVisual *mainvisual;
 
     QString visual_mode;

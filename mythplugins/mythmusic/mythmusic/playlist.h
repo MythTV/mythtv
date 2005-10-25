@@ -75,7 +75,7 @@ class Playlist
 
     void describeYourself(void); //  debugging
 
-    void fillSongsFromSonglist();
+    void fillSongsFromSonglist(bool filter);
     void fillSonglistFromSongs();
     void fillSonglistFromQuery(QString whereClause);
     void fillSonglistFromSmartPlaylist(QString category, QString name);

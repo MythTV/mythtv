@@ -373,54 +373,55 @@ void handleMedia(MythMediaDevice *)
 
 void setupKeys(void)
 {
-    REG_JUMP("Play music", "", "", runMusicPlayback);
+    REG_JUMP("Play music",             "", "", runMusicPlayback);
     REG_JUMP("Select music playlists", "", "", runMusicSelection);
-    REG_JUMP("Rip CD", "", "", runRipCD);
+    REG_JUMP("Rip CD",                 "", "", runRipCD);
 
+    REG_KEY("Music", "DELETE",     "Delete track from playlist", "D");
+    REG_KEY("Music", "NEXTTRACK",  "Move to the next track",     ">,.,Z,End");
+    REG_KEY("Music", "PREVTRACK",  "Move to the previous track", ",,<,Q,Home");
+    REG_KEY("Music", "FFWD",       "Fast forward",               "PgDown");
+    REG_KEY("Music", "RWND",       "Rewind",                     "PgUp");
+    REG_KEY("Music", "PAUSE",      "Pause/Start playback",       "P");
+    REG_KEY("Music", "STOP",       "Stop playback",              "O");
+    REG_KEY("Music", "VOLUMEDOWN", "Volume down",                "[,{,F10");
+    REG_KEY("Music", "VOLUMEUP",   "Volume up",                  "],},F11");
+    REG_KEY("Music", "MUTE",       "Mute",                       "|,\\,F9");
+    REG_KEY("Music", "CYCLEVIS",   "Cycle visualizer mode",      "6");
+    REG_KEY("Music", "BLANKSCR",   "Blank screen",               "5");
+    REG_KEY("Music", "THMBUP",     "Increase rating",            "9");
+    REG_KEY("Music", "THMBDOWN",   "Decrease rating",            "7");
+    REG_KEY("Music", "REFRESH",    "Refresh music tree",         "8");
+    REG_KEY("Music", "FILTER",     "Filter All My Music",        "F");
+    REG_KEY("Music", "JUMPA",      "Jump to the letter A",       "Ctrl+A");
+    REG_KEY("Music", "JUMPB",      "Jump to the letter B",       "Ctrl+B");
+    REG_KEY("Music", "JUMPC",      "Jump to the letter C",       "Ctrl+C");
+    REG_KEY("Music", "JUMPD",      "Jump to the letter D",       "Ctrl+D");
+    REG_KEY("Music", "JUMPE",      "Jump to the letter E",       "Ctrl+E");
+    REG_KEY("Music", "JUMPF",      "Jump to the letter F",       "Ctrl+F");
+    REG_KEY("Music", "JUMPG",      "Jump to the letter G",       "Ctrl+G");
+    REG_KEY("Music", "JUMPH",      "Jump to the letter H",       "Ctrl+H");
+    REG_KEY("Music", "JUMPI",      "Jump to the letter I",       "Ctrl+I");
+    REG_KEY("Music", "JUMPJ",      "Jump to the letter J",       "Ctrl+J");
+    REG_KEY("Music", "JUMPK",      "Jump to the letter K",       "Ctrl+K");
+    REG_KEY("Music", "JUMPL",      "Jump to the letter L",       "Ctrl+L");
+    REG_KEY("Music", "JUMPM",      "Jump to the letter M",       "Ctrl+M");
+    REG_KEY("Music", "JUMPN",      "Jump to the letter N",       "Ctrl+N");
+    REG_KEY("Music", "JUMPO",      "Jump to the letter O",       "Ctrl+O");
+    REG_KEY("Music", "JUMPP",      "Jump to the letter P",       "Ctrl+P");
+    REG_KEY("Music", "JUMPQ",      "Jump to the letter Q",       "Ctrl+Q");
+    REG_KEY("Music", "JUMPR",      "Jump to the letter R",       "Ctrl+R");
+    REG_KEY("Music", "JUMPS",      "Jump to the letter S",       "Ctrl+S");
+    REG_KEY("Music", "JUMPT",      "Jump to the letter T",       "Ctrl+T");
+    REG_KEY("Music", "JUMPU",      "Jump to the letter U",       "Ctrl+U");
+    REG_KEY("Music", "JUMPV",      "Jump to the letter V",       "Ctrl+V");
+    REG_KEY("Music", "JUMPW",      "Jump to the letter W",       "Ctrl+W");
+    REG_KEY("Music", "JUMPX",      "Jump to the letter X",       "Ctrl+X");
+    REG_KEY("Music", "JUMPY",      "Jump to the letter Y",       "Ctrl+Y");
+    REG_KEY("Music", "JUMPZ",      "Jump to the letter Z",       "Ctrl+Z");
 
-    REG_KEY("Music", "DELETE", "Delete track from playlist", "D");
-    REG_KEY("Music", "NEXTTRACK", "Move to the next track", ">,.,Z,End");
-    REG_KEY("Music", "PREVTRACK", "Move to the previous track", ",,<,Q,Home");
-    REG_KEY("Music", "FFWD", "Fast forward", "PgDown");
-    REG_KEY("Music", "RWND", "Rewind", "PgUp");
-    REG_KEY("Music", "PAUSE", "Pause/Start playback", "P");
-    REG_KEY("Music", "STOP", "Stop playback", "O");
-    REG_KEY("Music", "VOLUMEDOWN", "Volume down", "[,{,F10");
-    REG_KEY("Music", "VOLUMEUP", "Volume up", "],},F11");
-    REG_KEY("Music", "MUTE", "Mute", "|,\\,F9");
-    REG_KEY("Music", "CYCLEVIS", "Cycle visualizer mode", "6");
-    REG_KEY("Music", "BLANKSCR", "Blank screen", "5");
-    REG_KEY("Music", "THMBUP", "Increase rating", "9");
-    REG_KEY("Music", "THMBDOWN", "Decrease rating", "7");
-    REG_KEY("Music", "REFRESH", "Refresh music tree", "8");
-    REG_KEY("Music", "JUMPA", "Jump to the letter A", "Ctrl+A");
-    REG_KEY("Music", "JUMPB", "Jump to the letter B", "Ctrl+B");
-    REG_KEY("Music", "JUMPC", "Jump to the letter C", "Ctrl+C");
-    REG_KEY("Music", "JUMPD", "Jump to the letter D", "Ctrl+D");
-    REG_KEY("Music", "JUMPE", "Jump to the letter E", "Ctrl+E");
-    REG_KEY("Music", "JUMPF", "Jump to the letter F", "Ctrl+F");
-    REG_KEY("Music", "JUMPG", "Jump to the letter G", "Ctrl+G");
-    REG_KEY("Music", "JUMPH", "Jump to the letter H", "Ctrl+H");
-    REG_KEY("Music", "JUMPI", "Jump to the letter I", "Ctrl+I");
-    REG_KEY("Music", "JUMPJ", "Jump to the letter J", "Ctrl+J");
-    REG_KEY("Music", "JUMPK", "Jump to the letter K", "Ctrl+K");
-    REG_KEY("Music", "JUMPL", "Jump to the letter L", "Ctrl+L");
-    REG_KEY("Music", "JUMPM", "Jump to the letter M", "Ctrl+M");
-    REG_KEY("Music", "JUMPN", "Jump to the letter N", "Ctrl+N");
-    REG_KEY("Music", "JUMPO", "Jump to the letter O", "Ctrl+O");
-    REG_KEY("Music", "JUMPP", "Jump to the letter P", "Ctrl+P");
-    REG_KEY("Music", "JUMPQ", "Jump to the letter Q", "Ctrl+Q");
-    REG_KEY("Music", "JUMPR", "Jump to the letter R", "Ctrl+R");
-    REG_KEY("Music", "JUMPS", "Jump to the letter S", "Ctrl+S");
-    REG_KEY("Music", "JUMPT", "Jump to the letter T", "Ctrl+T");
-    REG_KEY("Music", "JUMPU", "Jump to the letter U", "Ctrl+U");
-    REG_KEY("Music", "JUMPV", "Jump to the letter V", "Ctrl+V");
-    REG_KEY("Music", "JUMPW", "Jump to the letter W", "Ctrl+W");
-    REG_KEY("Music", "JUMPX", "Jump to the letter X", "Ctrl+X");
-    REG_KEY("Music", "JUMPY", "Jump to the letter Y", "Ctrl+Y");
-    REG_KEY("Music", "JUMPZ", "Jump to the letter Z", "Ctrl+Z");
-
-    REG_MEDIA_HANDLER("MythMusic Media Handler", "", "", handleMedia, MEDIATYPE_AUDIO | MEDIATYPE_MIXED);
+    REG_MEDIA_HANDLER("MythMusic Media Handler", "", "", handleMedia,
+                      MEDIATYPE_AUDIO | MEDIATYPE_MIXED);
 }
 
 int mythplugin_init(const char *libversion)

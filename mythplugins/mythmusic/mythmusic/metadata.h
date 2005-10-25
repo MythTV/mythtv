@@ -38,6 +38,7 @@ class Metadata
                 lastplay = llastplay;
                 compilation = lcompilation;
                 changed = false;
+                show = true;
             }
 
     Metadata(const Metadata &other) 
@@ -58,6 +59,7 @@ class Metadata
                 lastplay = other.lastplay;
                 playcount = other.playcount;
                 compilation = other.compilation;
+                show = other.show;
                 changed = false;
             }
 
@@ -110,6 +112,9 @@ class Metadata
     int PlayCount() { return playcount; }
     void incPlayCount();
 
+    bool isVisible() { return show; }
+    void setVisible(bool visible) { show = visible; }
+
     // track is part of a compilation album
     bool Compilation() { return compilation; }
     void setCompilation(bool state) { compilation = state; formattedartist = formattedtitle = ""; }
@@ -152,6 +157,8 @@ class Metadata
     unsigned int id;
     QString filename;
     bool    changed;
+
+    bool    show;
 
     static QString m_startdir;
 
@@ -287,6 +294,7 @@ class AllMusic
     bool        cleanOutThreads();
     int         getCDTrackCount(){return cd_data.count();}
     void        resetListings(){last_listed = -1;}
+    void        setAllVisible(bool visible);
     
   private:
   

@@ -859,7 +859,8 @@ void AllMusic::buildTree()
     Metadata *inserter;
     while ( (inserter = an_iterator.current()) != 0 )
     {
-        intoTree(inserter);
+        if (inserter->isVisible())
+            intoTree(inserter);
         ++an_iterator;
     }
 }
@@ -1167,6 +1168,17 @@ void AllMusic::setSorting(QString a_paths)
                  << "\" as a tree level in a music hierarchy " << endl ; 
         }
             
+    }
+}
+
+void AllMusic::setAllVisible(bool visible)
+{
+    QPtrListIterator<Metadata> an_iterator( all_music );
+    Metadata *md;
+    while ( (md = an_iterator.current()) != 0 )
+    {
+        md->setVisible(visible);
+        ++an_iterator;
     }
 }
 

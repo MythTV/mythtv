@@ -51,6 +51,8 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     curSmartPlaylistCategory = "";
     curSmartPlaylistName = "";
     
+    menufilters = gContext->GetNumSetting("MusicMenuFilters", 0);
+
     // Set our pointers the playlists and the metadata containers
 
     all_playlists = the_playlists;
@@ -316,7 +318,15 @@ void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
         else if (action == "MUTE")
             toggleMute();
         else if (action == "MENU")
+        {
+            menufilters = false;
             showMenu();
+        }
+        else if (action == "FILTER")
+        {
+            menufilters = true;
+            showMenu();
+        }
         else if (action == "INFO")
             showEditMetadataDialog();
         else
@@ -556,25 +566,30 @@ void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause)
     
     visual_mode_timer->stop();
 
-    all_playlists->getActive()->removeAllTracks();
+    if (!menufilters)
+        all_playlists->getActive()->removeAllTracks();
     all_playlists->getActive()->fillSonglistFromQuery(whereClause);
-    all_playlists->getActive()->fillSongsFromSonglist();
-    all_playlists->getActive()->postLoad();
+    all_playlists->getActive()->fillSongsFromSonglist(menufilters);
+    if (!menufilters)
+        all_playlists->getActive()->postLoad();
 
     if (visual_mode_delay > 0)
         visual_mode_timer->start(visual_mode_delay * 1000);
 
-    constructPlaylistTree();
-    
-    stop();
-    wipeTrackInfo();
-    
-    // move to first track in list
-    branches_to_current_node.clear();
-    branches_to_current_node.append(0); //  Root node
-    branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
-    branches_to_current_node.append(0); //  Active play Queue
-    music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+    if (!menufilters)
+    {
+        constructPlaylistTree();
+        
+        stop();
+        wipeTrackInfo();
+        
+        // move to first track in list
+        branches_to_current_node.clear();
+        branches_to_current_node.append(0); //  Root node
+        branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+        branches_to_current_node.append(0); //  Active play Queue
+        music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+    }
     music_tree_list->refresh();
 }
 
@@ -586,7 +601,7 @@ void PlaybackBoxMusic::updatePlaylistFromSmartPlaylist(QString category, QString
 
     all_playlists->getActive()->removeAllTracks();
     all_playlists->getActive()->fillSonglistFromSmartPlaylist(category, name);
-    all_playlists->getActive()->fillSongsFromSonglist();
+    all_playlists->getActive()->fillSongsFromSonglist(menufilters);
     all_playlists->getActive()->postLoad();
 
     if (visual_mode_delay > 0)

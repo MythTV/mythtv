@@ -319,10 +319,10 @@ void PlaylistsContainer::load()
     cd_playlist.clear();
 
     active_playlist->loadPlaylist("default_playlist_storage", my_host);
-    active_playlist->fillSongsFromSonglist();
+    active_playlist->fillSongsFromSonglist(false);
     
     backup_playlist->loadPlaylist("backup_playlist_storage", my_host);
-    backup_playlist->fillSongsFromSonglist();
+    backup_playlist->fillSongsFromSonglist(false);
 
     all_other_playlists->clear();
 
@@ -342,7 +342,7 @@ void PlaylistsContainer::load()
             Playlist *temp_playlist = new Playlist(all_available_music);   //  No, we don't destruct this ...
             temp_playlist->setParent(this);
             temp_playlist->loadPlaylistByID(query.value(0).toInt(), my_host);
-            temp_playlist->fillSongsFromSonglist();
+            temp_playlist->fillSongsFromSonglist(false);
             all_other_playlists->append(temp_playlist); //  ... cause it's sitting on this PtrList
         }
     }
@@ -520,9 +520,13 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
         name = "and they should **REALLY** never see this";
 }
 
-void Playlist::fillSongsFromSonglist()
+void Playlist::fillSongsFromSonglist(bool filter)
 {
     int an_int;
+
+    if (filter)
+        all_available_music->setAllVisible(false);
+
     QStringList list = QStringList::split(",", raw_songlist);
     QStringList::iterator it = list.begin();
     for (; it != list.end(); it++)
@@ -530,9 +534,18 @@ void Playlist::fillSongsFromSonglist()
         an_int = QString(*it).toInt();
         if (an_int != 0)
         {
-            Track *a_track = new Track(an_int, all_available_music);
-            a_track->setParent(this);
-            songs.append(a_track);
+            if (filter)
+            {
+                Metadata *md = all_available_music->getMetadata(an_int);
+                if(md)
+                    md->setVisible(true);
+            }
+            else
+            {
+                Track *a_track = new Track(an_int, all_available_music);
+                a_track->setParent(this);
+                songs.append(a_track);
+            }
         }
         else
         {
@@ -540,6 +553,12 @@ void Playlist::fillSongsFromSonglist()
             cerr << "playlist.o: Taking a 0 (zero) off a playlist" << endl;
             cerr << "            If this happens on repeated invocations of mythmusic, then something is really wrong" << endl;
         }
+    }
+
+    if (filter)
+    {
+        all_available_music->buildTree();
+        all_available_music->sortTree();
     }
 }
 
