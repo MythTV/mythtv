@@ -2730,6 +2730,25 @@ fi
 
 fi
 
+if test x"$frontend" = x"no" ; then
+    echo
+    echo "WARNING: --disable-frontend is only intended to aid porting."
+    echo "WARNING: THIS WILL BREAK THINGS. You are on your own now."
+    echo
+fi
+
+if test x"$backend" = x"no" ; then
+    echo
+    echo "WARNING: --disable-backend is only intended to aid porting."
+    echo "WARNING: You are on your own now."
+    echo
+    ivtv="no"
+    ivtv_header="no"
+    dbox2_dvb_box="no"
+    dvb="no"
+    dvb_eit="no"
+fi
+
 if test x"$mmx" = x"yes"; then
   CONFIG_DEFINES="$CONFIG_DEFINES MMX"
   if test x"$cpu" != x"x86_64" ; then
