@@ -1,7 +1,7 @@
 #ifndef WELCOMESETTINGS_H
 #define WELCOMESETTINGS_H
 
-#include <mythtv/settings.h>
+#include <settings.h>
 
 
 class MythWelcomeSettings: virtual public ConfigurationWizard {

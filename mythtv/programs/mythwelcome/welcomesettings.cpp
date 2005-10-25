@@ -1,4 +1,4 @@
-#include "mythtv/mythcontext.h"
+#include <mythcontext.h>
 
 #include <unistd.h>
 

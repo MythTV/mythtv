@@ -6,9 +6,9 @@
 using namespace std;
 #include <unistd.h>
 
-#include <mythtv/exitcodes.h>
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
+#include <exitcodes.h>
+#include <mythcontext.h>
+#include <mythdbcon.h>
 
 int lockShutdown()
 {

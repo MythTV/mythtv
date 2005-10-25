@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 
-#include <mythtv/mythdialogs.h>
+#include <mythdialogs.h>
 
 class WelcomeDialog : public MythThemedDialog
 {
