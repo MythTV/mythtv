@@ -223,12 +223,19 @@ TMPE="${TMPDIR1}/myth-conf-${RANDOM}-$$-${RANDOM}"
 
 has_library()
 {
-    LIBPATHS="`echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
-    if [ -f /etc/ld.so.conf ]; then
+    if test -f /etc/ld.so.conf ; then
         LIBPATHS=`cat /etc/ld.so.conf | grep -v "#" | grep -v "include"`
+    else
+        LIBPATHS=''
+    fi
 
-        # recurse down just one level, should be enough in most cases
-        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep "include "`
+    LIBPATHS="$LIBPATHS `echo $LD_LIBRARY_PATH | sed s/':'/' '/g` "
+    # Mac OS X has a different variable for this:
+    LIBPATHS="$LIBPATHS `echo $DYLD_LIBRARY_PATH | sed s/':'/' '/g` "
+
+    # recurse down just one level, should be enough in most cases
+    if test -f /etc/ld.so.conf ; then
+        INCL=`cat /etc/ld.so.conf | grep -v "#" | grep  "include"`
         SRCH=`echo $INCL | sed s/"include "//g`
         for x in $SRCH ; do
             LP_APPEND=`cat /etc/$x | grep -v "#" | grep -v "include"`
@@ -236,7 +243,7 @@ has_library()
         done
     fi
 
-    LIBPATHS="`echo $LIBPATHS $prefix/lib /lib /usr/lib | sed s/'\/ '/' '/g` "
+    LIBPATHS="`echo $LIBPATHS $prefix/lib /lib /usr/lib /usr/local/lib /usr/X11R6/lib | sed s/'\/ '/' '/g` "
 
     HAS_IT="no"
     for LIBPATH in $LIBPATHS ; do
@@ -394,17 +401,18 @@ fi
 if test "$browser" != "no" ; then
     hasit="no"
     if has_library libkhtml ; then
-        if has_header kde/khtml_part.h  ; then
-           hasit="yes"
+        if has_header kde/khtml_part.h                  || \
+           has_header /opt/kde3/include/khtml_part.h    || \
+           has_header /usr/kde/3.3/include/khtml_part.h || \
+           has_header /usr/kde/3.4/include/khtml_part.h || \
+           has_header khtml_part.h ; then
+            hasit="yes"
         fi
-        if has_header /opt/kde3/include/khtml_part.h ; then
-           hasit="yes"
-        fi
-   fi
-   if test "$hasit" = "no" ; then
-       echo "Disabling MythBrowser due to missing KDE development packages."
-       browser="no"
-   fi
+    fi
+    if test "$hasit" = "no" ; then
+        echo "Disabling MythBrowser due to missing KDE development packages."
+        browser="no"
+    fi
 fi
 
 if test "$festival" != "no" ; then
