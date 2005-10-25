@@ -6,6 +6,9 @@
 #ifndef SITYPES_H
 #define SITYPES_H
 
+#include <vector>
+using namespace std;
+
 #include <qmap.h>
 #include <qstringlist.h>
 #include <qdatetime.h>
@@ -223,26 +226,35 @@ public:
     // Do array for EIT Events
 };
 
-// Classes for tracking table loads
+/// Class for tracking DVB sections
 class SectionTracker
 {
-public:
-    SectionTracker() { Reset(); }
-    /* Clear values */
-    void Reset();
-    /* Mark certain sections unused (Only used in DVBEIT) */
+  public:
+    SectionTracker() : maxSections(-1), version(-1), empty(true) {;}
+
+    /// Clear values to defaults
+    void Reset(void);
+    /// Mark certain tables as unused (used for EIT).
     void MarkUnused(int Section);
-    /* Check for complete section load */
-    int Complete();
-    // Debug function to know what sections have been loaded
-    QString loadStatus();
+    /// Add a section to this tracker
+    int  AddSection(const tablehead *head);
 
-    int AddSection(tablehead *head);
+    /// Do we have all the entries?
+    bool IsComplete(void) const;
+    /// Do we have any entries?
+    bool IsEmpty(void)    const { return empty; }
+    /// Debug function to know what sections have been loaded
+    QString Status(void)  const;
 
-private:
-    int16_t MaxSections;       // Max number of sections
-    int8_t  Version;           // Table Version
-    uint8_t Filled[0x100];     // Fill status of each section
+    typedef enum fill_status
+    {
+        kStatusEmpty = 0, kStatusFilled = 1,  kStatusUnused = 2
+    } FillStatus;
+  private:
+    int        maxSections;         ///< Maximum number of sections
+    int        version;             ///< PSIP Table Version
+    bool       empty;               ///< do we have any section?
+    vector<FillStatus> fillStatus;  ///< Fill status of each section
 };
 
 // Tables to hold Actual Network Objects

@@ -56,6 +56,7 @@ enum VerboseMask {
     VB_LIBAV     = 0x0800,
     VB_JOBQUEUE  = 0x1000,
     VB_SIPARSER  = 0x2000,
+    VB_EIT       = 0x4000,
     VB_NONE      = 0x0000,
     VB_ALL       = 0xffff
 };

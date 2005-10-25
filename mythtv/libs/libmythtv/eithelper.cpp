@@ -102,7 +102,7 @@ uint EITHelper::ProcessEvents(int mplexid)
 
     if (insertCount != 0)
     {
-        VERBOSE(VB_SCHEDULE, QString ("EITHelper: Added %1 events")
+        VERBOSE(VB_EIT, QString ("EITHelper: Added %1 events")
                 .arg(insertCount));
     }
     return insertCount;
@@ -166,7 +166,7 @@ static int get_chan_id_from_db(int mplexid, const Event &event)
 
     if (query.size() <= 0)
     {
-        VERBOSE(VB_SIPARSER, QString(
+        VERBOSE(VB_EIT, QString(
                     "EITHelper: chanid not found for atscsrcid = %1 "
                     "and mplexid = %2, \n\t\t\tso event updates were skipped.")
             .arg(event.ServiceID).arg(mplexid));
@@ -221,13 +221,13 @@ static uint delete_invalid_programs_in_db(
         counter++;
         // New guide data overriding existing
         // Possibly more than one conflict
-        VERBOSE(VB_GENERAL, QString("Schedule Change on Channel %1")
+        VERBOSE(VB_EIT, QString("Schedule Change on Channel %1")
                 .arg(chanid));
-        VERBOSE(VB_GENERAL, QString("Old: %1 %2 %3")
+        VERBOSE(VB_EIT, QString("Old: %1 %2 %3")
                 .arg(query.value(0).toString())
                 .arg(query.value(1).toString())
                 .arg(query.value(2).toString()));
-        VERBOSE(VB_GENERAL, QString("New: %1 %2 %3")
+        VERBOSE(VB_EIT, QString("New: %1 %2 %3")
                 .arg(event.StartTime.
                      toString(QString("yyyy-MM-dd hh:mm:00")))
                 .arg(event.EndTime.

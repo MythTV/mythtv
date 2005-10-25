@@ -361,6 +361,11 @@ int main(int argc, char **argv)
                             print_verbose_messages |= VB_SIPARSER;
                             verboseString += " " + *it;
                         }
+                        else if(!strcmp(*it,"eit"))
+                        {
+                            print_verbose_messages |= VB_EIT;
+                            verboseString += " " + *it;
+                        }
                         else
                         {
                             cerr << "Unknown argument for -v/--verbose: "
@@ -427,7 +432,7 @@ int main(int argc, char **argv)
                     "                               Accepts any combination (separated by comma)" << endl << 
                     "                               of all,none,important,quiet,record,playback," << endl <<
                     "                               channel,osd,file,schedule,network,commflag," << endl <<
-                    "                               audio,libav,jobqueue,siparser" << endl <<
+                    "                               audio,libav,jobqueue,siparser,eit" << endl <<
                     "--printexpire                  List of auto-expire programs" << endl <<
                     "--printsched                   Upcoming scheduled programs" << endl <<
                     "--testsched                    Test run scheduler (ignore existing schedule)" << endl <<

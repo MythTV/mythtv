@@ -203,7 +203,7 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
         activeScanNextChan = activeScanChannels.begin();
     }
 
-    VERBOSE(VB_SIPARSER, "StartActiveScan called with "<<
+    VERBOSE(VB_EIT, "StartActiveScan called with "<<
             activeScanChannels.size()<<" channels");
 
     if (activeScanChannels.size())

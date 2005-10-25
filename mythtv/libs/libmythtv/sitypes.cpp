@@ -88,79 +88,91 @@ void TableSourcePIDObject::Reset()
     ChannelETT = 0;
 }
 
-void SectionTracker::Reset()
+void SectionTracker::Reset(void)
 {
-    MaxSections = -1;
-    Version = -1;
-    memset(&Filled, 0, sizeof(Filled));
+    maxSections = -1;
+    version     = -1;
+    empty       = true;
+    fillStatus.clear();
 }
 
-void SectionTracker::MarkUnused(int Section)
+void SectionTracker::MarkUnused(int section)
 {
-    if (Section > (MaxSections+1))
+    if (section > maxSections)
         return;
-    else
-        Filled[Section]=2;
+    
+    fillStatus[section] = kStatusUnused;
 }
 
-int SectionTracker::Complete()
+bool SectionTracker::IsComplete(void) const
 {
-    if (MaxSections == -1)
-        return 0;
-    for (int x = 0; x <= MaxSections; x++)
+    if (maxSections < 0)
+        return false;
+
+    for (int x = 0; x <= maxSections; x++)
     {
-        if (Filled[x] == 0)
-            return 0;
+        if (kStatusEmpty == fillStatus[x])
+            return false;
     }
-    return 1;
+
+    return true;
 }
 
-QString SectionTracker::loadStatus()
+QString SectionTracker::Status(void) const
 {
-    QString retval = "";
-    if (MaxSections == -1)
+    if (maxSections < 0)
         return QString("[---] ");
-    retval += QString("[");
-    for (int x=0;x<MaxSections+1;x++)
+
+    QString retval = "[";
+    for (int x = 0; x <= maxSections; x++)
     {
-        if (Filled[x] == 1)
-            retval += QString("P");
-        else if (Filled[x] == 2)
-            retval += QString("u");
-        else
-            retval += QString("m");
+        switch (fillStatus[x])
+        {
+            case kStatusEmpty:  retval += "m"; break;
+            case kStatusFilled: retval += "P"; break;
+            case kStatusUnused: retval += "u"; break;
+            default:            retval += "i"; break;
+        }
     }
-    retval += QString("] ");
-    return retval;
+
+    return retval + "] ";
 }
 
-int SectionTracker::AddSection(tablehead *head)
+int SectionTracker::AddSection(const tablehead *head)
 {
-    if (MaxSections == -1)
+    empty = false;
+    if (maxSections < 0)
     {
-         MaxSections = head->section_last;
-         Version = head->version;
-         Filled[head->section_number]=1;
+         maxSections = head->section_last;
+         version     = head->version;
+
+         fillStatus.clear();
+         fillStatus.resize(maxSections+10, kStatusEmpty);
+         fillStatus[head->section_number] = kStatusFilled;
          return 0;
     }
-    else if (Version != head->version)
+    else if (version != head->version)
     {
          Reset();
-         MaxSections = head->section_last;
-         Version = head->version;
-         Filled[head->section_number]=1;
+         maxSections = head->section_last;
+         version     = head->version;
+
+         fillStatus.clear();
+         fillStatus.resize(maxSections+10, kStatusEmpty);
+         fillStatus[head->section_number] = kStatusFilled;
          return -1;
     }
-    else
+    else if (head->section_number <= maxSections)
     {
-        if (Filled[head->section_number] == 1)
+        if (kStatusFilled == fillStatus[head->section_number])
              return 1;
         else
         {
-             Filled[head->section_number] = 1;
+             fillStatus[head->section_number] = kStatusFilled;
              return 0;
         }
     }
+    return 1; // just ignore it if it is outside bounds
 }
 
 void SDTObject::Reset()
@@ -456,7 +468,7 @@ void PATHandler::Request(uint16_t key)
 
 bool PATHandler::Complete()
 {
-    if (Tracker.Complete() && (!status.emitted))
+    if (Tracker.IsComplete() && (!status.emitted))
     {
         if (status.requestedEmit == false)
             status.emitted = true;
@@ -516,8 +528,11 @@ bool PMTHandler::EmitRequired()
     QMap_pullStatus::Iterator i;
     for (i = status.begin() ; i != status.end() ; ++i)
     {
-        if (i.data().requestedEmit && (i.data().emitted == false) && Tracker[i.key()].Complete())
+        if (i.data().requestedEmit && !i.data().emitted &&
+            Tracker[i.key()].IsComplete())
+        {
             return true;
+        }
     }
     return false;
 }
@@ -527,7 +542,8 @@ bool PMTHandler::GetEmitID(uint16_t& key0, uint16_t& key1)
     QMap_pullStatus::Iterator i;
     for (i = status.begin() ; i != status.end() ; ++i)
     {
-        if ((i.data().requestedEmit) && (i.data().emitted == false) && Tracker[i.key()].Complete())
+        if (i.data().requestedEmit && !i.data().emitted &&
+            Tracker[i.key()].IsComplete())
         {
             i.data().emitted = true;
             key0 = i.key();
@@ -593,7 +609,7 @@ void MGTHandler::Request(uint16_t key)
 
 bool MGTHandler::Complete()
 {
-    if (Tracker.Complete() && (!status.emitted))
+    if (Tracker.IsComplete() && !status.emitted)
     {
         if (status.requestedEmit == false)
             status.emitted = true;
@@ -640,7 +656,7 @@ void STTHandler::Request(uint16_t key)
 
 bool STTHandler::Complete()
 {
-    if (Tracker.Complete() && (!status.emitted))
+    if (Tracker.IsComplete() && !status.emitted)
     {
         if (status.requestedEmit == false)
             status.emitted = true;
@@ -792,11 +808,16 @@ bool EventHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)
 void EventHandler::RequestEmit(uint16_t key)
 {
 #ifdef EIT_DEBUG_SID
-    fprintf(stdout,"EventHandler::RequestEmit for serviceid=%i\n", key);
+    VERBOSE(VB_EIT, QString("EventHandler::RequestEmit for serviceid = %1")
+            .arg(key));
 #endif
+
     status[key].requested = true;
     status[key].requestedEmit = true;
     status[key].emitted = false;
+// HACK begin -- this is probably not the right place to set this
+    status[key].pulling = true;
+// HACK end
 }
 
 bool EventHandler::EmitRequired()
@@ -814,29 +835,52 @@ bool EventHandler::EmitRequired()
         if (!(sttloaded))
             return false;
     }
+
     if (!(servicesloaded))
+    {
+#ifdef EIT_DEBUG_SID
+        static int n =0;
+        if (!(n++%100))
+            VERBOSE(VB_EIT, "EventHandler::EmitRequired no services");
+#endif
         return false;
+    }
 
     for (s = status.begin() ; s != status.end() ; ++s)
     {
-        if (s.data().emitted || !s.data().pulling)
+#ifdef EIT_DEBUG_SID
+        if (s.key() == EIT_DEBUG_SID &&
+            (s.data().emitted || !s.data().pulling))
         {
-            continue;
+            VERBOSE(VB_EIT, QString("EventHandler::EmitRequired %1: "
+                                    "not pulling").arg(EIT_DEBUG_SID));
         }
+#endif
+        if (s.data().emitted || !s.data().pulling)
+            continue;
+
+        if (!TrackerSetup[s.key()])
+            continue;
 
         AllComplete = true;
         /* Make sure all sections are being pulled otherwise your not done */
-        if (TrackerSetup[s.key()] == false)
-            AllComplete = false;
         for (i = Tracker[s.key()].begin() ; i != Tracker[s.key()].end() ; ++i)
         {
-            if (!i.data().Complete())
+            if (!i.data().IsComplete())
             {
+#ifdef EIT_DEBUG_SID
+                if (s.key() == EIT_DEBUG_SID)
+                {
+                    VERBOSE(VB_EIT, QString("EventHandler::EmitRequired %1:"
+                                            " 0x%2 is not complete")
+                            .arg(EIT_DEBUG_SID).arg(i.key(),0,16));
+                }
+#endif
                 AllComplete = false;
                 break;
             }
         }
-        if (SIStandard == SI_STANDARD_ATSC)
+        if (AllComplete && (SIStandard == SI_STANDARD_ATSC))
         {
             for (e = Events[s.key()].begin() ; e != Events[s.key()].end() ; ++e)
             {
@@ -857,6 +901,13 @@ bool EventHandler::EmitRequired()
                 }
             }
         }
+#ifdef EIT_DEBUG_SID
+        if (s.key() == EIT_DEBUG_SID)
+        {
+            VERBOSE(VB_EIT, "EventHandler::EmitRequired (End) "
+                    <<EIT_DEBUG_SID<<": AllComplete = "<<AllComplete);
+        }
+#endif
         if (AllComplete)
             return true;
     }
@@ -866,7 +917,6 @@ bool EventHandler::EmitRequired()
 bool EventHandler::GetEmitID(uint16_t& key0, uint16_t& key1)
 {
     QMap_pidHandler::Iterator p;
-    QMap_SectionTracker::Iterator i;
     QMap_pullStatus::Iterator s;
     QMap_Events::Iterator e;
     bool AllComplete;
@@ -877,14 +927,22 @@ bool EventHandler::GetEmitID(uint16_t& key0, uint16_t& key1)
         {
             AllComplete = true;
             if (TrackerSetup[s.key()] == false)
-                AllComplete = false;
-            /* Make sure all sections are being pulled otherwise your not done */
-            for (i = Tracker[s.key()].begin() ; i != Tracker[s.key()].end() ; ++i)
+                continue;
+
+            // Make sure all sections are being pulled,
+            // otherwise your not done.
+            QMap_SectionTracker::Iterator it = Tracker[s.key()].begin();
+            while (it != Tracker[s.key()].end())
             {
-                if (!(i.data().Complete()))
+                if (!(it.data().IsComplete()))
+                {
                     AllComplete = false;
+                    break;
+                }
+                ++it;
             }
-            if (SIStandard == SI_STANDARD_ATSC)
+
+            if (AllComplete && (SIStandard == SI_STANDARD_ATSC))
             {
                 for (e = Events[s.key()].begin() ; e != Events[s.key()].end() ; ++e)
                 {
@@ -962,10 +1020,25 @@ bool EventHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
     int retval = false;
 
 #ifdef EIT_DEBUG_SID
-    if (key0 == EIT_DEBUG_SID) {
-        printf("EventHandler::AddSection sid=%i eid=%i version=%i section %02x of %02x\n", key0, key1, head->version, head->section_number, head->section_last);
+    if (key0 == EIT_DEBUG_SID)
+    {
+        VERBOSE(VB_EIT, QString("EventHandler::AddSection sid(%1) eid(%2) "
+                                "version(%3) section 0x%4 of %0x%5")
+                .arg(key0).arg(key1).arg(head->version)
+                .arg(head->section_number,0,16).arg(head->section_last,0,16));
     }
 #endif
+
+// HACK begin -- this is probably not the right place to set this
+    // If we are interested in this but the tracker does not have any
+    // data in it then set the status back to pulling if appropriate.
+    if (status[key0].requestedEmit && status[key0].emitted &&
+        Tracker[key0][key1].IsEmpty())
+    {
+        status[key0].pulling = true;
+        status[key0].emitted = false;
+    }
+// HACK end
 
     if (SIStandard == SI_STANDARD_ATSC)
     {
@@ -982,9 +1055,10 @@ bool EventHandler::AddSection(tablehead_t *head, uint16_t key0, uint16_t key1)
     if (SIStandard == SI_STANDARD_DVB)
     {
 #ifdef EIT_DEBUG_SID
-        if (key0 == EIT_DEBUG_SID) {
-            QString foo = Tracker[key0][key1].loadStatus();
-            printf("%s\n", foo.ascii());
+        if (key0 == EIT_DEBUG_SID)
+        {
+            QString foo = Tracker[key0][key1].Status();
+            VERBOSE(VB_EIT, "EventHandler::AddSection Status: "<<foo);
         }
 #endif
         return Tracker[key0][key1].AddSection(head);
@@ -1126,7 +1200,7 @@ bool NetworkHandler::Complete()
     if (CompleteSent)
         return false;
 
-    if ((status.pulling == true) && (Tracker.Complete()) )
+    if (status.pulling && Tracker.IsComplete())
     {
         CompleteSent = true;
         return true;
@@ -1174,9 +1248,7 @@ void NetworkHandler::RequestEmit(uint16_t key)
 
 bool NetworkHandler::EmitRequired()
 {
-    if ((status.emitted == false) && (Tracker.Complete()) && (status.requestedEmit))
-        return true;
-    return false;
+    return !status.emitted && status.requestedEmit && Tracker.IsComplete();
 }
 
 bool NetworkHandler::GetEmitID(uint16_t& key0, uint16_t& key1)
