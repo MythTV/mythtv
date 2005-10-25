@@ -5559,8 +5559,9 @@ static int decode_vol_header(MpegEncContext *s, GetBitContext *gb){
 
     if (get_bits1(gb) != 0) {   /* fixed_vop_rate  */
         s->avctx->time_base.num = get_bits(gb, s->time_increment_bits);
-    }else
-        s->avctx->time_base.num = 1;
+    } else { /* fix for h263 frame rate */
+        s->avctx->time_base.num = (s->avctx->time_base.den>10000) ? 1001 : 1;
+    }
 
     s->t_frame=0;
 

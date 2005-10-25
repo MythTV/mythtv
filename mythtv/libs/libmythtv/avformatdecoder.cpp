@@ -678,9 +678,17 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
 void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
 {
     fps = 1 / av_q2d(enc->time_base);
+
     // Some formats report fps waaay too high. (wrong time_base)
-    if (fps > 100)
-        fps /= 100;
+    if (fps > 100.0f && (enc->time_base.den > 10000) &&
+        (enc->time_base.num == 1))
+    {
+        enc->time_base.num = 1001;  // seems pretty standard
+        if (av_q2d(enc->time_base) > 0)
+            fps = 1.0f / av_q2d(enc->time_base);
+    }
+    // If it is still out of range, just assume NTSC...
+    fps = (fps > 100.0f) ? (30000.0f / 1001.0f) : fps;
 
     float aspect_ratio;
     if (enc->sample_aspect_ratio.num == 0)
