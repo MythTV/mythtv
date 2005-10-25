@@ -5,8 +5,8 @@
 #include <cmath>
 #include <ctime>
 #include <cerrno>
-#include <malloc.h>
 
+#include <malloc.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>
@@ -65,6 +65,7 @@ static void clear_xv_buffers(VideoBuffers&, int w, int h, int xv_chroma);
 
 // See http://www.fourcc.org/yuv.php for more info on formats
 #define GUID_I420_PLANAR 0x30323449
+#define GUID_IYUV_PLANAR 0x56555949 /**< bit equivalent to I420 */
 #define GUID_YV12_PLANAR 0x32315659
 
 static void SetFromEnv(bool &useXvVLD, bool &useXvIDCT, bool &useXvMC,
@@ -457,9 +458,8 @@ void VideoOutputXv::InitDisplayMeasurements(uint width, uint height)
     float pixel_aspect = ((float)w) / ((float)h);
 
     VERBOSE(VB_PLAYBACK, LOC + QString(
-                "Window pixel dimensions: %1x%2"
-                "\n\t\t\tScreen pixel dimensions: %1x%2")
-            .arg(window_w).arg(window_h).arg(w).arg(h));
+                "Pixel dimensions: Screen %1x%2, window %3x%4")
+            .arg(w).arg(h).arg(window_w).arg(window_h));
 
     // Determine if we are using Xinerama
     int event_base, error_base;
@@ -848,7 +848,8 @@ bool VideoOutputXv::InitXVideo()
     X11S(fo = XvListImageFormats(XJ_disp, xv_port, &formats));
     for (int i = 0; i < formats; i++)
     {
-        if (fo[i].id == GUID_I420_PLANAR)
+        if ((fo[i].id == GUID_I420_PLANAR) ||
+            (fo[i].id == GUID_IYUV_PLANAR))
         {
             foundimageformat = true;
             xv_chroma = GUID_I420_PLANAR;
@@ -865,12 +866,25 @@ bool VideoOutputXv::InitXVideo()
                 xv_chroma = GUID_YV12_PLANAR;
             }
         }
-    } 
+    }
+
+    for (int i = 0; i < formats; i++)
+    {
+        char *chr = (char*) &(fo[i].id);
+        VERBOSE(VB_PLAYBACK, LOC + QString("XVideo Format #%1 is '%2%3%4%5'")
+                .arg(i).arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
+    }
 
     if (fo)
         X11S(XFree(fo));
 
-    if (!foundimageformat)
+    if (foundimageformat)
+    {
+        char *chr = (char*) &xv_chroma;
+        VERBOSE(VB_PLAYBACK, LOC + QString("Using XVideo Format '%1%2%3%4'")
+                .arg(chr[0]).arg(chr[1]).arg(chr[2]).arg(chr[3]));
+    }
+    else
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Couldn't find the proper XVideo image format.");
