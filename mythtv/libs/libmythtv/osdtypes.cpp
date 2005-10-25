@@ -900,30 +900,14 @@ void OSDTypeImage::LoadFromQImage(const QImage &img)
     m_imagesize = QRect(0, 0, imwidth, imheight);
 }
 
-void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff, 
-                        int yoff)
+void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade,
+                        int xoff, int yoff)
 {
     if (!m_isvalid)
         return;
 
-    unsigned char *dest, *destalpha, *src, *srcalpha;
-    unsigned char *udest, *vdest, *usrc, *vsrc;
-    int alpha, iwidth, drawwidth;
-
-    iwidth = drawwidth = m_imagesize.width();
-    int drawheight = m_imagesize.height();
-
-    if (m_drawwidth >= 0)
-        drawwidth = m_drawwidth;
-
-    int ystart = m_displaypos.y();
-    int xstart = m_displaypos.x();
-
-    xstart += xoff;
-    ystart += yoff;
-
-    ystart = (ystart / 2) * 2;
-    xstart = ((xstart + 1) / 2) * 2;
+    int xstart = ((m_displaypos.x() + xoff + 1) / 2) * 2;
+    int ystart = ((m_displaypos.y() + yoff)     / 2) * 2;
 
     int startline = 0;
     int startcol = 0;
@@ -940,27 +924,24 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         xstart = 0;
     }
 
-    if (drawheight + ystart > surface->height)
-        drawheight = surface->height - ystart - 1;
-    if (drawwidth + xstart > surface->width)
-        drawwidth = surface->width - xstart - 1;
+    int iwidth     = m_imagesize.width();
+    int drawwidth  = (m_drawwidth >= 0) ? m_drawwidth : m_imagesize.width();
+    int drawheight = m_imagesize.height();
 
-    if (drawwidth == 0 || drawheight == 0)
+    drawwidth = (drawwidth + xstart > surface->width) ?
+        surface->width - xstart - 1 : drawwidth;
+
+    drawheight = (drawheight + ystart > surface->height) ?
+        surface->height - ystart - 1 : drawheight;
+ 
+    if ((drawwidth <= 0) || (drawheight <= 0))
         return;
 
     QRect destRect = QRect(xstart, ystart, drawwidth, drawheight);
-    bool needblend = false;
+    bool needblend = m_onlyusefirst || surface->IntersectsDrawn(destRect);
 
-    if (m_onlyusefirst || surface->IntersectsDrawn(destRect))
-        needblend = true;
     surface->AddRect(destRect);
     
-    int ysrcwidth;
-    int ydestwidth;
-
-    int uvsrcwidth;
-    int uvdestwidth;
-
     int alphamod = 255;
 
     if (maxfade > 0 && fade >= 0)
@@ -970,17 +951,17 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
     {
         for (int y = startline; y < drawheight; y++)
         {
-            ysrcwidth = y * iwidth;
-            ydestwidth = (y + ystart - startline) * surface->width;
+            int ysrcwidth = y * iwidth;
+            int ydestwidth = (y + ystart - startline) * surface->width;
 
             memcpy(surface->y + xstart + ydestwidth,
                    m_ybuffer + startcol + ysrcwidth, drawwidth);
 
-            destalpha = surface->alpha + xstart + ydestwidth;
+            unsigned char *destalpha = surface->alpha + xstart + ydestwidth;
 
             for (int x = startcol; x < drawwidth; x++)
             {
-                alpha = *(m_alpha + x + ysrcwidth);
+                int alpha = *(m_alpha + x + ysrcwidth);
   
                 if (alpha == 0)
                     *destalpha = 0;
@@ -991,20 +972,18 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
             }
         }
 
-        iwidth /= 2;
-        drawwidth /= 2;
+        iwidth     /= 2;
+        drawwidth  /= 2;
         drawheight /= 2;
-
-        ystart /= 2;
-        xstart /= 2;
-
-        startline /= 2;
-        startcol /= 2;
+        ystart     /= 2;
+        xstart     /= 2;
+        startline  /= 2;
+        startcol   /= 2;
 
         for (int y = startline; y < drawheight; y++)
         {
-            uvsrcwidth = y * iwidth;
-            uvdestwidth = (y + ystart - startline) * (surface->width / 2);
+            int uvsrcwidth = y * iwidth;
+            int uvdestwidth = (y + ystart - startline) * (surface->width / 2);
 
             memcpy(surface->u + xstart + uvdestwidth,
                    m_ubuffer + startcol + uvsrcwidth, drawwidth);
@@ -1015,27 +994,22 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
         return;
     }
 
-    int startingx = startcol;
-    if (m_onlyusefirst)
-        startingx = 0;
+    int ysrcwidth   = startline * iwidth;
+    int uvsrcwidth  = ysrcwidth  / 4;
+    int startingx   = (m_onlyusefirst) ? 0 : startcol;
 
-    ysrcwidth = startline * iwidth;
-    ydestwidth = ystart * surface->width;
+    unsigned char *src       = m_ybuffer      + ysrcwidth  + startingx;
+    unsigned char *usrc      = m_ubuffer      + uvsrcwidth + startingx / 2;
+    unsigned char *vsrc      = m_vbuffer      + uvsrcwidth + startingx / 2;
+    unsigned char *srcalpha  = m_alpha        + ysrcwidth  + startingx;
 
-    dest = surface->y + xstart + ydestwidth;
-    destalpha = surface->alpha + xstart + ydestwidth;
-    src = m_ybuffer + ysrcwidth + startingx;
+    int ydestwidth  = ystart * surface->width;
+    int uvdestwidth = ydestwidth / 4;
 
-    srcalpha = m_alpha + ysrcwidth + startingx;
-
-    uvsrcwidth = ysrcwidth / 4;
-    uvdestwidth = ydestwidth / 4;
-
-    udest = surface->u + xstart / 2 + uvdestwidth;
-    usrc = m_ubuffer + uvsrcwidth + startingx / 2;
-
-    vdest = surface->v + xstart / 2 + uvdestwidth;
-    vsrc = m_vbuffer + uvsrcwidth + startingx / 2;
+    unsigned char *dest      = surface->y     + xstart     + ydestwidth;
+    unsigned char *udest     = surface->u     + xstart / 2 + uvdestwidth;
+    unsigned char *vdest     = surface->v     + xstart / 2 + uvdestwidth;
+    unsigned char *destalpha = surface->alpha + xstart     + ydestwidth;
 
     if (m_onlyusefirst)
         (surface->blendcolumnfunc) (src, usrc, vsrc, srcalpha, iwidth, dest,
@@ -1053,7 +1027,7 @@ void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
                                     surface->pow_lut);
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 OSDTypePosSlider::OSDTypePosSlider(const QString &name,
                                    const QString &filename,
