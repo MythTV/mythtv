@@ -185,7 +185,7 @@ TV::TV(void)
       menurunning(false), runMainLoop(false), wantsToQuit(true),
       exitPlayer(false), paused(false), errored(false),
       stretchAdjustment(false),
-      audiosyncAdjustment(false), audiosyncBaseline(0),
+      audiosyncAdjustment(false), audiosyncBaseline(LONG_LONG_MIN),
       editmode(false), zoomMode(false), sigMonMode(false),
       update_osd_pos(false), endOfRecording(false), requestDelete(false),
       doSmartForward(false), switchingCards(false), lastRecorderNum(-1),
@@ -3874,7 +3874,7 @@ void TV::ChangeAudioSync(int dir, bool allowEdit)
 {
     long long newval;
 
-    if (!audiosyncAdjustment)
+    if (!audiosyncAdjustment && LONG_LONG_MIN == audiosyncBaseline)
         audiosyncBaseline = activenvp->GetAudioTimecodeOffset();
 
     audiosyncAdjustment = allowEdit;
