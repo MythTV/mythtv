@@ -170,6 +170,29 @@ class Metadata
 bool operator==(const Metadata& a, const Metadata& b);
 bool operator!=(const Metadata& a, const Metadata& b);
 
+class MetadataPtrList : public QPtrList<Metadata>
+{
+  public:
+    MetadataPtrList() {}
+    ~MetadataPtrList() {}
+
+  protected:
+    int compareItems(QPtrCollection::Item item1,
+                     QPtrCollection::Item item2);
+};
+
+class MusicNode;
+class MusicNodePtrList : public QPtrList<MusicNode>
+{
+  public:
+    MusicNodePtrList() {}
+    ~MusicNodePtrList() {}
+
+  protected:
+    int compareItems(QPtrCollection::Item item1,
+                     QPtrCollection::Item item2);
+};
+
 class MusicNode
 {
     //  Not a root of the music tree, and
@@ -199,8 +222,8 @@ class MusicNode
  
   private:
   
-    QPtrList<Metadata>  my_tracks;
-    QPtrList<MusicNode> my_subnodes;
+    MetadataPtrList     my_tracks;
+    MusicNodePtrList    my_subnodes;
     QString             my_title;
     QString             my_level;
 
@@ -267,8 +290,8 @@ class AllMusic
     
   private:
   
-    QPtrList<Metadata>  all_music;
-    QPtrList<MusicNode> top_nodes;
+    MetadataPtrList     all_music;
+    MusicNodePtrList    top_nodes;
     MusicNode           *root_node;
     
     

@@ -809,42 +809,9 @@ void AllMusic::sortTree()
 {
     root_node->sort();
 
-    bool something_changed;
-    QString Title1;
-    QString Title2;
-    
     //  sort top level nodes
     
-    something_changed = false;
-    if(top_nodes.count() > 1)
-    {
-        something_changed = true;
-    }
-    while(something_changed)
-    {
-        something_changed = false;
-        for(uint i = 0; i < top_nodes.count() - 1;)
-        {
-            Title1 = top_nodes.at(i)->getTitle().lower();
-            Title2 = top_nodes.at(i+1)->getTitle().lower();
-
-            if (Title1.left(4) == thePrefix)
-                Title1 = Title1.mid(4);
-            if (Title2.left(4) == thePrefix)
-                Title2 = Title2.mid(4);
-           
-            if(qstrcmp(Title1, Title2) > 0)
-            {
-                something_changed = true;
-                MusicNode *temp = top_nodes.take(i + 1);
-                top_nodes.insert(i, temp);
-            }
-            else
-            {
-                ++i;
-            }
-        }
-    }
+    top_nodes.sort();
     
     //  tell top level nodes to sort from themselves 
     //  downwards
@@ -1400,69 +1367,13 @@ void MusicNode::writeTree(GenericTree *tree_to_write_to, int a_counter)
 
 void MusicNode::sort()
 {
-    bool something_changed;
-    QString Title1, Title2;
-
     //  Sort any tracks
-    
-    something_changed = false;
-    if(my_tracks.count() > 1)
-    {
-        something_changed = true;
-    }
-    while(something_changed)
-    {
-        something_changed = false;
-        for(uint i = 0; i < my_tracks.count() - 1;)
-        {
-            if(my_tracks.at(i)->Track() > my_tracks.at(i+1)->Track())
-            {
-                something_changed = true;
-                Metadata *temp = my_tracks.take(i + 1);
-                my_tracks.insert(i, temp);
-            }
-            else
-            {
-                ++i;
-            }
-        }
-    }
+    my_tracks.sort();
 
     //  Sort any subnodes
-    
-    something_changed = false;
-    if(my_subnodes.count() > 1)
-    {
-        something_changed = true;
-    }
-    while(something_changed)
-    {
-        something_changed = false;
-        for(uint i = 0; i < my_subnodes.count() - 1;)
-        {
-            Title1 = my_subnodes.at(i)->getTitle().lower();
-            Title2 = my_subnodes.at(i+1)->getTitle().lower();
-
-            if (Title1.left(4) == thePrefix)
-                Title1 = Title1.mid(4);
-            if (Title2.left(4) == thePrefix)
-                Title2 = Title2.mid(4);
-
-            if(qstrcmp(Title1, Title2) > 0)
-            {
-                something_changed = true;
-                MusicNode *temp = my_subnodes.take(i + 1);
-                my_subnodes.insert(i, temp);
-            }
-            else
-            {
-                ++i;
-            }
-        }
-    }
+    my_subnodes.sort();
     
     //  Tell any subnodes to sort themselves
-
     QPtrListIterator<MusicNode> iter(my_subnodes);
     MusicNode *crawler;
     while ( (crawler = iter.current()) != 0 )
@@ -1503,3 +1414,26 @@ void MusicNode::printYourself(int indent_level)
     }
 }
 
+/**************************************************************************/
+
+int MetadataPtrList::compareItems(QPtrCollection::Item item1, 
+                                  QPtrCollection::Item item2)
+{
+    return ((Metadata*)item2)->Track() - ((Metadata*)item1)->Track();
+}
+
+int MusicNodePtrList::compareItems (QPtrCollection::Item item1, 
+                                    QPtrCollection::Item item2)
+{
+    MusicNode *itemA = (MusicNode*)item1;
+    MusicNode *itemB = (MusicNode*)item2;
+
+    QString title1 = itemA->getTitle().lower();
+    QString title2 = itemB->getTitle().lower();
+    
+    // Cut "the " off the front of titles
+    title1 = (title1.lower().left(4) == thePrefix) ? title1.mid(4) : title1;
+    title2 = (title2.lower().left(4) == thePrefix) ? title2.mid(4) : title2;
+
+    return qstrcmp(title1, title2);
+}
