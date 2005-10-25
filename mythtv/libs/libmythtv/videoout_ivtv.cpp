@@ -47,6 +47,8 @@ VideoOutputIvtv::VideoOutputIvtv(void)
     videoDevice = "/dev/video16";
     driver_version = 0;
     last_speed = 1.0;
+    frame_at_speed_change = 0;
+    internal_offset = 0;
     last_normal = true;
     last_mask = 2;
     osdbuffer = NULL;
@@ -447,6 +449,9 @@ void VideoOutputIvtv::Stop(bool hide)
             break;
         }
     }
+
+    frame_at_speed_change = 0;
+    internal_offset       = 0;
 }
 
 void VideoOutputIvtv::Pause(void)
@@ -496,7 +501,7 @@ int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int len)
     return count;
 }
 
-int VideoOutputIvtv::GetFramesPlayed(void)
+int VideoOutputIvtv::GetFirmwareFramesPlayed(void)
 {
     struct ivtv_ioctl_framesync frameinfo;
     memset(&frameinfo, 0, sizeof frameinfo);
@@ -505,6 +510,13 @@ int VideoOutputIvtv::GetFramesPlayed(void)
         perror("IVTV_IOC_GET_TIMING");
 
     return frameinfo.frame;
+}
+
+int VideoOutputIvtv::GetFramesPlayed(void)
+{
+    int frame = GetFirmwareFramesPlayed();
+    int f = internal_offset + (frame - frame_at_speed_change) * last_speed;
+    return (int)round(f);
 }
 
 bool VideoOutputIvtv::Play(float speed, bool normal, int mask)
@@ -525,6 +537,9 @@ bool VideoOutputIvtv::Play(float speed, bool normal, int mask)
     play.aud_mute = !normal;
     play.fr_field = 0;
     play.mute = 0;
+
+    internal_offset = GetFramesPlayed();
+    frame_at_speed_change = GetFirmwareFramesPlayed();
 
     while (ioctl(videofd, IVTV_IOC_S_SPEED, &play) < 0)
     {

@@ -52,11 +52,18 @@ class VideoOutputIvtv: public VideoOutput
     int GetFramesPlayed(void);
 
   private:
-    typedef enum { kAlpha_Solid, kAlpha_Local, kAlpha_Clear, kAlpha_Embedded } eAlphaState;
+    typedef enum
+    {
+        kAlpha_Solid,
+        kAlpha_Local,
+        kAlpha_Clear,
+        kAlpha_Embedded
+    } eAlphaState;
 
     void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     void SetAlpha(eAlphaState newAlpha);
- 
+    int  GetFirmwareFramesPlayed(void);
+
     int videofd;
     int fbfd;
 
@@ -81,6 +88,9 @@ class VideoOutputIvtv: public VideoOutput
     int osdbufsize;
 
     float last_speed;
+    int   internal_offset;
+    int   frame_at_speed_change;
+
     bool last_normal;
     int last_mask;
     eAlphaState alphaState;
