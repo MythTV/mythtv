@@ -328,7 +328,7 @@ void BookmarksConfig::setupView()
 
     scrollspeed = new MythSpinBox(this);
     scrollspeed->setMinValue(1);
-    scrollspeed->setMaxValue(8);
+    scrollspeed->setMaxValue(16);
     scrollspeed->setLineStep(1);
     hbox3->addWidget(scrollspeed);
     scrollspeed->setValue(gContext->GetNumSetting("WebBrowserScrollSpeed", 4));
