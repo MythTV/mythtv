@@ -143,7 +143,6 @@ NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
       vsynctol(30/4),               avsync_delay(0),
       avsync_adjustment(0),         avsync_avg(0),
       avsync_oldavg(0),             refreshrate(0),
-      lastaudiotime(0),             audio_timecode_offset(0),
       lastsync(false),              m_playing_slower(false),
       m_stored_audio_stretchfactor(1.0),
       // Audio warping stuff
@@ -1451,19 +1450,16 @@ void NuppelVideoPlayer::AVSync(void)
     if (audioOutput && normal_speed)
     {
         long long currentaudiotime = audioOutput->GetAudiotime();
-        if (audio_timecode_offset == (long long)0x8000000000000000LL)
-            audio_timecode_offset = buffer->timecode - currentaudiotime;
-
-        // ms, same scale as timecodes
-        lastaudiotime = currentaudiotime + audio_timecode_offset;
 #if 0
-        VERBOSE(VB_PLAYBACK, QString("A/V timecodes audio %1 video %2 frameinterval %3 avdel %4 avg %5 tcoffset %6")
-                .arg(lastaudiotime)
+        VERBOSE(VB_PLAYBACK, QString(
+                    "A/V timecodes audio %1 video %2 frameinterval %3 "
+                    "avdel %4 avg %5 tcoffset %6")
+                .arg(currentaudiotime)
                 .arg(buffer->timecode)
                 .arg(frame_interval)
-                .arg(buffer->timecode - lastaudiotime)
+                .arg(buffer->timecode - currentaudiotime)
                 .arg(avsync_avg)
-                .arg(audio_timecode_offset)
+                .arg(tc_wrap[TC_AUDIO])
                  );
 #endif
         if (currentaudiotime != 0 && buffer->timecode != 0)
@@ -1484,7 +1480,7 @@ void NuppelVideoPlayer::AVSync(void)
                     videosync->AdvanceTrigger();
             }
 
-            avsync_delay = (buffer->timecode - lastaudiotime) * 1000; // uSecs
+            avsync_delay = (buffer->timecode - currentaudiotime) * 1000;//usec
             avsync_avg = (avsync_delay + (avsync_avg * 3)) / 4;
             if (!usevideotimebase)
             {
@@ -1653,7 +1649,6 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
 
 void NuppelVideoPlayer::OutputVideoLoop(void)
 {
-    lastaudiotime = 0;
     delay = 0;
     avsync_delay = 0;
     avsync_avg = 0;
@@ -2195,6 +2190,16 @@ void NuppelVideoPlayer::SetTranscoding(bool value)
 
 void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type) 
 {
+    if ((tc_type == TC_AUDIO) && (tc_wrap[TC_AUDIO] == LONG_LONG_MIN))
+    {
+        long long newaudio;
+        newaudio = tc_lastval[TC_VIDEO] - tc_diff_estimate;
+        tc_wrap[TC_AUDIO] = newaudio - timecode;
+        timecode = newaudio;
+        tc_lastval[TC_AUDIO] = timecode;
+        VERBOSE(VB_IMPORTANT, "Manual Resync AV sync values");
+    }
+
     timecode += tc_wrap[tc_type];
 
     // wrapped
@@ -2213,6 +2218,8 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
         tc_avcheck_framecounter++;
         if (tc_avcheck_framecounter == 30)
         {
+#define AUTO_RESYNC 1
+#if AUTO_RESYNC
             // something's terribly, terribly wrong.
             if (tc_lastval[TC_AUDIO] < tc_lastval[TC_VIDEO] - 10000000 ||
                 tc_lastval[TC_VIDEO] < tc_lastval[TC_AUDIO] - 10000000)
@@ -2224,6 +2231,7 @@ void NuppelVideoPlayer::WrapTimecode(long long &timecode, TCTypes tc_type)
                 tc_lastval[TC_AUDIO] = timecode;
                 VERBOSE(VB_IMPORTANT, "Guessing at new AV sync values");
             }
+#endif
 
             tc_diff_estimate = tc_lastval[TC_VIDEO] - tc_lastval[TC_AUDIO];
             tc_avcheck_framecounter = 0;

@@ -229,13 +229,13 @@ class NuppelVideoPlayer
 
     // Time Code adjustment stuff
     long long AdjustAudioTimecodeOffset(long long v)
-        { audio_timecode_offset += v;  return audio_timecode_offset; }
+        { tc_wrap[TC_AUDIO] += v;  return tc_wrap[TC_AUDIO]; }
     long long ResetAudioTimecodeOffset(void)
-        { audio_timecode_offset = 0LL; return audio_timecode_offset; }
+        { tc_wrap[TC_AUDIO] = 0LL; return tc_wrap[TC_AUDIO]; }
     long long ResyncAudioTimecodeOffset(void)
-        { audio_timecode_offset = 0x8000LL << 12; return 0L; }
+        { tc_wrap[TC_AUDIO] = LONG_LONG_MIN; return 0L; }
     long long GetAudioTimecodeOffset(void) const 
-        { return audio_timecode_offset; }
+        { return tc_wrap[TC_AUDIO]; }
  
   protected:
     void DisplayPauseFrame(void);
@@ -514,8 +514,6 @@ class NuppelVideoPlayer
     int        avsync_avg;
     int        avsync_oldavg;
     int        refreshrate;
-    long long  lastaudiotime;
-    long long  audio_timecode_offset;
     bool       lastsync;
     bool       m_playing_slower;
     float      m_stored_audio_stretchfactor;
