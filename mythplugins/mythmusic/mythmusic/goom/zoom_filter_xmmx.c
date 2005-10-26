@@ -68,7 +68,7 @@ void zoom_filter_xmmx (int prevX, int prevY,
 			__asm__ __volatile__ (
 				"movq %0,%%mm0\n"
 				"movq %1,%%mm1\n"
-				: :"X"(brutS[loop]),"X"(brutD[loop])
+				: :"m"(brutS[loop]),"m"(brutD[loop])
 				);               /* mm0 = S */
 			
 			psubd_r2r (mm0,mm1);           /* mm1 = D - S */
