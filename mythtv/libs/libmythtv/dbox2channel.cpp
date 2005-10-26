@@ -23,7 +23,6 @@ DBox2Channel::DBox2Channel(TVRec *parent, DBox2DBOptions *dbox2_options,
       http(new QHttp()),             httpChanger(new QHttp()),
       m_dbox2channelcount(0)
 {
-    capchannels = 1;
     channelnames[0] = "DBOX2";
 
     connect(http,        SIGNAL(           done(bool)),

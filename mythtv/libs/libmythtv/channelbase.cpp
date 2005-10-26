@@ -19,10 +19,13 @@
 #include <iostream>
 using namespace std;
 
+#define LOC QString("ChannelBase(%1): ").arg(GetCardID())
+#define LOC_ERR QString("ChannelBase(%1) Error: ").arg(GetCardID())
+
 ChannelBase::ChannelBase(TVRec *parent)
     : 
     pParent(parent), channelorder("channum + 0"), curchannelname(""),
-    capchannels(0), currentcapchannel(-1), commfree(false),
+    currentcapchannel(-1), commfree(false),
     currentATSCMajorChannel(-1), currentATSCMinorChannel(-1),
     currentProgramNum(-1)
 {
@@ -49,35 +52,58 @@ bool ChannelBase::SetChannelByDirection(ChannelChangeDirection dir)
     return fTune;
 }
 
+int ChannelBase::GetNextInput(void) const
+{
+    QMap<int, QString>::const_iterator it;
+    it = channelnames.find(currentcapchannel);
+
+    // if we can't find the current input, start at the beginning.
+    if (it == channelnames.end())
+        it = channelnames.begin();
+
+    // check that the list isn't empty...
+    if (it == channelnames.end())
+        return -1;
+
+    // find the next _connected_ input.
+    int i = 0;
+    for (; i < 100; i++)
+    {
+        ++it;
+        if (it == channelnames.end())
+            it = channelnames.begin();
+        if (!inputTuneTo[it.key()].isEmpty())
+            break;
+    }
+
+    // if we found anything, including current cap channel return it
+    return (i<100) ? it.key() : -1;
+}
+
 bool ChannelBase::ToggleInputs(void)
 {
-    bool ok = true;
-    int newcapchannel = currentcapchannel;
-
-    if (capchannels > 0)
-    {
-        do 
-        {
-            newcapchannel = (newcapchannel + 1) % capchannels;
-        } while (inputTuneTo[newcapchannel].isEmpty());
-
-        ok = SwitchToInput(newcapchannel, true);
-    }
-    return ok;
+    int nextInput = GetNextInput();
+    if (nextInput >= 0 && (nextInput != currentcapchannel))
+        return SwitchToInput(nextInput, true);
+    return true;
 }
 
 QString ChannelBase::GetInputByNum(int capchannel) const
 {
-    if (capchannel > capchannels)
-        return "";
-    return channelnames[capchannel];
+    QMap<int, QString>::const_iterator it = channelnames.find(capchannel);
+    if (it != channelnames.end())
+        return *it;
+    return "";
 }
 
 int ChannelBase::GetInputByName(const QString &input) const
 {
-    for (int i = capchannels-1; i >= 0; i--)
-        if (channelnames[i] == input)
-            return i;
+    QMap<int, QString>::const_iterator it = channelnames.begin();
+    for (; it != channelnames.end(); ++it)
+    {
+        if (*it == input)
+            return it.key();
+    }
     return -1;
 }
 
@@ -206,7 +232,7 @@ bool ChannelBase::ChangeExternalChannel(const QString &channum)
 
 void ChannelBase::StoreInputChannels(void)
 {
-    pParent->StoreInputChannels(inputChannel);
+    StoreInputChannels(inputChannel);
 }
 
 /** \fn ChannelBase::GetCachedPids(int, pid_cache_t&)
@@ -320,4 +346,96 @@ void ChannelBase::SetCachedATSCInfo(const QString &chan)
                 QString("ChannelBase(%1)::SetCachedATSCInfo(%2): %3-%4")
                 .arg(GetDevice()).arg(chan)
                 .arg(currentATSCMajorChannel).arg(currentProgramNum));
+}
+
+int ChannelBase::GetCardID() const
+{
+    if (pParent)
+        return pParent->GetCaptureCardNum();
+    return -1;
+}
+
+/** \fn  ChannelBase::RetrieveInputChannels(QMap<int,QString>&,QMap<int,QString>&,QMap<int,QString>&,QMap<int,QString>&)
+ */
+void ChannelBase::RetrieveInputChannels(QMap<int, QString> &startChanNum,
+                                        QMap<int, QString> &inputTuneTo,
+                                        QMap<int, QString> &externalChanger,
+                                        QMap<int, QString> &sourceid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT inputname, "
+        "       trim(externalcommand), "
+        "       if(tunechan='', 'Undefined', tunechan), "
+        "       if(startchan, startchan, ''), "
+        "       sourceid "
+        "FROM capturecard, cardinput "
+        "WHERE capturecard.cardid = :CARDID AND "
+        "      capturecard.cardid = cardinput.cardid");
+    query.bindValue(":CARDID", GetCardID());
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("RetrieveInputChannels", query);
+        return;
+    }
+    else if (!query.size())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                "\n\t\t\tCould not get inputs for the capturecard."
+                "\n\t\t\tPerhaps you have forgotten to bind video"
+                "\n\t\t\tsources to your card's inputs?");
+        return;
+    }
+
+    while (query.next())
+    {
+        int inputNum = GetInputByName(query.value(0).toString());
+
+        externalChanger[inputNum] = query.value(1).toString();
+        // This is initialized to "Undefined" when empty, this is
+        // so that GetNextInput() knows this is a connected input.
+        inputTuneTo[inputNum]     = query.value(2).toString();
+        startChanNum[inputNum]    = query.value(3).toString();
+        sourceid[inputNum]        = query.value(4).toString();
+    }
+}
+
+/** \fn ChannelBase::StoreInputChannels(const QMap<int, QString>&)
+ *  \brief Sets starting channel for the each input in the 
+ *         "startChanNum" map.
+ *
+ *  \param startChanNum Map from input number to channel, 
+ *                      with an input and default channel 
+ *                      for each input to update.
+ */
+void ChannelBase::StoreInputChannels(
+    const QMap<int, QString> &startChanNum)
+{
+    int cardid = GetCardID();
+    QString querystr, input;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    for (int i = 0;; i++)
+    {
+        input = GetInputByNum(i);
+        if (input.isEmpty())
+            break;
+
+        if (startChanNum[i].isEmpty())
+            continue;
+
+        query.prepare(
+            "UPDATE cardinput "
+            "SET startchan = :STARTCHAN "
+            "WHERE cardid    = :CARDID AND "
+            "      inputname = :INPUTNAME");
+        query.bindValue(":STARTCHAN", startChanNum[i]);
+        query.bindValue(":CARDID",    cardid);
+        query.bindValue(":INPUTNAME", input);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("StoreInputChannels", query);
+    }
 }

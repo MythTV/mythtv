@@ -182,12 +182,6 @@ class TVRec : public QObject
                           int cardid, QString channelorder,
                           int channeldirection, QString &chanid);
 
-    void RetrieveInputChannels(QMap<int, QString> &inputChannel,
-                               QMap<int, QString> &inputTuneTo,
-                               QMap<int, QString> &externalChanger,
-                               QMap<int, QString> &sourceid);
-    void StoreInputChannels(const QMap<int, QString> &inputChannel);
-
     bool IsBusy(void);
     bool IsReallyRecording(void);
 

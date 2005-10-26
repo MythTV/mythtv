@@ -108,7 +108,15 @@ class ChannelBase
     /// \brief Returns minor channel, -1 if unknown.
     virtual int GetMinorChannel(void) const { return currentATSCMinorChannel; };
 
+    void RetrieveInputChannels(QMap<int, QString> &inputChannel,
+                               QMap<int, QString> &inputTuneTo,
+                               QMap<int, QString> &externalChanger,
+                               QMap<int, QString> &sourceid);
+    void StoreInputChannels(const QMap<int, QString> &inputChannel);
+
   protected:
+    int GetNextInput(void) const;
+    virtual int GetCardID(void) const;
     virtual bool ChangeExternalChannel(const QString &newchan);
     virtual void SetCachedATSCInfo(const QString &chan);
     static void GetCachedPids(int chanid, pid_cache_t&);
@@ -117,7 +125,6 @@ class ChannelBase
     TVRec  *pParent;
     QString channelorder;
     QString curchannelname;
-    int     capchannels;
     int     currentcapchannel;
     bool    commfree;
 

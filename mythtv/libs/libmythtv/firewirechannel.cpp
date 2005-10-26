@@ -18,7 +18,6 @@ FirewireChannel::FirewireChannel(FireWireDBOptions firewire_opts, TVRec *parent)
 {
 	
     isopen = false;
-    capchannels = 1;
     fwhandle = NULL;
     channelnames[0] = "MPEG2TS";
 
@@ -149,6 +148,6 @@ bool FirewireChannel::SwitchToInput(const QString &input, const QString &chan)
 
 void FirewireChannel::SetExternalChanger(void)
 {	
-     pParent->RetrieveInputChannels(
-         inputChannel, inputTuneTo, externalChanger, sourceid);
+    RetrieveInputChannels(inputChannel, inputTuneTo,
+                          externalChanger, sourceid);
 }
