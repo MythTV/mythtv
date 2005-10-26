@@ -1431,7 +1431,7 @@ void MusicNode::printYourself(int indent_level)
 int MetadataPtrList::compareItems(QPtrCollection::Item item1, 
                                   QPtrCollection::Item item2)
 {
-    return ((Metadata*)item2)->Track() - ((Metadata*)item1)->Track();
+    return ((Metadata*)item1)->Track() - ((Metadata*)item2)->Track();
 }
 
 int MusicNodePtrList::compareItems (QPtrCollection::Item item1, 
