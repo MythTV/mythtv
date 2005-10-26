@@ -13,6 +13,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "util.h"
 #include "mythdialogs.h"
+#include "virtualkeyboard.h"
 
 void MythComboBox::keyPressEvent(QKeyEvent *e)
 {
@@ -319,11 +320,23 @@ void MythSlider::focusOutEvent(QFocusEvent *e)
     QSlider::focusOutEvent(e);
 }
 
+MythLineEdit::~MythLineEdit()
+{
+    if (popup)
+        delete popup;
+}
+
+void MythLineEdit::Init()
+{
+    popup = NULL;
+}
+
 void MythLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    if ((!popup || !popup->isShown()) &&
+        gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -334,7 +347,21 @@ void MythLineEdit::keyPressEvent(QKeyEvent *e)
                 focusNextPrevChild(false);
             else if (action == "DOWN")
                 focusNextPrevChild(true);
-            else if (action == "SELECT" && e->text().isNull())
+            else if (action == "SELECT" && 
+                    (e->text().isNull() ||
+                    (e->key() == Qt::Key_Enter) ||
+                    (e->key() == Qt::Key_Return)))
+            {
+                if (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
+                {
+                    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
+                    gContext->GetMainWindow()->detach(popup);
+                    popup->exec();
+                    delete popup;
+                    popup = NULL;
+                }
+            }
+            else if (action == "SELECT" && e->text().isNull() )
                 e->ignore();
             else
                 handled = false;
@@ -370,7 +397,21 @@ void MythLineEdit::focusInEvent(QFocusEvent *e)
 void MythLineEdit::focusOutEvent(QFocusEvent *e)
 {
     this->unsetPalette();
+    if (popup && popup->isShown() && !popup->hasFocus())
+        popup->hide();
     QLineEdit::focusOutEvent(e);
+}
+
+void MythLineEdit::hideEvent(QHideEvent *e)
+{
+    if (popup && popup->isShown())
+        popup->hide();
+    QLineEdit::hideEvent(e);
+}
+
+void MythLineEdit::mouseDoubleClickEvent(QMouseEvent *e)
+{
+    QLineEdit::mouseDoubleClickEvent(e);
 }
 
 MythRemoteLineEdit::MythRemoteLineEdit(QWidget * parent, const char * name)
@@ -452,6 +493,8 @@ void MythRemoteLineEdit::Init()
     setMaximumHeight(fontsize.height() * m_lines * 5 / 4);
 
     connect(cycle_timer, SIGNAL(timeout()), this, SLOT(endCycle()));
+    
+    popup = NULL;
 }
 
 void MythRemoteLineEdit::startCycle(QString current_choice, QString set)
@@ -656,7 +699,9 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 {
     bool handled = false;
     QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+
+    if ((!popup || !popup->isShown()) &&
+          gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
@@ -679,6 +724,21 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
                 QWidget::focusNextPrevChild(true);
                 emit tryingToLooseFocus(true);
             }
+            else if (action == "SELECT" &&
+                    (e->text().isNull() ||
+                    (e->key() == Qt::Key_Enter) || 
+                    (e->key() == Qt::Key_Return)))
+            {
+                if (gContext->GetNumSetting("UseVirtualKeyboard", 1) == 1)
+                {
+                    popup = new VirtualKeyboard(gContext->GetMainWindow(), this);
+                    gContext->GetMainWindow()->detach(popup);
+                    popup->exec();
+                    delete popup;
+                    popup = NULL;
+                }
+ 
+            }
             else
                 handled = false;
         }
@@ -686,6 +746,14 @@ void MythRemoteLineEdit::keyPressEvent(QKeyEvent *e)
 
     if (handled)
         return;
+
+    if (!handled && popup && popup->isShown())
+    {
+        endCycle();
+        QTextEdit::keyPressEvent(e);
+        emit textChanged(this->text());
+        return;
+    }
 
     switch (e->key())
     {
@@ -860,9 +928,13 @@ void MythRemoteLineEdit::focusOutEvent(QFocusEvent *e)
 {
     this->unsetPalette();
 
+    if (popup && popup->isShown() && !popup->hasFocus())
+        popup->hide();
+
     emit lostFocus();
     QTextEdit::focusOutEvent(e);
 }
+
 
 MythRemoteLineEdit::~MythRemoteLineEdit()
 {
@@ -870,6 +942,27 @@ MythRemoteLineEdit::~MythRemoteLineEdit()
     {
         delete cycle_timer;
     }
+
+    if (popup)
+        delete popup;
+}
+
+void MythRemoteLineEdit::insert(QString text)
+{
+    QTextEdit::insert(text);
+    emit textChanged(this->text());
+}
+
+void MythRemoteLineEdit::del()
+{
+    doKeyboardAction(QTextEdit::ActionDelete);
+    emit textChanged(this->text());
+}
+
+void MythRemoteLineEdit::backspace()
+{
+    doKeyboardAction(QTextEdit::ActionBackspace);
+    emit textChanged(this->text());
 }
 
 void MythTable::keyPressEvent(QKeyEvent *e)
@@ -1255,4 +1348,3 @@ void MythListBox::focusInEvent(QFocusEvent *e)
     emit changeHelpText(helptext);
     QListBox::focusInEvent(e);
 }
-

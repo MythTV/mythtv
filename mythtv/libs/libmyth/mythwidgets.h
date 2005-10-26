@@ -19,9 +19,13 @@
 #include <qradiobutton.h>
 #include <qimage.h>
 #include <qlabel.h>
-#include <qtimer.h>
+#include <qtimer.h> 
 
 #include <vector>
+
+using namespace std;
+
+class VirtualKeyboard;
 
 // These widgets follow these general navigation rules:
 //
@@ -117,11 +121,13 @@ class MythLineEdit : public QLineEdit
     Q_OBJECT
   public:
     MythLineEdit(QWidget *parent=NULL, const char* widgetName=0) :
-      QLineEdit(parent, widgetName) { rw = true; };
+      QLineEdit(parent, widgetName) { rw = true; Init(); };
 
     MythLineEdit(const QString& contents, QWidget *parent=NULL, 
                  const char* widgetName=0) :
-      QLineEdit(contents, parent, widgetName) { rw = true; };
+      QLineEdit(contents, parent, widgetName) { rw = true; Init(); };
+
+    virtual ~MythLineEdit();
 
     void setHelpText(QString help) { helptext = help; };
     void setRW(bool readwrite = true) { rw = readwrite; };
@@ -137,8 +143,12 @@ class MythLineEdit : public QLineEdit
     virtual void keyPressEvent(QKeyEvent *e);
     virtual void focusInEvent(QFocusEvent *e); 
     virtual void focusOutEvent(QFocusEvent *e);
+    virtual void hideEvent(QHideEvent *e);
+    virtual void mouseDoubleClickEvent(QMouseEvent *e);
+    void Init(void);
 
   private:
+    VirtualKeyboard *popup;
     QString helptext;
     bool rw;
 };
@@ -157,7 +167,10 @@ class MythRemoteLineEdit : public QTextEdit
     void setHelpText(QString help) { helptext = help; }
     void setCycleTime(float desired_interval); // in seconds
     void setCharacterColors(QColor unselected, QColor selected, QColor special);
-
+    void insert(QString text);
+    void backspace();
+    void del();
+     
   signals:
     
     void    shiftState(bool);
@@ -214,6 +227,8 @@ class MythRemoteLineEdit : public QTextEdit
     QString  hex_special;
 
     int m_lines;
+    
+    VirtualKeyboard *popup;
 };
 
 class MythTable : public QTable

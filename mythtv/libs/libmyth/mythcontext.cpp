@@ -1816,6 +1816,58 @@ void MythContext::ThemeWidget(QWidget *widget)
         delete bgpixmap;
 }
 
+bool MythContext::FindThemeFile(QString &filename)
+{
+    QString baseDir = d->m_installprefix + "/share/mythtv/themes/default/";
+    QString file;
+    int pathStart = filename.findRev('/');
+    bool bFound = false;
+
+    // Given a full path?
+    file = filename;
+    bFound = QFile::exists(file);
+
+    // look in theme directory first including any sub directory
+    if (!bFound)
+    {
+        file = d->m_themepathname + filename;
+        bFound = QFile::exists(file);
+    }
+
+    if (!bFound && pathStart > 0)
+    {
+        // look in theme directory minus any sub directories
+        file = d->m_themepathname + filename.mid(pathStart + 1);
+        bFound = QFile::exists(file);
+    }
+
+    // look in default theme directory
+    if (!bFound)
+    {
+        file = baseDir + filename;
+        bFound = QFile::exists(file);
+    }
+
+    if (!bFound && pathStart > 0)
+    {
+        file = baseDir + filename.mid(pathStart + 1);
+        bFound = QFile::exists(file);
+    }
+
+    // look in tmp directory
+    if (!bFound)
+    {
+        file = "/tmp/" + filename;
+        bFound = QFile::exists(file);
+    }
+
+    if (!bFound)
+        return false;
+
+    filename = file;
+    return true;
+}
+
 QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
 {
     if (filename.left(5) == "myth:")
@@ -1868,33 +1920,12 @@ QImage *MythContext::LoadScaleImage(QString filename, bool fromcache)
         }
     }
 
-    QFile checkFile(filename);
-    if (!checkFile.exists())
+
+    if (!FindThemeFile(filename))
     {
-        QString fileTemp;
-        fileTemp = d->m_themepathname + filename;
-        checkFile.setName(fileTemp);
-        if (!checkFile.exists())
-        {
-            QFileInfo fi(filename);
-            filename = d->m_themepathname + fi.fileName();
-            checkFile.setName(filename);
-            if (!checkFile.exists())
-            {
-                filename = baseDir + fi.fileName();
-                checkFile.setName(filename);
-                if (!checkFile.exists())
-                {
-                    VERBOSE(VB_IMPORTANT,
-                            "Unable to find image file: " << filename);
-                    return NULL;
-                }
-            }
-        }
-        else
-        {
-            filename = fileTemp;
-        }
+        VERBOSE(VB_IMPORTANT,
+                "Unable to find image file: " << filename);
+        return NULL;
     }
 
     QImage *ret = NULL;
@@ -1983,36 +2014,13 @@ QPixmap *MythContext::LoadScalePixmap(QString filename, bool fromcache)
         }
     }
 
-    QFile checkFile(filename);
-    if (!checkFile.exists())
+    if (!FindThemeFile(filename))
     {
-        QString fileTemp;
-        fileTemp = d->m_themepathname + filename;
-        checkFile.setName(fileTemp);
-        if (!checkFile.exists())
-        {
-            QFileInfo fi(filename);
-            filename = d->m_themepathname + fi.fileName();
-            checkFile.setName(filename);
-            if (!checkFile.exists())
-            {
-                filename = baseDir + fi.fileName();
-                checkFile.setName(filename);
-                if (!checkFile.exists())
-                {
-                    VERBOSE(VB_IMPORTANT,
-                            "Unable to find image file: " << filename);
-                    return NULL;
-                }
-            }
-        }
-        else
-        {
-            filename = fileTemp;
-        }
-
+        VERBOSE(VB_IMPORTANT,
+                "Unable to find image file: " << filename);
+        return NULL;
     }
-        
+
     QPixmap *ret = new QPixmap();
 
     int width, height;

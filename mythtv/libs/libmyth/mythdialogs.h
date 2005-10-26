@@ -33,6 +33,7 @@ class UIImageType;
 class UIStatusBarType;
 class UIListBtnType;
 class UIListTreeType;
+class UIKeyboardType;
 class LayerSet;
 class GenericTree;
 class MythMediaDevice;
@@ -116,7 +117,7 @@ class MythMainWindow : public QDialog
     void keyPressEvent(QKeyEvent *e);
     void customEvent(QCustomEvent *ce);
     void closeEvent(QCloseEvent *e);
-
+    
     void ExitToMainMenu();
 
     QObject *getTarget(QKeyEvent &key);
@@ -254,8 +255,12 @@ class MythThemedDialog : public MythDialog
     MythThemedDialog(MythMainWindow *parent, QString window_name,
                      QString theme_filename = "", const char *name = 0,
                      bool setsize = true);
+    MythThemedDialog(MythMainWindow *parent, const char *name = 0,
+                     bool setsize = true);
+
    ~MythThemedDialog();
 
+    virtual bool loadThemedWindow(QString window_name, QString theme_filename);
     virtual void loadWindow(QDomElement &);
     virtual void parseContainer(QDomElement &);
     virtual void parseFont(QDomElement &);
@@ -278,6 +283,8 @@ class MythThemedDialog : public MythDialog
     UIStatusBarType *getUIStatusBarType(const QString &name);
     UIListBtnType *getUIListBtnType(const QString &name);
     UIListTreeType *getUIListTreeType(const QString &name);
+    UIKeyboardType *getUIKeyboardType(const QString &name);
+
     LayerSet* getContainer(const QString &name);
 
     void setContext(int a_context) { context = a_context; }
@@ -302,7 +309,7 @@ class MythThemedDialog : public MythDialog
     // These need to be just "protected" so that subclasses can mess with them
     XMLParse *getTheme() {return theme;}
     QDomElement& getXmlData() {return xmldata;}
-    
+
     QPixmap my_background;
     QPixmap my_foreground;
 

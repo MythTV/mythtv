@@ -3262,12 +3262,16 @@ void XMLParse::parseListTreeArea(LayerSet *container, QDomElement &element)
 
 void XMLParse::parseKey(LayerSet *container, QDomElement &element)
 {
-    QString name, action, order, notclicked;
-    QString clicked, chars, font, subtitle;
-    QPoint pos;
-
-    notclicked = clicked = subtitle = chars = font = "";
-    pos = QPoint(0, 0);
+    QPixmap *normalImage = NULL, *focusedImage = NULL;
+    QPixmap *downImage = NULL, *downFocusedImage = NULL;
+    QString normalFontName = "", focusedFontName = "";
+    QString downFontName = "", downFocusedFontName = "";
+    QString name, order, type;
+    QString normalChar = "", shiftChar = "";
+    QString altChar = "", shiftaltChar = "";
+    QString moveLeft = "", moveRight = "";
+    QString moveUp = "", moveDown = "";
+    QPoint pos = QPoint(0, 0);
 
     name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
@@ -3276,21 +3280,19 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
         return;
     }
 
-    action = element.attribute("action", "");
-    if (action.isNull() || action.isEmpty())
+    type = element.attribute("type", "");
+    if (type.isNull() || type.isEmpty())
     {
-        cerr << "key needs an action\n";
+        cerr << "key needs a type\n";
         return;
     }
 
     order = element.attribute("draworder", "");
     if (order.isNull() || order.isEmpty())
     {
-        cerr << "keyboard needs an order\n";
+        cerr << "key needs an order\n";
         return;
     }
-
-    LayerSet *c = new LayerSet("_internal");
 
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
@@ -3298,36 +3300,110 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
         QDomElement e = child.toElement();
         if (!e.isNull())
         {
-            if (e.tagName() == "notclickedimg")
-            {
-                notclicked = getFirstText(e);
-            }
-            else if (e.tagName() == "clickedimg")
-            {
-                clicked = getFirstText(e);
-            }
-            else if (e.tagName() == "subtitleimg")
-            {
-                subtitle = getFirstText(e);
-            }
-            else if (e.tagName() == "position")
+            if (e.tagName() == "position")
             {
                 pos = parsePoint(getFirstText(e));
                 pos.setX((int)(pos.x() * wmult));
                 pos.setY((int)(pos.y() * hmult));
 
             }
-            else if (e.tagName() == "chars")
+            else if (e.tagName() == "char")
             {
-                chars = getFirstText(e);
+                normalChar = e.attribute("normal", "");
+                shiftChar = e.attribute("shift", "");
+                altChar = e.attribute("alt", "");
+                shiftaltChar = e.attribute("altshift", "");
             }
-            else if (e.tagName() == "textarea")
+            else if (e.tagName() == "move")
             {
-                parseTextArea(c, e);
+                moveLeft = e.attribute("left", "");
+                moveRight = e.attribute("right", "");
+                moveUp = e.attribute("up", "");
+                moveDown = e.attribute("down", "");
             }
-            else if (e.tagName() == "font")
+            else if (e.tagName() == "image")
             {
-                font = getFirstText(e);
+                QString imgname = "";
+                QString imgfunction = "";
+
+                imgfunction = e.attribute("function", "");
+                if (imgfunction.isNull() || imgfunction.isEmpty())
+                {
+                    cerr << "Image in a key needs a function\n";
+                    return;
+                }
+
+                imgname = e.attribute("filename", "");
+                if (imgname.isNull() || imgname.isEmpty())
+                {
+                    cerr << "Image in a key needs a filename\n";
+                    return;
+                }
+
+                if (imgfunction.lower() == "normal")
+                {
+                    normalImage = gContext->LoadScalePixmap(imgname);
+                    if (!normalImage)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " 
+                             << imgname << endl;
+                    }
+                }
+                else if (imgfunction.lower() == "focused")
+                {
+                    focusedImage = gContext->LoadScalePixmap(imgname);
+                    if (!focusedImage)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " 
+                             << imgname << endl;
+                    }
+                }
+                else if (imgfunction.lower() == "down")
+                {
+                    downImage = gContext->LoadScalePixmap(imgname);
+
+                    if (!downImage)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " 
+                             << imgname << endl;
+                    }
+                }
+                else if (imgfunction.lower() == "downfocused")
+                {
+                    downFocusedImage = gContext->LoadScalePixmap(imgname);
+
+                    if (!downFocusedImage)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " 
+                             << imgname << endl;
+                    }
+                }
+                else
+                {
+                    std::cerr << "Unknown image function in key type: "
+                              << imgfunction << endl;
+                    return;
+                }
+            }
+            else if (e.tagName() == "fcnfont")
+            {
+                QString fontName = e.attribute("name", "");
+                QString fontFcn  = e.attribute("function", "");
+
+                if (fontFcn.lower() == "normal")
+                    normalFontName = fontName;
+                else if (fontFcn.lower() == "focused")
+                    focusedFontName = fontName;
+                else if (fontFcn.lower() == "down")
+                    downFontName = fontName;
+                else if (fontFcn.lower() == "downfocused")
+                    downFocusedFontName = fontName;
+                else
+                {
+                    cerr << "Unknown font function in key type: "
+                         << fontFcn << endl;
+                    return;
+                }
             }
             else
             {
@@ -3337,33 +3413,34 @@ void XMLParse::parseKey(LayerSet *container, QDomElement &element)
         }
     }
 
-    vector<UIType *>::iterator i = c->getAllTypes()->begin();
-    for (; i != c->getAllTypes()->end(); i++)
-    {
-        UIType *type = (*i);
-        if (UITextType *text = dynamic_cast<UITextType*>(type))
-        {
-            QRect rect = text->DisplayArea();
-            rect.moveTopLeft(rect.topLeft() + pos);
-            text->SetDisplayArea(rect);
-        }
-    }
+    fontProp *normalFont = GetFont(normalFontName);
+    fontProp *focusedFont = GetFont(focusedFontName);
+    fontProp *downFont = GetFont(downFontName);
+    fontProp *downFocusedFont = GetFont(downFocusedFontName);
 
     UIKeyType *key = new UIKeyType(name);
-    key->SetContainer(c);
+    key->SetScreen(wmult, hmult);
+    key->SetParent(container);
     key->SetOrder(order.toInt());
-    key->SetAction(action);
-    key->SetClicked(clicked);
-    key->SetNotClicked(notclicked);
-    key->SetSubtitle(subtitle);
-    key->SetChars(chars);
-    key->SetFont(font);
+    key->SetType(type);
+    key->SetChars(normalChar, shiftChar, altChar, shiftaltChar);
+    key->SetMoves(moveLeft, moveRight, moveUp, moveDown);
     key->SetPosition(pos);
+    key->SetImages(normalImage, focusedImage, downImage, downFocusedImage);
+    key->SetFonts(normalFont, focusedFont, downFont, downFocusedFont);
+
     container->AddType(key);
 }
 
 void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
 {
+    QString normalFontName = "", focusedFontName = ""; 
+    QString downFontName = "", downFocusedFontName = "";
+    int context = -1;
+    QRect area;
+    QPixmap *normalImage = NULL, *focusedImage = NULL; 
+    QPixmap *downImage = NULL, *downFocusedImage = NULL;
+
     QString name = element.attribute("name", "");
     if (name.isNull() || name.isEmpty())
     {
@@ -3378,21 +3455,107 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
         return;
     }
 
-    LayerSet *c = new LayerSet("_internal");
-
     for (QDomNode child = element.firstChild(); !child.isNull();
          child = child.nextSibling())
     {
         QDomElement e = child.toElement();
         if (!e.isNull())
         {
-            if (e.tagName() == "image")
+            if (e.tagName() == "key")
             {
-                parseImage(c, e);
+                parseKey(container, e);
             }
-            else if (e.tagName() == "key")
+            else if (e.tagName() == "area")
             {
-                parseKey(c, e);
+                area = parseRect(getFirstText(e));
+                normalizeRect(area);
+            }
+            else if (e.tagName() == "context")
+            {
+                context = getFirstText(e).toInt();
+            }
+
+            else if (e.tagName() == "image")
+            {
+                QString imgname = "";
+                QString imgfunction = "";
+
+                imgfunction = e.attribute("function", "");
+                if (imgfunction.isNull() || imgfunction.isEmpty())
+                {
+                    cerr << "Image in a keyboard needs a function\n";
+                    return;
+                }
+
+                imgname = e.attribute("filename", "");
+                if (imgname.isNull() || imgname.isEmpty())
+                {
+                    cerr << "Image in a keyboard needs a filename\n";
+                    return;
+                }
+
+                if (imgfunction.lower() == "normal")
+                {
+                    normalImage = gContext->LoadScalePixmap(imgname);
+                    if (!normalImage)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << imgname << endl ;
+                    }
+                }
+                else if (imgfunction.lower() == "focused")
+                {
+                    focusedImage = gContext->LoadScalePixmap(imgname);
+                    if (!focusedImage)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << imgname << endl ;
+                    }
+                }
+                else if (imgfunction.lower() == "down")
+                {
+                    downImage = gContext->LoadScalePixmap(imgname);
+
+                    if (!downImage)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << imgname << endl ;
+                    }
+                }
+                else if (imgfunction.lower() == "downfocused")
+                {
+                    downFocusedImage = gContext->LoadScalePixmap(imgname);
+
+                    if (!downFocusedImage)
+                    {
+                        cerr << "xmparse.o: I can't find a file called " << imgname << endl ;
+                    }
+                }
+                else
+                {
+                    std::cerr << "Unknown image function in keyboard type: "
+                              << imgfunction
+                              << std::endl;
+                    return;
+                }
+            }
+            else if (e.tagName() == "fcnfont")
+            {
+                QString fontName = e.attribute("name", "");
+                QString fontFcn  = e.attribute("function", "");
+
+                if (fontFcn.lower() == "normal")
+                    normalFontName = fontName;
+                else if (fontFcn.lower() == "focused")
+                    focusedFontName = fontName;
+                else if (fontFcn.lower() == "down")
+                    downFontName = fontName;
+                else if (fontFcn.lower() == "downfocused")
+                    downFocusedFontName = fontName;
+                else 
+                {
+                    std::cerr << "Unknown font function in keyboard type: "
+                              << fontFcn
+                              << std::endl;
+                    return;
+                }
             }
             else
             {
@@ -3402,17 +3565,72 @@ void XMLParse::parseKeyboard(LayerSet *container, QDomElement &element)
         }
     }
 
+    if (normalFontName == "")
+    {
+      cerr << "Keyboard need a normal font" << endl;
+      return;
+    }
+
+    if (focusedFontName == "")
+        focusedFontName = normalFontName;
+
+    if (downFontName == "")
+        downFontName = normalFontName;
+
+    if (downFocusedFontName == "")
+        downFocusedFontName = normalFontName;
+
+    fontProp *normalFont = GetFont(normalFontName);
+    if (!normalFont)
+    {
+      cerr << "Unknown font: " << normalFontName
+           << " in Keyboard: " << name << endl;
+      return;
+    }
+
+    fontProp *focusedFont = GetFont(focusedFontName);
+    if (!focusedFont)
+    {
+        cerr << "Unknown font: " << focusedFontName
+                << " in Keyboard: " << name << endl;
+        return;
+    }
+
+    fontProp *downFont = GetFont(downFontName);
+    if (!downFont)
+    {
+        cerr << "Unknown font: " << downFontName
+                << " in Keyboard: " << name << endl;
+        return;
+    }
+
+    fontProp *downFocusedFont = GetFont(downFocusedFontName);
+    if (!downFocusedFont)
+    {
+        cerr << "Unknown font: " << downFocusedFontName
+                << " in Keyboard: " << name << endl;
+        return;
+    }
+
     UIKeyboardType *kbd = new UIKeyboardType(name, order.toInt());
-    kbd->SetContainer(c);
+    kbd->SetScreen(wmult, hmult);
+    kbd->SetParent(container);
+    kbd->SetContext(context);
+    kbd->SetArea(area);
+    kbd->calculateScreenArea();
+
     container->AddType(kbd);
 
-    vector<UIType *>::iterator i = c->getAllTypes()->begin();
-    for (; i != c->getAllTypes()->end(); i++)
+    vector<UIType *>::iterator i = container->getAllTypes()->begin();
+    for (; i != container->getAllTypes()->end(); i++)
     {
         UIType *type = (*i);
         if (UIKeyType *keyt = dynamic_cast<UIKeyType*>(type))
         {
-            kbd->AddKey(keyt->GetAction(), keyt);
+            kbd->AddKey(keyt);
+            keyt->SetDefaultImages(normalImage, focusedImage, downImage, downFocusedImage);
+            keyt->SetDefaultFonts(normalFont, focusedFont, downFont, downFocusedFont);
+            keyt->calculateScreenArea();
         }
     }
 }

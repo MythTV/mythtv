@@ -684,6 +684,7 @@ class UIRemoteEditType : public UIType
     ~UIRemoteEditType();
     
     void    createEdit(MythThemedDialog* parent);
+    QWidget *getEdit(void) { return (QWidget*) edit; };
     void    Draw(QPainter *, int drawlayer, int context);
     void    setArea(QRect area){m_displaysize = area;}
     void    setText(const QString some_text);
@@ -694,13 +695,14 @@ class UIRemoteEditType : public UIType
 
   public slots:
     void takeFocusAwayFromEditor(bool up_or_down);
+    void editorChanged(QString value);
     virtual bool takeFocus();
     virtual void looseFocus();
     virtual void show();
     virtual void hide();
      
   signals:
-    void    changed();
+    void    textChanged(QString value);
 
   private:
     MythRemoteLineEdit *edit;
@@ -1094,36 +1096,83 @@ class UIKeyType : public UIType
     UIKeyType(const QString &);
     ~UIKeyType();
 
-    void SetContainer(LayerSet *container) { m_container = container; }
-    UIType *GetType(const QString &name) { return m_container->GetType(name); }
-
-    QString GetAction() { return m_action; }
-    QString GetChars() { return m_chars; }
     QPoint GetPosition() { return m_pos; }
-    QString GetClicked() { return m_clicked; }
-    QString GetNotClicked() { return m_notclicked; }
-    QString GetSubtitle() { return m_subtitle; }
 
-    void SetAction(QString action) { m_action = action; }
-    void SetClicked(QString filename) { m_clicked = filename; }
-    void SetNotClicked(QString filename) { m_notclicked = filename; }
-    void SetSubtitle(QString filename) { m_subtitle = filename; }
-    void SetChars(QString chars) { m_chars = chars; }
-    void SetFont(QString font) { m_font = font; }
+    void SetArea(QRect &area) { m_area = area; }
     void SetPosition(QPoint pos) { m_pos = pos; }
+    void SetImages(QPixmap *normal, QPixmap *focused, QPixmap *down,
+                   QPixmap *downFocused);
+    void SetDefaultImages(QPixmap *normal, QPixmap *focused, QPixmap *down,
+                          QPixmap *downFocused);
 
-    virtual void Draw(QPainter *, int, int);
+    void SetFonts(fontProp *normal, fontProp *focused, fontProp *down,
+                  fontProp *downFocused);
+    void SetDefaultFonts(fontProp *normal, fontProp *focused, fontProp *down,
+                         fontProp *downFocused);
+
+    void    SetType(QString type) { m_type = type; }
+    QString GetType() { return m_type; }
+
+    void    SetChars(QString normal, QString shift, QString alt, QString shiftAlt);
+    QString GetChar();
+
+    void    SetMoves(QString moveLeft, QString moveRight, QString moveUp, 
+                  QString moveDown);
+    QString GetMove(QString direction);
+
+    void SetShiftState(bool sh, bool ag); 
+    void SetOn(bool bOn) { m_bDown = bOn; refresh(); }
+    bool IsOn(void) { return m_bDown; }
+
+    void SetToggleKey(bool bOn) { m_bToggle = bOn; }
+    bool IsToggleKey(void) { return m_bToggle; }
+
+   virtual void Draw(QPainter *, int, int);
+    virtual void calculateScreenArea();
+
+  public slots:
+    void    push();
+    void    unPush();
+    void    activate(){push();}
+
+  signals:
+    void    pushed();
 
   private:
-    QString m_action;
-    QString m_clicked;
-    QString m_notclicked;
-    QString m_subtitle;
-    QString m_chars;
-    QString m_font;
+    QString decodeChar(QString c);
+
+    QRect   m_area;
+    QString m_type;
+
+    QPixmap *m_normalImg;
+    QPixmap *m_focusedImg;
+    QPixmap *m_downImg;
+    QPixmap *m_downFocusedImg;
+
+    fontProp *m_normalFont;
+    fontProp *m_focusedFont;
+    fontProp *m_downFont;
+    fontProp *m_downFocusedFont;
+
     QPoint m_pos;
 
-    LayerSet *m_container;
+    QString m_normalChar; 
+    QString m_shiftChar; 
+    QString m_altChar; 
+    QString m_shiftAltChar;
+
+    QString m_moveLeft;
+    QString m_moveRight;
+    QString m_moveUp;
+    QString m_moveDown;
+
+    bool    m_bShift;
+    bool    m_bAlt;
+    bool    m_bDown;
+    bool    m_bToggle;
+
+    bool    m_bPushed;
+    QTimer  m_pushTimer;
 };
 
 class UIKeyboardType : public UIType
@@ -1134,20 +1183,64 @@ class UIKeyboardType : public UIType
     UIKeyboardType(const QString &, int);
     ~UIKeyboardType();
 
-    typedef QValueList <UIKeyType*> KeyList;
-    void SetContainer(LayerSet *container) { m_container = container; }
-    UIType *GetType(const QString &name) { return m_container->GetType(name); }
-    UIKeyType *GetKey(const QString &action);
-    KeyList GetKeys() { return m_keymap.values(); }
+    typedef QPtrList <UIKeyType> KeyList;
 
-    void AddKey(const QString &action, UIKeyType *key) { m_keymap[action] = key; }
-    bool HasKey(const QString &action) { return m_keymap.keys().contains(action); }
+    void SetContainer(LayerSet *container) { m_container = container; }
+    void SetArea(QRect &area) { m_area = area; }
+    void SetEdit(QWidget* edit) { m_parentEdit = edit; }
+    void SetParentDialog(MythThemedDialog * parentDialog)
+            { m_parentDialog = parentDialog; }
+
+    KeyList GetKeys() { return m_keyList; }
+    void AddKey(UIKeyType *key);
 
     virtual void Draw(QPainter *, int, int);
+    virtual void calculateScreenArea();
+    virtual void keyPressEvent(QKeyEvent *e);
+
+  private slots:
+    void charKey();
+    void lockOnOff();
+    void shiftLOnOff();
+    void shiftROnOff();
+    void shiftOff();
+    void altGrOnOff();
+    void compOnOff();
+    void updateButtons();
+    void leftCursor();
+    void rightCursor();
+    void backspaceKey();
+    void delKey();
+    void close(); 
 
   private:
-    LayerSet *m_container;
-    QMap <QString, UIKeyType*> m_keymap;
+    void init();
+    void insertChar(QString c);
+    void moveUp();
+    void moveDown();
+    void moveLeft();
+    void moveRight();
+    UIKeyType *findKey(QString keyName);
+
+    QRect     m_area;
+
+    bool m_bInitalized;
+
+    bool      m_bCompTrap;
+    QString   m_comp1;
+
+    UIKeyType *m_altKey;
+    UIKeyType *m_lockKey;
+    UIKeyType *m_shiftLKey;
+    UIKeyType *m_shiftRKey;
+    UIKeyType *m_focusedKey;
+    UIKeyType *m_doneKey;
+
+    QWidget          *m_parentEdit;
+    MythThemedDialog *m_parentDialog;
+
+    LayerSet  *m_container;
+    KeyList   m_keyList;
 };
 
 #endif

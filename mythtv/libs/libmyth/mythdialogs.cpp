@@ -1594,20 +1594,10 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
                 : MythDialog(parent, name, setsize)
 {
     setNoErase();
-    context = -1;
-    my_containers.clear();
-    widget_with_current_focus = NULL;
 
-    redrawRect = QRect(0, 0, 0, 0);
+    theme = NULL;
 
-    //
-    //  Load the theme. Crap out if we can't find it.
-    //
-
-    theme = new XMLParse();
-    theme->SetWMult(wmult);
-    theme->SetHMult(hmult);
-    if (!theme->LoadTheme(xmldata, window_name, theme_filename))
+    if (!loadThemedWindow(window_name, theme_filename))
     {
         QString msg = 
             QString(tr("Could not locate '%1' in theme '%2'."
@@ -1617,6 +1607,35 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
                                   tr("Missing UI Element"), msg);
         done(-1);
         return;
+    }
+}
+
+MythThemedDialog::MythThemedDialog(MythMainWindow *parent, const char* name,
+                                   bool setsize)
+                : MythDialog(parent, name, setsize)
+{
+    setNoErase();
+    theme = NULL;
+}
+
+bool MythThemedDialog::loadThemedWindow(QString window_name, QString theme_filename)
+{
+
+    if (theme)
+        delete theme;
+
+    context = -1;
+    my_containers.clear();
+    widget_with_current_focus = NULL;
+
+    redrawRect = QRect(0, 0, 0, 0);
+
+    theme = new XMLParse();
+    theme->SetWMult(wmult);
+    theme->SetHMult(hmult);
+    if (!theme->LoadTheme(xmldata, window_name, theme_filename))
+    {
+        return false;
     }
 
     loadWindow(xmldata);
@@ -1650,6 +1669,8 @@ MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,
 
     updateBackground();
     initForeground();
+
+    return true;
 }
 
 bool MythThemedDialog::buildFocusList()
@@ -1690,7 +1711,8 @@ bool MythThemedDialog::buildFocusList()
 
 MythThemedDialog::~MythThemedDialog()
 {
-    delete theme;
+    if (theme)
+        delete theme;
 }
 
 void MythThemedDialog::loadWindow(QDomElement &element)
@@ -2421,6 +2443,27 @@ UIListTreeType* MythThemedDialog::getUIListTreeType(const QString &name)
     return NULL;
 }
 
+UIKeyboardType *MythThemedDialog::getUIKeyboardType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if (hunter)
+        {
+            UIKeyboardType *hunted;
+            if ( (hunted = dynamic_cast<UIKeyboardType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
 LayerSet* MythThemedDialog::getContainer(const QString& name)
 {
     QPtrListIterator<LayerSet> an_it(my_containers);
@@ -2436,6 +2479,7 @@ LayerSet* MythThemedDialog::getContainer(const QString& name)
     
     return NULL;
 }
+
 
 /*
 ---------------------------------------------------------------------

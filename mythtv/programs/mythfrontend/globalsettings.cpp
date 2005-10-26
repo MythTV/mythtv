@@ -1112,6 +1112,17 @@ static HostComboBox *PlayBoxShading()
     return gc;
 }
 
+static HostCheckBox *UseVirtualKeyboard()
+{
+    HostCheckBox *gc = new HostCheckBox("UseVirtualKeyboard");
+    gc->setLabel(QObject::tr("Use line edit virtual keyboards"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("Allows you to use a virtual keyboard "
+		    "in Myth line edit boxes.  To use, hit OK/Select "
+		    "while a line edit is in focus."));
+    return gc;
+}
+
 static HostComboBox *AllowQuitShutdown()
 {
     HostComboBox *gc = new HostComboBox("AllowQuitShutdown");
@@ -3192,6 +3203,7 @@ AppearanceSettings::AppearanceSettings()
     qttheme->addChild(QtFontBig());
     qttheme->addChild(PlayBoxTransparency());
     qttheme->addChild(PlayBoxShading());
+    qttheme->addChild(UseVirtualKeyboard());
     addChild(qttheme );
 
     addChild(new LcdSettings());

@@ -341,6 +341,7 @@ class MythContext : public QObject
 
     void ThemeWidget(QWidget *widget);
 
+    bool FindThemeFile(QString &filename);
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true); 
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
 

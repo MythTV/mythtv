@@ -1,5 +1,7 @@
 
 #include <iostream>
+#include <qapplication.h>
+
 using namespace std;
 
 #include "uitypes.h"
@@ -991,6 +993,8 @@ void AlphaBlender::blendImage(const QImage &image, const QColor &color)
     }
 }
 
+// **************************************************************
+
 UIListType::UIListType(const QString &name, QRect area, int dorder)
           : UIType(name)
 {
@@ -1344,53 +1348,14 @@ void UIImageType::LoadImage()
         }
     }
 
-    int pathStart = m_filename.findRev('/');
-    bool bFound = false;
-    
-    // Given a full path?
     file = m_filename;
-    bFound = QFile::exists(file);
 
-    // look in theme directory first including any sub directory
-    if (!bFound)
-    {
-        file = themeDir + m_filename;
-        bFound = QFile::exists(file);
-    } 
-    
-    if (!bFound && pathStart > 0)
-    {
-        // look in theme directory minus any sub directories
-        file = themeDir + m_filename.mid(pathStart + 1);
-        bFound = QFile::exists(file);
-    }
-
-    // look in default theme directory
-    if (!bFound)
-    {
-        file = baseDir + m_filename;
-        bFound = QFile::exists(file);
-    }
-    
-    if (!bFound && pathStart > 0)
-    {
-        file = baseDir + m_filename.mid(pathStart + 1);
-        bFound = QFile::exists(file);
-    }        
-    
-    // look in tmp directory
-    if (!bFound)
-    {
-        file = "/tmp/" + m_filename;
-        bFound = QFile::exists(file);
-    }
-    
-    if (!bFound)
+    if (!gContext->FindThemeFile(file))
     {
         cerr << "UIImageType::LoadImage() - Cannot find image: " << m_filename << endl;
         m_show = false;
         return;
-    }    
+    }
 
     if (m_debug == true)
         cerr << "     -Filename: " << file << endl;
@@ -2091,6 +2056,9 @@ void UIRemoteEditType::createEdit(MythThemedDialog* parent)
         
     connect(edit, SIGNAL(tryingToLooseFocus(bool)), 
             this, SLOT(takeFocusAwayFromEditor(bool)));
+    connect(edit, SIGNAL(textChanged(QString)), 
+            this, SLOT(editorChanged(QString)));
+
     edit->show();
 }
 
@@ -2181,12 +2149,7 @@ void UIRemoteEditType::takeFocusAwayFromEditor(bool up_or_down)
     if (m_parentDialog) 
         m_parentDialog->nextPrevWidgetFocus(up_or_down);
     
-    MythRemoteLineEdit * which_editor = (MythRemoteLineEdit *) sender();
-    
-    if (which_editor)
-    {
-        which_editor->clearFocus();
-    }    
+    looseFocus();
 }
 
 bool UIRemoteEditType::takeFocus()
@@ -2208,6 +2171,11 @@ void UIRemoteEditType::looseFocus()
     }
     
     UIType::looseFocus();
+}
+
+void UIRemoteEditType::editorChanged(QString value)
+{
+    emit textChanged(value);
 }
 
 // ******************************************************************
@@ -2680,7 +2648,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             VERBOSE(VB_IMPORTANT, "UIManagedTreeListType: LCD sees no "
                  "parent to current_node" );
         }
-        else 
+        else
         {
             // add max of lcd height menu items either side of the selected node
             // let the lcdserver figure out which ones to display
@@ -4392,16 +4360,22 @@ void UIBlackHoleType::calculateScreenArea()
 UIKeyType::UIKeyType(const QString &name)
          : UIType(name)
 {
-    m_container = NULL;
-    m_action = m_clicked = m_notclicked = m_subtitle = m_chars =
-    m_font = "";
+    m_normalImg = m_focusedImg = m_downImg = m_downFocusedImg = NULL;
+    m_normalFont = m_focusedFont = m_downFont = m_downFocusedFont = NULL;
+
     m_pos = QPoint(0, 0);
+
+    m_bDown = false;
+    m_bShift = false;
+    m_bAlt = false;
+    m_bToggle = false;
+
+    takes_focus = true;
+    connect(&m_pushTimer, SIGNAL(timeout()), this, SLOT(unPush()));
 }
 
 UIKeyType::~UIKeyType()
 {
-    if (m_container)
-        delete m_container;
 }
 
 void UIKeyType::Draw(QPainter *dr, int drawlayer, int context)
@@ -4410,22 +4384,305 @@ void UIKeyType::Draw(QPainter *dr, int drawlayer, int context)
     {
         if (drawlayer == m_order)
         {
-            if (m_container)
+            fontProp *tempFont;
+
+            // draw the button image
+            if (!m_bDown)
             {
-                // draw textareas
-                m_container->Draw(dr, 0, context);
+                if (!has_focus)
+                {
+                    dr->drawPixmap(m_pos.x(), m_pos.y(), *m_normalImg);
+                    tempFont = m_normalFont;
+                }
+                else
+                {
+                    dr->drawPixmap(m_pos.x(), m_pos.y(), *m_focusedImg);
+                    tempFont = m_focusedFont;
+                }
+            }
+            else
+            {
+                if (!has_focus)
+                {
+                    dr->drawPixmap(m_pos.x(), m_pos.y(), *m_downImg);
+                    tempFont = m_downFont;
+                }
+                else
+                {
+                    dr->drawPixmap(m_pos.x(), m_pos.y(), *m_downFocusedImg);
+                    tempFont = m_downFocusedFont;
+                }
+            }
+
+            dr->setFont(tempFont->face);
+            dr->setBrush(tempFont->color);
+            dr->setPen(QPen(tempFont->color, (int)(2 * m_wmult))); 
+
+            // draw the button text
+            if (!m_bShift)
+            {
+                if (!m_bAlt)
+                    dr->drawText(m_pos.x(), m_pos.y(), 
+                                 m_area.width(), m_area.height(),
+                                 Qt::AlignCenter,
+                                 m_normalChar);
+                else
+                    dr->drawText(m_pos.x(), m_pos.y(), 
+                                 m_area.width(), m_area.height(),
+                                 Qt::AlignCenter,
+                                 m_altChar);
+            }
+            else
+            {
+                if (!m_bAlt)
+                    dr->drawText(m_pos.x(), m_pos.y(), 
+                                 m_area.width(), m_area.height(),
+                                 Qt::AlignCenter,
+                                 m_shiftChar);
+                else
+                    dr->drawText(m_pos.x(), m_pos.y(), 
+                                 m_area.width(), m_area.height(),
+                                 Qt::AlignCenter,
+                                 m_shiftAltChar);
             }
         }
     }
 }
 
+void UIKeyType::SetImages(QPixmap *normal, QPixmap *focused,
+                          QPixmap *down, QPixmap *downFocused)
+{
+    m_normalImg = normal;
+    m_focusedImg = focused;
+    m_downImg = down;
+    m_downFocusedImg = downFocused;
+}
+
+void UIKeyType::SetDefaultImages(QPixmap *normal, QPixmap *focused,
+                                 QPixmap *down, QPixmap *downFocused)
+{
+    if (!m_normalImg) m_normalImg = normal;
+    if (!m_focusedImg) m_focusedImg = focused;
+    if (!m_downImg) m_downImg = down;
+    if (!m_downFocusedImg) m_downFocusedImg = downFocused;
+}
+
+void UIKeyType::SetFonts(fontProp *normal, fontProp *focused,
+                         fontProp *down, fontProp *downFocused)
+{
+    m_normalFont = normal;
+    m_focusedFont = focused;
+    m_downFont = down;
+    m_downFocusedFont = downFocused;
+}
+
+void UIKeyType::SetDefaultFonts(fontProp *normal, fontProp *focused,
+                                fontProp *down, fontProp *downFocused)
+{
+    if (!m_normalFont) m_normalFont = normal;
+    if (!m_focusedFont) m_focusedFont = focused;
+    if (!m_downFont) m_downFont = down;
+    if (!m_downFocusedFont) m_downFocusedFont = downFocused;
+}
+
+void UIKeyType::SetChars(QString normal, QString shift, QString alt,
+                         QString shiftAlt)
+{
+    m_normalChar = decodeChar(normal);
+    m_shiftChar = decodeChar(shift);
+    m_altChar = decodeChar(alt);
+    m_shiftAltChar = decodeChar(shiftAlt);
+}
+
+QString UIKeyType::GetChar()
+{
+    if (!m_bShift && !m_bAlt)
+        return m_normalChar;
+    else if (m_bShift && !m_bAlt)
+        return m_shiftChar;
+    else if (!m_bShift && m_bAlt)
+        return m_altChar;
+    else if (m_bShift && m_bAlt)
+        return m_shiftAltChar;
+
+    return m_normalChar;
+}
+
+QString UIKeyType::decodeChar(QString c)
+{
+    QString res = "";
+
+    while (c.length() > 0)
+    {
+        if (c.startsWith("0x"))
+        {
+            QString sCode = c.left(6);
+            bool bOK;
+            short nCode = sCode.toShort(&bOK, 16);
+
+            c = c.mid(6);
+
+            if (bOK)
+            {
+                QChar uc(nCode);
+                res += QString(uc);
+            }
+            else
+                cout <<  "UIKeyType::decodeChar - bad char code " 
+                     <<  "(" << sCode << ")" << endl;
+        }
+        else
+        {
+            res += c.left(1);
+            c = c.mid(1);
+        }
+    }
+
+    return res;
+}
+
+void UIKeyType::SetMoves(QString moveLeft, QString moveRight, QString moveUp,
+                         QString moveDown)
+{
+    m_moveLeft = moveLeft;
+    m_moveRight = moveRight;
+    m_moveUp = moveUp;
+    m_moveDown = moveDown;
+}
+
+QString UIKeyType::GetMove(QString direction)
+{
+    QString res = m_moveLeft;
+
+    if (direction == "Up")
+        res = m_moveUp;
+    else if (direction == "Down")
+        res = m_moveDown;
+    else if (direction == "Right")
+        res = m_moveRight;
+
+    return res;
+}
+
+void UIKeyType::calculateScreenArea()
+{
+    if (!m_normalImg)
+        return;
+
+    int width = m_normalImg->width();
+    int height = m_normalImg->height();
+
+    QRect r = QRect(m_pos.x(), m_pos.y(), width, height);
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+    m_area = r;
+}
+
+void UIKeyType::SetShiftState(bool sh, bool ag)
+{
+    m_bShift = sh;
+    m_bAlt = ag;
+    refresh();
+}
+
+void UIKeyType::push()
+{
+    if (m_bToggle)
+    {
+        m_bDown = !m_bDown;
+        refresh();
+        emit pushed();
+
+        return;
+    }
+
+    if (m_bDown)
+        return;
+
+    m_bDown = true;
+    m_pushTimer.start(300, TRUE);
+    refresh();
+    emit pushed();
+}
+
+void UIKeyType::unPush()
+{
+    if (!m_bToggle)
+    {
+        m_bDown = false;
+        refresh();
+    }
+}
+
 // ********************************************************************
+
+const int numcomps = 95;
+
+const QString comps[numcomps][3] = {
+        {"!", "!", (QChar)0xa1},    {"c", "/", (QChar)0xa2},
+        {"l", "-", (QChar)0xa3},    {"o", "x", (QChar)0xa4},
+        {"y", "-", (QChar)0xa5},    {"|", "|", (QChar)0xa6},
+        {"s", "o", (QChar)0xa7},    {"\"", "\"", (QChar)0xa8},
+        {"c", "o", (QChar)0xa9},    {"-", "a", (QChar)0xaa},
+        {"<", "<", (QChar)0xab},    {"-", "|", (QChar)0xac},
+        {"-", "-", (QChar)0xad},    {"r", "o", (QChar)0xae},
+        {"^", "-", (QChar)0xaf},    {"^", "0", (QChar)0xb0},
+        {"+", "-", (QChar)0xb1},    {"^", "2", (QChar)0xb2},
+        {"^", "3", (QChar)0xb3},    {"/", "/", (QChar)0xb4},
+        {"/", "u", (QChar)0xb5},    {"P", "!", (QChar)0xb6},
+        {"^", ".", (QChar)0xb7},    {",", ",", (QChar)0xb8},
+        {"^", "1", (QChar)0xb9},    {"_", "o", (QChar)0xba},
+        {">", ">", (QChar)0xbb},    {"1", "4", (QChar)0xbc},
+        {"1", "2", (QChar)0xbd},    {"3", "4", (QChar)0xbe},
+        {"?", "?", (QChar)0xbf},    {"A", "`", (QChar)0xc0},
+        {"A", "'", (QChar)0xc1},    {"A", "^", (QChar)0xc2},
+        {"A", "~", (QChar)0xc3},    {"A", "\"", (QChar)0xc4},
+        {"A", "*", (QChar)0xc5},    {"A", "E", (QChar)0xc6},
+        {"C", ",", (QChar)0xc7},    {"E", "`", (QChar)0xc8},
+        {"E", "'", (QChar)0xc9},    {"E", "^", (QChar)0xca},
+        {"E", "\"", (QChar)0xcb},   {"I", "`", (QChar)0xcc},
+        {"I", "'", (QChar)0xcd},    {"I", "^", (QChar)0xce},
+        {"I", "\"", (QChar)0xcf},   {"D", "-", (QChar)0xd0},
+        {"N", "~", (QChar)0xd1},    {"O", "`", (QChar)0xd2},
+        {"O", "'", (QChar)0xd3},    {"O", "^", (QChar)0xd4},
+        {"O", "~", (QChar)0xd5},    {"O", "\"", (QChar)0xd6},
+        {"x", "x", (QChar)0xd7},    {"O", "/", (QChar)0xd8},
+        {"U", "`", (QChar)0xd9},    {"U", "'", (QChar)0xda},
+        {"U", "^", (QChar)0xdb},    {"U", "\"", (QChar)0xdc},
+        {"Y", "'", (QChar)0xdd},    {"T", "H", (QChar)0xde},
+        {"s", "s", (QChar)0xdf},    {"a", "`", (QChar)0xe0},
+        {"a", "'", (QChar)0xe1},    {"a", "^", (QChar)0xe2},
+        {"a", "~", (QChar)0xe3},    {"a", "\"", (QChar)0xe4},
+        {"a", "*", (QChar)0xe5},    {"a", "e", (QChar)0xe6},
+        {"c", ",", (QChar)0xe7},    {"e", "`", (QChar)0xe8},
+        {"e", "'", (QChar)0xe9},    {"e", "^", (QChar)0xea},	
+        {"e", "\"", (QChar)0xeb},   {"i", "`", (QChar)0xec},
+        {"i", "'", (QChar)0xed},    {"i", "^", (QChar)0xee},
+        {"i", "\"", (QChar)0xef},   {"d", "-", (QChar)0xf0},
+        {"n", "~", (QChar)0xf1},    {"o", "`", (QChar)0xf2},
+        {"o", "'", (QChar)0xf3},    {"o", "^", (QChar)0xf4},
+        {"o", "~", (QChar)0xf5},    {"o", "\"", (QChar)0xf6},
+        {"-", ":", (QChar)0xf7},    {"o", "/", (QChar)0xf8},
+        {"u", "`", (QChar)0xf9},    {"u", "'", (QChar)0xfa},
+        {"u", "^", (QChar)0xfb},    {"u", "\"", (QChar)0xfc},
+        {"y", "'", (QChar)0xfd},    {"t", "h", (QChar)0xfe},
+        {"y", "\"", (QChar)0xff}
+};
 
 UIKeyboardType::UIKeyboardType(const QString &name, int order)
                     : UIType(name)
 {
     m_order = order;
     m_container = NULL;
+    m_parentEdit = NULL;
+    m_parentDialog = NULL;
+    m_bInitalized = false;
+    m_focusedKey = m_doneKey = m_altKey = m_lockKey = NULL;
+    m_shiftRKey = m_shiftLKey = NULL;
+
+    m_bCompTrap = false;
+    m_comp1 = "";
 }
 
 
@@ -4435,17 +4692,77 @@ UIKeyboardType::~UIKeyboardType()
         delete m_container;
 }
 
-UIKeyType *UIKeyboardType::GetKey(const QString &action)
+void UIKeyboardType::init()
 {
-    UIKeyType *key = NULL;
-    if (HasKey(action))
-        key = m_keymap[action];
+    m_bInitalized = true;
 
-    return key;
+    UIKeyType *key;
+    for (key = m_keyList.first(); key; key = m_keyList.next())
+    {
+        if (key->GetType() == "char")
+        {
+            connect(key, SIGNAL( pushed() ), this, SLOT( charKey() ) );
+        }
+        else if (key->GetType() == "shift")
+        {
+            if (!m_shiftLKey)
+            {
+                connect(key, SIGNAL( pushed() ), this, SLOT( shiftLOnOff() ) );
+                m_shiftLKey = key;
+                m_shiftLKey->SetToggleKey(true);
+            }
+            else
+            {
+                connect(key, SIGNAL( pushed() ), this, SLOT( shiftROnOff() ) );
+                m_shiftRKey = key;
+                m_shiftRKey->SetToggleKey(true);
+            }
+        }
+        else if (key->GetType() == "del")
+        {
+            connect(key, SIGNAL( pushed() ), this, SLOT( delKey() ) );
+        }
+        else if (key->GetType() == "back")
+        {
+            connect(key, SIGNAL( pushed() ), this, SLOT( backspaceKey() ) );
+        }
+        else if (key->GetType() == "lock")
+        {
+            connect(key, SIGNAL( pushed() ), this, SLOT( lockOnOff() ) );
+            m_lockKey = key;
+            m_lockKey->SetToggleKey(true);
+        }
+        else if (key->GetType() == "done")
+        {
+            connect(key, SIGNAL( pushed() ), this, SLOT( close() ) );
+            m_doneKey = key;
+        }
+        else if (key->GetType() == "moveleft")
+        {
+            connect(key, SIGNAL( pushed() ), this, SLOT( leftCursor() ) );
+        }
+        else if (key->GetType() == "moveright")
+        {
+            connect(key, SIGNAL( pushed() ), this, SLOT( rightCursor() ) );
+        }
+        else if (key->GetType() == "comp")
+        {
+            connect(key, SIGNAL( pushed() ), this, SLOT( compOnOff() ) );
+        }
+        else if (key->GetType() == "alt")
+        {
+            connect(key, SIGNAL( pushed() ), this, SLOT( altGrOnOff() ) );
+            m_altKey = key;
+            m_altKey->SetToggleKey(true);
+        }
+    }
 }
 
 void UIKeyboardType::Draw(QPainter *dr, int drawlayer, int context)
 {
+    if (!m_bInitalized)
+        init();
+
     if (hidden)
         return;
 
@@ -4453,37 +4770,373 @@ void UIKeyboardType::Draw(QPainter *dr, int drawlayer, int context)
     {
         if (drawlayer == m_order)
         {
-            KeyList keys = GetKeys();
-            KeyList::iterator it;
-            for (it = keys.begin(); it != keys.end(); ++it)
+            dr = dr;
+        }
+    }
+}
+
+void UIKeyboardType::calculateScreenArea()
+{
+    QRect r = m_area;
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+}
+
+void UIKeyboardType::leftCursor()
+{
+    if (!m_parentEdit) 
+        return;
+
+    if (m_parentEdit->inherits("QLineEdit"))
+    {
+        QLineEdit *par = (QLineEdit *)m_parentEdit;
+        par->cursorBackward(m_shiftLKey->IsOn());
+    }
+    else
+    {
+        QTextEdit *par = (QTextEdit *)m_parentEdit;
+        par->moveCursor(QTextEdit::MoveBackward, false);
+    }
+}
+
+void UIKeyboardType::rightCursor()
+{
+    if (!m_parentEdit) 
+        return;
+
+    if (m_parentEdit->inherits("QLineEdit"))
+    {
+        QLineEdit *par = (QLineEdit *)m_parentEdit;
+        par->cursorForward(m_shiftLKey->IsOn());
+    }
+    else
+    {
+        QTextEdit *par = (QTextEdit *)m_parentEdit;
+        par->moveCursor(QTextEdit::MoveForward, false);
+    }
+}
+
+void UIKeyboardType::backspaceKey()
+{
+    if (!m_parentEdit) 
+        return;
+
+    if (m_parentEdit->inherits("QLineEdit"))
+    {
+        QLineEdit *par = (QLineEdit *)m_parentEdit;
+        par->backspace();
+    }
+    else
+    {
+        MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
+        par->backspace();
+    }
+}
+
+void UIKeyboardType::delKey()
+{
+    if (!m_parentEdit) 
+        return;
+
+    if (m_parentEdit->inherits("QLineEdit"))
+    {
+        QLineEdit *par = (QLineEdit *)m_parentEdit;
+        par->del();
+    }
+    else
+    {
+        MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
+        par->del();
+    }
+}
+
+void UIKeyboardType::altGrOnOff()
+{
+    if (m_lockKey->IsOn())
+    {
+        m_shiftLKey->SetOn(false);
+        m_shiftRKey->SetOn(false);
+        if (m_altKey) m_altKey->SetOn(false);
+        m_lockKey->SetOn(false);
+    }
+    updateButtons();
+}
+
+void UIKeyboardType::compOnOff()
+{
+    m_bCompTrap = !m_bCompTrap;
+    m_comp1 = "";
+}
+
+void UIKeyboardType::charKey()
+{
+    if (m_focusedKey && m_focusedKey->GetType() == "char")
+    {
+        insertChar(m_focusedKey->GetChar());
+        shiftOff();
+    }
+}
+
+void UIKeyboardType::insertChar(QString c)
+{
+    if (!m_bCompTrap)
+    {
+        if (m_parentEdit->inherits("QLineEdit"))
+        {
+            QLineEdit *par = (QLineEdit *)m_parentEdit;
+            par->insert(c);
+        }
+        else
+        {
+            MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
+            par->insert(c);
+        }
+    }
+    else
+    {
+        if (m_comp1.isEmpty()) m_comp1 = c;
+        else
+        {
+            // Produce the composed key.
+            for (int i=0; i<numcomps; i++)
             {
-                UIKeyType *key = (*it);
-
-                // button bg img (notclicked)
-                QString notclicked = key->GetNotClicked();
-                UIImageType *img;
-                img = (UIImageType*)GetType(notclicked);
-                if (img)
+                if ((m_comp1 == comps[i][0]) && (c == comps[i][1]))
                 {
-                    img->SetPosition(key->GetPosition());
-                    img->Draw(dr, 0, context);
-                }
+                    if (m_parentEdit->inherits("QLineEdit"))
+                    {
+                        QLineEdit *par = (QLineEdit *)m_parentEdit;
+                        par->insert(comps[i][2]);
+                    }
+                    else
+                    {
+                        MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
+                        par->insert(comps[i][2]);
+                    }
 
-                // button subtitle img
-                QString subtitle = key->GetSubtitle();
-                img = (UIImageType*)GetType(subtitle);
-                if (img)
-                {
-                    img->Draw(dr, 1, context);
+                    break;
                 }
             }
-
-            // button text
-            m_container->Draw(dr, 1, context);
-
-            // button bg img (clicked)
-            m_container->Draw(dr, 2, context);
+            // Reset compTrap.
+            m_comp1 = "";
+            m_bCompTrap = false;
         }
+    }
+}
+
+void UIKeyboardType::lockOnOff()
+{
+    if (m_lockKey->IsOn())
+    {
+        if (!(m_altKey && m_altKey->IsOn()))
+        {
+            m_shiftLKey->SetOn(true);
+            m_shiftRKey->SetOn(true);
+        }
+    }
+    else
+    {
+        m_shiftLKey->SetOn(false);
+        m_shiftRKey->SetOn(false);
+        if (m_altKey) m_altKey->SetOn(false);
+    }
+    updateButtons();
+}
+
+void UIKeyboardType::shiftOff()
+{
+    if (!m_lockKey->IsOn())
+    {
+        m_shiftLKey->SetOn(false);
+        m_shiftRKey->SetOn(false);
+        if (m_altKey) m_altKey->SetOn(false);
+    }
+    updateButtons();
+}
+
+void UIKeyboardType::close(void)
+{
+    if (!m_parentDialog)
+        return;
+
+    m_parentDialog->done(0);
+}
+
+void UIKeyboardType::updateButtons()
+{
+    bool bShift = m_shiftLKey->IsOn();
+    bool bAlt = (m_altKey ? m_altKey->IsOn() : false);
+
+    UIKeyType *key;
+    for (key = m_keyList.first(); key; key = m_keyList.next())
+    {
+        key->SetShiftState(bShift, bAlt);
+    }
+}
+
+void UIKeyboardType::shiftLOnOff()
+{
+    if (m_lockKey->IsOn())
+    {
+        m_shiftLKey->SetOn(false);
+        m_shiftRKey->SetOn(false);
+        if (m_altKey) m_altKey->SetOn(false);
+        m_lockKey->SetOn(false);
+    }
+    else m_shiftRKey->SetOn(m_shiftLKey->IsOn());
+
+    updateButtons();
+}
+
+void UIKeyboardType::shiftROnOff()
+{
+    if (m_lockKey->IsOn())
+    {
+        m_shiftLKey->SetOn(false);
+        m_shiftRKey->SetOn(false);
+        if (m_altKey) m_altKey->SetOn(false);
+        m_lockKey->SetOn(false);
+    }
+    else m_shiftLKey->SetOn(m_shiftRKey->IsOn());
+
+    updateButtons();
+}
+
+void UIKeyboardType::keyPressEvent(QKeyEvent *e)
+{
+    bool handled = false;
+    QStringList actions;
+    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
+    {
+        for (unsigned int i = 0; i < actions.size() && !handled; i++)
+        {
+            QString action = actions[i];
+            handled = true;
+
+            if (action == "UP")
+            {
+                moveUp();
+            }
+            else if (action == "DOWN")
+            {
+                moveDown();
+            }
+            else if (action == "LEFT")
+            {
+                moveLeft();
+            }
+            else if (action == "RIGHT")
+            {
+                moveRight();
+            }
+            else if (action == "SELECT")
+                m_focusedKey->activate();
+            else
+                handled = false;
+        }
+    }
+
+    if (!handled)
+    {
+        QApplication::postEvent(m_parentEdit, new QKeyEvent(e->type(), e->key(),
+                e->ascii(), e->state(), e->text(), e->isAutoRepeat(), e->count()));
+        m_parentEdit->setFocus();
+    }
+}
+
+void UIKeyboardType::moveUp()
+{
+    if (!m_focusedKey)
+    {
+        m_focusedKey = m_doneKey;
+        return;
+    }
+
+    UIKeyType *newKey = findKey(m_focusedKey->GetMove("Up"));
+
+    if (newKey)
+    {
+        m_focusedKey->looseFocus();
+        m_focusedKey = newKey;
+        m_focusedKey->takeFocus();
+    }
+}
+
+void UIKeyboardType::moveDown()
+{
+    if (!m_focusedKey)
+    {
+        m_focusedKey = m_doneKey;
+        return;
+    }
+
+    UIKeyType *newKey = findKey(m_focusedKey->GetMove("Down"));
+
+    if (newKey)
+    {
+        m_focusedKey->looseFocus();
+        m_focusedKey = newKey;
+        m_focusedKey->takeFocus();
+    }
+}
+
+void UIKeyboardType::moveLeft()
+{
+    if (!m_focusedKey)
+    {
+        m_focusedKey = m_doneKey;
+        return;
+    }
+
+    UIKeyType *newKey = findKey(m_focusedKey->GetMove("Left"));
+
+    if (newKey)
+    {
+        m_focusedKey->looseFocus();
+        m_focusedKey = newKey;
+        m_focusedKey->takeFocus();
+    }
+}
+
+void UIKeyboardType::moveRight()
+{
+    if (!m_focusedKey)
+    {
+        m_focusedKey = m_doneKey;
+        return;
+    }
+
+    UIKeyType *newKey = findKey(m_focusedKey->GetMove("Right"));
+
+    if (newKey)
+    {
+        m_focusedKey->looseFocus();
+        m_focusedKey = newKey;
+        m_focusedKey->takeFocus();
+    }
+}
+
+UIKeyType *UIKeyboardType::findKey(QString keyName)
+{
+    UIKeyType *key;
+    for (key = m_keyList.first(); key; key = m_keyList.next())
+    {
+        if (key->getName() == keyName)
+        {
+            return key;
+        }
+    }
+    return NULL;
+}
+
+void UIKeyboardType::AddKey(UIKeyType *key)
+{
+    m_keyList.append(key); 
+
+    if (key->GetType().lower() == "done")
+    {
+        key->takeFocus();
+        m_focusedKey = key;
     }
 }
 

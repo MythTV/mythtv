@@ -16,24 +16,24 @@ HEADERS += dialogbox.h lcddevice.h mythcontext.h mythwidgets.h oldsettings.h
 HEADERS += remotefile.h settings.h themedmenu.h util.h mythwizard.h
 HEADERS += volumecontrol.h uitypes.h xmlparse.h mythplugin.h mythdbcon.h
 HEADERS += mythdialogs.h audiooutput.h httpcomms.h mythmedia.h 
-HEADERS += uilistbtntype.h uiphoneentry.h generictree.h screensaver.h
+HEADERS += uilistbtntype.h generictree.h screensaver.h
 HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
 HEADERS += dbsettings.h screensaver-null.h output.h visual.h
 HEADERS += langsettings.h audiooutputnull.h
 HEADERS += DisplayResScreen.h util-x11.h mythdeque.h qmdcodec.h
-HEADERS += exitcodes.h
+HEADERS += exitcodes.h virtualkeyboard.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
 SOURCES += util.cpp mythwizard.cpp uitypes.cpp xmlparse.cpp
 SOURCES += mythplugin.cpp mythdialogs.cpp audiooutput.cpp  
-SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp uiphoneentry.cpp
+SOURCES += httpcomms.cpp mythmedia.cpp uilistbtntype.cpp 
 SOURCES += generictree.cpp managedlist.cpp DisplayRes.cpp
 SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
 SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp
-
+SOURCES += virtualkeyboard.h
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../..
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
@@ -57,9 +57,9 @@ inc.files  = dialogbox.h lcddevice.h themedmenu.h mythcontext.h mythdbcon.h
 inc.files += mythwidgets.h remotefile.h util.h oldsettings.h volumecontrol.h
 inc.files += settings.h uitypes.h xmlparse.h mythplugin.h mythdialogs.h
 inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
-inc.files += uilistbtntype.h uiphoneentry.h generictree.h managedlist.h
+inc.files += uilistbtntype.h generictree.h managedlist.h
 inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
-inc.files += exitcodes.h mythconfig.h mythconfig.mak
+inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
 
 using_oss {
     DEFINES += USING_OSS
