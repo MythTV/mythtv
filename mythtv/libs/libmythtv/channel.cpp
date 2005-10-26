@@ -899,15 +899,16 @@ bool Channel::SetInputAndFormat(int newcapchannel, QString newFmt)
 
 bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
 {
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::SwitchToInput(in %2%3)")
+    QString channum   = inputTuneTo[newcapchannel];
+    QString inputname = channelnames[newcapchannel];
+
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::SwitchToInput(in %2, '%3')")
             .arg(device).arg(newcapchannel)
-            .arg(setstarting ? ", set ch" : ""));
+            .arg(setstarting ? channum : QString("")));
 
     if (videomode_v4l2.find(newcapchannel) == videomode_v4l2.end())
         SetFormat("Default");
     QString newFmt    = mode_to_format(videomode_v4l2[newcapchannel], 2);
-    QString channum   = inputTuneTo[newcapchannel];
-    QString inputname = channelnames[newcapchannel];
 
     // If we are setting a channel, get its video mode...
     bool chanValid  = (channum != "Undefined") && !channum.isEmpty();
@@ -925,7 +926,10 @@ bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
         ok = SetInputAndFormat(newcapchannel, "ATSC");
 
     if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "SetInputAndFormat() failed");
         return false;
+    }
 
     currentFormat     = newFmt;
     is_dtv            = newFmt == "ATSC";
@@ -935,7 +939,13 @@ bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
     if (setstarting && chanValid)
         ok = SetChannelByString(channum);
     else if (setstarting && !chanValid)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("SwitchToInput(in %2, set ch): ").arg(newcapchannel) +
+                QString("\n\t\t\tDefault channel '%1' is not valid.")
+                .arg(channum));
         ok = false;
+    }
 
     return ok;
 }
