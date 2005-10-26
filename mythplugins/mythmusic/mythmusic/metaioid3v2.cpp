@@ -252,6 +252,10 @@ Metadata* MetaIOID3v2::read(QString filename)
 
     length = getTrackLength(filename);
 
+    // If we don't have title and artist or don't have the length return NULL
+    if ((title.isEmpty() && artist.isEmpty()) || length<=0)
+        return NULL;
+
     Metadata *retdata = new Metadata(filename, artist, compilation_artist, album,
                                      title, genre, year, tracknum, length);
                                      
