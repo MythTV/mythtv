@@ -118,6 +118,16 @@ static HostCheckBox *AutoLookupCD()
     return gc;
 };
 
+static HostCheckBox *AutoPlayCD()
+{
+    HostCheckBox *gc = new HostCheckBox("AutoPlayCD");
+    gc->setLabel(QObject::tr("Automatically play CDs"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Automatically put a new CD on the "
+                                "playlist and start playing the CD."));
+    return gc;
+};
+
 static HostCheckBox *KeyboardAccelerators()
 {
     HostCheckBox *gc = new HostCheckBox("KeyboardAccelerators");
@@ -540,6 +550,7 @@ MusicGeneralSettings::MusicGeneralSettings()
     general->addChild(NonID3FileNameFormat());
     general->addChild(IgnoreID3Tags());
     general->addChild(AutoLookupCD());
+    general->addChild(AutoPlayCD());
     general->addChild(KeyboardAccelerators());
     addChild(general);
 

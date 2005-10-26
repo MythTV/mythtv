@@ -17,6 +17,7 @@ using namespace std;
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythwidgets.h>
 #include <mythtv/lcddevice.h>
+#include <mythtv/mythmedia.h>
 
 PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
                                    QString theme_filename, 
@@ -53,6 +54,10 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     
     menufilters = gContext->GetNumSetting("MusicMenuFilters", 0);
 
+    cd_reader_thread = NULL;
+    cd_watcher = NULL;
+    scan_for_cd = gContext->GetNumSetting("AutoPlayCD", 0);
+ 
     // Set our pointers the playlists and the metadata containers
 
     all_playlists = the_playlists;
@@ -165,7 +170,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     bool delayOK;
     visual_mode_delay = visual_delay.toInt(&delayOK);
     if (!delayOK)
-    	visual_mode_delay = 0;
+        visual_mode_delay = 0;
     if (visual_mode_delay > 0)
     {
         visual_mode_timer->start(visual_mode_delay * 1000);
@@ -196,6 +201,14 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
 PlaybackBoxMusic::~PlaybackBoxMusic(void)
 {
     stopAll();
+
+    if (cd_reader_thread)
+    {
+        cd_watcher->stop();
+        cd_reader_thread->wait();
+        delete cd_reader_thread;
+    }
+
     if (playlist_tree)
         delete playlist_tree;
 
@@ -214,6 +227,11 @@ PlaybackBoxMusic::~PlaybackBoxMusic(void)
         gContext->SaveSetting("RepeatMode", "none");
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
+}
+
+bool PlaybackBoxMusic::onMediaEvent(MythMediaDevice *pDev)
+{
+    return scan_for_cd;
 }
 
 void PlaybackBoxMusic::keyPressEvent(QKeyEvent *e)
@@ -453,6 +471,8 @@ void PlaybackBoxMusic::showMenu()
     splitter->setMaximumHeight((int) (5 * hmult));
     splitter->setMaximumHeight((int) (5 * hmult));
     
+    playlist_popup->addButton(tr("From CD"), this,
+                              SLOT(fromCD()));
     playlist_popup->addButton(tr("All Tracks"), this,
                               SLOT(allTracks()));
     if (curMeta)
@@ -488,6 +508,15 @@ void PlaybackBoxMusic::allTracks()
         return;
 
     updatePlaylistFromQuickPlaylist("ORDER BY artist, album, tracknum");
+    closePlaylistPopup();
+}
+
+void PlaybackBoxMusic::fromCD()
+{
+    if (!playlist_popup)
+        return;
+
+    updatePlaylistFromCD();
     closePlaylistPopup();
 }
 
@@ -593,10 +622,80 @@ void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause)
     music_tree_list->refresh();
 }
 
+void PlaybackBoxMusic::updatePlaylistFromCD()
+{
+    if (!cd_reader_thread)
+    {
+        cd_reader_thread = new ReadCDThread(all_playlists, all_music);
+        cd_reader_thread->start();
+    }
+
+    if (!cd_watcher)
+    {
+        cd_watcher = new QTimer(this);
+        connect(cd_watcher, SIGNAL(timeout()), this, SLOT(occasionallyCheckCD()));
+        cd_watcher->start(1000);
+    }
+
+}
+
+void PlaybackBoxMusic::postUpdate()
+{
+   QValueList <int> branches_to_current_node;
+
+   if (visual_mode_delay > 0)
+       visual_mode_timer->start(visual_mode_delay * 1000);
+
+   constructPlaylistTree();
+
+   stop();
+   wipeTrackInfo();
+
+   // move to first track in list
+   branches_to_current_node.clear();
+   branches_to_current_node.append(0); //  Root node
+   branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+   branches_to_current_node.append(0); //  Active play Queue
+   music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+   music_tree_list->refresh();
+}
+
+void PlaybackBoxMusic::occasionallyCheckCD()
+{
+    if (cd_reader_thread->getLock()->locked())
+        return;
+
+    if (!scan_for_cd) {
+        cd_watcher->stop();
+        delete cd_watcher;
+        cd_watcher = NULL;
+
+        cd_reader_thread->wait();
+        delete cd_reader_thread;
+        cd_reader_thread = NULL;
+    }
+
+    if (!scan_for_cd || cd_reader_thread->statusChanged())
+    {
+        all_playlists->clearCDList();
+        all_playlists->getActive()->ripOutAllCDTracksNow();
+
+        if(all_music->getCDTrackCount()) {
+            visual_mode_timer->stop();
+
+            all_playlists->getActive()->removeAllTracks();
+            all_playlists->getActive()->fillSongsFromCD();
+
+            postUpdate();
+        }
+    }
+
+    if (scan_for_cd && !cd_reader_thread->running())
+        cd_reader_thread->start();
+}
+
 void PlaybackBoxMusic::updatePlaylistFromSmartPlaylist(QString category, QString name)
 {
-    QValueList <int> branches_to_current_node;
-    
     visual_mode_timer->stop();
 
     all_playlists->getActive()->removeAllTracks();
@@ -604,21 +703,7 @@ void PlaybackBoxMusic::updatePlaylistFromSmartPlaylist(QString category, QString
     all_playlists->getActive()->fillSongsFromSonglist(menufilters);
     all_playlists->getActive()->postLoad();
 
-    if (visual_mode_delay > 0)
-        visual_mode_timer->start(visual_mode_delay * 1000);
-
-    constructPlaylistTree();
-    
-    stop();
-    wipeTrackInfo();
-    
-    // move to first track in list
-    branches_to_current_node.clear();
-    branches_to_current_node.append(0); //  Root node
-    branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
-    branches_to_current_node.append(0); //  Active play Queue
-    music_tree_list->moveToNodesFirstChild(branches_to_current_node);
-    music_tree_list->refresh();
+    postUpdate();
 }
 
 void PlaybackBoxMusic::showEditMetadataDialog()
@@ -667,6 +752,9 @@ void PlaybackBoxMusic::checkForPlaylists()
     {
         if (tree_is_done)
         {
+            if (scan_for_cd)
+                updatePlaylistFromCD();
+
             music_tree_list->showWholeTree(show_whole_tree);
             waiting_for_playlists_timer->stop();
             QValueList <int> branches_to_current_node;
@@ -808,13 +896,13 @@ void PlaybackBoxMusic::play()
 
         // TODO: Error checking that device is opened correctly!
         output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
-	                                 AUDIOOUTPUT_MUSIC, true );	
+                                     AUDIOOUTPUT_MUSIC, true ); 
         output->setBufferSize(outputBufferSize * 1024);
         output->SetBlocking(false);
         output->addListener(this);
         output->addListener(mainvisual);
         output->addVisual(mainvisual);
-	
+    
         startoutput = true;
 
     }

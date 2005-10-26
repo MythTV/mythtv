@@ -24,22 +24,21 @@ Track::Track(int x, AllMusic *all_music_ptr)
 
 void Track::postLoad(PlaylistsContainer *grandparent)
 {
-    if (!cd_flag)
+    if (cd_flag)
     {
-        if (index_value == 0)
-        {
-            cerr << "playlist.o: Not sure how I got 0 as a track number, but "
-                    "it ain't good" << endl;
-        }
-        else if (index_value > 0) // Normal Track
-            label = all_available_music->getLabel(index_value, &bad_reference);
-        else if (index_value < 0)
-            label = grandparent->getPlaylistName(index_value, 
-                                                 bad_reference);
+        int val = (index_value < 0) ? -index_value : index_value;
+        label = all_available_music->getLabel(val, &bad_reference);
+        return;
     }
+
+    if (index_value > 0) // Normal Track
+        label = all_available_music->getLabel(index_value, &bad_reference);
+    else if (index_value < 0)
+        label = grandparent->getPlaylistName( index_value,  bad_reference);
     else
     {
-        label = all_available_music->getLabel(index_value * -1, &bad_reference);
+        cerr << "playlist.o: Not sure how I got 0 as a track number, but "
+            "it ain't good" << endl;
     }
 }
 
@@ -608,6 +607,12 @@ void Playlist::fillSonglistFromQuery(QString whereClause)
         raw_songlist += ", " + query.value(0).toString();
     }
     raw_songlist.remove(0, 2);
+}
+
+void Playlist::fillSongsFromCD()
+{
+    for (int i = 1; i <= all_available_music->getCDTrackCount(); i++)
+       addTrack(-1 * i, true, true);
 }
 
 void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name)

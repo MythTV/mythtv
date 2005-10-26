@@ -368,7 +368,10 @@ void runRipCD(void);
 
 void handleMedia(MythMediaDevice *) 
 {
-    mythplugin_run();
+    if (gContext->GetNumSetting("AutoPlayCD", 0))
+        runMusicPlayback();
+    else
+        mythplugin_run();
 }
 
 void setupKeys(void)

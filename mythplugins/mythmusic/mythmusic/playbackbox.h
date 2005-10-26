@@ -13,6 +13,7 @@
 #include "metadata.h"
 #include "playlist.h"
 #include "editmetadata.h"
+#include "databasebox.h"
 
 class Output;
 class Decoder;
@@ -39,6 +40,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void showEvent(QShowEvent *);
     void keyPressEvent(QKeyEvent *e);
     void constructPlaylistTree();
+
+    bool onMediaEvent(MythMediaDevice *pDev);
 
   public slots:
 
@@ -73,6 +76,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     void toggleFullBlankVisualizer();
     void end();
 
+    void occasionallyCheckCD();
+
     // popup menu
     void showMenu();
     void closePlaylistPopup();
@@ -81,6 +86,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void byAlbum();
     void byGenre();
     void byYear();    
+    void fromCD();
     void showSmartPlaylistDialog();
     
   signals:
@@ -93,6 +99,9 @@ class PlaybackBoxMusic : public MythThemedDialog
     void updatePlaylistFromQuickPlaylist(QString whereClause);
     void updatePlaylistFromSmartPlaylist(QString category, QString name);
     void CycleVisualizer(void);
+    void updatePlaylistFromCD(void);
+
+    void postUpdate();
 
     QIODevice *input;
     AudioOutput *output;
@@ -130,6 +139,11 @@ class PlaybackBoxMusic : public MythThemedDialog
     bool lcd_volume_visible;
 
     bool menufilters;
+
+    ReadCDThread *cd_reader_thread;
+    QTimer *cd_watcher;
+    bool cd_checking_flag;
+    bool scan_for_cd;
 
     MainVisual *mainvisual;
 
