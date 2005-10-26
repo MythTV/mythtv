@@ -2693,7 +2693,7 @@ void UIManagedTreeListType::Draw(QPainter *p, int drawlayer, int context)
             bool selected;
             int pos = current_node->getPosition();
 
-            if (pos > lcddev->getLCDHeight())
+            if (pos > (int)lcddev->getLCDHeight())
                 lnode = nodes->at(pos - lcddev->getLCDHeight());
             else
                 lnode = nodes->first();
