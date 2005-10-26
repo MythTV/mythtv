@@ -55,6 +55,7 @@ class LCDServer : public QObject
     void switchToMenu(const QStringList &tokens, QSocket *socket);
     void setChannelProgress(const QStringList &tokens, QSocket *socket);
     void setMusicProgress(const QStringList &tokens, QSocket *socket);
+    void setMusicProp(const QStringList &tokens, QSocket *socket);
     void setGenericProgress(const QStringList &tokens, QSocket *socket);
     void setVolumeLevel(const QStringList &tokens, QSocket *socket);
     void updateLEDs(const QStringList &tokens, QSocket *socket);

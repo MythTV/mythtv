@@ -29,7 +29,8 @@
 #define LCD_TIME_TIME       5000
 #define LCD_SCROLLLIST_TIME 2000
 
-LCDProcClient::LCDProcClient(LCDServer *lparent) : QObject(NULL, "LCDProcClient")
+LCDProcClient::LCDProcClient(LCDServer *lparent) :
+    QObject(NULL, "LCDProcClient")
 {
     // Constructor for LCDProcClient
     //
@@ -470,6 +471,7 @@ void LCDProcClient::init()
     setPriority("Music", LOW);
     sendToServer("widget_add Music topWidget string");
     sendToServer("widget_add Music timeWidget string");
+    sendToServer("widget_add Music infoWidget string");
     sendToServer("widget_add Music progressBar hbar");
     
     // The Channel Screen
@@ -959,6 +961,7 @@ void LCDProcClient::assignScrollingList(QStringList theList, QString theScreen,
 void LCDProcClient::startMusic(QString artist, QString album, QString track)
 {
     QString aString;
+    music_progress = 0.0f;
     if (lcd_showmusic)
       setPriority("Music", HIGH);
     aString = artist;
@@ -1016,7 +1019,7 @@ void LCDProcClient::startGeneric(QPtrList<LCDTextItem> * textItems)
     QString aString;
 
     if (lcd_showgeneric)
-      setPriority("Generic", HIGH);
+        setPriority("Generic", TOP);
 
     // Clear out the LCD.  Do this before checking if its empty incase the user
     //  wants to just clear the lcd
@@ -1029,6 +1032,11 @@ void LCDProcClient::startGeneric(QPtrList<LCDTextItem> * textItems)
         return;
 
     activeScreen = "Generic";
+
+    busy_progress = false;
+    busy_pos = 1;
+    busy_direction = 1;
+    busy_indicator_size = 2.0f;
     generic_progress = 0.0;
 
     // Return if there are no more items
@@ -1505,7 +1513,7 @@ void LCDProcClient::setChannelProgress(float value)
     outputChannel();    
 }
 
-void LCDProcClient::setGenericProgress(float value)
+void LCDProcClient::setGenericProgress(bool b, float value)
 {
     if (!lcd_ready)
         return;
@@ -1516,6 +1524,26 @@ void LCDProcClient::setGenericProgress(float value)
         generic_progress = 0.0;
     else if (generic_progress > 1.0)
         generic_progress = 1.0;
+
+    // Note, this will let us switch to/from busy indicator by 
+    // alternating between being passed true or false for b.
+    busy_progress = b;
+    if (busy_progress)
+    {
+        // If we're at either end of the line, switch direction
+        if ((busy_pos + busy_direction >
+             (signed int)lcdWidth - busy_indicator_size) ||
+            (busy_pos + busy_direction < 1))
+        {
+            busy_direction = -busy_direction;
+        }
+        busy_pos += busy_direction;
+        generic_progress = busy_indicator_size / (float)lcdWidth;
+    }
+    else
+    {
+        busy_pos = 1;
+    }
 
     outputGeneric();
 }
@@ -1534,6 +1562,26 @@ void LCDProcClient::setMusicProgress(QString time, float value)
         music_progress = 1.0;
 
     outputMusic();
+}
+
+void LCDProcClient::setMusicRepeat (int repeat) 
+{
+    if (!lcd_ready)
+        return;
+
+    music_repeat = repeat;
+
+    outputMusic ();
+}
+
+void LCDProcClient::setMusicShuffle (int shuffle) 
+{
+    if (!lcd_ready)
+        return;
+
+    music_shuffle = shuffle;
+
+    outputMusic ();
 }
 
 void LCDProcClient::setVolumeLevel(float value)
@@ -1767,18 +1815,45 @@ QStringList LCDProcClient::formatScrollerText(const QString &text)
 
 void LCDProcClient::outputMusic()
 {
-    QString aString;
+    outputCenteredText("Music", music_time, "timeWidget", 2);
 
-    if (lcdHeight > 2) {
-      outputCenteredText("Music", music_time, "timeWidget", 2);
+    if (lcdHeight > 2)
+    {
+        QString props;
+        QString shuffle = "      ";
+        QString repeat  = "      ";
+
+        if (music_shuffle == 1)
+        {
+            shuffle = "Shfl ?";
+        }
+        else if (music_shuffle == 2)
+        {
+            shuffle = "Shfl i";         
+        }
+
+        if (music_repeat == 1)
+        {
+            repeat = "Rpt 1";
+        }
+        else if (music_repeat == 2)
+        {
+            repeat = "Rpt *";         
+        }
+
+        props.sprintf("%s  %s", shuffle.ascii(), repeat.ascii());
+
+        outputCenteredText("Music", props, "infoWidget", lcdHeight);
     }
 
-    aString = "widget_set Music progressBar 1 ";
-    aString += QString::number(lcdHeight);
-    aString += " ";
-    aString += QString::number((int)rint(music_progress * lcdWidth * 
-                               cellWidth));
-    sendToServer(aString);
+    if (lcdHeight > 3)
+    {
+        QString aString;
+        aString = "widget_set Music progressBar 1 3 ";
+        aString += QString::number((int)rint(music_progress * lcdWidth * 
+                                             cellWidth));
+        sendToServer(aString);
+    }
 }
 
 void LCDProcClient::outputChannel()
@@ -1794,7 +1869,9 @@ void LCDProcClient::outputChannel()
 void LCDProcClient::outputGeneric()
 {
     QString aString;
-    aString = "widget_set Generic progressBar 1 ";
+    aString = "widget_set Generic progressBar ";
+    aString += QString::number (busy_pos);
+    aString += " ";
     aString += QString::number(lcdHeight);
     aString += " ";
     aString += QString::number((int)rint(generic_progress * lcdWidth * 
@@ -1935,6 +2012,7 @@ void LCDProcClient::shutdown()
     sendToServer("screen_del Menu menuWidget5");
 
     sendToServer("widget_del Music progressBar");
+    sendToServer("widget_del Music infoWidget");
     sendToServer("widget_del Music timeWidget");
     sendToServer("widget_del Music topWidget");
     sendToServer("screen_del Music");
@@ -2003,7 +2081,12 @@ void LCDProcClient::updateRecordingList(void)
                                   "- is the master server running?\n\t\t\t"
                                   "Will retry in 30 seconds");
             QTimer::singleShot(30 * 1000, this, SLOT(updateRecordingList()));
-            switchToTime();
+
+            // If we can't get the recording status and we're showing
+            // it, switch back to time. Maybe it would be even better
+            // to show that the backend is unreachable ?
+            if (activeScreen == "RecStatus")
+                switchToTime();
             return;
         }    
     }

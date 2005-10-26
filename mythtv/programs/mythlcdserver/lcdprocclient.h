@@ -39,6 +39,8 @@ class LCDProcClient : public QObject
     
     void switchToMusic(const QString &artist, const QString &album, const QString &track);
     void setMusicProgress(QString time, float generic_progress);
+    void setMusicRepeat(int repeat);
+    void setMusicShuffle(int shuffle);
     void setLevels(int numbLevels, float *values);
     
     void switchToChannel(QString channum = "", QString title = "", 
@@ -49,7 +51,7 @@ class LCDProcClient : public QObject
                       bool popMenu = true);
     
     void switchToGeneric(QPtrList<LCDTextItem> *textItems);
-    void setGenericProgress(float generic_progress);
+    void setGenericProgress(bool busy, float generic_progress);
 
     void switchToVolume(QString app_name);
     void setVolumeLevel(float volume_level);
@@ -162,11 +164,25 @@ class LCDProcClient : public QObject
         
     float EQlevels[10];
     float progress;
+    /** true if the generic progress indicator is a busy
+        (ie. doesn't have a known total steps */
+    bool busy_progress;
+    /** Current position of the busy indicator,
+        used if @p busy_progress is true. */
+    int busy_pos;
+    /** How many "blocks" the busy indicator must be,
+        used if @p busy_progress is true. */
+    float busy_indicator_size;
+    /** Direction of the busy indicator on the, -1 or 1,
+        used if @p busy_progress is true. */
+    int busy_direction;
     float generic_progress;
     float volume_level;
 
     float music_progress;
     QString music_time;
+    int music_repeat;
+    int music_shuffle;
 
     QString scrollingText;
     QString scrollScreen, scrollWidget;

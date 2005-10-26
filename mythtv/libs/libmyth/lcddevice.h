@@ -104,6 +104,18 @@ class LCD : public QObject
   public:
    ~LCD();
 
+    enum { 
+        MUSIC_REPEAT_NONE  = 0,
+        MUSIC_REPEAT_TRACK = 1,
+        MUSIC_REPEAT_ALL   = 2,
+    };
+
+    enum { 
+        MUSIC_SHUFFLE_NONE  = 0,
+        MUSIC_SHUFFLE_RAND  = 1,
+        MUSIC_SHUFFLE_SMART = 2,
+    };
+
     static class LCD * Get(void);
     static void SetupLCD (void);
 
@@ -147,11 +159,29 @@ class LCD : public QObject
     // define the screen, row, and alignment of the text
     void switchToGeneric(QPtrList<LCDTextItem> *textItems);
 
-    // Do a progress bar with the generic level between 0 and 1.0
+    /** \brief Update the generic progress bar.
+        \param generic_progress a value between 0 and 1.0
+    */
     void setGenericProgress(float generic_progress);
+
+    /** \brief Update the generic screen to display a busy spinner.
+        \note The LCD busy spinner only 'moves' when this is called
+              instead of the lcdserver just handling it itself. 
+    */
+    void setGenericBusy();
 
     // Do a music progress bar with the generic level between 0 and 1.0
     void setMusicProgress(QString time, float generic_progress);
+
+    /** \brief Set music player's repeat properties         
+        \param repeat the state of repeat
+    */
+    void setMusicRepeat(int repeat);
+
+    /** \brief Set music player's shuffle properties             
+        \param repeat the state of repeat
+    */
+    void setMusicShuffle(int shuffle);
 
     // Show the Volume Level top_text scrolls
     void switchToVolume(QString app_name);

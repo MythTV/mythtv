@@ -102,6 +102,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void updatePlaylistFromSmartPlaylist(QString category, QString name);
     void CycleVisualizer(void);
     void updatePlaylistFromCD(void);
+    void setTrackOnLCD (Metadata *mdata);
 
     void postUpdate();
 

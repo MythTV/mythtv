@@ -192,7 +192,7 @@ void LCD::sendToServer(const QString &someText)
 #endif
         // Just stream the text out the socket
 
-        os << someText << "\n";
+        os << someText << "\n" << flush;
     }
     else
     {
@@ -382,12 +382,16 @@ void LCD::setGenericProgress(float value)
     if (!lcd_ready || !lcd_showgeneric)
         return;
 
-    if (value < 0.0)
-        value = 0.0;
-    else if (value > 1.0)
-        value = 1.0;
-        
-    sendToServer("SET_GENERIC_PROGRESS " + QString().setNum(value));    
+    value = min(max(0.0f, value), 1.0f);
+    QString msg = QString("SET_GENERIC_PROGRESS 0 %2").arg(value);
+}
+
+void LCD::setGenericBusy()
+{
+    if (!lcd_ready || !lcd_showgeneric)
+        return;
+
+    sendToServer("SET_GENERIC_PROGRESS 1 0.0");
 }
 
 void LCD::setMusicProgress(QString time, float value)
@@ -395,13 +399,25 @@ void LCD::setMusicProgress(QString time, float value)
     if (!lcd_ready || !lcd_showmusic)
         return;
 
-    if (value < 0.0)
-        value = 0.0;
-    else if (value > 1.0)
-        value = 1.0;
-        
+    value = min(max(0.0f, value), 1.0f);
     sendToServer("SET_MUSIC_PROGRESS " + quotedString(time) + " " + 
             QString().setNum(value));    
+}
+
+void LCD::setMusicShuffle(int shuffle)
+{
+    if (!lcd_ready || !lcd_showmusic)
+        return;
+
+    sendToServer(QString("SET_MUSIC_PLAYER_PROP SHUFFLE %1").arg(shuffle));
+}
+
+void LCD::setMusicRepeat(int repeat)
+{
+    if (!lcd_ready || !lcd_showmusic)
+        return;
+
+    sendToServer(QString("SET_MUSIC_PLAYER_PROP REPEAT %1").arg(repeat));
 }
 
 void LCD::setVolumeLevel(float value)

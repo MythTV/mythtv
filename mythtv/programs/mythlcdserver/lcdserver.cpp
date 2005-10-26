@@ -39,7 +39,12 @@
         time is a string
         progress is a float between 0.0 and 1.0
 
-    SET_GENERIC_PROGRESS <progress>
+    SET_MUSIC_PLAYER_PROP <field> <val>
+        field is a string, currently SHUFFLE or REPEAT
+        val depends on field, currently integer
+
+    SET_GENERIC_PROGRESS <busy> <progress>
+        busy is 0 for busy spinner, 0 for normal progess bar
         progress is a float between 0.0 and 1.0
     
     UPDATE_LEDS
@@ -212,6 +217,10 @@ void LCDServer::parseTokens(const QStringList &tokens, QSocket *socket)
     else if (tokens[0] == "SET_MUSIC_PROGRESS")
     {
         setMusicProgress(tokens, socket);
+    }
+    else if (tokens[0] == "SET_MUSIC_PLAYER_PROP")
+    {
+        setMusicProp(tokens, socket);
     }
     else if (tokens[0] == "SET_CHANNEL_PROGRESS")
     {
@@ -577,7 +586,7 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QSocket *socket)
 
     QString flat = tokens.join(" ");
    
-    if (tokens.count() != 2)
+    if (tokens.count() != 3)
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_GENERIC_PROGRESS command: "
                 << flat);
@@ -586,7 +595,15 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QSocket *socket)
     }
      
     bool bOK;
-    float progress = tokens[1].toFloat(&bOK);
+    bool busy = tokens[1].toInt(&bOK);
+    if (!bOK)
+    {
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad bool value in "
+                "SET_GENERIC_PROGRESS command: %1 %2" << tokens[1] << tokens[2]);
+        sendMessage(socket, "HUH?");
+        return;
+    }
+    float progress = tokens[2].toFloat(&bOK);
     if (!bOK)
     {
         VERBOSE(VB_IMPORTANT, "LCDServer: bad float value in "
@@ -596,7 +613,7 @@ void LCDServer::setGenericProgress(const QStringList &tokens, QSocket *socket)
     }
     
     if (m_lcd)
-        m_lcd->setGenericProgress(progress);
+        m_lcd->setGenericProgress(busy, progress);
         
     sendMessage(socket, "OK");
 }
@@ -629,6 +646,74 @@ void LCDServer::setMusicProgress(const QStringList &tokens, QSocket *socket)
     if (m_lcd)
         m_lcd->setMusicProgress(tokens[1], progress);
         
+    sendMessage(socket, "OK");
+}
+
+void LCDServer::setMusicProp(const QStringList &tokens, QSocket *socket)
+{
+    if (debug_level > 0)
+        VERBOSE(VB_GENERAL, "LCDServer: SET_MUSIC_PROP");
+
+    QString flat = tokens.join(" ");
+
+    if (tokens.count() < 3)
+    {
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad SET_MUSIC_PROP command: "
+                << flat);
+        sendMessage(socket, "HUH?");
+        return;
+    }
+
+    if (tokens[1] == "SHUFFLE")
+    {
+        if (tokens.count () != 3)
+        {
+            VERBOSE(VB_IMPORTANT, "LCDServer: missing argument for "
+                    "SET_MUSIC_PROP SHUFFLE command: " << flat);
+            sendMessage(socket, "HUH?");
+            return;
+        }
+        bool bOk;
+        int state = tokens[2].toInt (&bOk);
+        if (!bOk)
+        {
+            VERBOSE(VB_IMPORTANT, "LCDServer: bad argument for "
+                    "SET_MUSIC_PROP SHUFFLE command: " << tokens[2]);
+            sendMessage(socket, "HUH?");
+            return;
+        }
+        if (m_lcd)
+            m_lcd->setMusicShuffle (state);
+    }
+    else if (tokens[1] == "REPEAT")
+    {
+        if (tokens.count () != 3)
+        {
+            VERBOSE(VB_IMPORTANT, "LCDServer: missing argument for "
+                    "SET_MUSIC_PROP REPEAT command: " << flat);
+            sendMessage(socket, "HUH?");
+            return;
+        }
+        bool bOk;
+        int state = tokens[2].toInt (&bOk);
+        if (!bOk)
+        {
+            VERBOSE(VB_IMPORTANT, "LCDServer: bad argument for "
+                    "SET_MUSIC_PROP REPEAT command: " << tokens[2]);
+            sendMessage(socket, "HUH?");
+            return;
+        }
+        if (m_lcd)
+            m_lcd->setMusicRepeat (state);
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, "LCDServer: bad argument for "
+                "SET_MUSIC_PROP command: " << tokens[1]);
+        sendMessage(socket, "HUH?");
+        return;
+    }
+
     sendMessage(socket, "OK");
 }
 
