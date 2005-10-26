@@ -13,6 +13,8 @@
 #include "eithelper.h"
 #include "scheduledrecording.h"
 
+#define LOC QString("EITScanner(): ")
+
 /** \class EITScanner
  *  \brief Acts as glue between DVBChannel, DVBSIParser, and EITHelper.
  *
@@ -78,8 +80,8 @@ void EITScanner::RunEventLoop(void)
 {
     exitThread = false;
 
-    bool has_new_info = false;
     MythTimer t;
+    uint eitCount = 0;
     
     while (!exitThread)
     {
@@ -88,31 +90,40 @@ void EITScanner::RunEventLoop(void)
             int mplex = channel->GetMultiplexID();
             if ((mplex > 0) && parser && eitHelper->GetListSize())
             {
-                eitHelper->ProcessEvents(mplex);
+                eitCount += eitHelper->ProcessEvents(mplex);
                 t.start();
-                has_new_info = true;
             }
         }
 
         // If there have been any new events and we haven't
         // seen any in a while, tell scheduler to run.
-        if (has_new_info && (t.elapsed() > 60 * 1000))
+        if (eitCount && (t.elapsed() > 60 * 1000))
         {
+            VERBOSE(VB_GENERAL, LOC + "Added "<<eitCount<<" EIT Events");
+            eitCount = 0;
             ScheduledRecording::signalChange(-1);
-            has_new_info = false;
         }
 
         if (activeScan && (QDateTime::currentDateTime() > activeScanNextTrig))
         {
             // if there have been any new events, tell scheduler to run.
-            if (has_new_info)
+            if (eitCount)
+            {
+                VERBOSE(VB_GENERAL, LOC + "Added "<<eitCount<<" EIT Events");
+                eitCount = 0;
                 ScheduledRecording::signalChange(-1);
+            }
 
             if (activeScanNextChan == activeScanChannels.end())
                 activeScanNextChan = activeScanChannels.begin();
  
             if (!(*activeScanNextChan).isEmpty())
+            {
                 rec->SetChannel(*activeScanNextChan, TVRec::kFlagEITScan);
+                VERBOSE(VB_GENERAL, LOC + 
+                        QString("Now looking for EIT data on channel %1")
+                        .arg(*activeScanNextChan));
+            }
 
             activeScanNextTrig = QDateTime::currentDateTime()
                 .addSecs(activeScanTrigTime);
