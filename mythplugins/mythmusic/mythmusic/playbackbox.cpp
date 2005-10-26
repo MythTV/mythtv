@@ -1,11 +1,23 @@
-#include <qapplication.h>
-#include <qregexp.h>
-#include <stdlib.h>
+// ANSI C includes
+#include <cstdlib>
+
+// C++ includes
 #include <iostream>
 using namespace std;
 
-#include "metadata.h"
+// Qt includes
+#include <qapplication.h>
+#include <qregexp.h>
+
+// MythTV plugin includes
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythwidgets.h>
+#include <mythtv/lcddevice.h>
+#include <mythtv/mythmedia.h>
 #include <mythtv/audiooutput.h>
+
+// MythMusic includes
+#include "metadata.h"
 #include "constants.h"
 #include "streaminput.h"
 #include "decoder.h"
@@ -13,11 +25,7 @@ using namespace std;
 #include "databasebox.h"
 #include "mainvisual.h"
 #include "smartplaylist.h"
-
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/lcddevice.h>
-#include <mythtv/mythmedia.h>
+#include "search.h"
 
 PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
                                    QString theme_filename, 
@@ -87,7 +95,8 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     {
         volume_control = true;
         volume_display_timer->start(2000);
-        connect(volume_display_timer, SIGNAL(timeout()), this, SLOT(hideVolume()));
+        connect(volume_display_timer, SIGNAL(timeout()),
+                this, SLOT(hideVolume()));
     }
     
     // Figure out the shuffle mode
@@ -229,7 +238,7 @@ PlaybackBoxMusic::~PlaybackBoxMusic(void)
         lcd->switchToTime();
 }
 
-bool PlaybackBoxMusic::onMediaEvent(MythMediaDevice *pDev)
+bool PlaybackBoxMusic::onMediaEvent(MythMediaDevice*)
 {
     return scan_for_cd;
 }
@@ -471,6 +480,8 @@ void PlaybackBoxMusic::showMenu()
     splitter->setMaximumHeight((int) (5 * hmult));
     splitter->setMaximumHeight((int) (5 * hmult));
     
+    playlist_popup->addButton(tr("Search"), this,
+                              SLOT(showSearchDialog()));
     playlist_popup->addButton(tr("From CD"), this,
                               SLOT(fromCD()));
     playlist_popup->addButton(tr("All Tracks"), this,
@@ -539,6 +550,25 @@ void PlaybackBoxMusic::showSmartPlaylistDialog()
     }    
 }    
 
+void PlaybackBoxMusic::showSearchDialog()
+{
+   if (!playlist_popup)
+        return;
+
+    closePlaylistPopup();
+
+    SearchDialog dialog(gContext->GetMainWindow(), "searchdialog");
+
+    int res = dialog.ExecPopup();
+    
+    if (res > 0)
+    {
+          QString whereClause;
+          dialog.getWhereClause(whereClause);
+          updatePlaylistFromQuickPlaylist(whereClause, false);
+    }    
+}    
+
 void PlaybackBoxMusic::byArtist()
 {
     if (!playlist_popup || !curMeta)
@@ -589,14 +619,16 @@ void PlaybackBoxMusic::byYear()
     closePlaylistPopup();
 }
 
-void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause)
+void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause,
+                                                       bool replace)
 {
     QValueList <int> branches_to_current_node;
     
     visual_mode_timer->stop();
 
-    if (!menufilters)
+    if (!menufilters && replace)
         all_playlists->getActive()->removeAllTracks();
+
     all_playlists->getActive()->fillSonglistFromQuery(whereClause);
     all_playlists->getActive()->fillSongsFromSonglist(menufilters);
     if (!menufilters)

@@ -88,6 +88,7 @@ class PlaybackBoxMusic : public MythThemedDialog
     void byYear();    
     void fromCD();
     void showSmartPlaylistDialog();
+    void showSearchDialog();
     
   signals:
   
@@ -96,7 +97,8 @@ class PlaybackBoxMusic : public MythThemedDialog
   private:
 
     void wireUpTheme();
-    void updatePlaylistFromQuickPlaylist(QString whereClause);
+    void updatePlaylistFromQuickPlaylist(QString whereClause,
+                                         bool replace = true);
     void updatePlaylistFromSmartPlaylist(QString category, QString name);
     void CycleVisualizer(void);
     void updatePlaylistFromCD(void);
