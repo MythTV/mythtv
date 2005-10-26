@@ -10,6 +10,9 @@ using namespace std;
 
 class TVRec;
 
+typedef QMap<int,int>         VidModV4L1;
+typedef QMap<int,v4l2_std_id> VidModV4L2;
+
 // Implements tuning for analog TV cards (both software and hardware encoding)
 // using the V4L driver API
 class Channel : public ChannelBase
@@ -61,12 +64,15 @@ class Channel : public ChannelBase
     void SetColourAttribute(int attrib, const char *name);
     void SetFreqTable(const int index);
     int  SetFreqTable(const QString &name);
+    bool SetInputAndFormat(int newcapchannel, QString newFmt);
 
     // Helper Gets
     unsigned short *GetV4L1Field(int attrib, struct video_picture &vid_pic);
     int  GetChanID(void) const;
     int  GetCardID(void) const;
     int  GetCurrentChannelNum(const QString &channame);
+    QString GetFormatForChannel(QString channum,
+                                QString inputname);
 
     // Helper Commands
     int  ChangeColourAttribute(int attrib, const char *name, bool up);
@@ -80,12 +86,11 @@ class Channel : public ChannelBase
     struct CHANLIST *curList;  
     int         totalChannels;
 
-    bool        usingv4l2;      ///< Set to true if tuner accepts v4l2 commands
-    int         videomode_v4l1; ///< Current video mode if 'usingv4l2' is false
-    v4l2_std_id videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
-    bool        is_dtv;         ///< Set if 'currentFormat' is a DTV format
-
     QString     currentFormat;
+    bool        is_dtv;         ///< Set if 'currentFormat' is a DTV format
+    bool        usingv4l2;      ///< Set to true if tuner accepts v4l2 commands
+    VidModV4L1  videomode_v4l1; ///< Current video mode if 'usingv4l2' is false
+    VidModV4L2  videomode_v4l2; ///< Current video mode if 'usingv4l2' is true
 
     int         defaultFreqTable;
 };

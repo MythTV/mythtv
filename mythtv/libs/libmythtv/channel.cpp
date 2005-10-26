@@ -22,6 +22,9 @@
 #include <iostream>
 using namespace std;
 
+#define LOC QString("Channel(%1): ").arg(device)
+#define LOC_ERR QString("Channel(%1) Error: ").arg(device)
+
 /** \class Channel
  *  \brief Class implementing ChannelBase interface to tuning hardware
  *         when using Video4Linux based drivers.
@@ -29,9 +32,9 @@ using namespace std;
 
 Channel::Channel(TVRec *parent, const QString &videodevice)
     : ChannelBase(parent), device(videodevice), videofd(-1),
-      curList(NULL), totalChannels(0), usingv4l2(false),
-      videomode_v4l1(VIDEO_MODE_NTSC), videomode_v4l2(V4L2_STD_NTSC),
-      is_dtv(false), currentFormat(""), defaultFreqTable(1)
+      curList(NULL), totalChannels(0),
+      currentFormat(""), is_dtv(false), usingv4l2(false),
+      defaultFreqTable(1)
 {
 }
 
@@ -216,8 +219,11 @@ void Channel::SetFormat(const QString &format)
     else
         fmt = format;
 
-    videomode_v4l1 = format_to_mode(fmt.upper(), 1);
-    videomode_v4l2 = format_to_mode(fmt.upper(), 2);
+    if (videomode_v4l1.find(-1) == videomode_v4l1.end())
+    {
+        videomode_v4l1[-1] = format_to_mode(fmt.upper(), 1);
+        videomode_v4l2[-1] = format_to_mode(fmt.upper(), 2);
+    }
     is_dtv = (fmt.upper() == "ATSC");
 
     channelnames.clear();
@@ -233,11 +239,14 @@ void Channel::SetFormat(const QString &format)
             VERBOSE(VB_CHANNEL, QString("Channel(%1):SetFormat(): Probed "
                                         "input: %2, name = %3")
                     .arg(device).arg(vin.index).arg((char*)vin.name));
-            channelnames[vin.index] = (char *)vin.name;
-            inputChannel[vin.index] = "";
-            inputTuneTo[vin.index] = "";
+
+            channelnames[vin.index]    = (char *)vin.name;
+            inputChannel[vin.index]    = "";
+            inputTuneTo[vin.index]     = "";
             externalChanger[vin.index] = "";
-            sourceid[vin.index] = "";
+            sourceid[vin.index]        = "";
+            videomode_v4l1[vin.index]  = videomode_v4l1[-1];
+            videomode_v4l2[vin.index]  = videomode_v4l2[-1];
             vin.index++;
 
             capchannels = vin.index;
@@ -251,7 +260,7 @@ void Channel::SetFormat(const QString &format)
         ioctl(videofd, VIDIOCGTUNER, &tuner);
 
         // set tuner video mode
-        tuner.mode = videomode_v4l1;
+        tuner.mode = videomode_v4l1[-1];
         ioctl(videofd, VIDIOCSTUNER, &tuner);
 
         // get the number of inputs in video mode
@@ -271,11 +280,13 @@ void Channel::SetFormat(const QString &format)
             VERBOSE(VB_CHANNEL, QString("Channel(%1):SetFormat(): Probed "
                                         "input: %2, name = %3")
                     .arg(device).arg(i).arg((char *)test.name));
-            channelnames[i] = test.name;
-            inputChannel[i] = "";
-            inputTuneTo[i] = "";
+            channelnames[i]    = test.name;
+            inputChannel[i]    = "";
+            inputTuneTo[i]     = "";
             externalChanger[i] = "";
-            sourceid[i] = "";
+            sourceid[i]        = "";
+            videomode_v4l1[i]  = videomode_v4l1[-1];
+            videomode_v4l2[i]  = videomode_v4l2[-1];
         }
     }
 
@@ -288,6 +299,8 @@ void Channel::SetFormat(const QString &format)
         inputTuneTo[i]     = "";
         externalChanger[i] = "";
         sourceid[i]        = "";
+        videomode_v4l1[i]  = videomode_v4l1[-1];
+        videomode_v4l2[i]  = videomode_v4l2[-1];
         capchannels        = 1;
     }
 
@@ -304,7 +317,7 @@ void Channel::SetFormat(const QString &format)
 
         vc.channel = currentcapchannel;
         ioctl(videofd, VIDIOCGCHAN, &vc);
-        vc.norm = videomode_v4l1;
+        vc.norm = videomode_v4l1[currentcapchannel];
         ioctl(videofd, VIDIOCSCHAN, &vc);
     }
 
@@ -465,8 +478,9 @@ bool Channel::SetChannelByString(const QString &chan)
         return false;
     }
 
-    // If CheckChannel filled in the inputName then we need to change inputs
-    // and return, since the act of changing inputs will change the channel as well.
+    // If CheckChannel filled in the inputName then we need to
+    // change inputs and return, since the act of changing
+    // inputs will change the channel as well.
     if (!inputName.isEmpty())
         return ChannelBase::SwitchToInput(inputName, chan);
 
@@ -475,7 +489,8 @@ bool Channel::SetChannelByString(const QString &chan)
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString thequery = QString(
-        "SELECT finetune, freqid, tvformat, freqtable, atscsrcid, commfree, mplexid "
+        "SELECT finetune, freqid, tvformat, freqtable, "
+        "       atscsrcid, commfree, mplexid "
         "FROM channel, videosource "
         "WHERE videosource.sourceid = channel.sourceid AND "
         "      channum = '%1' AND channel.sourceid = '%2'")
@@ -565,7 +580,8 @@ bool Channel::SetChannelByString(const QString &chan)
 bool Channel::TuneTo(const QString &channum, int finetune)
 {
     int i = GetCurrentChannelNum(channum);
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneTo(%2): curList[%3].freq(%4)")
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::TuneTo(%2): "
+                                "curList[%3].freq(%4)")
             .arg(device).arg(channum).arg(i)
             .arg((i != -1) ? curList[i].freq : -1));
 
@@ -784,44 +800,58 @@ bool Channel::TuneMultiplex(uint mplexid)
     return true;
 }
 
-bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
+QString Channel::GetFormatForChannel(QString channum, QString inputname)
 {
-    bool ok = true;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT tvformat "
+        "FROM channel, cardinput "
+        "WHERE channum            = :CHANNUM   AND "
+        "      inputname          = :INPUTNAME AND "
+        "      cardinput.cardid   = :CARDID    AND "
+        "      cardinput.sourceid = channel.sourceid");
+    query.bindValue(":CHANNUM",   channum);
+    query.bindValue(":INPUTNAME", inputname);
+    query.bindValue(":CARDID",    GetCardID());
+
+    QString fmt = QString::null;
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("SwitchToInput:find format", query);
+    else if (query.next())
+        fmt = query.value(0).toString();
+    return fmt;
+}
+
+bool Channel::SetInputAndFormat(int newcapchannel, QString newFmt)
+{
     bool usingv4l1 = !usingv4l2;
+    bool ok = true;
 
-    VERBOSE(VB_CHANNEL, QString("Channel(%1)::SwitchToInput(in %2%3)")
-            .arg(device).arg(newcapchannel)
-            .arg(setstarting ? ", set ch" : ""));
-
-    int ioctlval = 0;
     if (usingv4l2)
     {
-        ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel);
+        int ioctlval = ioctl(videofd, VIDIOC_S_INPUT, &newcapchannel);
         if (ioctlval < 0)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Channel(%1)::SwitchToInput(in %2%3): Error %4 "
-                            "while setting input (v2): %5").arg(device)
-                    .arg(newcapchannel).arg(setstarting?", set ch":"")
-                    .arg(ioctlval).arg(strerror(errno)));
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                        "SetInputAndFormat(%1, %2) "
+                        "while setting input (v4l v2)")
+                    .arg(newcapchannel).arg(newFmt) + ENO);
             ok = false;
         }
 
-        VERBOSE(VB_CHANNEL, 
-                QString("Channel(%1)::SwitchToInput() "
-                        "setting video mode to %2")
-                .arg(device).arg(mode_to_format(videomode_v4l2, 2)));
-        ioctlval = ioctl(videofd, VIDIOC_S_STD, &videomode_v4l2);
+        VERBOSE(VB_CHANNEL, LOC + QString(
+                    "SetInputAndFormat(%1, %2) "
+                    "setting format (v4l v2)")
+                .arg(newcapchannel).arg(newFmt));
+
+        v4l2_std_id vid_mode = format_to_mode(newFmt, 2);
+        ioctlval = ioctl(videofd, VIDIOC_S_STD, &vid_mode);
         if (ioctlval < 0)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Channel(%1)::SwitchToInput(in %2%3): Error %4 "
-                            "while setting video mode '%5' (v2), \"%6\", "
-                            "trying v4l v1")
-                    .arg(device).arg(newcapchannel)
-                    .arg(setstarting ? ", set ch" : "")
-                    .arg(ioctlval).arg(mode_to_format(videomode_v4l2, 2))
-                    .arg(strerror(errno)));
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                        "SetInputAndFormat(%1, %2) "
+                        "while setting format (v4l v2)")
+                    .arg(newcapchannel).arg(newFmt) + ENO);
 
             // Fall through to try v4l version 1, pcHDTV 1.4 (for HD-2000)
             // drivers don't work with VIDIOC_S_STD ioctl.
@@ -832,73 +862,80 @@ bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
 
     if (usingv4l1)
     {
+        VERBOSE(VB_CHANNEL, LOC + QString(
+                    "SetInputAndFormat(%1, %2) "
+                    "setting format (v4l v1)")
+                .arg(newcapchannel).arg(newFmt));
+
+        // read in old settings
         struct video_channel set;
-        memset(&set, 0, sizeof(set));
-        ioctl(videofd, VIDIOCGCHAN, &set); // read in old settings
+        bzero(&set, sizeof(set));
+        ioctl(videofd, VIDIOCGCHAN, &set);
+
+        // set new settings
         set.channel = newcapchannel;
-        set.norm = videomode_v4l1;
-        VERBOSE(VB_CHANNEL, 
-                QString("Channel(%1)::SwitchToInput() "
-                        "setting video mode to %2")
-                .arg(device).arg(mode_to_format(videomode_v4l1, 1)));
-        ioctlval = ioctl(videofd, VIDIOCSCHAN, &set); // set new settings
+        set.norm    = format_to_mode(newFmt, 1);
+        int ioctlval = ioctl(videofd, VIDIOCSCHAN, &set);
+
         if (ioctlval < 0)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Channel(%1)::SwitchToInput(in %2%3): "
-                            "Error %4 while setting video mode '%5' (v1): %6")
-                    .arg(device).arg(newcapchannel)
-                    .arg(setstarting ? ", set ch" : "")
-                    .arg(ioctlval).arg(mode_to_format(videomode_v4l1, 1))
-                    .arg(strerror(errno)));
+            VERBOSE(VB_IMPORTANT, LOC_ERR + QString(
+                        "SetInputAndFormat(%1, %2) "
+                        "while setting format (v4l v1)")
+                    .arg(newcapchannel).arg(newFmt) + ENO);
             ok = false;
         }
         else if (usingv4l2)
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("Channel(%1)::SwitchToInput(in %2%3): "
-                            "Setting video mode with v4l version 1 worked")
-                    .arg(device).arg(newcapchannel)
-                    .arg(setstarting ? ", set ch" : ""));
+            VERBOSE(VB_IMPORTANT, LOC + QString(
+                        "SetInputAndFormat(%1, %2) "
+                        "Setting video mode with v4l version 1 worked")
+                    .arg(newcapchannel).arg(newFmt));
             ok = true;
         }
     }
+    return ok;
+}
 
-    if (!ok)
-    {
-        // Try to set ATSC mode if NTSC fails
-        if (mode_to_format(videomode_v4l1, 1) != "NTSC")
-            return false;
-
-        int v1 = videomode_v4l1, v2 = videomode_v4l2;
-        videomode_v4l1 = VIDEO_MODE_ATSC;
-        videomode_v4l2 = V4L2_STD_ATSC_8_VSB;
-        ok = SwitchToInput(newcapchannel, setstarting);
-        videomode_v4l1 = v1;
-        videomode_v4l2 = v2;
-
-        // ATSC mode didn't work either, oh well
-        if (!ok)
-            return false;
-
-        // Warn user, but keep going...
-        QString msg = QString(
-            "Channel(%1)::SwitchToInput(in %2%3):\n"
-            "\t\t\tRequested NTSC mode failed, but only ATSC succeeded.\n"
-            "\t\t\tYou must should the video mode to ATSC!")
+bool Channel::SwitchToInput(int newcapchannel, bool setstarting)
+{
+    VERBOSE(VB_CHANNEL, QString("Channel(%1)::SwitchToInput(in %2%3)")
             .arg(device).arg(newcapchannel)
-            .arg(setstarting ? ", set ch" : "");
-        VERBOSE(VB_IMPORTANT, msg);
+            .arg(setstarting ? ", set ch" : ""));
+
+    if (videomode_v4l2.find(newcapchannel) == videomode_v4l2.end())
+        SetFormat("Default");
+    QString newFmt    = mode_to_format(videomode_v4l2[newcapchannel], 2);
+    QString channum   = inputTuneTo[newcapchannel];
+    QString inputname = channelnames[newcapchannel];
+
+    // If we are setting a channel, get its video mode...
+    bool chanValid  = (channum != "Undefined") && !channum.isEmpty();
+    if (setstarting && chanValid)
+    {
+        QString tmp = GetFormatForChannel(channum, inputname);
+        if (tmp != "Default" && !tmp.isEmpty())
+            newFmt = tmp;
     }
 
+    bool ok = SetInputAndFormat(newcapchannel, newFmt);
+
+    // Try to set ATSC mode if NTSC fails
+    if (!ok && newFmt == "NTSC")
+        ok = SetInputAndFormat(newcapchannel, "ATSC");
+
+    if (!ok)
+        return false;
+
+    currentFormat     = newFmt;
+    is_dtv            = newFmt == "ATSC";
     currentcapchannel = newcapchannel;
-    curchannelname = "";
+    curchannelname    = ""; // this will be set by SetChannelByString
 
-    if (setstarting && inputTuneTo[currentcapchannel] != "Undefined")
-        ok = TuneTo(inputTuneTo[currentcapchannel], 0);
-
-    if (setstarting && !inputChannel[currentcapchannel].isEmpty())
-        ok = SetChannelByString(inputChannel[currentcapchannel]);
+    if (setstarting && chanValid)
+        ok = SetChannelByString(channum);
+    else if (setstarting && !chanValid)
+        ok = false;
 
     return ok;
 }
