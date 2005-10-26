@@ -1,5 +1,25 @@
-#include <stdio.h>
-#include <string.h>
+// ANSI C includes
+#include <cstdio>
+#include <cstring>
+
+// Unix C includes
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+
+// Linux C includes
+#include <cdaudio.h>
+extern "C" {
+#include <cdda_interface.h>
+#include <cdda_paranoia.h>
+}
+
+// C++ includes
+#include <iostream>
+using namespace std;
+
+// Qt includes
 #include <qapplication.h>
 #include <qdir.h>
 #include <qdialog.h>
@@ -12,32 +32,20 @@
 #include <qvbox.h>
 #include <qprogressbar.h>
 #include <qradiobutton.h>
-#include <iostream>
 
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <cdaudio.h>
+// MythTV plugin includes
+#include <mythtv/mythcontext.h>
+#include <mythtv/mythdbcon.h>
+#include <mythtv/mythwidgets.h>
+#include <mythtv/lcddevice.h>
 
-extern "C" {
-#include <cdda_interface.h>
-#include <cdda_paranoia.h>
-}
-
+// MythMusic includes
 #include "cdrip.h"
 #include "cddecoder.h"
 #include "encoder.h"
 #include "vorbisencoder.h"
 #include "lameencoder.h"
 #include "flacencoder.h"
-
-#include <mythtv/mythcontext.h>
-#include <mythtv/mythdbcon.h>
-#include <mythtv/mythwidgets.h>
-#include <mythtv/lcddevice.h>
-
-using namespace std;
 
 Ripper::Ripper(MythMainWindow *parent, const char *name)
       : MythDialog(parent, name)
@@ -607,14 +615,16 @@ static long int getSectorCount (QString &cddevice, int tracknum)
     }
 
     // we only care about audio tracks
-    if (cdda_track_audiop (device, tracknum)) {
+    if (cdda_track_audiop (device, tracknum))
+    {
         cdda_verbose_set(device, CDDA_MESSAGE_FORGETIT, CDDA_MESSAGE_FORGETIT);
         long int start = cdda_track_firstsector(device, tracknum);
-        long int end = cdda_track_lastsector(device, tracknum);
+        long int end   = cdda_track_lastsector( device, tracknum);
         cdda_close(device);
         return end - start + 1;        
     }
 
+    cdda_close(device);
     return 0;
 }
 
