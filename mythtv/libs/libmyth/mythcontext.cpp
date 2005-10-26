@@ -53,7 +53,7 @@ QString safe_eno_to_string(int errnum)
 {
     char buf[256];
     strerror_r(errnum, buf, 256);
-    return QString(buf);
+    return QString(buf) + QString(" (%1)").arg(errno);
 }
 
 
