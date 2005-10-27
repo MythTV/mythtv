@@ -118,7 +118,6 @@ bool DVBDiSEqC::ToneVoltageLnb(DVBTuning& tuning, bool reset, bool& havetuned)
         }
 
         prev_tuning.tone = tuning.tone;
-        havetuned = true;
     }
 
     usleep(DISEQC_SHORT_WAIT);
@@ -132,8 +131,10 @@ bool DVBDiSEqC::ToneVoltageLnb(DVBTuning& tuning, bool reset, bool& havetuned)
         }
 
         prev_tuning.voltage = tuning.voltage;
-        havetuned = true;
     }
+
+    havetuned |= ((prev_tuning.voltage == tuning.voltage) &&
+                  (prev_tuning.tone == tuning.tone));
 
     return true;
 }
@@ -155,8 +156,9 @@ bool DVBDiSEqC::ToneSwitch(DVBTuning& tuning, bool reset, bool& havetuned)
         }
 
         prev_tuning.diseqc_port = tuning.diseqc_port;
-        havetuned = true;
     }
+
+    havetuned |= (prev_tuning.diseqc_port == tuning.diseqc_port);
 
     return true;
 }
@@ -388,6 +390,11 @@ bool DVBDiSEqC::Diseqc1xSwitch(DVBTuning& tuning, bool reset,
 
     }
 
+    havetuned |=
+        (prev_tuning.diseqc_port == tuning.diseqc_port) &&
+        (prev_tuning.voltage     == tuning.voltage)     &&
+        (prev_tuning.tone        == tuning.tone);
+
     return true;
 }
 
@@ -496,8 +503,12 @@ bool DVBDiSEqC::PositionerGoto(DVBTuning& tuning, bool reset, bool& havetuned)
         prev_tuning.diseqc_port = tuning.diseqc_port;
         prev_tuning.tone = tuning.tone;
         prev_tuning.voltage = tuning.voltage;
-        havetuned = true;
     }
+
+    havetuned |=
+        (prev_tuning.diseqc_port == tuning.diseqc_port) &&
+        (prev_tuning.voltage     == tuning.voltage)     &&
+        (prev_tuning.tone        == tuning.tone);
 
     return true;
 }
@@ -698,8 +709,13 @@ bool DVBDiSEqC::PositionerGotoAngular(DVBTuning& tuning, bool reset,
         prev_tuning.diseqc_pos = tuning.diseqc_pos;
         prev_tuning.tone = tuning.tone;
         prev_tuning.voltage = tuning.voltage;
-        havetuned = true;
     }
+
+    havetuned |=
+        (prev_tuning.diseqc_port == tuning.diseqc_port) &&
+        (prev_tuning.diseqc_pos  == tuning.diseqc_pos)  &&
+        (prev_tuning.voltage     == tuning.voltage)     &&
+        (prev_tuning.tone        == tuning.tone);
 
     return true;
 }
