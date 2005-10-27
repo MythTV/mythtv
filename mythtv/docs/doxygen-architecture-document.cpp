@@ -13,8 +13,8 @@ Before we get started, if you are just looking for the code
 formatting standards, see the unofficial mythtv.info page 
 <a href="http://www.mythtv.info/moin.cgi/CodingStandards">
 Coding Standards</a>. If you are looking for the 
-<a href="http://www.mythtv.org/bugs/">Bug tracker</a>, it
-can be found on the official pages. And you should subscribe to
+<a href="http://svn.mythtv.org/trac/wiki/TicketHowTo">Bug tracker</a>,
+it can be found on the official pages. And you should subscribe to
 the <a href="http://www.mythtv.org/mailman/listinfo/mythtv-dev/">
 developer mailing list</a>, if you haven't already.
 And, of course, if you just stumbled onto the developer pages
