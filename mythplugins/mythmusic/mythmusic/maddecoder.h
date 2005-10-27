@@ -24,8 +24,7 @@ class MadDecoder : public Decoder
     static const int maxFrameCheck;
     static const int initialFrameSize;
 
-    Metadata *getMetadata();
-    void commitMetadata(Metadata *mdata);
+    MetaIO *doCreateTagger(void);
 
 private:
     void run();

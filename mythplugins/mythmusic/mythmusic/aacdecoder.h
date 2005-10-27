@@ -29,8 +29,7 @@ class aacDecoder : public Decoder
     void seek(double);
     void stop();
 
-    Metadata *getMetadata();
-    void commitMetadata(Metadata *mdata);
+    MetaIO *doCreateTagger(void);
 
     bool     initializeMP4();
     int      getAACTrack(mp4ff_t *infile);

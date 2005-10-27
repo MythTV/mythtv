@@ -293,53 +293,21 @@ void VorbisDecoder::run()
     deinit();
 }
 
-Metadata *VorbisDecoder::getMetadata()
+MetaIO *VorbisDecoder::doCreateTagger(void)
 {
-    Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(musiclocation))
-    {
-        return mdata;
-    }
-
-    delete mdata;
-
-
-    MetaIOOggVorbisComment* p_tagger = new MetaIOOggVorbisComment;
-    if (ignore_id3)
-        mdata = p_tagger->readFromFilename(filename);
-    else
-        mdata = p_tagger->read(filename);
-
-    delete p_tagger;
-
-    if (mdata)
-        mdata->dumpToDatabase(musiclocation);
-    else
-        cerr << "vorbisdecoder.o: Could not read metadata from " << filename.local8Bit() << endl;    
-
-    return mdata;
-}    
-
-void VorbisDecoder::commitMetadata(Metadata *mdata)
-{
-    MetaIOOggVorbisComment* p_tagger = new MetaIOOggVorbisComment;
-    p_tagger->write(mdata);
-    delete p_tagger;
+    return new MetaIOOggVorbisComment();
 }
-
 
 bool VorbisDecoderFactory::supports(const QString &source) const
 {
     return (source.right(extension().length()).lower() == extension());
 }
 
-
 const QString &VorbisDecoderFactory::extension() const
 {
     static QString ext(".ogg");
     return ext;
 }
-
 
 const QString &VorbisDecoderFactory::description() const
 {

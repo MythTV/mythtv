@@ -65,18 +65,32 @@ Decoder *getDecoder(const QString &filename)
     return decoder;
 }
 
-void CheckFile(const QString &filename)
+void AddFileToDB(const QString &directory, const QString &filename)
 {
     Decoder *decoder = getDecoder(filename);
 
     if (decoder)
     {
         Metadata *data = decoder->getMetadata();
-        if (data)
+        if (data) {
+            data->dumpToDatabase(directory);
             delete data;
+        }
 
         delete decoder;
     }
+}
+
+// Remove a file from the database
+void RemoveFileFromDB (const QString &directory, const QString &filename)
+{
+    QString name(filename);
+    name.remove(0, directory.length());
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("DELETE FROM musicmetadata WHERE "
+                  "filename = :NAME ;");
+    query.bindValue(":NAME", name.utf8());
+    query.exec();
 }
 
 enum MusicFileLocation
@@ -196,8 +210,7 @@ void SearchDir(QString &directory)
     busy->start();
     BuildFileList(directory, music_files);
     busy->Close();
-    busy->deleteLater();
-    busy = NULL;
+    delete busy;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec("SELECT filename "
@@ -234,23 +247,13 @@ void SearchDir(QString &directory)
     file_checking = new MythProgressDialog(
         QObject::tr("Updating music database"), music_files.size());
 
-    QRegExp quote_regex("\"");
+    counter = 0;
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
         if (*iter == kFileSystem)
-        {
-            CheckFile(iter.key());
-        }
+            AddFileToDB(directory, iter.key());
         else if (*iter == kDatabase)
-        {
-            QString name(iter.key());
-            name.remove(0, directory.length());
-
-            query.prepare("DELETE FROM musicmetadata WHERE "
-                          "filename = :NAME ;");
-            query.bindValue(":NAME", name.utf8());
-            query.exec();
-        }
+            RemoveFileFromDB(directory, iter.key ());
 
         file_checking->setProgress(++counter);
     }

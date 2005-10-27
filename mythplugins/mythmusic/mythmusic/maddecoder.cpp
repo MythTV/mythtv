@@ -512,38 +512,9 @@ enum mad_flow MadDecoder::madError(struct mad_stream *stream,
     return MAD_FLOW_STOP;
 }
 
-Metadata *MadDecoder::getMetadata()
+MetaIO *MadDecoder::doCreateTagger(void)
 {
-    Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(musiclocation))
-    {
-        return mdata;
-    }
-
-    delete mdata;
-
-
-    MetaIOID3v2* p_tagger = new MetaIOID3v2;
-    if (ignore_id3)
-        mdata = p_tagger->readFromFilename(filename);
-    else
-        mdata = p_tagger->read(filename);
-
-    delete p_tagger;
-
-    if (mdata)
-        mdata->dumpToDatabase(musiclocation);
-    else
-        cerr << "maddecoder.o: Could not read metadata from " << filename.local8Bit() << endl;
-
-    return mdata;
-}
-
-void MadDecoder::commitMetadata(Metadata *mdata)
-{
-    MetaIOID3v2* p_tagger = new MetaIOID3v2;
-    p_tagger->write(mdata);
-    delete p_tagger;
+    return new MetaIOID3v2();
 }
 
 bool MadDecoderFactory::supports(const QString &source) const

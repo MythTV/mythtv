@@ -6,6 +6,8 @@
 
 #include "decoder.h"
 #include "constants.h"
+#include "metadata.h"
+#include "metaio.h"
 #include <mythtv/output.h>
 #include <mythtv/visual.h>
 
@@ -87,6 +89,102 @@ void Decoder::removeListener(QObject *object)
     listeners.remove(object);
 }
 
+/** \fn Decoder::readMetadata(void)
+ *  \brief Read the metadata from \p filename directly.
+ *
+ *  Creates a \p MetaIO object using \p Decoder::doCreateTagger and uses
+ *  the MetaIO object to read the metadata.
+ *  \returns an instance of \p Metadata owned by the caller
+ */
+Metadata *Decoder::readMetadata(void)
+{
+    Metadata *mdata = NULL;
+    MetaIO* p_tagger = doCreateTagger();
+
+    if (p_tagger)
+    {
+        if (ignore_id3)
+            mdata = p_tagger->readFromFilename(filename);
+        else
+            mdata = p_tagger->read(filename);
+
+        delete p_tagger;
+    }
+    else if (!mdata)
+    {
+        VERBOSE(VB_IMPORTANT, "Decoder::readMetadata(): " +
+                QString("Could not read '%1'").arg(filename));
+    }
+
+    return mdata;
+}
+
+
+/** \fn Decoder::getMetadata(void)
+ *  \brief Get the metadata  for \p filename 
+ *
+ *  First tries to read the metadata from the database. If there
+ *  is no database entry, it'll call \p Decoder::readMetadata.
+ *
+ *  \returns an instance of \p Metadata owned by the caller
+ */
+Metadata* Decoder::getMetadata(void)
+{
+
+    Metadata *mdata = new Metadata(filename);
+    if (mdata->isInDatabase(musiclocation))
+    {
+        return mdata;
+    }
+
+    delete mdata;
+
+    return readMetadata();
+}
+
+
+/** \fn commitMetadata(Metadata*)
+ *  \brief Create a \p MetaIO object for the format.
+ *
+ *  This method should be overwritten by subclasses to return an
+ *  instance of the appropriate MetaIO subtype. It is used by \p
+ *  Decoder::getMetadata, \p Decoder::readMetadata and \p
+ *  Decoder::commitMetadata.
+ *       
+ *  The default implementation returns a NULL pointer, which
+ *  essentially means, that if the decoder does not overrider this
+ *  method or all of the users (see previous paragraph), files
+ *  that the decoder supports cannot be indexed using metadata in
+ *  the file.
+ *
+ *  e.g. the mp3 decoder (\p MadDecoder) implements this, whereas
+ *  the audio CD decoder (\p CdDecoder) does not.
+ *
+ *  \returns an instance of \p MetaIO owned by the caller
+ */
+MetaIO *Decoder::doCreateTagger(void)
+{
+    return NULL;
+}
+
+/** \fn commitMetadata(Metadata*)
+ *  \brief Write the given metadata to the \p filename.
+ *
+ *  Creates a \p MetaIO object using \p Decoder::doCreateTagger and
+ *  asks the MetaIO object to write the contents of mdata to \p
+ *  filename.
+ *
+ *  \params mdata the metadata to write to the disk
+ */
+void Decoder::commitMetadata(Metadata *mdata)
+{
+    MetaIO* p_tagger = doCreateTagger();
+    if (p_tagger)
+    {
+        p_tagger->write(mdata);
+        delete p_tagger;
+    }
+}
 
 // static methods
 

@@ -18,8 +18,7 @@ class VorbisDecoder : public Decoder
     void seek(double);
     void stop();
 
-    Metadata *getMetadata();
-    void commitMetadata(Metadata *mdata);
+    MetaIO *doCreateTagger(void);
 
   private:
     void run();

@@ -385,39 +385,10 @@ E=VALUE" */
         char *field_value;
 } Argument_VcField;
 
-Metadata *FlacDecoder::getMetadata()
+MetaIO *FlacDecoder::doCreateTagger(void)
 {
-    Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(musiclocation))
-    {
-        return mdata;
-    }
-
-    delete mdata;
-
-    MetaIOFLACVorbisComment* p_tagger = new MetaIOFLACVorbisComment;
-    if (ignore_id3)
-        mdata = p_tagger->readFromFilename(filename);
-    else
-        mdata = p_tagger->read(filename);
-
-    delete p_tagger;
-
-    if (mdata)
-        mdata->dumpToDatabase(musiclocation);
-    else
-        cerr << "flacdecoder.o: Could not read metadata from " << filename.local8Bit() << endl;
-
-    return mdata;
-}    
-
-void FlacDecoder::commitMetadata(Metadata *mdata)
-{
-    MetaIOFLACVorbisComment* p_tagger = new MetaIOFLACVorbisComment;
-    p_tagger->write(mdata);
-    delete p_tagger;
-    }
-
+    return new MetaIOFLACVorbisComment();
+}
 
 bool FlacDecoderFactory::supports(const QString &source) const
 {

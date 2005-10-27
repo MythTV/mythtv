@@ -357,39 +357,10 @@ void avfDecoder::run()
     deinit();
 }
 
-Metadata* avfDecoder::getMetadata()
+MetaIO* avfDecoder::doCreateTagger(void)
 {
-    Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(musiclocation))
-    {
-        return mdata;
-    }
-
-    delete mdata;
-
-
-    MetaIOAVFComment* p_tagger = new MetaIOAVFComment;
-    if (ignore_id3)
-        mdata = p_tagger->readFromFilename(filename);
-    else
-        mdata = p_tagger->read(filename);
-    
-    delete p_tagger;
-
-    if (mdata)
-        mdata->dumpToDatabase(musiclocation);
-    else
-        cerr << "avfdecoder.o: Could not read metadata from " << filename << endl;
-
-    return mdata;
+    return new MetaIOAVFComment();
 }    
-
-void avfDecoder::commitMetadata(Metadata *mdata)
-{
-    MetaIOAVFComment* p_tagger = new MetaIOAVFComment;
-    p_tagger->write(mdata);
-    delete p_tagger;
-}
 
 bool avfDecoderFactory::supports(const QString &source) const
 {

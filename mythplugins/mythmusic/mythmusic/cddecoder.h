@@ -26,8 +26,8 @@ class CdDecoder : public Decoder
     int getNumCDAudioTracks(void);
 
     Metadata *getMetadata(int track);
-    Metadata *getMetadata();
-    Metadata *getLastMetadata();
+    Metadata *getMetadata(void);
+    Metadata *getLastMetadata(void);
     void commitMetadata(Metadata *mdata);
 
   private:

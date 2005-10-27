@@ -8,6 +8,7 @@
 #include <qptrlist.h>
 
 class Metadata;
+class MetaIO;
 class Decoder;
 class DecoderFactory;
 
@@ -70,7 +71,13 @@ class Decoder : public QThread
     QWaitCondition *cond() { return &cnd; }
 
     void setBlockSize(unsigned int sz) { blksize = sz; }
-    unsigned int blockSize() const { return blksize; }
+    unsigned int blockSize()  const { return blksize; }
+    QString getFilename(void) const { return filename; }
+
+    virtual Metadata *readMetadata(void);
+    virtual Metadata *getMetadata(void);
+    virtual MetaIO *doCreateTagger (void);
+    virtual void commitMetadata(Metadata *mdata);
 
     // static methods
     static QStringList all();
@@ -78,13 +85,7 @@ class Decoder : public QThread
     static void registerFactory(DecoderFactory *);
     static Decoder *create(const QString &, QIODevice *, AudioOutput *, 
                            bool = FALSE);
-
-    virtual Metadata *getMetadata() = 0;
-    virtual void commitMetadata(Metadata *mdata) = 0;
-
     static void SetLocationFormatUseTags(void);
-
-    QString getFilename(void) { return filename; }
 
   protected:
     Decoder(DecoderFactory *, QIODevice *, AudioOutput *);

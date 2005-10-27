@@ -22,8 +22,7 @@ class FlacDecoder : public Decoder
     void doWrite(const FLAC__Frame *frame, const FLAC__int32 * const buffer[]);
     void setFlacMetadata(const FLAC__StreamMetadata *metadata);
 
-    Metadata *getMetadata();
-    void commitMetadata(Metadata *mdata);
+    MetaIO *doCreateTagger(void);
 
   private:
     void run();

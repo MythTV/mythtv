@@ -614,39 +614,9 @@ void aacDecoder::run()
     deinit();
 }
 
-Metadata* aacDecoder::getMetadata()
+MetaIO *aacDecoder::doCreateTagger(void)
 {
-
-    Metadata *mdata = new Metadata(filename);
-    if (mdata->isInDatabase(musiclocation))
-    {
-      return mdata;
-    }
-    
-    delete mdata;
-
-    MetaIOMP4* p_tagger = new MetaIOMP4;
-    if (ignore_id3) {
-        mdata = p_tagger->readFromFilename(filename);
-    } else {
-        mdata = p_tagger->read(filename);
-    }
-    
-    delete p_tagger;
-
-    if (mdata)
-        mdata->dumpToDatabase(musiclocation);
-    else
-      error(QString("aacdecoder.o: Could not read metadata from \"%1\"").arg(filename.local8Bit()));
-
-    return mdata;
-}    
-
-void aacDecoder::commitMetadata(Metadata *mdata)
-{
-    MetaIOMP4* p_tagger = new MetaIOMP4;
-    p_tagger->write(mdata);
-    delete p_tagger;
+    return new MetaIOMP4;
 }
 
 uint32_t aacDecoder::aacRead(char *buffer, uint32_t length)
