@@ -4856,7 +4856,7 @@ void UIKeyboardType::altGrOnOff()
     if (m_lockKey->IsOn())
     {
         m_shiftLKey->SetOn(false);
-        m_shiftRKey->SetOn(false);
+        if (m_shiftRKey) m_shiftRKey->SetOn(false);
         if (m_altKey) m_altKey->SetOn(false);
         m_lockKey->SetOn(false);
     }
@@ -4931,13 +4931,13 @@ void UIKeyboardType::lockOnOff()
         if (!(m_altKey && m_altKey->IsOn()))
         {
             m_shiftLKey->SetOn(true);
-            m_shiftRKey->SetOn(true);
+            if (m_shiftRKey) m_shiftRKey->SetOn(true);
         }
     }
     else
     {
         m_shiftLKey->SetOn(false);
-        m_shiftRKey->SetOn(false);
+        if (m_shiftRKey) m_shiftRKey->SetOn(false);
         if (m_altKey) m_altKey->SetOn(false);
     }
     updateButtons();
@@ -4948,7 +4948,7 @@ void UIKeyboardType::shiftOff()
     if (!m_lockKey->IsOn())
     {
         m_shiftLKey->SetOn(false);
-        m_shiftRKey->SetOn(false);
+        if (m_shiftRKey) m_shiftRKey->SetOn(false);
         if (m_altKey) m_altKey->SetOn(false);
     }
     updateButtons();
@@ -4979,17 +4979,19 @@ void UIKeyboardType::shiftLOnOff()
     if (m_lockKey->IsOn())
     {
         m_shiftLKey->SetOn(false);
-        m_shiftRKey->SetOn(false);
+        if (m_shiftRKey) m_shiftRKey->SetOn(false);
         if (m_altKey) m_altKey->SetOn(false);
         m_lockKey->SetOn(false);
     }
-    else m_shiftRKey->SetOn(m_shiftLKey->IsOn());
+    else if (m_shiftRKey) m_shiftRKey->SetOn(m_shiftLKey->IsOn());
 
     updateButtons();
 }
 
 void UIKeyboardType::shiftROnOff()
 {
+    if (!m_shiftRKey) return;
+
     if (m_lockKey->IsOn())
     {
         m_shiftLKey->SetOn(false);

@@ -4,33 +4,33 @@
 
     <font name="normal" face="Arial">
       <color>#ffffff</color>
-      <size>13</size>
-      <bold>no</bold>
+      <size>14</size>
+      <bold>yes</bold>
     </font>
 
     <font name="focused" face="Arial">
       <color>#ffffff</color>
-      <size>13</size>
-      <bold>no</bold>
+      <size>14</size>
+      <bold>yes</bold>
     </font>
 
     <font name="down" face="Arial">
       <color>#ffffff</color>
-      <size>13</size>
-      <bold>no</bold>
+      <size>14</size>
+      <bold>yes</bold>
     </font>
 
     <font name="downfocused" face="Arial">
       <color>#ffffff</color>
-      <size>13</size>
-      <bold>no</bold>
+      <size>14</size>
+      <bold>yes</bold>
     </font>
 
     <container name="keyboard_container">
-      <area>0,0,540,193</area>
+      <area>0,0,537,193</area>
 
       <keyboard name="keyboard" draworder="2">
-        <area>0,0,540,193</area>
+        <area>0,0,537,193</area>
         <context>-1</context>
 
         <image function="normal" filename="keyboard/key_normal.png"></image>
