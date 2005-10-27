@@ -771,11 +771,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>Nicht autom. löschen</translation>
+        <translation type="obsolete">Nicht autom. löschen</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>Automatisch löschen</translation>
+        <translation type="obsolete">Automatisch löschen</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1095,6 +1095,26 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished">Titel</translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1718,11 +1738,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
-        <translation>Anzeigedauer des OSD (in Sek.)</translation>
+        <translation type="obsolete">Anzeigedauer des OSD (in Sek.)</translation>
     </message>
     <message>
         <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation>Bestimmt wie lange das OSD (on screen display) nach dem Umschalten angezeigt wird.</translation>
+        <translation type="obsolete">Bestimmt wie lange das OSD (on screen display) nach dem Umschalten angezeigt wird.</translation>
     </message>
     <message>
         <source>OSD theme</source>
@@ -2923,7 +2943,7 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>ERROR, No inputs found</source>
-        <translation>FEHLER, Keine Eingänge gefunden</translation>
+        <translation type="obsolete">FEHLER, Keine Eingänge gefunden</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
@@ -3007,11 +3027,11 @@ Ihr XMLTV Grabber liefert keine Kanalnummern, Sie müssen sie deshalb manuell ei
     </message>
     <message>
         <source>Card Type</source>
-        <translation>Kartentyp</translation>
+        <translation type="obsolete">Kartentyp</translation>
     </message>
     <message>
         <source>Card Name</source>
-        <translation>Kartenname</translation>
+        <translation type="obsolete">Kartenname</translation>
     </message>
     <message>
         <source>Normally the dvb-recording will drop packets from the card untill a sequence start header is seen. This option turns off this feature.</source>
@@ -4084,7 +4104,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>ERROR, V4L support unavailable on this OS</source>
-        <translation>FEHLER. Ihrem Betriebssystem fehlt die Unterstützung für Video4Linux</translation>
+        <translation type="obsolete">FEHLER. Ihrem Betriebssystem fehlt die Unterstützung für Video4Linux</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -5376,7 +5396,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation>Deinterlace Algorithmus. &apos;Kernel&apos; benötigt SSE Unterstützung. &apos;Bob&apos; funktioniert nur falls Xv oder XvMC zur Videoausgabe vewendet werden.</translation>
+        <translation type="obsolete">Deinterlace Algorithmus. &apos;Kernel&apos; benötigt SSE Unterstützung. &apos;Bob&apos; funktioniert nur falls Xv oder XvMC zur Videoausgabe vewendet werden.</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
@@ -5781,11 +5801,11 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation>Firewire Modell</translation>
+        <translation type="obsolete">Firewire Modell</translation>
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation>Firewire Anschluß</translation>
+        <translation type="obsolete">Firewire Anschluß</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
@@ -5793,7 +5813,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation>Firewire Knoten</translation>
+        <translation type="obsolete">Firewire Knoten</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
@@ -5801,7 +5821,7 @@ Myth wird nun beendet.</translation>
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation>Firewire Geschwindigkeit</translation>
+        <translation type="obsolete">Firewire Geschwindigkeit</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -5948,7 +5968,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation>Firewire Verbindungstyp</translation>
+        <translation type="obsolete">Firewire Verbindungstyp</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -5992,11 +6012,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>ATSC Transport</source>
-        <translation>ATSC Transport</translation>
+        <translation type="obsolete">ATSC Transport</translation>
     </message>
     <message>
         <source>ATSC transport, cable or terrestrial</source>
-        <translation>ATSC Transport, Kabel oder Terrestrisch</translation>
+        <translation type="obsolete">ATSC Transport, Kabel oder Terrestrisch</translation>
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
@@ -6718,10 +6738,6 @@ Myth will now exit.</source>
         <translation type="unfinished">Status: </translation>
     </message>
     <message>
-        <source>Cable-HRC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Channel Separator</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7189,6 +7205,114 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable HRC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency table to use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC modulation, 8-VSB, QAM-256, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not query inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with V4L support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtype</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frontend ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable box model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IEEE-1394 Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with DVB support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Kernel&apos; requires SSE CPU support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Bob&apos; requires XVideo or XvMC video out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General OSD time-out (sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active after it is first activated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Info OSD time-out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use line edit virtual keyboards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

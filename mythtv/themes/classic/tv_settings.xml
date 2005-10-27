@@ -84,6 +84,7 @@
       <text lang="JA">録画優先順位</text>
       <text lang="SI">Snemalne prioritete</text>
       <text lang="ET">Salvestamisprioriteedid</text>
+      <text lang="DK">Optagelsesprioriteter</text>
       <alttext lang="ET">Prioriteedid</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>

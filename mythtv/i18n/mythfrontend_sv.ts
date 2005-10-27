@@ -706,11 +706,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>Autoradera inte</translation>
+        <translation type="obsolete">Autoradera inte</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>Autoradera</translation>
+        <translation type="obsolete">Autoradera</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1007,6 +1007,26 @@ Returning to the previous menu.</source>
     <message>
         <source>Categories</source>
         <translation>Kategorier</translation>
+    </message>
+    <message>
+        <source>Disable Auto Expire</source>
+        <translation>Avaktivera autoradering</translation>
+    </message>
+    <message>
+        <source>Enable Auto Expire</source>
+        <translation>Aktivera autoradering</translation>
+    </message>
+    <message>
+        <source>Change Recording Title</source>
+        <translation>Ändra titel</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation>Titel</translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
+        <translation>Undertitel</translation>
     </message>
 </context>
 <context>
@@ -1469,7 +1489,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Deinterlace playback</source>
-        <translation>Gör &apos;deinterlace&apos; vid uppspelning</translation>
+        <translation>Avfläta uppspelning</translation>
     </message>
     <message>
         <source>Extra audio buffering</source>
@@ -1581,11 +1601,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
-        <translation>Antal sekunder som information visas</translation>
+        <translation type="obsolete">Antal sekunder som information visas</translation>
     </message>
     <message>
         <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation>Antal sekunder som programinformation visas efter ett kanalbyte.</translation>
+        <translation type="obsolete">Antal sekunder som programinformation visas efter ett kanalbyte.</translation>
     </message>
     <message>
         <source>OSD theme</source>
@@ -2702,7 +2722,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>ERROR, No inputs found</source>
-        <translation>FEL, inga ingångar hittade</translation>
+        <translation type="obsolete">FEL, inga ingångar hittade</translation>
     </message>
     <message>
         <source>XMLTV listings grabber</source>
@@ -2774,11 +2794,11 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>Card Type</source>
-        <translation>Korttyp</translation>
+        <translation type="obsolete">Korttyp</translation>
     </message>
     <message>
         <source>Card Name</source>
-        <translation>Kortnamn</translation>
+        <translation type="obsolete">Kortnamn</translation>
     </message>
     <message>
         <source>Per PID driver buffer size</source>
@@ -3742,7 +3762,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>ERROR, V4L support unavailable on this OS</source>
-        <translation>FEL, stöd för V4L saknas under detta OS</translation>
+        <translation type="obsolete">FEL, stöd för V4L saknas under detta OS</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -4852,7 +4872,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation>Avflätningsalgoritm. &apos;Kärna&apos; kräver SSE. &apos;Bob&apos; kräver Xv eller XvMC video ut.</translation>
+        <translation type="obsolete">Avflätningsalgoritm. &apos;Kärna&apos; kräver SSE. &apos;Bob&apos; kräver Xv eller XvMC video ut.</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
@@ -5197,11 +5217,11 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation>Firewire-modell</translation>
+        <translation type="obsolete">Firewire-modell</translation>
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation>Firewire-port</translation>
+        <translation type="obsolete">Firewire-port</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
@@ -5209,7 +5229,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation>Firewire-nod</translation>
+        <translation type="obsolete">Firewire-nod</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
@@ -5217,7 +5237,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation>Firewire-hastighet</translation>
+        <translation type="obsolete">Firewire-hastighet</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -5358,7 +5378,7 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation>Firewire-anslutningstyp</translation>
+        <translation type="obsolete">Firewire-anslutningstyp</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -5386,11 +5406,11 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     </message>
     <message>
         <source>ATSC Transport</source>
-        <translation>ATSC-transport</translation>
+        <translation type="obsolete">ATSC-transport</translation>
     </message>
     <message>
         <source>ATSC transport, cable or terrestrial</source>
-        <translation>ATSC-transport, kabel eller marksänt</translation>
+        <translation type="obsolete">ATSC-transport, kabel eller marksänt</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
@@ -6115,7 +6135,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Cable-HRC</source>
-        <translation>Kabel-HRC</translation>
+        <translation type="obsolete">Kabel-HRC</translation>
     </message>
     <message>
         <source>Channel Separator</source>
@@ -6570,6 +6590,114 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
         <translation>VIA XvMC använder sig av VIA VLD XvMC.</translation>
+    </message>
+    <message>
+        <source>Cable HRC</source>
+        <translation>Kabel HRC</translation>
+    </message>
+    <message>
+        <source>Frequency Table</source>
+        <translation>Frekvenstabell</translation>
+    </message>
+    <message>
+        <source>Frequency table to use.</source>
+        <translation>Frekvenstabell att använda.</translation>
+    </message>
+    <message>
+        <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
+        <translation>De flesta digitala kanaler befinner sig på kanal 78 och över.</translation>
+    </message>
+    <message>
+        <source>ATSC Modulation</source>
+        <translation>ATSC-modulation</translation>
+    </message>
+    <message>
+        <source>ATSC modulation, 8-VSB, QAM-256, etc.</source>
+        <translation>ATSC-modulation, 8-VSB, QAM-256, etc.</translation>
+    </message>
+    <message>
+        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
+        <translation>De flesta amerikanska kabelsystem använder QAM-256 eller QAM-64, men en del mixade system kan använda 8-VSB för marksända kanaler.</translation>
+    </message>
+    <message>
+        <source>Could not query inputs.</source>
+        <translation>Kunde inte få fram ingångar.</translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with V4L support to query inputs</source>
+        <translation>FEL, kompilera med V4L-stöd för att få fram ingångar</translation>
+    </message>
+    <message>
+        <source>Subtype</source>
+        <translation>Subtyp</translation>
+    </message>
+    <message>
+        <source>Frontend ID</source>
+        <translation>Uppspelningsklient-ID</translation>
+    </message>
+    <message>
+        <source>Cable box model</source>
+        <translation>Kabelbox-modell</translation>
+    </message>
+    <message>
+        <source>Connection Type</source>
+        <translation>Anslutningstyp</translation>
+    </message>
+    <message>
+        <source>IEEE-1394 Port</source>
+        <translation>IEEE-1394 port</translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation>Nod</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation>Hastighet</translation>
+    </message>
+    <message>
+        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
+        <translation>Kunde inte öppna &apos;%1&apos; för att undersöka dess ingångar.</translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with DVB support to query inputs</source>
+        <translation>FEL, kompilera med DVB-stöd för att få fram ingångar</translation>
+    </message>
+    <message>
+        <source>Deinterlace algorithm.</source>
+        <translation>Avflätningsalgoritm.</translation>
+    </message>
+    <message>
+        <source>&apos;Kernel&apos; requires SSE CPU support.</source>
+        <translation>&apos;Kärna&apos; kräver CPU med SSE-stöd.</translation>
+    </message>
+    <message>
+        <source>&apos;Bob&apos; requires XVideo or XvMC video out.</source>
+        <translation>&apos;Bob&apos; kräver XVideo eller XvMC video ut.</translation>
+    </message>
+    <message>
+        <source>General OSD time-out (sec)</source>
+        <translation>Generell OSD-tidsgräns (sek)</translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active after it is first activated.</source>
+        <translation>Antal sekunder för informationsvisningen att vara synlig i TV-bilden.</translation>
+    </message>
+    <message>
+        <source>Program Info OSD time-out</source>
+        <translation>Programinfo OSD-tidsgräns</translation>
+    </message>
+    <message>
+        <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
+        <translation>Antal sekunder för informationsvisningen att visa programinformation i TV-bilden.</translation>
+    </message>
+    <message>
+        <source>Use line edit virtual keyboards</source>
+        <translation>Använd virtuellt tangentbord</translation>
+    </message>
+    <message>
+        <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
+        <translation>Använd ett virtuellt tangentbord för att skriva text som aktiveras med OK när text ska matas in.</translation>
     </message>
 </context>
 <context>

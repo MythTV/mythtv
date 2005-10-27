@@ -43,7 +43,7 @@
      <text lang="ES">Configuración de TV</text>
      <text lang="FR">Options TV</text>
      <text lang="DE">TV</text>
-     <text lang="DK">TV indstillinger</text>
+     <text lang="DK">TV Indstillinger</text>
      <text lang="NL">TV Instellingen</text>
      <text lang="PT">Configurar Televisão</text>
      <text lang="SV">TV</text>
@@ -76,7 +76,7 @@
        <text lang="ES">Configurar Videos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="DE">Videos</text>
-       <text lang="DK">Video indstillinger</text>
+       <text lang="DK">Video Indstillinger</text>
        <text lang="NL">Films Instellingen</text>
        <text lang="PT">Configurar Filmes</text>
        <text lang="SV">Video</text>
@@ -99,6 +99,7 @@
      <text lang="JA">DVD設定</text>
      <text lang="SI">DVD nastavitve</text>
      <text lang="ET">DVD seaded</text>
+     <text lang="DK">DVD Indstillinger</text>
      <action>CONFIGPLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -110,6 +111,7 @@
       <text lang="SI">Radio nastavitve</text>
       <text lang="ET">Raadio seaded</text>
       <text lang="SV">Radio</text>
+      <text lang="DK">Radio Indstillinger</text>
       <action>CONFIGPLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -137,7 +139,7 @@
      <text lang="ES">Configurar Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
-     <text lang="DK">Spil indstillinger</text>
+     <text lang="DK">Spil Indstillinger</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
      <text lang="SV">Spel</text>
@@ -176,6 +178,7 @@
      <text lang="JA">ニュース設定</text>
      <text lang="SI">Nastavitve novic</text>
      <text lang="ET">Uudiste seaded</text>
+     <text lang="DK">Nyhedsindstillingen</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -188,6 +191,7 @@
      <text lang="JA">Web設定</text>
      <text lang="SI">Spletne nastavitve</text>
      <text lang="ET">Veebi seaded</text>
+     <text lang="DK">Web Indstillinger</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -199,6 +203,7 @@
       <text lang="SI">Nastavitve receptov</text>
       <text lang="ET">Retseptide seaded</text>
       <text lang="SV">Recept</text>
+      <text lang="DK">Opskriftsindstillinger</text>
       <action>CONFIGPLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -210,6 +215,7 @@
       <text lang="SI">Telefonske nastavitve</text>
       <text lang="ET">Telefoni seaded</text>
       <text lang="SV">Telefon</text>
+      <text lang="DK">Telefon Indstillinger</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -221,6 +227,7 @@
      <text lang="SI">Nastavitve čas filmov</text>
      <text lang="ET">Filmiaegade seaded</text>
      <text lang="SV">Biotider</text>
+     <text lang="DK">Biograf Indstillinger</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -237,6 +244,7 @@
      <text lang="JA">XBox設定</text>
      <text lang="SI">Xbox nastavitve</text>
      <text lang="ET">Xbox-i seaded</text>
+     <text lang="DK">XBox Indstillinger</text>
      <action>SETTINGS XBOXSETTINGS</action>
      <dependssetting>EnableXbox</dependssetting>
    </button>

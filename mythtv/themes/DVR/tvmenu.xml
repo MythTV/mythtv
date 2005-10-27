@@ -61,6 +61,7 @@
       <text lang="DE">Alte Aufnahmen</text>
       <text lang="SI">Že posneto</text>
       <text lang="ET">Varem salvestatud</text>
+      <text lang="DK">Tidligere optagelser</text>
       <action>TV_PREVIOUS</action>
    </button>
 
@@ -72,6 +73,7 @@
       <text lang="JA">システムステータス</text>
       <text lang="SI">Status sistema</text>
       <text lang="ET">Süsteemi olek</text>
+      <text lang="DK">Systemstatus</text>
       <action>TV_STATUS</action>
    </button>
 

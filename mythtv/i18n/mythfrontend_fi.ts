@@ -801,11 +801,11 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>Ei Automaattista Vanhentumista</translation>
+        <translation type="obsolete">Ei Automaattista Vanhentumista</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>Automaattinen Vanhentuminen</translation>
+        <translation type="obsolete">Automaattinen Vanhentuminen</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1126,6 +1126,26 @@ Palaa edelliseen valikkoon.</translation>
     <message>
         <source>Categories</source>
         <translation>Kategoriat</translation>
+    </message>
+    <message>
+        <source>Disable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished">Nimi</translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1748,11 +1768,11 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
-        <translation>Kuinka monta sekuntia näytöllä esitetään tietoja kanavasta ja ohjelmasta </translation>
+        <translation type="obsolete">Kuinka monta sekuntia näytöllä esitetään tietoja kanavasta ja ohjelmasta </translation>
     </message>
     <message>
         <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation>Kuinka monta sekuntia näytöllä esitetään tietoja ohjelmasta kanavanvaihdon jälkeen.</translation>
+        <translation type="obsolete">Kuinka monta sekuntia näytöllä esitetään tietoja ohjelmasta kanavanvaihdon jälkeen.</translation>
     </message>
     <message>
         <source>OSD theme</source>
@@ -2950,7 +2970,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>ERROR, No inputs found</source>
-        <translation>VIRHE, Ei tuloja löydetty</translation>
+        <translation type="obsolete">VIRHE, Ei tuloja löydetty</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
@@ -3034,11 +3054,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Card Type</source>
-        <translation>Korttityyppi</translation>
+        <translation type="obsolete">Korttityyppi</translation>
     </message>
     <message>
         <source>Card Name</source>
-        <translation>Kortin Nimi</translation>
+        <translation type="obsolete">Kortin Nimi</translation>
     </message>
     <message>
         <source>Do NOT use DVB driver for filtering.</source>
@@ -4119,7 +4139,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>ERROR, V4L support unavailable on this OS</source>
-        <translation>VIRHE, V4L- tukea ei löydetty käyttöjärjestelmästä</translation>
+        <translation type="obsolete">VIRHE, V4L- tukea ei löydetty käyttöjärjestelmästä</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -5410,10 +5430,6 @@ Myth will now exit.</translation>
         <translation type="obsolete">%1% Valmiina @ %2 fps.</translation>
     </message>
     <message>
-        <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enable gamma correction for video</source>
         <translation>Käytä gamman korjausta videolle</translation>
     </message>
@@ -5819,11 +5835,11 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation>Firewiren Malli</translation>
+        <translation type="obsolete">Firewiren Malli</translation>
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation>Firewire Portti</translation>
+        <translation type="obsolete">Firewire Portti</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
@@ -5831,7 +5847,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation>Firewiren Noodi</translation>
+        <translation type="obsolete">Firewiren Noodi</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
@@ -5839,7 +5855,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation>Firewiren Nopeus</translation>
+        <translation type="obsolete">Firewiren Nopeus</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -5989,7 +6005,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation>Firewire:n liitäntätyyppi</translation>
+        <translation type="obsolete">Firewire:n liitäntätyyppi</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -6033,11 +6049,11 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     </message>
     <message>
         <source>ATSC Transport</source>
-        <translation>ATSC Lähetys</translation>
+        <translation type="obsolete">ATSC Lähetys</translation>
     </message>
     <message>
         <source>ATSC transport, cable or terrestrial</source>
-        <translation>ATSC joko kaapelina tai maanpäällisenä lähetyksenä</translation>
+        <translation type="obsolete">ATSC joko kaapelina tai maanpäällisenä lähetyksenä</translation>
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
@@ -6784,7 +6800,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>Cable-HRC</source>
-        <translation>Kaapeli-HRC</translation>
+        <translation type="obsolete">Kaapeli-HRC</translation>
     </message>
     <message>
         <source>Channel Separator</source>
@@ -7286,6 +7302,114 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable HRC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency table to use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC modulation, 8-VSB, QAM-256, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not query inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with V4L support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtype</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frontend ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable box model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IEEE-1394 Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with DVB support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Kernel&apos; requires SSE CPU support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Bob&apos; requires XVideo or XvMC video out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General OSD time-out (sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active after it is first activated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Info OSD time-out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use line edit virtual keyboards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

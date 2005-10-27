@@ -39,7 +39,7 @@
       <text lang="NL">Programma Zoeker</text>
       <text lang="FR">Recherche de programmes</text>
       <text lang="DE">Alphabetische Suche</text>
-      <text lang="DK">Program Finder</text>
+      <text lang="DK">Program Søger</text>
       <text lang="PT">Procurar Programa</text>
       <text lang="SV">Programletaren</text>
       <text lang="JA">番組検索</text>
@@ -50,7 +50,7 @@
       <alttext lang="ES">Buscar</alttext>
       <alttext lang="CA">Cercar</alttext>
       <alttext lang="DE">ABC Suche</alttext>
-      <alttext lang="DK">Finder</alttext>
+      <alttext lang="DK">Søger</alttext>
       <alttext lang="NL">Zoeker</alttext>
       <alttext lang="PT">Procurar</alttext>
       <alttext lang="SV">Letaren</alttext>
@@ -69,11 +69,13 @@
       <text lang="JA">リスト検索</text>
       <text lang="SI">Iskanje seznamov</text>
       <text lang="ET">Otsi telekavu</text>
+      <text lang="DK">Søg på lister</text>
       <alttext>Search</alttext>
       <alttext lang="SV">Sök tablå</alttext>
       <alttext lang="NL">Zoek</alttext>      
       <alttext lang="SI">Iskanje</alttext>
       <alttext lang="ET">Telekavad</alttext>
+      <alttext lang="DK">Lister</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 

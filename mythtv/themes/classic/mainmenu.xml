@@ -8,6 +8,7 @@
      <text lang="DE">TV</text>
      <text lang="SI">TV</text>
      <text lang="ET">TV</text>
+     <text lang="DK">TV</text>
      <action>MENU tvmenu.xml</action>
    </button>
 
@@ -57,6 +58,7 @@
      <text lang="SV">DVD</text>
      <text lang="SI">DVD</text>
      <text lang="ET">DVD</text>
+     <text lang="DK">DVD</text>
      <action>PLUGIN mythdvd</action>
      <depends>mythdvd</depends>
    </button>
@@ -68,6 +70,7 @@
       <text lang="SI">Radio</text>
       <text lang="ET">Raadio</text>
       <text lang="SV">Radio</text>
+      <text lang="DK">Radio</text>
       <action>PLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -140,6 +143,7 @@
      <text lang="JA">ニュース</text>
      <text lang="SI">Novice</text>
      <text lang="ET">Uudised</text>
+     <text lang="DK">Nyheder</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -152,6 +156,7 @@
       <text lang="JA">ウェブ</text>
       <text lang="SI">Splet</text>
       <text lang="ET">Veeb</text>
+      <text lang="DK">Web</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -163,6 +168,7 @@
       <text lang="SI">Telefon</text>
       <text lang="ET">Telefon</text>
       <text lang="SV">Telefon</text>
+      <text lang="DK">Telefon</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -213,6 +219,7 @@
      <text lang="SV">Avstängning</text>
      <text lang="DE">Beenden</text>
      <text lang="ET">Seiska</text>
+     <text lang="DK">Afslut</text>
      <action>SHUTDOWN</action>
    </button> -->
 

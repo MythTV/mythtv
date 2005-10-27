@@ -82,12 +82,14 @@
       <text lang="JA">録画優先順位</text>
       <text lang="SI">Snemalne prirotete</text>
       <text lang="ET">Salvestamisprioriteedid</text>
+      <text lang="DK">Optagelses prioriteter</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
       <alttext lang="NL">Prioriteiten</alttext>
       <alttext lang="DE">Prioritäten</alttext>
       <alttext lang="SI">Prioritete</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
+      <alttext lang="DK">Prioriteter</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -119,6 +121,7 @@
      <text lang="SV">Avstängning</text>
      <text lang="DE">Beenden</text>
      <text lang="ET">Seiska</text>
+     <text lang="DK">Afslut</text>
      <action>SHUTDOWN</action>
    </button> -->
 

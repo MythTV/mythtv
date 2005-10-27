@@ -7,11 +7,13 @@
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="SI">Nast. snemalne prioritete</text>
       <text lang="ET">Salvestamisprioriteetide määramine</text>
+      <text lang="DK">Optagelsesprioriteter</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="SI">Snemalne prioritete</alttext>
       <alttext lang="ET">Salvestamisprioriteedid</alttext>
+      <alttext lang="DK">Optagelser</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -23,12 +25,14 @@
       <text lang="JA">チャンネル録画優先順位設定</text>
       <text lang="SI">Nast. kanalne snem. priritete</text>
       <text lang="ET">Kanaliprioriteetide määramine</text>
+      <text lang="DK">Kanalprioriteter</text>
       <alttext>Channel Priorities</alttext>
       <alttext lang="SV">Kanal</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
       <alttext lang="DE">Sender</alttext>
       <alttext lang="SI">Kanalne prioritete</alttext>
       <alttext lang="ET">Kanaliprioriteedid</alttext>
+      <alttext lang="DK">Kanal</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 

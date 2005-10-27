@@ -767,11 +767,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>自動削除しない</translation>
+        <translation type="obsolete">自動削除しない</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>自動削除</translation>
+        <translation type="obsolete">自動削除</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1093,6 +1093,26 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished">タイトル</translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1716,11 +1736,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
-        <translation>OSD情報表示秒数</translation>
+        <translation type="obsolete">OSD情報表示秒数</translation>
     </message>
     <message>
         <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation>チャンネルを変更した時に画面に情報を表示している時間．</translation>
+        <translation type="obsolete">チャンネルを変更した時に画面に情報を表示している時間．</translation>
     </message>
     <message>
         <source>OSD theme</source>
@@ -2848,7 +2868,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>ERROR, No inputs found</source>
-        <translation>エラー．入力が見つかりませんでした</translation>
+        <translation type="obsolete">エラー．入力が見つかりませんでした</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
@@ -2932,11 +2952,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Card Type</source>
-        <translation>カードタイプ</translation>
+        <translation type="obsolete">カードタイプ</translation>
     </message>
     <message>
         <source>Card Name</source>
-        <translation>カード名</translation>
+        <translation type="obsolete">カード名</translation>
     </message>
     <message>
         <source>Do NOT use DVB driver for filtering.</source>
@@ -4089,7 +4109,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>ERROR, V4L support unavailable on this OS</source>
-        <translation>エラー, V4LはこのOSではサポートされていません</translation>
+        <translation type="obsolete">エラー, V4LはこのOSではサポートされていません</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -5337,7 +5357,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation>デインターレースアルゴリズム。&quot;カーネル&quot;はSSE機能が必要です。&quot;Bob&quot;は、XvあるいはXvMCビデオ出力のサポートが必要です。</translation>
+        <translation type="obsolete">デインターレースアルゴリズム。&quot;カーネル&quot;はSSE機能が必要です。&quot;Bob&quot;は、XvあるいはXvMCビデオ出力のサポートが必要です。</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
@@ -5743,11 +5763,11 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation>Firewireモデル</translation>
+        <translation type="obsolete">Firewireモデル</translation>
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation>Firewireポート</translation>
+        <translation type="obsolete">Firewireポート</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
@@ -5755,7 +5775,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation>Firewireノード</translation>
+        <translation type="obsolete">Firewireノード</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
@@ -5763,7 +5783,7 @@ MythTVは終了します。</translation>
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation>Firewireスピード</translation>
+        <translation type="obsolete">Firewireスピード</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -5913,7 +5933,7 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation>Firewire接続タイプ</translation>
+        <translation type="obsolete">Firewire接続タイプ</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -5957,11 +5977,11 @@ Most cards can autodetect this now, so leave it at Auto unless it won&apos;t wor
     </message>
     <message>
         <source>ATSC Transport</source>
-        <translation>ATSCトランスポート</translation>
+        <translation type="obsolete">ATSCトランスポート</translation>
     </message>
     <message>
         <source>ATSC transport, cable or terrestrial</source>
-        <translation>ATSCトランスポート、ケーブルまたは地上波</translation>
+        <translation type="obsolete">ATSCトランスポート、ケーブルまたは地上波</translation>
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
@@ -6696,10 +6716,6 @@ Myth will now exit.</source>
         <translation type="unfinished">ステータス:</translation>
     </message>
     <message>
-        <source>Cable-HRC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Channel Separator</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7167,6 +7183,114 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable HRC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency table to use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC modulation, 8-VSB, QAM-256, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not query inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with V4L support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtype</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frontend ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable box model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IEEE-1394 Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with DVB support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Kernel&apos; requires SSE CPU support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Bob&apos; requires XVideo or XvMC video out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General OSD time-out (sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active after it is first activated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Info OSD time-out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use line edit virtual keyboards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

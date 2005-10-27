@@ -811,11 +811,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>Ne odstrani samodejno</translation>
+        <translation type="obsolete">Ne odstrani samodejno</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>Samodejno odstrani</translation>
+        <translation type="obsolete">Samodejno odstrani</translation>
     </message>
     <message>
         <source>Change Recording Group</source>
@@ -1095,6 +1095,26 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished">Naslov</translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2666,11 +2686,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Card Type</source>
-        <translation>Tip kartice</translation>
+        <translation type="obsolete">Tip kartice</translation>
     </message>
     <message>
         <source>Card Name</source>
-        <translation>Ime kartice</translation>
+        <translation type="obsolete">Ime kartice</translation>
     </message>
     <message>
         <source>Do NOT use DVB driver for filtering.</source>
@@ -2790,11 +2810,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>ERROR, No inputs found</source>
-        <translation>NAPAKA, ne najdem nobenih vhodov</translation>
+        <translation type="obsolete">NAPAKA, ne najdem nobenih vhodov</translation>
     </message>
     <message>
         <source>ERROR, V4L support unavailable on this OS</source>
-        <translation>NAPAKA, na tem OS podpora V4L ni na voljo</translation>
+        <translation type="obsolete">NAPAKA, na tem OS podpora V4L ni na voljo</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
@@ -3264,11 +3284,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
-        <translation>Število sekund za OSD informacije</translation>
+        <translation type="obsolete">Število sekund za OSD informacije</translation>
     </message>
     <message>
         <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation>Kako dolgo ostane sporočilo na zaslonu, po spremembi kanala.</translation>
+        <translation type="obsolete">Kako dolgo ostane sporočilo na zaslonu, po spremembi kanala.</translation>
     </message>
     <message>
         <source>Menu theme</source>
@@ -5376,7 +5396,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation>Neprepreteni algoritem. &apos;Jedro&apos; potrebuje SSE. &apos;Bob&apos; potrebuje Xv ali XvMC video izhod.</translation>
+        <translation type="obsolete">Neprepreteni algoritem. &apos;Jedro&apos; potrebuje SSE. &apos;Bob&apos; potrebuje Xv ali XvMC video izhod.</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
@@ -5792,11 +5812,11 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation>Firewire model</translation>
+        <translation type="obsolete">Firewire model</translation>
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation>Firewire port</translation>
+        <translation type="obsolete">Firewire port</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
@@ -5804,7 +5824,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation>Firewire node</translation>
+        <translation type="obsolete">Firewire node</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
@@ -5812,7 +5832,7 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation>Firewire hitrost</translation>
+        <translation type="obsolete">Firewire hitrost</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -5962,7 +5982,7 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation>Tip firewire povezave</translation>
+        <translation type="obsolete">Tip firewire povezave</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -6006,11 +6026,11 @@ Večina kartic samo zazna te nastavitve, pustite na Avto drugače ne bo delovalo
     </message>
     <message>
         <source>ATSC Transport</source>
-        <translation>ATSC promet</translation>
+        <translation type="obsolete">ATSC promet</translation>
     </message>
     <message>
         <source>ATSC transport, cable or terrestrial</source>
-        <translation>ATSC promet, kabeljski ali zemeljski</translation>
+        <translation type="obsolete">ATSC promet, kabeljski ali zemeljski</translation>
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
@@ -6745,10 +6765,6 @@ Myth will now exit.</source>
         <translation type="unfinished">Status: </translation>
     </message>
     <message>
-        <source>Cable-HRC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Channel Separator</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7216,6 +7232,114 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable HRC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency table to use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC modulation, 8-VSB, QAM-256, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not query inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with V4L support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtype</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frontend ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable box model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IEEE-1394 Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with DVB support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Kernel&apos; requires SSE CPU support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Bob&apos; requires XVideo or XvMC video out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General OSD time-out (sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active after it is first activated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Info OSD time-out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use line edit virtual keyboards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -873,11 +873,11 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>Don&apos;t Auto Expire</source>
-        <translation>Ikke utløp automatisk</translation>
+        <translation type="obsolete">Ikke utløp automatisk</translation>
     </message>
     <message>
         <source>Auto Expire</source>
-        <translation>Utløp automatisk</translation>
+        <translation type="obsolete">Utløp automatisk</translation>
     </message>
     <message>
         <source>Do not preserve this episode</source>
@@ -1041,6 +1041,26 @@ Går tilbake til forrige meny.</translation>
     </message>
     <message>
         <source>Categories</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable Auto Expire</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Recording Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="unfinished">Tittel</translation>
+    </message>
+    <message>
+        <source>Subtitle</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2488,11 +2508,11 @@ Mesteparten av kortene kan oppdage dette automatisk, så sett dette til automati
     </message>
     <message>
         <source>ATSC Transport</source>
-        <translation>ATSC-transport</translation>
+        <translation type="obsolete">ATSC-transport</translation>
     </message>
     <message>
         <source>ATSC transport, cable or terrestrial</source>
-        <translation>ATSC-transport, kabel eller bakkenett</translation>
+        <translation type="obsolete">ATSC-transport, kabel eller bakkenett</translation>
     </message>
     <message>
         <source>Bandwidth (Default: Auto)
@@ -3174,11 +3194,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Card Type</source>
-        <translation>Korttype</translation>
+        <translation type="obsolete">Korttype</translation>
     </message>
     <message>
         <source>Card Name</source>
-        <translation>Kortnavn</translation>
+        <translation type="obsolete">Kortnavn</translation>
     </message>
     <message>
         <source>Use hardware MPEG decoder</source>
@@ -3222,7 +3242,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Firewire Model</source>
-        <translation>Firewire-modell</translation>
+        <translation type="obsolete">Firewire-modell</translation>
     </message>
     <message>
         <source>Other</source>
@@ -3230,7 +3250,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Firewire Connection Type</source>
-        <translation>Forbindelsestype for Firewire</translation>
+        <translation type="obsolete">Forbindelsestype for Firewire</translation>
     </message>
     <message>
         <source>Point to Point</source>
@@ -3242,7 +3262,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Firewire Port</source>
-        <translation>Firewire-port</translation>
+        <translation type="obsolete">Firewire-port</translation>
     </message>
     <message>
         <source>Firewire port on your firewire card.</source>
@@ -3250,7 +3270,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Firewire Node</source>
-        <translation>Firewire-node</translation>
+        <translation type="obsolete">Firewire-node</translation>
     </message>
     <message>
         <source>Firewire node is the remote device.</source>
@@ -3258,7 +3278,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Firewire Speed</source>
-        <translation>Firewire-hastighet</translation>
+        <translation type="obsolete">Firewire-hastighet</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -3414,11 +3434,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>ERROR, No inputs found</source>
-        <translation>FEIL: ingen inndata ble funnet</translation>
+        <translation type="obsolete">FEIL: ingen inndata ble funnet</translation>
     </message>
     <message>
         <source>ERROR, V4L support unavailable on this OS</source>
-        <translation>FEIL: V¤L-støtte er ikke tilgjengelig på dette operativsystemet</translation>
+        <translation type="obsolete">FEIL: V¤L-støtte er ikke tilgjengelig på dette operativsystemet</translation>
     </message>
     <message>
         <source>Advanced Configuration</source>
@@ -3550,7 +3570,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation>Avflettingsalgoritme. &apos;Kjerne&apos; krever SSE, &apos;Klatte&apos; krever Xv eller XvMC video-ut.</translation>
+        <translation type="obsolete">Avflettingsalgoritme. &apos;Kjerne&apos; krever SSE, &apos;Klatte&apos; krever Xv eller XvMC video-ut.</translation>
     </message>
     <message>
         <source>Deinterlace settings</source>
@@ -3824,11 +3844,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Number of seconds for OSD information</source>
-        <translation>Antall sekunder for tekst på skjermen</translation>
+        <translation type="obsolete">Antall sekunder for tekst på skjermen</translation>
     </message>
     <message>
         <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation>Hvor lenge programinformasjon vises på skjermen etter at det byttes kanal.</translation>
+        <translation type="obsolete">Hvor lenge programinformasjon vises på skjermen etter at det byttes kanal.</translation>
     </message>
     <message>
         <source>Menu theme</source>
@@ -5927,7 +5947,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Cable-HRC</source>
-        <translation>Kabel-HRC</translation>
+        <translation type="obsolete">Kabel-HRC</translation>
     </message>
     <message>
         <source>Underscore (5_1)</source>
@@ -6867,6 +6887,114 @@ Myth vil nå avsluttes.</translation>
     </message>
     <message>
         <source>VIA XvMC will use the VIA VLD XvMC extension.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable HRC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency Table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frequency table to use.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The option of scanning only at channel 78 and above is provided because most digital channels are in that range.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC Modulation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ATSC modulation, 8-VSB, QAM-256, etc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Most cable systems in the United States use QAM-256 or QAM-64, but some mixed systems may use 8-VSB for over-the-air channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not query inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with V4L support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subtype</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Frontend ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cable box model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IEEE-1394 Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not open &apos;%1&apos; to probe its inputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>ERROR, Compile with DVB support to query inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deinterlace algorithm.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Kernel&apos; requires SSE CPU support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;Bob&apos; requires XVideo or XvMC video out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>General OSD time-out (sec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active after it is first activated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Program Info OSD time-out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use line edit virtual keyboards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
