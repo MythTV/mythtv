@@ -1,4 +1,5 @@
 #include <iostream> 
+#include <qapplication.h>
 #include <qregexp.h> 
 #include <qdatetime.h>
 #include <qdir.h>
@@ -193,10 +194,14 @@ void Metadata::dumpToDatabase(QString startdir)
     if (query.exec() && query.isActive() && query.size() > 0)
         return;
 
-    query.prepare("INSERT INTO musicmetadata (artist,compilation_artist,album,title,"
-                  "genre,year,tracknum,length,filename,compilation,date_added) VALUES "
-                  "(:ARTIST, :COMPILATION_ARTIST, :ALBUM, :TITLE, :GENRE, :YEAR, :TRACKNUM, "
-                  ":LENGTH, :FILENAME, :COMPILATION, :DATE_ADDED );");
+    query.prepare("INSERT INTO musicmetadata "
+                  "(artist,   compilation_artist, album,      title,  "
+                  " genre,    year,               tracknum,   length, "
+                  " filename, compilation,        date_added, date_modified) "
+                  "VALUES "
+                  "(:ARTIST,  :COMPILATION_ARTIST,:ALBUM,     :TITLE,   "
+                  " :GENRE,   :YEAR,              :TRACKNUM,  :LENGTH,  "
+                  " :FILENAME,:COMPILATION,       :DATE_ADDED,:DATE_MOD)");
     query.bindValue(":ARTIST", artist.utf8());
     query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
     query.bindValue(":ALBUM", album.utf8());
@@ -207,7 +212,8 @@ void Metadata::dumpToDatabase(QString startdir)
     query.bindValue(":LENGTH", length);
     query.bindValue(":FILENAME", sqlfilename.utf8());
     query.bindValue(":COMPILATION", compilation);
-    query.bindValue(":DATE_ADDED", QDate::currentDate());
+    query.bindValue(":DATE_ADDED",  QDateTime::currentDateTime());
+    query.bindValue(":DATE_MOD",    QDateTime::currentDateTime());
     
     query.exec();
 
@@ -360,21 +366,28 @@ void Metadata::updateDatabase(QString startdir)
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("UPDATE musicmetadata SET artist = :ARTIST, album = :ALBUM, "
-                  "compilation_artist = :COMPILATION_ARTIST, "
-                  "title = :TITLE, genre = :GENRE, year = :YEAR, "
-                  "tracknum = :TRACKNUM, rating = :RATING, " 
-                  "compilation = :COMPILATION "
+    query.prepare("UPDATE musicmetadata    "
+                  "SET artist   = :ARTIST,   "
+                  "    album    = :ALBUM,    "
+                  "    title    = :TITLE,    "
+                  "    genre    = :GENRE,    "
+                  "    year     = :YEAR,     "
+                  "    tracknum = :TRACKNUM, "
+                  "    rating   = :RATING,   " 
+                  "    date_modified      = :DATE_MODIFIED, "
+                  "    compilation        = :COMPILATION,   "
+                  "    compilation_artist = :COMPILATION_ARTIST "
                   "WHERE intid = :ID;");
-    query.bindValue(":ARTIST", artist.utf8());
+    query.bindValue(":ARTIST",             artist.utf8());
+    query.bindValue(":ALBUM",              album.utf8());
+    query.bindValue(":TITLE",              title.utf8());
+    query.bindValue(":GENRE",              genre.utf8());
+    query.bindValue(":YEAR",               year);
+    query.bindValue(":TRACKNUM",           tracknum);
+    query.bindValue(":RATING",             rating);
+    query.bindValue(":DATE_MODIFIED",      QDateTime::currentDateTime());
+    query.bindValue(":COMPILATION",        compilation);
     query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
-    query.bindValue(":ALBUM", album.utf8());
-    query.bindValue(":TITLE", title.utf8());
-    query.bindValue(":GENRE", genre.utf8());
-    query.bindValue(":YEAR", year);
-    query.bindValue(":TRACKNUM", tracknum);
-    query.bindValue(":RATING", rating);
-    query.bindValue(":COMPILATION", compilation);
     query.bindValue(":ID", id);
 
     if (!query.exec())
@@ -683,8 +696,8 @@ AllMusic::AllMusic(QString path_assignment, QString a_startdir)
     //  loading and sorting
     //
     
-    metadata_loader = new MetadataLoadingThread(this);
-    metadata_loader->start();
+    metadata_loader = NULL;
+    startLoading();
 
     all_music.setAutoDelete(true);
     top_nodes.setAutoDelete(true);
@@ -718,6 +731,35 @@ bool AllMusic::cleanOutThreads()
     return false;
 }
 
+/** \fn AllMusic::startLoading(void)
+ *  \brief Start loading metadata.
+ *
+ *  Makes the AllMusic object run it's resync in a thread.
+ *  Once done, the doneLoading() method will return true.
+ *
+ *  \note Alternatively, this could be made to emit a signal
+ *        so the caller won't have to poll for completion.
+ *
+ *  \returns true if the loader thread was started
+ */
+bool AllMusic::startLoading(void)
+{
+    // Set this to false early rather than letting it be
+    // delayed till the thread calls resync.
+    done_loading = false;
+
+    if (metadata_loader)
+    {
+        cleanOutThreads();
+        delete metadata_loader;
+    }
+
+    metadata_loader = new MetadataLoadingThread(this);
+    metadata_loader->start();
+
+    return true;
+}
+
 void AllMusic::resync()
 {
     done_loading = false;
@@ -745,35 +787,37 @@ void AllMusic::resync()
             if (!filename.contains("://"))
                 filename = startdir + filename;
 
-            Metadata *temp = new Metadata
-                                    (
-                                        filename,
-                                        QString::fromUtf8(query.value(1).toString()),
-                                        QString::fromUtf8(query.value(2).toString()),
-                                        QString::fromUtf8(query.value(3).toString()),
-                                        QString::fromUtf8(query.value(4).toString()),
-                                        QString::fromUtf8(query.value(5).toString()),
-                                        query.value(6).toInt(),
-                                        query.value(7).toInt(),
-                                        query.value(8).toInt(),
-                                        query.value(0).toInt(),
-                                        query.value(10).toInt(),
-                                        query.value(12).toInt(),
-                                        query.value(11).toString(),
-                                        (query.value(13).toInt() > 0)
-                                    );
-            all_music.append(temp); //  Don't delete temp, as PtrList now owns it
+            Metadata *temp = new Metadata(
+                filename,
+                QString::fromUtf8(query.value(1).toString()),
+                QString::fromUtf8(query.value(2).toString()),
+                QString::fromUtf8(query.value(3).toString()),
+                QString::fromUtf8(query.value(4).toString()),
+                QString::fromUtf8(query.value(5).toString()),
+                query.value(6).toInt(),
+                query.value(7).toInt(),
+                query.value(8).toInt(),
+                query.value(0).toInt(),
+                query.value(10).toInt(),
+                query.value(12).toInt(),
+                query.value(11).toString(),
+                (query.value(13).toInt() > 0));
+
+            //  Don't delete temp, as PtrList now owns it
+            all_music.append(temp);
 
             // compute max/min playcount,lastplay for all music
-            if (query.at() == 0) { // first song
+            if (query.at() == 0)
+            { // first song
                 playcountMin = playcountMax = temp->PlayCount();
-                lastplayMin = lastplayMax = temp->LastPlay();
-            } else {
-                if (temp->PlayCount() < playcountMin) { playcountMin = temp->PlayCount(); }
-                else if (temp->PlayCount() > playcountMax) { playcountMax = temp->PlayCount(); }
-
-                if (temp->LastPlay() < lastplayMin) { lastplayMin = temp->LastPlay(); }
-                else if (temp->LastPlay() > lastplayMax) { lastplayMax = temp->LastPlay(); }
+                lastplayMin  = lastplayMax  = temp->LastPlay();
+            }
+            else
+            {
+                playcountMin = min(temp->PlayCount(), playcountMin);
+                playcountMax = max(temp->PlayCount(), playcountMax);
+                lastplayMin  = min(temp->LastPlay(),  lastplayMin);
+                lastplayMax  = max(temp->LastPlay(),  lastplayMax);
             }
         }
     }
@@ -1148,26 +1192,24 @@ void AllMusic::setSorting(QString a_paths)
 {
     paths = a_paths;
     if (paths == "directory")
-    {
         return;
-    }
     else
-    {
         tree_levels = QStringList::split(" ", paths);
-    }
+
     //  Error checking
-    for (QStringList::Iterator it = tree_levels.begin(); it != tree_levels.end(); ++it )
+    QStringList::const_iterator it = tree_levels.begin();
+    for (; it != tree_levels.end(); ++it)
     {
-        if( *it != "genre"  &&
-            *it != "artist" &&
-            *it != "splitartist" && 
-            *it != "album"  &&
+        if (*it != "genre"        &&
+            *it != "artist"       &&
+            *it != "splitartist"  && 
+            *it != "splitartist1" && 
+            *it != "album"        &&
             *it != "title")
         {
-            cerr << "metadata.o: I don't understand the expression \"" << *it 
-                 << "\" as a tree level in a music hierarchy " << endl ; 
+            VERBOSE(VB_IMPORTANT, "AllMusic::setSorting()" +
+                    QString("Unknown tree level '%1'").arg(*it));
         }
-            
     }
 }
 

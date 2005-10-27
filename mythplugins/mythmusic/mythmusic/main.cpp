@@ -6,6 +6,8 @@ using namespace std;
 #include <qapplication.h>
 #include <qsqldatabase.h>
 #include <qregexp.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include <cdaudio.h>
@@ -93,10 +95,36 @@ void RemoveFileFromDB (const QString &directory, const QString &filename)
     query.exec();
 }
 
+void UpdateFileInDB(const QString &directory, const QString &filename)
+{
+    Decoder *decoder = getDecoder(filename);
+
+    if (decoder)
+    {
+        Metadata *db_meta   = decoder->getMetadata();
+        Metadata *disk_meta = decoder->readMetadata();
+
+        if (db_meta && disk_meta)
+        {
+            disk_meta->setID(db_meta->ID());
+            disk_meta->updateDatabase(directory);
+        }
+
+        if (disk_meta)
+            delete disk_meta;
+
+        if (db_meta)
+            delete db_meta;
+
+        delete decoder;
+    }
+}
+
 enum MusicFileLocation
 {
     kFileSystem,
     kDatabase,
+    kNeedUpdate,
     kBoth
 };
 
@@ -140,6 +168,22 @@ void BuildFileList(QString &directory, MusicLoadedMap &music_files)
             music_files[filename] = kFileSystem;
         }
     }
+}
+
+bool HasFileChanged(const QString &filename, const QString &date_modified)
+{
+    struct stat sbuf;
+    if (stat(filename.ascii(), &sbuf) == 0)
+    {
+        if (date_modified.isEmpty() ||
+            sbuf.st_mtime >
+            (time_t)QDateTime::fromString(date_modified,
+                                          Qt::ISODate).toTime_t())
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void SavePending(int pending)
@@ -213,7 +257,7 @@ void SearchDir(QString &directory)
     delete busy;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT filename "
+    query.exec("SELECT filename, date_modified "
                "FROM musicmetadata "
                "WHERE filename NOT LIKE ('%://%')");
 
@@ -233,9 +277,16 @@ void SearchDir(QString &directory)
             if (name != QString::null)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
-                    music_files.remove(iter);
+                {
+                    if (HasFileChanged(name, query.value(1).toString()))
+                        music_files[name] = kNeedUpdate;
+                    else
+                        music_files.remove(iter);
+                }
                 else
+                {
                     music_files[name] = kDatabase;
+                }
             }
             file_checking->setProgress(++counter);
         }
@@ -247,6 +298,19 @@ void SearchDir(QString &directory)
     file_checking = new MythProgressDialog(
         QObject::tr("Updating music database"), music_files.size());
 
+     /*
+       This can be optimised quite a bit by consolidating all commands
+       via a lot of refactoring.
+       
+       1) group all files of the same decoder type, and don't
+       create/delete a Decoder pr. AddFileToDB. Or make Decoders be
+       singletons, it should be a fairly simple change.
+       
+       2) RemoveFileFromDB should group the remove into one big SQL.
+       
+       3) UpdateFileInDB, same as 1.
+     */
+
     counter = 0;
     for (iter = music_files.begin(); iter != music_files.end(); iter++)
     {
@@ -254,6 +318,8 @@ void SearchDir(QString &directory)
             AddFileToDB(directory, iter.key());
         else if (*iter == kDatabase)
             RemoveFileFromDB(directory, iter.key ());
+        else if (*iter == kNeedUpdate)
+            UpdateFileInDB(directory, iter.key());
 
         file_checking->setProgress(++counter);
     }
@@ -309,6 +375,20 @@ struct MusicData
     AllMusic *all_music;
 };
 
+void RebuildMusicTree(MusicData *mdata)
+{
+    MythBusyDialog busy(QObject::tr("Rebuilding music tree"));
+    busy.start();
+    mdata->all_music->startLoading();
+    while (!mdata->all_music->doneLoading())
+    {
+        qApp->processEvents();
+        usleep(50000);
+    }
+    mdata->all_playlists->postLoad();
+    busy.Close();
+}
+
 void MusicCallback(void *data, QString &selection)
 {
     MusicData *mdata = (MusicData *)data;
@@ -328,8 +408,7 @@ void MusicCallback(void *data, QString &selection)
             //  Reconcile with the database
             SearchDir(mdata->startdir);
             //  Tell the metadata to reset itself
-            mdata->all_music->resync();
-            mdata->all_playlists->postLoad();
+            RebuildMusicTree(mdata);
         }
     }
     else if (sel == "settings_scan")
@@ -337,8 +416,7 @@ void MusicCallback(void *data, QString &selection)
         if ("" != mdata->startdir)
         {
             SearchDir(mdata->startdir);
-            mdata->all_music->resync();
-            mdata->all_playlists->postLoad();
+            RebuildMusicTree(mdata);
         }
     }
     else if (sel == "music_set_general")
@@ -610,8 +688,7 @@ void runRipCD(void)
         // if startRipper returns true, then new files should be present
         // so we should look for them.
         SearchDir(mdata.startdir);
-        mdata.all_music->resync();
-        mdata.all_playlists->postLoad();
+        RebuildMusicTree(&mdata);
     }
     postMusic(&mdata);
 }

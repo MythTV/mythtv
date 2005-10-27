@@ -274,6 +274,7 @@ class AllMusic
     Metadata*   getMetadata(int an_id);
     bool        updateMetadata(int an_id, Metadata *the_track);
     void        save();
+    bool        startLoading(void);
     void        resync();   //  After a CD rip, for example
     void        clearCDData();
     void        addCDTrack(Metadata *the_track);
