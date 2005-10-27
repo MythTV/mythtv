@@ -4,33 +4,33 @@
 
     <font name="normal" face="Arial">
       <color>#ffffff</color>
-      <size>14</size>
-      <bold>yes</bold>
+      <size>13</size>
+      <bold>no</bold>
     </font>
 
     <font name="focused" face="Arial">
       <color>#ffffff</color>
-      <size>14</size>
-      <bold>yes</bold>
+      <size>13</size>
+      <bold>no</bold>
     </font>
 
     <font name="down" face="Arial">
       <color>#ffffff</color>
-      <size>14</size>
-      <bold>yes</bold>
+      <size>13</size>
+      <bold>no</bold>
     </font>
 
     <font name="downfocused" face="Arial">
       <color>#ffffff</color>
-      <size>14</size>
-      <bold>yes</bold>
+      <size>13</size>
+      <bold>no</bold>
     </font>
 
     <container name="keyboard_container">
-      <area>0,0,537,193</area>
+      <area>0,0,540,193</area>
 
       <keyboard name="keyboard" draworder="2">
-        <area>0,0,537,193</area>
+        <area>0,0,540,193</area>
         <context>-1</context>
 
         <image function="normal" filename="keyboard/key_normal.png"></image>
@@ -46,84 +46,84 @@
         <!-- top row -->
         <key name="key1" type="char" draworder="1">
           <position>5,5</position>
-          <char normal="0x0026" shift="1" alt="0x0026" altshift="1"></char>
+          <char normal="1" shift="!" alt="0x00b9" altshift="!"></char>
           <move left="" right="key2" up="" down="key15"></move>
         </key>
         <key name="key2" type="char" draworder="1">
           <position>42,5</position>
-          <char normal="0x00e9" shift="2" alt="~" altshift="2"></char>
+          <char normal="2" shift="\" alt="0x00b2" altshift="\"></char>
           <move left="key1" right="key3" up="" down="key16"></move>
         </key>
         <key name="key3" type="char" draworder="1">
           <position>79,5</position>
-          <char normal="0x0022" shift="3" alt="#" altshift="3"></char>
+          <char normal="3" shift="0x00a7" alt="0x00b3" altshift="0x00a7"></char>
           <move left="key2" right="key4" up="" down="key17"></move>
         </key>
         <key name="key4" type="char" draworder="1">
           <position>116,5</position>
-          <char normal="'" shift="4" alt="{" altshift="4"></char>
+          <char normal="4" shift="$" alt="0x00a3" altshift="$"></char>
           <move left="key3" right="key5" up="" down="key18"></move>
         </key>
         <key name="key5" type="char" draworder="1">
           <position>153,5</position>
-          <char normal="(" shift="5" alt="[" altshift="5"></char>
+          <char normal="5" shift="%" alt="0x00ac" altshift="%"></char>
           <move left="key4" right="key6" up="" down="key19"></move>
         </key>
         <key name="key6" type="char" draworder="1">
           <position>190,5</position>
-          <char normal="-" shift="6" alt="|" altshift="6"></char>
+          <char normal="6" shift="0x0026" alt="0x00a9" altshift="0x0026"></char>
           <move left="key5" right="key7" up="" down="key20"></move>
         </key>
         <key name="key7" type="char" draworder="1">
           <position>227,5</position>
-          <char normal="0x00e8" shift="7" alt="`" altshift="7"></char>
+          <char normal="7" shift="/" alt="{" altshift="/"></char>
           <move left="key6" right="key8" up="" down="key21"></move>
         </key>
         <key name="key8" type="char" draworder="1">
           <position>264,5</position>
-          <char normal="_" shift="8" alt="\" altshift="8"></char>
+          <char normal="8" shift="(" alt="[" altshift="("></char>
           <move left="key7" right="key9" up="" down="key22"></move>
         </key>
         <key name="key9" type="char" draworder="1">
           <position>301,5</position>
-          <char normal="0x00e7" shift="9" alt="^" altshift="9"></char>
+          <char normal="9" shift=")" alt="]" altshift=")"></char>
           <move left="key8" right="key10" up="" down="key23"></move>
         </key>
         <key name="key10" type="char" draworder="1">
           <position>338,5</position>
-          <char normal="0x00e0" shift="0" alt="@" altshift="0"></char>
+          <char normal="0" shift="=" alt="}" altshift="="></char>
           <move left="key9" right="key11" up="" down="key24"></move>
         </key>
         <key name="key11" type="char" draworder="1">
           <position>375,5</position>
-          <char normal=")" shift="0x00b0" alt="]" altshift="0x00b0"></char>
+          <char normal="?" shift="0x00df" alt="0x00fc" altshift="0x00df"></char>
           <move left="key10" right="key12" up="" down="key25"></move>
         </key>
         <key name="key12" type="char" draworder="1">
           <position>412,5</position>
-          <char normal="=" shift="+" alt="}" altshift="+"></char>
+          <char normal="`" shift="'" alt="`" altshift="'"></char>
           <move left="key11" right="key13" up="" down="key26"></move>
         </key>
         <key name="key13" type="char" draworder="1">
           <position>449,5</position>
-          <char normal="0x00b2" shift="0x00b3" alt="0x00b2" altshift="0x00b3"></char>
+          <char normal="^" shift="0x00b0" alt="^" altshift="0x00b0"></char>
           <move left="key12" right="key14" up="" down="key55"></move>
         </key>
         <key name="key14" type="char" draworder="1">
           <position>486,5</position>
-          <char normal="*" shift="0x00b5" alt="*" altshift="0x00b5"></char>
+          <char normal="#" shift="|" alt="#" altshift="|"></char>
           <move left="key13" right="" up="" down="key55"></move>
         </key>
 
         <!-- row 2 -->
         <key name="key15" type="char" draworder="1">
           <position>16,42</position>
-          <char normal="a" shift="A" alt="a" altshift="A"></char>
+          <char normal="q" shift="Q" alt="@" altshift="Q"></char>
           <move left="" right="key16" up="key1" down="key27"></move>
         </key>
         <key name="key16" type="char" draworder="1">
           <position>53,42</position>
-          <char normal="z" shift="Z" alt="z" altshift="Z"></char>
+          <char normal="w" shift="W" alt="w" altshift="W"></char>
           <move left="key15" right="key17" up="key2" down="key28"></move>
         </key>
         <key name="key17" type="char" draworder="1">
@@ -143,7 +143,7 @@
         </key>
         <key name="key20" type="char" draworder="1">
           <position>201,42</position>
-          <char normal="y" shift="Y" alt="y" altshift="Y"></char>
+          <char normal="z" shift="Z" alt="z" altshift="Z"></char>
           <move left="key19" right="key21" up="key6" down="key32"></move>
         </key>
         <key name="key21" type="char" draworder="1">
@@ -168,19 +168,19 @@
         </key>
         <key name="key25" type="char" draworder="1">
           <position>386,42</position>
-          <char normal="^" shift="0x00a8" alt="^" altshift="0x00a8"></char>
+          <char normal="0x00fc" shift="0x00dc" alt="0x00fc" altshift="0x00dc"></char>
           <move left="key24" right="key26" up="key11" down="key37"></move>
         </key>
         <key name="key26" type="char" draworder="1">
           <position>423,42</position>
-          <char normal="$" shift="0x00a3" alt="0x00a4" altshift="0x00a3"></char>
+          <char normal="+" shift="*" alt="~" altshift="*"></char>
           <move left="key25" right="key55" up="key12" down="key37"></move>
         </key>
 
         <!-- row 3 -->
         <key name="key27" type="char" draworder="1">
           <position>28,79</position>
-          <char normal="q" shift="Q" alt="q" altshift="Q"></char>
+          <char normal="a" shift="A" alt="a" altshift="A"></char>
           <move left="" right="key28" up="key15" down="key39"></move>
         </key>
         <key name="key28" type="char" draworder="1">
@@ -225,24 +225,24 @@
         </key>
         <key name="key36" type="char" draworder="1">
           <position>361,79</position>
-          <char normal="m" shift="M" alt="m" altshift="M"></char>
+          <char normal="0x00f6" shift="0x00d6" alt="0x00f6" altshift="0x00d6"></char>
           <move left="key35" right="key37" up="key24" down="key48"></move>
         </key>
         <key name="key37" type="char" draworder="1">
           <position>398,79</position>
-          <char normal="0x00f9" shift="%" alt="0x00f9" altshift="%"></char>
+          <char normal="0x00e4" shift="0x00c4" alt="0x00e4" altshift="0x00c4"></char>
           <move left="key36" right="key58" up="key25" down="key56"></move>
         </key>
 
         <!-- row 4 -->
         <key name="key38" type="char" draworder="1">
           <position>5,116</position>
-          <char normal="0x003c" shift=">" alt="0x003c" altshift=">"></char>
+          <char normal="0x003c" shift=">" alt="|" altshift=">"></char>
           <move left="" right="key39" up="key27" down="key50"></move>
         </key>
         <key name="key39" type="char" draworder="1">
           <position>42,116</position>
-          <char normal="w" shift="W" alt="w" altshift="W"></char>
+          <char normal="y" shift="Y" alt="y" altshift="Y"></char>
           <move left="key38" right="key40" up="key27" down="key50"></move>
         </key>
         <key name="key40" type="char" draworder="1">
@@ -272,22 +272,22 @@
         </key>
         <key name="key45" type="char" draworder="1">
           <position>264,116</position>
-          <char normal="," shift="?" alt="," altshift="?"></char>
+          <char normal="m" shift="M" alt="m" altshift="M"></char>
           <move left="key44" right="key46" up="key33" down="key49"></move>
         </key>
         <key name="key46" type="char" draworder="1">
           <position>301,116</position>
-          <char normal=";" shift="." alt=";" altshift="."></char>
+          <char normal="," shift=";" alt="," altshift=";"></char>
           <move left="key45" right="key47" up="key34" down="key52"></move>
         </key>
         <key name="key47" type="char" draworder="1">
           <position>338,116</position>
-          <char normal=":" shift="/" alt=":" altshift="/"></char>
+          <char normal="." shift=":" alt="." altshift=":"></char>
           <move left="key46" right="key48" up="key35" down="key52"></move>
         </key>
         <key name="key48" type="char" draworder="1">
           <position>375,116</position>
-          <char normal="!" shift="0x00a7" alt="!" altshift="0x00a7"></char>
+          <char normal="-" shift="_" alt="_" altshift="_"></char>
           <move left="key47" right="key56" up="key36" down="key52"></move>
         </key>
 
