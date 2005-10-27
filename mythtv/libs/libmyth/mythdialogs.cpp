@@ -1602,6 +1602,7 @@ MythBusyDialog::~MythBusyDialog()
 {
     if (timer)
     {
+        timer->disconnect();
         timer->deleteLater();
         timer = NULL;
     }
