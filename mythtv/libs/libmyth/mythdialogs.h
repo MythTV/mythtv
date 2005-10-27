@@ -275,7 +275,7 @@ class MythProgressDialog: public MythDialog
     QProgressBar *progress;
 
   private:
-    void setTotalSteps (int totalSteps);	
+    void setTotalSteps(int totalSteps);
     int steps;
     int m_totalSteps;
     QPtrList<class LCDTextItem> * textItems;
@@ -287,7 +287,8 @@ class MythProgressDialog: public MythDialog
 
     Ie. used by MythMusic when scanning the filesystem for musicfiles.
  */
-class MythBusyDialog : public MythProgressDialog {
+class MythBusyDialog : public MythProgressDialog
+{
     Q_OBJECT
   public:
     /** \brief Create the busy indicator.  
@@ -297,9 +298,9 @@ class MythBusyDialog : public MythProgressDialog {
 
         \param title the title to appear in the progress bar dialog
     */
-    MythBusyDialog (const QString &title);
+    MythBusyDialog(const QString &title);
 
-    ~MythBusyDialog ();
+    ~MythBusyDialog();
 
     /** \brief Setup a timer to 'move' the spinner
 
@@ -308,17 +309,17 @@ class MythBusyDialog : public MythProgressDialog {
 
         \param interval msecs between movement, default is 100
     */
-    void start (int interval = 100);
+    void start(int interval = 100);
 
     /** \brief Close the dialog.
 
         This will close the dialog and stop the timer.		
     */
-    void Close ();
+    void Close();
 
   protected slots:
     void setProgress();
-    void timeout ();
+    void timeout();
 
   private:
     QTimer *timer;
