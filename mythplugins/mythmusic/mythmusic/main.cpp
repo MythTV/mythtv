@@ -102,6 +102,9 @@ void BuildFileList(QString &directory, MusicLoadedMap &music_files)
     QFileInfoListIterator it(*list);
     QFileInfo *fi;
 
+    /* Recursively traverse directory, calling QApplication::processEvents()
+       every now and then to ensure the UI updates */
+    int update_interval = 0;
     while ((fi = it.current()) != 0)
     {
         ++it;
@@ -109,9 +112,19 @@ void BuildFileList(QString &directory, MusicLoadedMap &music_files)
             continue;
         QString filename = fi->absFilePath();
         if (fi->isDir())
+        {
             BuildFileList(filename, music_files);
+            qApp->processEvents ();
+        }
         else
+        {
+            if (++update_interval > 100)
+            {
+                qApp->processEvents();
+                update_interval = 0;
+            }
             music_files[filename] = kFileSystem;
+        }
     }
 }
 
@@ -177,23 +190,33 @@ void SearchDir(QString &directory)
     MusicLoadedMap music_files;
     MusicLoadedMap::Iterator iter;
 
+    MythBusyDialog *busy = new MythBusyDialog(
+        QObject::tr("Searching for music files"));
+
+    busy->start();
     BuildFileList(directory, music_files);
+    busy->Close();
+    busy->deleteLater();
+    busy = NULL;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT filename FROM musicmetadata "
-                    "WHERE filename NOT LIKE ('%://%');");
+    query.exec("SELECT filename "
+               "FROM musicmetadata "
+               "WHERE filename NOT LIKE ('%://%')");
 
     int counter = 0;
 
     MythProgressDialog *file_checking;
-    file_checking = new MythProgressDialog(QObject::tr("Searching for music files"),
-                                           query.numRowsAffected());
+    file_checking = new MythProgressDialog(
+        QObject::tr("Scanning music files"), query.numRowsAffected());
 
     if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
-            QString name = directory + QString::fromUtf8(query.value(0).toString());
+            QString name = directory +
+                QString::fromUtf8(query.value(0).toString());
+
             if (name != QString::null)
             {
                 if ((iter = music_files.find(name)) != music_files.end())
@@ -208,8 +231,8 @@ void SearchDir(QString &directory)
     file_checking->Close();
     delete file_checking;
 
-    file_checking = new MythProgressDialog(QObject::tr("Updating music database"), 
-                                           music_files.size());
+    file_checking = new MythProgressDialog(
+        QObject::tr("Updating music database"), music_files.size());
 
     QRegExp quote_regex("\"");
     for (iter = music_files.begin(); iter != music_files.end(); iter++)

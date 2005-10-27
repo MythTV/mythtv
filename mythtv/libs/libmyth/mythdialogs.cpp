@@ -1520,10 +1520,7 @@ MythProgressDialog::MythProgressDialog(const QString &message, int totalSteps)
     progress->setBackgroundOrigin(ParentOrigin);
     progress->setProgress(0);
 
-    m_totalSteps = totalSteps;
-    steps = totalSteps / 1000;
-    if (steps == 0)
-        steps = 1;
+    setTotalSteps(totalSteps);
 
     if (class LCD * lcddev = LCD::Get())
     {
@@ -1586,6 +1583,64 @@ void MythProgressDialog::keyPressEvent(QKeyEvent *e)
 
     if (!handled)
         MythDialog::keyPressEvent(e);
+}
+
+void MythProgressDialog::setTotalSteps(int totalSteps)
+{
+    m_totalSteps = totalSteps;
+    steps = totalSteps / 1000;
+    if (steps == 0)
+        steps = 1;
+}
+
+MythBusyDialog::MythBusyDialog(const QString &title)
+    : MythProgressDialog(title, 0), timer(NULL)
+{
+}
+
+MythBusyDialog::~MythBusyDialog()
+{
+    if (timer)
+    {
+        timer->deleteLater();
+        timer = NULL;
+    }
+}
+
+void MythBusyDialog::start(int interval)
+{
+    if (!timer)
+        timer = new QTimer (this);
+
+    connect(timer, SIGNAL(timeout()),
+            this,  SLOT  (timeout()));
+
+    timer->start(interval);
+}
+
+void MythBusyDialog::Close(void)
+{
+    if (timer)
+    {
+        timer->disconnect();
+        timer->deleteLater();
+        timer = NULL;
+    }
+
+    MythProgressDialog::Close();
+}
+
+void MythBusyDialog::setProgress(void)
+{
+    progress->setProgress(progress->progress () + 10);
+    qApp->processEvents();
+    if (LCD *lcddev = LCD::Get())
+        lcddev->setGenericBusy();
+}
+
+void MythBusyDialog::timeout(void)
+{
+    setProgress();
 }
 
 MythThemedDialog::MythThemedDialog(MythMainWindow *parent, QString window_name,

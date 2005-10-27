@@ -3389,14 +3389,23 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
     if (!ok)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR +
-                QString("Failed to set channel to %1. Reverting to kState_None")
-                .arg(channum));
-        if (kState_None != internalState)
-            ChangeState(kState_None);
+        if (!(request.flags & kFlagLiveTV))
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Failed to set channel to %1. "
+                            "Reverting to kState_None")
+                    .arg(channum));
+            if (kState_None != internalState)
+                ChangeState(kState_None);
+            else
+                tuningRequests.enqueue(TuningRequest(kFlagKillRec));
+            return;
+        }
         else
-            tuningRequests.enqueue(TuningRequest(kFlagKillRec));
-        return;
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Failed to set channel to %1.").arg(channum));
+        }
     }
 
     // Start dummy recorder for devices capable of signal monitoring.

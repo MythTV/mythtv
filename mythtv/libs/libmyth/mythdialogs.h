@@ -11,6 +11,7 @@
 #include <qevent.h>
 #include <qvaluevector.h>
 #include <qscrollview.h>
+#include <qthread.h>
 
 #include <vector>
 using namespace std;
@@ -230,22 +231,97 @@ class MythPopupBox : public MythDialog
     bool arrowAccel;
 };
 
+/** The MythTV progress bar dialog.
+
+    This dialog is responsible for displaying a progress bar box on
+    the screen. This is used when you have a known set of steps to
+    perform and the possibility of calling the \p setProgress call at
+    the end of each step.
+
+	If you do not know the number of steps, use \p MythBusyDialog
+	instead.
+
+    The dialog widget also updates the LCD display if present.
+
+*/
 class MythProgressDialog: public MythDialog
 {
   public:
+    /** Create a progress bar dialog.
+        
+        \param message the title string to appear in the progress dialog.
+        \param totalSteps the total number of steps
+     */
     MythProgressDialog(const QString& message, int totalSteps);
 
+    /* \brief Close the dialog.
+
+        This will close the dialog and return the LCD to the Time screen 
+    */
     void Close(void);
+    /* \brief Update the progress bar.  
+
+       This will move the progress bar the percentage-completed as
+       determined by \p curprogress and the totalsteps as set by the
+       call to the constructor.
+
+       The LCD is updated as well.
+    */
     void setProgress(int curprogress);
+
     void keyPressEvent(QKeyEvent *);
 
-  private:
+  protected:
     QProgressBar *progress;
+
+  private:
+    void setTotalSteps (int totalSteps);	
     int steps;
-
-    QPtrList<class LCDTextItem> * textItems;
-
     int m_totalSteps;
+    QPtrList<class LCDTextItem> * textItems;
+};
+
+/** MythDialog box that displays a busy spinner-style dialog box to
+    indicate the program is busy, but that the number of steps needed
+    is unknown. 
+
+    Ie. used by MythMusic when scanning the filesystem for musicfiles.
+ */
+class MythBusyDialog : public MythProgressDialog {
+    Q_OBJECT
+  public:
+    /** \brief Create the busy indicator.  
+
+        Creates the dialog widget and sets up the timer that causes
+        the widget to indicate progress every 100msec;
+
+        \param title the title to appear in the progress bar dialog
+    */
+    MythBusyDialog (const QString &title);
+
+    ~MythBusyDialog ();
+
+    /** \brief Setup a timer to 'move' the spinner
+
+        This will create a \p QTimer object that will update the
+        spinner ever \p interval msecs.
+
+        \param interval msecs between movement, default is 100
+    */
+    void start (int interval = 100);
+
+    /** \brief Close the dialog.
+
+        This will close the dialog and stop the timer.		
+    */
+    void Close ();
+
+  protected slots:
+    void setProgress();
+    void timeout ();
+
+  private:
+    QTimer *timer;
 };
 
 class MythThemedDialog : public MythDialog
