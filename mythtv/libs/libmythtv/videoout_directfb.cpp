@@ -192,7 +192,11 @@ struct DirectfbData
     //DirectFB hook
     IDirectFB *dfb;
     //video output
+#if (DIRECTFB_MINOR_VERSION <= 9) && (DIRECTFB_MICRO_VERSION <= 22)
     DFBCardCapabilities cardCapabilities;
+#else
+    DFBGraphicsDeviceDescription cardDescription;
+#endif
     IDirectFBDisplayLayer *primaryLayer;
     IDirectFBSurface *primarySurface;
     IDirectFBDisplayLayer *videoLayer;
@@ -337,7 +341,11 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
 
 
     //determine output card capacities
+#if (DIRECTFB_MINOR_VERSION <= 9) && (DIRECTFB_MICRO_VERSION <= 22)
     DFBCHECKFAIL(data->dfb->GetCardCapabilities(data->dfb, &(data->cardCapabilities)), false);
+#else
+    DFBCHECKFAIL(data->dfb->GetDeviceDescription(data->dfb, &(data->cardDescription)), false);
+#endif
     VERBOSE(VB_GENERAL, QString("DirectFB output : card : %1")
             .arg((data->cardCapabilities.acceleration_mask & DFXL_BLIT) > 0 ?
                  "hardware blit support" : "NO hardware blit support"));
