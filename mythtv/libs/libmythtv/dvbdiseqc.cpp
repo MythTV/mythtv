@@ -71,9 +71,12 @@ bool DVBDiSEqC::Set(DVBTuning& tuning, bool reset, bool& havetuned)
             break;
         case 2: // v1.0 2 Way
         case 3: // v1.1 2 Way
+            if (!Diseqc1xSwitch(tuning, reset, havetuned, 2))
+                return false;
+            break;
         case 4: // v1.0 4 Way
         case 5: // v1.1 4 Way
-            if (!Diseqc1xSwitch(tuning, reset, havetuned))
+            if (!Diseqc1xSwitch(tuning, reset, havetuned, 4))
                 return false;
             break;
         case 6: // 1.2 Positioner (HH Motor)
@@ -85,7 +88,7 @@ bool DVBDiSEqC::Set(DVBTuning& tuning, bool reset, bool& havetuned)
 		return false;
             break;
         case 8: // v1.1 10 Way
-            if (!Diseqc1xSwitch_10way(tuning, reset, havetuned))
+            if (!Diseqc1xSwitch(tuning, reset, havetuned, 10))
                 return false;
             break;
  
@@ -322,8 +325,8 @@ bool DVBDiSEqC::SendDiSEqCMessage(dvb_diseqc_master_cmd &cmd)
     return true;
 }
 
-bool DVBDiSEqC::Diseqc1xSwitch_10way(DVBTuning& tuning, bool reset, 
-                               bool& havetuned)
+bool DVBDiSEqC::Diseqc1xSwitch(DVBTuning& tuning, bool reset, 
+                               bool& havetuned, uint ports)
 {
     if (reset) 
     {
@@ -334,71 +337,43 @@ bool DVBDiSEqC::Diseqc1xSwitch_10way(DVBTuning& tuning, bool reset,
       	}
     }
 
-    GENERAL(QString("DiSEqC 1.1 Switch - Port %1").arg(tuning.diseqc_port));
+    CHANNEL(QString("DiSEqC 1.1 Switch (%1 ports) - Port %2 - %3 %4")
+            .arg(ports)
+            .arg(tuning.diseqc_port)
+            .arg(tuning.tone==SEC_TONE_ON?"Tone ON":"Tone OFF")
+            .arg(tuning.voltage==SEC_VOLTAGE_13?"13V":"18V"));
 
     if ((prev_tuning.diseqc_port != tuning.diseqc_port ||
         prev_tuning.tone != tuning.tone ||
         prev_tuning.voltage != tuning.voltage) || reset)
     {
-        if (tuning.diseqc_port > 9)
-        {
-            ERRNO("Supports only up to 10-way switches.");
-            return false;
-        }
-
-        dvb_diseqc_master_cmd cmd = 
+        dvb_diseqc_master_cmd cmd =
             {{CMD_FIRST, MASTER_TO_LSS, WRITE_N1, 0xf0, 0x00, 0x00}, 4};
 
-        cmd.msg[DATA_1] = 0xF0 
-		| (tuning.diseqc_port & 0x0F); 
-
-        if (!SendDiSEqCMessage(tuning,cmd)) 
+        if (tuning.diseqc_port >= ports )
         {
-            ERRNO("Setting DiSEqC failed.\n");
+            ERRNO(QString("Supports only up to %d-way switches.").arg(ports));
             return false;
         }
 
-        prev_tuning.diseqc_port = tuning.diseqc_port;
-        prev_tuning.tone = tuning.tone;
-        prev_tuning.voltage = tuning.voltage;
-        havetuned = true;
-
-    }
-
-    return true;
-}
-
-bool DVBDiSEqC::Diseqc1xSwitch(DVBTuning& tuning, bool reset, 
-                               bool& havetuned)
-{
-    if (reset) 
-    {
-      	if (!DiseqcReset()) 
+        switch (ports)
         {
-      	    ERRNO("DiseqcReset() failed");
-      	    return false;
-      	}
-    }
-
-    GENERAL(QString("DiSEqC 1.0 Switch - Port %1").arg(tuning.diseqc_port));
-
-    if ((prev_tuning.diseqc_port != tuning.diseqc_port ||
-        prev_tuning.tone != tuning.tone ||
-        prev_tuning.voltage != tuning.voltage) || reset)
-    {
-        if (tuning.diseqc_port > 3)
-        {
-            ERRNO("Supports only up to 4-way switches.");
-            return false;
+            case 10:
+                cmd.msg[COMMAND] = WRITE_N1;
+                cmd.msg[DATA_1] = 0xF0 | (tuning.diseqc_port & 0x0F);
+                break;
+            case 4:
+            case 2: 
+                cmd.msg[COMMAND] = WRITE_N0;
+                cmd.msg[DATA_1] =
+                    0xF0 |
+                    (((tuning.diseqc_port) * 4) & 0x0F)          |
+                    ((tuning.voltage == SEC_VOLTAGE_18) ? 2 : 0) |
+                    ((tuning.tone == SEC_TONE_ON) ? 1 : 0);
+                break;
+            default:
+                ERRNO("Unsupported number of ports for DiSEqC 1.1 Switch");
         }
-
-        dvb_diseqc_master_cmd cmd = 
-            {{CMD_FIRST, MASTER_TO_LSS, WRITE_N0, 0xf0, 0x00, 0x00}, 4};
-
-        cmd.msg[DATA_1] = 0xF0 
-                          | (((tuning.diseqc_port) * 4) & 0x0F) 
-                          | ((tuning.voltage == SEC_VOLTAGE_18) ? 2 : 0) 
-                          | ((tuning.tone == SEC_TONE_ON) ? 1 : 0);
 
         if (!SendDiSEqCMessage(tuning,cmd)) 
         {
