@@ -2804,6 +2804,7 @@ void TV::SwitchCards(void)
 
 void TV::ToggleInputs(void)
 {
+    // If main Nuppel Video Player is paused, unpause it
     if (activenvp == nvp && paused)
     {
         if (GetOSD())
@@ -2812,11 +2813,14 @@ void TV::ToggleInputs(void)
         paused = false;
     }
 
+    // Pause the backend recorder, send command, and then unpause..
     PauseLiveTV();
-
     activerecorder->ToggleInputs();
-
     UnpauseLiveTV();
+
+    // If activenvp is main nvp, show new input in on screen display
+    if (nvp && activenvp == nvp)
+        UpdateOSDInput();
 }
 
 void TV::ToggleChannelFavorite(void)
