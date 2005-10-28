@@ -403,7 +403,9 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
 {
     QString timeFormat = gContext->GetSetting("TimeFormat", "h:mm AP");
     QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
+    QString fullDateFormat = dateFormat;
+    if (fullDateFormat.find(QRegExp("yyyy")) < 0)
+        fullDateFormat += " yyyy";
     QString shortDateFormat = gContext->GetSetting("ShortDateFormat", "M/d");
     QString channelFormat = 
         gContext->GetSetting("ChannelFormat", "<num> <sign>");
@@ -551,7 +553,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
         progMap["REPEAT"] = QString("(%1) ").arg(QObject::tr("Repeat"));
         progMap["LONGREPEAT"] = QString("(%1 %2) ")
                                 .arg(QObject::tr("Repeat"))
-                                .arg(originalAirDate.toString(oldDateFormat));
+                                .arg(originalAirDate.toString(fullDateFormat));
     }
     else
     {
@@ -2814,8 +2816,9 @@ void ProgramInfo::EditScheduled(void)
 void ProgramInfo::showDetails(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
-
+    QString fullDateFormat = gContext->GetSetting("DateFormat", "M/d/yyyy");
+    if (fullDateFormat.find(QRegExp("yyyy")) < 0)
+        fullDateFormat += " yyyy";
     QString category_type, epinum, rating;
     int partnumber = 0, parttotal = 0;
     int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0;
@@ -2967,7 +2970,7 @@ void ProgramInfo::showDetails(void) const
     if (hasAirDate && category_type != "movie")
     {
         msg += QObject::tr("Original Airdate") + ":  ";
-        msg += originalAirDate.toString(oldDateFormat) + "\n";
+        msg += originalAirDate.toString(fullDateFormat) + "\n";
     }
     if (programid  != "")
         msg += QObject::tr("Program ID") + ":  " + programid + "\n";
@@ -3082,7 +3085,7 @@ void ProgramInfo::showDetails(void) const
     }
     msg += "\nMythTV " + QObject::tr("Status: ") + p->RecStatusText();
     if (statusDate.isValid())
-        msg += " " + statusDate.toString(oldDateFormat);
+        msg += " " + statusDate.toString(fullDateFormat);
     msg += "\n";
     delete p;
 
@@ -3091,7 +3094,7 @@ void ProgramInfo::showDetails(void) const
         QDate fdate = QDate::QDate (1970, 1, 1);
         fdate = fdate.addDays(findid - 719528);
         msg += QString("%1: %2 (%3)\n").arg(QObject::tr("Find ID"))
-                       .arg(findid).arg(fdate.toString(oldDateFormat));
+                       .arg(findid).arg(fdate.toString(fullDateFormat));
     }
     if (filesize > 0)
     {

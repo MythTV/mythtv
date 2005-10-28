@@ -3723,7 +3723,9 @@ void MainServer::ShutSlaveBackendsDown(QString &haltcmd)
 
 void MainServer::FillStatusXML( QDomDocument *pDoc )
 {
-    QString   oldDateFormat   = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
+    QString   dateFormat   = gContext->GetSetting("DateFormat", "M/d/yyyy");
+    if (dateFormat.find(QRegExp("yyyy")) < 0)
+        dateFormat += " yyyy";
     QString   shortdateformat = gContext->GetSetting("ShortDateFormat", "M/d");
     QString   timeformat      = gContext->GetSetting("TimeFormat", "h:mm AP");
     QDateTime qdtNow          = QDateTime::currentDateTime();
@@ -3733,7 +3735,7 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
     QDomElement root = pDoc->createElement("Status");
     pDoc->appendChild(root);
 
-    root.setAttribute("date"    , qdtNow.toString(oldDateFormat));
+    root.setAttribute("date"    , qdtNow.toString(dateFormat));
     root.setAttribute("time"    , qdtNow.toString(timeformat)   );
     root.setAttribute("version" , MYTH_BINARY_VERSION           );
     root.setAttribute("protoVer", MYTH_PROTO_VERSION            );

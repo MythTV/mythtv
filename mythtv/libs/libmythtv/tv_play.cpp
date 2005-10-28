@@ -3550,8 +3550,9 @@ void TV::GetChannelInfo(RemoteEncoder *enc, InfoMap &infoMap)
                         seriesid, programid, outputFilters,
                         repeat, airdate, stars);
     
-    QString dateFormat = gContext->GetSetting("DateFormat", "ddd MMMM d");
-    QString oldDateFormat = gContext->GetSetting("OldDateFormat", "M/d/yyyy");
+    QString dateFormat = gContext->GetSetting("DateFormat", "M/d/yyyy");
+    if (dateFormat.find(QRegExp("yyyy")) < 0)
+        dateFormat += " yyyy";
     QString tmFmt = gContext->GetSetting("TimeFormat");
     QString dtFmt = gContext->GetSetting("ShortDateFormat");
 
@@ -3618,7 +3619,7 @@ void TV::GetChannelInfo(RemoteEncoder *enc, InfoMap &infoMap)
         infoMap["REPEAT"] = QString("(%1) ").arg(QObject::tr("Repeat"));
         infoMap["LONGREPEAT"] = QString("(%1 %2) ")
                                 .arg(QObject::tr("Repeat"))
-                                .arg(originalAirDate.toString(oldDateFormat));
+                                .arg(originalAirDate.toString(dateFormat));
     }
     else
     {
