@@ -75,7 +75,7 @@ SIParser::SIParser(const char *name) :
     // (Lowest number wins)
     QStringList langPref = iso639_get_language_list();
     QStringList::Iterator plit;
-    int prio = 1;
+    uint prio = 1;
     for (plit = langPref.begin(); plit != langPref.end(); ++plit)
     {
         SIPARSER(QString("Added preferred language %1 with priority %2")
@@ -1252,6 +1252,41 @@ void SIParser::ParseSDT(tablehead_t *head, uint8_t *buffer, int size)
     Table[EVENTS]->AddPid(0x12,0x00,0x00,true);
 }
 
+/** \fn GetLanguagePriority(const QString&)
+ *  \brief Returns the desirability of a particular language to the user.
+ *
+ *   The lower the returned number the more preferred the language is.
+ *
+ *   If the language does not exist in our list of languages it is
+ *   inserted as a less desirable language than any of the 
+ *   previously inserted languages.
+ *
+ *  \param language Three character ISO-639 language code.
+ */
+uint SIParser::GetLanguagePriority(const QString &language)
+{
+    QMap<QString,uint>::const_iterator it;
+    it = LanguagePriority.find(language);
+
+    // if this is an unknown language, insert into priority list
+    if (it == LanguagePriority.end())
+    {
+        // find maximum existing priority
+        uint max_priority = 0;
+        it = LanguagePriority.begin();
+        for (;it != LanguagePriority.end(); ++it)
+            max_priority = max(*it, max_priority);
+        // insert new language, and point iterator to it
+        SIPARSER(QString("Added preferred language %1 with priority %2")
+                 .arg(language).arg(max_priority + 1));
+        LanguagePriority[language] = max_priority + 1;
+        it = LanguagePriority.find(language);
+    }
+
+    // return the priority
+    return *it;
+}
+
 void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer ,int size)
 {
 
@@ -1384,7 +1419,7 @@ if (e.ServiceID == EIT_DEBUG_SID) {
                     {
                         QString lang = QString::fromLatin1(
                                 (const char*) &buffer[des_pos + 2], 3);
-                        int prio = LanguagePriority[lang];
+                        int prio = GetLanguagePriority(lang);
 
 #ifdef EIT_DEBUG_SID
                         if (e.ServiceID == EIT_DEBUG_SID)
@@ -1410,7 +1445,7 @@ if (e.ServiceID == EIT_DEBUG_SID) {
                     {
                         QString lang = QString::fromLatin1(
                             (const char*) &buffer[des_pos + 3], 3);
-                        int prio = LanguagePriority[lang];
+                        int prio = GetLanguagePriority(lang);
 
                         int desc_number = (buffer[des_pos + 2]>>4) & 0xf;
                         int last_desc_number = buffer[des_pos + 2] & 0xf;

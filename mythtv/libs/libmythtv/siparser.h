@@ -117,6 +117,8 @@ class SIParser : public QObject
     void UpdatePMT(const PMTObject *pmt);
 
   private:
+    uint GetLanguagePriority(const QString &language);
+
     // Fixes for various DVB Network Spec Deviations
     void LoadDVBSpecDeviations(uint16_t NetworkID);
 
@@ -224,7 +226,7 @@ class SIParser : public QObject
     uint                RequestedTransportID;
     
     // Preferred languages and their priority
-    QMap<QString, int>  LanguagePriority;
+    QMap<QString,uint>  LanguagePriority;
 
     // DVB Variables
     uint                NITPID;
