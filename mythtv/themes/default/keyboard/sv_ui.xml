@@ -55,13 +55,7 @@
             move  - key to move to in the up/down/left/right directions
         -->
 
-        <!-- top row -->
-<!--        <key name="key1" type="char" draworder="1">
-          <position>5,5</position>
-          <char normal="§" shift="½" alt="¶" altshift=""></char>
-          <move left="" right="key2" up="" down="key26"></move>
-        </key>
--->
+        <!-- row 1 -->
         <key name="key_1" type="char" draworder="1">
           <position>42,5</position>
           <char normal="1" shift="!" alt="¡" altshift=""></char>
@@ -125,7 +119,6 @@
           <image function="down" filename="keyboard/key_down_back.png"></image>
           <image function="downfocused" filename="keyboard/key_downfocused_back.png"></image>
         </key>
-
 
         <!-- row 2 -->
         <key name="key_q" type="char" draworder="1">
