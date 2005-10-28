@@ -383,7 +383,7 @@ void LCD::setGenericProgress(float value)
         return;
 
     value = min(max(0.0f, value), 1.0f);
-    QString msg = QString("SET_GENERIC_PROGRESS 0 %2").arg(value);
+    QString msg = QString("SET_GENERIC_PROGRESS 0 %1").arg(value);
 }
 
 void LCD::setGenericBusy()
