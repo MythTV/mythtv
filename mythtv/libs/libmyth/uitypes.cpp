@@ -4415,36 +4415,42 @@ void UIKeyType::Draw(QPainter *dr, int drawlayer, int context)
             }
 
             dr->setFont(tempFont->face);
-            dr->setBrush(tempFont->color);
-            dr->setPen(QPen(tempFont->color, (int)(2 * m_wmult))); 
 
             // draw the button text
+            QString text;
+
             if (!m_bShift)
             {
                 if (!m_bAlt)
-                    dr->drawText(m_pos.x(), m_pos.y(), 
-                                 m_area.width(), m_area.height(),
-                                 Qt::AlignCenter,
-                                 m_normalChar);
+                    text = m_normalChar;
                 else
-                    dr->drawText(m_pos.x(), m_pos.y(), 
-                                 m_area.width(), m_area.height(),
-                                 Qt::AlignCenter,
-                                 m_altChar);
+                    text = m_altChar;
             }
             else
             {
                 if (!m_bAlt)
-                    dr->drawText(m_pos.x(), m_pos.y(), 
-                                 m_area.width(), m_area.height(),
-                                 Qt::AlignCenter,
-                                 m_shiftChar);
+                    text = m_shiftChar;
                 else
-                    dr->drawText(m_pos.x(), m_pos.y(), 
-                                 m_area.width(), m_area.height(),
-                                 Qt::AlignCenter,
-                                 m_shiftAltChar);
+                    text = m_shiftAltChar;
             }
+
+            if (drawFontShadow &&
+                (tempFont->shadowOffset.x() != 0 || tempFont->shadowOffset.y() != 0))
+            {
+                dr->setBrush(tempFont->dropColor);
+                dr->setPen(QPen(tempFont->dropColor, (int)(2 * m_wmult)));
+                dr->drawText(m_pos.x() + tempFont->shadowOffset.x(),
+                             m_pos.y() + tempFont->shadowOffset.y(),
+                             m_area.width(), m_area.height(),
+                             Qt::AlignCenter, text);
+            }
+
+            dr->setBrush(tempFont->color);
+            dr->setPen(QPen(tempFont->color, (int)(2 * m_wmult))); 
+            dr->drawText(m_pos.x(), m_pos.y(), 
+                         m_area.width(), m_area.height(),
+                         Qt::AlignCenter,
+                         text);
         }
     }
 }
