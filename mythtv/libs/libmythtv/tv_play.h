@@ -50,31 +50,69 @@ class TV : public QObject
     TV(void);
    ~TV();
 
-    static void InitKeys(void);
-
     bool Init(bool createWindow = true);
 
-    int LiveTV(bool showDialogs = true);
-    void ShowNoRecorderDialog(void);
-    void StopLiveTV(void) { exitPlayer = true; }
-    void FinishRecording(void);
-    bool WantsToQuit(void) { return wantsToQuit; }
-    int GetLastRecorderNum(void) { return lastRecorderNum; }
-    int PlayFromRecorder(int recordernum);
+    // User input processing commands
+    void ProcessKeypress(QKeyEvent *e);
+    void customEvent(QCustomEvent *e);
 
+    // LiveTV commands
+    int  LiveTV(bool showDialogs = true);
+    /// This command is used to exit the player in order to record using
+    /// the recording being used by LiveTV.
+    void StopLiveTV(void) { exitPlayer = true; }
+    void AddPreviousChannel(void);
+    void PreviousChannel(void);
+
+    // Embedding commands for the guidegrid to use in LiveTV
+    void EmbedOutput(WId wid, int x, int y, int w, int h);
+    void StopEmbeddingOutput(void);
+    void EPGChannelUpdate(QString chanid, QString chanstr);
+   
+    // Recording commands
+    int  PlayFromRecorder(int recordernum);
+    int  Playback(ProgramInfo *rcinfo);
+    void setLastProgram(ProgramInfo *rcinfo);
+
+    // Various commands
+    void ShowNoRecorderDialog(void);
+    void FinishRecording(void);
     void AskAllowRecording(const QStringList &messages, int timeuntil);
 
-    // next two functions only work on recorded programs.
-    int Playback(ProgramInfo *rcinfo);
+    // Boolean queries
 
-    bool IsRunning(void) { return runMainLoop; }
-    void Stop(void) { runMainLoop = false; }
+    /// Returns true if we are playing back a non-LiveTV recording.
+    bool IsPlaying(void)         const { return StateIsPlaying(GetState()); }
+    /// Returns true if we are watching a recording not currently in progress.
+    bool IsRecording(void)       const { return StateIsRecording(GetState()); }
+    /// Returns true if the EPG is currently on screen.
+    bool IsMenuRunning(void)     const { return menurunning; }
+    /// Returns true if we are currently in the process of switching recorders.
+    bool IsSwitchingCards(void)  const { return switchingCards; }
+    /// Returns true if the TV event thread is running. Should always be true
+    /// between the end of the constructor and the beginning of the destructor.
+    bool IsRunning(void)         const { return runMainLoop; }
+    /// Returns true if the user told MythTV to stop plaback. If this
+    /// is false when we exit the player, we display an error screen.
+    bool WantsToQuit(void)       const { return wantsToQuit; }
+    /// Returns true if the user told MythTV to delete the recording
+    /// we were most recently playing.
+    bool getRequestDelete(void)  const { return requestDelete; }
+    /// This is set to true if the player reaches the end of the
+    /// recording without the user explicitly exiting the player.
+    bool getEndOfRecording(void) const { return endOfRecording; }
+    /// This is set if the user asked MythTV to jump to the previous
+    /// recording in the playlist.
+    bool getJumpToProgram(void)  const { return jumpToProgram; }
+    /// This is set if the player encountered some irrecoverable error.
+    bool IsErrored(void)         const { return errored; }
 
-    TVState GetState(void);
-    bool IsPlaying(void) { return StateIsPlaying(GetState()); }
-    bool IsRecording(void) { return StateIsRecording(GetState()); }
-    bool IsMenuRunning(void) { return menurunning; }
-    bool IsSwitchingCards(void) { return switchingCards; }
+    // Other queries
+    int GetLastRecorderNum(void) const { return lastRecorderNum; }
+    TVState GetState(void) const;
+
+    // Non-const queries
+    OSD *GetOSD(void);
 
     void GetNextProgram(RemoteEncoder *enc, int direction,
                         InfoMap &infoMap);
@@ -97,27 +135,8 @@ class TV : public QObject
                         QString &repeat,    QString &airdate,
                         QString &stars);
 
-    // for the guidegrid to use
-    void EmbedOutput(WId wid, int x, int y, int w, int h);
-    void StopEmbeddingOutput(void);
-    void EPGChannelUpdate(QString chanid, QString chanstr);
-    static void GetValidRecorderList(uint chanid, QStringList &reclist);
-   
-    bool getRequestDelete(void) { return requestDelete; }
-    bool getEndOfRecording(void) { return endOfRecording; }
-
-    void ProcessKeypress(QKeyEvent *e);
-    void customEvent(QCustomEvent *e);
-
-    void AddPreviousChannel(void);
-    void PreviousChannel(void);
-
-    OSD *GetOSD(void);
-
-    bool IsErrored(void) { return errored; }
-
-    void setLastProgram(ProgramInfo *rcinfo);
-    bool getJumpToProgram(void) { return jumpToProgram; }
+    // static functions
+    static void InitKeys(void);
 
   public slots:
     void HandleOSDClosed(int osdType);
@@ -230,11 +249,6 @@ class TV : public QObject
     bool InStateChange(void) const;
     void ChangeState(TVState nextState);
     void ForceNextStateNone(void);
-    bool StateIsRecording(TVState state);
-    bool StateIsPlaying(TVState state);
-    bool StateIsLiveTV(TVState state);
-    TVState RemovePlaying(TVState state);
-    TVState RemoveRecording(TVState state);
 
     void TogglePIPView(void);
     void ToggleActiveWindow(void);
@@ -259,6 +273,13 @@ class TV : public QObject
     void ShowLCDChannelInfo(void);
 
     QString PlayMesg(void);
+
+    static void GetValidRecorderList(uint chanid, QStringList &reclist);
+    static bool StateIsRecording(TVState state);
+    static bool StateIsPlaying(TVState state);
+    static bool StateIsLiveTV(TVState state);
+    static TVState RemovePlaying(TVState state);
+    static TVState RemoveRecording(TVState state);
 
   private:
     // Configuration variables from database
@@ -384,9 +405,12 @@ class TV : public QObject
     NuppelVideoPlayer *activenvp;  ///< Player to which LiveTV events are sent
 
     // Remote Encoders
+    /// Main recorder
     RemoteEncoder *recorder;
+    /// Picture-in-Picture recorder
     RemoteEncoder *piprecorder;
-    RemoteEncoder *activerecorder; ///< Recorder to which LiveTV events are sent
+    /// Recorder to which LiveTV events are being sent
+    RemoteEncoder *activerecorder;
 
     // RingBuffers
     RingBuffer *prbuffer;

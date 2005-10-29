@@ -414,7 +414,7 @@ TV::~TV(void)
         lcd->switchToTime();
 }
 
-TVState TV::GetState(void)
+TVState TV::GetState(void) const
 {
     if (InStateChange())
         return kState_ChangingState;
