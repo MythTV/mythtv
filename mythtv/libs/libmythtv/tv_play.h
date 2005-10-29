@@ -88,7 +88,7 @@ class TV : public QObject
     /// Returns true if the EPG is currently on screen.
     bool IsMenuRunning(void)     const { return menurunning; }
     /// Returns true if we are currently in the process of switching recorders.
-    bool IsSwitchingCards(void)  const { return switchingCards; }
+    bool IsSwitchingCards(void)  const { return switchToRec; }
     /// Returns true if the TV event thread is running. Should always be true
     /// between the end of the constructor and the beginning of the destructor.
     bool IsRunning(void)         const { return runMainLoop; }
@@ -108,7 +108,7 @@ class TV : public QObject
     bool IsErrored(void)         const { return errored; }
 
     // Other queries
-    int GetLastRecorderNum(void) const { return lastRecorderNum; }
+    int GetLastRecorderNum(void) const;
     TVState GetState(void) const;
 
     // Non-const queries
@@ -328,8 +328,6 @@ class TV : public QObject
     bool endOfRecording; ///< !nvp->IsPlaying() && StateIsPlaying(internalState)
     bool requestDelete;  ///< User wants last video deleted
     bool doSmartForward;
-    bool switchingCards; ///< User wants new recorder, see mythfrontend/main.cpp
-    int lastRecorderNum; ///< Last recorder, for implementing SwitchCards()
     bool queuedTranscode;
     bool getRecorderPlaybackInfo; ///< Main loop should get recorderPlaybackInfo
     int picAdjustment;   ///< Player pict attr to modify (on arrow left or right)
@@ -411,6 +409,8 @@ class TV : public QObject
     RemoteEncoder *piprecorder;
     /// Recorder to which LiveTV events are being sent
     RemoteEncoder *activerecorder;
+    /// Main recorder to use after a successful SwitchCards() call.
+    RemoteEncoder *switchToRec;
 
     // RingBuffers
     RingBuffer *prbuffer;

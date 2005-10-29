@@ -189,7 +189,7 @@ TV::TV(void)
       audiosyncAdjustment(false), audiosyncBaseline(LONG_LONG_MIN),
       editmode(false), zoomMode(false), sigMonMode(false),
       update_osd_pos(false), endOfRecording(false), requestDelete(false),
-      doSmartForward(false), switchingCards(false), lastRecorderNum(-1),
+      doSmartForward(false),
       queuedTranscode(false), getRecorderPlaybackInfo(false),
       picAdjustment(kPictureAttribute_None),
       recAdjustment(kPictureAttribute_None),
@@ -220,6 +220,7 @@ TV::TV(void)
       nvp(NULL), pipnvp(NULL), activenvp(NULL),
       // Remote Encoders
       recorder(NULL), piprecorder(NULL), activerecorder(NULL),
+      switchToRec(NULL),
       // RingBuffers
       prbuffer(NULL), piprbuffer(NULL), activerbuffer(NULL),
       // OSD info
@@ -426,10 +427,17 @@ int TV::LiveTV(bool showDialogs)
     if (internalState == kState_None && RequestNextRecorder(showDialogs))
     {
         ChangeState(kState_WatchingLiveTV);
-        switchingCards = false;
+        switchToRec = NULL;
         return 1;
     }
     return 0;
+}
+
+int TV::GetLastRecorderNum(void) const
+{
+    if (!recorder)
+        return -1;
+    return recorder->GetRecorderNumber();
 }
 
 void TV::DeleteRecorder()
@@ -445,21 +453,22 @@ bool TV::RequestNextRecorder(bool showDialogs)
     DeleteRecorder();
 
     RemoteEncoder *testrec = NULL;
-    if (lookForChannel)
+    if (switchToRec)
     {
-        QStringList reclist;
-        GetValidRecorderList(channelid.toUInt(), reclist);
-        testrec = RemoteRequestFreeRecorderFromList(reclist);
-        lookForChannel = false;
-        channelqueued = true;
-        channelid = "";
+        // If this is set we, already got a new recorder in SwitchCards()
+        testrec = switchToRec;
+        switchToRec = NULL;
+        if (lookForChannel)
+        {
+            lookForChannel = false;
+            channelqueued  = true;
+            channelid      = "";
+        }
     }
     else
     {
-        // The default behavior for starting live tv is to get the next
-        // free recorder.  This is also how switching to the next recorder
-        // works
-        testrec = RemoteRequestNextFreeRecorder(lastRecorderNum);
+        // When starting LiveTV we just get the next free recorder
+        testrec = RemoteRequestNextFreeRecorder(-1);
     }
 
     if (!testrec)
@@ -488,7 +497,6 @@ bool TV::RequestNextRecorder(bool showDialogs)
     }
     
     activerecorder = recorder = testrec;
-    lastRecorderNum = recorder->GetRecorderNumber();
     return true;
 }
 
@@ -1314,7 +1322,7 @@ void TV::RunTV(void)
     
     ChannelClear();
 
-    switchingCards = false;
+    switchToRec = NULL;
     runMainLoop = true;
     exitPlayer = false;
 
@@ -2795,10 +2803,37 @@ void TV::DoSkipCommercials(int direction)
 
 void TV::SwitchCards(void)
 {
-    if (StateIsLiveTV(GetState()))
+    RemoteEncoder *testrec = NULL;
+
+    if (!StateIsLiveTV(GetState()))
+        return;
+
+    if (lookForChannel)
     {
-        switchingCards = true;
-        exitPlayer = true;
+        // If we are switching to a channel not on the current recorder
+        // we need to find the next free recorder with that channel.
+        QStringList reclist;
+        GetValidRecorderList(channelid.toUInt(), reclist);
+        testrec = RemoteRequestFreeRecorderFromList(reclist);
+    }
+    else
+    {
+        // If we are just switching recorders find first available recorder.
+        testrec = RemoteRequestNextFreeRecorder(recorder->GetRecorderNumber());
+    }
+
+    if (testrec && testrec->IsValidRecorder())
+    {
+        switchToRec = testrec;
+        exitPlayer  = true;
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, LOC + "No recorder to switch to...");
+        // If activenvp is main nvp, show old input in on screen display
+        if (nvp && activenvp == nvp)
+            UpdateOSDInput();
+        delete testrec;
     }
 }
 
