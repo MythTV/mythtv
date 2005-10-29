@@ -41,7 +41,7 @@ const int TV::kMuteTimeout    = 800;
 const int TV::kLCDTimeout     = 30000;
 const int TV::kBrowseTimeout  = 30000;
 const int TV::kSMExitTimeout  = 2000;
-const int TV::kChannelKeysMax = 6;
+const int TV::kInputKeysMax = 6;
 
 #define DEBUG_ACTIONS 0 /**< set to 1 to debug actions */
 #define LOC QString("TV: ")
@@ -204,7 +204,7 @@ TV::TV(void)
       // Estimated framerate from recorder
       frameRate(30.0f),
       // Channel changing state variables
-      channelqueued(false), channelKeys(""), lookForChannel(false),
+      queuedChanNum(""),
       lastCC(""), lastCCDir(0), muteTimer(new QTimer(this)),
       lockTimerOn(false),
       // previous channel functionality state variables
@@ -458,12 +458,6 @@ bool TV::RequestNextRecorder(bool showDialogs)
         // If this is set we, already got a new recorder in SwitchCards()
         testrec = switchToRec;
         switchToRec = NULL;
-        if (lookForChannel)
-        {
-            lookForChannel = false;
-            channelqueued  = true;
-            channelid      = "";
-        }
     }
     else
     {
@@ -954,8 +948,8 @@ uint TV::GetLockTimeout(uint cardid)
              SignalMonitor::IsSupported(query.value(1).toString()))
         timeout = max(query.value(0).toInt(), 500);
 
-    VERBOSE(VB_PLAYBACK, LOC + "GetLockTimeout(%1): " +
-            QString("Set lock timeout to %2 ms")
+    VERBOSE(VB_PLAYBACK, LOC + QString("GetLockTimeout(%1): "
+                                       "Set lock timeout to %2 ms")
             .arg(cardid).arg(timeout));
 
     return timeout;
@@ -1320,7 +1314,7 @@ void TV::RunTV(void)
     lastLcdUpdate = QDateTime::currentDateTime();
     UpdateLCD();
     
-    ChannelClear();
+    ClearInputQueues();
 
     switchToRec = NULL;
     runMainLoop = true;
@@ -1448,11 +1442,11 @@ void TV::RunTV(void)
             updatecheck = 0;
         }
 
-        if (channelqueued && GetOSD())
+        if (HasQueuedChannel() && GetOSD())
         {
             OSDSet *set = GetOSD()->GetSet("channel_number");
             if ((set && !set->Displaying()) || !set)
-                ChannelCommit();
+                CommitQueuedChannel();
         }
 
         if (class LCD * lcd = LCD::Get())
@@ -1577,21 +1571,21 @@ void TV::ProcessKeypress(QKeyEvent *e)
                      action == "6" || action == "7" || action == "8" ||
                      action == "9")
             {
-                ChannelKey('0' + action.toInt());
+                AddKeyToInputQueue('0' + action.toInt());
             }
             else if (action == "SUBCHANNELSEP")
             {
-                ChannelKey('_');
+                AddKeyToInputQueue('_');
             }
             else if (action == "TOGGLEBROWSE" || action == "ESCAPE" ||
                      action == "CLEAROSD")
             {
-                ChannelCommit(); 
+                CommitQueuedChannel(); 
                 BrowseEnd(false);
             }
             else if (action == "SELECT")
             {
-                ChannelCommit(); 
+                CommitQueuedChannel(); 
                 BrowseEnd(true);
             }
             else if (action == "TOGGLERECORD")
@@ -1752,7 +1746,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 else if (dialogname == "ccwarningstring")
                 {
                     if (GetOSD()->GetDialogResponse(dialogname) == 1)
-                        ChangeChannelByString(lastCC, true);
+                        ChangeChannel(0, lastCC, true);
                     else if (!paused)
                         activenvp->Play(normal_speed, true);
                 }
@@ -1880,10 +1874,10 @@ void TV::ProcessKeypress(QKeyEvent *e)
         if (action == "TOGGLECC")
         {
             bool valid = false;
-            int page = inputKeys.toInt(&valid, 16) << 16;
+            int page = GetQueuedInputAsInt(&valid, 16) << 16;
             if (!valid)
                 page = 0;
-            ChannelClear();
+            ClearInputQueues();
             DoToggleCC(page);
         }
         else if (action == "SKIPCOMMERCIAL")
@@ -1926,7 +1920,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "SEEKFFWD")
         {
-            if (channelqueued)
+            if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_FORWARD);
             else if (paused)
                 DoSeek(1.001 / frameRate, tr("Forward"));
@@ -1942,7 +1936,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "FFWDSTICKY")
         {
-            if (channelqueued)
+            if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_END);
             else if (paused)
                 DoSeek(1.0, tr("Forward"));
@@ -1951,7 +1945,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "SEEKRWND")
         {
-            if (channelqueued)
+            if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_REWIND);
             else if (paused)
                 DoSeek(-1.001 / frameRate, tr("Rewind"));
@@ -1966,7 +1960,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         }
         else if (action == "RWNDSTICKY")
         {
-            if (channelqueued)
+            if (HasQueuedInput())
                 DoArbSeek(ARBSEEK_SET);
             else if (paused)
                 DoSeek(-1.0, tr("Rewind"));
@@ -2155,12 +2149,12 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
             if (ok)
             {
-                ChannelKey('0' + val);
+                AddKeyToInputQueue('0' + val);
                 handled = true;
             }
             if (action == "SUBCHANNELSEP")
             {
-                ChannelKey('_');
+                AddKeyToInputQueue('_');
                 handled = true;
             }
         }
@@ -2175,7 +2169,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
             if (action == "INFO")
             {
-                if (channelqueued)
+                if (HasQueuedInput())
                     DoArbSeek(ARBSEEK_SET);
                 else
                     ToggleOSD();
@@ -2205,7 +2199,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "SWITCHCARDS")
                 SwitchCards();
             else if (action == "SELECT")
-                ChannelCommit();
+                CommitQueuedChannel();
             else if (action == "GUIDE")
                 LoadMenu();
             else if (action == "TOGGLEPIPMODE")
@@ -2238,7 +2232,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
             if (action == "INFO")
             {
-                if (channelqueued)
+                if (HasQueuedInput())
                     DoArbSeek(ARBSEEK_SET);
                 else
                     DoInfo();
@@ -2409,11 +2403,11 @@ void TV::SwapPIP(void)
     if (activenvp != nvp)
         ToggleActiveWindow();
 
-    ChangeChannelByString(pipchanname);
+    ChangeChannel(0, pipchanname, false);
 
     ToggleActiveWindow();
 
-    ChangeChannelByString(bigchanname);
+    ChangeChannel(0, bigchanname, false);
 
     ToggleActiveWindow();
 }
@@ -2576,8 +2570,11 @@ void TV::DoSeek(float time, const QString &mesg)
 
 void TV::DoArbSeek(ArbSeekWhence whence)
 {
-    int seek = inputKeys.toInt();
-    ChannelClear(true);
+    bool ok = false;
+    int seek = GetQueuedInputAsInt(&ok);
+    ClearInputQueues(true);
+    if (!ok)
+        return;
 
     float time = ((seek / 100) * 3600) + ((seek % 100) * 60);
 
@@ -2801,26 +2798,71 @@ void TV::DoSkipCommercials(int direction)
         muteTimer->start(kMuteTimeout, true);
 }
 
-void TV::SwitchCards(void)
+static int get_cardinputid(uint cardid, const QString &channum)
 {
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT cardinputid "
+        "FROM channel, capturecard, cardinput "
+        "WHERE channel.channum      = :CHANNUM           AND "
+        "      channel.sourceid     = cardinput.sourceid AND "
+        "      cardinput.cardid     = capturecard.cardid AND "
+        "      capturecard.cardid   = :CARDID");
+    query.bindValue(":CHANNUM", channum);
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("get_cardinputid", query);
+    else if (query.next())
+        return query.value(0).toInt();
+
+    return -1;    
+}
+
+static void set_startchan(uint cardinputid, const QString &channum)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("UPDATE cardinput "
+                  "SET startchan = :CHANNUM "
+                  "WHERE cardinputid = :INPUTID");
+    query.bindValue(":CHANNUM", channum);
+    query.bindValue(":INPUTID", cardinputid);
+    query.exec();
+    if (!query.exec())
+        MythContext::DBError("set_startchan", query);
+}
+
+void TV::SwitchCards(uint chanid, QString channum)
+{
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("SwitchCards(%1,'%2')").arg(chanid).arg(channum));
+
     RemoteEncoder *testrec = NULL;
 
     if (!StateIsLiveTV(GetState()))
         return;
 
-    if (lookForChannel)
+    if (/*chanid || */!channum.isEmpty())
     {
         // If we are switching to a channel not on the current recorder
         // we need to find the next free recorder with that channel.
-        QStringList reclist;
-        GetValidRecorderList(channelid.toUInt(), reclist);
+        QStringList reclist = GetValidRecorderList(chanid, channum);
         testrec = RemoteRequestFreeRecorderFromList(reclist);
+        // now we need to set our channel as the starting channel..
+        if (testrec && testrec->IsValidRecorder())
+        {
+            int cardid = testrec->GetRecorderNumber();
+            int cardinputid = get_cardinputid(cardid, channum);
+            VERBOSE(VB_IMPORTANT, LOC + "setting startchan: " +
+                    QString("cardid(%1) cardinputid(%2) channum(%3)")
+                    .arg(cardid).arg(cardinputid).arg(channum));
+            set_startchan(cardinputid, channum);
+        }
     }
-    else
-    {
-        // If we are just switching recorders find first available recorder.
+
+    // If we are just switching recorders find first available recorder.
+    if (!testrec)
         testrec = RemoteRequestNextFreeRecorder(recorder->GetRecorderNumber());
-    }
 
     if (testrec && testrec->IsValidRecorder())
     {
@@ -2919,7 +2961,7 @@ void TV::ChangeChannel(int direction, bool force)
     PauseLiveTV();
 
     activerecorder->ChangeChannel(direction);
-    ChannelClear();
+    ClearInputQueues(false);
 
     if (muted)
         muteTimer->start(kMuteTimeout * 2, true);
@@ -2927,45 +2969,36 @@ void TV::ChangeChannel(int direction, bool force)
     UnpauseLiveTV();
 }
 
-QString TV::QueuedChannel(void)
+QString TV::GetQueuedChanNum(void) const
 {
-    if (!channelqueued)
-        return "";
-
     // strip initial zeros.
-    int nzi = channelKeys.find(QRegExp("([1-9]|\\w)"));
+    int nzi = queuedChanNum.find(QRegExp("([1-9]|\\w)"));
     if (nzi > 0)
-        channelKeys = channelKeys.right(channelKeys.length() - nzi);
+        queuedChanNum = queuedChanNum.right(queuedChanNum.length() - nzi);
 
-    return channelKeys.stripWhiteSpace();
+    return queuedChanNum.stripWhiteSpace();
 }
 
-/** \fn TV::ChannelClear(bool)
+/** \fn TV::ClearInputQueues(bool)
  *  \brief Clear channel key buffer of input keys.
  *  \param hideosd, if true hides "channel_number" OSDSet.
  */
-void TV::ChannelClear(bool hideosd)
+void TV::ClearInputQueues(bool hideosd)
 {
-    if (lookForChannel)
-        return;
-
     if (hideosd && GetOSD()) 
         GetOSD()->HideSet("channel_number");
 
-    channelqueued = false;
-
-    channelKeys = "";
-    inputKeys = "";
-    channelid = "";
+    queuedInput   = "";
+    queuedChanNum = "";
+    queuedChanID  = 0;
 }
 
-void TV::ChannelKey(char key)
+void TV::AddKeyToInputQueue(char key)
 {
     static char *spacers[5] = { "_", "-", "#", ".", NULL };
 
-    channelKeys   = channelKeys.append(key).right(kChannelKeysMax);
-    inputKeys     = inputKeys.append(key).right(kChannelKeysMax);
-    channelqueued = true;
+    queuedInput     = queuedInput.append(key).right(kInputKeysMax);
+    queuedChanNum   = queuedChanNum.append(key).right(kInputKeysMax);
 
     /* 
      * Always use smartChannelChange when channel numbers are entered in
@@ -2976,7 +3009,7 @@ void TV::ChannelKey(char key)
      */
     bool do_smart = StateIsLiveTV(GetState()) &&
         (smartChannelChange || browsemode);
-    QString chan = QueuedChannel();
+    QString chan = GetQueuedChanNum();
     if (!chan.isEmpty() && do_smart)
     {
         // Look for channel in line-up
@@ -2992,7 +3025,7 @@ void TV::ChannelKey(char key)
         }
 
         // Use valid channel if it is there, otherwise reset...
-        channelKeys = (ok) ? mod : chan.right(1);
+        queuedChanNum = (ok) ? mod : chan.right(1);
         do_smart &= unique;
     }
 
@@ -3000,62 +3033,77 @@ void TV::ChannelKey(char key)
     {
         InfoMap infoMap;
 
-        infoMap["channum"] = (do_smart) ? channelKeys : inputKeys;
+        infoMap["channum"] = (do_smart) ? queuedChanNum : queuedInput;
         infoMap["callsign"] = "";
         GetOSD()->ClearAllText("channel_number");
         GetOSD()->SetText("channel_number", infoMap, 2);
     }
 
     if (do_smart)
-        ChannelCommit();
+        CommitQueuedChannel();
 }
 
-void TV::ChannelCommit(void)
+void TV::CommitQueuedChannel(void)
 {
-    if (!channelqueued)
-        return;
+    VERBOSE(VB_PLAYBACK, LOC + "CommitQueuedChannel() " + 
+            QString("livetv(%1) qchannum(%2) qchanid(%3)")
+            .arg(StateIsLiveTV(GetState()))
+            .arg(GetQueuedChanNum())
+            .arg(GetQueuedChanID()));
 
-    if (!StateIsLiveTV(GetState()))
+    if (StateIsLiveTV(GetState()))
     {
-        ChannelClear(); 
- 	return; 
+        QString channum = GetQueuedChanNum();
+        if (browsemode)
+        {
+            BrowseChannel(channum);
+            if (activenvp == nvp && GetOSD())
+                GetOSD()->HideSet("channel_number");
+        }
+        else if (activerecorder->CheckChannel(channum))
+            ChangeChannel(GetQueuedChanID(), channum, false);
+        else
+            ChangeChannel(GetQueuedChanID(), GetQueuedInput(), false);
     }
 
-    QString chan = QueuedChannel();
-
-    if (browsemode)
-    {
-        BrowseChannel(chan);
-        if (activenvp == nvp && GetOSD())
-            GetOSD()->HideSet("channel_number");
-    }
-    else
-        ChangeChannelByString(chan);
-
-    ChannelClear();
+    ClearInputQueues(true);
 }
 
-void TV::ChangeChannelByString(QString &name, bool force)
+void TV::ChangeChannel(uint chanid, const QString &channum,  bool force)
 {
+    VERBOSE(VB_PLAYBACK, LOC + QString("ChangeChannel(%1, '%2', %3) ")
+            .arg(chanid).arg(channum).arg((force) ? "force" : "don't force"));
+
+    QStringList reclist;
     bool muted = false;
 
-    if (!channelid.isEmpty() && activerecorder &&
-        activerecorder->ShouldSwitchToAnotherCard(channelid))
+    if (activerecorder)
+    {
+        bool getit = false, unique = false;
+        if (chanid)
+            getit = activerecorder->ShouldSwitchToAnotherCard(
+                QString::number(chanid));
+        else
+            getit = !activerecorder->CheckChannelPrefix(channum, unique);
+
+        if (getit)
+            reclist = GetValidRecorderList(chanid, channum);
+    }
+
+    if (reclist.size())
     {
         RemoteEncoder *testrec = NULL;
-        QStringList reclist;
-        GetValidRecorderList(channelid.toUInt(), reclist);
         testrec = RemoteRequestFreeRecorderFromList(reclist);
         if (!testrec || !testrec->IsValidRecorder())
         {
-            ChannelClear();
+            ClearInputQueues(true);
             ShowNoRecorderDialog();
             if (testrec)
                 delete testrec;
             return;
         }
 
-        if (!prevChan.empty() && prevChan.back() == name)
+        if (!prevChan.empty() && prevChan.back() == channum)
         {
             // need to remove it if the new channel is the same as the old.
             prevChan.pop_back();
@@ -3063,16 +3111,14 @@ void TV::ChangeChannelByString(QString &name, bool force)
 
         // found the card on a different recorder.
         delete testrec;
-        lookForChannel = true;
-        channelqueued = true;
-        SwitchCards();
+        SwitchCards(chanid, channum);
         return;
     }
 
-    if (!prevChan.empty() && prevChan.back() == name)
+    if (!prevChan.empty() && prevChan.back() == channum)
         return;
 
-    if (!activerecorder->CheckChannel(name))
+    if (!activerecorder->CheckChannel(channum))
         return;
 
     if (!force && GetOSD() && nvp && (activenvp == nvp) && showBufferedWarnings)
@@ -3093,7 +3139,7 @@ void TV::ChangeChannelByString(QString &name, bool force)
             options += tr("Change the channel anyway");
             options += tr("Keep watching");
 
-            lastCC = name;
+            lastCC = channum;
             dialogname = "ccwarningstring";
 
             GetOSD()->NewDialogBox(dialogname, message, options, 0);
@@ -3124,7 +3170,7 @@ void TV::ChangeChannelByString(QString &name, bool force)
 
     PauseLiveTV();
 
-    activerecorder->SetChannel(name);
+    activerecorder->SetChannel(channum);
 
     if (muted)
         muteTimer->start(kMuteTimeout * 2, true);
@@ -3187,10 +3233,11 @@ void TV::SetPreviousChannel()
     // Only change channel if prevChan[vector] != current channel
     QString chan_name = activerecorder->GetCurrentChannel();
 
-    if (chan_name != prevChan[i].latin1())
+    if (chan_name != prevChan[i])
     {
-        channelKeys = prevChan[i];
-        channelqueued = true;
+        queuedInput   = prevChan[i];
+        queuedChanNum = prevChan[i];
+        queuedChanID  = 0;
     }
 
     //Turn off the OSD Channel Num so the channel changes right away
@@ -3202,9 +3249,9 @@ bool TV::ClearOSD(void)
 {
     bool res = false;
 
-    if (channelqueued)
+    if (HasQueuedInput() || HasQueuedChannel())
     {
-        ChannelClear(true);
+        ClearInputQueues(true);
         res = true;
     }
 
@@ -4049,13 +4096,13 @@ void TV::ToggleLetterbox(int letterboxMode)
         GetOSD()->SetSettingsText(text, 3);
 }
 
-void TV::EPGChannelUpdate(QString chanid, QString chanstr)
+void TV::EPGChannelUpdate(QString chanid, QString channum)
 {
-    if (chanid != "" && chanstr != "")
+    if (chanid != "" && channum != "")
     {
-        channelKeys = chanstr;
-        channelid = chanid;
-        channelqueued = true; 
+        queuedInput   = channum;
+        queuedChanNum = channum;
+        queuedChanID  = chanid.toUInt();
     }
 }
 
@@ -4224,7 +4271,7 @@ void TV::BrowseStart(void)
 
 /** \fn TV::BrowseEnd(bool)
  *  \brief Ends channel browsing. Changing the channel if change is true.
- *  \param change, iff true we call ChangeChannelByString(const QString&)
+ *  \param change, iff true we call ChangeChannel()
  */
 void TV::BrowseEnd(bool change)
 {
@@ -4237,7 +4284,7 @@ void TV::BrowseEnd(bool change)
 
     if (change)
     {
-        ChangeChannelByString(browsechannum);
+        ChangeChannel(0, browsechannum, false);
     }
 
     browsemode = false;
@@ -4404,7 +4451,7 @@ void TV::ToggleRecord(void)
     delete program_info;
 }
 
-void TV::BrowseChannel(QString &chan)
+void TV::BrowseChannel(const QString &chan)
 {
     if (!activerecorder->CheckChannel(chan))
         return;
@@ -5145,14 +5192,15 @@ void TV::ToggleSleepTimer(const QString time)
     }
 }
 
-/** \fn TV::GetValidRecorderList(uint chanid, QStringList&)
+/** \fn TV::GetValidRecorderList(uint)
  *  \brief Returns list of the recorders that have chanid in their sources.
- *  \param [in] chanid  Channel ID of channel we are querying recorders for
- *  \param [out]reclist List of cardid's for recorders with channel.
+ *  \param chanid  Channel ID of channel we are querying recorders for.
+ *  \return List of cardid's for recorders with channel.
  */
-void TV::GetValidRecorderList(uint chanid, QStringList &reclist)
+QStringList TV::GetValidRecorderList(uint chanid)
 {
-    reclist.clear();
+    QStringList reclist;
+
     // Query the database to determine which source is being used currently.
     // set the EPG so that it only displays the channels of the current source
     MSqlQuery query(MSqlQuery::InitCon());
@@ -5166,13 +5214,62 @@ void TV::GetValidRecorderList(uint chanid, QStringList &reclist)
 
     if (!query.exec() || !query.isActive())
     {
-        MythContext::DBError("GetValidRecorderList", query);
+        MythContext::DBError("GetValidRecorderList ChanID", query);
+        return reclist;
     }
-    else
+
+    while (query.next())
+        reclist << query.value(0).toString();
+
+    return reclist;
+}
+
+/** \fn TV::GetValidRecorderList(const QString&)
+ *  \brief Returns list of the recorders that have channum in their sources.
+ *  \param channum  Channel "number" we are querying recorders for.
+ *  \return List of cardid's for recorders with channel.
+ */
+QStringList TV::GetValidRecorderList(const QString &channum)
+{
+    QStringList reclist;
+
+    // Query the database to determine which source is being used currently.
+    // set the EPG so that it only displays the channels of the current source
+    MSqlQuery query(MSqlQuery::InitCon());
+    // We want to get the current source id for this recorder
+    query.prepare(
+        "SELECT cardinput.cardid "
+        "FROM channel "
+        "LEFT JOIN cardinput ON channel.sourceid = cardinput.sourceid "
+        "WHERE channel.channum = :CHANNUM");
+    query.bindValue(":CHANNUM", channum);
+
+    if (!query.exec() || !query.isActive())
     {
-        while (query.next())
-            reclist << query.value(0).toString();
+        MythContext::DBError("GetValidRecorderList ChanNum", query);
+        return reclist;
     }
+
+    while (query.next())
+        reclist << query.value(0).toString();
+
+    return reclist;
+}
+
+/** \fn TV::GetValidRecorderList(uint, const QString&)
+ *  \brief Returns list of the recorders that have chanid or channum
+ *         in their sources.
+ *  \param chanid   Channel ID of channel we are querying recorders for.
+ *  \param channum  Channel "number" we are querying recorders for.
+ *  \return List of cardid's for recorders with channel.
+ */
+QStringList TV::GetValidRecorderList(uint chanid, const QString &channum)
+{
+    if (chanid)
+        return GetValidRecorderList(chanid);
+    else if (!channum.isEmpty())
+        return GetValidRecorderList(channum);
+    return QStringList();
 }
 
 void TV::ShowNoRecorderDialog(void)
@@ -5191,7 +5288,7 @@ void TV::ShowNoRecorderDialog(void)
 }
 
 /** \fn TV::PauseLiveTV()
- *  \brief Used in ChangeChannel(), ChangeChannelByString(),
+ *  \brief Used in ChangeChannel(), ChangeChannel(),
  *         and ToggleInputs() to temporarily stop video output.
  */
 void TV::PauseLiveTV(void)
@@ -5224,7 +5321,7 @@ void TV::PauseLiveTV(void)
 }
 
 /** \fn TV::UnpauseLiveTV()
- *  \brief Used in ChangeChannel(), ChangeChannelByString(),
+ *  \brief Used in ChangeChannel(), ChangeChannel(),
  *         and ToggleInputs() to restart video output.
  */
 void TV::UnpauseLiveTV(void)

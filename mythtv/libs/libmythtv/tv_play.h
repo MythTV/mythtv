@@ -173,7 +173,7 @@ class TV : public QObject
 
     void ToggleChannelFavorite(void);
     void ChangeChannel(int direction, bool force = false);
-    void ChangeChannelByString(QString &name, bool force = false);
+    void ChangeChannel(uint chanid, const QString &channum, bool force);
     void PauseLiveTV(void);
     void UnpauseLiveTV(void);
 
@@ -190,15 +190,28 @@ class TV : public QObject
 
     void ChangeSubtitleTrack(int dir);
     void SetSubtitleTrack(int track);
-    
-    QString QueuedChannel(void);
-    void ChannelClear(bool hideosd = false); 
-    void ChannelKey(char key);
-    void ChannelCommit(void);
+
+    // key queue commands
+    void AddKeyToInputQueue(char key);
+    void ClearInputQueues(bool hideosd = false); 
+    void CommitQueuedChannel(void);
+
+    // query key queues
+    bool HasQueuedInput(void) const
+        { return !GetQueuedInput().isEmpty(); }
+    bool HasQueuedChannel(void) const
+        { return queuedChanID || !GetQueuedChanNum().isEmpty(); }
+
+    // get queued up input
+    QString GetQueuedInput(void)   const { return queuedInput; }
+    int GetQueuedInputAsInt(bool *ok = NULL, int base = 10) const
+        { return queuedInput.toInt(ok, base); }
+    QString GetQueuedChanNum(void) const;
+    uint    GetQueuedChanID(void)  const { return queuedChanID; }
 
     void ToggleInputs(void); 
 
-    void SwitchCards(void);
+    void SwitchCards(uint chanid = 0, QString channum = "");
 
     void ToggleSleepTimer(void);
     void ToggleSleepTimer(const QString);
@@ -260,7 +273,7 @@ class TV : public QObject
     void BrowseEnd(bool change);
     void BrowseDispInfo(int direction);
     void ToggleRecord(void);
-    void BrowseChannel(QString &chan);
+    void BrowseChannel(const QString &channum);
 
     void DoTogglePictureAttribute(void);
     void DoToggleRecPictureAttribute(void);
@@ -274,7 +287,10 @@ class TV : public QObject
 
     QString PlayMesg(void);
 
-    static void GetValidRecorderList(uint chanid, QStringList &reclist);
+    static QStringList GetValidRecorderList(uint chanid);
+    static QStringList GetValidRecorderList(const QString &channum);
+    static QStringList GetValidRecorderList(uint, const QString&);
+
     static bool StateIsRecording(TVState state);
     static bool StateIsPlaying(TVState state);
     static bool StateIsLiveTV(TVState state);
@@ -361,12 +377,14 @@ class TV : public QObject
     float frameRate;     ///< Estimated framerate from recorder
 
     // Channel changing state variables
-    bool    channelqueued;  ///< If true info is queued up for a channel change
-    QString channelKeys;    ///< Channel key presses queued up so far...
-    QString inputKeys;      ///< Input key presses queued up so far...
-    bool    lookForChannel; ///< If true try to find recorder for channel
-    QString channelid;      ///< Non-numeric Channel Name
-    QString lastCC;         ///< Last channel
+    /// Input key presses queued up so far...
+    QString queuedInput;
+    /// Input key presses queued up so far to form a valid ChanNum
+    mutable QString queuedChanNum;
+    ///< Queued ChanID (from EPG channel selector)
+    uint    queuedChanID;
+
+    QString lastCC;         ///< Last channel (channum)
     int     lastCCDir;      ///< Last channel changing direction
     QTimer *muteTimer;      ///< For temp. audio muting during channel changes
 
@@ -460,7 +478,7 @@ class TV : public QObject
     static const int kBrowseTimeout; ///< Timeout for browse mode exit in msec
     /// Timeout after last Signal Monitor message for ignoring OSD when exiting.
     static const int kSMExitTimeout;
-    static const int kChannelKeysMax;///< When to start discarding early keys
+    static const int kInputKeysMax;///< When to start discarding early keys
 };
 
 #endif
