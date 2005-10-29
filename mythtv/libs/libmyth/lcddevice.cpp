@@ -369,12 +369,8 @@ void LCD::setChannelProgress(float value)
     if (!lcd_ready || !lcd_showchannel)
         return;
 
-    if (value < 0.0)
-        value = 0.0;
-    else if (value > 1.0)
-        value = 1.0;
-        
-    sendToServer("SET_CHANNEL_PROGRESS " + QString().setNum(value));    
+    value = min(max(0.0f, value), 1.0f);
+    sendToServer(QString("SET_CHANNEL_PROGRESS %1").arg(value));    
 }
 
 void LCD::setGenericProgress(float value)
@@ -383,7 +379,7 @@ void LCD::setGenericProgress(float value)
         return;
 
     value = min(max(0.0f, value), 1.0f);
-    QString msg = QString("SET_GENERIC_PROGRESS 0 %1").arg(value);
+    sendToServer(QString("SET_GENERIC_PROGRESS 0 %1").arg(value));
 }
 
 void LCD::setGenericBusy()
