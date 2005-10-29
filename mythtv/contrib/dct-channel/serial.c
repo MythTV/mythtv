@@ -31,11 +31,11 @@ int serial_init(char *port)
 	struct termios t;
 	int locktried = 0;
 
-	if((serial_fd=open(port,O_RDWR,O_NONBLOCK))<0)
+	if ((serial_fd=open(port,O_RDWR,O_NONBLOCK))<0)
 		return -1;
  trylock:
-	if(flock(serial_fd,LOCK_EX|LOCK_NB)<0) {
-		if((errno==EAGAIN) && locktried<LOCKTRIES) {
+	if (flock(serial_fd,LOCK_EX|LOCK_NB)<0) {
+		if ((errno==EAGAIN) && locktried<LOCKTRIES) {
 			verb("%s is locked; waiting...\n",port);
 			locktried++;
 			sleep(1);
@@ -44,23 +44,23 @@ int serial_init(char *port)
 		verb("Failed to get lock: %s\n",strerror(errno));
 		return -1;
 	}
-	if(locktried>0) {
+	if (locktried>0) {
 		verb("Just got lock, so giving box time to settle\n");
 		sleep(2);
 	}	
-	if(tcgetattr(serial_fd,&t)<0)
+	if (tcgetattr(serial_fd,&t)<0)
 		return -1;
 	t.c_cflag |= CLOCAL;
-	if(tcsetattr(serial_fd,TCSANOW,&t)<0)
+	if (tcsetattr(serial_fd,TCSANOW,&t)<0)
 		return -1;
 	
 	bzero(&t,sizeof(t));
 	t.c_iflag=IGNBRK|IGNPAR;
 	t.c_cflag=CS8|CREAD|CLOCAL;
 	t.c_cc[VMIN]=1;
-	if(cfsetispeed(&t,B9600)==-1)
+	if (cfsetispeed(&t,B9600)==-1)
 		return -1;
-	if(tcsetattr(serial_fd,TCSANOW,&t)==-1)
+	if (tcsetattr(serial_fd,TCSANOW,&t)==-1)
 		return -1;
 
 	return 0;
@@ -90,12 +90,12 @@ int serial_getnextbyte(char *ch, int timeout_msec)
 	pfd.events = POLLIN|POLLERR;
 
 	/* Wait 2 seconds for the byte */
-	if(poll(&pfd, 1, timeout_msec)!=1)
+	if (poll(&pfd, 1, timeout_msec)!=1)
 		return -1;
-	if(pfd.revents & POLLERR)
+	if (pfd.revents & POLLERR)
 		return -1;
 	
-	if(read(serial_fd, ch, 1)!=1)
+	if (read(serial_fd, ch, 1)!=1)
 		return -1;
 
 	return 0;
@@ -111,11 +111,11 @@ int serial_getpacket(packet *p, int timeout_msec)
 	packet_stream_init();
 
  more:
-	if(serial_getnextbyte(&ch,timeout_msec)<0) {
+	if (serial_getnextbyte(&ch,timeout_msec)<0) {
 		debug("Serial timeout\n");
 		return -1;
 	}
-	if((new=packet_stream_add(ch))==NULL)
+	if ((new=packet_stream_add(ch))==NULL)
 		goto more;
 
 	memcpy(p,new,sizeof(packet));
@@ -132,7 +132,7 @@ void serial_write(unsigned char c)
 
 void serial_escape_write(unsigned char c)
 {
-	if(c==0x10) serial_write(c);
+	if (c==0x10) serial_write(c);
 	serial_write(c);
 }
 	

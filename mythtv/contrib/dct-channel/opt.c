@@ -21,10 +21,10 @@ char opt_parse(int argc, char **argv, int *optind, char **optarg,
 	char c;
 	int i;
 	(*optind)++;
-	if(*optind>=argc)
+	if (*optind>=argc)
 		return 0;
 	
-	if(argv[*optind][0]=='-' && 
+	if (argv[*optind][0]=='-' && 
 	   argv[*optind][1]!='-' &&
 	   argv[*optind][1]!=0) {
 		/* Short option (or a bunch of 'em) */
@@ -33,20 +33,20 @@ char opt_parse(int argc, char **argv, int *optind, char **optarg,
 		for(i=2;argv[*optind][i]!=0;i++)
 			argv[*optind][i-1]=argv[*optind][i];
 		argv[*optind][i-1]=0;
-		if(argv[*optind][1]!=0)
+		if (argv[*optind][1]!=0)
 			(*optind)--;
 		/* Now find it */
 		for(i=0;opt[i].shortopt!=0;i++)
-			if(opt[i].shortopt==c)
+			if (opt[i].shortopt==c)
 				break;
-		if(opt[i].shortopt==0) {
+		if (opt[i].shortopt==0) {
 			fprintf(stderr,"Error: unknown option '-%c'\n",c);
 			return '?';
 		}
-		if(opt[i].arg==NULL)
+		if (opt[i].arg==NULL)
 			return c;
 		(*optind)++;
-		if(*optind>=argc || (argv[*optind][0]=='-' &&
+		if (*optind>=argc || (argv[*optind][0]=='-' &&
 			argv[*optind][1]!=0)) {
 			fprintf(stderr,"Error: option '-%c' requires an "
 				"argument\n",c);
@@ -54,22 +54,22 @@ char opt_parse(int argc, char **argv, int *optind, char **optarg,
 		} 
 		(*optarg)=argv[*optind];
 		return c;
-	} else if(argv[*optind][0]=='-' &&
+	} else if (argv[*optind][0]=='-' &&
 		  argv[*optind][1]=='-' &&
 		  argv[*optind][2]!=0) {
 		/* Long option */
 		for(i=0;(c=opt[i].shortopt)!=0;i++)
-			if(strcmp(opt[i].longopt,argv[*optind]+2)==0)
+			if (strcmp(opt[i].longopt,argv[*optind]+2)==0)
 				break;
-		if(opt[i].shortopt==0) {
+		if (opt[i].shortopt==0) {
 			fprintf(stderr,"Error: unknown option '%s'\n",
 				argv[*optind]);
 			return '?';
 		}
-		if(opt[i].arg==NULL)
+		if (opt[i].arg==NULL)
 			return c;
 		(*optind)++;
-		if(*optind>=argc || (argv[*optind][0]=='-' &&
+		if (*optind>=argc || (argv[*optind][0]=='-' &&
 			argv[*optind][1]!=0)) {
 			fprintf(stderr,"Error: option '%s' requires an "
 				"argument\n",argv[*optind-1]);

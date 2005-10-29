@@ -13,12 +13,12 @@
 extern int verb_count;
 
 #define debug(x...) ({ \
-	if(verb_count >= 2) \
+	if (verb_count >= 2) \
 		fprintf(stderr,x); \
 })
 
 #define verb(x...) ({ \
-	if(verb_count >= 1) \
+	if (verb_count >= 1) \
 		fprintf(stderr,x); \
 })
 

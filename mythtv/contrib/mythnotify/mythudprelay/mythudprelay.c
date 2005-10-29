@@ -260,7 +260,7 @@ int waitfor_udp(GLOBALS *globals, SOCKET_HANDLE* sock)
   memset (globals->udp_rcv_buffer, 0, UDP_RCV_BUFSIZE);
 
   rv = select(sock->fd+1, &udp_rd_set, NULL, NULL, NULL);
-  if(rv < 0)
+  if (rv < 0)
   {
     printf("Select failed\n");
     return -1;

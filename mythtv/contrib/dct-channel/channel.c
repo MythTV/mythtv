@@ -56,11 +56,11 @@ int send_and_get_ack(packet *p, int timeout)
 	int done=0;
 	serial_sendpacket(p);
 	while(!done) {
-		if(serial_getpacket(&s,timeout)<0) {
+		if (serial_getpacket(&s,timeout)<0) {
 			verb("No response to packet\n");
 			return -1;
 		}
-		if(packet_is_ack(p,&s))
+		if (packet_is_ack(p,&s))
 			done = 1;
 		else 
 			verb("Got response, but it's not an ACK; "
@@ -79,19 +79,19 @@ int initialize(void)
 	/* Send initialize_1 and get ack.  Sometimes the box
 	   doesn't respond to this one. */
 	packet_build_initialize_1(&p);
-	if(send_and_get_ack(&p,TIMEOUT_TINY)<0)
+	if (send_and_get_ack(&p,TIMEOUT_TINY)<0)
 		verb("No response to init_1; trying to continue\n");
 
 	/* We should always get a response to initialize_2 */
 	packet_build_initialize_2(&p);
-	if(send_and_get_ack(&p,TIMEOUT_SHORT)<0) {
+	if (send_and_get_ack(&p,TIMEOUT_SHORT)<0) {
 		verb("No response to initialize_2\n");
 		return -1;
 	}
 
 	/* The DCT might now send us a status message, but 
 	   not always.  Ignore it if it comes. */
-	if(serial_getpacket(&p,TIMEOUT_TINY)<0)
+	if (serial_getpacket(&p,TIMEOUT_TINY)<0)
 		verb("No initial status message\n");
 	       
 	return 0;
@@ -106,16 +106,16 @@ int get_channel(void)
 
 	/* Send channelquery and get ack */
 	packet_build_channelquery(&p);
-	if(send_and_get_ack(&p,TIMEOUT_SHORT)<0)
+	if (send_and_get_ack(&p,TIMEOUT_SHORT)<0)
 		return -1;
 	
 	/* Now we expect one more packet with the channel status */
-	if(serial_getpacket(&p,TIMEOUT_SHORT)<0) {
+	if (serial_getpacket(&p,TIMEOUT_SHORT)<0) {
 		verb("Didn't get channel status message\n");
 		return -1;
 	}
 
-	if((chan=packet_extract_channel(&p))<0) {
+	if ((chan=packet_extract_channel(&p))<0) {
 		verb("Returned packet isn't channel status!\n");
 		return -1;
 	}
@@ -128,7 +128,7 @@ int send_keypress(int key)
 	packet p;
 
 	packet_build_keypress(&p,key);
-	if(send_and_get_ack(&p,TIMEOUT_TINY)<0)
+	if (send_and_get_ack(&p,TIMEOUT_TINY)<0)
 		return -1;
 
 	/* After sending a keypress, we have to wait. 
@@ -142,7 +142,7 @@ int set_channel(int chan)
 	packet p;
 	int cur;
 
-	if((send_keypress(KEY_0+((chan/100)%10)))<0 ||
+	if ((send_keypress(KEY_0+((chan/100)%10)))<0 ||
 	   (send_keypress(KEY_0+((chan/10)%10)))<0 ||
 	   (send_keypress(KEY_0+((chan/1)%10)))<0 ||
 	   (send_ok && send_keypress(KEY_OK)<0)) {
@@ -151,11 +151,11 @@ int set_channel(int chan)
 	}
 
 	/* Now the DCT should send us channel status */
-	if(serial_getpacket(&p,TIMEOUT_LONG)<0) {
+	if (serial_getpacket(&p,TIMEOUT_LONG)<0) {
 		verb("Didn't get channel status message\n");
 		return -1;
 	}
-	if((cur=packet_extract_channel(&p))<0) {
+	if ((cur=packet_extract_channel(&p))<0) {
 		verb("Returned packet isn't channel status!\n");
 		return -1;
 	}
@@ -165,7 +165,7 @@ int set_channel(int chan)
 	   for these, but don't wait long. */
 	while(serial_getpacket(&p,TIMEOUT_TINY)>=0) {
 		int newcur;
-		if((newcur=packet_extract_channel(&p))>=0) {
+		if ((newcur=packet_extract_channel(&p))>=0) {
 			debug("Got extra status back\n");
 			cur = newcur;
 		}
@@ -202,7 +202,7 @@ void blind_channel(int chan)
 	blind_key(KEY_0+((chan/10)%10));
 	usleep(BLIND_SLEEP * 1000);
 	blind_key(KEY_0+((chan/1)%10));
-	if(send_ok) {
+	if (send_ok) {
 		usleep(BLIND_SLEEP * 1000);
 		blind_key(KEY_OK);
 	}
@@ -252,7 +252,7 @@ int main(int argc, char *argv[])
 			break;
 		case 't':
 			timeout_scale = strtod(optarg, &t);
-			if(timeout_scale<0 || *t!=0 ||
+			if (timeout_scale<0 || *t!=0 ||
 			   optarg[0]<'0' || optarg[0]>'9') {
 				fprintf(stderr,"Invalid time scale: %s\n",
 					optarg);
@@ -287,57 +287,57 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if((optind+1)<argc) {
+	if ((optind+1)<argc) {
 		fprintf(stderr,"Error: too many arguments (%s)\n\n",
 			argv[optind+1]);
 		goto printhelp;
 	}
 
-	if(optind<argc) {
+	if (optind<argc) {
 		char *end;
 		chan = strtol(argv[optind],&end,10);
-		if(*end!='\0' || chan<1 || chan>999) {
+		if (*end!='\0' || chan<1 || chan>999) {
 			fprintf(stderr,"Invalid channel: %s\n",argv[optind]);
 			fprintf(stderr,"valid channels are 1 - 999\n");
 			goto printhelp;
 		}
 	}
 
-	if(blind && !chan) {
+	if (blind && !chan) {
 		fprintf(stderr,"Can't read channel number in blind mode;\n");
 		fprintf(stderr,"turning off blind mode.\n");
 		blind=0;
 	}
 
-	if((serial_init(port))<0) 
+	if ((serial_init(port))<0) 
 		err(1,port);
 
 	atexit(serial_close);
 
-	if(blind) {
+	if (blind) {
 		blind_channel(chan);
-		if(!quiet) printf("%d\n",chan);
+		if (!quiet) printf("%d\n",chan);
 		return 0;
 	}
 
 	while(tries < 5) {
 		tries++;
-		if(initialize()<0) {
+		if (initialize()<0) {
 			verb("Initialization failed\n");
-			if(!force) continue;
+			if (!force) continue;
 		}
 
-		if((newcur=get_channel())<0) {
+		if ((newcur=get_channel())<0) {
 			verb("Failed to read current channel\n");
-			if(!force) continue;
+			if (!force) continue;
 			newcur = 0;
 		}
 		cur = newcur;
 
-		if(chan!=0 && chan!=cur) {
+		if (chan!=0 && chan!=cur) {
 			verb("Changing from channel %d to channel %d\n",cur,chan);
 			/* Switch channel. */
-			if((newcur=set_channel(chan))<0 &&
+			if ((newcur=set_channel(chan))<0 &&
 			   (newcur=get_channel())!=chan) {
 				int i;
 
@@ -358,7 +358,7 @@ int main(int argc, char *argv[])
 					   not in a menu or something */
 					verb("Attempting to exit menus\n");
 					for(i=0;i<4;i++)
-						if(send_keypress(KEY_EXIT)<0)
+						if (send_keypress(KEY_EXIT)<0)
 							break;
 					break;
 				case 4:
@@ -369,10 +369,10 @@ int main(int argc, char *argv[])
 					   to actually power on, and
 					   flush buffers since it will
 					   probably send garbage. */
-					if(nopower) 
+					if (nopower) 
 						break;
 					verb("Attempting to turn box on\n");
-					if(send_keypress(KEY_POWER)>=0) {
+					if (send_keypress(KEY_POWER)>=0) {
 						usleep(POWER_SLEEP*1000);
 					}
  					serial_flush();
@@ -384,18 +384,18 @@ int main(int argc, char *argv[])
 			}
 			cur = newcur;
 
-			if(cur != chan) {
+			if (cur != chan) {
 				debug("channel is wrong; didn't switch?\n");
 				continue;
 			}
 
 			verb("Success!\n");
 		}
-		if(!quiet) printf("%d\n",cur);
+		if (!quiet) printf("%d\n",cur);
 		return 0;
 	}
 
-	if(!quiet) {
+	if (!quiet) {
 		fprintf(stderr,"Communication failed after %d tries\n", tries);
 		printf("%d\n",cur);
 	}

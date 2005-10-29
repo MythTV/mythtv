@@ -110,7 +110,7 @@ char *replace(char *in_string, char *out_string, char* key_string, char *replace
     str_index += key_len;
     
     /* Check for another pattern match */
-    if((c = (char *) strstr(in_string+str_index, key_string)) != NULL)
+    if ((c = (char *) strstr(in_string+str_index, key_string)) != NULL)
     {
       key_idx = c - in_string;
     }
@@ -235,7 +235,7 @@ int waitfor_ring(int fd, char *wait_string, CID_Info *cid_info)
      */
      
      rv = select(fd+1, &mrd_set, NULL, NULL, tv_p);
-     if(rv < 0)
+     if (rv < 0)
        {
 	 printf("Select failed\n");
 	 return -1;
@@ -355,17 +355,17 @@ int getNum(char *dest, int dsize, const char *src, int ssize)
 {
   int ret = 0;
 
-  if( dest && src )
+  if ( dest && src )
   {
     int i, j;
     memset(dest, 0, dsize);
     for(i=0,j=0; i<ssize && i<dsize; i++)
     {
-      if( isspace(src[i]) )
+      if ( isspace(src[i]) )
       {
         break;
       }
-      else if( isdigit(src[i]) )
+      else if ( isdigit(src[i]) )
       {
         dest[j++] = src[i];
       }
@@ -396,7 +396,7 @@ int checkfor_cid_info(char *buffer, int len, CID_Info *cid_info)
   char *field_ptr, date[8], time[8];
   int field_len, time_len = 0;
 
-  if( (field_ptr = extract_cid_field(buffer, len, "NAME = ", &field_len)) 
+  if ( (field_ptr = extract_cid_field(buffer, len, "NAME = ", &field_len)) 
    || (field_ptr = extract_cid_field(buffer, len, "CALLER NAME: ", &field_len)) )
   {
     memset(cid_info->name, 0, sizeof(cid_info->name));
@@ -415,7 +415,7 @@ int checkfor_cid_info(char *buffer, int len, CID_Info *cid_info)
     return 0;
   }
 
-  if( (field_ptr = extract_cid_field(buffer, len, "NMBR = ", &field_len))
+  if ( (field_ptr = extract_cid_field(buffer, len, "NMBR = ", &field_len))
    || (field_ptr = extract_cid_field(buffer, len, "CALLER NUMBER: ", &field_len)) )
   {
     memset(cid_info->number, 0, sizeof(cid_info->number));
@@ -434,14 +434,14 @@ int checkfor_cid_info(char *buffer, int len, CID_Info *cid_info)
     return 0;
   }
 
-  if( (field_ptr = extract_cid_field(buffer, len, "TIME: ", &field_len)) )
+  if ( (field_ptr = extract_cid_field(buffer, len, "TIME: ", &field_len)) )
   {
     int date_len;
     date_len = getNum(date, sizeof(date), field_ptr, field_len);
     time_len = getNum(time, sizeof(time), &field_ptr[date_len+2], field_len-date_len-2);
     field_ptr = &date[0];
     field_len = date_len;
-    if( verbose )
+    if ( verbose )
     {
       printf( "Date(%d): %s\nTime(%d): %s\nField_ptr: %s\n",
         field_len, date, time_len, time, field_ptr );
