@@ -7,11 +7,12 @@
 #include <qstringlist.h>
 #include <iostream>
 #include <qdir.h>
+#include <qregexp.h>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
-
+#include <mythtv/util.h>
 
 using namespace std;
 
