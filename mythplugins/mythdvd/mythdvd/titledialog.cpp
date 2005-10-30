@@ -16,6 +16,7 @@ using namespace std;
 #include <qregexp.h>
 
 #include <mythtv/util.h>
+#include <mythtv/uitypes.h>
 
 #include "titledialog.h"
 

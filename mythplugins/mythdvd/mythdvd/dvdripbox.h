@@ -14,6 +14,7 @@
 #include <qtimer.h>
 #include <qptrlist.h>
 #include <qthread.h>
+#include <qsocket.h>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/dialogbox.h>
