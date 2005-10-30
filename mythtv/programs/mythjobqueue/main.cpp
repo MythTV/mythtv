@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
-    if(!gContext->Init(false))
+    if (!gContext->Init(false))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return JOBQUEUE_EXIT_NO_MYTHCONTEXT;

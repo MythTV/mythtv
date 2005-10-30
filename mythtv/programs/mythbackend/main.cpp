@@ -286,82 +286,82 @@ int main(int argc, char **argv)
                     for (QStringList::Iterator it = verboseOpts.begin(); 
                          it != verboseOpts.end(); ++it )
                     {
-                        if(!strcmp(*it,"none"))
+                        if (!strcmp(*it,"none"))
                         {
                             print_verbose_messages = VB_NONE;
                             verboseString = "";
                         }
-                        else if(!strcmp(*it,"all"))
+                        else if (!strcmp(*it,"all"))
                         {
                             print_verbose_messages = VB_ALL;
                             verboseString = "all";
                         }
-                        else if(!strcmp(*it,"quiet"))
+                        else if (!strcmp(*it,"quiet"))
                         {
                             print_verbose_messages = VB_IMPORTANT;
                             verboseString = "important";
                         }
-                        else if(!strcmp(*it,"record"))
+                        else if (!strcmp(*it,"record"))
                         {
                             print_verbose_messages |= VB_RECORD;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"playback"))
+                        else if (!strcmp(*it,"playback"))
                         {
                             print_verbose_messages |= VB_PLAYBACK;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"channel"))
+                        else if (!strcmp(*it,"channel"))
                         {
                             print_verbose_messages |= VB_CHANNEL;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"osd"))
+                        else if (!strcmp(*it,"osd"))
                         {
                             print_verbose_messages |= VB_OSD;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"file"))
+                        else if (!strcmp(*it,"file"))
                         {
                             print_verbose_messages |= VB_FILE;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"schedule"))
+                        else if (!strcmp(*it,"schedule"))
                         {
                             print_verbose_messages |= VB_SCHEDULE;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"network"))
+                        else if (!strcmp(*it,"network"))
                         {
                             print_verbose_messages |= VB_NETWORK;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"commflag"))
+                        else if (!strcmp(*it,"commflag"))
                         {
                             print_verbose_messages |= VB_COMMFLAG;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"jobqueue"))
+                        else if (!strcmp(*it,"jobqueue"))
                         {
                             print_verbose_messages |= VB_JOBQUEUE;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"audio"))
+                        else if (!strcmp(*it,"audio"))
                         {
                             print_verbose_messages |= VB_AUDIO;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"libav"))
+                        else if (!strcmp(*it,"libav"))
                         {
                             print_verbose_messages |= VB_LIBAV;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"siparser"))
+                        else if (!strcmp(*it,"siparser"))
                         {
                             print_verbose_messages |= VB_SIPARSER;
                             verboseString += " " + *it;
                         }
-                        else if(!strcmp(*it,"eit"))
+                        else if (!strcmp(*it,"eit"))
                         {
                             print_verbose_messages |= VB_EIT;
                             verboseString += " " + *it;

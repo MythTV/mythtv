@@ -1040,7 +1040,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                                             Qt::ISODate);
             proginfo->findid = query.value(25).toInt();
 
-            if(query.value(26).isNull())
+            if (query.value(26).isNull())
             {
                 proginfo->originalAirDate = proginfo->startts.date();
                 proginfo->hasAirDate = false;
@@ -3084,7 +3084,7 @@ void MainServer::HandleGetRecorderFromNum(QStringList &slist,
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recordernum);
 
-    if(iter != encoderList->end())
+    if (iter != encoderList->end())
         encoder =  iter.data();
 
     if (encoder && encoder->IsConnected())
@@ -3441,7 +3441,7 @@ void MainServer::endConnection(RefSocket *socket)
                     while (enc->GetState() == kState_ChangingState)
                         usleep(500);
 
-                    if(enc->IsBusy() && enc->GetReadThreadSocket() == socket)
+                    if (enc->IsBusy() && enc->GetReadThreadSocket() == socket)
                     {
                         if (enc->GetState() == kState_WatchingLiveTV)
                         {

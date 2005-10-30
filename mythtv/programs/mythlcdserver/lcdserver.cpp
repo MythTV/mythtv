@@ -168,7 +168,7 @@ void LCDServer::parseTokens(const QStringList &tokens, QSocket *socket)
     //  parse commands coming in from the socket
     //
     
-    if(tokens[0] == "HALT" ||
+    if (tokens[0] == "HALT" ||
        tokens[0] == "QUIT" ||
        tokens[0] == "SHUTDOWN")
     {

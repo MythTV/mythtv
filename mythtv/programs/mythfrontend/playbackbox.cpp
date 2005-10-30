@@ -527,7 +527,7 @@ void PlaybackBox::updateCurGroup(QPainter *p)
     QRect pr = curGroupRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
-    if( recGroup != "Default")
+    if ( recGroup != "Default")
         updateGroupInfo(p, pr, pix, "cur_group");
     else
     {
@@ -550,7 +550,7 @@ void PlaybackBox::updateCurGroup(QPainter *p)
 void PlaybackBox::updateGroupInfo(QPainter *p, QRect& pr, QPixmap& pix, QString cont_name)
 {
     LayerSet *container = theme->GetSet(cont_name);
-    if( container)
+    if ( container)
     {    
         container->ClearAllText();
         QPainter tmp(&pix);

@@ -420,7 +420,7 @@ void TVMenuCallback(void *data, QString &selection)
             exit(FRONTEND_BUGGY_EXIT_NO_THEME);
 
         LCD::SetupLCD ();
-        if(class LCD * lcd = LCD::Get()) {
+        if (class LCD * lcd = LCD::Get()) {
             lcd->setupLEDs(RemoteGetRecordingMask);
             lcd->resetServer();
         }

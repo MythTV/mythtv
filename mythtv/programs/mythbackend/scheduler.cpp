@@ -222,9 +222,9 @@ static bool comp_timechannel(ProgramInfo *a, ProgramInfo *b)
 {
     if (a->recstartts != b->recstartts)
         return a->recstartts < b->recstartts;
-    if(a->chanstr == b->chanstr)
+    if (a->chanstr == b->chanstr)
         return a->chanid < b->chanid;
-    if(a->chanstr.toInt() > 0 && b->chanstr.toInt() > 0)
+    if (a->chanstr.toInt() > 0 && b->chanstr.toInt() > 0)
         return a->chanstr.toInt() < b->chanstr.toInt();
     return a->chanstr < b->chanstr;
 }
@@ -1976,7 +1976,7 @@ void Scheduler::AddNewRecords(void)
         p->year = result.value(30).toString();
         p->stars =  result.value(31).toDouble();
 
-        if(result.value(32).isNull())
+        if (result.value(32).isNull())
         {
             p->originalAirDate = p->startts.date();
             p->hasAirDate = false;

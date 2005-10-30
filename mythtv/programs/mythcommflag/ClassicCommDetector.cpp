@@ -166,7 +166,7 @@ void ClassicCommDetector::Init()
     sendCommBreakMapUpdates = false;
 
     // Check if close to 4:3
-    if(fabs(((width*1.0)/height) - 1.333333) < 0.1)
+    if (fabs(((width*1.0)/height) - 1.333333) < 0.1)
         currentAspect = COMM_ASPECT_NORMAL;
 
     lastFrameWasSceneChange = false;
@@ -577,7 +577,7 @@ void ClassicCommDetector::SetVideoParams(float aspect)
                                  "aspect = %1").arg(aspect));
     // Default to Widescreen but use the same check as VideoOutput::MoveResize()
     // to determine if is normal 4:3 aspect
-    if(fabs(aspect - 1.333333) < 0.1)
+    if (fabs(aspect - 1.333333) < 0.1)
         newAspect = COMM_ASPECT_NORMAL;
 
     if (newAspect != currentAspect)

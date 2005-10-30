@@ -18,7 +18,7 @@ using namespace std;
 LCDServerSocket::LCDServerSocket(int port, QObject *parent)
                 :QServerSocket(port, 1, parent)
 {
-    if(!ok())
+    if (!ok())
     {
         cerr << "LCDServerSocket.o: Something is wrong trying to start with port=" << port << endl;
         cerr << "LCDServerSocket.o: You've probably got another copy of lcd server already running." << endl;
@@ -42,7 +42,7 @@ void LCDServerSocket::newConnection(int socket)
 void LCDServerSocket::discardClient()
 {
     QSocket *socket = (QSocket *)sender();
-    if(socket)
+    if (socket)
     {
         emit(endConnect(socket));
     }
