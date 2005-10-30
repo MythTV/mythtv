@@ -623,7 +623,24 @@ void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause,
                                                        bool replace)
 {
     QValueList <int> branches_to_current_node;
-    
+
+    // store path to current track
+    if (curMeta)
+    {
+        QValueList <int> *a_route;
+        a_route = music_tree_list->getRouteToActive();
+        branches_to_current_node = *a_route;
+    }
+    else
+    {
+        // No current metadata, so when we come back we'll try and play the 
+        // first thing on the active queue
+        branches_to_current_node.clear();
+        branches_to_current_node.append(0); //  Root node
+        branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+        branches_to_current_node.append(0); //  Active play Queue
+    }
+
     visual_mode_timer->stop();
 
     if (!menufilters && replace)
@@ -640,16 +657,17 @@ void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause,
     if (!menufilters)
     {
         constructPlaylistTree();
-        
-        stop();
-        wipeTrackInfo();
-        
-        // move to first track in list
-        branches_to_current_node.clear();
-        branches_to_current_node.append(0); //  Root node
-        branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
-        branches_to_current_node.append(0); //  Active play Queue
-        music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+
+        if (!music_tree_list->tryToSetActive(branches_to_current_node))
+        {
+            stop();
+            wipeTrackInfo();
+            branches_to_current_node.clear();
+            branches_to_current_node.append(0); //  Root node
+            branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+            branches_to_current_node.append(0); //  Active play Queue
+            music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+        }
     }
     music_tree_list->refresh();
 }
