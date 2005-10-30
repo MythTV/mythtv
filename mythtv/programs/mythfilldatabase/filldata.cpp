@@ -35,6 +35,7 @@
 #include "libmythtv/frequencytables.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/videosource.h"
+#include "libmyth/util.h"
 
 using namespace std;
 

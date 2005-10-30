@@ -14,6 +14,7 @@ using namespace std;
 
 #include "lirc.h"
 #include "lircevent.h"
+#include "util.h"
 
 #if (QT_VERSION < 0x030100)
 #error Native LIRC support requires Qt 3.1 or greater.

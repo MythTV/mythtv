@@ -8,15 +8,15 @@
 #include <qptrlist.h>
 #include <qpixmap.h>
 #include <qpushbutton.h>
+#include <qlabel.h>
 #include <qevent.h>
 #include <qvaluevector.h>
 #include <qscrollview.h>
 #include <qthread.h>
+#include <qlayout.h>
 
 #include <vector>
 using namespace std;
-
-#include "uitypes.h"
 
 class XMLParse;
 class UIType;
@@ -38,6 +38,9 @@ class UIKeyboardType;
 class LayerSet;
 class GenericTree;
 class MythMediaDevice;
+class MythLineEdit;
+class MythRemoteLineEdit;
+class MythListBox; 
 
 const int kExternalKeycodeEventType = 33213;
 const int kExitToMainMenuEventType = 33214;
@@ -199,6 +202,8 @@ class MythPopupBox : public MythDialog
                        QObject *target = NULL, const char *slot = NULL);
 
     int ExecPopup(QObject *target = NULL, const char *slot = NULL);
+    int ExecPopupAtXY(int destx, int desty,
+                      QObject *target = NULL, const char *slot = NULL);
 
     static void showOkPopup(MythMainWindow *parent, QString title,
                             QString message);

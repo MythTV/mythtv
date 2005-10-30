@@ -21,6 +21,7 @@
 #include "libmyth/dialogbox.h"
 #include "libmyth/exitcodes.h"
 #include "libmyth/themedmenu.h"
+#include "libmyth/util.h"
 
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/videosource.h"

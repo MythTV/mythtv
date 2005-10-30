@@ -4,6 +4,7 @@
 #include <qsqlquery.h>
 #include <qdatetime.h>
 #include <qfileinfo.h>
+#include <qregexp.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -17,6 +18,7 @@ using namespace std;
 #include "jobqueue.h"
 #include "programinfo.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/util.h"
 #include "NuppelVideoPlayer.h"
 #include "mythdbcon.h"
 

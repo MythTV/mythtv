@@ -22,7 +22,7 @@ using namespace std;
 #include "mythplugin.h"
 #include "dialogbox.h"
 #include "lcddevice.h"
-
+#include "uitypes.h"
 
 
 extern QMap<QString, fontProp> globalFontMap;

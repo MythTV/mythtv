@@ -16,6 +16,7 @@
 #include <qcursor.h>
 #include <qdir.h>
 #include <qimage.h>
+#include "uitypes.h"
 
 static HostComboBox *AudioOutputDevice()
 {

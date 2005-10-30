@@ -5,6 +5,7 @@
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qapplication.h>
+#include <qfile.h>
 
 #include "programinfo.h"
 #include "scheduledrecording.h"

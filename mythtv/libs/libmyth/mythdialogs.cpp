@@ -1367,6 +1367,17 @@ int MythPopupBox::ExecPopup(QObject *target, const char *slot)
     return exec();
 }
 
+int MythPopupBox::ExecPopupAtXY(int destx, int desty,
+                            QObject *target, const char *slot)
+{
+    if (!target)
+        ShowPopupAtXY(destx, desty, this, SLOT(defaultExitHandler()));
+    else
+        ShowPopupAtXY(destx, desty, target, slot);
+
+    return exec();
+}
+
 void MythPopupBox::defaultButtonPressedHandler(void)
 {
     const QObjectList *objlist = children();
@@ -2623,12 +2634,13 @@ MythSearchDialog::MythSearchDialog(MythMainWindow *parent, const char *name)
 {
     // create the widgets
     caption = addLabel(QString(""));
-    
+
     editor = new MythRemoteLineEdit(this);
     connect(editor, SIGNAL(textChanged()), this, SLOT(searchTextChanged()));
     addWidget(editor);
-    editor->setFocus(); 
-    
+    editor->setFocus();
+    editor->setPopupPosition(VK_POSBOTTOMDIALOG); 
+
     listbox = new MythListBox(this);
     listbox->setScrollBar(false);
     listbox->setBottomScrollBar(false);

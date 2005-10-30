@@ -33,7 +33,7 @@ SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
 SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp
-SOURCES += virtualkeyboard.h
+SOURCES += virtualkeyboard.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../..
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch

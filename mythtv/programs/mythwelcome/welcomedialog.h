@@ -4,7 +4,8 @@
 #include <iostream>
 using namespace std;
 
-#include <mythdialogs.h>
+#include <qdatetime.h>
+#include "mythdialogs.h"
 
 class WelcomeDialog : public MythThemedDialog
 {

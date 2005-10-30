@@ -8,7 +8,6 @@ using namespace std;
 #include "virtualkeyboard.h"
 #include "mythcontext.h"
 #include "mythdialogs.h"
-#include "dialogbox.h"
 #include "uitypes.h"
 
 VirtualKeyboard::VirtualKeyboard(MythMainWindow *parent,
@@ -79,22 +78,63 @@ void VirtualKeyboard::switchLayout(QString language)
     QRect tlwg = tlw->frameGeometry();
 
     QPoint newpos;
-    if (pw->mapTo(tlw, QPoint(0,pwg.height()+m_popupHeight+5)).y()
-            < tlwg.height())
+
+    PopupPosition preferredPos;
+    if (m_parentEdit->inherits("MythLineEdit"))
     {
-        newpos = QPoint(pwg.width()/2-m_popupWidth/2, pwg.height() + 5);
+        MythLineEdit *par = (MythLineEdit *)m_parentEdit;
+        preferredPos = par->getPopupPosition();
     }
-    else 
+    else
     {
-        newpos = QPoint(pwg.width()/2-m_popupWidth/2, -5-m_popupHeight);
+        MythRemoteLineEdit *par = (MythRemoteLineEdit *)m_parentEdit;
+        preferredPos = par->getPopupPosition();
     }
 
-    int delx = pw->mapTo(tlw,newpos).x() + m_popupWidth-tlwg.width();
-    newpos = QPoint(newpos.x()-(delx > 0 ? delx : 0), newpos.y());
-    delx = pw->mapTo(tlw, newpos).x();
-    newpos = QPoint(newpos.x()-(delx < 0 ? delx : 0), newpos.y());
-    this->resize(m_popupWidth, m_popupHeight);
-    this->move( pw->mapToGlobal( newpos ) );
+    if (preferredPos == VK_POSBELOWEDIT)
+    {
+        if (pw->mapTo(tlw, QPoint(0,pwg.height() + m_popupHeight + 5)).y()
+                < tlwg.height())
+        {
+            newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, pwg.height() + 5);
+        }
+        else 
+        {
+            newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, - 5 - m_popupHeight);
+        }
+    }
+    else if (preferredPos == VK_POSABOVEEDIT)
+    {
+        if (pw->mapTo(tlw, QPoint(0, - m_popupHeight - 5)).y()
+            > 0)
+        {
+            newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, - 5 - m_popupHeight);
+        }
+        else 
+        {
+            newpos = QPoint(pwg.width() / 2 - m_popupWidth / 2, pwg.height() + 5);
+        }
+    }
+    else if (preferredPos == VK_POSTOPDIALOG)
+    {
+        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 5);
+        this->move(newpos);
+    }
+    else if (preferredPos == VK_POSBOTTOMDIALOG)
+    {
+        newpos = QPoint(tlwg.width() / 2 - m_popupWidth / 2, 
+                        tlwg.height() - 5 - m_popupHeight);
+        this->move(newpos);
+    }
+
+    if (preferredPos == VK_POSABOVEEDIT || preferredPos == VK_POSBELOWEDIT)
+    {
+        int delx = pw->mapTo(tlw,newpos).x() + m_popupWidth - tlwg.width();
+        newpos = QPoint(newpos.x() - (delx > 0 ? delx : 0), newpos.y());
+        delx = pw->mapTo(tlw, newpos).x();
+        newpos = QPoint(newpos.x() - (delx < 0 ? delx : 0), newpos.y());
+        this->move( pw->mapToGlobal( newpos ) );
+    }
 
     // find the UIKeyboardType
     m_keyboard = getUIKeyboardType("keyboard");

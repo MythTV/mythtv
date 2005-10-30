@@ -29,6 +29,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "fifowriter.h"
 #include "filtermanager.h"
+#include "util.h"
 
 #include "decoderbase.h"
 #include "nuppeldecoder.h"

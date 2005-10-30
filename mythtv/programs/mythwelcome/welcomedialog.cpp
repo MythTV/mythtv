@@ -1,10 +1,11 @@
 #include <qapplication.h>
 
-#include "libmyth/mythcontext.h"
-#include "libmyth/mythdbcon.h"
-#include "libmyth/lcddevice.h"
-#include "libmythtv/tv.h"
-#include "libmythtv/programinfo.h"
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "lcddevice.h"
+#include "tv.h"
+#include "programinfo.h"
+#include "uitypes.h"
 
 #include "welcomedialog.h"
 #include "welcomesettings.h"

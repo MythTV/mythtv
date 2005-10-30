@@ -329,6 +329,7 @@ MythLineEdit::~MythLineEdit()
 void MythLineEdit::Init()
 {
     popup = NULL;
+    popupPosition = VK_POSBELOWEDIT;
 }
 
 void MythLineEdit::keyPressEvent(QKeyEvent *e)
@@ -495,6 +496,7 @@ void MythRemoteLineEdit::Init()
     connect(cycle_timer, SIGNAL(timeout()), this, SLOT(endCycle()));
     
     popup = NULL;
+    popupPosition = VK_POSBELOWEDIT;
 }
 
 void MythRemoteLineEdit::startCycle(QString current_choice, QString set)

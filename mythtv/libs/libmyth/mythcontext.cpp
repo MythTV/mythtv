@@ -9,6 +9,7 @@
 #include <qurl.h>
 #include <qnetwork.h>
 #include <qwaitcondition.h>
+#include <qregexp.h>
 
 #include <qsocketdevice.h>
 #include <qhostaddress.h>

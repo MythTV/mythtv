@@ -3,9 +3,17 @@
 
 #include <qstring.h>
 #include <qimage.h>
-#include "xmlparse.h"
 
-class MythDialog;
+#include "mythdialogs.h"
+
+/// Preferred position to place virtual keyboard popup.
+enum PopupPosition 
+{
+    VK_POSABOVEEDIT = 1,
+    VK_POSBELOWEDIT,
+    VK_POSTOPDIALOG,
+    VK_POSBOTTOMDIALOG
+};
 
 class VirtualKeyboard : public MythThemedDialog
 {
