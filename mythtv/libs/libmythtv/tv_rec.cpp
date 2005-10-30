@@ -2598,20 +2598,24 @@ bool TVRec::SetupRingBuffer(QString &path, long long &filesize,
 {
     QMutexLocker lock(&stateChangeLock);
 
+    // Flush out any pending state changes
+    WaitForEventThreadSleep();
+
     if (ringBuffer)
     {
+        VERBOSE(VB_IMPORTANT, "Hmm, RingBuffer already on this recorder...\n");
         // If we are in state none, assume frontend crashed in LiveTV...
         if (GetState() == kState_None)
         {
             stateChangeLock.unlock();
             StopLiveTV();
-            WaitForEventThreadSleep();
             stateChangeLock.lock();
+            WaitForEventThreadSleep();
         }
         if (ringBuffer)
         {
             VERBOSE(VB_IMPORTANT, "A RingBuffer already on this recorder...\n"
-                    "\t\t\tIs someone watich 'Live TV' on this recorder?");
+                    "\t\t\tIs someone watching 'Live TV' on this recorder?");
             return false;
         }
     }
@@ -3102,6 +3106,9 @@ void TVRec::SetReadThreadSocket(QSocket *sock)
 {
     QMutexLocker lock(&stateChangeLock);
 
+#if 0
+    // This appears to be a sanity check, but I can't make sense of
+    // it and it seems to be screewing up "R"ecord on LiveTV. -- dtk
     if ((rbStreamingLive && sock) || (!rbStreamingLive && !sock))
     {
         VERBOSE(VB_IMPORTANT, LOC +
@@ -3110,6 +3117,7 @@ void TVRec::SetReadThreadSocket(QSocket *sock)
         
         return;
     }
+#endif
 
     if (sock)
     {
