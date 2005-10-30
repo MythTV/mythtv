@@ -28,6 +28,7 @@
 #include "libmyth/mythwidgets.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
+#include "libmyth/util.h"
 #include "videosource.h"
 #include "datadirect.h"
 #include "scanwizard.h"
