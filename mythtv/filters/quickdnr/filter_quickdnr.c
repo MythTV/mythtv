@@ -70,7 +70,7 @@ int quickdnr(VideoFilter *f, VideoFrame *frame)
     tf->first = 0;
   }
   for(y = 0;y < tf->Luma_size;y++) {
-    if(abs(tf->average[y] - frame->buf[y]) < tf->Luma_threshold1) {
+    if (abs(tf->average[y] - frame->buf[y]) < tf->Luma_threshold1) {
       tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
       frame->buf[y] = tf->average[y];
     }
@@ -78,7 +78,7 @@ int quickdnr(VideoFilter *f, VideoFrame *frame)
   }
   
   for(y = tf->Luma_size;y < tf->UV_size;y++) {
-    if(abs(tf->average[y] - frame->buf[y]) < tf->Chroma_threshold1) {
+    if (abs(tf->average[y] - frame->buf[y]) < tf->Chroma_threshold1) {
       tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
       frame->buf[y] = tf->average[y];
     }
@@ -102,8 +102,8 @@ int quickdnr2(VideoFilter *f, VideoFrame *frame)
 
   for(y = 0; y < tf->Luma_size; y++) {
     t = abs(tf->average[y] - frame->buf[y]);
-    if(t < tf->Luma_threshold1) {
-      if(t > tf->Luma_threshold2)
+    if (t < tf->Luma_threshold1) {
+      if (t > tf->Luma_threshold2)
 	tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
       frame->buf[y] = tf->average[y];
     }
@@ -112,8 +112,8 @@ int quickdnr2(VideoFilter *f, VideoFrame *frame)
 
  for(y = tf->Luma_size; y < (tf->UV_size); y++) {
     t = abs(tf->average[y] - frame->buf[y]);
-    if(t < tf->Chroma_threshold1) {
-      if(t > tf->Chroma_threshold2)
+    if (t < tf->Chroma_threshold1) {
+      if (t > tf->Chroma_threshold2)
 	tf->average[y] = (tf->average[y] + frame->buf[y]) >> 1;
       frame->buf[y] = tf->average[y];
     }
@@ -446,8 +446,8 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
   }
 
 #ifdef MMX
-  if(mm_support() > MM_MMXEXT) {
-    if(double_threshold) filter->vf.filter = &quickdnr2MMX;
+  if (mm_support() > MM_MMXEXT) {
+    if (double_threshold) filter->vf.filter = &quickdnr2MMX;
     else filter->vf.filter = &quickdnrMMX;
     
     filter->Luma_threshold_mask1 = 0;
@@ -474,7 +474,7 @@ VideoFilter *new_filter(VideoFrameType inpixfmt, VideoFrameType outpixfmt,
   }
   else
 #endif
-  if(double_threshold) filter->vf.filter = &quickdnr2;
+  if (double_threshold) filter->vf.filter = &quickdnr2;
   else filter->vf.filter = &quickdnr;
 
   filter->first = 1;
