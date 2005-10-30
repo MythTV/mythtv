@@ -110,6 +110,7 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     // Open communications
     // Store the hostname and port in case we need to reconnect.
 
+    bool startedServer = false;
     int timeout = 1000;
     hostname = lhostname;
     port = lport;
@@ -130,32 +131,51 @@ bool LCD::connectToHost(const QString &lhostname, unsigned int lport)
     if (res == 0)
     {
         // we need to start the mythlcdserver 
-        system(gContext->GetInstallPrefix() + "/bin/mythlcdserver&");
-        // we need to give the server time to startup
-        sleep(1);
-    }        
-    
+        startedServer = true;
+        system(gContext->GetInstallPrefix() + "/bin/mythlcdserver -v none&");
+        // have to disconnect the error signal otherwise we get connection refused
+        // errors while the server is starting up 
+        disconnect(socket, SIGNAL(error(int)), 0, 0);
+    }
+
     if (!connected)
     {
         QTextStream os(socket);
-        socket->connectToHost(hostname, port);
 
-        while (--timeout && socket->state() != QSocket::Idle)
+        int count = 0;
+        do
         {
-            qApp->lock();
-            qApp->processEvents();
-            qApp->unlock();
-            usleep(1000);
+            usleep(500000);
+            ++count;
 
-            if (socket->state() == QSocket::Connected)
+            VERBOSE(VB_GENERAL, QString("Connecting to lcd server: " 
+                    "%1:%2 (try %3 of 10)").arg(hostname).arg(port)
+                                           .arg(count));
+
+            socket->connectToHost(hostname, port);
+
+            timeout = 1000;
+            while (--timeout && socket->state() != QSocket::Idle)
             {
-                lcd_ready = true;
-                connected = true;
-                os << "HELLO\n";
-                break;
+                qApp->lock();
+                qApp->processEvents();
+                qApp->unlock();
+                usleep(1000);
+
+                if (socket->state() == QSocket::Connected)
+                {
+                    lcd_ready = true;
+                    connected = true;
+                    os << "HELLO\n";
+                    break;
+                }
             }
         }
+        while (count <= 10 && !connected);
     }
+
+    if (startedServer)
+        connect(socket, SIGNAL(error(int)), this, SLOT(veryBadThings(int)));
 
     if (connected == false)
         m_server_unavailable = true;
