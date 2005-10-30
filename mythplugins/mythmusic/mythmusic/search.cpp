@@ -11,13 +11,10 @@
 SearchDialog::SearchDialog(MythMainWindow *parent, const char *name) 
     : MythPopupBox(parent, name)
 {
-    vbox = new QVBoxLayout((QWidget *) 0, (int)(10 * hmult));
-    QHBoxLayout *hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
-        
     // Create the widgets
 
     // Caption
-    caption = new QLabel(QString(tr("Search Music Database")), this);
+    caption = addLabel(QString(tr("Search Music Database")));
     QFont font = caption->font();
     font.setPointSize(int (font.pointSize() * 1.2));
     font.setBold(true);
@@ -28,33 +25,28 @@ SearchDialog::SearchDialog(MythMainWindow *parent, const char *name)
     caption->setSizePolicy(QSizePolicy(QSizePolicy::Fixed,
                                        QSizePolicy::Fixed));
     caption->setMinimumWidth((int)(600 * hmult));
-    caption->setMaximumWidth((int)(600 * hmult));  
-    hbox->addWidget(caption);
-    
+    caption->setMaximumWidth((int)(600 * hmult));
+
     // LineEdit for search string
-    hbox = new QHBoxLayout(vbox, (int)(10 * hmult));
-    searchText = new MyLineEdit(this);
+    searchText = new MythLineEdit(this);
     searchText->setRW();
     searchText->setFocus();
+    searchText->setPopupPosition(VK_POSBOTTOMDIALOG);
     connect(searchText, SIGNAL(textChanged(const QString &)),
             this, SLOT(searchTextChanged(const QString &)));
-    connect(searchText, SIGNAL(returnPressed()),
-            this, SLOT(accept()));
-    hbox->addWidget(searchText);    
-    
+    addWidget(searchText); 
+
     // Listbox for search results
-    hbox = new QHBoxLayout(vbox, (int)(5 * hmult));
     listbox = new MythListBox(this);
     listbox->setScrollBar(false);
     listbox->setBottomScrollBar(false);
-    connect(listbox, SIGNAL(accepted(int)),
-            this, SLOT(itemSelected(int)));
-    connect(this, SIGNAL(done()),
-            this, SLOT(accept()));
-    hbox->addWidget(listbox);
-      
-    addLayout(vbox);
-    
+    connect(listbox, SIGNAL(accepted(int)), this, SLOT(itemSelected(int)));
+    addWidget(listbox);
+
+    // buttons
+    okButton = addButton(tr("OK"), this, SLOT(okPressed()));
+    cancelButton = addButton(tr("Cancel"), this, SLOT(cancelPressed()));
+
     // Initially, fill list with all music
     runQuery("");
 }
@@ -203,7 +195,7 @@ void SearchDialog::itemSelected(int i)
 {
     unsigned int id = ((SearchListBoxItem*)listbox->item(i))->getId();
     whereClause = QString("WHERE intid='%1';").arg(id);
-    emit done();
+    done(0);
 }
 
 
@@ -214,9 +206,14 @@ void SearchDialog::getWhereClause(QString &whereClause)
 
 SearchDialog::~SearchDialog()
 {
-    if (vbox)
-    {
-        delete vbox;
-        vbox = NULL;
-    }
+}
+
+void SearchDialog::okPressed(void)
+{
+    done(0);
+}
+
+void SearchDialog::cancelPressed(void)
+{
+    done(-1);
 }

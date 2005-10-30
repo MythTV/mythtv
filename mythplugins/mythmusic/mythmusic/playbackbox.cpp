@@ -559,15 +559,15 @@ void PlaybackBoxMusic::showSearchDialog()
 
     SearchDialog dialog(gContext->GetMainWindow(), "searchdialog");
 
-    int res = dialog.ExecPopup();
-    
-    if (res > 0)
+    int res = dialog.ExecPopupAtXY(-1, 20);
+
+    if (res != -1)
     {
           QString whereClause;
           dialog.getWhereClause(whereClause);
           updatePlaylistFromQuickPlaylist(whereClause, false);
-    }    
-}    
+    }
+}
 
 void PlaybackBoxMusic::byArtist()
 {

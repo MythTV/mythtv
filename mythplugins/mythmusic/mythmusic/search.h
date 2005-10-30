@@ -33,39 +33,20 @@ class SearchDialog: public MythPopupBox
 
     void searchTextChanged(const QString &searchText);
     void itemSelected(int i);
-
-  signals:
-
-    void done();
+    void okPressed(void);
+    void cancelPressed(void);
 
   private:
 
     void runQuery(QString searchText);
-    
-    QVBoxLayout         *vbox;
+
     QLabel              *caption;
     MythListBox         *listbox;  
     MythLineEdit        *searchText;
-    
+    QButton             *cancelButton;
+    QButton             *okButton;
+
     QString              whereClause;
-};
-
-// For some reason, pressing "OK" on my Hauppauge remote does *NOT* cause the
-// returnPressed() signal to be emitted. Hence the dirty hack below :(
-class MyLineEdit : public MythLineEdit
-{
-  public:
-
-    MyLineEdit(QWidget* parent) : MythLineEdit(parent) {};
-  
-  protected:
-
-    virtual void keyPressEvent( QKeyEvent *e )
-    {
-        MythLineEdit::keyPressEvent(e);
-        if (e->key() == Qt::Key_Return)
-            emit returnPressed();
-    }
 };
 
 #endif
