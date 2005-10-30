@@ -3748,6 +3748,30 @@ void TV::StopEmbeddingOutput(void)
     embedWinID = 0;
 }
 
+uint get_chanid(uint cardid, const QString &inputname, const QString &channum)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT chanid "
+        "FROM channel, capturecard, cardinput "
+        "WHERE channel.sourceid    = cardinput.sourceid AND "
+        "      capturecard.cardid  = cardinput.cardid   AND "
+        "      capturecard.cardid  = :CARDID            AND "
+        "      cardinput.inputname = :INPUTNAME         AND "
+        "      channel.channum     = :CHANNUM");
+    query.bindValue(":CARDID",    cardid);
+    query.bindValue(":INPUTNAME", inputname);
+    query.bindValue(":CARDNUM",   channum);
+
+    uint chanid = 0;
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("get_chanid", query);
+    else if (query.next())
+        chanid = query.value(0).toUInt();
+
+    return chanid;
+}
+
 void TV::doLoadMenu(void)
 {
     if (!activerecorder)
@@ -3756,6 +3780,7 @@ void TV::doLoadMenu(void)
         return;
     }
 
+    // Resize window to the MythTV GUI size
     MythMainWindow *mwnd = gContext->GetMainWindow();
     bool using_gui_size_for_tv = gContext->GetNumSetting("GuiSizeForTV", 0);
     if (!using_gui_size_for_tv)
@@ -3765,17 +3790,24 @@ void TV::doLoadMenu(void)
         mwnd->setFixedSize(saved_gui_bounds.size());
     }
 
-    QString channame = activerecorder->GetCurrentChannel();
+    // Get the chanid of the current channel
+    QString inputname;
+    activerecorder->GetInputName(inputname);
+    QString channum = activerecorder->GetCurrentChannel();
+    uint    cardid  = activerecorder->GetRecorderNumber();
+    uint    chanid  = get_chanid(cardid, inputname, channum);
 
+    // See if we can provide a channel preview in EPG
     bool allowsecondary = true;
-
     if (nvp && nvp->getVideoOutput())
         allowsecondary = nvp->getVideoOutput()->AllowPreviewEPG();
 
-    QString chanid = RunProgramGuide(channame, true, this, allowsecondary);
+    // Start up EPG
+    bool cc = RunProgramGuide(chanid, channum, true, this, allowsecondary);
 
     StopEmbeddingOutput();
 
+    // Resize the window back to the MythTV Player size
     if (!using_gui_size_for_tv)
     {
         mwnd->setGeometry(player_bounds.left(), player_bounds.top(),
@@ -3783,7 +3815,9 @@ void TV::doLoadMenu(void)
         mwnd->setFixedSize(player_bounds.size());
     }
 
-    EPGChannelUpdate(chanid, channame);
+    // If user selected a new channel in the EPG, change to that channel
+    if (cc)
+        EPGChannelUpdate(chanid, channum);
 
     menurunning = false;
 }
@@ -4096,13 +4130,14 @@ void TV::ToggleLetterbox(int letterboxMode)
         GetOSD()->SetSettingsText(text, 3);
 }
 
-void TV::EPGChannelUpdate(QString chanid, QString channum)
+void TV::EPGChannelUpdate(uint chanid, QString channum)
 {
-    if (chanid != "" && channum != "")
+    if (chanid && !channum.isEmpty())
     {
-        queuedInput   = channum;
-        queuedChanNum = channum;
-        queuedChanID  = chanid.toUInt();
+        // we need to use deep copy bcs this can be called from another thread.
+        queuedInput   = QDeepCopy<QString>(channum);
+        queuedChanNum = queuedInput;
+        queuedChanID  = chanid;
     }
 }
 

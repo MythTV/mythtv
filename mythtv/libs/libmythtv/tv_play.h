@@ -67,7 +67,7 @@ class TV : public QObject
     // Embedding commands for the guidegrid to use in LiveTV
     void EmbedOutput(WId wid, int x, int y, int w, int h);
     void StopEmbeddingOutput(void);
-    void EPGChannelUpdate(QString chanid, QString chanstr);
+    void EPGChannelUpdate(uint chanid, QString channum);
    
     // Recording commands
     int  PlayFromRecorder(int recordernum);

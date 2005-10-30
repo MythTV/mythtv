@@ -30,18 +30,17 @@ using namespace std;
 #include "util.h"
 #include "remoteutil.h"
 
-QString RunProgramGuide(QString &startchannel, bool thread, TV *player,
-                        bool allowsecondaryepg)
+bool RunProgramGuide(uint &chanid, QString &channum,
+                     bool thread, TV *player,
+                     bool allowsecondaryepg)
 {
-    QString chanid;
-   
+    bool channel_changed = false;
+
     if (thread)
         qApp->lock();
 
-    if (startchannel == QString::null)
-        startchannel = "";
-
-    GuideGrid *gg = new GuideGrid(gContext->GetMainWindow(), startchannel, 
+    GuideGrid *gg = new GuideGrid(gContext->GetMainWindow(),
+                                  chanid, channum,
                                   player, allowsecondaryepg, "guidegrid");
 
     gg->Show();
@@ -56,8 +55,12 @@ QString RunProgramGuide(QString &startchannel, bool thread, TV *player,
     else
         gg->exec();
 
-    chanid = gg->getLastChannelId();
-    startchannel = gg->getLastChannel();
+    if (chanid != gg->GetChanID())
+    {
+        chanid  = gg->GetChanID();
+        channum = gg->GetChanNum();
+        channel_changed = true;
+    }
 
     if (thread)
         qApp->lock();
@@ -67,11 +70,13 @@ QString RunProgramGuide(QString &startchannel, bool thread, TV *player,
     if (thread)
         qApp->unlock();
 
-    return chanid;
+    return channel_changed;
 }
 
-GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
-                     bool allowsecondaryepg, const char *name)
+GuideGrid::GuideGrid(MythMainWindow *parent,
+                     uint chanid, QString channum,
+                     TV *player, bool allowsecondaryepg,
+                     const char *name)
          : MythDialog(parent, name)
 {
     desiredDisplayChans = DISPLAY_CHANS = 6;
@@ -213,7 +218,8 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     int secsoffset = -((m_originalStartTime.time().minute() % 30) * 60 +
                         m_originalStartTime.time().second());
     m_currentStartTime = m_originalStartTime.addSecs(secsoffset);
-    m_startChanStr = channel;
+    startChanID  = chanid;
+    startChanNum = channum;
 
     m_currentRow = (int)(desiredDisplayChans / 2);
     m_currentCol = 0;
@@ -233,7 +239,8 @@ GuideGrid::GuideGrid(MythMainWindow *parent, const QString &channel, TV *player,
     fillTimeInfos();
     //int filltime = clock.elapsed();
     //clock.restart();
-    fillChannelInfos(maxchannel);
+    fillChannelInfos();
+    maxchannel = max((int)m_channelInfos.size() - 1, 0);
     setStartChannel((int)(m_currentStartChannel) - 
                     (int)(desiredDisplayChans / 2));
     if (DISPLAY_CHANS > maxchannel)
@@ -497,30 +504,22 @@ void GuideGrid::parseContainer(QDomElement &element)
         videoRect = area;
 }
 
-QString GuideGrid::getLastChannel(void)
+QString GuideGrid::GetChanNum(void)
 {
-    unsigned int chanNum = m_currentRow + m_currentStartChannel;
-    if (chanNum >= m_channelInfos.size())
-        chanNum -= m_channelInfos.size();
-    if (chanNum >= m_channelInfos.size())
+    if (m_channelInfos.empty() || !selectState)
         return "";
 
-    if (selectState)
-        return m_channelInfos[chanNum].chanstr;
-    return "";
+    uint idx = (m_currentRow + m_currentStartChannel) % m_channelInfos.size();
+    return m_channelInfos[idx].chanstr;
 }
 
-QString GuideGrid::getLastChannelId(void)
+uint GuideGrid::GetChanID(void)
 {
-    unsigned int chanNum = m_currentRow + m_currentStartChannel;
-    while (chanNum >= m_channelInfos.size())
-        chanNum -= m_channelInfos.size();
-    if (chanNum >= m_channelInfos.size())
-        return "";
+    if (m_channelInfos.empty() || !selectState)
+        return 0;
 
-    if (selectState)
-        return QString::number(m_channelInfos[chanNum].chanid);
-    return "";
+    uint idx = (m_currentRow + m_currentStartChannel) % m_channelInfos.size();
+    return m_channelInfos[idx].chanid;
 }
 
 void GuideGrid::timeout()
@@ -551,80 +550,94 @@ void GuideGrid::timeout()
     repaint(curInfoRect, false);
 }
 
-void GuideGrid::fillChannelInfos(int &maxchannel, bool gotostartchannel)
+void GuideGrid::fillChannelInfos(bool gotostartchannel)
 {
-    m_channelInfos.clear();
-
-    QString queryfav;
-   
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString queryall = "SELECT channel.channum, channel.callsign, "
-                       "channel.icon, channel.chanid, favorites.favid, "
-                       "channel.name FROM channel LEFT JOIN favorites ON "
-                       "favorites.chanid = channel.chanid WHERE visible = 1 "
-                       "GROUP BY channum, callsign "
-                       "ORDER BY " + channelOrdering + ";";
+    m_channelInfos.clear();
 
     if (showFavorites)
     {
-        queryfav = "SELECT channel.channum, channel.callsign, "
-                   "channel.icon, channel.chanid, favorites.favid, "
-                   "channel.name FROM favorites, channel WHERE "
-                   "channel.chanid = favorites.chanid and visible = 1 "
-                   "ORDER BY " + channelOrdering + ";";
+        query.prepare(
+            "SELECT channel.channum, channel.callsign, "
+            "       channel.icon,    channel.chanid, "
+            "       favorites.favid, channel.name "
+            "FROM videosource, cardinput, favorites, channel "
+            "WHERE channel.chanid       = favorites.chanid     AND "
+            "      visible              = 1                    AND "
+            "      channel.sourceid     = videosource.sourceid AND "
+            "      videosource.sourceid = cardinput.sourceid "
+            "GROUP BY channum, callsign "
+            "ORDER BY " + channelOrdering);
 
-        query.prepare(queryfav);
-        query.exec();   
-
-        // If we don't have any favorites, then just show regular listings.
-        if (!query.isActive() || query.size() == 0)
-        {
-            showFavorites = (!showFavorites);
-            query.prepare(queryall);
-            query.exec();
-        }
+        if (query.exec() && query.isActive())
+            showFavorites = query.size();
+        else
+            MythContext::DBError("fillChannelInfos -- favorites", query);
     }
-    else
+
+    if (!showFavorites)
     {
-        query.prepare(queryall);
-        query.exec();
+        query.prepare(
+            "SELECT channel.channum, channel.callsign, "
+            "       channel.icon,    channel.chanid, "
+            "       favorites.favid, channel.name "
+            "FROM videosource, cardinput, "
+            "       channel LEFT JOIN favorites "
+            "       ON favorites.chanid = channel.chanid "
+            "WHERE visible              = 1                    AND "
+            "      channel.sourceid     = videosource.sourceid AND "
+            "      videosource.sourceid = cardinput.sourceid "
+            "GROUP BY channum, callsign "
+            "ORDER BY " + channelOrdering);
+
+        if (!query.exec() || !query.isActive())
+        {
+            MythContext::DBError("fillChannelInfos -- all connected", query);
+            return;
+        }
     }
  
-    bool set = false;
-    maxchannel = 0;
-    
-    if (query.isActive() && query.size() > 0)
+    bool startingset = false;
+    while (query.next())
     {
-        while (query.next())
+        ChannelInfo val;
+
+        val.chanstr  = query.value(0).toString();
+        val.chanid   = query.value(3).toInt();
+
+        // validate the channum and chanid, skip channel if these are invalid
+        if (val.chanstr == "" || !val.chanid)
+            continue;
+
+        // fill in the rest of the data...
+        val.callsign = QString::fromUtf8(query.value(1).toString());
+        val.iconpath = query.value(2).toString();
+        val.favid    = query.value(4).toInt();
+        val.channame = QString::fromUtf8(query.value(5).toString());
+        val.icon     = NULL;
+
+        // set starting channel index if it hasn't been set
+        bool match   = gotostartchannel && !startingset;
+        match &= (startChanID)  ? val.chanid  == (int)startChanID : true;
+        match &= (!startChanID) ? val.chanstr == startChanNum     : true;
+        if (match)
         {
-            ChannelInfo val;
-            val.chanstr = query.value(0).toString();
-            if (val.chanstr != "")
-            {
-                val.callsign = QString::fromUtf8(query.value(1).toString());
-                val.iconpath = query.value(2).toString();
-                val.chanstr = query.value(0).toString();
-                val.chanid = query.value(3).toInt();
-                val.favid = query.value(4).toInt();
-                val.channame = QString::fromUtf8(query.value(5).toString());
-                val.icon = NULL;
-        
-                if (gotostartchannel && val.chanstr == m_startChanStr && !set)
-                {
-                    m_currentStartChannel = m_channelInfos.size();
-                    set = true;
-                }
-                
-                m_channelInfos.push_back(val);
-                maxchannel++;
-            }
+            m_currentStartChannel = m_channelInfos.size();
+            startingset = true;
         }
+                
+        // add the new channel to the list
+        m_channelInfos.push_back(val);
     }
-    else
+    // set starting channel index to 0 if it hasn't been set
+    m_currentStartChannel = (startingset) ? m_currentStartChannel : 0;
+
+    if (m_channelInfos.empty())
     {
-        cerr << "You don't have any channels defined in the database\n";
-        cerr << "This isn't going to work.\n";
+        VERBOSE(VB_IMPORTANT, "GuideGrid: "
+                "\n\t\t\tYou don't have any channels defined in the database."
+                "\n\t\t\tGuide grid will have nothing to show you.");
     }
 }
 
@@ -1286,7 +1299,8 @@ void GuideGrid::generateListings()
 
     int maxchannel = 0;
     DISPLAY_CHANS = desiredDisplayChans;
-    fillChannelInfos(maxchannel);
+    fillChannelInfos();
+    maxchannel = max((int)m_channelInfos.size() - 1, 0);
     if (DISPLAY_CHANS > maxchannel)
         DISPLAY_CHANS = maxchannel;
 
@@ -1331,7 +1345,8 @@ void GuideGrid::toggleChannelFavorite()
     {
         int maxchannel = 0;
         DISPLAY_CHANS = desiredDisplayChans;
-        fillChannelInfos(maxchannel, false);
+        fillChannelInfos(false);
+        maxchannel = max((int)m_channelInfos.size() - 1, 0);
         if (DISPLAY_CHANS > maxchannel)
             DISPLAY_CHANS = maxchannel;
 
@@ -1735,19 +1750,8 @@ void GuideGrid::details()
 
 void GuideGrid::channelUpdate(void)
 {
-    if (!m_player)
-        return;
-
-    int chanNum = m_currentRow + m_currentStartChannel;
-    if (chanNum >= (int)m_channelInfos.size())
-        chanNum -= (int)m_channelInfos.size();
-    if (chanNum >= (int)m_channelInfos.size())
-        return;
-    if (chanNum < 0)
-        chanNum = 0;
-
-    m_player->EPGChannelUpdate(QString::number(m_channelInfos[chanNum].chanid),
-                               m_channelInfos[chanNum].chanstr);
+    if (m_player)
+        m_player->EPGChannelUpdate(GetChanID(), GetChanNum());
 }
 
 //

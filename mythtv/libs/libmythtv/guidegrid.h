@@ -26,20 +26,23 @@ class QWidget;
 #define MAX_DISPLAY_TIMES 30
 
 // Use this function to instantiate a guidegrid instance.
-QString RunProgramGuide(QString &startchannel, bool thread = false, 
-                        TV *player = NULL, bool allowsecondaryepg = true);
+bool RunProgramGuide(uint &startChanId, QString &startChanNum,
+                     bool thread = false, TV *player = NULL,
+                     bool allowsecondaryepg = true);
 
 
 class GuideGrid : public MythDialog
 {
     Q_OBJECT
   public:
-    GuideGrid(MythMainWindow *parent, const QString &channel, TV *player = NULL,
-              bool allowsecondaryepg = true, const char *name = 0);
+    GuideGrid(MythMainWindow *parent,
+              uint chanid = 0, QString channum = "",
+              TV *player = NULL, bool allowsecondaryepg = true,
+              const char *name = "GuideGrid");
    ~GuideGrid();
 
-    QString getLastChannelId(void);
-    QString getLastChannel(void);
+    uint    GetChanID(void);
+    QString GetChanNum(void);
 
   protected slots:
     void cursorLeft();
@@ -120,7 +123,7 @@ class GuideGrid : public MythDialog
     QRect curInfoRect;
     QRect videoRect;
 
-    void fillChannelInfos(int &maxchannel, bool gotostartchannel = true);
+    void fillChannelInfos(bool gotostartchannel = true);
 
     void fillTimeInfos();
 
@@ -140,8 +143,9 @@ class GuideGrid : public MythDialog
     QDateTime m_originalStartTime;
     QDateTime m_currentStartTime;
     QDateTime m_currentEndTime;
-    unsigned int m_currentStartChannel;
-    QString m_startChanStr;
+    uint      m_currentStartChannel;
+    uint      startChanID;
+    QString   startChanNum;
     
     int m_currentRow;
     int m_currentCol;

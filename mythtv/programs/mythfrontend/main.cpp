@@ -53,11 +53,10 @@ XBox *xbox = NULL;
 
 void startGuide(void)
 {
-    QString startchannel = gContext->GetSetting("DefaultTVChannel");
-    if (startchannel == "")
-        startchannel = "3";
-
-    RunProgramGuide(startchannel);
+    uint chanid = 0;
+    QString channum = gContext->GetSetting("DefaultTVChannel");
+    channum = (channum.isEmpty()) ? "3" : channum;
+    RunProgramGuide(chanid, channum);
 }
 
 void startFinder(void)

@@ -393,10 +393,9 @@ void ProgFinder::showGuide()
         QString startchannel = gContext->GetSetting("DefaultTVChannel");
         if (startchannel == "")
             startchannel = "3";
-
-        RunProgramGuide(startchannel);
+        uint startchanid = 0;
+        RunProgramGuide(startchanid, startchannel);
     }
-
                 
     running = false;
     hide();
