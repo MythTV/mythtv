@@ -760,7 +760,7 @@ bool EventHandler::RequirePIDs()
     QMap_pidHandler::Iterator i;
     for (i = EITpid.begin() ; i != EITpid.end() ; ++i)
     {
-        if(i.data().pulling == false)
+        if (i.data().pulling == false)
         {
             SetupTrackers();
             return true;
@@ -768,7 +768,7 @@ bool EventHandler::RequirePIDs()
     }
     for (i = ETTpid.begin() ; i != ETTpid.end() ; ++i)
     {
-        if(i.data().pulling == false)
+        if (i.data().pulling == false)
         {
             SetupTrackers();
             return true;
@@ -782,7 +782,7 @@ bool EventHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)
     QMap_pidHandler::Iterator i;
     for (i = EITpid.begin() ; i != EITpid.end() ; ++i)
     {
-        if(i.data().pulling == false)
+        if (i.data().pulling == false)
         {
             pid = i.data().pid;
             filter = i.data().filter;
@@ -793,7 +793,7 @@ bool EventHandler::GetPIDs(uint16_t& pid, uint8_t& filter, uint8_t& mask)
     }
     for (i = ETTpid.begin() ; i != ETTpid.end() ; ++i)
     {
-        if(i.data().pulling == false)
+        if (i.data().pulling == false)
         {
             pid = i.data().pid;
             filter = i.data().filter;

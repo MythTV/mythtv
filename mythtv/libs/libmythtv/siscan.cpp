@@ -1410,7 +1410,7 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
                                    .arg(db_mplexid);
             query.prepare(versionQuery);
 
-            if(!query.exec())
+            if (!query.exec())
                 MythContext::DBError("Selecting channel/dtv_multiplex", query);
 
             if (!query.isActive())
@@ -1615,7 +1615,7 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
 
     n = NIT.Network.begin();
 
-    if(!NIT.Network.empty())
+    if (!NIT.Network.empty())
     {
         SISCAN(QString("Network %1 Scanned").arg((*n).NetworkName));
         emit TransportScanUpdateText(QString("Network %1 Processing").arg((*n).NetworkName));
@@ -1633,7 +1633,7 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                    .arg(sourceID);
         query.prepare(theQuery);
 
-        if(!query.exec())
+        if (!query.exec())
             MythContext::DBError("Selecting transports", query);
 
         if (!query.isActive())
@@ -1677,7 +1677,7 @@ void SIScan::UpdateTransportsInDB(NITObject NIT)
                                query.bindValue(":TRANSMISSION_MODE",(*t).TransmissionMode);
                                query.bindValue(":INVERSION",(*t).Inversion);
                                query.bindValue(":SOURCEID",sourceID);
-            if(!query.exec())
+            if (!query.exec())
                 MythContext::DBError("Inserting new transport", query);
             if (!query.isActive())
                 MythContext::DBError("Adding transport to Database.", query);

@@ -580,11 +580,11 @@ void VideoOutput::MoveResize(void)
     displayAspect = GetDisplayAspect();
 
     // Check if close to 4:3
-    if(fabs(displayAspect - 1.333333) < 0.05)
+    if (fabs(displayAspect - 1.333333) < 0.05)
         displayAspect = 1.333333;
 
     // Check if close to 16:9
-    if(fabs(displayAspect - 1.777777) < 0.05)
+    if (fabs(displayAspect - 1.777777) < 0.05)
         displayAspect = 1.777777;
 
 /*
@@ -699,7 +699,7 @@ void VideoOutput::MoveResize(void)
     //    dispyoff);
     
     if ((fabs(displayAspect - XJ_aspect) / displayAspect) > 0.1){
-        if(letterbox == kLetterbox_Fill){
+        if (letterbox == kLetterbox_Fill){
             if (displayAspect > XJ_aspect)
             {
                 float pixNeeded = ((displayAspect / XJ_aspect) * (float)disphoff) + 0.5;

@@ -23,13 +23,13 @@ using namespace std;
 int read_tspacket (unsigned char *tspacket, int len, unsigned int dropped, void *callback_data) {
 
      FirewireRecorder *fw = (FirewireRecorder*)callback_data;
-     if(!fw) return 0;
+     if (!fw) return 0;
 
-     if(dropped) {
+     if (dropped) {
          VERBOSE(VB_GENERAL,QString("Firewire: %1 packet(s) dropped.").arg(dropped));
      }
 
-     if(tspacket[0] == SYNC_BYTE) {
+     if (tspacket[0] == SYNC_BYTE) {
          fw->ProcessTSPacket(tspacket,len);
      } else {
         VERBOSE(VB_GENERAL,QString("Firewire: out of sync mpeg2ts packet"));
@@ -46,7 +46,7 @@ void FirewireRecorder::deleteLater(void)
 
 bool FirewireRecorder::Open() {
 
-     if(isopen)
+     if (isopen)
          return true;
     
      VERBOSE(VB_GENERAL,QString("Firewire: Initializing Port: %1, Node: %2, Speed: %3")
@@ -54,22 +54,22 @@ bool FirewireRecorder::Open() {
                                .arg(fwnode)
                                .arg(FirewireSpeedString(fwspeed)));
 
-     if((fwhandle = raw1394_new_handle_on_port(fwport)) == NULL) {
+     if ((fwhandle = raw1394_new_handle_on_port(fwport)) == NULL) {
          VERBOSE(VB_IMPORTANT, QString("Firewire: unable to get handle for port: %1, bailing").arg(fwport));
          perror("firewire port");
          return false;
      }
 
-     if(fwconnection == FIREWIRE_CONNECTION_P2P) {
+     if (fwconnection == FIREWIRE_CONNECTION_P2P) {
           VERBOSE(VB_GENERAL,QString("Firewire: Creating P2P Connection with Node: %1").arg(fwnode));
           fwchannel = iec61883_cmp_connect (fwhandle, fwnode | 0xffc0, &fwoplug, 
                         raw1394_get_local_id (fwhandle), &fwiplug, &fwbandwidth);
-          if(fwchannel > -1) {
+          if (fwchannel > -1) {
 	      VERBOSE(VB_GENERAL,QString("Firewire: Created Channel: %1, Bandwidth Allocation: %2").arg(fwchannel).arg(fwbandwidth));
           }
      } else {
           VERBOSE(VB_GENERAL,QString("Firewire: Creating Broadcast Connection with Node: %1").arg(fwnode));
-          if(iec61883_cmp_create_bcast_output(fwhandle, fwnode | 0xffc0, 0, FIREWIRE_CHANNEL_BROADCAST, fwspeed) != 0) {
+          if (iec61883_cmp_create_bcast_output(fwhandle, fwnode | 0xffc0, 0, FIREWIRE_CHANNEL_BROADCAST, fwspeed) != 0) {
 	      VERBOSE(VB_IMPORTANT, QString("Firewire: Failed to create connection"));
 	      // release raw1394 object;
               raw1394_destroy_handle(fwhandle);
@@ -80,7 +80,7 @@ bool FirewireRecorder::Open() {
      }
 
 
-     if((fwmpeg = iec61883_mpeg2_recv_init (fwhandle, read_tspacket, this)) == NULL) {
+     if ((fwmpeg = iec61883_mpeg2_recv_init (fwhandle, read_tspacket, this)) == NULL) {
          VERBOSE(VB_IMPORTANT, QString("Firewire: unable to init iec61883_mpeg2 object, bailing"));
          perror("iec61883_mpeg2 object");
  
@@ -92,12 +92,12 @@ bool FirewireRecorder::Open() {
      // set speed if needed
      // probably shouldnt even allow user to set, 100Mbps should be more the enough
      int curspeed = iec61883_mpeg2_get_speed(fwmpeg);
-     if(curspeed != fwspeed) {
+     if (curspeed != fwspeed) {
          VERBOSE(VB_GENERAL,QString("Firewire: Changing Speed %1 -> %2")
                                     .arg(FirewireSpeedString(curspeed))
                                     .arg(FirewireSpeedString(fwspeed)));
          iec61883_mpeg2_set_speed(fwmpeg, fwspeed);
-         if(fwspeed != iec61883_mpeg2_get_speed(fwmpeg)) {
+         if (fwspeed != iec61883_mpeg2_get_speed(fwmpeg)) {
               VERBOSE(VB_IMPORTANT, QString("Firewire: unable to set firewire speed, continuing"));
          }
      }
@@ -150,7 +150,7 @@ void FirewireRecorder::StartRecording(void) {
        if (PauseAndWait())
            continue;
 
-       if(time(NULL) - lastpacket > FIREWIRE_TIMEOUT) {
+       if (time(NULL) - lastpacket > FIREWIRE_TIMEOUT) {
             VERBOSE(VB_IMPORTANT, QString("Firewire: No Input in %1 seconds [P:%2 N:%3] (time)").arg(FIREWIRE_TIMEOUT).arg(fwport).arg(fwnode));
             iec61883_mpeg2_recv_stop(fwmpeg);
             _error = true;
@@ -162,8 +162,8 @@ void FirewireRecorder::StartRecording(void) {
        tv.tv_sec = FIREWIRE_TIMEOUT;
        tv.tv_usec = 0;
 
-       if(select (fwfd + 1, &rfds, NULL, NULL, &tv) > 0) {
-            if(raw1394_loop_iterate(fwhandle) != 0) {
+       if (select (fwfd + 1, &rfds, NULL, NULL, &tv) > 0) {
+            if (raw1394_loop_iterate(fwhandle) != 0) {
                  VERBOSE(VB_IMPORTANT, "Firewire: libraw1394_loop_iterate() returned error.");
                  iec61883_mpeg2_recv_stop(fwmpeg);
                  _error = true;
@@ -204,26 +204,26 @@ void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 void FirewireRecorder::SetOption(const QString &name, const QString &value) {
 
-    if(name == "model") {
+    if (name == "model") {
         fwmodel = value;
     }
 }
 
 void FirewireRecorder::SetOption(const QString &name, int value) {
 
-    if(name == "port") {
+    if (name == "port") {
 	fwport = value;
-    } else if(name == "node") {
+    } else if (name == "node") {
         fwnode = value;
-    } else if(name == "speed") {
+    } else if (name == "speed") {
         fwspeed = value;
-        if(fwspeed != RAW1394_ISO_SPEED_100 && fwspeed != RAW1394_ISO_SPEED_200 && fwspeed != RAW1394_ISO_SPEED_400) {
+        if (fwspeed != RAW1394_ISO_SPEED_100 && fwspeed != RAW1394_ISO_SPEED_200 && fwspeed != RAW1394_ISO_SPEED_400) {
             VERBOSE(VB_IMPORTANT, QString("Firewire: Invalid speed '%1', assuming 0 (100Mbps)").arg(fwspeed));
             fwspeed = 0;
         }
-    } else if(name == "connection") {
+    } else if (name == "connection") {
 	fwconnection = value;
-	if(fwconnection != FIREWIRE_CONNECTION_P2P && fwconnection != FIREWIRE_CONNECTION_BROADCAST) {
+	if (fwconnection != FIREWIRE_CONNECTION_P2P && fwconnection != FIREWIRE_CONNECTION_BROADCAST) {
 	    VERBOSE(VB_IMPORTANT, QString("Firewire: Invalid Connection type '%1', assuming P2P").arg(fwconnection));
             fwconnection = FIREWIRE_CONNECTION_P2P;
         }

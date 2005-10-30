@@ -617,7 +617,7 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
     
     fontProp newFont;
     
-    if(baseFont)
+    if (baseFont)
         newFont = *baseFont;
 
     if ( haveSizeSmall && fontSizeType == "small")
@@ -625,7 +625,7 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
         if (sizeSmall > 0)
             size = sizeSmall;
     }
-    else if( haveSizeBig && fontSizeType == "big")
+    else if (haveSizeBig && fontSizeType == "big")
     {
         if (sizeBig > 0)
             size = sizeBig;
@@ -648,7 +648,7 @@ void ThemedMenuPrivate::parseFont(QDomElement &element)
     if (!haveFace && baseFont)
     {
         newFont.face = baseFont->face;
-        if(haveSize)
+        if (haveSize)
             newFont.face.setPointSize(size);
     }
     else
@@ -2247,7 +2247,7 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
 
         if (action == "UP")
         { 
-            if( maxrows > 1)
+            if (maxrows > 1)
             {
                 if (currentrow > 0)
                     currentrow--;
@@ -2279,7 +2279,7 @@ bool ThemedMenuPrivate::keyPressHandler(QKeyEvent *e)
         }
         else if (action == "DOWN")
         {
-            if( maxrows > 1)
+            if (maxrows > 1)
             {
                 if (currentrow < (int)buttonRows.size() - 1)
                     currentrow++;

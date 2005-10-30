@@ -328,7 +328,7 @@ void DBox2Recorder::StartRecording(void) {
 
     while(_request_recording) 
     {
-        if(_request_abort) 
+        if (_request_abort) 
   	    break;
 
         bool was_paused = request_pause || paused;
@@ -347,7 +347,7 @@ void DBox2Recorder::StartRecording(void) {
 	    }
 	    usleep(1000);
         }
-	else if(time(NULL) - lastpacket > DBOX2_TIMEOUT) 
+	else if (time(NULL) - lastpacket > DBOX2_TIMEOUT) 
         {
 	    VERBOSE(VB_IMPORTANT, QString("DBOX#%1: No Input in %2 seconds.").arg(m_cardid).arg(DBOX2_TIMEOUT));
             _error = true;
@@ -383,19 +383,19 @@ void DBox2Recorder::SetOptionsFromProfile(RecordingProfile *profile,
 
 void DBox2Recorder::SetOption(const QString &name, const QString &value) 
 {
-    if(name == "ip") {
+    if (name == "ip") {
         ip = value;
     }
-    if(name == "host") {
+    if (name == "host") {
         ip = value;
     }
 }
 
 void DBox2Recorder::SetOption(const QString &name, int value) 
 {
-    if(name == "port") 
+    if (name == "port") 
 	port = value;
-    if(name == "httpport") 
+    if (name == "httpport") 
 	httpPort = value;
 }
 

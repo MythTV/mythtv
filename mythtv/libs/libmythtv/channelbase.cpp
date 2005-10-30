@@ -366,8 +366,8 @@ void ChannelBase::RetrieveInputChannels(QMap<int, QString> &startChanNum,
     query.prepare(
         "SELECT inputname, "
         "       trim(externalcommand), "
-        "       if(tunechan='', 'Undefined', tunechan), "
-        "       if(startchan, startchan, ''), "
+        "       if (tunechan='', 'Undefined', tunechan), "
+        "       if (startchan, startchan, ''), "
         "       sourceid "
         "FROM capturecard, cardinput "
         "WHERE capturecard.cardid = :CARDID AND "

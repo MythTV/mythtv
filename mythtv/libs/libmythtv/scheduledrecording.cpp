@@ -469,7 +469,7 @@ void ScheduledRecording::runProgList(void)
 {
     ProgLister *pl = NULL;
 
-    if(search->intValue() && getRecordID())
+    if (search->intValue() && getRecordID())
     {
         ScheduledRecording rule;
         rule.loadByID(getRecordID());

@@ -564,7 +564,7 @@ QCString QCodecs::uuencode( const QByteArray& in )
 void QCodecs::uuencode( const QByteArray& in, QByteArray& out )
 {
     out.resize( 0 );
-    if( in.isEmpty() )
+    if (in.isEmpty() )
         return;
 
     unsigned int sidx = 0;
@@ -661,7 +661,7 @@ QCString QCodecs::uudecode( const QByteArray& in )
 void QCodecs::uudecode( const QByteArray& in, QByteArray& out )
 {
     out.resize( 0 );
-    if( in.isEmpty() )
+    if (in.isEmpty() )
         return;
 
     unsigned int sidx = 0;

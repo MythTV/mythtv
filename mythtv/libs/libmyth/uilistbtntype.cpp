@@ -808,7 +808,7 @@ void UIListTreeType::moveAwayFrom(UIListGenericTree *node)
 
 int UIListTreeType::getNumbItemsVisible()
 {
-    if(!currentlevel)
+    if (!currentlevel)
     {
         return 0;
     }

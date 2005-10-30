@@ -53,9 +53,9 @@ void AudioOutputNULL::CloseDevice()
 
 void AudioOutputNULL::WriteAudio(unsigned char* aubuf, int size)
 {
-    if(buffer_output_data_for_use)
+    if (buffer_output_data_for_use)
     {
-        if(size + current_buffer_size > NULLAUDIO_OUTPUT_BUFFER_SIZE)
+        if (size + current_buffer_size > NULLAUDIO_OUTPUT_BUFFER_SIZE)
         {
             VERBOSE(VB_IMPORTANT, "null audio output should not have just "
                                   "had data written to it");
@@ -71,7 +71,7 @@ void AudioOutputNULL::WriteAudio(unsigned char* aubuf, int size)
 int AudioOutputNULL::readOutputData(unsigned char *read_buffer, int max_length)
 {
     int amount_to_read = max_length;
-    if(amount_to_read > current_buffer_size)
+    if (amount_to_read > current_buffer_size)
     {
         amount_to_read = current_buffer_size;
     }
@@ -88,7 +88,7 @@ int AudioOutputNULL::readOutputData(unsigned char *read_buffer, int max_length)
 
 void AudioOutputNULL::Reset()
 {
-    if(buffer_output_data_for_use)
+    if (buffer_output_data_for_use)
     {
         pcm_output_buffer_mutex.lock();
             current_buffer_size = 0;
@@ -99,7 +99,7 @@ void AudioOutputNULL::Reset()
 
 inline int AudioOutputNULL::getBufferedOnSoundcard(void) 
 {
-    if(buffer_output_data_for_use)
+    if (buffer_output_data_for_use)
     {
         return current_buffer_size;
     }
@@ -110,7 +110,7 @@ inline int AudioOutputNULL::getBufferedOnSoundcard(void)
 
 inline int AudioOutputNULL::getSpaceOnSoundcard(void)
 {
-    if(buffer_output_data_for_use)
+    if (buffer_output_data_for_use)
     {
         return NULLAUDIO_OUTPUT_BUFFER_SIZE - current_buffer_size;
     }

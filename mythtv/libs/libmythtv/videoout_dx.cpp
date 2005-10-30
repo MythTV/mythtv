@@ -574,7 +574,7 @@ int VideoOutputDX::DirectXInitDDraw()
 
     OurDirectDrawCreate =
       (LPFNDDC)GetProcAddress(ddraw_dll, "DirectDrawCreate");
-    if ( OurDirectDrawCreate == NULL )
+    if (OurDirectDrawCreate == NULL )
     {
         VERBOSE(VB_ALL, "DirectXInitDDraw failed GetProcAddress");
         goto error;
@@ -851,7 +851,7 @@ int VideoOutputDX::DirectXCreateSurface(LPDIRECTDRAWSURFACE2 *pp_surface_final,
         VERBOSE(VB_ALL, "x: " << XJ_width << " y: " << XJ_height << " chrom :" << PRINT_FOURCC(i_chroma));
 
         dxresult = IDirectDraw2_CreateSurface(ddobject, &ddsd, &p_surface, NULL );
-        if ( dxresult != DD_OK )
+        if (dxresult != DD_OK )
         {
             VERBOSE(VB_ALL, "DD_CreateSurface failed " << hex << dxresult << dec);
 
@@ -1059,7 +1059,7 @@ int VideoOutputDX::NewPicture()
      * acceleration like rescaling, blitting or YUV->RGB conversions.
      * We then only need to blit this surface onto the main display when we
      * want to display it */
-    if ( !using_overlay )
+    if (!using_overlay )
     {
         if (chroma != MAKEFOURCC('R','G','B','X'))
         {
@@ -1266,7 +1266,7 @@ DWORD VideoOutputDX::DirectXFindColorkey(uint32_t i_color)
 
     VERBOSE(VB_ALL, "surface unlocked");
 
-    if ( IDirectDrawSurface2_GetDC(display, &hdc) == DD_OK )
+    if (IDirectDrawSurface2_GetDC(display, &hdc) == DD_OK )
     {
         i_rgb = GetPixel(hdc, 0, 0);
         IDirectDrawSurface2_ReleaseDC(display, hdc);
@@ -1274,7 +1274,7 @@ DWORD VideoOutputDX::DirectXFindColorkey(uint32_t i_color)
 
     ddsd.dwSize = sizeof(ddsd);
     dxresult = IDirectDrawSurface2_Lock(display, NULL, &ddsd, DDLOCK_WAIT, NULL );
-    if ( dxresult != DD_OK )
+    if (dxresult != DD_OK )
     {
         VERBOSE(VB_ALL, "surface lock failed: 0x" << hex << dxresult << dec);
         return i_rgb;

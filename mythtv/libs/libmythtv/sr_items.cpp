@@ -134,7 +134,7 @@ void SRStorageOptionsGroup::setEnabled(bool isScheduled, bool)
 
 void SRRecGroup::onGoingBack()
 {
-    if ( selectItem->getCurItemValue() == "__NEW_GROUP__" )
+    if (selectItem->getCurItemValue() == "__NEW_GROUP__" )
     {
         selectItem->selectValue("Default");
     }

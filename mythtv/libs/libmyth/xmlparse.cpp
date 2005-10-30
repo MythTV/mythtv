@@ -271,7 +271,7 @@ void XMLParse::parseFont(QDomElement &element)
     
     fontProp newFont;
     
-    if(baseFont)
+    if (baseFont)
         newFont = *baseFont;
 
     if ( haveSizeSmall && fontSizeType == "small")
@@ -279,7 +279,7 @@ void XMLParse::parseFont(QDomElement &element)
         if (sizeSmall > 0)
             size = sizeSmall;
     }
-    else if( haveSizeBig && fontSizeType == "big")
+    else if (haveSizeBig && fontSizeType == "big")
     {
         if (sizeBig > 0)
             size = sizeBig;
@@ -304,7 +304,7 @@ void XMLParse::parseFont(QDomElement &element)
     if (!haveFace && baseFont)
     {
         newFont.face = baseFont->face;
-        if(haveSize)
+        if (haveSize)
             newFont.face.setPointSize(size);
     }
     else

@@ -2171,7 +2171,7 @@ int JobQueue::UserJobTypeToIndex(int jobType)
             bits++;
             x = x >> 1;
         }
-        if( bits > 4 )
+        if ( bits > 4 )
             return JOB_NONE;
 
         return bits;

@@ -174,7 +174,7 @@ void AnalogScan::addChannel(int number,const QString& channumber,
     query.bindValue(":NAME",name);
     query.bindValue(":FREQID",frequency);
 
-    if(!query.exec())
+    if (!query.exec())
         MythContext::DBError("Adding new Channel", query);
 
     if (!query.isActive())

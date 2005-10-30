@@ -848,7 +848,7 @@ fe_code_rate DVBTuning::parseCodeRate(const QString &cr, bool &ok)
 {
     QString code_rate = cr.lower();
     ok = true;
-    if (     code_rate == "none") return FEC_NONE;
+    if (   code_rate == "none") return FEC_NONE;
     else if (code_rate == "auto") return FEC_AUTO;
     else if (code_rate ==  "8/9") return FEC_8_9;
     else if (code_rate ==  "7/8") return FEC_7_8;
@@ -871,7 +871,7 @@ fe_modulation DVBTuning::parseModulation(const QString &mod, bool &ok)
 {
     QString modulation = mod.lower();
     ok = true;
-    if (     modulation ==    "qpsk") return QPSK; 
+    if (   modulation ==    "qpsk") return QPSK; 
     else if (modulation ==    "auto") return QAM_AUTO;
     else if (modulation ==       "a") return QAM_AUTO;
     else if (modulation =="qam_auto") return QAM_AUTO;

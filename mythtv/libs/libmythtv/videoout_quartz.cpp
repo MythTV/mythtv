@@ -119,7 +119,7 @@ struct QuartzData
 //     {
 //         int32_t  val;
 // 
-//         if ( CFNumberGetValue(ref, kCFNumberSInt32Type, &val) )
+//         if (CFNumberGetValue(ref, kCFNumberSInt32Type, &val) )
 //             return val;
 //         else
 //             puts("getCFint32() - Failed to get 32bit int from value");

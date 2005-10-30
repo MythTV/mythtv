@@ -94,7 +94,7 @@ void RecOptDialog::paintEvent(QPaintEvent *e)
     QRect r = e->rect();
     QPainter p(this);
 
-    if ( updateAll || r.intersects(infoRect))
+    if (updateAll || r.intersects(infoRect))
         updateInfo(&p);
 
     listMenu.paintEvent(r, &p, updateAll);

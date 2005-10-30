@@ -76,7 +76,7 @@ DVBConfParser::DVBConfParser(enum TYPE _type,unsigned _sourceid,
 int DVBConfParser::parse()
 {
     QFile file( filename );
-    if ( file.open( IO_ReadOnly ) ) 
+    if (file.open( IO_ReadOnly ) ) 
     {
         QTextStream stream( &file );
         QString line;
@@ -277,7 +277,7 @@ int DVBConfParser::generateNewChanID(int sourceID)
                 "FROM channel WHERE sourceid=%1").arg(sourceID);
     query.prepare(theQuery);
 
-    if(!query.exec())
+    if (!query.exec())
         MythContext::DBError("Calculating new ChanID", query);
 
     if (!query.isActive())
@@ -337,7 +337,7 @@ int DVBConfParser::findMultiplex(const DVBConfParser::Multiplex& m)
         break;
     } 
     query.prepare(queryStr);
-    if(!query.exec())
+    if (!query.exec())
         MythContext::DBError("searching for transport", query);
     if (!query.isActive())
         MythContext::DBError("searching for transport.", query);
@@ -358,7 +358,7 @@ int DVBConfParser::findChannel(const DVBConfParser::Channel& c)
     query.bindValue(":SOURCEID",sourceid);
     query.bindValue(":CALLSIGN",c.name.utf8());
 
-    if(!query.exec())
+    if (!query.exec())
         MythContext::DBError("searching for channel", query);
     if (!query.isActive())
         MythContext::DBError("searching for channel.", query);
@@ -428,12 +428,12 @@ void DVBConfParser::processChannels()
             query.bindValue(":FEC",multiplexes[i].fec.toString());
             query.bindValue(":POLARITY",multiplexes[i].polarity.toString());
 
-            if(!query.exec())
+            if (!query.exec())
                 MythContext::DBError("Inserting new transport", query);
             if (!query.isActive())
                 MythContext::DBError("Adding transport to Database.", query);
             query.prepare("select max(mplexid) from dtv_multiplex;");
-            if(!query.exec())
+            if (!query.exec())
                 MythContext::DBError("Getting ID of new Transport", query);
             if (!query.isActive())
                 MythContext::DBError("Getting ID of new Transport.", query);
@@ -464,7 +464,7 @@ void DVBConfParser::processChannels()
             query.bindValue(":NAME",(*iter).name.utf8());
             query.bindValue(":MPLEXID",multiplexes[(*iter).mplexnumber].mplexid);
             query.bindValue(":SERVICEID",(*iter).serviceid);
-            if(!query.exec())
+            if (!query.exec())
                 MythContext::DBError("Adding new DVB Channel", query);
 
             if (!query.isActive())

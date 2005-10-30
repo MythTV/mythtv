@@ -1661,7 +1661,7 @@ bool UIAnimatedImageType::LoadImage(int imageNo)
 
 void UIAnimatedImageType::Draw(QPainter *dr, int drawlayer, int context)
 {
-    if(hidden)
+    if (hidden)
     {
         return;
     }
@@ -1930,7 +1930,7 @@ UITextType::UITextType(const QString &name, fontProp *font,
 {
 
     m_name = name;
-    if(text.length())
+    if (text.length())
         m_message = text;
     else
         m_message = " ";

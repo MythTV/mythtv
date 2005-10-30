@@ -109,7 +109,7 @@ class DVDRingBufferPriv
         {
             if (isInMenu())
             {
-                if((part <= DVD_MENU_MAX) && dvdnav_menu_table[part] )
+                if ((part <= DVD_MENU_MAX) && dvdnav_menu_table[part] )
                 {
                     desc = QString("%1 Menu").arg(dvdnav_menu_table[part]);
                 }
@@ -149,7 +149,7 @@ class DVDRingBufferPriv
                     dvdRet = dvdnav_get_number_of_titles(dvdnav, &numTitles);
                 }
                 
-                if( dvdRet == DVDNAV_STATUS_ERR)
+                if ( dvdRet == DVDNAV_STATUS_ERR)
                 {
                     VERBOSE(VB_IMPORTANT, QString("Failed to get the number of titles on the DVD" ));
                 } 
@@ -219,7 +219,7 @@ class DVDRingBufferPriv
                 
                 // Use the next_cache_block instead of the next_block to avoid a memcpy inside libdvdnav
                 dvdStat = dvdnav_get_next_cache_block( dvdnav, &blockBuf, &dvdEvent, &dvdEventSize);
-                if(dvdStat == DVDNAV_STATUS_ERR) 
+                if (dvdStat == DVDNAV_STATUS_ERR) 
                 {
                     VERBOSE(VB_IMPORTANT, QString("Error reading block from DVD: %1")
                                                  .arg(dvdnav_err_to_string(dvdnav)));
@@ -1435,7 +1435,7 @@ long long RingBuffer::Seek(long long pos, int whence)
     
         if (remotefile)
             ret = remotefile->Seek(pos, whence, readpos);
-        else if(dvdPriv)
+        else if (dvdPriv)
         {
             dvdPriv->Seek(pos, whence);
         }

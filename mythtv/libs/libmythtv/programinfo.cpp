@@ -1712,7 +1712,7 @@ void ProgramInfo::SetAutoExpire(bool autoExpire) const
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
 
-    if(!query.exec() || !query.isActive())
+    if (!query.exec() || !query.isActive())
         MythContext::DBError("AutoExpire update",
                              query);
 }
@@ -2132,7 +2132,7 @@ void ProgramInfo::SetPositionMap(QMap<long long, long long> &posMap, int type,
         comp += tempc;
     }
 
-    if(isVideo)
+    if (isVideo)
     {
         query.prepare("DELETE FROM filemarkup"
                       " WHERE filename = :PATH"
@@ -3044,7 +3044,7 @@ void ProgramInfo::showDetails(void) const
     p->rectype = kSingleRecord; // must be != kNotRecording
     p->recstatus = recstatus;
 
-    if ( p->recstatus == rsPreviousRecording ||  p->recstatus == rsUnknown)
+    if (p->recstatus == rsPreviousRecording ||  p->recstatus == rsUnknown)
     {
         query.prepare("SELECT recstatus, starttime "
                       "FROM oldrecorded WHERE duplicate > 0 AND "

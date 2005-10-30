@@ -460,12 +460,12 @@ void MythListButton::MoveDown(MovementUnit unit)
 
 bool MythListButton::MoveToNamedPosition(const QString &position_name)
 {
-    if(m_selPosition < 0)
+    if (m_selPosition < 0)
     {
         return false;
     }
 
-    if(!m_selIterator->toFirst())
+    if (!m_selIterator->toFirst())
     {
         return false;
     }
@@ -474,7 +474,7 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
     bool found_it = false;
     while(m_selIterator->current())
     {
-        if(m_selIterator->current()->text() == position_name)
+        if (m_selIterator->current()->text() == position_name)
         {
             found_it = true;
             break;
@@ -483,7 +483,7 @@ bool MythListButton::MoveToNamedPosition(const QString &position_name)
         ++m_selPosition;
     }
 
-    if(!found_it)
+    if (!found_it)
     {
         m_selPosition = -1;
         return false;

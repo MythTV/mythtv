@@ -47,12 +47,12 @@ MythUIType::~MythUIType()
     //  delete debugging images if they exist
     //
     
-    if(m_debug_hor_line)
+    if (m_debug_hor_line)
     {
         m_debug_hor_line->DownRef();
         m_debug_hor_line = NULL;
     }
-    if(m_debug_ver_line)
+    if (m_debug_ver_line)
     {
         m_debug_ver_line->DownRef();
         m_debug_ver_line = NULL;
@@ -262,7 +262,7 @@ void MythUIType::Draw(MythPainter *p, int xoffset, int yoffset, int alphaMod,
     
     if (m_debug_mode && m_Area.width() > 0 && m_Area.height() > 0)
     {
-        if(!m_debug_hor_line || !m_debug_ver_line)
+        if (!m_debug_hor_line || !m_debug_ver_line)
         {
             makeDebugImages();
         }

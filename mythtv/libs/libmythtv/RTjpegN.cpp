@@ -170,7 +170,7 @@ int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
 	break;
    }
 
-   if( bitoff == 0 ) {
+   if ( bitoff == 0 ) {
       ustrm[co]= bitten; 
       bitten = 0;
       bitoff = 8; 
@@ -181,7 +181,7 @@ int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
  }
  
  /* ci must be 0 */
- if(bitoff != 6) {
+ if (bitoff != 6) {
 
       ustrm[co]= bitten; 
       co++;
@@ -213,14 +213,14 @@ HERZWEH:
 
    ZZvalue = data[RTjpeg_ZZ[ci]];
 
-   if( (ZZvalue > 7) || (ZZvalue < -7) ) {
+   if ( (ZZvalue > 7) || (ZZvalue < -7) ) {
         bitten |= (0x08<<bitoff);
 	goto HIRNWEH;
    } 
    
    bitten |= (ZZvalue&0xf)<<bitoff;
 
-   if( bitoff == 0 ) {
+   if ( bitoff == 0 ) {
       ustrm[co]= bitten; 
       bitten = 0;
       bitoff = 8;
@@ -230,7 +230,7 @@ HERZWEH:
  }
  
  /* ci must be 0 */
- if( bitoff == 0 ) {
+ if ( bitoff == 0 ) {
     ustrm[co]= bitten; 
     co++;
  }  
@@ -247,7 +247,7 @@ HIRNWEH:
 
    ZZvalue = data[RTjpeg_ZZ[ci]];
 
-   if(ZZvalue>0) 
+   if (ZZvalue>0) 
    {
      strm[co++]=(int8_t)(ZZvalue>127)?127:ZZvalue;
    } 
@@ -336,7 +336,7 @@ int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, int32_t *qtbla)
     break;	
   } 
 
-  if( bitoff == 0 ) {
+  if ( bitoff == 0 ) {
     bitoff = 8;
     ci++;
   }
@@ -375,19 +375,19 @@ FUSSWEG:
 
   i=RTjpeg_ZZ[co];
 
-  if( bitten == 0x08 ) {
+  if ( bitten == 0x08 ) {
     goto STRASSE;
   }
 
   /* the compiler cannot do sign extension for signed nibbles */
-  if( bitten & 0x08 ) {
+  if ( bitten & 0x08 ) {
     bitten |= 0xf0;
   }
   /* the unsigned char bitten now is a valid signed char */
    
   data[i]=((signed char)bitten)*qtbl[i];
   
-  if( bitoff == 0 ) {
+  if ( bitoff == 0 ) {
     bitoff = 8;
     ci++;
   }
@@ -446,7 +446,7 @@ int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
  {
 	ZZvalue = data[RTjpeg_ZZ[ci]];
 
-   if(ZZvalue>0) 
+   if (ZZvalue>0) 
 	{
      strm[co++]=(int8_t)(ZZvalue>127)?127:ZZvalue;
    } 
@@ -460,11 +460,11 @@ int RTjpeg::b2s(int16_t *data, int8_t *strm, uint8_t bt8)
  {
   ZZvalue = data[RTjpeg_ZZ[ci]];
 
-  if(ZZvalue>0)
+  if (ZZvalue>0)
   {
    strm[co++]=(int8_t)(ZZvalue>63)?63:ZZvalue;
   } 
-  else if(ZZvalue<0)
+  else if (ZZvalue<0)
   {
    strm[co++]=(int8_t)(ZZvalue<-64)?-64:ZZvalue;
   } 
@@ -500,7 +500,7 @@ int RTjpeg::s2b(int16_t *data, int8_t *strm, uint8_t bt8, uint32_t *qtbla)
  
  for(; co<64; co++)
  {
-  if(strm[ci]>63)
+  if (strm[ci]>63)
   {
    tmp=co+strm[ci]-63;
    for(; co<tmp; co++)data[RTjpeg_ZZ[co]]=0;
@@ -2967,25 +2967,25 @@ inline void RTjpeg::decompressYUV422(int8_t *sp, uint8_t **planes)
  for(i=height; i; i-=8)
  {
   for(k=0, j=0; j<width; j+=16, k+=8) {
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, lb8, liqt);
     Idct(bp+j, block, width);
    }
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, lb8, liqt);
     Idct(bp+j+8, block, width);
    }
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, cb8, ciqt);
     Idct(bp2+k, block, width>>1);
    } 
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, cb8, ciqt);
@@ -3017,37 +3017,37 @@ inline void RTjpeg::decompressYUV420(int8_t *sp, uint8_t **planes)
  for(i=height>>1; i; i-=8)
  {
   for(k=0, j=0; j<width; j+=16, k+=8) {
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, lb8, liqt);
     Idct(bp+j, block, width);
    }
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, lb8, liqt);
     Idct(bp+j+8, block, width);
    }
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, lb8, liqt);
     Idct(bp1+j, block, width);
    }
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, lb8, liqt);
     Idct(bp1+j+8, block, width);
    }
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, cb8, ciqt);
     Idct(bp2+k, block, width>>1);
    } 
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, cb8, ciqt);
@@ -3077,7 +3077,7 @@ inline void RTjpeg::decompress8(int8_t *sp, uint8_t **planes)
  for(i=0; i<height; i+=8)
  {
   for(j=0; j<width; j+=8)
-   if(*sp==-1)sp++;
+   if (*sp==-1)sp++;
    else
    { 
     sp += s2b(block, sp, lb8, liqt);
@@ -3124,7 +3124,7 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *old, mmx_t *mask)
  }
  movq_r2m(mm5, result);
  
- if(result.q)
+ if (result.q)
  {
   for(i=0; i<16; i++)((uint64_t *)old)[i]=((uint64_t *)rblock)[i];
   return 0;
@@ -3138,7 +3138,7 @@ int RTjpeg::bcomp(int16_t *rblock, int16_t *old, uint16_t *mask)
  int i;
 
  for(i=0; i<64; i++)
-  if(abs(old[i]-rblock[i])>*mask)
+  if (abs(old[i]-rblock[i])>*mask)
   {
    for(i=0; i<16; i++)((uint64_t *)old)[i]=((uint64_t *)rblock)[i];
    return 0;
@@ -3166,7 +3166,7 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
   {
    DctY(bp+j, Ywidth);
    Quant(block, lqt);
-   if(bcomp(block, lblock, &lmask))
+   if (bcomp(block, lblock, &lmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3175,7 +3175,7 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
 
    DctY(bp+j+8, Ywidth);
    Quant(block, lqt);
-   if(bcomp(block, lblock, &lmask))
+   if (bcomp(block, lblock, &lmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3184,7 +3184,7 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
 
    DctY(bp1+j, Ywidth);
    Quant(block, lqt);
-   if(bcomp(block, lblock, &lmask))
+   if (bcomp(block, lblock, &lmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3193,7 +3193,7 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
 
    DctY(bp1+j+8, Ywidth);
    Quant(block, lqt);
-   if(bcomp(block, lblock, &lmask))
+   if (bcomp(block, lblock, &lmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3202,7 +3202,7 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
 
    DctY(bp2+k, Cwidth);
    Quant(block, cqt);
-   if(bcomp(block, lblock, &cmask))
+   if (bcomp(block, lblock, &cmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3211,7 +3211,7 @@ inline int RTjpeg::mcompressYUV420(int8_t *sp, uint8_t **planes)
 
    DctY(bp3+k, Cwidth);
    Quant(block, cqt);
-   if(bcomp(block, lblock, &cmask))
+   if (bcomp(block, lblock, &cmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3247,7 +3247,7 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
   {
    DctY(bp+j, Ywidth);
    Quant(block, lqt);
-   if(bcomp(block, lblock, &lmask))
+   if (bcomp(block, lblock, &lmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3256,7 +3256,7 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
 
    DctY(bp+j+8, Ywidth);
    Quant(block, lqt);
-   if(bcomp(block, lblock, &lmask))
+   if (bcomp(block, lblock, &lmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3265,7 +3265,7 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
 
    DctY(bp2+k, Cwidth);
    Quant(block, cqt);
-   if(bcomp(block, lblock, &cmask))
+   if (bcomp(block, lblock, &cmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3274,7 +3274,7 @@ inline int RTjpeg::mcompressYUV422(int8_t *sp, uint8_t **planes)
 
    DctY(bp3+k, Cwidth);
    Quant(block, cqt);
-   if(bcomp(block, lblock, &cmask))
+   if (bcomp(block, lblock, &cmask))
    {
     *((uint8_t *)sp++)=255;
    } 
@@ -3307,7 +3307,7 @@ inline int RTjpeg::mcompress8(int8_t *sp, uint8_t **planes)
   {
    DctY(bp+j, width);
    Quant(block, lqt);
-   if(bcomp(block, lblock, &lmask))
+   if (bcomp(block, lblock, &lmask))
    {
     *((uint8_t *)sp++)=255;
    } else sp+=b2s(block, sp, lb8);
@@ -3331,7 +3331,7 @@ int RTjpeg::Compress(int8_t *sp, uint8_t **planes)
  RTjpeg_frameheader * fh = (RTjpeg_frameheader *)sp;
  int ds = 0;
 
- if(key_rate == 0)
+ if (key_rate == 0)
  {
   switch(f)
   {
@@ -3341,7 +3341,7 @@ int RTjpeg::Compress(int8_t *sp, uint8_t **planes)
   }
   fh->key = 0;
  } else {
-  if(key_count == 0)
+  if (key_count == 0)
    memset(old, 0, ((4 * width * height)));
   switch(f)
   {
@@ -3350,7 +3350,7 @@ int RTjpeg::Compress(int8_t *sp, uint8_t **planes)
    case RTJ_RGB8: ds = mcompress8((int8_t*)&(fh->data), planes); break;
   }
   fh->key = key_count;
-  if(++key_count > key_rate)
+  if (++key_count > key_rate)
    key_count = 0;
  }
  ds += RTJPEG_HEADER_SIZE;
@@ -3367,14 +3367,14 @@ void RTjpeg::Decompress(int8_t *sp, uint8_t **planes)
 {
  RTjpeg_frameheader * fh = (RTjpeg_frameheader *)sp;
 
- if((RTJPEG_SWAP_HALFWORD(fh->width) != width)||
+ if ((RTJPEG_SWAP_HALFWORD(fh->width) != width)||
     (RTJPEG_SWAP_HALFWORD(fh->height) != height))
  {
   int w = RTJPEG_SWAP_HALFWORD(fh->width);
   int h = RTJPEG_SWAP_HALFWORD(fh->height);
   SetSize(&w, &h);
  }
- if(fh->quality != Q)
+ if (fh->quality != Q)
  {
   int q = fh->quality;
   SetQuality(&q);

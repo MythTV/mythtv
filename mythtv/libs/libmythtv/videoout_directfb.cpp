@@ -733,25 +733,25 @@ int VideoOutputDirectfb::ChangePictureAttribute(int attributeType, int newValue)
 
     switch (attributeType) {
     case kPictureAttribute_Brightness:
-        if ( data->videoLayerDesc.caps & DLCAPS_BRIGHTNESS ) {
+        if (data->videoLayerDesc.caps & DLCAPS_BRIGHTNESS ) {
             adj.flags = DCAF_BRIGHTNESS;
             adj.brightness = (unsigned short)(0xffff*newValue/100);
         }
         break;
     case kPictureAttribute_Contrast:
-        if ( data->videoLayerDesc.caps & DLCAPS_CONTRAST ) {
+        if (data->videoLayerDesc.caps & DLCAPS_CONTRAST ) {
             adj.flags = DCAF_CONTRAST;
             adj.contrast = (unsigned short)(0xffff*newValue/100);
         }
         break;
     case kPictureAttribute_Colour:
-        if ( data->videoLayerDesc.caps & DLCAPS_SATURATION ) {
+        if (data->videoLayerDesc.caps & DLCAPS_SATURATION ) {
             adj.flags = DCAF_SATURATION;
             adj.saturation = (unsigned short)(0xffff*newValue/100);
         }
         break;
     case kPictureAttribute_Hue:
-        if ( data->videoLayerDesc.caps & DLCAPS_HUE ) {
+        if (data->videoLayerDesc.caps & DLCAPS_HUE ) {
             adj.flags = DCAF_HUE;
             adj.hue = (unsigned short)(0xffff*newValue/100);
         }

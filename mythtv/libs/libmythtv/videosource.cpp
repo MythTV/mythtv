@@ -1613,7 +1613,7 @@ void CaptureCard::fillSelections(SelectSetting* setting)
         while (query.next())
         { 
             // dont like doing this..
-            if(query.value(0).toString() == "FIREWIRE") 
+            if (query.value(0).toString() == "FIREWIRE") 
             {
                 setting->addSelection(
                       "[ " + query.value(0).toString() + " Port: " +
@@ -1621,7 +1621,7 @@ void CaptureCard::fillSelections(SelectSetting* setting)
                              query.value(4).toString() + "]",
                              query.value(2).toString());
             } 
-            else if(query.value(0).toString() == "DBOX2")
+            else if (query.value(0).toString() == "DBOX2")
             {
                 setting->addSelection(
                     "[ " + query.value(0).toString() + " " + 
@@ -2368,7 +2368,7 @@ void CardInputEditor::load()
                     addSelection(label, index);
                 }
             }
-            else if(capturecards.value(2).toString() == "FIREWIRE")
+            else if (capturecards.value(2).toString() == "FIREWIRE")
             {
                 inputs = QStringList("MPEG2TS");
                 for (QStringList::iterator i = inputs.begin();
@@ -2390,7 +2390,7 @@ void CardInputEditor::load()
                     addSelection(label, index);
                 }
             }
-            else if(capturecards.value(2).toString() == "DBOX2")
+            else if (capturecards.value(2).toString() == "DBOX2")
             {
                 inputs = QStringList("MPEG2TS");
                 for (QStringList::iterator i = inputs.begin();

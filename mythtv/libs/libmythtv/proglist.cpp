@@ -903,7 +903,7 @@ void ProgLister::powerEdit()
 
     QStringList field = QStringList::split( ":", text, true);
 
-    if ( field.count() != 6)
+    if (field.count() != 6)
     {
         VERBOSE(VB_IMPORTANT, QString("Error. PowerSearch %1 has %2 fields")
                 .arg(text).arg(field.count()));

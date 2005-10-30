@@ -234,7 +234,7 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
 
     query.prepare(theQuery);
 
-    if(!query.exec())
+    if (!query.exec())
         MythContext::DBError("Loading Private Types for SIParser", query);
 
     if (!query.isActive())
@@ -621,7 +621,7 @@ void SIParser::ParsePAT(tablehead_t *head, uint8_t *buffer,int size)
 
     // Check to see if you have already loaded all of the PAT sections
     // ISO 13818-1 state that PAT can be segmented, although it rarely is
-    if(((PATHandler*) Table[PAT])->Tracker.AddSection(head))
+    if (((PATHandler*) Table[PAT])->Tracker.AddSection(head))
         return;
 
     SIPARSER(QString("PAT Version = %1").arg(head->version));
@@ -2038,7 +2038,7 @@ void SIParser::ProcessShortEventDescriptor(uint8_t *buf, int, Event &e)
     e.Event_Name = DecodeText(buf + 6, event_name_len);
     e.Event_Subtitle = DecodeText(buf + event_name_len + 7, text_char_len);
 
-    if(e.Event_Subtitle == e.Event_Name)
+    if (e.Event_Subtitle == e.Event_Name)
         e.Event_Subtitle= "";
 }
 
@@ -2704,7 +2704,7 @@ int SIParser::Huffman2GetBit(int bit_index, uint8_t *byteptr)
     byte_offset = bit_index / 8;
     bit_number  = bit_index - ( byte_offset * 8 );
 
-    if ( byteptr[ byte_offset ] & ( 1 << (7 - bit_number) ) )
+    if (byteptr[ byte_offset ] & ( 1 << (7 - bit_number) ) )
         return 1;
     else
         return 0;
@@ -2734,7 +2734,7 @@ int SIParser::Huffman2ToQString(uint8_t *compressed, int length, int table,
     struct huffman_table *ptrTable;
 
     // Determine which huffman table to use
-    if ( table == 1 )
+    if (table == 1 )
     {
         table_size = 128;
         ptrTable   = Table128; 
@@ -2755,7 +2755,7 @@ int SIParser::Huffman2ToQString(uint8_t *compressed, int length, int table,
         {
             bits = Huffman2GetBits(
                 current_bit, ptrTable[i].number_of_bits, compressed );
-            if ( bits == ptrTable[i].encoded_sequence ) 
+            if (bits == ptrTable[i].encoded_sequence ) 
             {
                 if ((ptrTable[i].character < 128) && 
                     (ptrTable[i].character > 30))
@@ -2766,7 +2766,7 @@ int SIParser::Huffman2ToQString(uint8_t *compressed, int length, int table,
         }
         // if we get here then the bit sequence was not found ... 
         // ...problem try to recover
-        if ( i == table_size ) 
+        if (i == table_size ) 
             current_bit += 1;
     }
     return count;

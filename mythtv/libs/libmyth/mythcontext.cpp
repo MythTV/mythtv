@@ -315,7 +315,7 @@ bool MythContextPrivate::Init(bool gui)
     {
         if (m_gui && PromptForDatabaseParams())
         {
-            if(!MSqlQuery::testDBConnection())
+            if (!MSqlQuery::testDBConnection())
             {
                 return false;
             }

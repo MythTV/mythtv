@@ -262,7 +262,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
 
     int64_t adj_cur_dts = st->cur_dts;
 
-    if(ic->start_time != (int64_t)AV_NOPTS_VALUE)
+    if (ic->start_time != (int64_t)AV_NOPTS_VALUE)
     {
         int64_t st1 = av_rescale(ic->start_time,
                                 st->time_base.den,

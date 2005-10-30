@@ -197,7 +197,7 @@ void MythUIText::StopCycling(void)
 
 MythUIText::~MythUIText()
 {
-    if(m_Font)
+    if (m_Font)
     {
         delete m_Font;
         m_Font = NULL;

@@ -1276,7 +1276,7 @@ bool ThemedMenuPrivate::parseMenu(const QString &menuname, int row, int col)
     {
         VERBOSE(VB_IMPORTANT, QString("ThemedMenuPrivate: Couldn't read "
                                       "menu file %1").arg(menuname));
-        if(menuname == "mainmenu.xml" )
+        if (menuname == "mainmenu.xml" )
         {
             return false;
         }

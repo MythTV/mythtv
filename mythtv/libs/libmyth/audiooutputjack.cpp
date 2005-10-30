@@ -52,7 +52,7 @@ bool AudioOutputJACK::OpenDevice()
     unsigned int jack_port_name_count=0;
     const char *jack_port_name=NULL;
     
-    if(!audiodevice.isEmpty()) {
+    if (!audiodevice.isEmpty()) {
         jack_port_flags = 0;
         jack_port_name_count = 1;
         jack_port_name = audiodevice.ascii();
