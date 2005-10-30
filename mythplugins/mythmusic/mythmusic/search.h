@@ -1,7 +1,9 @@
 #ifndef SEARCH_H_
 #define SEARCH_H_
 
+#include <qregexp.h>
 #include <mythtv/mythdialogs.h>
+#include <mythtv/mythwidgets.h>
 
 class SearchListBoxItem: public QListBoxText
 {

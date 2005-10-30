@@ -6,7 +6,7 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
-
+#include <mythtv/uitypes.h>
 #include "videofilter.h"
 
 VideoFilterSettings::VideoFilterSettings(bool loaddefaultsettings, const QString& _prefix)

@@ -23,8 +23,11 @@
 #include <qimage.h>
 #include <qfileinfo.h>
 #include <qdir.h>
+#include <qtimer.h>
+#include <qpainter.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/util.h>
 
 #include "singleview.h"
 #include "constants.h"

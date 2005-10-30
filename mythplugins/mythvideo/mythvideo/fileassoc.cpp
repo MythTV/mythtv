@@ -12,6 +12,7 @@
 #include <qaccel.h>
 
 #include "fileassoc.h"
+#include <mythtv/uitypes.h>
 
 FileAssociation::FileAssociation(const QString &new_extension)
 {

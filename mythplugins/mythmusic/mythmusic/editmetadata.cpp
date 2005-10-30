@@ -352,7 +352,7 @@ bool EditMetadataDialog::showList(QString caption, QString &value)
     searchDialog->setCaption(caption);
     searchDialog->setSearchText(value);
     searchDialog->setItems(searchList);
-    if (searchDialog->ExecPopup() == 0)
+    if (searchDialog->ExecPopupAtXY(-1, 8) == 0)
     {
         value = searchDialog->getResult();
         res = true;

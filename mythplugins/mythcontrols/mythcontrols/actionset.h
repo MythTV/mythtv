@@ -24,6 +24,7 @@
 #ifndef ACTIONSET_H
 #define ACTIONSET_H
 
+#include <qdict.h>
 
 /**
  * @brief The statically assigned context for jump point actions.

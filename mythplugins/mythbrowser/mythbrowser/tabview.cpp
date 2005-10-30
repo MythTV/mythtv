@@ -36,6 +36,7 @@
 
 #include "mythtv/mythcontext.h"
 #include "mythtv/mythdbcon.h"
+#include "mythtv/mythwidgets.h"
 
 using namespace std;
 

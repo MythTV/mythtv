@@ -28,8 +28,10 @@
 #include <qsize.h>
 #include <qfileinfo.h>
 #include <qdir.h>
+#include <qpainter.h>
 
 #include <mythtv/mythcontext.h>
+#include <mythtv/util.h>
 
 #include "glsingleview.h"
 #include "galleryutil.h"

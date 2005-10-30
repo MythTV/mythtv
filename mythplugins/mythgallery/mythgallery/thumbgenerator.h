@@ -25,6 +25,7 @@
 #include <qthread.h>
 #include <qstring.h>
 #include <qstringlist.h>
+#include <qimage.h>
 
 class QObject;
 class QImage;

@@ -9,9 +9,9 @@
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
+#include <mythtv/uitypes.h>
 
 #include "editmetadata.h"
-
 
 EditMetadataDialog::EditMetadataDialog(const Metadata *source_metadata,
                                        MythMainWindow *parent, 
