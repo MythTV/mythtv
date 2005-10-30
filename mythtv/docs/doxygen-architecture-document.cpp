@@ -294,7 +294,7 @@ might get are dispatched with qApp->postEvent(), then you can
 safely use deleteLater() to queue your object up for deletion
 in the event thread.
 
-MythTV is a very much a multithreaded program so you may need to have
+%MythTV is a very much a multithreaded program so you may need to have
 a QObject that may get events from another thread if you send signals
 but do not get any signals and or events from outside the Qt event
 thread, then you can use deleteLater() or delete depending on whether
