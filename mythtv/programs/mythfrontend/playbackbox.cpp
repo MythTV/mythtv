@@ -40,18 +40,17 @@ using namespace std;
 static int comp_programid(ProgramInfo *a, ProgramInfo *b)
 {
     if (a->programid == b->programid)
-    {
-        if (a->recstartts == b->recstartts)
-            return 0;
-        if (a->recstartts < b->recstartts)
-            return -1;
-        else
-            return 1;
-    }
-    if (a->programid < b->programid)
-        return -1;
+        return (a->recstartts < b->recstartts ? 1 : -1);
     else
-        return 1;
+        return (a->programid < b->programid ? 1 : -1);
+}
+
+static int comp_programid_rev(ProgramInfo *a, ProgramInfo *b)
+{
+    if (a->programid == b->programid)
+        return (a->recstartts > b->recstartts ? 1 : -1);
+    else
+        return (a->programid > b->programid ? 1 : -1);
 }
 
 static int comp_originalAirDate(ProgramInfo *a, ProgramInfo *b)
@@ -69,18 +68,29 @@ static int comp_originalAirDate(ProgramInfo *a, ProgramInfo *b)
         dt2 = b->startts.date();
 
     if (dt1 == dt2)
-    {
-        if (a->recstartts == b->recstartts)
-            return 0;
-        if (a->recstartts < b->recstartts)
-            return -1;
-        else
-            return 1;
-    }
-    if (dt1 < dt2)
-        return -1;
+        return (a->recstartts < b->recstartts ? 1 : -1);
     else
-        return 1;
+        return (dt1 < dt2 ? 1 : -1);
+}
+
+static int comp_originalAirDate_rev(ProgramInfo *a, ProgramInfo *b)
+{
+    QDate dt1, dt2;
+
+    if (a->hasAirDate)
+        dt1 = a->originalAirDate;
+    else
+        dt1 = a->startts.date();
+
+    if (b->hasAirDate)
+        dt2 = b->originalAirDate;
+    else
+        dt2 = b->startts.date();
+
+    if (dt1 == dt2)
+        return (a->recstartts > b->recstartts ? 1 : -1);
+    else
+        return (dt1 > dt2 ? 1 : -1);
 }
 
 PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent, 
@@ -1422,7 +1432,12 @@ bool PlaybackBox::FillList()
         for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
         {
             if (!Iprog.key().isEmpty())
-                Iprog.data().Sort(comp_originalAirDate);
+            {
+                if (listOrder == 0 || type == Delete)
+                    Iprog.data().Sort(comp_originalAirDate_rev);
+                else
+                    Iprog.data().Sort(comp_originalAirDate);
+            }
         }
     }
     else if (episodeSort == "Id")
@@ -1431,7 +1446,12 @@ bool PlaybackBox::FillList()
         for (Iprog = progLists.begin(); Iprog != progLists.end(); ++Iprog)
         {
             if (!Iprog.key().isEmpty())
-                Iprog.data().Sort(comp_programid);
+            {
+                if (listOrder == 0 || type == Delete)
+                    Iprog.data().Sort(comp_programid_rev);
+                else
+                    Iprog.data().Sort(comp_programid);
+            }
         }
     }
     
@@ -1469,25 +1489,41 @@ bool PlaybackBox::FillList()
         {
             p = l->at(i);
 
-            if (episodeSort == "OrigAirDate" && titleIndex > 0)
+            if (listOrder == 0 || type == Delete)
             {
-                if (oldoriginalAirDate > p->originalAirDate)
-                    break;
-            }
-            else if (episodeSort == "Id" && titleIndex > 0)
-            {
-                if (oldprogramid > p->programid)
-                    break;
-            }
-            else if (listOrder == 0 || type == Delete)
-            {
-                if (oldstartts > p->recstartts)
-                    break;
+                if (episodeSort == "OrigAirDate" && titleIndex > 0)
+                {
+                    if (oldoriginalAirDate > p->originalAirDate)
+                        break;
+                }
+                else if (episodeSort == "Id" && titleIndex > 0)
+                {
+                    if (oldprogramid > p->programid)
+                        break;
+                }
+                else 
+                {
+                    if (oldstartts > p->recstartts)
+                        break;
+                }
             }
             else
             {
-                if (oldstartts < p->recstartts)
-                    break;
+                if (episodeSort == "OrigAirDate" && titleIndex > 0)
+                {
+                    if (oldoriginalAirDate < p->originalAirDate)
+                        break;
+                }
+                else if (episodeSort == "Id" && titleIndex > 0)
+                {
+                    if (oldprogramid < p->programid)
+                        break;
+                }
+                else
+                {
+                    if (oldstartts < p->recstartts)
+                        break;
+                }
             }
 
             progIndex = i;
