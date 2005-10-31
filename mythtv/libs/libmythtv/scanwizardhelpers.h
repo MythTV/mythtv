@@ -141,6 +141,19 @@ class TransportSetting : public ComboBoxSetting
     void sourceID(const QString& str);
 };
 
+class IgnoreSignalTimeout : public CheckBoxSetting, public TransientStorage
+{
+  public:
+    IgnoreSignalTimeout()
+    {
+        setLabel(tr("Ignore Signal Timeout"));
+        setHelpText(
+            tr("This option allows you to slow down the scan for "
+               "broken drivers, such as the DVB drivers for the "
+               "Leadtek LR6650 DVB card."));
+    }
+};
+
 class CaptureCardSetting: public ComboBoxSetting
 {
     Q_OBJECT
@@ -220,9 +233,11 @@ class ScanOptionalConfig: public VerticalConfigurationGroup,
   public:
     ScanOptionalConfig(ScanWizard* wizard, ScanTypeSetting* scanType);
 
-    TransportSetting *transport;
-    ScanCountry *country;
-    ScanFileImport *filename;
+    ScanCountry         *country;
+    TransportSetting    *transport;
+    IgnoreSignalTimeout *ignoreSignalTimeoutOne;
+    IgnoreSignalTimeout *ignoreSignalTimeoutAll;
+    ScanFileImport      *filename;
   protected slots:
     void triggerChanged(const QString&);
 };

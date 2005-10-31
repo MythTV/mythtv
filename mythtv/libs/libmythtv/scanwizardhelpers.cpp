@@ -338,30 +338,54 @@ ScanCountry::ScanCountry()
 
 ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
                                       ScanTypeSetting *scanType) : 
-                  VerticalConfigurationGroup(false,false,true,true)
+    VerticalConfigurationGroup(false,false,true,true),
+    country(new ScanCountry()),
+    transport(new TransportSetting()),
+    ignoreSignalTimeoutOne(new IgnoreSignalTimeout()),
+    ignoreSignalTimeoutAll(new IgnoreSignalTimeout()),
+    filename(new ScanFileImport())
 {
     setUseLabel(false);
     setTrigger(scanType);
+
     // only save settings for the selected pane
     setSaveAll(false);
+
+    // There need to be two IgnoreSignalTimeout instances
+    // because otherwise Qt will free the one instance twice..
+    VerticalConfigurationGroup *scanOneTransport =
+        new VerticalConfigurationGroup(false,false,true,true);
+    scanOneTransport->addChild(transport);
+    scanOneTransport->addChild(ignoreSignalTimeoutOne);
+
+    // There need to be two IgnoreSignalTimeout instances
+    // because otherwise Qt will free the one instance twice..
+    VerticalConfigurationGroup *scanAllTransports =
+        new VerticalConfigurationGroup(false,false,true,true);
+    scanAllTransports->addChild(ignoreSignalTimeoutAll);
 
     addTarget(QString::number(ScanTypeSetting::Error_Open),
              new ErrorPane(QObject::tr("Failed to open the card")));
     addTarget(QString::number(ScanTypeSetting::Error_Probe),
              new ErrorPane(QObject::tr("Failed to probe the card")));
-
-    addTarget(QString::number(ScanTypeSetting::FullTunedScan_QAM),wizard->paneQAM);
-    addTarget(QString::number(ScanTypeSetting::FullTunedScan_QPSK),wizard->paneQPSK);
-    addTarget(QString::number(ScanTypeSetting::FullTunedScan_OFDM),wizard->paneOFDM);
-    addTarget(QString::number(ScanTypeSetting::FullScan_ATSC),wizard->paneATSC);
-    country = new ScanCountry();
-    addTarget(QString::number(ScanTypeSetting::FullScan_OFDM),country);
-    addTarget(QString::number(ScanTypeSetting::FullScan_Analog),new BlankSetting());
-    transport = new TransportSetting();
-    addTarget(QString::number(ScanTypeSetting::TransportScan),transport);
-    addTarget(QString::number(ScanTypeSetting::FullTransportScan),new BlankSetting());
-    filename = new ScanFileImport();
-    addTarget(QString::number(ScanTypeSetting::Import),filename);
+    addTarget(QString::number(ScanTypeSetting::FullTunedScan_QAM),
+              wizard->paneQAM);
+    addTarget(QString::number(ScanTypeSetting::FullTunedScan_QPSK),
+              wizard->paneQPSK);
+    addTarget(QString::number(ScanTypeSetting::FullTunedScan_OFDM),
+              wizard->paneOFDM);
+    addTarget(QString::number(ScanTypeSetting::FullScan_ATSC),
+              wizard->paneATSC);
+    addTarget(QString::number(ScanTypeSetting::FullScan_OFDM),
+              country);
+    addTarget(QString::number(ScanTypeSetting::FullScan_Analog),
+              new BlankSetting());
+    addTarget(QString::number(ScanTypeSetting::TransportScan),
+              scanOneTransport);
+    addTarget(QString::number(ScanTypeSetting::FullTransportScan),
+              scanAllTransports);
+    addTarget(QString::number(ScanTypeSetting::Import),
+              filename);
 }
 
 void ScanOptionalConfig::triggerChanged(const QString& value)

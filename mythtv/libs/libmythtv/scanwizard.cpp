@@ -435,11 +435,20 @@ void ScanWizardScanner::scan()
             return;
         }
 
-        // These locks and objects might already exist in videosource need to check
+        // If the backend is running this will may fail...
         if (!channel->Open())
         {
             VERBOSE(VB_IMPORTANT, "Error, Channel could not be opened");
             return;
+        }
+
+        // Ugh, Some DVB drivers in DVB countries don't fully support
+        // signal monitoring...
+        if (ScanTypeSetting::TransportScan == parent->scanType() ||
+            ScanTypeSetting::FullTransportScan == parent->scanType())
+        {
+            signal_timeout = (parent->ignoreSignalTimeout()) ?
+                channel_timeout * 10 : signal_timeout;
         }
 
         scanner = new SIScan(card_type, channel, parent->videoSource(),
@@ -468,18 +477,24 @@ void ScanWizardScanner::scan()
         SignalMonitor *monitor = scanner->GetSignalMonitor();
         if (monitor)
         {
-            connect(monitor, SIGNAL(StatusSignalLock(const SignalMonitorValue&)),
-                    this, SLOT(dvbLock(const SignalMonitorValue&)));
-            connect(monitor, SIGNAL(StatusSignalStrength(const SignalMonitorValue&)),
-                    this, SLOT(dvbSignalStrength(const SignalMonitorValue&)));
+            connect(monitor,
+                    SIGNAL(StatusSignalLock(const SignalMonitorValue&)),
+                    this,
+                    SLOT(  dvbLock(         const SignalMonitorValue&)));
+            connect(monitor,
+                    SIGNAL(StatusSignalStrength(const SignalMonitorValue&)),
+                    this,
+                    SLOT(  dvbSignalStrength(   const SignalMonitorValue&)));
         }
 
 #ifdef USING_DVB
         DVBSignalMonitor *dvbm = scanner->GetDVBSignalMonitor();
         if (dvbm)
         {
-            connect(dvbm, SIGNAL(StatusSignalToNoise(const SignalMonitorValue&)),
-                    this, SLOT(  dvbSNR(const SignalMonitorValue&)));
+            connect(dvbm,
+                    SIGNAL(StatusSignalToNoise(const SignalMonitorValue&)),
+                    this,
+                    SLOT(  dvbSNR(const SignalMonitorValue&)));
         }
         bzero(&chan_opts.tuning, sizeof(chan_opts.tuning));
 #endif // USING_DVB

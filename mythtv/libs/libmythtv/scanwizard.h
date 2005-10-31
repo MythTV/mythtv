@@ -84,6 +84,7 @@ class ScanWizard: public ConfigurationWizard
     int captureCard()  const { return page1->capturecard->getValue().toInt(); }
     int scanType()     const { return page1->scanType->getValue().toInt();    }
     QString filename() const { return page1->scanConfig->filename->getValue();}
+    inline bool ignoreSignalTimeout(void) const;
 
     QSqlDatabase *db;
     OFDMPane     *paneOFDM;
@@ -95,6 +96,15 @@ class ScanWizard: public ConfigurationWizard
     int           nCaptureCard;
     ScanWizardScanType *page1;
 };
+
+bool ScanWizard::ignoreSignalTimeout(void) const
+{
+    return (ScanTypeSetting::TransportScan == scanType()) ?
+        page1->scanConfig->ignoreSignalTimeoutOne->getValue().toInt() :
+        ((ScanTypeSetting::FullTransportScan == scanType()) ?
+         page1->scanConfig->ignoreSignalTimeoutAll->getValue().toInt() :
+         false);
+}
 
 class ScanWizardScanner :  public VerticalConfigurationGroup
 {
