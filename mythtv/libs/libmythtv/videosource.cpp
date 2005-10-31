@@ -585,6 +585,19 @@ FreqTableSelector::FreqTableSelector(const VideoSource& parent)
                 "defined in the General settings."));
 }
 
+class UseEIT : public CheckBoxSetting, public VSSetting
+{
+  public:
+    UseEIT(const VideoSource& parent) : VSSetting(parent, "useeit")
+    {
+        setLabel(QObject::tr("Perform EIT Scan"));
+        setHelpText(QObject::tr(
+                        "If this is enabled the data in this source will be "
+                        "updated with listing data provided by the channels "
+                        "themselves 'over-the-air'."));
+    }
+};
+
 class DataDirectUserID: public LineEditSetting, public VSSetting
 {
   public:
@@ -905,6 +918,13 @@ void XMLTV_generic_config::save()
     pdlg.Close();
 }
 
+EITOnly_config::EITOnly_config()
+{
+    setLabel(tr("Use only the transmitted guide data."));
+    setValue(tr("This will usually only work with ATSC or DVB channels, "
+                "and generally provides data only for the next few days."));
+}
+
 XMLTVConfig::XMLTVConfig(const VideoSource& parent) 
 {
     setUseLabel(false);
@@ -921,6 +941,11 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
     
     addTarget("technovera", new DataDirect_config(parent, DD_LXM));
     grabber->addSelection("LxM (United States)", "technovera");
+
+#ifdef USING_DVB_EIT
+    addTarget("eitonly", new EITOnly_config());
+    grabber->addSelection("Transmitted guide only (EIT)", "eitonly");
+#endif
 
     addTarget("tv_grab_de_tvtoday", new XMLTV_generic_config(parent, "tv_grab_de_tvtoday"));
     grabber->addSelection("Germany (tvtoday)", "tv_grab_de_tvtoday");
@@ -984,6 +1009,7 @@ VideoSource::VideoSource()
     group->addChild(name = new Name(*this));
     group->addChild(new XMLTVConfig(*this));
     group->addChild(new FreqTableSelector(*this));
+    group->addChild(new UseEIT(*this));
     addChild(group);
 }
 

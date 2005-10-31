@@ -209,6 +209,15 @@ protected:
     QString grabber;
 };
 
+class EITOnly_config: public LabelSetting
+{
+  public:
+    EITOnly_config();
+
+    virtual void load() {};
+    virtual void save() {};
+};
+
 class XMLTVConfig: public VerticalConfigurationGroup, 
                    public TriggeredConfigurationGroup {
 public:

@@ -300,42 +300,39 @@ void ChannelOptionsCommon::onAirGuideChanged(bool fValue)
 #endif
 }
 
-void ChannelOptionsCommon::sourceChanged(const QString& str)
+void ChannelOptionsCommon::sourceChanged(const QString& sourceid)
 {
-    (void)str;
-#ifdef USING_DVB
-
-    bool fDVB =false;
+    bool supports_eit  = true;
+    bool uses_eit_only = false;
 
     MSqlQuery query(MSqlQuery::InitCon());
-
-    query.prepare("SELECT count(cardtype) "
+    query.prepare("SELECT SUM(1) "
                   "FROM capturecard, videosource, cardinput "
-                  "WHERE cardinput.sourceid = videosource.sourceid "
-                  "AND cardinput.cardid = capturecard.cardid "
-                  "AND capturecard.cardtype in ('DVB') "
-                  "AND videosource.sourceid = :SOURCEID "
-                  "AND capturecard.hostname = :HOSTNAME");
-    query.bindValue(":SOURCEID", str);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
+                  "WHERE cardinput.sourceid   = videosource.sourceid AND "
+                  "      cardinput.cardid     = capturecard.cardid   AND "
+                  "      videosource.sourceid = :SOURCEID            AND "
+                  "      cardtype IN ('DVB','HDTV')");
+    query.bindValue(":SOURCEID", sourceid);
 
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-        if (query.value(0).toInt())
-           fDVB = true;
-    }
-    if (fDVB)
-    {
-       onairguide->setEnabled(true);
-       xmltvID->setEnabled(!onairguide->boolValue());
-    }
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("sourceChanged -- supports eit", query);
     else
     {
-       onairguide->setEnabled(false);
-       xmltvID->setEnabled(true);
+        supports_eit = query.next() && query.value(0).toInt();
+
+        query.prepare("SELECT xmltvgrabber "
+                      "FROM videosource "
+                      "WHERE sourceid = :SOURCEID");
+        query.bindValue(":SOURCEID", sourceid);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("sourceChanged -- eit only", query);
+        else if (query.next())
+            uses_eit_only = (query.value(0).toString() == "eitonly");
     }
-#endif
+
+    onairguide->setEnabled(supports_eit);
+    xmltvID->setEnabled(!uses_eit_only);
 }
 
 ChannelOptionsV4L::ChannelOptionsV4L(const ChannelID& id)

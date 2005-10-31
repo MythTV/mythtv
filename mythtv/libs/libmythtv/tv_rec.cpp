@@ -700,7 +700,7 @@ void TVRec::HandleStateChange(void)
     internalState = nextState;
     changeState = false;
 
-    eitScanStartTime = QDateTime::currentDateTime();
+    eitScanStartTime = QDateTime::currentDateTime();    
     if ((internalState == kState_None) && (genOpt.cardtype == "DVB"))
         eitScanStartTime = eitScanStartTime.addSecs(kEITScanStartTimeout);
     else
@@ -1113,6 +1113,26 @@ void *TVRec::RecorderThread(void *param)
     return NULL;
 }
 
+bool get_use_eit(uint cardid)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT SUM(useeit) "
+        "FROM videosource, cardinput "
+        "WHERE videosource.sourceid = cardinput.sourceid AND"
+        "      cardinput.cardid     = :CARDID");
+    query.bindValue(":CARDID", cardid);
+
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("get_use_eit", query);
+        return false;
+    }
+    else if (query.next())
+        return query.value(0).toBool();
+    return false;
+}
+
 /** \fn TVRec::RunTV()
  *  \brief Event handling method, contains event loop.
  */
@@ -1208,12 +1228,22 @@ void TVRec::RunTV(void)
         }
 
 #ifdef USING_DVB_EIT
-        if (scanner && QDateTime::currentDateTime() > eitScanStartTime)
+        if (channel && scanner &&
+            QDateTime::currentDateTime() > eitScanStartTime)
         {
-            uint ttMin = gContext->GetNumSetting("EITTransportTimeout", 5);
-            scanner->StartActiveScan(this, ttMin * 60);
-            SetFlags(kFlagEITScannerRunning);
-            eitScanStartTime = QDateTime::currentDateTime().addYears(1);
+            if (!get_use_eit(GetCaptureCardNum()))
+            {
+                VERBOSE(VB_EIT, LOC + "EIT scanning disabled "
+                        "for all sources on this card.");
+                eitScanStartTime = eitScanStartTime.addYears(1);
+            }
+            else
+            {
+                uint ttMin = gContext->GetNumSetting("EITTransportTimeout", 5);
+                scanner->StartActiveScan(this, ttMin * 60);
+                SetFlags(kFlagEITScannerRunning);
+                eitScanStartTime = QDateTime::currentDateTime().addYears(1);
+            }
         }
 #endif // USING_DVB_EIT
 
