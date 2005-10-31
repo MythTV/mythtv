@@ -224,7 +224,7 @@ ProgramInfo::~ProgramInfo()
         delete record;
 }
 
-/** \fn ProgramInfo::MakeUniqueKey() const
+/** \fn ProgramInfo::MakeUniqueKey(void) const
  *  \brief Creates a unique string that can be used to identify a recording.
  */
 QString ProgramInfo::MakeUniqueKey(void) const
@@ -1016,7 +1016,7 @@ void ProgramInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QStri
 }
 
 
-/** \fn ProgramInfo::ToggleRecord()
+/** \fn ProgramInfo::ToggleRecord(void)
  *  \brief Cycles through recording types.
  *
  *   If the program recording status is kNotRecording, 
@@ -1077,7 +1077,7 @@ void ProgramInfo::ToggleRecord(void)
     }
 }
 
-/** \fn ProgramInfo::GetScheduledRecording()
+/** \fn ProgramInfo::GetScheduledRecording(void)
  *  \brief Returns the "record" field, creating it if necessary.
  */
 ScheduledRecording* ProgramInfo::GetScheduledRecording(void)
@@ -1086,7 +1086,7 @@ ScheduledRecording* ProgramInfo::GetScheduledRecording(void)
     return record;
 }
 
-/** \fn ProgramInfo::getRecordID()
+/** \fn ProgramInfo::getRecordID(void)
  *  \brief Returns a record id, creating "record" it if necessary.
  */
 int ProgramInfo::getRecordID(void)
@@ -1445,7 +1445,7 @@ void ProgramInfo::SetFilesize(long long fsize)
                              query);
 }
 
-/** \fn ProgramInfo::GetFilesize()
+/** \fn ProgramInfo::GetFilesize(void)
  *  \brief Gets recording file size from database, and sets "filesize" field.
  */
 long long ProgramInfo::GetFilesize(void)
@@ -1519,7 +1519,7 @@ void ProgramInfo::SetBookmark(long long pos) const
                              query);
 }
 
-/** \fn ProgramInfo::GetBookmark()
+/** \fn ProgramInfo::GetBookmark(void)
  *  \brief Gets any bookmark position in database,
  *         unless "ignoreBookmark" is set.
  *
@@ -1563,7 +1563,7 @@ long long ProgramInfo::GetBookmark(void) const
     return pos;
 }
 
-/** \fn ProgramInfo::IsEditing() const
+/** \fn ProgramInfo::IsEditing(void) const
  *  \brief Queries "recorded" table for its "editing" field
  *         and returns true if it is set to true.
  *  \return true iff we have started, but not finished, editing.
@@ -1632,7 +1632,7 @@ void ProgramInfo::SetDeleteFlag(bool deleteFlag) const
         MythContext::DBError("Set delete flag", query);
 }
 
-/** \fn ProgramInfo::IsCommFlagged() const
+/** \fn ProgramInfo::IsCommFlagged(void) const
  *  \brief Returns true if commercial flagging has been started
  *         according to "commflagged" field in "recorded" table.
  */
@@ -1696,7 +1696,7 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
         MythContext::DBError("PreserveEpisode update", query);
 }
 
-/** \fn ProgramInfo::SetAutoExpire(bool autoExpire) const
+/** \fn ProgramInfo::SetAutoExpire(bool) const
  *  \brief Set "autoexpire" field in "recorded" table to "autoExpire".
  *  \param autoEpisode value to set auto expire field to.
  */
@@ -2331,7 +2331,7 @@ void ProgramInfo::AddHistory(bool resched)
         ScheduledRecording::signalChange(0);
 }
 
-/** \fn ProgramInfo::DeleteHistory()
+/** \fn ProgramInfo::DeleteHistory(void)
  *  \brief Deletes recording history, creating "record" it if necessary.
  */
 void ProgramInfo::DeleteHistory(void)
@@ -2365,7 +2365,7 @@ void ProgramInfo::DeleteHistory(void)
     ScheduledRecording::signalChange(0);
 }
 
-/** \fn ProgramInfo::ForgetHistory()
+/** \fn ProgramInfo::ForgetHistory(void)
  *  \brief Forget the recording of a program so it will be recorded again.
  */
 void ProgramInfo::ForgetHistory(void)
@@ -2747,7 +2747,7 @@ bool ProgramInfo::FillInRecordInfo(const vector<ProgramInfo *> &reclist)
     return found;
 }
 
-/** \fn ProgramInfo::Save() const
+/** \fn ProgramInfo::Save(void) const
  *  \brief Saves this ProgramInfo to the database, replacing any existing
  *         program in the same timeslot on the same channel.
  */
@@ -2810,7 +2810,7 @@ void ProgramInfo::EditScheduled(void)
     record->exec();
 }
 
-/** \fn ProgramInfo::showDetails() const
+/** \fn ProgramInfo::showDetails(void) const
  *  \brief Pops up a DialogBox with program info, blocking until user exits
  *         the dialog.
  */
@@ -3115,9 +3115,9 @@ void ProgramInfo::showDetails(void) const
     delete details_dialog;
 }
 
-/** \fn ProgramInfo::getProgramFlags() const
+/** \fn ProgramInfo::getProgramFlags(void) const
  *  \brief Returns a bitmap of which jobs have been completed for recording.
- *  \sa GetAutoRunJobs()
+ *  \sa GetAutoRunJobs(void)
  */
 int ProgramInfo::getProgramFlags(void) const
 {
