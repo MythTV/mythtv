@@ -979,7 +979,16 @@ void SIScan::UpdatePATinDB(int tid_db,
 
     for (uint i = 0; i < pat->ProgramCount(); i++)
     {
-        const ProgramMapTable *pmt = pmt_map[pat->ProgramNumber(i)];
+        pmt_map_t::const_iterator it = pmt_map.find(pat->ProgramNumber(i));
+        if (it == pmt_map.end())
+        {
+            VERBOSE(VB_SIPARSER,
+                   QString("UpdatePATinDB(): PMT for Program #%1 is missing")
+                   .arg(pat->ProgramNumber(i)));
+            continue;
+        }
+
+        const ProgramMapTable *pmt = *it;
         VERBOSE(VB_SIPARSER,
                 QString("UpdatePATinDB(): Prog %1 PID %2: PMT @")
                 .arg(pat->ProgramNumber(i))
@@ -988,6 +997,8 @@ void SIScan::UpdatePATinDB(int tid_db,
         // ignore all services without PMT, and
         // ignore services we have decided to ignore
         if (!pmt)
+            continue;
+        else if (pmt->StreamCount() <= 0)
             continue;
         else if (ignoreAudioOnlyServices && pmt->IsStillPicture())
             continue;
