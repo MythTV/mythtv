@@ -37,11 +37,11 @@
 #endif
 
 const int TV::kInitFFRWSpeed  = 0;
-const int TV::kMuteTimeout    = 800;   
+const int TV::kMuteTimeout    = 800;
 const int TV::kLCDTimeout     = 30000;
 const int TV::kBrowseTimeout  = 30000;
 const int TV::kSMExitTimeout  = 2000;
-const int TV::kInputKeysMax = 6;
+const int TV::kInputKeysMax   = 6;
 
 #define DEBUG_ACTIONS 0 /**< set to 1 to debug actions */
 #define LOC QString("TV: ")
@@ -4377,113 +4377,126 @@ void TV::BrowseDispInfo(int direction)
 
 void TV::ToggleRecord(void)
 {
-    if (!browsemode)
+    if (browsemode)
     {
-        QString title, subtitle, desc, category, starttime, endtime;
-        QString callsign, iconpath, channum, chanid, seriesid, programid;
-        QString outFilters, repeat, airdate, stars;
+        InfoMap infoMap;
+        QDateTime startts = QDateTime::fromString(
+            browsestarttime, Qt::ISODate);
 
-        GetChannelInfo(activerecorder, title, subtitle, desc, category, 
-                       starttime, endtime, callsign, iconpath, channum,
-                       chanid, seriesid, programid, outFilters, repeat,
-                       airdate, stars);
+        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
+            browsechanid, startts);
+        program_info->ToggleRecord();
+        program_info->ToMap(infoMap);
 
-        if (starttime > "")
+        if (GetOSD())
         {
-            QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
+            GetOSD()->ClearAllText("browse_info");
+            GetOSD()->SetText("browse_info", infoMap, -1);
 
-            ProgramInfo *program_info = 
-                    ProgramInfo::GetProgramAtDateTime(chanid, startts);
-
-            if (program_info)
-            {
-                program_info->ToggleRecord();
-
-                QString msg = QString("%1 \"%2\"")
-                                      .arg(tr("Record")).arg(title);
-
-                if (activenvp == nvp && GetOSD())
-                    GetOSD()->SetSettingsText(msg, 3);
-
-                delete program_info;
-            }
+            if (activenvp == nvp)
+                GetOSD()->SetSettingsText(tr("Record"), 3);
         }
-        else
-        {
-            VERBOSE(VB_GENERAL, LOC + "Creating a manual recording");
-
-            QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-            QString channelFormat =
-                    gContext->GetSetting("ChannelFormat", "<num> <sign>");
-
-            ProgramInfo p;
-
-            p.chanid = chanid;
-
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT chanid, channum, callsign, name "
-                          "FROM channel WHERE chanid=:CHANID");
-            query.bindValue(":CHANID", p.chanid);
-
-            query.exec();
-
-            if (query.isActive() && query.numRowsAffected()) 
-            {
-                query.next();
-                p.chanstr = query.value(1).toString();
-                p.chansign = QString::fromUtf8(query.value(2).toString());
-                p.channame = QString::fromUtf8(query.value(3).toString());
-            }
-            else
-            {
-                MythContext::DBError("ToggleRecord channel info", query);
-                return;
-            }
-
-            p.startts = QDateTime::currentDateTime();
-            QTime tmptime = p.startts.time();
-            tmptime = tmptime.addSecs(-(tmptime.second()));
-            p.startts.setTime(tmptime);
-            p.endts = p.startts.addSecs(3600);
-
-            p.title = p.ChannelText(channelFormat) + " - " + 
-                      p.startts.toString(timeformat) +
-                      " (" + tr("Manual Record") + ")";
-
-            ScheduledRecording record;
-            record.loadByProgram(&p);
-            record.setSearchType(kManualSearch);
-            record.setRecordingType(kSingleRecord);
-            record.save();
-
-            QString msg = QString("%1 \"%2\"")
-                                  .arg(tr("Record")).arg(p.title);
-
-            if (activenvp == nvp && GetOSD())
-                GetOSD()->SetSettingsText(msg, 3);
-        }
+        delete program_info;
         return;
     }
 
     InfoMap infoMap;
-    QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
-
-    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(browsechanid,
-                                                                  startts);
-    program_info->ToggleRecord();
-
-    program_info->ToMap(infoMap);
-
-    if (GetOSD())
+    GetChannelInfo(activerecorder, infoMap);
+    if (!infoMap["startts"].isEmpty())
     {
-        GetOSD()->ClearAllText("browse_info");
-        GetOSD()->SetText("browse_info", infoMap, -1);
+        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
+            infoMap["chanid"],
+            QDateTime::fromString(infoMap["startts"], Qt::ISODate));
 
-        if (activenvp == nvp)
-            GetOSD()->SetSettingsText(tr("Record"), 3);
+        QString cmdmsg("");
+        if (program_info)
+        {
+            QString title = infoMap["title"];
+
+            if (program_info->GetProgramRecordingStatus() == kNotRecording)
+            {
+                program_info->ApplyRecordStateChange(kSingleRecord);
+                cmdmsg = tr("Record");
+            }
+            else
+            {
+                MSqlQuery query(MSqlQuery::InitCon());
+                query.prepare("SELECT reactivate "
+                              "FROM oldrecorded "
+                              "WHERE station   = :STATION AND "
+                              "      starttime = :STARTTIME AND "
+                              "      title     = :TITLE");
+                query.bindValue(":STATION",   infoMap["callsign"]);
+                query.bindValue(":STARTTIME", infoMap["startts"]);
+                query.bindValue(":TITLE",     title.utf8());
+
+                if (!query.exec() || !query.isActive())
+                    MythContext::DBError("TV::ToggleRecord", query);
+                else if (query.next() && !query.value(0).toBool())
+                {
+                    program_info->ReactivateRecording();
+                    cmdmsg = tr("Reactivate");
+                }
+            }
+
+            QString msg = (cmdmsg.isEmpty()) ? tr("Use guide cancel") :
+                QString("%1 \"%2\"").arg(cmdmsg).arg(title);
+
+            if (activenvp == nvp && GetOSD())
+                GetOSD()->SetSettingsText(msg, 3);
+
+            delete program_info;
+            return;
+        }
     }
 
-    delete program_info;
+    VERBOSE(VB_GENERAL, LOC + "Creating a manual recording");
+
+    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
+    QString channelFormat =
+        gContext->GetSetting("ChannelFormat", "<num> <sign>");
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT chanid, channum, callsign, name "
+                  "FROM channel "
+                  "WHERE chanid=:CHANID");
+    query.bindValue(":CHANID", infoMap["chanid"]);
+    if (!query.exec() || !query.isActive())
+    {
+        MythContext::DBError("ToggleRecord channel info", query);
+        return;
+    }
+    else if (!query.next())
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "ToggleRecord(): "
+                "Could not find chanid in DB");
+        return;
+    }
+
+    ProgramInfo p;
+    p.chanid      = infoMap["chanid"];
+    p.chanstr     = query.value(1).toString();
+    p.chansign    = QString::fromUtf8(query.value(2).toString());
+    p.channame    = QString::fromUtf8(query.value(3).toString());
+
+    p.startts     = QDateTime::currentDateTime();
+    QTime tmptime = p.startts.time();
+    tmptime       = tmptime.addSecs(-(tmptime.second()));
+    p.startts.setTime(tmptime);
+    p.endts       = p.startts.addSecs(3600);
+
+    p.title       = p.ChannelText(channelFormat) + " - " + 
+        p.startts.toString(timeformat) + " (" + tr("Manual Record") + ")";
+
+    ScheduledRecording record;
+    record.loadByProgram(&p);
+    record.setSearchType(kManualSearch);
+    record.setRecordingType(kSingleRecord);
+    record.save();
+
+    QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(p.title);
+    if (activenvp == nvp && GetOSD())
+        GetOSD()->SetSettingsText(msg, 3);
 }
 
 void TV::BrowseChannel(const QString &chan)
