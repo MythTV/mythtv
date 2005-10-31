@@ -143,9 +143,23 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
     tf->first = 0;
   }
 
-  asm volatile("prefetch 64(%0)     \n\t" //Experimental values from athlon
-	       "prefetch 64(%1)     \n\t"
-	       "prefetch 64(%2)     \n\t"
+  /*
+    Commented out all the prefetches. These don't do anything when
+    you are processing an array with sequential accesses because the
+    processor automatically does a prefetchT0 in these cases. The
+    instruction is meant to be used to specify a different prefetch
+    cache level, or to prefetch non-sequental data.
+    
+    These prefetches are not available on all MMX processors so if
+    we wanted to use them we would need to test for a prefetch
+    capable processor before using them. -- dtk
+  */
+
+  asm volatile(/*
+               "prefetch 64(%0)     \n\t" //Experimental values from athlon
+               "prefetch 64(%1)     \n\t"
+               "prefetch 64(%2)     \n\t"
+               -- pointless & breaks on some processors */
 	       "movq (%0), %%mm4    \n\t"
 	       "movq (%1), %%mm5    \n\t"
 	       "movq (%2), %%mm6    \n\t"
@@ -153,8 +167,10 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
 	       );
 
   for(y = 0;y < (tf->Luma_size);y += 8) { //Luma
-    asm volatile("prefetchw 384(%0)    \n\t" //Experimental values from athlon
+    asm volatile(/*
+                 "prefetchw 384(%0)    \n\t" //Experimental values from athlon
 		 "prefetch 384(%1)     \n\t"
+                 -- pointless & breaks on some processors */
 
 		 "movq (%0), %%mm0     \n\t" //av-p
 		 "movq (%1), %%mm1     \n\t" //buf
@@ -185,8 +201,10 @@ int quickdnrMMX(VideoFilter *f, VideoFrame *frame)
   }
 
   for(y = tf->Luma_size;y < tf->UV_size;y += 8) { //Chroma
-    asm volatile("prefetchw 384(%0)    \n\t" //Experimental values for athlon
+    asm volatile(/*
+                 "prefetchw 384(%0)    \n\t" //Experimental values for athlon
 		 "prefetch 384(%1)     \n\t"
+                 -- pointless & breaks on some processors */
 
 		 "movq (%0), %%mm0     \n\t" //av-p
 		 "movq (%1), %%mm1     \n\t" //buf
@@ -241,16 +259,20 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
     tf->first = 0;
   }
 
-  asm volatile("prefetch 64(%0)     \n\t" //Experimental values from athlon
-	       "prefetch 64(%1)     \n\t"
+  asm volatile(/*
+               "prefetch 64(%0)     \n\t" //Experimental values from athlon
+               "prefetch 64(%1)     \n\t"
+               -- pointless & breaks on some processors */
 	       "movq (%0), %%mm4    \n\t"
 	       "movq (%1), %%mm5    \n\t"
 	       : : "r" (&sign_convert), "r" (&tf->Luma_threshold_mask1)
 	       );
 
   for(y = 0;y < (tf->Luma_size);y += 8) { //Luma
-    asm volatile("prefetchw 384(%0)    \n\t" //Experimental values from athlon
-		 "prefetch 384(%1)     \n\t"
+    asm volatile(/*
+                 "prefetchw 384(%0)    \n\t" //Experimental values from athlon
+                 "prefetch 384(%1)     \n\t"
+                 -- pointless & breaks on some processors */
 
 		 "movq (%0), %%mm0     \n\t" //av-p
 		 "movq (%1), %%mm1     \n\t" //buf
@@ -302,14 +324,18 @@ int quickdnr2MMX(VideoFilter *f, VideoFrame *frame)
     av_p++;
   }
 
-  asm volatile("prefetch 64(%0)     \n\t" //Experimental values from athlon
+  asm volatile(/*
+               "prefetch 64(%0)     \n\t" //Experimental values from athlon
+               -- pointless & breaks on some processors */
 	       "movq (%1), %%mm5    \n\t"
 	       : : "r" (&sign_convert), "r" (&tf->Chroma_threshold_mask1)
 	       );
 
   for(y = tf->Luma_size;y < tf->UV_size;y += 8) { //Chroma
-    asm volatile("prefetchw 384(%0)    \n\t" //Experimental values for athlon
-		 "prefetch 384(%1)     \n\t"
+    asm volatile(/*
+                 "prefetchw 384(%0)    \n\t" //Experimental values from athlon
+                 "prefetch 384(%1)     \n\t"
+                 -- pointless & breaks on some processors */
 
 		 "movq (%0), %%mm0     \n\t" //av-p
 		 "movq (%1), %%mm1     \n\t" //buf
