@@ -86,6 +86,7 @@ void  ProgramMapTable::Parse() const
         pos += 5 + StreamInfoLength(i);
     }
     _ptrs.push_back(pos);
+    VERBOSE(VB_SIPARSER, "Parsed PMT(0x"<<this<<") "<<this->toString());
 }
 
 void ProgramMapTable::AppendStream(
@@ -279,7 +280,6 @@ const QString ProgramAssociationTable::toString() const
 
 const QString ProgramMapTable::toString() const
 {
-    Parse();
     QString str = 
         QString("Program Map Table ver(%1) pid(0x%2) pnum(%3)\n")
         .arg(Version()).arg(tsheader()->PID(), 0, 16)
