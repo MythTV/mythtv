@@ -181,12 +181,12 @@ freq_table_list_t get_matching_freq_tables(
     QString lookup = QString("%1_%2_%3%4")
         .arg(format).arg(modulation).arg(country);
 
-    for (uint i = 0; true; i++)
+    freq_table_map_t::const_iterator it = fmap.begin();
+    for (uint i = 0; it != fmap.end(); i++)
     {
-        const FrequencyTable* ft = fmap[lookup.arg(i)];
-        if (!ft)
-            break;
-        list.push_back(ft);
+        it = fmap.find(lookup.arg(i));
+        if (it != fmap.end())
+            list.push_back(*it);
     }
 
     return list;
