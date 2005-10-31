@@ -1062,7 +1062,7 @@ void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
     if (field[1])
     {
         if (output > "")
-            output += "AND ";
+            output += "\nAND ";
 
         curfield = "%" + field[1] + "%";
         output += "program.subtitle LIKE :POWERSUB ";
@@ -1072,7 +1072,7 @@ void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
     if (field[2])
     {
         if (output > "")
-            output += "AND ";
+            output += "\nAND ";
 
         curfield = "%" + field[2] + "%";
         output += "program.description LIKE :POWERDESC ";
@@ -1082,7 +1082,7 @@ void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
     if (field[3])
     {
         if (output > "")
-            output += "AND ";
+            output += "\nAND ";
 
         output += "program.category_type = :POWERCATTYPE ";
         bindings[":POWERCATTYPE"] = field[3];
@@ -1091,7 +1091,7 @@ void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
     if (field[4])
     {
         if (output > "")
-            output += "AND ";
+            output += "\nAND ";
 
         output += "program.category = :POWERCAT ";
         bindings[":POWERCAT"] = field[4];
@@ -1100,7 +1100,7 @@ void ProgLister::powerStringToSQL(const QString &qphrase, QString &output,
     if (field[5])
     {
         if (output > "")
-            output += "AND ";
+            output += "\nAND ";
 
         output += "channel.callsign = :POWERCALLSIGN ";
         bindings[":POWERCALLSIGN"] = field[5];
@@ -1394,8 +1394,8 @@ void ProgLister::fillItemList(void)
             where += "      AND DAYOFYEAR(program.originalairdate) = "; 
             where += "          DAYOFYEAR(program.starttime)) ";
             where += "    OR (program.category_type='movie' ";
-            where += "      AND program.stars >= 0.75 ";
-            where += "      AND program.airdate >= YEAR(NOW()) - 1) ";
+            where += "      AND program.stars > 0.5 ";
+            where += "      AND program.airdate >= YEAR(NOW()) - 2) ";
             where += "  ) ";
         }
         else if (qphrase == "movies")
