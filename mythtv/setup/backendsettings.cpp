@@ -244,6 +244,18 @@ static GlobalComboBox *TimeOffset()
     return gc;
 };
 
+static GlobalSpinBox *EITTransportTimeout()
+{
+    GlobalSpinBox *gc = new GlobalSpinBox("EITTransportTimeout", 1, 15, 1);
+    gc->setLabel(QObject::tr("EIT Transport Timeout (mins)"));
+    gc->setValue(5);
+    QString helpText = QObject::tr(
+        "Maximum time to spend waiting for listings data on one DTV channel "
+        "before checking for new listings data on the next channel.");
+    gc->setHelpText(helpText);
+    return gc;
+}
+
 static GlobalCheckBox *MasterBackendOverride()
 {
     GlobalCheckBox *gc = new GlobalCheckBox("MasterBackendOverride");
@@ -648,6 +660,7 @@ BackendSettings::BackendSettings() {
     group2->addChild(VbiFormat());
     group2->addChild(FreqTable());
     group2->addChild(TimeOffset());
+    group2->addChild(EITTransportTimeout());
     group2->addChild(MasterBackendOverride());
     group2->addChild(DeletesFollowLinks());
     addChild(group2);

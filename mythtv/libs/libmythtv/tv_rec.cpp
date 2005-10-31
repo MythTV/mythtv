@@ -81,9 +81,6 @@ const uint TVRec::kRequestBufferSize = 256*1024; /* 256 KB */
 /// How many seconds after entering kState_None should we start EIT Scanner
 const uint TVRec::kEITScanStartTimeout = 60; /* 1 minute */
 
-/// How many seconds should EIT Scanner spend on each transport
-const uint TVRec::kEITScanTransportTimeout = 5*60; /* 5 minutes */
-
 /// How many milliseconds the signal monitor should wait between checks
 const uint TVRec::kSignalMonitoringRate = 50; /* msec */
 
@@ -1213,7 +1210,8 @@ void TVRec::RunTV(void)
 #ifdef USING_DVB_EIT
         if (scanner && QDateTime::currentDateTime() > eitScanStartTime)
         {
-            scanner->StartActiveScan(this, kEITScanTransportTimeout);
+            uint ttMin = gContext->GetNumSetting("EITTransportTimeout", 5);
+            scanner->StartActiveScan(this, ttMin * 60);
             SetFlags(kFlagEITScannerRunning);
             eitScanStartTime = QDateTime::currentDateTime().addYears(1);
         }

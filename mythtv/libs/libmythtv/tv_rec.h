@@ -397,7 +397,6 @@ class TVRec : public QObject
     static const uint kStreamedFileReadTimeout;
     static const uint kRequestBufferSize;
     static const uint kEITScanStartTimeout;
-    static const uint kEITScanTransportTimeout;
     static const uint kSignalMonitoringRate;
 
     // General State flags
