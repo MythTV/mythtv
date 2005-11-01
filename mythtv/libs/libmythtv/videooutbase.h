@@ -146,8 +146,7 @@ class VideoOutput
     virtual void Zoom(int direction);
  
     virtual void GetDrawSize(int &xoff, int &yoff, int &width, int &height);
-    virtual void GetVisibleSize(int &xoff, int &yoff, int &width, int &height);
-    virtual void GetOSDSize(int &width, int &height);
+    virtual void GetOSDBounds(QRect &visible, QRect &total) const;
 
     virtual int GetRefreshRate(void) = 0;
 
@@ -271,6 +270,8 @@ class VideoOutput
     int DisplayOSD(VideoFrame *frame, OSD *osd, int stride = -1, int revision = -1);
 
     virtual int ChangePictureAttribute(int attributeType, int newValue);
+    virtual QRect GetVisibleOSDBounds(void) const;
+    virtual QRect GetTotalOSDBounds(void) const;
 
     static void CopyFrame(VideoFrame* to, const VideoFrame* from);
 

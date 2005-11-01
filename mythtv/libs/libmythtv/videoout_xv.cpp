@@ -316,15 +316,19 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
     }
 }
 
-void VideoOutputXv::GetOSDSize(int &width, int &height)
+// documented in videooutbase.cpp
+QRect VideoOutputXv::GetVisibleOSDBounds(void) const
 {
-    if (chroma_osd)
-    {
-        width  = dispw;
-        height = disph;
-        return;
-    }
-    VideoOutput::GetOSDSize(width, height);
+    QRect bounds = QRect(0,0,dispw,disph);
+    if (!chroma_osd)
+        bounds = VideoOutput::GetVisibleOSDBounds();
+    return bounds;
+}
+
+// documented in videooutbase.cpp
+QRect VideoOutputXv::GetTotalOSDBounds(void) const
+{
+    return (chroma_osd) ? QRect(0,0,dispw,disph) : QRect(0,0,imgw,imgh);
 }
 
 /**
@@ -3230,7 +3234,7 @@ void ChromaKeyOSD::AllocImage(int i)
                         videoOutput->XJ_depth, ZPixmap, 0,
                         &shm_infos[i],
                         videoOutput->dispw, videoOutput->disph);
-    uint size = shm_img->bytes_per_line * shm_img->height + 64;
+    uint size = shm_img->bytes_per_line * (shm_img->height+1) + 128;
     X11U;
 
     if (shm_img)
@@ -3298,10 +3302,11 @@ void ChromaKeyOSD::Reinit(int i)
     uint bpl = img[i]->bytes_per_line;
 
     // create chroma key line
-    char *cln = (char*) memalign(128, bpl);
+    char *cln = (char*) memalign(128, bpl + 128);
     bzero(cln, bpl);
-    int j = videoOutput->dispxoff - videoOutput->dispx;
-    for (; j < videoOutput->dispxoff + videoOutput->dispwoff; ++j)
+    int j  = max(videoOutput->dispxoff - videoOutput->dispx, 0);
+    int ej = min(videoOutput->dispxoff + videoOutput->dispwoff, vf[i].width);
+    for (; j < ej; ++j)
         ((uint*)cln)[j] = key;
 
     // boboff assumes the smallest interlaced resolution is 480 lines - 5%
@@ -3310,22 +3315,23 @@ void ChromaKeyOSD::Reinit(int i)
               videoOutput->m_deintfiltername == "bobdeint") ? boboff : 0;
 
     // calculate beginning and end of chromakey
-    int cstart = min(max(videoOutput->dispyoff + boboff,0),
-                     videoOutput->disph);
-    int cend   = min(max(videoOutput->dispyoff + videoOutput->disphoff,0),
-                     videoOutput->disph);
+    int cstart = min(max(videoOutput->dispyoff + boboff, 0), vf[i].height - 1);
+    int cend   = min(max(videoOutput->dispyoff + videoOutput->disphoff, 0),
+                     vf[i].height);
 
     // Paint with borders and chromakey
     char *buf = shm_infos[i].shmaddr;
-    int dispy = max(videoOutput->dispy,0);
-    //cerr<<"cstart: "<<cstart<<" cend: "<<cend;
-    //cerr<<" dispy: "<<dispy<<" disph: "<<videoOutput->disph<<endl;
+    int dispy = min(max(videoOutput->dispy, 0), vf[i].height - 1);
+
+    VERBOSE(VB_PLAYBACK, LOC + "cstart: "<<cstart<<"  cend: "<<cend);
+    VERBOSE(VB_PLAYBACK, LOC + " dispy: "<<dispy <<" disph: "<<vf[i].height);
+
     if (cstart > dispy)
         bzero(buf + (dispy * bpl), (cstart - dispy) * bpl);
     for (j = cstart; j < cend; ++j)
         memcpy(buf + (j*bpl), cln, bpl);
-    if (cend < videoOutput->disph)
-        bzero(buf + (cend * bpl), (videoOutput->disph - cend) * bpl);
+    if (cend < vf[i].height)
+        bzero(buf + (cend * bpl), (vf[i].height - cend) * bpl);
 
     free(cln);
 }

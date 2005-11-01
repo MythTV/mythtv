@@ -501,20 +501,22 @@ void VideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
     height = imgh;
 }
 
-/**
- * \fn VideoOutput::GetVisibleSize(int&,int&,int&,int&)
- * \brief Returns visible portions of video.
- * \param xoff    X location where visible video is located in window
- * \param yoff    Y location where visible video is located in window
- * \param width   visible width of video output
- * \param height  visible height of video output
- */
-void VideoOutput::GetVisibleSize(int &xoff, int &yoff, int &width, int &height)
+void VideoOutput::GetOSDBounds(QRect &total, QRect &visible) const
 {
-    xoff   = imgx;
-    yoff   = imgy;
-    width  = imgw;
-    height = imgh;
+    total   = GetTotalOSDBounds();
+    visible = GetVisibleOSDBounds();
+}
+
+/**
+ * \fn VideoOutput::GetVisibleOSDBounds(void) const
+ * \brief Returns visible portions of total OSD bounds
+ */
+QRect VideoOutput::GetVisibleOSDBounds(void) const
+{
+    uint xoff   = imgx;
+    uint yoff   = imgy;
+    uint width  = imgw;
+    uint height = imgh;
 
     switch (letterbox)
     {
@@ -548,12 +550,16 @@ void VideoOutput::GetVisibleSize(int &xoff, int &yoff, int &width, int &height)
         default:
             break;
     }
+    return QRect(xoff, yoff, width, height);
 }
 
-void VideoOutput::GetOSDSize(int &width, int &height)
+/**
+ * \fn VideoOutput::GetVisibleSize(void) const
+ * \brief Returns total OSD bounds
+ */
+QRect VideoOutput::GetTotalOSDBounds(void) const
 {
-    width  = XJ_width;
-    height = XJ_height;
+    return QRect(0, 0, imgw, imgh);
 }
 
 /**
