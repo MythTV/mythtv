@@ -93,6 +93,7 @@ HEADERS += sr_dialog.h              sr_root.h
 HEADERS += sr_items.h               scheduledrecording.h
 HEADERS += signalmonitorvalue.h 
 HEADERS += mpeg/iso639.h
+HEADERS += livetvchain.h
 
 SOURCES += programinfo.cpp          proglist.cpp
 SOURCES += RingBuffer.cpp           ThreadedFileWriter.cpp
@@ -105,6 +106,7 @@ SOURCES += sr_dialog.cpp            sr_root.cpp
 SOURCES += sr_items.cpp             scheduledrecording.cpp
 SOURCES += signalmonitorvalue.cpp
 SOURCES += mpeg/iso639.cpp
+SOURCES += livetvchain.cpp
 
 using_frontend {
     # Recording profile stuff
