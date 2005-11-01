@@ -1,6 +1,8 @@
 #include "osdsurface.h"
 #include "dithertable.h"
 
+#include <algorithm>
+
 #ifdef MMX
 
 extern "C" {
