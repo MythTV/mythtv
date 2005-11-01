@@ -129,10 +129,17 @@ void VirtualKeyboard::switchLayout(QString language)
 
     if (preferredPos == VK_POSABOVEEDIT || preferredPos == VK_POSBELOWEDIT)
     {
-        int delx = pw->mapTo(tlw,newpos).x() + m_popupWidth - tlwg.width();
+        int delx = pw->mapTo(tlw,newpos).x() + m_popupWidth - tlwg.width() + 5;
         newpos = QPoint(newpos.x() - (delx > 0 ? delx : 0), newpos.y());
         delx = pw->mapTo(tlw, newpos).x();
         newpos = QPoint(newpos.x() - (delx < 0 ? delx : 0), newpos.y());
+
+        int xbase, width, ybase, height;
+        float wmult, hmult;
+        gContext->GetScreenSettings(xbase, width, wmult, ybase, height, hmult);
+        newpos.setX(newpos.x() - xbase);
+        newpos.setY(newpos.y() - ybase);
+
         this->move( pw->mapToGlobal( newpos ) );
     }
 
