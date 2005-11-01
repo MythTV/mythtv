@@ -1047,6 +1047,8 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
 
     VideoFrame *pipimage = pipplayer->GetCurrentFrame(pipw, piph);
     float pipVideoAspect = pipplayer->GetVideoAspect();
+    uint  pipVideoWidth  = pipplayer->GetVideoWidth();
+    uint  pipVideoHeight = pipplayer->GetVideoHeight();
 
     // If PiP is not initialized to values we like, silently ignore the frame.
     if ((videoAspect <= 0) || (pipVideoAspect <= 0) || 
@@ -1071,11 +1073,15 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
         letterAdj  = videoAspect / XJ_aspect;
     }
 
-    // adjust for non-square pixels
-    float pixelAdj = (GetDisplayAspect() * XJ_height) / XJ_width;
+    // adjust for non-square pixels on screen
+    float dispPixelAdj = (GetDisplayAspect() * XJ_height) / XJ_width;
+
+    // adjust for non-square pixels in video
+    float vidPixelAdj  = pipVideoWidth / (pipVideoAspect * pipVideoHeight);
 
     // set width and height
-    desired_pipw =(int)(desired_piph * pipVideoAspect * pixelAdj * letterAdj);
+    desired_pipw = (int) (desired_piph * pipVideoAspect * vidPixelAdj *
+                          dispPixelAdj * letterAdj);
     desired_pipw -= desired_pipw % 2;
 
     // Scale the image if we have to...
