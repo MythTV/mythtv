@@ -381,7 +381,7 @@ void PreviousBox::upcoming()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
-    ProgLister *pl = new ProgLister(plTitle, pi->title,
+    ProgLister *pl = new ProgLister(plTitle, pi->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;

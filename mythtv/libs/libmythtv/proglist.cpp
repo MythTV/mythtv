@@ -23,12 +23,14 @@ using namespace std;
 #include "remoteutil.h"
 #include "mythdbcon.h"
 
-ProgLister::ProgLister(ProgListType pltype, const QString &view,
+ProgLister::ProgLister(ProgListType pltype,
+                       const QString &view, const QString &from,
                        MythMainWindow *parent,
                        const char *name)
             : MythDialog(parent, name)
 {
     type = pltype;
+    addTables = from;
     startTime = QDateTime::currentDateTime();
     searchTime = startTime;
 
@@ -1144,7 +1146,7 @@ void ProgLister::upcoming()
     if (!pi || type == plTitle)
         return;
 
-    ProgLister *pl = new ProgLister(plTitle, pi->title,
+    ProgLister *pl = new ProgLister(plTitle, pi->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
@@ -1460,6 +1462,8 @@ void ProgLister::fillItemList(void)
         where = QString("WHERE channel.visible = 1 "
                         "  AND program.endtime > :PGILSTART "
                         "  AND ( %1 ) ").arg(qphrase);
+        if (addTables > "")
+            where = addTables + " " + where;
     }
     else if (type == plChannel) // list by channel
     {

@@ -29,8 +29,8 @@ class ProgLister : public MythDialog
     Q_OBJECT
 
   public:
-    ProgLister(ProgListType pltype, const QString &view, 
-	       MythMainWindow *parent, const char *name = 0);
+    ProgLister(ProgListType pltype, const QString &view, const QString &from,
+               MythMainWindow *parent, const char *name = 0);
     ~ProgLister();
 
   protected slots:
@@ -62,6 +62,7 @@ class ProgLister : public MythDialog
 
   private:
     ProgListType type;
+    QString addTables;
     QDateTime startTime;
     QDateTime searchTime;
     QString dayFormat;

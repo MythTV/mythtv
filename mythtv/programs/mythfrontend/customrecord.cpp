@@ -34,21 +34,14 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
 
     QVBoxLayout *vbox = new QVBoxLayout(this, (int)(20 * wmult));
 
-    // Window title
-    QString message = tr("Power Search Recording Rule Editor");
-    QLabel *label = new QLabel(message, this);
-    label->setBackgroundOrigin(WindowOrigin);
-    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-    vbox->addWidget(label);
-
     QVBoxLayout *vkbox = new QVBoxLayout(vbox, (int)(1 * wmult));
     QHBoxLayout *hbox = new QHBoxLayout(vkbox, (int)(1 * wmult));
 
     // Edit selection
     hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
 
-    message = tr("Edit Rule") + ": ";
-    label = new QLabel(message, this);
+    QString message = tr("Edit Rule") + ": ";
+    QLabel *label = new QLabel(message, this);
     label->setBackgroundOrigin(WindowOrigin);
     label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
     hbox->addWidget(label);
@@ -58,11 +51,12 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
 
     m_rule->insertItem(tr("<New rule>"));
     m_recid   << "0";
+    m_recsub  << "";
     m_recdesc << "";
 
     MSqlQuery result(MSqlQuery::InitCon());
-    result.prepare("SELECT recordid, title, description FROM record "
-                   "WHERE search = :SEARCH ORDER BY title;");
+    result.prepare("SELECT recordid, title, subtitle, description "
+                   "FROM record WHERE search = :SEARCH ORDER BY title;");
     result.bindValue(":SEARCH", kPowerSearch);
 
     if (result.exec() && result.isActive())
@@ -74,7 +68,8 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
 
             m_rule->insertItem(trimTitle);
             m_recid   << result.value(0).toString();
-            m_recdesc << QString::fromUtf8(result.value(2).toString());
+            m_recsub  << QString::fromUtf8(result.value(2).toString());
+            m_recdesc << QString::fromUtf8(result.value(3).toString());
         }
     }
     else
@@ -99,96 +94,152 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_clause->setBackgroundOrigin(WindowOrigin);
 
     m_clause->insertItem(tr("Match an exact title"));
+    m_cfrom << "";
     m_csql << "program.title = 'Nova' ";
 
     m_clause->insertItem(tr("Match an exact episode"));
+    m_cfrom << "";
     m_csql << QString("program.title = 'Seinfeld' \n"
                       "AND program.subtitle = 'The Soup' ");
 
     m_clause->insertItem(tr("Match words in the title"));
+    m_cfrom << "";
     m_csql << "program.title LIKE '%Junkyard%' ";
 
     m_clause->insertItem(tr("Match in any descriptive field"));
+    m_cfrom << "";
     m_csql << QString("(program.title LIKE '%Japan%' \n"
                       "     OR program.subtitle LIKE '%Japan%' \n"
                       "     OR program.description LIKE '%Japan%') ");
 
     m_clause->insertItem(tr("Limit by category"));
+    m_cfrom << "";
     m_csql << "program.category = 'Reality' ";
 
+    m_clause->insertItem(tr("All matches for a genre (Data Direct)"));
+    m_cfrom << "LEFT JOIN programgenres ON "
+               "program.chanid = programgenres.chanid AND "
+               "program.starttime = programgenres.starttime ";
+    m_csql << "programgenres.genre = 'Reality' ";
+
     m_clause->insertItem(tr("New episodes only"));
+    m_cfrom << "";
     m_csql << "program.previouslyshown = 0 ";
 
     m_clause->insertItem(tr("Exclude unidentified episodes (Data Direct)"));
+    m_cfrom << "";
     m_csql << QString("NOT (program.category_type = 'series' \n"
                       "     AND program.programid LIKE '%0000') ");
 
     m_clause->insertItem(tr("Exclude unidentified episodes (XMLTV)"));
+    m_cfrom << "";
     m_csql << "NOT (program.subtitle = '' AND program.description = '') ";
 
     m_clause->insertItem(QString(tr("Category type") +
             " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')"));
+    m_cfrom << "";
     m_csql << "program.category_type = 'sports' ";
 
     m_clause->insertItem(tr("Limit movies by the year of release"));
-    m_csql << "program.category_type = 'movie' AND airdate >= 2000 ";
+    m_cfrom << "";
+    m_csql << "program.category_type = 'movie' AND program.airdate >= 2000 ";
 
     m_clause->insertItem(tr("Minimum star rating (0.0 to 1.0 for movies only)"));
+    m_cfrom << "";
     m_csql << "program.stars >= 0.75 ";
 
+    m_clause->insertItem(tr("Person named in the credits"));
+    m_cfrom << ", people, credits";
+    m_csql << QString("people.name = 'Tom Hanks' \n"
+                      "AND credits.person = people.person \n"
+                      "AND program.chanid = credits.chanid \n"
+                      "AND program.starttime = credits.starttime ");
+
+    m_clause->insertItem(tr("Only on a specific station"));
+    m_cfrom << "";
+    m_csql << "channel.callsign = 'ESPN' ";
+
     m_clause->insertItem(tr("Exclude one station"));
+    m_cfrom << "";
     m_csql << "channel.callsign != 'GOLF' ";
 
     m_clause->insertItem(tr("Match related callsigns"));
+    m_cfrom << "";
     m_csql << "channel.callsign LIKE 'HBO%' ";
 
+    m_clause->insertItem(tr("Only on channels marked as favorites"));
+    m_cfrom << ", favorites";
+    m_csql << "program.chanid = favorites.chanid ";
+
     m_clause->insertItem(tr("Only channels from a specific video source"));
+    m_cfrom << "";
     m_csql << "channel.sourceid = 2 ";
 
     m_clause->insertItem(tr("Only channels marked as commercial free"));
+    m_cfrom << "";
     m_csql << "channel.commfree > 0 ";
 
     m_clause->insertItem(tr("Only shows marked as HDTV"));
+    m_cfrom << "";
     m_csql << "program.hdtv > 0 ";
 
     m_clause->insertItem(tr("Anytime on a specific day of the week"));
+    m_cfrom << "";
     m_csql << "DAYNAME(program.starttime) = 'Tuesday' ";
 
     m_clause->insertItem(tr("Only on weekdays (Monday through Friday)"));
+    m_cfrom << "";
     m_csql << "WEEKDAY(program.starttime) < 5 ";
 
     m_clause->insertItem(tr("Only on weekends"));
+    m_cfrom << "";
     m_csql << "WEEKDAY(program.starttime) >= 5 ";
 
     m_clause->insertItem(tr("Only in primetime"));
+    m_cfrom << "";
     m_csql << QString("HOUR(program.starttime) >= 19 \n"
                       "AND HOUR(program.starttime) < 23 ");
 
     m_clause->insertItem(tr("Not in primetime"));
+    m_cfrom << "";
     m_csql << QString("(HOUR(program.starttime) < 19 \n"
                       "      OR HOUR(program.starttime) >= 23) ");
 
+/*  This shows how to use oldprogram but is a bad idea in practice.
+    This would match all future showings until the day after the first
+    showing when all future showing are no longer 'new' titles.
+
+    m_clause->insertItem(tr("Only titles from the New Titles list"));
+    m_cfrom << "LEFT JOIN oldprogram ON oldprogram.oldtitle = program.title ";
+    m_csql << "oldprogram.oldtitle IS NULL ";
+*/
+
     m_clause->insertItem(tr("Multiple sports teams (complete example)"));
-    m_csql << QString("program.title LIKE 'NBA B%' \n"
-              "AND program.subtitle REGEXP '(Rockets|Cavaliers|Lakers)' ");
+    m_cfrom << "";
+    m_csql << QString("program.title = 'NBA Basketball' \n"
+              "AND program.subtitle REGEXP '(Miami|Cavaliers|Lakers)' ");
 
     m_clause->insertItem(tr("Sci-fi B-movies (complete example)"));
+    m_cfrom << "";
     m_csql << QString("program.category_type='movie' \n"
               "AND program.category='Science fiction' \n"
-              "AND program.stars <= 0.5 AND airdate < 1970 ");
+              "AND program.stars <= 0.5 AND program.airdate < 1970 ");
 
     m_clause->insertItem(tr("SportsCenter Overnight (complete example - use FindDaily)"));
+    m_cfrom << "";
     m_csql << QString("program.title = 'SportsCenter' \n"
               "AND HOUR(program.starttime) >= 2 \n"
               "AND HOUR(program.starttime) <= 6 ");
 
     m_clause->insertItem(tr("Movie of the Week (complete example - use FindWeekly)"));
+    m_cfrom << "";
     m_csql << QString("program.category_type='movie' \n"
-              "AND program.stars >= 1.0 AND airdate >= 1965 \n"
+              "AND program.stars >= 1.0 AND program.airdate >= 1965 \n"
               "AND DAYNAME(program.starttime) = 'Friday' \n"
               "AND HOUR(program.starttime) >= 12 ");
 
     m_clause->insertItem(tr("First Episodes (complete example for Data Direct)"));
+    m_cfrom << "";
     m_csql << QString("program.previouslyshown = 0 \n"
               "AND program.programid LIKE 'EP%0001' \n"
               "AND DAYOFYEAR(program.originalairdate) = \n"
@@ -209,6 +260,19 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_addButton->setEnabled(true);
 
     vbox->addWidget(m_addButton);
+
+    // Subtitle edit box
+    hbox = new QHBoxLayout(vbox, (int)(10 * wmult));
+
+    message = tr("Additional Tables") + ": ";
+    label = new QLabel(message, this);
+    label->setBackgroundOrigin(WindowOrigin);
+    label->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    hbox->addWidget(label);
+
+    m_subtitle = new MythRemoteLineEdit(this, "subtitle" );
+    m_subtitle->setBackgroundOrigin(WindowOrigin);
+    hbox->addWidget(m_subtitle);
 
     // Description edit box
     m_description = new MythRemoteLineEdit(5, this, "description" );
@@ -283,6 +347,7 @@ void CustomRecord::ruleChanged(void)
     else
         m_title->setText("");
 
+    m_subtitle->setText(m_recsub[curItem]);
     m_description->setText(m_recdesc[curItem]);
     textChanged();
 }
@@ -313,6 +378,7 @@ void CustomRecord::addClicked(void)
 
     clause += m_csql[m_clause->currentItem()];
     m_description->append(clause);
+    m_subtitle->append(m_cfrom[m_clause->currentItem()]);
 }
 
 void CustomRecord::testClicked(void)
@@ -323,7 +389,8 @@ void CustomRecord::testClicked(void)
         return;
     }
 
-    ProgLister *pl = new ProgLister(plSQLSearch, m_description->text(),
+    ProgLister *pl = new ProgLister(plSQLSearch, m_description->text(), 
+                                    m_subtitle->text(),
                                     gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
@@ -345,10 +412,11 @@ void CustomRecord::recordClicked(void)
 
     if (cur_recid > 0)
         record.modifyPowerSearchByID(cur_recid, m_title->text(),
-                                     m_description->text());
+                                     m_subtitle->text(),
+                                     m_description->text()); 
     else
         record.loadBySearch(kPowerSearch, m_title->text(),
-                             m_description->text());
+                            m_subtitle->text(), m_description->text());
     record.exec();
 
     if (record.getRecordID())
@@ -368,7 +436,7 @@ bool CustomRecord::checkSyntax(void)
     QString msg = "";
 
     QString desc = m_description->text();
-
+    QString from = m_subtitle->text();
     if (desc.contains(QRegExp("^\\s*AND\\s", false)))
     {
         msg = "Power Search rules no longer reqiure a leading \"AND\"";
@@ -376,8 +444,8 @@ bool CustomRecord::checkSyntax(void)
     else
     {
         MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare(QString("SELECT NULL FROM program,channel WHERE\n%1") 
-                              .arg(desc));
+        query.prepare(QString("SELECT NULL FROM program,channel %1 WHERE\n%2") 
+                              .arg(from).arg(desc));
 
         if (query.exec() && query.isActive())
         {

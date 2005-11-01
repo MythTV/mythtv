@@ -37,14 +37,17 @@ class CustomRecord : public MythDialog
     int prevItem;
 
     QStringList m_recid;
+    QStringList m_recsub;
     QStringList m_recdesc;
 
+    QStringList m_cfrom;
     QStringList m_csql;
 
     MythComboBox *m_rule;
     MythRemoteLineEdit *m_title;
     MythComboBox *m_clause;
     MythRemoteLineEdit *m_preview;
+    MythRemoteLineEdit *m_subtitle;
     MythRemoteLineEdit *m_description;
     MythPushButton *m_addButton;
     MythPushButton *m_testButton;

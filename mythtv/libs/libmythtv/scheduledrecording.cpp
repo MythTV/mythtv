@@ -123,6 +123,14 @@ void ScheduledRecording::loadBySearch(RecSearchType lsearch,
                                       QString textname,
                                       QString forwhat)
 {
+    QString from = "";
+    loadBySearch(lsearch, textname, from, forwhat);
+}
+void ScheduledRecording::loadBySearch(RecSearchType lsearch,
+                                      QString textname,
+                                      QString from,
+                                      QString forwhat)
+{
     MSqlQuery query(MSqlQuery::InitCon());
 
     int rid = 0;
@@ -167,13 +175,25 @@ void ScheduledRecording::loadBySearch(RecSearchType lsearch,
         }
         QString ltitle = QString("%1 %2").arg(textname).arg(searchType);
         title->setValue(ltitle);
+        subtitle->setValue(from);
         description->setValue(forwhat);
         findday->setValue((startDate->dateValue().dayOfWeek() + 1) % 7);
+        QDate epoch = QDate::QDate (1970, 1, 1);
+        findid->setValue(epoch.daysTo(startDate->dateValue()) + 719528);
     } 
 }
 
 void ScheduledRecording::modifyPowerSearchByID(int rid,
                                                QString textname,
+                                               QString forwhat)
+{
+    QString from = "";
+    modifyPowerSearchByID(rid, textname, from, forwhat);
+}
+
+void ScheduledRecording::modifyPowerSearchByID(int rid,
+                                               QString textname,
+                                               QString from,
                                                QString forwhat)
 {
     if (rid <= 0)
@@ -185,6 +205,7 @@ void ScheduledRecording::modifyPowerSearchByID(int rid,
 
     QString ltitle = textname + " (" + QObject::tr("Power Search") + ")";
     title->setValue(ltitle);
+    subtitle->setValue(from);
     description->setValue(forwhat);
 }
 
@@ -477,29 +498,33 @@ void ScheduledRecording::runProgList(void)
         switch (search->intValue())
         {
         case kTitleSearch:
-            pl = new ProgLister(plTitleSearch, rule.description->getValue(),
+            pl = new ProgLister(plTitleSearch,
+                                rule.description->getValue(), "",
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kKeywordSearch:
-            pl = new ProgLister(plKeywordSearch, rule.description->getValue(),
+            pl = new ProgLister(plKeywordSearch,
+                                rule.description->getValue(), "",
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kPeopleSearch:
-            pl = new ProgLister(plPeopleSearch, rule.description->getValue(),
+            pl = new ProgLister(plPeopleSearch,
+                                rule.description->getValue(), "",
                                 gContext->GetMainWindow(), "proglist");
             break;
         case kPowerSearch:
             pl = new ProgLister(plSQLSearch, rule.description->getValue(),
+                                rule.subtitle->getValue(),
                                 gContext->GetMainWindow(), "proglist");
             break;
         default:
-            pl = new ProgLister(plTitle, title->getValue(),
+            pl = new ProgLister(plTitle, title->getValue(), "",
                                 gContext->GetMainWindow(), "proglist");
             break;
         }
     }
     else
-        pl = new ProgLister(plTitle, title->getValue(),
+        pl = new ProgLister(plTitle, title->getValue(), "",
                             gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;

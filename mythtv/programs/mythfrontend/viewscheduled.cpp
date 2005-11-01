@@ -534,7 +534,7 @@ void ViewScheduled::upcoming()
     if (!p)
         return;
 
-    ProgLister *pl = new ProgLister(plTitle, p->title,
+    ProgLister *pl = new ProgLister(plTitle, p->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;

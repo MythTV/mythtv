@@ -576,7 +576,7 @@ void ProgFinder::upcoming()
         if (!curPick)
             return;
 
-        ProgLister *pl = new ProgLister(plTitle, curPick->title,
+        ProgLister *pl = new ProgLister(plTitle, curPick->title, "",
                                         gContext->GetMainWindow(), "proglist");
         pl->exec();
         delete pl;

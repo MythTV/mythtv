@@ -66,7 +66,7 @@ void startFinder(void)
 
 void startSearchTitle(void)
 {
-  ProgLister searchTitle(plTitleSearch, "",
+    ProgLister searchTitle(plTitleSearch, "", "",
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -76,7 +76,7 @@ void startSearchTitle(void)
 
 void startSearchKeyword(void)
 {
-  ProgLister searchKeyword(plKeywordSearch, "",
+    ProgLister searchKeyword(plKeywordSearch, "", "",
                         gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -86,7 +86,7 @@ void startSearchKeyword(void)
 
 void startSearchPeople(void)
 {
-  ProgLister searchPeople(plPeopleSearch, "",
+    ProgLister searchPeople(plPeopleSearch, "", "",
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -96,7 +96,7 @@ void startSearchPeople(void)
 
 void startSearchPower(void)
 {
-  ProgLister searchPower(plPowerSearch, "",
+    ProgLister searchPower(plPowerSearch, "", "",
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -106,7 +106,7 @@ void startSearchPower(void)
 
 void startSearchChannel(void)
 {
-    ProgLister searchChannel(plChannel, "",
+    ProgLister searchChannel(plChannel, "", "",
                              gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -116,7 +116,7 @@ void startSearchChannel(void)
 
 void startSearchCategory(void)
 {
-  ProgLister searchCategory(plCategory, "",
+    ProgLister searchCategory(plCategory, "", "",
                             gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -126,7 +126,7 @@ void startSearchCategory(void)
 
 void startSearchMovie(void)
 {
-    ProgLister searchMovie(plMovies, "",
+    ProgLister searchMovie(plMovies, "", "",
                            gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -136,7 +136,7 @@ void startSearchMovie(void)
 
 void startSearchNew(void)
 {
-    ProgLister searchNew(plNewListings, "",
+    ProgLister searchNew(plNewListings, "", "",
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();
@@ -146,7 +146,7 @@ void startSearchNew(void)
 
 void startSearchTime(void)
 {
-  ProgLister searchTime(plTime, "",
+    ProgLister searchTime(plTime, "", "",
                          gContext->GetMainWindow(), "proglist");
 
     qApp->unlock();

@@ -1739,7 +1739,7 @@ void PlaybackBox::upcoming()
         return;
     }
 
-    ProgLister *pl = new ProgLister(plTitle, curitem->title,
+    ProgLister *pl = new ProgLister(plTitle, curitem->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;

@@ -1729,7 +1729,7 @@ void GuideGrid::upcoming()
     if (pginfo->title == unknownTitle)
         return;
 
-    ProgLister *pl = new ProgLister(plTitle, pginfo->title,
+    ProgLister *pl = new ProgLister(plTitle, pginfo->title, "",
                                    gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
