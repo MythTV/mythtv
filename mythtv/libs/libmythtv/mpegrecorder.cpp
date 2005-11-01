@@ -47,6 +47,8 @@ const char* MpegRecorder::streamType[] = { "MPEG-2 PS", "MPEG-2 TS",
 const char* MpegRecorder::aspectRatio[] = { "Square", "4:3", "16:9", 
                                             "2.21:1", 0 };
 
+#define BUILDBUFFERMAX (1024 * 1024)
+
 MpegRecorder::MpegRecorder(TVRec *rec) :
     RecorderBase(rec, "MpegRecorder")
 {
@@ -76,11 +78,15 @@ MpegRecorder::MpegRecorder(TVRec *rec) :
 
     deviceIsMpegFile = false;
     bufferSize = 4096;
+
+    buildbuffer = new unsigned char[BUILDBUFFERMAX + 1];
+    buildbuffersize = 0;
 }
 
 MpegRecorder::~MpegRecorder()
 {
     TeardownAll();
+    delete [] buildbuffer;
 }
 
 void MpegRecorder::deleteLater(void)
@@ -119,26 +125,30 @@ void MpegRecorder::SetOption(const QString &opt, int value)
     else if (opt == "mpeg2audbitratel1")
     {
         for (int i = 0; audRateL1[i] != 0; i++)
+        {
             if (audRateL1[i] == value)
             {
                 audbitratel1 = i + 1;
                 found = true;
                 break;
             }
-        if (! found)
+        }
+        if (!found)
             cerr << "Audiorate(L1): " << value << " is invalid\n";
 
     }
     else if (opt == "mpeg2audbitratel2")
     {
         for (int i = 0; audRateL2[i] != 0; i++)
+        {
             if (audRateL2[i] == value)
             {
                 audbitratel2 = i + 1;
                 found = true;
                 break;
             }
-        if (! found)
+        }
+        if (!found)
             cerr << "Audiorate(L2): " << value << " is invalid\n";
     }
     else if (opt == "mpeg2audvolume")
@@ -466,7 +476,7 @@ void MpegRecorder::StartRecording(void)
                 perror("select");
                 continue;
             case 0:
-                printf("select timeout\n");
+                printf("select timeout - ivtv driver has stopped responding\n");
                 continue;
            default: break;
         }
@@ -547,8 +557,9 @@ void MpegRecorder::Initialize(void)
 
 void MpegRecorder::ProcessData(unsigned char *buffer, int len)
 {
-    unsigned char *bufptr = buffer;
+    unsigned char *bufptr = buffer, *bufstart = buffer;
     unsigned int state = leftovers, v = 0;
+    int leftlen = len;
 
     while (bufptr < buffer + len)
     {
@@ -560,8 +571,36 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
             if (state == PACK_HEADER)
             {
                 long long startpos = ringBuffer->GetFileWritePosition();
-                startpos += bufptr - buffer - 4;
+                startpos += buildbuffersize + bufptr - bufstart - 4;
                 lastpackheaderpos = startpos;
+
+                int curpos = bufptr - bufstart - 4;
+                if (curpos < 0)
+                {
+                    // header was split
+                    buildbuffersize += curpos;
+                    if (buildbuffersize > 0)
+                        ringBuffer->Write(buildbuffer, buildbuffersize);
+
+                    buildbuffersize = 4;
+                    memcpy(buildbuffer, &state, 4);
+
+                    leftlen = leftlen - curpos + 4;
+                    bufstart = bufptr;
+                }
+                else
+                {
+                    // header was entirely in this packet
+                    memcpy(buildbuffer + buildbuffersize, bufstart, curpos);
+                    buildbuffersize += curpos;
+                    bufstart += curpos;
+                    leftlen -= curpos;
+
+                    if (buildbuffersize > 0)
+                        ringBuffer->Write(buildbuffer, buildbuffersize);
+
+                    buildbuffersize = 0;
+                }
             }
 
             if (state == SEQ_START)
@@ -576,13 +615,21 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
                 HandleKeyframe();
             }
         }
-
-        state = ((state << 8) | v) & 0xFFFFFF;
+        else
+            state = ((state << 8) | v) & 0xFFFFFF;
     }
 
     leftovers = state;
 
-    ringBuffer->Write(buffer, len);
+    if (buildbuffersize + leftlen > BUILDBUFFERMAX)
+    {
+        ringBuffer->Write(buildbuffer, buildbuffersize);
+        buildbuffersize = 0;
+    }
+
+    // copy remaining..
+    memcpy(buildbuffer + buildbuffersize, bufstart, leftlen);
+    buildbuffersize += leftlen;
 }
 
 void MpegRecorder::StopRecording(void)
@@ -590,22 +637,26 @@ void MpegRecorder::StopRecording(void)
     encoding = false;
 }
 
-void MpegRecorder::Reset(void)
+void MpegRecorder::ResetForNewFile(void)
 {
     errored = false;
     framesWritten = 0;
     numgops = 0;
-    lastseqstart = 0;
-
-    leftovers = 0xFFFFFFFF;
+    lastseqstart = lastpackheaderpos = 0;
 
     positionMap.clear();
     positionMapDelta.clear();
+}
+
+void MpegRecorder::Reset(void)
+{
+    ResetForNewFile();
+
+    leftovers = 0xFFFFFFFF;
+    buildbuffersize = 0;
 
     if (curRecording)
-    {
         curRecording->ClearPositionMap(MARK_GOP_START);
-    }
 }
 
 void MpegRecorder::Pause(bool clear)
@@ -675,11 +726,13 @@ void MpegRecorder::HandleKeyframe(void)
 
     // Perform ringbuffer switch if needed.
     nextRingBufferLock.lock();
+
     bool rb_changed = false;
+
     if (nextRingBuffer)
     {
         FinishRecording();
-        Reset();
+        ResetForNewFile();
 
         if (weMadeBuffer && ringBuffer)
             delete ringBuffer;
@@ -694,6 +747,7 @@ void MpegRecorder::HandleKeyframe(void)
         rb_changed = true;
     }
     nextRingBufferLock.unlock();
+
     if (rb_changed && tvrec)
         tvrec->RingBufferChanged();
 }

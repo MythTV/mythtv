@@ -55,6 +55,8 @@ class MpegRecorder : public RecorderBase
     bool OpenMpegFileAsInput(void);
     bool OpenV4L2DeviceAsInput(void);
 
+    void ResetForNewFile(void);
+
     bool errored;
     bool deviceIsMpegFile;
     int bufferSize;
@@ -92,5 +94,8 @@ class MpegRecorder : public RecorderBase
     long long lastpackheaderpos;
     long long lastseqstart;
     long long numgops;
+
+    unsigned char *buildbuffer;
+    unsigned int buildbuffersize;
 };
 #endif

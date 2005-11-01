@@ -1208,7 +1208,7 @@ void TVRec::RunTV(void)
             static bool rbSwitched = false;
             if ((QDateTime::currentDateTime() > switchTime) && !rbSwitched)
             {
-                RingBuffer *rb = new RingBuffer("/video/mythtv/x.mpg", true);
+                RingBuffer *rb = new RingBuffer("/mnt/store/x.mpg", true);
                 VERBOSE(VB_IMPORTANT, LOC +"Switching RingBuffer soon");
                 recorder->SetNextRecording(curRecording, rb);
                 rbSwitched = true;
