@@ -559,7 +559,7 @@ QRect VideoOutput::GetVisibleOSDBounds(void) const
  */
 QRect VideoOutput::GetTotalOSDBounds(void) const
 {
-    return QRect(0, 0, imgw, imgh);
+    return QRect(0, 0, XJ_width, XJ_height);
 }
 
 /**
