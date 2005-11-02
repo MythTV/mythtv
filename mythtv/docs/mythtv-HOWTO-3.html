@@ -115,7 +115,7 @@ MPEG-4, 2 GB/hour for MPEG-2 and RTjpeg and 7 GB/hour for ATSC HDTV.</P>
 <IMG SRC="stop.png">
 <CAPTION><B>NOTE</B>:  You <EM>must</EM> use DMA for hard drive access to prevent
 choppy or jittery video.  Not all distributions enable DMA at boot time. See the Troubleshooting Section for 
-<A HREF="mythtv-HOWTO-21.html#Setting_DMA">instructions</A> on how to do this.</CAPTION>
+<A HREF="mythtv-HOWTO-22.html#Setting_DMA">instructions</A> on how to do this.</CAPTION>
 </FIGURE>
 </P>
 <P>Writing video to disk is sensitive to timing issues; RTjpeg requires less
@@ -124,7 +124,7 @@ faster.  MPEG-4 requires more CPU, but the files are smaller.  At the
 default resolution, MPEG-2 creates the largest files of all with almost no
 CPU impact.</P>
 <P>See the Troubleshooting 
-<A HREF="mythtv-HOWTO-21.html#Setting_DMA">section</A> for more
+<A HREF="mythtv-HOWTO-22.html#Setting_DMA">section</A> for more
 information.</P>
 
 <H3>Filesystems</H3>
@@ -139,8 +139,8 @@ either of these for your MythTV filesystem.</P>
 <P>Because of the size of the MythTV files, it may be useful to plan for future
 expansion right from the beginning.  If your case and power supply have the
 capacity for additional hard drives, read through the 
-<A HREF="mythtv-HOWTO-23.html#LVM">LVM</A> and 
-<A HREF="mythtv-HOWTO-23.html#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
+<A HREF="mythtv-HOWTO-24.html#LVM">LVM</A> and 
+<A HREF="mythtv-HOWTO-24.html#advancedpartitionformatting">Advanced Partition Formatting</A> sections for some pointers.</P>
 <P>
 <A NAME="video_capture_device"></A> </P>
 <H3>Video Capture Device </H3>
@@ -323,7 +323,7 @@ a single chassis, since each capture card will not need its own sound
 card.  Note that a separate sound card is still required for playback
 when using <CODE>btaudio</CODE>, and that often the audio recorded in this
 way will be mono only.  See the 
-<A HREF="mythtv-HOWTO-22.html#btaudio">btaudio</A>
+<A HREF="mythtv-HOWTO-23.html#btaudio">btaudio</A>
 section for more information.</P>
 <P>
 <FIGURE>
@@ -467,15 +467,16 @@ inexpensive Savage card with TV out) is broken. See
 
 <P>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
 driver.</P>
-<P>The PVR-350 is unique in that it also supports audio output. However, as of
-MythTV 0.17, the IvyTV drivers do not support volume control.  There are two
-courses of action you may take:
+<P>The PVR-350 is unique amongst the Hauppauge PVR-x50 cards in that it also
+supports audio output, but you need to connect that audio output to
+something.  There are two courses of action you may take:
 <OL>
 <LI>Take the audio output from the PVR-350 and plug it into an input on a
 sound card on your machine.  You may then use MythTV's internal audio
 controls.</LI>
-<LI>Take the audio output from the PVR-350 and connect it directly to your television / audio system.  
-You must indicate that you are using external audio control on the PVR-350 setup page.</LI>
+<LI>Take the audio output from the PVR-350 and connect it directly to your
+television / audio system.  You must indicate that you are using external
+audio control on the PVR-350 setup page.</LI>
 </OL>
 </P>
 
@@ -522,19 +523,6 @@ satisfying any prerequisites.</P>
 system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.</CAPTION>
 </FIGURE>
-</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  The following distributions have issues which may prevent a
-successful MythTV installation:</CAPTION>
-</FIGURE>
-
-<UL>
-<LI>Suse 8.2 - Broken Qt package</LI>
-<LI>Red Hat 8 - does not meet minimum version requirement for Qt (3.1+)</LI>
-</UL>
 </P>
 
 <H3><A NAME="precompiled"></A> Pre-compiled packages </H3>
@@ -677,7 +665,7 @@ you will need <B>perl</B>.</P>
 <P>
 <HR>
 <PRE>
-NOTE:  Qt v3.1 or higher is required.
+NOTE:  Qt v3.1 or higher, but less than Qt v4.0, is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary

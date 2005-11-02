@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: MythMusic. </TITLE>
+ <TITLE>Installing and using MythTV: MythGame.</TITLE>
  <LINK HREF="mythtv-HOWTO-17.html" REL=next>
  <LINK HREF="mythtv-HOWTO-15.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc16" REL=contents>
@@ -12,333 +12,226 @@
 <A HREF="mythtv-HOWTO-15.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc16">Contents</A>
 <HR>
-<H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">MythMusic. </A></H2>
+<H2><A NAME="s16">16.</A> <A HREF="mythtv-HOWTO.html#toc16">MythGame.</A></H2>
 
-<P>MythMusic has a number of prerequisites that must be satisfied before it
-is operational.  Depending on your distribution, some of these prerequisites can
-be satisfied through the various package managers.  If your distribution doesn't
-offer pre-compiled versions of the software below, then follow the generic
-instructions for manually compiling and installing the software.</P>
-<P>The prerequisites for MythMusic are:
-<UL>
-<LI>MAD</LI>
-<LI>id3tag</LI>
-<LI>libvorbis-devel</LI>
-<LI>FLAC</LI>
-<LI>libcdaudio</LI>
-<LI>CDParanoia</LI>
-</UL>
+<P>
+<A HREF="http://www.mameworld.net/">http://www.mameworld.net/</A> is
+an excellent resource for all things mame.</P>
+<P>Installation overview:
+<OL>
+<LI>Setup directory structure</LI>
+<LI>Download and install xmame</LI>
+<LI>Download and place files (artwork/catver.ini/etc..)</LI>
+<LI>Download and install mythgame plugin</LI>
+<LI>Setup mythgame from inside mythfrontend</LI>
+<LI>Hints: No joystick solution</LI>
+</OL>
 </P>
-
-<H2><A NAME="ss16.1">16.1</A> <A HREF="mythtv-HOWTO.html#toc16.1">Manual installation of prerequisites</A>
+<H2><A NAME="ss16.1">16.1</A> <A HREF="mythtv-HOWTO.html#toc16.1">Setup Directory Structure</A>
 </H2>
 
-<P>These instructions are for distributions which don't have pre-compiled
-versions of the software necessary to run MythTV.</P>
-<P>Download MAD from 
-<A HREF="http://www.mars.org/home/rob/proj/mpeg/">http://www.mars.org/home/rob/proj/mpeg/</A>  Save it to a directory you
-can find later.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ tar -xzf mad-0.14.2b.tar.gz
-$ cd mad-0.14.2b
-$ ./configure
-$ make
-$ su
-# make install
-# exit
-$ 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Download libid3tag from 
-<A HREF="http://www.underbit.com/products/mad/">http://www.underbit.com/products/mad/</A> Save it to a directory you can
-find later.</P>
+<P>To keep things organized, create the following directories for <B>xmame</B> to use
+in <CODE>/usr/local/share/xmame</CODE>: hiscore, roms, and snaps.</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ tar -xzf libid3tag-0.15.0b.tar.gz
-$ cd libid3tag-0.15.0b
-$ ./configure
-$ make
-$ su
-# make install
-# exit
-$ 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Download FLAC from 
-<A HREF="http://flac.sourceforge.net">http://flac.sourceforge.net</A> and install:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ tar -xzf flac-1.1.0.tar.gz
-$ cd flac-1.1.0
-$ ./configure
-$ make
-$ su
-# make install
-# exit
-$ 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Download libcdaudio from 
-<A HREF="http://sourceforge.net/project/showfiles.php?group_id=27134">libcdaudio.sourceforge.net</A> and
-install:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ tar -xzf libcdaudio-0.99.9.tar.gz
-$ cd libcdaudio-0.99.9
-$ ./configure
-$ make
-$ su
-# make install
-# exit
-$ 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Download cdparanoia from 
-<A HREF="http://www.xiph.org/paranoia/download/cdparanoia-III-alpha9.8.src.tgz">http://www.xiph.org/paranoia/down.html</A>.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ tar -xzf cdparanoia-III-alpha9.8.src.tgz
-$ cd cdparanoia-III-alpha9.8
-$ ./configure
-$ make
-$ su
-# make install
-# cd /usr/lib
-# ln -sf libcdda_interface.so.0.9.8 libcdda_interface.so
-# ln -sf libcdda_paranoia.so.0.9.8 libcdda_paranoia.so
-# exit
-$ 
+$ mkdir -p /usr/local/share/xmame/{highscore,roms,snaps}
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss16.2">16.2</A> <A HREF="mythtv-HOWTO.html#toc16.2">Mandrake</A>
+<H2><A NAME="ss16.2">16.2</A> <A HREF="mythtv-HOWTO.html#toc16.2">Download and Install xmame</A>
 </H2>
 
-<P>Mandrake has a number of the prerequisites available on the
-installation CD.  Some of the software you're going to need will have to be
-obtained from the "contrib" or "cooker" development repositories. 
-Applications downloaded from "cooker" come from the development branch, so
-there may be issues with some software.  It isn't recommended that you mix
-cooker and release-level software.</P>
-
-<P><B>urpmi</B> is the simplest tool for installation of packages from the
-command line.  The difficult part is the configuration, but this has been
-made easier at the following website: 
-<A HREF="http://addmedia.linuxfornewbies.org/">http://addmedia.linuxfornewbies.org/</A> The website will allow
-you to choose a mirror site and then present the command-line configuration
-text for that mirror.  You will most likely need to add a "Contrib" mirror
-to your setup.  Once you have done that, you can proceed.  If <B>urpmi</B>
-prompts you about other modules that need to be installed to satisfy
-dependencies, say "Yes".</P>
+<P>Download the source to <B>xmame</B> from 
+<A HREF="http://x.mame.net/download/xmame-0.97.tar.bz2">http://x.mame.net/download/xmame-0.97.tar.bz2</A></P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-# urpmi libmad0 libmad0-devel libflac4 libflac4-devel libcdaudio1 cdparanoia
-# urpmi libcdda0 libcdda0-devel libvorbis0 libvorbis0-devel
-# urpmi libcdaudio1-devel libid3tag0 libid3tag0-devel
+$ wget http://x.mame.net/download/xmame-0.97.tar.bz2
+$ tar -xjf xmame-0.97.tar.bz2
+$ cd xmame-0.97
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-
-<H3>Additional options with MythMusic</H3>
-
-<P>Additional visualizations have been added to MythMusic.  If you wish to
-use these, there are some prerequisites you must install prior to compiling.</P>
+<P>Edit the Makefile with your favorite editor.  Adjust the options as required for your system.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ joe Makefile
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Then make and install xmame
+<BLOCKQUOTE><CODE>
+<PRE>
+$ make
+$ su
+(enter password)
+# make install
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>After <B>mame</B> has been installed, we need to create some defaults.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mkdir ~/.xmame
+$ cp docs/xmamerc.dist ~/.xmame/xmamerc
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Because some ROMS work better with different display toolkits, or possibly
+even older versions of xmame, it's convenient to keep all of your
+<B>xmame</B> binaries and to rename them to include the version number,
+then make a symbolic link to "xmame". If you want to test a different
+version of <B>xmame</B> at some point you only need to switch this link.</P>
 <P>
-<UL>
-<LI>fftw</LI>
-<LI>OpenGL</LI>
-<LI>SDL</LI>
-</UL>
-</P>
-<P><CODE>fftw</CODE> may be obtained from 
-<A HREF="http://www.fftw.org/">http://www.fftw.org/</A>.  In Mandrake it may be installed by
-typing:
 <BLOCKQUOTE><CODE>
 <PRE>
-# urpmi libfftw2 libfftw2-devel
+$ su
+(enter password)
+# mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.97.x11
+# ln -s /usr/local/bin/xmame-0.97.x11 /usr/local/bin/xmame
+# exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><CODE>OpenGL</CODE> should be installed on practically all distributions. 
-However, you will need the devel module.  In Mandrake it may be
-installed by typing:
+<P><B>NOTE</B>: Depending on how you compiled <B>xmame</B>, you may have
+<B>xmame.X11</B>, <B>xmame.SDL</B> or <B>xmame.xgl</B> based on what
+display toolkit you used. Also, you may need to remove and recreate
+<CODE>xmamerc</CODE> after upgrading since some of the default options may have
+changed.</P>
+<P>Confirm that <B>xmame</B> works before running it inside MythTV. Place
+your ROM in the <CODE>/usr/local/share/xmame/roms</CODE> directory you created
+earlier.</P>
+<P><B>NOTE</B>: There are three public domain ROM sets available at
+<A HREF="http://www.mame.net/downmisc.html">http://www.mame.net/downmisc.html</A></P>
+<P>Launch <B>xmame</B> with your game of choice.  In this example, we are using Gauntlet.
 <BLOCKQUOTE><CODE>
 <PRE>
-# urpmi libMesaGLU1-devel
+$ xmame gauntlet
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><CODE>SDL</CODE> may be obtained from 
-<A HREF="http://www.libsdl.org">http://www.libsdl.org</A>.  In Mandrake it may be installed by
-typing:
+<P>Some basic <B>mame</B> keyboard commands:
 <BLOCKQUOTE><CODE>
 <PRE>
-# urpmi libSDL1.2 libSDL1.2-devel
+5 = Insert coin
+1 = Player 1 start
+arrow keys = movement
+left control = button 1
+left alt = button 2
+SPACE = button 3
+ESC = exit
+TAB - menu
+~ to adjust Volume
+     &lt; and >
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss16.3">16.3</A> <A HREF="mythtv-HOWTO.html#toc16.3">Red Hat Linux 9</A>
+<H2><A NAME="ss16.3">16.3</A> <A HREF="mythtv-HOWTO.html#toc16.3">Download extra files</A>
 </H2>
 
-<P>Red Hat provides packages for several of the prerequisites, making 
-installation very simple. Of the prerequisites, Red Hat provides 
-packages for Vorbis, cdparanoia, SDL, and OpenGL (which you probably 
-already have installed). To install these all at once, simply type (all on
-the same line):
-<BLOCKQUOTE><CODE>
-<PRE>
-$ up2date --solvedeps libvorbis libvorbis-devel vorbis-tools cdparanoia-devel cdparanoia-libs cdparanoia SDL-devel SDL
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you get the following message: "None of the packages you requested 
-were found, or they are already updated" it probably means you already 
-have all of those packages installed.</P>
-<P>You must install the remaining packages, (MAD, FLAC, libcdaudio and
-optionally fftw) manually following the installation directions above. When
-installing fftw do not use the rpm package offered on the website because it
-will cause an error, so use the source package instead.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: you can use the instructions given at the 
-<A HREF="mythtv-HOWTO-3.html#atrpms">automated installation section</A> to install all of MythMusic in one
-step.</CAPTION>
-</FIGURE>
-</P>
-<H2><A NAME="ss16.4">16.4</A> <A HREF="mythtv-HOWTO.html#toc16.4">Compiling MythMusic</A>
+<P>The following files allow you to add extra functionality.  Place them
+into <CODE>/usr/local/share/xmame</CODE></P>
+<P>- <CODE>catver.ini</CODE> is a catalog of categories and versions of popular mame ROMs.</P>
+<P>Useful for keeping large libraries of ROMs organized.</P>
+<P>It may be downloaded from 
+<A HREF="http://www.catver.com">http://www.catver.com</A> or 
+<A HREF="http://www.mameworld.net/catlist">http://www.mameworld.net/catlist</A></P>
+<P>- Screenshots aka "snaps"</P>
+<P>These may be downloaded from 
+<A HREF="http://www.classicgaming.com/mame32qa/">http://www.classicgaming.com/mame32qa/</A></P>
+<P>Screenshots are displayed when you are browsing your ROMS in <B>mythgame</B>.
+Unzip and place them in <CODE>/usr/local/share/xmame/snaps</CODE></P>
+<P>- <CODE>history.dat</CODE></P>
+<P>Download from 
+<A HREF="http://www.arcade-history.com/history_database.php">http://www.arcade-history.com/history_database.php</A>
+This file fills in a bit of background about each ROM.</P>
+<P>- <CODE>hiscore.dat</CODE></P>
+<P>Download from 
+<A HREF="http://www.mameworld.net/highscore/">http://www.mameworld.net/highscore/</A></P>
+<P>- Cheats</P>
+<P>Download from 
+<A HREF="http://cheat.retrogames.com/">http://cheat.retrogames.com/</A></P>
+
+<H2><A NAME="ss16.4">16.4</A> <A HREF="mythtv-HOWTO.html#toc16.4">Download and Install Mythgame.</A>
 </H2>
 
-<P>Once all the prerequisites have been installed, you can proceed with
-compiling MythMusic.</P>
-<P>
+<P><B>mythgame</B> is part of the mythplugins package.  See the instructions
+in the 
+<A HREF="mythtv-HOWTO-5.html#DownloadAndCompile">Downloading and Compiling</A>
+section to obtain mythplugins.</P>
+<P>Switch to the mythplugins directory:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd ~/mythplugins-0.18.1
-$ ./configure --disable-all --enable-mythmusic --enable-fftw --enable-sdl --enable-aac
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Compile and install mythgame:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ ./configure --disable-all --enable-mythgame
 $ qmake mythplugins.pro
 $ make
 $ su
+(enter password)
 # make install
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H2><A NAME="ss16.5">16.5</A> <A HREF="mythtv-HOWTO.html#toc16.5">Configuring MythMusic</A>
+<H2><A NAME="ss16.5">16.5</A> <A HREF="mythtv-HOWTO.html#toc16.5">Setup mythgame</A>
 </H2>
 
-<P>Configuration of MythMusic occurs in two places.  The main mythfrontend
-Setup is for global MythMusic configuration.  Go to the
-Setup/MythMusic/General Setup screen and adjust it for your particular
-configuration.</P>
-<P>The second configuration screen is within the MythMusic program and will
-allow you rescan your music library, etc.</P>
-<P>Here's some explanation about the Ignore_ID3 and The NonID3FileNameFormat:</P>
-<P>If Ignore_ID3 is set to TRUE, MythMusic will try to determine the
-Genre, Artist, Album, Track Number, and Title from the filename of the
-mp3 file.  The NonID3FileNameFormat variable should be set to the
-directory/file format where the mp3 files are stored.  For instance, I
-store mine in the above shown Genre/Artist/Album/Track format.  MythMusic
-will then use this information to fill in the proper fields when it
-populates the musicmetadata table rather than searching for an ID3 tag in
-the mp3 file.</P>
-<P>The files can be laid out in any format, such as:</P>
-<P>Genre/Artist/Album/Title
-Artist/Genre/Album/Title
-Artist/Album/Title (with Genre left as Unknown)</P>
-<P>The track number is optional but can be specified with the title by using
-the TRACK_TITLE keyword instead of TITLE.  If TRACK_TITLE is used,
-then the filename can have a space, hyphen, or underscore separating the
-track number from the track title.  Keywords are case insensitive, so if
-you specify GENRE it's the same as Genre in the format field.</P>
-<P>The Ignore_ID3 option does not disable the code that determines the track
-length, just the portion that tries to read ID3 info.</P>
-
-<H2><A NAME="ss16.6">16.6</A> <A HREF="mythtv-HOWTO.html#toc16.6">Using MythMusic</A>
-</H2>
-
-<P>MythMusic is fairly simple to use.  It is recommended that you insert the
-CD before selecting "Import CD".  You should also ensure that your system
-doesn't try to automount the CD and begin playing it automatically.</P>
-<P>Here's some information on playlist management:</P>
-<P>Q: How do I create a new playlist?  
-A: Using the MythMusic "Select Music" menu option, setup the playlist as you
-normally would by adding songs or other playlists as needed.  When you are
-ready to save the new playlist, highlight "Active Play Queue" at the bottom
-of the selection tree and hit the "i" key. This will pop up a menu allowing
-you to name and save the new playlist.  You can also hit Enter to bring up
-the popup on the Active Play Queue. This does not work on the playlists
-above, as Enter is obviously bound to checking/unchecking the boxes. Any
-number (i.e. keypad on remote) will also bring up the menu in both cases.</P>
-<P>Q: How do I enter the playlist name in the text field without a keyboard?
-A: Use the keypad number keys (bound to your remote) to select letters
-quasi-cell phone style. Keys 2-9 work pretty much like any cell phone text
-entry. 1 cycles through a few special characters, delete, and space. 0 is
-like a CAPS LOCK. Hard to describe, fairly easy to use. You will soon be
-able to specify the cycle timing in a Setup screen. You can type fairly
-quickly through a combination of jumping around the number keys AND hitting
-a non-number key (right arrow is particularly good for this) to force the
-current character.</P>
-<P>Q: How do I edit a playlist? 
-A: Highlight the playlist in the selection tree and hit the "i" key then
-select "Move to Active Play Queue" in the popup.  You can now modify the
-"Active Play Queue" like normal, adding songs and playlists by selecting
-them from the song tree.  When you are done, highlight the "Active Play
-Queue" in the selection tree and hit the "i" key then select "Save Back to
-Playlist Tree".  And whatever you were editing as your Active Queue before
-you moved an existing playlist "on top" of Active reappears. Think of Active
-has having a push on, pop off capability, but with a depth of only 1.</P>
-<P>Q: How do I delete an item from a playlist?
-A: Highlight the item in the selection tree and hit the "d" key.</P>
-<P>Q: How do I rearrange the songs in my playlist?
-A: Highlight a song and hit the "space" bar, the song will now have pair of
-red arrows in front of it.  Use the up and down arrow keys to move it around
-in the playlist.  When you have it where you want it, hit the "space" bar
-again.</P>
-<P>Q: How do I delete a playlist?
-A: Highlight the playlist in the selection tree and hit the "i" key then
-select "Delete this Playlist" from the popup.</P>
-
-<H2><A NAME="ss16.7">16.7</A> <A HREF="mythtv-HOWTO.html#toc16.7">Troubleshooting MythMusic</A>
-</H2>
-
-<P>You may run into errors when running MythMusic.</P>
-<H3>When I run MythMusic and try and look up a CD, I get an error message </H3>
-
-<P>The full text of the message will say: </P>
-<P>databasebox.o: Couldn't find your CD. It may not be in the freedb database. 
-More likely, however, is that you need to delete &nbsp;/.cddb and &nbsp;/.cdserverrc
-and restart mythmusic. Have a nice day.</P>
-<P>If you get this message, you should go to the home directory of whatever
-user MythMusic is running as and type:
+<P>Start <B>mythfrontend</B> and navigate to Utilities/Setup>Setup>Media
+Settings>Game Settings>General Settings</P>
+<P>On page one you can setup the display order of your games, on page 2 and 3
+you need to enter the paths to files and directories that xmame uses.</P>
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-rm .cdserverrc
-rm -rf .cddb/
+MAME binary location:  /usr/local/bin/xmame               (path to xmame binary)
+MAME ROM location:     /usr/local/share/xmame/roms        (where you store all your roms)
+catver.ini file:       /usr/local/share/xmame/catver.ini  (Category and Version information for your ROMs)
+MAME screenshots path: /usr/local/share/xmame/snaps       (screenshots of ROMs in play)
+MAME hiscores path:    /usr/local/share/xmame/hiscore     (directory for mame to create hiscore.hi files)
+MAME hiscores file:    /usr/local/share/xmame/hiscore.dat (file that tells mame how to store hiscores)
+MAME flyers path:      /usr/local/share/xmame/flyers      (not used with mythgame)
+MAME cabinets path:    /usr/local/share/xmame/cabinets    (not used with mythgame)
+MAME history path:     /usr/local/share/xmame/history.dat (a little history about each game)
+MAME cheat files path: /usr/local/share/xmame/cheats
+MAME image downloader                                     (no longer used)
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>These files aren't automatically deleted because of a conscious design
-decision by the author that programs that automatically delete things are
-bad.</P>
-<P>The files are used to locally cache CD lookups. If you are re-inserting
-CDs, your machine will not actually have to go out to the Internet to
-determine what is on them.  However, the URL used to access the freedb
-database has recently changed, so the stale information in the files from
-previous runs of MythMusic would cause the error above.  Once the files have
-been deleted the stale information will be gone and your local database
-will be rebuilt as you use CDs.</P>
+<P>Setup options:</P>
+<P>Automatically download images - no longer used</P>
+<P>Show disclaimer - show warning about illegal ROMs before starting each ROM.</P>
+<P>Show game info - show info about the game, ie:year, maker, CPU, sound,
+screen resolution before starting the game</P>
+
+<H2><A NAME="ss16.6">16.6</A> <A HREF="mythtv-HOWTO.html#toc16.6">Hints:</A>
+</H2>
+
+<P>No joystick causing failure to launch.</P>
+<P>By default, <B>mythgame</B> expects that you have a joystick installed.
+<B>xmame</B> will fail to launch because <B>mythgame</B> sends the
+option "-joytype 4" to <B>xmame</B> by default.  You may reset this using
+the following command:</P>
+<P><B>NOTE</B>: The following command will set the joytype to "0" for all
+hosts.  If you need to specify this on a per-host basis you can either
+modify the command below (if you know SQL), or use a tool which simplifies
+access to MySQL such as <B>phpMyAdmin</B>.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root -e "update mythconverg.mamesettings set joytype=0"
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-17.html">Next</A>

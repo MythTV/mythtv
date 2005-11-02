@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: MythWeb.</TITLE>
+ <TITLE>Installing and using MythTV: MythPlugins. </TITLE>
  <LINK HREF="mythtv-HOWTO-14.html" REL=next>
  <LINK HREF="mythtv-HOWTO-12.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc13" REL=contents>
@@ -12,105 +12,93 @@
 <A HREF="mythtv-HOWTO-12.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc13">Contents</A>
 <HR>
-<H2><A NAME="s13">13.</A> <A HREF="mythtv-HOWTO.html#toc13">MythWeb.</A></H2>
+<H2><A NAME="mythplugins_"></A> <A NAME="s13">13.</A> <A HREF="mythtv-HOWTO.html#toc13">MythPlugins. </A></H2>
 
-<P>MythWeb allows you to use a web page to control various aspects of your
-MythTV system.  MythWeb is a separate application, but it's dependent on
-MythTV being installed and operational.</P>
-
-<H2><A NAME="ss13.1">13.1</A> <A HREF="mythtv-HOWTO.html#toc13.1">Installation and prerequisites</A>
-</H2>
-
-<P>Mythweb is a part of the <B>mythplugins</B> package.  See 
-<A HREF="mythtv-HOWTO-12.html#mythplugins_">MythPlugins</A> for instructions on downloading the
-tarball. The next step depends on whether your distribution has a web server
-and if you have PHP support.</P>
-
-<H3>Mandrake</H3>
-
-<P>Mandrake has <B>apache</B> and <B>PHP</B> pre-packaged, so
-installation is quite simple.  Once you have installed the two programs,
-either with the graphical installer (see instructions in 
-<A HREF="mythtv-HOWTO-3.html#graphicinstalltools_">Graphic Install Tools</A>) or through the
-command line (section 
-<A HREF="mythtv-HOWTO-3.html#CLIinstalltools_">Command Line</A>), and
-you've ensured that the <B>apache</B> server will start at boot using the
-Mandrake Control Center.</P>
+<P>MythTV has a rich set of plugins available.  Beginning with MythTV v0.18,
+a single tarball contains all of the plugins. Once you have downloaded
+the tarball, untar it and run the <B>configure</B> script:</P>
 <P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: Mandrake 9.1 users, perform the following:</CAPTION>
-</FIGURE>
-
 <BLOCKQUOTE><CODE>
 <PRE>
-# urpmi apache2 apache2-mod_php php-mysql
-# chkconfig --level 345 httpd on
-# /etc/rc.d/init.d/httpd restart
+$ tar -xjf mythplugins-0.18.1.tar.bz2
+$ cd mythplugins-0.18.1
+$ ./configure --help
+
+Usage:   configure [options]
+Options: [defaults in brackets after descriptions]
+NB:      all --enable-* options can be reversed with --disable-*
+
+Generic options:
+  --help                   print this message
+  --enable-all             Enable all options
+  --enable-opengl          enable OpenGL (Music and Gallery) [default=no]
+
+MythBrowser related options:
+  --enable-mythbrowser     build the mythbrowser plugin [default=yes]
+
+MythDVD related options:
+  --enable-mythdvd         build the mythdvd plugin [default=yes]
+  --enable-transcode       enable DVD ripping and transcoding [default=no]
+  --enable-vcd             enable VCD playing [default=no]
+
+MythGallery related options:
+  --enable-mythgallery     build the mythgallery plugin [default=yes]
+  --enable-exif            enable reading of EXIF headers [default=no]
+
+MythGame related options:
+  --enable-mythgame        build the mythgame plugin [default=yes]
+
+MythMusic related options:
+  --enable-mythmusic       build the mythmusic plugin [default=yes]
+  --enable-fftw            enable fftw visualizers [default=no]
+  --enable-sdl             use SDL for the synaesthesia output [default=no]
+  --enable-aac             enable AAC/MP4 audio file decompression [default=no]
+
+MythNews related options:
+  --enable-mythnews        build the mythnews plugin [default=yes]
+
+MythPhone related options:
+  --enable-mythphone       build the mythphone plugin [default=yes]
+  --enable-festival        enable festival TTS Engine [default=no]
+
+MythVideo related options:
+  --enable-mythvideo       build the mythvideo plugin [default=yes]
+
+MythWeather related options:
+  --enable-mythweather     build the mythweather plugin [default=yes]
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-
-<H2><A NAME="ss13.2">13.2</A> <A HREF="mythtv-HOWTO.html#toc13.2">Completing the installation</A>
-</H2>
-
+<P>The sections detailing configuration of the plugins assume that you are
+already in the <CODE>~/mythplugins-0.18.1/</CODE> directory.</P>
+<P>Note that a single <B>configure</B> script now does configuration for all
+modules.  By default, it will compile all modules.  If you do not wish to
+compile a module, either because it is of no use to you, or you do not have
+the prerequisites, the simplest course of action is to go through the
+various sections below, satisfying the prerequisites, and then compile all
+modules at once.</P>
+<P>For example, you would only like to compile and install MythGallery and
+MythMusic.  For MythGallery, you would like to use the EXIF data in the .JPG
+file to present additional information onscreen.  For MythMusic, you would
+like to enable support for the opengl and FFT visualizations.  The command
+line would look like:</P>
 <P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18.1/mythweb
-$ su
-# mkdir /var/www/html/mythweb
-# cp -r . /var/www/html/mythweb
+$ cd ~/mythplugins-0.18.1
+$ ./configure --disable-all --enable-opengl --enable-mythgallery --enable-exif --enable-mythmusic --enable-fft
+$ qmake mythplugins.pro
+$ make
+$ su -
+# make install
 # exit
-$ 
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Edit the <CODE>/var/www/html/mythweb/config/conf.php</CODE> file if required.</P>
-<P>By default, MythWeb uses an Apache <CODE>.htaccess</CODE> file to restrict
-access to the website and to configure some variables.</P>
-<P>To create the password file for Apache (if your system doesn't already have
-one), you could do something like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-# cd /var/www
-# htpasswd -c htpasswd mythtv
-New password:
-Re-type new password:
-Adding password for user mythtv
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>See the man page for <B>htpasswd</B> for more examples.</P>
-<P>To access the web page, open a web browser and use <B>http://[name or ip
-address]/mythweb/</B></P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: Make sure that you have a trailing slash on the URL,
-otherwise you will get a <CODE>404 Page not Found</CODE> error.</CAPTION>
-</FIGURE>
-</P>
-<H2><A NAME="ss13.3">13.3</A> <A HREF="mythtv-HOWTO.html#toc13.3">Resetting the key binding table</A>
-</H2>
+<P>For simplicity, the examples below will disable compilation of all other
+modules other than the one being discussed.</P>
 
-<P>MythWeb allows you to configure which keys are bound to which actions
-within MythTV.  If you'd like to reset this back to the default, execute the
-following command:
-<BLOCKQUOTE><CODE>
-<PRE>
-$ echo "delete from keybindings ;" | mysql -u mythtv -pmythtv mythconverg
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<H2><A NAME="ss13.4">13.4</A> <A HREF="mythtv-HOWTO.html#toc13.4">Resetting the theme.</A>
-</H2>
-
-<P>If you find yourself wedged into a theme that isn't working, open your
-web browser and go to site:
-<CODE>http://mythweb_name_or_ip_address/mythweb/settings.php?RESET_THEME=yes</CODE></P>
 <HR>
 <A HREF="mythtv-HOWTO-14.html">Next</A>
 <A HREF="mythtv-HOWTO-12.html">Previous</A>

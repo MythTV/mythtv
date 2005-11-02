@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: MythGallery.</TITLE>
+ <TITLE>Installing and using MythTV: MythWeb.</TITLE>
  <LINK HREF="mythtv-HOWTO-15.html" REL=next>
  <LINK HREF="mythtv-HOWTO-13.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc14" REL=contents>
@@ -12,123 +12,105 @@
 <A HREF="mythtv-HOWTO-13.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc14">Contents</A>
 <HR>
-<H2><A NAME="s14">14.</A> <A HREF="mythtv-HOWTO.html#toc14">MythGallery.</A></H2>
+<H2><A NAME="s14">14.</A> <A HREF="mythtv-HOWTO.html#toc14">MythWeb.</A></H2>
 
-<P>MythGallery is a photo and slideshow application.  MythGallery is a
-separate application, but it's dependent on MythTV being installed and
-operational.</P>
+<P>MythWeb allows you to use a web page to control various aspects of your
+MythTV system.  MythWeb is a separate application, but it's dependent on
+MythTV being installed and operational.</P>
+
 <H2><A NAME="ss14.1">14.1</A> <A HREF="mythtv-HOWTO.html#toc14.1">Installation and prerequisites</A>
 </H2>
 
-<P>MythGallery is a part of the <B>mythplugins</B> package.  See 
-<A HREF="mythtv-HOWTO-12.html#mythplugins_">MythPlugins</A> for instructions on downloading the
-tarball.</P>
-<P>There are a number of transitions available, some requiring OpenGL
-support.  You will also need to install a TIFF library.  Under Mandrake, you 
-would perform the following command:
+<P>Mythweb is a part of the <B>mythplugins</B> package.  See 
+<A HREF="mythtv-HOWTO-13.html#mythplugins_">MythPlugins</A> for instructions on downloading the
+tarball. The next step depends on whether your distribution has a web server
+and if you have PHP support.</P>
+
+<H3>Mandrake</H3>
+
+<P>Mandrake has <B>apache</B> and <B>PHP</B> pre-packaged, so
+installation is quite simple.  Once you have installed the two programs,
+either with the graphical installer (see instructions in 
+<A HREF="mythtv-HOWTO-3.html#graphicinstalltools_">Graphic Install Tools</A>) or through the
+command line (section 
+<A HREF="mythtv-HOWTO-3.html#CLIinstalltools_">Command Line</A>), and
+you've ensured that the <B>apache</B> server will start at boot using the
+Mandrake Control Center.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: Mandrake 9.1 users, perform the following:</CAPTION>
+</FIGURE>
+
 <BLOCKQUOTE><CODE>
 <PRE>
-# urpmi libtiff3-devel
+# urpmi apache2 apache2-mod_php php-mysql
+# chkconfig --level 345 httpd on
+# /etc/rc.d/init.d/httpd restart
 </PRE>
 </CODE></BLOCKQUOTE>
+</P>
 
-Once you have satisfied the prerequisites for your distribution, install the application:
+<H2><A NAME="ss14.2">14.2</A> <A HREF="mythtv-HOWTO.html#toc14.2">Completing the installation</A>
+</H2>
+
+<P>
 <BLOCKQUOTE><CODE>
 <PRE>
-$ cd ~/mythplugins-0.18.1
-$ ./configure --disable-all --enable-opengl --enable-mythgallery
-$ qmake mythplugins.pro
-$ make
-# su
-# make install
+$ cd ~/mythplugins-0.18.1/mythweb
+$ su
+# mkdir /var/www/html/mythweb
+# cp -r . /var/www/html/mythweb
 # exit
 $ 
 </PRE>
 </CODE></BLOCKQUOTE>
-
-The configuration for MythGallery is accessed through the main Setup option
-in mythfrontend.  Make sure you set your pictures directory to wherever
-you're storing your photos.</P>
-<P>The controls for MythGallery can be found in the README that comes with the
-application.</P>
-<H2><A NAME="ss14.2">14.2</A> <A HREF="mythtv-HOWTO.html#toc14.2">Using MythGallery</A>
-</H2>
-
-<P>When you first start MythGallery, you will see a thumbnail view of any
-folders and pictures in the Gallery Directory you specified in setup.  If
-this is the first time you have accessed this directory, the thumbnails will
-be generated on the fly.  If the Gallery Dir is writable, these thumbnails
-will be cached thus speeding up future access.  On the left is a greyed-out
-menu of options.</P>
-<P>Use the arrow keys to select a folder or picture to open/view with the
-Select key, or use the Menu key to toggle access the menu on the left.  The
-menu options are as follows:
-<UL>
-<LI> Slideshow - Will cycle through all the pictures in the current folder. 
-The currently selected item must be a picture (not a folder) for this to
-work.  It does not currently traverse subfolders.</LI>
-<LI> Rotate CW - Rotate the current image 90 degrees in the clockwise
-direction.  This change persists if the current directory is writable.</LI>
-<LI> Rotate CCW - As above except the direction of rotation is counter(anti)
-clockwise.</LI>
-<LI> Import - Import pictures into your Gallery Dir.  This option is
-described in the next section.</LI>
-<LI> Settings - Access the MythGallery settings screen.</LI>
-</UL>
 </P>
-<H2><A NAME="ss14.3">14.3</A> <A HREF="mythtv-HOWTO.html#toc14.3">Importing Pictures</A>
-</H2>
-
-<P>The import path in the setup dialog is a colon separated list of
-directories and/or executable files.  When the import key is pressed, a new
-directory (the destination directory) under the current directory will be
-created and the import path will be searched.  If the item in the import
-path is a directory (the source directory), the contents of that directory
-will be copied to the destination directory. If you would like the source
-directory to be that of a removable device, it might be a good idea to use
-autofs.  See the automount howto at 
-<A HREF="www.linuxdoc.org">www.linuxdoc.org</A> for info on how to get it working.</P>
-<P>If the item in the import path is an executable file, MythGallery will
-attempt to execute it with the destination directory as its sole argument.
-Be careful when using executable scripts that the script runs unattended
-(doesn't need user intervention) and returns properly, otherwise it could
-create the appearance of MythGallery hanging (e.g. running
-<B>smbclient</B> and prompting for password).  Also be sure that scripts
-have executable permissions set.</P>
-<P>Here is an example script that a user may want to run
-on import: 
+<P>Edit the <CODE>/var/www/html/mythweb/config/conf.php</CODE> file if required.</P>
+<P>By default, MythWeb uses an Apache <CODE>.htaccess</CODE> file to restrict
+access to the website and to configure some variables.</P>
+<P>To create the password file for Apache (if your system doesn't already have
+one), you could do something like this:
 <BLOCKQUOTE><CODE>
 <PRE>
-#!/bin/csh
-
-if ($#argv == 0) then 
-        echo "Usage: $0 dest_dir" 
-        exit 
-endif 
-
-cd $argv[1]
-
-# get stuff over the network
-wget http://www.somesite.dom/dir/file1.jpg 
-wget http://www.somesite.dom/dir/file2.jpg
-wget http://www.somesite.dom/dir/file3.jpg
-
-# stuff that requires manual module loading and/or fs mounting
-modprobe camera_module
-mount /dev/camera /mnt/camera
-cp /mnt/camera/* $argv[1]
-umount /mnt/camera
-rmmod camera_module
-
-# perform some processing
-foreach pname (`ls *.jpg`)
-        jpegtran -flip vertical $pname > $pname.new
-        mv $pname.new $pname
-end
+# cd /var/www
+# htpasswd -c htpasswd mythtv
+New password:
+Re-type new password:
+Adding password for user mythtv
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<P>See the man page for <B>htpasswd</B> for more examples.</P>
+<P>To access the web page, open a web browser and use <B>http://[name or ip
+address]/mythweb/</B></P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: Make sure that you have a trailing slash on the URL,
+otherwise you will get a <CODE>404 Page not Found</CODE> error.</CAPTION>
+</FIGURE>
+</P>
+<H2><A NAME="ss14.3">14.3</A> <A HREF="mythtv-HOWTO.html#toc14.3">Resetting the key binding table</A>
+</H2>
 
+<P>MythWeb allows you to configure which keys are bound to which actions
+within MythTV.  If you'd like to reset this back to the default, execute the
+following command:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ echo "delete from keybindings ;" | mysql -u mythtv -pmythtv mythconverg
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H2><A NAME="ss14.4">14.4</A> <A HREF="mythtv-HOWTO.html#toc14.4">Resetting the theme.</A>
+</H2>
+
+<P>If you find yourself wedged into a theme that isn't working, open your
+web browser and go to site:
+<CODE>http://mythweb_name_or_ip_address/mythweb/settings.php?RESET_THEME=yes</CODE></P>
 <HR>
 <A HREF="mythtv-HOWTO-15.html">Next</A>
 <A HREF="mythtv-HOWTO-13.html">Previous</A>

@@ -2,7 +2,7 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: MythNews.</TITLE>
+ <TITLE>Installing and using MythTV: MythDVD.</TITLE>
  <LINK HREF="mythtv-HOWTO-21.html" REL=next>
  <LINK HREF="mythtv-HOWTO-19.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc20" REL=contents>
@@ -12,15 +12,47 @@
 <A HREF="mythtv-HOWTO-19.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc20">Contents</A>
 <HR>
-<H2><A NAME="s20">20.</A> <A HREF="mythtv-HOWTO.html#toc20">MythNews.</A></H2>
+<H2><A NAME="s20">20.</A> <A HREF="mythtv-HOWTO.html#toc20">MythDVD.</A></H2>
 
-<P>MythNews is a part of the <B>mythplugins</B> package.  See 
-<A HREF="mythtv-HOWTO-12.html#mythplugins_">MythPlugins</A> for instructions on downloading the
-tarball.  MythNews is a RSS reader.
+<P>MythDVD is a part of the <B>mythplugins</B> package.  See 
+<A HREF="mythtv-HOWTO-13.html#mythplugins_">MythPlugins</A> for instructions on downloading the
+tarball.  MythDVD is an application which rips DVDs and makes them available for
+use with MythVideo.  You may also transcode the DVD content from MPEG-2 to
+other formats which should greatly reduce the amount of space the DVD
+material takes up on your hard drive.</P>
+<P>MythDVD has a number of prerequisites to enable transcoding functionality. 
+If you only wish to play DVDs rather than convert them to something like
+MPEG-4 or xvid you may skip the prerequisite installation step.</P>
+
+<H2><A NAME="ss20.1">20.1</A> <A HREF="mythtv-HOWTO.html#toc20.1">Manual Compilation of Prerequisites</A>
+</H2>
+
+
+<H2><A NAME="ss20.2">20.2</A> <A HREF="mythtv-HOWTO.html#toc20.2">Pre-compiled binaries</A>
+</H2>
+
+<P>Mandrake users may install the prerequisites this way:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi libdvdread3 libdvdread3-devel a52dec liba52dec-devel 
+# urpmi mplayer ogle xine
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Assuming that you've added a PLF mirror, you may also load the rest of the
+prerequisites using the following command:
+<BLOCKQUOTE><CODE>
+<PRE>
+# urpmi xvid xvid-devel fame libfame0.9-devel transcode libdvdcss
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>In the example below, we have enabled support for transcoding and for VCD
+playing.  You may remove these options if you don't need them.
 <BLOCKQUOTE><CODE>
 <PRE>
 $ cd ~/mythplugins-0.18.1
-$ ./configure --disable-all --enable-mythnews
+$ ./configure --disable-all --enable-mythdvd --enable-transcode --enable-vcd
 $ qmake mythplugins.pro
 $ make
 $ su
@@ -28,6 +60,39 @@ $ su
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
+<H2><A NAME="ss20.3">20.3</A> <A HREF="mythtv-HOWTO.html#toc20.3">Running the Myth Transcoding Daemon</A>
+</H2>
+
+<P>Transcoding ("ripping") a DVD requires you to run the Myth Transcoding
+Daemon (mtd).  To ensure that mtd is configured correctly, you should first
+test it at the command line.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mtd -n
+</PRE>
+</CODE></BLOCKQUOTE>
+
+The last line of text should show something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+mtd is listening on port 2342
+</PRE>
+</CODE></BLOCKQUOTE>
+
+This indicates that mtd is ready for use.  Once you've successfully
+tested mtd in the foreground, type <B>CTRL-C</B> to stop mtd.  You may
+then start it as a background (daemon) process.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mtd -d
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Running mtd as a daemon will allow you to automatically start it during the
+boot process.  For example, you may add <CODE>mtd -d</CODE> to your
+<CODE>rc.local</CODE> file, or you can adjust the script/steps outlined in the
+section called 
+<A HREF="mythtv-HOWTO-23.html#mythbackend_autostart">Automatically starting mythbackend at system boot time</A> to start mtd instead of mythbackend.</P>
 
 <HR>
 <A HREF="mythtv-HOWTO-21.html">Next</A>

@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-10-14, v0.18.13
+<date>2005-11-01, v0.18.14
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -662,15 +662,16 @@ Specific cards:
 <p>MythTV supports the TV-out and MPEG-2 decoder functions in the IvyTV
 driver.
 
-The PVR-350 is unique in that it also supports audio output. However, as of
-MythTV 0.17, the IvyTV drivers do not support volume control.  There are two
-courses of action you may take:
+The PVR-350 is unique amongst the Hauppauge PVR-x50 cards in that it also
+supports audio output, but you need to connect that audio output to
+something.  There are two courses of action you may take:
 <enum>
 <item>Take the audio output from the PVR-350 and plug it into an input on a
 sound card on your machine.  You may then use MythTV's internal audio
 controls.
-<item>Take the audio output from the PVR-350 and connect it directly to your television / audio system.  
-You must indicate that you are using external audio control on the PVR-350 setup page.
+<item>Take the audio output from the PVR-350 and connect it directly to your
+television / audio system.  You must indicate that you are using external
+audio control on the PVR-350 setup page.
 </enum>
 
 <sect3>Other Options
@@ -711,18 +712,6 @@ satisfying any prerequisites.
 system to store the master database.  This does not necessarily mean that
 MySQL must run on one of the MythTV boxes.
 </caption></figure>
-
-<figure loc="here">
-<eps file="stop.eps" height="1cm">
-<img src="stop.png">
-<caption><bf>NOTE</bf>:  The following distributions have issues which may prevent a
-successful MythTV installation:
-</caption>
-</figure>
-<itemize>
-<item>Suse 8.2 - Broken Qt package
-<item>Red Hat 8 - does not meet minimum version requirement for Qt (3.1+)
-</itemize>
 
 <sect2>Pre-compiled packages <label id="precompiled">
 <p>A number of people have created pre-compiled packages for MythTV that may
@@ -855,7 +844,7 @@ pre-packaged <bf>lirc</bf>.  If you are using <bf>XMLTV</bf> as a grabber,
 you will need <bf>perl</bf>.
 
 <code>
-NOTE:  Qt v3.1 or higher is required.
+NOTE:  Qt v3.1 or higher, but less than Qt v4.0, is required.
 
 NOTE:  If you are going to be using RPMs to install various
 components, you should be aware that not all packages include the necessary
@@ -2956,7 +2945,7 @@ For stations with poor signal quality: "linearblend,denoise3d=12"
 
 For synchronous TV-out: check Deinterlace with "Bob (2x framerate)"
  
-<sect1>Recording 
+<sect1>Recording <label id="Recording">
 <p>Depending on your capture card, MythTV offers different video encoders. 
 The following types of hardware encoding cards are supported:
 <itemize>
@@ -3641,9 +3630,9 @@ If you get "nvram-wakeup: /dev/rtc: Device or resource busy" your
 set-wakeuptime-script should stop the program that uses <tt>/dev/rtc</tt> before
 setting the wakeuptime.
 
-<sect1>Scheduling Recordings
+<sect>Scheduling Recordings
 <p>The MythTV master backend is responsible for managing the schedule
-for all TV tuner cards on the master and any slave. It's job is to
+for all TV tuner cards on the master and any slave. Its job is to
 search the TV listing for the shows you have requested and assign
 recordings to the TV tuner cards. If none of the shows that you've
 chosen overlap, it simply records all of the shows. However, if
@@ -3654,7 +3643,7 @@ preference. Further, the "Upcoming Recordings" page allows you make
 specific decisions about what you really do and don't want to
 record.
 
-<sect2>Record Types
+<sect1>Record Types
 <p>When you choose a show that you would like to record from the
 Options Page, there are eight different types of rules to help the
 scheduler find which showings you would like to record.
@@ -3709,48 +3698,10 @@ rebroadcast allowing the scheduler to record rebroadcasts on the other
 station when the original airing cannot be recorded.
 </itemize>
 
-<sect2>Duplicates
-<p>Singles will record without regard to duplicate matching.
-
-<p>The standard recurring methods of All, Channel, Weekly and Daily use
-the descriptive information in the TV listings to try to record only one
-showing of each unique episode. However, This goal is sometimes
-complicated by the fact that the stations may not include a description
-for a specific episode but use a generic description for the series
-instead. When there is a generic description, the default behavior is to
-assume that it may be an episode that you have not seen and to record it
-for you.  One of the duplicate matching options is "Record new episodes
-only".  If this is selected, listing that have an original air date of
-more than 14 days earlier are considered repeats and are not eligible to
-record. Generally, generic episodes will be marked as repeats also.
-
-<p>Because of generic episodes and other situations, MythTV offers an
-alternative approach where shows may be recorded by choosing from
-multiple showings even when the descriptive information is not reliable.
-All of the "Find" record types look for matching titles in the
-listings. If there is a showing with specific episode information and
-that episode has recorded before, that showing is marked as previously
-or currently recorded. The scheduler will then choose to record the
-earliest non-conflicting showing from any of other remaining showings
-regardless of the descriptive information. Generally, Find One is most
-useful for movies or specials and the Find Daily and Find Weekly rules
-are best for news or current events shows that are repeated. However,
-these may be useful in other situations where the standard recording
-rules may not work correctly.
-
-<sect2>Conflicts
-<p>As you add more shows that you would like to record, the scheduler
-will eventually encounter conflicts. If there are two shows at the
-same time and you have two or more TV tuner cards, both shows will
-record. However, if there are more shows than cards, the scheduler
-will have to decide what it thinks it should not record based on the
-information you have given. If you see an unexpected situation you
-are not "stuck" with the scheduler's choice. You can still tell the
-scheduler exactly which shows you do want to record and/or don't
-want to record in any situation.
+<sect1>Scheduling Options
 
 <sect2>Priority
-<p>By default, all shows you select are have equal value to the
+<p>By default, all shows you select have equal value to the
 scheduler.  There are a set of rules to make good choices when
 two or more shows are in conflict. However, priority values let the
 scheduler know what you want so that it can set the schedule based
@@ -3813,6 +3764,50 @@ For any single showing of any show you've chosen to record, these
 factors are added together to find the "total priority". This is the
 priority that the scheduler uses to decide which shows are given the
 first choice when filling in the schedule.
+
+The scheduling priority of a show may also be used to determine
+auto-expiration of recordings when disk space gets full (see <ref
+id="Auto-Expire" name="Auto-Expire">, below).
+
+<sect2>Duplicates
+<p>Singles will record without regard to duplicate matching.
+
+<p>The standard recurring methods of All, Channel, Weekly and Daily use
+the descriptive information in the TV listings to try to record only one
+showing of each unique episode. However, This goal is sometimes
+complicated by the fact that the stations may not include a description
+for a specific episode but use a generic description for the series
+instead. When there is a generic description, the default behavior is to
+assume that it may be an episode that you have not seen and to record it
+for you.  One of the duplicate matching options is "Record new episodes
+only".  If this is selected, listing that have an original air date of
+more than 14 days earlier are considered repeats and are not eligible to
+record. Generally, generic episodes will be marked as repeats also.
+
+<p>Because of generic episodes and other situations, MythTV offers an
+alternative approach where shows may be recorded by choosing from
+multiple showings even when the descriptive information is not reliable.
+All of the "Find" record types look for matching titles in the
+listings. If there is a showing with specific episode information and
+that episode has recorded before, that showing is marked as previously
+or currently recorded. The scheduler will then choose to record the
+earliest non-conflicting showing from any of other remaining showings
+regardless of the descriptive information. Generally, Find One is most
+useful for movies or specials and the Find Daily and Find Weekly rules
+are best for news or current events shows that are repeated. However,
+these may be useful in other situations where the standard recording
+rules may not work correctly.
+
+<sect2>Conflicts
+<p>As you add more shows that you would like to record, the scheduler
+will eventually encounter conflicts. If there are two shows at the
+same time and you have two or more TV tuner cards, both shows will
+record. However, if there are more shows than cards, the scheduler
+will have to decide what it thinks it should not record based on the
+information you have given. If you see an unexpected situation you
+are not "stuck" with the scheduler's choice. You can still tell the
+scheduler exactly which shows you do want to record and/or don't
+want to record in any situation.
 
 <sect2>Scheduling decisions
 <p>Here are the actual decisions made by the scheduler as it fills in the
@@ -3949,6 +3944,87 @@ If you return to an override page after an override has already been set,
 you will also see a "Clear override" to undo your changes. This option makes
 it very easy to try out some "what if" attempts when deciding on your best
 strategy in a difficult situation.
+
+<sect1>Storage Options
+<sect2>Recording Profile
+<p>Each schedule can be configured with a different recording profile.
+For example, important shows can be configured with a "High Quality"
+profile, while "filler" shows can be configured with a "Low Quality"
+profile. These recording profiles need to be configured first (see
+<ref id="Recording" name="Recording">, above).
+
+<sect2>Recording Group <label id="Recording Group">
+<p>For organization of the "Watch Recordings" screen and the MythWeb
+interface, recordings can be grouped into "recording groups".
+
+<sect2>Time Stretch
+<p>A default time stretch value can be configured for each schedule;
+this value will automatically be applied when the recordings are
+played back.
+
+<sect2>Auto-Expire <label id="Auto-Expire">
+<p>MythTV will "autoexpire" old recordings to make room for new recordings
+when disk space gets filled up. This option can be set to "Don't allow
+auto expire" to prevent recordings from being automatically deleted
+when disk space fills up.
+
+<p>The default setting is for all scheduled recordings to be eligible
+for auto-expiration; this can be changed in the Settings->TV
+Settings->General page by manipulating the "Auto Expire Default"
+checkbox.
+
+<p>The default auto-expire policy is "Oldest Show First"; the oldest
+recordings are deleted first. The "Lowest Priority First" method
+chooses to expire the lowest-priority recordings first.
+
+<sect2>Episode Limit
+<p>An episode limit can also be configured to limit the maximum number
+of episodes recorded of a single series, to restrict that series' disk
+usage. If this is set, you can further decide what to do when this
+limit is reached: either stop recording that series, or to delete the
+oldest episodes in favor of the new ones.
+
+<sect1>Post Recording Processing
+<sect2>Commercial Flagging
+<p>Select whether or not to automatically flag commercials for these
+recordings. Commercial Flagging parameters can be set in
+Setup->TV Settings->General.
+
+<sect2>Transcoding
+<p>Select whether or not to automatically transcode recordings to save
+disk space. Before using this, you must first enable auto-transcode in
+the recording profile and configure the transcoding parameters; see
+<ref id="Recording" name="Recording">, above.
+
+<sect2>User Jobs
+<p>User Jobs allow you to configure up to 4 custom commands to run on
+recordings. They can be configured in mythtv-setup. The following
+tokens have special meaning when used in the User Job commands:
+
+<itemize>
+<item>%DIR% - the directory component of the recording's filename
+<item>%FILE% - the filename component of the recording's filename
+<item>%TITLE% - the title of the recording (e.g., name of the series)
+<item>%SUBTITLE% - the subtitle of the recording (e.g., name of the
+episode)
+<item>%DESCRIPTION% - description text for the recording (from guide
+data)
+<item>%HOSTNAME% - the backend making the recording
+<item>%CATEGORY% - the category of the recording (from guide data)
+<item>%RECGROUP% - the <ref id="Recording Group" name="recording
+group">
+<item>%CHANID% - the MythTV channel ID making the recording
+<item>%STARTTIME% - the recording start time (YYYYMMDDhhmmss)
+<item>%ENDTIME% - the recording end time (YYYYMMDDhhmmss)
+<item>%STARTTIMEISO% - the recording start time in ISO 8601 format
+(YYYY-MM-DDTHH:MM:SS)
+<item>%ENDTIMEISO% - the recording end time in ISO 8601 format
+<item>%PROGSTART% - the recording's start time (from guide data;
+YYYYMMDDhhmmss)
+<item>%PROGEND% - the recording's end time (from guide data)
+<item>%PROGSTARTISO%, %PROGENDISO% - the recording's start and end
+time in ISO 8601 format.
+</itemize>
 
 <sect1>Advanced Recording Options
 <p>Creating Power Search rules with Custom Record
@@ -5767,7 +5843,7 @@ desktop area which is larger than the display size. If this happens, edit
 your X configuration file to match the display size then restart X.
 
 <sect2>MythTV Dimensions
-<p>In 0.10 and later, from "mythfrontend" go to Setup->Appearance.
+<p>From "mythfrontend" go to Setup->Appearance.
 The default for the height and width is "0" - this will cause
 MythTV to automatically size itself to full screen.
 
@@ -6812,16 +6888,48 @@ $
 </verb></tscreen>
 <sect1>What do the icons on the Watch Recordings screen mean?
 <p>Press "1" or F1 to get a popup.
-<sect1>What is the difference between a PVR-250 and a PVR-350
+<sect1>What do the letters mean when I change channels?
+<p>These letters let you know what's going on with the backend as it tries
+to tune to a channel.
+
+Lower case = seen
+Upper Case = seen & good
+
+l/L = Lock  : This could be seen by PVR-250/BTTV users
+a/A = PAT   : Any recording transmitted in MPEG 
+m/M = PMT   : Any recording transmitted in MPEG 
+g/G = MGT   : ATSC only
+v/V = VCT   : ATSC only
+n/N = NIT   : DVB only
+s/S = SDT   : DVB only
+
+<sect1>What is the difference between the various Hauppauge PVR models?
 <p>This is covered in the hardware section, and extensively covered on the
-Hauppauge website.  Briefly recapping:
+Hauppauge website.  (<url
+url="http://www.hauppauge.com/pages/compare_pvr.html"
+name="http://www.hauppauge.com/pages/compare_pvr.html">) Please check the
+Hauppauge website for the most accurate information.
 
-A PVR-250 (model 980) is primarily a MPEG-2 encoder.  It has a tuner,
-composite and SVideo connection for video, and an 1/8" audio jack for stereo
-analog audio.  It also has an IR receiver and comes with a remote control.
+A PVR-150 comes in a number of versions:
+<itemize>
+<item>The PVR-150 (Model 1045) is the retail kit.  It comes with a remote
+control and an IR Blaster.  It does not have a radio tuner.
+<item>The PVR-150 MCE (Model 1042) will usually come in a plain white box and is
+sold as an OEM device.  It does not come with a remote control, since it's
+usually used as the second, third, etc capture device.
+<item>The PVR-150 MCE Kit (Model 1062) does not have a radio tuner and
+comes with a Microsoft Media Center remote control instead of Hauppauge's.
+<item>The PVR-150 low profile (Model 1086) is a low-profile card. It has a
+radio tuner and is approximately half the height of a standard card. 
+However, it comes with a low-profile PCI bracket, so it is not suitable for
+use in a standard PCI slot without removing the bracket, which may not be
+worth the trouble.
+</itemize>
 
-The PVR-250 MCE (Media Center Edition, aka model 975)) contains a FM radio
-tuner.  The tuner is currently not support by MythTV.  The PVR-250 MCE does
+A PVR-250 (Model 980) is a retail kit which comes with an IR receiver and a
+remote control.
+
+The PVR-250 MCE (Model 975) contains a FM radio tuner.  The PVR-250 MCE does
 not contain a IR receiver or a remote.
 
 The PVR-250 Rev 1 contained an MPEG-2 decoder.  However, this function was
@@ -6830,18 +6938,30 @@ pull decoded video from the card, so it's a fairly useless feature.
 
 The PVR-350 (model 990) has the features of the PVR-250 as well as being
 able to decode MPEG-2.  The encode and decode functions may be used
-simultaneously.  The MPEG-2 decoder function gives superior video quality. 
-However, the decoder function is only available once Linux has started, so
-you will not see any boot-time messages.
+simultaneously.  The MPEG-2 decoder function gives superior video quality
+compared to what you'll find on a standard video card.  However, the decoder
+function is only available once Linux has started, so you will not see any
+boot-time messages.  Also, the card is not capable of resolutions higher
+than 720x480, so it cannot be used with HDTV.  Make a conscious decision
+(and ask for advice on the mailing list) that you want to tradeoff potential
+HDTV use in the future compared to video quality.
 
-Also, the card does not support any 3D functions, making it a poor gamer
-card.
-
-Non-MPEG-2 content will be displayed on the PVR-350 output using framebuffer
-features, placing a large load on the host CPU.
+The X-driver for the PVR-350 support playback using Xv efficiently but does
+not support any other 2d or 3d acceleration. For some application this may
+place a large load on the host CPU, some will run without any problem and
+others (mplayer, xine, xmame etc.) should be configured to utilize the Xv
+interface.
 
 Note that for the PVR-350 there are some <ref id="PVR-350" name="considerations">
 regarding the way audio is handled.
+
+The PVR-500 is a dual-encoder version of the PVR-150 card.  This means that
+you can simultaneously record two different programs at the same time,
+because there are two encoder chips on the PCI card.  Hauppuage has also
+installed an onboard splitter, so you can use one COAX to feed both tuners. 
+Current versions of the PVR-500 should come with an adapter to allow you to
+connect a second S-Video or composite input.  Early adopters may need to
+purchase this item separately.
 
 <sect1>Changing channels on an external Set Top Box
 <p>If you need to use an external Set Top Box (STB), such as for satellite
@@ -7528,7 +7648,9 @@ v0.18.13, 2005-10-14.  Updates from users.  Update bugzilla entry to point
 at trac.  Get rid of PVR-250 example install - it's not necessary anymore
 and way out of date.  Specifically mention how multiple mysql.txt files are
 bad if they're all saying different things.
-
+v0.18.14, 2005-11-01.  Add "don't use QT 4.0" warning message.  Add explanation
+of what the tuning status letters mean.  Add some details about PVR 150/500
+cards.  Robert Tsai's doc contribution.
 
 -->
 

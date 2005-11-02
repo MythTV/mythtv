@@ -2,619 +2,1396 @@
 <HTML>
 <HEAD>
  <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
- <TITLE>Installing and using MythTV: Example Configurations.</TITLE>
+ <TITLE>Installing and using MythTV: Miscellaneous. </TITLE>
+ <LINK HREF="mythtv-HOWTO-24.html" REL=next>
  <LINK HREF="mythtv-HOWTO-22.html" REL=previous>
  <LINK HREF="mythtv-HOWTO.html#toc23" REL=contents>
 </HEAD>
 <BODY>
-Next
+<A HREF="mythtv-HOWTO-24.html">Next</A>
 <A HREF="mythtv-HOWTO-22.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc23">Contents</A>
 <HR>
-<H2><A NAME="s23">23.</A> <A HREF="mythtv-HOWTO.html#toc23">Example Configurations.</A></H2>
+<H2><A NAME="s23">23.</A> <A HREF="mythtv-HOWTO.html#toc23">Miscellaneous. </A></H2>
 
-<H2><A NAME="LVM"></A> <A NAME="ss23.1">23.1</A> <A HREF="mythtv-HOWTO.html#toc23.1">Logical Volume Manager (LVM) </A>
+<H2><A NAME="ss23.1">23.1</A> <A HREF="mythtv-HOWTO.html#toc23.1">I'd like to watch the files without using MythTV / I'd like to convert the files to some other format</A>
 </H2>
 
-<P>LVM greatly increases the flexibility you have in managing your storage
-than traditional physical partitions. This section will provide some brief
-notes on how to use LVM to create storage space for your video files and how
-to add additional disk space in the future. There's lots more that can be
-done with LVM, so check the LVM HOWTO 
-<A HREF="http://tldp.org/HOWTO/LVM-HOWTO/">http://tldp.org/HOWTO/LVM-HOWTO/</A> document for details.</P>
-<P>If you don't understand how to partition a drive, or how to change the
-partition type you should stop and look at documentation on how to perform
-these steps.</P>
+<P>MythTV comes with a utility called <B>mythtranscode</B> which can
+decode nuv files into raw format for use with other applications.  This
+command-line utility was not designed to be used by the end-user, but
+instead to be called by other applications or scripts.  Programs like
+<B>mkmovie</B> (
+<A HREF="http://www.icelus.org/">http://www.icelus.org/</A>) and <B>nuvexport</B> (
+<A HREF="http://forevermore.net/myth/">http://forevermore.net/myth/</A>) are
+better suited for the end user.  However, since <B>mythtranscode</B> can
+be a useful tool, directions on using it follow.</P>
+<P><B>mythtranscode</B> creates raw streams, which means that they do not
+contain any container information such as resolution, frame-rate, or audio
+sampling rate.  In order to process the output, you must supply this
+information to the processing utility.  <B>mythtranscode</B> provides the
+relevant information on STDOUT.</P>
+<P>There are two modes in which <B>mythtranscode</B> can create raw streams. 
+The first has no synchronization and assumes that the processing utility
+will read audio and video at a constant rate.  This method is useful when a
+single application will be processing the raw output, such as
+<B>mencoder</B> or <B>ffmpeg</B>.  The second method assumes that two
+separate applications will be processing the audio and video streams
+independently, and there is no rate control between them which means that
+the two programs don't coordinate their efforts to maintain synchronization.</P>
+
+<H3>mythtranscode example</H3>
+
+<P>First, start <B>mythtranscode</B>.  You will need to determine the
+channel and the start time manually.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 --profile \
+autodetect --fifodir . &amp;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>When <B>mythtranscode</B> begins executing, it will create two FIFOs
+("audout" and "vidout") in the directory specified (in this case ".",
+meaning the current directory) and will print out information about the
+video stream.</P>
+<P>The next step is to start the processing application.  The following assumes
+that the stream is NTSC 640x480 with 32Kbps audio.</P>
+<P>To use <B>mencoder</B> you would enter a command like:
+<BLOCKQUOTE><CODE>
+<PRE>
+mencoder -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+-rawvideo on:w=640:h=480:fps=29.97 -ovc lavc -oac mp3lame -o out.avi \
+vidout
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>BIG FAT WARNING</B>:  Using an incorrect parameter can make your files
-inaccessible, prevent your computer from booting, etc.  Be careful!</CAPTION>
+<CAPTION><B>NOTE</B>: You must use mencoder 1.0PRE1 or later. <B>mencoder</B>
+version 0.9x <EM>WILL NOT WORK!</EM></CAPTION>
 </FIGURE>
+
+Using ffmepg:
+<BLOCKQUOTE><CODE>
+<PRE>
+ffmpeg -f u16le -ar 32000 -ac 2 -i audout -f rawvideo -s 640x480 -r 29.97 \
+-i vidout -vcodec mpeg4 -b 2000 -acodec mp3 -ab 128 out.avi
+</PRE>
+</CODE></BLOCKQUOTE>
 </P>
-<P>Make sure your kernel configuration includes LVM support or that it's
-available as a module. Today, most vendors include this by default. You'll
-also want to ensure that you have a copy of the LVM utilities; check your
-distribution, or get the latest versions from 
-<A HREF="http://www.sistina.com/products_lvm.htm">http://www.sistina.com/products_lvm.htm</A> and build them manually.</P>
-<P>Check that the <B>vgscan</B> program is being run at some point during
-your boot sequence - most distributions do this by default. Look for a
-message during boot up that looks like this: <CODE>vgscan -- reading all
-physical volumes (this may take a while...)</CODE> If you don't see any
-messages during boot, you may need to install a LVM init script or confirm
-that you have all of the LVM packages installed from your distribution.</P>
-<P>LVM uses a few concepts you should be familiar with before starting.
+<P>Or to play directly using mplayer (again 1.0PRE1 or later is needed):
+<BLOCKQUOTE><CODE>
+<PRE>
+mplayer -audiofile audout -audio-demuxer 20 -rawaudio rate=32000 \
+-rawvideo on:w=640:h=480:fps=29.97 vidout
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you wanted to write the raw data to separate audio and video files for
+later processing, the following would work (note the use of --fifosync
+for rate-control):
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mythtranscode --chanid 1036 --starttime 2003-10-20T15:30:00 \
+--profile autodetect --fifodir . --fifosync &amp;
+$ cat audout > audio.raw &amp;
+$ cat vidout > video.yuv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss23.2">23.2</A> <A HREF="mythtv-HOWTO.html#toc23.2">Using a different window manager</A>
+</H2>
+
+<P>MythTV is not dependent on any particular window manager.  If you wish to
+run a lightweight window manager, the <CODE>configfiles/</CODE> directory has an
+example of a <CODE>.twmrc</CODE> and <CODE>.fvwmrc</CODE> file you may use.</P>
+
+<H2><A NAME="capture_resolution_"></A> <A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">What capture resolution should I use?  How does video work?</A>
+</H2>
+
+<P>While MythTV allows you to set various GUI and capture resolutions, not
+all combinations make sense.</P>
+<P>First, analog video signals have a defined vertical resolution.  In NTSC,
+the video standard specifies that there are 525 vertical scan lines.  Once
+the "extra" lines are removed (they're used to synchronize the video signal,
+and encode closed captioning data), you have 480 horizontal lines stacked
+vertically.</P>
+<P>In PAL, there are 625 "raw" lines of resolution, with a net of 576
+horizontal lines stacked vertically.</P>
+<P>Horizontally, the maximum value allowed for a Bt8X8 chip is 720. However,
+due to limitations in the chip and other limitations of broadcast
+television, there may not be a noticeable improvement in image quality
+beyond 400 or 500 pixels.</P>
+<P>With this in mind, there are certain commonly accepted values for
+resolution.  While other values may be accepted for the vertical
+resolution, they will cause scan lines to be repeated or dropped.</P>
+<P>From "best" to "worst", in NTSC:
 <UL>
-<LI>PV (Physical Volume).  The actual partition on the hard drive.</LI>
-<LI>VG (Volume Group).  The aggregation of all the PVs make a VG.</LI>
-<LI>LV (Logical Volume).  Subdivision of the pool of space available in
-the VG into individual chunks, like /usr, /var/video, etc.</LI>
+<LI>720x480 ("DVD" resolution. Also commonly, 704x480)</LI>
+<LI>640x480 4:3</LI>
+<LI>544x480 (TiVo high resolution)</LI>
+<LI>480x480 (Video CD resolution)</LI>
+<LI>352x480 (ReplayTV "Standard" quality)</LI>
+<LI>320x480 </LI>
+<LI>544x240</LI>
+<LI>480x240 </LI>
+<LI>352x240 </LI>
+<LI>320x240</LI>
 </UL>
 </P>
-<P>The following example assumes that you want to create a LVM partition from a
-chunk of space in /dev/hda5, using a reiserfs filesystem and mounted on
-/var/video. You later decide to extend this filesystem by adding a new disk:
-/dev/hdb.</P>
-<P>You need to create at least one LVM partition for a physical volume. Use
-<B>fdisk</B> or your favorite partition editor to set the type to LVM
-(0x8e). If you're using an entire disk, create one big partition rather than
-using the device itself. e.g. use /dev/hdb1 not /dev/hdb.  </P>
-<P>In the following example, you have a 15GB disk.  The first 6GB are set as
-your boot partition.  <CODE>/dev/hda2</CODE> was added as an extended partition,
-and within that partition you created the <CODE>/dev/hda5</CODE> linux (ext2)
-partition.</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-# fdisk /dev/hda
+<P>As you can see, the lower quality values are half of the better ones. 
+720x240 is possible, but isn't a good tradeoff relative to the number of
+vertical lines lost.  In a PAL country, the you would use values like
+720x576 or x288.</P>
+<P>The higher resolutions will be more CPU intensive if you're using software
+encoding (PVR-250/350 will have minimal host CPU impact even if you're using
+720x480). If the CPU is overtaxed, frames will be dropped causing uneven
+motion. You will likely see the best results at resolutions which average at
+least 10% CPU idle time.  You can use system tools such as <CODE>top</CODE> or
+<CODE>sar</CODE> to check the CPU % idle while recording.  If the CPU average
+usage is consistently exceeding 90%, frames will need to be dropped during
+peak times when more than 100% of the available CPU would be needed to
+process all of the frames.</P>
+<P>If you'd like to read more on this, go to the vcdhelp website at 
+<A HREF="http://www.vcdhelp.com/forum/userguides/94382.php">http://www.vcdhelp.com/forum/userguides/94382.php</A>.</P>
 
-The number of cylinders for this disk is set to 1823.
-There is nothing wrong with that, but this is larger than 1024,
-and could in certain setups cause problems with:
-1) software that runs at boot time (e.g., old versions of LILO)
-2) booting and partitioning software from other OSs
-   (e.g., DOS FDISK, OS/2 FDISK)
+<H2><A NAME="ss23.4">23.4</A> <A HREF="mythtv-HOWTO.html#toc23.4">MythTV GUI and X Display Sizes</A>
+</H2>
 
-Command (m for help): p
+<P>MythTV is designed to be run as dedicated full screen TV application
+but can also be run as a desktop application on a computer monitor. Here
+are a few consideration for configuring sizes to best suit you needs.</P>
 
-Disk /dev/hda: 15.0 GB, 15000330240 bytes
-255 heads, 63 sectors/track, 1823 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
+<H3>X Dimensions</H3>
 
-   Device Boot    Start       End    Blocks   Id  System
-/dev/hda1   *         1       764   6136798+  83  Linux
-/dev/hda2           765      1823   8506417+   5  Extended
-/dev/hda5           765      1823   8506417   83  Linux
+<P>For output to a Television, common resolutions are 640x480, 800x600, and
+some rare devices support 1024x768. Generally, higher resolutions are
+better. However, you may find that you prefer the picture quality at one of
+the lower resolutions. Everything in MythTV is scalable and should 'fit'
+regardless of the resolution you choose.</P>
+<P>Edit your X configuration file, usually <CODE>/etc/X11/XF86Config-4</CODE> for
+XFree, or <CODE>/etc/X11/xorg.conf</CODE> for Xorg, so that the resolution you
+want to use is listed first in the lists under "Screen". If this resolution
+is higher than the resolutions supported by your output device, you will see
+a 'panning' effect where moving the mouse to the edge will scroll around a
+desktop area which is larger than the display size. If this happens, edit
+your X configuration file to match the display size then restart X.</P>
 
-Command (m for help): t
-Partition number (1-6): 5
-Hex code (type L to list codes): 8e
+<H3>MythTV Dimensions</H3>
 
-Command (m for help): p
-
-Disk /dev/hda: 15.0 GB, 15000330240 bytes
-255 heads, 63 sectors/track, 1823 cylinders
-Units = cylinders of 16065 * 512 = 8225280 bytes
-
-   Device Boot    Start       End    Blocks   Id  System
-/dev/hda1   *         1       764   6136798+  83  Linux
-/dev/hda2           765      1823   8506417+   5  Extended
-/dev/hda5           765      1823   8506417   8e  Linux LVM
-
-Command (m for help): w
-
-#
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Create the LVM physical volume from the partitions (repeat if you have
-multiple partitions to use):
-<BLOCKQUOTE><CODE>
-<PRE>
-# pvcreate /dev/hda5
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Create a LVM volume group out of this physical volume called "VGforMyth" that is
-allocated in chunks that are a multiple of 64MB
-<BLOCKQUOTE><CODE>
-<PRE>
-# vgcreate VGforMyth -s 64m /dev/hda5
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Create a logical volume of 5GB called "video" and then create the reiserfs
-filesystem and mount it:
-<BLOCKQUOTE><CODE>
-<PRE>
-# lvcreate --name video --size 5G VGforMyth
-# mkreiserfs /dev/VGforMyth/video
-# mount /dev/VGforMyth/video /var/video
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Now create a 3GB volume for mythmusic files if you like:
-<BLOCKQUOTE><CODE>
-<PRE>
-# lvcreate --name music --size 3G VGforMyth
-# mkreiserfs /dev/VGforMyth/music
-# mount /dev/VGforMyth/music /var/music
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Display the volume group status:
-<CODE># vgdisplay -v</CODE></P>
-<P>Now, lets suppose you want to add a 60GB hard disk to the system as hdb and
-allocate 50GB of it to video storage.</P>
-<P>First, create a single partition /dev/hdb1 covering the whole disk and make
-it type 0x8e using your partition editor.</P>
-<P><CODE># fdisk /dev/hdb</CODE>
-.... create partition, set type, save and reboot if it says you have to</P>
-<P>Create the new LVM physical volume:</P>
-<P><CODE># pvcreate /dev/hdb1</CODE></P>
-<P>Add the new physical volume to the volume group:</P>
-<P><CODE># vgextend VGforMyth /dev/hdb1</CODE></P>
+<P>From "mythfrontend" go to Setup->Appearance.
+The default for the height and width is "0" - this will cause
+MythTV to automatically size itself to full screen.</P>
+<P>If the MythTV GUI width and height are not 0, mythfrontend uses these GUI
+dimensions and is anchored to the upper left corner of the X Desktop. If
+the GUI X and/or Y are not 0, the upper left corner is positioned at the
+specified coordinates. If the "Run the frontend in a window" box is checked,
+the window will have a frame and can then be dragged to any position on the
+desktop.</P>
 <P>
 <FIGURE>
 <EPS FILE="stop.eps">
 <IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>:  You may get errors at this point stating that there are no
-physical volumes available for adding to the LV, even though you know for a
-fact that there are.  You may need to specify the physical volume in the <CODE>/dev/ide/host/bus/target/lun/etc</CODE> format.</CAPTION>
+<CAPTION><B>NOTE</B>: When the GUI is full screen, you may see windows rapidly
+flipping on top of each other. If this happens you will need to set your
+window manager to 'Click to Focus' for windows to stack properly.</CAPTION>
 </FIGURE>
 
-Once you've completed one of the following two procedures, use <B>df</B>
-to check that you've got more space.</P>
+The fonts for the GUI and OSD will scale to whatever sizes you use. Most
+font sizes can be changed in setup selections or in the .xml files under
+<CODE>/usr/local/share/mythtv/</CODE> . Make sure to use fonts large enough
+to be read on a TV screen from a distance.</P>
+<P>The full screen TV size is based on the X display size. For Xinerama, you
+can specify a screen in Setup->General. The TV picture will be stretched
+to fit the entire GUI area regardless of the 
+<A HREF="#capture_resolution_">capture resolutions</A> used. However, during playback, the "W" key can
+to used to correct differences between 16:9 and 4:3.</P>
 
-<H3>ReiserFS</H3>
+<H3>Overscan Dimensions</H3>
 
-<P>Make the logical volume used for video bigger:</P>
-<P><CODE># lvextend --size +50G /dev/VGforMyth/video</CODE></P>
-<P>Unmount, resize and remount the filesystem.  Technically, you don't need to
-unmount and remount the ReiserFS. 
-<BLOCKQUOTE><CODE>
-<PRE>
-# umount /var/video
-# resize_reiserfs /dev/VGforMyth/video
-# mount /dev/VGforMyth/video /var/video
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
+<P>Because picture edges can be ragged and screen edges aren't straight,
+Television is designed to project an image larger than the physical screen.
+This is called "overscan". Underscan is fitting the entire image inside the
+screen. Underscan is useful for computer monitors so that toolbars and
+scrollbars at the edges can be seen.</P>
+<P>For best results, match the X display area as close as possible to the edges
+of the physical screen. This can only be adjusted by your tv-out device or
+by the settings for the television set. Many sets have these adjustments in
+a 'service mode'. If you cannot make these adjustments, there will be black
+borders around the edges of the X desktop, MythTV GUI and TV playback.</P>
+<P>MythTV has settings for "Overscan" in Setup->Playback. These can not, and do
+not, cause the image to display beyond the edge of the X display area. The
+purpose of these settings are to cut off rough edges and to expand the image
+so that objects will appear to be the same size as a normal overscanned TV
+picture.</P>
 
-<H3>ext2 or ext3</H3>
-
-<P>LVM comes with a program called <B>e2fsadm</B>.</P>
-<P>Unmount, resize and remount the filesystem.  The filesystem <EM>must</EM> be
-unmounted during this procedure.
-<BLOCKQUOTE><CODE>
-<PRE>
-# umount /var/video
-# e2fsadm --size +50G /dev/VGforMyth/video
-# mount /dev/VGforMyth/video /var/video
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<H3>xfs</H3>
-
-<P>XFS does not need to be unmounted to extend the size:
-<BLOCKQUOTE><CODE>
-<PRE>
-# lvextend --size +50G /dev/VGforMyth/video
-# xfs_growfs /dev/VGforMyth/video
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss23.2">23.2</A> <A HREF="mythtv-HOWTO.html#toc23.2">Advanced Partition Formatting </A>
+<H2><A NAME="backupdb"></A> <A NAME="ss23.5">23.5</A> <A HREF="mythtv-HOWTO.html#toc23.5">Saving or restoring the database </A>
 </H2>
 
-<P>The partitions that your distribution sets up for you may not be
-optimized for large files. Using LVM in conjunction with the following
-techniques can be quite useful.</P>
-<P>Unlike a typical filesystem, a MythTV video partition is usually a very
-large filesystem filled with a fairly small number of large files.
-Filesystem I/O is usually not an issue, even in multi-tuner and/or
-multi-frontend setups.</P>
-<P>There is however, one aspect of filesystem performance that can have a
-bearing on the performance of MythTV.  In Linux, deleting a file will
-utilize I/O bandwidth until the deletion has been completed.  If deleting
-the file takes long enough, the video capture buffer may overrun, thereby
-resulting in dropped frames.  Some filesystems are faster at deleting files
-than others and, for multi-gigabyte MythTV video files, these differences
-can be significant.</P>
-<P>Fortunately, there are published tests (
-<A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>) that provide
-insight into filesystem performance under conditions relevant to MythTV
-usage.  In addition, some limited testing (archived at 
-<A HREF="http://www.gossamer-threads.com/lists/mythtv/users/52672">http://www.gossamer-threads.com/lists/mythtv/users/52672</A>)
-with very large files (10 gigabytes) was reported in the MythTV Users
-mailing list.</P>
-
-<H3>Ext2</H3>
-
-<P>Ext2 was the defacto standard Linux filesystem for many years.  It is
-stable, provides good I/O performance and can quickly delete large files. 
-The primary disadvantage of Ext2 is that it is not a journaling filesystem,
-so a file system consistency check (fsck, which is normally only performed
-after a system crash) can take many hours on a filesystem the size of a
-typical MythTV partition.</P>
-
-<H3>Ext3</H3>
-
-<P>Ext3 is Ext2 with a journal, so your biggest gain is that in case of a
-crash and reboot you won't have to wait very long for your partition to be
-remounted.</P>
-<P>There are options available when formatting an Ext3 partition, as in:
+<P>See the <B>mysqldump</B> manpage for more information.
 <BLOCKQUOTE><CODE>
 <PRE>
-# mkfs.ext3 -T largefile4 /dev/hdb1
+$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>This example assumes that <CODE>/dev/hdb1</CODE> has already been created using
-<B>fdisk</B>. If you're using LVM, <CODE>/dev/hdb1</CODE> may be something like
-<CODE>/dev/VGforMyth/video</CODE>.</P>
-<P>The "-T largefile4" option creates one inode per 4 megabytes, which can
-provide a few percent more storage space.  However, tests indicate that
-using the "-T largefile4" option can drastically increase the amount of time
-required to delete a large file and thus it should only be used with encoder
-settings that produce small video files (YMMV).</P>
-<P>You can check on your filesystem using the <B>dumpe2fs</B> program. See
-the man page for details.</P>
-<H3>ReiserFS</H3>
-
-<P>The Reiser filesystem is another journaling filesystem commonly
-distributed with Linux.  It is known to be an extremely efficient filesystem
-and it especially excels at managing partitions containing a large number of
-small files.  However, tests indicate it is not the fastest at deleting very
-large files.  For that reason, it may not be the best choice when using
-encoder bitrates that produce very large files.</P>
-
-<H3>JFS</H3>
-
-<P>JFS (Journaling File System) is a journaling filesystem originally
-developed by IBM for AIX which was later released as open source.  While not
-as common as Ext3 or ReiserFS, it is distributed with RedHat 9 (RH9) and
-Fedora Core 1 (RHFC1) and Mandrake as well as other distros.  According to
-tests, JFS is the file deletion speed king, deleting virtually any file in
-under one second, even files as large as 10 gigabytes.</P>
-
-<H3>XFS</H3>
-
-<P>XFS is a journaling file system originally developed by SGI for Irix, and
-later released as open source.  While not a part of the default RedHat Linux
-9 or Fedora Core installation (although it is a part of Mandrake and Fedora
-Core 2), it can be easily installed via ATrpms.  XFS provides deletion
-speeds for large files only slightly slower than JFS.  According to the test
-results shown at (
-<A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>), XFS provide
-higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
-issues if you do not have the spare CPU capacity to handle XFS, potentially
-leading to dropped frames.</P>
-
-<H2><A NAME="ss23.3">23.3</A> <A HREF="mythtv-HOWTO.html#toc23.3">HDTV with the Air2PC-ATSC-PCI card</A>
-</H2>
-
-<P>The Air2PC card has the capability to capture over-the-air HDTV signals
-(8VSB).  The Air2PC card is
-installed as a DVB device and is supported within MythTV.  </P>
-<P>First, you must compile a version of the Linux kernel to support the new
-tuner device.  </P>
-<P>Download the source to 2.6.11.  
+<P>To restore: (assuming that you've dropped the database)
 <BLOCKQUOTE><CODE>
 <PRE>
-$ su
-# cd /usr/src
-# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
-# tar -xjf linux-2.6.11.tar.bz2
-# pushd .
+$ mysql -u root
+mysql>create database mythconverg;
+mysql>exit
+$ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_backup.sql
 </PRE>
 </CODE></BLOCKQUOTE>
+</P>
+<P>You may need to alter the MySQL permissions if this database is being shared
+with multiple systems.  See the 
+<A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A> section for more
+information.</P>
 
-If you already have a 2.6 kernel running, copy the <CODE>.config</CODE> file and
-use it as your starting point.  If not, then go straight to the <CODE>make
-menuconfig</CODE> portion below.</P>
-<P>On Debian with a 2.6.10 kernel:</P>
+<H2><A NAME="ss23.6">23.6</A> <A HREF="mythtv-HOWTO.html#toc23.6">Deleting the MySQL database</A>
+</H2>
+
 <P>
-<BLOCKQUOTE><CODE>
-<PRE>
-# cp /lib/modules/`uname -r`/build/.config .
-# make oldconfig
-</PRE>
-</CODE></BLOCKQUOTE>
-
-Read the prompts that come up; for the most part you should be able to
-answer "No".
-<BLOCKQUOTE><CODE>
-<PRE>
-# make menuconfig
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>For Gentoo:
-<BLOCKQUOTE><CODE>
-<PRE>
-# emerge genkernel udev hotplug coldplug
-# genkernel --menuconfig --udev --save-config all
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Go to the Device Drivers->Multimedia->Digital Video Broadcasting Devices</P>
-<P>Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2 PCI.</P>
-<P>Exit menuconfig, then compile modules and the kernel.  (Gentoo will do this
-automatically as a part of the <B>genkernel</B> step.
-<BLOCKQUOTE><CODE>
-<PRE>
-# make modules
-# make
-# make install modules_install
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Make any modifications necessary to your boot configuration files (lilo or
-grub) as required to boot your new kernel.</P>
-<P>Download and compile the dvb applications you'll need to configure the card. 
-At the password prompt, press ENTER.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
-$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
-$ cd dvb-apps
-$ make
-</PRE>
-</CODE></BLOCKQUOTE>
-
-<B>NOTE</B>: As of 2005-02-16, the compile aborts with an error, however
-not before the <B>azap</B> is compiled, so you should be able to continue.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su
-# cp utils/szap/azap /usr/local/bin
-</PRE>
-</CODE></BLOCKQUOTE>
-
-On Gentoo, execute the following:
-<BLOCKQUOTE><CODE>
-<PRE>
-# mkdir /lib/firmware
-# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /lib/firmware
-# echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-
-On Debian:
-<BLOCKQUOTE><CODE>
-<PRE>
-# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
-# exit
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Shutdown your machine, install the card and restart.  Ensure that you're
-using your newly compiled kernel.</P>
-<P>Once you've rebooted, confirm that the card is detected.  If you type
-<B>dmesg</B>, you should see something like this:
-<BLOCKQUOTE><CODE>
-<PRE>
-drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
-drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
-DVB: registering new adapter (SkyStar2).
-DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>If you are using 8VSB (Over-the-Air HDTV), run the <B>azap</B> program. 
-Replace ZIPCODE with your zip code.  The perl script will connect to 
-<A HREF="http://www.antennaweb.org">http://www.antennaweb.org</A> to obtain
-your HDTV channels.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
-$ test ~/.azap || mkdir ~/.azap
-$ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
-</PRE>
-</CODE></BLOCKQUOTE>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Performing this step will remove the entire database. You will lose all of your settings and will need to re-run the mc.sql script
+to setup the database structure before running the setup program.</CAPTION>
+</FIGURE>
 
 <BLOCKQUOTE><CODE>
 <PRE>
-$ /usr/local/bin/azap wsvn
-using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
-tuning to 183000000 Hz
-video pid 0x0000, audio pid 0x0000
-status 00 | signal fff0 | snr ea60 | ber 00000000 | unc 00000000 |
-status 1f | signal f840 | snr ce6e | ber 00000068 | unc 00000000 | FE_HAS_LOCK
-status 1f | signal f600 | snr d2d8 | ber 00000018 | unc 00000000 | FE_HAS_LOCK
-status 1f | signal f290 | snr cd54 | ber 00000008 | unc 00000000 | FE_HAS_LOCK
-status 1f | signal f340 | snr c658 | ber 00000030 | unc 00000000 | FE_HAS_LOCK
-CTRL-C
+$ mysql -u root
+mysql> drop database mythconverg;
+mysql> quit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss23.7">23.7</A> <A HREF="mythtv-HOWTO.html#toc23.7">Moving your data to new hardware</A>
+</H2>
+
+<P>This assumes that you will be moving your data to newer / bigger hardware
+and don't want to lose your programs.</P>
+<P>The first step is to create a database backup as demonstrated in an earlier
+section.</P>
+<P>Next, you will extract only the data that is relevant to the programs:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ grep "INSERT INTO record "         mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO recorded "       mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO oldrecorded "    mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO recordedmarkup " mythtv_backup.sql >> restore.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><B>NOTE</B>:  Newer versions of <B>mysqldump</B> place backticks around
+the table names.  Backticks are not the same as apostrophes!  On a typical
+North American keyboard, backticks are located to the left of the "1" key,
+on the same key as the tilde.  Also, because the <B>bash</B> shell may try
+to interpret the backticks, make sure you use a \ before each one.</P>
+<P>If your <CODE>restore.sql</CODE> file is empty, you'll need to re-run the
+commands like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ grep "INSERT INTO \`record\` "         mythtv_backup.sql > restore.sql
+$ grep "INSERT INTO \`recorded\` "       mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`oldrecorded\` "    mythtv_backup.sql >> restore.sql
+$ grep "INSERT INTO \`recordedmarkup\` " mythtv_backup.sql >> restore.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Note the space after the table name and the ">>" to append to the file for
+all but the first <B>grep</B>. "recordedmarkup" is huge and may be
+hundreds of thousands of lines if you had lots of hours of recordings.</P>
+<P>After you have moved the data files to the new hardware, configure MythTV
+using the <B>mythtv-setup</B> program as you normally would with a
+standard MythTV installation.</P>
+<P>At this point we will restore the information about your programs back into
+the database:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u mythtv -pmythtv mythconverg &lt; restore.sql 
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>After successful insertion of the data you may delete the
+<CODE>restore.sql</CODE> file.</P>
+
+<H2><A NAME="btaudio"></A> <A NAME="ss23.8">23.8</A> <A HREF="mythtv-HOWTO.html#toc23.8">btaudio </A>
+</H2>
+
+<P>btaudio allows you to obtain the audio data from your tuner card directly
+over the PCI bus without using a sound card.  This is useful if you would
+like to use multiple tuner cards in a system without adding a sound card for
+each one, or if your existing sound card is not capable of full-duplex
+operation.</P>
+<P>In order to use btaudio, your tuner card will need certain hardware
+installed on it, and that hardware must be wired correctly.  The chip that
+will allow you to use the btaudio module is the MSP34xx.  However, having a
+MSP34xx is no guarantee that you will be able to use the btaudio module.</P>
+<P>As of 2003-03-31, this is the current list of cards and their status:
+Works with btaudio:</P>
+<P>
+<UL>
+<LI>Hauppauge WinTV-radio with dbx-TV stereo, model 401</LI>
+<LI>Hauppauge WinTV-Theater, model 495, 498 (Europe)</LI>
+<LI>ATI TV Wonder</LI>
+</UL>
+</P>
+<P>The following cards do not work:
+<UL>
+<LI>Pinnacle Studio PCTV Pro - note: this has a MSP34xx, but it's not
+wired correctly to the BT878 chip.</LI>
+<LI>ATI TV Wonder VE</LI>
+<LI>Leadtek Winfast 2000 XP (PAL, UK and NTSC)</LI>
+<LI>I/O Magic PC-PVR.  No MSP34xx chip.</LI>
+</UL>
+</P>
+<P>The following cards have been reported to work, but have issues:
+<UL>
+<LI>Avermedia AVerTV Studio (no digital DSP output, "whiney noise" on
+analog)</LI>
+</UL>
+</P>
+<P>Once btaudio loads, it should register additional <CODE>/dev/dsp</CODE> and
+<CODE>/dev/mixer</CODE> devices.  Typing <CODE>$ dmesg</CODE> will let you know
+what's going on.</P>
+
+<H2><A NAME="ss23.9">23.9</A> <A HREF="mythtv-HOWTO.html#toc23.9">Removing unwanted channels</A>
+</H2>
+
+<P>If <B>mythfilldatabase</B> grabbed a channel which you do not want to
+include in your TV listings, you can remove the entries from the grabber
+configuration and the MySQL database.  This often happens with premium
+channels; for example, HBO or Showtime may be available on your cable TV
+system, but is scrambled because you're not a subscriber to that channel. 
+Since you can never watch it, you want to get rid of it.</P>
+<P>If you are using the DataDirect service, login to your account at
+<A HREF="http://labs.zap2it.com/">http://labs.zap2it.com/</A> to
+modify your lineup. Uncheck the boxes for any unwanted channels, and they
+will no longer be included in your download.</P>
+<P>If you are using a grabber from XMLTV, comment out the channel from the
+<CODE>~/.mythtv/&lt;sourcename&gt;.xmltv</CODE> file by inserting the word "not
+" (including the space) in front of the unwanted entry. This will prevent
+<B>xmltv</B> from grabbing future listings.</P>
+<P>Next, delete the unwanted item from the channel table so that it will not
+appear in the EPG or when changing channels.  To delete the data from the
+database we need to perform some steps.  First, assuming that HBO is channel
+15, we need to find out the internal <CODE>chanid</CODE> used by MySQL:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> select chanid from channel where channum=15;
++--------+
+| chanid |
++--------+
+|   1015 |
++--------+
+1 row in set (0.00 sec)
+mysql> delete from channel where chanid = 1015;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Old program data will be removed over the course of a week. However, you may
+want to immediately delete any current program listings for the channel that
+has been removed:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql> delete from program where chanid = 1015;
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss23.10">23.10</A> <A HREF="mythtv-HOWTO.html#toc23.10">NFS</A>
+</H2>
+
+<P>You may want to use a central server to store your files.  </P>
+<P>On the host machine, (in this case, the hostname is "masterbackend") you'll
+want to edit your <CODE>/etc/exports</CODE> file and use something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+/var/video (rw)
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To export the <CODE>/var/video</CODE> directory with read / write privileges.</P>
+<P>On the "slave" machine, you'll want to edit the <CODE>/etc/fstab</CODE> file and
+add something like:
+<BLOCKQUOTE><CODE>
+<PRE>
+masterbackend:/var/video /var/video nfs rsize=8192,wsize=8192,hard,intr,nfsvers=3
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Then run <CODE># mount -a</CODE> to re-read the file to mount the file system.</P>
+<P>In this case, the source is a machine called "masterbackend" which is
+exporting the directory "/var/video", which we're mounting locally at
+"/var/video".  The rsize and wsize options are used to increase the
+performance of NFS; "hard,intr" is there because that's the recommendation
+of the NFS-HOWTO, and the nfsvers is required for filesizes over 2GB.</P>
+
+<H2><A NAME="ss23.11">23.11</A> <A HREF="mythtv-HOWTO.html#toc23.11">Automatically starting mythfrontend at system boot time</A>
+</H2>
+
+<P>Here's an example submitted to the mythtv-dev list by Pat Pflaum
+<A HREF="mailto:pat@netburp.com">mailto:pat@netburp.com</A> using fvwm:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat > .xinitrc
+fvwm &amp;
+mythfrontend
+^D
+$ cat > .fvwmrc
+Style myth* NoTitle, NoHandles, Sticky, WindowListSkip, SloppyFocus, GrabFocus, BorderWidth 0
+^D
 $
 </PRE>
 </CODE></BLOCKQUOTE>
-
-<B>NOTE</B>: if you have anything in the unc column ("uncorrectable
-errors") you will probably have problems with HDTV.  Check your antenna,
-cables, etc.</P>
-<P>Once you have confirmed that your card is able to lock onto a HDTV signal it
-is time to configure MythTV. Start the setup program, and in the Capture
-Cards section change the card type to "Digital Video Broadcast".</P>
-<P>For HDTV you do not need to use the Advanced configuration. </P>
-<H2><A NAME="ss23.4">23.4</A> <A HREF="mythtv-HOWTO.html#toc23.4">Diskless Ubuntu</A>
+</P>
+<P>The following also works with blackbox:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat > .xinitrc
+xset -dpms s off &amp;
+irxevent &amp;
+mythfrontend &amp;
+blackbox
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Make sure that your <CODE>.blackboxrc</CODE> file has:
+<BLOCKQUOTE><CODE>
+<PRE>
+session.screen0.focusNewWindows:        True
+session.screen0.focusModel:     SloppyFocus
+</PRE>
+</CODE></BLOCKQUOTE>
+ in it.</P>
+<P>
+<A NAME="mythbackend_autostart"></A> </P>
+<H2><A NAME="ss23.12">23.12</A> <A HREF="mythtv-HOWTO.html#toc23.12">Automatically starting mythbackend at system boot time</A>
 </H2>
 
-<P>(This information is a work in progress - 2005-07-15.)</P>
-<P>In the following examples, we are going to create an environment which can
-be used to boot a diskless workstation using PXE.</P>
-<P>There are two machines in this scenario:  the backend, a Debian Sarge system
-which has the disks and which will run the necessary support software, and
-the "basement" machine, an Intel D865PERL motherboard with 512MB of DRAM, a
-NVidia 440MX video card, a Microsoft MCE USB remote and a HD44780 16x2
-Vacuum Fluorescent Display.</P>
+<H3>Red Hat And Mandrake</H3>
 
-<H3>Backend Configuration</H3>
-
-<P>The backend machine needs to provide the support software for the
-services needed to boot a diskless workstation.</P>
-<P>
+<P>Here's a method for automatically starting mythbackend submitted by Mike
+Thomson (
+<A HREF="mailto:linux@m-thomson.net">mailto:linux@m-thomson.net</A>) and Stu Tomlinson (
+<A HREF="mailto:stu@nosnilmot.com">mailto:stu@nosnilmot.com</A>).</P>
+<P>Copy the files from the MythTV <CODE>contrib</CODE> directory or from Mike's web
+site (
+<A HREF="http://m-thomson.net/mythtv/">http://m-thomson.net/mythtv/</A>) as follows:</P>
+<P><CODE>etc.rc.d.init.mythbackend</CODE> should be made executable and copied to
+<CODE>/etc/rc.d/init.d/</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd contrib
+$ su
+# chmod a+x etc.rc.d.init.d.mythbackend
+# cp etc.rc.d.init.d.mythbackend /etc/rc.d/init.d/mythbackend
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P><CODE>etc.sysconfig.mythbackend</CODE> should be copied to
+<CODE>/etc/sysconfig/</CODE>:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd contrib
+$ su
+# cp etc.sysconfig.mythbackend /etc/sysconfig/mythbackend
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Edit <CODE>/etc/sysconfig/mythbackend</CODE> if you want to change the defaults
+(the userid that should start mythbackend, location of the logfile and (if
+required) the name and location of the mythbackend binary).</P>
+<P>Use <B>chkconfig</B> to make sure the script is called when
+entering runlevels 3, 4 or 5:
 <BLOCKQUOTE><CODE>
 <PRE>
 $ su
-# apt-get install dhcpd3-server atftpd syslinux
+# chkconfig --level 345 mythbackend on
+# exit
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-# mkdir -p /nfsroot/basement
-# debootstrap --arch i386 hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html</P>
-<P>Once that's done, we'll need to <B>chroot</B> into the newly created
-directory structure for some initial setup.
-<BLOCKQUOTE><CODE>
-<PRE>
-$ su 
-# chroot /nfsroot/basement
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Set the hostname that you'd like this machine to display at login and at the
-shell:
-<BLOCKQUOTE><CODE>
-<PRE>
-# echo "basement" > /etc/hostname
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Add the IP address of this host to <CODE>/etc/hosts</CODE>
-<BLOCKQUOTE><CODE>
-<PRE>
-# echo "127.0.0.1 localhost" >> /etc/hosts
-# echo "192.168.10.51 backend-2" >> /etc/hosts
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Create the initial configuration:
-<BLOCKQUOTE><CODE>
-<PRE>
-/usr/sbin/base-config new
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Create a <CODE>xorg.conf</CODE> file:
-<BLOCKQUOTE><CODE>
-<PRE>
-# xorgconfig
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>Edit your <CODE>/etc/apt/sources.list</CODE> and look at the bottom of the file. 
-It should end up looking like this:</P>
-<P>
-<BLOCKQUOTE><CODE>
-<PRE>
-deb http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
-deb-src http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
 
-## Uncomment the following two lines to add software from the 'universe'
-## repository.
-## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
-## team, and may not be under a free licence. Please satisfy yourself as to
-## your rights to use the software. Also, please note that software in
-## universe WILL NOT receive any review or updates from the Ubuntu security
-## team.
-deb http://us.archive.ubuntu.com/ubuntu/ hoary universe
-deb-src http://us.archive.ubuntu.com/ubuntu/ hoary universe
+<H3>Log files </H3>
 
-deb http://security.ubuntu.com/ubuntu hoary-security main restricted
-deb-src http://security.ubuntu.com/ubuntu hoary-security main restricted
-
-deb http://security.ubuntu.com/ubuntu hoary-security universe
-deb-src http://security.ubuntu.com/ubuntu hoary-security universe
-
-deb http://archive.ubuntu.com/ubuntu hoary multiverse
-deb-src http://archive.ubuntu.com/ubuntu hoary multiverse
+<P>By default, the log file for mythbackend will be written to
+<CODE>/var/tmp/mythbackend.log</CODE>. This has been tested and is known to work
+on Mandrake and Red Hat, but many people prefer to place logs under
+<CODE>/var/log/</CODE>.</P>
+<P>To do this, create a group called <CODE>mythtv</CODE> (or anything you prefer)
+and add your usual MythTV users to that group. If you changed the user that
+starts mythbackend from the default of root you <EM>must</EM> perform this
+step.</P>
+<P>Create the directory <CODE>/var/log/mythtv</CODE> and set its
+permissions as follows:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# mkdir /var/log/mythtv
+# chown root:mythtv /var/log/mythtv
+# chmod 0775 /var/log/mythtv
+# exit
+$ ls -ld /var/log/mythtv
+drwxrwxr-x    2 root     mythtv       4096 Apr 28 21:58 /var/log/mythtv/
+$
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>Finally, exit out of the <B>chroot</B>:
+
+<H3>Mandrake </H3>
+
+<P>Mandrake adds one more twist in the form of the <CODE>msec</CODE> utility,
+which runs regularly and (at the default or any higher security level) sets
+permissions on many files, including those under <CODE>/var/log</CODE>.</P>
+<P>To tell msec about the MythTV log files and their directory, you need to
+edit the <CODE>/etc/security/msec/perm.local</CODE> file to include the
+following:
 <BLOCKQUOTE><CODE>
 <PRE>
+# /etc/security/msec/perm.local
+# Local overrides to the msec program
+#
+# Full file path                user.group              permissions
+/var/log/mythtv/                root.mythtv             775
+/var/log/mythtv/*               root.mythtv             664
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>A copy of the above has been included in the contrib/ directory.  You may
+add it by typing:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd contrib
+$ su
+# cat etc.security.msec.perm.local >> /etc/security/msec/perm.local
 # exit
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>sudo apt-get install subversion distcc bind9 bind9-doc libqt3c102-mt-mysql
-edit /etc/default/distcc to start it and allow other hosts</P>
-<P>sudo apt-get build-dep mythtv</P>
-<P>sudo apt-get install libqt3c102-mysql</P>
-
-<H3>Configuring DHCP</H3>
-
-<P>edit /etc/default/dhcp3-server.  add interface</P>
-<P>
+<P>Finally run the <CODE>msec</CODE> tool to check and implement your
+changes.
 <BLOCKQUOTE><CODE>
 <PRE>
-option domain-name              "local";
-option subnet-mask              255.255.255.0;
-option domain-name-servers 192.168.10.50, 68.87.66.196, 68.87.64.196, 63.240.76.4
+$ su
+# msec
+# exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>: msec can only <EM>reduce</EM> the permissions of files, so if
+you don't get the results you expect, check that you're not asking
+<CODE>msec</CODE> to add missing permissions to the files or directories you
+created.</CAPTION>
+</FIGURE>
+</P>
+<H3>Gentoo</H3>
 
-# Turn on Dynamic DNS:
-ddns-update-style interim;
-ddns-updates on;
+<P>The portage file for MythTV has scripts that will allow you to run
+mythbackend at startup.</P>
+<P>To run mythbackend as a daemon which starts at boot time:
+<BLOCKQUOTE><CODE>
+<PRE>
+# rc-update add mythbackend default
+</PRE>
+</CODE></BLOCKQUOTE>
 
-# Don't allow clients to update DNS, make the server do it
-# based on the hostname passed by the DHCP client:
-deny client-updates;
-allow unknown-clients;
-
-allow bootp;
-allow booting;
-
-#option ip-forwarding    false;  # No IP forwarding
-#option mask-supplier    false;  # Don't respond to ICMP Mask req
-
-subnet 192.168.10.0 netmask 255.255.255.0 {
-  option routers        192.168.10.1;
-#  range 192.168.10.100 192.168.10.250;
-}
-
-group {
-  next-server 192.168.10.50;          # IP address of your TFTP server
-  default-lease-time 864000;
-  max-lease-time 864000;
-
-  host basement {
-        hardware ethernet 00:13:20:11:a3:ea;
-        fixed-address 192.168.10.51;
-        filename "/tftpboot/pxelinux.0";
-        option root-path "/nfsroot/basement/";
-        option host-name "basement" ;
-  }
-}
+To stop mythbackend as a daemon:
+<BLOCKQUOTE><CODE>
+<PRE>
+# /etc/init.d/mythbackend stop
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>To obtain a list of options:
+<BLOCKQUOTE><CODE>
+<PRE>
+# /etc/init.d/mythbackend
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
 
-<H3>Editing </H3>
+<H2><A NAME="advanced_backend_config"></A> <A NAME="ss23.13">23.13</A> <A HREF="mythtv-HOWTO.html#toc23.13">Advanced Backend Configurations </A>
+</H2>
 
-<P>svn co http://svn.mythtv.org/svn/trunk/mythtv
-svn co http://svn.mythtv.org/svn/trunk/mythplugins
-svn co http://svn.mythtv.org/svn/trunk/myththemes</P>
-<P>First time in, it will create .mythtv/mysql.txt, but it's pointing at the wrong
-server (ie, there is none on the frontend).</P>
-<P>Exit out at this point (should be the language selection screen), and edit .mythtv/mysql.txt</P>
-<P>Then restart</P>
-<P>Disable xscreensaver: System->Preferences->ScreenSaver.  Mode: Disable Screen Saver
-Advanced: Power Management Enabled: uncheck</P>
-<P>System->Preferences->Sound uncheck Enable sound server startup</P>
+<P>MythTV is flexible in the way that you define multiple backend tuner
+configurations.  The only hard-and-fast rule is that the Master backend
+<EM>must</EM> have a capture device defined, but shouldn't imply that the
+capture device in the Master backend must be the first capture card defined in the
+database.</P>
+<P>One example of an advanced configuration is the round-robin scheme.  Rather
+than defining all of the cards on the master, you could first go into setup
+on the master to define globals such as the general configuration and the
+channel lineup but not the host-specific configuration item like the capture
+card.  In this example, we will use a 4 tuner configuration, where two
+slaves have one card each and the master has two.
+<OL>
+<LI>Add the first capture card on one of the slaves.  Complete the
+configuration, connecting the input source to the card.  This will get
+cardid #1 in the database.  Exit setup.</LI>
+<LI>Configure the first capture card on the master backend.  This will get
+cardid #2 in the database.  Exit setup.</LI>
+<LI>Configure the first capture card on the second slave.  This will be
+cardid #3 in the database.  Exit setup.</LI>
+<LI>Configure the second capture card on the master backend.  This will
+get cardid #4 in the database.  Exit setup.</LI>
+</OL>
+</P>
+<P>Using this scheme, the master backend will not use both capture cards until
+one of the following happens:
+<UL>
+<LI>There are four recordings scheduled for the same time</LI>
+<LI>Both slaves are unavailable</LI>
+</UL>
+</P>
+<P>The scheduler in MythTV checks whether an encoder is available; if a slave
+backend isn't running, its encoder isn't available, so the scheduler will
+look for the next available encoder.  This makes MythTV very flexible; slave
+tuners can come and go, and as long as there are enough tuners for what
+you'd like to record it doesn't matter which tuner in particular is going to
+be used.</P>
+<P>Using this round-robin scheme along with a shared storage directory like
+NFS and enabling the Master Backend Override setting will allow you to view
+content even if the slave backend that recorded a program is not available.</P>
 
+<H2><A NAME="ss23.14">23.14</A> <A HREF="mythtv-HOWTO.html#toc23.14">What is this transcoder thing, and how do I use it?</A>
+</H2>
+
+<P>The transcoder re-encodes files from one MythTV format to another.  The
+main purpose of the transcoder is to allow users with hardware
+encoders (PVR-250) or systems that can only record in RTjpeg due to
+performance reasons (multiple capture cards, slow system, etc) to create
+MPEG-4 streams to save space.</P>
+<P>The transcoder can be used in two ways:
+<UL>
+<LI>Automatically re-encode every file once it has completed recording</LI>
+<LI> After marking commercials, the transcoder can be run manually to
+delete the commercials from the file (thus further saving space)</LI>
+</UL>
+
+The two methods are independent.  The first is an automatic process that can be
+enabled/disabled through the setup program; the second is a manual method which
+must be invoked on each recording individually.</P>
+<P>The second method can be used on files that have already been transcoded (or
+files which were are already in the correct format), so only the frames
+immediately following a cut section will be re-encoded, resulting in a very
+minimal loss of quality.</P>
+<P>To enable automatic transcoding, do the following:
+start the setup program
+under the host-specific settings:
+set the Transcoder Auto-run checkbox</P>
+<P>For either manual or automatic transcoding:
+start mythbackend
+start mythfrontend
+select setup, and the Transcoding recording profile.
+now select either RTjpeg or MPEG-4 (selecting any of the hardware
+encoders will result in the transcoder not working).
+set the other parameters as you'd like.  For best performance, you
+should match the audio to the 'Default' profile.  If you plan to
+only use the manual transcoder, you can choose to set the video to
+be the same as the default profile too (as long as it is MPEG-4 or
+RTjpeg)</P>
+<P>Everything should now be setup properly.  If you elected to use the
+Auto-Run feature, the transcoder will automatically launch after each
+recording is complete.  The transcoder thread runs at a low priority, so it
+should not impact any critical tasks or other recordings.</P>
+<P>If you want to manually transcode a program, simply press 'X' while
+watching a recording (you should have already finished marking all
+commercials).  If you change your mind, hitting 'X' again will stop the
+transcoding.</P>
+<P>Once the transcode is complete, mythbackend will replace the old file
+with the new as soon as it is no longer in use.</P>
+
+<H2><A NAME="ss23.15">23.15</A> <A HREF="mythtv-HOWTO.html#toc23.15">Changing your hostname</A>
+</H2>
+
+<P>If you need to change the name of the computers used with MythTV you'll
+need to perform a sequence of steps.  There are a number of pieces of
+information that MythTV keeps track of which are tied to the hostname of the
+box, so changing the hostname involves altering the name in the
+operating system and in the MySQL database.  In the examples below, the old
+name of the system was "frontend1" and we're going to change it to
+"kidsroom".</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  Changing the hostname using direct SQL update commands will
+break things.  You <EM>MUST</EM> use this indirect method.</CAPTION>
+</FIGURE>
+ </P>
+<P>1.  Stop all backends.  If you run <B>mythbackend</B> from a terminal
+session, press control-c. If your backends are started with an init
+script, you would do something like the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# /etc/init.d/mythbackend stop
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>2.  Change the hostname.</P>
+<P>For Red Hat and derived distributions, edit the
+<CODE>/etc/sysconfig/network</CODE> file.  Look for
+<CODE>HOSTNAME=frontend1</CODE> and change this to
+<CODE>HOSTNAME=kidsroom</CODE> or whatever you'll be using.  For other
+distributions, refer to the documentation, such as the
+<PRE>
+hostname(1)
+</PRE>
+ man page.</P>
+
+<P>To alter the
+hostname in the current session, run:
+<BLOCKQUOTE><CODE>
+<PRE>
+# hostname kidsroom
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>3.  Dump the database.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysqldump -u mythtv -pmythtv mythconverg -c > mythtv_backup.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>4.  Rename the host in the database.  First, ensure that the new hostname
+you'll be using isn't already in the database.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ grep kidsroom mythtv_backup.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Now we're actually going to change the name.  The following should all be
+typed on the same line:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cat mythtv_backup.sql | sed s/\'frontend1\'/\'kidsroom\'/ >> mythtv_restore.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If you don't feel comfortable using <B>sed</B>, you can open the
+<CODE>mythtv_backup.sql</CODE> file in a text editor and perform a global search
+and replace.  When saving the file, make sure you use the new name,
+<CODE>mythtv_restore.sql</CODE> or the rest of the steps below will fail.</P>
+<P>5.  Drop and recreate the database.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root
+mysql>drop database mythconverg;
+mysql>create database mythconverg;
+mysql>exit      
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>6.  Restore the database using your edited version.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u mythtv -pmythtv mythconverg &lt; mythtv_restore.sql
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you are running slave backends or frontends, don't forget to re-enable
+access as detailed in 
+<A HREF="mythtv-HOWTO-6.html#modify_perm_mysql">Modifying access to the MySQL database for multiple systems</A>. </P>
+<P>7.  Start the backends.  If you use init scripts, do the following, otherwise
+start them from terminal consoles.
+<BLOCKQUOTE><CODE>
+<PRE>
+# /etc/init.d/mythbackend start
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>8.  Quit and restart all frontends.  Delete the <CODE>mythtv_backup.sql</CODE>
+and <CODE>mythtv_restore.sql</CODE> files.</P>
+
+<H2><A NAME="ss23.16">23.16</A> <A HREF="mythtv-HOWTO.html#toc23.16">Can I run MythTV on my TiVo?</A>
+</H2>
+
+<H2><A NAME="ss23.17">23.17</A> <A HREF="mythtv-HOWTO.html#toc23.17">Can I run MythTV on my ReplayTV?</A>
+</H2>
+
+<P>No.</P>
+<P>While it is true that the TiVo runs the Linux kernel, and TiVo has released
+their changes to the kernel under the GPL, the TiVo is <EM>not</EM> a
+general-purpose computer, and there is no programming information available
+for the custom hardware contained within a TiVo.  TiVo is under no
+obligation to release the source code to their <EM>application</EM>.</P>
+<P>The ReplayTV runs VxWorks, a Real Time Operating System from Wind River
+Systems.</P>
+<H2><A NAME="ss23.18">23.18</A> <A HREF="mythtv-HOWTO.html#toc23.18">Can a wireless connection be used between the frontend and the backend?</A>
+</H2>
+
+<P>Yes, assuming that your wireless connection has sufficient bandwidth to
+maintain the datarate between the frontend and the backend.  802.11b should
+be sufficient if the encoded bitrate of the content is less than the
+datarate of your wireless connection, which in the case of 802.11b would be
+approximately 4 Mbps.  (The advertised rate of 11Mbps gives an actual
+throughput of 4 Mbps.) 802.11a and 802.11g, if operating in their high-speed
+modes, or proprietary 802.11b "Turbo" schemes should be adequate.  Multiple
+wireless frontends, poor signal strength or other factors can severely
+impact the viewing experience on the frontend.</P>
+
+<H2><A NAME="ss23.19">23.19</A> <A HREF="mythtv-HOWTO.html#toc23.19">How can I burn shows that I have recorded to a DVD?</A>
+</H2>
+
+<P>There are two answers to this question.  The easiest thing to do is to
+simply burn the MythTV files onto the DVD and treat the DVD as if it were a
+hard drive.  This will allow you to save the programs, but it's likely that
+they will <EM>not</EM> be playable in a DVD player because the disc will
+simply contain files and not any DVD structure.  If you'd like to create a
+DVD that will play in a standard DVD player and your files have been
+recorded as MPEG-2 from a device supported by the IVTV driver, the first
+step you'll need to perform is to remux the file to make it DVD compliant. 
+Next, you'll use <B>dvdauthor</B>, <B>mkisofs</B> to create the ISO
+image, and finally <B>dvdrecord</B> to burn that to a blank DVD-R.</P>
+<P>The requirements for this procedure are <B>mjpegtools</B> (provides
+<B>mplex</B>) and <B>dvdauthor</B> (provides <B>mpeg2desc</B> and
+<B>dvdauthor</B>).</P>
+<P>This script will perform the necessary steps. You'll need to pass it the
+.nuv file and a name for the new DVD project.  You should end up with a
+directory which you can <B>mkisofs</B> into a ISO file then burn it.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+#!/bin/sh
+
+mkfifo aud0
+mkfifo vid0
+mkfifo dvdmpg
+
+mpeg2desc -a0 &lt; $1 > aud0 &amp;
+mpeg2desc -v0 &lt; $1 > vid0 &amp;
+mplex -f 8 -V -o dvdmpg aud0 vid0 &amp;
+dvdauthor -o $2 -f dvdmpg
+dvdauthor -o $2 -T
+
+rm aud0
+rm vid0
+rm dvdmpg
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>It's also possible to pipe the output of <B>mkisofs</B> directly to
+<B>cdrecord</B> without any intermediate files being written to your hard
+drive.  For example:
+<BLOCKQUOTE><CODE>
+<PRE>
+#!/bin/sh
+TSIZE=`mkisofs -dvd-video -udf -q -print-size .`
+mkisofs -dvd-video -udf -V "$1" . | nice -10 cdrecord speed=1 dev=1,1,0 \
+driveropts=burnfree -dao -v tsize="$TSIZE"s -
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H2><A NAME="ss23.20">23.20</A> <A HREF="mythtv-HOWTO.html#toc23.20">Burning a MythTV recording to a DVD (alternate version)</A>
+</H2>
+
+
+<P>This is specific to MPEG-2 .nuv files created by Hauppauge PVR-X50 video 
+capture cards.</P>
+<P>The software packages you will want are:
+<UL>
+<LI>dvd+rw-tools</LI>
+<LI>dvdauthor</LI>
+<LI>mjpegtools</LI>
+<LI>avidemux2</LI>
+<LI>transcode - not necessary for this, but useful for working with video</LI>
+<LI>k3b - a GUI for burning DVD's and CD's.  Not necessary, but useful.</LI>
+</UL>
+</P>
+<P>1. Find the file you want.</P>
+<P>2. Run <B>avidemux2</B> and open the .nuv file which corresponds with the
+program you wish to burn to DVD.</P>
+<P>3. Remove the segments you don't need.  Click twice on "A" when you are at
+the beginning of the segment you want to save, find the end of the segment,
+and click "B".</P>
+<P>4. Save the raw video stream and audio: <CODE>File-> Save -> Save Raw Video
+Stream</CODE>.  Save the file as <CODE>1.m2v</CODE>.  When that's done, go to
+<CODE>Audio -> Save Audio</CODE>.  Save the file as <CODE>1.mp2</CODE></P>
+<P>5. Repeat steps 2 &amp; 3 until you have saved all the segments you wish to keep.</P>
+<P>6.  Mplex the video and audio for each segment together in DVD-MPEG2 format.
+Do that by running</P>
+<P><CODE>mplex -f 8 -o 1.mpg 1.m2v 1.mp2</CODE></P>
+<P>7.  Create a DVD file system by running</P>
+<P><CODE>dvdauthor -o DVD 1.mpg 2.mpg ... n.mpg</CODE></P>
+<P><CODE>dvdauthor -T -o DVD</CODE></P>
+<P>8.  Put a blank DVD in your drive and write the video by running</P>
+<P><CODE>growisofs -Z /dev/scd0 -dvd-video DVD</CODE></P>
+<P>9.  Be sure and check the DVD in a player and then delete all the files you 
+created in this process.</P>
+<P>Notes:</P>
+<P>You can reduce the size of your files and fit more video on a DVD by using 
+<B>tcrequant</B>, which is part of <B>transcode</B>.  </P>
+<P>The steps above create a DVD that starts playing the video automatically. If
+you want to burn a DVD with menus and multiple video titles, see the next
+section.</P>
+
+<H2><A NAME="ss23.21">23.21</A> <A HREF="mythtv-HOWTO.html#toc23.21">Creating a DVD with Menus</A>
+</H2>
+
+<P>This assumes that you have already formatted the videos in a 
+DVD-compliant format that works with <B>dvdauthor</B>. </P>
+
+<H3>CREATING A MENU</H3>
+
+<P>This is potentially the most difficult step in creating a DVD with a menu.
+You must capture or create a background image with the appropriate
+resolution and <B>mplex</B> it together with an audio file (typically
+silence, although though you may use sound) and then create overlay images
+that show</P>
+<P>
+<OL>
+<LI>the menu text</LI>
+<LI>the highlighted buttons</LI>
+<LI>the selected buttons  </LI>
+</OL>
+</P>
+<P>You would then use <B>spumux</B> to combine the background video with the
+overlay menus.</P>
+<P>The background image must be saved as a JPG and the overlay images must be
+PNG with a maximum of three colors.  Four colors are allowed, but the
+transparent background counts as one of the available colors.  In these
+examples, the background file is called <CODE>menu.jpg</CODE>, the menu text is called
+<CODE>menu1.png</CODE> and the highlighted and selected buttons are the same and called
+<CODE>menu2.png</CODE>.</P>
+
+
+<H3>Create a Background </H3>
+
+<P>To get a background image, use <B>avidemux2</B> and find the frame you
+wish to use as a background image.  Save the frame as
+<CODE>menu.jpg</CODE> by executing <CODE>File -> Save -> Save JPG Image</CODE>.  </P>
+<P>You may also create your own background image in the GIMP.  Use the following
+settings:</P>
+<P>For NTSC Video:
+<BLOCKQUOTE><CODE>
+<PRE>
+width: 720
+height: 480
+x-axis: 81dpi
+y-axis: 72dpi
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Convert the background JPG file into a M2V video file</H3>
+
+<P><CODE>jpeg2yuv -n 50 -I p -f 29.97 -j menu.jpg | mpeg2enc -n n -f 8 -o menu.m2v</CODE></P>
+<P>For PAL Video 
+<BLOCKQUOTE><CODE>
+<PRE>
+width: 720
+height: 576
+x-axis: 75dpi
+y-axis: 80dpi
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Convert the background JPG file into a M2V video file</H3>
+
+<P><CODE>jpeg2yuv -n 50 -I p -f 25 -j menu.jpg | mpeg2enc -n p -f 8 -o menu.m2v</CODE></P>
+
+<H3>Merge the background you just created with audio </H3>
+
+<P>You will need some sort of audio to <B>mplex</B> with the M2V file you
+just created, so either capture some audio using <B>avidemux2</B> or
+another program, or to create empty audio to <B>mplex</B>, use this
+command</P>
+<P><CODE>dd if=/dev/zero bs=4 count=2000 | toolame -b 128 -s 48 /dev/stdin menu.mp2</CODE></P>
+
+<H3>Merge the M2V video with the MP2 audio</H3>
+
+<P><CODE>mplex -f 8 -o menu.mpg menu.m2v menu.mp2</CODE></P>
+
+<H3>Create the menu buttons</H3>
+
+
+<P>Open the background <CODE>menu.jpg</CODE> file in the GIMP.  Add a transparent layer
+over the background and mark where you will want the different buttons to be
+located.  This layer will later be deleted, so it doesn't have to be clean. 
+When creating this layer, use all the colors you want to use in your
+buttons.  Remember, no more than three colors.</P>
+<P>Delete the Background layer.</P>
+<P>Change the image to an indexed color mode.  Do this by right-clicking on
+the image and selecting <CODE>Image -> Mode -> Indexed</CODE>.  Enter "4" in the
+number of colors.</P>
+<P>Create two new layers.</P>
+<P>In the top layer, you will enter the text for your buttons.  Select the
+color you want for your text either in the color palette or by using the
+Color Picker Tool.  To use the Color Picker, you must make sure you have
+that bottom layer selected.  Enter the text for all the buttons on the top
+layer according to whatever layout you decided on.</P>
+<P>Now you will create the actual buttons by drawing boxes around the text
+and filling that area with the Color Fill Tool.  Be sure and select the
+color you want (contrasting to the text) and to create your boxes in the
+second from the top layer.</P>
+<P>Delete that bottom layer which we stated earlier would be deleted.</P>
+<P>Save the current image as <CODE>menu2.png</CODE>.  Do that by right-clicking
+and selecting <CODE>File -> Save as</CODE>, and make the name <CODE>menu.png</CODE>. 
+Click "Export" and make sure that "Save Background Color" and "Save
+Resolution" are selected.</P>
+<P>Select the bottom layer and change the Opacity to 0%.  Now save the image 
+as <CODE>menu1.png</CODE>.</P>
+
+<H3>Create the final menu video </H3>
+
+<P> To create the DVD menu, an XML file is used.  An example
+<CODE>menu.xml</CODE> file is shown below.  The autoorder line is used to decide
+what takes precedent for ordering.  If your buttons are ordered primarily by
+rows, then select "rows".  If your ordering is by column, then choose
+"columns".</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+###begin menu.xml###
+&lt;subpictures>
+  &lt;stream>
+    &lt;spu
+     force="yes"
+     start="00:00:00.00"
+     image="menu1.png"
+     select="menu2.png"
+     highlight="menu2.png"
+     autooutline="infer"
+     outlinewidth="6"
+     autoorder="rows"
+    >
+    &lt;/spu>
+  &lt;/stream>
+&lt;/subpictures>
+###end menu.xml###
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Then create the final menu with</P>
+<P><CODE>spumux menu.xml &lt; menu.mpg &gt; menu_final.mpg</CODE></P>
+<P>You should see some lines in the output to the console that show</P>
+<P>INFO:  Autodetect ...</P>
+<P>The number of these lines that you see should be the same number of buttons 
+you created.  If there are, then good job!</P>
+
+
+<H3>Authoring the DVD</H3>
+
+<P>To create the DVD structure, an XML file is used.  The below file is an
+example <CODE>dvd.xml</CODE> file.  This example file allows for the 4 buttons in the
+menu created earlier and has three video segments making up each of the 4
+video titles.  Each of the separate video segments will be treated as
+separate chapters of one consistent video title.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+### begin dvd.xml ###
+&lt;dvdauthor dest="DVD"&gt;
+  &lt;vmgm&gt;
+    &lt;menus&gt;
+      &lt;pgc&gt;
+        &lt;button&gt;jump title 1;&lt;/button&gt; 
+        &lt;button&gt;jump title 2;&lt;/button&gt; 
+        &lt;button&gt;jump title 3;&lt;/button&gt; 
+        &lt;button&gt;jump title 4;&lt;/button&gt; 
+        &lt;vob file="menu_final.mpg" pause="inf" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/menus&gt;
+  &lt;/vmgm&gt;
+  &lt;titleset&gt;
+    &lt;titles&gt;
+      &lt;pgc&gt;
+        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
+        &lt;vob file="1a.mpg" /&gt; 
+        &lt;vob file="1b.mpg" /&gt; 
+        &lt;vob file="1c.mpg" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/titles&gt;
+  &lt;/titleset&gt;
+  &lt;titleset&gt;
+    &lt;titles&gt;
+      &lt;pgc&gt;
+        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
+        &lt;vob file="2a.mpg" /&gt; 
+        &lt;vob file="2b.mpg" /&gt; 
+        &lt;vob file="2c.mpg" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/titles&gt;
+  &lt;/titleset&gt;
+  &lt;titleset&gt;
+    &lt;titles&gt;
+      &lt;pgc&gt;
+        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
+        &lt;vob file="3a.mpg" /&gt; 
+        &lt;vob file="3b.mpg" /&gt; 
+        &lt;vob file="3c.mpg" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/titles&gt;
+  &lt;/titleset&gt;
+  &lt;titleset&gt;
+    &lt;titles&gt;
+      &lt;pgc&gt;
+        &lt;post&gt;call vmgm menu 1;&lt;/post&gt; 
+        &lt;vob file="4a.mpg" /&gt; 
+        &lt;vob file="4b.mpg" /&gt; 
+        &lt;vob file="4c.mpg" /&gt; 
+      &lt;/pgc&gt;
+    &lt;/titles&gt;
+  &lt;/titleset&gt;
+&lt;/dvdauthor&gt;
+### end dvd.xml ###
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Create the DVD file structure with</P>
+<P><CODE>dvdauthor -x dvd.xml</CODE></P>
+<P>Test the created DVD file structure with</P>
+<P><CODE>xine dvd:/full/path/to/DVD/VIDEO_TS/</CODE></P>
+<P>Then burn the DVD file structure to a DVD with</P>
+<P><CODE>growisofs -Z /dev/scd0 -dvd-video DVD</CODE></P>
+
+<H2><A NAME="ss23.22">23.22</A> <A HREF="mythtv-HOWTO.html#toc23.22">Using the DBoxII within MythTV</A>
+</H2>
+
+<P>The configuration of the DBoxII for use within MythTV is tricky 
+(as of May 16 2005), that's why it's covered here. Your DBoxII has to be 
+running linux and the Neutrino GUI instead of the stock BetaNova firmware. 
+For further information, please refer to 
+<A HREF="http://www.tuxbox.org">http://www.tuxbox.org</A>. Additionally, you need to enable the SPTS mode in 
+Neutrino.</P>
+<P>1.) Add a new "Capture Card" in the setup. The "Card type" is "DBOX2 Input", 
+the other values have to be adjusted according to your setup. 
+The default values, except for the "DBOX2 host ip", should work fine.
+2.) Define a new video source. It doesn't need to be configured, 
+you just need to define it. MythTV grabs the EPG from the DBoxII.
+3.) Connect the DBoxII to the newly defined input source in "input connections".
+4.) Since channel scanning is not implemented yet, you need to define channels 
+in the "Channel Editor". Make sure that you use the same value for 
+"Channel Name" as on the DBoxII. You can get a list of available 
+channels from the web interface of Neutrino at http://ip-of-your-box:80/. 
+Associate the channel with your new video source and repeat when needed.</P>
+<P>You may leave the Setup now and proceed as usual.</P>
+
+<H2><A NAME="MigratingtoDD"></A> <A NAME="ss23.23">23.23</A> <A HREF="mythtv-HOWTO.html#toc23.23">Migrating from XMLTV to DataDirect </A>
+</H2>
+
+<P>DataDirect will use different information for your video sources and
+channels than was used by XMLTV. The following will clear your old
+information in a way that will allow your EPG and existing recording rules
+to continue to work as you'd expect.</P>
+<P>The first step is to create a backup of your database using the
+instructions found in 
+<A HREF="#backupdb">Saving or restoring the database</A></P>
+<P><B>NOTE</B>: Examine the contents of the backup file to be sure that the
+backup succeeded before modifying your database.</P>
+<P><B>NOTE</B>: The MythTV DataDirect grabber requires <B>wget</B> version
+1.9.1 or later. Verify that this is installed before modifying your
+database.</P>
+<P>Next, start <B>mysql</B> and perform the following commands:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql>CREATE TABLE channel_copy SELECT * FROM channel;
+mysql>exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Run the MythTV setup program.  When the setup program prompts "Would you
+like to clear all program/channel settings before starting configuration
+[no]" type "yes".</P>
+<P>Complete the configuration as detailed in the section called 
+<A HREF="mythtv-HOWTO-5.html#ConfigureDD">Configuring the Zap2It.com DataDirect service</A> and
+in 
+<A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A>.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION>You <EM>must</EM> associate your DataDirect information with the inputs on
+your capture device.  If you created "Cable-DD", then don't forget to bind
+<CODE>/dev/video0</CODE> to Cable-DD in the 
+<A HREF="mythtv-HOWTO-9.html#VideoSources">Video Sources</A> portion of setup.</CAPTION>
+</FIGURE>
+</P>
+<P>Once you're done running setup, run <B>mythfilldatabase</B> to populate
+the database with new data.</P>
+<P>To restore the channel icons, you will need to perform one of two steps. 
+Both are dependant on the channel_copy table you created above.</P>
+<P>If you're running MySQL v3, execute the following.  Note that the
+select command is very long.  You can press ENTER at the end of each line;
+the command won't be evaluated until you end the statement with a semicolon.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql>create table channel_temp
+select c.chanid, c.channum, c.sourceid, c.callsign, c.name, cb.icon,
+c.finetune, c.videofilters, c.xmltvid, c.contrast, c.brightness,
+c.colour, c.freqid, c.recpriority, c.hue, c.tvformat,
+c.commfree, c.visible, c.outputfilters
+from channel c
+left join channel_copy cb on (c.callsign = cb.callsign);
+mysql>truncate channel;
+mysql>insert channel select * from channel_temp;
+mysql>drop table channel_temp;
+mysql>drop table channel_copy;
+mysql>exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you are running MySQL v4, it's a little simpler. The next command is
+one long string:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ mysql -u root mythconverg
+mysql>UPDATE channel,channel_copy SET channel.icon = channel_copy.icon 
+WHERE channel.callsign = channel_copy.callsign;
+mysql>drop table channel_copy;
+mysql>exit
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H2><A NAME="ss23.24">23.24</A> <A HREF="mythtv-HOWTO.html#toc23.24">What do the icons on the Watch Recordings screen mean?</A>
+</H2>
+
+<P>Press "1" or F1 to get a popup.</P>
+<H2><A NAME="ss23.25">23.25</A> <A HREF="mythtv-HOWTO.html#toc23.25">What do the letters mean when I change channels?</A>
+</H2>
+
+<P>These letters let you know what's going on with the backend as it tries
+to tune to a channel.</P>
+<P>Lower case = seen
+Upper Case = seen &amp; good</P>
+<P>l/L = Lock  : This could be seen by PVR-250/BTTV users
+a/A = PAT   : Any recording transmitted in MPEG 
+m/M = PMT   : Any recording transmitted in MPEG 
+g/G = MGT   : ATSC only
+v/V = VCT   : ATSC only
+n/N = NIT   : DVB only
+s/S = SDT   : DVB only</P>
+
+<H2><A NAME="ss23.26">23.26</A> <A HREF="mythtv-HOWTO.html#toc23.26">What is the difference between the various Hauppauge PVR models?</A>
+</H2>
+
+<P>This is covered in the hardware section, and extensively covered on the
+Hauppauge website.  (
+<A HREF="http://www.hauppauge.com/pages/compare_pvr.html">http://www.hauppauge.com/pages/compare_pvr.html</A>) Please check the
+Hauppauge website for the most accurate information.</P>
+<P>A PVR-150 comes in a number of versions:
+<UL>
+<LI>The PVR-150 (Model 1045) is the retail kit.  It comes with a remote
+control and an IR Blaster.  It does not have a radio tuner.</LI>
+<LI>The PVR-150 MCE (Model 1042) will usually come in a plain white box and is
+sold as an OEM device.  It does not come with a remote control, since it's
+usually used as the second, third, etc capture device.</LI>
+<LI>The PVR-150 MCE Kit (Model 1062) does not have a radio tuner and
+comes with a Microsoft Media Center remote control instead of Hauppauge's.</LI>
+<LI>The PVR-150 low profile (Model 1086) is a low-profile card. It has a
+radio tuner and is approximately half the height of a standard card. 
+However, it comes with a low-profile PCI bracket, so it is not suitable for
+use in a standard PCI slot without removing the bracket, which may not be
+worth the trouble.</LI>
+</UL>
+</P>
+<P>A PVR-250 (Model 980) is a retail kit which comes with an IR receiver and a
+remote control.</P>
+<P>The PVR-250 MCE (Model 975) contains a FM radio tuner.  The PVR-250 MCE does
+not contain a IR receiver or a remote.</P>
+<P>The PVR-250 Rev 1 contained an MPEG-2 decoder.  However, this function was
+not connected to any output jacks, and there doesn't appear to be any way to
+pull decoded video from the card, so it's a fairly useless feature.</P>
+<P>The PVR-350 (model 990) has the features of the PVR-250 as well as being
+able to decode MPEG-2.  The encode and decode functions may be used
+simultaneously.  The MPEG-2 decoder function gives superior video quality
+compared to what you'll find on a standard video card.  However, the decoder
+function is only available once Linux has started, so you will not see any
+boot-time messages.  Also, the card is not capable of resolutions higher
+than 720x480, so it cannot be used with HDTV.  Make a conscious decision
+(and ask for advice on the mailing list) that you want to tradeoff potential
+HDTV use in the future compared to video quality.</P>
+<P>The X-driver for the PVR-350 support playback using Xv efficiently but does
+not support any other 2d or 3d acceleration. For some application this may
+place a large load on the host CPU, some will run without any problem and
+others (mplayer, xine, xmame etc.) should be configured to utilize the Xv
+interface.</P>
+<P>Note that for the PVR-350 there are some 
+<A HREF="mythtv-HOWTO-3.html#PVR-350">considerations</A>
+regarding the way audio is handled.</P>
+<P>The PVR-500 is a dual-encoder version of the PVR-150 card.  This means that
+you can simultaneously record two different programs at the same time,
+because there are two encoder chips on the PCI card.  Hauppuage has also
+installed an onboard splitter, so you can use one COAX to feed both tuners. 
+Current versions of the PVR-500 should come with an adapter to allow you to
+connect a second S-Video or composite input.  Early adopters may need to
+purchase this item separately.</P>
+
+<H2><A NAME="ss23.27">23.27</A> <A HREF="mythtv-HOWTO.html#toc23.27">Changing channels on an external Set Top Box</A>
+</H2>
+
+<P>If you need to use an external Set Top Box (STB), such as for satellite
+TV or for digital cable you will need some way for MythTV to tell the STB to
+switch to a new channel.  There are several methods:
+<OL>
+<LI>Use an IR blaster.  An IR blaster is an infrared transmitter connected
+to your computer.  When MythTV needs to change channels it will send IR
+pulses, thereby emulating a remote control.</LI>
+<LI>Use a direct serial connection.  Some STB's have a serial port on the
+back, although it may not look like a serial port.  It may look like a phone
+jack, or a strange VGA connector.  It may be labeled "Low Speed Data".  A
+direct serial connection is more reliable than an IR blaster.  Not all STB's
+that have a Low Speed Data port have it enabled; you may need to convince
+your service provider to turn it on.  Stating that you have a Tivo may help;
+the Tivo has a direct-connect capability.</LI>
+<LI>Use a firewire connection.  There is a <CODE>6200ch.c</CODE> in the MythTV
+contrib directory which may work for you.</LI>
+</OL>
+</P>
+<H2><A NAME="ss23.28">23.28</A> <A HREF="mythtv-HOWTO.html#toc23.28">Configuring one machine to flag all commercials</A>
+</H2>
+
+<P>Commercial flagging can be CPU intensive.  By default, the backend that
+created a recording is the one which will flag commercials.  You may wish to
+use a different machine to run commercial flagging.</P>
+<P>On the slower machine:</P>
+<P>Start the backend setup program.  Advance through the pages until you get to
+the Job Queue page.  Turn off the setting that says "Allow Commercial
+Detection jobs", thereby preventing any commercial flagging jobs from
+running on this machine.</P>
+<P>Next, make sure that "Run Jobs only on original recording host" is turned
+OFF so that new jobs are allowed to run anywhere.</P>
+<P>Restart <B>mythbackend</B> since it only reads this setting when it starts up.</P>
+<P>On the faster machine:</P>
+<P>Start the backend setup program.  Advance through the pages until you get to
+the Job Queue page.  Ensure that "Allow Commercial Detection jobs" is turned
+ON for this machine.</P>
+<P>Run <B>mythjobqueue</B>.  <B>mythjobqueue</B> will examine the JobQueue
+and run any jobs it finds.  <B>mythjobqueue</B> should be left running so
+that it will pick up any new commercial flagging jobs that are added to the
+queue, otherwise new jobs will be added to the queue and your programs won't
+be flagged until you run manually run <B>mythjobqueue</B>.</P>
 
 <HR>
-Next
+<A HREF="mythtv-HOWTO-24.html">Next</A>
 <A HREF="mythtv-HOWTO-22.html">Previous</A>
 <A HREF="mythtv-HOWTO.html#toc23">Contents</A>
 </BODY>
