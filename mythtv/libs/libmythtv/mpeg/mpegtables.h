@@ -19,7 +19,69 @@
  *  \endcode
  */
 
-/** \class TableID
+/** \class PESStreamID
+ *  \brief Contains a listing of PES Stream ID's for various PES Packet types.
+ */
+class PESStreamID
+{
+  public:
+    enum
+    {
+        PictureStartCode        = 0x00,
+        SliceStartCodeBegin     = 0x01,
+        SliceStartCodeEnd       = 0xaf,
+        DVBECMData              = 0xb0,
+        DVBEMMData              = 0xb1,
+        UserData                = 0xb2,
+        /// Sequence (SEQ) start code contains frame size, aspect ratio and fps
+        SequenceStartCode       = 0xb3,
+        SequenceError           = 0xb4,
+        /// Followed by an extension byte, not documented here
+        MPEG2ExtensionStartCode = 0xb5,
+        MPEGReservedB6          = 0xb6,
+        SEQEndCode              = 0xb7,
+        /// Group of Pictures (GOP) start code. Tells us how to 
+        /// reorder frames from transmitted order to display order.
+        /// Required in MPEG-1, but optional in MPEG-2.
+        GOPStartCode            = 0xb8,
+        ProgramEndCode          = 0xb9,
+        PackHeader              = 0xba,
+        SystemHeader            = 0xbb,
+        ProgramStreamMap        = 0xbc,
+        /// Non-MPEG audio & subpictures (w/ext hdr)
+        NonMPEGAudioVideo       = 0xbd,
+        PaddingStream           = 0xbe,
+        /// DVD navigation data
+        DVDNavigation           = 0xbf,
+        /// First MPEG-1/2 audio stream (w/ext hdr)
+        MPEGAudioStreamBegin    = 0xc0,
+        /// Last MPEG-1/2 audio stream (w/ext hdr)
+        MPEGAudioStreamEnd      = 0xdf,
+        /// First MPEG-1/2 video stream (w/ext hdr)
+        MPEGVideoStreamBegin    = 0xe0,
+        /// Last MPEG-1/2 video stream (w/ext hdr)
+        MPEGVideoStreamEnd      = 0xef,
+        ECMData                 = 0xf0,
+        EMMData                 = 0xf1,
+        DSMCCData               = 0xf2,
+        /// Data as defined in ISO and IEC standard number 13522
+        Data13522               = 0xf3,
+        /// First Data as defined in ITU-T recomendation H.222.1
+        DataH2221Begin          = 0xf4,
+        /// Last Data as defined in ITU-T recomendation H.222.1
+        DataH2221End            = 0xf8,
+        AncillaryData           = 0xf9,
+        MPEGReservedFA          = 0xfa,
+        MPEGReservedFB          = 0xfb,
+        MPEGReservedFC          = 0xfc,
+        MPEGReservedFD          = 0xfd,
+        MPEGReservedFE          = 0xfe,
+        MPEGReservedFF          = 0xff,
+    };
+};
+
+
+/** \class StreamID
  *  \brief Contains listing of Stream ID's for various A/V Stream types.
  */
 class StreamID
