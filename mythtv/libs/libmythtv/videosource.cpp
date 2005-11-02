@@ -696,6 +696,7 @@ DataDirect_config::DataDirect_config(const VideoSource& _parent, int _source)
     addChild(lp);
 
     addChild(lineupselector = new DataDirectLineupSelector(parent));
+    addChild(new UseEIT(parent));
 
     connect(button, SIGNAL(pressed()),
             this,   SLOT(fillDataDirectLineupSelector()));
@@ -707,153 +708,24 @@ void DataDirect_config::fillDataDirectLineupSelector(void)
         userid->getValue(), password->getValue(), source);
 }
 
-void RegionSelector::fillSelections()
-{
-    clearSelections();
-
-    QString command = QString("tv_grab_uk --configure --list-regions");
-    FILE* fp = popen(command.ascii(), "r");
-
-    if (fp == NULL)
-    {
-        perror(command.ascii());
-        return;
-    }
-
-    QFile f;
-    f.open(IO_ReadOnly, fp);
-    for (QString line ; f.readLine(line, 1024) > 0 ; )
-    {
-        addSelection(line.stripWhiteSpace());
-    }
-
-    f.close();
-    fclose(fp);
-}
-
-void ProviderSelector::fillSelections(const QString& location)
-{
-    QString waitMsg = QString("Fetching providers for %1... Please be patient.")
-                             .arg(location);
-    VERBOSE(VB_GENERAL, waitMsg);
-    
-    MythProgressDialog pdlg(waitMsg, 2);
-
-    clearSelections();
-
-    // First let the final character show up...
-    qApp->processEvents();    
-    
-    // Now show our progress dialog.
-    pdlg.show();
-
-    QString command = QString("%1 --configure --postalcode %2 --list-providers")
-        .arg(grabber)
-        .arg(location);
-
-    FILE* fp = popen(command.ascii(), "r");
-
-    if (fp == NULL)
-    {
-        pdlg.Close();
-        VERBOSE(VB_GENERAL, "Failed to retrieve provider list");
-
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(), 
-                            QObject::tr("Failed to retrieve provider list"), 
-                            QObject::tr("You probably need to update XMLTV."));
-        qApp->processEvents();
-
-        perror(command.ascii());
-        return;
-    }
-
-    // Update our progress
-    pdlg.setProgress(1);
-
-    QFile f;
-    f.open(IO_ReadOnly, fp);
-    for (QString line ; f.readLine(line, 1024) > 0 ; )
-    {
-        QStringList fields = QStringList::split(":", line.stripWhiteSpace());
-        addSelection(fields.last(), fields.first());
-    }
-
-    pdlg.setProgress( 2 );
-    pdlg.Close();
-
-    f.close();
-    fclose(fp);
-}
-
-XMLTV_uk_config::XMLTV_uk_config(const VideoSource& _parent)
-  : VerticalConfigurationGroup(false, false), parent(_parent) 
-{
-    setLabel(QObject::tr("tv_grab_uk configuration"));
-    region = new RegionSelector();
-    addChild(region);
-
-    provider = new ProviderSelector("tv_grab_uk");
-    addChild(provider);
-
-    connect(region, SIGNAL(valueChanged(const QString&)),
-            provider, SLOT(fillSelections(const QString&)));
-}
-
-void XMLTV_uk_config::save()
-{
-    QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
-                                "list of available channels\n.  You "
-                                "might want to check the output as it\n"
-                                "runs by switching to the terminal from "
-                                "which you started\nthis program."));
-    MythProgressDialog pdlg( waitMsg, 2 );
-    VERBOSE(VB_GENERAL, QString("Please wait while MythTV retrieves the "
-                                "list of available channels"));
-    pdlg.show();
-
-    QString filename = QString("%1/%2.xmltv")
-        .arg(MythContext::GetConfDir()).arg(parent.getSourceName());
-    QString command = QString(
-        "tv_grab_uk --config-file '%1' --configure --retry-limit %2 "
-        "--retry-delay %3 --postalcode %4 --provider %5 "
-        "--auto-new-channels add")
-        .arg(filename)
-        .arg(2)
-        .arg(30)
-        .arg(region->getValue())
-        .arg(provider->getValue());
-
-    pdlg.setProgress(1);
-
-    int ret = system(command);
-    if (ret != 0)
-    {
-        VERBOSE(VB_GENERAL, command);
-        VERBOSE(VB_GENERAL, QString("exited with status %1").arg(ret));
-        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                  QObject::tr("Failed to retrieve channel "
-                                              "information."),
-                                  QObject::tr("MythTV was unable to retrieve "
-                                              "channel information for your "
-                                              "provider.\nPlease check the "
-                                              "terminal window for more "
-                                              "information"));
-    }
-
-    pdlg.setProgress( 2 );
-    pdlg.Close();
-}
-
 XMLTV_generic_config::XMLTV_generic_config(const VideoSource& _parent, 
                                            QString _grabber)
                     : parent(_parent), grabber(_grabber) 
 {
-    setLabel(grabber);
-    setValue(QObject::tr("Configuration will run in the terminal window"));
+    setUseLabel(false);
+    setUseFrame(false);
+
+    TransLabelSetting *label = new TransLabelSetting();
+    label->setLabel(grabber);
+    label->setValue(
+        QObject::tr("Configuration will run in the terminal window"));
+    addChild(label);
+    addChild(new UseEIT(parent));
 }
 
 void XMLTV_generic_config::save()
 {
+    VerticalConfigurationGroup::save();
     QString waitMsg(QObject::tr("Please wait while MythTV retrieves the "
                                 "list of available channels.\nYou "
                                 "might want to check the output as it\n"
@@ -918,11 +790,33 @@ void XMLTV_generic_config::save()
     pdlg.Close();
 }
 
-EITOnly_config::EITOnly_config()
+EITOnly_config::EITOnly_config(const VideoSource& _parent)
+    : VerticalConfigurationGroup(false, false, true, true)
 {
-    setLabel(tr("Use only the transmitted guide data."));
-    setValue(tr("This will usually only work with ATSC or DVB channels, "
-                "and generally provides data only for the next few days."));
+    useeit = new UseEIT(_parent);
+    useeit->setValue(true);
+    useeit->setVisible(false);
+    addChild(useeit);
+
+    TransLabelSetting *label;
+    label=new TransLabelSetting();
+    label->setValue(tr("Use only the transmitted guide data."));
+    addChild(label);
+    label=new TransLabelSetting();
+    label->setValue(
+        tr("This will usually only work with ATSC or DVB channels,"));
+    addChild(label);
+    label=new TransLabelSetting();
+    label->setValue(
+        tr("and generally provides data only for the next few days."));
+    addChild(label);
+}
+
+void EITOnly_config::save()
+{
+    // Force this value on
+    useeit->setValue(true);
+    useeit->save();
 }
 
 XMLTVConfig::XMLTVConfig(const VideoSource& parent) 
@@ -943,7 +837,7 @@ XMLTVConfig::XMLTVConfig(const VideoSource& parent)
     grabber->addSelection("LxM (United States)", "technovera");
 
 #ifdef USING_DVB_EIT
-    addTarget("eitonly", new EITOnly_config());
+    addTarget("eitonly", new EITOnly_config(parent));
     grabber->addSelection("Transmitted guide only (EIT)", "eitonly");
 #endif
 
@@ -1009,7 +903,6 @@ VideoSource::VideoSource()
     group->addChild(name = new Name(*this));
     group->addChild(new XMLTVConfig(*this));
     group->addChild(new FreqTableSelector(*this));
-    group->addChild(new UseEIT(*this));
     addChild(group);
 }
 

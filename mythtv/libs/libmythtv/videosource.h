@@ -16,6 +16,7 @@
 
 class SignalTimeout;
 class ChannelTimeout;
+class UseEIT;
 
 typedef QMap<int,QString> InputNames;
 
@@ -105,31 +106,6 @@ protected:
     const VideoSource& parent;
 };
 
-class RegionSelector: public ComboBoxSetting, public TransientStorage {
-    Q_OBJECT
-public:
-    RegionSelector() {
-        setLabel(QObject::tr("Region"));
-        fillSelections();
-    };
-
-public slots:
-    void fillSelections();
-};
-
-class ProviderSelector: public ComboBoxSetting, public TransientStorage {
-    Q_OBJECT
-public:
-    ProviderSelector(const QString& _grabber) :
-        grabber(_grabber) { setLabel(QObject::tr("Provider")); };
-
-public slots:
-    void fillSelections(const QString& location);
-
-protected:
-    QString grabber;
-};
-
 class FreqTableSelector: public ComboBoxSetting, public VSSetting {
     Q_OBJECT
 public:
@@ -185,23 +161,11 @@ class DataDirect_config: public VerticalConfigurationGroup
     int source;
 };
 
-class XMLTV_uk_config: public VerticalConfigurationGroup {
-public:
-    XMLTV_uk_config(const VideoSource& _parent);
-
-    virtual void save();
-
-protected:
-    const VideoSource& parent;
-    RegionSelector* region;
-    ProviderSelector* provider;
-};
-
-class XMLTV_generic_config: public LabelSetting {
+class XMLTV_generic_config: public VerticalConfigurationGroup 
+{
 public:
     XMLTV_generic_config(const VideoSource& _parent, QString _grabber);
 
-    virtual void load() {};
     virtual void save();
 
 protected:
@@ -209,13 +173,13 @@ protected:
     QString grabber;
 };
 
-class EITOnly_config: public LabelSetting
+class EITOnly_config: public VerticalConfigurationGroup
 {
-  public:
-    EITOnly_config();
-
-    virtual void load() {};
-    virtual void save() {};
+public:
+    EITOnly_config(const VideoSource& _parent);
+    virtual void save();
+protected:
+    UseEIT *useeit;
 };
 
 class XMLTVConfig: public VerticalConfigurationGroup, 
