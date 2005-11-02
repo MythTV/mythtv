@@ -9,9 +9,14 @@ using namespace std;
 
 #include "RingBuffer.h"
 #include "programinfo.h"
-#include "tspacket.h"
+#include "mpegtables.h"
 #include "dtvrecorder.h"
 #include "tv_rec.h"
+
+#define LOC QString("DTVRec(%1): ").arg(tvrec->GetCaptureCardNum())
+#define LOC_ERR QString("DTVRec(%1) Error: ").arg(tvrec->GetCaptureCardNum())
+
+const uint DTVRecorder::kMaxKeyFrameDistance = 32;
 
 /** \class DTVRecorder
  *  \brief This is a specialization of RecorderBase used to
@@ -25,6 +30,38 @@ using namespace std;
  *
  *  \sa DVBRecorder, HDTVRecorder, FirewireRecorder, DBox2Recorder
  */
+
+DTVRecorder::DTVRecorder(TVRec *rec, const char *name) : 
+    RecorderBase(rec, name),
+    // file handle for stream
+    _stream_fd(-1),
+    // used for scanning pes headers for keyframes
+    _keyframe_seen(false),          _position_within_gop_header(0),
+    _first_keyframe(0),             _last_keyframe_seen(0),
+    _last_gop_seen(0),              _last_seq_seen(0),
+    // settings
+    _request_recording(false),
+    _wait_for_keyframe_option(true),
+    _wait_for_keyframe(true),
+    // state
+    _recording(false),
+    _streamid_not_in_first_ts_packet(false),
+    _error(false),
+    // TS packet buffer
+    _buffer(0),                     _buffer_size(0),
+    // statistics
+    _frames_seen_count(0),          _frames_written_count(0)
+{
+}
+
+DTVRecorder::~DTVRecorder()
+{
+    if (_streamid_not_in_first_ts_packet)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                "Saw keyframe stream_id which was not in first TS Packet.");
+    }
+}
 
 /** \fn DTVRecorder::SetOption(const QString&,int)
  *  \brief handles the "wait_for_seqstart" and "pkt_buf_size" options.
@@ -86,18 +123,25 @@ long long DTVRecorder::GetKeyframePosition(long long desired)
 }
 
 // documented in recorderbase.h
-void DTVRecorder::Reset()
+void DTVRecorder::Reset(void)
 {
-    _error = false;
+    QMutexLocker locker(&_position_map_lock);
 
-    _frames_seen_count = 0;
-    _frames_written_count = 0;
-
-    _first_keyframe = 0;
+    _keyframe_seen              = false;
     _position_within_gop_header = 0;
-    _keyframe_seen = false;
-    _last_gop_seen = 0;
-    _last_seq_seen = 0;
+    _first_keyframe             = 0;
+    _last_keyframe_seen         = 0;
+    _last_gop_seen              = 0;
+    _last_seq_seen              = 0;
+    //_recording
+    //_streamid_not_in_first_ts_packet
+    _error                      = false;
+    //_buffer
+    //_buffer_size
+    _frames_seen_count          = 0;
+    _frames_written_count       = 0;
+    _position_map.clear();
+    _position_map_delta.clear();
 }
 
 /** \fn DTVRecorder::FindKeyframes(const TSPacket* tspacket)
@@ -111,24 +155,32 @@ void DTVRecorder::Reset()
  *   streams, and if all else fails we just look for the picture
  *   start codes and call every 16th frame a keyframe.
  *
+ * \startcode
+ *   PES header format
+ *   byte 0  byte 1  byte 2  byte 3      [byte 4     byte 5]
+ *   0x00    0x00    0x01    PESStreamID  PES packet length
+ * \endcode
+ *
  */
 void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
 {
-#define AVG_KEYFRAME_DIFF 16
-#define MAX_KEYFRAME_DIFF 32
-#define DEBUG_FIND_KEY_FRAMES 0 /* set to 1 to debug */
-    bool noPayload = !tspacket->HasPayload();
-    bool payloadStart = tspacket->PayloadStart();
-
-    if (noPayload)
+    if (!tspacket->HasPayload())
         return; // no payload to scan
 
-    if (payloadStart)
-    {
-        // packet contains start of PES packet
-        // start looking for first byte of pattern
-        _position_within_gop_header = 0;
-    }
+    // if packet contains start of PES packet, start
+    // looking for first byte of MPEG start code (3 bytes 0 0 1)
+    // otherwise, pick up search where we left off.
+    const bool payloadStart = tspacket->PayloadStart();
+    _position_within_gop_header = (payloadStart) ?
+        0 : _position_within_gop_header;
+ 
+    // Just make these local for efficiency reasons (gcc not so smart..)
+    const uint maxKFD            = kMaxKeyFrameDistance;
+    const long long frameSeenNum = _frames_seen_count;
+    const unsigned char *buffer  = tspacket->data();
+
+    bool hasKeyFrame = false;
+    int  stream_id   = 0xffff; // sentinel value (0xffff is always invalid)
 
     // Scan for PES header codes; specifically picture_start
     // and group_start (of_pictures).  These should be within
@@ -137,77 +189,73 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
     //   00 00 01 B8: group_start_code
     //   00 00 01 B3: seq_start_code
     //   (there are others that we don't care about)
-    long long frameSeenNum = _frames_seen_count;
-    const unsigned char *buffer = tspacket->data();
-    for (unsigned int i = tspacket->AFCOffset(); i+1<TSPacket::SIZE; i++)
+    uint i = tspacket->AFCOffset();
+    for (; (i+1) < TSPacket::SIZE && !hasKeyFrame; i++)
     {
         const unsigned char k = buffer[i];
         if (0 == _position_within_gop_header)
             _position_within_gop_header = (k == 0x00) ? 1 : 0;
         else if (1 == _position_within_gop_header)
             _position_within_gop_header = (k == 0x00) ? 2 : 0;
-        else 
+        else // if (2 == _position_within_gop_header)
         {
             if (0x01 != k)
             {
                 _position_within_gop_header = (k == 0x00) ? 2 : 0;
                 continue;
             }
-            const unsigned char k1 = buffer[i+1];
-            if (0x00 == k1)
-            {   //   00 00 01 00: picture_start_code
+
+            // At this point we have seen the start code 0 0 1
+            // the next byte will be the PES packet stream id.
+
+            stream_id = buffer[i+1];
+            if (PESStreamID::PictureStartCode == stream_id)
+            {
                 _frames_written_count += (_first_keyframe > 0) ? 1 : 0;
                 _frames_seen_count++;
 
-                bool f16 = (0 == (_frames_seen_count & 0xf));
-                if (f16 &&
-                    (_last_gop_seen + MAX_KEYFRAME_DIFF < frameSeenNum) &&
-                    (_last_seq_seen + MAX_KEYFRAME_DIFF < frameSeenNum))
-                {
-                    // We've seen MAX_KEYFRAME_DIFF frames and no GOP
-                    // or seq header? let's pretend we have them
-#if DEBUG_FIND_KEY_FRAMES
-                    VERBOSE(VB_RECORD,
-                            QString("f16 sc(%1) wc(%2) lgop(%3) lseq(%4)")
-                            .arg(_frames_seen_count).arg(_frames_written_count)
-                            .arg(_last_gop_seen).arg(_last_seq_seen));
-#endif
-                    HandleKeyframe();
-                    _last_keyframe_seen = frameSeenNum;
-                }
+                // If we have seen kMaxKeyFrameDistance frames since the
+                // last GOP or SEQ stream_id, then pretend this picture
+                // is a keyframe. We may get artifacts but at least
+                // we will be able to skip frames.
+                hasKeyFrame = (0 == (_frames_seen_count & 0xf)) &&
+                    (_last_gop_seen + maxKFD < frameSeenNum) &&
+                    (_last_seq_seen + maxKFD < frameSeenNum);
             }
-            else if (0xB8 == k1)
-            {   //   00 00 01 B8: group_start_code
-#if DEBUG_FIND_KEY_FRAMES
-                VERBOSE(VB_RECORD,
-                        QString("GOP sc(%1) wc(%2) lgop(%3) lseq(%4)")
-                        .arg(_frames_seen_count).arg(_frames_written_count)
-                        .arg(_last_gop_seen).arg(_last_seq_seen));
-#endif
-                HandleKeyframe();
-                _last_keyframe_seen = _last_gop_seen = frameSeenNum;
+            else if (PESStreamID::GOPStartCode == stream_id)
+            {
+                _last_gop_seen = frameSeenNum;
+                hasKeyFrame    = true;
             }
-            else if (0xB3 == k1)
-            {   //   00 00 01 B3: seq_start_code
-                if (_last_gop_seen + MAX_KEYFRAME_DIFF < frameSeenNum)
-                {
-#if DEBUG_FIND_KEY_FRAMES
-                    VERBOSE(VB_RECORD,
-                            QString("seq sc(%1) wc(%2) lgop(%3) lseq(%4)")
-                            .arg(_frames_seen_count).arg(_frames_written_count)
-                            .arg(_last_gop_seen).arg(_last_seq_seen));
-#endif
-                    HandleKeyframe();
-                    _last_keyframe_seen = frameSeenNum;
-                }
+            else if (PESStreamID::SequenceStartCode == stream_id)
+            {
                 _last_seq_seen = frameSeenNum;
+                hasKeyFrame    = _last_gop_seen + maxKFD < frameSeenNum;
             }
             _position_within_gop_header = 0;
         }
     }
-#undef AVG_KEYFRAME_DIFF
-#undef MAX_KEYFRAME_DIFF
-#undef DEBUG_FIND_KEY_FRAMES
+
+    if (hasKeyFrame)
+    {
+        _last_keyframe_seen = frameSeenNum;
+        HandleKeyframe();
+
+        if (!payloadStart && !_streamid_not_in_first_ts_packet)
+        {
+            VERBOSE(VB_IMPORTANT, LOC +
+                    "Keyframe stream_id not in first TS Packet.\n"
+                    "This is not an error, but MythTV may not always handle\n"
+                    "this gracefully. If you would like it to, please inform\n"
+                    "the mythtv developer mailing list of this message.\n");
+            // If this happens in practice, it means we need to buffer
+            // all TS packets after the first payload start until
+            // we determine the PES stream ID; and then only write
+            // data to the ringbuffer after we determine the PES stream ID
+            // and call HandleKeyframe() if needed.
+            _streamid_not_in_first_ts_packet = true;
+        }
+    }
 }
 
 // documented in recorderbase.h
@@ -228,20 +276,21 @@ void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
     nextRingBufferLock.unlock();
 }
 
-/** \fn DTVRecorder::HandleKeyframe()
+/** \fn DTVRecorder::HandleKeyframe(void)
  *  \brief This save the current frame to the position maps
  *         and handles ringbuffer switching.
  */
 void DTVRecorder::HandleKeyframe(void)
 {
-    long long frameNum = _frames_written_count - 1;
+    unsigned long long frameNum = _frames_written_count ?
+        _frames_written_count - 1 : 0;
 
-    if (!_keyframe_seen && _frames_seen_count > 0)
+    if (!_keyframe_seen && _frames_seen_count)
     {
         if (_first_keyframe > 0)
             _keyframe_seen = true;
         else
-            _first_keyframe = (frameNum > 0) ? frameNum : 1;
+            _first_keyframe = (_frames_written_count) ? frameNum : 1;
     }
 
     // Add key frame to position map

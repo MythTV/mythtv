@@ -17,16 +17,8 @@ class DTVRecorder: public RecorderBase
 {
     Q_OBJECT
   public:
-    DTVRecorder::DTVRecorder(TVRec *rec, const char *name = "DTVRecorder") : 
-        RecorderBase(rec, name),
-        _first_keyframe(0), _position_within_gop_header(0),
-        _keyframe_seen(false), _last_keyframe_seen(0), _last_gop_seen(0),
-        _last_seq_seen(0), _stream_fd(-1), _error(false),
-        _request_recording(false),
-        _wait_for_keyframe_option(true),
-        _recording(false), _wait_for_keyframe(true),
-        _buffer(0), _buffer_size(0),
-        _frames_seen_count(0), _frames_written_count(0) {;}
+    DTVRecorder(TVRec *rec, const char *name = "DTVRecorder");
+    ~DTVRecorder();
 
     void SetOption(const QString &opt, const QString &value)
     {
@@ -54,29 +46,35 @@ class DTVRecorder: public RecorderBase
     void HandleKeyframe();
     void SavePositionMap(bool force);
 
-    // used for scanning pes header for group of pictures header
-    int _first_keyframe;
-    int _position_within_gop_header;
-    bool _keyframe_seen;
-    long long _last_keyframe_seen, _last_gop_seen, _last_seq_seen;
-
     // file handle for stream
     int _stream_fd;
 
-    // irrecoverable recording error detected
-    bool _error;
+    // used for scanning pes headers for keyframes
+    bool _keyframe_seen;
+    int  _position_within_gop_header;
+    long long _first_keyframe;
+    long long _last_keyframe_seen;
+    long long _last_gop_seen;
+    long long _last_seq_seen;
 
-    // API call is requesting action
+    /// True if API call has requested a recording be [re]started
     bool _request_recording;
     /// Wait for the a GOP/SEQ-start before sending data
     bool _wait_for_keyframe_option;
+    bool _wait_for_keyframe;
+
+    // state tracking variables
     /// True iff recording is actually being performed
     bool _recording;
-    bool _wait_for_keyframe;
+    /// True iff a frame PESStreamID seen outside first TS Packet
+    /// containing a PES Packet
+    bool _streamid_not_in_first_ts_packet;
+    /// True iff irrecoverable recording error detected
+    bool _error;
 
     // packet buffer
     unsigned char* _buffer;
-    int  _buffer_size;
+    int            _buffer_size;
 
     // statistics
     long long _frames_seen_count;
@@ -86,6 +84,12 @@ class DTVRecorder: public RecorderBase
     QMutex                     _position_map_lock;
     QMap<long long, long long> _position_map;
     QMap<long long, long long> _position_map_delta;
+
+    // constants
+    /// If the number of regular frames detected since the last
+    /// detected keyframe exceeds this value, then we begin marking
+    /// random regular frames as keyframes.
+    static const uint kMaxKeyFrameDistance;
 };
 
 #endif // DTVRECORDER_H
