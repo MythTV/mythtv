@@ -9,11 +9,6 @@
 
 using namespace std;
 
-static inline uint calcOffset(uint cnt)
-{
-    return (cnt * TSPacket::PAYLOAD_SIZE) + TSPacket::HEADER_SIZE;
-}
-
 // return true if complete or broken
 bool PESPacket::AddTSPacket(const TSPacket* packet)
 {
@@ -33,23 +28,35 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
 
     const int cc = packet->ContinuityCounter();
     const int ccExp = (_ccLast + 1) & 0xf;
+    uint payloadSize  = TSPacket::PAYLOAD_SIZE;
+    uint payloadStart = TSPacket::HEADER_SIZE;
+
+    // If the next TS has an offset, we need to strip it out.
+    // The offset will be used when a new PESPacket is created.
+    if (packet->PayloadStart())
+    {
+        payloadSize--;
+        payloadStart++;
+    }
+
     if (ccExp == cc)
     {
-        if (calcOffset(_cnt+1) >= _allocSize)
+        if (_pesdataSize + payloadSize >= _allocSize)
         {
             uint sz = (((_allocSize * 2) + 4095) / 4096) * 4096;
             unsigned char *nbuf = pes_alloc(sz);
-            memcpy(nbuf, _fullbuffer, _allocSize);
+            memcpy(nbuf, _fullbuffer, _pesdataSize);
             pes_free(_fullbuffer);
             _fullbuffer = nbuf;
             _allocSize  = sz;
         }
-        memcpy(_fullbuffer    + calcOffset(_cnt),
-               packet->data() + TSPacket::HEADER_SIZE,
-               TSPacket::PAYLOAD_SIZE);
+
+        memcpy(_fullbuffer    + _pesdataSize,
+               packet->data() + payloadStart,
+               payloadSize);
 
         _ccLast = cc;
-        _cnt++;
+        _pesdataSize += payloadSize;
     }
     else if (int(_ccLast) == cc)
     {
@@ -62,7 +69,7 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
         return true;
     }
 
-    if (calcOffset(_cnt) >= tlen)
+    if (_pesdataSize >= tlen)
     {
         if (CalcCRC()==CRC())
         {

@@ -49,7 +49,7 @@ class PESPacket
   protected:
     // does not create it's own data
     PESPacket(const TSPacket* tspacket, bool)
-        : _pesdata(0), _fullbuffer(0), _allocSize(0)
+        : _pesdata(0), _fullbuffer(0), _pesdataSize(188), _allocSize(0)
     {
         InitPESPacket(const_cast<TSPacket&>(*tspacket));
         _fullbuffer = const_cast<unsigned char*>(tspacket->data());
@@ -64,7 +64,8 @@ class PESPacket
     PESPacket(const PESPacket& pkt)
         : _pesdata(0),
           _psiOffset(pkt._psiOffset),
-          _ccLast(pkt._ccLast), _cnt(pkt._cnt),
+          _ccLast(pkt._ccLast),
+          _pesdataSize(pkt._pesdataSize),
           _allocSize((pkt._allocSize) ? pkt._allocSize : 188),
           _badPacket(pkt._badPacket)
     { // clone
@@ -75,7 +76,7 @@ class PESPacket
 
     // may be modified
     PESPacket(const TSPacket& tspacket)
-        : _ccLast(tspacket.ContinuityCounter()), _cnt(1)
+        : _ccLast(tspacket.ContinuityCounter()), _pesdataSize(188)
     { // clone
         InitPESPacket(const_cast<TSPacket&>(tspacket)); // sets _psiOffset
 
@@ -118,8 +119,7 @@ class PESPacket
     unsigned int Length() const
         { return (pesdata()[2] & 0x0f) << 8 | pesdata()[3]; }
 
-    unsigned int TSSizeInBuffer() const
-        { return (_cnt * TSPacket::PAYLOAD_SIZE) + TSPacket::HEADER_SIZE; }
+    unsigned int TSSizeInBuffer() const { return _pesdataSize; }
     unsigned int PSIOffset() const { return _psiOffset; }
 
     const unsigned char* pesdata() const { return _pesdata; }
@@ -188,8 +188,8 @@ class PESPacket
   private:
     uint _psiOffset;    ///< AFCOffset + StartOfFieldPointer
     uint _ccLast;       ///< Continuity counter of last inserted TS Packet
-    uint _cnt;          ///< Number of tspackets contained in PES Packet
-    uint _allocSize;    ///< number of bytes we allocated
+    uint _pesdataSize;  ///< Number of bytes containing PES data
+    uint _allocSize;    ///< Total number of bytes we allocated
     bool _badPacket;    ///< true if a CRC is not good yet
 };
 
