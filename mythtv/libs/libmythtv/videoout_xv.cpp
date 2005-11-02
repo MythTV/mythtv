@@ -1151,6 +1151,36 @@ bool VideoOutputXv::Init(
     if (video_output_subtype >= XVideo)
         InitColorKey(true);
 
+    // Deal with the nVidia 6xxx & 7xxx cards which do
+    // not support chromakeying with the latest drivers
+    if (!xv_colorkey && chroma_osd)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Ack! Disabling ChromaKey OSD"
+                "\n\t\t\tWe can't use ChromaKey OSD "
+                "if chromakeying is not supported!");
+
+#ifdef USING_XVMC
+        // Delete the buffers we allocated before
+        DeleteBuffers(VideoOutputSubType(), true);
+        if (xv_port >= 0)
+        {
+            X11S(XvUngrabPort(XJ_disp, xv_port, CurrentTime));
+            xv_port = -1;
+        }
+#endif // USING_XVMC
+
+        // Get rid of the chromakey osd..
+        delete chroma_osd;
+        chroma_osd = NULL;
+
+#ifdef USING_XVMC
+        // Recreate video buffers
+        xvmc_buf_attr->SetOSDNum(1);
+        ok = InitVideoBuffers(myth_codec_id, xv, shm);
+        XV_INIT_FATAL_ERROR_TEST(!ok, "Failed to get any video output (nCK)");
+#endif // USING_XVMC
+    }
+
     MoveResize(); 
 
     XJ_started = true;
@@ -1169,6 +1199,7 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
 {
     int ret = Success, xv_val=0;
     xv_draw_colorkey = true;
+    xv_colorkey = 0; // set to invalid value as a sentinel
 
     Atom xv_atom;
     XvAttribute *attributes;
@@ -1226,7 +1257,7 @@ void VideoOutputXv::InitColorKey(bool turnoffautopaint)
             {
                 VERBOSE(VB_IMPORTANT, LOC_ERR +
                         "Couldn't get the color key color,"
-                        "\n\t\t\tprobably due to a driver bug."
+                        "\n\t\t\tprobably due to a driver bug or limitation."
                         "\n\t\t\tYou might not get any video, "
                         "but we'll try anyway.");
                 xv_colorkey = 0;
