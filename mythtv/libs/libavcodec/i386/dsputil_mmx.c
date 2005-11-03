@@ -618,6 +618,15 @@ static void h263_v_loop_filter_mmx(uint8_t *src, int stride, int qscale){
 }
 
 static inline void transpose4x4(uint8_t *dst, uint8_t *src, int dst_stride, int src_stride){
+    uint32_t d0 = *(uint32_t*)(dst + 0*dst_stride);
+    uint32_t d1 = *(uint32_t*)(dst + 1*dst_stride);
+    uint32_t d2 = *(uint32_t*)(dst + 2*dst_stride);
+    uint32_t d3 = *(uint32_t*)(dst + 3*dst_stride);
+    uint32_t s0 = *(uint32_t*)(src + 0*src_stride);
+    uint32_t s1 = *(uint32_t*)(src + 1*src_stride);
+    uint32_t s2 = *(uint32_t*)(src + 2*src_stride);
+    uint32_t s3 = *(uint32_t*)(src + 3*src_stride);
+
     asm volatile( //FIXME could save 1 instruction if done as 8x4 ...
         "movd  %4, %%mm0		\n\t"
         "movd  %5, %%mm1		\n\t"
@@ -635,14 +644,8 @@ static inline void transpose4x4(uint8_t *dst, uint8_t *src, int dst_stride, int 
         "punpckhdq %%mm1, %%mm1		\n\t"
         "movd  %%mm1, %3		\n\t"
         
-        : "=m" (*(uint32_t*)(dst + 0*dst_stride)),
-          "=m" (*(uint32_t*)(dst + 1*dst_stride)),
-          "=m" (*(uint32_t*)(dst + 2*dst_stride)),
-          "=m" (*(uint32_t*)(dst + 3*dst_stride))
-        :  "m" (*(uint32_t*)(src + 0*src_stride)),
-           "m" (*(uint32_t*)(src + 1*src_stride)),
-           "m" (*(uint32_t*)(src + 2*src_stride)),
-           "m" (*(uint32_t*)(src + 3*src_stride))
+        : "=m" (d0), "=m" (d1), "=m" (d2), "=m" (d3)
+        :  "m" (s0), "m" (s1), "m" (s2), "m" (s3)
     );
 }
 
