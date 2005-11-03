@@ -1,4 +1,5 @@
 #include <qapplication.h>
+#include <unistd.h>
 
 #include "mythcontext.h"
 #include "mythdbcon.h"
