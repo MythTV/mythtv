@@ -194,7 +194,7 @@ class TV : public QObject
     // key queue commands
     void AddKeyToInputQueue(char key);
     void ClearInputQueues(bool hideosd = false); 
-    void CommitQueuedChannel(void);
+    void CommitQueuedInput(void);
 
     // query key queues
     bool HasQueuedInput(void) const
@@ -248,6 +248,7 @@ class TV : public QObject
     void ToggleOSD(void); 
     void UpdateOSD(void);
     void UpdateOSDInput(void);
+    void UpdateOSDTextEntry(const QString &message);
     void UpdateOSDSignal(const QStringList& strlist);
     void UpdateOSDTimeoutMessage(void);
 
@@ -376,12 +377,24 @@ class TV : public QObject
 
     float frameRate;     ///< Estimated framerate from recorder
 
+    // CC/Teletex input state variables
+    /// Are we in CC/Teletext page/stream selection mode?
+    bool  ccInputMode;
+    /// When does ccInputMode expire
+    QTime ccInputModeExpires;
+
+    // Arbitrary Seek input state variables
+    /// Are we in Arbitrary seek input mode?
+    bool  asInputMode;
+    /// When does asInputMode expire
+    QTime asInputModeExpires;
+
     // Channel changing state variables
     /// Input key presses queued up so far...
     QString queuedInput;
     /// Input key presses queued up so far to form a valid ChanNum
     mutable QString queuedChanNum;
-    ///< Queued ChanID (from EPG channel selector)
+    /// Queued ChanID (from EPG channel selector)
     uint    queuedChanID;
 
     QString lastCC;         ///< Last channel (channum)

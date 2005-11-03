@@ -81,6 +81,7 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "DELETE", "Delete Program", "D");
     REG_KEY("TV Playback", "SEEKFFWD", "Fast Forward", "Right");
     REG_KEY("TV Playback", "SEEKRWND", "Rewind", "Left");
+    REG_KEY("TV Playback", "ARBSEEK", "Arbitrary Seek", "*");
     REG_KEY("TV Playback", "CHANNELUP", "Channel up", "Up");
     REG_KEY("TV Playback", "CHANNELDOWN", "Channel down", "Down");
     REG_KEY("TV Playback", "NEXTFAV", "Switch to the next favorite channel",
@@ -140,7 +141,6 @@ void TV::InitKeys(void)
     REG_KEY("TV Playback", "PREVAUDIO", "Switch to the previous audio track", "-");
     REG_KEY("TV Playback", "NEXTSUBTITLE", "Switch to the next subtitle track", "");
     REG_KEY("TV Playback", "PREVSUBTITLE", "Switch to the previous subtitle track", "");
-    REG_KEY("TV Playback", "SUBCHANNELSEP", "Separator for HDTV subchannels", "_");
     REG_KEY("TV Playback", "JUMPPREV", "Jump to previously played recording", "");
     REG_KEY("TV Playback", "SIGNALMON", "Monitor Signal Quality", "F7");
     
@@ -155,6 +155,23 @@ void TV::InitKeys(void)
     REG_KEY("TV Editing", "BIGJUMPFWD", "Jump forward 10x the normal amount",
             ">,.");
     REG_KEY("TV Editing", "TOGGLEEDIT", "Exit out of Edit Mode", "E");
+/*
+  keys already used:
+
+  Playback: ABCDEFGH JK  NOPQRSTUVWXYZ 0123456789
+  Frontend:    D          OP R  U  X   01 3   7 9
+  Editing:    C E   I       Q        Z
+
+  Playback: <>,.?/|[]{}\+-*
+  Frontend: <>,.?/
+  Editing:  <>,.
+
+  Playback: PgDown, PgUp, Right, Left, Home, End, Up, Down, Backspace,
+  Frontend:               Right, Left, Home, End
+  Editing:  PgDown, PgUp,              Home, End
+
+  Playback: Ctrl-B,F7,F8,F9,F10,F11
+ */
 }
 
 void *SpawnDecode(void *param)
@@ -203,6 +220,10 @@ TV::TV(void)
       normal_speed(1.0f),
       // Estimated framerate from recorder
       frameRate(30.0f),
+      // CC/Teletex input state variables
+      ccInputMode(false), ccInputModeExpires(QTime::currentTime()),
+      // Arbritary seek input state variables
+      asInputMode(false), asInputModeExpires(QTime::currentTime()),
       // Channel changing state variables
       queuedChanNum(""),
       lastCC(""), lastCCDir(0), muteTimer(new QTimer(this)),
@@ -1441,7 +1462,7 @@ void TV::RunTV(void)
         {
             OSDSet *set = GetOSD()->GetSet("channel_number");
             if ((set && !set->Displaying()) || !set)
-                CommitQueuedChannel();
+                CommitQueuedInput();
         }
 
         if (class LCD * lcd = LCD::Get())
@@ -1534,11 +1555,26 @@ void TV::ProcessKeypress(QKeyEvent *e)
         return;
     }
 
+    // If text is already queued up, be more lax on what is ok.
+    // This allows hex teletext entry and minor channel entry.
+    const QString txt = e->text();
+    if (HasQueuedInput() && (1 == txt.length()))
+    {
+        bool ok = false;
+        txt.toInt(&ok, 16);
+        if (ok || txt=="_" || txt=="-" || txt=="#" || txt==".")
+        {
+            AddKeyToInputQueue(txt.at(0).latin1());
+            return;
+        }
+    }
+
     QStringList actions;
-    QString action;
-    if (!gContext->GetMainWindow()->TranslateKeyPress("TV Playback", e, 
-                                                      actions))
+    if (!gContext->GetMainWindow()->TranslateKeyPress(
+            "TV Playback", e, actions))
+    {
         return;
+    }
 
     bool handled = false;
 
@@ -1548,7 +1584,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             handled = true;
 
             if (action == "UP" || action == "CHANNELUP")
@@ -1568,19 +1604,15 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 AddKeyToInputQueue('0' + action.toInt());
             }
-            else if (action == "SUBCHANNELSEP")
-            {
-                AddKeyToInputQueue('_');
-            }
             else if (action == "TOGGLEBROWSE" || action == "ESCAPE" ||
                      action == "CLEAROSD")
             {
-                CommitQueuedChannel(); 
+                CommitQueuedInput(); 
                 BrowseEnd(false);
             }
             else if (action == "SELECT")
             {
-                CommitQueuedChannel(); 
+                CommitQueuedInput(); 
                 BrowseEnd(true);
             }
             else if (action == "TOGGLERECORD")
@@ -1613,7 +1645,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             handled = true;
 
             if (action == "UP" || action == "CHANNELUP")
@@ -1655,7 +1687,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             handled = true;
 
             if (action == "UP")
@@ -1776,7 +1808,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         for (unsigned int i = 0; i < actions.size(); i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             handled = true;
 
             if (action == "LEFT")
@@ -1792,7 +1824,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         for (unsigned int i = 0; i < actions.size(); i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             handled = true;
 
             if (action == "LEFT")
@@ -1808,7 +1840,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         for (unsigned int i = 0; i < actions.size(); i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             handled = true;
 
             if (action == "LEFT")
@@ -1830,7 +1862,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         for (unsigned int i = 0; i < actions.size(); i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             handled = true;
 
             if (action == "LEFT")
@@ -1863,17 +1895,28 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
     for (unsigned int i = 0; i < actions.size() && !handled; i++)
     {
-        action = actions[i];
+        QString action = actions[i];
         handled = true;
 
-        if (action == "TOGGLECC")
+        if (action == "TOGGLECC" && !browsemode)
         {
-            bool valid = false;
-            int page = GetQueuedInputAsInt(&valid, 16) << 16;
-            if (!valid)
-                page = 0;
-            ClearInputQueues();
-            DoToggleCC(page);
+            if (ccInputMode)
+            {
+                bool valid = false;
+                int page = GetQueuedInputAsInt(&valid, 16) << 16;
+                page = (valid) ? page : 0;
+                DoToggleCC(page);
+                if (page) // expire ccInputMode now...
+                    ccInputModeExpires.start();
+                ClearInputQueues(true);
+            }
+            else
+            {
+                ccInputMode        = true;
+                ccInputModeExpires = QTime::currentTime().addMSecs(500);
+                asInputModeExpires = QTime::currentTime();
+                ClearInputQueues(false);
+            }
         }
         else if (action == "SKIPCOMMERCIAL")
             DoSkipCommercials(1);
@@ -1912,6 +1955,23 @@ void TV::ProcessKeypress(QKeyEvent *e)
                     picAdjustment = kPictureAttribute_MIN;
                 DoTogglePictureAttribute();
             }
+        }
+        else if (action == "ARBSEEK")
+        {
+            if (asInputMode)
+            {
+                asInputModeExpires.start();
+                ClearInputQueues(true);
+                UpdateOSDTextEntry(tr("Seek:"));
+            }
+            else
+            {
+                asInputMode        = true;
+                asInputModeExpires = QTime::currentTime().addMSecs(500);
+                ccInputModeExpires = QTime::currentTime();
+                ClearInputQueues(false);
+                UpdateOSDTextEntry(tr("Seek:"));
+            }            
         }
         else if (action == "SEEKFFWD")
         {
@@ -2107,7 +2167,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             for (unsigned int i = 0; i < actions.size() && !handled; i++)
             {
-                action = actions[i];
+                QString action = actions[i];
                 bool ok = false;
                 int val = action.toInt(&ok);
 
@@ -2138,18 +2198,13 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             bool ok = false;
             int val = action.toInt(&ok);
 
             if (ok)
             {
                 AddKeyToInputQueue('0' + val);
-                handled = true;
-            }
-            if (action == "SUBCHANNELSEP")
-            {
-                AddKeyToInputQueue('_');
                 handled = true;
             }
         }
@@ -2159,7 +2214,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             handled = true;
 
             if (action == "INFO")
@@ -2194,7 +2249,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else if (action == "SWITCHCARDS")
                 SwitchCards();
             else if (action == "SELECT")
-                CommitQueuedChannel();
+                CommitQueuedInput();
             else if (action == "GUIDE")
                 LoadMenu();
             else if (action == "TOGGLEPIPMODE")
@@ -2222,7 +2277,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
     {
         for (unsigned int i = 0; i < actions.size() && !handled; i++)
         {
-            action = actions[i];
+            QString action = actions[i];
             handled = true;
 
             if (action == "INFO")
@@ -3002,7 +3057,7 @@ void TV::AddKeyToInputQueue(char key)
      * the only way to enter a channel number to browse without waiting for the
      * OSD to fadeout after entering numbers.
      */
-    bool do_smart = StateIsLiveTV(GetState()) &&
+    bool do_smart = StateIsLiveTV(GetState()) && !ccInputMode && !asInputMode &&
         (smartChannelChange || browsemode);
     QString chan = GetQueuedChanNum();
     if (!chan.isEmpty() && do_smart)
@@ -3024,29 +3079,48 @@ void TV::AddKeyToInputQueue(char key)
         do_smart &= unique;
     }
 
-    if (activenvp == nvp && GetOSD())
-    {
-        InfoMap infoMap;
-
-        infoMap["channum"] = (do_smart) ? queuedChanNum : queuedInput;
-        infoMap["callsign"] = "";
-        GetOSD()->ClearAllText("channel_number");
-        GetOSD()->SetText("channel_number", infoMap, 2);
-    }
+    QString inputStr = (do_smart) ? queuedChanNum : queuedInput;
+    if (ccInputMode)
+        inputStr = tr("CC:") + " " + inputStr;
+    else if (asInputMode)
+        inputStr = tr("Seek:") + " " + inputStr;
+    UpdateOSDTextEntry(inputStr);
 
     if (do_smart)
-        CommitQueuedChannel();
+        CommitQueuedInput();
 }
 
-void TV::CommitQueuedChannel(void)
+void TV::UpdateOSDTextEntry(const QString &message)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "CommitQueuedChannel() " + 
+    if (!GetOSD())
+        return;
+
+    InfoMap infoMap;
+
+    infoMap["channum"]  = message;
+    infoMap["callsign"] = "";
+
+    GetOSD()->ClearAllText("channel_number");
+    GetOSD()->SetText("channel_number", infoMap, 2);
+}
+
+void TV::CommitQueuedInput(void)
+{
+    VERBOSE(VB_PLAYBACK, LOC + "CommitQueuedInput() " + 
             QString("livetv(%1) qchannum(%2) qchanid(%3)")
             .arg(StateIsLiveTV(GetState()))
             .arg(GetQueuedChanNum())
             .arg(GetQueuedChanID()));
 
-    if (StateIsLiveTV(GetState()))
+    if (ccInputMode)
+    {
+        bool valid = false;
+        int page = GetQueuedInputAsInt(&valid, 16) << 16;
+        if (valid && page)
+            DoToggleCC(page);
+        ccInputModeExpires.start(); // expire ccInputMode
+    }
+    else if (StateIsLiveTV(GetState()))
     {
         QString channum = GetQueuedChanNum();
         if (browsemode)
@@ -4882,49 +4956,60 @@ void TV::BuildOSDTreeMenu(void)
     
     item = new OSDGenericTree(treeMenu, tr("Select Audio Track"), "NEXTAUDIO");
 
-    const QStringList atracks = activenvp->listAudioTracks();
-    int atrack = activenvp->getCurrentAudioTrack();
-    int i = 1;
-
-    for (QStringList::const_iterator it = atracks.begin(); it != atracks.end(); it++)
     {
-        subitem = new OSDGenericTree(item, *it, "SELECTAUDIO" + QString("%1").arg(i),
-                                     (i == atrack) ? 1 : 0, NULL, "AUDIOGROUP");
-        i++;
+        const QStringList atracks = activenvp->listAudioTracks();
+        int atrack = activenvp->getCurrentAudioTrack();
+
+        QStringList::const_iterator it = atracks.begin();
+        for (uint i = 1; it != atracks.end(); ++it, ++i)
+        {
+            subitem = new OSDGenericTree(
+                item, *it, "SELECTAUDIO" + QString("%1").arg(i),
+                ((int)i == atrack) ? 1 : 0, NULL, "AUDIOGROUP");
+        }
     }
 
     const QStringList stracks = activenvp->listSubtitleTracks();
-    
-    if (stracks.size() > 0)
+    if (!stracks.empty())
     {
-        item = new OSDGenericTree(treeMenu, tr("Select Subtitles"),
-                                      "TOGGLECC");
+        item = new OSDGenericTree(
+            treeMenu, tr("Select Subtitles"), "TOGGLECC");
+
         int strack = activenvp->getCurrentSubtitleTrack();
-        int i = 1;
 
-        subitem = new OSDGenericTree(item, "None", "SELECTSUBTITLE" + QString("%1").arg(0),
-                                     (0 == strack) ? 1 : 0, NULL, "SUBTITLEGROUP");
+        subitem = new OSDGenericTree(
+            item, "None", "SELECTSUBTITLE" + QString("%1").arg(0),
+            (0 == strack) ? 1 : 0, NULL, "SUBTITLEGROUP");
 
-        for (QStringList::const_iterator it = stracks.begin(); it != stracks.end(); it++)
+        
+        QStringList::const_iterator it = stracks.begin();
+        for (uint i = 1; it != stracks.end(); ++it, ++i)
         {
-            subitem = new OSDGenericTree(item, *it, "SELECTSUBTITLE" + QString("%1").arg(i),
-                                         (i == strack) ? 1 : 0, NULL, "SUBTITLEGROUP");
-            i++;
+            subitem = new OSDGenericTree(
+                item, *it, "SELECTSUBTITLE" + QString("%1").arg(i),
+                ((int)i == strack) ? 1 : 0, NULL, "SUBTITLEGROUP");
         }
-    } else {
-        if (vbimode == 1)
-            item = new OSDGenericTree(treeMenu, tr("Toggle Teletext"),
-                                      "TOGGLECC");
-        else if (vbimode == 2)
+    }
+    else if (vbimode == 1)
+    {
+        item = new OSDGenericTree(
+            treeMenu, tr("Toggle Teletext"), "TOGGLECC");
+    }
+    else if (vbimode == 2)
+    {
+        item    = new OSDGenericTree(treeMenu, tr("Closed Captioning"));
+        subitem = new OSDGenericTree(item, tr("Toggle CC"), "TOGGLECC");
+        for (uint i = 1; i <= 4; i++)
         {
-            item = new OSDGenericTree(treeMenu, tr("Closed Captioning"));
-            subitem = new OSDGenericTree(item, tr("Toggle CC"), "TOGGLECC");
-            for (int i = 1; i <= 4; i++)
-                subitem = new OSDGenericTree(item, QString("%1%2").arg(tr("CC")).arg(i),
-                                             QString("DISPCC%1").arg(i));
-            for (int i = 1; i <= 4; i++)
-                subitem = new OSDGenericTree(item, QString("%1%2").arg(tr("TXT")).arg(i),
-                                             QString("DISPTXT%1").arg(i));
+            subitem = new OSDGenericTree(
+                item, QString("%1%2").arg(tr("CC")).arg(i),
+                QString("DISPCC%1").arg(i));
+        }
+        for (uint i = 1; i <= 4; i++)
+        {
+            subitem = new OSDGenericTree(
+                item, QString("%1%2").arg(tr("TXT")).arg(i),
+                QString("DISPTXT%1").arg(i));
         }
     }
 
