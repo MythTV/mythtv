@@ -1136,12 +1136,19 @@ bool VideoOutputXv::Init(
         XJ_curwin = XJ_win = embedid;
 
     // create chroma key osd structure if needed
-    if (use_chroma_key_osd)
+    if (use_chroma_key_osd && (32 == XJ_depth))
     {
         chroma_osd = new ChromaKeyOSD(this);
 #ifdef USING_XVMC
         xvmc_buf_attr->SetOSDNum(0); // disable XvMC blending OSD
 #endif // USING_XVMC
+    }
+    else if (use_chroma_key_osd)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + QString(
+                    "Number of bits per pixel is %1, \n\t\t\t"
+                    "but we only support ARGB 32 bbp for ChromaKeyOSD.")
+                .arg(XJ_depth));
     }
 
     // Create video buffers
