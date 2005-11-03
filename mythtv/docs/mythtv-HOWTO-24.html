@@ -1,0 +1,621 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+ <META NAME="GENERATOR" CONTENT="LinuxDoc-Tools 0.9.21">
+ <TITLE>Installing and using MythTV: Example Configurations.</TITLE>
+ <LINK HREF="mythtv-HOWTO-23.html" REL=previous>
+ <LINK HREF="mythtv-HOWTO.html#toc24" REL=contents>
+</HEAD>
+<BODY>
+Next
+<A HREF="mythtv-HOWTO-23.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc24">Contents</A>
+<HR>
+<H2><A NAME="s24">24.</A> <A HREF="mythtv-HOWTO.html#toc24">Example Configurations.</A></H2>
+
+<H2><A NAME="LVM"></A> <A NAME="ss24.1">24.1</A> <A HREF="mythtv-HOWTO.html#toc24.1">Logical Volume Manager (LVM) </A>
+</H2>
+
+<P>LVM greatly increases the flexibility you have in managing your storage
+than traditional physical partitions. This section will provide some brief
+notes on how to use LVM to create storage space for your video files and how
+to add additional disk space in the future. There's lots more that can be
+done with LVM, so check the LVM HOWTO 
+<A HREF="http://tldp.org/HOWTO/LVM-HOWTO/">http://tldp.org/HOWTO/LVM-HOWTO/</A> document for details.</P>
+<P>If you don't understand how to partition a drive, or how to change the
+partition type you should stop and look at documentation on how to perform
+these steps.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>BIG FAT WARNING</B>:  Using an incorrect parameter can make your files
+inaccessible, prevent your computer from booting, etc.  Be careful!</CAPTION>
+</FIGURE>
+</P>
+<P>Make sure your kernel configuration includes LVM support or that it's
+available as a module. Today, most vendors include this by default. You'll
+also want to ensure that you have a copy of the LVM utilities; check your
+distribution, or get the latest versions from 
+<A HREF="http://www.sistina.com/products_lvm.htm">http://www.sistina.com/products_lvm.htm</A> and build them manually.</P>
+<P>Check that the <B>vgscan</B> program is being run at some point during
+your boot sequence - most distributions do this by default. Look for a
+message during boot up that looks like this: <CODE>vgscan -- reading all
+physical volumes (this may take a while...)</CODE> If you don't see any
+messages during boot, you may need to install a LVM init script or confirm
+that you have all of the LVM packages installed from your distribution.</P>
+<P>LVM uses a few concepts you should be familiar with before starting.
+<UL>
+<LI>PV (Physical Volume).  The actual partition on the hard drive.</LI>
+<LI>VG (Volume Group).  The aggregation of all the PVs make a VG.</LI>
+<LI>LV (Logical Volume).  Subdivision of the pool of space available in
+the VG into individual chunks, like /usr, /var/video, etc.</LI>
+</UL>
+</P>
+<P>The following example assumes that you want to create a LVM partition from a
+chunk of space in /dev/hda5, using a reiserfs filesystem and mounted on
+/var/video. You later decide to extend this filesystem by adding a new disk:
+/dev/hdb.</P>
+<P>You need to create at least one LVM partition for a physical volume. Use
+<B>fdisk</B> or your favorite partition editor to set the type to LVM
+(0x8e). If you're using an entire disk, create one big partition rather than
+using the device itself. e.g. use /dev/hdb1 not /dev/hdb.  </P>
+<P>In the following example, you have a 15GB disk.  The first 6GB are set as
+your boot partition.  <CODE>/dev/hda2</CODE> was added as an extended partition,
+and within that partition you created the <CODE>/dev/hda5</CODE> linux (ext2)
+partition.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# fdisk /dev/hda
+
+The number of cylinders for this disk is set to 1823.
+There is nothing wrong with that, but this is larger than 1024,
+and could in certain setups cause problems with:
+1) software that runs at boot time (e.g., old versions of LILO)
+2) booting and partitioning software from other OSs
+   (e.g., DOS FDISK, OS/2 FDISK)
+
+Command (m for help): p
+
+Disk /dev/hda: 15.0 GB, 15000330240 bytes
+255 heads, 63 sectors/track, 1823 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+   Device Boot    Start       End    Blocks   Id  System
+/dev/hda1   *         1       764   6136798+  83  Linux
+/dev/hda2           765      1823   8506417+   5  Extended
+/dev/hda5           765      1823   8506417   83  Linux
+
+Command (m for help): t
+Partition number (1-6): 5
+Hex code (type L to list codes): 8e
+
+Command (m for help): p
+
+Disk /dev/hda: 15.0 GB, 15000330240 bytes
+255 heads, 63 sectors/track, 1823 cylinders
+Units = cylinders of 16065 * 512 = 8225280 bytes
+
+   Device Boot    Start       End    Blocks   Id  System
+/dev/hda1   *         1       764   6136798+  83  Linux
+/dev/hda2           765      1823   8506417+   5  Extended
+/dev/hda5           765      1823   8506417   8e  Linux LVM
+
+Command (m for help): w
+
+#
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Create the LVM physical volume from the partitions (repeat if you have
+multiple partitions to use):
+<BLOCKQUOTE><CODE>
+<PRE>
+# pvcreate /dev/hda5
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Create a LVM volume group out of this physical volume called "VGforMyth" that is
+allocated in chunks that are a multiple of 64MB
+<BLOCKQUOTE><CODE>
+<PRE>
+# vgcreate VGforMyth -s 64m /dev/hda5
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Create a logical volume of 5GB called "video" and then create the reiserfs
+filesystem and mount it:
+<BLOCKQUOTE><CODE>
+<PRE>
+# lvcreate --name video --size 5G VGforMyth
+# mkreiserfs /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Now create a 3GB volume for mythmusic files if you like:
+<BLOCKQUOTE><CODE>
+<PRE>
+# lvcreate --name music --size 3G VGforMyth
+# mkreiserfs /dev/VGforMyth/music
+# mount /dev/VGforMyth/music /var/music
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Display the volume group status:
+<CODE># vgdisplay -v</CODE></P>
+<P>Now, lets suppose you want to add a 60GB hard disk to the system as hdb and
+allocate 50GB of it to video storage.</P>
+<P>First, create a single partition /dev/hdb1 covering the whole disk and make
+it type 0x8e using your partition editor.</P>
+<P><CODE># fdisk /dev/hdb</CODE>
+.... create partition, set type, save and reboot if it says you have to</P>
+<P>Create the new LVM physical volume:</P>
+<P><CODE># pvcreate /dev/hdb1</CODE></P>
+<P>Add the new physical volume to the volume group:</P>
+<P><CODE># vgextend VGforMyth /dev/hdb1</CODE></P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  You may get errors at this point stating that there are no
+physical volumes available for adding to the LV, even though you know for a
+fact that there are.  You may need to specify the physical volume in the <CODE>/dev/ide/host/bus/target/lun/etc</CODE> format.</CAPTION>
+</FIGURE>
+
+Once you've completed one of the following two procedures, use <B>df</B>
+to check that you've got more space.</P>
+
+<H3>ReiserFS</H3>
+
+<P>Make the logical volume used for video bigger:</P>
+<P><CODE># lvextend --size +50G /dev/VGforMyth/video</CODE></P>
+<P>Unmount, resize and remount the filesystem.  Technically, you don't need to
+unmount and remount the ReiserFS. 
+<BLOCKQUOTE><CODE>
+<PRE>
+# umount /var/video
+# resize_reiserfs /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>ext2 or ext3</H3>
+
+<P>LVM comes with a program called <B>e2fsadm</B>.</P>
+<P>Unmount, resize and remount the filesystem.  The filesystem <EM>must</EM> be
+unmounted during this procedure.
+<BLOCKQUOTE><CODE>
+<PRE>
+# umount /var/video
+# e2fsadm --size +50G /dev/VGforMyth/video
+# mount /dev/VGforMyth/video /var/video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H3>xfs</H3>
+
+<P>XFS does not need to be unmounted to extend the size:
+<BLOCKQUOTE><CODE>
+<PRE>
+# lvextend --size +50G /dev/VGforMyth/video
+# xfs_growfs /dev/VGforMyth/video
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<H2><A NAME="advancedpartitionformatting"></A> <A NAME="ss24.2">24.2</A> <A HREF="mythtv-HOWTO.html#toc24.2">Advanced Partition Formatting </A>
+</H2>
+
+<P>The partitions that your distribution sets up for you may not be
+optimized for large files. Using LVM in conjunction with the following
+techniques can be quite useful.</P>
+<P>Unlike a typical filesystem, a MythTV video partition is usually a very
+large filesystem filled with a fairly small number of large files.
+Filesystem I/O is usually not an issue, even in multi-tuner and/or
+multi-frontend setups.</P>
+<P>There is however, one aspect of filesystem performance that can have a
+bearing on the performance of MythTV.  In Linux, deleting a file will
+utilize I/O bandwidth until the deletion has been completed.  If deleting
+the file takes long enough, the video capture buffer may overrun, thereby
+resulting in dropped frames.  Some filesystems are faster at deleting files
+than others and, for multi-gigabyte MythTV video files, these differences
+can be significant.</P>
+<P>Fortunately, there are published tests (
+<A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>) that provide
+insight into filesystem performance under conditions relevant to MythTV
+usage.  In addition, some limited testing (archived at 
+<A HREF="http://www.gossamer-threads.com/lists/mythtv/users/52672">http://www.gossamer-threads.com/lists/mythtv/users/52672</A>)
+with very large files (10 gigabytes) was reported in the MythTV Users
+mailing list.</P>
+
+<H3>Ext2</H3>
+
+<P>Ext2 was the defacto standard Linux filesystem for many years.  It is
+stable, provides good I/O performance and can quickly delete large files. 
+The primary disadvantage of Ext2 is that it is not a journaling filesystem,
+so a file system consistency check (fsck, which is normally only performed
+after a system crash) can take many hours on a filesystem the size of a
+typical MythTV partition.</P>
+
+<H3>Ext3</H3>
+
+<P>Ext3 is Ext2 with a journal, so your biggest gain is that in case of a
+crash and reboot you won't have to wait very long for your partition to be
+remounted.</P>
+<P>There are options available when formatting an Ext3 partition, as in:
+<BLOCKQUOTE><CODE>
+<PRE>
+# mkfs.ext3 -T largefile4 /dev/hdb1
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>This example assumes that <CODE>/dev/hdb1</CODE> has already been created using
+<B>fdisk</B>. If you're using LVM, <CODE>/dev/hdb1</CODE> may be something like
+<CODE>/dev/VGforMyth/video</CODE>.</P>
+<P>The "-T largefile4" option creates one inode per 4 megabytes, which can
+provide a few percent more storage space.  However, tests indicate that
+using the "-T largefile4" option can drastically increase the amount of time
+required to delete a large file and thus it should only be used with encoder
+settings that produce small video files (YMMV).</P>
+<P>You can check on your filesystem using the <B>dumpe2fs</B> program. See
+the man page for details.</P>
+<H3>ReiserFS</H3>
+
+<P>The Reiser filesystem is another journaling filesystem commonly
+distributed with Linux.  It is known to be an extremely efficient filesystem
+and it especially excels at managing partitions containing a large number of
+small files.  However, tests indicate it is not the fastest at deleting very
+large files.  For that reason, it may not be the best choice when using
+encoder bitrates that produce very large files.</P>
+
+<H3>JFS</H3>
+
+<P>JFS (Journaling File System) is a journaling filesystem originally
+developed by IBM for AIX which was later released as open source.  While not
+as common as Ext3 or ReiserFS, it is distributed with RedHat 9 (RH9) and
+Fedora Core 1 (RHFC1) and Mandrake as well as other distros.  According to
+tests, JFS is the file deletion speed king, deleting virtually any file in
+under one second, even files as large as 10 gigabytes.</P>
+
+<H3>XFS</H3>
+
+<P>XFS is a journaling file system originally developed by SGI for Irix, and
+later released as open source.  While not a part of the default RedHat Linux
+9 or Fedora Core installation (although it is a part of Mandrake and Fedora
+Core 2), it can be easily installed via ATrpms.  XFS provides deletion
+speeds for large files only slightly slower than JFS.  According to the test
+results shown at (
+<A HREF="http://aurora.zemris.fer.hr/filesystems/big.html">http://aurora.zemris.fer.hr/filesystems/big.html</A>), XFS provide
+higher I/O rates than JFS, albeit at a higher CPU loading.  This may cause
+issues if you do not have the spare CPU capacity to handle XFS, potentially
+leading to dropped frames.</P>
+
+<H2><A NAME="ss24.3">24.3</A> <A HREF="mythtv-HOWTO.html#toc24.3">HDTV with the Air2PC-ATSC-PCI card</A>
+</H2>
+
+<P>The Air2PC card has the capability to capture over-the-air HDTV signals
+(8VSB).  The Air2PC card is
+installed as a DVB device and is supported within MythTV.  </P>
+<P>First, you must compile a version of the Linux kernel to support the new
+tuner device.  </P>
+<P>Download the source to 2.6.11.  
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cd /usr/src
+# wget http://www.kernel.org/pub/linux/kernel/v2.6/linux-2.6.11.tar.bz2
+# tar -xjf linux-2.6.11.tar.bz2
+# pushd .
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If you already have a 2.6 kernel running, copy the <CODE>.config</CODE> file and
+use it as your starting point.  If not, then go straight to the <CODE>make
+menuconfig</CODE> portion below.</P>
+<P>On Debian with a 2.6.10 kernel:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# cp /lib/modules/`uname -r`/build/.config .
+# make oldconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+
+Read the prompts that come up; for the most part you should be able to
+answer "No".
+<BLOCKQUOTE><CODE>
+<PRE>
+# make menuconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>For Gentoo:
+<BLOCKQUOTE><CODE>
+<PRE>
+# emerge genkernel udev hotplug coldplug
+# genkernel --menuconfig --udev --save-config all
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Go to the Device Drivers->Multimedia->Digital Video Broadcasting Devices</P>
+<P>Enable DVB for Linux and select B2C2/Technisat Air/Sky/CableStar 2 PCI.</P>
+<P>Exit menuconfig, then compile modules and the kernel.  (Gentoo will do this
+automatically as a part of the <B>genkernel</B> step.
+<BLOCKQUOTE><CODE>
+<PRE>
+# make modules
+# make
+# make install modules_install
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Make any modifications necessary to your boot configuration files (lilo or
+grub) as required to boot your new kernel.</P>
+<P>Download and compile the dvb applications you'll need to configure the card. 
+At the password prompt, press ENTER.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv login
+$ cvs -d :pserver:anonymous@linuxtv.org:/cvs/linuxtv co dvb-apps dvb-kernel
+$ cd dvb-apps
+$ make
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<B>NOTE</B>: As of 2005-02-16, the compile aborts with an error, however
+not before the <B>azap</B> is compiled, so you should be able to continue.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# cp utils/szap/azap /usr/local/bin
+</PRE>
+</CODE></BLOCKQUOTE>
+
+On Gentoo, execute the following:
+<BLOCKQUOTE><CODE>
+<PRE>
+# mkdir /lib/firmware
+# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /lib/firmware
+# echo skystar2 >> /etc/modules.autoload.d/kernel-2.6
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+
+On Debian:
+<BLOCKQUOTE><CODE>
+<PRE>
+# cp ~/dvb-kernel/firmware/dvb-fe-nxt2002.fw /usr/lib/hotplug/firmware
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Shutdown your machine, install the card and restart.  Ensure that you're
+using your newly compiled kernel.</P>
+<P>Once you've rebooted, confirm that the card is detected.  If you type
+<B>dmesg</B>, you should see something like this:
+<BLOCKQUOTE><CODE>
+<PRE>
+drivers/media/dvb/b2c2/skystar2.c: FlexCopIIB(rev.195) chip found
+drivers/media/dvb/b2c2/skystar2.c: the chip has 38 hardware filters
+DVB: registering new adapter (SkyStar2).
+DVB: registering frontend 0 (Nextwave nxt2002 VSB/QAM frontend)...
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>If you are using 8VSB (Over-the-Air HDTV), run the <B>azap</B> program. 
+Replace ZIPCODE with your zip code.  The perl script will connect to 
+<A HREF="http://www.antennaweb.org">http://www.antennaweb.org</A> to obtain
+your HDTV channels.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ cd /usr/src/dvb-apps/util/szap/channels-conf/atsc
+$ test ~/.azap || mkdir ~/.azap
+$ perl ./make_atsc_chanconf.pl ZIPCODE >~/.azap/channels.conf
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<BLOCKQUOTE><CODE>
+<PRE>
+$ /usr/local/bin/azap wsvn
+using '/dev/dvb/adapter0/frontend0' and '/dev/dvb/adapter0/demux0'
+tuning to 183000000 Hz
+video pid 0x0000, audio pid 0x0000
+status 00 | signal fff0 | snr ea60 | ber 00000000 | unc 00000000 |
+status 1f | signal f840 | snr ce6e | ber 00000068 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f600 | snr d2d8 | ber 00000018 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f290 | snr cd54 | ber 00000008 | unc 00000000 | FE_HAS_LOCK
+status 1f | signal f340 | snr c658 | ber 00000030 | unc 00000000 | FE_HAS_LOCK
+CTRL-C
+$
+</PRE>
+</CODE></BLOCKQUOTE>
+
+<B>NOTE</B>: if you have anything in the unc column ("uncorrectable
+errors") you will probably have problems with HDTV.  Check your antenna,
+cables, etc.</P>
+<P>Once you have confirmed that your card is able to lock onto a HDTV signal it
+is time to configure MythTV. Start the setup program, and in the Capture
+Cards section change the card type to "Digital Video Broadcast".</P>
+<P>For HDTV you do not need to use the Advanced configuration. </P>
+<H2><A NAME="ss24.4">24.4</A> <A HREF="mythtv-HOWTO.html#toc24.4">Diskless Ubuntu</A>
+</H2>
+
+<P>(This information is a work in progress - 2005-07-15.)</P>
+<P>In the following examples, we are going to create an environment which can
+be used to boot a diskless workstation using PXE.</P>
+<P>There are two machines in this scenario:  the backend, a Debian Sarge system
+which has the disks and which will run the necessary support software, and
+the "basement" machine, an Intel D865PERL motherboard with 512MB of DRAM, a
+NVidia 440MX video card, a Microsoft MCE USB remote and a HD44780 16x2
+Vacuum Fluorescent Display.</P>
+
+<H3>Backend Configuration</H3>
+
+<P>The backend machine needs to provide the support software for the
+services needed to boot a diskless workstation.</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su
+# apt-get install dhcpd3-server atftpd syslinux
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+# mkdir -p /nfsroot/basement
+# debootstrap --arch i386 hoary /nfsroot/basement/ http://archive.ubuntulinux.org/ubuntu
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>http://archive.ubuntulinux.org/ubuntu/dists/warty/main/installer-i386/current/doc/manual/en/apcs03.html</P>
+<P>Once that's done, we'll need to <B>chroot</B> into the newly created
+directory structure for some initial setup.
+<BLOCKQUOTE><CODE>
+<PRE>
+$ su 
+# chroot /nfsroot/basement
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Set the hostname that you'd like this machine to display at login and at the
+shell:
+<BLOCKQUOTE><CODE>
+<PRE>
+# echo "basement" > /etc/hostname
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Add the IP address of this host to <CODE>/etc/hosts</CODE>
+<BLOCKQUOTE><CODE>
+<PRE>
+# echo "127.0.0.1 localhost" >> /etc/hosts
+# echo "192.168.10.51 backend-2" >> /etc/hosts
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Create the initial configuration:
+<BLOCKQUOTE><CODE>
+<PRE>
+/usr/sbin/base-config new
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Create a <CODE>xorg.conf</CODE> file:
+<BLOCKQUOTE><CODE>
+<PRE>
+# xorgconfig
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Edit your <CODE>/etc/apt/sources.list</CODE> and look at the bottom of the file. 
+It should end up looking like this:</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+deb http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
+deb-src http://us.archive.ubuntu.com/ubuntu/ hoary main restricted
+
+## Uncomment the following two lines to add software from the 'universe'
+## repository.
+## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
+## team, and may not be under a free licence. Please satisfy yourself as to
+## your rights to use the software. Also, please note that software in
+## universe WILL NOT receive any review or updates from the Ubuntu security
+## team.
+deb http://us.archive.ubuntu.com/ubuntu/ hoary universe
+deb-src http://us.archive.ubuntu.com/ubuntu/ hoary universe
+
+deb http://security.ubuntu.com/ubuntu hoary-security main restricted
+deb-src http://security.ubuntu.com/ubuntu hoary-security main restricted
+
+deb http://security.ubuntu.com/ubuntu hoary-security universe
+deb-src http://security.ubuntu.com/ubuntu hoary-security universe
+
+deb http://archive.ubuntu.com/ubuntu hoary multiverse
+deb-src http://archive.ubuntu.com/ubuntu hoary multiverse
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>Finally, exit out of the <B>chroot</B>:
+<BLOCKQUOTE><CODE>
+<PRE>
+# exit
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+<P>sudo apt-get install subversion distcc bind9 bind9-doc libqt3c102-mt-mysql
+edit /etc/default/distcc to start it and allow other hosts</P>
+<P>sudo apt-get build-dep mythtv</P>
+<P>sudo apt-get install libqt3c102-mysql</P>
+
+<H3>Configuring DHCP</H3>
+
+<P>edit /etc/default/dhcp3-server.  add interface</P>
+<P>
+<BLOCKQUOTE><CODE>
+<PRE>
+option domain-name              "local";
+option subnet-mask              255.255.255.0;
+option domain-name-servers 192.168.10.50, 68.87.66.196, 68.87.64.196, 63.240.76.4
+
+# Turn on Dynamic DNS:
+ddns-update-style interim;
+ddns-updates on;
+
+# Don't allow clients to update DNS, make the server do it
+# based on the hostname passed by the DHCP client:
+deny client-updates;
+allow unknown-clients;
+
+allow bootp;
+allow booting;
+
+#option ip-forwarding    false;  # No IP forwarding
+#option mask-supplier    false;  # Don't respond to ICMP Mask req
+
+subnet 192.168.10.0 netmask 255.255.255.0 {
+  option routers        192.168.10.1;
+#  range 192.168.10.100 192.168.10.250;
+}
+
+group {
+  next-server 192.168.10.50;          # IP address of your TFTP server
+  default-lease-time 864000;
+  max-lease-time 864000;
+
+  host basement {
+        hardware ethernet 00:13:20:11:a3:ea;
+        fixed-address 192.168.10.51;
+        filename "/tftpboot/pxelinux.0";
+        option root-path "/nfsroot/basement/";
+        option host-name "basement" ;
+  }
+}
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>Editing </H3>
+
+<P>svn co http://svn.mythtv.org/svn/trunk/mythtv
+svn co http://svn.mythtv.org/svn/trunk/mythplugins
+svn co http://svn.mythtv.org/svn/trunk/myththemes</P>
+<P>First time in, it will create .mythtv/mysql.txt, but it's pointing at the wrong
+server (ie, there is none on the frontend).</P>
+<P>Exit out at this point (should be the language selection screen), and edit .mythtv/mysql.txt</P>
+<P>Then restart</P>
+<P>Disable xscreensaver: System->Preferences->ScreenSaver.  Mode: Disable Screen Saver
+Advanced: Power Management Enabled: uncheck</P>
+<P>System->Preferences->Sound uncheck Enable sound server startup</P>
+
+
+<HR>
+Next
+<A HREF="mythtv-HOWTO-23.html">Previous</A>
+<A HREF="mythtv-HOWTO.html#toc24">Contents</A>
+</BODY>
+</HTML>
