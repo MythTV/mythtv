@@ -260,7 +260,6 @@ static void h264_v_loop_filter_luma_mmx2(uint8_t *pix, int stride, int alpha, in
 }
 static void h264_h_loop_filter_luma_mmx2(uint8_t *pix, int stride, int alpha, int beta, int8_t *tc0)
 {
-#if 0
     //FIXME: could cut some load/stores by merging transpose with filter
     // also, it only needs to transpose 6x8
     uint8_t trans[8*8];
@@ -276,7 +275,6 @@ static void h264_h_loop_filter_luma_mmx2(uint8_t *pix, int stride, int alpha, in
         transpose4x4(pix-2,          trans  +2*8, stride, 8);
         transpose4x4(pix-2+4*stride, trans+4+2*8, stride, 8);
     }
-#endif
 }
 
 static inline void h264_loop_filter_chroma_mmx2(uint8_t *pix, int stride, int alpha1, int beta1, int8_t *tc0)
@@ -894,20 +892,137 @@ H264_MC(avg_, 16,mmx2)
 
 
 #define H264_CHROMA_OP(S,D)
+#define H264_CHROMA_OP4(S,D,T)
 #define H264_CHROMA_MC8_TMPL put_h264_chroma_mc8_mmx
+#define H264_CHROMA_MC4_TMPL put_h264_chroma_mc4_mmx
+#define H264_CHROMA_MC8_MV0 put_pixels8_mmx
 #include "dsputil_h264_template_mmx.c"
 #undef H264_CHROMA_OP
+#undef H264_CHROMA_OP4
 #undef H264_CHROMA_MC8_TMPL
+#undef H264_CHROMA_MC4_TMPL
+#undef H264_CHROMA_MC8_MV0
 
 #define H264_CHROMA_OP(S,D) "pavgb " #S ", " #D " \n\t"
+#define H264_CHROMA_OP4(S,D,T) "movd  " #S ", " #T " \n\t"\
+                               "pavgb " #T ", " #D " \n\t"
 #define H264_CHROMA_MC8_TMPL avg_h264_chroma_mc8_mmx2
+#define H264_CHROMA_MC4_TMPL avg_h264_chroma_mc4_mmx2
+#define H264_CHROMA_MC8_MV0 avg_pixels8_mmx2
 #include "dsputil_h264_template_mmx.c"
 #undef H264_CHROMA_OP
+#undef H264_CHROMA_OP4
 #undef H264_CHROMA_MC8_TMPL
+#undef H264_CHROMA_MC4_TMPL
+#undef H264_CHROMA_MC8_MV0
 
 #define H264_CHROMA_OP(S,D) "pavgusb " #S ", " #D " \n\t"
+#define H264_CHROMA_OP4(S,D,T) "movd " #S ", " #T " \n\t"\
+                               "pavgusb " #T ", " #D " \n\t"
 #define H264_CHROMA_MC8_TMPL avg_h264_chroma_mc8_3dnow
+#define H264_CHROMA_MC4_TMPL avg_h264_chroma_mc4_3dnow
+#define H264_CHROMA_MC8_MV0 avg_pixels8_3dnow
 #include "dsputil_h264_template_mmx.c"
 #undef H264_CHROMA_OP
+#undef H264_CHROMA_OP4
 #undef H264_CHROMA_MC8_TMPL
+#undef H264_CHROMA_MC4_TMPL
+#undef H264_CHROMA_MC8_MV0
+
+/***********************************/
+/* weighted prediction */
+
+static inline void ff_h264_weight_WxH_mmx2(uint8_t *dst, int stride, int log2_denom, int weight, int offset, int w, int h)
+{
+    int x, y;
+    offset <<= log2_denom;
+    offset += (1 << log2_denom) >> 1;
+    asm volatile(
+        "movd    %0, %%mm4        \n\t"
+        "movd    %1, %%mm5        \n\t"
+        "movd    %2, %%mm6        \n\t"
+        "pshufw  $0, %%mm4, %%mm4 \n\t"
+        "pshufw  $0, %%mm5, %%mm5 \n\t"
+        "pxor    %%mm7, %%mm7     \n\t"
+        :: "g"(weight), "g"(offset), "g"(log2_denom)
+    );
+    for(y=0; y<h; y+=2){
+        for(x=0; x<w; x+=4){
+            asm volatile(
+                "movd      %0,    %%mm0 \n\t"
+                "movd      %1,    %%mm1 \n\t"
+                "punpcklbw %%mm7, %%mm0 \n\t"
+                "punpcklbw %%mm7, %%mm1 \n\t"
+                "pmullw    %%mm4, %%mm0 \n\t"
+                "pmullw    %%mm4, %%mm1 \n\t"
+                "paddw     %%mm5, %%mm0 \n\t"
+                "paddw     %%mm5, %%mm1 \n\t"
+                "psraw     %%mm6, %%mm0 \n\t"
+                "psraw     %%mm6, %%mm1 \n\t"
+                "packuswb  %%mm7, %%mm0 \n\t"
+                "packuswb  %%mm7, %%mm1 \n\t"
+                "movd      %%mm0, %0    \n\t"
+                "movd      %%mm1, %1    \n\t"
+                : "+m"(*(uint32_t*)(dst+x)),
+                  "+m"(*(uint32_t*)(dst+x+stride))
+            );
+        }
+        dst += 2*stride;
+    }
+}
+
+static inline void ff_h264_biweight_WxH_mmx2(uint8_t *dst, uint8_t *src, int stride, int log2_denom, int weightd, int weights, int offsetd, int offsets, int w, int h)
+{
+    int x, y;
+    int offset = ((offsets + offsetd + 1) | 1) << log2_denom;
+    asm volatile(
+        "movd    %0, %%mm3        \n\t"
+        "movd    %1, %%mm4        \n\t"
+        "movd    %2, %%mm5        \n\t"
+        "movd    %3, %%mm6        \n\t"
+        "pshufw  $0, %%mm3, %%mm3 \n\t"
+        "pshufw  $0, %%mm4, %%mm4 \n\t"
+        "pshufw  $0, %%mm5, %%mm5 \n\t"
+        "pxor    %%mm7, %%mm7     \n\t"
+        :: "g"(weightd), "g"(weights), "g"(offset), "g"(log2_denom+1)
+    );
+    for(y=0; y<h; y++){
+        for(x=0; x<w; x+=4){
+            asm volatile(
+                "movd      %0,    %%mm0 \n\t"
+                "movd      %1,    %%mm1 \n\t"
+                "punpcklbw %%mm7, %%mm0 \n\t"
+                "punpcklbw %%mm7, %%mm1 \n\t"
+                "pmullw    %%mm3, %%mm0 \n\t"
+                "pmullw    %%mm4, %%mm1 \n\t"
+                "paddw     %%mm5, %%mm0 \n\t"
+                "paddw     %%mm1, %%mm0 \n\t"
+                "psraw     %%mm6, %%mm0 \n\t"
+                "packuswb  %%mm0, %%mm0 \n\t"
+                "movd      %%mm0, %0    \n\t"
+                : "+m"(*(uint32_t*)(dst+x))
+                :  "m"(*(uint32_t*)(src+x))
+            );
+        }
+        src += stride;
+        dst += stride;
+    }
+}
+
+#define H264_WEIGHT(W,H) \
+static void ff_h264_biweight_ ## W ## x ## H ## _mmx2(uint8_t *dst, uint8_t *src, int stride, int log2_denom, int weightd, int weights, int offsetd, int offsets){ \
+    ff_h264_biweight_WxH_mmx2(dst, src, stride, log2_denom, weightd, weights, offsetd, offsets, W, H); \
+} \
+static void ff_h264_weight_ ## W ## x ## H ## _mmx2(uint8_t *dst, int stride, int log2_denom, int weight, int offset){ \
+    ff_h264_weight_WxH_mmx2(dst, stride, log2_denom, weight, offset, W, H); \
+}
+
+H264_WEIGHT(16,16)
+H264_WEIGHT(16, 8)
+H264_WEIGHT( 8,16)
+H264_WEIGHT( 8, 8)
+H264_WEIGHT( 8, 4)
+H264_WEIGHT( 4, 8)
+H264_WEIGHT( 4, 4)
+H264_WEIGHT( 4, 2)
 

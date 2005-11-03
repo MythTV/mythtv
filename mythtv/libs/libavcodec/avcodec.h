@@ -21,8 +21,8 @@ extern "C" {
 #define AV_STRINGIFY(s)	AV_TOSTRING(s)
 #define AV_TOSTRING(s) #s
 
-#define LIBAVCODEC_VERSION_INT ((50<<16)+(0<<8)+0)
-#define LIBAVCODEC_VERSION     50.0.0
+#define LIBAVCODEC_VERSION_INT ((50<<16)+(1<<8)+0)
+#define LIBAVCODEC_VERSION     50.1.0
 #define LIBAVCODEC_BUILD       LIBAVCODEC_VERSION_INT
 
 #define LIBAVCODEC_IDENT       "Lavc" AV_STRINGIFY(LIBAVCODEC_VERSION)
@@ -112,6 +112,7 @@ enum CodecID {
     CODEC_ID_AASC,
     CODEC_ID_INDEO2,
     CODEC_ID_FRAPS,
+    CODEC_ID_TRUEMOTION2,
 
     /* various pcm "codecs" */
     CODEC_ID_PCM_S16LE= 0x10000,
@@ -185,6 +186,7 @@ enum CodecID {
     CODEC_ID_ALAC,
     CODEC_ID_WESTWOOD_SND1,
     CODEC_ID_GSM,    
+    CODEC_ID_QDM2,
     
     CODEC_ID_OGGTHEORA= 0x16000, 
 
@@ -1855,6 +1857,7 @@ typedef struct AVCodecContext {
      * - decoding: set by decoder
      */
     int xvmc_vld_hwslice;
+
 } AVCodecContext;
 
 /**
@@ -2008,6 +2011,7 @@ extern AVCodec mp2_decoder;
 extern AVCodec mp3_decoder;
 extern AVCodec mp3adu_decoder;
 extern AVCodec mp3on4_decoder;
+extern AVCodec qdm2_decoder;
 extern AVCodec mace3_decoder;
 extern AVCodec mace6_decoder;
 extern AVCodec huffyuv_decoder;
@@ -2048,6 +2052,7 @@ extern AVCodec flic_decoder;
 extern AVCodec vmdvideo_decoder;
 extern AVCodec vmdaudio_decoder;
 extern AVCodec truemotion1_decoder;
+extern AVCodec truemotion2_decoder;
 extern AVCodec mszh_decoder;
 extern AVCodec zlib_decoder;
 extern AVCodec ra_144_decoder;
