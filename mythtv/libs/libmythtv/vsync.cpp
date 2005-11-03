@@ -28,7 +28,9 @@
 #include <sys/poll.h>
 
 #include <mythcontext.h>
-#include "util-x11.h"
+#include "mythdialogs.h" // for OpenGL VSync
+#include "videoout_xv.h" // for OpenGL VSync
+#include "util-x11.h"    // for OpenGL VSync
 
 #ifdef USING_OPENGL_VSYNC
 #define GLX_GLXEXT_PROTOTYPES
@@ -50,61 +52,66 @@ bool tryingVideoSync = false;
 int VideoSync::m_forceskip = 0;
 
 #define TESTVIDEOSYNC(NAME) \
-    if (++m_forceskip > skip) \
+    do { if (++m_forceskip > skip) \
     { \
-        trial = new NAME (frame_interval, refresh_interval, interlaced); \
+        trial = new NAME (video_output,     frame_interval, \
+                          refresh_interval, halve_frame_interval); \
         if (trial->TryInit()) \
         { \
 	    m_forceskip = skip; \
-	    tryingVideoSync=false; \
+	    tryingVideoSync = false; \
 	    return trial; \
         } \
         delete trial; \
-    }
+    } } while (false)
 
-/** \fn VideoSync::BestMethod(int, int, bool)
+/** \fn VideoSync::BestMethod(VideoOutput*,uint,uint,bool)
  *  \brief Returns the most sophisticated video sync method available.
  */
-VideoSync *VideoSync::BestMethod(int frame_interval, int refresh_interval,
-                                 bool interlaced)
+VideoSync *VideoSync::BestMethod(VideoOutput *video_output,
+                                 uint frame_interval, uint refresh_interval,
+                                 bool halve_frame_interval)
 {
-    VideoSync *trial;
+    VideoSync *trial = NULL;
+    tryingVideoSync  = true;
+    bool tryOpenGL   = (gContext->GetNumSetting("UseOpenGLVSync", 1) &&
+                        (getenv("NO_OPENGL_VSYNC") == NULL));
 
-    tryingVideoSync=true;
-    int skip=0;
-    if (m_forceskip!=0)
+    // m_forceskip allows for skipping one sync method
+    // due to crash on the previous run.
+    int skip = 0;
+    if (m_forceskip)
     {
         VERBOSE(VB_PLAYBACK, QString("A previous trial crashed,"
 		" skipping %1").arg(m_forceskip));
     
-	skip=m_forceskip;
-	m_forceskip=0;
+	skip = m_forceskip;
+	m_forceskip = 0;
     }
     
-    TESTVIDEOSYNC(nVidiaVideoSync)
-    TESTVIDEOSYNC(DRMVideoSync)
-#ifdef USING_OPENGL_VSYNC
-    if ((gContext->GetNumSetting("UseOpenGLVSync", 1)) && (getenv("NO_OPENGL_VSYNC") == NULL))
-    {
-        TESTVIDEOSYNC(OpenGLVideoSync)
-    }
-#endif
+    TESTVIDEOSYNC(nVidiaVideoSync);
+    TESTVIDEOSYNC(DRMVideoSync);
+    if (tryOpenGL)
+        TESTVIDEOSYNC(OpenGLVideoSync);
 #ifdef __linux__
-    TESTVIDEOSYNC(RTCVideoSync)
+    TESTVIDEOSYNC(RTCVideoSync);
 #endif
-    TESTVIDEOSYNC(BusyWaitVideoSync)
+    TESTVIDEOSYNC(BusyWaitVideoSync);
 
     tryingVideoSync=false;
     return NULL;
 }
 
-/** \fn VideoSync::VideoSync(int, int, bool)
- *  \brief Used by BestMethod(int, int, bool) to initialize
+/** \fn VideoSync::VideoSync(VideoOutput*,int,int,bool)
+ *  \brief Used by BestMethod(VideoOutput*,uint,uint,bool) to initialize
  *         video synchronization method.
  */
-VideoSync::VideoSync(int frameint, int refreshint, bool interlaced) :
-    m_frame_interval(frameint), m_refresh_interval(refreshint), 
-    m_interlaced(interlaced) 
+VideoSync::VideoSync(VideoOutput *video_output,
+                     int frameint, int refreshint,
+                     bool halve_frame_interval) :
+    m_video_output(video_output),
+    m_frame_interval(frameint), m_refresh_interval(refreshint),
+    m_interlaced(halve_frame_interval) 
 {
     if (m_interlaced && m_refresh_interval > m_frame_interval/2)
         m_interlaced = false; // can't display both fields at 2x rate
@@ -112,7 +119,7 @@ VideoSync::VideoSync(int frameint, int refreshint, bool interlaced) :
     //cout << "Frame interval: " << m_frame_interval << endl;
 }
 
-void VideoSync::Start()
+void VideoSync::Start(void)
 {
     gettimeofday(&m_nexttrigger, NULL); // now
 }
@@ -253,10 +260,12 @@ static int drmWaitVBlank(int fd, drm_wait_vblank_t *vbl)
 
 char *DRMVideoSync::sm_dri_dev = "/dev/dri/card0";
 
-DRMVideoSync::DRMVideoSync(int fr, int ri, bool intl) : VideoSync(fr, ri, intl)
+DRMVideoSync::DRMVideoSync(VideoOutput *vo, int fr, int ri, bool intl) :
+    VideoSync(vo, fr, ri, intl)
 {
     m_dri_fd = -1;
 }
+
 DRMVideoSync::~DRMVideoSync()
 {
     if (m_dri_fd >= 0)
@@ -264,7 +273,7 @@ DRMVideoSync::~DRMVideoSync()
     m_dri_fd = -1;
 }
 
-bool DRMVideoSync::TryInit()
+bool DRMVideoSync::TryInit(void)
 {
     drm_wait_vblank_t blank;
 
@@ -288,7 +297,7 @@ bool DRMVideoSync::TryInit()
     return true;
 }
 
-void DRMVideoSync::Start()
+void DRMVideoSync::Start(void)
 {
     // Wait for a refresh so we start out synched
     drm_wait_vblank_t blank;
@@ -333,7 +342,7 @@ void DRMVideoSync::WaitForFrame(int sync_delay)
     }
 }
 
-void DRMVideoSync::AdvanceTrigger()
+void DRMVideoSync::AdvanceTrigger(void)
 {
     KeepPhase();
     UpdateNexttrigger();
@@ -341,8 +350,11 @@ void DRMVideoSync::AdvanceTrigger()
 
 char *nVidiaVideoSync::sm_nvidia_dev = "/dev/nvidia0";
 
-nVidiaVideoSync::nVidiaVideoSync(int fi, int ri, bool intr) : 
-    VideoSync(fi, ri, intr) {}
+nVidiaVideoSync::nVidiaVideoSync(VideoOutput *vo,
+                                 int fi, int ri, bool intr) : 
+    VideoSync(vo, fi, ri, intr)
+{
+}
 
 nVidiaVideoSync::~nVidiaVideoSync()
 {
@@ -368,7 +380,7 @@ bool nVidiaVideoSync::dopoll() const
     return true;
 }
 
-bool nVidiaVideoSync::TryInit()
+bool nVidiaVideoSync::TryInit(void)
 {
     m_nvidia_fd = open(sm_nvidia_dev, O_RDONLY);
     if (m_nvidia_fd < 0)
@@ -388,7 +400,7 @@ bool nVidiaVideoSync::TryInit()
     return true;
 }
 
-void nVidiaVideoSync::Start()
+void nVidiaVideoSync::Start(void)
 {
     dopoll();
     VideoSync::Start();
@@ -415,45 +427,51 @@ void nVidiaVideoSync::WaitForFrame(int sync_delay)
     }
 }
 
-void nVidiaVideoSync::AdvanceTrigger()
+void nVidiaVideoSync::AdvanceTrigger(void)
 {
     KeepPhase();
     UpdateNexttrigger();
 }
 
-#ifdef USING_OPENGL_VSYNC
-OpenGLVideoSync::OpenGLVideoSync(int frame_interval, int refresh_interval,
+OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
+                                 int frame_interval, int refresh_interval,
                                  bool interlaced)
-    : VideoSync(frame_interval, refresh_interval, interlaced),
+    : VideoSync(video_output, frame_interval, refresh_interval, interlaced),
       m_display(NULL), m_drawable(0), m_context(0)
 {
 }
 
 OpenGLVideoSync::~OpenGLVideoSync()
 {
+#ifdef USING_OPENGL_VSYNC
     if (m_display)
     {
+        Stop();
         if (m_context)
-            glXDestroyContext(m_display, m_context);
+            X11S(glXDestroyContext(m_display, m_context));
         if (m_drawable)
             X11S(XDestroyWindow(m_display, m_drawable));
-        X11S(XCloseDisplay(m_display));
     }
+#endif /* USING_OPENGL_VSYNC */
 }
 
-/** \fn OpenGLVideoSync::TryInit()
+/** \fn OpenGLVideoSync::TryInit(void)
  *  \brief Try to create an OpenGL surface so we can use glXWaitVideoSyncSGI:
  *  \return true if this method can be employed, false if it can not.
  */
-bool OpenGLVideoSync::TryInit()
+bool OpenGLVideoSync::TryInit(void)
 {
-    X11S(m_display = XOpenDisplay(NULL));
-    if (m_display == NULL)
-    {
-        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Could not"
-                " open X Window Display.")/*arg(XErrorMessage)*/;
+#ifdef USING_OPENGL_VSYNC
+    VideoOutputXv *vo =  dynamic_cast<VideoOutputXv*>(m_video_output);
+    if (!vo)
         return false;
+
+    if (!vo->XJ_disp)
+    {
+        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: "
+                "VideoOutputXv does not have X Window Display.");
     }
+    m_display = vo->XJ_disp;
 
     /* Look for GLX at all */
     int ndummy;
@@ -468,7 +486,8 @@ bool OpenGLVideoSync::TryInit()
     /* Look for video sync extension */
     const char *xt = NULL;
     X11S(xt = glXQueryExtensionsString(m_display, DefaultScreen(m_display)));
-    VERBOSE(VB_PLAYBACK, QString("OpenGLVideoSync: GLX extensions: %1").arg(xt));
+    VERBOSE(VB_PLAYBACK, QString("OpenGLVideoSync: GLX extensions: %1")
+            .arg(xt));
     if (strstr(xt, "GLX_SGI_video_sync") == NULL)
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: GLX Video Sync"
@@ -484,8 +503,8 @@ bool OpenGLVideoSync::TryInit()
     XVisualInfo *vis;
     XSetWindowAttributes swa;
     Window w;
-    
-    X11S(vis = glXChooseVisual(m_display, DefaultScreen(m_display), attribList));
+
+    X11S(vis = glXChooseVisual(m_display, vo->XJ_screen_num, attribList));
     if (vis == NULL) 
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: No appropriate visual found");
@@ -499,8 +518,14 @@ bool OpenGLVideoSync::TryInit()
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create colormap");
         return false;
     }
+
+    MythMainWindow *mainWindow = gContext->GetMainWindow();
+    uint x = mainWindow->x() + (mainWindow->width()/2);
+    uint y = mainWindow->y() + (mainWindow->height()/2);
+    VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: x,y -> "<<x<<", "<<y);
     X11S(w = XCreateWindow(m_display, RootWindow(m_display, vis->screen),
-                           0, 0, 1, 1, 0, vis->depth, InputOutput,
+                           x, y, 1 /*width*/, 1 /*height*/,
+                           0 /*border width*/, vis->depth, InputOutput,
                            vis->visual, CWColormap, &swa));
     if (w == 0)
     {
@@ -538,6 +563,9 @@ bool OpenGLVideoSync::TryInit()
                 "OpenGLVideoSync: Failed to make GLX context current context");
         return false;
     }
+#else
+    return false;
+#endif /* USING_OPENGL_VSYNC */
 }
 
 /** \fn checkGLSyncError(const QString&, int)
@@ -547,6 +575,7 @@ bool OpenGLVideoSync::TryInit()
  */
 bool checkGLSyncError(const QString& hdr, int err)
 {
+#ifdef USING_OPENGL_VSYNC
     QString errStr("");
     switch (err)
     {
@@ -568,10 +597,14 @@ bool checkGLSyncError(const QString& hdr, int err)
         return false;
     }
     return true;
+#else
+    return false;
+#endif /* USING_OPENGL_VSYNC */
 }
 
-void OpenGLVideoSync::Start()
+void OpenGLVideoSync::Start(void)
 {
+#ifdef USING_OPENGL_VSYNC
     int err;
     // Bind OpenGL context to current thread.
     X11S(err = glXMakeCurrent(m_display, m_drawable, m_context));
@@ -591,10 +624,12 @@ void OpenGLVideoSync::Start()
 
     // Initialize next trigger 
     VideoSync::Start();
+#endif /* USING_OPENGL_VSYNC */
 }
 
 void OpenGLVideoSync::WaitForFrame(int sync_delay)
 {
+#ifdef USING_OPENGL_VSYNC
     const QString msg1("First A/V Sync"), msg2("Second A/V Sync");
     OffsetTimeval(m_nexttrigger, sync_delay);
 
@@ -618,28 +653,32 @@ void OpenGLVideoSync::WaitForFrame(int sync_delay)
         checkGLSyncError(msg2, err);
         m_delay = CalcDelay();
     }
+#endif /* USING_OPENGL_VSYNC */
 }
 
-void OpenGLVideoSync::AdvanceTrigger()
+void OpenGLVideoSync::AdvanceTrigger(void)
 {
+#ifdef USING_OPENGL_VSYNC
     KeepPhase();
     UpdateNexttrigger();
+#endif /* USING_OPENGL_VSYNC */
 }
 
-/** \fn OpenGLVideoSync::Stop()
+/** \fn OpenGLVideoSync::Stop(void)
  *  \brief Stops VSync; must be called from main thread.
  *
  */
-void OpenGLVideoSync::Stop()
+void OpenGLVideoSync::Stop(void)
 {
+#ifdef USING_OPENGL_VSYNC
     X11S(glXMakeCurrent(m_display, 0, 0));
-}
 #endif /* USING_OPENGL_VSYNC */
+}
 
 #ifdef __linux__
 #define RTCRATE 1024
-RTCVideoSync::RTCVideoSync(int fi, int ri, bool intr) :
-    VideoSync(fi, ri, intr)
+RTCVideoSync::RTCVideoSync(VideoOutput *vo, int fi, int ri, bool intr) :
+    VideoSync(vo, fi, ri, intr)
 {
     m_rtcfd = -1;
 }
@@ -650,7 +689,7 @@ RTCVideoSync::~RTCVideoSync()
         close(m_rtcfd);
 }
 
-bool RTCVideoSync::TryInit()
+bool RTCVideoSync::TryInit(void)
 {
     m_rtcfd = open("/dev/rtc", O_RDONLY);
     if (m_rtcfd < 0)
@@ -692,14 +731,15 @@ void RTCVideoSync::WaitForFrame(int sync_delay)
     }
 }
 
-void RTCVideoSync::AdvanceTrigger()
+void RTCVideoSync::AdvanceTrigger(void)
 {
     UpdateNexttrigger();
 }
 #endif /* __linux__ */
 
-BusyWaitVideoSync::BusyWaitVideoSync(int fr, int ri, bool intl) : 
-    VideoSync(fr, ri, intl) 
+BusyWaitVideoSync::BusyWaitVideoSync(VideoOutput *vo,
+                                     int fr, int ri, bool intl) : 
+    VideoSync(vo, fr, ri, intl) 
 {
     m_cheat = 5000;
     m_fudge = 0;
@@ -709,7 +749,7 @@ BusyWaitVideoSync::~BusyWaitVideoSync()
 {
 }
 
-bool BusyWaitVideoSync::TryInit()
+bool BusyWaitVideoSync::TryInit(void)
 {
     return true;
 }
@@ -744,13 +784,14 @@ void BusyWaitVideoSync::WaitForFrame(int sync_delay)
     }
 }
 
-void BusyWaitVideoSync::AdvanceTrigger()
+void BusyWaitVideoSync::AdvanceTrigger(void)
 {
     UpdateNexttrigger();
 }
 
-USleepVideoSync::USleepVideoSync(int fr, int ri, bool intl) : 
-    VideoSync(fr, ri, intl) 
+USleepVideoSync::USleepVideoSync(VideoOutput *vo,
+                                 int fr, int ri, bool intl) : 
+    VideoSync(vo, fr, ri, intl)
 {
 }
 
@@ -758,7 +799,7 @@ USleepVideoSync::~USleepVideoSync()
 {
 }
 
-bool USleepVideoSync::TryInit()
+bool USleepVideoSync::TryInit(void)
 {
     return true;
 }
@@ -773,7 +814,7 @@ void USleepVideoSync::WaitForFrame(int sync_delay)
         usleep(m_delay);
 }
 
-void USleepVideoSync::AdvanceTrigger()
+void USleepVideoSync::AdvanceTrigger(void)
 {
     UpdateNexttrigger();
 }

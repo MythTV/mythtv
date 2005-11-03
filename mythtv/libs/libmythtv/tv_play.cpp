@@ -1209,11 +1209,6 @@ void TV::TeardownPlayer(void)
     if (nvp)
     {
         QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal using osd...
-        // Stop the player's video sync method.  Do so from this
-        // main thread to work around a potential OpenGL bug.
-        VideoSync *vs = nvp->getVideoSync();
-        if (vs != NULL)
-            vs->Stop();
         pthread_join(decode, NULL);
         delete nvp;
         nvp = NULL;

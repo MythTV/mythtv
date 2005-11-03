@@ -205,11 +205,11 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
     if (videoFilters)
         delete videoFilters;
 
-    if (videoOutput)
-        delete videoOutput;
-
     if (videosync)
         delete videosync;
+
+    if (videoOutput)
+        delete videoOutput;
 }
 
 void NuppelVideoPlayer::SetWatchingRecording(bool mode)
@@ -573,7 +573,8 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (videosync != NULL && m_double_framerate)
     {
         videosync->SetFrameInterval(frame_interval, m_double_framerate);
-        if (!videosync->isInterlaced()) {
+        if (videosync->UsesFrameInterval())
+        {
             VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
                     "framerate (refresh rate too low for bob deint)");
             m_scan = kScan_Ignore;
@@ -1663,31 +1664,36 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
     refreshrate = frame_interval;
 
     float temp_speed = (play_speed == 0.0) ? audio_stretchfactor : play_speed;
-    int fr_int = (int)(1000000.0 / video_frame_rate / temp_speed);
+    uint fr_int = (int)(1000000.0 / video_frame_rate / temp_speed);
+    uint rf_int = 0;
+    if (videoOutput)
+        rf_int = videoOutput->GetRefreshRate();
+
     if (using_null_videoout)
     {
-        videosync = new USleepVideoSync(fr_int, 0, false);
+        videosync = new USleepVideoSync(videoOutput, (int)fr_int, 0, false);
     }
-    else
+    else if (videoOutput)
     {
         // Set up deinterlacing in the video output method
         m_double_framerate = false;
-        if (m_scan == kScan_Interlaced && m_DeintSetting) {
-            if (videoOutput && videoOutput->SetupDeinterlace(true)) {
-                if (videoOutput->NeedsDoubleFramerate())
-                {
-                    m_double_framerate = true;
-                    m_can_double = true;
-                }
-            }
+        if (m_scan == kScan_Interlaced && m_DeintSetting &&
+            videoOutput->SetupDeinterlace(true) &&
+            videoOutput->NeedsDoubleFramerate())
+        {
+            m_double_framerate = true;
+            m_can_double       = true;
         }
+
         videosync = VideoSync::BestMethod(
-            fr_int, videoOutput->GetRefreshRate(), m_double_framerate);
+            videoOutput, fr_int, rf_int, m_double_framerate);
+
         // Make sure video sync can do it
         if (videosync != NULL && m_double_framerate)
         {
             videosync->SetFrameInterval(frame_interval, m_double_framerate);
-            if (!videosync->isInterlaced()) {
+            if (videosync->UsesFrameInterval())
+            {
                 m_scan = kScan_Ignore;
                 m_double_framerate = false;
                 m_can_double = false;
@@ -1695,6 +1701,11 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
                     videoOutput->SetupDeinterlace(false);
             }
         }
+    }
+    if (!videosync)
+    {
+        videosync = new BusyWaitVideoSync(
+            videoOutput, (int)fr_int, (int)rf_int, m_double_framerate);
     }
 
     InitAVSync();
@@ -1718,10 +1729,14 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             DisplayNormalFrame();
     }
 
-    vidExitLock.lock();
-    delete videoOutput;
-    videoOutput = NULL;
-    vidExitLock.unlock();
+    {
+        QMutexLocker locker(&vidExitLock);
+        delete videosync;
+        videosync = NULL;
+
+        delete videoOutput;
+        videoOutput = NULL;
+    }
 
     ShutdownAVSync();
 }

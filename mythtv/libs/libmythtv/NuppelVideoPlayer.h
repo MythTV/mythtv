@@ -144,7 +144,6 @@ class NuppelVideoPlayer
     OSD         *GetOSD(void)                 { return osd; }
     VideoOutput *getVideoOutput(void)         { return videoOutput; }
     AudioOutput *getAudioOutput(void)         { return audioOutput; }
-    VideoSync   *getVideoSync(void)           { return videosync; }
     char        *GetScreenGrab(int secondsin, int &buflen,
                                int &vw, int &vh, float &ar);
 

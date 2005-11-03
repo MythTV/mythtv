@@ -19,30 +19,10 @@
 #ifndef VSYNC_H_INCLUDED
 #define VSYNC_H_INCLUDED
 
-/* Notes 
-
-   This set of classes implements a variety of algorithms for synching
-   video frames to a display.  The better algorithms synchronize to
-   the display's refresh rate, and also attempt to maintain phase with
-   respect to the vertical retrace.  The poorer algorithms simply try
-   to display frames at a regular interval.
-
-   The factory method BestMethod tries subclasses in roughly quality
-   order until one succeeds.
-
-   A/V sync methods may supply an additonal delay per frame.  Other
-   than that, video timing is entirely up to these classes.  When
-   WaitForFrame returns, it is time to show the frame.
-
-   There is some basic support for interlaced video timing where the
-   fields need to be displayed sequentially.  Passing true for the
-   interlaced flags for the constructors, BestMethod, and
-   SetFrameInterval will cause us to wait for half the specified frame
-   interval, if the refresh rate is sufficient to do so.
- */
-
 #include <sys/time.h>
 #include <time.h>
+
+class VideoOutput;
 
 #ifdef USING_OPENGL_VSYNC
 typedef unsigned long XID;
@@ -53,59 +33,89 @@ typedef struct _XDisplay Display;
 
 extern bool tryingVideoSync;
 
-/// \brief Virtual base class for all video synchronization classes.
+/** \class VideoSync
+ *  \brief Virtual base class for all video synchronization classes.
+ *
+ *   This set of classes implements a variety of algorithms for synching
+ *   video frames to a display. The better algorithms synchronize to
+ *   the display's refresh rate, and also attempt to maintain phase with
+ *   respect to the vertical retrace. The poorer algorithms simply try
+ *   to display frames at a regular interval.
+ *
+ *   The factory method BestMethod tries subclasses in roughly quality
+ *   order until one succeeds.
+ *
+ *   A/V sync methods may supply an additonal delay per frame. Other
+ *   than that, video timing is entirely up to these classes. When
+ *   WaitForFrame returns, it is time to show the frame.
+ *
+ *   There is some basic support for interlaced video timing where the
+ *   fields need to be displayed sequentially. Passing true for the
+ *   interlaced flags for the constructors, BestMethod, and
+ *   SetFrameInterval will cause us to wait for half the specified frame
+ *   interval, if the refresh rate is sufficient to do so.
+ */
 class VideoSync
 // virtual base class
 {
- public:
-    VideoSync(int fi, int ri, bool intr);
+  public:
+    VideoSync(VideoOutput*, int fi, int ri, bool intr);
     virtual ~VideoSync() {}
 
     /// \brief Returns name of instanciated VSync method.
-    virtual QString getName() const = 0;
+    virtual QString getName(void) const = 0;
     /// \brief Tries to initialize VSync method.
-    virtual bool TryInit() = 0;
+    virtual bool TryInit(void) = 0;
 
     /** \brief Start VSync; must be called from main thread.
      *
-     *   Start(), WaitForFrame(), and Stop() should always be called
-     *   from same thread, to prevent bad interactions with pthreads.
+     *   Start(void), WaitForFrame(void), and Stop(void) should 
+     *   always be called from same thread, to prevent bad 
+     *   interactions with pthreads.
      */
-    virtual void Start();
+    virtual void Start(void);
 
     /** \brief Waits for next a frame or field.
      *
-     *   Start(), WaitForFrame(), and Stop() should always be called
-     *   from same thread, to prevent bad interactions with pthreads.
+     *   Start(void), WaitForFrame(void), and Stop(void) should
+     *   always be called from same thread, to prevent bad
+     *   interactions with pthreads.
      *
      *  \param sync_delay time until the desired frame or field
-     *  \sa CalcDelay(), KeepPhase()
+     *  \sa CalcDelay(void), KeepPhase(void)
      */
     virtual void WaitForFrame(int sync_delay) = 0;
 
-    /// \brief Use the next frame or field for CalcDelay() and WaitForFrame(int).
-    virtual void AdvanceTrigger() = 0;
+    /// \brief Use the next frame or field for CalcDelay(void)
+    ///        and WaitForFrame(int).
+    virtual void AdvanceTrigger(void) = 0;
 
     void SetFrameInterval(int fi, bool interlaced);
 
-    /// \brief Returns whether AdvanceTrigger() advances
-    ///        a field or frame at a time.
-    bool isInterlaced() const { return m_interlaced; }
+    /// \brief Returns true AdvanceTrigger(void) advances a field at a time.
+    bool UsesFieldInterval(void) const { return m_interlaced; }
+    /// \brief Returns true AdvanceTrigger(void) advances a frame at a time.
+    bool UsesFrameInterval(void) const { return !m_interlaced; }
 
     /** \brief Stops VSync; must be called from main thread.
      *
-     *   Start(), WaitForFrame(), and Stop() should always be called
-     *   from same thread, to prevent bad interactions with pthreads.
+     *   Start(void), WaitForFrame(void), and Stop(void) should
+     *   always be called from same thread, to prevent bad
+     *   interactions with pthreads.
      */
-    virtual void Stop() {}
-    static VideoSync *BestMethod(int frame_interval, int refresh_interval,
-                                 bool interlaced);
- protected:
-    static void OffsetTimeval(struct timeval& tv, int offset);
-    void UpdateNexttrigger();
-    int CalcDelay();
-    void KeepPhase();
+    virtual void Stop(void) {}
 
+    // documented in vsync.cpp
+    static VideoSync *BestMethod(VideoOutput*,
+                                 uint frame_interval, uint refresh_interval,
+                                 bool interlaced);
+  protected:
+    static void OffsetTimeval(struct timeval& tv, int offset);
+    void UpdateNexttrigger(void);
+    int CalcDelay(void);
+    void KeepPhase(void);
+
+    VideoOutput *m_video_output;
     int m_frame_interval; // of video
     int m_refresh_interval; // of display
     bool m_interlaced;
@@ -123,17 +133,18 @@ class VideoSync
  */
 class DRMVideoSync : public VideoSync
 {
- public:
-    DRMVideoSync(int frame_interval, int refresh_interval, bool interlaced);
+  public:
+    DRMVideoSync(VideoOutput*,
+                 int frame_interval, int refresh_interval, bool interlaced);
     ~DRMVideoSync();
 
-    QString getName() const { return QString("DRM"); }
-    bool TryInit();
-    void Start();
+    QString getName(void) const { return QString("DRM"); }
+    bool TryInit(void);
+    void Start(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger();
+    void AdvanceTrigger(void);
 
- private:
+  private:
     int m_dri_fd;
     static char *sm_dri_dev;
     
@@ -148,27 +159,27 @@ class DRMVideoSync : public VideoSync
  */
 class nVidiaVideoSync : public VideoSync
 {
- public:
-    nVidiaVideoSync(int frame_interval, int refresh_interval, bool interlaced);
+  public:
+    nVidiaVideoSync(VideoOutput*,
+                    int frame_interval, int refresh_interval, bool interlaced);
     ~nVidiaVideoSync();
 
-    QString getName() const { return QString("nVidia polling"); }
-    bool TryInit();
-    void Start();
+    QString getName(void) const { return QString("nVidia polling"); }
+    bool TryInit(void);
+    void Start(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger();
+    void AdvanceTrigger(void);
 
- private:
-    bool dopoll() const;
+  private:
+    bool dopoll(void) const;
     int m_nvidia_fd;
     static char *sm_nvidia_dev;
 };
 
-#ifdef USING_OPENGL_VSYNC
 /** \brief Video synchronization class employing SGI_video_sync
  *         OpenGL extension.
  *
- *   Uses glXWaitVideoSyncSGI() to wait for retrace.  Phase-maintaining,
+ *   Uses glXWaitVideoSyncSGI() to wait for retrace. Phase-maintaining,
  *   meaning WaitForFrame should always return approximately the same time 
  *   after a vertical retrace.
  *
@@ -179,7 +190,7 @@ class nVidiaVideoSync : public VideoSync
  *   and OpenGL. OpenGL DIRECT contexts can not be shared between
  *   processes. And some pthread implementations, notably a common
  *   one on Linux, treat each thread as a seperate process.
- *   Hence Start(), Stop() and WaitForFrame() must all be called
+ *   Hence Start(void), Stop(void) and WaitForFrame(void) must all be called
  *   from the same thread.
  *
  *  \sa http://osgcvs.no-ip.com/osgarchiver/archives/June2002/0022.html
@@ -188,23 +199,23 @@ class nVidiaVideoSync : public VideoSync
  */
 class OpenGLVideoSync : public VideoSync
 {
-public:
-    OpenGLVideoSync(int frame_interval, int refresh_interval, bool interlaced);
+  public:
+    OpenGLVideoSync(VideoOutput*,
+                    int frame_interval, int refresh_interval, bool interlaced);
     ~OpenGLVideoSync();
 
-    QString getName() const { return QString("SGI OpenGL"); }
-    bool TryInit();
-    void Start();
+    QString getName(void) const { return QString("SGI OpenGL"); }
+    bool TryInit(void);
+    void Start(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger();
-    void Stop();
+    void AdvanceTrigger(void);
+    void Stop(void);
 
-private:
+  private:
     Display *m_display;
     GLXDrawable m_drawable;
     GLXContext m_context;
 };
-#endif /* USING_OPENGL_VSYNC */
 
 #ifdef __linux__
 /** \brief Video synchronization class employing /dev/rtc
@@ -219,16 +230,17 @@ private:
  */
 class RTCVideoSync : public VideoSync
 {
-public:
-    RTCVideoSync(int frame_interval, int refresh_interval, bool interlaced);
+  public:
+    RTCVideoSync(VideoOutput*,
+                 int frame_interval, int refresh_interval, bool interlaced);
     ~RTCVideoSync();
 
-    QString getName() const { return QString("RTC"); }
-    bool TryInit();
+    QString getName(void) const { return QString("RTC"); }
+    bool TryInit(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger();
+    void AdvanceTrigger(void);
 
-private:
+  private:
     int m_rtcfd;
 };
 #endif
@@ -240,22 +252,23 @@ private:
  *
  *  This method does not maintain phase and uses the most CPU of any of
  *  the VSync methods. But it is the catch-all fallback algorithm,
- *  TryInit() always succeeds.
+ *  TryInit(void) always succeeds.
  *
  */
 class BusyWaitVideoSync : public VideoSync
 {
-public:
-    BusyWaitVideoSync(int frame_interval, int refresh_interval, 
+  public:
+    BusyWaitVideoSync(VideoOutput*,
+                      int frame_interval, int refresh_interval, 
                       bool interlaced);
     ~BusyWaitVideoSync();
 
-    QString getName() const { return QString("USleep with busy wait"); }
-    bool TryInit();
+    QString getName(void) const { return QString("USleep with busy wait"); }
+    bool TryInit(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger();
+    void AdvanceTrigger(void);
 
-private:
+  private:
     int m_cheat;
     int m_fudge;
 };
@@ -272,14 +285,15 @@ private:
  */
 class USleepVideoSync : public VideoSync
 {
-public:
-    USleepVideoSync(int frame_interval, int refresh_interval, 
-                          bool interlaced);
+  public:
+    USleepVideoSync(VideoOutput*,
+                    int frame_interval, int refresh_interval, 
+                    bool interlaced);
     ~USleepVideoSync();
 
-    QString getName() const { return QString("USleep"); }
-    bool TryInit();
+    QString getName(void) const { return QString("USleep"); }
+    bool TryInit(void);
     void WaitForFrame(int sync_delay);
-    void AdvanceTrigger();
+    void AdvanceTrigger(void);
 };
 #endif /* VSYNC_H_INCLUDED */

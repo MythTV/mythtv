@@ -42,6 +42,7 @@ typedef enum VideoOutputSubType {
 class VideoOutputXv : public VideoOutput
 {
     friend class ChromaKeyOSD;
+    friend class OpenGLVideoSync;
   public:
     VideoOutputXv(MythCodecID av_codec_id);
    ~VideoOutputXv();
