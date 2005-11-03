@@ -24,11 +24,11 @@
 
 class VideoOutput;
 
+typedef unsigned long GLXDrawable;
 #ifdef USING_OPENGL_VSYNC
-typedef unsigned long XID;
-typedef XID GLXDrawable;
 typedef struct __GLXcontextRec *GLXContext;
-typedef struct _XDisplay Display;
+#else 
+typedef void *GLXContext;
 #endif
 
 extern bool tryingVideoSync;
@@ -212,9 +212,8 @@ class OpenGLVideoSync : public VideoSync
     void Stop(void);
 
   private:
-    Display *m_display;
     GLXDrawable m_drawable;
-    GLXContext m_context;
+    GLXContext  m_context;
 };
 
 #ifdef __linux__

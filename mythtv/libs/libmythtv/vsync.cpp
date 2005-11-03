@@ -437,20 +437,21 @@ OpenGLVideoSync::OpenGLVideoSync(VideoOutput *video_output,
                                  int frame_interval, int refresh_interval,
                                  bool interlaced)
     : VideoSync(video_output, frame_interval, refresh_interval, interlaced),
-      m_display(NULL), m_drawable(0), m_context(0)
+      m_drawable(0), m_context(0)
 {
 }
 
 OpenGLVideoSync::~OpenGLVideoSync()
 {
 #ifdef USING_OPENGL_VSYNC
-    if (m_display)
+    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
+    if (vo && vo->XJ_disp)
     {
         Stop();
         if (m_context)
-            X11S(glXDestroyContext(m_display, m_context));
+            X11S(glXDestroyContext(vo->XJ_disp, m_context));
         if (m_drawable)
-            X11S(XDestroyWindow(m_display, m_drawable));
+            X11S(XDestroyWindow(vo->XJ_disp, m_drawable));
     }
 #endif /* USING_OPENGL_VSYNC */
 }
@@ -464,19 +465,22 @@ bool OpenGLVideoSync::TryInit(void)
 #ifdef USING_OPENGL_VSYNC
     VideoOutputXv *vo =  dynamic_cast<VideoOutputXv*>(m_video_output);
     if (!vo)
+    {
+        VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: No VideoOutput.");
         return false;
+    }
 
     if (!vo->XJ_disp)
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: "
                 "VideoOutputXv does not have X Window Display.");
+        return false;
     }
-    m_display = vo->XJ_disp;
 
     /* Look for GLX at all */
     int ndummy;
     int ret;
-    X11S(ret = glXQueryExtension(m_display, &ndummy, &ndummy));
+    X11S(ret = glXQueryExtension(vo->XJ_disp, &ndummy, &ndummy));
     if (!ret)
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: OpenGL extension not present.");
@@ -485,7 +489,7 @@ bool OpenGLVideoSync::TryInit(void)
 
     /* Look for video sync extension */
     const char *xt = NULL;
-    X11S(xt = glXQueryExtensionsString(m_display, DefaultScreen(m_display)));
+    X11S(xt = glXQueryExtensionsString(vo->XJ_disp, DefaultScreen(vo->XJ_disp)));
     VERBOSE(VB_PLAYBACK, QString("OpenGLVideoSync: GLX extensions: %1")
             .arg(xt));
     if (strstr(xt, "GLX_SGI_video_sync") == NULL)
@@ -504,14 +508,14 @@ bool OpenGLVideoSync::TryInit(void)
     XSetWindowAttributes swa;
     Window w;
 
-    X11S(vis = glXChooseVisual(m_display, vo->XJ_screen_num, attribList));
+    X11S(vis = glXChooseVisual(vo->XJ_disp, vo->XJ_screen_num, attribList));
     if (vis == NULL) 
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: No appropriate visual found");
         return false;
     }
-    X11S(swa.colormap = XCreateColormap(m_display,
-                                        RootWindow(m_display, vis->screen),
+    X11S(swa.colormap = XCreateColormap(vo->XJ_disp,
+                                        RootWindow(vo->XJ_disp, vis->screen),
                                         vis->visual, AllocNone));
     if (swa.colormap == 0)
     {
@@ -523,7 +527,7 @@ bool OpenGLVideoSync::TryInit(void)
     uint x = mainWindow->x() + (mainWindow->width()/2);
     uint y = mainWindow->y() + (mainWindow->height()/2);
     VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: x,y -> "<<x<<", "<<y);
-    X11S(w = XCreateWindow(m_display, RootWindow(m_display, vis->screen),
+    X11S(w = XCreateWindow(vo->XJ_disp, RootWindow(vo->XJ_disp, vis->screen),
                            x, y, 1 /*width*/, 1 /*height*/,
                            0 /*border width*/, vis->depth, InputOutput,
                            vis->visual, CWColormap, &swa));
@@ -534,13 +538,13 @@ bool OpenGLVideoSync::TryInit(void)
     }
     m_drawable = w;
 
-    X11S(m_context = glXCreateContext(m_display, vis, None, GL_TRUE));
+    X11S(m_context = glXCreateContext(vo->XJ_disp, vis, None, GL_TRUE));
     if (m_context == NULL)
     {
         VERBOSE(VB_PLAYBACK, "OpenGLVideoSync: Failed to create GLX context");
         return false;
     }
-    X11S(ret = glXMakeCurrent(m_display, m_drawable, m_context));
+    X11S(ret = glXMakeCurrent(vo->XJ_disp, m_drawable, m_context));
     if (ret != False)
     {
         unsigned int count;
@@ -575,6 +579,8 @@ bool OpenGLVideoSync::TryInit(void)
  */
 bool checkGLSyncError(const QString& hdr, int err)
 {
+    (void) hdr;
+    (void) err;
 #ifdef USING_OPENGL_VSYNC
     QString errStr("");
     switch (err)
@@ -605,9 +611,13 @@ bool checkGLSyncError(const QString& hdr, int err)
 void OpenGLVideoSync::Start(void)
 {
 #ifdef USING_OPENGL_VSYNC
+    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
+    if (!vo || !vo->XJ_disp)
+        return;
+
     int err;
     // Bind OpenGL context to current thread.
-    X11S(err = glXMakeCurrent(m_display, m_drawable, m_context));
+    X11S(err = glXMakeCurrent(vo->XJ_disp, m_drawable, m_context));
     if (err != True)
     {
         VERBOSE(VB_PLAYBACK,
@@ -629,6 +639,7 @@ void OpenGLVideoSync::Start(void)
 
 void OpenGLVideoSync::WaitForFrame(int sync_delay)
 {
+    (void) sync_delay;
 #ifdef USING_OPENGL_VSYNC
     const QString msg1("First A/V Sync"), msg2("Second A/V Sync");
     OffsetTimeval(m_nexttrigger, sync_delay);
@@ -671,7 +682,9 @@ void OpenGLVideoSync::AdvanceTrigger(void)
 void OpenGLVideoSync::Stop(void)
 {
 #ifdef USING_OPENGL_VSYNC
-    X11S(glXMakeCurrent(m_display, 0, 0));
+    VideoOutputXv *vo = dynamic_cast<VideoOutputXv*>(m_video_output);
+    if (vo && vo->XJ_disp)
+        X11S(glXMakeCurrent(vo->XJ_disp, 0, 0));
 #endif /* USING_OPENGL_VSYNC */
 }
 
