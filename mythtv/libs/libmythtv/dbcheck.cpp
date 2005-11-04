@@ -2161,6 +2161,8 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 
         if (!UpdateDBVersionNumber("1094"))
             return false;
+
+        dbver = "1094";
     }
 
     if (dbver == "1094")
