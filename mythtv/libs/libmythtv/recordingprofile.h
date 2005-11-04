@@ -37,11 +37,12 @@ protected:
 
 class ImageSize;
 
-class RecordingProfile: public ConfigurationWizard {
-protected:
+class RecordingProfile: public ConfigurationWizard
+{
+  protected:
     class ID: virtual public IntegerSetting,
               public AutoIncrementStorage {
-    public:
+      public:
         ID():
             AutoIncrementStorage("recordingprofiles", "id") {
             setVisible(false);
@@ -57,7 +58,7 @@ protected:
     };
 
     class Name: public LineEditSetting, public RecordingProfileParam {
-    public:
+      public:
         Name(const RecordingProfile& parent):
             LineEditSetting(false),
             RecordingProfileParam(parent, "name") {
@@ -65,37 +66,43 @@ protected:
             setLabel(QObject::tr("Profile name"));
         };
     };
-public:
-    RecordingProfile(QString profName = NULL);
 
+  public:
+    // initializers
+    RecordingProfile(QString profName = NULL);
     virtual void loadByID(int id);
     virtual bool loadByCard(QString name, int cardid);
     virtual bool loadByGroup(QString name, QString group);
 
-    static const int TranscoderAutodetect = 0;  /* sentinel value */
-    static const int TranscoderGroup = 6;       /* hard-coded DB value */
+    // sets
+    void setCodecTypes();
+    void setName(const QString& newName);
+
+    // gets
+    const ImageSize& getImageSize(void) const { return *imageSize;       }
+    int     getProfileNum(void)         const { return id->intValue();   }
+    QString getName(void)               const { return name->getValue(); }
+    QString groupType(void)             const;
+
+    // static functions
+    static QString getName(int id);    
     static void fillSelections(SelectSetting* setting,
                                int group, bool foldautodetect = false);
     static void fillSelections(SelectManagedListItem* setting,
                                int group);                           
-                               
-    QString groupType();
-    void setCodecTypes();
-    int getProfileNum(void) const {
-        return id->intValue();
-    };
 
-    QString getName(void) const { return name->getValue(); };
-    static QString getName(int id);
-    void setName(QString newName) { name->setValue(newName); name->setRW(); };
-    const ImageSize& getImageSize(void) const { return *imageSize; };
-    
-private:
-    ID* id;
-    Name* name;
-    ImageSize* imageSize;
-    VideoCompressionSettings *vc;
-    AudioCompressionSettings *ac;
+    // constants
+    static const int TranscoderAutodetect = 0;  ///< sentinel value
+    static const int TranscoderGroup = 6;       ///< hard-coded DB value
+                               
+  private:
+    ID                       *id;
+    Name                     *name;
+    ImageSize                *imageSize;
+    VideoCompressionSettings *videoSettings;
+    AudioCompressionSettings *audioSettings;
+    QString                   profileName;
+    bool                      isEncoder;
 };
 
 class RecordingProfileEditor: public ListBoxSetting, public ConfigurationDialog {

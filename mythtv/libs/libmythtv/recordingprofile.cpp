@@ -716,9 +716,13 @@ public:
 };
 
 RecordingProfile::RecordingProfile(QString profName)
+    : id(new ID()),        name(new Name(*this)),
+      imageSize(NULL),     videoSettings(NULL),
+      audioSettings(NULL), profileName(profName),
+      isEncoder(true)
 {
     // This must be first because it is needed to load/save the other settings
-    addChild(id = new ID());
+    addChild(id);
 
     ConfigurationGroup* profile = new VerticalConfigurationGroup(false);
     QString labelName;
@@ -727,7 +731,7 @@ RecordingProfile::RecordingProfile(QString profName)
     else
         labelName = profName + "->" + QObject::tr("Profile");
     profile->setLabel(labelName);
-    profile->addChild(name = new Name(*this));
+    profile->addChild(name);
 
     if (profName != NULL)
     {
@@ -743,18 +747,38 @@ RecordingProfile::RecordingProfile(QString profName)
     }
 
     addChild(profile);
-
-    QString tvFormat = gContext->GetSetting("TVFormat");
-    addChild(new ImageSize(*this, tvFormat, profName));
-    vc = new VideoCompressionSettings(*this, profName);
-    addChild(vc);
-
-    ac = new AudioCompressionSettings(*this, profName);
-    addChild(ac);
 };
 
 void RecordingProfile::loadByID(int profileId) 
 {
+    MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "SELECT cardtype "
+        "FROM profilegroups, recordingprofiles "
+        "WHERE profilegroups.id     = recordingprofiles.profilegroup AND "
+        "      recordingprofiles.id = :PROFILEID");
+    result.bindValue(":PROFILEID", profileId);
+
+    if (!result.exec() || !result.isActive())
+        MythContext::DBError("RecordingProfile::loadByID -- cardtype", result);
+    else if (result.next())
+    {
+        QString type = result.value(0).toString();
+        isEncoder = (type != "DVB" && type != "HDTV");
+    }
+
+    if (isEncoder)
+    {
+        QString tvFormat = gContext->GetSetting("TVFormat");
+        addChild(new ImageSize(*this, tvFormat, profileName));
+
+        videoSettings = new VideoCompressionSettings(*this, profileName);
+        addChild(videoSettings);
+
+        audioSettings = new AudioCompressionSettings(*this, profileName);
+        addChild(audioSettings);
+    }
+
     id->setValue(profileId);
     load();
 }
@@ -765,17 +789,19 @@ bool RecordingProfile::loadByCard(QString name, int cardid)
     int recid = 0;
 
     MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "SELECT recordingprofiles.id, profilegroups.hostname, "
+        "       profilegroups.is_default "
+        "FROM recordingprofiles, profilegroups, capturecard "
+        "WHERE profilegroups.id       = recordingprofiles.profilegroup AND "
+        "      capturecard.cardtype   = profilegroups.cardtype         AND "
+        "      capturecard.cardid     = :CARDID                        AND "
+        "      recordingprofiles.name = :NAME");
+    result.bindValue(":CARDID", cardid);
+    result.bindValue(":NAME", name);
 
-    QString querystr = QString("SELECT recordingprofiles.id, "
-                   "profilegroups.hostname, profilegroups.is_default FROM "
-                   "recordingprofiles,profilegroups,capturecard WHERE "
-                   "profilegroups.id = recordingprofiles.profilegroup "
-                   "AND capturecard.cardid = %1 "
-                   "AND capturecard.cardtype = profilegroups.cardtype "
-                   "AND recordingprofiles.name = '%2';").arg(cardid).arg(name);
-    result.prepare(querystr);
-
-    if (result.exec() && result.isActive() && result.size() > 0) {
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
         while (result.next())
         {
             if (result.value(1).toString() == hostname)
@@ -792,34 +818,41 @@ bool RecordingProfile::loadByCard(QString name, int cardid)
         loadByID(recid);
         return true;
     }
-    else
-        return false;
+    return false;
 }
 
 bool RecordingProfile::loadByGroup(QString name, QString group) 
 {
     MSqlQuery result(MSqlQuery::InitCon());
+    result.prepare(
+        "SELECT recordingprofiles.id "
+        "FROM recordingprofiles, profilegroups "
+        "WHERE recordingprofiles.profilegroup = profilegroups.id AND "
+        "      profilegroups.name             = :GROUPNAME       AND "
+        "      recordingprofiles.name         = :NAME");
+    result.bindValue(":GROUPNAME", group);
+    result.bindValue(":NAME", name);
 
-    QString querystr = QString("SELECT recordingprofiles.id FROM "
-                 "recordingprofiles, profilegroups WHERE "
-                 "recordingprofiles.profilegroup = profilegroups.id AND "
-                 "profilegroups.name = '%1' AND recordingprofiles.name = '%2';")
-                 .arg(group).arg(name);
-    result.prepare(querystr);
-
-    if (result.exec() && result.isActive() && result.size() > 0) {
-        result.next();
+    if (result.exec() && result.isActive() && result.next())
+    {
         loadByID(result.value(0).toInt());
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 void RecordingProfile::setCodecTypes()
 {
-    vc->selectCodecs(groupType());
-    ac->selectCodecs(groupType());
+    if (videoSettings)
+        videoSettings->selectCodecs(groupType());
+    if (audioSettings)
+        audioSettings->selectCodecs(groupType());
+}
+
+void RecordingProfile::setName(const QString& newName)
+{
+    name->setValue(newName);
+    name->setRW(isEncoder);
 }
 
 void RecordingProfileEditor::open(int id) 
@@ -973,7 +1006,7 @@ void RecordingProfile::fillSelections(SelectManagedListItem* setting, int group)
     }
 }
 
-QString RecordingProfile::groupType()
+QString RecordingProfile::groupType(void) const
 {
     MSqlQuery result(MSqlQuery::InitCon());
     QString querystr = QString("SELECT profilegroups.cardtype FROM "
