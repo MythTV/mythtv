@@ -35,7 +35,7 @@ class EITHelper : public QObject
 
     QListList_Events  eitList;      ///< Event Information Tables List
     mutable QMutex    eitList_lock; ///< EIT List lock
-    mutable QMap<uint,uint> srv_to_chanid;
+    mutable QMap<unsigned long long, uint> srv_to_chanid;
 
     /// Maximum number of DB inserts per ProcessEvents call.
     static const uint kChunkSize;

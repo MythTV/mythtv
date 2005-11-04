@@ -110,8 +110,9 @@ uint EITHelper::ProcessEvents(int mplexid)
 
 int EITHelper::GetChanID(int mplexid, const Event &event) const
 {
-    uint srv = (event.ATSC) ? (mplexid << 16) : (event.NetworkID << 16);
-    srv |= event.ServiceID;
+    unsigned long long srv = event.ServiceID;
+    srv |= ((unsigned long long) event.TransportID) << 32;
+    srv |= (event.ATSC) ? (mplexid << 16) : (event.NetworkID << 16);
 
     int chanid = srv_to_chanid[srv];
     if (chanid == 0)
@@ -157,8 +158,11 @@ static int get_chan_id_from_db(int mplexid, const Event &event)
                               "FROM channel, dtv_multiplex "
                               "WHERE serviceid = %1 AND "
                               "      networkid = %2 AND "
+                              "      transportid = %3 AND "
                               "      channel.mplexid = dtv_multiplex.mplexid")
-                      .arg(event.ServiceID).arg(event.NetworkID));
+                      .arg(event.ServiceID)
+                      .arg(event.NetworkID)
+                      .arg(event.TransportID));
     }
 
     if (!query.exec() || !query.isActive())
