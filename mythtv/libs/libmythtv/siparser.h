@@ -31,6 +31,8 @@ using namespace std;
 // MythTV includes
 #include "sitypes.h"
 
+class VirtualChannelTable;
+
 /** \TODO Fix this size */
 #define NumHandlers     7
 
@@ -104,6 +106,9 @@ class SIParser : public QObject
     void ParseTable(uint8_t* buffer, int size, uint16_t pid);
     void CheckTrackers(void);
 
+    // Functions that allow you to initialize the SIParser
+    void AddToServices(const VirtualChannelTable &vct);
+
   public slots:
     virtual void deleteLater(void);
 
@@ -132,7 +137,7 @@ class SIParser : public QObject
     void ParseCAT     (tablehead_t* head, uint8_t* buffer, int size);
     void ParsePMT     (tablehead_t* head, uint8_t* buffer, int size);
 
-    void ProcessUnknownDescriptor(const uint8_t *buffer, uint size);
+    void ProcessUnusedDescriptor(const uint8_t *buffer, uint size);
 
     // Common Helper Functions
     QString DecodeText(const uint8_t *s, uint length);
@@ -184,7 +189,6 @@ class SIParser : public QObject
 
     // ATSC Table Parsers
     void ParseMGT       (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseVCT       (tablehead_t* head, uint8_t* buffer, int size);
     void ParseRRT       (tablehead_t* head, uint8_t* buffer, int size);
     void ParseATSCEIT   (tablehead_t* head, uint8_t* buffer, int size, uint16_t pid);
     void ParseETT       (tablehead_t* head, uint8_t* buffer, int size, uint16_t pid);

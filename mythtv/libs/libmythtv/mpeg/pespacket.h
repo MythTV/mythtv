@@ -88,6 +88,28 @@ class PESPacket
         memcpy(_fullbuffer, tspacket.data(), 188);
     }
 
+    // At this point we should have the entire VCT table in buffer
+    // at (buffer - 8), and without the tspacket 4 byte header
+    
+        //if (TableID::TVCT == table_id)
+        //VirtualChannelTable vct;
+
+    // may be modified
+    PESPacket(const TSPacket &tspacket, int start_code_prefix,
+              const unsigned char *pesdata_plus_one, uint pes_size)
+        : _ccLast(tspacket.ContinuityCounter()), _pesdataSize(pes_size)
+    { // clone
+        InitPESPacket(const_cast<TSPacket&>(tspacket)); // sets _psiOffset
+        int len     = pes_size+4;
+        /* make alloc size multiple of 188 */
+        _allocSize  = ((len+_psiOffset+187)/188)*188;
+        _fullbuffer = pes_alloc(_allocSize);
+        _pesdata    = _fullbuffer + _psiOffset;
+        memcpy(_fullbuffer, tspacket.data(), 188);
+        _pesdata[0] = start_code_prefix;
+        memcpy(_fullbuffer + _psiOffset + 1, pesdata_plus_one, pes_size-1);
+    }
+
     virtual ~PESPacket()
     {
         if (IsClone())

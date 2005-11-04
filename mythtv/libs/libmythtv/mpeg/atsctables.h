@@ -165,14 +165,16 @@ class MasterGuideTable : public PSIPTable
  */
 class VirtualChannelTable : public PSIPTable
 {
-  protected:
+  public:
     VirtualChannelTable(const PSIPTable& table) : PSIPTable(table)
     {
     //       Name             bits  loc  expected value
     // start_code_prefix        8   0.0          0
-    // table_id                 8   1.0       0xC8
+    // table_id                 8   1.0      0xC8/0xC9
+        assert(TableID::TVCT == TableID() || TableID::CVCT == TableID());
+        Parse();
     }
-  public:
+
     ~VirtualChannelTable() { ; }
 
     // transport_stream_id     16   4.0
@@ -304,7 +306,6 @@ class TerrestrialVirtualChannelTable : public VirtualChannelTable
     // start_code_prefix        8   0.0          0
     // table_id                 8   1.0       0xC8
         assert(TableID::TVCT == TableID());
-        Parse();
     }
     ~TerrestrialVirtualChannelTable() { ; }
 
@@ -358,9 +359,8 @@ class CableVirtualChannelTable : public VirtualChannelTable
     {
     //       Name             bits  loc  expected value
     // start_code_prefix        8   0.0          0
-    // table_id                 8   1.0       0xC8
+    // table_id                 8   1.0       0xC9
         assert(TableID::CVCT == TableID());
-        Parse();
     }
     ~CableVirtualChannelTable() { ; }
 

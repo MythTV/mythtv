@@ -104,8 +104,7 @@ class TSHeader {
     const unsigned char* data() const { return _tsdata; }
     unsigned char* data() { return _tsdata; }
 
-    static const unsigned int HEADER_SIZE   =      4;
-  protected:
+    static const unsigned int HEADER_SIZE;
     static const unsigned char PAYLOAD_ONLY_HEADER[4];
   private:
     unsigned char _tsdata[4];
@@ -146,8 +145,8 @@ class TSPacket : public TSHeader
 
     QString toString() const;
 
-    static const unsigned int SIZE         = 188;
-    static const unsigned int PAYLOAD_SIZE = SIZE-HEADER_SIZE;
+    static const unsigned int SIZE;
+    static const unsigned int PAYLOAD_SIZE;
     static const TSPacket *TSPacket::NULL_PACKET;
   private:
     unsigned char _tspayload[184];

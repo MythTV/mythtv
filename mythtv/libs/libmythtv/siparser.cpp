@@ -13,6 +13,8 @@
 #include "util.h"
 #include "iso639.h"
 #include "atsc_huffman.h"
+#include "pespacket.h"
+#include "atsctables.h"
 #include "mpegdescriptors.h"
 
 // MythTV DVB headers
@@ -31,6 +33,9 @@
 
 // Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging
 // #define EIT_DEBUG_SID 1602
+
+#define LOC QString("SIParser: ")
+#define LOC_ERR QString("SIParser, Error: ")
 
 /** \class SIParser
  *  This class parses DVB SI and ATSC PSIP tables.
@@ -86,9 +91,12 @@ SIParser::SIParser(const char *name) :
     uint prio = 1;
     for (plit = langPref.begin(); plit != langPref.end(); ++plit)
     {
-        SIPARSER(QString("Added preferred language %1 with priority %2")
-                 .arg(*plit).arg(prio));
-        LanguagePriority[*plit] = prio++;
+        if (!(*plit).isEmpty())
+        {
+            SIPARSER(QString("Added initial preferred language '%1' "
+                             "with priority %2").arg(*plit).arg(prio));
+            LanguagePriority[*plit] = prio++;
+        }
     }
 }
 
@@ -576,27 +584,53 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
 
     if (SIStandard == SI_STANDARD_ATSC)
     {
-        switch(head.table_id)
+        switch (head.table_id)
         {
-              case 0xC7:  ParseMGT(&head, &buffer[8], size-8);
-                          break;
-              case 0xC8:  
-              case 0xC9:  ParseVCT(&head, &buffer[8], size-8);
-                          break;
-              case 0xCA:  ParseRRT(&head, &buffer[8], size-8);
-                          break;
+              case TableID::MGT:
+                  ParseMGT(&head, &buffer[8], size-8);
+                  break;
+              case TableID::TVCT:  
+              case TableID::CVCT:
+              {
+                  emit TableLoaded();
+
+                  if (Table[SERVICES]->AddSection(&head,0,0))
+                      break;
+
+                  // We should have a PSIP table starting at 
+                  // stream_id in the buffer.
+                  // So lets construct a PSIP parsing object...
+                  TSPacket tspacket;
+                  tspacket.InitHeader(TSPacket::PAYLOAD_ONLY_HEADER);
+                  memcpy(tspacket.data()+4, buffer,
+                         min(TSPacket::PAYLOAD_SIZE, (uint)size));
+                  PESPacket pes(tspacket, 0, buffer, size+1);
+                  PSIPTable psip(pes);
+
+                  const VirtualChannelTable vct(psip);
+                  AddToServices(vct);
+              }
+              break;
+              case TableID::RRT:
+                  ParseRRT(&head, &buffer[8], size-8);
+                  break;
 #ifdef USING_DVB_EIT
-              case 0xCB:  ParseATSCEIT(&head, &buffer[8], size-8, pid);
-                          break;
-              case 0xCC:  ParseETT(&head, &buffer[8], size-8, pid);
-                          break;
-#endif
-              case 0xCD:  ParseSTT(&head, &buffer[8], size-8);
-                          break;
-              case 0xD3:  ParseDCCT(&head, &buffer[8], size-8);
-                          break;
-              case 0xD4:  ParseDCCSCT(&head, &buffer[8], size-8);
-                          break;
+              case  TableID::EIT:
+                  ParseATSCEIT(&head, &buffer[8], size-8, pid);
+                  break;
+              case TableID::ETT:
+                  ParseETT(&head, &buffer[8], size-8, pid);
+                  break;
+#endif // USING_DVB_EIT
+              case TableID::STT:
+                  ParseSTT(&head, &buffer[8], size-8);
+                  break;
+              case TableID:: DCCT:
+                  ParseDCCT(&head, &buffer[8], size-8);
+                  break;
+              case TableID::DCCSCT:
+                  ParseDCCSCT(&head, &buffer[8], size-8);
+                  break;
         }
     }
 
@@ -846,8 +880,8 @@ void SIParser::ParsePMT(tablehead_t *head, uint8_t *buffer, int size)
                         break;
 
                     default:
-                        SIPARSER(QString("Unknown descriptor, tag = %1")
-                                 .arg(descriptor_tag));
+                        ProcessUnusedDescriptor(
+                            descriptor, descriptor_len + 2);
                         break;
                 }
             }
@@ -908,14 +942,13 @@ void SIParser::ParsePMT(tablehead_t *head, uint8_t *buffer, int size)
     ((PMTHandler*) Table[PMT])->pmt[head->table_id_ext] = p;
 }
 
-void SIParser::ProcessUnknownDescriptor(const uint8_t *buf, uint len)
+void SIParser::ProcessUnusedDescriptor(const uint8_t *data, uint)
 {
-    QString temp = "Unknown Descriptor: ";
-
-    for (uint x = 0; x < len; x++)
-        temp += QString("%1 ").arg(buf[x],2,16);
-
-    SIPARSER(temp);
+    if (print_verbose_messages & VB_SIPARSER)
+    {
+        VERBOSE(VB_SIPARSER, LOC + "Unused Descriptor: \n" +
+                MPEGDescriptor(data).toString());
+    }
 }
 
 /*------------------------------------------------------------------------
@@ -1056,7 +1089,8 @@ void SIParser::ParseNIT(tablehead_t *head, uint8_t *buffer, int size)
                           ParseDescLinkage(&buffer[pos],buffer[pos+1],n);
                           break;
                default:
-                          ProcessUnknownDescriptor(&buffer[pos],buffer[pos+1]);
+                          ProcessUnusedDescriptor(&buffer[pos],
+                                                  buffer[pos+1] + 2);
                           break;
            }
            pos += (buffer[pos+1] + 2);
@@ -1115,8 +1149,8 @@ void SIParser::ParseNIT(tablehead_t *head, uint8_t *buffer, int size)
                             ChannelNumbers);
                     break;
                 default:
-                    ProcessUnknownDescriptor(
-                        &buffer[pos + 6 + dpos],buffer[pos + 7 + dpos]);
+                    ProcessUnusedDescriptor(
+                        &buffer[pos + 6 + dpos], buffer[pos + 7 + dpos] + 2);
                     break;
              }
              dpos += (buffer[pos + 7 + dpos] + 2);
@@ -1216,8 +1250,8 @@ void SIParser::ParseSDT(tablehead_t *head, uint8_t *buffer, int size)
                      buffer[pos + 6 + lentotal], s);
                 break;
             default:
-                ProcessUnknownDescriptor(&buffer[pos + 5 + lentotal],
-                      buffer[pos + 6 + lentotal]);
+                ProcessUnusedDescriptor(&buffer[pos + 5 + lentotal],
+                                        buffer[pos + 6 + lentotal] + 2);
                 break;
             }
             len = buffer[pos + 6 + lentotal];
@@ -1288,7 +1322,7 @@ uint SIParser::GetLanguagePriority(const QString &language)
         for (;it != LanguagePriority.end(); ++it)
             max_priority = max(*it, max_priority);
         // insert new language, and point iterator to it
-        SIPARSER(QString("Added preferred language %1 with priority %2")
+        SIPARSER(QString("Added preferred language '%1' with priority %2")
                  .arg(language).arg(max_priority + 1));
         LanguagePriority[language] = max_priority + 1;
         it = LanguagePriority.find(language);
@@ -1926,6 +1960,7 @@ uint SIParser::ProcessDVBEventDescriptors(
         case DescriptorID::short_event:
         {
             QString language = ParseDescLanguage(data+2, descriptorLength);
+
             uint    priority = GetLanguagePriority(language);
             bestPrioritySE   = min(bestPrioritySE, priority);
 
@@ -1974,7 +2009,7 @@ uint SIParser::ProcessDVBEventDescriptors(
             break;
 
         default:
-            ProcessUnknownDescriptor(data, descriptorLength + 2);
+            ProcessUnusedDescriptor(data, descriptorLength + 2);
             break;
     }
     return descriptorLength + 2;
@@ -2018,7 +2053,7 @@ void SIParser::ProcessShortEventDescriptor(
 
     uint name_len     = data[5];
     uint subtitle_len = data[6 + name_len];
-    e.LanguageCode    = ParseDescLanguage(data, size);
+    e.LanguageCode    = ParseDescLanguage(data+2, size);
     e.Event_Name      = DecodeText(&data[6],            name_len);
     e.Event_Subtitle  = DecodeText(&data[7 + name_len], subtitle_len);
 
@@ -2216,12 +2251,12 @@ void SIParser::ParseMGT(tablehead_t *head, uint8_t *buffer, int)
                 TableSourcePIDs.ServicesMask = 0xFF;
                 if (table_type == 0x02)
                 {
-                    TableSourcePIDs.ServicesTable = 0xC9;
+                    TableSourcePIDs.ServicesTable = TableID::CVCT;
                     SIPARSER("CVCT Present on this Transport");
                 }
                 if (table_type == 0x00)
                 {
-                    TableSourcePIDs.ServicesTable = 0xC8;
+                    TableSourcePIDs.ServicesTable = TableID::TVCT;
                     SIPARSER("TVCT Present on this Transport");
                 }
                 break;
@@ -2259,97 +2294,41 @@ void SIParser::ParseMGT(tablehead_t *head, uint8_t *buffer, int)
     }
 }
 
-/*
- *  ATSC Table 0xC8/0xC9 - Terrestrial/Cable Virtual Channel Table - PID 0x1FFB
- */
-void SIParser::ParseVCT(tablehead_t *head, uint8_t *buffer, int size)
+void SIParser::AddToServices(const VirtualChannelTable &vct)
 {
-
-// Prerequisites: MGT, and CHANNEL_ETT
-    (void) size;
-
-    emit TableLoaded();
-
-    if (Table[SERVICES]->AddSection(head,0,0))
-        return;
-
-    uint8_t num_channels_in_section = buffer[1];
-    uint16_t pos = 2, lentotal = 0, len = 0;
-
-    SDTObject s;
-
-    for (int x = 0; x < num_channels_in_section ; x++)
+    for (uint chan_idx = 0; chan_idx < vct.ChannelCount() ; chan_idx++)
     {
-        for (int y = 0; y < 14 ; y+=2)
-        {
-            uint16_t temp = buffer[pos+y] << 8 | buffer[pos+y+1];
-            s.ServiceName += QChar(temp);
-        }
+        // Do not add in Analog Channels in the VCT
+        if (1 == vct.ModulationMode(chan_idx))
+            continue;
 
-        uint16_t major_channel_number =
-            ((buffer[pos+14] & 0x0F) >> 2) | ((buffer[pos+15] & 0xFC) >> 2);
-        uint16_t minor_channel_number =
-            (buffer[pos+15] & 0x03) << 2 | (buffer[pos+16]);
-        uint8_t modulation = buffer[pos+17];
-        s.ChanNum = (major_channel_number * 10) + minor_channel_number;
+        // Create SDTObject from info in VCT
+        SDTObject s;
+        s.Version      = vct.Version();
+        s.ServiceType  = 1;
+        s.EITPresent   = !vct.IsHiddenInGuide(chan_idx);
 
-        s.TransportID = buffer[pos+22] << 8 | buffer[pos+23];
+        s.ServiceName  = vct.ShortChannelName(chan_idx);
+        s.ChanNum      =(vct.MajorChannel(chan_idx) * 10 +
+                         vct.MinorChannel(chan_idx));
+        s.TransportID  = vct.ChannelTransportStreamID(chan_idx);
+        s.CAStatus     = vct.IsAccessControlled(chan_idx);
+        s.ServiceID    = vct.ProgramNumber(chan_idx);
+        s.ATSCSourceID = vct.SourceID(chan_idx);
 
-        if (PrivateTypesLoaded == false)
+        if (!PrivateTypesLoaded)
             LoadPrivateTypes(s.TransportID);
 
-//        uint8_t ETM_Location = (buffer[pos+26] & 0xC0) >> 6;
-        s.CAStatus = (buffer[pos+26] & 0x20) >> 5;
-        s.ServiceID = buffer[pos+24] << 8 | buffer[pos+25];
-
-        s.ATSCSourceID = buffer[pos+28] << 8 | buffer[pos+29];
-        sourceid_to_channel[s.ATSCSourceID] =
-            major_channel_number << 8 | minor_channel_number;
 #ifdef USING_DVB_EIT
-        Table[EVENTS]->RequestEmit(s.ATSCSourceID);
+        if (!vct.IsHiddenInGuide(chan_idx))
+        {
+            sourceid_to_channel[s.ATSCSourceID] =
+                vct.MajorChannel(chan_idx) << 8 | vct.MinorChannel(chan_idx);
+            Table[EVENTS]->RequestEmit(s.ATSCSourceID);
+        }
 #endif
 
-        s.Version = head->version;
-        s.ServiceType = 1;
-        s.EITPresent = 1;
-
-        SIPARSER(QString("Found Channel %1-%2 - %3 CAStatus=%4 Modulation=%5")
-                 .arg(major_channel_number)
-                 .arg(minor_channel_number)
-                 .arg(s.ServiceName)
-                 .arg(s.CAStatus)
-                 .arg(modulation));
-
-        uint16_t descriptors_length =
-            (buffer[pos+30] & 0x02) << 8 | buffer[pos+31];
-
-        lentotal = 0;
-
-        while ((descriptors_length) > (lentotal))
-        {
-            switch(buffer[pos + 32 + lentotal])
-            {
-/*                case 0xA0:   s.ServiceName = ParseATSCExtendedChannelName
-                  (&buffer[pos + 32 + lentotal],buffer[pos + 33 + lentotal]);
-                  break;
-*/
-                default:
-                    ProcessUnknownDescriptor(
-                        &buffer[pos + 32 + lentotal],
-                        buffer[pos + 33 + lentotal]);
-                    break;
-            }
-            len = buffer[pos + 33 + lentotal];
-            lentotal += (len + 2);
-        }
-
-        pos += (32 + descriptors_length);
-
-        /* Do not add in Analog Channels in the VCT */
-        if (modulation != 1)
-            ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
-        s.Reset();
-
+        ((ServiceHandler*) Table[SERVICES])->Services[0][s.ServiceID] = s;
     }
 
 // TODO REMOVE THIS WHEN SERVIVES SET
@@ -2481,9 +2460,9 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
                     buffer[pos + 3 + lentotal]);
             break;
             default:
-                ProcessUnknownDescriptor(
+                ProcessUnusedDescriptor(
                     &buffer[pos + 2 + lentotal],
-                    buffer[pos + 3 + lentotal]);
+                    buffer[pos + 3 + lentotal] + 2);
                 break;
             }
             len = buffer[pos + 3 + lentotal];

@@ -3,6 +3,10 @@
 #include <iostream>
 #include "tspacket.h"
 
+const unsigned int TSPacket::SIZE         = 188;
+const unsigned int TSHeader::HEADER_SIZE  = 4;
+const unsigned int TSPacket::PAYLOAD_SIZE = 188-4;
+
 const unsigned char TSHeader::PAYLOAD_ONLY_HEADER[4] =
 {
     SYNC_BYTE,
