@@ -132,18 +132,18 @@ class SIParser : public QObject
     void ParseCAT     (tablehead_t* head, uint8_t* buffer, int size);
     void ParsePMT     (tablehead_t* head, uint8_t* buffer, int size);
 
-    void ProcessUnknownDescriptor(uint8_t *buffer, int size);
+    void ProcessUnknownDescriptor(const uint8_t *buffer, uint size);
 
     // Common Helper Functions
-    QString DecodeText(uint8_t *s, int length);
+    QString DecodeText(const uint8_t *s, uint length);
 
     // DVB Helper Parsers
-    QDateTime ConvertDVBDate(uint8_t* dvb_buf);
+    QDateTime ConvertDVBDate(const uint8_t* dvb_buf);
 
     // DVB Table Parsers
     void ParseNIT       (tablehead_t* head, uint8_t* buffer, int size);
     void ParseSDT       (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseDVBEIT    (tablehead_t* head, uint8_t* buffer, int size);
+    void ParseDVBEIT    (tablehead_t* head, uint8_t* buffer, uint size);
 
     // Common Descriptor Parsers
     CAPMTObject ParseDescCA(uint8_t* buffer, int size);
@@ -157,7 +157,7 @@ class SIParser : public QObject
     TransportObject ParseDescTerrestrial     (uint8_t* buf, int sz);
     TransportObject ParseDescSatellite       (uint8_t* buf, int sz);
     TransportObject ParseDescCable           (uint8_t* buf, int sz);
-    QString ParseDescLanguage                (uint8_t* buf, int sz);
+    QString ParseDescLanguage                (const uint8_t*, uint sz);
     void ParseDescTeletext                   (uint8_t* buf, int sz);
     void ParseDescSubtitling                 (uint8_t* buf, int sz);
 
@@ -167,10 +167,16 @@ class SIParser : public QObject
     QString ProcessDescHuffmanTextLarge      (uint8_t *buf, uint sz);
 
     // DVB EIT Table Descriptor processors
-    void ProcessContentDescriptor            (uint8_t *buf, int sz, Event &e);
-    void ProcessShortEventDescriptor         (uint8_t *buf, int sz, Event &e);
-    void ProcessExtendedEventDescriptor      (uint8_t *buf, int sz, Event &e);
-    void ProcessComponentDescriptor          (uint8_t *buf, int sz, Event &e);
+    uint ProcessDVBEventDescriptors(
+        const unsigned char          *data,
+        const unsigned char*         &bestDescriptorSE, 
+        vector<const unsigned char*> &bestDescriptorsEE,
+        Event                        &event);
+
+    void ProcessContentDescriptor       (const uint8_t*, uint sz, Event &e);
+    void ProcessShortEventDescriptor    (const uint8_t*, uint sz, Event &e);
+    void ProcessExtendedEventDescriptor (const uint8_t*, uint sz, Event &e);
+    void ProcessComponentDescriptor     (const uint8_t*, uint sz, Event &e);
 
     // ATSC Helper Parsers
     QDateTime ConvertATSCDate(uint32_t offset);

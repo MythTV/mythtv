@@ -3,6 +3,8 @@
 #ifndef _MPEG_DESCRIPTORS_H_
 #define _MPEG_DESCRIPTORS_H_
 
+#include <cassert>
+
 typedef vector<const unsigned char*> desc_list_t;
 
 class DescriptorID

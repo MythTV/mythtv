@@ -1,15 +1,23 @@
-#include "mythcontext.h"
-#include "mythdbcon.h"
-#include "util.h"
-#include "iso639.h"
+// Std C++ headers
+#include <algorithm>
 
-#include "siparser.h"
+// Qt headers
 #include <qdatetime.h>
 #include <qtextcodec.h>
 #include <qregexp.h>
 #include <qptrvector.h>
-#include "dvbtypes.h"
+
+// MythTV headers
+#include "mythcontext.h"
+#include "mythdbcon.h"
+#include "util.h"
+#include "iso639.h"
 #include "atsc_huffman.h"
+#include "mpegdescriptors.h"
+
+// MythTV DVB headers
+#include "siparser.h"
+#include "dvbtypes.h"
 
 //QMap<uint,uint> SIParser::sourceid_to_channel;
 
@@ -900,16 +908,14 @@ void SIParser::ParsePMT(tablehead_t *head, uint8_t *buffer, int size)
     ((PMTHandler*) Table[PMT])->pmt[head->table_id_ext] = p;
 }
 
-void SIParser::ProcessUnknownDescriptor(uint8_t *buf, int len)
+void SIParser::ProcessUnknownDescriptor(const uint8_t *buf, uint len)
 {
-
     QString temp = "Unknown Descriptor: ";
-   
-    for (int x=0;x<len;x++)
-       temp += QString("%1 ").arg(buf[x],2,16);
+
+    for (uint x = 0; x < len; x++)
+        temp += QString("%1 ").arg(buf[x],2,16);
 
     SIPARSER(temp);
-
 }
 
 /*------------------------------------------------------------------------
@@ -917,34 +923,39 @@ void SIParser::ProcessUnknownDescriptor(uint8_t *buf, int len)
  *------------------------------------------------------------------------*/
 
 // Decode a text string according to ETSI EN 300 468 Annex A
-QString SIParser::DecodeText(uint8_t *s, int length)
+QString SIParser::DecodeText(const uint8_t *src, uint length)
 {
     QString result;
 
     if (length <= 0)
         return QString("");
 
-    if ((*s < 0x10) || (*s >= 0x20))
+    unsigned char buf[length];
+    memcpy(buf, src, length);
+
+    if ((buf[0] < 0x10) || (buf[0] >= 0x20))
     {
         // Strip formatting characters
-        for (int p = 0; p < length; p++)
-            if ((s[p] >= 0x80) && (s[p] <= 0x9F))
-                memmove(s + p, s + p + 1, --length - p);
-
-        if (*s >= 0x20)
+        for (uint p = 0; p < length; p++)
         {
-            result = QString::fromLatin1((const char*) s, length);
+            if ((buf[p] >= 0x80) && (buf[p] <= 0x9F))
+                memmove(buf + p, buf + p + 1, --length - p);
         }
-        else if ((*s >= 0x01) && (*s <= 0x0B))
+
+        if (buf[0] >= 0x20)
         {
-            QString coding = "ISO8859-" + QString::number(4 + *s);
+            result = QString::fromLatin1((const char*)buf, length);
+        }
+        else if ((buf[0] >= 0x01) && (buf[0] <= 0x0B))
+        {
+            QString coding = "ISO8859-" + QString::number(4 + buf[0]);
             QTextCodec *codec = QTextCodec::codecForName(coding);
-            result = codec->toUnicode((const char*) s + 1, length - 1);
+            result = codec->toUnicode((const char*)buf + 1, length - 1);
         }
         else
         {
             // Unknown/invalid encoding - assume local8Bit
-            result = QString::fromLocal8Bit((const char*) s + 1, length - 1);
+            result = QString::fromLocal8Bit((const char*)buf + 1, length - 1);
         }
     }
     else
@@ -962,7 +973,7 @@ QString SIParser::DecodeText(uint8_t *s, int length)
  *   DVB HELPER FUNCTIONS
  *------------------------------------------------------------------------*/
 
-QDateTime SIParser::ConvertDVBDate(uint8_t *dvb_buf)
+QDateTime SIParser::ConvertDVBDate(const uint8_t *dvb_buf)
 {
 // TODO: clean this up some since its sort of a mess right now
 
@@ -975,8 +986,8 @@ QDateTime SIParser::ConvertDVBDate(uint8_t *dvb_buf)
     mjd = (dvb_buf[0] & 0xff) << 8;
     mjd += (dvb_buf[1] & 0xff);
     hour = bcdtoint(dvb_buf[2] & 0xff);
-    min = bcdtoint(dvb_buf[3] & 0xff);
-    sec = bcdtoint(dvb_buf[4] & 0xff);
+    min  = bcdtoint(dvb_buf[3] & 0xff);
+    sec  = bcdtoint(dvb_buf[4] & 0xff);
 
 /*
  * Use the routine specified in ETSI EN 300 468 V1.4.1,
@@ -1287,9 +1298,8 @@ uint SIParser::GetLanguagePriority(const QString &language)
     return *it;
 }
 
-void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer ,int size)
+void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer, uint size)
 {
-
     uint8_t last_segment_number  = buffer[4];
     uint8_t last_table_id        = buffer[5];
 
@@ -1346,201 +1356,89 @@ void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer ,int size)
                 Tracker[head->table_id_ext][head->table_id].MarkUnused(x);
     }
 
-    uint16_t pos = 6;
-    uint16_t des_pos = 0;
-    uint16_t descriptor_length = 0;
+    uint pos                = 6;
+    uint des_pos            = 0;
+    uint descriptors_length = 0;
 
-    // Event to use temporarily to fill in data
-    Event e;
+    // Loop through table (last 4 bytes are CRC)
+    while (pos + 4 < size)
+    {
+        // Event to use temporarily to fill in data
+        Event event;
+        event.ServiceID   = head->table_id_ext;
+        event.TransportID = buffer[0] << 8 | buffer[1];
+        event.NetworkID   = buffer[2] << 8 | buffer[3];
+        event.EventID     = buffer[pos] << 8 | buffer[pos+1];
+        event.StartTime   = ConvertDVBDate(&buffer[pos+2]);
 
-    // Set ServiceID/NetworkID/TransportID since they remain the same per table
-    e.ServiceID                  = head->table_id_ext;
-    e.TransportID                = buffer[0] << 8 | buffer[1];
-    e.NetworkID                  = buffer[2]  << 8 | buffer[3];
+        uint lenInSeconds = ((bcdtoint(buffer[pos+7] & 0xFF) * 3600) +
+                             (bcdtoint(buffer[pos+8] & 0xFF) * 60) +
+                             (bcdtoint(buffer[pos+9] & 0xFF)));
 
-#ifdef EIT_DEBUG_SID
-if (e.ServiceID == EIT_DEBUG_SID) {
-    fprintf(stdout,"EIT_DEBUG: sid:%d nid:%04X tid:%04X lseg:%02X "
-            "ltab:%02X tab:%02X sec:%02X lsec: %02X size:%d\n",
-           e.ServiceID,
-           e.NetworkID,
-           e.TransportID,
-           last_segment_number,
-           last_table_id,
-           head->table_id,
-           head->section_number,
-           head->section_last,
-           size);
-}
-#endif
-
-   // Loop through table (last 4 bytes are CRC)
-   while (pos < (size-4))
-   {
-
-       e.EventID = buffer[pos] << 8 | buffer[pos+1];
-       e.StartTime = ConvertDVBDate(&buffer[pos+2]);
-       e.EndTime = e.StartTime.addSecs(
-                       (bcdtoint(buffer[pos+7] & 0xFF) * 3600) +
-                       (bcdtoint(buffer[pos+8] & 0xFF) * 60) +
-                       (bcdtoint(buffer[pos+9] & 0xFF)) ) ;
+        event.EndTime     = event.StartTime.addSecs(lenInSeconds);
 
 #ifdef EIT_DEBUG_SID
-       if (e.ServiceID == EIT_DEBUG_SID) {
-           fprintf(stdout, "EIT_EVENT: %d EventID: %d   Time: %s - %s\n",
-                   e.ServiceID, e.EventID,
-                   e.StartTime.toString(QString("yyyyMMddhhmm")).ascii(),
-                   e.EndTime.toString(QString("yyyyMMddhhmm")).ascii());
-       }
+        if (event.ServiceID == EIT_DEBUG_SID)
+        {
+            VERBOSE(VB_EIT, "SIParser: DVB Events: " +
+                    QString("ServiceID %1 EventID: %2   Time: %3 - %4")
+                    .arg(event.ServiceID).arg(event.EventID)
+                    .arg(event.StartTime.toString(QString("MM/dd hh:mm")));
+                    .arg(event.EndTime.toString(QString("hh:mm"))));
+        }
 #endif
 
-        // variables to store info about "best descriptor" 4D & 4E
-        // (used to pick out the one with the preferred language 
-        // in case there are more than one)
-        int bd4D_prio = -1;
-        uint8_t *bd4D_data = NULL;
-        QString bd4D_lang;
-        int bd4E_prio = -1;
-        QString bd4E_lang;
+        // Hold short & extended event information from descriptors.
+        const unsigned char *bestDescriptorSE = NULL;
+        vector<const unsigned char*> bestDescriptorsEE;
 
         // Parse descriptors
-        descriptor_length = ((buffer[pos+10] & 0x0F) << 8) | buffer[pos+11];
-        pos+=12;
+        descriptors_length = ((buffer[pos+10] & 0x0F) << 8) | buffer[pos+11];
+        pos += 12;
         des_pos = pos;
 
-        // Hold extended event information from multiple descriptors.
-        QPtrVector<uint8_t> exEvInfos;
-
-        while (des_pos < (pos + descriptor_length)) 
+        // Pick out EIT descriptors for later parsing, and parse others.
+        while ((des_pos < (pos + descriptors_length)) && (des_pos <= size)) 
         { 
-            switch (buffer[des_pos]) 
-            {
-                case 0x4D:
-                    {
-                        QString lang = QString::fromLatin1(
-                                (const char*) &buffer[des_pos + 2], 3);
-                        int prio = GetLanguagePriority(lang);
-
-#ifdef EIT_DEBUG_SID
-                        if (e.ServiceID == EIT_DEBUG_SID)
-                        {
-                            fprintf(stdout,"EIT_EVENT: 4D descriptor, "
-                                    "lang %s, prio %i\n",
-                                    lang.ascii(), prio);
-                        }
-#endif
-
-                        if ((prio > 0 && prio < bd4D_prio) || bd4D_prio == -1)
-                        {
-                            // this descriptor is better than what we have
-                            // => store a reference to this one
-                            bd4D_lang = lang;
-                            bd4D_prio = prio;
-                            bd4D_data = &buffer[des_pos];
-                        }
-                    }
-                    break;
-
-                case 0x4E:
-                    {
-                        QString lang = QString::fromLatin1(
-                            (const char*) &buffer[des_pos + 3], 3);
-                        int prio = GetLanguagePriority(lang);
-
-                        int desc_number = (buffer[des_pos + 2]>>4) & 0xf;
-                        int last_desc_number = buffer[des_pos + 2] & 0xf;
-
-                        if (desc_number > last_desc_number)
-                        {
-                            // Completely broken descriptor. Ignore this one.
-                            break;
-                        }
-
-#ifdef EIT_DEBUG_SID
-                        if (e.ServiceID == EIT_DEBUG_SID)
-                        {
-                            fprintf(stdout,"EIT_EVENT: 4E descriptor, "
-                                    "lang %s, prio %i\n", lang.ascii(), prio);
-                        }
-#endif
-
-                        if (prio == 0 && (bd4E_prio == -1 || bd4E_prio == 0))
-                        {
-                            exEvInfos.resize (last_desc_number + 1);
-                            exEvInfos.insert (desc_number, &buffer[des_pos]);
-                            bd4E_prio = prio;
-                            bd4E_lang = lang;
-                        }
-                        else if (prio > 0 &&
-                                 (prio < bd4E_prio || bd4E_prio <= 0))
-                        {
-                            exEvInfos.resize (last_desc_number);
-                            exEvInfos.insert (desc_number, &buffer[des_pos]);
-                            bd4E_prio = prio;
-                            bd4E_lang = lang;
-                        }
-                    }
-                    break;
-
-                case 0x50:
-                    ProcessComponentDescriptor(
-                        &buffer[des_pos], buffer[des_pos+1]+2,e);
-                    break;
-
-                case 0x54:
-                    ProcessContentDescriptor(
-                        &buffer[des_pos],buffer[des_pos+1]+2,e);
-                    break;
-
-                default:            
-                    ProcessUnknownDescriptor(
-                        &buffer[des_pos],buffer[des_pos+1]+2);
-                    break;
-            }
-            des_pos += (buffer[des_pos+1]+2);
-
-            if (des_pos > size)
-                return;
+            des_pos += ProcessDVBEventDescriptors(
+                &buffer[des_pos], bestDescriptorSE, bestDescriptorsEE, event);
         }
 
-        // Process extended event descriptions if we gathered some
-        for (uint i = 0; i < exEvInfos.size (); ++i)
+        // Parse extended event descriptions for the most preferred language
+        for (uint i = 0; i < bestDescriptorsEE.size(); ++i)
         {
-            if (exEvInfos[i])
-                ProcessExtendedEventDescriptor(
-                    exEvInfos[i], exEvInfos[i][1] + 2, e);
+            if (!bestDescriptorsEE[i])
+                continue;
+
+            uint8_t *desc    = (uint8_t*) bestDescriptorsEE[i];
+            uint     descLen = desc[1];
+            ProcessExtendedEventDescriptor(desc, descLen + 2, event);
         }
 
-        // Resolve data for "best" 4D
-        if (bd4D_data != NULL)
+        // Parse short event descriptor for the most preferred language
+        if (bestDescriptorSE)
         {
-#ifdef EIT_DEBUG_SID
-            if (e.ServiceID == EIT_DEBUG_SID)
-            {
-                fprintf(stdout, "EIT_EVENT: using 4D data "
-                        "for language='%s'\n", bd4D_lang.ascii());
-            }
-#endif
-            e.LanguageCode = bd4D_lang;
-            ProcessShortEventDescriptor(bd4D_data, bd4D_data[1] + 2, e);
+            uint8_t *desc    = (uint8_t*) bestDescriptorSE;
+            uint     descLen = desc[1];
+            ProcessShortEventDescriptor(desc, descLen + 2, event);
         }
 
-        EITFixUp(e);
+        EITFixUp(event);
 
 #ifdef EIT_DEBUG_SID
-        if (e.ServiceID == EIT_DEBUG_SID)
+        if (event.ServiceID == EIT_DEBUG_SID)
         {
-            fprintf(stdout, "EIT_EVENT: LanguageCode='%s' "
-                    "Event_Name='%s' Description='%s'\n",
-                    e.LanguageCode.ascii(), e.Event_Name.ascii(),
-                    e.Description.ascii());
+            VERBOSE(VB_EIT, "SIParser: DVB Events: "
+                    QString("LanguageCode='%1' "
+                            "\n\t\t\tEvent_Name='%2' Description='%3'")
+                    .arg(event.LanguageCode).arg(event.Event_Name)
+                    .arg(event.Description));
         }
 #endif
 
-        ((EventHandler*) Table[EVENTS])->
-            Events[head->table_id_ext][e.EventID] = e;
-        e.clearEventValues();
-        pos += descriptor_length;
+        QMap2D_Events &events = ((EventHandler*) Table[EVENTS])->Events;
+        events[head->table_id_ext][event.EventID] = event;
+        pos += descriptors_length;
     }
 }
 
@@ -2000,14 +1898,98 @@ TransportObject SIParser::ParseDescCable(uint8_t *buffer, int)
      return retval;
 }
 
+/** \fn ProcessDVBEventDescriptors(const unsigned char*,QString&,const unsigned char*,QString&, vector<const unsigned char*>&,Event&)
+ *  \brief Processes non-language dependent DVB Event descriptors, and caches
+ *         language dependent DVB Event descriptors for the most preferred
+ *         language.
+ * \returns descriptor lenght + 2, aka total descriptor size
+ */
+uint SIParser::ProcessDVBEventDescriptors(
+    const unsigned char          *data,
+    const unsigned char*         &bestDescriptorSE, 
+    vector<const unsigned char*> &bestDescriptorsEE,
+    Event                        &event)
+{
+    QString bestLanguageSE   = "";
+    uint    bestPrioritySE   = 0;
+    bestDescriptorSE         = NULL;
+
+    QString bestLanguageEE   = "";
+    uint    bestPriorityEE   = 0;
+    bestDescriptorsEE.clear();
+
+    uint    descriptorTag    = data[0];
+    uint    descriptorLength = data[1];
+
+    switch (descriptorTag)
+    {
+        case DescriptorID::short_event:
+        {
+            QString language = ParseDescLanguage(data, descriptorLength + 2);
+            uint    priority = GetLanguagePriority(language);
+            bestPrioritySE   = min(bestPrioritySE, priority);
+
+            if (priority == bestPrioritySE)
+            {
+                // add the descriptor, and update the language
+                bestDescriptorSE = data;
+                bestLanguageSE   = language;
+            }
+        }
+        break;
+
+        case DescriptorID::extended_event:
+        {
+            uint last_desc_number =  data[2]     & 0xf;
+            uint desc_number      = (data[2]>>4) & 0xf;
+
+            // Break if the descriptor is out of bounds
+            if (desc_number > last_desc_number)
+                break;
+
+            QString language = ParseDescLanguage(data, descriptorLength + 2);
+            uint    priority = GetLanguagePriority(language);
+            bestPriorityEE   = min(bestPriorityEE, priority);
+
+            if (priority == bestPriorityEE)
+            {
+                // don't keep things from the wrong language
+                if (bestLanguageEE != language)
+                    bestDescriptorsEE.clear();
+                // make sure the vector is big enough
+                bestDescriptorsEE.resize(last_desc_number + 1);
+                // add the descriptor, and update the language
+                bestDescriptorsEE[desc_number] = data;
+                bestLanguageEE                 = language;
+            }
+        }
+        break;
+
+        case DescriptorID::component:
+            ProcessComponentDescriptor(data, descriptorLength + 2, event);
+            break;
+
+        case DescriptorID::content:
+            ProcessContentDescriptor(data, descriptorLength + 2, event);
+            break;
+
+        default:
+            ProcessUnknownDescriptor(data, descriptorLength + 2);
+            break;
+    }
+    return descriptorLength + 2;
+}
+
 /**
  *  \brief DVB Descriptor 0x54 - Process Content Descriptor - EIT
  *
  *  \TODO Add all types, possibly just lookup from a big 
  *        array that is an include file?
  */
-void SIParser::ProcessContentDescriptor(uint8_t *buf, int, Event& e)
+void SIParser::ProcessContentDescriptor(const uint8_t *buf, uint size, Event& e)
 {
+    (void) size; // TODO validate size
+
     uint8_t content = buf[2];
     if (content)
     {
@@ -2026,68 +2008,66 @@ void SIParser::ProcessContentDescriptor(uint8_t *buf, int, Event& e)
     }
 }
 
-/**
- * \brief DVB Descriptor 0x4D - Short Event Descriptor - EIT
- * \TODO Test lower loop
+/** \fn ProcessShortEventDescriptor(const uint8_t*,uint,Event&)
+ *  \brief Processes DVB Descriptor 0x4D - Short Event Descriptor - EIT
  */
-void SIParser::ProcessShortEventDescriptor(uint8_t *buf, int, Event &e)
+void SIParser::ProcessShortEventDescriptor(
+    const uint8_t *data, uint size, Event &e)
 {
-    int event_name_len = buf[5] & 0xFF;
-    int text_char_len = buf[event_name_len + 6];;
+    // TODO validate size
 
-    e.Event_Name = DecodeText(buf + 6, event_name_len);
-    e.Event_Subtitle = DecodeText(buf + event_name_len + 7, text_char_len);
+    uint name_len     = data[5];
+    uint subtitle_len = data[6 + name_len];
+    e.LanguageCode    = ParseDescLanguage(data, size);
+    e.Event_Name      = DecodeText(&data[6],            name_len);
+    e.Event_Subtitle  = DecodeText(&data[7 + name_len], subtitle_len);
 
     if (e.Event_Subtitle == e.Event_Name)
-        e.Event_Subtitle= "";
+        e.Event_Subtitle = "";
 }
 
-
-/*
- *  DVB Descriptor 0x4E - Extended Event - EIT
+/** \fn ProcessExtendedEventDescriptor(const uint8_t*,uint,Event&)
+ *  \brief Processes DVB Descriptor 0x4E - Extended Event - EIT
  */
-void SIParser::ProcessExtendedEventDescriptor(uint8_t *buf,int size,Event &e)
+void SIParser::ProcessExtendedEventDescriptor(
+    const uint8_t *data, uint size, Event &e)
 {
+    (void) size; // TODO validate size
 
-   (void) size;
-
-// TODO: Nothing, Complete
-
-    if (buf[6] != 0)
-      return;
-
-    // Append description to already existing.
-    int text_length = buf[7] & 0xFF;
-    e.Description += DecodeText(buf + 8, text_length);
+    if (data[6] == 0)
+        e.Description += DecodeText(&data[8], data[7]);
 }
 
-QString SIParser::ParseDescLanguage(uint8_t *buffer, int size)
+QString SIParser::ParseDescLanguage(const uint8_t *data, uint size)
 {
-    (void) size;
-    return QString::fromLatin1((const char*) buffer + 2, 3);
+    (void) size; // TODO validate size
+
+    return QString::fromLatin1((const char*)data + 2, 3);
 }
 
-void SIParser::ProcessComponentDescriptor(uint8_t *buf,int size,Event &e)
+void SIParser::ProcessComponentDescriptor(
+    const uint8_t *buf, uint size, Event &e)
 {
-   (void)size;
+   (void) size; // TODO validate size
+
    switch (buf[2] & 0x0f)
    {
    case 0x1: //Video
-       if ((buf[3]>=0x9) && (buf[3]<=0x10))
+       if ((buf[3] >= 0x9) && (buf[3] <= 0x10))
            e.HDTV = true;
        break;
    case 0x2: //Audio
-       if ((buf[3]=0x3) || (buf[3]=0x5))
+       if ((buf[3] == 0x3) || (buf[3] == 0x5))
            e.Stereo = true;
        break;
    case 0x3: //Teletext/Subtitles
        switch (buf[3])
        {
-       case 0x1:
-       case 0x3:
-       case 0x10 ... 0x13:
-       case 0x20 ... 0x23:
-            e.SubTitled = true;
+           case 0x1:
+           case 0x3:
+           case 0x10 ... 0x13:
+           case 0x20 ... 0x23:
+               e.SubTitled = true;
        }
        break;
    }
