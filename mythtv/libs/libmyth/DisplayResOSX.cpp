@@ -6,9 +6,9 @@ using namespace std;
 #import <IOKit/graphics/IOGraphicsLib.h> // for IODisplayCreateInfoDictionary()
 
 #include "DisplayResOSX.h"
+#include "util-osx.h"
 
 CGDirectDisplayID mythtv_display();
-static int get_int_val(CFDictionaryRef, CFStringRef);
 
 
 DisplayResOSX::DisplayResOSX(void)
@@ -32,8 +32,8 @@ bool DisplayResOSX::GetDisplaySize(int &width_mm, int &height_mm) const
     if (!dict)
         return false;
 
-    width_mm = get_int_val(dict, CFSTR(kDisplayHorizontalImageSize));
-    height_mm = get_int_val(dict, CFSTR(kDisplayVerticalImageSize));
+    width_mm  = get_int_CF(dict, CFSTR(kDisplayHorizontalImageSize));
+    height_mm = get_int_CF(dict, CFSTR(kDisplayVerticalImageSize));
     //CFRelease(dict); // this release causes a segfault
     
     return true;
@@ -114,9 +114,9 @@ const DisplayResVector& DisplayResOSX::GetVideoModes() const
     {
         CFDictionaryRef displayMode = (CFDictionaryRef) 
             CFArrayGetValueAtIndex(displayModes, i);
-        int width = get_int_val(displayMode, kCGDisplayWidth);
-        int height = get_int_val(displayMode, kCGDisplayHeight);
-        int refresh = get_int_val(displayMode, kCGDisplayRefreshRate);
+        int width   = get_int_CF(displayMode, kCGDisplayWidth);
+        int height  = get_int_CF(displayMode, kCGDisplayHeight);
+        int refresh = get_int_CF(displayMode, kCGDisplayRefreshRate);
 
         uint key = DisplayResScreen::CalcKey(width, height, 0);
 
@@ -133,15 +133,4 @@ const DisplayResVector& DisplayResOSX::GetVideoModes() const
         m_video_modes.push_back(it->second);
 
     return m_video_modes;
-}
-
-static int get_int_val(CFDictionaryRef dict, CFStringRef key)
-{
-    int val = 0;
-    CFNumberRef idx = (CFNumberRef) CFDictionaryGetValue(dict, key);
-    if (idx)
-    {
-        CFNumberGetValue(idx, kCFNumberLongType, &val);
-    }
-    return val;
 }
