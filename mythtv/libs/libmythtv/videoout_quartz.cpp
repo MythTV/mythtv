@@ -49,6 +49,8 @@ using namespace std;
 #include "filtermanager.h"
 #include "videoout_quartz.h"
 
+#include "util-osx.h"
+
 #import <CoreGraphics/CGBase.h>
 #import <CoreGraphics/CGDisplayConfiguration.h>
 #import <CoreGraphics/CGImage.h>
@@ -106,48 +108,6 @@ struct QuartzData
     // Embedding:
     VideoOutputQuartzView * embeddedView;    // special embedded widget
 };
-
-/*
- * These utility functions are used for querying parameters
- * from a CFDictionary.
- */
-// static int32_t getCFint32(CFDictionaryRef dict, CFStringRef key)
-// {
-//     CFNumberRef  ref = (CFNumberRef) CFDictionaryGetValue(dict, key);
-// 
-//     if (ref)
-//     {
-//         int32_t  val;
-// 
-//         if (CFNumberGetValue(ref, kCFNumberSInt32Type, &val) )
-//             return val;
-//         else
-//             puts("getCFint32() - Failed to get 32bit int from value");
-//     }
-//     else
-//         puts("getCFint32() - Failed to get value");
-// 
-//     return 0;
-// }
-
-static double getCFdouble(CFDictionaryRef dict, CFStringRef key)
-{
-    CFNumberRef  ref = (CFNumberRef) CFDictionaryGetValue(dict, key);
-
-    if (ref)
-    {
-        double val;
-
-        if (CFNumberGetValue(ref, kCFNumberDoubleType, &val))
-            return val;
-        else
-            puts("getCFdouble() - Failed to get float from value");
-    }
-    else
-        puts("getCFdouble() - Failed to get value");
-
-    return 0.0;
-}
 
 /*
  * This abstract class is used for implementing output viewports.
@@ -1344,7 +1304,7 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     // Find the refresh rate of our screen
     CFDictionaryRef m;
     m = CGDisplayCurrentMode(data->screen);
-    data->refreshRate = getCFdouble(m, kCGDisplayRefreshRate);
+    data->refreshRate = get_float_CF(m, kCGDisplayRefreshRate);
     if (data->refreshRate == 0.0)	// LCD display?
         data->refreshRate = 150;
 
