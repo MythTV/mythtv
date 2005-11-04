@@ -827,7 +827,7 @@ void SIParser::ParsePMT(tablehead_t *head, uint8_t *buffer, int size)
 
                     case 0x0A: // ISO 639 Language Descriptor
                         e.Language =
-                            ParseDescLanguage(descriptor, descriptor_len);
+                            ParseDescLanguage(descriptor+2, descriptor_len);
                         break;
 
                     case 0x56: // Teletext Descriptor
@@ -1925,7 +1925,7 @@ uint SIParser::ProcessDVBEventDescriptors(
     {
         case DescriptorID::short_event:
         {
-            QString language = ParseDescLanguage(data, descriptorLength + 2);
+            QString language = ParseDescLanguage(data+2, descriptorLength);
             uint    priority = GetLanguagePriority(language);
             bestPrioritySE   = min(bestPrioritySE, priority);
 
@@ -1947,7 +1947,7 @@ uint SIParser::ProcessDVBEventDescriptors(
             if (desc_number > last_desc_number)
                 break;
 
-            QString language = ParseDescLanguage(data, descriptorLength + 2);
+            QString language = ParseDescLanguage(data+3, descriptorLength-1);
             uint    priority = GetLanguagePriority(language);
             bestPriorityEE   = min(bestPriorityEE, priority);
 
@@ -2042,7 +2042,7 @@ QString SIParser::ParseDescLanguage(const uint8_t *data, uint size)
 {
     (void) size; // TODO validate size
 
-    return QString::fromLatin1((const char*)data + 2, 3);
+    return QString::fromLatin1((const char*)data, 3);
 }
 
 void SIParser::ProcessComponentDescriptor(
