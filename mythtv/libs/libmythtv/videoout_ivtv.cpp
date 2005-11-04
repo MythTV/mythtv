@@ -515,7 +515,7 @@ int VideoOutputIvtv::GetFirmwareFramesPlayed(void)
 int VideoOutputIvtv::GetFramesPlayed(void)
 {
     int frame = GetFirmwareFramesPlayed();
-    int f = internal_offset + (frame - frame_at_speed_change) * last_speed;
+    float f = internal_offset + (frame - frame_at_speed_change) * last_speed;
     return (int)round(f);
 }
 
