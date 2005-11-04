@@ -324,7 +324,10 @@ void SIScan::HandleNIT(const NetworkInformationTable*)
         emit TransportScanUpdateText(
             tr("Network %1 Processing").arg(nit->NetworkName()));
 
-        ChannelUtil::CreateMultiplexes(sourceID, nit);
+        vector<uint> mp;
+        mp = ChannelUtil::CreateMultiplexes(sourceID, nit);
+        VERBOSE(VB_SIPARSER, QString("Created %1 multiplexes from NIT")
+                .arg(mp.size()));
 
         // Get channel numbers from UK Frequency List Descriptors
         for (uint i = 0; i < nit->TransportStreamCount(); i++)

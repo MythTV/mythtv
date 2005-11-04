@@ -96,7 +96,7 @@ class DescriptorID
 class MPEGDescriptor
 {
   public:
-    //operator (const unsigned char*)() const { return _data; }
+    operator const unsigned char*() const { return _data; }
 
     MPEGDescriptor(const unsigned char* data) : _data(data) { ; }
     uint DescriptorTag() const    { return _data[0]; }

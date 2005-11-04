@@ -131,13 +131,117 @@ int ChannelUtil::CreateMultiplex(int sourceid, const QString &sistandard,
     return get_max_mplex_id();
 }
 
+void HandleTransportDescriptor(vector<uint> &muxes, const MPEGDescriptor &desc,
+                               uint sourceid, uint tsid, uint netid)
+{
+    uint tag = desc.DescriptorTag();
+
+    if (tag == DescriptorID::terrestrial_delivery_system)
+    {
+        const TerrestrialDeliverySystemDescriptor cd(desc);
+        int mux = ChannelUtil::CreateMultiplex(
+            sourceid,            "dvb",
+            cd.FrequencyHz(),     QString::null,
+            // DVB specific
+            tsid,                 netid,
+            true,
+            -1,                   QChar(cd.BandwidthString()[0]),
+            -1,                   -1,
+            QChar(cd.TransmissionModeString()[0]),
+            QString::null,        cd.ConstellationString(),
+            QChar(cd.HierarchyString()[0]), cd.CodeRateHPString(),
+            cd.CodeRateLPString(),cd.GuardIntervalString());
+
+        if (mux >= 0)
+            muxes.push_back(mux);
+
+        /* unused
+           HighPriority()
+           IsTimeSlicingIndicatorUsed()
+           IsMPE_FECUsed()
+           NativeInterleaver()
+           Alpha()
+           OtherFrequencyInUse()
+        */
+    }
+    else if (tag == DescriptorID::satellite_delivery_system)
+    {
+        const SatelliteDeliverySystemDescriptor cd(desc);
+        int mux = ChannelUtil::CreateMultiplex(
+            sourceid,             "dvb",
+            cd.FrequencyHz(),     cd.ModulationString(),
+            // DVB specific
+            tsid,                 netid,
+            false,
+            cd.SymbolRateHz(),    -1,
+            QChar(cd.PolarizationString()[0]), -1,
+            -1,
+            cd.FECInnerString(),  QString::null,
+            -1,                   QString::null,
+            QString::null,        QString::null);
+
+        if (mux >= 0)
+            muxes.push_back(mux);
+
+        /* unused
+           OrbitalPositionString() == OrbitalLocation
+        */
+    }
+    else if (tag == DescriptorID::cable_delivery_system)
+    {
+        const CableDeliverySystemDescriptor cd(desc);
+        int mux = ChannelUtil::CreateMultiplex(
+            sourceid,             "dvb",
+            cd.FrequencyHz(),     cd.ModulationString(),
+            // DVB specific
+            tsid,                 netid,
+            false,
+            cd.SymbolRateHz(),    -1,
+            -1,                   -1,
+            -1,
+            cd.FECInnerString(),  QString::null,
+            -1,                   QString::null,
+            QString::null,        QString::null);
+
+        if (mux >= 0)
+            muxes.push_back(mux);
+    }
+    else if (tag == DescriptorID::frequency_list)
+    {
+        const FrequencyListDescriptor cd(desc);
+        //uint ct = cd.CodingType(); //nd,sat,cable,terra
+        for (uint i = 0; i<cd.FrequencyCount(); i++)
+        {
+            int mux = ChannelUtil::CreateMultiplex(
+                sourceid,             "dvb",
+                cd.FrequencyHz(i),    QString::null/*modulation*/,
+                // DVB specific
+                tsid,                 netid,
+                false,
+                -1,                   -1,
+                -1,                   -1,
+                -1,
+                QString::null,        QString::null,
+                -1,                   QString::null,
+                QString::null,        QString::null);
+
+            if (mux >= 0)
+                muxes.push_back(mux);
+        }
+    }
+}
+
 /** \fn CreateMultiplexes(int, const NetworkInformationTable*)
  *
  */
-vector<int> ChannelUtil::CreateMultiplexes(int sourceid,
+vector<uint> ChannelUtil::CreateMultiplexes(int sourceid,
                                            const NetworkInformationTable *nit)
 {
-    vector<int> muxes;
+    vector<uint> muxes;
+
+    if (sourceid <= 0)
+        return muxes;
+
     for (uint i = 0; i < nit->TransportStreamCount(); ++i)
     {        
         const desc_list_t& list = 
@@ -146,100 +250,10 @@ vector<int> ChannelUtil::CreateMultiplexes(int sourceid,
 
         uint tsid  = nit->TSID(i);
         uint netid = nit->OriginalNetworkID(i);
-        uint tag   = MPEGDescriptor(list[i]).DescriptorTag();
-
-        if (tag == DescriptorID::terrestrial_delivery_system)
+        for (uint j = 0; j < list.size(); ++j)
         {
-            TerrestrialDeliverySystemDescriptor cd(list[i]);
-            int mux = ChannelUtil::CreateMultiplex(
-                sourceid,            "dvb",
-                cd.FrequencyHz(),     QString::null,
-                // DVB specific
-                tsid,                 netid,
-                true,
-                -1,                   QChar(cd.BandwidthString()[0]),
-                -1,                   -1,
-                QChar(cd.TransmissionModeString()[0]),
-                QString::null,        cd.ConstellationString(),
-                QChar(cd.HierarchyString()[0]), cd.CodeRateHPString(),
-                cd.CodeRateLPString(),cd.GuardIntervalString());
-
-            if (mux >= 0)
-                muxes.push_back(mux);
-
-            /* unused
-            HighPriority()
-            IsTimeSlicingIndicatorUsed()
-            IsMPE_FECUsed()
-            NativeInterleaver()
-            Alpha()
-            OtherFrequencyInUse()
-            */
-        }
-        else if (tag == DescriptorID::satellite_delivery_system)
-        {
-            SatelliteDeliverySystemDescriptor cd(list[i]);
-            int mux = ChannelUtil::CreateMultiplex(
-                sourceid,             "dvb",
-                cd.FrequencyHz(),     cd.ModulationString(),
-                // DVB specific
-                tsid,                 netid,
-                false,
-                cd.SymbolRateHz(),    -1,
-                QChar(cd.PolarizationString()[0]), -1,
-                -1,
-                cd.FECInnerString(),  QString::null,
-                -1,                   QString::null,
-                QString::null,        QString::null);
-
-            if (mux >= 0)
-                muxes.push_back(mux);
-
-            /* unused
-              OrbitalPositionString() == OrbitalLocation
-             */
-        }
-        else if (tag == DescriptorID::cable_delivery_system)
-        {
-            CableDeliverySystemDescriptor cd(list[i]);
-            int mux = ChannelUtil::CreateMultiplex(
-                sourceid,             "dvb",
-                cd.FrequencyHz(),     cd.ModulationString(),
-                // DVB specific
-                tsid,                 netid,
-                false,
-                cd.SymbolRateHz(),    -1,
-                -1,                   -1,
-                -1,
-                cd.FECInnerString(),  QString::null,
-                -1,                   QString::null,
-                QString::null,        QString::null);
-
-            if (mux >= 0)
-                muxes.push_back(mux);
-        }
-        else if (tag == DescriptorID::frequency_list)
-        {
-            FrequencyListDescriptor cd(list[i]);
-            //uint ct = cd.CodingType(); //nd,sat,cable,terra
-            for (uint i = 0; i<cd.FrequencyCount(); i++)
-            {
-                int mux = ChannelUtil::CreateMultiplex(
-                    sourceid,             "dvb",
-                    cd.FrequencyHz(i),    QString::null/*modulation*/,
-                    // DVB specific
-                    tsid,                 netid,
-                    false,
-                    -1,                   -1,
-                    -1,                   -1,
-                    -1,
-                    QString::null,        QString::null,
-                    -1,                   QString::null,
-                    QString::null,        QString::null);
-
-                if (mux >= 0)
-                    muxes.push_back(mux);
-            }
+            const MPEGDescriptor desc(list[j]);
+            HandleTransportDescriptor(muxes, desc, sourceid, tsid, netid);
         }
     }
     return muxes;

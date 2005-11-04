@@ -28,7 +28,7 @@ class ChannelUtil
                                    QString inner_FEC,     QString constellation,
                                    signed char hierarchy, QString hp_code_rate,
                                    QString lp_code_rate, QString guard_interval);
-    static vector<int>
+    static vector<uint>
                    CreateMultiplexes(int sourceid,
                                      const NetworkInformationTable *nit);
 
