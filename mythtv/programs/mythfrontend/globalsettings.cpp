@@ -709,6 +709,17 @@ static HostSpinBox *OSDProgramInfoTimeout()
     return gs;
 }
 
+static HostSpinBox *OSDNotifyTimeout()
+{
+    HostSpinBox *gs = new HostSpinBox("OSDNotifyTimeout", 1, 30, 1);
+    gs->setLabel(QObject::tr("UDP Notify OSD time-out"));
+    gs->setValue(5);
+    gs->setHelpText(QObject::tr(
+                        "How many seconds an on-screen display "
+                        "will be active for UDP Notify events."));
+    return gs;
+}
+
 static HostComboBox *MenuTheme()
 {
     HostComboBox *gc = new HostComboBox("MenuTheme");
@@ -776,9 +787,10 @@ static HostComboBox *OSDFont()
 static HostComboBox *OSDCCFont()
 {
     HostComboBox *gc = new HostComboBox("OSDCCFont");
-    gc->setLabel(QObject::tr("Closed Caption font"));
+    gc->setLabel(QObject::tr("CC font"));
     QDir ttf(gContext->GetFontsDir(), gContext->GetFontsNameFilter());
     gc->fillSelectionsFromDir(ttf, false);
+    gc->setHelpText(QObject::tr("Closed Caption font"));
 
     return gc;
 }
@@ -3053,11 +3065,24 @@ PlaybackSettings::PlaybackSettings()
     VerticalConfigurationGroup* osd = new VerticalConfigurationGroup(false);
     osd->setLabel(QObject::tr("On-screen display"));
     osd->addChild(OSDTheme());
-    osd->addChild(OSDGeneralTimeout());
-    osd->addChild(OSDProgramInfoTimeout());
-    osd->addChild(OSDFont());
-    osd->addChild(OSDCCFont());
-    osd->addChild(OSDThemeFontSizeType());
+
+    HorizontalConfigurationGroup* osdhg =
+        new HorizontalConfigurationGroup(false, false);
+    VerticalConfigurationGroup* osdvg1 =
+        new VerticalConfigurationGroup(false, false);
+    osdvg1->addChild(OSDGeneralTimeout());
+    osdvg1->addChild(OSDProgramInfoTimeout());
+    osdvg1->addChild(OSDNotifyTimeout());
+    osdhg->addChild(osdvg1);
+
+    VerticalConfigurationGroup* osdvg2 =
+        new VerticalConfigurationGroup(false, false);
+    osdvg2->addChild(OSDFont());
+    osdvg2->addChild(OSDCCFont());
+    osdvg2->addChild(OSDThemeFontSizeType());
+    osdhg->addChild(osdvg2);
+    osd->addChild(osdhg);
+
     osd->addChild(CCBackground());
     osd->addChild(DefaultCCMode());
     osd->addChild(PersistentBrowseMode());

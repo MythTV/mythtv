@@ -8,7 +8,7 @@ you must subscribe to the caller ID service from your telephone company.
 I have tested this with 2 modems - 1) USR Sportster modem on /dev/ttyS0 
 and 2) a 'PCTel' 'winmodem' on /dev/ttyS15
 
-1) [DEFAULT] It continuosly monitors a caller ID capable modem. The
+1) [DEFAULT] It continuously monitors a caller ID capable modem. The
 calling info is extracted, wrapped in an XML structure, and UDP
 broadcast.
 
@@ -76,3 +76,13 @@ on and not from the phone company. See 'localtime' manpage.
 %cid_time_string%      - string representation (see ctime())
                        - example: Wed Sep 17 22:48:21 2003
 
+
+gnassas@mac.com 6/25/2005
+
+The phonebook argument allows cidbcast to supply names when the
+telco doesn't transmit one which is very handy in my area where
+few/no mobile numbers have names associated with them. Subsitutions
+are made just before expanding the keywords in the xml file. The
+phonebook parsing routine is very simplistic - it expects a number,
+a colon and then a name with no whitespace before or after. The
+program has a hard limit of 19 characters for names.

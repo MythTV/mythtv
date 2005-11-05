@@ -336,7 +336,7 @@ void UDPNotify::incomingData(int socket)
         return;
     }
  
-    int displaytime = 5;
+    int displaytime = gContext->GetNumSetting("OSDNotifyTimeout", 5);
  
     QDomElement docElem = doc.documentElement();
     if (!docElem.isNull())

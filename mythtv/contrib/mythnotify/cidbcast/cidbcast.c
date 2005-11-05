@@ -34,6 +34,61 @@ typedef struct
 int checkfor_cid_info(char *buffer, int len, CID_Info *cid_info);
 int checkfor_two_rings(char *buffer, int len);
 
+typedef struct
+{
+  char *name;
+  char *number;
+} phonebook_entry;
+
+phonebook_entry *phonebook = NULL;
+int phonebook_size = 0;
+
+void read_phonebook(const char *filename)
+{
+  FILE *pb = fopen(filename, "r");
+  if (pb == NULL)
+  {
+    fprintf(stderr, "Unable to open phonebook file %s\n", filename);
+    exit(1);
+  }
+  fseek(pb, 0L, SEEK_END);
+  int pbsize = ftell(pb);
+  fseek(pb, 0L, SEEK_SET);
+  char *pbtext = (char *) malloc(pbsize+1);
+  fread(pbtext, 1, pbsize, pb);
+  fclose(pb);
+
+  int num_entries = 0;
+  char *cp;
+  for (cp = pbtext; *cp != '\0'; cp++)
+    if (*cp == '\n') num_entries++;
+  if (num_entries == 0) return;
+
+  phonebook = (phonebook_entry *) malloc(num_entries * sizeof(phonebook_entry));
+  int i;
+  for (i = 0; i < num_entries; i++)
+  {
+    if ((phonebook[i].number = strtok(pbtext, ":")) == NULL) return;
+    pbtext = NULL;
+    if ((phonebook[i].name = strtok(pbtext, "\n")) == NULL) return;
+    phonebook_size++;
+  }
+}
+
+void match_in_phonebook(CID_Info *cid_info)
+{
+  if (phonebook == NULL) return;
+  int i;
+  for (i = 0; i < phonebook_size; i++)
+  {
+    if (strcmp(cid_info->number, phonebook[i].number) == 0)
+    {
+      strcpy(cid_info->name, phonebook[i].name);
+      return;
+    }
+  }
+}
+
 int verbose = 0;
 char xml_filename[255];
 char bcast_addr[16];
@@ -590,6 +645,8 @@ void print_help(char *progname)
   printf("  -b, --bcast     : UDP broadcast address (--bcast=255.255.255.255)\n");
   printf("  -f, --file      : (REQUIRED)XML file to use as a template (--file=cidbcast.xml)\n");
   printf("  -i, --init      : Modem init string (--init=\"AT S7=45 S0=0 L0 V1 X4 &c1 E0 Q0 #CID=1 S41=1\")\n");
+  printf("  -l, --logfile   : Append stdout and stderr (--logfile=/var/log/cibcast.log)\n");
+  printf("  -p, --phonebook : File of NUMBER:NAME lines used to supply/override caller names\n");
   printf("  -v, --verbose   : some debug stuff\n");
 
   printf("\n  -o, --once      : runs program in 'single shot' mode (see README)\n");
@@ -607,7 +664,6 @@ int main(int argc, char *argv[])
     char* tmp1_message;
     char* tmp2_message;
     struct timeb time;
-    struct tm timeValues_r;
     struct tm* timeValues;
     FILE *fptr;
     long fsize;
@@ -626,6 +682,8 @@ int main(int argc, char *argv[])
 	{"udpport", required_argument, 0, 'u'},
 	{"bcast", required_argument, 0, 'b'},
 	{"file", required_argument, 0, 'f'},
+	{"logfile", required_argument, 0, 'l'},
+	{"phonebook", required_argument, 0, 'p'},
 	{"init", required_argument, 0, 'i'},
 	{"help", no_argument, 0, 'h'},
 	{"verbose", no_argument, 0, 'v'},
@@ -679,6 +737,21 @@ int main(int argc, char *argv[])
       case 'f':
 	strncpy(xml_filename, optarg, sizeof(xml_filename)-1);
 	file_arg_found = 1;
+	break;
+
+      case 'l':
+        // redirect output immediately so arg errors will be logged
+        if (freopen(optarg, "a", stdout) == (FILE *) NULL ||
+            dup2(STDOUT_FILENO, STDERR_FILENO) < 0)
+        {
+            fprintf(stderr, "Unable to open logfile %s\n", optarg);
+            exit(1);
+        }
+        setbuf(stdout, NULL);
+	break;
+
+      case 'p':
+        read_phonebook(optarg);
 	break;
 
       case 'h':
@@ -778,7 +851,15 @@ int main(int argc, char *argv[])
 	}
 
 	ftime(&time);
-	timeValues = localtime_r(&(time.time), &timeValues_r);
+	timeValues = localtime(&(time.time));
+
+        match_in_phonebook(&cid_info);
+
+        /* USR modems use name 0 when caller is unidentified */
+        if (strcmp(cid_info.name, "0") == 0)
+        {
+          strcpy(cid_info.name, "Unknown");
+        }
 
 	replace(raw_message, tmp2_message, "%cid_number%", cid_info.number);
 	replace(tmp2_message, tmp1_message, "%cid_name%", cid_info.name);
