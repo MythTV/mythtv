@@ -70,35 +70,35 @@
     </message>
     <message>
         <source>Capture Card Menu</source>
-        <translation type="unfinished">TV-kortsmeny</translation>
+        <translation>TV-kortsmeny</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished">Ändra..</translation>
+        <translation>Ändra..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished">Ta bort..</translation>
+        <translation>Ta bort..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation type="unfinished">Är du säker på att du vill ta bort detta TV-kort?</translation>
+        <translation>Är du säker på att du vill ta bort detta TV-kort?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation type="unfinished">Ja, ta bort TV-kortet</translation>
+        <translation>Ja, ta bort TV-kortet</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished">Nej, låt bli</translation>
+        <translation>Nej, låt bli</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation type="unfinished">Är du säker på att du vill ta bort ALLA TV-kort?</translation>
+        <translation>Är du säker på att du vill ta bort ALLA TV-kort?</translation>
     </message>
     <message>
         <source>Yes, delete capture cards</source>
-        <translation type="unfinished">Ja, ta bort TV-kort</translation>
+        <translation>Ja, ta bort TV-korten</translation>
     </message>
 </context>
 <context>
@@ -109,7 +109,7 @@
     </message>
     <message>
         <source>Use channel scanner to find channels for this input.</source>
-        <translation type="unfinished">Använd kanalsökare för att hitta kanaler för denna ingång.</translation>
+        <translation>Använd kanalsökare för att hitta kanaler för denna ingång.</translation>
     </message>
     <message>
         <source>Fetch channels from listings source</source>
@@ -117,11 +117,11 @@
     </message>
     <message>
         <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation type="unfinished">Använd programlistkällan för att hämta kanalerna för denna ingång.</translation>
+        <translation>Använd programlistkällan för att hämta kanalerna för denna ingång.</translation>
     </message>
     <message>
         <source>This can take a long time to run.</source>
-        <translation type="unfinished">Detta kan ta lång tid att köra.</translation>
+        <translation>Detta kan ta lång tid att köra.</translation>
     </message>
 </context>
 <context>
@@ -425,18 +425,12 @@
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation type="unfinished">Hämtar programutbud från DataDirect-tjänst...</translation>
+        <translation>Hämtar programutbud från DataDirect-tjänst...</translation>
     </message>
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
-        <translation type="unfinished">Hämtar programutbud från Myth Plus-tjänsten...</translation>
+        <translation>Hämtar programutbud från Myth Plus-tjänsten...</translation>
     </message>
-</context>
-<context>
-    <name>EITOnly_config</name>
-</context>
-<context>
-    <name>IgnoreSignalTimeout</name>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -6990,76 +6984,76 @@ Myth kommer nu att avslutas.</translation>
     <name>ScanCountry</name>
     <message>
         <source>Country</source>
-        <translation type="unfinished">Land</translation>
+        <translation>Land</translation>
     </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation type="unfinished">Sökförlopp</translation>
+        <translation>Sökförlopp</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation type="unfinished">Justerar</translation>
+        <translation>Justerar</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="unfinished">Status</translation>
+        <translation>Status</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation type="unfinished">Sökning</translation>
+        <translation>Sökning</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation type="unfinished">Signalstyrka</translation>
+        <translation>Signalstyrka</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation type="unfinished">Signal/Brus</translation>
+        <translation>Signal/Brus</translation>
     </message>
     <message>
         <source>Locked</source>
-        <translation type="unfinished">Låst</translation>
+        <translation>Låst</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation type="unfinished">Inget lås</translation>
+        <translation>Inget lås</translation>
     </message>
 </context>
 <context>
     <name>ScanTypeSetting</name>
     <message>
         <source>Full Scan</source>
-        <translation type="unfinished">Full sökning</translation>
+        <translation>Full sökning</translation>
     </message>
     <message>
         <source>Full Scan (Tuned)</source>
-        <translation type="unfinished">Full sökning (justerad)</translation>
+        <translation>Full sökning (justerad)</translation>
     </message>
     <message>
         <source>Import channels.conf</source>
-        <translation type="unfinished">Importera channels.conf</translation>
+        <translation>Importera channels.conf</translation>
     </message>
     <message>
         <source>Full Scan of Existing Transports</source>
-        <translation type="unfinished">Full sökning av existerande transporter</translation>
+        <translation>Full sökning av existerande transporter</translation>
     </message>
     <message>
         <source>Existing Transport Scan</source>
-        <translation type="unfinished">Sök av existerande transporter</translation>
+        <translation>Sök av existerande transporter</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation type="unfinished">Söktyp</translation>
+        <translation>Söktyp</translation>
     </message>
 </context>
 <context>
@@ -7687,7 +7681,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Seek:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sök:</translation>
     </message>
     <message>
         <source>CC:</source>
@@ -7695,7 +7689,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Reactivate</source>
-        <translation type="unfinished">Återaktivera</translation>
+        <translation>Återaktivera</translation>
     </message>
     <message>
         <source>Use guide cancel</source>
@@ -7861,35 +7855,35 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Video Source Menu</source>
-        <translation type="unfinished">Videokällsmeny</translation>
+        <translation>Videokällsmeny</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation type="unfinished">Ändra..</translation>
+        <translation>Ändra..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation type="unfinished">Ta bort..</translation>
+        <translation>Ta bort..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation type="unfinished">Är du säker på att du vill ta bort denna videokälla?</translation>
+        <translation>Är du säker på att du vill ta bort denna videokälla?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation type="unfinished">Ja, ta bort videokällan</translation>
+        <translation>Ja, ta bort videokällan</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation type="unfinished">Nej, låt bli</translation>
+        <translation>Nej, låt bli</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>
-        <translation type="unfinished">Är du säker på att du vill ta bort ALLA videokällor?</translation>
+        <translation>Är du säker på att du vill ta bort ALLA videokällor?</translation>
     </message>
     <message>
         <source>Yes, delete video sources</source>
-        <translation type="unfinished">Ja, ta bort videokällor</translation>
+        <translation>Ja, ta bort videokällorna</translation>
     </message>
 </context>
 <context>
@@ -7940,7 +7934,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Please Wait ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vänligen vänta...</translation>
     </message>
     <message>
         <source>MythTV is about to start recording.</source>
@@ -8004,11 +7998,11 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">Avsluta</translation>
+        <translation>Avsluta</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished">Avbryt</translation>
+        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is currently recording</source>
