@@ -93,27 +93,27 @@
     </message>
     <message>
         <source>Capture Card Menu</source>
-        <translation>キャプチャカードメニュー</translation>
+        <translation type="unfinished">キャプチャカードメニュー</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>編集..</translation>
+        <translation type="unfinished">編集..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>削除..</translation>
+        <translation type="unfinished">削除..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation>本当にこのキャプチャカードを削除しますか？</translation>
+        <translation type="unfinished">本当にこのキャプチャカードを削除しますか？</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation>はい，削除します</translation>
+        <translation type="unfinished">はい，削除します</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>いいえ</translation>
+        <translation type="unfinished">いいえ</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
@@ -131,11 +131,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use channel scanner to find channels for this input.</source>
+        <source>Fetch channels from listings source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fetch channels from listings source</source>
+        <source>Use channel scanner to find channels for this input.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -448,7 +448,7 @@
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation>DataDirectサービスからラインナップを取得中...</translation>
+        <translation type="unfinished">DataDirectサービスからラインナップを取得中...</translation>
     </message>
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
@@ -457,29 +457,9 @@
 </context>
 <context>
     <name>EITOnly_config</name>
-    <message>
-        <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>IgnoreSignalTimeout</name>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -7451,6 +7431,74 @@ Myth will now exit.</source>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="obsolete">スキャン進捗</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="obsolete">チューニング</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from DataDirect service...</source>
+        <translation type="obsolete">DataDirectサービスからラインナップを取得中...</translation>
+    </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card Menu</source>
+        <translation type="obsolete">キャプチャカードメニュー</translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="obsolete">編集..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="obsolete">削除..</translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="obsolete">いいえ</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this capture card?</source>
+        <translation type="obsolete">本当にこのキャプチャカードを削除しますか？</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture card</source>
+        <translation type="obsolete">はい，削除します</translation>
+    </message>
+    <message>
+        <source>Video Source Menu</source>
+        <translation type="obsolete">ビデオソースメニュー</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this video source?</source>
+        <translation type="obsolete">このビデオソースを本当に削除しますか?</translation>
+    </message>
+    <message>
+        <source>Yes, delete video source</source>
+        <translation type="obsolete">はい，ビデオソースを削除します</translation>
+    </message>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7463,23 +7511,19 @@ Myth will now exit.</source>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation>スキャン進捗</translation>
+        <translation type="unfinished">スキャン進捗</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation>チューニング</translation>
+        <translation type="unfinished">チューニング</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>キャンセル</translation>
+        <translation type="unfinished">キャンセル</translation>
     </message>
     <message>
         <source>Status</source>
         <translation type="unfinished">ステータス</translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Signal Strength</source>
@@ -7490,12 +7534,16 @@ Myth will now exit.</source>
         <translation type="unfinished">シグナル/ノイズ比</translation>
     </message>
     <message>
-        <source>Locked</source>
+        <source>No Lock</source>
+        <translation type="unfinished">ロック無し</translation>
+    </message>
+    <message>
+        <source>Scan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No Lock</source>
-        <translation type="unfinished">ロック無し</translation>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7525,7 +7573,7 @@ Myth will now exit.</source>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation>スキャンタイプ</translation>
+        <translation type="unfinished">スキャンタイプ</translation>
     </message>
 </context>
 <context>
@@ -8358,27 +8406,27 @@ No other details</source>
     </message>
     <message>
         <source>Video Source Menu</source>
-        <translation>ビデオソースメニュー</translation>
+        <translation type="unfinished">ビデオソースメニュー</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>編集..</translation>
+        <translation type="unfinished">編集..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>削除..</translation>
+        <translation type="unfinished">削除..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation>このビデオソースを本当に削除しますか?</translation>
+        <translation type="unfinished">このビデオソースを本当に削除しますか?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation>はい，ビデオソースを削除します</translation>
+        <translation type="unfinished">はい，ビデオソースを削除します</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>いいえ</translation>
+        <translation type="unfinished">いいえ</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>

@@ -97,27 +97,27 @@
     </message>
     <message>
         <source>Capture Card Menu</source>
-        <translation>TV-kaart Menu</translation>
+        <translation type="unfinished">TV-kaart Menu</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Bewerk..</translation>
+        <translation type="unfinished">Bewerk..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Verwijder..</translation>
+        <translation type="unfinished">Verwijder..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation>Bent u zeker van het verwijderen van deze TV-kaart?</translation>
+        <translation type="unfinished">Bent u zeker van het verwijderen van deze TV-kaart?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation>Ja, verwijder TV-kaart</translation>
+        <translation type="unfinished">Ja, verwijder TV-kaart</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Nee, niet doen</translation>
+        <translation type="unfinished">Nee, niet doen</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
@@ -135,11 +135,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use channel scanner to find channels for this input.</source>
+        <source>Fetch channels from listings source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fetch channels from listings source</source>
+        <source>Use channel scanner to find channels for this input.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -453,38 +453,18 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation>Ophalen van data van de DataDirect-service...</translation>
+        <translation type="unfinished">Ophalen van data van de DataDirect-service...</translation>
     </message>
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
-        <translation>Ophalen van data van de Myth Plus service...</translation>
+        <translation type="unfinished">Ophalen van data van de Myth Plus service...</translation>
     </message>
 </context>
 <context>
     <name>EITOnly_config</name>
-    <message>
-        <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>IgnoreSignalTimeout</name>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -7558,27 +7538,127 @@ Myth zal nu afsluiten.</translation>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="obsolete">Scan Voortgang</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="obsolete">Aan het tunen</translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="obsolete">Niet Vastzetten</translation>
+    </message>
+    <message>
+        <source>Full Scan</source>
+        <translation type="obsolete">Volledig scannen</translation>
+    </message>
+    <message>
+        <source>Full Scan (Tuned)</source>
+        <translation type="obsolete">Volledig scannen (Getuned)</translation>
+    </message>
+    <message>
+        <source>Import channels.conf</source>
+        <translation type="obsolete">Importeer channels.conf</translation>
+    </message>
+    <message>
+        <source>Full Scan of Existing Transports</source>
+        <translation type="obsolete">Volledige scan van bestaande Transports</translation>
+    </message>
+    <message>
+        <source>Existing Transport Scan</source>
+        <translation type="obsolete">Scan bestaande Transports</translation>
+    </message>
+    <message>
+        <source>Country</source>
+        <translation type="obsolete">Land</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from DataDirect service...</source>
+        <translation type="obsolete">Ophalen van data van de DataDirect-service...</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from the Myth Plus service...</source>
+        <translation type="obsolete">Ophalen van data van de Myth Plus service...</translation>
+    </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card Menu</source>
+        <translation type="obsolete">TV-kaart Menu</translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="obsolete">Bewerk..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="obsolete">Verwijder..</translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="obsolete">Nee, niet doen</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this capture card?</source>
+        <translation type="obsolete">Bent u zeker van het verwijderen van deze TV-kaart?</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture card</source>
+        <translation type="obsolete">Ja, verwijder TV-kaart</translation>
+    </message>
+    <message>
+        <source>Video Source Menu</source>
+        <translation type="obsolete">Menu voor Video-bronnen</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this video source?</source>
+        <translation type="obsolete">Bent u zeker van het verwijderen van deze video-bron?</translation>
+    </message>
+    <message>
+        <source>Yes, delete video source</source>
+        <translation type="obsolete">Ja, verwijder video-bron</translation>
+    </message>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
     <message>
         <source>Country</source>
-        <translation>Land</translation>
+        <translation type="unfinished">Land</translation>
     </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation>Scan Voortgang</translation>
+        <translation type="unfinished">Scan Voortgang</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation>Aan het tunen</translation>
+        <translation type="unfinished">Aan het tunen</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Annuleer</translation>
+        <translation type="unfinished">Annuleer</translation>
     </message>
     <message>
         <source>Status</source>
@@ -7597,42 +7677,42 @@ Myth zal nu afsluiten.</translation>
         <translation type="unfinished">Signaal/Ruis</translation>
     </message>
     <message>
-        <source>Locked</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No Lock</source>
         <translation type="unfinished">Niet Vastzetten</translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ScanTypeSetting</name>
     <message>
         <source>Full Scan</source>
-        <translation>Volledig scannen</translation>
+        <translation type="unfinished">Volledig scannen</translation>
     </message>
     <message>
         <source>Full Scan (Tuned)</source>
-        <translation>Volledig scannen (Getuned)</translation>
+        <translation type="unfinished">Volledig scannen (Getuned)</translation>
     </message>
     <message>
         <source>Import channels.conf</source>
-        <translation>Importeer channels.conf</translation>
+        <translation type="unfinished">Importeer channels.conf</translation>
     </message>
     <message>
         <source>Full Scan of Existing Transports</source>
-        <translation>Volledige scan van bestaande Transports</translation>
+        <translation type="unfinished">Volledige scan van bestaande Transports</translation>
     </message>
     <message>
         <source>Existing Transport Scan</source>
-        <translation>Scan bestaande Transports</translation>
+        <translation type="unfinished">Scan bestaande Transports</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation>Scan Type</translation>
+        <translation type="unfinished">Scan Type</translation>
     </message>
 </context>
 <context>
@@ -8477,27 +8557,27 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>Video Source Menu</source>
-        <translation>Menu voor Video-bronnen</translation>
+        <translation type="unfinished">Menu voor Video-bronnen</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Bewerk..</translation>
+        <translation type="unfinished">Bewerk..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Verwijder..</translation>
+        <translation type="unfinished">Verwijder..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation>Bent u zeker van het verwijderen van deze video-bron?</translation>
+        <translation type="unfinished">Bent u zeker van het verwijderen van deze video-bron?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation>Ja, verwijder video-bron</translation>
+        <translation type="unfinished">Ja, verwijder video-bron</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Nee, niet doen</translation>
+        <translation type="unfinished">Nee, niet doen</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>

@@ -93,27 +93,27 @@
     <name>CaptureCardEditor</name>
     <message>
         <source>Capture Card Menu</source>
-        <translation>Izbira kartice za zajem</translation>
+        <translation type="unfinished">Izbira kartice za zajem</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Spremeni...</translation>
+        <translation type="unfinished">Spremeni...</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Odstrani...</translation>
+        <translation type="unfinished">Odstrani...</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation>Ali ste prepričani, da želite odstraniti kartico za zajem?</translation>
+        <translation type="unfinished">Ali ste prepričani, da želite odstraniti kartico za zajem?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation>Da, odstrani kartico za zajem</translation>
+        <translation type="unfinished">Da, odstrani kartico za zajem</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Ne odstrani</translation>
+        <translation type="unfinished">Ne odstrani</translation>
     </message>
     <message>
         <source>Capture cards</source>
@@ -135,11 +135,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use channel scanner to find channels for this input.</source>
+        <source>Fetch channels from listings source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fetch channels from listings source</source>
+        <source>Use channel scanner to find channels for this input.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -452,7 +452,7 @@
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation>Prenos nastavitev iz DataDirect-a</translation>
+        <translation type="unfinished">Prenos nastavitev iz DataDirect-a</translation>
     </message>
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
@@ -461,29 +461,9 @@
 </context>
 <context>
     <name>EITOnly_config</name>
-    <message>
-        <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>IgnoreSignalTimeout</name>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -7500,6 +7480,62 @@ Myth will now exit.</source>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="obsolete">Napredek iskanja</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="obsolete">Uglaševanje</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from DataDirect service...</source>
+        <translation type="obsolete">Prenos nastavitev iz DataDirect-a</translation>
+    </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card Menu</source>
+        <translation type="obsolete">Izbira kartice za zajem</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this capture card?</source>
+        <translation type="obsolete">Ali ste prepričani, da želite odstraniti kartico za zajem?</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture card</source>
+        <translation type="obsolete">Da, odstrani kartico za zajem</translation>
+    </message>
+    <message>
+        <source>Video Source Menu</source>
+        <translation type="obsolete">Video vir menu</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this video source?</source>
+        <translation type="obsolete">Ste prepričani, da želite izbrisati ta video vir?</translation>
+    </message>
+    <message>
+        <source>Yes, delete video source</source>
+        <translation type="obsolete">Da, izbriši ta video vir</translation>
+    </message>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7512,23 +7548,19 @@ Myth will now exit.</source>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation>Napredek iskanja</translation>
+        <translation type="unfinished">Napredek iskanja</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation>Uglaševanje</translation>
+        <translation type="unfinished">Uglaševanje</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Prekliči</translation>
+        <translation type="unfinished">Prekliči</translation>
     </message>
     <message>
         <source>Status</source>
         <translation type="unfinished">Status</translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Signal Strength</source>
@@ -7539,12 +7571,16 @@ Myth will now exit.</source>
         <translation type="unfinished">Signal/Šum</translation>
     </message>
     <message>
-        <source>Locked</source>
+        <source>No Lock</source>
+        <translation type="unfinished">Ni zaklenjen</translation>
+    </message>
+    <message>
+        <source>Scan</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No Lock</source>
-        <translation type="unfinished">Ni zaklenjen</translation>
+        <source>Locked</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7574,7 +7610,7 @@ Myth will now exit.</source>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation>Tip iskanja</translation>
+        <translation type="unfinished">Tip iskanja</translation>
     </message>
 </context>
 <context>
@@ -8403,27 +8439,27 @@ Ni ostalih podatkov</translation>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video Source Menu</source>
-        <translation>Video vir menu</translation>
+        <translation type="unfinished">Video vir menu</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Spremeni...</translation>
+        <translation type="unfinished">Spremeni...</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Izbriši...</translation>
+        <translation type="unfinished">Izbriši...</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation>Ste prepričani, da želite izbrisati ta video vir?</translation>
+        <translation type="unfinished">Ste prepričani, da želite izbrisati ta video vir?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation>Da, izbriši ta video vir</translation>
+        <translation type="unfinished">Da, izbriši ta video vir</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Ne izbriši</translation>
+        <translation type="unfinished">Ne izbriši</translation>
     </message>
     <message>
         <source>Video sources</source>

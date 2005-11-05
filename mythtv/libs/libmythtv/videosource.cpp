@@ -800,15 +800,15 @@ EITOnly_config::EITOnly_config(const VideoSource& _parent)
 
     TransLabelSetting *label;
     label=new TransLabelSetting();
-    label->setValue(tr("Use only the transmitted guide data."));
+    label->setValue(QObject::tr("Use only the transmitted guide data."));
     addChild(label);
     label=new TransLabelSetting();
     label->setValue(
-        tr("This will usually only work with ATSC or DVB channels,"));
+        QObject::tr("This will usually only work with ATSC or DVB channels,"));
     addChild(label);
     label=new TransLabelSetting();
     label->setValue(
-        tr("and generally provides data only for the next few days."));
+        QObject::tr("and generally provides data only for the next few days."));
     addChild(label);
 }
 

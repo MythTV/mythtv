@@ -146,11 +146,11 @@ class IgnoreSignalTimeout : public CheckBoxSetting, public TransientStorage
   public:
     IgnoreSignalTimeout()
     {
-        setLabel(tr("Ignore Signal Timeout"));
+        setLabel(QObject::tr("Ignore Signal Timeout"));
         setHelpText(
-            tr("This option allows you to slow down the scan for "
-               "broken drivers, such as the DVB drivers for the "
-               "Leadtek LR6650 DVB card."));
+            QObject::tr("This option allows you to slow down the scan for "
+                        "broken drivers, such as the DVB drivers for the "
+                        "Leadtek LR6650 DVB card."));
     }
 };
 

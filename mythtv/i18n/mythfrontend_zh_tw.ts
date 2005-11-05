@@ -65,6 +65,10 @@
 <context>
     <name>CaptureCardEditor</name>
     <message>
+        <source>Capture cards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Capture Card Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -77,11 +81,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to delete this capture card?</source>
+        <source>Are you sure you want to delete ALL capture cards?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Yes, delete capture card</source>
+        <source>Yes, delete capture cards</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -89,15 +93,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Capture cards</source>
+        <source>Are you sure you want to delete this capture card?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes, delete capture cards</source>
+        <source>Yes, delete capture card</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -108,11 +108,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use channel scanner to find channels for this input.</source>
+        <source>Fetch channels from listings source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fetch channels from listings source</source>
+        <source>Use channel scanner to find channels for this input.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -430,29 +430,9 @@
 </context>
 <context>
     <name>EITOnly_config</name>
-    <message>
-        <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>IgnoreSignalTimeout</name>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -6699,6 +6679,26 @@ Myth will now exit.</source>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -6714,15 +6714,11 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tuning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6735,6 +6731,10 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>Signal/Noise</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7566,6 +7566,10 @@ No other details</source>
 <context>
     <name>VideoSourceEditor</name>
     <message>
+        <source>Video sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Video Source Menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7578,11 +7582,11 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to delete this video source?</source>
+        <source>Are you sure you want to delete ALL video sources?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Yes, delete video source</source>
+        <source>Yes, delete video sources</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7590,15 +7594,11 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Video sources</source>
+        <source>Are you sure you want to delete this video source?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Are you sure you want to delete ALL video sources?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes, delete video sources</source>
+        <source>Yes, delete video source</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

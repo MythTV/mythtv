@@ -70,35 +70,35 @@
     </message>
     <message>
         <source>Capture Card Menu</source>
-        <translation>TV-kortsmeny</translation>
+        <translation type="unfinished">TV-kortsmeny</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Ändra..</translation>
+        <translation type="unfinished">Ändra..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Ta bort..</translation>
+        <translation type="unfinished">Ta bort..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation>Är du säker på att du vill ta bort detta TV-kort?</translation>
+        <translation type="unfinished">Är du säker på att du vill ta bort detta TV-kort?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation>Ja, ta bort TV-kortet</translation>
+        <translation type="unfinished">Ja, ta bort TV-kortet</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Nej, låt bli</translation>
+        <translation type="unfinished">Nej, låt bli</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation>Är du säker på att du vill ta bort ALLA TV-kort?</translation>
+        <translation type="unfinished">Är du säker på att du vill ta bort ALLA TV-kort?</translation>
     </message>
     <message>
         <source>Yes, delete capture cards</source>
-        <translation>Ja, ta bort TV-kort</translation>
+        <translation type="unfinished">Ja, ta bort TV-kort</translation>
     </message>
 </context>
 <context>
@@ -109,7 +109,7 @@
     </message>
     <message>
         <source>Use channel scanner to find channels for this input.</source>
-        <translation>Använd kanalsökare för att hitta kanaler för denna ingång.</translation>
+        <translation type="unfinished">Använd kanalsökare för att hitta kanaler för denna ingång.</translation>
     </message>
     <message>
         <source>Fetch channels from listings source</source>
@@ -117,11 +117,11 @@
     </message>
     <message>
         <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation>Använd programlistkällan för att hämta kanalerna för denna ingång.</translation>
+        <translation type="unfinished">Använd programlistkällan för att hämta kanalerna för denna ingång.</translation>
     </message>
     <message>
         <source>This can take a long time to run.</source>
-        <translation>Detta kan ta lång tid att köra.</translation>
+        <translation type="unfinished">Detta kan ta lång tid att köra.</translation>
     </message>
 </context>
 <context>
@@ -425,38 +425,18 @@
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation>Hämtar programutbud från DataDirect-tjänst...</translation>
+        <translation type="unfinished">Hämtar programutbud från DataDirect-tjänst...</translation>
     </message>
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
-        <translation>Hämtar programutbud från Myth Plus-tjänsten...</translation>
+        <translation type="unfinished">Hämtar programutbud från Myth Plus-tjänsten...</translation>
     </message>
 </context>
 <context>
     <name>EITOnly_config</name>
-    <message>
-        <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>IgnoreSignalTimeout</name>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -6857,81 +6837,229 @@ Myth kommer nu att avslutas.</translation>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="obsolete">Sökförlopp</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="obsolete">Status</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="obsolete">Justerar</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="obsolete">Sökning</translation>
+    </message>
+    <message>
+        <source>Signal Strength</source>
+        <translation type="obsolete">Signalstyrka</translation>
+    </message>
+    <message>
+        <source>Signal/Noise</source>
+        <translation type="obsolete">Signal/Brus</translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="obsolete">Låst</translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="obsolete">Inget lås</translation>
+    </message>
+    <message>
+        <source>Full Scan</source>
+        <translation type="obsolete">Full sökning</translation>
+    </message>
+    <message>
+        <source>Full Scan (Tuned)</source>
+        <translation type="obsolete">Full sökning (justerad)</translation>
+    </message>
+    <message>
+        <source>Import channels.conf</source>
+        <translation type="obsolete">Importera channels.conf</translation>
+    </message>
+    <message>
+        <source>Full Scan of Existing Transports</source>
+        <translation type="obsolete">Full sökning av existerande transporter</translation>
+    </message>
+    <message>
+        <source>Existing Transport Scan</source>
+        <translation type="obsolete">Sök av existerande transporter</translation>
+    </message>
+    <message>
+        <source>Country</source>
+        <translation type="obsolete">Land</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from DataDirect service...</source>
+        <translation type="obsolete">Hämtar programutbud från DataDirect-tjänst...</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from the Myth Plus service...</source>
+        <translation type="obsolete">Hämtar programutbud från Myth Plus-tjänsten...</translation>
+    </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use channel scanner to find channels for this input.</source>
+        <translation type="obsolete">Använd kanalsökare för att hitta kanaler för denna ingång.</translation>
+    </message>
+    <message>
+        <source>This uses the listings data source to provide the channels for this input.</source>
+        <translation type="obsolete">Använd programlistkällan för att hämta kanalerna för denna ingång.</translation>
+    </message>
+    <message>
+        <source>This can take a long time to run.</source>
+        <translation type="obsolete">Detta kan ta lång tid att köra.</translation>
+    </message>
+    <message>
+        <source>Capture Card Menu</source>
+        <translation type="obsolete">TV-kortsmeny</translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="obsolete">Ändra..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="obsolete">Ta bort..</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL capture cards?</source>
+        <translation type="obsolete">Är du säker på att du vill ta bort ALLA TV-kort?</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture cards</source>
+        <translation type="obsolete">Ja, ta bort TV-kort</translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="obsolete">Nej, låt bli</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this capture card?</source>
+        <translation type="obsolete">Är du säker på att du vill ta bort detta TV-kort?</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture card</source>
+        <translation type="obsolete">Ja, ta bort TV-kortet</translation>
+    </message>
+    <message>
+        <source>Video Source Menu</source>
+        <translation type="obsolete">Videokällsmeny</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL video sources?</source>
+        <translation type="obsolete">Är du säker på att du vill ta bort ALLA videokällor?</translation>
+    </message>
+    <message>
+        <source>Yes, delete video sources</source>
+        <translation type="obsolete">Ja, ta bort videokällor</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this video source?</source>
+        <translation type="obsolete">Är du säker på att du vill ta bort denna videokälla?</translation>
+    </message>
+    <message>
+        <source>Yes, delete video source</source>
+        <translation type="obsolete">Ja, ta bort videokällan</translation>
+    </message>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
     <message>
         <source>Country</source>
-        <translation>Land</translation>
+        <translation type="unfinished">Land</translation>
     </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation>Sökförlopp</translation>
+        <translation type="unfinished">Sökförlopp</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation>Justerar</translation>
+        <translation type="unfinished">Justerar</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Avbryt</translation>
+        <translation type="unfinished">Avbryt</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>Status</translation>
+        <translation type="unfinished">Status</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation>Sökning</translation>
+        <translation type="unfinished">Sökning</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation>Signalstyrka</translation>
+        <translation type="unfinished">Signalstyrka</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation>Signal/Brus</translation>
+        <translation type="unfinished">Signal/Brus</translation>
     </message>
     <message>
         <source>Locked</source>
-        <translation>Låst</translation>
+        <translation type="unfinished">Låst</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation>Inget lås</translation>
+        <translation type="unfinished">Inget lås</translation>
     </message>
 </context>
 <context>
     <name>ScanTypeSetting</name>
     <message>
         <source>Full Scan</source>
-        <translation>Full sökning</translation>
+        <translation type="unfinished">Full sökning</translation>
     </message>
     <message>
         <source>Full Scan (Tuned)</source>
-        <translation>Full sökning (justerad)</translation>
+        <translation type="unfinished">Full sökning (justerad)</translation>
     </message>
     <message>
         <source>Import channels.conf</source>
-        <translation>Importera channels.conf</translation>
+        <translation type="unfinished">Importera channels.conf</translation>
     </message>
     <message>
         <source>Full Scan of Existing Transports</source>
-        <translation>Full sökning av existerande transporter</translation>
+        <translation type="unfinished">Full sökning av existerande transporter</translation>
     </message>
     <message>
         <source>Existing Transport Scan</source>
-        <translation>Sök av existerande transporter</translation>
+        <translation type="unfinished">Sök av existerande transporter</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation>Söktyp</translation>
+        <translation type="unfinished">Söktyp</translation>
     </message>
 </context>
 <context>
@@ -7733,35 +7861,35 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Video Source Menu</source>
-        <translation>Videokällsmeny</translation>
+        <translation type="unfinished">Videokällsmeny</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Ändra..</translation>
+        <translation type="unfinished">Ändra..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Ta bort..</translation>
+        <translation type="unfinished">Ta bort..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation>Är du säker på att du vill ta bort denna videokälla?</translation>
+        <translation type="unfinished">Är du säker på att du vill ta bort denna videokälla?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation>Ja, ta bort videokällan</translation>
+        <translation type="unfinished">Ja, ta bort videokällan</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Nej, låt bli</translation>
+        <translation type="unfinished">Nej, låt bli</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>
-        <translation>Är du säker på att du vill ta bort ALLA videokällor?</translation>
+        <translation type="unfinished">Är du säker på att du vill ta bort ALLA videokällor?</translation>
     </message>
     <message>
         <source>Yes, delete video sources</source>
-        <translation>Ja, ta bort videokällor</translation>
+        <translation type="unfinished">Ja, ta bort videokällor</translation>
     </message>
 </context>
 <context>

@@ -97,35 +97,35 @@
     </message>
     <message>
         <source>Capture Card Menu</source>
-        <translation>TV-kortti Valikko</translation>
+        <translation type="unfinished">TV-kortti Valikko</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Muokkaa..</translation>
+        <translation type="unfinished">Muokkaa..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Poista..</translation>
+        <translation type="unfinished">Poista..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation>Poistetaanko tämä TV-kortti?</translation>
+        <translation type="unfinished">Poistetaanko tämä TV-kortti?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation>Kyllä, poista</translation>
+        <translation type="unfinished">Kyllä, poista</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Ei, älä poista</translation>
+        <translation type="unfinished">Ei, älä poista</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation>Poistetaanko KAIKKIEN TV-korttien asetukset?</translation>
+        <translation type="unfinished">Poistetaanko KAIKKIEN TV-korttien asetukset?</translation>
     </message>
     <message>
         <source>Yes, delete capture cards</source>
-        <translation>Kyllä, poista</translation>
+        <translation type="unfinished">Kyllä, poista</translation>
     </message>
 </context>
 <context>
@@ -136,7 +136,7 @@
     </message>
     <message>
         <source>Use channel scanner to find channels for this input.</source>
-        <translation>Käyttää kanavaselainta tämän sisääntulon kanavien etsintään.</translation>
+        <translation type="unfinished">Käyttää kanavaselainta tämän sisääntulon kanavien etsintään.</translation>
     </message>
     <message>
         <source>Fetch channels from listings source</source>
@@ -144,11 +144,11 @@
     </message>
     <message>
         <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation>Käyttää tekstipohjaista dokumenttia kanavien virittämiseen.</translation>
+        <translation type="unfinished">Käyttää tekstipohjaista dokumenttia kanavien virittämiseen.</translation>
     </message>
     <message>
         <source>This can take a long time to run.</source>
-        <translation>Voi kestää jonkin aikaa.</translation>
+        <translation type="unfinished">Voi kestää jonkin aikaa.</translation>
     </message>
 </context>
 <context>
@@ -452,38 +452,18 @@
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation>Haetaan DataDirect-palvelusta...</translation>
+        <translation type="unfinished">Haetaan DataDirect-palvelusta...</translation>
     </message>
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
-        <translation>Haetaan Myth Plus palvelusta...</translation>
+        <translation type="unfinished">Haetaan Myth Plus palvelusta...</translation>
     </message>
 </context>
 <context>
     <name>EITOnly_config</name>
-    <message>
-        <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>IgnoreSignalTimeout</name>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -7570,81 +7550,209 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="obsolete">Selauksen Tilanne</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="obsolete">Virittyy</translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="obsolete">Lukittu</translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="obsolete">Ei Lukitusta</translation>
+    </message>
+    <message>
+        <source>Full Scan</source>
+        <translation type="obsolete">Täysi Selaus</translation>
+    </message>
+    <message>
+        <source>Full Scan (Tuned)</source>
+        <translation type="obsolete">Täysi Etsintä (Viritetyt)</translation>
+    </message>
+    <message>
+        <source>Import channels.conf</source>
+        <translation type="obsolete">Tuo channels.conf</translation>
+    </message>
+    <message>
+        <source>Full Scan of Existing Transports</source>
+        <translation type="obsolete">Olemassaolevien Lähetysvirtojen Täysi Etsintä</translation>
+    </message>
+    <message>
+        <source>Existing Transport Scan</source>
+        <translation type="obsolete">Olemassaolevan Lähetysvirran Etsintä</translation>
+    </message>
+    <message>
+        <source>Country</source>
+        <translation type="obsolete">Maa</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from DataDirect service...</source>
+        <translation type="obsolete">Haetaan DataDirect-palvelusta...</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from the Myth Plus service...</source>
+        <translation type="obsolete">Haetaan Myth Plus palvelusta...</translation>
+    </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use channel scanner to find channels for this input.</source>
+        <translation type="obsolete">Käyttää kanavaselainta tämän sisääntulon kanavien etsintään.</translation>
+    </message>
+    <message>
+        <source>This uses the listings data source to provide the channels for this input.</source>
+        <translation type="obsolete">Käyttää tekstipohjaista dokumenttia kanavien virittämiseen.</translation>
+    </message>
+    <message>
+        <source>This can take a long time to run.</source>
+        <translation type="obsolete">Voi kestää jonkin aikaa.</translation>
+    </message>
+    <message>
+        <source>Capture Card Menu</source>
+        <translation type="obsolete">TV-kortti Valikko</translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="obsolete">Muokkaa..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="obsolete">Poista..</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL capture cards?</source>
+        <translation type="obsolete">Poistetaanko KAIKKIEN TV-korttien asetukset?</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture cards</source>
+        <translation type="obsolete">Kyllä, poista</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this capture card?</source>
+        <translation type="obsolete">Poistetaanko tämä TV-kortti?</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture card</source>
+        <translation type="obsolete">Kyllä, poista</translation>
+    </message>
+    <message>
+        <source>Video Source Menu</source>
+        <translation type="obsolete">Kuvanlähteet-valikko</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL video sources?</source>
+        <translation type="obsolete">Poistetaanko varmasti kaikki kuvanlähteet?</translation>
+    </message>
+    <message>
+        <source>Yes, delete video sources</source>
+        <translation type="obsolete">Kyllä, poista kuvanlähteet</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this video source?</source>
+        <translation type="obsolete">Poistetaanko tämä kuvanlähde?</translation>
+    </message>
+    <message>
+        <source>Yes, delete video source</source>
+        <translation type="obsolete">Kyllä, poista kuvanlähde</translation>
+    </message>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
     <message>
         <source>Country</source>
-        <translation>Maa</translation>
+        <translation type="unfinished">Maa</translation>
     </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation>Selauksen Tilanne</translation>
+        <translation type="unfinished">Selauksen Tilanne</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation>Virittyy</translation>
+        <translation type="unfinished">Virittyy</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Peruuta</translation>
+        <translation type="unfinished">Peruuta</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>Tila</translation>
+        <translation type="unfinished">Tila</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation>Selaa</translation>
+        <translation type="unfinished">Selaa</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation>Signaalin Voimakkuus</translation>
+        <translation type="unfinished">Signaalin Voimakkuus</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation>Signaali/Kohina</translation>
+        <translation type="unfinished">Signaali/Kohina</translation>
     </message>
     <message>
         <source>Locked</source>
-        <translation>Lukittu</translation>
+        <translation type="unfinished">Lukittu</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation>Ei Lukitusta</translation>
+        <translation type="unfinished">Ei Lukitusta</translation>
     </message>
 </context>
 <context>
     <name>ScanTypeSetting</name>
     <message>
         <source>Full Scan</source>
-        <translation>Täysi Selaus</translation>
+        <translation type="unfinished">Täysi Selaus</translation>
     </message>
     <message>
         <source>Full Scan (Tuned)</source>
-        <translation>Täysi Etsintä (Viritetyt)</translation>
+        <translation type="unfinished">Täysi Etsintä (Viritetyt)</translation>
     </message>
     <message>
         <source>Import channels.conf</source>
-        <translation>Tuo channels.conf</translation>
+        <translation type="unfinished">Tuo channels.conf</translation>
     </message>
     <message>
         <source>Full Scan of Existing Transports</source>
-        <translation>Olemassaolevien Lähetysvirtojen Täysi Etsintä</translation>
+        <translation type="unfinished">Olemassaolevien Lähetysvirtojen Täysi Etsintä</translation>
     </message>
     <message>
         <source>Existing Transport Scan</source>
-        <translation>Olemassaolevan Lähetysvirran Etsintä</translation>
+        <translation type="unfinished">Olemassaolevan Lähetysvirran Etsintä</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation>Virityksen Tyyppi</translation>
+        <translation type="unfinished">Virityksen Tyyppi</translation>
     </message>
 </context>
 <context>
@@ -8491,35 +8599,35 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Video Source Menu</source>
-        <translation>Kuvanlähteet-valikko</translation>
+        <translation type="unfinished">Kuvanlähteet-valikko</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Muokkaa..</translation>
+        <translation type="unfinished">Muokkaa..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Poista..</translation>
+        <translation type="unfinished">Poista..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation>Poistetaanko tämä kuvanlähde?</translation>
+        <translation type="unfinished">Poistetaanko tämä kuvanlähde?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation>Kyllä, poista kuvanlähde</translation>
+        <translation type="unfinished">Kyllä, poista kuvanlähde</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Ei, älä poista</translation>
+        <translation type="unfinished">Ei, älä poista</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>
-        <translation>Poistetaanko varmasti kaikki kuvanlähteet?</translation>
+        <translation type="unfinished">Poistetaanko varmasti kaikki kuvanlähteet?</translation>
     </message>
     <message>
         <source>Yes, delete video sources</source>
-        <translation>Kyllä, poista kuvanlähteet</translation>
+        <translation type="unfinished">Kyllä, poista kuvanlähteet</translation>
     </message>
 </context>
 <context>

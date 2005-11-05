@@ -97,35 +97,35 @@
     </message>
     <message>
         <source>Capture Card Menu</source>
-        <translation>Menú capturadoras</translation>
+        <translation type="unfinished">Menú capturadoras</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Editar..</translation>
+        <translation type="unfinished">Editar..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Borrar..</translation>
+        <translation type="unfinished">Borrar..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation>¿Está seguro de borrar esta capturadora?</translation>
+        <translation type="unfinished">¿Está seguro de borrar esta capturadora?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation>Sí, borrar capturadora</translation>
+        <translation type="unfinished">Sí, borrar capturadora</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>No</translation>
+        <translation type="unfinished">No</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation>¿Está seguro de borrar TODAS las capturadoras?</translation>
+        <translation type="unfinished">¿Está seguro de borrar TODAS las capturadoras?</translation>
     </message>
     <message>
         <source>Yes, delete capture cards</source>
-        <translation>Sí, borrar las capturadoras</translation>
+        <translation type="unfinished">Sí, borrar las capturadoras</translation>
     </message>
 </context>
 <context>
@@ -136,7 +136,7 @@
     </message>
     <message>
         <source>Use channel scanner to find channels for this input.</source>
-        <translation>Usar la búsqueda de canales en esta entrada.</translation>
+        <translation type="unfinished">Usar la búsqueda de canales en esta entrada.</translation>
     </message>
     <message>
         <source>Fetch channels from listings source</source>
@@ -144,11 +144,11 @@
     </message>
     <message>
         <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation>Usar los listados para proveer los canales de esta entrada.</translation>
+        <translation type="unfinished">Usar los listados para proveer los canales de esta entrada.</translation>
     </message>
     <message>
         <source>This can take a long time to run.</source>
-        <translation>Esto puede tardar mucho en completarse.</translation>
+        <translation type="unfinished">Esto puede tardar mucho en completarse.</translation>
     </message>
 </context>
 <context>
@@ -452,38 +452,18 @@
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation>Cargando programación desde servicio DataDirect...</translation>
+        <translation type="unfinished">Cargando programación desde servicio DataDirect...</translation>
     </message>
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
-        <translation>Cargando programación desde servicio Myth Plus...</translation>
+        <translation type="unfinished">Cargando programación desde servicio Myth Plus...</translation>
     </message>
 </context>
 <context>
     <name>EITOnly_config</name>
-    <message>
-        <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>IgnoreSignalTimeout</name>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -7146,81 +7126,213 @@ Myth saldrá ahora.</translation>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Scan Progress</source>
+        <translation type="obsolete">Progreso de exploración</translation>
+    </message>
+    <message>
+        <source>Tuning</source>
+        <translation type="obsolete">Sintonización</translation>
+    </message>
+    <message>
+        <source>Locked</source>
+        <translation type="obsolete">Bloqueado</translation>
+    </message>
+    <message>
+        <source>No Lock</source>
+        <translation type="obsolete">Sin bloqueo</translation>
+    </message>
+    <message>
+        <source>Full Scan</source>
+        <translation type="obsolete">Exploración completa</translation>
+    </message>
+    <message>
+        <source>Full Scan (Tuned)</source>
+        <translation type="obsolete">Exploración completa (Sintonizado)</translation>
+    </message>
+    <message>
+        <source>Import channels.conf</source>
+        <translation type="obsolete">Importar channels.conf</translation>
+    </message>
+    <message>
+        <source>Full Scan of Existing Transports</source>
+        <translation type="obsolete">Exploración completa de los transportes existentes</translation>
+    </message>
+    <message>
+        <source>Existing Transport Scan</source>
+        <translation type="obsolete">Exploración de los transportes existentes</translation>
+    </message>
+    <message>
+        <source>Country</source>
+        <translation type="obsolete">País</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from DataDirect service...</source>
+        <translation type="obsolete">Cargando programación desde servicio DataDirect...</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from the Myth Plus service...</source>
+        <translation type="obsolete">Cargando programación desde servicio Myth Plus...</translation>
+    </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use channel scanner to find channels for this input.</source>
+        <translation type="obsolete">Usar la búsqueda de canales en esta entrada.</translation>
+    </message>
+    <message>
+        <source>This uses the listings data source to provide the channels for this input.</source>
+        <translation type="obsolete">Usar los listados para proveer los canales de esta entrada.</translation>
+    </message>
+    <message>
+        <source>This can take a long time to run.</source>
+        <translation type="obsolete">Esto puede tardar mucho en completarse.</translation>
+    </message>
+    <message>
+        <source>Capture Card Menu</source>
+        <translation type="obsolete">Menú capturadoras</translation>
+    </message>
+    <message>
+        <source>Edit..</source>
+        <translation type="obsolete">Editar..</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="obsolete">Borrar..</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL capture cards?</source>
+        <translation type="obsolete">¿Está seguro de borrar TODAS las capturadoras?</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture cards</source>
+        <translation type="obsolete">Sí, borrar las capturadoras</translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="obsolete">No</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this capture card?</source>
+        <translation type="obsolete">¿Está seguro de borrar esta capturadora?</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture card</source>
+        <translation type="obsolete">Sí, borrar capturadora</translation>
+    </message>
+    <message>
+        <source>Video Source Menu</source>
+        <translation type="obsolete">Menú de fuentes de Vídeo</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete ALL video sources?</source>
+        <translation type="obsolete">¿Está seguro de borrar TODAS las fuentes de vídeo?</translation>
+    </message>
+    <message>
+        <source>Yes, delete video sources</source>
+        <translation type="obsolete">Sí, borrar las fuentes de vídeo</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this video source?</source>
+        <translation type="obsolete">¿Está seguro de borrar esta fuente de vídeo?</translation>
+    </message>
+    <message>
+        <source>Yes, delete video source</source>
+        <translation type="obsolete">Sí, borrar fuente de vídeo</translation>
+    </message>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
     <message>
         <source>Country</source>
-        <translation>País</translation>
+        <translation type="unfinished">País</translation>
     </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
     <message>
         <source>Scan Progress</source>
-        <translation>Progreso de exploración</translation>
+        <translation type="unfinished">Progreso de exploración</translation>
     </message>
     <message>
         <source>Tuning</source>
-        <translation>Sintonización</translation>
+        <translation type="unfinished">Sintonización</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation>Cancelar</translation>
+        <translation type="unfinished">Cancelar</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation>Estado</translation>
+        <translation type="unfinished">Estado</translation>
     </message>
     <message>
         <source>Scan</source>
-        <translation>Analizar</translation>
+        <translation type="unfinished">Analizar</translation>
     </message>
     <message>
         <source>Signal Strength</source>
-        <translation>Potencia de señal</translation>
+        <translation type="unfinished">Potencia de señal</translation>
     </message>
     <message>
         <source>Signal/Noise</source>
-        <translation>Señal/Ruido</translation>
+        <translation type="unfinished">Señal/Ruido</translation>
     </message>
     <message>
         <source>Locked</source>
-        <translation>Bloqueado</translation>
+        <translation type="unfinished">Bloqueado</translation>
     </message>
     <message>
         <source>No Lock</source>
-        <translation>Sin bloqueo</translation>
+        <translation type="unfinished">Sin bloqueo</translation>
     </message>
 </context>
 <context>
     <name>ScanTypeSetting</name>
     <message>
         <source>Full Scan</source>
-        <translation>Exploración completa</translation>
+        <translation type="unfinished">Exploración completa</translation>
     </message>
     <message>
         <source>Full Scan (Tuned)</source>
-        <translation>Exploración completa (Sintonizado)</translation>
+        <translation type="unfinished">Exploración completa (Sintonizado)</translation>
     </message>
     <message>
         <source>Import channels.conf</source>
-        <translation>Importar channels.conf</translation>
+        <translation type="unfinished">Importar channels.conf</translation>
     </message>
     <message>
         <source>Full Scan of Existing Transports</source>
-        <translation>Exploración completa de los transportes existentes</translation>
+        <translation type="unfinished">Exploración completa de los transportes existentes</translation>
     </message>
     <message>
         <source>Existing Transport Scan</source>
-        <translation>Exploración de los transportes existentes</translation>
+        <translation type="unfinished">Exploración de los transportes existentes</translation>
     </message>
 </context>
 <context>
     <name>ScanWizardScanType</name>
     <message>
         <source>Scan Type</source>
-        <translation>Tipo de exploración</translation>
+        <translation type="unfinished">Tipo de exploración</translation>
     </message>
 </context>
 <context>
@@ -8038,35 +8150,35 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Video Source Menu</source>
-        <translation>Menú de fuentes de Vídeo</translation>
+        <translation type="unfinished">Menú de fuentes de Vídeo</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Editar..</translation>
+        <translation type="unfinished">Editar..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Borrar..</translation>
+        <translation type="unfinished">Borrar..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this video source?</source>
-        <translation>¿Está seguro de borrar esta fuente de vídeo?</translation>
+        <translation type="unfinished">¿Está seguro de borrar esta fuente de vídeo?</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation>Sí, borrar fuente de vídeo</translation>
+        <translation type="unfinished">Sí, borrar fuente de vídeo</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>No</translation>
+        <translation type="unfinished">No</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>
-        <translation>¿Está seguro de borrar TODAS las fuentes de vídeo?</translation>
+        <translation type="unfinished">¿Está seguro de borrar TODAS las fuentes de vídeo?</translation>
     </message>
     <message>
         <source>Yes, delete video sources</source>
-        <translation>Sí, borrar las fuentes de vídeo</translation>
+        <translation type="unfinished">Sí, borrar las fuentes de vídeo</translation>
     </message>
 </context>
 <context>

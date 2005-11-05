@@ -97,27 +97,27 @@
     </message>
     <message>
         <source>Capture Card Menu</source>
-        <translation>Stillingar upptökuspjalda</translation>
+        <translation type="unfinished">Stillingar upptökuspjalda</translation>
     </message>
     <message>
         <source>Edit..</source>
-        <translation>Breyta..</translation>
+        <translation type="unfinished">Breyta..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Eyða..</translation>
+        <translation type="unfinished">Eyða..</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this capture card?</source>
-        <translation>Ertu viss um að þú viljir eyða stillingum þessa upptökuspjalds?</translation>
+        <translation type="unfinished">Ertu viss um að þú viljir eyða stillingum þessa upptökuspjalds?</translation>
     </message>
     <message>
         <source>Yes, delete capture card</source>
-        <translation>Já, eyddu upptökuspjaldi</translation>
+        <translation type="unfinished">Já, eyddu upptökuspjaldi</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Nei, sleppa</translation>
+        <translation type="unfinished">Nei, sleppa</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
@@ -135,11 +135,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Use channel scanner to find channels for this input.</source>
+        <source>Fetch channels from listings source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fetch channels from listings source</source>
+        <source>Use channel scanner to find channels for this input.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -452,38 +452,18 @@
     <name>DataDirectLineupSelector</name>
     <message>
         <source>Fetching lineups from DataDirect service...</source>
-        <translation>Sæki sýningatíma frá DataDirect þjónustunni...</translation>
+        <translation type="unfinished">Sæki sýningatíma frá DataDirect þjónustunni...</translation>
     </message>
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
-        <translation>Sæki sýningatíma frá Myth Plus þjónustunni...</translation>
+        <translation type="unfinished">Sæki sýningatíma frá Myth Plus þjónustunni...</translation>
     </message>
 </context>
 <context>
     <name>EITOnly_config</name>
-    <message>
-        <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>IgnoreSignalTimeout</name>
-    <message>
-        <source>Ignore Signal Timeout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -6778,30 +6758,86 @@ Myth will now exit.</source>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Country</source>
+        <translation type="obsolete">Land</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from DataDirect service...</source>
+        <translation type="obsolete">Sæki sýningatíma frá DataDirect þjónustunni...</translation>
+    </message>
+    <message>
+        <source>Fetching lineups from the Myth Plus service...</source>
+        <translation type="obsolete">Sæki sýningatíma frá Myth Plus þjónustunni...</translation>
+    </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Capture Card Menu</source>
+        <translation type="obsolete">Stillingar upptökuspjalda</translation>
+    </message>
+    <message>
+        <source>Delete..</source>
+        <translation type="obsolete">Eyða..</translation>
+    </message>
+    <message>
+        <source>No, don&apos;t</source>
+        <translation type="obsolete">Nei, sleppa</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this capture card?</source>
+        <translation type="obsolete">Ertu viss um að þú viljir eyða stillingum þessa upptökuspjalds?</translation>
+    </message>
+    <message>
+        <source>Yes, delete capture card</source>
+        <translation type="obsolete">Já, eyddu upptökuspjaldi</translation>
+    </message>
+    <message>
+        <source>Yes, delete video source</source>
+        <translation type="obsolete">Já, eyða</translation>
+    </message>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
     <message>
         <source>Country</source>
-        <translation>Land</translation>
+        <translation type="unfinished">Land</translation>
     </message>
 </context>
 <context>
     <name>ScanProgressPopup</name>
     <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Afbryd</translation>
+    </message>
+    <message>
         <source>Scan Progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tuning</source>
+        <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Afbryd</translation>
-    </message>
-    <message>
-        <source>Status</source>
+        <source>Tuning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7649,28 +7685,24 @@ No other details</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Video Source Menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Edit..</source>
-        <translation>Bræta..</translation>
+        <translation type="unfinished">Bræta..</translation>
     </message>
     <message>
         <source>Delete..</source>
-        <translation>Eyða..</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this video source?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Eyða..</translation>
     </message>
     <message>
         <source>Yes, delete video source</source>
-        <translation>Já, eyða</translation>
+        <translation type="unfinished">Já, eyða</translation>
     </message>
     <message>
         <source>No, don&apos;t</source>
-        <translation>Nei, sleppa</translation>
+        <translation type="unfinished">Nei, sleppa</translation>
+    </message>
+    <message>
+        <source>Video Source Menu</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>
@@ -7678,6 +7710,10 @@ No other details</source>
     </message>
     <message>
         <source>Yes, delete video sources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this video source?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7797,7 +7833,7 @@ No other details</source>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Hætta við</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is currently recording</source>
