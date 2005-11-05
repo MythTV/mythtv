@@ -956,16 +956,6 @@ void ProgramInfo::ApplyRecordRecPriorityChange(int newrecpriority)
     GetProgramRecordingStatus();
     record->setRecPriority(newrecpriority);
     record->save();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE recorded"
-            " SET recpriority = :RECPRIORITY"
-            " WHERE recordid = :RECORDID"
-            ";");
-    query.bindValue(":RECPRIORITY", record->getRecPriority());
-    query.bindValue(":RECORDID", record->getRecordID());
-    if (!query.exec())
-        MythContext::DBError("recpriority update", query);
 }
 
 /** \fn ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)

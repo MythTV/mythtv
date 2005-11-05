@@ -431,6 +431,21 @@ void ScheduledRecording::save()
     else
     {
         ConfigurationGroup::save();
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.prepare(
+            "UPDATE recorded "
+                "SET recpriority = :RECPRIORITY, recgroup = :RECGROUP, "
+                    "transcoder = :TRANSCODER, timestretch = :TIMESTRETCH "
+                "WHERE recordid = :RECORDID ;");
+        query.bindValue(":RECPRIORITY", getRecPriority());
+        query.bindValue(":RECGROUP", recgroup->getValue());
+        query.bindValue(":TRANSCODER", transcoder->getValue().toInt());
+        query.bindValue(":TIMESTRETCH", timestretchid->getValue().toFloat());
+        query.bindValue(":RECORDID", getRecordID());
+
+        if (!query.exec())
+            MythContext::DBError("UPDATE recorded", query);
     }
     signalChange(getRecordID());
 }
