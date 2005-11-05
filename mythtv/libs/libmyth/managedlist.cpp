@@ -682,7 +682,7 @@ void ManagedList::cursorDown(bool page)
         int newIndex = curGroup->getCurIndex();
         int itemCount = curGroup->getItemCount();
 
-        newIndex += (page ? itemCount : 1);
+        newIndex += (page ? listSize : 1);
 
         if (newIndex >= itemCount)
             newIndex = (page ? itemCount - 1 : newIndex - itemCount);
@@ -707,7 +707,7 @@ void ManagedList::cursorUp(bool page)
         int newIndex = curGroup->getCurIndex();
         int itemCount = curGroup->getItemCount();
 
-        newIndex -= (page ? itemCount : 1);
+        newIndex -= (page ? listSize : 1);
         if (newIndex < 0)
             newIndex = (page ? 0 : itemCount + newIndex);
 
