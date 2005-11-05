@@ -287,16 +287,16 @@ void MythControls::keyPressEvent(QKeyEvent *e)
         else if (action == "PAGEUP")
         {
             if (focused == ContextList)
-                ContextList->MoveUp(UIListTreeType::MovePage);
+                ContextList->MoveUp(UIListBtnType::MovePage);
             else if (focused == ActionList)
-                ActionList->MoveUp(UIListTreeType::MovePage);
+                ActionList->MoveUp(UIListBtnType::MovePage);
         }
         else if (action == "PAGEDOWN")
         {
             if (focused == ContextList)
-                ContextList->MoveDown(UIListTreeType::MovePage);
+                ContextList->MoveDown(UIListBtnType::MovePage);
             else if (focused == ActionList)
-                ActionList->MoveDown(UIListTreeType::MovePage);
+                ActionList->MoveDown(UIListBtnType::MovePage);
         }
         else handled = false;
     }
