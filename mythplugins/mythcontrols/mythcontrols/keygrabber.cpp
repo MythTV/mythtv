@@ -40,7 +40,7 @@ KeyGrabPopupBox::KeyGrabPopupBox(MythMainWindow *window)
     key_label = addLabel("Waiting for key press", Small, false);
 
     ok_button = this->addButton(tr("OK"), this, SLOT(acceptBinding()));
-    this->addButton(tr("Cancel"), this, SLOT(cancel()));
+    cancel_button = this->addButton(tr("Cancel"), this, SLOT(cancel()));
 
     this->grabKeyboard();
 }
@@ -71,10 +71,21 @@ void KeyGrabPopupBox::keyReleaseEvent(QKeyEvent *e)
         key_name = modifiers + key_name;
     }
 
-    this->captured_key_event = key_name;
-    this->key_label->setText("Add key, \"" + key_name + "\"?");
-    this->releaseKeyboard();
-    this->ok_button->setFocus();
+    /* keys without a name are no good to us */
+    if (key_name.isEmpty())
+    {
+        key_label->setText(tr("Pressed key not recognized"));
+        ok_button->setDisabled(true);
+        cancel_button->setFocus();
+    }
+    else
+    {
+        captured_key_event = key_name;
+        key_label->setText(tr("Add key '%1'?").arg(key_name));
+        ok_button->setFocus();
+    }
+
+    releaseKeyboard();
 }
 
 

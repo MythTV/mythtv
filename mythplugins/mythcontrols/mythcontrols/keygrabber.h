@@ -52,13 +52,13 @@ public:
 
 public slots:
 
-/**
- * @brief Accept the captured keybinding.
- *
- * The QString provided in the constructor will be set to the
- * captured key value.
- */
-inline void acceptBinding(void) { done(1); }
+    /**
+     * @brief Accept the captured keybinding.
+     *
+     * The QString provided in the constructor will be set to the
+     * captured key value.
+     */
+    inline void acceptBinding(void) { done(1); }
 
     /**
      * @brief Reject the captured key binding.
@@ -87,6 +87,7 @@ private:
     bool has_captured;
     QString captured_key_event;
     QButton *ok_button;
+    QButton *cancel_button;
     QLabel *key_label;
 };
 
@@ -122,10 +123,10 @@ public:
     inline int getOption(void) { return ExecPopup(this,SLOT(finish())); }
 
 protected slots:
-/**
- * @brief Close the popup.
- */
-inline void finish(void) { done(0); }
+    /**
+     * @brief Close the popup.
+     */
+    inline void finish(void) { done(0); }
 };
 
 
@@ -154,10 +155,10 @@ public:
 
 public slots:
 
-/**
- * @brief Slot to connect to when the save button is pressed.
- */
-inline void save(void) { done(OptionsMenu::SAVE); }
+    /**
+     * @brief Slot to connect to when the save button is pressed.
+     */
+    inline void save(void) { done(OptionsMenu::SAVE); }
 
     /**
      * @brief Slot to connect to when the cancel button is pressed.
@@ -193,10 +194,10 @@ public:
 
 public slots:
 
-/**
- * @brief Slot to connect to when the set button is pressed.
- */
-inline void set(void) { done(ActionMenu::SET); }
+    /**
+     * @brief Slot to connect to when the set button is pressed.
+     */
+    inline void set(void) { done(ActionMenu::SET); }
 
     /**
      * @brief Slot to connect to when the remove button is pressed.
@@ -235,10 +236,10 @@ public:
 
 public slots:
 
-/**
- * @brief Slot to connect to when the save button is pressed.
- */
-inline void save(void) { done(UnsavedMenu::SAVE); }
+    /**
+     * @brief Slot to connect to when the save button is pressed.
+     */
+    inline void save(void) { done(UnsavedMenu::SAVE); }
 
     /**
      * @brief Slot to connect to when the cancel button is pressed.
