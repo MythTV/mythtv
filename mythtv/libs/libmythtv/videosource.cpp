@@ -1746,32 +1746,52 @@ class PresetTuner: public LineEditSetting, public CISetting {
 
 void StartingChannel::SetSourceID(const QString &sourceid)
 {
-    const QString oldvalue = getValue();
-    //VERBOSE(VB_IMPORTANT, "StartingChannel::SetSourceID("<<sourceid<<"): "
-    //        <<QString("old value was '%1'").arg(oldvalue));
-
+    //VERBOSE(VB_IMPORTANT, "StartingChannel::SetSourceID("<<sourceid<<")");
     clearSelections();
+    if (sourceid.isEmpty() || !sourceid.toUInt())
+        return;
 
+    // Get the existing starting channel
+    QString startChan = QString::null;
     MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare(
+        "SELECT startchan "
+        "FROM cardinput "
+        "WHERE cardinputid = :INPUTID");
+    query.bindValue(":INPUTID", getInputID());
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("SetSourceID -- get start chan", query);
+    else if (query.next())
+        startChan = query.value(0).toString();
+
+    // Get the existing channels on the connected source
     query.prepare(
         "SELECT channum "
         "FROM channel "
-        "WHERE sourceid = :SOURCEID"
+        "WHERE sourceid = :SOURCEID "
         "ORDER BY atscsrcid, channum");
-    query.bindValue(":SOURCEID", sourceid);
-    if (query.exec() && query.isActive() && query.size() > 0)
+    query.bindValue(":SOURCEID", sourceid.toUInt());
+
+    QString nnsc = startChan.isEmpty() ? "" : startChan;
+    if (!query.exec() || !query.isActive())
     {
-        while(query.next())
+        addSelection(tr("DB Error, see console"), nnsc);
+        MythContext::DBError("SetSourceID -- get channels", query);
+    }
+    else if (query.size() > 0)
+    {
+        // If there are channels add them, and
+        // highlight the old start channel
+        while (query.next())
         {
             const QString channum = query.value(0).toString();
-            addSelection(channum, channum, oldvalue == channum);
-            //VERBOSE(VB_IMPORTANT, "Adding '"<<channum<<"'");
+            addSelection(channum, channum, channum == startChan);
         }
     }
-    else if (!oldvalue.isEmpty())
+    else
     {
-        addSelection(oldvalue, oldvalue, true);
-        //VERBOSE(VB_IMPORTANT, "Adding '"<<oldvalue<<"'");
+        addSelection(tr("Please add channels to this source"), nnsc);
     }
 }
 

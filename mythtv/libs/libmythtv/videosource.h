@@ -493,13 +493,14 @@ class StartingChannel : public ComboBoxSetting, public CISetting
     Q_OBJECT
   public:
     StartingChannel(const CardInput &parent) :
-        ComboBoxSetting(true, 1), CISetting(parent, "startchan")
+        ComboBoxSetting(false, 1), CISetting(parent, "startchan")
     {
         setLabel(QObject::tr("Starting channel"));
         setHelpText(QObject::tr("Starting LiveTV channel.") + " " +
                     QObject::tr("This is updated on every successful "
                                 "channel change."));
     }
+    void fillSelections(void) {;}
   public slots:
     void SetSourceID(const QString &sourceid);
 };
