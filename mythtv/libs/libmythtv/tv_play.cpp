@@ -758,16 +758,18 @@ void TV::HandleStateChange(void)
 
             SET_LAST();
         }
+        else
+        {
+            tvchain->SetProgram(pginfo);
 
-        tvchain->SetProgram(pginfo);
-
-        prbuffer = new RingBuffer(pginfo->pathname, false);
-        prbuffer->SetLiveMode(tvchain);
+            prbuffer = new RingBuffer(pginfo->pathname, false);
+            prbuffer->SetLiveMode(tvchain);
+        }
 
         gContext->DisableScreensaver();
 
         bool ok = false;
-        if (StartRecorder())
+        if (pginfo && StartRecorder())
         {
             if (StartPlayer(false))
                 ok = true;
