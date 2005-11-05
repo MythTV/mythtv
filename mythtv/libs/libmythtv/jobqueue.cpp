@@ -1774,6 +1774,9 @@ void JobQueue::DoTranscodeThread(void)
             msg = QString("Transcoding ERRORED for %1, unable to find "
                           "mythtranscode, check your PATH and backend logs.")
                           .arg(details);
+            VERBOSE(VB_JOBQUEUE, msg);
+            VERBOSE(VB_JOBQUEUE,
+                    QString("Current PATH: '%1'").arg(getenv("PATH")));
 
             gContext->LogEntry("transcode", LP_WARNING,
                                "Transcoding Errored", msg);
@@ -2003,12 +2006,15 @@ void JobQueue::DoFlagCommercialsThread(void)
         msg = QString("Commercial Flagging ERRORED for %1, unable to find "
                       "mythcommflag, check your PATH and backend logs.")
                       .arg(logDesc);
+        VERBOSE(VB_JOBQUEUE, msg);
+        VERBOSE(VB_JOBQUEUE, QString("Current PATH: '%1'").arg(getenv("PATH")));
 
         gContext->LogEntry("commflag", LP_WARNING,
                            "Commercial Flagging Errored", msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
             "ERROR: Unable to find mythcommflag, check backend logs.");
+        msg = ""; // reset msg so we don't reprint it later
     }
     else if ((*(jobControlFlags[key]) == JOB_STOP) ||
              (breaksFound >= COMMFLAG_EXIT_START))
@@ -2061,7 +2067,9 @@ void JobQueue::DoFlagCommercialsThread(void)
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
     }
-    VERBOSE(VB_GENERAL, msg);
+
+    if (msg != "")
+        VERBOSE(VB_JOBQUEUE, msg);
 
     jobControlFlags.erase(key);
     runningJobIDs.erase(key);
@@ -2126,6 +2134,8 @@ void JobQueue::DoUserJobThread(void)
         msg = QString("User Job '%1' ERRORED, unable to find "
                       "executable, check your PATH and backend logs.")
                       .arg(runningJobCommands[key]);
+        VERBOSE(VB_JOBQUEUE, msg);
+        VERBOSE(VB_JOBQUEUE, QString("Current PATH: '%1'").arg(getenv("PATH")));
 
         gContext->LogEntry("jobqueue", LP_WARNING,
                            "User Job Errored", msg);
