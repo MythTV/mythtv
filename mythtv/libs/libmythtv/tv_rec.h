@@ -311,7 +311,7 @@ class TVRec : public QObject
     TVState RemoveRecording(TVState state);
 
     bool GetProgramRingBufferForLiveTV(ProgramInfo **pginfo, RingBuffer **rb);
-    void CreateLiveTVRingBuffer();
+    bool CreateLiveTVRingBuffer(void);
     void SwitchLiveTVRingBuffer(bool discont = false);
 
     void StartedRecording(ProgramInfo*);

@@ -3207,9 +3207,12 @@ void TVRec::TuningFrequency(const TuningRequest &request)
         }
     }
 
+    bool livetv = request.flags & kFlagLiveTV;
+    if (livetv && !tvchain->TotalSize() && !CreateLiveTVRingBuffer())
+        return;
+
     // Start dummy recorder for devices capable of signal monitoring.
     bool use_sm = SignalMonitor::IsSupported(genOpt.cardtype);
-    bool livetv = request.flags & kFlagLiveTV;
     bool antadj = request.flags & kFlagAntennaAdjust;
     if (use_sm && !dummyRecorder && (livetv || antadj))
     {
@@ -3421,10 +3424,6 @@ void TVRec::TuningNewRecorder(void)
             return;
         }
     }
-    else if (lastTuningRequest.flags & kFlagLiveTV)
-    {
-        CreateLiveTVRingBuffer();
-    }
 
     if (HasFlags(kFlagDummyRecorderRunning))
     {
@@ -3617,7 +3616,7 @@ QString TVRec::FlagToString(uint f)
         if (kFlagNeedToStartRecorder & f)
             msg += "NeedToStartRecorder,";
         if (kFlagKillRingBuffer & f)
-            msg += "KillWringBuffer,";
+            msg += "KillRingBuffer,";
     }
     if ((kFlagAnyRunning & f) == kFlagAnyRunning)
         msg += "ANYRUNNING,";
@@ -3651,6 +3650,7 @@ QString TVRec::FlagToString(uint f)
 bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
                                           RingBuffer **rb)
 {
+    VERBOSE(VB_RECORD, LOC + "GetProgramRingBufferForLiveTV()");
     if (!channel || !tvchain || !pginfo || !rb)
         return false;
 
@@ -3700,8 +3700,9 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
     return true;
 }
 
-void TVRec::CreateLiveTVRingBuffer(void)
+bool TVRec::CreateLiveTVRingBuffer(void)
 {
+    VERBOSE(VB_RECORD, LOC + "CreateLiveTVRingBuffer()");
     ProgramInfo *pginfo = NULL;
     RingBuffer *rb = NULL;
 
@@ -3709,7 +3710,8 @@ void TVRec::CreateLiveTVRingBuffer(void)
     {
         ClearFlags(kFlagPendingActions);
         ChangeState(kState_None);
-        return;
+        VERBOSE(VB_IMPORTANT, "CreateLiveTVRingBuffer() failed");
+        return false;
     }
 
     SetRingBuffer(rb);
@@ -3723,11 +3725,12 @@ void TVRec::CreateLiveTVRingBuffer(void)
 
     curRecording = pginfo;
     lastTuningRequest.program = curRecording;
+    return true;
 }
 
 void TVRec::SwitchLiveTVRingBuffer(bool discont)
 {
-printf("switching!\n");
+    VERBOSE(VB_RECORD, LOC + "SwitchLiveTVRingBuffer(discont "<<discont<<")");
     if (!recorder)
         return;
 
