@@ -4215,19 +4215,35 @@ void TV::customEvent(QCustomEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
 
-        if (GetState() == kState_WatchingRecording &&
-            message.left(14) == "DONE_RECORDING")
+        if (message.left(14) == "DONE_RECORDING")
         {
-            message = message.simplifyWhiteSpace();
-            QStringList tokens = QStringList::split(" ", message);
-            int cardnum = tokens[1].toInt();
-            int filelen = tokens[2].toInt();
-
-            if (cardnum == recorder->GetRecorderNumber())
+            if (GetState() == kState_WatchingRecording)
             {
-                nvp->SetWatchingRecording(false);
-                nvp->SetLength(filelen);
-                ChangeState(kState_WatchingPreRecorded);
+                message = message.simplifyWhiteSpace();
+                QStringList tokens = QStringList::split(" ", message);
+                int cardnum = tokens[1].toInt();
+                int filelen = tokens[2].toInt();
+
+                if (cardnum == recorder->GetRecorderNumber())
+                {
+                    nvp->SetWatchingRecording(false);
+                    nvp->SetLength(filelen);
+                    ChangeState(kState_WatchingPreRecorded);
+                }
+            }
+            else if (StateIsLiveTV(GetState()))
+            {
+                message = message.simplifyWhiteSpace();
+                QStringList tokens = QStringList::split(" ", message);
+                int cardnum = tokens[1].toInt();
+                int filelen = tokens[2].toInt();
+
+                if (cardnum == recorder->GetRecorderNumber() &&
+                    tvchain && tvchain->HasNext())
+                {
+                    nvp->SetWatchingRecording(false);
+                    nvp->SetLength(filelen);
+                }
             }
         }
         else if (StateIsLiveTV(GetState()) &&
@@ -4266,6 +4282,7 @@ void TV::customEvent(QCustomEvent *e)
                 if (tokens[2] == tvchain->GetID())
                 {
                     tvchain->ReloadAll();
+                    nvp->CheckTVChain();
                 }
             }
         }

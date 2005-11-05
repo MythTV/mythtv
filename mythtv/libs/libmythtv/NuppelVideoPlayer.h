@@ -148,6 +148,7 @@ class NuppelVideoPlayer
     AudioOutput *getAudioOutput(void)         { return audioOutput; }
     char        *GetScreenGrab(int secondsin, int &buflen,
                                int &vw, int &vh, float &ar);
+    LiveTVChain *GetTVChain(void)             { return livetvchain; }
 
     // Start/Reset/Stop playing
     void StartPlaying(void);
@@ -237,6 +238,9 @@ class NuppelVideoPlayer
         { tc_wrap[TC_AUDIO] = LONG_LONG_MIN; return 0L; }
     long long GetAudioTimecodeOffset(void) const 
         { return tc_wrap[TC_AUDIO]; }
+
+    // LiveTV public stuff
+    void CheckTVChain();
  
   protected:
     void DisplayPauseFrame(void);

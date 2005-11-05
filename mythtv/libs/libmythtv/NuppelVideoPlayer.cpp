@@ -1843,6 +1843,12 @@ void NuppelVideoPlayer::ResetPlaying(void)
     errored |= GetDecoder()->IsErrored();
 }
 
+void NuppelVideoPlayer::CheckTVChain(void)
+{
+    bool last = !(livetvchain->HasNext());
+    SetWatchingRecording(last);
+}
+
 void NuppelVideoPlayer::SwitchToProgram(void)
 {
     printf("nvp: need to switch!\n");
@@ -1871,6 +1877,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     m_playbackinfo = pginfo;
     livetvchain->SetProgram(pginfo);
+    CheckTVChain();
 }
 
 void NuppelVideoPlayer::StartPlaying(void)

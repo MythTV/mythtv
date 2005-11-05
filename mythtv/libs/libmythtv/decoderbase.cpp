@@ -4,6 +4,7 @@
 #include "mythdbcon.h"
 #include "decoderbase.h"
 #include "programinfo.h"
+#include "livetvchain.h"
 
 DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo) 
     : m_parent(parent), m_playbackinfo(pginfo),
@@ -47,7 +48,7 @@ void DecoderBase::setWatchingRecording(bool mode)
     posmapStarted = false;
     watchingrecording = mode;
 
-    if (wereWatchingRecording && !watchingrecording)
+    if (livetv || (wereWatchingRecording && !watchingrecording))
         SyncPositionMap();
 }
 
@@ -126,6 +127,14 @@ bool DecoderBase::PosMapFromEnc(void)
     // Reads only new positionmap entries from encoder
     if (!(livetv || (nvr_enc && nvr_enc->IsValidRecorder())))
         return false;
+
+    // if livetv, and we're not the last entry, don't get it from the encoder
+    if (livetv)
+    {
+        LiveTVChain *chain = m_parent->GetTVChain();
+        if (chain->HasNext())
+            return false;
+    }
 
     QMap<long long, long long> posMap;
     
@@ -221,14 +230,7 @@ bool DecoderBase::SyncPositionMap(void)
 
     unsigned int old_posmap_size = m_positionMap.size();
     
-    if (livetv)
-    {
-        PosMapFromEnc();
-        VERBOSE(VB_IMPORTANT,
-                QString("SyncPositionMap liveTV, from Encoder: %1 entries")
-                .arg(m_positionMap.size()));
-    }
-    else if (watchingrecording)
+    if (livetv || watchingrecording)
     {
         if (!posmapStarted) 
         {
