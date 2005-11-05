@@ -2588,6 +2588,7 @@ void TVRec::StopLiveTV(void)
 
         if (tvchain)
             delete tvchain;
+        tvchain = NULL;
     }
 
     // Tell tuner it is safe to shut down ring buffer.
@@ -3521,6 +3522,11 @@ void TVRec::TuningRestartRecorder(void)
         dummyRecorder->StopRecordingThread();
         ClearFlags(kFlagDummyRecorderRunning);
     }
+
+    // XXX: Is this only called during livetv?  must check
+    if (GetState() == kState_WatchingLiveTV)
+        SwitchLiveTVRingBuffer(true);
+
     recorder->Reset();
 
     // Set file descriptor of channel from recorder for V4L
@@ -3719,7 +3725,7 @@ void TVRec::CreateLiveTVRingBuffer(void)
     lastTuningRequest.program = curRecording;
 }
 
-void TVRec::SwitchLiveTVRingBuffer(void)
+void TVRec::SwitchLiveTVRingBuffer(bool discont)
 {
 printf("switching!\n");
     if (!recorder)
@@ -3736,7 +3742,7 @@ printf("switching!\n");
 
     StartedRecording(pginfo);
     pginfo->SetAutoExpire(10000);
-    tvchain->AppendNewProgram(pginfo, false);
+    tvchain->AppendNewProgram(pginfo, discont);
 
     recorder->SetNextRecording(pginfo, rb);
     delete pginfo;

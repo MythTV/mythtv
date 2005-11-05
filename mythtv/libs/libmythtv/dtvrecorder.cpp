@@ -125,6 +125,9 @@ long long DTVRecorder::GetKeyframePosition(long long desired)
 // documented in recorderbase.h
 void DTVRecorder::Reset(void)
 {
+    // XXX right?
+    HandleKeyFrame();
+
     QMutexLocker locker(&_position_map_lock);
 
     _keyframe_seen              = false;

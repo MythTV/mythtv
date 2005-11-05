@@ -676,8 +676,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp)
 
     GetDecoder()->setExactSeeks(exactseeks);
     GetDecoder()->setLiveTVMode(livetv);
-    GetDecoder()->setWatchingRecording(watchingrecording);
     GetDecoder()->setRecorder(nvr_enc);
+    GetDecoder()->setWatchingRecording(watchingrecording);
     GetDecoder()->setTranscoding(transcoding);
 
     eof = false;
@@ -1849,14 +1849,28 @@ void NuppelVideoPlayer::CheckTVChain(void)
     SetWatchingRecording(last);
 }
 
+void NuppelVideoPlayer::SwitchToProgramExtChange(void)
+{
+    bool discontinuity;
+    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity);
+    ringBuffer->OpenFile(pginfo->pathname);
+
+    if (m_playbackinfo)
+        delete m_playbackinfo;
+
+    m_playbackinfo = pginfo;
+    livetvchain->SetProgram(pginfo);
+    CheckTVChain();
+}
+
 void NuppelVideoPlayer::SwitchToProgram(void)
 {
-    printf("nvp: need to switch!\n");
     bool discontinuity = false;
     ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity);
 
     if (discontinuity)
     {
+        printf("unhandled discontinuity\n");
         // FIXME
     }
     else
@@ -1868,8 +1882,6 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         ringBuffer->OpenFile(pginfo->pathname);
 
         ringBuffer->Unpause();
-
-        // gotta tell the decoder to sync the new position map..  bad things otherwise..
     }
 
     if (m_playbackinfo)

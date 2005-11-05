@@ -48,7 +48,7 @@ void DecoderBase::setWatchingRecording(bool mode)
     posmapStarted = false;
     watchingrecording = mode;
 
-    if (livetv || (wereWatchingRecording && !watchingrecording))
+    if (wereWatchingRecording && !watchingrecording)
         SyncPositionMap();
 }
 

@@ -2089,6 +2089,8 @@ void NuppelVideoRecorder::Reset(void)
         SetupAVCodec();
     }
 
+    //XXX Switch files..
+
     seektable->clear();
     positionMap.clear();
     positionMapDelta.clear();

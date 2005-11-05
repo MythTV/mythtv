@@ -4282,7 +4282,8 @@ void TV::customEvent(QCustomEvent *e)
                 if (tokens[2] == tvchain->GetID())
                 {
                     tvchain->ReloadAll();
-                    nvp->CheckTVChain();
+                    if (nvp)
+                        nvp->CheckTVChain();
                 }
             }
         }
@@ -5470,8 +5471,12 @@ void TV::UnpauseLiveTV(void)
 {
     VERBOSE(VB_PLAYBACK, LOC + "UnpauseLiveTV()");
 
-    if (activenvp)
+    if (activenvp && tvchain)
     {
+        tvchain->ReloadAll();
+        tvchain->SwitchTo(-1);
+        activenvp->SwitchToProgramExtChange();
+
         activenvp->ResetPlaying();
         if (activenvp->IsErrored())
         {

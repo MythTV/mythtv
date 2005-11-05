@@ -241,7 +241,9 @@ class NuppelVideoPlayer
 
     // LiveTV public stuff
     void CheckTVChain();
- 
+    void SwitchToProgramExtChange(void);  // change the ringbuffer externally..
+                                          // must be called when paused. 
+
   protected:
     void DisplayPauseFrame(void);
     void DisplayNormalFrame(void);

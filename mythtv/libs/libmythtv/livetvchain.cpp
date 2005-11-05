@@ -273,8 +273,9 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont)
     
 void LiveTVChain::SwitchTo(int num)
 {
+    int size = m_chain.count();;
     if (num < 0 || num >= (int)m_chain.count())
-        return;
+        num = size - 1;
 
     if (m_curpos != num)
         m_switchid = num;
