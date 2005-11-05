@@ -167,15 +167,19 @@ void LiveTVChain::ReloadAll(void)
 
 void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry)
 {
-    m_lock.lock();
+    QMutexLocker lock(&m_lock);
 
     int size = m_chain.count();
-    if (at < 0 || at >= size)
-        at = size - 1;
+    int new_at = (at < 0 || at >= size) ? size - 1 : at;
 
-    entry = m_chain[at];
-
-    m_lock.unlock();
+    if (new_at >= 0 && new_at <= size)
+        entry = m_chain[new_at];
+    else
+    {
+        VERBOSE(VB_IMPORTANT, QString("GetEntryAt(%1) failed.").arg(at));
+        entry.chanid = "0";
+        entry.starttime.setTime_t(0);
+    }
 }
 
 ProgramInfo *LiveTVChain::EntryToProgram(LiveTVChainEntry &entry)
@@ -183,8 +187,14 @@ ProgramInfo *LiveTVChain::EntryToProgram(LiveTVChainEntry &entry)
     ProgramInfo *pginfo;
     pginfo = ProgramInfo::GetProgramFromRecorded(entry.chanid,
                                                  entry.starttime);
-
-    pginfo->pathname = entry.hostprefix + pginfo->pathname;
+    if (pginfo)
+        pginfo->pathname = entry.hostprefix + pginfo->pathname;
+    else
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("EntryToProgram(%1@%2) failed to get pginfo")
+                .arg(entry.chanid).arg(entry.starttime.toString()));
+    }
 
     return pginfo;
 }
