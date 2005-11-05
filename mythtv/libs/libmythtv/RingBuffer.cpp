@@ -585,6 +585,8 @@ void RingBuffer::OpenFile(const QString &lfilename)
 
 void RingBuffer::Init(void)
 {
+    tfw = NULL;
+
     writemode = false;
     livetvchain = NULL;
     oldfile = false; 
