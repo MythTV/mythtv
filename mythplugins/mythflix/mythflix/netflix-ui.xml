@@ -1,0 +1,277 @@
+<mythuitheme>
+
+<window name="browse">
+
+    <font name="active" face="Arial Narrow">
+        <color>#ffffff</color>
+        <size>18</size>
+        <bold>yes</bold>
+    </font>
+    
+    <font name="inactive" face="Arial Narrow">
+        <color>#c5c5c5</color>
+        <size>18</size>
+        <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial Narrow">
+      <color>#ffff00</color>
+      <dropcolor>#000000</dropcolor>
+      <size>18</size>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="desc" face="Arial Narrow">
+      <color>#ffffff</color>
+      <size>16</size>
+      <bold>no</bold>
+    </font>
+
+    <container name="sites">
+
+      <area>20,20,220,320</area>
+
+      <listbtnarea name="siteslist" draworder="0">
+        <area>0,0,200,300</area>
+        <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#df0d0c" end="#990909" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showscrollarrows>yes</showscrollarrows>
+      </listbtnarea>
+
+    </container>
+
+    <container name="articles"> 
+
+      <area>250,20,780,320</area>
+
+      <listbtnarea name="articleslist"  draworder="0">
+        <area>0,0,530,300</area>
+        <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#df0d0c" end="#990909" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showscrollarrows>yes</showscrollarrows>
+        <showarrow>no</showarrow>
+      </listbtnarea>
+
+    </container>
+
+    <container name="info"> 
+
+      <area>0,340,800,260</area>
+
+
+      <textarea name="title" draworder="1">
+        <area>20,10,670,35</area>
+        <font>title</font>
+        <multiline>yes</multiline>
+      </textarea>
+
+      <textarea name="description" draworder="1">
+        <area>170,50,610,200</area>
+        <font>desc</font>
+        <multiline>yes</multiline>
+      </textarea>
+
+      <textarea name="status" draworder="1">
+        <area>200,10,170,35</area>
+        <font>desc</font>
+      </textarea>
+      
+      <image name="boxshot" draworder="2">
+        <position>20,50</position>
+        <staticsize>110,150</staticsize>
+      </image>
+
+      <image name="background" draworder="0" fleximage="no">
+        <filename>news-info-bg.png</filename>
+        <position>0,0</position>
+      </image>
+
+    </container>
+</window>
+
+<window name="queue">
+      
+    <font name="active" face="Arial Narrow">
+        <color>#ffffff</color>
+        <size>18</size>
+        <bold>yes</bold>
+    </font>
+        
+    <font name="inactive" face="Arial Narrow">
+        <color>#c5c5c5</color>
+        <size>18</size>
+        <bold>yes</bold>
+    </font>
+  
+      <font name="title" face="Arial Narrow">
+        <color>#ffff00</color>
+        <dropcolor>#000000</dropcolor>
+        <size>18</size>
+        <shadow>1,1</shadow>
+        <bold>yes</bold>
+      </font>
+      
+      <font name="desc" face="Arial Narrow">
+        <color>#ffffff</color>
+        <size>16</size>
+        <bold>no</bold>
+      </font>
+      
+      <container name="articles"> 
+        
+        <area>20,20,780,320</area>
+        
+        <listbtnarea name="articleslist"  draworder="0">
+          <area>0,0,760,300</area>
+          <gradient type="unselected" start="#505050" end="#000000" alpha="100">
+          </gradient>
+          <gradient type="selected" start="#df0d0c" end="#990909" alpha="255">
+          </gradient>
+          <fcnfont name="active" function="active"></fcnfont>
+          <fcnfont name="inactive" function="inactive"></fcnfont>
+          <showscrollarrows>yes</showscrollarrows>
+          <showarrow>no</showarrow>
+        </listbtnarea>
+        
+      </container>
+      
+      <container name="info"> 
+        
+        <area>0,340,800,260</area>
+        
+        
+        <textarea name="title" draworder="1">
+          <area>20,10,670,35</area>
+          <font>title</font>
+          <multiline>yes</multiline>
+        </textarea>
+        
+        <textarea name="description" draworder="1">
+          <area>170,50,610,200</area>
+          <font>desc</font>
+          <multiline>yes</multiline>
+        </textarea>
+        
+        <textarea name="status" draworder="1">
+          <area>200,10,170,35</area>
+          <font>desc</font>
+        </textarea>
+        
+        <image name="boxshot" draworder="2">
+          <position>20,50</position>
+          <staticsize>110,150</staticsize>
+        </image>
+        
+        <image name="background" draworder="0" fleximage="no">
+          <filename>news-info-bg.png</filename>
+          <position>0,0</position>
+        </image>
+        
+      </container>
+
+</window>
+
+<window name="config">
+  <font name="active" face="Arial Narrow">
+    <color>#ffffff</color>
+    <size>18</size>
+    <bold>yes</bold>
+  </font>
+  
+  <font name="inactive" face="Arial Narrow">
+    <color>#c5c5c5</color>
+    <size>18</size>
+    <bold>yes</bold>
+  </font>
+  
+  <font name="desc" face="Arial Narrow">
+    <color>#ffffff</color>
+    <size>16</size>
+    <bold>no</bold>
+  </font>
+  
+    <container name="config-sites">
+
+      <area>20,40,760,560</area>
+
+      <listbtnarea name="category" draworder="0">
+        <area>0,0,300,500</area>
+        <gradient type="unselected" start="#000000" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#df0d0c" end="#990909" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showscrollarrows>yes</showscrollarrows>
+      </listbtnarea>
+
+      <listbtnarea name="sites"  draworder="0">
+        <area>320,0,440,500</area>
+        <gradient type="unselected" start="#000000" end="#505050" alpha="100">
+        </gradient>
+        <gradient type="selected" start="#df0d0c" end="#990909" alpha="255">
+        </gradient>
+        <fcnfont name="active" function="active"></fcnfont>
+        <fcnfont name="inactive" function="inactive"></fcnfont>
+        <showarrow>no</showarrow>
+        <showscrollarrows>yes</showscrollarrows>
+      </listbtnarea>
+
+      <textarea name="context_switch" draworder="0">
+          <area>0,510,760,50</area>
+          <font>desc</font>
+          <multiline>yes</multiline>
+      </textarea>
+
+    </container>
+
+    <container name="config-freq">
+
+      <area>20,40,760,560</area>
+
+         <textarea name="help" draworder="0">
+          <area>0,50,760,150</area>
+          <font>desc</font>
+          <multiline>yes</multiline>
+         </textarea>
+
+         <blackhole name="spinbox_holder" draworder="0">
+            <area>20,170,70,30</area>
+         </blackhole>
+
+         <textarea name="minutes" draworder="0">
+          <area>90,170,100,30</area>
+          <font>active</font>
+          <value>Minutes</value>
+         </textarea>
+
+	     <textarea name="context_switch" draworder="0">
+          <area>0,510,760,50</area>
+          <font>desc</font>
+          <multiline>yes</multiline>
+         </textarea>
+    </container>
+
+    <container name="config-bottom">
+
+      <area>0,400,800,200</area>
+
+      <image name="background" draworder="0" fleximage="no">
+        <filename>news-info-bg.png</filename>
+        <position>0,0</position>
+      </image>
+
+    </container>
+
+</window>
+ 
+</mythuitheme>

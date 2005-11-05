@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+
+<sites>
+
+<category name="NetFlix">
+
+    <item>
+        <title>Netflix Top 100</title>
+        <url>http://rss.netflix.com/Top100RSS</url>
+        <ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+        <title>New Releases</title>
+        <url>http://rss.netflix.com/NewReleasesRSS</url>
+        <ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+        <title>Now in Theaters</title>
+        <url>http://rss.netflix.com/NowInTheatersRSS</url>
+        <ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Action &amp; Adventure Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=296</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Anime &amp; Animation Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=623</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Children &amp; Family Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=302</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Classics Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=306</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Comedy Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=307</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Documentary Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=864</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Drama Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=315</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Foreign Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=326</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Gay &amp; Lesbian Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=330</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Horror Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=338</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Independent Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=343</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Music &amp; Musicals Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=355</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Romance Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=371</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Sci-Fi &amp; Fantasy Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=373</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Special Interest Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=379</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Sports Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=380</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Television Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=1052</url>
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+    <item>
+<title>Thrillers Top 25</title>
+<url>http://rss.netflix.com/Top25RSS?gid=387</url>    
+<ico>http://cdn.nflximg.com/us/icons/nficon.ico</ico>
+    </item>
+
+</category>
+
+
+</sites>

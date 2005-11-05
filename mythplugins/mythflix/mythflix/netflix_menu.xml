@@ -1,0 +1,15 @@
+<mythmenu name="NETFLIX">
+  
+  <button>
+    <type>NETFLIX_QUEUE</type>
+    <text>View Queue</text>
+    <action>NETFLIX_QUEUE</action>
+  </button>
+  
+  <button>
+    <type>NETFLIX_BROWSE</type>
+    <text>Browse Movies</text>
+    <action>NETFLIX_BROWSE</action>
+  </button>
+  
+</mythmenu>

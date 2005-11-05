@@ -1,0 +1,68 @@
+MythFlix (A NetFlix MythTV)
+---------------------------------------------------------------------
+
+
+INSTALLATION:
+---------------------------------------------------------------------
+
+Unzip the mythflix-x.x-x.tgz to the mythplugin-x.x-x directory.
+
+type 'qmake mythflix.pro' in the mythflix directory to create the Makefile.
+
+type 'make' in the mythflix directory to begin compiling
+
+Compiling note:  If you get an error on building this, that says
+		something about 'mkspecs', then you don't have the 
+		QTDIR environment variable set.  On debian, this 
+		should be set to /usr/share/qt3.
+
+Once the make is completed, do a 'make install' as root
+
+- libmythflix.so will go into /usr/local/lib/mythtv/plugins
+- data files will be put into the 
+  /usr/local/share/mythtv/mythflix directory
+- image files and ui file go to /usr/local/share/mythtv/themes/default
+
+Mythtv menu needs to be modified to support MythFlix plugin.  Patches for the menu 
+xml files are provided.  Apply each patch: patch -p0 < xxxx.patch.  When prompted for
+which file to patch: 
+- main_settings.xml.patch ->  /usr/local/share/mythtv/main_settings.xml
+- info_menu.xml.patch  -> /usr/local/share/mythtv/info_menu.xml
+- info_settings.xml.patch -> /usr/local/share/mythtv/info_settings.xml
+- theme.xml.patch  -> /usr/local/share/mythtv/themes/G.A.N.T./theme.xml
+
+Insert you Netflix ShopperId in the database.  Your Netflix shopperId can be found in
+your browser's cookie. For KDE Konqueuer users, your cookie file is .kde/share/apps//kcookiejar/cookies
+look for cookie key NetflixShopperId.  The cookie value should look like something like P234214938249083290480903298 
+
+    insert settings values ('NetflixShopperId','[NetflixShooperId]', null);
+
+Run mythfrontend and setup the Netflix RSS feeds to include when you browse for movies. 
+You MUST run the mythfrontend first to give the plugin a chance to intial the database
+before continuing. See CONFIGURATION/USAGE.
+
+FINAL INSTALLATION
+---------------------------------------------------------------------
+
+After running the plugin once you must manually enter your NetFlix Queue RSS feed into the database.
+This can be found by going to NetFlix.com, login, click RSS feed at the bottom of the page. Cut
+and paste the url into netflix table with the is_queue flag set.
+  
+  insert into netflix values ("Queue","NetFlix", '[YOUR QUEUE RSS URL]','http://cdn.nflximg.com/us/icons/nficon.ico', null, 1);
+
+
+CONFIGURATION/USAGE:
+---------------------------------------------------------------------
+
+Once you have installed mythflix you need to set it up. Go to
+Settings->NetFlix Settings (This will setup the mythflix database for you
+automatically). On the Settings page there will be RRS feed on
+the left window. Double clicking or selecting and pressing
+return/space will add them to the database (These will also be shown
+on the right window). Now exit the setup page (by pressing ESC).
+
+Go to the NetFlix main page and you should see the RSS feeds on the
+left column and corresponding movies on the right). You can
+move between RSS feeds/articles using the UP/DOWN keys and between
+the news sites column and articles column using the LEFT/RIGHT
+keys. 

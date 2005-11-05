@@ -19,6 +19,7 @@ news="yes"
 phone="yes"
 browser="yes"
 controls="yes"
+flix="yes"
 cc="gcc"
 opengl="detect"
 fftw_lib="detect"
@@ -63,6 +64,9 @@ MythDVD related options:
   --enable-mythdvd         build the mythdvd plugin [$dvd]
   --enable-transcode       enable DVD ripping and transcoding [$transcode]
   --enable-vcd             enable VCD playing [$vcdsupport]
+
+MythFlix related options:
+  --enable-mythflix        build the mythflix plugin [$flix]
 
 MythGallery related options:
   --enable-mythgallery     build the mythgallery plugin [$gallery]
@@ -138,6 +142,10 @@ for opt do
   ;;
   --disable-mythcontrols) controls="no"
   ;;
+  --enable-mythflix) flix="yes"
+  ;;
+  --disable-mythflix) flix="no"
+  ;;
   --enable-opengl) opengl="yes"
   ;;
   --disable-opengl) opengl="no"
@@ -185,6 +193,7 @@ for opt do
                  phone="yes";
                  browser="yes";
                  controls="yes";
+                 flix="yes";
                  sdl="yes";
                  opengl="yes";
                  fftw_lib="yes";
@@ -204,6 +213,7 @@ for opt do
                  phone="no";
                  browser="no";
                  controls="no";
+                 flix="no";
                  sdl="no";  
                  opengl="no"; 
                  fftw_lib="no"; 
@@ -484,6 +494,13 @@ if test "$controls" = "yes" ; then
   echo "SUBDIRS += mythcontrols" >> ./config.pro
 else
   echo "        MythControls  plugin will not be built"
+fi
+
+if test "$flix" = "yes" ; then
+  echo "        MythFlix      plugin will be built"
+  echo "SUBDIRS += mythflix" >> ./config.pro
+else
+  echo "        MythFlix      plugin will not be built"
 fi
 
 if test "$dvd" = "yes" ; then
