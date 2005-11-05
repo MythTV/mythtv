@@ -148,7 +148,7 @@ ActionMenu::ActionMenu(MythMainWindow *window)
 UnsavedMenu::UnsavedMenu(MythMainWindow *window)
     : MythPopupBox(window, "unsavedmenu")
 {
-    addLabel(tr("Unsaged Changes"), Large, false);
+    addLabel(tr("Unsaved Changes"), Large, false);
     addLabel(tr("Would you like to save now?"));
     addButton(tr("Save"), this, SLOT(save()))->setFocus();
     addButton(tr("Exit"), this, SLOT(cancel()));

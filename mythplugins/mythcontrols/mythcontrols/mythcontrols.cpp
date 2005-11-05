@@ -202,6 +202,7 @@ void MythControls::switchListFocus(UIListBtnType *focus, UIListBtnType *unfocus)
     focus->SetActive(true);
     focus->takeFocus();
     repaintButtonLists();
+    refreshKeyInformation();
 }
 
 
