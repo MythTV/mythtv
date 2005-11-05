@@ -375,11 +375,11 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
         lastKey = m_positionMap[pos_idx].index * keyframedist;
 
     long long keyPos = m_positionMap[pos_idx].pos;
-    long long curPosition = ringBuffer->GetTotalReadPosition();
+    long long curPosition = ringBuffer->GetReadPosition();
     long long diff = keyPos - curPosition;
 
     // Don't rewind further than we have space to store video
-    while (ringBuffer->GetFreeSpaceWithReadChange(diff) <= 0)
+    while (keyPos <= 0)
     {
         pos_idx++;
         if (pos_idx >= (int)m_positionMap.size())
@@ -492,7 +492,7 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
 
     if (framesPlayed < lastKey)
     {
-        long long diff = keyPos - ringBuffer->GetTotalReadPosition();
+        long long diff = keyPos - ringBuffer->GetReadPosition();
 
         ringBuffer->Seek(diff, SEEK_CUR);
         needflush = true;

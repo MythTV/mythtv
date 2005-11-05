@@ -138,8 +138,6 @@ class MainServer : public QObject
 
     QString LocalFilePath(QUrl &url);
 
-    bool isRingBufSock(QSocket *sock);
-
     static void *SpawnDeleteThread(void *param);
     void DoDeleteThread(DeleteStruct *ds);
 
@@ -148,7 +146,6 @@ class MainServer : public QObject
     MythServer *mythserver;
 
     vector<PlaybackSock *> playbackList;
-    vector<QSocket *> ringBufList;
     vector<FileTransfer *> fileTransferList;
 
     QString recordfileprefix;

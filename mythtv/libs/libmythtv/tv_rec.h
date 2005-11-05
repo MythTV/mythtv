@@ -15,12 +15,13 @@
 #include "tv.h"
 
 class QSocket;
-class RingBuffer;
 class NuppelVideoRecorder;
+class RingBuffer;
 class EITScanner;
 class DVBSIParser;
 class DummyDTVRecorder;
 class RecordingProfile;
+class LiveTVChain;
 
 class RecorderBase;
 class DVBRecorder;
@@ -188,13 +189,9 @@ class TVRec : public QObject
     float GetFramerate(void);
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
-    long long GetFreeSpace(long long totalreadpos);
     long long GetMaxBitrate();
     long long GetKeyframePosition(long long desired);
-    void StopPlaying(void);
-    bool SetupRingBuffer(QString &path, long long &filesize, 
-                         long long &fillamount, bool pip = false);
-    void SpawnLiveTV(void);
+    void SpawnLiveTV(QString chainid, bool pip = false);
     void StopLiveTV(void);
     void PauseRecorder(void);
     void ToggleChannelFavorite(void);
@@ -231,18 +228,12 @@ class TVRec : public QObject
                         QString &airdate,     QString &stars);
     void GetInputName(QString &inputname);
 
-    QSocket *GetReadThreadSocket(void);
-    void SetReadThreadSocket(QSocket *sock);
-
-    int RequestRingBufferBlock(uint size);
-    long long SeekRingBuffer(long long curpos, long long pos, int whence);
-
     /// \brief Returns the caputure card number
     int GetCaptureCardNum(void) { return cardid; }
     /// \brief Returns true is "errored" is true, false otherwise.
     bool IsErrored(void)  const { return HasFlags(kFlagErrored); }
 
-    void RingBufferChanged(void);
+    void RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo);
     void RecorderPaused(void);
 
   public slots:
@@ -258,7 +249,7 @@ class TVRec : public QObject
     static void *RecorderThread(void *param);
 
   private:
-    void SetRingBuffer(RingBuffer*);
+    void SetRingBuffer(RingBuffer *);
     void TeardownAll(void);
 
     void GetChannelInfo(ChannelBase *chan,  QString &title,
@@ -318,6 +309,10 @@ class TVRec : public QObject
     bool StateIsPlaying(TVState state);
     TVState RemovePlaying(TVState state);
     TVState RemoveRecording(TVState state);
+
+    bool GetProgramRingBufferForLiveTV(ProgramInfo **pginfo, RingBuffer **rb);
+    void CreateLiveTVRingBuffer();
+    void SwitchLiveTVRingBuffer();
 
     void StartedRecording(ProgramInfo*);
     void FinishedRecording(ProgramInfo*);
@@ -383,19 +378,15 @@ class TVRec : public QObject
     ProgramInfo *pendingRecording;
     QDateTime    recordPendingStart;
 
-    // RingBuffer info
-    RingBuffer    *ringBuffer;
-    QString        rbFileName;
-    QString        rbFileExt;
+    // LiveTV file chain
+    LiveTVChain *tvchain;
 
-    // Data Socket stuff for streaming
-    QSocket       *rbStreamingSock;
-    char          *rbStreamingBuffer;
-    bool           rbStreamingLive;
+    // RingBuffer info
+    RingBuffer  *ringBuffer;
+    QString      rbFileName;
+    QString      rbFileExt;
 
   public:
-    static const uint kStreamedFileReadTimeout;
-    static const uint kRequestBufferSize;
     static const uint kEITScanStartTimeout;
     static const uint kSignalMonitoringRate;
 

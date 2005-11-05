@@ -538,27 +538,6 @@ long long EncoderLink::GetFilePosition(void)
     return -1;
 }
 
-/** \fn EncoderLink::GetFreeSpace(long long)
- *  \brief Returns number of bytes beyond "totalreadpos" it is safe to read.
- *         <b>This only works on local recorders.</b>
- *
- *  Note: This may return a negative number, including -1 if the call
- *  succeeds. This means totalreadpos is past the "safe read" portion of
- *  the file.
- *
- *  \sa TVRec::GetFreeSpace(long long), RemoteEncoder::GetFreeSpace(long long)
- *  \return Returns number of bytes ahead of totalreadpos it is safe to read
- *          if call succeeds, -1 otherwise.
- */
-long long EncoderLink::GetFreeSpace(long long totalreadpos)
-{
-    if (local)
-        return tv->GetFreeSpace(totalreadpos);
-
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetFreeSpace");
-    return -1;
-}
-
 /** \fn EncoderLink::GetKeyframePosition(long long)
  *  \brief Returns byte position in RingBuffer of a keyframe.
  *         <b>This only works on local recorders.</b>
@@ -605,51 +584,19 @@ void EncoderLink::CancelNextRecording(void)
         VERBOSE(VB_IMPORTANT, "Should be local only query: CancelNextRecording");
 }
 
-/** \fn EncoderLink::StopPlaying()
- *  \brief Tells TVRec to stop streaming a recording to the frontend.
- *         <b>This only works on local recorders.</b>
- */
-void EncoderLink::StopPlaying(void)
-{
-    if (local)
-        tv->StopPlaying();
-    else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: StopPlaying");
-}
-
-/** \fn EncoderLink::SetupRingBuffer(QString&,long long&,long long&,bool)
- *  \brief Sets up TVRec's RingBuffer for "Live TV" playback.
- *         <b>This only works on local recorders.</b>
- *
- *  \sa TVRec::SetupRingBuffer(QString&,long long&,long long&,bool),
- *      RemoteEncoder::SetupRingBuffer(QString&,long long&,long long&,bool),
- *      StopLiveTV()
- *
- *  \param path Returns path to recording.
- *  \param filesize Returns size of recording file in bytes.
- *  \param fillamount Returns the maximum buffer fill in bytes.
- *  \param pip Tells TVRec's RingBuffer that this is for a Picture in Picture display.
- *  \return true if successful, false otherwise.
- */
-bool EncoderLink::SetupRingBuffer(QString &path, long long &filesize,
-                                  long long &fillamount, bool pip)
-{
-    if (local)
-        return tv->SetupRingBuffer(path, filesize, fillamount, pip);
-
-    VERBOSE(VB_IMPORTANT, "Should be local only query: SetupRingBuffer");
-    return false;
-}
-
 /** \fn EncoderLink::SpawnLiveTV()
  *  \brief Tells TVRec to Spawn a "Live TV" recorder.
  *         <b>This only works on local recorders.</b>
+ *
+ *  \param chainid The LiveTV chain id to use
+ *  \param pip Tells TVRec's RingBuffer that this is for a Picture in Picture di
+splay.
  *  \sa TVRec::SpawnLiveTV(), RemoteEncoder::SpawnLiveTV()
  */
-void EncoderLink::SpawnLiveTV(void)
+void EncoderLink::SpawnLiveTV(QString chainid, bool pip)
 {
     if (local)
-        tv->SpawnLiveTV();
+        tv->SpawnLiveTV(chainid, pip);
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: SpawnLiveTV");
 }
@@ -937,74 +884,6 @@ QString EncoderLink::GetInputName()
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: GetInputName");
     return inputname;
-}
-
-/** \fn EncoderLink::SetReadThreadSocket(QSocket*)
- *  \brief Sets RingBuffer streaming socket.
- *         <b>This only works on local recorders.</b>
- *  \param rsock socket to use.
- *  \sa GetReadThreadSocket(), RequestRingBufferBlock(uint)
- */
-void EncoderLink::SetReadThreadSocket(QSocket *rsock)
-{
-    if (local)
-    {
-        tv->SetReadThreadSocket(rsock);
-        return;
-    }
-
-    VERBOSE(VB_IMPORTANT, "Should be local only query: SpawnReadThread");
-}
-
-/** \fn EncoderLink::GetReadThreadSocket()
- *  \brief Returns RingBuffer streaming socket.
- *         <b>This only works on local recorders.</b>
- *  \return socket if it exists, NULL otherwise.
- *  \sa SetReadThreadSock(QSocket*), RequestRingBufferBlock(uint)
- */
-QSocket *EncoderLink::GetReadThreadSocket(void)
-{
-    if (local)
-        return tv->GetReadThreadSocket();
-
-    VERBOSE(VB_IMPORTANT, "Should be local only query: GetReadThreadSocket");
-    return NULL;
-}
-
-/** \fn EncoderLink::RequestRingBufferBlock(uint)
- *  \brief Tells TVRec to stream A/V data if it is available.
- *         <b>This only works on local recorders.</b>
- *
- *  \param size Requested block size, may not be respected, but this many
- *              bytes of data will be returned if it is available.
- *  \return -1 if request does not succeed, amount of data sent otherwise.
- */
-int EncoderLink::RequestRingBufferBlock(uint size)
-{
-    if (local)
-        return tv->RequestRingBufferBlock(size);
-
-    VERBOSE(VB_IMPORTANT, "Should be local only query: RequestRingBufferBlock");
-    return -1;
-}
-
-/** \fn EncoderLink::SeekRingBuffer(long long, long long, int)
- *  \brief Tells TVRec to seek to a specific byte in RingBuffer.
- *         <b>This only works on local recorders.</b>
- *  \param curpos Current byte position in RingBuffer
- *  \param pos    Desired position, or position delta.
- *  \param whence One of SEEK_SET, or SEEK_CUR, or SEEK_END.
- *                These work like the equivalent fseek parameters.
- *  \return new position if seek is successful, -1 otherwise.
- */
-long long EncoderLink::SeekRingBuffer(long long curpos, long long pos, 
-                                      int whence)
-{
-    if (local)
-        return tv->SeekRingBuffer(curpos, pos, whence);
-
-    VERBOSE(VB_IMPORTANT, "Should be local only query: SeekRingBuffer");
-    return -1;
 }
 
 /** \fn EncoderLink::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)

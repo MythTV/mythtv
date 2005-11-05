@@ -709,7 +709,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                   "channel.outputfilters,seriesid,programid,filesize, "
                   "lastmodified,stars,previouslyshown,originalairdate, "
                   "hostname,recordid,transcoder,timestretch, "
-                  "recorded.recpriority,progstart,progend "
+                  "recorded.recpriority,progstart,progend,basename "
                   "FROM recorded "
                   "LEFT JOIN channel "
                   "ON recorded.chanid = channel.chanid "
@@ -769,6 +769,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
 
         proginfo->timestretch = query.value(21).toString().toFloat();
         proginfo->recpriority = query.value(22).toInt();
+
+        proginfo->pathname = query.value(25).toString();
 
         return proginfo;
     }
@@ -3482,6 +3484,9 @@ bool ProgramList::FromScheduler(bool &hasConflicts)
 {
     clear();
     hasConflicts = false;
+
+    if (gContext->IsBackend())
+        return false;
 
     QStringList slist = QString("QUERY_GETALLPENDING");
     if (!gContext->SendReceiveStringList(slist) || slist.size() < 2)

@@ -1883,7 +1883,7 @@ void NuppelVideoRecorder::WriteHeader(void)
     moredata.audio_channels = audio_channels;
     moredata.audio_bits_per_sample = audio_bits;
 
-    extendeddataOffset = ringBuffer->GetFileWritePosition();
+    extendeddataOffset = ringBuffer->GetWritePosition();
 
 #ifdef WORDS_BIGENDIAN
     moredata.version                 = bswap_32(moredata.version);
@@ -1920,7 +1920,7 @@ void NuppelVideoRecorder::WriteSeekTable(void)
     frameheader.frametype = 'Q'; // SeekTable
     frameheader.packetlength = sizeof(struct seektable_entry) * numentries;
 
-    long long currentpos = ringBuffer->GetFileWritePosition();
+    long long currentpos = ringBuffer->GetWritePosition();
 
     ringBuffer->Write(&frameheader, sizeof(frameheader));    
 
@@ -1968,7 +1968,7 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
     frameheader.frametype = 'K'; // KFA Table
     frameheader.packetlength = sizeof(struct kfatable_entry) * numentries;
 
-    long long currentpos = ringBuffer->GetFileWritePosition();
+    long long currentpos = ringBuffer->GetWritePosition();
 
     ringBuffer->Write(&frameheader, sizeof(frameheader));
 
@@ -1999,7 +1999,7 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
 
 void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offset)
 {
-    long long position = ringBuffer->GetFileWritePosition() + offset;
+    long long position = ringBuffer->GetWritePosition() + offset;
     struct seektable_entry ste;
     ste.file_offset = position;
     ste.keyframe_number = frame_num;

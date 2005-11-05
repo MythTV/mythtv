@@ -12,25 +12,11 @@ using namespace std;
 
 RemoteFile::RemoteFile(const QString &url, int lrecordernum)
 {
-    type = 0;
     path = url;
     readposition = 0;
     filesize = -1;
 
-    if (lrecordernum > 0)
-    {
-        type = 1;
-        query = "QUERY_RECORDER %1";
-        append = "_RINGBUF";
-        recordernum = lrecordernum;
-    }
-    else
-    {
-        type = 0;
-        query = "QUERY_FILETRANSFER %1";
-        append = "";
-        recordernum = -1;
-    }
+    query = "QUERY_FILETRANSFER %1";
 
     controlSock = openSocket(true);
     sock = openSocket(false);
@@ -57,8 +43,7 @@ QSocketDevice *RemoteFile::openSocket(bool control)
     
     if (!connectSocket(lsock, host, port))
     {
-        QString dtype = (type == 0) ? "file" : "ringbuffer";
-        QString stype = (control) ? "control socket" : dtype + " data socket";
+        QString stype = (control) ? "control socket" : "file data socket";
         VERBOSE(VB_IMPORTANT,
                 QString("RemoteFile::openSocket(%1): \n"
                         "\t\t\tCould not connect to server \"%2\" @ port %3")
@@ -79,24 +64,14 @@ QSocketDevice *RemoteFile::openSocket(bool control)
     }
     else
     {
-        if (type == 0)
-        {
-            strlist = QString("ANN FileTransfer %1").arg(hostname);
-            strlist << dir;
+        strlist = QString("ANN FileTransfer %1").arg(hostname);
+        strlist << dir;
 
-            WriteStringList(lsock, strlist);
-            ReadStringList(lsock, strlist, true);
+        WriteStringList(lsock, strlist);
+        ReadStringList(lsock, strlist, true);
 
-            recordernum = strlist[1].toInt();
-            filesize = decodeLongLong(strlist, 2);
-        }
-        else
-        {
-            strlist = QString("ANN RingBuffer %1 %2").arg(hostname)
-                             .arg(recordernum);
-            WriteStringList(lsock, strlist);
-            ReadStringList(lsock, strlist, true);
-        }
+        recordernum = strlist[1].toInt();
+        filesize = decodeLongLong(strlist, 2);
     }
     
     return lsock;
@@ -123,7 +98,7 @@ void RemoteFile::Close(void)
         return;
 
     QStringList strlist = QString(query).arg(recordernum);
-    strlist << "DONE" + append;
+    strlist << "DONE";
 
     lock.lock();
     WriteStringList(controlSock, strlist);
@@ -187,7 +162,7 @@ long long RemoteFile::Seek(long long pos, int whence, long long curpos)
         return 0;
 
     QStringList strlist = QString(query).arg(recordernum);
-    strlist << "SEEK" + append;
+    strlist << "SEEK";
     encodeLongLong(strlist, pos);
     strlist << QString::number(whence);
     if (curpos > 0)
@@ -252,7 +227,7 @@ int RemoteFile::Read(void *data, int size)
     }
     
     QStringList strlist = QString(query).arg(recordernum);
-    strlist << "REQUEST_BLOCK" + append;
+    strlist << "REQUEST_BLOCK";
     strlist << QString::number(size);
     WriteStringList(controlSock, strlist);
 

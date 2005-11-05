@@ -69,12 +69,8 @@ class EncoderLink
     float GetFramerate(void);
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
-    long long GetFreeSpace(long long totalreadpos);
     long long GetKeyframePosition(long long desired);
-    void StopPlaying(void);
-    bool SetupRingBuffer(QString &path, long long &filesize,
-                         long long &fillamount, bool pip = false);
-    void SpawnLiveTV(void);
+    void SpawnLiveTV(QString chainid, bool pip = false);
     void StopLiveTV(void);
     void PauseRecorder(void);
     void ToggleInputs(void);
@@ -101,12 +97,6 @@ class EncoderLink
                         QString &seriesid, QString &programid, QString &chanFilters, 
                         QString &repeat, QString &airdate, QString &stars);
     QString GetInputName();
-
-    void SetReadThreadSocket(QSocket *rsock);
-    QSocket *GetReadThreadSocket(void);
-
-    int RequestRingBufferBlock(uint size);
-    long long SeekRingBuffer(long long curpos, long long pos, int whence);
 
     char *GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
                         int secondsin, int &bufferlen,

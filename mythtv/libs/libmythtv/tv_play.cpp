@@ -31,6 +31,7 @@
 #include "signalmonitor.h"
 #include "scheduledrecording.h"
 #include "config.h"
+#include "livetvchain.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -242,6 +243,8 @@ TV::TV(void)
       // Remote Encoders
       recorder(NULL), piprecorder(NULL), activerecorder(NULL),
       switchToRec(NULL),
+      // LiveTVChain
+      tvchain(NULL), piptvchain(NULL),
       // RingBuffers
       prbuffer(NULL), piprbuffer(NULL), activerbuffer(NULL),
       // OSD info
@@ -443,10 +446,11 @@ TVState TV::GetState(void) const
     return internalState;
 }
 
-int TV::LiveTV(bool showDialogs)
+int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
 {
     if (internalState == kState_None && RequestNextRecorder(showDialogs))
     {
+        tvchain = chain;
         ChangeState(kState_WatchingLiveTV);
         switchToRec = NULL;
         return 1;
@@ -731,54 +735,58 @@ void TV::HandleStateChange(void)
 
     if (TRANSITION(kState_None, kState_WatchingLiveTV))
     {
-        long long filesize = 0;
-        long long smudge = 0;
         QString name = "";
 
         lastSignalUIInfo.clear();
         activerecorder = recorder;
         recorder->Setup();
-        if (!recorder->SetupRingBuffer(name, filesize, smudge))
+        
+        lockTimerOn = false;
+
+        SET_NEXT();
+        recorder->SpawnLiveTV(tvchain->GetID(), false);
+
+        tvchain->ReloadAll();
+
+        ProgramInfo *pginfo = tvchain->GetProgramAt(-1);
+        if (!pginfo)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "HandleStateChange(): "
-                    "Failed to start RingBuffer on backend. Aborting.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "LiveTV not successfully started");
+            gContext->RestoreScreensaver();
+            DeleteRecorder();
+
+            SET_LAST();
+        }
+
+        tvchain->SetProgram(pginfo);
+
+        prbuffer = new RingBuffer(pginfo->pathname, false);
+        prbuffer->SetLiveMode(tvchain);
+
+        gContext->DisableScreensaver();
+
+        bool ok = false;
+        if (StartRecorder())
+        {
+            if (StartPlayer(false))
+                ok = true;
+            else
+                StopStuff(true, true, true);
+        }
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "LiveTV not successfully started");
+            gContext->RestoreScreensaver();
             DeleteRecorder();
 
             SET_LAST();
         }
         else
         {
-            lockTimerOn = false;
-            prbuffer = new RingBuffer(name, filesize, smudge, recorder);
-
-            SET_NEXT();
-
-            recorder->SpawnLiveTV();
-
-            gContext->DisableScreensaver();
-
-            bool ok = false;
-            if (StartRecorder())
-            {
-                if (StartPlayer(false))
-                    ok = true;
-                else
-                    StopStuff(true, true, true);
-            }
-            if (!ok)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_ERR +
-                        "LiveTV not successfully started");
-                gContext->RestoreScreensaver();
-                DeleteRecorder();
-
-                SET_LAST();
-            }
-            else
-            {
-                lockTimer.start();
-                lockTimerOn = true;
-            }
+            lockTimer.start();
+            lockTimerOn = true;
         }
     }
     else if (TRANSITION(kState_WatchingLiveTV, kState_None))
@@ -795,31 +803,7 @@ void TV::HandleStateChange(void)
     else if (TRANSITION(kState_None, kState_WatchingPreRecorded) ||
              TRANSITION(kState_None, kState_WatchingRecording))
     {
-        QString tmpFilename;
-        if ((inputFilename.left(7) == "myth://") &&
-            (inputFilename.length() > 7))
-        {
-            tmpFilename = gContext->GetSettingOnHost("RecordFilePrefix",
-                                                     playbackinfo->hostname);
-
-            int pathLen = inputFilename.find(QRegExp("/"), 7);
-            if (pathLen != -1)
-            {
-                tmpFilename += inputFilename.right(inputFilename.length() -
-                                                   pathLen);
-
-                QFile checkFile(tmpFilename);
-
-                if (!checkFile.exists())
-                    tmpFilename = inputFilename;
-            }
-        }
-        else
-        {
-            tmpFilename = inputFilename;
-        }
-
-        prbuffer = new RingBuffer(tmpFilename, false);
+        prbuffer = new RingBuffer(inputFilename, false);
         if (prbuffer->IsOpen())
         {
 
@@ -862,9 +846,6 @@ void TV::HandleStateChange(void)
     else if (TRANSITION(kState_WatchingPreRecorded, kState_None) ||
              TRANSITION(kState_WatchingRecording, kState_None))
     {
-        if (internalState == kState_WatchingRecording)
-            recorder->StopPlaying();
-
         SET_NEXT();
 
         StopStuff(true, true, false);
@@ -1147,6 +1128,7 @@ void TV::SetupPlayer(bool isWatchingRecording)
     nvp->SetLength(playbackLen);
     nvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));
     nvp->SetAutoCommercialSkip(autoCommercialSkip);
+    nvp->SetLiveTVChain(tvchain);
 
     nvp->SetAudioStretchFactor(normal_speed);
 
@@ -1221,6 +1203,7 @@ void TV::SetupPipPlayer(void)
     pipnvp->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
     pipnvp->SetAudioDevice(gContext->GetSetting("AudioOutputDevice"));
     pipnvp->SetExactSeeks(gContext->GetNumSetting("ExactSeeking"));
+    pipnvp->SetLiveTVChain(piptvchain);
 
     pipnvp->SetLength(playbackLen);
 }
@@ -2252,8 +2235,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 CommitQueuedInput();
             else if (action == "GUIDE")
                 LoadMenu();
-            else if (action == "TOGGLEPIPMODE")
-                TogglePIPView();
+            //else if (action == "TOGGLEPIPMODE")
+            //    TogglePIPView();
             else if (action == "TOGGLEPIPWINDOW")
                 ToggleActiveWindow();
             else if (action == "SWAPPIP")
@@ -2349,6 +2332,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
 void TV::TogglePIPView(void)
 {
+#if 0
     if (!pipnvp)
     {
         RemoteEncoder *testrec = RemoteRequestRecorder();
@@ -2384,7 +2368,7 @@ void TV::TogglePIPView(void)
         lockTimeout[piprecorder->GetRecorderNumber()] =
             GetLockTimeout(piprecorder->GetRecorderNumber());
 
-        piprecorder->SpawnLiveTV();
+        piprecorder->SpawnLiveTV( , true);
 
         while (!piprecorder->IsRecording())
             usleep(50);
@@ -2417,6 +2401,7 @@ void TV::TogglePIPView(void)
 
         TeardownPipPlayer();        
     }
+#endif
 }
 
 void TV::ToggleActiveWindow(void)
@@ -4272,6 +4257,18 @@ void TV::customEvent(QCustomEvent *e)
                 exitPlayer = true;
             }
         }
+        else if (tvchain && message.left(12) == "LIVETV_CHAIN")
+        {
+            message = message.simplifyWhiteSpace();
+            QStringList tokens = QStringList::split(" ", message);
+            if (tokens[1] == "UPDATE")
+            {
+                if (tokens[2] == tvchain->GetID())
+                {
+                    tvchain->ReloadAll();
+                }
+            }
+        }
         else if (nvp && message.left(12) == "EXIT_TO_MENU")
         {
             int exitprompt = gContext->GetNumSetting("PlaybackExitPrompt");
@@ -4812,8 +4809,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     {
         if (action == "GUIDE")
             LoadMenu();
-        else if (action == "TOGGLEPIPMODE")
-            TogglePIPView();
+        //else if (action == "TOGGLEPIPMODE")
+        //    TogglePIPView();
         else if (action == "TOGGLEPIPWINDOW")
             ToggleActiveWindow();
         else if (action == "SWAPPIP")

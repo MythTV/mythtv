@@ -205,14 +205,14 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20051026-1"
+#define MYTH_BINARY_VERSION "0.19.20051104-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
  *   You must also update this value in
  *   mythplugins/mythweb/includes/mythbackend.php
  */
-#define MYTH_PROTO_VERSION "19"
+#define MYTH_PROTO_VERSION "20"
 
 /** \class MythContext
  *  \brief This class contains the runtime context for MythTV.

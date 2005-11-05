@@ -570,7 +570,7 @@ void MpegRecorder::ProcessData(unsigned char *buffer, int len)
             
             if (state == PACK_HEADER)
             {
-                long long startpos = ringBuffer->GetFileWritePosition();
+                long long startpos = ringBuffer->GetWritePosition();
                 startpos += buildbuffersize + bufptr - bufstart - 4;
                 lastpackheaderpos = startpos;
 
@@ -749,7 +749,7 @@ void MpegRecorder::HandleKeyframe(void)
     nextRingBufferLock.unlock();
 
     if (rb_changed && tvrec)
-        tvrec->RingBufferChanged();
+        tvrec->RingBufferChanged(ringBuffer, curRecording);
 }
 
 /** \fn MpegRecorder::SavePositionMap(bool)

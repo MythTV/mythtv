@@ -43,6 +43,7 @@ using namespace std;
 #include "statusbox.h"
 #include "lcddevice.h"
 #include "langsettings.h"
+#include "livetvchain.h"
 
 #define NO_EXIT  0
 #define QUIT     1
@@ -239,6 +240,8 @@ void startManualSchedule(void)
 
 void startTV(void)
 {
+    return;
+
     TV *tv = new TV();
 
     MythTimer timer;
@@ -255,9 +258,12 @@ void startTV(void)
     bool tryTV = false;
     bool tryRecorder = false;
     bool quitAll = false;
-
     bool showDialogs = true;
-    if (!tv->LiveTV(showDialogs))
+
+    LiveTVChain *tvchain = new LiveTVChain();
+    QString chainid = tvchain->InitializeNewChain(gContext->GetHostName());
+
+    if (!tv->LiveTV(tvchain, showDialogs))
     {
         tv->StopLiveTV();
         quitAll = true;
@@ -289,7 +295,7 @@ void startTV(void)
         while (tryTV)
         {//try to start livetv
             bool showDialogs = false;
-            if (tv->LiveTV(showDialogs) == 1) //1 == livetv ok
+            if (tv->LiveTV(tvchain, showDialogs) == 1) //1 == livetv ok
                 tryTV = false;
             else if (timer.elapsed() > 2000)
             {
@@ -339,6 +345,9 @@ void startTV(void)
     }
 
     delete tv;
+
+    tvchain->DestroyChain();
+    delete tvchain;
 }
 
 void showStatus(void)

@@ -25,16 +25,13 @@ class RemoteEncoder
     /// \brief Return value last returned by GetFramesWritten().
     long long GetCachedFramesWritten(void) const { return cachedFramesWritten; }
     long long GetFilePosition(void);
-    long long GetFreeSpace(long long totalreadpos);
     long long GetFreeDiskSpace();
     long long GetMaxBitrate();
     long long GetKeyframePosition(long long desired);
     void FillPositionMap(int start, int end,
                          QMap<long long, long long> &positionMap);
     void StopPlaying(void);
-    bool SetupRingBuffer(QString &path, long long &filesize, 
-                         long long &fillamount, bool pip = false);
-    void SpawnLiveTV(void);
+    void SpawnLiveTV(QString chainid, bool pip);
     void StopLiveTV(void);
     void PauseRecorder(void);
     void FinishRecording(void);

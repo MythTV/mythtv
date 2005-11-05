@@ -4,7 +4,8 @@
 #include "programinfo.h"
 
 LiveTVChain::LiveTVChain()
-           : m_id(""), m_maxpos(0)
+           : m_id(""), m_maxpos(0), m_curpos(0), m_cur_chanid(""),
+             m_switchid(-1)
 {
 }
 
@@ -16,6 +17,16 @@ QString LiveTVChain::InitializeNewChain(const QString &seed)
 {
     QDateTime curdt = QDateTime::currentDateTime();
     m_id = QString("live-%1-%2").arg(seed).arg(curdt.toString(Qt::ISODate));
+    return m_id;
+}
+
+void LiveTVChain::SetHostPrefix(const QString &prefix)
+{
+    m_hostprefix = prefix;
+}
+
+QString LiveTVChain::GetID(void)
+{
     return m_id;
 }
 
@@ -33,20 +44,22 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, bool discont)
     newent.chanid = pginfo->chanid;
     newent.starttime = pginfo->recstartts;
     newent.discontinuity = discont;
+    newent.hostprefix = m_hostprefix;
 
     m_chain.append(newent);
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO livetvchain (chanid, starttime, chainid,"
-                  " chainpos, discontinuity, watching) "
+    query.prepare("INSERT INTO tvchain (chanid, starttime, chainid,"
+                  " chainpos, discontinuity, watching, hostprefix) "
                   "VALUES(:CHANID, :START, :CHAINID, :CHAINPOS, :DISCONT, "
-                  " :WATCHING);");
+                  " :WATCHING, :PREFIX);");
     query.bindValue(":CHANID", pginfo->chanid);
     query.bindValue(":START", pginfo->recstartts);
     query.bindValue(":CHAINID", m_id);
     query.bindValue(":CHAINPOS", m_maxpos);
     query.bindValue(":DISCONT", discont);
     query.bindValue(":WATCHING", 0);
+    query.bindValue(":PREFIX", m_hostprefix);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Chain: AppendNewProgram", query);
@@ -72,7 +85,7 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
             if (it != m_chain.end())
             {
                 (*it).discontinuity = true;
-                query.prepare("UPDATE livetvchain SET discontinuity = :DISCONT "
+                query.prepare("UPDATE tvchain SET discontinuity = :DISCONT "
                               "WHERE chanid = :CHANID AND starttime = :START "
                               "AND chainid = :CHAINID ;");
                 query.bindValue(":CHANID", (*it).chanid);
@@ -82,7 +95,7 @@ void LiveTVChain::DeleteProgram(ProgramInfo *pginfo)
                 query.exec();
             }
 
-            query.prepare("DELETE FROM livetvchain WHERE chanid = :CHANID "
+            query.prepare("DELETE FROM tvchain WHERE chanid = :CHANID "
                           "AND starttime = :START AND chainid = :CHAINID ;");
             query.bindValue(":CHANID", (*del).chanid);
             query.bindValue(":START", (*del).starttime);
@@ -111,7 +124,7 @@ void LiveTVChain::DestroyChain(void)
     m_chain.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("DELETE FROM livetvchain WHERE chainid = :CHAINID ;");
+    query.prepare("DELETE FROM tvchain WHERE chainid = :CHAINID ;");
     query.bindValue(":CHAINID", m_id);
 
     query.exec();
@@ -119,13 +132,14 @@ void LiveTVChain::DestroyChain(void)
 
 void LiveTVChain::ReloadAll(void)
 {
-    QMutexLocker lock(&m_lock);
+    m_lock.lock();
 
     m_chain.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, starttime, discontinuity, chainpos "
-                  "FROM livetvchain "
+    query.prepare("SELECT chanid, starttime, discontinuity, chainpos, "
+                  "hostprefix "
+                  "FROM tvchain "
                   "WHERE chainid = :CHAINID ORDER BY chainpos;");
     query.bindValue(":CHAINID", m_id);
 
@@ -133,15 +147,144 @@ void LiveTVChain::ReloadAll(void)
     {
         while (query.next())
         {
+
             LiveTVChainEntry entry;
             entry.chanid = query.value(0).toString();
             entry.starttime = query.value(1).toDateTime();
             entry.discontinuity = query.value(2).toInt();
+            entry.hostprefix = query.value(4).toString();
 
             m_maxpos = query.value(3).toInt() + 1;
 
             m_chain.append(entry);
         }
     }
+
+    m_lock.unlock();
+
+    m_curpos = ProgramIsAt(m_cur_chanid, m_cur_startts);
+}
+
+void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry)
+{
+    m_lock.lock();
+
+    int size = m_chain.count();
+    if (at < 0 || at >= size)
+        at = size - 1;
+
+    entry = m_chain[at];
+
+    m_lock.unlock();
+}
+
+ProgramInfo *LiveTVChain::EntryToProgram(LiveTVChainEntry &entry)
+{
+    ProgramInfo *pginfo;
+    pginfo = ProgramInfo::GetProgramFromRecorded(entry.chanid,
+                                                 entry.starttime);
+
+    pginfo->pathname = entry.hostprefix + pginfo->pathname;
+
+    return pginfo;
+}
+
+ProgramInfo *LiveTVChain::GetProgramAt(int at)
+{
+    LiveTVChainEntry entry;
+    GetEntryAt(at, entry);
+
+    return EntryToProgram(entry);
+}
+
+int LiveTVChain::ProgramIsAt(const QString &chanid, const QDateTime &starttime)
+{
+    QMutexLocker lock(&m_lock);
+
+    int count = 0;
+    QValueList<LiveTVChainEntry>::iterator it, del;
+    for (it = m_chain.begin(); it != m_chain.end(); ++it, ++count)
+    {
+        if ((*it).chanid == chanid &&
+            (*it).starttime == starttime)
+        {
+            return count;
+        }
+    }
+
+    return -1;
+}
+
+int LiveTVChain::ProgramIsAt(ProgramInfo *pginfo)
+{
+    return ProgramIsAt(pginfo->chanid, pginfo->recstartts);
+}
+
+int LiveTVChain::TotalSize(void)
+{
+    return m_chain.count();
+}
+
+void LiveTVChain::SetProgram(ProgramInfo *pginfo)
+{
+    if (!pginfo)
+        return;
+
+    m_cur_chanid = pginfo->chanid;
+    m_cur_startts = pginfo->recstartts;
+
+    m_curpos = ProgramIsAt(pginfo);
+    m_switchid = -1;
+}
+
+bool LiveTVChain::HasNext(void)
+{
+    return ((int)m_chain.count() - 1 > m_curpos);
+}
+
+bool LiveTVChain::HasPrev(void)
+{
+    return (m_curpos > 0);
+}
+
+bool LiveTVChain::NeedsToSwitch(void)
+{
+    return (m_switchid >= 0);
+}
+
+ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont)
+{
+    if (m_switchid < 0 || m_curpos == m_switchid)
+        return NULL;
+
+    LiveTVChainEntry entry;
+    GetEntryAt(m_switchid, entry);
+
+    ProgramInfo *pginfo = EntryToProgram(entry);
+
+    discont = true;
+    if (m_curpos == m_switchid - 1)
+        discont = entry.discontinuity;
+
+    m_switchid = -1;
+
+    return pginfo;
+}
+    
+void LiveTVChain::SwitchTo(int num)
+{
+    if (num < 0 || num >= (int)m_chain.count())
+        return;
+
+    if (m_curpos != num)
+        m_switchid = num;
+}
+
+void LiveTVChain::SwitchToNext(bool up)
+{
+    if (up && HasNext())
+        SwitchTo(m_curpos + 1);
+    else if (!up && HasPrev())
+        SwitchTo(m_curpos - 1);
 }
 

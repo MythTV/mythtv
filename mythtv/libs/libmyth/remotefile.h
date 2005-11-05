@@ -37,10 +37,8 @@ class RemoteFile
 
     long long readposition;
     int recordernum;
-    int type;
 
     QString query;
-    QString append;
 
     QMutex lock;
 

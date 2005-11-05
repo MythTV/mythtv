@@ -298,7 +298,7 @@ void DTVRecorder::HandleKeyframe(void)
     _position_map_lock.lock();
     if (!_position_map.contains(frameNum))
     {
-        long long startpos = ringBuffer->GetFileWritePosition();
+        long long startpos = ringBuffer->GetWritePosition();
         _position_map_delta[frameNum] = startpos;
         _position_map[frameNum]       = startpos;
         save_map = true;
@@ -331,7 +331,7 @@ void DTVRecorder::HandleKeyframe(void)
     }
     nextRingBufferLock.unlock();
     if (rb_changed && tvrec)
-        tvrec->RingBufferChanged();
+        tvrec->RingBufferChanged(ringBuffer, nextRecording);
 }
 
 /** \fn DTVRecorder::SavePositionMap(bool)
@@ -354,7 +354,7 @@ void DTVRecorder::SavePositionMap(bool force)
     {
         curRecording->SetPositionMapDelta(_position_map_delta, 
                                           MARK_GOP_BYFRAME);
-        curRecording->SetFilesize(ringBuffer->GetFileWritePosition());
+        curRecording->SetFilesize(ringBuffer->GetWritePosition());
         _position_map_delta.clear();
     }
 }

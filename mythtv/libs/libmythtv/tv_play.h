@@ -29,6 +29,7 @@ class MythDialog;
 class UDPNotify;
 class OSDListTreeType;
 class OSDGenericTree;
+class LiveTVChain;
 
 typedef QValueVector<QString> str_vec_t;
 typedef QMap<QString, QString> InfoMap;
@@ -57,7 +58,7 @@ class TV : public QObject
     void customEvent(QCustomEvent *e);
 
     // LiveTV commands
-    int  LiveTV(bool showDialogs = true);
+    int  LiveTV(LiveTVChain *chain, bool showDialogs = true);
     /// This command is used to exit the player in order to record using
     /// the recording being used by LiveTV.
     void StopLiveTV(void) { exitPlayer = true; }
@@ -442,6 +443,10 @@ class TV : public QObject
     RemoteEncoder *activerecorder;
     /// Main recorder to use after a successful SwitchCards() call.
     RemoteEncoder *switchToRec;
+
+    // LiveTVChain
+    LiveTVChain *tvchain;
+    LiveTVChain *piptvchain;
 
     // RingBuffers
     RingBuffer *prbuffer;

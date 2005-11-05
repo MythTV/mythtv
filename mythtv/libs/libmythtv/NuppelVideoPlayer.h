@@ -30,6 +30,7 @@ class AudioOutput;
 class FilterManager;
 class FilterChain;
 class VideoSync;
+class LiveTVChain;
 struct AVSubtitle;
 
 struct TextContainer
@@ -80,6 +81,7 @@ class NuppelVideoPlayer
     void SetCommercialSkipMethod(int m)       { commercialskipmethod = m; }
     void SetCommBreakMap(QMap<long long, int> &newMap);
     void SetRingBuffer(RingBuffer *rbuf)      { ringBuffer = rbuf; }
+    void SetLiveTVChain(LiveTVChain *tvchain) { livetvchain = tvchain; }
     void SetAudioSampleRate(int rate)         { audio_samplerate = rate; }
     void SetAudioStretchFactor(float factor)  { audio_stretchfactor = factor; }
     void SetLength(int len)                   { totalLength = len; }
@@ -329,6 +331,9 @@ class NuppelVideoPlayer
     void  DisplaySubtitles(void);
     void  ClearSubtitles(void);
 
+    // Private LiveTV stuff
+    void  SwitchToProgram(void);
+
   private:
     VideoOutputType forceVideoOutput;
 
@@ -531,6 +536,9 @@ class NuppelVideoPlayer
     long long  tc_wrap[TCTYPESMAX];
     long long  tc_lastval[TCTYPESMAX];
     long long  tc_diff_estimate;
+
+    // LiveTV
+    LiveTVChain *livetvchain;
 
     // Debugging variables
     Jitterometer *output_jmeter;

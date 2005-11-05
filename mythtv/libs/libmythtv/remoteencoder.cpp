@@ -167,30 +167,6 @@ long long RemoteEncoder::GetFilePosition(void)
     return retval;
 }
 
-/** \fn TVRec::GetFreeSpace(long long)
- *  \brief Returns number of bytes beyond "totalreadpos" it is safe to read.
- *
- *  Note: This may return a negative number, including -1 if the call
- *  succeeds. This means totalreadpos is past the "safe read" portion of
- *  the file.
- *
- *  \sa TVRec::GetFreeSpace(long long), EncoderLink::GetFreeSpace(long long)
- *  \return Returns number of bytes ahead of totalreadpos it is safe to read
- *          if call succeeds, -1 otherwise.
- */
-long long RemoteEncoder::GetFreeSpace(long long totalreadpos)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
-    strlist << "GET_FREE_SPACE";
-    encodeLongLong(strlist, totalreadpos);
-
-    SendReceiveStringList(strlist);
-
-    long long retval = decodeLongLong(strlist, 0);
-
-    return retval;
-}
-
 /** \fn TVRec::GetMaxBitrate()
  *   Returns the maximum bits per second this recorder can produce.
  *  \sa TVRec::GetMaxBitrate(), EncoderLink::GetMaxBitrate()
@@ -281,44 +257,16 @@ void RemoteEncoder::StopPlaying(void)
     SendReceiveStringList(strlist);
 }
 
-/** \fn RemoteEncoder::SetupRingBuffer(QString&,long long&,long long&,bool)
- *  \brief Sets up TVRec's RingBuffer for "Live TV" playback.
- *
- *  \sa TVRec::SetupRingBuffer(QString&,long long&,long long&,bool),
- *      EncoderLink::SetupRingBuffer(QString&,long long&,long long&,bool),
- *      StopLiveTV()
- *
- *  \param path Returns path to recording.
- *  \param filesize Returns size of recording file in bytes.
- *  \param fillamount Returns the maximum buffer fill in bytes.
- *  \param pip Tells TVRec's RingBuffer that this is for a Picture in Picture display.
- *  \return true if successful, false otherwise.
- */
-bool RemoteEncoder::SetupRingBuffer(QString &path, long long &filesize,
-                                    long long &fillamount, bool pip)
-{
-    QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
-    strlist << "SETUP_RING_BUFFER";
-    strlist << QString::number((int)pip);
-
-    SendReceiveStringList(strlist);
-
-    bool ok = (strlist[0] == "ok");
-    path = strlist[1];
-
-    filesize = decodeLongLong(strlist, 2);
-    fillamount = decodeLongLong(strlist, 4);
-    return ok;
-}
-
 /** \fn TVRec::SpawnLiveTV()
  *  \brief Tells TVRec to Spawn a "Live TV" recorder.
  *  \sa TVRec::SpawnLiveTV(), EncoderLink::SpawnLiveTV()
  */
-void RemoteEncoder::SpawnLiveTV(void)
+void RemoteEncoder::SpawnLiveTV(QString chainId, bool pip)
 {
     QStringList strlist = QString("QUERY_RECORDER %1").arg(recordernum);
     strlist << "SPAWN_LIVETV";
+    strlist << chainId;
+    strlist << QString::number((int)pip);
 
     SendReceiveStringList(strlist);
 }

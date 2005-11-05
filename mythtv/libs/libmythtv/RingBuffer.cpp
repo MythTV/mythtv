@@ -22,6 +22,7 @@ using namespace std;
 #include "remotefile.h"
 #include "remoteencoder.h"
 #include "ThreadedFileWriter.h"
+#include "livetvchain.h"
 
 #ifndef O_STREAMING
 #define O_STREAMING 0
@@ -401,8 +402,6 @@ class DVDRingBufferPriv
         int mainTitle;
 };    
 
-
-
 bool RingBuffer::IsOpen(void) 
 { 
     return (tfw || fd2 > -1 || remotefile || (dvdPriv && dvdPriv->isOpen())); 
@@ -438,13 +437,9 @@ bool RingBuffer::IsOpen(void)
 
 RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
 {
-    
-    int openAttempts = OPEN_READ_ATTEMPTS;
     Init();
     
     startreadahead = usereadahead;
-
-    normalfile = true;
     filename = (QString)lfilename;
 
     if (write)
@@ -459,154 +454,124 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
             delete tfw;
             tfw = NULL;
         }
+        writemode = true;
+        return;
     }
-    else
+
+    OpenFile(filename);
+}
+
+void RingBuffer::OpenFile(const QString &lfilename)
+{
+    int openAttempts = OPEN_READ_ATTEMPTS;
+
+    filename = lfilename;
+
+    if (remotefile)
     {
-        bool is_local = false;
-        bool is_dvd = false;
-        if ((filename.left(7) == "myth://") &&
-            (filename.length() > 7 ))
+        delete remotefile;
+    }
+
+    if (fd2 >= 0)
+    {
+        close(fd2);
+        fd2 = -1;
+    }
+
+    bool is_local = false;
+    bool is_dvd = false;
+    if ((filename.left(7) == "myth://") &&
+        (filename.length() > 7 ))
+    {
+        QString local_pathname = gContext->GetSetting("RecordFilePrefix");
+        int hostlen = filename.find(QRegExp("/"), 7);
+
+        if (hostlen != -1)
         {
-            QString local_pathname = gContext->GetSetting("RecordFilePrefix");
-            int hostlen = filename.find(QRegExp("/"), 7);
+            local_pathname += filename.right(filename.length() - hostlen);
 
-            if (hostlen != -1)
+            QFile checkFile(local_pathname);
+            if (checkFile.exists())
             {
-                local_pathname += filename.right(filename.length() - hostlen);
-
-                QFile checkFile(local_pathname);
-
-                if (checkFile.exists())
-                {
-                    is_local = true;
-                    filename = local_pathname;
-                }
+                is_local = true;
+                filename = local_pathname;
             }
         }
-        else if (filename.left(4) == "dvd:")
+    }
+    else if (filename.left(4) == "dvd:")
+    {
+        is_dvd = true;
+        dvdPriv = new DVDRingBufferPriv;
+        startreadahead = false;
+        int pathLen = filename.find(QRegExp("/"), 4);
+        if (pathLen != -1)
         {
-            is_dvd = true;
-            dvdPriv = new DVDRingBufferPriv;
-            startreadahead = false;
-            int pathLen = filename.find(QRegExp("/"), 4);
-            if (pathLen != -1)
-            {
-                QString tempFilename = filename.right(filename.length() -  pathLen);
+            QString tempFilename = filename.right(filename.length() -  pathLen);
 
-                QFile checkFile(tempFilename);
-
-                if (!checkFile.exists())
-                    filename = "/dev/dvd";
-                else
-                    filename = tempFilename;
-            }
-
-            else
-            {
+            QFile checkFile(tempFilename);
+            if (!checkFile.exists())
                 filename = "/dev/dvd";
-            }
-            
+            else
+                filename = tempFilename;
         }
         else
-            is_local = true;
-
-        if (is_local)
         {
-            char buf[READ_TEST_SIZE];
-            while (openAttempts > 0)
+            filename = "/dev/dvd";
+        }
+    }
+    else
+        is_local = true;
+
+    if (is_local)
+    {
+        char buf[READ_TEST_SIZE];
+        while (openAttempts > 0)
+        {
+            int ret;
+            openAttempts--;
+                
+            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
+                
+            if (fd2 < 0)
             {
-                int ret;
-                openAttempts--;
-                
-                fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
-                
-                if (fd2 < 0)
+                VERBOSE( VB_IMPORTANT, QString("Could not open %1.  %2 retries remaining.")
+                                       .arg(filename).arg(openAttempts));
+                usleep(500000);
+            }
+            else
+            {
+                if ((ret = read(fd2, buf, READ_TEST_SIZE)) != READ_TEST_SIZE)
                 {
-                    VERBOSE( VB_IMPORTANT, QString("Could not open %1.  %2 retries remaining.")
-                                           .arg(filename).arg(openAttempts));
+                    VERBOSE( VB_IMPORTANT, QString("Invalid file handle when opening %1.  "
+                                                   "%2 retries remaining.")
+                                                   .arg(filename).arg(openAttempts));
+                    close(fd2);
+                    fd2 = -1;
                     usleep(500000);
                 }
                 else
                 {
-                    if ((ret = read(fd2, buf, READ_TEST_SIZE)) != READ_TEST_SIZE)
-                    {
-                        VERBOSE( VB_IMPORTANT, QString("Invalid file handle when opening %1.  "
-                                                       "%2 retries remaining.")
-                                                       .arg(filename).arg(openAttempts));
-                        close(fd2);
-                        fd2 = -1;
-                        usleep(500000);
-                    }
-                    else
-                    {
-                        lseek(fd2, 0, SEEK_SET);
-                        openAttempts = 0;
-                    }
+                    lseek(fd2, 0, SEEK_SET);
+                    openAttempts = 0;
                 }
             }
-
-            QFileInfo fileInfo(filename);
-            if (fileInfo.lastModified().secsTo(QDateTime::currentDateTime()) >
-                30 * 60)
-            {
-                oldfile = true;
-            }
-        }
-        else if (is_dvd)
-        {
-            dvdPriv->open(filename);    
-            readblocksize = DVD_BLOCK_SIZE * 62;
-        }
-        else
-        {
-            remotefile = new RemoteFile(filename);
-            if (!remotefile->isOpen())
-            {
-                VERBOSE(VB_IMPORTANT,
-                    QString("RingBuffer::RingBuffer(): Failed to open remote "
-                            "file (%1)").arg(filename));
-                delete remotefile;
-                remotefile = NULL;
-            }
         }
 
-        writemode = false;
+        QFileInfo fileInfo(filename);
+        if (fileInfo.lastModified().secsTo(QDateTime::currentDateTime()) >
+            30 * 60)
+        {
+            oldfile = true;
+        }
     }
-
-    smudgeamount = 0;
-}
-
-RingBuffer::RingBuffer(const QString &lfilename, long long size,
-                       long long smudge, RemoteEncoder *enc)
-{
-    Init();
-
-    if (enc)
+    else if (is_dvd)
     {
-        remoteencoder = enc;
-        recorder_num = enc->GetRecorderNumber();
-    }
-
-    normalfile = false;
-    filename = (QString)lfilename;
-    filesize = size;
-
-    if (recorder_num == 0)
-    {
-        tfw = new ThreadedFileWriter(filename.ascii(),
-                                     O_WRONLY|O_CREAT|O_TRUNC|O_LARGEFILE,
-                                     0644);
-        if (tfw->Open())
-            fd2 = open(filename.ascii(), O_RDONLY|O_LARGEFILE|O_STREAMING);
-        else
-        {
-            delete tfw;
-            tfw = NULL;
-        }
+        dvdPriv->open(filename);    
+        readblocksize = DVD_BLOCK_SIZE * 62;
     }
     else
     {
-        remotefile = new RemoteFile(filename, recorder_num);
+        remotefile = new RemoteFile(filename);
         if (!remotefile->isOpen())
         {
             VERBOSE(VB_IMPORTANT,
@@ -616,13 +581,12 @@ RingBuffer::RingBuffer(const QString &lfilename, long long size,
             remotefile = NULL;
         }
     }
-
-    wrapcount = 0;
-    smudgeamount = smudge;
 }
 
 void RingBuffer::Init(void)
 {
+    writemode = false;
+    livetvchain = NULL;
     oldfile = false; 
     startreadahead = true;
     dvdPriv = NULL;
@@ -637,13 +601,11 @@ void RingBuffer::Init(void)
    
     recorder_num = 0;
     remoteencoder = NULL;
-    tfw = NULL;
     remotefile = NULL;
     
     fd2 = -1;
 
-    totalwritepos = writepos = 0;
-    totalreadpos = readpos = 0;
+    writepos = readpos = 0;
 
     stopreads = false;
     wanttoread = 0;
@@ -659,15 +621,18 @@ RingBuffer::~RingBuffer(void)
     KillReadAheadThread();
 
     pthread_rwlock_wrlock(&rwlock);
+
     if (remotefile)
     {
         delete remotefile;
     }
+
     if (tfw)
     {
         delete tfw;
         tfw = NULL;
     }
+
     if (fd2 >= 0)
     {
         close(fd2);
@@ -683,46 +648,27 @@ RingBuffer::~RingBuffer(void)
 
 void RingBuffer::Start(void)
 {
-    if ((normalfile && writemode) || (!normalfile && !recorder_num))
+    if (writemode)
     {
     }
     else if (!readaheadrunning && startreadahead)
         StartupReadAheadThread();
 }
 
+//FIXME remove soon
 void RingBuffer::Reset(void)
 {
     wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
     wantseek = false;
-
-    if (!normalfile)
-    {
-        if (remotefile)
-        {
-            remotefile->Reset();
-        }
-        else
-        {
-            tfw->Seek(0, SEEK_SET);
-            lseek(fd2, 0, SEEK_SET);
-        }
-
-        totalwritepos = writepos = 0;
-        totalreadpos = readpos = 0;
-
-        wrapcount = 0;
-
-        if (readaheadrunning)
-            ResetReadAhead(0);
-    }
-
     numfailures = 0;
     commserror = false;
 
+    writepos = 0;
+    readpos = 0;
+
     pthread_rwlock_unlock(&rwlock);
 }
-
 
 int RingBuffer::safe_read(int fd, void *data, unsigned sz)
 {
@@ -759,7 +705,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
                 break;
 
             zerocnt++;
-            if (zerocnt >= ((oldfile) ? 2 : 50)) // 3 second timeout with usleep(60000), or .12 if it's an old, unmodified file.
+            if (zerocnt >= ((oldfile) ? 2 : (livetvchain) ? 6 : 50)) // 3 second timeout with usleep(60000), or .12 if it's an old, unmodified file.
             {
                 break;
             }
@@ -955,7 +901,7 @@ void RingBuffer::ReadAheadThread(void)
     readaheadrunning = true;
     while (readaheadrunning)
     {
-        if (pausereadthread)
+        if (pausereadthread || writemode)
         {
             readaheadpaused = true;
             pauseWait.wakeAll();
@@ -987,70 +933,21 @@ void RingBuffer::ReadAheadThread(void)
             if (rbwpos + totfree > READ_AHEAD_SIZE)
                 totfree = READ_AHEAD_SIZE - rbwpos;
 
-            if (normalfile)
+            if (remotefile)
             {
-                if (!writemode)
-                {
-                    if (remotefile)
-                    {
-                        ret = safe_read(remotefile, readAheadBuffer + rbwpos,
-                                        totfree);
-                        internalreadpos += ret;
-                    }
-                    else if (dvdPriv)
-                    {                        
-                        ret = dvdPriv->safe_read(readAheadBuffer + rbwpos, totfree);
-                        internalreadpos += ret;
-                    }
-                    else
-                    {
-                        ret = safe_read(fd2, readAheadBuffer + rbwpos, totfree);
-                        internalreadpos += ret;
-                    }
-                }
+                ret = safe_read(remotefile, readAheadBuffer + rbwpos,
+                                totfree);
+                internalreadpos += ret;
+            }
+            else if (dvdPriv)
+            {                        
+                ret = dvdPriv->safe_read(readAheadBuffer + rbwpos, totfree);
+                internalreadpos += ret;
             }
             else
             {
-                if (remotefile)
-                {
-                    ret = safe_read(remotefile, readAheadBuffer + rbwpos,
-                                    totfree);
-
-                    if (internalreadpos + totfree > filesize)
-                    {
-                        int toread = filesize - readpos;
-                        int left = totfree - toread;
-
-                        internalreadpos = left;
-                    }
-                    else
-                        internalreadpos += ret;
-                }
-                else if (internalreadpos + totfree > filesize)
-                {
-                    int toread = filesize - internalreadpos;
-
-                    ret = safe_read(fd2, readAheadBuffer + rbwpos, toread);
-
-                    int left = totfree - toread;
-                    lseek(fd2, 0, SEEK_SET);
-
-                    ret = safe_read(fd2, readAheadBuffer + rbwpos + toread,
-                                    left);
-                    ret += toread;
-
-                    internalreadpos = left;
-                }
-                else if (dvdPriv)
-                {                        
-                        ret = dvdPriv->safe_read(readAheadBuffer + rbwpos, totfree);
-                        internalreadpos += ret;
-                }
-                else
-                {
-                    ret = safe_read(fd2, readAheadBuffer + rbwpos, totfree);
-                    internalreadpos += ret;
-                }
+                ret = safe_read(fd2, readAheadBuffer + rbwpos, totfree);
+                internalreadpos += ret;
             }
 
             readAheadLock.lock();
@@ -1058,9 +955,19 @@ void RingBuffer::ReadAheadThread(void)
                 rbwpos = (rbwpos + ret) % READ_AHEAD_SIZE;
             readAheadLock.unlock();
 
-            if (ret == 0 && normalfile && !stopreads)
+            if (ret == 0 && !stopreads)
             {
-                ateof = true;
+                if (livetvchain)
+                {
+                    if (livetvchain->HasNext())
+                    {
+                        livetvchain->SwitchToNext(true);
+                    }
+                }
+                else
+                {
+                    ateof = true;
+                }
             }
         }
 
@@ -1214,116 +1121,37 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
 
 int RingBuffer::Read(void *buf, int count)
 {
+    int ret = -1;
+    if (writemode)
+    {
+        fprintf(stderr, "Attempt to read from a write only file\n");
+        return ret;
+    }
+
     pthread_rwlock_rdlock(&rwlock);
 
-    int ret = -1;
-    if (normalfile)
+    if (!readaheadrunning)
     {
-        if (!writemode)
+        if (remotefile)
         {
-            if (!readaheadrunning)
-            {
-                if (remotefile)
-                {
-                    ret = safe_read(remotefile, buf, count);
-                    totalreadpos += ret;
-                    readpos += ret;
-                }
-                else if (dvdPriv)
-                {                        
-                    ret = dvdPriv->safe_read(buf, count);
-                    readpos += ret;
-                }
-                else
-                {
-                    ret = safe_read(fd2, buf, count);
-                    totalreadpos += ret;
-                    readpos += ret;
-                }
-            }
-            else
-            {
-                ret = ReadFromBuf(buf, count);
-                totalreadpos += ret;
-                readpos += ret;
-            }
+            ret = safe_read(remotefile, buf, count);
+            readpos += ret;
+        }
+        else if (dvdPriv)
+        {                        
+            ret = dvdPriv->safe_read(buf, count);
+            readpos += ret;
         }
         else
         {
-            fprintf(stderr, "Attempt to read from a write only file\n");
+            ret = safe_read(fd2, buf, count);
+            readpos += ret;
         }
     }
     else
     {
-//cout << "reading: " << totalreadpos << " " << readpos << " " << count << " " << filesize << endl;
-        if (remotefile)
-        {
-            ret = ReadFromBuf(buf, count);
-
-            if (readpos + ret > filesize)
-            {
-                int toread = filesize - readpos;
-                int left = count - toread;
-
-                readpos = left;
-            }
-            else
-                readpos += ret;
-            totalreadpos += ret;
-        }
-        else
-        {
-            if (stopreads)
-            {
-                pthread_rwlock_unlock(&rwlock);
-                return 0;
-            }
-
-            availWaitMutex.lock();
-            wanttoread = totalreadpos + count;
-
-            while (totalreadpos + count > totalwritepos - tfw->BufUsed())
-            {
-                if (!availWait.wait(&availWaitMutex, 15000))
-                {
-                    VERBOSE(VB_IMPORTANT,
-                            "RingBuffer: Couldn't read data from the "
-                            "capture card in 15 seconds. Stopping.");
-                    StopReads();
-                }
-
-                if (stopreads)
-                {
-                    availWaitMutex.unlock();
-                    pthread_rwlock_unlock(&rwlock);
-                    return 0;
-                }
-            }
-
-            availWaitMutex.unlock();
-
-            if (readpos + count > filesize)
-            {
-                int toread = filesize - readpos;
-
-                ret = safe_read(fd2, buf, toread);
-
-                int left = count - toread;
-                lseek(fd2, 0, SEEK_SET);
-
-                ret = safe_read(fd2, (char *)buf + toread, left);
-                ret += toread;
-
-                totalreadpos += ret;
-                readpos = left;
-            }
-            else
-            {
-                ret = safe_read(fd2, buf, count);
-                readpos += ret;
-                totalreadpos += ret;
-            }
-        }
+        ret = ReadFromBuf(buf, count);
+        readpos += ret;
     }
 
     pthread_rwlock_unlock(&rwlock);
@@ -1354,59 +1182,19 @@ bool RingBuffer::IsIOBound(void)
 int RingBuffer::Write(const void *buf, int count)
 {
     int ret = -1;
-
-    pthread_rwlock_rdlock(&rwlock);
-
-    if (!tfw)
+    if (!writemode)
     {
-        pthread_rwlock_unlock(&rwlock);
+        fprintf(stderr, "Attempt to write to a read only file\n");
         return ret;
     }
 
-    if (normalfile)
-    {
-        if (writemode)
-        {
-            ret = tfw->Write(buf, count);
-            totalwritepos += ret;
-            writepos += ret;
-        }
-        else
-        {
-            fprintf(stderr, "Attempt to write to a read only file\n");
-        }
-    }
-    else
-    {
-//cout << "write: " << totalwritepos << " " << writepos << " " << count << " " << filesize << endl;
-        if (writepos + count > filesize)
-        {
-            int towrite = filesize - writepos;
-            ret = tfw->Write(buf, towrite);
+    if (!tfw)
+        return ret;
 
-            int left = count - towrite;
-            tfw->Seek(0, SEEK_SET);
+    pthread_rwlock_rdlock(&rwlock);
 
-            ret = tfw->Write((char *)buf + towrite, left);
-            writepos = left;
-
-            ret += towrite;
-
-            totalwritepos += ret;
-            wrapcount++;
-        }
-        else
-        {
-            ret = tfw->Write(buf, count);
-            writepos += ret;
-            totalwritepos += ret;
-        }
-
-        availWaitMutex.lock();
-        if (totalwritepos >= wanttoread)
-            availWait.wakeAll();
-        availWaitMutex.unlock();
-    }
+    ret = tfw->Write(buf, count);
+    writepos += ret;
 
     pthread_rwlock_unlock(&rwlock);
     return ret;
@@ -1418,11 +1206,6 @@ void RingBuffer::Sync(void)
         tfw->Sync();
 }
 
-long long RingBuffer::GetFileWritePosition(void)
-{
-    return totalwritepos;
-}
-
 long long RingBuffer::Seek(long long pos, int whence)
 {
     wantseek = true;
@@ -1430,79 +1213,27 @@ long long RingBuffer::Seek(long long pos, int whence)
     wantseek = false;
 
     long long ret = -1;
-    if (normalfile)
+    if (remotefile)
+        ret = remotefile->Seek(pos, whence, readpos);
+    else if (dvdPriv)
     {
-    
-        if (remotefile)
-            ret = remotefile->Seek(pos, whence, readpos);
-        else if (dvdPriv)
-        {
-            dvdPriv->Seek(pos, whence);
-        }
-        else
-        {
-            if (whence == SEEK_SET)
-                ret = lseek(fd2, pos, whence);
-            else
-            {
-                long long realseek = readpos + pos;
-                ret = lseek(fd2, realseek, SEEK_SET);
-            }
-        }
-
-        if (whence == SEEK_SET)
-            readpos = ret;
-        else if (whence == SEEK_CUR)
-            readpos += pos;
-        totalreadpos = readpos;
+        dvdPriv->Seek(pos, whence);
     }
     else
     {
-        if (remotefile)
-            ret = remotefile->Seek(pos, whence, totalreadpos);
+        if (whence == SEEK_SET)
+            ret = lseek(fd2, pos, whence);
         else
         {
-            if (whence == SEEK_SET)
-            {
-                long long tmpPos = pos;
-                long long tmpRet;
-
-                if (tmpPos > filesize)
-                    tmpPos = tmpPos % filesize;
-
-                tmpRet = lseek(fd2, tmpPos, whence);
-                if (tmpRet == tmpPos)
-                    ret = pos;
-                else
-                    ret = tmpRet;
-            }
-            else if (whence == SEEK_CUR)
-            {
-                long long realseek = totalreadpos + pos;
-                while (realseek > filesize)
-                    realseek -= filesize;
-
-                ret = lseek(fd2, realseek, SEEK_SET);
-            }
+            long long realseek = readpos + pos;
+            ret = lseek(fd2, realseek, SEEK_SET);
         }
-
-        if (whence == SEEK_SET)
-        {
-            totalreadpos = pos; // only used for file open
-            readpos = ret;
-        }
-        else if (whence == SEEK_CUR)
-        {
-            readpos += pos;
-            totalreadpos += pos;
-        }
-
-        while (readpos > filesize && filesize > 0)
-            readpos -= filesize;
-
-        while (readpos < 0 && filesize > 0)
-            readpos += filesize;
     }
+
+    if (whence == SEEK_SET)
+        readpos = ret;
+    else if (whence == SEEK_CUR)
+        readpos += pos;
 
     if (readaheadrunning)
         ResetReadAhead(readpos);
@@ -1519,7 +1250,7 @@ long long RingBuffer::WriterSeek(long long pos, int whence)
     if (tfw)
     {
         ret = tfw->Seek(pos, whence);
-        totalwritepos = ret;
+        writepos = ret;
     }
 
     return ret;
@@ -1544,33 +1275,6 @@ void RingBuffer::SetWriteBufferMinWriteSize(int newMinSize)
     tfw->SetWriteBufferMinWriteSize(newMinSize);
 }
 
-long long RingBuffer::GetFreeSpace(void)
-{
-    if (!normalfile)
-    {
-        if (remoteencoder)
-            return remoteencoder->GetFreeSpace(totalreadpos);
-        return totalreadpos + filesize - totalwritepos - smudgeamount;
-    }
-    else
-        return -1;
-}
-
-long long RingBuffer::GetFreeSpaceWithReadChange(long long readchange)
-{
-    if (!normalfile)
-    {
-        if (readchange > 0)
-            readchange = 0 - (filesize - readchange);
-
-        return GetFreeSpace() + readchange;
-    }
-    else
-    {
-        return readpos + readchange;
-    }
-}
-
 long long RingBuffer::GetReadPosition(void)
 {
     if (dvdPriv)
@@ -1583,42 +1287,30 @@ long long RingBuffer::GetReadPosition(void)
     }
 }
 
-long long RingBuffer::GetTotalReadPosition(void)
-{
-    if (dvdPriv)
-    {
-        return dvdPriv->GetTotalReadPosition();
-    }
-    else
-    {
-        return totalreadpos;
-    }
-}
-
 long long RingBuffer::GetWritePosition(void)
 {
     return writepos;
 }
 
-long long RingBuffer::GetTotalWritePosition(void)
-{
-    return totalwritepos;
-}
-
 long long RingBuffer::GetRealFileSize(void)
 {
     if (remotefile)
-    {
-        if (normalfile)
-            return remotefile->GetFileSize();
-        else
-            return -1;
-    }
+        return remotefile->GetFileSize();
 
     struct stat st;
     if (stat(filename.ascii(), &st) == 0)
         return st.st_size;
     return -1;
+}
+
+bool RingBuffer::LiveMode(void)
+{
+    return (livetvchain);
+}
+
+void RingBuffer::SetLiveMode(LiveTVChain *chain)
+{
+    livetvchain = chain;
 }
 
 void RingBuffer::getPartAndTitle(int& title, int& part)
@@ -1627,22 +1319,21 @@ void RingBuffer::getPartAndTitle(int& title, int& part)
         dvdPriv->getPartAndTitle(title, part);
 }
 
-
 void RingBuffer::getDescForPos(QString& desc)
 {
     if (dvdPriv)
         dvdPriv->getDescForPos(desc);
 }
 
-
 void RingBuffer::nextTrack()
 {
    if (dvdPriv)
-        dvdPriv->nextTrack();
+       dvdPriv->nextTrack();
 }
 
 void RingBuffer::prevTrack()
 {
    if (dvdPriv)
-        dvdPriv->prevTrack();
+       dvdPriv->prevTrack();
 }
+

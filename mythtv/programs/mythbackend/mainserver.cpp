@@ -829,90 +829,6 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
 
         AutoExpire::Update(encoderList, false);
     }
-    else if (commands[1] == "RingBuffer")
-    {
-        VERBOSE(VB_ALL, QString("adding: %1 as a remote ringbuffer")
-                               .arg(commands[2]));
-        ringBufList.push_back(socket);
-        int recnum = commands[3].toInt();
-
-        QMap<int, EncoderLink *>::Iterator iter = encoderList->find(recnum);
-        if (iter == encoderList->end())
-        {
-            VERBOSE(VB_ALL, "Unknown encoder.");
-            exit(BACKEND_BUGGY_EXIT_UNKNOWN_ENC);
-        }
-
-        EncoderLink *enc = iter.data();
-
-        enc->SetReadThreadSocket(socket);
-
-        if (enc->IsLocal())
-        {
-            int dsp_status, soundcardcaps;
-            QString audiodevice, audiooutputdevice, querytext;
-            QString cardtype;
-
-            MSqlQuery query(MSqlQuery::InitCon());
-            query.prepare("SELECT audiodevice,cardtype FROM capturecard "
-                          "WHERE cardid = :CARDID ;");
-            query.bindValue(":CARDID", recnum);
-
-            if (query.exec() && query.isActive() && query.size())
-            {
-                query.next();
-                audiodevice = query.value(0).toString();
-                cardtype = query.value(1).toString();
-            }
-
-            query.prepare("SELECT data FROM settings WHERE "
-                          "value ='AudioOutputDevice';");
-
-            if (query.exec() && query.isActive() && query.size())
-            {
-                query.next();
-                audiooutputdevice = query.value(0).toString();
-            }
-
-            if (audiodevice.right(4) == audiooutputdevice.right(4) &&
-                (cardtype == "V4L" || cardtype == "MJPEG")) //they match
-            {
-#if !defined(HAVE_SYS_SOUNDCARD_H) && !defined(HAVE_SOUNDCARD_H)
-                VERBOSE(VB_ALL, QString("Audio device files are not "
-                                        "supported on this Unix."));
-#else
-                int dsp_fd = open(audiodevice, O_RDWR | O_NONBLOCK);
-                if (dsp_fd != -1)
-                {
-                    dsp_status = ioctl(dsp_fd, SNDCTL_DSP_GETCAPS,
-                                       &soundcardcaps);
-                    if (dsp_status != -1)
-                    {
-                        if (!(soundcardcaps & DSP_CAP_DUPLEX))
-                            VERBOSE(VB_ALL, QString(" WARNING:  Capture device "
-                                                    "%1 is not reporting full "
-                                                    "duplex capability.\nSee the "
-                                                    "Troubleshooting Audio section "
-                                                    "of the mythtv-HOWTO for more "
-                                                    "information.")
-                                                    .arg(audiodevice));
-                    }
-                    else 
-                        VERBOSE(VB_ALL, QString("Could not get capabilities for"
-                                                " audio device: %1")
-                                               .arg(audiodevice));
-                    close(dsp_fd);
-                }
-                else 
-                {
-                    perror("open");
-                    VERBOSE(VB_ALL, QString("Could not open audio device: %1")
-                                           .arg(audiodevice));
-                }
-#endif // CONFIG_DARWIN
-            }
-        }
-    }
     else if (commands[1] == "FileTransfer")
     {
         VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce FileTransfer");
@@ -2348,13 +2264,6 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         long long value = enc->GetFilePosition();
         encodeLongLong(retlist, value);
     }
-    else if (command == "GET_FREE_SPACE")
-    {
-        long long pos = decodeLongLong(slist, 2);
-
-        long long value = enc->GetFreeSpace(pos);
-        encodeLongLong(retlist, value);
-    }
     else if (command == "GET_MAX_BITRATE")
     {
         long long value = enc->GetMaxBitrate();
@@ -2391,29 +2300,6 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         if (!retlist.size())
             retlist << "ok";
     }
-    else if (command == "SETUP_RING_BUFFER")
-    {
-        bool pip = slist[2].toInt();
-
-        QString path = "";
-        long long filesize = 0;
-        long long fillamount = 0;
-
-        bool ok = enc->SetupRingBuffer(path, filesize, fillamount, pip);
-
-        QString ip = gContext->GetSetting("BackendServerIP");
-        QString port = gContext->GetSetting("BackendServerPort");
-        QString url = QString("rbuf://") + ip + ":" + port + path;
-
-        if (ok)
-            retlist<<"ok";
-        else
-            retlist<<"not_ok";
-
-        retlist << url;
-        encodeLongLong(retlist, filesize);
-        encodeLongLong(retlist, fillamount);
-    }
     else if (command == "GET_RECORDING")
     {
         ProgramInfo *pginfo = enc->GetRecording();
@@ -2428,11 +2314,6 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
             dummy.ToStringList(retlist);
         }
     }
-    else if (command == "STOP_PLAYING")
-    {
-        enc->StopPlaying();
-        retlist << "ok";
-    }
     else if (command == "FRONTEND_READY")
     {
         enc->FrontendReady();
@@ -2446,7 +2327,7 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "SPAWN_LIVETV")
     {
-        enc->SpawnLiveTV();
+        enc->SpawnLiveTV(slist[2], slist[3].toInt());
         retlist << "ok";
     }
     else if (command == "STOP_LIVETV")
@@ -2655,27 +2536,6 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         QString input = enc->GetInputName();
 
         retlist << input;
-    }
-    else if (command == "REQUEST_BLOCK_RINGBUF")
-    {
-        int size = slist[2].toInt();
-
-        int ret = enc->RequestRingBufferBlock(size);
-        retlist << QString::number(ret);
-    }
-    else if (command == "SEEK_RINGBUF")
-    {
-        long long pos = decodeLongLong(slist, 2);
-        int whence = slist[4].toInt();
-        long long curpos = decodeLongLong(slist, 5);
-
-        long long ret = enc->SeekRingBuffer(curpos, pos, whence);
-        encodeLongLong(retlist, ret);
-    }
-    else if (command == "DONE_RINGBUF")
-    {
-        enc->SetReadThreadSocket(NULL);
-        retlist << "OK";
     }
     else
     {
@@ -3426,40 +3286,6 @@ void MainServer::endConnection(RefSocket *socket)
         }
     }
 
-    vector<QSocket *>::iterator rt = ringBufList.begin();
-    for (; rt != ringBufList.end(); ++rt)
-    {
-        QSocket *sock = *rt;
-        if (sock == socket)
-        {
-            QMap<int, EncoderLink *>::iterator i = encoderList->begin();
-            for (; i != encoderList->end(); ++i)
-            {
-                EncoderLink *enc = i.data();
-                if (enc->IsLocal())
-                {
-                    while (enc->GetState() == kState_ChangingState)
-                        usleep(500);
-
-                    if (enc->IsBusy() && enc->GetReadThreadSocket() == socket)
-                    {
-                        if (enc->GetState() == kState_WatchingLiveTV)
-                        {
-                            enc->StopLiveTV();
-                        }
-                        else if (enc->GetState() == kState_WatchingRecording)
-                        {
-                            enc->StopPlaying();
-                        }
-                    }
-                }
-            }
-            socket->DownRef();
-            ringBufList.erase(rt);
-            return;
-        }
-    }
-
     VERBOSE(VB_ALL, "Unknown socket closing");
 }
 
@@ -3570,18 +3396,6 @@ QString MainServer::LocalFilePath(QUrl &url)
     return lpath;
 }
 
-bool MainServer::isRingBufSock(QSocket *sock)
-{
-    vector<QSocket *>::iterator it = ringBufList.begin();
-    for (; it != ringBufList.end(); it++)
-    {
-        if (*it == sock)
-            return true;
-    }
-
-    return false;
-}
-
 void MainServer::masterServerDied(void)
 {
     bool deleted = false;
@@ -3686,7 +3500,6 @@ bool MainServer::isClientConnected()
 {
     bool foundClient = false;
 
-    foundClient |= (ringBufList.size() > 0);
     foundClient |= (fileTransferList.size() > 0);
 
     if ((playbackList.size() > 0) && !foundClient)

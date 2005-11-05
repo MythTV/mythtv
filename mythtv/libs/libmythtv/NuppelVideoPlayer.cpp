@@ -30,7 +30,7 @@ using namespace std;
 #include "fifowriter.h"
 #include "filtermanager.h"
 #include "util.h"
-
+#include "livetvchain.h"
 #include "decoderbase.h"
 #include "nuppeldecoder.h"
 #include "avformatdecoder.h"
@@ -1843,6 +1843,36 @@ void NuppelVideoPlayer::ResetPlaying(void)
     errored |= GetDecoder()->IsErrored();
 }
 
+void NuppelVideoPlayer::SwitchToProgram(void)
+{
+    printf("nvp: need to switch!\n");
+    bool discontinuity = false;
+    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity);
+
+    if (discontinuity)
+    {
+        // FIXME
+    }
+    else
+    {
+        ringBuffer->Pause();
+        ringBuffer->WaitForPause();
+
+        ringBuffer->Reset();
+        ringBuffer->OpenFile(pginfo->pathname);
+
+        ringBuffer->Unpause();
+
+        // gotta tell the decoder to sync the new position map..  bad things otherwise..
+    }
+
+    if (m_playbackinfo)
+        delete m_playbackinfo;
+
+    m_playbackinfo = pginfo;
+    livetvchain->SetProgram(pginfo);
+}
+
 void NuppelVideoPlayer::StartPlaying(void)
 {
     killplayer = false;
@@ -1957,8 +1987,6 @@ void NuppelVideoPlayer::StartPlaying(void)
         //gContext->addPrivRequest(MythPrivRequest::MythRealtime, &decoder_thread);
     }
 
-    int pausecheck = 0;
-
     if (bookmarkseek > 30)
     {
         GetFrame(audioOutput == NULL || !normal_speed);
@@ -1990,6 +2018,11 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     while (!eof && !killplayer && !errored)
     {
+        if (livetvchain && livetvchain->NeedsToSwitch())
+        {
+            SwitchToProgram();
+        }
+
         if (nvr_enc && nvr_enc->GetErrorStatus())
         {
             errored = killplayer = true;
@@ -2020,17 +2053,6 @@ void NuppelVideoPlayer::StartPlaying(void)
         if (paused)
         {
             decoderThreadPaused.wakeAll();
-            pausecheck++;
-
-            if (!(pausecheck % 20))
-            {
-                if (livetv && ringBuffer->GetFreeSpace() < -1000)
-                {
-                    Play();
-                    printf("forced unpause\n");
-                }
-                pausecheck = 0;
-            }
 
             if (rewindtime > 0)
             {
@@ -3906,6 +3928,7 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc) const
 
     QString text1, text2;
 
+/*
     if (livetv)
     {
         ret = ringBuffer->GetFreeSpace() /
@@ -3961,10 +3984,11 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc) const
         
         return (int)(1000 - ret);
     }
-    else if (ringBuffer->isDVD())
+*/
+    if (ringBuffer->isDVD())
     {
         long long rPos = ringBuffer->GetReadPosition();
-        long long tPos = ringBuffer->GetTotalReadPosition();
+        long long tPos = 1;//ringBuffer->GetTotalReadPosition();
         
         ringBuffer->getDescForPos(desc);
         

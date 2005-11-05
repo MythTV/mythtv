@@ -180,7 +180,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         char dummychar;
         ringBuffer->Read(&dummychar, 1);
 
-        startpos = ringBuffer->GetTotalReadPosition();
+        startpos = ringBuffer->GetReadPosition();
 
         if (!ReadFileheader(&fileheader))
         {
@@ -257,7 +257,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
                 .arg( video_height));
     }
 
-    startpos = ringBuffer->GetTotalReadPosition();
+    startpos = ringBuffer->GetReadPosition();
 
     ReadFrameheader(&frameheader);
 
@@ -297,7 +297,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
 
     if (usingextradata && extradata.seektable_offset > 0)
     {
-        long long currentpos = ringBuffer->GetTotalReadPosition();
+        long long currentpos = ringBuffer->GetReadPosition();
         struct rtframeheader seek_frameheader;
 
         int seekret = ringBuffer->Seek(extradata.seektable_offset, SEEK_SET);
@@ -363,7 +363,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
     if (usingextradata && extradata.keyframeadjust_offset > 0 &&
         hasFullPositionMap)
     {
-        long long currentpos = ringBuffer->GetTotalReadPosition();
+        long long currentpos = ringBuffer->GetReadPosition();
         struct rtframeheader kfa_frameheader;
 
         int kfa_ret = ringBuffer->Seek(extradata.keyframeadjust_offset, 
@@ -442,7 +442,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         char dummychar;
         ringBuffer->Read(&dummychar, 1);
 
-        startpos = ringBuffer->GetTotalReadPosition();
+        startpos = ringBuffer->GetReadPosition();
 
         if (!ReadFrameheader(&frameheader))
         {
@@ -503,7 +503,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             }
         }
 
-        long long startpos2 = ringBuffer->GetTotalReadPosition();
+        long long startpos2 = ringBuffer->GetReadPosition();
 
         foundit = !ReadFrameheader(&frameheader);
 
@@ -523,7 +523,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
             char dummychar;
             ringBuffer->Read(&dummychar, 1);
 
-            startpos2 = ringBuffer->GetTotalReadPosition();
+            startpos2 = ringBuffer->GetReadPosition();
 
             foundit = !ReadFrameheader(&frameheader);
             if (foundit)
@@ -897,7 +897,7 @@ bool NuppelDecoder::GetFrame(int avignore)
 
     while (!gotvideo)
     {
-        long long currentposition = ringBuffer->GetTotalReadPosition();
+        long long currentposition = ringBuffer->GetReadPosition();
 
         if (!ReadFrameheader(&frameheader)
             || (frameheader.frametype == 'Q') || (frameheader.frametype == 'K'))

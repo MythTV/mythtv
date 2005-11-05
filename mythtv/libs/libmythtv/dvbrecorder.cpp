@@ -839,7 +839,7 @@ void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
 
             if (GOP_START == state)
             {
-                long long startpos = ringBuffer->GetFileWritePosition();
+                long long startpos = ringBuffer->GetWritePosition();
                         
                 if (!_position_map.contains(_frames_written_count))
                 {

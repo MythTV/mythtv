@@ -6,12 +6,11 @@
 #include <qmutex.h>
 #include <pthread.h>
 
-
-
 class RemoteFile;
 class RemoteEncoder;
 class ThreadedFileWriter;
 class DVDRingBufferPriv;
+class LiveTVChain;
 
 class RingBuffer
 {
@@ -19,11 +18,9 @@ class RingBuffer
     // can explicitly disable the readahead thread here, or just by not
     // calling Start()
     RingBuffer(const QString &lfilename, bool write, bool usereadahead = true);
-    RingBuffer(const QString &lfilename, long long size, long long smudge,
-               RemoteEncoder *enc = NULL);
-    
    ~RingBuffer();
 
+    void OpenFile(const QString &lfilename);
     bool IsOpen(void);
     
     int Read(void *buf, int count);
@@ -38,17 +35,7 @@ class RingBuffer
     void SetWriteBufferMinWriteSize(int newMinSize);
 
     long long GetReadPosition(void);
-    long long GetTotalReadPosition(void);
     long long GetWritePosition(void);
-    long long GetTotalWritePosition(void);
-    long long GetFileSize(void) { return filesize; }
-    long long GetSmudgeSize(void) { return smudgeamount; }
-
-    long long GetFileWritePosition(void);
-    
-    long long GetFreeSpace(void);
-
-    long long GetFreeSpaceWithReadChange(long long readchange);
 
     void Reset(void);
 
@@ -56,7 +43,8 @@ class RingBuffer
     void StartReads(void);
     bool GetStopReads(void) { return stopreads; }
 
-    bool LiveMode(void) { return !normalfile; }
+    bool LiveMode(void);
+    void SetLiveMode(LiveTVChain *chain);
 
     const QString GetFilename(void) { return filename; }
 
@@ -70,7 +58,6 @@ class RingBuffer
     void WaitForPause(void);
     
     bool isDVD() {return dvdPriv;}
-    
     
     void CalcReadAheadThresh(int estbitrate);
 
@@ -97,20 +84,11 @@ class RingBuffer
 
     ThreadedFileWriter *tfw;
     int fd2;
- 
-    bool normalfile;
+
     bool writemode;
-    
-    long long writepos;
-    long long totalwritepos;
-
+ 
     long long readpos;
-    long long totalreadpos;
-
-    long long filesize;
-    long long smudgeamount;
-
-    long long wrapcount;
+    long long writepos;
 
     bool stopreads;
 
@@ -160,11 +138,11 @@ class RingBuffer
 
     bool commserror;
 
-
     DVDRingBufferPriv *dvdPriv;
 
     bool oldfile;
-    
+
+    LiveTVChain *livetvchain;    
 };
 
 #endif
