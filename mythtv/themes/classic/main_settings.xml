@@ -194,6 +194,13 @@
    </button>
 
    <button>
+     <type>SETTINGS_NETFLIX</type>
+     <text>NetFlix Settings</text>
+     <action>CONFIGPLUGIN mythflix</action>
+     <depends>mythflix</depends>
+   </button>
+
+   <button>
      <type>SETTINGS_WEBPAGE</type>
      <text>Web Settings</text>
      <text lang="DE">WWW</text>

@@ -75,6 +75,13 @@
    </button>
 
    <button>
+     <type>NETFLIX</type>
+     <text>NetFlix</text>
+     <action>PLUGIN mythflix</action>
+     <depends>mythflix</depends>
+   </button>
+
+   <button>
       <type>WEBPAGE</type>
       <text>Web</text>
       <text lang="DE">WWW</text>

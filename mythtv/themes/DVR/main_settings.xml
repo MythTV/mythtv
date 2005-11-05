@@ -249,4 +249,11 @@
      <dependssetting>EnableXbox</dependssetting>
    </button>
 
+   <button>
+     <type>SETTINGS_NETFLIX</type>
+     <text>NetFlix Settings</text>
+     <action>CONFIGPLUGIN mythflix</action>
+     <depends>mythflix</depends>
+   </button>
+
 </mythmenu>

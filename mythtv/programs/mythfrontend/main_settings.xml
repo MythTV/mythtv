@@ -100,7 +100,7 @@
      <text lang="DK">Informationscenter</text>
      <text lang="ES">Centro Información</text>
      <action>MENU info_settings.xml</action>
-     <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends> 
+     <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythflix</depends> 
    </button>
 
    <button>

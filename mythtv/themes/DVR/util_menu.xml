@@ -235,4 +235,11 @@
      <action>SHUTDOWN</action>
    </button> -->
 
+   <button>
+     <type>NETFLIX</type>
+     <text>NetFlix</text>
+     <action>PLUGIN mythflix</action>
+     <depends>mythflix</depends>
+   </button>
+
 </mythmenu>

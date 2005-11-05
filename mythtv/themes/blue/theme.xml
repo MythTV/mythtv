@@ -120,6 +120,7 @@
     <image mode="UTIL">SETTINGS.png</image>
     <image mode="WORDS">SEARCH_WORDS.png</image>
     <image mode="LISTS">SEARCH_LISTS.png</image>
+    <image mode="NETFLIX">title/title_netflix.png</image>
   </titles>
 
 
@@ -311,6 +312,12 @@
   <buttondef name="SHUTDOWN">
     <image>mv-vmanager.png</image>
     <offset>20,20</offset>
+  </buttondef>
+
+  <buttondef name="NETFLIX">
+          <image>text-blank.png</image>
+          <!--<watermarkimage>watermark/netflix.png</watermarkimage>-->
+          <offset>0,0</offset>
   </buttondef>
 
 <!-- #####################################-->

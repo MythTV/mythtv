@@ -26,6 +26,7 @@
     <image mode="INFO_SETUP">title/title_info_settings.png</image>
     <image mode="DVD">title/title_dvd.png</image>
     <image mode="DVD_SETTINGS">title/title_dvd_setup.png</image>
+    <image mode="NETFLIX">title/title_netflix.png</image>
     <image mode="MUSIC_SETTINGS">title/title_music_setup.png</image>
     <image mode="VIDEO_SETTINGS">title/title_video_setup.png</image>
     <image mode="GAME_SETTINGS">title/title_game_setup.png</image>
@@ -217,6 +218,12 @@
     <offset>0,0</offset>
   </buttondef>
 
+  <buttondef name="NETFLIX">
+	  <image>text-blank.png</image>
+	  <!--<watermarkimage>watermark/netflix.png</watermarkimage>-->
+	  <offset>0,0</offset>
+  </buttondef>
+  
   <buttondef name="WEBPAGE">
     <image>text-blank.png</image>
     <watermarkimage>watermark/globe.png</watermarkimage>

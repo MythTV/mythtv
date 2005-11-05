@@ -53,6 +53,13 @@
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
+
+   <button>
+     <type>SETTINGS_NETFLIX</type>
+     <text>NetFlix Settings</text>
+     <action>CONFIGPLUGIN mythflix</action>
+     <depends>mythflix</depends>
+   </button>
    
    <button>
      <type>SETTINGS_WEBPAGE</type>
