@@ -19,11 +19,12 @@ enum SkipTypes {
 };
 
 enum frameMaskValues {
-    COMM_FRAME_BLANK         = 0x0001,
-    COMM_FRAME_SCENE_CHANGE  = 0x0002,
-    COMM_FRAME_LOGO_PRESENT  = 0x0004,
-    COMM_FRAME_ASPECT_CHANGE = 0x0008,
-    COMM_FRAME_RATING_SYMBOL = 0x0010
+    COMM_FRAME_SKIPPED       = 0x0001,
+    COMM_FRAME_BLANK         = 0x0002,
+    COMM_FRAME_SCENE_CHANGE  = 0x0004,
+    COMM_FRAME_LOGO_PRESENT  = 0x0008,
+    COMM_FRAME_ASPECT_CHANGE = 0x0010,
+    COMM_FRAME_RATING_SYMBOL = 0x0020
 };
 
 enum frameAspects {
@@ -112,6 +113,7 @@ void ClassicCommDetector::Init()
 
     currentAspect = COMM_ASPECT_WIDE;
 
+    lastFrameNumber = -2;
     curFrameNumber = -1;
 
     if (getenv("DEBUGCOMMFLAG"))
@@ -650,6 +652,24 @@ void ClassicCommDetector::ProcessFrame(VideoFrame *frame,
     fInfo.aspect = currentAspect;
     fInfo.format = COMM_FORMAT_NORMAL;
     fInfo.flagMask = 0;
+
+    // Fill in dummy info records for skipped frames.
+    if (lastFrameNumber != (curFrameNumber - 1))
+    {
+        if (lastFrameNumber > 0)
+        {
+            fInfo.aspect = frameInfo[lastFrameNumber].aspect;
+            fInfo.format = frameInfo[lastFrameNumber].format;
+        }
+        fInfo.flagMask = COMM_FRAME_SKIPPED;
+
+        lastFrameNumber++;
+        while(lastFrameNumber < curFrameNumber)
+            frameInfo[lastFrameNumber++] = fInfo;
+
+        fInfo.flagMask = 0;
+    }
+    lastFrameNumber = curFrameNumber;
 
     frameInfo[curFrameNumber] = fInfo;
 

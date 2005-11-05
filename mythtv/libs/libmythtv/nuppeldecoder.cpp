@@ -965,7 +965,7 @@ bool NuppelDecoder::GetFrame(int avignore)
             else if (frameheader.comptype == 'V')
             {
                 lastKey = frameheader.timecode;
-                //framesPlayed = frameheader.timecode - 1;
+                framesPlayed = frameheader.timecode - 1;
 
                 if (!hasFullPositionMap)
                 {

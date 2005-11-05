@@ -120,6 +120,7 @@ class ClassicCommDetector : public CommDetectorBase
 
         bool verboseDebugging;
 
+        long long lastFrameNumber;
         long long curFrameNumber;
 
         int width;
