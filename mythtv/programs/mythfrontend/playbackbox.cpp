@@ -3768,6 +3768,7 @@ void PlaybackBox::showRecGroupChooser(void)
                                         .arg(tr("Groups")));
     groups.sort();
     recGroupListBox->insertStringList(groups);
+    groups.clear();
 
     query.prepare("SELECT DISTINCT category, COUNT(title) "
                    "FROM recorded GROUP BY category;");
