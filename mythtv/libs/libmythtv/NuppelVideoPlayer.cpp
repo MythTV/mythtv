@@ -3324,8 +3324,13 @@ void NuppelVideoPlayer::HandleArbSeek(bool right)
     {
         if (right)
         {
+            // editKeyFrameDist is a workaround for when keyframe distance
+            // is set to one, and keyframe detection is disabled because 
+            // the position map uses MARK_GOP_BYFRAME. (see DecoderBase)
+            float editKeyFrameDist = keyframedist <= 2 ? 18 : keyframedist;
+
             GetDecoder()->setExactSeeks(false);
-            fftime = (long long)(keyframedist * 1.1);
+            fftime = (long long)(editKeyFrameDist * 1.1);
             while (fftime > 0)
                 usleep(50);
         }
