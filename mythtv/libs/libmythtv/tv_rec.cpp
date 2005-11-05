@@ -868,8 +868,6 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (killFile)
     {
-        if (!rbFileName.isEmpty())
-            unlink(rbFileName.ascii());
         rbFileName = "";
     }
 
@@ -2564,6 +2562,7 @@ void TVRec::SpawnLiveTV(QString chainid, bool pip)
                                 .arg(gContext->GetSetting("BackendServerPort"));
 
     tvchain->SetHostPrefix(hostprefix);
+    tvchain->SetCardType(genOpt.cardtype);
 
     ispip = pip;
 

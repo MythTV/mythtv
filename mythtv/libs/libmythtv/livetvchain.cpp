@@ -25,6 +25,11 @@ void LiveTVChain::SetHostPrefix(const QString &prefix)
     m_hostprefix = prefix;
 }
 
+void LiveTVChain::SetCardType(const QString &type)
+{
+    m_cardtype = type;
+}
+
 QString LiveTVChain::GetID(void)
 {
     return m_id;
@@ -45,14 +50,15 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, bool discont)
     newent.starttime = pginfo->recstartts;
     newent.discontinuity = discont;
     newent.hostprefix = m_hostprefix;
+    newent.cardtype = m_cardtype;
 
     m_chain.append(newent);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO tvchain (chanid, starttime, chainid,"
-                  " chainpos, discontinuity, watching, hostprefix) "
+                  " chainpos, discontinuity, watching, hostprefix, cardtype) "
                   "VALUES(:CHANID, :START, :CHAINID, :CHAINPOS, :DISCONT, "
-                  " :WATCHING, :PREFIX);");
+                  " :WATCHING, :PREFIX, :CARDTYPE);");
     query.bindValue(":CHANID", pginfo->chanid);
     query.bindValue(":START", pginfo->recstartts);
     query.bindValue(":CHAINID", m_id);
@@ -60,6 +66,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, bool discont)
     query.bindValue(":DISCONT", discont);
     query.bindValue(":WATCHING", 0);
     query.bindValue(":PREFIX", m_hostprefix);
+    query.bindValue(":CARDTYPE", m_cardtype);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Chain: AppendNewProgram", query);
@@ -138,7 +145,7 @@ void LiveTVChain::ReloadAll(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, starttime, discontinuity, chainpos, "
-                  "hostprefix "
+                  "hostprefix, cardtype "
                   "FROM tvchain "
                   "WHERE chainid = :CHAINID ORDER BY chainpos;");
     query.bindValue(":CHAINID", m_id);
@@ -153,6 +160,7 @@ void LiveTVChain::ReloadAll(void)
             entry.starttime = query.value(1).toDateTime();
             entry.discontinuity = query.value(2).toInt();
             entry.hostprefix = query.value(4).toString();
+            entry.cardtype = query.value(5).toString();
 
             m_maxpos = query.value(3).toInt() + 1;
 
@@ -262,12 +270,13 @@ bool LiveTVChain::NeedsToSwitch(void)
     return (m_switchid >= 0);
 }
 
-ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont)
+ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
 {
     if (m_switchid < 0 || m_curpos == m_switchid)
         return NULL;
 
-    LiveTVChainEntry entry;
+    LiveTVChainEntry oldentry, entry;
+    GetEntryAt(m_curpos, oldentry);
     GetEntryAt(m_switchid, entry);
 
     ProgramInfo *pginfo = EntryToProgram(entry);
@@ -275,6 +284,8 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont)
     discont = true;
     if (m_curpos == m_switchid - 1)
         discont = entry.discontinuity;
+
+    newtype = (oldentry.cardtype !=  entry.cardtype);
 
     m_switchid = -1;
 

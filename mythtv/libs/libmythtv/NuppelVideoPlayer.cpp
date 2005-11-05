@@ -1851,13 +1851,15 @@ void NuppelVideoPlayer::CheckTVChain(void)
 
 void NuppelVideoPlayer::SwitchToProgramExtChange(void)
 {
-    bool discontinuity;
-    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity);
+    bool discontinuity = false, newtype = false;
+    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
     if (!pginfo)
     {
         VERBOSE(VB_IMPORTANT, LOC + "SwitchToProgramExtChange() failed");
         return;
     }
+
+    // XXX Handle new type
 
     ringBuffer->OpenFile(pginfo->pathname);
 
@@ -1871,8 +1873,10 @@ void NuppelVideoPlayer::SwitchToProgramExtChange(void)
 
 void NuppelVideoPlayer::SwitchToProgram(void)
 {
-    bool discontinuity = false;
-    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity);
+    bool discontinuity = false, newtype = false;
+    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
+
+    // XXX handle new type
 
     if (discontinuity)
     {

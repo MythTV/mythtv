@@ -14,6 +14,7 @@ struct LiveTVChainEntry
     QDateTime starttime;
     bool discontinuity; // if true, can't play smooth from last entry
     QString hostprefix;
+    QString cardtype;
 };
 
 class LiveTVChain
@@ -26,6 +27,7 @@ class LiveTVChain
     void LoadFromExistingChain(const QString &id);
 
     void SetHostPrefix(const QString &prefix);
+    void SetCardType(const QString &type);
 
     QString GetID(void);
 
@@ -46,7 +48,7 @@ class LiveTVChain
     bool HasPrev(void);
 
     bool NeedsToSwitch(void);
-    ProgramInfo *GetSwitchProgram(bool &discont);
+    ProgramInfo *GetSwitchProgram(bool &discont, bool &newtype);
 
     void SwitchTo(int num);
     void SwitchToNext(bool up); // true up, false down
@@ -62,6 +64,7 @@ class LiveTVChain
     QMutex m_lock;
 
     QString m_hostprefix;
+    QString m_cardtype;
 
     int m_curpos;
     QString m_cur_chanid;
