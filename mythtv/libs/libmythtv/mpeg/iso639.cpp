@@ -4,23 +4,30 @@
 #include "iso639.h"
 #include "mythcontext.h"
 
-QMap<int, QString> iso639_key_to_english_name;
-QMap<int, int> iso639_str2_to_str3;
-static QStringList languages;
+QMap<int, QString>    _iso639_key_to_english_name;
+static QMap<int, int> _iso639_key2_to_key3;
+static QMap<int, int> _iso639_key3_to_canonical_key3;
+static QStringList    _languages;
 
 /* Note: this file takes a long time to compile. **/
 
 static int createCodeToEnglishNamesMap(QMap<int, QString>& names);
 static int createCode2ToCode3Map(QMap<int, int>& codemap);
+static int createCodeToCanonicalCodeMap(QMap<int, int>& canonical);
 
-/** \fn QStringList iso639_get_language_list()
+void iso639_clear_language_list(void)
+{
+    _languages.clear();
+}
+
+/** \fn QStringList iso639_get_language_list(void)
  *  \brief Returns list of three character ISO-639 language
  *         descriptors, starting with the most preferred.
  *  \sa MythContext::GetLanguage()
  */
 QStringList iso639_get_language_list(void)
 {
-    if (languages.empty())
+    if (_languages.empty())
     {
         for (uint i = 0; true; i++)
         {
@@ -28,33 +35,46 @@ QStringList iso639_get_language_list(void)
             QString lang = gContext->GetSetting(q, "").lower();
             if (lang == "")
                 break;
-            languages << lang;
+            _languages << lang;
         }
-        if (languages.empty())
+        if (_languages.empty())
         {
-            int key = iso639_str2_to_key(gContext->GetLanguage());
-            languages << QString(iso639_key_to_str3(key));
+            QString s3 = iso639_str2_to_str3(gContext->GetLanguage().lower());
+            if (!s3.isEmpty())
+                _languages << s3;
         }
     }
-    return languages;
+    return _languages;
+}
+
+QString iso639_str2_to_str3(const QString &str2)
+{
+    int key2 = iso639_str2_to_key2(str2);
+    int key3 = 0;
+    if (_iso639_key2_to_key3.contains(key2))
+        key3 = _iso639_key2_to_key3[key2];
+    if (key3)
+        return iso639_key_to_str3(key3);
+    return QString::null;
 }
 
 QString iso639_Alpha3_toName(const unsigned char *iso639_2)
 {
     int alpha3 = iso639_str3_to_key(iso639_2);
-    
-    if (iso639_key_to_english_name.contains(alpha3))
-        return iso639_key_to_english_name[alpha3];
+    alpha3 = iso639_key_to_canonical_key(alpha3);
+
+    if (_iso639_key_to_english_name.contains(alpha3))
+        return _iso639_key_to_english_name[alpha3];
         
     return "Unknown";
 }
 
 QString iso639_Alpha2_toName(const unsigned char *iso639_1)
 {
-    int alpha2 = iso639_str2_to_key(iso639_1);
+    int alpha2 = iso639_str2_to_key2(iso639_1);
 
-    if (iso639_str2_to_str3.contains(alpha2))
-        return iso639_key_to_english_name[iso639_str2_to_str3[alpha2]];
+    if (_iso639_key2_to_key3.contains(alpha2))
+        return _iso639_key_to_english_name[_iso639_key2_to_key3[alpha2]];
         
     return "Unknown";
 }
@@ -69,7 +89,50 @@ QString iso639_toName(const unsigned char *iso639)
     return "Unknown";
 }
 
-/*
+int iso639_key_to_canonical_key(int iso639_2)
+{
+    QMap<int, int>::const_iterator it;
+    it = _iso639_key3_to_canonical_key3.find(iso639_2);
+
+    if (it != _iso639_key3_to_canonical_key3.end())
+        return *it;
+    return iso639_2;
+}
+
+int dummy_createCodeToEnglishNamesMap =
+    createCodeToEnglishNamesMap(_iso639_key_to_english_name);
+
+int dummy_createCode2ToCode3Map =
+    createCode2ToCode3Map(_iso639_key2_to_key3);
+
+int dummy_createCodeToCanonicalCodeMap =
+    createCodeToCanonicalCodeMap(_iso639_key3_to_canonical_key3);
+
+static int createCodeToCanonicalCodeMap(QMap<int, int>& canonical)
+{
+    canonical[iso639_str3_to_key("sqi")] = iso639_str3_to_key("alb");
+    canonical[iso639_str3_to_key("hye")] = iso639_str3_to_key("arm");
+    canonical[iso639_str3_to_key("eus")] = iso639_str3_to_key("baq");
+    canonical[iso639_str3_to_key("zho")] = iso639_str3_to_key("chi");
+    canonical[iso639_str3_to_key("ces")] = iso639_str3_to_key("cze");
+    canonical[iso639_str3_to_key("nld")] = iso639_str3_to_key("dut");
+    canonical[iso639_str3_to_key("kat")] = iso639_str3_to_key("geo");
+    canonical[iso639_str3_to_key("deu")] = iso639_str3_to_key("ger");
+    canonical[iso639_str3_to_key("ell")] = iso639_str3_to_key("gre");
+    canonical[iso639_str3_to_key("isl")] = iso639_str3_to_key("ice");
+    canonical[iso639_str3_to_key("mkd")] = iso639_str3_to_key("mac");
+    canonical[iso639_str3_to_key("mri")] = iso639_str3_to_key("mao");
+    canonical[iso639_str3_to_key("msa")] = iso639_str3_to_key("may");
+    canonical[iso639_str3_to_key("fas")] = iso639_str3_to_key("per");
+    canonical[iso639_str3_to_key("srp")] = iso639_str3_to_key("scc");
+    canonical[iso639_str3_to_key("hrv")] = iso639_str3_to_key("scr");
+    canonical[iso639_str3_to_key("slk")] = iso639_str3_to_key("slo");
+    canonical[iso639_str3_to_key("bod")] = iso639_str3_to_key("tib");
+    canonical[iso639_str3_to_key("cym")] = iso639_str3_to_key("wel");
+    return 0;
+}
+
+/** \fn createCodeToEnglishNamesMap(QMap<int, QString>&)
   Generated from
     http://www.loc.gov/standards/iso639-2/ascii_8bits.html
   using awk script:
@@ -77,15 +140,11 @@ QString iso639_toName(const unsigned char *iso639)
       awk -F'|' \
       '{printf "  names[iso639_str3_to_key(\"%s\")] = QString(\"%s\");\n", \
         $1, $4}'
+
+  with hand editing for duplicates ("ger"=="deu").
 */
-
-int dummy_createCodeToEnglishNamesMap =
-    createCodeToEnglishNamesMap(iso639_key_to_english_name);
-
-int dummy_createCode2ToCode3Map =
-    createCode2ToCode3Map(iso639_str2_to_str3);
-
-static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
+static int createCodeToEnglishNamesMap(QMap<int, QString>& names)
+{
   names[iso639_str3_to_key("aar")] = QString("Afar");
   names[iso639_str3_to_key("abk")] = QString("Abkhazian");
   names[iso639_str3_to_key("ace")] = QString("Achinese");
@@ -97,8 +156,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("afr")] = QString("Afrikaans");
   names[iso639_str3_to_key("aka")] = QString("Akan");
   names[iso639_str3_to_key("akk")] = QString("Akkadian");
-  names[iso639_str3_to_key("alb")] = QString("Albanian");
-  names[iso639_str3_to_key("alb")] = QString("Albanian");
+  names[iso639_str3_to_key("alb")] = QString("Albanian"); // sqi
   names[iso639_str3_to_key("ale")] = QString("Aleut");
   names[iso639_str3_to_key("alg")] = QString("Algonquian languages");
   names[iso639_str3_to_key("amh")] = QString("Amharic");
@@ -107,8 +165,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("ara")] = QString("Arabic");
   names[iso639_str3_to_key("arc")] = QString("Aramaic");
   names[iso639_str3_to_key("arg")] = QString("Aragonese");
-  names[iso639_str3_to_key("arm")] = QString("Armenian");
-  names[iso639_str3_to_key("arm")] = QString("Armenian");
+  names[iso639_str3_to_key("arm")] = QString("Armenian"); // hye
   names[iso639_str3_to_key("arn")] = QString("Araucanian");
   names[iso639_str3_to_key("arp")] = QString("Arapaho");
   names[iso639_str3_to_key("art")] = QString("Artificial (Other)");
@@ -128,8 +185,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("bal")] = QString("Baluchi");
   names[iso639_str3_to_key("bam")] = QString("Bambara");
   names[iso639_str3_to_key("ban")] = QString("Balinese");
-  names[iso639_str3_to_key("baq")] = QString("Basque");
-  names[iso639_str3_to_key("baq")] = QString("Basque");
+  names[iso639_str3_to_key("baq")] = QString("Basque"); // eus
   names[iso639_str3_to_key("bas")] = QString("Basa");
   names[iso639_str3_to_key("bat")] = QString("Baltic (Other)");
   names[iso639_str3_to_key("bej")] = QString("Beja");
@@ -165,8 +221,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("chb")] = QString("Chibcha");
   names[iso639_str3_to_key("che")] = QString("Chechen");
   names[iso639_str3_to_key("chg")] = QString("Chagatai");
-  names[iso639_str3_to_key("chi")] = QString("Chinese");
-  names[iso639_str3_to_key("chi")] = QString("Chinese");
+  names[iso639_str3_to_key("chi")] = QString("Chinese"); // zho
   names[iso639_str3_to_key("chk")] = QString("Chuukese");
   names[iso639_str3_to_key("chm")] = QString("Mari");
   names[iso639_str3_to_key("chn")] = QString("Chinook jargon");
@@ -189,8 +244,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("crp")] = QString("Creoles and pidgins (Other)");
   names[iso639_str3_to_key("csb")] = QString("Kashubian");
   names[iso639_str3_to_key("cus")] = QString("Cushitic (Other)");
-  names[iso639_str3_to_key("cze")] = QString("Czech");
-  names[iso639_str3_to_key("cze")] = QString("Czech");
+  names[iso639_str3_to_key("cze")] = QString("Czech"); // ces
   names[iso639_str3_to_key("dak")] = QString("Dakota");
   names[iso639_str3_to_key("dan")] = QString("Danish");
   names[iso639_str3_to_key("dar")] = QString("Dargwa");
@@ -205,8 +259,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("dsb")] = QString("Lower Sorbian");
   names[iso639_str3_to_key("dua")] = QString("Duala");
   names[iso639_str3_to_key("dum")] = QString("Middle Dutch (ca.1050-1350)");
-  names[iso639_str3_to_key("dut")] = QString("Dutch; Flemish");
-  names[iso639_str3_to_key("dut")] = QString("Dutch; Flemish");
+  names[iso639_str3_to_key("dut")] = QString("Dutch; Flemish"); // nld
   names[iso639_str3_to_key("dyu")] = QString("Dyula");
   names[iso639_str3_to_key("dzo")] = QString("Dzongkha");
   names[iso639_str3_to_key("efi")] = QString("Efik");
@@ -236,10 +289,8 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("gay")] = QString("Gayo");
   names[iso639_str3_to_key("gba")] = QString("Gbaya");
   names[iso639_str3_to_key("gem")] = QString("Germanic (Other)");
-  names[iso639_str3_to_key("geo")] = QString("Georgian");
-  names[iso639_str3_to_key("geo")] = QString("Georgian");
-  names[iso639_str3_to_key("ger")] = QString("German");
-  names[iso639_str3_to_key("ger")] = QString("German");
+  names[iso639_str3_to_key("geo")] = QString("Georgian"); // kat
+  names[iso639_str3_to_key("ger")] = QString("German"); // deu
   names[iso639_str3_to_key("gez")] = QString("Geez");
   names[iso639_str3_to_key("gil")] = QString("Gilbertese");
   names[iso639_str3_to_key("gla")] = QString("Gaelic; Scottish Gaelic");
@@ -253,8 +304,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("got")] = QString("Gothic");
   names[iso639_str3_to_key("grb")] = QString("Grebo");
   names[iso639_str3_to_key("grc")] = QString("Greek, Ancient (to 1453)");
-  names[iso639_str3_to_key("gre")] = QString("Greek, Modern (1453-)");
-  names[iso639_str3_to_key("gre")] = QString("Greek, Modern (1453-)");
+  names[iso639_str3_to_key("gre")] = QString("Greek, Modern (1453-)"); // ell
   names[iso639_str3_to_key("grn")] = QString("Guarani");
   names[iso639_str3_to_key("guj")] = QString("Gujarati");
   names[iso639_str3_to_key("gwi")] = QString("Gwich´in");
@@ -275,7 +325,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("hup")] = QString("Hupa");
   names[iso639_str3_to_key("iba")] = QString("Iban");
   names[iso639_str3_to_key("ibo")] = QString("Igbo");
-  names[iso639_str3_to_key("ice")] = QString("Icelandic");
+  names[iso639_str3_to_key("ice")] = QString("Icelandic"); // isl
   names[iso639_str3_to_key("ido")] = QString("Ido");
   names[iso639_str3_to_key("iii")] = QString("Sichuan Yi");
   names[iso639_str3_to_key("ijo")] = QString("Ijo");
@@ -349,8 +399,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("lun")] = QString("Lunda");
   names[iso639_str3_to_key("luo")] = QString("Luo (Kenya and Tanzania)");
   names[iso639_str3_to_key("lus")] = QString("lushai");
-  names[iso639_str3_to_key("mac")] = QString("Macedonian");
-  names[iso639_str3_to_key("mac")] = QString("Macedonian");
+  names[iso639_str3_to_key("mac")] = QString("Macedonian"); // mkd
   names[iso639_str3_to_key("mad")] = QString("Madurese");
   names[iso639_str3_to_key("mag")] = QString("Magahi");
   names[iso639_str3_to_key("mah")] = QString("Marshallese");
@@ -358,13 +407,11 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("mak")] = QString("Makasar");
   names[iso639_str3_to_key("mal")] = QString("Malayalam");
   names[iso639_str3_to_key("man")] = QString("Mandingo");
-  names[iso639_str3_to_key("mao")] = QString("Maori");
-  names[iso639_str3_to_key("mao")] = QString("Maori");
+  names[iso639_str3_to_key("mao")] = QString("Maori"); // mri
   names[iso639_str3_to_key("map")] = QString("Austronesian (Other)");
   names[iso639_str3_to_key("mar")] = QString("Marathi");
   names[iso639_str3_to_key("mas")] = QString("Masai");
-  names[iso639_str3_to_key("may")] = QString("Malay");
-  names[iso639_str3_to_key("may")] = QString("Malay");
+  names[iso639_str3_to_key("may")] = QString("Malay"); // msa
   names[iso639_str3_to_key("mdf")] = QString("Moksha");
   names[iso639_str3_to_key("mdr")] = QString("Mandar");
   names[iso639_str3_to_key("men")] = QString("Mende");
@@ -431,8 +478,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("pap")] = QString("Papiamento");
   names[iso639_str3_to_key("pau")] = QString("Palauan");
   names[iso639_str3_to_key("peo")] = QString("Old Persian (ca.600-400 B.C.)");
-  names[iso639_str3_to_key("per")] = QString("Persian");
-  names[iso639_str3_to_key("per")] = QString("Persian");
+  names[iso639_str3_to_key("per")] = QString("Persian"); // fas
   names[iso639_str3_to_key("phi")] = QString("Philippine (Other)");
   names[iso639_str3_to_key("phn")] = QString("Phoenician");
   names[iso639_str3_to_key("pli")] = QString("Pali");
@@ -463,11 +509,9 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("san")] = QString("Sanskrit");
   names[iso639_str3_to_key("sas")] = QString("Sasak");
   names[iso639_str3_to_key("sat")] = QString("Santali");
-  names[iso639_str3_to_key("scc")] = QString("Serbian");
-  names[iso639_str3_to_key("scc")] = QString("Serbian");
+  names[iso639_str3_to_key("scc")] = QString("Serbian"); // srp
   names[iso639_str3_to_key("sco")] = QString("Scots");
-  names[iso639_str3_to_key("scr")] = QString("Croatian");
-  names[iso639_str3_to_key("scr")] = QString("Croatian");
+  names[iso639_str3_to_key("scr")] = QString("Croatian"); // hrv
   names[iso639_str3_to_key("sel")] = QString("Selkup");
   names[iso639_str3_to_key("sem")] = QString("Semitic (Other)");
   names[iso639_str3_to_key("sga")] = QString("Old Irish (to 900)");
@@ -478,7 +522,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("sio")] = QString("Siouan languages");
   names[iso639_str3_to_key("sit")] = QString("Sino-Tibetan (Other)");
   names[iso639_str3_to_key("sla")] = QString("Slavic (Other)");
-  names[iso639_str3_to_key("slo")] = QString("Slovak");
+  names[iso639_str3_to_key("slo")] = QString("Slovak"); // slk
   names[iso639_str3_to_key("slv")] = QString("Slovenian");
   names[iso639_str3_to_key("sma")] = QString("Southern Sami");
   names[iso639_str3_to_key("sme")] = QString("Northern Sami");
@@ -517,8 +561,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("tgk")] = QString("Tajik");
   names[iso639_str3_to_key("tgl")] = QString("Tagalog");
   names[iso639_str3_to_key("tha")] = QString("Thai");
-  names[iso639_str3_to_key("tib")] = QString("Tibetan");
-  names[iso639_str3_to_key("tib")] = QString("Tibetan");
+  names[iso639_str3_to_key("tib")] = QString("Tibetan"); // bod
   names[iso639_str3_to_key("tig")] = QString("Tigre");
   names[iso639_str3_to_key("tir")] = QString("Tigrinya");
   names[iso639_str3_to_key("tiv")] = QString("Tiv");
@@ -557,8 +600,7 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
   names[iso639_str3_to_key("wal")] = QString("Walamo");
   names[iso639_str3_to_key("war")] = QString("Waray");
   names[iso639_str3_to_key("was")] = QString("Washo");
-  names[iso639_str3_to_key("wel")] = QString("Welsh");
-  names[iso639_str3_to_key("wel")] = QString("Welsh");
+  names[iso639_str3_to_key("wel")] = QString("Welsh"); // cym
   names[iso639_str3_to_key("wen")] = QString("Sorbian languages");
   names[iso639_str3_to_key("wln")] = QString("Walloon");
   names[iso639_str3_to_key("wol")] = QString("Wolof");
@@ -585,209 +627,209 @@ static int createCodeToEnglishNamesMap(QMap<int, QString>& names) {
 */
 
 static int createCode2ToCode3Map(QMap<int, int>& codemap) {
-  codemap[iso639_str2_to_key("aa")] = iso639_str3_to_key("aar");
-  codemap[iso639_str2_to_key("ab")] = iso639_str3_to_key("abk");
-  codemap[iso639_str2_to_key("af")] = iso639_str3_to_key("afr");
-  codemap[iso639_str2_to_key("ak")] = iso639_str3_to_key("aka");
-  codemap[iso639_str2_to_key("sq")] = iso639_str3_to_key("alb");
-  codemap[iso639_str2_to_key("sq")] = iso639_str3_to_key("alb");
-  codemap[iso639_str2_to_key("am")] = iso639_str3_to_key("amh");
-  codemap[iso639_str2_to_key("ar")] = iso639_str3_to_key("ara");
-  codemap[iso639_str2_to_key("an")] = iso639_str3_to_key("arg");
-  codemap[iso639_str2_to_key("hy")] = iso639_str3_to_key("arm");
-  codemap[iso639_str2_to_key("hy")] = iso639_str3_to_key("arm");
-  codemap[iso639_str2_to_key("as")] = iso639_str3_to_key("asm");
-  codemap[iso639_str2_to_key("av")] = iso639_str3_to_key("ava");
-  codemap[iso639_str2_to_key("ae")] = iso639_str3_to_key("ave");
-  codemap[iso639_str2_to_key("ay")] = iso639_str3_to_key("aym");
-  codemap[iso639_str2_to_key("az")] = iso639_str3_to_key("aze");
-  codemap[iso639_str2_to_key("ba")] = iso639_str3_to_key("bak");
-  codemap[iso639_str2_to_key("bm")] = iso639_str3_to_key("bam");
-  codemap[iso639_str2_to_key("eu")] = iso639_str3_to_key("baq");
-  codemap[iso639_str2_to_key("eu")] = iso639_str3_to_key("baq");
-  codemap[iso639_str2_to_key("be")] = iso639_str3_to_key("bel");
-  codemap[iso639_str2_to_key("bn")] = iso639_str3_to_key("ben");
-  codemap[iso639_str2_to_key("bh")] = iso639_str3_to_key("bih");
-  codemap[iso639_str2_to_key("bi")] = iso639_str3_to_key("bis");
-  codemap[iso639_str2_to_key("bs")] = iso639_str3_to_key("bos");
-  codemap[iso639_str2_to_key("br")] = iso639_str3_to_key("bre");
-  codemap[iso639_str2_to_key("bg")] = iso639_str3_to_key("bul");
-  codemap[iso639_str2_to_key("my")] = iso639_str3_to_key("bur");
-  codemap[iso639_str2_to_key("my")] = iso639_str3_to_key("bur");
-  codemap[iso639_str2_to_key("ca")] = iso639_str3_to_key("cat");
-  codemap[iso639_str2_to_key("ch")] = iso639_str3_to_key("cha");
-  codemap[iso639_str2_to_key("ce")] = iso639_str3_to_key("che");
-  codemap[iso639_str2_to_key("zh")] = iso639_str3_to_key("chi");
-  codemap[iso639_str2_to_key("zh")] = iso639_str3_to_key("chi");
-  codemap[iso639_str2_to_key("cu")] = iso639_str3_to_key("chu");
-  codemap[iso639_str2_to_key("cv")] = iso639_str3_to_key("chv");
-  codemap[iso639_str2_to_key("kw")] = iso639_str3_to_key("cor");
-  codemap[iso639_str2_to_key("co")] = iso639_str3_to_key("cos");
-  codemap[iso639_str2_to_key("cr")] = iso639_str3_to_key("cre");
-  codemap[iso639_str2_to_key("cs")] = iso639_str3_to_key("cze");
-  codemap[iso639_str2_to_key("cs")] = iso639_str3_to_key("cze");
-  codemap[iso639_str2_to_key("da")] = iso639_str3_to_key("dan");
-  codemap[iso639_str2_to_key("dv")] = iso639_str3_to_key("div");
-  codemap[iso639_str2_to_key("nl")] = iso639_str3_to_key("dut");
-  codemap[iso639_str2_to_key("nl")] = iso639_str3_to_key("dut");
-  codemap[iso639_str2_to_key("dz")] = iso639_str3_to_key("dzo");
-  codemap[iso639_str2_to_key("en")] = iso639_str3_to_key("eng");
-  codemap[iso639_str2_to_key("eo")] = iso639_str3_to_key("epo");
-  codemap[iso639_str2_to_key("et")] = iso639_str3_to_key("est");
-  codemap[iso639_str2_to_key("ee")] = iso639_str3_to_key("ewe");
-  codemap[iso639_str2_to_key("fo")] = iso639_str3_to_key("fao");
-  codemap[iso639_str2_to_key("fj")] = iso639_str3_to_key("fij");
-  codemap[iso639_str2_to_key("fi")] = iso639_str3_to_key("fin");
-  codemap[iso639_str2_to_key("fr")] = iso639_str3_to_key("fre");
-  codemap[iso639_str2_to_key("fy")] = iso639_str3_to_key("fry");
-  codemap[iso639_str2_to_key("ff")] = iso639_str3_to_key("ful");
-  codemap[iso639_str2_to_key("ka")] = iso639_str3_to_key("geo");
-  codemap[iso639_str2_to_key("ka")] = iso639_str3_to_key("geo");
-  codemap[iso639_str2_to_key("de")] = iso639_str3_to_key("ger");
-  codemap[iso639_str2_to_key("de")] = iso639_str3_to_key("ger");
-  codemap[iso639_str2_to_key("gd")] = iso639_str3_to_key("gla");
-  codemap[iso639_str2_to_key("ga")] = iso639_str3_to_key("gle");
-  codemap[iso639_str2_to_key("gl")] = iso639_str3_to_key("glg");
-  codemap[iso639_str2_to_key("gv")] = iso639_str3_to_key("glv");
-  codemap[iso639_str2_to_key("el")] = iso639_str3_to_key("gre");
-  codemap[iso639_str2_to_key("el")] = iso639_str3_to_key("gre");
-  codemap[iso639_str2_to_key("gn")] = iso639_str3_to_key("grn");
-  codemap[iso639_str2_to_key("gu")] = iso639_str3_to_key("guj");
-  codemap[iso639_str2_to_key("ht")] = iso639_str3_to_key("hat");
-  codemap[iso639_str2_to_key("ha")] = iso639_str3_to_key("hau");
-  codemap[iso639_str2_to_key("he")] = iso639_str3_to_key("heb");
-  codemap[iso639_str2_to_key("hz")] = iso639_str3_to_key("her");
-  codemap[iso639_str2_to_key("hi")] = iso639_str3_to_key("hin");
-  codemap[iso639_str2_to_key("ho")] = iso639_str3_to_key("hmo");
-  codemap[iso639_str2_to_key("hu")] = iso639_str3_to_key("hun");
-  codemap[iso639_str2_to_key("ig")] = iso639_str3_to_key("ibo");
-  codemap[iso639_str2_to_key("is")] = iso639_str3_to_key("ice");
-  codemap[iso639_str2_to_key("is")] = iso639_str3_to_key("ice");
-  codemap[iso639_str2_to_key("io")] = iso639_str3_to_key("ido");
-  codemap[iso639_str2_to_key("ii")] = iso639_str3_to_key("iii");
-  codemap[iso639_str2_to_key("iu")] = iso639_str3_to_key("iku");
-  codemap[iso639_str2_to_key("ie")] = iso639_str3_to_key("ile");
-  codemap[iso639_str2_to_key("ia")] = iso639_str3_to_key("ina");
-  codemap[iso639_str2_to_key("id")] = iso639_str3_to_key("ind");
-  codemap[iso639_str2_to_key("ik")] = iso639_str3_to_key("ipk");
-  codemap[iso639_str2_to_key("it")] = iso639_str3_to_key("ita");
-  codemap[iso639_str2_to_key("jv")] = iso639_str3_to_key("jav");
-  codemap[iso639_str2_to_key("ja")] = iso639_str3_to_key("jpn");
-  codemap[iso639_str2_to_key("kl")] = iso639_str3_to_key("kal");
-  codemap[iso639_str2_to_key("kn")] = iso639_str3_to_key("kan");
-  codemap[iso639_str2_to_key("ks")] = iso639_str3_to_key("kas");
-  codemap[iso639_str2_to_key("kr")] = iso639_str3_to_key("kau");
-  codemap[iso639_str2_to_key("kk")] = iso639_str3_to_key("kaz");
-  codemap[iso639_str2_to_key("km")] = iso639_str3_to_key("khm");
-  codemap[iso639_str2_to_key("ki")] = iso639_str3_to_key("kik");
-  codemap[iso639_str2_to_key("rw")] = iso639_str3_to_key("kin");
-  codemap[iso639_str2_to_key("ky")] = iso639_str3_to_key("kir");
-  codemap[iso639_str2_to_key("kv")] = iso639_str3_to_key("kom");
-  codemap[iso639_str2_to_key("kg")] = iso639_str3_to_key("kon");
-  codemap[iso639_str2_to_key("ko")] = iso639_str3_to_key("kor");
-  codemap[iso639_str2_to_key("kj")] = iso639_str3_to_key("kua");
-  codemap[iso639_str2_to_key("ku")] = iso639_str3_to_key("kur");
-  codemap[iso639_str2_to_key("lo")] = iso639_str3_to_key("lao");
-  codemap[iso639_str2_to_key("la")] = iso639_str3_to_key("lat");
-  codemap[iso639_str2_to_key("lv")] = iso639_str3_to_key("lav");
-  codemap[iso639_str2_to_key("li")] = iso639_str3_to_key("lim");
-  codemap[iso639_str2_to_key("ln")] = iso639_str3_to_key("lin");
-  codemap[iso639_str2_to_key("lt")] = iso639_str3_to_key("lit");
-  codemap[iso639_str2_to_key("lb")] = iso639_str3_to_key("ltz");
-  codemap[iso639_str2_to_key("lu")] = iso639_str3_to_key("lub");
-  codemap[iso639_str2_to_key("lg")] = iso639_str3_to_key("lug");
-  codemap[iso639_str2_to_key("mk")] = iso639_str3_to_key("mac");
-  codemap[iso639_str2_to_key("mk")] = iso639_str3_to_key("mac");
-  codemap[iso639_str2_to_key("mh")] = iso639_str3_to_key("mah");
-  codemap[iso639_str2_to_key("ml")] = iso639_str3_to_key("mal");
-  codemap[iso639_str2_to_key("mi")] = iso639_str3_to_key("mao");
-  codemap[iso639_str2_to_key("mi")] = iso639_str3_to_key("mao");
-  codemap[iso639_str2_to_key("mr")] = iso639_str3_to_key("mar");
-  codemap[iso639_str2_to_key("ms")] = iso639_str3_to_key("may");
-  codemap[iso639_str2_to_key("ms")] = iso639_str3_to_key("may");
-  codemap[iso639_str2_to_key("mg")] = iso639_str3_to_key("mlg");
-  codemap[iso639_str2_to_key("mt")] = iso639_str3_to_key("mlt");
-  codemap[iso639_str2_to_key("mo")] = iso639_str3_to_key("mol");
-  codemap[iso639_str2_to_key("mn")] = iso639_str3_to_key("mon");
-  codemap[iso639_str2_to_key("na")] = iso639_str3_to_key("nau");
-  codemap[iso639_str2_to_key("nv")] = iso639_str3_to_key("nav");
-  codemap[iso639_str2_to_key("nr")] = iso639_str3_to_key("nbl");
-  codemap[iso639_str2_to_key("nd")] = iso639_str3_to_key("nde");
-  codemap[iso639_str2_to_key("ng")] = iso639_str3_to_key("ndo");
-  codemap[iso639_str2_to_key("ne")] = iso639_str3_to_key("nep");
-  codemap[iso639_str2_to_key("nn")] = iso639_str3_to_key("nno");
-  codemap[iso639_str2_to_key("nb")] = iso639_str3_to_key("nob");
-  codemap[iso639_str2_to_key("no")] = iso639_str3_to_key("nor");
-  codemap[iso639_str2_to_key("ny")] = iso639_str3_to_key("nya");
-  codemap[iso639_str2_to_key("oc")] = iso639_str3_to_key("oci");
-  codemap[iso639_str2_to_key("oj")] = iso639_str3_to_key("oji");
-  codemap[iso639_str2_to_key("or")] = iso639_str3_to_key("ori");
-  codemap[iso639_str2_to_key("om")] = iso639_str3_to_key("orm");
-  codemap[iso639_str2_to_key("os")] = iso639_str3_to_key("oss");
-  codemap[iso639_str2_to_key("pa")] = iso639_str3_to_key("pan");
-  codemap[iso639_str2_to_key("fa")] = iso639_str3_to_key("per");
-  codemap[iso639_str2_to_key("fa")] = iso639_str3_to_key("per");
-  codemap[iso639_str2_to_key("pi")] = iso639_str3_to_key("pli");
-  codemap[iso639_str2_to_key("pl")] = iso639_str3_to_key("pol");
-  codemap[iso639_str2_to_key("pt")] = iso639_str3_to_key("por");
-  codemap[iso639_str2_to_key("ps")] = iso639_str3_to_key("pus");
-  codemap[iso639_str2_to_key("qu")] = iso639_str3_to_key("que");
-  codemap[iso639_str2_to_key("rm")] = iso639_str3_to_key("roh");
-  codemap[iso639_str2_to_key("ro")] = iso639_str3_to_key("rum");
-  codemap[iso639_str2_to_key("rn")] = iso639_str3_to_key("run");
-  codemap[iso639_str2_to_key("ru")] = iso639_str3_to_key("rus");
-  codemap[iso639_str2_to_key("sg")] = iso639_str3_to_key("sag");
-  codemap[iso639_str2_to_key("sa")] = iso639_str3_to_key("san");
-  codemap[iso639_str2_to_key("sr")] = iso639_str3_to_key("scc");
-  codemap[iso639_str2_to_key("sr")] = iso639_str3_to_key("scc");
-  codemap[iso639_str2_to_key("hr")] = iso639_str3_to_key("scr");
-  codemap[iso639_str2_to_key("hr")] = iso639_str3_to_key("scr");
-  codemap[iso639_str2_to_key("si")] = iso639_str3_to_key("sin");
-  codemap[iso639_str2_to_key("sk")] = iso639_str3_to_key("slo");
-  codemap[iso639_str2_to_key("sl")] = iso639_str3_to_key("slv");
-  codemap[iso639_str2_to_key("se")] = iso639_str3_to_key("sme");
-  codemap[iso639_str2_to_key("sm")] = iso639_str3_to_key("smo");
-  codemap[iso639_str2_to_key("sn")] = iso639_str3_to_key("sna");
-  codemap[iso639_str2_to_key("sd")] = iso639_str3_to_key("snd");
-  codemap[iso639_str2_to_key("so")] = iso639_str3_to_key("som");
-  codemap[iso639_str2_to_key("st")] = iso639_str3_to_key("sot");
-  codemap[iso639_str2_to_key("es")] = iso639_str3_to_key("spa");
-  codemap[iso639_str2_to_key("sc")] = iso639_str3_to_key("srd");
-  codemap[iso639_str2_to_key("ss")] = iso639_str3_to_key("ssw");
-  codemap[iso639_str2_to_key("su")] = iso639_str3_to_key("sun");
-  codemap[iso639_str2_to_key("sw")] = iso639_str3_to_key("swa");
-  codemap[iso639_str2_to_key("sv")] = iso639_str3_to_key("swe");
-  codemap[iso639_str2_to_key("ty")] = iso639_str3_to_key("tah");
-  codemap[iso639_str2_to_key("ta")] = iso639_str3_to_key("tam");
-  codemap[iso639_str2_to_key("tt")] = iso639_str3_to_key("tat");
-  codemap[iso639_str2_to_key("te")] = iso639_str3_to_key("tel");
-  codemap[iso639_str2_to_key("tg")] = iso639_str3_to_key("tgk");
-  codemap[iso639_str2_to_key("tl")] = iso639_str3_to_key("tgl");
-  codemap[iso639_str2_to_key("th")] = iso639_str3_to_key("tha");
-  codemap[iso639_str2_to_key("bo")] = iso639_str3_to_key("tib");
-  codemap[iso639_str2_to_key("bo")] = iso639_str3_to_key("tib");
-  codemap[iso639_str2_to_key("ti")] = iso639_str3_to_key("tir");
-  codemap[iso639_str2_to_key("to")] = iso639_str3_to_key("ton");
-  codemap[iso639_str2_to_key("tn")] = iso639_str3_to_key("tsn");
-  codemap[iso639_str2_to_key("ts")] = iso639_str3_to_key("tso");
-  codemap[iso639_str2_to_key("tk")] = iso639_str3_to_key("tuk");
-  codemap[iso639_str2_to_key("tr")] = iso639_str3_to_key("tur");
-  codemap[iso639_str2_to_key("tw")] = iso639_str3_to_key("twi");
-  codemap[iso639_str2_to_key("ug")] = iso639_str3_to_key("uig");
-  codemap[iso639_str2_to_key("uk")] = iso639_str3_to_key("ukr");
-  codemap[iso639_str2_to_key("ur")] = iso639_str3_to_key("urd");
-  codemap[iso639_str2_to_key("uz")] = iso639_str3_to_key("uzb");
-  codemap[iso639_str2_to_key("ve")] = iso639_str3_to_key("ven");
-  codemap[iso639_str2_to_key("vi")] = iso639_str3_to_key("vie");
-  codemap[iso639_str2_to_key("vo")] = iso639_str3_to_key("vol");
-  codemap[iso639_str2_to_key("cy")] = iso639_str3_to_key("wel");
-  codemap[iso639_str2_to_key("cy")] = iso639_str3_to_key("wel");
-  codemap[iso639_str2_to_key("wa")] = iso639_str3_to_key("wln");
-  codemap[iso639_str2_to_key("wo")] = iso639_str3_to_key("wol");
-  codemap[iso639_str2_to_key("xh")] = iso639_str3_to_key("xho");
-  codemap[iso639_str2_to_key("yi")] = iso639_str3_to_key("yid");
-  codemap[iso639_str2_to_key("yo")] = iso639_str3_to_key("yor");
-  codemap[iso639_str2_to_key("za")] = iso639_str3_to_key("zha");
-  codemap[iso639_str2_to_key("zu")] = iso639_str3_to_key("zul");
+  codemap[iso639_str2_to_key2("aa")] = iso639_str3_to_key("aar");
+  codemap[iso639_str2_to_key2("ab")] = iso639_str3_to_key("abk");
+  codemap[iso639_str2_to_key2("af")] = iso639_str3_to_key("afr");
+  codemap[iso639_str2_to_key2("ak")] = iso639_str3_to_key("aka");
+  codemap[iso639_str2_to_key2("sq")] = iso639_str3_to_key("alb");
+  codemap[iso639_str2_to_key2("sq")] = iso639_str3_to_key("alb");
+  codemap[iso639_str2_to_key2("am")] = iso639_str3_to_key("amh");
+  codemap[iso639_str2_to_key2("ar")] = iso639_str3_to_key("ara");
+  codemap[iso639_str2_to_key2("an")] = iso639_str3_to_key("arg");
+  codemap[iso639_str2_to_key2("hy")] = iso639_str3_to_key("arm");
+  codemap[iso639_str2_to_key2("hy")] = iso639_str3_to_key("arm");
+  codemap[iso639_str2_to_key2("as")] = iso639_str3_to_key("asm");
+  codemap[iso639_str2_to_key2("av")] = iso639_str3_to_key("ava");
+  codemap[iso639_str2_to_key2("ae")] = iso639_str3_to_key("ave");
+  codemap[iso639_str2_to_key2("ay")] = iso639_str3_to_key("aym");
+  codemap[iso639_str2_to_key2("az")] = iso639_str3_to_key("aze");
+  codemap[iso639_str2_to_key2("ba")] = iso639_str3_to_key("bak");
+  codemap[iso639_str2_to_key2("bm")] = iso639_str3_to_key("bam");
+  codemap[iso639_str2_to_key2("eu")] = iso639_str3_to_key("baq");
+  codemap[iso639_str2_to_key2("eu")] = iso639_str3_to_key("baq");
+  codemap[iso639_str2_to_key2("be")] = iso639_str3_to_key("bel");
+  codemap[iso639_str2_to_key2("bn")] = iso639_str3_to_key("ben");
+  codemap[iso639_str2_to_key2("bh")] = iso639_str3_to_key("bih");
+  codemap[iso639_str2_to_key2("bi")] = iso639_str3_to_key("bis");
+  codemap[iso639_str2_to_key2("bs")] = iso639_str3_to_key("bos");
+  codemap[iso639_str2_to_key2("br")] = iso639_str3_to_key("bre");
+  codemap[iso639_str2_to_key2("bg")] = iso639_str3_to_key("bul");
+  codemap[iso639_str2_to_key2("my")] = iso639_str3_to_key("bur");
+  codemap[iso639_str2_to_key2("my")] = iso639_str3_to_key("bur");
+  codemap[iso639_str2_to_key2("ca")] = iso639_str3_to_key("cat");
+  codemap[iso639_str2_to_key2("ch")] = iso639_str3_to_key("cha");
+  codemap[iso639_str2_to_key2("ce")] = iso639_str3_to_key("che");
+  codemap[iso639_str2_to_key2("zh")] = iso639_str3_to_key("chi");
+  codemap[iso639_str2_to_key2("zh")] = iso639_str3_to_key("chi");
+  codemap[iso639_str2_to_key2("cu")] = iso639_str3_to_key("chu");
+  codemap[iso639_str2_to_key2("cv")] = iso639_str3_to_key("chv");
+  codemap[iso639_str2_to_key2("kw")] = iso639_str3_to_key("cor");
+  codemap[iso639_str2_to_key2("co")] = iso639_str3_to_key("cos");
+  codemap[iso639_str2_to_key2("cr")] = iso639_str3_to_key("cre");
+  codemap[iso639_str2_to_key2("cs")] = iso639_str3_to_key("cze");
+  codemap[iso639_str2_to_key2("cs")] = iso639_str3_to_key("cze");
+  codemap[iso639_str2_to_key2("da")] = iso639_str3_to_key("dan");
+  codemap[iso639_str2_to_key2("dv")] = iso639_str3_to_key("div");
+  codemap[iso639_str2_to_key2("nl")] = iso639_str3_to_key("dut");
+  codemap[iso639_str2_to_key2("nl")] = iso639_str3_to_key("dut");
+  codemap[iso639_str2_to_key2("dz")] = iso639_str3_to_key("dzo");
+  codemap[iso639_str2_to_key2("en")] = iso639_str3_to_key("eng");
+  codemap[iso639_str2_to_key2("eo")] = iso639_str3_to_key("epo");
+  codemap[iso639_str2_to_key2("et")] = iso639_str3_to_key("est");
+  codemap[iso639_str2_to_key2("ee")] = iso639_str3_to_key("ewe");
+  codemap[iso639_str2_to_key2("fo")] = iso639_str3_to_key("fao");
+  codemap[iso639_str2_to_key2("fj")] = iso639_str3_to_key("fij");
+  codemap[iso639_str2_to_key2("fi")] = iso639_str3_to_key("fin");
+  codemap[iso639_str2_to_key2("fr")] = iso639_str3_to_key("fre");
+  codemap[iso639_str2_to_key2("fy")] = iso639_str3_to_key("fry");
+  codemap[iso639_str2_to_key2("ff")] = iso639_str3_to_key("ful");
+  codemap[iso639_str2_to_key2("ka")] = iso639_str3_to_key("geo");
+  codemap[iso639_str2_to_key2("ka")] = iso639_str3_to_key("geo");
+  codemap[iso639_str2_to_key2("de")] = iso639_str3_to_key("ger");
+  codemap[iso639_str2_to_key2("de")] = iso639_str3_to_key("ger");
+  codemap[iso639_str2_to_key2("gd")] = iso639_str3_to_key("gla");
+  codemap[iso639_str2_to_key2("ga")] = iso639_str3_to_key("gle");
+  codemap[iso639_str2_to_key2("gl")] = iso639_str3_to_key("glg");
+  codemap[iso639_str2_to_key2("gv")] = iso639_str3_to_key("glv");
+  codemap[iso639_str2_to_key2("el")] = iso639_str3_to_key("gre");
+  codemap[iso639_str2_to_key2("el")] = iso639_str3_to_key("gre");
+  codemap[iso639_str2_to_key2("gn")] = iso639_str3_to_key("grn");
+  codemap[iso639_str2_to_key2("gu")] = iso639_str3_to_key("guj");
+  codemap[iso639_str2_to_key2("ht")] = iso639_str3_to_key("hat");
+  codemap[iso639_str2_to_key2("ha")] = iso639_str3_to_key("hau");
+  codemap[iso639_str2_to_key2("he")] = iso639_str3_to_key("heb");
+  codemap[iso639_str2_to_key2("hz")] = iso639_str3_to_key("her");
+  codemap[iso639_str2_to_key2("hi")] = iso639_str3_to_key("hin");
+  codemap[iso639_str2_to_key2("ho")] = iso639_str3_to_key("hmo");
+  codemap[iso639_str2_to_key2("hu")] = iso639_str3_to_key("hun");
+  codemap[iso639_str2_to_key2("ig")] = iso639_str3_to_key("ibo");
+  codemap[iso639_str2_to_key2("is")] = iso639_str3_to_key("ice");
+  codemap[iso639_str2_to_key2("is")] = iso639_str3_to_key("ice");
+  codemap[iso639_str2_to_key2("io")] = iso639_str3_to_key("ido");
+  codemap[iso639_str2_to_key2("ii")] = iso639_str3_to_key("iii");
+  codemap[iso639_str2_to_key2("iu")] = iso639_str3_to_key("iku");
+  codemap[iso639_str2_to_key2("ie")] = iso639_str3_to_key("ile");
+  codemap[iso639_str2_to_key2("ia")] = iso639_str3_to_key("ina");
+  codemap[iso639_str2_to_key2("id")] = iso639_str3_to_key("ind");
+  codemap[iso639_str2_to_key2("ik")] = iso639_str3_to_key("ipk");
+  codemap[iso639_str2_to_key2("it")] = iso639_str3_to_key("ita");
+  codemap[iso639_str2_to_key2("jv")] = iso639_str3_to_key("jav");
+  codemap[iso639_str2_to_key2("ja")] = iso639_str3_to_key("jpn");
+  codemap[iso639_str2_to_key2("kl")] = iso639_str3_to_key("kal");
+  codemap[iso639_str2_to_key2("kn")] = iso639_str3_to_key("kan");
+  codemap[iso639_str2_to_key2("ks")] = iso639_str3_to_key("kas");
+  codemap[iso639_str2_to_key2("kr")] = iso639_str3_to_key("kau");
+  codemap[iso639_str2_to_key2("kk")] = iso639_str3_to_key("kaz");
+  codemap[iso639_str2_to_key2("km")] = iso639_str3_to_key("khm");
+  codemap[iso639_str2_to_key2("ki")] = iso639_str3_to_key("kik");
+  codemap[iso639_str2_to_key2("rw")] = iso639_str3_to_key("kin");
+  codemap[iso639_str2_to_key2("ky")] = iso639_str3_to_key("kir");
+  codemap[iso639_str2_to_key2("kv")] = iso639_str3_to_key("kom");
+  codemap[iso639_str2_to_key2("kg")] = iso639_str3_to_key("kon");
+  codemap[iso639_str2_to_key2("ko")] = iso639_str3_to_key("kor");
+  codemap[iso639_str2_to_key2("kj")] = iso639_str3_to_key("kua");
+  codemap[iso639_str2_to_key2("ku")] = iso639_str3_to_key("kur");
+  codemap[iso639_str2_to_key2("lo")] = iso639_str3_to_key("lao");
+  codemap[iso639_str2_to_key2("la")] = iso639_str3_to_key("lat");
+  codemap[iso639_str2_to_key2("lv")] = iso639_str3_to_key("lav");
+  codemap[iso639_str2_to_key2("li")] = iso639_str3_to_key("lim");
+  codemap[iso639_str2_to_key2("ln")] = iso639_str3_to_key("lin");
+  codemap[iso639_str2_to_key2("lt")] = iso639_str3_to_key("lit");
+  codemap[iso639_str2_to_key2("lb")] = iso639_str3_to_key("ltz");
+  codemap[iso639_str2_to_key2("lu")] = iso639_str3_to_key("lub");
+  codemap[iso639_str2_to_key2("lg")] = iso639_str3_to_key("lug");
+  codemap[iso639_str2_to_key2("mk")] = iso639_str3_to_key("mac");
+  codemap[iso639_str2_to_key2("mk")] = iso639_str3_to_key("mac");
+  codemap[iso639_str2_to_key2("mh")] = iso639_str3_to_key("mah");
+  codemap[iso639_str2_to_key2("ml")] = iso639_str3_to_key("mal");
+  codemap[iso639_str2_to_key2("mi")] = iso639_str3_to_key("mao");
+  codemap[iso639_str2_to_key2("mi")] = iso639_str3_to_key("mao");
+  codemap[iso639_str2_to_key2("mr")] = iso639_str3_to_key("mar");
+  codemap[iso639_str2_to_key2("ms")] = iso639_str3_to_key("may");
+  codemap[iso639_str2_to_key2("ms")] = iso639_str3_to_key("may");
+  codemap[iso639_str2_to_key2("mg")] = iso639_str3_to_key("mlg");
+  codemap[iso639_str2_to_key2("mt")] = iso639_str3_to_key("mlt");
+  codemap[iso639_str2_to_key2("mo")] = iso639_str3_to_key("mol");
+  codemap[iso639_str2_to_key2("mn")] = iso639_str3_to_key("mon");
+  codemap[iso639_str2_to_key2("na")] = iso639_str3_to_key("nau");
+  codemap[iso639_str2_to_key2("nv")] = iso639_str3_to_key("nav");
+  codemap[iso639_str2_to_key2("nr")] = iso639_str3_to_key("nbl");
+  codemap[iso639_str2_to_key2("nd")] = iso639_str3_to_key("nde");
+  codemap[iso639_str2_to_key2("ng")] = iso639_str3_to_key("ndo");
+  codemap[iso639_str2_to_key2("ne")] = iso639_str3_to_key("nep");
+  codemap[iso639_str2_to_key2("nn")] = iso639_str3_to_key("nno");
+  codemap[iso639_str2_to_key2("nb")] = iso639_str3_to_key("nob");
+  codemap[iso639_str2_to_key2("no")] = iso639_str3_to_key("nor");
+  codemap[iso639_str2_to_key2("ny")] = iso639_str3_to_key("nya");
+  codemap[iso639_str2_to_key2("oc")] = iso639_str3_to_key("oci");
+  codemap[iso639_str2_to_key2("oj")] = iso639_str3_to_key("oji");
+  codemap[iso639_str2_to_key2("or")] = iso639_str3_to_key("ori");
+  codemap[iso639_str2_to_key2("om")] = iso639_str3_to_key("orm");
+  codemap[iso639_str2_to_key2("os")] = iso639_str3_to_key("oss");
+  codemap[iso639_str2_to_key2("pa")] = iso639_str3_to_key("pan");
+  codemap[iso639_str2_to_key2("fa")] = iso639_str3_to_key("per");
+  codemap[iso639_str2_to_key2("fa")] = iso639_str3_to_key("per");
+  codemap[iso639_str2_to_key2("pi")] = iso639_str3_to_key("pli");
+  codemap[iso639_str2_to_key2("pl")] = iso639_str3_to_key("pol");
+  codemap[iso639_str2_to_key2("pt")] = iso639_str3_to_key("por");
+  codemap[iso639_str2_to_key2("ps")] = iso639_str3_to_key("pus");
+  codemap[iso639_str2_to_key2("qu")] = iso639_str3_to_key("que");
+  codemap[iso639_str2_to_key2("rm")] = iso639_str3_to_key("roh");
+  codemap[iso639_str2_to_key2("ro")] = iso639_str3_to_key("rum");
+  codemap[iso639_str2_to_key2("rn")] = iso639_str3_to_key("run");
+  codemap[iso639_str2_to_key2("ru")] = iso639_str3_to_key("rus");
+  codemap[iso639_str2_to_key2("sg")] = iso639_str3_to_key("sag");
+  codemap[iso639_str2_to_key2("sa")] = iso639_str3_to_key("san");
+  codemap[iso639_str2_to_key2("sr")] = iso639_str3_to_key("scc");
+  codemap[iso639_str2_to_key2("sr")] = iso639_str3_to_key("scc");
+  codemap[iso639_str2_to_key2("hr")] = iso639_str3_to_key("scr");
+  codemap[iso639_str2_to_key2("hr")] = iso639_str3_to_key("scr");
+  codemap[iso639_str2_to_key2("si")] = iso639_str3_to_key("sin");
+  codemap[iso639_str2_to_key2("sk")] = iso639_str3_to_key("slo");
+  codemap[iso639_str2_to_key2("sl")] = iso639_str3_to_key("slv");
+  codemap[iso639_str2_to_key2("se")] = iso639_str3_to_key("sme");
+  codemap[iso639_str2_to_key2("sm")] = iso639_str3_to_key("smo");
+  codemap[iso639_str2_to_key2("sn")] = iso639_str3_to_key("sna");
+  codemap[iso639_str2_to_key2("sd")] = iso639_str3_to_key("snd");
+  codemap[iso639_str2_to_key2("so")] = iso639_str3_to_key("som");
+  codemap[iso639_str2_to_key2("st")] = iso639_str3_to_key("sot");
+  codemap[iso639_str2_to_key2("es")] = iso639_str3_to_key("spa");
+  codemap[iso639_str2_to_key2("sc")] = iso639_str3_to_key("srd");
+  codemap[iso639_str2_to_key2("ss")] = iso639_str3_to_key("ssw");
+  codemap[iso639_str2_to_key2("su")] = iso639_str3_to_key("sun");
+  codemap[iso639_str2_to_key2("sw")] = iso639_str3_to_key("swa");
+  codemap[iso639_str2_to_key2("sv")] = iso639_str3_to_key("swe");
+  codemap[iso639_str2_to_key2("ty")] = iso639_str3_to_key("tah");
+  codemap[iso639_str2_to_key2("ta")] = iso639_str3_to_key("tam");
+  codemap[iso639_str2_to_key2("tt")] = iso639_str3_to_key("tat");
+  codemap[iso639_str2_to_key2("te")] = iso639_str3_to_key("tel");
+  codemap[iso639_str2_to_key2("tg")] = iso639_str3_to_key("tgk");
+  codemap[iso639_str2_to_key2("tl")] = iso639_str3_to_key("tgl");
+  codemap[iso639_str2_to_key2("th")] = iso639_str3_to_key("tha");
+  codemap[iso639_str2_to_key2("bo")] = iso639_str3_to_key("tib");
+  codemap[iso639_str2_to_key2("bo")] = iso639_str3_to_key("tib");
+  codemap[iso639_str2_to_key2("ti")] = iso639_str3_to_key("tir");
+  codemap[iso639_str2_to_key2("to")] = iso639_str3_to_key("ton");
+  codemap[iso639_str2_to_key2("tn")] = iso639_str3_to_key("tsn");
+  codemap[iso639_str2_to_key2("ts")] = iso639_str3_to_key("tso");
+  codemap[iso639_str2_to_key2("tk")] = iso639_str3_to_key("tuk");
+  codemap[iso639_str2_to_key2("tr")] = iso639_str3_to_key("tur");
+  codemap[iso639_str2_to_key2("tw")] = iso639_str3_to_key("twi");
+  codemap[iso639_str2_to_key2("ug")] = iso639_str3_to_key("uig");
+  codemap[iso639_str2_to_key2("uk")] = iso639_str3_to_key("ukr");
+  codemap[iso639_str2_to_key2("ur")] = iso639_str3_to_key("urd");
+  codemap[iso639_str2_to_key2("uz")] = iso639_str3_to_key("uzb");
+  codemap[iso639_str2_to_key2("ve")] = iso639_str3_to_key("ven");
+  codemap[iso639_str2_to_key2("vi")] = iso639_str3_to_key("vie");
+  codemap[iso639_str2_to_key2("vo")] = iso639_str3_to_key("vol");
+  codemap[iso639_str2_to_key2("cy")] = iso639_str3_to_key("wel");
+  codemap[iso639_str2_to_key2("cy")] = iso639_str3_to_key("wel");
+  codemap[iso639_str2_to_key2("wa")] = iso639_str3_to_key("wln");
+  codemap[iso639_str2_to_key2("wo")] = iso639_str3_to_key("wol");
+  codemap[iso639_str2_to_key2("xh")] = iso639_str3_to_key("xho");
+  codemap[iso639_str2_to_key2("yi")] = iso639_str3_to_key("yid");
+  codemap[iso639_str2_to_key2("yo")] = iso639_str3_to_key("yor");
+  codemap[iso639_str2_to_key2("za")] = iso639_str3_to_key("zha");
+  codemap[iso639_str2_to_key2("zu")] = iso639_str3_to_key("zul");
   return 0;
 }

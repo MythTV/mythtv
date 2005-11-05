@@ -2094,12 +2094,18 @@ static HostComboBox *MythLanguage()
     return gc;
 }
 
-static void ISO639_fill_selections(SelectSetting *widget)
+static void ISO639_fill_selections(SelectSetting *widget, uint i)
 {
     widget->clearSelections();
+    QString q = QString("ISO639Language%1").arg(i);
+    QString lang = gContext->GetSetting(q, "").lower();
+    VERBOSE(VB_IMPORTANT, "lang"<<i<<": "<<lang);
+    if (lang.isEmpty() && !gContext->GetSetting("Language", "").isEmpty())
+        lang = iso639_str2_to_str3(gContext->GetLanguage().lower());
+    VERBOSE(VB_IMPORTANT, "lang: "<<lang);
 
-    QMap<int,QString>::iterator it = iso639_key_to_english_name.begin();
-    QMap<int,QString>::iterator ite = iso639_key_to_english_name.end();
+    QMap<int,QString>::iterator it  = _iso639_key_to_english_name.begin();
+    QMap<int,QString>::iterator ite = _iso639_key_to_english_name.end();
     
     for (; it != ite; ++it)
     {
@@ -2107,7 +2113,9 @@ static void ISO639_fill_selections(SelectSetting *widget)
         int idx = desc.find(";");
         if (idx > 0)
             desc = desc.left(idx);
-        widget->addSelection(desc, iso639_key_to_str3(it.key()));
+
+        const QString il = iso639_key_to_str3(it.key());
+        widget->addSelection(desc, il, il == lang);
     }
 }
 
@@ -2117,7 +2125,7 @@ static HostComboBox *ISO639PreferredLanguage(uint i)
     gc->setLabel(QObject::tr("Guide Language #%1").arg(i+1));
     // We should try to get language from "MythLanguage"
     // then use code 2 to code 3 map in iso639.h
-    ISO639_fill_selections(gc);
+    ISO639_fill_selections(gc, i);
     gc->setHelpText(
         QObject::tr("Your #%1 preferred language for "
                     "Program Guide Data and captions.").arg(i+1));

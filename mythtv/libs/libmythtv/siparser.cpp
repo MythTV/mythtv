@@ -759,19 +759,18 @@ void SIParser::ParsePMT(tablehead_t *head, uint8_t *buffer, int size)
         {
             // Conditional Access Descriptor
             case 0x09:
-                {
-                    CAPMTObject cad = ParseDescCA(&buffer[pos], buffer[pos+1]);
-                    p.CA.append(cad);
-                    p.hasCA = true;
-                }
-                break;
+            {
+                CAPMTObject cad = ParseDescCA(&buffer[pos], buffer[pos + 1]);
+                p.CA.append(cad);
+                p.hasCA = true;
+            }
+            break;
 
             default:
-                SIPARSER(QString("Unknown descriptor, tag = %1")
-                         .arg(buffer[pos]));
+                ProcessUnusedDescriptor(&buffer[pos], buffer[pos + 1] + 2);
                 p.Descriptors.append(
                     Descriptor(&buffer[pos], buffer[pos + 1] + 2));
-                break;
+            break;
         }
         pos += buffer[pos+1] + 2;
     }
@@ -1312,6 +1311,19 @@ uint SIParser::GetLanguagePriority(const QString &language)
 {
     QMap<QString,uint>::const_iterator it;
     it = LanguagePriority.find(language);
+
+    // if this is an unknown language, check if the canonical version exists
+    if (it == LanguagePriority.end())
+    {
+        QString clang = iso639_str_to_canonoical_str(language);
+        it = LanguagePriority.find(clang);
+        if (it != LanguagePriority.end())
+        {
+            SIPARSER(QString("Added preferred language '%1' with same "
+                             "priority as '%2'").arg(language).arg(clang));
+            LanguagePriority[language] = *it;
+        }
+    }
 
     // if this is an unknown language, insert into priority list
     if (it == LanguagePriority.end())
@@ -1945,11 +1957,11 @@ uint SIParser::ProcessDVBEventDescriptors(
     Event                        &event)
 {
     QString bestLanguageSE   = "";
-    uint    bestPrioritySE   = 0;
+    uint    bestPrioritySE   = UINT_MAX;
     bestDescriptorSE         = NULL;
 
     QString bestLanguageEE   = "";
-    uint    bestPriorityEE   = 0;
+    uint    bestPriorityEE   = UINT_MAX;
     bestDescriptorsEE.clear();
 
     uint    descriptorTag    = data[0];
