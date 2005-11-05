@@ -134,6 +134,7 @@
       <text lang="SI">Status sistema</text>
       <text lang="ET">Süsteemi olek</text>
       <text lang="NB">Systemstatus</text>
+      <text lang="ES">Estado Sistema</text>
       <action>TV_STATUS</action>
    </button>
 

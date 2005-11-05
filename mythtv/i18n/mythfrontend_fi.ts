@@ -121,34 +121,34 @@
     </message>
     <message>
         <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaanko KAIKKIEN TV-korttien asetukset?</translation>
     </message>
     <message>
         <source>Yes, delete capture cards</source>
-        <translation type="unfinished"></translation>
+        <translation>Kyllä, poista</translation>
     </message>
 </context>
 <context>
     <name>CardInput</name>
     <message>
         <source>Scan for channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi kanavia</translation>
     </message>
     <message>
         <source>Use channel scanner to find channels for this input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttää kanavaselainta tämän sisääntulon kanavien etsintään.</translation>
     </message>
     <message>
         <source>Fetch channels from listings source</source>
-        <translation type="unfinished"></translation>
+        <translation>Hae kanavat tekstilähteestä</translation>
     </message>
     <message>
         <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttää tekstipohjaista dokumenttia kanavien virittämiseen.</translation>
     </message>
     <message>
         <source>This can take a long time to run.</source>
-        <translation type="unfinished"></translation>
+        <translation>Voi kestää jonkin aikaa.</translation>
     </message>
 </context>
 <context>
@@ -183,19 +183,19 @@
     </message>
     <message>
         <source>Delete Channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanavien Poistaminen</translation>
     </message>
     <message>
         <source>Delete all channels on currently selected source[s].</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista kaikki nykyis[t]en ohjelmalähteen/lähteiden kanavat.</translation>
     </message>
     <message>
         <source>Are you sure you would like to delete these channels?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaanko nämä kanavat?</translation>
     </message>
     <message>
         <source>Yes, delete the channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Kyllä, poista</translation>
     </message>
 </context>
 <context>
@@ -213,7 +213,7 @@
     <name>CustomRecord</name>
     <message>
         <source>Power Search Recording Rule Editor</source>
-        <translation>Tehokkaan Haun Muokkaus</translation>
+        <translation type="obsolete">Tehokkaan Haun Muokkaus</translation>
     </message>
     <message>
         <source>Rule Name</source>
@@ -359,16 +359,36 @@
         <source>First Episodes (complete example for Data Direct)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>All matches for a genre (Data Direct)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Person named in the credits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only on a specific station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only on channels marked as favorites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional Tables</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DTVSignalMonitor</name>
     <message>
         <source>Seen</source>
-        <translation type="unfinished"></translation>
+        <translation>Nähty</translation>
     </message>
     <message>
         <source>Matching</source>
-        <translation type="unfinished"></translation>
+        <translation>Sopiva</translation>
     </message>
 </context>
 <context>
@@ -379,7 +399,7 @@
     </message>
     <message>
         <source>Recording Options</source>
-        <translation type="unfinished">Nauhoitusasetukset</translation>
+        <translation>Nauhoitusasetukset</translation>
     </message>
 </context>
 <context>
@@ -437,6 +457,32 @@
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
         <translation>Haetaan Myth Plus palvelusta...</translation>
+    </message>
+</context>
+<context>
+    <name>EITOnly_config</name>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>IgnoreSignalTimeout</name>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1129,23 +1175,23 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Disable Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Poista Käytöstä Automaattinen Vanhentuminen</translation>
     </message>
     <message>
         <source>Enable Auto Expire</source>
-        <translation type="unfinished"></translation>
+        <translation>Salli Automaattinen Vanhentuminen</translation>
     </message>
     <message>
         <source>Change Recording Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaihda Nauhoituksen Nimikettä</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">Nimi</translation>
+        <translation>Nimike</translation>
     </message>
     <message>
         <source>Subtitle</source>
-        <translation type="unfinished"></translation>
+        <translation>Jakson Kuvaus</translation>
     </message>
 </context>
 <context>
@@ -2893,11 +2939,11 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Failed to retrieve provider list</source>
-        <translation>Tarjoajan hakeminen epäonnistui</translation>
+        <translation type="obsolete">Tarjoajan hakeminen epäonnistui</translation>
     </message>
     <message>
         <source>You probably need to update XMLTV.</source>
-        <translation>XMLTV tarvitsee luultavasti päivittää.</translation>
+        <translation type="obsolete">XMLTV tarvitsee luultavasti päivittää.</translation>
     </message>
     <message>
         <source>Failed to retrieve channel information.</source>
@@ -2913,7 +2959,7 @@ Please check the terminal window for more information</source>
 .  You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>MythTV hakee kanavatietoja....
+        <translation type="obsolete">MythTV hakee kanavatietoja....
 Katso lisätietoja terminaalista.</translation>
     </message>
     <message>
@@ -2990,11 +3036,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Region</source>
-        <translation>Region</translation>
+        <translation type="obsolete">Region</translation>
     </message>
     <message>
         <source>Provider</source>
-        <translation>Provider</translation>
+        <translation type="obsolete">Provider</translation>
     </message>
     <message>
         <source>Channel frequency table</source>
@@ -3006,7 +3052,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>tv_grab_uk configuration</source>
-        <translation>tv_grap_uk asetukset</translation>
+        <translation type="obsolete">tv_grap_uk asetukset</translation>
     </message>
     <message>
         <source>Configuration will run in the terminal window</source>
@@ -6828,7 +6874,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>DBOX2 Streaming Port</source>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2 Lähetysportti</translation>
     </message>
     <message>
         <source>DBOX2 streaming port on your DBOX2.</source>
@@ -6836,7 +6882,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>DBOX2 HTTP Port</source>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2 HTTP-portti</translation>
     </message>
     <message>
         <source>DBOX2 http port on your DBOX2.</source>
@@ -6844,7 +6890,7 @@ Myth lopetetaan.</translation>
     </message>
     <message>
         <source>DBOX2 Host IP</source>
-        <translation type="unfinished"></translation>
+        <translation>DBOX2 Isännän IP</translation>
     </message>
     <message>
         <source>DBOX2 Host IP is the remote device.</source>
@@ -7090,27 +7136,27 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation type="unfinished"></translation>
+        <translation>Olemassaolevien asetusten, kuten sisääntulojen ja kanavaviritysten, muuttaminen ei ole suositeltavaa.</translation>
     </message>
     <message>
         <source>Channel Scanner</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanavaselain</translation>
     </message>
     <message>
         <source>Starts the channel scanner.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloittaa kanavien virittämisen.</translation>
     </message>
     <message>
         <source>Transport Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Lähetysvirtojen Muokkaus</translation>
     </message>
     <message>
         <source>Allows you to edit the transports directly</source>
-        <translation type="unfinished"></translation>
+        <translation>Voidaan muokata lähetysvirtoja käsin</translation>
     </message>
     <message>
         <source>This is rarely required unless you are using a satelite dish and must enter an initial frequency to for the channel scanner to try.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei tarvita yleensä kuin satelliittikanavien virittämiseen.</translation>
     </message>
     <message>
         <source>(5_1) Underscore</source>
@@ -7134,7 +7180,7 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Using hardware MPEG decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Käyttää laitteiston MPEG purkua</translation>
     </message>
     <message>
         <source>This reduces the complexity of the stream that MythTV records so that it can be fed directly to a hardware MPEG decoder.</source>
@@ -7142,67 +7188,67 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Specifically, MythTV will record only one audio and one subtitle stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV nauhoittaa vain yhden ääniraidan ja yhden tekstityskielen.</translation>
     </message>
     <message>
         <source>You will want to also set preferred languages in the frontend&apos;s Utilities/Setup:Setup:TV Settings:General(page 3).</source>
-        <translation type="unfinished"></translation>
+        <translation>Haluttu kieli  Mythfrontend:in asetuksista (Asetukset/TV:n Asetukset/Yleiset).</translation>
     </message>
     <message>
         <source>(Delete all capture cards)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Poista TV-korttien asetukset)</translation>
     </message>
     <message>
         <source>Monitor Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvasuhde</translation>
     </message>
     <message>
         <source>4:3</source>
-        <translation type="unfinished">4:3</translation>
+        <translation>4:3</translation>
     </message>
     <message>
         <source>16:9</source>
-        <translation type="unfinished">16:9</translation>
+        <translation>16:9</translation>
     </message>
     <message>
         <source>16:10</source>
-        <translation type="unfinished">16:10</translation>
+        <translation>16:10</translation>
     </message>
     <message>
         <source>Continue</source>
-        <translation type="unfinished"></translation>
+        <translation>Jatka</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistu</translation>
     </message>
     <message>
         <source>(Delete all video sources)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Poista kaikki sisääntuloasetukset)</translation>
     </message>
     <message>
         <source>Display volume level information on LCD display.</source>
-        <translation type="unfinished"></translation>
+        <translation>Näytä äänenvoimakkuustietoja LCD:ssä.</translation>
     </message>
     <message>
         <source>The aspect ratio of a Xinerama display can not be queried from the display, so you must specify it.</source>
-        <translation type="unfinished"></translation>
+        <translation>Xineraman kuvasuhdetta ei voitu tiedustella näytöltä, joten se on määriteltävä itse.</translation>
     </message>
     <message>
         <source>Minimal Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Pienimmät Päivitykset</translation>
     </message>
     <message>
         <source>Rename to Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Uudelleennimeä</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Poista</translation>
+        <translation>Poista</translation>
     </message>
     <message>
         <source>Existing Channel Treatment</source>
-        <translation type="unfinished"></translation>
+        <translation>Olemassaolevien Kanavien Kohtelu</translation>
     </message>
     <message>
         <source>How to treat existing channels.</source>
@@ -7210,35 +7256,35 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Analog V4L capture card</source>
-        <translation type="unfinished"></translation>
+        <translation>V4L-kortti</translation>
     </message>
     <message>
         <source>MPEG-2 encoder card (PVR-x50, PVR-500)</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG-2-kortti  (PVR-x50, PVR-500)</translation>
     </message>
     <message>
         <source>DVB DTV capture card (v3.x)</source>
-        <translation type="unfinished"></translation>
+        <translation>DVB DTV-kortti  (v3.x)</translation>
     </message>
     <message>
         <source>pcHDTV DTV capture card (w/V4L drivers)</source>
-        <translation type="unfinished"></translation>
+        <translation>pcHDTV DTV-kortti  (w/V4L drivers)</translation>
     </message>
     <message>
         <source>FireWire cable box</source>
-        <translation type="unfinished"></translation>
+        <translation>FireWire-kaapeliboksi</translation>
     </message>
     <message>
         <source>USB MPEG-4 encoder box (Plextor ConvertX, etc)</source>
-        <translation type="unfinished"></translation>
+        <translation>USB MPEG-4-boksi (Plextor ConvertX, etc)</translation>
     </message>
     <message>
         <source>DBox2 TCP/IP cable box</source>
-        <translation type="unfinished"></translation>
+        <translation>DBox2 TCP/IP-kaapeliboksi</translation>
     </message>
     <message>
         <source>Select the LNB Settings for DVB-S cards.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse LNB Asetukset DVB-S korteille.</translation>
     </message>
     <message>
         <source>For DVB-C and DVB-T you don&apos;t need to set these values.</source>
@@ -7246,7 +7292,7 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Starting LiveTV channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloitetaan LiveTV.</translation>
     </message>
     <message>
         <source>This is updated on every successful channel change.</source>
@@ -7254,7 +7300,7 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Number of threads</source>
-        <translation type="unfinished"></translation>
+        <translation>Säikeiden lukumäärä</translation>
     </message>
     <message>
         <source>Threads to use for software encoding.</source>
@@ -7266,23 +7312,23 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>MPEG-2 Parameters</source>
-        <translation type="unfinished">MPEG2:n Asetukset</translation>
+        <translation>MPEG-2:n Asetukset</translation>
     </message>
     <message>
         <source>Preferred MPEG2 Decoder</source>
-        <translation type="unfinished"></translation>
+        <translation>Haluttu MPEG2-Purkaja</translation>
     </message>
     <message>
         <source>libmpeg2</source>
-        <translation type="unfinished"></translation>
+        <translation>libmpeg2</translation>
     </message>
     <message>
         <source>Standard XvMC</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardi XvMC</translation>
     </message>
     <message>
         <source>VIA XvMC</source>
-        <translation type="unfinished"></translation>
+        <translation>VIA XvMC</translation>
     </message>
     <message>
         <source>Decoder to use to play back MPEG2 video.</source>
@@ -7306,11 +7352,11 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Cable HRC</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaapeli HRC</translation>
     </message>
     <message>
         <source>Frequency Table</source>
-        <translation type="unfinished"></translation>
+        <translation>Taajuusalue</translation>
     </message>
     <message>
         <source>Frequency table to use.</source>
@@ -7322,7 +7368,7 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>ATSC Modulation</source>
-        <translation type="unfinished"></translation>
+        <translation>ATSC-Modulaatio</translation>
     </message>
     <message>
         <source>ATSC modulation, 8-VSB, QAM-256, etc.</source>
@@ -7334,15 +7380,15 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Could not query inputs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sisääntuloja ei voitu tiedustella.</translation>
     </message>
     <message>
         <source>ERROR, Compile with V4L support to query inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>VIRHE, Käännä uudestaan käyttäen V4L-tukea</translation>
     </message>
     <message>
         <source>Subtype</source>
-        <translation type="unfinished"></translation>
+        <translation>Alatyyppi</translation>
     </message>
     <message>
         <source>Frontend ID</source>
@@ -7350,35 +7396,35 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Cable box model</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaapeliboksin tyyppi</translation>
     </message>
     <message>
         <source>Connection Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Yhteyden Tyyppi</translation>
     </message>
     <message>
         <source>IEEE-1394 Port</source>
-        <translation type="unfinished"></translation>
+        <translation>IEEE-1394-Portti</translation>
     </message>
     <message>
         <source>Node</source>
-        <translation type="unfinished"></translation>
+        <translation>Solmu</translation>
     </message>
     <message>
         <source>Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Nopeus</translation>
     </message>
     <message>
         <source>Could not open &apos;%1&apos; to probe its inputs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei saatu avattua &apos;%1&apos;:sta sisääntulojen koettamiseksi.</translation>
     </message>
     <message>
         <source>ERROR, Compile with DVB support to query inputs</source>
-        <translation type="unfinished"></translation>
+        <translation>VIRHE, Käännä uudestaan käyttäen DVB-tukea</translation>
     </message>
     <message>
         <source>Deinterlace algorithm.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lomituksen poistoalgoritmi.</translation>
     </message>
     <message>
         <source>&apos;Kernel&apos; requires SSE CPU support.</source>
@@ -7390,7 +7436,7 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>General OSD time-out (sec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Yleinen OSD:n näkyvyysaika (sekuntia)</translation>
     </message>
     <message>
         <source>How many seconds an on-screen display will be active after it is first activated.</source>
@@ -7398,7 +7444,7 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Program Info OSD time-out</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohjelmatietojen OSD:n näkyvyysaika (sekuntia)</translation>
     </message>
     <message>
         <source>How many seconds the on-screen display will display the program information after it is first displayed.</source>
@@ -7406,10 +7452,122 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Use line edit virtual keyboards</source>
-        <translation type="unfinished"></translation>
+        <translation>Käytä virtuaalista näppäimistöä</translation>
     </message>
     <message>
         <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 1 Start Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 1 start time. Set both start and end times to 00:00 to disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 1 End Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 1 end time. Set both start and end times to 00:00 to disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 2 Start Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 2 start time. Set both start and end times to 00:00 to disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 2 End Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 2 end time. Set both Start &amp; End times to 00:00 to disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Start Myth Frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mythwelcome will automatically start the mythfrontend if it is determined that it was not started to record a program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythWelcome Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Daily Wakeup/ShutDown Period 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Daily Wakeup/ShutDown Period 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>nvram-wakeup Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to set the wakeup time in the BIOS. See the README file for more examples.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>nvram-wakeup Restart Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. See the README file for more examples.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to reboot computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to shutdown computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run Xterm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to start an Xterm. Can be disabled by leaving this setting blank.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythShutdown Script Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Perform EIT Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is enabled the data in this source will be updated with listing data provided by the channels themselves &apos;over-the-air&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EIT Transport Timeout (mins)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8147,14 +8305,30 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Signal %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Signaali %1%</translation>
     </message>
     <message>
         <source>S/N %1 dB</source>
-        <translation type="unfinished"></translation>
+        <translation>Signaali/kohina %1 dB</translation>
     </message>
     <message>
         <source>Bit Errors %1</source>
+        <translation>Bitti-virheitä %1</translation>
+    </message>
+    <message>
+        <source>Seek:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reactivate</source>
+        <translation type="unfinished">Uudelleenaktivoi</translation>
+    </message>
+    <message>
+        <source>Use guide cancel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8341,11 +8515,11 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Are you sure you want to delete ALL video sources?</source>
-        <translation type="unfinished"></translation>
+        <translation>Poistetaanko varmasti kaikki kuvanlähteet?</translation>
     </message>
     <message>
         <source>Yes, delete video sources</source>
-        <translation type="unfinished"></translation>
+        <translation>Kyllä, poista kuvanlähteet</translation>
     </message>
 </context>
 <context>
@@ -8365,6 +8539,118 @@ Se ohitetaan</translation>
     <message>
         <source>Important</source>
         <translation>Tärkeä</translation>
+    </message>
+</context>
+<context>
+    <name>WelcomeDialog</name>
+    <message>
+        <source>Start Frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to server!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner %1 is recording:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner %1 is not recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no recordings currently taking place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no scheduled recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please Wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is about to start recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is busy recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is busy transcoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is busy flagging commercials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is busy grabbing EPG data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is locked by a user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is in a daily wakeup/shutdown period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is about to start a wakeup/shutdown period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown shortly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unlock Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run mythfilldatabase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished">Poistu</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Peruuta</translation>
+    </message>
+    <message>
+        <source>Cannot shutdown because MythTV is currently recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot shutdown because MythTV is about to start recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

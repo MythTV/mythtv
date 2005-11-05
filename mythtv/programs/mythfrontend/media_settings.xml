@@ -25,7 +25,7 @@
    <button>
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>
-       <text lang="ES">Configurar Videos</text>
+       <text lang="ES">Configurar Vídeos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="FR">Configuration de la vidéo</text>
        <text lang="DE">Videos</text>
@@ -122,6 +122,7 @@
      <text lang="ET">Raadio seaded</text>
      <text lang="NB">Radioinnstillinger</text>
      <text lang="DK">Radioindstillinger</text>
+     <text lang="ES">Configurar Radio</text>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>

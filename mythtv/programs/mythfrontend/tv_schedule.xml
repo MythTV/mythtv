@@ -21,7 +21,7 @@
       <text lang="NB">Programoversikt</text>
       <alttext>Guide</alttext>
       <alttext lang="FR">Grille</alttext>
-      <alttext lang="ES">Parilla</alttext>
+      <alttext lang="ES">Guía</alttext>
       <alttext lang="CA">Guia</alttext>
       <alttext lang="DE">EPG</alttext>
       <alttext lang="DK">Guide</alttext>
@@ -88,6 +88,7 @@
       <text lang="ET">Otsi sõnu</text>
       <text lang="NB">Søk etter ord</text>
       <text lang="DK">Søg ord</text>
+      <text lang="ES">Buscar Palabras</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoek</alttext>
@@ -98,6 +99,7 @@
       <alttext lang="ET">Sõnad</alttext>
       <alttext lang="NB">Søk</alttext>
       <alttext lang="DK">Søg</alttext>
+      <alttext lang="ES">Palabras</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -115,6 +117,7 @@
       <text lang="ET">Otsi nimekirju</text>
       <text lang="NB">Søk i lister</text>
       <text lang="DK">Søg i lister</text>
+      <text lang="ES">Buscar Listas</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="IS">Listar</alttext>
@@ -125,6 +128,7 @@
       <alttext lang="ET">Nimekirjad</alttext>
       <alttext lang="NB">Lister</alttext>
       <alttext lang="DK">Lister</alttext>
+      <alttext lang="ES">Listas</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -174,6 +178,7 @@
       <text lang="ET">Kohandatud salvestamine</text>
       <text lang="NB">Egendefinert opptak</text>
       <text lang="DK">Brugerstyret optagelse</text>
+      <text lang="ES">Avanzada</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 
@@ -195,6 +200,7 @@
       <text lang="SI">Ročno planiranje</text>
       <text lang="ET">Käsitsi salvestamine</text>
       <text lang="NB">Manuelt opptak</text>
+      <text lang="ES">Programación Manual</text>
       <alttext>Man. Sched.</alttext>
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
@@ -210,6 +216,7 @@
       <alttext lang="SI">Roč. snem.</alttext>
       <alttext lang="ET">Käsitsi</alttext>
       <alttext lang="NB">Manuelt</alttext>
+      <alttext lang="ES">Manual</alttext>
       <action>TV_MANUALSCHEDULE</action>
    </button>
 

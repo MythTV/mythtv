@@ -26,7 +26,7 @@
    <button>
      <type>VIDEO_BROWSER</type>
      <text>Watch Videos</text>
-     <text lang="ES">Ver vídeos</text>
+     <text lang="ES">Ver Vídeos</text>
      <text lang="CA">Veure vídeos</text>
      <text lang="DE">Videos ansehen</text>
      <text lang="DK">Gennemse film</text>
@@ -83,6 +83,7 @@
      <text lang="ET">Kuula raadiot</text>
      <text lang="NB">Hør på radio</text>
      <text lang="DK">Hør radio</text>
+     <text lang="ES">Escuchar Radio</text>
      <alttext lang="SV">Radio</alttext>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>

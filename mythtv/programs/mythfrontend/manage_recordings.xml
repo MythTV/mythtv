@@ -38,6 +38,7 @@
       <text lang="ET">Muuda prioriteete</text>
       <text lang="NB">Sett prioriteter</text>
       <text lang="DK">Prioriteter</text>
+      <text lang="ES">Fijar Prioridades</text>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -102,6 +103,7 @@
       <text lang="ET">Varem salvestatud</text>
       <text lang="NB">Tatt opp tidligere</text>
       <text lang="NB">Tidligere optagelser</text>
+      <text lang="ES">Grabados Anteriormente</text>
       <action>TV_PREVIOUS</action>
    </button>
 

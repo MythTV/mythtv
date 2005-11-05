@@ -15,6 +15,7 @@
       <text lang="ET">Muusikatööriistad</text>
       <text lang="NB">Musikkverktøy</text>
       <text lang="DK">Musik tools</text>
+      <text lang="ES">Gestionar Música</text>
       <action>PLUGIN mythmusic</action>
       <depends>mythmusic</depends>	
    </button>
@@ -22,7 +23,7 @@
    <button>
       <type>VIDEO_MANAGER</type>
       <text>Video Manager</text>
-      <text lang="ES">Gestionar vÃ­deos</text>
+      <text lang="ES">Gestionar vídeos</text>
       <text lang="CA">Gestionar vÃ­deos</text>
       <text lang="DK">Film opsætning</text>
       <text lang="DE">Videos verwalten</text>
@@ -49,6 +50,7 @@
       <text lang="FI">Muokkaa Näppäimiä</text>
       <text lang="DK">Ændre tasteinstillinger</text>
       <text lang="SV">Ändra knappar</text>
+      <text lang="ES">Editar Teclas</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>

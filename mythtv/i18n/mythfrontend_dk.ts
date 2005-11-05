@@ -213,7 +213,7 @@
     <name>CustomRecord</name>
     <message>
         <source>Power Search Recording Rule Editor</source>
-        <translation>Super Søgnings opsætning</translation>
+        <translation type="obsolete">Super Søgnings opsætning</translation>
     </message>
     <message>
         <source>Rule Name</source>
@@ -359,6 +359,26 @@
         <source>First Episodes (complete example for Data Direct)</source>
         <translation>Første episoder (komplet eksempel fra Data Direct)</translation>
     </message>
+    <message>
+        <source>All matches for a genre (Data Direct)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Person named in the credits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only on a specific station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Only on channels marked as favorites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Additional Tables</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DTVSignalMonitor</name>
@@ -437,6 +457,32 @@
     <message>
         <source>Fetching lineups from the Myth Plus service...</source>
         <translation>Henter lineups fra Myth Plus service...</translation>
+    </message>
+</context>
+<context>
+    <name>EITOnly_config</name>
+    <message>
+        <source>Use only the transmitted guide data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This will usually only work with ATSC or DVB channels,</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>and generally provides data only for the next few days.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>IgnoreSignalTimeout</name>
+    <message>
+        <source>Ignore Signal Timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2779,11 +2825,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Failed to retrieve provider list</source>
-        <translation>Kunne ikke modtage listen over udgivere</translation>
+        <translation type="obsolete">Kunne ikke modtage listen over udgivere</translation>
     </message>
     <message>
         <source>You probably need to update XMLTV.</source>
-        <translation>XMLTV behøver opdatering</translation>
+        <translation type="obsolete">XMLTV behøver opdatering</translation>
     </message>
     <message>
         <source>Failed to retrieve channel information.</source>
@@ -2800,7 +2846,7 @@ Check terminal viduet.</translation>
 .  You might want to check the output as it
 runs by switching to the terminal from which you started
 this program.</source>
-        <translation>Vent venligst mens MythTV henter listen over tilgængelige kanaler
+        <translation type="obsolete">Vent venligst mens MythTV henter listen over tilgængelige kanaler
 . Du kan se resultatet mens programmet kører
 ved st skifte tilbage til den terminal du startede
 programmet fra.</translation>
@@ -2876,11 +2922,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Region</source>
-        <translation>Region</translation>
+        <translation type="obsolete">Region</translation>
     </message>
     <message>
         <source>Provider</source>
-        <translation>Udgiver</translation>
+        <translation type="obsolete">Udgiver</translation>
     </message>
     <message>
         <source>Channel frequency table</source>
@@ -2892,7 +2938,7 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>tv_grab_uk configuration</source>
-        <translation>tv_grab_uk opsætning</translation>
+        <translation type="obsolete">tv_grab_uk opsætning</translation>
     </message>
     <message>
         <source>Configuration will run in the terminal window</source>
@@ -6892,6 +6938,118 @@ Myth will now exit.</source>
         <source>Allows you to use a virtual keyboard in Myth line edit boxes.  To use, hit OK/Select while a line edit is in focus.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Period 1 Start Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 1 start time. Set both start and end times to 00:00 to disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 1 End Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 1 end time. Set both start and end times to 00:00 to disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 2 Start Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 2 start time. Set both start and end times to 00:00 to disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 2 End Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period 2 end time. Set both Start &amp; End times to 00:00 to disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically Start Myth Frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mythwelcome will automatically start the mythfrontend if it is determined that it was not started to record a program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythWelcome Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Daily Wakeup/ShutDown Period 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Daily Wakeup/ShutDown Period 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>nvram-wakeup Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to set the wakeup time in the BIOS. See the README file for more examples.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>nvram-wakeup Restart Command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. See the README file for more examples.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to reboot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to reboot computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to shutdown computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run Xterm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to start an Xterm. Can be disabled by leaving this setting blank.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythShutdown Script Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Perform EIT Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If this is enabled the data in this source will be updated with listing data provided by the channels themselves &apos;over-the-air&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EIT Transport Timeout (mins)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7612,6 +7770,22 @@ Ikke flere oplysninger</translation>
         <source>Bit Errors %1</source>
         <translation>Bit fejl %1</translation>
     </message>
+    <message>
+        <source>Seek:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reactivate</source>
+        <translation type="unfinished">Genaktiver</translation>
+    </message>
+    <message>
+        <source>Use guide cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -7820,6 +7994,118 @@ Ikke flere oplysninger</translation>
     <message>
         <source>Important</source>
         <translation>Vigtig</translation>
+    </message>
+</context>
+<context>
+    <name>WelcomeDialog</name>
+    <message>
+        <source>Start Frontend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to server!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner %1 is recording:
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuner %1 is not recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no recordings currently taking place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There are no scheduled recordings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please Wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is about to start recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is busy recording.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is busy transcoding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is busy flagging commercials.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is busy grabbing EPG data.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is locked by a user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is in a daily wakeup/shutdown period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is about to start a wakeup/shutdown period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown shortly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unlock Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lock Shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Run mythfilldatabase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown Now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished">Afslut</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished">Afbryd</translation>
+    </message>
+    <message>
+        <source>Cannot shutdown because MythTV is currently recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot shutdown because MythTV is about to start recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

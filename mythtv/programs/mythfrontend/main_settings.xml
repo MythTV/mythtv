@@ -49,7 +49,8 @@
      <text>TV Settings</text>
      <text lang="DE">TV</text>
      <text lang="SV">TV</text>
-     <text lang="NL">TV</text>     
+     <text lang="NL">TV</text>    
+     <text lang="ES">TV</text>
      <text lang="FR">Configuration TV</text>
      <text lang="IS">Stillingar sjónvarps</text>
      <text lang="JA">TV設定</text>
@@ -77,6 +78,7 @@
      <text lang="ET">Andmekandja seaded</text>
      <text lang="NB">Media</text>
      <text lang="DK">Media</text>
+     <text lang="ES">Medios</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
    </button>
@@ -96,6 +98,7 @@
      <text lang="ET">Infokeskuse seaded</text>
      <text lang="NB">Informasjonssenter</text>
      <text lang="DK">Informationscenter</text>
+     <text lang="ES">Centro Información</text>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe</depends> 
    </button>
@@ -135,6 +138,7 @@
       <text lang="ET">Telefoni seaded</text>
       <text lang="NB">Telefon</text>
       <text lang="DK">Telefon</text>
+      <text lang="ES">Teléfono</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

@@ -37,6 +37,7 @@
      <text lang="ET">Meediakataloog</text>
      <text lang="NB">Mediebibliotek</text>
      <text lang="DK">Mediabibliotek</text>
+     <text lang="ES">Mediateca</text>
      <alttext lang="SV">Bibliotek</alttext>
      <alttext lang="ET">Kataloog</alttext>
      <action>MENU library.xml</action>
@@ -64,6 +65,7 @@
       <alttext lang="DE">Verwaltung</alttext>
       <alttext lang="SV">Hantera</alttext>
       <alttext lang="ET">Salvestused</alttext>
+      <alttext lang="ES">Programar</alttext>
       <action>MENU manage_recordings.xml</action>
    </button>
 
@@ -82,6 +84,8 @@
      <text lang="ET">Infokeskus</text>
      <text lang="NB">Informasjonssenter</text>
      <text lang="DK">Informationscenter</text>
+     <text lang="ES">Centro de Información</text>
+     <alttext lang="ES">Información</alttext>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
      <alttext lang="ET">Info</alttext>
@@ -103,6 +107,7 @@
      <text lang="ET">DVD ja CD</text>
      <text lang="NB">CD-/DVD-stasjoner</text>
      <text lang="DK">CD/DVD</text>
+     <text lang="ES">CD/DVD</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
@@ -111,7 +116,7 @@
      <type>MENU_UTILITIES_SETUP</type>
      <text>Utilities / Setup</text>
      <text lang="IT">Impostazioni</text>
-     <text lang="ES">Configurar</text>
+     <text lang="ES">Configuración</text>
      <text lang="CA">Configurar</text>
      <text lang="FR">Configuration</text>
      <text lang="DE">Zubehör / Konfiguration</text>

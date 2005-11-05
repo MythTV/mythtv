@@ -69,6 +69,7 @@
      <text lang="ET">Veebi seaded</text>
      <text lang="NB">Innstilinger for nettleser</text>
      <text lang="DK">Web instillinger</text>
+     <text lang="ES">Configurar Web</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -87,6 +88,7 @@
      <text lang="ET">Retseptide seaded</text>     
      <text lang="NB">Innstillinger for oppskrifter</text>
      <text lang="DK">Opskrifts indstillinger</text>
+     <text lang="ES">Configurar Recetas</text>
      <alttext lang="DE">Rezepte</alttext>
      <alttext lang="ET">Retseptid</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>

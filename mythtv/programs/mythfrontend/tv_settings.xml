@@ -107,8 +107,10 @@
       <text lang="ET">Salvestamisprioriteedid</text>
       <text lang="NB">Opptaksprioriteter</text>
       <text lang="DK">Optagelselssprioriteter</text>
+      <text lang="ES">Prioridades Grabación</text>
       <alttext lang="DE">Prioritäten</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
+      <alttext lang="ES">Prioridades</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

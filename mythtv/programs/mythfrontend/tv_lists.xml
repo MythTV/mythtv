@@ -15,6 +15,7 @@
       <text lang="ET">Uued pealkirjad</text>
       <text lang="NB">Nye titler</text>
       <text lang="DK">Nye titler</text>
+      <text lang="ES">Títulos Nuevos</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -33,6 +34,7 @@
       <text lang="ET">Filmid</text>
       <text lang="NB">Filmer</text>
       <text lang="DK">Film</text>
+      <text lang="ES">Películas</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -51,6 +53,7 @@
       <text lang="ET">Kategooriad</text>
       <text lang="NB">Kategories</text>
       <text lang="DK">Kategorier</text>
+      <text lang="ES">Categorías</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -69,6 +72,7 @@
       <text lang="ET">Kanalid</text>
       <text lang="NB">Kanaler</text>
       <text lang="DK">Kanaler</text>
+      <text lang="ES">Canales</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -87,6 +91,7 @@
       <text lang="ET">Aeg</text>
       <text lang="NB">Tid</text>
       <text lang="DK">Tid</text>
+      <text lang="ES">Hora</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 
