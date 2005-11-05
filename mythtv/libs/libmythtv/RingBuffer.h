@@ -37,7 +37,7 @@ class RingBuffer
     long long GetReadPosition(void);
     long long GetWritePosition(void);
 
-    void Reset(void);
+    void Reset(bool full = false);
 
     void StopReads(void);
     void StartReads(void);

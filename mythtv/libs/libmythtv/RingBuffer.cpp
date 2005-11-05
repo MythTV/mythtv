@@ -657,8 +657,7 @@ void RingBuffer::Start(void)
         StartupReadAheadThread();
 }
 
-//FIXME remove soon
-void RingBuffer::Reset(void)
+void RingBuffer::Reset(bool full)
 {
     wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
@@ -668,6 +667,9 @@ void RingBuffer::Reset(void)
 
     writepos = 0;
     readpos = 0;
+
+    if (full)
+        ResetReadAhead(0);
 
     pthread_rwlock_unlock(&rwlock);
 }

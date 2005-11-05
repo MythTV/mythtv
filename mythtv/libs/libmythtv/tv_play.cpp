@@ -5449,7 +5449,7 @@ void TV::PauseLiveTV(void)
 
     activerecorder->PauseRecorder();
     if (activerbuffer)
-        activerbuffer->Reset();
+        activerbuffer->Reset(true);
 
     osdlock.lock();
     lastSignalMsg.clear();
