@@ -52,6 +52,16 @@ bool setupTVs(bool ismaster, bool &error)
 
     if (ismaster)
     {
+        // Hack to make sure recorded.basename gets set if the user
+        // downgrades to a prior version and creates new entries
+        // without it.
+        if (!query.exec("UPDATE recorded SET basename = CONCAT(chanid, '_', "
+                        "DATE_FORMAT(starttime, '%Y%m%d%H%i00'), '_', "
+                        "DATE_FORMAT(endtime, '%Y%m%d%H%i00'), '.nuv') "
+                        "WHERE basename = '';"))
+            MythContext::DBError("Updating record basename",
+                                 query.lastQuery());
+
         // Hack to make sure record.station gets set if the user
         // downgrades to a prior version and creates new entries
         // without it.
