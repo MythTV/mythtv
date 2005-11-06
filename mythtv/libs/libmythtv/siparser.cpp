@@ -1958,11 +1958,9 @@ uint SIParser::ProcessDVBEventDescriptors(
 {
     QString bestLanguageSE   = "";
     uint    bestPrioritySE   = UINT_MAX;
-    bestDescriptorSE         = NULL;
 
     QString bestLanguageEE   = "";
     uint    bestPriorityEE   = UINT_MAX;
-    bestDescriptorsEE.clear();
 
     uint    descriptorTag    = data[0];
     uint    descriptorLength = data[1];
