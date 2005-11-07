@@ -4021,8 +4021,6 @@ void PlaybackBox::showRecGroupChanger(void)
 
     recGroupListBox->setFocus();
 
-    connect(recGroupLineEdit, SIGNAL(returnPressed()), recGroupPopup,
-            SLOT(accept()));
     connect(recGroupListBox, SIGNAL(accepted(int)), recGroupPopup,
             SLOT(accept()));
     connect(recGroupListBox, SIGNAL(currentChanged(QListBoxItem *)), this,
@@ -4064,8 +4062,6 @@ void PlaybackBox::showRecTitleChanger()
     recGroupOkButton->setText(tr("OK"));
     recGroupPopup->addWidget(recGroupOkButton);
 
-    connect(recGroupLineEdit, SIGNAL(returnPressed()), recGroupPopup, SLOT(accept()));
-    connect(recGroupLineEdit1, SIGNAL(returnPressed()), recGroupPopup, SLOT(accept()));
     connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
     int result = recGroupPopup->ExecPopup();
