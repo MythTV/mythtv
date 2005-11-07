@@ -108,7 +108,6 @@ TVRec::TVRec(int capturecardnum)
       transcodeFirst(false), earlyCommFlag(false), runJobOnHostOnly(false),
       audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
       overRecordCategory(""),
-      liveTVRingBufSize(0), liveTVRingBufFill(0), liveTVRingBufLoc(""),
       recprefix(""),
       // Configuration variables from setup rutines
       cardid(capturecardnum), ispip(false),
@@ -220,9 +219,6 @@ bool TVRec::Init(void)
     overRecordSecNrml = gContext->GetNumSetting("RecordOverTime");
     overRecordSecCat  = gContext->GetNumSetting("CategoryOverTime") * 60;
     overRecordCategory= gContext->GetSetting("OverTimeCategory");
-    liveTVRingBufSize = gContext->GetNumSetting("BufferSize", 5);
-    liveTVRingBufFill = gContext->GetNumSetting("MaxBufferFill", 50);
-    liveTVRingBufLoc  = gContext->GetSetting("LiveBufferDir");
     recprefix         = gContext->GetSetting("RecordFilePrefix");
 
     pthread_create(&event_thread, NULL, EventThread, this);

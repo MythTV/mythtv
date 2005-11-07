@@ -341,9 +341,6 @@ class TVRec : public QObject
     int     overRecordSecNrml;
     int     overRecordSecCat;
     QString overRecordCategory;
-    int     liveTVRingBufSize;
-    int     liveTVRingBufFill;
-    QString liveTVRingBufLoc;
     QString recprefix;
 
     // Configuration variables from setup routines

@@ -73,17 +73,6 @@ static HostLineEdit *RecordFilePrefix()
     return gc;
 };
 
-static HostLineEdit *LiveBufferPrefix()
-{
-    HostLineEdit *gc = new HostLineEdit("LiveBufferDir");
-    gc->setLabel(QObject::tr("Directory to hold the Live-TV buffers"));
-    gc->setValue("/mnt/store/");
-    gc->setHelpText(QObject::tr("All Live-TV buffers will get stored in this "
-                    "directory. These buffers are used to allow you to pause, "
-                    "fast forward and rewind through live TV."));
-    return gc;
-};
-
 static GlobalComboBox *TVFormat()
 {
     GlobalComboBox *gc = new GlobalComboBox("TVFormat");
@@ -140,26 +129,6 @@ static GlobalComboBox *FreqTable()
     gc->setHelpText(QObject::tr("Select the appropriate frequency table for "
                     "your system.  If you have an antenna, use a \"-bcast\" "
                     "frequency."));
-    return gc;
-};
-
-static HostSlider *BufferSize()
-{
-    HostSlider* gc = new HostSlider("BufferSize", 1, 100, 1);
-    gc->setLabel(QObject::tr("Live TV buffer (GB)"));
-    gc->setValue(5);
-    gc->setHelpText(QObject::tr("How large the live TV buffer is allowed to "
-                    "grow."));
-    return gc;
-};
-
-static HostSlider *MaxBufferFill()
-{
-    HostSlider *gc = new HostSlider("MaxBufferFill", 1, 100, 1);
-    gc->setLabel(QObject::tr("Minimum free Live TV buffer (MB)"));
-    gc->setValue(50);
-    gc->setHelpText(QObject::tr("How full the live TV buffer is allowed to "
-                    "grow before forcing an unpause."));
     return gc;
 };
 
@@ -648,9 +617,6 @@ BackendSettings::BackendSettings() {
     VerticalConfigurationGroup* group1 = new VerticalConfigurationGroup(false);
     group1->setLabel(QObject::tr("Host-specific Backend Setup"));
     group1->addChild(RecordFilePrefix());
-    group1->addChild(LiveBufferPrefix());
-    group1->addChild(BufferSize());
-    group1->addChild(MaxBufferFill());
     group1->addChild(SaveTranscoding());
     addChild(group1);
 
