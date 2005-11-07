@@ -9,8 +9,6 @@
 class DVBChannel;
 
 typedef QMap<uint,int> FilterMap;
-typedef QMap<uint,uint> RemainderMap;
-typedef QMap<uint,unsigned char*> BufferMap;
 
 class DVBSignalMonitor: public DTVSignalMonitor
 {
@@ -33,7 +31,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
     void StatusBitErrorRate(const SignalMonitorValue&);
     void StatusUncorrectedBlocks(const SignalMonitorValue&);
 
-  private:
+  protected:
     DVBSignalMonitor(void);
     DVBSignalMonitor(const DVBSignalMonitor&);
 
@@ -47,7 +45,7 @@ class DVBSignalMonitor: public DTVSignalMonitor
 
     int GetDVBCardNum(void) const;
 
-  private:
+  protected:
     SignalMonitorValue signalToNoise;
     SignalMonitorValue bitErrorRate;
     SignalMonitorValue uncorrectedBlocks;
@@ -56,8 +54,6 @@ class DVBSignalMonitor: public DTVSignalMonitor
     pthread_t          table_monitor_thread;
 
     FilterMap          filters; ///< PID filters for table monitoring
-    BufferMap          buffers; ///< Stream buffers for table monitoring
-    RemainderMap       remainders;///< buffers remainders for table monitoring
 };
 
 #endif // DVBSIGNALMONITOR_H

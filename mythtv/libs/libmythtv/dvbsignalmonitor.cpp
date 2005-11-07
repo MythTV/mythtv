@@ -179,25 +179,7 @@ bool DVBSignalMonitor::AddPIDFilter(uint pid)
         return false;
     }
 
-    unsigned char *buffer = new unsigned char[buffer_size];
-    if (buffer)
-    {
-        bzero(buffer, buffer_size);
-        filters[pid]    = mux_fd;        
-        buffers[pid]    = buffer;
-        remainders[pid] = 0;
-    }
-    else
-    {
-        VERBOSE(VB_IMPORTANT,
-                QString("Failed to allocate buffer for pes filter (pid %1)")
-                .arg(pid));
-        if (close(mux_fd)<0)
-            VERBOSE(VB_IMPORTANT, QString("Failed to close mux (pid %1)")
-                    .arg(pid));
- 
-        return false;
-    }
+    filters[pid] = mux_fd;
 
     return true;
 }
@@ -214,13 +196,6 @@ bool DVBSignalMonitor::RemovePIDFilter(uint pid)
     if (err < 0)
         VERBOSE(VB_IMPORTANT, QString("Failed to close mux (pid 0x%1)")
                 .arg(pid, 0, 16));
-
-    unsigned char *buffer = buffers[pid];
-    buffers.erase(buffers.find(pid));
-    if (buffer)
-        delete[] buffer;
-
-    remainders.erase(remainders.find(pid));
 
     return err >= 0;
 }
