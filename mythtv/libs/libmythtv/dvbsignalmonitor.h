@@ -40,16 +40,20 @@ class DVBSignalMonitor: public DTVSignalMonitor
 
     static void *TableMonitorThread(void *param);
     void RunTableMonitor(void);
+    void RunTableMonitorTS(void);
+    void RunTableMonitorSR(void);
     bool AddPIDFilter(uint pid);
     bool RemovePIDFilter(uint pid);
 
     int GetDVBCardNum(void) const;
 
+    bool SupportsTSMonitoring(void);
   protected:
     SignalMonitorValue signalToNoise;
     SignalMonitorValue bitErrorRate;
     SignalMonitorValue uncorrectedBlocks;
 
+    bool               useSectionReader;
     bool               dtvMonitorRunning;
     pthread_t          table_monitor_thread;
 
