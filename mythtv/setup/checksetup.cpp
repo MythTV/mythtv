@@ -9,6 +9,7 @@
 #include <qdir.h>
 #include "libmyth/mythdbcon.h"
 #include "libmyth/mythcontext.h"
+#include "libmyth/util.h"
 
 
 static bool checkPath(QString path, QString *probs)
@@ -39,8 +40,85 @@ static bool checkPath(QString path, QString *probs)
 }
 
 
+bool checkBufferSize(QString path, QString *probs)
+{
+    bool problemFound = false;
+
+    MSqlQuery *query = new MSqlQuery(MSqlQuery::InitCon());
+
+    query->prepare("SELECT data FROM settings"
+                   " WHERE value='BufferSize' AND hostname = :HOSTNAME;");
+    query->bindValue(":HOSTNAME", gContext->GetHostName());
+    if (!query->exec() || !query->isActive())
+    {
+        MythContext::DBError("checkBufferSize", *query);
+        return false;
+    }
+
+    if (query->size())
+    {
+        query->first();
+        int bufferSize = query->value(0).toInt();
+
+        // Count the number of cards (each of which may create a buffer file).
+        // Note there might be a better way to do this somewhere in libmythtv?
+
+        int numCards = 0;
+        MSqlQuery *cardsQuery = new MSqlQuery(MSqlQuery::InitCon());
+
+        cardsQuery->prepare("SELECT cardinputid FROM cardinput;");
+
+        if (!cardsQuery->exec() || !cardsQuery->isActive())
+        {
+            MythContext::DBError("checkBufferSize", *cardsQuery);
+            delete query;
+            return false;
+        }
+
+        while (cardsQuery->next())
+            ++numCards;
+
+        // How much space on volume? Enough for bufferSize * numCards?
+
+        long long free, total, used;
+
+        free = getDiskSpace(path, total, used);
+
+        // Note that free and total are in KB, not MB or GB.
+        if (free > -1 && bufferSize * 1024 * 1024 * numCards > free)
+        {
+            probs->append(QObject::tr("Not enough space for buffers on disk"));
+            probs->append(QString(" %1 - %2 ").arg(path).arg(numCards));
+            probs->append(QObject::tr("cards at"));
+            probs->append(QString(" %1 GB ").arg(bufferSize));
+            probs->append(QObject::tr("each is larger than"));
+            probs->append(QString(" %1 MB ").arg(free/1024));
+            probs->append(QObject::tr("free space"));
+            probs->append("\n");
+
+            if (bufferSize * 1024 * 1024 * numCards > total)
+            {
+                probs->append(QObject::tr("It is also larger than the total drive size of"));
+                probs->append(QString(" %1 GB").arg(total/1024/1024));
+                probs->append("\n");
+            }
+
+            problemFound = true;
+        }
+
+        delete cardsQuery;
+    }
+    else
+        VERBOSE(VB_GENERAL, QString("BufferSize is not set?"));
+
+    delete query;
+
+    return problemFound;
+}
+
+
 // Do the recording and Live TV filesystem paths exist? Are they writable?
-// Note that this should be checking by hostname, but doesn't yet.
+// Is the Live TV filesystem large enough?
 
 bool checkStoragePaths(QString *probs)
 {
@@ -81,9 +159,16 @@ bool checkStoragePaths(QString *probs)
     if (query2->size())
     {
         query2->first();
-        if (query->value(0).toString() != query2->value(0).toString())
-            if (checkPath(query2->value(0).toString(), probs))
+
+        QString bufferPath = query2->value(0).toString();
+
+        // Only check this path if it is different to the recordings path:
+        if (query->value(0).toString() != bufferPath)
+            if (checkPath(bufferPath, probs))
                 problemFound = true;
+
+        if (checkBufferSize(bufferPath, probs))
+            problemFound = true;
     }
     else
         VERBOSE(VB_GENERAL, QString("LiveBufferDir is not set?"));
