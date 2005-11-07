@@ -758,39 +758,60 @@ class SRRecGroup: public SRSelectSetting
 
         virtual void fillSelections()
         {
+            QStringList groups;
+            QStringList::Iterator it;
+            QString value, dispValue;
+            bool foundDefault = false;
+
             addButton(QString("[ %1 ]").arg(QObject::tr("Create a new recording group")), "__NEW_GROUP__");
             connect(selectItem, SIGNAL(buttonPressed(ManagedListItem*, ManagedListItem*)), this,
                                        SLOT(showNewRecGroup()));
 
-            addSelection(QString(QObject::tr("Store in the \"%1\" recording group"))
-                         .arg(QObject::tr("Default")), "Default");
             MSqlQuery query(MSqlQuery::InitCon());
-            QString thequery = QString("SELECT DISTINCT recgroup from recorded "
-                                       "WHERE recgroup <> 'Default'");
-            query.prepare(thequery);
+            query.prepare("SELECT DISTINCT recgroup FROM recorded");
 
             if (query.exec() && query.isActive() && query.size() > 0)
+                while (query.next())
+                {
+                    value = QString::fromUtf8(query.value(0).toString());
+                    groups += value;
+
+                    if (value == "Default")
+                        foundDefault = true;
+                }
+
+
+            query.prepare("SELECT DISTINCT recgroup FROM record");
+
+            if (query.exec() && query.isActive() && query.size() > 0)
+                while (query.next())
+                {
+                    value = QString::fromUtf8(query.value(0).toString());
+                    groups += value;
+
+                    if (value == "Default")
+                        foundDefault = true;
+                }
+
+            groups.sort();
+            for (it = groups.begin(); it != groups.end(); ++it)
             {
-                while (query.next())
+                if (!foundDefault && *it > QObject::tr("Default"))
                 {
-                    QString recgroup = QString::fromUtf8(query.value(0).toString());
-
-                    addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(recgroup),
-                                 recgroup);
+                    addSelection(QObject::tr(
+                                 "Store in the \"%1\" recording group")
+                                 .arg(QObject::tr("Default")), "Default");
+                    foundDefault = true;
                 }
+
+                if (*it == "Default")
+                    dispValue = QObject::tr("Default");
+                else
+                    dispValue = *it;
+
+                addSelection(QObject::tr("Store in the \"%1\" recording group")
+                                         .arg(dispValue), *it);
             }
-
-            thequery = QString("SELECT DISTINCT recgroup from record "
-                               "WHERE recgroup <> 'Default'");
-            query.prepare(thequery);
-
-            if (query.exec() && query.isActive() && query.size() > 0)
-                while (query.next())
-                {
-                    QString recgroup = QString::fromUtf8(query.value(0).toString());
-                    addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(recgroup),
-                                 recgroup);
-                }
 
         }
 
