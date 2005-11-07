@@ -4015,6 +4015,10 @@ void PlaybackBox::showRecGroupChanger(void)
         }
     }
 
+    recGroupOkButton = new MythPushButton(recGroupPopup);
+    recGroupOkButton->setText(tr("OK"));
+    recGroupPopup->addWidget(recGroupOkButton);
+
     recGroupListBox->setFocus();
 
     connect(recGroupLineEdit, SIGNAL(returnPressed()), recGroupPopup,
@@ -4023,6 +4027,7 @@ void PlaybackBox::showRecGroupChanger(void)
             SLOT(accept()));
     connect(recGroupListBox, SIGNAL(currentChanged(QListBoxItem *)), this,
             SLOT(recGroupChangerListBoxChanged()));
+    connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
     int result = recGroupPopup->ExecPopup();
 
@@ -4055,8 +4060,13 @@ void PlaybackBox::showRecTitleChanger()
 
     recGroupLineEdit->setFocus();
 
+    recGroupOkButton = new MythPushButton(recGroupPopup);
+    recGroupOkButton->setText(tr("OK"));
+    recGroupPopup->addWidget(recGroupOkButton);
+
     connect(recGroupLineEdit, SIGNAL(returnPressed()), recGroupPopup, SLOT(accept()));
     connect(recGroupLineEdit1, SIGNAL(returnPressed()), recGroupPopup, SLOT(accept()));
+    connect(recGroupOkButton, SIGNAL(clicked()), recGroupPopup, SLOT(accept()));
 
     int result = recGroupPopup->ExecPopup();
 
