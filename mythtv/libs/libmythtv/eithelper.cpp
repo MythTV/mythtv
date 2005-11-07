@@ -203,7 +203,8 @@ static uint delete_invalid_programs_in_db(
         "FROM program "
         "WHERE chanid=:CHANID AND "
         "      ( ( starttime>=:STIME AND starttime<:ETIME ) AND NOT "
-        "        ( starttime=:STIME AND endtime=:ETIME AND title=:TITLE ) );");
+        "        ( starttime=:STIME AND endtime=:ETIME AND title=:TITLE ) AND "
+        "          manualid=0 );");
 
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STIME", event.StartTime.
