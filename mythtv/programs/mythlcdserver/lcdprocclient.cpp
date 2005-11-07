@@ -369,36 +369,17 @@ void LCDProcClient::serverSendingData()
             it++; // the string "protocol"
             it++; // protocol version
             QString protocol_version = *it;
-	    setVersion (server_version, protocol_version);
+            setVersion (server_version, protocol_version);
             it++; // the string "lcd"
             it++; // the string "wid";
             it++; // Ah, the LCD width
-            
-            // default priorities
-            prioTop = 64;
-            prioUrgent = 128;
-            prioHigh = 240;
-            prioMedium = 248;
-            prioLow = 252;
-            prioOff = 255;
-            if (protocolVersion == "0.3") {
-                if (serverVersion.startsWith ("CVS-current")) {
-                    // Latest CVS versions of LCDd has priorities switched
-                    prioTop = 252;
-                    prioUrgent = 248;
-                    prioHigh = 240;
-                    prioMedium = 128;
-                    prioLow = 64;
-                    prioOff = 0;
-                }
-            }
 
             tempString = *it;
             setWidth(tempString.toInt());
 
             it++; // the string "hgt"
             it++; // the LCD height
-            
+
             tempString = *it;
             setHeight(tempString.toInt());
             it++; // the string "cellwid"
@@ -659,15 +640,11 @@ void LCDProcClient::setVersion(const QString &sversion, const QString &pversion)
 
     // the pVersion number is used internally to designate which protocol
     // version LCDd is using:
-    if (protocolVersion.find(QRegExp("0[.]4"), 0) != -1) {
-	pVersion = LCD_VERSION_4;
-        prioTop = 64;
-        prioUrgent = 128;
-        prioHigh = 240;
-        prioMedium = 248;
-        prioLow = 252;
-        prioOff = 0;
-    } else {
+
+    if (serverVersion.startsWith ("CVS-current") ||
+            serverVersion.startsWith ("0.5dev"))
+    {
+        // Latest CVS versions of LCDd has priorities switched
         pVersion = LCD_VERSION_5;
         prioTop = 252;
         prioUrgent = 248;
@@ -675,6 +652,16 @@ void LCDProcClient::setVersion(const QString &sversion, const QString &pversion)
         prioMedium = 128;
         prioLow = 64;
         prioOff = 0;
+    }
+    else
+    {
+        pVersion = LCD_VERSION_4;
+        prioTop = 64;
+        prioUrgent = 128;
+        prioHigh = 240;
+        prioMedium = 248;
+        prioLow = 252;
+        prioOff = 255;
     }
 }
 
