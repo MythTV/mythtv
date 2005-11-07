@@ -159,7 +159,8 @@ void TV::InitKeys(void)
 /*
   keys already used:
 
-  Playback: ABCDEFGH JK  NOPQRSTUVWXYZ 0123456789
+  Global:           I   M              0123456789
+  Playback: ABCDEFGH JK  NOPQRSTUVWXYZ
   Frontend:    D          OP R  U  X   01 3   7 9
   Editing:    C E   I       Q        Z
 
@@ -167,11 +168,15 @@ void TV::InitKeys(void)
   Frontend: <>,.?/
   Editing:  <>,.
 
-  Playback: PgDown, PgUp, Right, Left, Home, End, Up, Down, Backspace,
-  Frontend:               Right, Left, Home, End
-  Editing:  PgDown, PgUp,              Home, End
+  Global:   PgDown, PgUp,  Right, Left, Home, End, Up, Down, 
+  Playback: PgDown, PgUp,  Right, Left, Home, End, Up, Down, Backspace,
+  Frontend:                Right, Left, Home, End
+  Editing:  PgDown, PgUp,               Home, End
 
-  Playback: Ctrl-B,F7,F8,F9,F10,F11
+  Global:   Return, Enter, Space, Esc
+
+  Global:          F1,
+  Playback: Ctrl-B,   F7,F8,F9,F10,F11
  */
 }
 
@@ -3804,30 +3809,6 @@ void TV::StopEmbeddingOutput(void)
     embedWinID = 0;
 }
 
-uint get_chanid(uint cardid, const QString &inputname, const QString &channum)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT chanid "
-        "FROM channel, capturecard, cardinput "
-        "WHERE channel.sourceid    = cardinput.sourceid AND "
-        "      capturecard.cardid  = cardinput.cardid   AND "
-        "      capturecard.cardid  = :CARDID            AND "
-        "      cardinput.inputname = :INPUTNAME         AND "
-        "      channel.channum     = :CHANNUM");
-    query.bindValue(":CARDID",    cardid);
-    query.bindValue(":INPUTNAME", inputname);
-    query.bindValue(":CARDNUM",   channum);
-
-    uint chanid = 0;
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("get_chanid", query);
-    else if (query.next())
-        chanid = query.value(0).toUInt();
-
-    return chanid;
-}
-
 void TV::doLoadMenu(void)
 {
     if (!activerecorder)
@@ -3846,12 +3827,11 @@ void TV::doLoadMenu(void)
         mwnd->setFixedSize(saved_gui_bounds.size());
     }
 
-    // Get the chanid of the current channel
-    QString inputname;
-    activerecorder->GetInputName(inputname);
-    QString channum = activerecorder->GetCurrentChannel();
-    uint    cardid  = activerecorder->GetRecorderNumber();
-    uint    chanid  = get_chanid(cardid, inputname, channum);
+    // Collect channel info
+    InfoMap infoMap;
+    GetChannelInfo(activerecorder, infoMap);
+    uint    chanid  = infoMap["chanid"].toUInt();
+    QString channum = infoMap["channum"];
 
     // See if we can provide a channel preview in EPG
     bool allowsecondary = true;
