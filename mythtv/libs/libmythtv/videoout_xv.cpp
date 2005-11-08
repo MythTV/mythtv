@@ -386,6 +386,9 @@ int VideoOutputXv::GetRefreshRate(void)
  */
 void VideoOutputXv::ResizeForVideo(uint width, uint height)
 {
+    if (width == 1920 && height == 1088)
+        height = 1080; // ATSC 1920x1080
+
     if (display_res && display_res->SwitchToVideo(width, height))
     {
         // Switching to custom display resolution succeeded
