@@ -88,7 +88,9 @@ bool ThreadedFileWriter::Open()
     }
     else
     {
-        buf = new char[TFW_DEF_BUF_SIZE + 20];
+        buf = new char[TFW_DEF_BUF_SIZE + 1024];
+        bzero(buf, TFW_DEF_BUF_SIZE + 64);
+
         tfw_buf_size = TFW_DEF_BUF_SIZE;
         tfw_min_write_size = TFW_MIN_WRITE_SIZE;
         pthread_create(&writer, NULL, boot_writer, this);
@@ -211,7 +213,8 @@ void ThreadedFileWriter::SetWriteBufferSize(int newSize)
     buflock.lock();
     delete [] buf;
     rpos = wpos = 0;
-    buf = new char[newSize + 20];
+    buf = new char[newSize + 1024];
+    bzero(buf, newSize + 64);
     tfw_buf_size = newSize;
     buflock.unlock();
 }
