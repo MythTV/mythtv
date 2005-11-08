@@ -10,7 +10,7 @@
       <text lang="DK">Generelle indstillinger</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Configurações Gerais</text>
-      <text lang="SV">Generella inställningar</text>
+      <text lang="SV">Generellt</text>
       <text lang="FR">Configuration générale</text>
       <text lang="JA">全般設定</text>
       <text lang="FI">Yleiset Asetukset</text>
@@ -28,7 +28,7 @@
       <text lang="DK">Afspiller-indstillinger</text>
       <text lang="NL">Afspelen</text>
       <text lang="PT">Configurações de Leitura</text>
-      <text lang="SV">Inställningar för avspelning</text>
+      <text lang="SV">Uppspelning</text>
       <text lang="FR">Configuration du lecteur</text>
       <text lang="JA">プレイヤー設定</text>
       <text lang="FI">Soittoasetukset</text>
@@ -42,7 +42,7 @@
       <text lang="DE">CD Import</text>
       <text lang="PT">Configurações de Cópia de CD</text>
       <text lang="DK">Kopierings-indstillinger</text>
-      <text lang="SV">Inställningar för kopiering</text>
+      <text lang="SV">Kopiering</text>
       <text lang="CA">Configuració de volcat</text>
       <text lang="ES">Configuració del riper</text>
       <text lang="FR">Configuration de l'extraction</text>
@@ -51,4 +51,5 @@
       <text lang="SI">Nastavitve ripanja</text>
       <action>MUSIC_SET_RIPPER</action>
    </button>
+
 </mythmenu>

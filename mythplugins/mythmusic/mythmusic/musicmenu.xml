@@ -18,7 +18,7 @@
       <action>MUSIC_PLAY</action>
    </button>
 
-      <button>
+   <button>
       <type>MUSIC_PLAYLIST</type>
       <text>Select Music</text>
       <text lang="IT">Seleziona brani musicali</text>
@@ -39,7 +39,7 @@
    <button>
       <type>MUSIC_RIP</type>
       <text>Import CD</text>
-     <text lang="IT">Importa un CD</text>
+      <text lang="IT">Importa un CD</text>
       <text lang="ES">Importar CD</text>
       <text lang="CA">Importar CD</text>
       <text lang="DE">CD importieren</text>
