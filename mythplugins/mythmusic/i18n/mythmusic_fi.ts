@@ -2,10 +2,6 @@
 <context>
     <name>DatabaseBox</name>
     <message>
-        <source>Select music to be played:</source>
-        <translation type="obsolete">Välj musik som skall spelas:</translation>
-    </message>
-    <message>
         <source>Active Play Queue</source>
         <translation>Aktiivinen Soittojono</translation>
     </message>
@@ -174,117 +170,6 @@
     </message>
 </context>
 <context>
-    <name>PlaybackBox</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">Muokkaa Soittolistaa</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Visualisoi</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Muokkaa Soittolistaa</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Visualisoi</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Satunnaist: Älykäs</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Satunnaist: Älykäs</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Satunnaist: Joku</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Satunnaist: Joku</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Satunnaist: Ei Mitään</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Satunnaist: Ei Mitään</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Toista: Kaikki</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Toista: Kaikki</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Toista: Kappale</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Toista: Kappale</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Toista: Ei Mitään</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Toista: Ei Mitään</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">soittolistan juuri</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Soittaa musiikkivirtaa.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Puskuroi musiikkivirtaa.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Musiikkivirta tauotettu.</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">kan</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Virhe ulostulossa.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Musiikkivirta lopetettu.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Musiikkivirta soitettu loppuun.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Purkuvirhe.</translation>
-    </message>
-</context>
-<context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
@@ -418,6 +303,14 @@
         <source>Tracks from current Year</source>
         <translation>Tämän Vuoden Kappaleet</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -468,12 +361,6 @@
     <message>
         <source>Tree Sorting</source>
         <translation>Puun Järjestäminen</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="obsolete">Den ordning som trädet för musikval sorteras i. Möjliga värden är:
-* Mellanslagsseparerad lista med &apos;genre&apos;, &apos;artist&apos;, &apos;album&apos; och &apos;title&apos;
-* &apos;directory&apos; (=katalog), vilket betyder att trädet speglar den faktiska katalogstrukturen.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -542,10 +429,6 @@
     <message>
         <source>Token separator</source>
         <translation>Erotusmerkki</translation>
-    </message>
-    <message>
-        <source> - </source>
-        <translation>-</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -776,26 +659,6 @@
         <translation>Päivitetään musiikkitietokantaa</translation>
     </message>
     <message>
-        <source>music database</source>
-        <translation type="obsolete">musikdatabas</translation>
-    </message>
-    <message>
-        <source>cd ripper</source>
-        <translation type="obsolete">cd-kopierare</translation>
-    </message>
-    <message>
-        <source>
-
-You have no MythMusic tables in your database.</source>
-        <translation type="obsolete">
-
-Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
-    </message>
-    <message>
-        <source>OK, I&apos;ll read the documentation</source>
-        <translation type="obsolete">OK, jag skall läsa dokumentationen</translation>
-    </message>
-    <message>
         <source>Unknown Artist</source>
         <translation>Tuntematon Esittäjä</translation>
     </message>
@@ -828,16 +691,8 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
         <translation>Puuttuva tietokannan alkio: %1</translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation>~</translation>
-    </message>
-    <message>
         <source>Ooops</source>
         <translation>Hupsis</translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
-        <translation>%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -846,10 +701,6 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     <message>
         <source>oops</source>
         <translation>hupsista</translation>
-    </message>
-    <message>
-        <source>,%1</source>
-        <translation>,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -888,10 +739,6 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
         <translation>Valittuna MP3 pakkaaja käyttää vaihtuvaa bittitasoa muilla paitsi alhaisella laadulla. Ogg -pakkaaja käyttää aina vaihtuvaa bittitasoa.</translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation>Albumikuva</translation>
-    </message>
-    <message>
         <source>CD Ripper Settings (part 2)</source>
         <translation>CD-tuontiasetukset (osa 2)</translation>
     </message>
@@ -906,10 +753,6 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     <message>
         <source>CD-Writer Device</source>
         <translation>CD-polttolaite</translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation>Valitaan SCSI-laite CD:n polttoon</translation>
     </message>
     <message>
         <source>Disk Size</source>
@@ -938,26 +781,6 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
     <message>
         <source>Auto</source>
         <translation>Automaattinen</translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation>1x</translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation>2x</translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation>4x</translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation>8x</translation>
-    </message>
-    <message>
-        <source>16x</source>
-        <translation>16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -1000,20 +823,32 @@ Du har inga tabeller för Musikspelaren (MythMusic) i din databas.</translation>
         <translation>?</translation>
     </message>
     <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="obsolete">Kuinka musiikkipuu järjestetään. Voidaan antaa välilyönnillä erotettuja termejä kuten musiikkilaji, esittäjä, albumi ja nimike tai avainsana &apos;directory&apos; osoittamaan, että puu on sama kuin kansion sisältö.</translation>
-    </message>
-    <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation>CD: %1 ~ %2 - %3</translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation>Kappale %1</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation>Musiikkitiedostojen järjestämistapa. Voidaan käyttää välilyönnillä erotettuja arvoja, kuten &quot;genre&quot;, &quot;splitartist&quot;, &quot;artist&quot;, &quot;album&quot;, &quot;title&quot; tai &quot;directory&quot; osoittamaan sitä, että käytetään tiedostojärjestelmän näkemää tapaa.</translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

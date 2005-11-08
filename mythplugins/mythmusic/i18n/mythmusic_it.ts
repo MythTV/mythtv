@@ -2,10 +2,6 @@
 <context>
     <name>DatabaseBox</name>
     <message>
-        <source>Select music to be played:</source>
-        <translation type="obsolete">Seleziona il brano musicale da ascoltare:</translation>
-    </message>
-    <message>
         <source>Copy To New Playlist</source>
         <translation>Copia in una nuova Playlist</translation>
     </message>
@@ -174,117 +170,6 @@
     </message>
 </context>
 <context>
-    <name>PlaybackBox</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">Modifica la Playlist</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Visualizza</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Ripetizione: Traccia</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Ripetizione: Tutto</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Esecuzione brano.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Buffering del brano.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Brano in pausa.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Errore di Output.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Brano fermato.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Esecuzione terminata.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Errore di decodifica.</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Ordine: No</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Ordine: No</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Ripeti: Tutti</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Ripeti: Traccia</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Ripeti: No</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Ripeti: No</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Modifica Playlist</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Visualizza</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Ordine: Furbo</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Ordine: Furbo</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Ordine: Casuale</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Ordine: Casuale</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">Radice della Playlist</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">ch</translation>
-    </message>
-</context>
-<context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
@@ -418,6 +303,14 @@
         <source>Tracks from current Year</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -543,10 +436,6 @@
     </message>
     <message>
         <source>Token separator</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> - </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -802,15 +691,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ooops</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -819,10 +700,6 @@
     </message>
     <message>
         <source>oops</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>,%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -862,10 +739,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>CD Ripper Settings (part 2)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -879,10 +752,6 @@
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -911,26 +780,6 @@
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16x</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -974,15 +823,31 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

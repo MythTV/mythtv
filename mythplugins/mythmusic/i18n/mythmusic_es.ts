@@ -1,49 +1,6 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>@default</name>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Repetir: Todo</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Reproduciendo.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Cargando reproducción.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Reproducción en pausa.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Error de salida.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Reproducción parada.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Reproducción finalizada.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Error de decodificación.</translation>
-    </message>
-</context>
-<context>
     <name>DatabaseBox</name>
-    <message>
-        <source>Select music to be played:</source>
-        <translation type="obsolete">Seleccione la música a escuchar:</translation>
-    </message>
     <message>
         <source>Copy To New Playlist</source>
         <translation>Copiar a una nueva lista de reproducción</translation>
@@ -213,145 +170,6 @@
     </message>
 </context>
 <context>
-    <name>PlaybackBox</name>
-    <message>
-        <source>Shuffle Mode</source>
-        <translation type="obsolete">Modo aleatorio</translation>
-    </message>
-    <message>
-        <source>Repeat Mode</source>
-        <translation type="obsolete">Modo de repetición</translation>
-    </message>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">Editar Lista</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Visualizar</translation>
-    </message>
-    <message>
-        <source>Rating</source>
-        <translation type="obsolete">Puntuación</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Título</translation>
-    </message>
-    <message>
-        <source>Length</source>
-        <translation type="obsolete">Duración</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Repetir: Todo</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Reproduciendo.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Cargando reproducción.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Reproducción en pausa.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Error de salida.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Reproducción parada.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Reproducción finalizada.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Error de decodificación.</translation>
-    </message>
-    <message>
-        <source>Shuffle: Intelligent</source>
-        <translation type="obsolete">Aleat.: Inteligente</translation>
-    </message>
-    <message>
-        <source>Shuffle: Random</source>
-        <translation type="obsolete">Aleatorio: Casual</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Intelligent</source>
-        <translation type="obsolete">1 Aleat.: Inteligente</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Random</source>
-        <translation type="obsolete">1 Aleatorio: Casual</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Aleatorio: No</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Aleatorio: No</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Repetir: Todo</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Repetir: No</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Repetir: No</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Editar Lista</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Visualizar</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Aleatorio: Preferido</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Aleatorio: Preferido</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Aleatorio: Variable</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Aleatorio: Variable</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">raiz de la lista</translation>
-    </message>
-</context>
-<context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
@@ -485,6 +303,14 @@
         <source>Tracks from current Year</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -543,10 +369,6 @@
     <message>
         <source>Tree Sorting</source>
         <translation>Ordenación del árbol</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="obsolete">Ordenación de la selección de música. Los valores se separan por espacios en blanco entre &apos;list&apos;, &apos;genre&apos;, &apos;artist&apos;, &apos;album&apos; y &apos;title&apos; o la palabra clave &apos;directory&apos; para indicar que se use el árbol de directorios dentro del arbol.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -615,10 +437,6 @@
     <message>
         <source>Token separator</source>
         <translation>Marca de separación</translation>
-    </message>
-    <message>
-        <source> - </source>
-        <translation>-</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -841,24 +659,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>music database</source>
-        <translation type="obsolete">Base de Datos de música</translation>
-    </message>
-    <message>
-        <source>cd ripper</source>
-        <translation type="obsolete">ripeador</translation>
-    </message>
-    <message>
-        <source>
-
-You have no MythMusic tables in your database.</source>
-        <translation type="obsolete">No tiene las tablas de MythMusic en su Base de Datos.</translation>
-    </message>
-    <message>
-        <source>OK, I&apos;ll read the documentation</source>
-        <translation type="obsolete">Bien, leeré la documentación</translation>
-    </message>
-    <message>
         <source>Unknown Artist</source>
         <translation>Artista desconocido</translation>
     </message>
@@ -891,16 +691,8 @@ You have no MythMusic tables in your database.</source>
         <translation>Flta entrada en la base de datos: %1</translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Ooops</source>
         <translation>Uuups</translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
-        <translation></translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -909,10 +701,6 @@ You have no MythMusic tables in your database.</source>
     <message>
         <source>oops</source>
         <translation>uups</translation>
-    </message>
-    <message>
-        <source>,%1</source>
-        <translation></translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -951,10 +739,6 @@ You have no MythMusic tables in your database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>CD Ripper Settings (part 2)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -968,10 +752,6 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1000,26 +780,6 @@ You have no MythMusic tables in your database.</source>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16x</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1063,15 +823,31 @@ You have no MythMusic tables in your database.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

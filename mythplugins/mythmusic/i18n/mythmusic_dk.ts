@@ -2,10 +2,6 @@
 <context>
     <name>DatabaseBox</name>
     <message>
-        <source>Select music to be played:</source>
-        <translation type="obsolete">Vælg musikken, der skal spilles:</translation>
-    </message>
-    <message>
         <source>Active Play Queue</source>
         <translation>Aktiv spillekø</translation>
     </message>
@@ -174,109 +170,6 @@
     </message>
 </context>
 <context>
-    <name>PlaybackBox</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">Redigér musikliste</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Visualisér</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Redigér musikliste</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Visualisér</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Bland: Smart</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Bland: Smart</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Bland: Tilfældigt</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Bland: Tilfældigt</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Bland: Ingen</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Bland: Ingen</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Gentag: Alle</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Gentag: Alle</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Gentag: Spor</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Gentag: Spor</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Gentag: Ingen</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Gentag: Ingen</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Afspiller musik.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Forbereder musik.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Musik sat på pause.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Output-fejl.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Musik stoppet.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Musik afsluttet.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Dekoder-fejl.</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">rod af spilleliste</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">kanaler</translation>
-    </message>
-</context>
-<context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
@@ -410,6 +303,14 @@
         <source>Tracks from current Year</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -536,10 +437,6 @@
     <message>
         <source>Token separator</source>
         <translation>Makro-separator</translation>
-    </message>
-    <message>
-        <source> - </source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -794,16 +691,8 @@
         <translation>Manglende post i database: %1</translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ooops</source>
         <translation>Hovsa</translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -812,10 +701,6 @@
     <message>
         <source>oops</source>
         <translation>hovsa</translation>
-    </message>
-    <message>
-        <source>,%1</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -854,10 +739,6 @@
         <translation>Hvis dette felt er markeret, vil MP3-algoritmen anvende variable bitrater (VBR) undtaget ved indstillingen &apos;lav kvalitet&apos;. Ogg-algoritmen vil dog altid anvende variable bitrater.</translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>CD Ripper Settings (part 2)</source>
         <translation>Indstillinger for CD-kopiering (del 2)</translation>
     </message>
@@ -872,10 +753,6 @@
     <message>
         <source>CD-Writer Device</source>
         <translation>Enhed for CD-brænding</translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation>Vælg SCSI-enheden til CD-brænding. Hvis din IDE-enhed ikke er tilgængelig, så prøv at tilføje hdd(eller hdc/hdb)=ide-scsi til dine boot-options</translation>
     </message>
     <message>
         <source>Disk Size</source>
@@ -904,26 +781,6 @@
     <message>
         <source>Auto</source>
         <translation>Automatisk</translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16x</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -966,19 +823,31 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="obsolete">Orden for musik-hierarkiet. Mulige værdier er en liste (adskilt af mellemrum) med følgende mulige værdier: genre, splitartist, artist, album, og title ELLER &quot;directory&quot; for at indikere at billedet på skærmen har samme struktur som filsystemet.</translation>
-    </message>
-    <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

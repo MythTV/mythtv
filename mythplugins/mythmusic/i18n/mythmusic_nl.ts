@@ -2,10 +2,6 @@
 <context>
     <name>DatabaseBox</name>
     <message>
-        <source>Select music to be played:</source>
-        <translation type="obsolete">Kies muziek om af te spelen:</translation>
-    </message>
-    <message>
         <source>Copy To New Playlist</source>
         <translation>Kopieer naar Nieuwe Afspeellijst</translation>
     </message>
@@ -174,117 +170,6 @@
     </message>
 </context>
 <context>
-    <name>PlaybackBox</name>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Mengen: Uit</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Mengen: Uit</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Herhalen: Alles</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Herhalen: Alles</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Herhalen: Nummer</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Herhalen: Nummer</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Herhalen: Geen</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Herhalen: Geen</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Bezig afspelen stream.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Bezig bufferen stream.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Stream gepauseerd.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Uitvoerfout.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Stream gestopt.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Stream afgespeeld.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Decodeerfout.</translation>
-    </message>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">Wijzig Speellijst</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Visuele Effecten</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Wijzig Speellijst</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Visuele Effecten</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Mengen: Slim</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Mengen: Slim</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Mengen: Willekeurig</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Mengen: Willekeurig</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">afspeellijst root</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">kan</translation>
-    </message>
-</context>
-<context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
@@ -418,6 +303,14 @@
         <source>Tracks from current Year</source>
         <translation>Alle Nummers Uit Dit Jaar</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -544,10 +437,6 @@
     <message>
         <source>Token separator</source>
         <translation>Scheidingsteken</translation>
-    </message>
-    <message>
-        <source> - </source>
-        <translation></translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -803,16 +692,8 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
         <translation>Ontbrekende databankinvoer: %1</translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation>~</translation>
-    </message>
-    <message>
         <source>Ooops</source>
         <translation>Oeps</translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
-        <translation>%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -821,10 +702,6 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     <message>
         <source>oops</source>
         <translation>oeps</translation>
-    </message>
-    <message>
-        <source>,%1</source>
-        <translation>,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -863,10 +740,6 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
         <translation>Indien geselecteerd zal de MP3-encoder met uitzondering van lage kwaliteit variabele bitrates (VBR) gebruiken. De Ogg-encoder gebruikt altijd variabele birates.</translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation>Album Illustratie</translation>
-    </message>
-    <message>
         <source>CD Ripper Settings (part 2)</source>
         <translation>Instellingen voor Importeren (Deel 2)</translation>
     </message>
@@ -881,11 +754,6 @@ Kan Normaal, Willekeurig of Intelligent (willekeurig) zijn.</translation>
     <message>
         <source>CD-Writer Device</source>
         <translation>CD-brander-apparaat</translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation>Selecteer het SCSI-apparaat voor schrijven van CD &apos;s.
-Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-apparaat niet aanwezig is.</translation>
     </message>
     <message>
         <source>Disk Size</source>
@@ -914,26 +782,6 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
     <message>
         <source>Auto</source>
         <translation>Auto</translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>16x</source>
-        <translation></translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -976,20 +824,32 @@ Probeer hdd(of hdc/hdb)=ide-scsi aan uw opstartopties toe te voegen, als uw IDE-
         <translation>?</translation>
     </message>
     <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="obsolete">Volgorde voor sorteren van muzieklijst. Mogelijke waarden zijn een door spaties gescheiden lijst van genre, splitartist, artist, album en titel OF het sleutelwoord &quot;directory&quot; om aan te geven dat de afgebeelde muzieklijst het bestandssyteem weergeeft.</translation>
-    </message>
-    <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation>CD: %1 ~ %2 - %3</translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation>Track %1</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
         <translation>Volgorde waarin de muziek boom moet worden gesorteerd. Mogelijk waarden zijn een spatie-gescheiden lijst van: genre, splitartist, splitartist1, artist, album, en title OF het woord &quot;directory&quot; om aan te geven dat op het scherm het bestandssysteem moet worden weergegeven.</translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

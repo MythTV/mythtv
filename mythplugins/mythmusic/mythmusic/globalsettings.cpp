@@ -192,7 +192,7 @@ static HostLineEdit *TagSeparator()
 {
     HostLineEdit *gc = new HostLineEdit("TagSeparator");
     gc->setLabel(QObject::tr("Token separator"));
-    gc->setValue(QObject::tr(" - "));
+    gc->setValue(" - ");
     gc->setHelpText(QObject::tr("Filename tokens will be separated by "
                     "this string."));
     return gc;
@@ -511,11 +511,11 @@ static HostComboBox *CDWriteSpeed()
     HostComboBox *gc = new HostComboBox("CDWriteSpeed");
     gc->setLabel(QObject::tr("CD Write Speed"));
     gc->addSelection(QObject::tr("Auto"), "0");
-    gc->addSelection(QObject::tr("1x"), "1");
-    gc->addSelection(QObject::tr("2x"), "2");
-    gc->addSelection(QObject::tr("4x"), "4");
-    gc->addSelection(QObject::tr("8x"), "8");
-    gc->addSelection(QObject::tr("16x"), "16");
+    gc->addSelection("1x", "1");
+    gc->addSelection("2x", "2");
+    gc->addSelection("4x", "4");
+    gc->addSelection("8x", "8");
+    gc->addSelection("16x", "16");
     gc->setHelpText(QObject::tr("CD Writer speed. Auto will use the recomended "
                     "speed."));
     return gc;

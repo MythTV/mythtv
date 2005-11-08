@@ -307,6 +307,14 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <source>Tracks from current Year</source>
         <translation>Piste de l&apos;année courante</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -433,10 +441,6 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     <message>
         <source>Token separator</source>
         <translation>Caractére de séparation</translation>
-    </message>
-    <message>
-        <source> - </source>
-        <translation>-</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -691,16 +695,8 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <translation>Entrée manquante dans la base de données : %1</translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation> ~ </translation>
-    </message>
-    <message>
         <source>Ooops</source>
         <translation>Ooops</translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
-        <translation>%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -709,10 +705,6 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     <message>
         <source>oops</source>
         <translation>oops</translation>
-    </message>
-    <message>
-        <source>,%1</source>
-        <translation>,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -751,10 +743,6 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <translation>Si coché, l&apos;encodeur MP3 utilisera des bitrates variables (VBR) sauf pour les réglages basses qualité. L&apos;encodeur Ogg utilisera toujours du bitrate variable.</translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation>Jaquette</translation>
-    </message>
-    <message>
         <source>CD Ripper Settings (part 2)</source>
         <translation>Paramétres de l&apos;import de CD (partie 2)</translation>
     </message>
@@ -769,10 +757,6 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     <message>
         <source>CD-Writer Device</source>
         <translation>Périphérique CD-RW</translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation>Choix du périphérique SCSI de gravure. Si votre périphérique IDE n&apos;est pas présent, essayez d&apos;ajouter hdd(ou hd/hdb)=ide-scsi à vos options de boot</translation>
     </message>
     <message>
         <source>Disk Size</source>
@@ -801,26 +785,6 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
     <message>
         <source>Auto</source>
         <translation>Auto</translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation>1x</translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation>2x</translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation>4x</translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation>8x</translation>
-    </message>
-    <message>
-        <source>16x</source>
-        <translation>16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -863,19 +827,31 @@ L&apos;écran suivant sera vide. Il faut le quitter pour revenir au menu. </tran
         <translation>?</translation>
     </message>
     <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="obsolete">Ordre dans lequel trier l&apos;arborescence de musique. Les valeurs possibles sont une liste séparé d&apos;espaces des valeurs genre, splitartist, artist, album, et title OU le mot clef &quot;directory&quot; qui indique que l&apos;arborescense affichée reflète le système de fichiers.</translation>
-    </message>
-    <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation>CD: %1 ~ %2 - %3</translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

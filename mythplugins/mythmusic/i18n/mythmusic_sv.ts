@@ -305,6 +305,14 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <source>Tracks from current Year</source>
         <translation>Spår från aktuellt år</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Sök</translation>
+    </message>
+    <message>
+        <source>From CD</source>
+        <translation>Från CD</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -423,10 +431,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Token separator</source>
         <translation>Separator</translation>
-    </message>
-    <message>
-        <source> - </source>
-        <translation>-</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -689,16 +693,8 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>Saknad databasrad: %1</translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation> ~ </translation>
-    </message>
-    <message>
         <source>Ooops</source>
         <translation>Ooops</translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
-        <translation>%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -707,10 +703,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>oops</source>
         <translation>oops</translation>
-    </message>
-    <message>
-        <source>,%1</source>
-        <translation>,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -749,10 +741,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>MP3-kodaren kommer att använda variabel bithastighet (VBR) förutom då lägsta kvaliteten väljs. Ogg-kodaren använder alltid variabel bithastighet.</translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation>AlbumArt</translation>
-    </message>
-    <message>
         <source>CD Ripper Settings (part 2)</source>
         <translation>Inställningar för CD-kopiering (del 2)</translation>
     </message>
@@ -767,10 +755,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>CD-Writer Device</source>
         <translation>CD-brännarenhet</translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation>Välj en SCSI-enhet för CD-bränning. Om idin IDE-enhet inte finns tillgänglig, testa lägga till hdd (eller hdc/hdb)=ide-scsi till dina startinstälningar</translation>
     </message>
     <message>
         <source>Disk Size</source>
@@ -799,26 +783,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
     <message>
         <source>Auto</source>
         <translation>Audo</translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation>1x</translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation>2x</translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation>4x</translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation>8x</translation>
-    </message>
-    <message>
-        <source>16x</source>
-        <translation>16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -861,10 +825,6 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>?</translation>
     </message>
     <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation>CD: %1 ~ %2 - %3</translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation>Spår %1</translation>
     </message>
@@ -873,6 +833,26 @@ Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till m
         <translation>Den ordning som trädet för musikval sorteras i. Möjliga värden är:
 * Mellanslagsseparerad lista med &apos;genre&apos;, &apos;splitartist&apos;, &apos;splitartist1&apos;, &apos;artist&apos;, &apos;album&apos; och &apos;title&apos;
 * &apos;directory&apos; (=katalog), vilket betyder att trädet speglar den faktiska katalogstrukturen.</translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation>Spela CD-skivor automatiskt</translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation>Lägg automatiskt ny CD-skiva i spellistan och börja spela.</translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation>Välj SCSI- eller IDE-enhet för CD-bränning.</translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation>Letar efter musikfiler</translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
+        <translation>Återuppbygger musikträd</translation>
     </message>
 </context>
 <context>

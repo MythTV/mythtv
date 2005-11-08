@@ -117,10 +117,6 @@
         <translation>Fertig</translation>
     </message>
     <message>
-        <source>Save</source>
-        <translation type="obsolete">Speichern</translation>
-    </message>
-    <message>
         <source>DB Statistics</source>
         <translation>Db Statistik</translation>
     </message>
@@ -307,6 +303,14 @@
         <source>Tracks from current Year</source>
         <translation>Alle Titel dieses Jahres</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -433,10 +437,6 @@
     <message>
         <source>Token separator</source>
         <translation>Feldtrenner</translation>
-    </message>
-    <message>
-        <source> - </source>
-        <translation> - </translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -691,16 +691,8 @@
         <translation>Fehlender Datenbankeintrag: %1</translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation> ~ </translation>
-    </message>
-    <message>
         <source>Ooops</source>
         <translation>Hoppla</translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
-        <translation>%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -709,10 +701,6 @@
     <message>
         <source>oops</source>
         <translation>Hoppla</translation>
-    </message>
-    <message>
-        <source>,%1</source>
-        <translation>,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -751,10 +739,6 @@
         <translation>Falls gesetzt, wird der MP3 Audiocodec variable Bitraten (VBR) nutzen, mit Ausnahme der niedrigen Qualitätsstufe. Der Ogg Audiocodec arbeitet immer mit variablen Bitraten.</translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation>Cover</translation>
-    </message>
-    <message>
         <source>CD Ripper Settings (part 2)</source>
         <translation>CD Import 2/2</translation>
     </message>
@@ -769,10 +753,6 @@
     <message>
         <source>CD-Writer Device</source>
         <translation>CD-Brenner Gerät</translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation>Wählen Sie das SCSI Gerät des CD Brenners aus. Versuchen Sie &apos;hdd=ide-scsi&apos; (bezw. hdc oder hdb) zu Ihren Boot-Optionen hinzuzufügen, falls Ihr IDE Gerät nicht aufgelistet wird</translation>
     </message>
     <message>
         <source>Disk Size</source>
@@ -801,26 +781,6 @@
     <message>
         <source>Auto</source>
         <translation>Automatisch</translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation>1x</translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation>2x</translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation>4x</translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation>8x</translation>
-    </message>
-    <message>
-        <source>16x</source>
-        <translation>16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -863,19 +823,31 @@
         <translation>?</translation>
     </message>
     <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="obsolete">Sortierreihenfolge in der Musikauswahl. Mögliche Werte sind (durch Leerzeichen getrennt): &apos;genre&apos;, &apos;splitartist&apos;, &apos;artist&apos;, &apos;album&apos;, &apos;title&apos; ODER das Schlüsselwort &apos;directory&apos;. Bei &apos;directory&apos; entspricht die Darstellung der tatsächlichen Verzeichnisstruktur.</translation>
-    </message>
-    <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation>CD: %1 ~ %2 - %3</translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1248,10 +1220,6 @@
     <message>
         <source>Are you sure you want to delete this Category?</source>
         <translation>Sind sie sicher, daß Sie diese Kategorie löschen wollen?</translation>
-    </message>
-    <message>
-        <source>It will also delete any Smart Playlists belonging to this category</source>
-        <translation type="obsolete">Damit werden auch alle Intell. Playlists dieser Kategorie gelöscht.</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>

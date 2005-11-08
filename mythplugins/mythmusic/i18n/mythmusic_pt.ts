@@ -1,123 +1,6 @@
 <!DOCTYPE TS><TS>
 <context>
-    <name>@default</name>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Repetir: Todo</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Reproduciendo.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Cargando reproducción.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Reproducción en pausa.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Error de salida.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Reproducción parada.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Reproducción finalizada.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Error de decodificación.</translation>
-    </message>
-    <message>
-        <source>Random</source>
-        <translation type="obsolete">Aleatório</translation>
-    </message>
-    <message>
-        <source>MonoScope</source>
-        <translation type="obsolete">Sinal Mono</translation>
-    </message>
-    <message>
-        <source>StereoScope</source>
-        <translation type="obsolete">Sinal Estéreo</translation>
-    </message>
-    <message>
-        <source>Spectrum</source>
-        <translation type="obsolete">Espectro</translation>
-    </message>
-    <message>
-        <source>BumpScope</source>
-        <translation type="obsolete">Scope aos Saltos</translation>
-    </message>
-    <message>
-        <source>Goom</source>
-        <translation type="obsolete">GoOoOoM</translation>
-    </message>
-    <message>
-        <source>Synaesthesia</source>
-        <translation type="obsolete">Sinastésia</translation>
-    </message>
-    <message>
-        <source>Gears</source>
-        <translation type="obsolete">Carretos</translation>
-    </message>
-    <message>
-        <source>Blank</source>
-        <translation type="obsolete">Nada</translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <translation type="obsolete">Baixa</translation>
-    </message>
-    <message>
-        <source>Medium</source>
-        <translation type="obsolete">Média</translation>
-    </message>
-    <message>
-        <source>High</source>
-        <translation type="obsolete">Alta</translation>
-    </message>
-    <message>
-        <source>Perfect</source>
-        <translation type="obsolete">Perfeita</translation>
-    </message>
-</context>
-<context>
-    <name>AllMusic</name>
-    <message>
-        <source>CD -- none</source>
-        <translation type="obsolete">Nenhum CD</translation>
-    </message>
-    <message>
-        <source>All My Music</source>
-        <translation type="obsolete">Todas as Músicas</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">Desconhecido</translation>
-    </message>
-</context>
-<context>
-    <name>BlankFactory</name>
-    <message>
-        <source>Blank</source>
-        <translation type="obsolete">Nada</translation>
-    </message>
-</context>
-<context>
     <name>DatabaseBox</name>
-    <message>
-        <source>Select music to be played:</source>
-        <translation type="obsolete">Seleccione as músicas para ouvir:</translation>
-    </message>
     <message>
         <source>Copy To New Playlist</source>
         <translation>Copiar Para Uma Lista Nova </translation>
@@ -155,16 +38,8 @@
         <translation>Todas as Músicas</translation>
     </message>
     <message>
-        <source>genre</source>
-        <translation type="obsolete">género</translation>
-    </message>
-    <message>
         <source>Blechy Blech Blah</source>
         <translation>Yada Yada</translation>
-    </message>
-    <message>
-        <source>cd</source>
-        <translation type="obsolete">cd</translation>
     </message>
     <message>
         <source>All My Music ~ Loading Music Data </source>
@@ -236,25 +111,6 @@
     </message>
 </context>
 <context>
-    <name>DefaultRipQuality</name>
-    <message>
-        <source>Low</source>
-        <translation type="obsolete">Baixa</translation>
-    </message>
-    <message>
-        <source>Medium</source>
-        <translation type="obsolete">Média</translation>
-    </message>
-    <message>
-        <source>High</source>
-        <translation type="obsolete">Alta</translation>
-    </message>
-    <message>
-        <source>Perfect</source>
-        <translation type="obsolete">Perfeita</translation>
-    </message>
-</context>
-<context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
@@ -311,189 +167,6 @@
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GearsFactory</name>
-    <message>
-        <source>Gears</source>
-        <translation type="obsolete">Carretos</translation>
-    </message>
-</context>
-<context>
-    <name>MadDecoder</name>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Título</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista</translation>
-    </message>
-</context>
-<context>
-    <name>MonoScopeFactory</name>
-    <message>
-        <source>MonoScope</source>
-        <translation type="obsolete">Sinal Mono</translation>
-    </message>
-</context>
-<context>
-    <name>PlayMode</name>
-    <message>
-        <source>Random</source>
-        <translation type="obsolete">Aleatório</translation>
-    </message>
-</context>
-<context>
-    <name>PlaybackBox</name>
-    <message>
-        <source>Shuffle Mode</source>
-        <translation type="obsolete">Modo aleatorio</translation>
-    </message>
-    <message>
-        <source>Repeat Mode</source>
-        <translation type="obsolete">Modo de repetición</translation>
-    </message>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">Editar Lista</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Ver Demo</translation>
-    </message>
-    <message>
-        <source>Rating</source>
-        <translation type="obsolete">Puntuación</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Título</translation>
-    </message>
-    <message>
-        <source>Length</source>
-        <translation type="obsolete">Duración</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Repetir: Tudo</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">A Tocar.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">A Carregar.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Em Pausa.</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Erro ao tocar.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Parado.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Fim de Música.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Erro de descodificação.</translation>
-    </message>
-    <message>
-        <source>Shuffle: Intelligent</source>
-        <translation type="obsolete">Aleat.: Inteligente</translation>
-    </message>
-    <message>
-        <source>Shuffle: Random</source>
-        <translation type="obsolete">Aleatorio: Casual</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Intelligent</source>
-        <translation type="obsolete">1 Aleat.: Inteligente</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Random</source>
-        <translation type="obsolete">1 Aleatorio: Casual</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Aleatório: Não</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Aleatório: Não</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Repetir: Tudo</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Repetir: Pista</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Repetir: Não</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Repetir: Não</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Editar Lista</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Ver Demo</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Aleatório: Esperto</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Aleatório: Esperto</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Aleatório: Sim</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Aleatório: Sim</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">Raiz da Lista</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">Kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">KHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">canais</translation>
     </message>
 </context>
 <context>
@@ -630,16 +303,13 @@
         <source>Tracks from current Year</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>PlaylistsContainer</name>
     <message>
-        <source>All My Playlists</source>
-        <translation type="obsolete">Todas as Listas</translation>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Active Play Queue</source>
-        <translation type="obsolete">Lista Activa</translation>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -669,16 +339,8 @@
         <translation>Dispositivo Áudio</translation>
     </message>
     <message>
-        <source>Audio Device to be used to play.</source>
-        <translation type="obsolete">O dispositivo a usar para tocar.</translation>
-    </message>
-    <message>
         <source>CD device</source>
         <translation>Dispositivo CD-Rom</translation>
-    </message>
-    <message>
-        <source>Synaestesia</source>
-        <translation type="obsolete">Sinastésia</translation>
     </message>
     <message>
         <source>MonoScope</source>
@@ -701,24 +363,12 @@
         <translation>Espectro</translation>
     </message>
     <message>
-        <source>Requires FFTW.</source>
-        <translation type="obsolete">Necessita da biblioteca FFTW.</translation>
-    </message>
-    <message>
         <source>BumpScope</source>
         <translation>Scope aos Saltos</translation>
     </message>
     <message>
-        <source>Help Text</source>
-        <translation type="obsolete">Sem texto de ajuda</translation>
-    </message>
-    <message>
         <source>Tree Sorting</source>
         <translation>Ordenação da Árvore</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the Music Selection Tree. Possible values are space-separated list of genre, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the actual directory tree.</source>
-        <translation type="obsolete">A ordem a ser usada na àrvode de selecção das músicas. Os valores possíveis deverâo ser separados por espaços e incluir da seguinte lista: &quot;genre&quot; (género), &quot;artist&quot; (artista), &quot;album&quot; (àlbum) ou &quot;title&quot; (título). Também pode incluir o valor &quot;directory&quot; para indicar que a àrvore no ecrâ representa a ârvore actual.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -731,10 +381,6 @@
     <message>
         <source>Filename Format</source>
         <translation>Formato do Nome do Ficheiro</translation>
-    </message>
-    <message>
-        <source>Help text here.</source>
-        <translation type="obsolete">Sem texto de ajuda.</translation>
     </message>
     <message>
         <source>Ignore ID3 Tags</source>
@@ -869,10 +515,6 @@
         <translation>Altura para Escala Visual</translation>
     </message>
     <message>
-        <source>Requires SDL.</source>
-        <translation type="obsolete">Requere SDL.</translation>
-    </message>
-    <message>
         <source>Goom</source>
         <translation>GoOoOoM</translation>
     </message>
@@ -881,16 +523,8 @@
         <translation>Carretos</translation>
     </message>
     <message>
-        <source>Requires OpenGL and FFTW.</source>
-        <translation type="obsolete">Requer OpenGL e FFTW.</translation>
-    </message>
-    <message>
         <source>Visualizations</source>
         <translation>Visualizações</translation>
-    </message>
-    <message>
-        <source>List of visualizations to use during playback. Possible values are space-separated list of Random, MonoScope, StereoScope, Spectrum, BumpScope, Goom, Synaesthesia, Gears, and Blank</source>
-        <translation type="obsolete">Lista de visualizações a usar enquanto toca. Os valores possíveis deverão ser separados por espaços e da seguinte lista: Random, MonoScope, StereoScope, Spectrum, BumpScope, Goom, Synaesthesia, Gears e Blank</translation>
     </message>
     <message>
         <source>General Settings</source>
@@ -913,56 +547,12 @@
         <translation>Áudio Ogg Vorbis</translation>
     </message>
     <message>
-        <source>music database</source>
-        <translation type="obsolete">Base de Dados de Música</translation>
-    </message>
-    <message>
-        <source>cd ripper</source>
-        <translation type="obsolete">cópia de CD</translation>
-    </message>
-    <message>
-        <source>
-
-You have no MythMusic tables in your database.</source>
-        <translation type="obsolete">
-
-Não existem dados do MythMusic na base de dados.</translation>
-    </message>
-    <message>
-        <source>OK, I&apos;ll read the documentation</source>
-        <translation type="obsolete">Ok, eu leio a documentação</translation>
-    </message>
-    <message>
         <source>Unknown</source>
         <translation>Desconhecido</translation>
     </message>
     <message>
         <source>FLAC Audio</source>
         <translation>Áudio FLAC</translation>
-    </message>
-    <message>
-        <source>Title</source>
-        <translation type="obsolete">Título</translation>
-    </message>
-    <message>
-        <source>Artist</source>
-        <translation type="obsolete">Artista</translation>
-    </message>
-    <message>
-        <source>Album</source>
-        <translation type="obsolete">Álbum</translation>
-    </message>
-    <message>
-        <source>Year</source>
-        <translation type="obsolete">Ano</translation>
-    </message>
-    <message>
-        <source>Track</source>
-        <translation type="obsolete">Pista</translation>
-    </message>
-    <message>
-        <source>Genre</source>
-        <translation type="obsolete">Género</translation>
     </message>
     <message>
         <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
@@ -1001,16 +591,8 @@ Não existem dados do MythMusic na base de dados.</translation>
         <translation>Não existe a entrada %1 na base de dados</translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation>-</translation>
-    </message>
-    <message>
         <source>Ooops</source>
         <translation>OoOoPs</translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
-        <translation>%1 - %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -1019,10 +601,6 @@ Não existem dados do MythMusic na base de dados.</translation>
     <message>
         <source>oops</source>
         <translation>oOps</translation>
-    </message>
-    <message>
-        <source>,%1</source>
-        <translation>, %1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -1039,10 +617,6 @@ Não existem dados do MythMusic na base de dados.</translation>
     <message>
         <source>Something is Wrong</source>
         <translation>Algo está Errado</translation>
-    </message>
-    <message>
-        <source>CDRom device to be used.</source>
-        <translation type="obsolete">O dispositivo CDRom a usar.</translation>
     </message>
     <message>
         <source>Encoding</source>
@@ -1065,20 +639,12 @@ Não existem dados do MythMusic na base de dados.</translation>
         <translation>Localização do repositório de músicas</translation>
     </message>
     <message>
-        <source>ARTIST/ALBUM/TRACK-TITLE</source>
-        <translation type="obsolete">ARTISTA/ÀLBUM/PISTA-TÍTULO</translation>
-    </message>
-    <message>
         <source>Defines the location/name for new songs. Valid tokens are: GENRE, ARTIST, ALBUM, TRACK, TITLE, YEAR, / and -. &apos;-&apos; will be replaced by the Token separator</source>
         <translation>Define a localização/nome para as novas músicas. As chaves válidas sâo: GENRE (Género), ARTIST (Artista), ALBUM (Àlbum), TRACK (Pista), TITLE (Título), YEAR (Ano), &apos;/&apos; (separador de directoria) ou &apos;-&apos;. O caractér &apos;-&apos; será substituido pelo valor em &quot;Separador de Campo&quot;</translation>
     </message>
     <message>
         <source>Token separator</source>
         <translation>Separador de Campo</translation>
-    </message>
-    <message>
-        <source> - </source>
-        <translation>-</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -1145,14 +711,6 @@ Não existem dados do MythMusic na base de dados.</translation>
         <translation>Qualidade padrão para cópias de CD.</translation>
     </message>
     <message>
-        <source>Stereo Scope</source>
-        <translation type="obsolete">Escopo Estéreo</translation>
-    </message>
-    <message>
-        <source>Mono Scope</source>
-        <translation type="obsolete">Escopo Mono</translation>
-    </message>
-    <message>
         <source>Audio Device used for playback.</source>
         <translation>O dispositivo àudio a usar para tocar.</translation>
     </message>
@@ -1181,10 +739,6 @@ Não existem dados do MythMusic na base de dados.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>CD Ripper Settings (part 2)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1198,10 +752,6 @@ Não existem dados do MythMusic na base de dados.</translation>
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1230,26 +780,6 @@ Não existem dados do MythMusic na base de dados.</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>16x</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1293,15 +823,31 @@ Não existem dados do MythMusic na base de dados.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1354,10 +900,6 @@ Não existem dados do MythMusic na base de dados.</translation>
     <message>
         <source>Genre: </source>
         <translation>Género:</translation>
-    </message>
-    <message>
-        <source>ripping</source>
-        <translation type="obsolete">a copiar</translation>
     </message>
     <message>
         <source>Ripping...</source>
@@ -1687,31 +1229,6 @@ Não existem dados do MythMusic na base de dados.</translation>
     </message>
 </context>
 <context>
-    <name>Spectrum</name>
-    <message>
-        <source>Visualization requires FFT library</source>
-        <translation type="obsolete">Este modo necessita da biblioteca FFT</translation>
-    </message>
-    <message>
-        <source>Did you run configure?</source>
-        <translation type="obsolete">Executou o configure?</translation>
-    </message>
-</context>
-<context>
-    <name>SpectrumFactory</name>
-    <message>
-        <source>Spectrum</source>
-        <translation type="obsolete">Espectro</translation>
-    </message>
-</context>
-<context>
-    <name>StereoScopeFactory</name>
-    <message>
-        <source>StereoScope</source>
-        <translation type="obsolete">Sinal Estéreo</translation>
-    </message>
-</context>
-<context>
     <name>ThemeUI</name>
     <message>
         <source>Please Wait...</source>
@@ -1764,45 +1281,6 @@ Não existem dados do MythMusic na base de dados.</translation>
     <message>
         <source>Filename:</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>VisualizationMode</name>
-    <message>
-        <source>Random</source>
-        <translation type="obsolete">Aleatório</translation>
-    </message>
-    <message>
-        <source>MonoScope</source>
-        <translation type="obsolete">Sinal Mono</translation>
-    </message>
-    <message>
-        <source>StereoScope</source>
-        <translation type="obsolete">Sinal Estéreo</translation>
-    </message>
-    <message>
-        <source>Spectrum</source>
-        <translation type="obsolete">Espectro</translation>
-    </message>
-    <message>
-        <source>BumpScope</source>
-        <translation type="obsolete">Scope aos Saltos</translation>
-    </message>
-    <message>
-        <source>Goom</source>
-        <translation type="obsolete">GoOoOoM</translation>
-    </message>
-    <message>
-        <source>Synaesthesia</source>
-        <translation type="obsolete">Sinastésia</translation>
-    </message>
-    <message>
-        <source>Gears</source>
-        <translation type="obsolete">Carretos</translation>
-    </message>
-    <message>
-        <source>Blank</source>
-        <translation type="obsolete">Nada</translation>
     </message>
 </context>
 </TS>

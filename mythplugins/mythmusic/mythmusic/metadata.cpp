@@ -997,7 +997,7 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
         {
             title_string = QObject::tr("Unknown");
         }
-        QString title_temp = QString(QObject::tr("%1 - %2")).arg((*anit).Track()).arg(title_string);
+        QString title_temp = QString("%1 - %2").arg((*anit).Track()).arg(title_string);
         QString level_temp = QObject::tr("title");
         CDCheckItem *new_item = new CDCheckItem(where, title_temp, level_temp, 
                                                 -(*anit).Track());
@@ -1060,7 +1060,7 @@ QString AllMusic::getLabel(int an_id, bool *error_flag)
         }
       
         a_label += music_map[an_id]->FormatArtist();
-        a_label += QObject::tr(" ~ ");
+        a_label += " ~ ";
         a_label += music_map[an_id]->FormatTitle();
     
 
@@ -1082,7 +1082,7 @@ QString AllMusic::getLabel(int an_id, bool *error_flag)
         {
             if( (*anit).Track() == an_id * -1)
             {
-                a_label = QString(QObject::tr("CD: %1 ~ %2 - %3")).arg((*anit).FormatArtist()).arg((*anit).Track()).arg((*anit).FormatTitle());
+                a_label = QString("CD: %1 ~ %2 - %3").arg((*anit).FormatArtist()).arg((*anit).Track()).arg((*anit).FormatTitle());
                 *error_flag = false;
                 return a_label;
             }

@@ -576,7 +576,7 @@ void Playlist::fillSonglistFromSongs()
                 a_list = QString("%1").arg(it->getValue());
             }
             else
-                a_list += QString(QObject::tr(",%1")).arg(it->getValue());
+                a_list += QString(",%1").arg(it->getValue());
         }
     }
 
@@ -832,7 +832,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
                 Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
                 if (tmpdata)
                 {
-                    QString a_string = QString(QObject::tr("%1 ~ %2")).arg(tmpdata->FormatArtist()).arg(tmpdata->FormatTitle());
+                    QString a_string = QString("%1 ~ %2").arg(tmpdata->FormatArtist()).arg(tmpdata->FormatTitle());
                     GenericTree *added_node = tree_to_write_to->addNode(a_string, it->getValue(), true);
                     ++a_counter;
                     added_node->setAttribute(0, 1);
@@ -878,7 +878,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
             Metadata *tmpdata = all_available_music->getMetadata(it->getValue());
             if (tmpdata)
             {
-                QString a_string = QString(QObject::tr("CD: %1 ~ %2 - %3"))
+                QString a_string = QString("CD: %1 ~ %2 - %3")
                   .arg(tmpdata->FormatArtist()).arg(tmpdata->Track()).arg(tmpdata->FormatTitle());
 
                 if(tmpdata->FormatArtist().length() < 1 ||

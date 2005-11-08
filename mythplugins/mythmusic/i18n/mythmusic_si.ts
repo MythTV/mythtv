@@ -170,117 +170,6 @@
     </message>
 </context>
 <context>
-    <name>PlaybackBox</name>
-    <message>
-        <source>Edit Playlist</source>
-        <translation type="obsolete">Uredi predvajalni seznam</translation>
-    </message>
-    <message>
-        <source>Visualize</source>
-        <translation type="obsolete">Vizualizacija</translation>
-    </message>
-    <message>
-        <source>3 Edit Playlist</source>
-        <translation type="obsolete">3 Uredi predvajalni seznam</translation>
-    </message>
-    <message>
-        <source>4 Visualize</source>
-        <translation type="obsolete">4 Vizualizacija</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Smart</source>
-        <translation type="obsolete">1 Mešaj: Pametno</translation>
-    </message>
-    <message>
-        <source>Shuffle: Smart</source>
-        <translation type="obsolete">Mešaj: Pametno</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: Rand</source>
-        <translation type="obsolete">1 Mešaj: Naključno</translation>
-    </message>
-    <message>
-        <source>Shuffle: Rand</source>
-        <translation type="obsolete">Mešaj: Naključno</translation>
-    </message>
-    <message>
-        <source>1 Shuffle: None</source>
-        <translation type="obsolete">1 Mešaj: Nobeden</translation>
-    </message>
-    <message>
-        <source>Shuffle: None</source>
-        <translation type="obsolete">Mešaj: Nobeden</translation>
-    </message>
-    <message>
-        <source>2 Repeat: All</source>
-        <translation type="obsolete">2 Ponovi: Vse</translation>
-    </message>
-    <message>
-        <source>Repeat: All</source>
-        <translation type="obsolete">Ponovi: Vse</translation>
-    </message>
-    <message>
-        <source>2 Repeat: Track</source>
-        <translation type="obsolete">2 Ponovi: Komad</translation>
-    </message>
-    <message>
-        <source>Repeat: Track</source>
-        <translation type="obsolete">Ponovi: Komad</translation>
-    </message>
-    <message>
-        <source>2 Repeat: None</source>
-        <translation type="obsolete">2 Ponovi: Nobenega</translation>
-    </message>
-    <message>
-        <source>Repeat: None</source>
-        <translation type="obsolete">Ponovi: Nobenega</translation>
-    </message>
-    <message>
-        <source>playlist root</source>
-        <translation type="obsolete">domač imenik predvajalnega seznama</translation>
-    </message>
-    <message>
-        <source>Playing stream.</source>
-        <translation type="obsolete">Predvajalni tok.</translation>
-    </message>
-    <message>
-        <source>Buffering stream.</source>
-        <translation type="obsolete">Tok medpolnjenja.</translation>
-    </message>
-    <message>
-        <source>Stream paused.</source>
-        <translation type="obsolete">Tok pavziran.</translation>
-    </message>
-    <message>
-        <source>kbps</source>
-        <translation type="obsolete">kbps</translation>
-    </message>
-    <message>
-        <source>kHz</source>
-        <translation type="obsolete">kHz</translation>
-    </message>
-    <message>
-        <source>ch</source>
-        <translation type="obsolete">kanal</translation>
-    </message>
-    <message>
-        <source>Output error.</source>
-        <translation type="obsolete">Napaka izhoda.</translation>
-    </message>
-    <message>
-        <source>Stream stopped.</source>
-        <translation type="obsolete">Tok ustavljen.</translation>
-    </message>
-    <message>
-        <source>Finished playing stream.</source>
-        <translation type="obsolete">Predvajanje toka končano.</translation>
-    </message>
-    <message>
-        <source>Decoder error.</source>
-        <translation type="obsolete">Napaka dekoderja.</translation>
-    </message>
-</context>
-<context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
@@ -414,6 +303,14 @@
         <source>Tracks from current Year</source>
         <translation>Glasba tega leta</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>From CD</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -464,10 +361,6 @@
     <message>
         <source>Tree Sorting</source>
         <translation>Drevesno sortiranje</translation>
-    </message>
-    <message>
-        <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="obsolete">Vrsti red sortiranja Glasbenega drevesa. Vrednosti, ki so na voljo, so z preslednico ločeni seznami zvrsti,izvajalca, albuma in naslova ALI ključna &quot;mapa&quot; ki potrdi, da je drevo na zaslonu zrcalna slika datotečnega sistema.</translation>
     </message>
     <message>
         <source>Script Path</source>
@@ -568,10 +461,6 @@
     <message>
         <source>Token separator</source>
         <translation>Ločilni simbol</translation>
-    </message>
-    <message>
-        <source> - </source>
-        <translation>-</translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -742,10 +631,6 @@
         <translation>Synaesthesia</translation>
     </message>
     <message>
-        <source>AlbumArt</source>
-        <translation>Album izvajalca</translation>
-    </message>
-    <message>
         <source>Gears</source>
         <translation>Prestave</translation>
     </message>
@@ -768,10 +653,6 @@
     <message>
         <source>CD-Writer Device</source>
         <translation>CD-RW naprava</translation>
-    </message>
-    <message>
-        <source>Select the SCSI Device for CD Writing.  If your IDE device is not present, try adding hdd(or hdc/hdb)=ide-scsi to your boot options</source>
-        <translation>Izberite SCSI napravo za zapisovanje CD-ja.  Če vaša IDE naprava ni prosotna, poizkušajte dodati hdd(or hdc/hdb)=ide-scsi k vašim zagonskin možnostim</translation>
     </message>
     <message>
         <source>Disk Size</source>
@@ -800,26 +681,6 @@
     <message>
         <source>Auto</source>
         <translation>Avtomatsko</translation>
-    </message>
-    <message>
-        <source>1x</source>
-        <translation>1x</translation>
-    </message>
-    <message>
-        <source>2x</source>
-        <translation>2x</translation>
-    </message>
-    <message>
-        <source>4x</source>
-        <translation>4x</translation>
-    </message>
-    <message>
-        <source>8x</source>
-        <translation>8x</translation>
-    </message>
-    <message>
-        <source>16x</source>
-        <translation>16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -914,16 +775,8 @@
         <translation>Manjkajoč vnos v bazi: %1</translation>
     </message>
     <message>
-        <source> ~ </source>
-        <translation>~</translation>
-    </message>
-    <message>
         <source>Ooops</source>
         <translation>Ooops</translation>
-    </message>
-    <message>
-        <source>%1 ~ %2</source>
-        <translation>%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -932,10 +785,6 @@
     <message>
         <source>oops</source>
         <translation>oops</translation>
-    </message>
-    <message>
-        <source>,%1</source>
-        <translation>,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -974,15 +823,31 @@
         <translation>?</translation>
     </message>
     <message>
-        <source>CD: %1 ~ %2 - %3</source>
-        <translation>CD: %1 ~ %2 - %3</translation>
-    </message>
-    <message>
         <source>Track %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically play CDs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically put a new CD on the playlist and start playing the CD.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select the SCSI or IDE Device for CD Writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning music files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding music tree</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
