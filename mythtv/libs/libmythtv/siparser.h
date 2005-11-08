@@ -174,7 +174,9 @@ class SIParser : public QObject
     // DVB EIT Table Descriptor processors
     uint ProcessDVBEventDescriptors(
         const unsigned char          *data,
+        uint                         &bestPrioritySE,
         const unsigned char*         &bestDescriptorSE, 
+        uint                         &bestPriorityEE,
         vector<const unsigned char*> &bestDescriptorsEE,
         Event                        &event);
 

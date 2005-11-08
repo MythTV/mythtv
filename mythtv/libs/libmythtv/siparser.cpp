@@ -1405,6 +1405,8 @@ void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer, uint size)
     uint pos                = 6;
     uint des_pos            = 0;
     uint descriptors_length = 0;
+    uint bestPrioritySE     = UINT_MAX;
+    uint bestPriorityEE     = UINT_MAX;
 
     // Loop through table (last 4 bytes are CRC)
     while (pos + 4 < size)
@@ -1447,7 +1449,9 @@ void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer, uint size)
         while ((des_pos < (pos + descriptors_length)) && (des_pos <= size)) 
         { 
             des_pos += ProcessDVBEventDescriptors(
-                &buffer[des_pos], bestDescriptorSE, bestDescriptorsEE, event);
+                &buffer[des_pos],
+                bestPrioritySE, bestDescriptorSE,
+                bestPriorityEE, bestDescriptorsEE, event);
         }
 
         // Parse extended event descriptions for the most preferred language
@@ -1952,16 +1956,12 @@ TransportObject SIParser::ParseDescCable(uint8_t *buffer, int)
  */
 uint SIParser::ProcessDVBEventDescriptors(
     const unsigned char          *data,
+    uint                         &bestPrioritySE,
     const unsigned char*         &bestDescriptorSE, 
+    uint                         &bestPriorityEE,
     vector<const unsigned char*> &bestDescriptorsEE,
     Event                        &event)
 {
-    QString bestLanguageSE   = "";
-    uint    bestPrioritySE   = UINT_MAX;
-
-    QString bestLanguageEE   = "";
-    uint    bestPriorityEE   = UINT_MAX;
-
     uint    descriptorTag    = data[0];
     uint    descriptorLength = data[1];
 
@@ -1974,12 +1974,9 @@ uint SIParser::ProcessDVBEventDescriptors(
             uint    priority = GetLanguagePriority(language);
             bestPrioritySE   = min(bestPrioritySE, priority);
 
+            // add the descriptor, and update the language
             if (priority == bestPrioritySE)
-            {
-                // add the descriptor, and update the language
                 bestDescriptorSE = data;
-                bestLanguageSE   = language;
-            }
         }
         break;
 
@@ -1994,18 +1991,22 @@ uint SIParser::ProcessDVBEventDescriptors(
 
             QString language = ParseDescLanguage(data+3, descriptorLength-1);
             uint    priority = GetLanguagePriority(language);
-            bestPriorityEE   = min(bestPriorityEE, priority);
+
+            // lower priority number is a higher priority...
+            if (priority < bestPriorityEE)
+            {
+                // found a language with better priority
+                // don't keep things from the wrong language
+                bestDescriptorsEE.clear();
+                bestPriorityEE = priority;
+            }
 
             if (priority == bestPriorityEE)
             {
-                // don't keep things from the wrong language
-                if (bestLanguageEE != language)
-                    bestDescriptorsEE.clear();
                 // make sure the vector is big enough
                 bestDescriptorsEE.resize(last_desc_number + 1);
                 // add the descriptor, and update the language
                 bestDescriptorsEE[desc_number] = data;
-                bestLanguageEE                 = language;
             }
         }
         break;
