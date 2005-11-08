@@ -444,7 +444,7 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
 
     if (write)
     {
-        tfw = new ThreadedFileWriter(filename.ascii(),
+        tfw = new ThreadedFileWriter(filename,
                                      O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE,
                                      0644);
         if (tfw->Open())
