@@ -76,6 +76,8 @@ unix {
 macx {
     HEADERS += audiooutputca.h   screensaver-osx.h   DisplayResOSX.h
     SOURCES += audiooutputca.cpp screensaver-osx.cpp DisplayResOSX.cpp
+    HEADERS += util-osx.h
+    SOURCES += util-osx.cpp
 
     # Mac OS X Frameworks
     FWKS = ApplicationServices AudioUnit Carbon CoreAudio IOKit
