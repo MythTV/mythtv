@@ -369,19 +369,12 @@ static HostLineEdit *VisualizationMode()
 {
     HostLineEdit *gc = new HostLineEdit("VisualMode");
     gc->setLabel(QObject::tr("Visualizations"));
-    gc->setValue(QObject::tr("Random"));
-    gc->setHelpText(QObject::tr("List of visualizations to use during playback."
-                    " Possible values are space-separated list of ") +
-                    QObject::tr("Random") + ", " + 
-                    QObject::tr("MonoScope") + ", " + 
-                    QObject::tr("StereoScope") + ", " + 
-                    QObject::tr("Spectrum") + ", " + 
-                    QObject::tr("BumpScope") + ", " + 
-                    QObject::tr("Goom") + ", " + 
-                    QObject::tr("Synaesthesia") + ", " +
-                    QObject::tr("AlbumArt") + ", " +
-                    QObject::tr("Gears") + ", " + QObject::tr("and") + " " + 
-                    QObject::tr("Blank"));
+    gc->setValue("Random");
+    gc->setHelpText(QObject::tr("List of visualizations to use during playback. "
+                    "Possible values are space-separated list of ") + "Random, "
+                    "MonoScope, StereoScope, Spectrum, BumpScope, Goom, "
+                    "Synaesthesia, AlbumArt, Gears, " + QObject::tr("and") +
+                    " Blank");
     return gc;
 };
 
