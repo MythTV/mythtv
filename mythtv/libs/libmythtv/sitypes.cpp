@@ -28,14 +28,16 @@
  * Or, point your browser to http://www.gnu.org/copyleft/gpl.html
  *
  */
-#include "config.h"
 
 #ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
-#include "sitypes.h"
 #include <qdeepcopy.h>
+
+#include "sitypes.h"
+#include "mythconfig.h"
+#include "mythcontext.h"
 
 // Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging
 // #define EIT_DEBUG_SID 1602

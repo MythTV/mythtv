@@ -1431,7 +1431,7 @@ void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer, uint size)
             VERBOSE(VB_EIT, "SIParser: DVB Events: " +
                     QString("ServiceID %1 EventID: %2   Time: %3 - %4")
                     .arg(event.ServiceID).arg(event.EventID)
-                    .arg(event.StartTime.toString(QString("MM/dd hh:mm")));
+                    .arg(event.StartTime.toString(QString("MM/dd hh:mm")))
                     .arg(event.EndTime.toString(QString("hh:mm"))));
         }
 #endif
@@ -1478,7 +1478,7 @@ void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer, uint size)
 #ifdef EIT_DEBUG_SID
         if (event.ServiceID == EIT_DEBUG_SID)
         {
-            VERBOSE(VB_EIT, "SIParser: DVB Events: "
+            VERBOSE(VB_EIT, "SIParser: DVB Events: " +
                     QString("LanguageCode='%1' "
                             "\n\t\t\tEvent_Name='%2' Description='%3'")
                     .arg(event.LanguageCode).arg(event.Event_Name)
