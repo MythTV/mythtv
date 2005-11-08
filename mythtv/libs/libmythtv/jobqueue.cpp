@@ -91,7 +91,7 @@ void JobQueue::customEvent(QCustomEvent *e)
                               "to determine job info for message: "
                               "%1.  Program will not be flagged.")
                               .arg(message);
-                VERBOSE(VB_GENERAL, msg);
+                VERBOSE(VB_IMPORTANT, msg);
                 return;
             }
 
@@ -1774,8 +1774,8 @@ void JobQueue::DoTranscodeThread(void)
             msg = QString("Transcoding ERRORED for %1, unable to find "
                           "mythtranscode, check your PATH and backend logs.")
                           .arg(details);
-            VERBOSE(VB_JOBQUEUE, msg);
-            VERBOSE(VB_JOBQUEUE,
+            VERBOSE(VB_IMPORTANT, msg);
+            VERBOSE(VB_IMPORTANT,
                     QString("Current PATH: '%1'").arg(getenv("PATH")));
 
             gContext->LogEntry("transcode", LP_WARNING,
@@ -1890,7 +1890,7 @@ void JobQueue::DoTranscodeThread(void)
         } else {
             // transcode didn't finish delete partial transcode
             filename += ".tmp";
-            VERBOSE(VB_GENERAL, QString("Deleting %1").arg(filename));
+            VERBOSE(VB_JOBQUEUE, QString("Deleting %1").arg(filename));
             unlink(filename);
             filename += ".map";
             unlink(filename);
@@ -1973,7 +1973,7 @@ void JobQueue::DoFlagCommercialsThread(void)
                               "new database connection for %1. "
                               "Program can not be flagged.")
                               .arg(logDesc);
-        VERBOSE(VB_GENERAL, msg);
+        VERBOSE(VB_IMPORTANT, msg);
 
         ChangeJobStatus(jobID, JOB_ERRORED,
                         "Could not open new database connection for "
@@ -2006,8 +2006,8 @@ void JobQueue::DoFlagCommercialsThread(void)
         msg = QString("Commercial Flagging ERRORED for %1, unable to find "
                       "mythcommflag, check your PATH and backend logs.")
                       .arg(logDesc);
-        VERBOSE(VB_JOBQUEUE, msg);
-        VERBOSE(VB_JOBQUEUE, QString("Current PATH: '%1'").arg(getenv("PATH")));
+        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, QString("Current PATH: '%1'").arg(getenv("PATH")));
 
         gContext->LogEntry("commflag", LP_WARNING,
                            "Commercial Flagging Errored", msg);
@@ -2064,12 +2064,15 @@ void JobQueue::DoFlagCommercialsThread(void)
         msg = QString("Finished, %1 break(s) found.").arg(breaksFound);
         ChangeJobStatus(jobID, JOB_FINISHED, msg);
 
+        VERBOSE(VB_GENERAL, QString("Commercial Flagging %1").arg(msg));
+        msg = "";
+
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
     }
 
     if (msg != "")
-        VERBOSE(VB_JOBQUEUE, msg);
+        VERBOSE(VB_IMPORTANT, msg);
 
     jobControlFlags.erase(key);
     runningJobIDs.erase(key);
@@ -2109,7 +2112,7 @@ void JobQueue::DoUserJobThread(void)
                           .arg(program_info->title)
                           .arg(program_info->chanid)
                           .arg(program_info->recstartts.toString());
-    VERBOSE(VB_JOBQUEUE, msg.local8Bit());
+    VERBOSE(VB_GENERAL, msg.local8Bit());
     gContext->LogEntry("jobqueue", LP_NOTICE,
                        QString("Job \"%1\" Started").arg(jobDesc), msg);
 
@@ -2134,8 +2137,8 @@ void JobQueue::DoUserJobThread(void)
         msg = QString("User Job '%1' ERRORED, unable to find "
                       "executable, check your PATH and backend logs.")
                       .arg(runningJobCommands[key]);
-        VERBOSE(VB_JOBQUEUE, msg);
-        VERBOSE(VB_JOBQUEUE, QString("Current PATH: '%1'").arg(getenv("PATH")));
+        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, QString("Current PATH: '%1'").arg(getenv("PATH")));
 
         gContext->LogEntry("jobqueue", LP_WARNING,
                            "User Job Errored", msg);
@@ -2151,7 +2154,7 @@ void JobQueue::DoUserJobThread(void)
                       .arg(program_info->title)
                       .arg(program_info->chanid)
                       .arg(program_info->recstartts.toString());
-        VERBOSE(VB_JOBQUEUE, msg.local8Bit());
+        VERBOSE(VB_GENERAL, msg.local8Bit());
 
         gContext->LogEntry("jobqueue", LP_NOTICE,
                            QString("Job \"%1\" Finished").arg(jobDesc), msg);
