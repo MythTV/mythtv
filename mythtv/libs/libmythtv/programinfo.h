@@ -218,6 +218,9 @@ class ProgramInfo
     void EditRecording(void);
     void EditScheduled(void);
 
+    // In-use, autodeletion prevention stuff
+    void MarkAsInUse(bool inuse);
+
   private:
     // GUI helper functions
     bool IsFindApplicable(void) const;
@@ -303,6 +306,8 @@ class ProgramInfo
   private:
     bool ignoreBookmark;
     mutable class ScheduledRecording* record;
+
+    QString inusekey;
 };
 
 /** \class ProgramList

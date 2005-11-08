@@ -114,6 +114,8 @@ ProgramInfo::ProgramInfo(void)
 
     sortTitle = "";
 
+    inusekey = "";
+
     record = NULL;
 }   
 
@@ -210,6 +212,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     year = other.year;
     ignoreBookmark = other.ignoreBookmark; 
    
+    inusekey = other.inusekey;
     record = NULL;
 
     return *this;
@@ -3136,6 +3139,43 @@ int ProgramInfo::getProgramFlags(void) const
     }
 
     return flags;
+}
+
+void ProgramInfo::MarkAsInUse(bool inuse)
+{
+    if (inuse && inusekey.length() < 2)
+    {
+        inusekey = gContext->GetHostName() + 
+                   QDateTime::currentDateTime().toString();
+    }
+
+    if (!inuse && inusekey.length() < 2)
+        return; // can't delete if we don't have a key
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM inuseprograms WHERE "
+                  "chanid = :CHANID AND starttime = :STARTTIME AND "
+                  "playid = :PLAYID  ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":PLAYID", inusekey);
+
+    query.exec();
+
+    if (!inuse)
+        return;
+
+    query.prepare("INSERT INTO inuseprograms (chanid, starttime, playid, "
+                  " lastupdatetime) VALUES(:CHANID, :STARTTIME, :PLAYID, "
+                  " :UPDATETIME);");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":PLAYID", inusekey);
+    query.bindValue(":UPDATETIME", QDateTime::currentDateTime());
+
+    if (!query.exec() || !query.isActive())
+        MythContext::DBError("SetInUse", query);
 }
 
 /** \fn ProgramInfo::GetChannel(const ProgramInfo*,QString&,QString&) const

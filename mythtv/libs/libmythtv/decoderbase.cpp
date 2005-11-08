@@ -7,7 +7,7 @@
 #include "livetvchain.h"
 
 DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo) 
-    : m_parent(parent), m_playbackinfo(pginfo),
+    : m_parent(parent), m_playbackinfo(NULL),
 
       ringBuffer(NULL), nvr_enc(NULL),
 
@@ -28,6 +28,24 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
       currentAudioTrack(-1), currentSubtitleTrack(-1),
       errored(false)
 {
+    if (pginfo)
+        m_playbackinfo = new ProgramInfo(*pginfo);
+}
+
+DecoderBase::~DecoderBase()
+{
+    if (m_playbackinfo)
+        delete m_playbackinfo;
+}
+
+void DecoderBase::SetProgramInfo(ProgramInfo *pginfo)
+{
+    if (m_playbackinfo)
+        delete m_playbackinfo;
+    m_playbackinfo = NULL;
+
+    if (pginfo)
+        m_playbackinfo = new ProgramInfo(*pginfo);
 }
 
 void DecoderBase::Reset(void)

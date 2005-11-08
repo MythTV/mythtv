@@ -753,8 +753,8 @@ void TV::HandleStateChange(void)
 
         tvchain->ReloadAll();
 
-        ProgramInfo *pginfo = tvchain->GetProgramAt(-1);
-        if (!pginfo)
+        playbackinfo = tvchain->GetProgramAt(-1);
+        if (!playbackinfo)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR +
                     "LiveTV not successfully started");
@@ -765,16 +765,16 @@ void TV::HandleStateChange(void)
         }
         else
         {
-            tvchain->SetProgram(pginfo);
+            tvchain->SetProgram(playbackinfo);
 
-            prbuffer = new RingBuffer(pginfo->pathname, false);
+            prbuffer = new RingBuffer(playbackinfo->pathname, false);
             prbuffer->SetLiveMode(tvchain);
         }
 
         gContext->DisableScreensaver();
 
         bool ok = false;
-        if (pginfo && StartRecorder())
+        if (playbackinfo && StartRecorder())
         {
             if (StartPlayer(false))
                 ok = true;
@@ -801,6 +801,9 @@ void TV::HandleStateChange(void)
         SET_NEXT();
 
         StopStuff(true, true, true);
+        if (playbackinfo)
+            delete playbackinfo;
+
         gContext->RestoreScreensaver();
     }
     else if (TRANSITION(kState_WatchingRecording, kState_WatchingPreRecorded))

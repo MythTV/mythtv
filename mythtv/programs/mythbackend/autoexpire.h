@@ -5,6 +5,7 @@
 
 #include <list>
 #include <vector>
+#include <set>
 
 #include <qmap.h> 
 #include <qmutex.h>
@@ -13,6 +14,7 @@
 using namespace std;
 class ProgramInfo;
 class EncoderLink;
+
 typedef vector<ProgramInfo*> pginfolist_t;
 typedef vector<EncoderLink*> enclinklist_t;
 
@@ -39,7 +41,11 @@ class AutoExpire : public QObject
     void ClearExpireList(void);
     void Sleep();
 
+    void UpdateDontExpireSet(void);
+    bool IsInDontExpireSet(QString chanid, QDateTime starttime);
+
     // main expire info
+    set<QString>  dont_expire_set;
     pginfolist_t  expire_list;
     pthread_t     expire_thread;
     QMutex        instance_lock;

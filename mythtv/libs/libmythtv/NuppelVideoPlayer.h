@@ -5,6 +5,7 @@
 #include <qmutex.h>
 #include <qwaitcondition.h>
 #include <qptrqueue.h>
+#include <qdatetime.h>
 #include <sys/time.h>
 
 #include "RingBuffer.h"
@@ -340,6 +341,8 @@ class NuppelVideoPlayer
     // Private LiveTV stuff
     void  SwitchToProgram(void);
 
+    void  UpdateInUseMark(void);
+
   private:
     VideoOutputType forceVideoOutput;
 
@@ -548,6 +551,9 @@ class NuppelVideoPlayer
 
     // Debugging variables
     Jitterometer *output_jmeter;
+
+    // Last InUse timestamp
+    QDateTime lastInUseTime;
 };
 
 #endif

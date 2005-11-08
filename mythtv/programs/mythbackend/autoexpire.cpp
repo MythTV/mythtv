@@ -235,6 +235,9 @@ void AutoExpire::RunExpirer(void)
     while (expire_thread_running)
     {
         instance_lock.lock();
+
+        UpdateDontExpireSet();
+
         if (is_master_backend)
             ExpireEpisodesOverMax();
 
@@ -433,20 +436,24 @@ void AutoExpire::ExpireEpisodesOverMax(void)
             {
                 found++;
 
-                if (found > maxIter.data())
+                QString chanid = query.value(0).toString();
+                QDateTime startts = query.value(1).toDateTime();
+                QString title = QString::fromUtf8(query.value(2).toString());
+
+                if (!IsInDontExpireSet(chanid, startts) && 
+                    found > maxIter.data())
                 {
                     QString msg = QString("Expiring \"%1\" from %2, "
                                           "too many episodes.")
-                                          .arg(query.value(2).toString())
-                                          .arg(query.value(1).toString());
+                                          .arg(title)
+                                          .arg(startts.toString());
                     VERBOSE(VB_FILE, msg);
                     gContext->LogEntry("autoexpire", LP_NOTICE,
                                        "Expired program", msg);
 
                     msg = QString("AUTO_EXPIRE %1 %2")
-                                  .arg(query.value(0).toString())
-                                  .arg(query.value(1).toDateTime()
-                                       .toString(Qt::ISODate));
+                                  .arg(chanid)
+                                  .arg(startts.toString(Qt::ISODate));
 
                     MythEvent me(msg);
                     gContext->dispatchNow(me);
@@ -593,7 +600,10 @@ void AutoExpire::FillDBOrdered(int expMethod)
 
         proginfo->filesize = size;
 
-        expire_list.push_back(proginfo);
+        if (IsInDontExpireSet(proginfo->chanid, proginfo->recstartts))
+            delete proginfo;
+        else
+            expire_list.push_back(proginfo);
     }
 }
 
@@ -663,6 +673,38 @@ void AutoExpire::Update(QMap<int, EncoderLink*> *encoderList, bool immediately)
         pthread_create(&expirer->update_thread, &attr,
                        SpawnUpdateThread, expirer);
     }
+}
+
+void AutoExpire::UpdateDontExpireSet(void)
+{
+    dont_expire_set.clear();
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT chanid, starttime FROM inuseprograms;");
+
+    if (!query.exec() || !query.isActive() || !query.size())
+        return;
+
+    QDateTime curTime;
+
+    while (query.next())
+    {
+        QString chanid = query.value(0).toString();
+        QDateTime startts = query.value(1).toDateTime();
+
+        if (startts.secsTo(curTime) < 2 * 60 * 60)
+        {
+            QString key = chanid + startts.toString(Qt::ISODate);
+            dont_expire_set.insert(key);
+        }
+    }
+}
+
+bool AutoExpire::IsInDontExpireSet(QString chanid, QDateTime starttime)
+{
+    QString key = chanid + starttime.toString(Qt::ISODate);
+
+    return (dont_expire_set.count(key));
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

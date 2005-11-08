@@ -157,8 +157,12 @@ NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
       // Debugging variables
       output_jmeter(NULL)
 {
+    lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
     if (info)
+    {
         m_playbackinfo = new ProgramInfo(*info);
+        m_playbackinfo->MarkAsInUse(true);
+    }
 
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
     commnotifyamount = gContext->GetNumSetting("CommNotifyAmount",0);
@@ -181,7 +185,11 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
         delete audioOutput;
 
     if (m_playbackinfo)
+    {
+        m_playbackinfo->MarkAsInUse(false);
         delete m_playbackinfo;
+    }
+
     if (weMadeBuffer)
         delete ringBuffer;
 
@@ -1864,11 +1872,18 @@ void NuppelVideoPlayer::SwitchToProgramExtChange(void)
     ringBuffer->OpenFile(pginfo->pathname);
 
     if (m_playbackinfo)
+    {
+        m_playbackinfo->MarkAsInUse(false);
         delete m_playbackinfo;
+    }
 
     m_playbackinfo = pginfo;
     livetvchain->SetProgram(pginfo);
+    GetDecoder()->SetProgramInfo(pginfo);
     CheckTVChain();
+
+    lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+    UpdateInUseMark();
 }
 
 void NuppelVideoPlayer::SwitchToProgram(void)
@@ -1895,11 +1910,18 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     }
 
     if (m_playbackinfo)
+    {
+        m_playbackinfo->MarkAsInUse(false);
         delete m_playbackinfo;
+    }
 
     m_playbackinfo = pginfo;
     livetvchain->SetProgram(pginfo);
+    GetDecoder()->SetProgramInfo(pginfo);
     CheckTVChain();
+
+    lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+    UpdateInUseMark();
 }
 
 void NuppelVideoPlayer::StartPlaying(void)
@@ -2047,6 +2069,8 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     while (!eof && !killplayer && !errored)
     {
+        UpdateInUseMark();
+
         if (livetvchain && livetvchain->NeedsToSwitch())
         {
             SwitchToProgram();
@@ -3754,6 +3778,8 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
 bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
                                               int *did_ff, bool *is_key, bool honorCutList)
 {
+    UpdateInUseMark();
+
     if (dm_iter == NULL && honorCutList)
         dm_iter = deleteMap.begin();
     
@@ -3865,6 +3891,8 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
 
     while (!eof)
     {
+        UpdateInUseMark();
+
         looped = true;
         myFramesPlayed++;
 
@@ -4538,3 +4566,14 @@ void NuppelVideoPlayer::SetDecoder(DecoderBase *dec)
         delete d;
     }
 }
+
+void NuppelVideoPlayer::UpdateInUseMark(void)
+{
+    if (lastInUseTime.secsTo(QDateTime::currentDateTime()) > 60 * 60)
+    {
+        lastInUseTime = QDateTime::currentDateTime();
+        if (m_playbackinfo)
+            m_playbackinfo->MarkAsInUse(true);
+    }
+}
+

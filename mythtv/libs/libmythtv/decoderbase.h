@@ -15,7 +15,7 @@ class DecoderBase
 {
   public:
     DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo);
-    virtual ~DecoderBase() { }
+    virtual ~DecoderBase();
 
     virtual void Reset(void);
 
@@ -25,6 +25,9 @@ class DecoderBase
     void setExactSeeks(bool exact) { exactseeks = exact; }
     void setLiveTVMode(bool live) { livetv = live; }
     void setRecorder(RemoteEncoder *recorder) { nvr_enc = recorder; }
+
+    // Must be done while player is paused.
+    void SetProgramInfo(ProgramInfo *pginfo);
 
     void SetLowBuffers(bool low) { lowbuffers = low; }
 
