@@ -340,7 +340,9 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         SetIntOption(profile, "mpeg4maxquality");
         SetIntOption(profile, "mpeg4minquality");
         SetIntOption(profile, "mpeg4qualdiff");
+#ifdef HAVE_PTHREADS
         SetIntOption(profile, "encodingthreadcount");
+#endif
         SetIntOption(profile, "mpeg4optionvhq");
         SetIntOption(profile, "mpeg4option4mv");
     }

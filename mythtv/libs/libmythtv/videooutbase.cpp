@@ -513,44 +513,18 @@ void VideoOutput::GetOSDBounds(QRect &total, QRect &visible) const
  */
 QRect VideoOutput::GetVisibleOSDBounds(void) const
 {
-    uint xoff   = imgx;
-    uint yoff   = imgy;
-    uint width  = imgw;
-    uint height = imgh;
+    float dv_w = ((float)XJ_width)  / dispwoff;
+    float dv_h = ((float)XJ_height) / disphoff;
 
-    switch (letterbox)
-    {
-        case kLetterbox_4_3_Zoom:
-            width = (imgw*3)/4;
-            xoff = imgw/8;
-            height = (imgh*3)/4;
-            yoff = imgh/8;
-            break;
-        case kLetterbox_16_9_Stretch:
-        case kLetterbox_16_9_Zoom:
-            width = (imgw*3)/4;
-            xoff = imgw/8;
-            break;
-        case kLetterbox_Fill:
-            if (GetDisplayAspect() > XJ_aspect)
-            {
-                int pixDisplayed = int(((XJ_aspect / GetDisplayAspect()) * imgh) + 0.5);
+    uint right_overflow = max((dispwoff + dispxoff) - dispw, 0);
+    uint lower_overflow = max((disphoff + dispyoff) - disph, 0);
 
-                height = pixDisplayed;
-                yoff = (imgh - pixDisplayed) / 2;
-            }
-            else
-            {
-                int pixDisplayed = int(((GetDisplayAspect() / XJ_aspect) * imgw) + 0.5);
-
-                width = pixDisplayed;
-                xoff = (imgw - pixDisplayed) / 2;
-            }
-            break;
-        default:
-            break;
-    }
-    return QRect(xoff, yoff, width, height);
+    // top left and bottom right corners.
+    QPoint tl = QPoint((uint) ceil(max(-dispxoff,0)*dv_w),
+                       (uint) ceil(max(-dispyoff,0)*dv_h));
+    QPoint br = QPoint((uint) floor(XJ_width-(right_overflow*dv_w)),
+                       (uint) floor(XJ_height-(lower_overflow*dv_h)));
+    return QRect(tl, br);
 }
 
 /**
