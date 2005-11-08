@@ -199,11 +199,12 @@ static uint delete_invalid_programs_in_db(
 {
     uint counter = 0;
     query.prepare(
-        "SELECT starttime, endtime, title "
+        "SELECT starttime, endtime, title, subtitle "
         "FROM program "
         "WHERE chanid=:CHANID AND "
         "      ( ( starttime>=:STIME AND starttime<:ETIME ) AND NOT "
-        "        ( starttime=:STIME AND endtime=:ETIME AND title=:TITLE ) AND "
+        "        ( starttime=:STIME AND endtime=:ETIME AND "
+        "            title=:TITLE AND subtitle=:SUBTITLE) AND "
         "          manualid=0 );");
 
     query.bindValue(":CHANID", chanid);
@@ -212,6 +213,7 @@ static uint delete_invalid_programs_in_db(
     query.bindValue(":ETIME", event.EndTime.
                     toString(QString("yyyy-MM-dd hh:mm:00")));
     query.bindValue(":TITLE", event.Event_Name.utf8());
+    query.bindValue(":SUBTITLE", event.Event_Subtitle.utf8());
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Checking Rescheduled Event", query);
@@ -228,16 +230,18 @@ static uint delete_invalid_programs_in_db(
         // Possibly more than one conflict
         VERBOSE(VB_EIT, QString("Schedule Change on Channel %1")
                 .arg(chanid));
-        VERBOSE(VB_EIT, QString("Old: %1 %2 %3")
+        VERBOSE(VB_EIT, QString("Old: %1 %2 %3: %4")
                 .arg(query.value(0).toString())
                 .arg(query.value(1).toString())
-                .arg(query.value(2).toString()));
-        VERBOSE(VB_EIT, QString("New: %1 %2 %3")
+                .arg(query.value(2).toString())
+                .arg(query.value(3).toString()));
+        VERBOSE(VB_EIT, QString("New: %1 %2 %3: %4")
                 .arg(event.StartTime.
                      toString(QString("yyyy-MM-dd hh:mm:00")))
                 .arg(event.EndTime.
                      toString(QString("yyyy-MM-dd hh:mm:00")))
-                .arg(event.Event_Name.utf8()));
+                .arg(event.Event_Name)
+                .arg(event.Event_Subtitle));
         // Delete old EPG record.
         query2.bindValue(":CHANID", chanid);
         query2.bindValue(":STARTTIME", query.value(0).toString());
