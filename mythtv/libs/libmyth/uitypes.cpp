@@ -1293,6 +1293,7 @@ UIImageType::UIImageType(const QString &name, const QString &filename, int dorde
     m_drop_x = 0;
     m_drop_y = 0;
     m_show = false;
+    m_transparent = gContext->GetNumSetting("PlayBoxTransparency", 1);
 }
 
 UIImageType::~UIImageType()
@@ -1308,11 +1309,10 @@ void UIImageType::LoadImage()
     }
 
     QString file;
-    int transparentFlag = gContext->GetNumSetting("PlayBoxTransparency", 1);
     if (m_flex == true)
     {
         int pathStart = m_filename.findRev('/');
-        if (transparentFlag == 1)
+        if (m_transparent)
         {
             if (pathStart < 0 )
                 m_filename = "trans-" + m_filename;

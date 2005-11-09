@@ -13,6 +13,7 @@
 #include <qstringlist.h>
 #include <qnetwork.h> 
 #include <qdeepcopy.h>
+#include <qmap.h>
 
 #include <cerrno>
 #include <iostream>
@@ -205,7 +206,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20051104-1"
+#define MYTH_BINARY_VERSION "0.19.20051109-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -236,6 +237,9 @@ class MythContext : public QObject
     QString GetMasterHostPrefix(void);
 
     QString GetHostName(void);
+
+    void ClearSettingsCache(QString myKey = "");
+    void ActivateSettingsCache(bool activate = true);
 
     bool ConnectToMasterServer(void);
     QSocketDevice *ConnectServer(QSocket *eventSocket,
@@ -406,6 +410,10 @@ class MythContext : public QObject
 
     MythContextPrivate *d;
     QString app_binary_version;
+
+    bool useSettingsCache;
+    QMutex cacheLock;
+    QMap <QString, QString> settingsCache;
 };
 
 /// This global variable contains the MythContext instance for the application

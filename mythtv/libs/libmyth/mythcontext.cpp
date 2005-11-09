@@ -724,6 +724,8 @@ bool MythContext::Init(bool gui)
     connect(d->eventSock, SIGNAL(connectionClosed()), 
             this, SLOT(EventSocketClosed()));
 
+    ActivateSettingsCache(true);
+
     return true;
 }
 
@@ -919,6 +921,34 @@ QString MythContext::GetMasterHostPrefix(void)
                      .arg(d->serverSock->peerAddress().toString())
                      .arg(d->serverSock->peerPort());
     return ret;
+}
+
+void MythContext::ClearSettingsCache(QString myKey)
+{
+    cacheLock.lock();
+    if (myKey != "" && settingsCache.contains(myKey))
+    {
+        VERBOSE(VB_GENERAL, QString("Clearing Settings Cache for '%1'.")
+                                    .arg(myKey));
+        settingsCache.remove(myKey);
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, "Clearing Settings Cache.");
+        settingsCache.clear();
+    }
+    cacheLock.unlock();
+}
+
+void MythContext::ActivateSettingsCache(bool activate)
+{
+    if (activate)
+        VERBOSE(VB_GENERAL, "Enabling Settings Cache.");
+    else
+        VERBOSE(VB_GENERAL, "Disabling Settings Cache.");
+
+    useSettingsCache = activate;
+    ClearSettingsCache();
 }
 
 QString MythContext::GetHostName(void)
@@ -1599,12 +1629,26 @@ void MythContext::SaveSettingOnHost(const QString &key, const QString &newValue,
                                 .arg(key));
     }
 
+    ClearSettingsCache(key);
+    ClearSettingsCache(host + " " + key);
 }
 
 QString MythContext::GetSetting(const QString &key, const QString &defaultval)
 {
     bool found = false;
     QString value;
+
+    if (useSettingsCache)
+    {
+        cacheLock.lock();
+        if (settingsCache.contains(key))
+        {
+            value = settingsCache[key];
+            cacheLock.unlock();
+            return value;
+        }
+        cacheLock.unlock();
+    }
 
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
@@ -1643,9 +1687,17 @@ QString MythContext::GetSetting(const QString &key, const QString &defaultval)
                                 .arg(key));
     }
 
-    if (found)
-        return value;
-    return d->m_settings->GetSetting(key, defaultval); 
+    if (!found)
+        value = d->m_settings->GetSetting(key, defaultval); 
+
+    if (useSettingsCache)
+    {
+        cacheLock.lock();
+        settingsCache[key] = value;
+        cacheLock.unlock();
+    }
+
+    return value;
 }
 
 int MythContext::GetNumSetting(const QString &key, int defaultval)
@@ -1670,6 +1722,19 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
     bool found = false;
     QString value = defaultval;
 
+    if (useSettingsCache)
+    {
+        QString myKey = host + " " + key;
+        cacheLock.lock();
+        if (settingsCache.contains(myKey))
+        {
+            value = settingsCache[myKey];
+            cacheLock.unlock();
+            return value;
+        }
+        cacheLock.unlock();
+    }
+
     MSqlQuery query(MSqlQuery::InitCon());
     if (query.isConnected())
     {
@@ -1690,6 +1755,13 @@ QString MythContext::GetSettingOnHost(const QString &key, const QString &host,
         VERBOSE(VB_IMPORTANT, 
              QString("Database not open while trying to load setting: %1")
                                 .arg(key));
+    }
+
+    if (found && useSettingsCache)
+    {
+        cacheLock.lock();
+        settingsCache[host + " " + key] = value;
+        cacheLock.unlock();
     }
 
     return value;
@@ -2088,6 +2160,7 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 void MythContext::SetSetting(const QString &key, const QString &newValue)
 {
     d->m_settings->SetSetting(key, newValue);
+    ClearSettingsCache(key);
 }
 
 bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
@@ -2167,6 +2240,12 @@ void MythContext::EventSocketRead(void)
             VERBOSE(VB_IMPORTANT,
                     "Received a: " << prefix << " message from the backend"
                     "\n\t\t\tBut I don't know what to do with it.");
+        }
+        else if (message == "CLEAR_SETTINGS_CACHE")
+        {
+            // No need to dispatch this message to ourself, so handle it
+            VERBOSE(VB_GENERAL, "Received a remote 'Clear Cache' request");
+            ClearSettingsCache();
         }
         else
         {

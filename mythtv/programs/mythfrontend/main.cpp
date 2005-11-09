@@ -374,6 +374,9 @@ void TVMenuCallback(void *data, QString &selection)
     (void)data;
     QString sel = selection.lower();
 
+    if (sel.left(9) == "settings ")
+        gContext->ActivateSettingsCache(false);
+
     if (sel == "tv_watch_live")
         startTV();
     else if (sel == "tv_watch_recording")
@@ -481,6 +484,12 @@ void TVMenuCallback(void *data, QString &selection)
     }
     else if (sel == "tv_status")
         showStatus();
+
+    if (sel.left(9) == "settings ")
+    {
+        gContext->ActivateSettingsCache(true);
+        RemoteSendMessage("CLEAR_SETTINGS_CACHE");
+    }
 }
 
 int handleExit(void)
