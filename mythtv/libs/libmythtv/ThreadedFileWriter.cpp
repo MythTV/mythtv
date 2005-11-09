@@ -43,7 +43,10 @@ static uint safe_write(int fd, const void *data, uint sz)
         if (ret < 0)
         {
             if (errno == EAGAIN)
+            {
+                VERBOSE(VB_IMPORTANT, LOC + "safe_write(): Got EAGAIN.");
                 continue;
+            }
 
             errcnt++;
             VERBOSE(VB_IMPORTANT, LOC_ERR + "safe_write(): File I/O " +
@@ -153,7 +156,7 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
         if (first)
         {
             VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND begin " + 
-                    QString("cnt(%1) free(%2)").arg(count, BufFree()));
+                    QString("cnt(%1) free(%2)").arg(count).arg(BufFree()));
             first = false;
         }
 
