@@ -104,6 +104,7 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     killState = kDone;
     waitToStart = false;
 
+    lastUpdateTime = QDateTime::currentDateTime().addSecs(-5);
     connected = false;
     rbuffer = NULL;
     nvp = NULL;
@@ -1325,6 +1326,9 @@ void PlaybackBox::cursorUp(bool page, bool newview)
 
 bool PlaybackBox::FillList()
 {
+    if (lastUpdateTime.secsTo(QDateTime::currentDateTime()) <= 1)
+        return connected;
+
     ProgramInfo *p;
 
     // Save some information so we can find our place again.
