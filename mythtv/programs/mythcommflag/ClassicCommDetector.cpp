@@ -2539,7 +2539,9 @@ void ClassicCommDetector::SearchForLogo()
         {
             VideoFrame* vf = nvp->GetRawVideoFrame(seekFrame);
 
-            emit breathe();
+            if ((loops % 50) == 0)
+                emit breathe();
+
             if (m_bStop)
                 return;
 
