@@ -3197,7 +3197,11 @@ void ProgramInfo::MarkAsInUse(bool inuse)
     query.exec();
 
     if (!inuse)
+    {
+        if (!gContext->IsBackend())
+            RemoteSendMessage("RECORDING_LIST_CHANGE");
         return;
+    }
 
     query.prepare("INSERT INTO inuseprograms (chanid, starttime, playid, "
                   " lastupdatetime) VALUES(:CHANID, :STARTTIME, :PLAYID, "
@@ -3211,7 +3215,7 @@ void ProgramInfo::MarkAsInUse(bool inuse)
         MythContext::DBError("SetInUse", query);
 
     // Let others know we changed status
-    if (notifyOfChange)
+    if (notifyOfChange && !gContext->IsBackend())
         RemoteSendMessage("RECORDING_LIST_CHANGE");
 }
 
