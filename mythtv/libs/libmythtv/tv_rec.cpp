@@ -3467,7 +3467,14 @@ void TVRec::TuningNewRecorder(void)
     if (channel && genOpt.cardtype == "MJPEG")
         channel->Open(); // Needed because of NVR::MJPEGInit()
 
-    recorder->SetRecording(lastTuningRequest.program);
+    if (lastTuningRequest.program)
+        recorder->SetRecording(lastTuningRequest.program);
+    else if (tvchain)
+    {
+        ProgramInfo *pginfo = tvchain->GetProgramAt(0);
+        recorder->SetRecording(pginfo);
+        delete pginfo;
+    }
 
     // Setup for framebuffer capture devices..
     if (channel)
