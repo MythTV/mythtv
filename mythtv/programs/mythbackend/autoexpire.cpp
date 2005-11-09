@@ -680,7 +680,8 @@ void AutoExpire::UpdateDontExpireSet(void)
     dont_expire_set.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, starttime FROM inuseprograms;");
+    query.prepare("SELECT chanid, starttime, lastupdatetime "
+                  "FROM inuseprograms;");
 
     if (!query.exec() || !query.isActive() || !query.size())
         return;
@@ -691,8 +692,9 @@ void AutoExpire::UpdateDontExpireSet(void)
     {
         QString chanid = query.value(0).toString();
         QDateTime startts = query.value(1).toDateTime();
+        QDateTime lastupdate = query.value(2).toDateTime();
 
-        if (startts.secsTo(curTime) < 2 * 60 * 60)
+        if (lastupdate.secsTo(curTime) > 2 * 60 * 60)
         {
             QString key = chanid + startts.toString(Qt::ISODate);
             dont_expire_set.insert(key);
