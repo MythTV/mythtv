@@ -55,7 +55,8 @@ enum FlagMask {
     FL_CUTLIST   = 0x02,
     FL_AUTOEXP   = 0x04,
     FL_EDITING   = 0x08,
-    FL_BOOKMARK  = 0x10
+    FL_BOOKMARK  = 0x10,
+    FL_INUSE     = 0x20
 };
 
 enum RecStatusType {
@@ -174,6 +175,7 @@ class ProgramInfo
     long long GetBookmark(void) const;
     bool IsEditing(void) const;
     bool IsCommFlagged(void) const;
+    bool IsInUse(QString &byWho) const;
     bool GetAutoExpireFromRecorded(void) const;
     bool GetPreserveEpisodeFromRecorded(void) const;
     bool UsesMaxEpisodes(void) const;

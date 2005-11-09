@@ -168,6 +168,12 @@ void HouseKeeper::RunHouseKeeping(void)
                 JobQueue::CleanupOldJobsInQueue();
                 updateLastrun("JobQueueCleanup");
             }
+
+            if (wantToRun("InUseProgramsCleanup", 1, 0, 24))
+            {
+                CleanupInUsePrograms();
+                updateLastrun("InUseProgramsCleanup");
+            }
         }
 
         dbTag = QString("JobQueueRecover-%1").arg(gContext->GetHostName());
@@ -229,6 +235,17 @@ void HouseKeeper::runFillDatabase()
         system(command.ascii());
         _exit(0); // this exit is ok, non-error exit from system command.
     }
+}
+
+void HouseKeeper::CleanupInUsePrograms(void)
+{
+    QDateTime fourHoursAgo = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM inuseprograms "
+                  "WHERE lastupdatetime > :FOURHOURSAGO ;");
+    query.bindValue(":FOURHOURSAGO", fourHoursAgo);
+    query.exec();
 }
 
 void *HouseKeeper::doHouseKeepingThread(void *param)

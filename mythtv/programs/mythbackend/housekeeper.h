@@ -27,6 +27,7 @@ class HouseKeeper
     void updateLastrun(const QString &dbTag);
     void flushLogs();
     void runFillDatabase();
+    void CleanupInUsePrograms();
     bool threadrunning;
     bool filldbRunning;
     bool isMaster;

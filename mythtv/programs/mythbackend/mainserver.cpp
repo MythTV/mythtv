@@ -894,6 +894,21 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QString port = gContext->GetSetting("BackendServerPort");
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
+    QValueList<QString> inUseList;
+    QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("SELECT DISTINCT chanid, starttime FROM inuseprograms "
+                  " WHERE lastupdatetime > :ONEHOURAGO ;");
+    query.bindValue(":ONEHOURAGO", oneHourAgo);
+
+    if (query.exec() && query.isActive() && query.size() > 0)
+        while (query.next())
+            inUseList.append(query.value(0).toString() + " " +
+                             query.value(1).toDateTime().toString(Qt::ISODate));
+
+
     QString thequery = "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
                        "recorded.title,recorded.subtitle,recorded.description,"
                        "recorded.hostname,channum,name,callsign,commflagged,cutlist,"
@@ -923,7 +938,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QMap<QString, QString> backendIpMap;
     QMap<QString, QString> backendPortMap;
 
-    MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(thequery);
 
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -993,6 +1007,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             flags |= query.value(11).toString().length() > 1 ? FL_CUTLIST : 0;
             flags |= query.value(12).toInt() ? FL_AUTOEXP : 0;
             flags |= query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
+
+            if (inUseList.contains(query.value(0).toString() + " " +
+                       query.value(1).toDateTime().toString(Qt::ISODate)))
+                flags |= FL_INUSE;
 
             if (query.value(13).toInt())
             {
@@ -1539,9 +1557,40 @@ void MainServer::HandleDeleteRecording(QStringList &slist, PlaybackSock *pbs,
 void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
                                          bool forceMetadataDelete)
 {
+    int resultCode = -1;
     QSocket *pbssock = NULL;
     if (pbs)
         pbssock = pbs->getSocket();
+
+    QString fileprefix = gContext->GetFilePrefix();
+    QString filename = pginfo->GetRecordFilename(fileprefix);
+    QString byWho;
+
+    // Don't even try to delete if the program is in use.
+    if (pginfo->IsInUse(byWho))
+    {
+        QString logInfo = QString("chanid %1 at %2")
+                              .arg(pginfo->chanid)
+                              .arg(pginfo->recstartts.toString());
+        VERBOSE(VB_ALL,
+                QString("ERROR when trying to delete file: %1. Program is in "
+                        "use.  Program can not be deleted.").arg(filename));
+        VERBOSE(VB_ALL, QString("Program in use by: %1").arg(byWho));
+        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
+                           QString("File %1 is in use for %2 when trying "
+                                   "to delete recording.")
+                                   .arg(filename).arg(logInfo));
+        resultCode = -3;
+
+        if (pbssock)
+        {
+            QStringList outputlist = QString::number(resultCode);
+            SendResponse(pbssock, outputlist);
+        }
+
+        delete pginfo;
+        return;
+    }
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.
@@ -1577,7 +1626,6 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
     // Tell all encoders to stop recordering to the file being deleted.
     // Hopefully this is never triggered.
-    int resultCode = -1;
 
     QMap<int, EncoderLink *>::Iterator iter = encoderList->begin();
     for (; iter != encoderList->end(); ++iter)
@@ -1605,8 +1653,6 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
         }
     }
 
-    QString fileprefix = gContext->GetFilePrefix();
-    QString filename = pginfo->GetRecordFilename(fileprefix);
     QFile checkFile(filename);
     bool fileExists = checkFile.exists();
 

@@ -686,6 +686,16 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
             itype->LoadImage();
         }
 
+        itype = (UIImageType *)container->GetType("inuse");
+        if (itype)
+        {
+            if (flags & FL_INUSE)
+                itype->ResetFilename();
+            else
+                itype->SetImage("blank.png");
+            itype->LoadImage();
+        }
+
         itype = (UIImageType *)container->GetType("bookmark");
         if (itype)
         {
@@ -1697,7 +1707,8 @@ void PlaybackBox::deleteSelected()
 
     if (!playList.count())
     {
-        if (curitem->availableStatus != asPendingDelete)
+        if ((curitem->availableStatus != asPendingDelete) &&
+            ((curitem->programflags & FL_INUSE) == 0))
             remove(curitem);
         else
             showAvailablePopup(curitem);
@@ -2124,10 +2135,16 @@ void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
     switch (rec->availableStatus)
     {
         case asAvailable:
-                 MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                               QObject::tr("Recording Unavailable"),
-                               QObject::tr("This recording is currently "
-                                           "Available"));
+                 if (rec->programflags & FL_INUSE)
+                     MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                   QObject::tr("Recording Available"),
+                                   QObject::tr("This recording is currently in "
+                                               "use by another Myth program"));
+                 else
+                     MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+                                   QObject::tr("Recording Available"),
+                                   QObject::tr("This recording is currently "
+                                               "Available"));
                  break;
         case asPendingDelete:
                  MythPopupBox::showOkPopup(gContext->GetMainWindow(),
@@ -2871,7 +2888,7 @@ void PlaybackBox::doPlaylistDelete(void)
     for (it = playList.begin(); it != playList.end(); ++it )
     {
         tmpItem = findMatchingProg(*it);
-        if (tmpItem)
+        if (tmpItem && ((tmpItem->programflags & FL_INUSE) == 0))
             RemoteDeleteRecording(tmpItem, false, false);
     }
 
@@ -2886,7 +2903,8 @@ void PlaybackBox::doDelete(void)
 
     cancelPopup();
 
-    if (delitem->availableStatus == asPendingDelete)
+    if ((delitem->availableStatus == asPendingDelete) ||
+        (delitem->programflags & FL_INUSE))
     {
         showAvailablePopup(delitem);
         return;
@@ -2915,7 +2933,8 @@ void PlaybackBox::doForceDelete(void)
 
     cancelPopup();
 
-    if (delitem->availableStatus == asPendingDelete)
+    if ((delitem->availableStatus == asPendingDelete) ||
+        (delitem->programflags & FL_INUSE))
     {
         showAvailablePopup(delitem);
         return;
@@ -2935,7 +2954,8 @@ void PlaybackBox::doDeleteForgetHistory(void)
 
     cancelPopup();
 
-    if (delitem->availableStatus == asPendingDelete)
+    if ((delitem->availableStatus == asPendingDelete) ||
+        (delitem->programflags & FL_INUSE))
     {
         showAvailablePopup(delitem);
         return;
@@ -3400,7 +3420,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
         delete previewPixmap;
         previewPixmap = NULL;
     }
-    
+
     int screenheight = 0, screenwidth = 0;
     float wmult = 0, hmult = 0;
 
@@ -3474,7 +3494,7 @@ void PlaybackBox::showIconHelp(void)
                                               popupBackground, popupHighlight,
                                               "icon help");
 
-    QGridLayout *grid = new QGridLayout(5, 2, (int)(10 * wmult));
+    QGridLayout *grid = new QGridLayout(6, 2, (int)(10 * wmult));
 
     QLabel *label;
     UIImageType *itype;
@@ -3593,6 +3613,28 @@ void PlaybackBox::showIconHelp(void)
         label->setBackgroundOrigin(ParentOrigin);
         label->setPaletteForegroundColor(popupForeground);
         grid->addWidget(label, 4, 0, Qt::AlignCenter);
+    }
+
+    itype = (UIImageType *)container->GetType("inuse");
+    if (itype)
+    {
+        label = new QLabel(tr("Recording is in use"), iconhelp);
+        label->setAlignment(Qt::WordBreak | Qt::AlignLeft);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 5, 1, Qt::AlignLeft);
+
+        label = new QLabel(iconhelp, "nopopsize");
+
+        itype->ResetFilename();
+        itype->LoadImage();
+        label->setPixmap(itype->GetImage());
+        displayme = true;
+
+        label->setMaximumWidth(width() / 2);
+        label->setBackgroundOrigin(ParentOrigin);
+        label->setPaletteForegroundColor(popupForeground);
+        grid->addWidget(label, 5, 0, Qt::AlignCenter);
     }
 
     if (!displayme)
@@ -3825,6 +3867,12 @@ void PlaybackBox::showRecGroupChooser(void)
         setGroupFilter();
 
     closeRecGroupPopup(result == MythDialog::Accepted);
+
+    if (result == MythDialog::Accepted)
+    {
+        progIndex = 0;
+        titleIndex = 0;
+    }
 }
 
 void PlaybackBox::recGroupChooserListBoxChanged(void)

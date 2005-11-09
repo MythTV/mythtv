@@ -1650,6 +1650,36 @@ bool ProgramInfo::IsCommFlagged(void) const
     return false;
 }
 
+/** \fn ProgramInfo::IsInUse(QString &byWho) const
+ *  \brief Returns true if Program is in use.  This is determined by
+ *         the inuseprograms table which is updated automatically by
+ *         NuppelVideoPlayer.
+ */
+bool ProgramInfo::IsInUse(QString &byWho) const
+{
+    QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
+    MSqlQuery query(MSqlQuery::InitCon());
+    
+    query.prepare("SELECT playid FROM inuseprograms "
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :STARTTIME "
+                  " AND lastupdatetime > :ONEHOURAGO ;");
+    query.bindValue(":CHANID", chanid);
+    query.bindValue(":STARTTIME", recstartts);
+    query.bindValue(":ONEHOURAGO", oneHourAgo);
+
+    byWho = "";
+    if (query.exec() && query.isActive() && query.size() > 0)
+    {
+        while(query.next())
+            byWho += "\n" + query.value(0).toString();
+
+        return true;
+    }
+
+    return false;
+}
+
 /** \fn ProgramInfo::SetCommFlagged(int) const
  *  \brief Set "commflagged" field in "recorded" table to "flag".
  *  \param flag value to set commercial flagging field to.
@@ -3143,10 +3173,13 @@ int ProgramInfo::getProgramFlags(void) const
 
 void ProgramInfo::MarkAsInUse(bool inuse)
 {
+    bool notifyOfChange = false;
+
     if (inuse && inusekey.length() < 2)
     {
-        inusekey = gContext->GetHostName() + 
+        inusekey = gContext->GetHostName() + " @ " +
                    QDateTime::currentDateTime().toString();
+        notifyOfChange = true;
     }
 
     if (!inuse && inusekey.length() < 2)
@@ -3176,6 +3209,10 @@ void ProgramInfo::MarkAsInUse(bool inuse)
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("SetInUse", query);
+
+    // Let others know we changed status
+    if (notifyOfChange)
+        RemoteSendMessage("RECORDING_LIST_CHANGE");
 }
 
 /** \fn ProgramInfo::GetChannel(const ProgramInfo*,QString&,QString&) const
