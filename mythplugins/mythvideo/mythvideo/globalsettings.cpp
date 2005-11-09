@@ -15,8 +15,8 @@ static HostComboBox *VideoDefaultParentalLevel()
     gc->setLabel(QObject::tr("Starting Parental Level"));
     gc->addSelection(QObject::tr("4 - Highest"), "4");
     gc->addSelection(QObject::tr("1 - Lowest"), "1");
-    gc->addSelection(QObject::tr("2"), "2"); 
-    gc->addSelection(QObject::tr("3"), "3");
+    gc->addSelection("2"); 
+    gc->addSelection("3");
     gc->setHelpText(QObject::tr("This is the 'level' that MythVideo starts at. "
                     "Any videos with a level at or below this will be shown in "
                     "the list or while browsing by default. The Parental PIN "

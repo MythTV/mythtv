@@ -64,14 +64,6 @@
         <translation>1 - Najnižji</translation>
     </message>
     <message>
-        <source>2</source>
-        <translation>2</translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation>3</translation>
-    </message>
-    <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
         <translation>&apos;Nivo&apos; v kateren se MythVideo zažene. Vsi filmi, z tem ali nižjim nivojem,  bodo kot privzeto prikazani v seznamu ali med brskanjem. PIN naj bo nastavljen za limitiranje sprememb privzetega nivoja.</translation>
     </message>
@@ -194,10 +186,6 @@
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
         <translation>Če nastavljeno, bodo sličice obdržale originalno velikost. Če ne, pa se bo njihova velikost prilagodila ikonam ozadja.</translation>
-    </message>
-    <message>
-        <source>General Settings</source>
-        <translation type="obsolete">Splošne nastavitve</translation>
     </message>
     <message>
         <source>Video Manager</source>
@@ -696,10 +684,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>Originalni PIN:</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation type="obsolete">Ni najdenih videov</translation>
     </message>
     <message>
         <source>Select action</source>

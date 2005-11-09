@@ -68,14 +68,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>2</source>
-        <translation type="unfinished">2</translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation type="unfinished">3</translation>
-    </message>
-    <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -596,14 +588,6 @@
         <translation>Vedi dettagli</translation>
     </message>
     <message>
-        <source>Plain View</source>
-        <translation type="obsolete">Visualizzazione semplice</translation>
-    </message>
-    <message>
-        <source>Folder View</source>
-        <translation type="obsolete">Visualizzazione cartelle</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
@@ -699,10 +683,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>Pin parentale:</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation type="obsolete">Nessun file trovato</translation>
     </message>
     <message>
         <source>Select action</source>

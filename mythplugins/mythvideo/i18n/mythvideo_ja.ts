@@ -68,14 +68,6 @@
         <translation>1 - 低</translation>
     </message>
     <message>
-        <source>2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -102,10 +94,6 @@
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
         <translation>これをセットすると、MythVideoの開始ディレクトリで関連の有るファイルをスキャンされてなくても表示します。</translation>
-    </message>
-    <message>
-        <source>General Settings</source>
-        <translation type="obsolete">全般設定</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -601,14 +589,6 @@
         <translation>詳細を表示する</translation>
     </message>
     <message>
-        <source>Plain View</source>
-        <translation type="obsolete">プレインビュー</translation>
-    </message>
-    <message>
-        <source>Folder View</source>
-        <translation type="obsolete">フォルダービュー</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
@@ -704,10 +684,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>再生制限ピン:</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation type="obsolete">ファイルを見つけられませんでした</translation>
     </message>
     <message>
         <source>Select action</source>

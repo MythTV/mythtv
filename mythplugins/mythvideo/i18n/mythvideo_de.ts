@@ -68,14 +68,6 @@
         <translation>1 - Niedrigster</translation>
     </message>
     <message>
-        <source>2</source>
-        <translation>2</translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation>3</translation>
-    </message>
-    <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
         <translation>MythVideo startet mit diesem &apos;Level&apos;. Videos mit gleichem oder niedrigerem Level werden angezeigt. Die Kindersicherungs-PIN sollte gesetzt werden, um das Ändern des Default-Levels einzuschränken.</translation>
     </message>
@@ -102,10 +94,6 @@
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
         <translation>Falls gesetzt, so werden im Videolisten-Menü alle relevanten Dateien im MythVideo Verzeichnis und darunter, unabhängig davon ob sie eingelesen wurden oder nicht, angezeigt.</translation>
-    </message>
-    <message>
-        <source>General Settings</source>
-        <translation type="obsolete">Grundeinstellungen</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -601,14 +589,6 @@
         <translation>Einzelheiten zeigen</translation>
     </message>
     <message>
-        <source>Plain View</source>
-        <translation type="obsolete">Einfache Ansicht</translation>
-    </message>
-    <message>
-        <source>Folder View</source>
-        <translation type="obsolete">Verzeichnisansicht</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -704,10 +684,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>Kindersicherungs-PIN:</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation type="obsolete">Keine Dateien gefunden</translation>
     </message>
     <message>
         <source>Select action</source>

@@ -68,14 +68,6 @@
         <translation>1 - Sévère</translation>
     </message>
     <message>
-        <source>2</source>
-        <translation>2</translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation>3</translation>
-    </message>
-    <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
         <translation>C&apos;est le niveau à partir duquel MythVideo démarre. Toutes les vidéos avec un niveau inférieur ou égal à la valeur seront affiché dans la liste. Afin d&apos;empêcher le changement du niveau par défaut, le code parental doit être saisi !</translation>
     </message>
@@ -102,10 +94,6 @@
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
         <translation>Si coché, l&apos;écran &apos;Liste des vidéos&apos; affichera tous les fichiers du répertoire MythVideo même s&apos;ils n&apos;ont pas été recherchés.</translation>
-    </message>
-    <message>
-        <source>General Settings</source>
-        <translation type="obsolete">Configuration générale</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -243,10 +231,6 @@
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
         <translation>La vue par défaut pour MythVideo. Les autres vues peuvent être atteintes à travers le menu popup accessible par la touche MENU</translation>
-    </message>
-    <message>
-        <source>videos</source>
-        <translation type="obsolete">videos</translation>
     </message>
     <message>
         <source>Video Browser browses files</source>
@@ -604,14 +588,6 @@
         <translation>Filtrage</translation>
     </message>
     <message>
-        <source>Plain View</source>
-        <translation type="obsolete">Vue plane</translation>
-    </message>
-    <message>
-        <source>Folder View</source>
-        <translation type="obsolete">Vue avec dossiers</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -704,10 +680,6 @@
 </context>
 <context>
     <name>VideoTree</name>
-    <message>
-        <source>No files found</source>
-        <translation type="obsolete">Pas de fichier trouvé</translation>
-    </message>
     <message>
         <source>Parental Pin:</source>
         <translation>Code parental:</translation>

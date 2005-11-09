@@ -68,14 +68,6 @@
         <translation>1 - Laagste</translation>
     </message>
     <message>
-        <source>2</source>
-        <translation>2</translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation>3</translation>
-    </message>
-    <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
         <translation>Dit is het niveau waarin MythVideo start. Alle films met een gelijk of lager niveau worden standaard getoond. De &apos;Parental Control&apos; PIN kan best zo ingesteld worden dat het niveau zo weinig mogelijk veranderd moet worden.</translation>
     </message>
@@ -102,10 +94,6 @@
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
         <translation>Indien geselecteerd worden alle relevante bestanden in de MythVideo-map getoond. Gescand of niet.</translation>
-    </message>
-    <message>
-        <source>General Settings</source>
-        <translation type="obsolete">Algemene Instellingen</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -602,14 +590,6 @@
         <translation>Bekijk Details</translation>
     </message>
     <message>
-        <source>Plain View</source>
-        <translation type="obsolete">Overzicht alle folders</translation>
-    </message>
-    <message>
-        <source>Folder View</source>
-        <translation type="obsolete">Gebruik Folders</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuleer</translation>
     </message>
@@ -705,10 +685,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>&apos;Parental Control&apos; PIN:</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation type="obsolete">Geen bestanden gevonden</translation>
     </message>
     <message>
         <source>Select action</source>

@@ -41,7 +41,8 @@
      <text lang="DE">Galerie</text>
      <text lang="SI">Galerija filmov</text>
      <text lang="FI">Videogalleria</text>
-   <action>GALLERY</action>
+     <text lang="SV">Filmgalleri</text>
+     <action>GALLERY</action>
    </button>
 
    <button>
@@ -60,8 +61,6 @@
      <text lang="FI">Videohallinta</text>
      <action>MANAGER</action>
    </button>
-
-
 
 </mythmenu>
 

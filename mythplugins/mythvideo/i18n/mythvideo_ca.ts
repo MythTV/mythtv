@@ -68,14 +68,6 @@
         <translation>1 - Inferior</translation>
     </message>
     <message>
-        <source>2</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>3</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
         <translation>Aquest és el &apos;nivell&apos; en el que MythVideo s&apos;inicia. Qualsevol video amb un nivell inferior serà visualitzat a la llista per omisió. El PIN de ontrol d&apos;accès té que ser activat per canviar el aquest nivell per omisió.</translation>
     </message>
@@ -102,10 +94,6 @@
     <message>
         <source>If set, this will cause the Video List screen to show all relevant files below the MythVideo starting directory whether they have been scanned or not.</source>
         <translation>Si està actiu, la pantalla que llista els vídeos visualitzará tots els arxius del directori de MythVideo encara que no hagin estat escanejats.</translation>
-    </message>
-    <message>
-        <source>General Settings</source>
-        <translation type="obsolete">Opcions Generals</translation>
     </message>
     <message>
         <source>Player Settings</source>
@@ -695,10 +683,6 @@
     <message>
         <source>Parental Pin:</source>
         <translation>PIN d&apos;accés:</translation>
-    </message>
-    <message>
-        <source>No files found</source>
-        <translation type="obsolete">No s&apos;han trovat arxius</translation>
     </message>
     <message>
         <source>Select action</source>
