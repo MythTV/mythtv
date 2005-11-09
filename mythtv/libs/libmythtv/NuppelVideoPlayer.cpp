@@ -154,6 +154,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
       // Time Code stuff
       prevtc(0),
       tc_avcheck_framecounter(0),   tc_diff_estimate(0),
+      // LiveTVChain stuff
+      livetvchain(NULL),
       // Debugging variables
       output_jmeter(NULL)
 {
