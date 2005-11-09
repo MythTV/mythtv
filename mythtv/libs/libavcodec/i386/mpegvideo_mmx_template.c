@@ -103,7 +103,6 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
     if((s->out_format == FMT_H263 || s->out_format == FMT_H261) && s->mpeg_quant==0){
     
         asm volatile(
-            "push %%"REG_c"                     \n\t"
             "movd %%"REG_a", %%mm3		\n\t" // last_non_zero_p1
             SPREADW(%%mm3)
             "pxor %%mm7, %%mm7			\n\t" // 0
