@@ -1323,9 +1323,6 @@ if test x"$proc_opt" = x"no"; then
     if is_x86_cmov "$cpu_raw" -a x"$ARCHFLAGS" != x"-march=k8"; then
         ARCHFLAGS="-march=pentiumpro";
     fi
-else
-    echo "WARNING: include the output of ./configure along with"
-    echo "any bug report, when using a processor optimized build."
 fi
 
 # if arch flag is present ignore tune and cpu and just use arch
@@ -2745,20 +2742,32 @@ if test x"$frontend" = x"no" ; then
     echo
     echo "WARNING: --disable-frontend is only intended to aid porting."
     echo "WARNING: THIS WILL BREAK THINGS. You are on your own now."
-    echo
 fi
 
 if test x"$backend" = x"no" ; then
     echo
     echo "WARNING: --disable-backend is only intended to aid porting."
     echo "WARNING: You are on your own now."
-    echo
     ivtv="no"
     ivtv_header="no"
     dbox2_dvb_box="no"
     dvb="no"
     dvb_eit="no"
 fi
+
+if test x"$proc_opt" = x"yes"; then
+    echo
+    echo "WARNING: When using --enable-proc-opt you must include the "
+    echo "         output of ./configure along with any bug report."
+fi
+
+if test x"$proc_opt" = x"no" -a x"$dvb" = x"yes" ; then
+    echo
+    echo "WARNING: If you plan to watch HDTV recordings you probably"
+    echo "         need to run ./configure with --enable-proc-opt   "
+fi
+
+echo # add a newline after any warnings.
 
 if test x"$mmx" = x"yes"; then
   CONFIG_DEFINES="$CONFIG_DEFINES MMX"
