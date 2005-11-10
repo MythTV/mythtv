@@ -27,6 +27,8 @@ class RingBuffer
     int Write(const void *buf, int count);
     void Sync(void);
 
+    int DataInReadAhead(void);
+
     long long Seek(long long pos, int whence);
     long long WriterSeek(long long pos, int whence);
     void WriterFlush(void);

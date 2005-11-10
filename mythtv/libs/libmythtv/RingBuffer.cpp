@@ -793,6 +793,11 @@ int RingBuffer::ReadBufFree(void)
     return ret;
 }
 
+int RingBuffer::DataInReadAhead(void)
+{
+    return ReadBufAvail();
+}
+
 int RingBuffer::ReadBufAvail(void)
 {
     int ret = 0;

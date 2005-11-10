@@ -1869,8 +1869,6 @@ void NuppelVideoPlayer::SwitchToProgramExtChange(void)
         return;
     }
 
-    // XXX Handle new type
-
     ringBuffer->OpenFile(pginfo->pathname);
 
     if (m_playbackinfo)
@@ -1881,7 +1879,12 @@ void NuppelVideoPlayer::SwitchToProgramExtChange(void)
 
     m_playbackinfo = pginfo;
     livetvchain->SetProgram(pginfo);
-    GetDecoder()->SetProgramInfo(pginfo);
+
+    if (newtype)
+        OpenFile();
+    else
+        GetDecoder()->SetProgramInfo(pginfo);
+
     CheckTVChain();
 
     lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
@@ -1890,25 +1893,18 @@ void NuppelVideoPlayer::SwitchToProgramExtChange(void)
 
 void NuppelVideoPlayer::SwitchToProgram(void)
 {
+    // Don't switch until we're low on data in the read ahead buffer
+    if (ringBuffer->DataInReadAhead() > 128000)
+        return;
+
     bool discontinuity = false, newtype = false;
     ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
 
-    // XXX handle new type
-
     if (discontinuity)
     {
-        printf("unhandled discontinuity\n");
-        // FIXME
-    }
-    else
-    {
-        ringBuffer->Pause();
-        ringBuffer->WaitForPause();
-
-        ringBuffer->Reset();
-        ringBuffer->OpenFile(pginfo->pathname);
-
-        ringBuffer->Unpause();
+        // Don't switch until we've displayed most of the existing decoded frames.
+        while (videoOutput && videoOutput->ValidVideoFrames() > 3)
+            usleep(500);
     }
 
     if (m_playbackinfo)
@@ -1918,6 +1914,23 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     }
 
     m_playbackinfo = pginfo;
+
+    ringBuffer->Pause();
+    ringBuffer->WaitForPause();
+
+    ringBuffer->Reset();
+    ringBuffer->OpenFile(pginfo->pathname);
+
+    if (discontinuity)
+    {
+        if (newtype)
+            OpenFile();
+        else
+            ResetPlaying();
+    }
+
+    ringBuffer->Unpause();
+
     livetvchain->SetProgram(pginfo);
     GetDecoder()->SetProgramInfo(pginfo);
     CheckTVChain();
@@ -2073,7 +2086,7 @@ void NuppelVideoPlayer::StartPlaying(void)
     {
         UpdateInUseMark();
 
-        if (livetvchain && livetvchain->NeedsToSwitch())
+        if (!paused && livetvchain && livetvchain->NeedsToSwitch())
         {
             SwitchToProgram();
         }
