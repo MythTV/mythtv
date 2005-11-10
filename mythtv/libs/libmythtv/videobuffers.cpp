@@ -1156,7 +1156,7 @@ void VideoBuffers::DeleteBuffers()
 }
 
 static unsigned long long to_bitmap(const frame_queue_t& list);
-QString VideoBuffers::GetStatus(int n)
+QString VideoBuffers::GetStatus(int n) const
 {
     if (0 > n)
         n = numbuffers;

@@ -258,6 +258,10 @@ class VideoOutput
     /// \brief Returns frame from the head of the ready to be displayed queue,
     ///        if StartDisplayingFrame has been called.
     VideoFrame *GetLastShownFrame(void)  { return vbuffers.GetLastShownFrame(); }
+
+    /// \brief Returns string with status of each frame for debugging.
+    QString GetFrameStatus(void) const { return vbuffers.GetStatus(); }
+
     /// \brief Updates frame displayed when video is paused.
     virtual void UpdatePauseFrame(void) = 0;
 

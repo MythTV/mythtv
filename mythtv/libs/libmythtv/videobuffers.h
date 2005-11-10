@@ -131,7 +131,7 @@ class VideoBuffers
                        vector<void*> surfs);
 #endif
 
-    QString GetStatus(int n=-1); // debugging method
+    QString GetStatus(int n=-1) const; // debugging method
   private:
     frame_queue_t         *queue(BufferType type);
     const frame_queue_t   *queue(BufferType type) const;
