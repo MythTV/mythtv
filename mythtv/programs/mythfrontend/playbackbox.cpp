@@ -104,7 +104,6 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     killState = kDone;
     waitToStart = false;
 
-    lastUpdateTime = QDateTime::currentDateTime().addSecs(-5);
     connected = false;
     rbuffer = NULL;
     nvp = NULL;
@@ -263,6 +262,9 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     connect(freeSpaceTimer, SIGNAL(timeout()), this, 
             SLOT(setUpdateFreeSpace()));
 
+    fillListTimer = new QTimer(this);
+    connect(fillListTimer, SIGNAL(timeout()), this, SLOT(listChanged()));
+
     if ((recGroupPassword != "") ||
         (titleList.count() <= 1) ||
         (gContext->GetNumSetting("QueryInitialFilter", 0)))
@@ -279,6 +281,7 @@ PlaybackBox::~PlaybackBox(void)
     gContext->removeListener(this);
     killPlayerSafe();
     delete timer;
+    delete fillListTimer;
     delete theme;
     delete bgTransBackup;
     
@@ -1324,11 +1327,20 @@ void PlaybackBox::cursorUp(bool page, bool newview)
     }
 }
 
+void PlaybackBox::listChanged(void)
+{
+    if (playingSomething)
+        return;
+
+    connected = FillList();      
+    skipUpdate = false;
+    update(fullRect);
+    if (type == Delete)
+        UpdateProgressBar();
+}
+
 bool PlaybackBox::FillList()
 {
-    if (lastUpdateTime.secsTo(QDateTime::currentDateTime()) <= 1)
-        return connected;
-
     ProgramInfo *p;
 
     // Save some information so we can find our place again.
@@ -1547,8 +1559,6 @@ bool PlaybackBox::FillList()
                 break;
         }
     }
-
-    lastUpdateTime = QDateTime::currentDateTime();
 
     return (infoList != NULL);
 }
@@ -3286,14 +3296,8 @@ void PlaybackBox::customEvent(QCustomEvent *e)
         MythEvent *me = (MythEvent *)e;
         QString message = me->Message();
  
-        if (message == "RECORDING_LIST_CHANGE")
-        {
-            connected = FillList();      
-            skipUpdate = false;
-            update(fullRect);
-            if (type == Delete)
-                UpdateProgressBar();
-        }
+        if (message == "RECORDING_LIST_CHANGE" && !fillListTimer->isActive())
+            fillListTimer->start(1000, true);
     }
 }
 

@@ -96,6 +96,7 @@ class PlaybackBox : public MythDialog
 
     void exitWin();
 
+    void listChanged(void);
     void setUpdateFreeSpace() { updateFreeSpace = true; }
 
     void initRecGroupPopup(QString title, QString name);
@@ -248,7 +249,6 @@ class PlaybackBox : public MythDialog
     MythTimer waitToStartPreviewTimer;
     bool waitToStart;
  
-    QDateTime lastUpdateTime;
     bool graphicPopup;
     bool playbackPreview;
     bool generatePreviewPixmap;
@@ -284,6 +284,7 @@ class PlaybackBox : public MythDialog
     QRect videoRect;
     QRect curGroupRect;
 
+    QTimer *fillListTimer;
     int listsize;
 
     QColor popupForeground;
