@@ -4808,12 +4808,13 @@ void TV::BuildOSDTreeMenu(void)
                                       "TOGGLEAUTOEXPIRE");
     }
     
-    item = new OSDGenericTree(treeMenu, tr("Select Audio Track"), "NEXTAUDIO");
-
+    const QStringList atracks = activenvp->listAudioTracks();
+    if (atracks.count() > 1)
     {
-        const QStringList atracks = activenvp->listAudioTracks();
-        int atrack = activenvp->getCurrentAudioTrack();
+        item = new OSDGenericTree(treeMenu, tr("Select Audio Track"),
+                                  "NEXTAUDIO");
 
+        int atrack = activenvp->getCurrentAudioTrack();
         QStringList::const_iterator it = atracks.begin();
         for (uint i = 1; it != atracks.end(); ++it, ++i)
         {
