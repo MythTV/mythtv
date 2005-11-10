@@ -89,6 +89,10 @@ const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
             << args << endl \
             << QString("          (%1) ").arg(errno) << strerror(errno));
 
+#define LOC      QString("DVB#%1 Rec: ").arg(_card_number_option)
+#define LOC_WARN QString("DVB#%1 Rec: Warning - ").arg(_card_number_option)
+#define LOC_ERR  QString("DVB#%1 Rec: Error - ").arg(_card_number_option)
+
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
     : DTVRecorder(rec, "DVBRecorder"),
       // Options set in SetOption()
@@ -246,7 +250,13 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
 {
     QMutexLocker read_lock(&_pid_read_lock);
     QMutexLocker change_lock(&_pid_change_lock);
-    RECORD(QString("Adding pid %1 (0x%2)").arg(pid).arg((int)pid,0,16));
+
+    uint msec_of_buffering = POLL_WARNING_TIMEOUT + 50;
+    uint pid_buffer_size = ((19200*msec_of_buffering + 7) / 8);
+    pid_buffer_size = ((pid_buffer_size + 4095) / 4096) * 4096;
+
+    VERBOSE(VB_RECORD, LOC + QString("Adding pid %1 (0x%2) size(%3)")
+           .arg(pid).arg((int)pid,0,16).arg(pid_buffer_size));
 
     if (pid < 0x10 || pid > 0x1fff)
         RECWARN(QString("PID value (%1) is outside DVB specification.\n"
@@ -267,6 +277,22 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
         RECENO(QString("Could not open demux device."));
         return;
     }
+
+    // Try to make buffer large enough to allow for longish disk writes.
+    uint sz    = pid_buffer_size;
+    uint usecs = POLL_WARNING_TIMEOUT * 1000;
+    while (ioctl(fd_tmp, DMX_SET_BUFFER_SIZE, sz) < 0 && sz > 1024*8)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set demux buffer size for "+
+                QString("pid 0x%1 to %2").arg(pid,0,16).arg(sz) + ENO);
+
+        sz    /= 2;
+        sz     = ((sz+4095)/4096)*4096;
+        usecs /= 2;
+    }
+    VERBOSE(VB_RECORD, LOC + "Set demux buffer size for " +
+            QString("pid 0x%1 to %2,\n\t\t\t which gives us a %3 msec buffer.")
+            .arg(pid,0,16).arg(sz).arg(usecs/1000));
 
     if (ioctl(fd_tmp, DMX_SET_PES_FILTER, &params) < 0)
     {
@@ -616,11 +642,20 @@ void DVBRecorder::StartRecording(void)
         }
         else if (ret == 1 && _polls.revents & POLLIN)
         {
-            if (t.restart() > POLL_WARNING_TIMEOUT)
-                RECWARN(QString("Got data from card after %1 ms.")
-                        .arg(POLL_WARNING_TIMEOUT));
+            int msec = t.restart();
+            if (msec >= POLL_WARNING_TIMEOUT)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_WARN +
+                        QString("Got data from card after %1 ms. (>%2)")
+                        .arg(msec).arg(POLL_WARNING_TIMEOUT));
+            }
 
             ReadFromDMX();
+            if (t.elapsed() >= 20)
+            {
+                VERBOSE(VB_RECORD, LOC_WARN +
+                        QString("ReadFromDMX took %1 ms").arg(t.elapsed()));
+            }
         }
         else if ((ret < 0) || (ret == 1 && _polls.revents & POLLERR))
             RECENO("Poll failed while waiting for data.");
@@ -727,12 +762,20 @@ void DVBRecorder::ReadFromDMX(void)
 
             if (_record_transport_stream_option)
             {   // handle TS recording
+                MythTimer t;
+                t.start();
                 if (_videoPID[pid])
                 {
                     // Check for keyframe
                     const TSPacket *pkt =
                         reinterpret_cast<const TSPacket*>(pktbuf);
                     FindKeyframes(pkt);
+                }
+                if (t.elapsed() > 10)
+                {
+                    VERBOSE(VB_RECORD, LOC_WARN +
+                            QString("Find keyframes took %1 ms!")
+                            .arg(t.elapsed()));
                 }
 
                 // Sync recording start to first keyframe
@@ -755,7 +798,14 @@ void DVBRecorder::ReadFromDMX(void)
                     _payload_start_seen[pid] = true;
                 }
 
+                t.start();
                 LocalProcessDataTS(pktbuf, MPEG_TS_PKT_SIZE);
+                if (t.elapsed() > 10)
+                {
+                    VERBOSE(VB_RECORD, LOC_WARN + 
+                            QString("TS packet write took %1 ms!")
+                            .arg(t.elapsed()));
+                }
             }
             else
             {   // handle PS recording
