@@ -69,6 +69,7 @@ int isnan(double);
 }
 #endif
 
+#define FAST_RESTART 0
 #define LOC QString("NVP: ")
 #define LOC_ERR QString("NVP, Error: ")
 
@@ -1604,9 +1605,10 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     }
     prebuffering_lock.unlock();
 
+    //VERBOSE(VB_PLAYBACK, LOC + "fs: " + videoOutput->GetFrameStatus());
     if (!videoOutput->EnoughPrebufferedFrames())
     {
-        VERBOSE(VB_GENERAL, "prebuffering pause");
+        VERBOSE(VB_GENERAL, LOC + "prebuffering pause");
         SetPrebuffering(true);
 #if FAST_RESTART
         if (!m_playing_slower && audio_channels <= 2)
@@ -1620,7 +1622,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
         return;
     }
 
-#ifdef FAST_RESTART
+#if FAST_RESTART
     if (m_playing_slower && videoOutput->EnoughDecodedFrames())
     {
         Play(m_stored_audio_stretchfactor, true);
