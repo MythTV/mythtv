@@ -1731,14 +1731,9 @@ void VideoOutputXv::EmbedInWidget(WId wid, int x, int y, int w, int h)
 
     VideoOutput::EmbedInWidget(wid, x, y, w, h);
 
+    // Switch to GUI size
     if (display_res)
-    {
-        // Switch to resolution of widget
-        XWindowAttributes   attr;
-
-        X11S(XGetWindowAttributes(XJ_disp, wid, &attr));
-        display_res->SwitchToCustomGUI(attr.width, attr.height);
-    }
+        display_res->SwitchToGUI();
 }
 
 void VideoOutputXv::StopEmbedding(void)

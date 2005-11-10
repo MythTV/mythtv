@@ -811,7 +811,7 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
     }
     while (cnt <= maxConnTry);
 
-#ifdef IGNORE_PROTO_VER_MISMATCH
+#ifndef IGNORE_PROTO_VER_MISMATCH
     if (!CheckProtoVersion(serverSock))
     {
         delete serverSock;
