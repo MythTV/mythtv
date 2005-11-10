@@ -771,8 +771,6 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         recorder->SetOption("hw_decoder",        dvbOpt.hw_decoder);
         recorder->SetOption("recordts",          dvbOpt.recordts);
-        recorder->SetOption("dmx_buf_size",      dvbOpt.dmx_buf_size);
-        recorder->SetOption("pkt_buf_size",      dvbOpt.pkt_buf_size);
         recorder->SetOption("dvb_on_demand",     dvbOpt.dvb_on_demand);
 #endif // USING_DVB
     }
@@ -1377,7 +1375,7 @@ bool TVRec::GetDevices(int cardid,
         "       audioratelimit,   defaultinput,        cardtype,       "
         "       skipbtaudio,"
         "       dvb_hw_decoder,   dvb_recordts,        dvb_wait_for_seqstart,"
-        "       dvb_dmx_buf_size, dvb_pkt_buf_size,    dvb_on_demand,  "
+        "       dvb_on_demand,"
         "       firewire_port,    firewire_node,       firewire_speed, "
         "       firewire_model,   firewire_connection,                 "
         "       dbox2_port,       dbox2_host,          dbox2_httpport, "
@@ -1422,26 +1420,24 @@ bool TVRec::GetDevices(int cardid,
         dvb_opts.hw_decoder    = query.value(7).toInt();
         dvb_opts.recordts      = query.value(8).toInt();
         gen_opts.wait_for_seqstart = query.value(9).toInt();
-        dvb_opts.dmx_buf_size  = query.value(10).toInt();
-        dvb_opts.pkt_buf_size  = query.value(11).toInt();
-        dvb_opts.dvb_on_demand = query.value(12).toInt();
+        dvb_opts.dvb_on_demand = query.value(10).toInt();
 
-        firewire_opts.port     = query.value(13).toInt();
-        firewire_opts.node     = query.value(14).toInt(); 
-        firewire_opts.speed    = query.value(15).toInt();
-        test = query.value(16).toString();
+        firewire_opts.port     = query.value(11).toInt();
+        firewire_opts.node     = query.value(12).toInt(); 
+        firewire_opts.speed    = query.value(13).toInt();
+        test = query.value(14).toString();
         if (test != QString::null)
             firewire_opts.model = QString::fromUtf8(test);
-        firewire_opts.connection = query.value(17).toInt();
+        firewire_opts.connection = query.value(15).toInt();
 
-        dbox2_opts.port = query.value(18).toInt();
-        dbox2_opts.httpport = query.value(20).toInt();
-        test = query.value(19).toString();
+        dbox2_opts.port = query.value(16).toInt();
+        test = query.value(17).toString();
         if (test != QString::null)
            dbox2_opts.host = QString::fromUtf8(test);
+        dbox2_opts.httpport = query.value(18).toInt();
 
-        gen_opts.signal_timeout  = (uint) max(query.value(21).toInt(), 0);
-        gen_opts.channel_timeout = (uint) max(query.value(22).toInt(), 0);
+        gen_opts.signal_timeout  = (uint) max(query.value(19).toInt(), 0);
+        gen_opts.channel_timeout = (uint) max(query.value(20).toInt(), 0);
 
         // We should have at least 100 ms to acquire tables...
         int table_timeout = ((int)gen_opts.channel_timeout - 

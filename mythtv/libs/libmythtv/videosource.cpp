@@ -1240,30 +1240,6 @@ class DVBDiseqcType: public ComboBoxSetting, public CCSetting
     };
 };
 
-class DVBPidBufferSize: public SpinBoxSetting, public CCSetting
-{
-  public:
-    DVBPidBufferSize(const CaptureCard& parent)
-      : SpinBoxSetting(0, 180000, 188),
-        CCSetting(parent, "dvb_dmx_buf_size")
-    {
-        setLabel(QObject::tr("Per PID driver buffer size"));
-        setValue(188*50);
-    };
-};
-
-class DVBBufferSize: public SpinBoxSetting, public CCSetting
-{
-  public:
-    DVBBufferSize(const CaptureCard& parent)
-      : SpinBoxSetting(0, 188000, 188),
-        CCSetting(parent, "dvb_pkt_buf_size")
-    {
-        setLabel(QObject::tr("Packet buffer"));
-        setValue(188*100);
-    };
-};
-
 class FirewireModel: public ComboBoxSetting, public CCSetting
 {
   public:
@@ -2649,8 +2625,6 @@ RecorderOptions::RecorderOptions(CaptureCard& parent)
     rec->addChild(new DVBHwDecoder(parent));
     rec->addChild(new DVBNoSeqStart(parent));
     rec->addChild(new DVBOnDemand(parent));
-    rec->addChild(new DVBPidBufferSize(parent));
-    rec->addChild(new DVBBufferSize(parent));
     addChild(rec);
 }
 

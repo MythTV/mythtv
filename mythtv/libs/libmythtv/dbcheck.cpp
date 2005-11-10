@@ -138,9 +138,12 @@ channel lock respectively. Signal lock detection is
 currently only supported on "DVB" and "HDTV" card types.
 
 The 'dvb_swfilter', 'dvb_recordts', 'dvb_sat_type', 
-'dvb_wait_for_seqstart', 'dvb_dmx_buf_size', 'dvb_pkt_buf_size',
+'dvb_wait_for_seqstart',
 'skipbtaudio', 'dvb_on_demand', 'dvb_diseqc_type' and 
 'dvb_hw_decoder' are all "DVB" specific configuration parameters.
+
+Both 'dvb_dmx_buf_size' and 'dvb_pkt_buf_size' are unused, and
+will be dropped in future versions of MythTV.
 
 The 'firewire_port', 'firewire_node', 'firewire_speed',
 'firewire_model', 'firewire_connection' are all "FIREWIRE" specific
@@ -2298,8 +2301,9 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
             return false;
     }
 
-// Drop xvmc_buffer_settings at some point
-    
+// Drop xvmc_buffer_settings table in 0.20
+// Drop dvb_dmx_buf_size and dvb_pkt_buf_size columns of channel in 0.20
+
     return true;
 }
 

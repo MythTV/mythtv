@@ -75,13 +75,10 @@ class DVBDBOptions
   public:
     DVBDBOptions() :
         hw_decoder(0),        recordts(1),
-        dmx_buf_size(4*1024), pkt_buf_size(16*1024),
         dvb_on_demand(false) {;}
 
     int hw_decoder;
     int recordts;
-    int dmx_buf_size;
-    int pkt_buf_size;
     bool dvb_on_demand;
 };
 
