@@ -56,7 +56,9 @@
 
 void usage()
 {
-   fprintf(stderr, "Usage: 6200ch [-v] <channel_num>\n");
+   fprintf(stderr, "Usage: 6200ch [-v] [-n NODE] <channel_num>\n");
+   fprintf(stderr, "-v        Print additional verbose output\n");
+   fprintf(stderr, "-n NODE   node to start device scanning on\n");
    exit(1);
 }
 
@@ -70,15 +72,35 @@ int main (int argc, char *argv[])
    int dig[3];
    int chn = 550;
 
+   /* some people experience crashes when starting on node 1 */
+   int starting_node = STARTING_NODE;
+   int c;
+   int index;
+
    if (argc < 2) 
       usage();
 
-   if (argc == 3 && argv[1][0] == '-' && argv[1][1] == 'v') {
-      verbose = 1;
-      chn = atoi(argv[2]);
-   } else {
-      chn = atoi(argv[1]);
+   opterr = 0;
+   while ((c = getopt(argc, argv, "vn:")) != -1) {
+       switch (c) {
+       case 'v':
+           verbose = 1;
+           break;
+       case 'n':
+           starting_node = atoi(optarg);
+           break;
+       default:
+           fprintf(stderr, "incorrect command line arguments\n");
+           usage();
+       }
    }
+
+   /* print out usage message if not enough arguments */
+   if (optind != argc-1) {
+       usage();
+   }
+   /* the last argument is the channel number */
+   chn = atoi(argv[optind]);
 
 #ifdef RAW1394_V_0_8
    raw1394handle_t handle = raw1394_get_handle();
@@ -102,8 +124,11 @@ int main (int argc, char *argv[])
       exit(1);
    }
 
+   if (verbose)
+       printf("starting with node: %d\n", starting_node);
+
    int nc = raw1394_get_nodecount(handle);
-   for (i=STARTING_NODE; i < nc; ++i) {
+   for (i=starting_node; i < nc; ++i) {
       if (rom1394_get_directory(handle, i, &dir) < 0) {
          fprintf(stderr,"error reading config rom directory for node %d\n", i);
          raw1394_destroy_handle(handle);
