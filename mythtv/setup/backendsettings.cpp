@@ -113,6 +113,7 @@ static GlobalComboBox *FreqTable()
     gc->addSelection("us-cable");
     gc->addSelection("us-bcast");
     gc->addSelection("us-cable-hrc");
+    gc->addSelection("us-cable-irc");
     gc->addSelection("japan-bcast");
     gc->addSelection("japan-cable");
     gc->addSelection("europe-west");
