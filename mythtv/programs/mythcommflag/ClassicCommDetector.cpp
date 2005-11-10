@@ -488,7 +488,7 @@ bool ClassicCommDetector::go()
             int secondsFlagged = (int)(framesProcessed / fps);
             
             if ((secondsRecorded - secondsFlagged) > alwaysStayNSecondsBehind)
-                usecSleep = (long)(usecSleep * 0.33);
+                usecSleep = (long)(usecSleep * 0.66);
             else
                 usecSleep = (long)(usecPerFrame * 1.5);
             
