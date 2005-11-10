@@ -3688,13 +3688,13 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
         ar = 0;
         return NULL;
     }
-    DiscardVideoFrame(videoOutput->GetLastDecodedFrame());
 
     if (!(data = frame->buf))
     {
         bufflen = 0;
         vw = vh = 0;
         ar = 0;
+        DiscardVideoFrame(frame);
         return NULL;
     }
 
@@ -3716,6 +3716,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
     vh = video_height;
     ar = video_aspect;
 
+    DiscardVideoFrame(frame);
     return (char *)outputbuf;
 }
 
