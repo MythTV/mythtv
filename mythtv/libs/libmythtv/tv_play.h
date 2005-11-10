@@ -115,6 +115,8 @@ class TV : public QObject
     // Non-const queries
     OSD *GetOSD(void);
 
+    void SetCurrentlyPlaying(ProgramInfo *pginfo);
+
     void GetNextProgram(RemoteEncoder *enc, int direction,
                         InfoMap &infoMap);
     void GetNextProgram(RemoteEncoder *enc, int direction,
@@ -124,17 +126,6 @@ class TV : public QObject
                         QString &callsign,  QString &iconpath,
                         QString &channame,  QString &chanid,
                         QString &seriesid,  QString &programid);
-
-    void GetChannelInfo(RemoteEncoder *enc, InfoMap &infoMap);
-    void GetChannelInfo(RemoteEncoder *enc, QString &title,
-                        QString &subtitle,  QString &desc,
-                        QString &category,  QString &starttime,
-                        QString &endtime,   QString &callsign,
-                        QString &iconpath,  QString &channelname,
-                        QString &chanid,    QString &seriesid,
-                        QString &programid, QString &outFilters, 
-                        QString &repeat,    QString &airdate,
-                        QString &stars);
 
     // static functions
     static void InitKeys(void);

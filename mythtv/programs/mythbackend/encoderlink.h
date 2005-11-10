@@ -90,13 +90,6 @@ class EncoderLink
                         QString &endtime, QString &callsign, QString &iconpath,
                         QString &channelname, QString &chanid,
                         QString &seriesid, QString &programid);
-    void GetChannelInfo(QString &title, QString &subtitle, QString &desc,
-                        QString &category, QString &starttime,
-                        QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid, QString &chanFilters, 
-                        QString &repeat, QString &airdate, QString &stars);
-    QString GetInputName();
 
     char *GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
                         int secondsin, int &bufferlen,

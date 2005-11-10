@@ -285,6 +285,7 @@ void ManualBox::refreshTimeout(void)
 
     if (NULL != m_tv)
     {
+#if 0
         QString dummy;
         QString title;
         QString subtitle;
@@ -304,6 +305,7 @@ void ManualBox::refreshTimeout(void)
             m_lastStarttime = m_startString;
             m_lastChanid = m_chanidString;
         }
+#endif
     }
 }
 

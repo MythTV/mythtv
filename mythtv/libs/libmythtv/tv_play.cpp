@@ -440,6 +440,9 @@ TV::~TV(void)
     if (treeMenu)
         delete treeMenu;
 
+    if (playbackinfo)
+        delete playbackinfo;
+
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
 }
@@ -583,7 +586,7 @@ int TV::Playback(ProgramInfo *rcinfo)
     inputFilename = rcinfo->pathname;
 
     playbackLen = rcinfo->CalculateLength();
-    playbackinfo = rcinfo;
+    playbackinfo = new ProgramInfo(*rcinfo);
 
     int overrecordseconds = gContext->GetNumSetting("RecordOverTime");
     QDateTime curtime = QDateTime::currentDateTime();
@@ -803,6 +806,7 @@ void TV::HandleStateChange(void)
         StopStuff(true, true, true);
         if (playbackinfo)
             delete playbackinfo;
+        playbackinfo = NULL;
 
         gContext->RestoreScreensaver();
     }
@@ -1131,6 +1135,7 @@ void TV::SetupPlayer(bool isWatchingRecording)
     
     nvp = new NuppelVideoPlayer(playbackinfo);
     nvp->SetParentWidget(myWindow);
+    nvp->SetParentPlayer(this);
     nvp->SetRingBuffer(prbuffer);
     nvp->SetRecorder(recorder);
     nvp->SetAudioSampleRate(gContext->GetNumSetting("AudioSampleRate"));
@@ -1172,11 +1177,6 @@ QString TV::GetFiltersForChannel()
     
     if (playbackinfo) // Recordings have this info already.
         chanFilters = playbackinfo->chanOutputFilters;
-    else if (activerecorder)
-    {
-        // Live TV requires a lookup
-        activerecorder->GetOutputFilters(chanFilters);
-    }
     
     if ((chanFilters.length() > 1) && (chanFilters[0] != '+'))
     {
@@ -1240,6 +1240,8 @@ void TV::TeardownPlayer(void)
 
     nvp = activenvp = NULL;
 
+    if (playbackinfo)
+        delete playbackinfo;
     playbackinfo = NULL;
  
     DeleteRecorder();
@@ -2435,15 +2437,15 @@ void TV::ToggleActiveWindow(void)
 
 void TV::SwapPIP(void)
 {
-    if (!pipnvp)
+    if (!pipnvp || !piptvchain || !tvchain) 
         return;
 
     QString dummy;
     QString pipchanname;
     QString bigchanname;
 
-    pipchanname = piprecorder->GetCurrentChannel();
-    bigchanname = recorder->GetCurrentChannel();
+    pipchanname = piptvchain->GetChannelName(-1);
+    bigchanname = tvchain->GetChannelName(-1);
 
     if (activenvp != nvp)
         ToggleActiveWindow();
@@ -3244,12 +3246,15 @@ void TV::ChangeChannel(uint chanid, const QString &channum,  bool force)
 
 void TV::AddPreviousChannel(void)
 {
+    if (!tvchain)
+        return;
+
     // Don't store more than thirty channels.  Remove the first item
     if (prevChan.size() > 29)
         prevChan.erase(prevChan.begin());
 
     // This method builds the stack of previous channels
-    prevChan.push_back(activerecorder->GetCurrentChannel());
+    prevChan.push_back(tvchain->GetChannelName(-1));
 }
 
 void TV::PreviousChannel(void)
@@ -3285,6 +3290,9 @@ void TV::PreviousChannel(void)
 
 void TV::SetPreviousChannel()
 {
+    if (!tvchain)
+        return;
+
     // Stop the timer
     prevChanTimer->stop();
 
@@ -3295,7 +3303,7 @@ void TV::SetPreviousChannel()
     prevChanKeyCnt = 0;
 
     // Only change channel if prevChan[vector] != current channel
-    QString chan_name = activerecorder->GetCurrentChannel();
+    QString chan_name = tvchain->GetChannelName(-1);
 
     if (chan_name != prevChan[i])
     {
@@ -3340,43 +3348,12 @@ void TV::ToggleOSD(void)
         UpdateOSD();
 }
 
-static void GetProgramInfo(NuppelVideoPlayer *activenvp,
-                           InfoMap &infoMap)
-{
-    ProgramInfo *progInfo = NULL;
-    QDateTime now = QDateTime::currentDateTime(), cur, prev;
-    QString prevTimeStr = infoMap["startts"];
-    int behind = 0;
-
-    // Current playback time
-    if (activenvp)
-        behind = activenvp->GetSecondsBehind();
-    cur = now.addSecs(0-behind);
-
-    // Previous osd time
-    if ((prevTimeStr == QString::null) || (prevTimeStr.length()<2))
-        prev = now.addSecs(1);
-    else 
-        prev = QDateTime::fromString(infoMap["startts"], Qt::ISODate);
-
-    // If we need it, try to set progInfo,
-    if (cur < prev)
-        progInfo = ProgramInfo::GetProgramAtDateTime(infoMap["chanid"], cur);
-
-    // If there is a progInfo, use it
-    if (progInfo)
-        progInfo->ToMap(infoMap);
-}
-
 void TV::UpdateOSD(void)
 {
     InfoMap infoMap;
 
-    // Collect channel info
-    GetChannelInfo(activerecorder, infoMap);
-
-    // Collect program info, if we are out of date
-    GetProgramInfo(activenvp, infoMap);
+    if (playbackinfo)
+        playbackinfo->ToMap(infoMap);
 
     if (GetOSD())
     {
@@ -3390,11 +3367,10 @@ void TV::UpdateOSD(void)
 
 void TV::UpdateOSDInput(void)
 {
-    if (!activerecorder)
+    if (!activerecorder || !tvchain)
         return;
 
-    QString name = "";
-    activerecorder->GetInputName(name);
+    QString name = tvchain->GetInputName(-1);
     QString msg = QString ("%1: %2")
         .arg(activerecorder->GetRecorderNumber()).arg(name);
 
@@ -3424,8 +3400,8 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
         //lastSignalUIInfo["name"]  = "signalmonitor";
         //lastSignalUIInfo["title"] = "Signal Monitor";
         lastSignalUIInfo.clear();
-        GetChannelInfo(activerecorder, lastSignalUIInfo);
-        GetProgramInfo(activenvp, lastSignalUIInfo);
+        if (playbackinfo)
+            playbackinfo->ToMap(lastSignalUIInfo);
         infoMap = lastSignalUIInfo;
         lastSignalUIInfoTime.start();
     }
@@ -3583,13 +3559,13 @@ void TV::UpdateLCD(void)
 void TV::ShowLCDChannelInfo(void)
 {
     class LCD * lcd = LCD::Get();
-    if (lcd == NULL)
+    if (lcd == NULL || playbackinfo == NULL)
         return;
 
-    QString title, subtitle, callsign, dummy;
-    GetChannelInfo(recorder, title, subtitle, dummy, dummy, dummy, dummy, 
-                   callsign, dummy, dummy, dummy, dummy, dummy, dummy,
-                   dummy, dummy, dummy);
+    QString title, subtitle, callsign;
+    title = playbackinfo->title;
+    subtitle = playbackinfo->subtitle;
+    callsign = playbackinfo->chansign;
 
     if ((callsign != lcdCallsign) || (title != lcdTitle) || 
         (subtitle != lcdSubtitle))
@@ -3681,121 +3657,6 @@ void TV::GetNextProgram(RemoteEncoder *enc, int direction,
                         channame,  chanid,    seriesid,  programid);
 }
 
-void TV::GetChannelInfo(RemoteEncoder *enc, InfoMap &infoMap)
-{
-    if (!enc)
-        enc = activerecorder;
-
-    QString title, subtitle, description, category, starttime, endtime;
-    QString callsign, iconpath, channum, chanid, seriesid, programid;
-    QString outputFilters;
-    QString repeat, airdate, stars;
-
-    enc->GetChannelInfo(title, subtitle, description, category, starttime,
-                        endtime, callsign, iconpath, channum, chanid,
-                        seriesid, programid, outputFilters,
-                        repeat, airdate, stars);
-    
-    QString dateFormat = gContext->GetSetting("DateFormat", "M/d/yyyy");
-    if (dateFormat.find(QRegExp("yyyy")) < 0)
-        dateFormat += " yyyy";
-    QString tmFmt = gContext->GetSetting("TimeFormat");
-    QString dtFmt = gContext->GetSetting("ShortDateFormat");
-
-    infoMap["startts"] = starttime;
-    infoMap["endts"] = endtime;
-    infoMap["dbstarttime"] = starttime;
-    infoMap["dbendtime"] = endtime;
-    infoMap["title"] = title;
-    infoMap["subtitle"] = subtitle;
-    infoMap["description"] = description;
-    infoMap["category"] = category;
-    infoMap["callsign"] = callsign;
-    
-    QDateTime startts, endts;
-    if ("" == starttime)
-        infoMap["starttime"] = infoMap["startdate"] = "";
-    else
-    {
-        startts = QDateTime::fromString(starttime, Qt::ISODate);
-        infoMap["starttime"] = startts.toString(tmFmt);
-        infoMap["startdate"] = startts.toString(dtFmt);
-    }
-    if ("" == endtime)
-        infoMap["endtime"] = infoMap["enddate"] = "";
-    else
-    {
-        endts = QDateTime::fromString(endtime, Qt::ISODate);
-        infoMap["endtime"] = endts.toString(tmFmt);
-        infoMap["enddate"] = endts.toString(dtFmt);
-    }
-    QString lenM(""), lenHM("");
-    if ((starttime != "") && (endtime != ""))
-        format_time(startts.secsTo(endts), lenM, lenHM);
-
-    infoMap["channum"]   = channum;
-    infoMap["chanid"]    = chanid;
-    infoMap["iconpath"]  = iconpath;
-    infoMap["seriesid"]  = seriesid;
-    infoMap["programid"] = programid;
-    infoMap["lenmins"]   = lenM;
-    infoMap["lentime"]   = lenHM;
-
-    bool ok;
-    double fstars = stars.toFloat(&ok);
-    if (ok)
-        infoMap["stars"] = QString("(%1 %2) ")
-            .arg(4.0 * fstars).arg(QObject::tr("stars"));
-    else
-        infoMap["stars"] = "";
-
-    QDate originalAirDate;       
-    
-    if (airdate.isEmpty())
-    {
-        originalAirDate = startts.date();
-    }
-    else
-    {
-        originalAirDate = QDate::fromString(airdate, Qt::ISODate);
-    }        
-
-    if (!repeat.isEmpty() && repeat.toInt())
-    {
-        infoMap["REPEAT"] = QString("(%1) ").arg(QObject::tr("Repeat"));
-        infoMap["LONGREPEAT"] = QString("(%1 %2) ")
-                                .arg(QObject::tr("Repeat"))
-                                .arg(originalAirDate.toString(dateFormat));
-    }
-    else
-    {
-        infoMap["REPEAT"] = "";
-        infoMap["LONGREPEAT"] = "";
-    }
-                
-    infoMap["originalairdate"]= originalAirDate.toString(dateFormat);
-    infoMap["shortoriginalairdate"]= originalAirDate.toString(dtFmt);
-
-}
-
-void TV::GetChannelInfo(RemoteEncoder *enc, QString &title, QString &subtitle, 
-                        QString &desc, QString &category, QString &starttime, 
-                        QString &endtime, QString &callsign, QString &iconpath,
-                        QString &channelname, QString &chanid,
-                        QString &seriesid, QString &programid, QString &outFilters,
-                        QString &repeat, QString &airdate, QString &stars)
-{
-    if (!enc)
-        enc = activerecorder;
-    if (!enc)
-        return;
-
-    enc->GetChannelInfo(title, subtitle, desc, category, starttime, endtime, 
-                        callsign, iconpath, channelname, chanid,
-                        seriesid, programid, outFilters, repeat, airdate,
-                        stars);
-}
-
 void TV::EmbedOutput(WId wid, int x, int y, int w, int h)
 {
     embedWinID = wid;
@@ -3814,9 +3675,9 @@ void TV::StopEmbeddingOutput(void)
 
 void TV::doLoadMenu(void)
 {
-    if (!activerecorder)
+    if (!playbackinfo)
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "doLoadMenu(): no active recorder.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "doLoadMenu(): no active playbackinfo.");
         return;
     }
 
@@ -3831,10 +3692,8 @@ void TV::doLoadMenu(void)
     }
 
     // Collect channel info
-    InfoMap infoMap;
-    GetChannelInfo(activerecorder, infoMap);
-    uint    chanid  = infoMap["chanid"].toUInt();
-    QString channum = infoMap["channum"];
+    uint    chanid  = playbackinfo->chanid.toUInt();
+    QString channum = playbackinfo->chanstr;
 
     // See if we can provide a channel preview in EPG
     bool allowsecondary = true;
@@ -4355,18 +4214,9 @@ void TV::BrowseStart(void)
 
     browsemode = true;
 
-    QString title, subtitle, desc, category, starttime, endtime;
-    QString callsign, iconpath, channum, chanid, seriesid, programid;
-    QString chanFilters, repeat, airdate, stars;
-
-    
-    GetChannelInfo(activerecorder, title, subtitle, desc, category, 
-                   starttime, endtime, callsign, iconpath, channum, chanid,
-                   seriesid, programid, chanFilters, repeat, airdate, stars);
-
-    browsechannum = channum;
-    browsechanid = chanid;
-    browsestarttime = starttime;
+    browsechannum = playbackinfo->chanstr;
+    browsechanid = playbackinfo->chanid;
+    browsestarttime = playbackinfo->startts.toString();
     
     BrowseDispInfo(BROWSE_SAME);
 
@@ -4470,9 +4320,12 @@ void TV::ToggleRecord(void)
     }
 
     InfoMap infoMap;
-    GetChannelInfo(activerecorder, infoMap);
+    if (playbackinfo)
+        playbackinfo->ToMap(infoMap); 
+
     if (!infoMap["startts"].isEmpty())
     {
+#if 0 
         ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
             infoMap["chanid"],
             QDateTime::fromString(infoMap["startts"], Qt::ISODate));
@@ -4517,6 +4370,7 @@ void TV::ToggleRecord(void)
             delete program_info;
             return;
         }
+#endif
     }
 
     VERBOSE(VB_GENERAL, LOC + "Creating a manual recording");
@@ -5483,3 +5337,14 @@ void TV::UnpauseLiveTV(void)
         AddPreviousChannel();
     }
 }
+
+void TV::SetCurrentlyPlaying(ProgramInfo *pginfo)
+{
+    if (playbackinfo)
+        delete playbackinfo;
+    playbackinfo = NULL;
+
+    if (pginfo)
+        playbackinfo = new ProgramInfo(*pginfo);
+}
+

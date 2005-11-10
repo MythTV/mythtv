@@ -41,7 +41,8 @@ void LiveTVChain::LoadFromExistingChain(const QString &id)
     ReloadAll();
 }
 
-void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, bool discont)
+void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
+                                   QString inputname, bool discont)
 {
     QMutexLocker lock(&m_lock);
 
@@ -51,14 +52,17 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, bool discont)
     newent.discontinuity = discont;
     newent.hostprefix = m_hostprefix;
     newent.cardtype = m_cardtype;
+    newent.channum = channum;
+    newent.inputname = inputname;
 
     m_chain.append(newent);
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("INSERT INTO tvchain (chanid, starttime, chainid,"
-                  " chainpos, discontinuity, watching, hostprefix, cardtype) "
+                  " chainpos, discontinuity, watching, hostprefix, cardtype, "
+                  " channame, input) "
                   "VALUES(:CHANID, :START, :CHAINID, :CHAINPOS, :DISCONT, "
-                  " :WATCHING, :PREFIX, :CARDTYPE);");
+                  " :WATCHING, :PREFIX, :CARDTYPE, :CHANNAME, :INPUT );");
     query.bindValue(":CHANID", pginfo->chanid);
     query.bindValue(":START", pginfo->recstartts);
     query.bindValue(":CHAINID", m_id);
@@ -67,6 +71,8 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, bool discont)
     query.bindValue(":WATCHING", 0);
     query.bindValue(":PREFIX", m_hostprefix);
     query.bindValue(":CARDTYPE", m_cardtype);
+    query.bindValue(":CHANNAME", channum.utf8());
+    query.bindValue(":INPUT", inputname.utf8());
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Chain: AppendNewProgram", query);
@@ -145,7 +151,7 @@ void LiveTVChain::ReloadAll(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, starttime, discontinuity, chainpos, "
-                  "hostprefix, cardtype "
+                  "hostprefix, cardtype, channame, input "
                   "FROM tvchain "
                   "WHERE chainid = :CHAINID ORDER BY chainpos;");
     query.bindValue(":CHAINID", m_id);
@@ -161,6 +167,8 @@ void LiveTVChain::ReloadAll(void)
             entry.discontinuity = query.value(2).toInt();
             entry.hostprefix = query.value(4).toString();
             entry.cardtype = query.value(5).toString();
+            entry.channum = QString::fromUtf8(query.value(6).toString());
+            entry.inputname = QString::fromUtf8(query.value(7).toString());
 
             m_maxpos = query.value(3).toInt() + 1;
 
@@ -231,6 +239,11 @@ int LiveTVChain::ProgramIsAt(const QString &chanid, const QDateTime &starttime)
     }
 
     return -1;
+}
+
+int LiveTVChain::GetCurPos(void)
+{
+    return m_curpos;
 }
 
 int LiveTVChain::ProgramIsAt(ProgramInfo *pginfo)
@@ -308,5 +321,21 @@ void LiveTVChain::SwitchToNext(bool up)
         SwitchTo(m_curpos + 1);
     else if (!up && HasPrev())
         SwitchTo(m_curpos - 1);
+}
+
+QString LiveTVChain::GetChannelName(int pos)
+{
+    LiveTVChainEntry entry;
+    GetEntryAt(pos, entry);
+
+    return entry.channum;
+}
+
+QString LiveTVChain::GetInputName(int pos)
+{
+    LiveTVChainEntry entry;
+    GetEntryAt(pos, entry);
+
+    return entry.inputname;
 }
 

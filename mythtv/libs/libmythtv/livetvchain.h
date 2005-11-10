@@ -15,6 +15,8 @@ struct LiveTVChainEntry
     bool discontinuity; // if true, can't play smooth from last entry
     QString hostprefix;
     QString cardtype;
+    QString channum;
+    QString inputname;
 };
 
 class LiveTVChain
@@ -33,11 +35,13 @@ class LiveTVChain
 
     void DestroyChain(void);
 
-    void AppendNewProgram(ProgramInfo *pginfo, bool discont);
+    void AppendNewProgram(ProgramInfo *pginfo, QString channum,
+                          QString inputname, bool discont);
     void DeleteProgram(ProgramInfo *pginfo);
 
     void ReloadAll();
 
+    int GetCurPos(void);
     ProgramInfo *GetProgramAt(int at); // -1 for last, new's the program caller must delete
     int ProgramIsAt(const QString &chanid, const QDateTime &starttime);
     int ProgramIsAt(ProgramInfo *pginfo); // -1 for not found
@@ -52,6 +56,9 @@ class LiveTVChain
 
     void SwitchTo(int num);
     void SwitchToNext(bool up); // true up, false down
+
+    QString GetChannelName(int pos = -1);
+    QString GetInputName(int pos = -1);
  
   private:
     void BroadcastUpdate();

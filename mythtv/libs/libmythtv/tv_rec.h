@@ -215,15 +215,6 @@ class TVRec : public QObject
                         QString &callsign,    QString &iconpath,
                         QString &channelname, QString &chanid,
                         QString &seriesid,    QString &programid);
-    void GetChannelInfo(QString &title,       QString &subtitle,
-                        QString &desc,        QString &category,
-                        QString &starttime,   QString &endtime,
-                        QString &callsign,    QString &iconpath,
-                        QString &channelname, QString &chanid,
-                        QString &seriesid,    QString &programid,
-                        QString &chanFilters, QString &repeat,
-                        QString &airdate,     QString &stars);
-    void GetInputName(QString &inputname);
 
     /// \brief Returns the caputure card number
     int GetCaptureCardNum(void) { return cardid; }
@@ -248,16 +239,6 @@ class TVRec : public QObject
   private:
     void SetRingBuffer(RingBuffer *);
     void TeardownAll(void);
-
-    void GetChannelInfo(ChannelBase *chan,  QString &title,
-                        QString &subtitle,  QString &desc,
-                        QString &category,  QString &starttime, 
-                        QString &endtime,   QString &callsign,
-                        QString &iconpath,  QString &channelname,
-                        QString &chanid,    QString &seriesid, 
-                        QString &programid, QString &outputFilters,
-                        QString &repeat,    QString &airdate,
-                        QString &stars);
 
     static bool GetDevices(int cardid,
                            GeneralDBOptions   &general_opts,

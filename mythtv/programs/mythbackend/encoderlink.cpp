@@ -844,48 +844,6 @@ void EncoderLink::GetNextProgram(int direction,
         VERBOSE(VB_IMPORTANT, "Should be local only query: GetNextProgram");
 }
 
-/** \fn EncoderLink::GetChannelInfo(QString&,QString&,QString&,QString&,QString&, QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
- *  \brief Returns information on the current program and current channel.
- *         <b>This only works on local recorders.</b>
- *  \sa TVRec::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
- *      RemoteEncoder::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
- *  \return -1 if query does not succeed, otherwise.
- */
-void EncoderLink::GetChannelInfo(QString &title,       QString &subtitle, 
-                                 QString &desc,        QString &category, 
-                                 QString &starttime,   QString &endtime, 
-                                 QString &callsign,    QString &iconpath,
-                                 QString &channelname, QString &chanid,
-                                 QString &seriesid,    QString &programid, 
-                                 QString &chanFilters, QString &repeat,
-                                 QString &airdate,     QString &stars)
-{
-    if (local)
-        tv->GetChannelInfo(title, subtitle, desc, category, starttime,
-                           endtime, callsign, iconpath, channelname, chanid,
-                           seriesid, programid, chanFilters, repeat, airdate,
-                           stars);
-    else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: GetChannelInfo");
-}
-
-/** \fn EncoderLink::GetInputName()
- *  \brief Returns the textual name of the current input,
- *         if a tuner is being used.
- *         <b>This only works on local recorders.</b>
- *  \sa TVRec::GetInputName(QString&), RemoteEncoder::GetInputName(QString&)
- *  \return Returns input name if successful, "" if not.
- */
-QString EncoderLink::GetInputName()
-{
-    QString inputname("");
-    if (local)
-        tv->GetInputName(inputname);
-    else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: GetInputName");
-    return inputname;
-}
-
 /** \fn EncoderLink::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)
  *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
  *         <b>This only works on local recorders.</b>

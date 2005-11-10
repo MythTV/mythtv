@@ -37,6 +37,7 @@ using namespace std;
 #include "jobqueue.h"
 
 #include "NuppelVideoRecorder.h"
+#include "tv_play.h"
 
 extern "C" {
 #include "vbitext/vbi.h"
@@ -155,7 +156,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
       prevtc(0),
       tc_avcheck_framecounter(0),   tc_diff_estimate(0),
       // LiveTVChain stuff
-      livetvchain(NULL),
+      livetvchain(NULL), m_tv(NULL),
       // Debugging variables
       output_jmeter(NULL)
 {
@@ -1879,6 +1880,8 @@ void NuppelVideoPlayer::SwitchToProgramExtChange(void)
 
     m_playbackinfo = pginfo;
     livetvchain->SetProgram(pginfo);
+    if (m_tv)
+        m_tv->SetCurrentlyPlaying(pginfo);
 
     if (newtype)
         OpenFile();
@@ -1933,6 +1936,9 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     livetvchain->SetProgram(pginfo);
     GetDecoder()->SetProgramInfo(pginfo);
+    if (m_tv)
+        m_tv->SetCurrentlyPlaying(pginfo);
+
     CheckTVChain();
 
     lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);

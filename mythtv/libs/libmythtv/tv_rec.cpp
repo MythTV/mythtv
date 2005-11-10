@@ -1257,109 +1257,6 @@ bool TVRec::WaitForEventThreadSleep(bool wake, unsigned long time)
     return ok;
 }
 
-void TVRec::GetChannelInfo(ChannelBase *chan, QString &title, QString &subtitle,
-                           QString &desc, QString &category, 
-                           QString &starttime, QString &endtime, 
-                           QString &callsign, QString &iconpath, 
-                           QString &channelname, QString &chanid,
-                           QString &seriesid, QString &programid,
-                           QString &outputFilters, QString &repeat, QString &airdate,
-                           QString &stars)
-{
-    title = "";
-    subtitle = "";
-    desc = "";
-    category = "";
-    starttime = "";
-    endtime = "";
-    callsign = "";
-    iconpath = "";
-    channelname = "";
-    chanid = "";
-    seriesid = "";
-    programid = "";
-    outputFilters = "";
-    repeat = "";
-    airdate = "";
-    stars = "";
-    
-    if (!chan)
-        return;
-
-    channelname = chan->GetCurrentName();
-    QString channelinput = chan->GetCurrentInput();
- 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare(
-        "SELECT starttime,       endtime,         title,    "
-        "       subtitle,        description,     category, "
-        "       callsign,        icon,            channel.chanid, "
-        "       seriesid,        programid,       channel.outputfilters, "
-        "       previouslyshown, originalairdate, stars  "
-        "FROM program,channel, capturecard, cardinput    "
-        "WHERE channel.channum = :CHANNAME           AND "
-        "      starttime < :CURTIME                  AND "
-        "      endtime   > :CURTIME                  AND "
-        "      program.chanid   = channel.chanid     AND "
-        "      channel.sourceid = cardinput.sourceid AND "
-        "      cardinput.cardid = capturecard.cardid AND "
-        "      capturecard.cardid   = :CARDID        AND "
-        "      capturecard.hostname = :HOSTNAME");
-    query.bindValue(":CHANNAME", channelname);
-    query.bindValue(":CURTIME", QDateTime::currentDateTime());
-    query.bindValue(":CARDID", cardid);
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-    if (query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-
-        starttime = query.value(0).toString();
-        endtime = query.value(1).toString();
-        title = QString::fromUtf8(query.value(2).toString());
-        subtitle = QString::fromUtf8(query.value(3).toString());
-        desc = QString::fromUtf8(query.value(4).toString());
-        category = QString::fromUtf8(query.value(5).toString());
-        callsign = QString::fromUtf8(query.value(6).toString());
-        iconpath = query.value(7).toString();
-        chanid = query.value(8).toString();
-        seriesid = query.value(9).toString();
-        programid = query.value(10).toString();
-        outputFilters = query.value(11).toString();
-        
-        repeat = query.value(12).toString();
-        airdate = query.value(13).toString();
-        stars = query.value(14).toString();
-    }
-    else
-    {
-        // couldn't find a matching program for the current channel.
-        // get the information about the channel anyway
-        
-        query.prepare(
-            "SELECT callsign, icon, channel.chanid, channel.outputfilters "
-            "FROM channel, capturecard, cardinput "
-            "WHERE channel.channum  = :CHANNUM           AND "
-            "      channel.sourceid = cardinput.sourceid AND "
-            "      cardinput.cardid = capturecard.cardid AND "
-            "      capturecard.cardid   = :CARDID        AND "
-            "      capturecard.hostname = :HOSTNAME");
-        query.bindValue(":CHANNUM", channelname);
-        query.bindValue(":CARDID", cardid);
-        query.bindValue(":HOSTNAME", gContext->GetHostName());
-
-        if (query.exec() && query.isActive() && query.size() > 0)
-        {
-            query.next();
-
-            callsign = QString::fromUtf8(query.value(0).toString());
-            iconpath = query.value(1).toString();
-            chanid = query.value(2).toString();
-            outputFilters = query.value(3).toString();
-        }
-    }
-}
-
 bool TVRec::GetDevices(int cardid,
                        GeneralDBOptions  &gen_opts,
                        DVBDBOptions      &dvb_opts,
@@ -2907,43 +2804,6 @@ void TVRec::GetNextProgram(int direction,
 
 }
 
-/** \fn TVRec::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
- *  \brief Returns information on the current program and current channel.
- *  \sa EncoderLink::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
- *      RemoteEncoder::GetChannelInfo(QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&),
- */
-void TVRec::GetChannelInfo(QString &title,       QString &subtitle, 
-                           QString &desc,        QString &category, 
-                           QString &starttime,   QString &endtime, 
-                           QString &callsign,    QString &iconpath,
-                           QString &channelname, QString &chanid,
-                           QString &seriesid,    QString &programid, 
-                           QString &outputFilters, QString &repeat,
-                           QString &airdate,     QString &stars)
-{
-    if (!channel)
-        return;
-
-    GetChannelInfo(channel, title, subtitle, desc, category, starttime,
-                   endtime, callsign, iconpath, channelname, chanid,
-                   seriesid, programid, outputFilters, repeat, airdate, stars);
-}
-
-/** \fn TVRec::GetInputName(QString&)
- *  \brief Sets inputname to the textual name of the current input,
- *         if a tuner is being used.
- *
- *  \sa EncoderLink::GetInputName(), RemoteEncoder::GetInputName(QString&)
- *  \return Sets input name if successful, does nothing if it isn't.
- */
-void TVRec::GetInputName(QString &inputname)
-{
-    if (!channel)
-        return;
-
-    inputname = channel->GetCurrentInput();
-}
-
 /** \fn TVRec::SetRingBuffer(RingBuffer*)
  *  \brief Sets "ringBuffer", deleting any existing RingBuffer.
  */
@@ -3716,7 +3576,8 @@ bool TVRec::CreateLiveTVRingBuffer(void)
 
     StartedRecording(pginfo);
     pginfo->SetAutoExpire(10000);
-    tvchain->AppendNewProgram(pginfo, false);
+    tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
+                              channel->GetCurrentInput(), false);
 
     if (curRecording)
         delete curRecording;
@@ -3743,7 +3604,8 @@ void TVRec::SwitchLiveTVRingBuffer(bool discont)
 
     StartedRecording(pginfo);
     pginfo->SetAutoExpire(10000);
-    tvchain->AppendNewProgram(pginfo, discont);
+    tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
+                              channel->GetCurrentInput(), discont);
 
     recorder->SetNextRecording(pginfo, rb);
     delete pginfo;

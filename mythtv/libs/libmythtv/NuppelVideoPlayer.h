@@ -32,6 +32,7 @@ class FilterManager;
 class FilterChain;
 class VideoSync;
 class LiveTVChain;
+class TV;
 struct AVSubtitle;
 
 struct TextContainer
@@ -93,6 +94,7 @@ class NuppelVideoPlayer
     void SetPipPlayer(NuppelVideoPlayer *pip)
         { setpipplayer = pip; needsetpipplayer = true; }
     void SetRecorder(RemoteEncoder *recorder);
+    void SetParentPlayer(TV *tv)             { m_tv = tv; }
 
     void SetTranscoding(bool value);
     void SetWatchingRecording(bool mode);
@@ -548,6 +550,7 @@ class NuppelVideoPlayer
 
     // LiveTV
     LiveTVChain *livetvchain;
+    TV *m_tv;
 
     // Debugging variables
     Jitterometer *output_jmeter;

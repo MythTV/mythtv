@@ -2512,77 +2512,6 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
         retlist << seriesid;
         retlist << programid;
     }
-    else if (command == "GET_PROGRAM_INFO")
-    {
-        QString title = "", subtitle = "", desc = "", category = "";
-        QString starttime = "", endtime = "", callsign = "", iconpath = "";
-        QString channelname = "", chanid = "", seriesid = "", programid = "";
-        QString chanOutputFilters = "";
-        QString repeat = "", airdate = "", stars = "";
-
-        enc->GetChannelInfo(title, subtitle, desc, category, starttime,
-                            endtime, callsign, iconpath, channelname, chanid,
-                            seriesid, programid, chanOutputFilters,
-                            repeat, airdate, stars);
-
-        if (title == "")
-            title = " ";
-        if (subtitle == "")
-            subtitle = " ";
-        if (desc == "")
-            desc = " ";
-        if (category == "")
-            category = " ";
-        if (starttime == "")
-            starttime = " ";
-        if (endtime == "")
-            endtime = " ";
-        if (callsign == "")
-            callsign = " ";
-        if (iconpath == "")
-            iconpath = " ";
-        if (channelname == "")
-            channelname = " ";
-        if (chanid == "")
-            chanid = " ";
-        if (seriesid == "")
-            seriesid = " ";
-        if (programid == "")
-            programid = " ";
-        if (chanOutputFilters == "")
-            chanOutputFilters = " ";    
-        if (repeat == "" )
-            repeat = "0";
-        if (airdate == "")
-            airdate = starttime;
-        if (stars == "")
-            stars = " ";
-
-        retlist << title;
-        retlist << subtitle;
-        retlist << desc;
-        retlist << category;
-        retlist << starttime;
-        retlist << endtime;
-        retlist << callsign;
-        retlist << iconpath;
-        retlist << channelname;
-        retlist << chanid;
-        retlist << seriesid;
-        retlist << programid;
-        retlist << chanOutputFilters;
-        retlist << repeat;
-        retlist << airdate;
-        retlist << stars;
-    }
-    else if (command == "GET_INPUT_NAME")
-    {
-        QString name = slist[2];
-
-        QString input = enc->GetInputName();
-
-        retlist << input;
-    }
     else
     {
         VERBOSE(VB_ALL, QString("Unknown command: %1").arg(command));
@@ -3640,6 +3569,8 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
                 {
                     if (isLocal)
                     {
+// FIXME
+#if 0
                         QString title, subtitle, desc, category, starttime,
                                 endtime, callsign, iconpath, channelname,
                                 chanid, seriesid, programid, chanFilters,
@@ -3676,7 +3607,7 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
                         channel.setAttribute("iconPath"   , iconpath   );
                         channel.setAttribute("channelName", channelname);
                         channel.setAttribute("chanFilters", chanFilters);
-
+#endif
                     }
                     break;
                 }
