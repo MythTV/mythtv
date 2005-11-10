@@ -1425,7 +1425,7 @@ void TV::RunTV(void)
             speed_index = 0;
             doing_ff_rew = 0;
             ff_rew_index = kInitFFRWSpeed;
-            UpdatePosOSD(0.0, PlayMesg(), osd_general_timeout);
+            UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
         }
 
         if (activenvp && (activenvp->GetNextPlaySpeed() != normal_speed) &&
@@ -1434,7 +1434,7 @@ void TV::RunTV(void)
         {
             // got changed in nvp due to close to end of file
             normal_speed = 1.0f;
-            UpdatePosOSD(0.0, PlayMesg(), osd_general_timeout);
+            UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
         }
 
         if (++updatecheck >= 20)
@@ -2022,7 +2022,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (prbuffer->isDVD())
             {
                 prbuffer->prevTrack();
-                UpdatePosOSD(0.0, tr("Previous Chapter"), osd_general_timeout);
+                UpdateOSDSeekMessage(tr("Previous Chapter"),
+                                     osd_general_timeout);
             }
             else
             {
@@ -2034,7 +2035,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (prbuffer->isDVD())
             {
                 prbuffer->nextTrack();
-                UpdatePosOSD(0.0, tr("Next Chapter"), osd_general_timeout);
+                UpdateOSDSeekMessage(tr("Next Chapter"), osd_general_timeout);
             }
             else
             {
@@ -2175,8 +2176,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
             if (!handled)
             {
-                float time = StopFFRew();
-                UpdatePosOSD(time, PlayMesg(), osd_general_timeout);
+                DoNVPSeek(StopFFRew());
+                UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
                 handled = true;
             }
         }
@@ -2184,7 +2185,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         if (speed_index)
         {
             NormalSpeed();
-            UpdatePosOSD(0.0, PlayMesg(), osd_general_timeout);
+            UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
             handled = true;
         }
     }
@@ -2314,8 +2315,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (prbuffer->isDVD())
                 {
                     prbuffer->prevTrack();
-                    UpdatePosOSD(0.0, tr("Previous Chapter"),
-                                 osd_general_timeout);
+                    UpdateOSDSeekMessage(tr("Previous Chapter"),
+                                         osd_general_timeout);
                 }
                 else
                 {
@@ -2327,7 +2328,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (prbuffer->isDVD())
                 {
                     prbuffer->nextTrack();
-                    UpdatePosOSD(0.0, tr("Next Chapter"), osd_general_timeout);
+                    UpdateOSDSeekMessage(tr("Next Chapter"),
+                                         osd_general_timeout);
                 }
                 else
                 {
@@ -2480,7 +2482,8 @@ void TV::DoPlay(void)
     if (activenvp != nvp)
         return;
 
-    UpdatePosOSD(time, PlayMesg(), osd_general_timeout);
+    DoNVPSeek(time);
+    UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
 
     gContext->DisableScreensaver();
 }
@@ -2523,12 +2526,14 @@ void TV::DoPause(void)
     if (paused)
     {
         activerbuffer->WaitForPause();
-        UpdatePosOSD(time, tr("Paused"), -1);
+        DoNVPSeek(time);
+        UpdateOSDSeekMessage(tr("Paused"), -1);
         gContext->RestoreScreensaver();
     }
     else
     {
-        UpdatePosOSD(time, PlayMesg(), osd_general_timeout);
+        DoNVPSeek(time);
+        UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
         gContext->DisableScreensaver();
     }
 }
@@ -2562,8 +2567,11 @@ void TV::DoInfo(void)
     }
 }
 
-bool TV::UpdatePosOSD(float time, const QString &mesg, int disptime)
+bool TV::DoNVPSeek(float time)
 {
+    if (time > -0.001f && time < +0.001f)
+        return false;
+
     bool muted = false;
 
     AudioOutput *aud = nvp->getAudioOutput(); 
@@ -2571,19 +2579,6 @@ bool TV::UpdatePosOSD(float time, const QString &mesg, int disptime)
     {
         aud->ToggleMute();
         muted = true;
-    }
-
-    if (activenvp == nvp)
-    {
-        QString desc = "";
-        int pos = nvp->calcSliderPos(desc);
-        bool slidertype = StateIsLiveTV(GetState());
-        int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
-                                         kOSDFunctionalType_Default;
-        if (GetOSD())
-            GetOSD()->StartPause(pos, slidertype, mesg, desc, disptime, 
-                                 osdtype);
-        update_osd_pos = true;
     }
 
     bool res = false;
@@ -2606,7 +2601,8 @@ void TV::DoSeek(float time, const QString &mesg)
 
     NormalSpeed();
     time += StopFFRew();
-    UpdatePosOSD(time, mesg, osd_general_timeout);
+    DoNVPSeek(time);
+    UpdateOSDSeekMessage(mesg, osd_general_timeout);
 
     if (activenvp->GetLimitKeyRepeat())
     {
@@ -2680,7 +2676,8 @@ void TV::ChangeSpeed(int direction)
     }
 
     paused = false;
-    UpdatePosOSD(time, mesg, osd_general_timeout);
+    DoNVPSeek(time);
+    UpdateOSDSeekMessage(mesg, osd_general_timeout);
 }
 
 float TV::StopFFRew(void)
@@ -2724,7 +2721,8 @@ void TV::ChangeFFRew(int direction)
         else
         {
             float time = StopFFRew();
-            UpdatePosOSD(time, PlayMesg(), osd_general_timeout);
+            DoNVPSeek(time);
+            UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
         }
     }
     else
@@ -2760,7 +2758,7 @@ void TV::SetFFRew(int index)
     }
 
     activenvp->Play(speed, false);
-    UpdatePosOSD(0.0, mesg, -1);
+    UpdateOSDSeekMessage(mesg, -1);
 }
 
 void TV::DoQueueTranscode(void)
@@ -3363,6 +3361,22 @@ void TV::UpdateOSD(void)
         GetOSD()->ClearAllText("channel_number");
         GetOSD()->SetText("channel_number", infoMap, osd_prog_info_timeout);
     }
+}
+
+void TV::UpdateOSDSeekMessage(const QString &mesg, int disptime)
+{
+    if (activenvp != nvp)
+        return;
+
+    QString desc = "";
+    int pos = nvp->calcSliderPos(desc);
+    bool slidertype = StateIsLiveTV(GetState());
+    int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
+                                     kOSDFunctionalType_Default;
+    if (GetOSD())
+        GetOSD()->StartPause(pos, slidertype, mesg, desc, disptime, 
+                             osdtype);
+    update_osd_pos = true;
 }
 
 void TV::UpdateOSDInput(void)

@@ -211,8 +211,8 @@ class TV : public QObject
     void DoInfo(void);
     void DoPlay(void);
     void DoPause(void);
-    bool UpdatePosOSD(float time, const QString &mesg, int disptime);
     void DoSeek(float time, const QString &mesg);
+    bool DoNVPSeek(float time);
     enum ArbSeekWhence {
         ARBSEEK_SET = 0,
         ARBSEEK_REWIND,
@@ -239,6 +239,7 @@ class TV : public QObject
     bool ClearOSD(void);
     void ToggleOSD(void); 
     void UpdateOSD(void);
+    void UpdateOSDSeekMessage(const QString &mesg, int disptime);
     void UpdateOSDInput(void);
     void UpdateOSDTextEntry(const QString &message);
     void UpdateOSDSignal(const QStringList& strlist);
