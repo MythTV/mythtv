@@ -97,9 +97,43 @@ uint GameHandler::count(void)
     return handlers->count();
 }
 
+void GameHandler::InitMetaDataMap(QString GameType) 
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString thequery = QString("SELECT crc, category, year, country, name, "
+                               "description, publisher, platform, version "
+                               " FROM romdb WHERE platform = \"%1\"; ")
+                              .arg(GameType);
+    query.exec(thequery);
 
-void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre, int* Year,
-                              QString* Country, QString* CRC32)
+    if (query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            romDB[query.value(0).toString()] = RomData(
+                                         query.value(1).toString(),
+                                         query.value(2).toString(),
+                                         query.value(3).toString(),
+                                         query.value(4).toString(),
+                                         query.value(5).toString(),
+                                         query.value(6).toString(),
+                                         query.value(7).toString(),
+                                         query.value(8).toString());
+
+            //cerr << " rominfo " << romDB[query.value(0).toString()].GameName() << endl;
+//"GENRE","YEAR","COUNTRY","NAME","DESC",
+//                             "PUB","PLAT","VERS");
+
+        }
+    }
+
+
+
+}
+
+void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre, QString* Year,
+                              QString* Country, QString* CRC32, QString* GameName,
+                              QString *Publisher, QString *Version)
 {
     uLong crc;
 
@@ -114,41 +148,29 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 
 
     // Set our default values
-    *Year = 0;
+    *Year = QObject::tr("19xx");
     *Country = QObject::tr("Unknown");
+    *GameName = QObject::tr("Unknown");
     *Genre = QObject::tr("Unknown");
+    *Publisher = QObject::tr("Unknown");
+    *Version = QObject::tr("0");
 
+    if (*CRC32 != "")
+    {
+        if (romDB.contains(*CRC32)) 
+        {
+            *Year = romDB[*CRC32].Year();
+            *Country = romDB[*CRC32].Country();
+            *Genre = romDB[*CRC32].Genre();
+            *Publisher = romDB[*CRC32].Publisher();
+            *GameName = romDB[*CRC32].GameName();
+            *Version = romDB[*CRC32].Version();
+        }
+    };
 
-    // Currently this is discard, but we'll use this to fill in GameName
-    QString GameTitle;
-    // Now if possible fill them in with more detailed information.
-    if (handler->GameType() == "NES")
-        NES_Meta(*CRC32, &GameTitle, Genre, Year, Country); 
-
-    else if (handler->GameType() == "SNES")
-        SNES_Meta(*CRC32, &GameTitle, Genre, Year, Country);
-
-    else if (handler->GameType() == "PCE")
-        PCE_Meta(*CRC32, &GameTitle, Genre, Year, Country);
-
-    else if (handler->GameType() == "MAME")
-        MAME_Meta(*CRC32, &GameTitle, Genre, Year, Country);
-
-    else if (handler->GameType() == "GENESIS")
-        GENESIS_Meta(*CRC32, &GameTitle, Genre, Year, Country);
-
-    else if (handler->GameType() == "N64")
-        N64_Meta(*CRC32, &GameTitle, Genre, Year, Country);
-
-    else if (handler->GameType() == "AMIGA")
-        AMIGA_Meta(*CRC32, &GameTitle, Genre, Year, Country);
-
-    else if (handler->GameType() == "ATARI")
-        ATARI_Meta(*CRC32, &GameTitle, Genre, Year, Country);
-
-    else 
-        cout << "No Meta routines for this game type : " << handler->GameType() << endl;
-
+    if (*Genre == "Unknown")
+        *Genre = QString("Unknown%1").arg( handler->GameType() );
+    
 }
 
 void purgeGameDB(QString filename, QString RomPath) 
@@ -241,10 +263,9 @@ void updateGameName(QString romname, QString GameName, QString Systemname)
 }
 
 
-static void UpdateGameCounts(void)
+static void UpdateGameCounts(QStringList updatelist)
 {
     MSqlQuery query(MSqlQuery::InitCon());
-    MSqlQuery query2(MSqlQuery::InitCon());
 
     QRegExp multiDiskRGXP = QRegExp( "[0-4]$", TRUE, FALSE );
     int diskcount = 0;
@@ -254,79 +275,73 @@ static void UpdateGameCounts(void)
     QString firstname = "";
     QString basename = "";
 
-    QString gtquery = QString("SELECT DISTINCT gametype FROM gamemetadata");
-    query.exec(gtquery);
-
-    if (query.isActive() && query.size() > 0)
+    for ( QStringList::Iterator it = updatelist.begin(); it != updatelist.end(); ++it ) 
     {
-        while (query.next())
+        diskcount = 0;
+        QString GameType = *it;
+        cerr << "Update gametype " << GameType << endl;
+        QString romquery = QString("SELECT romname,system,spandisks,gamename FROM gamemetadata,gameplayers WHERE gamemetadata.gametype = \"%1\" AND playername = system ORDER BY romname").arg(GameType);
+        query.exec(romquery);
+        if (query.isActive() && query.size() > 0)
         {   
-            diskcount = 0;
-            QString GameType = query.value(0).toString();
-            cerr << "Update gametype " << GameType << endl;
-            QString romquery = QString("SELECT romname,system,spandisks,gamename FROM gamemetadata,gameplayers WHERE gamemetadata.gametype = \"%1\" AND playername = system ORDER BY romname").arg(GameType);
-            query2.exec(romquery);
-            if (query2.isActive() && query2.size() > 0)
+            while (query.next())
             {   
-                while (query2.next())
-                {   
-                    QString RomName = query2.value(0).toString();
-                    QString System = query2.value(1).toString();
-                    int spandisks = query2.value(2).toInt();
-                    QString GameName = query2.value(3).toString(); 
-                    int extlength = 0;
+                QString RomName = query.value(0).toString();
+                QString System = query.value(1).toString();
+                int spandisks = query.value(2).toInt();
+                QString GameName = query.value(3).toString(); 
+                int extlength = 0;
 
-                    basename = RomName;
+                basename = RomName;
 
-                    if (spandisks)
+                if (spandisks)
+                {
                     {
-                        {
 
-                            pos = RomName.findRev(".");
-                            if (pos > 1)
-                            {   
-                                extlength = RomName.length() - pos;
-                                pos--;
+                        pos = RomName.findRev(".");
+                        if (pos > 1)
+                        {   
+                            extlength = RomName.length() - pos;
+                            pos--;
 
-                                basename = RomName.mid(pos,1);
-                            }
-
-                            if (basename.contains(multiDiskRGXP))
-                            {
-                                pos = (RomName.length() - extlength) - 1;
-                                basename = RomName.left(pos);
-
-                                if (basename.right(1) == ".")
-                                    basename = RomName.left(pos - 1);
-                            }
-                            else
-                                basename = GameName;
-
-                            if (basename == lastrom)
-                            {
-                                updateDisplayRom(RomName,0,System);
-                                diskcount++;
-                                if (diskcount > 1)
-                                    updateDiskCount(firstname,diskcount,GameType);
-                            }
-                            else
-                            {
-                                firstname = RomName;
-                                lastrom = basename;
-                                diskcount = 1;
-                            }
-                            if (basename != GameName)
-                                updateGameName(RomName,basename,System);
+                            basename = RomName.mid(pos,1);
                         }
-                    } 
-                    else
-                    {
-                        if (basename == lastrom)
-                                updateDisplayRom(RomName,0,System);
-                            else
-                                lastrom = basename;
 
+                        if (basename.contains(multiDiskRGXP))
+                        {
+                            pos = (RomName.length() - extlength) - 1;
+                            basename = RomName.left(pos);
+
+                            if (basename.right(1) == ".")
+                                basename = RomName.left(pos - 1);
+                        }
+                        else
+                            basename = GameName;
+
+                        if (basename == lastrom)
+                        {
+                            updateDisplayRom(RomName,0,System);
+                            diskcount++;
+                            if (diskcount > 1)
+                                updateDiskCount(firstname,diskcount,GameType);
+                        }
+                        else
+                        {
+                            firstname = RomName;
+                            lastrom = basename;
+                            diskcount = 1;
+                        }
+                        if (basename != GameName)
+                            updateGameName(RomName,basename,System);
                     }
+                } 
+                else
+                {
+                    if (basename == lastrom)
+                            updateDisplayRom(RomName,0,System);
+                        else
+                            lastrom = basename;
+
                 }
             }
         }
@@ -337,9 +352,13 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 {
     int counter = 0;
     MSqlQuery query(MSqlQuery::InitCon());
-    MythProgressDialog progressDlg(QObject::tr("Updating Rom database"),
+
+    MythProgressDialog progressDlg(QString("Updating %1(%2) Rom database")
+                                   .arg(handler->SystemName())
+                                   .arg(handler->GameType()),
                                    m_GameMap.size());
-    GameDataMap::Iterator iter;
+
+    GameScanMap::Iterator iter;
 
     QString GameName;
     QString Genre;
@@ -347,45 +366,60 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
     QString CRC32;
     QString thequery;
     QString queryvalues;
-    int Year;
+    QString Year;
+    QString Publisher;
+    QString Version;
 
     int removalprompt = gContext->GetSetting("GameRemovalPrompt").toInt();
     int indepth = gContext->GetSetting("GameDeepScan").toInt();
 
     for (iter = m_GameMap.begin(); iter != m_GameMap.end(); iter++)
     {
-        GameName = iter.data().GameName();
 
         if (iter.data().FoundLoc() == inFileSystem)
         {
-            Genre = QObject::tr("Unknown");
-            Country = QObject::tr("Unknown");
-            CRC32 = "";
-            Year = 0;
-
             if (indepth)
-                GetMetadata(handler, iter.data().RomFullPath(), &Genre, &Year, &Country, &CRC32);
+            {
+                GetMetadata(handler, iter.data().RomFullPath(), &Genre, &Year, &Country, &CRC32, &GameName,
+                            &Publisher, &Version);
+            }
+            else
+            {
+                Genre = QObject::tr("Unknown");
+                Country = QObject::tr("Unknown");
+                CRC32 = "";
+                Year = QObject::tr("19xx");
+                GameName = QObject::tr("Unknown");
+                Publisher = QObject::tr("Unknown");
+                Version = QObject::tr("0");
+            }
+
+            if (GameName == "Unknown") 
+                GameName = iter.data().GameName();
 
                 // Put the game into the database.
                 // Had to break the values up into 2 pieces since QString only allows 9 arguments and we had 10
+
             thequery = QString("INSERT INTO gamemetadata "
-                    "(system, romname, gamename, genre, year, gametype, rompath,country,crc_value,diskcount,display) ");
-            queryvalues = QString ("VALUES (\"%1\", \"%2\", \"%3\", \"%4\", %5, \"%6\",")
+                               "(system, romname, gamename, genre, year, gametype, rompath, country, crc_value,"
+                               " diskcount, display, publisher, version) ");
+            queryvalues = QString ("VALUES (\"%1\", \"%2\", \"%3\", \"%4\", \"%5\", \"%6\",")
                 .arg(handler->SystemName())
                 .arg(iter.data().Rom().latin1())
                 .arg(GameName.latin1())
                 .arg(Genre.latin1())
-                .arg(Year)
+                .arg(Year.latin1())
                 .arg(handler->GameType());
 
-            queryvalues.append( QString("\"%1\", \"%2\", \"%3\", 1 ,\"1\");")
+            queryvalues.append( QString("\"%1\", \"%2\", \"%3\", 1 ,\"1\", \"%4\", \"%5\");")
                 .arg(iter.data().RomPath().latin1())
                 .arg(Country.latin1())
-                .arg(CRC32));
+                .arg(CRC32)
+                .arg(Publisher)
+                .arg(Version));
 
             thequery.append(queryvalues);
             query.exec(thequery);
-
         } 
         else if ((iter.data().FoundLoc() == inDatabase) && (removalprompt))
         {
@@ -402,7 +436,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
 void GameHandler::VerifyGameDB(GameHandler *handler)
 {
     int counter = 0;
-    GameDataMap::Iterator iter;
+    GameScanMap::Iterator iter;
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.exec("SELECT romname,rompath,gamename FROM gamemetadata WHERE system = \"" + handler->SystemName() + "\";");
@@ -584,9 +618,9 @@ void GameHandler::processGames(GameHandler *handler)
     {
         thequery = QString("INSERT INTO gamemetadata "
                            "(system, romname, gamename, genre, year, gametype, country, "
-                           "diskcount, display) "
-                           "VALUES (\"%1\", \"%2\", \"%3\", \"Unknown\", 1970 , \"%4\", "
-                           "\"Unknown\",1,1);")
+                           "diskcount, display, publisher, version) "
+                           "VALUES (\"%1\", \"%2\", \"%3\", \"UnknownPC\", \"19xx\" , \"%4\", "
+                           "\"Unknown\",1,1,\"Unknown\", \"0\");")
                            .arg(handler->SystemName())
                            .arg(handler->SystemName())
                            .arg(handler->SystemName())
@@ -605,7 +639,17 @@ void GameHandler::processGames(GameHandler *handler)
 
 	// If we still have some games in the list then update the database
         if (!m_GameMap.empty())
+        {
+            InitMetaDataMap(handler->GameType());
+
             UpdateGameDB(handler);
+
+            romDB.clear();
+            handler->setRebuild(true);
+        } 
+        else
+            handler->setRebuild(false);
+
     }
 
     pdial.Close();
@@ -614,20 +658,23 @@ void GameHandler::processGames(GameHandler *handler)
 void GameHandler::processAllGames(void)
 {
     checkHandlers();
+    QStringList updatelist;
 
     GameHandler *handler = handlers->first();
+
     while(handler)
     {
 	updateSettings(handler);
         handler->processGames(handler);
+
+        if (handler->needRebuild())
+            updatelist.append(handler->GameType());
+
         handler = handlers->next();
     }
 
-    // Maybe add some flag or check here to see if we have to bother?
-    // Or maybe only update counts for specific gametypes/players?
-    // We shouldn't need to update counts and display values for ALL
-    // games in the system unless an element of that gametype changed.
-    UpdateGameCounts();
+    if (!updatelist.isEmpty()) 
+        UpdateGameCounts(updatelist);
 }
 
 GameHandler* GameHandler::GetHandler(RomInfo *rominfo)

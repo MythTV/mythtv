@@ -12,21 +12,21 @@ struct GameTypes {
     QString   extensions;
 };
 
-#define MAX_GAME_TYPES 10
+#define MAX_GAME_TYPES 11
 
 const GameTypes GameTypeList[MAX_GAME_TYPES] =
 {   
     { QObject::tr("OTHER"),   "OTHER",  "" },
-    { QObject::tr("MAME"),    "MAME",   "" },
-    { QObject::tr("NES"),     "NES",    "zip,nes" },
-    { QObject::tr("SNES"),    "SNES",   "zip,smc,sfc,fig,swc" },
-    { QObject::tr("N64"),     "N64",    "v64,n64" },
-    { QObject::tr("PCE/TG16"),"PCE",    "pce" },
-    { QObject::tr("GENESIS/MEGADRIVE"), "GENESIS", "smd,bin,md" },
-    { QObject::tr("PC GAME"), "PC",     "" },
     { QObject::tr("AMIGA"),   "AMIGA",  "adf,ipf" },
     { QObject::tr("ATARI"),   "ATARI",  "bin,a26" },
-
+    { QObject::tr("GENESIS/MEGADRIVE"), "GENESIS", "smd,bin,md" },
+    { QObject::tr("MAME"),    "MAME",   "" },
+    { QObject::tr("N64"),     "N64",    "v64,n64" },
+    { QObject::tr("NES"),     "NES",    "zip,nes" },
+    { QObject::tr("PC GAME"), "PC",     "" },
+    { QObject::tr("PCE/TG16"),"PCE",    "pce" },
+    { QObject::tr("SEGA/MASTER SYSYTEM"), "SEGA", "sms" },
+    { QObject::tr("SNES"),    "SNES",   "zip,smc,sfc,fig,swc" }
 };
 
 const QString GetGameExtensions(const QString GameType);

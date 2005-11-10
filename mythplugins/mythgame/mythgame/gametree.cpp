@@ -50,9 +50,9 @@ QString GameTreeItem::getFillSql() const
             filter += conj + "trim(system)='" + m_romInfo->System() + "'";
             conj = " and ";
         }
-        if (m_romInfo->Year() != 0)
+        if (m_romInfo->Year() != "")
         {
-            filter += conj + "year=" + QString::number(m_romInfo->Year());
+            filter += conj + "year='" + m_romInfo->Year() + "'";
             conj = " and ";
         }
         if (!m_romInfo->Genre().isEmpty())
@@ -107,7 +107,7 @@ GameTreeItem* GameTreeItem::createChild(QSqlQuery *query) const
         childItem->m_romInfo = GameHandler::CreateRomInfo(&temp);
 
         childItem->m_romInfo->setSystem(temp.System());
-        childItem->m_romInfo->setYear(query->value(2).toInt());
+        childItem->m_romInfo->setYear(query->value(2).toString());
         childItem->m_romInfo->setGenre(query->value(3).toString().stripWhiteSpace());
         childItem->m_romInfo->setGamename(query->value(4).toString().stripWhiteSpace());
     }
@@ -233,7 +233,7 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
 
         m_gameTitle->SetText(romInfo->Gamename());
         m_gameSystem->SetText(romInfo->AllSystems());
-        m_gameYear->SetText(QString::number(romInfo->Year()));
+        m_gameYear->SetText(romInfo->Year());
         m_gameGenre->SetText(romInfo->Genre());
 
         if (item->isLeaf())
@@ -259,7 +259,7 @@ void GameTree::handleTreeListEntry(int nodeInt, IntVector *)
         m_gameImage->SetImage("");
         m_gameTitle->SetText("");
         m_gameSystem->SetText("Unknown");
-        m_gameYear->SetText("0");
+        m_gameYear->SetText("19xx");
         m_gameGenre->SetText("Unknown");
         m_gameFavourite->SetText("");
     }
@@ -324,16 +324,17 @@ void GameTreeItem::showGameInfo(RomInfo *rom)
 
     info_popup = new MythPopupBox(gContext->GetMainWindow(), "info_popup");
 
-    info_popup->addLabel(QObject::tr("Rom Information\n"));
-    info_popup->addLabel(QString("Name: %1").arg(rom->Gamename()));
+    //info_popup->addLabel(QObject::tr("Rom Information\n"));
+    info_popup->addLabel(QString("Name: %1 (%2)").arg(rom->Gamename()).arg(rom->GameType()));
     info_popup->addLabel(QString("Rom : %1").arg(rom->Romname()));
     info_popup->addLabel(QString("CRC : %1").arg(rom->CRC_VALUE()));
     info_popup->addLabel(QString("Path: %1").arg(rom->Rompath()));
-    info_popup->addLabel(QString("Type: %1").arg(rom->GameType()));
+    //info_popup->addLabel(QString("Type: %1").arg(rom->GameType()));
     info_popup->addLabel(QString("Genre: %1").arg(rom->Genre()));
     info_popup->addLabel(QString("Year: %1").arg(rom->Year()));
     info_popup->addLabel(QString("Country: %1").arg(rom->Country()));
-    info_popup->addLabel(QString("DiskCount : %1").arg(rom->DiskCount()));
+    info_popup->addLabel(QString("Publisher: %1").arg(rom->Publisher()));
+    //info_popup->addLabel(QString("DiskCount : %1").arg(rom->DiskCount()));
     info_popup->addLabel(QString("Player(s): %1").arg(rom->AllSystems())); 
 
     OKButton = info_popup->addButton(QString("OK"), this,

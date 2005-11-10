@@ -14,37 +14,47 @@
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
 
-#include "rom_metadata.h"
 #include "unzip.h"
 
-bool validRom(QString RomName,QString GameType);
+class RomData
+{
+public:
+    RomData(QString lgenre = "", QString lyear = "",
+            QString lcountry = "", QString lgamename = "",
+            QString ldescription = "", QString lpublisher = "",
+            QString lplatform = "", QString lversion = ""  )
+            {
+                genre = lgenre;
+                year = lyear;
+                country = lcountry;
+                gamename = lgamename;
+                description = ldescription;
+                publisher = lpublisher;
+                platform = lplatform;
+                version = lversion;
+            }
 
-void NES_Meta(QString CRC32, QString* GameTitle, QString* Genre, 
-                         int* Year, QString* Country);
+    QString Genre() const { return genre; }
+    QString Year() const { return year; }
+    QString Country() const { return country; }
+    QString GameName() const { return gamename; }
+    QString Description() const { return description; }
+    QString Publisher() const { return publisher; }
+    QString Platform() const { return platform; }
+    QString Version() const { return version; }
 
-void SNES_Meta(QString CRC32, QString* GameTitle, QString* Genre, 
-                         int* Year, QString* Country);
-  
-void PCE_Meta(QString CRC32, QString* GameTitle, QString* Genre, 
-                         int* Year, QString* Country);
-  
-void MAME_Meta(QString CRC32, QString* GameTitle, QString* Genre, 
-                         int* Year, QString* Country);
-  
-void GENESIS_Meta(QString CRC32, QString* GameTitle, QString* Genre, 
-                         int* Year, QString* Country);
+private:
+    QString genre;
+    QString year;
+    QString country;
+    QString gamename;
+    QString description;
+    QString publisher;
+    QString platform;
+    QString version;
+};
 
-  
-void N64_Meta(QString CRC32, QString* GameTitle, QString* Genre,
-                         int* Year, QString* Country);
-
- 
-void AMIGA_Meta(QString CRC32, QString* GameTitle, QString* Genre,
-                         int* Year, QString* Country);
-
- 
-void ATARI_Meta(QString CRC32, QString* GameTitle, QString* Genre,
-                         int* Year, QString* Country);
+typedef QMap <QString, RomData> RomDBMap;
 
 uLong crcinfo(QString romname, int offset);
 

@@ -9,10 +9,10 @@ class RomInfo
 {
   public:
     RomInfo(QString lromname = "", QString lsystem = "", QString lgamename ="",
-            QString lgenre = "", int lyear = 0, bool lfavorite = FALSE, 
+            QString lgenre = "", QString lyear = "", bool lfavorite = FALSE, 
             QString lrompath = "", QString lcountry ="", QString lcrc_value = "",
             int ldiskcount = 0, QString lgametype = "", int lromcount = 0,
-            QString lallsystems = "")
+            QString lallsystems = "", QString lpublisher = "", QString lversion = "")
             {
                 romname = lromname;
                 system = lsystem;
@@ -27,6 +27,8 @@ class RomInfo
                 gametype = lgametype;
                 romcount = lromcount;
                 allsystems = lallsystems;
+                publisher = lpublisher;
+                version = lversion;
             }
 
     RomInfo(const RomInfo &lhs)
@@ -44,6 +46,8 @@ class RomInfo
                 gametype = lhs.gametype;
                 romcount = lhs.romcount;
                 allsystems = lhs.allsystems;
+                publisher = lhs.publisher;
+                version = lhs.version;
             }
 
     virtual ~RomInfo() {}
@@ -86,8 +90,15 @@ class RomInfo
     QString ImagePath() { return imagepath; }
     void setImagePath(const QString &limagepath) { imagepath = limagepath; } 
 
-    int Year() { return year; }
-    void setYear(int lyear) { year = lyear; }
+    QString Publisher() { return publisher; }
+    void setPublisher(const QString &lpublisher) { publisher = lpublisher; }
+
+    QString Version() { return version; }
+    void setVersion(const QString &lversion) { version = lversion; }
+
+
+    QString Year() { return year; }
+    void setYear(const QString &lyear) { year = lyear; }
 
     int Favorite() { return favorite; }
      virtual void setFavorite();
@@ -108,9 +119,11 @@ class RomInfo
     QString crc_value;
     QString gametype;
     QString allsystems;
+    QString publisher;
+    QString version;
     int romcount;
     int diskcount;
-    int year;
+    QString year;
     bool favorite;
     QString rompath;
 };

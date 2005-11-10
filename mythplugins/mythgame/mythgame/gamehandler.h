@@ -51,7 +51,7 @@ private:
     QString rompath;
 };
 
-typedef QMap <QString, GameScan> GameDataMap;
+typedef QMap <QString, GameScan> GameScanMap;
 
 class GameHandler
 {
@@ -60,16 +60,18 @@ class GameHandler
     {
         m_RemoveAll = false;
         m_KeepAll = false;
+        rebuild = false;
     }
 
     static void updateSettings(GameHandler*);
     static GameHandler* getHandler(uint i);
     static GameHandler* newHandler(QString name);
     static uint count(void);
-
-    static void GetMetadata(GameHandler *handler, QString rom, 
-                             QString* Genre, int* Year, QString* Country,
-                             QString* CRC32);
+    void InitMetaDataMap(QString GameType);
+    void GetMetadata(GameHandler *handler, QString rom, 
+                             QString* Genre, QString* Year, QString* Country,
+                             QString* CRC32, QString* GameName,
+                             QString* Publisher, QString* Version);
 
     void promptForRemoval(QString filename, QString RomPath );
     void UpdateGameDB(GameHandler *handler);
@@ -89,6 +91,9 @@ class GameHandler
     static void EditSystemSettings(RomInfo *romdata);
     static RomInfo* CreateRomInfo(RomInfo* parent);
 
+    void setRebuild(bool setrebuild) { rebuild = setrebuild; }
+    bool needRebuild(void) const { return rebuild; }
+
     static RomInfo* create_rominfo(RomInfo* parent);
     int SpanDisks() const { return spandisks; }
     QString SystemName() const { return systemname; }
@@ -103,6 +108,7 @@ class GameHandler
     static GameHandler* GetHandler(RomInfo *rominfo);
     static GameHandler* GameHandler::GetHandlerByName(QString systemname);
 
+    bool rebuild;
     int spandisks;
     QString systemname;
     QString rompath;
@@ -113,12 +119,15 @@ class GameHandler
     QString gametype;
     QStringList validextensions;
 
-    GameDataMap m_GameMap;
+    RomDBMap romDB;
+    GameScanMap m_GameMap;
+
     bool m_RemoveAll;
     bool m_KeepAll;
 
   private:
     static GameHandler* newInstance;
+
 
 };
 

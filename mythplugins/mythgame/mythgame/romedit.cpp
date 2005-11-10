@@ -40,6 +40,17 @@ public:
     };
 };
 
+class RomPublisher: virtual public RomSetting, virtual public LineEditSetting {
+public:
+    RomPublisher(QString rom):
+        RomSetting("publisher",rom) {
+        setLabel(QObject::tr("Publisher"));
+        setHelpText(QObject::tr("The Company that made and published this game."));
+    };
+};
+
+
+
 RomEditDLG::RomEditDLG(QString romname)
 {
     QString title = QObject::tr("Editing Metadata - ") + romname;
@@ -50,8 +61,9 @@ RomEditDLG::RomEditDLG(QString romname)
     group->addChild(new RomGenre(romname));
     group->addChild(new RomYear(romname));
     group->addChild(new RomCountry(romname));
+    group->addChild(new RomPublisher(romname));
 
     addChild(group);
-
-
 }
+
+

@@ -16,8 +16,57 @@ bool operator==(const RomInfo& a, const RomInfo& b)
 
 void RomInfo::edit_rominfo()
 {
+
+    QString rom_ver = Version();
+
     RomEditDLG romeditdlg(Romname().latin1());
     romeditdlg.exec();
+
+    if (rom_ver != "CUSTOM") 
+    {
+//        cerr << "Checking to see if data changed" << endl;
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        QString thequery = QString("SELECT gamename,genre,year,country,publisher FROM gamemetadata "
+                                   " WHERE gametype = \"%1\" AND romname = \"%2\"; ")
+                                   .arg(GameType())
+                                   .arg(Romname());
+
+        query.exec(thequery);
+
+        if (query.isActive() && query.size() > 0);
+        {
+            QString t_gamename, t_genre, t_year, t_country, t_publisher;
+
+            query.next();
+            t_gamename = query.value(0).toString();
+            t_genre = query.value(1).toString();
+            t_year = query.value(2).toString();
+            t_country = query.value(3).toString();
+            t_publisher = query.value(4).toString();
+
+            if ((t_gamename != Gamename()) || (t_genre != Genre()) || (t_year != Year()) 
+               || (t_country != Country()) || (t_publisher != Publisher()))
+            {
+                thequery = QString("UPDATE gamemetadata SET version = \"%1\" WHERE gametype = \"%2\" AND romname = \"%3\";")
+                                   .arg(QString("CUSTOM"))
+                                   .arg(GameType())
+                                   .arg(Romname());
+
+                query.exec(thequery);
+
+//                cerr << "Something changed, update VERSION" << endl;
+
+            }
+//            else
+//                 cerr << "No Data Changed. Don't do anything" << endl;
+ 
+
+        }
+
+    }
+//    else
+//        cerr << "Already a Custom data set. Don't do anything" << endl;
 }
 
 // Return the count of how many times this appears in the db already
@@ -134,7 +183,8 @@ void RomInfo::fillData()
     }
 
     QString thequery = "SELECT system,gamename,genre,year,romname,favorite,"
-                       "rompath,country,crc_value,diskcount,gametype FROM gamemetadata WHERE gamename=\"" 
+                       "rompath,country,crc_value,diskcount,gametype,publisher,"
+                       "version FROM gamemetadata WHERE gamename=\"" 
                        + gamename + "\"";
 
     if (system != "")
@@ -152,7 +202,7 @@ void RomInfo::fillData()
         setSystem(query.value(0).toString());
         setGamename(query.value(1).toString());
         setGenre(query.value(2).toString());
-        setYear(query.value(3).toInt());
+        setYear(query.value(3).toString());
         setRomname(query.value(4).toString());
         setField("favorite",query.value(5).toString());
         setRompath(query.value(6).toString());
@@ -160,6 +210,8 @@ void RomInfo::fillData()
         setCRC_VALUE(query.value(8).toString());
         setDiskCount(query.value(9).toInt());
         setGameType(query.value(10).toString());
+        setPublisher(query.value(11).toString());
+        setVersion(query.value(12).toString());
     }
 
     thequery = "SELECT screenshots FROM gameplayers WHERE playername = \"" + system + "\";";
