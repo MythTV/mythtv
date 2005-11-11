@@ -73,8 +73,8 @@ public:
     RecSearchType getSearchType(void) const;
     void setSearchType(RecSearchType);
 
-    bool GetAutoExpire(void) const;
-    void SetAutoExpire(bool expire);
+    int GetAutoExpire(void) const;
+    void SetAutoExpire(int expire);
 
     int GetMaxEpisodes(void) const;
     bool GetMaxNewest(void) const;

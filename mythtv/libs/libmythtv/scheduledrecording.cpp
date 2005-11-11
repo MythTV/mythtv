@@ -383,11 +383,11 @@ void ScheduledRecording::setSearchType(RecSearchType newType) {
                               search->intValue() == kManualSearch);
 }
 
-bool ScheduledRecording::GetAutoExpire(void) const {
+int ScheduledRecording::GetAutoExpire(void) const {
     return(autoexpire->getValue().toInt());
 }
 
-void ScheduledRecording::SetAutoExpire(bool expire) {
+void ScheduledRecording::SetAutoExpire(int expire) {
     autoexpire->setValue(expire);
 }
 

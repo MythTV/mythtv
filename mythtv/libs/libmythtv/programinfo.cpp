@@ -1721,11 +1721,11 @@ void ProgramInfo::SetPreserveEpisode(bool preserveEpisode) const
         MythContext::DBError("PreserveEpisode update", query);
 }
 
-/** \fn ProgramInfo::SetAutoExpire(bool) const
+/** \fn ProgramInfo::SetAutoExpire(int) const
  *  \brief Set "autoexpire" field in "recorded" table to "autoExpire".
- *  \param autoEpisode value to set auto expire field to.
+ *  \param autoExpire value to set auto expire field to.
  */
-void ProgramInfo::SetAutoExpire(bool autoExpire) const
+void ProgramInfo::SetAutoExpire(int autoExpire) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 

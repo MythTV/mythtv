@@ -3043,7 +3043,7 @@ void PlaybackBox::noAutoExpire(void)
 
     cancelPopup();
 
-    delitem->SetAutoExpire(false);
+    delitem->SetAutoExpire(0);
 
     ProgramInfo *tmpItem = findMatchingProg(delitem);
     if (tmpItem)
@@ -3064,7 +3064,7 @@ void PlaybackBox::doAutoExpire(void)
 
     cancelPopup();
 
-    delitem->SetAutoExpire(true);
+    delitem->SetAutoExpire(1);
 
     ProgramInfo *tmpItem = findMatchingProg(delitem);
     if (tmpItem)

@@ -5055,12 +5055,12 @@ void TV::ToggleAutoExpire(void)
 
     if (playbackinfo->GetAutoExpireFromRecorded())
     {
-        playbackinfo->SetAutoExpire(false);
+        playbackinfo->SetAutoExpire(0);
         desc = tr("Auto-Expire OFF");
     }
     else
     {
-        playbackinfo->SetAutoExpire(true);
+        playbackinfo->SetAutoExpire(1);
         desc = tr("Auto-Expire ON");
     }
 

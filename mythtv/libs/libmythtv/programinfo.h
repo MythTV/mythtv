@@ -188,7 +188,7 @@ class ProgramInfo
     void SetEditing(bool edit) const;
     void SetDeleteFlag(bool deleteFlag) const;
     void SetCommFlagged(int flag) const; // 1 = flagged, 2 = processing
-    void SetAutoExpire(bool autoExpire) const;
+    void SetAutoExpire(int autoExpire) const;
     void SetPreserveEpisode(bool preserveEpisode) const;
 
     // Commercial/Edit flagging maps
