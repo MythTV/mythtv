@@ -6,12 +6,28 @@
 #include <mythtv/mythmedia.h>
 #include <mythtv/mythmediamonitor.h>
 
-
 VideoList::VideoList(const QString& _prefix)
 {
     currentVideoFilter = new VideoFilterSettings(true, _prefix);
     video_tree_root = NULL;
     nitems = 0;
+
+    m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
+
+    m_LoadMetaData = gContext->GetNumSetting("VideoTreeLoadMetaData", 0);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString thequery("SELECT extension FROM videotypes WHERE f_ignore = 1 ;");
+    query.exec(thequery);
+
+    if (query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            m_IgnoreList.append(query.value(0).toString());
+        }
+    }
+
 }
 
 VideoList::~VideoList()
@@ -309,13 +325,18 @@ void VideoList::buildFsysList(bool flatlist, int parental_level)
         Metadata *myData = new Metadata;
         // See if we can find this filename in DB
         myData->setFilename(file_string);
-        if(!myData->fillDataFromFilename()) {
-            // No, fake it.
+        if (m_LoadMetaData) {
+            if(!myData->fillDataFromFilename()) {
+                // No, fake it.
+                QString base_name = file_string.section("/", -1);
+                myData->setTitle(base_name.section(".", 0, -2));
+            }
+        }
+        else
+        {
             QString base_name = file_string.section("/", -1);
             myData->setTitle(base_name.section(".", 0, -2));
 
-
-            // XXX: Maybe more...
         }
 
         metas.append(*myData); 
@@ -369,20 +390,6 @@ void VideoList::addUpnodes(GenericTree *parent)
                 addUpnodes(child);
         }
     }
-}
-
-bool VideoList::ignoreExtension(const QString& extension)
-{
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT f_ignore FROM videotypes WHERE extension = :EXT ;");
-    query.bindValue(":EXT", extension);
-    if(query.exec() && query.isActive() && query.size() > 0)
-    {
-        query.next();
-        return query.value(0).toBool();
-    }
-    
-    return !gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
 }
 
 GenericTree *VideoList::addDirNode(GenericTree *where_to_add,
@@ -463,8 +470,15 @@ void VideoList::buildFileList(const QString& directory)
         
         if(!fi->isDir())
         {
-            if(ignoreExtension(fi->extension(false)))
+            QRegExp r;
+
+            r.setPattern("^" + fi->extension(false) + "$");
+            r.setCaseSensitive(false);
+            QStringList result = m_IgnoreList.grep(r);
+            if ((!result.isEmpty() && (!m_ListUnknown))) {
                 continue;
+            }
+
         }
         
         QString filename = fi->absFilePath();

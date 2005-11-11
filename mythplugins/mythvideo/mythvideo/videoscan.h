@@ -25,7 +25,8 @@ class VideoScanner
         bool m_RemoveAll;
         bool m_KeepAll;
         VideoLoadedMap m_VideoFiles;
-        
+        QStringList m_IgnoreList;
+
         void promptForRemoval(const QString& filename);
         bool ignoreExtension(const QString& extension) const;
         void verifyFiles();

@@ -9,13 +9,25 @@ using namespace std;
 #include <mythtv/mythdbcon.h>
 #include <mythtv/mythdialogs.h>
 
-
-
 VideoScanner::VideoScanner()
 {
     m_RemoveAll = false;
     m_KeepAll = false;
     m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString thequery("SELECT extension FROM videotypes WHERE f_ignore = 1 ;");
+    query.exec(thequery);
+
+    if (query.isActive() && query.size() > 0)
+    {
+        while (query.next())
+        {
+            m_IgnoreList.append(query.value(0).toString());
+        }
+    }
+
+
 }
 
 void VideoScanner::doScan(const QString& videoDirs)
@@ -184,8 +196,10 @@ void VideoScanner::buildFileList(const QString &directory,
         
         if(!fi->isDir())
         {
-            if(ignoreExtension(fi->extension(false)))
-            {
+            r.setPattern("^" + fi->extension(false) + "$");
+            r.setCaseSensitive(false);
+            QStringList result = m_IgnoreList.grep(r);
+            if ((!result.isEmpty() && (!m_ListUnknown))) {
                 continue;
             }
         }
@@ -204,35 +218,13 @@ void VideoScanner::buildFileList(const QString &directory,
         }
         else
         {
-            r.setPattern("^" + fi->extension() + "$");
+            r.setPattern("^" + fi->extension(false) + "$");
             r.setCaseSensitive(false);
-            QStringList result = imageExtensions.grep(r);
 
+            QStringList result = imageExtensions.grep(r);
             if (result.isEmpty())
                 m_VideoFiles[filename] = kFileSystem;
         }
     }
 }
 
-
-bool VideoScanner::ignoreExtension(const QString& extension) const
-{
-    MSqlQuery a_query(MSqlQuery::InitCon());
-    a_query.prepare("SELECT f_ignore FROM videotypes WHERE extension = :EXT");
-    a_query.bindValue(":EXT", extension);
-
-    if(a_query.exec() && a_query.isActive() && a_query.size() > 0)
-    {
-        //  This extension is a recognized file type (in the videotypes
-        //  database). Return true only if ignore explicitly set.
-        //
-        a_query.next();
-        return a_query.value(0).toBool();
-    }
-    
-    //
-    //  Otherwise, ignore this file only if the user has a setting to
-    //  ignore unknown file types.
-    //
-    return !m_ListUnknown;
-}

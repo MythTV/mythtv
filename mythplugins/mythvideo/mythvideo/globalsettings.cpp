@@ -109,6 +109,19 @@ static HostCheckBox *VideoTreeNoDB()
     return gc;
 };
 
+static HostCheckBox *VideoTreeNoMetaData()
+{
+    HostCheckBox *gc = new HostCheckBox("VideoTreeLoadMetaData");
+    gc->setLabel(QObject::tr("Video List Loads Video Meta Data"));
+    gc->setValue(true);
+    gc->setHelpText(QObject::tr("If set along with Browse Files, this "
+                    "will cause the Video List load any known video meta"
+                    "data from the database. Turning this off can greatly "
+                    " speed up how long it takes to create a video list."));
+    return gc;
+};
+
+
 static HostCheckBox *VideoNewBrowsable()
 {
     HostCheckBox *gc = new HostCheckBox("VideoNewBrowsable");
@@ -246,6 +259,7 @@ VideoGeneralSettings::VideoGeneralSettings()
     general2->addChild(VideoBrowserNoDB());
     general2->addChild(VideoGalleryNoDB());
     general2->addChild(VideoTreeNoDB());
+    general2->addChild(VideoTreeNoMetaData());
     general2->addChild(VideoNewBrowsable());
     general2->addChild(VideoDefaultView());
     addChild(general2);

@@ -45,6 +45,9 @@ class VideoList
         GenericTree *addFileNode(GenericTree *where_to_add,
                                                 const QString& fname, int id);
 
+        bool m_ListUnknown;
+        bool m_LoadMetaData;
+        QStringList m_IgnoreList;
 
         QSqlDatabase *db;
         int nitems;      // Number of real items in the tree
