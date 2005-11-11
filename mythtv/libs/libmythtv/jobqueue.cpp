@@ -21,6 +21,7 @@ using namespace std;
 #include "libmyth/util.h"
 #include "NuppelVideoPlayer.h"
 #include "mythdbcon.h"
+#include "previewgenerator.h"
 
 JobQueue::JobQueue(bool master)
 {
@@ -2069,6 +2070,8 @@ void JobQueue::DoFlagCommercialsThread(void)
 
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
+
+        (new PreviewGenerator(program_info))->Start();
     }
 
     if (msg != "")

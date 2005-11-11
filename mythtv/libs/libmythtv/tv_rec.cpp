@@ -36,6 +36,7 @@ using namespace std;
 #include "eitscanner.h"
 #include "videosource.h"
 #include "RingBuffer.h"
+#include "previewgenerator.h"
 
 #include "atscstreamdata.h"
 #include "hdtvrecorder.h"
@@ -462,6 +463,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
         // Tell event loop to begin recording.
         curRecording = new ProgramInfo(*rcinfo);
+        curRecording->pathname = rbFileName;
+        curRecording->hostname = gContext->GetHostName();
         ChangeState(kState_RecordingOnly);
 
         retval = rsRecording;
@@ -491,7 +494,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
     return retval;
 }
 
-/** \fn TVRec::StopRecording()
+/** \fn TVRec::StopRecording(void)
  *  \brief Changes from kState_RecordingOnly to kState_None.
  *  \sa StartRecording(const ProgramInfo *rec), FinishRecording()
  */
@@ -615,7 +618,7 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
 #define SET_NEXT() do { nextState = desiredNextState; changed = true; } while(0)
 #define SET_LAST() do { nextState = internalState; changed = true; } while(0)
 
-/** \fn TVRec::HandleStateChange()
+/** \fn TVRec::HandleStateChange(void)
  *  \brief Changes the internalState to the desiredNextState if possible.
  *
  *   Note: There must exist a state transition from any state we can enter
@@ -867,8 +870,12 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (curRecording)
     {
-        if (autoRunJobs && !killFile)
-            JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
+        if (!killFile)
+        {
+            (new PreviewGenerator(curRecording))->Start();
+            if (autoRunJobs)
+                JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
+        }
 
         delete curRecording;
         curRecording = NULL;
@@ -1109,7 +1116,7 @@ bool get_use_eit(uint cardid)
     return false;
 }
 
-/** \fn TVRec::RunTV()
+/** \fn TVRec::RunTV(void)
  *  \brief Event handling method, contains event loop.
  */
 void TVRec::RunTV(void)
@@ -3259,6 +3266,8 @@ void TVRec::TuningNewRecorder(void)
     VERBOSE(VB_RECORD, LOC + "Starting Recorder");
     RecordingProfile profile;
     ProgramInfo *rec = lastTuningRequest.program;
+    if (tvchain)
+        rec = tvchain->GetProgramAt(0);
 
     load_recording_profile(profile, rec, cardid);
 
@@ -3271,8 +3280,7 @@ void TVRec::TuningNewRecorder(void)
             VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(rbFileName));
             SetRingBuffer(NULL);
             ClearFlags(kFlagPendingActions);
-            ChangeState(kState_None);
-            return;
+            goto err_ret;
         }
     }
 
@@ -3295,8 +3303,7 @@ void TVRec::TuningNewRecorder(void)
             MythEvent me(message);
             gContext->dispatch(me);
         }
-        ChangeState(kState_None);
-        return;
+        goto err_ret;
     }
 
     if (channel && genOpt.cardtype == "MJPEG")
@@ -3316,21 +3323,14 @@ void TVRec::TuningNewRecorder(void)
             gContext->dispatch(me);
         }
         TeardownRecorder(true);
-        ChangeState(kState_None);
-        return;
+        goto err_ret;
     }
 
     if (channel && genOpt.cardtype == "MJPEG")
         channel->Open(); // Needed because of NVR::MJPEGInit()
 
-    if (lastTuningRequest.program)
-        recorder->SetRecording(lastTuningRequest.program);
-    else if (tvchain)
-    {
-        ProgramInfo *pginfo = tvchain->GetProgramAt(0);
-        recorder->SetRecording(pginfo);
-        delete pginfo;
-    }
+    if (rec)
+        recorder->SetRecording(rec);
 
     // Setup for framebuffer capture devices..
     if (channel)
@@ -3366,6 +3366,14 @@ void TVRec::TuningNewRecorder(void)
                             transcodeFirst, earlyCommFlag);
 
     ClearFlags(kFlagNeedToStartRecorder);
+    if (tvchain)
+        delete rec;
+    return;
+
+  err_ret:
+    ChangeState(kState_None);
+    if (tvchain)
+        delete rec;
 }
 
 /** \fn TVRec::TuningRestartRecorder(void)
@@ -3542,6 +3550,8 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
 
     QString rbBaseName = prog->CreateRecordBasename(rbFileExt);
     rbFileName = QString("%1/%2").arg(recprefix).arg(rbBaseName);
+    prog->pathname = rbFileName;
+    prog->hostname = gContext->GetHostName();
 
     *rb = new RingBuffer(rbFileName, true);
     if (!(*rb)->IsOpen())
@@ -3600,6 +3610,13 @@ void TVRec::SwitchLiveTVRingBuffer(bool discont)
     {
         ChangeState(kState_None);
         return;
+    }
+
+    ProgramInfo *oldinfo = tvchain->GetProgramAt(-1);
+    if (oldinfo)
+    {
+        (new PreviewGenerator(oldinfo))->Start();
+        delete oldinfo;
     }
 
     StartedRecording(pginfo);
