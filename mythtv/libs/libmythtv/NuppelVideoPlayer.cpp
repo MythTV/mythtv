@@ -1998,7 +1998,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
 
     bool seeks = exactseeks;
     GetDecoder()->setExactSeeks(false);
-    fftime = bookmarkseek;
+    fftime = nextpos;
     DoFastForward();
     fftime = 0;
     GetDecoder()->setExactSeeks(seeks);
