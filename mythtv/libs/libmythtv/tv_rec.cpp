@@ -771,6 +771,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     {
 #ifdef USING_DVB
         recorder = new DVBRecorder(this, GetDVBChannel());
+        ringBuffer->SetWriteBufferSize(4*1024*1024);
         recorder->SetOption("wait_for_seqstart", genOpt.wait_for_seqstart);
         recorder->SetOption("hw_decoder",        dvbOpt.hw_decoder);
         recorder->SetOption("recordts",          dvbOpt.recordts);
