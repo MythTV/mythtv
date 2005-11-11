@@ -13,14 +13,14 @@
 class DummyDTVRecorder: public DTVRecorder
 {
   public:
-    DummyDTVRecorder::DummyDTVRecorder(
+    DummyDTVRecorder(
         TVRec *rec,
         bool tsmode = true,        RingBuffer *rbuffer = NULL,
         uint desired_width = 1920, uint desired_height = 1088,
         double desired_frame_rate = 29.97, uint bits_per_sec = 20000000,
         uint non_buf_frames = 0, bool autoStart = true);
 
-    DummyDTVRecorder::~DummyDTVRecorder();
+    ~DummyDTVRecorder();
 
     void SetOptionsFromProfile(RecordingProfile*, const QString&,
                                const QString&, const QString&, int) {;}
@@ -34,7 +34,7 @@ class DummyDTVRecorder: public DTVRecorder
     void StopRecordingThread(void);
 
   public slots:
-    void DummyDTVRecorder::deleteLater(void);
+    void deleteLater(void);
 
   private:
     void Close(void);

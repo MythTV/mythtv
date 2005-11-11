@@ -41,7 +41,7 @@ class PreviewGenerator : public QObject
         emit previewThreadDone(filename);
     }
 
-    static void *PreviewGenerator::PreviewRun(void *param)
+    static void *PreviewRun(void *param)
     {
         PreviewGenerator *gen = (PreviewGenerator*) param;
         gen->Run();

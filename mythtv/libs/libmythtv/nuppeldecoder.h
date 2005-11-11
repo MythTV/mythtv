@@ -56,8 +56,8 @@ class NuppelDecoder : public DecoderBase
     QString GetEncodingType(void) const;
 
   private:
-    inline bool NuppelDecoder::ReadFileheader(struct rtfileheader *fileheader);
-    inline bool NuppelDecoder::ReadFrameheader(struct rtframeheader *frameheader);
+    inline bool ReadFileheader(struct rtfileheader *fileheader);
+    inline bool ReadFrameheader(struct rtframeheader *frameheader);
 
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *lstrm, VideoFrame *frame);

@@ -48,7 +48,7 @@ class WelcomeDialog : public MythThemedDialog
     bool checkConnectionToServer(void);
     void runMythFillDatabase(void);
         
-    UITextType* WelcomeDialog::getTextType(QString name);
+    UITextType* getTextType(QString name);
     
     MythPopupBox *popup;
     

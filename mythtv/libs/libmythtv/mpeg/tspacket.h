@@ -147,7 +147,7 @@ class TSPacket : public TSHeader
 
     static const unsigned int SIZE;
     static const unsigned int PAYLOAD_SIZE;
-    static const TSPacket *TSPacket::NULL_PACKET;
+    static const TSPacket    *NULL_PACKET;
   private:
     unsigned char _tspayload[184];
 };

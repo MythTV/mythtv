@@ -108,7 +108,7 @@ class NuppelVideoRecorder : public RecorderBase
     void doVbiThread(void);
     
  private:
-    inline void NuppelVideoRecorder::WriteFrameheader(rtframeheader *fh);
+    inline void WriteFrameheader(rtframeheader *fh);
 
     void InitBuffers(void);
     void InitFilters(void);   
