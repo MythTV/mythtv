@@ -332,7 +332,7 @@ int DVBConfParser::findMultiplex(const DVBConfParser::Multiplex& m)
                          .arg(m.fec.toString());
         break;
     case ATSC:
-        queryStr+=QString("modulation=%1;")
+        queryStr+=QString("modulation=\"%1\";")
                          .arg(m.modulation.toString());
         break;
     } 
