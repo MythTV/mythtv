@@ -143,6 +143,7 @@ class NuppelVideoPlayer
 
     // Complicated gets
     long long CalcMaxFFTime(long long ff) const;
+    long long CalcRWTime(long long rw) const;
     int       calcSliderPos(QString &desc) const;
 
     /// Non-const gets
@@ -342,6 +343,7 @@ class NuppelVideoPlayer
 
     // Private LiveTV stuff
     void  SwitchToProgram(void);
+    void  JumpToProgram(void);
 
     void  UpdateInUseMark(void);
 

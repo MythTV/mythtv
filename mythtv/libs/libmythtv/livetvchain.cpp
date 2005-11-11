@@ -5,7 +5,7 @@
 
 LiveTVChain::LiveTVChain()
            : m_id(""), m_maxpos(0), m_curpos(0), m_cur_chanid(""),
-             m_switchid(-1)
+             m_switchid(-1), m_jumppos(0)
 {
 }
 
@@ -280,7 +280,12 @@ bool LiveTVChain::HasPrev(void)
 
 bool LiveTVChain::NeedsToSwitch(void)
 {
-    return (m_switchid >= 0);
+    return (m_switchid >= 0 && m_jumppos == 0);
+}
+
+bool LiveTVChain::NeedsToJump(void)
+{
+    return (m_switchid >= 0 && m_jumppos != 0);
 }
 
 ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
@@ -321,6 +326,19 @@ void LiveTVChain::SwitchToNext(bool up)
         SwitchTo(m_curpos + 1);
     else if (!up && HasPrev())
         SwitchTo(m_curpos - 1);
+}
+
+void LiveTVChain::JumpToNext(bool up, int pos)
+{
+    SwitchToNext(up);
+    m_jumppos = pos;
+}
+
+int LiveTVChain::GetJumpPos(void)
+{
+    int ret = m_jumppos;
+    m_jumppos = 0;
+    return ret;
 }
 
 QString LiveTVChain::GetChannelName(int pos)

@@ -875,23 +875,30 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
 
     if (ffrew_skip != 1)
     {
-        bool stop;
+        bool stop = false;
         long long real_skip;
 
         if (ffrew_skip > 0)
         {
             long long delta = GetDecoder()->GetFramesRead() - framesPlayed;
             real_skip = CalcMaxFFTime(ffrew_skip + delta) - delta;
-            GetDecoder()->DoFastForward(GetDecoder()->GetFramesRead() + real_skip, false);
-            stop = (CalcMaxFFTime(100) < 100);
+            if (real_skip >= 0)
+            {
+                GetDecoder()->DoFastForward(GetDecoder()->GetFramesRead() + real_skip, false);
+                stop = (CalcMaxFFTime(100) < 100);
+            }
         }
         else
         {
-            real_skip = (-GetDecoder()->GetFramesRead() > ffrew_skip) ? 
-                -GetDecoder()->GetFramesRead() : ffrew_skip;
-            GetDecoder()->DoRewind(GetDecoder()->GetFramesRead() + real_skip, false);
-            stop = framesPlayed <= keyframedist;
+            if (CalcRWTime(ffrew_skip) >= 0)
+            {
+                real_skip = (-GetDecoder()->GetFramesRead() > ffrew_skip) ? 
+                             -GetDecoder()->GetFramesRead() : ffrew_skip;
+                GetDecoder()->DoRewind(GetDecoder()->GetFramesRead() + real_skip, false);
+                stop = framesPlayed <= keyframedist;
+            }
         }
+
         if (stop)
         {
             float stretch = (ffrew_skip > 0) ? 1.0f : audio_stretchfactor;
@@ -1891,6 +1898,7 @@ void NuppelVideoPlayer::SwitchToProgramExtChange(void)
         GetDecoder()->SetProgramInfo(pginfo);
 
     CheckTVChain();
+    GetDecoder()->SyncPositionMap();
 
     lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
     UpdateInUseMark();
@@ -1942,7 +1950,59 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         m_tv->SetCurrentlyPlaying(pginfo);
 
     CheckTVChain();
+    GetDecoder()->SyncPositionMap();
 
+    lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+    UpdateInUseMark();
+}
+
+void NuppelVideoPlayer::JumpToProgram(void)
+{
+    bool discontinuity = false, newtype = false;
+    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
+    long long nextpos = livetvchain->GetJumpPos();
+    
+    if (m_playbackinfo)
+    {
+        m_playbackinfo->MarkAsInUse(false);
+        delete m_playbackinfo;
+    }
+
+    m_playbackinfo = pginfo;
+
+    ringBuffer->Pause();
+    ringBuffer->WaitForPause();
+
+    ringBuffer->Reset();
+    ringBuffer->OpenFile(pginfo->pathname);
+
+    if (newtype)
+        OpenFile();
+    else
+        ResetPlaying();
+
+    ringBuffer->Unpause();
+
+    livetvchain->SetProgram(pginfo);
+    GetDecoder()->SetProgramInfo(pginfo);
+    if (m_tv)
+        m_tv->SetCurrentlyPlaying(pginfo);
+
+    CheckTVChain();
+    GetDecoder()->SyncPositionMap();
+
+    if (nextpos < 0)
+        nextpos += totalFrames;
+    if (nextpos < 0)
+        nextpos = 0;
+
+    bool seeks = exactseeks;
+    GetDecoder()->setExactSeeks(false);
+    fftime = bookmarkseek;
+    DoFastForward();
+    fftime = 0;
+    GetDecoder()->setExactSeeks(seeks);
+     
     lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
     UpdateInUseMark();
 }
@@ -2094,9 +2154,12 @@ void NuppelVideoPlayer::StartPlaying(void)
     {
         UpdateInUseMark();
 
-        if (!paused && livetvchain && livetvchain->NeedsToSwitch())
+        if (!paused && livetvchain)
         {
-            SwitchToProgram();
+            if (livetvchain->NeedsToSwitch())
+                SwitchToProgram();
+            else if (livetvchain->NeedsToJump())
+                JumpToProgram();
         }
 
         if (nvr_enc && nvr_enc->GetErrorStatus())
@@ -2132,64 +2195,83 @@ void NuppelVideoPlayer::StartPlaying(void)
 
             if (rewindtime > 0)
             {
-                DoRewind();
+                rewindtime = CalcRWTime(rewindtime);
+                if (rewindtime > 0)
+                {
+                    DoRewind();
 
-                GetFrame(audioOutput == NULL || !normal_speed);
-                resetvideo = true;
-                while (resetvideo)
-                    usleep(50);
-
+                    GetFrame(audioOutput == NULL || !normal_speed);
+                    resetvideo = true;
+                    while (resetvideo)
+                        usleep(50);
+                }
                 rewindtime = 0;
-                continue;
             }
             else if (fftime > 0)
             {
                 fftime = CalcMaxFFTime(fftime);
-                DoFastForward();
+                if (fftime > 0)
+                {
+                    DoFastForward();
+
+                    GetFrame(audioOutput == NULL || !normal_speed);
+                    resetvideo = true;
+                    while (resetvideo)
+                        usleep(50);
+                }
+                fftime = 0;
+            }
+            else if (livetvchain && livetvchain->NeedsToJump())
+            {
+                JumpToProgram();
 
                 GetFrame(audioOutput == NULL || !normal_speed);
-                resetvideo = true;
                 while (resetvideo)
                     usleep(50);
-
-                fftime = 0;
-                continue;
             }
             else
             {
                 //printf("startplaying waiting for unpause\n");
                 usleep(500);
-                continue;
             }
         }
 
         if (rewindtime > 0 && ffrew_skip == 1)
         {
-            PauseVideo();
+            rewindtime = CalcRWTime(rewindtime);
 
             if (rewindtime >= 1)
+            {
+                PauseVideo();
+
                 DoRewind();
 
-            UnpauseVideo();
-            while (GetVideoPause())
-                usleep(50);
+                UnpauseVideo();
+                while (GetVideoPause())
+                    usleep(50);
+            }
             rewindtime = 0;
         }
 
         if (fftime > 0 && ffrew_skip == 1)
         {
             fftime = CalcMaxFFTime(fftime);
-            PauseVideo();
 
             if (fftime >= 5)
-                DoFastForward();
+            {
+                PauseVideo();
 
-            if (eof)
-                continue;
+                if (fftime >= 5)
+                    DoFastForward();
 
-            UnpauseVideo();
-            while (GetVideoPause())
-                usleep(50);
+                if (eof)
+                    continue;
+
+                UnpauseVideo();
+                while (GetVideoPause())
+                    usleep(50);
+            }
+
             fftime = 0;
         }
 
@@ -2674,9 +2756,27 @@ bool NuppelVideoPlayer::DoRewind(void)
     return true;
 }
 
+long long NuppelVideoPlayer::CalcRWTime(long long rw) const
+{
+    bool hasliveprev = (livetv && livetvchain && livetvchain->HasPrev());
+
+    if (!hasliveprev)
+        return rw;
+
+    if ((framesPlayed - rw + 1) < 0)
+    {
+        livetvchain->JumpToNext(false, (int)(-5.0 * video_frame_rate));
+        return -1;
+    }
+
+    return rw;
+}
+
 long long NuppelVideoPlayer::CalcMaxFFTime(long long ff) const
 {
     long long maxtime = (long long)(1.0 * video_frame_rate);
+    bool islivetvcur = (livetv && livetvchain && !livetvchain->HasNext());
+
     if (livetv || (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
         maxtime = (long long)(3.0 * video_frame_rate);
 
@@ -2684,7 +2784,20 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff) const
 
     limitKeyRepeat = false;
 
-    if (livetv || (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder()))
+    if (livetv && !islivetvcur)
+    {
+        if (totalFrames > 0)
+        {
+            long long behind = totalFrames - framesPlayed;
+            if (behind < maxtime || behind - ff <= maxtime * 2)
+            {
+                ret = -1;
+                livetvchain->JumpToNext(true, 1);
+            }
+        }
+    }
+    else if (islivetvcur || (watchingrecording && nvr_enc && 
+                        nvr_enc->IsValidRecorder()))
     {
         long long behind = nvr_enc->GetFramesWritten() - framesPlayed;
         if (behind < maxtime) // if we're close, do nothing
@@ -2720,6 +2833,9 @@ bool NuppelVideoPlayer::IsNearEnd(long long margin) const
     long long framesRead, framesLeft;
     bool watchingTV = watchingrecording && nvr_enc && nvr_enc->IsValidRecorder();
     if (!livetv && !watchingTV)
+        return false;
+
+    if (livetv && livetvchain && livetvchain->HasNext())
         return false;
 
     margin = (margin >= 0) ? margin: (long long) (video_frame_rate*2);

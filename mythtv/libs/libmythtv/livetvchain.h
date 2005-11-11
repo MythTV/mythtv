@@ -52,10 +52,14 @@ class LiveTVChain
     bool HasPrev(void);
 
     bool NeedsToSwitch(void);
-    ProgramInfo *GetSwitchProgram(bool &discont, bool &newtype);
+    ProgramInfo *GetSwitchProgram(bool &discont, bool &newtype); // clears switch flag
 
     void SwitchTo(int num);
     void SwitchToNext(bool up); // true up, false down
+
+    bool NeedsToJump(void);
+    void JumpToNext(bool up, int pos);
+    int  GetJumpPos(void);  // clears jumppos
 
     QString GetChannelName(int pos = -1);
     QString GetInputName(int pos = -1);
@@ -78,6 +82,7 @@ class LiveTVChain
     QDateTime m_cur_startts;
 
     int m_switchid;
+    int m_jumppos;
 };
 
 #endif
