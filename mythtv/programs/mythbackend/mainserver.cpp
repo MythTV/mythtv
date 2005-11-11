@@ -1078,9 +1078,12 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             {
                 if (!slave)
                 {
-                    VERBOSE(VB_ALL, QString("Couldn't find backend for: %1 : "
-                                            "%2").arg(proginfo->title)
-                                                 .arg(proginfo->subtitle));
+                    VERBOSE(VB_IMPORTANT,
+                            "MainServer::HandleQueryRecordings()"
+                            "\n\t\t\tCouldn't find backend for: " +
+                            QString("\n\t\t\t%1 : \"%2\"")
+                            .arg(proginfo->title).arg(proginfo->subtitle));
+
                     proginfo->filesize = 0;
                     proginfo->pathname = "file not found";
                 }
@@ -2992,8 +2995,10 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
         PlaybackSock *slave = getSlaveByHostname(pginfo->hostname);
 
         if (!slave)
-            VERBOSE(VB_ALL, QString("Couldn't find backend for: %1 : %2")
-                                   .arg(pginfo->title).arg(pginfo->subtitle));
+            VERBOSE(VB_IMPORTANT, "MainServer::HandleGenPreviewPixmap()"
+                    "\n\t\t\tCouldn't find backend for: " +
+                    QString("\n\t\t\t%1 : \"%2\"")
+                    .arg(pginfo->title).arg(pginfo->subtitle));
         else
         {
             slave->GenPreviewPixmap(pginfo);
@@ -3008,8 +3013,9 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
 
     if (pginfo->hostname != gContext->GetHostName())
     {
-        VERBOSE(VB_ALL, QString("Got requested to generate preview pixmap "
-                                "for %1").arg(pginfo->hostname));
+        VERBOSE(VB_IMPORTANT, "Mainserver, Error: Got request to generate " +
+                QString("\n\t\t\tpreview pixmap for %1 on host %2.")
+                .arg(pginfo->hostname).arg(gContext->GetHostName()));
 
         QStringList outputlist = "BAD";
         SendResponse(pbssock, outputlist);
@@ -3049,11 +3055,8 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     int secondsin = gContext->GetNumSetting("PreviewPixmapOffset", 64) +
                     gContext->GetNumSetting("RecordPreRoll",0);
 
-    unsigned char *data = (unsigned char *)elink->GetScreenGrab(pginfo, 
-                                                                filename, 
-                                                                secondsin,
-                                                                len, width,
-                                                                height, aspect);
+    unsigned char *data = (unsigned char *)elink->GetScreenGrab(
+        pginfo, filename, secondsin, len, width, height, aspect);
 
     if (data)
     {
@@ -3117,9 +3120,11 @@ void MainServer::HandlePixmapLastModified(QStringList &slist, PlaybackSock *pbs)
              return;
         }
         else
-        { 
-            VERBOSE(VB_ALL, QString("Couldn't find backend for: %1 : %2")
-                                   .arg(pginfo->title).arg(pginfo->subtitle));
+        {
+            VERBOSE(VB_IMPORTANT, "MainServer::HandlePixmapLastModified()"
+                    "\n\t\t\t Couldn't find backend for: " +
+                    QString("\n\t\t\t%1 : \"%2\"").arg(pginfo->title)
+                    .arg(pginfo->subtitle));
         }
     }
 
