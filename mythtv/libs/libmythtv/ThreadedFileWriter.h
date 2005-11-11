@@ -35,34 +35,49 @@ class ThreadedFileWriter
     void SyncLoop(void);
 
   private:
+    // file info
     QString         filename;
     int             flags;
     mode_t          mode;
     int             fd;
 
+    // state
     bool            no_writes;
     bool            flush;
-
-    unsigned long   tfw_buf_size;
+    bool            write_is_blocked;
+    bool            in_dtor;
     unsigned long   tfw_min_write_size;
-    uint            rpos;
-    uint            wpos;
+
+    // buffer position state
+    uint            rpos;    ///< points to end of data written to disk
+    uint            wpos;    ///< points to end of data added to buffer
+    QMutex          buflock; ///< lock needed to update rpos and wpos
+
+    // buffer
     char           *buf;
-    int             in_dtor;
+    unsigned long   tfw_buf_size;
 
+    // threads
     pthread_t       writer;
-    QMutex          buflock;
-
     pthread_t       syncer;
 
+    // wait conditions
     QWaitCondition  bufferEmpty;
     QWaitCondition  bufferHasData;
     QWaitCondition  bufferSyncWait;
     QWaitCondition  bufferWroteData;
+
   private:
-    static const uint TFW_DEF_BUF_SIZE   = 2*1024*1024;
-    static const uint TFW_MAX_WRITE_SIZE = TFW_DEF_BUF_SIZE / 4;
-    static const uint TFW_MIN_WRITE_SIZE = TFW_DEF_BUF_SIZE / 8;
+    // constants
+    /// Default buffer size.
+    static const uint TFW_DEF_BUF_SIZE;
+    /// Maximum to write to disk in a single write.
+    static const uint TFW_MAX_WRITE_SIZE;
+    /// Minimum to write to disk in a single write, when not flushing buffer.
+    static const uint TFW_MIN_WRITE_SIZE;
+    /// Maximum to write to disk in s single write,
+    /// if another thread is already waiting on disk thread.
+    static const uint TFW_BLK_WRITE_SIZE;
 };
 
 #endif

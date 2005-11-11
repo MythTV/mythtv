@@ -20,6 +20,11 @@
 #define LOC QString("TFW: ")
 #define LOC_ERR QString("TFW, Error: ")
 
+const uint ThreadedFileWriter::TFW_DEF_BUF_SIZE   = 2*1024*1024;
+const uint ThreadedFileWriter::TFW_MAX_WRITE_SIZE = TFW_DEF_BUF_SIZE / 4;
+const uint ThreadedFileWriter::TFW_MIN_WRITE_SIZE = TFW_DEF_BUF_SIZE / 8;
+const uint ThreadedFileWriter::TFW_BLK_WRITE_SIZE = 16*1024;
+
 /** \class ThreadedFileWriter
  *  \brief This class supports the writing of recordings to disk.
  *
@@ -31,6 +36,17 @@
  *   to the stream.
  */
 
+/** \fn safe_write(int, const void*, uint)
+ *  \brief Writes data to disk
+ *
+ *   This just uses the Standard C write() to write to disk.
+ *   We retry forever on EAGAIN errors, and three times on
+ *   any other error.
+ *
+ *  \param fd   File descriptor
+ *  \param data Pointer to data to write
+ *  \param sz   Size of data to write in bytes
+ */
 static uint safe_write(int fd, const void *data, uint sz)
 {
     int ret;
@@ -69,6 +85,9 @@ static uint safe_write(int fd, const void *data, uint sz)
     return tot;
 }
 
+/** \fn ThreadedFileWriter::boot_writer(void*)
+ *  \brief Thunk that runs ThreadedFileWriter::DiskLoop(void)
+ */
 void *ThreadedFileWriter::boot_writer(void *wotsit)
 {
     ThreadedFileWriter *fw = (ThreadedFileWriter *)wotsit;
@@ -76,6 +95,9 @@ void *ThreadedFileWriter::boot_writer(void *wotsit)
     return NULL;
 }
 
+/** \fn ThreadedFileWriter::boot_syncer(void*)
+ *  \brief Thunk that runs ThreadedFileWriter::SyncLoop(void)
+ */
 void *ThreadedFileWriter::boot_syncer(void *wotsit)
 {
     ThreadedFileWriter *fw = (ThreadedFileWriter *)wotsit;
@@ -83,16 +105,29 @@ void *ThreadedFileWriter::boot_syncer(void *wotsit)
     return NULL;
 }
 
+/** \fn ThreadedFileWriter::ThreadedFileWriter(const QString&,int,mode_t)
+ *  \brief Creates a threaded file writer.
+ */
 ThreadedFileWriter::ThreadedFileWriter(const QString &fname,
-                                       int pflags, mode_t pmode)
-    : filename(QDeepCopy<QString>(fname)),
-      flags(pflags), mode(pmode), fd(-1),
-      no_writes(false), flush(false), tfw_buf_size(0),
-      tfw_min_write_size(0), rpos(0), wpos(0), buf(NULL),
-      in_dtor(0)
+                                       int pflags, mode_t pmode) :
+    // file stuff
+    filename(QDeepCopy<QString>(fname)), flags(pflags),
+    mode(pmode),                         fd(-1),
+    // state
+    no_writes(false),                    flush(false),
+    write_is_blocked(false),             in_dtor(false),
+    tfw_min_write_size(0),
+    // buffer position state
+    rpos(0),                             wpos(0),
+    // buffer
+    buf(NULL),                           tfw_buf_size(0)
 {
 }
 
+/** \fn ThreadedFileWriter::Open(void)
+ *  \brief Opens the file we will be writing to.
+ *  \return true if we successfully open the file.
+ */
 bool ThreadedFileWriter::Open(void)
 {
     fd = open(filename.ascii(), flags, mode);
@@ -126,7 +161,7 @@ ThreadedFileWriter::~ThreadedFileWriter()
     if (fd >= 0)
     {
         Flush();
-        in_dtor = 1; /* tells child thread to exit */
+        in_dtor = true; /* tells child thread to exit */
 
         bufferSyncWait.wakeAll();
         pthread_join(syncer, NULL);
@@ -144,6 +179,14 @@ ThreadedFileWriter::~ThreadedFileWriter()
     }
 }
 
+/** \fn ThreadedFileWriter::Write(const void*, uint)
+ *  \brief Writes data to the end of the write buffer
+ *
+ *   NOTE: This blocks while buffer is in use by the write to disk thread.
+ *
+ *  \param data  pointer to data to write to disk
+ *  \param count size of data in bytes
+ */
 uint ThreadedFileWriter::Write(const void *data, uint count)
 {
     if (count == 0)
@@ -159,9 +202,11 @@ uint ThreadedFileWriter::Write(const void *data, uint count)
                     QString("cnt(%1) free(%2)").arg(count).arg(BufFree()));
             first = false;
         }
-
+        write_is_blocked = true;
+        bufferHasData.wakeAll(); // make sure DiskLoop is run soon...
         bufferWroteData.wait(100);
     }
+    write_is_blocked = false;
     if (!first)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Write() -- IOBOUND end");
 
@@ -224,12 +269,12 @@ void ThreadedFileWriter::Flush(void)
 /** \fn ThreadedFileWriter::Sync(void)
  *  \brief flush data written to the file descriptor to disk.
  *
- *   Note, this doesn't even try flush our queue of data.
- *   It only ensures that data which has already been sent
- *   to the kernel is written to disk. This means that if
- *   this backend is writing the data over a network 
- *   filesystem like NFS, then the data will be visible to
- *   the NFS server after this is called. It is also useful
+ *   NOTE: This doesn't even try flush our queue of data.
+ *   This only ensures that data which has already been sent
+ *   to the kernel for this file is written to disk. This 
+ *   means that if this backend is writing the data over a 
+ *   network filesystem like NFS, then the data will be visible
+ *   to the NFS server after this is called. It is also useful
  *   in preventing the kernel from buffering up so many writes
  *   that they steal the CPU for a long time when the write
  *   to disk actually occurs.
@@ -246,6 +291,10 @@ void ThreadedFileWriter::Sync(void)
     }
 }
 
+/** \fn ThreadedFileWriter::SetWriteBufferSize(uint)
+ *  \brief Sets the total size of the write buffer.
+ *  WARNING: This is not safe when another thread is writing to the buffer.
+ */
 void ThreadedFileWriter::SetWriteBufferSize(uint newSize)
 {
     if (newSize <= 0)
@@ -262,6 +311,10 @@ void ThreadedFileWriter::SetWriteBufferSize(uint newSize)
     buflock.unlock();
 }
 
+/** \fn ThreadedFileWriter::SetWriteBufferSize(uint)
+ *  \brief Sets the minumum number of bytes to write to disk in a single write.
+ *         This is ignored during a Flush(void)
+ */
 void ThreadedFileWriter::SetWriteBufferMinWriteSize(uint newMinSize)
 {
     if (newMinSize <= 0)
@@ -287,19 +340,22 @@ void ThreadedFileWriter::SyncLoop(void)
  */
 void ThreadedFileWriter::DiskLoop(void)
 {
-    uint size = 0, written = 0;
+    uint size = 0;
 
     while (!in_dtor || BufUsed() > 0)
     {
         size = BufUsed();
 
-        if (size == 0)
-            bufferEmpty.wakeAll();
-
-        if (!size || (!in_dtor && !flush &&
-            ((size < tfw_min_write_size) &&
-             (written >= tfw_min_write_size))))
+        if (!size)
         {
+            bufferEmpty.wakeAll();
+            bufferHasData.wait(100);
+            continue;
+        }
+        else if ((size < tfw_min_write_size) &&
+                 (!in_dtor && !flush && !write_is_blocked))
+        {
+            // we don't have enough data to bother writing to disk
             bufferHasData.wait(100);
             continue;
         }
@@ -307,9 +363,11 @@ void ThreadedFileWriter::DiskLoop(void)
         /* cap the max. write size. Prevents the situation where 90% of the
            buffer is valid, and we try to write all of it at once which
            takes a long time. During this time, the other thread fills up
-           the 10% that was free... */
-        if (size > TFW_MAX_WRITE_SIZE)
-            size = TFW_MAX_WRITE_SIZE;
+           the 10% that was free...
+           Then make write size even smaller if we are aleady blocked.
+        */
+        size = (size > TFW_MAX_WRITE_SIZE) ? TFW_MAX_WRITE_SIZE : size;
+        size = (write_is_blocked)          ? TFW_BLK_WRITE_SIZE : size;
 
         if ((rpos + size) > tfw_buf_size)
         {
@@ -322,11 +380,6 @@ void ThreadedFileWriter::DiskLoop(void)
         else
         {
             size = safe_write(fd, buf+rpos, size);
-        }
-
-        if (written < tfw_min_write_size)
-        {
-            written += size;
         }
 
         buflock.lock();
