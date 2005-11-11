@@ -20,7 +20,7 @@ class RingBuffer
     RingBuffer(const QString &lfilename, bool write, bool usereadahead = true);
    ~RingBuffer();
 
-    void OpenFile(const QString &lfilename);
+    void OpenFile(const QString &lfilename, uint retryCount = 4);
     bool IsOpen(void);
     
     int Read(void *buf, int count);
@@ -43,12 +43,12 @@ class RingBuffer
 
     void StopReads(void);
     void StartReads(void);
-    bool GetStopReads(void) { return stopreads; }
+    bool GetStopReads(void) const { return stopreads; }
 
     bool LiveMode(void);
     void SetLiveMode(LiveTVChain *chain);
 
-    const QString GetFilename(void) { return filename; }
+    const QString GetFilename(void) const { return filename; }
 
     bool IsIOBound(void);
 
@@ -59,7 +59,7 @@ class RingBuffer
     bool isPaused(void);
     void WaitForPause(void);
     
-    bool isDVD() {return dvdPriv;}
+    bool isDVD(void) const { return dvdPriv; }
     
     void CalcReadAheadThresh(int estbitrate);
 
@@ -68,8 +68,8 @@ class RingBuffer
     void getPartAndTitle( int& title, int& part);
     void getDescForPos(QString& desc);
     
-    void nextTrack();
-    void prevTrack();
+    void nextTrack(void);
+    void prevTrack(void);
     
   protected:
     static void *startReader(void *type);
@@ -144,7 +144,11 @@ class RingBuffer
 
     bool oldfile;
 
-    LiveTVChain *livetvchain;    
+    LiveTVChain *livetvchain;
+
+    // constants
+    static const uint kBufferSize;
+    static const uint kReadTestSize;
 };
 
 #endif
