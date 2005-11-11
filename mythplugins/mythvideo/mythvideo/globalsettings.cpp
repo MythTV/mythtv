@@ -115,9 +115,9 @@ static HostCheckBox *VideoTreeNoMetaData()
     gc->setLabel(QObject::tr("Video List Loads Video Meta Data"));
     gc->setValue(true);
     gc->setHelpText(QObject::tr("If set along with Browse Files, this "
-                    "will cause the Video List load any known video meta"
+                    "will cause the Video List to load any known video meta"
                     "data from the database. Turning this off can greatly "
-                    " speed up how long it takes to create a video list."));
+                    " speed up how long it takes to load the Video List tree"));
     return gc;
 };
 
