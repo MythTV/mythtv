@@ -177,7 +177,8 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
             "movq %%mm0, (%5, %%"REG_a")	\n\t"
             "pcmpeqw %%mm7, %%mm0		\n\t" // out==0 ? 0xFF : 0x00
             "movq (%4, %%"REG_a"), %%mm1		\n\t" 
-            "movq %%mm7, (%1, %%"REG_a")		\n\t" // 0
+            "mov %1, %%"REG_c"		#HERE	\n\t"
+            "movq %%mm7, (%%"REG_c", %%"REG_a")	\n\t" // 0
             "pandn %%mm1, %%mm0			\n\t"
 	    PMAXW(%%mm0, %%mm3)
             "add $8, %%"REG_a"			\n\t"
@@ -188,7 +189,6 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
 	    : "+a" (last_non_zero_p1)
             : "g" (block+64), "g" (qmat+64), "r" (bias+64),
               "r" (inv_zigzag_direct16+64), "r" (temp_block+64)
-            : "%"REG_c
         );
         // note the asm is split cuz gcc doesnt like that many operands ...
         asm volatile(
