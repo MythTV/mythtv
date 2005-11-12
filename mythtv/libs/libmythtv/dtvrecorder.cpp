@@ -125,9 +125,6 @@ long long DTVRecorder::GetKeyframePosition(long long desired)
 // documented in recorderbase.h
 void DTVRecorder::Reset(void)
 {
-    // XXX right?
-    //HandleKeyframe();
-
     QMutexLocker locker(&_position_map_lock);
 
     _keyframe_seen              = false;
@@ -279,6 +276,11 @@ void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
     nextRingBufferLock.unlock();
 }
 
+void DTVRecorder::ResetForNewFile(void)
+{
+    Reset();
+}
+
 /** \fn DTVRecorder::HandleKeyframe(void)
  *  \brief This save the current frame to the position maps
  *         and handles ringbuffer switching.
@@ -311,30 +313,8 @@ void DTVRecorder::HandleKeyframe(void)
     if (save_map)
         SavePositionMap(false);
 
-
     // Perform ringbuffer switch if needed.
-    nextRingBufferLock.lock();
-    bool rb_changed = false;
-    if (nextRingBuffer)
-    {
-        FinishRecording();
-        Reset();
-
-        if (weMadeBuffer && ringBuffer)
-            delete ringBuffer;
-        SetRingBuffer(nextRingBuffer);
-        nextRingBuffer = NULL;
-
-        ProgramInfo *oldrec = curRecording;
-        curRecording        = nextRecording;
-        nextRecording       = NULL;
-        if (oldrec)
-            delete oldrec;
-        rb_changed = true;
-    }
-    nextRingBufferLock.unlock();
-    if (rb_changed && tvrec)
-        tvrec->RingBufferChanged(ringBuffer, nextRecording);
+    CheckForRingBufferSwitch();
 }
 
 /** \fn DTVRecorder::SavePositionMap(bool)

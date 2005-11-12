@@ -42,6 +42,8 @@ class DTVRecorder: public RecorderBase
     virtual void Reset();
   protected:
     void FinishRecording(void);
+    void ResetForNewFile(void);
+
     void FindKeyframes(const TSPacket* tspacket);
     void HandleKeyframe();
     void SavePositionMap(bool force);

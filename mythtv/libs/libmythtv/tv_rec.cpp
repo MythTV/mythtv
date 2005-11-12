@@ -3626,6 +3626,9 @@ void TVRec::SwitchLiveTVRingBuffer(bool discont)
                               channel->GetCurrentInput(), discont);
 
     recorder->SetNextRecording(pginfo, rb);
+    if (discont)
+        recorder->CheckForRingBufferSwitch();
+
     delete pginfo;
 }
 

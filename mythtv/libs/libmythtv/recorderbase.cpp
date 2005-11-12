@@ -180,3 +180,33 @@ bool RecorderBase::PauseAndWait(int timeout)
         paused = false;
     return paused;
 }
+
+void RecorderBase::CheckForRingBufferSwitch(void)
+{
+    nextRingBufferLock.lock();
+
+    bool rb_changed = false;
+
+    if (nextRingBuffer)
+    {
+        FinishRecording();
+        ResetForNewFile();
+
+        if (weMadeBuffer && ringBuffer)
+            delete ringBuffer;
+        SetRingBuffer(nextRingBuffer);
+        nextRingBuffer = NULL;
+
+        ProgramInfo *oldrec = curRecording;
+        curRecording        = nextRecording;
+        nextRecording       = NULL;
+        if (oldrec)
+            delete oldrec;
+        rb_changed = true;
+    }
+    nextRingBufferLock.unlock();
+
+    if (rb_changed && tvrec)
+        tvrec->RingBufferChanged(ringBuffer, curRecording);
+}
+

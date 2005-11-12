@@ -3372,6 +3372,18 @@ void NuppelVideoRecorder::SetNextRecording(const ProgramInfo*, RingBuffer*)
     // TODO
 }
 
+void NuppelVideoRecorder::CheckForRingBufferSwitch(void)
+{
+}
+
+void NuppelVideoRecorder::ResetForNewFile(void)
+{
+}
+
+void NuppelVideoRecorder::FinishRecording(void)
+{
+}
+
 void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync, 
                                      bool forcekey)
 {

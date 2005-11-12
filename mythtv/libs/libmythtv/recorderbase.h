@@ -202,6 +202,10 @@ class RecorderBase : public QObject
      */
     double GetFrameRate(void) { return video_frame_rate; }
 
+    /** \brief If requested, switch to new RingBuffer/ProgramInfo objects
+     */
+    virtual void CheckForRingBufferSwitch(void);
+
   public slots:
     virtual void deleteLater(void);
 
@@ -211,6 +215,9 @@ class RecorderBase : public QObject
      */
     void SetIntOption(RecordingProfile *profile, const QString &name);
     virtual bool PauseAndWait(int timeout = 100);
+
+    virtual void ResetForNewFile(void) = 0;
+    virtual void FinishRecording(void) = 0;
 
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;

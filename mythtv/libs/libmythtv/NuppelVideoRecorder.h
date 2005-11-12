@@ -78,6 +78,9 @@ class NuppelVideoRecorder : public RecorderBase
     long long GetKeyframePosition(long long desired);
 
     void SetNextRecording(const ProgramInfo*, RingBuffer*);
+    void CheckForRingBufferSwitch(void);
+    void ResetForNewFile(void);
+    void FinishRecording(void);
 
     // reencode stuff
     void StreamAllocate(void);
@@ -106,7 +109,7 @@ class NuppelVideoRecorder : public RecorderBase
     void doWriteThread(void);
     void doAudioThread(void);
     void doVbiThread(void);
-    
+
  private:
     inline void WriteFrameheader(rtframeheader *fh);
 
