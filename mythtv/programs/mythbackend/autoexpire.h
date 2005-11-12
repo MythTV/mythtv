@@ -18,6 +18,12 @@ class EncoderLink;
 typedef vector<ProgramInfo*> pginfolist_t;
 typedef vector<EncoderLink*> enclinklist_t;
 
+enum ExpireMethodType {
+    emOldestFirst          = 1,
+    emLowestPriorityFirst  = 2,
+    emShortLiveTVPrograms  = 10000
+};
+
 class AutoExpire : public QObject
 {
   public:
@@ -34,12 +40,15 @@ class AutoExpire : public QObject
     static void *ExpirerThread(void *param);
 
   private:
+    void ExpireShortLiveTV(void);
+    void ExpireRecordings(void);
     void ExpireEpisodesOverMax(void);
 
     void FillDBOrdered(int expMethod);
-    void SendDeleteMessages(size_t, size_t);
+    void SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
+                            bool deleteAll = false);
     void ClearExpireList(void);
-    void Sleep();
+    void Sleep(int sleepTime);
 
     void UpdateDontExpireSet(void);
     bool IsInDontExpireSet(QString chanid, QDateTime starttime);
@@ -54,7 +63,6 @@ class AutoExpire : public QObject
     uint          desired_freq;
     bool          expire_thread_running;
     bool          is_master_backend;
-    bool          disable_expire;
 
     // update info
     bool          update_pending;
@@ -65,3 +73,5 @@ class AutoExpire : public QObject
 };
 
 #endif
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

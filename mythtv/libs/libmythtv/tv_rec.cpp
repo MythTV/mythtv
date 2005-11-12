@@ -3635,8 +3635,8 @@ void TVRec::SwitchLiveTVRingBuffer(bool discont)
     }
 
     StartedRecording(pginfo);
-    pginfo->SetAutoExpire(10000);
-    pginfo->ApplyRecordRecGroupChange(QObject::tr("LiveTV"));
+    pginfo->SetAutoExpire(kLiveTVAutoExpire);
+    pginfo->ApplyRecordRecGroupChange("LiveTV");
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
 

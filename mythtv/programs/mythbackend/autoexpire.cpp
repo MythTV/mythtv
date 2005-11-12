@@ -52,7 +52,7 @@ extern AutoExpire *expirer;
 AutoExpire::AutoExpire(bool runthread, bool master)
     : record_file_prefix("/"), desired_space(3*1024*1024),
       desired_freq(10), expire_thread_running(runthread),
-      is_master_backend(master), disable_expire(true), update_pending(false)    
+      is_master_backend(master), update_pending(false)    
 {
     if (runthread)
     {
@@ -93,7 +93,6 @@ void AutoExpire::CalcParams(vector<EncoderLink*> recs)
 {
     DBG_CALC_PARAM("CalcParams() -- begin");
     QString recordFilePrefix = gContext->GetSetting("RecordFilePrefix");
-    bool disableAutoExpire = !(gContext->GetNumSetting("AutoExpireMethod", 1));
 
     DBG_CALC_PARAM("CalcParams() -- A recs.size():"<<recs.size());
 
@@ -178,7 +177,6 @@ void AutoExpire::CalcParams(vector<EncoderLink*> recs)
     instance_lock.lock();
     desired_space      = expireMinKB;
     desired_freq       = expireFreq;
-    disable_expire     = disableAutoExpire;
     record_file_prefix = recordFilePrefix;
     instance_lock.unlock();
     DBG_CALC_PARAM("CalcParams() -- end");
@@ -227,53 +225,109 @@ static inline bool operator!= (const fsid_t &a, const fsid_t &b) { return !(a==b
  */
 void AutoExpire::RunExpirer(void)
 {
-    long long availFreeKB = 0;
+    QTime curTime;
+    QTime timer;
 
     // wait a little for main server to come up and things to settle down
     sleep(20);
 
+    timer.start();
+
     while (expire_thread_running)
     {
+        timer.restart();
+
         instance_lock.lock();
 
         UpdateDontExpireSet();
 
-        if (is_master_backend)
-            ExpireEpisodesOverMax();
+        curTime = QTime::currentTime();
 
-        long long tKB, uKB;
-        if (!disable_expire &&
-            ((availFreeKB = getDiskSpace(record_file_prefix, tKB, uKB)) < 0))
+        // Expire LiveTV every 2 minutes
+        if (is_master_backend && (curTime.minute() % 2) == 0)
+            ExpireShortLiveTV();
+
+        // Expire normal recordings depending on frequency calculated
+        if ((curTime.minute() % desired_freq) == 0)
         {
-            QString msg = QString("ERROR: Could not calculate free space.");
-            VERBOSE(VB_IMPORTANT, msg);
-            gContext->LogEntry("mythbackend", LP_WARNING,
-                               "Autoexpire Recording", msg);
+            if (is_master_backend)
+                ExpireEpisodesOverMax();
+
+            ExpireRecordings();
         }
-        else if (!disable_expire && (((size_t)availFreeKB) < desired_space))
-        {
-            VERBOSE(VB_FILE,
-                    QString("Running autoexpire, we want %1 MB free, "
-                            "but only have %2 MB.")
-                    .arg(desired_space/1024).arg(availFreeKB/1024));
-            
-            FillExpireList();
-            SendDeleteMessages(availFreeKB, desired_space);
-        }
+
         instance_lock.unlock();
-        Sleep();
+
+        Sleep(60 - (timer.elapsed() / 1000));
     }
 } 
 
-/** \fn AutoExpire::Sleep()
- *  \brief Sleeps for "desired_freq" minutes; unless the expire thread
+/** \fn AutoExpire::Sleep(int sleepTime)
+ *  \brief Sleeps for sleepTime minutes; unless the expire thread
  *         is told to quit, then stops sleeping within 5 seconds.
  */
-void AutoExpire::Sleep()
+void AutoExpire::Sleep(int sleepTime)
 {
     int minSleep = 5, timeExpended = 0;
-    while (expire_thread_running && timeExpended < (int)(desired_freq*60))
+    while (expire_thread_running && timeExpended < sleepTime)
+    {
+        if (timeExpended > (sleepTime - minSleep))
+            minSleep = sleepTime - timeExpended;
         timeExpended += minSleep - (int)sleep(minSleep);
+    }
+}
+
+/** \fn AutoExpire::ExpireShortLiveTV()
+ *  \brief This expires short LiveTV programs generated because of
+ *         channel surfing.
+ *        
+ */
+void AutoExpire::ExpireShortLiveTV(void)
+{
+    long long availFreeKB = 0;
+    long long tKB, uKB;
+
+    if ((availFreeKB = getDiskSpace(record_file_prefix, tKB, uKB)) < 0)
+    {
+        QString msg = QString("ERROR: Could not calculate free space.");
+        VERBOSE(VB_IMPORTANT, msg);
+        gContext->LogEntry("mythbackend", LP_WARNING,
+                           "Autoexpire Recording", msg);
+    }
+    else
+    {
+        ClearExpireList();
+        FillDBOrdered(emShortLiveTVPrograms);
+        SendDeleteMessages(availFreeKB, 0, true);
+    }
+}
+
+/** \fn AutoExpire::ExpireRecordings()
+ *  \brief This expires normal recordings.
+ *
+ */
+void AutoExpire::ExpireRecordings(void)
+{
+    long long availFreeKB = 0;
+    long long tKB, uKB;
+
+    if ((availFreeKB = getDiskSpace(record_file_prefix, tKB, uKB)) < 0)
+    {
+        QString msg = QString("ERROR: Could not calculate free space.");
+        VERBOSE(VB_IMPORTANT, msg);
+        gContext->LogEntry("mythbackend", LP_WARNING,
+                           "Autoexpire Recording", msg);
+    }
+    else if (((size_t)availFreeKB) < desired_space)
+    {
+        VERBOSE(VB_FILE,
+                QString("Running autoexpire, we want %1 MB free, "
+                        "but only have %2 MB.")
+                .arg(desired_space/1024).arg(availFreeKB/1024));
+        
+        FillExpireList();
+        SendDeleteMessages(availFreeKB, desired_space);
+    }
 }
 
 /** \fn CheckFile(const ProgramInfo*, const QString&, const fsid_t&)
@@ -328,17 +382,18 @@ static bool CheckFile(const ProgramInfo *pginfo,
     return true;
 }
 
-/** \fn AutoExpire::SendDeleteMessages(size_t, size_t)
+/** \fn AutoExpire::SendDeleteMessages(size_t, size_t, bool)
  *  \brief This sends delete message to main event thread.
  */
-void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB)
+void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
+                                    bool deleteAll)
 {
     QString msg;
     fsid_t fsid = UniqueFileSystemID(record_file_prefix);
 
     pginfolist_t::iterator it = expire_list.begin();
     while (it != expire_list.end() &&
-           (availFreeKB < desiredFreeKB))
+           (deleteAll || availFreeKB < desiredFreeKB))
     {
         if (CheckFile(*it, record_file_prefix, fsid))
         {
@@ -363,7 +418,7 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB)
         ++it; // move on to next program
     }
     
-    if (availFreeKB < desiredFreeKB)
+    if (!deleteAll && availFreeKB < desiredFreeKB)
     {
         msg = QString("ERROR when trying to autoexpire files.  "
                       "No recordings available to expire.");
@@ -387,6 +442,7 @@ void *AutoExpire::ExpirerThread(void *param)
 /** \fn AutoExpire::ExpireEpisodesOverMax()
  *  \brief This deletes programs exceeding the maximum
  *         number of episodes of that program desired.
+ *         Excludes recordings in the LiveTV Recording Group.
  */
 void AutoExpire::ExpireEpisodesOverMax(void)
 {
@@ -416,6 +472,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
     {
         query.prepare("SELECT chanid, starttime, title FROM recorded "
                       "WHERE recordid = :RECID AND preserve = 0 "
+                      "AND recgroup <> 'LiveTV' "
                       "ORDER BY starttime DESC;");
         query.bindValue(":RECID", maxIter.key());
 
@@ -477,8 +534,10 @@ void AutoExpire::FillExpireList(void)
 
     switch(expMethod)
     {
-        case 1:
-        case 2: FillDBOrdered(expMethod); break;
+        case emOldestFirst:
+        case emLowestPriorityFirst:
+                FillDBOrdered(expMethod);
+                break;
         // default falls through so list is empty so no AutoExpire
     }
 }
@@ -529,17 +588,24 @@ void AutoExpire::ClearExpireList(void)
 void AutoExpire::FillDBOrdered(int expMethod)
 {
     QString fileprefix = gContext->GetFilePrefix();
-
+    QString where;
     QString orderby;
 
     switch (expMethod)
     {
         default:
-        case 1: // Oldest first
+        case emOldestFirst:
+            where = "autoexpire > 0";
             orderby = "starttime ASC";
             break;
-        case 2: // Lowest priority first
+        case emLowestPriorityFirst:
+            where = "autoexpire > 0";
             orderby = "recorded.recpriority ASC, starttime ASC";
+            break;
+        case emShortLiveTVPrograms:
+            where = "recgroup = 'LiveTV' "
+                    "AND endtime < DATE_ADD(starttime, INTERVAL 2 MINUTE) ";
+            orderby = "starttime ASC";
             break;
     }
 
@@ -552,8 +618,8 @@ void AutoExpire::FillDBOrdered(int expMethod)
                "       recorded.recpriority, progstart, progend "
                "FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
-               "WHERE autoexpire > 0 "
-               "ORDER BY autoexpire DESC, %1").arg(orderby);
+               "WHERE %1 "
+               "ORDER BY autoexpire DESC, %2").arg(where).arg(orderby);
 
     query.prepare(querystr);
 
@@ -694,7 +760,7 @@ void AutoExpire::UpdateDontExpireSet(void)
         QDateTime startts = query.value(1).toDateTime();
         QDateTime lastupdate = query.value(2).toDateTime();
 
-        if (lastupdate.secsTo(curTime) > 2 * 60 * 60)
+        if (lastupdate.secsTo(curTime) < 2 * 60 * 60)
         {
             QString key = chanid + startts.toString(Qt::ISODate);
             dont_expire_set.insert(key);
