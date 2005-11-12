@@ -686,7 +686,7 @@ void AutoExpire::UpdateDontExpireSet(void)
     if (!query.exec() || !query.isActive() || !query.size())
         return;
 
-    QDateTime curTime;
+    QDateTime curTime = QDateTime::currentDateTime();
 
     while (query.next())
     {

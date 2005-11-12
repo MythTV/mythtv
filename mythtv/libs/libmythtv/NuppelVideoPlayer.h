@@ -345,8 +345,6 @@ class NuppelVideoPlayer
     void  SwitchToProgram(void);
     void  JumpToProgram(void);
 
-    void  UpdateInUseMark(void);
-
   private:
     VideoOutputType forceVideoOutput;
 
@@ -556,9 +554,6 @@ class NuppelVideoPlayer
 
     // Debugging variables
     Jitterometer *output_jmeter;
-
-    // Last InUse timestamp
-    QDateTime lastInUseTime;
 };
 
 #endif

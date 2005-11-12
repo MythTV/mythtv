@@ -463,6 +463,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
         // Tell event loop to begin recording.
         curRecording = new ProgramInfo(*rcinfo);
+        curRecording->MarkAsInUse(true);
         curRecording->pathname = rbFileName;
         curRecording->hostname = gContext->GetHostName();
         ChangeState(kState_RecordingOnly);
@@ -878,6 +879,7 @@ void TVRec::TeardownRecorder(bool killFile)
                 JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
         }
 
+        curRecording->MarkAsInUse(false);
         delete curRecording;
         curRecording = NULL;
     }
@@ -1182,6 +1184,9 @@ void TVRec::RunTV(void)
             ChangeState(kState_None);
             ClearFlags(kFlagFinishRecording);
         }
+
+        if (curRecording)
+            curRecording->UpdateInUseMark();
 
         if (GetState() == kState_WatchingLiveTV && curRecording)
         {
@@ -2843,8 +2848,12 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
     if (pginfo)
     {
         if (curRecording)
+        {
+            curRecording->MarkAsInUse(false);
             delete curRecording;
+        }
         curRecording = new ProgramInfo(*pginfo);
+        curRecording->MarkAsInUse(true);
     }
 }
 
@@ -3587,13 +3596,18 @@ bool TVRec::CreateLiveTVRingBuffer(void)
 
     StartedRecording(pginfo);
     pginfo->SetAutoExpire(10000);
+    pginfo->ApplyRecordRecGroupChange(QObject::tr("LiveTV"));
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), false);
 
     if (curRecording)
+    {
+        curRecording->MarkAsInUse(false);
         delete curRecording;
+    }
 
     curRecording = pginfo;
+    curRecording->MarkAsInUse(true);
     lastTuningRequest.program = curRecording;
     return true;
 }
@@ -3622,6 +3636,7 @@ void TVRec::SwitchLiveTVRingBuffer(bool discont)
 
     StartedRecording(pginfo);
     pginfo->SetAutoExpire(10000);
+    pginfo->ApplyRecordRecGroupChange(QObject::tr("LiveTV"));
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
 

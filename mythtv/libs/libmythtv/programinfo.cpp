@@ -81,7 +81,7 @@ ProgramInfo::ProgramInfo(void)
     recendts = startts;
     originalAirDate = startts.date();
     lastmodified = startts;
-
+    lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
 
     recstatus = rsUnknown;
     oldrecstatus = rsUnknown;
@@ -213,6 +213,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     ignoreBookmark = other.ignoreBookmark; 
    
     inusekey = other.inusekey;
+    lastInUseTime = other.lastInUseTime;
     record = NULL;
 
     return *this;
@@ -3171,6 +3172,12 @@ int ProgramInfo::getProgramFlags(void) const
     return flags;
 }
 
+void ProgramInfo::UpdateInUseMark(bool force)
+{
+    if (force || lastInUseTime.secsTo(QDateTime::currentDateTime()) > 60 * 60)
+        MarkAsInUse(true);
+}
+
 void ProgramInfo::MarkAsInUse(bool inuse)
 {
     bool notifyOfChange = false;
@@ -3200,8 +3207,11 @@ void ProgramInfo::MarkAsInUse(bool inuse)
     {
         if (!gContext->IsBackend())
             RemoteSendMessage("RECORDING_LIST_CHANGE");
+        inusekey = "";
         return;
     }
+
+    lastInUseTime = QDateTime::currentDateTime();
 
     query.prepare("INSERT INTO inuseprograms (chanid, starttime, playid, "
                   " lastupdatetime) VALUES(:CHANID, :STARTTIME, :PLAYID, "
@@ -3209,7 +3219,7 @@ void ProgramInfo::MarkAsInUse(bool inuse)
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
     query.bindValue(":PLAYID", inusekey);
-    query.bindValue(":UPDATETIME", QDateTime::currentDateTime());
+    query.bindValue(":UPDATETIME", lastInUseTime);
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("SetInUse", query);

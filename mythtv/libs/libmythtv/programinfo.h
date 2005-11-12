@@ -164,6 +164,7 @@ class ProgramInfo
     QString RecStatusChar(void) const;
     QString RecStatusText(void) const;
     QString RecStatusDesc(void) const;
+    void UpdateInUseMark(bool force = false);
 
     // Quick sets
     /// \brief If "ignore" is true GetBookmark() will return 0, otherwise
@@ -265,6 +266,7 @@ class ProgramInfo
 
     QDate originalAirDate;
     QDateTime lastmodified;
+    QDateTime lastInUseTime;
     
     bool hasAirDate;
     bool repeat;

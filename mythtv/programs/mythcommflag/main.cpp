@@ -178,8 +178,11 @@ void commDetectorBreathe()
 
     if (jobID != -1)
     {
+        if (program_info)
+            program_info->UpdateInUseMark();
+
         int curCmd = JobQueue::GetJobCmd(jobID);
-        if (curCmd==lastCmd)
+        if (curCmd == lastCmd)
             return;
 
         switch (curCmd)
