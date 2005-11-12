@@ -6,6 +6,8 @@
 using namespace std;
 #include <unistd.h>
 
+#include <sys/wait.h>   // For WIFEXITED on Mac OS X
+
 #include <exitcodes.h>
 #include <mythcontext.h>
 #include <mythdbcon.h>
