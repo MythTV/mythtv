@@ -323,14 +323,6 @@ void MythFlixQueue::keyPressEvent(QKeyEvent *e)
             cursorDown();
         else if (action == "PAGEDOWN")
              cursorDown(true);
-        else if (action == "RETRIEVENEWS")
-            slotRetrieveNews();
-        else if(action == "SELECT")
-            slotViewArticle();
-        else if (action == "CANCEL")
-        {
-            cancelRetrieve();
-        }
         else
             handled = false;
     }
