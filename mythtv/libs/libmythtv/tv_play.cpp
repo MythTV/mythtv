@@ -2628,7 +2628,7 @@ void TV::DoArbSeek(ArbSeekWhence whence)
     else
     {
         if (whence == ARBSEEK_END)
-            time = (activenvp->CalcMaxFFTime(LONG_MAX) / frameRate) - time;
+            time = (activenvp->CalcMaxFFTime(LONG_MAX, false) / frameRate) - time;
         else
             time = time - (activenvp->GetFramesPlayed() - 1) / frameRate;
         DoSeek(time, tr("Jump To"));
@@ -5294,14 +5294,13 @@ void TV::PauseLiveTV(void)
     lockTimerOn = false;
 
     if (activenvp)
-        activenvp->Pause(false);
+        activenvp->PauseDecoder();
 
     if (activerbuffer)
-        activerbuffer->WaitForPause();
+        activerbuffer->IgnoreLiveEOF(true);
 
+    // XXX: Get rid of this?
     activerecorder->PauseRecorder();
-    if (activerbuffer)
-        activerbuffer->Reset(true);
 
     osdlock.lock();
     lastSignalMsg.clear();
@@ -5328,18 +5327,15 @@ void TV::UnpauseLiveTV(void)
     if (activenvp && tvchain)
     {
         tvchain->ReloadAll();
-        tvchain->SwitchTo(-1);
-        activenvp->SwitchToProgramExtChange();
-
-        activenvp->ResetPlaying();
-        if (activenvp->IsErrored())
+        ProgramInfo *pginfo = tvchain->GetProgramAt(-1);
+        if (pginfo)
         {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    "UnpauseLiveTV(): Unable to reset playing.");
-            wantsToQuit = false;
-            exitPlayer = true;
-            return;
+            SetCurrentlyPlaying(pginfo);
+            delete pginfo;
         }
+
+        tvchain->JumpTo(-1, 1);
+
         QString filters = GetFiltersForChannel();
         activenvp->SetVideoFilters(filters);
         activenvp->Play(normal_speed, true, false);

@@ -236,6 +236,7 @@ void RingBuffer::Init(void)
 
     numfailures = 0;
     commserror = false;
+    ignoreliveeof = false;
 
     pthread_rwlock_init(&rwlock, NULL);
 }
@@ -590,15 +591,11 @@ void RingBuffer::ReadAheadThread(void)
             {
                 if (livetvchain)
                 {
-                    if (livetvchain->HasNext())
-                    {
+                    if (!ignoreliveeof && livetvchain->HasNext())
                         livetvchain->SwitchToNext(true);
-                    }
                 }
                 else
-                {
                     ateof = true;
-                }
             }
         }
 

@@ -54,10 +54,14 @@ class LiveTVChain
     bool NeedsToSwitch(void);
     ProgramInfo *GetSwitchProgram(bool &discont, bool &newtype); // clears switch flag
 
+    void ClearSwitch(void);
+
     void SwitchTo(int num);
     void SwitchToNext(bool up); // true up, false down
 
     bool NeedsToJump(void);
+
+    void JumpTo(int num, int pos);
     void JumpToNext(bool up, int pos);
     int  GetJumpPos(void);  // clears jumppos
 

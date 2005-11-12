@@ -237,7 +237,7 @@ void NuppelVideoPlayer::SetRecorder(RemoteEncoder *recorder)
         GetDecoder()->setRecorder(recorder);
 }
 
-void NuppelVideoPlayer::Pause(bool waitvideo)
+void NuppelVideoPlayer::PauseDecoder(void)
 {
     decoder_lock.lock();
     next_play_speed = 0.0;
@@ -253,6 +253,11 @@ void NuppelVideoPlayer::Pause(bool waitvideo)
             VERBOSE(VB_IMPORTANT, "Waited too long for decoder to pause");
         }
     }
+}
+
+void NuppelVideoPlayer::Pause(bool waitvideo)
+{
+    PauseDecoder();
 
     //cout << "stopping other threads" << endl;
     PauseVideo(waitvideo);
@@ -884,7 +889,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
             if (real_skip >= 0)
             {
                 GetDecoder()->DoFastForward(GetDecoder()->GetFramesRead() + real_skip, false);
-                stop = (CalcMaxFFTime(100) < 100);
+                stop = (CalcMaxFFTime(100, false) < 100);
             }
         }
         else
@@ -1823,13 +1828,13 @@ bool NuppelVideoPlayer::FastForward(float seconds)
     if (!videoOutput)
         return false;
 
-    if (fftime == 0)
+    if (fftime <= 0)
         fftime = (int)(seconds * video_frame_rate);
 
     if (osdHasSubtitles || nonDisplayedSubtitles.size() > 0)
        ClearSubtitles();
 
-    return fftime > CalcMaxFFTime(fftime);
+    return fftime > CalcMaxFFTime(fftime, false);
 }
 
 bool NuppelVideoPlayer::Rewind(float seconds)
@@ -1837,7 +1842,7 @@ bool NuppelVideoPlayer::Rewind(float seconds)
     if (!videoOutput)
         return false;
 
-    if (rewindtime == 0)
+    if (rewindtime <= 0)
         rewindtime = (int)(seconds * video_frame_rate);
 
     if (osdHasSubtitles || nonDisplayedSubtitles.size() > 0)
@@ -1868,41 +1873,6 @@ void NuppelVideoPlayer::CheckTVChain(void)
     SetWatchingRecording(last);
 }
 
-void NuppelVideoPlayer::SwitchToProgramExtChange(void)
-{
-    bool discontinuity = false, newtype = false;
-    ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
-    if (!pginfo)
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "SwitchToProgramExtChange() failed");
-        return;
-    }
-
-    ringBuffer->OpenFile(pginfo->pathname);
-
-    if (m_playbackinfo)
-    {
-        m_playbackinfo->MarkAsInUse(false);
-        delete m_playbackinfo;
-    }
-
-    m_playbackinfo = pginfo;
-    livetvchain->SetProgram(pginfo);
-    if (m_tv)
-        m_tv->SetCurrentlyPlaying(pginfo);
-
-    if (newtype)
-        OpenFile();
-    else
-        GetDecoder()->SetProgramInfo(pginfo);
-
-    CheckTVChain();
-    GetDecoder()->SyncPositionMap();
-
-    if (m_playbackinfo)
-        m_playbackinfo->UpdateInUseMark(true);
-}
-
 void NuppelVideoPlayer::SwitchToProgram(void)
 {
     // Don't switch until we're low on data in the read ahead buffer
@@ -1911,6 +1881,8 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     bool discontinuity = false, newtype = false;
     ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
+    if (!pginfo)
+        return;
 
     if (discontinuity)
     {
@@ -1959,6 +1931,8 @@ void NuppelVideoPlayer::JumpToProgram(void)
 {
     bool discontinuity = false, newtype = false;
     ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
+    if (!pginfo)
+        return;
     long long nextpos = livetvchain->GetJumpPos();
     
     if (m_playbackinfo)
@@ -1972,7 +1946,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
 
-    ringBuffer->Reset();
+    ringBuffer->Reset(true);
     ringBuffer->OpenFile(pginfo->pathname);
 
     if (newtype)
@@ -1981,6 +1955,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
         ResetPlaying();
 
     ringBuffer->Unpause();
+    ringBuffer->IgnoreLiveEOF(false);
 
     livetvchain->SetProgram(pginfo);
     GetDecoder()->SetProgramInfo(pginfo);
@@ -1995,13 +1970,16 @@ void NuppelVideoPlayer::JumpToProgram(void)
     if (nextpos < 0)
         nextpos = 0;
 
-    bool seeks = exactseeks;
-    GetDecoder()->setExactSeeks(false);
-    fftime = nextpos;
-    DoFastForward();
-    fftime = 0;
-    GetDecoder()->setExactSeeks(seeks);
-     
+    if (nextpos > 10)
+    {
+        bool seeks = exactseeks;
+        GetDecoder()->setExactSeeks(false);
+        fftime = nextpos;
+        DoFastForward();
+        fftime = 0;
+        GetDecoder()->setExactSeeks(seeks);
+    }
+
     if (m_playbackinfo)
         m_playbackinfo->UpdateInUseMark(true);
 }
@@ -2182,6 +2160,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 DoPlay();
 
             decoder_lock.unlock();
+            continue;
         }
 
         if (rewindtime < 0)
@@ -2226,6 +2205,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 JumpToProgram();
 
                 GetFrame(audioOutput == NULL || !normal_speed);
+                resetvideo = true;
                 while (resetvideo)
                     usleep(50);
             }
@@ -2234,6 +2214,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 //printf("startplaying waiting for unpause\n");
                 usleep(500);
             }
+            continue;
         }
 
         if (rewindtime > 0 && ffrew_skip == 1)
@@ -2772,7 +2753,7 @@ long long NuppelVideoPlayer::CalcRWTime(long long rw) const
     return rw;
 }
 
-long long NuppelVideoPlayer::CalcMaxFFTime(long long ff) const
+long long NuppelVideoPlayer::CalcMaxFFTime(long long ff, bool setjump) const
 {
     long long maxtime = (long long)(1.0 * video_frame_rate);
     bool islivetvcur = (livetv && livetvchain && !livetvchain->HasNext());
@@ -2792,7 +2773,8 @@ long long NuppelVideoPlayer::CalcMaxFFTime(long long ff) const
             if (behind < maxtime || behind - ff <= maxtime * 2)
             {
                 ret = -1;
-                livetvchain->JumpToNext(true, 1);
+                if (setjump)
+                    livetvchain->JumpToNext(true, 1);
             }
         }
     }
@@ -2939,6 +2921,9 @@ void NuppelVideoPlayer::ClearAfterSeek(void)
 
     SetDeleteIter();
     SetCommBreakIter();
+
+    if (livetvchain)
+        livetvchain->ClearSwitch();
 }
 
 void NuppelVideoPlayer::SetDeleteIter(void)

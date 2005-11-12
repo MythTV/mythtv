@@ -47,6 +47,7 @@ class RingBuffer
 
     bool LiveMode(void);
     void SetLiveMode(LiveTVChain *chain);
+    void IgnoreLiveEOF(bool ignore) { ignoreliveeof = ignore; }
 
     const QString GetFilename(void) const { return filename; }
 
@@ -145,6 +146,7 @@ class RingBuffer
     bool oldfile;
 
     LiveTVChain *livetvchain;
+    bool ignoreliveeof;
 
     // constants
     static const uint kBufferSize;

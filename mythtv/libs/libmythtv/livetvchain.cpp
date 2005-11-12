@@ -288,6 +288,12 @@ bool LiveTVChain::NeedsToJump(void)
     return (m_switchid >= 0 && m_jumppos != 0);
 }
 
+void LiveTVChain::ClearSwitch(void)
+{
+    m_switchid = -1;
+    m_jumppos = 0;
+}
+
 ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
 {
     if (m_switchid < 0 || m_curpos == m_switchid)
@@ -328,10 +334,16 @@ void LiveTVChain::SwitchToNext(bool up)
         SwitchTo(m_curpos - 1);
 }
 
+void LiveTVChain::JumpTo(int num, int pos)
+{
+    m_jumppos = pos;
+    SwitchTo(num);
+}
+
 void LiveTVChain::JumpToNext(bool up, int pos)
 {
-    SwitchToNext(up);
     m_jumppos = pos;
+    SwitchToNext(up);
 }
 
 int LiveTVChain::GetJumpPos(void)

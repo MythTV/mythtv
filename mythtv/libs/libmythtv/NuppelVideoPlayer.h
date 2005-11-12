@@ -142,7 +142,7 @@ class NuppelVideoPlayer
     bool    PlayingSlowForPrebuffer(void) const { return m_playing_slower; }
 
     // Complicated gets
-    long long CalcMaxFFTime(long long ff) const;
+    long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
     int       calcSliderPos(QString &desc) const;
 
@@ -160,6 +160,7 @@ class NuppelVideoPlayer
     void StopPlaying(void) { killplayer = true; decoder_thread_alive = false; }
 
     // Pause stuff
+    void PauseDecoder(void);
     void Pause(bool waitvideo = true);
     bool Play(float speed = 1.0, bool normal = true,
               bool unpauseaudio = true);
@@ -245,8 +246,6 @@ class NuppelVideoPlayer
 
     // LiveTV public stuff
     void CheckTVChain();
-    void SwitchToProgramExtChange(void);  // change the ringbuffer externally..
-                                          // must be called when paused. 
 
   protected:
     void DisplayPauseFrame(void);
