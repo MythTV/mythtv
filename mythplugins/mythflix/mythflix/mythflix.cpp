@@ -58,7 +58,6 @@ MythFlix::MythFlix(MythMainWindow *parent, const char *name )
     m_InColumn     = 0;
     m_UISites      = 0;
     m_UIArticles   = 0;
-    m_TimerTimeout = 10*60*1000; 
 
     setNoErase();
     loadTheme();
@@ -69,7 +68,7 @@ MythFlix::MythFlix(MythMainWindow *parent, const char *name )
     query.exec("SELECT name, url, updated FROM netflix WHERE is_queue=0 ORDER BY name");
 
     if (!query.isActive()) {
-        cerr << "MythFlix: Error in loading Sites from DB" << endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Error in loading sites from DB"));
     }
     else {
         QString name;
@@ -89,27 +88,20 @@ MythFlix::MythFlix(MythMainWindow *parent, const char *name )
             new UIListBtnTypeItem(m_UISites, site->name());
         item->setData(site);
     }
-    
-    // Now do the actual work
-    m_RetrieveTimer = new QTimer(this);
-    connect(m_RetrieveTimer, SIGNAL(timeout()),
-            this, SLOT(slotRetrieveNews()));
-    m_UpdateFreq = gContext->GetNumSetting("NewsUpdateFrequency", 30);
-    m_RetrieveTimer->start(m_TimerTimeout, false);
 
+    
+    NewsSite* site = (NewsSite*) m_NewsSites.first();
+    connect(site, SIGNAL(finished(NewsSite*)),
+            this, SLOT(slotNewsRetrieved(NewsSite*)));
+    
     slotRetrieveNews();
 
-    slotSiteSelected((NewsSite*) m_NewsSites.first());
-
     netflixShopperId = gContext->GetSetting("NetflixShopperId");
-    std::cerr << "MythFlix: Using NetflixShopperId " << netflixShopperId << std::endl;
-
-
+    VERBOSE(VB_GENERAL, QString("MythFlix: Using NetflixShopperId %1").arg(netflixShopperId));
 }
 
 MythFlix::~MythFlix()
 {
-    m_RetrieveTimer->stop();
     delete m_Theme;
 }
 
@@ -145,8 +137,7 @@ void MythFlix::loadTheme()
                     m_InfoRect = area;
             }
             else {
-                std::cerr << "Unknown element: " << e.tagName()
-                          << std::endl;
+                VERBOSE(VB_IMPORTANT, QString("MythFlix: Unknown element: %1").arg(e.tagName()));
                 exit(-1);
             }
         }
@@ -154,13 +145,13 @@ void MythFlix::loadTheme()
 
     LayerSet *container = m_Theme->GetSet("sites");
     if (!container) {
-        std::cerr << "MythFlix: Failed to get sites container." << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get sites container."));
         exit(-1);
     }
         
     m_UISites = (UIListBtnType*)container->GetType("siteslist");
     if (!m_UISites) {
-        std::cerr << "MythFlix: Failed to get sites list area." << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get list area."));
         exit(-1);
     }
         
@@ -169,15 +160,13 @@ void MythFlix::loadTheme()
 
     container = m_Theme->GetSet("articles");
     if (!container) {
-        std::cerr << "MythFlix: Failed to get articles container."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get articles container."));
         exit(-1);
     }
 
     m_UIArticles = (UIListBtnType*)container->GetType("articleslist");
     if (!m_UIArticles) {
-        std::cerr << "MythFlix: Failed to get articles list area."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get articles list area."));
         exit(-1);
     }
     
@@ -306,27 +295,21 @@ void MythFlix::updateInfoView()
                 if (!dir.exists())
                     dir.mkdir(fileprefix);
             
-                if (debug)
-                    cerr << "MythFlix: Boxshot File Prefix: " << fileprefix << endl;
+                VERBOSE(VB_FILE, QString("MythFlix: Boxshot File Prefix: %1").arg(fileprefix));
 
                 QString sFilename(fileprefix + "/" + imageLoc);
             
-                
                 bool exists = QFile::exists(sFilename);
                 if (!exists) 
                 {
-                    if (debug)
-                        cerr << "MythFlix: Copying BoxShot File from NetFlix (" << imageLoc << ")..." << endl;
-    
                     VERBOSE(VB_NETWORK, QString("MythFlix: Copying boxshot file from server (%1)").arg(imageLoc));
                     
                     QString sURL("http://cdn.nflximg.com/us/boxshots/large/" + imageLoc);
                 
                     if (!HttpComms::getHttpFile(sFilename, sURL, 20000))
-                        cerr << "Failed to download image from:" << sURL << endl;
+                        VERBOSE(VB_NETWORK, QString("MythFlix: Failed to download image from: %1").arg(sURL));
                 
-                    if (debug)
-                        cerr << "Done.\n";
+                    VERBOSE(VB_NETWORK, QString("MythFlix: Finished copying boxshot file from server (%1)").arg(imageLoc));
                 }
 
                 UIImageType *itype = (UIImageType *)container->GetType("boxshot");
@@ -412,14 +395,8 @@ void MythFlix::keyPressEvent(QKeyEvent *e)
             cursorLeft();
         else if (action == "RIGHT")
             cursorRight();
-        else if (action == "RETRIEVENEWS")
-            slotRetrieveNews();
         else if(action == "SELECT")
             slotViewArticle();
-        else if (action == "CANCEL")
-        {
-            cancelRetrieve();
-        }
         else
             handled = false;
     }
@@ -493,50 +470,16 @@ void MythFlix::slotRetrieveNews()
     if (m_NewsSites.count() == 0)
         return;
 
-    cancelRetrieve();
-
-    m_RetrieveTimer->stop();
-
     for (NewsSite* site = m_NewsSites.first(); site; site = m_NewsSites.next())
     {
-        site->stop();
-        connect(site, SIGNAL(finished(NewsSite*)),
-                this, SLOT(slotNewsRetrieved(NewsSite*)));
+        site->retrieve();
     }
 
-    for (NewsSite* site = m_NewsSites.first(); site; site = m_NewsSites.next())
-    {
-        if (site->timeSinceLastUpdate() > m_UpdateFreq)
-            site->retrieve();
-        else
-            processAndShowNews(site);
-    }
-
-    m_RetrieveTimer->start(m_TimerTimeout, false);
 }
 
 void MythFlix::slotNewsRetrieved(NewsSite* site)
 {
-    unsigned int updated = site->lastUpdated().toTime_t();
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("UPDATE netflix SET updated = :UPDATED "
-                  "WHERE name = :NAME ;");
-    query.bindValue(":UPDATED", updated);
-    query.bindValue(":NAME", site->name().utf8());
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("news update time", query);
-
     processAndShowNews(site);
-}
-
-void MythFlix::cancelRetrieve()
-{
-    for (NewsSite* site = m_NewsSites.first(); site;
-         site = m_NewsSites.next()) {
-        site->stop();
-        processAndShowNews(site);
-    }
 }
 
 void MythFlix::processAndShowNews(NewsSite* site)
@@ -565,31 +508,13 @@ void MythFlix::processAndShowNews(NewsSite* site)
         update(m_InfoRect);
     } 
 }
-void MythFlix::slotSiteSelected(NewsSite* site)
-{
-    if(!site)
-        return;
-        
-    m_UIArticles->Reset();
-
-    for (NewsArticle* article = site->articleList().first(); article;
-         article = site->articleList().next()) {
-        UIListBtnTypeItem* item =
-            new UIListBtnTypeItem(m_UIArticles, article->title());
-        item->setData(article);
-    }
-
-    update(m_SitesRect);
-    update(m_ArticlesRect);
-    update(m_InfoRect);
-}
 
 void MythFlix::slotSiteSelected(UIListBtnTypeItem *item)
 {
     if (!item || !item->getData())
         return;
     
-    slotSiteSelected((NewsSite*) item->getData());
+    processAndShowNews((NewsSite*) item->getData());
 }
 
 void MythFlix::slotArticleSelected(UIListBtnTypeItem*)
@@ -607,6 +532,9 @@ void MythFlix::slotViewArticle()
         NewsArticle *article = (NewsArticle*) articleUIItem->getData();
         if(article)
         {
+
+//            updateAddingView();
+
             QString cmdUrl(article->articleURL());
             cmdUrl.replace('\'', "%27");
 
@@ -631,47 +559,25 @@ void MythFlix::slotViewArticle()
     } 
 }
 
-void MythFlix::slotMovieAdded(const QHttpResponseHeader &resp){
+void MythFlix::slotMovieAdded(const QHttpResponseHeader &resp)
+{
     QString location = resp.value(QString("Location"));
 
     if (location)
     {
+        //How do you clean up http objects
+        //do you listen for signal done
+        //delete http;
 
-      //How do you clean up http objects
-      //do you listen for signal done
-      //delete http;
+        VERBOSE(VB_NETWORK, QString("MythFlix: Redirecting to (%1)").arg(location));
 
-     if (debug)
-        cerr << "MythFlix: Redirecting to (" << location << ")..." << endl;
+        http = new QHttp();
+        connect(http, SIGNAL(responseHeaderReceived (const QHttpResponseHeader&)), this, SLOT(slotMovieAdded(const QHttpResponseHeader&)));
 
-      http = new QHttp();
-      connect(http, SIGNAL(responseHeaderReceived (const QHttpResponseHeader&)), this, SLOT(slotMovieAdded(const QHttpResponseHeader&)));
-
-      QHttpRequestHeader header( "GET", location );
-      header.setValue( "Cookie", "validReEntryCookie=Y; validReEntryConfirmed=Y; NetflixShopperId=" + netflixShopperId + ";" );
-      header.setValue( "Host", "www.netflix.com" );
-      http->setHost( "www.netflix.com" );
-      http->request( header );
-    }
-    else 
-    {
-
-      //How do you clean up http objects
-      //do you listen for signal done
-      //delete http;
-
-/*
-     if (debug)
-        cerr << "MythFlix: Movie Added" << endl;
-
-      LayerSet* container = m_Theme->GetSet("info");
-      UITextType* ttype =
-        (UITextType *)container->GetType("status");
-        
-      if (ttype)
-        ttype->SetText("Added");
-
-*/        
-
+        QHttpRequestHeader header( "GET", location );
+        header.setValue( "Cookie", "validReEntryCookie=Y; validReEntryConfirmed=Y; NetflixShopperId=" + netflixShopperId + ";" );
+        header.setValue( "Host", "www.netflix.com" );
+        http->setHost( "www.netflix.com" );
+        http->request( header );
     }
 }

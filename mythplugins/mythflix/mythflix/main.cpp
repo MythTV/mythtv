@@ -55,7 +55,7 @@ void queue(void){
 
 void NetFlixCallback(void *data, QString &selection)
 {
-    cerr << "NetFlixCallback " << selection << endl;
+    VERBOSE(VB_NONE, QString("MythFlix: NetFlixCallback %1").arg(selection));
 
     (void)data;
     QString sel = selection.lower();
@@ -86,7 +86,7 @@ void runMenu()
     }
     else
     {
-        cerr << "Couldn't find theme " << themedir << endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Couldn't find theme %1").arg(themedir));
     }
 
     delete diag;

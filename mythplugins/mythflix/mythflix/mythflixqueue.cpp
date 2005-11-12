@@ -65,7 +65,7 @@ MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name )
     query.exec("SELECT name, url, updated FROM netflix WHERE is_queue=1 ORDER BY name");
 
     if (!query.isActive()) {
-        cerr << "MythFlixQueue: Error in loading Queue from DB" << endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlixQueue: Error in loading queue from DB"));
     }
     else {
         QString name;
@@ -122,8 +122,7 @@ void MythFlixQueue::loadTheme()
                     m_InfoRect = area;
             }
             else {
-                std::cerr << "Unknown element: " << e.tagName()
-                          << std::endl;
+                VERBOSE(VB_IMPORTANT, QString("MythFlix: Unknown element: %1").arg(e.tagName()));
                 exit(-1);
             }
         }
@@ -131,15 +130,13 @@ void MythFlixQueue::loadTheme()
 
     LayerSet *container = m_Theme->GetSet("articles");
     if (!container) {
-        std::cerr << "MythFlixQueue: Failed to get articles container."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlixQueue: Failed to get articles container."));
         exit(-1);
     }
 
     m_UIArticles = (UIListBtnType*)container->GetType("articleslist");
     if (!m_UIArticles) {
-        std::cerr << "MythFlixQueue: Failed to get articles list area."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlixQueue: Failed to get articles list area."));
         exit(-1);
     }
     
@@ -258,27 +255,21 @@ void MythFlixQueue::updateInfoView()
                 if (!dir.exists())
                     dir.mkdir(fileprefix);
             
-                if (debug)
-                    cerr << "MythFlixQueue: Boxshot File Prefix: " << fileprefix << endl;
+                VERBOSE(VB_FILE, QString("MythFlixQueue: Boxshot File Prefix: %1").arg(fileprefix));
 
                 QString sFilename(fileprefix + "/" + imageLoc);
-            
                 
                 bool exists = QFile::exists(sFilename);
                 if (!exists) 
                 {
-                    if (debug)
-                        cerr << "MythFlixQueue: Copying BoxShot File from NetFlix (" << imageLoc << ")..." << endl;
-    
                     VERBOSE(VB_NETWORK, QString("MythFlixQueue: Copying boxshot file from server (%1)").arg(imageLoc));
                     
                     QString sURL("http://cdn.nflximg.com/us/boxshots/large/" + imageLoc);
                 
                     if (!HttpComms::getHttpFile(sFilename, sURL, 20000))
-                        cerr << "Failed to download image from:" << sURL << endl;
+                        VERBOSE(VB_NETWORK, QString("MythFlix: Failed to download image from: %1").arg(sURL));
                 
-                    if (debug)
-                        cerr << "Done.\n";
+                    VERBOSE(VB_NETWORK, QString("MythFlixQueue: Finished copying boxshot file from server (%1)").arg(imageLoc));
                 }
 
                 UIImageType *itype = (UIImageType *)container->GetType("boxshot");

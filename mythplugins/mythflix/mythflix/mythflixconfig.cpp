@@ -117,9 +117,8 @@ MythFlixConfig::MythFlixConfig(MythMainWindow *parent,
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    if (!query.exec(queryString)) {
-        cerr << "MythFlixConfig: Error in creating sql table" << endl;
-    }
+    if (!query.exec(queryString))
+        VERBOSE(VB_IMPORTANT, QString("MythFlixConfig: Error in creating sql table"));
 
     m_Theme       = 0;
     m_UICategory  = 0;
@@ -148,7 +147,7 @@ void MythFlixConfig::populateSites()
     QFile xmlFile(filename);
 
     if (!xmlFile.exists() || !xmlFile.open(IO_ReadOnly)) {
-        cerr << "MythFlix: Cannot open netflix-rss.xml" << endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Cannot open netflix-rss.xml"));
         return;
     }
 
@@ -160,7 +159,7 @@ void MythFlixConfig::populateSites()
 
     if (!domDoc.setContent(&xmlFile, false, &errorMsg, &errorLine, &errorColumn)) 
     {
-        cerr << "MythFlix: Error in reading content of netflix-rss.xml" << endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Error in reading content of netflix-rss.xml"));
         VERBOSE(VB_IMPORTANT, QString("MythFlix: Error, parsing %1\n"
                                       "at line: %2  column: %3 msg: %4").
                 arg(filename).arg(errorLine).arg(errorColumn).arg(errorMsg));
@@ -240,8 +239,7 @@ void MythFlixConfig::loadTheme()
                     m_BotRect = area;
             }
             else {
-                std::cerr << "Unknown element: " << e.tagName()
-                          << std::endl;
+                VERBOSE(VB_IMPORTANT, QString("MythFlix: Unknown element: %1").arg(e.tagName()));
                 exit(-1);
             }
         }
@@ -250,7 +248,7 @@ void MythFlixConfig::loadTheme()
 
     LayerSet *container  = m_Theme->GetSet("config-sites");
     if (!container) {
-        std::cerr << "MythFlix: Failed to get sites container." << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get sites container."));
         exit(-1);
     }
 
@@ -262,14 +260,13 @@ void MythFlixConfig::loadTheme()
 
     m_UICategory = (UIListBtnType*)container->GetType("category");
     if (!m_UICategory) {
-        std::cerr << "MythFlix: Failed to get category list area."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get category list area."));
         exit(-1);
     }
 
     m_UISite = (UIListBtnType*)container->GetType("sites");
     if (!m_UISite) {
-        std::cerr << "MythFlix: Failed to get site list area." << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get site list area."));
         exit(-1);
     }
 
@@ -283,8 +280,7 @@ void MythFlixConfig::loadTheme()
 
     container = m_Theme->GetSet("config-freq");
     if (!container) {
-        std::cerr << "MythFlix: Failed to get frequency container."
-                  << std::endl;
+        VERBOSE(VB_IMPORTANT, QString("MythFlix: Failed to get frequency container."));
         exit(-1);
     }
 

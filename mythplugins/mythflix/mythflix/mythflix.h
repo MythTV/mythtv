@@ -73,13 +73,9 @@ private:
 
     NewsSite::List m_NewsSites;
 
-    QTimer        *m_RetrieveTimer;
     QHttp         *http;
 
     QString        netflixShopperId;
-
-    int            m_TimerTimeout;
-    unsigned int   m_UpdateFreq;
 
 private slots:
     void slotViewArticle();
@@ -87,8 +83,6 @@ private slots:
     void slotNewsRetrieved(NewsSite* site);
 
     void slotSiteSelected(UIListBtnTypeItem *item);
-    void slotSiteSelected(NewsSite*);
-    
     void slotArticleSelected(UIListBtnTypeItem *item);
 
     void slotMovieAdded(const QHttpResponseHeader &resp);
