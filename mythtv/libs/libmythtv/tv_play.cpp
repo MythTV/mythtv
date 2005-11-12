@@ -804,9 +804,11 @@ void TV::HandleStateChange(void)
         SET_NEXT();
 
         StopStuff(true, true, true);
+        pbinfoLock.lock();
         if (playbackinfo)
             delete playbackinfo;
         playbackinfo = NULL;
+        pbinfoLock.unlock();
 
         gContext->RestoreScreensaver();
     }
@@ -820,7 +822,6 @@ void TV::HandleStateChange(void)
         prbuffer = new RingBuffer(inputFilename, false);
         if (prbuffer->IsOpen())
         {
-
             gContext->DisableScreensaver();
     
             if (desiredNextState == kState_WatchingRecording)
@@ -841,7 +842,6 @@ void TV::HandleStateChange(void)
             }
 
             StartPlayer(desiredNextState == kState_WatchingRecording);
-            
             
             SET_NEXT();
             if (!playbackinfo->isVideo)
@@ -1174,10 +1174,12 @@ QString TV::GetFiltersForChannel()
     QString chanFilters;
     
     QString chan_name;
-    
+
+    pbinfoLock.lock();    
     if (playbackinfo) // Recordings have this info already.
         chanFilters = playbackinfo->chanOutputFilters;
-    
+    pbinfoLock.unlock();    
+
     if ((chanFilters.length() > 1) && (chanFilters[0] != '+'))
     {
         filters = chanFilters;
@@ -1240,10 +1242,12 @@ void TV::TeardownPlayer(void)
 
     nvp = activenvp = NULL;
 
+    pbinfoLock.lock();
     if (playbackinfo)
         delete playbackinfo;
     playbackinfo = NULL;
- 
+    pbinfoLock.unlock(); 
+
     DeleteRecorder();
 
     if (prbuffer)
@@ -2551,7 +2555,9 @@ void TV::DoInfo(void)
     if ((oset) && (oset->Displaying()) && !prbuffer->isDVD())
     {
         InfoMap infoMap;
+        pbinfoLock.lock();
         playbackinfo->ToMap(infoMap);
+        pbinfoLock.unlock();
         GetOSD()->HideSet("status");
         GetOSD()->ClearAllText("program_info");
         GetOSD()->SetText("program_info", infoMap, osd_prog_info_timeout);
@@ -2763,6 +2769,8 @@ void TV::SetFFRew(int index)
 
 void TV::DoQueueTranscode(void)
 {
+    QMutexLocker lock(&pbinfoLock);
+
     if (internalState == kState_WatchingPreRecorded)
     {
         bool stop = false;
@@ -3350,8 +3358,10 @@ void TV::UpdateOSD(void)
 {
     InfoMap infoMap;
 
+    pbinfoLock.lock();
     if (playbackinfo)
         playbackinfo->ToMap(infoMap);
+    pbinfoLock.unlock();
 
     if (GetOSD())
     {
@@ -3414,8 +3424,10 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
         //lastSignalUIInfo["name"]  = "signalmonitor";
         //lastSignalUIInfo["title"] = "Signal Monitor";
         lastSignalUIInfo.clear();
+        pbinfoLock.lock();
         if (playbackinfo)
             playbackinfo->ToMap(lastSignalUIInfo);
+        pbinfoLock.unlock();
         infoMap = lastSignalUIInfo;
         lastSignalUIInfoTime.start();
     }
@@ -3577,9 +3589,12 @@ void TV::ShowLCDChannelInfo(void)
         return;
 
     QString title, subtitle, callsign;
+
+    pbinfoLock.lock();
     title = playbackinfo->title;
     subtitle = playbackinfo->subtitle;
     callsign = playbackinfo->chansign;
+    pbinfoLock.unlock();
 
     if ((callsign != lcdCallsign) || (title != lcdTitle) || 
         (subtitle != lcdSubtitle))
@@ -3706,8 +3721,10 @@ void TV::doLoadMenu(void)
     }
 
     // Collect channel info
+    pbinfoLock.lock();
     uint    chanid  = playbackinfo->chanid.toUInt();
     QString channum = playbackinfo->chanstr;
+    pbinfoLock.unlock();
 
     // See if we can provide a channel preview in EPG
     bool allowsecondary = true;
@@ -4172,7 +4189,9 @@ void TV::customEvent(QCustomEvent *e)
             bool tc = recorder && (recorder->GetRecorderNumber() == cardnum);
             (void)tc;
         }
-        else if (playbackinfo && message.left(14) == "COMMFLAG_START")
+
+        pbinfoLock.lock();
+        if (playbackinfo && message.left(14) == "COMMFLAG_START")
         {
             message = message.simplifyWhiteSpace();
             QStringList tokens = QStringList::split(" ", message);
@@ -4184,7 +4203,9 @@ void TV::customEvent(QCustomEvent *e)
             {
                 QString msg = "COMMFLAG_REQUEST ";
                 msg += tokens[1] + " " + tokens[2];
+                pbinfoLock.unlock();
                 RemoteSendMessage(msg);
+                pbinfoLock.lock();
             }
         }
         else if (playbackinfo && message.left(15) == "COMMFLAG_UPDATE")
@@ -4209,6 +4230,7 @@ void TV::customEvent(QCustomEvent *e)
                 nvp->SetCommBreakMap(newMap);
             }
         }
+        pbinfoLock.unlock();
     }
 }
 
@@ -4226,15 +4248,19 @@ void TV::BrowseStart(void)
 
     ClearOSD();
 
-    browsemode = true;
+    pbinfoLock.lock();
+    if (playbackinfo)
+    {
+        browsemode = true;
+        browsechannum = playbackinfo->chanstr;
+        browsechanid = playbackinfo->chanid;
+        browsestarttime = playbackinfo->startts.toString();
 
-    browsechannum = playbackinfo->chanstr;
-    browsechanid = playbackinfo->chanid;
-    browsestarttime = playbackinfo->startts.toString();
-    
-    BrowseDispInfo(BROWSE_SAME);
+        BrowseDispInfo(BROWSE_SAME);
 
-    browseTimer->start(kBrowseTimeout, true);
+        browseTimer->start(kBrowseTimeout, true);
+    }
+    pbinfoLock.unlock();
 }
 
 /** \fn TV::BrowseEnd(bool)
@@ -4317,7 +4343,7 @@ void TV::ToggleRecord(void)
             browsestarttime, Qt::ISODate);
 
         ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
-            browsechanid, startts);
+                                                       browsechanid, startts);
         program_info->ToggleRecord();
         program_info->ToMap(infoMap);
 
@@ -4333,105 +4359,31 @@ void TV::ToggleRecord(void)
         return;
     }
 
-    InfoMap infoMap;
-    if (playbackinfo)
-        playbackinfo->ToMap(infoMap); 
+    QMutexLocker lock(&pbinfoLock);
 
-    if (!infoMap["startts"].isEmpty())
+    if (!playbackinfo)
     {
-#if 0 
-        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
-            infoMap["chanid"],
-            QDateTime::fromString(infoMap["startts"], Qt::ISODate));
-
-        QString cmdmsg("");
-        if (program_info)
-        {
-            QString title = infoMap["title"];
-
-            if (program_info->GetProgramRecordingStatus() == kNotRecording)
-            {
-                program_info->ApplyRecordStateChange(kSingleRecord);
-                cmdmsg = tr("Record");
-            }
-            else
-            {
-                MSqlQuery query(MSqlQuery::InitCon());
-                query.prepare("SELECT reactivate "
-                              "FROM oldrecorded "
-                              "WHERE station   = :STATION AND "
-                              "      starttime = :STARTTIME AND "
-                              "      title     = :TITLE");
-                query.bindValue(":STATION",   infoMap["callsign"]);
-                query.bindValue(":STARTTIME", infoMap["startts"]);
-                query.bindValue(":TITLE",     title.utf8());
-
-                if (!query.exec() || !query.isActive())
-                    MythContext::DBError("TV::ToggleRecord", query);
-                else if (query.next() && !query.value(0).toBool())
-                {
-                    program_info->ReactivateRecording();
-                    cmdmsg = tr("Reactivate");
-                }
-            }
-
-            QString msg = (cmdmsg.isEmpty()) ? tr("Use guide cancel") :
-                QString("%1 \"%2\"").arg(cmdmsg).arg(title);
-
-            if (activenvp == nvp && GetOSD())
-                GetOSD()->SetSettingsText(msg, 3);
-
-            delete program_info;
-            return;
-        }
-#endif
-    }
-
-    VERBOSE(VB_GENERAL, LOC + "Creating a manual recording");
-
-    QString timeformat = gContext->GetSetting("TimeFormat", "h:mm AP");
-    QString channelFormat =
-        gContext->GetSetting("ChannelFormat", "<num> <sign>");
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, channum, callsign, name "
-                  "FROM channel "
-                  "WHERE chanid=:CHANID");
-    query.bindValue(":CHANID", infoMap["chanid"]);
-    if (!query.exec() || !query.isActive())
-    {
-        MythContext::DBError("ToggleRecord channel info", query);
-        return;
-    }
-    else if (!query.next())
-    {
-        VERBOSE(VB_IMPORTANT, LOC + "ToggleRecord(): "
-                "Could not find chanid in DB");
+printf("%p\n", playbackinfo);
+        VERBOSE(VB_GENERAL, LOC + "Unknown recording during live tv.");
         return;
     }
 
-    ProgramInfo p;
-    p.chanid      = infoMap["chanid"];
-    p.chanstr     = query.value(1).toString();
-    p.chansign    = QString::fromUtf8(query.value(2).toString());
-    p.channame    = QString::fromUtf8(query.value(3).toString());
+    QString cmdmsg("");
+    if (playbackinfo->GetAutoExpireFromRecorded() == kLiveTVAutoExpire)
+    {
+        int autoexpiredef = gContext->GetNumSetting("AutoExpireDefault", 0);
+        playbackinfo->SetAutoExpire(autoexpiredef);
+        playbackinfo->ApplyRecordRecGroupChange("Default");
+        cmdmsg = tr("Record");
+    }
+    else
+    {
+        playbackinfo->SetAutoExpire(kLiveTVAutoExpire);
+        playbackinfo->ApplyRecordRecGroupChange("LiveTV");
+        cmdmsg = tr("Cancel Record");
+    }
 
-    p.startts     = QDateTime::currentDateTime();
-    QTime tmptime = p.startts.time();
-    tmptime       = tmptime.addSecs(-(tmptime.second()));
-    p.startts.setTime(tmptime);
-    p.endts       = p.startts.addSecs(3600);
-
-    p.title       = p.ChannelText(channelFormat) + " - " + 
-        p.startts.toString(timeformat) + " (" + tr("Manual Record") + ")";
-
-    ScheduledRecording record;
-    record.loadByProgram(&p);
-    record.setSearchType(kManualSearch);
-    record.setRecordingType(kSingleRecord);
-    record.save();
-
-    QString msg = QString("%1 \"%2\"").arg(tr("Record")).arg(p.title);
+    QString msg = cmdmsg + "\"" + playbackinfo->title + "\"";
     if (activenvp == nvp && GetOSD())
         GetOSD()->SetSettingsText(msg, 3);
 }
@@ -4597,7 +4549,9 @@ void TV::TreeMenuEntered(OSDListTreeType *tree, OSDGenericTree *item)
 
 void TV::DoEditMode(void)
 {
+    pbinfoLock.lock();
     bool isEditing = playbackinfo->IsEditing();
+    pbinfoLock.unlock();
 
     if (isEditing && GetOSD())
     {
@@ -4794,11 +4748,14 @@ void TV::BuildOSDTreeMenu(void)
         if (lastProgram != NULL)
             item = new OSDGenericTree(treeMenu, tr("Previous Recording"), "JUMPPREV");
 
+        pbinfoLock.lock();
+
         if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
                                    playbackinfo->chanid, playbackinfo->startts))
             item = new OSDGenericTree(treeMenu, tr("Stop Transcoding"), "QUEUETRANSCODE");
         else
             item = new OSDGenericTree(treeMenu, tr("Begin Transcoding"), "QUEUETRANSCODE");
+
 
         item = new OSDGenericTree(treeMenu, tr("Commercial Auto-Skip"));
         subitem = new OSDGenericTree(item, tr("Auto-Skip OFF"),
@@ -4820,6 +4777,8 @@ void TV::BuildOSDTreeMenu(void)
         else
             item = new OSDGenericTree(treeMenu, tr("Turn Auto-Expire ON"),
                                       "TOGGLEAUTOEXPIRE");
+
+        pbinfoLock.unlock();
     }
     
     const QStringList atracks = activenvp->listAudioTracks();
@@ -5053,6 +5012,8 @@ void TV::ToggleAutoExpire(void)
 {
     QString desc = "";
 
+    pbinfoLock.lock();
+
     if (playbackinfo->GetAutoExpireFromRecorded())
     {
         playbackinfo->SetAutoExpire(0);
@@ -5063,6 +5024,8 @@ void TV::ToggleAutoExpire(void)
         playbackinfo->SetAutoExpire(1);
         desc = tr("Auto-Expire ON");
     }
+
+    pbinfoLock.unlock();
 
     if (GetOSD() && activenvp == nvp && desc != "" )
     {
@@ -5351,11 +5314,15 @@ void TV::UnpauseLiveTV(void)
 
 void TV::SetCurrentlyPlaying(ProgramInfo *pginfo)
 {
+    pbinfoLock.lock();
+
     if (playbackinfo)
         delete playbackinfo;
     playbackinfo = NULL;
 
     if (pginfo)
         playbackinfo = new ProgramInfo(*pginfo);
+
+    pbinfoLock.unlock();
 }
 

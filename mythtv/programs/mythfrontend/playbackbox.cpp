@@ -164,7 +164,8 @@ PlaybackBox::PlaybackBox(BoxType ltype, MythMainWindow *parent,
     VERBOSE( VB_GENERAL, recGroup);
     if (groupnameAsAllProg)
     {
-        if ((recGroup == "Default") || (recGroup == "All Programs"))
+        if ((recGroup == "Default") || (recGroup == "All Programs") || 
+            (recGroup == "LiveTV"))
             groupDisplayName = tr(recGroup);
         else
             groupDisplayName = recGroup;
@@ -541,7 +542,7 @@ void PlaybackBox::updateCurGroup(QPainter *p)
     QRect pr = curGroupRect;
     QPixmap pix(pr.size());
     pix.fill(this, pr.topLeft());
-    if ( recGroup != "Default")
+    if (recGroup != "Default")
         updateGroupInfo(p, pr, pix, "cur_group");
     else
     {
@@ -3796,6 +3797,8 @@ void PlaybackBox::showRecGroupChooser(void)
 
             if (dispGroup == "Default")
                 dispGroup = tr("Default");
+            else if (dispGroup == "LiveTV")
+                dispGroup = tr("LiveTV");
 
             groups += QString::fromUtf8(QString("%1 [%2 %3]").arg(dispGroup)
                                                 .arg(items).arg(itemStr));
@@ -3857,6 +3860,8 @@ void PlaybackBox::showRecGroupChooser(void)
         dispGroup = tr("All Programs");
     else if (recGroup == "Default")
         dispGroup = tr("Default");
+    else if (recGroup == "LiveTV")
+        dispGroup = tr("LiveTV");
     else
         dispGroup = recGroup;
 
@@ -3914,8 +3919,10 @@ void PlaybackBox::setGroupFilter(void)
 
     if (recGroup == tr("Default"))
         recGroup = "Default";
-    if (recGroup == tr("All Programs"))
+    else if (recGroup == tr("All Programs"))
         recGroup = "All Programs";
+    else if (recGroup == tr("LiveTV"))
+        recGroup = "LiveTV";
 
     recGroupPassword = getRecGroupPassword(recGroup);
 
@@ -4027,10 +4034,12 @@ void PlaybackBox::showRecGroupChanger(void)
             else
                 itemStr = tr("items");
 
-            if (query.value(0).toString() == "Default")
+            dispGroup = query.value(0).toString();
+
+            if (dispGroup == "Default")
                 dispGroup = tr("Default");
-            else
-                dispGroup = query.value(0).toString();
+            else if (dispGroup == "LiveTV")
+                dispGroup = tr("LiveTV");
 
             groups += QString::fromUtf8(QString("%1 [%2 %3]")
                                         .arg(dispGroup)
@@ -4057,18 +4066,16 @@ void PlaybackBox::showRecGroupChanger(void)
     }
     else
     {
+        QString dispGroup = recGroup;
+
         if (recGroup == "Default")
-        {
-            recGroupLineEdit->setText(tr("Default"));
-            recGroupListBox->setCurrentItem(recGroupListBox->index(
-                                     recGroupListBox->findItem(tr("Default"))));
-        }
-        else
-        {
-            recGroupLineEdit->setText(recGroup);
-            recGroupListBox->setCurrentItem(recGroupListBox->index(
-                                     recGroupListBox->findItem(recGroup)));
-        }
+            dispGroup = tr("Default");
+        else if (recGroup == "LiveTV")
+            dispGroup = tr("LiveTV");
+
+        recGroupLineEdit->setText(dispGroup);
+        recGroupListBox->setCurrentItem(recGroupListBox->index(
+                                        recGroupListBox->findItem(dispGroup)));
     }
 
     recGroupOkButton = new MythPushButton(recGroupPopup);
@@ -4139,6 +4146,8 @@ void PlaybackBox::setRecGroup(void)
     {
         if (newRecGroup == tr("Default"))
             newRecGroup = "Default";
+        else if (newRecGroup == tr("LiveTV"))
+            newRecGroup = "LiveTV";
 
         if (delitem)
         {
@@ -4204,7 +4213,8 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
     label->setPaletteForegroundColor(popupForeground);
     grid->addWidget(label, 0, 0, Qt::AlignLeft);
 
-    if ((recGroup == "Default") || (recGroup == "All Programs"))
+    if ((recGroup == "Default") || (recGroup == "All Programs") || 
+        (recGroup == "LiveTV"))
         label = new QLabel(tr(recGroup), recGroupPopup);
     else
         label = new QLabel(recGroup, recGroupPopup);

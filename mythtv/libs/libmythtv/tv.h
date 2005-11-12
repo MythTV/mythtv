@@ -48,6 +48,8 @@ typedef enum
     kState_ChangingState,
 } TVState;
 
+const int kLiveTVAutoExpire = 10000;
+
 #include "tv_play.h"
 #include "tv_rec.h"
 

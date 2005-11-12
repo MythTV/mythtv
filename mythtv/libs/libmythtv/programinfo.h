@@ -177,7 +177,7 @@ class ProgramInfo
     bool IsEditing(void) const;
     bool IsCommFlagged(void) const;
     bool IsInUse(QString &byWho) const;
-    bool GetAutoExpireFromRecorded(void) const;
+    int GetAutoExpireFromRecorded(void) const;
     bool GetPreserveEpisodeFromRecorded(void) const;
     bool UsesMaxEpisodes(void) const;
     int getProgramFlags(void) const;

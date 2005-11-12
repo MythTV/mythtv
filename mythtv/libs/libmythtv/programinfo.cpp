@@ -1746,7 +1746,7 @@ void ProgramInfo::SetAutoExpire(int autoExpire) const
 /** \fn ProgramInfo::GetAutoExpireFromRecorded(void) const
  *  \brief Returns "autoexpire" field from "recorded" table.
  */
-bool ProgramInfo::GetAutoExpireFromRecorded(void) const
+int ProgramInfo::GetAutoExpireFromRecorded(void) const
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -1759,7 +1759,7 @@ bool ProgramInfo::GetAutoExpireFromRecorded(void) const
     if (query.exec() && query.isActive() && query.size() > 0)
     {
         query.next();
-        return query.value(0).toBool();
+        return query.value(0).toInt();
     }
 
     return false;
