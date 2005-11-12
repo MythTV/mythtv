@@ -511,6 +511,7 @@ int main(int argc, char **argv)
 
     if (printsched || testsched)
     {
+        gContext->SetBackend(false);
         sched = new Scheduler(false, &tvList);
         if (!testsched && gContext->ConnectToMasterServer())
         {
