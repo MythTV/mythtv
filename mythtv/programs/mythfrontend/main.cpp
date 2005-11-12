@@ -240,6 +240,8 @@ void startManualSchedule(void)
 
 void startTV(void)
 {
+    return;
+
     TV *tv = new TV();
 
     MythTimer timer;
