@@ -4363,7 +4363,6 @@ void TV::ToggleRecord(void)
 
     if (!playbackinfo)
     {
-printf("%p\n", playbackinfo);
         VERBOSE(VB_GENERAL, LOC + "Unknown recording during live tv.");
         return;
     }
