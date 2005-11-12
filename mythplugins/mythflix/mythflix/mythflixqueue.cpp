@@ -79,9 +79,12 @@ MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name )
         }
     }
 
-    slotRetrieveNews();
+    NewsSite* site = (NewsSite*) m_NewsSites.first();
+    connect(site, SIGNAL(finished(NewsSite*)),
+            this, SLOT(slotNewsRetrieved(NewsSite*)));
+    
 
-    slotSiteSelected((NewsSite*) m_NewsSites.first());
+    slotRetrieveNews();
 }
 
 MythFlixQueue::~MythFlixQueue()
@@ -364,15 +367,6 @@ void MythFlixQueue::slotRetrieveNews()
     if (m_NewsSites.count() == 0)
         return;
 
-    cancelRetrieve();
-
-    for (NewsSite* site = m_NewsSites.first(); site; site = m_NewsSites.next())
-    {
-        site->stop();
-        connect(site, SIGNAL(finished(NewsSite*)),
-                this, SLOT(slotNewsRetrieved(NewsSite*)));
-    }
-
     for (NewsSite* site = m_NewsSites.first(); site; site = m_NewsSites.next())
     {
         site->retrieve();
@@ -382,15 +376,6 @@ void MythFlixQueue::slotRetrieveNews()
 void MythFlixQueue::slotNewsRetrieved(NewsSite* site)
 {
     processAndShowNews(site);
-}
-
-void MythFlixQueue::cancelRetrieve()
-{
-    for (NewsSite* site = m_NewsSites.first(); site;
-         site = m_NewsSites.next()) {
-        site->stop();
-        processAndShowNews(site);
-    }
 }
 
 void MythFlixQueue::processAndShowNews(NewsSite* site)
@@ -414,24 +399,6 @@ void MythFlixQueue::processAndShowNews(NewsSite* site)
         update(m_ArticlesRect);
         update(m_InfoRect);
     } 
-}
-
-void MythFlixQueue::slotSiteSelected(NewsSite* site)
-{
-    if(!site)
-        return;
-        
-    m_UIArticles->Reset();
-
-    for (NewsArticle* article = site->articleList().first(); article;
-         article = site->articleList().next()) {
-        UIListBtnTypeItem* item =
-            new UIListBtnTypeItem(m_UIArticles, article->title());
-        item->setData(article);
-    }
-
-    update(m_ArticlesRect);
-    update(m_InfoRect);
 }
 
 void MythFlixQueue::slotArticleSelected(UIListBtnTypeItem*)
