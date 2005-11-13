@@ -266,4 +266,11 @@
      <dependssetting>EnableXbox</dependssetting>
    </button>
 
+   <button>
+      <type>SETTINGS_BURN</type>
+      <text>Burn DVD Settings</text>
+      <action>CONFIGPLUGIN mythburn</action>
+      <depends>mythburn</depends>
+   </button>
+
 </mythmenu>

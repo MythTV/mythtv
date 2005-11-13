@@ -66,6 +66,13 @@
       <action>JUMP Rip DVD</action>
       <depends>mythdvd</depends>
    </button>
+   
+   <button>
+      <type>BURN</type>
+      <text>Burn DVD</text>
+      <action>PLUGIN mythburn</action>
+      <depends>mythburn</depends>
+   </button>
 
    <button>
       <type>MUSIC_RIP</type>

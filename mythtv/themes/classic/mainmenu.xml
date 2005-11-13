@@ -192,6 +192,13 @@
    </button>
 
    <button>
+      <type>BURN</type>
+      <text>Burn DVD</text>
+      <action>PLUGIN mythburn</action>
+      <depends>mythburn</depends>
+   </button>
+
+   <button>
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
      <text lang="FI">Elokuvien Ajat</text>
