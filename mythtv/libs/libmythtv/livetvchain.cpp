@@ -48,9 +48,13 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
 {
     QMutexLocker lock(&m_lock);
 
+    QTime tmptime = pginfo->recstartts.time();
+
     LiveTVChainEntry newent;
     newent.chanid = pginfo->chanid;
-    newent.starttime = QDateTime::fromString(pginfo->recstartts.toString(Qt::ISODate), Qt::ISODate);
+    newent.starttime = pginfo->recstartts;
+    newent.starttime.setTime(QTime(tmptime.hour(), tmptime.minute(), 
+                                   tmptime.second()));
     newent.discontinuity = discont;
     newent.hostprefix = m_hostprefix;
     newent.cardtype = m_cardtype;
