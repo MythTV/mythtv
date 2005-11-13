@@ -39,35 +39,66 @@ const uint RingBuffer::kBufferSize = 10 * 256000;
 #define NUV_MIN_SIZE  204 /* header size? */
 #define MPEG_MIN_SIZE 376 /* 2 TS packets */
 
+#define LOC QString("RingBuf: ")
+#define LOC_ERR QString("RingBuf, Error: ")
+
 /* should be minimum of the above test sizes */
 const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
 
-bool RingBuffer::IsOpen(void) 
-{ 
-#ifdef HAVE_DVDNAV
-    return tfw || (fd2 > -1) || remotefile || (dvdPriv && dvdPriv->IsOpen());
-#else // if !HAVE_DVDNAV
-    return tfw || (fd2 > -1) || remotefile; 
-#endif // !HAVE_DVDNAV
-}
+/** \class RingBuffer
+ *  \brief Implements a file/stream reader/writer.
+ *
+ *  This class, despite its name, no-longer provides a ring buffer.
+ *  It can buffer reads and provide support for streaming files.
+ *  It also provides a wrapper for the ThreadedFileWriter which
+ *  makes sure that the file reader does not read past where the 
+ *  wrapped TFW has written new data.
+ *
+ */
 
-/**********************************************************************/
-
-RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
+/** \fn RingBuffer::RingBuffer(const QString&, bool, bool, uint)
+ *  \brief Creates a RingBuffer instance.
+ *
+ *   You can explicitly disable the readahead thread by setting
+ *   readahead to false, or by just not calling Start(void).
+ *
+ *  \param lfilename    Name of file to read or write.
+ *  \param write        If true an encapsulated writer is created
+ *  \param readahead    If false a call to Start(void) will not
+ *                      a pre-buffering thread, otherwise Start(void)
+ *                      will start a pre-buffering thread.
+ *  \param read_retries How often to retry reading the file
+ *                      before giving up.
+ */
+RingBuffer::RingBuffer(const QString &lfilename,
+                       bool write, bool readahead,
+                       uint read_retries)
+    : filename(QDeepCopy<QString>(lfilename)),
+      tfw(NULL),                fd2(-1),
+      writemode(false),
+      readpos(0),               writepos(0),
+      stopreads(false),         recorder_num(0),
+      remoteencoder(NULL),      remotefile(NULL),
+      startreadahead(readahead),readAheadBuffer(NULL),
+      readaheadrunning(false),  readaheadpaused(false),
+      pausereadthread(false),
+      rbrpos(0),                rbwpos(0),
+      internalreadpos(0),       ateof(false),
+      readsallowed(false),      wantseek(false),
+      fill_threshold(-1),       fill_min(-1),
+      readblocksize(128000),    wanttoread(0),
+      numfailures(0),           commserror(false),
+      dvdPriv(NULL),            oldfile(false),
+      livetvchain(NULL),        ignoreliveeof(false)
 {
-    Init();
-    
-    startreadahead = usereadahead;
-    filename = (QString)lfilename;
+    pthread_rwlock_init(&rwlock, NULL);
 
     if (write)
     {
-        tfw = new ThreadedFileWriter(filename,
-                                     O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE,
-                                     0644);
-        if (tfw->Open())
-            writemode = true;
-        else
+        tfw = new ThreadedFileWriter(
+            filename, O_WRONLY|O_TRUNC|O_CREAT|O_LARGEFILE, 0644);
+
+        if (!tfw->Open())
         {
             delete tfw;
             tfw = NULL;
@@ -76,9 +107,15 @@ RingBuffer::RingBuffer(const QString &lfilename, bool write, bool usereadahead)
         return;
     }
 
-    OpenFile(filename);
+    OpenFile(filename, read_retries);
 }
 
+/** \fn RingBuffer::OpenFile(const QString&, uint)
+ *  \brief Opens a file for reading.
+ *
+ *  \param lfilename  Name of file to read
+ *  \param retryCount How often to retry reading the file before giving up
+ */
 void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 {
     uint openAttempts = retryCount + 1;
@@ -205,42 +242,21 @@ void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
     }
 }
 
-void RingBuffer::Init(void)
-{
-    tfw = NULL;
-
-    writemode = false;
-    livetvchain = NULL;
-    oldfile = false; 
-    startreadahead = true;
-    dvdPriv = NULL;
-    
-    readaheadrunning = false;
-    readaheadpaused = false;
-    wantseek = false;
-    fill_threshold = -1;
-    fill_min = -1;
-
-    readblocksize = 128000;
-   
-    recorder_num = 0;
-    remoteencoder = NULL;
-    remotefile = NULL;
-    
-    fd2 = -1;
-
-    writepos = readpos = 0;
-
-    stopreads = false;
-    wanttoread = 0;
-
-    numfailures = 0;
-    commserror = false;
-    ignoreliveeof = false;
-
-    pthread_rwlock_init(&rwlock, NULL);
+/** \fn RingBuffer::IsOpen(void) const
+ *  \brief Returns true if the file is open for either reading or writing.
+ */
+bool RingBuffer::IsOpen(void) const
+{ 
+#ifdef HAVE_DVDNAV
+    return tfw || (fd2 > -1) || remotefile || (dvdPriv && dvdPriv->IsOpen());
+#else // if !HAVE_DVDNAV
+    return tfw || (fd2 > -1) || remotefile; 
+#endif // !HAVE_DVDNAV
 }
 
+/** \fn RingBuffer::~RingBuffer(void)
+ *  \brief Shuts down any threads and closes any files.
+ */
 RingBuffer::~RingBuffer(void)
 {
     KillReadAheadThread();
@@ -271,15 +287,22 @@ RingBuffer::~RingBuffer(void)
     
 }
 
+/** \fn RingBuffer::Start(void)
+ *  \brief Starts the read-ahead thread.
+ *
+ *   If this RingBuffer is not in write-mode, the RingBuffer constructor 
+ *   was called with a usereadahead of true, and the read-ahead thread
+ *   is not already running.
+ */
 void RingBuffer::Start(void)
 {
-    if (writemode)
-    {
-    }
-    else if (!readaheadrunning && startreadahead)
+    if (!writemode && !readaheadrunning && startreadahead)
         StartupReadAheadThread();
 }
 
+/** \fn RingBuffer::Reset(bool)
+ *  \brief Resets the read-ahead thread and our position in the file
+ */
 void RingBuffer::Reset(bool full)
 {
     wantseek = true;
@@ -297,7 +320,18 @@ void RingBuffer::Reset(bool full)
     pthread_rwlock_unlock(&rwlock);
 }
 
-int RingBuffer::safe_read(int fd, void *data, unsigned sz)
+/** \fn RingBuffer::safe_read(int, void*, uint)
+ *  \brief Reads data from the file-descriptor.
+ *
+ *   This will re-read the file forever until the
+ *   end-of-file is reached or the buffer is full.
+ *
+ *  \param fd   File descriptor to read from
+ *  \param data Pointer to where data will be written
+ *  \param sz   Number of bytes to read
+ *  \return Returns number of bytes read
+ */
+int RingBuffer::safe_read(int fd, void *data, uint sz)
 {
     int ret;
     unsigned tot = 0;
@@ -313,8 +347,7 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
                 continue;
 
             VERBOSE(VB_IMPORTANT,
-                    QString("ERROR: file I/O problem in 'safe_read()' %1")
-                    .arg(strerror(errno)));
+                    LOC_ERR + "File I/O problem in 'safe_read()'" + ENO);
 
             errcnt++;
             numfailures++;
@@ -332,7 +365,10 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
                 break;
 
             zerocnt++;
-            if (zerocnt >= ((oldfile) ? 2 : (livetvchain) ? 6 : 50)) // 3 second timeout with usleep(60000), or .12 if it's an old, unmodified file.
+
+            // 3 second timeout with usleep(60000), 
+            // or 0.12 seconds if it's an old, unmodified file.
+            if (zerocnt >= ((oldfile) ? 2 : (livetvchain) ? 6 : 50))
             {
                 break;
             }
@@ -345,14 +381,24 @@ int RingBuffer::safe_read(int fd, void *data, unsigned sz)
     return tot;
 }
 
-int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
+/** \fn RingBuffer::safe_read(RemoteFile*, void*, uint)
+ *  \brief Reads data from the RemoteFile.
+ *
+ *  \param rf   RemoteFile to read from
+ *  \param data Pointer to where data will be written
+ *  \param sz   Number of bytes to read
+ *  \return Returns number of bytes read
+ */
+int RingBuffer::safe_read(RemoteFile *rf, void *data, uint sz)
 {
     int ret = 0;
 
     ret = rf->Read(data, sz);
     if (ret < 0)
     {
-        VERBOSE(VB_IMPORTANT, "RemoteFile::Read() failed in RingBuffer::safe_read().");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "RingBuffer::safe_read(RemoteFile* ...): read failed");
+
         rf->Seek(internalreadpos, SEEK_SET);
         ret = 0;
         numfailures++;
@@ -361,7 +407,12 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, unsigned sz)
     return ret;
 }
 
-void RingBuffer::CalcReadAheadThresh(int estbitrate)
+/** \fn RingBuffer::CalcReadAheadThresh(uint)
+ *  \brief Calculates fill_min, fill_threshold, and readblocksize from
+ *         the estimated bitrate of the stream.
+ *  \param estbitrate Streams average number of kilobits per second.
+ */
+void RingBuffer::CalcReadAheadThresh(uint estbitrate)
 {
     wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
@@ -401,41 +452,36 @@ void RingBuffer::CalcReadAheadThresh(int estbitrate)
     pthread_rwlock_unlock(&rwlock);
 }
 
-int RingBuffer::ReadBufFree(void)
+/** \fn RingBuffer::ReadBufFree(void) const
+ *  \brief Returns number of bytes available for reading into buffer.
+ */
+int RingBuffer::ReadBufFree(void) const
 {
-    int ret = 0;
-
-    readAheadLock.lock();
-
-    if (rbwpos >= rbrpos)
-        ret = rbrpos + kBufferSize - rbwpos - 1;
-    else
-        ret = rbrpos - rbwpos - 1;
-
-    readAheadLock.unlock();
-    return ret;
+    QMutexLocker locker(&readAheadLock);
+    return ((rbwpos >= rbrpos) ? rbrpos + kBufferSize : rbrpos) - rbwpos - 1;
 }
 
-int RingBuffer::DataInReadAhead(void)
+/** \fn RingBuffer::ReadBufAvail(void) const
+ *  \brief Returns number of bytes available for reading from buffer.
+ */
+int RingBuffer::ReadBufAvail(void) const
 {
-    return ReadBufAvail();
+    QMutexLocker locker(&readAheadLock);
+    return (rbwpos >= rbrpos) ?
+        rbwpos - rbrpos : kBufferSize - rbrpos + rbwpos;
 }
 
-int RingBuffer::ReadBufAvail(void)
-{
-    int ret = 0;
-
-    readAheadLock.lock();
-
-    if (rbwpos >= rbrpos)
-        ret = rbwpos - rbrpos;
-    else
-        ret = kBufferSize - rbrpos + rbwpos;
-    readAheadLock.unlock();
-    return ret;
-}
-
-// must call with rwlock in write lock
+/** \fn RingBuffer::ResetReadAhead(long long)
+ *  \brief Restart the read-ahead threat at the 'newinternal' position.
+ *
+ *   This is called after a Seek(long long, int) so that the read-ahead
+ *   buffer doesn't contain any stale data, and so that it will read 
+ *   any new data from the new position in the file.
+ *
+ *   WARNING: Must be called with rwlock in write lock state.
+ *
+ *  \param newinternal Position in file to start reading data from
+ */
 void RingBuffer::ResetReadAhead(long long newinternal)
 {
     readAheadLock.lock();
@@ -447,16 +493,24 @@ void RingBuffer::ResetReadAhead(long long newinternal)
     readAheadLock.unlock();
 }
 
+/** \fn RingBuffer::StartupReadAheadThread(void)
+ *  \brief Creates the read-ahead thread, and waits for it to start.
+ *
+ *  \sa Start(void).
+ */
 void RingBuffer::StartupReadAheadThread(void)
 {
     readaheadrunning = false;
 
-    pthread_create(&reader, NULL, startReader, this);
+    pthread_create(&reader, NULL, StartReader, this);
 
     while (!readaheadrunning)
         usleep(50);
 }
 
+/** \fn RingBuffer::KillReadAheadThread(void)
+ *  \brief Stops the read-ahead thread, and waits for it to stop.
+ */
 void RingBuffer::KillReadAheadThread(void)
 {
     if (!readaheadrunning)
@@ -466,37 +520,48 @@ void RingBuffer::KillReadAheadThread(void)
     pthread_join(reader, NULL);
 }
 
+/** \fn RingBuffer::StopReads(void)
+ *  \brief ????
+ *  \sa StartReads(void), Pause(void)
+ */
 void RingBuffer::StopReads(void)
 {
     stopreads = true;
     availWait.wakeAll();
 }
 
+/** \fn RingBuffer::StartReads(void)
+ *  \brief ????
+ *  \sa StopReads(void), Unpause(void)
+ */
 void RingBuffer::StartReads(void)
 {
     stopreads = false;
 }
 
+/** \fn RingBuffer::Pause(void)
+ *  \brief Pauses the read-ahead thread. Calls StopReads(void).
+ *  \sa Unpause(void), WaitForPause(void)
+ */
 void RingBuffer::Pause(void)
 {
     pausereadthread = true;
     StopReads();
 }
 
+/** \fn RingBuffer::Unpause(void)
+ *  \brief Unpauses the read-ahead thread. Calls StartReads(void).
+ *  \sa Pause(void)
+ */
 void RingBuffer::Unpause(void)
 {
     StartReads();
     pausereadthread = false;
 }
 
-bool RingBuffer::isPaused(void)
-{
-    if (!readaheadrunning)
-        return true;
-
-    return readaheadpaused;
-}
-
+/** \fn RingBuffer::WaitForPause(void)
+ *  \brief Waits for Pause(void) to take effect.
+ */
 void RingBuffer::WaitForPause(void)
 {
     if (!readaheadrunning)
@@ -505,17 +570,24 @@ void RingBuffer::WaitForPause(void)
     if  (!readaheadpaused)
     {
         while (!pauseWait.wait(1000))
-            VERBOSE(VB_IMPORTANT, "Waited too long for ringbuffer pause..");
+            VERBOSE(VB_IMPORTANT,
+                    LOC + "Waited too long for ringbuffer pause..");
     }
 }
 
-void *RingBuffer::startReader(void *type)
+/** \fn RingBuffer::StartReader(void*)
+ *  \brief Thunk that calls ReadAheadThread(void)
+ */
+void *RingBuffer::StartReader(void *type)
 {
     RingBuffer *rbuffer = (RingBuffer *)type;
     rbuffer->ReadAheadThread();
     return NULL;
 }
 
+/** \fn RingBuffer::ReadAheadThread(void)
+ *  \brief Read-ahead run function.
+ */
 void RingBuffer::ReadAheadThread(void)
 {
     long long totfree = 0;
@@ -644,6 +716,13 @@ void RingBuffer::ReadAheadThread(void)
     rbwpos = 0;
 }
 
+/** \fn RingBuffer::ReadFromBuf(void*, int)
+ *  \brief Reads from the read-ahead buffer, this is called by
+ *         Read(void*, int) when the read-ahead thread is running.
+ *  \param data  Pointer to where data will be written
+ *  \param count Number of bytes to read
+ *  \return Returns number of bytes read
+ */
 int RingBuffer::ReadFromBuf(void *buf, int count)
 {
     if (commserror)
@@ -663,7 +742,8 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         {
             if (!readsAllowedWait.wait(1000))
             {
-                 VERBOSE(VB_IMPORTANT, "taking too long to be allowed to read..");
+                 VERBOSE(VB_IMPORTANT,
+                         LOC + "Taking too long to be allowed to read..");
                  readErr++;
                  
                  // HACK Sometimes the readhead thread gets borked on startup.
@@ -676,8 +756,8 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
                    */ 
                  if (readErr > 10)
                  {
-                     VERBOSE(VB_IMPORTANT, "Took more than 10 seconds to be allowed to read, "
-                                           "aborting.");
+                     VERBOSE(VB_IMPORTANT, LOC_ERR + "Took more than "
+                             "10 seconds to be allowed to read, aborting.");
                      wanttoread = 0;
                      stopreads = true;
                      return 0;
@@ -695,13 +775,15 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
         wanttoread = count;
         if (!availWait.wait(&availWaitMutex, 4000))
         {
-            VERBOSE(VB_IMPORTANT,"Waited 4 seconds for data to become available, waiting "
-                    "again...");
+            VERBOSE(VB_IMPORTANT, LOC + "Waited 4 seconds for data to "
+                    "become available, waiting again...");
+
             readErr++;
             if (readErr > 7)
             {
-                VERBOSE(VB_IMPORTANT,"Waited 14 seconds for data to become available, "
-                        "aborting");
+                VERBOSE(VB_IMPORTANT, LOC + "Waited 14 seconds for data to "
+                        "become available, aborting");
+
                 wanttoread = 0;
                 stopreads = true;
                 availWaitMutex.unlock();
@@ -747,12 +829,21 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
     return count;
 }
 
+/** \fn RingBuffer::Read(void*, int)
+ *  \brief This is the public method for reading from a file,
+ *         it calls the appropriate read method if the file
+ *         is remote or buffered, or a DVD.
+ *  \param buf   Pointer to where data will be written
+ *  \param count Number of bytes to read
+ *  \return Returns number of bytes read
+ */
 int RingBuffer::Read(void *buf, int count)
 {
     int ret = -1;
     if (writemode)
     {
-        fprintf(stderr, "Attempt to read from a write only file\n");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Attempt to read from a write only file");
         return ret;
     }
 
@@ -786,7 +877,10 @@ int RingBuffer::Read(void *buf, int count)
     return ret;
 }
 
-bool RingBuffer::IsIOBound(void)
+/** \fn RingBuffer::IsIOBound(void) const
+ *  \brief Returns true if a RingBuffer::Read(void*,int) is likely to block.
+ */
+bool RingBuffer::IsIOBound(void) const
 {
     bool ret = false;
     int used, free;
@@ -807,12 +901,16 @@ bool RingBuffer::IsIOBound(void)
     return ret;
 }
 
-int RingBuffer::Write(const void *buf, int count)
+/** \fn RingBuffer::Write(const void*, uint)
+ *  \brief Writes buffer to ThreadedFileWriter::Write(const void*,uint)
+ *  \return Bytes written, or -1 on error.
+ */
+int RingBuffer::Write(const void *buf, uint count)
 {
     int ret = -1;
     if (!writemode)
     {
-        fprintf(stderr, "Attempt to write to a read only file\n");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Tried to write to a read only file.");
         return ret;
     }
 
@@ -828,12 +926,18 @@ int RingBuffer::Write(const void *buf, int count)
     return ret;
 }
 
+/** \fn RingBuffer::Sync(void)
+ *  \brief Calls ThreadedFileWriter::Sync(void)
+ */
 void RingBuffer::Sync(void)
 {
     if (tfw)
         tfw->Sync();
 }
 
+/** \fn RingBuffer::Seek(long long, int)
+ *  \brief Seeks to a particular position in the file.
+ */
 long long RingBuffer::Seek(long long pos, int whence)
 {
     wantseek = true;
@@ -871,6 +975,9 @@ long long RingBuffer::Seek(long long pos, int whence)
     return ret;
 }
 
+/** \fn RingBuffer::WriterSeek(long long, int)
+ *  \brief Calls ThreadedFileWriter::Seek(long long,int).
+ */
 long long RingBuffer::WriterSeek(long long pos, int whence)
 {
     long long ret = -1;
@@ -884,6 +991,10 @@ long long RingBuffer::WriterSeek(long long pos, int whence)
     return ret;
 }
 
+/** \fn RingBuffer::WriterFlush(void)
+ *  \brief Calls ThreadedFileWriter::Flush(void) and 
+ *         ThreadedFileWriter::Sync(void).
+ */
 void RingBuffer::WriterFlush(void)
 {
     if (tfw)
@@ -893,34 +1004,45 @@ void RingBuffer::WriterFlush(void)
     }
 }
 
+/** \fn RingBuffer::SetWriteBufferSize(int)
+ *  \brief Calls ThreadedFileWriter::SetWriteBufferSize(int)
+ */
 void RingBuffer::SetWriteBufferSize(int newSize)
 {
     tfw->SetWriteBufferSize(newSize);
 }
 
+/** \fn RingBuffer::SetWriteBufferMinWriteSize(int)
+ *  \brief Calls ThreadedFileWriter::SetWriteBufferMinWriteSize(int)
+ */
 void RingBuffer::SetWriteBufferMinWriteSize(int newMinSize)
 {
     tfw->SetWriteBufferMinWriteSize(newMinSize);
 }
 
-long long RingBuffer::GetReadPosition(void)
+/** \fn RingBuffer::GetReadPosition(void) const
+ *  \brief Returns how far into the file we have read.
+ */
+long long RingBuffer::GetReadPosition(void) const
 {
     if (dvdPriv)
-    {
         return dvdPriv->GetReadPosition();
-    }
-    else
-    {
-        return readpos;
-    }
+    return readpos;
 }
 
-long long RingBuffer::GetWritePosition(void)
+/** \fn RingBuffer::GetWritePosition(void) const
+ *  \brief Returns how far into a ThreadedFileWriter file we have written.
+ */
+long long RingBuffer::GetWritePosition(void) const
 {
     return writepos;
 }
 
-long long RingBuffer::GetRealFileSize(void)
+/** \fn RingBuffer::GetRealFileSize(void) const
+ *  \brief Returns the size of the file we are reading/writing,
+ *         or -1 if the query fails.
+ */
+long long RingBuffer::GetRealFileSize(void) const
 {
     if (remotefile)
         return remotefile->GetFileSize();
@@ -931,35 +1053,55 @@ long long RingBuffer::GetRealFileSize(void)
     return -1;
 }
 
-bool RingBuffer::LiveMode(void)
+/** \fn RingBuffer::LiveMode(void) const
+ *  \brief Returns true if this RingBuffer has been assigned a LiveTVChain.
+ *  \sa SetLiveMode(LiveTVChain*)
+ */
+bool RingBuffer::LiveMode(void) const
 {
     return (livetvchain);
 }
 
+/** \fn RingBuffer::SetLiveMode(LiveTVChain*)
+ *  \brief Assigns a LiveTVChain to this RingBuffer
+ *  \sa LiveMode(void)
+ */
 void RingBuffer::SetLiveMode(LiveTVChain *chain)
 {
     livetvchain = chain;
 }
 
-void RingBuffer::getPartAndTitle(int& title, int& part)
+/** \fn RingBuffer::getPartAndTitle(int&,int&)
+ *  \brief Calls DVDRingBufferPriv::GetPartAndTitle(int&,int&)
+ */
+void RingBuffer::getPartAndTitle(int &title, int &part)
 {
     if (dvdPriv)
         dvdPriv->GetPartAndTitle(title, part);
 }
 
-void RingBuffer::getDescForPos(QString& desc)
+/** \fn RingBuffer::getDescForPos(QString&)
+ *  \brief Calls DVDRingBufferPriv::GetDescForPos(QString&)
+ */
+void RingBuffer::getDescForPos(QString &desc)
 {
     if (dvdPriv)
         dvdPriv->GetDescForPos(desc);
 }
 
-void RingBuffer::nextTrack()
+/** \fn RingBuffer::nextTrack(void)
+ *  \brief Calls DVDRingBufferPriv::nextTrack(void)
+ */
+void RingBuffer::nextTrack(void)
 {
    if (dvdPriv)
        dvdPriv->nextTrack();
 }
 
-void RingBuffer::prevTrack()
+/** \fn RingBuffer::prevTrack(void)
+ *  \brief Calls DVDRingBufferPriv::prevTrack(void)
+ */
+void RingBuffer::prevTrack(void)
 {
    if (dvdPriv)
        dvdPriv->prevTrack();
