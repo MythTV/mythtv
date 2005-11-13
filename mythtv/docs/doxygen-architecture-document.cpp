@@ -39,6 +39,9 @@ thread.
 There are also special dangers when 
 \ref qobject_dangers "using QObject" outside the Qt event thread.
 
+The is also short HOWTO on \ref profiling_mythtv available in addition
+to documentation on the code itself.
+
 \section libs Libraries
 
 %MythTV is divided up into eight libraries:
@@ -377,5 +380,159 @@ or more QObject derived classes virtually. The linker doesn't
 complain, but strange unexplainable behaviour ensues when
 the application is run and signals start showing up on the
 wrong slots.
+
+*/
+
+/** \defgroup profiling_mythtv    Profiling MythTV
+
+You can use any sampling profiler to profile %MythTV, the most
+popular GPL one is OProfile and this section tells you how to
+use it to profile %MythTV. For Intel also makes VTune, AMD
+makes CodeAnalyst, and Apple makes Shark. These all work 
+similarly to oprofile, so the %MythTV portions are the same.
+
+This do not describe how to install oprofile. There are a
+few cotchas on installation: You must have APIC enabled to
+use performance counters. This is usually the default, but
+you may want to check this in your kernel configuration. You
+also need the oprofile module, this is part of the kernel
+config in Linux 2.6+, but must be compiled seperately for
+earlier kernels. Finally, some RedHat kernels does not work
+with the standard oprofile, so you must use the RedHat
+version of oprofile, or compile your own kernel.
+
+
+\section prof_compile Compiling MythTV for profiling
+
+The first thing you need to do is compile with profiling in
+mind. %MythTV has three compile types "release", "debug" and
+"profile". The "release" type enables optimizations that 
+make debugging practically impossible, while "debug" has so
+few optimizations that profiling it usually won't tell you 
+where the real performance problems are. The "profile" compile
+type enables the all the optimizations in "release" but also
+enables debugging symbols, so that you know which functions
+are the CPU hogs.
+
+So we configure thusly:
+\code
+  make distclean
+  ./configure --compile-type=profile --enable-proc-opt [+your normal opts]
+\endcode
+
+The "make distclean" clears out all your old binaries and the the configure
+sets the compile type approriately. You may not want the "--enable-proc-opt"
+if you plan on making a package for other CPUs. This only makes about a
+10% difference in playback speed because MMX and CMOV are enabled for 
+CPUs that support them regardless of this option.
+
+Next, you compile and install %MythTV as you normally would.
+\code
+  qmake; make -j2 -k
+  su
+  make install
+\endcode
+
+
+\section prof_init Initializing profiler
+
+Most sampling profilers, OProfile included, require a kernel module so
+this module must be loaded. In oprofile's case the module gets confused
+when it has been loaded a long time, so it is best to begin each session
+by shutting down the OProfile server and reloading the module:
+
+\code
+  opcontrol --deinit
+  opcontrol --init
+\endcode
+
+You also will want to tell the profiler whether to profile the
+kernel as well, if you want the kernel profiled, and assuming
+your compiled kernel is in /usr/src/linux, issue this command:
+\code
+  opcontrol --vmlinux=/usr/src/linux/vmlinux
+\endcode
+If you don't want it in your profile report, use this command:
+\code
+  opcontrol --no-vmlinux
+\endcode
+Normally, you don't need it when profiling %MythTV, but there are
+times when the kernel is a bottleneck. For example when writing
+streams to disk is taking too long.
+
+Now all CPU's are not profiled the same way. In the days of olde,
+a sampling profiler would hook into the clock interupt and record
+the instuction pointer's location at the instant the interrupt was
+triggered. But the wall clock timer still ticks as often as it did
+when CPU's ran at 5 Mhz, and now they run almost a thousand times
+faster. Such a profile would now take a thousand times longer than
+it did in 1985.
+
+So modern processors include explicit support for profiling. For,
+example the Pentium Pro has the INST_RETIRED counter, the Pentium 4
+has the INSTR_RETIRED counter, the AMD64 has the RETIRED_INSNS
+counter, etc. For a full list see the 
+<a href="http://oprofile.sourceforge.net/docs/">OProfile documentation</a>.
+You need to find a performance counter you can use for your CPU,
+after you've run "opcontrol --init" you can run the following command:
+\code
+  opcontrol --list-events
+\endcode
+And it will list all the performance counters available with your
+CPU. You need to pick the best one for what you want to measure,
+for overall performance you want something line INSTR_RETIRED.
+
+For an Intel Pentium 4, the following will work
+\code
+  opcontrol -e INSTR_RETIRED:6000:0x0f:0:1
+\endcode
+
+This tells OProfile to schedule an interrupt on every 6000th 
+instruction that finishes and matches the flag 0x0f. You
+could also count cycles when not in idle for the same type of
+measurements. The last two numbers tell OProfile it should not 
+profile the kernel and should profile userspace, if you want 
+to profile the kernel as well you need to replace the zero with 
+a one.
+
+It is possible to profile in oprofile the old fashioned way, by
+using the real-time-clock. But you must compile your Linux kernel
+WITHOUT RTC support, and run %MythTV significantly longer to get
+enough samples for a good report.
+
+
+\section prof_run Running Profiler
+
+Normally, oprofile will tell you about everything running in
+its reports. You can limit what information is collected by 
+running a opcontrol command such as:
+\code
+  opcontrol --image=/usr/local/bin/mythfrontend
+\endcode
+This tells OProfile to only profile the frontend.
+
+Now you want to start %MythTV as usual:
+
+Then begin doing whatever you want to profile, then issue these
+commands:
+\code
+  opcontrol --reset ; opcontrol --start
+\endcode
+
+After a few seconds/minutes your should have collected enough data.
+Then you want to issue the following commands:
+\code
+  opcontrol --shutdown
+  opreport --merge tgid -l --image-path=/usr/local/bin > report.txt
+\endcode
+
+Now you can peruse the report at your pleasure.
+
+This should be enough to get you started with finding and fixing
+performance problems in %MythTV, but there is more information
+available from the
+<a href=http://oprofile.sourceforge.net/doc/index.html>OProfile manual</a>.
+This includes information on constructing callgraphs, producing
+an annotated versions of the code, and saving results.
 
 */
