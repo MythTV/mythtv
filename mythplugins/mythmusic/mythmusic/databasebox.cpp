@@ -208,6 +208,12 @@ void DatabaseBox::keepFilling()
             //Display the menu when this opens up
             QKeyEvent *fakeKey = new QKeyEvent(QEvent::None, Qt::Key_sterling,
                                                0, Qt::NoButton);
+
+            // make sure we get rid of the 'Loading Music Data' message
+            // before updating the menu
+            if (class LCD * lcd = LCD::Get())
+                lcd->switchToNothing();
+
             updateLCDMenu(fakeKey);
             delete fakeKey;
         }
