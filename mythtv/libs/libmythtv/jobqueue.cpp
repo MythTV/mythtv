@@ -2071,7 +2071,7 @@ void JobQueue::DoFlagCommercialsThread(void)
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
 
-        (new PreviewGenerator(program_info))->Start();
+        //(new PreviewGenerator(program_info))->Start();
     }
 
     if (msg != "")

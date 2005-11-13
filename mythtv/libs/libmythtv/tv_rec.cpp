@@ -882,7 +882,7 @@ void TVRec::TeardownRecorder(bool killFile)
     {
         if (!killFile)
         {
-            (new PreviewGenerator(curRecording))->Start();
+            //(new PreviewGenerator(curRecording))->Start();
             if (autoRunJobs)
                 JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
         }
@@ -3646,7 +3646,7 @@ void TVRec::SwitchLiveTVRingBuffer(bool discont)
     ProgramInfo *oldinfo = tvchain->GetProgramAt(-1);
     if (oldinfo)
     {
-        (new PreviewGenerator(oldinfo))->Start();
+        //(new PreviewGenerator(oldinfo))->Start();
         delete oldinfo;
     }
 
