@@ -588,17 +588,29 @@ void EncoderLink::CancelNextRecording(void)
  *  \brief Tells TVRec to Spawn a "Live TV" recorder.
  *         <b>This only works on local recorders.</b>
  *
- *  \param chainid The LiveTV chain id to use
+ *  \param chain The LiveTV chain to use
  *  \param pip Tells TVRec's RingBuffer that this is for a Picture in Picture di
 splay.
  *  \sa TVRec::SpawnLiveTV(), RemoteEncoder::SpawnLiveTV()
  */
-void EncoderLink::SpawnLiveTV(QString chainid, bool pip)
+void EncoderLink::SpawnLiveTV(LiveTVChain *chain, bool pip)
 {
     if (local)
-        tv->SpawnLiveTV(chainid, pip);
+        tv->SpawnLiveTV(chain, pip);
     else
         VERBOSE(VB_IMPORTANT, "Should be local only query: SpawnLiveTV");
+}
+
+/** \fn EncoderLink::GetChainID()
+ *  \brief Get the LiveTV chain id that's in use.
+ */
+QString EncoderLink::GetChainID(void)
+{
+    if (local)
+        return tv->GetChainID();
+
+    VERBOSE(VB_IMPORTANT, "Should be local only query: SpawnLiveTV");
+    return "";
 }
 
 /** \fn EncoderLink::StopLiveTV()

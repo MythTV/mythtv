@@ -664,6 +664,16 @@ void MainServer::customEvent(QCustomEvent *e)
             }
         }
 
+        if (me->Message().left(13) == "LIVETV_EXITED")
+        {
+            QString chainid = me->ExtraData();
+            LiveTVChain *chain = GetExistingChain(chainid);
+            if (chain)
+                DeleteChain(chain);
+
+            return;
+        }
+
         if (me->Message().left(6) == "LOCAL_")
             return;
 
@@ -2376,12 +2386,35 @@ void MainServer::HandleRecorderQuery(QStringList &slist, QStringList &commands,
     }
     else if (command == "SPAWN_LIVETV")
     {
-        enc->SpawnLiveTV(slist[2], slist[3].toInt());
+        QString chainid = slist[2];
+        LiveTVChain *chain = GetExistingChain(chainid);
+        if (!chain)
+        {
+            chain = new LiveTVChain();
+            chain->LoadFromExistingChain(chainid);
+            AddToChains(chain);
+        }
+
+        chain->SetHostSocket(pbssock);
+
+        enc->SpawnLiveTV(chain, slist[3].toInt());
         retlist << "ok";
     }
     else if (command == "STOP_LIVETV")
     {
+        QString chainid = enc->GetChainID();
         enc->StopLiveTV();
+
+        LiveTVChain *chain = GetExistingChain(chainid);
+        if (chain)
+        {
+            chain->DelHostSocket(pbssock);
+            if (chain->HostSocketCount() == 0)
+            {
+                DeleteChain(chain);
+            }
+        }
+
         retlist << "ok";
     }
     else if (command == "PAUSE")
@@ -3241,6 +3274,32 @@ void MainServer::endConnection(RefSocket *socket)
                 gContext->dispatch(me);
             }
 
+            LiveTVChain *chain;
+            if ((chain = GetExistingChain(sock)))
+            {
+                chain->DelHostSocket(sock);
+                if (chain->HostSocketCount() == 0)
+                {
+                    QMap<int, EncoderLink *>::iterator i = encoderList->begin();
+                    for (; i != encoderList->end(); ++i)
+                    {
+                        EncoderLink *enc = i.data();
+                        if (enc->IsLocal())
+                        {
+                            while (enc->GetState() == kState_ChangingState)
+                                usleep(500);
+
+                            if (enc->IsBusy() && 
+                                enc->GetChainID() == chain->GetID())
+                            {
+                                enc->StopLiveTV();
+                            }
+                        }
+                    }
+                    DeleteChain(chain);
+                }
+            }
+
             pbs->SetDisconnected();
             playbackList.erase(it);
 
@@ -3338,6 +3397,49 @@ FileTransfer *MainServer::getFileTransferBySock(QSocket *sock)
     }
 
     return retval;
+}
+
+LiveTVChain *MainServer::GetExistingChain(QString id)
+{
+    LiveTVChain *chain;
+
+    QPtrListIterator<LiveTVChain> it(liveTVChains);
+    while ((chain = it.current()) != 0)
+    {
+        ++it;
+        if (chain->GetID() == id)
+            return chain;
+    }
+
+    return NULL;
+}
+
+LiveTVChain *MainServer::GetExistingChain(QSocket *sock)
+{
+    LiveTVChain *chain;
+
+    QPtrListIterator<LiveTVChain> it(liveTVChains);
+    while ((chain = it.current()) != 0)
+    {
+        ++it;
+        if (chain->IsHostSocket(sock))
+            return chain;
+    }
+
+    return NULL;
+}
+
+void MainServer::AddToChains(LiveTVChain *chain)
+{
+    liveTVChains.append(chain);
+}
+
+void MainServer::DeleteChain(LiveTVChain *chain)
+{
+    while (liveTVChains.removeRef(chain))
+        ;
+
+    delete chain;
 }
 
 QString MainServer::LocalFilePath(QUrl &url)
@@ -3571,51 +3673,6 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
             switch (elink->GetState())
             {
                 case kState_WatchingLiveTV:
-                {
-                    if (isLocal)
-                    {
-// FIXME
-#if 0
-                        QString title, subtitle, desc, category, starttime,
-                                endtime, callsign, iconpath, channelname,
-                                chanid, seriesid, programid, chanFilters,
-                                repeat, airdate, stars;
-
-                        elink->GetChannelInfo(title, subtitle, desc, category,
-                                              starttime, endtime, callsign,
-                                              iconpath, channelname, chanid,
-                                              seriesid, programid, chanFilters,
-                                              repeat, airdate, stars);
-
-                        QDomElement program = pDoc->createElement("Program");
-                        encoder.appendChild(program);
-
-                        program.setAttribute("seriesId" , seriesid );
-                        program.setAttribute("programId", programid);
-                        program.setAttribute("title"    , title    );
-                        program.setAttribute("subTitle" , subtitle );
-                        program.setAttribute("category" , category );
-                        program.setAttribute("startTime", starttime);
-                        program.setAttribute("endTime"  , endtime  );
-                        program.setAttribute("repeat"   , repeat   );
-                        program.setAttribute("airdate"  , airdate  );
-                        program.setAttribute("stars"    , stars    );
-
-                        QDomText textNode = pDoc->createTextNode(desc);
-                        program.appendChild(textNode);
-
-                        QDomElement channel = pDoc->createElement("Channel");
-                        program.appendChild(channel);
-
-                        channel.setAttribute("chanId"     , chanid     );
-                        channel.setAttribute("callSign"   , callsign   );
-                        channel.setAttribute("iconPath"   , iconpath   );
-                        channel.setAttribute("channelName", channelname);
-                        channel.setAttribute("chanFilters", chanFilters);
-#endif
-                    }
-                    break;
-                }
                 case kState_RecordingOnly:
                 case kState_WatchingRecording:
                 {

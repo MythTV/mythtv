@@ -188,7 +188,8 @@ class TVRec : public QObject
     long long GetFilePosition(void);
     long long GetMaxBitrate();
     long long GetKeyframePosition(long long desired);
-    void SpawnLiveTV(QString chainid, bool pip = false);
+    void SpawnLiveTV(LiveTVChain *newchain, bool pip = false);
+    QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
     void ToggleChannelFavorite(void);

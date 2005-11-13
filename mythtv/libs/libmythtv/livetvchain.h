@@ -5,8 +5,10 @@
 #include <qvaluelist.h>
 #include <qdatetime.h>
 #include <qmutex.h>
+#include <qptrlist.h>
 
 class ProgramInfo;
+class QSocket;
 
 struct LiveTVChainEntry
 {
@@ -67,6 +69,11 @@ class LiveTVChain
 
     QString GetChannelName(int pos = -1);
     QString GetInputName(int pos = -1);
+
+    void SetHostSocket(QSocket *sock);
+    bool IsHostSocket(QSocket *sock);
+    int HostSocketCount(void);
+    void DelHostSocket(QSocket *sock);
  
   private:
     void BroadcastUpdate();
@@ -87,6 +94,9 @@ class LiveTVChain
 
     int m_switchid;
     int m_jumppos;
+
+    QMutex m_sockLock;
+    QPtrList<QSocket> m_inUseSocks;
 };
 
 #endif

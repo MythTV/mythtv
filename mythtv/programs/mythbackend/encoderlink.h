@@ -7,6 +7,7 @@
 
 class MainServer;
 class PlaybackSock;
+class LiveTVChain;
 
 class EncoderLink
 {
@@ -70,7 +71,8 @@ class EncoderLink
     long long GetFramesWritten(void);
     long long GetFilePosition(void);
     long long GetKeyframePosition(long long desired);
-    void SpawnLiveTV(QString chainid, bool pip = false);
+    void SpawnLiveTV(LiveTVChain *chain, bool pip = false);
+    QString GetChainID(void);
     void StopLiveTV(void);
     void PauseRecorder(void);
     void ToggleInputs(void);

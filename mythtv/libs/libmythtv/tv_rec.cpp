@@ -452,6 +452,14 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     if (internalState == kState_None)
     {
+        if (tvchain)
+        {
+            QString message = QString("LIVETV_EXITED");
+            MythEvent me(message, tvchain->GetID());
+            gContext->dispatch(me);
+            tvchain = NULL;
+        }
+
         // Figure out new ringbuffer backing file name.
         QString rbBaseName = rcinfo->CreateRecordBasename(rbFileExt);
         rbFileName = QString("%1/%2").arg(recprefix).arg(rbBaseName);
@@ -2449,15 +2457,12 @@ long long TVRec::GetMaxBitrate()
  *  \brief Tells TVRec to spawn a "Live TV" recorder.
  *  \sa EncoderLink::SpawnLiveTV(), RemoteEncoder::SpawnLiveTV()
  */
-void TVRec::SpawnLiveTV(QString chainid, bool pip)
+void TVRec::SpawnLiveTV(LiveTVChain *newchain, bool pip)
 {
     QMutexLocker lock(&stateChangeLock);
 
-    if (tvchain)
-        delete tvchain;
-
-    tvchain = new LiveTVChain();
-    tvchain->LoadFromExistingChain(chainid);
+    tvchain = newchain;
+    tvchain->ReloadAll();
 
     QString hostprefix = QString("myth://%1:%2/")
                                 .arg(gContext->GetSetting("BackendServerIP"))
@@ -2474,6 +2479,15 @@ void TVRec::SpawnLiveTV(QString chainid, bool pip)
     WaitForEventThreadSleep();
 }
 
+/** \fn TVRec::GetChainID()
+ *  \brief Get the chainid of the livetv instance
+ */
+QString TVRec::GetChainID(void)
+{
+    if (tvchain)
+        return tvchain->GetID();
+}
+
 /** \fn TVRec::StopLiveTV()
  *  \brief Tells TVRec to stop a "Live TV" recorder.
  *  \sa EncoderLink::StopLiveTV(), RemoteEncoder::StopLiveTV()
@@ -2487,8 +2501,6 @@ void TVRec::StopLiveTV(void)
         // Wait for state change to take effect...
         WaitForEventThreadSleep();
 
-        if (tvchain)
-            delete tvchain;
         tvchain = NULL;
     }
 

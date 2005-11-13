@@ -16,6 +16,7 @@ using namespace std;
 #include "encoderlink.h"
 #include "filetransfer.h"
 #include "scheduler.h"
+#include "livetvchain.h"
 
 class HttpStatus;
 class ProcessRequestThread;
@@ -140,6 +141,13 @@ class MainServer : public QObject
 
     static void *SpawnDeleteThread(void *param);
     void DoDeleteThread(DeleteStruct *ds);
+
+    LiveTVChain *GetExistingChain(QString id);
+    LiveTVChain *GetExistingChain(QSocket *sock);
+    void AddToChains(LiveTVChain *chain);
+    void DeleteChain(LiveTVChain *chain);
+
+    QPtrList<LiveTVChain> liveTVChains;
 
     QMap<int, EncoderLink *> *encoderList;
 

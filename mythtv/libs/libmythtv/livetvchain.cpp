@@ -369,3 +369,29 @@ QString LiveTVChain::GetInputName(int pos)
     return entry.inputname;
 }
 
+void LiveTVChain::SetHostSocket(QSocket *sock)
+{
+    QMutexLocker lock(&m_sockLock);
+
+    if (!m_inUseSocks.containsRef(sock))
+        m_inUseSocks.append(sock);
+}
+
+bool LiveTVChain::IsHostSocket(QSocket *sock)
+{
+    QMutexLocker lock(&m_sockLock);
+    return m_inUseSocks.containsRef(sock);
+}
+
+int LiveTVChain::HostSocketCount(void)
+{
+    return m_inUseSocks.count();
+}
+
+void LiveTVChain::DelHostSocket(QSocket *sock)
+{
+    QMutexLocker lock(&m_sockLock);
+
+    m_inUseSocks.removeRef(sock);
+}
+
