@@ -49,6 +49,7 @@ This can be found by going to NetFlix.com, login, click RSS feed at the bottom o
 and paste the url into netflix table with the is_queue flag set.
   
   insert into netflix values ("Queue","NetFlix", '[YOUR QUEUE RSS URL]','http://cdn.nflximg.com/us/icons/nficon.ico', null, 1);
+  insert into netflix values ("History","NetFlix", '[YOUR HISTORY RSS URL]','http://cdn.nflximg.com/us/icons/nficon.ico', null, 2);
 
 
 CONFIGURATION/USAGE:

@@ -53,6 +53,11 @@ void queue(void){
         flix.exec();
 }
 
+void history(void){
+        MythFlixQueue flix(gContext->GetMainWindow(), "netflix history");
+        flix.exec();
+}
+
 void NetFlixCallback(void *data, QString &selection)
 {
     VERBOSE(VB_NONE, QString("MythFlix: NetFlixCallback %1").arg(selection));
@@ -63,6 +68,10 @@ void NetFlixCallback(void *data, QString &selection)
     if (sel == "netflix_queue")
     {
         queue();
+    }
+    if (sel == "netflix_history")
+    {
+        history();
     }
     if (sel == "netflix_browse")
     {

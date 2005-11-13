@@ -11,5 +11,11 @@
     <text>Browse Movies</text>
     <action>NETFLIX_BROWSE</action>
   </button>
+
+  <button>
+    <type>NETFLIX_HISTORY</type>
+    <text>Rental History</text>
+    <action>NETFLIX_HISTORY</action>
+  </button>
   
 </mythmenu>

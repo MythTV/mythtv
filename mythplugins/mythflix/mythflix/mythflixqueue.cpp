@@ -62,7 +62,11 @@ MythFlixQueue::MythFlixQueue(MythMainWindow *parent, const char *name )
     // Load sites from database
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.exec("SELECT name, url, updated FROM netflix WHERE is_queue=1 ORDER BY name");
+    if (QString::compare("netflix queue",name)==0)
+        query.exec("SELECT name, url, updated FROM netflix WHERE is_queue=1 ORDER BY name");
+
+    if (QString::compare("netflix history",name)==0)
+        query.exec("SELECT name, url, updated FROM netflix WHERE is_queue=2 ORDER BY name");
 
     if (!query.isActive()) {
         VERBOSE(VB_IMPORTANT, QString("MythFlixQueue: Error in loading queue from DB"));
