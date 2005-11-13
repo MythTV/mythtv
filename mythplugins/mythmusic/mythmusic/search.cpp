@@ -153,21 +153,12 @@ void SearchDialog::runQuery(QString searchText)
     has_entries &= (query.numRowsAffected() > 0);
 
     uint matchCount = 0;
+
     while (has_entries && query.next())
     {
-        // Strip path from filename
-        QString fileName(query.value(0).toString());
-        fileName.replace(QRegExp(".*/"), "");
-
         QString aComposer(query.value(1).toString());
-        // cut off composer's first name
-        aComposer.replace(QRegExp(",.*"),"");
-
         QString aTitle(query.value(2).toString());
-        // truncate Title at 30, cut off any trailing whitespace or ,
         aTitle.truncate( 30 );
-        aTitle.replace(QRegExp(",*\\s*$"),"");
-
         // Append artist/title/album info... ok this is ugly :(
         QString text(aComposer + ": " + aTitle + "; " +
                      query.value(3).toString() );

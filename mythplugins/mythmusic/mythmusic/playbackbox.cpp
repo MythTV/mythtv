@@ -470,16 +470,22 @@ void PlaybackBoxMusic::showMenu()
     playlist_popup = new MythPopupBox(gContext->GetMainWindow(),
                                       "playlist_popup");
 
+    if (menufilters)
+    {
+        QLabel *caption = playlist_popup->addLabel(tr("Change Filter"), MythPopupBox::Large);
+        caption->setAlignment(Qt::AlignCenter);
+    }
+
     QButton *button = playlist_popup->addButton(tr("Smart playlists"), this,
                               SLOT(showSmartPlaylistDialog()));
-    
+
     QLabel *splitter = playlist_popup->addLabel(" ", MythPopupBox::Small);
     splitter->setLineWidth(2);
     splitter->setFrameShape(QFrame::HLine);
     splitter->setFrameShadow(QFrame::Sunken);
     splitter->setMaximumHeight((int) (5 * hmult));
     splitter->setMaximumHeight((int) (5 * hmult));
-    
+
     playlist_popup->addButton(tr("Search"), this,
                               SLOT(showSearchDialog()));
     playlist_popup->addButton(tr("From CD"), this,
@@ -518,8 +524,8 @@ void PlaybackBoxMusic::allTracks()
    if (!playlist_popup)
         return;
 
-    updatePlaylistFromQuickPlaylist("ORDER BY artist, album, tracknum");
-    closePlaylistPopup();
+   closePlaylistPopup();
+   updatePlaylistFromQuickPlaylist("ORDER BY artist, album, tracknum");
 }
 
 void PlaybackBoxMusic::fromCD()
@@ -546,9 +552,9 @@ void PlaybackBoxMusic::showSmartPlaylistDialog()
     if (res > 0)
     {
         dialog.getSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
-        updatePlaylistFromSmartPlaylist(curSmartPlaylistCategory, curSmartPlaylistName);
-    }    
-}    
+        updatePlaylistFromSmartPlaylist();
+    }
+}
 
 void PlaybackBoxMusic::showSearchDialog()
 {
@@ -565,7 +571,7 @@ void PlaybackBoxMusic::showSearchDialog()
     {
           QString whereClause;
           dialog.getWhereClause(whereClause);
-          updatePlaylistFromQuickPlaylist(whereClause, false);
+          updatePlaylistFromQuickPlaylist(whereClause);
     }
 }
 
@@ -577,9 +583,9 @@ void PlaybackBoxMusic::byArtist()
     QString value = formattedFieldValue(curMeta->Artist().utf8());
     QString whereClause = "WHERE artist = " + value +
                           " ORDER BY album, tracknum"; 
-  
-    updatePlaylistFromQuickPlaylist(whereClause);
+
     closePlaylistPopup();
+    updatePlaylistFromQuickPlaylist(whereClause);
 }
 
 void PlaybackBoxMusic::byAlbum()
@@ -614,15 +620,27 @@ void PlaybackBoxMusic::byYear()
     QString value = formattedFieldValue(curMeta->Year()); 
     QString whereClause = "WHERE year = " + value + 
                           " ORDER BY artist, album, tracknum";
-    
-    updatePlaylistFromQuickPlaylist(whereClause);
     closePlaylistPopup();
+    updatePlaylistFromQuickPlaylist(whereClause);
 }
 
-void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause,
-                                                       bool replace)
+void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause)
 {
+    doUpdatePlaylist(whereClause);
+}
+
+void PlaybackBoxMusic::doUpdatePlaylist(QString whereClause)
+{
+    bool bRemoveDups;
+    InsertPLOption insertOption;
+    PlayPLOption playOption;
+    int curTrackID, trackCount;
+
+    if (!menufilters && !getInsertPLOptions(insertOption, playOption, bRemoveDups))
+        return;
+
     QValueList <int> branches_to_current_node;
+    trackCount = music_tree_list->getCurrentNode()->siblingCount();
 
     // store path to current track
     if (curMeta)
@@ -630,6 +648,7 @@ void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause,
         QValueList <int> *a_route;
         a_route = music_tree_list->getRouteToActive();
         branches_to_current_node = *a_route;
+        curTrackID = curMeta->ID();
     }
     else
     {
@@ -639,37 +658,118 @@ void PlaybackBoxMusic::updatePlaylistFromQuickPlaylist(QString whereClause,
         branches_to_current_node.append(0); //  Root node
         branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
         branches_to_current_node.append(0); //  Active play Queue
+        curTrackID = 0;
     }
 
     visual_mode_timer->stop();
 
-    if (!menufilters && replace)
-        all_playlists->getActive()->removeAllTracks();
-
-    all_playlists->getActive()->fillSonglistFromQuery(whereClause);
-    all_playlists->getActive()->fillSongsFromSonglist(menufilters);
-    if (!menufilters)
-        all_playlists->getActive()->postLoad();
+    if (whereClause != "")
+    {
+        // update playlist from quick playlist
+        if (menufilters)
+            all_playlists->getActive()->fillSonglistFromQuery(
+                        whereClause, false, PL_FILTERONLY, curTrackID);
+        else
+            all_playlists->getActive()->fillSonglistFromQuery(
+                        whereClause, bRemoveDups, insertOption, curTrackID);
+    }
+    else
+    {
+        // update playlist from smart playlist
+        if (menufilters)
+            all_playlists->getActive()->fillSonglistFromSmartPlaylist(
+                    curSmartPlaylistCategory, curSmartPlaylistName,
+                    false, PL_FILTERONLY, curTrackID);
+        else
+        {
+            all_playlists->getActive()->fillSonglistFromSmartPlaylist(
+                    curSmartPlaylistCategory, curSmartPlaylistName,
+                    bRemoveDups, insertOption, curTrackID);
+        }
+    }
 
     if (visual_mode_delay > 0)
         visual_mode_timer->start(visual_mode_delay * 1000);
 
+    constructPlaylistTree();
+
     if (!menufilters)
     {
-        constructPlaylistTree();
-
-        if (!music_tree_list->tryToSetActive(branches_to_current_node))
+        switch (playOption)
         {
-            stop();
-            wipeTrackInfo();
-            branches_to_current_node.clear();
-            branches_to_current_node.append(0); //  Root node
-            branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
-            branches_to_current_node.append(0); //  Active play Queue
-            music_tree_list->moveToNodesFirstChild(branches_to_current_node);
+            case PL_CURRENT:
+                // try to move to the current track
+                if (!music_tree_list->tryToSetActive(branches_to_current_node))
+                    playFirstTrack();
+                break;
+
+            case PL_FIRST:
+                playFirstTrack();
+                break;
+
+            case PL_FIRSTNEW:
+            {
+                switch (insertOption)
+                {
+                    case PL_REPLACE:
+                        playFirstTrack();
+                        break;
+
+                    case PL_INSERTATEND:
+                    {
+                        GenericTree *node = NULL;
+                        pause();
+                        if (music_tree_list->tryToSetActive(branches_to_current_node))
+                        {
+                            node = music_tree_list->getCurrentNode()->getParent();
+                            if (node)
+                            {
+                                node = node->getChildAt((uint) trackCount);
+                            }
+                        }
+
+                        if (node)
+                        {
+                            music_tree_list->setCurrentNode(node);
+                            music_tree_list->select();
+                        }
+                        else
+                            playFirstTrack();
+
+                        break;
+                    }
+
+                    case PL_INSERTAFTERCURRENT:
+                        pause();
+                        if (music_tree_list->tryToSetActive(branches_to_current_node))
+                            next();
+                        else
+                            playFirstTrack();
+                        break;
+
+                    default:
+                        playFirstTrack();
+                }
+
+                break;
+            }
         }
     }
+
     music_tree_list->refresh();
+}
+
+void PlaybackBoxMusic::playFirstTrack()
+{
+    QValueList <int> branches_to_current_node;
+
+    stop();
+    wipeTrackInfo();
+    branches_to_current_node.clear();
+    branches_to_current_node.append(0); //  Root node
+    branches_to_current_node.append(1); //  We're on a playlist (not "My Music")
+    branches_to_current_node.append(0); //  Active play Queue
+    music_tree_list->moveToNodesFirstChild(branches_to_current_node);
 }
 
 void PlaybackBoxMusic::updatePlaylistFromCD()
@@ -744,16 +844,9 @@ void PlaybackBoxMusic::occasionallyCheckCD()
         cd_reader_thread->start();
 }
 
-void PlaybackBoxMusic::updatePlaylistFromSmartPlaylist(QString category, QString name)
+void PlaybackBoxMusic::updatePlaylistFromSmartPlaylist()
 {
-    visual_mode_timer->stop();
-
-    all_playlists->getActive()->removeAllTracks();
-    all_playlists->getActive()->fillSonglistFromSmartPlaylist(category, name);
-    all_playlists->getActive()->fillSongsFromSonglist(menufilters);
-    all_playlists->getActive()->postLoad();
-
-    postUpdate();
+    doUpdatePlaylist("");
 }
 
 void PlaybackBoxMusic::showEditMetadataDialog()
@@ -763,27 +856,27 @@ void PlaybackBoxMusic::showEditMetadataDialog()
         return;
     }
 
-    // stop music playing
-    stop();
-    
-    EditMetadataDialog editDialog(curMeta, gContext->GetMainWindow(),
+    // store the current track metadata in case the track changes
+    // while we show the edit dialog
+    Metadata *editMeta = curMeta;
+    GenericTree *node = music_tree_list->getCurrentNode();
+
+    EditMetadataDialog editDialog(editMeta, gContext->GetMainWindow(),
                       "edit_metadata", "music-", "edit metadata");
     if (editDialog.exec())
     {
         // update the metadata copy stored in all_music
-        if (all_music->updateMetadata(curMeta->ID(), curMeta))
+        if (all_music->updateMetadata(editMeta->ID(), editMeta))
         {
            // update the displayed track info
-           GenericTree *node = music_tree_list->getCurrentNode();
            if (node)
            {
                bool errorFlag;
-               node->setString(all_music->getLabel(curMeta->ID(), &errorFlag));
-           }    
-        }   
+               node->setString(all_music->getLabel(editMeta->ID(), &errorFlag));
+               music_tree_list->refresh();
+           }
+        }
     }
-    
-    music_tree_list->select();    
 }
 
 void PlaybackBoxMusic::checkForPlaylists()
@@ -1836,4 +1929,88 @@ void PlaybackBoxMusic::wireUpTheme()
     if (vis_button)
         connect(vis_button, SIGNAL(pushed()), this, SLOT(visEnable()));
 }
+
+bool PlaybackBoxMusic::getInsertPLOptions(InsertPLOption &insertOption,
+                                          PlayPLOption &playOption, bool &bRemoveDups)
+{
+    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+                                      "playlist_popup");
+
+    QLabel *caption = popup->addLabel(tr("Update Playlist Options"), MythPopupBox::Medium);
+    caption->setAlignment(Qt::AlignCenter);
+
+    QButton *button = popup->addButton(tr("Replace"));
+    popup->addButton(tr("Insert after current track"));
+    popup->addButton(tr("Append to end"));
+    button->setFocus();
+
+    QLabel *splitter = popup->addLabel(" ", MythPopupBox::Small);
+    splitter->setLineWidth(2);
+    splitter->setFrameShape(QFrame::HLine);
+    splitter->setFrameShadow(QFrame::Sunken);
+    splitter->setMinimumHeight((int) (25 * hmult));
+    splitter->setMaximumHeight((int) (25 * hmult));
+
+    // only give the user a choice of the track to play if shuffle mode is off
+    MythComboBox *playCombo = NULL;
+    if (shufflemode == SHUFFLE_OFF)
+    {
+        playCombo = new MythComboBox(false, popup, "play_combo" );
+        playCombo->insertItem(tr("Continue playing current track"));
+        playCombo->insertItem(tr("Play first track"));
+        playCombo->insertItem(tr("Play first new track"));
+        playCombo->setBackgroundOrigin(ParentOrigin);
+        popup->addWidget(playCombo);
+    }
+    
+    MythCheckBox *dupsCheck = new MythCheckBox(popup);
+    dupsCheck->setText(tr("Remove Duplicates"));
+    dupsCheck->setChecked(false);
+    dupsCheck->setBackgroundOrigin(ParentOrigin);
+    popup->addWidget(dupsCheck);
+
+    int res = popup->ExecPopup();
+    switch (res)
+    {
+        case 0:
+            insertOption = PL_REPLACE;
+            break;
+        case 1:
+            insertOption = PL_INSERTAFTERCURRENT;
+            break;
+        case 2:
+            insertOption = PL_INSERTATEND;
+            break;
+    }
+
+    bRemoveDups = dupsCheck->isChecked();
+
+
+    // if shuffle mode != SHUFFLE_OFF we always try to continue playing
+    // the current track
+    if (shufflemode == SHUFFLE_OFF)
+    {
+        switch (playCombo->currentItem())
+        {
+            case 0:
+                playOption = PL_CURRENT;
+                break;
+            case 1:
+                playOption = PL_FIRST;
+                break;
+            case 2:
+                playOption = PL_FIRSTNEW;
+                break;
+            default:
+                playOption = PL_CURRENT;
+        }
+    }
+    else
+        playOption = PL_CURRENT;
+
+    delete popup;
+
+    return (res >= 0);
+}
+
 

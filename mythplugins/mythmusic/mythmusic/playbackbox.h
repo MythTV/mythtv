@@ -89,22 +89,24 @@ class PlaybackBoxMusic : public MythThemedDialog
     void fromCD();
     void showSmartPlaylistDialog();
     void showSearchDialog();
-    
+    bool getInsertPLOptions(InsertPLOption &insertOption,
+                            PlayPLOption &playOption, bool &bRemoveDups);
+
   signals:
-  
+
     void dummy();   // debugging
 
   private:
 
     void wireUpTheme();
-    void updatePlaylistFromQuickPlaylist(QString whereClause,
-                                         bool replace = true);
-    void updatePlaylistFromSmartPlaylist(QString category, QString name);
+    void updatePlaylistFromQuickPlaylist(QString whereClause);
+    void updatePlaylistFromSmartPlaylist();
+    void doUpdatePlaylist(QString whereClause);
     void CycleVisualizer(void);
     void updatePlaylistFromCD(void);
     void setTrackOnLCD (Metadata *mdata);
-
     void postUpdate();
+    void playFirstTrack();
 
     QIODevice *input;
     AudioOutput *output;

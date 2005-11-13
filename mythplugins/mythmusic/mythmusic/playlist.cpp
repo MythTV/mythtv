@@ -519,6 +519,12 @@ void Playlist::loadPlaylistByID(int id, QString a_host)
         name = "and they should **REALLY** never see this";
 }
 
+void Playlist::fillSongsFromSonglist(QString songList, bool filter)
+{
+    raw_songlist = songList;
+    fillSongsFromSonglist(filter);
+}
+
 void Playlist::fillSongsFromSonglist(bool filter)
 {
     int an_int;
@@ -583,30 +589,105 @@ void Playlist::fillSonglistFromSongs()
     raw_songlist = a_list;
 }
 
-void Playlist::fillSonglistFromQuery(QString whereClause)
+void Playlist::fillSonglistFromQuery(QString whereClause,
+                                     bool removeDuplicates,
+                                     InsertPLOption insertOption,
+                                     int currentTrackID)
 {
+    QString orig_songlist;
+
+    if (insertOption != PL_FILTERONLY)
+        removeAllTracks();
+
     MSqlQuery query(MSqlQuery::InitCon());
 
     QString theQuery;
 
     theQuery = "SELECT intid FROM musicmetadata ";
-    
+
     if (whereClause.length() > 0)
       theQuery += whereClause;
 
     if (!query.exec(theQuery))
-    {    
+    {
         MythContext::DBError("Load songlist from query", query);
         raw_songlist = "";
         return;
     }
-    
-    raw_songlist = "";
+
+    QString new_songlist = "";
     while (query.next())
     {
-        raw_songlist += ", " + query.value(0).toString();
+        new_songlist += "," + query.value(0).toString();
     }
-    raw_songlist.remove(0, 2);
+    new_songlist.remove(0, 1);
+
+    if (insertOption != PL_FILTERONLY && removeDuplicates)
+    {
+        new_songlist = removeDuplicateTracks(new_songlist);
+    }
+
+    switch (insertOption)
+    {
+        case PL_REPLACE:
+            raw_songlist = new_songlist;
+            break;
+
+        case PL_INSERTATBEGINNING:
+            raw_songlist = new_songlist + "," + raw_songlist;
+            break;
+
+        case PL_INSERTATEND:
+            raw_songlist = raw_songlist + "," + new_songlist;
+            break;
+
+        case PL_INSERTAFTERCURRENT:
+        {
+            QStringList list = QStringList::split(",", raw_songlist);
+            QStringList::iterator it = list.begin();
+            raw_songlist = "";
+            bool bFound = false;
+
+            for (; it != list.end(); it++)
+            {
+                int an_int = QString(*it).toInt();
+                raw_songlist += "," + QString(*it);
+                if (!bFound && an_int == currentTrackID)
+                {
+                    bFound = true;
+                    raw_songlist += "," + new_songlist;
+                }
+            }
+
+            if (!bFound)
+            {
+                raw_songlist += "," + new_songlist;
+            }
+
+            raw_songlist.remove(0, 1);
+
+            break;
+        }
+
+        case PL_FILTERONLY:
+            orig_songlist = raw_songlist;
+            raw_songlist = new_songlist;
+            break;
+
+        default:
+            raw_songlist = new_songlist;
+    }
+
+    if (insertOption != PL_FILTERONLY)
+    {
+        fillSongsFromSonglist(false);
+        postLoad();
+    }
+    else
+    {
+        fillSongsFromSonglist(true);
+        raw_songlist = orig_songlist;
+    }
 }
 
 void Playlist::fillSongsFromCD()
@@ -615,7 +696,10 @@ void Playlist::fillSongsFromCD()
        addTrack(-1 * i, true, true);
 }
 
-void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name)
+void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name,
+                                             bool removeDuplicates,
+                                             InsertPLOption insertOption,
+                                             int currentTrackID)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -692,8 +776,8 @@ void Playlist::fillSonglistFromSmartPlaylist(QString category, QString name)
     // add limit
     if (limitTo > 0)
         whereClause +=  " LIMIT " + QString::number(limitTo); 
-             
-    fillSonglistFromQuery(whereClause); 
+
+    fillSonglistFromQuery(whereClause, removeDuplicates, insertOption, currentTrackID);
 }
     
 void Playlist::savePlaylist(QString a_name)
@@ -770,6 +854,24 @@ void Playlist::saveNewPlaylist(QString a_host)
     {
         MythContext::DBError("playlist insert", query);
     }
+}
+
+QString Playlist::removeDuplicateTracks(const QString &new_songlist)
+{
+    raw_songlist = raw_songlist.remove(' '); 
+
+    QStringList curList = QStringList::split(",", raw_songlist);
+    QStringList newList = QStringList::split(",", new_songlist);
+    QStringList::iterator it = newList.begin();
+    QString songlist = "";
+
+    for (; it != newList.end(); it++)
+    {
+        if (curList.find(QString(*it)) == curList.end())
+            songlist += "," + QString(*it);
+    }
+    songlist.remove(0, 1);
+    return songlist;
 }
 
 int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)

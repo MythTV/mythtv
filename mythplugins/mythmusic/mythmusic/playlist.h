@@ -13,6 +13,23 @@
 
 class PlaylistsContainer;
 
+
+enum InsertPLOption
+{
+    PL_REPLACE = 1,
+    PL_INSERTATBEGINNING,
+    PL_INSERTATEND,
+    PL_INSERTAFTERCURRENT,
+    PL_FILTERONLY
+};
+
+enum PlayPLOption
+{
+    PL_FIRST = 1,
+    PL_FIRSTNEW,
+    PL_CURRENT
+};
+
 class Track
 {
     //  Why isn't this class just Metadata?
@@ -77,10 +94,18 @@ class Playlist
 
     void fillSongsFromCD();
     void fillSongsFromSonglist(bool filter);
+    void fillSongsFromSonglist(QString songList, bool filter);
     void fillSonglistFromSongs();
-    void fillSonglistFromQuery(QString whereClause);
-    void fillSonglistFromSmartPlaylist(QString category, QString name);
-    
+    void fillSonglistFromQuery(QString whereClause, 
+                               bool removeDuplicates = false,
+                               InsertPLOption insertOption = PL_REPLACE,
+                               int currentTrackID = 0);
+    void fillSonglistFromSmartPlaylist(QString category, QString name,
+                                       bool removeDuplicates = false,
+                                       InsertPLOption insertOption = PL_REPLACE,
+                                       int currentTrackID = 0);
+    QString  getSonglist(void) { return raw_songlist; }
+
     void moveTrackUpDown(bool flag, Track *the_track);
 
     bool checkTrack(int a_track_id, bool cd_flag);
@@ -111,6 +136,7 @@ class Playlist
     int CreateCDAudio(void);
 
   private:
+    QString             removeDuplicateTracks(const QString &new_songlist);
     int                 playlistid;
     QString             name;
     QString             raw_songlist;
