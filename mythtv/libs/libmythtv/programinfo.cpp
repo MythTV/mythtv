@@ -7,6 +7,9 @@
 #include <qapplication.h>
 #include <qfile.h>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "programinfo.h"
 #include "scheduledrecording.h"
 #include "util.h"
@@ -3185,7 +3188,8 @@ void ProgramInfo::MarkAsInUse(bool inuse)
     if (inuse && inusekey.length() < 2)
     {
         inusekey = gContext->GetHostName() + " @ " +
-                   QDateTime::currentDateTime().toString();
+                   QDateTime::currentDateTime().toString() + " @ " +
+                   QString::number(getpid());
         notifyOfChange = true;
     }
 

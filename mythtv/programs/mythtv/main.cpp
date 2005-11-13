@@ -153,7 +153,10 @@ int main(int argc, char *argv[])
     delete tv;
 
     if (tvchain)
+    {
+        tvchain->DestroyChain();
         delete tvchain;
+    }
 
     if (priv_thread != 0) 
     {

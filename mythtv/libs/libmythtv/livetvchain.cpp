@@ -1,3 +1,5 @@
+#include <qsocket.h>
+
 #include "livetvchain.h"
 #include "mythcontext.h"
 #include "mythdbcon.h"
@@ -48,7 +50,7 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
 
     LiveTVChainEntry newent;
     newent.chanid = pginfo->chanid;
-    newent.starttime = pginfo->recstartts;
+    newent.starttime = QDateTime::fromString(pginfo->recstartts.toString(Qt::ISODate), Qt::ISODate);
     newent.discontinuity = discont;
     newent.hostprefix = m_hostprefix;
     newent.cardtype = m_cardtype;
@@ -179,6 +181,8 @@ void LiveTVChain::ReloadAll(void)
     m_lock.unlock();
 
     m_curpos = ProgramIsAt(m_cur_chanid, m_cur_startts);
+    if (m_curpos < 0)
+        m_curpos = 0;
 }
 
 void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry)
@@ -301,9 +305,24 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
 
     LiveTVChainEntry oldentry, entry;
     GetEntryAt(m_curpos, oldentry);
-    GetEntryAt(m_switchid, entry);
 
-    ProgramInfo *pginfo = EntryToProgram(entry);
+    ProgramInfo *pginfo = NULL;
+    while (!pginfo && m_switchid < (int)m_chain.count() && m_switchid >= 0)
+    {
+        GetEntryAt(m_switchid, entry);
+        pginfo = EntryToProgram(entry);
+
+        if (!pginfo)
+        {
+            if (m_switchid > m_curpos)
+                m_switchid++;
+            else
+                m_switchid--;
+        }
+    }
+
+    if (!pginfo)
+        return NULL;
 
     discont = true;
     if (m_curpos == m_switchid - 1)

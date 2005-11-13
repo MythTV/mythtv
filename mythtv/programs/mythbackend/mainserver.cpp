@@ -1295,6 +1295,10 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
 
     JobQueue::DeleteAllJobs(ds->chanid, ds->recstartts);
 
+    LiveTVChain *tvchain = GetChainWithRecording(pginfo);
+    if (tvchain)
+        tvchain->DeleteProgram(pginfo);
+
     int err;
     QString filename = ds->filename;
     bool followLinks = gContext->GetNumSetting("DeletesFollowLinks", 0);
@@ -3401,6 +3405,8 @@ FileTransfer *MainServer::getFileTransferBySock(QSocket *sock)
 
 LiveTVChain *MainServer::GetExistingChain(QString id)
 {
+    QMutexLocker lock(&liveTVChainsLock);
+
     LiveTVChain *chain;
 
     QPtrListIterator<LiveTVChain> it(liveTVChains);
@@ -3416,6 +3422,8 @@ LiveTVChain *MainServer::GetExistingChain(QString id)
 
 LiveTVChain *MainServer::GetExistingChain(QSocket *sock)
 {
+    QMutexLocker lock(&liveTVChainsLock);
+
     LiveTVChain *chain;
 
     QPtrListIterator<LiveTVChain> it(liveTVChains);
@@ -3429,6 +3437,23 @@ LiveTVChain *MainServer::GetExistingChain(QSocket *sock)
     return NULL;
 }
 
+LiveTVChain *MainServer::GetChainWithRecording(ProgramInfo *pginfo)
+{
+    QMutexLocker lock(&liveTVChainsLock);
+
+    LiveTVChain *chain;
+
+    QPtrListIterator<LiveTVChain> it(liveTVChains);
+    while ((chain = it.current()) != 0)
+    {
+        ++it;
+        if (chain->ProgramIsAt(pginfo) >= 0)
+            return chain;
+    }
+
+    return NULL;
+}
+
 void MainServer::AddToChains(LiveTVChain *chain)
 {
     liveTVChains.append(chain);
@@ -3436,6 +3461,8 @@ void MainServer::AddToChains(LiveTVChain *chain)
 
 void MainServer::DeleteChain(LiveTVChain *chain)
 {
+    QMutexLocker lock(&liveTVChainsLock);
+
     while (liveTVChains.removeRef(chain))
         ;
 

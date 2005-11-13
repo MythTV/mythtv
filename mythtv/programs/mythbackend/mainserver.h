@@ -144,10 +144,12 @@ class MainServer : public QObject
 
     LiveTVChain *GetExistingChain(QString id);
     LiveTVChain *GetExistingChain(QSocket *sock);
+    LiveTVChain *GetChainWithRecording(ProgramInfo *pginfo);
     void AddToChains(LiveTVChain *chain);
     void DeleteChain(LiveTVChain *chain);
 
     QPtrList<LiveTVChain> liveTVChains;
+    QMutex liveTVChainsLock;
 
     QMap<int, EncoderLink *> *encoderList;
 

@@ -604,7 +604,8 @@ void AutoExpire::FillDBOrdered(int expMethod)
             break;
         case emShortLiveTVPrograms:
             where = "recgroup = 'LiveTV' "
-                    "AND endtime < DATE_ADD(starttime, INTERVAL 2 MINUTE) ";
+                    "AND endtime < DATE_ADD(starttime, INTERVAL '2' MINUTE) "
+                    "AND DATE_ADD(endtime, INTERVAL '1' MINUTE) <= NOW() ";
             orderby = "starttime ASC";
             break;
     }

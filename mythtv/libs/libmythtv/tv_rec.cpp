@@ -887,6 +887,9 @@ void TVRec::TeardownRecorder(bool killFile)
                 JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
         }
 
+        if (tvchain)
+            FinishedRecording(curRecording);
+
         curRecording->MarkAsInUse(false);
         delete curRecording;
         curRecording = NULL;
@@ -2861,6 +2864,7 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
     {
         if (curRecording)
         {
+            FinishedRecording(curRecording);
             curRecording->MarkAsInUse(false);
             delete curRecording;
         }
