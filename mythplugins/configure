@@ -37,6 +37,9 @@ case $targetos in
 OpenBSD)
     phone="no"
 ;;
+Darwin) 
+    opengl="yes" 
+;;
 *) ;;
 esac
 
@@ -274,6 +277,9 @@ has_library()
 has_header()
 {
     HPATHS="$prefix/include /usr/local/include /usr/include /usr/include/g++-v3 /usr/X11R6/include /"
+    INCL=`echo $DYLD_LIBRARY_PATH $LD_LIBRARY_PATH | sed s/':'/' '/g`
+    HPATHS="$HPATHS `echo $INCL | sed s/lib/include/g` "
+
     HAS_IT="no"
     for HPATH in $HPATHS ; do
         if test x`ls $HPATH/$1* 2> /dev/null | head -n 1` != x"" ; then
