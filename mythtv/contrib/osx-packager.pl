@@ -298,9 +298,10 @@ our %conf = (
         '--disable-transcode',
         '--enable-mythgallery',
         '--enable-exif',
+        '--enable-new-exif',
         '--disable-mythgame',
         '--disable-mythmusic', 
-        '--disable-mythnews',
+        '--enable-mythnews',
         '--disable-mythphone',
         '--enable-mythweather',
       ],
@@ -540,6 +541,7 @@ foreach my $comp (@comps)
 {
   my $compdir = "$cvsdir/$comp/" ;
   my $svn = '/sw/bin/svn';
+#     $svn = '/Volumes/Users/nigel/bin/svn';
 
   # Get CVS
   unless (-d $compdir)
@@ -595,6 +597,15 @@ foreach my $comp (@comps)
              'PREFIX=../Resources',
              @qmake_opts,
              "$comp.pro" ]) or die;
+
+  if ($comp eq 'mythtv')
+  {
+    # MythTV has an empty subdirectory 'config' that causes problems for me:
+    system("touch config/config.pro");
+    # Nigel's hack to speedup building
+    system("echo SUBDIRS = mythfrontend >> programs/programs.pro");
+  }
+  
   &Verbose("Making $comp");
   &Syscall([ '/usr/bin/make' ]) or die;
   # install
