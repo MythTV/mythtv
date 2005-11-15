@@ -885,7 +885,7 @@ void TVRec::TeardownRecorder(bool killFile)
     {
         if (!killFile)
         {
-            //(new PreviewGenerator(curRecording))->Start();
+            (new PreviewGenerator(curRecording))->Start();
             if (autoRunJobs)
                 JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
         }
@@ -1010,6 +1010,7 @@ Channel *TVRec::GetV4LChannel(void)
  *  \return Buffer allocated with new containing frame in RGBA32 format if
  *          successful, NULL otherwise.
  */
+#define sLOC_ERR QString("TVRec Error: ")
 char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
                            int secondsin, int &bufferlen,
                            int &video_width, int &video_height,
@@ -1024,7 +1025,7 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
 #ifdef USING_FRONTEND
     if (!MSqlQuery::testDBConnection())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer could not connect to DB.");
+        VERBOSE(VB_IMPORTANT, sLOC_ERR + "Previewer could not connect to DB.");
         return NULL;
     }
 
@@ -1047,7 +1048,7 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
         }
         if (invalid)
         {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer file " +
+            VERBOSE(VB_IMPORTANT, sLOC_ERR + "Previewer file " +
                     QString("'%1'").arg(filename) + " is not valid.");
             return NULL;
         }
@@ -1056,7 +1057,7 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
     RingBuffer *tmprbuf = new RingBuffer(filename, false, false, 0);
     if (!tmprbuf->IsOpen())
     {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer could not open file: " +
+        VERBOSE(VB_IMPORTANT, sLOC_ERR + "Previewer could not open file: " +
                 QString("'%1'").arg(filename));
         delete tmprbuf;
         return NULL;
@@ -1064,7 +1065,6 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
 
     NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(pginfo);
     nupvidplay->SetRingBuffer(tmprbuf);
-    nupvidplay->SetAudioSampleRate(audioSampleRateDB);
 
     char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen, video_width,
                                              video_height, video_aspect);
@@ -1075,10 +1075,11 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
     return retbuf;
 #else // USING_FRONTEND
     QString msg = "Backend compiled without USING_FRONTEND !!!!";
-    VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+    VERBOSE(VB_IMPORTANT, sLOC_ERR + msg);
     return NULL;
 #endif // USING_FRONTEND
 }
+#undef sLOC_ERR
 
 void TVRec::CreateSIParser(int program_num)
 {
@@ -3683,7 +3684,7 @@ void TVRec::SwitchLiveTVRingBuffer(bool discont)
     ProgramInfo *oldinfo = tvchain->GetProgramAt(-1);
     if (oldinfo)
     {
-        //(new PreviewGenerator(oldinfo))->Start();
+        (new PreviewGenerator(oldinfo))->Start();
         delete oldinfo;
     }
 

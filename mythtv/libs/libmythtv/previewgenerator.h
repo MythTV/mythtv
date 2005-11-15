@@ -15,41 +15,16 @@ class PreviewGenerator : public QObject
 {
     Q_OBJECT
   public:
-    PreviewGenerator(const ProgramInfo *pginfo)
-        : programInfo(*pginfo),
-          eventSock(new QSocket(0, "preview event socket")),
-          serverSock(NULL)
-    {
-        QObject::connect(eventSock, SIGNAL(connected()), 
-                         this,      SLOT(  EventSocketConnected()));
-        QObject::connect(eventSock, SIGNAL(readyRead()), 
-                         this,      SLOT(  EventSocketRead()));
-        QObject::connect(eventSock, SIGNAL(connectionClosed()), 
-                         this,      SLOT(  EventSocketClosed()));
-    }
+    PreviewGenerator(const ProgramInfo *pginfo);
+    virtual ~PreviewGenerator();
 
-    void Start(void)
-    {
-        pthread_create(&previewThread, NULL, PreviewRun, this);
-        pthread_detach(previewThread);
-    }
 
-    virtual ~PreviewGenerator()
-    {
-        QMutexLocker locker(&previewLock);
-        const QString filename = programInfo.pathname + ".png";
-        emit previewThreadDone(filename);
-    }
-
-    static void *PreviewRun(void *param)
-    {
-        PreviewGenerator *gen = (PreviewGenerator*) param;
-        gen->Run();
-        gen->deleteLater();
-        return NULL;
-    }
-
+    void Start(void);
     void Run(void);
+
+    static bool SavePreview(QString filename,
+                            const unsigned char *data,
+                            uint width, uint height, float aspect);
 
   signals:
     void previewThreadDone(const QString&);
@@ -61,9 +36,18 @@ class PreviewGenerator : public QObject
     void EventSocketRead();
 
   private:
+    bool RemotePreviewSetup(void);
+    void RemotePreviewRun(void);
+    void RemotePreviewTeardown(void);
+    void LocalPreviewRun(void);
+    bool IsLocal(void) const;
+    static void *PreviewRun(void*);
+
     QMutex             previewLock;
     pthread_t          previewThread;
     ProgramInfo        programInfo;
+
+    bool               createSockets;
     QSocket           *eventSock;
     QSocketDevice     *serverSock;
 };

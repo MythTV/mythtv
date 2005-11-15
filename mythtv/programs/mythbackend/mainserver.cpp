@@ -44,6 +44,7 @@ using namespace std;
 #include "programinfo.h"
 #include "jobqueue.h"
 #include "autoexpire.h"
+#include "previewgenerator.h"
 
 /** Milliseconds to wait for an existing thread from
  *  process request thread pool.
@@ -3102,34 +3103,15 @@ void MainServer::HandleGenPreviewPixmap(QStringList &slist, PlaybackSock *pbs)
     unsigned char *data = (unsigned char *)elink->GetScreenGrab(
         pginfo, filename, secondsin, len, width, height, aspect);
 
-    if (data)
+    if (PreviewGenerator::SavePreview(filename+".png", data,
+                                      width, height, aspect))
     {
-        QImage img(data, width, height, 32, NULL, 65536 * 65536,
-                   QImage::LittleEndian);
-
-        float ppw = gContext->GetNumSetting("PreviewPixmapWidth", 160);
-        float pph = gContext->GetNumSetting("PreviewPixmapHeight", 120);
-
-        if (aspect <= 0)
-            aspect = ((float) width) / height;
-
-        if (aspect > ppw / pph)
-            pph = rint(ppw / aspect);
-        else
-            ppw = rint(pph * aspect);
-
-        img = img.smoothScale((int) ppw, (int) pph);
-
-        filename += ".png";
-        img.save(filename.ascii(), "PNG");
-
         QStringList retlist = "OK";
         SendResponse(pbssock, retlist);    
     }
     else
     {
-        VERBOSE(VB_ALL, QString("Not enough video to make thumbnail"));
-
+        VERBOSE(VB_IMPORTANT, "MainServer: Failed to make preview image.");
         QStringList outputlist = "BAD";
         SendResponse(pbssock, outputlist);
     } 
