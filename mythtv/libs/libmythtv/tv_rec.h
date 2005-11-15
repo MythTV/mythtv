@@ -321,7 +321,6 @@ class TVRec : public QObject
     int     overRecordSecNrml;
     int     overRecordSecCat;
     QString overRecordCategory;
-    QString recprefix;
 
     // Configuration variables from setup routines
     int               cardid;
@@ -360,7 +359,7 @@ class TVRec : public QObject
 
     // RingBuffer info
     RingBuffer  *ringBuffer;
-    QString      rbFileName;
+    QString      rbFilePrefix;
     QString      rbFileExt;
 
   public:

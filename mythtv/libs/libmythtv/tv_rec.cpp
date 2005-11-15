@@ -112,7 +112,6 @@ TVRec::TVRec(int capturecardnum)
       transcodeFirst(false), earlyCommFlag(false), runJobOnHostOnly(false),
       audioSampleRateDB(0), overRecordSecNrml(0), overRecordSecCat(0),
       overRecordCategory(""),
-      recprefix(""),
       // Configuration variables from setup rutines
       cardid(capturecardnum), ispip(false),
       // State variables
@@ -126,7 +125,7 @@ TVRec::TVRec(int capturecardnum)
       // tvchain
       tvchain(NULL),
       // RingBuffer info
-      ringBuffer(NULL), rbFileName(""), rbFileExt("mpg")
+      ringBuffer(NULL), rbFilePrefix(""), rbFileExt("mpg")
 {
 }
 
@@ -223,7 +222,7 @@ bool TVRec::Init(void)
     overRecordSecNrml = gContext->GetNumSetting("RecordOverTime");
     overRecordSecCat  = gContext->GetNumSetting("CategoryOverTime") * 60;
     overRecordCategory= gContext->GetSetting("OverTimeCategory");
-    recprefix         = gContext->GetSetting("RecordFilePrefix");
+    rbFilePrefix      = gContext->GetSetting("RecordFilePrefix");
 
     pthread_create(&event_thread, NULL, EventThread, this);
 
@@ -463,10 +462,6 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
             tvchain = NULL;
         }
 
-        // Figure out new ringbuffer backing file name.
-        QString rbBaseName = rcinfo->CreateRecordBasename(rbFileExt);
-        rbFileName = QString("%1/%2").arg(recprefix).arg(rbBaseName);
-
         // Add post-roll to new recording end time.
         bool spcat = (rcinfo->category == overRecordCategory);
         int secs = (spcat) ? overRecordSecCat : overRecordSecNrml;
@@ -475,8 +470,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
         // Tell event loop to begin recording.
         curRecording = new ProgramInfo(*rcinfo);
         curRecording->MarkAsInUse(true);
-        curRecording->pathname = rbFileName;
-        curRecording->hostname = gContext->GetHostName();
+        StartedRecording(curRecording);
+
         ChangeState(kState_RecordingOnly);
 
         retval = rsRecording;
@@ -586,8 +581,9 @@ void TVRec::StartedRecording(ProgramInfo *curRec)
     if (!curRec)
         return;
 
-    QString rbBaseName = rbFileName.section("/", -1);
-    curRec->StartedRecording(rbBaseName);
+    curRec->StartedRecording(rbFilePrefix, rbFileExt);
+    VERBOSE(VB_RECORD, LOC + "StartedRecording("<<curRec<<") fn("
+            <<curRec->GetFileName()<<")");
 
     if (curRec->chancommfree != 0)
         curRec->SetCommFlagged(COMM_FLAG_COMMFREE);
@@ -875,11 +871,6 @@ void TVRec::TeardownRecorder(bool killFile)
 
     if (ringBuffer)
         ringBuffer->StopReads();
-
-    if (killFile)
-    {
-        rbFileName = "";
-    }
 
     if (curRecording)
     {
@@ -2947,7 +2938,6 @@ void TVRec::HandleTuning(void)
         ClearFlags(kFlagWaitingForRecPause);
         if (ringBuffer)
             ringBuffer->Reset();
-        SetFlags(kFlagRingBufferReset);
         TuningFrequency(lastTuningRequest);
     }
 
@@ -3000,7 +2990,6 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
             GetDVBRecorder()->Close();
         if (ringBuffer)
             ringBuffer->Reset();
-        SetFlags(kFlagRingBufferReset);
     }
     if (HasFlags(kFlagWaitingForSIParser))
         ClearFlags(kFlagWaitingForSIParser);
@@ -3183,7 +3172,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             //FIXME check
             //ringBuffer->Reset();
             //ringBuffer->StartReads();
-            SetFlags(kFlagRingBufferReset);
             dummyRecorder->StartRecordingThread();
             SetFlags(kFlagDummyRecorderRunning);
         }
@@ -3337,11 +3325,12 @@ void TVRec::TuningNewRecorder(void)
 
     if (lastTuningRequest.flags & kFlagRecording)
     {
-        SetRingBuffer(new RingBuffer(rbFileName, true));
+        SetRingBuffer(new RingBuffer(rec->GetFileName(), true));
         if (!ringBuffer->IsOpen())
         {
-            QString msg = "RingBuffer '%1' not open...";
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(rbFileName));
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("RingBuffer '%1' not open...")
+                    .arg(rec->GetFileName()));
             SetRingBuffer(NULL);
             ClearFlags(kFlagPendingActions);
             goto err_ret;
@@ -3423,8 +3412,6 @@ void TVRec::TuningNewRecorder(void)
         channel->SetFd(recorder->GetVideoFd());
 
     SetFlags(kFlagRecorderRunning);
-    if (lastTuningRequest.flags & kFlagRecording)
-        StartedRecording(lastTuningRequest.program);
 
     autoRunJobs = init_jobs(rec, profile, runJobOnHostOnly,
                             transcodeFirst, earlyCommFlag);
@@ -3597,31 +3584,35 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
     }
 
     QString chanids = QString::number(chanid);
-    ProgramInfo *prog;
-    prog = ProgramInfo::GetProgramAtDateTime(chanids, QDateTime::currentDateTime());
+    ProgramInfo *prog = ProgramInfo::GetProgramAtDateTime(
+        chanids, QDateTime::currentDateTime());
 
     if (!prog)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetProgramRingBufferForLiveTV()"
+                "\n\t\t\tProgramInfo is NULL.");
         return false;
+    }
 
     if (prog->recstartts == prog->recendts)
     {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetProgramRingBufferForLiveTV()"
+                "\n\t\t\tProgramInfo is invalid.");
         delete prog;
         // deal with no data situations
         return false;
     }
 
     prog->recstartts = QDateTime::currentDateTime();
+    StartedRecording(prog);
 
-    QString rbBaseName = prog->CreateRecordBasename(rbFileExt);
-    rbFileName = QString("%1/%2").arg(recprefix).arg(rbBaseName);
-    prog->pathname = rbFileName;
-    prog->hostname = gContext->GetHostName();
-
-    *rb = new RingBuffer(rbFileName, true);
+    *rb = new RingBuffer(prog->GetFileName(), true);
     if (!(*rb)->IsOpen())
     {
-        QString msg = "RingBuffer '%1' not open...";
-        VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(rbFileName));
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("RingBuffer '%1' not open...")
+                .arg(prog->GetFileName()));
+
         delete *rb;
         delete prog;
 
@@ -3642,17 +3633,17 @@ bool TVRec::CreateLiveTVRingBuffer(void)
     {
         ClearFlags(kFlagPendingActions);
         ChangeState(kState_None);
-        VERBOSE(VB_IMPORTANT, "CreateLiveTVRingBuffer() failed");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "CreateLiveTVRingBuffer() failed");
         return false;
     }
 
     SetRingBuffer(rb);
 
-    StartedRecording(pginfo);
     pginfo->SetAutoExpire(kLiveTVAutoExpire);
     pginfo->ApplyRecordRecGroupChange("LiveTV");
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), false);
+    SetFlags(kFlagRingBufferReset);
 
     if (curRecording)
     {
@@ -3688,11 +3679,11 @@ void TVRec::SwitchLiveTVRingBuffer(bool discont)
         delete oldinfo;
     }
 
-    StartedRecording(pginfo);
     pginfo->SetAutoExpire(kLiveTVAutoExpire);
     pginfo->ApplyRecordRecGroupChange("LiveTV");
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
+    SetFlags(kFlagRingBufferReset);
 
     recorder->SetNextRecording(pginfo, rb);
     if (discont)

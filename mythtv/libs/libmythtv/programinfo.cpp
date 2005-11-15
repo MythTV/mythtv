@@ -21,6 +21,10 @@
 
 using namespace std;
 
+static bool insert_program(MSqlQuery&,
+                           const ProgramInfo*,
+                           const ScheduledRecording*);
+
 /** \fn StripHTMLTags(const QString&)
  *  \brief Returns a copy of "src" with all the HTML tags removed.
  *
@@ -1292,56 +1296,33 @@ QString ProgramInfo::GetPlaybackURL(QString playbackHost) const
     return tmpURL;
 }
 
-/** \fn ProgramInfo::StartedRecording(const QString&)
+/** \fn ProgramInfo::StartedRecording(QString, QString)
  *  \brief Inserts this ProgramInfo into the database as an existing recording.
  *  
  *  This method, of course, only works if a recording has been scheduled
  *  and started.
+ *
+ *  \param prefix Directory recording should be placed in
+ *  \param ext    File extension for recording
  */
-void ProgramInfo::StartedRecording(const QString &basename)
+void ProgramInfo::StartedRecording(QString prefix, QString ext)
 {
-    if (record == NULL) {
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    if (!record)
+    {
         record = new ScheduledRecording();
         record->loadByProgram(this);
     }
 
-    MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("INSERT INTO recorded (chanid,starttime,endtime,title,"
-                  " subtitle,description,hostname,category,recgroup,"
-                  " autoexpire,recordid,seriesid,programid,stars,"
-                  " previouslyshown,originalairdate,findid,transcoder,"
-                  " timestretch,recpriority,basename,progstart,progend)"
-                  " VALUES(:CHANID,:STARTS,:ENDS,:TITLE,:SUBTITLE,:DESC,"
-                  " :HOSTNAME,:CATEGORY,:RECGROUP,:AUTOEXP,:RECORDID,"
-                  " :SERIESID,:PROGRAMID,:STARS,:REPEAT,:ORIGAIRDATE,"
-                  " :FINDID,:TRANSCODER,:TIMESTRETCH,:RECPRIORITY,"
-                  " :BASENAME,:PROGSTART,:PROGEND);");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTS", recstartts);
-    query.bindValue(":ENDS", recendts);
-    query.bindValue(":TITLE", title.utf8());
-    query.bindValue(":SUBTITLE", subtitle.utf8());
-    query.bindValue(":DESC", description.utf8());
-    query.bindValue(":HOSTNAME", gContext->GetHostName());
-    query.bindValue(":CATEGORY", category.utf8());
-    query.bindValue(":RECGROUP", recgroup.utf8());
-    query.bindValue(":AUTOEXP", record->GetAutoExpire());
-    query.bindValue(":RECORDID", recordid);
-    query.bindValue(":SERIESID", seriesid.utf8());
-    query.bindValue(":PROGRAMID", programid.utf8());
-    query.bindValue(":FINDID", findid);
-    query.bindValue(":STARS", stars);
-    query.bindValue(":REPEAT", repeat);
-    query.bindValue(":ORIGAIRDATE", originalAirDate);
-    query.bindValue(":TRANSCODER", record->GetTranscoder());
-    query.bindValue(":TIMESTRETCH", timestretch);
-    query.bindValue(":RECPRIORITY", record->getRecPriority());
-    query.bindValue(":BASENAME", basename);
-    query.bindValue(":PROGSTART", startts);
-    query.bindValue(":PROGEND", endts);
-
-    if (!query.exec() || !query.isActive())
-        MythContext::DBError("WriteRecordedToDB", query);
+    hostname = gContext->GetHostName();
+    pathname = CreateRecordBasename(ext);
+    while (!insert_program(query, this, record))
+    {
+        recstartts.addSecs(1);
+        pathname = CreateRecordBasename(ext);
+    }
+    pathname = prefix + "/" + pathname;
 
     query.prepare("DELETE FROM recordedmarkup WHERE chanid = :CHANID"
                   " AND starttime = :START;");
@@ -1374,6 +1355,88 @@ void ProgramInfo::StartedRecording(const QString &basename)
     query.bindValue(":START", startts);
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Copy program ratings on record", query);    
+}
+
+static bool insert_program(MSqlQuery                &query,
+                           const ProgramInfo        *pg,
+                           const ScheduledRecording *schd)
+{
+    query.prepare("LOCK TABLES recorded WRITE");
+    if (!query.exec())
+    {
+        MythContext::DBError("insert_program -- lock", query);
+        return false;
+    }
+
+    query.prepare(
+        "SELECT recordid "
+        "    FROM recorded "
+        "    WHERE chanid    = :CHANID AND "
+        "          starttime = :STARTS");
+    query.bindValue(":CHANID", pg->chanid);
+    query.bindValue(":STARTS", pg->recstartts);
+
+    if (!query.exec() || query.size())
+    {
+        if (!query.isActive())
+            MythContext::DBError("insert_program -- select", query);
+        else
+            VERBOSE(VB_IMPORTANT, "recording already exists...");
+
+        query.prepare("UNLOCK TABLES");
+        query.exec();
+        return false;
+    }
+
+    query.prepare(    
+        "INSERT INTO recorded "
+        "   (chanid,    starttime,   endtime,         title,            "
+        "    subtitle,  description, hostname,        category,         "
+        "    recgroup,  autoexpire,  recordid,        seriesid,         "
+        "    programid, stars,       previouslyshown, originalairdate,  "
+        "    findid,    transcoder,  timestretch,     recpriority,      "
+        "    basename,  progstart,   progend) "
+        "VALUES"
+        "  (:CHANID,   :STARTS,     :ENDS,           :TITLE,            "
+        "   :SUBTITLE, :DESC,       :HOSTNAME,       :CATEGORY,         "
+        "   :RECGROUP, :AUTOEXP,    :RECORDID,       :SERIESID,         "
+        "   :PROGRAMID,:STARS,      :REPEAT,         :ORIGAIRDATE,      "
+        "   :FINDID,   :TRANSCODER, :TIMESTRETCH,    :RECPRIORITY,      "
+        "    :BASENAME, :PROGSTART,  :PROGEND) "
+        );
+
+    query.bindValue(":CHANID",      pg->chanid);
+    query.bindValue(":STARTS",      pg->recstartts);
+    query.bindValue(":ENDS",        pg->recendts);
+    query.bindValue(":TITLE",       pg->title.utf8());
+    query.bindValue(":SUBTITLE",    pg->subtitle.utf8());
+    query.bindValue(":DESC",        pg->description.utf8());
+    query.bindValue(":HOSTNAME",    pg->hostname);
+    query.bindValue(":CATEGORY",    pg->category.utf8());
+    query.bindValue(":RECGROUP",    pg->recgroup.utf8());
+    query.bindValue(":AUTOEXP",     schd->GetAutoExpire());
+    query.bindValue(":RECORDID",    pg->recordid);
+    query.bindValue(":SERIESID",    pg->seriesid.utf8());
+    query.bindValue(":PROGRAMID",   pg->programid.utf8());
+    query.bindValue(":FINDID",      pg->findid);
+    query.bindValue(":STARS",       pg->stars);
+    query.bindValue(":REPEAT",      pg->repeat);
+    query.bindValue(":ORIGAIRDATE", pg->originalAirDate);
+    query.bindValue(":TRANSCODER",  schd->GetTranscoder());
+    query.bindValue(":TIMESTRETCH", pg->timestretch);
+    query.bindValue(":RECPRIORITY", schd->getRecPriority());
+    query.bindValue(":BASENAME",    pg->pathname);
+    query.bindValue(":PROGSTART",   pg->startts);
+    query.bindValue(":PROGEND",     pg->endts);
+
+    bool ok = query.exec() && (query.numRowsAffected() > 0);
+    if (!ok && !query.isActive())
+        MythContext::DBError("insert_program -- insert", query);
+
+    query.prepare("UNLOCK TABLES");
+    query.exec();
+
+    return ok;
 }
 
 /** \fn ProgramInfo::FinishedRecording(bool prematurestop) 

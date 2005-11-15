@@ -142,7 +142,7 @@ class ProgramInfo
     void ForgetHistory(void);
 
     // Used to update database with recording info
-    void StartedRecording(const QString &basename);
+    void StartedRecording(QString prefix, QString ext);
     void FinishedRecording(bool prematurestop);
     void UpdateRecordingEnd(void);
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
@@ -150,7 +150,6 @@ class ProgramInfo
                                    const QString &newSubtitle);
 
     // Quick gets
-    QString CreateRecordBasename(const QString &ext) const;
     bool SetRecordBasename(QString basename);
     QString GetRecordBasename(void) const;
     QString GetRecordFilename(const QString &prefix) const;
@@ -182,6 +181,7 @@ class ProgramInfo
     bool UsesMaxEpisodes(void) const;
     int getProgramFlags(void) const;
     bool GetChannel(QString &channum, QString &input) const;
+    QString GetFileName() const { return pathname; }
 
     // DB sets
     void SetFilesize(long long fsize);
@@ -229,6 +229,9 @@ class ProgramInfo
     bool IsFindApplicable(void) const;
     void ShowRecordingDialog(void);
     void ShowNotRecordingDialog(void);
+
+    // Creates a basename from the start and end times
+    QString CreateRecordBasename(const QString &ext) const;
 
   public:
     // data

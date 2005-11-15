@@ -82,6 +82,11 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Chain: AppendNewProgram", query);
+    else
+        VERBOSE(VB_RECORD, QString("Chain: Appended '%1_%2.%3' @ %4")
+                .arg(newent.chanid)
+                .arg(newent.starttime.toString("yyyyMMddhhmmss"))
+                .arg("???").arg(m_maxpos));
 
     m_maxpos++;
     BroadcastUpdate();
@@ -341,16 +346,30 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
     
 void LiveTVChain::SwitchTo(int num)
 {
+    VERBOSE(VB_PLAYBACK, "LiveTVChain::SwitchTo("<<num<<")");
+
     int size = m_chain.count();
-    if (num < 0 || num >= (int)m_chain.count())
+    if ((num < 0) || (num >= size))
         num = size - 1;
 
     if (m_curpos != num)
         m_switchid = num;
+
+    if (print_verbose_messages & VB_PLAYBACK)
+    {
+        LiveTVChainEntry e;
+        GetEntryAt(num, e);
+        QString msg = QString("%1_%2.%3")
+            .arg(e.chanid)
+            .arg(e.starttime.toString("yyyyMMddhhmmss"))
+            .arg("???");
+        VERBOSE(VB_PLAYBACK, "LiveTVChain: Entry@"<<num<<": '"<<msg<<"'");
+    }
 }
 
 void LiveTVChain::SwitchToNext(bool up)
 {
+    VERBOSE(VB_PLAYBACK, "LiveTVChain::SwitchToNext("<<(up?"up":"down")<<")");
     if (up && HasNext())
         SwitchTo(m_curpos + 1);
     else if (!up && HasPrev())
