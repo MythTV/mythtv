@@ -610,23 +610,26 @@ void NuppelVideoPlayer::SetFileLength(int total, int frames)
     totalFrames = frames;
 }
 
-int NuppelVideoPlayer::OpenFile(bool skipDsp)
+int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries)
 {
     if (!skipDsp)
     {
         if (!ringBuffer)
         {
-            QString msg;
+            QString msg("");
 
             if (m_playbackinfo)
-                msg = QString("m_playbackinfo filename is %1")
-                               .arg(m_playbackinfo->GetRecordBasename());
+            {
+                msg = QString("\n\t\t\tm_playbackinfo filename is %1")
+                    .arg(m_playbackinfo->GetRecordBasename());
+            }
 
-            VERBOSE(VB_IMPORTANT, QString("NVP::OpenFile() Warning, old player "
-                    "exited before new ring buffer created.  RingBuffer will "
-                    "use filename %1. %2").arg(filename).arg(msg));
+            VERBOSE(VB_IMPORTANT, LOC + "OpenFile() Warning, "
+                    "old player exited before new ring buffer created. " + 
+                    QString("\n\t\t\tRingBuffer will use filename '%1'.")
+                    .arg(filename) + msg);
 
-            ringBuffer = new RingBuffer(filename, false);
+            ringBuffer = new RingBuffer(filename, false, true, retries);
             weMadeBuffer = true;
             livetv = false;
         }
@@ -3714,15 +3717,17 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
 
     using_null_videoout = true;
 
-    if (OpenFile() < 0)
+    if (OpenFile(false, 0) < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open file for preview.");
         return NULL;
+    }
 
     if (!hasFullPositionMap)
     {
-        VERBOSE(VB_IMPORTANT, "NVP: Does not have position map.\n" +
+        VERBOSE(VB_IMPORTANT, LOC + "Recording does not have position map.\n" +
                 QString("\t\t\tRun 'mythcommflag --file %1 --rebuild' to fix")
                 .arg(m_playbackinfo->GetRecordBasename()));
-        return NULL;
     }
 
     if ((video_width <= 0) || (video_height <= 0))
@@ -3734,7 +3739,8 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
 
     if (!InitVideo())
     {
-        VERBOSE(VB_IMPORTANT, "NVP: Unable to initialize video for screen grab.");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Unable to initialize video for screen grab.");
         return NULL;
     }
 
@@ -3743,44 +3749,54 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
 
     ClearAfterSeek();
 
-    number = (int)(secondsin * video_frame_rate);
-    if (number >= totalFrames)
-        number = totalFrames / 2;
+    number = (long long) (secondsin * video_frame_rate);
+    number = (number >= totalFrames) ? (totalFrames/2) : number;
 
-    previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
-    if (previewFromBookmark != 0)
+    // Only get bookmark if we have position map
+    if (hasFullPositionMap)
     {
-        bookmarkseek = GetBookmark();
-        if (bookmarkseek > 30)
-            number = bookmarkseek;
-    }
-
-    oldnumber = number;
-    LoadCutList();
-
-    commBreakMapLock.lock();
-    LoadCommBreakList();
-
-    while ((FrameIsInMap(number, commBreakMap) || 
-           (FrameIsInMap(number, deleteMap))))
-    {
-        number += (long long) (30 * video_frame_rate);
-        if (number >= totalFrames)
+        previewFromBookmark = gContext->GetNumSetting("PreviewFromBookmark");
+        if (previewFromBookmark != 0)
         {
-            number = oldnumber;
-            break;
+            bookmarkseek = GetBookmark();
+            if (bookmarkseek > 30)
+                number = bookmarkseek;
         }
     }
-    commBreakMapLock.unlock();
 
-    GetFrame(1, true);
-    DiscardVideoFrame(videoOutput->GetLastDecodedFrame());
+    // Only get commercial map if we have position map
+    if (hasFullPositionMap)
+    {
+        oldnumber = number;
+        LoadCutList();
 
-    fftime = number;
-    DoFastForward();
-    fftime = 0;
+        QMutexLocker locker(&commBreakMapLock);
+        LoadCommBreakList();
 
-    GetFrame(1, true);
+        while ((FrameIsInMap(number, commBreakMap) || 
+                (FrameIsInMap(number, deleteMap))))
+        {
+            number += (long long) (30 * video_frame_rate);
+            if (number >= totalFrames)
+            {
+                number = oldnumber;
+                break;
+            }
+        }
+    }
+
+    // Only do seek if we have position map
+    if (hasFullPositionMap)
+    {
+        GetFrame(1);
+        DiscardVideoFrame(videoOutput->GetLastDecodedFrame());
+
+        fftime = number;
+        DoFastForward();
+        fftime = 0;
+    }
+
+    GetFrame(1);
 
     if (!(frame = videoOutput->GetLastDecodedFrame()))
     {

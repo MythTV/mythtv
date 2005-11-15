@@ -5,6 +5,9 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <sched.h> // for sched_yield
+#include <sys/types.h> // for stat
+#include <sys/stat.h>  // for stat
+#include <unistd.h>    // for stat
 
 // C++ headers
 #include <iostream>
@@ -1019,13 +1022,47 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
     (void) video_width;
     (void) video_height;
 #ifdef USING_FRONTEND
-    RingBuffer *tmprbuf = new RingBuffer(filename, false);
-
     if (!MSqlQuery::testDBConnection())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer could not connect to DB.");
         return NULL;
+    }
 
-    NuppelVideoPlayer *nupvidplay =
-        new NuppelVideoPlayer(pginfo);
+    // pre-test local files for existence and size. 500 ms speed-up...
+    if (filename.left(1)=="/")
+    {
+        QFileInfo info(filename);
+        bool invalid = !info.exists() || !info.isReadable() || !info.isFile();
+        if (!invalid)
+        {
+            // Check size too, QFileInfo can not handle large files
+            struct stat status;
+            stat(filename.ascii(), &status);
+            // Using off_t requires a lot of 32/64 bit checking.
+            // So just get the size in blocks.
+            unsigned long long bsize = status.st_blksize;
+            unsigned long long nblk  = status.st_blocks;
+            unsigned long long approx_size = nblk * bsize;
+            invalid = (approx_size < 8*1024);
+        }
+        if (invalid)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer file " +
+                    QString("'%1'").arg(filename) + " is not valid.");
+            return NULL;
+        }
+    }
+
+    RingBuffer *tmprbuf = new RingBuffer(filename, false, false, 0);
+    if (!tmprbuf->IsOpen())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer could not open file: " +
+                QString("'%1'").arg(filename));
+        delete tmprbuf;
+        return NULL;
+    }
+
+    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(pginfo);
     nupvidplay->SetRingBuffer(tmprbuf);
     nupvidplay->SetAudioSampleRate(audioSampleRateDB);
 
