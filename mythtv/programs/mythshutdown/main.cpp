@@ -16,7 +16,7 @@ int lockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --lock");
     
-    gContext->SaveSetting("MythShutdownLock", 1);
+    gContext->SaveSettingOnHost("MythShutdownLock", "1", "");
     
     return 0;         
 }
@@ -25,7 +25,7 @@ int unlockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --unlock");
     
-    gContext->SaveSetting("MythShutdownLock", 0);         
+    gContext->SaveSettingOnHost("MythShutdownLock", "0", "");
     
     return 0;
 }
@@ -73,7 +73,7 @@ int getStatus()
         res += 4;
     }    
 
-    if (gContext->GetNumSetting("MythShutdownLock", 0) == 1)
+    if (gContext->GetSettingOnHost("MythShutdownLock", "", "0") == "1")
     {    
         VERBOSE(VB_IMPORTANT, "Shutdown is locked");
         res += 16;
