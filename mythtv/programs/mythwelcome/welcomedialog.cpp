@@ -23,7 +23,6 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
                                  const char* name)
                 :MythThemedDialog(parent, window_name, theme_filename, name)
 {
-    m_bSentAllowShutdown = false;
     checkConnectionToServer();
     
     LCD::SetupLCD();
@@ -73,9 +72,6 @@ void WelcomeDialog::startFrontend(void)
     myth_system(m_installDir + "/bin/mythfrontend");
     
     gContext->addListener(this);
-
-    // make sure the server knows we don't want to block shutdown when idle
-    sendAllowShutdown();
 }
 
 void WelcomeDialog::startFrontendClick(void)
@@ -595,32 +591,11 @@ bool WelcomeDialog::checkConnectionToServer(void)
         bRes = true;
     else
     {    
-        m_bSentAllowShutdown = false;
-
-        // try to connect to the backend if we are not connected
-        if (gContext->ConnectToMasterServer())
+        if (!gContext->ConnectToMasterServer(false))
             bRes = true;
     }
      
-    // this makes sure the main server has enough time to detect that
-    // a client has connected and release its blockshutdown flag
-    // before we tell it to ignore our connection when its idle  
-    if (gContext->IsConnectedToMaster() && !m_bSentAllowShutdown)
-        QTimer::singleShot(5000, this, SLOT(sendAllowShutdown()));
-
     return bRes;        
-}
-
-void WelcomeDialog::sendAllowShutdown(void)
-{
-    if (!gContext->IsConnectedToMaster())
-        return;
-
-    // tell the server we don't wont to block shutdown
-    gContext->AllowShutdown();
-    m_bSentAllowShutdown = true;
-  
-    updateAll();
 }
 
 void WelcomeDialog::showPopup(void)

@@ -86,7 +86,6 @@ class LCDProcClient : public QObject
     void scrollList();             // display a list line by line
     void updateRecordingList(void);
     void removeStartupMessage(void);
-    void sendAllowShutdown(void);
           
   private:
     void outputCenteredText(QString theScreen, QString theText,
@@ -205,8 +204,7 @@ class LCDProcClient : public QObject
     QString last_command;
     QString hostname;
     unsigned int port;
-    bool bSentAllowShutdown;
-      
+
     bool lcd_ready;
 
     bool lcd_showtime;

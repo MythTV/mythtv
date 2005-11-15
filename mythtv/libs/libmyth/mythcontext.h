@@ -213,7 +213,7 @@ class MythPrivRequest
  *   You must also update this value in
  *   mythplugins/mythweb/includes/mythbackend.php
  */
-#define MYTH_PROTO_VERSION "21"
+#define MYTH_PROTO_VERSION "22"
 
 /** \class MythContext
  *  \brief This class contains the runtime context for MythTV.
@@ -241,10 +241,11 @@ class MythContext : public QObject
     void ClearSettingsCache(QString myKey = "");
     void ActivateSettingsCache(bool activate = true);
 
-    bool ConnectToMasterServer(void);
+    bool ConnectToMasterServer(bool blockingClient = true);
     QSocketDevice *ConnectServer(QSocket *eventSocket,
                                  const QString &hostname,
-                                 int port);
+                                 int port,
+                                 bool blockingClient = false);
     bool IsConnectedToMaster(void);
     void SetBackend(bool backend);
     bool IsBackend(void);

@@ -64,7 +64,6 @@ LCDProcClient::LCDProcClient(LCDServer *lparent) :
     generic_progress = 0.0;
     volume_level = 0.0;
     connected = false;
-    bSentAllowShutdown = false;
     send_buffer = "";
     lcdMenuItems = new QPtrList<LCDMenuItem>;
     lcdMenuItems->setAutoDelete(true);
@@ -277,45 +276,27 @@ void LCDProcClient::checkConnections()
 {
     if (debug_level > 0)
         VERBOSE(VB_GENERAL, "LCDProcClient: checking connections");
-    
+
     // check connection to mythbackend
     if (!gContext->IsConnectedToMaster())
-    {    
+    {
         if (debug_level > 0)
            VERBOSE(VB_GENERAL, "LCDProcClient: connecting to master server");
-        
-        bSentAllowShutdown = false;
-        gContext->ConnectToMasterServer();
+        gContext->ConnectToMasterServer(false);
     }
-    
+
     //check connection to LCDProc server
     if (socket->state() == QSocket::Idle)
     {
         if (debug_level > 0)
            VERBOSE(VB_GENERAL, "LCDProcClient: connecting to LCDProc server");
-   
+
         lcd_ready = false;
         connected = false;
-        
+
         // Retry to connect. . .  Maybe the user restarted LCDd?
         connectToHost(hostname, port);
     }
-    
-    // this makes sure the main server has enough time to detect that
-    // a client has connected and release its blockshutdown flag
-    // before we tell it to ignore our connection when its idle  
-    if (gContext->IsConnectedToMaster() && !bSentAllowShutdown)
-        QTimer::singleShot(5000, this, SLOT(sendAllowShutdown()));
-}
-
-void LCDProcClient::sendAllowShutdown(void)
-{
-    if (!gContext->IsConnectedToMaster())
-        return;
-
-    // tell the server we don't wont to block shutdown
-    gContext->AllowShutdown();
-    bSentAllowShutdown = true;
 }
 
 void LCDProcClient::serverSendingData()
@@ -2061,8 +2042,8 @@ void LCDProcClient::updateRecordingList(void)
     isRecording = false;
 
     if (!gContext->IsConnectedToMaster())
-    {    
-        if (!gContext->ConnectToMasterServer())
+    {
+        if (!gContext->ConnectToMasterServer(false))
         {
             VERBOSE(VB_IMPORTANT, "LCDProcClient: Cannot get recording status "
                                   "- is the master server running?\n\t\t\t"

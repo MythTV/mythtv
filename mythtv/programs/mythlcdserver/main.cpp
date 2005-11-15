@@ -274,7 +274,7 @@ int main(int argc, char **argv)
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
     }
 
-    gContext->ConnectToMasterServer();
+    gContext->ConnectToMasterServer(false);
 
     //  Figure out port to listen on
     int assigned_port = gContext->GetNumSetting("LCDServerPort", 6545);

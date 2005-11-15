@@ -788,13 +788,18 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
         }
     }
 
-    if (commands[1] == "Playback")
+    if (commands[1] == "Playback" || commands[1] == "Monitor")
     {
+        // Monitor connections are same as Playback but they don't
+        // block shutdowns. See the Scheduler event loop for more.
+
         bool wantevents = commands[3].toInt();
-        VERBOSE(VB_GENERAL, "MainServer::HandleAnnounce Playback");
+        VERBOSE(VB_GENERAL, QString("MainServer::HandleAnnounce %1")
+                                    .arg(commands[1]));
         VERBOSE(VB_ALL, QString("adding: %1 as a client (events: %2)")
                                .arg(commands[2]).arg(wantevents));
         PlaybackSock *pbs = new PlaybackSock(this, socket, commands[2], wantevents);
+        pbs->setBlockShutdown(commands[1] == "Playback");
         playbackList.push_back(pbs);
     }
     else if (commands[1] == "SlaveBackend")
@@ -834,6 +839,8 @@ void MainServer::HandleAnnounce(QStringList &slist, QStringList commands,
                                   .arg(commands[2]);
         MythEvent me(message);
         gContext->dispatch(me);
+
+        pbs->setBlockShutdown(false);
 
         playbackList.push_back(pbs);
 

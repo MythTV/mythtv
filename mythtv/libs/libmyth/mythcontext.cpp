@@ -735,18 +735,19 @@ MythContext::~MythContext()
         delete d;
 }
 
-bool MythContext::ConnectToMasterServer(void)
+bool MythContext::ConnectToMasterServer(bool blockingClient)
 {
     QString server = gContext->GetSetting("MasterServerIP", "localhost");
     int port = gContext->GetNumSetting("MasterServerPort", 6543);
     if (!d->serverSock)
-        d->serverSock = ConnectServer(d->eventSock, server, port);
+        d->serverSock = ConnectServer(d->eventSock, server, port, blockingClient);
     return (bool) (d->serverSock);
 }
 
 QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
                                           const QString &hostname,
-                                          int port)
+                                          int port,
+                                          bool blockingClient)
 {
     QSocketDevice *serverSock = NULL;
     int cnt = 0;
@@ -823,7 +824,8 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
     if (serverSock)
     {
         // called with the lock
-        QString str = QString("ANN Playback %1 %2")
+        QString str = QString("ANN %1 %2 %3")
+            .arg(blockingClient ? "Playback" : "Monitor")
             .arg(d->m_localhostname).arg(false);
         QStringList strlist = str;
         WriteStringList(serverSock, strlist);
@@ -2168,7 +2170,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
     d->serverSockLock.lock();
     
     if (!d->serverSock)
-        ConnectToMasterServer();
+        ConnectToMasterServer(false);
 
     bool ok = false;
     
@@ -2180,7 +2182,7 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
         if (!ok)
         {
             VERBOSE(VB_IMPORTANT, QString("Connection to backend server lost"));
-            ConnectToMasterServer();
+            ConnectToMasterServer(false);
             WriteStringList(d->serverSock, strlist);
             ok = ReadStringList(d->serverSock, strlist, quickTimeout);
         }
@@ -2313,7 +2315,7 @@ void MythContext::EventSocketConnected(void)
         return;
 #endif
 
-    QString str = QString("ANN Playback %1 %2")
+    QString str = QString("ANN Monitor %1 %2")
                          .arg(d->m_localhostname).arg(true);
     QStringList strlist = str;
     WriteStringList(d->eventSock, strlist);

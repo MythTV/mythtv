@@ -32,7 +32,6 @@ class WelcomeDialog : public MythThemedDialog
     void updateStatus(void);
     void updateScreen(void);
     void closeDialog();
-    void sendAllowShutdown(void);
     void updateTime();  
     void showPopup();
     void cancelPopup();
@@ -72,7 +71,6 @@ class WelcomeDialog : public MythThemedDialog
     QString        m_timeFormat;
     bool           m_isRecording;
     bool           m_hasConflicts;
-    bool           m_bSentAllowShutdown;
     bool           m_bWillShutdown;
     QDateTime      m_nextRecordingStart;
     int            m_preRollSeconds;
