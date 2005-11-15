@@ -982,16 +982,6 @@ static HostCheckBox *UsePicControls()
     return gc;
 }
 
-static HostCheckBox *CCWarnSetting()
-{
-    HostCheckBox *gc = new HostCheckBox("CCBufferWarnings");
-    gc->setLabel(QObject::tr("Enable channel change buffer warnings"));
-    gc->setValue(false);
-    gc->setHelpText(QObject::tr("If enabled, MythTV will warn you whenever you "
-                   "change the channel but are not caught up to live TV."));
-    return gc;
-}
-
 static HostCheckBox *AudioNagSetting()
 {
     HostCheckBox *gc = new HostCheckBox("AudioNag");
@@ -3003,7 +2993,6 @@ PlaybackSettings::PlaybackSettings()
     gen2->addChild(ClearSavedPosition());
     gen2->addChild(AltClearSavedPosition());
     gen2->addChild(UsePicControls());
-    gen2->addChild(CCWarnSetting());
     gen2->addChild(AudioNagSetting());
     gen2->addChild(UDPNotifyPort());
     addChild(gen2);

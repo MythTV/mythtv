@@ -164,8 +164,8 @@ class TV : public QObject
     QString GetFiltersForChannel(void);
 
     void ToggleChannelFavorite(void);
-    void ChangeChannel(int direction, bool force = false);
-    void ChangeChannel(uint chanid, const QString &channum, bool force);
+    void ChangeChannel(int direction);
+    void ChangeChannel(uint chanid, const QString &channum);
     void PauseLiveTV(void);
     void UnpauseLiveTV(void);
 
@@ -313,8 +313,6 @@ class TV : public QObject
     bool    ff_rew_reverse;
     vector<int> ff_rew_speeds;
 
-    bool    showBufferedWarnings;
-    int     bufferedChannelThreshold;
     int     vbimode;
 
     // State variables
@@ -390,8 +388,6 @@ class TV : public QObject
     /// Queued ChanID (from EPG channel selector)
     uint    queuedChanID;
 
-    QString lastCC;         ///< Last channel (channum)
-    int     lastCCDir;      ///< Last channel changing direction
     QTimer *muteTimer;      ///< For temp. audio muting during channel changes
 
     // Channel changing timeout notification variables

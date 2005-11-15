@@ -202,7 +202,6 @@ TV::TV(void)
       autoCommercialSkip(false), tryUnflaggedSkip(false),
       smartForward(false), stickykeys(0),
       ff_rew_repos(1.0f), ff_rew_reverse(false),
-      showBufferedWarnings(false), bufferedChannelThreshold(0),
       vbimode(0),
       // State variables
       internalState(kState_None),
@@ -232,7 +231,7 @@ TV::TV(void)
       asInputMode(false), asInputModeExpires(QTime::currentTime()),
       // Channel changing state variables
       queuedChanNum(""),
-      lastCC(""), lastCCDir(0), muteTimer(new QTimer(this)),
+      muteTimer(new QTimer(this)),
       lockTimerOn(false),
       // previous channel functionality state variables
       prevChanKeyCnt(0), prevChanTimer(new QTimer(this)),
@@ -318,8 +317,6 @@ bool TV::Init(bool createWindow)
         ff_rew_speeds.push_back(
             gContext->GetNumSetting(QString("FFRewSpeed%1").arg(i), def[i]));
 
-    showBufferedWarnings     = gContext->GetNumSetting("CCBufferWarnings", 0);
-    bufferedChannelThreshold = gContext->GetNumSetting("CCWarnThresh", 10);
     QString vbiformat = gContext->GetSetting("VbiFormat");
     vbimode = (vbiformat.lower() == "pal teletext") ? 1 : 0;
     vbimode = (vbiformat.lower().left(4) == "ntsc") ? 2 : vbimode;
@@ -1762,20 +1759,6 @@ void TV::ProcessKeypress(QKeyEvent *e)
                             break;
                     }
                 }
-                else if (dialogname == "ccwarningdirection")
-                {
-                    if (GetOSD()->GetDialogResponse(dialogname) == 1)
-                        ChangeChannel(lastCCDir, true);
-                    else if (!paused)
-                        activenvp->Play(normal_speed, true);
-                }     
-                else if (dialogname == "ccwarningstring")
-                {
-                    if (GetOSD()->GetDialogResponse(dialogname) == 1)
-                        ChangeChannel(0, lastCC, true);
-                    else if (!paused)
-                        activenvp->Play(normal_speed, true);
-                }
                 else if (dialogname == "allowrecordingbox")
                 {
                     int result = GetOSD()->GetDialogResponse(dialogname);
@@ -2456,11 +2439,11 @@ void TV::SwapPIP(void)
     if (activenvp != nvp)
         ToggleActiveWindow();
 
-    ChangeChannel(0, pipchanname, false);
+    ChangeChannel(0, pipchanname);
 
     ToggleActiveWindow();
 
-    ChangeChannel(0, bigchanname, false);
+    ChangeChannel(0, bigchanname);
 
     ToggleActiveWindow();
 }
@@ -2958,36 +2941,9 @@ void TV::ToggleChannelFavorite(void)
     activerecorder->ToggleChannelFavorite();
 }
 
-void TV::ChangeChannel(int direction, bool force)
+void TV::ChangeChannel(int direction)
 {
     bool muted = false;
-
-    if (!force && GetOSD() && showBufferedWarnings && 
-        (nvp && (activenvp == nvp)))
-    {
-        int behind = activenvp->GetSecondsBehind();
-        if (behind > bufferedChannelThreshold)
-        {
-            VERBOSE(VB_GENERAL, LOC + "Channel change requested when the "
-                    "we is " << behind << " seconds behind Live TV.");
-
-            if (!paused)
-                nvp->Pause();
-
-            QString message = tr("You are currently behind real time. If you "
-                                 "change channels now, you will lose any "
-                                 "unwatched video.");
-            QStringList options;
-            options += tr("Change the channel anyway");
-            options += tr("Keep watching");
-
-            lastCCDir = direction;
-            dialogname = "ccwarningdirection";
-
-            GetOSD()->NewDialogBox(dialogname, message, options, 0);
-            return;
-        }
-    }
 
     if (nvp)
     {
@@ -3133,18 +3089,18 @@ void TV::CommitQueuedInput(void)
                 GetOSD()->HideSet("channel_number");
         }
         else if (activerecorder->CheckChannel(channum))
-            ChangeChannel(GetQueuedChanID(), channum, false);
+            ChangeChannel(GetQueuedChanID(), channum);
         else
-            ChangeChannel(GetQueuedChanID(), GetQueuedInput(), false);
+            ChangeChannel(GetQueuedChanID(), GetQueuedInput());
     }
 
     ClearInputQueues(true);
 }
 
-void TV::ChangeChannel(uint chanid, const QString &channum,  bool force)
+void TV::ChangeChannel(uint chanid, const QString &channum)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("ChangeChannel(%1, '%2', %3) ")
-            .arg(chanid).arg(channum).arg((force) ? "force" : "don't force"));
+    VERBOSE(VB_PLAYBACK, LOC + QString("ChangeChannel(%1, '%2') ")
+            .arg(chanid).arg(channum));
 
     QStringList reclist;
     bool muted = false;
@@ -3192,32 +3148,6 @@ void TV::ChangeChannel(uint chanid, const QString &channum,  bool force)
 
     if (!activerecorder->CheckChannel(channum))
         return;
-
-    if (!force && GetOSD() && nvp && (activenvp == nvp) && showBufferedWarnings)
-    {
-        int behind = activenvp->GetSecondsBehind();
-        if (behind > bufferedChannelThreshold)
-        {
-            VERBOSE(VB_GENERAL, LOC + "Channel change requested when the "
-                    "we is " << behind << " seconds behind Live TV.");
-
-            if (!paused)
-                nvp->Pause();
-
-            QString message = tr("You are currently behind real time. If you "
-                                 "change channels now, you will lose any "
-                                 "unwatched video.");
-            QStringList options;
-            options += tr("Change the channel anyway");
-            options += tr("Keep watching");
-
-            lastCC = channum;
-            dialogname = "ccwarningstring";
-
-            GetOSD()->NewDialogBox(dialogname, message, options, 0);
-            return;
-        }
-    }
 
     if (nvp)
     {
@@ -4278,7 +4208,7 @@ void TV::BrowseEnd(bool change)
 
     if (change)
     {
-        ChangeChannel(0, browsechannum, false);
+        ChangeChannel(0, browsechannum);
     }
 
     browsemode = false;
