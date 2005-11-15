@@ -317,14 +317,25 @@ See the Troubleshooting <ref id="Setting_DMA" name="section"> for more
 information.
 
 <sect2>Filesystems
-<p>MythTV creates large files, many in excess of 2GB.  You <em>must</em> use a
-filesystem that will allow you to create large files.  Filesystems known to
-have problems with large files are FAT and FAT32.
+<p>MythTV creates large files, many in excess of 4GB.  You <em>must</em> 
+use a 64 or 128 bit filesystem. These will allow you to create large files.
+Filesystems known to have problems with large files are FAT (all versions),
+and ReiserFS (versions 3 and 4). The ext3 filesystem can be made to work
+but requires great care in how you format and mount the volume.
 
 Because MythTV creates very large files, a filesystem that does well at
 deleting large files is important.  Numerous benchmarks show that XFS and
-JFS do very well at this task.  You are strongly encouraged to consider
-either of these for your MythTV filesystem.
+JFS do very well at this task.  You are <em>strongly</em> encouraged to
+consider one of these for your MythTV filesystem.  JFS is the absolute
+best at deletion, so you may want to try it if XFS gives you problems.
+
+<figure loc="here">
+<eps file="stop.eps" height="1cm">
+<img src="stop.png">
+<caption><bf>NOTE</bf>:  You <em>must not</em> use ReiserFS v3 for
+your recordings. You will get corrupted recordings if you do.
+</caption>
+</figure>
 
 Because of the size of the MythTV files, it may be useful to plan for future
 expansion right from the beginning.  If your case and power supply have the
