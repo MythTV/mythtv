@@ -41,7 +41,8 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
 
     // if idleTimeoutSecs is 0, the user disabled the auto-shutdown feature
     m_bWillShutdown = (gContext->GetNumSetting("idleTimeoutSecs", 0) != 0);
-    
+    m_secondsToShutdown = -1;
+
     wireUpTheme();
     assignFirstFocus();
     
@@ -107,7 +108,7 @@ void WelcomeDialog::customEvent(QCustomEvent *e)
     if ((MythEvent::Type)(e->type()) == MythEvent::MythEventMessage)
     {
         MythEvent *me = (MythEvent *) e;
-       
+
         if (me->Message().left(21) == "RECORDING_LIST_CHANGE")
         {
             VERBOSE(VB_GENERAL, "MythWelcome received a RECORDING_LIST_CHANGE event");
@@ -119,7 +120,15 @@ void WelcomeDialog::customEvent(QCustomEvent *e)
             VERBOSE(VB_GENERAL, "MythWelcome received a SCHEDULE_CHANGE event");
             QTimer::singleShot(500, this, SLOT(updateScheduledList()));   
         }
-    }    
+        else if (me->Message().left(18) == "SHUTDOWN_COUNTDOWN")
+        {
+            //VERBOSE(VB_GENERAL, "MythWelcome received a SHUTDOWN_COUNTDOWN event");
+            QString secs = me->Message().mid(19);
+            m_secondsToShutdown = secs.toInt();
+            updateStatusMessage();
+            updateScreen();
+        }
+    }
 }
 
 void WelcomeDialog::keyPressEvent(QKeyEvent *e)
@@ -571,8 +580,9 @@ void WelcomeDialog::updateStatusMessage(void)
     
     if (m_statusList.count() == 0)
     {
-        if (m_bWillShutdown)
-            m_statusList.append(tr("MythTV is idle and will shutdown shortly."));            
+        if (m_bWillShutdown && m_secondsToShutdown != -1)
+            m_statusList.append(tr("MythTV is idle and will shutdown in %1 seconds.")
+                    .arg(m_secondsToShutdown));
         else
             m_statusList.append(tr("MythTV is idle."));
     }

@@ -72,6 +72,7 @@ class WelcomeDialog : public MythThemedDialog
     bool           m_isRecording;
     bool           m_hasConflicts;
     bool           m_bWillShutdown;
+    int            m_secondsToShutdown;
     QDateTime      m_nextRecordingStart;
     int            m_preRollSeconds;
     int            m_idleWaitForRecordingTime;

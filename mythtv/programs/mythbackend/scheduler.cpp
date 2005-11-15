@@ -1294,6 +1294,9 @@ void Scheduler::RunScheduler(void)
                                               "occur in %1 seconds.")
                                              .arg(idleTimeoutSecs);
                                 VERBOSE(VB_ALL, msg);
+                                MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
+                                             .arg(idleTimeoutSecs));
+                                gContext->dispatch(me);
                             }
                             else if (itime % 10 == 0)
                             {
@@ -1301,6 +1304,9 @@ void Scheduler::RunScheduler(void)
                                               "shutdown!")
                                              .arg(idleTimeoutSecs - itime);
                                 VERBOSE(VB_ALL, msg);
+                                MythEvent me(QString("SHUTDOWN_COUNTDOWN %1")
+                                             .arg(idleTimeoutSecs - itime));
+                                gContext->dispatch(me);
                             }
                         }
                     }
