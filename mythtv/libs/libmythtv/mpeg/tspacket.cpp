@@ -14,7 +14,7 @@ const unsigned char TSHeader::PAYLOAD_ONLY_HEADER[4] =
 
 QString TSPacket::toString() const {
     QString str;
-    str.append("TSPacket @0x%1  ").arg(int(&data()[0]),0,16);
+    str.append("TSPacket @0x%1  ").arg(long(&data()[0]),0,16);
     str.append("raw: 0x%1 0x%2 0x%3 0x%4\n").arg(int(data()[0]),0,16).
         arg(int(data()[1]),0,16).arg(int(data()[2]),0,16).arg(int(data()[3]),0,16);
     str.append("                 inSync: %1\n").arg( HasSync());

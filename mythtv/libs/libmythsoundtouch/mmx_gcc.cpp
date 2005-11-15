@@ -251,7 +251,7 @@ void FIRFilterMMX::setCoefficients(const short *coeffs, uint newLength, uint uRe
     // Ensure that filter coeffs array is aligned to 16-byte boundary
     delete[] filterCoeffsUnalign;
     filterCoeffsUnalign = new short[2 * newLength + 8];
-    filterCoeffsAlign = (short *)(((uint)filterCoeffsUnalign + 15) & -16);
+    filterCoeffsAlign = (short *)(((ulong)filterCoeffsUnalign + 15) & -16);
 
     // rearrange the filter coefficients for mmx routines 
     for (i = 0;i < length; i += 4) 
