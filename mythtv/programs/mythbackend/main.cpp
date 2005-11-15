@@ -605,7 +605,7 @@ int main(int argc, char **argv)
 
     if (noexpirer)
         cerr << "********* Auto-Expire has been DISABLED with "
-                "the --noautoexpire option *********\n";
+                "the --noautoexpire option ********\n";
     else
         expirer = new AutoExpire(true, ismaster);
 
