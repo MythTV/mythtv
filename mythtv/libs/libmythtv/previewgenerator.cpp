@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include <qfileinfo.h>
 #include <qimage.h>
 #include "previewgenerator.h"
