@@ -1312,8 +1312,15 @@ void Scheduler::RunScheduler(void)
                     }
                 }
                 else
+                {
                     // not idle, make the time invalid
+                    if (idleSince.isValid())
+                    {
+                        MythEvent me(QString("SHUTDOWN_COUNTDOWN -1"));
+                        gContext->dispatch(me);
+                    }
                     idleSince = QDateTime();
+                }
             }
         }
     }
