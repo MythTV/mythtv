@@ -544,7 +544,7 @@
     </message>
     <message>
         <source>current conditions</source>
-        <translation>Nykyinen säätila</translation>
+        <translation>Nykyinen Säätila</translation>
     </message>
     <message>
         <source>Humidity</source>
@@ -584,7 +584,7 @@
     </message>
     <message>
         <source>today&apos;s forecast</source>
-        <translation>Päivän Sääennuste</translation>
+        <translation>Päivän Säätiedotus</translation>
     </message>
     <message>
         <source>tomorrow&apos;s outlook</source>
@@ -803,7 +803,7 @@
     </message>
     <message>
         <source> There will be a visibility of </source>
-        <translation> Näkyvyys tulee olemaan </translation>
+        <translation> Näkyvyys on </translation>
     </message>
     <message>
         <source> miles.</source>

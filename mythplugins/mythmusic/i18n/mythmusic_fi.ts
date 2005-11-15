@@ -3,7 +3,7 @@
     <name>DatabaseBox</name>
     <message>
         <source>Active Play Queue</source>
-        <translation>Aktiivinen Soittojono</translation>
+        <translation>Aktiivinen Soittolista</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -27,7 +27,7 @@
     </message>
     <message>
         <source>Move to Active Play Queue</source>
-        <translation>Siirrä Aktiiviseen Soittojonoon</translation>
+        <translation>Siirrä Aktiiviseen Soittolistaan</translation>
     </message>
     <message>
         <source>Delete This Playlist</source>
@@ -43,7 +43,7 @@
     </message>
     <message>
         <source>Clear the Active Play Queue</source>
-        <translation>Puhdista Aktiivinen Soittojono</translation>
+        <translation>Puhdista Aktiivinen Soittolista</translation>
     </message>
     <message>
         <source>Save Back to Playlist Tree</source>
@@ -229,11 +229,11 @@
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation>2 Toista: Ei Mitään</translation>
+        <translation>2 Toista: -</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation>Toista: Ei Mitään</translation>
+        <translation>Toista: -</translation>
     </message>
     <message>
         <source>playlist root</source>
@@ -305,11 +305,11 @@
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Etsi</translation>
     </message>
     <message>
         <source>From CD</source>
-        <translation type="unfinished"></translation>
+        <translation>CD:ltä</translation>
     </message>
 </context>
 <context>
@@ -708,11 +708,11 @@
     </message>
     <message>
         <source>Active Play Queue</source>
-        <translation>Aktiivinen Soittojono</translation>
+        <translation>Aktiivinen Soittolista</translation>
     </message>
     <message>
         <source>Active Play Queue (%1)</source>
-        <translation>Aktiivinen Soittojono (%1)</translation>
+        <translation>Aktiivinen Soittolista (%1)</translation>
     </message>
     <message>
         <source>Something is Wrong</source>
@@ -832,23 +832,23 @@
     </message>
     <message>
         <source>Automatically play CDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Soita CD automaattisesti</translation>
     </message>
     <message>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Laittaa CD:n automaattisesti soittolistaan ja aloittaa sen soittamisen.</translation>
     </message>
     <message>
         <source>Select the SCSI or IDE Device for CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse SCSI- tai IDE-laite CD:n kirjoittamiseen.</translation>
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation type="unfinished"></translation>
+        <translation>Haetaan musiikkitiedostoja</translation>
     </message>
     <message>
         <source>Rebuilding music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjestetään musiikkitietokantaa</translation>
     </message>
 </context>
 <context>

@@ -12,6 +12,7 @@
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generella inställningar</text>
       <text lang="SI">Splošne nastavitve</text>
+      <text lang="FI">Yleiset Asetukset</text>
       <action>GAME_SETTINGS</action>
    </button>
 
@@ -27,6 +28,7 @@
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generella inställningar</text>
       <text lang="SI">Splošne nastavitve</text>
+      <text lang="FI">Pelaajat</text>
       <action>GAME_PLAYERS</action>
    </button>
 
@@ -37,6 +39,7 @@
       <text lang="SV">Sök efter spel</text>
       <text lang="DE">Nach Spielen suchen</text>
       <text lang="SI">Iskanje iger</text>
+      <text lang="FI">Etsi Pelejä</text>
       <action>SEARCH_FOR_GAMES</action>
    </button>
 
@@ -52,6 +55,7 @@
       <text lang="PT">Configurações Gerais</text>
       <text lang="SV">Generella inställningar</text>
       <text lang="SI">Splošne nastavitve</text>
+      <text lang="FI">Tyhjennä Tietueet</text>
       <action>CLEAR_GAME_DATA</action>
    </button>
 

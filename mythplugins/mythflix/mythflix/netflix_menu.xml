@@ -3,18 +3,21 @@
   <button>
     <type>NETFLIX_QUEUE</type>
     <text>View Queue</text>
+    <text lang="FI">Näytä Listaus</text>
     <action>NETFLIX_QUEUE</action>
   </button>
   
   <button>
     <type>NETFLIX_BROWSE</type>
     <text>Browse Movies</text>
+    <text lang="FI">Selaa Elokuvia</text>
     <action>NETFLIX_BROWSE</action>
   </button>
 
   <button>
     <type>NETFLIX_HISTORY</type>
     <text>Rental History</text>
+    <text lang="FI">Historia</text>
     <action>NETFLIX_HISTORY</action>
   </button>
   

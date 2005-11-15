@@ -8,6 +8,7 @@
      <text lang="SV">Spel</text>
      <text lang="DE">Spiele</text>
      <text lang="SI">Igre</text>
+     <text lang="FI">Pelaa</text>
      <action>GAME_PLAY</action>
   </button>
 
