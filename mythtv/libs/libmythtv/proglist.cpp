@@ -1324,44 +1324,44 @@ void ProgLister::fillViewList(const QString &view)
 class plTitleSort
 {
     public:
-        plTitleSort(bool reverseSort = false) {m_reverse = reverseSort;}
+        plTitleSort(void) {;}
 
         bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
         {
-            if (m_reverse)
-                return (a->sortTitle > b->sortTitle);
-            else
-                return (a->sortTitle < b->sortTitle);
-        }
+            if (a->sortTitle != b->sortTitle)
+                    return (a->sortTitle < b->sortTitle);
 
-    private:
-        bool m_reverse;
+            if (a->recstatus == b->recstatus)
+                return a->startts < b->startts;
+
+            if (a->recstatus == rsRecording) return true;
+            if (b->recstatus == rsRecording) return false;
+
+            if (a->recstatus == rsWillRecord) return true;
+            if (b->recstatus == rsWillRecord) return false;
+
+            return a->startts < b->startts;
+        }
 };
 
 class plTimeSort
 {
     public:
-        plTimeSort(bool reverseSort = false) {m_reverse = reverseSort;}
+        plTimeSort(void) {;}
 
         bool operator()(const ProgramInfo *a, const ProgramInfo *b) 
         {
             if (a->startts == b->startts)
                 return (a->chanid < b->chanid);
 
-            if (m_reverse)
-                return (a->startts > b->startts);
-            else
-                return (a->startts < b->startts);
+            return (a->startts < b->startts);
         }
-
-    private:
-        bool m_reverse;
 };
 
 void ProgLister::fillItemList(void)
 {
     if (curView < 0)
-        return;
+         return;
 
     QString where;
     QString startstr = startTime.toString("yyyy-MM-ddThh:mm:50");
@@ -1502,30 +1502,30 @@ void ProgLister::fillItemList(void)
 
     while (itemList.count())
     {
-	s = itemList.take();
-	if (type == plTitle)
-	    s->sortTitle = s->subtitle;
-	else
-	    s->sortTitle = s->title;
+        s = itemList.take();
+        if (type == plTitle)
+            s->sortTitle = s->subtitle;
+        else
+            s->sortTitle = s->title;
 
-	s->sortTitle.remove(QRegExp("^(The |A |An )"));
-	sortedList.push_back(s);
+        s->sortTitle.remove(QRegExp("^(The |A |An )"));
+        sortedList.push_back(s);
     }
 
     if (type == plNewListings || titleSort)
     {
-	// Prune to one per title
-	sort(sortedList.begin(), sortedList.end(), plTitleSort());
+        // Prune to one per title
+        sort(sortedList.begin(), sortedList.end(), plTitleSort());
 
-	QString curtitle = "";
-	vector<ProgramInfo *>::iterator i = sortedList.begin();
+        QString curtitle = "";
+        vector<ProgramInfo *>::iterator i = sortedList.begin();
         while (i != sortedList.end())
         {
             ProgramInfo *p = *i;
             if (p->sortTitle != curtitle)
             {
                 curtitle = p->sortTitle;
-		i++;
+                i++;
             }
             else
             {
@@ -1535,19 +1535,19 @@ void ProgLister::fillItemList(void)
         }
     }
     if (!titleSort)
-	sort(sortedList.begin(), sortedList.end(), plTimeSort());
+        sort(sortedList.begin(), sortedList.end(), plTimeSort());
 
     if (reverseSort)
     {
-	vector<ProgramInfo *>::reverse_iterator r = sortedList.rbegin();
-	for (; r != sortedList.rend(); r++)
-	    itemList.append(*r);
+        vector<ProgramInfo *>::reverse_iterator r = sortedList.rbegin();
+        for (; r != sortedList.rend(); r++)
+            itemList.append(*r);
     }
     else
     {
-	vector<ProgramInfo *>::iterator i = sortedList.begin();
-	for (; i != sortedList.end(); i++)
-	    itemList.append(*i);
+        vector<ProgramInfo *>::iterator i = sortedList.begin();
+        for (; i != sortedList.end(); i++)
+            itemList.append(*i);
     }
 
     if (curItem < 0 && itemList.count() > 0)
