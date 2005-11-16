@@ -218,6 +218,7 @@ class RecorderBase : public QObject
 
     virtual void ResetForNewFile(void) = 0;
     virtual void FinishRecording(void) = 0;
+    virtual void StartNewFile(void) { }
 
     TVRec         *tvrec;
     RingBuffer    *ringBuffer;

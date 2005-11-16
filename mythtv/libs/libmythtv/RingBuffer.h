@@ -16,7 +16,7 @@ class RingBuffer
 {
   public:
     RingBuffer(const QString &lfilename, bool write,
-               bool usereadahead = true, uint read_retries = 4);
+               bool usereadahead = true, uint read_retries = 6);
    ~RingBuffer();
 
     // Sets

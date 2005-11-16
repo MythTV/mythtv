@@ -474,6 +474,7 @@ int NuppelDecoder::OpenFile(RingBuffer *rbuffer, bool novideo,
         GetNVP()->SetAudioParams(extradata.audio_bits_per_sample,
                                  extradata.audio_channels, 
                                  extradata.audio_sample_rate);
+        GetNVP()->ReinitAudio();
         foundit = 1;
     }
 
@@ -812,7 +813,7 @@ bool NuppelDecoder::isValidFrametype(char type)
     switch (type)
     {
         case 'A': case 'V': case 'S': case 'T': case 'R': case 'X':
-        case 'M': case 'D':
+        case 'M': case 'D': case 'Q': case 'K':
             return true;
         default:
             return false;
@@ -904,8 +905,16 @@ bool NuppelDecoder::GetFrame(int avignore)
             currentposition = ringBuffer->GetReadPosition();
         }
 
-        if (!ReadFrameheader(&frameheader)
-            || (frameheader.frametype == 'Q') || (frameheader.frametype == 'K'))
+        if (!ReadFrameheader(&frameheader))
+        {
+            ateof = true;
+            GetNVP()->SetEof();
+            return false;
+        }
+
+
+        if (!ringBuffer->LiveMode() && 
+            ((frameheader.frametype == 'Q') || (frameheader.frametype == 'K')))
         {
             ateof = true;
             GetNVP()->SetEof();

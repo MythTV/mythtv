@@ -3120,7 +3120,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     }
 
     bool livetv = request.flags & kFlagLiveTV;
-    if (livetv && !tvchain->TotalSize() && !CreateLiveTVRingBuffer())
+    if (livetv && !ringBuffer && !CreateLiveTVRingBuffer())
         return;
 
     // Start dummy recorder for devices capable of signal monitoring.
@@ -3320,7 +3320,7 @@ void TVRec::TuningNewRecorder(void)
     RecordingProfile profile;
     ProgramInfo *rec = lastTuningRequest.program;
     if (tvchain)
-        rec = tvchain->GetProgramAt(0);
+        rec = tvchain->GetProgramAt(-1);
 
     load_recording_profile(profile, rec, cardid);
 
@@ -3642,8 +3642,10 @@ bool TVRec::CreateLiveTVRingBuffer(void)
 
     pginfo->SetAutoExpire(kLiveTVAutoExpire);
     pginfo->ApplyRecordRecGroupChange("LiveTV");
+
+    bool discont = (tvchain->TotalSize() > 0);
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
-                              channel->GetCurrentInput(), false);
+                              channel->GetCurrentInput(), discont);
     SetFlags(kFlagRingBufferReset);
 
     if (curRecording)

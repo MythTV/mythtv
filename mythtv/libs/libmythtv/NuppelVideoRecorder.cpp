@@ -170,6 +170,7 @@ NuppelVideoRecorder::NuppelVideoRecorder(TVRec *rec, ChannelBase *channel)
 
     volume = 100;
     go7007 = false;
+    resetcapture = false;
 }
 
 NuppelVideoRecorder::~NuppelVideoRecorder(void)
@@ -384,7 +385,10 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
         SetIntOption(profile, "samplerate");
     }
     else if (setting == "Uncompressed")
+    {
         SetOption("audiocompression", 0);
+        SetIntOption(profile, "samplerate");
+    }
     else
     {
         VERBOSE(VB_IMPORTANT, "NVR: Error, unknown audio codec");
@@ -849,6 +853,7 @@ void NuppelVideoRecorder::InitBuffers(void)
         vidbuf->freeToEncode = 0;
         vidbuf->freeToBuffer = 1;
         vidbuf->bufferlen = 0;
+        vidbuf->forcekey = 0;
        
         videobuffer.push_back(vidbuf);
     }
@@ -982,8 +987,11 @@ void NuppelVideoRecorder::StartRecording(void)
     }
 
     StreamAllocate();
+
+    positionMapLock.lock();
     positionMap.clear();
     positionMapDelta.clear();
+    positionMapLock.unlock();
 
     if (codec.lower() == "rtjpeg")
         useavcodec = false;
@@ -1199,8 +1207,7 @@ void NuppelVideoRecorder::StartRecording(void)
 
     KillChildren();
 
-    if (!livetv)
-        WriteSeekTable();
+    FinishRecording();
 
     recording = false;
     close(fd);
@@ -1372,6 +1379,7 @@ void NuppelVideoRecorder::DoV4L2(void)
     struct timeval tv;
     fd_set rdset;
     int frame = 0;
+    bool forcekey = false;
 
     encoding = true;
     recording = true;
@@ -1391,6 +1399,23 @@ again:
             continue;
         }
         mainpaused = false;
+
+        if (resetcapture && go7007)
+        {
+            int turnon = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+            ioctl(fd, VIDIOC_STREAMOFF, &turnon);
+
+            for (int i = 0; i < numbuffers; i++)
+            {
+                memset(buffers[i], 0, bufferlen[i]);
+                vbuf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+                vbuf.index = i;
+                ioctl(fd, VIDIOC_QBUF, &vbuf);
+             }
+
+             ioctl(fd, VIDIOC_STREAMON, &turnon);
+             resetcapture = false;
+        }
 
         tv.tv_sec = 5;
         tv.tv_usec = 0;
@@ -1429,6 +1454,8 @@ again:
         }
 
         frame = vbuf.index;
+        if (go7007)
+            forcekey = vbuf.flags & V4L2_BUF_FLAG_KEYFRAME;
 
         if (!request_pause)
         {
@@ -1480,7 +1507,7 @@ again:
             else
             {
                 // buffer the frame directly
-                BufferIt(buffers[frame], vbuf.bytesused);
+                BufferIt(buffers[frame], vbuf.bytesused, forcekey);
             }
         }
 
@@ -1497,8 +1524,7 @@ again:
         munmap(buffers[i], bufferlen[i]);
     }
 
-    if (!livetv)
-        WriteSeekTable();
+    FinishRecording();
 
     recording = false;
     close(fd);
@@ -1629,9 +1655,8 @@ void NuppelVideoRecorder::DoMJPEG(void)
 
     munmap(MJPG_buff, breq.count * breq.size);
     KillChildren();
-            
-    if (!livetv)
-        WriteSeekTable();
+        
+    FinishRecording();    
             
     recording = false;
     close(fd);
@@ -1690,7 +1715,7 @@ void NuppelVideoRecorder::KillChildren(void)
 #endif
 }
 
-void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
+void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len, bool forcekey)
 {
     int act;
     long tcres;
@@ -1746,6 +1771,7 @@ void NuppelVideoRecorder::BufferIt(unsigned char *buf, int len)
 
     memcpy(videobuffer[act]->buffer, buf, len);
     videobuffer[act]->bufferlen = len;
+    videobuffer[act]->forcekey = forcekey;
 
     videobuffer[act]->freeToBuffer = 0;
     act_video_buffer++;
@@ -1947,16 +1973,6 @@ void NuppelVideoRecorder::WriteSeekTable(void)
 
     ringBuffer->WriterSeek(0, SEEK_END);
 
-    if (curRecording)
-    {
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
-        if (positionMapDelta.size())
-        {
-            curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME);
-            positionMapDelta.clear();
-        } 
-    }
-
     delete [] seekbuf;
 }
 
@@ -1999,7 +2015,8 @@ void NuppelVideoRecorder::WriteKeyFrameAdjustTable(
     delete [] kfa_buf;
 }
 
-void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offset)
+void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool update_db,
+                                          long offset)
 {
     long long position = ringBuffer->GetWritePosition() + offset;
     struct seektable_entry ste;
@@ -2007,18 +2024,34 @@ void NuppelVideoRecorder::UpdateSeekTable(int frame_num, bool use_db, long offse
     ste.keyframe_number = frame_num;
     seektable->push_back(ste);
 
+    bool save_map = false;
+
+    positionMapLock.lock();
     if (!positionMap.contains(ste.keyframe_number))
     {
         positionMapDelta[ste.keyframe_number] = position;
         positionMap[ste.keyframe_number] = position;
+        lastPositionMapPos = position;
+        save_map = true;
+    }
+    positionMapLock.unlock();
 
-        if (use_db && curRecording &&
-            (positionMapDelta.size() % 15) == 0)
-        {
-            curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME);
-            curRecording->SetFilesize(position);
-            positionMapDelta.clear();
-        }
+    if (save_map && update_db)
+        SavePositionMap(false);
+}
+
+void NuppelVideoRecorder::SavePositionMap(bool force)
+{
+    QMutexLocker locker(&positionMapLock);
+
+    force |= (positionMap.size() < 30) && (positionMap.size() % 5 == 1);
+    force |= positionMapDelta.size() >= 30;
+
+    if (curRecording && force)
+    {
+        curRecording->SetPositionMapDelta(positionMapDelta, MARK_KEYFRAME);
+        curRecording->SetFilesize(lastPositionMapPos);
+        positionMapDelta.clear();
     }
 }
 
@@ -2045,9 +2078,7 @@ int NuppelVideoRecorder::CreateNuppelFile(void)
 
 void NuppelVideoRecorder::Reset(void)
 {
-    framesWritten = 0;
-    lf = 0;
-    last_block = 0;
+    ResetForNewFile();
 
     for (int i = 0; i < video_buffer_count; i++)
     {
@@ -2056,6 +2087,7 @@ void NuppelVideoRecorder::Reset(void)
         vidbuf->timecode = 0;
         vidbuf->freeToEncode = 0;
         vidbuf->freeToBuffer = 1;
+        vidbuf->forcekey = 0;
     }
 
     for (int i = 0; i < audio_buffer_count; i++)
@@ -2087,20 +2119,10 @@ void NuppelVideoRecorder::Reset(void)
     effectivedsp = 0;
 
     if (useavcodec)
-    {
         SetupAVCodec();
-    }
-
-    //XXX Switch files..
-
-    seektable->clear();
-    positionMap.clear();
-    positionMapDelta.clear();
 
     if (curRecording)
-    {
         curRecording->ClearPositionMap(MARK_KEYFRAME);
-    }
 }
 
 void *NuppelVideoRecorder::WriteThread(void *param)
@@ -3262,7 +3284,9 @@ void NuppelVideoRecorder::doWriteThread(void)
             continue;
         }
         writepaused = false;
-    
+
+        CheckForRingBufferSwitch();
+ 
         enum 
         { ACTION_NONE, 
           ACTION_VIDEO, 
@@ -3306,12 +3330,14 @@ void NuppelVideoRecorder::doWriteThread(void)
                 frame.size = videobuffer[act_video_encode]->bufferlen;
                 frame.frameNumber = videobuffer[act_video_encode]->sample;
                 frame.timecode = videobuffer[act_video_encode]->timecode;
-    
+                frame.forcekey = videobuffer[act_video_encode]->forcekey;  
+ 
                 WriteVideo(&frame);
 
                 videobuffer[act_video_encode]->sample = 0;
                 videobuffer[act_video_encode]->freeToEncode = 0;
                 videobuffer[act_video_encode]->freeToBuffer = 1;
+                videobuffer[act_video_encode]->forcekey = 0;
                 act_video_encode++;
                 if (act_video_encode >= video_buffer_count)
                     act_video_encode = 0;
@@ -3359,6 +3385,8 @@ void NuppelVideoRecorder::doWriteThread(void)
 
 long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
 {
+    QMutexLocker lock(&positionMapLock);
+
     long long ret = -1;
 
     if (positionMap.find(desired) != positionMap.end())
@@ -3367,21 +3395,57 @@ long long NuppelVideoRecorder::GetKeyframePosition(long long desired)
     return ret;
 }
 
-void NuppelVideoRecorder::SetNextRecording(const ProgramInfo*, RingBuffer*)
+void NuppelVideoRecorder::SetNextRecording(const ProgramInfo *progInf, 
+                                           RingBuffer *rb)
 {
-    // TODO
-}
+    // First we do some of the time consuming stuff we can do now
+    SavePositionMap(true);
+    ringBuffer->WriterFlush();
 
-void NuppelVideoRecorder::CheckForRingBufferSwitch(void)
-{
+    // Then we set the next info
+    QMutexLocker locker(&nextRingBufferLock);
+    nextRecording = NULL;
+    if (progInf)
+        nextRecording = new ProgramInfo(*progInf);
+    nextRingBuffer = rb;
 }
 
 void NuppelVideoRecorder::ResetForNewFile(void)
 {
+    framesWritten = 0;
+    lf = 0;
+    last_block = 0;
+
+    seektable->clear();
+
+    positionMapLock.lock();
+    positionMap.clear();
+    positionMapDelta.clear();
+    positionMapLock.unlock();
+
+    resetcapture = true;
+}
+
+void NuppelVideoRecorder::StartNewFile(void)
+{
+    CreateNuppelFile();
 }
 
 void NuppelVideoRecorder::FinishRecording(void)
 {
+    ringBuffer->WriterFlush();
+
+    WriteSeekTable();
+
+    if (curRecording)
+    {
+        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+        SavePositionMap(true);
+    }
+    positionMapLock.lock();
+    positionMap.clear();
+    positionMapDelta.clear();
+    positionMapLock.unlock();
 }
 
 void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync, 
@@ -3414,6 +3478,7 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
         startnum = fnum;
         lasttimecode = 0;
         frameofgop = 0;
+        forcekey = true;
     }
 
     // count free buffers -- FIXME this can be done with less CPU time!!
@@ -3450,12 +3515,20 @@ void NuppelVideoRecorder::WriteVideo(VideoFrame *frame, bool skipsync,
 
     bool wantkeyframe = forcekey;
 
-    if (((fnum-startnum)>>1) % keyframedist == 0 && !skipsync) {
+    bool writesync = false;
+
+    if (!go7007 && (((fnum-startnum)>>1) % keyframedist == 0 && !skipsync))
+        writesync = true;
+    else if (go7007 && frame->forcekey)
+        writesync = true;
+
+    if (writesync) 
+    {
         frameheader.keyframe=0;
         frameofgop=0;
         ringBuffer->Write("RTjjjjjjjjjjjjjjjjjjjjjjjj", FRAMEHEADERSIZE);
 
-        UpdateSeekTable(((fnum - startnum) >> 1) / keyframedist, true);
+        UpdateSeekTable(((fnum - startnum) >> 1) / keyframedist);
 
         frameheader.frametype    = 'S';           // sync frame
         frameheader.comptype     = 'V';           // video sync information

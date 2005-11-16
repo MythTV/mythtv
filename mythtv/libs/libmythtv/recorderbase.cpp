@@ -203,6 +203,8 @@ void RecorderBase::CheckForRingBufferSwitch(void)
         if (oldrec)
             delete oldrec;
         rb_changed = true;
+
+        StartNewFile();
     }
     nextRingBufferLock.unlock();
 

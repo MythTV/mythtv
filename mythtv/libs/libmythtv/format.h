@@ -145,6 +145,7 @@ typedef struct vidbuffertype
     int freeToBuffer;
     unsigned char *buffer;
     int bufferlen;
+    int forcekey;
 } vidbuffertyp;
 
 typedef struct audbuffertype

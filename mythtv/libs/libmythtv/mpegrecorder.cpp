@@ -537,6 +537,7 @@ void MpegRecorder::FinishRecording(void)
     }
     positionMapLock.lock();
     positionMap.clear();
+    positionMapDelta.clear();
     positionMapLock.unlock();
 }
 

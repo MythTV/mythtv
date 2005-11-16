@@ -78,16 +78,16 @@ class NuppelVideoRecorder : public RecorderBase
     long long GetKeyframePosition(long long desired);
 
     void SetNextRecording(const ProgramInfo*, RingBuffer*);
-    void CheckForRingBufferSwitch(void);
     void ResetForNewFile(void);
     void FinishRecording(void);
+    void StartNewFile(void);
 
     // reencode stuff
     void StreamAllocate(void);
     void WriteHeader(void);
     void WriteSeekTable(void);
     void WriteKeyFrameAdjustTable(QPtrList<struct kfatable_entry> *kfa_table);
-    void UpdateSeekTable(int frame_num, bool update_db, long offset = 0);
+    void UpdateSeekTable(int frame_num, bool update_db = true, long offset = 0);
 
     bool SetupAVCodec(void);
     void SetupRTjpeg(void);
@@ -113,6 +113,8 @@ class NuppelVideoRecorder : public RecorderBase
  private:
     inline void WriteFrameheader(rtframeheader *fh);
 
+    void SavePositionMap(bool force);
+
     void InitBuffers(void);
     void InitFilters(void);   
     void ResizeVideoBuffers(void);
@@ -122,7 +124,7 @@ class NuppelVideoRecorder : public RecorderBase
     int SpawnChildren(void);
     void KillChildren(void);
     
-    void BufferIt(unsigned char *buf, int len = -1);
+    void BufferIt(unsigned char *buf, int len = -1, bool forcekey = false);
     
     int CreateNuppelFile(void);
 
@@ -215,6 +217,8 @@ class NuppelVideoRecorder : public RecorderBase
     vector<struct seektable_entry> *seektable;
     QMap<long long, long long> positionMap;
     QMap<long long, long long> positionMapDelta;
+    QMutex positionMapLock;
+    long long lastPositionMapPos;
 
     long long extendeddataOffset;
 
@@ -282,6 +286,7 @@ class NuppelVideoRecorder : public RecorderBase
 
     int volume;
     bool go7007;
+    bool resetcapture;
 };
 
 #endif

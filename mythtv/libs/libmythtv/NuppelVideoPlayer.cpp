@@ -1878,21 +1878,16 @@ void NuppelVideoPlayer::CheckTVChain(void)
 
 void NuppelVideoPlayer::SwitchToProgram(void)
 {
-    // Don't switch until we're low on data in the read ahead buffer
-    if (ringBuffer->DataInReadAhead() > 128000)
+    if (videoOutput && videoOutput->ValidVideoFrames() > 3 &&
+        ringBuffer->DataInReadAhead() > 128000)
+    {
         return;
+    }
 
     bool discontinuity = false, newtype = false;
     ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
     if (!pginfo)
         return;
-
-    if (discontinuity)
-    {
-        // Don't switch until we've displayed most of the existing decoded frames.
-        while (videoOutput && videoOutput->ValidVideoFrames() > 3)
-            usleep(500);
-    }
 
     if (m_playbackinfo)
     {
@@ -1907,9 +1902,9 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     ringBuffer->OpenFile(pginfo->pathname);
 
-    if (discontinuity)
+    if (discontinuity || newtype)
     {
-        ringBuffer->Reset();
+        ringBuffer->Reset(true);
         if (newtype)
             OpenFile();
         else
@@ -1925,7 +1920,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     ringBuffer->Unpause();
 
-    if (discontinuity)
+    if (discontinuity || newtype)
     {
         livetvchain->SetProgram(pginfo);
         GetDecoder()->SetProgramInfo(pginfo);
@@ -2780,7 +2775,7 @@ long long NuppelVideoPlayer::CalcRWTime(long long rw) const
 
     if ((framesPlayed - rw + 1) < 0)
     {
-        livetvchain->JumpToNext(false, (int)(-5.0 * video_frame_rate));
+        livetvchain->JumpToNext(false, (int)(-15.0 * video_frame_rate));
         return -1;
     }
 
