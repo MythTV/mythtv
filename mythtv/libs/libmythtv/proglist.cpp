@@ -1494,41 +1494,60 @@ void ProgLister::fillItemList(void)
                      "INTERVAL '1' HOUR) ";
     }
 
-    if (titleSort && type == plTitle)
-        where += " GROUP BY subtitle ";
-    else if (type == plNewListings || titleSort)
-        where += " GROUP BY title ";
-
     schedList.FromScheduler();
     itemList.FromProgram(where, bindings, schedList);
 
-    if (titleSort || reverseSort)
+    ProgramInfo *s;
+    vector<ProgramInfo *> sortedList;
+
+    while (itemList.count())
     {
-        ProgramInfo *s;
+	s = itemList.take();
+	if (type == plTitle)
+	    s->sortTitle = s->subtitle;
+	else
+	    s->sortTitle = s->title;
 
-        vector<ProgramInfo *> sortedList;
-        while (itemList.count())
+	s->sortTitle.remove(QRegExp("^(The |A |An )"));
+	sortedList.push_back(s);
+    }
+
+    if (type == plNewListings || titleSort)
+    {
+	// Prune to one per title
+	sort(sortedList.begin(), sortedList.end(), plTitleSort());
+
+	QString curtitle = "";
+	vector<ProgramInfo *>::iterator i = sortedList.begin();
+        while (i != sortedList.end())
         {
-            s = itemList.take();
-            if (type == plTitle)
-                s->sortTitle = s->subtitle;
+            ProgramInfo *p = *i;
+            if (p->sortTitle != curtitle)
+            {
+                curtitle = p->sortTitle;
+		i++;
+            }
             else
-                s->sortTitle = s->title;
-
-            s->sortTitle.remove(QRegExp("^(The |A |An )"));
-            sortedList.push_back(s);
+            {
+                delete p;
+                i = sortedList.erase(i);
+            }
         }
+    }
+    if (!titleSort)
+	sort(sortedList.begin(), sortedList.end(), plTimeSort());
 
-        if (titleSort)
-            sort(sortedList.begin(), sortedList.end(),
-                 plTitleSort(reverseSort));
-        else
-            sort(sortedList.begin(), sortedList.end(),
-                 plTimeSort(reverseSort));
-
-        vector<ProgramInfo *>::iterator i = sortedList.begin();
-        for (; i != sortedList.end(); i++)
-            itemList.append(*i);
+    if (reverseSort)
+    {
+	vector<ProgramInfo *>::reverse_iterator r = sortedList.rbegin();
+	for (; r != sortedList.rend(); r++)
+	    itemList.append(*r);
+    }
+    else
+    {
+	vector<ProgramInfo *>::iterator i = sortedList.begin();
+	for (; i != sortedList.end(); i++)
+	    itemList.append(*i);
     }
 
     if (curItem < 0 && itemList.count() > 0)
