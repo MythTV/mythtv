@@ -20,25 +20,24 @@ phone="yes"
 browser="yes"
 controls="yes"
 flix="yes"
+
 cc="gcc"
-opengl="detect"
-fftw_lib="detect"
-fftw_lib3="detect"
-sdl="detect"
+
+opengl="yes"
+fftw_lib="yes"
+fftw_lib3="yes"
+sdl="yes"
 aac="no"          # compile fails w/libfaad v2.0
 transcode="no"    # need to check for more stuff?
 vcdsupport="no"   # no config detection rutine
-exif="detect"
-newexif="detect"
+exif="yes"
+newexif="yes"
 festival="no"     # no config detection/setup rutine
 
 targetos=`uname -s`
 case $targetos in
 OpenBSD)
     phone="no"
-;;
-Darwin) 
-    opengl="yes" 
 ;;
 *) ;;
 esac
@@ -292,6 +291,9 @@ has_header()
 if test "$opengl" != "no" ; then
     opengl="no"
     if has_library libGL ; then
+        opengl="yes"
+    fi
+    if test -f /System/Library/Frameworks/AGL.framework/Versions/A/AGL ; then
         opengl="yes"
     fi
 fi
