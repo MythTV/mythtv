@@ -40,7 +40,7 @@ class CardUtil
         HDTV,
         FIREWIRE,
     };
-    /// \brief all the different dvb diseqc
+    /// \brief all the different dvb DiSEqC devices
     enum DISEQC_TYPES
     {
         SINGLE=0,
@@ -297,12 +297,13 @@ public:
     };
 };
 
-class DVBDiseqcInputList
+class DVBDiSEqCInputList
 {
   public:
-    DVBDiseqcInputList() { clearValues(); }
-    DVBDiseqcInputList(const QString& in, const QString& prt, 
-                       const QString& pos) : input(in), port(prt), position(pos)
+    DVBDiSEqCInputList() { clearValues(); }
+    DVBDiSEqCInputList(const QString& in, const QString& prt, 
+                       const QString& pos)
+        : input(in), port(prt), position(pos)
     {}
 
     void clearValues() 
@@ -332,24 +333,17 @@ class DVBConfigurationGroup: public VerticalConfigurationGroup {
 public:
     DVBConfigurationGroup(CaptureCard& a_parent);
 
-    void load() {
-        VerticalConfigurationGroup::load();
-    };
-
 public slots:
     void probeCard(const QString& cardNumber);
 
 private:
-    CaptureCard& parent;
+    CaptureCard        &parent;
 
-    TunerCardInput* defaultinput;
-    DVBCardName* cardname;
-    DVBCardType* cardtype;
-    DVBDiseqcType* diseqctype;
-    TransButtonSetting *buttonDisEqC;
-    TransButtonSetting *buttonRecOpt;
-    SignalTimeout* signal_timeout;
-    ChannelTimeout* channel_timeout;
+    TunerCardInput     *defaultinput;
+    DVBCardName        *cardname;
+    DVBCardType        *cardtype;
+    SignalTimeout      *signal_timeout;
+    ChannelTimeout     *channel_timeout;
 };
 
 class CaptureCardGroup: public VerticalConfigurationGroup,
@@ -382,7 +376,7 @@ public:
     };
 
 public slots:
-    void disEqCPanel();
+    void DiSEqCPanel();
     void recorderOptionsPanel();
     void setDvbCard(const QString& card) { dvbCard = card; };
 
@@ -509,8 +503,8 @@ class CardID;
 class InputName;
 class SourceID;
 class DVBLNBChooser;
-class DiseqcPos;
-class DiseqcPort;
+class DiSEqCPos;
+class DiSEqCPort;
 class LNBLofSwitch;
 class LNBLofLo;
 class LNBLofHi;
@@ -559,8 +553,8 @@ class CardInput: public ConfigurationWizard
     InputName       *inputname;
     SourceID        *sourceid;
     DVBLNBChooser   *lnbsettings;
-    DiseqcPos       *diseqcpos;
-    DiseqcPort      *diseqcport;
+    DiSEqCPos       *diseqcpos;
+    DiSEqCPort      *diseqcport;
     LNBLofSwitch    *lnblofswitch;
     LNBLofLo        *lnbloflo;
     LNBLofHi        *lnblofhi;

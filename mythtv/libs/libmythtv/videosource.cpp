@@ -50,10 +50,10 @@ class RecorderOptions: public ConfigurationWizard
     RecorderOptions(CaptureCard& parent);
 };
 
-class DVBDiseqcConfigurationWizard: public ConfigurationWizard
+class DVBDiSEqCConfigurationWizard: public ConfigurationWizard
 {
   public:
-    DVBDiseqcConfigurationWizard();
+    DVBDiSEqCConfigurationWizard(CaptureCard &parent);
 };
 
 /** \fn CardUtil::IsCardTypePresent(const QString&)
@@ -1031,7 +1031,8 @@ class VideoDevice: public PathSetting, public CCSetting
     static QStringList probeDVBInputs(int diseq_type);
 
     static QStringList fillDVBInputs(int dvb_diseqc_type);
-    static QValueList<DVBDiseqcInputList> fillDVBInputsDiseqc(int dvb_diseqc_type);
+    static QValueList<DVBDiSEqCInputList>
+        fillDVBInputsDiSEqC(int dvb_diseqc_type);
   private:
     QMap<uint, uint> minor_list;
 };
@@ -1075,10 +1076,7 @@ class SignalTimeout: public SpinBoxSetting, public CCSetting
         setLabel(QObject::tr("Signal Timeout (msec)"));
         setHelpText(QObject::tr(
                         "Maximum time MythTV waits for any signal when "
-                        "scanning for channels, or when when making "
-                        "recording. This does set the time at which "
-                        "point a recording would be abandoned, see "
-                        "Channel Timeout for that value."));
+                        "scanning for channels."));
     };
 };
 
@@ -1089,11 +1087,11 @@ class ChannelTimeout: public SpinBoxSetting, public CCSetting
       : SpinBoxSetting(start_val,65000,250),
         CCSetting(parent, "channel_timeout")
     {
-        setLabel(QObject::tr("Channel Timeout (msec)"));
+        setLabel(QObject::tr("Tuning Timeout (msec)"));
         setHelpText(QObject::tr(
-                        "Maximum time MythTV waits for a channel to finish "
-                        "tuning before abandoning a timed recording or "
-                        "issuing a warning in LiveTV."));
+                        "Maximum time MythTV waits for a channel lock "
+                        "when scanning for channels. Or, for issuing "
+                        "a warning in LiveTV mode."));
     };
 };
 
@@ -1224,10 +1222,10 @@ class DVBOnDemand: public CheckBoxSetting, public CCSetting
     };
 };
 
-class DVBDiseqcType: public ComboBoxSetting, public CCSetting
+class DVBDiSEqCType: public ComboBoxSetting, public CCSetting
 {
   public:
-    DVBDiseqcType(const CaptureCard& parent)
+    DVBDiSEqCType(const CaptureCard& parent)
       : CCSetting(parent, "dvb_diseqc_type")
     {
         setLabel(QObject::tr("DiSEqC Input Type: (DVB-S)"));
@@ -1660,10 +1658,12 @@ class LNBLofLo: public LineEditSetting, public CISetting {
     };
 };
 
-class DiseqcPos: public LineEditSetting, public CISetting {
+class DiSEqCPos: public LineEditSetting, public CISetting
+{
   public:
-    DiseqcPos(const CardInput& parent):
-        CISetting(parent, "diseqc_pos") {
+    DiSEqCPos(const CardInput& parent)
+        : CISetting(parent, "diseqc_pos")
+    {
         setLabel(QObject::tr("DiSEqC Satellite Location"));
         setValue("0.0");
         setHelpText(QObject::tr("The longitude of the satellite "
@@ -1677,10 +1677,12 @@ class DiseqcPos: public LineEditSetting, public CISetting {
 };
 
 
-class DiseqcPort: public LabelSetting, public CISetting {
+class DiSEqCPort: public LabelSetting, public CISetting
+{
   public:
-    DiseqcPort(const CardInput& parent):
-        CISetting(parent, "diseqc_port") {
+    DiSEqCPort(const CardInput& parent)
+        : CISetting(parent, "diseqc_port")
+    {
         setVisible(false);
     };
     void fillSelections(const QString& port) {
@@ -1854,8 +1856,8 @@ CardInput::CardInput(bool isDVBcard)
 #ifdef USING_DVB
     if (isDVBcard)
     {
-        group->addChild(diseqcpos = new DiseqcPos(*this));
-        group->addChild(diseqcport = new DiseqcPort(*this));
+        group->addChild(diseqcpos    = new DiSEqCPos(*this));
+        group->addChild(diseqcport   = new DiSEqCPort(*this));
         group->addChild(lnblofswitch = new LNBLofSwitch(*this));
         group->addChild(lnblofhi = new LNBLofHi(*this));
         group->addChild(lnbloflo = new LNBLofLo(*this));
@@ -1964,7 +1966,7 @@ void CardInput::loadByInput(int _cardid, QString _inputname)
         {
             if (dvbType == CardUtil::QPSK)
             {
-                //Check for diseqc type
+                //Check for DiSEqC type
                 diseqcpos->setVisible(true);
                 lnblofswitch->setVisible(true);
                 lnbloflo->setVisible(true);
@@ -2266,10 +2268,11 @@ void CardInputEditor::load()
             QStringList inputs;
             if (capturecards.value(2).toString() == "DVB")
             {
-                QValueList<DVBDiseqcInputList> dvbinput;
-                dvbinput = VideoDevice::fillDVBInputsDiseqc(capturecards.value(3).toInt());
+                QValueList<DVBDiSEqCInputList> dvbinput;
+                dvbinput = VideoDevice::fillDVBInputsDiSEqC(
+                    capturecards.value(3).toInt());
 
-                QValueList<DVBDiseqcInputList>::iterator it;
+                QValueList<DVBDiSEqCInputList>::iterator it;
                 for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
                 {
                     // IS DVB Check for CardInput class
@@ -2365,10 +2368,10 @@ CardInputEditor::~CardInputEditor() {
     }
 }
 
-QValueList<DVBDiseqcInputList>
-VideoDevice::fillDVBInputsDiseqc(int dvb_diseqc_type)
+QValueList<DVBDiSEqCInputList>
+VideoDevice::fillDVBInputsDiSEqC(int dvb_diseqc_type)
 {
-    QValueList<DVBDiseqcInputList> list;
+    QValueList<DVBDiSEqCInputList> list;
 
     QString stxt = "DiSEqC Switch Input %1";
     QString mtxt = "DiSEqC v1.2 Motor Position %1";
@@ -2379,31 +2382,31 @@ VideoDevice::fillDVBInputsDiseqc(int dvb_diseqc_type)
     {
         case 1: case 2: case 3:
             for (i = 0; i < 2; ++i)
-                list.append(DVBDiseqcInputList(
+                list.append(DVBDiSEqCInputList(
                                 stxt.arg(i+1), QString::number(i), ""));
             break;
         case 4: case 5:
             for (i = 0; i < 4; ++i)
-                list.append(DVBDiseqcInputList(
+                list.append(DVBDiSEqCInputList(
                                 stxt.arg(i+1), QString::number(i), ""));
             break;
         case 6:
             for (i = 1; i < 50; ++i)
-                list.append(DVBDiseqcInputList(
+                list.append(DVBDiSEqCInputList(
                                 mtxt.arg(i), "", QString::number(i)));
             break;
         case 7:
             for (i = 1; i < 20; ++i)
-                list.append(DVBDiseqcInputList(
+                list.append(DVBDiSEqCInputList(
                                 itxt.arg(i), "", QString::number(i)));
             break;
         case 8:
             for (i = 0; i < 10; ++i)
-                list.append(DVBDiseqcInputList(
+                list.append(DVBDiSEqCInputList(
                                 stxt.arg(i+1,2), QString::number(i), ""));
             break;
         default:
-            list.append(DVBDiseqcInputList(
+            list.append(DVBDiSEqCInputList(
                             QString("DVBInput"), QString(""), QString("")));
     }
 
@@ -2452,10 +2455,10 @@ QStringList VideoDevice::probeDVBInputs(int diseq_type)
 {
     QStringList ret;
 #ifdef USING_DVB
-    QValueList<DVBDiseqcInputList> dvbinput;
-    dvbinput = fillDVBInputsDiseqc(diseq_type);
+    QValueList<DVBDiSEqCInputList> dvbinput;
+    dvbinput = fillDVBInputsDiSEqC(diseq_type);
 
-    QValueList<DVBDiseqcInputList>::iterator it;
+    QValueList<DVBDiSEqCInputList>::iterator it;
     for (it = dvbinput.begin(); it != dvbinput.end(); ++it)
         ret += (*it).input;
 #else
@@ -2517,8 +2520,6 @@ void DVBConfigurationGroup::probeCard(const QString& cardNumber)
         default:
             fEnable = false;
     }
-    defaultinput->setEnabled(fEnable);
-    diseqctype->setEnabled(fEnable);
 #else
     (void)cardNumber;
     cardtype->setValue(QString("Recompile with DVB-Support!"));
@@ -2547,38 +2548,32 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
     cardname = new DVBCardName();
     cardtype = new DVBCardType();
 
-    defaultinput = new TunerCardInput(parent);
-    diseqctype = new DVBDiseqcType(parent);
     signal_timeout = new SignalTimeout(parent, 500);
     channel_timeout = new ChannelTimeout(parent, 3000);
 
     addChild(cardnum);
+
     HorizontalConfigurationGroup *hg0 = 
         new HorizontalConfigurationGroup(false, false, true, true);
     hg0->addChild(cardname);
     hg0->addChild(cardtype);
     addChild(hg0);
 
-    HorizontalConfigurationGroup *hg1 = 
-        new HorizontalConfigurationGroup(false, false, true, true);
-    hg1->addChild(signal_timeout);
-    hg1->addChild(channel_timeout);
-    addChild(hg1);
+    addChild(signal_timeout);
+    addChild(channel_timeout);
 
     addChild(new DVBAudioDevice(parent));
     addChild(new DVBVbiDevice(parent));
-    addChild(diseqctype);
-    addChild(defaultinput);
 
-    buttonDisEqC = new TransButtonSetting();
-    buttonDisEqC->setLabel(tr("DisEqC"));
+    TransButtonSetting *buttonDiSEqC = new TransButtonSetting();
+    buttonDiSEqC->setLabel(tr("DiSEqC"));
 
-    buttonRecOpt = new TransButtonSetting();
+    TransButtonSetting *buttonRecOpt = new TransButtonSetting();
     buttonRecOpt->setLabel(tr("Recording Options"));    
 
     HorizontalConfigurationGroup *advcfg = 
         new HorizontalConfigurationGroup(false, false, true, true);
-    advcfg->addChild(buttonDisEqC);
+    advcfg->addChild(buttonDiSEqC);
     advcfg->addChild(buttonRecOpt);
     addChild(advcfg);
 
@@ -2586,19 +2581,12 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
             this,         SLOT(  probeCard   (const QString&)));
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             &parent,      SLOT(  setDvbCard  (const QString&)));
-    connect(diseqctype,   SIGNAL(valueChanged(const QString&)),
-            defaultinput, SLOT(fillSelections(const QString&)));
     connect(buttonRecOpt, SIGNAL(pressed()),
             &parent,      SLOT(  recorderOptionsPanel()));
-    connect(buttonDisEqC, SIGNAL(pressed()),
-            &parent,      SLOT(  disEqCPanel()));
-
-    defaultinput->setEnabled(false);
-    diseqctype->setEnabled(false);
+    connect(buttonDiSEqC, SIGNAL(pressed()),
+            &parent,      SLOT(  DiSEqCPanel()));
 
     cardnum->setValue(0);
-
-    defaultinput->fillSelections(diseqctype->getValue());
 }
 
 void CaptureCard::recorderOptionsPanel()
@@ -2612,14 +2600,14 @@ void CaptureCard::recorderOptionsPanel()
     acw.exec();
 }
 
-void CaptureCard::disEqCPanel()
+void CaptureCard::DiSEqCPanel()
 {
     if (getCardID() == 0)
     {
         save();
         load();
     }
-    DVBDiseqcConfigurationWizard diseqcWiz;
+    DVBDiSEqCConfigurationWizard diseqcWiz(*this);
     diseqcWiz.exec();
 }
 
@@ -2635,39 +2623,45 @@ RecorderOptions::RecorderOptions(CaptureCard& parent)
     addChild(rec);
 }
 
-static GlobalLineEdit *DiseqcLatitude()
+static GlobalLineEdit *DiSEqCLatitude()
 {
     GlobalLineEdit *gc = new GlobalLineEdit("latitude");
     gc->setLabel("Latitude");
     gc->setHelpText(
-        QObject::tr(
-            "The Latitude of your satellite dishes "
-            "location on the Earth.. "
-            " This is used with DiSEqC Motor Support.  Format 35.78"
-            " for 35.78 degrees North Longitude"));
+        QObject::tr("The Cartesian latitude for your location.") + " " +
+        QObject::tr("Use negative numbers for southern "
+                    "and western coordinates."));
     return gc;
-};
+}
 
-static GlobalLineEdit *DiseqcLongitude()
+static GlobalLineEdit *DiSEqCLongitude()
 {
     GlobalLineEdit *gc = new GlobalLineEdit("longitude");
     gc->setLabel("Longitude");
     gc->setHelpText(
-        QObject::tr(
-            "The Longitude of your satellite dishes "
-            "location on the Earth.. "
-            " This is used with DiSEqC Motor Support.  Format -78.93"
-            " for 78.93 degrees West Longitude"));
+        QObject::tr("The Cartesian longitude for your location.") + " " +
+        QObject::tr("Use negative numbers for southern "
+                    "and western coordinates."));
     return gc;
-};
+}
 
-DVBDiseqcConfigurationWizard::DVBDiseqcConfigurationWizard()
+DVBDiSEqCConfigurationWizard::DVBDiSEqCConfigurationWizard(CaptureCard &parent)
 {
     VerticalConfigurationGroup* rec = new VerticalConfigurationGroup(false);
-    rec->setLabel(QObject::tr("Diseqc Options"));
+    rec->setLabel(QObject::tr("DiSEqC Options"));
     rec->setUseLabel(false);
 
-    rec->addChild(DiseqcLatitude());
-    rec->addChild(DiseqcLongitude());
+    DVBDiSEqCType  *diseqctype   = new DVBDiSEqCType(parent);
+    TunerCardInput *defaultinput = new TunerCardInput(parent);
+
+    rec->addChild(diseqctype);
+    rec->addChild(defaultinput);
+    rec->addChild(DiSEqCLatitude());
+    rec->addChild(DiSEqCLongitude());
     addChild(rec);
+
+    connect(diseqctype,   SIGNAL(valueChanged(const QString&)),
+            defaultinput, SLOT(fillSelections(const QString&)));
+
+    defaultinput->fillSelections(diseqctype->getValue());
 }
