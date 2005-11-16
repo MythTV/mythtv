@@ -130,7 +130,7 @@ class TV : public QObject
     // static functions
     static void InitKeys(void);
 
-    void SetIgnoreKeys(bool ignore);
+    void SetIgnoreKeys(bool ignore) { ignoreKeys = ignore; }
 
   public slots:
     void HandleOSDClosed(int osdType);

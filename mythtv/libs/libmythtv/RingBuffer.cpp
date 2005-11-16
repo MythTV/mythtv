@@ -1038,7 +1038,7 @@ long long RingBuffer::GetReadPosition(void) const
     if (dvdPriv)
         return dvdPriv->GetReadPosition();
 
-    return readpos - readAdjust;
+    return readpos;
 }
 
 /** \fn RingBuffer::GetWritePosition(void) const

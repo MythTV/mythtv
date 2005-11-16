@@ -1919,6 +1919,8 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     {
         GetDecoder()->SetReadAdjust(ringBuffer->SetAdjustFilesize());
         GetDecoder()->SetWaitForChange();
+        if (m_tv)
+            m_tv->SetIgnoreKeys(true);
     }
 
     ringBuffer->Unpause();
@@ -1946,6 +1948,9 @@ void NuppelVideoPlayer::FileChangedCallback(void)
     ringBuffer->Reset(false, true);
 
     ringBuffer->Unpause();
+
+    if (m_tv)
+        m_tv->SetIgnoreKeys(false);
 
     livetvchain->SetProgram(m_playbackinfo);
     GetDecoder()->SetProgramInfo(m_playbackinfo);
