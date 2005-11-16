@@ -215,6 +215,7 @@ TV::TV(void)
       queuedTranscode(false), getRecorderPlaybackInfo(false),
       picAdjustment(kPictureAttribute_None),
       recAdjustment(kPictureAttribute_None),
+      ignoreKeys(false),
       // Sleep Timer
       sleep_index(0), sleepTimer(new QTimer(this)),
       // Key processing buffer, lock, and state
