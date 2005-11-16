@@ -1588,10 +1588,11 @@ bool TVRec::SetupDTVSignalMonitor(void)
         VERBOSE(VB_RECORD, LOC + msg);
 
 #ifdef USING_DVB
-        // Some DVB devices munge the PMT so the CRC check fails  we need to
-        // tell the stream data class to not check the CRC on these devices.
+        // Some DVB devices munge the PMT and/or PAT so the CRC check fails.
+        // We need to tell the stream data class to not check the CRC on 
+        // these devices.
         if (GetDVBChannel())
-            sd->SetIgnoreCRCforPMT(GetDVBChannel()->HasCRCBug());
+            sd->SetIgnoreCRC(GetDVBChannel()->HasCRCBug());
 #endif // USING_DVB
 
         bool fta = CardUtil::IgnoreEncrypted(

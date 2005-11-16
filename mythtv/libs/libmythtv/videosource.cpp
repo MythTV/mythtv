@@ -135,15 +135,22 @@ enum CardUtil::CARD_TYPES CardUtil::GetDVBType(
 }
 
 /** \fn CardUtil::HasDVBCRCBug(uint)
- *  \brief Returns true iff the device munges PMT tables, so that they fail a CRC check.
+ *  \brief Returns true if and only if the device munges 
+ *         PAT/PMT tables, and then doesn't fix the CRC.
+ *
+ *   Currently the list of broken DVB hardware and drivers includes:
+ *   "Philips TDA10046H DVB-T", "VLSI VES1x93 DVB-S", and "ST STV0299 DVB-S"
+ *
  *  \param [in]device video dev to be checked
- *  \return true iff the device munges PMT tables, so that they fail a CRC check.
+ *  \return true iff the device munges tables, so that they fail a CRC check.
  */
 bool CardUtil::HasDVBCRCBug(uint device)
 {
     QString name(""), type("");
     GetDVBType(device, name, type);
-    return (name == "VLSI VES1x93 DVB-S") || (name == "Philips TDA10046H DVB-T");
+    return ((name == "Philips TDA10046H DVB-T") || // munges PMT
+            (name == "VLSI VES1x93 DVB-S")      || // munges PMT
+            (name == "ST STV0299 DVB-S"));         // munges PAT
 }
 
 /** \fn CardUtil::GetCardType(uint, QString&, QString&)

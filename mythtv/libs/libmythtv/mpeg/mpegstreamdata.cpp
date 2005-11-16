@@ -19,7 +19,7 @@
  *  \param cacheTables    If true PAT and PMT tables will be cached
  */
 MPEGStreamData::MPEGStreamData(int desiredProgram, bool cacheTables)
-    : QObject(NULL, "MPEGStreamData"), _have_pmt_CRC_bug(false),
+    : QObject(NULL, "MPEGStreamData"), _have_CRC_bug(false),
       _pat_version(-1), _cache_tables(cacheTables), _cache_lock(true),
       _cached_pat(NULL), _desired_program(desiredProgram),
       _pmt_single_program_num_video(1),
@@ -435,9 +435,11 @@ void MPEGStreamData::HandleTSTables(const TSPacket* tspacket)
        return;
 
     // Validate PSIP
-    // but don't validate PMT if our driver has the PMT CRC bug.
-    bool validate = !_have_pmt_CRC_bug || (TableID::PMT != psip->TableID());
-    if (validate && !psip->IsGood())
+    // but don't validate PMT/PAT if our driver has the PMT/PAT CRC bug.
+    bool buggy = _have_CRC_bug &&
+        ((TableID::PMT == psip->TableID()) ||
+         (TableID::PAT == psip->TableID()));
+    if (!buggy && !psip->IsGood())
     {
         VERBOSE(VB_RECORD, QString("PSIP packet failed CRC check. "
                                    "pid(0x%1) type(0x%2)")

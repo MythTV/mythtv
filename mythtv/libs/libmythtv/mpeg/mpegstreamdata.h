@@ -33,7 +33,7 @@ class MPEGStreamData : public QObject
     virtual void Reset(int desiredProgram);
 
     // Table processing
-    void SetIgnoreCRCforPMT(bool pmtCRCbug) { _have_pmt_CRC_bug = pmtCRCbug; }
+    void SetIgnoreCRC(bool haveCRCbug) { _have_CRC_bug = haveCRCbug; }
     virtual bool IsRedundant(const PSIPTable&) const;
     virtual bool HandleTables(uint pid, const PSIPTable &psip);
     virtual void HandleTSTables(const TSPacket* tspacket);
@@ -146,7 +146,7 @@ class MPEGStreamData : public QObject
     void CachePMT(uint program_num, ProgramMapTable *pmt);
 
   protected:
-    bool                      _have_pmt_CRC_bug;
+    bool                      _have_CRC_bug;
 
     // Listening
     QMap<uint, bool>          _pids_listening;
