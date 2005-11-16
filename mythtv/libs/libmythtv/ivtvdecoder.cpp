@@ -55,6 +55,8 @@ void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
     //fprintf(stderr, "seek reset frame = %llu, skip = %d, exact = %d\n", 
     //        newkey, skipframes, exactseeks);
 
+    DecoderBase::SeekReset();
+
     if (!exactseeks)
         skipframes = 0;
 
@@ -426,6 +428,12 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
         if (vidread >= vidwrite)
         {
             long long startpos = ringBuffer->GetReadPosition();
+            if (waitingForChange && startpos + 4 >= readAdjust)
+            {
+                FileChanged();
+                startpos = ringBuffer->GetReadPosition();
+            }
+
             count = ringBuffer->Read(&vidbuf[vidread], vidmax - vidread);
             if (count > 0)
             {
@@ -441,6 +449,12 @@ bool IvtvDecoder::ReadWrite(int onlyvideo, long stopframe)
         if (vidread < vidwrite)
         {
             long long startpos = ringBuffer->GetReadPosition();
+            if (waitingForChange && startpos + 4 >= readAdjust)
+            {
+                FileChanged();
+                startpos = ringBuffer->GetReadPosition();
+            }
+
             count = ringBuffer->Read(&vidbuf[vidread], vidwrite - vidread);
             if (count > 0)
             {

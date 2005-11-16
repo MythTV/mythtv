@@ -89,7 +89,8 @@ RingBuffer::RingBuffer(const QString &lfilename,
       readblocksize(128000),    wanttoread(0),
       numfailures(0),           commserror(false),
       dvdPriv(NULL),            oldfile(false),
-      livetvchain(NULL),        ignoreliveeof(false)
+      livetvchain(NULL),        ignoreliveeof(false),
+      readAdjust(0)
 {
     pthread_rwlock_init(&rwlock, NULL);
 
@@ -303,7 +304,7 @@ void RingBuffer::Start(void)
 /** \fn RingBuffer::Reset(bool)
  *  \brief Resets the read-ahead thread and our position in the file
  */
-void RingBuffer::Reset(bool full)
+void RingBuffer::Reset(bool full, bool toAdjust)
 {
     wantseek = true;
     pthread_rwlock_wrlock(&rwlock);
@@ -312,10 +313,11 @@ void RingBuffer::Reset(bool full)
     commserror = false;
 
     writepos = 0;
-    readpos = 0;
+    readpos = (toAdjust) ? (readpos - readAdjust) : 0;
+    readAdjust = 0;
 
     if (full)
-        ResetReadAhead(0);
+        ResetReadAhead(readpos - readAdjust);
 
     pthread_rwlock_unlock(&rwlock);
 }
@@ -399,7 +401,7 @@ int RingBuffer::safe_read(RemoteFile *rf, void *data, uint sz)
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "RingBuffer::safe_read(RemoteFile* ...): read failed");
 
-        rf->Seek(internalreadpos, SEEK_SET);
+        rf->Seek(internalreadpos - readAdjust, SEEK_SET);
         ret = 0;
         numfailures++;
      }
@@ -716,6 +718,12 @@ void RingBuffer::ReadAheadThread(void)
     rbwpos = 0;
 }
 
+long long RingBuffer::SetAdjustFilesize(void)
+{
+    readAdjust += internalreadpos;
+    return readAdjust;
+}
+
 /** \fn RingBuffer::ReadFromBuf(void*, int)
  *  \brief Reads from the read-ahead buffer, this is called by
  *         Read(void*, int) when the read-ahead thread is running.
@@ -970,6 +978,8 @@ long long RingBuffer::Seek(long long pos, int whence)
     if (readaheadrunning)
         ResetReadAhead(readpos);
 
+    readAdjust = 0;
+
     pthread_rwlock_unlock(&rwlock);
 
     return ret;
@@ -1027,7 +1037,8 @@ long long RingBuffer::GetReadPosition(void) const
 {
     if (dvdPriv)
         return dvdPriv->GetReadPosition();
-    return readpos;
+
+    return readpos - readAdjust;
 }
 
 /** \fn RingBuffer::GetWritePosition(void) const

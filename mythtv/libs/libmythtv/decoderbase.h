@@ -64,8 +64,7 @@ class DecoderBase
 
     virtual void SetPositionMap(void);
     virtual void SeekReset(long long newKey = 0, int skipFrames = 0,
-                           bool needFlush = false) 
-                          { (void)newKey; (void)skipFrames; (void)needFlush; }
+                           bool needFlush = false);
 
     const int getCurrentAudioTrack() const { return currentAudioTrack;}
     virtual void incCurrentAudioTrack(){}
@@ -82,7 +81,13 @@ class DecoderBase
     void setTranscoding(bool value) { transcoding = value; };
                                                           
     bool IsErrored() { return errored; }
+
+    void SetWaitForChange(void);
+    void SetReadAdjust(long long adjust);
+
   protected:
+    void FileChanged(void);
+
     typedef struct posmapentry
     {
         long long index;    // frame or keyframe number
@@ -132,6 +137,10 @@ class DecoderBase
     int currentAudioTrack;
     int currentSubtitleTrack;
     bool errored;
+
+    bool waitingForChange;
+    long long readAdjust;
+    bool justAfterChange;
 };
 
 #endif

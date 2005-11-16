@@ -26,7 +26,8 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
       hasKeyFrameAdjustTable(false), lowbuffers(false),
       getrawframes(false), getrawvideo(false),
       currentAudioTrack(-1), currentSubtitleTrack(-1),
-      errored(false)
+      errored(false), waitingForChange(false), readAdjust(0),
+      justAfterChange(false)
 {
     if (pginfo)
         m_playbackinfo = new ProgramInfo(*pginfo);
@@ -55,6 +56,13 @@ void DecoderBase::Reset(void)
     m_positionMap.clear();
     framesPlayed = 0;
     framesRead = 0;
+}
+
+void DecoderBase::SeekReset(long long newKey, int skipFrames, bool needFlush)
+{
+    (void)newKey, (void)skipFrames, (void)needFlush;
+
+    readAdjust = 0;
 }
 
 void DecoderBase::setWatchingRecording(bool mode)
@@ -545,3 +553,25 @@ void DecoderBase::UpdateFramesPlayed(void)
     GetNVP()->SetFramesPlayed(framesPlayed);
 }
 
+void DecoderBase::FileChanged(void)
+{
+    m_positionMap.clear();
+    framesPlayed = 0;
+    framesRead = 0;
+
+    waitingForChange = false;
+    justAfterChange = true;
+
+    GetNVP()->FileChangedCallback();
+}
+
+void DecoderBase::SetReadAdjust(long long adjust)
+{
+    readAdjust = adjust;
+}
+
+void DecoderBase::SetWaitForChange(void)
+{
+    waitingForChange = true;
+}
+ 

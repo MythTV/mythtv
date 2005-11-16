@@ -130,6 +130,8 @@ class TV : public QObject
     // static functions
     static void InitKeys(void);
 
+    void SetIgnoreKeys(bool ignore);
+
   public slots:
     void HandleOSDClosed(int osdType);
 
@@ -340,6 +342,8 @@ class TV : public QObject
     bool getRecorderPlaybackInfo; ///< Main loop should get recorderPlaybackInfo
     int picAdjustment;   ///< Player pict attr to modify (on arrow left or right)
     int recAdjustment;   ///< Which recorder picture attribute to modify...
+
+    bool ignoreKeys;
 
     /// Vector or sleep timer sleep times in seconds,
     /// with the appropriate UI message.

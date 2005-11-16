@@ -1905,29 +1905,55 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
 
-    ringBuffer->Reset();
     ringBuffer->OpenFile(pginfo->pathname);
 
     if (discontinuity)
     {
+        ringBuffer->Reset();
         if (newtype)
             OpenFile();
         else
             ResetPlaying();
     }
+    else
+    {
+        GetDecoder()->SetReadAdjust(ringBuffer->SetAdjustFilesize());
+        GetDecoder()->SetWaitForChange();
+    }
 
     ringBuffer->Unpause();
 
-    livetvchain->SetProgram(pginfo);
-    GetDecoder()->SetProgramInfo(pginfo);
-    if (m_tv)
-        m_tv->SetCurrentlyPlaying(pginfo);
+    if (discontinuity)
+    {
+        livetvchain->SetProgram(pginfo);
+        GetDecoder()->SetProgramInfo(pginfo);
+        if (m_tv)
+            m_tv->SetCurrentlyPlaying(pginfo);
 
-    CheckTVChain();
-    GetDecoder()->SyncPositionMap();
+        CheckTVChain();
+        GetDecoder()->SyncPositionMap();
+    }
 
     if (m_playbackinfo)
         m_playbackinfo->UpdateInUseMark(true);
+}
+
+void NuppelVideoPlayer::FileChangedCallback(void)
+{
+    ringBuffer->Pause();
+    ringBuffer->WaitForPause();
+
+    ringBuffer->Reset(false, true);
+
+    ringBuffer->Unpause();
+
+    livetvchain->SetProgram(m_playbackinfo);
+    GetDecoder()->SetProgramInfo(m_playbackinfo);
+    if (m_tv)
+        m_tv->SetCurrentlyPlaying(m_playbackinfo);
+
+    CheckTVChain();
+    GetDecoder()->SyncPositionMap();
 }
 
 void NuppelVideoPlayer::JumpToProgram(void)

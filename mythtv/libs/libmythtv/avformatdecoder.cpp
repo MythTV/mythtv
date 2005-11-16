@@ -306,6 +306,8 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
     VERBOSE(VB_PLAYBACK, LOC + "SeekReset("
             <<skipFrames<<", "<<( doflush ? "do" : "don't" )<<" flush)");
 
+    DecoderBase::SeekReset();
+
     lastapts = 0;
     lastvpts = 0;
 
@@ -1875,6 +1877,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 GetNVP()->SetEof();
                 return false;
             }
+
+            if (waitingForChange && pkt->pos >= readAdjust)
+                FileChanged();
+
+            if (pkt->pos > readAdjust)
+                pkt->pos -= readAdjust;
         }
 
         if (pkt->stream_index > ic->nb_streams)
@@ -1904,13 +1912,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (len > 0 && curstream->codec->codec_type == CODEC_TYPE_VIDEO)
         {
-            if (framesRead == 0 && !(pkt->flags & PKT_FLAG_KEY))
+            if (framesRead == 0 && !justAfterChange && 
+                !(pkt->flags & PKT_FLAG_KEY))
             {
                 av_free_packet(pkt);
                 continue;
             }
 
             framesRead++;
+            justAfterChange = false;
+
             if (exitafterdecoded)
                 gotvideo = 1;
 

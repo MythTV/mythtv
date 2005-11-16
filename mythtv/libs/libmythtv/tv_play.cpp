@@ -1533,6 +1533,9 @@ void TV::ProcessKeypress(QKeyEvent *e)
     bool was_doing_ff_rew = false;
     bool redisplayBrowseInfo = false;
 
+    if (ignoreKeys)
+        return;
+
     if (editmode)
     {   
         if (!nvp->DoKeypress(e))

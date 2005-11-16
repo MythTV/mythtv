@@ -246,6 +246,7 @@ class NuppelVideoPlayer
 
     // LiveTV public stuff
     void CheckTVChain();
+    void FileChangedCallback();
 
   protected:
     void DisplayPauseFrame(void);

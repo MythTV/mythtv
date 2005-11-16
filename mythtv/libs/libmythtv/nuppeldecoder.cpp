@@ -898,6 +898,11 @@ bool NuppelDecoder::GetFrame(int avignore)
     while (!gotvideo)
     {
         long long currentposition = ringBuffer->GetReadPosition();
+        if (waitingForChange && currentposition + 4 >= readAdjust)
+        {
+            FileChanged();
+            currentposition = ringBuffer->GetReadPosition();
+        }
 
         if (!ReadFrameheader(&frameheader)
             || (frameheader.frametype == 'Q') || (frameheader.frametype == 'K'))
@@ -1127,6 +1132,8 @@ bool NuppelDecoder::GetFrame(int avignore)
 void NuppelDecoder::SeekReset(long long, int skipFrames,
                               bool needFlush)
 {
+    DecoderBase::SeekReset();
+
     if (mpa_codec && needFlush)
         avcodec_flush_buffers(mpa_ctx);
 

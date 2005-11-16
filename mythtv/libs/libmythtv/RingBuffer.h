@@ -44,7 +44,7 @@ class RingBuffer
     // General Commands
     void OpenFile(const QString &lfilename, uint retryCount = 4);
     int  Read(void *buf, int count);
-    void Reset(bool full = false);
+    void Reset(bool full = false, bool toAdjust = false);
 
     // Seeks
     long long Seek(long long pos, int whence);
@@ -79,6 +79,8 @@ class RingBuffer
     void getDescForPos(QString &desc);
     void nextTrack(void);
     void prevTrack(void);
+
+    long long SetAdjustFilesize(void);
     
   protected:
     static void *StartReader(void *type);
@@ -154,6 +156,8 @@ class RingBuffer
 
     LiveTVChain *livetvchain;
     bool ignoreliveeof;
+
+    long long readAdjust;
 
     // constants
     static const uint kBufferSize;
