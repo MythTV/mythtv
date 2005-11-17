@@ -1998,7 +1998,7 @@ void JobQueue::DoFlagCommercialsThread(void)
 
     VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'").arg(cmd));
 
-    breaksFound = 10; //myth_system(cmd.ascii());
+    breaksFound = myth_system(cmd.ascii());
 
     controlFlagsLock.lock();
     if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
