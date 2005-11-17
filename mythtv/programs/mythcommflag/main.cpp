@@ -79,6 +79,7 @@ int BuildVideoMarkup(QString& filename)
     }
 
     NuppelVideoPlayer *nvp = new NuppelVideoPlayer(program_info);
+    nvp->SetNeedsInUseUpdates(false);
     nvp->SetRingBuffer(tmprbuf);
 
     nvp->RebuildSeekTable(!quiet);
@@ -178,9 +179,6 @@ void commDetectorBreathe()
 
     if (jobID != -1)
     {
-        if (program_info)
-            program_info->UpdateInUseMark();
-
         int curCmd = JobQueue::GetJobCmd(jobID);
         if (curCmd == lastCmd)
             return;
@@ -454,6 +452,7 @@ int FlagCommercials(QString chanid, QString starttime)
     }
 
     NuppelVideoPlayer* nvp = new NuppelVideoPlayer(program_info);
+    nvp->SetNeedsInUseUpdates(false);
     nvp->SetRingBuffer(tmprbuf);
 
     if (rebuildSeekTable)

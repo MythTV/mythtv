@@ -304,6 +304,7 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
         JobQueue::ChangeJobComment(jobID, "0% " + QObject::tr("Completed"));
 
     nvp = new NuppelVideoPlayer(m_proginfo);
+    nvp->SetNeedsInUseUpdates(false);
     nvp->SetNullVideo();
 
     QDateTime curtime = QDateTime::currentDateTime();

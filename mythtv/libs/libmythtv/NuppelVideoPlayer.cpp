@@ -91,6 +91,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(const ProgramInfo *info)
       hasFullPositionMap(false),    limitKeyRepeat(false),
       errored(false),
       m_DeintSetting(0),
+      needsInUseUpdates(true),
       // Bookmark stuff
       bookmarkseek(0),              previewFromBookmark(false),
       // Seek
@@ -221,6 +222,14 @@ NuppelVideoPlayer::~NuppelVideoPlayer(void)
 
     if (videoOutput)
         delete videoOutput;
+}
+
+void NuppelVideoPlayer::SetNeedsInUseUpdates(bool needsUpdates)
+{
+    if (needsInUseUpdates && m_playbackinfo)
+        m_playbackinfo->MarkAsInUse(false);
+
+    needsInUseUpdates = needsUpdates;
 }
 
 void NuppelVideoPlayer::SetWatchingRecording(bool mode)
@@ -1931,7 +1940,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         GetDecoder()->SyncPositionMap();
     }
 
-    if (m_playbackinfo)
+    if (needsInUseUpdates && m_playbackinfo)
         m_playbackinfo->UpdateInUseMark(true);
 }
 
@@ -2009,7 +2018,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
         GetDecoder()->setExactSeeks(seeks);
     }
 
-    if (m_playbackinfo)
+    if (needsInUseUpdates && m_playbackinfo)
         m_playbackinfo->UpdateInUseMark(true);
 }
 
@@ -2158,7 +2167,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
     while (!eof && !killplayer && !errored)
     {
-        if (m_playbackinfo)
+        if (needsInUseUpdates && m_playbackinfo)
             m_playbackinfo->UpdateInUseMark();
 
         if (!paused && livetvchain)
@@ -3945,9 +3954,6 @@ void NuppelVideoPlayer::InitForTranscode(bool copyaudio, bool copyvideo)
 bool NuppelVideoPlayer::TranscodeGetNextFrame(QMap<long long, int>::Iterator &dm_iter,
                                               int *did_ff, bool *is_key, bool honorCutList)
 {
-    if (m_playbackinfo)
-        m_playbackinfo->UpdateInUseMark();
-
     if (dm_iter == NULL && honorCutList)
         dm_iter = deleteMap.begin();
     
@@ -4059,9 +4065,6 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
 
     while (!eof)
     {
-        if (m_playbackinfo)
-            m_playbackinfo->UpdateInUseMark();
-
         looped = true;
         myFramesPlayed++;
 
