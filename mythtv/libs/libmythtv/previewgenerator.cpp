@@ -26,8 +26,22 @@
  *   and when the preview thread finishes running if Start(void) was called.
  */
 
-PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo)
-    : programInfo(*pginfo),
+/** \fn PreviewGenerator(const ProgramInfo*,bool)
+ *  \brief Constructor
+ *
+ *   ProgramInfo::pathname must include recording prefix, so that
+ *   the file can be found on the file system for local preview
+ *   generation. When called by the backend 'local_only' should be set
+ *   to true, otherwise the backend may deadlock if the PreviewGenerator
+ *   can not find the file.
+ *
+ *  \param pginfo     ProgramInfo for the recording we want a preview of.
+ *  \param local_only If set to true, the preview will only be generated
+ *                    if the file is local.
+ */
+PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
+                                   bool local_only)
+    : programInfo(*pginfo), localOnly(local_only),
       createSockets(false), eventSock(NULL), serverSock(NULL)
 {
 }
@@ -61,9 +75,14 @@ void PreviewGenerator::Run(void)
     {
         LocalPreviewRun();
     }
-    else
+    else if (!localOnly)
     {
         RemotePreviewRun();
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + QString("Run() file not local: '%1'")
+                .arg(programInfo.pathname));
     }
 }
 
@@ -194,7 +213,7 @@ void PreviewGenerator::LocalPreviewRun(void)
 
 bool PreviewGenerator::IsLocal(void) const
 {
-    return (QFileInfo(programInfo.pathname).exists());
+    return QFileInfo(programInfo.pathname).exists();
 }
 
 void PreviewGenerator::EventSocketConnected(void)

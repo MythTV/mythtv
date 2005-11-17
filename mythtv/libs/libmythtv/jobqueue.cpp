@@ -1998,7 +1998,7 @@ void JobQueue::DoFlagCommercialsThread(void)
 
     VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'").arg(cmd));
 
-    breaksFound = myth_system(cmd.ascii());
+    breaksFound = 10; //myth_system(cmd.ascii());
 
     controlFlagsLock.lock();
     if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
@@ -2071,7 +2071,9 @@ void JobQueue::DoFlagCommercialsThread(void)
         MythEvent me("RECORDING_LIST_CHANGE");
         gContext->dispatch(me);
 
-        (new PreviewGenerator(program_info))->Run();
+        const QString prefix   = gContext->GetSetting("RecordFilePrefix");
+        program_info->pathname = prefix + "/" + program_info->pathname;
+        (new PreviewGenerator(program_info, true))->Run();
     }
 
     if (msg != "")

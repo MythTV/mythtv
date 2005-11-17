@@ -3455,7 +3455,7 @@ QPixmap PlaybackBox::getPixmap(ProgramInfo *pginfo)
 
     // If the image is not available remotely either, we need to generate it.
     if (!image && !IsGeneratingPreview(filename))
-        SetPreviewGenerator(filename, new PreviewGenerator(pginfo));
+        SetPreviewGenerator(filename, new PreviewGenerator(pginfo, false));
 
     if (image)
     {

@@ -15,9 +15,8 @@ class PreviewGenerator : public QObject
 {
     Q_OBJECT
   public:
-    PreviewGenerator(const ProgramInfo *pginfo);
+    PreviewGenerator(const ProgramInfo *pginfo, bool local_only = true);
     virtual ~PreviewGenerator();
-
 
     void Start(void);
     void Run(void);
@@ -47,6 +46,7 @@ class PreviewGenerator : public QObject
     pthread_t          previewThread;
     ProgramInfo        programInfo;
 
+    bool               localOnly;
     bool               createSockets;
     QSocket           *eventSock;
     QSocketDevice     *serverSock;
