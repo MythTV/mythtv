@@ -5,6 +5,9 @@
 #include "mythdbcon.h"
 #include "programinfo.h"
 
+/** \class LiveTVChain
+ *  \brief Keeps track of recordings in a current LiveTV instance
+ */
 LiveTVChain::LiveTVChain()
            : m_id(""), m_maxpos(0), m_curpos(0), m_cur_chanid(""),
              m_switchid(-1), m_jumppos(0)
@@ -30,11 +33,6 @@ void LiveTVChain::SetHostPrefix(const QString &prefix)
 void LiveTVChain::SetCardType(const QString &type)
 {
     m_cardtype = type;
-}
-
-QString LiveTVChain::GetID(void)
-{
-    return m_id;
 }
 
 void LiveTVChain::LoadFromExistingChain(const QString &id)
@@ -83,10 +81,10 @@ void LiveTVChain::AppendNewProgram(ProgramInfo *pginfo, QString channum,
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Chain: AppendNewProgram", query);
     else
-        VERBOSE(VB_RECORD, QString("Chain: Appended '%1_%2.%3' @ %4")
+        VERBOSE(VB_RECORD, QString("Chain: Appended@%3 '%1_%2'")
                 .arg(newent.chanid)
                 .arg(newent.starttime.toString("yyyyMMddhhmmss"))
-                .arg("???").arg(m_maxpos));
+                .arg(m_maxpos));
 
     m_maxpos++;
     BroadcastUpdate();
@@ -194,7 +192,7 @@ void LiveTVChain::ReloadAll(void)
         m_curpos = 0;
 }
 
-void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry)
+void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
 {
     QMutexLocker lock(&m_lock);
 
@@ -211,7 +209,7 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry)
     }
 }
 
-ProgramInfo *LiveTVChain::EntryToProgram(LiveTVChainEntry &entry)
+ProgramInfo *LiveTVChain::EntryToProgram(const LiveTVChainEntry &entry)
 {
     ProgramInfo *pginfo;
     pginfo = ProgramInfo::GetProgramFromRecorded(entry.chanid,
@@ -228,7 +226,14 @@ ProgramInfo *LiveTVChain::EntryToProgram(LiveTVChainEntry &entry)
     return pginfo;
 }
 
-ProgramInfo *LiveTVChain::GetProgramAt(int at)
+/** \fn LiveTVChain::GetProgramAt(int) const
+ *  \brief Returns program at the desired location.
+ *
+ *   NOTE: The caller must delete the returned program.
+ *
+ *  \param at  ProgramInfo to return [0..TotalSize()-1] or -1 for last program
+ */
+ProgramInfo *LiveTVChain::GetProgramAt(int at) const
 {
     LiveTVChainEntry entry;
     GetEntryAt(at, entry);
@@ -236,12 +241,16 @@ ProgramInfo *LiveTVChain::GetProgramAt(int at)
     return EntryToProgram(entry);
 }
 
-int LiveTVChain::ProgramIsAt(const QString &chanid, const QDateTime &starttime)
+/** \fn LiveTVChain::ProgramIsAt(const QString&, const QDateTime&) const
+ *  \returns program location or -1 for not found.
+ */
+int LiveTVChain::ProgramIsAt(const QString &chanid,
+                             const QDateTime &starttime) const
 {
     QMutexLocker lock(&m_lock);
 
     int count = 0;
-    QValueList<LiveTVChainEntry>::iterator it, del;
+    QValueList<LiveTVChainEntry>::const_iterator it, del;
     for (it = m_chain.begin(); it != m_chain.end(); ++it, ++count)
     {
         if ((*it).chanid == chanid &&
@@ -254,17 +263,15 @@ int LiveTVChain::ProgramIsAt(const QString &chanid, const QDateTime &starttime)
     return -1;
 }
 
-int LiveTVChain::GetCurPos(void)
-{
-    return m_curpos;
-}
-
-int LiveTVChain::ProgramIsAt(ProgramInfo *pginfo)
+/** \fn LiveTVChain::ProgramIsAt(const ProgramInfo*) const
+ *  \returns program location or -1 for not found.
+ */
+int LiveTVChain::ProgramIsAt(const ProgramInfo *pginfo) const
 {
     return ProgramIsAt(pginfo->chanid, pginfo->recstartts);
 }
 
-int LiveTVChain::TotalSize(void)
+int LiveTVChain::TotalSize(void) const
 {
     return m_chain.count();
 }
@@ -281,24 +288,9 @@ void LiveTVChain::SetProgram(ProgramInfo *pginfo)
     m_switchid = -1;
 }
 
-bool LiveTVChain::HasNext(void)
+bool LiveTVChain::HasNext(void) const
 {
     return ((int)m_chain.count() - 1 > m_curpos);
-}
-
-bool LiveTVChain::HasPrev(void)
-{
-    return (m_curpos > 0);
-}
-
-bool LiveTVChain::NeedsToSwitch(void)
-{
-    return (m_switchid >= 0 && m_jumppos == 0);
-}
-
-bool LiveTVChain::NeedsToJump(void)
-{
-    return (m_switchid >= 0 && m_jumppos != 0);
 }
 
 void LiveTVChain::ClearSwitch(void)
@@ -307,6 +299,16 @@ void LiveTVChain::ClearSwitch(void)
     m_jumppos = 0;
 }
 
+/** \fn LiveTVChain::GetSwitchProgram(bool&,bool&)
+ *  \brief Returns the recording we should switch to
+ *
+ *   This returns a ProgramInfo* and tells us if this is a discontiuous
+ *   switch and whether the recording type is changing.
+ *
+ *   This also clears the NeedsToSwitch()/NeedsToJump() state.
+ *
+ *   NOTE: The caller is resposible for deleting the ProgramInfo
+ */
 ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
 {
     if (m_switchid < 0 || m_curpos == m_switchid)
@@ -343,7 +345,11 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
 
     return pginfo;
 }
-    
+
+/** \fn LiveTVChain::SwitchTo(int)
+ *  \brief Sets the recording to switch to.
+ *  \param num Index of recording to switch to, -1 for last recording.
+ */
 void LiveTVChain::SwitchTo(int num)
 {
     VERBOSE(VB_PLAYBACK, "LiveTVChain::SwitchTo("<<num<<")");
@@ -359,14 +365,17 @@ void LiveTVChain::SwitchTo(int num)
     {
         LiveTVChainEntry e;
         GetEntryAt(num, e);
-        QString msg = QString("%1_%2.%3")
-            .arg(e.chanid)
-            .arg(e.starttime.toString("yyyyMMddhhmmss"))
-            .arg("???");
+        QString msg = QString("%1_%2")
+            .arg(e.chanid).arg(e.starttime.toString("yyyyMMddhhmmss"));
         VERBOSE(VB_PLAYBACK, "LiveTVChain: Entry@"<<num<<": '"<<msg<<"'");
     }
 }
 
+/** \fn LiveTVChain::SwitchToNext(bool)
+ *  \brief Sets the recording to switch to.
+ *  \param up Set to true to switch to the next recording,
+ *            false to switch to the previous recording.
+ */
 void LiveTVChain::SwitchToNext(bool up)
 {
     VERBOSE(VB_PLAYBACK, "LiveTVChain::SwitchToNext("<<(up?"up":"down")<<")");
@@ -388,6 +397,9 @@ void LiveTVChain::JumpToNext(bool up, int pos)
     SwitchToNext(up);
 }
 
+/** \fn LiveTVChain::GetJumpPos(void)
+ *  \brief Returns the jump position and clears it.
+ */
 int LiveTVChain::GetJumpPos(void)
 {
     int ret = m_jumppos;
@@ -395,7 +407,7 @@ int LiveTVChain::GetJumpPos(void)
     return ret;
 }
 
-QString LiveTVChain::GetChannelName(int pos)
+QString LiveTVChain::GetChannelName(int pos) const
 {
     LiveTVChainEntry entry;
     GetEntryAt(pos, entry);
@@ -403,7 +415,7 @@ QString LiveTVChain::GetChannelName(int pos)
     return entry.channum;
 }
 
-QString LiveTVChain::GetInputName(int pos)
+QString LiveTVChain::GetInputName(int pos) const
 {
     LiveTVChainEntry entry;
     GetEntryAt(pos, entry);

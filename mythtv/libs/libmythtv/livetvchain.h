@@ -33,8 +33,6 @@ class LiveTVChain
     void SetHostPrefix(const QString &prefix);
     void SetCardType(const QString &type);
 
-    QString GetID(void);
-
     void DestroyChain(void);
 
     void AppendNewProgram(ProgramInfo *pginfo, QString channum,
@@ -43,33 +41,37 @@ class LiveTVChain
 
     void ReloadAll();
 
-    int GetCurPos(void);
-    ProgramInfo *GetProgramAt(int at); // -1 for last, new's the program caller must delete
-    int ProgramIsAt(const QString &chanid, const QDateTime &starttime);
-    int ProgramIsAt(ProgramInfo *pginfo); // -1 for not found
-    int TotalSize(void);
+    // const gets
+    QString GetID(void)  const { return m_id; }
+    int  GetCurPos(void) const { return m_curpos; }
+    int  ProgramIsAt(const QString &chanid, const QDateTime &starttime) const;
+    int  ProgramIsAt(const ProgramInfo *pginfo) const;
+    int  TotalSize(void) const;
+    bool HasNext(void)   const;
+    bool HasPrev(void)   const { return (m_curpos > 0); }
+    ProgramInfo *GetProgramAt(int at) const;
+    /// Returns true iff a switch is required but no jump is required
+    bool NeedsToSwitch(void) const
+        { return (m_switchid >= 0 && m_jumppos == 0); }
+    /// Returns true iff a switch and jump are required
+    bool NeedsToJump(void)   const
+        { return (m_switchid >= 0 && m_jumppos != 0); }
+    QString GetChannelName(int pos = -1) const;
+    QString GetInputName(int pos = -1) const;
 
+    // sets/gets program to switch to
     void SetProgram(ProgramInfo *pginfo);
-    bool HasNext(void);
-    bool HasPrev(void);
-
-    bool NeedsToSwitch(void);
-    ProgramInfo *GetSwitchProgram(bool &discont, bool &newtype); // clears switch flag
-
-    void ClearSwitch(void);
-
     void SwitchTo(int num);
-    void SwitchToNext(bool up); // true up, false down
+    void SwitchToNext(bool up);
+    void ClearSwitch(void);
+    ProgramInfo *GetSwitchProgram(bool &discont, bool &newtype);
 
-    bool NeedsToJump(void);
-
+    // sets/gets program to jump to
     void JumpTo(int num, int pos);
     void JumpToNext(bool up, int pos);
-    int  GetJumpPos(void);  // clears jumppos
+    int  GetJumpPos(void);
 
-    QString GetChannelName(int pos = -1);
-    QString GetInputName(int pos = -1);
-
+    // socket stuff
     void SetHostSocket(QSocket *sock);
     bool IsHostSocket(QSocket *sock);
     int HostSocketCount(void);
@@ -77,13 +79,13 @@ class LiveTVChain
  
   private:
     void BroadcastUpdate();
-    void GetEntryAt(int at, LiveTVChainEntry &entry);
-    ProgramInfo *EntryToProgram(LiveTVChainEntry &entry);
+    void GetEntryAt(int at, LiveTVChainEntry &entry) const;
+    static ProgramInfo *EntryToProgram(const LiveTVChainEntry &entry);
 
     QString m_id;
     QValueList<LiveTVChainEntry> m_chain;
     int m_maxpos;
-    QMutex m_lock;
+    mutable QMutex m_lock;
 
     QString m_hostprefix;
     QString m_cardtype;
