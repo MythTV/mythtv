@@ -101,7 +101,6 @@ class DBox2Recorder : public DTVRecorder
 	time_t lastpacket;
 	int bufferSize;
 	stream_meta transportStream;
-	TSPacket tpkt;
 	int m_videoWidth;
 	int m_videoHeight;
 	QString m_videoFormat;

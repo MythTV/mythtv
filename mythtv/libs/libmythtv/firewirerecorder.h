@@ -41,7 +41,7 @@ class FirewireRecorder : public DTVRecorder
 
     void StartRecording(void);
     bool Open(void); 
-    void ProcessTSPacket(unsigned char *tspacket, int len);
+    void ProcessTSPacket(const TSPacket &tspacket);
     void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                          const QString &videodev,
                                          const QString &audiodev,
@@ -66,7 +66,6 @@ class FirewireRecorder : public DTVRecorder
     iec61883_mpeg2_t fwmpeg;
     bool isopen;
     time_t lastpacket;
-    TSPacket tpkt;
 };
 
 #endif

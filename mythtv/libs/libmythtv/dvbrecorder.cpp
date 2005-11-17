@@ -365,7 +365,6 @@ bool DVBRecorder::SetDemuxFilters(void)
     _payload_start_seen.clear();
     data_found = false;
     _wait_for_keyframe = _wait_for_keyframe_option;
-    keyframe_found = false;
 
     _ps_rec_audio_id = 0xC0;
     _ps_rec_video_id = 0xE0;
@@ -761,52 +760,7 @@ void DVBRecorder::ReadFromDMX(void)
             }
 
             if (_record_transport_stream_option)
-            {   // handle TS recording
-                MythTimer t;
-                t.start();
-                if (_videoPID[pid])
-                {
-                    // Check for keyframe
-                    const TSPacket *pkt =
-                        reinterpret_cast<const TSPacket*>(pktbuf);
-                    FindKeyframes(pkt);
-                }
-                if (t.elapsed() > 10)
-                {
-                    VERBOSE(VB_RECORD, LOC_WARN +
-                            QString("Find keyframes took %1 ms!")
-                            .arg(t.elapsed()));
-                }
-
-                // Sync recording start to first keyframe
-                if (_wait_for_keyframe && !_keyframe_seen)
-                    continue;
-                if (!keyframe_found)
-                {
-                    keyframe_found = true;
-                    RECORD(QString("Found first keyframe"));
-                }
-
-                // Sync streams to the first Payload Unit Start Indicator
-                // _after_ first keyframe iff _wait_for_keyframe is true
-                if (!_payload_start_seen[pid])
-                {
-                    if ((pktbuf[1] & 0x40) == 0)
-                        continue; // not payload start - drop packet
-
-                    RECORD(QString("Found Payload Start for PID %1").arg(pid));
-                    _payload_start_seen[pid] = true;
-                }
-
-                t.start();
-                LocalProcessDataTS(pktbuf, MPEG_TS_PKT_SIZE);
-                if (t.elapsed() > 10)
-                {
-                    VERBOSE(VB_RECORD, LOC_WARN + 
-                            QString("TS packet write took %1 ms!")
-                            .arg(t.elapsed()));
-                }
-            }
+                ProcessTSPacket(*(reinterpret_cast<const TSPacket*>(pktbuf)));
             else
             {   // handle PS recording
                 ipack *ip = _ps_rec_pid_ipack[pid];
@@ -835,6 +789,47 @@ void DVBRecorder::ReadFromDMX(void)
         }
         _pid_read_lock.unlock();
     }
+}
+
+// handle TS recording
+bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
+{
+    // Check video pids for keyframes
+    if (_videoPID[tspacket.PID()])
+        _buffer_packets = !FindKeyframes(&tspacket);
+
+    // If haven't seen a keyframe yet and we are supposed to wait for the
+    // first keyframe before starting a recording, then return early...
+    if (_wait_for_keyframe && !_keyframe_seen)
+        return true;
+
+    // Sync each stream to the first Payload Start
+    // _after_ first keyframe iff _wait_for_keyframe is true
+    if (!_payload_start_seen[tspacket.PID()])
+    {
+        if (!tspacket.PayloadStart())
+            return true; // not payload start - drop packet
+        VERBOSE(VB_RECORD, LOC + "Found first payload start for " +
+                QString("PID 0x%1").arg(tspacket.PID(),0,16));
+        _payload_start_seen[tspacket.PID()] = true;
+    }
+
+    // Write out PAT & PMT on occasion...
+    int pktCnt = _payload_buffer.size() / TSPacket::SIZE;
+    _ts_packets_until_psip_sync -= (pktCnt + 1);
+    {
+        QMutexLocker read_lock(&_pid_read_lock);
+        if (_ts_packets_until_psip_sync <= 0 && _pat && _pmt)
+        {
+            BufferedWrite(*(reinterpret_cast<TSPacket*>(_pat->tsheader())));
+            BufferedWrite(*(reinterpret_cast<TSPacket*>(_pmt->tsheader())));
+            _ts_packets_until_psip_sync = TSPACKETS_BETWEEN_PSIP_SYNC;
+        }
+    }
+
+    BufferedWrite(tspacket);
+
+    return true;
 }
 
 #define SEQ_START     0x000001B3
@@ -917,21 +912,8 @@ void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
         ringBuffer->Write(buffer, len);
 }
 
-void DVBRecorder::LocalProcessDataTS(unsigned char *buffer, int len)
+void DVBRecorder::LocalProcessDataTS(const unsigned char *buffer, uint len)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
-    if (_ts_packets_until_psip_sync == 0)
-    {
-        if (_pat && _pmt)
-        {
-            ringBuffer->Write(_pat->tsheader()->data(), TSPacket::SIZE);
-            ringBuffer->Write(_pmt->tsheader()->data(), TSPacket::SIZE);
-            _ts_packets_until_psip_sync = TSPACKETS_BETWEEN_PSIP_SYNC;
-        }
-    }
-    else
-        _ts_packets_until_psip_sync--;
-
     ringBuffer->Write(buffer,len);
 }
 
