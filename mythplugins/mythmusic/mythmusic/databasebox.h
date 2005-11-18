@@ -66,7 +66,6 @@ class DatabaseBox : public MythThemedDialog
     void occasionallyCheckCD();
     void keepFilling();
     void showWaiting();
-    void updateLCDMenu(QKeyEvent *e);
 
     void ErrorPopup(const QString &msg);
     void closeErrorPopup();
@@ -80,12 +79,6 @@ class DatabaseBox : public MythThemedDialog
     void doPlaylistPopup(TreeCheckItem *item_ptr);
     void doActivePopup(PlaylistTitle *item_ptr);
     void checkParent(UIListGenericTree *);
-    LCDMenuItem *buildLCDMenuItem(TreeCheckItem *item_ptr, bool curMenuItem);
-    LCDMenuItem *buildLCDMenuItem(UIListGenericTree *item_ptr, bool curMenuItem);
-    void buildMenuTree(QPtrList<LCDMenuItem> *menuItems,
-                       UIListGenericTree *item_ptr, int level);
-
-    QString indentMenuItem(QString itemLevel);
  
     void checkTree(UIListGenericTree *startingpoint = NULL);
     QPixmap getPixmap(QString &level);

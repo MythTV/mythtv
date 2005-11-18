@@ -22,8 +22,6 @@ using namespace std;
 #include <mythtv/uitypes.h>
 #include <mythtv/uilistbtntype.h>
 
-#define LCD_MAX_MENU_ITEMS 5
-
 DatabaseBox::DatabaseBox(PlaylistsContainer *all_playlists,
                          AllMusic *music_ptr, MythMainWindow *parent, 
                          const QString &window_name, 
@@ -205,17 +203,9 @@ void DatabaseBox::keepFilling()
             // XXX listview->ensureItemVisible(listview->currentItem());
             checkTree();
 
-            //Display the menu when this opens up
-            QKeyEvent *fakeKey = new QKeyEvent(QEvent::None, Qt::Key_sterling,
-                                               0, Qt::NoButton);
-
             // make sure we get rid of the 'Loading Music Data' message
-            // before updating the menu
             if (class LCD * lcd = LCD::Get())
-                lcd->switchToNothing();
-
-            updateLCDMenu(fakeKey);
-            delete fakeKey;
+                lcd->switchToTime();
         }
         else
             showWaiting();
@@ -778,13 +768,6 @@ void DatabaseBox::selected(UIListGenericTree *item)
         cerr << "databasebox.o: That's odd ... there's something I don't "
                 "recognize on a ListView" << endl;
     }
-
-    // Update the menu
-    // Fake a key event, Key_sterling is a dummy
-    QKeyEvent *fakeKey = new QKeyEvent(QEvent::None, Qt::Key_sterling, 0, 
-                                       Qt::NoButton);
-    updateLCDMenu(fakeKey);
-    delete fakeKey;
 }
 
 
@@ -1190,8 +1173,6 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
     if (handled)
         return;
 
-    updateLCDMenu(e);
-
     MythDialog::keyPressEvent(e);
 }
 
@@ -1339,155 +1320,5 @@ void ReadCDThread::run()
     }
 
     delete decoder;
-}
-
-void DatabaseBox::updateLCDMenu(QKeyEvent * e)
-{
-    class LCD * lcd = LCD::Get();
-    if (lcd == NULL)
-        return;
-
-    // Update the LCD with a menu of items
-    UIListGenericTree *curItem = tree->GetCurrentPosition();
-
-    // Add the current item, and a few items below
-    if(!curItem)
-        return;
-
-    // Container
-    QPtrList<LCDMenuItem> *menuItems = new QPtrList<LCDMenuItem>;
-
-    // Let the pointer object take care of deleting things for us
-    menuItems->setAutoDelete(true);
-
-    if (TreeCheckItem *item_ptr = dynamic_cast<TreeCheckItem*>(curItem))
-        buildMenuTree(menuItems, item_ptr, 1);
-    else if (UIListGenericTree *item_ptr = dynamic_cast<UIListGenericTree*>(curItem))
-        buildMenuTree(menuItems, item_ptr, 1);
-
-    if (!menuItems->isEmpty())
-        lcd->switchToMenu(menuItems, "MythMusic", false);
-
-    //release the container
-    delete menuItems;
-
-    //Were done, so switch back to the time display
-    if (e->key() == Key_Escape)
-        lcd->switchToTime();
-}
-
-LCDMenuItem *DatabaseBox::buildLCDMenuItem(TreeCheckItem *item_ptr, 
-                                           bool curMenuItem)
-{
-    CHECKED_STATE check_state;
-
-    if (item_ptr->getCheck() == 2)
-        check_state = CHECKED;
-    else
-        check_state = UNCHECKED;
-
-    QString indent = indentMenuItem(item_ptr->getLevel());
-    QString name = indent + item_ptr->getString().stripWhiteSpace();
-    return new LCDMenuItem(curMenuItem, check_state, name, indent.length());
-}
-
-void DatabaseBox::buildMenuTree(QPtrList<LCDMenuItem> *menuItems, 
-                                UIListGenericTree *item_ptr, int level)
-{
-    if (!item_ptr || level > LCD_MAX_MENU_ITEMS)
-        return;
-
-    // If this is the first time in, try to add a few previous items
-    if (level == 1 && item_ptr->prevSibling(1))
-    {
-        TreeCheckItem *tcitem;
-        UIListGenericTree *qlvitem;
-
-        UIListGenericTree *testitem = (UIListGenericTree *)item_ptr->prevSibling(2);
-        if (testitem)
-        {
-            if ((tcitem = dynamic_cast<TreeCheckItem*>(testitem)))
-                menuItems->append(buildLCDMenuItem(tcitem, false));
-            else if ((qlvitem = dynamic_cast<UIListGenericTree*>(testitem)))
-                menuItems->append(buildLCDMenuItem(qlvitem, false));
-        }
-
-        testitem = (UIListGenericTree *)item_ptr->prevSibling(1);
-        if ((tcitem = dynamic_cast<TreeCheckItem*>(testitem)))
-            menuItems->append(buildLCDMenuItem(tcitem, false));
-        else if ((qlvitem = dynamic_cast<UIListGenericTree*>(testitem)))
-            menuItems->append(buildLCDMenuItem(qlvitem, false));
-    }
-
-    // Is this the item to point at in the menu?
-    // The first item ever comming into this method is expected to be
-    // the currently highlighted item
-    bool tf = (level == 1 ? true: false);
-
-    // Add this item
-    menuItems->append(buildLCDMenuItem(dynamic_cast<UIListGenericTree*>(item_ptr), 
-                                       tf));
-
-    TreeCheckItem *tcitem;
-    UIListGenericTree *qlvitem;
-
-    // If there is an item below, add it to the list
-
-    qlvitem = (UIListGenericTree *)item_ptr->nextSibling(1);
-
-    if ((tcitem = dynamic_cast<TreeCheckItem*>(qlvitem)))
-        buildMenuTree(menuItems, tcitem, ++level);
-    else
-        menuItems->append(buildLCDMenuItem(qlvitem, false));
-}
-
-LCDMenuItem *DatabaseBox::buildLCDMenuItem(UIListGenericTree *item_ptr, 
-                                           bool curMenuItem)
-{
-    CHECKED_STATE check_state = NOTCHECKABLE;
-    QString name = "Danger Will Robinson";
-    QString indent = "";
-
-    if (PlaylistTitle *pl_ptr = dynamic_cast<PlaylistTitle*>(item_ptr))
-    {
-        check_state = NOTCHECKABLE;
-        name = pl_ptr->getText().stripWhiteSpace();
-    }
-    else if (PlaylistItem *pli_ptr = dynamic_cast<PlaylistItem*>(item_ptr))
-    {
-        check_state = NOTCHECKABLE;
-
-        indent = indentMenuItem("album");
-        name = indent + pli_ptr->getText().stripWhiteSpace();
-    }
-
-    return new LCDMenuItem(curMenuItem, check_state, name, indent.length());
-}
-
-QString DatabaseBox::indentMenuItem(QString itemLevel)
-{
-    // Find the index and indent that number of spaces
-    int count = 1;
-    QStringList::ConstIterator it;
-    for (it = treelevels.begin(); it != treelevels.end(); ++it) 
-    {
-        if(*it == itemLevel)
-            break;
-        ++count;
-    }
-
-    // Reset the count if it hit the end without a match
-    if (it == treelevels.end() || itemLevel == "cd")
-        count = 0;
-
-    // Try to do a few overrides for indentation
-    if (itemLevel == "playlist")
-        count = 1;
-
-    QString returnvalue;
-    if (count > 0)
-        returnvalue = returnvalue.fill(' ', count);
-
-    return returnvalue;
 }
 
