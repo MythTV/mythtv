@@ -10,7 +10,7 @@ using namespace std;
 
 #include "gamesettings.h"
 
-const QString currentDatabaseVersion = "1011";
+const QString currentDatabaseVersion = "1012";
 
 static bool UpdateDBVersionNumber(const QString &newnumber)
 {
@@ -307,6 +307,17 @@ bool UpgradeGameDatabaseSchema(void)
             return false;
     }
 
+
+    if (dbver == "1011")
+    {
+        const QString updates[] = {
+"ALTER TABLE romdb ADD COLUMN binfile varchar(64) NOT NULL default ''; ",
+""
+};
+
+        if (!performActualUpdate(updates, "1012", dbver))
+            return false;
+    }
 
 
 

@@ -179,20 +179,21 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     node = m_gameTree->addNode(tr("Favourites"), m_gameTreeItems.size(), false);
     m_favouriteNode = node;
 
-    root = new GameTreeRoot("gamename", systemFilter);
+
+    root = new GameTreeRoot("genre gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("-   By Name"), m_gameTreeItems.size(), false);
+    node = m_gameTree->addNode(tr("-   By Genre"), m_gameTreeItems.size(), false);
 
     root = new GameTreeRoot("year gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
     node = m_gameTree->addNode(tr("-   By Year"), m_gameTreeItems.size(), false);
 
-    root = new GameTreeRoot("genre gamename", systemFilter);
+    root = new GameTreeRoot("gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
     m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("-   By Genre"), m_gameTreeItems.size(), false);
+    node = m_gameTree->addNode(tr("-   By Name"), m_gameTreeItems.size(), false);
 
     m_gameTreeUI->assignTreeData(m_gameTree);
     m_gameTreeUI->enter();

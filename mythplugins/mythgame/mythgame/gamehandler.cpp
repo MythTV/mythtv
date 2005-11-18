@@ -99,10 +99,12 @@ uint GameHandler::count(void)
 
 void GameHandler::InitMetaDataMap(QString GameType) 
 {
+    QString key;
+
     MSqlQuery query(MSqlQuery::InitCon());
     QString thequery = QString("SELECT crc, category, year, country, name, "
-                               "description, publisher, platform, version "
-                               " FROM romdb WHERE platform = \"%1\"; ")
+                               "description, publisher, platform, version, "
+                               "binfile FROM romdb WHERE platform = \"%1\"; ")
                               .arg(GameType);
     query.exec(thequery);
 
@@ -110,7 +112,10 @@ void GameHandler::InitMetaDataMap(QString GameType)
     {
         while (query.next())
         {
-            romDB[query.value(0).toString()] = RomData(
+            key = QString("%1:%2")
+                  .arg(query.value(0).toString())
+                  .arg(query.value(9).toString());
+            romDB[key] = RomData(
                                          query.value(1).toString(),
                                          query.value(2).toString(),
                                          query.value(3).toString(),
@@ -119,11 +124,6 @@ void GameHandler::InitMetaDataMap(QString GameType)
                                          query.value(6).toString(),
                                          query.value(7).toString(),
                                          query.value(8).toString());
-
-            //cerr << " rominfo " << romDB[query.value(0).toString()].GameName() << endl;
-//"GENRE","YEAR","COUNTRY","NAME","DESC",
-//                             "PUB","PLAT","VERS");
-
         }
     }
 
@@ -136,11 +136,11 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
                               QString *Publisher, QString *Version)
 {
     uLong crc;
+    QString key;
 
-    if (handler->GameType() == "NES")
-        crc = crcinfo(rom, 16);
-    else
-        crc = crcinfo(rom,0);
+    crc = crcinfo(rom, handler->GameType(), &key, &romDB);
+
+    //cerr << "Key = " << key << endl;
 
     *CRC32 = QString("%1").arg( crc, 0, 16 );
     if (*CRC32 == "0")
@@ -157,14 +157,14 @@ void GameHandler::GetMetadata(GameHandler *handler, QString rom, QString* Genre,
 
     if (*CRC32 != "")
     {
-        if (romDB.contains(*CRC32)) 
+        if (romDB.contains(key)) 
         {
-            *Year = romDB[*CRC32].Year();
-            *Country = romDB[*CRC32].Country();
-            *Genre = romDB[*CRC32].Genre();
-            *Publisher = romDB[*CRC32].Publisher();
-            *GameName = romDB[*CRC32].GameName();
-            *Version = romDB[*CRC32].Version();
+            *Year = romDB[key].Year();
+            *Country = romDB[key].Country();
+            *Genre = romDB[key].Genre();
+            *Publisher = romDB[key].Publisher();
+            *GameName = romDB[key].GameName();
+            *Version = romDB[key].Version();
         }
     };
 
@@ -457,7 +457,6 @@ void GameHandler::VerifyGameDB(GameHandler *handler)
                 if ((iter = m_GameMap.find(RomName)) != m_GameMap.end())
                 {
                     // If it's both on disk and in the database we're done with it.
-                    //iter.data().setLoc(inBoth);
                     m_GameMap.remove(iter);
                 }
                 else
