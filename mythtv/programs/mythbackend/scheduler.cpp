@@ -1967,7 +1967,9 @@ void Scheduler::AddNewRecords(void)
     QMap<int, bool> cardMap    = create_card_map(m_tvList);
 
     MSqlQuery rlist(MSqlQuery::SchedCon());
-    rlist.prepare("SELECT recordid, type FROM record");
+    rlist.prepare("SELECT recordid, type "
+                  "FROM record "
+                  "ORDER BY recordid DESC");
     if (!rlist.exec() || !rlist.isActive())
     {
         MythContext::DBError("AddNewRecords -- get rec", rlist);
