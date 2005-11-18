@@ -8,8 +8,8 @@ using namespace std;
 #include "programinfo.h"
 #include "recordingprofile.h"
 
-#define LOC QString("RecorderBase(%1): ").arg(videodevice)
-#define LOC_ERR QString("RecorderBase(%1) Error: ").arg(videodevice)
+#define LOC QString("RecBase(%1): ").arg(videodevice)
+#define LOC_ERR QString("RecBase(%1) Error: ").arg(videodevice)
 
 RecorderBase::RecorderBase(TVRec *rec, const char *name)
     : QObject(NULL, name),
@@ -50,15 +50,18 @@ void RecorderBase::deleteLater(void)
 
 void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 {
+    VERBOSE(VB_RECORD, LOC + "SetRingBuffer("<<rbuf<<")");
     ringBuffer = rbuf;
     weMadeBuffer = false;
 }
 
-void RecorderBase::SetRecording(ProgramInfo *pginfo)
+void RecorderBase::SetRecording(const ProgramInfo *pginfo)
 {
-    VERBOSE(VB_RECORD, "SetRecording(0x"<<pginfo<<")");
-    if (pginfo && pginfo->title)
-        VERBOSE(VB_IMPORTANT, "Prog title: "<<pginfo->title);
+    if (pginfo)
+        VERBOSE(VB_RECORD, LOC + "SetRecording(" << pginfo
+                << QString(") title(%1)").arg(pginfo->title));
+    else
+        VERBOSE(VB_RECORD, LOC + "SetRecording(0x0)");
 
     ProgramInfo *oldrec = curRecording;
     if (pginfo)
@@ -118,8 +121,8 @@ void RecorderBase::SetOption(const QString &name, const QString &value)
 
 void RecorderBase::SetOption(const QString &name, int value)
 {
-    VERBOSE(VB_IMPORTANT,
-            QString("RecorderBase::SetOption(): Unknown int option: %1: %2")
+    VERBOSE(VB_IMPORTANT, LOC_ERR +
+            QString("SetOption(): Unknown int option: %1: %2")
             .arg(name).arg(value));
 }
 

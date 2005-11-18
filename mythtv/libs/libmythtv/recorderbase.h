@@ -50,7 +50,7 @@ class RecorderBase : public QObject
      *
      *  \sa ChannelNameChanged(const QString&)
      */
-    void SetRecording(ProgramInfo *pginfo);
+    void SetRecording(const ProgramInfo *pginfo);
 
     /** \brief Tells recorder to use an externally created ringbuffer.
      *
