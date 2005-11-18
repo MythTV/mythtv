@@ -31,10 +31,6 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
 
-#define LOC QString("Schd: ")
-#define LOC_WARN QString("Schd Warning: ")
-#define LOC_ERR QString("Schd Error: ")
-
 Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList)
 {
     hasconflicts = false;
@@ -1755,302 +1751,197 @@ void Scheduler::UpdateMatches(int recordid) {
     VERBOSE(VB_SCHEDULE, " +-- Done.");
 }
 
-QString construct_new_rec_query(int recordid, const RecordingType type)
+void Scheduler::AddNewRecords(void) 
 {
+    struct timeval dbstart, dbend;
+
+    QMap<RecordingType, int> recTypeRecPriorityMap;
+    RecList tmpList;
+
+    QMap<int, bool> cardMap;
+    QMap<int, EncoderLink *>::Iterator enciter = m_tvList->begin();
+    for (; enciter != m_tvList->end(); ++enciter)
+    {
+        EncoderLink *enc = enciter.data();
+        if (enc->IsConnected())
+            cardMap[enc->GetCardID()] = true;
+    }
+
+    QMap<int, bool> tooManyMap;
+    bool checkTooMany = false;
+
+    MSqlQuery rlist(MSqlQuery::SchedCon());
+    rlist.prepare("SELECT recordid,title,maxepisodes,maxnewest FROM record;");
+
+    rlist.exec();
+
+    if (!rlist.isActive())
+    {
+        MythContext::DBError("CheckTooMany", rlist);
+        return;
+    }
+
+    while (rlist.next())
+    {
+        int recid = rlist.value(0).toInt();
+        QString qtitle = QString::fromUtf8(rlist.value(1).toString());
+        int maxEpisodes = rlist.value(2).toInt();
+        int maxNewest = rlist.value(3).toInt();
+
+        tooManyMap[recid] = false;
+
+        if (maxEpisodes && !maxNewest)
+        {
+            MSqlQuery epicnt(MSqlQuery::SchedCon());
+
+            epicnt.prepare("SELECT count(*) FROM recorded "
+                           "WHERE title = :TITLE;");
+            epicnt.bindValue(":TITLE", qtitle.utf8());
+
+            epicnt.exec();
+
+            if (epicnt.isActive() && epicnt.size() > 0)
+            {
+                epicnt.next();
+
+                if (epicnt.value(0).toInt() >= maxEpisodes)
+                {
+                    tooManyMap[recid] = true;
+                    checkTooMany = true;
+                }
+            }
+        }
+    }
+
     QString progfindid = QString(
-        "(CASE record.type "
-        "  WHEN %1 "
-        "   THEN record.findid "
-        "  WHEN %2 "
-        "   THEN to_days(date_sub(program.starttime, interval "
-        "                time_format(record.findtime, '%H:%i') hour_minute)) "
-        "  WHEN %3 "
-        "   THEN floor((to_days(date_sub(program.starttime, interval "
-        "               time_format(record.findtime, '%H:%i') hour_minute)) - "
-        "               record.findday)/7) * 7 + record.findday "
-        "  WHEN %4 "
-        "   THEN record.findid "
-        "  ELSE 0 "
-        " END) ")
+"(CASE record.type "
+"  WHEN %1 "
+"   THEN record.findid "
+"  WHEN %2 "
+"   THEN to_days(date_sub(program.starttime, interval "
+"                time_format(record.findtime, '%H:%i') hour_minute)) "
+"  WHEN %3 "
+"   THEN floor((to_days(date_sub(program.starttime, interval "
+"               time_format(record.findtime, '%H:%i') hour_minute)) - "
+"               record.findday)/7) * 7 + record.findday "
+"  WHEN %4 "
+"   THEN record.findid "
+"  ELSE 0 "
+" END) ")
         .arg(kFindOneRecord)
         .arg(kFindDailyRecord)
         .arg(kFindWeeklyRecord)
         .arg(kOverrideRecord);
 
-    if (recordid >= 0)
+    QString query = QString(
+"SELECT DISTINCT channel.chanid, channel.sourceid, "
+"program.starttime, program.endtime, "
+"program.title, program.subtitle, program.description, "
+"channel.channum, channel.callsign, channel.name, "
+"oldrecorded.endtime IS NOT NULL AS oldrecduplicate, program.category, "
+"record.recpriority, "
+"record.dupin, "
+"recorded.endtime IS NOT NULL AND recorded.endtime < NOW() AS recduplicate, "
+"oldfind.findid IS NOT NULL AS findduplicate, "
+"record.type, record.recordid, "
+"program.starttime - INTERVAL record.startoffset minute AS recstartts, "
+"program.endtime + INTERVAL record.endoffset minute AS recendts, "
+"program.previouslyshown, record.recgroup, record.dupmethod, "
+"channel.commfree, capturecard.cardid, "
+"cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
+"program.seriesid, program.programid, program.category_type, "
+"program.airdate, program.stars, program.originalairdate, record.inactive, "
+"record.parentid, ") + progfindid + ", record.tsdefault, "
+"oldrecstatus.recstatus, oldrecstatus.reactivate, " 
+"channel.recpriority + cardinput.preference "
++ QString(
+"FROM recordmatch "
+
+" INNER JOIN record ON (recordmatch.recordid = record.recordid) "
+" INNER JOIN program ON (recordmatch.chanid = program.chanid AND "
+"                        recordmatch.starttime = program.starttime AND "
+"                        recordmatch.manualid = program.manualid) "
+" INNER JOIN channel ON (channel.chanid = program.chanid) "
+" INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
+" INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) "
+" LEFT JOIN oldrecorded as oldrecstatus ON "
+"  ( oldrecstatus.station = channel.callsign AND "
+"    oldrecstatus.starttime = program.starttime AND "
+"    oldrecstatus.title = program.title ) "
+" LEFT JOIN oldrecorded ON "
+"  ( "
+"    record.dupmethod > 1 AND "
+"    oldrecorded.duplicate <> 0 AND "
+"    program.title = oldrecorded.title "
+"     AND "
+"     ( "
+"      (program.programid <> '' AND NOT "
+"       (program.category_type = 'series' AND program.programid LIKE '%0000') "
+"       AND program.programid = oldrecorded.programid) "
+"      OR "
+"      (oldrecorded.findid <> 0 AND "
+"        oldrecorded.findid = ") + progfindid + QString(") "
+"      OR "
+"      ( "
+"       (program.programid = '' OR oldrecorded.programid = '') "
+"       AND "
+"       (((record.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
+"          AND program.subtitle = oldrecorded.subtitle)) "
+"       AND "
+"       (((record.dupmethod & 0x04) = 0) OR (program.description <> '' "
+"          AND program.description = oldrecorded.description)) "
+"      ) "
+"     ) "
+"  ) "
+" LEFT JOIN recorded ON "
+"  ( "
+"    record.dupmethod > 1 AND "
+"    program.title = recorded.title "
+"     AND "
+"     ( "
+"      (program.programid <> '' AND NOT "
+"       (program.category_type = 'series' AND program.programid LIKE '%0000') "
+"       AND program.programid = recorded.programid) "
+"      OR "
+"      (recorded.findid <> 0 AND "
+"        recorded.findid = ") + progfindid + QString(") "
+"      OR "
+"      ( "
+"       (program.programid = '' OR recorded.programid = '') "
+"       AND "
+"       (((record.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
+"          AND program.subtitle = recorded.subtitle)) "
+"       AND "
+"       (((record.dupmethod & 0x04) = 0) OR (program.description <> '' "
+"          AND program.description = recorded.description)) "
+"      ) "
+"     ) "
+"  ) "
+" LEFT JOIN oldfind ON "
+"  (oldfind.recordid = recordmatch.recordid AND "
+"   oldfind.findid = ") + progfindid + QString(") "
+" ORDER BY record.recordid DESC "
+);
+
+    VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
+
+    gettimeofday(&dbstart, NULL);
+    MSqlQuery result(MSqlQuery::SchedCon());
+    result.prepare(query);
+    result.exec();
+    gettimeofday(&dbend, NULL);
+
+    if (!result.isActive())
     {
-        if ((kFindOneRecord == type) || (kOverrideRecord == type))
-            progfindid = " record.findid ";
-        else if (kFindDailyRecord == type)
-            progfindid =
-                " to_days(date_sub(program.starttime, interval "
-                "time_format(record.findtime, '%H:%i') hour_minute)) ";
-        else if (kFindWeeklyRecord == type)
-            progfindid = " floor((to_days(date_sub(program.starttime, "
-                "interval time_format(record.findtime, '%H:%i') "
-                "hour_minute)) - record.findday)/7) * 7 + record.findday ";
-        else
-            progfindid = " 0 ";
-    }
-
-    QString select_part = QString(
-        "SELECT DISTINCT "
-        "   channel.chanid, channel.sourceid, "
-        "   program.starttime, program.endtime, "
-        "   program.title, program.subtitle, program.description, "
-        "   channel.channum, channel.callsign, channel.name, "
-        "   oldrecorded.endtime IS NOT NULL AS oldrecduplicate, "
-        "   program.category, "
-        "   record.recpriority, "
-        "   record.dupin, "
-        "   recorded.endtime IS NOT NULL AND recorded.endtime < NOW() "
-        "       AS recduplicate, "
-        "   oldfind.findid IS NOT NULL AS findduplicate, "
-        "   record.type, record.recordid, "
-        "   program.starttime - INTERVAL record.startoffset minute "
-        "       AS recstartts, "
-        "   program.endtime + INTERVAL record.endoffset minute AS recendts, "
-        "   program.previouslyshown, record.recgroup, record.dupmethod, "
-        "   channel.commfree, capturecard.cardid, "
-        "   cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' "
-        "       AS shareable, "
-        "   program.seriesid, program.programid, program.category_type, "
-        "   program.airdate, program.stars, program.originalairdate, "
-        "   record.inactive, "
-        "   record.parentid, ")+progfindid+", record.tsdefault, "
-        "   oldrecstatus.recstatus, oldrecstatus.reactivate, " 
-        "   channel.recpriority + cardinput.preference ";
-    static const QString from_part = QString("FROM recordmatch ");
-    static const QString inner_join_part =
-        "INNER JOIN record ON (recordmatch.recordid = record.recordid) "
-        "INNER JOIN program ON "
-        "  (recordmatch.chanid    = program.chanid    AND "
-        "   recordmatch.starttime = program.starttime AND "
-        "   recordmatch.manualid  = program.manualid) "
-        "INNER JOIN channel ON (channel.chanid = program.chanid) "
-        "INNER JOIN cardinput ON (channel.sourceid = cardinput.sourceid) "
-        "INNER JOIN capturecard ON (capturecard.cardid = cardinput.cardid) ";
-    static const QString left_oldrec_keys =
-        "LEFT JOIN oldrecorded as oldrecstatus ON "
-        "  (oldrecstatus.station   = channel.callsign AND "
-        "   oldrecstatus.starttime = program.starttime AND "
-        "   oldrecstatus.title     = program.title ) ";
-    QString left_oldrec_find = QString(
-        "LEFT JOIN oldrecorded ON "
-        "  ( "
-        "    record.dupmethod > 1 AND "
-        "    oldrecorded.duplicate <> 0 AND "
-        "    program.title = oldrecorded.title "
-        "     AND "
-        "     ( "
-        "      (program.programid <> '' AND NOT "
-        "       (program.category_type = 'series' AND "
-        "        program.programid LIKE '%0000') "
-        "       AND program.programid = oldrecorded.programid) "
-        "      OR "
-        "      (oldrecorded.findid <> 0 AND "
-        "        oldrecorded.findid = ")+progfindid+") "
-        "      OR "
-        "      ( "
-        "       (program.programid = '' OR oldrecorded.programid = '') "
-        "       AND "
-        "       (((record.dupmethod & 0x02) = 0) OR "
-        "        (program.subtitle <> '' AND "
-        "         program.subtitle = oldrecorded.subtitle)) "
-        "       AND "
-        "       (((record.dupmethod & 0x04) = 0) OR "
-        "        (program.description <> '' AND "
-        "         program.description = oldrecorded.description)) "
-        "      ) "
-        "     ) "
-        "  ) ";
-    QString left_recorded_find = QString(
-        "LEFT JOIN recorded ON "
-        "  ( "
-        "    record.dupmethod > 1 AND "
-        "    program.title = recorded.title "
-        "     AND "
-        "     ( "
-        "      (program.programid <> '' AND NOT "
-        "       (program.category_type = 'series' AND "
-        "        program.programid LIKE '%0000') "
-        "       AND program.programid = recorded.programid) "
-        "      OR "
-        "      (recorded.findid <> 0 AND "
-        "        recorded.findid = ")+progfindid+") "
-        "      OR "
-        "      ( "
-        "       (program.programid = '' OR recorded.programid = '') "
-        "       AND "
-        "       (((record.dupmethod & 0x02) = 0) OR "
-        "        (program.subtitle <> '' AND "
-        "         program.subtitle = recorded.subtitle)) "
-        "       AND "
-        "       (((record.dupmethod & 0x04) = 0) OR "
-        "        (program.description <> '' AND "
-        "         program.description = recorded.description)) "
-        "      ) "
-        "     ) "
-        "  ) ";
-    static const QString left_oldfind_find = QString(
-        "LEFT JOIN oldfind ON "
-        "  (oldfind.recordid = recordmatch.recordid AND "
-        "   oldfind.findid = ")+progfindid+") ";
-    QString where_part = QString("WHERE record.recordid = %1 ").arg(recordid);
-    static const QString order_by = " ORDER BY record.recordid DESC ";
-    QString tail = (recordid >= 0) ? where_part : order_by;
-
-    return
-        select_part        + "\n" +
-        from_part          + "\n" + 
-        inner_join_part    + "\n" + 
-        left_oldrec_keys   + "\n" + left_oldrec_find  + "\n" +
-        left_recorded_find + "\n" + left_oldfind_find + "\n" +
-        tail               + "\n";
-}
-
-QMap<int, bool> create_too_many_map(bool &checkTooMany)
-{
-    QMap<int, bool> tooManyMap;
-    checkTooMany = false;
-
-    MSqlQuery rlist(MSqlQuery::SchedCon());
-    rlist.prepare("SELECT recordid,title,maxepisodes,maxnewest FROM record;");
-    rlist.exec();
-    if (!rlist.isActive())
-    {
-        MythContext::DBError("AddNewRecords -- check too many", rlist);
-        return tooManyMap;
-    }
-
-    MSqlQuery epicnt(MSqlQuery::SchedCon());
-    while (rlist.next())
-    {
-        const int recid    = rlist.value(0).toInt();
-        QString title_utf8 = rlist.value(1).toString();
-        int maxEpisodes    = rlist.value(2).toInt();
-        int maxNewest      = rlist.value(3).toInt();
-
-        tooManyMap[recid]  = false;
-        if (!maxEpisodes || maxNewest)
-            continue;
-
-        epicnt.prepare("SELECT count(*) "
-                       "FROM recorded "
-                       "WHERE title = :TITLE");
-        epicnt.bindValue(":TITLE", title_utf8);
-        epicnt.exec();
-
-        checkTooMany |= tooManyMap[recid] =
-            epicnt.isActive() && epicnt.next() &&
-            (epicnt.value(0).toInt() >= maxEpisodes);
-    }
-    return tooManyMap;
-}
-
-QMap<int, bool> create_card_map(const QMap<int, EncoderLink*> *tvList)
-{
-    QMap<int, bool> cardMap;
-    QMap<int, EncoderLink *>::const_iterator enciter = tvList->begin();
-    for (; enciter != tvList->end(); ++enciter)
-    {
-        const EncoderLink *enc = enciter.data();
-        cardMap[enc->GetCardID()] = enc->IsConnected();
-    }
-    return cardMap;
-}
-
-void Scheduler::AddNewRecords(void) 
-{
-    bool checkTooMany = false;
-    QMap<int, bool> tooManyMap = create_too_many_map(checkTooMany);
-    QMap<int, bool> cardMap    = create_card_map(m_tvList);
-
-    MSqlQuery rlist(MSqlQuery::SchedCon());
-    rlist.prepare("SELECT recordid, type "
-                  "FROM record "
-                  "ORDER BY recordid DESC");
-    if (!rlist.exec() || !rlist.isActive())
-    {
-        MythContext::DBError("AddNewRecords -- get rec", rlist);
+        MythContext::DBError("AddNewRecords", result);
         return;
     }
 
-    VERBOSE(VB_SCHEDULE, QString(" |-- Start DB recording queries..."));
+    VERBOSE(VB_SCHEDULE, QString(" |-- %1 results in %2 sec. Processing...")
+            .arg(result.size())
+            .arg(((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
+                  (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0));
 
-    MSqlQuery result(MSqlQuery::SchedCon());
-    uint      totalResultSize = 0;
-    float     totalDBMSecs    = 0.0f;
-    float     totalProcMSecs  = 0.0f;
-    float     msecs           = 0.0f;
-    uint      sleepTime       = 50; // ms to sleep btw queries
-    RecList   tmpList;
-    struct timeval dbstart;
-    struct timeval dbend;
-    QMap<RecordingType, int> recTypeRecPriorityMap;
-    while (rlist.next())
-    {
-        uint recordid = rlist.value(0).toUInt();
-        uint type     = rlist.value(1).toUInt();
-        QString query = construct_new_rec_query(
-            recordid, (RecordingType) type);
-
-        gettimeofday(&dbstart, NULL);
-        result.prepare(query);
-        result.exec();
-        gettimeofday(&dbend, NULL);
-
-        if (!result.isActive())
-        {
-            MythContext::DBError("AddNewRecords -- adding rec", result);
-            continue;
-        }
-
-        totalResultSize += result.size();
-
-        msecs = (((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
-                  (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0f) * 1000;
-
-        totalDBMSecs += msecs;
-
-        if (msecs > 50.0f)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_WARN + "Query for rec id " +
-                    QString("%1 t%2 took %3 ms! cnt:%4")
-                    .arg(recordid,3).arg(type,2).arg(msecs,5,'f',1)
-                    .arg(result.size(),3));
-        }
-
-        gettimeofday(&dbstart, NULL);
-        ProcessNewRecords(result, checkTooMany, tooManyMap, cardMap,
-                          recTypeRecPriorityMap, tmpList);
-        gettimeofday(&dbend, NULL);
-        msecs = (((dbend.tv_sec  - dbstart.tv_sec) * 1000000 +
-                  (dbend.tv_usec - dbstart.tv_usec)) / 1000000.0f) * 1000;
-        totalProcMSecs += msecs;
-
-        usleep(sleepTime * 1000); // sleep a few ms to give recorders a chance
-    }
-
-    VERBOSE(VB_SCHEDULE,
-            QString(" |-- %1 results  DB,Proc,Sleep (%2,%3,%4) ms, resp.")
-            .arg(totalResultSize)
-            .arg(totalDBMSecs,0,'f',0).arg(totalProcMSecs,0,'f',0)
-            .arg(rlist.size()*sleepTime,0,'f',0));
-
-    VERBOSE(VB_SCHEDULE, " +-- Cleanup...");
-    reclist.insert(reclist.end(), tmpList.begin(), tmpList.end());
-    return;
-}
-
-void Scheduler::ProcessNewRecords(
-    MSqlQuery               &result,
-    bool                    checkTooMany,
-    const QMap<int,bool>    &tooManyMap,
-    const QMap<int,bool>    &cardMap,
-    QMap<RecordingType,int> &recTypeRecPriorityMap,
-    RecList                 &tmpList)
-{
     while (result.next())
     {
         // Don't bother if the tuner card isn't on-line
@@ -2105,8 +1996,7 @@ void Scheduler::ProcessNewRecords(
         }
         else
         {
-            p->originalAirDate =
-                QDate::fromString(result.value(32).toString(), Qt::ISODate);
+            p->originalAirDate = QDate::fromString(result.value(32).toString(), Qt::ISODate);
             p->hasAirDate = true;
         }
 
@@ -2130,12 +2020,12 @@ void Scheduler::ProcessNewRecords(
         p->schedulerid = 
             p->startts.toString() + "_" + p->chanid;
 
-        // Check to see if the program is currently recording and if
+        // Chedk to see if the program is currently recording and if
         // the end time was changed.  Ideally, checking for a new end
         // time should be done after PruneOverlaps, but that would
         // complicate the list handling.  Do it here unless it becomes
         // problematic.
-        RecConstIter rec = reclist.begin();
+        RecIter rec = reclist.begin();
         for ( ; rec != reclist.end(); rec++)
         {
             ProgramInfo *r = *rec;
@@ -2145,9 +2035,7 @@ void Scheduler::ProcessNewRecords(
                     r->recendts != p->recendts &&
                     (r->recordid == p->recordid ||
                      p->rectype == kOverrideRecord))
-                {
                     ChangeRecordingEnd(r, p);
-                }
                 delete p;
                 p = NULL;
                 break;
@@ -2173,8 +2061,7 @@ void Scheduler::ProcessNewRecords(
             if (p->dupin == kDupsNewEpi && p->repeat)
                 p->recstatus = rsRepeat;
 
-            if (((p->dupin & kDupsInOldRecorded) ||
-                 (p->dupin == kDupsNewEpi)) &&
+            if (((p->dupin & kDupsInOldRecorded) || (p->dupin == kDupsNewEpi)) &&
                 result.value(10).toInt())
                 p->recstatus = rsPreviousRecording;
 
@@ -2194,6 +2081,11 @@ void Scheduler::ProcessNewRecords(
 
         tmpList.push_back(p);
     }
+
+    VERBOSE(VB_SCHEDULE, " +-- Cleanup...");
+    RecIter tmp = tmpList.begin();
+    for ( ; tmp != tmpList.end(); tmp++)
+        reclist.push_back(*tmp);
 }
 
 void Scheduler::AddNotListed(void) {

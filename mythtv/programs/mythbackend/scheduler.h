@@ -17,7 +17,6 @@ class MainServer;
 using namespace std;
 
 typedef list<ProgramInfo *> RecList;
-typedef RecList::const_iterator RecConstIter;
 typedef RecList::iterator RecIter;
 
 class Scheduler : public QObject
@@ -84,14 +83,6 @@ class Scheduler : public QObject
     void SchedNewRecords(void);
     void MoveHigherRecords(void);
     void PruneRedundants(void);
-
-    void ProcessNewRecords(
-        MSqlQuery               &result,
-        bool                    checkTooMany,
-        const QMap<int,bool>    &tooManyMap,
-        const QMap<int,bool>    &cardMap,
-        QMap<RecordingType,int> &recTypeRecPriorityMap,
-        RecList                 &tmpList);
 
     bool ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp);
 
