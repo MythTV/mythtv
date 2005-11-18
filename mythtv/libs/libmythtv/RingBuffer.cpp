@@ -39,8 +39,8 @@ const uint RingBuffer::kBufferSize = 10 * 256000;
 #define NUV_MIN_SIZE  204 /* header size? */
 #define MPEG_MIN_SIZE 376 /* 2 TS packets */
 
-#define LOC QString("RingBuf: ")
-#define LOC_ERR QString("RingBuf, Error: ")
+#define LOC QString("RingBuf(%1): ").arg(filename)
+#define LOC_ERR QString("RingBuf(%1) Error: ").arg(filename)
 
 /* should be minimum of the above test sizes */
 const uint RingBuffer::kReadTestSize = PNG_MIN_SIZE;
@@ -119,6 +119,9 @@ RingBuffer::RingBuffer(const QString &lfilename,
  */
 void RingBuffer::OpenFile(const QString &lfilename, uint retryCount)
 {
+    VERBOSE(VB_PLAYBACK, LOC + QString("OpenFile(%1, %1)")
+            .arg(lfilename).arg(retryCount));
+
     uint openAttempts = retryCount + 1;
 
     filename = lfilename;
