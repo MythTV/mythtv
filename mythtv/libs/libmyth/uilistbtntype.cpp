@@ -22,6 +22,7 @@
 #include <iostream>
 
 #include "mythcontext.h"
+#include "lcddevice.h"
 
 #include "uilistbtntype.h"
 
@@ -276,6 +277,7 @@ void UIListTreeType::CreateLevel(int level)
                                       m_itemSelAlpha);
             newlevel->SetSpacing(m_spacing);
             newlevel->SetMargin(m_margin);
+            newlevel->SetParentListTree(this);
 
             listLevels.append(newlevel);
         }
@@ -833,6 +835,7 @@ UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
                              int order, bool showArrow, bool showScrollArrows)
              : UIType(name)
 {
+    m_parentListTree   = NULL;
     m_order            = order;
     m_rect             = area;
 
@@ -853,7 +856,7 @@ UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount = 0;
-
+ 
     m_initialized     = false;
     m_clearing        = false;
     m_itemSpacing     = 0;
@@ -1448,8 +1451,76 @@ void UIListBtnType::Draw(QPainter *p, int order, int context, bool active_on)
     if (m_context != -1 && m_context != context)
         return;
 
+    //  Put something on the LCD device (if one exists)
+    if (class LCD *lcddev = LCD::Get())
+    {
+        if (m_active)
+        {
+            // add max of lcd height menu items either side of the selected item
+            // let the lcdserver figure out which ones to display
+
+            QPtrList<LCDMenuItem> menuItems;
+            menuItems.setAutoDelete(true);
+
+            QPtrListIterator<UIListBtnTypeItem> it = (*m_selIterator);
+            uint count = 0;
+
+            // move back up the list a little
+            while (it.current() && count < lcddev->getLCDHeight())
+            {
+                --it;
+                ++count;
+            }
+
+            if (!it.current())
+                it.toFirst();
+            count = 0;
+            while (it.current() && count < lcddev->getLCDHeight() * 2)
+            {
+                UIListBtnTypeItem *curItem = it.current();
+                QString msg = curItem->text();
+                bool selected;
+                CHECKED_STATE checkState = NOTCHECKABLE;
+                if (curItem->checkable())
+                {
+                    if (curItem->state() == UIListBtnTypeItem::HalfChecked || 
+                        curItem->state() == UIListBtnTypeItem::FullChecked)
+                        checkState = CHECKED;
+                    else
+                        checkState = UNCHECKED;
+                }
+
+                if (curItem == m_selItem)
+                    selected = true;
+                else
+                    selected = false;
+
+                menuItems.append(new LCDMenuItem(selected, checkState, msg));
+                ++it;
+                ++count;
+            }
+
+            QString title = "";
+
+            if (m_parentListTree && m_parentListTree->getDepth() > 0)
+                title = "<< ";
+            else
+                title = "   ";
+
+            if ((m_selItem && m_selItem->getDrawArrow()) || m_showArrow)
+                title += " >>";
+            else
+                title += "   ";
+
+            if (!menuItems.isEmpty())
+            {
+                lcddev->switchToMenu(&menuItems, title);
+            }
+        }
+    }
+
     fontProp* font = m_active ? m_fontActive : m_fontInactive;
-    
+
     if (!active_on)
     {
         font = m_fontInactive;

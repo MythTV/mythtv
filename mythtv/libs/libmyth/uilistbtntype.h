@@ -167,6 +167,7 @@ class UIListBtnType : public UIType
                   bool showArrow=true, bool showScrollArrows=false);
     ~UIListBtnType();
 
+    void  SetParentListTree(UIListTreeType* parent) { m_parentListTree = parent;}
     void  SetFontActive(fontProp *font);
     void  SetFontInactive(fontProp *font);
     void  SetSpacing(int spacing);
@@ -220,6 +221,8 @@ class UIListBtnType : public UIType
 
     void  InsertItem(UIListBtnTypeItem *item);
     void  RemoveItem(UIListBtnTypeItem *item);
+
+    UIListTreeType *m_parentListTree;
 
     QRect m_rect;
     QRect m_contentsRect;
@@ -277,7 +280,7 @@ class UIListBtnType : public UIType
     friend class UIListBtnTypeItem;
   
     int m_xdrawoffset;
-  
+
   signals:
 
     void itemSelected(UIListBtnTypeItem* item);
@@ -315,7 +318,8 @@ class UIListBtnTypeItem
     void setChecked(CheckState state);
 
     void setDrawArrow(bool flag);
-
+    bool getDrawArrow(void) { return m_showArrow; }
+     
     void setData(void *data);
     void *getData();
     
