@@ -68,7 +68,7 @@ void JobQueue::customEvent(QCustomEvent *e)
             QString action = tokens[1];
             int jobType = JOB_UNKNOWN;
             int jobID = -1;
-            QString chanid;
+            uint chanid;
             
             QDateTime starttime;
             QString detectionHost = "";
@@ -81,7 +81,7 @@ void JobQueue::customEvent(QCustomEvent *e)
             else
             {
                 jobType = tokens[2].toInt();
-                chanid = tokens[3];
+                chanid = tokens[3].toUInt();
                 starttime = QDateTime::fromString(tokens[4], Qt::ISODate);
                 detectionHost = tokens[5];
             }
@@ -150,7 +150,7 @@ void JobQueue::ProcessQueue(void)
 {
     VERBOSE(VB_JOBQUEUE, "JobQueue::ProcessQueue() started");
 
-    QString chanid;
+    uint chanid;
     QDateTime starttime;
     QString startts;
     int type;
@@ -500,7 +500,7 @@ bool JobQueue::QueueRecordingJobs(ProgramInfo *pinfo, int jobTypes)
     return true;
 }
 
-bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime, 
+bool JobQueue::QueueJob(int jobType, uint chanid, QDateTime starttime, 
                         QString args, QString comment, QString host,
                         int flags, int status)
 {
@@ -576,7 +576,7 @@ bool JobQueue::QueueJob(int jobType, QString chanid, QDateTime starttime,
     return true;
 }
 
-bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime, 
+bool JobQueue::QueueJobs(int jobTypes, uint chanid, QDateTime starttime, 
                          QString args, QString comment, QString host)
 {
     if (gContext->GetNumSetting("AutoTranscodeBeforeAutoCommflag", 0))
@@ -606,7 +606,7 @@ bool JobQueue::QueueJobs(int jobTypes, QString chanid, QDateTime starttime,
     return true;
 }
 
-int JobQueue::GetJobID(int jobType, QString chanid, QDateTime starttime)
+int JobQueue::GetJobID(int jobType, uint chanid, QDateTime starttime)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
@@ -633,7 +633,7 @@ int JobQueue::GetJobID(int jobType, QString chanid, QDateTime starttime)
     return -1;
 }
 
-bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid, 
+bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, uint &chanid, 
                                 QDateTime &starttime)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -655,7 +655,7 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
         if ((query.size() > 0) && query.next())
         {
             jobType = query.value(0).toInt();
-            chanid = query.value(1).toString();
+            chanid = query.value(1).toUInt();
             starttime = query.value(2).toDateTime();
             return true;
         }
@@ -664,7 +664,7 @@ bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid,
     return false;
 }
 
-bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, QString &chanid, 
+bool JobQueue::GetJobInfoFromID(int jobID, int &jobType, uint &chanid, 
                                 QString &starttime)
 {
     QDateTime tmpStarttime;
@@ -712,7 +712,7 @@ bool JobQueue::StopJob(int jobID)
     return ChangeJobCmds(jobID, JOB_STOP);
 }
 
-bool JobQueue::DeleteAllJobs(QString chanid, QDateTime starttime)
+bool JobQueue::DeleteAllJobs(uint chanid, QDateTime starttime)
 {
     QString key = GetJobQueueKey(chanid, starttime);
     MSqlQuery query(MSqlQuery::InitCon());
@@ -889,7 +889,7 @@ bool JobQueue::ChangeJobCmds(int jobID, int newCmds)
     return true;
 }
 
-bool JobQueue::ChangeJobCmds(int jobType, QString chanid,
+bool JobQueue::ChangeJobCmds(int jobType, uint chanid,
                              QDateTime starttime,  int newCmds)
 {
     MSqlQuery query(MSqlQuery::InitCon());
@@ -1009,7 +1009,7 @@ bool JobQueue::ChangeJobArgs(int jobID, QString args)
     return true;
 }
 
-bool JobQueue::IsJobRunning(int jobType, QString chanid, QDateTime starttime)
+bool JobQueue::IsJobRunning(int jobType, uint chanid, QDateTime starttime)
 {
     int tmpStatus = GetJobStatus(jobType, chanid, starttime);
 
@@ -1025,7 +1025,7 @@ bool JobQueue::IsJobRunning(int jobType, ProgramInfo *pginfo)
     return JobQueue::IsJobRunning(jobType, pginfo->chanid, pginfo->recstartts);
 }
 
-bool JobQueue::IsJobQueuedOrRunning(int jobType, QString chanid,
+bool JobQueue::IsJobQueuedOrRunning(int jobType, uint chanid,
                                     QDateTime starttime)
 {
     int tmpStatus = GetJobStatus(jobType, chanid, starttime);
@@ -1036,7 +1036,7 @@ bool JobQueue::IsJobQueuedOrRunning(int jobType, QString chanid,
     return false;
 }
 
-bool JobQueue::IsJobQueued(int jobType, QString chanid,
+bool JobQueue::IsJobQueued(int jobType, uint chanid,
                             QDateTime starttime)
 {
     int tmpStatus = GetJobStatus(jobType, chanid, starttime);
@@ -1076,12 +1076,12 @@ QString JobQueue::StatusText(int status)
     return tr("Undefined");
 }
 
-QString JobQueue::GetJobQueueKey(QString chanid, QString startts)
+QString JobQueue::GetJobQueueKey(uint chanid, QString startts)
 {
     return QString("%1_%2").arg(chanid).arg(startts);
 }
 
-QString JobQueue::GetJobQueueKey(QString chanid, QDateTime starttime)
+QString JobQueue::GetJobQueueKey(uint chanid, QDateTime starttime)
 {
     return JobQueue::GetJobQueueKey(chanid,
                                     starttime.toString("yyyyMMddhhmmss"));
@@ -1129,7 +1129,7 @@ int JobQueue::GetJobsInQueue(QMap<int, JobQueueEntry> &jobs, int findJobs)
         {
             bool wantThisJob = false;
 
-            thisJob.chanid = query.value(1).toString();
+            thisJob.chanid = query.value(1).toUInt();
             thisJob.starttime = query.value(2).toDateTime();
             thisJob.type = query.value(4).toInt();
             thisJob.status = query.value(7).toInt();
@@ -1368,7 +1368,7 @@ int JobQueue::GetJobStatus(int jobID)
     return JOB_UNKNOWN;
 }
 
-int JobQueue::GetJobStatus(int jobType, QString chanid, QDateTime startts)
+int JobQueue::GetJobStatus(int jobType, uint chanid, QDateTime startts)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     
@@ -1481,7 +1481,7 @@ void JobQueue::CleanupOldJobsInQueue()
     }
 }
 
-void JobQueue::ProcessJob(int id, int jobType, QString chanid,
+void JobQueue::ProcessJob(int id, int jobType, uint chanid,
                           QDateTime starttime)
 {
     QString name = QString("jobqueue%1%2").arg(id).arg(rand());
@@ -1608,7 +1608,7 @@ QString JobQueue::GetJobCommand(int jobType, ProgramInfo *tmpInfo)
         command.replace(QRegExp("%HOSTNAME%"), tmpInfo->hostname);
         command.replace(QRegExp("%CATEGORY%"), tmpInfo->category);
         command.replace(QRegExp("%RECGROUP%"), tmpInfo->recgroup);
-        command.replace(QRegExp("%CHANID%"), tmpInfo->chanid);
+        command.replace(QRegExp("%CHANID%"), QString::number(tmpInfo->chanid));
         command.replace(QRegExp("%STARTTIME%"),
                         tmpInfo->recstartts.toString("yyyyMMddhhmmss"));
         command.replace(QRegExp("%ENDTIME%"),

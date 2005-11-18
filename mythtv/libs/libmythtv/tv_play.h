@@ -409,7 +409,7 @@ class TV : public QObject
     bool persistentbrowsemode;
     QTimer *browseTimer;
     QString browsechannum;
-    QString browsechanid;
+    uint    browsechanid;
     QString browsestarttime;
 
     // Program Info for currently playing video

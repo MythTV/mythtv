@@ -97,12 +97,6 @@ class ProgramInfo
     // Constructors and bulk set methods.
     ProgramInfo(void);
     ProgramInfo(const ProgramInfo &other);
-    static ProgramInfo *GetProgramAtDateTime(
-        const QString &channel, const QDateTime &dtime);
-    static ProgramInfo *GetProgramFromRecorded(
-        const QString &channel, const QString &starttime);
-    static ProgramInfo *GetProgramFromRecorded(
-        const QString &channel, const QDateTime &dtime);
 
     ProgramInfo& operator=(const ProgramInfo &other);
     ProgramInfo& clone(const ProgramInfo &other);
@@ -124,8 +118,6 @@ class ProgramInfo
     bool IsSameProgram(const ProgramInfo& other) const;
     bool IsSameTimeslot(const ProgramInfo& other) const;
     bool IsSameProgramTimeslot(const ProgramInfo& other) const;
-    static int GetChannelRecPriority(const QString &channel);
-    static int GetRecordingTypeRecPriority(RecordingType type);
 
     // Used to query and set ScheduledRecording info
     ScheduledRecording* GetScheduledRecording(void);
@@ -181,7 +173,8 @@ class ProgramInfo
     bool UsesMaxEpisodes(void) const;
     int getProgramFlags(void) const;
     bool GetChannel(QString &channum, QString &input) const;
-    QString GetFileName() const { return pathname; }
+    QString GetFileName(void) const { return pathname; }
+    QString toString(void) const;
 
     // DB sets
     void SetFilesize(long long fsize);
@@ -224,6 +217,12 @@ class ProgramInfo
     // In-use, autodeletion prevention stuff
     void MarkAsInUse(bool inuse);
 
+    // static functions
+    static ProgramInfo *GetProgramAtDateTime  (uint chan_id, const QDateTime&);
+    static ProgramInfo *GetProgramFromRecorded(uint chan_id, const QDateTime&);
+    static ProgramInfo *GetProgramFromRecorded(uint chan_id, const QString&);
+    static int GetChannelRecPriority(uint chan_id);
+    static int GetRecordingTypeRecPriority(RecordingType type);
   private:
     // GUI helper functions
     bool IsFindApplicable(void) const;
@@ -240,7 +239,7 @@ class ProgramInfo
     QString description;
     QString category;
 
-    QString chanid;
+    uint    chanid;
     QString chanstr;
     QString chansign;
     QString channame;

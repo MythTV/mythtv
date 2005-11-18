@@ -51,7 +51,7 @@ class AutoExpire : public QObject
     void Sleep(int sleepTime);
 
     void UpdateDontExpireSet(void);
-    bool IsInDontExpireSet(QString chanid, QDateTime starttime);
+    bool IsInDontExpireSet(uint chanid, QDateTime starttime);
 
     // main expire info
     set<QString>  dont_expire_set;

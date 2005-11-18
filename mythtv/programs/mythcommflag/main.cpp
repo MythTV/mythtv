@@ -93,7 +93,7 @@ int BuildVideoMarkup(QString& filename)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int QueueCommFlagJob(QString chanid, QString starttime)
+int QueueCommFlagJob(uint chanid, QString starttime)
 {
     ProgramInfo *pginfo =
         ProgramInfo::GetProgramFromRecorded(chanid, starttime);
@@ -127,7 +127,7 @@ int QueueCommFlagJob(QString chanid, QString starttime)
     return COMMFLAG_EXIT_NO_ERROR_WITH_NO_BREAKS;
 }
 
-int CopySkipListToCutList(QString chanid, QString starttime)
+int CopySkipListToCutList(uint chanid, QString starttime)
 {
     QMap<long long, int> cutlist;
     QMap<long long, int>::Iterator it;
@@ -139,7 +139,7 @@ int CopySkipListToCutList(QString chanid, QString starttime)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid.ascii()).arg(starttime.ascii()));
+                .arg(chanid).arg(starttime));
         return COMMFLAG_BUGGY_EXIT_NO_CHAN_DATA;
     }
 
@@ -370,7 +370,7 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
     return comms_found;
 }
 
-int FlagCommercials(QString chanid, QString starttime)
+int FlagCommercials(uint chanid, QString starttime)
 {
     int breaksFound = 0;
     if (commDetectMethod==-1)
@@ -384,7 +384,7 @@ int FlagCommercials(QString chanid, QString starttime)
     {
         VERBOSE(VB_IMPORTANT,
                 QString("No program data exists for channel %1 at %2")
-                .arg(chanid.ascii()).arg(starttime.ascii()));
+                .arg(chanid).arg(starttime));
         return COMMFLAG_EXIT_NO_PROGRAM_DATA;
     }
 
@@ -415,7 +415,7 @@ int FlagCommercials(QString chanid, QString starttime)
 
     if (!quiet)
     {
-        cerr << chanid.leftJustify(6, ' ', true) << "  "
+        cerr << QString::number(chanid).leftJustify(6, ' ', true) << "  "
              << starttime.leftJustify(14, ' ', true) << "  "
              << program_info->title.leftJustify(41, ' ', true) << "  ";
         cerr.flush();
@@ -641,12 +641,15 @@ int main(int argc, char *argv[])
             int jobID = QString(a.argv()[++argpos]).toInt();
             int jobType = JOB_NONE;
 
-            if ( !JobQueue::GetJobInfoFromID(jobID, jobType, chanid, starttime))
+            uint chanid_num = 0;
+            if (!JobQueue::GetJobInfoFromID(jobID, jobType,
+                                            chanid_num, starttime))
             {
                 cerr << "mythcommflag: ERROR: Unable to find DB info for "
                      << "JobQueue ID# " << jobID << endl;
                 return COMMFLAG_EXIT_NO_PROGRAM_DATA;
             }
+            chanid = QString::number(chanid_num);
 
             inJobQueue = true;
             force = true;
@@ -895,10 +898,10 @@ int main(int argc, char *argv[])
     }
 
     if (queueJobInstead)
-        return QueueCommFlagJob(chanid, starttime);
+        return QueueCommFlagJob(chanid.toUInt(), starttime);
 
     if (copyToCutlist)
-        return CopySkipListToCutList(chanid, starttime);
+        return CopySkipListToCutList(chanid.toUInt(), starttime);
 
     if (inJobQueue)
     {
@@ -916,7 +919,7 @@ int main(int argc, char *argv[])
         isVideo = false;
         showPercentage = false;
 
-        int breaksFound = FlagCommercials(chanid, starttime);
+        int breaksFound = FlagCommercials(chanid.toUInt(), starttime);
 
         delete gContext;
 
@@ -973,7 +976,7 @@ int main(int argc, char *argv[])
     }
     else if (!chanid.isEmpty() && !starttime.isEmpty())
     {
-        result = FlagCommercials(chanid, starttime);
+        result = FlagCommercials(chanid.toUInt(), starttime);
     }
     else
     {
@@ -999,7 +1002,7 @@ int main(int argc, char *argv[])
 
                 if ( allRecorded )
                 {
-                    FlagCommercials(chanid, starttime);
+                    FlagCommercials(chanid.toUInt(), starttime);
                 }
                 else
                 {
@@ -1053,7 +1056,9 @@ int main(int argc, char *argv[])
 
                             if ((flagStatus == COMM_FLAG_NOT_FLAGGED) &&
                                 (marksFound == 0))
-                                FlagCommercials(chanid, starttime);
+                            {
+                                FlagCommercials(chanid.toUInt(), starttime);
+                            }
                         }
                     }
                 }

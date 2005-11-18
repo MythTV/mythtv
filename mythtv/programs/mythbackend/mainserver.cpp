@@ -608,8 +608,8 @@ void MainServer::customEvent(QCustomEvent *e)
             }
 
             QDateTime startts = QDateTime::fromString(tokens[2], Qt::ISODate);
-            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(tokens[1],
-                                                                     startts);
+            ProgramInfo *pinfo = ProgramInfo::GetProgramFromRecorded(
+                tokens[1].toUInt(), startts);
             if (pinfo)
             {
                 pinfo->ForgetHistory(); // allow re-record of auto expired rec
@@ -966,7 +966,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
         {
             ProgramInfo *proginfo = new ProgramInfo;
 
-            proginfo->chanid = query.value(0).toString();
+            proginfo->chanid = query.value(0).toUInt();
             proginfo->startts = query.value(29).toDateTime();
             proginfo->endts = query.value(30).toDateTime();
             proginfo->recstartts = query.value(1).toDateTime();
@@ -2680,8 +2680,8 @@ void MainServer::HandleCutMapQuery(const QString &chanid,
     QStringList retlist;
     int rowcnt = 0;
 
-    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
-                                                              startdt);
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(
+        chanid.toUInt(), startdt);
 
     if (commbreak)
         pginfo->GetCommBreakList(markMap);
@@ -2757,8 +2757,8 @@ void MainServer::HandleBookmarkQuery(const QString &chanid,
     QStringList retlist;
     long long bookmark;
 
-    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
-                                                              startdt);
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(
+        chanid.toUInt(), startdt);
     bookmark = pginfo->GetBookmark();
 
     encodeLongLong(retlist,bookmark);
@@ -2795,8 +2795,8 @@ void MainServer::HandleSetBookmark(QStringList &tokens,
     QStringList retlist;
     long long bookmark = decodeLongLong(bookmarklist, 0);
 
-    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(chanid,
-                                                              startdt);
+    ProgramInfo *pginfo = ProgramInfo::GetProgramFromRecorded(
+        chanid.toUInt(), startdt);
     pginfo->SetBookmark(bookmark);
 
     retlist << "OK";

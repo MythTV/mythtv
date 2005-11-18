@@ -58,7 +58,7 @@ class MainServer : public QObject
     typedef struct deletestruct
     {
         MainServer *ms;
-        QString chanid;
+        uint chanid;
         QDateTime recstartts;
         QDateTime recendts;
         QString filename;

@@ -12,7 +12,7 @@ class QSocket;
 
 struct LiveTVChainEntry
 {
-    QString chanid;
+    uint chanid;
     QDateTime starttime;
     bool discontinuity; // if true, can't play smooth from last entry
     QString hostprefix;
@@ -44,7 +44,7 @@ class LiveTVChain
     // const gets
     QString GetID(void)  const { return m_id; }
     int  GetCurPos(void) const { return m_curpos; }
-    int  ProgramIsAt(const QString &chanid, const QDateTime &starttime) const;
+    int  ProgramIsAt(uint chanid, const QDateTime &starttime) const;
     int  ProgramIsAt(const ProgramInfo *pginfo) const;
     int  TotalSize(void) const;
     bool HasNext(void)   const;
@@ -91,7 +91,7 @@ class LiveTVChain
     QString m_cardtype;
 
     int m_curpos;
-    QString m_cur_chanid;
+    uint m_cur_chanid;
     QDateTime m_cur_startts;
 
     int m_switchid;
@@ -102,4 +102,3 @@ class LiveTVChain
 };
 
 #endif
-    

@@ -268,7 +268,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     STR_TO_LIST(subtitle)
     STR_TO_LIST(description)
     STR_TO_LIST(category)
-    STR_TO_LIST(chanid)
+    INT_TO_LIST(chanid)
     STR_TO_LIST(chanstr)
     STR_TO_LIST(chansign)
     STR_TO_LIST(channame)
@@ -365,7 +365,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     STR_FROM_LIST(subtitle)
     STR_FROM_LIST(description)
     STR_FROM_LIST(category)
-    STR_FROM_LIST(chanid)
+    INT_FROM_LIST(chanid)
     STR_FROM_LIST(chanstr)
     STR_FROM_LIST(chansign)
     STR_FROM_LIST(channame)
@@ -477,7 +477,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
                               lastmodified.toString(timeFormat);
 
     progMap["channum"] = chanstr;
-    progMap["chanid"] = chanid;
+    progMap["chanid"] = QString::number(chanid);
     progMap["channel"] = ChannelText(channelFormat);
     progMap["longchannel"] = ChannelText(longChannelFormat);
     progMap["iconpath"] = "";
@@ -622,96 +622,108 @@ int ProgramInfo::SecsTillStart(void) const
 }
 
 
-/** \fn ProgramInfo::GetProgramAtDateTime(const QString&, const QDateTime&)
+/** \fn ProgramInfo::GetProgramAtDateTime(uint, const QDateTime&)
  *  \brief Returns a new ProgramInfo for the program that air at
- *         "dtime" on "channel".
- *  \param channel %Channel ID on which to search for program.
+ *         "dtime" on "chanid".
+ *  \param chan_id %Channel ID on which to search for program.
  *  \param dtime   Date and Time for which we desire the program.
- *  \return Pointer to a ProgramInfo from database if it succeeds, Pointer to an
- *          "Unknown" ProgramInfo if it does not find anything in database.
+ *  \return Pointer to a ProgramInfo from database if it succeeds,
+ *          Pointer to an "Unknown" ProgramInfo if it does not find
+ *          anything in database.
  */
-ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel, 
+ProgramInfo *ProgramInfo::GetProgramAtDateTime(uint chan_id, 
                                                const QDateTime &dtime)
 {
     ProgramList schedList;
     ProgramList progList;
 
     MSqlBindings bindings;
-    QString querystr = "WHERE program.chanid = :CHANID "
-                       "  AND program.starttime < :STARTTS "
-                       "  AND program.endtime > :STARTTS ";
-    bindings[":CHANID"] = channel;
+    QString querystr = "WHERE program.chanid    = :CHANID  AND "
+                       "      program.starttime < :STARTTS AND "
+                       "      program.endtime   > :STARTTS ";
+    bindings[":CHANID"]  = QString::number(chan_id);
     bindings[":STARTTS"] = dtime.toString("yyyy-MM-ddThh:mm:50");
 
     schedList.FromScheduler();
     progList.FromProgram(querystr, bindings, schedList);
 
     if (!progList.isEmpty())
-    {
         return progList.take(0);
-    }
-    else
+
+
+    ProgramInfo *p = new ProgramInfo;
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT chanid, channum,  callsign,     "
+                  "       name,   commfree, outputfilters "
+                  "FROM channel "
+                  "WHERE chanid = :CHANID");
+    query.bindValue(":CHANID", chan_id);
+
+    if (!query.exec() || !query.isActive())
     {
-        ProgramInfo *p = new ProgramInfo;
-
-        MSqlQuery query(MSqlQuery::InitCon());
-        query.prepare("SELECT chanid, channum, callsign, name, "
-                      "commfree, outputfilters "
-                      "FROM channel "
-                      "WHERE chanid = :CHANID ;");
-        query.bindValue(":CHANID", channel);
-
-        if (!query.exec() || !query.isActive())
-        {
-            MythContext::DBError("ProgramInfo::GetProgramAtDateTime", 
-                                 query);
-            return p;
-        }
-
-        if (query.next())
-        {
-            p->chanid = query.value(0).toString();
-            p->startts = dtime;
-            p->endts = dtime;
-            p->recstartts = p->startts;
-            p->recendts = p->endts;
-            p->lastmodified = p->startts;
-            p->title = gContext->GetSetting("UnknownTitle");
-            p->subtitle = "";
-            p->description = "";
-            p->category = "";
-            p->chanstr = query.value(1).toString();
-            p->chansign = QString::fromUtf8(query.value(2).toString());
-            p->channame = QString::fromUtf8(query.value(3).toString());
-            p->repeat = 0;
-            p->chancommfree = query.value(4).toInt();
-            p->chanOutputFilters = query.value(5).toString();
-            p->seriesid = "";
-            p->programid = "";
-            p->year = "";
-            p->stars = 0.f;
-        }
-
+        MythContext::DBError("ProgramInfo::GetProgramAtDateTime", query);
         return p;
     }
+
+    if (query.next())
+    {
+        p->chanid             = query.value(0).toUInt();
+        p->startts            = dtime;
+        p->endts              = dtime;
+        p->recstartts         = p->startts;
+        p->recendts           = p->endts;
+        p->lastmodified       = p->startts;
+        p->title              = gContext->GetSetting("UnknownTitle");
+        p->subtitle           = "";
+        p->description        = "";
+        p->category           = "";
+        p->chanstr            = query.value(1).toString();
+        p->chansign           = QString::fromUtf8(query.value(2).toString());
+        p->channame           = QString::fromUtf8(query.value(3).toString());
+        p->repeat             = 0;
+        p->chancommfree       = query.value(4).toInt();
+        p->chanOutputFilters  = query.value(5).toString();
+        p->seriesid           = "";
+        p->programid          = "";
+        p->year               = "";
+        p->stars              = 0.0f;
+    }
+
+    return p;
 }
 
-/** \fn ProgramInfo::GetProgramFromRecorded(const QString&, const QDateTime&)
+QString ProgramInfo::toString(void) const
+{
+    QString str("");
+    str += "ProgramInfo: channame(" + channame + ") startts(" +
+        startts.toString() + ") endts(" + endts.toString() + ")\n";
+    str += "             recstartts(" + recstartts.toString() +
+        ") recendts(" + recendts.toString() + ")\n";
+    str += "             title(" + title + ")";
+    return str;
+}
+
+/** \fn ProgramInfo::GetProgramFromRecorded(uint, const QDateTime&)
  *  \brief Returns a new ProgramInfo for an existing recording.
+ *  \param chan_id   Channel ID of channel we want info on
+ *  \param starttime Scheduled 'starttime' of recording. (not 'recstarttime')
  *  \return Pointer to a ProgramInfo if it succeeds, NULL otherwise.
  */
-ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
-                                                 const QDateTime &dtime)
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(
+    uint chan_id, const QDateTime &starttime)
 {
-    return GetProgramFromRecorded(channel, dtime.toString(Qt::ISODate));
+    return GetProgramFromRecorded(chan_id, starttime.toString(Qt::ISODate));
 }
 
 /** \fn ProgramInfo::GetProgramFromRecorded(const QString&, const QString&)
  *  \brief Returns a new ProgramInfo for an existing recording.
+ *  \param chan_id   Channel ID of channel we want info on
+ *  \param starttime ISODate string representing scheduled 'starttime'
+ *                   of the recording. (not recstarttime)
  *  \return Pointer to a ProgramInfo if it succeeds, NULL otherwise.
  */
-ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel, 
-                                                 const QString &starttime)
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(
+    uint chan_id, const QString &starttime)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recorded.chanid,starttime,endtime,title, "
@@ -726,7 +738,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                   "ON recorded.chanid = channel.chanid "
                   "WHERE recorded.chanid = :CHANNEL "
                   "AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANNEL", channel);
+    query.bindValue(":CHANNEL", chan_id);
     query.bindValue(":STARTTIME", starttime);
     
     if (query.exec() && query.isActive() && query.size() > 0)
@@ -734,7 +746,7 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         query.next();
 
         ProgramInfo *proginfo = new ProgramInfo;
-        proginfo->chanid = query.value(0).toString();
+        proginfo->chanid = query.value(0).toUInt();
         proginfo->startts = query.value(23).toDateTime();
         proginfo->endts = query.value(24).toDateTime();
         proginfo->recstartts = query.value(1).toDateTime();
@@ -894,15 +906,15 @@ int ProgramInfo::GetAutoRunJobs(void) const
     return record->GetAutoRunJobs();
 }
 
-/** \fn ProgramInfo::GetChannelRecPriority(const QString&)
+/** \fn ProgramInfo::GetChannelRecPriority(uint)
  *  \brief Returns Recording Priority of channel.
- *  \param channel %Channel ID of channel whose priority we desire.
+ *  \param chan_id Channel ID of channel whose priority we desire.
  */
-int ProgramInfo::GetChannelRecPriority(const QString &channel)
+int ProgramInfo::GetChannelRecPriority(uint chan_id)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recpriority FROM channel WHERE chanid = :CHANID ;");
-    query.bindValue(":CHANID", channel);
+    query.bindValue(":CHANID", chan_id);
     
     if (query.exec() && query.isActive() && query.size() > 0)
     {
@@ -2852,7 +2864,7 @@ void ProgramInfo::Save(void) const
     query.prepare("DELETE FROM program"
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME ;");
-    query.bindValue(":CHANID", chanid.toInt());
+    query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", startts);
     if (!query.exec())
         MythContext::DBError("Saving program", 
@@ -2862,7 +2874,7 @@ void ProgramInfo::Save(void) const
                   " title,subtitle,description,category,airdate,"
                   " stars) VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
                   " :SUBTITLE,:DESCRIPTION,:CATEGORY,:AIRDATE,:STARS);");
-    query.bindValue(":CHANID", chanid.toInt());
+    query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", startts);
     query.bindValue(":ENDTIME", endts);
     query.bindValue(":TITLE", title.utf8());
@@ -3296,7 +3308,7 @@ void ProgramInfo::MarkAsInUse(bool inuse)
         RemoteSendMessage("RECORDING_LIST_CHANGE");
 }
 
-/** \fn ProgramInfo::GetChannel(const ProgramInfo*,QString&,QString&) const
+/** \fn ProgramInfo::GetChannel(QString&,QString&) const
  *  \brief Returns the channel and input needed to record the program.
  *  \return true on success, false on failure
  */
@@ -3716,7 +3728,7 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
     while (query.next())
     {
         ProgramInfo *p = new ProgramInfo;
-        p->chanid = query.value(0).toString();
+        p->chanid = query.value(0).toUInt();
         p->startts = QDateTime::fromString(query.value(1).toString(),
                                            Qt::ISODate);
         p->endts = QDateTime::fromString(query.value(2).toString(),
@@ -3806,7 +3818,7 @@ bool ProgramList::FromOldRecorded(const QString &sql, MSqlBindings &bindings)
     while (query.next())
     {
         ProgramInfo *p = new ProgramInfo;
-        p->chanid = query.value(0).toString();
+        p->chanid = query.value(0).toUInt();
         p->startts = QDateTime::fromString(query.value(1).toString(),
                                            Qt::ISODate);
         p->endts = QDateTime::fromString(query.value(2).toString(),

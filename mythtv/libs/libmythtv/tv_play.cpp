@@ -239,7 +239,7 @@ TV::TV(void)
       // channel browsing state variables
       browsemode(false), persistentbrowsemode(false),
       browseTimer(new QTimer(this)),
-      browsechannum(""), browsechanid(""), browsestarttime(""),
+      browsechannum(""), browsechanid(0), browsestarttime(""),
       // Program Info for currently playing video
       recorderPlaybackInfo(NULL),
       playbackinfo(NULL), inputFilename(""), playbackLen(0),
@@ -2764,9 +2764,11 @@ void TV::DoQueueTranscode(void)
         if (queuedTranscode)
             stop = true;
         else if (JobQueue::IsJobQueuedOrRunning(JOB_TRANSCODE,
-                                        playbackinfo->chanid,
-                                        playbackinfo->recstartts))
+                                                playbackinfo->chanid,
+                                                playbackinfo->recstartts))
+        {
             stop = true;
+        }
         if (stop)
         {
             JobQueue::ChangeJobCmds(JOB_TRANSCODE,
@@ -3656,7 +3658,7 @@ void TV::doLoadMenu(void)
 
     // Collect channel info
     pbinfoLock.lock();
-    uint    chanid  = playbackinfo->chanid.toUInt();
+    uint    chanid  = playbackinfo->chanid;
     QString channum = playbackinfo->chanstr;
     pbinfoLock.unlock();
 
@@ -4185,9 +4187,9 @@ void TV::BrowseStart(void)
     pbinfoLock.lock();
     if (playbackinfo)
     {
-        browsemode = true;
-        browsechannum = playbackinfo->chanstr;
-        browsechanid = playbackinfo->chanid;
+        browsemode      = true;
+        browsechannum   = playbackinfo->chanstr;
+        browsechanid    = playbackinfo->chanid;
         browsestarttime = playbackinfo->startts.toString();
 
         BrowseDispInfo(BROWSE_SAME);
@@ -4245,19 +4247,19 @@ void TV::BrowseDispInfo(int direction)
 
     infoMap["dbstarttime"] = browsestarttime;
     infoMap["channum"]     = browsechannum;
-    infoMap["chanid"]      = browsechanid;
+    infoMap["chanid"]      = QString::number(browsechanid);
     
     GetNextProgram(activerecorder, direction, infoMap);
     
     browsechannum = infoMap["channum"];
-    browsechanid  = infoMap["chanid"];
+    browsechanid  = infoMap["chanid"].toUInt();
 
     if ((direction == BROWSE_LEFT) || (direction == BROWSE_RIGHT))
         browsestarttime = infoMap["dbstarttime"];
 
     QDateTime startts = QDateTime::fromString(browsestarttime, Qt::ISODate);
-    ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
-        browsechanid, startts);
+    ProgramInfo *program_info =
+        ProgramInfo::GetProgramAtDateTime(browsechanid, startts);
     
     if (program_info)
         program_info->ToMap(infoMap);
@@ -4276,8 +4278,8 @@ void TV::ToggleRecord(void)
         QDateTime startts = QDateTime::fromString(
             browsestarttime, Qt::ISODate);
 
-        ProgramInfo *program_info = ProgramInfo::GetProgramAtDateTime(
-                                                       browsechanid, startts);
+        ProgramInfo *program_info =
+            ProgramInfo::GetProgramAtDateTime(browsechanid, startts);
         program_info->ToggleRecord();
         program_info->ToMap(infoMap);
 

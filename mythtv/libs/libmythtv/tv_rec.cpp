@@ -3584,9 +3584,8 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
         return false;
     }
 
-    QString chanids = QString::number(chanid);
     ProgramInfo *prog = ProgramInfo::GetProgramAtDateTime(
-        chanids, QDateTime::currentDateTime());
+        chanid, QDateTime::currentDateTime());
 
     if (!prog)
     {
