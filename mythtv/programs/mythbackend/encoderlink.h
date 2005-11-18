@@ -23,14 +23,14 @@ class EncoderLink
     PlaybackSock *GetSocket(void) { return sock; }
 
     /// \brief Returns the remote host for a non-local EncoderLink.
-    QString GetHostName(void) { return hostname; }
+    QString GetHostName(void) const { return hostname; }
     /// \brief Returns true for a local EncoderLink.
-    bool IsLocal(void) { return local; }
+    bool IsLocal(void) const { return local; }
     /// \brief Returns true if the EncoderLink instance is usable.
-    bool IsConnected(void) { return (IsLocal() || GetSocket()!=NULL); }
+    bool IsConnected(void) const { return (IsLocal() || sock!=NULL); }
 
     /// \brief Returns the cardid used to refer to the recorder in the DB.
-    int GetCardID(void) { return m_capturecardnum; }
+    int GetCardID(void) const { return m_capturecardnum; }
     /// \brief Returns the TVRec used by a local EncoderLink instance.
     TVRec *GetTVRec(void) { return tv; }
 
@@ -40,7 +40,7 @@ class EncoderLink
     void FreeTuner(void) { locked = false; }
     /// \brief Returns true iff the tuner is locked.
     /// \sa LockTuner(), FreeTuner()
-    bool IsTunerLocked(void) { return locked; }
+    bool IsTunerLocked(void) const { return locked; }
     
     long long GetFreeDiskSpace(long long &total, long long &used,
                                bool from_cache=false);
