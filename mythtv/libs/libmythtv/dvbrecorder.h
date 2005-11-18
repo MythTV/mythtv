@@ -59,8 +59,10 @@ class DVBRecorder: public DTVRecorder
 
   public slots:
     void SetPMTObject(const PMTObject*);
+    void deleteLater(void);
 
   private:
+    void TeardownAll(void);
     void ReadFromDMX(void);
     static void ProcessDataPS(unsigned char *buffer, int len, void *priv);
     void LocalProcessDataPS(unsigned char *buffer, int len);

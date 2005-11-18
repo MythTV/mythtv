@@ -71,27 +71,9 @@ const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
 const int DVBRecorder::POLL_INTERVAL        =  50; // msec
 const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
 
-#define RECORD(args...) \
-    VERBOSE(VB_RECORD, QString("DVB#%1 Rec: ") \
-            .arg(_card_number_option) << args);
-
-#define RECWARN(args...) \
-    VERBOSE(VB_GENERAL, QString("DVB#%1 Rec: WARNING - ") \
-            .arg(_card_number_option) << args);
-
-#define RECERR(args...) \
-    VERBOSE(VB_IMPORTANT, QString("DVB#%1 Rec: ERROR - ") \
-            .arg(_card_number_option) << args);
-
-#define RECENO(args...) \
-    VERBOSE(VB_IMPORTANT, \
-            QString("DVB#%1 Rec: ERROR - ").arg(_card_number_option) \
-            << args << endl \
-            << QString("          (%1) ").arg(errno) << strerror(errno));
-
-#define LOC      QString("DVB#%1 Rec: ").arg(_card_number_option)
-#define LOC_WARN QString("DVB#%1 Rec: Warning - ").arg(_card_number_option)
-#define LOC_ERR  QString("DVB#%1 Rec: Error - ").arg(_card_number_option)
+#define LOC      QString("DVBRec(%1): ").arg(_card_number_option)
+#define LOC_WARN QString("DVBRec(%1) Warning: ").arg(_card_number_option)
+#define LOC_ERR  QString("DVBRec(%1) Error: ").arg(_card_number_option)
 
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
     : DTVRecorder(rec, "DVBRecorder"),
@@ -126,20 +108,37 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
 
 DVBRecorder::~DVBRecorder()
 {
+    TeardownAll();
+}
+
+void DVBRecorder::TeardownAll(void)
+{
     if (_stream_fd >= 0)
         Close();
 
     if (_buffer)
+    {
         delete[] _buffer;
+        _buffer = NULL;
+    }
 
     SetPAT(NULL);
     SetPMT(NULL);
 }
 
+void DVBRecorder::deleteLater(void)
+{
+    TeardownAll();
+    DTVRecorder::deleteLater();
+}
+
 void DVBRecorder::SetOption(const QString &name, int value)
 {
     if (name == "cardnum")
+    {
         _card_number_option = value;
+        videodevice = QString::number(value);
+    }
     else if (name == "hw_decoder")
         _hw_decoder_option = (value == 1);
     else if (name == "recordts")
@@ -160,7 +159,7 @@ void DVBRecorder::SetPMTObject(const PMTObject *_pmt)
 {
     QMutexLocker read_lock(&_pid_read_lock);
     QMutexLocker change_lock(&_pid_change_lock);
-    RECORD("SetPMTObject()");
+    VERBOSE(VB_RECORD, LOC + "SetPMTObject()");
     _input_pmt = *_pmt;
 
     AutoPID();
@@ -181,7 +180,7 @@ bool DVBRecorder::Open(void)
 {
     if (_stream_fd >= 0)
     {
-        RECWARN("Card already open");
+        VERBOSE(VB_GENERAL, LOC_WARN + "Card already open");
         return true;
     }
 
@@ -189,7 +188,7 @@ bool DVBRecorder::Open(void)
                       O_RDONLY | O_NONBLOCK);
     if (_stream_fd < 0)
     {
-        RECENO("Failed to open DVB device");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open DVB device" + ENO);
         return false;
     }
 
@@ -200,8 +199,9 @@ bool DVBRecorder::Open(void)
     connect(dvbchannel, SIGNAL(UpdatePMTObject(const PMTObject *)),
             this, SLOT(SetPMTObject(const PMTObject *)));
 
-    RECORD(QString("Card opened successfully (using %1 mode).")
-           .arg(_record_transport_stream_option ? "TS" : "PS"));
+    VERBOSE(VB_RECORD, LOC + 
+            QString("Card opened successfully (using %1 mode).")
+            .arg(_record_transport_stream_option ? "TS" : "PS"));
 
     dvbchannel->RecorderStarted();
 
@@ -210,10 +210,10 @@ bool DVBRecorder::Open(void)
 
 void DVBRecorder::Close(void)
 {
+    VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- begin");
+
     if (_stream_fd < 0)
         return;
-
-    RECORD("Closing DVB recorder");
 
     CloseFilters();
 
@@ -222,6 +222,8 @@ void DVBRecorder::Close(void)
 
     _stream_fd = -1;
     _polls.fd = -1;
+
+    VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- end");
 }
 
 void DVBRecorder::CloseFilters(void)
@@ -255,12 +257,16 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
     uint pid_buffer_size = ((19200*msec_of_buffering + 7) / 8);
     pid_buffer_size = ((pid_buffer_size + 4095) / 4096) * 4096;
 
-    VERBOSE(VB_RECORD, LOC + QString("Adding pid %1 (0x%2) size(%3)")
-           .arg(pid).arg((int)pid,0,16).arg(pid_buffer_size));
+    VERBOSE(VB_RECORD, LOC + QString("Adding pid 0x%2 size(%3)")
+            .arg((int)pid,0,16).arg(pid_buffer_size));
 
     if (pid < 0x10 || pid > 0x1fff)
-        RECWARN(QString("PID value (%1) is outside DVB specification.\n"
-                        "\t\t\tPerhaps this is an ATSC stream?").arg(pid));
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                QString("PID value (0x%1) ").arg(pid,0,16) +
+                "is outside DVB specification."
+                "\n\t\t\tPerhaps this is an ATSC stream?");
+    }
 
     struct dmx_pes_filter_params params;
     memset(&params, 0, sizeof(params));
@@ -274,7 +280,7 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
 
     if (fd_tmp < 0)
     {
-        RECENO(QString("Could not open demux device."));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open demux device." + ENO);
         return;
     }
 
@@ -298,7 +304,7 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
     {
         close(fd_tmp);
 
-        RECENO(QString("Failed to set demux filter."));
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set demux filter." + ENO);
         return;
     }
 
@@ -313,7 +319,7 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
         ipack* ip = (ipack*)malloc(sizeof(ipack));
         if (ip == NULL)
         {
-            RECERR(QString("Failed to allocate ipack."));
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate ipack.");
             return;
         }
 
@@ -429,7 +435,8 @@ bool DVBRecorder::SetDemuxFilters(void)
 
     if (_pid_filters.size() == 0 && _ps_rec_pid_ipack.size() == 0)
     {        
-        RECWARN("Recording will not commence until a PID is set.");
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                "Recording will not commence until a PID is set.");
         return false;
     }
     return true;
@@ -444,9 +451,9 @@ void DVBRecorder::AutoPID(void)
     QMutexLocker change_lock(&_pid_change_lock);
     _videoPID.clear();
 
-    RECORD(QString("AutoPID for ServiceID=%1, PCRPID=%2 (0x%3)")
-           .arg(_input_pmt.ServiceID).arg(_input_pmt.PCRPID)
-           .arg(((uint)_input_pmt.PCRPID),0,16));
+    VERBOSE(VB_RECORD, LOC +
+            QString("AutoPID for MPEG Program Number(%1), PCR PID(0x%2)")
+            .arg(_input_pmt.ServiceID).arg(((uint)_input_pmt.PCRPID),0,16));
 
     // Wanted languages:
     //QStringList Languages = iso639_get_language_list();
@@ -551,9 +558,9 @@ void DVBRecorder::AutoPID(void)
 
         if ((*es).Record)
         {
-            RECORD(QString("AutoPID selecting PID %1 (0x%2), %3")
-                   .arg((*es).PID).arg((*es).PID,0,16)
-                   .arg((*es).Description));
+            VERBOSE(VB_RECORD, LOC +
+                    QString("AutoPID selecting PID 0x%1, %2")
+                    .arg((*es).PID,0,16).arg((*es).Description));
 
             switch ((*es).Type)
             {
@@ -569,17 +576,16 @@ void DVBRecorder::AutoPID(void)
         }
         else
         {
-            RECORD(QString("AutoPID skipping PID %1 (0x%2), %3")
-                   .arg((*es).PID).arg((*es).PID,0,16).arg((*es).Description));
+            VERBOSE(VB_RECORD, LOC +
+                    QString("AutoPID skipping PID 0x%1, %2")
+                    .arg((*es).PID,0,16).arg((*es).Description));
         }
     }
 
-    RECORD(QString("AutoPID Complete - PAT/PMT Loaded for service"));
+    VERBOSE(VB_RECORD, LOC + "AutoPID Complete - PAT/PMT Loaded for service");
 
-    if (_input_pmt.FTA())
-        RECORD(QString("Service is FTA"))
-    else
-        RECORD(QString("Service has Conditional Access"))
+    QString msg = (_input_pmt.FTA()) ? "unencrypted" : "ENCRYPTED";
+    VERBOSE(VB_RECORD, LOC + "A/V Stream is " + msg);
 }
 
 void DVBRecorder::StartRecording(void)
@@ -616,7 +622,7 @@ void DVBRecorder::StartRecording(void)
 
         if (_reset_pid_filters)
         {
-            RECORD("Resetting Demux Filters");
+            VERBOSE(VB_RECORD, LOC + "Resetting Demux Filters");
             if (SetDemuxFilters())
             {
                 CreatePAT();
@@ -636,7 +642,8 @@ void DVBRecorder::StartRecording(void)
 
         if (ret == 0 && t.elapsed() > POLL_WARNING_TIMEOUT)
         {
-            RECWARN(QString("No data from card in %1 milliseconds.")
+            VERBOSE(VB_GENERAL, LOC_WARN +
+                    QString("No data from card in %1 milliseconds.")
                     .arg(t.elapsed()));
         }
         else if (ret == 1 && _polls.revents & POLLIN)
@@ -657,7 +664,8 @@ void DVBRecorder::StartRecording(void)
             }
         }
         else if ((ret < 0) || (ret == 1 && _polls.revents & POLLERR))
-            RECENO("Poll failed while waiting for data.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Poll failed while waiting for data." + ENO);
     }
 
     Close();
@@ -681,20 +689,22 @@ void DVBRecorder::ReadFromDMX(void)
             if (errno == EOVERFLOW)
             {
                 ++_stream_overflow_count;
-                RECORD("DVB Buffer overflow error detected on read");
+                VERBOSE(VB_RECORD, LOC +
+                        "DVB Buffer overflow error detected on read");
                 break;
             }
 
             if (errno == EAGAIN)
                 break;
-            RECENO("Error reading from DVB device.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Error reading from DVB device." + ENO);
             break;
         } else if (readsz == 0)
             break;
 
         if (readsz % MPEG_TS_PKT_SIZE)
         {
-            RECERR("Incomplete packet received.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Incomplete packet received.");
             readsz = readsz - (readsz % MPEG_TS_PKT_SIZE);
         }
 
@@ -722,7 +732,8 @@ void DVBRecorder::ReadFromDMX(void)
 
             if (pktbuf[1] & 0x80)
             {
-                RECORD("Packet dropped due to uncorrectable error.");
+                VERBOSE(VB_RECORD, LOC +
+                        "Packet dropped due to uncorrectable error.");
                 ++_bad_packet_count;
                 continue;
             }
@@ -731,7 +742,9 @@ void DVBRecorder::ReadFromDMX(void)
             {
                 if (!_encrypted_pid[pid])
                 {
-                    RECORD(QString("PID %1 is encrypted, ignoring").arg(pid));
+                    VERBOSE(VB_RECORD, LOC +
+                            QString("PID 0x%1 is encrypted, ignoring")
+                            .arg(pid,0,16));
                     _encrypted_pid[pid] = true;
                 }
                 continue; // Drop encrypted TS packet
@@ -739,7 +752,9 @@ void DVBRecorder::ReadFromDMX(void)
 
             if (_encrypted_pid[pid])
             {
-                RECORD(QString("PID %1 is no longer encrypted").arg(pid));
+                VERBOSE(VB_RECORD, LOC +
+                        QString("PID 0x%1 is no longer encrypted")
+                        .arg(pid,0,16));
                 _encrypted_pid[pid] = false;
             }
             if (content & 0x1)
@@ -751,8 +766,10 @@ void DVBRecorder::ReadFromDMX(void)
                      _continuity_count[pid] = (_continuity_count[pid]+1) & 0xf;
                      if (_continuity_count[pid] != cc)
                      {
-                         RECORD(QString("PID %1 _continuity_count %2 cc %3")
-                                .arg(pid).arg(_continuity_count[pid]).arg(cc));
+                         VERBOSE(VB_RECORD, LOC +
+                                 QString("PID 0x%1 _continuity_count %2 cc %3")
+                                 .arg(pid,0,16).arg(_continuity_count[pid])
+                                 .arg(cc));
                          _continuity_count[pid] = cc;
                          ++_continuity_error_count;
                      }
