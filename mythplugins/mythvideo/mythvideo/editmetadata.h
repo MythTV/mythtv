@@ -88,32 +88,3 @@ class EditMetadataDialog : public MythThemedDialog
 
 #endif
 
-class MythInputDialog: public MythDialog
-{
-  Q_OBJECT
-
-    //
-    //  Very simple class, not themeable
-    //
-
-  public:
-
-    MythInputDialog( QString message,
-                        bool *success,
-                        QString *target,
-                        MythMainWindow *parent, 
-                        const char *name = 0, 
-                        bool setsize = true);
-    ~MythInputDialog();
-
- protected:
- 
-    void keyPressEvent(QKeyEvent *e);
-
-  private:
-  
-    MythLineEdit        *text_editor;
-    QString             *target_text;
-    bool                *success_flag;
-};
-

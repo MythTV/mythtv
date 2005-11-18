@@ -300,16 +300,11 @@ void EditMetadataDialog::keyPressEvent(QKeyEvent *e)
                 if (getCurrentFocusWidget() == category_select)
                 {
                     QString category = QString("");
-                    bool ok = false;
-                    MythInputDialog    *newcategory = new MythInputDialog(
-                                    QObject::tr("New category"),
-                                    &ok,
-                                    &category,
-                                    gContext->GetMainWindow());
-                    newcategory->exec();
-                    delete newcategory;    
-
-                    if (ok)
+                    if (MythPopupBox::showGetTextPopup(
+                                gContext->GetMainWindow(),
+                                "Enter category",
+                                QObject::tr("New category"),
+                                category))
                     {
                         working_metadata->setCategory(category);
                         int id = working_metadata->getCategoryID();
@@ -544,69 +539,3 @@ EditMetadataDialog::~EditMetadataDialog()
     }
 }
 
-
-/*
----------------------------------------------------------------------
-*/
-
-MythInputDialog::MythInputDialog(QString message,
-                                       bool *success,
-                                       QString *target,
-                                       MythMainWindow *parent, 
-                                       const char *name, 
-                                       bool)
-                   :MythDialog(parent, name, false)
-{
-    success_flag = success;
-    target_text = target;
-
-    gContext->GetScreenSettings(screenwidth, wmult, screenheight, hmult);
-    this->setGeometry((screenwidth - 400 ) / 2,
-                      (screenheight - 50 ) / 2,
-                      400,50);
-    QFrame *outside_border = new QFrame(this);
-    outside_border->setGeometry(0,0,400,50);
-    outside_border->setFrameStyle(QFrame::Panel | QFrame::Raised );
-    outside_border->setLineWidth(4);
-    QLabel *message_label = new QLabel(message, this);
-    message_label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    message_label->setGeometry(15,10,180,30);
-    message_label->setBackgroundOrigin(ParentOrigin);
-    text_editor = new MythLineEdit(this);
-    text_editor->setGeometry(200,10,185,30);
-    text_editor->setBackgroundOrigin(ParentOrigin);
-
-    this->setActiveWindow();
-    text_editor->setFocus();
-}
-
-void MythInputDialog::keyPressEvent(QKeyEvent *e)
-{
-    bool handled = false;
-    QStringList actions;
-    if (gContext->GetMainWindow()->TranslateKeyPress("qt", e, actions))
-    {
-        for (unsigned int i = 0; i < actions.size() && !handled; i++)
-        {
-            QString action = actions[i];
-            if (action == "ESCAPE")
-            {
-                handled = true;
-                MythDialog::keyPressEvent(e);
-            }
-            else if (action == "SELECT")
-            {
-                *success_flag = true;
-                *target_text = QString(text_editor->text());
-                handled = true;
-                MythDialog::keyPressEvent(e);
-                done(0);
-            }
-        }
-    }
-}
-
-
-MythInputDialog::~MythInputDialog()
-{
-}
