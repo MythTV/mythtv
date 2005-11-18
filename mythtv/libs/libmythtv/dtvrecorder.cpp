@@ -65,13 +65,13 @@ DTVRecorder::~DTVRecorder()
 void DTVRecorder::SetOption(const QString &name, int value)
 {
     if (name == "wait_for_seqstart")
-        _wait_for_keyframe_option = (value == 1);
+        _wait_for_keyframe = _wait_for_keyframe_option = (value == 1);
     else if (name == "pkt_buf_size")
     {
         if (_request_recording)
         {
-            VERBOSE(VB_IMPORTANT, "Error: Attempt made to "
-                    "resize packet buffer while recording.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Attempt made to resize packet buffer while recording.");
             return;
         }
         int newsize = max(value - (value % TSPacket::SIZE), TSPacket::SIZE*50);
@@ -83,22 +83,24 @@ void DTVRecorder::SetOption(const QString &name, int value)
             _buffer_size = newsize;
         }
         else
-            VERBOSE(VB_IMPORTANT, "Error: could not allocate "
-                    "new packet buffer.");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + 
+                    "Could not allocate new packet buffer.");
     }
 }
 
-/** \fn DTVRecorder::FinishRecording()
+/** \fn DTVRecorder::FinishRecording(void)
  *  \brief Flushes the ringbuffer, and if this is not a live LiveTV
  *         recording saves the position map and filesize.
  */
 void DTVRecorder::FinishRecording(void)
 {
-    ringBuffer->WriterFlush();
+    if (ringBuffer)
+        ringBuffer->WriterFlush();
 
     if (curRecording)
     {
-        curRecording->SetFilesize(ringBuffer->GetRealFileSize());
+        if (ringBuffer)
+            curRecording->SetFilesize(ringBuffer->GetRealFileSize());
         SavePositionMap(true);
     }
     _position_map_lock.lock();
@@ -280,9 +282,11 @@ bool DTVRecorder::FindKeyframes(const TSPacket* tspacket)
 // documented in recorderbase.h
 void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
 {
+    VERBOSE(VB_RECORD, LOC + "SetNextRecord("<<progInf<<", "<<rb<<")");
     // First we do some of the time consuming stuff we can do now
     SavePositionMap(true);
-    ringBuffer->WriterFlush();
+    if (ringBuffer)
+        ringBuffer->WriterFlush();
 
     // Then we set the next info
     nextRingBufferLock.lock();
@@ -297,6 +301,7 @@ void DTVRecorder::SetNextRecording(const ProgramInfo *progInf, RingBuffer *rb)
 
 void DTVRecorder::ResetForNewFile(void)
 {
+    VERBOSE(VB_RECORD, LOC + "ResetForNewFile(void)");
     Reset();
 }
 
@@ -352,11 +357,13 @@ void DTVRecorder::SavePositionMap(bool force)
     // save every 30th key frame later on
     force |= _position_map_delta.size() >= 30;
 
-    if (curRecording && force)
+    if (curRecording && force && _position_map_delta.size())
     {
         curRecording->SetPositionMapDelta(_position_map_delta, 
                                           MARK_GOP_BYFRAME);
-        curRecording->SetFilesize(ringBuffer->GetWritePosition());
         _position_map_delta.clear();
+
+        if (ringBuffer)
+            curRecording->SetFilesize(ringBuffer->GetWritePosition());
     }
 }
