@@ -2,7 +2,6 @@
 #include <qpushbutton.h>
 #include <qbuttongroup.h>
 #include <qlabel.h>
-#include <qlist.h>
 #include <qcursor.h>
 #include <qsqldatabase.h>
 #include <qdatetime.h>
