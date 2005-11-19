@@ -2867,7 +2867,6 @@ void PlaybackBox::stopPlaylistJobQueueJob(int jobType)
             (JobQueue::IsJobQueuedOrRunning(jobType, tmpItem->chanid,
                                 tmpItem->recstartts)))
         {
-cout << "stop job " << jobType << ": job is queued or running\n";
             JobQueue::ChangeJobCmds(jobType, tmpItem->chanid,
                                      tmpItem->recstartts, JOB_STOP);
             if ((jobType & JOB_COMMFLAG) && (tmpItem))
@@ -2875,8 +2874,7 @@ cout << "stop job " << jobType << ": job is queued or running\n";
                 tmpItem->programflags &= ~FL_EDITING;
                 tmpItem->programflags &= ~FL_COMMFLAG;
             }
-        } else 
-cout << "stop job tmpItem == NULL\n";
+        }
     }
 }
 
