@@ -3584,8 +3584,9 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
         return false;
     }
 
-    ProgramInfo *prog = ProgramInfo::GetProgramAtDateTime(
-        chanid, QDateTime::currentDateTime());
+    ProgramInfo *prog = ProgramInfo::GetProgramAtDateTime(chanid, 
+                                                  QDateTime::currentDateTime(),
+                                                  true);
 
     if (!prog)
     {
@@ -3599,7 +3600,6 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
         VERBOSE(VB_IMPORTANT, LOC_ERR + "GetProgramRingBufferForLiveTV()"
                 "\n\t\t\tProgramInfo is invalid.");
         delete prog;
-        // deal with no data situations
         return false;
     }
 

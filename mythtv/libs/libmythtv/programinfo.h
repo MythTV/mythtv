@@ -218,7 +218,8 @@ class ProgramInfo
     void MarkAsInUse(bool inuse);
 
     // static functions
-    static ProgramInfo *GetProgramAtDateTime  (uint chan_id, const QDateTime&);
+    static ProgramInfo *GetProgramAtDateTime  (uint chan_id, const QDateTime&,
+                                               bool genUnknown = false);
     static ProgramInfo *GetProgramFromRecorded(uint chan_id, const QDateTime&);
     static ProgramInfo *GetProgramFromRecorded(uint chan_id, const QString&);
     static int GetChannelRecPriority(uint chan_id);

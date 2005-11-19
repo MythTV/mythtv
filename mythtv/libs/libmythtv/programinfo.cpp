@@ -501,8 +501,6 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
         minutes = seconds / 60;
     }
     
-    
-    
     progMap["lenmins"] = QString("%1 %2").
         arg(minutes).arg(QObject::tr("minutes"));
     hours   = minutes / 60;
@@ -627,12 +625,14 @@ int ProgramInfo::SecsTillStart(void) const
  *         "dtime" on "chanid".
  *  \param chan_id %Channel ID on which to search for program.
  *  \param dtime   Date and Time for which we desire the program.
+ *  \param genUnknown Generate a full entry for live-tv if unknown
  *  \return Pointer to a ProgramInfo from database if it succeeds,
  *          Pointer to an "Unknown" ProgramInfo if it does not find
  *          anything in database.
  */
 ProgramInfo *ProgramInfo::GetProgramAtDateTime(uint chan_id, 
-                                               const QDateTime &dtime)
+                                               const QDateTime &dtime,
+                                               bool genUnknown)
 {
     ProgramList schedList;
     ProgramList progList;
@@ -650,7 +650,6 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(uint chan_id,
     if (!progList.isEmpty())
         return progList.take(0);
 
-
     ProgramInfo *p = new ProgramInfo;
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum,  callsign,     "
@@ -665,28 +664,70 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(uint chan_id,
         return p;
     }
 
-    if (query.next())
+    if (!query.next())
+        return p;
+
+    p->chanid             = query.value(0).toUInt();
+    p->startts            = dtime;
+    p->endts              = dtime;
+    p->recstartts         = p->startts;
+    p->recendts           = p->endts;
+    p->lastmodified       = p->startts;
+    p->title              = gContext->GetSetting("UnknownTitle");
+    p->subtitle           = "";
+    p->description        = "";
+    p->category           = "";
+    p->chanstr            = query.value(1).toString();
+    p->chansign           = QString::fromUtf8(query.value(2).toString());
+    p->channame           = QString::fromUtf8(query.value(3).toString());
+    p->repeat             = 0;
+    p->chancommfree       = query.value(4).toInt();
+    p->chanOutputFilters  = query.value(5).toString();
+    p->seriesid           = "";
+    p->programid          = "";
+    p->year               = "";
+    p->stars              = 0.0f;
+
+    if (!genUnknown)
+        return p;
+
+    // Round endtime up to the next half-hour.
+    QTime endtime = p->endts.time();
+    if (p->endts.time().minute() < 30)
+        p->endts.setTime(QTime(p->endts.time().hour(), 30));
+    else
     {
-        p->chanid             = query.value(0).toUInt();
-        p->startts            = dtime;
-        p->endts              = dtime;
-        p->recstartts         = p->startts;
-        p->recendts           = p->endts;
-        p->lastmodified       = p->startts;
-        p->title              = gContext->GetSetting("UnknownTitle");
-        p->subtitle           = "";
-        p->description        = "";
-        p->category           = "";
-        p->chanstr            = query.value(1).toString();
-        p->chansign           = QString::fromUtf8(query.value(2).toString());
-        p->channame           = QString::fromUtf8(query.value(3).toString());
-        p->repeat             = 0;
-        p->chancommfree       = query.value(4).toInt();
-        p->chanOutputFilters  = query.value(5).toString();
-        p->seriesid           = "";
-        p->programid          = "";
-        p->year               = "";
-        p->stars              = 0.0f;
+        if (p->endts.time().hour() == 23)
+        {
+            p->endts = p->endts.addDays(1);
+            p->endts.setTime(QTime(0, 0));
+        }
+        else
+            p->endts.setTime(QTime(p->endts.time().hour() + 1, 0));
+    }
+
+    // if under a minute, bump it up to the next half hour
+    if (p->startts.secsTo(p->endts) < 60)
+        p->endts = p->endts.addSecs(30 * 60);
+
+    p->recendts = p->endts;
+
+    // Find next program starttime
+    QDateTime nextstart = p->startts;
+    querystr = "WHERE program.chanid    = :CHANID  AND "
+               "      program.starttime > :STARTTS "
+               "GROUP BY program.starttime ORDER BY program.starttime LIMIT 1 ";
+    bindings[":CHANID"]  = QString::number(chan_id);
+    bindings[":STARTTS"] = dtime.toString("yyyy-MM-ddThh:mm:50");
+
+    progList.FromProgram(querystr, bindings, schedList);
+
+    if (!progList.isEmpty())
+        nextstart = progList.at(0)->startts;
+
+    if (nextstart > p->startts && nextstart < p->recendts)
+    {
+        p->recendts = p->endts = nextstart;
     }
 
     return p;
@@ -709,8 +750,8 @@ QString ProgramInfo::toString(void) const
  *  \param starttime Scheduled 'starttime' of recording. (not 'recstarttime')
  *  \return Pointer to a ProgramInfo if it succeeds, NULL otherwise.
  */
-ProgramInfo *ProgramInfo::GetProgramFromRecorded(
-    uint chan_id, const QDateTime &starttime)
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(uint chan_id, 
+                                                 const QDateTime &starttime)
 {
     return GetProgramFromRecorded(chan_id, starttime.toString(Qt::ISODate));
 }
@@ -722,8 +763,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(
  *                   of the recording. (not recstarttime)
  *  \return Pointer to a ProgramInfo if it succeeds, NULL otherwise.
  */
-ProgramInfo *ProgramInfo::GetProgramFromRecorded(
-    uint chan_id, const QString &starttime)
+ProgramInfo *ProgramInfo::GetProgramFromRecorded(uint chan_id, 
+                                                 const QString &starttime)
 {
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT recorded.chanid,starttime,endtime,title, "
