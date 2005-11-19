@@ -2931,7 +2931,7 @@ void PlaybackBox::doDelete(void)
     cancelPopup();
 
     if ((delitem->availableStatus == asPendingDelete) ||
-        (REC_CAN_BE_DELETED(delitem)))
+        (!REC_CAN_BE_DELETED(delitem)))
     {
         showAvailablePopup(delitem);
         return;
@@ -2961,7 +2961,7 @@ void PlaybackBox::doForceDelete(void)
     cancelPopup();
 
     if ((delitem->availableStatus == asPendingDelete) ||
-        (REC_CAN_BE_DELETED(delitem)))
+        (!REC_CAN_BE_DELETED(delitem)))
     {
         showAvailablePopup(delitem);
         return;
@@ -2982,7 +2982,7 @@ void PlaybackBox::doDeleteForgetHistory(void)
     cancelPopup();
 
     if ((delitem->availableStatus == asPendingDelete) ||
-        (REC_CAN_BE_DELETED(delitem)))
+        (!REC_CAN_BE_DELETED(delitem)))
     {
         showAvailablePopup(delitem);
         return;
