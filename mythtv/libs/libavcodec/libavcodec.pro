@@ -31,7 +31,7 @@ SOURCES += mpeg12.c mpegaudiodec.c pcm.c simple_idct.c ratecontrol.c adpcm.c
 SOURCES += eval.c error_resilience.c fft.c mdct.c raw.c golomb.c cabac.c
 SOURCES += dpcm.c adx.c faandct.c parser.c g726.c vp3dsp.c 
 SOURCES += h264idct.c rangecoder.c pnm.c h263.c msmpeg4.c h263dec.c dvdsub.c 
-SOURCES += dvbsub.c dvbsubdec.c opt.c qdm2.c truemotion2.c myth_utils.c
+SOURCES += dvbsub.c dvbsubdec.c dvdsubenc.c opt.c myth_utils.c
 
 inc.path = $${PREFIX}/include/mythtv/ffmpeg/
 inc.files = avcodec.h i386/mmx.h opt.h
@@ -155,6 +155,10 @@ contains( DO_PNG, yes ) {
     SOURCES += png.c
 }
 
+contains( CONFIG_QDM2_DECODER, yes ) { 
+    SOURCES += qdm2.c
+}
+
 contains( CONFIG_QDRAW_DECODER, yes ) {
     SOURCES += qdrw.c
 }
@@ -213,6 +217,10 @@ contains( DO_SVQ1, yes ) {
 
 contains( CONFIG_TRUEMOTION1_DECODER, yes ) {
     SOURCES += truemotion1.c
+}
+
+contains( CONFIG_TRUEMOTION2_DECODER, yes ) {
+    SOURCES += truemotion2.c
 }
 
 contains( CONFIG_TSCC_DECODER, yes ) {

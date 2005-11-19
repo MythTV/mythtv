@@ -2505,9 +2505,11 @@ int av_write_header(AVFormatContext *s)
         }
     }
 
-    ret = s->oformat->write_header(s);
-    if (ret < 0)
-        return ret;
+    if(s->oformat->write_header){
+        ret = s->oformat->write_header(s);
+        if (ret < 0)
+            return ret;
+    }
 
     /* init PTS generation */
     for(i=0;i<s->nb_streams;i++) {
@@ -2794,7 +2796,8 @@ int av_write_trailer(AVFormatContext *s)
             goto fail;
     }
 
-    ret = s->oformat->write_trailer(s);
+    if(s->oformat->write_trailer)
+        ret = s->oformat->write_trailer(s);
 fail:
     if(ret == 0)
        ret=url_ferror(&s->pb);

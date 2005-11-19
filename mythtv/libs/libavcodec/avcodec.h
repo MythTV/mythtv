@@ -739,6 +739,7 @@ typedef struct AVCodecContext {
      * mpeg4: global headers (they can be in the bitstream or here)
      * the allocated memory should be FF_INPUT_BUFFER_PADDING_SIZE bytes larger
      * then extradata_size to avoid prolems if its read with the bitstream reader
+     * the bytewise contents of extradata must not depend on the architecture or cpu endianness
      * - encoding: set/allocated/freed by lavc.
      * - decoding: set/allocated/freed by user.
      */
@@ -2133,6 +2134,7 @@ extern AVCodec ac3_decoder;
 extern AVCodec dts_decoder;
 
 /* subtitles */
+extern AVCodec dvdsub_encoder;
 extern AVCodec dvdsub_decoder;
 extern AVCodec dvbsub_encoder;
 extern AVCodec dvbsub_decoder;

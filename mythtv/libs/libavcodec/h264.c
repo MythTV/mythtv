@@ -3089,11 +3089,12 @@ static int decode_init(AVCodecContext *avctx){
     return 0;
 }
 
-static void frame_start(H264Context *h){
+static int frame_start(H264Context *h){
     MpegEncContext * const s = &h->s;
     int i;
 
-    MPV_frame_start(s, s->avctx);
+    if(MPV_frame_start(s, s->avctx) < 0)
+        return -1;
     ff_er_frame_start(s);
 
     assert(s->linesize && s->uvlinesize);
@@ -3115,6 +3116,7 @@ static void frame_start(H264Context *h){
         s->obmc_scratchpad = av_malloc(16*s->linesize + 2*8*s->uvlinesize);
 
 //    s->decode= (s->flags&CODEC_FLAG_PSNR) || !s->encoding || s->current_picture.reference /*|| h->contains_intra*/ || 1;
+    return 0;
 }
 
 static inline void backup_mb_border(H264Context *h, uint8_t *src_y, uint8_t *src_cb, uint8_t *src_cr, int linesize, int uvlinesize){
@@ -4290,7 +4292,8 @@ static int decode_slice_header(H264Context *h){
     }
 
     if(h->slice_num == 0){
-        frame_start(h);
+        if(frame_start(h) < 0)
+            return -1;
     }
 
     s->current_picture_ptr->frame_num= //FIXME frame_num cleanup
@@ -5291,12 +5294,10 @@ static int decode_cabac_mb_intra4x4_pred_mode( H264Context *h, int pred_mode ) {
     if( get_cabac( &h->cabac, &h->cabac_state[68] ) )
         return pred_mode;
 
-    if( get_cabac( &h->cabac, &h->cabac_state[69] ) )
-        mode += 1;
-    if( get_cabac( &h->cabac, &h->cabac_state[69] ) )
-        mode += 2;
-    if( get_cabac( &h->cabac, &h->cabac_state[69] ) )
-        mode += 4;
+    mode += 1 * get_cabac( &h->cabac, &h->cabac_state[69] );
+    mode += 2 * get_cabac( &h->cabac, &h->cabac_state[69] );
+    mode += 4 * get_cabac( &h->cabac, &h->cabac_state[69] );
+
     if( mode >= pred_mode )
         return mode + 1;
     else
@@ -7730,10 +7731,13 @@ static int decode_frame(AVCodecContext *avctx,
         h->delayed_output_pic = out;
 #endif
 
-        *pict= *(AVFrame*)out;
+        if(out)
+            *pict= *(AVFrame*)out;
+        else
+            av_log(avctx, AV_LOG_DEBUG, "no picture\n");
     }
 
-    assert(pict->data[0]);
+    assert(pict->data[0] || !*data_size);
     ff_print_debug_info(s, pict);
 //printf("out %d\n", (int)pict->data[0]);
 #if 0 //?
