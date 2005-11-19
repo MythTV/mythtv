@@ -49,7 +49,7 @@ uLong crcinfo(QString romname, QString GameType, QString *key, RomDBMap *romDB)
 
                 // Get CRC of rom data
                 int count;
-                while ((count = unzReadCurrentFile(zf, block, 32768)))
+                while ((count = unzReadCurrentFile(zf, block, 32768)) > 0)
                 {
                     crc = crc32(crc, (Bytef *)block, (uInt)count);
                 }   
