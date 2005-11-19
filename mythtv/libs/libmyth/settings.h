@@ -30,7 +30,7 @@ public:
 
     virtual void load() = 0;
     virtual void save() = 0;
-    virtual void save(QString destination) = 0;
+    virtual void save(QString /*destination*/) { }
 
     // A name for looking up the setting
     void setName(QString str) {
@@ -600,7 +600,7 @@ public:
 
     virtual void load() = 0;
     virtual void save() = 0;
-    virtual void save(QString destination) = 0;
+    virtual void save(QString /*destination*/) { }
 
 protected:
     QString getColumn(void) const { return column; };

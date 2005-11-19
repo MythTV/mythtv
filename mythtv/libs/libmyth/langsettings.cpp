@@ -25,7 +25,6 @@ public:
         gContext->SaveSetting("Language", getValue());
         LanguageSettings::reload();
     };
-    virtual void save(QString destination) { }
 };
 
 

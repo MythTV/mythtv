@@ -113,7 +113,6 @@ public:
     virtual int exec();
     virtual void load();
     virtual void save() { };
-    virtual void save(QString) { };
 
 protected slots:
     void open(int id);

@@ -450,7 +450,6 @@ public:
     virtual int exec();
     virtual void load();
     virtual void save() { };
-    virtual void save(QString) { };
 
 public slots:
     void menu();
@@ -476,7 +475,6 @@ public:
     virtual int exec();
     virtual void load();
     virtual void save() { };
-    virtual void save(QString) { };
 
 public slots:
     void menu(); 
@@ -496,7 +494,6 @@ public:
     virtual int exec();
     virtual void load();
     virtual void save() { };
-    virtual void save(QString) { };
 
 protected:
     vector<CardInput*> cardinputs;

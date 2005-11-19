@@ -69,7 +69,6 @@ public:
     };
 
     void save() { };
-    void save(QString) { };
     void load() 
     {
         MSqlQuery query(MSqlQuery::InitCon());
