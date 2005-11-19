@@ -1,5 +1,5 @@
-#ifndef PREVIOUSBOX_H_
-#define PREVIOUSBOX_H_
+#ifndef PREVIOUSLIST_H_
+#define PREVIOUSLIST_H_
 
 #include <qdatetime.h>
 #include "libmyth/uitypes.h"
@@ -9,13 +9,14 @@
 #include "libmythtv/programinfo.h"
 
 
-class PreviousBox : public MythDialog
+class PreviousList : public MythDialog
 {
     Q_OBJECT
 
   public:
-    PreviousBox(MythMainWindow *parent, const char *name = 0);
-    ~PreviousBox();
+    PreviousList(MythMainWindow *parent, const char *name = 0,
+                int recid = 0, QString ltitle = "");
+    ~PreviousList();
 
   protected slots:
     void cursorDown(bool page = false);
@@ -37,6 +38,9 @@ class PreviousBox : public MythDialog
     void customEvent(QCustomEvent *e);
 
   private:
+    int m_recid;
+    QString m_title;
+
     QString view;
     QDateTime startTime;
     QDateTime searchTime;

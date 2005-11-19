@@ -2439,17 +2439,17 @@ void PlaybackBox::showRecordingPopup()
 
     initPopup(popup, delitem, "", "");
 
-    QButton *changeButton = popup->addButton(tr("Change Recording Group"), this,
+    QButton *editButton = popup->addButton(tr("Edit Recording Schedule"), this,
+                     SLOT(doEditScheduled()));
+
+    popup->addButton(tr("Change Recording Group"), this,
                      SLOT(showRecGroupChanger()));
 
     popup->addButton(tr("Change Recording Title"), this,
                      SLOT(showRecTitleChanger()));
-
-    popup->addButton(tr("Edit Recording Schedule"), this,
-                     SLOT(doEditScheduled()));
     
     popup->ShowPopup(this, SLOT(doCancel()));
-    changeButton->setFocus();
+    editButton->setFocus();
     
     expectingPopup = true;
 }

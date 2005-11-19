@@ -361,6 +361,23 @@ class SRJobQueueGroup : public ManagedListGroup
         ScheduledRecording *schedRec;
 };
 
+class SRSchedInfoGroup : public ManagedListGroup
+{
+    Q_OBJECT
+    
+    public:
+        SRSchedInfoGroup(ScheduledRecording *_rec, ManagedList* _list, ManagedListGroup* _group, QObject* _parent);
+        
+    protected:
+
+        friend class SRRootGroup;
+        ManagedListItem* detailsButton;
+        ManagedListItem* previousButton;
+        ManagedListItem* upcomingButton;
+
+        ScheduledRecording *schedRec;
+};
+
 
 class SRStorageOptionsGroup : public ManagedListGroup
 {

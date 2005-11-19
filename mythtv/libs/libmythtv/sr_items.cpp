@@ -119,7 +119,31 @@ SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording *_rec, ManagedLi
 
     maxNewest = new SRMaxNewest(_rec, this, _parentList);
     addItem(maxNewest->getItem(), -1);
+}
 
+SRSchedInfoGroup::SRSchedInfoGroup(ScheduledRecording *_rec, ManagedList* _parentList, 
+                                         ManagedListGroup* _group, QObject* _parent)
+                 : ManagedListGroup(QObject::tr("Schedule Information"), _group, _parentList,
+                                    _parent, "schedInfo"),
+                   schedRec(_rec)
+{
+    detailsButton = new ManagedListItem(QObject::tr("Program details"),
+                                         _parentList, this, "showDetails");
+    addItem(detailsButton, -1);
+    connect(detailsButton, SIGNAL(selected(ManagedListItem*)), _rec,
+                                  SLOT(runShowDetails()));
+
+    previousButton = new ManagedListItem(QObject::tr("List previous episodes"),
+                                         _parentList, this, "listPrevious");
+    addItem(previousButton, -1);
+    connect(previousButton, SIGNAL(selected(ManagedListItem*)), _rec,
+                                   SLOT(runPrevList()));
+
+    upcomingButton = new ManagedListItem(QObject::tr("List upcoming episodes"),
+                                         _parentList, this, "listUpcoming");
+    addItem(upcomingButton, -1);
+    connect(upcomingButton, SIGNAL(selected(ManagedListItem*)), _rec,
+                                   SLOT(runProgList()));
 }
 
 void SRStorageOptionsGroup::itemChanged(ManagedListItem*)

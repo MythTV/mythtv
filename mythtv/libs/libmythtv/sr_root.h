@@ -26,12 +26,12 @@ class RootSRGroup : public ManagedListGroup
          
          DialogDoneListItem* cancelItem;
          DialogDoneListItem* recordAsShownItem;
-         ManagedListItem* upcomingButton;         
-         ManagedListItem* detailsButton;
+         ManagedListItem* testButton;         
 
          class SRSchedOptionsGroup* schedOptions;
          class SRStorageOptionsGroup* storageOptions;
          class SRJobQueueGroup* jobQueue;
+         class SRSchedInfoGroup* schedInfo;
          
          class SRRecordingType* recType;
 };

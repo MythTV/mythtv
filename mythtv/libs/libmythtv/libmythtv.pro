@@ -84,7 +84,7 @@ SOURCES += minilzo.cpp              RTjpegN.cpp
 # Misc. needed by backend/frontend
 HEADERS += programinfo.h            proglist.h
 HEADERS += RingBuffer.h             DVDRingBuffer.h
-HEADERS += ThreadedFileWriter.h
+HEADERS += ThreadedFileWriter.h     previouslist.h
 HEADERS += dbcheck.h                
 HEADERS += remoteutil.h             tv.h
 HEADERS += recordingtypes.h         jobqueue.h
@@ -92,13 +92,13 @@ HEADERS += filtermanager.h          recordingprofile.h
 HEADERS += remoteencoder.h          videosource.h
 HEADERS += sr_dialog.h              sr_root.h
 HEADERS += sr_items.h               scheduledrecording.h
-HEADERS += signalmonitorvalue.h 
+HEADERS += signalmonitorvalue.h     viewschdiff.h
 HEADERS += mpeg/iso639.h
 HEADERS += livetvchain.h
 
 SOURCES += programinfo.cpp          proglist.cpp
 SOURCES += RingBuffer.cpp           DVDRingBuffer.cpp
-SOURCES += ThreadedFileWriter.cpp
+SOURCES += ThreadedFileWriter.cpp   previouslist.cpp
 SOURCES += dbcheck.cpp              
 SOURCES += remoteutil.cpp           tv.cpp
 SOURCES += recordingtypes.cpp       jobqueue.cpp
@@ -108,6 +108,7 @@ SOURCES += sr_dialog.cpp            sr_root.cpp
 SOURCES += sr_items.cpp             scheduledrecording.cpp
 SOURCES += signalmonitorvalue.cpp
 SOURCES += mpeg/iso639.cpp
+SOURCES += viewschdiff.cpp
 SOURCES += livetvchain.cpp
 
 using_frontend {

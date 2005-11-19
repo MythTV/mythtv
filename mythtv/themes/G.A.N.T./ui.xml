@@ -550,6 +550,185 @@
 
   </window>
 
+  <window name="schdiff">
+
+    <font name="active_font" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="inactive_font" face="Arial">
+      <color>#9999cc</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="record_font" face="Arial">
+      <color>#F7862B</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="recording_font" face="Arial">
+      <color>#FF33FF</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="norecordfnt" face="Arial">
+      <color>#999999</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="conflictfnt" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="currenttitle" face="Arial">
+      <color>#ffff33</color>
+      <size>18</size>
+      <size:small>12</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="title" face="Arial">
+      <color>#ffffff</color>
+      <dropcolor>#000000</dropcolor>
+      <size>27</size>
+      <size:small>13</size:small>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>17</size>
+      <size:small>8</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="message" face="Arial">
+      <color>#ffffff</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="messagegray" face="Arial">
+      <color>#999999</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="messageyellow" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <container name="background">
+      <textarea name="sched" draworder="0">
+        <area>20,10,400,40</area>
+        <font>info</font>
+        <value>Preview Schedule Changes:</value>
+      </textarea>
+      <textarea name="view" align="right" draworder="0">
+        <area>400,10,380,30</area>
+        <font>info</font>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="yes">
+        <filename>cr-background.png</filename>
+        <position>0,39</position>
+      </image>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,290</area>
+      <listarea name="conflictlist" draworder="4">
+        <area>20,12,760,265</area>
+        <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
+        <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
+        <fcnfont name="active_font" function="active"></fcnfont>
+        <fcnfont name="inactive_font" function="inactive"></fcnfont>
+        <fcnfont name="record_font" function="record"></fcnfont>
+        <fcnfont name="recording_font" function="recording"></fcnfont>
+        <fcnfont name="active_font" function="selected"></fcnfont>
+        <columnpadding>10</columnpadding>
+        <column number="1" width="160" context="-1"></column>
+        <column number="2" width="120" context="-1"></column>
+        <column number="3" width="370" context="-1"></column>
+        <column number="4" width="20" context="-1"></column>
+        <column number="5" width="20" context="-1"></column>
+        <items>9</items>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-14,-5"></image>
+        <image function="uparrow" filename="uparrow.png" location="755,22"></image>
+        <image function="downarrow" filename="downarrow.png" location="755,230"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>0,360,800,210</area>
+      <textarea name="title" draworder="6">
+        <area>20,0,800,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>20,40,160,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>200,40,420,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="subdescr" draworder="6">
+        <area>20,70,720,140</area>
+        <font>info</font>
+        <multiline>yes</multiline>
+        <value>%SUBTITLE|"|"
+%%STARS%%DESCRIPTION%</value>
+      </textarea>
+    </container>
+
+    <container name="status_info">
+      <area>300,330,480,30</area>
+      <textarea name="recordingstatus" align="right" draworder="6">
+        <area>0,0,480,30</area>
+        <font>message</font>
+      </textarea>
+    </container>
+ 
+
+   <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>The recording schedule would not be affected.</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+  </window>
+
   <window name="recprioritychannels">
 
     <font name="active_font" face="Arial">
@@ -1477,12 +1656,12 @@
 
     <container name="background">
       <textarea name="sched" draworder="0">
-        <area>20,10,200,40</area>
+        <area>20,10,215,40</area>
         <font>info</font>
         <value>Program Listings</value>
       </textarea>
       <textarea name="keyinstr" align="center" draworder="0">
-        <area>210,10,190,30</area>
+        <area>240,10,180,30</area>
         <font>message</font>
         <value>(1)Time (2)Title</value>
       </textarea>
@@ -1493,9 +1672,9 @@
     </container>
 
     <container name="view">
-      <area>400,10,380,30</area>
+      <area>420,10,360,30</area>
       <textarea name="curview" draworder="4" align="right">
-        <area>0,0,380,30</area>
+        <area>0,0,360,30</area>
         <font>info</font>
       </textarea>
     </container>

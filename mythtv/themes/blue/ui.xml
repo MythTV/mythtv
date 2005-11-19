@@ -365,6 +365,95 @@
 
   </window>
 
+  <window name="schdiff">
+
+    <container name="background">
+      <area> 0, 0, 800, 600</area>
+      <textarea name="sched" draworder="0">
+        <area>20,10,400,40</area>
+        <font>info</font>
+        <value>Preview Schedule Changes:</value>
+      </textarea>
+      <textarea name="view" align="right" draworder="0">
+        <area>400,10,380,30</area>
+        <font>info</font>
+      </textarea>
+      <image name="filler" draworder="0" fleximage="no">
+        <filename>cr-background.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="selector">
+      <area>0,39,800,290</area>
+      <listarea name="conflictlist" draworder="4">
+        <area>20,12,760,265</area>
+        <fcnfont name="list-conflict" function="conflictingrecording"></fcnfont>
+        <fcnfont name="list-norecord" function="disabledrecording"></fcnfont>
+        <fcnfont name="list-active" function="active"></fcnfont>
+        <fcnfont name="list-inactive" function="inactive"></fcnfont>
+        <fcnfont name="list-record" function="record"></fcnfont>
+        <fcnfont name="list-recording" function="recording"></fcnfont>
+        <fcnfont name="list-selected" function="selected"></fcnfont>
+        <columnpadding>10</columnpadding>
+        <column number="1" width="165" context="-1"></column>
+        <column number="2" width="110" context="-1"></column>
+        <column number="3" width="390" context="-1"></column>
+        <column number="4" width="20" context="-1"></column>
+        <column number="5" width="20" context="-1"></column>
+        <items>9</items>
+        <image function="selectionbar" filename="cr-selectbar.png" location="-10,-2"></image>
+        <image function="uparrow" filename="uparrow.png" location="745,12"></image>
+        <image function="downarrow" filename="downarrow.png" location="745,244"></image>
+      </listarea>
+      <image name="showinglines" draworder="5" fleximage="no">
+        <filename>cr-lines.png</filename>
+        <position>0,0</position>
+      </image>
+    </container>
+
+    <container name="program_info">
+      <area>25,365,775,210</area>
+      <textarea name="title" draworder="6">
+        <area>0,0,730,40</area>
+        <font>title</font>
+      </textarea>
+      <textarea name="channel" draworder="6">
+        <area>0,45,160,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="timedate" draworder="6">
+        <area>175,45,420,30</area>
+        <font>info</font>
+      </textarea>
+      <textarea name="subdescr" draworder="6">
+        <area>0,75,720,140</area>
+        <font>metadata</font>
+        <multiline>yes</multiline>
+        <value>%SUBTITLE|"|"
+%%REPEAT%%STARS%%DESCRIPTION%</value>
+      </textarea>
+    </container>
+
+    <container name="status_info">
+      <area>300,345,480,30</area>
+      <textarea name="recordingstatus" align="right" draworder="6">
+        <area>0,0,480,30</area>
+        <font>recstatus</font>
+      </textarea>
+    </container>
+
+   <container name="norecordings_list">
+      <textarea name="msg" align="center" draworder="8">
+         <area>0,110,800,70</area>
+         <font>info</font>
+         <value>The recording schedule would not be affected.</value>
+         <multiline>yes</multiline>
+      </textarea>
+    </container>
+
+  </window>
+
   <window name="recprioritychannels">
 
     <container name="background">
@@ -1042,12 +1131,12 @@
 
     <container name="background">
       <textarea name="sched" draworder="0">
-        <area>20,10,200,40</area>
+        <area>20,10,215,40</area>
         <font>info</font>
         <value>Program Listings</value>
       </textarea>
       <textarea name="keyinstr" align="center" draworder="0">
-        <area>210,10,190,30</area>
+        <area>240,10,180,30</area>
         <font>info</font>
         <value>(1)Time (2)Title</value>
       </textarea>
@@ -1058,9 +1147,9 @@
     </container>
 
     <container name="view">
-      <area>400,10,380,30</area>
+      <area>420,10,360,30</area>
       <textarea name="curview" draworder="4" align="right">
-        <area>0,0,380,30</area>
+        <area>0,0,360,30</area>
         <font>info</font>
       </textarea>
     </container>

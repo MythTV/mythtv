@@ -30,6 +30,7 @@ public:
 
     virtual void load() = 0;
     virtual void save() = 0;
+    virtual void save(QString destination) = 0;
 
     // A name for looking up the setting
     void setName(QString str) {
@@ -123,6 +124,7 @@ class ConfigurationGroup: virtual public Configurable
     virtual void load();
 
     virtual void save();
+    virtual void save(QString destination);
 
     void setUseLabel(bool useit) { uselabel = useit; }
     void setUseFrame(bool useit) { useframe = useit; }
@@ -183,6 +185,7 @@ public:
 
     void raise(Configurable* child);
     virtual void save();
+    virtual void save(QString destination);
 
     // save all children, or only the top?
     void setSaveAll(bool b) { saveAll = b; };
@@ -597,6 +600,7 @@ public:
 
     virtual void load() = 0;
     virtual void save() = 0;
+    virtual void save(QString destination) = 0;
 
 protected:
     QString getColumn(void) const { return column; };
@@ -615,6 +619,7 @@ public:
 
     virtual void load();
     virtual void save();
+    virtual void save(QString destination);
 
 protected:
 
@@ -628,6 +633,7 @@ class TransientStorage: virtual public Setting {
 public:
     virtual void load() {  }
     virtual void save() {  }
+    virtual void save(QString) {  }
 };
 
 class AutoIncrementStorage: virtual public IntegerSetting, public DBStorage {
@@ -639,6 +645,7 @@ public:
 
     virtual void load() { };
     virtual void save();
+    virtual void save(QString destination);
 };
 
 class ButtonSetting: virtual public Setting {

@@ -3702,7 +3702,8 @@ void ProgramInfo::ShowNotRecordingDialog(void)
  *                                                                           *
  * ************************************************************************* */
 
-bool ProgramList::FromScheduler(bool &hasConflicts)
+bool ProgramList::FromScheduler(bool &hasConflicts, QString rectable,
+                                int recordid)
 {
     clear();
     hasConflicts = false;
@@ -3710,7 +3711,16 @@ bool ProgramList::FromScheduler(bool &hasConflicts)
     if (gContext->IsBackend())
         return false;
 
-    QStringList slist = QString("QUERY_GETALLPENDING");
+    QString query;
+    if (rectable != "")
+    {
+        query = QString("QUERY_GETALLPENDING %1 %2")
+                        .arg(rectable).arg(recordid);
+    } else {
+        query = QString("QUERY_GETALLPENDING");
+    }
+
+    QStringList slist = query;
     if (!gContext->SendReceiveStringList(slist) || slist.size() < 2)
     {
         VERBOSE(VB_IMPORTANT,

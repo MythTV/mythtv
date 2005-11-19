@@ -20,7 +20,7 @@ using namespace std;
 #include "manualbox.h"
 #include "manualschedule.h"
 #include "playbackbox.h"
-#include "previousbox.h"
+#include "previouslist.h"
 #include "customrecord.h"
 #include "viewscheduled.h"
 #include "programrecpriority.h"
@@ -204,7 +204,7 @@ void startDelete(void)
 
 void startPrevious(void)
 {
-    PreviousBox previous(gContext->GetMainWindow(), "previous box");
+    PreviousList previous(gContext->GetMainWindow(), "previous list");
 
     qApp->unlock();
     previous.exec();

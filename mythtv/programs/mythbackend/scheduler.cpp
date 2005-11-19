@@ -31,10 +31,24 @@ using namespace std;
 #include "libmythtv/programinfo.h"
 #include "libmythtv/scheduledrecording.h"
 
-Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList)
+Scheduler::Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
+                     QString recordTbl, MSqlQueryInfo *databaseConnection,
+                     Scheduler *master_sched)
 {
     hasconflicts = false;
     m_tvList = tvList;
+    specsched = false;
+
+    if (master_sched)
+    {
+        specsched = true;
+        master_sched->getAllPending(&reclist);
+    }
+
+    if (databaseConnection) dbConn = *databaseConnection;
+    else dbConn = MSqlQuery::SchedCon();
+
+    recordTable = recordTbl;
 
     m_mainServer = NULL;
 
@@ -77,7 +91,7 @@ void Scheduler::verifyCards(void)
 {
     QString thequery;
 
-    MSqlQuery query(MSqlQuery::SchedCon());
+    MSqlQuery query(dbConn);
     query.prepare("SELECT NULL FROM capturecard;");
 
     int numcards = -1;
@@ -103,7 +117,7 @@ void Scheduler::verifyCards(void)
         while (query.next())
         {
             source = query.value(0).toInt();
-            MSqlQuery subquery(MSqlQuery::SchedCon());
+            MSqlQuery subquery(dbConn);
 
             subquery.prepare("SELECT cardinputid FROM cardinput WHERE "
                              "sourceid = :SOURCEID ORDER BY cardinputid;");
@@ -275,22 +289,58 @@ bool Scheduler::FillRecordList(void)
     return hasconflicts;
 }
 
-void Scheduler::FillRecordListFromDB(void)
+void Scheduler::FillRecordListFromDB(int recordid)
 {
-    MSqlQuery query(MSqlQuery::SchedCon());
-    query.prepare("CREATE TEMPORARY TABLE recordmatch "
+    struct timeval fillstart, fillend;
+
+    gettimeofday(&fillstart, NULL);
+    
+    MSqlQuery query(dbConn);
+    QString thequery;
+    if (recordid == -1)
+    {
+            thequery = "CREATE TEMPORARY TABLE recordmatch "
                   "(recordid int unsigned, chanid int unsigned, "
                   " starttime datetime, manualid int unsigned, "
-                  " INDEX (recordid));");
+                  " INDEX (recordid));";
+    } else {
+            thequery = "CREATE TEMPORARY TABLE recordmatch "
+                  "(recordid int unsigned, chanid int unsigned, "
+                  " starttime datetime, manualid int unsigned, "
+                  " INDEX (recordid)) SELECT * from recordmatch;";
+    }
+
+    query.prepare(thequery);
+    recordmatchLock.lock();
     query.exec();
+    recordmatchLock.unlock();
     if (!query.isActive())
     {
         MythContext::DBError("FillRecordListFromDB", query);
         return;
     }
 
-    UpdateMatches(-1);
+    UpdateMatches(recordid);
     FillRecordList();
+
+    MSqlQuery queryDrop(dbConn);
+    queryDrop.prepare("DROP TEMPORARY TABLE recordmatch;");
+    queryDrop.exec();
+    if (!queryDrop.isActive())
+    {
+        MythContext::DBError("FillRecordListFromDB", queryDrop);
+        return;
+    }
+
+    gettimeofday(&fillend, NULL);
+
+    double schedTime = (fillend.tv_sec - fillstart.tv_sec ) +
+                         (fillend.tv_usec - fillstart.tv_usec) / 1000000.0;
+    QString msg;
+    msg.sprintf("Speculative scheduled %d items in "
+                "%.2f", (int)reclist.size(),
+                schedTime);
+    VERBOSE(VB_GENERAL, msg);
 }
 
 void Scheduler::FillRecordListFromMaster(void)
@@ -416,6 +466,17 @@ bool Scheduler::ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp)
     oldp->recordid = newp->recordid;
     oldp->recendts = newp->recendts;
 
+    if (specsched)
+    {
+        if (newp->recendts < QDateTime::currentDateTime())
+        {
+            oldp->recstatus = rsRecorded;
+            newp->recstatus = rsRecorded;
+            return false;
+        }
+        else
+            return true;
+    }
     EncoderLink *tv = (*m_tvList)[oldp->cardid];
     RecStatusType rs = tv->StartRecording(oldp);
     if (rs != rsRecording)
@@ -427,7 +488,6 @@ bool Scheduler::ChangeRecordingEnd(ProgramInfo *oldp, ProgramInfo *newp)
         oldp->recordid = oldrecordid;
         oldp->recendts = oldrecendts;
     }
-
     return rs == rsRecording;
 }
 
@@ -514,7 +574,11 @@ void Scheduler::PruneOldRecords(void)
     {
         ProgramInfo *p = *dreciter;
         if (p->recstatus == rsRecording)
+        {
             dreciter++;
+            VERBOSE(VB_SCHEDULE, QString("Card %1 is recording \"%2\"")
+                                         .arg(p->cardid).arg(p->title));
+        }
         else
         {
             delete p;
@@ -980,7 +1044,7 @@ void Scheduler::RunScheduler(void)
 
     // Mark anything that was recording as aborted.  We'll fix it up.
     // if possible, after the slaves connect and we start scheduling.
-    MSqlQuery query(MSqlQuery::SchedCon());
+    MSqlQuery query(dbConn);
     query.prepare("UPDATE oldrecorded SET recstatus = :RSABORTED "
                   "  WHERE recstatus = :RSRECORDING");
     query.bindValue(":RSABORTED", rsAborted);
@@ -1023,7 +1087,9 @@ void Scheduler::RunScheduler(void)
                 {
                     if (recordid == -1)
                         reschedQueue.clear();
+                    recordmatchLock.lock();
                     UpdateMatches(recordid);
+                    recordmatchLock.unlock();
                 }
             }
             gettimeofday(&fillend, NULL);
@@ -1438,11 +1504,11 @@ void *Scheduler::SchedulerThread(void *param)
 
 void Scheduler::UpdateManuals(int recordid)
 {
-    MSqlQuery query(MSqlQuery::SchedCon());
+    MSqlQuery query(dbConn);
 
-    query.prepare("SELECT type,title,station,startdate,starttime, "
+    query.prepare(QString("SELECT type,title,station,startdate,starttime, "
                   " enddate,endtime "
-                  "FROM record WHERE recordid = :RECORDID");
+                  "FROM %1 WHERE recordid = :RECORDID").arg(recordTable));
     query.bindValue(":RECORDID", recordid);
     query.exec();
     if (!query.isActive() || query.size() != 1)
@@ -1517,7 +1583,7 @@ void Scheduler::UpdateManuals(int recordid)
             if (weekday && startdt.date().dayOfWeek() >= 6)
                 continue;
 
-            query.prepare("INSERT INTO program (chanid,starttime,endtime,"
+            query.prepare("REPLACE INTO program (chanid,starttime,endtime,"
                           " title,subtitle,manualid) "
                           "VALUES (:CHANID,:STARTTIME,:ENDTIME,:TITLE,"
                           " :SUBTITLE,:RECORDID)");
@@ -1542,14 +1608,14 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
                                        QStringList &where, 
                                        MSqlBindings &bindings)
 {
-    MSqlQuery result(MSqlQuery::SchedCon());
+    MSqlQuery result(dbConn);
     QString query;
     QString qphrase;
 
     query = QString("SELECT recordid,search,subtitle,description "
-                    "FROM record WHERE search <> %1 AND "
-                    "(recordid = %2 OR %3 = -1) ")
-        .arg(kNoSearch).arg(recordid).arg(recordid);
+                    "FROM %1 WHERE search <> %2 AND "
+                    "(recordid = %3 OR %4 = -1) ")
+        .arg(recordTable).arg(kNoSearch).arg(recordid).arg(recordid);
 
     result.prepare(query);
 
@@ -1587,19 +1653,19 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         case kPowerSearch:
             qphrase.remove(QRegExp("^\\s*AND\\s+", false));
             from << result.value(2).toString();
-            where << (QString("record.recordid = ") + bindrecid +
+            where << (QString("%1.recordid = ").arg(recordTable) + bindrecid +
                       QString(" AND program.manualid = 0 AND ( %2 )")
                       .arg(qphrase));
             break;
         case kTitleSearch:
             from << "";
-            where << (QString("record.recordid = ") + bindrecid + " AND "
+            where << (QString("%1.recordid = ").arg(recordTable) + bindrecid + " AND "
                       "program.manualid = 0 AND "
                       "program.title LIKE " + bindlikephrase);
             break;
         case kKeywordSearch:
             from << "";
-            where << (QString("record.recordid = ") + bindrecid +
+            where << (QString("%1.recordid = ").arg(recordTable) + bindrecid +
                       " AND program.manualid = 0"
                       " AND (program.title LIKE " + bindlikephrase +
                       " OR program.subtitle LIKE " + bindlikephrase +
@@ -1607,7 +1673,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
             break;
         case kPeopleSearch:
             from << ", people, credits";
-            where << (QString("record.recordid = ") + bindrecid + " AND "
+            where << (QString("%1.recordid = ").arg(recordTable) + bindrecid + " AND "
                       "program.manualid = 0 AND "
                       "people.name LIKE " + bindphrase + " AND "
                       "credits.person = people.person AND "
@@ -1617,8 +1683,8 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
         case kManualSearch:
             UpdateManuals(result.value(0).toInt());
             from << "";
-            where << (QString("record.recordid = ") + bindrecid + " AND "
-                              "program.manualid = record.recordid ");
+            where << ((QString("%1.recordid = ").arg(recordTable)) + bindrecid + " AND " +
+                              QString("program.manualid = %1.recordid ").arg(recordTable));
             break;
         default:
             VERBOSE(VB_IMPORTANT, QString("Unknown RecSearchType "
@@ -1634,10 +1700,19 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
     if (recordid == -1 || from.count() == 0)
     {
         from << "";
-        where << "record.search = :NRST AND "
-                 "(record.recordid = :NRRECORDID OR :NRRECORDID = -1) AND "
+        QString s("RECTABLE.search = :NRST AND "
+                 "(RECTABLE.recordid = :NRRECORDID OR :NRRECORDID = -1) AND "
                  "program.manualid = 0 AND "
-                 "program.title = record.title ";
+                 "program.title = RECTABLE.title ");
+
+        while (1)
+        {
+            int i = s.find("RECTABLE");
+            if (i == -1) break;
+            s = s.replace(i, strlen("RECTABLE"), recordTable);
+        }
+
+        where << s;
         bindings[":NRST"] = kNoSearch;
         bindings[":NRRECORDID"] = recordid;
     }
@@ -1646,7 +1721,7 @@ void Scheduler::BuildNewRecordsQueries(int recordid, QStringList &from,
 void Scheduler::UpdateMatches(int recordid) {
     struct timeval dbstart, dbend;
 
-    MSqlQuery query(MSqlQuery::SchedCon());
+    MSqlQuery query(dbConn);
     query.prepare("DELETE FROM recordmatch "
                   "WHERE recordid = :RECORDID OR :RECORDID = -1;");
 
@@ -1686,29 +1761,29 @@ void Scheduler::UpdateMatches(int recordid) {
     {
         QString query = QString(
 "INSERT INTO recordmatch (recordid, chanid, starttime, manualid) "
-"SELECT record.recordid, program.chanid, program.starttime, "
+"SELECT RECTABLE.recordid, program.chanid, program.starttime, "
 " IF(search = %1, recordid, 0) "
-"FROM record, program ").arg(kManualSearch) + fromclauses[clause] + QString(
+"FROM RECTABLE, program ").arg(kManualSearch) + fromclauses[clause] + QString(
 " INNER JOIN channel ON (channel.chanid = program.chanid) "
 "WHERE ") + whereclauses[clause] + QString(" AND channel.visible = 1 AND "
-"((record.type = %1 " // allrecord
-"OR record.type = %2 " // findonerecord
-"OR record.type = %3 " // finddailyrecord
-"OR record.type = %4) " // findweeklyrecord
+"((RECTABLE.type = %1 " // allrecord
+"OR RECTABLE.type = %2 " // findonerecord
+"OR RECTABLE.type = %3 " // finddailyrecord
+"OR RECTABLE.type = %4) " // findweeklyrecord
 " OR "
-" ((record.station = channel.callsign) " // channel matches
+" ((RECTABLE.station = channel.callsign) " // channel matches
 "  AND "
-"  ((record.type = %5) " // channelrecord
+"  ((RECTABLE.type = %5) " // channelrecord
 "   OR"
-"   ((TIME_TO_SEC(record.starttime) = TIME_TO_SEC(program.starttime)) " // timeslot matches
+"   ((TIME_TO_SEC(RECTABLE.starttime) = TIME_TO_SEC(program.starttime)) " // timeslot matches
 "    AND "
-"    ((record.type = %6) " // timeslotrecord
+"    ((RECTABLE.type = %6) " // timeslotrecord
 "     OR"
-"     ((DAYOFWEEK(record.startdate) = DAYOFWEEK(program.starttime) "
+"     ((DAYOFWEEK(RECTABLE.startdate) = DAYOFWEEK(program.starttime) "
 "      AND "
-"      ((record.type = %7) " // weekslotrecord
+"      ((RECTABLE.type = %7) " // weekslotrecord
 "       OR"
-"       ((TO_DAYS(record.startdate) = TO_DAYS(program.starttime)) " // date matches
+"       ((TO_DAYS(RECTABLE.startdate) = TO_DAYS(program.starttime)) " // date matches
 "        )"
 "       )"
 "      )"
@@ -1726,10 +1801,17 @@ void Scheduler::UpdateMatches(int recordid) {
             .arg(kTimeslotRecord)
             .arg(kWeekslotRecord);
 
+        while (1)
+        {
+            int i = query.find("RECTABLE");
+            if (i == -1) break;
+            query = query.replace(i, strlen("RECTABLE"), recordTable);
+        }
+
         VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query %1...").arg(clause));
 
         gettimeofday(&dbstart, NULL);
-        MSqlQuery result(MSqlQuery::SchedCon());
+        MSqlQuery result(dbConn);
         result.prepare(query);
         result.bindValues(bindings);
         result.exec();
@@ -1770,8 +1852,8 @@ void Scheduler::AddNewRecords(void)
     QMap<int, bool> tooManyMap;
     bool checkTooMany = false;
 
-    MSqlQuery rlist(MSqlQuery::SchedCon());
-    rlist.prepare("SELECT recordid,title,maxepisodes,maxnewest FROM record;");
+    MSqlQuery rlist(dbConn);
+    rlist.prepare(QString("SELECT recordid,title,maxepisodes,maxnewest FROM %1;").arg(recordTable));
 
     rlist.exec();
 
@@ -1792,7 +1874,7 @@ void Scheduler::AddNewRecords(void)
 
         if (maxEpisodes && !maxNewest)
         {
-            MSqlQuery epicnt(MSqlQuery::SchedCon());
+            MSqlQuery epicnt(dbConn);
 
             epicnt.prepare("SELECT count(*) FROM recorded "
                            "WHERE title = :TITLE;");
@@ -1814,18 +1896,18 @@ void Scheduler::AddNewRecords(void)
     }
 
     QString progfindid = QString(
-"(CASE record.type "
+"(CASE RECTABLE.type "
 "  WHEN %1 "
-"   THEN record.findid "
+"   THEN RECTABLE.findid "
 "  WHEN %2 "
 "   THEN to_days(date_sub(program.starttime, interval "
-"                time_format(record.findtime, '%H:%i') hour_minute)) "
+"                time_format(RECTABLE.findtime, '%H:%i') hour_minute)) "
 "  WHEN %3 "
 "   THEN floor((to_days(date_sub(program.starttime, interval "
-"               time_format(record.findtime, '%H:%i') hour_minute)) - "
-"               record.findday)/7) * 7 + record.findday "
+"               time_format(RECTABLE.findtime, '%H:%i') hour_minute)) - "
+"               RECTABLE.findday)/7) * 7 + RECTABLE.findday "
 "  WHEN %4 "
-"   THEN record.findid "
+"   THEN RECTABLE.findid "
 "  ELSE 0 "
 " END) ")
         .arg(kFindOneRecord)
@@ -1839,25 +1921,25 @@ void Scheduler::AddNewRecords(void)
 "program.title, program.subtitle, program.description, "
 "channel.channum, channel.callsign, channel.name, "
 "oldrecorded.endtime IS NOT NULL AS oldrecduplicate, program.category, "
-"record.recpriority, "
-"record.dupin, "
+"RECTABLE.recpriority, "
+"RECTABLE.dupin, "
 "recorded.endtime IS NOT NULL AND recorded.endtime < NOW() AS recduplicate, "
 "oldfind.findid IS NOT NULL AS findduplicate, "
-"record.type, record.recordid, "
-"program.starttime - INTERVAL record.startoffset minute AS recstartts, "
-"program.endtime + INTERVAL record.endoffset minute AS recendts, "
-"program.previouslyshown, record.recgroup, record.dupmethod, "
+"RECTABLE.type, RECTABLE.recordid, "
+"program.starttime - INTERVAL RECTABLE.startoffset minute AS recstartts, "
+"program.endtime + INTERVAL RECTABLE.endoffset minute AS recendts, "
+"program.previouslyshown, RECTABLE.recgroup, RECTABLE.dupmethod, "
 "channel.commfree, capturecard.cardid, "
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid, program.category_type, "
-"program.airdate, program.stars, program.originalairdate, record.inactive, "
-"record.parentid, ") + progfindid + ", record.tsdefault, "
+"program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
+"RECTABLE.parentid, ") + progfindid + ", RECTABLE.tsdefault, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
 "channel.recpriority + cardinput.preference "
 + QString(
 "FROM recordmatch "
 
-" INNER JOIN record ON (recordmatch.recordid = record.recordid) "
+" INNER JOIN RECTABLE ON (recordmatch.recordid = RECTABLE.recordid) "
 " INNER JOIN program ON (recordmatch.chanid = program.chanid AND "
 "                        recordmatch.starttime = program.starttime AND "
 "                        recordmatch.manualid = program.manualid) "
@@ -1870,7 +1952,7 @@ void Scheduler::AddNewRecords(void)
 "    oldrecstatus.title = program.title ) "
 " LEFT JOIN oldrecorded ON "
 "  ( "
-"    record.dupmethod > 1 AND "
+"    RECTABLE.dupmethod > 1 AND "
 "    oldrecorded.duplicate <> 0 AND "
 "    program.title = oldrecorded.title "
 "     AND "
@@ -1885,17 +1967,17 @@ void Scheduler::AddNewRecords(void)
 "      ( "
 "       (program.programid = '' OR oldrecorded.programid = '') "
 "       AND "
-"       (((record.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
+"       (((RECTABLE.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
 "          AND program.subtitle = oldrecorded.subtitle)) "
 "       AND "
-"       (((record.dupmethod & 0x04) = 0) OR (program.description <> '' "
+"       (((RECTABLE.dupmethod & 0x04) = 0) OR (program.description <> '' "
 "          AND program.description = oldrecorded.description)) "
 "      ) "
 "     ) "
 "  ) "
 " LEFT JOIN recorded ON "
 "  ( "
-"    record.dupmethod > 1 AND "
+"    RECTABLE.dupmethod > 1 AND "
 "    program.title = recorded.title "
 "     AND "
 "     ( "
@@ -1909,10 +1991,10 @@ void Scheduler::AddNewRecords(void)
 "      ( "
 "       (program.programid = '' OR recorded.programid = '') "
 "       AND "
-"       (((record.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
+"       (((RECTABLE.dupmethod & 0x02) = 0) OR (program.subtitle <> '' "
 "          AND program.subtitle = recorded.subtitle)) "
 "       AND "
-"       (((record.dupmethod & 0x04) = 0) OR (program.description <> '' "
+"       (((RECTABLE.dupmethod & 0x04) = 0) OR (program.description <> '' "
 "          AND program.description = recorded.description)) "
 "      ) "
 "     ) "
@@ -1920,13 +2002,20 @@ void Scheduler::AddNewRecords(void)
 " LEFT JOIN oldfind ON "
 "  (oldfind.recordid = recordmatch.recordid AND "
 "   oldfind.findid = ") + progfindid + QString(") "
-" ORDER BY record.recordid DESC "
+" ORDER BY RECTABLE.recordid DESC "
 );
+
+    while (1)
+    {
+        int i = query.find("RECTABLE");
+        if (i == -1) break;
+        query = query.replace(i, strlen("RECTABLE"), recordTable);
+    }
 
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
     gettimeofday(&dbstart, NULL);
-    MSqlQuery result(MSqlQuery::SchedCon());
+    MSqlQuery result(dbConn);
     result.prepare(query);
     result.exec();
     gettimeofday(&dbend, NULL);
@@ -1946,7 +2035,7 @@ void Scheduler::AddNewRecords(void)
     {
         // Don't bother if the tuner card isn't on-line
         int cardid = result.value(24).toInt();
-        if (threadrunning && !cardMap.contains(cardid))
+        if ((threadrunning || specsched) && !cardMap.contains(cardid))
             continue;
 
         ProgramInfo *p = new ProgramInfo;
@@ -1988,6 +2077,7 @@ void Scheduler::AddNewRecords(void)
         p->catType = result.value(29).toString();
         p->year = result.value(30).toString();
         p->stars =  result.value(31).toDouble();
+
 
         if (result.value(32).isNull())
         {
@@ -2094,22 +2184,29 @@ void Scheduler::AddNotListed(void) {
     RecList tmpList;
 
     QString query = QString(
-"SELECT record.recordid, record.type, record.chanid, "
-"record.starttime, record.startdate, record.endtime, record.enddate, "
-"record.startoffset, record.endoffset, "
-"record.title, record.subtitle, record.description, "
+"SELECT RECTABLE.recordid, RECTABLE.type, RECTABLE.chanid, "
+"RECTABLE.starttime, RECTABLE.startdate, RECTABLE.endtime, RECTABLE.enddate, "
+"RECTABLE.startoffset, RECTABLE.endoffset, "
+"RECTABLE.title, RECTABLE.subtitle, RECTABLE.description, "
 "channel.channum, channel.callsign, channel.name "
-"FROM record "
-" INNER JOIN channel ON (channel.chanid = record.chanid) "
-" LEFT JOIN recordmatch on record.recordid = recordmatch.recordid "
+"FROM RECTABLE "
+" INNER JOIN channel ON (channel.chanid = RECTABLE.chanid) "
+" LEFT JOIN recordmatch on RECTABLE.recordid = recordmatch.recordid "
 "WHERE (type = %1 OR type = %2) AND recordmatch.chanid IS NULL")
         .arg(kSingleRecord)
         .arg(kOverrideRecord);
 
+    while (1)
+    {
+        int i = query.find("RECTABLE");
+        if (i == -1) break;
+        query = query.replace(i, strlen("RECTABLE"), recordTable);
+    }
+
     VERBOSE(VB_SCHEDULE, QString(" |-- Start DB Query..."));
 
     gettimeofday(&dbstart, NULL);
-    MSqlQuery result(MSqlQuery::SchedCon());
+    MSqlQuery result(dbConn);
     result.prepare(query);
     result.exec();
     gettimeofday(&dbend, NULL);
@@ -2179,17 +2276,24 @@ void Scheduler::AddNotListed(void) {
 void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 {
     QString temptime, tempdate;
-    QString query = QString("SELECT record.chanid, record.starttime, "
-"record.startdate, record.endtime, record.enddate, record.title, "
-"record.subtitle, record.description, record.recpriority, record.type, "
-"channel.name, record.recordid, record.recgroup, record.dupin, "
-"record.dupmethod, channel.commfree, channel.channum, record.station, "
-"record.seriesid, record.programid, record.category, record.findid, "
-"record.tsdefault "
-"FROM record "
-"LEFT JOIN channel ON channel.callsign = record.station "
+    QString query = QString("SELECT RECTABLE.chanid, RECTABLE.starttime, "
+"RECTABLE.startdate, RECTABLE.endtime, RECTABLE.enddate, RECTABLE.title, "
+"RECTABLE.subtitle, RECTABLE.description, RECTABLE.recpriority, RECTABLE.type, "
+"channel.name, RECTABLE.recordid, RECTABLE.recgroup, RECTABLE.dupin, "
+"RECTABLE.dupmethod, channel.commfree, channel.channum, RECTABLE.station, "
+"RECTABLE.seriesid, RECTABLE.programid, RECTABLE.category, RECTABLE.findid, "
+"RECTABLE.tsdefault "
+"FROM RECTABLE "
+"LEFT JOIN channel ON channel.callsign = RECTABLE.station "
 "GROUP BY recordid "
 "ORDER BY title ASC;");
+
+    while (1)
+    {
+        int i = query.find("RECTABLE");
+        if (i == -1) break;
+        query = query.replace(i, strlen("RECTABLE"), recordTable);
+    }
 
     MSqlQuery result(MSqlQuery::InitCon());
     result.prepare(query);

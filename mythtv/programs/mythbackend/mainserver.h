@@ -84,7 +84,7 @@ class MainServer : public QObject
     void HandleQueryFreeSpace(PlaybackSock *pbs, bool allBackends);
     void HandleQueryCheckFile(QStringList &slist, PlaybackSock *pbs);
     void HandleQueryGuideDataThrough(PlaybackSock *pbs);
-    void HandleGetPendingRecordings(PlaybackSock *pbs);
+    void HandleGetPendingRecordings(PlaybackSock *pbs, QString table = "", int recordid=-1);
     void HandleGetScheduledRecordings(PlaybackSock *pbs);
     void HandleGetConflictingRecordings(QStringList &slist, PlaybackSock *pbs);
     void HandleGetNextFreeRecorder(QStringList &slist, PlaybackSock *pbs);

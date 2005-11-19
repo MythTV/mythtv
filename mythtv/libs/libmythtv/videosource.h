@@ -167,6 +167,7 @@ public:
     XMLTV_generic_config(const VideoSource& _parent, QString _grabber);
 
     virtual void save();
+    virtual void save(QString) { save(); }
 
 protected:
     const VideoSource& parent;
@@ -178,6 +179,8 @@ class EITOnly_config: public VerticalConfigurationGroup
 public:
     EITOnly_config(const VideoSource& _parent);
     virtual void save();
+    virtual void save(QString) { save(); }
+
 protected:
     UseEIT *useeit;
 };
@@ -204,6 +207,10 @@ public:
     virtual void save() {
         if (name)
             ConfigurationWizard::save();
+    };
+    virtual void save(QString destination) {
+        if (name)
+            ConfigurationWizard::save(destination);
     };
 
 private:
@@ -281,6 +288,11 @@ public:
         settingValue = "";
         SimpleDBStorage::save();
     };
+    void save(QString destination) {
+        changed = true;
+        settingValue = "";
+        SimpleDBStorage::save(destination);
+    };
 };
 
 class DVBVbiDevice: public LineEditSetting, public CCSetting {
@@ -294,6 +306,11 @@ public:
         changed = true;
         settingValue = "";
         SimpleDBStorage::save();
+    };
+    void save(QString destination) {
+        changed = true;
+        settingValue = "";
+        SimpleDBStorage::save(destination);
     };
 };
 
@@ -433,6 +450,7 @@ public:
     virtual int exec();
     virtual void load();
     virtual void save() { };
+    virtual void save(QString) { };
 
 public slots:
     void menu();
@@ -458,6 +476,7 @@ public:
     virtual int exec();
     virtual void load();
     virtual void save() { };
+    virtual void save(QString) { };
 
 public slots:
     void menu(); 
@@ -477,6 +496,7 @@ public:
     virtual int exec();
     virtual void load();
     virtual void save() { };
+    virtual void save(QString) { };
 
 protected:
     vector<CardInput*> cardinputs;
@@ -524,6 +544,7 @@ class CardInput: public ConfigurationWizard
     void fillDiseqcSettingsInput(QString _pos, QString _port);
 
     virtual void save();
+    virtual void save(QString destination) { save(); }
 
   public slots:
     void channelScanner();

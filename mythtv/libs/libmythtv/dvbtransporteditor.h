@@ -87,6 +87,7 @@ public:
     DVBTransportList() {}
 
     void save() { };
+    void save(QString) { };
     void load() 
     {
         fillSelections();

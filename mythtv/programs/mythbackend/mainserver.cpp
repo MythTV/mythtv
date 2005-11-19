@@ -380,7 +380,12 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     }
     else if (command == "QUERY_GETALLPENDING")
     {
-        HandleGetPendingRecordings(pbs);
+        if (tokens.size() == 1)
+            HandleGetPendingRecordings(pbs);
+        else if (tokens.size() == 2)
+            HandleGetPendingRecordings(pbs, tokens[1]);
+        else
+            HandleGetPendingRecordings(pbs, tokens[1], tokens[2].toInt());
     }
     else if (command == "QUERY_GETALLSCHEDULED")
     {
@@ -1913,14 +1918,43 @@ void MainServer::HandleQueryGuideDataThrough(PlaybackSock *pbs)
     SendResponse(pbssock, strlist);
 }
 
-void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs)
+void MainServer::HandleGetPendingRecordings(PlaybackSock *pbs, QString table, int recordid)
 {
     QSocket *pbssock = pbs->getSocket();
 
     QStringList strList;
 
-    if (m_sched)
-        m_sched->getAllPending(strList);
+    if (m_sched) {
+        if (table == "") m_sched->getAllPending(strList);
+        else {
+            // We need a different connection from the scheduler proper
+            // DDCon exists, although it's designed for other purposes.
+            MSqlQueryInfo dbconn = MSqlQuery::DDCon();
+            Scheduler *sched = new Scheduler(false, encoderList,
+                                             table, &dbconn, m_sched);
+            sched->FillRecordListFromDB(recordid);
+            sched->getAllPending(strList);
+            delete sched;
+
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("SELECT NULL FROM record WHERE recordid = :RECID;");
+            query.bindValue(":RECID", recordid);
+
+            if (query.exec() && query.isActive() && query.size())
+            {
+                ScheduledRecording s;
+                s.loadByID(recordid);
+                if (s.getSearchType() == kManualSearch)
+                    HandleRescheduleRecordings(recordid, NULL);
+            }
+            else if (recordid > 0)
+            {
+                query.prepare("DELETE FROM program WHERE manualid = :RECID;");
+                query.bindValue(":RECID", recordid);
+                query.exec();
+            }
+        }
+    }
     else
     {
         strList << QString::number(0);

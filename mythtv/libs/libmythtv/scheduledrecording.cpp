@@ -3,16 +3,19 @@
 #include "recordingprofile.h"
 #include "mythcontext.h"
 #include "proglist.h"
+#include "previouslist.h"
 #include "sr_items.h"
 #include "sr_root.h"
 #include "sr_dialog.h"
 #include "jobqueue.h"
 #include "mythdbcon.h"
+#include "viewschdiff.h"
 
 #include <qlayout.h>
 #include <qlabel.h>
 #include <qapplication.h>
 #include <qregexp.h>
+#include <qsqlquery.h>
 
 // NOTE: if this changes, you _MUST_ update the RecTypePriority function 
 // in recordingtypes.cpp.
@@ -450,6 +453,18 @@ void ScheduledRecording::save()
     signalChange(getRecordID());
 }
 
+void ScheduledRecording::save(QString destination) 
+{
+    if (type->isChanged() && getRecordingType() == kNotRecording)
+    {
+        remove();
+    }
+    else
+    {
+        ConfigurationGroup::save(destination);
+    }
+}
+
 void ScheduledRecording::remove() 
 {
     int rid = getRecordID();
@@ -543,6 +558,16 @@ void ScheduledRecording::runProgList(void)
                             gContext->GetMainWindow(), "proglist");
     pl->exec();
     delete pl;
+}
+
+void ScheduledRecording::runPrevList(void)
+{
+    PreviousList *pb = NULL;
+
+    pb = new PreviousList(gContext->GetMainWindow(), "proglist",
+                          getRecordID(), title->getValue());
+    pb->exec();
+    delete pb;
 }
 
 void ScheduledRecording::runShowDetails(void)
@@ -826,6 +851,97 @@ void ScheduledRecording::makeOverride(void)
     endoffset->setChanged();
     recpriority->setChanged();
     recgroup->setChanged();
+}
+
+void
+ScheduledRecording::testRecording()
+{
+
+    QString ttable = "record_tmp";
+
+    MSqlQueryInfo dbcon = MSqlQuery::SchedCon();
+    MSqlQuery query(dbcon);
+    QString thequery;
+
+    thequery ="SELECT GET_LOCK(:LOCK, 2);";
+    query.prepare(thequery);
+    query.bindValue(":LOCK", "DiffSchedule");
+    query.exec();
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (Obtaining lock in testRecording): \n"
+                    "Query was: %1 \nError was: %2 \n")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()));
+        VERBOSE(VB_IMPORTANT, msg);
+        return;
+    }
+
+
+    thequery = QString("DROP TABLE IF EXISTS %1;").arg(ttable);
+    query.prepare(thequery);
+    query.exec();
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (deleting old table in testRecording): \n"
+                    "Query was: %1 \nError was: %2 \n")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()));
+        VERBOSE(VB_IMPORTANT, msg);
+        return;
+    }
+
+    thequery = QString("CREATE TABLE %1 SELECT * FROM record;").arg(ttable);
+    query.prepare(thequery);
+    query.exec();
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (create new table): \n"
+                    "Query was: %1 \nError was: %2 \n")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()));
+        VERBOSE(VB_IMPORTANT, msg);
+        return;
+    }
+
+    bool resetID = false;
+    if (getRecordID() == 0) {
+        thequery = QString("SELECT MAX(recordid) FROM %1 ORDER BY recordid;")
+                           .arg(ttable);
+        query.prepare(thequery);
+        query.exec();
+        if (query.isActive() && query.next())
+            id->setValue(query.value(0).toInt() + 1);
+        else
+            id->setValue(100000);
+    }
+    save(ttable);
+
+    ViewScheduleDiff vsd(gContext->GetMainWindow(), "Preview Schedule Changes",
+                         ttable, getRecordID(), title->getValue());
+
+    thequery = "SELECT RELEASE_LOCK(:LOCK);";
+    query.prepare(thequery);
+    query.bindValue(":LOCK", "DiffSchedule");
+    query.exec();
+    if (query.lastError().type() != QSqlError::None)
+    {
+        QString msg =
+            QString("DB Error (free lock): \n"
+                    "Query was: %1 \nError was: %2 \n")
+            .arg(thequery)
+            .arg(MythContext::DBErrorMessage(query.lastError()));
+        VERBOSE(VB_IMPORTANT, msg);
+        return;
+    }
+
+    if (resetID)
+        id->setValue(0);
+
+    vsd.exec();
 }
 
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

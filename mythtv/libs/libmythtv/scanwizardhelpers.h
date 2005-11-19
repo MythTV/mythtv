@@ -120,6 +120,7 @@ class VideoSourceSetting: public ComboBoxSetting
         { setLabel(QObject::tr("Video Source")); }
     virtual void load();
     virtual void save() {}
+    virtual void save(QString) {}
   private:
     int sourceid;
 };
@@ -135,6 +136,7 @@ class TransportSetting : public ComboBoxSetting
         { setLabel(QObject::tr("Transport")); }
     virtual void load() { refresh(); }
     virtual void save() { ; }
+    virtual void save(QString) { ; }
 
     void refresh();
   public slots:
@@ -165,6 +167,7 @@ class CaptureCardSetting: public ComboBoxSetting
         { setLabel(QObject::tr("Capture Card")); }
     virtual void load() { refresh(); }
     virtual void save() { ; }
+    virtual void save(QString) { ; }
     void refresh();
 
   public slots:

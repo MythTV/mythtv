@@ -26,7 +26,7 @@ public:
     };
 
     void load() { };
-    void save() 
+    void save(QString table) 
     {
         if (intValue() == 0) {
             setValue(findHighest());
@@ -53,7 +53,11 @@ public:
             if (query.numRowsAffected() != 1)
                 cerr << "ChannelID:Failed to insert into: " << table << endl;
         }
-    };
+    }
+    void save() 
+    {
+        save(table);
+    }
 
     int findHighest(int floor = 1000)
     {

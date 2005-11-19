@@ -335,7 +335,7 @@ class ProgramList: public QPtrList<ProgramInfo> {
         return at(index);
     };
 
-    bool FromScheduler(bool &hasConflicts);
+    bool FromScheduler(bool &hasConflicts, QString altTable = "", int recordid=-1);
     bool FromScheduler(void) {
         bool dummyConflicts;
         return FromScheduler(dummyConflicts);

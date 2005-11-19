@@ -10,7 +10,6 @@ RootSRGroup::RootSRGroup(ScheduledRecording *_rec,ManagedList* _parentList, QObj
     cancelItem->setState(MLS_BOLD);
     addItem(cancelItem);
 
-
     recType = new SRRecordingType(schedRec, _parentList, this);
     addItem(recType->getItem(), -1);
     connect(recType->getItem(), SIGNAL(changed(ManagedListItem*)), this, SLOT(itemChanged(ManagedListItem*)));
@@ -24,15 +23,13 @@ RootSRGroup::RootSRGroup(ScheduledRecording *_rec,ManagedList* _parentList, QObj
     jobQueue = new SRJobQueueGroup(_rec, _parentList, this, this);
     addItem(jobQueue, -1);
 
-    detailsButton = new ManagedListItem(QObject::tr("Program details"),
-                                         _parentList, this, "showDetails");
-    addItem(detailsButton, -1);
-    connect(detailsButton, SIGNAL(selected(ManagedListItem*)), _rec, SLOT(runShowDetails()));
+    schedInfo = new SRSchedInfoGroup(_rec, _parentList, this, this);
+    addItem(schedInfo, -1);
 
-    upcomingButton = new ManagedListItem(QObject::tr("List upcoming episodes"),
-                                         _parentList, this, "listUpcoming");
-    addItem(upcomingButton, -1);
-    connect(upcomingButton, SIGNAL(selected(ManagedListItem*)), _rec, SLOT(runProgList()));
+    testButton = new ManagedListItem(QObject::tr("Preview schedule changes"),
+                                         _parentList, this, "test");
+    addItem(testButton, -1);
+    connect(testButton, SIGNAL(selected(ManagedListItem*)), _rec, SLOT(testRecording()));
 
     recordAsShownItem = new DialogDoneListItem(QString("[ %1 ]").arg(QObject::tr("Save these settings")),
                                                MythDialog::Accepted, NULL, _parentList, this, "recordAsShown");

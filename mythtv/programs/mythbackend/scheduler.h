@@ -22,11 +22,14 @@ typedef RecList::iterator RecIter;
 class Scheduler : public QObject
 {
   public:
-    Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList);
+    Scheduler(bool runthread, QMap<int, EncoderLink *> *tvList,
+              QString recordTbl = "record", MSqlQueryInfo *dbConnUse = NULL,
+              Scheduler *master_sched = NULL);
     ~Scheduler();
 
     void Reschedule(int recordid);
-    void FillRecordListFromDB(void);
+    /// @param[in] recordID changed from master (-1 == everything changed)
+    void FillRecordListFromDB(int recordid = -1);
     void FillRecordListFromMaster(void);
 
     void FillEncoderFreeSpaceCache(void);
@@ -61,6 +64,8 @@ class Scheduler : public QObject
     static void *SchedulerThread(void *param);
 
   private:
+    QString recordTable;
+
     void verifyCards(void);
 
     bool FillRecordList(void);
@@ -94,6 +99,7 @@ class Scheduler : public QObject
 
     QValueList<int> reschedQueue;
     QMutex reschedLock;
+    QMutex recordmatchLock;
     QWaitCondition reschedWait;
     RecList reclist;
     RecList retrylist;
@@ -105,6 +111,7 @@ class Scheduler : public QObject
     QMutex *reclist_lock;
     QMutex *schedlist_lock;
 
+    bool specsched;
     bool hasconflicts;
     bool schedMoveHigher;
 
@@ -117,6 +124,7 @@ class Scheduler : public QObject
     MainServer *m_mainServer;
 
     bool m_isShuttingDown;
+    MSqlQueryInfo dbConn;
 
 };
 

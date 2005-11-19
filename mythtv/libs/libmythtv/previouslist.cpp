@@ -17,7 +17,7 @@
 using namespace std;
 
 #include "exitcodes.h"
-#include "previousbox.h"
+#include "previouslist.h"
 #include "proglist.h"
 #include "scheduledrecording.h"
 #include "dialogbox.h"
@@ -25,9 +25,13 @@ using namespace std;
 #include "mythdbcon.h"
 #include "remoteutil.h"
 
-PreviousBox::PreviousBox(MythMainWindow *parent, const char *name)
+PreviousList::PreviousList(MythMainWindow *parent, const char *name,
+                         int recid, QString ltitle)
             : MythDialog(parent, name)
 {
+    m_recid = recid;
+    m_title = ltitle;
+
     view = "";
     startTime = QDateTime::currentDateTime();
     searchTime = startTime;
@@ -98,7 +102,7 @@ PreviousBox::PreviousBox(MythMainWindow *parent, const char *name)
     gContext->addListener(this);
 }
 
-PreviousBox::~PreviousBox()
+PreviousList::~PreviousList()
 {
     itemList.clear();
 
@@ -106,7 +110,7 @@ PreviousBox::~PreviousBox()
     delete theme;
 }
 
-void PreviousBox::keyPressEvent(QKeyEvent *e)
+void PreviousList::keyPressEvent(QKeyEvent *e)
 {
     if (!allowEvents)
         return;
@@ -188,7 +192,7 @@ void PreviousBox::keyPressEvent(QKeyEvent *e)
     allowEvents = true;
 }
 
-void PreviousBox::LoadWindow(QDomElement &element)
+void PreviousList::LoadWindow(QDomElement &element)
 {
     QString name;
     int context;
@@ -215,14 +219,14 @@ void PreviousBox::LoadWindow(QDomElement &element)
             else
             {
                 VERBOSE(VB_IMPORTANT,
-                        QString("PreviousBox: Unknown child element: %1. "
+                        QString("PreviousList: Unknown child element: %1. "
                                 "Ignoring.").arg(e.tagName()));
             }
         }
     }
 }
 
-void PreviousBox::updateBackground(void)
+void PreviousList::updateBackground(void)
 {
     QPixmap bground(size());
     bground.fill(this, 0, 0);
@@ -246,7 +250,7 @@ void PreviousBox::updateBackground(void)
     setPaletteBackgroundPixmap(bground);
 }
 
-void PreviousBox::paintEvent(QPaintEvent *e)
+void PreviousList::paintEvent(QPaintEvent *e)
 {
     if (!allowUpdates)
     {
@@ -267,7 +271,7 @@ void PreviousBox::paintEvent(QPaintEvent *e)
     updateAll = false;
 }
 
-void PreviousBox::cursorDown(bool page)
+void PreviousList::cursorDown(bool page)
 {
     if (curItem < (int)itemList.count() - 1)
     {
@@ -278,7 +282,7 @@ void PreviousBox::cursorDown(bool page)
     }
 }
 
-void PreviousBox::cursorUp(bool page)
+void PreviousList::cursorUp(bool page)
 {
     if (curItem > 0)
     {
@@ -289,7 +293,7 @@ void PreviousBox::cursorUp(bool page)
     }
 }
 
-void PreviousBox::prevView(void)
+void PreviousList::prevView(void)
 {
     if (viewList.count() < 2)
         return;
@@ -302,7 +306,7 @@ void PreviousBox::prevView(void)
     refillAll = true;
 }
 
-void PreviousBox::nextView(void)
+void PreviousList::nextView(void)
 {
     if (viewList.count() < 2)
         return;
@@ -315,7 +319,7 @@ void PreviousBox::nextView(void)
     refillAll = true;
 }
 
-void PreviousBox::setViewFromList(void)
+void PreviousList::setViewFromList(void)
 {
     if (!choosePopup || !chooseListBox)
         return;
@@ -333,7 +337,7 @@ void PreviousBox::setViewFromList(void)
     refillAll = true;
 }
 
-void PreviousBox::chooseView(void)
+void PreviousList::chooseView(void)
 {
     if (viewList.count() < 2)
         return;
@@ -362,12 +366,12 @@ void PreviousBox::chooseView(void)
     choosePopup = NULL;
 }
 
-void PreviousBox::select()
+void PreviousList::select()
 {
     removalDialog();
 }
 
-void PreviousBox::edit()
+void PreviousList::edit()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -377,7 +381,7 @@ void PreviousBox::edit()
     pi->EditScheduled();
 }
 
-void PreviousBox::upcoming()
+void PreviousList::upcoming()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -387,7 +391,7 @@ void PreviousBox::upcoming()
     delete pl;
 }
 
-void PreviousBox::details()
+void PreviousList::details()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -395,7 +399,7 @@ void PreviousBox::details()
         pi->showDetails();
 }
 
-void PreviousBox::fillViewList(const QString &view)
+void PreviousList::fillViewList(const QString &view)
 {
     viewList.clear();
     viewTextList.clear();
@@ -459,14 +463,26 @@ class pbTimeSort
         bool m_reverse;
 };
 
-void PreviousBox::fillItemList(void)
+void PreviousList::fillItemList(void)
 {
     if (curView < 0)
         return;
 
     ProgramInfo *s;
     MSqlBindings bindings;
-    itemList.FromOldRecorded("", bindings);
+
+    QString sql = "";
+    if (m_recid > 0 && m_title > "")
+    {
+        sql = QString("WHERE recordid = %1 OR title = :MTITLE ").arg(m_recid);
+        bindings[":MTITLE"] = m_title;
+    }
+    else if (m_title > "")
+    {
+        sql = QString("WHERE title = :MTITLE ");
+        bindings[":MTITLE"] = m_title;
+    }
+    itemList.FromOldRecorded(sql, bindings); 
 
     vector<ProgramInfo *> sortedList;
     while (itemList.count())
@@ -496,7 +512,7 @@ void PreviousBox::fillItemList(void)
         curItem = itemList.count() - 1;
 }
 
-void PreviousBox::updateView(QPainter *p)
+void PreviousList::updateView(QPainter *p)
 {
     QRect pr = viewRect;
     QPixmap pix(pr.size());
@@ -523,7 +539,7 @@ void PreviousBox::updateView(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-void PreviousBox::updateList(QPainter *p)
+void PreviousList::updateList(QPainter *p)
 {
     QRect pr = listRect;
     QPixmap pix(pr.size());
@@ -613,7 +629,7 @@ void PreviousBox::updateList(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-void PreviousBox::updateInfo(QPainter *p)
+void PreviousList::updateInfo(QPainter *p)
 {
     QRect pr = infoRect;
     QPixmap pix(pr.size());
@@ -650,7 +666,7 @@ void PreviousBox::updateInfo(QPainter *p)
     p->drawPixmap(pr.topLeft(), pix);
 }
 
-void PreviousBox::removalDialog()
+void PreviousList::removalDialog()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -702,7 +718,7 @@ void PreviousBox::removalDialog()
     }
 }
 
-void PreviousBox::deleteItem()
+void PreviousList::deleteItem()
 {
     ProgramInfo *pi = itemList.at(curItem);
 
@@ -719,7 +735,7 @@ void PreviousBox::deleteItem()
     fillItemList();
 }
 
-void PreviousBox::customEvent(QCustomEvent *e)
+void PreviousList::customEvent(QCustomEvent *e)
 {
     if ((MythEvent::Type)(e->type()) != MythEvent::MythEventMessage)
         return;

@@ -91,6 +91,7 @@ public:
 
     
     virtual void save();
+    virtual void save(QString);
 
     virtual void loadByID(int id);
     virtual void loadByProgram(const ProgramInfo* proginfo);
@@ -168,6 +169,8 @@ public:
 
 public slots:
     void runProgList();
+    void runPrevList();
+    void testRecording();
 
 protected slots:
     void runShowDetails();
@@ -253,6 +256,7 @@ public:
     virtual int exec();
     virtual void load();
     virtual void save() { };
+    virtual void save(QString) { };
 
 protected slots:
     void open(int id);

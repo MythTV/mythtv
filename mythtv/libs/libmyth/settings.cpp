@@ -109,6 +109,13 @@ void ConfigurationGroup::save() {
         (*i)->save();
 }
 
+void ConfigurationGroup::save(QString destination) {
+    for(childList::iterator i = children.begin() ;
+        i != children.end() ;
+        ++i )
+        (*i)->save(destination);
+}
+
 QWidget* VerticalConfigurationGroup::configWidget(ConfigurationGroup *cg, 
                                                   QWidget* parent,
                                                   const char* widgetName) 
@@ -348,6 +355,13 @@ void StackedConfigurationGroup::save() {
         ConfigurationGroup::save();
     else if (top < children.size())
         children[top]->save();
+}
+
+void StackedConfigurationGroup::save(QString destination) {
+    if (saveAll)
+        ConfigurationGroup::save(destination);
+    else if (top < children.size())
+        children[top]->save(destination);
 }
 
 void TriggeredConfigurationGroup::setTrigger(Configurable* _trigger) {
@@ -981,7 +995,7 @@ void SimpleDBStorage::load()
     }
 }
 
-void SimpleDBStorage::save() 
+void SimpleDBStorage::save(QString table) 
 {
     if (!isChanged())
         return;
@@ -1011,7 +1025,12 @@ void SimpleDBStorage::save()
     }
 }
 
-void AutoIncrementStorage::save() {
+void SimpleDBStorage::save() 
+{
+    save(table);
+}
+
+void AutoIncrementStorage::save(QString table) {
     if (intValue() == 0) 
     {
         // Generate a new, unique ID
@@ -1036,6 +1055,11 @@ void AutoIncrementStorage::save() {
         query.next();
         setValue(query.value(0).toInt());
     }
+}
+
+void AutoIncrementStorage::save() 
+{
+    save(table);
 }
 
 void ListBoxSetting::setEnabled(bool b)
