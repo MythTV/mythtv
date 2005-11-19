@@ -1169,11 +1169,7 @@ void PlaybackBox::updateShowTitles(QPainter *p)
                 if (tempInfo->recstatus == rsRecording)
                     ltype->EnableForcedFont(cnt, "recording");
 
-                QString key;
-                key = tempInfo->chanid + "_" +
-                      tempInfo->recstartts.toString(Qt::ISODate);
-
-                if (playList.grep(key).count())
+                if (playList.grep(tempInfo->MakeUniqueKey()).count())
                     ltype->EnableForcedFont(cnt, "tagged");
 
                 if (tempInfo->availableStatus != asAvailable)
@@ -1364,7 +1360,7 @@ bool PlaybackBox::FillList()
     for (unsigned int i = 0; i < progLists[""].count(); i++)
     {
         p = progLists[""].at(i);
-        asKey = p->chanid + ":" + p->recstartts.toString(Qt::ISODate);
+        asKey = p->MakeUniqueKey();
         asCache[asKey] = p->availableStatus;
     }
 
@@ -1399,7 +1395,7 @@ bool PlaybackBox::FillList()
                 if ((titleView) || (useCategories) || (useRecGroups))
                     progLists[""].prepend(p);
 
-                asKey = p->chanid + ":" + p->recstartts.toString(Qt::ISODate);
+                asKey = p->MakeUniqueKey();
                 if (asCache.contains(asKey))
                     p->availableStatus = asCache[asKey];
                 else
@@ -2553,11 +2549,7 @@ void PlaybackBox::showActionPopup(ProgramInfo *program)
         playButton = popup->addButton(tr("Play"), this, SLOT(doPlay()));
     }
 
-    QString key;
-    key = curitem->chanid + "_" +
-         curitem->recstartts.toString(Qt::ISODate);
-
-    if (playList.grep(key).count())
+    if (playList.grep(curitem->MakeUniqueKey()).count())
         popup->addButton(tr("Remove from Playlist"), this,
                          SLOT(togglePlayListItem()));
     else
@@ -3016,7 +3008,8 @@ ProgramInfo *PlaybackBox::findMatchingProg(QString key)
 
     keyParts = QStringList::split("_", key);
 
-    if (keyParts.count() == 2)
+    // ProgramInfo::MakeUniqueKey() has 4 parts separated by '_' characters
+    if (keyParts.count() == 4)
         return findMatchingProg(keyParts[0], keyParts[1]);
     else
         return NULL;
@@ -3167,8 +3160,6 @@ void PlaybackBox::togglePlayListItem(void)
 
 void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
 {
-    QString key;
-
     if (!pginfo)
         return;
 
@@ -3178,7 +3169,7 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
         return;
     }
 
-    key  = pginfo->chanid + "_" + pginfo->recstartts.toString(Qt::ISODate);
+    QString key = pginfo->MakeUniqueKey();
 
     if (playList.grep(key).count())
     {

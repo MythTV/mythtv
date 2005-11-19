@@ -240,7 +240,8 @@ ProgramInfo::~ProgramInfo()
  */
 QString ProgramInfo::MakeUniqueKey(void) const
 {
-    return title + ":" + chanid + ":" + startts.toString(Qt::ISODate);
+    return chanid + "_" + recstartts.toString(Qt::ISODate) + "_" +
+           startts.toString(Qt::ISODate) + "_" +title;
 }
 
 #define INT_TO_LIST(x)       sprintf(tmp, "%i", (x)); list << tmp;
