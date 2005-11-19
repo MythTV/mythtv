@@ -176,25 +176,28 @@ osx-packager.pl - build OS X binary packages for MythTV
    -help            print the usage message
    -man             print full documentation
    -verbose         print informative messages during the process
-   -version <str>   custom version suffix (defaults to "cvsYYYYMMDD")
+   -version <str>   custom version suffix (defaults to "svnYYYYMMDD")
    -noversion       don't use any version (for building release versions)
    -distclean       throw away all intermediate files and exit
    -thirdclean      do a clean rebuild of third party packages
+   -thirdskip       don't rebuild the third party packages
    -clean           do a clean rebuild of MythTV
-   -cvstag <str>    build specified CVS release, instead of HEAD
-   -nocvs           don't update MythTV CVS before building
+   -svnbranch <str> build a specified Subversion branch,   instead of HEAD
+   -svnrev <str>    build a specified Subversion revision, instead of HEAD
+   -svntag <str>    build a specified release, instead of Subversion HEAD
+   -nohead          don't update to HEAD revision of MythTV before building
    -plugins <str>   comma-separated list of plugins to include
                       Available plugins:
-                          mythvideo mythweather mythgallery mythgame
-                          mythdvd mythnews ALL
+   mythbrowser mythcontrols mythdvd mythflix mythgallery mythgame
+   mythmusic mythnews mythphone mythvideo mythweather
 
 =head1 DESCRIPTION
 
 This script builds a MythTV frontend and all necessary dependencies, along
 with plugins as specified, as a standalone binary package for Mac OS X. 
 
-It was designed for building daily CVS snapshots, but can also be used to
-create release builds with the '-cvstag' option.
+It was designed for building daily CVS (now Subversion) snapshots,
+but can also be used to create release builds with the '-svntag' option.
 
 All intermediate files go into an '.osx-packager' directory in the current
 working directory. The finished application is named 'MythFrontend.app' and
@@ -206,13 +209,18 @@ Building two snapshots, one with plugins and one without:
 
   osx-packager.pl -clean -plugins mythvideo,mythweather
   mv MythFrontend.app MythFrontend-plugins.app
-  osx-packager.pl -nocvs
+  osx-packager.pl -nohead
   mv MythFrontend.app MythFrontend-noplugins.app
 
 Building a 0.17 release build:
 
   osx-packager.pl -distclean
-  osx-packager.pl -cvstag release-0-17 -noversion
+  osx-packager.pl -svntag release-0-17 -noversion
+
+Building a "fixes" branch:
+
+  osx-packager.pl -distclean
+  osx-packager.pl -svnbranch release-0-18-fixes
 
 =head1 CREDITS
 
@@ -221,7 +229,7 @@ Written by Jeremiah Morris (jm@whpress.com)
 Special thanks to Nigel Pearson, Jan Ornstedt, Angel Li, and Andre Pang
 for help, code, and advice.
 
-Small modifications made by Bas Hulsken (bhulsken@hotmail.com) to allow building current cvs, and allow lirc (if installed properly on before running script). The modifications are crappy, and should probably be revised by someone who can actually code in perl. However it works for the moment, and I wanted to share with other mac frontend experimenters!
+Small modifications made by Bas Hulsken (bhulsken@hotmail.com) to allow building current svn, and allow lirc (if installed properly on before running script). The modifications are crappy, and should probably be revised by someone who can actually code in perl. However it works for the moment, and I wanted to share with other mac frontend experimenters!
 
 =cut
 
@@ -237,25 +245,32 @@ Getopt::Long::GetOptions(\%OPT,
                          'thirdclean',
                          'thirdskip',
                          'clean',
-                         'cvstag=s',
-                         'nocvs',
+                         'svnbranch=s',
+                         'svnrev=s',
+                         'svntag=s',
+                         'nocvs', # This is obsolete, but should stay a while
+                         'nohead',
                          'plugins=s',
                         ) or Pod::Usage::pod2usage(2);
 Pod::Usage::pod2usage(1) if $OPT{'help'};
 Pod::Usage::pod2usage('-verbose' => 2) if $OPT{'man'};
 
 # Get version string sorted out
-$OPT{'version'} = $OPT{'cvstag'} if ($OPT{'cvstag'} && !$OPT{'version'});
+if ($OPT{'svntag'} && !$OPT{'version'})
+{
+  $OPT{'version'} = $OPT{'svntag'};
+  $OPT{'version'} =~ s/-r *//;
+  $OPT{'version'} =~ s/--revision *//;
+}
 $OPT{'version'} = '' if $OPT{'noversion'};
 unless (defined $OPT{'version'})
 {
   my @lt = gmtime(time);
-  $OPT{'version'} = sprintf('cvs%04d%02d%02d',
+  $OPT{'version'} = sprintf('svn%04d%02d%02d',
                             $lt[5] + 1900,
                             $lt[4] + 1,
                             $lt[3]);
 }
-$OPT{'cvstag'} = 'HEAD' unless $OPT{'cvstag'};
 
 # Build our temp directories
 our $SCRIPTDIR = Cwd::abs_path(Cwd::getcwd());
@@ -291,6 +306,7 @@ mkdir $SRCDIR;
 our %conf = (
   'mythplugins'
   =>  [
+        '--prefix=' . $PREFIX,
         '--enable-opengl',
         '--disable-mythbrowser',
         '--enable-mythdvd',
@@ -362,17 +378,7 @@ END
 
 ### Third party packages
 my (@build_depends, %seen_depends);
-my @comps = ('mythtv');
-#if ($OPT{'plugins'} eq 'ALL')
-#{
-#  push(@comps, @components);
-#}
-#elsif ($OPT{'plugins'})
-#{
-#  push(@comps, split(',', $OPT{'plugins'}));
-#}
-# changed by Bas, always build working plugins!
-push(@comps, @components);
+my @comps = ('mythtv', @components);
 &Verbose("Including components:", @comps);
 
 foreach my $comp (@comps)
@@ -415,13 +421,23 @@ foreach my $sw (@build_depends)
     &Verbose("Using previously downloaded $sw");
   }
   
-  if ($OPT{'thirdclean'} && -d $dirname)
+  if ( -d $dirname )
   {
+   if ( $OPT{'thirdclean'} )
+   {
     &Verbose("Removing previous build of $sw");
     &Syscall([ '/bin/rm', '-f', '-r', $dirname ]) or die;
+   }
+
+   if ( $OPT{'thirdskip'} )
+   {
+    &Verbose("Using previous build of $sw");
+    next;
+   }
+
+    &Verbose("Using previously unpacked $sw");
   }
-  
-  unless (-d $dirname)
+  else
   {
     &Verbose("Unpacking $sw");
     if ( substr($filename,-3) eq ".gz" )
@@ -432,10 +448,6 @@ foreach my $sw (@build_depends)
     {
       &Syscall([ '/usr/bin/tar', '-xjf', $filename ]) or die;
     }
-  }
-  else
-  {
-    &Verbose("Using previously unpacked $sw");
   }
   
   # Configure
@@ -500,27 +512,6 @@ foreach my $sw (@build_depends)
 
 ### build MythTV
 
-# prepare CVS
-my $cvsdir = "$SRCDIR/myth-cvs";
-mkdir $cvsdir;
-
-unless (-e "$cvsdir/.cvspass")
-{
-  &Verbose("Creating .cvspass file");
-  # Create .cvspass file to bypass manual login
-  my $passfile;
-  unless (open($passfile, ">$cvsdir/.cvspass"))
-  {
-    &Complain("Failed to open .cvspass for writing");
-    die;
-  }
-  print $passfile <<END;
-:pserver:mythtv\@cvs.mythtv.org:/var/lib/mythcvs A%a,c,<
-END
-  close $passfile;
-}
-$ENV{'CVS_PASSFILE'} = "$cvsdir/.cvspass";
-
 # Clean any previously installed libraries
 &Verbose("Cleaning previous installs of MythTV");
 my @mythlibs = glob "$PREFIX/lib/libmyth*";
@@ -536,29 +527,63 @@ foreach my $dir ('include', 'lib', 'share')
   }
 }
 
+my $svndir = "$SRCDIR/myth-svn";
+mkdir $svndir;
+
+# Deal with Subversion branches, revisions and tags:
+my $svnrepository = 'http://svn.mythtv.org/svn/';
+my @svnrevision   = ();
+
+if ( $OPT{'svnbranch'} )
+{
+  $svnrepository .= 'branches/' . $OPT{'svnbranch'} . '/';
+}
+elsif ( $OPT{'svntag'} )
+{
+  $svnrepository .= 'tags/' . $OPT{'svntag'} . '/';
+}
+elsif ( $OPT{'svnrev'} )
+{
+  $svnrepository .= 'trunk/';
+
+  # If the user just specified a number, add appropriate flag:
+  if ( $OPT{'svnrev'} =~ m/^\d+$/ )
+  {
+    push @svnrevision, '--revision';
+  }
+
+  push @svnrevision, $OPT{'svnrev'};
+}
 # Build MythTV and any plugins
 foreach my $comp (@comps)
 {
-  my $compdir = "$cvsdir/$comp/" ;
+  my $compdir = "$svndir/$comp/" ;
   my $svn = '/sw/bin/svn';
-#     $svn = '/Volumes/Users/nigel/bin/svn';
+     $svn = '/Volumes/Users/nigel/bin/svn';
 
-  # Get CVS
-  unless (-d $compdir)
+  if ($comp eq 'mythtv')
   {
-    &Verbose("Checking out $comp");
-    chdir $cvsdir;
-
-    &Syscall([ $svn, 'co',
-               'http://svn.mythtv.org/svn/trunk/' . $comp, $compdir]) or die;
+    # Empty subdirectory 'config' sometimes causes checkout problems
+    &Syscall(['rm', '-fr', $compdir . 'config']);
   }
-  elsif (!$OPT{'nocvs'})
+
+  # Checkout source code. If the user wants a particular branch or tag,
+  # then we have to ignore the current checked out version and check out again
+  if ( ! -d $compdir || $OPT{'svnbranch'} || $OPT{'svntag'} )
   {
-    &Verbose("Updating $comp CVS");
+    &Verbose("Checking out $comp source code");
+    chdir $svndir;
+
+    &Syscall([ $svn, 'co', @svnrevision,
+               $svnrepository . $comp, $compdir]) or die;
+  }
+  elsif ( !$OPT{'nocvs'} && !$OPT{'nohead'} )
+  {
+    &Verbose("Updating $comp source code");
     chdir $compdir;
-#	print $compdir;
-    &Syscall([ $svn, 'update']) or die;
+    &Syscall([ $svn, 'update', @svnrevision]) or die;
   }
+
   chdir $compdir;
   
   if ($OPT{'clean'} && -e 'Makefile')
@@ -571,7 +596,6 @@ foreach my $comp (@comps)
     # clean the Makefiles, as process requires PREFIX hacking
     &CleanMakefiles();
   }
-  
   
   # configure and make
   if ( $makecleanopt{$comp} && -e 'Makefile' )
@@ -601,9 +625,9 @@ foreach my $comp (@comps)
   if ($comp eq 'mythtv')
   {
     # MythTV has an empty subdirectory 'config' that causes problems for me:
-    system("touch config/config.pro");
+    &Syscall('touch config/config.pro');
     # Nigel's hack to speedup building
-    system("echo SUBDIRS = mythfrontend >> programs/programs.pro");
+    &Syscall('echo SUBDIRS = mythfrontend >> programs/programs.pro');
   }
   
   &Verbose("Making $comp");
