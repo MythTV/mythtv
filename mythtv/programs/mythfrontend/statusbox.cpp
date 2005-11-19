@@ -114,54 +114,45 @@ void StatusBox::updateContent()
         contentSize = contentTotalLines;
     contentMid = contentSize / 2;
 
-    // In order to maintain a center scrolling highlight, we need to determine
-    // the point at which to start the content list so that the current item
-    // is in the center
-    int startPos = 0; 
-    if (contentPos >= contentMid)
+    int startPos = 0;
+    int highlightPos = 0;
+
+    if (contentPos < contentMid)
+    {
+        startPos = 0;
+        highlightPos = contentPos;
+    }
+    else if (contentPos >= (contentTotalLines - contentMid))
+    {
+        startPos = contentTotalLines - contentSize;
+        highlightPos = contentSize - (contentTotalLines - contentPos);
+    }
+    else if (contentPos >= contentMid)
+    {
         startPos = contentPos - contentMid;
+        highlightPos = contentMid;
+    }
  
     if (content  == NULL) return;
     LayerSet *container = content;
 
-    // If the content position is beyond the midpoint and before the end
-    // or if the content is first being displayed, write the content using
-    // the offset we determined above.  If we are before the midpoint or 
-    // close to the end, we stop moving the content up or down to let the 
-    // hightlight move up and down with fixed content
-    if (((contentPos >= contentMid) &&
-         (contentPos < (contentTotalLines - contentMid))) ||
-        (contentPos == 0))
+    list_area->ResetList();
+    for (int x = startPos; (x - startPos) <= contentSize; x++)
     {
-        list_area->ResetList();
-        for (int x = startPos; (x - startPos) <= contentSize; x++)
-            if (contentLines.contains(x))
-            {
-                list_area->SetItemText(x - startPos, contentLines[x]);
-                if (contentFont.contains(x))
-                    list_area->EnableForcedFont(x - startPos, contentFont[x]);
-            }
+        if (contentLines.contains(x))
+        {
+            list_area->SetItemText(x - startPos, contentLines[x]);
+            if (contentFont.contains(x))
+                list_area->EnableForcedFont(x - startPos, contentFont[x]);
+        }
     }
 
-    // If we are scrolling, the determine the item to highlight
-    if (doScroll)
+    list_area->SetItemCurrent(highlightPos);
+
+    if (inContent)
     {
-        int newPos = 0;
-
-        if (contentPos < contentMid)
-            newPos = contentPos;
-        else if (contentPos >= (contentTotalLines - contentMid))
-            newPos = contentSize - (contentTotalLines - contentPos);
-        else
-            newPos = contentMid;
-
-        list_area->SetItemCurrent(newPos);
-
-        if (inContent)
-        {
-            helptext->SetText(contentDetail[contentPos]);
-            update(TopRect);
-        }
+        helptext->SetText(contentDetail[contentPos]);
+        update(TopRect);
     }
 
     list_area->SetUpArrow((startPos > 0) && (contentSize < contentTotalLines));
@@ -393,6 +384,20 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
                 setHelpText();
                 update(SelectRect);
             }
+        }
+        else if (action == "PAGEUP" && inContent) 
+        {
+            contentPos -= contentSize;
+            if (contentPos < 0)
+                contentPos = 0;
+            update(ContentRect);
+        }
+        else if (action == "PAGEDOWN" && inContent)
+        {
+            contentPos += contentSize;
+            if (contentPos > (contentTotalLines - 1))
+                contentPos = contentTotalLines - 1;
+            update(ContentRect);
         }
         else if ((action == "RIGHT") &&
                  (!inContent) &&
@@ -1163,3 +1168,4 @@ void StatusBox::doMachineStatus()
     update(ContentRect);
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
