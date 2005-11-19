@@ -593,6 +593,9 @@ int main(int argc, char **argv)
                            "MythBackend started as a slave backend", "");
     }
 
+    // Get any initial housekeeping done before we fire up anything else
+    housekeeping = new HouseKeeper(true, ismaster);
+
     bool fatal_error = false;
     bool runsched = setupTVs(ismaster, fatal_error);
     if (fatal_error)
@@ -608,8 +611,6 @@ int main(int argc, char **argv)
                 "the --noautoexpire option ********\n";
     else
         expirer = new AutoExpire(true, ismaster);
-
-    housekeeping = new HouseKeeper(true, ismaster);
 
     if (nojobqueue)
         cerr << "********* The JobQueue has been DISABLED with "

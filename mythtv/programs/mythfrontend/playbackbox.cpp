@@ -37,6 +37,11 @@ using namespace std;
 #include "lcddevice.h"
 #include "previewgenerator.h"
 
+#define REC_CAN_BE_DELETED(rec) \
+    ((((rec)->programflags & FL_INUSEPLAYING) == 0) && \
+     ((((rec)->programflags & FL_INUSERECORDING) == 0) || \
+      ((rec)->recgroup != "LiveTV")))
+
 static int comp_programid(ProgramInfo *a, ProgramInfo *b)
 {
     if (a->programid == b->programid)
@@ -694,7 +699,7 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         itype = (UIImageType *)container->GetType("inuse");
         if (itype)
         {
-            if (flags & FL_INUSE)
+            if (flags & (FL_INUSERECORDING | FL_INUSEPLAYING))
                 itype->ResetFilename();
             else
                 itype->SetImage("blank.png");
@@ -1632,7 +1637,7 @@ void PlaybackBox::startPlayer(ProgramInfo *rec)
 
         rbuffer = new RingBuffer(rec->pathname, false, false);
 
-        nvp = new NuppelVideoPlayer();
+        nvp = new NuppelVideoPlayer("preview player");
         nvp->SetRingBuffer(rbuffer);
         nvp->SetAsPIP();
         QString filters = "";
@@ -1719,7 +1724,7 @@ void PlaybackBox::deleteSelected()
     if (!playList.count())
     {
         if ((curitem->availableStatus != asPendingDelete) &&
-            ((curitem->programflags & FL_INUSE) == 0))
+            (REC_CAN_BE_DELETED(curitem)))
             remove(curitem);
         else
             showAvailablePopup(curitem);
@@ -2143,29 +2148,44 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
 
 void PlaybackBox::showAvailablePopup(ProgramInfo *rec)
 {
+    if (!rec)
+        return;
+
+    QString msg = rec->title + "\n";
+    if (rec->subtitle != "")
+        msg += rec->subtitle + "\n";
+    msg += "\n";
+
     switch (rec->availableStatus)
     {
         case asAvailable:
-                 if (rec->programflags & FL_INUSE)
+                 if (rec->programflags & (FL_INUSERECORDING | FL_INUSEPLAYING))
+                 {
+                     QString byWho;
+                     rec->IsInUse(byWho);
+
                      MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                   QObject::tr("Recording Available"),
+                                   QObject::tr("Recording Available"), msg +
                                    QObject::tr("This recording is currently in "
-                                               "use by another Myth program"));
+                                               "use by:") + "\n" + byWho);
+                 }
                  else
+                 {
                      MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                                   QObject::tr("Recording Available"),
+                                   QObject::tr("Recording Available"), msg +
                                    QObject::tr("This recording is currently "
                                                "Available"));
+                 }
                  break;
         case asPendingDelete:
                  MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                               QObject::tr("Recording Unavailable"),
+                               QObject::tr("Recording Unavailable"), msg +
                                QObject::tr("This recording is currently being "
                                            "deleted and is unavailable"));
                  break;
         case asFileNotFound:
                  MythPopupBox::showOkPopup(gContext->GetMainWindow(),
-                               QObject::tr("Recording Unavailable"),
+                               QObject::tr("Recording Unavailable"), msg +
                                QObject::tr("The file for this recording can "
                                            "not be found"));
                  break;
@@ -2895,7 +2915,7 @@ void PlaybackBox::doPlaylistDelete(void)
     for (it = playList.begin(); it != playList.end(); ++it )
     {
         tmpItem = findMatchingProg(*it);
-        if (tmpItem && ((tmpItem->programflags & FL_INUSE) == 0))
+        if (tmpItem && (REC_CAN_BE_DELETED(tmpItem)))
             RemoteDeleteRecording(tmpItem, false, false);
     }
 
@@ -2911,7 +2931,7 @@ void PlaybackBox::doDelete(void)
     cancelPopup();
 
     if ((delitem->availableStatus == asPendingDelete) ||
-        (delitem->programflags & FL_INUSE))
+        (REC_CAN_BE_DELETED(delitem)))
     {
         showAvailablePopup(delitem);
         return;
@@ -2941,7 +2961,7 @@ void PlaybackBox::doForceDelete(void)
     cancelPopup();
 
     if ((delitem->availableStatus == asPendingDelete) ||
-        (delitem->programflags & FL_INUSE))
+        (REC_CAN_BE_DELETED(delitem)))
     {
         showAvailablePopup(delitem);
         return;
@@ -2962,7 +2982,7 @@ void PlaybackBox::doDeleteForgetHistory(void)
     cancelPopup();
 
     if ((delitem->availableStatus == asPendingDelete) ||
-        (delitem->programflags & FL_INUSE))
+        (REC_CAN_BE_DELETED(delitem)))
     {
         showAvailablePopup(delitem);
         return;

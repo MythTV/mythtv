@@ -1131,7 +1131,7 @@ void TV::SetupPlayer(bool isWatchingRecording)
     QString filters = "";
     
     
-    nvp = new NuppelVideoPlayer(playbackinfo);
+    nvp = new NuppelVideoPlayer("player", playbackinfo);
     nvp->SetParentWidget(myWindow);
     nvp->SetParentPlayer(this);
     nvp->SetRingBuffer(prbuffer);
@@ -1206,7 +1206,7 @@ void TV::SetupPipPlayer(void)
         return;
     }
 
-    pipnvp = new NuppelVideoPlayer();
+    pipnvp = new NuppelVideoPlayer("PIP player");
     pipnvp->SetAsPIP();
     pipnvp->SetRingBuffer(piprbuffer);
     pipnvp->SetRecorder(piprecorder);

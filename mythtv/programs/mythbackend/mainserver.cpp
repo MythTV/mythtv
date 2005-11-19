@@ -912,19 +912,34 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
     QString port = gContext->GetSetting("BackendServerPort");
     QString chanorder = gContext->GetSetting("ChannelOrdering", "channum + 0");
 
-    QValueList<QString> inUseList;
+    QMap<QString, int> inUseMap;
+    QString inUseKey;
+    QString inUseForWhat;
     QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    query.prepare("SELECT DISTINCT chanid, starttime FROM inuseprograms "
-                  " WHERE lastupdatetime > :ONEHOURAGO ;");
+    query.prepare("SELECT DISTINCT chanid, starttime, recusage "
+                  " FROM inuseprograms WHERE lastupdatetime >= :ONEHOURAGO ;");
     query.bindValue(":ONEHOURAGO", oneHourAgo);
 
     if (query.exec() && query.isActive() && query.size() > 0)
         while (query.next())
-            inUseList.append(query.value(0).toString() + " " +
-                             query.value(1).toDateTime().toString(Qt::ISODate));
+        {
+            inUseKey = query.value(0).toString() + " " +
+                       query.value(1).toDateTime().toString(Qt::ISODate);
+            inUseForWhat = query.value(2).toString();
+
+            if (!inUseMap.contains(inUseKey))
+                inUseMap[inUseKey] = 0;
+
+            if ((inUseForWhat == "player") ||
+                (inUseForWhat == "preview player") ||
+                (inUseForWhat == "PIP player"))
+                inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSEPLAYING;
+            else if (inUseForWhat == "recorder")
+                inUseMap[inUseKey] = inUseMap[inUseKey] | FL_INUSERECORDING;
+        }
 
 
     QString thequery = "SELECT recorded.chanid,recorded.starttime,recorded.endtime,"
@@ -1026,9 +1041,10 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             flags |= query.value(12).toInt() ? FL_AUTOEXP : 0;
             flags |= query.value(14).toString().length() > 1 ? FL_BOOKMARK : 0;
 
-            if (inUseList.contains(query.value(0).toString() + " " +
-                       query.value(1).toDateTime().toString(Qt::ISODate)))
-                flags |= FL_INUSE;
+            inUseKey = query.value(0).toString() + " " +
+                       query.value(1).toDateTime().toString(Qt::ISODate);
+            if (inUseMap.contains(inUseKey))
+                flags |= inUseMap[inUseKey];
 
             if (query.value(13).toInt())
             {
@@ -1589,33 +1605,6 @@ void MainServer::DoHandleDeleteRecording(ProgramInfo *pginfo, PlaybackSock *pbs,
 
     QString fileprefix = gContext->GetFilePrefix();
     QString filename = pginfo->GetRecordFilename(fileprefix);
-    QString byWho;
-
-    // Don't even try to delete if the program is in use.
-    if (pginfo->IsInUse(byWho))
-    {
-        QString logInfo = QString("chanid %1 at %2")
-                              .arg(pginfo->chanid)
-                              .arg(pginfo->recstartts.toString());
-        VERBOSE(VB_ALL,
-                QString("ERROR when trying to delete file: %1. Program is in "
-                        "use.  Program can not be deleted.").arg(filename));
-        VERBOSE(VB_ALL, QString("Program in use by: %1").arg(byWho));
-        gContext->LogEntry("mythbackend", LP_WARNING, "Delete Recording",
-                           QString("File %1 is in use for %2 when trying "
-                                   "to delete recording.")
-                                   .arg(filename).arg(logInfo));
-        resultCode = -3;
-
-        if (pbssock)
-        {
-            QStringList outputlist = QString::number(resultCode);
-            SendResponse(pbssock, outputlist);
-        }
-
-        delete pginfo;
-        return;
-    }
 
     // If this recording was made by a another recorder, and that
     // recorder is available, tell it to do the deletion.

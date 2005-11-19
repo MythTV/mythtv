@@ -33,6 +33,8 @@ HouseKeeper::HouseKeeper(bool runthread, bool master)
     threadrunning = runthread;
     filldbRunning = false;
 
+    CleanupMyOldRecordings();
+
     if (runthread)
     {
         pthread_t hkthread;
@@ -171,7 +173,7 @@ void HouseKeeper::RunHouseKeeping(void)
 
             if (wantToRun("InUseProgramsCleanup", 1, 0, 24))
             {
-                CleanupInUsePrograms();
+                CleanupAllOldInUsePrograms();
                 updateLastrun("InUseProgramsCleanup");
             }
         }
@@ -237,7 +239,17 @@ void HouseKeeper::runFillDatabase()
     }
 }
 
-void HouseKeeper::CleanupInUsePrograms(void)
+void HouseKeeper::CleanupMyOldRecordings(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM inuseprograms "
+                  "WHERE hostname = :HOSTNAME and recusage = 'recorder' ;");
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.exec();
+}
+
+void HouseKeeper::CleanupAllOldInUsePrograms(void)
 {
     QDateTime fourHoursAgo = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
     MSqlQuery query(MSqlQuery::InitCon());

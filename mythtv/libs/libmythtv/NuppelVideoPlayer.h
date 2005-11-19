@@ -58,7 +58,8 @@ enum TCTypes
 class NuppelVideoPlayer
 {
  public:
-    NuppelVideoPlayer(const ProgramInfo *info = NULL);
+    NuppelVideoPlayer(QString inUseID = "Unknown",
+                      const ProgramInfo *info = NULL);
    ~NuppelVideoPlayer();
 
     // Initialization
@@ -108,7 +109,6 @@ class NuppelVideoPlayer
     void SetFileLength(int total, int frames);
     void Zoom(int direction);
     void ClearBookmark(void);
-    void SetNeedsInUseUpdates(bool needsUpdates = true);
 
     // Toggle Sets
     void ToggleLetterbox(int letterboxMode = -1);
@@ -386,7 +386,6 @@ class NuppelVideoPlayer
     mutable bool     limitKeyRepeat;
     bool     errored;
     int      m_DeintSetting;
-    bool     needsInUseUpdates;
 
     // Bookmark stuff
     long long bookmarkseek;

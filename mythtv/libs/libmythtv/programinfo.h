@@ -51,12 +51,13 @@ enum TranscoderStatus {
 };
 
 enum FlagMask {
-    FL_COMMFLAG  = 0x01,
-    FL_CUTLIST   = 0x02,
-    FL_AUTOEXP   = 0x04,
-    FL_EDITING   = 0x08,
-    FL_BOOKMARK  = 0x10,
-    FL_INUSE     = 0x20
+    FL_COMMFLAG       = 0x01,
+    FL_CUTLIST        = 0x02,
+    FL_AUTOEXP        = 0x04,
+    FL_EDITING        = 0x08,
+    FL_BOOKMARK       = 0x10,
+    FL_INUSERECORDING = 0x20,
+    FL_INUSEPLAYING   = 0x40
 };
 
 enum RecStatusType {
@@ -224,7 +225,7 @@ class ProgramInfo
     void EditScheduled(void);
 
     // In-use, autodeletion prevention stuff
-    void MarkAsInUse(bool inuse);
+    void MarkAsInUse(bool inuse, QString usedFor = "");
 
   private:
     // GUI helper functions
@@ -316,7 +317,7 @@ class ProgramInfo
     bool ignoreBookmark;
     mutable class ScheduledRecording* record;
 
-    QString inusekey;
+    QString inUseForWhat;
 };
 
 /** \class ProgramList

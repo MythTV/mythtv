@@ -758,7 +758,17 @@ static void *run_priv_thread(void *data)
     }
     return NULL; // will never happen
 }
-   
+
+void CleanupMyOldInUsePrograms(void)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("DELETE FROM inuseprograms "
+                  "WHERE hostname = :HOSTNAME and recusage = 'player' ;");
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.exec();
+}
+
 int main(int argc, char **argv)
 {
     QString geometry = "";
@@ -1070,6 +1080,8 @@ int main(int argc, char **argv)
     InitJumpPoints();
 
     internal_media_init();
+
+    CleanupMyOldInUsePrograms();
 
     MythPluginManager *pmanager = new MythPluginManager();
     gContext->SetPluginManager(pmanager);

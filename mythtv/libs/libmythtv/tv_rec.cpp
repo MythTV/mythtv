@@ -469,7 +469,7 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
         // Tell event loop to begin recording.
         curRecording = new ProgramInfo(*rcinfo);
-        curRecording->MarkAsInUse(true);
+        curRecording->MarkAsInUse(true, "recorder");
         StartedRecording(curRecording);
 
         ChangeState(kState_RecordingOnly);
@@ -1054,7 +1054,8 @@ char *TVRec::GetScreenGrab(const ProgramInfo *pginfo, const QString &filename,
         return NULL;
     }
 
-    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer(pginfo);
+    NuppelVideoPlayer *nupvidplay = new NuppelVideoPlayer("pixmap generater",
+                                                          pginfo);
     nupvidplay->SetRingBuffer(tmprbuf);
 
     char *retbuf = nupvidplay->GetScreenGrab(secondsin, bufferlen, video_width,
@@ -2899,7 +2900,7 @@ void TVRec::RingBufferChanged(RingBuffer *rb, ProgramInfo *pginfo)
             delete curRecording;
         }
         curRecording = new ProgramInfo(*pginfo);
-        curRecording->MarkAsInUse(true);
+        curRecording->MarkAsInUse(true, "recorder");
     }
 }
 
@@ -3655,7 +3656,7 @@ bool TVRec::CreateLiveTVRingBuffer(void)
     }
 
     curRecording = pginfo;
-    curRecording->MarkAsInUse(true);
+    curRecording->MarkAsInUse(true, "recorder");
     lastTuningRequest.program = curRecording;
     return true;
 }

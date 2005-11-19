@@ -78,8 +78,8 @@ int BuildVideoMarkup(QString& filename)
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
-    NuppelVideoPlayer *nvp = new NuppelVideoPlayer(program_info);
-    nvp->SetNeedsInUseUpdates(false);
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("seektable rebuilder",
+                                                   program_info);
     nvp->SetRingBuffer(tmprbuf);
 
     nvp->RebuildSeekTable(!quiet);
@@ -451,8 +451,7 @@ int FlagCommercials(QString chanid, QString starttime)
         return COMMFLAG_EXIT_DB_ERROR;
     }
 
-    NuppelVideoPlayer* nvp = new NuppelVideoPlayer(program_info);
-    nvp->SetNeedsInUseUpdates(false);
+    NuppelVideoPlayer* nvp = new NuppelVideoPlayer("flagger", program_info);
     nvp->SetRingBuffer(tmprbuf);
 
     if (rebuildSeekTable)

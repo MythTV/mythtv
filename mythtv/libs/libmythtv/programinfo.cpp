@@ -121,7 +121,7 @@ ProgramInfo::ProgramInfo(void)
 
     sortTitle = "";
 
-    inusekey = "";
+    inUseForWhat = "";
 
     record = NULL;
 }   
@@ -219,7 +219,7 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     year = other.year;
     ignoreBookmark = other.ignoreBookmark; 
    
-    inusekey = other.inusekey;
+    inUseForWhat = other.inUseForWhat;
     lastInUseTime = other.lastInUseTime;
     record = NULL;
 
@@ -1778,7 +1778,7 @@ bool ProgramInfo::IsInUse(QString &byWho) const
     QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
     MSqlQuery query(MSqlQuery::InitCon());
     
-    query.prepare("SELECT playid FROM inuseprograms "
+    query.prepare("SELECT hostname, recusage FROM inuseprograms "
                   " WHERE chanid = :CHANID"
                   " AND starttime = :STARTTIME "
                   " AND lastupdatetime > :ONEHOURAGO ;");
@@ -1789,8 +1789,25 @@ bool ProgramInfo::IsInUse(QString &byWho) const
     byWho = "";
     if (query.exec() && query.isActive() && query.size() > 0)
     {
+        QString usageStr, recusage;
         while(query.next())
-            byWho += "\n" + query.value(0).toString();
+        {
+            usageStr = QObject::tr("Unknown");
+            recusage = query.value(1).toString();
+
+            if (recusage == "player")
+                usageStr = QObject::tr("Playing");
+            else if (recusage == "recorder")
+                usageStr = QObject::tr("Recording");
+            else if (recusage == "flagger")
+                usageStr = QObject::tr("Commercial Flagging");
+            else if (recusage == "transcoder")
+                usageStr = QObject::tr("Transcoding");
+            else if (recusage == "PIP player")
+                usageStr = QObject::tr("PIP");
+
+            byWho += query.value(0).toString() + " (" + usageStr + ")\n";
+        }
 
         return true;
     }
@@ -2468,8 +2485,8 @@ void ProgramInfo::AddHistory(bool resched)
             MythContext::DBError("addFindHistory", result);
     }
 
-    // The removal of an entry from oldrecorded may affect near-future
-    // scheduling decisions, so recalculate
+    // The adding of an entry to oldrecorded may affect near-future
+    // scheduling decisions, so recalculate if told
     if (resched)
         ScheduledRecording::signalChange(0);
 }
@@ -2723,7 +2740,7 @@ QString ProgramInfo::RecStatusText(void) const
         }
     }
 
-    return QObject::tr("Unknown");;
+    return QObject::tr("Unknown");
 }
 
 /** \fn ProgramInfo::RecStatusDesc(void) const
@@ -3295,29 +3312,33 @@ void ProgramInfo::UpdateInUseMark(bool force)
         MarkAsInUse(true);
 }
 
-void ProgramInfo::MarkAsInUse(bool inuse)
+void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 {
     bool notifyOfChange = false;
 
-    if (inuse && inusekey.length() < 2)
+    if (inuse && inUseForWhat.length() < 2)
     {
-        inusekey = gContext->GetHostName() + " @ " +
-                   QDateTime::currentDateTime().toString() + " @ " +
-                   QString::number(getpid());
+        if (usedFor != "")
+            inUseForWhat = usedFor;
+        else
+            inUseForWhat = QObject::tr("Unknown") + " [" +
+                           QString::number(getpid()) + "]";
+
         notifyOfChange = true;
     }
 
-    if (!inuse && inusekey.length() < 2)
+    if (!inuse && inUseForWhat.length() < 2)
         return; // can't delete if we don't have a key
 
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("DELETE FROM inuseprograms WHERE "
                   "chanid = :CHANID AND starttime = :STARTTIME AND "
-                  "playid = :PLAYID  ;");
+                  "hostname = :HOSTNAME AND recusage = :RECUSAGE ;");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
-    query.bindValue(":PLAYID", inusekey);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":RECUSAGE", inUseForWhat);
 
     query.exec();
 
@@ -3325,18 +3346,20 @@ void ProgramInfo::MarkAsInUse(bool inuse)
     {
         if (!gContext->IsBackend())
             RemoteSendMessage("RECORDING_LIST_CHANGE");
-        inusekey = "";
+        inUseForWhat = "";
         return;
     }
 
     lastInUseTime = QDateTime::currentDateTime();
 
-    query.prepare("INSERT INTO inuseprograms (chanid, starttime, playid, "
-                  " lastupdatetime) VALUES(:CHANID, :STARTTIME, :PLAYID, "
-                  " :UPDATETIME);");
+    query.prepare("INSERT INTO inuseprograms "
+                  " (chanid, starttime, recusage, hostname, lastupdatetime) "
+                  " VALUES "
+                  " (:CHANID, :STARTTIME, :RECUSAGE, :HOSTNAME, :UPDATETIME);");
     query.bindValue(":CHANID", chanid);
     query.bindValue(":STARTTIME", recstartts);
-    query.bindValue(":PLAYID", inusekey);
+    query.bindValue(":HOSTNAME", gContext->GetHostName());
+    query.bindValue(":RECUSAGE", inUseForWhat);
     query.bindValue(":UPDATETIME", lastInUseTime);
 
     if (!query.exec() || !query.isActive())
