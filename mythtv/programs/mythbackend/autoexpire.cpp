@@ -493,7 +493,7 @@ void AutoExpire::ExpireEpisodesOverMax(void)
             {
                 found++;
 
-                uint chanid = query.value(0).toUInt();
+                QString chanid = query.value(0).toString();
                 QDateTime startts = query.value(1).toDateTime();
                 QString title = QString::fromUtf8(query.value(2).toString());
 
@@ -631,7 +631,7 @@ void AutoExpire::FillDBOrdered(int expMethod)
     {
         ProgramInfo *proginfo = new ProgramInfo;
 
-        proginfo->chanid = query.value(0).toUInt();
+        proginfo->chanid = query.value(0).toString();
         proginfo->startts = query.value(13).toDateTime();
         proginfo->endts = query.value(14).toDateTime();
         proginfo->recstartts = query.value(1).toDateTime();
@@ -769,9 +769,9 @@ void AutoExpire::UpdateDontExpireSet(void)
     }
 }
 
-bool AutoExpire::IsInDontExpireSet(uint chanid, QDateTime starttime)
+bool AutoExpire::IsInDontExpireSet(QString chanid, QDateTime starttime)
 {
-    QString key = QString::number(chanid) + starttime.toString(Qt::ISODate);
+    QString key = chanid + starttime.toString(Qt::ISODate);
 
     return (dont_expire_set.count(key));
 }

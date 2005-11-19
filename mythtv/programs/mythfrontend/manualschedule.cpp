@@ -289,7 +289,7 @@ void ManualSchedule::recordClicked(void)
     ProgramInfo p;
 
     QString channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
-    p.chanid = m_chanids[m_channel->currentItem()].toUInt();
+    p.chanid = m_chanids[m_channel->currentItem()];
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT chanid, channum, callsign, name "

@@ -9,7 +9,7 @@
  *  \brief Keeps track of recordings in a current LiveTV instance
  */
 LiveTVChain::LiveTVChain()
-           : m_id(""), m_maxpos(0), m_curpos(0), m_cur_chanid(0),
+           : m_id(""), m_maxpos(0), m_curpos(0), m_cur_chanid(""),
              m_switchid(-1), m_jumppos(0)
 {
 }
@@ -171,7 +171,7 @@ void LiveTVChain::ReloadAll(void)
         {
 
             LiveTVChainEntry entry;
-            entry.chanid = query.value(0).toUInt();
+            entry.chanid = query.value(0).toString();
             entry.starttime = query.value(1).toDateTime();
             entry.discontinuity = query.value(2).toInt();
             entry.hostprefix = query.value(4).toString();
@@ -204,7 +204,7 @@ void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
     else
     {
         VERBOSE(VB_IMPORTANT, QString("GetEntryAt(%1) failed.").arg(at));
-        entry.chanid = 0;
+        entry.chanid = "0";
         entry.starttime.setTime_t(0);
     }
 }
@@ -241,10 +241,10 @@ ProgramInfo *LiveTVChain::GetProgramAt(int at) const
     return EntryToProgram(entry);
 }
 
-/** \fn LiveTVChain::ProgramIsAt(uint, const QDateTime&) const
+/** \fn LiveTVChain::ProgramIsAt(const QString&, const QDateTime&) const
  *  \returns program location or -1 for not found.
  */
-int LiveTVChain::ProgramIsAt(uint chanid,
+int LiveTVChain::ProgramIsAt(const QString &chanid,
                              const QDateTime &starttime) const
 {
     QMutexLocker lock(&m_lock);

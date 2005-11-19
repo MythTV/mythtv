@@ -851,7 +851,7 @@ void StatusBox::doJobQueueStatus()
     {
         for (it = jobs.begin(); it != jobs.end(); ++it)
         {
-            uint chanid = it.data().chanid;
+            QString chanid = it.data().chanid;
             QDateTime starttime = it.data().starttime;
             ProgramInfo *pginfo;
 

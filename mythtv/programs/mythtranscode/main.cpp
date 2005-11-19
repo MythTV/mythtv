@@ -120,15 +120,12 @@ int main(int argc, char *argv[])
             jobID = QString(a.argv()[++argpos]).toInt();
             int jobType = JOB_NONE;
             
-            uint chanid_num = 0;
-            if ( !JobQueue::GetJobInfoFromID(jobID, jobType,
-                                             chanid_num, startts))
+            if ( !JobQueue::GetJobInfoFromID(jobID, jobType, chanid, startts))
             {
                 cerr << "mythtranscode: ERROR: Unable to find DB info for "
                      << "JobQueue ID# " << jobID << endl;
                 return TRANSCODE_EXIT_NO_RECORDING_DATA;
             }
-            chanid = QString::number(chanid_num);
             starttime = startts.toString(Qt::ISODate);
             found_starttime = 1;
             found_chanid = 1;
@@ -378,7 +375,7 @@ int main(int argc, char *argv[])
     if (!found_infile)
     {
         QDateTime startts = QDateTime::fromString(starttime, Qt::ISODate);
-        pginfo = ProgramInfo::GetProgramFromRecorded(chanid.toUInt(), startts);
+        pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
 
         if (!pginfo)
         {
@@ -401,8 +398,7 @@ int main(int argc, char *argv[])
             chanid = r.cap(1);
             QDateTime startts(QDate(r.cap(2).toInt(), r.cap(3).toInt(), r.cap(4).toInt()),
                               QTime(r.cap(5).toInt(), r.cap(6).toInt(), r.cap(7).toInt()));
-            pginfo = ProgramInfo::GetProgramFromRecorded(
-                chanid.toUInt(), startts);
+            pginfo = ProgramInfo::GetProgramFromRecorded(chanid, startts);
             
             if (!pginfo)
             {

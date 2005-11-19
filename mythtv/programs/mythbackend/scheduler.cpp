@@ -1957,7 +1957,7 @@ void Scheduler::AddNewRecords(void)
         else
             p->recstatus = p->oldrecstatus;
 
-        p->chanid = result.value(0).toUInt();
+        p->chanid = result.value(0).toString();
         p->sourceid = result.value(1).toInt();
         p->startts = result.value(2).toDateTime();
         p->endts = result.value(3).toDateTime();
@@ -2131,7 +2131,7 @@ void Scheduler::AddNotListed(void) {
         p->recstatus = rsNotListed;
         p->recordid = result.value(0).toInt();
         p->rectype = RecordingType(result.value(1).toInt());
-        p->chanid = result.value(2).toUInt();
+        p->chanid = result.value(2).toString();
 
         p->startts.setTime(result.value(3).toTime());
         p->startts.setDate(result.value(4).toDate());
@@ -2205,7 +2205,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
         while (result.next()) 
         {
             ProgramInfo *proginfo = new ProgramInfo;
-            proginfo->chanid = result.value(0).toUInt();
+            proginfo->chanid = result.value(0).toString();
             proginfo->rectype = RecordingType(result.value(9).toInt());
             proginfo->recordid = result.value(11).toInt();
 

@@ -763,7 +763,7 @@ void ScheduledRecording::setProgram(const ProgramInfo *proginfo)
         title->setValue(proginfo->title);
         subtitle->setValue(proginfo->subtitle);
         description->setValue(proginfo->description);
-        channel->setValue(QString::number(proginfo->chanid));
+        channel->setValue(proginfo->chanid);
         station->setValue(proginfo->chansign);
         startDate->setValue(proginfo->startts.date());
         startTime->setValue(proginfo->startts.time());

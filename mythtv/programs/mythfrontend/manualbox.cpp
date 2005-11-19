@@ -332,7 +332,7 @@ void ManualBox::startClicked(void)
     progInfo.subtitle = m_subtitle->text();
     progInfo.description = m_descString;
     progInfo.category = m_categoryString;
-    progInfo.chanid = m_chanidString.toUInt();
+    progInfo.chanid = m_chanidString;
 
     QDateTime now = QDateTime::currentDateTime();
     // Make sure we set the seconds to 0
