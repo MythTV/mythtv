@@ -165,7 +165,6 @@ void AutoExpire::CalcParams(vector<EncoderLink*> recs)
     else
         (expireMinKB = tot5min), (expireFreq = 5);
     expireMinKB += gContext->GetNumSetting("AutoExpireExtraSpace", 0) * 1024*1024;
-    // TODO also add ringbuffer sizes...
 
     DBG_CALC_PARAM("CalcParams() -- C");
 
@@ -243,8 +242,8 @@ void AutoExpire::RunExpirer(void)
 
         curTime = QTime::currentTime();
 
-        // Expire LiveTV every 2 minutes
-        if (is_master_backend && (curTime.minute() % 2) == 0)
+        // Expire Short LiveTV files for this backend every 2 minutes
+        if ((curTime.minute() % 2) == 0)
             ExpireShortLiveTV();
 
         // Expire normal recordings depending on frequency calculated
@@ -603,9 +602,10 @@ void AutoExpire::FillDBOrdered(int expMethod)
             orderby = "recorded.recpriority ASC, starttime ASC";
             break;
         case emShortLiveTVPrograms:
-            where = "recgroup = 'LiveTV' "
+            where = QString("recgroup = 'LiveTV' AND hostname = '%1' "
                     "AND endtime < DATE_ADD(starttime, INTERVAL '2' MINUTE) "
-                    "AND DATE_ADD(endtime, INTERVAL '1' MINUTE) <= NOW() ";
+                    "AND DATE_ADD(endtime, INTERVAL '1' MINUTE) <= NOW() ")
+                    .arg(gContext->GetHostName());
             orderby = "starttime ASC";
             break;
     }
@@ -668,9 +668,17 @@ void AutoExpire::FillDBOrdered(int expMethod)
         proginfo->filesize = size;
 
         if (IsInDontExpireSet(proginfo->chanid, proginfo->recstartts))
+        {
             delete proginfo;
+        }
         else
+        {
+            VERBOSE(VB_FILE, QString("AutoExpire::FillDBOrdered: Adding chanid "
+                                     "%1 @ %2 to expire list")
+                                     .arg(proginfo->chanid)
+                                     .arg(proginfo->recstartts.toString()));
             expire_list.push_back(proginfo);
+        }
     }
 }
 
@@ -765,6 +773,9 @@ void AutoExpire::UpdateDontExpireSet(void)
         {
             QString key = chanid + startts.toString(Qt::ISODate);
             dont_expire_set.insert(key);
+            VERBOSE(VB_FILE, QString("AutoExpire::UpdateDontExpireSet: Adding "
+                                     "chanid %1 @ %2 to DON'T Expire List")
+                                     .arg(chanid).arg(startts.toString()));
         }
     }
 }
