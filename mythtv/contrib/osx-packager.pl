@@ -11,6 +11,9 @@ use Cwd ();
 
 ### Configuration settings (stuff that might change more often)
 
+our $svn = '/sw/bin/svn';
+#our $svn = '/Volumes/Users/nigel/bin/svn';
+
 our @components = ( 'myththemes', 'mythplugins' );
 
 
@@ -271,6 +274,9 @@ unless (defined $OPT{'version'})
                             $lt[4] + 1,
                             $lt[3]);
 }
+
+# Fold nocvs to nohead
+$OPT{'nohead'} = 1 if $OPT{'nocvs'};
 
 # Build our temp directories
 our $SCRIPTDIR = Cwd::abs_path(Cwd::getcwd());
@@ -546,6 +552,7 @@ elsif ( $OPT{'svnrev'} )
 {
   $svnrepository .= 'trunk/';
 
+  # This arg. could be '1234', '-r 1234', or '--revision 1234'
   # If the user just specified a number, add appropriate flag:
   if ( $OPT{'svnrev'} =~ m/^\d+$/ )
   {
@@ -554,12 +561,16 @@ elsif ( $OPT{'svnrev'} )
 
   push @svnrevision, $OPT{'svnrev'};
 }
+else
+{
+  $svnrepository .= 'trunk/';
+  #@svnrevision = ('--revision', 'HEAD');
+}
+
 # Build MythTV and any plugins
 foreach my $comp (@comps)
 {
   my $compdir = "$svndir/$comp/" ;
-  my $svn = '/sw/bin/svn';
-     $svn = '/Volumes/Users/nigel/bin/svn';
 
   if ($comp eq 'mythtv')
   {
@@ -569,6 +580,7 @@ foreach my $comp (@comps)
 
   # Checkout source code. If the user wants a particular branch or tag,
   # then we have to ignore the current checked out version and check out again
+  # (this is assuming that the already checked out version is from /trunk)
   if ( ! -d $compdir || $OPT{'svnbranch'} || $OPT{'svntag'} )
   {
     &Verbose("Checking out $comp source code");
@@ -577,7 +589,7 @@ foreach my $comp (@comps)
     &Syscall([ $svn, 'co', @svnrevision,
                $svnrepository . $comp, $compdir]) or die;
   }
-  elsif ( !$OPT{'nocvs'} && !$OPT{'nohead'} )
+  elsif ( !$OPT{'nohead'} )
   {
     &Verbose("Updating $comp source code");
     chdir $compdir;
