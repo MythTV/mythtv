@@ -39,6 +39,7 @@ class EITScanner : public QObject
     void TeardownAll(void);
     void RunEventLoop(void);
     static void *SpawnEventLoop(void*);
+    static void RescheduleRecordings(void);
 
     DVBChannel      *channel;
     DVBSIParser     *parser;
@@ -53,6 +54,12 @@ class EITScanner : public QObject
     uint             activeScanTrigTime;
     QStringList      activeScanChannels;
     QStringList::iterator activeScanNextChan;
+
+    static QMutex    resched_lock;
+    static QDateTime resched_next_time;
+
+    /// Minumum number of seconds between reschedules.
+    static const uint kMinRescheduleInterval;
 };
 
 #endif // EITSCANNER_H

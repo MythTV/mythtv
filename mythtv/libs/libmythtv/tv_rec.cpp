@@ -693,7 +693,12 @@ void TVRec::HandleStateChange(void)
 
     eitScanStartTime = QDateTime::currentDateTime();    
     if ((internalState == kState_None) && (genOpt.cardtype == "DVB"))
-        eitScanStartTime = eitScanStartTime.addSecs(kEITScanStartTimeout);
+    {
+        // Add some randomness to avoid all cards starting
+        // EIT scanning at nearly the same time.
+        uint timeout = kEITScanStartTimeout + random() % 59;
+        eitScanStartTime = eitScanStartTime.addSecs(timeout);
+    }
     else
         eitScanStartTime = eitScanStartTime.addYears(1);
 }
@@ -1168,8 +1173,11 @@ void TVRec::RunTV(void)
     QMutexLocker lock(&stateChangeLock);
     SetFlags(kFlagRunMainLoop);
     ClearFlags(kFlagExitPlayer | kFlagFinishRecording);
-    eitScanStartTime = QDateTime::currentDateTime()
-        .addSecs(kEITScanStartTimeout);
+
+    // Add some randomness to avoid all cards starting
+    // EIT scanning at nearly the same time.
+    uint timeout = kEITScanStartTimeout + random() % 59;
+    eitScanStartTime = QDateTime::currentDateTime().addSecs(timeout);
 
     while (HasFlags(kFlagRunMainLoop))
     {

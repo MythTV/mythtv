@@ -13,14 +13,18 @@
 #include "eithelper.h"
 #include "scheduledrecording.h"
 
-#define LOC QString("EITScanner(): ")
+#define LOC QString("EITScanner: ")
 
 /** \class EITScanner
  *  \brief Acts as glue between DVBChannel, DVBSIParser, and EITHelper.
  *
- *  This is the class where the "EIT Crawl" should be implemented.
+ *   This is the class where the "EIT Crawl" is implemented.
  *
  */
+
+QMutex     EITScanner::resched_lock;
+QDateTime  EITScanner::resched_next_time      = QDateTime::currentDateTime();
+const uint EITScanner::kMinRescheduleInterval = 150;
 
 EITScanner::EITScanner()
     : QObject(NULL, "EITScanner"),
@@ -101,7 +105,7 @@ void EITScanner::RunEventLoop(void)
         {
             VERBOSE(VB_GENERAL, LOC + "Added "<<eitCount<<" EIT Events");
             eitCount = 0;
-            ScheduledRecording::signalChange(-1);
+            RescheduleRecordings();
         }
 
         if (activeScan && (QDateTime::currentDateTime() > activeScanNextTrig))
@@ -111,7 +115,7 @@ void EITScanner::RunEventLoop(void)
             {
                 VERBOSE(VB_GENERAL, LOC + "Added "<<eitCount<<" EIT Events");
                 eitCount = 0;
-                ScheduledRecording::signalChange(-1);
+                RescheduleRecordings();
             }
 
             if (activeScanNextChan == activeScanChannels.end())
@@ -134,6 +138,31 @@ void EITScanner::RunEventLoop(void)
     }
 }
 
+/** \fn EITScanner::RescheduleRecordings(void)
+ *  \brief Tells scheduler about programming changes.
+ *
+ *  This implements some very basic rate limiting. If a call is made
+ *  to this within kMinRescheduleInterval of the last call it is ignored.
+ */
+void EITScanner::RescheduleRecordings(void)
+{
+    if (!resched_lock.tryLock())
+        return;
+
+    if (resched_next_time > QDateTime::currentDateTime())
+    {
+        VERBOSE(VB_EIT, LOC + "Rate limiting reschedules..");
+        resched_lock.unlock();
+        return;
+    }
+
+    resched_next_time =
+        QDateTime::currentDateTime().addSecs(kMinRescheduleInterval);
+    resched_lock.unlock();
+
+    ScheduledRecording::signalChange(-1);
+}
+
 /** \fn EITScanner::StartPassiveScan(DVBChannel*, DVBSIParser*)
  *  \brief Start inserting Event Information Tables from the multiplex
  *         we happen to be tuned to into the database.
@@ -149,7 +178,7 @@ void EITScanner::StartPassiveScan(DVBChannel *_channel, DVBSIParser *_parser)
             this,      SLOT(SetPMTObject(const PMTObject *)));
 }
 
-/** \fn EITScanner::StopPassiveScan()
+/** \fn EITScanner::StopPassiveScan(void)
  *  \brief Stops inserting Event Information Tables into DB.
  */
 void EITScanner::StopPassiveScan(void)
@@ -219,10 +248,22 @@ void EITScanner::StartActiveScan(TVRec *_rec, uint max_seconds_per_source)
     VERBOSE(VB_EIT, "StartActiveScan called with "<<
             activeScanChannels.size()<<" channels");
 
+    // Start at a random channel.This is so that multiple cards with
+    // the same source don't all scan the same channels in the same 
+    // order when the backend is first started up.
+    if (activeScanChannels.size())
+    {
+        uint randomStart = random() % activeScanChannels.size();
+        activeScanNextChan = activeScanChannels.at(randomStart);
+    }
+
     if (activeScanChannels.size())
     {
         activeScanNextTrig = QDateTime::currentDateTime();
         activeScanTrigTime = max_seconds_per_source;
+        // Add a little randomness to trigger time so multiple 
+        // cards will have a staggered channel changing time.
+        activeScanTrigTime += random() % 29;
         activeScan = true;
     }
 }
