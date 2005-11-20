@@ -1,0 +1,52 @@
+0.1.4
+fixed problem with audio PTS which ruined dvdauthor
+
+0.1.3
+added vdr flag for different AC3 PES handling
+added HDTV option for handling HDTV TS to MPEG conversion
+
+0.1.2
+Added AVI idx support for better synching
+fixed some problems with AC3 scan.
+
+0.1.1
+added scan option (-s) to scan for PIDs in MPEG files.
+
+0.1.0
+fixed problem with short PES in TS
+
+0.0.9
+still working on finding the correct audio headers
+
+0.0.8
+some fixes in audio checking
+some fixes to ringbuffer handling 
+
+0.0.7
+added demux option -z
+added analyze option -y
+fix pid search bug
+fix PS lockup bug
+
+0.0.6
+fixed file end bug
+decoupled demuxing and muxing
+some more synching and input changes
+added file type recognition
+
+0.0.5
+better AVI synching
+more AVI information read
+different buffer sizes for AVI
+SCR/PTS wrap around should be handled now
+fixed AC3 segfault (Thanks to Nic)
+
+0.0.4
+fixed error discovered by David Chapman in BBC3 streams
+i.e. better gop header recognition
+
+0.0.3
+activated AC3 for TS
+more in TODO
+
+0.0.2 first release

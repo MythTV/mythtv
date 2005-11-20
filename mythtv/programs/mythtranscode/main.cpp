@@ -19,11 +19,13 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "transcode.h"
-#include "mpeg2trans.h"
+#include "mpeg2fix.h"
 
 void StoreTranscodeState(ProgramInfo *pginfo, int status, bool useCutlist);
 void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
                        ProgramInfo *pginfo);
+int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
+                        QMap <long long, long long> &posMap, int jobID);
 
 void usage(char *progname) 
 {
@@ -35,6 +37,7 @@ void usage(char *progname)
     cerr << "\t--starttime      or -s: Takes a starttime for the\n";
     cerr << "\t                        recording. REQUIRED\n";
     cerr << "\t--infile         or -i: Input file (Alternative to -c and -s)\n";
+    cerr << "\t--outfile        or -o: Output file\n";
     cerr << "\t--profile        or -p: Takes a profile number or 'autodetect'\n";
     cerr << "\t                        recording profile. REQUIRED\n";
     cerr << "\t--honorcutlist   or -l: Specifies whether to use the cutlist.\n";
@@ -53,7 +56,7 @@ void usage(char *progname)
 
 int main(int argc, char *argv[])
 {
-    QString chanid, starttime, infile;
+    QString chanid, starttime, infile, outfile;
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
     int jobID = -1;
@@ -143,6 +146,21 @@ int main(int argc, char *argv[])
             else 
             {
                 cerr << "Missing argument to -i/--infile option\n";
+                usage(a.argv()[0]);
+                return TRANSCODE_EXIT_INVALID_CMDLINE;
+            }
+        }
+        else if (!strcmp(a.argv()[argpos],"-o") ||
+                 !strcmp(a.argv()[argpos],"--outfile"))
+        {
+            if(a.argc() > argpos)
+            {
+                outfile = a.argv()[argpos + 1];
+                ++argpos;
+            }
+            else
+            {
+                cerr << "Missing argument to -o/--outfile option\n";
                 usage(a.argv()[0]);
                 return TRANSCODE_EXIT_INVALID_CMDLINE;
             }
@@ -341,7 +359,6 @@ int main(int argc, char *argv[])
         
     }
 
-    QString tmpfile;
     if (infile.left(7) == "myth://") {
         VERBOSE(VB_IMPORTANT, QString("Attempted to transcode %1. "
                "Mythtranscode is currently unable to transcode remote "
@@ -350,7 +367,8 @@ int main(int argc, char *argv[])
         return TRANSCODE_EXIT_REMOTE_FILE;
     }
 
-    tmpfile = infile + ".tmp";
+    if (outfile.isNull())
+        outfile = infile + ".tmp";
 
     if (jobID >= 0)
         JobQueue::ChangeJobStatus(jobID, JOB_RUNNING);
@@ -358,7 +376,7 @@ int main(int argc, char *argv[])
     Transcode *transcode = new Transcode(pginfo);
 
     VERBOSE(VB_GENERAL, QString("Transcoding from %1 to %2")
-                        .arg(infile).arg(tmpfile));
+                        .arg(infile).arg(outfile));
 
     if (showprogress)
         transcode->ShowProgress(true);
@@ -366,7 +384,7 @@ int main(int argc, char *argv[])
     if (!mpeg2)
     {
         result = transcode->TranscodeFile((char *)infile.ascii(),
-                                          (char *)tmpfile.ascii(),
+                                          (char *)outfile.ascii(),
                                           profilename, useCutlist, 
                                           (fifosync || keyframesonly), jobID,
                                           fifodir);
@@ -377,26 +395,24 @@ int main(int argc, char *argv[])
     int exitcode = TRANSCODE_EXIT_OK;
     if ((result == REENCODE_MPEG2TRANS) || mpeg2)
     {
-        if (!pginfo)
-        {
-            VERBOSE( VB_IMPORTANT, "MPEG2 to MPEG2 transcoding requires a program info entry.");
-            return TRANSCODE_EXIT_NO_RECORDING_DATA;
-        }
-        
-        MPEG2trans *mpeg2trans = new MPEG2trans(pginfo, jobID);
+        if (useCutlist && !found_infile)
+            pginfo->GetCutList(deleteMap);
+       
+        MPEG2fixup *m2f = new MPEG2fixup(infile.ascii(), outfile.ascii(),
+                                         &deleteMap, NULL, false, false, 20);
         if (build_index)
         {
-            int err = mpeg2trans->BuildKeyframeIndex(infile, posMap);
+            int err = BuildKeyframeIndex(m2f, infile, posMap, jobID);
             if (err)
                 return err;
             UpdatePositionMap(posMap, NULL, pginfo);
         }
         else
         {
-            int err = mpeg2trans->DoTranscode(infile, tmpfile, useCutlist);
+            int err = m2f->start();
             if (err)
                 return err;
-            err = mpeg2trans->BuildKeyframeIndex(tmpfile, posMap);
+            err = BuildKeyframeIndex(m2f, outfile, posMap, jobID);
             if (err)
                 return err;
             UpdatePositionMap(posMap, NULL, pginfo);
@@ -460,4 +476,21 @@ void UpdatePositionMap(QMap <long long, long long> &posMap, QString mapfile,
     }
 }
 
+int BuildKeyframeIndex(MPEG2fixup *m2f, QString &infile,
+                        QMap <long long, long long> &posMap, int jobID)
+{
+    if (jobID < 0 || JobQueue::GetJobCmd(jobID) != JOB_STOP)
+    {
+        if (jobID >= 0)
+            JobQueue::ChangeJobComment(jobID,
+                QString(QObject::tr("Generating Keyframe Index")));
+        int err = m2f->BuildKeyframeIndex(infile, posMap);
+        if (err)
+            return err;
+        if (jobID >= 0)
+            JobQueue::ChangeJobComment(jobID,
+                QString(QObject::tr("Transcode Completed")));
+    }
+    return 0;
+}
 /* vim: set expandtab tabstop=4 shiftwidth=4: */

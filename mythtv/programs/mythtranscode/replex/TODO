@@ -1,0 +1,12 @@
+- check for dvdauthor audio PTS errors
+
+- check/fix/replace broken frames
+
+- split DVD output Files
+
+- use more than one input File
+
+- add cutting option
+
+- better handling of broken streams
+

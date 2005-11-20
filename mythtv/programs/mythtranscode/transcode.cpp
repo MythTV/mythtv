@@ -363,7 +363,9 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             return REENCODE_ERROR;
         }
         vidsetting = profile.byName("videocodec")->getValue();
-        if (vidsetting == "MPEG-2")
+        if (vidsetting == "MPEG-2"
+        //    || vidsetting == "" && encodingType == "MPEG-2"
+           )
         {
             VERBOSE(VB_IMPORTANT, "Transcoding aborted, need MPEG-2.");
             return REENCODE_MPEG2TRANS;

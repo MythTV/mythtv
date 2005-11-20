@@ -1,0 +1,42 @@
+Replex was created to remultiplex transport stream (TS) data taken from a DVB
+source. The result is supposed to be a program stream (PS) that can be
+used to be burned to a DVD (with dvdauthor).
+Replex can also remultiplex other PSs and AVIs with MPEG2 content.
+
+usage: ./replex [options] <input files>
+ 
+options:
+  --help,             -h:  print help message
+  --type,             -t:  set output type (MPEG2, DVD, HDTV)
+  --of,               -o:  set output file
+  --input_stream,     -i:  set input stream type (TS(default), PS, AVI)
+  --audio_pid,        -a:  audio PID for TS stream (also used for PS id)
+  --ac3_id,           -c:  ID of AC3 audio for demux (also used for PS id)
+  --video_pid,        -v:  video PID for TS stream (also used for PS id)
+  --video_delay,      -d:  video delay in ms
+  --audio_delay,      -e:  audio delay in ms
+  --ignore_PTS,       -f:  ignore all PTS information of original
+  --keep_PTS,         -k:  keep and don't correct PTS information of original
+  --demux,            -z:  demux only (-o is basename)
+  --analyze,          -y:  analyze (0=video,1=audio, 2=both)
+  --scan,             -s:  scan for streams  
+  --vdr,              -x:  handle AC3 for vdr input file
+
+A typical call would be
+replex -t DVD -o mynewps.mpg myoldts.ts
+
+Replex can guess the PIDs of your audio and video streams, but
+especially if you have more than one audio stream you should use the
+-v and -a or -c options. The -a and -c options can be used more than
+once to create multiple audio tracks.
+
+The -k option means that replex tries to keep the original PTS spacing,
+which can be helpful in case of corrupt streams. Replex will ignore
+missing frames and just keep the PTS intervals between the frame it
+can find as given by the original file.
+
+The opposite is the -f option, which just ignores all PTS information
+from t]he original and creates the PTS according to the frames that are
+found.
+
+For questions and/or suggestions contact me at mocm@metzlerbros.de. 
