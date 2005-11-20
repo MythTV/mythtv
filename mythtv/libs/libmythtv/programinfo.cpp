@@ -240,8 +240,7 @@ ProgramInfo::~ProgramInfo()
  */
 QString ProgramInfo::MakeUniqueKey(void) const
 {
-    return chanid + "_" + recstartts.toString(Qt::ISODate) + "_" +
-           startts.toString(Qt::ISODate) + "_" +title;
+    return chanid + "_" + recstartts.toString(Qt::ISODate);
 }
 
 #define INT_TO_LIST(x)       sprintf(tmp, "%i", (x)); list << tmp;
@@ -695,7 +694,6 @@ ProgramInfo *ProgramInfo::GetProgramAtDateTime(const QString &channel,
         return p;
 
     // Round endtime up to the next half-hour.
-    QTime endtime = p->endts.time();
     if (p->endts.time().minute() < 30)
         p->endts.setTime(QTime(p->endts.time().hour(), 30));
     else

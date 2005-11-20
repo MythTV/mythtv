@@ -3026,8 +3026,8 @@ ProgramInfo *PlaybackBox::findMatchingProg(QString key)
 
     keyParts = QStringList::split("_", key);
 
-    // ProgramInfo::MakeUniqueKey() has 4 parts separated by '_' characters
-    if (keyParts.count() == 4)
+    // ProgramInfo::MakeUniqueKey() has 2 parts separated by '_' characters
+    if (keyParts.count() == 2)
         return findMatchingProg(keyParts[0], keyParts[1]);
     else
         return NULL;
