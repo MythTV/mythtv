@@ -521,9 +521,8 @@ void ProgramRecPriority::edit(void)
                 progInfo->recTypeRecPriority = rtRecPriors[progInfo->recType];
                 // also set the origRecPriorityData with new recording 
                 // priority so we don't save to db again when we exit
-                QString key = progInfo->MakeUniqueKey(); 
-                origRecPriorityData[key] = progInfo->recpriority;
-
+                origRecPriorityData[progInfo->recordid] = 
+                                                        progInfo->recpriority;
                 // also set the active/inactive state
                 progInfo->recstatus = inactive ? rsInactive : rsWillRecord;
 
@@ -659,7 +658,7 @@ void ProgramRecPriority::saveRecPriority(void)
     for (it = programData.begin(); it != programData.end(); ++it) 
     {
         ProgramRecPriorityInfo *progInfo = &(it.data());
-        QString key = progInfo->MakeUniqueKey(); 
+        int key = progInfo->recordid; 
 
         // if this program's recording priority changed from when we entered
         // save new value out to db
@@ -685,8 +684,7 @@ void ProgramRecPriority::FillList(void)
 
         // save recording priority value in map so we don't have to 
         // save all program's recording priority values when we exit
-        QString key = (*pgiter)->MakeUniqueKey();
-        origRecPriorityData[key] = (*pgiter)->recpriority;
+        origRecPriorityData[(*pgiter)->recordid] = (*pgiter)->recpriority;
 
         delete (*pgiter);
         cnt--;
