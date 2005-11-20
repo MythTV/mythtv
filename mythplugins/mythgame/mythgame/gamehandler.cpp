@@ -394,7 +394,7 @@ void GameHandler::UpdateGameDB(GameHandler *handler)
                 Version = QObject::tr("0");
             }
 
-            if (GameName == "Unknown") 
+            if (GameName == QObject::tr("Unknown")) 
                 GameName = iter.data().GameName();
 
                 // Put the game into the database.
@@ -582,7 +582,7 @@ void GameHandler::buildFileList(QString directory, GameHandler *handler,
 
             m_GameMap[RomName] = GameScan(RomName,Info.filePath(),inFileSystem,
                                  GameName,Info.dirPath());
-//            cout << "Found Rom : (" << handler->SystemName() << ") " << " - " << RomName << endl;
+            cout << "Found Rom : (" << handler->SystemName() << ") " << " - " << RomName << endl;
             *filecount = *filecount + 1;
             pdial->setProgress(*filecount);
 
