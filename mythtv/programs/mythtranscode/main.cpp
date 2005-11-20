@@ -30,29 +30,29 @@ void usage(char *progname)
     cerr << "Usage: " << progname << " <--chanid <channelid>>\n";
     cerr << "\t<--starttime <starttime>> <--profile <profile>>\n";
     cerr << "\t[options]\n\n";
-    cerr << "\t--mpeg2        or -m: Perform MPEG2 to MPEG2 transcode.\n";
-    cerr << "\t--chanid       or -c: Takes a channel id. REQUIRED\n";
-    cerr << "\t--starttime    or -s: Takes a starttime for the\n";
-    cerr << "\t                      recording. REQUIRED\n";
-    cerr << "\t--infile       or -i: Input file (Alternative to -c and -s)\n";
-    cerr << "\t--profile      or -p: Takes a profile number or 'autodetect'\n";
-    cerr << "\t                      recording profile. REQUIRED\n";
-    cerr << "\t--honorcutlist or -l: Specifies whether to use the cutlist.\n";
-    cerr << "\t--allkeys      or -k: Specifies that the output file\n";
-    cerr << "\t                      should be made entirely of keyframes.\n";
-    cerr << "\t--fifodir      or -f: Directory to write fifos to\n";
-    cerr << "\t                      If --fifodir is specified, 'audout' and 'vidout'\n";
-    cerr << "\t                      will be created in the specified directory\n";
-    cerr << "\t--fifosync          : Enforce fifo sync\n";
-    cerr << "\t--buildindex   or -b: Build a new keyframe index\n";
-    cerr << "\t                      (use only if audio and video fifos are read independantly)\n";
-    cerr << "\t--showprogress      : Display status info to the stdout\n";
-    cerr << "\t--help         or -h: Prints this help statement.\n";
+    cerr << "\t--mpeg2          or -m: Perform MPEG2 to MPEG2 transcode.\n";
+    cerr << "\t--chanid         or -c: Takes a channel id. REQUIRED\n";
+    cerr << "\t--starttime      or -s: Takes a starttime for the\n";
+    cerr << "\t                        recording. REQUIRED\n";
+    cerr << "\t--infile         or -i: Input file (Alternative to -c and -s)\n";
+    cerr << "\t--profile        or -p: Takes a profile number or 'autodetect'\n";
+    cerr << "\t                        recording profile. REQUIRED\n";
+    cerr << "\t--honorcutlist   or -l: Specifies whether to use the cutlist.\n";
+    cerr << "\t--allkeys        or -k: Specifies that the output file\n";
+    cerr << "\t                        should be made entirely of keyframes.\n";
+    cerr << "\t--fifodir        or -f: Directory to write fifos to\n";
+    cerr << "\t                        If --fifodir is specified, 'audout' and 'vidout'\n";
+    cerr << "\t                        will be created in the specified directory\n";
+    cerr << "\t--fifosync            : Enforce fifo sync\n";
+    cerr << "\t--buildindex     or -b: Build a new keyframe index\n";
+    cerr << "\t                        (use only if audio and video fifos are read independantly)\n";
+    cerr << "\t--showprogress        : Display status info to the stdout\n";
+    cerr << "\t--verbose level  or -v: Use '-v help' for level info\n";
+    cerr << "\t--help           or -h: Prints this help statement.\n";
 }
 
 int main(int argc, char *argv[])
 {
-    QString verboseString = QString("");
     QString chanid, starttime, infile;
     QString profilename = QString("autodetect");
     QString fifodir = NULL;
@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv, false);
 
     print_verbose_messages = VB_IMPORTANT;
+    verboseString = "important";
 
     //  Load the context
     gContext = NULL;
@@ -162,89 +163,13 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-v") ||
                  !strcmp(a.argv()[argpos],"--verbose"))
         {
-            if (a.argc() > argpos)
+            if (a.argc()-1 > argpos)
             {
-                QString temp = a.argv()[argpos+1];
-                if (temp.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -v/--verbose option\n";
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
                     return TRANSCODE_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    QStringList verboseOpts;
-                    verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
-                    ++argpos;
-                    for (QStringList::Iterator it = verboseOpts.begin(); 
-                         it != verboseOpts.end(); ++it )
-                    {
-                        if (!strcmp(*it,"none"))
-                        {
-                            print_verbose_messages = VB_NONE;
-                            verboseString = "";
-                        }
-                        else if (!strcmp(*it,"all"))
-                        {
-                            print_verbose_messages = VB_ALL;
-                            verboseString = "all";
-                        }
-                        else if (!strcmp(*it,"quiet"))
-                        {
-                            print_verbose_messages = VB_IMPORTANT;
-                            verboseString = "important";
-                        }
-                        else if (!strcmp(*it,"record"))
-                        {
-                            print_verbose_messages |= VB_RECORD;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"playback"))
-                        {
-                            print_verbose_messages |= VB_PLAYBACK;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"channel"))
-                        {
-                            print_verbose_messages |= VB_CHANNEL;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"osd"))
-                        {
-                            print_verbose_messages |= VB_OSD;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"file"))
-                        {
-                            print_verbose_messages |= VB_FILE;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"schedule"))
-                        {
-                            print_verbose_messages |= VB_SCHEDULE;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"network"))
-                         {
-                            print_verbose_messages |= VB_NETWORK;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"jobqueue"))
-                        {
-                            print_verbose_messages |= VB_JOBQUEUE;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"commflag"))
-                        {
-                            print_verbose_messages |= VB_COMMFLAG;
-                            verboseString += " " + *it;
-                        }
-                        else
-                        {
-                            cerr << "Unknown argument for -v/--verbose: "
-                                 << *it << endl;;
-                        }
-                    }
-                }
+
+                ++argpos;
             } else
             {
                 cerr << "Missing argument to -v/--verbose option\n";

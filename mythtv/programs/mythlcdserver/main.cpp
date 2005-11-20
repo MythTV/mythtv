@@ -113,47 +113,11 @@ int main(int argc, char **argv)
         {
             if (a.argc()-1 > argpos)
             {
-                QString temp = a.argv()[argpos+1];
-                if (temp.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -v/--verbose option\n";
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
                     return FRONTEND_EXIT_INVALID_CMDLINE;
-                } 
-                else
-                {
-                    QStringList verboseOpts;
-                    verboseOpts = QStringList::split(',', temp);
-                    ++argpos;
-                    for (QStringList::Iterator it = verboseOpts.begin(); 
-                         it != verboseOpts.end(); ++it )
-                    {
-                        if (!strcmp(*it,"none"))
-                        {
-                            print_verbose_messages = VB_NONE;
-                        }
-                        else if (!strcmp(*it,"all"))
-                        {
-                            print_verbose_messages = VB_ALL;
-                        }
-                        else if (!strcmp(*it,"important"))
-                        {
-                            print_verbose_messages |= VB_IMPORTANT;
-                        }
-                        else if (!strcmp(*it,"general"))
-                        {
-                            print_verbose_messages |= VB_GENERAL;
-                        }
-                        else if (!strcmp(*it,"network"))
-                        {
-                            print_verbose_messages |= VB_NETWORK;
-                        }
-                        else
-                        {
-                            cerr << "Unknown argument for -v/--verbose: "
-                                 << *it << endl;;
-                        }
-                    }
-                }
+
+                ++argpos;
             } 
             else
             {
@@ -215,9 +179,7 @@ int main(int argc, char **argv)
                     "-m or --startupmessage        Message to show at startup" << endl <<
                     "-t or --messagetime           How long to show startup message (default 30 seconds)" << endl << 
                     "-l or --logfile filename      Writes STDERR and STDOUT messages to filename" << endl <<
-                    "-v or --verbose debug-level   Prints more information" << endl <<
-                    "                              Accepts any combination (separated by comma)" << endl << 
-                    "                              of all,none,important,general,network (default important)" << endl <<
+                    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
                     "-x or --debuglevel level      Control how much debug messages to show" << endl <<
                     "                              [number between 0 and 10] (default 0)" << endl;
             return FRONTEND_EXIT_INVALID_CMDLINE;

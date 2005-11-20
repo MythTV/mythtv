@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "mythcontext.h"
+#include "exitcodes.h"
 #include "oldsettings.h"
 #include "themedmenu.h"
 #include "util.h"
@@ -48,6 +49,153 @@ MythContext *gContext = NULL;
 QMutex MythContext::verbose_mutex(true);
 
 int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
+QString verboseString = QString(" important general");
+
+int parse_verbose_arg(QString arg)
+{
+    if (arg.startsWith("-"))
+    {
+        cerr << "Invalid or missing argument to -v/--verbose option\n";
+        return GENERIC_EXIT_INVALID_CMDLINE;
+    }
+    else
+    {
+        QStringList verboseOpts = QStringList::split(',', arg);
+        for (QStringList::Iterator it = verboseOpts.begin(); 
+             it != verboseOpts.end(); ++it )
+        {
+            if (!strcmp(*it,"help"))
+            {
+                QString m_verbose = verboseString;
+                m_verbose.replace(QRegExp(" "), ",");
+                m_verbose.replace(QRegExp("^,"), "");
+                cerr <<
+                  "Verbose debug levels.\n"
+                  "Accepts any combination (separated by comma) of:\n\n"
+                  "  all        - ALL debug output\n"
+                  "  none       - NO debug output\n"
+                  "  important  - Important messages only\n"
+                  "  general    - General messages (not quite so important)\n"
+                  "  record     - Recording related messages\n"
+                  "  playback   - Playback related messages\n"
+                  "  channel    - Channel changing related messages\n"
+                  "  osd        - On-Screen Display related messages\n"
+                  "  file       - File and AutoExpire related messages\n"
+                  "  schedule   - Scheduling related messages\n"
+                  "  network    - Network protocol related messages\n"
+                  "  jobqueue   - JobQueue related messages\n"
+                  "  commflag   - Commercial Flagging related messages\n"
+                  "  audio      - Audio related messages\n"
+                  "  libav      - Enables libav debugging\n"
+                  "  siparser   - Siparser related messages\n"
+                  "  eit        - EIT related messages\n"
+                  "\n"
+                  "The default for this program appears to be: '-v " <<
+                  m_verbose << "'\n\n"
+                  "Most options are additive except for none, all, and important.\n"
+                  "These three are explicit and take precedence over any\n"
+                  "prior options given.  You can however use something like\n"
+                  "'-v none,jobqueue' to get only JobQueue related messages\n"
+                  "and override the default verbosity level\n"
+                  "Some debug levels may not apply to this program\n"
+                  << endl;
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+            else if (!strcmp(*it,"none"))
+            {
+                print_verbose_messages = VB_NONE;
+                verboseString = *it;
+            }
+            else if (!strcmp(*it,"all"))
+            {
+                print_verbose_messages = VB_ALL;
+                verboseString = *it;
+            }
+            else if (!strcmp(*it,"important"))
+            {
+                print_verbose_messages = VB_IMPORTANT;
+                verboseString = *it;
+            }
+            else if (!strcmp(*it,"general"))
+            {
+                print_verbose_messages = VB_GENERAL;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"record"))
+            {
+                print_verbose_messages |= VB_RECORD;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"playback"))
+            {
+                print_verbose_messages |= VB_PLAYBACK;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"channel"))
+            {
+                print_verbose_messages |= VB_CHANNEL;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"osd"))
+            {
+                print_verbose_messages |= VB_OSD;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"file"))
+            {
+                print_verbose_messages |= VB_FILE;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"schedule"))
+            {
+                print_verbose_messages |= VB_SCHEDULE;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"network"))
+            {
+                print_verbose_messages |= VB_NETWORK;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"commflag"))
+            {
+                print_verbose_messages |= VB_COMMFLAG;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"jobqueue"))
+            {
+                print_verbose_messages |= VB_JOBQUEUE;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"audio"))
+            {
+                print_verbose_messages |= VB_AUDIO;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"libav"))
+            {
+                print_verbose_messages |= VB_LIBAV;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"siparser"))
+            {
+                print_verbose_messages |= VB_SIPARSER;
+                verboseString += " " + *it;
+            }
+            else if (!strcmp(*it,"eit"))
+            {
+                print_verbose_messages |= VB_EIT;
+                verboseString += " " + *it;
+            }
+            else
+            {
+                cerr << "Unknown argument for -v/--verbose: "
+                     << *it << endl;;
+            }
+        }
+    }
+
+    return GENERIC_EXIT_OK;
+}
 
 // Verbose helper function for ENO macro
 QString safe_eno_to_string(int errnum)

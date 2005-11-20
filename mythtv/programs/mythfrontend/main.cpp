@@ -787,7 +787,6 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 
     QString logfile = "";
-    QString verboseString = QString(" important general");
 
     QString pluginname = "";
 
@@ -826,91 +825,11 @@ int main(int argc, char **argv)
         {
             if (a.argc()-1 > argpos)
             {
-                QString temp = a.argv()[argpos+1];
-                if (temp.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -v/--verbose option\n";
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
                     return FRONTEND_EXIT_INVALID_CMDLINE;
-                } else
-                {
-                    QStringList verboseOpts;
-                    verboseOpts = QStringList::split(',', temp);
-                    ++argpos;
-                    for (QStringList::Iterator it = verboseOpts.begin(); 
-                         it != verboseOpts.end(); ++it )
-                    {
-                        if (!strcmp(*it,"none"))
-                        {
-                            print_verbose_messages = VB_NONE;
-                            verboseString = "";
-                        }
-                        else if (!strcmp(*it,"all"))
-                        {
-                            print_verbose_messages = VB_ALL;
-                            verboseString = "all";
-                        }
-                        else if (!strcmp(*it,"quiet"))
-                        {
-                            print_verbose_messages = VB_IMPORTANT;
-                            verboseString = "important";
-                        }
-                        else if (!strcmp(*it,"record"))
-                        {
-                            print_verbose_messages |= VB_RECORD;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"playback"))
-                        {
-                            print_verbose_messages |= VB_PLAYBACK;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"channel"))
-                        {
-                            print_verbose_messages |= VB_CHANNEL;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"osd"))
-                        {
-                            print_verbose_messages |= VB_OSD;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"file"))
-                        {
-                            print_verbose_messages |= VB_FILE;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"schedule"))
-                        {
-                            print_verbose_messages |= VB_SCHEDULE;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"network"))
-                        {
-                            print_verbose_messages |= VB_NETWORK;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"commflag"))
-                        {
-                            print_verbose_messages |= VB_COMMFLAG;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"audio"))
-                        {
-                            print_verbose_messages |= VB_AUDIO;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"libav"))
-                        {
-                            print_verbose_messages |= VB_LIBAV;
-                            verboseString += " " + *it;
-                        }
-                        else
-                        {
-                            cerr << "Unknown argument for -v/--verbose: "
-                                 << *it << endl;;
-                        }
-                    }
-                }
+
+                ++argpos;
             } else
             {
                 cerr << "Missing argument to -v/--verbose option\n";
@@ -964,10 +883,8 @@ int main(int argc, char **argv)
                     "-geometry or --geometry WxH    Override window size settings\n" <<
                     "--geometry WxH+X+Y             Override window size and position\n" <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
-                    "-v or --verbose debug-level    Prints more information" << endl <<
-                    "                               Accepts any combination (separated by comma)" << endl << 
-                    "                               of all,none,quiet,record,playback,channel," << endl <<
-                    "                               osd,file,schedule,network,commflag,audio,libav" << endl <<
+                    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
+
                     "--version                      Version information" << endl <<
                     "<plugin>                       Initialize and run this plugin" << endl <<
                     endl <<

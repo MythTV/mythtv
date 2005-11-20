@@ -48,39 +48,11 @@ int main(int argc, char **argv)
         {
             if (a.argc()-1 > argpos)
             {
-                QString temp = a.argv()[argpos+1];
-                if (temp.startsWith("-"))
-                {
-                    cerr << "Invalid or missing argument to -v/--verbose option\n";
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
                     return FRONTEND_EXIT_INVALID_CMDLINE;
-                } 
-                else
-                {
-                    QStringList verboseOpts;
-                    verboseOpts = QStringList::split(',', temp);
-                    ++argpos;
-                    for (QStringList::Iterator it = verboseOpts.begin(); 
-                         it != verboseOpts.end(); ++it )
-                    {
-                        if (!strcmp(*it,"none"))
-                        {
-                            print_verbose_messages = VB_NONE;
-                        }
-                        else if (!strcmp(*it,"all"))
-                        {
-                            print_verbose_messages = VB_ALL;
-                        }
-                        else if (!strcmp(*it,"quiet"))
-                        {
-                            print_verbose_messages = VB_IMPORTANT;
-                        }
-                        else
-                        {
-                            cerr << "Unknown argument for -v/--verbose: "
-                                 << *it << endl;;
-                        }
-                    }
-                }
+
+                ++argpos;
             } 
             else
             {
@@ -97,9 +69,7 @@ int main(int argc, char **argv)
         {
             cerr << "Invalid argument: " << a.argv()[argpos] << endl <<
                     "Valid options are: " << endl <<
-                    "-v or --verbose debug-level    Prints more information" << endl <<
-                    "                               Accepts one of the following" << endl << 
-                    "                               all,none,quiet" << endl <<
+                    "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
                     "-s or --setup                  Run setup for the mythshutdown program" << endl;
             return FRONTEND_EXIT_INVALID_CMDLINE;
         }

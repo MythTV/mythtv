@@ -454,9 +454,8 @@ void showUsage()
   cout << "        32 - Not used\n";
   cout << "        64 - In a daily wakeup/shutdown period\n";
   cout << "       128 - Less than 15 minutes to next wakeup period\n";
-  cout << "-v/--verbose         (shows information messages)\n";
-  cout << "-d/--debug           (shows more debug messages)\n";
-  cout << "-h/--help            (shows this usage)\n";
+  cout << "-v/--verbose debug-level  (Use '-v help' for level info\n";
+  cout << "-h/--help                 (shows this usage)\n";
 }
 
 int main(int argc, char **argv)
@@ -488,17 +487,21 @@ int main(int argc, char **argv)
     //  Check command line arguments
     for (int argpos = 1; argpos < a.argc(); ++argpos)
     {
-        if (!strcmp(a.argv()[argpos],"-d") ||
-            !strcmp(a.argv()[argpos],"--debug"))
-        {
-            // show ALL messages
-            print_verbose_messages |= VB_ALL;
-        }
-        else if (!strcmp(a.argv()[argpos],"-v") ||
+        if (!strcmp(a.argv()[argpos],"-v") ||
             !strcmp(a.argv()[argpos],"--verbose"))
         {
-            // show only IMPORTANT messages
-            print_verbose_messages |= VB_IMPORTANT;
+            if (a.argc()-1 > argpos)
+            {
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+                    return FRONTEND_EXIT_INVALID_CMDLINE;                        
+                ++argpos;
+            } 
+            else
+            {
+                cerr << "Missing argument to -v/--verbose option\n";
+                return FRONTEND_EXIT_INVALID_CMDLINE;
+            }
         }
 
         else if (!strcmp(a.argv()[argpos],"-l") ||

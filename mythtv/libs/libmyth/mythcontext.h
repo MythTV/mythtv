@@ -65,6 +65,10 @@ enum VerboseMask {
 /// This global variable is set at startup with the flags 
 /// of the verbose messages we want to see.
 extern int print_verbose_messages;
+extern QString verboseString;
+
+int parse_verbose_arg(QString arg);
+
 
 /// These are the database logging priorities used for filterig the logs.
 enum LogPriorities
@@ -206,7 +210,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20051119-1"
+#define MYTH_BINARY_VERSION "0.19.20051120-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *

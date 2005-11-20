@@ -114,110 +114,20 @@ int main(int argc, char *argv[])
                 return -1;
             }            
         }
-        else if ((!strcmp(a.argv()[argpos],"-v") ||
-                  !strcmp(a.argv()[argpos],"--verbose")) && (a.argc() <= argpos))
+        else if (!strcmp(a.argv()[argpos],"-v") ||
+                  !strcmp(a.argv()[argpos],"--verbose"))
         {
-            cerr << "Missing argument to -v/--verbose option\n";
-            return BACKEND_EXIT_INVALID_CMDLINE;
-        }
-        else if ((!strcmp(a.argv()[argpos],"-v") ||
-                  !strcmp(a.argv()[argpos],"--verbose")) && (a.argc() > argpos))
-        {
-            QString temp = a.argv()[argpos+1];
-            if (temp.startsWith("-"))
+            if (a.argc()-1 > argpos)
             {
-                cerr << "Invalid or missing argument to -v/--verbose option\n";
-                return BACKEND_EXIT_INVALID_CMDLINE;
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+                    return BACKEND_EXIT_INVALID_CMDLINE;                        
+                ++argpos;
             } 
             else
             {
-                QStringList verboseOpts;
-                verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
-                ++argpos;
-                for (QStringList::Iterator it = verboseOpts.begin(); 
-                     it != verboseOpts.end(); ++it )
-                {
-                    if (!strcmp(*it,"none"))
-                    {
-                        print_verbose_messages = VB_NONE;
-                        verboseString = "";
-                    }
-                    else if (!strcmp(*it,"all"))
-                    {
-                        print_verbose_messages = VB_ALL;
-                        verboseString = "all";
-                    }
-                    else if (!strcmp(*it,"quiet"))
-                    {
-                        print_verbose_messages = VB_IMPORTANT;
-                        verboseString = "important";
-                    }
-                    else if (!strcmp(*it,"record"))
-                    {
-                        print_verbose_messages |= VB_RECORD;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"playback"))
-                    {
-                        print_verbose_messages |= VB_PLAYBACK;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"channel"))
-                    {
-                        print_verbose_messages |= VB_CHANNEL;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"osd"))
-                    {
-                        print_verbose_messages |= VB_OSD;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"file"))
-                    {
-                        print_verbose_messages |= VB_FILE;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"schedule"))
-                    {
-                        print_verbose_messages |= VB_SCHEDULE;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"network"))
-                    {
-                        print_verbose_messages |= VB_NETWORK;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"commflag"))
-                    {
-                        print_verbose_messages |= VB_COMMFLAG;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"jobqueue"))
-                    {
-                        print_verbose_messages |= VB_JOBQUEUE;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"audio"))
-                    {
-                        print_verbose_messages |= VB_AUDIO;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"libav"))
-                    {
-                        print_verbose_messages |= VB_LIBAV;
-                        verboseString += " " + *it;
-                    }
-                    else if (!strcmp(*it,"siparser"))
-                    {
-                        print_verbose_messages |= VB_SIPARSER;
-                        verboseString += " " + *it;
-                    }
-                    else
-                    {
-                        cerr << "Unknown argument for -v/--verbose: "
-                             << *it << endl;;
-                    }
-                }
+                cerr << "Missing argument to -v/--verbose option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
             }
         } 
         else
@@ -233,11 +143,8 @@ int main(int argc, char *argv[])
 #endif          
                  <<"--geometry WxH                 Override window size settings"<<endl
                  <<"-geometry WxH+X+Y              Override window size and position"<<endl
-                 <<"-v or --verbose debug-level    Prints more information\n"
-                 <<"                               Accepts any combination (separated by comma)\n"
-                 <<"                               of all,none,quiet,record,playback,channel,\n"
-                 <<"                               osd,file,schedule,network,commflag,audio,\n"
-                 <<"                               libav,jobqueue"<<endl;
+                 <<"-v or --verbose debug-level    Use '-v help' for level info"<<endl 
+                 <<endl;
             return -1;
         }
     }

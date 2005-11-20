@@ -545,7 +545,6 @@ int main(int argc, char *argv[])
     QString allEnd   = QDateTime::currentDateTime().toString("yyyyMMddhhmmss");
     time_t time_now;
     bool allRecorded = false;
-    QString verboseString = QString("");
     bool queueJobInstead = false;
 
     QFileInfo finfo(a.argv()[0]);
@@ -741,92 +740,13 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos],"-v") ||
                  !strcmp(a.argv()[argpos],"--verbose"))
         {
-            if (a.argc() > argpos)
+            if (a.argc()-1 > argpos)
             {
-                QString temp = a.argv()[argpos+1];
-                if (temp.startsWith("-"))
-                {
-                    VERBOSE(VB_IMPORTANT, "Invalid or missing "
-                            "argument to -v/--verbose option");
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
                     return COMMFLAG_EXIT_INVALID_CMDLINE;
-                }
-                else
-                {
-                    QStringList verboseOpts;
-                    verboseOpts = QStringList::split(',', a.argv()[argpos+1]);
-                    ++argpos;
-                    print_verbose_messages = VB_NONE;
-                    for (QStringList::Iterator it = verboseOpts.begin();
-                         it != verboseOpts.end(); ++it )
-                    {
-                        if (!strcmp(*it,"none"))
-                        {
-                            print_verbose_messages = VB_NONE;
-                            verboseString = "";
-                        }
-                        else if (!strcmp(*it,"all"))
-                        {
-                            print_verbose_messages = VB_ALL;
-                            verboseString = "all";
-                        }
-                        else if (!strcmp(*it,"quiet"))
-                        {
-                            print_verbose_messages = VB_IMPORTANT;
-                            verboseString = "important";
-                        }
-                        else if (!strcmp(*it,"record"))
-                        {
-                            print_verbose_messages |= VB_RECORD;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"playback"))
-                        {
-                            print_verbose_messages |= VB_PLAYBACK;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"channel"))
-                        {
-                            print_verbose_messages |= VB_CHANNEL;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"osd"))
-                        {
-                            print_verbose_messages |= VB_OSD;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"file"))
-                        {
-                            print_verbose_messages |= VB_FILE;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"schedule"))
-                        {
-                            print_verbose_messages |= VB_SCHEDULE;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"network"))
-                        {
-                            print_verbose_messages |= VB_NETWORK;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"jobqueue"))
-                        {
-                            print_verbose_messages |= VB_JOBQUEUE;
-                            verboseString += " " + *it;
-                        }
-                        else if (!strcmp(*it,"commflag"))
-                        {
-                            print_verbose_messages |= VB_COMMFLAG;
-                            verboseString += " " + *it;
-                        }
-                        else
-                        {
-                            VERBOSE(VB_IMPORTANT,
-                                    QString("Unknown argument for -v/"
-                                            "--verbose: %1").arg(*it));
-                        }
-                    }
-                }
+
+                ++argpos;
             }
             else
             {
@@ -847,10 +767,7 @@ int main(int argc, char *argv[])
                     "--sleep                      Give up some CPU time after processing each frame\n"
                     "--rebuild                    Do not flag commercials, just rebuild seektable\n"
                     "--gencutlist                 Copy the commercial skip list to the cutlist\n"
-                    "-v OR --verbose debug-level  Prints more information\n"
-                    "                             Accepts any combination (separated by comma)\n" 
-                    "                             of all,none,quiet,record,playback,\n"
-                    "                             channel,osd,file,schedule,network,commflag\n"
+                    "-v or --verbose debug-level  Use '-v help' for level info\n"
                     "--queue                      Insert flagging job into the JobQueue rather than\n"
                     "                             running flagging in the foreground\n"
                     "--quiet                      Turn OFF display (also causes the program to\n"
