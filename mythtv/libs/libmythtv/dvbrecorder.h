@@ -7,6 +7,7 @@
 #ifndef DVBRECORDER_H
 #define DVBRECORDER_H
 
+// C++ includes
 #include <vector>
 using namespace std;
 
@@ -70,7 +71,8 @@ class DVBRecorder: public DTVRecorder
     void LocalProcessDataTS(const unsigned char *buffer, uint len);
 
     void CloseFilters(void);
-    void OpenFilters(uint16_t pid, ES_Type type, dmx_pes_type_t pes_type);
+    void OpenFilter(uint pid, ES_Type type, dmx_pes_type_t pes_type,
+                    uint mpeg_stream_type);
     bool SetDemuxFilters(void);
     void AutoPID(void);
 
@@ -117,8 +119,7 @@ class DVBRecorder: public DTVRecorder
     QMap<uint,bool> _encrypted_pid;
 
     // locking
-    QMutex          _pid_read_lock;
-    QMutex          _pid_change_lock;
+    QMutex          _pid_lock;
 
     // Statistics
     uint            _continuity_error_count;

@@ -46,6 +46,7 @@
 
 // C++ includes
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 // MythTV includes
@@ -90,8 +91,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       // Input Misc
       _reset_pid_filters(true),
       // Locking
-      _pid_read_lock(true),
-      _pid_change_lock(true),
+      _pid_lock(true),
       // Statistics
       _continuity_error_count(0), _stream_overflow_count(0),
       _bad_packet_count(0)
@@ -101,7 +101,7 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
     bzero(&_polls, sizeof(struct pollfd));
     _polls.fd = _stream_fd;
 
-    _buffer_size = MPEG_TS_PKT_SIZE * 50;
+    _buffer_size = (4*1024*1024 / MPEG_TS_PKT_SIZE) * MPEG_TS_PKT_SIZE;
     _buffer = new unsigned char[_buffer_size];
     bzero(_buffer, _buffer_size);
 }
@@ -157,8 +157,7 @@ void DVBRecorder::SetOptionsFromProfile(RecordingProfile*,
 
 void DVBRecorder::SetPMTObject(const PMTObject *_pmt)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
-    QMutexLocker change_lock(&_pid_change_lock);
+    QMutexLocker change_lock(&_pid_lock);
     VERBOSE(VB_RECORD, LOC + "SetPMTObject()");
     _input_pmt = *_pmt;
 
@@ -228,8 +227,7 @@ void DVBRecorder::Close(void)
 
 void DVBRecorder::CloseFilters(void)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
-    QMutexLocker change_lock(&_pid_change_lock);
+    QMutexLocker change_lock(&_pid_lock);
     for(unsigned int i=0; i<_pid_filters.size(); i++)
         if (_pid_filters[i] >= 0)
             close(_pid_filters[i]);
@@ -247,46 +245,35 @@ void DVBRecorder::CloseFilters(void)
     _ps_rec_pid_ipack.clear();
 }
 
-void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
-                              dmx_pes_type_t pes_type)
+void DVBRecorder::OpenFilter(uint           pid,
+                             ES_Type        type,
+                             dmx_pes_type_t pes_type,
+                             uint           stream_type)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
-    QMutexLocker change_lock(&_pid_change_lock);
-
-    uint msec_of_buffering = POLL_WARNING_TIMEOUT + 50;
-    uint pid_buffer_size = ((19200*msec_of_buffering + 7) / 8);
+    // bits per millisecond
+    uint bpms = (StreamID::IsVideo(stream_type)) ? 19200 : 500;
+    // msec of buffering we want
+    uint msec_of_buffering = max(POLL_WARNING_TIMEOUT + 50, 1500);
+    // actual size of buffer we need
+    uint pid_buffer_size = ((bpms*msec_of_buffering + 7) / 8);
+    // rounded up to the nearest page
     pid_buffer_size = ((pid_buffer_size + 4095) / 4096) * 4096;
 
     VERBOSE(VB_RECORD, LOC + QString("Adding pid 0x%2 size(%3)")
             .arg((int)pid,0,16).arg(pid_buffer_size));
 
-    if (pid < 0x10 || pid > 0x1fff)
-    {
-        VERBOSE(VB_GENERAL, LOC_WARN +
-                QString("PID value (0x%1) ").arg(pid,0,16) +
-                "is outside DVB specification."
-                "\n\t\t\tPerhaps this is an ATSC stream?");
-    }
-
-    struct dmx_pes_filter_params params;
-    memset(&params, 0, sizeof(params));
-    params.input = DMX_IN_FRONTEND;
-    params.output = DMX_OUT_TS_TAP;
-    params.flags = DMX_IMMEDIATE_START;
-    params.pid = pid;
-    params.pes_type = pes_type;
-
+    // Open the demux device
     int fd_tmp = open(dvbdevice(DVB_DEV_DEMUX,_card_number_option), O_RDWR);
-
     if (fd_tmp < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open demux device." + ENO);
         return;
     }
 
-    // Try to make buffer large enough to allow for longish disk writes.
+    // Try to make the demux buffer large enough to
+    // allow for longish disk writes.
     uint sz    = pid_buffer_size;
-    uint usecs = POLL_WARNING_TIMEOUT * 1000;
+    uint usecs = msec_of_buffering * 1000;
     while (ioctl(fd_tmp, DMX_SET_BUFFER_SIZE, sz) < 0 && sz > 1024*8)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to set demux buffer size for "+
@@ -300,6 +287,14 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
             QString("pid 0x%1 to %2,\n\t\t\t which gives us a %3 msec buffer.")
             .arg(pid,0,16).arg(sz).arg(usecs/1000));
 
+    // Set the filter type
+    struct dmx_pes_filter_params params;
+    bzero(&params, sizeof(params));
+    params.input    = DMX_IN_FRONTEND;
+    params.output   = DMX_OUT_TS_TAP;
+    params.flags    = DMX_IMMEDIATE_START;
+    params.pid      = pid;
+    params.pes_type = pes_type;
     if (ioctl(fd_tmp, DMX_SET_PES_FILTER, &params) < 0)
     {
         close(fd_tmp);
@@ -308,62 +303,58 @@ void DVBRecorder::OpenFilters(uint16_t pid, ES_Type type,
         return;
     }
 
+    // Add the file descriptor to the filter list
+    QMutexLocker change_lock(&_pid_lock);
     _pid_filters.push_back(fd_tmp);
 
+    // Initialize continuity count
+    _continuity_count[pid] = -1;
     if (_record_transport_stream_option)
     {
+        //Set the TS->PES converter to NULL
         _ps_rec_pid_ipack[pid] = NULL;
+        return;
     }
-    else
+
+    // If we are in legacy PES mode, initialize TS->PES converter
+    ipack* ip = (ipack*)malloc(sizeof(ipack));
+    assert(ip);
+    switch (type)
     {
-        ipack* ip = (ipack*)malloc(sizeof(ipack));
-        if (ip == NULL)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate ipack.");
-            return;
-        }
+        case ES_TYPE_VIDEO_MPEG1:
+        case ES_TYPE_VIDEO_MPEG2:
+            init_ipack(ip, 2048, ProcessDataPS);
+            ip->replaceid = _ps_rec_video_id++;
+            break;
 
-        switch (type)
-        {
-            case ES_TYPE_VIDEO_MPEG1:
-            case ES_TYPE_VIDEO_MPEG2:
-                init_ipack(ip, 2048, ProcessDataPS);
-                ip->replaceid = _ps_rec_video_id++;
-                break;
+        case ES_TYPE_AUDIO_MPEG1:
+        case ES_TYPE_AUDIO_MPEG2:
+            init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
+            ip->replaceid = _ps_rec_audio_id++;
+            break;
 
-            case ES_TYPE_AUDIO_MPEG1:
-            case ES_TYPE_AUDIO_MPEG2:
-                init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
-                ip->replaceid = _ps_rec_audio_id++;
-                break;
+        case ES_TYPE_AUDIO_AC3:
+            init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
+            ip->priv_type = PRIV_TS_AC3;
+            break;
 
-            case ES_TYPE_AUDIO_AC3:
-                init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
-                ip->priv_type=PRIV_TS_AC3;
-                break;
+        case ES_TYPE_SUBTITLE:
+        case ES_TYPE_TELETEXT:
+            init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
+            ip->priv_type = PRIV_DVB_SUB;
+            break;
 
-            case ES_TYPE_SUBTITLE:
-            case ES_TYPE_TELETEXT:
-                init_ipack(ip, 65535, ProcessDataPS); /* don't repack PES */
-                ip->priv_type=PRIV_DVB_SUB;
-                break;
-
-            default:
-                init_ipack(ip, 2048, ProcessDataPS);
-                break;
-        }
-
-        ip->data = (void*)this;
-        _ps_rec_pid_ipack[pid] = ip;
+        default:
+            init_ipack(ip, 2048, ProcessDataPS);
+            break;
     }
-
-    _continuity_count[pid] = -1;
+    ip->data = (void*)this;
+    _ps_rec_pid_ipack[pid] = ip;
 }
 
 bool DVBRecorder::SetDemuxFilters(void)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
-    QMutexLocker change_lock(&_pid_change_lock);
+    QMutexLocker change_lock(&_pid_lock);
     CloseFilters();
 
     _continuity_count.clear();
@@ -413,7 +404,7 @@ bool DVBRecorder::SetDemuxFilters(void)
         else
             pes_type = DMX_PES_OTHER;
 
-        OpenFilters(pid, (*es).Type, pes_type);
+        OpenFilter(pid, (*es).Type, pes_type, (*es).Orig_Type);
 
         if (_hw_decoder_option)
         {
@@ -422,7 +413,8 @@ bool DVBRecorder::SetDemuxFilters(void)
                 (pid != _input_pmt.PCRPID) &&
                 (_input_pmt.PCRPID != 0))
             {
-                OpenFilters(_input_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_PCR);
+                OpenFilter(_input_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_PCR,
+                            (*es).Orig_Type);
             }
         }
         else if (pid == _input_pmt.PCRPID)
@@ -430,7 +422,8 @@ bool DVBRecorder::SetDemuxFilters(void)
     }
 
     if (!_hw_decoder_option && need_pcr_pid && (_input_pmt.PCRPID != 0))
-        OpenFilters(_input_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_OTHER);
+        OpenFilter(_input_pmt.PCRPID, ES_TYPE_UNKNOWN, DMX_PES_OTHER,
+                    (*es).Orig_Type);
 
 
     if (_pid_filters.size() == 0 && _ps_rec_pid_ipack.size() == 0)
@@ -447,8 +440,7 @@ bool DVBRecorder::SetDemuxFilters(void)
  */
 void DVBRecorder::AutoPID(void)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
-    QMutexLocker change_lock(&_pid_change_lock);
+    QMutexLocker change_lock(&_pid_lock);
     _videoPID.clear();
 
     VERBOSE(VB_RECORD, LOC +
@@ -711,7 +703,7 @@ void DVBRecorder::ReadFromDMX(void)
         int pkts = readsz / MPEG_TS_PKT_SIZE;
         int curpkt = 0;
 
-        _pid_read_lock.lock();
+        _pid_lock.lock();
         while (curpkt < pkts)
         {
             if (data_found == false)
@@ -804,7 +796,7 @@ void DVBRecorder::ReadFromDMX(void)
                                MPEG_TS_PKT_SIZE - 4 - pes_offset, ip);
             }
         }
-        _pid_read_lock.unlock();
+        _pid_lock.unlock();
     }
 }
 
@@ -835,7 +827,7 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
     int pktCnt = _payload_buffer.size() / TSPacket::SIZE;
     _ts_packets_until_psip_sync -= (pktCnt + 1);
     {
-        QMutexLocker read_lock(&_pid_read_lock);
+        QMutexLocker read_lock(&_pid_lock);
         if (_ts_packets_until_psip_sync <= 0 && _pat && _pmt)
         {
             BufferedWrite(*(reinterpret_cast<TSPacket*>(_pat->tsheader())));
@@ -946,8 +938,7 @@ void DVBRecorder::Reset(void)
 
 void DVBRecorder::SetPAT(ProgramAssociationTable *new_pat)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
-    QMutexLocker change_lock(&_pid_change_lock);
+    QMutexLocker change_lock(&_pid_lock);
 
     ProgramAssociationTable *old_pat = _pat;
     _pat = new_pat;
@@ -957,8 +948,7 @@ void DVBRecorder::SetPAT(ProgramAssociationTable *new_pat)
 
 void DVBRecorder::SetPMT(ProgramMapTable *new_pmt)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
-    QMutexLocker change_lock(&_pid_change_lock);
+    QMutexLocker change_lock(&_pid_lock);
 
     ProgramMapTable *old_pmt = _pmt;
     _pmt = new_pmt;
@@ -968,7 +958,7 @@ void DVBRecorder::SetPMT(ProgramMapTable *new_pmt)
 
 void DVBRecorder::CreatePAT(void)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
+    QMutexLocker read_lock(&_pid_lock);
     int next_cc = 0;
     if (_pat)
         next_cc = (_pat->tsheader()->ContinuityCounter() + 1) & 0x0F;
@@ -983,7 +973,7 @@ void DVBRecorder::CreatePAT(void)
 
 void DVBRecorder::CreatePMT(void)
 {
-    QMutexLocker read_lock(&_pid_read_lock);
+    QMutexLocker read_lock(&_pid_lock);
     int pmt_cc = 0;
     if (_pmt)
         pmt_cc = (_pmt->tsheader()->ContinuityCounter() + 1) & 0x0F;
