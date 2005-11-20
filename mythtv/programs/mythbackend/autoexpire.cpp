@@ -31,6 +31,8 @@ using namespace std;
 #include "libmythtv/remoteencoder.h"
 #include "encoderlink.h"
 
+#define LOC QString("AutoExpire: ")
+
 extern AutoExpire *expirer;
 
 /** If calculated desired space for 10 min freq is > SPACE_TOO_BIG_KB
@@ -77,13 +79,13 @@ AutoExpire::~AutoExpire()
         gContext->removeListener(this);
         expire_thread_running = false;
         pthread_kill(expire_thread, SIGALRM); // try to speed up join..
-        VERBOSE(VB_IMPORTANT, "Warning: Stopping auto expire thread "
+        VERBOSE(VB_IMPORTANT, LOC + "Warning: Stopping auto expire thread "
                 "can take several seconds. Please be patient.");
         pthread_join(expire_thread, NULL);
     }
 }
 
-//#define DBG_CALC_PARAM(X) VERBOSE(VB_IMPORTANT, X);
+//#define DBG_CALC_PARAM(X) VERBOSE(VB_IMPORTANT, LOC + X);
 #define DBG_CALC_PARAM(X) 
 
 /** \fn AutoExpire::CalcParams()
@@ -120,9 +122,9 @@ void AutoExpire::CalcParams(vector<EncoderLink*> recs)
             DBG_CALC_PARAM("CalcParams() -- A 2");
             if (beginSize<0 || remoteSize<0 || endSize<0)
             {
-                VERBOSE(VB_IMPORTANT, "AutoExpire:CalcParams(): "
+                VERBOSE(VB_IMPORTANT, LOC + "CalcParams(): "
                         "Error, can not determine free space.");
-                VERBOSE(VB_IMPORTANT, QString("beg: %1 rem: %2 end: %3")
+                VERBOSE(VB_IMPORTANT, QString("    beg: %1 rem: %2 end: %3")
                         .arg(beginSize).arg(remoteSize).arg(endSize));
                 sharing = true; // assume shared disk
             }
@@ -150,8 +152,8 @@ void AutoExpire::CalcParams(vector<EncoderLink*> recs)
     }
     DBG_CALC_PARAM("CalcParams() -- B");
 
-    VERBOSE(VB_IMPORTANT,
-            QString("AutoExpire: Found %1 recorders w/max rate of %1 MiB/min")
+    VERBOSE(VB_IMPORTANT, LOC +
+            QString("Found %1 recorders w/max rate of %1 MiB/min")
             .arg(rec_cnt).arg(totalKBperMin/1024));
 
     // Determine GB needed to account for recordings if autoexpire
@@ -169,7 +171,8 @@ void AutoExpire::CalcParams(vector<EncoderLink*> recs)
     DBG_CALC_PARAM("CalcParams() -- C");
 
     double expireMinGB = expireMinKB/(1024.0*1024.0);
-    VERBOSE(VB_IMPORTANT, QString("AutoExpire: space: %2 GB w/freq: %2 min")
+    VERBOSE(VB_IMPORTANT, LOC +
+            QString("Required Free Space: %2 GB w/freq: %2 min")
             .arg(expireMinGB, 0, 'f', 1).arg(expireFreq));
 
     // lock class and save these parameters.
@@ -289,7 +292,7 @@ void AutoExpire::ExpireShortLiveTV(void)
     if ((availFreeKB = getDiskSpace(record_file_prefix, tKB, uKB)) < 0)
     {
         QString msg = QString("ERROR: Could not calculate free space.");
-        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, LOC + msg);
         gContext->LogEntry("mythbackend", LP_WARNING,
                            "Autoexpire Recording", msg);
     }
@@ -313,13 +316,13 @@ void AutoExpire::ExpireRecordings(void)
     if ((availFreeKB = getDiskSpace(record_file_prefix, tKB, uKB)) < 0)
     {
         QString msg = QString("ERROR: Could not calculate free space.");
-        VERBOSE(VB_IMPORTANT, msg);
+        VERBOSE(VB_IMPORTANT, LOC + msg);
         gContext->LogEntry("mythbackend", LP_WARNING,
                            "Autoexpire Recording", msg);
     }
     else if (((size_t)availFreeKB) < desired_space)
     {
-        VERBOSE(VB_FILE,
+        VERBOSE(VB_FILE, LOC +
                 QString("Running autoexpire, we want %1 MB free, "
                         "but only have %2 MB.")
                 .arg(desired_space/1024).arg(availFreeKB/1024));
@@ -352,7 +355,7 @@ static bool CheckFile(const ProgramInfo *pginfo,
             QString msg =
                 QString("Don't know how to delete %1, "
                         "no hostname.").arg(filename);
-            VERBOSE(VB_IMPORTANT, msg);
+            VERBOSE(VB_IMPORTANT, LOC + msg);
             gContext->LogEntry("mythbackend", LP_WARNING,
                                "Autoexpire Recording", msg); 
         }
@@ -362,7 +365,7 @@ static bool CheckFile(const ProgramInfo *pginfo,
                 QString("ERROR when trying to autoexpire file: %1. "
                         "File doesn't exist.  Database metadata "
                         "will not be removed.").arg(filename);
-            VERBOSE(VB_IMPORTANT, msg);
+            VERBOSE(VB_IMPORTANT, LOC + msg);
             gContext->LogEntry("mythbackend", LP_WARNING,
                                "Autoexpire Recording", msg); 
         }
@@ -375,7 +378,7 @@ static bool CheckFile(const ProgramInfo *pginfo,
             QString("File '%1' is a symlink and does not appear to be on "
                     "the same file system as new recordings. "
                     "Not autoexpiring.").arg(filename);
-        VERBOSE(VB_FILE, msg);
+        VERBOSE(VB_FILE, LOC + msg);
         return false;
     }
     return true;
@@ -397,10 +400,10 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
         if (CheckFile(*it, record_file_prefix, fsid))
         {
             // Print informative message 
-            msg = QString("AutoExpiring: %1 %2 %3 MBytes")
+            msg = QString("Expiring: %1 %2 %3 MBytes")
                 .arg((*it)->title).arg((*it)->startts.toString())
                 .arg((int)((*it)->filesize/1024/1024));
-            VERBOSE(VB_IMPORTANT, msg);
+            VERBOSE(VB_IMPORTANT, LOC + msg);
             gContext->LogEntry("autoexpire", LP_NOTICE,
                                "Expiring Program", msg);                
 
@@ -410,7 +413,8 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
             gContext->dispatch(me);
 
             availFreeKB += ((*it)->filesize/1024); // add size to avail size
-            VERBOSE(VB_FILE, QString("After unlink we will have %1 MB free.")
+            VERBOSE(VB_FILE, LOC +
+                    QString("After unlink we will have %1 MB free.")
                     .arg(availFreeKB/1024));
 
         }
@@ -421,7 +425,7 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
     {
         msg = QString("ERROR when trying to autoexpire files.  "
                       "No recordings available to expire.");
-        VERBOSE(VB_IMPORTANT, msg); 
+        VERBOSE(VB_IMPORTANT, LOC + msg); 
         gContext->LogEntry("mythbackend", LP_WARNING,
                            "Autoexpire Recording", msg);
     }
@@ -447,6 +451,8 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 {
     QMap<QString, int> maxEpisodes;
     QMap<QString, int>::Iterator maxIter;
+    QMap<QString, int> episodeParts;
+    QString episodeKey;
 
     QString fileprefix = gContext->GetFilePrefix();
 
@@ -457,19 +463,25 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
     if (query.exec() && query.isActive() && query.size() > 0)
     {
-        VERBOSE(VB_FILE, QString("Found %1 record profiles using max episode "
-                                 "expiration")
+        VERBOSE(VB_FILE, LOC + QString("Found %1 record profiles using max "
+                                 "episode expiration")
                                  .arg(query.size()));
         while (query.next())
         {
-            VERBOSE(VB_FILE, QString(" - %1").arg(query.value(2).toString()));
+            VERBOSE(VB_FILE, QString("    %1 (%2 for rec id %3)")
+                                     .arg(query.value(2).toString())
+                                     .arg(query.value(1).toInt())
+                                     .arg(query.value(0).toInt()));
             maxEpisodes[query.value(0).toString()] = query.value(1).toInt();
         }
     }
 
+    VERBOSE(VB_FILE, LOC + "Checking episode count for each recording "
+                           "profile using max episodes");
     for (maxIter = maxEpisodes.begin(); maxIter != maxEpisodes.end(); maxIter++)
     {
-        query.prepare("SELECT chanid, starttime, title FROM recorded "
+        query.prepare("SELECT chanid, starttime, title, progstart, progend "
+                      "FROM recorded "
                       "WHERE recordid = :RECID AND preserve = 0 "
                       "AND recgroup <> 'LiveTV' "
                       "ORDER BY starttime DESC;");
@@ -481,29 +493,34 @@ void AutoExpire::ExpireEpisodesOverMax(void)
             continue;
         }
 
-        VERBOSE(VB_FILE, QString("Found %1 episodes in recording profile %2 "
-                                 "using max expiration")
-                                 .arg(query.size())
-                                 .arg(maxIter.key()));
+        VERBOSE(VB_FILE, QString("    Recordid %1 has %2 recordings.")
+                                 .arg(maxIter.key())
+                                 .arg(query.size()));
         if (query.size() > 0)
         {
-            int found = 0;
+            int found = 1;
             while (query.next())
             {
-                found++;
-
                 QString chanid = query.value(0).toString();
                 QDateTime startts = query.value(1).toDateTime();
                 QString title = QString::fromUtf8(query.value(2).toString());
+                QDateTime progstart = query.value(3).toDateTime();
+                QDateTime progend = query.value(4).toDateTime();
 
-                if (!IsInDontExpireSet(chanid, startts) && 
-                    found > maxIter.data())
+                episodeKey = QString("%1_%2_%3")
+                             .arg(chanid)
+                             .arg(progstart.toString(Qt::ISODate))
+                             .arg(progend.toString(Qt::ISODate));
+
+                if ((!IsInDontExpireSet(chanid, startts)) && 
+                    (!episodeParts.contains(episodeKey)) &&
+                    (found > maxIter.data()))
                 {
                     QString msg = QString("Expiring \"%1\" from %2, "
                                           "too many episodes.")
                                           .arg(title)
                                           .arg(startts.toString());
-                    VERBOSE(VB_FILE, msg);
+                    VERBOSE(VB_FILE, QString("    ") + msg);
                     gContext->LogEntry("autoexpire", LP_NOTICE,
                                        "Expired program", msg);
 
@@ -513,6 +530,21 @@ void AutoExpire::ExpireEpisodesOverMax(void)
 
                     MythEvent me(msg);
                     gContext->dispatchNow(me);
+                }
+                else
+                {
+                    // keep track of shows we haven't expired so we can
+                    // make sure we don't expire another part of the same
+                    // episode.
+                    if (episodeParts.contains(episodeKey))
+                    {
+                        episodeParts[episodeKey] = episodeParts[episodeKey] + 1;
+                    }
+                    else
+                    {
+                        episodeParts[episodeKey] = 1;
+                        found++;
+                    }
                 }
             }
         }
@@ -669,7 +701,7 @@ void AutoExpire::FillDBOrdered(int expMethod)
         }
         else
         {
-            VERBOSE(VB_FILE, QString("AutoExpire::FillDBOrdered: Adding chanid "
+            VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Adding chanid "
                                      "%1 @ %2 to expire list")
                                      .arg(proginfo->chanid)
                                      .arg(proginfo->recstartts.toString()));
@@ -759,6 +791,7 @@ void AutoExpire::UpdateDontExpireSet(void)
 
     QDateTime curTime = QDateTime::currentDateTime();
 
+    VERBOSE(VB_FILE, LOC + "Adding Programs to 'Do Not Expire' List");
     while (query.next())
     {
         QString chanid = query.value(0).toString();
@@ -769,8 +802,7 @@ void AutoExpire::UpdateDontExpireSet(void)
         {
             QString key = chanid + startts.toString(Qt::ISODate);
             dont_expire_set.insert(key);
-            VERBOSE(VB_FILE, QString("AutoExpire::UpdateDontExpireSet: Adding "
-                                     "chanid %1 @ %2 to DON'T Expire List")
+            VERBOSE(VB_FILE, QString("    %1 @ %2")
                                      .arg(chanid).arg(startts.toString()));
         }
     }
