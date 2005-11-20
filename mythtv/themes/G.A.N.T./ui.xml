@@ -158,15 +158,14 @@
       </textarea>
     </container>
 
-<container name="jumptochannel">
-<area>20,20,115,25</area>
-<textarea name="channel" draworder="4" align="right">
-<font>info</font>
-<area>0,0,115,25</area>
-<cutdown>no</cutdown>
-</textarea>
-</container>
-
+    <container name="jumptochannel">
+      <area>20,20,115,25</area>
+      <textarea name="channel" draworder="4" align="right">
+        <font>info</font>
+        <area>0,0,115,25</area>
+        <cutdown>no</cutdown>
+      </textarea>
+    </container>
 
   </window>
 
@@ -374,7 +373,7 @@
       <bold>yes</bold>
     </font>
 
-    <font name="conflictfnt" face="Arial">
+    <font name="conflict_font" face="Arial">
       <color>#ffff33</color>
       <size>16</size>
       <size:small>11</size:small>
@@ -471,7 +470,7 @@
       <area>0,39,800,290</area>
       <listarea name="conflictlist" draworder="4">
         <area>20,12,760,265</area>
-        <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
+        <fcnfont name="conflict_font" function="conflictingrecording"></fcnfont>
         <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
@@ -587,7 +586,7 @@
       <bold>yes</bold>
     </font>
 
-    <font name="conflictfnt" face="Arial">
+    <font name="conflict_font" face="Arial">
       <color>#ffff33</color>
       <size>16</size>
       <size:small>11</size:small>
@@ -662,7 +661,7 @@
       <area>0,39,800,290</area>
       <listarea name="conflictlist" draworder="4">
         <area>20,12,760,265</area>
-        <fcnfont name="conflictfnt" function="conflictingrecording"></fcnfont>
+        <fcnfont name="conflict_font" function="conflictingrecording"></fcnfont>
         <fcnfont name="norecordfnt" function="disabledrecording"></fcnfont>
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
@@ -890,6 +889,20 @@
       <bold>yes</bold>
     </font>
 
+    <font name="recording_font" face="Arial">
+      <color>#FF33FF</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
+    <font name="conflict_font" face="Arial">
+      <color>#ffff33</color>
+      <size>16</size>
+      <size:small>11</size:small>
+      <bold>yes</bold>
+    </font>
+
     <font name="currenttitle" face="Arial">
       <color>#ffff33</color>
       <size>18</size>
@@ -980,6 +993,8 @@
         <fcnfont name="active_font" function="active"></fcnfont>
         <fcnfont name="inactive_font" function="inactive"></fcnfont>
         <fcnfont name="record_font" function="record"></fcnfont>
+        <fcnfont name="recording_font" function="recording"></fcnfont>
+        <fcnfont name="conflict_font" function="conflicting"></fcnfont>
         <fcnfont name="active_font" function="selected"></fcnfont>
         <columnpadding>1</columnpadding>
         <column number="1" width="35" context="-1"></column>

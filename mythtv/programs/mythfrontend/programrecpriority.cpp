@@ -776,6 +776,8 @@ void ProgramRecPriority::FillList(void)
     else
         MythContext::DBError("Get program recording priorities query", result);
 
+    conMatch.clear();
+    nowMatch.clear();
     recMatch.clear();
     ProgramList schedList;
     schedList.FromScheduler();
@@ -787,8 +789,15 @@ void ProgramRecPriority::FillList(void)
         if (s->recendts > now)
         {
             listMatch[s->recordid]++;
-            if (s->recstatus == rsWillRecord || s->recstatus == rsRecording)
+            if (s->recstatus == rsConflict)
+                conMatch[s->recordid]++;
+            else if (s->recstatus == rsWillRecord)
                 recMatch[s->recordid]++;
+            else if (s->recstatus == rsRecording)
+            {
+                nowMatch[s->recordid]++;
+                recMatch[s->recordid]++;
+            }
         }
     }
 }
@@ -1040,13 +1049,15 @@ void ProgramRecPriority::updateList(QPainter *p)
                         ltype->SetItemText(cnt, 6, 
                                 QString::number(abs(finalRecPriority)));
 
-                        if (progInfo->recType == kDontRecord ||
-                            progInfo->recstatus == rsInactive)
-                            ltype->EnableForcedFont(cnt, "inactive");
+                        if (conMatch[progInfo->recordid] > 0)
+                            ltype->EnableForcedFont(cnt, "conflicting");
+                        else if (nowMatch[progInfo->recordid] > 0)
+                            ltype->EnableForcedFont(cnt, "recording");
                         else if (recMatch[progInfo->recordid] > 0)
                             ltype->EnableForcedFont(cnt, "record");
-                        // else if (listMatch[progInfo->recordid] < 1)
-                        //    ltype->EnableForcedFont(cnt, "dormant");
+                        else if (progInfo->recType == kDontRecord ||
+                            progInfo->recstatus == rsInactive)
+                            ltype->EnableForcedFont(cnt, "inactive");
 
                         cnt++;
                         listCount++;
