@@ -2960,7 +2960,12 @@ bool fillData(QValueList<Source> &sourcelist)
                 bool download_needed = false;
 
                 if (refresh_all)
+                {
+                    if (!quiet)
+                        cout << "Data Refresh needed because of --refresh-all"
+                             << endl;
                     download_needed = true;
+                }
 
                 QString date(qCurrentDate.addDays(i).toString());
 
@@ -3000,6 +3005,10 @@ bool fillData(QValueList<Source> &sourcelist)
                     if (!query.size() ||
                         (query.next() && query.value(0).toInt() < chancnt * 4))
                     {
+                        if (!quiet)
+                            cout << "Data Refresh needed because not enough "
+                                    "programs on date from 6PM - Midnight" <<
+                                    endl;
                         download_needed = true;
                     }
                 } 
@@ -3028,6 +3037,10 @@ bool fillData(QValueList<Source> &sourcelist)
                         if (query.size() || 
                             (query.next() && query.value(0).toInt() >= 1)) 
                         {
+                            if (!quiet)
+                                cout << "Data Refresh needed because there are "
+                                        "TBA category programs from noon to "
+                                        "midnight." << endl;
                             download_needed = true;
                         }
                     } 
