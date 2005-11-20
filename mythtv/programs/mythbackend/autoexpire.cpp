@@ -616,7 +616,8 @@ void AutoExpire::FillDBOrdered(int expMethod)
                "       title,           subtitle,    description, "
                "       hostname,        channum,     name,        "
                "       callsign,        seriesid,    programid,   "
-               "       recorded.recpriority, progstart, progend "
+               "       recorded.        recpriority, progstart, "
+               "       progend,         filesize "
                "FROM recorded "
                "LEFT JOIN channel ON recorded.chanid = channel.chanid "
                "WHERE %1 "
@@ -660,12 +661,7 @@ void AutoExpire::FillDBOrdered(int expMethod)
 
         proginfo->pathname = proginfo->GetRecordFilename(fileprefix);
 
-        struct stat st;
-        long long size = 0;
-        if (stat(proginfo->pathname.ascii(), &st) == 0)
-            size = st.st_size;
-
-        proginfo->filesize = size;
+        proginfo->filesize = query.value(15).toInt();
 
         if (IsInDontExpireSet(proginfo->chanid, proginfo->recstartts))
         {
