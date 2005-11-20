@@ -96,8 +96,8 @@ int parse_verbose_arg(QString arg)
                   "These three are explicit and take precedence over any\n"
                   "prior options given.  You can however use something like\n"
                   "'-v none,jobqueue' to get only JobQueue related messages\n"
-                  "and override the default verbosity level\n"
-                  "Some debug levels may not apply to this program\n"
+                  "and override the default verbosity level.\n"
+                  "Some debug levels may not apply to this program.\n"
                   << endl;
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
