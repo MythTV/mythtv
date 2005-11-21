@@ -25,6 +25,12 @@ class PreviewGenerator : public QObject
                             const unsigned char *data,
                             uint width, uint height, float aspect);
 
+    static char *GetScreenGrab(const ProgramInfo *pginfo,
+                               const QString &filename, int secondsin,
+                               int &bufferlen,
+                               int &video_width, int &video_height,
+                               float &video_aspect);
+
   signals:
     void previewThreadDone(const QString&);
     void previewReady(const ProgramInfo*);

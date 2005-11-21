@@ -1,12 +1,23 @@
+// C headers
 #include <cmath>
 
+// POSIX headers
+#include <sys/types.h> // for stat
+#include <sys/stat.h>  // for stat
+#include <unistd.h>    // for stat
+
+// Qt headers
 #include <qfileinfo.h>
 #include <qimage.h>
+
+// MythTV headers
+#include "RingBuffer.h"
+#include "NuppelVideoPlayer.h"
 #include "previewgenerator.h"
 #include "tv_rec.h"
 
-#define LOC QString("PreviewGen: ")
-#define LOC_ERR QString("PreviewGen, Error: ")
+#define LOC QString("Preview: ")
+#define LOC_ERR QString("Preview Error: ")
 
 /** \class Preview Generator
  *  \brief This class creates a preview image of a recording.
@@ -198,8 +209,8 @@ void PreviewGenerator::LocalPreviewRun(void)
 
     len = width = height = sz = 0;
     unsigned char *data = (unsigned char*)
-        TVRec::GetScreenGrab(&programInfo, programInfo.pathname, secsin,
-                             sz, width, height, aspect);
+        GetScreenGrab(&programInfo, programInfo.pathname, secsin,
+                      sz, width, height, aspect);
 
     if (SavePreview(programInfo.pathname+".png", data, width, height, aspect))
     {
@@ -245,4 +256,87 @@ void PreviewGenerator::EventSocketRead(void)
         if (!ReadStringList(eventSock, strlist))
             continue;
     }
+}
+
+/** \fn PreviewGenerator::GetScreenGrab(const ProgramInfo*,const QString&,int,int&,int&,int&)
+ *  \brief Returns a PIX_FMT_RGBA32 buffer containg a frame from the video.
+ *
+ *  \param pginfo       Recording to grab from.
+ *  \param filename     File containing recording.
+ *  \param secondsin    Seconds into the video to seek before
+ *                      capturing a frame.
+ *  \param bufferlen    Returns size of buffer returned (in bytes).
+ *  \param video_width  Returns width of frame grabbed.
+ *  \param video_height Returns height of frame grabbed.
+ *  \return Buffer allocated with new containing frame in RGBA32 format if
+ *          successful, NULL otherwise.
+ */
+char *PreviewGenerator::GetScreenGrab(
+    const ProgramInfo *pginfo, const QString &filename, int secondsin,
+    int &bufferlen,
+    int &video_width, int &video_height, float &video_aspect)
+{
+    (void) pginfo;
+    (void) filename;
+    (void) secondsin;
+    (void) bufferlen;
+    (void) video_width;
+    (void) video_height;
+    char *retbuf = NULL;
+    bufferlen = 0;
+#ifdef USING_FRONTEND
+    if (!MSqlQuery::testDBConnection())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer could not connect to DB.");
+        return NULL;
+    }
+
+    // pre-test local files for existence and size. 500 ms speed-up...
+    if (filename.left(1)=="/")
+    {
+        QFileInfo info(filename);
+        bool invalid = !info.exists() || !info.isReadable() || !info.isFile();
+        if (!invalid)
+        {
+            // Check size too, QFileInfo can not handle large files
+            struct stat status;
+            stat(filename.ascii(), &status);
+            // Using off_t requires a lot of 32/64 bit checking.
+            // So just get the size in blocks.
+            unsigned long long bsize = status.st_blksize;
+            unsigned long long nblk  = status.st_blocks;
+            unsigned long long approx_size = nblk * bsize;
+            invalid = (approx_size < 8*1024);
+        }
+        if (invalid)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer file " +
+                    QString("'%1'").arg(filename) + " is not valid.");
+            return NULL;
+        }
+    }
+
+    RingBuffer *rbuf = new RingBuffer(filename, false, false, 0);
+    if (!rbuf->IsOpen())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Previewer could not open file: " +
+                QString("'%1'").arg(filename));
+        delete rbuf;
+        return NULL;
+    }
+
+    NuppelVideoPlayer *nvp = new NuppelVideoPlayer("Preview", pginfo);
+    nvp->SetRingBuffer(rbuf);
+
+    retbuf = nvp->GetScreenGrab(secondsin, bufferlen,
+                                video_width, video_height, video_aspect);
+
+    delete nvp;
+    delete rbuf;
+
+#else // USING_FRONTEND
+    QString msg = "Backend compiled without USING_FRONTEND !!!!";
+    VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
+#endif // USING_FRONTEND
+    return retbuf;
 }

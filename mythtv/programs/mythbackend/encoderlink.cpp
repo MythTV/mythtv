@@ -12,6 +12,7 @@ using namespace std;
 #include "tv.h"
 #include "programinfo.h"
 #include "util.h"
+#include "previewgenerator.h"
 
 /**
  * \class EncoderLink
@@ -874,13 +875,13 @@ char *EncoderLink::GetScreenGrab(const ProgramInfo *pginfo,
                                  int &video_width, int &video_height,
                                  float &video_aspect)
 {
-    if (local && tv)
-        return tv->GetScreenGrab(pginfo, filename, secondsin, bufferlen, 
-                                 video_width, video_height, video_aspect);
-    else if (local)
-        VERBOSE(VB_IMPORTANT, "EncoderLink::GetScreenGrab() -- Error, tv is null");
-    else
-        VERBOSE(VB_IMPORTANT, "Should be local only query: GetScreenGrab");
+    if (local)
+    {
+        return PreviewGenerator::GetScreenGrab(
+            pginfo, filename, secondsin, bufferlen, 
+            video_width, video_height, video_aspect);
+    }
+    VERBOSE(VB_IMPORTANT, "Should be local only query: GetScreenGrab");
     return NULL;
 }
 

@@ -150,12 +150,6 @@ class TVRec : public QObject
     void CancelNextRecording(void) { SetFlags(kFlagCancelNextRecording); }
     ProgramInfo *GetRecording(void);
 
-    static char *GetScreenGrab(const ProgramInfo *pginfo,
-                               const QString &filename, 
-                               int secondsin, int &bufferlen,
-                               int &video_width, int &video_height,
-                               float &video_aspect);
-
     /// \brief Returns true if event loop has not been told to shut down
     bool IsRunning(void)  const { return HasFlags(kFlagRunMainLoop); }
     /// \brief Tells TVRec to stop event loop
