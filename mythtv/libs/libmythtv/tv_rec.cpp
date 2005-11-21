@@ -881,7 +881,7 @@ void TVRec::TeardownRecorder(bool killFile)
     {
         if (!killFile)
         {
-            (new PreviewGenerator(curRecording))->Start();
+            (new PreviewGenerator(curRecording, true))->Start();
             if (autoRunJobs)
                 JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
         }
@@ -1734,7 +1734,7 @@ void TVRec::TeardownSignalMonitor()
 int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
 {
     QString msg = "SetSignalMonitoringRate(%1, %2)";
-    VERBOSE(VB_RECORD, LOC + msg.arg(rate).arg(notifyFrontend));
+    VERBOSE(VB_RECORD, LOC + msg.arg(rate).arg(notifyFrontend) + "-- start");
 
     QMutexLocker lock(&stateChangeLock);
 
@@ -1766,7 +1766,7 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
     // Wait for RingBuffer reset
     while (!HasFlags(kFlagRingBufferReset))
         WaitForEventThreadSleep();
-
+    VERBOSE(VB_RECORD, LOC + msg.arg(rate).arg(notifyFrontend) + " -- end");
     return 1;
 }
 
@@ -2725,6 +2725,7 @@ int TVRec::ChangeHue(bool direction)
 void TVRec::SetChannel(QString name, uint requestType)
 {
     QMutexLocker lock(&stateChangeLock);
+    VERBOSE(VB_RECORD, LOC + "SetChannel()" + " -- begin");
 
     // Detect tuning request type if needed
     if (requestType & kFlagDetect)
@@ -2747,6 +2748,7 @@ void TVRec::SetChannel(QString name, uint requestType)
         while (!HasFlags(kFlagRingBufferReset))
             WaitForEventThreadSleep();
     }
+    VERBOSE(VB_RECORD, LOC + "SetChannel()" + " -- end");
 }
 
 /** \fn TVRec::GetNextProgram(int,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&,QString&)
@@ -3130,12 +3132,15 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     }
 
     bool livetv = request.flags & kFlagLiveTV;
-    if (livetv && !ringBuffer && !CreateLiveTVRingBuffer())
+    bool antadj = request.flags & kFlagAntennaAdjust;
+    if ((livetv || antadj) && !CreateLiveTVRingBuffer())
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to create RingBuffer");
         return;
+    }
 
     // Start dummy recorder for devices capable of signal monitoring.
     bool use_sm = SignalMonitor::IsSupported(genOpt.cardtype);
-    bool antadj = request.flags & kFlagAntennaAdjust;
     if (use_sm && !dummyRecorder && (livetv || antadj))
     {
         bool is_atsc = genOpt.cardtype == "HDTV";
@@ -3157,6 +3162,7 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             dummyRecorder = new DummyDTVRecorder(
                 this, true, ringBuffer, 1920, 1088, 29.97,
                 90, 30000000, false);
+        dummyRecorder->SetRecording(curRecording);
     }
 
     // Start signal monitoring for devices capable of monitoring
@@ -3327,10 +3333,20 @@ static int init_jobs(const ProgramInfo *rec, RecordingProfile &profile,
 void TVRec::TuningNewRecorder(void)
 {
     VERBOSE(VB_RECORD, LOC + "Starting Recorder");
+
+    if (HasFlags(kFlagDummyRecorderRunning))
+    {
+        dummyRecorder->StopRecordingThread();
+        ClearFlags(kFlagDummyRecorderRunning); 
+    }
+
     RecordingProfile profile;
     ProgramInfo *rec = lastTuningRequest.program;
     if (tvchain)
+    {
+        CreateLiveTVRingBuffer();
         rec = tvchain->GetProgramAt(-1);
+    }
 
     load_recording_profile(profile, rec, cardid);
 
@@ -3346,12 +3362,6 @@ void TVRec::TuningNewRecorder(void)
             ClearFlags(kFlagPendingActions);
             goto err_ret;
         }
-    }
-
-    if (HasFlags(kFlagDummyRecorderRunning))
-    {
-        dummyRecorder->StopRecordingThread();
-        ClearFlags(kFlagDummyRecorderRunning); 
     }
 
     if (!ringBuffer)
@@ -3448,13 +3458,14 @@ void TVRec::TuningRestartRecorder(void)
     {
         dummyRecorder->StopRecordingThread();
         ClearFlags(kFlagDummyRecorderRunning);
+        CreateLiveTVRingBuffer();
     }
 
-    // XXX: Is this only called during livetv?  must check
-    if (GetState() == kState_WatchingLiveTV)
-        SwitchLiveTVRingBuffer(true);
-
     recorder->Reset();
+    recorder->SetRingBuffer(ringBuffer);
+    ProgramInfo *progInfo = tvchain->GetProgramAt(-1);
+    recorder->SetRecording(progInfo);
+    delete progInfo;
 
     // Set file descriptor of channel from recorder for V4L
     channel->SetFd(recorder->GetVideoFd());
@@ -3599,19 +3610,12 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
                                                   QDateTime::currentDateTime(),
                                                   true);
 
-    if (!prog)
-    {
-        VERBOSE(VB_IMPORTANT, LOC_ERR + "GetProgramRingBufferForLiveTV()"
-                "\n\t\t\tProgramInfo is NULL.");
-        return false;
-    }
-
     if (prog->recstartts == prog->recendts)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "GetProgramRingBufferForLiveTV()"
-                "\n\t\t\tProgramInfo is invalid.");
-        delete prog;
-        return false;
+                "\n\t\t\tProgramInfo is invalid."
+                "\n" + prog->toString());
+        prog->endts = prog->recendts = prog->recstartts.addSecs(3600);
     }
 
     prog->recstartts = QDateTime::currentDateTime();
@@ -3666,7 +3670,7 @@ bool TVRec::CreateLiveTVRingBuffer(void)
 
     curRecording = pginfo;
     curRecording->MarkAsInUse(true, "recorder");
-    lastTuningRequest.program = curRecording;
+
     return true;
 }
 
@@ -3688,7 +3692,7 @@ void TVRec::SwitchLiveTVRingBuffer(bool discont)
     ProgramInfo *oldinfo = tvchain->GetProgramAt(-1);
     if (oldinfo)
     {
-        (new PreviewGenerator(oldinfo))->Start();
+        (new PreviewGenerator(oldinfo, true))->Start();
         delete oldinfo;
     }
 
