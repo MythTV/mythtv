@@ -95,6 +95,8 @@ class LiveTVChain
     QDateTime m_cur_startts;
 
     int m_switchid;
+    LiveTVChainEntry m_switchentry;
+
     int m_jumppos;
 
     QMutex m_sockLock;

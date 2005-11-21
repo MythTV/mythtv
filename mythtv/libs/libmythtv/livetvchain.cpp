@@ -9,7 +9,7 @@
  *  \brief Keeps track of recordings in a current LiveTV instance
  */
 LiveTVChain::LiveTVChain()
-           : m_id(""), m_maxpos(0), m_curpos(0), m_cur_chanid(""),
+           : m_id(""), m_maxpos(0), m_lock(true), m_curpos(0), m_cur_chanid(""),
              m_switchid(-1), m_jumppos(0)
 {
 }
@@ -154,7 +154,8 @@ void LiveTVChain::DestroyChain(void)
 
 void LiveTVChain::ReloadAll(void)
 {
-    m_lock.lock();
+    QMutexLocker lock(&m_lock);
+    VERBOSE(VB_PLAYBACK, "LiveTVChain::ReloadAll()");
 
     m_chain.clear();
 
@@ -185,11 +186,12 @@ void LiveTVChain::ReloadAll(void)
         }
     }
 
-    m_lock.unlock();
-
     m_curpos = ProgramIsAt(m_cur_chanid, m_cur_startts);
     if (m_curpos < 0)
         m_curpos = 0;
+
+    if (m_switchid >= 0)
+        m_switchid = ProgramIsAt(m_switchentry.chanid, m_switchentry.starttime);
 }
 
 void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
@@ -281,6 +283,8 @@ void LiveTVChain::SetProgram(ProgramInfo *pginfo)
     if (!pginfo)
         return;
 
+    QMutexLocker lock(&m_lock);
+
     m_cur_chanid = pginfo->chanid;
     m_cur_startts = pginfo->recstartts;
 
@@ -295,6 +299,8 @@ bool LiveTVChain::HasNext(void) const
 
 void LiveTVChain::ClearSwitch(void)
 {
+    QMutexLocker lock(&m_lock);
+
     m_switchid = -1;
     m_jumppos = 0;
 }
@@ -311,6 +317,8 @@ void LiveTVChain::ClearSwitch(void)
  */
 ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
 {
+    QMutexLocker lock(&m_lock);
+
     if (m_switchid < 0 || m_curpos == m_switchid)
         return NULL;
 
@@ -352,6 +360,8 @@ ProgramInfo *LiveTVChain::GetSwitchProgram(bool &discont, bool &newtype)
  */
 void LiveTVChain::SwitchTo(int num)
 {
+    QMutexLocker lock(&m_lock);
+
     VERBOSE(VB_PLAYBACK, "LiveTVChain::SwitchTo("<<num<<")");
 
     int size = m_chain.count();
@@ -359,7 +369,12 @@ void LiveTVChain::SwitchTo(int num)
         num = size - 1;
 
     if (m_curpos != num)
+    {
         m_switchid = num;
+        GetEntryAt(num, m_switchentry);
+    }
+    else
+        VERBOSE(VB_IMPORTANT, "LiveTVChain::SwitchTo() not switching to current");   
 
     if (print_verbose_messages & VB_PLAYBACK)
     {

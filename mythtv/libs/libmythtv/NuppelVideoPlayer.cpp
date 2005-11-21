@@ -2177,17 +2177,6 @@ void NuppelVideoPlayer::StartPlaying(void)
                 JumpToProgram();
         }
 
-        if (eof)
-        {
-            if (livetvchain)
-            {
-                livetvchain->JumpToNext(true, 1);
-                continue;
-            }
-            else
-                break;
-        }
-
         if (nvr_enc && nvr_enc->GetErrorStatus())
         {
             errored = killplayer = true;
@@ -2203,12 +2192,29 @@ void NuppelVideoPlayer::StartPlaying(void)
             //cout << "changing speed to " << play_speed << endl;
 
             if (play_speed == 0.0)
+            {
                 DoPause();
+                decoderThreadPaused.wakeAll();
+            }
             else
                 DoPlay();
 
             decoder_lock.unlock();
             continue;
+        }
+
+        if (eof)
+        {
+            if (livetvchain)
+            {
+                if (!paused)
+                {
+                    livetvchain->JumpToNext(true, 1);
+                    continue;
+                }
+            }
+            else
+                break;
         }
 
         if (rewindtime < 0)
