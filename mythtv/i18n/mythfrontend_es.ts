@@ -394,12 +394,12 @@
 <context>
     <name>DVBConfigurationGroup</name>
     <message>
-        <source>DisEqC</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Recording Options</source>
         <translation>Opciones Grabación</translation>
+    </message>
+    <message>
+        <source>DiSEqC</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -458,12 +458,6 @@
         <source>Fetching lineups from the Myth Plus service...</source>
         <translation type="unfinished">Cargando programación desde servicio Myth Plus...</translation>
     </message>
-</context>
-<context>
-    <name>EITOnly_config</name>
-</context>
-<context>
-    <name>IgnoreSignalTimeout</name>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -1093,48 +1087,99 @@ Returning to the previous menu.</source>
         <source>Subtitle</source>
         <translation>Subtítulo</translation>
     </message>
+    <message>
+        <source>Recording is in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
     <message>
         <source>Previously Recorded</source>
-        <translation>Grabados Anteriormente</translation>
+        <translation type="obsolete">Grabados Anteriormente</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
-        <translation>Seleccione Orden</translation>
+        <translation type="obsolete">Seleccione Orden</translation>
     </message>
     <message>
         <source>Sort by Title</source>
-        <translation>Orden por Título</translation>
+        <translation type="obsolete">Orden por Título</translation>
     </message>
     <message>
         <source>Reverse Title</source>
-        <translation>Título (al revés)</translation>
+        <translation type="obsolete">Título (al revés)</translation>
     </message>
     <message>
         <source>Sort by Time</source>
-        <translation>Orden por Tiempo</translation>
+        <translation type="obsolete">Orden por Tiempo</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation>Tiempo (al revés)</translation>
+        <translation type="obsolete">Tiempo (al revés)</translation>
     </message>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation>NOTA: borrar elementos de esta lista no borrará ninguna grabación.</translation>
+        <translation type="obsolete">NOTA: borrar elementos de esta lista no borrará ninguna grabación.</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation>Mantener este episodio en la lista</translation>
+        <translation type="obsolete">Mantener este episodio en la lista</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation>Borrar este episodio de la lista</translation>
+        <translation type="obsolete">Borrar este episodio de la lista</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation>Borrar todos los episodios de la lista</translation>
+        <translation type="obsolete">Borrar todos los episodios de la lista</translation>
+    </message>
+</context>
+<context>
+    <name>PreviousList</name>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Sort Order</source>
+        <translation type="unfinished">Seleccione Orden</translation>
+    </message>
+    <message>
+        <source>Sort by Time</source>
+        <translation type="unfinished">Orden por Tiempo</translation>
+    </message>
+    <message>
+        <source>Reverse Time</source>
+        <translation type="unfinished">Tiempo (al revés)</translation>
+    </message>
+    <message>
+        <source>Sort by Title</source>
+        <translation type="unfinished">Orden por Título</translation>
+    </message>
+    <message>
+        <source>Reverse Title</source>
+        <translation type="unfinished">Título (al revés)</translation>
+    </message>
+    <message>
+        <source>NOTE: removing items from this list will not delete any recordings.</source>
+        <translation type="unfinished">NOTA: borrar elementos de esta lista no borrará ninguna grabación.</translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation type="unfinished">Mantener este episodio en la lista</translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation type="unfinished">Borrar este episodio de la lista</translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation type="unfinished">Borrar todos los episodios de la lista</translation>
     </message>
 </context>
 <context>
@@ -2982,11 +3027,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Per PID driver buffer size</source>
-        <translation>Tamaño del buffer por controlador PID</translation>
+        <translation type="obsolete">Tamaño del buffer por controlador PID</translation>
     </message>
     <message>
         <source>Packet buffer</source>
-        <translation>Buffer de paquetes</translation>
+        <translation type="obsolete">Buffer de paquetes</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3090,11 +3135,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Directory to hold the Live-TV buffers</source>
-        <translation>Directorio donde se guardarán los buffers de TV</translation>
+        <translation type="obsolete">Directorio donde se guardarán los buffers de TV</translation>
     </message>
     <message>
         <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation>Todos los buffers de TV serán almacenados en este directorio. Estos buffers son usados para permitirle pausar, avanzar y rebobinar la TV.</translation>
+        <translation type="obsolete">Todos los buffers de TV serán almacenados en este directorio. Estos buffers son usados para permitirle pausar, avanzar y rebobinar la TV.</translation>
     </message>
     <message>
         <source>TV format</source>
@@ -3118,19 +3163,19 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Live TV buffer (GB)</source>
-        <translation>Buffer de TV (GB)</translation>
+        <translation type="obsolete">Buffer de TV (GB)</translation>
     </message>
     <message>
         <source>How large the live TV buffer is allowed to grow.</source>
-        <translation>Cuanto se le permite crecer al buffer de TV.</translation>
+        <translation type="obsolete">Cuanto se le permite crecer al buffer de TV.</translation>
     </message>
     <message>
         <source>Minimum free Live TV buffer (MB)</source>
-        <translation>Tamaño mínimo libre para el buffer TV (MB)</translation>
+        <translation type="obsolete">Tamaño mínimo libre para el buffer TV (MB)</translation>
     </message>
     <message>
         <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation>Cuanto se puede llenar el buffer de TV hasta que se fuerce un despausado</translation>
+        <translation type="obsolete">Cuanto se puede llenar el buffer de TV hasta que se fuerce un despausado</translation>
     </message>
     <message>
         <source>Save original files after transcoding</source>
@@ -3258,7 +3303,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>Enable channel change buffer warnings</source>
-        <translation>Activar avisos del buffer ante cambios de canal</translation>
+        <translation type="obsolete">Activar avisos del buffer ante cambios de canal</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3322,11 +3367,11 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
-        <translation>%1 detrás  --  %2 lleno</translation>
+        <translation type="obsolete">%1 detrás  --  %2 lleno</translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation>%1 detrás</translation>
+        <translation type="obsolete">%1 detrás</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -4105,7 +4150,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation>Si está activado, MythTV le avisará cuando cambie de canal pero no haya llegado a la emisión real de TV.</translation>
+        <translation type="obsolete">Si está activado, MythTV le avisará cuando cambie de canal pero no haya llegado a la emisión real de TV.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -5312,18 +5357,6 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     <message>
         <source>If set, only free to air channels will be used.</source>
         <translation>Si está activado, sólo se usarán canales sin encriptar.</translation>
-    </message>
-    <message>
-        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Diseqc Options</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>All</source>
@@ -6568,15 +6601,15 @@ Myth saldrá ahora.</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
-        <translation>Tiempo máximo que MythTV esperará por una señal al buscar canales, o cuando se comience a grabar. Esto ajusta el tiempo en el que una grabación será abandonada, vea Interrupción Canal para ese valor.</translation>
+        <translation type="obsolete">Tiempo máximo que MythTV esperará por una señal al buscar canales, o cuando se comience a grabar. Esto ajusta el tiempo en el que una grabación será abandonada, vea Interrupción Canal para ese valor.</translation>
     </message>
     <message>
         <source>Channel Timeout (msec)</source>
-        <translation>Interrupción Canal (mseg)</translation>
+        <translation type="obsolete">Interrupción Canal (mseg)</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
-        <translation>Tiempo máximo que MythTV esperará por un canal para finalizar la sintonización antes de abandonar una grabación programada o mostrar una advertencia en LiveTV.</translation>
+        <translation type="obsolete">Tiempo máximo que MythTV esperará por un canal para finalizar la sintonización antes de abandonar una grabación programada o mostrar una advertencia en LiveTV.</translation>
     </message>
     <message>
         <source>Store recordings in TS format.</source>
@@ -7015,38 +7048,6 @@ Myth saldrá ahora.</translation>
         <translation>Permite usar un teclado virtual en las cajas de edición de Myth.  Para usar, pulse OK/Seleccionar cuando tenga el foco una caja de edición.</translation>
     </message>
     <message>
-        <source>Period 1 Start Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 1 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 1 End Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 1 end time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 Start Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 End Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 end time. Set both Start &amp; End times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Automatically Start Myth Frontend</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7258,6 +7259,104 @@ Myth saldrá ahora.</translation>
         <source>Use only the transmitted guide data.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>UDP Notify OSD time-out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active for UDP Notify events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for any signal when scanning for channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for a channel lock when scanning for channels. Or, for issuing a warning in LiveTV mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Cartesian latitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use negative numbers for southern and western coordinates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Cartesian longitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>start time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set both Start &amp; End times to 00:00 to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>end time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flagging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding</source>
+        <translation type="unfinished">Trascodificación</translation>
+    </message>
+    <message>
+        <source>PIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List previous episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview schedule changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording is currently in use by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> The following programs will be recorded instead:
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7371,6 +7470,17 @@ Myth saldrá ahora.</translation>
     <message>
         <source>or later</source>
         <translation>o después</translation>
+    </message>
+</context>
+<context>
+    <name>StartingChannel</name>
+    <message>
+        <source>DB Error, see console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please add channels to this source</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7652,11 +7762,11 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation>Está antes del tiempo real. Si cambia canales ahora, perderá video aún no visto.</translation>
+        <translation type="obsolete">Está antes del tiempo real. Si cambia canales ahora, perderá video aún no visto.</translation>
     </message>
     <message>
         <source>Change the channel anyway</source>
-        <translation>Cambiar el canal de todos modos</translation>
+        <translation type="obsolete">Cambiar el canal de todos modos</translation>
     </message>
     <message>
         <source>Zoom Mode OFF</source>
@@ -7944,7 +8054,7 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation>Grabación Manual</translation>
+        <translation type="obsolete">Grabación Manual</translation>
     </message>
     <message>
         <source>Previous Recording</source>
@@ -7984,10 +8094,10 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Reactivate</source>
-        <translation type="unfinished">Reactivar</translation>
+        <translation type="obsolete">Reactivar</translation>
     </message>
     <message>
-        <source>Use guide cancel</source>
+        <source>Cancel Record</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8182,6 +8292,13 @@ Sin más detalles</translation>
     </message>
 </context>
 <context>
+    <name>ViewScheduleDiff</name>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Todos</translation>
+    </message>
+</context>
+<context>
     <name>ViewScheduled</name>
     <message>
         <source>Time Conflict</source>
@@ -8264,10 +8381,6 @@ Sin más detalles</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MythTV is idle and will shutdown shortly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>MythTV is idle.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8309,6 +8422,10 @@ Sin más detalles</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown in %1 seconds.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

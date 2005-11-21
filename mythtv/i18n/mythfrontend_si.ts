@@ -394,12 +394,12 @@
 <context>
     <name>DVBConfigurationGroup</name>
     <message>
-        <source>DisEqC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recording Options</source>
         <translation type="unfinished">Snemalne možnosti</translation>
+    </message>
+    <message>
+        <source>DiSEqC</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -458,12 +458,6 @@
         <source>Fetching lineups from the Myth Plus service...</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>EITOnly_config</name>
-</context>
-<context>
-    <name>IgnoreSignalTimeout</name>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -1143,48 +1137,99 @@ Returning to the previous menu.</source>
         <source>Subtitle</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recording is in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
     <message>
         <source>Previously Recorded</source>
-        <translation>Že posneto</translation>
+        <translation type="obsolete">Že posneto</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
-        <translation>Izberite vrstni red urejanja</translation>
+        <translation type="obsolete">Izberite vrstni red urejanja</translation>
     </message>
     <message>
         <source>Sort by Title</source>
-        <translation>Uredi po naslovu</translation>
+        <translation type="obsolete">Uredi po naslovu</translation>
     </message>
     <message>
         <source>Reverse Title</source>
-        <translation>Obraten vrstni red naslovov</translation>
+        <translation type="obsolete">Obraten vrstni red naslovov</translation>
     </message>
     <message>
         <source>Sort by Time</source>
-        <translation>Uredi po času</translation>
+        <translation type="obsolete">Uredi po času</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation>Obraten vrstni red časov</translation>
+        <translation type="obsolete">Obraten vrstni red časov</translation>
     </message>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation>OPOZORILO: odstranjevanje teh stvari iz seznama ne bo izbrisalo nobenega posnetka.</translation>
+        <translation type="obsolete">OPOZORILO: odstranjevanje teh stvari iz seznama ne bo izbrisalo nobenega posnetka.</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation>Obdrži to serijo v seznamu</translation>
+        <translation type="obsolete">Obdrži to serijo v seznamu</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation>Odstrani to serijo iz seznama</translation>
+        <translation type="obsolete">Odstrani to serijo iz seznama</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation>Odstrani vse serije tega naslova</translation>
+        <translation type="obsolete">Odstrani vse serije tega naslova</translation>
+    </message>
+</context>
+<context>
+    <name>PreviousList</name>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Že posneto</translation>
+    </message>
+    <message>
+        <source>Select Sort Order</source>
+        <translation type="unfinished">Izberite vrstni red urejanja</translation>
+    </message>
+    <message>
+        <source>Sort by Time</source>
+        <translation type="unfinished">Uredi po času</translation>
+    </message>
+    <message>
+        <source>Reverse Time</source>
+        <translation type="unfinished">Obraten vrstni red časov</translation>
+    </message>
+    <message>
+        <source>Sort by Title</source>
+        <translation type="unfinished">Uredi po naslovu</translation>
+    </message>
+    <message>
+        <source>Reverse Title</source>
+        <translation type="unfinished">Obraten vrstni red naslovov</translation>
+    </message>
+    <message>
+        <source>NOTE: removing items from this list will not delete any recordings.</source>
+        <translation type="unfinished">OPOZORILO: odstranjevanje teh stvari iz seznama ne bo izbrisalo nobenega posnetka.</translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation type="unfinished">Obdrži to serijo v seznamu</translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation type="unfinished">Odstrani to serijo iz seznama</translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation type="unfinished">Odstrani vse serije tega naslova</translation>
     </message>
 </context>
 <context>
@@ -1840,11 +1885,11 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
-        <translation>%1 za  --  %2 polno</translation>
+        <translation type="obsolete">%1 za  --  %2 polno</translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation>%1 za</translation>
+        <translation type="obsolete">%1 za</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -2744,11 +2789,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Per PID driver buffer size</source>
-        <translation>Velikost PID predpomnilnika</translation>
+        <translation type="obsolete">Velikost PID predpomnilnika</translation>
     </message>
     <message>
         <source>Packet buffer</source>
-        <translation>Paketni predpomnilnik</translation>
+        <translation type="obsolete">Paketni predpomnilnik</translation>
     </message>
     <message>
         <source>Capture Card Setup</source>
@@ -3470,11 +3515,11 @@ Your grabber does not provide channel numbers, so you have to set them manually.
     </message>
     <message>
         <source>Enable channel change buffer warnings</source>
-        <translation>Omogoči opozorila spremembe kanala</translation>
+        <translation type="obsolete">Omogoči opozorila spremembe kanala</translation>
     </message>
     <message>
         <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation>Če omogočeno, vas bo MythTV opozoril kadarkoli boste spremenili kanal.</translation>
+        <translation type="obsolete">Če omogočeno, vas bo MythTV opozoril kadarkoli boste spremenili kanal.</translation>
     </message>
     <message>
         <source>UDP Notify Port</source>
@@ -4720,11 +4765,11 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Directory to hold the Live-TV buffers</source>
-        <translation>Mapa za medpolnilnik žive TV</translation>
+        <translation type="obsolete">Mapa za medpolnilnik žive TV</translation>
     </message>
     <message>
         <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation>Vsi medpolnilniki žive TV bodo shranjeni v tej mapi. Ti medpolnilniki se uporabljajo za pavzo, hitro previjanje žive TV naprej in nazaj.</translation>
+        <translation type="obsolete">Vsi medpolnilniki žive TV bodo shranjeni v tej mapi. Ti medpolnilniki se uporabljajo za pavzo, hitro previjanje žive TV naprej in nazaj.</translation>
     </message>
     <message>
         <source>TV format</source>
@@ -4748,19 +4793,19 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>Live TV buffer (GB)</source>
-        <translation>Medpolnilnik žive TV (Gb)</translation>
+        <translation type="obsolete">Medpolnilnik žive TV (Gb)</translation>
     </message>
     <message>
         <source>How large the live TV buffer is allowed to grow.</source>
-        <translation>Na kolikšno vrednost lahko medpolnilnik žive TV zraste.</translation>
+        <translation type="obsolete">Na kolikšno vrednost lahko medpolnilnik žive TV zraste.</translation>
     </message>
     <message>
         <source>Minimum free Live TV buffer (MB)</source>
-        <translation>Minimalni prosti medpolnilnik žive TV (Mb)</translation>
+        <translation type="obsolete">Minimalni prosti medpolnilnik žive TV (Mb)</translation>
     </message>
     <message>
         <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation>Kako poln je lako medpolnilnik žive TV, preden se predvajanje žive TV nadaljuje.</translation>
+        <translation type="obsolete">Kako poln je lako medpolnilnik žive TV, preden se predvajanje žive TV nadaljuje.</translation>
     </message>
     <message>
         <source>Save original files after transcoding</source>
@@ -5650,15 +5695,15 @@ Myth se bo končal.</translation>
     </message>
     <message>
         <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
-        <translation>Zemljepisna širina vašega satelitskega krožnika na zemlji.  Uporabljeno za DiSEqC podporo.  Format 35.78 za 35.78 stopinj severne zemljepisne širine</translation>
+        <translation type="obsolete">Zemljepisna širina vašega satelitskega krožnika na zemlji.  Uporabljeno za DiSEqC podporo.  Format 35.78 za 35.78 stopinj severne zemljepisne širine</translation>
     </message>
     <message>
         <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
-        <translation>Zemljepisna dolžina vašega satelitskega krožnika na zemlji.  Uporabljeno za DiSEqC podporo.  Format -78.93 za 78.93 stopinj severne zemljepisne dolžine</translation>
+        <translation type="obsolete">Zemljepisna dolžina vašega satelitskega krožnika na zemlji.  Uporabljeno za DiSEqC podporo.  Format -78.93 za 78.93 stopinj severne zemljepisne dolžine</translation>
     </message>
     <message>
         <source>Diseqc Options</source>
-        <translation>DiSEqC Možnosti</translation>
+        <translation type="obsolete">DiSEqC Možnosti</translation>
     </message>
     <message>
         <source>All</source>
@@ -6921,18 +6966,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel Timeout (msec)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Store recordings in TS format.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7369,38 +7402,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Period 1 Start Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 1 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 1 End Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 1 end time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 Start Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 End Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 end time. Set both Start &amp; End times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Automatically Start Myth Frontend</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7536,6 +7537,104 @@ Myth will now exit.</source>
         <source>Use only the transmitted guide data.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>UDP Notify OSD time-out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active for UDP Notify events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for any signal when scanning for channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for a channel lock when scanning for channels. Or, for issuing a warning in LiveTV mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Cartesian latitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use negative numbers for southern and western coordinates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Cartesian longitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>start time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set both Start &amp; End times to 00:00 to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>end time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flagging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding</source>
+        <translation type="unfinished">Transkodiranje</translation>
+    </message>
+    <message>
+        <source>PIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List previous episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview schedule changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording is currently in use by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> The following programs will be recorded instead:
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7668,6 +7767,17 @@ Myth will now exit.</source>
     <message>
         <source>or later</source>
         <translation>ali pozneje</translation>
+    </message>
+</context>
+<context>
+    <name>StartingChannel</name>
+    <message>
+        <source>DB Error, see console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please add channels to this source</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7869,11 +7979,11 @@ Ni ostalih podatkov</translation>
     </message>
     <message>
         <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation>TRenutno ste za realnim časom. Če sedaj spremenite kanale, boste izgubili vse negledane videe.</translation>
+        <translation type="obsolete">TRenutno ste za realnim časom. Če sedaj spremenite kanale, boste izgubili vse negledane videe.</translation>
     </message>
     <message>
         <source>Change the channel anyway</source>
-        <translation>Vseeno spremeni kanal</translation>
+        <translation type="obsolete">Vseeno spremeni kanal</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -8237,7 +8347,7 @@ Ni ostalih podatkov</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation type="unfinished">Ročno snemanje</translation>
+        <translation type="obsolete">Ročno snemanje</translation>
     </message>
     <message>
         <source>Previous Recording</source>
@@ -8277,10 +8387,10 @@ Ni ostalih podatkov</translation>
     </message>
     <message>
         <source>Reactivate</source>
-        <translation type="unfinished">Ponovna aktivacija</translation>
+        <translation type="obsolete">Ponovna aktivacija</translation>
     </message>
     <message>
-        <source>Use guide cancel</source>
+        <source>Cancel Record</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8475,6 +8585,13 @@ Ni ostalih podatkov</translation>
     </message>
 </context>
 <context>
+    <name>ViewScheduleDiff</name>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Vsi</translation>
+    </message>
+</context>
+<context>
     <name>ViewScheduled</name>
     <message>
         <source>Time Conflict</source>
@@ -8557,10 +8674,6 @@ Ni ostalih podatkov</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MythTV is idle and will shutdown shortly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>MythTV is idle.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8602,6 +8715,10 @@ Ni ostalih podatkov</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown in %1 seconds.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

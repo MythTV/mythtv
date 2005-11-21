@@ -395,12 +395,12 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
 <context>
     <name>DVBConfigurationGroup</name>
     <message>
-        <source>DisEqC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recording Options</source>
         <translation type="unfinished">Opname Opties</translation>
+    </message>
+    <message>
+        <source>DiSEqC</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -459,12 +459,6 @@ Het volgende scherm zal leeg zijn. Ga terug om het menu opnieuw weer te geven.</
         <source>Fetching lineups from the Myth Plus service...</source>
         <translation type="unfinished">Ophalen van data van de Myth Plus service...</translation>
     </message>
-</context>
-<context>
-    <name>EITOnly_config</name>
-</context>
-<context>
-    <name>IgnoreSignalTimeout</name>
 </context>
 <context>
     <name>InfoDialog</name>
@@ -1150,48 +1144,99 @@ Terug naar het vorige menu.</translation>
         <source>Subtitle</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Recording is in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
     <message>
         <source>Previously Recorded</source>
-        <translation>Eerder Opgenomen</translation>
+        <translation type="obsolete">Eerder Opgenomen</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
-        <translation>Selecteer Sorteervolgorde</translation>
+        <translation type="obsolete">Selecteer Sorteervolgorde</translation>
     </message>
     <message>
         <source>Sort by Title</source>
-        <translation>Sorteren op Titels</translation>
+        <translation type="obsolete">Sorteren op Titels</translation>
     </message>
     <message>
         <source>Reverse Title</source>
-        <translation>Titels Omgekeerd</translation>
+        <translation type="obsolete">Titels Omgekeerd</translation>
     </message>
     <message>
         <source>Sort by Time</source>
-        <translation>Sorteren op Tijd</translation>
+        <translation type="obsolete">Sorteren op Tijd</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation>Tijd Omgekeerd</translation>
+        <translation type="obsolete">Tijd Omgekeerd</translation>
     </message>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation>OPMERKING: items uit deze lijst weghalen zal geen opnames wissen.</translation>
+        <translation type="obsolete">OPMERKING: items uit deze lijst weghalen zal geen opnames wissen.</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation>Behoud deze aflevering in de lijst</translation>
+        <translation type="obsolete">Behoud deze aflevering in de lijst</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation>Verwijder deze aflevering uit de lijst</translation>
+        <translation type="obsolete">Verwijder deze aflevering uit de lijst</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation>Verwijder alle afleveringen uit de lijst</translation>
+        <translation type="obsolete">Verwijder alle afleveringen uit de lijst</translation>
+    </message>
+</context>
+<context>
+    <name>PreviousList</name>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished">Eerder Opgenomen</translation>
+    </message>
+    <message>
+        <source>Select Sort Order</source>
+        <translation type="unfinished">Selecteer Sorteervolgorde</translation>
+    </message>
+    <message>
+        <source>Sort by Time</source>
+        <translation type="unfinished">Sorteren op Tijd</translation>
+    </message>
+    <message>
+        <source>Reverse Time</source>
+        <translation type="unfinished">Tijd Omgekeerd</translation>
+    </message>
+    <message>
+        <source>Sort by Title</source>
+        <translation type="unfinished">Sorteren op Titels</translation>
+    </message>
+    <message>
+        <source>Reverse Title</source>
+        <translation type="unfinished">Titels Omgekeerd</translation>
+    </message>
+    <message>
+        <source>NOTE: removing items from this list will not delete any recordings.</source>
+        <translation type="unfinished">OPMERKING: items uit deze lijst weghalen zal geen opnames wissen.</translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation type="unfinished">Behoud deze aflevering in de lijst</translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation type="unfinished">Verwijder deze aflevering uit de lijst</translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation type="unfinished">Verwijder alle afleveringen uit de lijst</translation>
     </message>
 </context>
 <context>
@@ -3071,12 +3116,8 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
         <translation type="obsolete">Normaal gezien zal dvb-opname pakketten van de kaart laten vallen totdat een \&quot;sequence start header\&quot; gevonden wordt. Deze optie schakelt deze functie uit.</translation>
     </message>
     <message>
-        <source>Per PID driver buffer size</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Packet buffer</source>
-        <translation>Pakket buffer</translation>
+        <translation type="obsolete">Pakket buffer</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3180,11 +3221,11 @@ Uw grabber levert geen kanaalnummers, die moet u handmatig invoeren.</translatio
     </message>
     <message>
         <source>Directory to hold the Live-TV buffers</source>
-        <translation>Map voor LiveTV-buffers</translation>
+        <translation type="obsolete">Map voor LiveTV-buffers</translation>
     </message>
     <message>
         <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation>Alle LiveTV-buffers worden in deze map opgeslagen. Deze buffers worden gebruikt om pauze, ff en rew te kunnen gebruiken tijdens LiveTV.</translation>
+        <translation type="obsolete">Alle LiveTV-buffers worden in deze map opgeslagen. Deze buffers worden gebruikt om pauze, ff en rew te kunnen gebruiken tijdens LiveTV.</translation>
     </message>
     <message>
         <source>TV format</source>
@@ -3210,19 +3251,19 @@ Als u een antenne heeft, gebruik dan een &quot;-bcast&quot; frequentie.</transla
     </message>
     <message>
         <source>Live TV buffer (GB)</source>
-        <translation>Live TV Buffer (GB)</translation>
+        <translation type="obsolete">Live TV Buffer (GB)</translation>
     </message>
     <message>
         <source>How large the live TV buffer is allowed to grow.</source>
-        <translation>Hoe groot de LiveTV-buffer mag worden.</translation>
+        <translation type="obsolete">Hoe groot de LiveTV-buffer mag worden.</translation>
     </message>
     <message>
         <source>Minimum free Live TV buffer (MB)</source>
-        <translation>Minimum vrije LiveTV-buffer (MB)</translation>
+        <translation type="obsolete">Minimum vrije LiveTV-buffer (MB)</translation>
     </message>
     <message>
         <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation>Hoe vol de LiveTV-buffer mag worden voordat stoppen met pauze geforceerd wordt.</translation>
+        <translation type="obsolete">Hoe vol de LiveTV-buffer mag worden voordat stoppen met pauze geforceerd wordt.</translation>
     </message>
     <message>
         <source>Save original files after transcoding</source>
@@ -3351,7 +3392,7 @@ Als er een opname start binnen deze tijdsperiode, zal de backend niet uitschakel
     </message>
     <message>
         <source>Enable channel change buffer warnings</source>
-        <translation>Schakel buffer-waarschuwingen voor veranderen kanaal in</translation>
+        <translation type="obsolete">Schakel buffer-waarschuwingen voor veranderen kanaal in</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3436,11 +3477,11 @@ Enkel programma &apos;s in groepen zonder wachtwoordbeveiliging worden getoond.<
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
-        <translation>%1 achter  --  %2 vol</translation>
+        <translation type="obsolete">%1 achter  --  %2 vol</translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation>%1 achter</translation>
+        <translation type="obsolete">%1 achter</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -4287,7 +4328,7 @@ Schakel uit wanneer sommige reclameblokken niet worden gedetecteerd.</translatio
     </message>
     <message>
         <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation>Indien ingeschakeld zal MythTV waarschuwen wanneer de zender veranderd wordt indien u niet bezig bent met LiveTV.</translation>
+        <translation type="obsolete">Indien ingeschakeld zal MythTV waarschuwen wanneer de zender veranderd wordt indien u niet bezig bent met LiveTV.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -5593,18 +5634,6 @@ Werkt mogelijk alleen wanneer uitgevoerd in een venster.</translation>
     <message>
         <source>If set, only free to air channels will be used.</source>
         <translation>Enkel vrij toegankelijke (ongescrambelde) zenders worden gebruikt.</translation>
-    </message>
-    <message>
-        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Diseqc Options</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>All</source>
@@ -6979,18 +7008,6 @@ Myth zal nu afsluiten.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Channel Timeout (msec)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Store recordings in TS format.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7427,38 +7444,6 @@ Myth zal nu afsluiten.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Period 1 Start Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 1 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 1 End Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 1 end time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 Start Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 End Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Period 2 end time. Set both Start &amp; End times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Automatically Start Myth Frontend</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7638,6 +7623,104 @@ Myth zal nu afsluiten.</translation>
         <source>Use only the transmitted guide data.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>UDP Notify OSD time-out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active for UDP Notify events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for any signal when scanning for channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for a channel lock when scanning for channels. Or, for issuing a warning in LiveTV mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Cartesian latitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use negative numbers for southern and western coordinates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Cartesian longitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>start time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set both Start &amp; End times to 00:00 to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>end time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flagging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding</source>
+        <translation type="unfinished">Transcode</translation>
+    </message>
+    <message>
+        <source>PIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List previous episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview schedule changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording is currently in use by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> The following programs will be recorded instead:
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7770,6 +7853,17 @@ Myth zal nu afsluiten.</translation>
     <message>
         <source>or later</source>
         <translation>of later</translation>
+    </message>
+</context>
+<context>
+    <name>StartingChannel</name>
+    <message>
+        <source>DB Error, see console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please add channels to this source</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8051,11 +8145,11 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation>U loopt momenteel achter op live. Als u nu van zender wijzigt, zal u het onbekeken stuk kwijt raken.</translation>
+        <translation type="obsolete">U loopt momenteel achter op live. Als u nu van zender wijzigt, zal u het onbekeken stuk kwijt raken.</translation>
     </message>
     <message>
         <source>Change the channel anyway</source>
-        <translation>Verander toch van zender</translation>
+        <translation type="obsolete">Verander toch van zender</translation>
     </message>
     <message>
         <source>Zoom Mode OFF</source>
@@ -8351,7 +8445,7 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation type="unfinished">Handmatig opnemen</translation>
+        <translation type="obsolete">Handmatig opnemen</translation>
     </message>
     <message>
         <source>Previous Recording</source>
@@ -8391,10 +8485,10 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>Reactivate</source>
-        <translation type="unfinished">Heractiveren</translation>
+        <translation type="obsolete">Heractiveren</translation>
     </message>
     <message>
-        <source>Use guide cancel</source>
+        <source>Cancel Record</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8589,6 +8683,13 @@ Geen verdere details</translation>
     </message>
 </context>
 <context>
+    <name>ViewScheduleDiff</name>
+    <message>
+        <source>All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ViewScheduled</name>
     <message>
         <source>Time Conflict</source>
@@ -8671,10 +8772,6 @@ Geen verdere details</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MythTV is idle and will shutdown shortly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>MythTV is idle.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8716,6 +8813,10 @@ Geen verdere details</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown in %1 seconds.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

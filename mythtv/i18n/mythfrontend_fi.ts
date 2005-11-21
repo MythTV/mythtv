@@ -394,12 +394,12 @@
 <context>
     <name>DVBConfigurationGroup</name>
     <message>
-        <source>DisEqC</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Recording Options</source>
         <translation>Nauhoitusasetukset</translation>
+    </message>
+    <message>
+        <source>DiSEqC</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1168,48 +1168,99 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
         <source>Subtitle</source>
         <translation>Jakson Kuvaus</translation>
     </message>
+    <message>
+        <source>Recording is in use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
     <message>
         <source>Previously Recorded</source>
-        <translation>Aiemmin Nauhoitetut</translation>
+        <translation type="obsolete">Aiemmin Nauhoitetut</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
-        <translation>Järjestämistapa</translation>
+        <translation type="obsolete">Järjestämistapa</translation>
     </message>
     <message>
         <source>Sort by Title</source>
-        <translation>Järjestys Nimikkeellä</translation>
+        <translation type="obsolete">Järjestys Nimikkeellä</translation>
     </message>
     <message>
         <source>Reverse Title</source>
-        <translation>Nimikkeellä Päinvastoin</translation>
+        <translation type="obsolete">Nimikkeellä Päinvastoin</translation>
     </message>
     <message>
         <source>Sort by Time</source>
-        <translation>Järjestys Lähetysajalla</translation>
+        <translation type="obsolete">Järjestys Lähetysajalla</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation>Lähetysajalla Päinvastoin</translation>
+        <translation type="obsolete">Lähetysajalla Päinvastoin</translation>
     </message>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation>HUOMIO: nimikkeen poisto ei tuhoa nauhoituksia.</translation>
+        <translation type="obsolete">HUOMIO: nimikkeen poisto ei tuhoa nauhoituksia.</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation>Pidä jakso jonossa</translation>
+        <translation type="obsolete">Pidä jakso jonossa</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation>Poista jakso jonosta</translation>
+        <translation type="obsolete">Poista jakso jonosta</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation>Poista kaikki tämän nimikkeen jaksot jonosta</translation>
+        <translation type="obsolete">Poista kaikki tämän nimikkeen jaksot jonosta</translation>
+    </message>
+</context>
+<context>
+    <name>PreviousList</name>
+    <message>
+        <source>Previously Recorded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Sort Order</source>
+        <translation type="unfinished">Järjestämistapa</translation>
+    </message>
+    <message>
+        <source>Sort by Time</source>
+        <translation type="unfinished">Järjestys Lähetysajalla</translation>
+    </message>
+    <message>
+        <source>Reverse Time</source>
+        <translation type="unfinished">Lähetysajalla Päinvastoin</translation>
+    </message>
+    <message>
+        <source>Sort by Title</source>
+        <translation type="unfinished">Järjestys Nimikkeellä</translation>
+    </message>
+    <message>
+        <source>Reverse Title</source>
+        <translation type="unfinished">Nimikkeellä Päinvastoin</translation>
+    </message>
+    <message>
+        <source>NOTE: removing items from this list will not delete any recordings.</source>
+        <translation type="unfinished">HUOMIO: nimikkeen poisto ei tuhoa nauhoituksia.</translation>
+    </message>
+    <message>
+        <source>Keep this episode in the list</source>
+        <translation type="unfinished">Pidä jakso jonossa</translation>
+    </message>
+    <message>
+        <source>Remove this episode from the list</source>
+        <translation type="unfinished">Poista jakso jonosta</translation>
+    </message>
+    <message>
+        <source>Remove all episodes for this title</source>
+        <translation type="unfinished">Poista kaikki tämän nimikkeen jaksot jonosta</translation>
     </message>
 </context>
 <context>
@@ -3095,11 +3146,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Per PID driver buffer size</source>
-        <translation>PID ajurin puskurikoko</translation>
+        <translation type="obsolete">PID ajurin puskurikoko</translation>
     </message>
     <message>
         <source>Packet buffer</source>
-        <translation>Pakettipuskuri</translation>
+        <translation type="obsolete">Pakettipuskuri</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3203,11 +3254,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Directory to hold the Live-TV buffers</source>
-        <translation>Kansio LiveTV:n puskurille</translation>
+        <translation type="obsolete">Kansio LiveTV:n puskurille</translation>
     </message>
     <message>
         <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation>Kaikki LiveTV:n puskurit talletetaan tähän kansioon.</translation>
+        <translation type="obsolete">Kaikki LiveTV:n puskurit talletetaan tähän kansioon.</translation>
     </message>
     <message>
         <source>TV format</source>
@@ -3231,19 +3282,19 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Live TV buffer (GB)</source>
-        <translation>Live-TV puskurikoko (Gigatavua)</translation>
+        <translation type="obsolete">Live-TV puskurikoko (Gigatavua)</translation>
     </message>
     <message>
         <source>How large the live TV buffer is allowed to grow.</source>
-        <translation>Kuinka suureksi LiveTV:n puskurin sallitaan kasvavan.</translation>
+        <translation type="obsolete">Kuinka suureksi LiveTV:n puskurin sallitaan kasvavan.</translation>
     </message>
     <message>
         <source>Minimum free Live TV buffer (MB)</source>
-        <translation>Pienin vapaa LiveTV:n puskuritila (Megatavuissa)</translation>
+        <translation type="obsolete">Pienin vapaa LiveTV:n puskuritila (Megatavuissa)</translation>
     </message>
     <message>
         <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation>Kuinka täydeksi LiveTV:n puskurin sallitaan kasvaa ennenkuin pakotetaan toisto.</translation>
+        <translation type="obsolete">Kuinka täydeksi LiveTV:n puskurin sallitaan kasvaa ennenkuin pakotetaan toisto.</translation>
     </message>
     <message>
         <source>Save original files after transcoding</source>
@@ -3371,7 +3422,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>Enable channel change buffer warnings</source>
-        <translation>Laita päälle kanavanvaihdon puskurivaroitukset</translation>
+        <translation type="obsolete">Laita päälle kanavanvaihdon puskurivaroitukset</translation>
     </message>
     <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
@@ -3463,11 +3514,11 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>%1 behind  --  %2 full</source>
-        <translation>%1 jäljessä  --  %2 täynnä</translation>
+        <translation type="obsolete">%1 jäljessä  --  %2 täynnä</translation>
     </message>
     <message>
         <source>%1 behind</source>
-        <translation>%1 jäljessä</translation>
+        <translation type="obsolete">%1 jäljessä</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -4320,7 +4371,7 @@ Myth will now exit.</translation>
     </message>
     <message>
         <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation>Valittuna MythTV varoittaa aina kun vaihdat kanavaa mutta et ole reaaliajassa.</translation>
+        <translation type="obsolete">Valittuna MythTV varoittaa aina kun vaihdat kanavaa mutta et ole reaaliajassa.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -5671,16 +5722,8 @@ Myth will now exit.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diseqc Options</source>
-        <translation>Diseqc Valinnat</translation>
+        <translation type="obsolete">Diseqc Valinnat</translation>
     </message>
     <message>
         <source>All</source>
@@ -6302,7 +6345,7 @@ Useimmat tv-kortit havaitsevat tämän automaattisesti.</translation>
     <message>
         <source>N</source>
         <comment>RecStatusChar rsNotListed</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">N</translation>
     </message>
     <message>
         <source>Not Listed</source>
@@ -6922,7 +6965,7 @@ Myth lopetetaan.</translation>
     <message>
         <source>A</source>
         <comment>RecStatusChar rsAborted</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">A</translation>
     </message>
     <message>
         <source>M</source>
@@ -6958,16 +7001,8 @@ Myth lopetetaan.</translation>
         <translation>Signaalin Odotusaika (msec)</translation>
     </message>
     <message>
-        <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Channel Timeout (msec)</source>
-        <translation>Virityksen Odotusaika (msec)</translation>
-    </message>
-    <message>
-        <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Virityksen Odotusaika (msec)</translation>
     </message>
     <message>
         <source>Store recordings in TS format.</source>
@@ -7435,35 +7470,19 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     </message>
     <message>
         <source>Period 1 Start Time</source>
-        <translation>1. Aloitusaika</translation>
-    </message>
-    <message>
-        <source>Period 1 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">1. Aloitusaika</translation>
     </message>
     <message>
         <source>Period 1 End Time</source>
-        <translation>1. Lopetusaika</translation>
-    </message>
-    <message>
-        <source>Period 1 end time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">1. Lopetusaika</translation>
     </message>
     <message>
         <source>Period 2 Start Time</source>
-        <translation>2. Aloitusaika</translation>
-    </message>
-    <message>
-        <source>Period 2 start time. Set both start and end times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">2. Aloitusaika</translation>
     </message>
     <message>
         <source>Period 2 End Time</source>
-        <translation>2. Lopetusaika</translation>
-    </message>
-    <message>
-        <source>Period 2 end time. Set both Start &amp; End times to 00:00 to disable</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">2. Lopetusaika</translation>
     </message>
     <message>
         <source>Automatically Start Myth Frontend</source>
@@ -7673,6 +7692,104 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
         <source>Use only the transmitted guide data.</source>
         <translation>Käytä vain ohjelmavirran oppaan tietoja.</translation>
     </message>
+    <message>
+        <source>Maximum time MythTV waits for any signal when scanning for channels.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tuning Timeout (msec)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum time MythTV waits for a channel lock when scanning for channels. Or, for issuing a warning in LiveTV mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Cartesian latitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use negative numbers for southern and western coordinates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The Cartesian longitude for your location.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DiSEqC Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UDP Notify OSD time-out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>How many seconds an on-screen display will be active for UDP Notify events.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CC font</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>start time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set both Start &amp; End times to 00:00 to disable.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>end time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commercial Flagging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transcoding</source>
+        <translation type="unfinished">Jälkikäsitellään</translation>
+    </message>
+    <message>
+        <source>PIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Schedule Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>List previous episodes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview schedule changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This recording is currently in use by:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> The following programs will be recorded instead:
+
+</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -7805,6 +7922,17 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
     <message>
         <source>or later</source>
         <translation>tai myöhemmin</translation>
+    </message>
+</context>
+<context>
+    <name>StartingChannel</name>
+    <message>
+        <source>DB Error, see console</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please add channels to this source</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8088,11 +8216,11 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation>Jäljessä reaaliajasta. Jos kanavaa muutetaan nyt, katsomaton materiaali menetetään.</translation>
+        <translation type="obsolete">Jäljessä reaaliajasta. Jos kanavaa muutetaan nyt, katsomaton materiaali menetetään.</translation>
     </message>
     <message>
         <source>Change the channel anyway</source>
-        <translation>Vaihda kanavaa kuitenkin</translation>
+        <translation type="obsolete">Vaihda kanavaa kuitenkin</translation>
     </message>
     <message>
         <source>Zoom Mode OFF</source>
@@ -8388,7 +8516,7 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Manual Record</source>
-        <translation>Manuaalinen Nauhoitus</translation>
+        <translation type="obsolete">Manuaalinen Nauhoitus</translation>
     </message>
     <message>
         <source>Previous Recording</source>
@@ -8428,11 +8556,15 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>Reactivate</source>
-        <translation>Uudelleenaktivoi</translation>
+        <translation type="obsolete">Uudelleenaktivoi</translation>
     </message>
     <message>
         <source>Use guide cancel</source>
-        <translation>Peruuta oppaan käyttö</translation>
+        <translation type="obsolete">Peruuta oppaan käyttö</translation>
+    </message>
+    <message>
+        <source>Cancel Record</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -8626,6 +8758,13 @@ Se ohitetaan</translation>
     </message>
 </context>
 <context>
+    <name>ViewScheduleDiff</name>
+    <message>
+        <source>All</source>
+        <translation type="unfinished">Kaikki</translation>
+    </message>
+</context>
+<context>
     <name>ViewScheduled</name>
     <message>
         <source>Time Conflict</source>
@@ -8710,7 +8849,7 @@ Se ohitetaan</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown shortly.</source>
-        <translation>MythTV sammuu piakkoin.</translation>
+        <translation type="obsolete">MythTV sammuu piakkoin.</translation>
     </message>
     <message>
         <source>MythTV is idle.</source>
@@ -8755,6 +8894,10 @@ Se ohitetaan</translation>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
         <translation>Ei voitu sammuttaa, koska Mythtv tulee suorittamaan heräämisen/sammuttamisen.</translation>
+    </message>
+    <message>
+        <source>MythTV is idle and will shutdown in %1 seconds.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
