@@ -1368,7 +1368,7 @@ void ProgramInfo::StartedRecording(QString prefix, QString ext)
     pathname = CreateRecordBasename(ext);
     while (!insert_program(query, this, record))
     {
-        recstartts.addSecs(1);
+        recstartts = recstartts.addSecs(1);
         pathname = CreateRecordBasename(ext);
     }
     pathname = prefix + "/" + pathname;
