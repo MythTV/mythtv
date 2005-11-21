@@ -1333,7 +1333,7 @@ void MPEG2fixup::add_cutlist(QStringList cutlist)
 
 int MPEG2fixup::start()
 {
-    //NOTE: expectedPTS/DTS are in units of 1/10 PTS to allow for better
+    //NOTE: expectedvPTS/DTS are in units of SCR (300*PTS) to allow for better
     //accounting of rounding errors (still won't be right, but better)
     int64_t expectedvPTS, expectedPTS[N_AUDIO];
     int64_t expectedDTS = 0, lastPTS = 0, initPTS = 0, deltaPTS = 0;
@@ -1376,7 +1376,8 @@ int MPEG2fixup::start()
         QPtrList<MPEG2frame> *af = &it.data();
         deltaPTS = diff2x33(vFrame.current()->pkt.pts, af->first()->pkt.pts);
         VERBOSE(MPF_GENERAL, QString("#%1 PTS:%2 Delta: %3ms queue: %4")
-                             .arg(it.key()).arg(af->current()->pkt.pts)
+                             .arg(it.key())
+                             .arg(pts_time(af->current()->pkt.pts))
                              .arg(1000.0*deltaPTS / 90000.0).arg(af->count()));
 
         if (cmp2x33(af->current()->pkt.pts, initPTS) < 0);
@@ -1408,14 +1409,14 @@ int MPEG2fixup::start()
         VERBOSE(MPF_PROCESS, msg);
     }
 
-    origvPTS = 10 * diff2x33(vFrame.first()->pkt.pts,
+    origvPTS = 300 * diff2x33(vFrame.first()->pkt.pts,
                      ptsIncrement * get_frame_num(vFrame.current()));
-    expectedvPTS = 10 * (diff2x33(vFrame.first()->pkt.pts, initPTS) -
+    expectedvPTS = 300 * (diff2x33(vFrame.first()->pkt.pts, initPTS) -
                          (ptsIncrement * get_frame_num(vFrame.current())));
-    expectedDTS = expectedvPTS - 10 * ptsIncrement;
+    expectedDTS = expectedvPTS - 300 * ptsIncrement;
 
     if (discard)
-        cutStartPTS = origvPTS / 10;
+        cutStartPTS = origvPTS / 300;
 
     for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
             it != aFrame.end(); it++)
@@ -1464,8 +1465,12 @@ int MPEG2fixup::start()
                 MPEG2frame *Lreorder[5];
                 MPEG2frame *markedFrame = NULL, *markedFrameP = NULL;
 
-                if (expectedvPTS != expectedDTS + ptsIncrement * 10)
+                if (expectedvPTS != expectedDTS + ptsIncrement * 300)
+                {
+                    VERBOSE(MPF_IMPORTANT, QString("expectedPTS != expectedDTS"
+                              "+ptsIncrement"));
                     return TRANSCODE_EXIT_UNKNOWN_ERROR;
+                }
                 //reorder frames in presentation order (to the next I/P frame)
 
                 for (vFrame.next(), reorder = 0;
@@ -1481,31 +1486,32 @@ int MPEG2fixup::start()
                 for (int i = 0; i < reorder; i++)
                 {
                     int64_t tmpPTS = diff2x33(Lreorder[i]->pkt.pts,
-                                              origvPTS / 10);
+                                              origvPTS / 300);
 
                     if ((uint64_t)Lreorder[i]->pkt.pts == AV_NOPTS_VALUE)
                     {
                         VERBOSE(MPF_PROCESS,
                             QString("Found frame %1 with mising PTS at %2")
                                 .arg(get_frame_num(Lreorder[i]))
-                                .arg(pts_time(origvPTS)));
-                        Lreorder[i]->pkt.pts = origvPTS / 10;
+                                .arg(pts_time(origvPTS / 300)));
+                        Lreorder[i]->pkt.pts = origvPTS / 300;
                     }
-                    else if (tmpPTS < ptsIncrement*maxframes ||
+                    else if (tmpPTS < -ptsIncrement*maxframes ||
                              tmpPTS > ptsIncrement*maxframes)
                     {
                         VERBOSE(MPF_PROCESS,
                             QString("Found invalid PTS (off by %1) at %2")
                                    .arg(pts_time(tmpPTS))
-                                   .arg(pts_time(origvPTS)));
-                        Lreorder[i]->pkt.pts = origvPTS / 10;
+                                   .arg(pts_time(origvPTS / 300)));
+                        Lreorder[i]->pkt.pts = origvPTS / 300;
                     }
                     else
                     {
-                        origvPTS = Lreorder[i]->pkt.pts * 10;
+                        origvPTS = Lreorder[i]->pkt.pts * 300;
                     }
-                    inc2x33(&origvPTS,
-                            5 * ptsIncrement * get_nb_fields(Lreorder[i]));
+                    ptsinc((uint64_t *)&origvPTS,
+                            (uint64_t)(150 * ptsIncrement *
+                                       get_nb_fields(Lreorder[i])));
                     
                     if (delMap.count() && delMap.begin().key() <= frame_count)
                     {
@@ -1516,7 +1522,7 @@ int MPEG2fixup::start()
                         if (! new_discard_state)
                         {
                             cutEndPTS = markedFrameP->pkt.pts;
-                            initPTS = diff2x33(cutEndPTS, expectedvPTS / 10);
+                            initPTS = diff2x33(cutEndPTS, expectedvPTS / 300);
                         }
                         else
                             cutStartPTS = add2x33(markedFrameP->pkt.pts,
@@ -1576,15 +1582,19 @@ int MPEG2fixup::start()
                         }
 
                         dec2x33(&Lreorder[i]->pkt.pts, initPTS);
-                        deltaPTS = Lreorder[i]->pkt.pts - (expectedvPTS / 10);
+                        deltaPTS = diff2x33(Lreorder[i]->pkt.pts,
+                                            expectedvPTS / 300);
 
                         if (fix_PTS && deltaPTS && ptsDelta->count() &&
-                                expectedvPTS / 10 > (ptsDelta->first().prev - initPTS))
+                                expectedvPTS / 300 > 
+                                   diff2x33(ptsDelta->first().prev, initPTS))
                         {
                             initPTS += ptsDelta->first().delta;
-                            Lreorder[i]->pkt.pts -= ptsDelta->first().delta;
+                            dec2x33(&Lreorder[i]->pkt.pts,
+                                    ptsDelta->first().delta);
                             ptsDelta->pop_front();
-                            deltaPTS = Lreorder[i]->pkt.pts - (expectedvPTS / 10);
+                            deltaPTS = diff2x33(Lreorder[i]->pkt.pts,
+                                                expectedvPTS / 300);
                         }
 
                         if (deltaPTS < -2 || deltaPTS > 2)
@@ -1592,7 +1602,7 @@ int MPEG2fixup::start()
                             VERBOSE(MPF_PROCESS, QString("PTS discrepency: "
                                        "%1 != %2 on %3-Type (%4)")
                                        .arg(Lreorder[i]->pkt.pts)
-                                       .arg(expectedvPTS / 10)
+                                       .arg(expectedvPTS / 300)
                                        .arg(get_frame_type_t( Lreorder[i]))
                                        .arg(get_frame_num( Lreorder[i])));
                         }
@@ -1606,20 +1616,22 @@ int MPEG2fixup::start()
                         //force PTS to stay in sync (this could be a bad idea!)
                         if (fix_PTS)
                         {
-                            Lreorder[i]->pkt.pts = expectedvPTS / 10;
+                            Lreorder[i]->pkt.pts = expectedvPTS / 300;
                         }
 
                         if (deltaPTS > ptsIncrement*maxframes)
                         {
-                            fprintf(stderr,
-                                    "Need to insert %d frames > max allowed:"
-                                    " %d.  Assuming bad PTS\n",
-                                    (int)(deltaPTS / ptsIncrement), maxframes);
-                            Lreorder[i]->pkt.pts = expectedvPTS / 10;
+                            VERBOSE(MPF_IMPORTANT, QString(
+                                    "Need to insert %1 frames > max allowed:"
+                                    " %2.  Assuming bad PTS\n")
+                                    .arg((int)(deltaPTS / ptsIncrement))
+                                    .arg( maxframes));
+                            Lreorder[i]->pkt.pts = expectedvPTS / 300;
+                            deltaPTS = 0;
                         }
 
                         lastPTS = expectedvPTS;
-                        expectedvPTS += 5 * ptsIncrement *
+                        expectedvPTS += 150 * ptsIncrement *
                                         get_nb_fields(Lreorder[i]);
 
                         if ( Lreorder[i] == markedFrameP && new_discard_state)
@@ -1630,7 +1642,7 @@ int MPEG2fixup::start()
 
                     //dtsExtra is applied at the end of this block iff the current
                     //tail has repeat_first_field set
-                    dtsExtra = 5 * ptsIncrement *
+                    dtsExtra = 150 * ptsIncrement *
                                (get_nb_fields(vFrame.at(frame_pos)) - 2);
 
                     if (! markedFrame && deltaPTS > (4*ptsIncrement / 5))
@@ -1640,7 +1652,7 @@ int MPEG2fixup::start()
                         // lVpkt_head will be adjusted acordingly
 
 
-                        vFrame.at(frame_pos)->pkt.pts = lastPTS / 10;
+                        vFrame.at(frame_pos)->pkt.pts = lastPTS / 300;
                         int ret = insert_frame(get_frame_num(vFrame.current()),
                                                deltaPTS, ptsIncrement, initPTS);
                         if(ret < 0)
@@ -1664,10 +1676,10 @@ int MPEG2fixup::start()
                             markedFrame = NULL;
                         }
 
-                        vFrame.current()->pkt.dts = (expectedDTS / 10);
+                        vFrame.current()->pkt.dts = (expectedDTS / 300);
                         if (get_frame_type_t(vFrame.current()) == 'B')
-                            vFrame.current()->pkt.pts = (expectedDTS / 10);
-                        expectedDTS += 5 * ptsIncrement *
+                            vFrame.current()->pkt.pts = (expectedDTS / 300);
+                        expectedDTS += 150 * ptsIncrement *
                                        (i == 0 ?
                                         2 : get_nb_fields(vFrame.current()));
                         VERBOSE(MPF_FRAME,QString("VID: %1 #:%2 nb: %3"
@@ -1721,7 +1733,7 @@ int MPEG2fixup::start()
                 int64_t tmpPTS = diff2x33(af->first()->pkt.pts,
                                           origaPTS[it.key()]);
                 if (tmpPTS > incPTS * maxframes ||
-                    tmpPTS < incPTS * maxframes)
+                    tmpPTS < -incPTS * maxframes)
                 {
                         VERBOSE(MPF_PROCESS,
                            QString("Found invalid audio PTS (off by %1) at %2")
@@ -1876,7 +1888,7 @@ int main(int argc, char **argv)
     if (cutlist.count())
         m2f.add_cutlist(cutlist);
 
-    m2f.start();
+    return m2f.start();
 }
 #endif
 
