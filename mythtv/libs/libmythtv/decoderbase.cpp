@@ -56,6 +56,8 @@ void DecoderBase::Reset(void)
     m_positionMap.clear();
     framesPlayed = 0;
     framesRead = 0;
+
+    ateof = false;
 }
 
 void DecoderBase::SeekReset(long long newKey, int skipFrames, bool needFlush)

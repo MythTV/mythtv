@@ -316,11 +316,12 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
     d->ResetMPEG2();
 
     // only reset the internal state if we're using our seeking, not libavformat's
-    if (recordingHasPositionMap)
+    if (recordingHasPositionMap || livetv)
     {
         ic->pb.pos = ringBuffer->GetReadPosition();
         ic->pb.buf_ptr = ic->pb.buffer;
         ic->pb.buf_end = ic->pb.buffer;
+        ic->pb.eof_reached = 0;
     }
 
     if (doflush)

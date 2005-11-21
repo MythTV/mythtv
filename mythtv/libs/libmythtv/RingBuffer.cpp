@@ -669,7 +669,10 @@ void RingBuffer::ReadAheadThread(void)
                 if (livetvchain)
                 {
                     if (!ignoreliveeof && livetvchain->HasNext())
+                    {
                         livetvchain->SwitchToNext(true);
+                        ateof = true;
+                    }
                 }
                 else
                     ateof = true;
@@ -779,6 +782,9 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
     
     int avail = ReadBufAvail();
     readErr = 0;
+
+    if (ateof && avail < count)
+        count = avail;
     
     while (avail < count && !stopreads)
     {

@@ -2528,6 +2528,7 @@ QString TVRec::GetChainID(void)
 {
     if (tvchain)
         return tvchain->GetID();
+    return "";
 }
 
 /** \fn TVRec::StopLiveTV()

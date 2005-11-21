@@ -1902,6 +1902,9 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     ringBuffer->OpenFile(pginfo->pathname);
 
+    if (eof)
+        discontinuity = true;
+
     if (discontinuity || newtype)
     {
         ringBuffer->Reset(true);
@@ -1933,6 +1936,8 @@ void NuppelVideoPlayer::SwitchToProgram(void)
 
     if (m_playbackinfo)
         m_playbackinfo->UpdateInUseMark(true);
+
+    eof = false;
 }
 
 void NuppelVideoPlayer::FileChangedCallback(void)
@@ -1962,6 +1967,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
     ProgramInfo *pginfo = livetvchain->GetSwitchProgram(discontinuity, newtype);
     if (!pginfo)
         return;
+
     long long nextpos = livetvchain->GetJumpPos();
     
     if (m_playbackinfo)
@@ -2011,6 +2017,8 @@ void NuppelVideoPlayer::JumpToProgram(void)
 
     if (m_playbackinfo)
         m_playbackinfo->UpdateInUseMark(true);
+
+    eof = false;
 }
 
 void NuppelVideoPlayer::StartPlaying(void)
@@ -2156,17 +2164,28 @@ void NuppelVideoPlayer::StartPlaying(void)
     SetCommBreakIter();
     commBreakMapLock.unlock();
 
-    while (!eof && !killplayer && !errored)
+    while (!killplayer && !errored)
     {
         if (m_playbackinfo)
             m_playbackinfo->UpdateInUseMark();
 
-        if (!paused && livetvchain)
+        if ((!paused || eof) && livetvchain)
         {
             if (livetvchain->NeedsToSwitch())
                 SwitchToProgram();
             else if (livetvchain->NeedsToJump())
                 JumpToProgram();
+        }
+
+        if (eof)
+        {
+            if (livetvchain)
+            {
+                livetvchain->JumpToNext(true, 1);
+                continue;
+            }
+            else
+                break;
         }
 
         if (nvr_enc && nvr_enc->GetErrorStatus())

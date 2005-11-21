@@ -5192,11 +5192,13 @@ void TV::PauseLiveTV(void)
     VERBOSE(VB_PLAYBACK, LOC + "PauseLiveTV()");
     lockTimerOn = false;
 
-    if (activenvp)
+    if (activenvp && activerbuffer)
+    {
+        activerbuffer->StopReads();
         activenvp->PauseDecoder();
-
-    if (activerbuffer)
         activerbuffer->IgnoreLiveEOF(true);
+        activerbuffer->StartReads();
+    }
 
     // XXX: Get rid of this?
     activerecorder->PauseRecorder();

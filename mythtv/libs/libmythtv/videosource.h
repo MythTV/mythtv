@@ -541,7 +541,7 @@ class CardInput: public ConfigurationWizard
     void fillDiseqcSettingsInput(QString _pos, QString _port);
 
     virtual void save();
-    virtual void save(QString destination) { save(); }
+    virtual void save(QString /*destination*/) { save(); }
 
   public slots:
     void channelScanner();
