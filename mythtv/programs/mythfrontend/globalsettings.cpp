@@ -345,27 +345,6 @@ static HostSpinBox *JumpAmount()
     return gs;
 }
 
-static HostSpinBox *FastForwardAmount()
-{
-    HostSpinBox *gs = new HostSpinBox("FastForwardAmount", 1, 600, 5, 
-                                            true);
-    gs->setLabel(QObject::tr("Fast forward amount (in seconds)"));
-    gs->setValue(30);
-    gs->setHelpText(QObject::tr("How many seconds to skip forward on a fast "
-                    "forward."));
-    return gs;
-}
-
-static HostSpinBox *RewindAmount()
-{
-    HostSpinBox *gs = new HostSpinBox("RewindAmount", 1, 600, 5, true);
-    gs->setLabel(QObject::tr("Rewind amount (in seconds)"));
-    gs->setValue(5);
-    gs->setHelpText(QObject::tr("How many seconds to skip backward on a "
-                    "rewind."));
-    return gs;
-}
-
 static HostCheckBox *SmartForward()
 {
     HostCheckBox *gc = new HostCheckBox("SmartForward");
@@ -3024,8 +3003,6 @@ PlaybackSettings::PlaybackSettings()
 
     VerticalConfigurationGroup* seek = new VerticalConfigurationGroup(false);
     seek->setLabel(QObject::tr("Seeking"));
-    seek->addChild(FastForwardAmount());
-    seek->addChild(RewindAmount());
     seek->addChild(SmartForward());
     seek->addChild(StickyKeys());
     seek->addChild(FFRewReposTime());

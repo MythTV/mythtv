@@ -1933,7 +1933,7 @@ void Scheduler::AddNewRecords(void)
 "cardinput.cardinputid, UPPER(cardinput.shareable) = 'Y' AS shareable, "
 "program.seriesid, program.programid, program.category_type, "
 "program.airdate, program.stars, program.originalairdate, RECTABLE.inactive, "
-"RECTABLE.parentid, ") + progfindid + ", RECTABLE.tsdefault, "
+"RECTABLE.parentid, ") + progfindid + ", RECTABLE.playgroup, "
 "oldrecstatus.recstatus, oldrecstatus.reactivate, " 
 "channel.recpriority + cardinput.preference "
 + QString(
@@ -2068,6 +2068,7 @@ void Scheduler::AddNewRecords(void)
         p->recendts = result.value(19).toDateTime();
         p->repeat = result.value(20).toInt();
         p->recgroup = result.value(21).toString();
+        p->playgroup = result.value(36).toString();
         p->chancommfree = result.value(23).toInt();
         p->cardid = cardid;
         p->inputid = result.value(25).toInt();
@@ -2093,7 +2094,6 @@ void Scheduler::AddNewRecords(void)
         bool inactive = result.value(33).toInt();
         p->parentid = result.value(34).toInt();
         p->findid = result.value(35).toInt();
-        p->timestretch = result.value(36).toString().toFloat();
 
         if (!recTypeRecPriorityMap.contains(p->rectype))
             recTypeRecPriorityMap[p->rectype] = 
@@ -2282,7 +2282,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
 "channel.name, RECTABLE.recordid, RECTABLE.recgroup, RECTABLE.dupin, "
 "RECTABLE.dupmethod, channel.commfree, channel.channum, RECTABLE.station, "
 "RECTABLE.seriesid, RECTABLE.programid, RECTABLE.category, RECTABLE.findid, "
-"RECTABLE.tsdefault "
+"RECTABLE.playgroup "
 "FROM RECTABLE "
 "LEFT JOIN channel ON channel.callsign = RECTABLE.station "
 "GROUP BY recordid "
@@ -2344,6 +2344,7 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             if (proginfo->channame.isNull())
                 proginfo->channame = "";
             proginfo->recgroup = result.value(12).toString();
+            proginfo->playgroup = result.value(22).toString();
             proginfo->dupin = RecordingDupInType(result.value(13).toInt());
             proginfo->dupmethod =
                 RecordingDupMethodType(result.value(14).toInt());
@@ -2356,7 +2357,6 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->programid = result.value(19).toString();
             proginfo->category = result.value(20).toString();
             proginfo->findid = result.value(21).toInt();
-            proginfo->timestretch = result.value(22).toString().toFloat();
             
             proginfo->recstartts = proginfo->startts;
             proginfo->recendts = proginfo->endts;

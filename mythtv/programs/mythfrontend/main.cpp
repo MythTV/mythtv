@@ -27,6 +27,7 @@ using namespace std;
 #include "channelrecpriority.h"
 #include "globalsettings.h"
 #include "profilegroup.h"
+#include "playgroup.h"
 
 #include "exitcodes.h"
 #include "themedmenu.h"
@@ -438,6 +439,11 @@ void TVMenuCallback(void *data, QString &selection)
     else if (sel == "settings recording") 
     {
         ProfileGroupEditor editor;
+        editor.exec();
+    } 
+    else if (sel == "settings playgroup") 
+    {
+        PlayGroupEditor editor;
         editor.exec();
     } 
     else if (sel == "settings general") 

@@ -32,6 +32,7 @@
 #include "scheduledrecording.h"
 #include "config.h"
 #include "livetvchain.h"
+#include "playgroup.h"
 
 #ifndef HAVE_ROUND
 #define round(x) ((int) ((x) + 0.5))
@@ -297,8 +298,6 @@ bool TV::Init(bool createWindow)
     }
 
     baseFilters         += gContext->GetSetting("CustomFilters");
-    fftime               = gContext->GetNumSetting("FastForwardAmount", 30);
-    rewtime              = gContext->GetNumSetting("RewindAmount", 5);
     jumptime             = gContext->GetNumSetting("JumpAmount", 10);
     usePicControls       = gContext->GetNumSetting("UseOutputPictureControls",0);
     smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
@@ -595,7 +594,10 @@ int TV::Playback(ProgramInfo *rcinfo)
     else
         ChangeState(kState_WatchingPreRecorded);
 
-    normal_speed = playbackinfo->timestretch;
+    fftime = PlayGroup::GetSetting(playbackinfo->playgroup, "skipahead", 30);
+    rewtime = PlayGroup::GetSetting(playbackinfo->playgroup, "skipback", 5);
+    normal_speed = PlayGroup::GetSetting(playbackinfo->playgroup, 
+                                         "timestretch", 100) / 100.0;
 
     if (class LCD * lcd = LCD::Get())
         lcd->switchToChannel(rcinfo->chansign, rcinfo->title, rcinfo->subtitle);
@@ -899,6 +901,7 @@ void TV::HandleStateChange(void)
     }
 
     // update internal state variable
+    TVState lastState = internalState;
     internalState = nextState;
     stateLock.unlock();
 
@@ -906,6 +909,12 @@ void TV::HandleStateChange(void)
     {
         UpdateOSDInput();
         UpdateLCD();
+    }
+    else if (StateIsPlaying(internalState) && lastState == kState_None)
+    {
+        if (GetOSD())
+            GetOSD()->SetSettingsText(tr("%1 Settings")
+                                      .arg(playbackinfo->playgroup), 3);
     }
     if (recorder)
         recorder->FrontendReady();

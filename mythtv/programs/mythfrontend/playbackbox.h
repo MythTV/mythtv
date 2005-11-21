@@ -60,6 +60,7 @@ class PlaybackBox : public MythDialog
     void showMenu();
     void showActionsSelected();
     void showRecGroupChanger();
+    void showPlayGroupChanger();
     void showRecTitleChanger();
     void showRecGroupChooser();
     void showRecGroupPasswordChanger();
@@ -105,6 +106,7 @@ class PlaybackBox : public MythDialog
     void recGroupChangerListBoxChanged(void);
     void recGroupChooserListBoxChanged(void);
     void setRecGroup(void);
+    void setPlayGroup(void);
     void setRecTitle(void);
     void setRecGroupPassword();
     void recGroupOldPasswordChanged(const QString &newText);
@@ -135,6 +137,7 @@ class PlaybackBox : public MythDialog
     void doClearPlaylist();
     void doPlaylistDelete();
     void doPlaylistChangeRecGroup();
+    void doPlaylistChangePlayGroup();
     void togglePlayListTitle(void);
     void togglePlayListItem(void);
     void playSelectedPlaylist(bool random);

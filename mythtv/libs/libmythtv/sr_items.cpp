@@ -106,8 +106,8 @@ SRStorageOptionsGroup::SRStorageOptionsGroup(ScheduledRecording *_rec, ManagedLi
     recGroup = new SRRecGroup(_rec, _parentList, this);
     addItem(recGroup->getItem(), -1);
 
-    tsValue = new SRTimeStretch(_rec, _parentList, this);
-    addItem(tsValue->getItem(), -1);
+    playGroup = new SRPlayGroup(_rec, _parentList, this);
+    addItem(playGroup->getItem(), -1);
 
     autoExpire = new SRAutoExpire(_rec, this, parentList);
     addItem(autoExpire->getItem(), -1);
@@ -179,32 +179,21 @@ void SRRecGroup::showNewRecGroup()
     }
 }
 
-SRTimeStretch::SRTimeStretch(ScheduledRecording *_parent, ManagedList *_list,
-        ManagedListGroup *_group) : SRSelectSetting(_parent,
-        "timeStretchList", QString("[ %1 ]").arg(QObject::tr("Time Stretch")),
-        _group, "tsdefault", _list)
+void SRPlayGroup::fillSelections()
 {
-    _parent->setTimeStretchIDObj(this);
-}
+    addSelection(QString(QObject::tr("Store in the \"%1\" playback group"))
+                 .arg(QObject::tr("Default")), "Default");
 
-void SRTimeStretch::load()
-{
-    fillSelections();
-    SRSelectSetting::load();
+    QStringList names = PlayGroup::GetNames();
 
-    setValue(QString::number(settingValue.toDouble(), 'f', 2));
-    setUnchanged();
-}
+    if (names.isEmpty())
+        getItem()->setEnabled(false);
 
-void SRTimeStretch::fillSelections()
-{
-    clearSelections();
-    QString ts_text = QObject::tr("Default time stretch %1");
-    float tsfac = 0.5;
-    float tsstep = 0.05;
-    while (tsfac < 2.01) {
-        addSelection(ts_text.arg(tsfac, 0, 'f', 2),
-                QString::number(tsfac, 'f', 2));
-        tsfac += tsstep;
+    while (!names.isEmpty())
+    {
+        addSelection(QObject::tr("Store in the \"%1\" playback group")
+                     .arg(names.front()), names.front());
+        names.pop_front();
     }
 }
+

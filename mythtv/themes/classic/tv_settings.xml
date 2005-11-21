@@ -56,6 +56,12 @@
    </button>
 
    <button>
+      <type>TV_SETTINGS_PLAYBACK_GROUPS</type>
+      <text>Playback Groups</text>
+      <action>SETTINGS PLAYGROUP</action>
+   </button>
+
+   <button>
       <type>TV_SETTINGS_RECORDING_PROFILES</type>
       <text>Recording Profiles</text>
       <text lang="IT">Registrazione</text>

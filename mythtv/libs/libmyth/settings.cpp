@@ -614,6 +614,8 @@ QWidget* SpinBoxSetting::configWidget(ConfigurationGroup *cg, QWidget* parent,
     if (1 < step)
         spinbox->setLineStep(step);
     spinbox->setValue(intValue());
+    if (!svtext.isEmpty())
+        spinbox->setSpecialValueText(svtext);
 
     connect(spinbox, SIGNAL(valueChanged(int)), this, SLOT(setValue(int)));
     connect(this, SIGNAL(valueChanged(int)), spinbox, SLOT(setValue(int)));

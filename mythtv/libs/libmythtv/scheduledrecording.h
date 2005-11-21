@@ -44,12 +44,12 @@ class SREndDate;
 class SRCategory;
 class SRRecPriority;
 class SRRecGroup;
+class SRPlayGroup;
 class SRSeriesid;
 class SRProgramid;
 class SRFindDay;
 class SRFindTime;
 class SRFindId;
-class SRTimeStretch;
 class SRParentId;
 
 class ScheduledRecording: public ConfigurationGroup, public ConfigurationDialog {
@@ -88,6 +88,7 @@ public:
     int getRecPriority(void) const;
     void setRecPriority(int recpriority);
     void setRecGroup(const QString& recgroup);
+    void setPlayGroup(const QString& recgroup);
 
     
     virtual void save();
@@ -155,13 +156,13 @@ public:
     void setCategoryObj(SRCategory* val) {category = val;}
     void setRecPriorityObj(SRRecPriority* val) {recpriority = val;}
     void setRecGroupObj(SRRecGroup* val) {recgroup = val;}
+    void setPlayGroupObj(SRPlayGroup* val) {playgroup = val;}
     void setSeriesIDObj(SRSeriesid* val) {seriesid = val;}
     void setProgramIDObj(SRProgramid* val) {programid = val;}
     void setFindDayObj(SRFindDay* val) {findday = val;}
     void setFindTimeObj(SRFindTime* val) {findtime = val;}
     void setFindIdObj(SRFindId* val) {findid = val;}
     void setParentIdObj(SRParentId* val) {parentid = val;}
-    void setTimeStretchIDObj(SRTimeStretch* val) {timestretchid = val;}
     
     void ToMap(QMap<QString, QString>& infoMap);
     
@@ -223,12 +224,12 @@ protected:
     class SRCategory* category;
     class SRRecPriority* recpriority;
     class SRRecGroup* recgroup;
+    class SRPlayGroup* playgroup;
     class SRSeriesid* seriesid;
     class SRProgramid* programid;
     class SRFindDay* findday;
     class SRFindTime* findtime;
     class SRFindId* findid;
-    SRTimeStretch* timestretchid;
     class SRParentId* parentid;
     
     const ProgramInfo* m_pginfo;

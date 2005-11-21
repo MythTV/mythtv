@@ -74,7 +74,6 @@ ProgramInfo::ProgramInfo(void)
     year = "";
     stars = 0;
     availableStatus = asAvailable;    
-    timestretch = 1.0;
 
     pathname = "";
     filesize = 0;
@@ -110,6 +109,7 @@ ProgramInfo::ProgramInfo(void)
     findid = 0;
     recpriority = 0;
     recgroup = QString("Default");
+    playgroup = QString("Default");
 
     hasAirDate = false;
     repeat = false;
@@ -200,13 +200,12 @@ ProgramInfo &ProgramInfo::clone(const ProgramInfo &other)
     findid = other.findid;
     recpriority = other.recpriority;
     recgroup = other.recgroup;
+    playgroup = other.playgroup;
     programflags = other.programflags;
     transcoder = other.transcoder;
 
     hasAirDate = other.hasAirDate;
     repeat = other.repeat;
-
-    timestretch = other.timestretch;
 
     seriesid = other.seriesid;
     programid = other.programid;
@@ -303,7 +302,7 @@ void ProgramInfo::ToStringList(QStringList &list) const
     FLOAT_TO_LIST(stars)
     DATETIME_TO_LIST(QDateTime(originalAirDate))
     INT_TO_LIST(hasAirDate)     
-    FLOAT_TO_LIST(timestretch);
+    STR_TO_LIST((playgroup != "") ? playgroup : "Default")
 }
 
 /** \fn ProgramInfo::FromStringList(QStringList&,int)
@@ -400,7 +399,7 @@ bool ProgramInfo::FromStringList(QStringList &list, QStringList::iterator &it)
     FLOAT_FROM_LIST(stars)
     DATE_FROM_LIST(originalAirDate);
     INT_FROM_LIST(hasAirDate);
-    FLOAT_FROM_LIST(timestretch);
+    STR_FROM_LIST(playgroup)
 
     return true;
 }
@@ -534,6 +533,7 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
 
     progMap["recpriority"] = recpriority;
     progMap["recgroup"] = recgroup;
+    progMap["playgroup"] = playgroup;
     progMap["programflags"] = programflags;
 
     progMap["timedate"] = recstartts.date().toString(dateFormat) + ", " +
@@ -571,8 +571,6 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
         progMap["LONGREPEAT"] = "";
     }
 
-    progMap["timestretch"] = QString::number(timestretch, 'f', 2);
-   
     progMap["seriesid"] = seriesid;
     progMap["programid"] = programid;
     progMap["catType"] = catType;
@@ -768,8 +766,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
                   "channel.callsign,channel.name,channel.commfree, "
                   "channel.outputfilters,seriesid,programid,filesize, "
                   "lastmodified,stars,previouslyshown,originalairdate, "
-                  "hostname,recordid,transcoder,timestretch, "
-                  "recorded.recpriority,progstart,progend,basename "
+                  "hostname,recordid,transcoder,playgroup, "
+                  "recorded.recpriority,progstart,progend,basename,recgroup "
                   "FROM recorded "
                   "LEFT JOIN channel "
                   "ON recorded.chanid = channel.chanid "
@@ -827,7 +825,8 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
 
         proginfo->programflags = proginfo->getProgramFlags();
 
-        proginfo->timestretch = query.value(21).toString().toFloat();
+        proginfo->recgroup = query.value(26).toString();
+        proginfo->playgroup = query.value(21).toString();
         proginfo->recpriority = query.value(22).toInt();
 
         proginfo->pathname = query.value(25).toString();
@@ -1039,6 +1038,29 @@ void ProgramInfo::ApplyRecordRecGroupChange(const QString &newrecgroup)
         MythContext::DBError("RecGroup update", query);
 
     recgroup = newrecgroup;
+}
+
+/** \fn ProgramInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
+ *  \brief Sets the recording group, both in this ProgramInfo
+ *         and in the database.
+ *  \param newplaygroup New recording group.
+ */
+void ProgramInfo::ApplyRecordPlayGroupChange(const QString &newplaygroup)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    query.prepare("UPDATE recorded"
+                  " SET playgroup = :PLAYGROUP"
+                  " WHERE chanid = :CHANID"
+                  " AND starttime = :START ;");
+    query.bindValue(":PLAYGROUP", newplaygroup.utf8());
+    query.bindValue(":START", recstartts);
+    query.bindValue(":CHANID", chanid);
+
+    if (!query.exec())
+        MythContext::DBError("PlayGroup update", query);
+
+    playgroup = newplaygroup;
 }
 
 /** \fn ProgramInfo::ApplyRecordRecTitleChange(const QString &newTitle, const QString &newSubtitle)
@@ -1443,14 +1465,14 @@ static bool insert_program(MSqlQuery                &query,
         "    subtitle,  description, hostname,        category,         "
         "    recgroup,  autoexpire,  recordid,        seriesid,         "
         "    programid, stars,       previouslyshown, originalairdate,  "
-        "    findid,    transcoder,  timestretch,     recpriority,      "
+        "    findid,    transcoder,  playgroup,       recpriority,      "
         "    basename,  progstart,   progend) "
         "VALUES"
         "  (:CHANID,   :STARTS,     :ENDS,           :TITLE,            "
         "   :SUBTITLE, :DESC,       :HOSTNAME,       :CATEGORY,         "
         "   :RECGROUP, :AUTOEXP,    :RECORDID,       :SERIESID,         "
         "   :PROGRAMID,:STARS,      :REPEAT,         :ORIGAIRDATE,      "
-        "   :FINDID,   :TRANSCODER, :TIMESTRETCH,    :RECPRIORITY,      "
+        "   :FINDID,   :TRANSCODER, :PLAYGROUP,      :RECPRIORITY,      "
         "    :BASENAME, :PROGSTART,  :PROGEND) "
         );
 
@@ -1472,7 +1494,7 @@ static bool insert_program(MSqlQuery                &query,
     query.bindValue(":REPEAT",      pg->repeat);
     query.bindValue(":ORIGAIRDATE", pg->originalAirDate);
     query.bindValue(":TRANSCODER",  schd->GetTranscoder());
-    query.bindValue(":TIMESTRETCH", pg->timestretch);
+    query.bindValue(":PLAYGROUP",   pg->playgroup);
     query.bindValue(":RECPRIORITY", schd->getRecPriority());
     query.bindValue(":BASENAME",    pg->pathname);
     query.bindValue(":PROGSTART",   pg->startts);
@@ -3265,6 +3287,7 @@ void ProgramInfo::showDetails(void) const
         msg += QObject::tr("Recording Host") + ":  " + hostname + "\n";
         msg += QObject::tr("Filesize") + ":  " + tmpSize + "\n";
         msg += QObject::tr("Recording Group") + ":  " + recgroup + "\n";
+        msg += QObject::tr("Playback Group") + ":  " + playgroup + "\n";
     }
     DialogBox *details_dialog = new DialogBox(gContext->GetMainWindow(), msg);
     details_dialog->AddButton(QObject::tr("OK"));

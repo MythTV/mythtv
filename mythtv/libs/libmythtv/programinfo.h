@@ -148,6 +148,7 @@ class ProgramInfo
     void FinishedRecording(bool prematurestop);
     void UpdateRecordingEnd(void);
     void ApplyRecordRecGroupChange(const QString &newrecgroup);
+    void ApplyRecordPlayGroupChange(const QString &newrecgroup);
     void ApplyRecordRecTitleChange(const QString &newTitle,
                                    const QString &newSubtitle);
 
@@ -251,6 +252,7 @@ class ProgramInfo
     
     int recpriority;
     QString recgroup;
+    QString playgroup;
     int chancommfree;
 
     QString pathname;
@@ -276,8 +278,6 @@ class ProgramInfo
     
     bool hasAirDate;
     bool repeat;
-
-    float timestretch;
 
     int spread;
     int startCol;

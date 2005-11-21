@@ -955,7 +955,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                        "record.recordid,outputfilters,"
                        "recorded.seriesid,recorded.programid,recorded.filesize, "
                        "recorded.lastmodified, recorded.findid, "
-                       "recorded.originalairdate, recorded.timestretch, "
+                       "recorded.originalairdate, recorded.playgroup, "
                        "recorded.basename, recorded.progstart, "
                        "recorded.progend "
                        "FROM recorded "
@@ -1020,7 +1020,6 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
                 proginfo->hasAirDate = true;
             }
 
-            proginfo->timestretch = query.value(27).toString().toFloat();
             QString basename = query.value(28).toString();
 
             if (proginfo->hostname.isEmpty() || proginfo->hostname.isNull())
@@ -1068,6 +1067,7 @@ void MainServer::HandleQueryRecordings(QString type, PlaybackSock *pbs)
             proginfo->category = QString::fromUtf8(query.value(15).toString());
 
             proginfo->recgroup = query.value(16).toString();
+            proginfo->playgroup = query.value(27).toString();
 
             proginfo->recstatus = rsRecorded;
             if (proginfo->recendts > rectime)
@@ -3945,6 +3945,7 @@ void MainServer::FillProgramInfo(QDomDocument *pDoc, QDomElement &e,
     recording.setAttribute( "recStatus"     , pInfo->recstatus   );
     recording.setAttribute( "recPriority"   , pInfo->recpriority );
     recording.setAttribute( "recGroup"      , pInfo->recgroup    );
+    recording.setAttribute( "playGroup"     , pInfo->playgroup   );
     recording.setAttribute( "recType"       , pInfo->rectype     );
     recording.setAttribute( "dupInType"     , pInfo->dupin       );
     recording.setAttribute( "dupMethod"     , pInfo->dupmethod   );

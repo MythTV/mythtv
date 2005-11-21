@@ -1608,6 +1608,7 @@ QString JobQueue::GetJobCommand(int jobType, ProgramInfo *tmpInfo)
         command.replace(QRegExp("%HOSTNAME%"), tmpInfo->hostname);
         command.replace(QRegExp("%CATEGORY%"), tmpInfo->category);
         command.replace(QRegExp("%RECGROUP%"), tmpInfo->recgroup);
+        command.replace(QRegExp("%PLAYGROUP%"), tmpInfo->playgroup);
         command.replace(QRegExp("%CHANID%"), tmpInfo->chanid);
         command.replace(QRegExp("%STARTTIME%"),
                         tmpInfo->recstartts.toString("yyyyMMddhhmmss"));

@@ -43,10 +43,10 @@ ScheduledRecording::ScheduledRecording()
     m_dialog = NULL;
     recpriority = NULL;
     recgroup = NULL;
+    playgroup = NULL;
     inactive = NULL;
     searchType = "";
     searchForWhat = "";
-    timestretchid = NULL;
         
     longChannelFormat = gContext->GetSetting("LongChannelFormat", "<num> <name>");
     channelFormat = gContext->GetSetting("ChannelFormat", "<num> <sign>");
@@ -119,7 +119,10 @@ void ScheduledRecording::loadByProgram(const ProgramInfo* proginfo)
 
     if (search->intValue() == kNoSearch ||
         search->intValue() == kManualSearch)
+    {
         setProgram(proginfo);
+        playgroup->setValue(PlayGroup::GetInitialName(proginfo));
+    }
 }
 
 void ScheduledRecording::loadBySearch(RecSearchType lsearch,
@@ -439,12 +442,12 @@ void ScheduledRecording::save()
         query.prepare(
             "UPDATE recorded "
                 "SET recpriority = :RECPRIORITY, recgroup = :RECGROUP, "
-                    "transcoder = :TRANSCODER, timestretch = :TIMESTRETCH "
+                    "transcoder = :TRANSCODER, playgroup = :PLAYGROUP "
                 "WHERE recordid = :RECORDID ;");
         query.bindValue(":RECPRIORITY", getRecPriority());
         query.bindValue(":RECGROUP", recgroup->getValue());
         query.bindValue(":TRANSCODER", transcoder->getValue().toInt());
-        query.bindValue(":TIMESTRETCH", timestretchid->getValue().toFloat());
+        query.bindValue(":PLAYGROUP", playgroup->getValue());
         query.bindValue(":RECORDID", getRecordID());
 
         if (!query.exec())
@@ -689,6 +692,10 @@ void ScheduledRecording::setRecGroup(const QString& newrecgroup) {
     recgroup->setValue(newrecgroup);
 }
 
+void ScheduledRecording::setPlayGroup(const QString& newplaygroup) {
+    playgroup->setValue(newplaygroup);
+}
+
 QString ScheduledRecording::getProfileName(void) const {
     return profile->getValue();
 }
@@ -773,11 +780,10 @@ void ScheduledRecording::setDefault(bool haschannel)
 
     recgroup->fillSelections();    
     recgroup->setValue("Default");
+    playgroup->fillSelections();    
+    playgroup->setValue("Default");
 
     inactive->setValue(0);
-
-    timestretchid->fillSelections();
-    timestretchid->setValue(QString::number(1.0f, 'f', 2));
 }
 
 void ScheduledRecording::setProgram(const ProgramInfo *proginfo)
@@ -851,6 +857,7 @@ void ScheduledRecording::makeOverride(void)
     endoffset->setChanged();
     recpriority->setChanged();
     recgroup->setChanged();
+    playgroup->setChanged();
 }
 
 void

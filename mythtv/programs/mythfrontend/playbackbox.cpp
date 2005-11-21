@@ -36,6 +36,7 @@ using namespace std;
 #include "remoteutil.h"
 #include "lcddevice.h"
 #include "previewgenerator.h"
+#include "playgroup.h"
 
 #define REC_CAN_BE_DELETED(rec) \
     ((((rec)->programflags & FL_INUSEPLAYING) == 0) && \
@@ -2238,6 +2239,8 @@ void PlaybackBox::showPlaylistPopup()
 
     popup->addButton(tr("Change Recording Group"), this,
                      SLOT(doPlaylistChangeRecGroup()));
+    popup->addButton(tr("Change Playback Group"), this,
+                     SLOT(doPlaylistChangePlayGroup()));
     popup->addButton(tr("Job Options"), this,
                      SLOT(showPlaylistJobPopup()));
     popup->addButton(tr("Delete"), this, SLOT(doPlaylistDelete()));
@@ -2448,6 +2451,9 @@ void PlaybackBox::showRecordingPopup()
     popup->addButton(tr("Change Recording Title"), this,
                      SLOT(showRecTitleChanger()));
     
+    popup->addButton(tr("Change Playback Group"), this,
+                     SLOT(showPlayGroupChanger()));
+
     popup->ShowPopup(this, SLOT(doCancel()));
     editButton->setFocus();
     
@@ -4107,6 +4113,57 @@ void PlaybackBox::showRecGroupChanger(void)
     closeRecGroupPopup(result == MythDialog::Accepted);
 }
 
+void PlaybackBox::doPlaylistChangePlayGroup(void)
+{
+    // If delitem is not NULL, then the Playback Group changer will operate
+    // on just that recording, otherwise it operates on the items in theplaylist
+    if (delitem)
+    {
+        delete delitem;
+        delitem = NULL;
+    }
+
+    showPlayGroupChanger();
+}
+
+void PlaybackBox::showPlayGroupChanger(void)
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    initRecGroupPopup(tr("Change Playback Group"), "showPlayGroupChanger");
+
+    recGroupListBox = new MythListBox(recGroupPopup);
+    recGroupListBox->insertItem(tr("Default"));
+    recGroupListBox->insertStringList(PlayGroup::GetNames());
+    recGroupPopup->addWidget(recGroupListBox);
+
+    if (delitem && (delitem->playgroup != "Default"))
+    {
+        recGroupListBox->setCurrentItem(
+            recGroupListBox->index(recGroupListBox->findItem(delitem->playgroup)));
+    }
+    else
+    {
+        QString dispGroup = tr("Default");
+        recGroupListBox->setCurrentItem(recGroupListBox->index(
+                                        recGroupListBox->findItem(dispGroup)));
+    }
+
+    recGroupListBox->setFocus();
+    connect(recGroupListBox, SIGNAL(accepted(int)), recGroupPopup,
+            SLOT(accept()));
+
+    int result = recGroupPopup->ExecPopup();
+
+    if (result == MythDialog::Accepted)
+        setPlayGroup();
+
+    closeRecGroupPopup(result == MythDialog::Accepted);
+}
+
 void PlaybackBox::showRecTitleChanger()
 {
     if (!expectingPopup)
@@ -4173,6 +4230,32 @@ void PlaybackBox::setRecGroup(void)
             }
             playList.clear();
         }
+    }
+}
+
+void PlaybackBox::setPlayGroup(void)
+{
+    QString newPlayGroup = recGroupListBox->currentText();
+
+    if (newPlayGroup == tr("Default"))
+        newPlayGroup = "Default";
+
+    if (delitem)
+    {
+        delitem->ApplyRecordPlayGroupChange(newPlayGroup);
+    } 
+    else if (playList.count() > 0) 
+    {
+        QStringList::Iterator it;
+        ProgramInfo *tmpItem;
+
+        for (it = playList.begin(); it != playList.end(); ++it )
+        {
+            tmpItem = findMatchingProg(*it);
+            if (tmpItem)
+                tmpItem->ApplyRecordPlayGroupChange(newPlayGroup);
+        }
+        playList.clear();
     }
 }
 

@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1107";
+const QString currentDatabaseVersion = "1108";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -2331,6 +2331,29 @@ QString("ALTER TABLE videosource ADD COLUMN freqtable VARCHAR(16) NOT NULL DEFAU
 ""
 };
         if (!performActualUpdate(updates, "1107", dbver))
+            return false;
+    }
+
+    if (dbver == "1107")
+    {
+        const QString updates[] = {
+"ALTER TABLE record ADD COLUMN playgroup VARCHAR(32) NOT NULL DEFAULT 'Default'; ", 
+"UPDATE record SET playgroup = 'Default'; ", 
+"ALTER TABLE recorded ADD COLUMN playgroup VARCHAR(32) NOT NULL DEFAULT 'Default'; ", 
+"UPDATE recorded SET playgroup = 'Default'; ", 
+"CREATE TABLE playgroup ("
+"  name VARCHAR(32) NOT NULL PRIMARY KEY, "
+"  titlematch VARCHAR(255) NOT NULL DEFAULT '', "
+"  skipahead INT NOT NULL DEFAULT 0, "
+"  skipback INT NOT NULL DEFAULT 0, "
+"  timestretch INT NOT NULL DEFAULT 0 "
+");",
+"INSERT INTO playgroup (name,skipahead,skipback,timestretch) "
+"            VALUES ('Default',30,5,100);",
+""
+};
+
+        if (!performActualUpdate(updates, "1108", dbver))
             return false;
     }
 

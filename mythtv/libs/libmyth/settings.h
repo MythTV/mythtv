@@ -301,11 +301,15 @@ public:
 
 class SpinBoxSetting: public BoundedIntegerSetting {
 protected:
-    SpinBoxSetting(int min, int max, int step, bool allow_single_step = false):
+    SpinBoxSetting(int min, int max, int step, 
+                   bool allow_single_step = false,
+                   QString special_value_text = ""):
         BoundedIntegerSetting(min, max, step),
-	sstep(allow_single_step) {};
+	sstep(allow_single_step),
+        svtext(special_value_text) {};
 
     bool sstep;
+    QString svtext;
     
 public:
     virtual QWidget* configWidget(ConfigurationGroup *cg, QWidget* parent, 

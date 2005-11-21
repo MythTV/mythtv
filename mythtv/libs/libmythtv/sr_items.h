@@ -6,7 +6,7 @@
 #include "managedlist.h"
 #include "scheduledrecording.h"
 #include "recordingprofile.h"
-
+#include "playgroup.h"
 
 class SimpleSRSetting: public SimpleDBStorage
 {
@@ -397,7 +397,7 @@ class SRStorageOptionsGroup : public ManagedListGroup
         friend class RootSRGroup;
         class SRProfileSelector* profile;
         class SRRecGroup* recGroup;
-        class SRTimeStretch* tsValue;
+        class SRPlayGroup* playGroup;
         class SRAutoExpire* autoExpire;
         class SRMaxEpisodes* maxEpisodes;
         class SRMaxNewest* maxNewest;
@@ -838,13 +838,30 @@ class SRRecGroup: public SRSelectSetting
         void onGoingBack();
 };
 
-class SRTimeStretch : public SRSelectSetting 
+class SRPlayGroup: public SRSelectSetting
 {
+    Q_OBJECT
+
     public:
-        SRTimeStretch(ScheduledRecording *_parent, ManagedList *_list,
-                ManagedListGroup *_group);
-        void load();
-        void fillSelections();
+        SRPlayGroup(ScheduledRecording *_parent, ManagedList* _list, ManagedListGroup* _group)
+            : SRSelectSetting(_parent, "playgroupList", QString("[ %1 ]")
+                              .arg(QObject::tr("Select Playback Group")),
+                              _group, "playgroup", _list )
+        {
+            setValue("Default");
+            _parent->setPlayGroupObj(this);
+        }
+
+        virtual void load() {
+            fillSelections();
+            SRSelectSetting::load();
+        }
+
+        virtual QString getValue(void) const {
+            return settingValue;
+        }
+
+        virtual void fillSelections();
 };
 
 #endif
