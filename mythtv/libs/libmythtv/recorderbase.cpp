@@ -50,7 +50,13 @@ void RecorderBase::deleteLater(void)
 
 void RecorderBase::SetRingBuffer(RingBuffer *rbuf)
 {
-    VERBOSE(VB_RECORD, LOC + "SetRingBuffer("<<rbuf<<")");
+    if (print_verbose_messages & VB_RECORD)
+    {
+        QString msg("");
+        if (rbuf)
+            msg = " '" + rbuf->GetFilename() + "'";
+        VERBOSE(VB_RECORD,  LOC + "SetRingBuffer("<<rbuf<<")"<<msg);
+    }
     ringBuffer = rbuf;
     weMadeBuffer = false;
 }
