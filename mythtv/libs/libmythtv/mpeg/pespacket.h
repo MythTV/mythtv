@@ -136,10 +136,47 @@ class PESPacket
     TSHeader* tsheader()
         { return reinterpret_cast<TSHeader*>(_fullbuffer); }
 
+    // _pesdata[-2] == 0, _pesdata[-1] == 0, _pesdata[0] == 1
     unsigned int StartCodePrefix() const { return _pesdata[0]; }
     unsigned int StreamID() const { return _pesdata[1]; }
     unsigned int Length() const
         { return (pesdata()[2] & 0x0f) << 8 | pesdata()[3]; }
+    // 2 bits "10"
+    // 2 bits "PES_scrambling_control (0 not scrambled)
+    unsigned int ScramblingControl() const
+        { return (pesdata()[4] & 0x30) >> 4; }
+    /// 1 bit  Indicates if this is a high priority packet
+    bool HighPriority() const { return (pesdata()[4] & 0x8) >> 3; }
+    /// 1 bit  Data alignment indicator (must be 0 for video)
+    bool DataAligned()  const { return (pesdata()[4] & 0x4) >> 2; }
+    /// 1 bit  If true packet may contain copy righted material and is
+    ///        known to have once contained materiale with copy rights.
+    ///        If false packet may contain copy righted material but is
+    ///        not known to have ever contained materiale with copy rights.
+    bool CopyRight()    const { return (pesdata()[4] & 0x2) >> 1; }
+    /// 1 bit  Original Recording
+    bool OriginalRecording() const { return pesdata()[4] & 0x1; }
+
+    /// 1 bit  Presentation Time Stamp field is present
+    bool HasPTS()       const { return (pesdata()[5] & 0x80) >> 7; }
+    /// 1 bit  Decoding Time Stamp field is present
+    bool HasDTS()       const { return (pesdata()[5] & 0x40) >> 6; }
+    /// 1 bit  Elementary Stream Clock Reference field is present
+    bool HasESCR()      const { return (pesdata()[5] & 0x20) >> 5; }
+    /// 1 bit  Elementary Stream Rate field is present
+    bool HasESR()       const { return (pesdata()[5] & 0x10) >> 4; }
+    /// 1 bit  DSM field present (should always be false for broadcasts)
+    bool HasDSM()       const { return (pesdata()[5] & 0x8) >> 3; }
+    /// 1 bit  Additional Copy Info field is present
+    bool HasACI() const { return (pesdata()[5] & 0x4) >> 2; }
+    /// 1 bit  Cyclic Redundancy Check present
+    bool HasCRC()        const { return (pesdata()[5] & 0x2) >> 1; }
+    /// 1 bit  Extension flags are present
+    bool HasExtensionFlags() const { return pesdata()[5] & 0x1; }
+
+    // 8 bits PES Header Length
+    // variable length -- pes header fields
+    // variable length -- pes data block
 
     unsigned int TSSizeInBuffer() const { return _pesdataSize; }
     unsigned int PSIOffset() const { return _psiOffset; }

@@ -71,11 +71,8 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
 
     if (_pesdataSize >= tlen)
     {
-        if (CalcCRC()==CRC())
-        {
-            _badPacket=false;
-            return true;
-        }
+        if (!HasCRC() || (CalcCRC() == CRC()))
+            _badPacket = false;
 
         return true;
     }
