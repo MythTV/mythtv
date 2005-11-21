@@ -292,7 +292,7 @@ class TVRec : public QObject
 
     bool GetProgramRingBufferForLiveTV(ProgramInfo **pginfo, RingBuffer **rb);
     bool CreateLiveTVRingBuffer(void);
-    void SwitchLiveTVRingBuffer(bool discont = false);
+    bool SwitchLiveTVRingBuffer(bool discont = false, bool set_rec = true);
 
     void StartedRecording(ProgramInfo*);
     void FinishedRecording(ProgramInfo*);
