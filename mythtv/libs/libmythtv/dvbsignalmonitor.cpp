@@ -284,7 +284,7 @@ bool DVBSignalMonitor::UpdateFiltersFromStreamData(void)
     return ok;
 }
 
-/** \fn DVBSignalMonitor::RunTableMonitorSR(void)
+/** \fn DVBSignalMonitor::RunTableMonitorTS(void)
  *  \brief Uses TS filtering monitor to monitor a DVB device for tables
  *
  *  This supports all types of MPEG based stream data, but is extreemely
@@ -425,7 +425,7 @@ void DVBSignalMonitor::RunTableMonitorSR(void)
             usleep(300);   // feed is slower than TS stream
         }
     }
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorTS(): " + "shutdown");
+    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorSR(): " + "shutdown");
 
     if (GetStreamData())
     {
@@ -441,7 +441,7 @@ void DVBSignalMonitor::RunTableMonitorSR(void)
 
     delete[] buffer;
 
-    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorTS(): " + "end");
+    VERBOSE(VB_CHANNEL, LOC + "RunTableMonitorSR(): " + "end");
 }
 
 // for caching TS monitoring supported value.

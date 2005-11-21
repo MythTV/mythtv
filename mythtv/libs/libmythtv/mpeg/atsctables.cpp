@@ -45,7 +45,7 @@ int MasterGuideTable::TableClass(unsigned int i) const
 void MasterGuideTable::Parse(void) const 
 {
     _ptrs.clear();
-    _ptrs.push_back(const_cast<unsigned char*>(pesdata()) + 12);
+    _ptrs.push_back(const_cast<unsigned char*>(PESData()) + 11);
     for (unsigned int i = 0; i < TableCount(); i++)
         _ptrs.push_back(_ptrs[i] + 11 + TableDescriptorsLength(i));
 }
@@ -54,7 +54,7 @@ void MasterGuideTable::Parse(void) const
 void VirtualChannelTable::Parse(void) const 
 {
     _ptrs.clear();
-    _ptrs.push_back(const_cast<unsigned char*>(pesdata()) + 11);
+    _ptrs.push_back(const_cast<unsigned char*>(PESData()) + 10);
     for (unsigned int i = 0; i < ChannelCount(); i++)
         _ptrs.push_back(_ptrs[i] + 32 + DescriptorsLength(i));
 }
@@ -62,7 +62,7 @@ void VirtualChannelTable::Parse(void) const
 void EventInformationTable::Parse(void) const 
 {
     _ptrs.clear();
-    _ptrs.push_back(const_cast<unsigned char*>(pesdata()) + 11);
+    _ptrs.push_back(const_cast<unsigned char*>(PESData()) + 10);
     for (unsigned int i = 0; i < EventCount(); i++)
         _ptrs.push_back(_ptrs[i] + 12 + TitleLength(i) + DescriptorsLength(i));
 }
