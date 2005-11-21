@@ -413,7 +413,7 @@ class TVRec : public QObject
     static const uint kFlagAnyRunning           = 0x3F000000;
 
     // Tuning state
-    static const uint kFlagRingBufferReset      = 0x40000000;
+    static const uint kFlagRingBufferReady      = 0x40000000;
     static const uint kFlagDetect               = 0x80000000;
 };
 

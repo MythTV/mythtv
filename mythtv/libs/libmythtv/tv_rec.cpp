@@ -802,9 +802,9 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
 
     if (recorder)
     {
-        recorder->SetRingBuffer(ringBuffer);
         recorder->SetOptionsFromProfile(
             &profile, genOpt.videodev, genOpt.audiodev, genOpt.vbidev, ispip);
+        recorder->SetRingBuffer(ringBuffer);
         recorder->Initialize();
 
         if (recorder->IsErrored())
@@ -1752,7 +1752,7 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
         return 0;
     }
 
-    ClearFlags(kFlagRingBufferReset);
+    ClearFlags(kFlagRingBufferReady);
     if (rate > 0)
     {
         tuningRequests.enqueue(
@@ -1765,7 +1765,7 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
         tuningRequests.enqueue(TuningRequest(kFlagLiveTV));
     }
     // Wait for RingBuffer reset
-    while (!HasFlags(kFlagRingBufferReset))
+    while (!HasFlags(kFlagRingBufferReady))
         WaitForEventThreadSleep();
     VERBOSE(VB_RECORD, LOC + msg.arg(rate).arg(notifyFrontend) + " -- end");
     return 1;
@@ -2736,7 +2736,7 @@ void TVRec::SetChannel(QString name, uint requestType)
     }
 
     // Clear the RingBuffer reset flag, in case we wait for a reset below
-    ClearFlags(kFlagRingBufferReset);
+    ClearFlags(kFlagRingBufferReady);
 
     // Actually add the tuning request to the queue, and
     // then wait for it to start tuning
@@ -2746,7 +2746,7 @@ void TVRec::SetChannel(QString name, uint requestType)
     // If we are using a recorder, wait for a RingBuffer reset
     if (requestType & kFlagRec)
     {
-        while (!HasFlags(kFlagRingBufferReset))
+        while (!HasFlags(kFlagRingBufferReady))
             WaitForEventThreadSleep();
     }
     VERBOSE(VB_RECORD, LOC + "SetChannel()" + " -- end");
@@ -2950,8 +2950,6 @@ void TVRec::HandleTuning(void)
             return;
 
         ClearFlags(kFlagWaitingForRecPause);
-        if (ringBuffer)
-            ringBuffer->Reset();
         TuningFrequency(lastTuningRequest);
     }
 
@@ -3002,8 +3000,6 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
         if (recorder)
             GetDVBRecorder()->Close();
-        if (ringBuffer)
-            ringBuffer->Reset();
     }
     if (HasFlags(kFlagWaitingForSIParser))
         ClearFlags(kFlagWaitingForSIParser);
@@ -3194,9 +3190,6 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
         if (dummyRecorder && ringBuffer)
         {
-            //FIXME check
-            //ringBuffer->Reset();
-            //ringBuffer->StartReads();
             dummyRecorder->StartRecordingThread();
             SetFlags(kFlagDummyRecorderRunning);
         }
@@ -3603,7 +3596,7 @@ QString TVRec::FlagToString(uint f)
                 msg += "RecorderRunning,";
         }
     }
-    if (kFlagRingBufferReset & f)
+    if (kFlagRingBufferReady & f)
         msg += "RingBufferReset,";
 
     if (msg.isEmpty())
@@ -3686,7 +3679,7 @@ bool TVRec::CreateLiveTVRingBuffer(void)
     bool discont = (tvchain->TotalSize() > 0);
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
-    SetFlags(kFlagRingBufferReset);
+    SetFlags(kFlagRingBufferReady);
 
     if (curRecording)
     {
@@ -3725,7 +3718,7 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     pginfo->ApplyRecordRecGroupChange("LiveTV");
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
-    SetFlags(kFlagRingBufferReset);
+    SetFlags(kFlagRingBufferReady);
 
     if (set_rec && recorder)
     {
