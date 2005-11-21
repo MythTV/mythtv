@@ -8,9 +8,16 @@ const uint EITHelper::kChunkSize = 20;
 
 static int get_chan_id_from_db(int tid_db, const Event&);
 static uint update_eit_in_db(MSqlQuery&, MSqlQuery&, int, const Event&);
-static uint delete_invalid_programs_in_db(MSqlQuery&, MSqlQuery&, int, const Event&);
+static uint delete_overlapping_in_db(MSqlQuery&, MSqlQuery&,
+                                     int, const Event&);
 static bool has_program(MSqlQuery&, int, const Event&);
 static bool insert_program(MSqlQuery&, int, const Event&);
+
+// TODO w/GPS->UTF time conversion ':00' can become ':ss'
+static const QString timeFmtDB  = "yyyy-MM-dd hh:mm:00";
+static const QString timeFmtDB2 = "yyyy-MM-dd hh:mm:00";
+// To overwrite datadirect data with eit data use this instead
+//  static const QString timeFmtDB2 = "yyyy-MM-ddThh:mm:00";
 
 void EITHelper::HandleEITs(QMap_Events* eventList)
 {
@@ -186,43 +193,35 @@ static int get_chan_id_from_db(int mplexid, const Event &event)
 static uint update_eit_in_db(MSqlQuery &query, MSqlQuery &query2,
                              int chanid, const Event &event)
 {
-    delete_invalid_programs_in_db(query, query2, chanid, event);
+    if (has_program(query, chanid, event))
+        return 0;
 
-    bool ok = has_program(query, chanid, event);
-    if (!ok)
-        ok = insert_program(query, chanid, event);
-    return (ok) ? 1 : 0;
+    delete_overlapping_in_db(query, query2, chanid, event);
+    return insert_program(query, chanid, event) ? 1 : 0;
 }
 
-static uint delete_invalid_programs_in_db(
+static uint delete_overlapping_in_db(
     MSqlQuery &query, MSqlQuery &query2, int chanid, const Event &event)
 {
     uint counter = 0;
     query.prepare(
         "SELECT starttime, endtime, title, subtitle "
         "FROM program "
-        "WHERE chanid=:CHANID AND "
-        "      ( ( starttime>=:STIME AND starttime<:ETIME ) AND NOT "
-        "        ( starttime=:STIME AND endtime=:ETIME AND "
-        "            title=:TITLE AND subtitle=:SUBTITLE) AND "
-        "          manualid=0 );");
+        "WHERE chanid = :CHANID AND manualid = 0 AND "
+        "      ( starttime >= :STIME AND starttime < :ETIME )");
 
     query.bindValue(":CHANID", chanid);
-    query.bindValue(":STIME", event.StartTime.
-                    toString(QString("yyyy-MM-dd hh:mm:00")));
-    query.bindValue(":ETIME", event.EndTime.
-                    toString(QString("yyyy-MM-dd hh:mm:00")));
-    query.bindValue(":TITLE", event.Event_Name.utf8());
-    query.bindValue(":SUBTITLE", event.Event_Subtitle.utf8());
+    query.bindValue(":STIME",  event.StartTime.toString(timeFmtDB));
+    query.bindValue(":ETIME",  event.EndTime.toString(timeFmtDB));
 
     if (!query.exec() || !query.isActive())
         MythContext::DBError("Checking Rescheduled Event", query);
 
     query2.prepare("DELETE FROM program "
-                   "WHERE chanid=:CHANID AND "
-                   "      starttime=:STARTTIME AND "
-                   "      endtime=:ENDTIME AND "
-                   "      title=:TITLE");
+                   "WHERE chanid    = :CHANID AND "
+                   "      starttime = :STARTTIME AND "
+                   "      endtime   = :ENDTIME AND "
+                   "      title     = :TITLE");
     for (query.first(); query.isValid(); query.next())
     {
         counter++;
@@ -236,17 +235,16 @@ static uint delete_invalid_programs_in_db(
                 .arg(query.value(2).toString())
                 .arg(query.value(3).toString()));
         VERBOSE(VB_EIT, QString("New: %1 %2 %3: %4")
-                .arg(event.StartTime.
-                     toString(QString("yyyy-MM-dd hh:mm:00")))
-                .arg(event.EndTime.
-                     toString(QString("yyyy-MM-dd hh:mm:00")))
+                .arg(event.StartTime.toString(timeFmtDB2))
+                .arg(event.EndTime.toString(timeFmtDB2))
                 .arg(event.Event_Name)
                 .arg(event.Event_Subtitle));
-        // Delete old EPG record.
-        query2.bindValue(":CHANID", chanid);
+
+        // Delete the old program row
+        query2.bindValue(":CHANID",    chanid);
         query2.bindValue(":STARTTIME", query.value(0).toString());
-        query2.bindValue(":ENDTIME", query.value(1).toString());
-        query2.bindValue(":TITLE", query.value(2).toString());
+        query2.bindValue(":ENDTIME",   query.value(1).toString());
+        query2.bindValue(":TITLE",     query.value(2).toString());
         if (!query2.exec() || !query2.isActive())
             MythContext::DBError("Deleting Rescheduled Event", query2);
     }
@@ -255,20 +253,34 @@ static uint delete_invalid_programs_in_db(
 
 static bool has_program(MSqlQuery &query, int chanid, const Event &event)
 {
-    query.prepare("SELECT * FROM program "
-                  "WHERE chanid=:CHANID AND "
-                  "      starttime=:STARTTIME AND "
-                  "      endtime=:ENDTIME AND "
-                  "      title=:TITLE LIMIT 1");
-    query.bindValue(":CHANID", chanid);
-    query.bindValue(":STARTTIME", event.StartTime.toString("yyyy-MM-ddThh:mm:00"));
-    query.bindValue(":ENDTIME", event.EndTime.toString("yyyy-MM-ddThh:mm:00"));
-    query.bindValue(":TITLE", event.Event_Name.utf8());
+    query.prepare("SELECT subtitle FROM program "
+                  "WHERE chanid    = :CHANID    AND "
+                  "      starttime = :STARTTIME AND "
+                  "      endtime   = :ENDTIME   AND "
+                  "      title     = :TITLE");
+    query.bindValue(":CHANID",    chanid);
+    query.bindValue(":STARTTIME", event.StartTime.toString(timeFmtDB2));
+    query.bindValue(":ENDTIME",   event.EndTime.toString(timeFmtDB2));
+    query.bindValue(":TITLE",     event.Event_Name.utf8());
 
-    if (!query.exec() || !query.isActive())
+    if (!query.exec())
+    {
         MythContext::DBError("Checking If Event Exists", query);
+        return true; // return true on error
+    }
 
-    return query.size() > 0;
+    QString eSubtitle = event.Event_Subtitle.lower();
+    if (eSubtitle.isEmpty())
+        return query.size(); // assume subtitle would be the same
+    else if (!query.size())
+        return false; // if there is nothing in db, then we don't have program
+
+    if (!query.next())
+        return true; // return true on error
+
+    QString dbSubtitle = query.value(0).toString().lower();
+
+    return dbSubtitle == eSubtitle; // return true on match...
 }
 
 static bool insert_program(MSqlQuery &query, int chanid, const Event &event)
@@ -284,9 +296,9 @@ static bool insert_program(MSqlQuery &query, int chanid, const Event &event)
                   "  :CC,            :HDTV,      :AIRDATE,   :ORIGAIRDATE, "
                   "  :PARTNUMBER,    :PARTTOTAL, :CATTYPE)");
 
-    QString begTime = event.StartTime.toString(QString("yyyy-MM-ddThh:mm:00"));
-    QString endTime = event.EndTime.toString(  QString("yyyy-MM-ddThh:mm:00"));
-    QString airDate = event.OriginalAirDate.toString(QString("yyyy-MM-dd"));
+    QString begTime = event.StartTime.toString(timeFmtDB2);
+    QString endTime = event.EndTime.toString(timeFmtDB2);
+    QString airDate = event.OriginalAirDate.toString("yyyy-MM-dd");
 
     query.bindValue(":CHANID",      chanid);
     query.bindValue(":STARTTIME",   begTime);
@@ -325,8 +337,7 @@ static bool insert_program(MSqlQuery &query, int chanid, const Event &event)
                       "SELECT person, :CHANID, :STARTTIME, :ROLE "
                       "FROM people WHERE people.name=:NAME");
         query.bindValue(":CHANID", chanid);
-        query.bindValue(":STARTTIME", event.StartTime.
-                        toString(QString("yyyy-MM-dd hh:mm:00")));
+        query.bindValue(":STARTTIME", event.StartTime.toString(timeFmtDB));
         query.bindValue(":ROLE", (*it).role.utf8());
         query.bindValue(":NAME", (*it).name.utf8());
 
