@@ -7317,9 +7317,7 @@ Myth vil nå avsluttes.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> The following programs will be recorded instead:
-
-</source>
+        <source>The following programs will be recorded instead:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

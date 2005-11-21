@@ -274,8 +274,8 @@ void ViewScheduleDiff::statusDialog()
 
     if (pi->recstatus == rsConflict || pi->recstatus == rsLaterShowing)
     {
-        message += QObject::tr(" The following programs will be recorded "
-                               "instead:\n\n");
+        message += " " + QObject::tr("The following programs will be recorded "
+                                     "instead:") + "\n\n";
         ProgramInfo *pa = recListAfter.first();
         while (pa)
         {

@@ -1108,43 +1108,43 @@ Returning to the previous menu.</source>
     <name>PreviousList</name>
     <message>
         <source>Previously Recorded</source>
-        <translation type="unfinished">Tidigare inspelat</translation>
+        <translation>Tidigare inspelat</translation>
     </message>
     <message>
         <source>Select Sort Order</source>
-        <translation type="unfinished">Välj sorteringsordning</translation>
+        <translation>Välj sorteringsordning</translation>
     </message>
     <message>
         <source>Sort by Time</source>
-        <translation type="unfinished">Sortera på tid</translation>
+        <translation>Sortera på tid</translation>
     </message>
     <message>
         <source>Reverse Time</source>
-        <translation type="unfinished">Omvänd tid</translation>
+        <translation>Omvänd tid</translation>
     </message>
     <message>
         <source>Sort by Title</source>
-        <translation type="unfinished">Sortera på titel</translation>
+        <translation>Sortera på titel</translation>
     </message>
     <message>
         <source>Reverse Title</source>
-        <translation type="unfinished">Omvänd titel</translation>
+        <translation>Omvänd titel</translation>
     </message>
     <message>
         <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="unfinished">OBS: borttagning av poster från denna lista raderar inte några inspelningar.</translation>
+        <translation>OBS: borttagning av poster från denna lista raderar inte några inspelningar.</translation>
     </message>
     <message>
         <source>Keep this episode in the list</source>
-        <translation type="unfinished">Behåll detta avsnitt i listan</translation>
+        <translation>Behåll detta avsnitt i listan</translation>
     </message>
     <message>
         <source>Remove this episode from the list</source>
-        <translation type="unfinished">Ta bort detta avsnitt från listan</translation>
+        <translation>Ta bort detta avsnitt från listan</translation>
     </message>
     <message>
         <source>Remove all episodes for this title</source>
-        <translation type="unfinished">Ta bort alla avsnitt för denna titel</translation>
+        <translation>Ta bort alla avsnitt för denna titel</translation>
     </message>
 </context>
 <context>
@@ -7064,15 +7064,15 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Playing</source>
-        <translation type="unfinished"></translation>
+        <translation>Spelar</translation>
     </message>
     <message>
         <source>Commercial Flagging</source>
-        <translation type="unfinished"></translation>
+        <translation>Reklamflaggning</translation>
     </message>
     <message>
         <source>Transcoding</source>
-        <translation type="unfinished">Startar omkodning</translation>
+        <translation>Omkodar</translation>
     </message>
     <message>
         <source>PIP</source>
@@ -7080,25 +7080,23 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Schedule Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Schemainformation</translation>
     </message>
     <message>
         <source>List previous episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Visa tidigare avsnitt</translation>
     </message>
     <message>
         <source>Preview schedule changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Förhandsgranska ändringar</translation>
     </message>
     <message>
         <source>This recording is currently in use by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Denna inspelning används av:</translation>
     </message>
     <message>
-        <source> The following programs will be recorded instead:
-
-</source>
-        <translation type="unfinished"></translation>
+        <source>The following programs will be recorded instead:</source>
+        <translation>Följande program kommer att spelas in istället:</translation>
     </message>
 </context>
 <context>
@@ -8022,7 +8020,7 @@ Inga andra detaljer</translation>
     <name>ViewScheduleDiff</name>
     <message>
         <source>All</source>
-        <translation type="unfinished">Alla</translation>
+        <translation>Alla</translation>
     </message>
 </context>
 <context>
