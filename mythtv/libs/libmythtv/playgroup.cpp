@@ -45,7 +45,7 @@ public:
 class SkipAhead: public SpinBoxSetting, public PlayGroupSetting {
 public:
     SkipAhead(const PlayGroup& _parent):
-        SpinBoxSetting(0, 600, 5, true, tr("(default)")),
+        SpinBoxSetting(0, 600, 5, true, QObject::tr("(default)")),
         PlayGroupSetting(_parent, "skipahead") {
         setLabel(QObject::tr("Skip ahead (seconds)"));
         setHelpText(QObject::tr("How many seconds to skip forward on a fast "
@@ -56,7 +56,7 @@ public:
 class SkipBack: public SpinBoxSetting, public PlayGroupSetting {
 public:
     SkipBack(const PlayGroup& _parent):
-        SpinBoxSetting(0, 600, 5, true, tr("(default)")),
+        SpinBoxSetting(0, 600, 5, true, QObject::tr("(default)")),
         PlayGroupSetting(_parent, "skipback") {
         setLabel(QObject::tr("Skip back (seconds)"));
         setHelpText(QObject::tr("How many seconds to skip backward on a "
@@ -67,7 +67,7 @@ public:
 class TimeStretch: public SpinBoxSetting, public PlayGroupSetting {
 public:
     TimeStretch(const PlayGroup& _parent):
-        SpinBoxSetting(45, 200, 5, false, tr("(default)")),
+        SpinBoxSetting(45, 200, 5, false, QObject::tr("(default)")),
         PlayGroupSetting(_parent, "timestretch") {
         setValue(45);
         setLabel(QObject::tr("Time stretch (speed x 100)"));
@@ -175,9 +175,9 @@ void PlayGroupEditor::open(QString name)
     if (name.isEmpty())
     {
         bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), 
-            QObject::tr("Create New Playback Group"),
-            QObject::tr("Using your keyboard or the numbers keys on your "
-                        "remote enter the group name"), name);
+            tr("Create New Playback Group"),
+            tr("Using your keyboard or the numbers keys on your "
+               "remote enter the group name"), name);
         if (!ok)
             return;
 
@@ -207,13 +207,13 @@ void PlayGroupEditor::doDelete(void)
     if (name.isEmpty() || name == "Default")
         return;
 
-    QString message = QObject::tr("Delete playback group:") +
+    QString message = tr("Delete playback group:") +
         QString("\n'%1'?").arg(name);
 
     int value = MythPopupBox::show2ButtonPopup(gContext->GetMainWindow(),
                                                "", message,
-                                               QObject::tr("Yes, delete group"),
-                                               QObject::tr("No, Don't delete group"), 2);
+                                               tr("Yes, delete group"),
+                                               tr("No, Don't delete group"), 2);
 
     if (value == 0)
     {
