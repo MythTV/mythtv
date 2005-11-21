@@ -3413,6 +3413,23 @@ int main(int argc, char *argv[])
         {
             refresh_tba = false;
         }
+        else if (!strcmp(a.argv()[argpos],"-v") ||
+                 !strcmp(a.argv()[argpos],"--verbose"))
+        {
+            if (a.argc()-1 > argpos)
+            {
+                if (parse_verbose_arg(a.argv()[argpos+1]) ==
+                        GENERIC_EXIT_INVALID_CMDLINE)
+                    return GENERIC_EXIT_INVALID_CMDLINE;
+
+                ++argpos;
+            } 
+            else
+            {
+                cerr << "Missing argument to -v/--verbose option\n";
+                return GENERIC_EXIT_INVALID_CMDLINE;
+            }
+        }
 #if 0
         else if (!strcmp(a.argv()[argpos], "--dd-grab-all"))
         {
@@ -3577,6 +3594,9 @@ int main(int argc, char *argv[])
             cout << "   Marks any programs with a OriginalAirDate earlier\n";
             cout << "   than their start date as a repeat\n";
             cout << "\n";
+            cout << "-v or --verbose debug-level\n";
+            cout << "   Use '-v help' for level info\n";
+
 #if 0
             cout << "--dd-grab-all\n";
             cout << "   The DataDirect grabber will grab all available data\n";
@@ -3819,7 +3839,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (grab_data || mark_repeats)
+    if (gContext->IsConnectedToMaster() && (grab_data || mark_repeats))
         ScheduledRecording::signalChange(-1);
 
     delete gContext;

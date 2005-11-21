@@ -898,7 +898,7 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
                                           bool blockingClient)
 {
     QSocketDevice *serverSock = NULL;
-    int cnt = 0;
+    int cnt = 1;
 
     int sleepTime = GetNumSetting("WOLbackendReconnectWaitTime", 0);
     int maxConnTry = GetNumSetting("WOLbackendConnectRetry", 1);
@@ -907,7 +907,7 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
     {
         VERBOSE(VB_GENERAL, QString("Connecting to backend server: "
                                     "%1:%2 (try %3 of %4)")
-                                    .arg(hostname).arg(port).arg(cnt+1)
+                                    .arg(hostname).arg(port).arg(cnt)
                                     .arg(maxConnTry));
 
         serverSock = new QSocketDevice(QSocketDevice::Stream);
@@ -961,7 +961,7 @@ QSocketDevice *MythContext::ConnectServer(QSocket *eventSock,
     while (cnt <= maxConnTry);
 
 #ifndef IGNORE_PROTO_VER_MISMATCH
-    if (!CheckProtoVersion(serverSock))
+    if (serverSock && !CheckProtoVersion(serverSock))
     {
         delete serverSock;
         serverSock = NULL;

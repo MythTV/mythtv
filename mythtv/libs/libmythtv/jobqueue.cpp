@@ -1626,6 +1626,8 @@ QString JobQueue::GetJobCommand(int jobType, ProgramInfo *tmpInfo)
                         tmpInfo->startts.toString(Qt::ISODate));
         command.replace(QRegExp("%PROGENDISO%"),
                         tmpInfo->endts.toString(Qt::ISODate));
+        command.replace(QRegExp("%VERBOSELEVEL%"),
+                        QString("%1").arg(print_verbose_messages));
     }
 
     return command;
