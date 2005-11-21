@@ -1452,7 +1452,8 @@ void MainServer::DoDeleteThread(DeleteStruct *ds)
                                    .arg(logInfo));
     }
 
-    ScheduledRecording::signalChange(0);
+    if (pginfo->recgroup != "LiveTV")
+        ScheduledRecording::signalChange(0);
 
     delete pginfo;
 
