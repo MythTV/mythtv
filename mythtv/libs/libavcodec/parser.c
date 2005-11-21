@@ -845,7 +845,8 @@ static int ac3_parse(AVCodecParserContext *s1,
     *poutbuf_size = 0;
 
     buf_ptr = buf;
-    while (buf_size > 0) {
+    while (buf_size > 0 || 
+           (s->frame_size != 0 && (s->inbuf_ptr - s->inbuf) == s->frame_size)) {
         len = s->inbuf_ptr - s->inbuf;
         if (s->frame_size == 0) {
             /* no header seen : find one. We need at least 7 bytes to parse it */
