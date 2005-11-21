@@ -121,7 +121,8 @@ void ScheduledRecording::loadByProgram(const ProgramInfo* proginfo)
         search->intValue() == kManualSearch)
     {
         setProgram(proginfo);
-        playgroup->setValue(PlayGroup::GetInitialName(proginfo));
+        if (!proginfo->recordid)
+            playgroup->setValue(PlayGroup::GetInitialName(proginfo));
     }
 }
 
