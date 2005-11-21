@@ -101,12 +101,14 @@ class MPEGDescriptor
     operator const unsigned char*() const { return _data; }
 
     MPEGDescriptor(const unsigned char* data) : _data(data) { ; }
+    virtual ~MPEGDescriptor() {}
+
     uint DescriptorTag() const    { return _data[0]; }
     QString DescriptorTagString() const;
     uint DescriptorLength() const { return _data[1]; }
     static desc_list_t Parse(const unsigned char* data, uint len);
     static const unsigned char* Find(const desc_list_t& parsed, uint desc_tag);
-    QString toString() const;
+    virtual QString toString() const;
   protected:
     const unsigned char* _data;
 };

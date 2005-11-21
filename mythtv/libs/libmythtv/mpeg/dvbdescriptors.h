@@ -145,6 +145,8 @@ class LinkageDescriptor : public MPEGDescriptor
         { return DescriptorLength() - (PrivateDataOffset_8()-2); }
     const unsigned char* PrivateData_8() const
         { return _data + PrivateDataOffset_8(); }
+
+    QString toString() const { return QString("LinkageDescriptor(stub)"); }
 };
 
 class AdaptationFieldDataDescriptor : public MPEGDescriptor
@@ -160,6 +162,8 @@ class AdaptationFieldDataDescriptor : public MPEGDescriptor
 
     /// adapt_field_data_id     8   2.0
     uint AdaptationFieldDataID() const { return _data[2]; }
+
+    QString toString() const { return QString("AdaptationFieldDataDescriptor(stub)"); }
 };
 
 class AncillaryDataDescriptor : public MPEGDescriptor
@@ -175,6 +179,8 @@ class AncillaryDataDescriptor : public MPEGDescriptor
 
     /// ancillary_data_id       8   2.0
     uint AncillaryDataID() const { return _data[2]; }
+
+    QString toString() const { return QString("AncillaryDataDescriptor(stub)"); }
 };
 
 class AnnouncementSupportDescriptor : public MPEGDescriptor
@@ -202,6 +208,7 @@ class AnnouncementSupportDescriptor : public MPEGDescriptor
     //     component_tag        8   6.0+p
     //   }                          7.0
     // } 
+    QString toString() const { return QString("AnnouncementSupportDescriptor(stub)"); }  
 };
 
 class BouquetNameDescriptor : public MPEGDescriptor
@@ -216,6 +223,7 @@ class BouquetNameDescriptor : public MPEGDescriptor
     }
 
     // for(i=0;i<N;i++) { char 8 } 
+    QString toString() const { return QString("BouquetNameDescriptor(stub)"); }
 };
 
 class CAIdentifierDescriptor : public MPEGDescriptor
@@ -232,6 +240,7 @@ class CAIdentifierDescriptor : public MPEGDescriptor
     // 
     // for (i=0; i<N; i++)
     //   { CA_system_id 16 }
+    QString toString() const { return QString("CAIdentifierDescriptor(stub)"); }
 };
 
 class CellFrequencyLinkDescriptor : public MPEGDescriptor
@@ -256,6 +265,7 @@ class CellFrequencyLinkDescriptor : public MPEGDescriptor
     //     transposer_freq     32   1.0+p2
     //   }                          5.0
     // } 
+    QString toString() const { return QString("CellFrequencyLinkDescriptor(stub)"); }
 };
 
 class CellListDescriptor : public MPEGDescriptor
@@ -287,6 +297,7 @@ class CellListDescriptor : public MPEGDescriptor
     //     subcell_ext_of_long 12  5.4+p2
     //   }                         7.0
     // } 
+    QString toString() const { return QString("CellListDescriptor(stub)"); }
 };
 
 class ComponentDescriptor : public MPEGDescriptor
@@ -306,7 +317,8 @@ class ComponentDescriptor : public MPEGDescriptor
     // component_tag            8   4.0
     // ISO_639_language_code   24   5.0
     // 
-    // for (i=0; i<N; i++) { text_char 8 } 
+    // for (i=0; i<N; i++) { text_char 8 }
+    QString toString() const { return QString("ComponentDescriptor(stub)"); }
 };
 
 class ContentDescriptor : public MPEGDescriptor
@@ -327,6 +339,7 @@ class ContentDescriptor : public MPEGDescriptor
     //   user_nibble            4   1.0+p
     //   user_nibble            4   1.4+p
     // }                            2.0
+    QString toString() const { return QString("ContentDescriptor(stub)"); }
 };
 
 class CountryAvailabilityDescriptor : public MPEGDescriptor
@@ -345,6 +358,7 @@ class CountryAvailabilityDescriptor : public MPEGDescriptor
     // 
     // for (i=0; i<N; i++)
     //   { country_code        24 } 
+    QString toString() const { return QString("CountryAvailabilityDescriptor(stub)"); }
 };
 
 class DataBroadcastDescriptor : public MPEGDescriptor
@@ -368,6 +382,7 @@ class DataBroadcastDescriptor : public MPEGDescriptor
     // ISO_639_language_code   24
     // text_length              8
     // for (i=0; i<text_length; i++) { text_char 8 } 
+    QString toString() const { return QString("DataBroadcastDescriptor(stub)"); }
 };
 
 class DataBroadcastIdDescriptor : public MPEGDescriptor
@@ -384,6 +399,7 @@ class DataBroadcastIdDescriptor : public MPEGDescriptor
     // data_broadcast_id       16   2.0
     // for(i=0; i < N;i++ )
     // { id_selector_byte       8 } 
+    QString toString() const { return QString("DataBroadcastIdDescriptor(stub)"); }
 };
 
 class CableDeliverySystemDescriptor : public MPEGDescriptor
@@ -455,6 +471,7 @@ class CableDeliverySystemDescriptor : public MPEGDescriptor
     };
     uint FECInner() const { return _data[12] & 0xf; }
     QString FECInnerString() const { return coderate_inner(FECInner()); }
+    QString toString() const { return QString("CableDeliverySystemDescriptor(stub)"); }
 };
 
 class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
@@ -535,6 +552,9 @@ class SatelliteDeliverySystemDescriptor : public MPEGDescriptor
     };
     uint FECInner() const { return _data[12] & 0xf; }
     QString FECInnerString() const { return coderate_inner(FECInner()); }
+
+    QString toString() const { return QString("SatelliteDeliverySystemDescriptor(stub)"); }
+
 };
 
 class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
@@ -675,6 +695,8 @@ class TerrestrialDeliverySystemDescriptor : public MPEGDescriptor
     // other_frequency_flag     1   8.7
     bool OtherFrequencyInUse()  const { return _data[8] & 0x1; }
     // reserved_future_use     32   9.0
+
+    QString toString() const { return QString("TerrestrialDeliverySystemDescriptor(stub)"); }
 };
 
 class DSNGDescriptor : public MPEGDescriptor
@@ -689,6 +711,7 @@ class DSNGDescriptor : public MPEGDescriptor
     }
 
     // for (i=0;i<N;i++) { byte 8 } 
+    QString toString() const { return QString("DSNGDescriptor(stub)"); }
 };
 
 class ExtendedEventDescriptor : public MPEGDescriptor
@@ -715,6 +738,7 @@ class ExtendedEventDescriptor : public MPEGDescriptor
     // }
     // text_length 8 
     // for (i=0; i<N; i++) { text_char 8 } 
+    QString toString() const { return QString("ExtendedEventDescriptor(stub)"); }
 };
 
 class FrequencyListDescriptor : public MPEGDescriptor
@@ -757,6 +781,8 @@ class FrequencyListDescriptor : public MPEGDescriptor
         return Frequency(i) *
             ((kCodingTypeTerrestrial == CodingType()) ? 10 : 100);
     }
+
+    QString toString() const { return QString("FrequencyListDescriptor(stub)"); }
 };
 
 class LocalTimeOffsetDescriptor : public MPEGDescriptor
@@ -780,6 +806,7 @@ class LocalTimeOffsetDescriptor : public MPEGDescriptor
     //   time_of_change        40   6.0+p
     //   next_time_offset      16  11.0+p
     // }                           13.0
+    QString toString() const { return QString("LocalTimeOffsetDescriptor(stub)"); }
 };
 
 class MosaicDescriptor : public MPEGDescriptor
@@ -833,6 +860,7 @@ class MosaicDescriptor : public MPEGDescriptor
     //     event_id            16
     //   }
     // } 
+    QString toString() const { return QString("MosaicDescriptor(stub)"); }
 };
 
 class MultilingualBouquetNameDescriptor : public MPEGDescriptor
@@ -853,6 +881,7 @@ class MultilingualBouquetNameDescriptor : public MPEGDescriptor
     //   bouquet_name_length    8 
     //   for (j=0;j<N;j++) { char 8 }
     // } 
+    QString toString() const { return QString("MultilingualBouguetNameDescriptor(stub)"); }
 };
 
 class MultilingualNetworkNameDescriptor : public MPEGDescriptor
@@ -872,6 +901,7 @@ class MultilingualNetworkNameDescriptor : public MPEGDescriptor
     //   network_name_length    8
     //   for (j=0;j<N;j++) { char 8 }
     // }
+    QString toString() const { return QString("MultilingualNetworkNameDescriptor(stub)"); }
 };
 
 class MultilingualServiceNameDescriptor : public MPEGDescriptor
@@ -894,6 +924,7 @@ class MultilingualServiceNameDescriptor : public MPEGDescriptor
     //   service_name_length    8
     //   for (j=0;j<N;j++) { char 8 }
     // } 
+    QString toString() const { return QString("MultiLingualServiceNameDescriptor(stub)"); }
 };
 
 class NVODReferenceDescriptor : public MPEGDescriptor
@@ -913,6 +944,7 @@ class NVODReferenceDescriptor : public MPEGDescriptor
     //   original_network_id   16
     //   service_id            16
     // }
+    QString toString() const { return QString("NVODReferenceDescriptor(stub)"); }
 };
 
 class ParentalRatingDescriptor : public MPEGDescriptor
@@ -931,6 +963,7 @@ class ParentalRatingDescriptor : public MPEGDescriptor
     //   country_code          24
     //   rating                 8
     // } 
+    QString toString() const { return QString("ParentalRatingDescriptor(stub)"); }
 };
 
 class PDCDescriptor : public MPEGDescriptor
@@ -946,6 +979,7 @@ class PDCDescriptor : public MPEGDescriptor
 
     // reserved_future_use      4   2.0
     // program_id_label        20   2.4
+    QString toString() const { return QString("PDCDescriptor(stub)"); }
 };
 
 class PrivateDataSpecifierDescriptor : public MPEGDescriptor
@@ -961,6 +995,7 @@ class PrivateDataSpecifierDescriptor : public MPEGDescriptor
     }
 
     // private_data_specifier  32   2.0
+    QString toString() const { return QString("PrivateDataSpecifierDescriptor(stub)"); }
 };
 
 class ScramblingDescriptor : public MPEGDescriptor
@@ -975,6 +1010,8 @@ class ScramblingDescriptor : public MPEGDescriptor
     }
 
     // scrambling_mode          8   2.0
+
+    QString toString() const { return QString("ScramblingDescriptor"); }
 };
 
 class ServiceDescriptor : public MPEGDescriptor
@@ -1026,6 +1063,7 @@ class ServiceDescriptor : public MPEGDescriptor
         { return ServiceType() ==  kServiceTypeDigitalTelevision; }
     bool IsDigitalAudio() const
         { return ServiceType() ==  kServiceTypeDigitalRadioSound; }
+    QString toString() const { return QString("ServiceDescriptor(stub)"); }
 };
 
 class ServiceAvailabilityDescriptor : public MPEGDescriptor
@@ -1042,6 +1080,7 @@ class ServiceAvailabilityDescriptor : public MPEGDescriptor
     // availability_flag        1   2.0
     // reserved                 7   2.1
     // for (i=0;i<N;i++) { cell_id 16 } 
+    QString toString() const { return QString("ServiceAvailabilityDescriptor(stub)"); }
 };
 
 class ServiceListDescriptor : public MPEGDescriptor
@@ -1060,6 +1099,7 @@ class ServiceListDescriptor : public MPEGDescriptor
     //   service_id            16  0.0+p
     //   service_type           8  2.0+p
     // } 
+    QString toString() const { return QString("ServiceListDescriptor(stub)"); }
 };
 
 class ServiceMoveDescriptor : public MPEGDescriptor
@@ -1076,6 +1116,7 @@ class ServiceMoveDescriptor : public MPEGDescriptor
     // new_original_network_id 16   2.0
     // new_transport_stream_id 16   4.0
     // new_service_id          16   6.0
+    QString toString() const { return QString("ServiceMoveDescriptor(stub)"); }
 };
 
 class ShortEventDescriptor : public MPEGDescriptor
@@ -1094,6 +1135,7 @@ class ShortEventDescriptor : public MPEGDescriptor
     // for (i=0;i<event_name_length;i++) { event_name_char 8 }
     // text_length              8
     // for (i=0;i<text_length;i++) { text_char 8 }
+    QString toString() const { return QString("ShortEventDescriptor(stub)"); }
 };
 
 class ShortSmoothingBufferDescriptor : public MPEGDescriptor
@@ -1111,6 +1153,7 @@ class ShortSmoothingBufferDescriptor : public MPEGDescriptor
     // sb_leak_rate             6   2.2
     // for (i=0; i<N; i++)
     // { DVB_reserved           8 } 
+    QString toString() const { return QString("ShortSmoothingBufferDescriptor(stub)"); }
 };
 
 class StreamIdentifierDescriptor : public MPEGDescriptor
@@ -1125,6 +1168,7 @@ class StreamIdentifierDescriptor : public MPEGDescriptor
     // descriptor_length        8   1.0
     }
     // component_tag            8   2.0
+    QString toString() const { return QString("StreamIdentifierDescriptor(stub)"); }
 };
 
 class SubtitlingDescriptor : public MPEGDescriptor
@@ -1145,6 +1189,7 @@ class SubtitlingDescriptor : public MPEGDescriptor
     //   composition_page_id   16   4.0+p
     //   ancillary_page_id     16   6.0+p
     // }                            8.0
+    QString toString() const { return QString("SubtitlingDescriptor(stub)"); }
 };
 
 class TelephoneDescriptor : public MPEGDescriptor
@@ -1179,6 +1224,7 @@ class TelephoneDescriptor : public MPEGDescriptor
     //   { national_area_code_char 8 }
     // for (i=0; i<N; i++)
     //   { core_number_char 8 }
+    QString toString() const { return QString("TelephoneDescriptor(stub)"); }
 };
 
 class TeletextDescriptor : public MPEGDescriptor
@@ -1198,6 +1244,7 @@ class TeletextDescriptor : public MPEGDescriptor
     //   teletext_magazine_num 3   3.5
     //   teletext_page_num     8   4.0
     // }                           5.0
+    QString toString() const { return QString("TeletextDescriptor(stub)"); }
 };
 
 class TimeShiftedEventDescriptor : public MPEGDescriptor
@@ -1213,6 +1260,7 @@ class TimeShiftedEventDescriptor : public MPEGDescriptor
 
     // reference_service_id    16   2.0
     // reference_event_id      16   4.0
+    QString toString() const { return QString("TimeShiftedEventDescriptor(stub)"); }
 };
 
 class TimeShiftedServiceDescriptor : public MPEGDescriptor
@@ -1228,6 +1276,7 @@ class TimeShiftedServiceDescriptor : public MPEGDescriptor
     }
 
     // reference_service_id    16   2.0
+    QString toString() const { return QString("TimeShiftedServiceDescriptor(stub)"); }
 };
 
 class TransportStreamDescriptor : public MPEGDescriptor
@@ -1242,6 +1291,7 @@ class TransportStreamDescriptor : public MPEGDescriptor
     }
 
     // for (i=0; i<N; i++) { byte 8 } 
+    QString toString() const { return QString("TransportStreamDescriptor(stub)"); }
 };
 
 class VBIDataDescriptor : public MPEGDescriptor
@@ -1273,6 +1323,7 @@ class VBIDataDescriptor : public MPEGDescriptor
     //     for (i=0; i<N; i++) { reserved 8 }
     //   }
     // }
+    QString toString() const { return QString("VBIDataDescriptor(stub)"); }
 };
 
 class VBITeletextDescriptor : public MPEGDescriptor
@@ -1293,6 +1344,7 @@ class VBITeletextDescriptor : public MPEGDescriptor
     //   teletext_magazine_num  3   3.5+p
     //   teletext_page_num      8   4.0+p
     // }                            5.0
+    QString toString() const { return QString("VBITeletextDescriptor(stub)"); }
 };
 
 class PartialTransportStreamDescriptor : public MPEGDescriptor
@@ -1312,6 +1364,7 @@ class PartialTransportStreamDescriptor : public MPEGDescriptor
     // min_overall_smooth_rate 22   5.2
     // DVB_reserved_future_use  2   8.0
     // max_overall_smooth_buf  14   8.2
+    QString toString() const { return QString("PartialTransportStreamDescriptor(stub)"); }
 };
 
 
@@ -1342,6 +1395,7 @@ class AC3DescriptorDescriptor : public MPEGDescriptor
     // for (I=0;I<N;I++)
     //   { additional_info[i] N*8 uimsbf }
     //};
+    QString toString() const { return QString("AC3DescriptorDescriptor(stub)"); }
 };
 
 static QString coderate_inner(uint cr)
@@ -1378,6 +1432,8 @@ class UKChannelListDescriptor : public MPEGDescriptor
 
     uint ChannelNumber(uint i) const
         { return ((_data[4 + (i<<2)] << 8) | _data[5 + (i<<2)]) & 0x3ff; }
+
+    QString toString() const { return QString("UKChannelListDescriptor(stub)"); }
 };
 
 #endif

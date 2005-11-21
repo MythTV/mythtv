@@ -283,6 +283,8 @@ class ContentIdentifierDescriptor : public MPEGDescriptor {
     //        0x02-0xFF ATSC Reserved
     //   ID_length                           8   3.0
     //   content_identifier                  v   4.0
+
+    QString toString() const { return QString("ContentIdentifierDescriptor(stub)"); }
 };
 
 /**
@@ -298,6 +300,8 @@ class ExtendedChannelNameDescriptor : public MPEGDescriptor
     ExtendedChannelNameDescriptor(const unsigned char *data);
     MultipleStringStructure LongChannelName(void) const;
     QString LongChannelNameString(void) const;
+
+    QString toString() const { return QString("ExtendedChannelNameDescriptor(stub)"); }
 };
 
 #endif
