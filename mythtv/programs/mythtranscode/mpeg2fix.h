@@ -193,7 +193,7 @@ class MPEG2fixup
 
     MPEG2ptsDeltaList *ptsDelta;
 
-    QMap<int64_t, int> delMap;
+    QMap<long long, int> delMap;
 
     pthread_t thread;
 
