@@ -178,6 +178,7 @@ class MPEG2fixup
 
     void dec2x33(int64_t *pts1, int64_t pts2);
     void inc2x33(int64_t *pts1, int64_t pts2);
+    int64_t udiff2x33(int64_t pts1, int64_t pts2);
     int64_t diff2x33(int64_t pts1, int64_t pts2);
     int64_t add2x33(int64_t pts1, int64_t pts2);
     int cmp2x33(int64_t pts1, int64_t pts2);

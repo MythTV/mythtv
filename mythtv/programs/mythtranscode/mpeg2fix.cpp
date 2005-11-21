@@ -117,7 +117,7 @@ static void SETBITS(unsigned char *ptr, long value, int num)
 
 void MPEG2fixup::dec2x33(int64_t *pts1, int64_t pts2)
 {
-    *pts1 = diff2x33(*pts1, pts2);
+    *pts1 = udiff2x33(*pts1, pts2);
 }
 
 void MPEG2fixup::inc2x33(int64_t *pts1, int64_t pts2)
@@ -125,7 +125,7 @@ void MPEG2fixup::inc2x33(int64_t *pts1, int64_t pts2)
     *pts1 = (*pts1 + pts2) % MAX_PTS;
 }
 
-int64_t MPEG2fixup::diff2x33(int64_t pts1, int64_t pts2)
+int64_t MPEG2fixup::udiff2x33(int64_t pts1, int64_t pts2)
 {
         int64_t diff;
 
@@ -135,6 +135,31 @@ int64_t MPEG2fixup::diff2x33(int64_t pts1, int64_t pts2)
                 diff = MAX_PTS + diff;
         }
         return diff;
+}
+
+int64_t MPEG2fixup::diff2x33(int64_t pts1, int64_t pts2)
+{
+    switch (cmp2x33(pts1, pts2)){
+        case 0:
+                return 0;
+                break;
+
+        case 1:
+        case -2:
+                return (pts1 -pts2);
+                break;
+
+        case 2:
+                return (pts1 + MAX_PTS -pts2);
+                break;
+
+        case -1:
+                return (pts1 - (pts2+ MAX_PTS));
+                break;
+
+    }
+
+    return 0;
 }
 
 int64_t MPEG2fixup::add2x33(int64_t pts1, int64_t pts2)
@@ -1409,9 +1434,9 @@ int MPEG2fixup::start()
         VERBOSE(MPF_PROCESS, msg);
     }
 
-    origvPTS = 300 * diff2x33(vFrame.first()->pkt.pts,
+    origvPTS = 300 * udiff2x33(vFrame.first()->pkt.pts,
                      ptsIncrement * get_frame_num(vFrame.current()));
-    expectedvPTS = 300 * (diff2x33(vFrame.first()->pkt.pts, initPTS) -
+    expectedvPTS = 300 * (udiff2x33(vFrame.first()->pkt.pts, initPTS) -
                          (ptsIncrement * get_frame_num(vFrame.current())));
     expectedDTS = expectedvPTS - 300 * ptsIncrement;
 
@@ -1423,7 +1448,7 @@ int MPEG2fixup::start()
     {
         QPtrList<MPEG2frame> *af = &it.data();
         origaPTS[it.key()] = af->first()->pkt.pts;
-        expectedPTS[it.key()] = diff2x33(af->first()->pkt.pts, initPTS);
+        expectedPTS[it.key()] = udiff2x33(af->first()->pkt.pts, initPTS);
     }
 
     init_replex();
@@ -1654,10 +1679,17 @@ int MPEG2fixup::start()
 
                         vFrame.at(frame_pos)->pkt.pts = lastPTS / 300;
                         int ret = insert_frame(get_frame_num(vFrame.current()),
-                                               deltaPTS, ptsIncrement, initPTS);
+                                               deltaPTS, ptsIncrement, 0);
                         if(ret < 0)
                             return TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR;
-                        frame_count -= ret;
+                        for (vFrame.at(frame_pos + reorder); ret;
+                             vFrame.next(), --ret)
+                        {
+                            lastPTS = expectedvPTS;
+                            expectedvPTS += 150 * ptsIncrement *
+                                            get_nb_fields(vFrame.current());
+                            ++reorder;
+                        }
                     }
 
                     //Set DTS (ignore any current values), and send frame to
@@ -1762,7 +1794,7 @@ int MPEG2fixup::start()
                 }
 
                 dec2x33(&af->first()->pkt.pts, initPTS);
-                expectedPTS[it.key()] = diff2x33(nextPTS, initPTS);
+                expectedPTS[it.key()] = udiff2x33(nextPTS, initPTS);
                 // write_audio(lApkt_tail->pkt, initPTS);
                 VERBOSE(MPF_FRAME, QString("AUD #%1: pts: %2").arg(it.key()) 
                         .arg(pts_time(af->current()->pkt.pts)));
@@ -1789,14 +1821,14 @@ int MPEG2fixup::start()
 }
 
 #ifdef NO_MYTH
-int print_verbose_messages = MPF_GENERAL;
+int print_verbose_messages = MPF_GENERAL | MPF_IMPORTANT;
 
 void usage(char *s)
 {
     fprintf(stderr, "%s usage:\n", s);
     fprintf(stderr, "\t--infile <file>    -i <file> : Input mpg file\n");
     fprintf(stderr, "\t--outfile <file>   -o <file> : Output mpg file\n");
-    fprintf(stderr, "\t--dbg_lvl #          -d #      : Debug level(0..4)\n");
+    fprintf(stderr, "\t--dbg_lvl #        -d #      : Debug level\n");
     fprintf(stderr, "\t--maxframes #      -m #      : Max frames to insert at once (default=10)\n");
     fprintf(stderr, "\t--cutlist \"start - end\" -c : Apply a cutlist.  Specify on e'-c' per cut\n");
     fprintf(stderr, "\t--no3to2           -t        : Remove 3:2 pullup\n");
