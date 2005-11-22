@@ -423,6 +423,12 @@ int avcodec_default_execute(AVCodecContext *c, int (*func)(AVCodecContext *c2, v
     return 0;
 }
 
+void avcodec_default_decode_cc_dvd(AVCodecContext *c, const uint8_t *buf, int buf_size){
+}
+
+void avcodec_default_decode_cc_atsc(AVCodecContext *c, const uint8_t *buf, int buf_size){
+}
+
 enum PixelFormat avcodec_default_get_format(struct AVCodecContext *s, const enum PixelFormat * fmt){
     return fmt[0];
 }
@@ -758,6 +764,8 @@ void avcodec_get_context_defaults(AVCodecContext *s){
     s->inter_quant_bias= FF_DEFAULT_QUANT_BIAS;
     s->palctrl = NULL;
     s->reget_buffer= avcodec_default_reget_buffer;
+    s->decode_cc_dvd= avcodec_default_decode_cc_dvd;
+    s->decode_cc_atsc= avcodec_default_decode_cc_atsc;
 }
 
 /**

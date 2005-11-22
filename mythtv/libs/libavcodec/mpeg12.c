@@ -2987,6 +2987,17 @@ static void mpeg_decode_user_data(AVCodecContext *avctx,
                 return;
             avctx->dtg_active_format = p[0] & 0x0f;
         }
+    } else if (len >= 3 &&
+               p[0] == 'C' && p[1] == 'C') {
+        p += 2;
+        len -= 2;
+        avctx->decode_cc_dvd(avctx, p, len);
+    } else if (len >= 6 &&
+               p[0] == 0x47 && p[1] == 0x41 && p[2] == 0x39 && p[3] == 0x34 &&
+               p[4] == 0x03) {
+        p += 5;
+        len -= 5;
+        avctx->decode_cc_atsc(avctx, p, len);
     }
 }
 

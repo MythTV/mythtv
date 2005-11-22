@@ -158,8 +158,10 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
       frame_decoded(0), directrendering(false), drawband(false), bitrate(0),
       gopset(false), seen_gop(false), seq_count(0), firstgoppos(0),
       prevgoppos(0), gotvideo(false), lastvpts(0), lastapts(0),
+      lastccptsu(0),
       using_null_videoout(use_null_videoout), video_codec_id(kCodec_NONE),
       maxkeyframedist(-1), 
+      ccd(new CCDecoder(this)),
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       audio_sample_size(-1), audio_sampling_rate(-1), audio_channels(-1),
@@ -173,11 +175,14 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
 
     bool debug = (bool)(print_verbose_messages & VB_LIBAV);
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
+
+    save_cctc[0] = save_cctc[1] = 0;
 }
 
 AvFormatDecoder::~AvFormatDecoder()
 {
     CloseContext();
+    delete ccd;
     delete d;
     if (audioSamples)
         delete [] audioSamples;
@@ -310,6 +315,8 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
 
     lastapts = 0;
     lastvpts = 0;
+    lastccptsu = 0;
+    save_cctc[0] = save_cctc[1] = 0;
 
     av_read_frame_flush(ic);
     
@@ -896,6 +903,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                 {
                     d->InitMPEG2();
                 }
+
+                enc->decode_cc_dvd  = decode_cc_dvd;
+                enc->decode_cc_atsc = decode_cc_atsc;
                 break;
             }
             case CODEC_TYPE_AUDIO:
@@ -1234,6 +1244,182 @@ void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
         cerr<<"render_slice_xvmc called with bad avctx or src"<<endl;
 }
 
+void decode_cc_dvd(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
+{
+    // taken from xine-lib libspucc by Christian Vogler
+
+    AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
+    unsigned long long utc = nd->lastccptsu;
+
+    const uint8_t *current = buf;
+    int curbytes = 0;
+    uint8_t data1, data2;
+    uint8_t cc_code;
+    int odd_offset = 1;
+
+    while (curbytes < buf_size)
+    {
+        int skip = 2;
+
+        cc_code = *current++;
+        curbytes++;
+    
+        if (buf_size - curbytes < 2)
+            break;
+    
+        data1 = *current;
+        data2 = *(current + 1);
+    
+        switch (cc_code)
+        {
+            case 0xfe:
+                /* expect 2 byte encoding (perhaps CC3, CC4?) */
+                /* ignore for time being */
+                skip = 2;
+                break;
+
+            case 0xff:
+            {
+                /* expect EIA-608 CC1/CC2 encoding */
+                int tc = utc / 1000;
+                int data = (data2 << 8) | data1;
+                nd->ccd->FormatCCField(tc, 0, data);
+                utc += 33367;
+                skip = 5;
+                break;
+            }
+
+            case 0x00:
+                /* This seems to be just padding */
+                skip = 2;
+                break;
+
+            case 0x01:
+                odd_offset = data2 & 0x80;
+                if (odd_offset)
+                    skip = 2;
+                else
+                    skip = 5;
+                break;
+
+            default:
+                // rest is not needed?
+                goto done;
+                //skip = 2;
+                //break;
+        }
+        current += skip;
+        curbytes += skip;
+
+    }
+  done:
+    nd->lastccptsu = utc;
+}
+
+void decode_cc_atsc(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
+{
+    AvFormatDecoder *nd = (AvFormatDecoder *)(s->opaque);
+    unsigned long long utc = nd->lastccptsu;
+
+    const uint8_t *current = buf;
+    int curbytes = 0;
+    int curcount = 0;
+    uint8_t data1, data2;
+    uint8_t cc_count;
+    uint8_t cc_code;
+    int  cc_state;
+
+    if (buf_size < 2)
+        return;
+
+    // check process_cc_data_flag
+    if (!(*current & 0x40))
+        return;
+    cc_count = *current & 0x1f;
+    current++;  curbytes++;
+
+    // skip em_data
+    current++;  curbytes++;
+
+    cc_state = 0;
+    while (curbytes < buf_size && curcount < cc_count)
+    {
+        cc_code = *current++;
+        curbytes++;
+    
+        if (buf_size - curbytes < 2)
+            break;
+    
+        data1 = *current++;
+        data2 = *current++;
+        curbytes += 2;
+        curcount++;
+
+        // check cc_valid
+        if (!(cc_code & 0x04))
+            continue;
+
+        cc_code &= 0x03;
+        if (cc_code <= 0x1)
+        {
+            // EIA-608 field-1/2
+            int data = (data2 << 8) | data1;
+            unsigned int tc;
+
+            if ((cc_state & cc_code) == cc_code)
+            {
+                // another field of same type -- assume
+                // it's for the next frame
+                utc += 33367;
+                cc_state = 0;
+            }
+            cc_state |= cc_code;
+            tc = utc / 1000;
+
+            // For some reason, one frame can be out of order.
+            // We need to save the CC codes for at least one
+            // frame so we can send the correct sequence to the
+            // decoder.
+
+            if (nd->save_cctc[cc_code])
+            {
+                if (nd->save_cctc[cc_code] < tc)
+                {
+                    // send saved code to decoder
+                    nd->ccd->FormatCCField(nd->save_cctc[cc_code],
+                                           cc_code,
+                                           nd->save_ccdata[cc_code]);
+                    nd->save_cctc[cc_code] = 0;
+                }
+                else if ((nd->save_cctc[cc_code] - tc) > 1000)
+                {
+                    // saved code is too far in the future; probably bad
+                    // - discard it
+                    nd->save_cctc[cc_code] = 0;
+                }
+                else
+                {
+                    // send new code to decoder
+                    nd->ccd->FormatCCField(tc, cc_code, data);
+                }
+            }
+            if (!nd->save_cctc[cc_code])
+            {
+                // no saved code
+                // - save new code since it may be out of order
+                nd->save_cctc[cc_code] = tc;
+                nd->save_ccdata[cc_code] = data;
+            }
+        }
+        else
+        {
+            // TODO:  EIA-708 DTVCC packet data
+        }
+
+    }
+    nd->lastccptsu = utc;
+}
+
 void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
 {
     if (prevgoppos != 0 && keyframedist != 1)
@@ -1409,7 +1595,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 
                         gopset = false;
                         prevgoppos = 0;
-                        lastapts = lastvpts = 0;
+                        lastapts = lastvpts = lastccptsu = 0;
                     }
 
                     seq_count++;
@@ -2035,6 +2221,11 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 }
                 case CODEC_TYPE_VIDEO:
                 {
+                    if (firstloop && pts != (int64_t) AV_NOPTS_VALUE)
+                    {
+                        lastccptsu = (long long)
+                            (av_q2d(curstream->time_base)*pkt->pts*1000000);
+                    }
                     if (onlyvideo < 0)
                     {
                         framesPlayed++;
@@ -2233,3 +2424,8 @@ int AvFormatDecoder::EncodeAC3Frame(unsigned char *data, int len,
     return len;  // consume whole frame even if len > enc_len ?
 }
 
+void AvFormatDecoder::AddTextData(unsigned char *buf, int len,
+                                  long long timecode, char type)
+{
+    m_parent->AddTextData((char*)buf, len, timecode, type);
+}

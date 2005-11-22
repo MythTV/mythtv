@@ -1859,6 +1859,14 @@ typedef struct AVCodecContext {
      */
     int xvmc_vld_hwslice;
 
+    /**
+     * Closed Caption decoder
+     * - encoding: forbidden
+     * - decoding: set by decoder
+     */
+    void (*decode_cc_dvd)(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
+    void (*decode_cc_atsc)(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
+
 } AVCodecContext;
 
 /**
@@ -2263,6 +2271,8 @@ void avcodec_thread_free(AVCodecContext *s);
 int avcodec_thread_execute(AVCodecContext *s, int (*func)(AVCodecContext *c2, void *arg2),void **arg, int *ret, int count);
 int avcodec_default_execute(AVCodecContext *c, int (*func)(AVCodecContext *c2, void *arg2),void **arg, int *ret, int count);
 //FIXME func typedef
+void avcodec_default_decode_cc_dvd(AVCodecContext *c, const uint8_t *buf, int buf_size);
+void avcodec_default_decode_cc_atsc(AVCodecContext *c, const uint8_t *buf, int buf_size);
 
 /**
  * opens / inits the AVCodecContext.

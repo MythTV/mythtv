@@ -7,6 +7,7 @@
 #include "programinfo.h"
 #include "format.h"
 #include "decoderbase.h"
+#include "ccdecoder.h"
 
 extern "C" {
 #include "frame.h"
@@ -24,7 +25,7 @@ extern "C" void HandleStreamChange(void*);
 /// The AvFormatDecoder is used to decode non-NuppleVideo files.
 /// It's used a a decoder of last resort after trying the NuppelDecoder
 /// and IvtvDecoder (if "USING_IVTV" is defined).
-class AvFormatDecoder : public DecoderBase
+class AvFormatDecoder : public DecoderBase, public CCReader
 {
     friend void HandleStreamChange(void*);
   public:
@@ -77,6 +78,8 @@ class AvFormatDecoder : public DecoderBase
     virtual bool setCurrentAudioTrack(int trackNo);    
     virtual QStringList listAudioTracks() const;
 
+    void AddTextData(unsigned char *buf, int len, long long timecode, char type);
+
     virtual void incCurrentSubtitleTrack();
     virtual void decCurrentSubtitleTrack();
     virtual bool setCurrentSubtitleTrack(int trackNo);    
@@ -105,6 +108,9 @@ class AvFormatDecoder : public DecoderBase
     friend void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
     friend void render_slice_xvmc(struct AVCodecContext *c, const AVFrame *src,
                                   int offset[4], int y, int type, int height);
+
+    friend void decode_cc_dvd(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
+    friend void decode_cc_atsc(struct AVCodecContext *c, const uint8_t *buf, int buf_size);
 
     friend int open_avf(URLContext *h, const char *filename, int flags);
     friend int read_avf(URLContext *h, uint8_t *buf, int buf_size);
@@ -168,11 +174,16 @@ class AvFormatDecoder : public DecoderBase
 
     long long lastvpts;
     long long lastapts;
+    long long lastccptsu;
+    unsigned int save_cctc[2];
+    int save_ccdata[2];
 
     bool using_null_videoout;
     MythCodecID video_codec_id;
 
     int maxkeyframedist;
+
+    CCDecoder *ccd;
 
     // Audio
     short int        *audioSamples;
