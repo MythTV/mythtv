@@ -42,8 +42,8 @@ class OSD : public QObject
 {
     Q_OBJECT
  public:
-    OSD(int width, int height, int framerate,
-        int dispx, int dispy, int dispw, int disph);
+    OSD(const QRect &totalBounds,   int   frameRate,
+        const QRect &visibleBounds, float visibleAspect);
    ~OSD(void);
 
     OSDSurface *Display(void);
@@ -108,8 +108,8 @@ class OSD : public QObject
 
     int getTimeType(void) { return timeType; }
 
-    void Reinit(int width, int height, int frint, int dispx, int dispy, 
-                int dispw, int disph);
+    void Reinit(const QRect &totalBounds,   int   frameRate,
+                const QRect &visibleBounds, float visibleAspect);
 
     void SetFrameInterval(int frint);
 
@@ -150,12 +150,13 @@ class OSD : public QObject
     void parsePositionImage(OSDSet *container, QDomElement &element);
     void parseListTree(OSDSet *container, QDomElement &element);
 
-    int vid_width;
-    int vid_height;
-    int frameint;
+    QRect osdBounds;
+    int   frameint;
+    bool  needPillarBox;
 
     QString themepath;
 
+    float wscale;
     float hmult, wmult;
     int xoffset, yoffset, displaywidth, displayheight;
 

@@ -27,55 +27,45 @@ using namespace std;
 
 #include "osdlistbtntype.h"
 
-OSD::OSD(int width, int height, int frint,
-         int dispx, int dispy, int dispw, int disph)
-   : QObject()
+OSD::OSD(const QRect &osd_bounds, int   frameRate,
+         const QRect &vis_bounds, float visibleAspect)
+    : QObject(),
+      osdBounds(osd_bounds),              frameint(frameRate),
+      needPillarBox(false),
+      themepath(FindTheme(gContext->GetSetting("OSDTheme"))),
+      wscale(1.0f),
+      hmult(vis_bounds.width() / 640.0f), wmult(vis_bounds.height() / 480.0f),
+      xoffset(vis_bounds.left()),         yoffset(vis_bounds.top()),
+      displaywidth(vis_bounds.width()),   displayheight(vis_bounds.height()),
+      m_setsvisible(false),
+      totalfadetime(0),                   timeType(0),
+      timeFormat(""),                     setList(new vector<OSDSet*>),
+      editarrowleft(NULL),                editarrowright(NULL),
+      drawSurface(new OSDSurface(osd_bounds.width(), osd_bounds.height())),
+      changed(false),                     runningTreeMenu(NULL),
+      treeMenuContainer("")
 {
-    changed = false;
-    vid_width = width;
-    vid_height = height;
-    frameint = frint;
+    needPillarBox = visibleAspect > 1.51f;
+    wscale = visibleAspect / 1.3333f;
 
-    editarrowleft = editarrowright = NULL;
-
-    wmult = dispw / 640.0;
-    hmult = disph / 480.0;
-
-    xoffset = dispx;
-    yoffset = dispy;   
-    displaywidth = dispw;
-    displayheight = disph;
-
-    timeType = 0; 
-    totalfadetime = 0;
-
-    m_setsvisible = false;
-    setList = NULL;
-
-    runningTreeMenu = NULL;
-
-    setList = new vector<OSDSet *>;
-    
-    QString osdtheme = gContext->GetSetting("OSDTheme");
-    themepath = FindTheme(osdtheme);
-
-    if (themepath == "")
+    if (themepath.isEmpty())
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't find OSD theme: " << osdtheme);
-    }
-    else
-    {
-        themepath += "/";
-        if (!LoadTheme())
-        {
-            VERBOSE(VB_IMPORTANT, "Couldn't load OSD theme: " << osdtheme
-                    << " at " << themepath);
-        }
+        VERBOSE(VB_IMPORTANT, "Couldn't find OSD theme: "
+                <<gContext->GetSetting("OSDTheme"));
+        SetDefaults();
+        return;
     }
 
+    themepath += "/";
+    if (!LoadTheme())
+    {
+        VERBOSE(VB_IMPORTANT, "Couldn't load OSD theme: "
+                <<gContext->GetSetting("OSDTheme")<<" at "<<themepath);
+    }
     SetDefaults();
 
-    drawSurface = new OSDSurface(width, height);
+    // Reinit since SetDefaults() appears to mess things up.
+    Reinit(osd_bounds, frameRate, vis_bounds, visibleAspect);
 }
 
 OSD::~OSD(void)
@@ -139,12 +129,26 @@ void OSD::SetDefaults(void)
     if (!container)
     {
         QString name = "cc_page";
-        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult,
-                               frameint);
+        container = new OSDSet(name, true,
+                               osdBounds.width(), osdBounds.height(),
+                               wmult, hmult, frameint);
         AddSet(container, name);
 
-        OSDTypeCC *ccpage = new OSDTypeCC(name, ccfont, xoffset, yoffset,
-                                          displaywidth, displayheight);
+        int sub_dispw = displaywidth;
+        int sub_disph = displayheight;
+        int sub_xoff = xoffset;
+        int sub_yoff = yoffset;
+        if (needPillarBox)
+        {
+            // widescreen -- need to "pillarbox" captions
+            sub_dispw = (int)(wscale * 4.0f*displayheight/3.0f);
+            sub_disph = displayheight;
+            sub_xoff = xoffset + (displaywidth-sub_dispw)/2;
+            sub_yoff = yoffset;
+        }
+
+        OSDTypeCC *ccpage = new OSDTypeCC(name, ccfont, sub_xoff, sub_yoff,
+                                          sub_dispw, sub_disph);
         container->AddType(ccpage);
     }
 
@@ -152,7 +156,8 @@ void OSD::SetDefaults(void)
     if (!container)
     {
         QString name = "menu";
-        container = new OSDSet(name, true, vid_width, vid_height,
+        container = new OSDSet(name, true,
+                               osdBounds.width(), osdBounds.height(),
                                wmult, hmult, frameint);
         AddSet(container, name);
  
@@ -169,8 +174,8 @@ void OSD::SetDefaults(void)
         lb->SetItemRegColor(QColor("#505050"), QColor("#000000"), 100);
         lb->SetItemSelColor(QColor("#52CA38"), QColor("#349838"), 255);
  
-        lb->SetSpacing((int)(2 * hmult));
-        lb->SetMargin((int)(3 * wmult));
+        lb->SetSpacing(2);
+        lb->SetMargin(3);
 
         TTFFont *actfont = GetFont("infofont");
         TTFFont *inactfont = GetFont("infofont");
@@ -203,51 +208,72 @@ void OSD::SetDefaults(void)
     if (!container)
     {
         QString name = "subtitles";
-        container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult,
-                               frameint);
+        container = new OSDSet(name, true,
+                               osdBounds.width(), osdBounds.height(),
+                               wmult, hmult, frameint);
         AddSet(container, name);
     }
 }
 
-void OSD::Reinit(int width, int height, int frint, int dispx, int dispy, 
-                 int dispw, int disph)
+void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
+                 const QRect &visibleBounds, float visibleAspect)
 {
-    osdlock.lock();
+    QMutexLocker locker(&osdlock);
 
-    vid_width = width;
-    vid_height = height;
-    if (frint != -1)
-        frameint = frint;
+    QRect oldB    = osdBounds;
 
-    wmult = dispw / 640.0;
-    hmult = disph / 480.0;
+    osdBounds     = totalBounds;
+    xoffset       = visibleBounds.left();
+    yoffset       = visibleBounds.top();
+    displaywidth  = visibleBounds.width();
+    displayheight = visibleBounds.height();
+    wmult         = displaywidth  / 640.0;
+    hmult         = displayheight / 480.0;
+    needPillarBox = visibleAspect > 1.51f;
+    frameint      = (frameRate <= 0) ? frameRate : frameint;
 
-    xoffset = dispx;
-    yoffset = dispy;
-    displaywidth = dispw;
-    displayheight = disph;
+    wscale = visibleAspect / 1.3333f;
 
     QMap<QString, TTFFont *>::iterator fonts = fontMap.begin();
     for (; fonts != fontMap.end(); ++fonts)
     {
         TTFFont *font = (*fonts);
         if (font)
-            font->Reinit(dispw, disph, hmult);
+            font->Reinit(wscale, hmult);
     }
 
     QMap<QString, OSDSet *>::iterator sets = setMap.begin();
     for (; sets != setMap.end(); ++sets)
     {
-        OSDSet *set = (*sets);
-        if (set)
-            set->Reinit(vid_width, vid_height, dispx, dispy, dispw, disph, 
+        if (!(*sets))
+            continue;
+
+        int sub_xoff  = xoffset;
+        int sub_yoff  = yoffset;
+        int sub_dispw = displaywidth;
+        int sub_disph = displayheight;
+        if ((*sets)->GetName() == "cc_page" && needPillarBox)
+        {
+            // widescreen -- need to "pillarbox" captions
+            sub_dispw = (int)(wscale * 4.0f*displayheight/3.0f);
+            sub_disph = displayheight;
+            sub_xoff = xoffset + (displaywidth-sub_dispw)/2;
+            sub_yoff = yoffset;
+        }
+        (*sets)->Reinit(osdBounds.width(), osdBounds.height(),
+                        sub_xoff, sub_yoff, sub_dispw, sub_disph, 
                         wmult, hmult, frameint);
     }
 
-    delete drawSurface;
-    drawSurface = new OSDSurface(width, height);
-
-    osdlock.unlock();
+    if (oldB != osdBounds)
+    {
+        delete drawSurface;
+        drawSurface = new OSDSurface(osdBounds.width(), osdBounds.height());
+    }
+    else
+    {
+        drawSurface->ClearUsed();
+    }
 }
 
 QString OSD::FindTheme(QString name)
@@ -274,8 +300,8 @@ QString OSD::FindTheme(QString name)
 TTFFont *OSD::LoadFont(QString name, int size)
 {
     QString fullname = MythContext::GetConfDir() + "/" + name;
-    TTFFont *font = new TTFFont((char *)fullname.ascii(), size, vid_width,
-                                vid_height, hmult);
+    TTFFont *font = new TTFFont((char *)fullname.ascii(), size,
+                                wscale, hmult);
 
     if (font->isValid())
         return font;
@@ -283,8 +309,8 @@ TTFFont *OSD::LoadFont(QString name, int size)
     delete font;
     fullname = gContext->GetShareDir() + name;
 
-    font = new TTFFont((char *)fullname.ascii(), size, vid_width,
-                       vid_height, hmult);
+    font = new TTFFont((char *)fullname.ascii(), size,
+                       wscale, hmult);
 
     if (font->isValid())
         return font;
@@ -293,8 +319,8 @@ TTFFont *OSD::LoadFont(QString name, int size)
     if (themepath != "")
     {
         fullname = themepath + "/" + name;
-        font = new TTFFont((char *)fullname.ascii(), size, vid_width,
-                           vid_height, hmult);
+        font = new TTFFont((char *)fullname.ascii(), size,
+                           wscale, hmult);
         if (font->isValid())
             return font;
     }
@@ -302,8 +328,8 @@ TTFFont *OSD::LoadFont(QString name, int size)
     delete font;
 
     fullname = name;
-    font = new TTFFont((char *)fullname.ascii(), size, vid_width, vid_height,
-                       hmult);
+    font = new TTFFont((char *)fullname.ascii(), size,
+                       wscale, hmult);
 
     if (font->isValid())
         return font;
@@ -1050,8 +1076,8 @@ void OSD::parseListTree(OSDSet *container, QDomElement &element)
     lb->SetFontInactive(fpInactive);
     lb->SetItemRegColor(grUnselectedBeg, grUnselectedEnd, grUnselectedAlpha);
     lb->SetItemSelColor(grSelectedBeg, grSelectedEnd, grSelectedAlpha);
-    lb->SetSpacing((int)(spacing * hmult));
-    lb->SetMargin((int)(margin * wmult));
+    lb->SetSpacing(spacing);
+    lb->SetMargin(margin);
 
     container->AddType(lb);
 }
@@ -1072,8 +1098,9 @@ void OSD::parseContainer(QDomElement &element)
         return;
     }
 
-    container = new OSDSet(name, true, vid_width, vid_height, wmult, hmult,
-                           frameint);
+    container = new OSDSet(name, true,
+                           osdBounds.width(), osdBounds.height(),
+                           wmult, hmult, frameint);
 
     QString prio = element.attribute("priority", "");
     if (!prio.isNull() && !prio.isEmpty())
@@ -1782,8 +1809,9 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
 
     osdlock.lock();
 
-    OSDSet *set = new OSDSet(name, false, vid_width, vid_height, wmult, hmult,
-                             frameint);
+    OSDSet *set = new OSDSet(name, false,
+                             osdBounds.width(), osdBounds.height(),
+                             wmult, hmult, frameint);
     set->SetAllowFade(false);
     AddSet(set, name, false);
 

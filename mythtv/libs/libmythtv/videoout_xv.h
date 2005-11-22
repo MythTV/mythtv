@@ -98,7 +98,7 @@ class VideoOutputXv : public VideoOutput
 
   private:
     VOSType VideoOutputSubType() const { return video_output_subtype; }
-    virtual QRect GetVisibleOSDBounds(void) const;
+    virtual QRect GetVisibleOSDBounds(float&) const;
     virtual QRect GetTotalOSDBounds(void) const;
 
     VideoFrame *GetNextFreeFrame(bool allow_unsafe);

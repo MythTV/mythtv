@@ -317,18 +317,21 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
 }
 
 // documented in videooutbase.cpp
-QRect VideoOutputXv::GetVisibleOSDBounds(void) const
+QRect VideoOutputXv::GetVisibleOSDBounds(float &visible_aspect) const
 {
-    QRect bounds = QRect(0,0,dispw,disph);
     if (!chroma_osd)
-        bounds = VideoOutput::GetVisibleOSDBounds();
-    return bounds;
+        return VideoOutput::GetVisibleOSDBounds(visible_aspect);
+
+    visible_aspect = GetDisplayAspect();
+    VERBOSE(VB_IMPORTANT, "visible_aspect: "<<visible_aspect);
+    return QRect(0,0,dispw,disph);
 }
 
 // documented in videooutbase.cpp
 QRect VideoOutputXv::GetTotalOSDBounds(void) const
 {
-    return (chroma_osd) ? QRect(0,0,dispw,disph) : QRect(0,0,XJ_width,XJ_height);
+    return (chroma_osd) ?
+        QRect(0,0,dispw,disph) : QRect(0,0,XJ_width,XJ_height);
 }
 
 /**

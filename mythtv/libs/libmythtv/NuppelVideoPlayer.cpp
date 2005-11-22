@@ -412,10 +412,9 @@ void NuppelVideoPlayer::ReinitOSD(void)
     if (osd)
     {
         QRect visible, total;
-        videoOutput->GetOSDBounds(total, visible);
-        osd->Reinit(total.width(),   total.height(), frame_interval,
-                    visible.left(),  visible.top(),
-                    visible.width(), visible.height());
+        float aspect;
+        videoOutput->GetOSDBounds(total, visible, aspect);
+        osd->Reinit(total, frame_interval, visible, aspect);
     }
 }
 
@@ -2090,10 +2089,9 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (!using_null_videoout)
     {
         QRect visible, total;
-        videoOutput->GetOSDBounds(total, visible);
-        osd = new OSD(total.width(),   total.height(), frame_interval,
-                      visible.left(),  visible.top(),
-                      visible.width(), visible.height());
+        float aspect;
+        videoOutput->GetOSDBounds(total, visible, aspect);
+        osd = new OSD(total, frame_interval, visible, aspect);
 
         if (kCodec_NORMAL_END < GetDecoder()->GetVideoCodecID() &&
             kCodec_SPECIAL_END > GetDecoder()->GetVideoCodecID() &&

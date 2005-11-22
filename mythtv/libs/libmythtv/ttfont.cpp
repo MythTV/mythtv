@@ -525,7 +525,7 @@ void TTFFont::KillFace(void)
     glyphs.clear();
 }
 
-TTFFont::TTFFont(char *file, int size, int video_width, int video_height,
+TTFFont::TTFFont(char *file, int size, float wscale,
                  float hmult)
 {
    FT_Error            error;
@@ -559,8 +559,7 @@ TTFFont::TTFFont(char *file, int size, int video_width, int video_height,
    fontsize = size;
    library = the_library;
 
-   vid_width = video_width;
-   vid_height = video_height;
+   m_wscale = wscale;
    m_file = file;
    m_hmult = hmult;
 
@@ -609,12 +608,7 @@ void TTFFont::Init(void)
    }
 
    loadedfontsize = (int)(fontsize * m_hmult);
-
-   if (vid_width != vid_height * 4 / 3)
-   {
-       xdpi = (int)(xdpi * 
-              (float)(vid_width / (float)(vid_height * 4 / 3)));
-   }
+   xdpi = (int)(xdpi * m_wscale);
 
    FT_Set_Char_Size(face, 0, loadedfontsize * 64, xdpi, ydpi);
 
@@ -650,10 +644,9 @@ void TTFFont::Init(void)
    spacewidth = twidth - (mwidth * 2);
 }
 
-void TTFFont::Reinit(int width, int height, float hmult)
+void TTFFont::Reinit(float wscale, float hmult)
 {
-    vid_width = width;
-    vid_height = height;
+    m_wscale = wscale;
     m_hmult = hmult;
 
     KillFace();

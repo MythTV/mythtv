@@ -501,17 +501,19 @@ void VideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
     height = imgh;
 }
 
-void VideoOutput::GetOSDBounds(QRect &total, QRect &visible) const
+void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
+                               float &visible_aspect) const
 {
     total   = GetTotalOSDBounds();
-    visible = GetVisibleOSDBounds();
+    visible = GetVisibleOSDBounds(visible_aspect);
 }
 
 /**
- * \fn VideoOutput::GetVisibleOSDBounds(void) const
+ * \fn VideoOutput::GetVisibleOSDBounds(float&) const
  * \brief Returns visible portions of total OSD bounds
+ * \param visible_aspect physical aspect ratio of bounds returned
  */
-QRect VideoOutput::GetVisibleOSDBounds(void) const
+QRect VideoOutput::GetVisibleOSDBounds(float &visible_aspect) const
 {
     float dv_w = ((float)XJ_width)  / dispwoff;
     float dv_h = ((float)XJ_height) / disphoff;
@@ -524,7 +526,12 @@ QRect VideoOutput::GetVisibleOSDBounds(void) const
                        (uint) ceil(max(-dispyoff,0)*dv_h));
     QPoint br = QPoint((uint) floor(XJ_width-(right_overflow*dv_w)),
                        (uint) floor(XJ_height-(lower_overflow*dv_h)));
-    return QRect(tl, br);
+    QRect bounds(tl, br);
+
+    visible_aspect = videoAspect * ((float)XJ_width/XJ_height) *
+        ((float)bounds.height()/bounds.width());
+    VERBOSE(VB_IMPORTANT, "visible_aspect: "<<visible_aspect);
+    return bounds;
 }
 
 /**
