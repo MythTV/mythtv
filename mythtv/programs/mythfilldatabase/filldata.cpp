@@ -3006,9 +3006,16 @@ bool fillData(QValueList<Source> &sourcelist)
                         (query.next() && query.value(0).toInt() < chancnt * 4))
                     {
                         if (!quiet)
-                            cout << "Data Refresh needed because not enough "
-                                    "programs on date from 6PM - Midnight" <<
-                                    endl;
+                            cout << "Data Refresh needed because there are not "
+                                    "enough programs in the DB for this date "
+                                    "from 6PM - Midnight.\n"
+                                 << QString("You have %1 channels for sourceid "
+                                    "%2 and only %3 programs in this time "
+                                    "period and the cutoff is %4 minimum")
+                                    .arg(chancnt).arg((*it).id)
+                                    .arg(query.value(0).toInt())
+                                    .arg(chancnt * 4)
+                                 << endl;
                         download_needed = true;
                     }
                 } 
@@ -3272,6 +3279,7 @@ int main(int argc, char *argv[])
     bool update_icon_map = false;
 
     bool from_dd_file = false;
+    int sourceid = -1;
     QString fromddfile_lineupid;
 
     while (argpos < a.argc())
@@ -3376,6 +3384,16 @@ int main(int argc, char *argv[])
             }
 
             graboptions = QString(" ") + QString(a.argv()[++argpos]);
+        }
+        else if (!strcmp(a.argv()[argpos], "--sourceid"))
+        {
+            if (((argpos + 1) >= a.argc()))
+            {
+                printf("missing parameter for --sourceid option\n");
+                return FILLDB_EXIT_INVALID_CMDLINE;
+            }
+
+            sourceid = QString(a.argv()[++argpos]).toInt();
         }
         else if (!strcmp(a.argv()[argpos], "--max-days"))
         {
@@ -3564,6 +3582,9 @@ int main(int argc, char *argv[])
             cout << "--graboptions <\"options\">\n";
             cout << "   Pass options to grabber\n";
             cout << "\n";
+            cout << "--sourceid <number>\n";
+            cout << "   Only refresh data for sourceid given\n";
+            cout << "\n";
             cout << "--max-days <number>\n";
             cout << "   Force the maximum number of days, counting today,\n";
             cout << "   for the grabber to check for future listings\n";
@@ -3596,6 +3617,7 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "-v or --verbose debug-level\n";
             cout << "   Use '-v help' for level info\n";
+            cout << "\n";
 
 #if 0
             cout << "--dd-grab-all\n";
@@ -3703,9 +3725,20 @@ int main(int argc, char *argv[])
         QValueList<Source> sourcelist;
 
         MSqlQuery sourcequery(MSqlQuery::InitCon());
+        QString where = "";
+
+        if (sourceid != -1)
+        {
+            if (!quiet)
+                cout << "Running for sourceid " << sourceid << " ONLY because "
+                        "--sourceid was given on command-line\n";
+            where = QString("WHERE sourceid = %1").arg(sourceid);
+        }
+
         QString querystr = QString("SELECT sourceid,name,xmltvgrabber,userid,"
                                    "password,lineupid "
-                                   "FROM videosource ORDER BY sourceid;");
+                                   "FROM videosource ") + where +
+                                   QString(" ORDER BY sourceid;");
         sourcequery.exec(querystr);
         
         if (sourcequery.isActive())
