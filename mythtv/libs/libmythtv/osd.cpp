@@ -46,7 +46,7 @@ OSD::OSD(const QRect &osd_bounds, int   frameRate,
       treeMenuContainer("")
 {
     needPillarBox = visibleAspect > 1.51f;
-    wscale = visibleAspect / 1.3333f;
+    wscale = (float)displaywidth/(visibleAspect*displayheight);
 
     if (themepath.isEmpty())
     {
@@ -232,7 +232,7 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
     needPillarBox = visibleAspect > 1.51f;
     frameint      = (frameRate <= 0) ? frameRate : frameint;
 
-    wscale = visibleAspect / 1.3333f;
+    wscale = (float)displaywidth/(visibleAspect*displayheight);
 
     QMap<QString, TTFFont *>::iterator fonts = fontMap.begin();
     for (; fonts != fontMap.end(); ++fonts)
