@@ -36,6 +36,9 @@ class PlayGroupEditor: public ListBoxSetting, public ConfigurationDialog {
 protected slots:
     void open(QString name);
     void doDelete(void);
+
+ protected:
+    QString lastValue;
 };
 
 #endif

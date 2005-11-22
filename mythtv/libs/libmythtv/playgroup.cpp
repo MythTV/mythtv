@@ -164,12 +164,14 @@ int PlayGroup::GetSetting(const QString &name, const QString &field,
 }
 
 PlayGroupEditor::PlayGroupEditor(void)
+    : lastValue("Default")
 {
     setLabel(tr("Playback Groups"));
 }
 
 void PlayGroupEditor::open(QString name) 
 {
+    lastValue = name;
     bool created = false;
 
     if (name.isEmpty())
@@ -191,7 +193,9 @@ void PlayGroupEditor::open(QString name)
     }
 
     PlayGroup group(name);
-    if (group.exec() != QDialog::Accepted && created)
+    if (group.exec() == QDialog::Accepted || !created)
+        lastValue = name;
+    else
     {
         MSqlQuery query(MSqlQuery::InitCon());
         query.prepare("DELETE FROM playgroup WHERE name = :NAME;");
@@ -223,8 +227,13 @@ void PlayGroupEditor::doDelete(void)
         if (!query.exec())
             MythContext::DBError("PlayGroupEditor::doDelete", query);
 
+        int lastIndex = getValueIndex(name);
+        lastValue = "";
         load();
+        setValue(lastIndex);
     }
+
+    setFocus();
 }
 
 void PlayGroupEditor::load() {
@@ -240,6 +249,8 @@ void PlayGroupEditor::load() {
     }
 
     addSelection("(Create new group)", "");
+
+    setValue(lastValue);
 }
 
 int PlayGroupEditor::exec() {
