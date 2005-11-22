@@ -105,6 +105,15 @@ class MSqlQuery : public QSqlQuery
     /// \brief Only updated once during object creation
     bool isConnected(void) { return m_isConnected; }
 
+    /// \brief Allow us to display the SQL executed for debugging purposes.
+    void PrintLastQuery(void);
+
+    /// \brief Wrap QSqlQuery::exec() so we can display SQL
+    bool exec(void);
+
+    /// \brief Wrap QSqlQuery::exec(const QString &query) so we can display SQL
+    bool exec(const QString &query);
+
     /// \brief QSqlQuery::prepare() is not thread safe in Qt <= 3.3.2
     bool prepare(const QString &query);
 

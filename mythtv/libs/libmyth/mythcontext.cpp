@@ -75,6 +75,7 @@ int parse_verbose_arg(QString arg)
                   "  all        - ALL debug output\n"
                   "  none       - NO debug output\n"
                   "  important  - Important messages only\n"
+                  "  database   - Display all SQL commands executed\n"
                   "  general    - General messages (not quite so important)\n"
                   "  record     - Recording related messages\n"
                   "  playback   - Playback related messages\n"
@@ -93,7 +94,7 @@ int parse_verbose_arg(QString arg)
                   "The default for this program appears to be: '-v " <<
                   m_verbose << "'\n\n"
                   "Most options are additive except for none, all, and important.\n"
-                  "These three are explicit and take precedence over any\n"
+                  "These three are semi-explicit and take precedence over any\n"
                   "prior options given.  You can however use something like\n"
                   "'-v none,jobqueue' to get only JobQueue related messages\n"
                   "and override the default verbosity level.\n"
@@ -115,6 +116,11 @@ int parse_verbose_arg(QString arg)
             {
                 print_verbose_messages = VB_IMPORTANT;
                 verboseString = *it;
+            }
+            else if (!strcmp(*it,"database"))
+            {
+                print_verbose_messages = VB_DATABASE;
+                verboseString += " " + *it;
             }
             else if (!strcmp(*it,"general"))
             {

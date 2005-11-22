@@ -315,6 +315,42 @@ MSqlQueryInfo MSqlQuery::DDCon()
     return qi;
 }
 
+void MSqlQuery::PrintLastQuery(void)
+{
+    QString str = "";
+
+#if QT_VERSION >= 0x030200
+    str += "MSqlQuery: ";
+    str += executedQuery() + "\n";
+#else
+    str += "Your version of Qt is too old to provide proper SQL debugging\n";
+    str += "MSqlQuery: ";
+    str += lastQuery() + "\n";
+#endif
+
+    VERBOSE(VB_DATABASE, str);
+}
+
+bool MSqlQuery::exec(void)
+{
+    bool result = QSqlQuery::exec();
+
+    if (print_verbose_messages & VB_DATABASE)
+        PrintLastQuery();
+
+    return result;
+}
+
+bool MSqlQuery::exec(const QString &query)
+{
+    bool result = QSqlQuery::exec(query);
+
+    if (print_verbose_messages & VB_DATABASE)
+        PrintLastQuery();
+
+    return result;
+}
+
 bool MSqlQuery::prepare(const QString& query)
 {
     static QMutex prepareLock;
