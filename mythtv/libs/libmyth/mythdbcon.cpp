@@ -328,11 +328,11 @@ bool MSqlQuery::exec(const QString &query)
 
 #if QT_VERSION >= 0x030200
         str += "MSqlQuery: ";
-        str += executedQuery() + "\n";
+        str += executedQuery();
 #else
         str += "Your Qt version is too old to provide proper SQL debugging\n";
         str += "MSqlQuery: ";
-        str += lastQuery() + "\n";
+        str += lastQuery();
 #endif
 
         VERBOSE(VB_DATABASE, str);
