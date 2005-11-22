@@ -800,6 +800,8 @@ int main(int argc, char **argv)
 
     QString binname = finfo.baseName();
 
+    bool ResetSettings = false;
+
     if (binname != "mythfrontend")
         pluginname = binname;
 
@@ -851,6 +853,11 @@ int main(int argc, char **argv)
 #endif
             return FRONTEND_EXIT_OK;
         }
+        else if (!strcmp(a.argv()[argpos],"-r") ||
+                 !strcmp(a.argv()[argpos],"--reset"))
+        {
+            ResetSettings = true;
+        }
         else if (!strcmp(a.argv()[argpos],"-geometry") ||
                  !strcmp(a.argv()[argpos],"--geometry"))
         {
@@ -889,6 +896,7 @@ int main(int argc, char **argv)
                     "-geometry or --geometry WxH    Override window size settings\n" <<
                     "--geometry WxH+X+Y             Override window size and position\n" <<
                     "-l or --logfile filename       Writes STDERR and STDOUT messages to filename" << endl <<
+                    "-r or --reset                  Resets frontend appearance settings and language" << endl <<
                     "-v or --verbose debug-level    Use '-v help' for level info" << endl <<
 
                     "--version                      Version information" << endl <<
@@ -940,6 +948,20 @@ int main(int argc, char **argv)
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return FRONTEND_EXIT_NO_MYTHCONTEXT;
+    }
+
+    if (ResetSettings)
+    {
+       AppearanceSettings as;
+       as.save();
+
+       MSqlQuery query(MSqlQuery::InitCon());
+       query.prepare("update settings set data='EN' "
+                     "WHERE hostname = :HOSTNAME and value='Language' ;");
+       query.bindValue(":HOSTNAME", gContext->GetHostName());
+       query.exec();
+
+       return FRONTEND_EXIT_OK;
     }
 
     if (geometry != "" && !gContext->ParseGeometryOverride(geometry))
