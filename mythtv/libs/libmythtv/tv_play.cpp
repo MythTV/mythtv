@@ -458,6 +458,12 @@ int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
         tvchain = chain;
         ChangeState(kState_WatchingLiveTV);
         switchToRec = NULL;
+
+        fftime       = PlayGroup::GetSetting("Default", "skipahead", 30);
+        rewtime      = PlayGroup::GetSetting("Default", "skipback", 5);
+        normal_speed = PlayGroup::GetSetting("Default", "timestretch", 
+                                                 100) / 100.0;
+
         return 1;
     }
     return 0;
