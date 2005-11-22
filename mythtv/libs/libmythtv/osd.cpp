@@ -242,8 +242,6 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
     // adjust for wscale font size scaling
     fscale *= (float) sqrt(2.0/(sq(wscale) + 1.0));
 
-    VERBOSE(VB_IMPORTANT, "wscale: "<<wscale<<" fscale: "<<fscale);
-
     QMap<QString, TTFFont *>::iterator fonts = fontMap.begin();
     for (; fonts != fontMap.end(); ++fonts)
     {

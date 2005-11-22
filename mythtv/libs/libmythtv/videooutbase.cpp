@@ -509,7 +509,6 @@ void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
     visible = GetVisibleOSDBounds(visible_aspect, font_scaling);
 }
 
-static float sq(float a) { return a*a; }
 /**
  * \fn VideoOutput::GetVisibleOSDBounds(float&) const
  * \brief Returns visible portions of total OSD bounds
@@ -799,7 +798,7 @@ void VideoOutput::MoveResize(void)
     //printf("After: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
     //dispyoff);
 
-#if 1
+#if 0
     printf("VideoOutput::MoveResize:\n");
     printf("Img(%d,%d %d,%d)\n", imgx, imgy, imgw, imgh);
     printf("Disp(%d,%d %d,%d)\n", dispxoff, dispyoff, dispwoff, disphoff);
