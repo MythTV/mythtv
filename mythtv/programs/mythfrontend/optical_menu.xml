@@ -13,7 +13,7 @@
       <text lang="FR">Lecture DVD</text>
       <text lang="NL">DVD Afspelen</text>
       <text lang="JA">DVD再生</text>
-      <text lang="FI">Toista DVD</text>
+      <text lang="FI">Katso DVD</text>
       <text lang="ZH_TW">播放DVD</text>
       <text lang="SI">Predvajaj DVD</text>
       <text lang="ET">Näita DVD-d</text>
@@ -58,7 +58,7 @@
       <text lang="SV">Importera DVD</text>
       <text lang="FR">Ripper un DVD</text>
       <text lang="JA">DVD取込</text>
-      <text lang="FI">Tuo DVD</text>
+      <text lang="FI">Kopioi DVD</text>
       <text lang="ZH_TW">輸入DVD</text>
       <text lang="SI">Ripanje DVD</text>
       <text lang="ET">DVD rippimine</text>
@@ -70,6 +70,7 @@
    <button>
       <type>BURN</type>
       <text>Burn DVD</text>
+      <text lang="FI">Polta DVD</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>
@@ -88,7 +89,7 @@
       <text lang="SV">Importera CD</text>
       <text lang="FR">Ripper un CD audio</text>
       <text lang="JA">CD取込</text>
-      <text lang="FI">Tuo CD</text>
+      <text lang="FI">Kopioi CD</text>
       <text lang="ZH_TW">輸入音樂CD</text>
       <text lang="SI">Ripanje CD</text>
       <text lang="ET">CD rippimine</text>

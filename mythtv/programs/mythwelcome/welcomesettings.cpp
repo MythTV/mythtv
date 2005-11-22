@@ -11,36 +11,40 @@
 static HostTimeBox *DailyWakeupStart1()
 {
     HostTimeBox *gc = new HostTimeBox("DailyWakeupStartPeriod1", "07:00");
-    gc->setLabel(QObject::tr("Period 1 Start Time"));
-    gc->setHelpText(QObject::tr("Period 1 start time. Set both start and end "
-                                "times to 00:00 to disable"));
+    gc->setLabel(QObject::tr("Period") + " 1 " +  QObject::tr("start time"));
+    gc->setHelpText(QObject::tr("Period") + " 1 " + QObject::tr("start time") +
+                    ". " + QObject::tr("Set both Start & End times to 00:00 "
+                                       "to disable."));
     return gc;
 };
 
 static HostTimeBox *DailyWakeupEnd1()
 {
     HostTimeBox *gc = new HostTimeBox("DailyWakeupEndPeriod1", "07:30");
-    gc->setLabel(QObject::tr("Period 1 End Time"));
-    gc->setHelpText(QObject::tr("Period 1 end time. Set both start and end "
-                                "times to 00:00 to disable"));
+    gc->setLabel(QObject::tr("Period") + " 1 " +  QObject::tr("end time"));
+    gc->setHelpText(QObject::tr("Period") + " 1 " + QObject::tr("end time") +
+                    ". " + QObject::tr("Set both Start & End times to 00:00 "
+                                       "to disable."));
     return gc;
 };
 
 static HostTimeBox *DailyWakeupStart2()
 {
     HostTimeBox *gc = new HostTimeBox("DailyWakeupStartPeriod2", "17:00");
-    gc->setLabel(QObject::tr("Period 2 Start Time"));
-    gc->setHelpText(QObject::tr("Period 2 start time. Set both start and end "
-                                "times to 00:00 to disable"));
+    gc->setLabel(QObject::tr("Period") + " 2 " +  QObject::tr("start time"));
+    gc->setHelpText(QObject::tr("Period") + " 2 " + QObject::tr("start time") +
+                    ". " + QObject::tr("Set both Start & End times to 00:00 "
+                                       "to disable."));
     return gc;
 };
 
 static HostTimeBox *DailyWakeupEnd2()
 {
     HostTimeBox *gc = new HostTimeBox("DailyWakeupEndPeriod2", "18:00");
-    gc->setLabel(QObject::tr("Period 2 End Time"));
-    gc->setHelpText(QObject::tr("Period 2 end time. Set both Start & End "
-                                "times to 00:00 to disable"));
+    gc->setLabel(QObject::tr("Period") + " 2 " +  QObject::tr("end time"));
+    gc->setHelpText(QObject::tr("Period") + " 2 " + QObject::tr("end time") +
+                    ". " + QObject::tr("Set both Start & End times to 00:00 "
+                                       "to disable."));
     return gc;
 };
 
@@ -66,12 +70,12 @@ MythWelcomeSettings::MythWelcomeSettings()
     
     vcg->setLabel(QObject::tr("MythWelcome Settings"));
     
-    hcg1->setLabel(QObject::tr("Daily Wakeup/ShutDown Period 1"));
+    hcg1->setLabel(QObject::tr("Daily Wakeup/ShutDown Period") + " 1");
     hcg1->addChild(DailyWakeupStart1());
     hcg1->addChild(DailyWakeupEnd1());
     vcg->addChild(hcg1);
     
-    hcg2->setLabel(QObject::tr("Daily Wakeup/ShutDown Period 2"));
+    hcg2->setLabel(QObject::tr("Daily Wakeup/ShutDown Period") + " 2");
     hcg2->addChild(DailyWakeupStart2());
     hcg2->addChild(DailyWakeupEnd2());
     vcg->addChild(hcg2);

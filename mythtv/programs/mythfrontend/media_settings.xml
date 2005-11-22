@@ -130,6 +130,7 @@
    <button>
       <type>SETTINGS_BURN</type>
       <text>Burn DVD Settings</text>
+      <text lang="FI">DVD:n Polttoasetukset</text>
       <action>CONFIGPLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

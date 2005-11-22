@@ -716,6 +716,44 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
+    <name>PlayGroup</name>
+    <message>
+        <source>Group</source>
+        <translation type="unfinished">Hópur</translation>
+    </message>
+</context>
+<context>
+    <name>PlayGroupEditor</name>
+    <message>
+        <source>Playback Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">Sjálfgefið</translation>
+    </message>
+    <message>
+        <source>Create New Playback Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete playback group:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes, delete group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No, Don&apos;t delete group</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PlaybackBox</name>
     <message>
         <source>% used</source>
@@ -1107,6 +1145,10 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>LiveTV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Playback Group</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1629,7 +1671,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Fast forward amount (in seconds)</source>
-        <translation>Tími hraðspólunar áfram (í sekúndum)</translation>
+        <translation type="obsolete">Tími hraðspólunar áfram (í sekúndum)</translation>
     </message>
     <message>
         <source>How many seconds to skip forward on a fast forward.</source>
@@ -1637,7 +1679,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Rewind amount (in seconds)</source>
-        <translation>Spóla afturábak (í sekúndum)</translation>
+        <translation type="obsolete">Spóla afturábak (í sekúndum)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
@@ -6062,14 +6104,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Time Stretch</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default time stretch %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Normally the dvb-recording will drop packets from the card until a sequence start header is seen. This option turns off this feature.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6632,14 +6666,6 @@ Myth will now exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Daily Wakeup/ShutDown Period 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Daily Wakeup/ShutDown Period 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>nvram-wakeup Command</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6849,6 +6875,46 @@ Myth will now exit.</source>
     </message>
     <message>
         <source>The following programs will be recorded instead:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Title match (regex)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip ahead (seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip back (seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time stretch (speed x 100)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initial playback speed with adjusted audio.  Use 100 for normal speed, 50 for half speed and 200 for double speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Store in the &quot;%1&quot; playback group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Playback Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Daily Wakeup/ShutDown Period</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7560,6 +7626,10 @@ No other details</source>
     </message>
     <message>
         <source>Cancel Record</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -43,7 +43,7 @@
    <button>
      <type>MOVIETIMES</type>
      <text>Movie Times</text>
-     <text lang="FI">Elokuvien Ajat</text>
+     <text lang="FI">Elokuvahaku</text>
      <text lang="SI">Čas filmov</text>
      <text lang="ET">Filmide ajad</text>
      <text lang="SV">Biotider</text>
@@ -77,6 +77,7 @@
    <button>
      <type>NETFLIX</type>
      <text>NetFlix</text>
+     <text lang="FI">MythFlix</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>

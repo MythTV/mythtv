@@ -46,7 +46,7 @@
    <button>
      <type>SETTINGS_MOVIETIME</type>
      <text>Movie Time Settings</text>
-     <text lang="FI">Elokuvien Aika-asetukset</text>
+     <text lang="FI">Elokuvahaun Asetukset</text>
      <text lang="SI">Nastavitve čas filmov</text>
      <text lang="ET">Filmiaegade seaded</text>
      <text lang="SV">Biotider</text>
@@ -57,6 +57,7 @@
    <button>
      <type>SETTINGS_NETFLIX</type>
      <text>NetFlix Settings</text>
+     <text lang="FI">MythFlix Asetukset</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>

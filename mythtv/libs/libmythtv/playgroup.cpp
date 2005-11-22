@@ -45,7 +45,7 @@ public:
 class SkipAhead: public SpinBoxSetting, public PlayGroupSetting {
 public:
     SkipAhead(const PlayGroup& _parent):
-        SpinBoxSetting(0, 600, 5, true, QObject::tr("(default)")),
+        SpinBoxSetting(0, 600, 5, true, "(" + QObject::tr("default") + ")"),
         PlayGroupSetting(_parent, "skipahead") {
         setLabel(QObject::tr("Skip ahead (seconds)"));
         setHelpText(QObject::tr("How many seconds to skip forward on a fast "
@@ -56,7 +56,7 @@ public:
 class SkipBack: public SpinBoxSetting, public PlayGroupSetting {
 public:
     SkipBack(const PlayGroup& _parent):
-        SpinBoxSetting(0, 600, 5, true, QObject::tr("(default)")),
+        SpinBoxSetting(0, 600, 5, true, "(" + QObject::tr("default") + ")"),
         PlayGroupSetting(_parent, "skipback") {
         setLabel(QObject::tr("Skip back (seconds)"));
         setHelpText(QObject::tr("How many seconds to skip backward on a "
@@ -67,7 +67,7 @@ public:
 class TimeStretch: public SpinBoxSetting, public PlayGroupSetting {
 public:
     TimeStretch(const PlayGroup& _parent):
-        SpinBoxSetting(45, 200, 5, false, QObject::tr("(default)")),
+        SpinBoxSetting(45, 200, 5, false, "(" + QObject::tr("default") + ")"),
         PlayGroupSetting(_parent, "timestretch") {
         setValue(45);
         setLabel(QObject::tr("Time stretch (speed x 100)"));
@@ -93,7 +93,7 @@ PlayGroup::PlayGroup(QString _name)
     : name(_name)
 {
     ConfigurationGroup* cgroup = new VerticalConfigurationGroup(false);
-    cgroup->setLabel(getName() + tr(" Group"));
+    cgroup->setLabel(getName() + " " + tr("Group"));
 
     cgroup->addChild(new TitleMatch(*this));
     cgroup->addChild(new SkipAhead(*this));

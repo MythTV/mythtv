@@ -675,6 +675,44 @@ Returning to the previous menu.</source>
     </message>
 </context>
 <context>
+    <name>PlayGroup</name>
+    <message>
+        <source>Group</source>
+        <translation>Grupp</translation>
+    </message>
+</context>
+<context>
+    <name>PlayGroupEditor</name>
+    <message>
+        <source>Playback Groups</source>
+        <translation>Uppspelningsgrupper</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>Create New Playback Group</source>
+        <translation>Skapa ny uppspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
+        <translation type="unfinished">Använd tangentbordet eller de numeriska knapparna på din fjärrkontroll för att skriva in gruppnamnet</translation>
+    </message>
+    <message>
+        <source>Delete playback group:</source>
+        <translation>Ta bort uppspelningsgrupp:</translation>
+    </message>
+    <message>
+        <source>Yes, delete group</source>
+        <translation>Ja, ta bort grupp</translation>
+    </message>
+    <message>
+        <source>No, Don&apos;t delete group</source>
+        <translation>Nej, ta inte bort grupp</translation>
+    </message>
+</context>
+<context>
     <name>PlaybackBox</name>
     <message>
         <source>% used</source>
@@ -1059,6 +1097,10 @@ Returning to the previous menu.</source>
     <message>
         <source>LiveTV</source>
         <translation>LiveTV</translation>
+    </message>
+    <message>
+        <source>Change Playback Group</source>
+        <translation>Ändra uppspelningsgrupp</translation>
     </message>
 </context>
 <context>
@@ -1580,7 +1622,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Fast forward amount (in seconds)</source>
-        <translation>Steglängd vid framåtspolning (sekunder)</translation>
+        <translation type="obsolete">Steglängd vid framåtspolning (sekunder)</translation>
     </message>
     <message>
         <source>How many seconds to skip forward on a fast forward.</source>
@@ -1588,7 +1630,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Rewind amount (in seconds)</source>
-        <translation>Steglängd vid bakåtspolning (sekunder)</translation>
+        <translation type="obsolete">Steglängd vid bakåtspolning (sekunder)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
@@ -6173,11 +6215,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Time Stretch</source>
-        <translation>Tempo</translation>
+        <translation type="obsolete">Tempo</translation>
     </message>
     <message>
         <source>Default time stretch %1</source>
-        <translation>Förvalt tempo %1</translation>
+        <translation type="obsolete">Förvalt tempo %1</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to delete first. Set to &apos;None&apos; to disable Auto Expire (not recommended).</source>
@@ -6776,83 +6818,79 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Automatically Start Myth Frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>Starta automatiskt uppspelningsklient</translation>
     </message>
     <message>
         <source>Mythwelcome will automatically start the mythfrontend if it is determined that it was not started to record a program.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythWelcome kommer automatiskt starta uppspelningsklienten (mythfrontend) om datorn ej startades automatiskt för att spela in ett program.</translation>
     </message>
     <message>
         <source>MythWelcome Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythWelcome-inställningar</translation>
     </message>
     <message>
         <source>Daily Wakeup/ShutDown Period 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Daily Wakeup/ShutDown Period 2</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">Daglig uppvakningsperiod 1</translation>
     </message>
     <message>
         <source>nvram-wakeup Command</source>
-        <translation type="unfinished"></translation>
+        <translation>nvram-wakeup kommando</translation>
     </message>
     <message>
         <source>Command to set the wakeup time in the BIOS. See the README file for more examples.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att sätta uppvakningstiden i BIOS. Se filen README för fler exempel.</translation>
     </message>
     <message>
         <source>nvram-wakeup Restart Command</source>
-        <translation type="unfinished"></translation>
+        <translation>nvram-wakeup omstartskommando</translation>
     </message>
     <message>
         <source>Command to run if your bios requires you to reboot to allow nvram-wakeup settings to take effect. See the README file for more examples.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando att köra om datorns BIOS kräver omstart för att uppvakningsinställningar ska träda i kraft. Se filen README för fler exempel.</translation>
     </message>
     <message>
         <source>Command to reboot</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för omstart</translation>
     </message>
     <message>
         <source>Command to reboot computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att starta om datorn.</translation>
     </message>
     <message>
         <source>Command to shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för nedstängning</translation>
     </message>
     <message>
         <source>Command to shutdown computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att stänga av datorn.</translation>
     </message>
     <message>
         <source>Command to run Xterm</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för terminalfönster</translation>
     </message>
     <message>
         <source>Command to start an Xterm. Can be disabled by leaving this setting blank.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando för att starta ett terminalfönster. Avaktivera genom att lämna tomt.</translation>
     </message>
     <message>
         <source>MythShutdown Script Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythShutdown skriptinställningar</translation>
     </message>
     <message>
         <source>Perform EIT Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Utför EIT-scanning</translation>
     </message>
     <message>
         <source>If this is enabled the data in this source will be updated with listing data provided by the channels themselves &apos;over-the-air&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uppdatera källans programinformation med data som sänds tillsammans med kanalerna.</translation>
     </message>
     <message>
         <source>EIT Transport Timeout (mins)</source>
-        <translation type="unfinished"></translation>
+        <translation>EIT-transport tidsgräns (min)</translation>
     </message>
     <message>
         <source>Maximum time to spend waiting for listings data on one DTV channel before checking for new listings data on the next channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximal tid att vänta på programinformation på en digital kanal innan scanningen går vidare till nästa kanal.</translation>
     </message>
     <message>
         <source>Scan Progress</source>
@@ -6920,11 +6958,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
-        <translation type="unfinished"></translation>
+        <translation>Detta fungerar vanligtvis endast med ATSC- eller DVB-kanaler</translation>
     </message>
     <message>
         <source>and generally provides data only for the next few days.</source>
-        <translation type="unfinished"></translation>
+        <translation>och innehåller oftast data endast för ett par dagar.</translation>
     </message>
     <message>
         <source>Use channel scanner to find channels for this input.</source>
@@ -7016,7 +7054,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Recording Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Inspelning tillgänglig</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for any signal when scanning for channels.</source>
@@ -7097,6 +7135,46 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>The following programs will be recorded instead:</source>
         <translation>Följande program kommer att spelas in istället:</translation>
+    </message>
+    <message>
+        <source>Title match (regex)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip ahead (seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip back (seconds)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time stretch (speed x 100)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Initial playback speed with adjusted audio.  Use 100 for normal speed, 50 for half speed and 200 for double speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Playback Group</source>
+        <translation>Uppspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Store in the &quot;%1&quot; playback group</source>
+        <translation>Lagra i uppspelningsgruppen &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Select Playback Group</source>
+        <translation>Välj uppspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Daily Wakeup/ShutDown Period</source>
+        <translation>Daglig uppvakningsperiod</translation>
     </message>
 </context>
 <context>
@@ -7825,6 +7903,10 @@ Inga andra detaljer</translation>
         <source>Cancel Record</source>
         <translation>Avbryt inspelning</translation>
     </message>
+    <message>
+        <source>%1 Settings</source>
+        <translation type="unfinished">%1-inställningar</translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>
@@ -8046,7 +8128,7 @@ Inga andra detaljer</translation>
     <name>WelcomeDialog</name>
     <message>
         <source>Start Frontend</source>
-        <translation type="unfinished"></translation>
+        <translation>Starta uppspelningsklient</translation>
     </message>
     <message>
         <source>Cannot connect to server!</source>
@@ -8055,15 +8137,16 @@ Inga andra detaljer</translation>
     <message>
         <source>Tuner %1 is recording:
 </source>
-        <translation type="unfinished"></translation>
+        <translation>TV-kort %1 spelar in:
+</translation>
     </message>
     <message>
         <source>Tuner %1 is not recording</source>
-        <translation type="unfinished"></translation>
+        <translation>TV-kort %1 spelar inte in</translation>
     </message>
     <message>
         <source>There are no recordings currently taking place</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingenting spelas in för tillfället</translation>
     </message>
     <message>
         <source>There are no scheduled recordings</source>
@@ -8103,7 +8186,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>MythTV is about to start a wakeup/shutdown period.</source>
-        <translation type="unfinished"></translation>
+        <translation>MythTV startar strax en uppvakningsperiod.</translation>
     </message>
     <message>
         <source>MythTV is idle.</source>
@@ -8139,15 +8222,15 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is currently recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte stänga ner eftersom MythTV spelar in</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte stänga ner eftersom MythTV strax kommer att spela in</translation>
     </message>
     <message>
         <source>Cannot shutdown because MythTV is about to start a wakeup/shutdown period.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kan inte stänga ner eftersom MythTV strax startar en uppvakningsperiod.</translation>
     </message>
     <message>
         <source>MythTV is idle and will shutdown in %1 seconds.</source>
