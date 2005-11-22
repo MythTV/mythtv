@@ -231,7 +231,7 @@ int MPEG2replex::wait_buffers()
             if (ring_avail(&index_ac3rbuf[i]) < sizeof(index_unit))
                 ok = 0;
 
-        if (ok)
+        if (ok || done)
             break;
 
         pthread_cond_signal(&cond);
