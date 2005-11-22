@@ -469,7 +469,7 @@ static HostSpinBox *CommRewindAmount()
 {
     HostSpinBox *gs = new HostSpinBox("CommRewindAmount", 0, 10, 1);
     gs->setLabel(QObject::tr("Commercial Skip Auto-Rewind Amount"));
-    gs->setHelpText(QObject::tr("If set, Myth will automatically rewind "
+    gs->setHelpText(QObject::tr("If set, MythTV will automatically rewind "
                     "this many seconds after performing a commercial skip."));
     gs->setValue(0);
     return gs;
