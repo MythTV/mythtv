@@ -12,7 +12,7 @@ using namespace std;
 // return true if complete or broken
 bool PESPacket::AddTSPacket(const TSPacket* packet)
 {
-    uint tlen = Length() + ((_pesdata-1) - _fullbuffer) + 4 /* CRC bytes */;
+    uint tlen = Length() + (_pesdata - _fullbuffer) + 4 /* CRC bytes */;
 
     if (!tsheader()->PayloadStart())
     {
@@ -71,7 +71,9 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
 
     if (_pesdataSize >= tlen)
     {
-        _badPacket != VerifyCRC();
+        if (!HasCRC() || (CalcCRC() == CRC()))
+            _badPacket = false;
+
         return true;
     }
 

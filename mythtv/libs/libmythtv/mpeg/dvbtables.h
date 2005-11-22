@@ -17,32 +17,33 @@ class NetworkInformationTable : public PSIPTable
     NetworkInformationTable(const PSIPTable& table)
         : PSIPTable(table), _cached_network_name(QString::null)
     {
-    // table_id                 8   0.0       0x40/0x41
+    // start_code_prefix        8   0.0          0
+    // table_id                 8   1.0       0x40/0x41
         assert(TableID::NIT == TableID() || TableID::NITo == TableID());
         Parse();
-    // section_syntax_indicator 1   1.0          1
-    // reserved_future_use      1   1.1          1
-    // reserved                 2   1.2          3
-    // section_length          12   1.4          0
-    // reserved                 2   5.0          3
-    // version_number           5   5.2          0
-    // current_next_indicator   1   5.7          1
-    // section_number           8   6.0       0x00
-    // last_section_number      8   7.0       0x00
+    // section_syntax_indicator 1   2.0          1
+    // reserved_future_use      1   2.1          1
+    // reserved                 2   2.2          3
+    // section_length          12   2.4          0
+    // reserved                 2   6.0          3
+    // version_number           5   6.2          0
+    // current_next_indicator   1   6.7          1
+    // section_number           8   7.0       0x00
+    // last_section_number      8   8.0       0x00
     }
     ~NetworkInformationTable() { ; }
 
-    /// network_id             16   3.0     0x0000
+    /// network_id             16   4.0     0x0000
     uint NetworkID() const { return TableIDExtension(); }
 
-    // reserved_future_use      4   8.0        0xf
-    /// network_desc_length    12   8.4          0
+    // reserved_future_use      4   9.0        0xf
+    /// network_desc_length    12   9.4          0
     uint NetworkDescriptorsLength() const
-        { return ((PESData()[8]<<8) | PESData()[9]) & 0xfff; }
+        { return ((pesdata()[9]<<8) | pesdata()[10]) & 0xfff; }
 
-    /// for(i=0; i<N; i++)      x  10.0
+    /// for(i=0; i<N; i++)      x  11.0
     ///   { descriptor() }
-    const unsigned char* NetworkDescriptors() const { return PESData()+10; }
+    const unsigned char* NetworkDescriptors() const { return pesdata()+11; }
 
     // reserved_future_use      4  0.0+ndl     0xf
     /// trans_stream_loop_len  12  0.4+ndl
@@ -83,32 +84,32 @@ class ServiceDescriptionTable: public PSIPTable
   public:
     ServiceDescriptionTable(const PSIPTable& table) : PSIPTable(table)
     {
-    // table_id                 8   0.0       0x42/0x46
+    // start_code_prefix        8   0.0          0
+    // table_id                 8   1.0       0x42/0x46
         assert(TableID::SDT == TableID() || TableID::SDTo == TableID());
         Parse();
-    // section_syntax_indicator 1   1.0          1
-    // reserved_future_use      1   1.1          1
-    // reserved                 2   1.2          3
-    // section_length          12   1.4          0
-    // reserved                 2   5.0          3
-    // version_number           5   5.2          0
-    // current_next_indicator   1   5.7          1
-    // section_number           8   6.0       0x00
-    // last_section_number      8   7.0       0x00
+    // section_syntax_indicator 1   2.0          1
+    // reserved_future_use      1   2.1          1
+    // reserved                 2   2.2          3
+    // section_length          12   2.4          0
+    // reserved                 2   6.0          3
+    // version_number           5   6.2          0
+    // current_next_indicator   1   6.7          1
+    // section_number           8   7.0       0x00
+    // last_section_number      8   8.0       0x00
     }
     ~ServiceDescriptionTable() { ; }
 
-    /// transport_stream_id    16   3.0     0x0000
+    /// transport_stream_id    16   4.0     0x0000
     uint TSID() const { return TableIDExtension(); }
 
-    /// original_network_id    16   8.0
-    // TODO check this
-    uint OriginalNetworkID() const { return (PESData()[3]<<8) | PESData()[4]; }
+    /// original_network_id    16   9.0
+    uint OriginalNetworkID() const { return (pesdata()[4]<<8) | pesdata()[5]; }
 
     /// Number of services
     uint ServiceCount() const { return _ptrs.size()-1; }
 
-    // reserved_future_use      8  10.0
+    // reserved_future_use      8  11.0
     // for (i=0;i<N;i++) { 
     ///  service_id            16  0.0+p
     uint ServiceID(uint i) const { return (_ptrs[i][0]<<8) | (_ptrs[i][1]); }

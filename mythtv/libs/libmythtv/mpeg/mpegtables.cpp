@@ -29,10 +29,10 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
     ProgramAssociationTable* pat = CreateBlank();
     pat->SetVersionNumber(version);
     pat->SetTranportStreamID(tsid);
-    pat->SetLength(PSIP_OFFSET+1+(count*4));
+    pat->SetLength(PSIP_OFFSET+(count*4));
 
     // create PAT data
-    if ((count * 4) >= (184 - (PSIP_OFFSET+1)))
+    if ((count * 4) >= (184 - PSIP_OFFSET))
     { // old PAT must be in single TS for this create function
         VERBOSE(VB_IMPORTANT, "PAT::Create: Error, old "
                 "PAT size exceeds maximum PAT size.");
@@ -43,11 +43,11 @@ ProgramAssociationTable* ProgramAssociationTable::Create(
     for (uint i=0; i<count; i++)
     {
         // pnum
-        pat->PESData()[offset++] = pnum[i]>>8;
-        pat->PESData()[offset++] = pnum[i] & 0xff;
+        pat->pesdata()[offset++] = pnum[i]>>8;
+        pat->pesdata()[offset++] = pnum[i] & 0xff;
         // pid
-        pat->PESData()[offset++] = ((pid[i]>>8) & 0x1f) | 0xe0;
-        pat->PESData()[offset++] = pid[i] & 0xff;
+        pat->pesdata()[offset++] = ((pid[i]>>8) & 0x1f) | 0xe0;
+        pat->pesdata()[offset++] = pid[i] & 0xff;
     }
 
     pat->Finalize();
@@ -80,8 +80,8 @@ void  ProgramMapTable::Parse() const
     _ptrs.clear();
     unsigned char *pos =
       const_cast<unsigned char*>
-        (PESData() + PSIP_OFFSET + pmt_header + ProgramInfoLength());
-    for (unsigned int i=0; pos < PESData()+Length()-1; i++) {
+        (pesdata() + PSIP_OFFSET + pmt_header + ProgramInfoLength());
+    for (unsigned int i=0; pos < pesdata()+Length(); i++) {
         _ptrs.push_back(pos);
         pos += 5 + StreamInfoLength(i);
     }
@@ -94,14 +94,14 @@ void ProgramMapTable::AppendStream(
     unsigned char* streamInfo, unsigned int infoLength)
 {
     if (!StreamCount())
-        _ptrs.push_back(PESData() + PSIP_OFFSET +
+        _ptrs.push_back(pesdata() + PSIP_OFFSET +
                         pmt_header + ProgramInfoLength());
     memset(_ptrs[StreamCount()], 0xff, 5);
     SetStreamPID(StreamCount(), pid);
     SetStreamType(StreamCount(), type);
     SetStreamProgramInfo(StreamCount(), streamInfo, infoLength);
     _ptrs.push_back(_ptrs[StreamCount()]+5+StreamInfoLength(StreamCount()));
-    SetLength(_ptrs[StreamCount()] - PESData());
+    SetLength(_ptrs[StreamCount()] - pesdata());
 }
 
 /** \fn ProgramMapTable::IsAudio(uint) const
@@ -246,9 +246,12 @@ uint ProgramMapTable::FindPIDs(uint type, vector<uint>& pids,
 const QString PSIPTable::toString() const
 {
     QString str;
-    str.append(QString(" PSIP tableID(0x%1) "
+    //for (unsigned int i=0; i<9; i++)
+    //str.append(QString(" 0x%1").arg(int(pesdata()[i]), 0, 16));
+    //str.append("\n");
+    str.append(QString(" PSIP prefix(0x%1) tableID(0x%1) "
                        "length(%2) extension(0x%3)\n")
-               .arg(TableID(), 0, 16)
+               .arg(StartCodePrefix(), 0, 16).arg(TableID(), 0, 16)
                .arg(Length()).arg(TableIDExtension(), 0, 16));
     str.append(QString("      version(%1) current(%2) "
                        "section(%3) last_section(%4)\n")
@@ -266,7 +269,7 @@ const QString ProgramAssociationTable::toString() const
     str.append(QString("         tsid: %1\n").arg(TransportStreamID()));
     str.append(QString(" programCount: %1\n").arg(ProgramCount()));
     for (unsigned int i=0; i<ProgramCount(); i++) {
-        const unsigned char* p=PESData()+PSIP_OFFSET+(i<<2);
+        const unsigned char* p=pesdata()+PSIP_OFFSET+(i<<2);
         str.append(QString("  program number %1").arg(int(ProgramNumber(i)))).
             append(QString(" has PID 0x%1   data ").arg(ProgramPID(i),4,16)).
             append(QString(" 0x%1 0x%2").arg(int(p[0])).arg(int(p[1]))).

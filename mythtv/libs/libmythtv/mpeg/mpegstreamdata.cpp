@@ -122,7 +122,7 @@ PSIPTable* MPEGStreamData::AssemblePSIP(const TSPacket* tspacket,
         uint packetStart = partial->PSIOffset() + psip->SectionLength();
         if (packetStart < partial->TSSizeInBuffer())
         {
-            if (partial->PESData()[psip->SectionLength()] != 0xff)
+            if (partial->pesdata()[psip->SectionLength() + 1] != 0xff)
             {
                 // If the next section starts in the new tspacket
                 // create a new partial packet to prevent overflow
