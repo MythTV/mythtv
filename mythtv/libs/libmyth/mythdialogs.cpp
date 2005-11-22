@@ -406,12 +406,14 @@ void MythMainWindow::ExitToMainMenu(void)
 }
 
 bool MythMainWindow::TranslateKeyPress(const QString &context,
-                                       QKeyEvent *e, QStringList &actions)
+                                       QKeyEvent *e, QStringList &actions,
+                                       bool allowJumps)
 {
     actions.clear();
     int keynum = d->TranslateKeyNum(e);
 
-    if (d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
+    if (allowJumps &&
+        d->jumpMap.count(keynum) > 0 && d->exitmenucallback == NULL)
     {
         d->exitingtomain = true;
         d->exitmenucallback = d->jumpMap[keynum]->callback;

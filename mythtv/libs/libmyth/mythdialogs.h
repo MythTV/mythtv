@@ -89,7 +89,7 @@ class MythMainWindow : public QDialog
     QWidget *currentWidget(void);
 
     bool TranslateKeyPress(const QString &context, QKeyEvent *e, 
-                           QStringList &actions);
+                           QStringList &actions, bool allowJumps = true);
 
     void ClearKey(const QString &context, const QString &action);
     void BindKey(const QString &context, const QString &action,

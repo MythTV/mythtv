@@ -315,38 +315,28 @@ MSqlQueryInfo MSqlQuery::DDCon()
     return qi;
 }
 
-void MSqlQuery::PrintLastQuery(void)
-{
-    QString str = "";
-
-#if QT_VERSION >= 0x030200
-    str += "MSqlQuery: ";
-    str += executedQuery() + "\n";
-#else
-    str += "Your version of Qt is too old to provide proper SQL debugging\n";
-    str += "MSqlQuery: ";
-    str += lastQuery() + "\n";
-#endif
-
-    VERBOSE(VB_DATABASE, str);
-}
-
-bool MSqlQuery::exec(void)
-{
-    bool result = QSqlQuery::exec();
-
-    if (print_verbose_messages & VB_DATABASE)
-        PrintLastQuery();
-
-    return result;
-}
-
+// This method is called from QSqlQuery::exec(void) so it gets executed
+// when we run MSqlQuery::exec(void) also.  So all SQL statements are printed
+// by this one method.
 bool MSqlQuery::exec(const QString &query)
 {
     bool result = QSqlQuery::exec(query);
 
     if (print_verbose_messages & VB_DATABASE)
-        PrintLastQuery();
+    {
+        QString str = "";
+
+#if QT_VERSION >= 0x030200
+        str += "MSqlQuery: ";
+        str += executedQuery() + "\n";
+#else
+        str += "Your Qt version is too old to provide proper SQL debugging\n";
+        str += "MSqlQuery: ";
+        str += lastQuery() + "\n";
+#endif
+
+        VERBOSE(VB_DATABASE, str);
+    }
 
     return result;
 }

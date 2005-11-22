@@ -105,11 +105,8 @@ class MSqlQuery : public QSqlQuery
     /// \brief Only updated once during object creation
     bool isConnected(void) { return m_isConnected; }
 
-    /// \brief Allow us to display the SQL executed for debugging purposes.
-    void PrintLastQuery(void);
-
-    /// \brief Wrap QSqlQuery::exec() so we can display SQL
-    bool exec(void);
+    /// \brief This is needed since we define exec(const QString &query)
+    bool exec(void) { return QSqlQuery::exec(); }
 
     /// \brief Wrap QSqlQuery::exec(const QString &query) so we can display SQL
     bool exec(const QString &query);
