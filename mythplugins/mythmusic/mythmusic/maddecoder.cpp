@@ -461,18 +461,22 @@ static inline signed long fix_sample(unsigned int bits, mad_fixed_t sample)
 
 enum mad_flow MadDecoder::madOutput()
 {
-    unsigned int samples, channels;
+    unsigned int samples;
     mad_fixed_t const *left, *right;
 
     samples = synth.pcm.length;
-    channels = synth.pcm.channels;
     left = synth.pcm.samples[0];
     right = synth.pcm.samples[1];
 
-
+    freq = frame.header.samplerate;
+    channels = MAD_NCHANNELS(&frame.header);
     bitrate = frame.header.bitrate / 1000;
+
     if (output())
+    {
+        output()->Reconfigure(16, channels, freq);
         output()->SetSourceBitrate(bitrate);
+    }
 
     while (samples--)
     {
