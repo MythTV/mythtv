@@ -194,34 +194,6 @@ struct cc *cc_open(const char *vbi_name)
     cc->code1 = -1;
     cc->code2 = -1;
 
-    for (int i = 0; i < 2; i++)
-    {
-        cc->badvbi[i] = 0;
-        cc->lasttc[i] = 0;
-        cc->lastcode[i] = -1;
-        cc->lastcodetc[i] = 0;
-        cc->ccmode[i] = -1;
-        cc->txtmode[i*2 + 0] = 0;
-        cc->txtmode[i*2 + 1] = 0;
-        cc->xds[i] = 0;
-    }
-
-    for (int i = 0; i < 8; i++)
-    {
-        cc->lastrow[i] = 0;
-        cc->newrow[i] = 0;
-        cc->newcol[i] = 0;
-        cc->timecode[i] = 0;
-        cc->row[i] = 0;
-        cc->col[i] = 0;
-        cc->rowcount[i] = 0;
-        cc->style[i] = 0;
-        cc->linecont[i] = 0;
-        cc->resumetext[i] = 0;
-        cc->lastclr[i] = 0;
-        cc->ccbuf[i] = "";
-    }
-
     return cc;
 }
 

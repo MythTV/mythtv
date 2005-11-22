@@ -30,6 +30,7 @@ using namespace std;
 // MythTV headers
 #include "recorderbase.h"
 #include "format.h"
+#include "ccdecoder.h"
 
 struct video_audio;
 struct VBIData;
@@ -40,7 +41,7 @@ class ChannelBase;
 class FilterManager;
 class FilterChain;
 
-class NuppelVideoRecorder : public RecorderBase
+class NuppelVideoRecorder : public RecorderBase, public CCReader
 {
  public:
     NuppelVideoRecorder(TVRec *rec, ChannelBase *channel);
@@ -133,11 +134,8 @@ class NuppelVideoRecorder : public RecorderBase
 
     void FormatTeletextSubtitles(struct VBIData *vbidata);
     void FormatCC(struct cc *cc);
-    void FormatCCField(struct cc *cc, int tc, int field);
-    QChar CharCC(int code);
-    void ResetCC(struct cc *cc, int mode);
-    void BufferCC(struct cc *cc, int mode, int len, int clr);
-    int NewRowCC(struct cc *cc, int mode, int len);
+    void AddTextData(unsigned char *buf, int len,
+                     long long timecode, char type);
     
     bool encoding;
     
@@ -285,6 +283,9 @@ class NuppelVideoRecorder : public RecorderBase
     bool correct_bttv;
 
     int volume;
+
+    CCDecoder *ccd;
+
     bool go7007;
     bool resetcapture;
 };
