@@ -2313,7 +2313,8 @@ void Scheduler::findAllScheduledPrograms(list<ProgramInfo *> &proglist)
             proginfo->rectype = RecordingType(result.value(9).toInt());
             proginfo->recordid = result.value(11).toInt();
 
-            if (proginfo->rectype == kSingleRecord || 
+            if (proginfo->rectype == kSingleRecord   || 
+                proginfo->rectype == kDontRecord     ||
                 proginfo->rectype == kOverrideRecord ||
                 proginfo->rectype == kTimeslotRecord ||
                 proginfo->rectype == kWeekslotRecord) 
