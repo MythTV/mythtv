@@ -43,7 +43,7 @@ class OSD : public QObject
     Q_OBJECT
  public:
     OSD(const QRect &totalBounds,   int   frameRate,
-        const QRect &visibleBounds, float visibleAspect);
+        const QRect &visibleBounds, float visibleAspect, float fontScaling);
    ~OSD(void);
 
     OSDSurface *Display(void);
@@ -109,7 +109,8 @@ class OSD : public QObject
     int getTimeType(void) { return timeType; }
 
     void Reinit(const QRect &totalBounds,   int   frameRate,
-                const QRect &visibleBounds, float visibleAspect);
+                const QRect &visibleBounds,
+                float visibleAspect, float fontScaling);
 
     void SetFrameInterval(int frint);
 
@@ -156,7 +157,7 @@ class OSD : public QObject
 
     QString themepath;
 
-    float wscale;
+    float wscale, fscale;
     float hmult, wmult;
     int xoffset, yoffset, displaywidth, displayheight;
 

@@ -317,13 +317,14 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
 }
 
 // documented in videooutbase.cpp
-QRect VideoOutputXv::GetVisibleOSDBounds(float &visible_aspect) const
+QRect VideoOutputXv::GetVisibleOSDBounds(
+    float &visible_aspect, float &font_scaling) const
 {
     if (!chroma_osd)
-        return VideoOutput::GetVisibleOSDBounds(visible_aspect);
+        return VideoOutput::GetVisibleOSDBounds(visible_aspect, font_scaling);
 
     visible_aspect = GetDisplayAspect();
-    VERBOSE(VB_IMPORTANT, "visible_aspect: "<<visible_aspect);
+    font_scaling   = 1.0f;
     return QRect(0,0,dispw,disph);
 }
 

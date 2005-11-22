@@ -502,18 +502,22 @@ void VideoOutput::GetDrawSize(int &xoff, int &yoff, int &width, int &height)
 }
 
 void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
-                               float &visible_aspect) const
+                               float &visible_aspect,
+                               float &font_scaling) const
 {
     total   = GetTotalOSDBounds();
-    visible = GetVisibleOSDBounds(visible_aspect);
+    visible = GetVisibleOSDBounds(visible_aspect, font_scaling);
 }
 
+static float sq(float a) { return a*a; }
 /**
  * \fn VideoOutput::GetVisibleOSDBounds(float&) const
  * \brief Returns visible portions of total OSD bounds
  * \param visible_aspect physical aspect ratio of bounds returned
+ * \param font_scaling   scaling to apply to fonts
  */
-QRect VideoOutput::GetVisibleOSDBounds(float &visible_aspect) const
+QRect VideoOutput::GetVisibleOSDBounds(
+    float &visible_aspect, float &font_scaling) const
 {
     float dv_w = ((float)XJ_width)  / dispwoff;
     float dv_h = ((float)XJ_height) / disphoff;
@@ -528,9 +532,11 @@ QRect VideoOutput::GetVisibleOSDBounds(float &visible_aspect) const
                        (uint) floor(XJ_height-(lower_overflow*dv_h)));
     QRect bounds(tl, br);
 
-    visible_aspect = videoAspect * ((float)XJ_width/XJ_height) *
-        ((float)bounds.height()/bounds.width());
-    VERBOSE(VB_IMPORTANT, "visible_aspect: "<<visible_aspect);
+    float dispPixelAdj = (GetDisplayAspect() * XJ_height) / XJ_width;
+    visible_aspect = XJ_aspect * dispPixelAdj;
+
+    // this can be used to account for Zooming letterbox modes
+    font_scaling = 1.0f;
     return bounds;
 }
 
@@ -793,7 +799,7 @@ void VideoOutput::MoveResize(void)
     //printf("After: %dx%d%+d%+d\n", dispwoff, disphoff, dispxoff, 
     //dispyoff);
 
-#if 0
+#if 1
     printf("VideoOutput::MoveResize:\n");
     printf("Img(%d,%d %d,%d)\n", imgx, imgy, imgw, imgh);
     printf("Disp(%d,%d %d,%d)\n", dispxoff, dispyoff, dispwoff, disphoff);

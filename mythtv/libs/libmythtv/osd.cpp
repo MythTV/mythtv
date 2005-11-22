@@ -27,13 +27,15 @@ using namespace std;
 
 #include "osdlistbtntype.h"
 
+static float sq(float a) { return a*a; }
+
 OSD::OSD(const QRect &osd_bounds, int   frameRate,
-         const QRect &vis_bounds, float visibleAspect)
+         const QRect &vis_bounds, float visibleAspect, float fontScaling)
     : QObject(),
       osdBounds(osd_bounds),              frameint(frameRate),
       needPillarBox(false),
       themepath(FindTheme(gContext->GetSetting("OSDTheme"))),
-      wscale(1.0f),
+      wscale(1.0f), fscale(fontScaling),
       hmult(vis_bounds.width() / 640.0f), wmult(vis_bounds.height() / 480.0f),
       xoffset(vis_bounds.left()),         yoffset(vis_bounds.top()),
       displaywidth(vis_bounds.width()),   displayheight(vis_bounds.height()),
@@ -46,7 +48,9 @@ OSD::OSD(const QRect &osd_bounds, int   frameRate,
       treeMenuContainer("")
 {
     needPillarBox = visibleAspect > 1.51f;
-    wscale = (float)displaywidth/(visibleAspect*displayheight);
+    wscale = visibleAspect / 1.3333f;
+    // adjust for wscale font size scaling
+    fscale *= (float) sqrt(2.0/(sq(wscale) + 1.0));
 
     if (themepath.isEmpty())
     {
@@ -65,7 +69,7 @@ OSD::OSD(const QRect &osd_bounds, int   frameRate,
     SetDefaults();
 
     // Reinit since SetDefaults() appears to mess things up.
-    Reinit(osd_bounds, frameRate, vis_bounds, visibleAspect);
+    Reinit(osd_bounds, frameRate, vis_bounds, visibleAspect, fontScaling);
 }
 
 OSD::~OSD(void)
@@ -216,7 +220,8 @@ void OSD::SetDefaults(void)
 }
 
 void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
-                 const QRect &visibleBounds, float visibleAspect)
+                 const QRect &visibleBounds,
+                 float visibleAspect, float fontScaling)
 {
     QMutexLocker locker(&osdlock);
 
@@ -232,14 +237,19 @@ void OSD::Reinit(const QRect &totalBounds,   int   frameRate,
     needPillarBox = visibleAspect > 1.51f;
     frameint      = (frameRate <= 0) ? frameRate : frameint;
 
-    wscale = (float)displaywidth/(visibleAspect*displayheight);
+    wscale = visibleAspect / 1.3333f;
+    fscale = fontScaling;
+    // adjust for wscale font size scaling
+    fscale *= (float) sqrt(2.0/(sq(wscale) + 1.0));
+
+    VERBOSE(VB_IMPORTANT, "wscale: "<<wscale<<" fscale: "<<fscale);
 
     QMap<QString, TTFFont *>::iterator fonts = fontMap.begin();
     for (; fonts != fontMap.end(); ++fonts)
     {
         TTFFont *font = (*fonts);
         if (font)
-            font->Reinit(wscale, hmult);
+            font->Reinit(wscale, hmult * fscale);
     }
 
     QMap<QString, OSDSet *>::iterator sets = setMap.begin();
@@ -301,7 +311,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
 {
     QString fullname = MythContext::GetConfDir() + "/" + name;
     TTFFont *font = new TTFFont((char *)fullname.ascii(), size,
-                                wscale, hmult);
+                                wscale, hmult*fscale);
 
     if (font->isValid())
         return font;
@@ -310,7 +320,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
     fullname = gContext->GetShareDir() + name;
 
     font = new TTFFont((char *)fullname.ascii(), size,
-                       wscale, hmult);
+                       wscale, hmult*fscale);
 
     if (font->isValid())
         return font;
@@ -320,7 +330,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
     {
         fullname = themepath + "/" + name;
         font = new TTFFont((char *)fullname.ascii(), size,
-                           wscale, hmult);
+                           wscale, hmult*fscale);
         if (font->isValid())
             return font;
     }
@@ -329,7 +339,7 @@ TTFFont *OSD::LoadFont(QString name, int size)
 
     fullname = name;
     font = new TTFFont((char *)fullname.ascii(), size,
-                       wscale, hmult);
+                       wscale, hmult*fscale);
 
     if (font->isValid())
         return font;
