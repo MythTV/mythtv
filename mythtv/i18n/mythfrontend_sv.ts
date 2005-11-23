@@ -840,7 +840,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Change Recording Group Password</source>
-        <translation>Ändra lösenord för inspelningsgruppen</translation>
+        <translation type="obsolete">Ändra lösenord för inspelningsgruppen</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1101,6 +1101,26 @@ Returning to the previous menu.</source>
     <message>
         <source>Change Playback Group</source>
         <translation>Ändra uppspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Group View</source>
+        <translation>Gruppvy</translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation>Inspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Playback Group</source>
+        <translation>Uppspelningsgrupp</translation>
+    </message>
+    <message>
+        <source>Recording Title</source>
+        <translation>Inspelningstitel</translation>
+    </message>
+    <message>
+        <source>Group Password</source>
+        <translation>Grupplösenord</translation>
     </message>
 </context>
 <context>
@@ -3247,7 +3267,7 @@ så du måste ställa in dessa manuellt.</translation>
     </message>
     <message>
         <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation>Spola tillbaka så här många sekunder efter ett reklamhopp.</translation>
+        <translation type="obsolete">Spola tillbaka så här många sekunder efter ett reklamhopp.</translation>
     </message>
     <message>
         <source>(All)</source>
@@ -3831,7 +3851,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Record using the &quot;%1&quot; profile</source>
-        <translation>Spela in med &quot;%1&quot;-profilen</translation>
+        <translation>Spela in med profilen &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Scheduling Options</source>
@@ -7126,7 +7146,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Preview schedule changes</source>
-        <translation>Förhandsgranska ändringar</translation>
+        <translation>Förhandsgranska schemaändringar</translation>
     </message>
     <message>
         <source>This recording is currently in use by:</source>
@@ -7138,7 +7158,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Title match (regex)</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel-matchning (regex)</translation>
     </message>
     <message>
         <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
@@ -7154,11 +7174,11 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Time stretch (speed x 100)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempo (hastighet x 100)</translation>
     </message>
     <message>
         <source>Initial playback speed with adjusted audio.  Use 100 for normal speed, 50 for half speed and 200 for double speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Initial uppspelningstempo. 100 är normalt tempo, 50 är halvt tempo och 200 är dubbelt tempo.</translation>
     </message>
     <message>
         <source>Playback Group</source>
@@ -7175,6 +7195,14 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>Daily Wakeup/ShutDown Period</source>
         <translation>Daglig uppvakningsperiod</translation>
+    </message>
+    <message>
+        <source>Use &quot;%1&quot; playback group settings</source>
+        <translation>Använd uppspelningsgrupp &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
+        <translation>Spola tillbaka så här många sekunder efter ett reklamhopp.</translation>
     </message>
 </context>
 <context>
@@ -7905,7 +7933,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation type="unfinished">%1-inställningar</translation>
+        <translation>Uppspelningsinställningar: %1</translation>
     </message>
 </context>
 <context>
@@ -8057,6 +8085,18 @@ Inga andra detaljer</translation>
     <message>
         <source>This screen displays the status of various system components</source>
         <translation>Denna skärm visar status för olika systemkomponenter</translation>
+    </message>
+    <message>
+        <source>Preview Schedule Changes:</source>
+        <translation>Förhandsgranska schemaändringar:</translation>
+    </message>
+    <message>
+        <source>The recording schedule would not be affected.</source>
+        <translation>Inspelningsschemat påverkas inte.</translation>
+    </message>
+    <message>
+        <source>(1)Time (2)Title</source>
+        <translation>(1)Tid (2)Titel</translation>
     </message>
 </context>
 <context>

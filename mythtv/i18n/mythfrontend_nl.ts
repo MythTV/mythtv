@@ -912,7 +912,7 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>Change Recording Group Password</source>
-        <translation>Wijzig Wachtwoord van Opnamegroep</translation>
+        <translation type="obsolete">Wijzig Wachtwoord van Opnamegroep</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1192,6 +1192,26 @@ Terug naar het vorige menu.</translation>
     </message>
     <message>
         <source>Change Playback Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished">Opnamegroep</translation>
+    </message>
+    <message>
+        <source>Playback Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3539,7 +3559,7 @@ Enkel programma &apos;s in groepen zonder wachtwoordbeveiliging worden getoond.<
     </message>
     <message>
         <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation>Indien ingevuld, zal MythTV automatisch zoveel seconden terugspringen nadat een reclameblok overgeslagen werd.</translation>
+        <translation type="obsolete">Indien ingevuld, zal MythTV automatisch zoveel seconden terugspringen nadat een reclameblok overgeslagen werd.</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -7793,6 +7813,14 @@ Myth zal nu afsluiten.</translation>
         <source>Daily Wakeup/ShutDown Period</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Use &quot;%1&quot; playback group settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8717,6 +8745,18 @@ Geen verdere details</translation>
     <message>
         <source>This screen displays the status of various system components</source>
         <translation>Dit scherm laat de status zien van de verschillende systeemonderdelen</translation>
+    </message>
+    <message>
+        <source>Preview Schedule Changes:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The recording schedule would not be affected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1)Time (2)Title</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

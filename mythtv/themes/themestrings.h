@@ -5,6 +5,8 @@ void strings_null() {
     ThemeUI::tr("You Haven't Scheduled Any Programs To Be Recorded");
     ThemeUI::tr("To schedule a recording, exit this screen and");
     ThemeUI::tr("Select 'Program Guide' or 'Program Finder'");
+    ThemeUI::tr("Preview Schedule Changes:");
+    ThemeUI::tr("The recording schedule would not be affected.");
     ThemeUI::tr("Channel Recording Priorities");
     ThemeUI::tr("(1) Sort by Channel    (2) Sort by Priority");
     ThemeUI::tr("Source:");
@@ -40,10 +42,12 @@ void strings_null() {
     ThemeUI::tr("No Programs");
     ThemeUI::tr("There are no available programs under this search. Please select another search.");
     ThemeUI::tr("Program Listings");
+    ThemeUI::tr("(1)Time (2)Title");
     ThemeUI::tr("No listings found for this program. ");
     ThemeUI::tr("Airdate:");
     ThemeUI::tr("Channel:");
     ThemeUI::tr("Description:");
     ThemeUI::tr("System Status - Select a category to view the status");
     ThemeUI::tr("This screen displays the status of various system components");
+    
 }

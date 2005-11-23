@@ -871,7 +871,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Change Recording Group Password</source>
-        <translation>Cambiar Contraseña Grupo Grabación</translation>
+        <translation type="obsolete">Cambiar Contraseña Grupo Grabación</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1135,6 +1135,26 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Change Playback Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished">Grupo Grabación</translation>
+    </message>
+    <message>
+        <source>Playback Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3429,7 +3449,7 @@ Su grabber no proporciona números de canal, así que debe establecerlos manualm
     </message>
     <message>
         <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation>Si se activa, Myth automáticamente rebobinará estos segundos después de saltarse el anuncio.</translation>
+        <translation type="obsolete">Si se activa, Myth automáticamente rebobinará estos segundos después de saltarse el anuncio.</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -7429,6 +7449,14 @@ Myth saldrá ahora.</translation>
         <source>Daily Wakeup/ShutDown Period</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Use &quot;%1&quot; playback group settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8326,6 +8354,18 @@ Sin más detalles</translation>
     <message>
         <source>This screen displays the status of various system components</source>
         <translation>Esta pantalla muestra el estado de varios de los componentes del sistema</translation>
+    </message>
+    <message>
+        <source>Preview Schedule Changes:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The recording schedule would not be affected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1)Time (2)Title</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

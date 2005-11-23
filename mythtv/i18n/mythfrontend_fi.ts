@@ -935,7 +935,7 @@ Palaa edelliseen valikkoon.</translation>
     </message>
     <message>
         <source>Change Recording Group Password</source>
-        <translation>Vaihda Nauhoitusryhmän Salasanaa</translation>
+        <translation type="obsolete">Vaihda Nauhoitusryhmän Salasanaa</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1216,6 +1216,26 @@ kun jaksojen lukumäärän rajoitus on päällä.</translation>
     </message>
     <message>
         <source>Change Playback Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Group</source>
+        <translation type="unfinished">Nauhoitusryhmä</translation>
+    </message>
+    <message>
+        <source>Playback Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording Title</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3576,7 +3596,7 @@ Käyttämäsi ohjelmahaku ei tue kanavanumeroita, joten ne on asetettava manuaal
     </message>
     <message>
         <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation>Asetettuna MythTV kelaa automaattisesti takaisin tämän verran sen jälkeen, kun on ohittanut mainoskatkon.</translation>
+        <translation type="obsolete">Asetettuna MythTV kelaa automaattisesti takaisin tämän verran sen jälkeen, kun on ohittanut mainoskatkon.</translation>
     </message>
     <message>
         <source>Skip %1</source>
@@ -7870,6 +7890,14 @@ Ei vaikuta olemassaoleviin nauhoituksiin.</translation>
         <source>Daily Wakeup/ShutDown Period</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Use &quot;%1&quot; playback group settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ScanCountry</name>
@@ -8800,6 +8828,18 @@ Se ohitetaan</translation>
     <message>
         <source>This screen displays the status of various system components</source>
         <translation>Näyttää tilatietoja laitteistosta</translation>
+    </message>
+    <message>
+        <source>Preview Schedule Changes:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The recording schedule would not be affected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(1)Time (2)Title</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
