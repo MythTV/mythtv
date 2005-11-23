@@ -171,7 +171,10 @@ void VideoGallery::fetchVideos()
         if (upnode && upnode->getInt() == UP_FOLDER)
             where_we_are->removeNode(upnode);
         if (where_we_are->childCount() > 1)
+        {
+            video_tree_root = where_we_are;
             where_we_are = where_we_are->getChildAt(0,0);
+        }
         // else { we have an empty tree! }
     }
     int list_count = where_we_are->siblingCount();
