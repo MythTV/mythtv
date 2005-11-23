@@ -42,7 +42,19 @@ ViewScheduleDiff::ViewScheduleDiff(MythMainWindow *parent, const char *name, QSt
     theme = new XMLParse();
     theme->SetWMult(wmult);
     theme->SetHMult(hmult);
-    theme->LoadTheme(xmldata, "schdiff");
+    if (!theme->LoadTheme(xmldata, "schdiff"))
+    {
+        DialogBox diag(gContext->GetMainWindow(), tr("The theme you are using "
+                       "does not contain a 'schdiff' element. Please contact "
+                       "the theme creator and ask if they could please update "
+                       "it.<br><br>The next screen will be empty. "
+                       "Escape out of it to return to the menu."));
+        diag.AddButton(tr("OK"));
+        diag.exec();
+
+        return;
+    }
+
     LoadWindow(xmldata);
 
     LayerSet *container = theme->GetSet("selector");
