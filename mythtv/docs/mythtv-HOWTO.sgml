@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-11-01, v0.18.14
+<date>2005-11-23, v0.18.15
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -405,8 +405,8 @@ You want to see the <tt>bttv</tt> module listed.
 <p>While inexpensive video-capture cards simply capture raw frames, leaving
 encoding to software, some higher-end cards incorporate hardware-based
 encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
-supported by the IvyTV project <url url="http://ivtv.sourceforge.net/"
-name="http://ivtv.sourceforge.net/"> such as the Hauppauge
+supported by the IvyTV project <url url="http://ivtvdriver.org/"
+name="http://ivtvdriver.org"> such as the Hauppauge
 PVR-150/250/350/500, Avermedia M179, Hauppauge "Freestyle" or Yuan M600
 cards will allow you to use dedicated hardware encoders rather than your
 CPU. (The PVR-350 can simultaneously be used as an output device.) Using the
@@ -415,7 +415,7 @@ encoding.
 
 <bf>NOTE</bf>:  Motherboards with the Via chipset are notoriously bad with
 DMA and have caused numerous issues with ivtv, including hard locks.  See
-the ivtv website <url url="http://ivtv.sf.net" name="http://ivtv.sf.net">
+the ivtv website <url url="http://ivtvdriver.org" name="http://ivtvdriver.org">
 for the latest information on what works and what doesn't.
 
 Here are some data points for encoding:
@@ -441,9 +441,11 @@ see the pages maintained by Martin Smith <url
 url="mailto:martin@ethics-gradient.net" name="martin@ethics-gradient.net">
 at <url url="http://www.ethics-gradient.net/myth/mythdvb.html"
 name="http://www.ethics-gradient.net/myth/mythdvb.html"> for more
-information.  To see if your DVB card is supported, see the list of cards at
-<url url="http://www.linuxtv.org/download/dvb/CARDS"
-name="http://www.linuxtv.org/download/dvb/CARDS"> for more information.
+information.  To see if your DVB card is supported, see the list of cards in
+the "Supported Hardware" section of the DVB Wiki at <url
+url="http://www.linuxtv.org/wiki/index.php/Main_Page"
+name="http://www.linuxtv.org/wiki/index.php/Main_Page"> for more
+information.
 
 In the United States, you may use a card such as the TwinHan to obtain
 unencrypted Free-To-Air satellite channels.
@@ -1236,13 +1238,14 @@ url="http://cvs.mythtv.org" name="http://cvs.mythtv.org">
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
-<caption><bf>NOTE</bf>: If you are going to use <bf>subversion</bf> to compile MythTV
-rather than using the distribution tarball, it is <bf>strongly</bf>
-recommended that you join the <url
-url="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"
+<caption><bf>NOTE</bf>: If you are going to use <bf>subversion</bf> to
+compile MythTV rather than using the distribution tarball, you <em>must</em>
+join the <url url="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"
 name="http://www.mythtv.org/mailman/listinfo/mythtv-commits/"> and <url
 url="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"
-name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists.
+name="http://www.mythtv.org/mailman/listinfo/mythtv-dev/"> mailing lists to
+keep up to date with the current status of the code.  Code obtained from
+subversion has no guarantees regarding stability, etc.
 </caption>
 </figure>
 
@@ -2962,7 +2965,7 @@ The following types of hardware encoding cards are supported:
 <itemize>
 <item>MJPEG - Zoran-based cards; see <url url="http://mjpeg.sourceforge.net" name="http://mjpeg.sourceforge.net">
 <item>MPEG-2 - iTVC15/16 based cards (Hauppauge PVR-250/PVR-350); see <url
-url="http://ivtv.sourceforge.net" name="http://ivtv.sourceforge.net"> 
+url="http://ivtvdriver.org" name="http://ivtvdriver.org"> 
 <item>HDTV - pcHDTV cards; see <url url="http://pchdtv.com" name="http://pchdtv.com"> and
 the Air2PC-ATSC-PCI see <url
 url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
@@ -7662,7 +7665,9 @@ bad if they're all saying different things.
 v0.18.14, 2005-11-01.  Add "don't use QT 4.0" warning message.  Add explanation
 of what the tuning status letters mean.  Add some details about PVR 150/500
 cards.  Robert Tsai's doc contribution.
-
+v0.18.15, 2005-11-23.  Update link to DVB wiki.  Update link to
+ivtvdriver.org.  If you're running SVN, you'd better be on -commits and
+-dev.
 -->
 
 <!--

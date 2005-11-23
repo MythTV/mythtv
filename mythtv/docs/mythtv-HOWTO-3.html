@@ -129,13 +129,24 @@ information.</P>
 
 <H3>Filesystems</H3>
 
-<P>MythTV creates large files, many in excess of 2GB.  You <EM>must</EM> use a
-filesystem that will allow you to create large files.  Filesystems known to
-have problems with large files are FAT and FAT32.</P>
+<P>MythTV creates large files, many in excess of 4GB.  You <EM>must</EM> 
+use a 64 or 128 bit filesystem. These will allow you to create large files.
+Filesystems known to have problems with large files are FAT (all versions),
+and ReiserFS (versions 3 and 4). The ext3 filesystem can be made to work
+but requires great care in how you format and mount the volume.</P>
 <P>Because MythTV creates very large files, a filesystem that does well at
 deleting large files is important.  Numerous benchmarks show that XFS and
-JFS do very well at this task.  You are strongly encouraged to consider
-either of these for your MythTV filesystem.</P>
+JFS do very well at this task.  You are <EM>strongly</EM> encouraged to
+consider one of these for your MythTV filesystem.  JFS is the absolute
+best at deletion, so you may want to try it if XFS gives you problems.</P>
+<P>
+<FIGURE>
+<EPS FILE="stop.eps">
+<IMG SRC="stop.png">
+<CAPTION><B>NOTE</B>:  You <EM>must not</EM> use ReiserFS v3 for
+your recordings. You will get corrupted recordings if you do.</CAPTION>
+</FIGURE>
+</P>
 <P>Because of the size of the MythTV files, it may be useful to plan for future
 expansion right from the beginning.  If your case and power supply have the
 capacity for additional hard drives, read through the 
@@ -208,7 +219,7 @@ the bttv modules by typing:
 encoding to software, some higher-end cards incorporate hardware-based
 encoding. Using either a G200 MJPEG encoder card, or a MPEG-2 encoder card
 supported by the IvyTV project 
-<A HREF="http://ivtv.sourceforge.net/">http://ivtv.sourceforge.net/</A> such as the Hauppauge
+<A HREF="http://ivtvdriver.org/">http://ivtvdriver.org</A> such as the Hauppauge
 PVR-150/250/350/500, Avermedia M179, Hauppauge "Freestyle" or Yuan M600
 cards will allow you to use dedicated hardware encoders rather than your
 CPU. (The PVR-350 can simultaneously be used as an output device.) Using the
@@ -217,7 +228,7 @@ encoding.</P>
 <P><B>NOTE</B>:  Motherboards with the Via chipset are notoriously bad with
 DMA and have caused numerous issues with ivtv, including hard locks.  See
 the ivtv website 
-<A HREF="http://ivtv.sf.net">http://ivtv.sf.net</A>
+<A HREF="http://ivtvdriver.org">http://ivtvdriver.org</A>
 for the latest information on what works and what doesn't.</P>
 <P>Here are some data points for encoding:
 <UL>
@@ -244,8 +255,10 @@ see the pages maintained by Martin Smith
 <A HREF="mailto:martin@ethics-gradient.net">martin@ethics-gradient.net</A>
 at 
 <A HREF="http://www.ethics-gradient.net/myth/mythdvb.html">http://www.ethics-gradient.net/myth/mythdvb.html</A> for more
-information.  To see if your DVB card is supported, see the list of cards at
-<A HREF="http://www.linuxtv.org/download/dvb/CARDS">http://www.linuxtv.org/download/dvb/CARDS</A> for more information.</P>
+information.  To see if your DVB card is supported, see the list of cards in
+the "Supported Hardware" section of the DVB Wiki at 
+<A HREF="http://www.linuxtv.org/wiki/index.php/Main_Page">http://www.linuxtv.org/wiki/index.php/Main_Page</A> for more
+information.</P>
 <P>In the United States, you may use a card such as the TwinHan to obtain
 unencrypted Free-To-Air satellite channels.</P>
 
