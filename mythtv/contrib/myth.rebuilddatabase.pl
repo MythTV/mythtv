@@ -234,6 +234,9 @@ foreach my $show (@files) {
 			print("    File: '$show'\n");
 			print("    Title: '$found_title'\n");
 		} else {
+			my $basename = $show;
+			$basename =~ s/$dir\/(.*)/$1/s;
+
 			my $guess = "select title, subtitle, description from oldrecorded where chanid=(?) and starttime=(?) and endtime=(?)";
 			$sth = $dbh->prepare($guess);
 			$sth->execute($channel, $starttime, $endtime)
@@ -278,18 +281,20 @@ foreach my $show (@files) {
 			}
 
 ## add records to db
-			my $i = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname) values ((?), (?), (?), (?), (?), (?), (?))";
+			my $i = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname, basename, progstart, progend) values ((?), (?), (?), (?), (?), (?), (?), (?), (?), (?))";
 
 			$sth = $dbh->prepare($i);
 			if (!$test_mode) {
 				$sth->execute($channel, $starttime, $endtime, $newtitle,
-						$newsubtitle, $newdescription, $host)
+						$newsubtitle, $newdescription, $host, $basename,
+						$starttime, $endtime)
 					or die "Could not execute ($i)\n";
 			} else {
 				print("Test mode: insert would have been done\n");
 				print("  Query: '$i'\n");
 				print("  Query params: '$channel', '$starttime', '$endtime',");
-				print("'$newtitle', '$newsubtitle', '$newdescription', '$host'\n");
+				print("'$newtitle', '$newsubtitle', '$newdescription',");
+				print("'$host', '$basename', '$starttime', '$endtime'\n");
 				
 			}
 		} ## if
@@ -299,6 +304,9 @@ foreach my $show (@files) {
         print("Do you want to import? (y/n): ");
         chomp(my $do_import = <STDIN>);
         if ($do_import eq "y") {
+			my $basename = $show;
+			$basename =~ s/$dir\/(.*)/$1/s;
+
             print("Enter channel: ");
             chomp(my $tmp_channel = <STDIN>);
             if ($tmp_channel) {$channel = $tmp_channel;}
@@ -324,18 +332,20 @@ foreach my $show (@files) {
 			if ($tmp_description) {$description = $tmp_description;}
 
 ## add records to db
-			my $i = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname) values ((?), (?), (?), (?), (?), (?), (?))";
+			my $i = "insert into recorded (chanid, starttime, endtime, title, subtitle, description, hostname, basename, progstart, progend) values ((?), (?), (?), (?), (?), (?), (?), (?), (?), (?))";
 
 			$sth = $dbh->prepare($i);
 			if (!$test_mode) {
 				$sth->execute($channel, $starttime, $endtime, $title,
-						$subtitle, $description, $host)
+						$subtitle, $description, $host, $basename,
+						$starttime, $endtime)
 					or die "Could not execute ($i)\n";
 			} else {
 				print("Test mode: insert would have been done\n");
 				print("  Query: '$i'\n");
 				print("  Query params: '$channel', '$starttime', '$endtime',");
-				print("'$title', '$subtitle', '$description', '$host'\n");
+				print("'$title', '$subtitle', '$description', '$host',");
+				print("'$basename', '$starttime', '$endtime'\n");
 				
 			}
 
