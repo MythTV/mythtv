@@ -285,7 +285,7 @@ void MPEG2replex::start()
 
     mx.priv = (void *)this;
 
-    fd_out = open(outfile, O_WRONLY | O_CREAT | O_TRUNC | O_LARGEFILE, S_IRWXU);
+    fd_out = open(outfile, O_WRONLY | O_CREAT | O_TRUNC | O_LARGEFILE, 0644);
 
     //await buffer fill
     pthread_mutex_lock(&mutex);
