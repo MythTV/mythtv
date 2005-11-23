@@ -673,6 +673,7 @@ AllMusic::AllMusic(QString path_assignment, QString a_startdir)
 {
     startdir = a_startdir;
     done_loading = false;
+    numPcs = numLoaded = 0;
     
     cd_title = QObject::tr("CD -- none");
 
@@ -770,7 +771,10 @@ void AllMusic::resync()
     query.exec(aquery);
 
     all_music.clear();
-    
+
+    numPcs = query.size() * 2;
+    numLoaded = 0;
+
     if (query.isActive() && query.size() > 0)
     {
         while (query.next())
@@ -814,6 +818,7 @@ void AllMusic::resync()
                 lastplayMin  = min(lastPlay,  lastplayMin);
                 lastplayMax  = max(lastPlay,  lastplayMax);
             }
+            numLoaded++;
         }
     }
     else
@@ -903,6 +908,8 @@ void AllMusic::buildTree()
         if (inserter->isVisible())
             list.append(inserter);
         ++an_iterator;
+
+        numLoaded++;
     }
 
     intoTree(list);

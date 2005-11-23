@@ -45,6 +45,7 @@ PlaybackBoxMusic::PlaybackBoxMusic(MythMainWindow *parent, QString window_name,
     waiting_for_playlists_timer = NULL;
     playlist_tree = NULL;
     playlist_popup = NULL;    
+    progress = NULL;
     
     lcd_volume_visible = false; 
     isplaying = false;
@@ -893,6 +894,14 @@ void PlaybackBoxMusic::checkForPlaylists()
     if (all_playlists->doneLoading() &&
         all_music->doneLoading())
     {
+        if (progress)
+        {
+            progress->Close();
+            delete progress;
+            progress = NULL;
+            progress_type = kProgressNone;
+        }
+
         if (tree_is_done)
         {
             if (scan_for_cd)
@@ -921,7 +930,25 @@ void PlaybackBoxMusic::checkForPlaylists()
     }
     else
     {
-        // Visual Feedback ...
+        if (!all_music->doneLoading())
+        {
+            if (all_music->count() < 250) return;
+
+            if (!progress)
+            {
+                progress = new MythProgressDialog(
+                    QObject::tr("Loading Music"), all_music->count());
+                progress_type = kProgressMusic;
+            }
+            progress->setProgress(all_music->countLoaded());
+        } 
+        else if (progress_type == kProgressMusic)
+        {
+            progress->Close();
+            delete progress;
+            progress = NULL;
+            progress_type = kProgressNone;
+        }
     }
 }
 

@@ -274,6 +274,8 @@ class AllMusic
     QString     getLabel(int an_id, bool *error_flag);
     Metadata*   getMetadata(int an_id);
     bool        updateMetadata(int an_id, Metadata *the_track);
+    int         count() { return numPcs; }
+    int         countLoaded() { return numLoaded; } 
     void        save();
     bool        startLoading(void);
     void        resync();   //  After a CD rip, for example
@@ -303,7 +305,8 @@ class AllMusic
     MusicNodePtrList    top_nodes;
     MusicNode           *root_node;
     
-    
+    int numPcs;
+    int numLoaded;
 
     //  NB: While a QMap is VALUE BASED the
     //  values we are copying here are pointers,

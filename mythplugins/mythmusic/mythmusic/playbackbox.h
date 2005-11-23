@@ -209,6 +209,8 @@ class PlaybackBoxMusic : public MythThemedDialog
     UITextButtonType      *pledit_button;
     UITextButtonType      *vis_button;
 
+    MythProgressDialog    *progress;
+    enum { kProgressNone, kProgressMusic } progress_type;
 };
 
 
