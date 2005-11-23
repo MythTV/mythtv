@@ -119,12 +119,12 @@ int parse_verbose_arg(QString arg)
             }
             else if (!strcmp(*it,"database"))
             {
-                print_verbose_messages = VB_DATABASE;
+                print_verbose_messages |= VB_DATABASE;
                 verboseString += " " + *it;
             }
             else if (!strcmp(*it,"general"))
             {
-                print_verbose_messages = VB_GENERAL;
+                print_verbose_messages |= VB_GENERAL;
                 verboseString += " " + *it;
             }
             else if (!strcmp(*it,"record"))
