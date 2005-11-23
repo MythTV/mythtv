@@ -293,6 +293,7 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
     QMutexLocker locker(&global_lock);
 
     bool res_changed = (width != XJ_width) || (height != XJ_height);
+    bool asp_changed = aspect != videoAspect;
 
     VideoOutput::InputChanged(width, height, aspect);
 
@@ -300,6 +301,8 @@ void VideoOutputXv::InputChanged(int width, int height, float aspect)
     {
         if (VideoOutputSubType() == XVideo)
             clear_xv_buffers(vbuffers, XJ_width, XJ_height, xv_chroma);
+        if (asp_changed)
+            MoveResize();
         return;
     }
 
