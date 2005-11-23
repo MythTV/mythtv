@@ -417,10 +417,11 @@ bool UpgradeTVDatabaseSchema(void)
 {
     QString dbver = gContext->GetSetting("DBSchemaVer");
 
+    VERBOSE(VB_IMPORTANT, QString("Current Schema Version: %1").arg(dbver));
+
     if (dbver == currentDatabaseVersion)
         return true;
 
-    VERBOSE(VB_IMPORTANT, QString("Current Schema Version: %1").arg(dbver));
     VERBOSE(VB_IMPORTANT, QString("Newest Schema Version : %1")
                                   .arg(currentDatabaseVersion));
 

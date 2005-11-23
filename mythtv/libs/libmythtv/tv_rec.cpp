@@ -1370,8 +1370,8 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
         QString test = query.value(0).toString();
         if (test != QString::null)
         {
-            msg = "Start channel '%1' invalid, setting to '%2' instead.";
-            VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(startchan).arg(test));
+            msg = "Start channel from DB is empty, setting to '%1' instead.";
+            VERBOSE(VB_IMPORTANT, LOC_ERR + msg.arg(test));
             startchan = QString::fromUtf8(test);
         }
     }
@@ -1399,9 +1399,9 @@ QString TVRec::GetStartChannel(int cardid, const QString &defaultinput)
         QString test = query.value(0).toString();
         if (test != QString::null)
         {
-            msg = QString("Start channel '%1' invalid, setting "
-                          "to '%2' on input %3 instead.")
-                .arg(startchan).arg(test).arg(query.value(1).toString());
+            msg = QString("Start channel invalid, setting "
+                          "to '%1' on input %2 instead.")
+                .arg(test).arg(query.value(1).toString());
             VERBOSE(VB_IMPORTANT, LOC_ERR + msg);
             startchan = QString::fromUtf8(test);
         }
