@@ -126,14 +126,9 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
     m_cfrom << "";
     m_csql << "program.previouslyshown = 0 ";
 
-    m_clause->insertItem(tr("Exclude unidentified episodes (Data Direct)"));
+    m_clause->insertItem(tr("Exclude unidentified episodes"));
     m_cfrom << "";
-    m_csql << QString("NOT (program.category_type = 'series' \n"
-                      "     AND program.programid LIKE '%0000') ");
-
-    m_clause->insertItem(tr("Exclude unidentified episodes (XMLTV)"));
-    m_cfrom << "";
-    m_csql << "NOT (program.subtitle = '' AND program.description = '') ";
+    m_csql << "program.generic = 0 ";
 
     m_clause->insertItem(QString(tr("Category type") +
             " ('movie', 'series', 'sports' " + tr("or") + " 'tvshow')"));

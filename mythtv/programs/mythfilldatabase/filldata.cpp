@@ -3827,11 +3827,26 @@ int main(int argc, char *argv[])
         gContext->LogEntry("mythfilldatabase", LP_INFO,
                            "Listings Download Finished", "");
     }
-    
+
+    if (grab_data)
+    {
+        if (!quiet)
+            cout << "Marking generic episodes... ";
+
+        MSqlQuery query(MSqlQuery::InitCon());
+        query.exec("UPDATE program SET generic = 1 WHERE "
+            "((programid = '' AND subtitle = '' AND description = '') OR "
+            " (programid <> '' AND category_type = 'series' AND "
+            "  program.programid LIKE '%0000'));");
+
+        if (!quiet)
+            cout << "found " << query.numRowsAffected() << endl;
+    }
+
     if (mark_repeats)
     {
-       if (!quiet)
-             cout << "Marking repeats...";
+        if (!quiet)
+             cout << "Marking repeats... ";
        
         int newEpiWindow = gContext->GetNumSetting( "NewEpisodeWindow", 14);
         
@@ -3846,8 +3861,7 @@ int main(int argc, char *argv[])
             cout << "found " << query.numRowsAffected() << endl;
             
         if (!quiet)
-             cout << "Unmarking repeats from grabber that fall within our new episode window...";            
-             
+             cout << "Unmarking new episode rebroadcast repeats... ";
         query.exec( QString( "UPDATE program SET previouslyshown = 0 "
                              "WHERE previouslyshown = 1 "
                              "AND originalairdate is not null "
@@ -3872,8 +3886,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (gContext->IsConnectedToMaster() && (grab_data || mark_repeats))
-        ScheduledRecording::signalChange(-1);
+    if (!quiet)
+        cout << "\nAttempting to contact the master backend for rescheduling."
+             << "\nIf the master is not running, rescheduling will happen when"
+             << "\nthe master backend is restarted.\n";
+
+    if (grab_data || mark_repeats)
+            ScheduledRecording::signalChange(-1);
 
     delete gContext;
 
