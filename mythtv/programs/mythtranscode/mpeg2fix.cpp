@@ -17,6 +17,10 @@
 
 #include "libavcodec/avcodec.h"
 
+#ifndef O_LARGEFILE
+#define O_LARGEFILE 0
+#endif
+
 #define ATTR_ALIGN(align) __attribute__ ((__aligned__ (align)))
 
 #define SHOW_MSG(msg) (msg & print_verbose_messages)
