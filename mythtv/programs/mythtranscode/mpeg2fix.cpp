@@ -2,6 +2,7 @@
 //support missing audio frames
 //support analyze-only mode
 
+#include "config.h"
 #include "mpeg2fix.h"
 
 #include <stdlib.h>
@@ -13,8 +14,8 @@
 #include <netinet/in.h>
 #include <getopt.h>
 #include <stdint.h>
-#include <malloc.h>
 
+#include "libavcodec/avcodec.h"
 
 #define ATTR_ALIGN(align) __attribute__ ((__aligned__ (align)))
 
@@ -280,7 +281,7 @@ void MPEG2replex::start()
 
     mx.priv = (void *)this;
 
-    fd_out = open64(outfile, O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+    fd_out = open(outfile, O_WRONLY | O_CREAT | O_TRUNC | O_LARGEFILE, S_IRWXU);
 
     //await buffer fill
     pthread_mutex_lock(&mutex);
@@ -818,7 +819,7 @@ int MPEG2fixup::build_frame(AVPacket *pkt, QString fname)
 
     picture = avcodec_alloc_frame();
 
-    pkt->data = (uint8_t *)memalign(16, outbuf_size);
+    pkt->data = (uint8_t *)av_malloc(outbuf_size);
 
     picture->data[0] = info->display_fbuf->buf[0];
     picture->data[1] = info->display_fbuf->buf[1];
@@ -1261,7 +1262,7 @@ int MPEG2fixup::convert_to_i(int frameNum, int numFrames, int headPos)
                            .arg(i).arg(fname));
         }
         spare->set_pkt(&pkt);
-        free(pkt.data);
+        av_free(pkt.data);
         set_frame_num(spare->pkt.data, get_frame_num(spare));
         process_video(spare, header_decoder); //process this new frame
     }
@@ -1324,7 +1325,7 @@ int MPEG2fixup::insert_frame(int frameNum, int64_t deltaPTS,
         deltaPTS -= ptsIncrement;
     }
 
-    free(pkt.data);
+    av_free(pkt.data);
 
     // update frame # for all frames in this group
     renumber_frames(vFrame.at() + 1, increment);
@@ -1341,7 +1342,7 @@ void MPEG2fixup::add_cutlist(QStringList cutlist)
 
     for (i = cutlist.begin(); i != cutlist.end(); ++i)
     {
-        int64_t start = 0, end = 0;
+        long long start = 0, end = 0;
 
         if (sscanf((*i).ascii(), "%lld - %lld", &start, &end) == 2)
         {
