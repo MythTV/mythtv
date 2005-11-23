@@ -4217,6 +4217,14 @@ void PlaybackBox::setRecGroup(void)
 
         if (delitem)
         {
+            if ((delitem->recgroup == "LiveTV") &&
+                (newRecGroup != "LiveTV"))
+                delitem->SetAutoExpire(
+                    gContext->GetNumSetting("AutoExpireDefault", 0));
+            else if ((delitem->recgroup != "LiveTV") &&
+                     (newRecGroup == "LiveTV"))
+                delitem->SetAutoExpire(kLiveTVAutoExpire);
+
             delitem->ApplyRecordRecGroupChange(newRecGroup);
         } else if (playList.count() > 0) {
             QStringList::Iterator it;
@@ -4226,7 +4234,17 @@ void PlaybackBox::setRecGroup(void)
             {
                 tmpItem = findMatchingProg(*it);
                 if (tmpItem)
+                {
+                    if ((tmpItem->recgroup == "LiveTV") &&
+                        (newRecGroup != "LiveTV"))
+                        tmpItem->SetAutoExpire(
+                            gContext->GetNumSetting("AutoExpireDefault", 0));
+                    else if ((tmpItem->recgroup != "LiveTV") &&
+                             (newRecGroup == "LiveTV"))
+                        tmpItem->SetAutoExpire(kLiveTVAutoExpire);
+
                     tmpItem->ApplyRecordRecGroupChange(newRecGroup);
+                }
             }
             playList.clear();
         }
