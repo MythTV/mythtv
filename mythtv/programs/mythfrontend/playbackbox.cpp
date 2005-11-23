@@ -3741,7 +3741,7 @@ void PlaybackBox::showViewChanger(void)
 
     cancelPopup();
 
-    initRecGroupPopup(tr("Change Group View"), "showViewChanger");
+    initRecGroupPopup(tr("Group View"), "showViewChanger");
 
     QStringList views;
 
@@ -4030,7 +4030,7 @@ void PlaybackBox::showRecGroupChanger(void)
 
     cancelPopup();
 
-    initRecGroupPopup(tr("Change Recording Group"), "showRecGroupChanger");
+    initRecGroupPopup(tr("Recording Group"), "showRecGroupChanger");
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
@@ -4133,7 +4133,7 @@ void PlaybackBox::showPlayGroupChanger(void)
 
     cancelPopup();
 
-    initRecGroupPopup(tr("Change Playback Group"), "showPlayGroupChanger");
+    initRecGroupPopup(tr("Playback Group"), "showPlayGroupChanger");
 
     recGroupListBox = new MythListBox(recGroupPopup);
     recGroupListBox->insertItem(tr("Default"));
@@ -4171,7 +4171,7 @@ void PlaybackBox::showRecTitleChanger()
 
     cancelPopup();
 
-    initRecGroupPopup(tr("Change Recording Title"), "showRecTitleChanger");
+    initRecGroupPopup(tr("Recording Title"), "showRecTitleChanger");
 
     recGroupPopup->addLabel(tr("Title"));
     recGroupLineEdit = new MythLineEdit(recGroupPopup);
@@ -4294,7 +4294,7 @@ void PlaybackBox::showRecGroupPasswordChanger(void)
 
     cancelPopup();
 
-    initRecGroupPopup(tr("Change Recording Group Password"),
+    initRecGroupPopup(tr("Group Password"),
                       "showRecGroupPasswordChanger");
 
     QGridLayout *grid = new QGridLayout(3, 2, (int)(10 * wmult));

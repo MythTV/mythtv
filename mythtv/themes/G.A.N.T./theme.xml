@@ -220,7 +220,7 @@
 
   <buttondef name="NETFLIX">
 	  <image>text-blank.png</image>
-	  <!--<watermarkimage>watermark/netflix.png</watermarkimage>-->
+          <watermarkimage>watermark/cd.png</watermarkimage>
 	  <offset>0,0</offset>
   </buttondef>
   
@@ -591,6 +591,12 @@
   </buttondef>
 
   <buttondef name="TV_SETTINGS_PLAYBACK">
+    <image>text-blank.png</image>
+    <watermarkimage>watermark/tv_recorded.png</watermarkimage>
+    <offset>0,0</offset>
+  </buttondef>
+
+  <buttondef name="TV_SETTINGS_PLAYBACK_GROUPS">
     <image>text-blank.png</image>
     <watermarkimage>watermark/tv_recorded.png</watermarkimage>
     <offset>0,0</offset>

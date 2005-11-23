@@ -181,7 +181,7 @@ void SRRecGroup::showNewRecGroup()
 
 void SRPlayGroup::fillSelections()
 {
-    addSelection(QString(QObject::tr("Store in the \"%1\" playback group"))
+    addSelection(QString(QObject::tr("Use \"%1\" playback group settings"))
                  .arg(QObject::tr("Default")), "Default");
 
     QStringList names = PlayGroup::GetNames();
