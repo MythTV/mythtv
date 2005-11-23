@@ -9,6 +9,7 @@
 */
 
 #include <mythtv/mythdialogs.h>
+#include <mythtv/uitypes.h>
 
 class MfdInfo;
 class MfdInterface;
