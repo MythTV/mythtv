@@ -1,4 +1,5 @@
 // C headers
+#include <cmath>
 #include <unistd.h>
 
 // C++ headers
