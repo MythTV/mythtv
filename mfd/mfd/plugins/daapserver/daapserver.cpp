@@ -446,6 +446,48 @@ void DaapServer::parsePath(HttpInRequest *http_request, DaapRequest *daap_reques
         }
 
     }
+    else if(user_agent.contains("iTunes/6"))
+    {
+
+        daap_request->setClientType(DAAP_CLIENT_ITUNES6X);
+
+        //
+        //  Try and set a specific iTunes minor version
+        //
+
+        QString sub_version_string = user_agent.section(" ",0,0);
+        sub_version_string = sub_version_string.section("/6.",1,1);
+        if ( sub_version_string.contains('.') )
+        {
+            //
+            //  For the time being, ignore the sub-sub version if there is
+            //  one
+            //
+
+            sub_version_string = sub_version_string.section(".", 0, 0);
+        }
+        
+        bool ok = true;
+        int itunes_sub_version = sub_version_string.toInt(&ok);
+        if(ok)
+        {
+            if(itunes_sub_version == 0)
+            {
+                daap_request->setClientType(DAAP_CLIENT_ITUNES60);
+            }
+            else
+            {
+                warning(QString("daapserver does not yet have "
+                                "specific code for this version of "
+                                "iTunes: 6.%1").arg(itunes_sub_version));
+            }
+        }
+        else
+        {
+            warning("could not determine iTunes minor version");
+        }
+
+    }
     else if(user_agent.contains("MythTV/1"))
     {
         daap_request->setClientType(DAAP_CLIENT_MFDDAAPCLIENT);
@@ -477,7 +519,8 @@ void DaapServer::sendServerInfo(HttpInRequest *http_request, DaapRequest *daap_r
                    daap_request->getClientType() == DAAP_CLIENT_ITUNES47 ||
                    daap_request->getClientType() == DAAP_CLIENT_ITUNES48 ||
                    daap_request->getClientType() == DAAP_CLIENT_ITUNES49 ||
-                   daap_request->getClientType() == DAAP_CLIENT_ITUNES50)
+                   daap_request->getClientType() == DAAP_CLIENT_ITUNES50 ||
+                   daap_request->getClientType() == DAAP_CLIENT_ITUNES60)
                 {
                     response << Tag('apro') << daapVersion3 << end ;
                 }
@@ -1271,7 +1314,8 @@ void DaapServer::sendDatabaseItem(HttpInRequest *http_request, u32 song_id, Daap
                daap_request->getClientType() == DAAP_CLIENT_ITUNES47 ||
                daap_request->getClientType() == DAAP_CLIENT_ITUNES48 ||
                daap_request->getClientType() == DAAP_CLIENT_ITUNES49 ||
-               daap_request->getClientType() == DAAP_CLIENT_ITUNES50)
+               daap_request->getClientType() == DAAP_CLIENT_ITUNES50 ||
+               daap_request->getClientType() == DAAP_CLIENT_ITUNES60)
             {
                 http_request->getResponse()->setBytesInContentRangeHeader(true);
             }

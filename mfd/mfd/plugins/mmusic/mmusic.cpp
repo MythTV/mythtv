@@ -742,16 +742,17 @@ void MMusicWatcher::buildFileList(const QString &directory, MusicFileMap &music_
             //  then include it in the list
             //
             
+            
             if(
-                fi->extension(FALSE) == "ogg"  ||
-                fi->extension(FALSE) == "flac" ||
+                fi->extension(FALSE).lower() == "ogg"  ||
+                fi->extension(FALSE).lower() == "flac" ||
 #ifdef WMA_AUDIO_SUPPORT
-                fi->extension(FALSE) == "wma"  ||
+                fi->extension(FALSE).lower() == "wma"  ||
 #endif
 #ifdef AAC_AUDIO_SUPPORT
-                fi->extension(FALSE) == "m4a"  ||
+                fi->extension(FALSE).lower() == "m4a"  ||
 #endif
-                fi->extension(FALSE) == "mp3" 
+                fi->extension(FALSE).lower() == "mp3" 
               )
             {
                 if(files_to_ignore.find(filename) == files_to_ignore.end())
@@ -1070,7 +1071,7 @@ AudioMetadata* MMusicWatcher::loadFromDatabase(
                     new_audio->setSize(size);
                 }
 
-                QString format = query.value(15).toString();
+                QString format = query.value(15).toString().lower();
                 if(format.length() > 0)
                 {
                     new_audio->setFormat(format);    
@@ -1417,7 +1418,7 @@ AudioMetadata* MMusicWatcher::getMetadataFromFile(QString file_path)
             return_value->setSize(file_info.size());
             return_value->setStartTime(0);
             return_value->setStopTime(return_value->getLength());
-            return_value->setFormat(file_info.extension(false));
+            return_value->setFormat(file_info.extension(false).lower());
             return_value->setDateModified(QDateTime::currentDateTime());
         }
 
