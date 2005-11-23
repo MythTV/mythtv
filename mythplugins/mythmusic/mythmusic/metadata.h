@@ -213,8 +213,8 @@ class MusicNode
 
     void        insert(Metadata* inserter);
     QString     getTitle(){return my_title;}
-    MusicNode*  findRightNode(QStringList tree_levels, Metadata *inserter, 
-                uint depth);
+    void        intoTree(QStringList tree_levels, MetadataPtrList &list,
+                         uint depth);
     void        printYourself(int indent_amount);   // debugging
     void        clearTracks() { my_tracks.clear(); }
     void        putYourselfOnTheListView(TreeCheckItem *parent, bool show_node);
@@ -231,6 +231,7 @@ class MusicNode
   
     MetadataPtrList     my_tracks;
     MusicNodePtrList    my_subnodes;
+    QDict<MusicNode>    my_subnode_hash;
     QString             my_title;
     QString             my_level;
 
@@ -286,8 +287,7 @@ class AllMusic
     void        printTree();    // debugging
     void        sortTree();
     void        writeTree(GenericTree *tree_to_write_to);
-    void        intoTree(Metadata* inserter);
-    MusicNode*  findRightNode(Metadata* inserter, uint depth);
+    void        intoTree(QPtrList<Metadata> &list);
     void        setSorting(QString a_paths);
     bool        putYourselfOnTheListView(TreeCheckItem *where, int how_many);
     void        putCDOnTheListView(CDCheckItem *where);

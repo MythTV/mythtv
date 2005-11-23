@@ -637,19 +637,11 @@ void Metadata::incRating()
 double Metadata::LastPlay()
 {
     QString timestamp = lastplay;
+    timestamp = timestamp.replace(':', "");
+    timestamp = timestamp.replace('T', "");
+    timestamp = timestamp.replace('-', "");
 
-    if(timestamp.contains('-') < 1)
-    {
-        timestamp.insert(4, '-');
-        timestamp.insert(7, '-');
-        timestamp.insert(10, 'T');
-        timestamp.insert(13, ':');
-        timestamp.insert(16, ':');
-    }
-
-    QDateTime lTime = QDateTime::fromString(timestamp, Qt::ISODate);
-    double lastDateTime = lTime.toString("yyyyMMddhhmmss").toDouble();
-    return lastDateTime;
+    return timestamp.toDouble();
 }
 
 void Metadata::setLastPlay()
@@ -814,10 +806,13 @@ void AllMusic::resync()
             }
             else
             {
-                playcountMin = min(temp->PlayCount(), playcountMin);
-                playcountMax = max(temp->PlayCount(), playcountMax);
-                lastplayMin  = min(temp->LastPlay(),  lastplayMin);
-                lastplayMax  = max(temp->LastPlay(),  lastplayMax);
+                int playCount = temp->PlayCount();
+                double lastPlay = temp->LastPlay();
+
+                playcountMin = min(playCount, playcountMin);
+                playcountMax = max(playCount, playcountMax);
+                lastplayMin  = min(lastPlay,  lastplayMin);
+                lastplayMax  = max(lastPlay,  lastplayMax);
             }
         }
     }
@@ -901,12 +896,16 @@ void AllMusic::buildTree()
     
     QPtrListIterator<Metadata> an_iterator( all_music );
     Metadata *inserter;
+    QPtrList<Metadata> list;
+
     while ( (inserter = an_iterator.current()) != 0 )
     {
         if (inserter->isVisible())
-            intoTree(inserter);
+            list.append(inserter);
         ++an_iterator;
     }
+
+    intoTree(list);
 }
 
 void AllMusic::writeTree(GenericTree *tree_to_write_to)
@@ -1006,44 +1005,49 @@ void AllMusic::putCDOnTheListView(CDCheckItem *where)
 }
 
 
-void AllMusic::intoTree(Metadata* inserter)
+void AllMusic::intoTree(QPtrList<Metadata> &list)
 {
-    MusicNode *insertion_point = findRightNode(inserter, 0);
-    insertion_point->insert(inserter);
-}
-
-MusicNode* AllMusic::findRightNode(Metadata* inserter, uint depth)
-{
+    uint depth = 0;
     QString a_field = "";
 
-    //  Use metadata to find pre-exisiting insertion
-    //  point or (recursively) create nodes as needed
-    //  and return ultimate insertion point
-    
-    if(inserter->areYouFinished(depth, tree_levels.count(), paths, startdir))
+    QDict<MetadataPtrList> mapping;
+    QPtrListIterator<Metadata> iter( list );
+    MetadataPtrList *curList;
+    mapping.setAutoDelete(true);
+
+    Metadata *cur;
+    while ((cur = iter.current()) != 0)
     {
-        //  special case, track is at root level
-        //  e.g. an mp3 in the root directory and
-        //  paths=directory
-        return root_node;
-    }
-    
-    inserter->getField(tree_levels.first(), &a_field, paths, startdir, depth);
-    QPtrListIterator<MusicNode> iter( top_nodes );
-    MusicNode *search;
-    while ( (search = iter.current()) != 0 )
-    {
-        if(a_field == search->getTitle())
+        if (cur->areYouFinished(depth, tree_levels.count(), paths, startdir))
         {
-            return ( search->findRightNode(tree_levels, inserter, depth + 1) );
+            //  special case, track is at root level
+            //  e.g. an mp3 in the root directory and
+            //  paths=directory
+            root_node->insert(cur);
+            ++iter;
+            continue;
         }
+
+        cur->getField(tree_levels.first(), &a_field, paths, startdir, depth);
+        curList = mapping.find(a_field);
+        if (!curList)
+        {
+            curList = new MetadataPtrList;
+            mapping.insert(a_field, curList);
+        }
+        curList->append(cur);
         ++iter;
     }
-    //  If we made it here, no appropriate top level node exists
-    
-    MusicNode *new_one = new MusicNode(a_field, tree_levels, 0);
-    top_nodes.append(new_one);
-    return ( new_one->findRightNode(tree_levels, inserter, depth + 1) );
+
+    QDictIterator<MetadataPtrList> rest(mapping);
+    while ((curList = rest.current()) != 0)
+    {
+        a_field = rest.currentKey();
+        MusicNode *new_one = new MusicNode(a_field, tree_levels, 0);
+        top_nodes.append(new_one);
+        new_one->intoTree(tree_levels, *curList, depth + 1);
+        ++rest;
+    }
 }
 
 QString AllMusic::getLabel(int an_id, bool *error_flag)
@@ -1275,47 +1279,66 @@ void MusicNode::insert(Metadata* inserter)
     my_tracks.append(inserter);
 }
 
-MusicNode* MusicNode::findRightNode(QStringList tree_levels, 
-                                    Metadata *inserter, uint depth)
+void MusicNode::intoTree(QStringList tree_levels, 
+                         MetadataPtrList &list, uint depth)
 {
     QString a_field = "";
     QString a_lowercase_field = "";
     QString a_title = "";
+    bool usesPath = false;
 
-    //
-    //  Search and create from my node downards
-    //
-
-
-    if(inserter->areYouFinished(depth, tree_levels.count(), m_paths, m_startdir))
-    {
-        return this;
-    }
+    if (m_paths == "directory") 
+        usesPath = true;
     else
     {
-        inserter->getField(tree_levels, &a_field, m_paths, m_startdir, depth);
+        if (depth + 1 >= tree_levels.count())
+        {
+            my_tracks = list;
+            return;
+        }
+    }
 
+    //  Search and create from my node downards
+
+    QDict<MetadataPtrList> mapping;
+    QPtrListIterator<Metadata> iter(list);
+    MetadataPtrList *curList;
+    mapping.setAutoDelete(true);
+
+    Metadata *cur;
+    while ((cur = iter.current()) != 0)
+    {
+        if (usesPath && cur->areYouFinished(depth, tree_levels.count(), m_paths, m_startdir))
+        {
+            insert(cur);
+            ++iter;
+            continue;
+        }
+ 
+        cur->getField(tree_levels, &a_field, m_paths, m_startdir, depth);
+  
         a_lowercase_field = a_field.lower();
         if (a_lowercase_field.left(4) == "the ")
             a_lowercase_field = a_lowercase_field.mid(4);
-
-        QPtrListIterator<MusicNode> iter(my_subnodes);
-        MusicNode *search;
-        while ((search = iter.current() ) != 0)
+  
+        curList = mapping.find(a_lowercase_field);
+        if (!curList)
         {
-            a_title = search->getTitle().lower();
-            if (a_title.left(4) == thePrefix)
-                a_title = a_title.mid(4);
-
-            if (a_lowercase_field == a_title)
-            {
-                return( search->findRightNode(tree_levels, inserter, depth + 1) );
-            }
-            ++iter;
+            curList = new MetadataPtrList;
+            mapping.insert(a_lowercase_field, curList);
         }
+        curList->append(cur);
+        ++iter;
+    }
+  
+    QDictIterator<MetadataPtrList> rest(mapping);
+    while ((curList = rest.current()) != 0)
+    {
+        a_field = rest.currentKey();
         MusicNode *new_one = new MusicNode(a_field, tree_levels, depth);
         my_subnodes.append(new_one);
-        return (new_one->findRightNode(tree_levels, inserter, depth + 1) );                
+        new_one->intoTree(tree_levels, *curList, depth + 1);
+        ++rest;
     }
 }
 
