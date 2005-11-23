@@ -393,17 +393,20 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
     QString msg;
     fsid_t fsid = UniqueFileSystemID(record_file_prefix);
 
+    VERBOSE(VB_FILE, LOC + "SendDeleteMessages, cycling through expire list.");
     pginfolist_t::iterator it = expire_list.begin();
     while (it != expire_list.end() &&
            (deleteAll || availFreeKB < desiredFreeKB))
     {
+        VERBOSE(VB_FILE, QString("    Checking %1 @ %2")
+                         .arg((*it)->chanid).arg((*it)->startts.toString()));
         if (CheckFile(*it, record_file_prefix, fsid))
         {
             // Print informative message 
             msg = QString("Expiring: %1 %2 %3 MBytes")
                 .arg((*it)->title).arg((*it)->startts.toString())
                 .arg((int)((*it)->filesize/1024/1024));
-            VERBOSE(VB_IMPORTANT, LOC + msg);
+            VERBOSE(VB_IMPORTANT, QString("    ") +  msg);
             gContext->LogEntry("autoexpire", LP_NOTICE,
                                "Expiring Program", msg);                
 
@@ -413,8 +416,8 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
             gContext->dispatch(me);
 
             availFreeKB += ((*it)->filesize/1024); // add size to avail size
-            VERBOSE(VB_FILE, LOC +
-                    QString("After unlink we will have %1 MB free.")
+            VERBOSE(VB_FILE,
+                    QString("    After unlink we will have %1 MB free.")
                     .arg(availFreeKB/1024));
 
         }
