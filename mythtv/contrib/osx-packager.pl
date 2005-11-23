@@ -11,9 +11,17 @@ use Cwd ();
 
 ### Configuration settings (stuff that might change more often)
 
-our $svn = '/sw/bin/svn';
+# We try to auto-locate the Subversion client binaries.
+# If they are not in your path, you should use the second line.
+#
+our $svn = `which svn`; chomp $svn;
 #our $svn = '/Volumes/Users/nigel/bin/svn';
 
+# By default, only the frontend is built (i.e. no backend or transcoding)
+#
+our $backend = 0;
+
+# At the moment, there is mythtv plus these two
 our @components = ( 'myththemes', 'mythplugins' );
 
 
@@ -189,6 +197,7 @@ osx-packager.pl - build OS X binary packages for MythTV
    -svnrev <str>    build a specified Subversion revision, instead of HEAD
    -svntag <str>    build a specified release, instead of Subversion HEAD
    -nohead          don't update to HEAD revision of MythTV before building
+   -usehdimage      perform build inside of a case-sensitive disk image
    -plugins <str>   comma-separated list of plugins to include
                       Available plugins:
    mythbrowser mythcontrols mythdvd mythflix mythgallery mythgame
@@ -253,6 +262,7 @@ Getopt::Long::GetOptions(\%OPT,
                          'svntag=s',
                          'nocvs', # This is obsolete, but should stay a while
                          'nohead',
+                         'usehdimage',
                          'plugins=s',
                         ) or Pod::Usage::pod2usage(2);
 Pod::Usage::pod2usage(1) if $OPT{'help'};
@@ -300,12 +310,26 @@ END
   die;
 }
 
-mkdir "$SCRIPTDIR/.osx-packager";
+our $WORKDIR = "$SCRIPTDIR/.osx-packager";
+mkdir $WORKDIR;
 
-our $PREFIX = "$SCRIPTDIR/.osx-packager/build";
+# Do we need to force a case-sensitive disk image?
+if (!$OPT{usehdimage} && !CaseSensitiveFilesystem())
+{
+  Verbose("Forcing -usehdimage due to case-insensitive filesystem");
+  $OPT{usehdimage} = 1;
+}
+
+if ($OPT{usehdimage})
+{
+  Verbose("Creating a case-sensitive device for the build");
+  MountHDImage();
+}
+
+our $PREFIX = "$WORKDIR/build";
 mkdir $PREFIX;
 
-our $SRCDIR = "$SCRIPTDIR/.osx-packager/src";
+our $SRCDIR = "$WORKDIR/src";
 mkdir $SRCDIR;
 
 # configure mythplugins, and mythtv, etc
@@ -342,7 +366,7 @@ our %makecleanopt = (
 );
 
 # Clean the environment
-$ENV{'PATH'} = "$PREFIX/bin:/bin:/usr/bin";
+$ENV{'PATH'} = "$PREFIX/bin:/sw/bin:/bin:/usr/bin";
 $ENV{'DYLD_LIBRARY_PATH'} = "$PREFIX/lib";
 $ENV{'LD_LIBRARY_PATH'} = "/usr/local/lib";
 delete $ENV{'CC'};
@@ -561,40 +585,29 @@ elsif ( $OPT{'svnrev'} )
 
   push @svnrevision, $OPT{'svnrev'};
 }
-else
+else  # Lookup and use the HEAD revision.
 {
+  my $rev = `$svn log $svnrepository --revision HEAD --xml | grep revision`;
+  $rev =~ s/[^[:digit:]]//gs;
+
   $svnrepository .= 'trunk/';
-  #@svnrevision = ('--revision', 'HEAD');
+  @svnrevision = ('--revision', $rev);
+}
+
+# Retrieve source
+if (! $OPT{'nohead'})
+{
+  # Empty subdirectory 'config' sometimes causes checkout problems
+  &Syscall(['rm', '-fr', $svndir . 'mythtv/config']);
+  Verbose("Checking out source code");
+  &Syscall([ $svn, 'co', @svnrevision,
+            map($svnrepository . $_, @comps), $svndir ]) or die;
 }
 
 # Build MythTV and any plugins
 foreach my $comp (@comps)
 {
   my $compdir = "$svndir/$comp/" ;
-
-  if ($comp eq 'mythtv')
-  {
-    # Empty subdirectory 'config' sometimes causes checkout problems
-    &Syscall(['rm', '-fr', $compdir . 'config']);
-  }
-
-  # Checkout source code. If the user wants a particular branch or tag,
-  # then we have to ignore the current checked out version and check out again
-  # (this is assuming that the already checked out version is from /trunk)
-  if ( ! -d $compdir || $OPT{'svnbranch'} || $OPT{'svntag'} )
-  {
-    &Verbose("Checking out $comp source code");
-    chdir $svndir;
-
-    &Syscall([ $svn, 'co', @svnrevision,
-               $svnrepository . $comp, $compdir]) or die;
-  }
-  elsif ( !$OPT{'nohead'} )
-  {
-    &Verbose("Updating $comp source code");
-    chdir $compdir;
-    &Syscall([ $svn, 'update', @svnrevision]) or die;
-  }
 
   chdir $compdir;
   
@@ -621,6 +634,10 @@ foreach my $comp (@comps)
     &Verbose("Configuring $comp");
     my @config = './configure';
     push(@config, @{ $conf{$comp} }) if $conf{$comp};
+    if ( $comp eq 'mythtv' && $backend )
+    {
+      push @config, '--enable-backend'
+    }
     &Syscall([ @config ]) or die;
   }
   &Verbose("Running qmake for $comp");
@@ -638,8 +655,12 @@ foreach my $comp (@comps)
   {
     # MythTV has an empty subdirectory 'config' that causes problems for me:
     &Syscall('touch config/config.pro');
-    # Nigel's hack to speedup building
-    &Syscall('echo SUBDIRS = mythfrontend >> programs/programs.pro');
+    if ( ! $backend )
+    {
+      # Nigel's hack to speedup building
+      &Syscall('echo Nigelz speedup hack    >> programs/programs.pro');
+      &Syscall('echo SUBDIRS = mythfrontend >> programs/programs.pro');
+    }
   }
   
   &Verbose("Making $comp");
@@ -706,6 +727,12 @@ if (1)
   &Syscall([ '/bin/cp', '-R',
              "$PREFIX/share/mythtv",
              "$MFE/Contents/Resources/share" ]) or die;
+}
+
+if ($OPT{usehdimage})
+{
+    Verbose("Dismounting case-sensitive build device");
+    UnmountHDImage();
 }
 
 &Verbose("Build complete. Self-contained package is at:\n\n    $MFE\n");
@@ -974,6 +1001,8 @@ sub Syscall
   {
     $arglist = [ join(' ', @$arglist) ];
   }
+  # clean out any null arguments
+  $arglist = [ map $_, @$arglist ];
   &Verbose(@$arglist);
   my $ret = system(@$arglist);
   if ($ret)
@@ -1006,6 +1035,60 @@ sub Complain
 {
   print STDERR '[osx-pkg] ' . join(' ', @_) . "\n";
 } # end Complain
+
+
+######################################
+## Manage usehdimage disk image
+######################################
+
+sub MountHDImage
+{
+    if (!HDImageDevice())
+    {
+        if (! -e "$SCRIPTDIR/.osx-packager.dmg")
+        {
+            Syscall(['hdiutil', 'create', '-size', '1000m', "$SCRIPTDIR/.osx-packager.dmg",
+                     '-volname', 'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']);
+        }
+
+        Syscall(['hdiutil', 'mount', "$SCRIPTDIR/.osx-packager.dmg",
+                 '-mountpoint', $WORKDIR, '-quiet']);
+    }
+
+    # configure defaults to /tmp and OSX barfs when mv crosses
+    # filesystems so tell configure to put temp files on the image
+
+    $ENV{TMPDIR} = $WORKDIR . "/tmp";
+    mkdir $ENV{TMPDIR};
+}
+
+sub UnmountHDImage
+{
+    my $device = HDImageDevice();
+    if ($device)
+    {
+        System('hdiutil', 'detach', $device, '-force');
+    }
+}
+
+sub HDImageDevice
+{
+    my @dev = split ' ', `/sbin/mount | grep $WORKDIR`;
+    $dev[0];
+}
+
+sub CaseSensitiveFilesystem
+{
+  my $funky = $SCRIPTDIR . "/.osx-packager.FunkyStuff";
+  my $unfunky = substr($funky, 0, -10) . "FUNKySTuFF";
+
+  unlink $funky if -e $funky;
+  `touch $funky`;
+  my $sensitivity = ! -e $unfunky;
+  unlink $funky;
+
+  return $sensitivity;
+}
 
 
 ### end file
