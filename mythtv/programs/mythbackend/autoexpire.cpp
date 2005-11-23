@@ -696,7 +696,7 @@ void AutoExpire::FillDBOrdered(int expMethod)
 
         proginfo->pathname = proginfo->GetRecordFilename(fileprefix);
 
-        proginfo->filesize = query.value(15).toInt();
+        proginfo->filesize = stringToLongLong(query.value(15).toString());
 
         if (IsInDontExpireSet(proginfo->chanid, proginfo->recstartts))
         {
