@@ -522,6 +522,8 @@ void MfdInstance::addMetadataClient(const QString &address, uint a_port)
 
 void MfdInstance::addRtspClient(const QString &address, uint a_port)
 {
+/*
+
     RtspClient *new_rtsp = new RtspClient(mfd_interface, mfd_id, address, a_port);
     if(new_rtsp->connect())
     {
@@ -534,6 +536,7 @@ void MfdInstance::addRtspClient(const QString &address, uint a_port)
              << endl;
         delete new_rtsp;
     }
+*/
 }
 
 void MfdInstance::addMtcpClient(const QString &address, uint a_port)

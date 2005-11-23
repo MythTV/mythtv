@@ -590,7 +590,6 @@ bool DaapInstance::checkServerType(const QString &server_description)
                 }
             }
         }
-
         else if(server_description.left(9) == "iTunes/5.")
         {
             QString sub_version_string = server_description.section(" ", 0, 0);
@@ -611,6 +610,31 @@ bool DaapInstance::checkServerType(const QString &server_description)
             if(itunes_sub_version == 0)
             {
                 if(daap_server_type != DAAP_SERVER_ITUNES50)
+                {
+                    copasetic = false;
+                }
+            }
+        }
+        else if(server_description.left(9) == "iTunes/6.")
+        {
+            QString sub_version_string = server_description.section(" ", 0, 0);
+            sub_version_string = sub_version_string.section("/6.", 1, 1);
+
+            if(sub_version_string.contains('.'))
+            {
+                //
+                //  Ignore sub-sub version, if it is present
+                //
+                
+                sub_version_string = sub_version_string.section(".", 0, 0);
+            }
+            
+            
+            bool ok = true;
+            int itunes_sub_version = sub_version_string.toInt(&ok);
+            if(itunes_sub_version == 0)
+            {
+                if(daap_server_type != DAAP_SERVER_ITUNES60)
                 {
                     copasetic = false;
                 }
@@ -762,6 +786,61 @@ bool DaapInstance::checkServerType(const QString &server_description)
                 log(QString("discovered service "
                         "named \"%1\" is being served by "
                         "iTunes version 5.%2")
+                        .arg(service_name)
+                        .arg(itunes_sub_version), 2);
+            }
+            service_details_mutex.unlock();
+            
+            //
+            //  If we don't have libopen daap, return false, cause that
+            //  means we can't talk to this server
+            //
+            
+            if(the_mfd->getPluginManager()->haveLibOpenDaap())
+            {
+                return true;
+            }
+            return false;
+            
+        }
+        else if(server_description.left(9) == "iTunes/6.")
+        {
+            service_details_mutex.lock();
+            daap_server_type = DAAP_SERVER_ITUNES6X;
+            QString sub_version_string = server_description.section(" ", 0, 0);
+            sub_version_string = sub_version_string.section("/6.", 1, 1);
+            
+            if(sub_version_string.contains('.'))
+            {
+                //
+                //  Ignore sub-sub version, if it is present
+                //
+                
+                sub_version_string = sub_version_string.section(".", 0, 0);
+            }
+            
+            bool ok = true;
+            int itunes_sub_version = sub_version_string.toInt(&ok);
+            if(!ok)
+            {
+                warning("could not determine iTunes minor version number");
+            }
+            else
+            {
+                if(itunes_sub_version == 0)
+                {
+                    daap_server_type = DAAP_SERVER_ITUNES60;
+                }
+                else
+                {
+                    warning(QString("seems to be a new version of "
+                            "iTunes I don't know about: %1")
+                            .arg(itunes_sub_version));
+                }                
+                
+                log(QString("discovered service "
+                        "named \"%1\" is being served by "
+                        "iTunes version 6.%2")
                         .arg(service_name)
                         .arg(itunes_sub_version), 2);
             }

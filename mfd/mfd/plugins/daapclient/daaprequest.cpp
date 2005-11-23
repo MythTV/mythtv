@@ -45,31 +45,37 @@ DaapRequest::DaapRequest(
     //  type
     //
     
-    if(server_type == DAAP_SERVER_ITUNES50)
+    if(server_type == DAAP_SERVER_ITUNES60)
+    {
+        addHeader("User-Agent: iTunes/6.0 (Windows; N)");
+        addHeader("Accept-Language: en-us, en;q=5.0");
+        addHeader("Client-DAAP-Version: 3.0");
+    }
+    else if(server_type == DAAP_SERVER_ITUNES50)
     {
         addHeader("User-Agent: iTunes/5.0 (Windows; N)");
         addHeader("Accept-Language: en-us, en;q=5.0");
         addHeader("Client-DAAP-Version: 3.0");
     }
-    if(server_type == DAAP_SERVER_ITUNES49)
+    else if(server_type == DAAP_SERVER_ITUNES49)
     {
         addHeader("User-Agent: iTunes/4.9 (Windows; N)");
         addHeader("Accept-Language: en-us, en;q=5.0");
         addHeader("Client-DAAP-Version: 3.0");
     }
-    if(server_type == DAAP_SERVER_ITUNES48)
+    else if(server_type == DAAP_SERVER_ITUNES48)
     {
         addHeader("User-Agent: iTunes/4.8 (Windows; N)");
         addHeader("Accept-Language: en-us, en;q=5.0");
         addHeader("Client-DAAP-Version: 3.0");
     }
-    if(server_type == DAAP_SERVER_ITUNES47)
+    else if(server_type == DAAP_SERVER_ITUNES47)
     {
         addHeader("User-Agent: iTunes/4.7 (Windows; N)");
         addHeader("Accept-Language: en-us, en;q=5.0");
         addHeader("Client-DAAP-Version: 3.0");
     }
-    if(server_type == DAAP_SERVER_ITUNES46)
+    else if(server_type == DAAP_SERVER_ITUNES46)
     {
         addHeader("User-Agent: iTunes/4.6 (Windows; N)");
         addHeader("Accept-Language: en-us, en;q=5.0");
@@ -137,7 +143,8 @@ bool DaapRequest::send(QSocketDevice *where_to_send, bool add_validation)
             }
             else
             {
-                if(server_type == DAAP_SERVER_ITUNES50 ||
+                if(server_type == DAAP_SERVER_ITUNES60 ||
+                   server_type == DAAP_SERVER_ITUNES50 ||
                    server_type == DAAP_SERVER_ITUNES49 ||
                    server_type == DAAP_SERVER_ITUNES48 ||
                    server_type == DAAP_SERVER_ITUNES47 ||

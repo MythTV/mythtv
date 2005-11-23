@@ -10,14 +10,18 @@
 
 #ifdef MFD_RTSP_SUPPORT
 
+
 #include <iostream>
 using namespace std;
 
 #include <unistd.h>
 
+#include <qstring.h>
+
 #include "rtspclient.h"
 #include "rtspin.h"
 #include "mfdinterface.h"
+#include "mfdinstance.h"
 
 RtspClient::RtspClient(
                             MfdInterface *the_mfd,

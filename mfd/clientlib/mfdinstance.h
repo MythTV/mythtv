@@ -10,6 +10,7 @@
 
 */
 
+#include <qstring.h>
 #include <qthread.h>
 #include <qmutex.h>
 #include <qsocketdevice.h>
