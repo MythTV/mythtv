@@ -533,10 +533,12 @@ QRect VideoOutput::GetVisibleOSDBounds(
     // adjust for overscan
     if ((img_vscanf > 0.0f) || (img_hscanf > 0.0f))
     {
-        QPoint s((int)((XJ_width  * img_hscanf)*0.5f),
-                 (int)((XJ_height * img_vscanf)*0.5f));
-        tl += s;
-        br -= (s * 2);
+        QRect v(tl, br);
+        float xs = (img_hscanf > 0.0f) ? img_hscanf : 0.0f;
+        float ys = (img_vscanf > 0.0f) ? img_vscanf : 0.0f;
+        QPoint s((int)(v.width() * xs), (int)(v.height() * ys));
+        tl += s*0.5f;
+        br -= s*1.5f;
     }
     QRect vb(tl, br);
 
