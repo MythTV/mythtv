@@ -1144,7 +1144,7 @@ bool VideoOutputXv::Init(
         XJ_curwin = XJ_win = embedid;
 
     // create chroma key osd structure if needed
-    if (use_chroma_key_osd && (32 == XJ_depth))
+    if (use_chroma_key_osd && ((32 == XJ_depth) || (24 == XJ_depth)))
     {
         chroma_osd = new ChromaKeyOSD(this);
 #ifdef USING_XVMC
