@@ -323,7 +323,8 @@ QRect VideoOutputXv::GetVisibleOSDBounds(
     if (!chroma_osd)
         return VideoOutput::GetVisibleOSDBounds(visible_aspect, font_scaling);
 
-    visible_aspect = GetDisplayAspect();
+    float dispPixelAdj = (GetDisplayAspect() * disph) / dispw;
+    visible_aspect = 1.3333f/dispPixelAdj;
     font_scaling   = 1.0f;
     return QRect(0,0,dispw,disph);
 }
