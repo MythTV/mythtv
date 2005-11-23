@@ -524,19 +524,27 @@ QRect VideoOutput::GetVisibleOSDBounds(
     uint right_overflow = max((dispwoff + dispxoff) - dispw, 0);
     uint lower_overflow = max((disphoff + dispyoff) - disph, 0);
 
-    // top left and bottom right corners.
+    // top left and bottom right corners respecting letterboxing
     QPoint tl = QPoint((uint) ceil(max(-dispxoff,0)*dv_w),
                        (uint) ceil(max(-dispyoff,0)*dv_h));
     QPoint br = QPoint((uint) floor(XJ_width-(right_overflow*dv_w)),
                        (uint) floor(XJ_height-(lower_overflow*dv_h)));
-    QRect bounds(tl, br);
+    // adjust for overscan
+    if ((img_vscanf > 0.0f) || (img_hscanf > 0.0f))
+    {
+        QPoint s((int)((XJ_width  * img_hscanf)*0.5f),
+                 (int)((XJ_height * img_vscanf)*0.5f));
+        tl += s;
+        br -= (s * 2);
+    }
 
+    // set the physical aspect ratio of the displayable area
     float dispPixelAdj = (GetDisplayAspect() * XJ_height) / XJ_width;
     visible_aspect = XJ_aspect * dispPixelAdj;
 
     // this can be used to account for Zooming letterbox modes
     font_scaling = 1.0f;
-    return bounds;
+    return QRect(tl, br);
 }
 
 /**
