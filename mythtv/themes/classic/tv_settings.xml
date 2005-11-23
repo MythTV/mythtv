@@ -58,6 +58,7 @@
    <button>
       <type>TV_SETTINGS_PLAYBACK_GROUPS</type>
       <text>Playback Groups</text>
+      <text lang="SV">Uppspelningsgrupper</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
