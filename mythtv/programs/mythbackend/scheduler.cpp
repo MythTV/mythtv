@@ -297,18 +297,14 @@ void Scheduler::FillRecordListFromDB(int recordid)
     
     MSqlQuery query(dbConn);
     QString thequery;
+    QString where = "";
+
+    // This will cause our temp copy of recordmatch to be empty
     if (recordid == -1)
-    {
-            thequery = "CREATE TEMPORARY TABLE recordmatch "
-                  "(recordid int unsigned, chanid int unsigned, "
-                  " starttime datetime, manualid int unsigned, "
-                  " INDEX (recordid));";
-    } else {
-            thequery = "CREATE TEMPORARY TABLE recordmatch "
-                  "(recordid int unsigned, chanid int unsigned, "
-                  " starttime datetime, manualid int unsigned, "
-                  " INDEX (recordid)) SELECT * from recordmatch;";
-    }
+        where = "WHERE recordid IS NULL ";
+
+    thequery = QString("CREATE TEMPORARY TABLE recordmatch ") +
+                           "SELECT * FROM recordmatch " + where + "; ";
 
     query.prepare(thequery);
     recordmatchLock.lock();
@@ -320,11 +316,20 @@ void Scheduler::FillRecordListFromDB(int recordid)
         return;
     }
 
+    thequery = "ALTER TABLE recordmatch ADD INDEX (recordid);";
+    query.prepare(thequery);
+    query.exec();
+    if (!query.isActive())
+    {
+        MythContext::DBError("FillRecordListFromDB", query);
+        return;
+    }
+
     UpdateMatches(recordid);
     FillRecordList();
 
     MSqlQuery queryDrop(dbConn);
-    queryDrop.prepare("DROP TEMPORARY TABLE recordmatch;");
+    queryDrop.prepare("DROP TABLE recordmatch;");
     queryDrop.exec();
     if (!queryDrop.isActive())
     {
