@@ -896,7 +896,7 @@ bool NuppelVideoPlayer::GetFrame(int onlyvideo, bool unsafe)
         }
         else
         {
-            if (CalcRWTime(ffrew_skip) >= 0)
+            if (CalcRWTime(-ffrew_skip) >= 0)
             {
                 real_skip = (-GetDecoder()->GetFramesRead() > ffrew_skip) ? 
                              -GetDecoder()->GetFramesRead() : ffrew_skip;
