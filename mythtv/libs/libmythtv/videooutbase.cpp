@@ -546,7 +546,7 @@ QRect VideoOutput::GetVisibleOSDBounds(
     float dispPixelAdj = (GetDisplayAspect() * disph) / dispw;
     // now adjust for scaling of the video
     float vs = ((float)vb.width())/vb.height();
-    visible_aspect = (vs/XJ_aspect) * dispPixelAdj;
+    visible_aspect = 1.3333f * (vs/XJ_aspect) * dispPixelAdj;
 
     // this can be used to account for Zooming letterbox modes
     font_scaling = 1.0/sqrt(2.0/(sq(visible_aspect / 1.3333f) + 1.0));
