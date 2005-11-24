@@ -8,8 +8,6 @@
 
 */
 
-#ifdef MFD_RTSP_SUPPORT
-
 
 #include <iostream>
 using namespace std;
@@ -126,4 +124,3 @@ RtspClient::~RtspClient()
     }
 }
 
-#endif // MFD_RTSP_SUPPORT

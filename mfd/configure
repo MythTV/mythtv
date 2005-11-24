@@ -18,8 +18,8 @@ wmasupport="yes"
 aacsupport="no"
 discwatchersupport="yes"
 mfdclient="yes"
-rtsp="yes"
-livemediaprefix="/usr/include"
+rtsp="no"
+livemediaprefix="/usr/local/src/live"
 transcoder="yes"
 
 for opt do
@@ -133,7 +133,7 @@ Standard options:
   --enable-transcoder  enable transcoding services (eg. CD rip) [default=yes]
   --enable-discwatcher monitor optical drives for content       [default=yes]
   --enable-mfdclient   build libmfdclient                       [default=yes]
-  --enable-rtsp        rtsp support (HIGHLY recommended)        [default=no]
+  --enable-rtsp        rtsp support (HIGHLY recommended)        [default=yes]
 
   --with-livemedia-prefix=[DIR] path to liveMedia/groupsock/etc include files
 

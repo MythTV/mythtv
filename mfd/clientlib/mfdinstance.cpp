@@ -18,9 +18,14 @@ using namespace std;
 #include "mfdinstance.h"
 #include "audioclient.h"
 #include "metadataclient.h"
-#include "rtspclient.h"
 #include "transcoderclient.h"
 #include "events.h"
+
+#include "../config.h"
+#ifdef MFD_RTSP_SUPPORT
+#include "rtspclient.h"
+#endif
+
 
 MfdInstance::MfdInstance(
                             int an_mfd,
@@ -522,8 +527,7 @@ void MfdInstance::addMetadataClient(const QString &address, uint a_port)
 
 void MfdInstance::addRtspClient(const QString &address, uint a_port)
 {
-/*
-
+#ifdef MFD_RTSP_SUPPORT
     RtspClient *new_rtsp = new RtspClient(mfd_interface, mfd_id, address, a_port);
     if(new_rtsp->connect())
     {
@@ -536,7 +540,9 @@ void MfdInstance::addRtspClient(const QString &address, uint a_port)
              << endl;
         delete new_rtsp;
     }
-*/
+#else
+    if(address){ a_port = a_port;}
+#endif
 }
 
 void MfdInstance::addMtcpClient(const QString &address, uint a_port)

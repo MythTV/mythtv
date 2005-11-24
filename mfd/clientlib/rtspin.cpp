@@ -8,8 +8,6 @@
 	device
 */
 
-#ifdef MFD_RTSP_SUPPORT
-
 #include <iostream>
 using namespace std;
 
@@ -390,4 +388,3 @@ RtspIn::~RtspIn()
     }
 }
 
-#endif // MFD_RTSP_SUPPORT

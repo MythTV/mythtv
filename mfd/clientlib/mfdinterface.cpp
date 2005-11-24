@@ -548,12 +548,10 @@ void MfdInterface::turnVizDataStreamOn(int which_mfd, bool on_or_off)
         {
             if(on_or_off)
             {
-                cout << "mfdinterface.o: turning on rtsp for visualizations" << endl;
                 an_mfd->addPendingCommand(QStringList::split(" ", "rtsp on"));    
             }
             else
             {
-                cout << "mfdinterface.o: turning off rtsp for visualizations" << endl;
                 an_mfd->addPendingCommand(QStringList::split(" ", "rtsp off"));
             }
             found_it = true;
