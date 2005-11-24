@@ -338,19 +338,6 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     {
         HandleQueryGuideDataThrough(pbs);
     }
-    else if (command == "QUEUE_TRANSCODE")
-    {
-        HandleQueueTranscode(listline, pbs, TRANSCODE_QUEUED);
-    }
-    else if (command == "QUEUE_TRANSCODE_CUTLIST")
-    {
-        HandleQueueTranscode(listline, pbs, TRANSCODE_QUEUED |
-                                            TRANSCODE_USE_CUTLIST);
-    }
-    else if (command == "QUEUE_TRANSCODE_STOP")
-    {
-        HandleQueueTranscode(listline, pbs, TRANSCODE_STOP);
-    }
     else if (command == "STOP_RECORDING")
     {
         HandleStopRecording(listline, pbs);
@@ -1205,35 +1192,6 @@ void MainServer::HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs)
     delete pginfo;
 
     SendResponse(pbssock, strlist);
-}
-
-void MainServer::HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs,
-                                      int state)
-{
-    QSocket *pbssock = pbs->getSocket();
-
-    ProgramInfo *pginfo = new ProgramInfo();
-    pginfo->FromStringList(slist, 1);
-
-    QString cmd;
-    if (state & TRANSCODE_STOP)
-       cmd = QString("LOCAL_TRANSCODE_STOP");
-    else if (state & TRANSCODE_USE_CUTLIST)
-       cmd = QString("LOCAL_TRANSCODE_CUTLIST");
-    else
-       cmd = QString("LOCAL_TRANSCODE");
-
-    QString message = QString("%1 %2 %3")
-                            .arg(cmd)
-                            .arg(pginfo->chanid)
-                            .arg(pginfo->recstartts.toString(Qt::ISODate));
-    MythEvent me(message);
-    gContext->dispatch(me);
-
-    QStringList outputlist = "0";
-    SendResponse(pbssock, outputlist);
-    delete pginfo;
-    return;
 }
 
 void *MainServer::SpawnDeleteThread(void *param)

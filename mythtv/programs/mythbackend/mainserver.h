@@ -104,8 +104,6 @@ class MainServer : public QObject
     void HandleIsRecording(QStringList &slist, PlaybackSock *pbs);
     void HandleCheckRecordingActive(QStringList &slist, PlaybackSock *pbs);
     void HandleFillProgramInfo(QStringList &slist, PlaybackSock *pbs);
-    void HandleQueueTranscode(QStringList &slist, PlaybackSock *pbs,
-                              int state);
     void HandleRemoteEncoder(QStringList &slist, QStringList &commands,
                              PlaybackSock *pbs);
     void HandleLockTuner(PlaybackSock *pbs);
