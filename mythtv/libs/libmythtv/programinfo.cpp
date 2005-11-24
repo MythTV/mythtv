@@ -1795,6 +1795,9 @@ bool ProgramInfo::IsCommFlagged(void) const
  */
 bool ProgramInfo::IsInUse(QString &byWho) const
 {
+    if (isVideo)
+        return false;
+
     QDateTime oneHourAgo = QDateTime::currentDateTime().addSecs(-61 * 60);
     MSqlQuery query(MSqlQuery::InitCon());
     
@@ -3329,12 +3332,18 @@ int ProgramInfo::getProgramFlags(void) const
 
 void ProgramInfo::UpdateInUseMark(bool force)
 {
+    if (isVideo)
+        return;
+
     if (force || lastInUseTime.secsTo(QDateTime::currentDateTime()) > 60 * 60)
         MarkAsInUse(true);
 }
 
 void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
 {
+    if (isVideo)
+        return;
+
     bool notifyOfChange = false;
 
     if (inuse && inUseForWhat.length() < 2)
