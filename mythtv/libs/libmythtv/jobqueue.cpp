@@ -1697,17 +1697,15 @@ void JobQueue::DoTranscodeThread(void)
     jobControlFlags[key] = &controlTranscoding;
     controlFlagsLock.unlock();
 
-    QString path = "mythtranscode";
     int transcoder = program_info->transcoder;
     QString profilearg = transcoder == RecordingProfile::TranscoderAutodetect ?
                             "autodetect" :
                             QString::number(transcoder);
+
+    QString path = gContext->GetInstallPrefix() + "/bin/mythtranscode";
     QString command = QString("%1 -j %2 -V %3 -p %4 %5")
-                      .arg(path.ascii())
-                      .arg(jobID)
-                      .arg(print_verbose_messages)
-                      .arg(profilearg.ascii())
-                      .arg(useCutlist ? "-l" : "");
+                      .arg(path).arg(jobID).arg(print_verbose_messages)
+                      .arg(profilearg.ascii()).arg(useCutlist ? "-l" : "");
 
     if (jobQueueCPU < 2)
         nice(17);
@@ -1775,12 +1773,10 @@ void JobQueue::DoTranscodeThread(void)
         if ((result == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
             (result == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
         {
-            msg = QString("Transcoding ERRORED for %1, unable to find "
-                          "mythtranscode, check your PATH and backend logs.")
-                          .arg(details);
+            msg = QString("Transcoding ERRORED for %1, %2 does not exist or "
+                          "is not executable")
+                          .arg(details).arg(path);
             VERBOSE(VB_IMPORTANT, msg);
-            VERBOSE(VB_IMPORTANT,
-                    QString("Current PATH: '%1'").arg(getenv("PATH")));
 
             gContext->LogEntry("transcode", LP_WARNING,
                                "Transcoding Errored", msg);
@@ -1996,8 +1992,9 @@ void JobQueue::DoFlagCommercialsThread(void)
     gContext->LogEntry("commflag", LP_NOTICE, msg, logDesc);
 
     int breaksFound = 0;
-    QString cmd = QString("mythcommflag -j %1 -V %2")
-                          .arg(jobID).arg(print_verbose_messages);
+    QString path = gContext->GetInstallPrefix() + "/bin/mythcommflag";
+    QString cmd = QString("%1 -j %2 -V %3")
+                          .arg(path).arg(jobID).arg(print_verbose_messages);
 
     VERBOSE(VB_JOBQUEUE, QString("JobQueue running command: '%1'").arg(cmd));
 
@@ -2007,11 +2004,10 @@ void JobQueue::DoFlagCommercialsThread(void)
     if ((breaksFound == MYTHSYSTEM__EXIT__EXECL_ERROR) ||
         (breaksFound == MYTHSYSTEM__EXIT__CMD_NOT_FOUND))
     {
-        msg = QString("Commercial Flagging ERRORED for %1, unable to find "
-                      "mythcommflag, check your PATH and backend logs.")
-                      .arg(logDesc);
+        msg = QString("Commercial Flagging ERRORED for %1, %2 does not exist "
+                      "or is not executable")
+                      .arg(logDesc).arg(path);
         VERBOSE(VB_IMPORTANT, msg);
-        VERBOSE(VB_IMPORTANT, QString("Current PATH: '%1'").arg(getenv("PATH")));
 
         gContext->LogEntry("commflag", LP_WARNING,
                            "Commercial Flagging Errored", msg);
