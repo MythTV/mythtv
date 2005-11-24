@@ -1174,6 +1174,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
                                             const QString &startdir
                                           )
 {
+    log(QString("checking new file: \"%1\"").arg(filename), 4);
 
     AudioMetadata *new_item = NULL;
     
@@ -1237,7 +1238,7 @@ AudioMetadata *MMusicWatcher::checkNewFile(
         new_item->setId(bumpMetadataId());
         new_item->setCollectionId(container_id);
         
-        log(QString("added audio file: \"%1\"").arg(filename), 4);
+        log(QString("added  audio file: \"%1\"").arg(filename), 4);
         
         //
         //  Fill out its database info.
