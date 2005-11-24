@@ -510,6 +510,8 @@ void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
 }
 
 static float sq(float a) { return a*a; }
+static float lerp(float r, float a, float b)
+    { return ((1.0f - r) * a) + (r * b); }
 /**
  * \fn VideoOutput::GetVisibleOSDBounds(float&) const
  * \brief Returns visible portions of total OSD bounds
@@ -544,12 +546,14 @@ QRect VideoOutput::GetVisibleOSDBounds(
 
     // set the physical aspect ratio of the displayable area
     float dispPixelAdj = (GetDisplayAspect() * disph) / dispw;
-    // now adjust for scaling of the video
+    // now adjust for scaling of the video on the aspect ratio
     float vs = ((float)vb.width())/vb.height();
     visible_aspect = 1.3333f * (vs/XJ_aspect) * dispPixelAdj;
 
-    // this can be used to account for Zooming letterbox modes
-    font_scaling = 1.0/sqrt(2.0/(sq(visible_aspect / 1.3333f) + 1.0));
+    // now adjust for scaling of the video on the size
+    font_scaling = 1.0f/sqrtf(2.0/(sq(visible_aspect / 1.3333f) + 1.0f));
+    // now adjust for aspect ratio effect on font size (should be in osd.cpp?)
+    font_scaling *= sqrtf(XJ_aspect/1.3333f);
     return vb;
 }
 
