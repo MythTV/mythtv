@@ -658,7 +658,7 @@ foreach my $comp (@comps)
     if ( ! $backend )
     {
       # Nigel's hack to speedup building
-      &Syscall('echo Nigelz speedup hack    >> programs/programs.pro');
+      &Syscall('echo # Nigelz speedup hack  >> programs/programs.pro');
       &Syscall('echo SUBDIRS = mythfrontend >> programs/programs.pro');
     }
   }
