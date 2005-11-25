@@ -248,7 +248,7 @@ void PlayGroupEditor::load() {
         names.pop_front();
     }
 
-    addSelection("(Create new group)", "");
+    addSelection(tr("(Create new group)"), "");
 
     setValue(lastValue);
 }
