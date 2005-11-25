@@ -9,6 +9,7 @@
 #include <qwidget.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <pthread.h>
 
 #include <iostream>
 using namespace std;
@@ -713,6 +714,9 @@ int internal_media_init()
 
 static void *run_priv_thread(void *data)
 {
+    VERBOSE(VB_PLAYBACK, QString("user: %1 effective user: %2 run_priv_thread")
+                            .arg(getuid()).arg(geteuid()));
+
     (void)data;
     while (true) 
     {
@@ -974,7 +978,11 @@ int main(int argc, char **argv)
     // Create priveleged thread, then drop privs
     pthread_t priv_thread;
 
+    VERBOSE(VB_PLAYBACK, QString("user: %1 effective user: %2 before "
+                            "privileged thread").arg(getuid()).arg(geteuid()));
     int status = pthread_create(&priv_thread, NULL, run_priv_thread, NULL);
+    VERBOSE(VB_PLAYBACK, QString("user: %1 effective user: %2 after "
+                            "privileged thread").arg(getuid()).arg(geteuid()));
     if (status) 
     {
         perror("pthread_create");
