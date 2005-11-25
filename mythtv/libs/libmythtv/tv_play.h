@@ -489,7 +489,9 @@ class TV : public QObject
     static const int kBrowseTimeout; ///< Timeout for browse mode exit in msec
     /// Timeout after last Signal Monitor message for ignoring OSD when exiting.
     static const int kSMExitTimeout;
-    static const int kInputKeysMax;///< When to start discarding early keys
+    static const int kInputKeysMax;  ///< When to start discarding early keys
+    static const int kInputModeTimeout; ///< Timeout for entry modes in msec
+
 };
 
 #endif

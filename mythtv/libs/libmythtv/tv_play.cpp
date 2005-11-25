@@ -44,6 +44,7 @@ const int TV::kLCDTimeout     = 30000;
 const int TV::kBrowseTimeout  = 30000;
 const int TV::kSMExitTimeout  = 2000;
 const int TV::kInputKeysMax   = 6;
+const int TV::kInputModeTimeout=5000;
 
 #define DEBUG_ACTIONS 0 /**< set to 1 to debug actions */
 #define LOC QString("TV: ")
@@ -1470,12 +1471,25 @@ void TV::RunTV(void)
             updatecheck = 0;
         }
 
+        // Commit input when the OSD fades away
         if (HasQueuedChannel() && GetOSD())
         {
             OSDSet *set = GetOSD()->GetSet("channel_number");
             if ((set && !set->Displaying()) || !set)
                 CommitQueuedInput();
         }
+        // Clear closed caption input mode when timer expires
+        if (ccInputMode && (ccInputModeExpires < QTime::currentTime()))
+        {
+            ccInputMode = false;
+            ClearInputQueues(true);
+        }
+        // Clear arbitrary seek input mode when timer expires
+        if (asInputMode && (asInputModeExpires < QTime::currentTime()))
+        {
+            asInputMode = false;
+            ClearInputQueues(true);
+        }   
 
         if (class LCD * lcd = LCD::Get())
         {
@@ -1907,16 +1921,17 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 int page = GetQueuedInputAsInt(&valid, 16) << 16;
                 page = (valid) ? page : 0;
                 DoToggleCC(page);
-                if (page) // expire ccInputMode now...
-                    ccInputModeExpires.start();
+                ccInputModeExpires.start(); // expire ccInputMode now...
                 ClearInputQueues(true);
             }
             else
             {
                 ccInputMode        = true;
-                ccInputModeExpires = QTime::currentTime().addMSecs(500);
+                ccInputModeExpires = QTime::currentTime()
+                    .addMSecs(kInputModeTimeout);
                 asInputModeExpires = QTime::currentTime();
                 ClearInputQueues(false);
+                AddKeyToInputQueue(0);
             }
         }
         else if (action == "SKIPCOMMERCIAL")
@@ -1968,10 +1983,11 @@ void TV::ProcessKeypress(QKeyEvent *e)
             else
             {
                 asInputMode        = true;
-                asInputModeExpires = QTime::currentTime().addMSecs(500);
+                asInputModeExpires = QTime::currentTime()
+                    .addMSecs(kInputModeTimeout);
                 ccInputModeExpires = QTime::currentTime();
                 ClearInputQueues(false);
-                UpdateOSDTextEntry(tr("Seek:"));
+                AddKeyToInputQueue(0);
             }            
         }
         else if (action == "SEEKFFWD")
@@ -3028,8 +3044,11 @@ void TV::AddKeyToInputQueue(char key)
 {
     static char *spacers[5] = { "_", "-", "#", ".", NULL };
 
-    queuedInput     = queuedInput.append(key).right(kInputKeysMax);
-    queuedChanNum   = queuedChanNum.append(key).right(kInputKeysMax);
+    if (key)
+    {
+        queuedInput   = queuedInput.append(key).right(kInputKeysMax);
+        queuedChanNum = queuedChanNum.append(key).right(kInputKeysMax);
+    }
 
     /* 
      * Always use smartChannelChange when channel numbers are entered in
@@ -3038,7 +3057,8 @@ void TV::AddKeyToInputQueue(char key)
      * the only way to enter a channel number to browse without waiting for the
      * OSD to fadeout after entering numbers.
      */
-    bool do_smart = StateIsLiveTV(GetState()) && !ccInputMode && !asInputMode &&
+    bool do_smart = StateIsLiveTV(GetState()) &&
+        !ccInputMode && !asInputMode &&
         (smartChannelChange || browsemode);
     QString chan = GetQueuedChanNum();
     if (!chan.isEmpty() && do_smart)
@@ -3061,10 +3081,11 @@ void TV::AddKeyToInputQueue(char key)
     }
 
     QString inputStr = (do_smart) ? queuedChanNum : queuedInput;
+    inputStr = inputStr.isEmpty() ? "?" : inputStr;
     if (ccInputMode)
-        inputStr = tr("CC:") + " " + inputStr;
+        inputStr = tr("CC:", "closed caption, teletext page") + " " + inputStr;
     else if (asInputMode)
-        inputStr = tr("Seek:") + " " + inputStr;
+        inputStr = tr("Seek:", "seek to location") + " " + inputStr;
     UpdateOSDTextEntry(inputStr);
 
     if (do_smart)
@@ -3100,6 +3121,11 @@ void TV::CommitQueuedInput(void)
         if (valid && page)
             DoToggleCC(page);
         ccInputModeExpires.start(); // expire ccInputMode
+    }
+    else if (asInputMode)
+    {
+        if (HasQueuedInput())
+            DoArbSeek(ARBSEEK_FORWARD);
     }
     else if (StateIsLiveTV(GetState()))
     {
