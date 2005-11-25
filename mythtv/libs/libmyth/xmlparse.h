@@ -35,6 +35,7 @@ class XMLParse
     void parseGuideGrid(LayerSet *, QDomElement &);
     void parseManagedTreeList(LayerSet *, QDomElement &);
     void parseTextArea(LayerSet *, QDomElement &);
+    void parseRichTextArea(LayerSet *, QDomElement &);
     void parseMultiTextArea(LayerSet *, QDomElement &);
     void parseRemoteEdit(LayerSet *, QDomElement &);
     void parseStatusBar(LayerSet *, QDomElement &);

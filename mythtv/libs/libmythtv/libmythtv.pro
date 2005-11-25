@@ -96,7 +96,7 @@ HEADERS += sr_items.h               scheduledrecording.h
 HEADERS += signalmonitorvalue.h     viewschdiff.h
 HEADERS += mpeg/iso639.h
 HEADERS += livetvchain.h
-HEADERS += playgroup.h
+HEADERS += playgroup.h              progdetails.h
 
 SOURCES += programinfo.cpp          proglist.cpp
 SOURCES += RingBuffer.cpp           DVDRingBuffer.cpp
@@ -114,6 +114,7 @@ SOURCES += mpeg/iso639.cpp
 SOURCES += viewschdiff.cpp
 SOURCES += livetvchain.cpp
 SOURCES += playgroup.cpp
+SOURCES += progdetails.cpp
 
 using_frontend {
     # Recording profile stuff

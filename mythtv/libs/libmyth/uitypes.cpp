@@ -1,6 +1,8 @@
 
 #include <iostream>
 #include <qapplication.h>
+#include <qsimplerichtext.h>
+#include <qbitmap.h>
 
 using namespace std;
 
@@ -2025,6 +2027,237 @@ void UITextType::calculateScreenArea()
     r.moveBy(m_parent->GetAreaRect().left(),
              m_parent->GetAreaRect().top());
     screen_area = r;
+}
+
+// ******************************************************************
+
+UIRichTextType::UIRichTextType(const QString &name, fontProp *font,
+                       const QString &text, int dorder, QRect displayrect,
+                       QRect textrect)
+    : UIType(name)
+{
+
+    m_name = name;
+    takes_focus = true;
+
+    if (QStyleSheet::mightBeRichText(text))
+        m_message = text;
+    else
+        m_message = QStyleSheet::convertFromPlainText(text, QStyleSheetItem::WhiteSpaceNormal);
+
+    m_font = font;
+    m_displayArea = displayrect;
+    m_yPos = 0;
+    m_textArea = textrect;
+    m_order = dorder;
+    m_image = new QPixmap(m_displayArea.width(), m_displayArea.height(), 24);
+    m_background = new QPixmap(m_displayArea.width(), m_displayArea.height(), 24);
+    m_compBackground = new QPixmap(m_displayArea.width(), m_displayArea.height(), 24);
+
+    m_bgImageReg = m_bgImageSel = "";
+    m_showScrollArrows = true;
+}
+
+UIRichTextType::~UIRichTextType()
+{
+    if (m_image)
+        delete m_image;
+
+    if (m_background)
+        delete m_background;
+
+    if (m_compBackground)
+        delete m_compBackground;
+}
+
+void UIRichTextType::SetText(const QString &text)
+{
+    if (QStyleSheet::mightBeRichText(text))
+        m_message = text;
+    else
+        m_message = QStyleSheet::convertFromPlainText(text, QStyleSheetItem::WhiteSpaceNormal);
+
+    m_yPos = 0;
+    m_showUpArrow = false;
+    refreshImage();
+}
+
+void UIRichTextType::SetBackgroundImages(QString bgImageReg, QString bgImageSel)
+{
+    m_bgImageReg = bgImageReg;
+    m_bgImageSel = bgImageSel;
+
+    updateBackground();
+}
+
+void UIRichTextType::SetBackground(QPixmap *background)
+{
+    copyBlt(m_background, 0, 0, background, m_displayArea.x(), m_displayArea.y(),
+            m_displayArea.width(), m_displayArea.height());
+
+    updateBackground();
+}
+
+void UIRichTextType::updateBackground(void)
+{
+    QString file = "";
+
+    file = isFocused() ? m_bgImageSel : m_bgImageReg;
+
+    // paint our background image over the window background
+    if (file != "")
+    {
+        if (gContext->FindThemeFile(file))
+        {
+            QImage *sourceImg = new QImage();
+            if (sourceImg->load(file))
+            {
+                QImage scalerImg;
+                scalerImg = sourceImg->smoothScale(
+                        (int)(m_displayArea.width() * m_wmult),
+                        (int)(m_displayArea.height() * m_hmult));
+                QPainter p(m_compBackground);
+                p.drawPixmap(QPoint(0, 0), *m_background);
+                p.drawImage(QPoint(0, 0), scalerImg);
+            }
+            delete sourceImg;
+        }
+    }
+    refreshImage();
+}
+
+void UIRichTextType::refreshImage()
+{
+    if (!m_background)
+        return;
+
+    QRect clipRect(0, 0, m_textArea.width(), m_textArea.height());
+
+    QPainter p(m_image);
+    QBrush brush;
+
+    brush.setPixmap(*m_compBackground);
+    p.fillRect(0, 0, m_displayArea.width(), m_displayArea.height() , brush);
+    p.translate(m_textArea.x() - m_displayArea.x() , m_textArea.y() - m_displayArea.y());
+    QSimpleRichText richText(m_message, m_font->face);
+    richText.setWidth(m_textArea.width());
+    richText.draw(&p, 0, -m_yPos, clipRect, gContext->GetMainWindow()->colorGroup(), 0);
+    m_textHeight = richText.height();
+
+    // do we need to show scroll arrows
+    if (m_showScrollArrows)
+    {
+        if (m_textHeight <= m_textArea.height())
+        {
+            m_showUpArrow = false;
+            m_showDnArrow = false;
+        }
+        else
+        {
+            m_showUpArrow = (m_yPos > 0);
+            m_showDnArrow = (m_yPos != m_textHeight - m_textArea.height());
+        }
+    }
+
+    refresh();
+}
+
+void UIRichTextType::Draw(QPainter *dr, int drawlayer, int context)
+{
+    if (hidden)
+        return;
+
+    if ((m_context == context || m_context == -1) && drawlayer == m_order)
+    {
+        // draw text image 
+        dr->drawPixmap(m_displayArea, *m_image);
+
+        // draw scroll arrows
+        if (m_showScrollArrows) 
+        {
+            if (m_showUpArrow)
+                dr->drawPixmap(m_upArrowSelPos, m_upArrowSel);
+            else
+                dr->drawPixmap(m_upArrowRegPos, m_upArrowReg);
+
+            if (m_showDnArrow)
+                dr->drawPixmap(m_dnArrowSelPos, m_dnArrowSel);
+            else
+                dr->drawPixmap(m_dnArrowRegPos, m_dnArrowReg);
+        }
+    }
+}
+
+void UIRichTextType::calculateScreenArea()
+{
+    QRect r = m_displayArea;
+    r.moveBy(m_parent->GetAreaRect().left(),
+             m_parent->GetAreaRect().top());
+    screen_area = r;
+}
+
+void UIRichTextType::ScrollUp()
+{
+    if (m_textHeight <= m_textArea.height())
+        return;
+
+    m_yPos -= m_textArea.height() / 10;
+    if (m_yPos < 0)
+        m_yPos = 0;
+
+    refreshImage();
+}
+
+void UIRichTextType::ScrollDown()
+{
+    if (m_textHeight <= m_textArea.height())
+        return;
+
+    m_yPos += m_textArea.height() / 10;
+
+    if (m_yPos > m_textHeight - m_textArea.height())
+        m_yPos = m_textHeight - m_textArea.height();
+
+    refreshImage();
+}
+
+void UIRichTextType::ScrollPageUp()
+{
+    if (m_textHeight <= m_textArea.height())
+        return;
+
+    m_yPos -= m_textArea.height();
+    if (m_yPos < 0)
+        m_yPos = 0;
+
+    refreshImage();
+}
+
+void UIRichTextType::ScrollPageDown()
+{
+    if (m_textHeight <= m_textArea.height())
+        return;
+
+    m_yPos += m_textArea.height();
+    if (m_yPos > m_textHeight - m_textArea.height())
+        m_yPos = m_textHeight - m_textArea.height();
+
+    refreshImage();
+}
+
+bool UIRichTextType::takeFocus()
+{
+    bool res = UIType::takeFocus();
+    updateBackground();
+
+    return res;
+}
+
+void UIRichTextType::looseFocus()
+{
+    UIType::looseFocus();
+
+    updateBackground();
 }
 
 // ******************************************************************

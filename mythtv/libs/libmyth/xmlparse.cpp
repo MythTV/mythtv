@@ -1156,6 +1156,10 @@ void XMLParse::parseContainer(QDomElement &element, QString &newname, int &conte
             {
                 parseTextArea(container, info);
             }
+            else if (info.tagName() == "richtextarea")
+            {
+                parseRichTextArea(container, info);
+            }
             else if (info.tagName() == "multitextarea")
             {
                 parseMultiTextArea(container, info);
@@ -1361,6 +1365,202 @@ void XMLParse::parseTextArea(LayerSet *container, QDomElement &element)
             text->SetJustification(jst | Qt::AlignHCenter);
     }
     align = "";
+    text->SetParent(container);
+    text->calculateScreenArea();
+    container->AddType(text);
+}
+
+void XMLParse::parseRichTextArea(LayerSet *container, QDomElement &element)
+{
+    int context = -1;
+    QRect area = QRect(0, 0, 0, 0);
+    QRect textArea = QRect(0, 0, 0, 0);
+    QString font = "";
+    QString value = "";
+    QString bgImageReg = "", bgImageSel = "";
+    int draworder = 0;
+
+    bool   bShowArrows = true;
+
+    QPoint upArrowSelPos = QPoint(0,0);
+    QPoint dnArrowSelPos = QPoint(0,0);
+    QPoint upArrowRegPos = QPoint(0,0);
+    QPoint dnArrowRegPos = QPoint(0,0);
+
+    QPixmap *upArrowSel = NULL;
+    QPixmap *dnArrowSel = NULL;
+    QPixmap *upArrowReg = NULL;
+    QPixmap *dnArrowReg = NULL;
+
+    QString name = element.attribute("name", "");
+    if (name.isNull() || name.isEmpty())
+    {
+        cerr << "Rich Text area needs a name\n";
+        return;
+    }
+
+    QString layerNum = element.attribute("draworder", "");
+    if (layerNum.isNull() && layerNum.isEmpty())
+    {
+        cerr << "Rich Text area needs a draworder\n";
+        return;
+    }
+    draworder = layerNum.toInt();
+
+    for (QDomNode child = element.firstChild(); !child.isNull();
+         child = child.nextSibling())
+    {
+        QDomElement info = child.toElement();
+        if (!info.isNull())
+        {
+            if (info.tagName() == "context")
+            {
+                context = getFirstText(info).toInt();
+            }
+            else if (info.tagName() == "area")
+            {
+                area = parseRect(getFirstText(info));
+                normalizeRect(area);
+            }
+            else if (info.tagName() == "textarea")
+            {
+                textArea = parseRect(getFirstText(info));
+                normalizeRect(textArea);
+            }
+            else if (info.tagName() == "font")
+            {
+                font = getFirstText(info);
+            }
+            else if (info.tagName() == "showscrollarrows") 
+            {
+                if (getFirstText(info).lower() == "no")
+                    bShowArrows = false;
+            }
+            else if (info.tagName() == "backgroundsel")
+            {
+                bgImageSel = getFirstText(info);
+            }
+            else if (info.tagName() == "backgroundreg")
+            {
+                bgImageReg = getFirstText(info);
+            }
+            else if (info.tagName() == "value")
+            {
+                if ((value.isNull() || value.isEmpty()) &&
+                     info.attribute("lang","") == "")
+                {
+                    value = qApp->translate("ThemeUI", getFirstText(info));
+                }
+                else if (info.attribute("lang","").lower() ==
+                         gContext->GetLanguage())
+                {
+                    value = getFirstText(info);
+                }
+            }
+            else if (info.tagName() == "image")
+            {
+                QString imgname = "";
+                QString imgpoint = "";
+                QString imgfile = "";
+
+                imgname = info.attribute("function", "");
+                if (imgname.isNull() || imgname.isEmpty())
+                {
+                    cerr << "Image needs a function\n";
+                    return;
+                }
+
+                imgfile = info.attribute("filename", "");
+                if (imgfile.isNull() || imgfile.isEmpty())
+                {
+                    cerr << "Image needs a filename\n";
+                    return;
+                }
+
+                imgpoint = info.attribute("location", "");
+                if (imgpoint.isNull() && imgpoint.isEmpty())
+                {
+                    cerr << "Image needs a location\n";
+                    return;
+                }
+
+                if (imgname.lower() == "uparrow-reg")
+                {
+                    upArrowReg = gContext->LoadScalePixmap(imgfile);
+                    upArrowRegPos = parsePoint(imgpoint);
+                    upArrowRegPos.setX((int)(upArrowRegPos.x() * wmult));
+                    upArrowRegPos.setY((int)(upArrowRegPos.y() * hmult));
+                }
+                if (imgname.lower() == "downarrow-reg")
+                {
+                    dnArrowReg = gContext->LoadScalePixmap(imgfile);
+                    dnArrowRegPos = parsePoint(imgpoint);
+                    dnArrowRegPos.setX((int)(dnArrowRegPos.x() * wmult));
+                    dnArrowRegPos.setY((int)(dnArrowRegPos.y() * hmult));
+                }
+                if (imgname.lower() == "uparrow-sel")
+                {
+                    upArrowSel = gContext->LoadScalePixmap(imgfile);
+                    upArrowSelPos = parsePoint(imgpoint);
+                    upArrowSelPos.setX((int)(upArrowSelPos.x() * wmult));
+                    upArrowSelPos.setY((int)(upArrowSelPos.y() * hmult));
+                }
+                if (imgname.lower() == "downarrow-sel")
+                {
+                    dnArrowSel = gContext->LoadScalePixmap(imgfile);
+                    dnArrowSelPos = parsePoint(imgpoint);
+                    dnArrowSelPos.setX((int)(dnArrowSelPos.x() * wmult));
+                    dnArrowSelPos.setY((int)(dnArrowSelPos.y() * hmult));
+                }
+            }
+            else
+            {
+                cerr << "Unknown tag in richtextarea: " << info.tagName() << endl;
+                return;
+            }
+        }
+    }
+
+    fontProp *testfont = GetFont(font);
+    if (!testfont)
+    {
+        cerr << "Unknown font: " << font << " in richtextarea: " << name << endl;
+        return;
+    }
+
+    UIRichTextType *text = new UIRichTextType(name, testfont, value, draworder, 
+                                              area, textArea);
+    text->SetScreen(wmult, hmult);
+    if (context != -1)
+    {
+        text->SetContext(context);
+    }
+    if (!value.isNull() && !value.isEmpty())
+        text->SetText(value);
+
+    if (upArrowReg)
+    {
+        text->SetImageUpArrowReg(*upArrowReg, upArrowRegPos);
+        delete upArrowReg;
+    }
+    if (upArrowSel)
+    {
+        text->SetImageUpArrowSel(*upArrowSel, upArrowSelPos);
+        delete upArrowSel;
+    }
+    if (dnArrowReg)
+    {
+        text->SetImageDnArrowReg(*dnArrowReg, dnArrowRegPos);
+        delete dnArrowReg;
+    }
+    if (dnArrowSel)
+    {
+        text->SetImageDnArrowSel(*dnArrowSel, dnArrowSelPos);
+        delete dnArrowSel;
+    }
+
+    text->SetShowScrollArrows(bShowArrows);
+    text->SetBackgroundImages(bgImageReg, bgImageSel);
     text->SetParent(container);
     text->calculateScreenArea();
     container->AddType(text);

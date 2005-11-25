@@ -2260,6 +2260,27 @@ UITextType* MythThemedDialog::getUITextType(const QString &name)
     return NULL;
 }
 
+UIRichTextType* MythThemedDialog::getUIRichTextType(const QString &name)
+{
+    QPtrListIterator<LayerSet> an_it(my_containers);
+    LayerSet *looper;
+
+    while( (looper = an_it.current()) != 0)
+    {
+        UIType *hunter = looper->GetType(name);
+        if (hunter)
+        {
+            UIRichTextType *hunted;
+            if ( (hunted = dynamic_cast<UIRichTextType*>(hunter)) )
+            {
+                return hunted;
+            }
+        }
+        ++an_it;
+    }
+    return NULL;
+}
+
 UIRemoteEditType* MythThemedDialog::getUIRemoteEditType(const QString &name)
 {
     QPtrListIterator<LayerSet> an_it(my_containers);

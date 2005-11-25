@@ -1,0 +1,75 @@
+<!--
+
+    This is a myth style theme file for progdetails
+
+    (c) 2005 by a whole bunch of people associated with MythTV
+
+-->
+<mythuitheme>
+
+    <window name="progdetails">
+
+        <!--
+
+            First, define all the fonts we need on this screen
+
+        -->
+       <font name="title" face="Arial">
+           <color>#ffff00</color>
+           <dropcolor>#000000</dropcolor>
+           <size>24</size>
+           <shadow>3,3</shadow>
+           <bold>yes</bold>
+       </font>
+
+       <font name="info" face="Arial">
+            <color>#ffffff</color>
+            <size>18</size>
+            <bold>no</bold>
+       </font>
+
+       <font name="buttons" face="Arial">
+            <color>#ffff00</color>
+            <size>14</size>
+            <bold>yes</bold>
+       </font>
+
+       <container name="main_display">
+            <area>0,0,800,600</area>
+
+            <textarea name="title" draworder="0" align="center">
+                <multiline>no</multiline>
+                <font>title</font>
+                <area>50,10,700,40</area>
+                <value>Program Details</value>
+            </textarea>
+
+
+            <richtextarea name="richtext" draworder="0">
+                <area>40,70,720,440</area>
+                <textarea>60,90,660,400</textarea>
+                <font>info</font>
+                <value>Program Details</value>
+                <image function="uparrow-reg" filename="lb-uparrow-reg.png" location="725,105"></image>
+                <image function="downarrow-reg" filename="lb-dnarrow-reg.png" location="725,460"></image>
+                <image function="uparrow-sel" filename="lb-uparrow-sel.png" location="725,105"></image>
+                <image function="downarrow-sel" filename="lb-dnarrow-sel.png" location="725,460"></image>
+                <backgroundreg>pd-back-reg.png</backgroundreg>
+                <backgroundsel>pd-back-sel.png</backgroundsel>
+            </richtextarea>
+
+            <!-- 
+                ok button
+            -->
+
+            <textbutton name="ok_button" draworder="1">
+                <position>81,535</position>
+                <font>buttons</font>
+                <image function="on" filename="mw_text_button_on.png"></image>
+                <image function="off" filename="mw_text_button_off.png"></image>
+                <image function="pushed" filename="mw_text_button_pushed.png"></image>
+            </textbutton>
+
+        </container>
+    </window>
+</mythuitheme>

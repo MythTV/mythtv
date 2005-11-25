@@ -617,6 +617,88 @@ class UITextType : public UIType
 
 };
 
+class UIRichTextType : public UIType
+{
+    Q_OBJECT
+
+    public:
+        UIRichTextType(const QString &, fontProp *, const QString &, int,
+                   QRect displayrect, QRect textrect);
+        ~UIRichTextType();
+
+        QString Name() { return m_name; }
+
+        void SetText(const QString &text);
+        QString GetText() { return m_message; }
+
+        QRect DisplayArea() { return m_displayArea; }
+        void SetDisplayArea(const QRect &rect) { m_displayArea = rect; }
+        void SetShowScrollArrows(bool bShowArrows) 
+            { m_showScrollArrows = bShowArrows; }
+
+        QRect TextArea() { return m_textArea; }
+        void SetTextArea(const QRect &rect) { m_textArea = rect; }
+
+        void SetImageUpArrowReg(QPixmap img, QPoint loc) 
+            { m_upArrowReg = img; m_upArrowRegPos = loc; }
+        void SetImageDnArrowReg(QPixmap img, QPoint loc) 
+            { m_dnArrowReg = img; m_dnArrowRegPos = loc; }
+        void SetImageUpArrowSel(QPixmap img, QPoint loc) 
+            { m_upArrowSel = img; m_upArrowSelPos = loc; }
+        void SetImageDnArrowSel(QPixmap img, QPoint loc) 
+            { m_dnArrowSel = img; m_dnArrowSelPos = loc; }
+
+        void SetBackground(QPixmap *background);
+        void SetBackgroundImages(QString bgImageReg, QString bgImageSel);
+
+        virtual void calculateScreenArea();
+
+        virtual void Draw(QPainter *, int, int);
+    public slots:
+        void ScrollDown(void);
+        void ScrollUp(void);
+        void ScrollPageDown(void);
+        void ScrollPageUp(void);
+
+        virtual bool takeFocus();
+        virtual void looseFocus();
+
+    protected:
+        void refreshImage();
+        void updateBackground();
+
+        QRect m_displayArea;
+        QRect m_textArea;
+
+        int   m_yPos;        // current scroll position
+        int   m_textHeight;  // total height of rendered text
+
+        QString m_message;
+        QString m_bgImageReg;
+        QString m_bgImageSel;
+
+        fontProp *m_font;
+
+        QPixmap *m_background;    // clipped image of the window background 
+        QPixmap *m_compBackground;// composite of the window background + the
+                                  // widget background image 
+        QPixmap *m_image;         // the completed image including the rich text
+
+        bool     m_showScrollArrows;
+        bool     m_showUpArrow;
+        bool     m_showDnArrow;
+
+        QPoint   m_upArrowRegPos;
+        QPoint   m_dnArrowRegPos;
+        QPoint   m_upArrowSelPos;
+        QPoint   m_dnArrowSelPos;
+
+        QPixmap  m_upArrowReg;
+        QPixmap  m_dnArrowReg;
+        QPixmap  m_upArrowSel;
+        QPixmap  m_dnArrowSel;
+};
+
 class UIMultiTextType : public UITextType
 {
 

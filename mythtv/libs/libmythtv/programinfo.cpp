@@ -11,6 +11,7 @@
 #include <unistd.h>
 
 #include "programinfo.h"
+#include "progdetails.h"
 #include "scheduledrecording.h"
 #include "util.h"
 #include "mythcontext.h"
@@ -2993,6 +2994,10 @@ void ProgramInfo::EditScheduled(void)
     record->exec();
 }
 
+#define ADD_PAR(title,text,result)                                             \
+    result += "<p><font color=\"yellow\"</font>" + title + ":  "               \
+           + "<font color=\"white\"</font>" + text + "</p>";
+
 /** \fn ProgramInfo::showDetails(void) const
  *  \brief Pops up a DialogBox with program info, blocking until user exits
  *         the dialog.
@@ -3071,13 +3076,15 @@ void ProgramInfo::showDetails(void) const
            category_type = "tvshow";
     }
 
-    QString msg = QObject::tr("Title") + ":  " + title;
+    QString msg = "";
+    QString s   = "";
 
+    s = title;
     if (subtitle != "")
-        msg += " - \"" + subtitle + "\"";
+        s += " - \"" + subtitle + "\"";
+    ADD_PAR(QObject::tr("Title"), s, msg)
 
-    if (description  != "")
-        msg += "\n" + QObject::tr("Description") + ":  " + description;
+    s = description; 
 
     QString attr = "";
 
@@ -3116,14 +3123,15 @@ void ProgramInfo::showDetails(void) const
     if (attr != "")
     {
         attr.truncate(attr.findRev(','));
-        msg += " (" + attr + ")";
+        s += " (" + attr + ")";
     }
-    msg += "\n";
+
+    if (s != "")
+        ADD_PAR(QObject::tr("Description"), s, msg)
 
     if (category != "")
     {
-        msg += QObject::tr("Category") + ":  " +
-               qApp->translate("Category", category);
+        s = qApp->translate("Category", category);
 
         query.prepare("SELECT genre FROM programgenres "
                       "WHERE chanid = :CHANID AND starttime = :STARTTIME "
@@ -3131,33 +3139,33 @@ void ProgramInfo::showDetails(void) const
 
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", startts);
-        
+
         if (query.exec() && query.isActive() && query.size() > 0)
         {
             while (query.next())
-                msg += ", " + query.value(0).toString();
+                s += ", " + query.value(0).toString();
         }
-        msg += "\n";
+        ADD_PAR(QObject::tr("Category"), s, msg)
     }
 
     if (category_type  != "")
     {
-        msg += QObject::tr("Type","category_type") + ":  " + category_type;
+        s = category_type;
         if (seriesid != "")
-            msg += "  (" + seriesid + ")";
-        msg += "\n";
+            s += "  (" + seriesid + ")";
+        ADD_PAR(QObject::tr("Type","category_type"), s, msg)
     }
 
     if (epinum != "")
-        msg += QObject::tr("Episode Number") + ":  " + epinum + "\n";
+        ADD_PAR(QObject::tr("Episode Number"), epinum, msg)
 
     if (hasAirDate && category_type != "movie")
     {
-        msg += QObject::tr("Original Airdate") + ":  ";
-        msg += originalAirDate.toString(fullDateFormat) + "\n";
+        ADD_PAR(QObject::tr("Original Airdate"),
+                originalAirDate.toString(fullDateFormat), msg)
     }
     if (programid  != "")
-        msg += QObject::tr("Program ID") + ":  " + programid + "\n";
+        ADD_PAR(QObject::tr("Program ID"), programid, msg)
 
     QString role = "", pname = "";
 
@@ -3197,11 +3205,11 @@ void ProgramInfo::showDetails(void) const
                     // Only print actors, guest star and director for now.
 
                     if (rstr == "actor")
-                        msg += QObject::tr("Actors") + ":  " + plist + "\n";
+                        ADD_PAR(QObject::tr("Actors"), plist, msg)
                     if (rstr == "guest_star")
-                        msg += QObject::tr("Guest Star") + ":  " + plist + "\n";
+                        ADD_PAR(QObject::tr("Guest Star"), plist, msg)
                     if (rstr == "director")
-                        msg += QObject::tr("Director") + ":  " + plist + "\n";
+                        ADD_PAR(QObject::tr("Director"), plist, msg)
 
                     rstr = role;
                     plist = pname;
@@ -3211,11 +3219,11 @@ void ProgramInfo::showDetails(void) const
             //    msg += QString("%1:  %2\n").arg(rstr).arg(plist);
 
             if (rstr == "actor")
-                msg += QObject::tr("Actors") + ":  " + plist + "\n";
+                ADD_PAR(QObject::tr("Actors"), plist, msg)
             if (rstr == "guest_star")
-                msg += QObject::tr("Guest Star") + ":  " + plist + "\n";
+                ADD_PAR(QObject::tr("Guest Star"), plist, msg)
             if (rstr == "director")
-                msg += QObject::tr("Director") + ":  " + plist + "\n";
+                ADD_PAR(QObject::tr("Director"), plist, msg)
         }
     }
 
@@ -3267,18 +3275,18 @@ void ProgramInfo::showDetails(void) const
             p->rectype = rectype; // re-enable "Not Recording" status text.
         }
     }
-    msg += "\nMythTV " + QObject::tr("Status: ") + p->RecStatusText();
+    s = p->RecStatusText();
     if (statusDate.isValid())
-        msg += " " + statusDate.toString(fullDateFormat);
-    msg += "\n";
+        s += " " + statusDate.toString(fullDateFormat);
+    ADD_PAR(QString("MythTV " + QObject::tr("Status")), s, msg)
     delete p;
 
     if (findid > 0)
     {
         QDate fdate = QDate::QDate (1970, 1, 1);
         fdate = fdate.addDays(findid - 719528);
-        msg += QString("%1: %2 (%3)\n").arg(QObject::tr("Find ID"))
-                       .arg(findid).arg(fdate.toString(fullDateFormat));
+        ADD_PAR(QObject::tr("Find ID"), QString("%1 (%2)").arg(findid)
+                .arg(fdate.toString(fullDateFormat)), msg)
     }
     if (filesize > 0)
     {
@@ -3286,14 +3294,16 @@ void ProgramInfo::showDetails(void) const
 
         tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
         tmpSize += QObject::tr("GB", "GigaBytes");
-    
-        msg += QObject::tr("Recording Host") + ":  " + hostname + "\n";
-        msg += QObject::tr("Filesize") + ":  " + tmpSize + "\n";
-        msg += QObject::tr("Recording Group") + ":  " + recgroup + "\n";
-        msg += QObject::tr("Playback Group") + ":  " + playgroup + "\n";
+
+        ADD_PAR(QObject::tr("Recording Host"), hostname, msg)
+        ADD_PAR(QObject::tr("Filesize"), tmpSize, msg)
+        ADD_PAR(QObject::tr("Recording Group"), recgroup, msg)
+        ADD_PAR(QObject::tr("Playback Group"), playgroup, msg)
     }
-    DialogBox *details_dialog = new DialogBox(gContext->GetMainWindow(), msg);
-    details_dialog->AddButton(QObject::tr("OK"));
+
+    ProgDetails *details_dialog = new ProgDetails(gContext->GetMainWindow(),
+                                                  "progdetails-", "progdetails",
+                                                  msg);
     details_dialog->exec();
 
     delete details_dialog;
