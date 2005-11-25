@@ -48,8 +48,11 @@
 DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
                                    uint _flags, const char *_name)
     : DTVSignalMonitor(db_cardnum, _channel, _flags, _name),
+      // This snr setup is incorrect for API 3.x but works better 
+      // than int16_t range in practice, however this is correct 
+      // for the 4.0 DVB API which uses a uint16_t for the snr
       signalToNoise    (tr("Signal To Noise"),    "snr",
-                        -32768, true, -32768, 32767, 0),
+                        0,      true,      0, 65535, 0),
       bitErrorRate     (tr("Bit Error Rate"),     "ber",
                         65535,  false,     0, 65535, 0),
       uncorrectedBlocks(tr("Uncorrected Blocks"), "ucb",
@@ -59,14 +62,19 @@ DVBSignalMonitor::DVBSignalMonitor(int db_cardnum, DVBChannel* _channel,
 {
     // These two values should probably come from the database...
     int wait = 3000; // timeout when waiting on signal
-    int threshold = -32768; // signal strength threshold in %
+    int threshold = 0; // signal strength threshold
 
     signalLock.SetTimeout(wait);
     signalStrength.SetTimeout(wait);
     signalStrength.SetThreshold(threshold);
-    signalStrength.SetRange(-32768, 32767);
 
-    int16_t  sig = 0, snr     = 0;
+    // This is incorrect for API 3.x but works better than int16_t range
+    // in practice, however this is correct for the 4.0 DVB API
+    signalStrength.SetRange(0, 65535);
+
+    // We use uint16_t for sig & snr because this is correct for DVB API 4.0,
+    // and works better than the correct int16_t for the 3.x API
+    uint16_t sig = 0, snr     = 0;
     uint32_t ber = 0, ublocks = 0;
     fe_status_t  status;
     bzero(&status, sizeof(status));
@@ -553,7 +561,9 @@ void DVBSignalMonitor::UpdateValues(void)
     }
 
     bool wasLocked = false, isLocked = false;
-    int16_t  sig = 0, snr     = 0;
+    // We use uint16_t for sig & snr because this is correct for DVB API 4.0,
+    // and works better than the correct int16_t for the 3.x API
+    uint16_t sig = 0, snr     = 0;
     uint32_t ber = 0, ublocks = 0;
     fe_status_t  status;
     bzero(&status, sizeof(status));
