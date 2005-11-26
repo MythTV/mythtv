@@ -87,6 +87,7 @@ struct QuartzData
 
     // Information about the display:
     WindowRef          window;            // MythTV window
+    Rect               windowBounds;      // dimensions, to restore size later
     CGDirectDisplayID  screen;            // screen containing main window
     float              refreshRate;       // for screen above
 
@@ -1284,15 +1285,15 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
     // dimensions and aspect ratio, but for simplicity we will just use the
     // display that contains the MythTV window.
 
-    Rect windowBounds;
-    if (GetWindowBounds(data->window, kWindowContentRgn, &windowBounds))
+    if (GetWindowBounds(data->window,
+                        kWindowStructureRgn, &(data->windowBounds)))
     {
         puts("GetWindowBounds failed");
         return false;
     }
     CGPoint pt;
-    pt.x = windowBounds.left;
-    pt.y = windowBounds.top;
+    pt.x = data->windowBounds.left;
+    pt.y = data->windowBounds.top;
     CGDisplayCount ct;
     data->screen = NULL;
     if (CGGetDisplaysWithPoint(pt, 1, &data->screen, &ct))
@@ -1351,6 +1352,13 @@ bool VideoOutputQuartz::Init(int width, int height, float aspect,
             tmp->SetFrameSkip(gContext->GetNumSetting("MacMainSkip", 0));
             data->views.append(tmp);
         }
+        else
+        {   
+            // If video in the main window is not enabled,
+            // hide (shrink) it so it is not in the way 
+            VERBOSE(VB_PLAYBACK, QString("Shrinking Main Window to 1x1"));
+            SizeWindow(data->window, 1, 1, true); 
+        } 
         if (gContext->GetNumSetting("MacFloatEnabled", 0))
         {
             float opacity =
@@ -1491,6 +1499,18 @@ void VideoOutputQuartz::Exit(void)
     if (Started) 
     {
         Started = false;
+
+        // Restore main window
+        // (assuming it was shrunk i.e. we were not in full screen mode)
+        if (data->windowedMode)
+        { 
+            VERBOSE(VB_PLAYBACK,
+                    QString("Restoring Main Window to %1x%2")  
+                    .arg(data->windowBounds.right - data->windowBounds.left)
+                    .arg(data->windowBounds.bottom - data->windowBounds.top));
+            SetWindowBounds(data->window, kWindowStructureRgn,
+                            &(data->windowBounds));
+        } 
 
         data->views.clear();
         DeleteQuartzBuffers();
