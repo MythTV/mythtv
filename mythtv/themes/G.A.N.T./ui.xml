@@ -1902,5 +1902,68 @@
 
   </window>
 
+  <window name="progdetails">
 
+        <!--
+
+            First, define all the fonts we need on this screen
+
+        -->
+    <font name="title" face="Arial">
+      <color>#FFFFFF</color>
+      <dropcolor>#000000</dropcolor>
+      <size>17</size>
+      <shadow>3,3</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="info" face="Arial">
+      <color>#ffffff</color>
+      <size>14</size>
+      <size:small>10</size:small>
+      <shadow>1,1</shadow>
+      <bold>yes</bold>
+    </font>
+
+    <font name="buttons" face="Arial">
+      <color>#FFFFFF</color>
+      <size>14</size>
+      <bold>yes</bold>
+    </font>
+
+    <container name="main_display">
+      <area>0,0,800,600</area>
+      <textarea name="title" draworder="0">
+        <area>40,30,720,40</area>
+        <font>title</font>
+        <value>Program Details:</value>
+      </textarea>
+
+      <richtextarea name="richtext" draworder="0">
+        <area>30,60,735,450</area>
+        <textarea>50,70,660,430</textarea>
+        <font>info</font>
+        <value>Program Details</value>
+        <image function="uparrow-reg" filename="blank.png" location="735,85"></image>
+        <image function="downarrow-reg" filename="blank.png" location="735,455"></image>
+        <image function="uparrow-sel" filename="uparrow.png" location="735,85"></image>
+        <image function="downarrow-sel" filename="downarrow.png" location="735,455"></image>
+        <backgroundreg>blank.png</backgroundreg>
+        <backgroundsel>blank.png</backgroundsel>
+      </richtextarea>
+
+            <!-- 
+                ok button
+            -->
+
+      <textbutton name="ok_button" draworder="1">
+        <position>81,535</position>
+        <font>buttons</font>
+        <image function="on" filename="mw_text_button_on.png"></image>
+        <image function="off" filename="mw_text_button_off.png"></image>
+        <image function="pushed" filename="mw_text_button_pushed.png"></image>
+      </textbutton>
+
+    </container>
+  </window>
 </mythuitheme>

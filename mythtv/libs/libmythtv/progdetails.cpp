@@ -11,10 +11,9 @@ using namespace std;
 #include "uitypes.h"
 
 ProgDetails::ProgDetails(MythMainWindow *parent,
-                         QString themeFile,
                          QString windowName,
                          QString details)
-    : MythThemedDialog(parent, windowName, themeFile)
+    : MythThemedDialog(parent, windowName)
 {
     m_details = details;
 
@@ -43,12 +42,8 @@ void ProgDetails::keyPressEvent(QKeyEvent *e)
         {
             QString action = actions[i];
             handled = true;
-            if (action == "ESCAPE")
+            if (action == "ESCAPE" || action == "SELECT")
                 done();
-            else if (action == "SELECT")
-            {
-                activateCurrent();
-            }
             else if (action == "UP")
             {
                 if (getCurrentFocusWidget() == m_richText)

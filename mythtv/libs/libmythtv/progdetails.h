@@ -12,7 +12,6 @@ class ProgDetails : public MythThemedDialog
     Q_OBJECT
   public:
       ProgDetails(MythMainWindow *parent, 
-                  QString themeFile,
                   QString windowName,
                   QString details);
       ~ProgDetails();

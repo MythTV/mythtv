@@ -3302,8 +3302,7 @@ void ProgramInfo::showDetails(void) const
     }
 
     ProgDetails *details_dialog = new ProgDetails(gContext->GetMainWindow(),
-                                                  "progdetails-", "progdetails",
-                                                  msg);
+                                                  "progdetails", msg);
     details_dialog->exec();
 
     delete details_dialog;
