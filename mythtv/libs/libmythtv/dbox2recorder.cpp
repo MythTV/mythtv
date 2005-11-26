@@ -527,21 +527,19 @@ int DBox2Recorder::processStream(stream_meta* stream)
 	// Inject PAT every 2000 TS packets.
 	if (pkts_until_pat == 0) 
 	{
-	    BufferedWrite(*(reinterpret_cast<const TSPacket*>(m_patPacket)));
+	    ringBuffer->Write(m_patPacket, 188);
 	    pkts_until_pat = 2000;
 	}
 	else
 	    pkts_until_pat--;
 
-        const void     *data     = stream->buffer + readIndex + tsPos;
-        const TSPacket *tspacket = reinterpret_cast<const TSPacket*>(data);
+	tpkt.InitHeader(stream->buffer+readIndex+tsPos);
+	tpkt.InitPayload(stream->buffer+readIndex+tsPos+4);
+	FindKeyframes(&tpkt);
 
-	_buffer_packets = !FindKeyframes(tspacket);
-
-	BufferedWrite(*tspacket);
-
+	ringBuffer->Write(stream->buffer+readIndex+tsPos, 188);
 	lastpacket = time(NULL);
-	readIndex += tsPos + TSPacket::SIZE;
+	readIndex += tsPos + 188;
     }
 
     memcpy(stream->buffer, stream->buffer + readIndex, bufferSize - readIndex);

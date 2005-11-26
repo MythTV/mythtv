@@ -62,10 +62,12 @@ class HDTVRecorder : public DTVRecorder
 
   private:
     void TeardownAll(void);
+    int ProcessData(unsigned char *buffer, int len);
+    bool ProcessTSPacket(const TSPacket& tspacket);
+    void HandleVideo(const TSPacket* tspacket);
+    void HandleAudio(const TSPacket* tspacket);
 
-    int  ProcessData    (const unsigned char *buffer, uint len);
-    int  ResyncStream   (const unsigned char *buffer, uint pos, uint len);
-    bool ProcessTSPacket(const TSPacket &tspacket);
+    int ResyncStream(unsigned char *buffer, int curr_pos, int len);
 
     static void *boot_ringbuffer(void *);
     void fill_ringbuffer(void);

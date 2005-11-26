@@ -110,9 +110,7 @@ using namespace std;
 #endif
 
 HDTVRecorder::HDTVRecorder(TVRec *rec)
-    : DTVRecorder(rec, "HDTVRecorder"),
-      _atsc_stream_data(NULL),
-      _resync_count(0)
+    : DTVRecorder(rec, "HDTVRecorder"), _atsc_stream_data(0), _resync_count(0)
 {
     _atsc_stream_data = new ATSCStreamData(-1, DEFAULT_SUBCHANNEL);
     connect(_atsc_stream_data, SIGNAL(UpdatePATSingleProgram(
@@ -689,17 +687,15 @@ bool HDTVRecorder::IsPaused(void) const
     return paused;
 }
 
-int HDTVRecorder::ResyncStream(const unsigned char *buffer,
-                               uint curr_pos, uint len)
+int HDTVRecorder::ResyncStream(unsigned char *buffer, int curr_pos, int len)
 {
     // Search for two sync bytes 188 bytes apart, 
-    uint pos = curr_pos;
-    uint nextpos = pos + TSPacket::SIZE;
+    int pos = curr_pos;
+    int nextpos = pos + TSPacket::SIZE;
     if (nextpos >= len)
         return -1; // not enough bytes; caller should try again
     
-    while (buffer[pos] != SYNC_BYTE || buffer[nextpos] != SYNC_BYTE)
-    {
+    while (buffer[pos] != SYNC_BYTE || buffer[nextpos] != SYNC_BYTE) {
         pos++;
         nextpos++;
         if (nextpos == len)
@@ -711,22 +707,81 @@ int HDTVRecorder::ResyncStream(const unsigned char *buffer,
 
 void HDTVRecorder::WritePAT(ProgramAssociationTable *pat)
 {
-    if (!pat)
-        return;
-
     int next = (pat->tsheader()->ContinuityCounter()+1)&0xf;
     pat->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<TSPacket*>(pat->tsheader())));
+    ringBuffer->Write(pat->tsheader()->data(), TSPacket::SIZE);
 }
+
+#if WHACK_A_BUG_VIDEO
+static int WABV_base_pid     = 0x100;
+#define WABV_WAIT 60
+static int WABV_wait_a_while = WABV_WAIT;
+bool WABV_started = false;
+#endif
+
+#if WHACK_A_BUG_AUDIO
+static int WABA_base_pid     = 0x200;
+#define WABA_WAIT 60
+static int WABA_wait_a_while = WABA_WAIT;
+bool WABA_started = false;
+#endif
 
 void HDTVRecorder::WritePMT(ProgramMapTable* pmt)
 {
-    if (!pmt)
-        return;
+    if (pmt) {
+        int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
+        pmt->tsheader()->SetContinuityCounter(next);
 
-    int next = (pmt->tsheader()->ContinuityCounter()+1)&0xf;
-    pmt->tsheader()->SetContinuityCounter(next);
-    BufferedWrite(*(reinterpret_cast<TSPacket*>(pmt->tsheader())));
+#if WHACK_A_BUG_VIDEO
+        WABV_wait_a_while--;
+        if (WABV_wait_a_while<=0) {
+            WABV_started = true;
+            WABV_wait_a_while = WABV_WAIT;
+            WABV_base_pid = (((WABV_base_pid-0x100)+1)%32)+0x100;
+            if (StreamID::MPEG2Video != StreamData()->PMT()->StreamType(0))
+            {
+                VERBOSE(VB_IMPORTANT, "HDTVRecorder::WritePMT(): Error,"
+                        "Whack a Bug can not rewrite PMT, wrong stream type");
+            }
+            else
+            {
+                VERBOSE(VB_IMPORTANT, QString("Whack a Bug: new video pid %1").
+                        arg(WABV_base_pid));
+                // rewrite video pid
+                const uint old_video_pid=StreamData()->PMT()->StreamPID(0);
+                StreamData()->PMT()->SetStreamPID(0, WABV_base_pid);
+                if (StreamData()->PMT()->PCRPID() == old_video_pid)
+                    StreamData()->PMT()->SetPCRPID(WABV_base_pid);
+                StreamData()->PMT()->SetCRC(StreamData()->PMT()->CalcCRC());
+                VERBOSE(VB_IMPORTANT, StreamData()->PMT()->toString());
+            }
+        }
+#endif
+#if WHACK_A_BUG_AUDIO
+        WABA_wait_a_while--;
+        if (WABA_wait_a_while<=0) {
+            WABA_started = true;
+            WABA_wait_a_while = WABA_WAIT;
+            WABA_base_pid = (((WABA_base_pid-0x200)+1)%32)+0x200;
+            VERBOSE(VB_IMPORTANT, QString("Whack a Bug: new audio BASE pid %1").arg(WABA_base_pid));
+            // rewrite audio pids
+            for (uint i=0; i<StreamData()->PMT()->StreamCount(); i++) {
+                if (StreamID::MPEG2Audio == StreamData()->PMT()->StreamType(i) ||
+                    StreamID::MPEG2Audio == StreamData()->PMT()->StreamType(i)) {
+                    const uint old_audio_pid = StreamData()->PMT()->StreamPID(i);
+                    const uint new_audio_pid = WABA_base_pid + old_audio_pid;
+                    StreamData()->PMT()->SetStreamPID(i, new_audio_pid);
+                    if (StreamData()->PMT()->PCRPID() == old_audio_pid)
+                        StreamData()->PMT()->SetPCRPID(new_audio_pid);
+                    StreamData()->PMT()->SetCRC(StreamData()->PMT()->CalcCRC());
+                    VERBOSE(VB_IMPORTANT, StreamData()->PMT()->toString());
+                }
+            }
+        }
+#endif
+
+        ringBuffer->Write(pmt->tsheader()->data(), TSPacket::SIZE);
+    }
 }
 
 /** \fn HDTVRecorder::ProcessMGT(const MasterGuideTable*)
@@ -791,7 +846,37 @@ void HDTVRecorder::ProcessVCT(uint /*tsid*/, const VirtualChannelTable *vct)
     }
 }
 
-bool HDTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
+void HDTVRecorder::HandleVideo(const TSPacket* tspacket)
+{
+    FindKeyframes(tspacket);
+    // decoder needs video, of course (just this PID)
+    // delay until first GOP to avoid decoder crash on res change
+    if (_wait_for_keyframe && !_keyframe_seen)
+        return;
+
+#if WHACK_A_BUG_VIDEO
+    if (WABV_started)
+        ((TSPacket*)(tspacket))->SetPID(WABV_base_pid);
+#endif
+
+    ringBuffer->Write(tspacket->data(), TSPacket::SIZE);
+}
+
+void HDTVRecorder::HandleAudio(const TSPacket* tspacket)
+{
+    // decoder needs audio, of course (just this PID)
+    if (_wait_for_keyframe && !_keyframe_seen)
+        return;
+
+#if WHACK_A_BUG_AUDIO
+    if (WABA_started)
+        ((TSPacket*)(tspacket))->SetPID(WABA_base_pid+tspacket->PID());
+#endif
+
+    ringBuffer->Write(tspacket->data(), TSPacket::SIZE);
+}
+
+bool HDTVRecorder::ProcessTSPacket(const TSPacket& tspacket)
 {
     bool ok = !tspacket.TransportError();
     if (ok && !tspacket.ScramplingControl())
@@ -803,16 +888,13 @@ bool HDTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
             const unsigned int lpid = tspacket.PID();
             // Pass or reject frames based on PID, and parse info from them
             if (lpid == StreamData()->VideoPIDSingleProgram())
-            {
-                _buffer_packets = !FindKeyframes(&tspacket);
-                BufferedWrite(tspacket);
-            }
+                HandleVideo(&tspacket);
             else if (StreamData()->IsAudioPID(lpid))
-                BufferedWrite(tspacket);
+                HandleAudio(&tspacket);
             else if (StreamData()->IsListeningPID(lpid))
                 StreamData()->HandleTSTables(&tspacket);
             else if (StreamData()->IsWritingPID(lpid))
-                BufferedWrite(tspacket);
+                ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
             else if (StreamData()->VersionMGT()>=0)
                 _ts_stats.IncrPIDCount(lpid);
         }
@@ -820,9 +902,9 @@ bool HDTVRecorder::ProcessTSPacket(const TSPacket &tspacket)
     return ok;
 }
 
-int HDTVRecorder::ProcessData(const unsigned char *buffer, uint len)
+int HDTVRecorder::ProcessData(unsigned char *buffer, int len)
 {
-    uint pos = 0;
+    int pos = 0;
 
     while (pos + 187 < len) // while we have a whole packet left
     {
@@ -843,17 +925,13 @@ int HDTVRecorder::ProcessData(const unsigned char *buffer, uint len)
         }
 
         const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[pos]);
-        if (ProcessTSPacket(*pkt))
-        {
+        if (ProcessTSPacket(*pkt)) {
             pos += TSPacket::SIZE; // Advance to next TS packet
             _ts_stats.IncrTSPacketCount();
             if (0 == _ts_stats.TSPacketCount()%1000000)
                 VERBOSE(VB_RECORD, _ts_stats.toString());
-        }
-        else
-        { // Let it resync in case of dropped bytes
-            pos++;
-        }
+        } else // Let it resync in case of dropped bytes
+            buffer[pos] = SYNC_BYTE+1;
     }
 
     return len - pos;

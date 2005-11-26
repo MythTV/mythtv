@@ -24,7 +24,6 @@ using namespace std;
 
 class ProgramAssociationTable;
 class ProgramMapTable;
-class TSPacket;
 
 /** \class DVBRecorder
  *  \brief This is a specialization of DTVRecorder used to
@@ -67,8 +66,7 @@ class DVBRecorder: public DTVRecorder
     void ReadFromDMX(void);
     static void ProcessDataPS(unsigned char *buffer, int len, void *priv);
     void LocalProcessDataPS(unsigned char *buffer, int len);
-    bool ProcessTSPacket(const TSPacket &tspacket);
-    void LocalProcessDataTS(const unsigned char *buffer, uint len);
+    void LocalProcessDataTS(unsigned char *buffer, int len);
 
     void CloseFilters(void);
     void OpenFilter(uint pid, ES_Type type, dmx_pes_type_t pes_type,
@@ -102,7 +100,7 @@ class DVBRecorder: public DTVRecorder
     ProgramAssociationTable *_pat;
     ProgramMapTable         *_pmt;
     uint            _next_pmt_version;
-    int             _ts_packets_until_psip_sync;
+    uint            _ts_packets_until_psip_sync;
     QMap<uint,bool> _payload_start_seen;
     QMap<uint,bool> _videoPID;
 
@@ -129,6 +127,7 @@ class DVBRecorder: public DTVRecorder
 
     // For debugging
     bool data_found; ///< debugging variable used by transform.c
+    bool keyframe_found;
 
     // Constants
     static const int PMT_PID;

@@ -15,33 +15,27 @@ using namespace std;
 // MythTV includes
 #include "firewirerecorder.h"
 #include "mythcontext.h"
+#include "RingBuffer.h"
 #include "tspacket.h"
 #include "tv_rec.h"
 
 // callback function for libiec61883
-int read_tspacket (unsigned char *tspacket, int /*len*/,
-                   uint dropped, void *callback_data)
-{
-    FirewireRecorder *fw = (FirewireRecorder*) callback_data;
+int read_tspacket (unsigned char *tspacket, int len, unsigned int dropped, void *callback_data) {
 
-    if (!fw)
-        return 0;
+     FirewireRecorder *fw = (FirewireRecorder*)callback_data;
+     if (!fw) return 0;
 
-    if (dropped)
-    {
-        VERBOSE(VB_RECORD,
-                QString("Firewire: %1 packet(s) dropped.").arg(dropped));
-    }
+     if (dropped) {
+         VERBOSE(VB_GENERAL,QString("Firewire: %1 packet(s) dropped.").arg(dropped));
+     }
 
-    if (SYNC_BYTE != tspacket[0])
-    {
-        VERBOSE(VB_IMPORTANT, "Firewire: Got out of sync TS Packet");
-        return 1;
-    }
+     if (tspacket[0] == SYNC_BYTE) {
+         fw->ProcessTSPacket(tspacket,len);
+     } else {
+        VERBOSE(VB_GENERAL,QString("Firewire: out of sync mpeg2ts packet"));
+     }
 
-    fw->ProcessTSPacket(*(reinterpret_cast<TSPacket*>(tspacket)));
-
-    return 1;
+     return 1;
 }
 
 void FirewireRecorder::deleteLater(void)
@@ -189,11 +183,12 @@ void FirewireRecorder::StartRecording(void) {
     _recording = false;
 }  
 
-void FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
-{
+void FirewireRecorder::ProcessTSPacket(unsigned char *tspacket, int len) {
+    tpkt.InitHeader(tspacket);
+    tpkt.InitPayload(tspacket+4);
+    FindKeyframes(&tpkt);
     lastpacket = time(NULL);
-    _buffer_packets = !FindKeyframes(&tspacket);
-    BufferedWrite(tspacket);
+    ringBuffer->Write(tspacket,len);
 }
 
 void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,

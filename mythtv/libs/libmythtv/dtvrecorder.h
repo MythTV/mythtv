@@ -9,9 +9,6 @@
 #ifndef DTVRECORDER_H
 #define DTVRECORDER_H
 
-#include <vector>
-using namespace std;
-
 #include "recorderbase.h"
 
 class TSPacket;
@@ -47,11 +44,9 @@ class DTVRecorder: public RecorderBase
     void FinishRecording(void);
     void ResetForNewFile(void);
 
-    bool FindKeyframes(const TSPacket* tspacket);
+    void FindKeyframes(const TSPacket* tspacket);
     void HandleKeyframe();
     void SavePositionMap(bool force);
-
-    void BufferedWrite(const TSPacket &tspacket);
 
     // file handle for stream
     int _stream_fd;
@@ -73,16 +68,15 @@ class DTVRecorder: public RecorderBase
     // state tracking variables
     /// True iff recording is actually being performed
     bool _recording;
+    /// True iff a frame PESStreamID seen outside first TS Packet
+    /// containing a PES Packet
+    bool _streamid_not_in_first_ts_packet;
     /// True iff irrecoverable recording error detected
     bool _error;
 
     // packet buffer
     unsigned char* _buffer;
     int            _buffer_size;
-
-    // keyframe finding buffer
-    bool                  _buffer_packets;
-    vector<unsigned char> _payload_buffer;
 
     // statistics
     long long _frames_seen_count;
