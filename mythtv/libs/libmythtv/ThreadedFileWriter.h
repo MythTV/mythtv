@@ -75,9 +75,6 @@ class ThreadedFileWriter
     static const uint TFW_MAX_WRITE_SIZE;
     /// Minimum to write to disk in a single write, when not flushing buffer.
     static const uint TFW_MIN_WRITE_SIZE;
-    /// Maximum to write to disk in s single write,
-    /// if another thread is already waiting on disk thread.
-    static const uint TFW_BLK_WRITE_SIZE;
 };
 
 #endif
