@@ -2593,7 +2593,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                         xmltv_grabber.ascii(), configfile.ascii(),
                         offset, filename.ascii());
     else if (xmltv_grabber == "tv_grab_fr")
-        command.sprintf("nice %s --days 7 '%s' --output %s",
+        command.sprintf("nice %s --days 7 --config-file '%s' --output %s",
                         xmltv_grabber.ascii(), configfile.ascii(),
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_nl")
