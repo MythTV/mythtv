@@ -313,6 +313,18 @@ static HostCheckBox *UseGroupNameAsAllPrograms()
     return gc;
 }
 
+static HostCheckBox *LiveTVInAllPrograms()
+{
+    HostCheckBox *gc = new HostCheckBox("LiveTVInAllPrograms");
+    gc->setLabel(QObject::tr("Show 'LiveTV' recordings when using "
+                             "\"All Programs\" filter"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("If this setting is disabled, LiveTV "
+                    "recordings will only be visible via the special \"LiveTV\""
+                    "Recording Group."));
+    return gc;
+}
+
 static HostCheckBox *PBBStartInTitle()
 {
     HostCheckBox *gc = new HostCheckBox("PlaybackBoxStartInTitle");
@@ -507,8 +519,9 @@ static GlobalComboBox *AutoExpireMethod()
     bc->addSelection(QObject::tr("Oldest Show First"), "1");
     bc->addSelection(QObject::tr("Lowest Priority First"), "2");
     bc->setHelpText(QObject::tr("Method used to determine which recorded "
-                                "shows to delete first. Set to 'None' to "
-                                "disable Auto Expire (not recommended)."));
+                                "shows to delete first.  LiveTV recordings "
+                                "will always expire before normal "
+                                "recordings."));
     bc->setValue(1);
     return bc;
 }
@@ -523,6 +536,19 @@ static GlobalCheckBox *AutoExpireDefault()
                     "Existing recordings will keep their current value."));
     return bc;
 }
+
+static GlobalSpinBox *AutoExpireLiveTVMaxAge()
+{
+    GlobalSpinBox *bs = new GlobalSpinBox("AutoExpireLiveTVMaxAge", 1, 365, 1);
+    bs->setLabel(QObject::tr("LiveTV recordings Max Age"));
+    bs->setHelpText(QObject::tr(
+                        "AutoExpire will force expiration of LiveTV "
+                        "recordings when they are this many days old.  "
+                        "LiveTV recordings may also be expired early if "
+                        "necessary to free up disk space."));
+    bs->setValue(7);
+    return bs;
+};
 
 #if 0
 static GlobalSpinBox *MinRecordDiskThreshold()
@@ -2996,6 +3022,7 @@ PlaybackSettings::PlaybackSettings()
     pbox2->addChild(QueryInitialFilter());
     pbox2->addChild(RememberRecGroup());
     pbox2->addChild(UseGroupNameAsAllPrograms());
+    pbox2->addChild(LiveTVInAllPrograms());
     pbox2->addChild(DefaultView());
     addChild(pbox2);
 
@@ -3082,7 +3109,19 @@ GeneralSettings::GeneralSettings()
     general->addChild(SmartChannelChange());
     general->addChild(LastFreeCard());
     general->addChild(AutoExpireMethod());
-    general->addChild(AutoExpireDefault());
+
+    HorizontalConfigurationGroup* general_h1 =
+              new HorizontalConfigurationGroup(false, false);
+    VerticalConfigurationGroup* general_h1_v1 =
+              new VerticalConfigurationGroup(false, false);
+    general_h1_v1->addChild(AutoExpireDefault());
+    general_h1->addChild(general_h1_v1);
+
+    VerticalConfigurationGroup* general_h1_v2 =
+              new VerticalConfigurationGroup(false, false);
+    general_h1_v2->addChild(AutoExpireLiveTVMaxAge());
+    general_h1->addChild(general_h1_v2);
+    general->addChild(general_h1);
     addChild(general);
 
     VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);

@@ -247,11 +247,13 @@ void AutoExpire::RunExpirer(void)
 
         // Expire Short LiveTV files for this backend every 2 minutes
         if ((curTime.minute() % 2) == 0)
-            ExpireShortLiveTV();
+            ExpireLiveTV(emShortLiveTVPrograms);
 
         // Expire normal recordings depending on frequency calculated
         if ((curTime.minute() % desired_freq) == 0)
         {
+            ExpireLiveTV(emNormalLiveTVPrograms);
+
             if (is_master_backend)
                 ExpireEpisodesOverMax();
 
@@ -279,12 +281,10 @@ void AutoExpire::Sleep(int sleepTime)
     }
 }
 
-/** \fn AutoExpire::ExpireShortLiveTV()
- *  \brief This expires short LiveTV programs generated because of
- *         channel surfing.
- *        
+/** \fn AutoExpire::ExpireLiveTV(int type)
+ *  \brief This expires LiveTV programs.
  */
-void AutoExpire::ExpireShortLiveTV(void)
+void AutoExpire::ExpireLiveTV(int type)
 {
     long long availFreeKB = 0;
     long long tKB, uKB;
@@ -298,8 +298,9 @@ void AutoExpire::ExpireShortLiveTV(void)
     }
     else
     {
+        VERBOSE(VB_FILE, LOC + QString("ExpireLiveTV(%1)").arg(type));
         ClearExpireList();
-        FillDBOrdered(emShortLiveTVPrograms);
+        FillDBOrdered(type);
         SendDeleteMessages(availFreeKB, 0, true);
     }
 }
@@ -392,6 +393,19 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
 {
     QString msg;
     fsid_t fsid = UniqueFileSystemID(record_file_prefix);
+
+    if (expire_list.size() == 0)
+    {
+        if ((!deleteAll) &&
+            (desiredFreeKB > 0) &&
+            (availFreeKB < desiredFreeKB))
+            VERBOSE(VB_FILE, LOC + "SendDeleteMessages. WARNING: below free "
+                    "disk space threshold, but nothing to expire~");
+        else
+            VERBOSE(VB_FILE, LOC + "SendDeleteMessages. Nothing to expire.");
+
+        return;
+    }
 
     VERBOSE(VB_FILE, LOC + "SendDeleteMessages, cycling through expire list.");
     pginfolist_t::iterator it = expire_list.begin();
@@ -639,8 +653,16 @@ void AutoExpire::FillDBOrdered(int expMethod)
         case emShortLiveTVPrograms:
             where = QString("recgroup = 'LiveTV' AND hostname = '%1' "
                     "AND endtime < DATE_ADD(starttime, INTERVAL '2' MINUTE) "
-                    "AND DATE_ADD(endtime, INTERVAL '1' MINUTE) <= NOW() ")
+                    "AND endtime <= DATE_ADD(NOW(), INTERVAL '-1' MINUTE) ")
                     .arg(gContext->GetHostName());
+            orderby = "starttime ASC";
+            break;
+        case emNormalLiveTVPrograms:
+            int LiveTVMaxAge =
+                    gContext->GetNumSetting("AutoExpireLiveTVMaxAge", 7);
+            where = QString("recgroup = 'LiveTV' AND hostname = '%1' "
+                    "AND endtime <= DATE_ADD(NOW(), INTERVAL '-%2' DAY) ")
+                    .arg(gContext->GetHostName()).arg(LiveTVMaxAge);
             orderby = "starttime ASC";
             break;
     }

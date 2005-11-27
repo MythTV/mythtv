@@ -1382,6 +1382,8 @@ bool PlaybackBox::FillList()
     QRegExp prefixes = tr("^(The |A |An )");
     QString sTitle = "";
 
+    bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
+
     vector<ProgramInfo *> *infoList;
     infoList = RemoteGetRecordedList(listOrder == 0 || type == Delete);
     if (infoList)
@@ -1392,7 +1394,8 @@ bool PlaybackBox::FillList()
         {
             p = *i;
             if ((((p->recgroup == recGroup) ||
-                  (recGroup == "All Programs")) &&
+                  ((recGroup == "All Programs") &&
+                   (p->recgroup != "LiveTV" || LiveTVInAllPrograms))) &&
                  (recGroupPassword == curGroupPassword)) ||
                 ((recGroupType[recGroup] == "category") &&
                  (p->category == recGroup ) &&

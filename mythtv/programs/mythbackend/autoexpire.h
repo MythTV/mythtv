@@ -21,7 +21,8 @@ typedef vector<EncoderLink*> enclinklist_t;
 enum ExpireMethodType {
     emOldestFirst          = 1,
     emLowestPriorityFirst  = 2,
-    emShortLiveTVPrograms  = 10000
+    emShortLiveTVPrograms  = 10000,
+    emNormalLiveTVPrograms = 10001
 };
 
 class AutoExpire : public QObject
@@ -40,7 +41,7 @@ class AutoExpire : public QObject
     static void *ExpirerThread(void *param);
 
   private:
-    void ExpireShortLiveTV(void);
+    void ExpireLiveTV(int type);
     void ExpireRecordings(void);
     void ExpireEpisodesOverMax(void);
 
