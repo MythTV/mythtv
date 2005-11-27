@@ -2994,9 +2994,9 @@ void ProgramInfo::EditScheduled(void)
     record->exec();
 }
 
-#define ADD_PAR(title,text,result)                                             \
-    result += "<p><font color=\"yellow\"</font>" + title + ":  "               \
-           + "<font color=\"white\"</font>" + text + "</p>";
+#define ADD_PAR(title,text,result)                             \
+    result += "<font color=\"yellow\"</font>" + title + ":  "  \
+           + "<font color=\"white\"</font>" + text + "<br>";
 
 /** \fn ProgramInfo::showDetails(void) const
  *  \brief Pops up a DialogBox with program info, blocking until user exits
@@ -3010,20 +3010,20 @@ void ProgramInfo::showDetails(void) const
         fullDateFormat += " yyyy";
     QString category_type, epinum, rating;
     int partnumber = 0, parttotal = 0;
-    int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0;
+    int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0, generic = 0;
 
     if (endts != startts)
     {
         if (filesize > 0)
             query.prepare("SELECT category_type, partnumber,"
                           " parttotal, stereo, subtitled, hdtv,"
-                          " closecaptioned, syndicatedepisodenumber"
+                          " closecaptioned, syndicatedepisodenumber, generic"
                           " FROM recordedprogram WHERE chanid = :CHANID"
                           " AND starttime = :STARTTIME ;");
         else
             query.prepare("SELECT category_type, partnumber,"
                           " parttotal, stereo, subtitled, hdtv,"
-                          " closecaptioned, syndicatedepisodenumber"
+                          " closecaptioned, syndicatedepisodenumber, generic"
                           " FROM program WHERE chanid = :CHANID"
                           " AND starttime = :STARTTIME ;");
 
@@ -3041,6 +3041,7 @@ void ProgramInfo::showDetails(void) const
             hdtv = query.value(5).toInt();
             closecaptioned = query.value(6).toInt();
             epinum = query.value(7).toString();
+            generic = query.value(8).toInt();
         }
 
         if (filesize > 0)
@@ -3088,6 +3089,9 @@ void ProgramInfo::showDetails(void) const
 
     QString attr = "";
 
+    if (generic && category_type == "series")
+        attr += QObject::tr("Unidentified Episode") + ", ";
+
     if (partnumber > 0)
         attr = QString(QObject::tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
 
@@ -3108,7 +3112,6 @@ void ProgramInfo::showDetails(void) const
             attr += QString("%1 %2, ").arg(4.0 * stars).arg(str);
         }
     }
-
     if (hdtv)
         attr += QObject::tr("HDTV") + ", ";
     if (closecaptioned)
@@ -3200,33 +3203,60 @@ void ProgramInfo::showDetails(void) const
                     plist += ", " + pname;
                 else
                 {
-                    // if (rstr != "")
-                    //    msg += QString("%1:  %2\n").arg(rstr).arg(plist);
-                    // Only print actors, guest star and director for now.
-
                     if (rstr == "actor")
                         ADD_PAR(QObject::tr("Actors"), plist, msg)
-                    if (rstr == "guest_star")
-                        ADD_PAR(QObject::tr("Guest Star"), plist, msg)
-                    if (rstr == "director")
+                    else if (rstr == "director")
                         ADD_PAR(QObject::tr("Director"), plist, msg)
+                    else if (rstr == "producer")
+                        ADD_PAR(QObject::tr("Producer"), plist, msg)
+                    else if (rstr == "executive_producer")
+                        ADD_PAR(QObject::tr("Executive Producer"), plist, msg)
+                    else if (rstr == "writer")
+                        ADD_PAR(QObject::tr("Writer"), plist, msg)
+                    else if (rstr == "guest_star")
+                        ADD_PAR(QObject::tr("Guest Star"), plist, msg)
+                    else if (rstr == "host")
+                        ADD_PAR(QObject::tr("Host"), plist, msg)
+                    else if (rstr == "adapter")
+                        ADD_PAR(QObject::tr("Adapter"), plist, msg)
+                    else if (rstr == "presenter")
+                        ADD_PAR(QObject::tr("Presenter"), plist, msg)
+                    else if (rstr == "commentator")
+                        ADD_PAR(QObject::tr("Commentator"), plist, msg)
+                    else if (rstr == "guest")
+                        ADD_PAR(QObject::tr("Guest"), plist, msg)
 
                     rstr = role;
                     plist = pname;
                 }
             }
-            // if (rstr != "")
-            //    msg += QString("%1:  %2\n").arg(rstr).arg(plist);
-
             if (rstr == "actor")
                 ADD_PAR(QObject::tr("Actors"), plist, msg)
-            if (rstr == "guest_star")
-                ADD_PAR(QObject::tr("Guest Star"), plist, msg)
-            if (rstr == "director")
+            else if (rstr == "director")
                 ADD_PAR(QObject::tr("Director"), plist, msg)
+            else if (rstr == "producer")
+                ADD_PAR(QObject::tr("Producer"), plist, msg)
+            else if (rstr == "executive_producer")
+                ADD_PAR(QObject::tr("Executive Producer"), plist, msg)
+            else if (rstr == "writer")
+                ADD_PAR(QObject::tr("Writer"), plist, msg)
+            else if (rstr == "guest_star")
+                ADD_PAR(QObject::tr("Guest Star"), plist, msg)
+            else if (rstr == "host")
+                ADD_PAR(QObject::tr("Host"), plist, msg)
+            else if (rstr == "adapter")
+                ADD_PAR(QObject::tr("Adapter"), plist, msg)
+            else if (rstr == "presenter")
+                ADD_PAR(QObject::tr("Presenter"), plist, msg)
+            else if (rstr == "commentator")
+                ADD_PAR(QObject::tr("Commentator"), plist, msg)
+            else if (rstr == "guest")
+                ADD_PAR(QObject::tr("Guest"), plist, msg)
         }
     }
 
+    // Begin MythTV information not found in the listings info
+    msg += "\n<p>";
     QDateTime statusDate;
     if (recstatus == rsWillRecord)
         statusDate = startts;
