@@ -518,7 +518,7 @@ void MythControls::addKeyToAction(void)
     /* dont bother rebinding the same key */
     if (keys[b] == key) return;
 
-    bool bind = false;
+    bool bind = true;
     int level;
 
     /* get the potential conflict */
