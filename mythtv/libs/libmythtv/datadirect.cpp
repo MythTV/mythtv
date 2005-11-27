@@ -314,7 +314,12 @@ bool DDStructureParser::characters(const QString& pchars)
            QDateTime EDFM = QDateTime::fromString(ExtractDateFromMessage, Qt::ISODate);
            QString ExpirationDate = EDFM.toString(Qt::LocalDate);
            QString ExpirationDateMessage = "Your subscription expires on " + ExpirationDate;
-           cout << ExpirationDateMessage << endl;
+
+           QDateTime curTime = QDateTime::currentDateTime();
+           if (curTime.daysTo(EDFM) <= 5)
+               VERBOSE(VB_ALL, QString("WARNING: ") + ExpirationDateMessage);
+           else
+               VERBOSE(VB_IMPORTANT, ExpirationDateMessage);
 
            MSqlQuery query(MSqlQuery::DDCon());
 
@@ -505,11 +510,16 @@ FILE *DataDirectProcessor::getInputFile(bool plineupsOnly, QDateTime pstartDate,
 
         QString command = QString("wget --http-user='%1' --http-passwd='%2' "
                                   "--post-file='%3' --header='Accept-Encoding:gzip'"
-                                  " %4 --output-document=- | gzip -df")
+                                  " %4 --output-document=- ")
                                  .arg(getUserID())
                                  .arg(getPassword())
                                  .arg(tmpfilename)
                                  .arg(ddurl);
+
+        if ((print_verbose_messages & VB_GENERAL) == 0)
+            command += " 2> /dev/null ";
+
+        command += " | gzip -df";
 
         err_txt = command;
 

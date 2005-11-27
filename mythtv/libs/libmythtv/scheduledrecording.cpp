@@ -499,8 +499,9 @@ void ScheduledRecording::signalChange(int recordid)
         QStringList slist;
         slist << QString("RESCHEDULE_RECORDINGS %1").arg(recordid);
         if (!gContext->SendReceiveStringList(slist))
-            cerr << "error resceduling id " << recordid << 
-                " in ScheduledRecording::signalChange" << endl;
+            VERBOSE(VB_ALL, QString("Error rescheduling id %1 "
+                                    "in ScheduledRecording::signalChange")
+                                    .arg(recordid));
     }
 }
 

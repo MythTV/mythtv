@@ -329,8 +329,8 @@ QString expandURLString(const QString &url)
 
 void UpdateSourceIcons(int sourceid)
 {
-    if (!quiet)
-        cout << QString("Updating icons for sourceid: %1").arg(sourceid) << endl;
+    VERBOSE(VB_GENERAL,
+            QString("Updating icons for sourceid: %1").arg(sourceid));
 
     QString fileprefix = SetupIconCacheDirectory();
 
@@ -357,8 +357,12 @@ void UpdateSourceIcons(int sourceid)
             {
                 QString icon_get_command = QString("wget --timestamping "
                         "--directory-prefix=") + fileprefix + " " + icon_url;
-                if (!quiet)
-                    cout << QString("Attempting to fetch icon with: %1").arg(icon_get_command) << endl;
+
+                if ((print_verbose_messages & VB_GENERAL) == 0)
+                    icon_get_command += " > /dev/null 2> /dev/null";
+                VERBOSE(VB_GENERAL,
+                        QString("Attempting to fetch icon with: %1")
+                                .arg(icon_get_command));
 
                 system(icon_get_command);
             }
@@ -1066,34 +1070,34 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
 
     if (needtoretrieve)
     {
-        if (!quiet)
-            cout << "Retrieving datadirect data... \n";
+        VERBOSE(VB_GENERAL, "Retrieving datadirect data.");
         if (dd_grab_all) 
         {
-            if (!quiet)
-                cout << "Grabbing ALL available data...\n";
+            VERBOSE(VB_GENERAL, "Grabbing ALL available data.");
             if (!ddprocessor.grabAllData())
             {
-                cerr << "Encountered error in grabbing data...\n";
+                VERBOSE(VB_ALL, "Encountered error in grabbing data.");
                 return false;
             }
         }
         else
         {
-            if (!quiet)
-                cout << "Grabbing data for " << pdate.toString() 
-                     << " offset " << poffset << "\n";
             QDateTime fromdatetime = QDateTime(pdate);
             QDateTime todatetime;
             fromdatetime.setTime_t(QDateTime(pdate).toTime_t(),Qt::UTC);
             fromdatetime = fromdatetime.addDays(poffset);
             todatetime = fromdatetime.addDays(1);
-            if (!quiet)
-                cout << "From : " << fromdatetime.toString() 
-                     << " To : " << todatetime.toString() << " (UTC)\n";
+
+            VERBOSE(VB_GENERAL, QString("Grabbing data for %1 offset %2")
+                                          .arg(pdate.toString())
+                                          .arg(poffset));
+            VERBOSE(VB_GENERAL, QString("From %1 to %2 (UTC)")
+                                          .arg(fromdatetime.toString())
+                                          .arg(todatetime.toString()));
+
             if (!ddprocessor.grabData(false, fromdatetime, todatetime))
             {
-                cout << "Encountered error in grabbing data..\n";
+                VERBOSE(VB_ALL, "Encountered error in grabbing data.");
                 return false;
             }
         }
@@ -1103,41 +1107,37 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
     }
     else
     {
-        if (!quiet)
-            cout << "Using existing grabbed data in temp tables..\n";
+        VERBOSE(VB_GENERAL, "Using existing grabbed data in temp tables.");
     }
 
-    if (!quiet)
-        cout << "Grab complete.  Actual data from " 
-             << ddprocessor.getActualListingsFrom().toString() << " "
-             << "to " << ddprocessor.getActualListingsTo().toString() 
-             << " (UTC) \n";
+    VERBOSE(VB_GENERAL,
+            QString("Grab complete.  Actual data from %1 to %2 (UTC)")
+                    .arg(ddprocessor.getActualListingsFrom().toString())
+                    .arg(ddprocessor.getActualListingsTo().toString()));
 
     qdtNow = QDateTime::currentDateTime();
     query.exec(QString("UPDATE settings SET data ='%1' "
                        "WHERE value='mythfilldatabaseLastRunEnd'")
                        .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
 
-    if (!quiet)
-        cout << "Clearing data for source...\n";
+    VERBOSE(VB_GENERAL, "Clearing data for source.");
     QDateTime fromlocaldt = MythUTCToLocal(ddprocessor.getActualListingsFrom());
     QDateTime tolocaldt = MythUTCToLocal(ddprocessor.getActualListingsTo());
 
-    if (!quiet)
-        cout << "Clearing from " << fromlocaldt.toString() 
-             << " to " << tolocaldt.toString() << " (localtime)\n";
-
+    VERBOSE(VB_GENERAL, QString("Clearing from %1 to %2 (localtime)")
+                                  .arg(fromlocaldt.toString())
+                                  .arg(tolocaldt.toString()));
     clearDataBySource(source.id, fromlocaldt,tolocaldt);
-    if (!quiet)
-        cout << "Data for source cleared...\n";
+    VERBOSE(VB_GENERAL, "Data for source cleared.");
 
-    if (!quiet)
-        cout << "Main temp tables populated.  Updating myth channels...\n";
+    VERBOSE(VB_GENERAL, "Main temp tables populated.");
+    VERBOSE(VB_GENERAL, "Updating myth channels.");
     DataDirectStationUpdate(source);
-
-    if (!quiet)
-        cout << "Channels updated..  Updating programs...\n";
+    VERBOSE(VB_GENERAL, "Channels updated.");
+    
+    VERBOSE(VB_GENERAL, "Updating programs.");
     DataDirectProgramUpdate(source);
+    VERBOSE(VB_GENERAL, "Program table update complete.");
 
     return true;
 }
@@ -2563,7 +2563,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
     char tempfilename[] = "/tmp/mythXXXXXX";
     if (mkstemp(tempfilename) == -1)
     {
-        VERBOSE(VB_IMPORTANT,
+        VERBOSE(VB_ALL,
                 QString("Error creating temporary file in /tmp, %1")
                 .arg(strerror(errno)));
         exit(FILLDB_BUGGY_EXIT_ERR_OPEN_TMPFILE);
@@ -2657,7 +2657,7 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                         offset, configfile.ascii(), filename.ascii());
     }
 
-    if (quiet &&
+    if (((print_verbose_messages & VB_GENERAL) == 0) &&
         (xmltv_grabber == "tv_grab_na" ||
          xmltv_grabber == "tv_grab_de_tvtoday" ||
          xmltv_grabber == "tv_grab_fi" ||
@@ -2680,8 +2680,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
 
     command += graboptions;
 
-    if (!quiet)
-         cout << "----------------- Start of XMLTV output -----------------" << endl;
+    VERBOSE(VB_GENERAL,
+            "----------------- Start of XMLTV output -----------------");
 
     QDateTime qdtNow = QDateTime::currentDateTime();
     MSqlQuery query(MSqlQuery::InitCon());
@@ -2719,8 +2719,8 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
             interrupted = true;
     }
  
-    if (!quiet)
-         cout << "------------------ End of XMLTV output ------------------" << endl;
+    VERBOSE(VB_GENERAL,
+            "------------------ End of XMLTV output ------------------");
 
     grabDataFromFile(source.id, filename);
 
@@ -2759,8 +2759,7 @@ void clearOldDBEntries(void)
     if (no_delete)
     {
         offset = 7;
-        if (!quiet)
-            cout << "Keeping 7 days of data." << endl;
+        VERBOSE(VB_GENERAL, "Keeping 7 days of data.");
     }
 
     query.prepare("DELETE FROM oldprogram WHERE airdate < "
@@ -2836,6 +2835,7 @@ bool fillData(QValueList<Source> &sourcelist)
 
     QString status;
     MSqlQuery query(MSqlQuery::InitCon());
+    QString querystr;
     QDateTime GuideDataBefore, GuideDataAfter;
 
     query.exec(QString("SELECT MAX(endtime) FROM program;"));
@@ -2848,9 +2848,12 @@ bool fillData(QValueList<Source> &sourcelist)
                                                     Qt::ISODate);
     }
 
+    QString sidStr = QString("Filling Data for sourceid: %1");
+
     int failures = 0;
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
-        int chancnt = 0;
+        VERBOSE(VB_GENERAL, sidStr.arg((*it).id));
+
         QString xmltv_grabber = (*it).xmltvgrabber;
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_uk_rt" ||
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
@@ -2896,24 +2899,21 @@ bool fillData(QValueList<Source> &sourcelist)
 
             if (refresh_today || refresh_all)
             {
-                if (!quiet)
-                    cout << "Refreshing Today's data" << endl;
+                VERBOSE(VB_IMPORTANT, "Refreshing Today's data");
                 if (!grabData(*it, 0, &qCurrentDate))
                     ++failures;
             }
 
             if (refresh_tomorrow || refresh_all)
             {
-                if (!quiet)
-                    cout << "Refreshing Tomorrow's data" << endl;
+                VERBOSE(VB_IMPORTANT, "Refreshing Tomorrow's data");
                 if (!grabData(*it, 1, &qCurrentDate))
                     ++failures;
             }
 
             if (refresh_second || refresh_all)
             {
-                if (!quiet)
-                    cout << "Refreshing data for 2 days from today" << endl;
+                VERBOSE(VB_IMPORTANT, "Refreshing data for 2 days from today");
                 if (!grabData(*it, 2, &qCurrentDate))
                     ++failures;
             }
@@ -2956,110 +2956,141 @@ bool fillData(QValueList<Source> &sourcelist)
                     qCurrentDate = newDate;
                 }
 
+                QString prevDate(qCurrentDate.addDays(i-1).toString());
+                QString currDate(qCurrentDate.addDays(i).toString());
+
+                VERBOSE(VB_GENERAL,
+                        QString("Checking day @ offset %1, date: ").arg(i) +
+                        currDate);
+
                 // Check to see if we already downloaded data for this date
                 bool download_needed = false;
 
                 if (refresh_all)
                 {
-                    if (!quiet)
-                        cout << "Data Refresh needed because of --refresh-all"
-                             << endl;
+                    VERBOSE(VB_GENERAL,
+                            "Data Refresh needed because of --refresh-all");
                     download_needed = true;
                 }
-
-                QString date(qCurrentDate.addDays(i).toString());
-
-                if (!chancnt)
+                else
                 {
-                    QString qstr = QString("SELECT COUNT(*) FROM channel "
-                                           "WHERE sourceid = %1")
-                                           .arg((*it).id);
-                    MSqlQuery qchan(MSqlQuery::InitCon());
-                    qchan.exec(qstr);
-                    if (qchan.isActive() && qchan.size() > 0) 
+                    int chanCount = 0;         // Channels with data only
+                    int previousDayCount = 0;
+                    int currentDayCount = 0;
+
+                    querystr = "SELECT c.chanid, COUNT(p.starttime) "
+                               "FROM channel c "
+                               "LEFT JOIN program p ON c.chanid = p.chanid "
+                               "  AND starttime >= "
+                                   "DATE_ADD(DATE_ADD(CURRENT_DATE(), "
+                                   "INTERVAL '%1' DAY), INTERVAL '18' HOUR) "
+                               "  AND starttime < DATE_ADD(CURRENT_DATE(), "
+                                   "INTERVAL '%2' DAY) "
+                               "WHERE c.sourceid = %3 "
+                               "GROUP BY c.chanid;";
+  
+                    if (query.exec(querystr.arg(i-1).arg(i).arg((*it).id)) &&
+                        query.isActive()) 
                     {
-                        qchan.next();
-                        chancnt = qchan.value(0).toInt();
+                        VERBOSE(VB_CHANNEL, QString(
+                                "Checking program counts for day %1").arg(i-1));
+
+                        while (query.next())
+                        {
+                            if (query.value(1).toInt() > 0)
+                            {
+                                chanCount++;
+                                previousDayCount += query.value(1).toInt();
+                            }
+                            VERBOSE(VB_CHANNEL,
+                                    QString("    chanid %1 -> %2 programs")
+                                            .arg(query.value(0).toString())
+                                            .arg(query.value(1).toInt()));
+                        }
+
+                        if (query.exec(querystr.arg(i).arg(i+1).arg((*it).id))
+                                && query.isActive()) 
+                        {
+                            VERBOSE(VB_CHANNEL, QString("Checking program "
+                                                "counts for day %1").arg(i));
+                            while (query.next())
+                            {
+                                currentDayCount += query.value(1).toInt();
+                                VERBOSE(VB_CHANNEL,
+                                        QString("    chanid %1 -> %2 programs")
+                                                .arg(query.value(0).toString())
+                                                .arg(query.value(1).toInt()));
+                            }
+                        }
+                        else
+                        {
+                            VERBOSE(VB_GENERAL, QString(
+                                    "Data Refresh because we are unable to "
+                                    "query the data for day %1 to "
+                                    "determine if we have enough").arg(i));
+                            download_needed = true;
+                        }
+
+                        if (currentDayCount == 0)
+                        {
+                            VERBOSE(VB_GENERAL, QString(
+                                    "Data refresh needed because no data "
+                                    "exists for day @ offset %1 from 6PM - "
+                                    "midnight.").arg(i)); 
+                            download_needed = true;
+                        }
+                        else if (previousDayCount == 0)
+                        {
+                            VERBOSE(VB_GENERAL, QString(
+                                    "Data refresh needed because no data "
+                                    "exists for day @ offset %1 from 6PM - "
+                                    "midnight.  Unable to calculate how much "
+                                    "we should have for the current day so "
+                                    "a refresh is being forced.").arg(i-1)); 
+                            download_needed = true;
+                        }
+                        else if (currentDayCount < (chanCount * 4))
+                        {
+                            VERBOSE(VB_GENERAL, QString(
+                                    "Data Refresh needed because offset day %1 "
+                                    "has less than 4 programs "
+                                    "per channel for the 6PM - midnight "
+                                    "time window for channels that "
+                                    "normally have data. "
+                                    "We want at least %2 programs, but only "
+                                    "found %3").arg(i)
+                                    .arg(chanCount * 4).arg(currentDayCount));
+                            download_needed = true;
+                        }
+                        else if (currentDayCount < (previousDayCount / 2))
+                        {
+                            VERBOSE(VB_GENERAL, QString(
+                                    "Data Refresh needed because offset day %1 "
+                                    "has less than half the number of programs "
+                                    "as the previous day for the 6PM - "
+                                    "midnight time window. "
+                                    "We want at least %2 programs, but only "
+                                    "found %3").arg(i)
+                                    .arg(previousDayCount / 2)
+                                    .arg(currentDayCount));
+                            download_needed = true;
+                        }
                     }
                     else
-                        MythContext::DBError("counting channels per source", 
-                                             qchan);
-                }
-                QString querystr;
-
-                querystr.sprintf("SELECT COUNT(*) FROM program "
-                                 "LEFT JOIN channel USING (chanid) "
-                                 "WHERE sourceid = %d "
-                                 "AND starttime >= DATE_ADD(CURRENT_DATE(), "
-                                 "    INTERVAL '%d 18' DAY_HOUR) "
-                                 "AND starttime < DATE_ADD(CURRENT_DATE(), "
-                                 "    INTERVAL '%d' DAY)",
-                                 (*it).id, i, i+1);
-                MSqlQuery query(MSqlQuery::InitCon());
-                query.exec(querystr);
-               
-                if (query.isActive()) 
-                {
-                    // We also need to get this day's data if there's only a 
-                    // suspiciously small amount in the DB.
-                    if (!query.size() ||
-                        (query.next() && query.value(0).toInt() < chancnt * 4))
                     {
-                        if (!quiet)
-                            cout << "Data Refresh needed because there are not "
-                                    "enough programs in the DB for this date "
-                                    "from 6PM - Midnight.\n"
-                                 << QString("You have %1 channels for sourceid "
-                                    "%2 and only %3 programs in this time "
-                                    "period and the cutoff is %4 minimum")
-                                    .arg(chancnt).arg((*it).id)
-                                    .arg(query.value(0).toInt())
-                                    .arg(chancnt * 4)
-                                 << endl;
+                        VERBOSE(VB_GENERAL, QString(
+                                "Data Refresh because we are unable to "
+                                "query the data for day @ offset %1 to "
+                                "determine how much we should have for "
+                                "offset day %2.").arg(i-1).arg(i));
                         download_needed = true;
                     }
                 } 
-                else
-                    MythContext::DBError("checking existing program data", 
-                                         query);
-
-                // Now look for programs marked as "To Be Announced" after noon
-                if (xmltv_grabber == "tv_grab_uk_rt" && 
-                    !download_needed && refresh_tba)
-                {
-                    querystr.sprintf("SELECT COUNT(*) FROM program "
-                                 "LEFT JOIN channel USING (chanid) "
-                                 "WHERE sourceid = %d "
-                                 "AND starttime >= DATE_ADD(CURRENT_DATE(), "
-                                 "    INTERVAL '%d 12' DAY_HOUR) "
-                                 "AND starttime < DATE_ADD(CURRENT_DATE(), "
-                                 "    INTERVAL '%d' DAY) "
-                                 "AND category = 'TBA'",
-                                 (*it).id, i, i+1);
-                    MSqlQuery query(MSqlQuery::InitCon());
-                    query.exec(querystr);
-
-                    if (query.isActive()) 
-                    {
-                        if (query.size() || 
-                            (query.next() && query.value(0).toInt() >= 1)) 
-                        {
-                            if (!quiet)
-                                cout << "Data Refresh needed because there are "
-                                        "TBA category programs from noon to "
-                                        "midnight." << endl;
-                            download_needed = true;
-                        }
-                    } 
-                    else
-                        MythContext::DBError("checking existing program data", 
-                                             query);
-                }
 
                 if (download_needed)
                 {
-                    if (!quiet)
-                        cout << "Fetching data for " << date << endl;
+                    VERBOSE(VB_IMPORTANT,
+                            QString("Refreshing data for ") + currDate);
                     if (!grabData(*it, i, &qCurrentDate))
                     {
                         ++failures;
@@ -3071,17 +3102,19 @@ bool fillData(QValueList<Source> &sourcelist)
                 }
                 else
                 {
-                    if (!quiet)
-                        cout << "Data is already present for " << date
-                             << ", skipping\n";
+                    VERBOSE(VB_IMPORTANT,
+                            QString("Data is already present for ") + currDate +
+                                    ", skipping");
                 }
             }
         }
         else
         {
-            cerr << "Grabbing XMLTV data using " << xmltv_grabber.ascii() 
-                 << " is not verified as working.\n";
+            VERBOSE(VB_IMPORTANT,
+                    QString("Grabbing XMLTV data using ") + xmltv_grabber +
+                            " is not verified as working.");
         }
+
         if (interrupted)
         {
             break;
@@ -3210,7 +3243,8 @@ int fix_end_times(void)
 
     if (!query1.exec(querystr))
     {
-        cerr << "fix_end_times:  " << querystr << " failed!\n";
+        VERBOSE(VB_ALL,
+                QString("fix_end_times query failed: %1").arg(querystr));
         return -1;
     }
 
@@ -3229,7 +3263,8 @@ int fix_end_times(void)
 
         if (!query2.exec(querystr))
         {
-            cerr << "fix_end_times:  " << querystr << " failed!\n";
+            VERBOSE(VB_ALL,
+                    QString("fix_end_times query failed: %1").arg(querystr));
             return -1;
         }
 
@@ -3247,7 +3282,8 @@ int fix_end_times(void)
 
             if (!query2.exec(querystr)) 
             {
-                cerr << "fix_end_times:  " << querystr << " failed!\n";
+                VERBOSE(VB_ALL,
+                       QString("fix_end_times query failed: %1").arg(querystr));
                 return -1;
             }
         }
@@ -3460,6 +3496,7 @@ int main(int argc, char *argv[])
         else if (!strcmp(a.argv()[argpos], "--quiet"))
         {
              quiet = true;
+             print_verbose_messages = VB_NONE;
         }
         else if (!strcmp(a.argv()[argpos], "--mark-repeats"))
         {
@@ -3645,7 +3682,7 @@ int main(int argc, char *argv[])
     gContext = new MythContext(MYTH_BINARY_VERSION);
     if (!gContext->Init(false))
     {
-        VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
+        VERBOSE(VB_ALL, "Failed to init MythContext, exiting.");
         return FILLDB_EXIT_NO_MYTHCONTEXT;
     }
 
@@ -3729,9 +3766,9 @@ int main(int argc, char *argv[])
 
         if (sourceid != -1)
         {
-            if (!quiet)
-                cout << "Running for sourceid " << sourceid << " ONLY because "
-                        "--sourceid was given on command-line\n";
+            VERBOSE(VB_GENERAL,
+                    QString("Running for sourceid %1 ONLY because --sourceid "
+                            "was given on command-line").arg(sourceid));
             where = QString("WHERE sourceid = %1").arg(sourceid);
         }
 
@@ -3761,8 +3798,9 @@ int main(int argc, char *argv[])
              }
              else
              {
-                  cerr << "There are no channel sources defined, did you run "
-                       << "the setup program?\n";
+                  VERBOSE(VB_ALL,
+                          "There are no channel sources defined, did you run "
+                          "the setup program?");
                   gContext->LogEntry("mythfilldatabase", LP_CRITICAL,
                                      "No channel sources defined",
                                      "Could not find any defined channel "
@@ -3779,11 +3817,13 @@ int main(int argc, char *argv[])
     
         if (!fillData(sourcelist))
         {
-             cerr << "Failed to fetch some program info\n";
+             VERBOSE(VB_ALL, "Failed to fetch some program info");
              gContext->LogEntry("mythfilldatabase", LP_WARNING,
                                 "Failed to fetch some program info", "");
              return FILLDB_EXIT_DB_ERROR;
         }
+        else
+            VERBOSE(VB_IMPORTANT, "Data fetching complete.");
     }
 
     if (reset_iconmap)
@@ -3816,13 +3856,13 @@ int main(int argc, char *argv[])
 
     if (grab_data)
     {
-        if (!quiet)
-             cout << "Adjusting program database end times...\n";
+        VERBOSE(VB_GENERAL, "Adjusting program database end times.");
         int update_count = fix_end_times();
         if (update_count == -1)
-             cerr << "fix_end_times failed!\a\n";
+            VERBOSE(VB_ALL, "fix_end_times failed!");
         else if (!quiet)
-             cout << update_count << " replacements made.\n";
+            VERBOSE(VB_GENERAL,
+                    QString("    %1 replacements made").arg(update_count));
 
         gContext->LogEntry("mythfilldatabase", LP_INFO,
                            "Listings Download Finished", "");
@@ -3830,8 +3870,7 @@ int main(int argc, char *argv[])
 
     if (grab_data)
     {
-        if (!quiet)
-            cout << "Marking generic episodes... ";
+        VERBOSE(VB_GENERAL, "Marking generic episodes.");
 
         MSqlQuery query(MSqlQuery::InitCon());
         query.exec("UPDATE program SET generic = 1 WHERE "
@@ -3839,14 +3878,13 @@ int main(int argc, char *argv[])
             " (programid <> '' AND category_type = 'series' AND "
             "  program.programid LIKE '%0000'));");
 
-        if (!quiet)
-            cout << "found " << query.numRowsAffected() << endl;
+        VERBOSE(VB_GENERAL,
+                QString("    Found %1").arg(query.numRowsAffected()));
     }
 
     if (mark_repeats)
     {
-        if (!quiet)
-             cout << "Marking repeats... ";
+        VERBOSE(VB_GENERAL, "Marking repeats.");
        
         int newEpiWindow = gContext->GetNumSetting( "NewEpisodeWindow", 14);
         
@@ -3857,19 +3895,18 @@ int main(int argc, char *argv[])
                     "AND (to_days(starttime) - to_days(originalairdate)) > %1;")
                     .arg(newEpiWindow));
         
-        if (!quiet)
-            cout << "found " << query.numRowsAffected() << endl;
+        VERBOSE(VB_GENERAL,
+                QString("    Found %1").arg(query.numRowsAffected()));
             
-        if (!quiet)
-             cout << "Unmarking new episode rebroadcast repeats... ";
+        VERBOSE(VB_GENERAL, "Unmarking new episode rebroadcast repeats.");
         query.exec( QString( "UPDATE program SET previouslyshown = 0 "
                              "WHERE previouslyshown = 1 "
                              "AND originalairdate is not null "
                              "AND (to_days(starttime) - to_days(originalairdate)) <= %1;")
                              .arg(newEpiWindow));             
     
-        if (!quiet)
-            cout << "found " << query.numRowsAffected() << endl;
+        VERBOSE(VB_GENERAL,
+                QString("    Found %1").arg(query.numRowsAffected()));
     }
 
     if (1) // limit MSqlQuery's lifetime
@@ -3886,15 +3923,19 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (!quiet)
-        cout << "\nAttempting to contact the master backend for rescheduling."
-             << "\nIf the master is not running, rescheduling will happen when"
-             << "\nthe master backend is restarted.\n";
+    VERBOSE(VB_IMPORTANT, "\n"
+            "===============================================================\n"
+            "| Attempting to contact the master backend for rescheduling.  |\n"
+            "| If the master is not running, rescheduling will happen when |\n"
+            "| the master backend is restarted.                            |\n"
+            "===============================================================");
 
     if (grab_data || mark_repeats)
             ScheduledRecording::signalChange(-1);
 
     delete gContext;
+
+    VERBOSE(VB_IMPORTANT, "mythfilldatabase run complete.");
 
     return FILLDB_EXIT_OK;
 }

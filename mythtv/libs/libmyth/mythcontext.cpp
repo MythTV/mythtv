@@ -79,7 +79,7 @@ int parse_verbose_arg(QString arg)
                   "  general    - General messages (not quite so important)\n"
                   "  record     - Recording related messages\n"
                   "  playback   - Playback related messages\n"
-                  "  channel    - Channel changing related messages\n"
+                  "  channel    - Channel related messages\n"
                   "  osd        - On-Screen Display related messages\n"
                   "  file       - File and AutoExpire related messages\n"
                   "  schedule   - Scheduling related messages\n"
