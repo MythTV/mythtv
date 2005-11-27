@@ -2996,7 +2996,7 @@ void ProgramInfo::EditScheduled(void)
 
 #define ADD_PAR(title,text,result)                             \
     result += "<font color=\"yellow\"</font>" + title + ":  "  \
-           + "<font color=\"white\"</font>" + text + "<br>";
+           + "<font color=\"white\"</font> " + text + "<br>";
 
 /** \fn ProgramInfo::showDetails(void) const
  *  \brief Pops up a DialogBox with program info, blocking until user exits
@@ -3008,24 +3008,22 @@ void ProgramInfo::showDetails(void) const
     QString fullDateFormat = gContext->GetSetting("DateFormat", "M/d/yyyy");
     if (fullDateFormat.find(QRegExp("yyyy")) < 0)
         fullDateFormat += " yyyy";
-    QString category_type, epinum, rating;
+    QString category_type, year, epinum, rating;
+    float stars = 0.0;
     int partnumber = 0, parttotal = 0;
     int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0, generic = 0;
 
     if (endts != startts)
     {
+        QString ptable = "program";
         if (filesize > 0)
-            query.prepare("SELECT category_type, partnumber,"
-                          " parttotal, stereo, subtitled, hdtv,"
-                          " closecaptioned, syndicatedepisodenumber, generic"
-                          " FROM recordedprogram WHERE chanid = :CHANID"
-                          " AND starttime = :STARTTIME ;");
-        else
-            query.prepare("SELECT category_type, partnumber,"
-                          " parttotal, stereo, subtitled, hdtv,"
-                          " closecaptioned, syndicatedepisodenumber, generic"
-                          " FROM program WHERE chanid = :CHANID"
-                          " AND starttime = :STARTTIME ;");
+            ptable = "recordedprogram";
+
+        query.prepare(QString("SELECT category_type, airdate, stars, "
+                      " partnumber, parttotal, stereo, subtitled, hdtv,"
+                      " closecaptioned, syndicatedepisodenumber, generic"
+                      " FROM %1 WHERE chanid = :CHANID AND"
+                      " starttime = :STARTTIME ;").arg(ptable));
 
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", startts);
@@ -3034,15 +3032,19 @@ void ProgramInfo::showDetails(void) const
         {
             query.next();
             category_type = query.value(0).toString();
-            partnumber = query.value(1).toInt();
-            parttotal = query.value(2).toInt();
-            stereo = query.value(3).toInt();
-            subtitled = query.value(4).toInt();
-            hdtv = query.value(5).toInt();
-            closecaptioned = query.value(6).toInt();
-            epinum = query.value(7).toString();
-            generic = query.value(8).toInt();
+            year = query.value(1).toString();
+            stars = query.value(2).toDouble();
+            partnumber = query.value(3).toInt();
+            parttotal = query.value(4).toInt();
+            stereo = query.value(5).toInt();
+            subtitled = query.value(6).toInt();
+            hdtv = query.value(7).toInt();
+            closecaptioned = query.value(8).toInt();
+            epinum = query.value(9).toString();
+            generic = query.value(10).toInt();
         }
+        else
+            MythContext::DBError("ProgramInfo::showDetails", query);
 
         if (filesize > 0)
             query.prepare("SELECT rating FROM recordedrating"
@@ -3093,11 +3095,10 @@ void ProgramInfo::showDetails(void) const
         attr += QObject::tr("Unidentified Episode") + ", ";
 
     if (partnumber > 0)
-        attr = QString(QObject::tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
+        attr += QString(QObject::tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
 
     if (rating != "" && rating != "NR")
         attr += rating + ", ";
-
     if (category_type == "movie")
     {
         if (year != "")
