@@ -22,6 +22,7 @@ SOURCES += ../libs/libmythtv/playgroup.cpp
 SOURCES += ../libs/libmythtv/previouslist.cpp
 SOURCES += ../libs/libmythtv/profilegroup.cpp
 SOURCES += ../libs/libmythtv/profilegroup.h
+SOURCES += ../libs/libmythtv/progdetails.cpp
 SOURCES += ../libs/libmythtv/progfind.cpp
 SOURCES += ../libs/libmythtv/proglist.cpp
 SOURCES += ../libs/libmythtv/programinfo.cpp
