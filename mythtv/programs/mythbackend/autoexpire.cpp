@@ -420,7 +420,7 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
             msg = QString("Expiring: %1 %2 %3 MBytes")
                 .arg((*it)->title).arg((*it)->startts.toString())
                 .arg((int)((*it)->filesize/1024/1024));
-            VERBOSE(VB_IMPORTANT, QString("    ") +  msg);
+            VERBOSE(VB_FILE, QString("    ") +  msg);
             gContext->LogEntry("autoexpire", LP_NOTICE,
                                "Expiring Program", msg);                
 
@@ -434,6 +434,12 @@ void AutoExpire::SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
                     QString("    After unlink we will have %1 MB free.")
                     .arg(availFreeKB/1024));
 
+        }
+        else
+        {
+            VERBOSE(VB_FILE, QString("    CheckFile failed for %1 @ %2, "
+                             "unable to expire.")
+                             .arg((*it)->chanid).arg((*it)->startts.toString()));
         }
         ++it; // move on to next program
     }
