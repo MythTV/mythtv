@@ -22,6 +22,7 @@ The following is a list of some of the prerequisites you will need installed:
    QT - Version 3.1 or greater is strongly recommended.  You need it 
         compiled threadsafe and with the MySQL bindings.  I'm using 
         version 3.1.1.  http://www.trolltech.com
+        NOTE: MythTV is not compatible with QT v4.0 or above.
 
    MySQL - You need this setup and working.  A recent version, I think, would
            be best.  I don't know, though, I'm utterly new to it.  Get it from
