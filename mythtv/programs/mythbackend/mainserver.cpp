@@ -2992,6 +2992,9 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
 
     QString message = slist[1];
 
+    if (message == "CLEAR_SETTINGS_CACHE")
+        gContext->ClearSettingsCache();
+
     MythEvent me(message);
     gContext->dispatch(me);
 
