@@ -2448,6 +2448,9 @@ void PlaybackBox::showRecordingPopup()
     QButton *editButton = popup->addButton(tr("Edit Recording Schedule"), this,
                      SLOT(doEditScheduled()));
 
+    popup->addButton(tr("Show Program Details"), this,
+                     SLOT(showProgramDetails()));
+
     popup->addButton(tr("Change Recording Group"), this,
                      SLOT(showRecGroupChanger()));
 
@@ -2770,6 +2773,19 @@ void PlaybackBox::doStop(void)
 
     timer->start(500);
 }
+
+void PlaybackBox::showProgramDetails()
+{
+    if (!expectingPopup)
+        return;
+
+    cancelPopup();
+
+    if (!curitem)
+        return;
+
+    curitem->showDetails();
+} 
 
 void PlaybackBox::doEditScheduled()
 {

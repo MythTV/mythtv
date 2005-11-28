@@ -70,6 +70,7 @@ class PlaybackBox : public MythDialog
     void showStoragePopup();
     void showPlaylistPopup();
     void showPlaylistJobPopup();
+    void showProgramDetails();
 
     void doPlay();
     void doPlayFromBeg();
