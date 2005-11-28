@@ -585,8 +585,9 @@ elsif ( $OPT{'svnrev'} )
 
   push @svnrevision, $OPT{'svnrev'};
 }
-else  # Lookup and use the HEAD revision.
+elsif ( ! $OPT{'nohead'} )
 {
+  # Lookup and use the HEAD revision so we are guaranteed consistent source
   my $rev = `$svn log $svnrepository --revision HEAD --xml | grep revision`;
   $rev =~ s/[^[:digit:]]//gs;
 
@@ -658,7 +659,7 @@ foreach my $comp (@comps)
     if ( ! $backend )
     {
       # Nigel's hack to speedup building
-      &Syscall('echo # Nigelz speedup hack  >> programs/programs.pro');
+      &Syscall('echo "# Nigel\'s speedup hack:" >> programs/programs.pro');
       &Syscall('echo SUBDIRS = mythfrontend >> programs/programs.pro');
     }
   }
