@@ -878,10 +878,11 @@ void MMusicWatcher::checkDatabaseAgainstMaster(const QString &startdir)
     {
         if(!it.data().checkedDatabase())
         {
-            AudioMetadata *new_item = loadFromDatabase(it.key(), startdir);
+            QString full_file_name = it.key();
+            AudioMetadata *new_item = loadFromDatabase(full_file_name, startdir);
             if(!new_item)
             {
-                new_item = checkNewFile(it.key(), startdir);
+                new_item = checkNewFile(full_file_name, startdir);
             }
             
             if(new_item)
