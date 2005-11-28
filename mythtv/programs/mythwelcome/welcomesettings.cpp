@@ -59,6 +59,17 @@ static HostCheckBox *AutoStartFrontend()
     return gc;
 };
 
+static HostCheckBox *ShutdownWithBE()
+{
+    HostCheckBox *gc = new HostCheckBox("ShutdownWithMasterBE");
+    gc->setLabel(QObject::tr("Shutdown with Master Backend"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Mythwelcome will automatically shutdown "
+                    "this computer when the master backend shuts down. "
+                    "Should only be set on frontend only machines"));
+    return gc;
+};
+
 MythWelcomeSettings::MythWelcomeSettings()
 {
     HorizontalConfigurationGroup* hcg1 =
@@ -67,21 +78,27 @@ MythWelcomeSettings::MythWelcomeSettings()
               new HorizontalConfigurationGroup(true, true);
     VerticalConfigurationGroup* vcg = 
               new VerticalConfigurationGroup(false);
-    
+
     vcg->setLabel(QObject::tr("MythWelcome Settings"));
-    
+
     hcg1->setLabel(QObject::tr("Daily Wakeup/ShutDown Period") + " 1");
     hcg1->addChild(DailyWakeupStart1());
     hcg1->addChild(DailyWakeupEnd1());
     vcg->addChild(hcg1);
-    
+
     hcg2->setLabel(QObject::tr("Daily Wakeup/ShutDown Period") + " 2");
     hcg2->addChild(DailyWakeupStart2());
     hcg2->addChild(DailyWakeupEnd2());
     vcg->addChild(hcg2);
 
     vcg->addChild(AutoStartFrontend());
-    
+
+    // this setting only makes sense on frontend only machines
+    if (gContext->IsFrontendOnly())
+    {
+        vcg->addChild(ShutdownWithBE());
+    }
+
     addChild(vcg);
 }
 

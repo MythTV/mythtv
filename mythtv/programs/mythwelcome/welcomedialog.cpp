@@ -128,6 +128,22 @@ void WelcomeDialog::customEvent(QCustomEvent *e)
             updateStatusMessage();
             updateScreen();
         }
+        else if (me->Message().left(12) == "SHUTDOWN_NOW")
+        {
+            VERBOSE(VB_GENERAL, "MythWelcome received a SHUTDOWN_NOW event");
+            if (gContext->IsFrontendOnly())
+            {
+                // does the user want to shutdown this frontend only machine
+                // when the BE shuts down?
+                if (gContext->GetNumSetting("ShutdownWithMasterBE", 0) == 1)
+                {
+                     VERBOSE(VB_GENERAL, "MythWelcome is shutting this computer down now");
+                     QString poweroff_cmd = gContext->GetSetting("MythShutdownPowerOff", "");
+                     if (poweroff_cmd != "")
+                         system(poweroff_cmd.ascii());
+                }
+            }
+        }
     }
 }
 
