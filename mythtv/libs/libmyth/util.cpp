@@ -134,7 +134,7 @@ bool WriteStringList(QSocketDevice *socket, QStringList &list)
         QString msg = QString("write -> %1 %2")
             .arg(socket->socket(), 2).arg(payload);
 
-        if (msg.length() > 88)
+        if ((print_verbose_messages != VB_ALL) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
@@ -309,7 +309,7 @@ bool ReadStringList(QSocketDevice *socket, QStringList &list, bool quickTimeout)
         QString msg = QString("read  <- %1 %2").arg(socket->socket(), 2)
                                                .arg(payload);
 
-        if (msg.length() > 88)
+        if ((print_verbose_messages != VB_ALL) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
@@ -421,7 +421,7 @@ bool WriteStringList(QSocket *socket, QStringList &list)
         QString msg = QString("write -> %1 %2")
             .arg(socket->socket(), 2).arg(payload);
 
-        if (msg.length() > 88)
+        if ((print_verbose_messages != VB_ALL) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
@@ -573,7 +573,7 @@ bool ReadStringList(QSocket *socket, QStringList &list)
         QString msg = QString("read  <- %1 %2")
             .arg(socket->socket(), 2).arg(payload);
 
-        if (msg.length() > 88)
+        if ((print_verbose_messages != VB_ALL) && msg.length() > 88)
         {
             msg.truncate(85);
             msg += "...";
