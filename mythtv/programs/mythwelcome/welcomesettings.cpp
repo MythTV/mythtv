@@ -150,6 +150,15 @@ static HostLineEdit *MythShutdownPowerOff()
     return gc;
 };
 
+static HostLineEdit *MythShutdownStartFECmd()
+{
+    HostLineEdit *gc = new HostLineEdit("MythWelcomeStartFECmd");
+    gc->setLabel(QObject::tr("Command to run to start the Frontend"));
+    gc->setValue(gContext->GetInstallPrefix() + "/bin/mythfrontend");
+    gc->setHelpText(QObject::tr("Command to start mythfrontend.")); 
+    return gc;
+};
+
 static HostLineEdit *MythShutdownXTermCmd()
 {
     HostLineEdit *gc = new HostLineEdit("MythShutdownXTermCmd");
@@ -160,17 +169,19 @@ static HostLineEdit *MythShutdownXTermCmd()
     return gc;
 };
 
+
 MythShutdownSettings::MythShutdownSettings()
 {
     VerticalConfigurationGroup* vcg = 
               new VerticalConfigurationGroup(false);
     
-    vcg->setLabel(QObject::tr("MythShutdown Script Settings"));
+    vcg->setLabel(QObject::tr("MythShutdown/MythWelcome Settings"));
     vcg->addChild(MythShutdownNvramCmd());
     vcg->addChild(MythShutdownNvramRestartCmd());
     vcg->addChild(MythShutdownReboot());
     vcg->addChild(MythShutdownPowerOff());
     vcg->addChild(MythShutdownXTermCmd());
-    
+    vcg->addChild(MythShutdownStartFECmd());
+
     addChild(vcg);
 }

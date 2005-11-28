@@ -69,9 +69,12 @@ WelcomeDialog::WelcomeDialog(MythMainWindow *parent,
 void WelcomeDialog::startFrontend(void)
 {
     gContext->removeListener(this);
-    
-    myth_system(m_installDir + "/bin/mythfrontend");
-    
+
+    QString startFECmd = gContext->GetSetting("MythWelcomeStartFECmd", 
+                         m_installDir + "/bin/mythfrontend");
+
+    myth_system(startFECmd.ascii());
+
     gContext->addListener(this);
 }
 
