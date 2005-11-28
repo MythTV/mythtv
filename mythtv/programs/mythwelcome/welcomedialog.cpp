@@ -9,6 +9,7 @@
 #include "tv.h"
 #include "programinfo.h"
 #include "uitypes.h"
+#include "remoteutil.h"
 
 #include "welcomedialog.h"
 #include "welcomesettings.h"
@@ -181,12 +182,14 @@ void WelcomeDialog::keyPressEvent(QKeyEvent *e)
         else if (action == "INFO")
         {
             MythWelcomeSettings settings;
-            settings.exec();
+            if (settings.exec() == 1)
+                RemoteSendMessage("CLEAR_SETTINGS_CACHE");
         }
         else if (action == "SHOWSETTINGS")
         {
             MythShutdownSettings settings;
-            settings.exec();
+            if (settings.exec() == 1)
+                RemoteSendMessage("CLEAR_SETTINGS_CACHE");
         }
         else if (action == "0")
         {
