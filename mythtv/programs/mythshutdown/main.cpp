@@ -12,21 +12,75 @@ using namespace std;
 #include <mythcontext.h>
 #include <mythdbcon.h>
 
+void setGlobalSetting(const QString &key, const QString &value)
+{
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
+    {
+        query.prepare("DELETE FROM settings WHERE value = :KEY;");
+        query.bindValue(":KEY", key);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("Clear setting", query);
+
+        query.prepare("INSERT INTO settings ( value, data ) "
+                "VALUES ( :VALUE, :DATA );");
+        query.bindValue(":VALUE", key);
+        query.bindValue(":DATA", value);
+
+        if (!query.exec() || !query.isActive())
+            MythContext::DBError("Save new global setting", query);
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("Database not open while trying to save setting: %1")
+                        .arg(key));
+    }
+}
+
+QString getGlobalSetting(const QString &key, const QString &defaultval)
+{
+    QString value = defaultval;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    if (query.isConnected())
+    {
+        query.prepare("SELECT data FROM settings WHERE value = :KEY AND "
+                      "hostname IS NULL;");
+        query.bindValue(":KEY", key);
+        query.exec();
+        if (query.isActive() && query.size() > 0)
+        {
+            query.next();
+            value = QString::fromUtf8(query.value(0).toString());
+        }
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, 
+                QString("Database not open while trying to load setting: %1")
+                        .arg(key));
+    }
+
+    return value;
+}
+
 int lockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --lock");
-    
-    gContext->SaveSettingOnHost("MythShutdownLock", "1", "");
-    
-    return 0;         
+
+    setGlobalSetting("MythShutdownLock", "1");
+
+    return 0;
 }
 
 int unlockShutdown()
 {
     VERBOSE(VB_GENERAL, "Mythshutdown: --unlock");
-    
-    gContext->SaveSettingOnHost("MythShutdownLock", "0", "");
-    
+
+    setGlobalSetting("MythShutdownLock", "0");
+
     return 0;
 }
 
@@ -42,10 +96,10 @@ bool isRunning(QString program)
 
 QDateTime getDailyWakeupTime(QString sPeriod)
 {
-    QString sTime = gContext->GetSetting(sPeriod, "00:00");
+    QString sTime = getGlobalSetting(sPeriod, "00:00");
     QTime tTime = QTime::fromString(sTime);
     QDateTime dtDateTime = QDateTime(QDate::currentDate(), tTime);
-    
+
     return dtDateTime;
 }
 
@@ -73,7 +127,7 @@ int getStatus()
         res += 4;
     }    
 
-    if (gContext->GetSettingOnHost("MythShutdownLock", "", "0") == "1")
+    if (getGlobalSetting("MythShutdownLock", "0") == "1")
     {    
         VERBOSE(VB_IMPORTANT, "Shutdown is locked");
         res += 16;
@@ -173,9 +227,9 @@ int setWakeupTime(QString sWakeupTime)
                                       .arg(sWakeupTime));
         return 1;
     }
-    
-    gContext->SaveSetting("MythShutdownNextScheduled", dtWakeupTime.toString(Qt::ISODate));
-    
+
+    setGlobalSetting("MythShutdownNextScheduled", dtWakeupTime.toString(Qt::ISODate));
+
     return 0;
 }
 
@@ -237,7 +291,7 @@ int shutdown()
 
     // get next scheduled wake up for a recording if any
     QDateTime dtNextRecordingStart = QDateTime();
-    QString s = gContext->GetSetting("MythShutdownNextScheduled", "");
+    QString s = getGlobalSetting("MythShutdownNextScheduled", "");
     if (s != "")    
         dtNextRecordingStart = QDateTime::fromString(s, Qt::ISODate);
     
@@ -258,7 +312,7 @@ int shutdown()
                                   "schedule deleted"); 
         
             dtNextRecordingStart = QDateTime();
-            gContext->SaveSetting("MythShutdownNextScheduled", "");
+            setGlobalSetting("MythShutdownNextScheduled", "");
         }    
     }
      
@@ -310,7 +364,7 @@ int shutdown()
     }
     
     // save the next wakuptime in the db
-    gContext->SaveSetting("MythShutdownWakeupTime", dtWakeupTime.toString(Qt::ISODate));
+    setGlobalSetting("MythShutdownWakeupTime", dtWakeupTime.toString(Qt::ISODate));
     
     // stop here to debug  
     //return 0;
@@ -399,7 +453,7 @@ int startup()
     
     int res = 0;
     QDateTime startupTime = QDateTime();
-    QString s = gContext->GetSetting("MythshutdownWakeupTime", "");
+    QString s = getGlobalSetting("MythshutdownWakeupTime", "");
     if (s != "")
         startupTime = QDateTime::fromString(s, Qt::ISODate);
     

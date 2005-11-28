@@ -869,5 +869,26 @@ class GlobalImageSelect: public ImageSelectSetting, public GlobalSetting {
         GlobalSetting(name) { }
 };
 
+class GlobalTimeBox: public ComboBoxSetting, public GlobalSetting {
+  public:
+    GlobalTimeBox(const QString &name, const QString &defaultTime = "00:00",
+                  const int interval = 1) :
+        ComboBoxSetting(false, 30 / interval),
+        GlobalSetting(name)
+    {
+        int hour;
+        int minute;
+        QString timeStr;
+
+        for (hour = 0; hour < 24; hour++)
+        {
+            for (minute = 0; minute < 60; minute += interval)
+            {
+                timeStr = timeStr.sprintf("%02d:%02d", hour, minute);
+                addSelection(timeStr, timeStr, timeStr == defaultTime);
+            }
+        }
+    }
+};
 
 #endif

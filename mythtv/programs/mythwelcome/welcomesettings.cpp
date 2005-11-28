@@ -8,42 +8,46 @@
 //  daily wakeup/shutdown settings
 ///////////////////////////////////////////////////////////////////
 
-static HostTimeBox *DailyWakeupStart1()
+static GlobalTimeBox *DailyWakeupStart1()
 {
-    HostTimeBox *gc = new HostTimeBox("DailyWakeupStartPeriod1", "07:00");
+    GlobalTimeBox *gc = new GlobalTimeBox("DailyWakeupStartPeriod1", "00:00");
     gc->setLabel(QObject::tr("Period") + " 1 " +  QObject::tr("start time"));
     gc->setHelpText(QObject::tr("Period") + " 1 " + QObject::tr("start time") +
-                    ". " + QObject::tr("Set both Start & End times to 00:00 "
+            ". " + QObject::tr("Defines a period the master backend should be awake") +
+            ". " + QObject::tr("Set both Start & End times to 00:00 "
                                        "to disable."));
     return gc;
 };
 
-static HostTimeBox *DailyWakeupEnd1()
+static GlobalTimeBox *DailyWakeupEnd1()
 {
-    HostTimeBox *gc = new HostTimeBox("DailyWakeupEndPeriod1", "07:30");
+    GlobalTimeBox *gc = new GlobalTimeBox("DailyWakeupEndPeriod1", "00:00");
     gc->setLabel(QObject::tr("Period") + " 1 " +  QObject::tr("end time"));
     gc->setHelpText(QObject::tr("Period") + " 1 " + QObject::tr("end time") +
-                    ". " + QObject::tr("Set both Start & End times to 00:00 "
+            ". " + QObject::tr("Defines a period the master backend should be awake") +
+            ". " + QObject::tr("Set both Start & End times to 00:00 "
                                        "to disable."));
     return gc;
 };
 
-static HostTimeBox *DailyWakeupStart2()
+static GlobalTimeBox *DailyWakeupStart2()
 {
-    HostTimeBox *gc = new HostTimeBox("DailyWakeupStartPeriod2", "17:00");
+    GlobalTimeBox *gc = new GlobalTimeBox("DailyWakeupStartPeriod2", "00:00");
     gc->setLabel(QObject::tr("Period") + " 2 " +  QObject::tr("start time"));
     gc->setHelpText(QObject::tr("Period") + " 2 " + QObject::tr("start time") +
-                    ". " + QObject::tr("Set both Start & End times to 00:00 "
+            ". " + QObject::tr("Defines a period the master backend should be awake") +
+            ". " + QObject::tr("Set both Start & End times to 00:00 "
                                        "to disable."));
     return gc;
 };
 
-static HostTimeBox *DailyWakeupEnd2()
+static GlobalTimeBox *DailyWakeupEnd2()
 {
-    HostTimeBox *gc = new HostTimeBox("DailyWakeupEndPeriod2", "18:00");
+    GlobalTimeBox *gc = new GlobalTimeBox("DailyWakeupEndPeriod2", "00:00");
     gc->setLabel(QObject::tr("Period") + " 2 " +  QObject::tr("end time"));
     gc->setHelpText(QObject::tr("Period") + " 2 " + QObject::tr("end time") +
-                    ". " + QObject::tr("Set both Start & End times to 00:00 "
+            ". " + QObject::tr("Defines a period the master backend should be awake") +
+            ". " + QObject::tr("Set both Start & End times to 00:00 "
                                        "to disable."));
     return gc;
 };
