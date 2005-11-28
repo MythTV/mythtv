@@ -2995,9 +2995,9 @@ void ProgramInfo::EditScheduled(void)
     record->exec();
 }
 
-#define ADD_PAR(title,text,result)                             \
-    result += "<font color=\"yellow\"</font>" + title + ":  "  \
-           + "<font color=\"white\"</font> " + text + "<br>";
+#define ADD_PAR(title,text,result)                                    \
+    result += details_dialog->themeText("heading", title + ":  ", 3)  \
+           +  details_dialog->themeText("body", text, 3) + "<br>";
 
 /** \fn ProgramInfo::showDetails(void) const
  *  \brief Pops up a DialogBox with program info, blocking until user exits
@@ -3083,6 +3083,9 @@ void ProgramInfo::showDetails(void) const
         else if (prefix == "SH")
            category_type = "tvshow";
     }
+
+    ProgDetails *details_dialog = new ProgDetails(gContext->GetMainWindow(),
+            "progdetails");
 
     QString msg = "";
     QString s   = "";
@@ -3351,8 +3354,7 @@ void ProgramInfo::showDetails(void) const
         ADD_PAR(QObject::tr("Playback Group"), playgroup, msg)
     }
 
-    ProgDetails *details_dialog = new ProgDetails(gContext->GetMainWindow(),
-                                                  "progdetails", msg);
+    details_dialog->setDetails(msg);
     details_dialog->exec();
 
     delete details_dialog;

@@ -1061,6 +1061,24 @@ bool MythContext::IsBackend(void)
     return d->m_backend;
 }
 
+bool MythContext::IsFrontendOnly(void)
+{
+    // find out if a backend runs on this host...
+    bool backendOnLocalhost = false;
+
+    QStringList strlist = "QUERY_IS_ACTIVE_BACKEND";
+    strlist << GetHostName();
+
+    SendReceiveStringList(strlist);
+
+    if (QString(strlist[0]) == "FALSE")
+        backendOnLocalhost = false;
+    else 
+        backendOnLocalhost = true;
+
+    return !backendOnLocalhost;
+}
+
 QString MythContext::GetMasterHostPrefix(void)
 {
     QString ret = "";

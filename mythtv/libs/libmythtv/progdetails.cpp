@@ -27,6 +27,58 @@ ProgDetails::ProgDetails(MythMainWindow *parent,
     }
 }
 
+void ProgDetails::setDetails(const QString &details)
+{
+    m_details = details;
+
+    if (m_richText)
+    {
+        m_richText->SetText(m_details);
+        m_richText->SetBackground(&my_background);
+    }
+}
+
+QString ProgDetails::themeText(const QString &fontName, const QString &text, int size)
+{
+    if (size < 1) size = 1;
+    if (size > 7) size = 7;
+
+    XMLParse *theme = getTheme();
+    if (!theme)
+        return text;
+
+    fontProp *font = getFont(fontName);
+
+    if (!font)
+        return text;
+
+    QString res = QString("<font color=\"%1\" face=\"%2\" size=\"%3\"</font>")
+            .arg(font->color.name())
+            .arg(font->face.family())
+            .arg(size);
+
+    bool bItalic = font->face.italic();
+    bool bBold = font->face.bold();
+    bool bUnderline = font->face.underline();
+
+    if (bItalic)
+        res += "<i>";
+    if (bBold)
+        res += "<b>";
+    if (bUnderline)
+        res += "<u>";
+
+    res += text;
+
+    if (bItalic)
+        res += "</i>";
+    if (bBold)
+        res += "</b>";
+    if (bUnderline)
+        res += "</u>";
+
+    return res;
+}
 
 ProgDetails::~ProgDetails(void)
 {

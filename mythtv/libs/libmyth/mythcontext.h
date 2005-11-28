@@ -211,7 +211,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20051122-1"
+#define MYTH_BINARY_VERSION "0.19.20051128-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -254,6 +254,7 @@ class MythContext : public QObject
     bool IsConnectedToMaster(void);
     void SetBackend(bool backend);
     bool IsBackend(void);
+    bool IsFrontendOnly(void);
 
     void BlockShutdown(void);
     void AllowShutdown(void);

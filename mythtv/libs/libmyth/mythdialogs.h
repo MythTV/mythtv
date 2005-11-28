@@ -42,6 +42,7 @@ class MythMediaDevice;
 class MythLineEdit;
 class MythRemoteLineEdit;
 class MythListBox; 
+struct fontProp;
 
 const int kExternalKeycodeEventType = 33213;
 const int kExitToMainMenuEventType = 33214;
@@ -370,7 +371,8 @@ class MythThemedDialog : public MythDialog
     UIKeyboardType *getUIKeyboardType(const QString &name);
 
     LayerSet* getContainer(const QString &name);
-
+    fontProp* getFont(const QString &name);
+    
     void setContext(int a_context) { context = a_context; }
     int  getContext(){return context;}
 

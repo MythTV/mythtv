@@ -1311,7 +1311,15 @@
 
   <window name="progdetails">
 
-    <container name="main_display">
+      <font name="heading" base="small-info">
+          <color>#ffff00</color>
+      </font>
+
+      <font name="body" base="small-info">
+          <color>#ffffff</color>
+      </font>
+
+      <container name="main_display">
       <area>0,0,800,600</area>
       <textarea name="title" draworder="0">
         <area>40,30,720,40</area>

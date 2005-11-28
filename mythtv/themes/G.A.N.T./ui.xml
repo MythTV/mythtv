@@ -1921,8 +1921,15 @@
       <color>#ffffff</color>
       <size>14</size>
       <size:small>10</size:small>
-      <shadow>1,1</shadow>
       <bold>yes</bold>
+    </font>
+
+    <font name="heading" base="info">
+        <color>#ffff00</color>
+    </font>
+
+    <font name="body" base="info">
+        <color>#ffffff</color>
     </font>
 
     <font name="buttons" face="Arial">

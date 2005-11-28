@@ -13,8 +13,11 @@ class ProgDetails : public MythThemedDialog
   public:
       ProgDetails(MythMainWindow *parent, 
                   QString windowName,
-                  QString details);
+                  QString details = "");
       ~ProgDetails();
+
+      QString themeText(const QString &fontName, const QString &text, int size);
+      void setDetails(const QString &details);
 
   protected slots:
     virtual void keyPressEvent(QKeyEvent *e);

@@ -2570,6 +2570,14 @@ LayerSet* MythThemedDialog::getContainer(const QString& name)
     return NULL;
 }
 
+fontProp* MythThemedDialog::getFont(const QString &name)
+{
+    fontProp* font = NULL;
+    if (theme)
+        font = theme->GetFont(name, true);
+
+    return font;
+}
 
 /*
 ---------------------------------------------------------------------
