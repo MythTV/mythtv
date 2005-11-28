@@ -210,7 +210,7 @@ class VideoOutput
     /// \brief Sets whether to use a normal number of buffers or fewer buffers.
     void SetPrebuffering(bool normal) { vbuffers.SetPrebuffering(normal); }
     /// \brief Tells video output to toss decoded buffers due to a seek
-    void ClearAfterSeek(void) { vbuffers.ClearAfterSeek(); }
+    virtual void ClearAfterSeek(void) { vbuffers.ClearAfterSeek(); }
     /// \brief Blocks until a frame is available for decoding onto.
     bool WaitForAvailable(uint w) { return vbuffers.WaitForAvailable(w); }
 
