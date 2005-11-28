@@ -497,6 +497,7 @@ class NuppelVideoPlayer
     int        lastCommSkipDirection;
     time_t     lastCommSkipTime;
     long long  lastCommSkipStart;
+    time_t     lastSkipTime;
 
     long long  deleteframe;
     bool       hasdeletetable;

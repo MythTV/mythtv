@@ -131,6 +131,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       commercialskipmethod(0),      commrewindamount(0),
       commnotifyamount(0),          lastCommSkipDirection(0),
       lastCommSkipTime(0/*1970*/),  lastCommSkipStart(0),
+      lastSkipTime(0 /*1970*/),
       deleteframe(0),
       hasdeletetable(false),        hasblanktable(false),
       hascommbreaktable(false),
@@ -2786,6 +2787,7 @@ bool NuppelVideoPlayer::DoRewind(void)
     GetDecoder()->setExactSeeks(exactseeks);
 
     ClearAfterSeek();
+    lastSkipTime = time(NULL);
     return true;
 }
 
@@ -2896,6 +2898,7 @@ bool NuppelVideoPlayer::DoFastForward(void)
     GetDecoder()->setExactSeeks(exactseeks);
 
     ClearAfterSeek();
+    lastSkipTime = time(NULL);
     return true;
 }
 
@@ -2949,6 +2952,8 @@ bool NuppelVideoPlayer::IsSkipTooCloseToEnd(int frames) const
  */
 void NuppelVideoPlayer::ClearAfterSeek(void)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek()");
+
     videoOutput->ClearAfterSeek();
 
     for (int i = 0; i < MAXTBUFFER; i++)
@@ -3003,6 +3008,8 @@ void NuppelVideoPlayer::SetDeleteIter(void)
 
 void NuppelVideoPlayer::SetCommBreakIter(void)
 {
+    VERBOSE(VB_COMMFLAG, LOC + QString("SetCommBreakIter @ framesPlayed = %1")
+                                       .arg(framesPlayed));
     commBreakIter = commBreakMap.begin();
     if (hascommbreaktable)
     {
@@ -3016,6 +3023,10 @@ void NuppelVideoPlayer::SetCommBreakIter(void)
                 break;
         }
     }
+
+    VERBOSE(VB_COMMFLAG, LOC + QString("new commBreakIter = %1 @ frame %2")
+                                       .arg(commBreakIter.data())
+                                       .arg(commBreakIter.key()));
 }
 
 void NuppelVideoPlayer::SetAutoCommercialSkip(int autoskip)
@@ -4299,6 +4310,10 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc) const
 
 void NuppelVideoPlayer::AutoCommercialSkip(void)
 {
+    if (((time(NULL) - lastSkipTime) <= 2) ||
+        ((time(NULL) - lastCommSkipTime) <= 2))
+        return;
+
     commBreakMapLock.lock();
     if (hascommbreaktable)
     {
@@ -4318,13 +4333,30 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
               (framesPlayed + commnotifyamount * video_frame_rate >=
                commBreakIter.key()))))
         {
+            VERBOSE(VB_COMMFLAG, LOC + QString("AutoCommercialSkip(), current "
+                    "framesPlayed %1, commBreakIter frame %2, incrementing "
+                    "commBreakIter")
+                    .arg(framesPlayed).arg(commBreakIter.key()));
+
             ++commBreakIter;
-            if ((commBreakIter == commBreakMap.end()) ||
-                (commBreakIter.data() == MARK_COMM_START))
+            if (commBreakIter == commBreakMap.end())
             {
                 commBreakMapLock.unlock();
+                VERBOSE(VB_COMMFLAG, LOC + "AutoCommercialSkip(), at "
+                        "end of commercial break list, will not skip.");
                 return;
             }
+
+            if (commBreakIter.data() == MARK_COMM_START)
+            {
+                commBreakMapLock.unlock();
+                VERBOSE(VB_COMMFLAG, LOC + "AutoCommercialSkip(), new "
+                        "commBreakIter mark is another start, will not skip.");
+                return;
+            }
+
+            VERBOSE(VB_COMMFLAG, LOC + QString("AutoCommercialSkip(), new "
+                    "commBreakIter frame %1").arg(commBreakIter.key()));
 
             if (commBreakIter.key() == totalFrames)
             {
@@ -4357,6 +4389,11 @@ void NuppelVideoPlayer::AutoCommercialSkip(void)
 
                 if (autocommercialskip == 1)
                 {
+                    VERBOSE(VB_COMMFLAG, LOC + QString("AutoCommercialSkip(), "
+                        "auto-skipping to frame %1")
+                        .arg(commBreakIter.key() - 
+                        (int)(commrewindamount * video_frame_rate)));
+
                     PauseVideo();
                     JumpToFrame(commBreakIter.key() -
                         (int)(commrewindamount * video_frame_rate));
