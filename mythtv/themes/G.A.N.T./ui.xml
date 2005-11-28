@@ -1964,11 +1964,11 @@
             -->
 
       <textbutton name="ok_button" draworder="1">
-        <position>81,535</position>
+        <position>320,515</position>
         <font>buttons</font>
-        <image function="on" filename="mw_text_button_on.png"></image>
-        <image function="off" filename="mw_text_button_off.png"></image>
-        <image function="pushed" filename="mw_text_button_pushed.png"></image>
+        <image function="on" filename="mm_simple_button_on.png"></image>
+        <image function="off" filename="mm_simple_button_off.png"></image>
+        <image function="pushed" filename="mm_simple_button_active.png"></image>
       </textbutton>
 
     </container>
