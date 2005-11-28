@@ -1486,6 +1486,10 @@ void Scheduler::ShutdownServer(int prerollseconds)
             myth_system(setwakeup_cmd.ascii());
     }
 
+    // tell anyone who is listening the master server is going down now
+    MythEvent me(QString("SHUTDOWN_NOW"));
+    gContext->dispatch(me);
+
     QString halt_cmd = gContext->GetSetting("ServerHaltCommand",
                                             "sudo /sbin/halt -p");
 

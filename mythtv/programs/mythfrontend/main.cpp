@@ -502,25 +502,15 @@ int handleExit(void)
     if (gContext->GetNumSetting("NoPromptOnExit", 1) == 0)
         return QUIT;
 
-    // first of all find out, if a backend runs on this host...
-    bool backendOnLocalhost = false;
-
-    QStringList strlist = "QUERY_IS_ACTIVE_BACKEND";
-    strlist << gContext->GetHostName();
-
-    gContext->SendReceiveStringList(strlist);
-
-    if (QString(strlist[0]) == "FALSE")
-        backendOnLocalhost = false;
-    else //if (QString(strlist[0]) == "TRUE")
-        backendOnLocalhost = true;
+    // first of all find out, if this is a frontend only host...
+    bool frontendOnly = gContext->IsFrontendOnly();
 
     QString title = QObject::tr("Do you really want to exit MythTV?");
 
     DialogBox diag(gContext->GetMainWindow(), title);
     diag.AddButton(QObject::tr("No"));
     diag.AddButton(QObject::tr("Yes, Exit now"));
-    if (!backendOnLocalhost)
+    if (frontendOnly)
         diag.AddButton(QObject::tr("Yes, Exit and Shutdown"));
 
     int result = diag.exec();
