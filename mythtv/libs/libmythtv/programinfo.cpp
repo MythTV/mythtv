@@ -1467,14 +1467,14 @@ static bool insert_program(MSqlQuery                &query,
         "    recgroup,  autoexpire,  recordid,        seriesid,         "
         "    programid, stars,       previouslyshown, originalairdate,  "
         "    findid,    transcoder,  playgroup,       recpriority,      "
-        "    basename,  progstart,   progend) "
+        "    basename,  progstart,   progend,         profile) "
         "VALUES"
         "  (:CHANID,   :STARTS,     :ENDS,           :TITLE,            "
         "   :SUBTITLE, :DESC,       :HOSTNAME,       :CATEGORY,         "
         "   :RECGROUP, :AUTOEXP,    :RECORDID,       :SERIESID,         "
         "   :PROGRAMID,:STARS,      :REPEAT,         :ORIGAIRDATE,      "
         "   :FINDID,   :TRANSCODER, :PLAYGROUP,      :RECPRIORITY,      "
-        "    :BASENAME, :PROGSTART,  :PROGEND) "
+        "    :BASENAME, :PROGSTART,  :PROGEND,       :PROFILE) "
         );
 
     query.bindValue(":CHANID",      pg->chanid);
@@ -1500,6 +1500,7 @@ static bool insert_program(MSqlQuery                &query,
     query.bindValue(":BASENAME",    pg->pathname);
     query.bindValue(":PROGSTART",   pg->startts);
     query.bindValue(":PROGEND",     pg->endts);
+    query.bindValue(":PROFILE",     schd->getProfileName());
 
     bool ok = query.exec() && (query.numRowsAffected() > 0);
     if (!ok && !query.isActive())
@@ -3012,11 +3013,15 @@ void ProgramInfo::showDetails(void) const
     float stars = 0.0;
     int partnumber = 0, parttotal = 0;
     int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0, generic = 0;
+    bool recorded = false;
+
+    if (filesize > 0)
+        recorded = true;
 
     if (endts != startts)
     {
         QString ptable = "program";
-        if (filesize > 0)
+        if (recorded)
             ptable = "recordedprogram";
 
         query.prepare(QString("SELECT category_type, airdate, stars, "
@@ -3043,10 +3048,10 @@ void ProgramInfo::showDetails(void) const
             epinum = query.value(9).toString();
             generic = query.value(10).toInt();
         }
-        else
+        else if (!query.isActive())
             MythContext::DBError("ProgramInfo::showDetails", query);
 
-        if (filesize > 0)
+        if (recorded)
             query.prepare("SELECT rating FROM recordedrating"
                           " WHERE chanid = :CHANID"
                           " AND starttime = :STARTTIME ;");
@@ -3175,7 +3180,7 @@ void ProgramInfo::showDetails(void) const
 
     if (endts != startts)
     {
-        if (filesize > 0)
+        if (recorded)
             query.prepare("SELECT role,people.name FROM recordedcredits"
                           " AS credits"
                           " LEFT JOIN people ON credits.person = people.person"
@@ -3296,7 +3301,7 @@ void ProgramInfo::showDetails(void) const
     }
     if (p->recstatus == rsUnknown)
     {
-        if (filesize > 0)
+        if (recorded)
         {
             p->recstatus = rsRecorded;
             statusDate = startts;
@@ -3319,13 +3324,27 @@ void ProgramInfo::showDetails(void) const
         ADD_PAR(QObject::tr("Find ID"), QString("%1 (%2)").arg(findid)
                 .arg(fdate.toString(fullDateFormat)), msg)
     }
-    if (filesize > 0)
+    if (recorded)
     {
         QString tmpSize;
 
         tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
         tmpSize += QObject::tr("GB", "GigaBytes");
 
+        query.prepare("SELECT profile FROM recorded"
+                      " WHERE chanid = :CHANID"
+                      " AND starttime = :STARTTIME ;");
+        query.bindValue(":CHANID", chanid);
+        query.bindValue(":STARTTIME", recstartts);
+        
+        if (query.exec() && query.isActive() && query.size() > 0)
+        {
+            query.next();
+            if (query.value(0).toString() > "")
+                tmpSize = QString("%1 (%2 %3)").arg(tmpSize)
+                                  .arg(query.value(0).toString())
+                                  .arg(QObject::tr("Profile"));
+        }
         ADD_PAR(QObject::tr("Recording Host"), hostname, msg)
         ADD_PAR(QObject::tr("Filesize"), tmpSize, msg)
         ADD_PAR(QObject::tr("Recording Group"), recgroup, msg)
