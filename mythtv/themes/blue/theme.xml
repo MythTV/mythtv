@@ -120,7 +120,7 @@
     <image mode="UTIL">SETTINGS.png</image>
     <image mode="WORDS">SEARCH_WORDS.png</image>
     <image mode="LISTS">SEARCH_LISTS.png</image>
-    <image mode="NETFLIX">title/title_netflix.png</image>
+    <image mode="NETFLIX">watch_dvd.png</image>
   </titles>
 
 
@@ -315,9 +315,8 @@
   </buttondef>
 
   <buttondef name="NETFLIX">
-          <image>text-blank.png</image>
-          <watermarkimage>watermark/cd.png</watermarkimage>
-          <offset>0,0</offset>
+    <image>watch_dvd.png</image>
+    <offset>20,10</offset>
   </buttondef>
 
 <!-- #####################################-->
