@@ -1,10 +1,17 @@
 #!/usr/bin/perl -w
 
+my $verbose = 1;
+my $directory;
+my $file;
+my $title = "";    # for display purposes only
+my $archiveDir;
+
 use Getopt::Long;
 
 GetOptions( "verbose!"     => \$verbose,
             "directory=s"  => \$directory,
             "file=s"       => \$file,
+            "title=s"      => \$title,
             "archivedir=s" => \$archiveDir
             );
 
@@ -33,11 +40,18 @@ if ( ! -r "$directory/$file" ) {
 	die( "ERROR: $directory/$file is not readable or does not exist: $!" );
 }
 
-if ( $verbose ) {
-	printf( "Myth 'Archive' Script\n\n" );
+my( $dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime,
+	$mtime, $ctime, $blksize, $blocks) = stat("$directory/$file");
+$size = $size * 1.0 / 1024 / 1024;
 
-	printf( "Dir      : %s\n", $directory );
-	printf( "File     : %s\n", $file );
+if ( $verbose ) {
+	printf( "+-----------------------+\n" );
+	printf( "| Myth 'Archive' Script |\n" );
+	printf( "+-----------------------+\n" );
+	printf( "Title     : %s\n", $title ) if ($title ne "");
+	printf( "Source Dir: %s\n", $directory );
+	printf( "Filename  : %s\n", $file );
+	printf( "Filesize  : %d MB\n", $size );
 
 	printf( "\n" );
 }
@@ -51,20 +65,20 @@ if ( $archiveDir ) {
 	foreach $dirEntry ( @ArchiveDirEntries ) {
 		my( $archiveDir, $keepFree ) = split( ':', $dirEntry );
 		my( $freeSpace ) = GetFreeSpace( $archiveDir );
-		my( $dev, $ino, $mode, $nlink, $uid, $gid, $rdev, $size, $atime,
-			$mtime, $ctime, $blksize, $blocks) = stat("$directory/$file");
 
-		$size = $size * 1.0 / 1024 / 1024;
 		if ( $verbose ) {
-			printf( "Checked %s and found %dMB free (we want to keep %dMB and need %dMB)\n",
-				$archiveDir, $freeSpace, $keepFree, $size );
-			printf( "\n" );
+			printf( "Trying Dir: %s\n", $archiveDir );
+			printf( "    Keep Free: %6d MB\n", $keepFree );
+			printf( "    Curr Free: %6d MB\n", $freeSpace );
 		}
 
 		if (( $freeSpace - ($size / 1024.0 / 1024.0)) > $keepFree ) {
+			printf( "Attempting archive to %s\nStatus: ", $archiveDir );
 			if (MoveFileToArchiveDir( $file, $directory, $archiveDir )) {
+				printf( "Success.\n" );
 				exit(0);
 			}
+			printf( "ERROR!\n" );
 		}
 	}
 }
@@ -98,13 +112,16 @@ sub MoveFileToArchiveDir {
 	my( $old ) = "$oldDir/$file";
 	my( $new ) = "$newDir/$file";
 
-	if ( $verbose ) {
-		printf( "Archiving from %s to %s\n", $old, $new );
+	if ( -l $old ) {
+		printf( "ERROR: The original '$file' is already a link, will not archive to '$new'!\n" );
+		return(1);
 	}
 
 	# don't like doing this this way, but this is an example script that
 	# people can enhance if they want
 	my( $cmd ) = sprintf( "mv %s %s && ln -s %s %s", $old, $new, $new, $old );
+
+	#printf( "Archiving by running '%s'\n", $cmd );
 
 	return (system( $cmd ) == 0);
 }
