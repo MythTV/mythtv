@@ -157,6 +157,13 @@ void DTVRecorder::Reset(void)
  *   streams, and if all else fails we just look for the picture
  *   start codes and call every 16th frame a keyframe.
  *
+ *   NOTE: This does not only find keyframes but also tracks the
+ *         total frames as well. At least a couple times seeking
+ *         has been broken by short-circuiting the search once
+ *         a keyframe stream id has been found. This may work on
+ *         some channels, but will break on others so algorithmic
+ *         optimizations should be done with great care.
+ *
  * \startcode
  *   PES header format
  *   byte 0  byte 1  byte 2  byte 3      [byte 4     byte 5]
@@ -182,7 +189,6 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
     const unsigned char *buffer  = tspacket->data();
 
     bool hasKeyFrame = false;
-    int  stream_id   = 0xffff; // sentinel value (0xffff is always invalid)
 
     // Scan for PES header codes; specifically picture_start
     // and group_start (of_pictures).  These should be within
@@ -192,7 +198,7 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
     //   00 00 01 B3: seq_start_code
     //   (there are others that we don't care about)
     uint i = tspacket->AFCOffset();
-    for (; (i+1) < TSPacket::SIZE && !hasKeyFrame; i++)
+    for (; (i+1) < TSPacket::SIZE; i++)
     {
         const unsigned char k = buffer[i];
         if (0 == _position_within_gop_header)
@@ -210,7 +216,7 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
             // At this point we have seen the start code 0 0 1
             // the next byte will be the PES packet stream id.
 
-            stream_id = buffer[i+1];
+            const int stream_id = buffer[i+1];
             if (PESStreamID::PictureStartCode == stream_id)
             {
                 _frames_written_count += (_first_keyframe > 0) ? 1 : 0;
@@ -220,19 +226,19 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
                 // last GOP or SEQ stream_id, then pretend this picture
                 // is a keyframe. We may get artifacts but at least
                 // we will be able to skip frames.
-                hasKeyFrame = (0 == (_frames_seen_count & 0xf)) &&
+                hasKeyFrame |= (0 == (_frames_seen_count & 0xf)) &&
                     (_last_gop_seen + maxKFD < frameSeenNum) &&
                     (_last_seq_seen + maxKFD < frameSeenNum);
             }
             else if (PESStreamID::GOPStartCode == stream_id)
             {
-                _last_gop_seen = frameSeenNum;
-                hasKeyFrame    = true;
+                _last_gop_seen  = frameSeenNum;
+                hasKeyFrame    |= true;
             }
             else if (PESStreamID::SequenceStartCode == stream_id)
             {
-                _last_seq_seen = frameSeenNum;
-                hasKeyFrame    = _last_gop_seen + maxKFD < frameSeenNum;
+                _last_seq_seen  = frameSeenNum;
+                hasKeyFrame    |= _last_gop_seen + maxKFD < frameSeenNum;
             }
             _position_within_gop_header = 0;
         }
