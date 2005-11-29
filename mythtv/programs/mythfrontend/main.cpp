@@ -990,7 +990,7 @@ int main(int argc, char **argv)
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));
 
-    VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
+    VERBOSE(VB_ALL, QString("Enabled verbose msgs: %1").arg(verboseString));
 
     LCD::SetupLCD ();
     if (class LCD *lcd = LCD::Get ()) {

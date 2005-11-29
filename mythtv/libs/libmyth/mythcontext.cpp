@@ -53,6 +53,9 @@ QString verboseString = QString(" important general");
 
 int parse_verbose_arg(QString arg)
 {
+    QString option;
+    bool reverseOption;
+
     if (arg.startsWith("-"))
     {
         cerr << "Invalid or missing argument to -v/--verbose option\n";
@@ -64,138 +67,77 @@ int parse_verbose_arg(QString arg)
         for (QStringList::Iterator it = verboseOpts.begin(); 
              it != verboseOpts.end(); ++it )
         {
-            if (!strcmp(*it,"help"))
+            option = *it;
+            reverseOption = false;
+
+            if (option != "none" && option.left(2) == "no")
+            {
+                reverseOption = true;
+                option = option.right(option.length() - 2);
+            }
+
+            if (!strcmp(option,"help"))
             {
                 QString m_verbose = verboseString;
                 m_verbose.replace(QRegExp(" "), ",");
                 m_verbose.replace(QRegExp("^,"), "");
                 cerr <<
-                  "Verbose debug levels.\n"
-                  "Accepts any combination (separated by comma) of:\n\n"
-                  "  all        - ALL debug output\n"
-                  "  none       - NO debug output\n"
-                  "  important  - Important messages only\n"
-                  "  database   - Display all SQL commands executed\n"
-                  "  general    - General messages (not quite so important)\n"
-                  "  record     - Recording related messages\n"
-                  "  playback   - Playback related messages\n"
-                  "  channel    - Channel related messages\n"
-                  "  osd        - On-Screen Display related messages\n"
-                  "  file       - File and AutoExpire related messages\n"
-                  "  schedule   - Scheduling related messages\n"
-                  "  network    - Network protocol related messages\n"
-                  "  jobqueue   - JobQueue related messages\n"
-                  "  commflag   - Commercial Flagging related messages\n"
-                  "  audio      - Audio related messages\n"
-                  "  libav      - Enables libav debugging\n"
-                  "  siparser   - Siparser related messages\n"
-                  "  eit        - EIT related messages\n"
-                  "\n"
+                  "Verbose debug levels.\n" <<
+                  "Accepts any combination (separated by comma) of:\n\n" <<
+
+#define VERBOSE_ARG_HELP(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
+                QString("  %1").arg(ARG_STR).leftJustify(15, ' ', true) << \
+                " - " << ARG_HELP << "\n" <<
+
+                  VERBOSE_MAP(VERBOSE_ARG_HELP)
+
+                  "\n" <<
                   "The default for this program appears to be: '-v " <<
-                  m_verbose << "'\n\n"
-                  "Most options are additive except for none, all, and important.\n"
-                  "These three are semi-explicit and take precedence over any\n"
-                  "prior options given.  You can however use something like\n"
-                  "'-v none,jobqueue' to get only JobQueue related messages\n"
-                  "and override the default verbosity level.\n"
-                  "Some debug levels may not apply to this program.\n"
-                  << endl;
+                  m_verbose << "'\n\n" <<
+                  "Most options are additive except for none, all, and important.\n" <<
+                  "These three are semi-explicit and take precedence over any\n" <<
+                  "prior options given.  You can however use something like\n" <<
+                  "'-v none,jobqueue' to get only JobQueue related messages\n" <<
+                  "and override the default verbosity level.\n" <<
+                  "\n" <<
+                  "The additive options may also be subtracted from 'all' by \n" <<
+                  "prefixing them with 'no', so you may use '-v all,nodatabase'\n" <<
+                  "to view all but database debug messages.\n" <<
+                  "\n" <<
+                  "Some debug levels may not apply to this program.\n" <<
+                  endl;
                 return GENERIC_EXIT_INVALID_CMDLINE;
             }
-            else if (!strcmp(*it,"none"))
-            {
-                print_verbose_messages = VB_NONE;
-                verboseString = *it;
+
+#define VERBOSE_ARG_CHECKS(ARG_ENUM, ARG_VALUE, ARG_STR, ARG_ADDITIVE, ARG_HELP) \
+            else if (option == ARG_STR) \
+            { \
+                if (reverseOption) \
+                { \
+                    print_verbose_messages &= ~(ARG_VALUE); \
+                    verboseString = verboseString + " no" + ARG_STR; \
+                } \
+                else \
+                { \
+                    if (ARG_ADDITIVE) \
+                    { \
+                        print_verbose_messages |= ARG_VALUE; \
+                        verboseString = verboseString + " " + ARG_STR; \
+                    } \
+                    else \
+                    { \
+                        print_verbose_messages = ARG_VALUE; \
+                        verboseString = ARG_STR; \
+                    } \
+                } \
             }
-            else if (!strcmp(*it,"all"))
-            {
-                print_verbose_messages = VB_ALL;
-                verboseString = *it;
-            }
-            else if (!strcmp(*it,"important"))
-            {
-                print_verbose_messages = VB_IMPORTANT;
-                verboseString = *it;
-            }
-            else if (!strcmp(*it,"database"))
-            {
-                print_verbose_messages |= VB_DATABASE;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"general"))
-            {
-                print_verbose_messages |= VB_GENERAL;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"record"))
-            {
-                print_verbose_messages |= VB_RECORD;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"playback"))
-            {
-                print_verbose_messages |= VB_PLAYBACK;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"channel"))
-            {
-                print_verbose_messages |= VB_CHANNEL;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"osd"))
-            {
-                print_verbose_messages |= VB_OSD;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"file"))
-            {
-                print_verbose_messages |= VB_FILE;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"schedule"))
-            {
-                print_verbose_messages |= VB_SCHEDULE;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"network"))
-            {
-                print_verbose_messages |= VB_NETWORK;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"commflag"))
-            {
-                print_verbose_messages |= VB_COMMFLAG;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"jobqueue"))
-            {
-                print_verbose_messages |= VB_JOBQUEUE;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"audio"))
-            {
-                print_verbose_messages |= VB_AUDIO;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"libav"))
-            {
-                print_verbose_messages |= VB_LIBAV;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"siparser"))
-            {
-                print_verbose_messages |= VB_SIPARSER;
-                verboseString += " " + *it;
-            }
-            else if (!strcmp(*it,"eit"))
-            {
-                print_verbose_messages |= VB_EIT;
-                verboseString += " " + *it;
-            }
+
+            VERBOSE_MAP(VERBOSE_ARG_CHECKS)
+
             else
             {
                 cerr << "Unknown argument for -v/--verbose: "
-                     << *it << endl;;
+                     << option << endl;;
             }
         }
     }

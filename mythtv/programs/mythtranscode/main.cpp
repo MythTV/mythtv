@@ -305,8 +305,7 @@ int main(int argc, char *argv[])
          return TRANSCODE_EXIT_INVALID_CMDLINE;
     }
 
-    if (verboseString != "")
-        VERBOSE(VB_ALL, QString("Enabled verbose msgs :%1").arg(verboseString));
+    VERBOSE(VB_ALL, QString("Enabled verbose msgs: %1").arg(verboseString));
 
     if (!MSqlQuery::testDBConnection())
     {
