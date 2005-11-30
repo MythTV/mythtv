@@ -3353,7 +3353,7 @@ void ProgramInfo::showDetails(void) const
         ADD_PAR(QObject::tr("Recording Group"), recgroup, msg)
         ADD_PAR(QObject::tr("Playback Group"), playgroup, msg)
     }
-
+    msg.remove(QRegExp("<br>$"));
     details_dialog->setDetails(msg);
     details_dialog->exec();
 

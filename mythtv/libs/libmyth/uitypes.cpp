@@ -2114,8 +2114,8 @@ void UIRichTextType::updateBackground(void)
             {
                 QImage scalerImg;
                 scalerImg = sourceImg->smoothScale(
-                        (int)(m_displayArea.width() * m_wmult),
-                        (int)(m_displayArea.height() * m_hmult));
+                        (int)(m_displayArea.width()),
+                        (int)(m_displayArea.height()));
                 QPainter p(m_compBackground);
                 p.drawPixmap(QPoint(0, 0), *m_background);
                 p.drawImage(QPoint(0, 0), scalerImg);
