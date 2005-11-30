@@ -219,7 +219,7 @@ void Channel::InitializeInputs(void)
 
     // set global setting...
     QString fmt = gContext->GetSetting("TVFormat");
-    VERBOSE(VB_IMPORTANT, QString("Global TVFormat Setting '%1'").arg(fmt));
+    VERBOSE(VB_CHANNEL, QString("Global TVFormat Setting '%1'").arg(fmt));
     videomode_v4l1[-1] = format_to_mode(fmt.upper(), 1);
     videomode_v4l2[-1] = format_to_mode(fmt.upper(), 2);
 
@@ -275,7 +275,7 @@ void Channel::SetFormat(const QString &format)
     if ((fmt == "Default") || format.isEmpty())
         fmt = mode_to_format(videomode_v4l2[inputNum], 2);
 
-    VERBOSE(VB_IMPORTANT, LOC + QString("SetFormat(%1) fmt(%2) input(%3)")
+    VERBOSE(VB_CHANNEL, LOC + QString("SetFormat(%1) fmt(%2) input(%3)")
             .arg(format).arg(fmt).arg(inputNum));
 
     if ((fmt == currentFormat) || SetInputAndFormat(inputNum, fmt))
