@@ -1312,46 +1312,44 @@
   <window name="progdetails">
 
       <font name="heading" base="small-info">
-          <color>#ffff00</color>
+          <color>#ffffdd</color>
       </font>
 
       <font name="body" base="small-info">
-          <color>#ffffff</color>
+          <color>#FFFFFF</color>
       </font>
 
-      <container name="main_display">
+    <container name="main_display">
       <area>0,0,800,600</area>
       <textarea name="title" draworder="0">
-        <area>40,30,720,40</area>
+        <area>50,30,720,40</area>
         <font>basefont</font>
         <value>Program Details:</value>
       </textarea>
 
       <richtextarea name="richtext" draworder="0">
-        <area>30,60,735,450</area>
-        <textarea>50,70,660,430</textarea>
-        <font>small-info</font>
+        <area>40,60,730,530</area>
+        <textarea>65,70,640,485</textarea>
+        <font>info</font>
         <value>Program Details</value>
-        <image function="uparrow-reg" filename="blank.png" location="735,85"></image>
-        <image function="downarrow-reg" filename="blank.png" location="735,455"></image>
-        <image function="uparrow-sel" filename="uparrow.png" location="735,85"></image>
-        <image function="downarrow-sel" filename="downarrow.png" location="735,455"></image>
-        <backgroundreg>blank.png</backgroundreg>
-        <backgroundsel>blank.png</backgroundsel>
+        <image function="uparrow-reg" filename="blank.png" location="720,90"></image>
+        <image function="downarrow-reg" filename="blank.png" location="720,500"></image>
+        <image function="uparrow-sel" filename="uparrow.png" location="720,90"></image>
+        <image function="downarrow-sel" filename="downarrow.png" location="720,500"></image>
+        <backgroundreg>pd-background.png</backgroundreg>
+        <backgroundsel>pd-background.png</backgroundsel>
       </richtextarea>
 
-            <!-- 
-                ok button
-            -->
+            <!-- An "OK" button may be included but is not necessary
 
       <textbutton name="ok_button" draworder="1">
-        <position>320,515</position>
-        <font>small-info</font>
-        <image function="on" filename="text_button_on.png"></image>
-        <image function="off" filename="text_button_off.png"></image>
-        <image function="pushed" filename="text_button_pushed.png"></image>
+        <position>81,535</position>
+        <font>buttons</font>
+        <image function="on" filename="mw_text_button_on.png"></image>
+        <image function="off" filename="mw_text_button_off.png"></image>
+        <image function="pushed" filename="mw_text_button_pushed.png"></image>
       </textbutton>
-
+            -->
     </container>
   </window>
 </mythuitheme>
