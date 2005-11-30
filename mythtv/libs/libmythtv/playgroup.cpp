@@ -103,6 +103,21 @@ PlayGroup::PlayGroup(QString _name)
     addChild(cgroup);
 };
 
+int PlayGroup::GetCount(void)
+{
+    int names = 0;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    query.prepare("SELECT COUNT(name) FROM playgroup "
+                  "WHERE name <> 'Default' ORDER BY name;");
+    if (!query.exec())
+        MythContext::DBError("PlayGroupEditor::load", query);
+    else if (query.next())
+        names = query.value(0).toInt();
+
+    return names;
+}
+
 QStringList PlayGroup::GetNames(void)
 {
     QStringList names;

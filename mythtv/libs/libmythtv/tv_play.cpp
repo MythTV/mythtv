@@ -919,7 +919,7 @@ void TV::HandleStateChange(void)
     }
     else if (StateIsPlaying(internalState) && lastState == kState_None)
     {
-        if (GetOSD())
+        if (GetOSD() && (PlayGroup::GetCount() > 0))
             GetOSD()->SetSettingsText(tr("%1 Settings")
                                       .arg(playbackinfo->playgroup), 3);
     }

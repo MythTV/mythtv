@@ -14,6 +14,7 @@ class PlayGroup: public ConfigurationWizard
     QString getName(void) const { return name; }
 
     static QStringList GetNames(void);
+    static int GetCount(void);
     static QString GetInitialName(const ProgramInfo *pi);
     static int GetSetting(const QString &name, const QString &field, 
                           int defval);
