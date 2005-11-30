@@ -55,6 +55,23 @@ PreviewGenerator::PreviewGenerator(const ProgramInfo *pginfo,
     : programInfo(*pginfo), localOnly(local_only),
       createSockets(false), eventSock(NULL), serverSock(NULL)
 {
+    if (IsLocal())
+        return;
+
+    // Try to find a local means to access file...
+    QString baseName = programInfo.GetRecordBasename();
+    QString prefix   = gContext->GetSetting("RecordFilePrefix");
+    QString localFN  = QString("%1/%2").arg(prefix).arg(baseName);
+    if (!QFileInfo(localFN).exists())
+        return; // didn't find file locally, must use remote backend
+
+    // Found file locally, so set the new pathname..
+    QString msg = QString(
+        "'%1' is not local, "
+        "\n\t\t\treplacing with '%2', which is local.")
+        .arg(programInfo.pathname).arg(localFN);
+    VERBOSE(VB_RECORD, LOC + msg);
+    programInfo.pathname = localFN;
 }
 
 PreviewGenerator::~PreviewGenerator()
