@@ -26,6 +26,7 @@
 #include "libmythtv/dbcheck.h"
 #include "libmythtv/videosource.h"
 #include "libmythtv/channeleditor.h"
+#include "libmythtv/remoteutil.h"
 #include "backendsettings.h"
 #include "checksetup.h"
 
@@ -198,6 +199,8 @@ int main(int argc, char *argv[])
         QObject::tr("Changing existing card inputs, deleting anything, "
                     "or scanning for channels may not work.");
 
+    bool backendIsRunning = false;
+
     if (is_backend_running())
     {
         int val = MythPopupBox::show2ButtonPopup(
@@ -207,6 +210,8 @@ int main(int argc, char *argv[])
             QObject::tr("Exit"), 1);
         if (1 == val)
             return 0;
+
+        backendIsRunning = true;
     }
 
     REG_KEY("qt", "DELETE", "Delete", "D");
@@ -255,6 +260,9 @@ int main(int argc, char *argv[])
     dia->AddButton(QObject::tr("OK"));
     dia->exec();
     delete dia;
+
+    if (backendIsRunning)
+        RemoteSendMessage("CLEAR_SETTINGS_CACHE");
 
     return 0;
 }
