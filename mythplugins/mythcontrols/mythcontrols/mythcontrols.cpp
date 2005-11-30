@@ -161,7 +161,6 @@ void MythControls::focusButton(int direction)
         ActionButtons[0]->takeFocus();
         ActionList->looseFocus();
         ActionList->SetActive(false);
-        repaintButtonLists();
     }
     else
     {
@@ -201,7 +200,6 @@ void MythControls::switchListFocus(UIListBtnType *focus, UIListBtnType *unfocus)
     focused = focus;
     focus->SetActive(true);
     focus->takeFocus();
-    repaintButtonLists();
     refreshKeyInformation();
 }
 
@@ -307,43 +305,19 @@ void MythControls::keyPressEvent(QKeyEvent *e)
 
 void MythControls::contextSelected(UIListBtnTypeItem *item)
 {
+    ContextList->refresh();
+
     ActionList->blockSignals(true);
     refreshActionList(getCurrentContext());
-    repaintButtonLists();
     ActionList->blockSignals(false);
+
+    ActionList->refresh();
 }
 
 void MythControls::actionSelected(UIListBtnTypeItem *item)
 {
-    repaintButtonLists();
+    ContextList->refresh();
     refreshKeyInformation();
-}
-
-
-/* method description in header */
-void MythControls::repaintButtonLists(void)
-{
-    /* why am i getting funky colour ? */
-    QPixmap pix(container->GetAreaRect().size());
-    pix.fill(this, container->GetAreaRect().topLeft());
-    QPainter p(&pix);
-    if (container)
-    {
-        container->Draw(&p, 0, 0);
-        container->Draw(&p, 1, 0);
-        container->Draw(&p, 2, 0);
-        container->Draw(&p, 3, 0);
-        container->Draw(&p, 4, 0);
-        container->Draw(&p, 5, 0);
-        container->Draw(&p, 6, 0);
-        container->Draw(&p, 7, 0);
-        container->Draw(&p, 8, 0);
-    }
-    p.end();
-
-    bitBlt(this, container->GetAreaRect().left(),
-           container->GetAreaRect().top(),
-           &pix, 0, 0, -1, -1, Qt::CopyROP);
 }
 
 

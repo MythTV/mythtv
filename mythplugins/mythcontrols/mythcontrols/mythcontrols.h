@@ -137,11 +137,6 @@ protected:
     bool resolveConflict(ActionID *conflict, int level);
 
     /**
-     * @brief Repaint the context and action button lists
-     */
-    void repaintButtonLists(void);
-
-    /**
      * @brief Focus a new list and take focus away from the old.
      * @param focus The list to gain focus
      * @param unfocus The list to loose focus
