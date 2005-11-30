@@ -728,6 +728,10 @@ void AutoExpire::FillDBOrdered(int expMethod)
 
         if (IsInDontExpireSet(proginfo->chanid, proginfo->recstartts))
         {
+            VERBOSE(VB_FILE, LOC + QString("FillDBOrdered: Chanid "
+                                     "%1 @ %2 is in Don't Expire List")
+                                     .arg(proginfo->chanid)
+                                     .arg(proginfo->recstartts.toString()));
             delete proginfo;
         }
         else
