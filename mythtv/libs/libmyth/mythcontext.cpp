@@ -14,7 +14,6 @@
 #include <qsocketdevice.h>
 #include <qhostaddress.h>
 
-#include <cerrno>
 #include <cmath>
 #include <queue>
 
@@ -148,9 +147,7 @@ int parse_verbose_arg(QString arg)
 // Verbose helper function for ENO macro
 QString safe_eno_to_string(int errnum)
 {
-    char buf[256];
-    strerror_r(errnum, buf, 256);
-    return QString(buf) + QString(" (%1)").arg(errno);
+    return QString("%1 (%2)").arg(strerror(errnum)).arg(errnum);
 }
 
 
@@ -543,8 +540,7 @@ bool MythContextPrivate::LoadDatabaseSettings(bool reload)
         if (gethostname(localhostname, 1024))
         {
             VERBOSE(VB_IMPORTANT,
-                    QString("MCP: Error, could not determine "
-                            "host name. '%1'").arg(strerror(errno)));
+                    "MCP: Error, could not determine host name." + ENO);
             return false;
         }
         m_localhostname = localhostname;
