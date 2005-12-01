@@ -84,6 +84,10 @@
         <area>365,25,240,90</area>
         <font>timefont</font>
      </textarea>
+    <textarea name="channum">
+      <area>90,20,160,90</area>
+      <font>channelfont</font>
+    </textarea>
   </container>
 
   <container name="browse_info">

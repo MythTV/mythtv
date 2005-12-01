@@ -2304,3 +2304,14 @@ bool OSD::TreeMenuHandleKeypress(QKeyEvent *e)
     return ret;
 }
 
+bool OSD::IsSetDisplaying(const QString &name)
+{
+    OSDSet *oset = GetSet(name);
+    return Visible() && (oset != NULL) && oset->Displaying();
+}
+
+bool OSD::HasSet(const QString &name)
+{
+    return setMap.contains(name);
+}
+

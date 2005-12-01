@@ -123,6 +123,8 @@ class OSD : public QObject
                                   OSDGenericTree *treeToShow);
 
     void DisableFade(void);
+    bool IsSetDisplaying(const QString &name);
+    bool HasSet(const QString &name);
 
  private:
     void SetDefaults();

@@ -2240,7 +2240,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (HasQueuedInput())
                     DoArbSeek(ARBSEEK_SET);
                 else
-                    ToggleOSD();
+                    ToggleOSD(false);
             }
             else if (action == "CHANNELUP")
             {
@@ -2303,7 +2303,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (HasQueuedInput())
                     DoArbSeek(ARBSEEK_SET);
                 else
-                    DoInfo();
+                    ToggleOSD(true);
             }
             else if (action == "SELECT")
             {
@@ -2557,37 +2557,6 @@ void TV::DoPause(void)
         DoNVPSeek(time);
         UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
         gContext->DisableScreensaver();
-    }
-}
-
-void TV::DoInfo(void)
-{
-    QString title, subtitle, description, category, starttime, endtime;
-    QString callsign, iconpath;
-    OSDSet *oset;
-
-    if (paused || !GetOSD())
-        return;
-
-    oset = GetOSD()->GetSet("status");
-    if ((oset) && (oset->Displaying()) && !prbuffer->isDVD())
-    {
-        InfoMap infoMap;
-        pbinfoLock.lock();
-        playbackinfo->ToMap(infoMap);
-        pbinfoLock.unlock();
-        GetOSD()->HideSet("status");
-        GetOSD()->ClearAllText("program_info");
-        GetOSD()->SetText("program_info", infoMap, osd_prog_info_timeout);
-    }
-    else
-    {
-        QString desc = "";
-        int pos = nvp->calcSliderPos(desc);
-        GetOSD()->HideSet("program_info");
-        GetOSD()->StartPause(pos, false, tr("Position"), desc,
-                             osd_prog_info_timeout);
-        update_osd_pos = true;
     }
 }
 
@@ -3320,35 +3289,95 @@ bool TV::ClearOSD(void)
     return res;
 }
 
-void TV::ToggleOSD(void)
+/** \fn TV::ToggleOSD(bool includeStatus)
+ *  \brief Cycle through the available Info OSDs. 
+ */
+void TV::ToggleOSD(bool includeStatusOSD)
 {
-    if (!GetOSD())
+    OSD *osd = GetOSD();
+    bool showStatus = false;
+    if (paused || !osd)
         return;
+        
+    // DVD toggles between status and nothing
+    if (prbuffer->isDVD())
+    {
+        if (osd->IsSetDisplaying("status"))
+            osd->HideAll();
+        else
+            showStatus = true;
+    }
+    else if (osd->IsSetDisplaying("status"))
+    {
+        if (osd->HasSet("program_info_small"))
+            UpdateOSDProgInfo("program_info_small");
+        else
+            UpdateOSDProgInfo("program_info");
+    }
+    // If small is displaying, show long if we have it, else hide info
+    else if (osd->IsSetDisplaying("program_info_small")) 
+    {
+        if (osd->HasSet("program_info"))
+            UpdateOSDProgInfo("program_info");
+        else
+            osd->HideAll();
+    }
+    // If long is displaying, hide info
+    else if (osd->IsSetDisplaying("program_info"))
+    {
+        osd->HideAll();
+    }
+    // If no program_info displaying, show status if we want it
+    else if (includeStatusOSD)
+    {
+        showStatus = true;
+    }
+    // No status desired? Nothing is up, Display small if we have, else display long
+    else
+    {   
+        if (osd->HasSet("program_info_small"))
+            UpdateOSDProgInfo("program_info_small");
+        else
+            UpdateOSDProgInfo("program_info");
+    }
 
-    OSDSet *oset = GetOSD()->GetSet("program_info");
-    if ((oset) && (oset->Displaying() || prbuffer->isDVD()))
-        GetOSD()->HideAll();
-    else if (!prbuffer->isDVD())
-        UpdateOSD();
+    if (showStatus)
+    {
+        osd->HideAll();
+        if (nvp)
+        {
+            QString desc = "";
+            int pos = nvp->calcSliderPos(desc);
+            osd->StartPause(pos, false, tr("Position"), desc,
+                                 osd_prog_info_timeout);
+            update_osd_pos = true;
+        }
+        else
+            update_osd_pos = false;
+    }
+    else
+        update_osd_pos = false;
 }
 
-void TV::UpdateOSD(void)
+/** \fn TV::UpdateOSDProgInfo(const char *whichInfo)
+ *  \brief Update and display the passed OSD set with programinfo
+ */
+void TV::UpdateOSDProgInfo(const char *whichInfo)
 {
     InfoMap infoMap;
+    OSD *osd = GetOSD();
+    if (!osd)
+        return;
 
     pbinfoLock.lock();
     if (playbackinfo)
         playbackinfo->ToMap(infoMap);
     pbinfoLock.unlock();
 
-    if (GetOSD())
-    {
-        // Clear previous osd and add new info
-        GetOSD()->ClearAllText("program_info");
-        GetOSD()->SetText("program_info", infoMap, osd_prog_info_timeout);
-        GetOSD()->ClearAllText("channel_number");
-        GetOSD()->SetText("channel_number", infoMap, osd_prog_info_timeout);
-    }
+    // Clear previous osd and add new info
+    osd->ClearAllText(whichInfo);
+    osd->HideAll();
+    osd->SetText(whichInfo, infoMap, osd_prog_info_timeout);
 }
 
 void TV::UpdateOSDSeekMessage(const QString &mesg, int disptime)
@@ -5285,7 +5314,7 @@ void TV::UnpauseLiveTV(void)
 
     if (!nvp || (nvp && activenvp == nvp))
     {
-        UpdateOSD();
+        UpdateOSDProgInfo("program_info");
         UpdateLCD();
         AddPreviousChannel();
     }

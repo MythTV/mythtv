@@ -210,7 +210,6 @@ class TV : public QObject
     void ToggleSleepTimer(void);
     void ToggleSleepTimer(const QString);
 
-    void DoInfo(void);
     void DoPlay(void);
     void DoPause(void);
     void DoSeek(float time, const QString &mesg);
@@ -239,8 +238,8 @@ class TV : public QObject
     void SetManualZoom(bool zoomON = false);
  
     bool ClearOSD(void);
-    void ToggleOSD(void); 
-    void UpdateOSD(void);
+    void ToggleOSD(bool includeStatusOSD); 
+    void UpdateOSDProgInfo(const char *whichInfo);
     void UpdateOSDSeekMessage(const QString &mesg, int disptime);
     void UpdateOSDInput(void);
     void UpdateOSDTextEntry(const QString &message);

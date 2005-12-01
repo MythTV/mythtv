@@ -70,6 +70,10 @@
        <area>538,274,60,27</area>
        <font>infofont</font>
     </textarea>
+    <textarea name="channum" align="right">
+      <area>440,30,160,90</area>
+      <font>channelfont</font>
+    </textarea>
  <!-- just some examples.  The textarea is displaying a static message.
       Possible values for align are 'right' and 'center'.  Leaving align
       off entirely will just left justify things.
