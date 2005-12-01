@@ -2577,6 +2577,14 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
     advcfg->addChild(buttonRecOpt);
     addChild(advcfg);
 
+    DVBDiSEqCType  *diseqctype   = new DVBDiSEqCType(parent);
+    addChild(diseqctype);
+    diseqctype->setVisible(false);
+
+    TunerCardInput *defaultinput = new TunerCardInput(parent);
+    addChild(defaultinput);
+    defaultinput->setVisible(false);
+
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
             this,         SLOT(  probeCard   (const QString&)));
     connect(cardnum,      SIGNAL(valueChanged(const QString&)),
@@ -2585,8 +2593,11 @@ DVBConfigurationGroup::DVBConfigurationGroup(CaptureCard& a_parent)
             &parent,      SLOT(  recorderOptionsPanel()));
     connect(buttonDiSEqC, SIGNAL(pressed()),
             &parent,      SLOT(  DiSEqCPanel()));
+    connect(diseqctype,   SIGNAL(valueChanged  (const QString&)),
+            defaultinput, SLOT(  fillSelections(const QString&)));
 
     cardnum->setValue(0);
+    defaultinput->fillSelections(diseqctype->getValue());
 }
 
 void CaptureCard::recorderOptionsPanel()
@@ -2609,6 +2620,7 @@ void CaptureCard::DiSEqCPanel()
     }
     DVBDiSEqCConfigurationWizard diseqcWiz(*this);
     diseqcWiz.exec();
+    load();
 }
 
 RecorderOptions::RecorderOptions(CaptureCard& parent)
