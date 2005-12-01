@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include "pespacket.h"
+#include "mpegdescriptors.h"
 
 /** \file mpegtables.h
  *  \code
@@ -281,7 +282,7 @@ class PSIPTable : public PESPacket
 
     // version_number       5       6.2      42
     // incremented modulo 32 when table info changes
-    uint Version(void) const { return (pesdata()[6]>>2) & 0x1f; }
+    uint Version(void) const { return (pesdata()[6]>>1) & 0x1f; }
 
     // current_next_ind     1       6.7      47
     // if 0 this table is not yet valid, but will be the next psip
@@ -316,9 +317,9 @@ class PSIPTable : public PESPacket
         pesdata()[5] = len & 0xff;
     }
     void SetVersionNumber(uint ver)
-        { pesdata()[6] = ((ver & 0x1f)<<2) | (pesdata()[6] & 0x83); }
+        { pesdata()[6] = (pesdata()[6] & 0xc1) | ((ver & 0x1f)<<1); }
     void SetCurrent(bool cur)
-        { pesdata()[6] = (pesdata()[6]&(0xff-0x80)) | (cur ? 0x80:0); }
+        { pesdata()[6] = (pesdata()[6] & 0xfe) | (cur ? 1 : 0); }
     void SetSection(uint num) { pesdata()[7] = num; }
     void SetLastSection(uint num) { pesdata()[8] = num; }
 
@@ -355,7 +356,7 @@ class ProgramAssociationTable : public PSIPTable
     static ProgramAssociationTable* CreateBlank(void)
     {
         TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
-        memcpy(tspacket->data() + tspacket->AFCOffset(),
+        memcpy(tspacket->data() + 4,
                init_patheader, PSIP_OFFSET);
         PSIPTable psip = PSIPTable::View(*tspacket);
         psip.SetLength(PSIP_OFFSET);
@@ -428,18 +429,19 @@ class ProgramMapTable : public PSIPTable
     static const uint pmt_header = 4; // minimum PMT header offset
     mutable vector<unsigned char*> _ptrs; // used to parse
 
+  public:
     static ProgramMapTable* CreateBlank(void)
     {
         TSPacket *tspacket = TSPacket::CreatePayloadOnlyPacket();
-        memcpy(tspacket->data() + tspacket->AFCOffset(),
-               DEFAULT_PMT_HEADER, PSIP_OFFSET);
+        memcpy(tspacket->data() + 4,
+               DEFAULT_PMT_HEADER, sizeof(DEFAULT_PMT_HEADER));
         PSIPTable psip = PSIPTable::View(*tspacket);
         psip.SetLength(PSIP_OFFSET);
         ProgramMapTable *pmt = new ProgramMapTable(psip);
         delete tspacket;
         return pmt;
     }
-  public:
+
     ProgramMapTable(const PSIPTable& table) : PSIPTable(table)
     {
         assert(TableID::PMT == TableID());
@@ -449,6 +451,13 @@ class ProgramMapTable : public PSIPTable
     static ProgramMapTable* Create(uint programNumber, uint basepid,
                                    uint pcrpid, uint version,
                                    vector<uint> pids, vector<uint> types);
+
+    static ProgramMapTable* Create(uint programNumber, uint basepid,
+                                   uint pcrpid, uint version,
+                                   const desc_list_t         &global_desc,
+                                   const vector<uint>        &pids,
+                                   const vector<uint>        &types,
+                                   const vector<desc_list_t> &prog_desc);
         
     /// stream that contrains program clock reference.
     uint PCRPID(void) const
@@ -461,7 +470,7 @@ class ProgramMapTable : public PSIPTable
         { return ((psipdata()[2]<<8) | psipdata()[3]) & 0x0fff; }
 
     const unsigned char* ProgramInfo(void) const
-        { return pesdata() + 13; }
+        { return psipdata() + 4; }
 
     uint StreamType(uint i) const
         { return _ptrs[i][0]; }
@@ -548,6 +557,12 @@ class ProgramMapTable : public PSIPTable
     {
         psipdata()[2] = ((length<<8) & 0x0f) | (psipdata()[2] & 0xf0);
         psipdata()[3] = length & 0xff;
+    }
+
+    void SetProgramInfo(unsigned char *streamInfo, uint infoLength)
+    {
+        SetProgramInfoLength(infoLength);
+        memcpy(psipdata() + 4, streamInfo, infoLength);
     }
 };
 

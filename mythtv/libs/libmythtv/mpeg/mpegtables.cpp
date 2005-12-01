@@ -5,20 +5,32 @@
 
 const unsigned char init_patheader[9] =
 {
-    (0x0), (0x0)/*TableID::PAT*/,
-    (0xb0), // set one reserved bit???
-    (0x0), (0x0), (0x0),
-    (0x83), // current | reserved
-    (0x0), (0x0)
+    0x00,
+
+    0x00, // TableID::PAT
+    0xb0, // Syntax indicator
+    0x00, // Length (set seperately)
+    0x00, // Transport stream ID top bits
+
+    0x00, // Transport stream ID bottom bits
+    0xc1, // current | reserved
+    0x00, // Current Section
+    0x00, // Last Section
 };
 
 const unsigned char DEFAULT_PMT_HEADER[9] =
 {
-    0x0, 0x2/*TableID::PMT*/,
-    0xb0, // set one reserved bit???
-    0x0, 0x0, 0x0,
-    0x83, // current | reserved
-    0x0, 0x0,
+    0x00,
+
+    0x02, // TableID::PMT
+    0xb0, // Syntax indicator
+    0x00, // Length (set seperately)
+    0x00, // MPEG Program number top bits (set seperately)
+
+    0x00, // MPEG Program number bottom bits (set seperately)
+    0xc1, // Version + Current/Next
+    0x00, // Current Section
+    0x00, // Last Section
 };
 
 ProgramAssociationTable* ProgramAssociationTable::Create(
@@ -70,6 +82,47 @@ ProgramMapTable* ProgramMapTable::Create(
 
     for (uint i=0; i<count; i++)
         pmt->AppendStream(pids[i], types[i]);
+    pmt->Finalize();
+
+    return pmt;
+}
+
+ProgramMapTable* ProgramMapTable::Create(
+    uint programNumber, uint basepid, uint pcrpid, uint version,
+    const desc_list_t         &global_desc,
+    const vector<uint>        &pids,
+    const vector<uint>        &types,
+    const vector<desc_list_t> &prog_desc)
+{
+    const uint count = min(pids.size(), types.size());
+    ProgramMapTable* pmt = CreateBlank();
+    pmt->tsheader()->SetPID(basepid);
+
+    pmt->RemoveAllStreams();
+    pmt->SetProgramNumber(programNumber);
+    pmt->SetPCRPID(pcrpid);
+    pmt->SetVersionNumber(version);
+
+    vector<unsigned char> gdesc;
+    for (uint i=0; i<global_desc.size(); i++)
+    {
+        uint len = global_desc[i][1];
+        gdesc.insert(gdesc.end(), global_desc[i], global_desc[i] + len);
+    }
+    pmt->SetProgramInfo(&gdesc[0], gdesc.size());
+
+    for (uint i=0; i<count; i++)
+    {
+        vector<unsigned char> pdesc;
+        for (uint j=0; j<prog_desc[i].size(); j++)
+        {
+            uint len = prog_desc[i][j][1];
+            pdesc.insert(pdesc.end(),
+                         prog_desc[i][j], prog_desc[i][j] + len);
+        }
+        
+        pmt->AppendStream(pids[i], types[i], &pdesc[0], pdesc.size());
+    }
     pmt->Finalize();
 
     return pmt;
