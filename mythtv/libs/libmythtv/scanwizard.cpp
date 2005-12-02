@@ -333,11 +333,12 @@ void ScanWizardScanner::scan()
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(QString("SELECT signal_timeout, channel_timeout "
+                          "FROM capturecard "
                           "WHERE cardid=%1").arg(parent->captureCard()));
-    if (query.exec() && query.isActive() && query.size() > 0)
+    if (query.exec() && query.isActive() && query.next())
     {
         signal_timeout  = (uint) max(query.value(0).toInt(), 250);
-        channel_timeout = (uint) max(query.value(0).toInt(), 500);
+        channel_timeout = (uint) max(query.value(1).toInt(), 500);
     }
  
     if (nScanType == ScanTypeSetting::FullScan_Analog)
