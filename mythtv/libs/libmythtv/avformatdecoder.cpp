@@ -1735,7 +1735,7 @@ QStringList AvFormatDecoder::listAudioTracks() const
         
         if (strlen(s->language) > 0)
         {
-            t += iso639_toName((unsigned char *)(s->language));
+            t += iso639_str_toName((unsigned char *)(s->language));
             t += " ";
         }
         
@@ -1930,7 +1930,7 @@ QStringList AvFormatDecoder::listSubtitleTracks() const
         
         if (strlen(s->language) > 0)
         {
-            t += iso639_toName((unsigned char *)(s->language));
+            t += iso639_str_toName((unsigned char *)(s->language));
             t += " ";
         }
          

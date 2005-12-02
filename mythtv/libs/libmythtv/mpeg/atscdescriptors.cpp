@@ -77,8 +77,9 @@ QString AudioStreamDescriptor::toString() const {
     return str;
 }
 
-QString ISO639LanguageCode::toString() const {
-    return iso639_toName(_data);
+QString ISO639LanguageCode::toString() const
+{
+    return iso639_str_toName(_data);
 }
 
 QString MultipleStringStructure::CompressionTypeString(int i, int j) const {
