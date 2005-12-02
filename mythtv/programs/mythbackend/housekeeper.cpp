@@ -244,7 +244,8 @@ void HouseKeeper::CleanupMyOldRecordings(void)
     MSqlQuery query(MSqlQuery::InitCon());
 
     query.prepare("DELETE FROM inuseprograms "
-                  "WHERE hostname = :HOSTNAME and recusage = 'recorder' ;");
+                  "WHERE hostname = :HOSTNAME AND "
+                    "( recusage = 'recorder' OR recusage LIKE 'Unknown %' );");
     query.bindValue(":HOSTNAME", gContext->GetHostName());
     query.exec();
 }
