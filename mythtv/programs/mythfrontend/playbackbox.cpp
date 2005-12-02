@@ -3806,7 +3806,8 @@ void PlaybackBox::showRecGroupChooser(void)
     
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT recgroup, COUNT(title) FROM recorded GROUP BY recgroup;");
+        "SELECT recgroup, COUNT(title) FROM recorded "
+        "WHERE deletepending = 0 GROUP BY recgroup;");
 
     QString itemStr;
     QString dispGroup;
@@ -4053,7 +4054,8 @@ void PlaybackBox::showRecGroupChanger(void)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
-        "SELECT recgroup, COUNT(title) FROM recorded GROUP BY recgroup");
+        "SELECT recgroup, COUNT(title) FROM recorded "
+        "WHERE deletepending = 0 GROUP BY recgroup");
 
     QStringList groups;
     QString itemStr;
