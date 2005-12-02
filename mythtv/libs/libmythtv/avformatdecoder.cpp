@@ -2058,7 +2058,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 av_init_packet(pkt);
             }
 
-            if (av_read_frame(ic, pkt) < 0)
+            if (!ic || (av_read_frame(ic, pkt) < 0))
             {
                 ateof = true;
                 GetNVP()->SetEof();

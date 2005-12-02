@@ -1920,6 +1920,11 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         if (m_tv)
             m_tv->SetIgnoreKeys(true);
     }
+    if (IsErrored())
+    {
+        eof = true;
+        return;
+    }
 
     ringBuffer->Unpause();
 
@@ -2176,7 +2181,7 @@ void NuppelVideoPlayer::StartPlaying(void)
                 JumpToProgram();
         }
 
-        if (nvr_enc && nvr_enc->GetErrorStatus())
+        if (IsErrored() || (nvr_enc && nvr_enc->GetErrorStatus()))
         {
             errored = killplayer = true;
             break;
