@@ -3396,6 +3396,9 @@ void ProgramInfo::UpdateInUseMark(bool force)
     if (isVideo)
         return;
 
+    if (inUseForWhat == "")
+        return;
+
     if (force || lastInUseTime.secsTo(QDateTime::currentDateTime()) > 60 * 60)
         MarkAsInUse(true);
 }
