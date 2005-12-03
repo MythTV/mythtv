@@ -3923,6 +3923,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    ddprocessor.getNextSuggestedTime();
+
     VERBOSE(VB_IMPORTANT, "\n"
             "===============================================================\n"
             "| Attempting to contact the master backend for rescheduling.  |\n"

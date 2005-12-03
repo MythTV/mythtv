@@ -534,6 +534,115 @@ FILE *DataDirectProcessor::getInputFile(bool plineupsOnly, QDateTime pstartDate,
     return ret;
 }
 
+bool DataDirectProcessor::getNextSuggestedTime(void)
+{
+    QString ddurl(DataDirectURLS[source]);
+         
+    char ctempfilenamesend[] = "/tmp/mythpostXXXXXX";
+    if (mkstemp(ctempfilenamesend) == -1) 
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("DDP: error creating temp file for sending -- %1").
+                arg(strerror(errno)));
+        return FALSE;
+    }
+    QString tmpfilenamesend = QString(ctempfilenamesend);
+
+    char ctempfilenamerecv[] = "/tmp/mythpostXXXXXX";
+    if (mkstemp(ctempfilenamerecv) == -1) 
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("DDP: error creating temp file for receiving -- %1").
+                arg(strerror(errno)));
+        return FALSE;
+    }
+    QString tmpfilenamereceive = QString(ctempfilenamerecv);
+
+    QFile postfile(tmpfilenamesend);
+    if (postfile.open(IO_WriteOnly)) 
+    {
+        QTextStream poststream(&postfile);
+        poststream << "<?xml version='1.0' encoding='utf-8'?>\n";
+        poststream << "<SOAP-ENV:Envelope\n";
+        poststream << "xmlns:SOAP-ENV='http://schemas.xmlsoap.org/soap/envelope/'\n";
+        poststream << "xmlns:xsd='http://www.w3.org/2001/XMLSchema'\n";
+        poststream << "xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n";
+        poststream << "xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'>\n";
+        poststream << "<SOAP-ENV:Body>\n";
+        poststream << "<tms:acknowledge xmlns:tms='urn:TMSWebServices'>\n";
+        poststream << "</SOAP-ENV:Body>\n";
+        poststream << "</SOAP-ENV:Envelope>\n";
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("DDP: error creating tmpfilesend -- %1").
+                arg(strerror(errno)));
+        return FALSE;
+    }
+    postfile.close();
+
+    QString command = QString("wget --http-user='%1' --http-passwd='%2' "
+                              "--post-file='%3' "
+                              " %4 --output-document='%5'")
+                              .arg(getUserID())
+                              .arg(getPassword())
+                              .arg(tmpfilenamesend)
+                              .arg(ddurl)
+                              .arg(tmpfilenamereceive);
+
+    popen(command.ascii(), "r");
+
+    QString NextSuggestedTime;
+//    QDateTime NextSuggestedTime;
+
+    QFile file(tmpfilenamereceive);
+
+    bool GotNextSuggestedTime = FALSE;
+
+    if (file.open(IO_ReadOnly)) 
+    {
+// There's probably a better way to do this, but we have to wait for the file to get
+// downloaded first, otherwise the while will immediately fall through.
+        sleep (10);
+        QTextStream stream(&file);
+        QString line;
+        while (!stream.atEnd()) 
+        {
+            line = stream.readLine();
+            if (line.startsWith("<suggestedTime>"))
+            {
+                GotNextSuggestedTime = TRUE;
+                NextSuggestedTime = line.mid(15,20);
+//                cout << endl << "timestr is: " << timestr << endl;
+//                QDateTime UTCdt = QDateTime::fromString(timestr, Qt::ISODate);
+//                NextSuggestedTime = MythUTCToLocal(UTCdt);
+//                NextSuggestedTime = timestr;
+                VERBOSE(VB_GENERAL, QString("NextSuggestedTime is: ") 
+//                        + NextSuggestedTime.toString(Qt::LocalDate));
+                        + NextSuggestedTime );
+// + ", localtime is: " 
+//                        + QString(QDateTime(NextSuggestedTime(Qt::LocalDate))));
+            }
+        }
+        file.close();
+    }
+    if (GotNextSuggestedTime)
+    {
+        MSqlQuery query(MSqlQuery::DDCon());
+
+        QString querystr = (QString("UPDATE settings SET data ='%1' "
+                                    "WHERE value='NextSuggestedMythfilldatabaseRun'")
+                                    .arg(NextSuggestedTime));
+//        cout << "querystr is:" << querystr << endl;
+        query.prepare(querystr);
+
+        if (!query.exec())
+            MythContext::DBError("Updating DataDirect Next Suggested Time", query);
+    }
+    return GotNextSuggestedTime;
+}
+
 bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate, 
                                    QDateTime pendDate) 
 {

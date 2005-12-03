@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1113";
+const QString currentDatabaseVersion = "1114";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -1887,8 +1887,22 @@ static bool doUpgradeTVDatabaseSchema(void)
 // Drop xvmc_buffer_settings table in 0.20
 // Drop dvb_dmx_buf_size and dvb_pkt_buf_size columns of channel in 0.20
 
+    if (dbver == "1113")
+    {
+        const QString updates[] = {
+"INSERT INTO settings VALUES ('NextSuggestedMythfilldatabaseRun',NULL,NULL);",
+"INSERT INTO settings VALUES ('HonorGrabberNextSuggestedMythfilldatabaseRunTime','1',NULL);",
+""
+};
+
+        if (!performActualUpdate(updates, "1114", dbver))
+            return false;
+    }
+
     return true;
 }
+
+
 
 bool InitializeDatabase(void)
 {
@@ -2546,6 +2560,8 @@ bool InitializeDatabase(void)
 "INSERT INTO `settings` VALUES ('mythfilldatabaseLastRunEnd',NULL,NULL);",
 "INSERT INTO `settings` VALUES ('mythfilldatabaseLastRunStatus',NULL,NULL);",
 "INSERT INTO `settings` VALUES ('DataDirectMessage',NULL,NULL);",
+"INSERT INTO `settings` VALUES ('NextSuggestedMythfilldatabaseRun',NULL,NULL);",
+"INSERT INTO `settings` VALUES ('HonorGrabberNextSuggestedMythfilldatabaseRunTime','1',NULL);",
 "INSERT INTO `settings` VALUES ('HaveRepeats','0',NULL);",
 "INSERT INTO `settings` VALUES ('DBSchemaVer','1112',NULL);",
 "INSERT INTO `settings` VALUES ('DefaultTranscoder','0',NULL);",
