@@ -70,7 +70,7 @@ struct ps_packet_{
 typedef
 struct pes_in_s{
 	int type;
-	int found;
+	unsigned int found;
 	int withbuf;
 	uint8_t *buf;
 	ringbuffer *rbuf;

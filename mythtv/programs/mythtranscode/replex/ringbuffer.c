@@ -92,10 +92,10 @@ int ring_write(ringbuffer *rbuf, uint8_t *data, int count)
 	return count;
 }
 
-int ring_peek(ringbuffer *rbuf, uint8_t *data, int count, long off)
+int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 {
 
-	int avail, pos, rest;
+	unsigned int avail, pos, rest;
 
 	if (count <=0 || off+count > rbuf->size || off+count >ring_avail(rbuf)) return -1;
 	pos  = (rbuf->read_pos+off)%rbuf->size;
@@ -120,10 +120,10 @@ int ring_peek(ringbuffer *rbuf, uint8_t *data, int count, long off)
 	return count;
 }
 
-int ring_poke(ringbuffer *rbuf, uint8_t *data, int count, long off)
+int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count, uint32_t off)
 {
 
-	int avail, pos, rest;
+	unsigned int avail, pos, rest;
 
 	if (count <=0 || off+count > rbuf->size || off+count >ring_avail(rbuf)) return -1;
 	pos  = (rbuf->read_pos+off)%rbuf->size;
@@ -309,10 +309,10 @@ static void show(uint8_t *buf, int length)
 	}
 }
 
-void ring_show(ringbuffer *rbuf, int count, long off)
+void ring_show(ringbuffer *rbuf, unsigned int count, uint32_t off)
 {
 
-	int avail, pos, rest;
+	unsigned int avail, pos, rest;
 
 	if (count <=0 || off+count > rbuf->size || off+count >ring_avail(rbuf)) return;
 	pos  = (rbuf->read_pos+off)%rbuf->size;

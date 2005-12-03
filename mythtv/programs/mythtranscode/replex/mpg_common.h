@@ -47,7 +47,7 @@ typedef struct index_unit_s{
 	uint8_t  frame_off;
 	uint8_t  frame_start;
 	uint8_t  err;
-	int      framesize;
+	uint16_t framesize;
 } index_unit;
 
 #define NO_ERR    0
@@ -58,7 +58,7 @@ void show_buf(uint8_t *buf, int length);
 int find_mpg_header(uint8_t head, uint8_t *buf, int length);
 int find_any_header(uint8_t *head, uint8_t *buf, int length);
 uint64_t trans_pts_dts(uint8_t *pts);
-int mring_peek( ringbuffer *rbuf, uint8_t *buf, int l, long off);
+int mring_peek( ringbuffer *rbuf, uint8_t *buf, unsigned int l, uint32_t off);
 int ring_find_mpg_header(ringbuffer *rbuf, uint8_t head, int off, int le);
 int ring_find_any_header(ringbuffer *rbuf, uint8_t *head, int off, int le);
 

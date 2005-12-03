@@ -333,7 +333,8 @@ void get_pes (pes_in_t *p, uint8_t *buf, int count, void (*func)(pes_in_t *p))
 				if (p->withbuf)
 					memcpy(p->buf+p->found, buf+c, l);
 				else {
-					if ( p->found < p->hlength+9 ){
+					if ( p->found < 
+                                             (unsigned int)p->hlength+9 ){
 						int rest = p->hlength+9-p->found;
 						memcpy(p->hbuf+p->found, buf+c, rest);
 						if (ring_write(p->rbuf, buf+c+rest, 
@@ -448,6 +449,7 @@ static void setl_ps(ps_packet *p)
 int cwrite_ps(uint8_t *buf, ps_packet *p, uint32_t length)
 {
         long count,i;
+        (void)length;
         uint8_t headr1[4] = {0x00, 0x00, 0x01, PACK_START };
         uint8_t headr2[4] = {0x00, 0x00, 0x01, SYS_START };
         uint8_t buffy = 0xFF;
@@ -843,6 +845,7 @@ int write_nav_pack(int pack_size, int apidn, int ac3n, uint64_t SCR, uint32_t mu
 {
 	int pos = 0;
         uint8_t headr[5] = {0x00, 0x00, 0x01, PRIVATE_STREAM2, 0x03 };
+        (void)pack_size;
 
 	pos = write_ps_header( buf, SCR, muxr, apidn+ac3n, 0, 0, 1, 1, 1, 1);
 	memcpy(buf+pos, headr, 5);

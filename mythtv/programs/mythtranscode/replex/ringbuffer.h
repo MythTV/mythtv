@@ -40,7 +40,7 @@ extern "C" {
 	typedef struct ringbuffer {
 		int read_pos;
 		int write_pos;
-		int size;
+		uint16_t size;
 		uint8_t *buffer;
 	} ringbuffer;
 
@@ -62,8 +62,10 @@ extern "C" {
 	int ring_read(ringbuffer *rbuf, uint8_t *data, int count);
 	int ring_write_file(ringbuffer *rbuf, int fd, int count);
 	int ring_read_file(ringbuffer *rbuf, int fd, int count);
-	int ring_peek(ringbuffer *rbuf, uint8_t *data, int count, long off);
-	int ring_poke(ringbuffer *rbuf, uint8_t *data, int count, long off);
+	int ring_peek(ringbuffer *rbuf, uint8_t *data, unsigned int count,
+                      uint32_t off);
+	int ring_poke(ringbuffer *rbuf, uint8_t *data, unsigned int count,
+                      uint32_t off);
 	int ring_skip(ringbuffer *rbuf, int count);
 
 	static inline int ring_wpos(ringbuffer *rbuf)
@@ -119,7 +121,7 @@ extern "C" {
 	void dummy_clear(dummy_buffer *dbuf);
 	int dummy_init(dummy_buffer *dbuf, int s);
         void dummy_destroy(dummy_buffer *dbuf);
-	void ring_show(ringbuffer *rbuf, int count, long off);
+	void ring_show(ringbuffer *rbuf, unsigned int count, uint32_t off);
 
 #ifdef __cplusplus
 }

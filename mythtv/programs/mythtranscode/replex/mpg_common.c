@@ -153,7 +153,7 @@ uint64_t trans_pts_dts(uint8_t *pts)
 }
 
 
-int mring_peek( ringbuffer *rbuf, uint8_t *buf, int l, long off)
+int mring_peek( ringbuffer *rbuf, uint8_t *buf, unsigned int l, uint32_t off)
 {
         int c = 0;
 

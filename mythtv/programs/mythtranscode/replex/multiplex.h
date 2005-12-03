@@ -47,7 +47,7 @@ typedef struct multiplex_s{
 	uint64_t video_delay;
 	uint64_t audio_delay;
 	int pack_size;
-	int data_size;
+	unsigned int data_size;
 	uint32_t audio_buffer_size;
 	uint32_t video_buffer_size;
 	uint32_t mux_rate;
@@ -60,7 +60,7 @@ typedef struct multiplex_s{
 	int reset_clocks;
 	int write_end_codes;
 	int set_broken_link;
-	int vsize, asize;
+	unsigned int vsize, asize;
 	int64_t extra_clock;
 	uint64_t first_vpts;
 	uint64_t first_apts[N_AUDIO];

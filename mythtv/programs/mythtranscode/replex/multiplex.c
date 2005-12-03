@@ -143,7 +143,7 @@ static void writeout_video(multiplex_t *mx)
 	uint8_t outbuf[3000];
 	int written=0;
 	uint8_t ptsdts=0;
-	int length;
+	unsigned int length;
 	int nlength=0;
         int frame_len=0;
 	index_unit *viu = &mx->viu;
@@ -249,7 +249,7 @@ static void writeout_audio(multiplex_t *mx, int type, int n)
 {  
 	uint8_t outbuf[3000];
 	int written=0;
-	int length=0;
+	unsigned int length=0;
 	dummy_buffer *dbuf;
 	ringbuffer *airbuffer;
 	int nlength=0;
