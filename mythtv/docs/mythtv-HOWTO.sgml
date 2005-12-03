@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-11-23, v0.18.15
+<date>2005-12-03, v0.18.16
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -804,7 +804,7 @@ should be brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).
 be obtained from <url url="http://rpm.nyvalls.se/"
 name="http://rpm.nyvalls.se/"> If you have problems with the RPMs, please
 send him email directly at <url url="thac@nyvalls.se" name="thac@nyvalls.se">.
-
+<!--
 <sect3>Debian
 <p>Debian packages for MythTV and most of its add-on modules are maintained
 by Matt Zimmerman <url url="mailto:mdz@debian.org"
@@ -841,7 +841,7 @@ devices, and everything else that MythTV needs to do.
 information, including copies of the MythTV documentation.  The
 <tt>mythtv-doc</tt> package contains a copy of this HOWTO in
 <tt>/usr/share/doc/mythtv-doc</tt>.
-
+-->
 <sect2>Manual installation
 <p>You may use the graphical tools that come with your distribution, or you
 can use command-line utilities.  Either system will get the job done, and it
@@ -984,6 +984,7 @@ To enable SQL support, add "mysql" to your USE variable in
 
 All the necessary files will be downloaded and built. Even on a fast machine
 this may take a lot of time if you need to do a full Qt build.
+<!--
 <sect3>Debian.
 <p>See <url
 url="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/"
@@ -1021,6 +1022,7 @@ Need to get 0B/24.0MB of archives.
 After unpacking 78.7MB of additional disk space will be used.
 Do you want to continue? [Y/n] 
 </verb></tscreen>
+-->
 <sect>System Configuration Requirements for Compiling MythTV. <label
 id="Setting_up_paths">
 <p>Before you compile MythTV from the current source tarball or from
@@ -7668,6 +7670,9 @@ cards.  Robert Tsai's doc contribution.
 v0.18.15, 2005-11-23.  Update link to DVB wiki.  Update link to
 ivtvdriver.org.  If you're running SVN, you'd better be on -commits and
 -dev.
+v0.18.16, 2005-12-03.  Remove link to mdz's Debian packages since he's not
+maintaining them anymore.
+
 -->
 
 <!--

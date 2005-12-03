@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-11-23, v0.18.15
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-12-03, v0.18.16
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -1044,46 +1044,6 @@ be obtained from
 <A HREF="http://rpm.nyvalls.se/">http://rpm.nyvalls.se/</A> If you have problems with the RPMs, please
 send him email directly at 
 <A HREF="thac@nyvalls.se">thac@nyvalls.se</A>.</P>
-
-<H3>Debian</H3>
-
-<P>Debian packages for MythTV and most of its add-on modules are maintained
-by Matt Zimmerman 
-<A HREF="mailto:mdz@debian.org">mailto:mdz@debian.org</A> and are available at 
-<A HREF="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/</A>. 
-Installation instructions can be found on those pages as well. All of the
-prerequisites for MythTV are available as Debian packages, most of them from
-the official Debian archive.</P>
-<P>If you have followed the instructions on the above page you should have added
-<BLOCKQUOTE><CODE>
-<PRE>
-deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
-<P>to your <CODE>/etc/apt/sources.list</CODE> file.  Running <B>apt-get update</B> and then
-executing <B>apt-get build-dep mythtv</B> should install all the
-pre-requisites required to compile MythTV.</P>
-<P>
-<FIGURE>
-<EPS FILE="warning.eps">
-<IMG SRC="warning.png">
-<CAPTION><B>NOTE</B>:  Due to the requirement for Qt 3.1+, there are no packages for
-Debian woody/stable.</CAPTION>
-</FIGURE>
-</P>
-
-<P>The Debian packages are configured such that MythTV programs should be
-run as the <CODE>mythtv</CODE> user, which is automatically created during
-installation.  This user has access to write new recordings to disk in the
-default directory, read and write the database, access the audio and video
-devices, and everything else that MythTV needs to do.</P>
-
-<P>See <CODE>/usr/share/doc/<I>packagename</I>/README.Debian</CODE> for more
-information, including copies of the MythTV documentation.  The
-<CODE>mythtv-doc</CODE> package contains a copy of this HOWTO in
-<CODE>/usr/share/doc/mythtv-doc</CODE>.</P>
-
 <H3>Manual installation</H3>
 
 <P>You may use the graphical tools that come with your distribution, or you
@@ -1239,48 +1199,6 @@ To enable SQL support, add "mysql" to your USE variable in
 </P>
 <P>All the necessary files will be downloaded and built. Even on a fast machine
 this may take a lot of time if you need to do a full Qt build.</P>
-<H3>Debian.</H3>
-
-<P>See 
-<A HREF="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/</A> for
-up-to-date information for Debian.</P>
-<P>Build-dependencies for MythTV can be satisfied by adding the following to
-your <CODE>/etc/apt/sources.list</CODE>
-<BLOCKQUOTE><CODE>
-<PRE>
-# MythTV
-deb http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
-deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
-
-# Christian Marillat's packages (mplayer, lame)
-deb ftp://ftp.nerim.net/debian-marillat/ sarge main
-</PRE>
-</CODE></BLOCKQUOTE>
-
-and executing:
-<BLOCKQUOTE><CODE>
-<PRE>
-sh-2.05b# apt-get build-dep mythtv
-Reading Package Lists...
-Building Dependency Tree...
-The following NEW packages will be installed:
-  debconf-utils debhelper file fontconfig gettext html2text intltool-debian
-  libaudio2 libexpat1 libfontconfig1 libfontconfig1-dev libfreetype6
-  libfreetype6-dev libglib2.0-0 libjpeg62 libjpeg62-dev liblame-dev liblame0
-  liblcms1 liblcms1-dev libmagic1 libmng-dev libmng1 libmysqlclient-dev
-  libmysqlclient12 libogg-dev libogg0 libpng12-0 libpng12-dev libqt3-headers
-  libqt3-mt-dev libqt3c102-mt libvorbis-dev libvorbis0a libvorbisenc2
-  libvorbisfile3 libxcursor-dev libxcursor1 libxft2 libxft2-dev libxrender-dev
-  libxrender1 mysql-common pkg-config po-debconf qt3-dev-tools xfree86-common
-  xlibmesa-gl-dev xlibmesa-glu-dev xlibmesa3-gl xlibmesa3-glu xlibs xlibs-dev
-  zlib1g-dev
-0 upgraded, 54 newly installed, 0 to remove and 0 not upgraded.
-Need to get 0B/24.0MB of archives.
-After unpacking 78.7MB of additional disk space will be used.
-Do you want to continue? [Y/n] 
-</PRE>
-</CODE></BLOCKQUOTE>
-</P>
 <H2><A NAME="Setting_up_paths"></A> <A NAME="s4">4.</A> <A HREF="#toc4">System Configuration Requirements for Compiling MythTV. </A></H2>
 
 <P>Before you compile MythTV from the current source tarball or from
