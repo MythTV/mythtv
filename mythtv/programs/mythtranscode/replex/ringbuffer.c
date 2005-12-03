@@ -348,6 +348,12 @@ int dummy_init(dummy_buffer *dbuf, int s)
 	return 0;
 }
 
+void dummy_destroy(dummy_buffer *dbuf)
+{
+        ring_destroy(&dbuf->time_index);
+        ring_destroy(&dbuf->data_index);
+}
+
 void dummy_clear(dummy_buffer *dbuf)
 {
 	dbuf->fill = 0;

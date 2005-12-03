@@ -408,7 +408,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            int err = m2f->start();
+            int err = m2f->Start();
             if (err)
                 return err;
             err = BuildKeyframeIndex(m2f, outfile, posMap, jobID);
@@ -416,6 +416,7 @@ int main(int argc, char *argv[])
                 return err;
             UpdatePositionMap(posMap, NULL, pginfo);
         }
+        delete m2f;
         result = REENCODE_OK;
     }
     

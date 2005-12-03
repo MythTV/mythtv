@@ -1,5 +1,4 @@
 
-#include <stdlib.h>
 #include <pthread.h>
 //Qt
 #include <qmap.h>
@@ -38,6 +37,10 @@ class MPEG2frame
     {
         pkt.data = (uint8_t *)malloc(size);
         pkt_memsize = size;
+    }
+    ~MPEG2frame()
+    {
+        free(pkt.data);
     }
     void ensure_size(int size)
     {
@@ -84,8 +87,9 @@ typedef QValueList<MPEG2ptsdelta> MPEG2ptsDeltaList;
 class MPEG2replex
 {
   public:
-    void start();
-    int wait_buffers();
+    ~MPEG2replex();
+    void Start();
+    int WaitBuffers();
     int done;
     QString outfile;
     ringbuffer vrbuf;
@@ -113,61 +117,62 @@ class MPEG2fixup
     MPEG2fixup(const char *inf, const char *outf,
                QMap<long long, int> *deleteMap, const char *fmt, int norp,
                int fixPTS, int maxf);
-    int start();
-    void add_cutlist(QStringList cutlist);
+    ~MPEG2fixup();
+    int Start();
+    void AddCutlist(QStringList cutlist);
     int BuildKeyframeIndex(QString &file, QMap<long long, long long> &posMap);
 
   protected:
-    static void *replex_start(void *data);
+    static void *ReplexStart(void *data);
     MPEG2replex rx;
 
   private:
-    int find_mpeg2_header(uint8_t *buf, int size, uint8_t code);
-    void init_replex();
-    QString pts_time(int64_t pts);
-    void frame_info(MPEG2frame *f);
-    int add_frame(MPEG2frame *f);
-    int init_av(const char *inputfile, const char *type, int64_t offset);
-    void scan_audio();
-    bool process_video(MPEG2frame *vf, mpeg2dec_t *dec);
-    void write_frame(const char *filename, AVPacket *pkt);
-    void write_yuv(const char *filename, const mpeg2_info_t *info);
-    void write_data(const char *filename, uint8_t *data, int size);
-    int build_frame(AVPacket *pkt, QString fname);
-    MPEG2frame *get_pool_frame(AVPacket *pkt);
-    int get_frame(AVPacket *pkt);
-    bool find_start();
-    void set_repeat(MPEG2frame *vf, int nb_fields, bool topff);
-    void set_repeat(uint8_t *ptr, int size, int fields, bool topff);
-    MPEG2frame *find_frame_num(int frameNum);
-    void renumber_frames(int frame_pos, int delta);
-    void store_secondary();
-    int  playback_secondary();
-    MPEG2frame *decode_to_frame(int frameNum, int skip_reset);
-    int convert_to_i(int frameNum, int numFrames, int headPos);
-    int insert_frame(int frameNum, int64_t deltaPTS,
+    int FindMPEG2Header(uint8_t *buf, int size, uint8_t code);
+    void InitReplex();
+    QString PtsTime(int64_t pts);
+    void FrameInfo(MPEG2frame *f);
+    int AddFrame(MPEG2frame *f);
+    int InitAV(const char *inputfile, const char *type, int64_t offset);
+    void ScanAudio();
+    bool ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec);
+    void WriteFrame(const char *filename, AVPacket *pkt);
+    void WriteYUV(const char *filename, const mpeg2_info_t *info);
+    void WriteData(const char *filename, uint8_t *data, int size);
+    int BuildFrame(AVPacket *pkt, QString fname);
+    MPEG2frame *GetPoolFrame(AVPacket *pkt);
+    int GetFrame(AVPacket *pkt);
+    bool FindStart();
+    void SetRepeat(MPEG2frame *vf, int nb_fields, bool topff);
+    void SetRepeat(uint8_t *ptr, int size, int fields, bool topff);
+    MPEG2frame *FindFrameNum(int frameNum);
+    void RenumberFrames(int frame_pos, int delta);
+    void StoreSecondary();
+    int  PlaybackSecondary();
+    MPEG2frame *DecodeToFrame(int frameNum, int skip_reset);
+    int ConvertToI(int frameNum, int numFrames, int headPos);
+    int InsertFrame(int frameNum, int64_t deltaPTS,
                      int64_t ptsIncrement, int64_t initPTS);
-    void add_sequence(MPEG2frame *frame1, MPEG2frame *frame2);
-    void set_frame_num(uint8_t *ptr, int num);
-    int get_frame_num(MPEG2frame *frame)
+    void AddSequence(MPEG2frame *frame1, MPEG2frame *frame2);
+    void SetFrameNum(uint8_t *ptr, int num);
+    int GetFrameNum(MPEG2frame *frame)
     {
         return frame->mpeg2_pic.temporal_reference;
     }
-    int get_frame_type_n(MPEG2frame *frame)
+    int GetFrameTypeN(MPEG2frame *frame)
     {
         return frame->mpeg2_pic.flags & PIC_MASK_CODING_TYPE;
     }
-    char get_frame_type_t(MPEG2frame *frame)
+    char GetFrameTypeT(MPEG2frame *frame)
     {
-        int type = get_frame_type_n(frame);
+        int type = GetFrameTypeN(frame);
         return (type == 1 ? 'I' :
                 (type == 2 ? 'P' : (type == 3 ? 'B' : 'X')));
     }
-    int get_nb_fields(MPEG2frame *frame)
+    int GetNbFields(MPEG2frame *frame)
     {
         return frame->mpeg2_pic.nb_fields;
     }
-    int get_stream_type(int id)
+    int GetStreamType(int id)
     {
         return (inputFC->streams[id]->codec->codec_id == CODEC_ID_AC3) ?
                CODEC_ID_AC3 : CODEC_ID_MP2;

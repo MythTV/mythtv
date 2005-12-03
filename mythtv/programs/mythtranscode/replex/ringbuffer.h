@@ -118,6 +118,7 @@ extern "C" {
 	int dummy_add(dummy_buffer *dbuf, uint64_t time, uint32_t size);
 	void dummy_clear(dummy_buffer *dbuf);
 	int dummy_init(dummy_buffer *dbuf, int s);
+        void dummy_destroy(dummy_buffer *dbuf);
 	void ring_show(ringbuffer *rbuf, int count, long off);
 
 #ifdef __cplusplus

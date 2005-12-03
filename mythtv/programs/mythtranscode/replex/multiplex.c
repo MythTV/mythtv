@@ -601,6 +601,12 @@ void finish_mpg(multiplex_t *mx)
                           
 	if (mx->otype == REPLEX_MPEG2)
 		write(mx->fd_out, mpeg_end,4);
+
+	dummy_destroy(&mx->vdbuf);
+	for (i=0; i<mx->apidn;i++)
+		dummy_destroy(&mx->adbuf[i]);
+	for (i=0; i<mx->ac3n;i++)
+		dummy_destroy(&mx->ac3dbuf[i]);
 }
 
 
