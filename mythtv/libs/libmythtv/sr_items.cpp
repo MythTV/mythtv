@@ -191,7 +191,7 @@ void SRPlayGroup::fillSelections()
 
     while (!names.isEmpty())
     {
-        addSelection(QObject::tr("Store in the \"%1\" playback group")
+        addSelection(QObject::tr("Use \"%1\" playback group settings")
                      .arg(names.front()), names.front());
         names.pop_front();
     }
