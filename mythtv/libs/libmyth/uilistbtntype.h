@@ -111,6 +111,8 @@ class UIListTreeType : public UIType
     void enter();
     void moveAwayFrom(UIListGenericTree *node);
     int  getNumbItemsVisible();
+    bool incSearchStart();
+    bool incSearchNext();
 
   signals:
     
@@ -202,6 +204,9 @@ class UIListBtnType : public UIType
     void  MoveUp(int count);    
     bool  MoveToNamedPosition(const QString &position_name);
 
+    bool  incSearchStart();
+    bool  incSearchNext();
+
     bool  IsVisible() { return m_visible; }
     void  SetVisible(bool vis) { m_visible = vis; }
 
@@ -280,6 +285,9 @@ class UIListBtnType : public UIType
     friend class UIListBtnTypeItem;
   
     int m_xdrawoffset;
+
+    QString  m_incSearch;
+    bool     m_bIncSearchContains;
 
   signals:
 

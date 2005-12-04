@@ -750,6 +750,30 @@ bool UIListTreeType::tryToSetCurrent(QStringList route)
     return keep_going;
 }
 
+bool UIListTreeType::incSearchStart(void)
+{
+    bool res = currentlevel->incSearchStart();
+
+    if (res)
+    {
+        SetCurrentPosition();
+        RedrawCurrent();
+    }
+    return (res);
+}
+
+bool UIListTreeType::incSearchNext(void)
+{
+    bool res = currentlevel->incSearchNext();
+
+    if (res)
+    {
+        SetCurrentPosition();
+        RedrawCurrent();
+    }
+    return (res);
+}
+
 int UIListTreeType::getDepth()
 {
     return curlevel;
@@ -856,7 +880,9 @@ UIListBtnType::UIListBtnType(const QString& name, const QRect& area,
     m_selPosition = 0;
     m_topPosition = 0;
     m_itemCount = 0;
- 
+    m_incSearch = "";
+    m_bIncSearchContains = false;
+
     m_initialized     = false;
     m_clearing        = false;
     m_itemSpacing     = 0;
@@ -1062,12 +1088,45 @@ void UIListBtnType::SetItemCurrent(UIListBtnTypeItem* item)
         m_selPosition = 0;
     }
 
-    m_itemCount = m_selPosition;
-    m_topItem = item;
     m_selItem = item;
+    m_topItem = m_selItem;
+    m_topPosition = m_selPosition;
     (*m_topIterator) = (*m_selIterator);
 
-    if (m_showScrollArrows && m_itemCount > (int)m_itemsVisible)
+    // centre the selected item in the list
+    int count = m_itemsVisible / 2;
+
+    while (count && m_topPosition > 0) 
+    {
+        --(*m_topIterator);
+        --m_topPosition;
+        --count;
+    }
+
+    // backup if we have scrolled past the end of the list
+    if (m_topPosition + (int)m_itemsVisible > m_itemCount)
+    {
+        while (m_topPosition > 0 && m_topPosition + (int)m_itemsVisible > m_itemCount) 
+        {
+            --(*m_topIterator);
+            --m_topPosition;
+        }
+    }
+
+    if (m_topIterator->current())
+        m_topItem = m_topIterator->current();
+    else
+    {
+        m_topItem = m_topIterator->toFirst();
+        m_topPosition = 0;
+    }
+
+    if (m_topItem != m_itemList.first())
+        m_showUpArrow = true;
+    else
+        m_showUpArrow = false;
+
+    if (m_topPosition + (int)m_itemsVisible < m_itemCount)
         m_showDnArrow = true;
     else
         m_showDnArrow = false;
@@ -1425,6 +1484,110 @@ bool UIListBtnType::MoveItemUpDown(UIListBtnTypeItem *item, bool flag)
     return true;
 }
 
+bool UIListBtnType::incSearchStart(void)
+{
+    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+                                           "incserach_popup");
+
+    QLabel *caption = popup->addLabel(tr("Search"), MythPopupBox::Large);
+    caption->setAlignment(Qt::AlignCenter);
+
+    MythComboBox *modeCombo = new MythComboBox(false, popup, "mode_combo" );
+    modeCombo->insertItem(tr("Starts with text"));
+    modeCombo->insertItem(tr("Contains text"));
+    popup->addWidget(modeCombo);
+
+    MythLineEdit *searchEdit = new MythLineEdit(false, popup, "mode_combo");
+    searchEdit->setText(m_incSearch);
+    popup->addWidget(searchEdit);
+    searchEdit->setFocus();
+
+    popup->addButton(tr("Search"));
+    popup->addButton(tr("Cancel"));
+
+    int res = popup->ExecPopup();
+
+    if (res == 0)
+    {
+        m_incSearch = searchEdit->text();
+        m_bIncSearchContains = (modeCombo->currentItem() == 1);
+        incSearchNext();
+    }
+
+    delete popup;
+
+    return (res == 0);
+}
+
+bool UIListBtnType::incSearchNext(void)
+{
+    if (!m_selItem)
+    {
+        return false;
+    }
+
+    //
+    //  Move the active node to the node whose string value
+    //  starts or contains the search text
+    //
+
+    QPtrListIterator<UIListBtnTypeItem> it = (*m_selIterator);
+    ++it;
+
+    while (it.current())
+    {
+        if (m_bIncSearchContains)
+        {
+            if (it.current()->text().find(m_incSearch, 0, false) != -1)
+                break;
+        }
+        else
+        {
+            if (it.current()->text().startsWith(m_incSearch, false))
+                break;
+        }
+
+        ++it;
+    }
+
+    // if it is NULL, we reached the end of the list. wrap to the
+    // beginning and try again
+    if (!it.current())
+    {
+        it.toFirst();
+
+        while (it.current())
+        {
+            // we're back at the current_node, which means there are no
+            // matching nodes
+            if (it.current() == m_selItem)
+            {
+                break;
+            }
+
+            if (m_bIncSearchContains)
+            {
+                if (it.current()->text().find(m_incSearch, 0, false) != -1)
+                    break;
+            }
+            else
+            {
+                if (it.current()->text().startsWith(m_incSearch, false))
+                    break;
+            }
+
+            ++it;
+        }
+    }
+
+    if (it.current())
+    {
+        SetItemCurrent(it.current());
+        return true;
+    }
+
+    return false;
+}
 
 void UIListBtnType::Draw(QPainter *p, int order, int context)
 {

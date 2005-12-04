@@ -908,7 +908,6 @@ class UIManagedTreeListType : public UIType
     bool    pushDown();
     bool    moveUp(bool do_refresh = true);
     bool    moveDown(bool do_refresh = true);
-    bool    jumpToLetter(QString letter);
     bool    pageUp();
     bool    pageDown();
     bool    nextActive(bool wrap_around, bool traverse_up_down);
@@ -917,6 +916,8 @@ class UIManagedTreeListType : public UIType
     void    activate();
     void    enter();
     void    deactivate(){active_node = NULL;}
+    bool    incSearchStart();
+    bool    incSearchNext();
 
   signals:
 
@@ -960,6 +961,8 @@ class UIManagedTreeListType : public UIType
     QPoint                  selectPoint;
     QPoint                  upArrowOffset;
     QPoint                  downArrowOffset;
+    QString                 incSearch;
+    bool                    bIncSearchContains;
 };
 
 class UIPushButtonType : public UIType

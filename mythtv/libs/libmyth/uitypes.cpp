@@ -2792,6 +2792,7 @@ UIManagedTreeListType::UIManagedTreeListType(const QString & name)
     upArrowOffset.setY(0);
     downArrowOffset.setX(0);
     downArrowOffset.setY(0);
+    incSearch = "";
 }
 
 UIManagedTreeListType::~UIManagedTreeListType()
@@ -3659,7 +3660,42 @@ bool UIManagedTreeListType::moveDown(bool do_refresh)
     return false;
 }
 
-bool UIManagedTreeListType::jumpToLetter(QString letter)
+bool UIManagedTreeListType::incSearchStart(void)
+{
+    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+                                           "incsearch_popup");
+
+    QLabel *caption = popup->addLabel(tr("Search"), MythPopupBox::Large);
+    caption->setAlignment(Qt::AlignCenter);
+
+    MythComboBox *modeCombo = new MythComboBox(false, popup, "mode_combo" );
+    modeCombo->insertItem(tr("Starts with text"));
+    modeCombo->insertItem(tr("Contains text"));
+    popup->addWidget(modeCombo);
+
+    MythLineEdit *searchEdit = new MythLineEdit(false, popup, "mode_combo");
+    searchEdit->setText(incSearch);
+    popup->addWidget(searchEdit);
+    searchEdit->setFocus();
+
+    popup->addButton(tr("Search"));
+    popup->addButton(tr("Cancel"));
+
+    int res = popup->ExecPopup();
+
+    if (res == 0)
+    {
+        incSearch = searchEdit->text();
+        bIncSearchContains = (modeCombo->currentItem() == 1);
+        incSearchNext();
+    }
+
+    delete popup;
+
+    return (res == 0);
+}
+
+bool UIManagedTreeListType::incSearchNext(void)
 {
     if (!current_node)
     {
@@ -3668,16 +3704,22 @@ bool UIManagedTreeListType::jumpToLetter(QString letter)
 
     //
     //  Move the active node to the node whose string value
-    //  starts with the given letter
+    //  starts or contains the search text
     //
-
-    letter = letter.lower();
 
     GenericTree *new_node = current_node->nextSibling(1, visual_order);
     while (new_node)
     {
-        if (new_node->getString().left(1).lower() == letter)
-            break;
+        if (bIncSearchContains)
+        {
+            if (new_node->getString().find(incSearch, 0, false) != -1)
+                break;
+        }
+        else
+        {
+            if (new_node->getString().startsWith(incSearch, false))
+                break;
+        }
 
         new_node = new_node->nextSibling(1, visual_order);
     }
@@ -3698,8 +3740,16 @@ bool UIManagedTreeListType::jumpToLetter(QString letter)
                 break;
             }
 
-            if (new_node->getString().left(1).lower() == letter)
-                break;
+            if (bIncSearchContains)
+            {
+                if (new_node->getString().find(incSearch, 0, false) != -1)
+                    break;
+            }
+            else
+            {
+                if (new_node->getString().startsWith(incSearch, false))
+                    break;
+            }
 
             new_node = new_node->nextSibling(1, visual_order);
         }
