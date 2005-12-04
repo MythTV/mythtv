@@ -818,7 +818,8 @@ void AutoExpire::UpdateDontExpireSet(void)
     dont_expire_set.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT chanid, starttime, lastupdatetime "
+    query.prepare("SELECT chanid, starttime, lastupdatetime, recusage, "
+                  " hostname "
                   "FROM inuseprograms;");
 
     if (!query.exec() || !query.isActive() || !query.size())
@@ -837,8 +838,10 @@ void AutoExpire::UpdateDontExpireSet(void)
         {
             QString key = chanid + startts.toString(Qt::ISODate);
             dont_expire_set.insert(key);
-            VERBOSE(VB_FILE, QString("    %1 @ %2")
-                                     .arg(chanid).arg(startts.toString()));
+            VERBOSE(VB_FILE, QString("    %1 @ %2 in use by %3 on %4")
+                                     .arg(chanid).arg(startts.toString())
+                                     .arg(query.value(3).toString())
+                                     .arg(query.value(4).toString()));
         }
     }
 }
