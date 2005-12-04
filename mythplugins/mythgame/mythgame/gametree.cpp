@@ -401,8 +401,10 @@ void GameTree::keyPressEvent(QKeyEvent *e)
             m_gameTreeUI->pageDown();
         else if (action == "TOGGLEFAV")
             toggleFavorite();
-        else if (action.left(4) == "JUMP")
-            m_gameTreeUI->jumpToLetter(action.mid(4));
+        else if (action == "INCSEARCH")
+            m_gameTreeUI->incSearchStart();
+        else if (action == "INCSEARCHNEXT")
+            m_gameTreeUI->incSearchNext();
         else
             handled = false;
     }

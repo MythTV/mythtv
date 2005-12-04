@@ -1166,6 +1166,10 @@ void DatabaseBox::keyPressEvent(QKeyEvent *e)
             tree->MoveUp(UIListTreeType::MovePage);
         else if (action == "PAGEDOWN")
             tree->MoveDown(UIListTreeType::MovePage);
+        else if (action == "INCSEARCH")
+            tree->incSearchStart();
+        else if (action == "INCSEARCHNEXT")
+            tree->incSearchNext();
         else
             handled = false;
     }
