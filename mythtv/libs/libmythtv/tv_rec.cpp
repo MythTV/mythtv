@@ -602,10 +602,14 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
         return;
 
     curRec->recstatus = rsRecorded;
-    curRec->recendts = QDateTime::currentDateTime().addSecs(30);
+    curRec->recendts = QDateTime::currentDateTime();
+
+    if (tvchain)
+        tvchain->FinishedRecording(curRec);
+
     curRec->recendts.setTime(QTime(
-        curRec->recendts.time().hour(),
-        curRec->recendts.time().minute()));
+        curRec->recendts.addSecs(30).time().hour(),
+        curRec->recendts.addSecs(30).time().minute()));
 
     MythEvent me(QString("UPDATE_RECORDING_STATUS %1 %2 %3 %4 %5")
                  .arg(curRec->cardid)

@@ -4201,63 +4201,32 @@ int NuppelVideoPlayer::calcSliderPos(QString &desc) const
 
     QString text1, text2;
 
-/*
     if (livetv)
     {
-        ret = ringBuffer->GetFreeSpace() /
-              ((float)ringBuffer->GetFileSize() - ringBuffer->GetSmudgeSize());
-        ret *= 1000.0;
+        int secondsBehind = 0;
+        int totalRecorded = 1;
 
-        long long written = nvr_enc->GetFramesWritten();
-        long long played = framesPlayed;
+        if (livetvchain)
+            livetvchain->GetSecondsBehind(
+                             (int)(framesPlayed / video_frame_rate),
+                             secondsBehind, totalRecorded);
 
-        if (played > written)
-            played = written;
-        if (played < 0)
-            played = 0;
+        ret = 1000.0 * (1.0 * secondsBehind / totalRecorded);
 
-        int secsbehind = (int)((float)(written - played) / video_frame_rate);
-
-        if (secsbehind < 0)
-            secsbehind = 0;
-
-        int hours = (int)secsbehind / 3600;
-        int mins = ((int)secsbehind - hours * 3600) / 60;
-        int secs = ((int)secsbehind - hours * 3600 - mins * 60);
+        int hours = secondsBehind / 3600;
+        int mins = (secondsBehind - hours * 3600) / 60;
+        int secs = (secondsBehind - hours * 3600 - mins * 60);
 
         if (hours > 0)
-        {
             text1.sprintf("%d:%02d:%02d", hours, mins, secs);
-            if (osd && osd->getTimeType() == 0)
-            {
-                text2.sprintf("%.2f%%", (1000 - ret) / 10);
-                desc = QObject::tr("%1 behind  --  %2 full")
-                                   .arg(text1).arg(text2);
-            }
-            else
-            {
-                desc = QObject::tr("%1 behind").arg(text1);
-            }
-        }
         else
-        {
             text1.sprintf("%d:%02d", mins, secs);
-            if (osd && osd->getTimeType() == 0)
-            {
-                text2.sprintf("%.2f%%", (1000 - ret) / 10);
-                desc = QObject::tr("%1 behind  --  %2 full")
-                        .arg(text1).arg(text2);
-            }
-            else
-            {
-                desc = QObject::tr("%1 behind").arg(text1);
-            }
-        }
 
+        desc = QObject::tr("%1 behind").arg(text1);
         
         return (int)(1000 - ret);
     }
-*/
+
     if (ringBuffer->isDVD())
     {
         long long rPos = ringBuffer->GetReadPosition();

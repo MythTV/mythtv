@@ -14,6 +14,7 @@ struct LiveTVChainEntry
 {
     QString chanid;
     QDateTime starttime;
+    QDateTime endtime;
     bool discontinuity; // if true, can't play smooth from last entry
     QString hostprefix;
     QString cardtype;
@@ -37,6 +38,7 @@ class LiveTVChain
 
     void AppendNewProgram(ProgramInfo *pginfo, QString channum,
                           QString inputname, bool discont);
+    void FinishedRecording(ProgramInfo *pginfo);
     void DeleteProgram(ProgramInfo *pginfo);
 
     void ReloadAll();
@@ -46,6 +48,8 @@ class LiveTVChain
     int  GetCurPos(void) const { return m_curpos; }
     int  ProgramIsAt(const QString &chanid, const QDateTime &starttime) const;
     int  ProgramIsAt(const ProgramInfo *pginfo) const;
+    void GetSecondsBehind(int secondsInCurrent, int &secondsBehind,
+                          int &totalLength);
     int  TotalSize(void) const;
     bool HasNext(void)   const;
     bool HasPrev(void)   const { return (m_curpos > 0); }
