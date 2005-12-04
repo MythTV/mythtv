@@ -4,6 +4,7 @@
 #include "mythdbcon.h"
 #include "util.h"
 
+#include <unistd.h>
 #include <qfile.h>
 #include <qstring.h>
 #include <cerrno>
