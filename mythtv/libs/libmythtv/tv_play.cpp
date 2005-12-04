@@ -3402,8 +3402,25 @@ void TV::UpdateOSDInput(void)
         return;
 
     QString name = tvchain->GetInputName(-1);
-    QString msg = QString ("%1: %2")
-        .arg(activerecorder->GetRecorderNumber()).arg(name);
+    QString displayName = "";
+    QString msg;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString thequery = QString("SELECT displayname FROM capturecard "
+                               "WHERE cardid = \"%1\";")
+                               .arg(activerecorder->GetRecorderNumber());
+    query.exec(thequery);
+    if (query.isActive() && query.size() > 0)
+    {
+        query.next();
+        displayName = query.value(0).toString();
+    }
+
+    if ( displayName == "")
+        msg = QString("%1: %2")
+                .arg(activerecorder->GetRecorderNumber()).arg(name);
+    else
+        msg = displayName;
 
     if (GetOSD())
         GetOSD()->SetSettingsText(msg, 3);

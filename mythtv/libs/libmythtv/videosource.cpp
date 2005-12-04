@@ -1095,6 +1095,19 @@ class ChannelTimeout: public SpinBoxSetting, public CCSetting
     };
 };
 
+class CaptureCardDisplayName: public LineEditSetting, public CCSetting
+{
+  public:
+    CaptureCardDisplayName(const CaptureCard& parent)
+      : CCSetting(parent, "displayname")
+    {
+        setLabel(QObject::tr("Display Name"));
+        setHelpText(QObject::tr(
+                        "This name is shown for example when changing "
+                        "the input in LiveTV via C or Y."));
+    };
+};
+
 class AudioRateLimit: public ComboBoxSetting, public CCSetting
 {
   public:
@@ -1470,9 +1483,12 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent)
 
     CardType* cardtype = new CardType(parent);
     addChild(cardtype);
+    addChild(new CaptureCardDisplayName(parent));
+
     setTrigger(cardtype);
     setSaveAll(false);
-
+    
+    
     addTarget("V4L", new V4LConfigurationGroup(parent));
     addTarget("DVB", new DVBConfigurationGroup(parent));
     addTarget("HDTV", new pcHDTVConfigurationGroup(parent));
