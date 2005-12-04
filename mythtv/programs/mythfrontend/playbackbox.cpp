@@ -3813,6 +3813,7 @@ void PlaybackBox::showRecGroupChooser(void)
     QString dispGroup;
     int items;
     int totalItems = 0;
+    bool LiveTVInAllPrograms = gContext->GetNumSetting("LiveTVInAllPrograms",0);
 
     recGroupType.clear();
 
@@ -3839,7 +3840,9 @@ void PlaybackBox::showRecGroupChooser(void)
                                                 .arg(items).arg(itemStr));
 
             recGroupType[query.value(0).toString()] = "recgroup";
-            totalItems += items;
+
+            if (dispGroup != "LiveTV" || LiveTVInAllPrograms)
+                totalItems += items;
         }
     }
 
