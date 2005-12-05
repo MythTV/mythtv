@@ -106,7 +106,7 @@ ProgramMapTable* ProgramMapTable::Create(
     vector<unsigned char> gdesc;
     for (uint i=0; i<global_desc.size(); i++)
     {
-        uint len = global_desc[i][1];
+        uint len = global_desc[i][1] + 2;
         gdesc.insert(gdesc.end(), global_desc[i], global_desc[i] + len);
     }
     pmt->SetProgramInfo(&gdesc[0], gdesc.size());
@@ -116,7 +116,7 @@ ProgramMapTable* ProgramMapTable::Create(
         vector<unsigned char> pdesc;
         for (uint j=0; j<prog_desc[i].size(); j++)
         {
-            uint len = prog_desc[i][j][1];
+            uint len = prog_desc[i][j][1] + 2;
             pdesc.insert(pdesc.end(),
                          prog_desc[i][j], prog_desc[i][j] + len);
         }

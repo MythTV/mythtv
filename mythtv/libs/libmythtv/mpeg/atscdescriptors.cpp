@@ -53,7 +53,7 @@ QString AudioStreamDescriptor::ChannelsString() const {
 
 QString AudioStreamDescriptor::toString() const {
     QString str;
-    str.append(QString("   Audio Stream Descriptor "));
+    str.append(QString("Audio Stream Descriptor "));
     str.append(QString(" full_srv(%1) sample_rate(%2) bit_rate(%3, %4)\n").
                arg(FullService()).arg(SampleRateCodeString()).
                arg(BitRateCodeString()).arg(BitRateCode()));

@@ -127,7 +127,7 @@ class CaptionServiceDescriptor : public MPEGDescriptor {
     void Parse() const;
     QString toString() const {
         Parse();
-        QString str("   Caption Service Descriptor  ");
+        QString str("Caption Service Descriptor  ");
         str.append(QString("services(%2)").arg(ServicesCount()));
         for (uint i=0; i<ServicesCount(); i++) {
             str.append(QString("\n     lang(%1) type(%2) ").
@@ -159,7 +159,7 @@ class ComponentNameDescriptor : public MPEGDescriptor {
         return MultipleStringStructure(_data+2);
     }
     QString toString() const {
-        return QString("           Component Name Descriptor  %1").
+        return QString("Component Name Descriptor  %1").
             arg(ComponentNameStrings().toString());
     }
 };

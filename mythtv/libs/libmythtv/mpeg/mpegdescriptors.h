@@ -4,6 +4,7 @@
 #define _MPEG_DESCRIPTORS_H_
 
 #include <cassert>
+#include "iso639.h"
 
 typedef vector<const unsigned char*> desc_list_t;
 
@@ -147,6 +148,26 @@ class ConditionalAccessDescriptor : public MPEGDescriptor
     uint PID(void) const      { return (_data[4] & 0x1F) << 8 | _data[5]; }
     uint DataSize(void) const { return DescriptorLength() - 4; }
     const unsigned char* Data(void) const { return _data+6; }
+    QString toString() const;
+};
+
+class ISO639LanguageDescriptor : public MPEGDescriptor
+{
+  public:
+    ISO639LanguageDescriptor(const unsigned char* data) : MPEGDescriptor(data)
+    {
+        assert(DescriptorID::ISO_639_language == DescriptorTag());
+    }
+    const unsigned char* CodeRaw() const { return &_data[2]; }
+
+    int LanguageKey(void) const
+        { return iso639_str3_to_key(&_data[2]); }
+    QString LanguageString(void) const
+        { return iso639_key_to_str3(LanguageKey()); }
+    int CanonicalLanguageKey(void) const
+        { return iso639_key_to_canonical_key(LanguageKey()); }
+    QString CanonicalLanguageString(void) const
+        { return iso639_key_to_str3(CanonicalLanguageKey()); }
     QString toString() const;
 };
 

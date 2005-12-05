@@ -198,6 +198,8 @@ QString MPEGDescriptor::toString() const
 
     if (DescriptorID::registration == DescriptorTag())
         str = RegistrationDescriptor(_data).toString();
+    else if (DescriptorID::ISO_639_language == DescriptorTag())
+        str = ISO639LanguageDescriptor(_data).toString();
     else if (DescriptorID::audio_stream == DescriptorTag())
         str = AudioStreamDescriptor(_data).toString();
     else if (DescriptorID::caption_service == DescriptorTag())
@@ -226,7 +228,7 @@ QString MPEGDescriptor::toString() const
         str = ServiceDescriptor(_data).toString();
     else
     {
-        str.append(QString("   %1 Descriptor (0x%2)")
+        str.append(QString("%1 Descriptor (0x%2)")
                    .arg(DescriptorTagString())
                    .arg(int(DescriptorTag()), 0, 16));
         str.append(QString(" length(%1)").arg(int(DescriptorLength())));
@@ -257,4 +259,11 @@ QString  ConditionalAccessDescriptor::toString() const
 {
     return QString("Conditional Access: sid(0x%1) pid(0x%2) data_size(%3)")
         .arg(SystemID(),0,16).arg(PID(),0,16).arg(DataSize());
+}
+
+QString ISO639LanguageDescriptor::toString() const
+{
+    return QString("ISO-639 Language: code(%1) canonical(%2) eng(%3)")
+        .arg(LanguageString()).arg(CanonicalLanguageString())
+        .arg(iso639_key_toName(CanonicalLanguageKey()));
 }

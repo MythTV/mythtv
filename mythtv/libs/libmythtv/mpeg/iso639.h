@@ -1,4 +1,6 @@
 // -*- Mode: c++ -*-
+#ifndef _ISO_639_2_H_
+#define _ISO_639_2_H_
 
 #include <qmap.h>
 #include <qstring.h>
@@ -72,3 +74,5 @@ static inline QString iso639_str_to_canonoical_str(const QString &str3)
     int can =  iso639_key_to_canonical_key(key);
     return iso639_key_to_str3(can);
 }
+
+#endif // _ISO_639_2_H_
