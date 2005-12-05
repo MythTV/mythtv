@@ -2543,7 +2543,10 @@ void ClassicCommDetector::SearchForLogo()
                 emit breathe();
 
             if (m_bStop)
+            {
+                nvp->DiscardVideoFrame(vf);
                 return;
+            }
 
             if (!fullSpeed)
                 usleep(10000);
