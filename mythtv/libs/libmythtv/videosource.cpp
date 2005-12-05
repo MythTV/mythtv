@@ -1602,10 +1602,12 @@ class InputDisplayName: public LineEditSetting, public CISetting
     InputDisplayName(const CardInput& parent):
         CISetting(parent, "displayname")
     {
-        setLabel(QObject::tr("Display Name"));
+        setLabel(QObject::tr("Display Name (optional)"));
         setHelpText(QObject::tr(
                         "This name is displayed on screen when live TV begins "
-                        "and when changing the selected input or card."));
+                        "and when changing the selected input or card. If you "
+                        "use this, make sure the information is unique for "
+                        "each input."));
     };
 };
 
