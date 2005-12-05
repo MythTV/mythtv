@@ -210,11 +210,11 @@
     </message>
     <message>
         <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation>Uteslut oidentifierade avsnitt (Data Direct)</translation>
+        <translation type="obsolete">Uteslut oidentifierade avsnitt (Data Direct)</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation>Uteslut oidentifierade avsnitt (XMLTV)</translation>
+        <translation type="obsolete">Uteslut oidentifierade avsnitt (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
@@ -342,14 +342,18 @@
     </message>
     <message>
         <source>Only on a specific station</source>
-        <translation type="unfinished"></translation>
+        <translation>Endast på en specifik kanal</translation>
     </message>
     <message>
         <source>Only on channels marked as favorites</source>
-        <translation type="unfinished"></translation>
+        <translation>Endast på kanaler markerade som favoriter</translation>
     </message>
     <message>
         <source>Additional Tables</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exclude unidentified episodes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -711,6 +715,10 @@ Returning to the previous menu.</source>
         <source>No, Don&apos;t delete group</source>
         <translation>Nej, ta inte bort grupp</translation>
     </message>
+    <message>
+        <source>(Create new group)</source>
+        <translation>(Skapa ny grupp)</translation>
+    </message>
 </context>
 <context>
     <name>PlaybackBox</name>
@@ -820,7 +828,7 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>Change Group View</source>
-        <translation>Ändra visad grupp</translation>
+        <translation>Ändra gruppvy</translation>
     </message>
     <message>
         <source>Change Group Password</source>
@@ -1122,6 +1130,10 @@ Returning to the previous menu.</source>
         <source>Group Password</source>
         <translation>Grupplösenord</translation>
     </message>
+    <message>
+        <source>Show Program Details</source>
+        <translation>Visa programdetaljer</translation>
+    </message>
 </context>
 <context>
     <name>PreviousBox</name>
@@ -1207,6 +1219,13 @@ Returning to the previous menu.</source>
     <message>
         <source>Remove all episodes for this title</source>
         <translation>Ta bort alla avsnitt för denna titel</translation>
+    </message>
+</context>
+<context>
+    <name>ProgDetails</name>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -1746,15 +1765,15 @@ Returning to the previous menu.</source>
     </message>
     <message>
         <source>OSD theme</source>
-        <translation>Tema för informationsvisning i TV-bilden</translation>
+        <translation>Informationstema</translation>
     </message>
     <message>
         <source>OSD font</source>
-        <translation>Typsnitt för informationsvisning i TV-bilden</translation>
+        <translation>Informationstypsnitt</translation>
     </message>
     <message>
         <source>Closed Caption font</source>
-        <translation>Typsnitt för textning</translation>
+        <translation>Textningstypsnitt</translation>
     </message>
     <message>
         <source>Channel ordering</source>
@@ -4063,7 +4082,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Confirm Exit</source>
-        <translation>Bekräfta avsluta</translation>
+        <translation>Bekräfta nedstängning</translation>
     </message>
     <message>
         <source>When enabled, MythTV will prompt for confirmation when you press the System Exit key.</source>
@@ -4071,7 +4090,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>If you have configured an exit key using the System Shutdown option, you will be given the opportunity to exit MythTV or halt the system completely. Another possibility for this field is &quot;poweroff&quot;</source>
-        <translation>Om du har konfigurerat en avslutningstangent kommer du att få tillfälle att välja mellan att gå ur MythTV eller stänga ner systemet helt. En annan möjlighet för detta fält är &quot;poweroff&quot;</translation>
+        <translation>Kommando som används för att stänga ner systemet då detta alternativ väljs i nedstängningsmenyn. Exempel på lämpligt kommando: &quot;poweroff&quot;</translation>
     </message>
     <message>
         <source>Use Arrow Key Accelerators</source>
@@ -4155,7 +4174,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>Move higher priority programs to other cards and showings when resolving conflicts.  This can be used to record lower priority programs that would otherwise not be recorded, but risks missing a higher priority program if the schedule changes.</source>
-        <translation>Flytta program med högre prioritet till andra kort och visningar vid konfliktlösning. Detta kan användas för att spela in program med lägre prioritet som annars inte skulle ha spelats in, men riskerar att missa ett högre prioriterat program om schemat ändras.</translation>
+        <translation>Flytta högre prioriterade program till andra kort och visningar vid konfliktlösning. Används för att spela in lägre prioriterade program som annars inte skulle spelats in, med risk att missa ett högre prioriterat program om schemat ändras.</translation>
     </message>
     <message>
         <source>If enabled, the Select key will change the channel while using the program guide during live TV.  If disabled, the select key will bring up the recording options screen.</source>
@@ -4941,7 +4960,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>User</source>
-        <translation>Användare</translation>
+        <translation>Användarnamn</translation>
     </message>
     <message>
         <source>The user name to use while connecting to the database. This information is required.</source>
@@ -6047,7 +6066,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>%1 total, %2 used, %3 (or %4%) free.</source>
-        <translation>%1 totalt, %2 använt, %3 (eller %4%) ledigt.</translation>
+        <translation>%1 totalt, %2 använt, %3 (%4%) ledigt.</translation>
     </message>
     <message>
         <source>, using recording profile &apos;%1&apos;</source>
@@ -6055,19 +6074,19 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>, using your typical recording profile.</source>
-        <translation>med din vanliga inspelningsprofil.</translation>
+        <translation>med din typiska inspelningsprofil.</translation>
     </message>
     <message>
         <source>%1 hours left %2</source>
-        <translation>%1 timmar kvar %2</translation>
+        <translation>%1 tim kvar %2</translation>
     </message>
     <message>
         <source>%1 hours and %2 minutes left %3</source>
-        <translation>%1 timmar och %2 minuter kvar %3</translation>
+        <translation>%1 tim och %2 min kvar %3</translation>
     </message>
     <message>
         <source>%1 minutes left %2</source>
-        <translation>%1 minuter kvar %2</translation>
+        <translation>%1 min kvar %2</translation>
     </message>
     <message>
         <source>Disk usage on %1:</source>
@@ -6243,7 +6262,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to delete first. Set to &apos;None&apos; to disable Auto Expire (not recommended).</source>
-        <translation>Metod som används för att bestämma vilka inspelningar som raderas först. Sätt till &apos;Ingen&apos; för att avaktivera Autoradera (rekommenderas ej).</translation>
+        <translation type="obsolete">Metod som används för att bestämma vilka inspelningar som raderas först. Sätt till &apos;Ingen&apos; för att avaktivera Autoradera (rekommenderas ej).</translation>
     </message>
     <message>
         <source>Auto Expire Default</source>
@@ -6268,7 +6287,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Status: </source>
-        <translation>Status: </translation>
+        <translation type="obsolete">Status: </translation>
     </message>
     <message>
         <source>Cable-HRC</source>
@@ -6894,7 +6913,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>MythShutdown Script Settings</source>
-        <translation>MythShutdown skriptinställningar</translation>
+        <translation type="obsolete">MythShutdown skriptinställningar</translation>
     </message>
     <message>
         <source>Perform EIT Scan</source>
@@ -6918,7 +6937,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation type="obsolete">Status</translation>
+        <translation type="unfinished">Status</translation>
     </message>
     <message>
         <source>Tuning</source>
@@ -7058,15 +7077,15 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Use only the transmitted guide data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd endast den utsända guidedatan.</translation>
     </message>
     <message>
         <source>UDP Notify OSD time-out</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP-meddelande OSD-tidsgräns</translation>
     </message>
     <message>
         <source>How many seconds an on-screen display will be active for UDP Notify events.</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal sekunder för UDP-meddelande att vara synligt i TV-bilden.</translation>
     </message>
     <message>
         <source>CC font</source>
@@ -7162,15 +7181,15 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Automatically set new recording rules to use this group if the title matches this regular expression.  For example, &quot;(News|CNN)&quot; would match any title in which &quot;News&quot; or &quot;CNN&quot; appears.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sätt automatiskt nya inspelningsregler till att använda denna grupp om titeln matchar det reguljära uttrycket. Exempel: &quot;(Nyheterna|Rapport)&quot;.</translation>
     </message>
     <message>
         <source>Skip ahead (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa framåt (sekunder)</translation>
     </message>
     <message>
         <source>Skip back (seconds)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hoppa bakåt (sekunder)</translation>
     </message>
     <message>
         <source>Time stretch (speed x 100)</source>
@@ -7186,7 +7205,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Store in the &quot;%1&quot; playback group</source>
-        <translation>Lagra i uppspelningsgruppen &quot;%1&quot;</translation>
+        <translation type="obsolete">Lagra i uppspelningsgruppen &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Select Playback Group</source>
@@ -7203,6 +7222,94 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>If set, MythTV will automatically rewind this many seconds after performing a commercial skip.</source>
         <translation>Spola tillbaka så här många sekunder efter ett reklamhopp.</translation>
+    </message>
+    <message>
+        <source>Unidentified Episode</source>
+        <translation>Oidentifierat avsnitt</translation>
+    </message>
+    <message>
+        <source>Producer</source>
+        <translation>Producent</translation>
+    </message>
+    <message>
+        <source>Executive Producer</source>
+        <translation>Exekutiv producent</translation>
+    </message>
+    <message>
+        <source>Writer</source>
+        <translation>Författare</translation>
+    </message>
+    <message>
+        <source>Host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adapter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Presenter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Commentator</source>
+        <translation>Kommentator</translation>
+    </message>
+    <message>
+        <source>Guest</source>
+        <translation>Gäst</translation>
+    </message>
+    <message>
+        <source>Show &apos;LiveTV&apos; recordings when using &quot;All Programs&quot; filter</source>
+        <translation>Visa &apos;LiveTV&apos;-inspelningar när &quot;Alla program&quot; visas</translation>
+    </message>
+    <message>
+        <source>If this setting is disabled, LiveTV recordings will only be visible via the special &quot;LiveTV&quot;Recording Group.</source>
+        <translation>Visa LiveTV-inspelningar med &quot;Alla program&quot;, annars måste inspelningsgruppen &quot;LiveTV&quot; specifikt väljas för att se dessa inspelningar.</translation>
+    </message>
+    <message>
+        <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>LiveTV recordings Max Age</source>
+        <translation>LiveTV-inspelningar max ålder</translation>
+    </message>
+    <message>
+        <source>AutoExpire will force expiration of LiveTV recordings when they are this many days old.  LiveTV recordings may also be expired early if necessary to free up disk space.</source>
+        <translation>Audoraderingen tvingar radering av LiveTV-inspelningar när de är så här många dagar gamla, men de raderas även tidigare om nödvändigt.</translation>
+    </message>
+    <message>
+        <source>Defines a period the master backend should be awake</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shutdown with Master Backend</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mythwelcome will automatically shutdown this computer when the master backend shuts down. Should only be set on frontend only machines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Command to run to start the Frontend</source>
+        <translation>Kommando att köra för att starta uppspelningsklienten</translation>
+    </message>
+    <message>
+        <source>Command to start mythfrontend.</source>
+        <translation>Kommando för att starta mythfrontend.</translation>
+    </message>
+    <message>
+        <source>MythShutdown/MythWelcome Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display Name</source>
+        <translation>Visningsnamn</translation>
+    </message>
+    <message>
+        <source>This name is displayed on screen when live TV begins and when changing the selected input or card.</source>
+        <translation>Detta namn visas när LiveTV startar och när vald ingång eller TV-kort ändras.</translation>
     </message>
 </context>
 <context>
@@ -7661,7 +7768,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>Enable Browse Mode</source>
-        <translation>Aktivera bläddringsläge</translation>
+        <translation>Bläddringsläge</translation>
     </message>
     <message>
         <source>Previous Channel</source>
@@ -7921,7 +8028,7 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>CC:</source>
-        <translation>CC:</translation>
+        <translation type="obsolete">CC:</translation>
     </message>
     <message>
         <source>Reactivate</source>
@@ -7933,7 +8040,17 @@ Inga andra detaljer</translation>
     </message>
     <message>
         <source>%1 Settings</source>
-        <translation>Uppspelningsinställningar: %1</translation>
+        <translation>Uppspelningsgrupp: %1</translation>
+    </message>
+    <message>
+        <source>CC:</source>
+        <comment>closed caption, teletext page</comment>
+        <translation type="unfinished">CC:</translation>
+    </message>
+    <message>
+        <source>Seek:</source>
+        <comment>seek to location</comment>
+        <translation>Sök:</translation>
     </message>
 </context>
 <context>
@@ -8100,6 +8217,25 @@ Inga andra detaljer</translation>
     </message>
 </context>
 <context>
+    <name>UIManagedTreeListType</name>
+    <message>
+        <source>Search</source>
+        <translation>Sök</translation>
+    </message>
+    <message>
+        <source>Starts with text</source>
+        <translation>Börjar med text</translation>
+    </message>
+    <message>
+        <source>Contains text</source>
+        <translation>Innehåller text</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Avbryt</translation>
+    </message>
+</context>
+<context>
     <name>VideoSourceEditor</name>
     <message>
         <source>Video sources</source>
@@ -8143,6 +8279,14 @@ Inga andra detaljer</translation>
     <message>
         <source>All</source>
         <translation>Alla</translation>
+    </message>
+    <message>
+        <source>The theme you are using does not contain a &apos;schdiff&apos; element. Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty. Escape out of it to return to the menu.</source>
+        <translation>Temat du använder innehåller inte &apos;schdiff&apos;-elementet. Vänligen kontakta upphovsmannen till temat och be dem uppdatera det.&lt;br&gt;&lt;br&gt;Nästa skärm kommer att vara tom, använd Escape för att komma tillbaka till menyn.</translation>
+    </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
