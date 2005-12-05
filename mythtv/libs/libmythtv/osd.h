@@ -172,7 +172,7 @@ class OSD : public QObject
     QString themepath;
 
     float wscale, fscale;
-    float wmult, hmult;
+    float hmult, wmult;
     int xoffset, yoffset, displaywidth, displayheight;
 
     QMutex osdlock;
