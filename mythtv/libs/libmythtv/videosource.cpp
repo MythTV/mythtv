@@ -1095,19 +1095,6 @@ class ChannelTimeout: public SpinBoxSetting, public CCSetting
     };
 };
 
-class CaptureCardDisplayName: public LineEditSetting, public CCSetting
-{
-  public:
-    CaptureCardDisplayName(const CaptureCard& parent)
-      : CCSetting(parent, "displayname")
-    {
-        setLabel(QObject::tr("Display Name"));
-        setHelpText(QObject::tr(
-                        "This name is shown for example when changing "
-                        "the input in LiveTV via C or Y."));
-    };
-};
-
 class AudioRateLimit: public ComboBoxSetting, public CCSetting
 {
   public:
@@ -1483,7 +1470,6 @@ CaptureCardGroup::CaptureCardGroup(CaptureCard& parent)
 
     CardType* cardtype = new CardType(parent);
     addChild(cardtype);
-    addChild(new CaptureCardDisplayName(parent));
 
     setTrigger(cardtype);
     setSaveAll(false);
@@ -1607,6 +1593,19 @@ class CardID: public SelectLabelSetting, public CISetting {
 
     void fillSelections() {
         CaptureCard::fillSelections(this);
+    };
+};
+
+class InputDisplayName: public LineEditSetting, public CISetting
+{
+  public:
+    InputDisplayName(const CardInput& parent):
+        CISetting(parent, "displayname")
+    {
+        setLabel(QObject::tr("Display Name"));
+        setHelpText(QObject::tr(
+                        "This name is displayed on screen when live TV begins "
+                        "and when changing the selected input or card."));
     };
 };
 
@@ -1838,8 +1837,13 @@ CardInput::CardInput(bool isDVBcard)
         new VerticalConfigurationGroup(false, false, true, true);
 
     group->setLabel(QObject::tr("Connect source to input"));
-    group->addChild(cardid = new CardID(*this));
-    group->addChild(inputname = new InputName(*this));
+
+    HorizontalConfigurationGroup *ci;
+    ci = new HorizontalConfigurationGroup(false, false);
+    ci->addChild(cardid = new CardID(*this));
+    ci->addChild(inputname = new InputName(*this));
+    group->addChild(ci);
+    group->addChild(new InputDisplayName(*this));
     group->addChild(sourceid = new SourceID(*this));
     if (!isDVBcard)
     {

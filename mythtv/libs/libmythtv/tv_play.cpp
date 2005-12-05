@@ -3406,10 +3406,11 @@ void TV::UpdateOSDInput(void)
     QString msg;
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery = QString("SELECT displayname FROM capturecard "
-                               "WHERE cardid = \"%1\";")
-                               .arg(activerecorder->GetRecorderNumber());
-    query.exec(thequery);
+    query.prepare("SELECT displayname FROM cardinput "
+                  "WHERE cardid = :CARDID AND inputname = :INPUTNAME");
+    query.bindValue(":CARDID", activerecorder->GetRecorderNumber());
+    query.bindValue(":INPUTNAME", name);
+    query.exec();
     if (query.isActive() && query.size() > 0)
     {
         query.next();
