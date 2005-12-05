@@ -172,6 +172,8 @@ class OSDListBtnType : public OSDType
   private:
 
     void  Init();
+    void  InitItem(OSDTypeImage &osdImg, uint width, uint height,
+                   QColor beg, QColor end, int alpha);
     void  LoadPixmap(OSDTypeImage& pix, const QString& fileName);
 
     void  InsertItem(OSDListBtnTypeItem *item);

@@ -794,8 +794,6 @@ void OSDListBtnType::Draw(OSDSurface *surface, int fade, int maxfade, int xoff,
 
 void OSDListBtnType::Init()
 {
-    qApp->lock();
-
     int sz1 = m_fontActive->Size() * 3 / 2;
     int sz2 = m_fontInactive->Size() * 3 / 2;
     m_itemHeight = QMAX(sz1, sz2) + (int)(2 * m_itemMargin);
@@ -831,114 +829,14 @@ void OSDListBtnType::Init()
     LoadPixmap(m_checkFullPix, "check-full");
     LoadPixmap(m_arrowPix, "arrow");
 
-    int itemWidth = (m_rect.width() / 2) * 2;
+    uint itemWidth = (m_rect.width() + 1) & (~1);
 
-    QImage img(itemWidth, m_itemHeight, 32);
-    img.setAlphaBuffer(true);
-
-    for (int y = 0; y < img.height(); y++) 
-    {
-        for (int x = 0; x < img.width(); x++) 
-        {
-            uint *p = (uint *)img.scanLine(y) + x;
-            *p = qRgba(0, 0, 0, m_itemRegAlpha);
-        }
-    }
-
-    {
-        float rstep = float(m_itemRegEnd.red() - m_itemRegBeg.red()) / 
-                      float(m_itemHeight);
-        float gstep = float(m_itemRegEnd.green() - m_itemRegBeg.green()) / 
-                      float(m_itemHeight);
-        float bstep = float(m_itemRegEnd.blue() - m_itemRegBeg.blue()) / 
-                      float(m_itemHeight);
-
-        QPixmap tmpRegPix = QPixmap(img);
-        QPainter p(&tmpRegPix);
-
-        float r = m_itemRegBeg.red();
-        float g = m_itemRegBeg.green();
-        float b = m_itemRegBeg.blue();
-        for (int y = 0; y < img.height(); y++) 
-        {
-            QColor c((int)r, (int)g, (int)b);
-            p.setPen(c);
-            p.drawLine(0, y, img.width(), y);
-            r += rstep;
-            g += gstep;
-            b += bstep;
-        }
-        p.setPen(Qt::black);
-        p.drawLine(0, 0, 0, img.height() - 1);
-        p.drawLine(0, 0, img.width() - 1, 0);
-        p.drawLine(0, img.height() - 1, img.width() - 1, img.height() - 1);
-        p.drawLine(img.width() - 1, 0, img.width() - 1, img.height() - 1);
-        p.end();
-
-        QImage tmpImg = tmpRegPix.convertToImage();
-        m_itemRegPix.LoadFromQImage(tmpImg);
-    }   
-
-    {
-        float rstep = float(m_itemSelEnd.red() - m_itemSelBeg.red()) /
-                      float(m_itemHeight);
-        float gstep = float(m_itemSelEnd.green() - m_itemSelBeg.green()) / 
-                      float(m_itemHeight);
-        float bstep = float(m_itemSelEnd.blue() - m_itemSelBeg.blue()) /
-                      float(m_itemHeight);
-
-        QPixmap tmpSelInactPix = QPixmap(img);
-        QPainter p(&tmpSelInactPix);
-
-        float r = m_itemSelBeg.red();
-        float g = m_itemSelBeg.green();
-        float b = m_itemSelBeg.blue();
-        for (int y = 0; y < img.height(); y++) 
-        {
-            QColor c((int)r, (int)g, (int)b);
-            p.setPen(c);
-            p.drawLine(0, y, img.width(), y);
-            r += rstep;
-            g += gstep;
-            b += bstep;
-        }
-        p.setPen(Qt::black);
-        p.drawLine(0, 0, 0, img.height() - 1);
-        p.drawLine(0, 0, img.width() - 1, 0);
-        p.drawLine(0, img.height() - 1, img.width() - 1, img.height() - 1);
-        p.drawLine(img.width() - 1, 0, img.width() - 1, img.height() - 1);
-        p.end();
-
-        QImage tmpImg = tmpSelInactPix.convertToImage();
-        m_itemSelInactPix.LoadFromQImage(tmpImg);
-
-        img.setAlphaBuffer(false);
-        
-        QPixmap tmpSelActPix = QPixmap(img);
-        p.begin(&tmpSelActPix);
-
-        r = m_itemSelBeg.red();
-        g = m_itemSelBeg.green();
-        b = m_itemSelBeg.blue();
-        for (int y = 0; y < img.height(); y++) 
-        {
-            QColor c((int)r, (int)g, (int)b);
-            p.setPen(c);
-            p.drawLine(0, y, img.width(), y);
-            r += rstep;
-            g += gstep;
-            b += bstep;
-        }
-        p.setPen(Qt::black);
-        p.drawLine(0, 0, 0, img.height() - 1);
-        p.drawLine(0, 0, img.width() - 1, 0);
-        p.drawLine(0, img.height() - 1, img.width() - 1, img.height() - 1);
-        p.drawLine(img.width() - 1, 0, img.width() - 1, img.height() - 1);
-        p.end();
-
-        tmpImg = tmpSelActPix.convertToImage();
-        m_itemSelActPix.LoadFromQImage(tmpImg);
-    }
+    InitItem(m_itemRegPix,      itemWidth,    m_itemHeight,
+             m_itemRegBeg,      m_itemRegEnd, m_itemRegAlpha);
+    InitItem(m_itemSelInactPix, itemWidth,    m_itemHeight,
+             m_itemSelBeg,      m_itemSelEnd, m_itemRegAlpha);
+    InitItem(m_itemSelActPix,   itemWidth,    m_itemHeight,
+             m_itemSelBeg,      m_itemSelEnd, 255);
 
     if (m_itemList.count() > m_itemsVisible && m_showScrollArrows)
         m_showDnArrow = true;
@@ -946,8 +844,43 @@ void OSDListBtnType::Init()
         m_showDnArrow = false;
 
     m_initialized = true;
+}
 
-    qApp->unlock();
+void OSDListBtnType::InitItem(
+    OSDTypeImage &osdImg, uint width, uint height,
+    QColor beg, QColor end, int alpha)
+{
+    float rstep = ((float) (end.red()   - beg.red()))   / m_itemHeight;
+    float gstep = ((float) (end.green() - beg.green())) / m_itemHeight;
+    float bstep = ((float) (end.blue()  - beg.blue()))  / m_itemHeight;
+
+    unsigned char *data = new unsigned char[4 * width * height];
+    uint32_t *ptr = (uint32_t*) data;
+
+    uint black = qRgba(0,0,0,alpha);
+    for (uint x = 0; x < width; x++, ptr++)
+        *ptr = black;
+    for (uint y = 1; y < height - 1; y++) 
+    {
+        int r = (int) (beg.red()   + (y * rstep));
+        int g = (int) (beg.green() + (y * gstep));
+        int b = (int) (beg.blue()  + (y * bstep));
+        uint32_t color = qRgba(r,g,b,alpha);
+        *ptr = black; ptr++;
+        for (uint x = 1; x < width - 1; x++, ptr++)
+            *ptr = color;
+        *ptr = black; ptr++;
+    }
+    for (uint x = 0; x < width; x++, ptr++)
+        *ptr = black;
+
+    {
+        QImage img(data, width, height, 32, NULL, 65536 * 65536,
+                   QImage::LittleEndian);
+        img.setAlphaBuffer(alpha<255);
+        osdImg.LoadFromQImage(img);
+    }
+    delete[] data;
 }
 
 void OSDListBtnType::LoadPixmap(OSDTypeImage& pix, const QString& fileName)
