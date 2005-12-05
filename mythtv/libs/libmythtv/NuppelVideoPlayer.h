@@ -411,6 +411,7 @@ class NuppelVideoPlayer
     long long totalFrames;
     long long totalLength;
     long long rewindtime;
+    QString m_recusage;
 
     // -- end state stuff -- 
 

@@ -99,7 +99,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       // Playback misc.
       videobuf_retries(0),          framesPlayed(0),
       totalFrames(0),               totalLength(0),
-      rewindtime(0),
+      rewindtime(0),                m_recusage(inUseID),
       // Input Video Attributes
       video_width(0), video_height(0), video_size(0),
       video_frame_rate(29.97f), video_aspect(4.0f / 3.0f),
@@ -165,7 +165,7 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
     if (info)
     {
         m_playbackinfo = new ProgramInfo(*info);
-        m_playbackinfo->MarkAsInUse(true, inUseID);
+        m_playbackinfo->MarkAsInUse(true, m_recusage);
     }
 
     commrewindamount = gContext->GetNumSetting("CommRewindAmount",0);
@@ -1898,6 +1898,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     }
 
     m_playbackinfo = pginfo;
+    m_playbackinfo->MarkAsInUse(true, m_recusage);
 
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
@@ -1941,9 +1942,6 @@ void NuppelVideoPlayer::SwitchToProgram(void)
         GetDecoder()->SyncPositionMap();
     }
 
-    if (m_playbackinfo)
-        m_playbackinfo->UpdateInUseMark(true);
-
     eof = false;
 }
 
@@ -1984,6 +1982,7 @@ void NuppelVideoPlayer::JumpToProgram(void)
     }
 
     m_playbackinfo = pginfo;
+    m_playbackinfo->MarkAsInUse(true, m_recusage);
 
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
@@ -2021,9 +2020,6 @@ void NuppelVideoPlayer::JumpToProgram(void)
         fftime = 0;
         GetDecoder()->setExactSeeks(seeks);
     }
-
-    if (m_playbackinfo)
-        m_playbackinfo->UpdateInUseMark(true);
 
     eof = false;
 }
