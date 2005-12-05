@@ -1,4 +1,4 @@
-
+#include <stdlib.h> 
 #include <pthread.h>
 //Qt
 #include <qmap.h>
