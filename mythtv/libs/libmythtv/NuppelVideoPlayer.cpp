@@ -1595,20 +1595,22 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
     prebuffering_lock.lock();
     if (prebuffering)
     {
-        VERBOSE(VB_PLAYBACK, "waiting for prebuffer... "<<prebuffer_tries);
+        VERBOSE(VB_PLAYBACK, LOC + QString("Waiting for prebuffer.. %1 %2")
+                .arg(prebuffer_tries).arg(videoOutput->GetFrameStatus()));
         if (!prebuffering_wait.wait(&prebuffering_lock,
                                     frame_interval * 4 / 1000))
         {
             // timed out.. do we need to know?
         }
         ++prebuffer_tries;
-        if (prebuffer_tries > 10)
+        if (prebuffering && (prebuffer_tries >= 10))
         {
-            VERBOSE(VB_IMPORTANT, "Prebuffer wait timed out 10 times.");
+            VERBOSE(VB_IMPORTANT, LOC + "Prebuffer wait timed out 10 times.");
             if (!videoOutput->EnoughFreeFrames())
             {
-                VERBOSE(VB_IMPORTANT, "Prebuffer wait timed out, and "
-                        "not enough free frames. Discarding buffers.");
+                VERBOSE(VB_IMPORTANT, LOC + "Prebuffer wait timed out, and"
+                        "\n\t\t\tthere are not enough free frames. "
+                        "Discarding buffered frames.");
                 DiscardVideoFrames();
             }
             prebuffer_tries = 0;
@@ -2183,6 +2185,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
         if (IsErrored() || (nvr_enc && nvr_enc->GetErrorStatus()))
         {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Unknown error, exiting decoder");
             errored = killplayer = true;
             break;
         }
@@ -2193,7 +2196,7 @@ void NuppelVideoPlayer::StartPlaying(void)
 
             play_speed = next_play_speed;
             normal_speed = next_normal_speed;
-            //cout << "changing speed to " << play_speed << endl;
+            VERBOSE(VB_PLAYBACK, LOC + "Changing speed to " << play_speed);
 
             if (play_speed == 0.0)
             {
@@ -2356,6 +2359,8 @@ void NuppelVideoPlayer::StartPlaying(void)
             }
         }
     }
+
+    VERBOSE(VB_PLAYBACK, LOC + "Exited decoder loop.");
 
     decoderThreadPaused.wakeAll();
 
