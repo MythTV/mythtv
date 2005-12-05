@@ -1,3 +1,4 @@
+// -*- Mode: c++ -*-
 /*
  *  Copyright (C) Kenneth Aafloy 2003
  *  

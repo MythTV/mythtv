@@ -928,13 +928,20 @@ void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
 
 void DVBRecorder::LocalProcessDataTS(unsigned char *buffer, int len)
 {
-    QMutexLocker read_lock(&_pid_lock);
     if (_ts_packets_until_psip_sync == 0)
     {
+        QMutexLocker read_lock(&_pid_lock);
+        uint next_cc;
         if (_pat && _pmt)
         {
+            next_cc = (_pat->tsheader()->ContinuityCounter()+1)&0xf;
+            _pat->tsheader()->SetContinuityCounter(next_cc);
             ringBuffer->Write(_pat->tsheader()->data(), TSPacket::SIZE);
+
+            next_cc = (_pmt->tsheader()->ContinuityCounter()+1)&0xf;
+            _pmt->tsheader()->SetContinuityCounter(next_cc);
             ringBuffer->Write(_pmt->tsheader()->data(), TSPacket::SIZE);
+
             _ts_packets_until_psip_sync = TSPACKETS_BETWEEN_PSIP_SYNC;
         }
     }
@@ -962,6 +969,11 @@ void DVBRecorder::SetPAT(ProgramAssociationTable *new_pat)
     _pat = new_pat;
     if (old_pat)
         delete old_pat;
+
+    if (_pat)
+        VERBOSE(VB_SIPARSER, "DVBRecorder::SetPAT()\n" + _pat->toString());
+    else
+        VERBOSE(VB_SIPARSER, "DVBRecorder::SetPAT(NULL)");
 }
 
 void DVBRecorder::SetPMT(ProgramMapTable *new_pmt)
@@ -972,147 +984,75 @@ void DVBRecorder::SetPMT(ProgramMapTable *new_pmt)
     _pmt = new_pmt;
     if (old_pmt)
         delete old_pmt;
+
+    if (_pmt)
+        VERBOSE(VB_SIPARSER, "DVBRecorder::SetPMT()\n" + _pmt->toString());
+    else
+        VERBOSE(VB_SIPARSER, "DVBRecorder::SetPMT(NULL)");
 }
 
 void DVBRecorder::CreatePAT(void)
 {
     QMutexLocker read_lock(&_pid_lock);
-    int next_cc = 0;
+    uint cc = 0;
     if (_pat)
-        next_cc = (_pat->tsheader()->ContinuityCounter() + 1) & 0x0F;
+        cc = (_pat->tsheader()->ContinuityCounter()+1) & 0xf;
 
     uint tsid = 1; // transport stream id
     vector<uint> pnum, pid;
     pnum.push_back(1); // program number / service id
     pid.push_back(PMT_PID);
 
-    SetPAT(ProgramAssociationTable::Create(tsid, next_cc, pnum, pid));
+    SetPAT(ProgramAssociationTable::Create(tsid, cc, pnum, pid));
+}
+
+static void DescList_to_desc_list(DescriptorList &list, desc_list_t &vec)
+{
+    vec.clear();
+    for (DescriptorList::iterator it = list.begin(); it != list.end(); ++it)
+        vec.push_back((*it).Data);
 }
 
 void DVBRecorder::CreatePMT(void)
 {
     QMutexLocker read_lock(&_pid_lock);
-    int pmt_cc = 0;
+
+    // Figure out what goes into the PMT
+    uint programNumber = 1; // MPEG Program Number
+    desc_list_t gdesc;
+    vector<uint> pids;
+    vector<uint> types;
+    vector<desc_list_t> pdesc;
+    QValueList<ElementaryPIDObject>::iterator it;
+
+    DescList_to_desc_list(_input_pmt.Descriptors, gdesc);
+
+    it = _input_pmt.Components.begin();
+    for (; it != _input_pmt.Components.end(); ++it)
+    {
+        if ((*it).Record)
+        {
+            pids.push_back((*it).PID);
+            types.push_back((*it).Orig_Type);
+            pdesc.resize(pdesc.size()+1);
+            DescList_to_desc_list((*it).Descriptors, pdesc.back());
+        }
+    }
+
+    // Create the PMT
+    ProgramMapTable *pmt = ProgramMapTable::Create(
+        programNumber, PMT_PID, _input_pmt.PCRPID,
+        _next_pmt_version, gdesc,
+        pids, types, pdesc);
+
+    // Set the continuity counter...
     if (_pmt)
-        pmt_cc = (_pmt->tsheader()->ContinuityCounter() + 1) & 0x0F;
-
-    TSPacket pkt;
-    uint8_t *ts_packet = pkt.data();
-    memset(ts_packet, 0xFF, TSPacket::SIZE);
-
-    ts_packet[0] = 0x47;                            // sync byte
-    ts_packet[1] = 0x40 | ((PMT_PID >> 8) & 0x1F);  // payload start & PID
-    ts_packet[2] = PMT_PID & 0xFF;                  // PID
-    // scrambling, adaptation & continuity counter
-    ts_packet[3] = 0x10 | pmt_cc; 
-    ts_packet[4] = 0x00;                            // pointer field
-
-    ++pmt_cc &= 0x0F;   // inc. continuity counter
-    uint8_t *pmt_data = ts_packet + 5;
-    int p = 0;
-
-    pmt_data[p++] = PMT_TID; // table ID
-    pmt_data[p++] = 0xB0;    // section syntax indicator
-    p++;                // section length (set later)
-    pmt_data[p++] = 0;       // program number (ServiceID)
-    pmt_data[p++] = 1;       // program number (ServiceID)
-    pmt_data[p++] = 0xC1 + (_next_pmt_version << 1); // Version + Current/Next
-    pmt_data[p++] = 0;       // Current Section
-    pmt_data[p++] = 0;       // Last Section
-    pmt_data[p++] = (_input_pmt.PCRPID >> 8) & 0x1F;
-    pmt_data[p++] = _input_pmt.PCRPID & 0xFF;
-
-    // Write descriptors
-    int program_info_length = 0;
-    DescriptorList::Iterator dit;
-    for (dit = _input_pmt.Descriptors.begin();
-         dit != _input_pmt.Descriptors.end(); ++dit)
     {
-        int len = (*dit).Length;
-        memcpy(&pmt_data[p + 2 + program_info_length], (*dit).Data, len);
-        program_info_length += len;
+        uint cc = (_pmt->tsheader()->ContinuityCounter()+1) & 0xf;
+        pmt->tsheader()->SetContinuityCounter(cc);
     }
 
-    // Program info length
-    pmt_data[p++] = (program_info_length >> 8) & 0x0F;
-    pmt_data[p++] = program_info_length & 0xFF;
-    p += program_info_length;
-
-    QValueList<ElementaryPIDObject>::Iterator es;
-    for (es = _input_pmt.Components.begin();
-         es != _input_pmt.Components.end(); ++es)
-    {
-        if (!(*es).Record)
-            continue;
-
-        // Normalize stream type to make ffmpeg happy
-        uint8_t stream_type;
-        switch ((*es).Type)
-        {
-            case ES_TYPE_VIDEO_MPEG1:
-                stream_type = STREAM_TYPE_VIDEO_MPEG1;
-                break;
-            case ES_TYPE_VIDEO_MPEG2:
-                stream_type = STREAM_TYPE_VIDEO_MPEG2;
-                break;
-            case ES_TYPE_VIDEO_MPEG4:
-                stream_type = STREAM_TYPE_VIDEO_MPEG4;
-                break;
-            case ES_TYPE_VIDEO_H264:
-                stream_type = STREAM_TYPE_VIDEO_H264;
-                break;
-
-            case ES_TYPE_AUDIO_MPEG1:
-                stream_type = STREAM_TYPE_AUDIO_MPEG1;
-                break;
-            case ES_TYPE_AUDIO_MPEG2:
-                stream_type = STREAM_TYPE_AUDIO_MPEG2;
-                break;
-            case ES_TYPE_AUDIO_AC3:
-                stream_type = STREAM_TYPE_AUDIO_AC3;
-                break;
-            case ES_TYPE_AUDIO_DTS:
-                stream_type = STREAM_TYPE_AUDIO_DTS;
-                break;
-            case ES_TYPE_AUDIO_AAC:
-                stream_type = STREAM_TYPE_AUDIO_AAC;
-                break;
-
-            default:
-                stream_type = (*es).Orig_Type;
-                break;
-        }
-        pmt_data[p++] = stream_type;
-
-        pmt_data[p++] = ((*es).PID >> 8) & 0x1F;
-        pmt_data[p++] = (*es).PID & 0xFF;
-
-        // Write descriptors
-        int es_info_length = 0;
-        DescriptorList::Iterator dit;
-        for (dit = (*es).Descriptors.begin();
-             dit != (*es).Descriptors.end(); ++dit)
-        {
-            int len = (*dit).Length;
-            memcpy(&pmt_data[p + 2 + es_info_length], (*dit).Data, len);
-            es_info_length += len;
-        }
-
-        // ES info length
-        pmt_data[p++] = (es_info_length >> 8) & 0x0F;
-        pmt_data[p++] = es_info_length & 0xFF;
-        p += es_info_length;
-    }
-
-    pmt_data[2] = p + 4 - 3; // section length
-
-    unsigned long crc = mpegts_crc32(pmt_data, p);
-    pmt_data[p++] = (crc >> 24) & 0xFF;
-    pmt_data[p++] = (crc >> 16) & 0xFF;
-    pmt_data[p++] = (crc >> 8) & 0xFF;
-    pmt_data[p++] = crc & 0xFF;
-    
-    SetPMT(new ProgramMapTable(PSIPTable(pkt)));
+    SetPMT(pmt);
 }
 
 void DVBRecorder::DebugTSHeader(unsigned char* buffer, int len)
