@@ -1455,7 +1455,7 @@ void TV::RunTV(void)
             UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
         }
 
-        if (++updatecheck >= 20)
+        if (++updatecheck >= 100)
         {
             OSDSet *oset;
             if (GetOSD() && (oset = GetOSD()->GetSet("status")) &&
@@ -1463,9 +1463,9 @@ void TV::RunTV(void)
                 (StateIsLiveTV(internalState) ||
                  StateIsPlaying(internalState)))
             {
-                QString desc = "";
-                int pos = nvp->calcSliderPos(desc);
-                GetOSD()->UpdatePause(pos, desc);
+                struct StatusPosInfo posInfo;
+                nvp->calcSliderPos(posInfo);
+                GetOSD()->UpdateStatus(posInfo);
             }
 
             updatecheck = 0;
@@ -1504,9 +1504,9 @@ void TV::RunTV(void)
 
             if (activenvp)
             {
-                QString dummy;
-                int pos = activenvp->calcSliderPos(dummy);
-                progress = (float)pos / 1000;
+                struct StatusPosInfo posInfo;
+                nvp->calcSliderPos(posInfo);
+                progress = (float)posInfo.position / 1000;
             }
             lcd->setChannelProgress(progress);
 
@@ -2827,10 +2827,10 @@ void TV::DoSkipCommercials(int direction)
 
     if (activenvp == nvp && GetOSD())
     {
-        QString dummy = "";
-        QString desc = tr("Searching...");
-        int pos = nvp->calcSliderPos(dummy);
-        GetOSD()->StartPause(pos, slidertype, tr("Skip"), desc, 6);
+        struct StatusPosInfo posInfo;
+        nvp->calcSliderPos(posInfo);
+        posInfo.desc = tr("Searching...");
+        GetOSD()->ShowStatus(posInfo, slidertype, tr("Skip"), 6);
         update_osd_pos = true;
     }
 
@@ -2928,7 +2928,7 @@ void TV::ToggleInputs(void)
     if (activenvp == nvp && paused)
     {
         if (GetOSD())
-            GetOSD()->EndPause();
+            GetOSD()->EndStatus();
         gContext->DisableScreensaver();
         paused = false;
     }
@@ -2965,7 +2965,7 @@ void TV::ChangeChannel(int direction)
     if (nvp && (activenvp == nvp) && paused)
     {
         if (GetOSD())
-            GetOSD()->EndPause();
+            GetOSD()->EndStatus();
         gContext->DisableScreensaver();
         paused = false;
     }
@@ -3178,7 +3178,7 @@ void TV::ChangeChannel(uint chanid, const QString &channum)
 
     if (nvp && (activenvp == nvp) && paused && GetOSD())
     {
-        GetOSD()->EndPause();
+        GetOSD()->EndStatus();
         gContext->DisableScreensaver();
         paused = false;
     }
@@ -3346,10 +3346,10 @@ void TV::ToggleOSD(bool includeStatusOSD)
         osd->HideAll();
         if (nvp)
         {
-            QString desc = "";
-            int pos = nvp->calcSliderPos(desc);
-            osd->StartPause(pos, false, tr("Position"), desc,
-                                 osd_prog_info_timeout);
+            struct StatusPosInfo posInfo;
+            nvp->calcSliderPos(posInfo);
+            osd->ShowStatus(posInfo, false, tr("Position"),
+                              osd_prog_info_timeout);
             update_osd_pos = true;
         }
         else
@@ -3385,14 +3385,13 @@ void TV::UpdateOSDSeekMessage(const QString &mesg, int disptime)
     if (activenvp != nvp)
         return;
 
-    QString desc = "";
-    int pos = nvp->calcSliderPos(desc);
+    struct StatusPosInfo posInfo;
+    nvp->calcSliderPos(posInfo);
     bool slidertype = StateIsLiveTV(GetState());
     int osdtype = (doSmartForward) ? kOSDFunctionalType_SmartForward :
                                      kOSDFunctionalType_Default;
     if (GetOSD())
-        GetOSD()->StartPause(pos, slidertype, mesg, desc, disptime, 
-                             osdtype);
+        GetOSD()->ShowStatus(posInfo, slidertype, mesg, disptime, osdtype);
     update_osd_pos = true;
 }
 
@@ -3808,7 +3807,7 @@ void TV::ChangeBrightness(bool up, bool recorder)
         {
             brightness = activerecorder->ChangeBrightness(up);
             text = QString(tr("Brightness (REC) %1 %")).arg(brightness);
-            GetOSD()->StartPause(brightness * 10, true, tr("Adjust Recording"),
+            GetOSD()->ShowStatus(brightness * 10, true, tr("Adjust Recording"),
                 text, 5, kOSDFunctionalType_RecPictureAdjust);
         }
         else
@@ -3816,7 +3815,7 @@ void TV::ChangeBrightness(bool up, bool recorder)
             brightness = nvp->getVideoOutput()->ChangeBrightness(up);
             gContext->SaveSetting("PlaybackBrightness", brightness);
             text = QString(tr("Brightness %1 %")).arg(brightness);
-            GetOSD()->StartPause(brightness * 10, true, tr("Adjust Picture"),
+            GetOSD()->ShowStatus(brightness * 10, true, tr("Adjust Picture"),
                 text, 5, kOSDFunctionalType_PictureAdjust);
         }
 
@@ -3835,7 +3834,7 @@ void TV::ChangeContrast(bool up, bool recorder)
         {
             contrast = activerecorder->ChangeContrast(up);
             text = QString(tr("Contrast (REC) %1 %")).arg(contrast);
-            GetOSD()->StartPause(contrast * 10, true, tr("Adjust Recording"),
+            GetOSD()->ShowStatus(contrast * 10, true, tr("Adjust Recording"),
                 text, 5, kOSDFunctionalType_RecPictureAdjust);
         }
         else
@@ -3843,7 +3842,7 @@ void TV::ChangeContrast(bool up, bool recorder)
             contrast = nvp->getVideoOutput()->ChangeContrast(up);
             gContext->SaveSetting("PlaybackContrast", contrast);
             text = QString(tr("Contrast %1 %")).arg(contrast);
-            GetOSD()->StartPause(contrast * 10, true, tr("Adjust Picture"),
+            GetOSD()->ShowStatus(contrast * 10, true, tr("Adjust Picture"),
                 text, 5, kOSDFunctionalType_PictureAdjust);
         }
 
@@ -3862,7 +3861,7 @@ void TV::ChangeColour(bool up, bool recorder)
         {
             colour = activerecorder->ChangeColour(up);
             text = QString(tr("Colour (REC) %1 %")).arg(colour);
-            GetOSD()->StartPause(colour * 10, true, tr("Adjust Recording"),
+            GetOSD()->ShowStatus(colour * 10, true, tr("Adjust Recording"),
                 text, 5, kOSDFunctionalType_RecPictureAdjust);
         }
         else
@@ -3870,7 +3869,7 @@ void TV::ChangeColour(bool up, bool recorder)
             colour = nvp->getVideoOutput()->ChangeColour(up);
             gContext->SaveSetting("PlaybackColour", colour);
             text = QString(tr("Colour %1 %")).arg(colour);
-            GetOSD()->StartPause(colour * 10, true, tr("Adjust Picture"),
+            GetOSD()->ShowStatus(colour * 10, true, tr("Adjust Picture"),
                 text, 5, kOSDFunctionalType_PictureAdjust);
         }
 
@@ -3889,7 +3888,7 @@ void TV::ChangeHue(bool up, bool recorder)
         {
             hue = activerecorder->ChangeHue(up);
             text = QString(tr("Hue (REC) %1 %")).arg(hue);
-            GetOSD()->StartPause(hue * 10, true, tr("Adjust Recording"),
+            GetOSD()->ShowStatus(hue * 10, true, tr("Adjust Recording"),
                 text, 5, kOSDFunctionalType_RecPictureAdjust);
         }
         else
@@ -3897,7 +3896,7 @@ void TV::ChangeHue(bool up, bool recorder)
             hue = nvp->getVideoOutput()->ChangeHue(up);
             gContext->SaveSetting("PlaybackHue", hue);
             text = QString(tr("Hue %1 %")).arg(hue);
-            GetOSD()->StartPause(hue * 10, true, tr("Adjust Picture"),
+            GetOSD()->ShowStatus(hue * 10, true, tr("Adjust Picture"),
                 text, 5, kOSDFunctionalType_PictureAdjust);
         }
 
@@ -3921,7 +3920,7 @@ void TV::ChangeVolume(bool up)
 
     if (GetOSD() && !browsemode)
     {
-        GetOSD()->StartPause(curvol * 10, true, tr("Adjust Volume"), text, 5, 
+        GetOSD()->ShowStatus(curvol * 10, true, tr("Adjust Volume"), text, 5, 
                         kOSDFunctionalType_PictureAdjust);
         update_osd_pos = false;
     }
@@ -3944,7 +3943,7 @@ void TV::ChangeTimeStretch(int dir, bool allowEdit)
     if (GetOSD() && !browsemode)
     {
         int val = (int)(normal_speed*500);
-        GetOSD()->StartPause(val, false, tr("Adjust Time Stretch"), text, 10, 
+        GetOSD()->ShowStatus(val, false, tr("Adjust Time Stretch"), text, 10, 
                         kOSDFunctionalType_TimeStretchAdjust);
         update_osd_pos = false;
     }
@@ -3988,8 +3987,8 @@ void TV::ChangeAudioSync(int dir, bool allowEdit)
         else
             text = tr("Audio Sync") + text;
 
-        GetOSD()->StartPause((val/2)+500, false, tr("Adjust Audio Sync"), text, 10, 
-                        kOSDFunctionalType_AudioSyncAdjust);
+        GetOSD()->ShowStatus((val/2)+500, false, tr("Adjust Audio Sync"), text,
+                             10, kOSDFunctionalType_AudioSyncAdjust);
         update_osd_pos = false;
     }
 }
@@ -4483,7 +4482,7 @@ void TV::DoTogglePictureAttribute(void)
                 picName = QString("%1 %2 %").arg(tr("Volume")).arg(value);
                 break;
         }
-        GetOSD()->StartPause(value*10, true, title, picName, 5, 
+        GetOSD()->ShowStatus(value*10, true, title, picName, 5, 
                         kOSDFunctionalType_PictureAdjust);
         update_osd_pos = false;
     }
@@ -4529,7 +4528,7 @@ void TV::DoToggleRecPictureAttribute(void)
                                   .arg(tr("(REC)")).arg(value);
                 break;
         }
-        GetOSD()->StartPause(value * 10, true, title, recName, 5,
+        GetOSD()->ShowStatus(value * 10, true, title, recName, 5,
                         kOSDFunctionalType_RecPictureAdjust);
         update_osd_pos = false;
     }
@@ -5053,9 +5052,9 @@ void TV::ToggleAutoExpire(void)
 
     if (GetOSD() && activenvp == nvp && desc != "" )
     {
-        QString curTime = "";
-        int pos = nvp->calcSliderPos(curTime);
-        GetOSD()->StartPause(pos, false, desc, curTime, 1);
+        struct StatusPosInfo posInfo;
+        nvp->calcSliderPos(posInfo);
+        GetOSD()->ShowStatus(posInfo, false, desc, 1);
         update_osd_pos = false;
     }
 }
@@ -5077,9 +5076,9 @@ void TV::SetAutoCommercialSkip(int skipMode)
 
     if (GetOSD() && activenvp == nvp && desc != "" )
     {
-        QString curTime = "";
-        int pos = nvp->calcSliderPos(curTime);
-        GetOSD()->StartPause(pos, false, desc, curTime, 1);
+        struct StatusPosInfo posInfo;
+        nvp->calcSliderPos(posInfo);
+        GetOSD()->ShowStatus(posInfo, false, desc, 1);
         update_osd_pos = false;
     }
 }
@@ -5099,9 +5098,9 @@ void TV::SetManualZoom(bool zoomON)
 
     if (GetOSD() && activenvp == nvp && desc != "" )
     {
-        QString curTime = "";
-        int pos = nvp->calcSliderPos(curTime);
-        GetOSD()->StartPause(pos, false, desc, curTime, 1);
+        struct StatusPosInfo posInfo;
+        nvp->calcSliderPos(posInfo);
+        GetOSD()->ShowStatus(posInfo, false, desc, 1);
         update_osd_pos = false;
     }
 }

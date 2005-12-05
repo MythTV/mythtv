@@ -25,6 +25,15 @@ enum OSDFunctionalType
     kOSDFunctionalType_AudioSyncAdjust
 };
 
+struct StatusPosInfo
+{
+    QString desc;
+    int position;
+    bool progBefore;
+    bool progAfter;
+};
+
+
 class QImage;
 class TTFFont;
 class OSDSet;
@@ -79,11 +88,14 @@ class OSD : public QObject
     void SetUpOSDClosedHandler(TV *tv);
 
     // position is 0 - 1000 
-    void StartPause(int position, bool fill, QString msgtext,
-                    QString slidertext, int displaytime,
+    void ShowStatus(int pos, bool fill, QString msgtext, QString desc,
+                    int displaytime,
                     int osdFunctionalType = kOSDFunctionalType_Default);
-    void UpdatePause(int position, QString slidertext);
-    void EndPause(void);
+    void ShowStatus(struct StatusPosInfo posInfo,
+                      bool fill, QString msgtext, int displaytime,
+                      int osdFunctionalType = kOSDFunctionalType_Default);
+    void UpdateStatus(struct StatusPosInfo posInfo);
+    void EndStatus(void);
 
     bool Visible(void);
 
@@ -160,7 +172,7 @@ class OSD : public QObject
     QString themepath;
 
     float wscale, fscale;
-    float hmult, wmult;
+    float wmult, hmult;
     int xoffset, yoffset, displaywidth, displayheight;
 
     QMutex osdlock;

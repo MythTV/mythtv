@@ -48,8 +48,7 @@ class LiveTVChain
     int  GetCurPos(void) const { return m_curpos; }
     int  ProgramIsAt(const QString &chanid, const QDateTime &starttime) const;
     int  ProgramIsAt(const ProgramInfo *pginfo) const;
-    void GetSecondsBehind(int secondsInCurrent, int &secondsBehind,
-                          int &totalLength);
+    int  GetLengthAtCurPos(void);
     int  TotalSize(void) const;
     bool HasNext(void)   const;
     bool HasPrev(void)   const { return (m_curpos > 0); }

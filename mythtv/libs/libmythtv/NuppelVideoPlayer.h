@@ -145,7 +145,7 @@ class NuppelVideoPlayer
     // Complicated gets
     long long CalcMaxFFTime(long long ff, bool setjump = true) const;
     long long CalcRWTime(long long rw) const;
-    int       calcSliderPos(QString &desc) const;
+    void      calcSliderPos(struct StatusPosInfo &posInfo) const;
 
     /// Non-const gets
     OSD         *GetOSD(void)                 { return osd; }

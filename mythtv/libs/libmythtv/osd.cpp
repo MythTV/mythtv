@@ -1427,8 +1427,22 @@ void OSD::SetUpOSDClosedHandler(TV *tv)
 
 }
 
-void OSD::StartPause(int position, bool fill, QString msgtext,
-                     QString slidertext, int displaytime, int osdFunctionalType)
+void OSD::ShowStatus(int pos, bool fill, QString msgtext, QString desc,
+                     int displaytime, int osdFunctionalType)
+{
+    struct StatusPosInfo posInfo;
+
+    posInfo.desc = desc;
+    posInfo.position = pos;
+    posInfo.progBefore = false;
+    posInfo.progAfter = false;
+
+    ShowStatus(posInfo, fill, msgtext, displaytime, osdFunctionalType);
+}
+
+void OSD::ShowStatus(struct StatusPosInfo posInfo,
+                       bool fill, QString msgtext, int displaytime,
+                       int osdFunctionalType)
 {
     fill = fill;
 
@@ -1443,11 +1457,27 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
             type->SetText(msgtext);
         type = (OSDTypeText *)container->GetType("slidertext");
         if (type)
-            type->SetText(slidertext);
+            type->SetText(posInfo.desc);
+
         OSDTypeFillSlider *slider = 
                       (OSDTypeFillSlider *)container->GetType("statusslider");
         if (slider)
-            slider->SetPosition(position);
+            slider->SetPosition(posInfo.position);
+
+        OSDTypePosSlider *ppos =
+                     (OSDTypePosSlider *)container->GetType("statusposition");
+        if (ppos)
+            ppos->SetPosition(posInfo.position);
+
+        OSDTypeImage *beforeImage =
+                      (OSDTypeImage *)container->GetType("progbefore");
+        if (beforeImage)
+            beforeImage->Hide(!posInfo.progBefore);
+
+        OSDTypeImage *afterImage =
+                      (OSDTypeImage *)container->GetType("progafter");
+        if (afterImage)
+            afterImage->Hide(!posInfo.progAfter);
 
         if (displaytime > 0)
             container->DisplayFor(displaytime * 1000000, osdFunctionalType);
@@ -1460,7 +1490,7 @@ void OSD::StartPause(int position, bool fill, QString msgtext,
     osdlock.unlock();
 }
 
-void OSD::UpdatePause(int position, QString slidertext)
+void OSD::UpdateStatus(struct StatusPosInfo posInfo)
 {
     osdlock.lock();
     OSDSet *container = GetSet("status");
@@ -1469,9 +1499,9 @@ void OSD::UpdatePause(int position, QString slidertext)
         OSDTypeText *type = (OSDTypeText *)container->GetType("slidertext");
         if (type)
         {
-            if (type->GetText() != slidertext)
+            if (type->GetText() != posInfo.desc)
             {
-                type->SetText(slidertext);
+                type->SetText(posInfo.desc);
                 m_setsvisible = true;
                 changed = true;
             }
@@ -1481,9 +1511,49 @@ void OSD::UpdatePause(int position, QString slidertext)
                       (OSDTypeFillSlider *)container->GetType("statusslider");
         if (slider)
         {
-            if (slider->GetPosition() != position)
+            if (slider->GetPosition() != posInfo.position)
             {
-                slider->SetPosition(position);
+                slider->SetPosition(posInfo.position);
+
+                m_setsvisible = true;
+                changed = true;
+            }
+        }
+
+        OSDTypePosSlider *ppos =
+             (OSDTypePosSlider *)container->GetType("statusposition");
+        if (ppos)
+        {
+            if (ppos->GetPosition() != posInfo.position)
+            {
+                ppos->SetPosition(posInfo.position);
+
+                m_setsvisible = true;
+                changed = true;
+            }
+        }
+
+        OSDTypeImage *beforeImage =
+                      (OSDTypeImage *)container->GetType("progbefore");
+        if (beforeImage)
+        {
+            if (beforeImage->isHidden() != !posInfo.progBefore)
+            {
+                beforeImage->Hide(!posInfo.progBefore);
+
+                m_setsvisible = true;
+                changed = true;
+            }
+        }
+
+        OSDTypeImage *afterImage =
+                      (OSDTypeImage *)container->GetType("progafter");
+        if (afterImage)
+        {
+            if (afterImage->isHidden() != !posInfo.progAfter)
+            {
+                afterImage->Hide(!posInfo.progAfter);
+
                 m_setsvisible = true;
                 changed = true;
             }
@@ -1492,7 +1562,7 @@ void OSD::UpdatePause(int position, QString slidertext)
     osdlock.unlock();
 }
 
-void OSD::EndPause(void)
+void OSD::EndStatus(void)
 {
     osdlock.lock();
     OSDSet *container = GetSet("status");
@@ -1928,7 +1998,7 @@ bool OSD::HideSets(QStringList &name)
 }
 
 void OSD::UpdateEditText(const QString &seek_amount, const QString &deletemarker, 
-		           const QString &edittime, const QString &framecnt)
+                         const QString &edittime, const QString &framecnt)
 {
     osdlock.lock();
 

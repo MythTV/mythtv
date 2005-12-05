@@ -432,6 +432,7 @@ void OSDSet::Draw(OSDSurface *surface, bool actuallydraw)
 
 OSDType::OSDType(const QString &name)
 {
+    m_hidden = false;
     m_name = name;
 }
 
@@ -903,6 +904,9 @@ void OSDTypeImage::LoadFromQImage(const QImage &img)
 void OSDTypeImage::Draw(OSDSurface *surface, int fade, int maxfade,
                         int xoff, int yoff)
 {
+    if (m_hidden)
+        return;
+
     if (!m_isvalid)
         return;
 

@@ -307,37 +307,19 @@ int LiveTVChain::ProgramIsAt(const ProgramInfo *pginfo) const
     return ProgramIsAt(pginfo->chanid, pginfo->recstartts);
 }
 
-/** \fn LiveTVChain::GetSecondsBehind(int secondsInCurrent, int &secondsBehind, int &totalLength)
- *  \returns seconds behind Live based on secondsInCurrent in m_curpos recording
+/** \fn LiveTVChain::GetLengthAtCurPos(void)
+ *  \returns length in seocnds of recording at m_curpos
  */
-void LiveTVChain::GetSecondsBehind(int secondsInCurrent, int &secondsBehind,
-                                   int &totalLength)
+int LiveTVChain::GetLengthAtCurPos(void)
 {
     QMutexLocker lock(&m_lock);
-    int index;
     LiveTVChainEntry entry;
-    int entryLength;
 
-    secondsBehind = 0;
-    totalLength = 0;
-
-    for (index = 0; index < (int)m_chain.count(); index++)
-    {
-        entry = m_chain[index];
-
-        if (index != ((int)m_chain.count() - 1))
-            entryLength = entry.starttime.secsTo(entry.endtime);
-        else
-            entryLength =
-                entry.starttime.secsTo(QDateTime::currentDateTime());
-
-        totalLength += entryLength;
-
-        if (index == m_curpos)
-            secondsBehind += entryLength - secondsInCurrent;
-        else if (index > m_curpos)
-            secondsBehind += entryLength;
-    }
+    entry = m_chain[m_curpos];
+    if (m_curpos == ((int)m_chain.count() - 1))
+        return entry.starttime.secsTo(QDateTime::currentDateTime());
+    else
+        return entry.starttime.secsTo(entry.endtime);
 }
 
 int LiveTVChain::TotalSize(void) const

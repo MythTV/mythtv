@@ -132,6 +132,8 @@ class OSDType : public QObject
     virtual ~OSDType();
 
     void SetParent(OSDSet *parent) { m_parent = parent; }
+    void Hide(bool hidden = true) { m_hidden = hidden; }
+    bool isHidden(void) { return m_hidden; }
 
     QString Name() { return m_name; }
 
@@ -139,6 +141,7 @@ class OSDType : public QObject
                       int yoff) = 0;
 
   protected:
+    bool m_hidden;
     QString m_name;
     OSDSet *m_parent;
 };
