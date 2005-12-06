@@ -1227,10 +1227,13 @@ cerr << "uptime is " << uptime << endl;
             detailString += contentLines[count] + "\n";
             count++;
         }
-    }
 
-    for (detailLoop = detailBegin; detailLoop < count; detailLoop++)
-        contentDetail[detailLoop] = detailString;
+        for (detailLoop = detailBegin; detailLoop < count; detailLoop++)
+            contentDetail[detailLoop] = detailString;
+
+        detailBegin = count;
+        detailString = "";
+    }
 
     contentTotalLines = count;
     update(ContentRect);
