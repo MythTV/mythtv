@@ -119,7 +119,7 @@ bool RemoteGetUptime(time_t &uptime)
         uptime = strlist[0].toULongLong();
 #endif
 
-    return false;
+    return true;
 }
 
 bool RemoteGetMemStats(int &totalMB, int &freeMB, int &totalVM, int &freeVM)

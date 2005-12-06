@@ -38,6 +38,7 @@ class StatusBox : public MythDialog
     void doMachineStatus();
     void clicked();
     void setHelpText();
+    void getActualRecordedBPS(QString hostnames);
 
     XMLParse *theme;
     QDomElement xmldata;

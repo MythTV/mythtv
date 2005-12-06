@@ -79,24 +79,6 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     min_level = gContext->GetNumSetting("LogDefaultView",1);
     my_parent = parent;
     clicked();
-
-
-    recordingProfilesBPS["HDTV"]    = 19400000;
-
-    MSqlQuery query(MSqlQuery::InitCon());
-    QString querystr = QString("SELECT SUM(filesize), SUM(UNIX_TIMESTAMP(endtime) - UNIX_TIMESTAMP(starttime)) FROM recorded");
-    query.prepare(querystr);
-    query.exec();
-    int bitrate = 5500000;
-    if (query.isActive() && query.size())
-    {
-        query.next();
-        double szsum = query.value(0).toDouble();
-        double tmsum = query.value(1).toDouble();
-        if (tmsum > 1.0)
-            bitrate = (int)((szsum * 8) / tmsum);
-    }
-    recordingProfilesBPS["1 average"] =  bitrate;
 }
 
 StatusBox::~StatusBox(void)
@@ -973,8 +955,8 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
                                         long long used, long long free,
                                         const recprof2bps_t& prof2bps)
 {
-    const QString tail = QObject::tr(", using recording profile '%1'");
-    const QString avg = QObject::tr(", using your typical recording profile.");
+    const QString tail = QObject::tr(", using your %1 rate of %2 Kb/sec");
+
     out<<usage_str_kb(total, used, free);
     if (free<0)
         return;
@@ -982,18 +964,20 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     recprof2bps_t::const_iterator it = prof2bps.begin();
     for (; it != prof2bps.end(); ++it)
     {
-        const QString pro = (it.key()=="1 average") ? avg : tail.arg(it.key());
+        const QString pro =
+                tail.arg(it.key()).arg((int)((float)it.data() / 1024.0));
+        
         long long bytesPerMin = (it.data() >> 1) * 15;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
         minLeft = (minLeft/15)*15;
         uint hoursLeft = minLeft/60;
         if (hoursLeft > 3)
-            out<<QObject::tr("%1 hours left%2").arg(hoursLeft).arg(pro);
+            out<<QObject::tr("%1 hours left").arg(hoursLeft) + pro;
         else if (minLeft > 90)
-            out<<QObject::tr("%1 hours and %2 minutes left%3")
-                .arg(hoursLeft).arg(minLeft%60).arg(pro);
+            out<<QObject::tr("%1 hours and %2 minutes left")
+                .arg(hoursLeft).arg(minLeft%60) + pro;
         else
-            out<<QObject::tr("%1 minutes left%2").arg(minLeft).arg(pro);
+            out<<QObject::tr("%1 minutes left").arg(minLeft) + pro;
     }
 }
 
@@ -1038,6 +1022,41 @@ static const QString uptimeStr(time_t uptime)
     }
 }
 
+/** \fn StatusBox::getActualRecordedBPS(QString hostnames)
+ *  \brief Fills in recordingProfilesBPS w/ average bitrate from recorded table
+ */
+void StatusBox::getActualRecordedBPS(QString hostnames)
+{
+    recordingProfilesBPS.clear();
+
+    QString querystr;
+    MSqlQuery query(MSqlQuery::InitCon());
+
+    querystr =
+        "SELECT sum(filesize) * 8 / "
+            "sum(((unix_timestamp(endtime) - unix_timestamp(starttime)))) "
+            "AS avg_bitrate "
+        "FROM recorded WHERE hostname in (%1) "
+            "AND (unix_timestamp(endtime) - unix_timestamp(starttime)) > 300;";
+
+    query.prepare(querystr.arg(hostnames));
+
+    if (query.exec() && query.isActive() && query.size() > 0 && query.next())
+        recordingProfilesBPS[QObject::tr("average")] = query.value(0).toInt();
+
+    querystr =
+        "SELECT max(filesize * 8 / "
+            "(unix_timestamp(endtime) - unix_timestamp(starttime))) "
+            "AS max_bitrate "
+        "FROM recorded WHERE hostname in (%1) "
+            "AND (unix_timestamp(endtime) - unix_timestamp(starttime)) > 300;";
+
+    query.prepare(querystr.arg(hostnames));
+
+    if (query.exec() && query.isActive() && query.size() > 0 && query.next())
+        recordingProfilesBPS[QObject::tr("maximum")] = query.value(0).toInt();
+}
+
 /** \fn StatusBox::doMachineStatus()
  *  \brief Should machine status.
  *  
@@ -1052,16 +1071,24 @@ void StatusBox::doMachineStatus()
     int           totalM, usedM, freeM;    // Physical memory
     int           totalS, usedS, freeS;    // Virtual  memory (swap)
     time_t        uptime;
+    int           detailBegin;
+    QString       detailString;
+    int           detailLoop;
 
     contentLines.clear();
     contentDetail.clear();
     contentFont.clear();
     //doScroll = false;??
 
+    detailBegin = count;
+    detailString = "";
+
     if (isBackend)
-        contentLines[count++] = QObject::tr("System") + ":";
+        contentLines[count] = QObject::tr("System") + ":";
     else
-        contentLines[count++] = QObject::tr("This machine") + ":";
+        contentLines[count] = QObject::tr("This machine") + ":";
+    detailString += contentLines[count] + "\n";
+    count++;
 
     // uptime
     if (!getUptime(uptime))
@@ -1082,6 +1109,7 @@ void StatusBox::doMachineStatus()
         sprintf(buff, "%0.2lf, %0.2lf, %0.2lf", loads[0], loads[1], loads[2]);
         contentLines[count].append(QString(buff));
     }
+    detailString += contentLines[count] + "\n";
     count++;
 
 
@@ -1090,22 +1118,38 @@ void StatusBox::doMachineStatus()
     {
         usedM = totalM - freeM;
         if (totalM > 0)
-            contentLines[count++] = "   " + QObject::tr("RAM") +
-                                    ": "  + usage_str_mb(totalM, usedM, freeM);
+        {
+            contentLines[count] = "   " + QObject::tr("RAM") +
+                                  ": "  + usage_str_mb(totalM, usedM, freeM);
+            detailString += contentLines[count] + "\n";
+            count++;
+        }
         usedS = totalS - freeS;
         if (totalS > 0)
-            contentLines[count++] = "   " +
-                                    QObject::tr("Swap") +
-                                    ": "  + usage_str_mb(totalS, usedS, freeS);
+        {
+            contentLines[count] = "   " + QObject::tr("Swap") +
+                                  ": "  + usage_str_mb(totalS, usedS, freeS);
+            detailString += contentLines[count] + "\n";
+            count++;
+        }
     }
+
+    for (detailLoop = detailBegin; detailLoop < count; detailLoop++)
+        contentDetail[detailLoop] = detailString;
+
+    detailBegin = count;
+    detailString = "";
 
     if (!isBackend)
     {
-        contentLines[count++] = QObject::tr("MythTV server") + ":";
+        contentLines[count] = QObject::tr("MythTV server") + ":";
+        detailString += contentLines[count] + "\n";
+        count++;
 
         // uptime
         if (!RemoteGetUptime(uptime))
             uptime = 0;
+cerr << "uptime is " << uptime << endl;
         contentLines[count] = uptimeStr(uptime);
 
         // weighted average loads
@@ -1119,39 +1163,74 @@ void StatusBox::doMachineStatus()
             contentLines[count].append(QString(buff));
         }
         else
-            contentLines[count++].append(QObject::tr("unknown"));
+            contentLines[count].append(QObject::tr("unknown"));
+
+        detailString += contentLines[count] + "\n";
+        count++;
 
         // memory usage
         if (RemoteGetMemStats(totalM, freeM, totalS, freeS))
         {
             usedM = totalM - freeM;
             if (totalM > 0)
-                contentLines[count++] = "   " + QObject::tr("RAM") +
-                                        ": "  + usage_str_mb(totalM, usedM, freeM);
+            {
+                contentLines[count] = "   " + QObject::tr("RAM") +
+                                      ": "  + usage_str_mb(totalM, usedM, freeM);
+                detailString += contentLines[count] + "\n";
+                count++;
+            }
+
             usedS = totalS - freeS;
             if (totalS > 0)
-                contentLines[count++] = "   " + QObject::tr("Swap") +
-                                        ": "  + usage_str_mb(totalS, usedS, freeS);
+            {
+                contentLines[count] = "   " + QObject::tr("Swap") +
+                                      ": "  + usage_str_mb(totalS, usedS, freeS);
+                detailString += contentLines[count] + "\n";
+                count++;
+            }
         }
     }
 
+    for (detailLoop = detailBegin; detailLoop < count; detailLoop++)
+        contentDetail[detailLoop] = detailString;
+
+    detailBegin = count;
+    detailString = "";
+
     // get free disk space
+    QString hostnames;
+    
     vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
     for (uint i=0; i<fsInfos.size(); i++)
     {
+        hostnames = QString("\"%1\"").arg(fsInfos[i].hostname);
+        hostnames.replace(QRegExp(" "), "");
+        hostnames.replace(QRegExp(","), "\",\"");
+
+        getActualRecordedBPS(hostnames);
+
         QStringList list;
         disk_usage_with_rec_time_kb(list,
             fsInfos[i].totalSpaceKB, fsInfos[i].usedSpaceKB,
             fsInfos[i].totalSpaceKB - fsInfos[i].usedSpaceKB,
             recordingProfilesBPS);
 
-        contentLines[count++] = 
+        contentLines[count] = 
             QObject::tr("Disk usage on %1:").arg(fsInfos[i].hostname);
+        detailString += contentLines[count] + "\n";
+        count++;
 
         QStringList::iterator it = list.begin();
         for (;it != list.end(); ++it)
-            contentLines[count++] =  QString("   ") + (*it);
+        {
+            contentLines[count] =  QString("   ") + (*it);
+            detailString += contentLines[count] + "\n";
+            count++;
+        }
     }
+
+    for (detailLoop = detailBegin; detailLoop < count; detailLoop++)
+        contentDetail[detailLoop] = detailString;
 
     contentTotalLines = count;
     update(ContentRect);
