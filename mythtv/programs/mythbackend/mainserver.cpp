@@ -1756,13 +1756,20 @@ void MainServer::HandleQueryFreeSpace(PlaybackSock *pbs, bool allHosts)
         encodeLongLong(strlist, totalKB);
         encodeLongLong(strlist, usedKB);
 
+        QMap <QString, bool> backendsCounted;
+        QString encoderHost;
         QMap<int, EncoderLink *>::Iterator eit = encoderList->begin();
         while (ismaster && eit != encoderList->end())
         {
-            if (eit.data()->IsConnected() && !eit.data()->IsLocal())
+            encoderHost = eit.data()->GetHostName();
+            if (eit.data()->IsConnected() &&
+                !eit.data()->IsLocal() &&
+                !backendsCounted.contains(encoderHost))
             {
+                backendsCounted[encoderHost] = true;
+
                 eit.data()->GetFreeDiskSpace(totalKB, usedKB);
-                strlist<<eit.data()->GetHostName();
+                strlist<<encoderHost;
                 encodeLongLong(strlist, totalKB);
                 encodeLongLong(strlist, usedKB);
             }

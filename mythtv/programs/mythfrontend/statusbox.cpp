@@ -1023,31 +1023,6 @@ static const QString uptimeStr(time_t uptime)
     }
 }
 
-/** \fn eliminate_duplicates(vector<FileSystemInfo> fsInfos)
- *  \brief Removes unique entries for hosts sharing space, replacing
- *         the "hostname" field with a comma sperated list of hosts.
- *  \param fsInfos File system info classes to process.
- */
-static void eliminate_duplicates(vector<FileSystemInfo>& fsInfos)
-{
-    vector<FileSystemInfo>::iterator it1, it2;
-    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
-    {
-        it2 = it1;
-        for (it2++; it2 != fsInfos.end(); it2++)
-        {
-            if ((it1->totalSpaceKB == it2->totalSpaceKB) &&
-                (it1->usedSpaceKB*0.95 < it2->usedSpaceKB) &&
-                (it1->usedSpaceKB*1.05 > it2->usedSpaceKB))
-            {
-                it1->hostname = it1->hostname + ", " + it2->hostname;
-                fsInfos.erase(it2);
-                it2 = it1;
-            }
-        }
-    }
-}
-
 /** \fn StatusBox::doMachineStatus()
  *  \brief Should machine status.
  *  
@@ -1147,7 +1122,6 @@ void StatusBox::doMachineStatus()
 
     // get free disk space
     vector<FileSystemInfo> fsInfos = RemoteGetFreeSpace();
-    eliminate_duplicates(fsInfos);
     for (uint i=0; i<fsInfos.size(); i++)
     {
         QStringList list;

@@ -90,7 +90,7 @@ bool PlaybackSock::SendReceiveStringList(QStringList &strlist)
     return ok;
 }
 
-/** \fn RemoteGetFreeSpace(long long&, long long&)
+/** \fn GetFreeDiskSpace(long long&, long long&)
  *  \brief Returns total and used space in kilobytes.
  */
 void PlaybackSock::GetFreeDiskSpace(long long &totalKB, long long &usedKB)

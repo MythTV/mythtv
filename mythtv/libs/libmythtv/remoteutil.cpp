@@ -63,6 +63,25 @@ vector<FileSystemInfo> RemoteGetFreeSpace()
             fsInfos.push_back(fsInfo);
         }
     }
+
+    // Consolidate hosts sharing storage
+    vector<FileSystemInfo>::iterator it1, it2;
+    for (it1 = fsInfos.begin(); it1 != fsInfos.end(); it1++)
+    {
+        it2 = it1;
+        for (it2++; it2 != fsInfos.end(); it2++)
+        {
+            if ((it1->totalSpaceKB == it2->totalSpaceKB) &&
+                (it1->usedSpaceKB*0.95 < it2->usedSpaceKB) &&
+                (it1->usedSpaceKB*1.05 > it2->usedSpaceKB))
+            {
+                it1->hostname = it1->hostname + ", " + it2->hostname;
+                fsInfos.erase(it2);
+                it2 = it1;
+            }
+        }
+    }
+
     return fsInfos;
 }
 
