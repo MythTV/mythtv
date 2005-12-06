@@ -786,7 +786,8 @@ bool MythContextPrivate::PromptForDatabaseParams(void)
 }
 
 MythContext::MythContext(const QString &binversion)
-    : QObject(), d(NULL), app_binary_version(binversion)
+    : QObject(), d(NULL), app_binary_version(binversion),
+      useSettingsCache(false)
 {
     qInitNetworkProtocols();
 }
