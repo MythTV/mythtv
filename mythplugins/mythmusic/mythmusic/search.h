@@ -14,7 +14,7 @@ class SearchListBoxItem: public QListBoxText
     unsigned int getId() { return id; }
 
   private:
-  
+    virtual void paint(QPainter *p);
     unsigned int id;
 };
 

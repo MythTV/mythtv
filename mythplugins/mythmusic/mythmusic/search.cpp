@@ -1,5 +1,7 @@
 // Qt includes
 #include <qlayout.h>
+#include <qfontmetrics.h>
+#include <qpainter.h>
 
 // MythTV plugin includes
 #include <mythtv/mythcontext.h>
@@ -104,10 +106,9 @@ void SearchDialog::runQuery(QString searchText)
     QString queryString("SELECT filename, artist, album, title, intid "
                         "FROM musicmetadata ");
 
+    QStringList list = QStringList::split(QRegExp("[>,]"), searchText);
     if (!searchText.isEmpty())
     {
-        QStringList list = QStringList::split(
-            QRegExp("[>,]"), searchText);
         whereClause = "";
         if (substringSearch) // alpha
         {
@@ -163,6 +164,37 @@ void SearchDialog::runQuery(QString searchText)
         QString text(aComposer + ": " + aTitle + "; " +
                      query.value(3).toString() );
 
+        // Highlight matches as appropriate
+        if(!searchText.isEmpty()) 
+        {
+            if (substringSearch) // alpha
+            {
+                for (uint i = 0; i < list.count(); i++) 
+                {
+                    QString stxt = list[i].stripWhiteSpace();
+                    int index = -1;
+                    while( (index = text.findRev(stxt, index, false)) != -1 ) 
+                    {
+                        text.insert(index + stxt.length(), "]");
+                        text.insert(index, "[");
+                    }
+                }
+            }
+            else // numeric
+            {
+                for (uint i = 0; i < list.count(); i++) 
+                {
+                    QString stxt = list[i].stripWhiteSpace();
+                    int index = -1;
+                    while( (index = text.findRev(QRegExp(stxt, false), index)) != -1 )
+                    {
+                        text.insert(index + stxt.contains('['), "]");
+                        text.insert(index, "[");
+                    }
+                }
+            }
+        }
+
         // Insert item into listbox, including song identifier
         listbox->insertItem(new SearchListBoxItem(
                                 QString::fromUtf8(text),
@@ -207,4 +239,53 @@ void SearchDialog::okPressed(void)
 void SearchDialog::cancelPressed(void)
 {
     done(-1);
+}
+
+void SearchListBoxItem::paint(QPainter *p)
+{
+    int itemHeight = height(listBox());
+    QFontMetrics fm = p->fontMetrics();
+    int yPos = ((itemHeight - fm.height()) / 2) + fm.ascent();
+
+    QColor normalColor = p->pen().color();
+    QColor highlightColor = QColor("yellow"); // should be themeable
+
+    QString sText = text();
+    int xPos = 3;
+    int start, end;
+    int index = 0;
+    QString sNormal, sHighlight;
+
+    while (index < (int) sText.length())
+    {
+        start = sText.find('[', index);
+        end = sText.find(']', start);
+
+        if (start != -1 && end != -1)
+        {
+            sNormal = sText.mid(index, start - index);
+            sHighlight = sText.mid(start + 1, end - start -1);
+            index = end + 1;
+        }
+        else
+        {
+            sNormal = sText.mid(index, 0xffffffff);
+            sHighlight = "";
+            index = sText.length();
+        } 
+
+        if (sNormal != "")
+        {
+            p->setPen(normalColor);
+            p->drawText(xPos, yPos, sNormal);
+            xPos += fm.width(sNormal);
+        }
+
+        if (sHighlight != "")
+        {
+            p->setPen(highlightColor);
+            p->drawText(xPos, yPos, sHighlight);
+            xPos += fm.width(sHighlight);
+        }
+    }
 }
