@@ -3303,6 +3303,7 @@ int main(int argc, char *argv[])
     int fromxawfile_id = 1;
     QString fromxawfile_name;
 
+    bool usingDataDirect = false;
     bool grab_data = true;
 
     bool export_iconmap = false;
@@ -3794,6 +3795,9 @@ int main(int argc, char *argv[])
                        newsource.lineupid = sourcequery.value(5).toString();
 
                        sourcelist.append(newsource);
+                       if (newsource.xmltvgrabber == "datadirect" || 
+                           newsource.xmltvgrabber == "technovera")
+                           usingDataDirect = true;
                   }
              }
              else
@@ -3923,7 +3927,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    ddprocessor.getNextSuggestedTime();
+    if (usingDataDirect)
+        ddprocessor.getNextSuggestedTime();
 
     VERBOSE(VB_IMPORTANT, "\n"
             "===============================================================\n"
