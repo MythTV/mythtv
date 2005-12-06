@@ -77,6 +77,8 @@ int main(int argc, char *argv[])
         return JOBQUEUE_EXIT_NO_MYTHCONTEXT;
     }
 
+    gContext->ConnectToMasterServer();
+
     jobqueue = new JobQueue(false);
 
     a.exec();

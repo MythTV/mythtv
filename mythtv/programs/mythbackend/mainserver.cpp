@@ -667,6 +667,9 @@ void MainServer::customEvent(QCustomEvent *e)
             return;
         }
 
+        if (me->Message() == "CLEAR_SETTINGS_CACHE")
+            gContext->ClearSettingsCache();
+
         if (me->Message().left(6) == "LOCAL_")
             return;
 
@@ -716,7 +719,13 @@ void MainServer::customEvent(QCustomEvent *e)
             sock->Lock();
             qApp->lock();
 
-            if (sendGlobal)
+            if (broadcast[1] == "CLEAR_SETTINGS_CACHE")
+            {
+                if ((ismaster) &&
+                    (pbs->isSlaveBackend() || pbs->wantsEvents()))
+                    WriteStringList(sock, broadcast);
+            }
+            else if (sendGlobal)
             {
                 if (pbs->isSlaveBackend())
                     WriteStringList(sock, broadcast);
@@ -2998,9 +3007,6 @@ void MainServer::HandleMessage(QStringList &slist, PlaybackSock *pbs)
     QSocket *pbssock = pbs->getSocket();
 
     QString message = slist[1];
-
-    if (message == "CLEAR_SETTINGS_CACHE")
-        gContext->ClearSettingsCache();
 
     MythEvent me(message);
     gContext->dispatch(me);
