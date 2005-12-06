@@ -2053,6 +2053,8 @@ UIRichTextType::UIRichTextType(const QString &name, fontProp *font,
     m_image = new QPixmap(m_displayArea.width(), m_displayArea.height(), 24);
     m_background = new QPixmap(m_displayArea.width(), m_displayArea.height(), 24);
     m_compBackground = new QPixmap(m_displayArea.width(), m_displayArea.height(), 24);
+    m_backgroundImage = NULL;
+    m_backgroundFile = "";
 
     m_bgImageReg = m_bgImageSel = "";
     m_showScrollArrows = true;
@@ -2065,6 +2067,9 @@ UIRichTextType::~UIRichTextType()
 
     if (m_background)
         delete m_background;
+
+    if (m_backgroundImage)
+        delete m_backgroundImage;
 
     if (m_compBackground)
         delete m_compBackground;
@@ -2087,7 +2092,9 @@ void UIRichTextType::SetBackgroundImages(QString bgImageReg, QString bgImageSel)
     m_bgImageReg = bgImageReg;
     m_bgImageSel = bgImageSel;
 
-    updateBackground();
+    bool needreload = false;
+    loadBackgroundImg(needreload);
+    if (needreload) updateBackground();
 }
 
 void UIRichTextType::SetBackground(QPixmap *background)
@@ -2098,31 +2105,35 @@ void UIRichTextType::SetBackground(QPixmap *background)
     updateBackground();
 }
 
-void UIRichTextType::updateBackground(void)
+void UIRichTextType::loadBackgroundImg(bool &changed)
 {
     QString file = "";
+    changed = false;
 
     file = isFocused() ? m_bgImageSel : m_bgImageReg;
 
     // paint our background image over the window background
     if (file != "")
     {
-        if (gContext->FindThemeFile(file))
+        if (file != m_backgroundFile)
         {
-            QImage *sourceImg = new QImage();
-            if (sourceImg->load(file))
-            {
-                QImage scalerImg;
-                scalerImg = sourceImg->smoothScale(
-                        (int)(m_displayArea.width()),
-                        (int)(m_displayArea.height()));
-                QPainter p(m_compBackground);
-                p.drawPixmap(QPoint(0, 0), *m_background);
-                p.drawImage(QPoint(0, 0), scalerImg);
-            }
-            delete sourceImg;
+            if (m_backgroundImage) 
+                delete m_backgroundImage;
+
+            m_backgroundImage = gContext->LoadScaleImage(file, true);
+            m_backgroundFile = file;
+            changed = true;
         }
     }
+}
+
+void UIRichTextType::updateBackground(void)
+{
+    // paint our background image over the window background
+    QPainter p(m_compBackground);
+    if (m_background) p.drawPixmap(QPoint(0, 0), *m_background);
+    if (m_backgroundImage)
+        p.drawImage(QPoint(0, 0), *m_backgroundImage);
     refreshImage();
 }
 
@@ -2248,7 +2259,9 @@ void UIRichTextType::ScrollPageDown()
 bool UIRichTextType::takeFocus()
 {
     bool res = UIType::takeFocus();
-    updateBackground();
+    bool needreload = false;
+    loadBackgroundImg(needreload);
+    if (needreload) updateBackground();
 
     return res;
 }
@@ -2256,8 +2269,9 @@ bool UIRichTextType::takeFocus()
 void UIRichTextType::looseFocus()
 {
     UIType::looseFocus();
-
-    updateBackground();
+    bool needreload = false;
+    loadBackgroundImg(needreload);
+    if (needreload) updateBackground();
 }
 
 // ******************************************************************

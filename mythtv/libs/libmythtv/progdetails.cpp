@@ -34,7 +34,6 @@ void ProgDetails::setDetails(const QString &details)
     if (m_richText)
     {
         m_richText->SetText(m_details);
-        m_richText->SetBackground(&my_background);
     }
 }
 

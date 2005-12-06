@@ -666,6 +666,7 @@ class UIRichTextType : public UIType
     protected:
         void refreshImage();
         void updateBackground();
+        void loadBackgroundImg(bool &changed);
 
         QRect m_displayArea;
         QRect m_textArea;
@@ -683,6 +684,9 @@ class UIRichTextType : public UIType
         QPixmap *m_compBackground;// composite of the window background + the
                                   // widget background image 
         QPixmap *m_image;         // the completed image including the rich text
+
+        QString m_backgroundFile;   //< current source of background image
+        QImage  *m_backgroundImage; //< current widget background image)
 
         bool     m_showScrollArrows;
         bool     m_showUpArrow;
