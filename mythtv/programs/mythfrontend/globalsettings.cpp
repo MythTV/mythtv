@@ -3109,19 +3109,8 @@ GeneralSettings::GeneralSettings()
     general->addChild(SmartChannelChange());
     general->addChild(LastFreeCard());
     general->addChild(AutoExpireMethod());
-
-    HorizontalConfigurationGroup* general_h1 =
-              new HorizontalConfigurationGroup(false, false);
-    VerticalConfigurationGroup* general_h1_v1 =
-              new VerticalConfigurationGroup(false, false);
-    general_h1_v1->addChild(AutoExpireDefault());
-    general_h1->addChild(general_h1_v1);
-
-    VerticalConfigurationGroup* general_h1_v2 =
-              new VerticalConfigurationGroup(false, false);
-    general_h1_v2->addChild(AutoExpireLiveTVMaxAge());
-    general_h1->addChild(general_h1_v2);
-    general->addChild(general_h1);
+    general->addChild(AutoExpireDefault());
+    general->addChild(AutoExpireLiveTVMaxAge());
     addChild(general);
 
     VerticalConfigurationGroup* jobs = new VerticalConfigurationGroup(false);
