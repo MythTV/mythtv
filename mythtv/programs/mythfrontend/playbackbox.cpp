@@ -3202,6 +3202,9 @@ void PlaybackBox::togglePlayListItem(void)
 
     if (!inTitle)
         cursorDown();
+
+    skipUpdate = false;
+    update(listRect);
 }
 
 void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
@@ -3235,6 +3238,9 @@ void PlaybackBox::togglePlayListItem(ProgramInfo *pginfo)
     {
         playList << key;
     }
+
+    skipUpdate = false;
+    update(listRect);
 }
 
 void PlaybackBox::timeout(void)
