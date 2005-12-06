@@ -75,7 +75,7 @@ bool AudioOutputALSA::OpenDevice()
     }
     else
     {
-        fragment_size = 4096;
+        fragment_size = 6144; // nicely divisible by 2,4,6,8 channels @ 16-bits
         buffer_time = 500000;  // .5 seconds
         period_time = buffer_time / 4;  // 4 interrupts per buffer
     }
