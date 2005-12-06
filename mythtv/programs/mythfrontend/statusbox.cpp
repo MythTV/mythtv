@@ -80,8 +80,23 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     my_parent = parent;
     clicked();
 
+
     recordingProfilesBPS["HDTV"]    = 19400000;
-    recordingProfilesBPS["average"] =  5500000;
+
+    MSqlQuery query(MSqlQuery::InitCon());
+    QString querystr = QString("SELECT SUM(filesize), SUM(UNIX_TIMESTAMP(endtime) - UNIX_TIMESTAMP(starttime)) FROM recorded");
+    query.prepare(querystr);
+    query.exec();
+    int bitrate = 5500000;
+    if (query.isActive() && query.size())
+    {
+        query.next();
+        double szsum = query.value(0).toDouble();
+        double tmsum = query.value(1).toDouble();
+        if (tmsum > 1.0)
+            bitrate = (int)((szsum * 8) / tmsum);
+    }
+    recordingProfilesBPS["1 average"] =  bitrate;
 }
 
 StatusBox::~StatusBox(void)
@@ -967,18 +982,18 @@ static void disk_usage_with_rec_time_kb(QStringList& out, long long total,
     recprof2bps_t::const_iterator it = prof2bps.begin();
     for (; it != prof2bps.end(); ++it)
     {
-        const QString pro = (it.key()=="average") ? avg : tail.arg(it.key());
+        const QString pro = (it.key()=="1 average") ? avg : tail.arg(it.key());
         long long bytesPerMin = (it.data() >> 1) * 15;
         uint minLeft = ((free<<5)/bytesPerMin)<<5;
         minLeft = (minLeft/15)*15;
         uint hoursLeft = minLeft/60;
         if (hoursLeft > 3)
-            out<<QObject::tr("%1 hours left %2").arg(hoursLeft).arg(pro);
+            out<<QObject::tr("%1 hours left%2").arg(hoursLeft).arg(pro);
         else if (minLeft > 90)
-            out<<QObject::tr("%1 hours and %2 minutes left %3")
+            out<<QObject::tr("%1 hours and %2 minutes left%3")
                 .arg(hoursLeft).arg(minLeft%60).arg(pro);
         else
-            out<<QObject::tr("%1 minutes left %2").arg(minLeft).arg(pro);
+            out<<QObject::tr("%1 minutes left%2").arg(minLeft).arg(pro);
     }
 }
 
