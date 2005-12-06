@@ -388,6 +388,9 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
 void AvFormatDecoder::Reset()
 {
     DecoderBase::Reset();
+#if 0
+// This is causing problems, and may not be needed anymore since
+// we do not reuse the same file for different streams anymore. -- dtk
 
     // mpeg ts reset
     if (QString("mpegts") == ic->iformat->name)
@@ -424,6 +427,7 @@ void AvFormatDecoder::Reset()
 
         fmt->flags &= ~AVFMT_NOFILE;
     }
+#endif
 }
 
 bool AvFormatDecoder::CanHandle(char testbuf[2048], const QString &filename)
