@@ -14,9 +14,39 @@ class DescriptorID
     enum
     {
         // MPEG
+        video                       = 0x02,
+        audio                       = 0x03,
+        hierarchy                   = 0x04,
         registration                = 0x05,
+        data_stream_alignment       = 0x06,
+        target_background_grid      = 0x07,
+        video_window                = 0x08,
         conditional_access          = 0x09,
         ISO_639_language            = 0x0A,
+        system_clock                = 0x0B,
+        multiplex_buffer_utilization= 0x0C,
+        copyright                   = 0x0D,
+        maximum_bitrate             = 0x0E,
+        private_data_indicator      = 0x0F,
+        smoothing_buffer            = 0x10,
+        STD                         = 0x11,
+        IBP                         = 0x12,
+        mpeg4_video                 = 0x1B,
+        mpeg4_audio                 = 0x1C,
+        IOD                         = 0x1D,
+        SL                          = 0x1E,
+        FMC                         = 0x1F,
+        external_es_id              = 0x20,
+        mux_code                    = 0x21,
+        fmx_buffer_size             = 0x22,
+        multiplex_buffer            = 0x23,
+        content_labeling            = 0x24,
+        metadata_pointer            = 0x25,
+        metadata                    = 0x26,
+        metadata_std                = 0x27,
+        avc_video                   = 0x28,
+        ipmp                        = 0x29,
+        avc_timing__hrd             = 0x30,
 
         // DVB
         network_name                = 0x40,
@@ -169,6 +199,67 @@ class ISO639LanguageDescriptor : public MPEGDescriptor
     QString CanonicalLanguageString(void) const
         { return iso639_key_to_str3(CanonicalLanguageKey()); }
     QString toString() const;
+};
+
+/// ISO 13818-1:2000/Amd.3:2004 page 11
+class AVCVideoDescriptor : public MPEGDescriptor
+{
+  public:
+    AVCVideoDescriptor(const unsigned char* data) : MPEGDescriptor(data)
+    {
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x
+        assert(DescriptorID::avc_video == DescriptorTag());
+    // descriptor_length        8   1.0
+    }
+    // profile_idc              8   2.0
+    uint ProfileIDC(void)         const { return _data[2]; }
+    // constraint_set0_flag     1   3.0
+    bool ConstaintSet0(void)      const { return _data[3]&0x80; }
+    // constraint_set1_flag     1   3.1
+    bool ConstaintSet1(void)      const { return _data[3]&0x40; }
+    // constraint_set2_flag     1   3.2
+    bool ConstaintSet2(void)      const { return _data[3]&0x20; }
+    // AVC_compatible_flags     5   3.3
+    uint AVCCompatible(void)      const { return _data[3]&0x1f; }
+    // level_idc                8   4.0
+    uint LevelIDC(void)           const { return _data[4]; }
+    // AVC_still_present        1   5.0
+    bool AVCStill(void)           const { return _data[5]&0x80; }
+    // AVC_24_hour_picture_flag 1   5.1
+    bool AVC24HourPicture(void)   const { return _data[5]&0x40; }
+    // reserved 6 bslbf
+    QString toString() const;
+};
+
+/// ISO 13818-1:2000/Amd.3:2004 page 12
+class AVCTimingAndHRDDescriptor : public MPEGDescriptor
+{
+    AVCTimingAndHRDDescriptor(const unsigned char* data) : MPEGDescriptor(data)
+    {
+    //       Name             bits  loc  expected value
+    // descriptor_tag           8   0.0       0x
+        assert(DescriptorID::avc_timing__hrd == DescriptorTag());
+    // descriptor_length        8   1.0
+    }
+    // hrd_management_valid     1   2.0
+    bool HRDManagementValid(void)      const { return _data[2]&0x80; }
+    // reserved                 6   2.1
+    // picture_and_timing_info_present 1 2.7
+    bool HasPictureAndTimingInfo(void) const { return _data[2]&0x01;}
+    // if (picture_and_timing_info_present) {
+    //   90kHz_flag             1   3.0
+    //   reserved               7   3.1
+    //   if (90kHz_flag == '0') {
+    //     N                   32   4.0 uimsbf
+    //     K                   32   8.0 uimsbf
+    //   }
+    //   num_units_in_tick     32 (90khz)?4.0:12.0 uimsbf
+    // }
+    // fixed_frame_rate_flag    1 (pict_info)?((90khz)?8.0:16.0):3.0
+    // temporal_poc_flag        1 (pict_info)?((90khz)?8.1:16.1):3.1
+    // picture_to_display_conversion_flag 1 (pict_info)?((90khz)?8.2:16.2):3.2
+    // reserved 5 bslbf
 };
 
 #endif // _MPEG_DESCRIPTORS_H_

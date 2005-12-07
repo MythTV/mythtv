@@ -35,12 +35,66 @@ QString MPEGDescriptor::DescriptorTagString() const
     switch(DescriptorTag())
     {
         // MPEG
+        case DescriptorID::video:
+            return QString("Video");
+        case DescriptorID::audio:
+            return QString("Audio");
+        case DescriptorID::hierarchy:
+            return QString("Hierarchy");
         case DescriptorID::registration:
             return QString("Registration");
         case DescriptorID::conditional_access:
             return QString("Conditional Access");
         case DescriptorID::ISO_639_language:
             return QString("ISO-639 Language");
+        case DescriptorID::system_clock:
+            return QString("System Clock");
+        case DescriptorID::multiplex_buffer_utilization:
+            return QString("Multiplex Buffer Utilization");
+        case DescriptorID::copyright:
+            return QString("Copyright");
+        case DescriptorID::maximum_bitrate:
+            return QString("Maximum Bitrate");
+        case DescriptorID::private_data_indicator:
+            return QString("Private Data Indicator");
+        case DescriptorID::smoothing_buffer:
+            return QString("Smoothing Buffer");
+        case DescriptorID::STD:
+            return QString("STD");
+        case DescriptorID::IBP:
+            return QString("IBP");
+        case DescriptorID::mpeg4_video:
+            return QString("MPEG-4 Video");
+        case DescriptorID::mpeg4_audio:
+            return QString("MPEG-4 Audio");
+        case DescriptorID::IOD:
+            return QString("IOD");
+        case DescriptorID::SL:
+            return QString("SL");
+        case DescriptorID::FMC:
+            return QString("FMC");
+        case DescriptorID::external_es_id:
+            return QString("External ES ID");
+        case DescriptorID::mux_code:
+            return QString("Multimpex Code");
+        case DescriptorID::fmx_buffer_size:
+            return QString("FMX buffer Size");
+        case DescriptorID::multiplex_buffer:
+            return QString("Multiplex Buffer");
+        case DescriptorID::content_labeling:
+            return QString("Content Labeling");
+        case DescriptorID::metadata_pointer:
+            return QString("Metadata Pointer");
+        case DescriptorID::metadata:
+            return QString("Metadata");
+        case DescriptorID::metadata_std:
+            return QString("Metadata Std");
+        case DescriptorID::avc_video:
+            return QString("AVC Video");
+        case DescriptorID::ipmp:
+            return QString("IPMP Digital Restrictions Management");
+        case DescriptorID::avc_timing__hrd:
+            return QString("AVC Timing & HRD");
 
         // DVB
         case DescriptorID::network_name:
@@ -200,6 +254,8 @@ QString MPEGDescriptor::toString() const
         str = RegistrationDescriptor(_data).toString();
     else if (DescriptorID::ISO_639_language == DescriptorTag())
         str = ISO639LanguageDescriptor(_data).toString();
+    else if (DescriptorID::avc_video == DescriptorTag())
+        str = AVCVideoDescriptor(_data).toString();
     else if (DescriptorID::audio_stream == DescriptorTag())
         str = AudioStreamDescriptor(_data).toString();
     else if (DescriptorID::caption_service == DescriptorTag())
@@ -266,4 +322,13 @@ QString ISO639LanguageDescriptor::toString() const
     return QString("ISO-639 Language: code(%1) canonical(%2) eng(%3)")
         .arg(LanguageString()).arg(CanonicalLanguageString())
         .arg(iso639_key_toName(CanonicalLanguageKey()));
+}
+
+QString AVCVideoDescriptor::toString() const
+{
+    return QString("AVC Video: IDC prof(%1) IDC level(%2) sets(%3%4%5) "
+                   "compat(%6) still(%7) 24hr(%8)")
+        .arg(ProfileIDC()).arg(LevelIDC())
+        .arg(ConstaintSet0()).arg(ConstaintSet1()).arg(ConstaintSet2())
+        .arg(AVCCompatible()).arg(AVCStill()).arg(AVC24HourPicture());
 }
