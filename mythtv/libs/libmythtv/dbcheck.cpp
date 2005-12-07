@@ -2088,8 +2088,7 @@ bool InitializeDatabase(void)
 "  `hp_code_rate` varchar(10) default 'auto',"
 "  `sistandard` varchar(10) default 'dvb',"
 "  `serviceversion` smallint(6) default '33',"
-"  `updatetimestamp` timestamp NOT NULL default CURRENT_TIMESTAMP"
-"                              on update CURRENT_TIMESTAMP,"
+"  `updatetimestamp` timestamp(14) NOT NULL,"
 "  PRIMARY KEY  (`mplexid`)"
 ");",
 "CREATE TABLE IF NOT EXISTS `dtv_privatetypes` ("
