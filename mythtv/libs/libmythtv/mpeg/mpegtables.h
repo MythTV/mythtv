@@ -145,6 +145,7 @@ class StreamID
                 (StreamID::DSMCC_C == type) ||
                 (StreamID::DSMCC_D == type));
     }
+    static uint Normalize(uint stream_id, const desc_list_t &desc);
     static const char* toString(uint streamID);
 };
 

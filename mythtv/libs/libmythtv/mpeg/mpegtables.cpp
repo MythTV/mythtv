@@ -33,6 +33,32 @@ const unsigned char DEFAULT_PMT_HEADER[9] =
     0x00, // Last Section
 };
 
+uint StreamID::Normalize(uint stream_id, const desc_list_t &desc)
+{
+    if (OpenCableVideo == stream_id)
+        return MPEG2Video;
+
+    if (MPEGDescriptor::Find(desc, DescriptorID::AC3))
+        return AC3Audio;
+
+    const unsigned char* d = NULL;
+    QString reg("");
+    if ((d = MPEGDescriptor::Find(desc, DescriptorID::registration)))
+        reg = RegistrationDescriptor(d).FormatIdentifierString();
+
+    if (reg == "DTS1")
+        return DTSAudio;
+
+#if 0
+    // not needed while there is no specific stream id for these
+    if (MPEGDescriptor::Find(desc, DescriptorID::teletext) ||
+        MPEGDescriptor::Find(desc, DescriptorID::subtitling))
+        return stream_id;
+#endif
+
+    return stream_id;
+}
+
 ProgramAssociationTable* ProgramAssociationTable::Create(
     uint tsid, uint version,
     const vector<uint>& pnum, const vector<uint>& pid)

@@ -448,9 +448,6 @@ void DVBRecorder::AutoPID(void)
             QString("AutoPID for MPEG Program Number(%1), PCR PID(0x%2)")
             .arg(_input_pmt.ServiceID).arg(((uint)_input_pmt.PCRPID),0,16));
 
-    // Wanted languages:
-    //QStringList Languages = iso639_get_language_list();
-
     // Wanted stream types:
     QValueList<ES_Type> StreamTypes;
     StreamTypes += ES_TYPE_VIDEO_MPEG1;
@@ -469,42 +466,54 @@ void DVBRecorder::AutoPID(void)
 
     QMap<ES_Type, bool> flagged;
     QValueList<ElementaryPIDObject>::Iterator es;
-    for (es = _input_pmt.Components.begin();
-         es != _input_pmt.Components.end(); ++es)
+
+    if (!_hw_decoder_option)
     {
-        if (!StreamTypes.contains((*es).Type))
+        for (es = _input_pmt.Components.begin();
+             es != _input_pmt.Components.end(); ++es)
         {
-            // Type not wanted
-            continue;
+            (*es).Record = true;
+            flagged[(*es).Type] = true;
         }
+    }
+    else
+    {
+        // Wanted languages:
+        QStringList Languages = iso639_get_language_list();
 
-        if (((*es).Type == ES_TYPE_AUDIO_MPEG1) ||
-            ((*es).Type == ES_TYPE_AUDIO_MPEG2) ||
-            ((*es).Type == ES_TYPE_AUDIO_AC3))
+        for (es = _input_pmt.Components.begin();
+             es != _input_pmt.Components.end(); ++es)
         {
-            bool ignore = false;
-
-            // Check for audio descriptors
-            DescriptorList::Iterator dit;
-            for (dit = (*es).Descriptors.begin();
-                 dit != (*es).Descriptors.end(); ++dit)
+            if (!StreamTypes.contains((*es).Type))
             {
-                // Check for "Hearing impaired" or 
-                // "Visual impaired commentary" stream
-                if (((*dit).Data[0] == 0x0A) &&
-                    ((*dit).Data[5] & 0xFE == 0x02))
-                {
-                    ignore = true;
-                    break;
-                }
+                // Type not wanted
+                continue;
             }
 
-            if (ignore)
-                continue; // Ignore this stream
-        }
+            if (((*es).Type == ES_TYPE_AUDIO_MPEG1) ||
+                ((*es).Type == ES_TYPE_AUDIO_MPEG2) ||
+                ((*es).Type == ES_TYPE_AUDIO_AC3))
+            {
+                bool ignore = false;
+                // Check for audio descriptors
+                DescriptorList::Iterator dit;
+                for (dit = (*es).Descriptors.begin();
+                     dit != (*es).Descriptors.end(); ++dit)
+                {
+                    // Check for "Hearing impaired" or 
+                    // "Visual impaired commentary" stream
+                    if (((*dit).Data[0] == 0x0A) &&
+                        ((*dit).Data[5] & 0xFE == 0x02))
+                    {
+                        ignore = true;
+                        break;
+                    }
+                }
 
-        if (_hw_decoder_option)
-        {
+                if (ignore)
+                    continue; // Ignore this stream
+            }
+
             // Limit hardware decoders to one A/V stream
             switch ((*es).Type)
             {
@@ -517,10 +526,16 @@ void DVBRecorder::AutoPID(void)
                     }
                     break;
 
-                case ES_TYPE_AUDIO_MPEG1:
+                case ES_TYPE_AUDIO_MPEG1: 
                 case ES_TYPE_AUDIO_MPEG2:
+                case ES_TYPE_AUDIO_AC3:
+                case ES_TYPE_AUDIO_DTS:
+                case ES_TYPE_AUDIO_AAC:
                     if (flagged.contains(ES_TYPE_AUDIO_MPEG1) ||
-                        flagged.contains(ES_TYPE_AUDIO_MPEG2))
+                        flagged.contains(ES_TYPE_AUDIO_MPEG2) ||
+                        flagged.contains(ES_TYPE_AUDIO_AC3)   ||
+                        flagged.contains(ES_TYPE_AUDIO_DTS)   ||
+                        flagged.contains(ES_TYPE_AUDIO_AAC))
                     {
                         continue; // Ignore this stream
                     }
@@ -529,26 +544,19 @@ void DVBRecorder::AutoPID(void)
                 default:
                     break;
             }
-        }
-
-        //if (Languages.isEmpty() // No specific language wanted
-        //    || (*es).Language.isEmpty() // Component has no language
-        //    || Languages.contains((*es).Language)) // This language is wanted!
-        {
-            (*es).Record = true;
-            flagged[(*es).Type] = true;
+            if (Languages.isEmpty() || // No specific language wanted
+                (*es).Language.isEmpty() || // Component has no language
+                Languages.contains((*es).Language)) // This language is wanted!
+            {
+                (*es).Record = true;
+                flagged[(*es).Type] = true;
+            }
         }
     }
 
     for (es = _input_pmt.Components.begin();
          es != _input_pmt.Components.end(); ++es)
     {
-        if (StreamTypes.contains((*es).Type) && !flagged.contains((*es).Type))
-        {
-            // We want this stream type but no component was flagged
-            (*es).Record = true;
-        }
-
         if ((*es).Record)
         {
             VERBOSE(VB_RECORD, LOC +
@@ -1032,10 +1040,11 @@ void DVBRecorder::CreatePMT(void)
     {
         if ((*it).Record)
         {
-            pids.push_back((*it).PID);
-            types.push_back((*it).Orig_Type);
             pdesc.resize(pdesc.size()+1);
             DescList_to_desc_list((*it).Descriptors, pdesc.back());
+            pids.push_back((*it).PID);
+            uint type = StreamID::Normalize((*it).Orig_Type, pdesc.back());
+            types.push_back(type);
         }
     }
 
