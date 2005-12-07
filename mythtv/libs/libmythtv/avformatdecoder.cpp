@@ -2458,6 +2458,15 @@ bool AvFormatDecoder::SetupAudioStream(void)
         audioOut.sample_rate = 48000;
         audioOut.sample_size = 4;
     }
+    else
+    {
+        if (audioOut.channels > MAX_OUTPUT_CHANNELS)
+        {
+            audioOut.channels = MAX_OUTPUT_CHANNELS;
+            audioOut.sample_size = audioOut.channels * 2;
+            codec_ctx->channels = MAX_OUTPUT_CHANNELS;
+        }
+    }
 
     VERBOSE(VB_AUDIO, LOC + "Audio format changed " +
             QString("\n\t\t\tfrom %1 ; %2\n\t\t\tto   %3 ; %4")
