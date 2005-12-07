@@ -10,7 +10,7 @@ using namespace std;
 #include "util.h"
 #include "mythcontext.h"
 
-RemoteFile::RemoteFile(const QString &url, int lrecordernum)
+RemoteFile::RemoteFile(const QString &url)
 {
     path = url;
     readposition = 0;

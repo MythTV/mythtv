@@ -10,7 +10,7 @@ class QSocketDevice;
 class RemoteFile
 {
   public:
-    RemoteFile(const QString &url, int recordernum = -1);
+    RemoteFile(const QString &url);
    ~RemoteFile();
 
     QSocketDevice *getSocket();

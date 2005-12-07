@@ -47,7 +47,7 @@ const QString kPluginLibSuffix = ".so";
 MythContext *gContext = NULL;
 QMutex MythContext::verbose_mutex(true);
 
-int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
+unsigned int print_verbose_messages = VB_IMPORTANT | VB_GENERAL;
 QString verboseString = QString(" important general");
 
 int parse_verbose_arg(QString arg)
@@ -1036,7 +1036,7 @@ QString MythContext::GetMasterHostPrefix(void)
     return ret;
 }
 
-void MythContext::ClearSettingsCache(QString myKey)
+void MythContext::ClearSettingsCache(QString myKey, QString newVal)
 {
     cacheLock.lock();
     if (myKey != "" && settingsCache.contains(myKey))
@@ -1044,6 +1044,7 @@ void MythContext::ClearSettingsCache(QString myKey)
         VERBOSE(VB_GENERAL, QString("Clearing Settings Cache for '%1'.")
                                     .arg(myKey));
         settingsCache.remove(myKey);
+        settingsCache[myKey] = newVal;
     }
     else
     {
@@ -1702,9 +1703,7 @@ Settings *MythContext::qtconfig(void)
 
 void MythContext::SaveSetting(const QString &key, int newValue)
 {
-    QString strValue = QString("%1").arg(newValue);
-
-    SaveSetting(key, strValue);
+    SaveSettingOnHost(key, QString::number(newValue), d->m_localhostname);
 }
 
 void MythContext::SaveSetting(const QString &key, const QString &newValue)
@@ -1742,8 +1741,8 @@ void MythContext::SaveSettingOnHost(const QString &key, const QString &newValue,
                                 .arg(key));
     }
 
-    ClearSettingsCache(key);
-    ClearSettingsCache(host + " " + key);
+    ClearSettingsCache(key, newValue);
+    ClearSettingsCache(host + " " + key, newValue);
 }
 
 QString MythContext::GetSetting(const QString &key, const QString &defaultval)
@@ -2273,7 +2272,7 @@ QImage *MythContext::CacheRemotePixmap(const QString &url, bool reCache)
 void MythContext::SetSetting(const QString &key, const QString &newValue)
 {
     d->m_settings->SetSetting(key, newValue);
-    ClearSettingsCache(key);
+    ClearSettingsCache(key, newValue);
 }
 
 bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)

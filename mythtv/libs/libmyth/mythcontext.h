@@ -82,7 +82,7 @@ enum VerboseMask {
 
 /// This global variable is set at startup with the flags 
 /// of the verbose messages we want to see.
-extern int print_verbose_messages;
+extern unsigned int print_verbose_messages;
 extern QString verboseString;
 
 int parse_verbose_arg(QString arg);
@@ -228,7 +228,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20051204-1"
+#define MYTH_BINARY_VERSION "0.19.20051207-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -260,7 +260,7 @@ class MythContext : public QObject
 
     QString GetHostName(void);
 
-    void ClearSettingsCache(QString myKey = "");
+    void ClearSettingsCache(QString myKey = "", QString newVal = "");
     void ActivateSettingsCache(bool activate = true);
 
     bool ConnectToMasterServer(bool blockingClient = true);
