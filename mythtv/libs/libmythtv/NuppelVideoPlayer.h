@@ -75,7 +75,7 @@ class NuppelVideoPlayer
     // Sets
     void SetParentWidget(QWidget *widget)     { parentWidget = widget; }
     void SetAsPIP(void)                       { SetNoAudio(); SetNullVideo(); }
-    void SetNoAudio(void)                     { disableaudio = true; }
+    void SetNoAudio(void)                     { no_audio_out = true; }
     void SetNullVideo(void)                   { using_null_videoout = true; }
     void SetAudioDevice(QString device)       { audiodevice = device; }
     void SetFileName(QString lfilename)       { filename = lfilename; }
@@ -380,7 +380,8 @@ class NuppelVideoPlayer
     bool     editmode;
     bool     resetvideo;
     bool     using_null_videoout;
-    bool     disableaudio;
+    bool     no_audio_in;
+    bool     no_audio_out;
     bool     transcoding;
     bool     hasFullPositionMap;
     mutable bool     limitKeyRepeat;

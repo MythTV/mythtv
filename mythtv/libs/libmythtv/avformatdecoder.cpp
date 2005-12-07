@@ -29,6 +29,9 @@ extern "C" {
 
 #define MAX_AC3_FRAME_SIZE 6144
 
+/** Set to zero to allow any number of AC3 channels. */
+#define MAX_OUTPUT_CHANNELS 2
+
 extern pthread_mutex_t avcodeclock;
 
 int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
@@ -164,10 +167,13 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
       ccd(new CCDecoder(this)),
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
-      audio_sample_size(-1), audio_sampling_rate(-1), audio_channels(-1),
-      do_ac3_passthru(false), wantedAudioStream(-1),
-      audio_check_1st(2), audio_sampling_rate_2nd(0), audio_channels_2nd(0),
-      wantedSubtitleStream(-1)
+      allow_ac3_passthru(false),
+      // Audio selection
+      wantedAudioStream(),    selectedAudioStream(),
+      // Subtitle selection
+      wantedSubtitleStream(), selectedSubtitleStream(),
+      // language preference
+      languagePreference(iso639_get_language_key_list())
 {
     bzero(&params, sizeof(AVFormatParameters));
     bzero(prvpkt, 3 * sizeof(char));
@@ -177,6 +183,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
     av_log_set_level((debug) ? AV_LOG_DEBUG : AV_LOG_ERROR);
 
     save_cctc[0] = save_cctc[1] = 0;
+    allow_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
+
+    audioIn.sample_size = -32; // force SetupAudioStream to run once
 }
 
 AvFormatDecoder::~AvFormatDecoder()
@@ -831,13 +840,9 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
     audioStreams.clear();
     subtitleStreams.clear();
-    do_ac3_passthru = false;
-    audio_sample_size = -1;
-    audio_sampling_rate = -1;
-    audio_channels = -1;
-    audio_check_1st = 2;
-    audio_sampling_rate_2nd = -1;
-    audio_channels_2nd = -1;
+
+    map<int,uint> lang_sub_cnt;
+    map<int,uint> lang_aud_cnt;
 
     for (int i = 0; i < ic->nb_streams; i++)
     {
@@ -923,8 +928,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             <<") already open, leaving it alone.");
                 }
                 assert(enc->codec_id);
-                if (enc->channels > 2)
-                    enc->channels = 2;
                 bitrate += enc->bit_rate;
                 break;
             }
@@ -993,16 +996,41 @@ int AvFormatDecoder::ScanStreams(bool novideo)
 
         if (enc->codec_type == CODEC_TYPE_SUBTITLE)
         {
-            subtitleStreams.push_back( i );
+            int lang = -1, lang_indx = 0;
+            if (ic->streams[i]->language)
+            {
+                lang = iso639_str3_to_key(ic->streams[i]->language);
+                lang = iso639_key_to_canonical_key(lang);
+                lang_indx = lang_sub_cnt[lang];
+                lang_sub_cnt[lang]++;
+            }
+            subtitleStreams.push_back(StreamInfo(i, lang, lang_indx));
+
+            VERBOSE(VB_PLAYBACK, LOC + QString(
+                        "Subtitle track #%1 is A/V stream #%2 "
+                        "and is in the %3 language(%4).")
+                    .arg(subtitleStreams.size()).arg(i)
+                    .arg(iso639_key_toName(lang)).arg(lang));
         }
 
         if (enc->codec_type == CODEC_TYPE_AUDIO)
         {
-            audioStreams.push_back( i );
+            int lang = -1, lang_indx = 0;
+            if (ic->streams[i]->language)
+            {
+                lang = iso639_str3_to_key(ic->streams[i]->language);
+                lang = iso639_key_to_canonical_key(lang);
+                lang_indx = lang_aud_cnt[lang];
+                lang_aud_cnt[lang]++;
+            }
+            audioStreams.push_back(StreamInfo(i, lang, lang_indx));
+
             VERBOSE(VB_AUDIO, LOC + QString(
-                        "Stream #%1 (audio track #%2) is an "
-                        "audio stream with %3 channels.")
-                    .arg(i).arg(audioStreams.size() - 1).arg(enc->channels));
+                        "Audio Track #%1 is A/V stream #%2 "
+                        "and has %3 channels in the %4 language(%5).")
+                    .arg(audioStreams.size()).arg(i)
+                    .arg(enc->channels)
+                    .arg(iso639_key_toName(lang)).arg(lang));
         }
     }
 
@@ -1063,76 +1091,6 @@ bool AvFormatDecoder::CheckVideoParams(int width, int height)
     }
 
     return true;
-}
-
-void AvFormatDecoder::CheckAudioParams(int freq, int channels, bool safe)
-{
-    if (freq <= 0 || channels <= 0)
-        return;
-
-    if (safe || audio_check_1st == 2)
-    {
-        if (freq == audio_sampling_rate && channels == audio_channels)
-            return;
-        audio_check_1st = 1;
-        audio_sampling_rate_2nd = freq;
-        audio_channels_2nd = channels;
-        if (safe == false)
-            return;
-    }
-    else
-    {
-        if (freq != audio_sampling_rate_2nd || channels != audio_channels_2nd ||
-            (freq == audio_sampling_rate && channels == audio_channels))
-        {
-            audio_sampling_rate_2nd = -1;
-            audio_channels_2nd = -1;
-            audio_check_1st = 2;
-            return;
-        }
-
-        if (audio_check_1st == 1)
-        {
-            audio_check_1st = 0;
-            return;
-        }
-    }
-
-    audio_check_1st = 2;
-
-    if (audio_channels != -1)
-        VERBOSE(VB_AUDIO, LOC + "Audio format changed " +
-                QString("\n\t\t\tfrom %1 channels at %2 Hertz")
-                .arg(audio_channels).arg(audio_sampling_rate) +
-                QString("\n\t\t\tto %1 channels at %2 Hertz")
-                .arg(channels).arg(freq));
-
-    AVCodecContext *enc = ic->streams[wantedAudioStream]->codec;
-    AVCodec *codec = enc->codec;
-    if (codec)
-        avcodec_close(enc);
-    codec = avcodec_find_decoder(enc->codec_id);
-    avcodec_open(enc, codec);
-
-    if (do_ac3_passthru)
-    {
-        // An AC3 stream looks like a 48KHz 2ch audio stream to
-        // the sound card
-        audio_sample_size = 4;
-        audio_sampling_rate = 48000;
-        audio_channels = 2;
-    }
-    else
-    {
-        audio_sample_size = channels * 2;
-        audio_sampling_rate = freq;
-        audio_channels = channels;
-    }
-
-    // TODO should this 16 bits per sample be hard coded?!?!?!
-    GetNVP()->SetAudioParams(16, audio_channels, audio_sampling_rate);
-    GetNVP()->ReinitAudio();
-    return;
 }
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -1667,333 +1625,375 @@ float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
     return retval;
 }
 
-void AvFormatDecoder::incCurrentAudioTrack()
+void AvFormatDecoder::incCurrentAudioTrack(void)
 {
-    if (audioStreams.size())
-    {
-        int tempTrackNo = currentAudioTrack;
-        ++tempTrackNo;
-        if (tempTrackNo > (int)(audioStreams.size() - 1))
-            tempTrackNo = 0;
-
-        currentAudioTrack = tempTrackNo;
-        wantedAudioStream = audioStreams[currentAudioTrack];
-
-        AVCodecContext *e = ic->streams[wantedAudioStream]->codec;
-        SetupAudioStream();
-        CheckAudioParams(e->sample_rate, e->channels, true);
-    }
+    int numStreams = (int)audioStreams.size();
+    int next       = (currentAudioTrack+1) % numStreams;
+    setCurrentAudioTrack((!numStreams) ? -1 : next);
 }
 
-void AvFormatDecoder::decCurrentAudioTrack()
+void AvFormatDecoder::decCurrentAudioTrack(void)
 {
-    if (audioStreams.size())
-    {
-        int tempTrackNo = currentAudioTrack;
-        --tempTrackNo;
-        if (tempTrackNo < 0)
-            tempTrackNo = audioStreams.size() - 1;
-
-        currentAudioTrack = tempTrackNo;
-        wantedAudioStream = audioStreams[currentAudioTrack];
-
-        AVCodecContext *e = ic->streams[wantedAudioStream]->codec;
-        SetupAudioStream();
-        CheckAudioParams(e->sample_rate, e->channels, true);
-    }
+    int numStreams = (int)audioStreams.size();
+    int next       = (currentAudioTrack < 0) ? 0 : currentAudioTrack;
+    next           = (next+numStreams-1) % numStreams;
+    setCurrentAudioTrack((!numStreams) ? -1 : next);
 }
 
 bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
 {
-    if (trackNo < 0)
-        trackNo = -1;
-    else if (trackNo >= (int)audioStreams.size())
+    if (trackNo >= (int)audioStreams.size())
         return false;
 
-    currentAudioTrack = trackNo;
-    if (currentAudioTrack < 0)
-        return false;
+    pthread_mutex_lock(&avcodeclock);
 
-    wantedAudioStream = audioStreams[currentAudioTrack];
+    currentAudioTrack = max(-1, trackNo);
+    if (currentAudioTrack >= 0)
+    {
+        wantedAudioStream   = audioStreams[currentAudioTrack];
+        selectedAudioStream = audioStreams[currentAudioTrack];
+    }
+    else
+        selectedAudioStream.av_stream_index = -1;
 
-    AVCodecContext *e = ic->streams[wantedAudioStream]->codec;
-    SetupAudioStream();
-    CheckAudioParams(e->sample_rate, e->channels, true);
-    return true;
+    QString msg = SetupAudioStream() ? "" : "not ";
+    VERBOSE(VB_AUDIO, LOC + "Audio stream type "+msg+"changed.");
+
+    pthread_mutex_unlock(&avcodeclock);
+
+    return (currentAudioTrack >= 0);
 }
 
-QStringList AvFormatDecoder::listAudioTracks() const
+QStringList AvFormatDecoder::listAudioTracks(void) const
 {
     QStringList list;
-    int num_tracks = audioStreams.size();
-    int track;
-    
-    for (track = 0; track < num_tracks; track++)
+
+    for (uint i = 0; i < audioStreams.size(); i++)
     {
-        AVStream *s = ic->streams[audioStreams[track]];
-        
-        if (!s)
-            continue;
-        
-        QString t = QString("%1: ").arg(track + 1);
-        
-        if (strlen(s->language) > 0)
+        QString msg  = iso639_key_toName(audioStreams[i].language);
+        AVStream *s  = ic->streams[audioStreams[i].av_stream_index];
+        if (s)
         {
-            t += iso639_str_toName((unsigned char *)(s->language));
-            t += " ";
+            if (s->codec->codec_id == CODEC_ID_MP3)
+                msg += QString(" MP%1").arg(s->codec->sub_id);
+            else
+                msg += QString(" %1").arg(s->codec->codec->name).upper();
+
+            if (!s->codec->channels)
+                msg += QString(" ?ch");
+            else if ((s->codec->channels > 4) && !(s->codec->channels & 1))
+                msg += QString(" %1.1ch").arg(s->codec->channels - 1);
+            else
+                msg += QString(" %1ch").arg(s->codec->channels);
         }
-        
-        if (s->codec->codec_id == CODEC_ID_MP3 && s->codec->sub_id == 1)
-            t += "MP1 ";
-        else if (s->codec->codec_id == CODEC_ID_MP3 && s->codec->sub_id == 2)
-            t += "MP2 ";
-        else
-        {      
-            t += QString(s->codec->codec->name).upper();
-            t += " ";
-        }
-        
-        t += QString("%1ch").arg(s->codec->channels);
-        
-        list += t;
+        list += QString("%1: %2").arg(i+1).arg(msg);
     }
-    
+
     return list;
 }
 
-
-//
-// This function will select the best audio track
-// available usgin the following rules:
-//
-// 1. The fist AC3 track found will be select,
-// 2. If no AC3 is found then the audio track with
-// the most number of channels is selected. 
-//
-// This code has no awareness to language preferences
-// although I don't think it would be too hard to 
-// add.
-//
-bool AvFormatDecoder::autoSelectAudioTrack()
+vector<int> filter_lang(const sinfo_vec_t &audioStreams, int lang_key)
 {
-    if (!audioStreams.size())
-    {
-        GetNVP()->SetAudioParams(-1, -1, -1);
-        return false;
-    }
+    vector<int> ret;
 
-    int minChannels = 1;
-    int maxTracks = (audioStreams.size() - 1);
-    int track;
-    if (do_ac3_passthru)
-        minChannels = 2;
+    for (uint i=0; i<audioStreams.size(); i++)
+        if ((lang_key < 0) || audioStreams[i].language == lang_key)
+            ret.push_back(i);
 
+    return ret;
+}
+
+int filter_ac3(const AVFormatContext *ic,
+               const sinfo_vec_t     &audioStreams,
+               const vector<int>     &fs)
+{
     int selectedTrack = -1;
-    int selectedChannels = -1;
-    
-    while ((selectedTrack == -1) && (minChannels >= 0))
+
+    vector<int>::const_iterator it = fs.begin();
+    for (; it != fs.end(); ++it)
     {
-        for (track = 0; track <= maxTracks; track++)
+        const int stream_index    = audioStreams[*it].av_stream_index;
+        const AVCodecContext *ctx = ic->streams[stream_index]->codec;
+        if (CODEC_ID_AC3 == ctx->codec_id)
         {
-            int tempStream = audioStreams[track];
-            AVCodecContext *e = ic->streams[tempStream]->codec;
-
-            if (e->channels > minChannels)
-            {
-                //if we find an AC3 codec then we select it 
-                //as the preferred codec.
-                if (e->codec_id == CODEC_ID_AC3)
-                {
-                    selectedTrack = track;
-                    break;
-                }
-
-                if (e->channels > selectedChannels)
-                {
-                    // this is a candidate with more channels
-                    // than the previous, or there was no previous
-                    // so select it.
-                    selectedChannels = e->channels;
-                    selectedTrack = track;
-                }
-            }
-        }
-        if (selectedTrack == -1)
-        {
-            minChannels--;
+            selectedTrack = *it;
+            break;
         }
     }
 
-    if (selectedTrack == -1)
+    return selectedTrack;
+}
+
+int filter_max_ch(const AVFormatContext *ic,
+                  const sinfo_vec_t     &audioStreams,
+                  const vector<int>     &fs)
+{
+    int selectedTrack = -1, max_seen = -1;
+
+    vector<int>::const_iterator it = fs.begin();
+    for (; it != fs.end(); ++it)
     {
-        VERBOSE(VB_AUDIO, LOC + "No suitable audio track exists.");
-        return false;
+        const int stream_index    = audioStreams[*it].av_stream_index;
+        const AVCodecContext *ctx = ic->streams[stream_index]->codec;
+        if (max_seen < ctx->channels)
+        {
+            selectedTrack = *it;
+            max_seen = ctx->channels;
+        }
     }
 
-    currentAudioTrack = selectedTrack;
-    wantedAudioStream = audioStreams[currentAudioTrack];
-     
-    AVCodecContext *e = ic->streams[wantedAudioStream]->codec;
-    if (e->codec_id == CODEC_ID_AC3)
+    return selectedTrack;
+}
+
+/** \fn AvFormatDecoder::autoSelectAudioTrack(void)
+ *  \brief Selects the best audio track.
+ *
+ *   This function will select the best audio track
+ *   available using the following rules:
+ *
+ *   First we try to select the stream last selected by the
+ *   user, which is recalled as the Nth stream in the 
+ *   preferred language. If it can not be located we attempt
+ *   to find a stream in the same language.
+ *
+ *   If we can not reselect the last user selected stream,
+ *   then for each preferred language from most preferred to
+ *   least preferred, we try to use the first AC3 track found,
+ *   or if no AC3 audio is found then we try to select the
+ *   audio track with the greatest number of audio channels.
+ *
+ *   If we can not select a stream in a preferred language
+ *   we try to use the first AC3 track found irrespective
+ *   of language, and if no AC3 audio is found then we try
+ *   to select the audio track with the greatest number of
+ *   audio channels.
+ *  \return true if a track was selected, false otherwise
+ */
+bool AvFormatDecoder::autoSelectAudioTrack(void)
+{
+    uint numStreams = audioStreams.size();
+    if ((currentAudioTrack >= 0) && (currentAudioTrack < (int)numStreams))
+        return true; // audio already selected
+
+#if 0
+    // enable this to print streams
+    for (uint i=0; i<audioStreams.size(); i++)
     {
-        VERBOSE(VB_AUDIO, LOC +
-                QString("Auto-selecting AC3 audio track (stream #%2).")
-                .arg(wantedAudioStream)); 
+        int idx = audioStreams[i].av_stream_index;
+        AVCodecContext *codec_ctx = ic->streams[idx]->codec;
+        AudioInfo item(codec_ctx->codec_id,
+                       codec_ctx->sample_rate, codec_ctx->channels,
+                       (allow_ac3_passthru && !transcoding &&
+                        (codec_ctx->codec_id == CODEC_ID_AC3)));
+        VERBOSE(VB_AUDIO, LOC + " * " + item.toString());
+    }
+#endif
+
+    int selectedTrack = (1 == numStreams) ? 0 : -1;
+
+    if ((selectedTrack < 0) && wantedAudioStream.language>=-1 && numStreams)
+    {
+        VERBOSE(VB_AUDIO, LOC + "Trying to reselect audio track");
+        // Try to reselect user selected subtitle stream.
+        // This should find the stream after a commercial
+        // break and in some cases after a channel change.
+        int  wlang = wantedAudioStream.language;
+        uint windx = wantedAudioStream.language_index;
+        for (uint i = 0; i < numStreams; i++)
+        {
+            if (wlang == audioStreams[i].language)
+                selectedTrack = i;
+            if (windx == audioStreams[i].language_index)
+                break;
+        }
+    }
+
+    if (selectedTrack < 0 && numStreams)
+    {
+        VERBOSE(VB_AUDIO, LOC + "Trying to select audio track (w/lang)");
+        // try to get best track for most preferred language
+        selectedTrack = -1;
+        vector<int>::const_iterator it = languagePreference.begin();
+        for (; it !=  languagePreference.end(); ++it)
+        {
+            vector<int> flang = filter_lang(audioStreams, *it);
+            if ((selectedTrack = filter_ac3(ic, audioStreams, flang)) >= 0)
+                break;
+            if ((selectedTrack = filter_max_ch(ic, audioStreams, flang)) >= 0)
+                break;
+        }
+        // try to get best track for any language
+        if (selectedTrack < 0)
+        {
+            VERBOSE(VB_AUDIO, LOC + "Trying to select audio track (wo/lang)");
+            vector<int> flang = filter_lang(audioStreams, -1);
+            if ((selectedTrack = filter_ac3(ic, audioStreams, flang)) < 0)
+                selectedTrack  = filter_max_ch(ic, audioStreams, flang);
+        }
+    }
+
+    if (selectedTrack < 0)
+    {
+        if (currentAudioTrack != selectedTrack)
+        {
+            VERBOSE(VB_AUDIO, LOC + "No suitable audio track exists.");
+            currentAudioTrack = selectedTrack;
+            selectedAudioStream.av_stream_index = -1;
+        }
     }
     else
     {
-        VERBOSE(VB_AUDIO, LOC +
-                QString("Auto-selecting audio track #%1 (stream #%2).")
-                .arg(selectedTrack + 1).arg(wantedAudioStream) + "\n\t\t\t" +
-                QString("It has %1 channels and we needed at least %2")
-                .arg(selectedChannels).arg(do_ac3_passthru ? 2 : 1));
+        currentAudioTrack     = selectedTrack;
+        selectedAudioStream   = audioStreams[currentAudioTrack];
+        if (wantedAudioStream.av_stream_index < 0)
+            wantedAudioStream = selectedAudioStream;
+
+        if (print_verbose_messages & VB_AUDIO)
+        {
+            QStringList list = listAudioTracks();
+            VERBOSE(VB_AUDIO, LOC +
+                    QString("Selected track %1 (A/V Stream #%2)")
+                    .arg(list[currentAudioTrack])
+                    .arg(selectedAudioStream.av_stream_index));
+        }
     }
+
     SetupAudioStream();
-    CheckAudioParams(e->sample_rate, e->channels, true);
-    return true;
-}
-
-void AvFormatDecoder::SetupAudioStream(void)
-{
-    if (wantedAudioStream >= ic->nb_streams || currentAudioTrack < 0)
-        return;
-
-    AVStream *curstream = ic->streams[wantedAudioStream];
-    if (curstream == NULL)
-        return;
-
-    VERBOSE(VB_AUDIO, LOC << "Initializing audio parms from audio track #"
-            <<currentAudioTrack);
-
-    GetNVP()->SetEffDsp(curstream->codec->sample_rate * 100);
-
-    do_ac3_passthru = curstream->codec->codec_id == CODEC_ID_AC3 &&
-                      !transcoding &&
-                      gContext->GetNumSetting("AC3PassThru", false);
+    return selectedTrack >= 0;
 }
 
 
-void AvFormatDecoder::incCurrentSubtitleTrack()
+void AvFormatDecoder::incCurrentSubtitleTrack(void)
 {
-    if (subtitleStreams.size())
-    {
-        int tempTrackNo = currentSubtitleTrack;
-        ++tempTrackNo;
-        if (tempTrackNo > (int)(subtitleStreams.size() - 1))
-            tempTrackNo = 0;
-
-        currentSubtitleTrack = tempTrackNo;
-        wantedSubtitleStream = subtitleStreams[currentSubtitleTrack];
-    }
+    int numStreams = (int)subtitleStreams.size();
+    int next       = (currentSubtitleTrack+1) % numStreams;
+    setCurrentSubtitleTrack((!numStreams) ? -1 : next);
 }
 
-void AvFormatDecoder::decCurrentSubtitleTrack()
+void AvFormatDecoder::decCurrentSubtitleTrack(void)
 {
-    if (subtitleStreams.size())
-    {
-        int tempTrackNo = currentSubtitleTrack;
-        --tempTrackNo;
-        if (tempTrackNo < 0)
-            tempTrackNo = subtitleStreams.size() - 1;
-
-        currentSubtitleTrack = tempTrackNo;
-        wantedSubtitleStream = subtitleStreams[currentSubtitleTrack];
-    }
+    int numStreams = (int)subtitleStreams.size();
+    int next       = (currentSubtitleTrack < 0) ? 0 : currentSubtitleTrack;
+    next           = (next+numStreams-1) % numStreams;
+    setCurrentSubtitleTrack((!numStreams) ? -1 : next);
 }
 
 bool AvFormatDecoder::setCurrentSubtitleTrack(int trackNo)
 {
-    if (trackNo < 0)
-        trackNo = -1;
-    else if (trackNo >= (int)subtitleStreams.size())
+    if (trackNo >= (int)subtitleStreams.size())
         return false;
 
-    currentSubtitleTrack = trackNo;
-    if (currentSubtitleTrack < 0)
-        return false;
+    pthread_mutex_lock(&avcodeclock);
 
-    wantedSubtitleStream = subtitleStreams[currentSubtitleTrack];
+    currentSubtitleTrack = max(-1, trackNo);
+    if (currentSubtitleTrack >= 0)
+    {
+        wantedSubtitleStream   = subtitleStreams[currentSubtitleTrack];
+        selectedSubtitleStream = subtitleStreams[currentSubtitleTrack];
+    }
+    else
+        selectedSubtitleStream.av_stream_index = -1;
 
-    return true;
+    pthread_mutex_unlock(&avcodeclock);
+
+    return currentSubtitleTrack >= 0;
 }
 
-QStringList AvFormatDecoder::listSubtitleTracks() const
+QStringList AvFormatDecoder::listSubtitleTracks(void) const
 {
     QStringList list;
-    int num_tracks = subtitleStreams.size();
-    int track;
-    
-    for (track = 0; track < num_tracks; track++)
+
+    for (uint i = 0; i < subtitleStreams.size(); i++)
     {
-        AVStream *s = ic->streams[subtitleStreams[track]];
-        
-        if (!s)
-            continue;
-        
-        QString t = QString("%1: ").arg(track + 1);
-        
-        if (strlen(s->language) > 0)
-        {
-            t += iso639_str_toName((unsigned char *)(s->language));
-            t += " ";
-        }
-         
-        list += t;
+        QString msg  = iso639_key_toName(subtitleStreams[i].language);
+        list += QString("%1: %2").arg(i+1).arg(msg);
     }
-    
+
     return list;
 }
 
-// in case there's only one subtitle language available, always choose it
-//
-// if more than one subtitle languages are found, the best one is
-// picked according to the ISO639Language[0..] settings
-//
-// in case there are no ISOLanguage[0..] settings, or no preferred language
-// is found, the first found subtitle stream is chosen
-bool AvFormatDecoder::autoSelectSubtitleTrack()
+/** \fn AvFormatDecoder::autoSelectSubtitleTrack(void)
+ *  \brief Select best subtitle track.
+ *
+ *   If case there's only one subtitle available, always choose it.
+ *
+ *   If there is a user selected subtitle we try to find it.
+ *
+ *   If we can't find the user selected subtitle we try to
+ *   picked according to the ISO639Language[0..] settings.
+ *
+ *   In case there are no ISOLanguage[0..] settings, or no preferred language
+ *   is found, the first found subtitle stream is chosen
+ *  \return true if a track was selected, false otherwise
+ */
+bool AvFormatDecoder::autoSelectSubtitleTrack(void)
 {
-    if (!subtitleStreams.size())
+    uint numStreams = subtitleStreams.size();
+
+    if ((currentSubtitleTrack >= 0) && 
+        (currentSubtitleTrack < (int)numStreams))
     {
-        currentSubtitleTrack = -1;
-        wantedSubtitleStream = -1;
-        return false;
+        return true; // subtitle already selected
     }
 
-    int maxTracks = (subtitleStreams.size() - 1);
-
-    int selectedTrack = -1;
-    
-    // go through all preferred languages and pick the best found
-    QStringList langPref = iso639_get_language_list();
-    QStringList::iterator l = langPref.begin();
-    for (; l != langPref.end() && selectedTrack == -1; ++l)
+    if (!numStreams)
     {
-        for (int track = 0; track < maxTracks; track++)
-        {
-            int tempStream = subtitleStreams[track];
-            AVStream* st = ic->streams[tempStream];
+        currentSubtitleTrack = -1;
+        selectedSubtitleStream.av_stream_index = -1;
+        return false; // no subtitles available
+    }
 
-            if (st->language == *l)
-            {
-                selectedTrack = track;
+    int selectedTrack = (1 == numStreams) ? 0 : -1;
+
+    if ((selectedTrack < 0) && wantedSubtitleStream.language>=-1 && numStreams)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Trying to reselect subtitle track");
+        // Try to reselect user selected subtitle stream.
+        // This should find the stream after a commercial
+        // break and in some cases after a channel change.
+        int  wlang = wantedSubtitleStream.language;
+        uint windx = wantedSubtitleStream.language_index;
+        for (uint i = 0; i < numStreams; i++)
+        {
+            if (wlang == subtitleStreams[i].language)
+                selectedTrack = i;
+            if (windx == subtitleStreams[i].language_index)
                 break;
+        }
+    }
+
+    if (selectedTrack < 0 && numStreams)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Trying to select subtitle track (w/lang)");
+        // Find first subtitle stream that matches a language in
+        // order of most preferred to least preferred language.
+        vector<int>::iterator it = languagePreference.begin();
+        for (; it != languagePreference.end(); ++it)
+        {
+            for (uint i = 0; i < numStreams; i++)
+            {
+                if (*it == subtitleStreams[i].language)
+                {
+                    selectedTrack = i;
+                    break;
+                }
             }
         }
     }
-    
-    if (selectedTrack == -1)
-    {
-        selectedTrack = 0;
-    }
 
-    currentSubtitleTrack = selectedTrack;
-    wantedSubtitleStream = subtitleStreams[currentSubtitleTrack];
+    currentSubtitleTrack = (selectedTrack < 0) ? 0 : -1;
+    selectedSubtitleStream = subtitleStreams[currentSubtitleTrack];
+    if (wantedSubtitleStream.av_stream_index < 0)
+        wantedSubtitleStream = selectedSubtitleStream;
      
+    int lang = subtitleStreams[currentSubtitleTrack].language;
+    VERBOSE(VB_PLAYBACK, LOC + 
+            QString("Selected subtitle track #%1 in the %2 language(%3)")
+            .arg(currentSubtitleTrack+1)
+            .arg(iso639_key_toName(lang)).arg(lang));
+
     return true;
 }
-
-
 
 bool AvFormatDecoder::GetFrame(int onlyvideo)
 {
@@ -2011,18 +2011,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
     bool allowedquit = false;
     bool storevideoframes = false;
 
-    if (currentAudioTrack == -1 || 
-        currentAudioTrack >= (int)audioStreams.size())
-    {
-        autoSelectAudioTrack();
-    }
-
-    if ((currentSubtitleTrack == -1 || 
-        currentSubtitleTrack >= (int)subtitleStreams.size()) &&
-        subtitleStreams.size() > 0)
-    {
-        autoSelectSubtitleTrack();
-    }
+    autoSelectAudioTrack();
+    autoSelectSubtitleTrack();
 
     bool skipaudio = (lastvpts == 0);
 
@@ -2154,24 +2144,46 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
         firstloop = true;
         have_err = false;
 
+        pthread_mutex_lock(&avcodeclock);
+        int ctype  = curstream->codec->codec_type;
+        int audIdx = selectedAudioStream.av_stream_index;
+        int subIdx = selectedSubtitleStream.av_stream_index;
+        pthread_mutex_unlock(&avcodeclock);
+
         while (!have_err && len > 0)
         {
-            pthread_mutex_lock(&avcodeclock);
-            int ctype = curstream->codec->codec_type;
-            pthread_mutex_unlock(&avcodeclock);
             switch (ctype)
             {
                 case CODEC_TYPE_AUDIO:
                 {
+                    // detect channels on streams that need
+                    // to be decoded before we can know this
+                    if (!curstream->codec->channels)
+                    {
+                        pthread_mutex_lock(&avcodeclock);
+                        curstream->codec->channels = MAX_OUTPUT_CHANNELS;
+                        ret = avcodec_decode_audio(
+                            curstream->codec, audioSamples,
+                            &data_size, ptr, len);
+                        if (curstream->codec->channels)
+                        {
+                            currentAudioTrack = -1;
+                            selectedAudioStream.av_stream_index = -1;
+                            audIdx = -1;
+                            autoSelectAudioTrack();
+                            audIdx = selectedAudioStream.av_stream_index;
+                        }
+                        pthread_mutex_unlock(&avcodeclock);
+                    }
+
                     if (firstloop && pkt->pts != (int64_t)AV_NOPTS_VALUE)
                         lastapts = (long long)(av_q2d(curstream->time_base) *
                                                pkt->pts * 1000);
 
-                    if (onlyvideo != 0 ||
-                        (pkt->stream_index != wantedAudioStream))
+                    if (onlyvideo != 0 || (pkt->stream_index != audIdx))
                     {
-                        ptr += pkt->size;
-                        len -= pkt->size;
+                        ptr += len;
+                        len = 0;
                         continue;
                     }
 
@@ -2179,8 +2191,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         if (lastapts < lastvpts - 30 || lastvpts == 0)
                         {
-                            ptr += pkt->size;
-                            len -= pkt->size;
+                            ptr += len;
+                            len = 0;
                             continue;
                         }
                         else
@@ -2188,7 +2200,9 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
 
                     pthread_mutex_lock(&avcodeclock);
-                    if (do_ac3_passthru)
+                    ret = len;
+                    data_size = 0;
+                    if (audioOut.do_ac3_passthru)
                     {
                         data_size = pkt->size;
                         ret = EncodeAC3Frame(ptr, len, audioSamples,
@@ -2196,9 +2210,27 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                     else
                     {
-                        ret = avcodec_decode_audio(curstream->codec,
-                                                   audioSamples, &data_size,
-                                                   ptr, len);
+                        AVCodecContext *ctx = curstream->codec;
+
+                        if ((ctx->channels == 0) ||
+                            (ctx->channels > MAX_OUTPUT_CHANNELS))
+                            ctx->channels = MAX_OUTPUT_CHANNELS;
+
+                        ret = avcodec_decode_audio(
+                            ctx, audioSamples, &data_size, ptr, len);
+
+                        // When decoding some audio streams the number of
+                        // channels, etc isn't known until we try decoding it.
+                        if ((ctx->sample_rate != audioOut.sample_rate) ||
+                            (ctx->channels    != audioOut.channels))
+                        {
+                            VERBOSE(VB_IMPORTANT, "audio stream changed");
+                            currentAudioTrack = -1;
+                            selectedAudioStream.av_stream_index = -1;
+                            audIdx = -1;
+                            autoSelectAudioTrack();
+                            data_size = 0;
+                        }
                     }
                     pthread_mutex_unlock(&avcodeclock);
 
@@ -2208,10 +2240,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     if (data_size <= 0)
                         continue;
 
-                    if (!do_ac3_passthru)
-                        CheckAudioParams(curstream->codec->sample_rate,
-                                         curstream->codec->channels, false);
-
                     long long temppts = lastapts;
 
                     // calc for next frame
@@ -2219,7 +2247,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                 (curstream->codec->channels * 2) / 
                                 curstream->codec->sample_rate);
 
-                    GetNVP()->AddAudioData((char *)audioSamples, data_size, temppts);
+                    GetNVP()->AddAudioData((char *)audioSamples, data_size,
+                                           temppts);
 
                     break;
                 }
@@ -2336,14 +2365,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                 }
                 case CODEC_TYPE_SUBTITLE:
                 {
-                    AVCodecContext *context = curstream->codec;
                     int gotSubtitles = 0;
                     AVSubtitle subtitle;
 
-                    if (pkt->stream_index == wantedSubtitleStream)
+                    if (pkt->stream_index == subIdx)
                     {
-                        avcodec_decode_subtitle(context, &subtitle, 
-                                                &gotSubtitles, ptr, len);
+                        pthread_mutex_lock(&avcodeclock);
+                        avcodec_decode_subtitle(curstream->codec,
+                                                &subtitle, &gotSubtitles,
+                                                ptr, len);
+                        pthread_mutex_unlock(&avcodeclock);
                     }
 
                     // the subtitle decoder always consumes the whole packet
@@ -2380,6 +2411,65 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
     if (pkt)
         delete pkt;
+
+    return true;
+}
+
+/** \fn AvFormatDecoder::SetupAudioStream(void)
+ *  \brief Reinitializes audio if it needs to be reinitialized.
+ *
+ *   NOTE: The avcodeclock must be held when this is called.
+ *
+ *  \return true if audio changed, false otherwise
+ */
+bool AvFormatDecoder::SetupAudioStream(void)
+{
+    AudioInfo info; // no_audio
+    AVStream *curstream = NULL;
+    AVCodecContext *codec_ctx = NULL;
+    AudioInfo old_in  = audioIn;
+    AudioInfo old_out = audioOut;
+
+    if ((currentAudioTrack >= 0) &&
+        (selectedAudioStream.av_stream_index <= ic->nb_streams) &&
+        (curstream = ic->streams[selectedAudioStream.av_stream_index]))
+    {
+        assert(curstream);
+        assert(curstream->codec);
+        codec_ctx = curstream->codec;        
+        bool do_ac3_passthru = (allow_ac3_passthru && !transcoding &&
+                                (codec_ctx->codec_id == CODEC_ID_AC3));
+        info = AudioInfo(codec_ctx->codec_id,
+                         codec_ctx->sample_rate, codec_ctx->channels,
+                         do_ac3_passthru);
+    }
+
+    if (info == audioIn)
+        return false; // no change
+
+    VERBOSE(VB_AUDIO, LOC + "Initializing audio parms from " +
+            QString("audio track #%1").arg(currentAudioTrack+1));
+
+    audioOut = audioIn = info;
+    if (audioIn.do_ac3_passthru)
+    {
+        // A passthru stream looks like a 48KHz 2ch (@ 16bit) to the sound card
+        audioOut.channels    = 2;
+        audioOut.sample_rate = 48000;
+        audioOut.sample_size = 4;
+    }
+
+    VERBOSE(VB_AUDIO, LOC + "Audio format changed " +
+            QString("\n\t\t\tfrom %1 ; %2\n\t\t\tto   %3 ; %4")
+            .arg(old_in.toString()).arg(old_out.toString())
+            .arg(audioIn.toString()).arg(audioOut.toString()));
+
+    if (audioOut.sample_rate > 0)
+        GetNVP()->SetEffDsp(audioOut.sample_rate * 100);
+
+    GetNVP()->SetAudioParams(audioOut.bps(), audioOut.channels,
+                             audioOut.sample_rate);
+    GetNVP()->ReinitAudio();
 
     return true;
 }

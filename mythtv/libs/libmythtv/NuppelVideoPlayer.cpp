@@ -87,7 +87,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       killvideo(false),             livetv(false),
       watchingrecording(false),     editmode(false),
       resetvideo(false),            using_null_videoout(false),
-      disableaudio(false),          transcoding(false),
+      no_audio_in(false),           no_audio_out(false),
+      transcoding(false),
       hasFullPositionMap(false),    limitKeyRepeat(false),
       errored(false),
       m_DeintSetting(0),
@@ -449,6 +450,24 @@ void NuppelVideoPlayer::ReinitVideo(void)
 QString NuppelVideoPlayer::ReinitAudio(void)
 {
     QString errMsg = QString::null;
+
+    if ((audio_bits <= 0) || (audio_channels <= 0) || (audio_samplerate <= 0))
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("Disabling Audio, params(%1,%2,%3)")
+                .arg(audio_bits).arg(audio_channels).arg(audio_samplerate));
+
+        no_audio_in = no_audio_out = true;
+        if (audioOutput)
+        {
+            delete audioOutput;
+            audioOutput = NULL;
+        }
+        return errMsg;
+    }
+
+    no_audio_in = false;
+
     if (!audioOutput && !using_null_videoout)
     {
         bool setVolume = gContext->GetNumSetting("MythControlsVolume", 1);
@@ -461,25 +480,32 @@ QString NuppelVideoPlayer::ReinitAudio(void)
         else
             errMsg = audioOutput->GetError();
 
-        if (errMsg != QString::null)
+        if (!errMsg.isEmpty())
         {
-            VERBOSE(VB_IMPORTANT, QString("Disabling Audio, reason is: %1")
-                    .arg(errMsg));
+            VERBOSE(VB_IMPORTANT, LOC + "Disabling Audio" +
+                    QString(", reason is: %1").arg(errMsg));
             if (audioOutput)
             {
                 delete audioOutput;
                 audioOutput = NULL;
             }
-            disableaudio = true;
+            no_audio_out = true;
+        }
+        else if (no_audio_out)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + "Enabling Audio");
+            no_audio_out = false;
         }
     }
-    else if (audioOutput)
+
+    if (audioOutput)
     {
         audioOutput->Reconfigure(audio_bits, audio_channels, audio_samplerate);
         errMsg = audioOutput->GetError();
+        if (!errMsg.isEmpty())
+            audioOutput->SetStretchFactor(audio_stretchfactor);
     }
-    if (audioOutput)
-        audioOutput->SetStretchFactor(audio_stretchfactor);
+
     return errMsg;
 }
 
@@ -671,7 +697,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries)
                                                      ringBuffer->GetFilename()))
     {
         SetDecoder(new IvtvDecoder(this, m_playbackinfo));
-        disableaudio = true; // no audio with ivtv.
+        no_audio_out = true; // no audio with ivtv.
         audio_bits = 16;
     }
 #endif
@@ -713,7 +739,7 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries)
     }
 
     if (audio_bits == -1)
-        disableaudio = true;
+        no_audio_in = no_audio_out = true;
 
     if (ret > 0)
     {
@@ -2032,12 +2058,14 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (OpenFile() < 0)
         return;
 
-    if (!disableaudio || (forceVideoOutput == kVideoOutput_IVTV &&
-                          !gContext->GetNumSetting("PVR350InternalAudioOnly")))
+    if (!no_audio_out ||
+        (forceVideoOutput == kVideoOutput_IVTV &&
+         !gContext->GetNumSetting("PVR350InternalAudioOnly")))
     {
         QString errMsg = ReinitAudio();
         int ret = 1;
-        if ((errMsg != QString::null) && gContext->GetNumSetting("AudioNag", 1))
+        if ((errMsg != QString::null) &&
+            gContext->GetNumSetting("AudioNag", 1))
         {
             DialogBox dialog(gContext->GetMainWindow(), errMsg);
 
@@ -2086,7 +2114,7 @@ void NuppelVideoPlayer::StartPlaying(void)
             delete audioOutput;
             audioOutput = NULL;
         }
-        disableaudio = true;
+        no_audio_out = true;
         return;
     }
 

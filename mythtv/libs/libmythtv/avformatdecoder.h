@@ -20,6 +20,53 @@ class MythSqlDatabase;
 
 extern "C" void HandleStreamChange(void*);
 
+class StreamInfo
+{
+  public:
+    StreamInfo() : av_stream_index(-1), language(-2), language_index(0) {}
+    StreamInfo(int a, int b, uint c)
+        : av_stream_index(a), language(b), language_index(c) {}
+  public:
+    int  av_stream_index;
+    int  language; ///< ISO639 canonical language key
+    uint language_index;
+};
+typedef vector<StreamInfo> sinfo_vec_t;
+
+class AudioInfo
+{
+  public:
+    AudioInfo() :
+        codec_id(CODEC_ID_NONE), sample_size(-2),   sample_rate(-1),
+        channels(-1), do_ac3_passthru(false)
+    {;}
+
+    AudioInfo(CodecID id, int sr, int ch, bool ac3) :
+        codec_id(id), sample_size(ch*2),   sample_rate(sr),
+        channels(ch), do_ac3_passthru(ac3)
+    {;}
+
+    CodecID codec_id;
+    int sample_size, sample_rate, channels;
+    bool do_ac3_passthru;
+
+    /// \brief Bits per sample.
+    int bps(void) const { return (8 * sample_size) / channels; }
+    bool operator==(const AudioInfo &o) const
+    {
+        return (codec_id==o.codec_id        && channels==o.channels       &&
+                sample_size==o.sample_size  && sample_rate==o.sample_rate &&
+                do_ac3_passthru==o.do_ac3_passthru);
+    }
+    QString toString() const
+    {
+        return QString("id(%1) %2Hz %3ch %4bps%5")
+            .arg(codec_id_string(codec_id),4).arg(sample_rate,5)
+            .arg(channels,2).arg(bps(),3)
+            .arg((do_ac3_passthru) ? "pt":"",3);
+    }
+};
+
 /// A decoder for video files.
 
 /// The AvFormatDecoder is used to decode non-NuppleVideo files.
@@ -134,9 +181,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     /// See if the video parameters have changed, return true if so.
     bool CheckVideoParams(int width, int height);
 
-    /// See if the audio parameters have changed, return true if so.
-    void CheckAudioParams(int freq, int channels, bool safe);
-    void SetupAudioStream(void);
+    bool SetupAudioStream(void);
 
     int EncodeAC3Frame(unsigned char* data, int len, short *samples,
                        int &samples_size);
@@ -187,18 +232,23 @@ class AvFormatDecoder : public DecoderBase, public CCReader
 
     // Audio
     short int        *audioSamples;
-    int               audio_sample_size;
-    int               audio_sampling_rate;
-    int               audio_channels;
-    bool              do_ac3_passthru;
-    int               wantedAudioStream;
-    QValueVector<int> audioStreams;
-    int               audio_check_1st;         ///< Used by CheckAudioParams
-    int               audio_sampling_rate_2nd; ///< Used by CheckAudioParams
-    int               audio_channels_2nd;      ///< Used by CheckAudioParams
+    bool              allow_ac3_passthru;
 
-    QValueVector<int> subtitleStreams;
-    int wantedSubtitleStream;
+    AudioInfo         audioIn;
+    AudioInfo         audioOut;
+
+    // Audio stream selection
+    sinfo_vec_t       audioStreams;
+    StreamInfo        wantedAudioStream;
+    StreamInfo        selectedAudioStream;
+
+    // Subtitle stream selection
+    sinfo_vec_t       subtitleStreams;
+    StreamInfo        wantedSubtitleStream;
+    StreamInfo        selectedSubtitleStream;
+
+    // language preferences for auto-selection of streams
+    vector<int>       languagePreference;
 };
 
 #endif
