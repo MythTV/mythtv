@@ -30,7 +30,7 @@ class DummyDTVRecorder: public DTVRecorder
     void StartRecording(void);
     bool Open(void);
 
-    void StartRecordingThread(void);
+    void StartRecordingThread(unsigned long long required_frames = 0);
     void StopRecordingThread(void);
 
   public slots:

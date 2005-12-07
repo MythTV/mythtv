@@ -2916,7 +2916,10 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         ClearFlags(kFlagSIParserRunning);
 
         if (recorder)
+        {
             GetDVBRecorder()->Close();
+            GetDVBRecorder()->SetRingBuffer(NULL);
+        }
     }
     if (HasFlags(kFlagWaitingForSIParser))
         ClearFlags(kFlagWaitingForSIParser);
@@ -3107,8 +3110,10 @@ void TVRec::TuningFrequency(const TuningRequest &request)
 
         if (dummyRecorder && ringBuffer)
         {
-            dummyRecorder->StartRecordingThread();
+            dummyRecorder->StartRecordingThread(5);
             SetFlags(kFlagDummyRecorderRunning);
+            VERBOSE(VB_RECORD, "DummyDTVRecorder -- started");
+            SetFlags(kFlagRingBufferReady);
         }
     }
 
@@ -3635,7 +3640,6 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     pginfo->ApplyRecordRecGroupChange("LiveTV");
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
-    SetFlags(kFlagRingBufferReady);
 
     if (set_rec && recorder)
     {
@@ -3643,6 +3647,7 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
         if (discont)
             recorder->CheckForRingBufferSwitch();
         delete pginfo;
+        SetFlags(kFlagRingBufferReady);
     }
     else if (!set_rec)
     {

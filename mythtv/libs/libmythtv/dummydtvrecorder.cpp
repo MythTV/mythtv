@@ -270,9 +270,14 @@ void *DummyDTVRecorder::RecordingThread(void *param)
     return NULL;    
 }
 
-void DummyDTVRecorder::StartRecordingThread(void)
+void DummyDTVRecorder::StartRecordingThread(unsigned long long req_frames)
 {
+    if (!ringBuffer)
+        return;
     pthread_create(&_rec_thread, NULL, RecordingThread, this);
+    while (_frames_seen_count < req_frames)
+        usleep(1000);
+    ringBuffer->WriterFlush();
 }
 
 void DummyDTVRecorder::FinishRecording(void)
