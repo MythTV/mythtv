@@ -709,12 +709,12 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
     return recordingHasPositionMap;
 }
 
-void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
+static float normalized_fps(AVCodecContext *enc)
 {
-    fps = 1 / av_q2d(enc->time_base);
+    float fps = 1.0f / av_q2d(enc->time_base);
 
     // Some formats report fps waaay too high. (wrong time_base)
-    if (fps > 100.0f && (enc->time_base.den > 10000) &&
+    if (fps > 121.0f && (enc->time_base.den > 10000) &&
         (enc->time_base.num == 1))
     {
         enc->time_base.num = 1001;  // seems pretty standard
@@ -722,16 +722,22 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
             fps = 1.0f / av_q2d(enc->time_base);
     }
     // If it is still out of range, just assume NTSC...
-    fps = (fps > 100.0f) ? (30000.0f / 1001.0f) : fps;
+    fps = (fps > 121.0f) ? (30000.0f / 1001.0f) : fps;
+    return fps;
+}
+
+void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
+{
+    fps = normalized_fps(enc);
 
     float aspect_ratio;
     if (enc->sample_aspect_ratio.num == 0)
-        aspect_ratio = 0;
+        aspect_ratio = 0.0f;
     else
         aspect_ratio = av_q2d(enc->sample_aspect_ratio) *
             enc->width / enc->height;
 
-    if (aspect_ratio <= 0.0)
+    if (aspect_ratio <= 0.0f)
         aspect_ratio = (float)enc->width / (float)enc->height;
 
     current_width = enc->width;
@@ -1552,13 +1558,10 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
                     {
                         int align_width = width;
                         int align_height = height;
-
-                        fps = 1 / av_q2d(context->time_base); 
-
                         align_dimensions(context, align_width, align_height);
 
-                        GetNVP()->SetVideoParams(align_width,
-                                                 align_height, fps,
+                        GetNVP()->SetVideoParams(align_width, align_height,
+                                                 normalized_fps(context),
                                                  keyframedist, aspect, 
                                                  kScan_Detect, true);
                         current_width = width;
