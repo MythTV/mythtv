@@ -14,6 +14,7 @@
 
 #include <sys/ioctl.h>
 
+#include <algorithm>
 #include <iostream>
 using namespace std;
 
@@ -4244,29 +4245,18 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo) const
         return;
     }
 
-    int playbackLen;
+    int playbackLen = totalLength;
     
-    if (livetv)
+    if (livetv && livetvchain)
     {
-        if (livetvchain)
-        {
-            posInfo.progBefore = livetvchain->HasPrev();
-            posInfo.progAfter = livetvchain->HasNext();
-            playbackLen = livetvchain->GetLengthAtCurPos();
-        }
-    }
-    else
-    {
-        playbackLen = totalLength;
+        posInfo.progBefore = livetvchain->HasPrev();
+        posInfo.progAfter = livetvchain->HasNext();
+        playbackLen = livetvchain->GetLengthAtCurPos();
     }
 
     float secsplayed = ((float)framesPlayed / video_frame_rate);
-    if (playbackLen <= 0)
-        playbackLen = 1;
-    if (secsplayed < 0)
-        secsplayed = 0;
-    if (secsplayed > playbackLen)
-        secsplayed = playbackLen;
+    playbackLen = max(playbackLen, 1);
+    secsplayed  = min((float)playbackLen, max(secsplayed, 0.0f));
 
     posInfo.position = (int)(1000.0 * (secsplayed / (float)playbackLen));
 
