@@ -141,6 +141,8 @@ class NuppelVideoPlayer
     bool    IsDecoderThreadAlive(void) const  { return decoder_thread_alive; }
     bool    IsNearEnd(long long framesRemaining = -1) const;
     bool    PlayingSlowForPrebuffer(void) const { return m_playing_slower; }
+    bool    HasAudioIn(void) const            { return !no_audio_in; }
+    bool    HasAudioOut(void) const           { return !no_audio_out; }
 
     // Complicated gets
     long long CalcMaxFFTime(long long ff, bool setjump = true) const;

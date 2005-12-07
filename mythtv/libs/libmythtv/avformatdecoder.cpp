@@ -1,9 +1,13 @@
-#include <iostream>
-#include <assert.h>
+// C headers
+#include <cassert>
 #include <unistd.h>
 
+// C++ headers
+#include <algorithm>
+#include <iostream>
 using namespace std;
 
+// MythTV headers
 #include "avformatdecoder.h"
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
@@ -1045,6 +1049,14 @@ int AvFormatDecoder::ScanStreams(bool novideo)
     currentAudioTrack = -1;
     currentSubtitleTrack = -1;
 
+    // We have to do this here to avoid the NVP getting stuck
+    // waiting on audio.
+    if (GetNVP()->HasAudioIn() && audioStreams.empty())
+    {
+        GetNVP()->SetAudioParams(-1, -1, -1);
+        GetNVP()->ReinitAudio();
+    }
+
     if (GetNVP()->IsErrored())
         scanerror = -1;
 
@@ -1834,11 +1846,11 @@ bool AvFormatDecoder::autoSelectAudioTrack(void)
 
     if (selectedTrack < 0)
     {
+        selectedAudioStream.av_stream_index = -1;
         if (currentAudioTrack != selectedTrack)
         {
             VERBOSE(VB_AUDIO, LOC + "No suitable audio track exists.");
             currentAudioTrack = selectedTrack;
-            selectedAudioStream.av_stream_index = -1;
         }
     }
     else
@@ -1862,7 +1874,6 @@ bool AvFormatDecoder::autoSelectAudioTrack(void)
     return selectedTrack >= 0;
 }
 
-
 void AvFormatDecoder::incCurrentSubtitleTrack(void)
 {
     int numStreams = (int)subtitleStreams.size();
@@ -1873,7 +1884,7 @@ void AvFormatDecoder::incCurrentSubtitleTrack(void)
 void AvFormatDecoder::decCurrentSubtitleTrack(void)
 {
     int numStreams = (int)subtitleStreams.size();
-    int next       = (currentSubtitleTrack < 0) ? 0 : currentSubtitleTrack;
+    int next       = max(currentSubtitleTrack, 0);
     next           = (next+numStreams-1) % numStreams;
     setCurrentSubtitleTrack((!numStreams) ? -1 : next);
 }
@@ -2011,13 +2022,22 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
     bool allowedquit = false;
     bool storevideoframes = false;
 
+    pthread_mutex_lock(&avcodeclock);
     autoSelectAudioTrack();
     autoSelectSubtitleTrack();
+    pthread_mutex_unlock(&avcodeclock);
 
     bool skipaudio = (lastvpts == 0);
 
     while (!allowedquit)
     {
+        if ((onlyvideo == 0) &&
+            ((currentAudioTrack<0) || (selectedAudioStream.av_stream_index<0)))
+        {
+            // disable audio request if there are no audio streams anymore
+            onlyvideo = 1;
+        }
+
         if (gotvideo)
         {
             if (lowbuffers && onlyvideo == 0 && lastapts < lastvpts + 100 &&
