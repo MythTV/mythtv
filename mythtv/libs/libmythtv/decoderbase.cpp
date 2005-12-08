@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "NuppelVideoPlayer.h"
 #include "remoteencoder.h"
 #include "mythcontext.h"
