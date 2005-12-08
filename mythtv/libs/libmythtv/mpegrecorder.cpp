@@ -382,14 +382,26 @@ bool MpegRecorder::OpenV4L2DeviceAsInput(void)
         vbifmt.service_set = (1==vbimode) ? VBI_TYPE_TELETEXT : VBI_TYPE_CC;
         if (ioctl(chanfd, IVTV_IOC_S_VBI_MODE, &vbifmt) < 0) 
         {
-            VERBOSE(VB_IMPORTANT, QString("Can't enable VBI recording"));
-            perror("vbi");
+            struct v4l2_format vbi_fmt;
+            memset(&vbi_fmt, 0, sizeof(struct v4l2_format));
+            vbi_fmt.type = V4L2_BUF_TYPE_SLICED_VBI_CAPTURE;
+            vbi_fmt.fmt.sliced.service_set = 0;
+            if (1 == vbimode)
+                vbi_fmt.fmt.sliced.service_set |= V4L2_SLICED_VBI_625;
+            else
+                vbi_fmt.fmt.sliced.service_set |= V4L2_SLICED_VBI_525;
+
+            if (ioctl(chanfd, VIDIOC_S_FMT, &vbi_fmt) < 0)
+            {
+                VERBOSE(VB_IMPORTANT, QString("Can't enable VBI recording"));
+                perror("vbi");
+            }
         }
 
         int embedon = 1;
         if (ioctl(chanfd, IVTV_IOC_S_VBI_EMBED, &embedon) < 0)
         {
-            VERBOSE(VB_IMPORTANT, QString("Can't enable VBI recording"));
+            VERBOSE(VB_IMPORTANT, QString("Can't enable VBI recording (2)"));
             perror("vbi");
         }
 

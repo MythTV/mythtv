@@ -15,145 +15,7 @@ typedef unsigned long long __u64;
 #include <linux/version.h>
 #endif /* __FreeBSD__ */
 
-#if 1
-/*
- * v4l2 is still work-in-progress, integration planed for 2.5.x
- *   v4l2 project homepage:   http://www.thedirks.org/v4l2/
- *   patches available from:  http://bytesex.org/patches/
- */ 
-# define HAVE_V4L2 1
-# include "videodev2_myth.h"
-#else
-# undef HAVE_V4L2
-#endif
-
-#ifdef __KERNEL__
-
-#include <linux/poll.h>
-#include <linux/mm.h>
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,69)
-#include <linux/devfs_fs_kernel.h>
-#endif
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
-#include <linux/device.h>
-#endif
-
-struct video_device
-{
-	/* device info */
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,0)
-	struct device *dev;
-#endif
-     	char name[32];
- 	int type;       /* v4l1 */
- 	int type2;      /* v4l2 */
-	int hardware;
-	int minor;
-
-	/* device ops + callbacks */
-	struct file_operations *fops;
-	void (*release)(struct video_device *vfd);
-
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,0)
-	/* old, obsolete interface -- dropped in 2.5.x, don't use it */
-	int (*open)(struct video_device *, int mode);
-	void (*close)(struct video_device *);
-	long (*read)(struct video_device *, char *, unsigned long, int noblock);
-	long (*write)(struct video_device *, const char *, unsigned long, int noblock);
-	unsigned int (*poll)(struct video_device *, struct file *, poll_table *);
-	int (*ioctl)(struct video_device *, unsigned int , void *);
-	int (*mmap)(struct video_device *, const char *, unsigned long);
-	int (*initialize)(struct video_device *);       
-#endif
-
-#if 1 /* to be removed in 2.7.x */
-	/* obsolete -- fops->owner is used instead */
-	struct module *owner;
-	/* dev->driver_data will be used instead some day.
-	 * Use the video_{get|set}_drvdata() helper functions,
-	 * so the switch over will be transparent for you.
-	 * Or use {pci|usb}_{get|set}_drvdata() directly. */
-	void *priv;
-#endif
-
-	/* for videodev.c intenal usage -- please don't touch */
-	int users;                     /* video_exclusive_{open|close} ... */
-	struct semaphore lock;         /* ... helper function uses these   */
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,69)
-	devfs_handle_t devfs_handle;   /* devfs */
-#else
-	char devfs_name[64];           /* devfs */
-#endif
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,0)
-	struct class_device class_dev; /* sysfs */
-#endif
-};
-
-#define VIDEO_MAJOR	81
-
-#define VFL_TYPE_GRABBER	0
-#define VFL_TYPE_VBI		1
-#define VFL_TYPE_RADIO		2
-#define VFL_TYPE_VTX		3
-
-extern int video_register_device(struct video_device *, int type, int nr);
-extern void video_unregister_device(struct video_device *);
-extern struct video_device* video_devdata(struct file*);
-
-#if LINUX_VERSION_CODE > KERNEL_VERSION(2,5,0)
-#define to_video_device(cd) container_of(cd, struct video_device, class_dev)
-static inline void
-video_device_create_file(struct video_device *vfd,
-			 struct class_device_attribute *attr)
-{
-	class_device_create_file(&vfd->class_dev, attr);
-}
-static inline void
-video_device_remove_file(struct video_device *vfd,
-			 struct class_device_attribute *attr)
-{
-	class_device_remove_file(&vfd->class_dev, attr);
-}
-#endif
-
-/* helper functions to alloc / release struct video_device, the
-   later can be used for video_device->release() */
-struct video_device *video_device_alloc(void);
-void video_device_release(struct video_device *vfd);
-
-/* helper functions to access driver private data. */
-static inline void *video_get_drvdata(struct video_device *dev)
-{
-	return dev->priv;
-}
-
-static inline void video_set_drvdata(struct video_device *dev, void *data)
-{
-	dev->priv = data;
-}
-
-extern int video_exclusive_open(struct inode *inode, struct file *file);
-extern int video_exclusive_release(struct inode *inode, struct file *file);
-extern int video_usercopy(struct inode *inode, struct file *file,
-			  unsigned int cmd, unsigned long arg,
-			  int (*func)(struct inode *inode, struct file *file,
-				      unsigned int cmd, void *arg));
-#endif /* __KERNEL__ */
-
-#define VID_TYPE_CAPTURE	1	/* Can capture */
-#define VID_TYPE_TUNER		2	/* Can tune */
-#define VID_TYPE_TELETEXT	4	/* Does teletext */
-#define VID_TYPE_OVERLAY	8	/* Overlay onto frame buffer */
-#define VID_TYPE_CHROMAKEY	16	/* Overlay by chromakey */
-#define VID_TYPE_CLIPPING	32	/* Can clip */
-#define VID_TYPE_FRAMERAM	64	/* Uses the frame buffer memory */
-#define VID_TYPE_SCALES		128	/* Scalable */
-#define VID_TYPE_MONOCHROME	256	/* Monochrome only */
-#define VID_TYPE_SUBCAPTURE	512	/* Can capture subareas of the image */
-#define VID_TYPE_MPEG_DECODER	1024	/* Can decode MPEG streams */
-#define VID_TYPE_MPEG_ENCODER	2048	/* Can encode MPEG streams */
-#define VID_TYPE_MJPEG_DECODER	4096	/* Can decode MJPEG streams */
-#define VID_TYPE_MJPEG_ENCODER	8192	/* Can encode MJPEG streams */
+#include "videodev2_myth.h"
 
 struct video_capability
 {
@@ -310,20 +172,15 @@ struct video_key
 	__u32	flags;
 };
 
-
-#define VIDEO_MAX_FRAME		32
-
 struct video_mbuf
 {
 	int	size;		/* Total memory to map */
 	int	frames;		/* Frames */
 	int	offsets[VIDEO_MAX_FRAME];
 };
-	
 
 #define 	VIDEO_NO_UNIT	(-1)
 
-	
 struct video_unit
 {
 	int 	video;		/* Video minor */
@@ -428,7 +285,7 @@ struct video_code
 	/* p1: = VIDEO_MODE_PAL, VIDEO_MODE_NTSC, etc ... */
 #define VID_PLAY_GENLOCK		1
 	/* p1: 0 = OFF, 1 = ON */
-	/* p2: GENLOCK FINE DELAY value */ 
+	/* p2: GENLOCK FINE DELAY value */
 #define VID_PLAY_NORMAL			2
 #define VID_PLAY_PAUSE			3
 #define VID_PLAY_SINGLE_FRAME		4
@@ -476,16 +333,19 @@ struct video_code
 #define VID_HARDWARE_CPIA	24
 #define VID_HARDWARE_ZR36120	25	/* Zoran ZR36120/ZR36125 */
 #define VID_HARDWARE_ZR36067	26	/* Zoran ZR36067/36060 */
-#define VID_HARDWARE_OV511	27	
+#define VID_HARDWARE_OV511	27
 #define VID_HARDWARE_ZR356700	28	/* Zoran 36700 series */
 #define VID_HARDWARE_W9966	29
 #define VID_HARDWARE_SE401	30	/* SE401 USB webcams */
 #define VID_HARDWARE_PWC	31	/* Philips webcams */
 #define VID_HARDWARE_MEYE	32	/* Sony Vaio MotionEye cameras */
 #define VID_HARDWARE_CPIA2	33
-#define VID_HARDWARE_VICAM	34	/* ViCam, 3Com Homeconnect */
+#define VID_HARDWARE_VICAM	34
 #define VID_HARDWARE_SF16FMR2	35
 #define VID_HARDWARE_W9968CF	36
+#define VID_HARDWARE_SAA7114H   37
+#define VID_HARDWARE_SN9C102    38
+#define VID_HARDWARE_ARV        39
 #endif /* __LINUX_VIDEODEV_H */
 
 /*
