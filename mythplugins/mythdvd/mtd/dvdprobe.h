@@ -10,9 +10,18 @@
 #ifndef DVDPROBE_H_
 #define DVDPROBE_H_
 
+#ifndef __STDC_LIMIT_MACROS
+#define __STDC_LIMIT_MACROS
+#endif
+
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif
+
 // C headers
 extern "C" { /* needed for inttypes.h by glibc 2.3.5 */
 #include <dvdread/ifo_types.h>
+#include <dvdread/ifo_read.h>
 }
 
 // Qt headers

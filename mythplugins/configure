@@ -618,7 +618,6 @@ if test "$dvd" = "yes" ; then
         echo "HEADERS += dvdripbox.h   dvdinfo.h   titledialog.h"   >> ./mythdvd/mythdvd/config.pro
         echo "SOURCES += dvdripbox.cpp dvdinfo.cpp titledialog.cpp" >> ./mythdvd/mythdvd/config.pro
         echo "LIBS    += -ldvdread"                                  >> ./mythdvd/mythdvd/config.pro
-        echo "DEFINES += __STDC_LIMIT_MACROS" >> ./mythdvd/mythdvd/config.pro 
 
         #
         #   Conditional build and link stuff for mtd
@@ -627,7 +626,6 @@ if test "$dvd" = "yes" ; then
         echo "HEADERS += logging.h   mtd.h   serversocket.h   jobthread.h   dvdprobe.h   fileobs.h   threadevents.h "   >> ./mythdvd/mtd/config.pro
         echo "SOURCES += logging.cpp mtd.cpp serversocket.cpp jobthread.cpp dvdprobe.cpp fileobs.cpp threadevents.cpp " >> ./mythdvd/mtd/config.pro
         echo "LIBS    += -ldvdread"                                          >> ./mythdvd/mtd/config.pro
-        echo "DEFINES += __STDC_LIMIT_MACROS" >> ./mythdvd/mythdvd/config.pro 
 
         #
         #   Need to make the xml menus reflect this choice
