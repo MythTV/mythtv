@@ -159,7 +159,7 @@ void JobQueue::ProcessQueue(void)
     int flags;
     int status;
     QString hostname;
-    int sleepTime = gContext->GetNumSetting("JobQueueCheckFrequency", 30);
+    int sleepTime;
 
     QMap<QString, int> jobStatus;
     int maxJobs;
@@ -178,6 +178,8 @@ void JobQueue::ProcessQueue(void)
 
     while (queuePoll)
     {
+        startedJobAlready = false;
+        sleepTime = gContext->GetNumSetting("JobQueueCheckFrequency", 30);
         queueStartTimeStr =
             gContext->GetSetting("JobQueueWindowStart", "00:00");
         queueEndTimeStr =
@@ -195,8 +197,6 @@ void JobQueue::ProcessQueue(void)
         
         if (jobs.size())
         {
-            startedJobAlready = false;
-
             tmpStr = queueStartTimeStr;
             queueStartTime = tmpStr.replace(QRegExp(":"), "").toInt();
             tmpStr = queueEndTimeStr;
@@ -469,7 +469,10 @@ void JobQueue::ProcessQueue(void)
             //VERBOSE(VB_JOBQUEUE, "JobQueue: No Jobs found to process.");
         }
 
-        sleep(sleepTime);
+        if (startedJobAlready)
+            sleep(5);
+        else
+            sleep(sleepTime);
     }
 }
 

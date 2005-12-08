@@ -380,7 +380,7 @@ static GlobalLineEdit *startupCommand()
 
 static HostSpinBox *JobQueueMaxSimultaneousJobs()
 {
-    HostSpinBox *gc = new HostSpinBox("JobQueueMaxSimultaneousJobs", 1, 5, 1);
+    HostSpinBox *gc = new HostSpinBox("JobQueueMaxSimultaneousJobs", 1, 10, 1);
     gc->setLabel(QObject::tr("Maximum simultaneous jobs on this backend"));
     gc->setHelpText(QObject::tr("The Job Queue will be limited to running "
                     "this many simultaneous jobs on this backend."));
@@ -390,7 +390,7 @@ static HostSpinBox *JobQueueMaxSimultaneousJobs()
 
 static HostSpinBox *JobQueueCheckFrequency()
 {
-    HostSpinBox *gc = new HostSpinBox("JobQueueCheckFrequency", 10, 300, 5);
+    HostSpinBox *gc = new HostSpinBox("JobQueueCheckFrequency", 5, 300, 5);
     gc->setLabel(QObject::tr("Job Queue Check frequency (in seconds)"));
     gc->setHelpText(QObject::tr("When looking for new jobs to process, the "
                     "Job Queue will wait this long between checks."));
