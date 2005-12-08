@@ -105,9 +105,9 @@ void avfDecoder::flush(bool final)
                 memmove(output_buf, output_buf + sz, output_bytes);
                 output_at = output_bytes;
             } else {
-                mutex()->unlock();
+                unlock();
                 usleep(500);
-                mutex()->lock();
+                lock();
                 done = user_stop;
             }
         }
@@ -227,17 +227,17 @@ void avfDecoder::run()
     int mem_len;
     char *s;
 
-    mutex()->lock();
+    lock();
 
     if (!inited) 
     {
-        mutex()->unlock();
+        unlock();
         return;
     }
 
     stat = DecoderEvent::Decoding;
 
-    mutex()->unlock();
+    unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);
@@ -247,7 +247,7 @@ void avfDecoder::run()
     av_read_play(ic);
     while (!done && !finish && !user_stop) 
     {
-        mutex()->lock();
+        lock();
 
         // Look to see if user has requested a seek
         if (seekTime >= 0.0) 
@@ -267,7 +267,7 @@ void avfDecoder::run()
         if (av_read_frame(ic, pkt) < 0)
         {
             cerr << "avfdecoder.o: read frame failed" << endl;
-            mutex()->unlock();
+            unlock();
             finish = TRUE;
             break;
         }
@@ -275,11 +275,11 @@ void avfDecoder::run()
         // Get the pointer to the data and its length
         ptr = pkt->data;
         len = pkt->size;
-        mutex()->unlock();
+        unlock();
 
         while (len > 0 && !done && !finish && !user_stop && seekTime <= 0.0)  
         {
-            mutex()->lock();
+            lock();
             // Decode the stream to the output codec
             // Samples is the output buffer
             // data_size is the size in bytes of the frame
@@ -289,17 +289,17 @@ void avfDecoder::run()
                                            ptr, len);    
             if (dec_len < 0) 
             {
-                mutex()->unlock();
+                unlock();
                 break;
             }
 
             s = (char *)samples;
-            mutex()->unlock();
+            unlock();
 
             while (data_size > 0 && !done && !finish && !user_stop && 
                    seekTime <= 0.0) 
              {
-                mutex()->lock();
+                lock();
                 // Store and check the size
                 // It is possible the returned data is larger than
                 // the output buffer.  If so, flush the buffer and
@@ -326,14 +326,14 @@ void avfDecoder::run()
                 if (output())
                     flush();
 
-                mutex()->unlock();
+                unlock();
             }
 
-            mutex()->lock();
+            lock();
             flush();
             ptr += dec_len;
             len -= dec_len;
-            mutex()->unlock();
+            unlock();
         }
         av_free_packet(pkt);
     }
@@ -347,7 +347,7 @@ void avfDecoder::run()
     else if (user_stop)
         stat = DecoderEvent::Stopped;
 
-    // mutex()->unlock();
+    // unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);

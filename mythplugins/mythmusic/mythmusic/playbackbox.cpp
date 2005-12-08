@@ -932,7 +932,7 @@ void PlaybackBoxMusic::checkForPlaylists()
             mainvisual->setVisual(visual_mode);
             
             if (curMeta) 
-                setTrackOnLCD(curMeta);
+                updateTrackInfo(curMeta);
         }    
         else
             constructPlaylistTree();
@@ -1018,7 +1018,7 @@ void PlaybackBoxMusic::showVolume(bool on_or_off)
                     volume_status->refresh();
 
                     if (curMeta)
-                        setTrackOnLCD (curMeta);
+                        setTrackOnLCD(curMeta);
                 }
             }
         }
@@ -1048,24 +1048,8 @@ void PlaybackBoxMusic::play()
     QUrl sourceurl(playfile);
     QString sourcename(playfile);
 
-    bool startoutput = false;
-
     if (!output)
-    {
-        QString adevice = gContext->GetSetting("AudioDevice");
-
-        // TODO: Error checking that device is opened correctly!
-        output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
-                                     AUDIOOUTPUT_MUSIC, true ); 
-        output->setBufferSize(outputBufferSize * 1024);
-        output->SetBlocking(false);
-        output->addListener(this);
-        output->addListener(mainvisual);
-        output->addVisual(mainvisual);
-    
-        startoutput = true;
-
-    }
+        openOutputDevice();
    
     if (output->GetPause())
     {
@@ -1218,9 +1202,9 @@ void PlaybackBoxMusic::pause(void)
     // wake up threads
     if (decoder) 
     {
-        decoder->mutex()->lock();
+        decoder->lock();
         decoder->cond()->wakeAll();
-        decoder->mutex()->unlock();
+        decoder->unlock();
     }
 
 }
@@ -1229,16 +1213,16 @@ void PlaybackBoxMusic::stopDecoder(void)
 {
     if (decoder && decoder->running()) 
     {
-        decoder->mutex()->lock();
+        decoder->lock();
         decoder->stop();
-        decoder->mutex()->unlock();
+        decoder->unlock();
     }
 
     if (decoder) 
     {
-        decoder->mutex()->lock();
+        decoder->lock();
         decoder->cond()->wakeAll();
-        decoder->mutex()->unlock();
+        decoder->unlock();
     }
 
     if (decoder)
@@ -1247,23 +1231,7 @@ void PlaybackBoxMusic::stopDecoder(void)
 
 void PlaybackBoxMusic::stop(void)
 {
-    if (decoder && decoder->running()) 
-    {
-        decoder->mutex()->lock();
-        decoder->stop();
-        decoder->mutex()->unlock();
-    }
-
-    // wake up threads
-    if (decoder) 
-    {
-        decoder->mutex()->lock();
-        decoder->cond()->wakeAll();
-        decoder->mutex()->unlock();
-    }
-
-    if (decoder)
-        decoder->wait();
+    stopDecoder();
 
     if (output)
     {
@@ -1388,7 +1356,7 @@ void PlaybackBoxMusic::seek(int pos)
 
         if (decoder && decoder->running()) 
         {
-            decoder->mutex()->lock();
+            decoder->lock();
             decoder->seek(pos);
 
             if (mainvisual) 
@@ -1398,7 +1366,7 @@ void PlaybackBoxMusic::seek(int pos)
                 mainvisual->mutex()->unlock();
             }
 
-            decoder->mutex()->unlock();
+            decoder->unlock();
         }
     }
 }
@@ -1629,7 +1597,7 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
     {
         case OutputEvent::Playing:
         {
-            setTrackOnLCD(curMeta);
+            updateTrackInfo(curMeta);
             statusString = tr("Playing stream.");
             break;
         }
@@ -1663,19 +1631,29 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
             int maxm = (maxTime / 60) % 60;
             int maxs = maxTime % 60;
             
-            if (maxh > 0)
-                time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em, 
-                                    es, maxh, maxm, maxs);
+            if (maxTime <= 0) 
+            {
+                if (eh > 0) 
+                    time_string.sprintf("%d:%02d:%02d", eh, em, es);
+                else 
+                    time_string.sprintf("%02d:%02d", em, es);                   
+            } 
             else
-                time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
-                                    maxs);
+            {
+                if (maxh > 0)
+                    time_string.sprintf("%d:%02d:%02d / %02d:%02d:%02d", eh, em,
+                                        es, maxh, maxm, maxs);
+                else
+                    time_string.sprintf("%02d:%02d / %02d:%02d", em, es, maxm, 
+                                        maxs);
+            }
             
             if (curMeta)
             {
                 if (class LCD *lcd = LCD::Get())
                 {
-                    float percent_heard = ((float)rs / 
-                                           (float)curMeta->Length()) * 1000.0;
+                    float percent_heard = maxTime<=0?0.0:((float)rs / 
+                                                          (float)curMeta->Length()) * 1000.0;
                     lcd->setMusicProgress(time_string, percent_heard);
                 }
             }
@@ -1775,6 +1753,32 @@ void PlaybackBoxMusic::wipeTrackInfo()
             ratings_image->setRepeat(0);
         if (current_visualization_text)
             current_visualization_text->SetText("");
+}
+
+void PlaybackBoxMusic::updateTrackInfo(Metadata *mdata)
+{
+    if (title_text)
+        title_text->SetText(mdata->FormatTitle());
+    if (artist_text)
+        artist_text->SetText(mdata->FormatArtist());
+    if (album_text)
+        album_text->SetText(mdata->Album());
+    
+    setTrackOnLCD(mdata);
+}
+
+void PlaybackBoxMusic::openOutputDevice(void)
+{
+    QString adevice = gContext->GetSetting("AudioDevice");
+    
+    // TODO: Error checking that device is opened correctly!
+    output = AudioOutput::OpenAudio(adevice, 16, 2, 44100, 
+                                    AUDIOOUTPUT_MUSIC, true ); 
+    output->setBufferSize(outputBufferSize * 1024);
+    output->SetBlocking(false);
+    output->addListener(this);
+    output->addListener(mainvisual);
+    output->addVisual(mainvisual);    
 }
 
 void PlaybackBoxMusic::handleTreeListSignals(int node_int, IntVector *attributes)

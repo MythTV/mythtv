@@ -45,16 +45,16 @@ Decoder::~Decoder()
 
 void Decoder::setInput(QIODevice *i)
 {
-    mutex()->lock();
+    lock();
     in = i;
-    mutex()->unlock();
+    unlock();
 }
 
 void Decoder::setOutput(AudioOutput *o)
 {
-    mutex()->lock();
+    lock();
     out = o;
-    mutex()->unlock();
+    unlock();
 }
 
 void Decoder::error(const QString &e) 

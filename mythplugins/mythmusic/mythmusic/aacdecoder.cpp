@@ -125,9 +125,9 @@ void aacDecoder::flush(bool final)
 		memmove(output_buf, output_buf + sz, output_bytes);
 		output_at = output_bytes;
 	      } else {
-		mutex()->unlock();
+		unlock();
 		usleep(500);
-		mutex()->lock();
+		lock();
 		done = user_stop;
 	      }
 	    
@@ -440,12 +440,12 @@ void aacDecoder::deinit()
 void aacDecoder::run()
 {
 
-    mutex()->lock();
+    lock();
 
     if (!inited) 
     {
       error("aacDecoder: run() called without being init'd");
-        mutex()->unlock();
+        unlock();
         return;
     }
 
@@ -453,7 +453,7 @@ void aacDecoder::run()
 
     stat = DecoderEvent::Decoding;
 
-    mutex()->unlock();
+    unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);
@@ -470,7 +470,7 @@ void aacDecoder::run()
 
     while (!done && !finish && !user_stop) 
     {
-        mutex()->lock();
+        lock();
 
         ++current_sample;
         if (seekTime >= 0.0) 
@@ -587,12 +587,12 @@ void aacDecoder::run()
                 }
             }
         }
-        mutex()->unlock();
+        unlock();
     }
 
     flush(TRUE);
 
-    mutex()->lock();
+    lock();
 
     //cerr << "aacDecoder: completed decoding of " << filename << endl;
     if (finish)
@@ -604,7 +604,7 @@ void aacDecoder::run()
         stat = DecoderEvent::Stopped;
     }
 
-    mutex()->unlock();
+    unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);

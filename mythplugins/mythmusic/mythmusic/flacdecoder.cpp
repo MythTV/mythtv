@@ -213,9 +213,9 @@ void FlacDecoder::flush(bool final)
                 memmove(output_buf, output_buf + sz, output_bytes);
                 output_at = output_bytes;
             } else {
-                mutex()->unlock();
+                unlock();
                 usleep(500);
-                mutex()->lock();
+                lock();
                 done = user_stop;
             }
         }
@@ -245,7 +245,7 @@ bool FlacDecoder::initialize()
 
     if (! input()->isOpen()) {
         if (! input()->open(IO_ReadOnly)) {
-            error("FlacOgg: Failed to open input. Error " +
+            error("FlacDecoder: Failed to open input. Error " +
                   QString::number(input()->status()) + ".");
             return FALSE;
         }
@@ -301,17 +301,17 @@ void FlacDecoder::deinit()
 
 void FlacDecoder::run()
 {
-    mutex()->lock();
+    lock();
 
     if (! inited) {
-        mutex()->unlock();
+        unlock();
 
         return;
     }
 
     stat = DecoderEvent::Decoding;
 
-    mutex()->unlock();
+    unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);
@@ -322,7 +322,7 @@ void FlacDecoder::run()
     FLAC__SeekableStreamDecoderState decoderstate;
 
     while (! done && ! finish) {
-        mutex()->lock();
+        lock();
         // decode
 
         if (seekTime >= 0.0) {
@@ -355,17 +355,17 @@ void FlacDecoder::run()
             }
         }
 
-        mutex()->unlock();
+        unlock();
     }
 
-    mutex()->lock();
+    lock();
 
     if (finish)
         stat = DecoderEvent::Finished;
     else if (user_stop)
         stat = DecoderEvent::Stopped;
 
-    mutex()->unlock();
+    unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);

@@ -66,7 +66,11 @@ class Decoder : public QThread, public MythObservable
     void setOutput(AudioOutput *);
     void setFilename(const QString &newName) { filename = newName; }
 
-    QMutex *mutex() { return &mtx; }
+	virtual void lock(void) { return mtx.lock(); }
+	virtual void unlock(void) { return mtx.unlock(); }
+	virtual bool tryLock(void) { return mtx.tryLock(); }
+	virtual bool locked(void) { return mtx.locked(); }
+
     QWaitCondition *cond() { return &cnd; }
 
     void setBlockSize(unsigned int sz) { blksize = sz; }
@@ -88,7 +92,7 @@ class Decoder : public QThread, public MythObservable
 
   protected:
     Decoder(DecoderFactory *, QIODevice *, AudioOutput *);
-
+	QMutex* getMutex(void) { return &mtx; }
     void error(const QString &);
 
     QString filename;

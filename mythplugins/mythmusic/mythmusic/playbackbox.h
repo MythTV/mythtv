@@ -104,7 +104,9 @@ class PlaybackBoxMusic : public MythThemedDialog
     void doUpdatePlaylist(QString whereClause);
     void CycleVisualizer(void);
     void updatePlaylistFromCD(void);
-    void setTrackOnLCD (Metadata *mdata);
+    void setTrackOnLCD(Metadata *mdata);
+    void updateTrackInfo(Metadata *mdata);
+    void openOutputDevice(void);
     void postUpdate();
     void playFirstTrack();
 

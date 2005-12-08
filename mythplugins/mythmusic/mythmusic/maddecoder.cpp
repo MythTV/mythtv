@@ -305,9 +305,9 @@ void MadDecoder::flush(bool final)
                 memmove(output_buf, output_buf + sz, output_bytes);
                 output_at = output_bytes;
             } else {
-                mutex()->unlock();
+                unlock();
                 usleep(500);
-                mutex()->lock();
+                lock();
                 done = user_stop;
             }
         }
@@ -316,16 +316,16 @@ void MadDecoder::flush(bool final)
 
 void MadDecoder::run()
 {
-    mutex()->lock();
+    lock();
 
     if (! inited) {
-        mutex()->unlock();
+        unlock();
         return;
     }
 
     stat = DecoderEvent::Decoding;
 
-    mutex()->unlock();
+    unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);
@@ -333,7 +333,7 @@ void MadDecoder::run()
     }
 
     while (! done && ! finish && ! derror) {
-        mutex()->lock();
+        lock();
 
         if (seekTime >= 0.0) {
             long seek_pos = long(seekTime * input()->size() / totalTime);
@@ -361,6 +361,7 @@ void MadDecoder::run()
                     eof = true;
                 } else if (len < 0) {
                     derror = true;
+                    unlock();
                     break;
                 }
 
@@ -373,7 +374,7 @@ void MadDecoder::run()
 
         seekTime = -1.;
 
-        mutex()->unlock();
+        unlock();
 
         while (! done && ! finish && ! derror) {
             if (mad_frame_decode(&frame, &stream) == -1) {
@@ -387,20 +388,20 @@ void MadDecoder::run()
                 continue;
             }
 
-            mutex()->lock();
+            lock();
 
             if (seekTime >= 0.) {
-                mutex()->unlock();
+                unlock();
                 break;
             }
 
             mad_synth_frame(&synth, &frame);
             madOutput();
-            mutex()->unlock();
+            unlock();
         }
     }
 
-    mutex()->lock();
+    lock();
 
     if (! user_stop && eof) {
         flush(TRUE);
@@ -419,7 +420,7 @@ void MadDecoder::run()
     else if (user_stop)
         stat = DecoderEvent::Stopped;
 
-    mutex()->unlock();
+    unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);

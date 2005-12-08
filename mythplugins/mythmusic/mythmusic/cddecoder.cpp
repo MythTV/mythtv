@@ -77,9 +77,9 @@ void CdDecoder::flush(bool final)
                 memmove(output_buf, output_buf + sz, output_bytes);
                 output_at = output_bytes;
             } else {
-                mutex()->unlock();
+                unlock();
                 usleep(500);
-                mutex()->lock();
+                lock();
                 done = user_stop;
             }
         }
@@ -174,17 +174,17 @@ static void paranoia_cb(long inpos, int function)
 
 void CdDecoder::run()
 {
-    mutex()->lock();
+    lock();
 
     if (! inited) {
-        mutex()->unlock();
+        unlock();
 
         return;
     }
 
     stat = DecoderEvent::Decoding;
 
-    mutex()->unlock();
+    unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);
@@ -194,7 +194,7 @@ void CdDecoder::run()
     int16_t *cdbuffer;
 
     while (! done && ! finish) {
-        mutex()->lock();
+        lock();
         // decode
 
         if (seekTime >= 0.0) {
@@ -231,17 +231,17 @@ void CdDecoder::run()
             }
         } 
 
-        mutex()->unlock();
+        unlock();
     }
 
-    mutex()->lock();
+    lock();
 
     if (finish)
         stat = DecoderEvent::Finished;
     else if (user_stop)
         stat = DecoderEvent::Stopped;
 
-    mutex()->unlock();
+    unlock();
 
     {
         DecoderEvent e((DecoderEvent::Type) stat);

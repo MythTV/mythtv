@@ -21,7 +21,7 @@ StreamInput::StreamInput(const QUrl &source)
 void StreamInput::setup()
 {
     if (! url.isValid())
-	return;
+        return;
 
     QString protocol = url.protocol();
     QString host = url.host();
@@ -29,10 +29,10 @@ void StreamInput::setup()
     int port = url.port();
 
     if (protocol != "mqp" || host.isNull())
-	return;
+        return;
 
     if (port == -1)
-	port = 42666;
+        port = 42666;
 
     request = ".song " + path.utf8() + "\r\n";
 
@@ -45,10 +45,11 @@ void StreamInput::setup()
 
     sock->connectToHost(host, port);
 
-    while (stage != -1 && stage < 4) {
-	qDebug("processing one event: stage %d %d %ld",
-	       stage, sock->canReadLine(), sock->bytesAvailable());
-	qApp->processOneEvent();
+    while (stage != -1 && stage < 4) 
+    {
+        qDebug("processing one event: stage %d %d %ld",
+               stage, sock->canReadLine(), sock->bytesAvailable());
+        qApp->processOneEvent();
     }
 
     qDebug("disconnecting from socket");
@@ -57,10 +58,11 @@ void StreamInput::setup()
     disconnect(sock, SIGNAL(connected()), this, SLOT(connected()));
     disconnect(sock, SIGNAL(readyRead()), this, SLOT(readyread()));
 
-    if (stage == -1) {
-	// some sort of error
-	delete sock;
-	sock = 0;
+    if (stage == -1) 
+    {
+        // some sort of error
+        delete sock;
+        sock = 0;
     }
 }
 
@@ -85,32 +87,38 @@ void StreamInput::connected()
 
 void StreamInput::readyread()
 {
-    if (stage == 2) {
-    qDebug("readyread... checking response");
+    if (stage == 2) 
+    {
+        qDebug("readyread... checking response");
+        
+        if (! sock->canReadLine()) 
+        {
+            stage = -1;
+            qDebug("can't read line");
+            return;
+        }
+        
+        QString line = sock->readLine();
+        if (line.isEmpty()) 
+        {
+            stage = -1;
+            qDebug("line is empty");
+            return;
+        }
 
-    if (! sock->canReadLine()) {
-	stage = -1;
-	qDebug("can't read line");
-	return;
-    }
-
-    QString line = sock->readLine();
-    if (line.isEmpty()) {
-	stage = -1;
-	qDebug("line is empty");
-	return;
-    }
-
-    if (line.left(5) != "*GOOD") {
-	VERBOSE(VB_IMPORTANT, QString("server error response: %1")
-                                      .arg(line));
-	stage = -1;
-	return;
-    }
-
-    stage = 3;
-    } else if (sock->bytesAvailable() > 65536 || sock->atEnd()) {
-	stage = 4;
+        if (line.left(5) != "*GOOD") 
+        {
+            VERBOSE(VB_IMPORTANT, QString("server error response: %1")
+                    .arg(line));
+            stage = -1;
+            return;
+        }
+        
+        stage = 3;
+    } 
+    else if (sock->bytesAvailable() > 65536 || sock->atEnd()) 
+    {
+        stage = 4;
     }
 }
 
