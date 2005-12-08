@@ -1156,7 +1156,7 @@ void TVRec::RunTV(void)
 
         if (GetState() == kState_WatchingLiveTV && curRecording)
         {
-            if (QDateTime::currentDateTime() >= curRecording->recstartts.addSecs(10)) // change to curRecording->recstartts.addSecs(60) for testing
+            if (QDateTime::currentDateTime() >= curRecording->endts) // change to curRecording->recstartts.addSecs(60) for testing
                 SwitchLiveTVRingBuffer();
         }
 
