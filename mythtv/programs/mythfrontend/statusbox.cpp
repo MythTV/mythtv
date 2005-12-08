@@ -1149,7 +1149,6 @@ void StatusBox::doMachineStatus()
         // uptime
         if (!RemoteGetUptime(uptime))
             uptime = 0;
-cerr << "uptime is " << uptime << endl;
         contentLines[count] = uptimeStr(uptime);
 
         // weighted average loads
