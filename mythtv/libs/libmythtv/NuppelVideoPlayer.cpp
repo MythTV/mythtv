@@ -987,7 +987,10 @@ void NuppelVideoPlayer::EmbedInWidget(WId wid, int x, int y, int w, int h)
 void NuppelVideoPlayer::StopEmbedding(void)
 {
     if (videoOutput)
+    {
         videoOutput->StopEmbedding();
+        ReinitOSD();
+    }
 }
 
 void NuppelVideoPlayer::ToggleCC(char mode, int arg)

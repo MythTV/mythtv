@@ -2663,7 +2663,10 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
         vbuffers.SetOSDFrame(frame, NULL);
     }
 
-    XvMCOSD* xvmc_osd = GetAvailableOSD();
+    XvMCOSD* xvmc_osd = NULL;
+    if (!embedding)
+        xvmc_osd = GetAvailableOSD();
+
     if (osd && xvmc_osd->IsValid())
     {
         VideoFrame *osdframe = NULL;
@@ -2807,7 +2810,7 @@ void VideoOutputXv::ProcessFrameMem(VideoFrame *frame, OSD *osd,
 
     ShowPip(frame, pipPlayer);
 
-    if (osd)
+    if (osd && !embedding)
     {
         DisplayOSD(frame, osd);
     }

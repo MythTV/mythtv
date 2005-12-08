@@ -439,6 +439,8 @@ void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
 {
     (void)wid;
 
+    embedding = true;
+
     olddispx = dispx;
     olddispy = dispy;
     olddispw = dispw;
@@ -448,8 +450,6 @@ void VideoOutput::EmbedInWidget(WId wid, int x, int y, int w, int h)
     dispyoff = dispy = y;
     dispwoff = dispw = w;
     disphoff = disph = h;
-
-    embedding = true;
 
     MoveResize();
 }
@@ -466,9 +466,9 @@ void VideoOutput::StopEmbedding(void)
     dispw = olddispw;
     disph = olddisph;
 
-    embedding = false;
-
     MoveResize();
+
+    embedding = false;
 }
 
 /**
@@ -510,8 +510,9 @@ void VideoOutput::GetOSDBounds(QRect &total, QRect &visible,
 }
 
 static float sq(float a) { return a*a; }
-static float lerp(float r, float a, float b)
-    { return ((1.0f - r) * a) + (r * b); }
+//static float lerp(float r, float a, float b)
+//    { return ((1.0f - r) * a) + (r * b); }
+
 /**
  * \fn VideoOutput::GetVisibleOSDBounds(float&) const
  * \brief Returns visible portions of total OSD bounds
@@ -543,6 +544,11 @@ QRect VideoOutput::GetVisibleOSDBounds(
         br -= s*1.5f;
     }
     QRect vb(tl, br);
+
+    // The calculation is completely bogus if the video is not centered
+    // which happens in the EPG, where we don't actually care about the OSD.
+    // So we just make sure the width and height are positive numbers
+    vb = QRect(vb.x(), vb.y(), abs(vb.width()), abs(vb.height()));
 
     // set the physical aspect ratio of the displayable area
     float dispPixelAdj = (GetDisplayAspect() * disph) / dispw;
