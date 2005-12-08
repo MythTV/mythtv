@@ -4782,3 +4782,13 @@ void NuppelVideoPlayer::SetDecoder(DecoderBase *dec)
     }
 }
 
+void NuppelVideoPlayer::ChangeDVDTrack(bool ffw)
+{
+    if (!ringBuffer->isDVD())
+       return;
+
+    GetDecoder()->ChangeDVDTrack(ffw);
+    usleep(100000);
+    ClearAfterSeek();
+}
+

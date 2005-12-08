@@ -1112,10 +1112,11 @@ void RingBuffer::getDescForPos(QString &desc)
 /** \fn RingBuffer::nextTrack(void)
  *  \brief Calls DVDRingBufferPriv::nextTrack(void)
  */
-void RingBuffer::nextTrack(void)
+bool RingBuffer::nextTrack(void)
 {
-   if (dvdPriv)
-       dvdPriv->nextTrack();
+    if (dvdPriv)
+        return dvdPriv->nextTrack();
+    return false;
 }
 
 /** \fn RingBuffer::prevTrack(void)
@@ -1123,7 +1124,37 @@ void RingBuffer::nextTrack(void)
  */
 void RingBuffer::prevTrack(void)
 {
-   if (dvdPriv)
-       dvdPriv->prevTrack();
+    if (dvdPriv)
+        dvdPriv->prevTrack();
+}
+
+/** \fn RingBuffer::GetTotalTimeOfTitle(void)
+ *  \brief Calls DVDRingBufferPriv::GetTotalTimeOfTitle(void)
+ */
+uint RingBuffer::GetTotalTimeOfTitle(void)
+{
+    if (dvdPriv)
+        return dvdPriv->GetTotalTimeOfTitle();
+    return 0;
+}
+
+/** \fn RingBuffer::GetCellStart(void)
+ *  \brief Calls DVDRingBufferPriv::GetCellStart(void)
+ */
+uint RingBuffer::GetCellStart(void)
+{
+    if (dvdPriv)
+        return dvdPriv->GetCellStart();
+    return 0;
+}
+
+/** \fn RingBuffer::GetTotalReadPosition(void)
+ *  \brief Calls DVDRingBufferPriv::GetTotalReadPosition(void)
+ */
+long long RingBuffer::GetTotalReadPosition(void)
+{
+    if (dvdPriv)
+        return dvdPriv->GetTotalReadPosition();
+    return 0;
 }
 

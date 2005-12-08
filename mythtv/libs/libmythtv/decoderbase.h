@@ -85,8 +85,17 @@ class DecoderBase
     void SetWaitForChange(void);
     void SetReadAdjust(long long adjust);
 
+    // DVD public stuff
+    void ChangeDVDTrack(bool ffw);
+    long long DVDFindPosition(long long desiredFrame);
+
   protected:
     void FileChanged(void);
+
+    bool DoRewindDVD(long long desiredFrame);
+    bool DoRewindNormal(long long desiredFrame);
+    void DoFastForwardDVD(long long desiredFrame);
+    void DoFastForwardNormal(long long desiredFrame, bool &needflush);
 
     typedef struct posmapentry
     {

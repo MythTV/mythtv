@@ -326,20 +326,35 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
     return tot;
 }
 
-void DVDRingBufferPriv::nextTrack(void)
+bool DVDRingBufferPriv::nextTrack(void)
 {
     int newPart = part + 1;
     if (newPart < maxPart)
+    {
         dvdnav_part_play(dvdnav, title, newPart);
+        return true;
+    }
+    return false;
 }
 
 void DVDRingBufferPriv::prevTrack(void)
 {
     int newPart = part - 1;
-    if (newPart < 0)
-        newPart = 0;
 
-    dvdnav_part_play(dvdnav, title, newPart);
+    if (newPart > 0)
+        dvdnav_part_play(dvdnav, title, newPart);
+    else
+        Seek(0,SEEK_SET); // May cause picture to become jumpy.
+}
+
+uint DVDRingBufferPriv::GetTotalTimeOfTitle(void)
+{
+    return pgcLength / 90000; // 90000 ticks = 1 second
+}
+
+uint DVDRingBufferPriv::GetCellStart(void)
+{
+    return cellStart / 90000;
 }
 
 #endif // HAVE_DVDNAV

@@ -2043,7 +2043,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             if (prbuffer->isDVD())
             {
-                prbuffer->prevTrack();
+                nvp->ChangeDVDTrack(0);
                 UpdateOSDSeekMessage(tr("Previous Chapter"),
                                      osd_general_timeout);
             }
@@ -2056,7 +2056,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
         {
             if (prbuffer->isDVD())
             {
-                prbuffer->nextTrack();
+                nvp->ChangeDVDTrack(1);
                 UpdateOSDSeekMessage(tr("Next Chapter"), osd_general_timeout);
             }
             else
@@ -2336,7 +2336,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 if (prbuffer->isDVD())
                 {
-                    prbuffer->prevTrack();
+                    nvp->ChangeDVDTrack(0);
                     UpdateOSDSeekMessage(tr("Previous Chapter"),
                                          osd_general_timeout);
                 }
@@ -2349,7 +2349,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             {
                 if (prbuffer->isDVD())
                 {
-                    prbuffer->nextTrack();
+                    nvp->ChangeDVDTrack(1);
                     UpdateOSDSeekMessage(tr("Next Chapter"),
                                          osd_general_timeout);
                 }

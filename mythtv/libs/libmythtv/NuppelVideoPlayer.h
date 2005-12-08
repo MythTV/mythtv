@@ -251,6 +251,9 @@ class NuppelVideoPlayer
     void CheckTVChain();
     void FileChangedCallback();
 
+    // DVD public stuff
+    void ChangeDVDTrack(bool ffw);
+
   protected:
     void DisplayPauseFrame(void);
     void DisplayNormalFrame(void);

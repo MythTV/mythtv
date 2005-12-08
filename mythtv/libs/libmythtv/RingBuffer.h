@@ -77,8 +77,11 @@ class RingBuffer
     bool isDVD(void) const { return dvdPriv; }
     void getPartAndTitle(int &title, int &part);
     void getDescForPos(QString &desc);
-    void nextTrack(void);
+    bool nextTrack(void);
     void prevTrack(void);
+    uint GetTotalTimeOfTitle(void);
+    uint GetCellStart(void);
+    long long GetTotalReadPosition(void);
 
     long long SetAdjustFilesize(void);
     

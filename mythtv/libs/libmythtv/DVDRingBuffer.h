@@ -2,7 +2,7 @@
 #ifndef DVD_RING_BUFFER_H_
 #define DVD_RING_BUFFER_H_
 
-#define DVD_BLOCK_SIZE 2048
+#define DVD_BLOCK_SIZE 2048LL
 #define DVD_MENU_MAX 7
 
 #include <qstring.h>
@@ -58,11 +58,13 @@ class DVDRingBufferPriv
     void GetDescForPos(QString &desc) const;
     void GetPartAndTitle(int &_part, int &_title) const
         { _part  = part; _title = _title; }
+    uint GetTotalTimeOfTitle(void);
+    uint GetCellStart(void);
 
     // commands
     bool OpenFile(const QString &filename);
     void close(void);
-    void nextTrack(void);
+    bool nextTrack(void);
     void prevTrack(void);
     int  safe_read(void *data, unsigned sz);
     long long Seek(long long pos, int whence);
