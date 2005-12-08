@@ -610,6 +610,21 @@ void Scheduler::PruneOverlaps(void)
         {
             int lpri = RecTypePriority(lastp->rectype);
             int cpri = RecTypePriority(p->rectype);
+
+            // In cases where two recording rules match the same
+            // showing, one of them needs to take precedence.
+            //
+            // An rsRepeat or rsInactive will not be considered for
+            // recording so we penalize these to force them to yield
+            // to a rule that may record. Otherwise, more specific
+            // record type beats less specific.
+            if (lastp->recstatus == rsInactive || 
+                lastp->recstatus == rsRepeat)
+                lpri += 100;
+            if (p->recstatus == rsInactive || 
+                p->recstatus == rsRepeat)
+                cpri += 100;
+
             if (lpri > cpri)
                 *lastp = *p;
             delete p;
