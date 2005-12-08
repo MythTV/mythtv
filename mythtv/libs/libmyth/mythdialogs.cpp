@@ -2094,6 +2094,7 @@ bool MythThemedDialog::assignFirstFocus()
             widget_with_current_focus->takeFocus();
             return true;
         }
+        ++an_it;
     }
 
     return false;

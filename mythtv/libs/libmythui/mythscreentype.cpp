@@ -56,6 +56,7 @@ bool MythScreenType::SetFocusWidget(MythUIType *widget)
                 widget = current;
                 break;
             }
+            ++it;
         }
     }
 
