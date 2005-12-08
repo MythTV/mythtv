@@ -91,7 +91,7 @@
    <button>
       <type>TV_PREVIOUS</type>
       <text>Previously Recorded</text>
-      <text lang="SV">Föregående</text>
+      <text lang="SV">Tidigare inspelningar</text>
       <text lang="JA">以前の録画</text>
       <text lang="DE">Alte Aufnahmen</text>
       <text lang="IS">Fyrri upptökur</text>
@@ -104,6 +104,7 @@
       <text lang="NB">Tatt opp tidligere</text>
       <text lang="NB">Tidligere optagelser</text>
       <text lang="ES">Grabados Anteriormente</text>
+      <alttext lang="SV">Tidigare</alttext>
       <action>TV_PREVIOUS</action>
    </button>
 
