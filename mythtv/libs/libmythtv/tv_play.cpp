@@ -2240,7 +2240,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 if (HasQueuedInput())
                     DoArbSeek(ARBSEEK_SET);
                 else
-                    ToggleOSD(false);
+                    ToggleOSD(true);
             }
             else if (action == "CHANNELUP")
             {
