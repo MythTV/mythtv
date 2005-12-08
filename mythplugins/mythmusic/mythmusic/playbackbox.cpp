@@ -212,6 +212,13 @@ PlaybackBoxMusic::~PlaybackBoxMusic(void)
 {
     stopAll();
 
+    if (progress)
+    {
+        progress->Close();
+        delete progress;
+        progress = NULL;
+    }
+
     if (cd_reader_thread)
     {
         cd_watcher->stop();
