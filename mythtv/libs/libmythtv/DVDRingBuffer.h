@@ -28,16 +28,18 @@ class DVDRingBufferPriv
 {
   public:
     DVDRingBufferPriv()                       {               }
-    bool OpenFile(const QString& filename)    { return false; }
+    bool OpenFile(const QString& )            { return false; }
     bool IsOpen()                       const { return false; }
-    long long Seek(long long pos, int whence) { return  0;    }
-    int safe_read(void *data, unsigned sz)    { return -1;    }
+    long long Seek(long long, int)            { return  0;    }
+    int safe_read(void *, unsigned)           { return -1;    }
     long long GetReadPosition()         const { return  0;    }
     long long GetTotalReadPosition()    const { return  0;    }
-    void GetPartAndTitle(int &title, int &part) const { title = 0; part = 0; }
-    void nextTrack()                          {               }
+    void GetPartAndTitle(int &, int &)  const {               }
+    bool nextTrack()                          {               }
     void prevTrack()                          {               }
-    void GetDescForPos(QString& desc)         {               }
+    void GetDescForPos(QString&)              {               }
+    uint GetTotalTimeOfTitle(void)            {               }
+    uint GetCellStart(void)                   {               }
 };
 
 #else // if HAVE_DVDNAV
