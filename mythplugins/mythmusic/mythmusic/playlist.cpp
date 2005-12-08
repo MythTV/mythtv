@@ -1048,7 +1048,7 @@ void PlaylistsContainer::writeTree(GenericTree *tree_to_write_to)
     while( ( a_list = iterator.current() ) != 0)
     {
         ++a_counter;
-        GenericTree *new_node = sub_node->addNode(a_list->getName(), 0);
+        GenericTree *new_node = sub_node->addNode(a_list->getName(), a_list->getID());
         new_node->setAttribute(0, 0);
         new_node->setAttribute(1, a_counter);
         new_node->setAttribute(2, rand());
