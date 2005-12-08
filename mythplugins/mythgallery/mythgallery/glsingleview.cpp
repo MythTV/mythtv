@@ -142,6 +142,7 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     m_running       = false;
     m_texInfo       = 0;
     m_showInfo      = false;
+    m_sequence      = 0;
 
     // ---------------------------------------------------------------
 
@@ -149,8 +150,14 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
     connect(m_timer, SIGNAL(timeout()),
             SLOT(slotTimeOut()));
 
-    if (slideShow > 1)
-        randomFrame();
+    if (slideShow > 1) 
+    {
+        m_sequence = new SequenceShuffle(m_itemList.count());
+        m_pos = 0;
+    }
+    else
+        m_sequence = new SequenceInc(m_itemList.count());
+    m_pos = m_sequence->index(m_pos);
 
     if (slideShow) {
         m_running = true;
@@ -161,7 +168,9 @@ GLSingleView::GLSingleView(ThumbList itemList, int pos, int slideShow,
 
 GLSingleView::~GLSingleView()
 {
-    
+    if( m_sequence ) {
+        delete m_sequence;
+    }    
 }
 
 void GLSingleView::cleanUp()
@@ -392,7 +401,24 @@ void GLSingleView::keyPressEvent(QKeyEvent *e)
             m_sy = 0;
             rotate(-90);
         }
-        else if (action == "PLAY")
+        else if (action == "DELETE")
+        {
+            ThumbItem *item = m_itemList.at(m_pos);
+            if (item) {
+                if( item->Remove() ) {
+                    m_zoom = 1.0;
+                    m_sx   = 0;
+                    m_sy   = 0;
+        	    // Delete thumbnail for this
+                    if (item->pixmap)
+                        delete item->pixmap;
+                    item->pixmap = 0;
+                    advanceFrame();
+                    loadImage();
+                }
+            }
+        }
+        else if (action == "PLAY" || action == "SLIDESHOW" || action == "RANDOMSHOW")
         {
             m_sx   = 0;
             m_sy   = 0;
@@ -487,20 +513,21 @@ void GLSingleView::paintTexture()
 
 void GLSingleView::advanceFrame()
 {
-    m_pos++;
-    if (m_pos >= (int)m_itemList.count())
-        m_pos = 0;
-
-    m_tex1First = !m_tex1First;
-    m_curr      = (m_curr == 0) ? 1 : 0;
-}
-
-void GLSingleView::randomFrame()
-{
-    int newframe;
-    if(m_itemList.count() > 1){
-        while((newframe = (int)(rand()/(RAND_MAX+1.0) * m_itemList.count())) ==m_pos);
-        m_pos = newframe;
+    // Search for next item that hasn't been deleted.  Close viewer in none remain.
+    ThumbItem *item;
+    int oldpos = m_pos;
+    while( 1 ) {
+        m_pos = m_sequence->next();
+        item = m_itemList.at(m_pos);
+        if( item ) {
+            if( QFile::exists(item->path) ) {
+                break;
+            }
+	}
+        if( m_pos == oldpos ) {
+            // No valid items!!!
+            close();
+        }
     }
 
     m_tex1First = !m_tex1First;
@@ -509,9 +536,22 @@ void GLSingleView::randomFrame()
 
 void GLSingleView::retreatFrame()
 {
-    m_pos--;
-    if (m_pos < 0)
-        m_pos = m_itemList.count() - 1;
+    // Search for next item that hasn't been deleted.  Close viewer in none remain.
+    ThumbItem *item;
+    int oldpos = m_pos;
+    while( 1 ) {
+        m_pos = m_sequence->prev();
+        item = m_itemList.at(m_pos);
+        if( item ) {
+            if( QFile::exists(item->path) ) {
+                break;
+            }
+	}
+        if( m_pos == oldpos ) {
+            // No valid items!!!
+            close();
+        }
+    };
 
     m_tex1First = !m_tex1First;
     m_curr = (m_curr == 0) ? 1 : 0;
@@ -612,6 +652,7 @@ void GLSingleView::rotate(int angle)
     t.cx = (float)sz.width()/(float)screenwidth;
     t.cy = (float)sz.height()/(float)screenheight;
 }
+
 void GLSingleView::registerEffects()
 {
     m_effectMap.insert("none", &GLSingleView::effectNone);
@@ -1398,6 +1439,7 @@ void GLSingleView::effectCube()
 
 void GLSingleView::slotTimeOut()
 {
+    bool wasMovie = false, isMovie = false;
     if (!m_effectMethod) {
         std::cerr << "GLSlideShow: No transition method"
                   << std::endl;
@@ -1422,14 +1464,11 @@ void GLSingleView::slotTimeOut()
             if (m_effectRandom)
                 m_effectMethod = getRandomEffect();
 
-            if (m_slideShow > 1)
-                randomFrame();
-            else
-                advanceFrame();
+            advanceFrame();
 
-            bool wasMovie = m_movieState > 0;
+            wasMovie = m_movieState > 0;
             loadImage();
-            bool isMovie = m_movieState > 0;
+            isMovie = m_movieState > 0;
             // If transitioning to/from a movie, don't do an effect,
             // and shorten timeout
             if (wasMovie || isMovie)
@@ -1447,6 +1486,11 @@ void GLSingleView::slotTimeOut()
 
     updateGL();
     m_timer->start(m_tmout, true);
+    // If transitioning to/from a movie, no effect is running so 
+    // next timeout should trigger proper immage delay.
+    if( wasMovie || isMovie ) {
+        m_tmout = -1;
+    }
 }
 
 void GLSingleView::createTexInfo()

@@ -114,6 +114,7 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
     m_i = 0;
     m_effectPix = 0;
     m_painter = 0;
+    m_sequence = 0;
     mIntArray = 0;
 
     m_timer = new QTimer(this);
@@ -122,7 +123,13 @@ SingleView::SingleView(ThumbList itemList, int pos, int slideShow,
     // --------------------------------------------------------------------
 
     if(slideShow > 1)
-        randomFrame();
+    {
+        m_sequence = new SequenceShuffle(m_itemList.count());
+        m_pos = 0;
+    }
+    else
+        m_sequence = new SequenceInc(m_itemList.count());
+    m_pos = m_sequence->index(m_pos);
     loadImage();
     if (slideShow) {
         m_running = true;
@@ -138,6 +145,9 @@ SingleView::~SingleView()
             m_painter->end();
         delete m_painter;
     }
+
+    if (m_sequence)
+        delete m_sequence;
 
     if (m_pixmap)
         delete m_pixmap;
@@ -392,7 +402,24 @@ void SingleView::keyPressEvent(QKeyEvent *e)
             m_sy = 0;
             rotate(-90);
         }
-        else if (action == "PLAY")
+        else if (action == "DELETE")
+        {
+            ThumbItem *item = m_itemList.at(m_pos);
+            if (item) {
+                if( item->Remove() ) {
+                    m_zoom = 1.0;
+                    m_sx   = 0;
+                    m_sy   = 0;
+                    // Delete thumbnail for this
+                    if (item->pixmap)
+                        delete item->pixmap;
+                    item->pixmap = 0;
+                    advanceFrame();
+                    loadImage();
+                }
+            }
+        }
+        else if (action == "PLAY" || action == "SLIDESHOW" || action == "RANDOMSHOW")
         {
             m_sx   = 0;
             m_sy   = 0;
@@ -423,25 +450,42 @@ void SingleView::keyPressEvent(QKeyEvent *e)
 
 void SingleView::advanceFrame()
 {
-    m_pos++;
-    if (m_pos >= (int)m_itemList.count())
-        m_pos = 0;
-}
-
-void SingleView::randomFrame()
-{
-    int newframe;
-    if(m_itemList.count() > 1){
-        while((newframe = (int)(rand()/(RAND_MAX+1.0) * m_itemList.count())) == m_pos);
-        m_pos = newframe;
+    // Search for next item that hasn't been deleted.  Close viewer in none remain.
+    ThumbItem *item;
+    int oldpos = m_pos;
+    while( 1 ) {
+        m_pos = m_sequence->next();
+        item = m_itemList.at(m_pos);
+        if( item ) {
+            if( QFile::exists(item->path) ) {
+                break;
+            }
+        }
+        if( m_pos == oldpos ) {
+            // No valid items!!!
+            reject();
+        }
     }
 }
 
 void SingleView::retreatFrame()
 {
-    m_pos--;
-    if (m_pos < 0)
-        m_pos = m_itemList.count()-1;
+    // Search for next item that hasn't been deleted.  Close viewer in none remain.
+    ThumbItem *item;
+    int oldpos = m_pos;
+    while( 1 ) {
+        m_pos = m_sequence->prev();
+        item = m_itemList.at(m_pos);
+        if( item ) { 
+            if( QFile::exists(item->path) ) {
+                break;
+            }
+        }
+        if( m_pos == oldpos ) {
+            // No valid items!!!
+            reject();
+        }
+    }
 }
 
 void SingleView::loadImage()
@@ -1167,6 +1211,7 @@ void SingleView::effectNoise()
 
 void SingleView::slotTimeOut()
 {
+    bool wasMovie = false, isMovie = false;
     if (!m_effectMethod) {
         std::cerr << "SingleView: No transition method"
                   << std::endl;
@@ -1189,14 +1234,11 @@ void SingleView::slotTimeOut()
             if (m_effectRandom)
                 m_effectMethod = getRandomEffect();
 
-             if (m_slideShow > 1)
-                 randomFrame();
-             else
-                 advanceFrame();
+            advanceFrame();
 
-            bool wasMovie = m_movieState > 0;
+            wasMovie = m_movieState > 0;
             loadImage();
-            bool isMovie = m_movieState > 0;
+            isMovie = m_movieState > 0;
             // If transitioning to/from a movie, don't do an effect,
             // and shorten timeout
             if (wasMovie || isMovie)
@@ -1214,4 +1256,9 @@ void SingleView::slotTimeOut()
 
     update();
     m_timer->start(m_tmout, true);
+    // If transitioning to/from a movie, no effect is running so 
+    // next timeout should trigger proper immage delay.
+    if( wasMovie || isMovie ) {
+        m_tmout = -1;
+    }
 }

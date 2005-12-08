@@ -26,6 +26,7 @@
 #include <qmap.h>
 
 #include "iconview.h"
+#include "sequence.h"
 
 class QImage;
 class QTimer;
@@ -110,11 +111,11 @@ private:
     EffectMethod                m_effectMethod;
     QMap<QString,EffectMethod>  m_effectMap;
     bool                        m_effectRandom;
+    SequenceBase               *m_sequence;
 
 private:
     
     void  advanceFrame();
-    void  randomFrame();
     void  retreatFrame();
     void  loadImage();
     void  paintTexture();

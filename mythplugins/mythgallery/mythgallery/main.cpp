@@ -47,6 +47,8 @@ void setupKeys(void)
             "Home");
     REG_KEY("Gallery", "END", "Go to the last image in thumbnail view", "End");
     REG_KEY("Gallery", "MENU", "Toggle activating menu in thumbnail view", "M");
+    REG_KEY("Gallery", "SLIDESHOW", "Start Slideshow in thumbnail view", "S");
+    REG_KEY("Gallery", "RANDOMSHOW", "Start Random Slideshow in thumbnail view", "R");
 
     REG_KEY("Gallery", "ROTRIGHT", "Rotate image right 90 degrees", "],3");
     REG_KEY("Gallery", "ROTLEFT", "Rotate image left 90 degrees", "[,1");
@@ -63,6 +65,7 @@ void setupKeys(void)
     REG_KEY("Gallery", "LOWRIGHT", "Go to the lower-right corner of the image",
             "PgDown");
     REG_KEY("Gallery", "INFO", "Toggle Showing Information about Image", "I");
+    REG_KEY("Gallery", "DELETE", "Delete current image", "D");
 }
 
 int mythplugin_init(const char *libversion)

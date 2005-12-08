@@ -72,6 +72,18 @@ void ThumbItem::SetRotationAngle(int angle)
     query.exec();
 }
 
+bool ThumbItem::Remove(void)
+{
+    if( QFile::exists(path) && QFile::remove(path) ) {
+	    MSqlQuery query(MSqlQuery::InitCon());
+	    query.prepare("DELETE FROM gallerymetadata WHERE image = :PATH ;");
+	    query.bindValue(":PATH", path.utf8());
+	    query.exec();
+        return true;
+    }
+    return false;
+}
+
 IconView::IconView(const QString& galleryDir, MythMainWindow* parent, 
                    const char* name )
     : MythDialog(parent, name)
@@ -95,6 +107,7 @@ IconView::IconView(const QString& galleryDir, MythMainWindow* parent,
     m_topRow  = 0;
     m_isGallery  = false;
 
+    srand(time(NULL));
     loadDirectory(galleryDir);
 }
 
@@ -322,9 +335,24 @@ void IconView::keyPressEvent(QKeyEvent *e)
             m_topRow  = QMAX(m_currRow-(m_nRows-1),0);
             handled = true;
         }
-        else if (action == "SELECT" || action == "PLAY")
+        else if (action == "ROTRIGHT") 
         {
-            if (m_inMenu) {
+            actionRotateCW();
+            handled = true;
+        }
+        else if (action == "ROTLEFT") 
+        {
+            actionRotateCCW();
+            handled = true;
+        }
+        else if (action == "DELETE")
+        {
+            actionDelete();
+            handled = true;
+        }
+        else if (action == "SELECT" || action == "PLAY" || action == "SLIDESHOW" || action == "RANDOMSHOW" )
+        {
+            if (m_inMenu && (action == "SELECT" || action == "PLAY") ) {
                 pressMenu();
                 menuHandled = true;
             }
@@ -337,7 +365,7 @@ void IconView::keyPressEvent(QKeyEvent *e)
                 }
         
                 QFileInfo fi(item->path);
-                if (item->isDir) {
+                if (item->isDir && (action == "SELECT" || action == "PLAY") ) {
                     loadDirectory(item->path);
                     handled = true;
                 }
@@ -345,7 +373,12 @@ void IconView::keyPressEvent(QKeyEvent *e)
           
                     handled = true;
                     
-                    int slideShow = (action == "PLAY")?1:0;
+                    int slideShow = 0;
+                    if( action == "PLAY" || action == "SLIDESHOW" ) {
+                        slideShow = 1;
+                    } else if( action == "RANDOMSHOW" ) {
+                        slideShow = 2;
+                    }
 #ifdef OPENGL_SUPPORT
                     int useOpenGL = gContext->GetNumSetting("SlideshowUseOpenGL");
                     if (useOpenGL) {
@@ -512,6 +545,8 @@ void IconView::loadTheme()
     item->setData(new Action(&IconView::actionRotateCW));
     item = new UIListBtnTypeItem(m_menuType, tr("Rotate CCW"));
     item->setData(new Action(&IconView::actionRotateCCW));
+    item = new UIListBtnTypeItem(m_menuType, tr("Delete"));
+    item->setData(new Action(&IconView::actionDelete));
     item = new UIListBtnTypeItem(m_menuType, tr("Import"));
     item->setData(new Action(&IconView::actionImport));
     item = new UIListBtnTypeItem(m_menuType, tr("Settings"));
@@ -580,7 +615,7 @@ void IconView::loadTheme()
     }
 }
 
-void IconView::loadDirectory(const QString& dir)
+void IconView::loadDirectory(const QString& dir, bool topleft)
 {
     QDir d(dir);
     if (!d.exists())
@@ -590,15 +625,27 @@ void IconView::loadDirectory(const QString& dir)
     m_itemList.clear();
     m_itemDict.clear();
 
-    m_currRow = 0;
-    m_currCol = 0;
+    if( topleft ) {
+        m_currRow = 0;
+        m_currCol = 0;
+        m_topRow  = 0;
+    }
     m_lastRow = 0;
     m_lastCol = 0;
-    m_topRow  = 0;
 
     m_isGallery = GalleryUtil::loadDirectory(m_itemList, dir, false, &m_itemDict, m_thumbGen);;
     m_lastRow = QMAX((int)ceilf((float)m_itemList.count()/(float)m_nCols)-1,0);
     m_lastCol = QMAX(m_itemList.count()-m_lastRow*m_nCols-1,0);
+
+    if( !topleft ) {
+        if( (unsigned int)(m_currRow * m_nCols + m_currCol) > (m_itemList.count()-1) ) {
+            m_currRow = (m_itemList.count()-1) / m_nCols;
+            m_currCol = (m_itemList.count()-1) % m_nCols;
+            if( m_topRow > m_currRow ) {
+                m_topRow = m_currRow;
+            }
+        }
+    }
 }
 
 void IconView::loadThumbnail(ThumbItem *item)
@@ -770,6 +817,18 @@ void IconView::actionRotateCCW()
     if (item->pixmap) {
         delete item->pixmap;
         item->pixmap = 0;
+    }
+}
+
+void IconView::actionDelete()
+{
+    ThumbItem* item = m_itemList.at(m_currRow * m_nCols +
+                                    m_currCol);
+    if (!item || item->isDir)
+        return;
+
+    if( item->Remove() ) {
+        loadDirectory(m_currDir, false);
     }
 }
 

@@ -116,6 +116,11 @@ void ThumbGenerator::run()
                 // cached thumbnail not there or out of date
                 QImage image;
 
+                if (cacheInfo.exists()) {
+                    // Remove the old one if it exists
+                    QFile::remove(cachePath);
+                }
+
                 if (fileInfo.isDir()) 
                     loadDir(image, fileInfo);
                 else

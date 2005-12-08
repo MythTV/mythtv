@@ -50,6 +50,7 @@ public:
 
     int GetRotationAngle();
     void SetRotationAngle(int angle);
+    bool Remove();
 
     QPixmap *pixmap;
     QString  name;
@@ -79,7 +80,7 @@ protected:
 private:
 
     void loadTheme();
-    void loadDirectory(const QString& dir);
+    void loadDirectory(const QString& dir, bool topleft = true);
 
     void updateMenu();
     void updateText();
@@ -92,6 +93,7 @@ private:
 
     void actionRotateCW();
     void actionRotateCCW();
+    void actionDelete();
     void actionSlideShow();
     void actionRandomShow();
     void actionSettings();
