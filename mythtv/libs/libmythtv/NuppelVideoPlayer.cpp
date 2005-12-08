@@ -1011,7 +1011,7 @@ void NuppelVideoPlayer::ToggleCC(char mode, int arg)
         {
             if (arg)
                 vbipagenr = arg;
-            msg = QObject::tr("TXT on");
+            msg = QObject::tr("TXT") + QString(" %1").arg(vbipagenr,3,16);
         }
         else if (mode == 2)
         {
