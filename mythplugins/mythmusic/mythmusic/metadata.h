@@ -19,7 +19,7 @@ class Metadata
              QString lalbum = "", QString ltitle = "", QString lgenre = "",
              int lyear = 0, int ltracknum = 0, int llength = 0, int lid = 0,
              int lrating = 0, int lplaycount = 0, QString llastplay = "",
-             bool lcompilation = false)
+             bool lcompilation = false, QString lformat="")
             {
                 filename = lfilename;
                 artist = lartist;
@@ -39,6 +39,7 @@ class Metadata
                 compilation = lcompilation;
                 changed = false;
                 show = true;
+                format = lformat;
             }
 
     Metadata(const Metadata &other) 
@@ -61,6 +62,7 @@ class Metadata
                 compilation = other.compilation;
                 show = other.show;
                 changed = false;
+                format = other.format;
             }
 
     Metadata& operator=(Metadata *rhs);
@@ -101,6 +103,9 @@ class Metadata
     QString Filename() const { return filename; }
     void setFilename(QString &lfilename) { filename = lfilename; }
     
+    QString Format() const { return format; }
+    void setFormat(const QString &lformat) { format = lformat; }
+    
     int Rating() { return rating; }
     void decRating();
     void incRating();
@@ -131,6 +136,7 @@ class Metadata
     void fillDataFromID();
     void persist();
     bool hasChanged(){return changed;}
+    int compare (Metadata *other);
     static void setArtistAndTrackFormats();
 
     static void SetStartdir(const QString &dir);
@@ -146,6 +152,7 @@ class Metadata
     QString formattedartist;
     QString formattedtitle;
     QString genre;
+    QString format;
     int year;
     int tracknum;
     int length;

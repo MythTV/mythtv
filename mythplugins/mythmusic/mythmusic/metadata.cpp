@@ -119,6 +119,24 @@ void Metadata::persist()
         MythContext::DBError("music persist", query);
 }
 
+int Metadata::compare(Metadata *other) 
+{
+    if (format == "cast") 
+    {
+        int artist_cmp = qstrcmp (Artist(), other->Artist());
+        int title_cmp = qstrcmp (Title(), other->Title());
+        
+        if (artist_cmp == 0) 
+            return title_cmp;
+        
+        return artist_cmp;
+    } 
+    else 
+    {
+        return (Track() - other->Track());
+    }
+}
+
 bool Metadata::isInDatabase(QString startdir)
 {
     bool retval = false;
@@ -128,7 +146,7 @@ bool Metadata::isInDatabase(QString startdir)
 
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT artist,compilation_artist,album,title,genre,year,tracknum,"
-                  "length,intid,rating,playcount,lastplay,compilation FROM "
+                  "length,intid,rating,playcount,lastplay,compilation,format FROM "
                   "musicmetadata WHERE filename = :FILENAME ;");
     query.bindValue(":FILENAME", sqlfilename.utf8());
 
@@ -149,6 +167,7 @@ bool Metadata::isInDatabase(QString startdir)
         playcount = query.value(10).toInt();
         lastplay = query.value(11).toString();
         compilation = (query.value(12).toInt() > 0);
+        format = query.value(13).toString();
         
         retval = true;
     }
@@ -181,7 +200,8 @@ void Metadata::dumpToDatabase(QString startdir)
                   "( album = :ALBUM ) AND ( title = :TITLE ) "
                   "AND ( genre = :GENRE ) AND "
                   "( year = :YEAR ) AND ( tracknum = :TRACKNUM ) "
-                  "AND ( length = :LENGTH ) );");
+                  "AND ( length = :LENGTH ) "
+                  "AND ( format = :FORMAT) );");
     query.bindValue(":ARTIST", artist.utf8());
     query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
     query.bindValue(":ALBUM", album.utf8());
@@ -190,6 +210,7 @@ void Metadata::dumpToDatabase(QString startdir)
     query.bindValue(":YEAR", year);
     query.bindValue(":TRACKNUM", tracknum);
     query.bindValue(":LENGTH", length);
+    query.bindValue(":FORMAT", format);
 
     if (query.exec() && query.isActive() && query.size() > 0)
         return;
@@ -197,11 +218,13 @@ void Metadata::dumpToDatabase(QString startdir)
     query.prepare("INSERT INTO musicmetadata "
                   "(artist,   compilation_artist, album,      title,  "
                   " genre,    year,               tracknum,   length, "
-                  " filename, compilation,        date_added, date_modified) "
+                  " filename, compilation,        date_added, date_modified, "
+                  " format ) "
                   "VALUES "
                   "(:ARTIST,  :COMPILATION_ARTIST,:ALBUM,     :TITLE,   "
                   " :GENRE,   :YEAR,              :TRACKNUM,  :LENGTH,  "
-                  " :FILENAME,:COMPILATION,       :DATE_ADDED,:DATE_MOD)");
+                  " :FILENAME,:COMPILATION,       :DATE_ADDED,:DATE_MOD,"
+                  " :FORMAT)");
     query.bindValue(":ARTIST", artist.utf8());
     query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
     query.bindValue(":ALBUM", album.utf8());
@@ -214,6 +237,7 @@ void Metadata::dumpToDatabase(QString startdir)
     query.bindValue(":COMPILATION", compilation);
     query.bindValue(":DATE_ADDED",  QDateTime::currentDateTime());
     query.bindValue(":DATE_MOD",    QDateTime::currentDateTime());
+    query.bindValue(":FORMAT", format);
     
     query.exec();
 
@@ -376,7 +400,8 @@ void Metadata::updateDatabase(QString startdir)
                   "    rating   = :RATING,   " 
                   "    date_modified      = :DATE_MODIFIED, "
                   "    compilation        = :COMPILATION,   "
-                  "    compilation_artist = :COMPILATION_ARTIST "
+                  "    compilation_artist = :COMPILATION_ARTIST, "
+                  "    format             = :FORMAT "
                   "WHERE intid = :ID;");
     query.bindValue(":ARTIST",             artist.utf8());
     query.bindValue(":ALBUM",              album.utf8());
@@ -388,6 +413,7 @@ void Metadata::updateDatabase(QString startdir)
     query.bindValue(":DATE_MODIFIED",      QDateTime::currentDateTime());
     query.bindValue(":COMPILATION",        compilation);
     query.bindValue(":COMPILATION_ARTIST", compilation_artist.utf8());
+    query.bindValue(":FORMAT", format);
     query.bindValue(":ID", id);
 
     if (!query.exec())
@@ -538,7 +564,7 @@ void Metadata::fillData()
         return;
 
     QString thequery = "SELECT artist,compilation_artist,album,title,genre,year,tracknum,length,"
-                       "filename,intid,rating,playcount,lastplay,compilation "
+                       "filename,intid,rating,playcount,lastplay,compilation,format "
                        "FROM musicmetadata WHERE title = :TITLE";
 
     if (album != "")
@@ -575,6 +601,7 @@ void Metadata::fillData()
         playcount = query.value(11).toInt();
         lastplay = query.value(12).toString();
         compilation = (query.value(13).toInt() > 0);
+        format = query.value(14).toString();
 
         if (!filename.contains("://"))
             filename = m_startdir + filename;
@@ -588,7 +615,7 @@ void Metadata::fillDataFromID()
         
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare("SELECT title,artist,compilation_artist,album,title,genre,year,tracknum,"
-                  "length,filename,rating,playcount,lastplay,compilation FROM "
+                  "length,filename,rating,playcount,lastplay,compilation,format FROM "
                   "musicmetadata WHERE intid = :ID ;");
     query.bindValue(":ID", id);
         
@@ -610,6 +637,7 @@ void Metadata::fillDataFromID()
         playcount = query.value(11).toInt();
         lastplay = query.value(12).toString();
         compilation = (query.value(13).toInt() > 0);
+        format = query.value(14).toString();
 
         if (!filename.contains("://"))
             filename = m_startdir + filename;
@@ -758,7 +786,8 @@ void AllMusic::resync()
     done_loading = false;
     QString aquery =    "SELECT intid, artist, compilation_artist, album, title, genre, "
                         "year, tracknum, length, filename, rating, "
-                        "lastplay, playcount, compilation FROM musicmetadata "
+                        "lastplay, playcount, compilation, format "
+                        "FROM musicmetadata "
                         "ORDER BY intid;";
 
     QString filename;
@@ -797,8 +826,9 @@ void AllMusic::resync()
                 query.value(10).toInt(),
                 query.value(12).toInt(),
                 query.value(11).toString(),
-                (query.value(13).toInt() > 0));
-
+                (query.value(13).toInt() > 0),
+                query.value(14).toString());
+            
             //  Don't delete temp, as PtrList now owns it
             all_music.append(temp);
 
@@ -1503,7 +1533,7 @@ void MusicNode::printYourself(int indent_level)
 int MetadataPtrList::compareItems(QPtrCollection::Item item1, 
                                   QPtrCollection::Item item2)
 {
-    return ((Metadata*)item1)->Track() - ((Metadata*)item2)->Track();
+    return ((Metadata*)item1)->compare((Metadata*)item2);
 }
 
 int MusicNodePtrList::compareItems (QPtrCollection::Item item1, 
