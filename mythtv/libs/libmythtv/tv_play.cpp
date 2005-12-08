@@ -4758,8 +4758,9 @@ void TV::BuildOSDTreeMenu(void)
                                          "TOGGLEPIPWINDOW");
         }
 
-        item = new OSDGenericTree(treeMenu, tr("Enable Browse Mode"),
-                                  "TOGGLEBROWSE");
+        if (!persistentbrowsemode)
+            item = new OSDGenericTree(treeMenu, tr("Enable Browse Mode"),
+                                      "TOGGLEBROWSE");
 
         item = new OSDGenericTree(treeMenu, tr("Previous Channel"),
                                   "PREVCHAN");
