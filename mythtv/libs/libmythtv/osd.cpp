@@ -2152,7 +2152,11 @@ OSDSurface *OSD::Display(void)
             if (timedisp)
             {
                 QString thetime = QTime::currentTime().toString(timeFormat);
-                timedisp->SetText(thetime);
+                if (timedisp->GetText() != thetime)
+                {
+                    timedisp->SetText(thetime);
+                    changed = true;
+                }
             }
 
             if (container->Fading())
