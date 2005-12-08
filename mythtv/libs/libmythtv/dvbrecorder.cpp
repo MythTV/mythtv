@@ -436,159 +436,6 @@ bool DVBRecorder::SetDemuxFilters(void)
     return true;
 }
 
-/*
- *  Process PMT and decide which components should be recorded
- */
-void DVBRecorder::AutoPID(void)
-{
-    QMutexLocker change_lock(&_pid_lock);
-    _videoPID.clear();
-
-    VERBOSE(VB_RECORD, LOC +
-            QString("AutoPID for MPEG Program Number(%1), PCR PID(0x%2)")
-            .arg(_input_pmt.ServiceID).arg(((uint)_input_pmt.PCRPID),0,16));
-
-    // Wanted stream types:
-    QValueList<ES_Type> StreamTypes;
-    StreamTypes += ES_TYPE_VIDEO_MPEG1;
-    StreamTypes += ES_TYPE_VIDEO_MPEG2;
-    StreamTypes += ES_TYPE_AUDIO_MPEG1;
-    StreamTypes += ES_TYPE_AUDIO_MPEG2;
-    StreamTypes += ES_TYPE_AUDIO_AC3;
-    if (_record_transport_stream_option)
-    {
-        // The following types are only supported with TS recording
-        StreamTypes += ES_TYPE_AUDIO_DTS;
-        StreamTypes += ES_TYPE_AUDIO_AAC;
-        StreamTypes += ES_TYPE_TELETEXT;
-        StreamTypes += ES_TYPE_SUBTITLE;
-    }
-
-    QMap<ES_Type, bool> flagged;
-    QValueList<ElementaryPIDObject>::Iterator es;
-
-    if (!_hw_decoder_option)
-    {
-        for (es = _input_pmt.Components.begin();
-             es != _input_pmt.Components.end(); ++es)
-        {
-            (*es).Record = true;
-            flagged[(*es).Type] = true;
-        }
-    }
-    else
-    {
-        // Wanted languages:
-        QStringList Languages = iso639_get_language_list();
-
-        for (es = _input_pmt.Components.begin();
-             es != _input_pmt.Components.end(); ++es)
-        {
-            if (!StreamTypes.contains((*es).Type))
-            {
-                // Type not wanted
-                continue;
-            }
-
-            if (((*es).Type == ES_TYPE_AUDIO_MPEG1) ||
-                ((*es).Type == ES_TYPE_AUDIO_MPEG2) ||
-                ((*es).Type == ES_TYPE_AUDIO_AC3))
-            {
-                bool ignore = false;
-                // Check for audio descriptors
-                DescriptorList::Iterator dit;
-                for (dit = (*es).Descriptors.begin();
-                     dit != (*es).Descriptors.end(); ++dit)
-                {
-                    // Check for "Hearing impaired" or 
-                    // "Visual impaired commentary" stream
-                    if (((*dit).Data[0] == 0x0A) &&
-                        ((*dit).Data[5] & 0xFE == 0x02))
-                    {
-                        ignore = true;
-                        break;
-                    }
-                }
-
-                if (ignore)
-                    continue; // Ignore this stream
-            }
-
-            // Limit hardware decoders to one A/V stream
-            switch ((*es).Type)
-            {
-                case ES_TYPE_VIDEO_MPEG1:
-                case ES_TYPE_VIDEO_MPEG2:
-                    if (flagged.contains(ES_TYPE_VIDEO_MPEG1) ||
-                        flagged.contains(ES_TYPE_VIDEO_MPEG2))
-                    {
-                        continue; // Ignore this stream
-                    }
-                    break;
-
-                case ES_TYPE_AUDIO_MPEG1: 
-                case ES_TYPE_AUDIO_MPEG2:
-                case ES_TYPE_AUDIO_AC3:
-                case ES_TYPE_AUDIO_DTS:
-                case ES_TYPE_AUDIO_AAC:
-                    if (flagged.contains(ES_TYPE_AUDIO_MPEG1) ||
-                        flagged.contains(ES_TYPE_AUDIO_MPEG2) ||
-                        flagged.contains(ES_TYPE_AUDIO_AC3)   ||
-                        flagged.contains(ES_TYPE_AUDIO_DTS)   ||
-                        flagged.contains(ES_TYPE_AUDIO_AAC))
-                    {
-                        continue; // Ignore this stream
-                    }
-                    break;
-
-                default:
-                    break;
-            }
-            if (Languages.isEmpty() || // No specific language wanted
-                (*es).Language.isEmpty() || // Component has no language
-                Languages.contains((*es).Language)) // This language is wanted!
-            {
-                (*es).Record = true;
-                flagged[(*es).Type] = true;
-            }
-        }
-    }
-
-    for (es = _input_pmt.Components.begin();
-         es != _input_pmt.Components.end(); ++es)
-    {
-        if ((*es).Record)
-        {
-            VERBOSE(VB_RECORD, LOC +
-                    QString("AutoPID selecting PID 0x%1, %2")
-                    .arg((*es).PID,0,16).arg((*es).Description));
-
-            switch ((*es).Type)
-            {
-                case ES_TYPE_VIDEO_MPEG1:
-                case ES_TYPE_VIDEO_MPEG2:
-                    _videoPID[(*es).PID] = true;
-                    break;
-
-                default:
-                    // Do nothing
-                    break;
-            }
-        }
-        else
-        {
-            VERBOSE(VB_RECORD, LOC +
-                    QString("AutoPID skipping PID 0x%1, %2")
-                    .arg((*es).PID,0,16).arg((*es).Description));
-        }
-    }
-
-    VERBOSE(VB_RECORD, LOC + "AutoPID Complete - PAT/PMT Loaded for service");
-
-    QString msg = (_input_pmt.FTA()) ? "unencrypted" : "ENCRYPTED";
-    VERBOSE(VB_RECORD, LOC + "A/V Stream is " + msg);
-}
-
 void DVBRecorder::StartRecording(void)
 {
     if (!Open())
@@ -1062,6 +909,187 @@ void DVBRecorder::CreatePMT(void)
     }
 
     SetPMT(pmt);
+}
+
+////////////////////////////////////////////////////////////
+// Stuff below this comment will be phased out after 0.20 //
+////////////////////////////////////////////////////////////
+
+static void print_pmt_info(
+    QString pre, const QValueList<ElementaryPIDObject> &pmt_list,
+    bool fta, uint program_number, uint pcr_pid)
+{
+    if (!(print_verbose_messages|VB_RECORD))
+        return;
+
+    VERBOSE(VB_RECORD, pre +
+            QString("AutoPID for MPEG Program Number(%1), PCR PID(0x%2)")
+            .arg(program_number).arg((pcr_pid),0,16));
+
+    QValueList<ElementaryPIDObject>::const_iterator it;
+    for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
+    {
+        VERBOSE(VB_RECORD, pre +
+                QString("AutoPID %1 PID 0x%2, %3")
+                .arg(((*it).Record) ? "recording" : "skipping")
+                .arg((*it).PID,0,16).arg((*it).Description));
+    }
+
+    VERBOSE(VB_RECORD, pre + "AutoPID Complete - PAT/PMT Loaded for service\n"
+            "\t\t\tA/V Streams are " + ((fta ? "unencrypted" : "ENCRYPTED")));
+}
+
+/// processes pmt program list for things to record
+/// return true if audio is found
+bool select_streams_for_hw_decode(QValueList<ElementaryPIDObject> &pmt_list,
+                                  bool use_ts,
+                                  bool use_language_pref = true)
+{
+    // Wanted stream types:
+    QValueList<ES_Type> StreamTypes;
+    StreamTypes += ES_TYPE_VIDEO_MPEG1;
+    StreamTypes += ES_TYPE_VIDEO_MPEG2;
+    StreamTypes += ES_TYPE_AUDIO_MPEG1;
+    StreamTypes += ES_TYPE_AUDIO_MPEG2;
+    StreamTypes += ES_TYPE_AUDIO_AC3;
+    if (use_ts)
+    {
+        // The following types are only supported with TS recording
+        StreamTypes += ES_TYPE_AUDIO_DTS;
+        StreamTypes += ES_TYPE_AUDIO_AAC;
+        StreamTypes += ES_TYPE_TELETEXT;
+        StreamTypes += ES_TYPE_SUBTITLE;
+    }
+
+    QMap<ES_Type, bool> flagged;
+    // Wanted languages:
+    QStringList preferred_languages;
+    if (use_language_pref)
+        preferred_languages = iso639_get_language_list();
+
+    QValueList<ElementaryPIDObject>::iterator it;
+    for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
+    {
+        (*it).Record = false;
+        if (!StreamTypes.contains((*it).Type))
+        {
+            // Type not wanted
+            continue;
+        }
+
+        if (((*it).Type == ES_TYPE_AUDIO_MPEG1) ||
+            ((*it).Type == ES_TYPE_AUDIO_MPEG2) ||
+            ((*it).Type == ES_TYPE_AUDIO_AC3))
+        {
+            bool ignore = false;
+            // Check for audio descriptors
+            DescriptorList::Iterator dit;
+            for (dit = (*it).Descriptors.begin();
+                 dit != (*it).Descriptors.end(); ++dit)
+            {
+                // Check for "Hearing impaired" or 
+                // "Visual impaired commentary" stream
+                if (((*dit).Data[0] == 0x0A) &&
+                    ((*dit).Data[5] & 0xFE == 0x02))
+                {
+                    ignore = true;
+                    break;
+                }
+            }
+
+            if (ignore)
+                continue; // Ignore this stream
+        }
+
+        // Limit hardware decoders to one A/V stream
+        switch ((*it).Type)
+        {
+            case ES_TYPE_VIDEO_MPEG1:
+            case ES_TYPE_VIDEO_MPEG2:
+                if (flagged.contains(ES_TYPE_VIDEO_MPEG1) ||
+                    flagged.contains(ES_TYPE_VIDEO_MPEG2))
+                {
+                    continue; // Ignore this stream
+                }
+                break;
+
+            case ES_TYPE_AUDIO_MPEG1: 
+            case ES_TYPE_AUDIO_MPEG2:
+            case ES_TYPE_AUDIO_AC3:
+            case ES_TYPE_AUDIO_DTS:
+            case ES_TYPE_AUDIO_AAC:
+                if (flagged.contains(ES_TYPE_AUDIO_MPEG1) ||
+                    flagged.contains(ES_TYPE_AUDIO_MPEG2) ||
+                    flagged.contains(ES_TYPE_AUDIO_AC3)   ||
+                    flagged.contains(ES_TYPE_AUDIO_DTS)   ||
+                    flagged.contains(ES_TYPE_AUDIO_AAC))
+                {
+                    continue; // Ignore this stream
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        // Record if no specific language wanted or component
+        // has no language or this is a desirable language.
+        if (preferred_languages.isEmpty() ||
+            (*it).Language.isEmpty() ||
+            preferred_languages.contains((*it).Language))
+        {
+            (*it).Record = true;
+            flagged[(*it).Type] = true;
+        }
+    }
+
+    return (flagged.contains(ES_TYPE_AUDIO_MPEG1) ||
+            flagged.contains(ES_TYPE_AUDIO_MPEG2) ||
+            flagged.contains(ES_TYPE_AUDIO_AC3)   ||
+            flagged.contains(ES_TYPE_AUDIO_DTS)   ||
+            flagged.contains(ES_TYPE_AUDIO_AAC));
+}
+
+/** \fn DVBRecorder::AutoPID(void)
+ *  \brief Process PMT and decide which components should be recorded
+ *
+ *   This is particularly for hardware decoders which don't
+ *   like to see more than one audio or one video stream.
+ *
+ *   When the hardware decoder is not specified all components
+ *   are recorded.
+ */
+void DVBRecorder::AutoPID(void)
+{
+    QMutexLocker change_lock(&_pid_lock);
+    QValueList<ElementaryPIDObject> &pmt_list = _input_pmt.Components;
+    QValueList<ElementaryPIDObject>::iterator it;
+
+    if (_hw_decoder_option)
+    {
+        bool ts = _record_transport_stream_option;
+        if (!select_streams_for_hw_decode(pmt_list, ts))
+            select_streams_for_hw_decode(pmt_list, ts, false);
+    }
+    else
+    {
+        // if this is not for a hardware decoder, record everything.
+        for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
+            (*it).Record = true;
+    }
+
+    // Set _videoPID values
+    _videoPID.clear();
+    for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
+    {
+        uint t = (*it).Type;
+        bool vid = (ES_TYPE_VIDEO_MPEG1 == t) || (ES_TYPE_VIDEO_MPEG2 == t);
+        _videoPID[(*it).PID] = (*it).Record && vid;
+            
+    }
+
+    print_pmt_info(LOC, pmt_list,
+                   _input_pmt.FTA(), _input_pmt.ServiceID, _input_pmt.PCRPID);
 }
 
 void DVBRecorder::DebugTSHeader(unsigned char* buffer, int len)
