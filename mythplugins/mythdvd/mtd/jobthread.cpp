@@ -15,21 +15,6 @@
 #include <iostream>
 using namespace std;
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
-#ifndef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
-#endif
-
-extern "C" {
-#include <dvdread/dvd_reader.h>
-#include <dvdread/ifo_types.h>
-#include <dvdread/ifo_read.h>
-#include <dvdread/nav_read.h>
-}
-
 #include <qdatetime.h>
 #include <qdir.h>
 #include <qapplication.h>
@@ -42,6 +27,7 @@ extern "C" {
 #include "jobthread.h"
 #include "mtd.h"
 #include "threadevents.h"
+#include "dvdprobe.h"
 
 JobThread::JobThread(MTD *owner, const QString &start_string, int nice_priority)
           :QThread()

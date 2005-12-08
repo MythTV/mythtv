@@ -10,19 +10,28 @@
 #ifndef DVDPROBE_H_
 #define DVDPROBE_H_
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
+#include <inttypes.h>
 
-#ifndef __STDC_CONSTANT_MACROS
-#define __STDC_CONSTANT_MACROS
+#ifndef UINT8_MAX
+#define UINT8_MAX
+#define UINT16_MAX
+#define INT32_MAX
+#define MAXDEFS
 #endif
 
 // C headers
 extern "C" { /* needed for inttypes.h by glibc 2.3.5 */
 #include <dvdread/ifo_types.h>
 #include <dvdread/ifo_read.h>
+#include <dvdread/dvd_reader.h>
+#include <dvdread/nav_read.h>
 }
+
+#ifdef MAXDEFS
+#undef UINT8_MAX
+#undef UINT16_MAX
+#undef INT32_MAX
+#endif
 
 // Qt headers
 #include <qstring.h>

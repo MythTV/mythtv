@@ -38,10 +38,12 @@ bool RipFile::open(int mode, bool multiple_files)
     files.append(new_file);
     active_file = new_file;
     return active_file->open(mode);
+/*
     if(!use_multiple_files)
     {
         filesize = 0;
     }
+*/
 }
 
 void RipFile::close()
