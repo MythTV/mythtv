@@ -13,6 +13,7 @@ class OutputEvent;
 #include <qthread.h>
 #include <qevent.h>
 #include <qptrlist.h>
+#include "mythobservable.h"
 
 class QObject;
 class Buffer;
@@ -21,34 +22,34 @@ namespace MythTV {
 class Visual;
 }
 
-class OutputEvent : public QCustomEvent
+class OutputEvent : public MythEvent
 {
 public:
     enum Type { Playing = (User + 200), Buffering, Info, Paused,
 		Stopped, Error };
 
     OutputEvent(Type t)
-	: QCustomEvent(t), error_msg(0), elasped_seconds(0), written_bytes(0),
+	: MythEvent(t), error_msg(0), elasped_seconds(0), written_bytes(0),
 	  brate(0), freq(0), prec(0), chan(0)
     { ; }
 
     OutputEvent(long s, unsigned long w, int b, int f, int p, int c)
-	: QCustomEvent(Info), error_msg(0), elasped_seconds(s), written_bytes(w),
+	: MythEvent(Info), error_msg(0), elasped_seconds(s), written_bytes(w),
 	  brate(b), freq(f), prec(p), chan(c)
     { ; }
 
     OutputEvent(const QString &e)
-	: QCustomEvent(Error), elasped_seconds(0), written_bytes(0),
+	: MythEvent(Error), elasped_seconds(0), written_bytes(0),
 	  brate(0), freq(0), prec(0), chan(0)
     {
-	error_msg = new QString(e.utf8());
+        error_msg = new QString(e.utf8());
     }
 
 
     ~OutputEvent()
     {
-	if (error_msg)
-	    delete error_msg;
+        if (error_msg)
+            delete error_msg;
     }
 
     const QString *errorMessage() const { return error_msg; }
@@ -60,6 +61,7 @@ public:
     const int &precision() const { return prec; }
     const int &channels() const { return chan; }
 
+    virtual OutputEvent *clone() { return new OutputEvent(*this); };
 
 private:
     QString *error_msg;
@@ -70,14 +72,11 @@ private:
 };
 
 
-class OutputListeners
+class OutputListeners : public MythObservable
 {
 public:
     OutputListeners();
     virtual ~OutputListeners();
-
-    void addListener(QObject *);
-    void removeListener(QObject *);
 
     void addVisual(MythTV::Visual *);
     void removeVisual(MythTV::Visual *);
@@ -88,7 +87,6 @@ public:
     unsigned int bufferSize() const { return bufsize; }
 
 protected:
-    void dispatch(OutputEvent &e);
     void error(const QString &e);
     void dispatchVisual(uchar *b, unsigned long b_len, 
                        unsigned long written, int chan, int prec);
@@ -96,7 +94,6 @@ protected:
 
 private:
     QMutex mtx;
-    QPtrList<QObject> listeners;
     QPtrList<MythTV::Visual> visuals;
     
     unsigned int bufsize;

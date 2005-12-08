@@ -6,6 +6,7 @@
 #include <qevent.h>
 #include <qthread.h>
 #include <qptrlist.h>
+#include <mythtv/mythobservable.h>
 
 class Metadata;
 class MetaIO;
@@ -21,17 +22,17 @@ class Buffer;
 class Recycler;
 class AudioOutput;
 
-class DecoderEvent : public QCustomEvent
+class DecoderEvent : public MythEvent
 {
 public:
     enum Type { Decoding = (QEvent::User + 100), Stopped, Finished, Error };
 
     DecoderEvent(Type t)
-        : QCustomEvent(t), error_msg(0)
+        : MythEvent(t), error_msg(0)
     { ; }
 
     DecoderEvent(QString *e)
-        : QCustomEvent(Error), error_msg(e)
+        : MythEvent(Error), error_msg(e)
     { ; }
 
     ~DecoderEvent()
@@ -42,12 +43,13 @@ public:
 
     const QString *errorMessage() const { return error_msg; }
 
+    virtual DecoderEvent *clone();
 
 private:
     QString *error_msg;
 };
 
-class Decoder : public QThread 
+class Decoder : public QThread, public MythObservable
 {
   public:
     virtual ~Decoder();
@@ -57,9 +59,6 @@ class Decoder : public QThread
     virtual void stop() = 0;
 
     DecoderFactory *factory() const { return fctry; }
-
-    void addListener(QObject *);
-    void removeListener(QObject *);
 
     QIODevice *input() { return in; }
     AudioOutput *output() { return out; }
@@ -90,8 +89,6 @@ class Decoder : public QThread
   protected:
     Decoder(DecoderFactory *, QIODevice *, AudioOutput *);
 
-    void dispatch(const DecoderEvent &);
-    void dispatch(const OutputEvent &);
     void error(const QString &);
 
     QString filename;
@@ -103,7 +100,6 @@ class Decoder : public QThread
   private:
     DecoderFactory *fctry;
 
-    QPtrList<QObject> listeners;
     QIODevice *in;
     AudioOutput *out;
 

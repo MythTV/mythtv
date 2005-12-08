@@ -12,13 +12,14 @@
 #include <qsocketdevice.h>
 #include <qstringlist.h>
 #include <qnetwork.h> 
-#include <qdeepcopy.h>
 #include <qmap.h>
 
 #include <cerrno>
 #include <iostream>
 #include <sstream>
 #include <vector>
+
+#include "mythobservable.h"
 
 using namespace std;
 
@@ -167,43 +168,6 @@ do { \
 /// Verbose helper function for ENO macro
 QString safe_eno_to_string(int errnum);
 
-/** \class MythEvent
- *  \brief This class is used as a container for messages.
- *
- *   MythEvents can be dispatched to all listeners by calling
- *   gContext->dispatch(MythEvent&) or gContext->dispatchNow(MythEvent&).
- *   The former is much preferred as it uses QApplication::postEvent()
- *   while the latter uses the blocking QApplication::sendEvent().
- */
-class MythEvent : public QCustomEvent
-{
-  public:
-    enum Type { MythEventMessage = (User + 1000) };
-
-    MythEvent(const QString lmessage) : QCustomEvent(MythEventMessage)
-    {
-        message = QDeepCopy<QString>(lmessage);
-        extradata = "empty";
-    }
-    MythEvent(const QString lmessage, const QStringList &lextradata)
-           : QCustomEvent(MythEventMessage)
-    {
-        message = QDeepCopy<QString>(lmessage);
-        extradata = lextradata;
-    }
-    
-    ~MythEvent() {}
-
-    const QString& Message() const { return message; }
-    const QString& ExtraData(int idx = 0) const { return extradata[idx]; } 
-    const QStringList& ExtraDataList() const { return extradata; } 
-    int ExtraDataCount() const { return extradata.size(); }
-
-  private:
-    QString message;
-    QStringList extradata;
-};
-
 /** \class MythPrivRequest
  *  \brief Container for requests that require privledge escalation.
  *
@@ -228,7 +192,7 @@ class MythPrivRequest
 
 /// Update this whenever the plug-in API changes.
 /// Including changes in the libmythtv class methods used by plug-ins.
-#define MYTH_BINARY_VERSION "0.19.20051207-1"
+#define MYTH_BINARY_VERSION "0.19.20051208-1"
 
 /** \brief Increment this whenever the MythTV network protocol changes.
  *
@@ -247,7 +211,7 @@ class MythPrivRequest
  *   It also contains support for database error printing, and
  *   database message logging.
  */
-class MythContext : public QObject
+class MythContext : public QObject, public MythObservable
 {
     Q_OBJECT
   public:
@@ -372,11 +336,6 @@ class MythContext : public QObject
     bool FindThemeFile(QString &filename);
     QPixmap *LoadScalePixmap(QString filename, bool fromcache = true); 
     QImage *LoadScaleImage(QString filename, bool fromcache = true);
-
-    void addListener(QObject *obj);
-    void removeListener(QObject *obj);
-    void dispatch(MythEvent &e);
-    void dispatchNow(MythEvent &e);
 
     bool SendReceiveStringList(QStringList &strlist, bool quickTimeout = false);
 

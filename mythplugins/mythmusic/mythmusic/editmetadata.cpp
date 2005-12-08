@@ -3,7 +3,7 @@
 #include <qdir.h>
 #include "editmetadata.h"
 #include "decoder.h"
-#include "genres.c"
+#include "genres.h"
 
 EditMetadataDialog::EditMetadataDialog(Metadata *source_metadata,
                                  MythMainWindow *parent,

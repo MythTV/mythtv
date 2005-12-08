@@ -205,8 +205,6 @@ class MythContextPrivate
 
     QMutex serverSockLock;
 
-    QPtrList<QObject> listeners;
-
     MDBManager m_dbmanager;
     
     QMap<QString, QImage> imageCache;
@@ -2439,38 +2437,6 @@ void MythContext::EventSocketClosed(void)
 
     delete d->serverSock;
     d->serverSock = NULL;
-}
-
-void MythContext::addListener(QObject *obj)
-{
-    if (d->listeners.find(obj) == -1)
-        d->listeners.append(obj);
-}
-
-void MythContext::removeListener(QObject *obj)
-{
-    if (d->listeners.find(obj) != -1)
-        d->listeners.remove(obj);
-}
-
-void MythContext::dispatch(MythEvent &e)
-{
-    QObject *obj = d->listeners.first();
-    while (obj)
-    {
-        QApplication::postEvent(obj, new MythEvent(e));
-        obj = d->listeners.next();
-    }
-}
-
-void MythContext::dispatchNow(MythEvent &e)
-{
-    QObject *obj = d->listeners.first();
-    while (obj)
-    {
-        QApplication::sendEvent(obj, &e);
-        obj = d->listeners.next();
-    }
 }
 
 QFont MythContext::GetBigFont(void)

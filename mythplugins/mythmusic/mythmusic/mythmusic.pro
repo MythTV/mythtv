@@ -35,7 +35,7 @@ HEADERS += metaioflacvorbiscomment.h metaioavfcomment.h metaio_libid3hack.h
 HEADERS += goom/filters.h goom/goomconfig.h goom/goom_core.h goom/graphic.h
 HEADERS += goom/ifs.h goom/lines.h goom/mythgoom.h goom/drawmethods.h
 HEADERS += goom/mmx.h goom/mathtools.h goom/tentacle3d.h goom/v3d.h
-HEADERS += editmetadata.h smartplaylist.h search.h
+HEADERS += editmetadata.h smartplaylist.h search.h genres.h
 
 SOURCES += cddecoder.cpp cdrip.cpp decoder.cpp 
 SOURCES += flacdecoder.cpp flacencoder.cpp maddecoder.cpp main.cpp
@@ -43,7 +43,7 @@ SOURCES += mainvisual.cpp metadata.cpp playbackbox.cpp playlist.cpp
 SOURCES += streaminput.cpp encoder.cpp dbcheck.cpp
 SOURCES += synaesthesia.cpp treecheckitem.cpp vorbisdecoder.cpp lameencoder.cpp
 SOURCES += vorbisencoder.cpp visualize.cpp bumpscope.cpp globalsettings.cpp
-SOURCES += databasebox.cpp
+SOURCES += databasebox.cpp genres.cpp
 SOURCES += metaio.cpp metaioid3v2.cpp vcedit.c metaiooggvorbiscomment.cpp 
 SOURCES += metaioflacvorbiscomment.cpp metaioavfcomment.cpp metaio_libid3hack.c
 SOURCES += goom/filters.c goom/goom_core.c goom/graphic.c goom/tentacle3d.c

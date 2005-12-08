@@ -21,7 +21,7 @@ HEADERS += managedlist.h DisplayRes.h volumebase.h audiooutputbase.h
 HEADERS += dbsettings.h screensaver-null.h output.h visual.h
 HEADERS += langsettings.h audiooutputnull.h
 HEADERS += DisplayResScreen.h util-x11.h mythdeque.h qmdcodec.h
-HEADERS += exitcodes.h virtualkeyboard.h
+HEADERS += exitcodes.h virtualkeyboard.h mythobservable.h mythevent.h
 
 SOURCES += dialogbox.cpp lcddevice.cpp mythcontext.cpp mythwidgets.cpp 
 SOURCES += oldsettings.cpp remotefile.cpp settings.cpp themedmenu.cpp
@@ -33,7 +33,7 @@ SOURCES += volumecontrol.cpp volumebase.cpp audiooutputbase.cpp
 SOURCES += dbsettings.cpp screensaver.cpp screensaver-null.cpp output.cpp
 SOURCES += langsettings.cpp mythdbcon.cpp audiooutputnull.cpp
 SOURCES += DisplayResScreen.cpp util-x11.cpp qmdcodec.cpp
-SOURCES += virtualkeyboard.cpp
+SOURCES += virtualkeyboard.cpp mythobservable.cpp
 
 INCLUDEPATH += ../libmythsamplerate ../libmythsoundtouch ../..
 DEPENDPATH += ../libmythsamplerate ../libmythsoundtouch
@@ -60,6 +60,7 @@ inc.files += audiooutput.h inetcomms.h httpcomms.h mythmedia.h mythwizard.h
 inc.files += uilistbtntype.h generictree.h managedlist.h
 inc.files += visual.h volumebase.h output.h langsettings.h qmdcodec.h
 inc.files += exitcodes.h mythconfig.h mythconfig.mak virtualkeyboard.h
+inc.files += mythevent.h mythobservable.h
 
 using_oss {
     DEFINES += USING_OSS

@@ -4,8 +4,8 @@
 // warranty, or liability of any kind.
 //
 
-#include <cstdio>
 #include <qobject.h>
+#include <qapplication.h>
 
 #include "output.h"
 #include "visual.h"
@@ -21,34 +21,11 @@ OutputListeners::~OutputListeners()
 }
 
 
-void OutputListeners::addListener(QObject *o)
-{
-    if (listeners.find(o) == -1)
-	listeners.append(o);
-}
-
-
-void OutputListeners::removeListener(QObject *o)
-{
-    listeners.remove(o);
-}
-
-
-void OutputListeners::dispatch(OutputEvent &e)
-{
-    QObject *object = listeners.first();
-    while (object) {
-	QThread::postEvent(object, new OutputEvent(e));
-	object = listeners.next();
-    }
-}
-
-
 void OutputListeners::error(const QString &e) {
-    QObject *object = listeners.first();
+    QObject *object = firstListener();
     while (object) {
-	QThread::postEvent(object, new OutputEvent(e));
-	object = listeners.next();
+	QApplication::postEvent(object, new OutputEvent(e));
+	object = nextListener();
     }
 }
 

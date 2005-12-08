@@ -11,6 +11,7 @@
 #include <mythtv/output.h>
 #include <mythtv/visual.h>
 
+#include <qapplication.h>
 #include <qobject.h>
 #include <qptrlist.h>
 #include <qdir.h>
@@ -18,6 +19,16 @@
 #include <qregexp.h>
 
 #include <mythtv/mythcontext.h>
+
+DecoderEvent* DecoderEvent::clone() 
+{ 
+    DecoderEvent *result = new DecoderEvent(*this);
+
+    if (error_msg)
+        result->error_msg = new QString(*error_msg);
+
+    return result;
+}
 
 Decoder::Decoder(DecoderFactory *d, QIODevice *i, AudioOutput *o)
        : fctry(d), in(i), out(o), blksize(0)
@@ -46,47 +57,11 @@ void Decoder::setOutput(AudioOutput *o)
     mutex()->unlock();
 }
 
-void Decoder::dispatch(const DecoderEvent &e)
-{
-    QObject *object = listeners.first();
-    while (object) 
-    {
-        QThread::postEvent(object, new DecoderEvent(e));
-        object = listeners.next();
-    }
-}
-
-void Decoder::dispatch(const OutputEvent &e)
-{
-    QObject *object = listeners.first();
-    while (object) 
-    {
-        QThread::postEvent(object, new OutputEvent(e));
-        object = listeners.next();
-    }
-}
-
 void Decoder::error(const QString &e) 
 {
-    QObject *object = listeners.first();
-    while (object) 
-    {
-        QString *str = new QString(e.utf8());
-        QThread::postEvent(object, new DecoderEvent(str));
-        object = listeners.next();
-    }
-}
-
-void Decoder::addListener(QObject *object)
-{
-    if (listeners.find(object) == -1)
-        listeners.append(object);
-}
-
-
-void Decoder::removeListener(QObject *object)
-{
-    listeners.remove(object);
+    QString *str = new QString(e.utf8());
+    DecoderEvent ev(str);
+    dispatch(ev);
 }
 
 /** \fn Decoder::readMetadata(void)
