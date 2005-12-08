@@ -1031,7 +1031,10 @@ void Scheduler::getAllScheduled(QStringList &strList)
 
 void Scheduler::Reschedule(int recordid) { 
     reschedLock.lock(); 
-    reschedQueue.append(recordid); 
+    if (recordid == -1)
+        reschedQueue.clear();
+    if (recordid != 0 || !reschedQueue.size())
+        reschedQueue.append(recordid);
     reschedWait.wakeOne();
     reschedLock.unlock();
 }
