@@ -953,8 +953,11 @@ void PlaybackBoxMusic::checkForPlaylists()
         } 
         else if (progress_type == kProgressMusic)
         {
-            progress->Close();
-            delete progress;
+            if (progress)
+            {
+                progress->Close();
+                delete progress;
+            }
             progress = NULL;
             progress_type = kProgressNone;
         }
