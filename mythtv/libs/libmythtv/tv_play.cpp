@@ -4181,7 +4181,7 @@ void TV::customEvent(QCustomEvent *e)
                 if (tokens[2] == tvchain->GetID())
                 {
                     tvchain->ReloadAll();
-                    if (nvp)
+                    if (nvp && nvp->GetTVChain())
                         nvp->CheckTVChain();
                 }
             }
