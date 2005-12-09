@@ -1132,7 +1132,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         for (int i=0;i<COMM_FORMAT_MAX;i++) formatCounts[i]=0;
 
         for(long long i = 0; i < framesProcessed; i++ )
-            formatCounts[frameInfo[i].aspect]++;
+            formatCounts[frameInfo[i].format]++;
 
         for(int i = 0; i < COMM_FORMAT_MAX; i++)
         {
