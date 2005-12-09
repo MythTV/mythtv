@@ -433,7 +433,7 @@ void DVBChannel::CheckOptions()
 
             if ((t.params.u.ofdm.guard_interval == GUARD_INTERVAL_AUTO)
                 && !(info.caps & FE_CAN_GUARD_INTERVAL_AUTO))
-                WARNING("Unsupported quard_interval parameter.");
+                WARNING("Unsupported guard_interval parameter.");
 
             if ((t.params.u.ofdm.hierarchy_information == HIERARCHY_AUTO)
                 && !(info.caps & FE_CAN_HIERARCHY_AUTO))
