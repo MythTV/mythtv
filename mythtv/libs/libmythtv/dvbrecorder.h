@@ -26,6 +26,25 @@ using namespace std;
 class ProgramAssociationTable;
 class ProgramMapTable;
 
+class PIDInfo
+{
+  public:
+    PIDInfo() :
+        filter_fd(-1),  continuityCount(0xFF), ip(NULL),
+        isVideo(false), isEncrypted(false),    payloadStartSeen(false) {;}
+
+    int    filter_fd;         ///< Input filter file descriptor
+    uint   continuityCount;   ///< last Continuity Count (sentinel 0xFF)
+    ipack *ip;                ///< TS->PES converter
+    bool   isVideo;
+    bool   isEncrypted;       ///< true if PID is marked as encrypted
+    bool   payloadStartSeen;  ///< true if payload start packet seen on PID
+
+    inline void Close(void);
+    inline bool CheckCC(uint cc);
+};
+typedef QMap<uint,PIDInfo*> PIDInfoMap;
+
 /** \class DVBRecorder
  *  \brief This is a specialization of DTVRecorder used to
  *         handle streams from DVB drivers.
@@ -72,9 +91,6 @@ class DVBRecorder: public DTVRecorder
     uint ProcessDataTS(unsigned char *buffer, uint len);
     bool ProcessTSPacket(const TSPacket& tspacket);
 
-    static void ProcessDataPS(unsigned char *buffer, int len, void *priv);
-    void ProcessDataPS(unsigned char *buffer, uint len);
-
     void AutoPID(void);
     bool OpenFilters(void);
     void CloseFilters(void);
@@ -90,6 +106,12 @@ class DVBRecorder: public DTVRecorder
 
     void DebugTSHeader(unsigned char* buffer, int len);
 
+    // TS->PS Transform
+    ipack *CreateIPack(ES_Type type);
+    void ProcessDataPS(unsigned char *buffer, uint len);
+    static void process_data_ps_cb(unsigned char*,int,void*);
+
+  private:
     // Options set in SetOption()
     int             _card_number_option;
     bool            _record_transport_stream_option;
@@ -102,35 +124,28 @@ class DVBRecorder: public DTVRecorder
     /// Set when we want to generate a new filter set
     bool            _reset_pid_filters;
     QMutex          _pid_lock;
+    PIDInfoMap      _pid_infos;
 
     // PS recorder stuff
     int             _ps_rec_audio_id;
     int             _ps_rec_video_id;
     unsigned char   _ps_rec_buf[3];
-    pid_ipack_t     _ps_rec_pid_ipack;
 
     // TS recorder stuff
     ProgramAssociationTable *_pat;
     ProgramMapTable         *_pmt;
     uint            _next_pmt_version;
     uint            _ts_packets_until_psip_sync;
-    QMap<uint,bool> _payload_start_seen;
-    QMap<uint,bool> _videoPID;
 
     // Input Misc
     /// PMT on input side
     PMTObject       _input_pmt;
-    /// Input filter file descriptors
-    vector<int>     _pid_filters;
-    /// Encrypted PID, so we can drop these
-    QMap<uint,bool> _encrypted_pid;
 
     // Statistics
     mutable uint        _continuity_error_count;
     mutable uint        _stream_overflow_count;
     mutable uint        _bad_packet_count;
     mutable MythTimer   _poll_timer;
-    mutable QMap<uint,int> _continuity_count;
 
     // Constants
     static const int PMT_PID;
@@ -138,5 +153,33 @@ class DVBRecorder: public DTVRecorder
     static const int POLL_INTERVAL;
     static const int POLL_WARNING_TIMEOUT;
 };
+
+inline void PIDInfo::Close(void)
+{
+    if (filter_fd >= 0)
+        close(filter_fd);
+
+    if (ip)
+    {
+        free_ipack(ip);
+        free(ip);
+    }
+}
+
+inline bool PIDInfo::CheckCC(uint new_cnt)
+{
+    if (continuityCount == 0xFF)
+    {
+        continuityCount = new_cnt;
+        return true;
+    }
+
+    continuityCount = (continuityCount+1) & 0xf;
+    if (continuityCount == new_cnt)
+        return true;
+    
+    continuityCount = new_cnt;
+    return false;
+}
 
 #endif
