@@ -85,6 +85,7 @@
      <text lang="NB">Informasjonssenter</text>
      <text lang="DK">Informationscenter</text>
      <text lang="ES">Centro de Información</text>
+     <text lang="EN_GB">Information Centre</text>
      <alttext lang="ES">Información</alttext>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
@@ -108,6 +109,7 @@
      <text lang="NB">CD-/DVD-stasjoner</text>
      <text lang="DK">CD/DVD</text>
      <text lang="ES">CD/DVD</text>
+     <text lang="EN_GB">CD/DVD</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>

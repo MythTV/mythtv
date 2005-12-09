@@ -35,6 +35,7 @@
       <text lang="NB">Filmer</text>
       <text lang="DK">Film</text>
       <text lang="ES">Películas</text>
+      <text lang="EN_GB">Films</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 

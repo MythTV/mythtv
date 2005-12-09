@@ -135,7 +135,7 @@ void LanguageSettings::reload(void)
 QStringList LanguageSettings::getLanguages(void)
 {
     QStringList langs;
-    langs << QString::fromUtf8("English")     << "EN"   // English
+    langs << QString::fromUtf8("English (US)") << "EN"   // English
           << QString::fromUtf8("Italiano")    << "IT"   // Italian
           << QString::fromUtf8("Català")     << "CA"   // Catalan
           << QString::fromUtf8("Español")    << "ES"   // Spanish
@@ -154,7 +154,8 @@ QStringList LanguageSettings::getLanguages(void)
               << "ZH_TW"                                // Traditional Chinese
           << QString::fromUtf8("Eesti")       << "ET"   // Estonian
           << QString::fromUtf8("Português Brasileiro")
-              << "PT_BR";                               // Brazilian Portuguese
+              << "PT_BR"                               // Brazilian Portuguese
+          << QString::fromUtf8("English (British)") << "EN_GB";   // British English
     return langs;
 }
 
