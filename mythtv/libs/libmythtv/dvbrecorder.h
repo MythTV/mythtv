@@ -26,6 +26,7 @@ using namespace std;
 
 class ProgramAssociationTable;
 class ProgramMapTable;
+class TSPacket;
 
 class PIDInfo
 {
@@ -141,7 +142,7 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     ProgramAssociationTable *_pat;
     ProgramMapTable         *_pmt;
     uint            _next_pmt_version;
-    uint            _ts_packets_until_psip_sync;
+    int             _ts_packets_until_psip_sync;
 
     // Input Misc
     /// PMT on input side

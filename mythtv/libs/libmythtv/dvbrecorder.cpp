@@ -516,11 +516,11 @@ void DVBRecorder::WritePATPMT(void)
         {
             next_cc = (_pat->tsheader()->ContinuityCounter()+1)&0xf;
             _pat->tsheader()->SetContinuityCounter(next_cc);
-            ringBuffer->Write(_pat->tsheader()->data(), TSPacket::SIZE);
+            BufferedWrite(*(reinterpret_cast<TSPacket*>(_pat->tsheader())));
 
             next_cc = (_pmt->tsheader()->ContinuityCounter()+1)&0xf;
             _pmt->tsheader()->SetContinuityCounter(next_cc);
-            ringBuffer->Write(_pmt->tsheader()->data(), TSPacket::SIZE);
+            BufferedWrite(*(reinterpret_cast<TSPacket*>(_pmt->tsheader())));
 
             _ts_packets_until_psip_sync = TSPACKETS_BETWEEN_PSIP_SYNC;
         }
@@ -780,7 +780,7 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
 
     // Check for keyframes and count frames
     if (info->isVideo)
-        FindKeyframes(&tspacket);
+        _buffer_packets = !FindKeyframes(&tspacket);
 
     // Sync recording start to first keyframe
     if (_wait_for_keyframe_option && !_keyframe_seen)
@@ -802,8 +802,8 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
     WritePATPMT();
 
     // Write Data
-    if (ringBuffer)
-        ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
+    BufferedWrite(tspacket);
+
     return true;
 }
 

@@ -45,10 +45,11 @@ DTVRecorder::DTVRecorder(TVRec *rec, const char *name) :
     _wait_for_keyframe(true),
     // state
     _recording(false),
-    _streamid_not_in_first_ts_packet(false),
     _error(false),
     // TS packet buffer
     _buffer(0),                     _buffer_size(0),
+    // keyframe TS buffer
+    _buffer_packets(false),
     // statistics
     _frames_seen_count(0),          _frames_written_count(0)
 {
@@ -56,11 +57,6 @@ DTVRecorder::DTVRecorder(TVRec *rec, const char *name) :
 
 DTVRecorder::~DTVRecorder()
 {
-    if (_streamid_not_in_first_ts_packet)
-    {
-        VERBOSE(VB_IMPORTANT, LOC +
-                "Saw keyframe stream_id which was not in first TS Packet.");
-    }
 }
 
 /** \fn DTVRecorder::SetOption(const QString&,int)
@@ -136,7 +132,6 @@ void DTVRecorder::Reset(void)
     _last_gop_seen              = 0;
     _last_seq_seen              = 0;
     //_recording
-    //_streamid_not_in_first_ts_packet
     _error                      = false;
     //_buffer
     //_buffer_size
@@ -144,6 +139,32 @@ void DTVRecorder::Reset(void)
     _frames_written_count       = 0;
     _position_map.clear();
     _position_map_delta.clear();
+}
+
+void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
+{
+    // delay until first GOP to avoid decoder crash on res change
+    if (_wait_for_keyframe && !_keyframe_seen)
+        return;
+
+    // Do we have to buffer the packet for exact keyframe detection?
+    if (_buffer_packets)
+    {
+        int idx = _payload_buffer.size();
+        _payload_buffer.resize(idx + TSPacket::SIZE);
+        memcpy(&_payload_buffer[idx], tspacket.data(), TSPacket::SIZE);
+        return;
+    }
+
+    // We are free to write the packet, but if we have buffered packet[s]
+    // we have to write them first...
+    if (!_payload_buffer.empty())
+    {
+        ringBuffer->Write(&_payload_buffer[0], _payload_buffer.size());
+        _payload_buffer.clear();
+    }
+
+    ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
 }
 
 /** \fn DTVRecorder::FindKeyframes(const TSPacket* tspacket)
@@ -164,17 +185,19 @@ void DTVRecorder::Reset(void)
  *         some channels, but will break on others so algorithmic
  *         optimizations should be done with great care.
  *
- * \startcode
+ *  \startcode
  *   PES header format
  *   byte 0  byte 1  byte 2  byte 3      [byte 4     byte 5]
  *   0x00    0x00    0x01    PESStreamID  PES packet length
- * \endcode
+ *  \endcode
  *
+ *  \return Returns true if packet[s] should be output.
  */
-void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
+bool DTVRecorder::FindKeyframes(const TSPacket* tspacket)
 {
-    if (!tspacket->HasPayload())
-        return; // no payload to scan
+    bool haveBufferedData = !_payload_buffer.empty();
+    if (!tspacket->HasPayload()) // no payload to scan
+        return !haveBufferedData;
 
     // if packet contains start of PES packet, start
     // looking for first byte of MPEG start code (3 bytes 0 0 1)
@@ -182,6 +205,11 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
     const bool payloadStart = tspacket->PayloadStart();
     _position_within_gop_header = (payloadStart) ?
         0 : _position_within_gop_header;
+
+    // if this is not a payload start packet, and aren't waiting
+    // for anything then just output this packet..
+    if (!payloadStart && !haveBufferedData)
+        return true;
 
     // Just make these local for efficiency reasons (gcc not so smart..)
     const uint maxKFD            = kMaxKeyFrameDistance;
@@ -248,22 +276,9 @@ void DTVRecorder::FindKeyframes(const TSPacket* tspacket)
     {
         _last_keyframe_seen = frameSeenNum;
         HandleKeyframe();
-
-        if (!payloadStart && !_streamid_not_in_first_ts_packet)
-        {
-            VERBOSE(VB_IMPORTANT, LOC +
-                    "Keyframe stream_id not in first TS Packet.\n"
-                    "This is not an error, but MythTV may not always handle\n"
-                    "this gracefully. If you would like it to, please inform\n"
-                    "the mythtv developer mailing list of this message.\n");
-            // If this happens in practice, it means we need to buffer
-            // all TS packets after the first payload start until
-            // we determine the PES stream ID; and then only write
-            // data to the ringbuffer after we determine the PES stream ID
-            // and call HandleKeyframe() if needed.
-            _streamid_not_in_first_ts_packet = true;
-        }
+        return true;
     }
+    return (_payload_buffer.size() >= (188*50));
 }
 
 // documented in recorderbase.h
