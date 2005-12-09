@@ -3279,6 +3279,7 @@ void TVRec::TuningNewRecorder(void)
 
     RecordingProfile profile;
     ProgramInfo *rec = lastTuningRequest.program;
+    load_recording_profile(profile, rec, cardid);
     if (tvchain)
     {
         bool ok;
@@ -3293,8 +3294,6 @@ void TVRec::TuningNewRecorder(void)
         }
         rec = tvchain->GetProgramAt(-1);
     }
-
-    load_recording_profile(profile, rec, cardid);
 
     if (lastTuningRequest.flags & kFlagRecording)
     {
