@@ -1728,26 +1728,11 @@ void PlaybackBox::deleteSelected()
     if (!curitem)
         return;
 
-    if (!playList.count())
-    {
-        if ((curitem->availableStatus != asPendingDelete) &&
-            (REC_CAN_BE_DELETED(curitem)))
-            remove(curitem);
-        else
-            showAvailablePopup(curitem);
-    }
+    if ((curitem->availableStatus != asPendingDelete) &&
+        (REC_CAN_BE_DELETED(curitem)))
+        remove(curitem);
     else
-    {
-        ProgramInfo *tmpItem;
-        QStringList::Iterator it;
-
-        for (it = playList.begin(); it != playList.end(); ++it )
-        {
-            tmpItem = findMatchingProg(*it);
-            if (tmpItem && (tmpItem->availableStatus != asPendingDelete))
-                remove(tmpItem);
-        }
-    }
+        showAvailablePopup(curitem);
 }
 
 void PlaybackBox::expireSelected()
@@ -2008,6 +1993,9 @@ void PlaybackBox::stop(ProgramInfo *rec)
 bool PlaybackBox::doRemove(ProgramInfo *rec, bool forgetHistory,
                            bool forceMetadataDelete)
 {
+    if (playList.grep(rec->MakeUniqueKey()).count())
+        togglePlayListItem(rec);
+
     return RemoteDeleteRecording(rec, forgetHistory, forceMetadataDelete);
 }
 
@@ -2079,7 +2067,8 @@ void PlaybackBox::showDeletePopup(ProgramInfo *program, deletePopupType types)
     const char *tmpslot = NULL;
 
     if ((types == EndOfRecording || types == DeleteRecording) &&
-        (program->IsSameProgram(*program)))
+        (program->IsSameProgram(*program)) &&
+        (program->recgroup != "LiveTV"))
     {
         if (types == EndOfRecording)
             tmpmessage = tr("Delete it, but allow it to re-record"); 
