@@ -7,8 +7,6 @@ CONFIG += thread staticlib warn_off
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.18.0 
-
 INCLUDEPATH += ../../libs/libavcodec ../..
 
 QMAKE_CXXFLAGS_RELEASE += -fPIC -DPIC

@@ -7,8 +7,6 @@ CONFIG += thread dll
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.18.0
-
 QMAKE_CLEAN += $(TARGET) $(TARGETA) $(TARGETD) $(TARGET0) $(TARGET1) $(TARGET2)
 
 # Input

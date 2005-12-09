@@ -7,8 +7,6 @@ CONFIG += thread staticlib warn_off
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.18.0 
-
 INCLUDEPATH += ../../ 
 
 QMAKE_CFLAGS_RELEASE = $$OPTFLAGS -DHAVE_AV_CONFIG_H -I.. -fPIC -DPIC -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_GNU_SOURCE

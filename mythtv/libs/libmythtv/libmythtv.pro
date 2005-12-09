@@ -7,8 +7,6 @@ CONFIG += thread dll
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.18.0
-
 INCLUDEPATH += ../..
 INCLUDEPATH += ../libmyth ../ ./dvbdev/ ./mpeg/ ../libavcodec ../libavutil ../libmythmpeg2
 DEPENDPATH += ../libmyth ../libavcodec ../libavformat ../libavutil ../libmythmpeg2

@@ -8,8 +8,6 @@ CONFIG -= qt
 target.path = $${PREFIX}/lib
 INSTALLS = target
 
-VERSION = 0.18.0
-
 INCLUDEPATH = ../ ../../
 
 DEFINES += HAVE_AV_CONFIG_H _LARGEFILE_SOURCE
