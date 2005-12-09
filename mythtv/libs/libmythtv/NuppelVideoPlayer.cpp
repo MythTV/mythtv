@@ -637,7 +637,8 @@ void NuppelVideoPlayer::SetFileLength(int total, int frames)
     totalFrames = frames;
 }
 
-int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries)
+int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
+                                bool allow_libmpeg2)
 {
     if (!skipDsp)
     {
@@ -694,8 +695,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries)
     if (NuppelDecoder::CanHandle(testbuf))
         SetDecoder(new NuppelDecoder(this, m_playbackinfo));
 #ifdef USING_IVTV
-    else if (!using_null_videoout && IvtvDecoder::CanHandle(testbuf,
-                                                     ringBuffer->GetFilename()))
+    else if (!using_null_videoout && IvtvDecoder::CanHandle(
+                 testbuf, ringBuffer->GetFilename()))
     {
         SetDecoder(new IvtvDecoder(this, m_playbackinfo));
         no_audio_out = true; // no audio with ivtv.
@@ -703,7 +704,8 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries)
     }
 #endif
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
-        SetDecoder(new AvFormatDecoder(this, m_playbackinfo, using_null_videoout));
+        SetDecoder(new AvFormatDecoder(this, m_playbackinfo,
+                                       using_null_videoout, allow_libmpeg2));
 
     if (!GetDecoder())
     {
@@ -3815,7 +3817,7 @@ char *NuppelVideoPlayer::GetScreenGrab(int secondsin, int &bufflen,
 
     using_null_videoout = true;
 
-    if (OpenFile(false, 0) < 0)
+    if (OpenFile(false, 0, false) < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Could not open file for preview.");
         return NULL;

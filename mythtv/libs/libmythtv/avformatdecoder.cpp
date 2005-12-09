@@ -57,7 +57,8 @@ void align_dimensions(AVCodecContext *avctx, int &width, int &height)
 class AvFormatDecoderPrivate
 {
   public:
-    AvFormatDecoderPrivate() : mpeg2dec(NULL) { ; }
+    AvFormatDecoderPrivate(bool allow_libmpeg2)
+        : mpeg2dec(NULL), allow_mpeg2dec(allow_libmpeg2) { ; }
    ~AvFormatDecoderPrivate() { DestroyMPEG2(); }
     
     bool InitMPEG2();
@@ -70,10 +71,13 @@ class AvFormatDecoderPrivate
 
   private:
     mpeg2dec_t *mpeg2dec;
+    bool        allow_mpeg2dec;
 };
 
 bool AvFormatDecoderPrivate::InitMPEG2()
 {
+    if (!allow_mpeg2dec)
+        return false;
     DestroyMPEG2();
     QString dec = gContext->GetSetting("PreferredMPEG2Decoder", "ffmpeg");
     if (dec == "libmpeg2")
@@ -158,10 +162,12 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
     }
 }
 
-AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
-                                 bool use_null_videoout)
+AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
+                                 ProgramInfo *pginfo,
+                                 bool use_null_videoout,
+                                 bool allow_libmpeg2)
     : DecoderBase(parent, pginfo),
-      d(new AvFormatDecoderPrivate()), ic(NULL),
+      d(new AvFormatDecoderPrivate(allow_libmpeg2)), ic(NULL),
       frame_decoded(0), directrendering(false), drawband(false), bitrate(0),
       gopset(false), seen_gop(false), seq_count(0), firstgoppos(0),
       prevgoppos(0), gotvideo(false), lastvpts(0), lastapts(0),

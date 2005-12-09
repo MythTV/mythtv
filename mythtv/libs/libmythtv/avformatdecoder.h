@@ -77,7 +77,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     friend void HandleStreamChange(void*);
   public:
     AvFormatDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo,
-                    bool use_null_video_out);
+                    bool use_null_video_out, bool allow_libmpeg2 = true);
    ~AvFormatDecoder();
 
     void CloseContext();

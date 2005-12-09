@@ -65,7 +65,8 @@ class NuppelVideoPlayer
     // Initialization
     void ForceVideoOutputType(VideoOutputType type);
     bool InitVideo(void);
-    int  OpenFile(bool skipDsp = false, uint retries = 4);
+    int  OpenFile(bool skipDsp = false, uint retries = 4,
+                  bool allow_libmpeg2 = true);
 
     // Windowing stuff
     void EmbedInWidget(WId wid, int x, int y, int w, int h);
