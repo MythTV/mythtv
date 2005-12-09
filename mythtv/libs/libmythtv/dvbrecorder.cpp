@@ -83,15 +83,13 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _hw_decoder_option(false),
       // DVB stuff
       dvbchannel(advbchannel),
+      _reset_pid_filters(true),
+      _pid_lock(true),
       // PS recorder stuff
       _ps_rec_audio_id(0xC0), _ps_rec_video_id(0xE0),
       // Output stream info
       _pat(NULL), _pmt(NULL), _next_pmt_version(0),
       _ts_packets_until_psip_sync(0),
-      // Input Misc
-      _reset_pid_filters(true),
-      // Locking
-      _pid_lock(true),
       // Statistics
       _continuity_error_count(0), _stream_overflow_count(0),
       _bad_packet_count(0)
@@ -113,7 +111,7 @@ DVBRecorder::~DVBRecorder()
 
 void DVBRecorder::TeardownAll(void)
 {
-    if (_stream_fd >= 0)
+    if (IsOpen())
         Close();
 
     if (_buffer)
@@ -177,7 +175,7 @@ void DVBRecorder::SetPMTObject(const PMTObject *_pmt)
 
 bool DVBRecorder::Open(void)
 {
-    if (_stream_fd >= 0)
+    if (IsOpen())
     {
         VERBOSE(VB_GENERAL, LOC_WARN + "Card already open");
         return true;
@@ -185,7 +183,7 @@ bool DVBRecorder::Open(void)
 
     _stream_fd = open(dvbdevice(DVB_DEV_DVR,_card_number_option),
                       O_RDONLY | O_NONBLOCK);
-    if (_stream_fd < 0)
+    if (!IsOpen())
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open DVB device" + ENO);
         return false;
@@ -198,8 +196,8 @@ bool DVBRecorder::Open(void)
     connect(dvbchannel, SIGNAL(UpdatePMTObject(const PMTObject *)),
             this, SLOT(SetPMTObject(const PMTObject *)));
 
-    VERBOSE(VB_RECORD, LOC + 
-            QString("Card opened successfully (using %1 mode).")
+    VERBOSE(VB_RECORD, LOC + QString("Card opened successfully fd(%1)")
+            .arg(_stream_fd) + QString(" (using %2 mode).")
             .arg(_record_transport_stream_option ? "TS" : "PS"));
 
     dvbchannel->RecorderStarted();
@@ -211,16 +209,13 @@ void DVBRecorder::Close(void)
 {
     VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- begin");
 
-    if (_stream_fd < 0)
-        return;
-
-    CloseFilters();
-
-    if (_stream_fd >= 0)
+    if (IsOpen())
+    {
+        CloseFilters();
         close(_stream_fd);
-
-    _stream_fd = -1;
-    _polls.fd = -1;
+        _stream_fd = -1;
+        _polls.fd = -1;
+    }
 
     VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- end");
 }
@@ -284,7 +279,7 @@ void DVBRecorder::OpenFilter(uint           pid,
         usecs /= 2;
     }
     VERBOSE(VB_RECORD, LOC + "Set demux buffer size for " +
-            QString("pid 0x%1 to %2,\n\t\t\t which gives us a %3 msec buffer.")
+            QString("pid 0x%1 to %2,\n\t\t\twhich gives us a %3 msec buffer.")
             .arg(pid,0,16).arg(sz).arg(usecs/1000));
 
     // Set the filter type
@@ -352,10 +347,11 @@ void DVBRecorder::OpenFilter(uint           pid,
     _ps_rec_pid_ipack[pid] = ip;
 }
 
-bool DVBRecorder::SetDemuxFilters(void)
+bool DVBRecorder::OpenFilters(void)
 {
-    QMutexLocker change_lock(&_pid_lock);
     CloseFilters();
+
+    QMutexLocker change_lock(&_pid_lock);
 
     _continuity_count.clear();
     _encrypted_pid.clear();
@@ -462,21 +458,21 @@ void DVBRecorder::StartRecording(void)
         if (PauseAndWait())
             continue;
 
-        if (_stream_fd < 0)
+        if (!IsOpen())
         {
-            usleep(50);
+            usleep(5000);
             continue;
         }
 
         if (_reset_pid_filters)
         {
+            _reset_pid_filters = false;
             VERBOSE(VB_RECORD, LOC + "Resetting Demux Filters");
-            if (SetDemuxFilters())
+            if (OpenFilters())
             {
                 CreatePAT();
                 CreatePMT();
             }
-            _reset_pid_filters = false;
         }
 
         int ret;
@@ -663,7 +659,8 @@ void DVBRecorder::ReadFromDMX(void)
                 }
 
                 t.start();
-                LocalProcessDataTS(pktbuf, MPEG_TS_PKT_SIZE);
+                WritePATPMT();
+                ringBuffer->Write(pktbuf, MPEG_TS_PKT_SIZE);
                 if (t.elapsed() > 10)
                 {
                     VERBOSE(VB_RECORD, LOC_WARN +
@@ -781,13 +778,13 @@ void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
         ringBuffer->Write(buffer, len);
 }
 
-void DVBRecorder::LocalProcessDataTS(unsigned char *buffer, int len)
+void DVBRecorder::WritePATPMT(void)
 {
-    if (_ts_packets_until_psip_sync == 0)
+    if (_ts_packets_until_psip_sync <= 0)
     {
         QMutexLocker read_lock(&_pid_lock);
         uint next_cc;
-        if (_pat && _pmt)
+        if (_pat && _pmt && ringBuffer)
         {
             next_cc = (_pat->tsheader()->ContinuityCounter()+1)&0xf;
             _pat->tsheader()->SetContinuityCounter(next_cc);
@@ -802,8 +799,6 @@ void DVBRecorder::LocalProcessDataTS(unsigned char *buffer, int len)
     }
     else
         _ts_packets_until_psip_sync--;
-
-    ringBuffer->Write(buffer,len);
 }
 
 void DVBRecorder::Reset(void)
@@ -909,6 +904,11 @@ void DVBRecorder::CreatePMT(void)
     }
 
     SetPMT(pmt);
+}
+
+void DVBRecorder::StopRecording(void)
+{
+    DTVRecorder::StopRecording();
 }
 
 ////////////////////////////////////////////////////////////

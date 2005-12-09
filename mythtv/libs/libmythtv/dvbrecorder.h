@@ -48,8 +48,10 @@ class DVBRecorder: public DTVRecorder
 
     void StartRecording(void);
     void Reset(void);
+    void StopRecording(void);
 
     bool Open(void);
+    bool IsOpen(void) const { return _stream_fd >= 0; }
     void Close(void);
 
     bool RecordsTransportStream(void) const
@@ -67,19 +69,19 @@ class DVBRecorder: public DTVRecorder
     void ReadFromDMX(void);
     static void ProcessDataPS(unsigned char *buffer, int len, void *priv);
     void LocalProcessDataPS(unsigned char *buffer, int len);
-    void LocalProcessDataTS(unsigned char *buffer, int len);
 
+    void AutoPID(void);
+    bool OpenFilters(void);
     void CloseFilters(void);
     void OpenFilter(uint pid, ES_Type type, dmx_pes_type_t pes_type,
                     uint mpeg_stream_type);
-    bool SetDemuxFilters(void);
-    void AutoPID(void);
 
     void SetPAT(ProgramAssociationTable*);
     void SetPMT(ProgramMapTable*);
 
     void CreatePAT(void);
     void CreatePMT(void);
+    void WritePATPMT(void);
 
     void DebugTSHeader(unsigned char* buffer, int len);
 
@@ -90,6 +92,11 @@ class DVBRecorder: public DTVRecorder
 
     // DVB stuff
     DVBChannel*     dvbchannel;
+
+    // general recorder stuff
+    /// Set when we want to generate a new filter set
+    bool            _reset_pid_filters;
+    QMutex          _pid_lock;
 
     // PS recorder stuff
     int             _ps_rec_audio_id;
@@ -112,19 +119,14 @@ class DVBRecorder: public DTVRecorder
     vector<int>     _pid_filters;
     /// Input polling structure for _stream_fd
     struct pollfd   _polls;
-    /// Set when we want to generate a new filter set
-    bool            _reset_pid_filters;
     /// Encrypted PID, so we can drop these
     QMap<uint,bool> _encrypted_pid;
 
-    // locking
-    QMutex          _pid_lock;
-
     // Statistics
-    uint            _continuity_error_count;
-    uint            _stream_overflow_count;
-    uint            _bad_packet_count;
-    QMap<uint,int>  _continuity_count;
+    mutable uint        _continuity_error_count;
+    mutable uint        _stream_overflow_count;
+    mutable uint        _bad_packet_count;
+    mutable QMap<uint,int> _continuity_count;
 
     // For debugging
     bool data_found; ///< debugging variable used by transform.c
