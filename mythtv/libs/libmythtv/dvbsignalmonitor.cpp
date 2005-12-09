@@ -457,7 +457,12 @@ static QMap<uint,bool> _rec_supports_ts_monitoring;
 static QMutex          _rec_supports_ts_monitoring_lock;
 
 /** \fn DVBSignalMonitor::SupportsTSMonitoring(void)
- *  \brief Returns true if TS monitoring is well supported.
+ *  \brief Returns true if TS monitoring is supported.
+ *
+ *   NOTE: If you are using a DEC2000-t device you need to
+ *   apply the patches provided by Peter Beutner for it, see
+ *   http://www.gossamer-threads.com/lists/mythtv/dev/166172
+ *   These patches should make it in to Linux 2.6.15 or 2.6.16.
  */
 bool DVBSignalMonitor::SupportsTSMonitoring(void)
 {
@@ -480,48 +485,18 @@ bool DVBSignalMonitor::SupportsTSMonitoring(void)
         return false;
     }
 
-    if (!AddPIDFilter(pat_pid))
+    bool supports_ts = false;
+    if (AddPIDFilter(pat_pid))
     {
-        close(dvr_fd);
-
-        QMutexLocker locker(&_rec_supports_ts_monitoring_lock);
-        _rec_supports_ts_monitoring[GetDVBCardNum()] = false;
-        return false;
-    }
-
-    // Wait up to 150 ms as the PATs should be no more than 100 ms apart.
-    struct timeval timeout = { 0, 150 /* ms */ * 1000 /* -> usec */ };
-    fd_set fd_select_set;
-    FD_ZERO(        &fd_select_set);
-    FD_SET (dvr_fd, &fd_select_set);
-
-    // Try to wait for some output...
-    int ret = select(dvr_fd+1, &fd_select_set, NULL, NULL, &timeout);
-    if (ret > 0)
-    {
-        VERBOSE(VB_CHANNEL, LOC + "Will use TS table monitoring");
+        supports_ts = true;
         RemovePIDFilter(pat_pid);
-        close(dvr_fd);
-
-        QMutexLocker locker(&_rec_supports_ts_monitoring_lock);
-        _rec_supports_ts_monitoring[GetDVBCardNum()] = true;
-        return true;
     }
 
-    // We didn't get any data using TS monitoring...
-    if (ret < 0)
-    {
-        VERBOSE(VB_IMPORTANT,
-                LOC + "SupportsTSMonitoring() -- select()" + ENO);
-    }
-    VERBOSE(VB_CHANNEL, LOC + "Will use \"section\" table monitoring");
-
-    RemovePIDFilter(pat_pid);
     close(dvr_fd);
 
     QMutexLocker locker(&_rec_supports_ts_monitoring_lock);
-    _rec_supports_ts_monitoring[GetDVBCardNum()] = false;
-    return false;
+    _rec_supports_ts_monitoring[GetDVBCardNum()] = supports_ts;
+    return supports_ts;
 }
 
 void DVBSignalMonitor::RunTableMonitor(void)
