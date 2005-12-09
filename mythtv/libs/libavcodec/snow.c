@@ -3185,6 +3185,11 @@ static int decode_header(SnowContext *s){
     s->mv_scale= get_symbol(&s->c, s->header_state, 0);
     s->qbias= get_symbol(&s->c, s->header_state, 1);
     s->block_max_depth= get_symbol(&s->c, s->header_state, 0);
+    if(s->block_max_depth > 1){
+        av_log(s->avctx, AV_LOG_ERROR, "block_max_depth= %d is too large", s->block_max_depth);
+        s->block_max_depth= 0;
+        return -1;
+    }
 
     return 0;
 }
@@ -3883,8 +3888,8 @@ int main(){
     for(i=0; i<width*height; i++)
         buffer[0][i]= buffer[1][i]= random()%54321 - 12345;
     
-    ff_spatial_dwt(buffer[0], width, height, width, s->spatial_decomposition_type, s->spatial_decomposition_count);
-    ff_spatial_idwt(buffer[0], width, height, width, s->spatial_decomposition_type, s->spatial_decomposition_count);
+    ff_spatial_dwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
+    ff_spatial_idwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
     
     for(i=0; i<width*height; i++)
         if(buffer[0][i]!= buffer[1][i]) printf("fsck: %d %d %d\n",i, buffer[0][i], buffer[1][i]);
@@ -3894,12 +3899,13 @@ int main(){
     for(i=0; i<width*height; i++)
         buffer[0][i]= buffer[1][i]= random()%54321 - 12345;
     
-    ff_spatial_dwt(buffer[0], width, height, width, s->spatial_decomposition_type, s->spatial_decomposition_count);
-    ff_spatial_idwt(buffer[0], width, height, width, s->spatial_decomposition_type, s->spatial_decomposition_count);
+    ff_spatial_dwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
+    ff_spatial_idwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
     
     for(i=0; i<width*height; i++)
-        if(buffer[0][i]!= buffer[1][i]) printf("fsck: %d %d %d\n",i, buffer[0][i], buffer[1][i]);
+        if(ABS(buffer[0][i] - buffer[1][i])>20) printf("fsck: %d %d %d\n",i, buffer[0][i], buffer[1][i]);
         
+#if 0
     printf("testing AC coder\n");
     memset(s.header_state, 0, sizeof(s.header_state));
     ff_init_range_encoder(&s.c, buffer[0], 256*256);
@@ -3923,6 +3929,7 @@ START_TIMER
 STOP_TIMER("get_symbol")
         if(j!=i*i*i/3*ABS(i)) printf("fsck: %d != %d\n", i, j);
     }
+#endif
 {
 int level, orientation, x, y;
 int64_t errors[8][4];
@@ -3944,7 +3951,7 @@ int64_t g=0;
             
             memset(buffer[0], 0, sizeof(int)*width*height);
             buf[w/2 + h/2*stride]= 256*256;
-            ff_spatial_idwt(buffer[0], width, height, width, s->spatial_decomposition_type, s->spatial_decomposition_count);
+            ff_spatial_idwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
             for(y=0; y<height; y++){
                 for(x=0; x<width; x++){
                     int64_t d= buffer[0][x + y*width];
@@ -3988,7 +3995,7 @@ int64_t g=0;
                     buffer[0][x+width*y]= 256*256*tab[(x&1) + 2*(y&1)];
                 }
             }
-            ff_spatial_dwt(buffer[0], width, height, width, s->spatial_decomposition_type, s->spatial_decomposition_count);
+            ff_spatial_dwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
 #else
             for(y=0; y<h; y++){
                 for(x=0; x<w; x++){
@@ -3996,7 +4003,7 @@ int64_t g=0;
                     buf[x + y*stride-w]=64;
                 }
             }
-            ff_spatial_idwt(buffer[0], width, height, width, s->spatial_decomposition_type, s->spatial_decomposition_count);
+            ff_spatial_idwt(buffer[0], width, height, width, s.spatial_decomposition_type, s.spatial_decomposition_count);
 #endif
             for(y=0; y<height; y++){
                 for(x=0; x<width; x++){

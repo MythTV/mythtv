@@ -523,6 +523,10 @@ void avcodec_register_all(void)
 #endif //CONFIG_ENCODERS
 #endif /* AMR_WB */
 
+#ifdef CONFIG_BMP_DECODER
+    register_avcodec(&bmp_decoder);
+#endif
+
     /* pcm codecs */
 #if defined (CONFIG_ENCODERS) && defined (CONFIG_DECODERS)
     #define PCM_CODEC(id, name) \
@@ -573,14 +577,18 @@ PCM_CODEC(CODEC_ID_ADPCM_YAMAHA, adpcm_yamaha);
 #undef PCM_CODEC
 
     /* subtitles */
-#ifdef CONFIG_ENCODERS
-    register_avcodec(&dvbsub_encoder);
+#ifdef CONFIG_DVDSUB_DECODER
+    register_avcodec(&dvdsub_decoder);
+#endif
+#ifdef CONFIG_DVDSUB_ENCODER
     register_avcodec(&dvdsub_encoder);
 #endif
 
-#ifdef CONFIG_DECODERS
-    register_avcodec(&dvdsub_decoder);
+#ifdef CONFIG_DVBSUB_DECODER
     register_avcodec(&dvbsub_decoder);
+#endif
+#ifdef CONFIG_DVBSUB_ENCODER
+    register_avcodec(&dvbsub_encoder);
 #endif
 
     /* parsers */ 
@@ -600,7 +608,12 @@ PCM_CODEC(CODEC_ID_ADPCM_YAMAHA, adpcm_yamaha);
 #ifdef CONFIG_AC3
     av_register_codec_parser(&ac3_parser);
 #endif
+
+#ifdef CONFIG_DVDSUB_DECODER
     av_register_codec_parser(&dvdsub_parser);
+#endif
+#ifdef CONFIG_DVBSUB_DECODER
     av_register_codec_parser(&dvbsub_parser);
+#endif
 }
 

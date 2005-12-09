@@ -279,6 +279,10 @@ contains( CONFIG_XL_DECODER, yes ) {
     SOURCES += xl.c
 }
 
+contains( CONFIG_BMP_DECODER, yes ) {
+    SOURCES += bmp.c
+}
+
 contains( HAVE_PTHREADS, yes ) {
     SOURCES += pthread.c
 }
