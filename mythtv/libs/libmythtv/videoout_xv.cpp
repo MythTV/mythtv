@@ -2664,10 +2664,10 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
     }
 
     XvMCOSD* xvmc_osd = NULL;
-    if (!embedding)
+    if (!embedding && osd)
         xvmc_osd = GetAvailableOSD();
 
-    if (osd && xvmc_osd->IsValid())
+    if (xvmc_osd && xvmc_osd->IsValid())
     {
         VideoFrame *osdframe = NULL;
         int ret = DisplayOSD(xvmc_osd->OSDFrame(), osd, -1,
@@ -2732,7 +2732,8 @@ void VideoOutputXv::ProcessFrameXvMC(VideoFrame *frame, OSD *osd)
             xvmc_osd->CompositeOSD(frame);
         }
     }
-    ReturnAvailableOSD(xvmc_osd);
+    if (xvmc_osd)
+        ReturnAvailableOSD(xvmc_osd);
     vbuffers.UnlockFrame(frame, "ProcessFrameXvMC");            
 #endif // USING_XVMC
 }
