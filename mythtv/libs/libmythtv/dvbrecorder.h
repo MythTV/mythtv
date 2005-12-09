@@ -66,9 +66,14 @@ class DVBRecorder: public DTVRecorder
 
   private:
     void TeardownAll(void);
-    void ReadFromDMX(void);
+
+    bool Poll(void) const;
+
+    uint ProcessDataTS(unsigned char *buffer, uint len);
+    bool ProcessTSPacket(const TSPacket& tspacket);
+
     static void ProcessDataPS(unsigned char *buffer, int len, void *priv);
-    void LocalProcessDataPS(unsigned char *buffer, int len);
+    void ProcessDataPS(unsigned char *buffer, uint len);
 
     void AutoPID(void);
     bool OpenFilters(void);
@@ -117,8 +122,6 @@ class DVBRecorder: public DTVRecorder
     PMTObject       _input_pmt;
     /// Input filter file descriptors
     vector<int>     _pid_filters;
-    /// Input polling structure for _stream_fd
-    struct pollfd   _polls;
     /// Encrypted PID, so we can drop these
     QMap<uint,bool> _encrypted_pid;
 
@@ -126,11 +129,8 @@ class DVBRecorder: public DTVRecorder
     mutable uint        _continuity_error_count;
     mutable uint        _stream_overflow_count;
     mutable uint        _bad_packet_count;
+    mutable MythTimer   _poll_timer;
     mutable QMap<uint,int> _continuity_count;
-
-    // For debugging
-    bool data_found; ///< debugging variable used by transform.c
-    bool keyframe_found;
 
     // Constants
     static const int PMT_PID;

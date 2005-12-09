@@ -72,6 +72,8 @@ const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
 const int DVBRecorder::POLL_INTERVAL        =  50; // msec
 const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
 
+static ssize_t safe_read(int fd, unsigned char *buf, size_t bufsize);
+
 #define LOC      QString("DVBRec(%1): ").arg(_card_number_option)
 #define LOC_WARN QString("DVBRec(%1) Warning: ").arg(_card_number_option)
 #define LOC_ERR  QString("DVBRec(%1) Error: ").arg(_card_number_option)
@@ -95,9 +97,6 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
       _bad_packet_count(0)
 {
     bzero(_ps_rec_buf, sizeof(unsigned char) * 3);
-
-    bzero(&_polls, sizeof(struct pollfd));
-    _polls.fd = _stream_fd;
 
     _buffer_size = (4*1024*1024 / MPEG_TS_PKT_SIZE) * MPEG_TS_PKT_SIZE;
     _buffer = new unsigned char[_buffer_size];
@@ -189,10 +188,6 @@ bool DVBRecorder::Open(void)
         return false;
     }
 
-    _polls.fd = _stream_fd;
-    _polls.events = POLLIN;
-    _polls.revents = 0;
-
     connect(dvbchannel, SIGNAL(UpdatePMTObject(const PMTObject *)),
             this, SLOT(SetPMTObject(const PMTObject *)));
 
@@ -214,7 +209,6 @@ void DVBRecorder::Close(void)
         CloseFilters();
         close(_stream_fd);
         _stream_fd = -1;
-        _polls.fd = -1;
     }
 
     VERBOSE(VB_RECORD, LOC + "Close() fd("<<_stream_fd<<") -- end");
@@ -356,9 +350,7 @@ bool DVBRecorder::OpenFilters(void)
     _continuity_count.clear();
     _encrypted_pid.clear();
     _payload_start_seen.clear();
-    data_found = false;
     _wait_for_keyframe = _wait_for_keyframe_option;
-    keyframe_found = false;
 
     _ps_rec_audio_id = 0xC0;
     _ps_rec_video_id = 0xE0;
@@ -451,8 +443,8 @@ void DVBRecorder::StartRecording(void)
     SetPMT(NULL);
     _ts_packets_until_psip_sync = 0;
 
-    MythTimer t;
-    t.start();
+    _poll_timer.start();
+
     while (_request_recording && !_error)
     {
         if (PauseAndWait())
@@ -475,41 +467,12 @@ void DVBRecorder::StartRecording(void)
             }
         }
 
-        int ret;
-        do
-            ret = poll(&_polls, 1, POLL_INTERVAL);
-        while (!request_pause && (_stream_fd >= 0) &&
-               ((-1 == ret) && ((EAGAIN == errno) || (EINTR == errno))));
-
-        if (request_pause || _stream_fd < 0)
-            continue;
-
-        if (ret == 0 && t.elapsed() > POLL_WARNING_TIMEOUT)
+        if (Poll())
         {
-            VERBOSE(VB_GENERAL, LOC_WARN +
-                    QString("No data from card in %1 milliseconds.")
-                    .arg(t.elapsed()));
+            ssize_t len = safe_read(_stream_fd, _buffer, _buffer_size);
+            if (len > 0)
+                ProcessDataTS(_buffer, len);
         }
-        else if (ret == 1 && _polls.revents & POLLIN)
-        {
-            int msec = t.restart();
-            if (msec >= POLL_WARNING_TIMEOUT)
-            {
-                VERBOSE(VB_IMPORTANT, LOC_WARN +
-                        QString("Got data from card after %1 ms. (>%2)")
-                        .arg(msec).arg(POLL_WARNING_TIMEOUT));
-            }
-
-            ReadFromDMX();
-            if (t.elapsed() >= 20)
-            {
-                VERBOSE(VB_RECORD, LOC_WARN +
-                        QString("ReadFromDMX took %1 ms").arg(t.elapsed()));
-            }
-        }
-        else if ((ret < 0) || (ret == 1 && _polls.revents & POLLERR))
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Poll failed while waiting for data." + ENO);
     }
 
     Close();
@@ -517,265 +480,6 @@ void DVBRecorder::StartRecording(void)
     FinishRecording();
 
     _recording = false;
-}
-
-void DVBRecorder::ReadFromDMX(void)
-{
-    int cardnum = _card_number_option;
-    int readsz = 1;
-    unsigned char *pktbuf;
-
-    while (readsz > 0)
-    {
-        readsz = read(_stream_fd, _buffer, _buffer_size);
-        if (readsz < 0)
-        {
-            if (errno == EOVERFLOW)
-            {
-                ++_stream_overflow_count;
-                VERBOSE(VB_RECORD, LOC +
-                        "DVB Buffer overflow error detected on read");
-                break;
-            }
-
-            if (errno == EAGAIN)
-                break;
-            VERBOSE(VB_IMPORTANT, LOC_ERR +
-                    "Error reading from DVB device." + ENO);
-            break;
-        } else if (readsz == 0)
-            break;
-
-        if (readsz % MPEG_TS_PKT_SIZE)
-        {
-            VERBOSE(VB_IMPORTANT, LOC_ERR + "Incomplete packet received.");
-            readsz = readsz - (readsz % MPEG_TS_PKT_SIZE);
-        }
-
-        int pkts = readsz / MPEG_TS_PKT_SIZE;
-        int curpkt = 0;
-
-        _pid_lock.lock();
-        while (curpkt < pkts)
-        {
-            if (data_found == false)
-            {
-                GENERAL("Data read from DMX - "
-                        "This is for debugging with transform.c");
-                data_found = true;
-            }
-
-            pktbuf = _buffer + (curpkt * MPEG_TS_PKT_SIZE);
-            curpkt++;
-
-            int pes_offset = 0;
-            int pid = ((pktbuf[1]&0x1f) << 8) | pktbuf[2];
-            uint8_t scrambling = (pktbuf[3] >> 6) & 0x03;
-            uint8_t cc = pktbuf[3] & 0xf;
-            uint8_t content = (pktbuf[3] & 0x30) >> 4;
-
-            if (pktbuf[1] & 0x80)
-            {
-                VERBOSE(VB_RECORD, LOC +
-                        "Packet dropped due to uncorrectable error.");
-                ++_bad_packet_count;
-                continue;
-            }
-
-            if (scrambling)
-            {
-                if (!_encrypted_pid[pid])
-                {
-                    VERBOSE(VB_RECORD, LOC +
-                            QString("PID 0x%1 is encrypted, ignoring")
-                            .arg(pid,0,16));
-                    _encrypted_pid[pid] = true;
-                }
-                continue; // Drop encrypted TS packet
-            }
-
-            if (_encrypted_pid[pid])
-            {
-                VERBOSE(VB_RECORD, LOC +
-                        QString("PID 0x%1 is no longer encrypted")
-                        .arg(pid,0,16));
-                _encrypted_pid[pid] = false;
-            }
-            if (content & 0x1)
-            {
-                 if (_continuity_count[pid] < 0)
-                     _continuity_count[pid] = cc;
-                 else
-                 {
-                     _continuity_count[pid] = (_continuity_count[pid]+1) & 0xf;
-                     if (_continuity_count[pid] != cc)
-                     {
-                         VERBOSE(VB_RECORD, LOC +
-                                 QString("PID 0x%1 _continuity_count %2 cc %3")
-                                 .arg(pid,0,16).arg(_continuity_count[pid])
-                                 .arg(cc));
-                         _continuity_count[pid] = cc;
-                         ++_continuity_error_count;
-                     }
-                 }
-            }
-
-            if (_record_transport_stream_option)
-            {   // handle TS recording
-                MythTimer t;
-                t.start();
-                if (_videoPID[pid])
-                {
-                    // Check for keyframe
-                    const TSPacket *pkt =
-                        reinterpret_cast<const TSPacket*>(pktbuf);
-                    FindKeyframes(pkt);
-                }
-                if (t.elapsed() > 10)
-                {
-                    VERBOSE(VB_RECORD, LOC_WARN +
-                            QString("Find keyframes took %1 ms!")
-                            .arg(t.elapsed()));
-                }
-
-                // Sync recording start to first keyframe
-                if (_wait_for_keyframe && !_keyframe_seen)
-                    continue;
-                if (!keyframe_found)
-                {
-                    keyframe_found = true;
-                    VERBOSE(VB_RECORD, QString("Found first keyframe"));
-                }
-
-                // Sync streams to the first Payload Unit Start Indicator
-                // _after_ first keyframe iff _wait_for_keyframe is true
-                if (!_payload_start_seen[pid])
-                {
-                    if ((pktbuf[1] & 0x40) == 0)
-                        continue; // not payload start - drop packet
-
-                    VERBOSE(VB_RECORD, QString("Found Payload Start for PID %1").arg(pid));
-                    _payload_start_seen[pid] = true;
-                }
-
-                t.start();
-                WritePATPMT();
-                ringBuffer->Write(pktbuf, MPEG_TS_PKT_SIZE);
-                if (t.elapsed() > 10)
-                {
-                    VERBOSE(VB_RECORD, LOC_WARN +
-                            QString("TS packet write took %1 ms!")
-                            .arg(t.elapsed()));
-                }
-            }
-            else
-            {   // handle PS recording
-                ipack *ip = _ps_rec_pid_ipack[pid];
-                if (ip == NULL)
-                    continue;
-
-                ip->ps = 1;
-
-                if ((pktbuf[1] & 0x40) && (ip->plength == MMAX_PLENGTH-6))
-                {
-                    ip->plength = ip->found-6;
-                    ip->found = 0;
-                    send_ipack(ip);
-                    reset_ipack(ip);
-                }
-
-                if (content & 0x2)
-                    pes_offset = pktbuf[4] + 1;
-
-                if (pes_offset > 183)
-                    continue;
-
-                instant_repack(pktbuf + 4 + pes_offset,
-                               MPEG_TS_PKT_SIZE - 4 - pes_offset, ip);
-            }
-        }
-        _pid_lock.unlock();
-    }
-}
-
-#define SEQ_START     0x000001B3
-#define GOP_START     0x000001B8
-#define PICTURE_START 0x00000100
-#define SLICE_MIN     0x00000101
-#define SLICE_MAX     0x000001af
-
-void DVBRecorder::ProcessDataPS(unsigned char *buffer, int len, void *priv)
-{
-    ((DVBRecorder*)priv)->LocalProcessDataPS(buffer, len);
-}
-
-void DVBRecorder::LocalProcessDataPS(unsigned char *buffer, int len)
-{
-    if (buffer[0] != 0x00 || buffer[1] != 0x00 || buffer[2] != 0x01)
-    {
-        if (!_wait_for_keyframe)
-            ringBuffer->Write(buffer, len);
-        return;
-    }
-
-    if (buffer[3] >= VIDEO_STREAM_S && buffer[3] <= VIDEO_STREAM_E)
-    {
-        int pos = 8 + buffer[8];
-        int datalen = len - pos;
-
-        unsigned char *bufptr = &buffer[pos];
-        uint state = 0xFFFFFFFF;
-        uint state_byte = 0;
-        int prvcount = -1;
-
-        while (bufptr < &buffer[pos] + datalen)
-        {
-            if (++prvcount < 3)
-                state_byte = _ps_rec_buf[prvcount];
-            else
-                state_byte = *bufptr++;
-
-            if (state != 0x000001)
-            {
-                state = ((state << 8) | state_byte) & 0xFFFFFF;
-                continue;
-            }
-
-            state = ((state << 8) | state_byte) & 0xFFFFFF;
-            if (state >= SLICE_MIN && state <= SLICE_MAX)
-                continue;
-
-            if (state == SEQ_START)
-                _wait_for_keyframe = false;
-
-            if (GOP_START == state)
-            {
-                long long startpos = ringBuffer->GetWritePosition();
-                        
-                if (!_position_map.contains(_frames_written_count))
-                {
-                    _position_map_delta[_frames_written_count] = startpos;
-                    _position_map[_frames_written_count] = startpos;
-
-                    if (curRecording &&
-                        ((_position_map_delta.size() % 30) == 0))
-                    {
-                        curRecording->SetPositionMapDelta(
-                            _position_map_delta,
-                            MARK_GOP_BYFRAME);
-                        curRecording->SetFilesize(startpos);
-                        _position_map_delta.clear();
-                    }
-                }
-            }
-            else if (PICTURE_START == state)
-                _frames_written_count++;
-        }
-    }
-    memcpy(_ps_rec_buf, &buffer[len - 3], 3);
-
-    if (!_wait_for_keyframe)
-        ringBuffer->Write(buffer, len);
 }
 
 void DVBRecorder::WritePATPMT(void)
@@ -909,6 +613,138 @@ void DVBRecorder::CreatePMT(void)
 void DVBRecorder::StopRecording(void)
 {
     DTVRecorder::StopRecording();
+}
+
+uint DVBRecorder::ProcessDataTS(unsigned char *buffer, uint len)
+{
+    if (len % TSPacket::SIZE)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Incomplete packet received.");
+        len = len - (len % TSPacket::SIZE);
+    }
+    if (len < TSPacket::SIZE)
+        return len;
+
+    uint pos = 0;
+    uint end = len - TSPacket::SIZE;
+    while (pos <= end)
+    {
+        const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[pos]);
+        ProcessTSPacket(*pkt);
+        pos += TSPacket::SIZE;
+    }
+    return len - pos;
+}
+
+bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
+{
+    if (tspacket.TransportError())
+    {
+        VERBOSE(VB_RECORD, LOC + "Packet dropped due to uncorrectable error.");
+        ++_bad_packet_count;
+        return false; // Drop bad TS packets...
+    }
+
+    const uint pid = tspacket.PID();
+
+    QMutexLocker locker(&_pid_lock);
+
+    // track scrambled pids
+    if (tspacket.ScramplingControl())
+    {
+        if (!_encrypted_pid[pid])
+        {
+            VERBOSE(VB_RECORD, LOC +
+                    QString("PID 0x%1 is encrypted, ignoring").arg(pid,0,16));
+            _encrypted_pid[pid] = true;
+        }
+        return true; // Drop encrypted TS packets...
+    }
+    else if (_encrypted_pid[pid])
+    {
+        VERBOSE(VB_RECORD, LOC +
+                QString("PID 0x%1 is no longer encrypted").arg(pid,0,16));
+        _encrypted_pid[pid] = false;
+    }
+
+    // Check continuity counter
+    if (tspacket.HasPayload())
+    {
+        int cc = tspacket.ContinuityCounter();
+        if (_continuity_count[pid] < 0)
+            _continuity_count[pid] = cc;
+        else
+        {
+            _continuity_count[pid] = (_continuity_count[pid]+1) & 0xf;
+            if (_continuity_count[pid] != cc)
+            {
+                VERBOSE(VB_RECORD, LOC +
+                        QString("PID 0x%1 _continuity_count %2 cc %3")
+                        .arg(pid,0,16).arg(_continuity_count[pid])
+                        .arg(cc));
+                _continuity_count[pid] = cc;
+                ++_continuity_error_count;
+            }
+        }
+    }
+
+    // handle legacy PES recording mode
+    if (!_record_transport_stream_option)
+    {
+        // handle PS recording
+
+        ipack *ip = _ps_rec_pid_ipack[pid];
+        if (ip == NULL)
+            return true;
+
+        ip->ps = 1;
+
+        if (tspacket.PayloadStart() && (ip->plength == MMAX_PLENGTH-6))
+        {
+            ip->plength = ip->found-6;
+            ip->found = 0;
+            send_ipack(ip);
+            reset_ipack(ip);
+        }
+
+        uint afc_offset = tspacket.AFCOffset();
+        if (afc_offset > 187)
+            return true;
+
+        instant_repack((uint8_t*)tspacket.data() + afc_offset,
+                       TSPacket::SIZE - afc_offset, ip);
+        return true;
+    }
+
+    // handle TS recording
+
+    // Check for keyframes and count frames
+    if (_videoPID[pid])
+        FindKeyframes(&tspacket);
+
+    // Sync recording start to first keyframe
+    if (_wait_for_keyframe_option && !_keyframe_seen)
+        return true;
+
+    // Sync streams to the first Payload Unit Start Indicator
+    // _after_ first keyframe iff _wait_for_keyframe_option is true
+    if (!_payload_start_seen[pid])
+    {
+        if (!tspacket.PayloadStart())
+            return true; // not payload start - drop packet
+
+        VERBOSE(VB_RECORD,
+                QString("PID 0x%1 Found Payload Start").arg(pid,0,16));
+        _payload_start_seen[pid] = true;
+    }
+
+    // Write PAT & PMT tables occasionally
+    WritePATPMT();
+
+    // Write Data
+    if (ringBuffer)
+        ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
+    return true;
 }
 
 ////////////////////////////////////////////////////////////
@@ -1090,6 +926,151 @@ void DVBRecorder::AutoPID(void)
 
     print_pmt_info(LOC, pmt_list,
                    _input_pmt.FTA(), _input_pmt.ServiceID, _input_pmt.PCRPID);
+}
+
+bool DVBRecorder::Poll(void) const
+{
+    struct pollfd polls;
+    polls.fd      = _stream_fd;
+    polls.events  = POLLIN;
+    polls.revents = 0;
+
+    int ret;
+    do
+        ret = poll(&polls, 1, POLL_INTERVAL);
+    while (!request_pause && IsOpen() &&
+           ((-1 == ret) && ((EAGAIN == errno) || (EINTR == errno))));
+
+    if (request_pause || !IsOpen())
+        return false;
+
+    if (ret > 0 && polls.revents & POLLIN)
+    {
+        if (_poll_timer.elapsed() >= POLL_WARNING_TIMEOUT)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_WARN +
+                    QString("Got data from card after %1 ms. (>%2)")
+                    .arg(_poll_timer.elapsed()).arg(POLL_WARNING_TIMEOUT));
+        }
+        _poll_timer.start();
+        return true;
+    }
+
+    if (ret == 0 && _poll_timer.elapsed() > POLL_WARNING_TIMEOUT)
+    {
+        VERBOSE(VB_GENERAL, LOC_WARN +
+                QString("No data from card in %1 ms.")
+                .arg(_poll_timer.elapsed()));
+    }
+
+    if (ret < 0 && (EOVERFLOW == errno))
+    {
+        _stream_overflow_count++;
+        VERBOSE(VB_RECORD, LOC_ERR + "Driver buffer overflow detected.");
+    }
+
+    if ((ret < 0) || (ret > 0 && polls.revents & POLLERR))
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Poll failed while waiting for data." + ENO);
+    }
+
+    return false;
+}
+
+#define SEQ_START     0x000001B3
+#define GOP_START     0x000001B8
+#define PICTURE_START 0x00000100
+#define SLICE_MIN     0x00000101
+#define SLICE_MAX     0x000001af
+
+void DVBRecorder::ProcessDataPS(unsigned char *buffer, uint len)
+{
+    if (buffer[0] != 0x00 || buffer[1] != 0x00 || buffer[2] != 0x01)
+    {
+        if (!_wait_for_keyframe)
+            ringBuffer->Write(buffer, len);
+        return;
+    }
+
+    if (buffer[3] >= VIDEO_STREAM_S && buffer[3] <= VIDEO_STREAM_E)
+    {
+        int pos = 8 + buffer[8];
+        int datalen = len - pos;
+
+        unsigned char *bufptr = &buffer[pos];
+        uint state = 0xFFFFFFFF;
+        uint state_byte = 0;
+        int prvcount = -1;
+
+        while (bufptr < &buffer[pos] + datalen)
+        {
+            if (++prvcount < 3)
+                state_byte = _ps_rec_buf[prvcount];
+            else
+                state_byte = *bufptr++;
+
+            if (state != 0x000001)
+            {
+                state = ((state << 8) | state_byte) & 0xFFFFFF;
+                continue;
+            }
+
+            state = ((state << 8) | state_byte) & 0xFFFFFF;
+            if (state >= SLICE_MIN && state <= SLICE_MAX)
+                continue;
+
+            if (state == SEQ_START)
+                _wait_for_keyframe = false;
+
+            if (GOP_START == state)
+            {
+                long long startpos = ringBuffer->GetWritePosition();
+                        
+                if (!_position_map.contains(_frames_written_count))
+                {
+                    _position_map_delta[_frames_written_count] = startpos;
+                    _position_map[_frames_written_count] = startpos;
+
+                    if (curRecording &&
+                        ((_position_map_delta.size() % 30) == 0))
+                    {
+                        curRecording->SetPositionMapDelta(
+                            _position_map_delta,
+                            MARK_GOP_BYFRAME);
+                        curRecording->SetFilesize(startpos);
+                        _position_map_delta.clear();
+                    }
+                }
+            }
+            else if (PICTURE_START == state)
+                _frames_written_count++;
+        }
+    }
+    memcpy(_ps_rec_buf, &buffer[len - 3], 3);
+
+    if (!_wait_for_keyframe)
+        ringBuffer->Write(buffer, len);
+}
+
+void DVBRecorder::ProcessDataPS(unsigned char *buffer, int len, void *priv)
+{
+    if (len>=0)
+        ((DVBRecorder*)priv)->ProcessDataPS(buffer, (uint)len);
+}
+
+static ssize_t safe_read(int fd, unsigned char *buf, size_t bufsize)
+{
+    ssize_t size = read(fd, buf, bufsize);
+
+    if ((size < 0) &&
+        (errno != EAGAIN) && (errno != EOVERFLOW) && (EINTR != errno))
+    {
+        VERBOSE(VB_IMPORTANT, "DVB:safe_read(): "
+                "Error reading from DVB device." + ENO);
+    }
+
+    return size;
 }
 
 void DVBRecorder::DebugTSHeader(unsigned char* buffer, int len)
