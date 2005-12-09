@@ -248,21 +248,26 @@ bool ClassicCommDetector::go()
     
     int requiredHeadStart = 30;
     if (commDetectMethod & COMM_DETECT_LOGO)
-    {
         requiredHeadStart += commDetectLogoSecondsNeeded;
-    }
+    else
+        requiredHeadStart += 30;
 
     emit statusUpdate("Building Detection Buffer");
 
-    int a = 0;
-    while (a < requiredHeadStart && stillRecording)
+    bool wereRecording = stillRecording;
+    int secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+    while (secsSince < requiredHeadStart && stillRecording)
     {
         emit breathe();
         if (m_bStop)
             return false;
         sleep(2);
-        a = recordingStartedAt.secsTo(QDateTime::currentDateTime());
+        secsSince = recordingStartedAt.secsTo(QDateTime::currentDateTime());
     }
+
+    // Don't bother flagging short ~realtime recordings
+    if ((wereRecording) && (!stillRecording) && (secsSince < requiredHeadStart))
+        return false;
 
     if (nvp->OpenFile() < 0)
         return false;

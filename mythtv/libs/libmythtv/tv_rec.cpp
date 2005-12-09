@@ -883,8 +883,20 @@ void TVRec::TeardownRecorder(bool killFile)
         if (!killFile)
         {
             (new PreviewGenerator(curRecording, true))->Start();
-            if (autoRunJobs)
-                JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
+
+            if (!tvchain)
+            {
+                int secsSince = curRecording->recstartts.secsTo(
+                                                  QDateTime::currentDateTime());
+                if (secsSince < 120)
+                {
+                    JobQueue::RemoveJobsFromMask(JOB_COMMFLAG, autoRunJobs);
+                    JobQueue::RemoveJobsFromMask(JOB_TRANSCODE, autoRunJobs);
+                }
+
+                if (autoRunJobs)
+                    JobQueue::QueueRecordingJobs(curRecording, autoRunJobs);
+            }
         }
 
         if (tvchain)
@@ -3368,8 +3380,9 @@ void TVRec::TuningNewRecorder(void)
 
     SetFlags(kFlagRecorderRunning);
 
-    autoRunJobs = init_jobs(rec, profile, runJobOnHostOnly,
-                            transcodeFirst, earlyCommFlag);
+    if (!tvchain)
+        autoRunJobs = init_jobs(rec, profile, runJobOnHostOnly,
+                                transcodeFirst, earlyCommFlag);
 
     ClearFlags(kFlagNeedToStartRecorder);
     if (tvchain)
