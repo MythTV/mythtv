@@ -18,6 +18,7 @@ using namespace std;
 #include "dtvrecorder.h"
 #include "tspacket.h"
 #include "transform.h"
+#include "DeviceReadBuffer.h"
 
 #include "dvbtypes.h"
 #include "dvbchannel.h"
@@ -51,7 +52,7 @@ typedef QMap<uint,PIDInfo*> PIDInfoMap;
  *
  *  \sa DTVRecorder, HDTVRecorder
  */
-class DVBRecorder: public DTVRecorder
+class DVBRecorder: public DTVRecorder, private ReaderPausedCB
 {
     Q_OBJECT
   public:
@@ -106,10 +107,15 @@ class DVBRecorder: public DTVRecorder
 
     void DebugTSHeader(unsigned char* buffer, int len);
 
+    void ReaderPaused(int fd);
+    bool PauseAndWait(int timeout = 100);
+
     // TS->PS Transform
     ipack *CreateIPack(ES_Type type);
     void ProcessDataPS(unsigned char *buffer, uint len);
     static void process_data_ps_cb(unsigned char*,int,void*);
+
+    DeviceReadBuffer *_drb;
 
   private:
     // Options set in SetOption()

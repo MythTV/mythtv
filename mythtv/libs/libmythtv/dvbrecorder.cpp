@@ -72,7 +72,10 @@ const int DVBRecorder::TSPACKETS_BETWEEN_PSIP_SYNC = 2000;
 const int DVBRecorder::POLL_INTERVAL        =  50; // msec
 const int DVBRecorder::POLL_WARNING_TIMEOUT = 500; // msec
 
+#define USE_DRB
+#ifndef USE_DRB
 static ssize_t safe_read(int fd, unsigned char *buf, size_t bufsize);
+#endif // USE_DRB
 
 #define LOC      QString("DVBRec(%1): ").arg(_card_number_option)
 #define LOC_WARN QString("DVBRec(%1) Warning: ").arg(_card_number_option)
@@ -80,6 +83,7 @@ static ssize_t safe_read(int fd, unsigned char *buf, size_t bufsize);
 
 DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
     : DTVRecorder(rec, "DVBRecorder"),
+      _drb(NULL),
       // Options set in SetOption()
       _card_number_option(0), _record_transport_stream_option(false),
       _hw_decoder_option(false),
@@ -98,7 +102,13 @@ DVBRecorder::DVBRecorder(TVRec *rec, DVBChannel* advbchannel)
 {
     bzero(_ps_rec_buf, sizeof(unsigned char) * 3);
 
-    _buffer_size = (4*1024*1024 / MPEG_TS_PKT_SIZE) * MPEG_TS_PKT_SIZE;
+#ifdef USE_DRB
+    _drb = new DeviceReadBuffer(this);
+    _buffer_size = (1024*1024 / TSPacket::SIZE) * TSPacket::SIZE;
+#else
+    _buffer_size = (4*1024*1024 / TSPacket::SIZE) * TSPacket::SIZE;
+#endif
+
     _buffer = new unsigned char[_buffer_size];
     bzero(_buffer, _buffer_size);
 }
@@ -110,6 +120,9 @@ DVBRecorder::~DVBRecorder()
 
 void DVBRecorder::TeardownAll(void)
 {
+    // Make SURE that the device read thread is cleaned up -- John Poet
+    StopRecording();
+
     if (IsOpen())
         Close();
 
@@ -118,6 +131,14 @@ void DVBRecorder::TeardownAll(void)
         delete[] _buffer;
         _buffer = NULL;
     }
+
+#ifdef USE_DRB
+    if (_drb)
+    {
+        delete _drb;
+        _drb = NULL;
+    }
+#endif
 
     SetPAT(NULL);
     SetPMT(NULL);
@@ -188,6 +209,11 @@ bool DVBRecorder::Open(void)
         return false;
     }
 
+#ifdef USE_DRB
+    if (_drb)
+        _drb->Reset(videodevice, _stream_fd);
+#endif
+
     connect(dvbchannel, SIGNAL(UpdatePMTObject(const PMTObject *)),
             this, SLOT(SetPMTObject(const PMTObject *)));
 
@@ -206,6 +232,12 @@ void DVBRecorder::Close(void)
 
     if (IsOpen())
     {
+
+#ifdef USE_DRB
+    if (_drb)
+        _drb->Reset(videodevice, -1);
+#endif
+
         CloseFilters();
         close(_stream_fd);
         _stream_fd = -1;
@@ -399,7 +431,19 @@ void DVBRecorder::StartRecording(void)
     SetPMT(NULL);
     _ts_packets_until_psip_sync = 0;
 
+#ifdef USE_DRB
+    bool ok = _drb->Setup(videodevice, _stream_fd);
+    if (!ok)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to allocate DRB buffer");
+        Close();
+        _error = true;
+        return;
+    }
+    _drb->Start();
+#else
     _poll_timer.start();
+#endif // USE_DRB
 
     while (_request_recording && !_error)
     {
@@ -425,11 +469,35 @@ void DVBRecorder::StartRecording(void)
 
         if (Poll())
         {
+#ifdef USE_DRB
+            ssize_t len = _drb->Read(_buffer, _buffer_size);
+#else // if !USE_DRB
             ssize_t len = safe_read(_stream_fd, _buffer, _buffer_size);
+#endif // !USE_DRB
             if (len > 0)
                 ProcessDataTS(_buffer, len);
         }
+
+#ifdef USE_DRB
+        // Check for DRB errors
+        if (_drb->IsErrored())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Device error detected");
+            _error = true;
+        }
+
+        if (_drb->IsEOF())
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Device EOF detected");
+            _error = true;
+        }
+#endif // !USE_DRB
     }
+
+#ifdef USE_DRB
+    if (_drb && _drb->IsRunning())
+        _drb->Stop();
+#endif        
 
     Close();
 
@@ -568,7 +636,50 @@ void DVBRecorder::CreatePMT(void)
 
 void DVBRecorder::StopRecording(void)
 {
-    DTVRecorder::StopRecording();
+    _request_recording = false;
+#ifdef USE_DRB
+    if (_drb && _drb->IsRunning())
+        _drb->Stop();
+
+    while (_recording)
+        usleep(2000);
+#endif
+}
+
+void DVBRecorder::ReaderPaused(int /*fd*/)
+{
+#ifdef USE_DRB
+    pauseWait.wakeAll();
+    if (tvrec)
+        tvrec->RecorderPaused();
+#endif // USE_DRB
+}
+
+bool DVBRecorder::PauseAndWait(int timeout)
+{
+#ifdef USE_DRB
+    if (request_pause)
+    {
+        paused = true;
+        if (!_drb->IsPaused())
+            _drb->SetRequestPause(true);
+
+        unpauseWait.wait(timeout);
+    }
+    else if (_drb->IsPaused())
+    {
+        _drb->SetRequestPause(false);
+        _drb->WaitForUnpause(timeout);
+        paused = _drb->IsPaused();
+    }
+    else
+    {
+        paused = false;
+    }
+    return paused;
+#else // if !USE_DRB
+    return RecorderBase::PauseAndWait(timeout);
+#endif // !USE_DRB
 }
 
 uint DVBRecorder::ProcessDataTS(unsigned char *buffer, uint len)
@@ -869,6 +980,9 @@ void DVBRecorder::AutoPID(void)
 
 bool DVBRecorder::Poll(void) const
 {
+#ifdef USE_DRB
+    return true;
+#else // if !USE_DRB
     struct pollfd polls;
     polls.fd      = _stream_fd;
     polls.events  = POLLIN;
@@ -915,6 +1029,7 @@ bool DVBRecorder::Poll(void) const
     }
 
     return false;
+#endif // USE_DRB
 }
 
 void DVBRecorder::ProcessDataPS(unsigned char *buffer, uint len)
@@ -1028,6 +1143,7 @@ ipack *DVBRecorder::CreateIPack(ES_Type type)
     return ip;
 }
 
+#ifndef USE_DRB
 static ssize_t safe_read(int fd, unsigned char *buf, size_t bufsize)
 {
     ssize_t size = read(fd, buf, bufsize);
@@ -1041,6 +1157,7 @@ static ssize_t safe_read(int fd, unsigned char *buf, size_t bufsize)
 
     return size;
 }
+#endif // USE_DRB
 
 void DVBRecorder::DebugTSHeader(unsigned char* buffer, int len)
 {
