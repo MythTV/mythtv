@@ -4256,6 +4256,9 @@ void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo) const
         posInfo.progAfter = livetvchain->HasNext();
         playbackLen = livetvchain->GetLengthAtCurPos();
     }
+    else if (watchingrecording && nvr_enc && nvr_enc->IsValidRecorder())
+        playbackLen =
+            (int)(((float)nvr_enc->GetFramesWritten() / video_frame_rate));
 
     float secsplayed = ((float)framesPlayed / video_frame_rate);
     playbackLen = max(playbackLen, 1);
