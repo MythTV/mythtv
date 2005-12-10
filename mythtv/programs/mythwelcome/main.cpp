@@ -3,6 +3,7 @@
 
 #include "libmyth/mythcontext.h"
 #include "libmyth/settings.h"
+#include "libmyth/langsettings.h"
 #include "libmyth/mythdbcon.h"
 #include <libmyth/exitcodes.h>
 
@@ -76,6 +77,8 @@ int main(int argc, char **argv)
     }
     
     gContext->LoadQtConfig();
+
+    LanguageSettings::load("mythfrontend");
 
     MythMainWindow *mainWindow = new MythMainWindow();
     mainWindow->Init();
