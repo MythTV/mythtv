@@ -29,7 +29,7 @@ static bool insert_program(MSqlQuery&,
 /** \fn StripHTMLTags(const QString&)
  *  \brief Returns a copy of "src" with all the HTML tags removed.
  *
- *   Three tags a respected: <br> and <p> are replaced with newlines,
+ *   Three tags are respected: <br> and <p> are replaced with newlines,
  *   and <li> is replaced with a newline followed by "- ".
  *  \param src String to be processed.
  *  \return Stripped string.
@@ -3334,9 +3334,12 @@ void ProgramInfo::showDetails(void) const
         tmpSize.sprintf("%0.2f ", filesize / 1024.0 / 1024.0 / 1024.0);
         tmpSize += QObject::tr("GB", "GigaBytes");
 
+        ADD_PAR(QObject::tr("Recording Host"), hostname, msg)
+        ADD_PAR(QObject::tr("Filesize"), tmpSize, msg)
+
         query.prepare("SELECT profile FROM recorded"
                       " WHERE chanid = :CHANID"
-                      " AND starttime = :STARTTIME ;");
+                      " AND starttime = :STARTTIME;");
         query.bindValue(":CHANID", chanid);
         query.bindValue(":STARTTIME", recstartts);
         
@@ -3344,14 +3347,12 @@ void ProgramInfo::showDetails(void) const
         {
             query.next();
             if (query.value(0).toString() > "")
-                tmpSize = QString("%1 (%2 %3)").arg(tmpSize)
-                                  .arg(query.value(0).toString())
-                                  .arg(QObject::tr("Profile"));
+                ADD_PAR(QObject::tr("Recording Profile"),
+                        QObject::tr(query.value(0).toString()), msg)
         }
-        ADD_PAR(QObject::tr("Recording Host"), hostname, msg)
-        ADD_PAR(QObject::tr("Filesize"), tmpSize, msg)
-        ADD_PAR(QObject::tr("Recording Group"), recgroup, msg)
-        ADD_PAR(QObject::tr("Playback Group"), playgroup, msg)
+
+        ADD_PAR(QObject::tr("Recording Group"), QObject::tr(recgroup), msg)
+        ADD_PAR(QObject::tr("Playback Group"), QObject::tr(playgroup), msg)
     }
     msg.remove(QRegExp("<br>$"));
     details_dialog->setDetails(msg);
