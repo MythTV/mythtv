@@ -193,8 +193,8 @@ void PlayGroupEditor::open(QString name)
     {
         bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), 
             tr("Create New Playback Group"),
-            tr("Using your keyboard or the numbers keys on your "
-               "remote enter the group name"), name);
+            tr("Enter group name or press SELECT to enter text via the "
+               "On Screen Keyboard"), name);
         if (!ok)
             return;
 

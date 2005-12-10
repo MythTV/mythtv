@@ -169,9 +169,11 @@ void SRRecGroup::showNewRecGroup()
 {
     QString newGroup;
 
-    bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), QObject::tr("Create New Recording Group"),
-                                             QObject::tr("Using your keyboard or the numbers keys on your remote"
-                                                         " enter the group name"), newGroup);
+    bool ok = MythPopupBox::showGetTextPopup(gContext->GetMainWindow(), 
+                                             QObject::tr("Create New Recording Group"),
+                                             QObject::tr("Enter group name or press SELECT to " 
+                                                         "enter text via the On Screen Keyboard"), 
+                                             newGroup);
     if (ok)
     {
         addSelection(QString(QObject::tr("Store in the \"%1\" recording group")).arg(newGroup), newGroup);
