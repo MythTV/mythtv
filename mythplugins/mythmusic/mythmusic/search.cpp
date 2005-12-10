@@ -107,9 +107,9 @@ void SearchDialog::runQuery(QString searchText)
                         "FROM musicmetadata ");
 
     QStringList list = QStringList::split(QRegExp("[>,]"), searchText);
+    whereClause = "";
     if (!searchText.isEmpty())
     {
-        whereClause = "";
         if (substringSearch) // alpha
         {
              for (uint i = 0; i < list.count(); i++)
