@@ -1067,7 +1067,7 @@ void LCDProcClient::startMenu(QPtrList<LCDMenuItem> *menuItems, QString app_name
     if (!oneSelected)
     {
         sendToServer("widget_set Menu topWidget 1 1 \"No menu item selected\"");
-        sendToServer("widget_set Menu menuWidget1 1 2 \"     ABORTING     ");
+        sendToServer("widget_set Menu menuWidget1 1 2 \"     ABORTING     \"");
         menuScrollTimer->stop();
         return;
     }
