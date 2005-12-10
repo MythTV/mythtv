@@ -1421,7 +1421,7 @@ bool PlaybackBox::FillList()
                     sortedList[sTitle] = p->title;
                 } 
 
-                if (useRecGroups) // Show recording groups                 
+                if (useRecGroups && p->recgroup != "") // Show recording groups                 
                 { 
                     progLists[p->recgroup].prepend(p);
                     sortedList[p->recgroup] = p->recgroup;
@@ -1431,7 +1431,7 @@ bool PlaybackBox::FillList()
                         progLists[p->recgroup].setAutoDelete(false);
                 }
 
-                if (useCategories) // Show categories
+                if (useCategories && p->category != "") // Show categories
                 {
                     progLists[p->category].prepend(p);
                     sortedList[p->category] = p->category;
