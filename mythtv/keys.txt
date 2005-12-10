@@ -39,7 +39,7 @@ Watching TV or a recording
 - K jumps to the bookmark position.
 - End or 'Z' to skip to next commercial break marker
 - Home or 'Q' to skip back to previous commercial break marker
-- T to toggle close caption support
+- T to toggle closed caption support
 - Pressing 0-9 (preferably 3 times) + T changes teletext page and turns on 
   teletext.
 - F to rotate between the various Picture Adjustments (Colour, Hue, etc.)
