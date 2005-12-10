@@ -4099,13 +4099,13 @@ bool NuppelVideoPlayer::RebuildSeekTable(bool showPercentage, StatusCallback cb,
     framesPlayed = 0;
     using_null_videoout = true;
 
-    if (OpenFile() < 0)
-        return(0);
-
     // clear out any existing seektables
     m_playbackinfo->ClearPositionMap(MARK_KEYFRAME);
     m_playbackinfo->ClearPositionMap(MARK_GOP_START);
     m_playbackinfo->ClearPositionMap(MARK_GOP_BYFRAME);
+
+    if (OpenFile() < 0)
+        return(0);
 
     playing = true;
 
