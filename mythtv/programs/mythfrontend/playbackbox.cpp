@@ -1842,8 +1842,6 @@ void PlaybackBox::showMenu()
         }
     }
 
-    popup->addButton(tr("Cancel"), this, SLOT(doCancel()));
-
     popup->ShowPopup(this, SLOT(doCancel()));
 
     topButton->setFocus();
