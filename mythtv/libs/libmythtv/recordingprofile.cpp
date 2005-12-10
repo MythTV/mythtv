@@ -577,13 +577,13 @@ public:
         // We'll eventually want to add MPEG2 software encoding params here
         params = new VerticalConfigurationGroup(false);
         params->setLabel(QObject::tr("MPEG-2 Parameters"));
-        params->addChild(new MPEG4bitrate(parent));
-        params->addChild(new MPEG4MaxQuality(parent));
-        params->addChild(new MPEG4MinQuality(parent));
-        params->addChild(new MPEG4QualDiff(parent));
-        params->addChild(new MPEG4ScaleBitrate(parent));
-        params->addChild(new MPEG4OptionVHQ(parent));
-        params->addChild(new MPEG4Option4MV(parent));
+        //params->addChild(new MPEG4bitrate(parent));
+        //params->addChild(new MPEG4MaxQuality(parent));
+        //params->addChild(new MPEG4MinQuality(parent));
+        //params->addChild(new MPEG4QualDiff(parent));
+        //params->addChild(new MPEG4ScaleBitrate(parent));
+        //params->addChild(new MPEG4OptionVHQ(parent));
+        //params->addChild(new MPEG4Option4MV(parent));
 #ifdef HAVE_PTHREADS
         params->addChild(new EncodingThreadCount(parent));
 #endif
@@ -622,6 +622,8 @@ public:
                 // V4L, TRANSCODE (and any undefined types)
                 codecName->addSelection("RTjpeg");
                 codecName->addSelection("MPEG-4");
+                if (groupType == "TRANSCODE")
+                    codecName->addSelection("MPEG-2");
             }
         }
         else

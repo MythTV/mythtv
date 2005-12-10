@@ -1,0 +1,34 @@
+This is a utility to test the remuxing/fixup capabilities for mpeg2
+streams.
+libavformat is used for reading the stream,
+libmpeg2 parses/decodes frames
+libreplex multiplexes the final result.
+
+This combination, in my opinion, results in the most compatible output file
+
+Known issues:
+Missing audio-frames will cause A/V sync issues
+The PTS discrepency code doesn't work with commercial cutting, so it has been
+temporarily disabled.
+
+Build instructions:
+create a link to the actual location for each of the following libraries:
+libavcodec
+libavformat
+libavutil
+libmpeg2
+you may be able to use the following shell script
+---------------------------------------------
+MYTHROOT=$HOME/svn/mythtv/libs/
+AVROOT=$MYTHROOT
+#AVROOT=$HOME/cvs/ffmpeg
+
+ln -sf $AVROOT/libavcodec .
+ln -sf $AVROOT/libavformat .
+ln -sf $AVROOT/libavutil .
+ln -sf $MYTHROOT/libmythmpeg2 libmpeg2
+---------------------------------------------
+
+change the Makefile.standalone to point at the correct libraries
+
+make -f Makefile.standalone

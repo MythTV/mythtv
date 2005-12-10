@@ -1,0 +1,49 @@
+CC       ?= gcc
+CXX      ?= g++
+CFLAGS   ?= -g -O0 -fno-inline -fno-default-inline -DNO_MYTH
+TOOL = mpeg2fix
+
+
+INCLUDES = -I./libavformat -I./libavcodec -I./libavutil -I./libmpeg2 -I./replex -I/usr/include/qt3
+#INCLUDES += -I/usr/src/DVB/include
+
+OBJS = $(TOOL).o helper.o replex/libreplex.a
+
+LIBS = -L./libavformat -L./libavcodec -L./libavutil -L./libmpeg2 -L./replex
+
+#if using libav from mythtv, use this:
+LIBS += -lmythavformat-0.18
+#if using libav from ffmpeg, use this instead:
+#LIBS += -lavformat -lavcodec -lavutil -lz -ldl -lmp3lame -lvorbisenc -lvorbis -logg -lqt-mt
+
+LIBS += -lmythmpeg2-0.18
+LIBS += -lreplex -lpthread -lqt-mt -lm
+
+all: $(TOOL)
+
+$(TOOL): $(OBJS)
+	$(CXX) $(CFLAGS) -o $(TOOL) $(OBJS) $(LIBS)
+
+# Implicit rules:
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $(DEFINES) $(INCLUDES) $<
+
+%.o: %.cpp %.h
+	$(CXX) $(CFLAGS) -c $(DEFINES) $(INCLUDES) $<
+
+replex/libreplex.a:
+	$(MAKE) -C replex libreplex.a
+
+mpegparse: mpegparse.c
+	$(CC) $(CFLAGS) -o mpegparse mpegparse.c -lz
+
+clean:
+	$(MAKE) -C replex clean
+	rm -f $(OBJS)
+
+distclean:
+	$(MAKE) -C replex clean
+	rm -f $(OBJS)
+	rm -f libavformat libavcodec libavutil libmpeg2
+	rm -f $(TOOL) mpegparse
