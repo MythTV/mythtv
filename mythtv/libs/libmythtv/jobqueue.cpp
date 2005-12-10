@@ -1462,8 +1462,8 @@ void JobQueue::RecoverQueue(bool justOld)
 void JobQueue::CleanupOldJobsInQueue()
 {
     MSqlQuery delquery(MSqlQuery::InitCon());
-    QDateTime donePurgeDate = QDateTime::currentDateTime().addDays(-7);
-    QDateTime errorsPurgeDate = QDateTime::currentDateTime().addDays(-14);
+    QDateTime donePurgeDate = QDateTime::currentDateTime().addDays(-2);
+    QDateTime errorsPurgeDate = QDateTime::currentDateTime().addDays(-4);
 
     delquery.prepare("DELETE FROM jobqueue "
                      "WHERE (status in (:FINISHED, :ABORTED, :CANCELLED) "
