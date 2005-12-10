@@ -1356,13 +1356,13 @@ void MusicNode::intoTree(QStringList tree_levels,
   
         a_lowercase_field = a_field.lower();
         if (a_lowercase_field.left(4) == "the ")
-            a_lowercase_field = a_lowercase_field.mid(4);
+            a_field = a_field.mid(4);
   
-        curList = mapping.find(a_lowercase_field);
+        curList = mapping.find(a_field);
         if (!curList)
         {
             curList = new MetadataPtrList;
-            mapping.insert(a_lowercase_field, curList);
+            mapping.insert(a_field, curList);
         }
         curList->append(cur);
         ++iter;
