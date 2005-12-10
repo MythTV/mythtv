@@ -8,7 +8,7 @@
 <H1>Installing and using MythTV</H1>
 
 <H2>Robert Kulagowski, 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-12-03, v0.18.16
+<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A></H2>2005-12-10, v0.18.17
 <HR>
 <EM>Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -191,7 +191,7 @@ necessary.</EM>
 
 <UL>
 <LI><A NAME="toc22.1">22.1</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.1">Compiling</A>
-<LI><A NAME="toc22.2">22.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.2">Debugging</A>
+<LI><A NAME="toc22.2">22.2</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.2">Debugging </A>
 <LI><A NAME="toc22.3">22.3</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.3">Installing</A>
 <LI><A NAME="toc22.4">22.4</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.4">Using</A>
 <LI><A NAME="toc22.5">22.5</A> <A HREF="mythtv-HOWTO-singlehtml.html#ss22.5">Miscellaneous</A>
@@ -250,7 +250,8 @@ necessary.</EM>
 the MythTV application!  I can not give you personalized installation
 support.  If you are having issues installing MythTV you should examine the
 archives, or post your question to the MythTV-users mailing list.  If you
-send me "Does MythTV work with 'X'"? messages - I will simply delete your mail.</CAPTION>
+send me "Does MythTV work with 'X'"? messages - I will simply delete your
+mail.</CAPTION>
 </FIGURE>
 </P>
 <H2><A NAME="ss1.1">1.1</A> <A HREF="#toc1.1">What is MythTV?</A>
@@ -405,6 +406,25 @@ seems to be ignoring you.</CAPTION>
 <P>If you feel you need to contribute to a bug database, use the MythTV bug
 ticketing system at 
 <A HREF="http://cvs.mythtv.org/trac">http://cvs.mythtv.org/trac</A>.</P>
+<P>Good entries will contain the following:
+<OL>
+<LI>Qt version</LI>
+<LI>Linux distribution</LI>
+<LI>gcc version</LI>
+<LI>the last entry in config.log to detail how you compiled</LI>
+<LI>MythTV version number</LI>
+<LI>Hardware</LI>
+<LI>How you are able to reproduce the bug</LI>
+</OL>
+</P>
+<P>See the instructions on how to debug in 
+<A HREF="#debugging">Section 22</A>.</P>
+<P>The bug database is not a chat room, so restrict your entries to what is
+relevant.  It's also not a repository of feature requests; a feature request
+without an accompanying patch file to implement that feature will be quickly
+closed.</P>
+<P>If a developer closes out your bug, it's likely you didn't provide enough
+information.  Don't re-open a bug without providing additional information.</P>
 
 <H2><A NAME="ss1.9">1.9</A> <A HREF="#toc1.9">Contributing to this document</A>
 </H2>
@@ -412,19 +432,19 @@ ticketing system at
 <P>Contributions to the HOWTO are welcome, especially if you find a
 grammatical or spelling error, or if the wording of something is just plain
 confusing.</P>
-<P>If you'd like to make a new contribution, feel free to email it to me 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A>, but
-as the maintainer I retain the right to edit or choose not to use your
-submission.</P>
-<P>If you would like to submit an update or contribution, please send it as
-either SGML or as plain text. <EM>NO HTML</EM>.  The source used to create
-the HOWTO is in SGML / Linuxdoc.  See the Linuxdoc HOWTO at 
+<P>If you'd like to make a new contribution, create a ticket at 
+<A HREF="http://cvs.mythtv.org/trac">http://cvs.mythtv.org/trac</A> and
+click "New Ticket".  The type should be set to "patch" and the owner set to
+"rkulagow" to ensure that I see your contribution.</P>
+<P>Please send it as either SGML or as plain text. <EM>NO HTML</EM>.  The
+source used to create the HOWTO is in SGML / Linuxdoc.  Do not be afraid of
+SGML!  A quick look at the source of this HOWTO will show that it is not
+difficult, because there aren't that many tags to worry about, so at least
+<EM>try</EM> to submit as SGML. See the Linuxdoc HOWTO at 
 <A HREF="http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html">http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html</A> for information
 on the linuxdoc format itself, or look at the <CODE>mythtv-HOWTO.sgml</CODE>
 file as an example.</P>
-<P>Do not be afraid of SGML.  A quick look at the source of this HOWTO will
-show that it is not difficult, so at least try to submit as SGML.</P>
-<P>SGML patch files are the easiest.  Run a <B>diff -u origfile newfile >
+<P>To create the actual patch, run <B>diff -u origfilename newfile >
 doc.patch</B> and mail it to the address above.</P>
 
 <H2><A NAME="s2">2.</A> <A HREF="#toc2">Introduction.</A></H2>
@@ -1735,34 +1755,84 @@ $ su
 the MythTV directory that you <CODE>cd</CODE>'d to above.</CAPTION>
 </FIGURE>
 </P>
+
+
 <H3>Enabling real-time scheduling of the display thread.</H3>
 
-<P>MythTV supports real-time scheduling of the video output thread if it is
-installed SUID root.</P>
-<P>This is an optional, but recommended step, if you understand the potential
-negative impact.  As a positive, It can make the video display more
-smoothly, especially if you are decoding HDTV.</P>
-<P>
-<FIGURE>
-<EPS FILE="stop.eps">
-<IMG SRC="stop.png">
-<CAPTION><B>NOTE</B>: Please note that this opens a security hole in your system.</CAPTION>
-</FIGURE>
-</P>
-<P>If the tradeoff is acceptable:</P>
-<P>
+<P>MythTV supports real-time scheduling of the video output thread.
+There are three ways to go about eanbling this: You can use rlimits,
+you can use the realtime security module, or on older systems you 
+can SUID the executable. Enabling real-time scheduling is optional,
+but can make the video display more smooth, especially if you are
+decoding HDTV.</P>
+
+<H3>1. rlimits</H3>
+
+<P>The rlimits method is the preferred method and is included in Linux 2.6.12
+and above. Unfortunately, you need PAM version 0.76-8 or above, which
+may not be supported by your distribution yet. Assuming anyone running
+mythfrontend is in the audio group and rlimits are supported, all
+you need to do is place this in your /etc/security/limit.conf
 <BLOCKQUOTE><CODE>
 <PRE>
-$ su 
-# chmod a+s /usr/local/bin/mythfrontend
-# exit
-$
+*               -       rt_priority     0
+*               -       nice            0
+@audio          -       rt_priority     50
+@audio          -       nice            0
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P><B>NOTE</B>:  Making this change will affect your ability to run
-<B>mythfrontend</B> within <B>gdb</B> for debugging purposes.  If you
-need to debug, you will need to run as root.</P>
+
+<H3>2. realtime module</H3>
+
+<P>The second option is to use the Linux realtime kernel module.
+This is will be phased out over time, but is currently supported
+by many distributions that do not yet support rlimits. If you are
+not using the distribution kernel you must configure your kernel
+with:
+<BLOCKQUOTE><CODE>
+<PRE>
+Security options : [*] Enable different security models
+Security options : [M] Default Linux Capabilties
+</PRE>
+</CODE></BLOCKQUOTE>
+
+You may also need to install the realtime module, using your
+distribution's realtime package. Assuming the users who will
+be running mythfrontend will be in the audio group you can
+get GUID of a named group like so:
+<BLOCKQUOTE><CODE>
+<PRE>
+$ grep audio /etc/group
+</PRE>
+</CODE></BLOCKQUOTE>
+
+If the number printed out from the grep was 18, you can now load 
+this module as root before starting mythfrontend like so:
+<BLOCKQUOTE><CODE>
+<PRE>
+# modprobe realtime gid=18
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
+<H3>3. run as root option (not safe)</H3>
+
+<P>The final and least preferred option is to set the sticky bit
+of the mythfrontend executable. This <B>opens a security hole</B>,
+but is the only option on systems that do not support either
+rlimits or the realtime module. This does not work on modern
+distributions either, and is <B><EM>not recommended</EM></B>
+on any system connected to the internet. This may also make it
+impossible to debug MythTV without running gdb as root. If you
+would still like to do this, you just need to run this as root:
+<BLOCKQUOTE><CODE>
+<PRE>
+# chmod a+s /usr/local/bin/mythfrontend /usr/local/bin/mythtv
+</PRE>
+</CODE></BLOCKQUOTE>
+</P>
+
 
 <H3><A NAME="frontend-only"></A> Frontend-only configuration </H3>
 
@@ -5671,7 +5741,7 @@ first choice is the better solution.</P>
 <P>This is most likely to be caused by an overheating processor rather than
 an actual programming fault within gcc.</P>
 
-<H2><A NAME="ss22.2">22.2</A> <A HREF="#toc22.2">Debugging</A>
+<H2><A NAME="debugging"></A> <A NAME="ss22.2">22.2</A> <A HREF="#toc22.2">Debugging </A>
 </H2>
 
 <H3>MythTV segfaults</H3>
@@ -5718,6 +5788,9 @@ This GDB was configured as "i586-mandrake-linux-gnu"...
 (gdb) handle SIGPIPE nostop
 Signal        Stop      Print   Pass to program Description
 SIGPIPE       No        Yes     Yes             Broken pipe
+(gdb) set logging on
+Copying output to gdb.txt.
+(gdb)
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -5729,11 +5802,12 @@ type
 <BLOCKQUOTE><CODE>
 <PRE>
 (gdb) thread apply all bt full
+(gdb) set logging off
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>All of the output from gdb should be posted to the mythtv-dev mailing
-list, along with the steps you followed to get the program to crash.</P>
+<P>All of the output from <CODE>gdb.txt</CODE> should be posted to the mythtv-dev
+mailing list, along with the steps you followed to get the program to crash.</P>
 <P>If you're trying to troubleshoot and you can't get back to the gdb window
 for some reason, it may be easier to use two systems or to start
 mythfrontend from the text console.</P>

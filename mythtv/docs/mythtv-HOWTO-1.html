@@ -22,7 +22,8 @@ Previous
 the MythTV application!  I can not give you personalized installation
 support.  If you are having issues installing MythTV you should examine the
 archives, or post your question to the MythTV-users mailing list.  If you
-send me "Does MythTV work with 'X'"? messages - I will simply delete your mail.</CAPTION>
+send me "Does MythTV work with 'X'"? messages - I will simply delete your
+mail.</CAPTION>
 </FIGURE>
 </P>
 <H2><A NAME="ss1.1">1.1</A> <A HREF="mythtv-HOWTO.html#toc1.1">What is MythTV?</A>
@@ -177,6 +178,25 @@ seems to be ignoring you.</CAPTION>
 <P>If you feel you need to contribute to a bug database, use the MythTV bug
 ticketing system at 
 <A HREF="http://cvs.mythtv.org/trac">http://cvs.mythtv.org/trac</A>.</P>
+<P>Good entries will contain the following:
+<OL>
+<LI>Qt version</LI>
+<LI>Linux distribution</LI>
+<LI>gcc version</LI>
+<LI>the last entry in config.log to detail how you compiled</LI>
+<LI>MythTV version number</LI>
+<LI>Hardware</LI>
+<LI>How you are able to reproduce the bug</LI>
+</OL>
+</P>
+<P>See the instructions on how to debug in 
+<A HREF="mythtv-HOWTO-22.html#debugging">Section 22</A>.</P>
+<P>The bug database is not a chat room, so restrict your entries to what is
+relevant.  It's also not a repository of feature requests; a feature request
+without an accompanying patch file to implement that feature will be quickly
+closed.</P>
+<P>If a developer closes out your bug, it's likely you didn't provide enough
+information.  Don't re-open a bug without providing additional information.</P>
 
 <H2><A NAME="ss1.9">1.9</A> <A HREF="mythtv-HOWTO.html#toc1.9">Contributing to this document</A>
 </H2>
@@ -184,19 +204,19 @@ ticketing system at
 <P>Contributions to the HOWTO are welcome, especially if you find a
 grammatical or spelling error, or if the wording of something is just plain
 confusing.</P>
-<P>If you'd like to make a new contribution, feel free to email it to me 
-<A HREF="mailto:rkulagow@rocketmail.com">mailto:rkulagow@rocketmail.com</A>, but
-as the maintainer I retain the right to edit or choose not to use your
-submission.</P>
-<P>If you would like to submit an update or contribution, please send it as
-either SGML or as plain text. <EM>NO HTML</EM>.  The source used to create
-the HOWTO is in SGML / Linuxdoc.  See the Linuxdoc HOWTO at 
+<P>If you'd like to make a new contribution, create a ticket at 
+<A HREF="http://cvs.mythtv.org/trac">http://cvs.mythtv.org/trac</A> and
+click "New Ticket".  The type should be set to "patch" and the owner set to
+"rkulagow" to ensure that I see your contribution.</P>
+<P>Please send it as either SGML or as plain text. <EM>NO HTML</EM>.  The
+source used to create the HOWTO is in SGML / Linuxdoc.  Do not be afraid of
+SGML!  A quick look at the source of this HOWTO will show that it is not
+difficult, because there aren't that many tags to worry about, so at least
+<EM>try</EM> to submit as SGML. See the Linuxdoc HOWTO at 
 <A HREF="http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html">http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html</A> for information
 on the linuxdoc format itself, or look at the <CODE>mythtv-HOWTO.sgml</CODE>
 file as an example.</P>
-<P>Do not be afraid of SGML.  A quick look at the source of this HOWTO will
-show that it is not difficult, so at least try to submit as SGML.</P>
-<P>SGML patch files are the easiest.  Run a <B>diff -u origfile newfile >
+<P>To create the actual patch, run <B>diff -u origfilename newfile >
 doc.patch</B> and mail it to the address above.</P>
 
 <HR>

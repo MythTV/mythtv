@@ -74,7 +74,7 @@ first choice is the better solution.</P>
 <P>This is most likely to be caused by an overheating processor rather than
 an actual programming fault within gcc.</P>
 
-<H2><A NAME="ss22.2">22.2</A> <A HREF="mythtv-HOWTO.html#toc22.2">Debugging</A>
+<H2><A NAME="debugging"></A> <A NAME="ss22.2">22.2</A> <A HREF="mythtv-HOWTO.html#toc22.2">Debugging </A>
 </H2>
 
 <H3>MythTV segfaults</H3>
@@ -121,6 +121,9 @@ This GDB was configured as "i586-mandrake-linux-gnu"...
 (gdb) handle SIGPIPE nostop
 Signal        Stop      Print   Pass to program Description
 SIGPIPE       No        Yes     Yes             Broken pipe
+(gdb) set logging on
+Copying output to gdb.txt.
+(gdb)
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
@@ -132,11 +135,12 @@ type
 <BLOCKQUOTE><CODE>
 <PRE>
 (gdb) thread apply all bt full
+(gdb) set logging off
 </PRE>
 </CODE></BLOCKQUOTE>
 </P>
-<P>All of the output from gdb should be posted to the mythtv-dev mailing
-list, along with the steps you followed to get the program to crash.</P>
+<P>All of the output from <CODE>gdb.txt</CODE> should be posted to the mythtv-dev
+mailing list, along with the steps you followed to get the program to crash.</P>
 <P>If you're trying to troubleshoot and you can't get back to the gdb window
 for some reason, it may be easier to use two systems or to start
 mythfrontend from the text console.</P>

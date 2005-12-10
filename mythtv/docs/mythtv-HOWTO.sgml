@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-12-03, v0.18.16
+<date>2005-12-10, v0.18.17
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -21,7 +21,8 @@ necessary.
 the MythTV application!  I can not give you personalized installation
 support.  If you are having issues installing MythTV you should examine the
 archives, or post your question to the MythTV-users mailing list.  If you
-send me "Does MythTV work with 'X'"? messages - I will simply delete your mail.
+send me "Does MythTV work with 'X'"? messages - I will simply delete your
+mail.
 </caption>
 </figure>
 <sect1>What is MythTV?
@@ -167,29 +168,49 @@ seems to be ignoring you.
 <p>If you feel you need to contribute to a bug database, use the MythTV bug
 ticketing system at <url url="http://cvs.mythtv.org/trac"
 name="http://cvs.mythtv.org/trac">.
+
+Good entries will contain the following:
+<enum>
+<item>Qt version
+<item>Linux distribution
+<item>gcc version
+<item>the last entry in config.log to detail how you compiled
+<item>MythTV version number
+<item>Hardware
+<item>How you are able to reproduce the bug
+</enum>
+
+See the instructions on how to debug in <ref id="debugging" name="Section 22">.
+
+The bug database is not a chat room, so restrict your entries to what is
+relevant.  It's also not a repository of feature requests; a feature request
+without an accompanying patch file to implement that feature will be quickly
+closed.
+
+If a developer closes out your bug, it's likely you didn't provide enough
+information.  Don't re-open a bug without providing additional information.
    
 <sect1>Contributing to this document
 <p>Contributions to the HOWTO are welcome, especially if you find a
 grammatical or spelling error, or if the wording of something is just plain
 confusing.
 
-If you'd like to make a new contribution, feel free to email it to me <url
-url="mailto:rkulagow@rocketmail.com" name="mailto:rkulagow@rocketmail.com">, but
-as the maintainer I retain the right to edit or choose not to use your
-submission.
+If you'd like to make a new contribution, create a ticket at <url
+url="http://cvs.mythtv.org/trac" name="http://cvs.mythtv.org/trac"> and
+click "New Ticket".  The type should be set to "patch" and the owner set to
+"rkulagow" to ensure that I see your contribution.
 
-If you would like to submit an update or contribution, please send it as
-either SGML or as plain text. <em>NO HTML</em>.  The source used to create
-the HOWTO is in SGML / Linuxdoc.  See the Linuxdoc HOWTO at <url
+Please send it as either SGML or as plain text. <em>NO HTML</em>.  The
+source used to create the HOWTO is in SGML / Linuxdoc.  Do not be afraid of
+SGML!  A quick look at the source of this HOWTO will show that it is not
+difficult, because there aren't that many tags to worry about, so at least
+<em>try</em> to submit as SGML. See the Linuxdoc HOWTO at <url
 url="http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html"
 name="http://www.tldp.org/HOWTO/Howtos-with-LinuxDoc.html"> for information
 on the linuxdoc format itself, or look at the <tt>mythtv-HOWTO.sgml</tt>
 file as an example.
 
-Do not be afraid of SGML.  A quick look at the source of this HOWTO will
-show that it is not difficult, so at least try to submit as SGML.
-
-SGML patch files are the easiest.  Run a <bf>diff -u origfile newfile >
+To create the actual patch, run <bf>diff -u origfilename newfile >
 doc.patch</bf> and mail it to the address above.
 
 <sect>Introduction.
@@ -5249,7 +5270,7 @@ id="Setting_up_paths" name="Setting up paths">.
 <p>This is most likely to be caused by an overheating processor rather than
 an actual programming fault within gcc.
 
-<sect1>Debugging
+<sect1>Debugging <label id="debugging">
 <sect2>MythTV segfaults
 <sect2>MythTV isn't doing anything
 <sect2>Debugging with GDB
@@ -5290,6 +5311,9 @@ This GDB was configured as "i586-mandrake-linux-gnu"...
 (gdb) handle SIGPIPE nostop
 Signal        Stop      Print   Pass to program Description
 SIGPIPE       No        Yes     Yes             Broken pipe
+(gdb) set logging on
+Copying output to gdb.txt.
+(gdb)
 </verb></tscreen>
 
 <bf>gdb</bf> has a number of options, read the <tt>man</tt> page for more
@@ -5299,10 +5323,11 @@ Once at the <tt>(gdb)</tt> prompt, type <tt>run</tt> to start program
 execution.  When the program segfaults or appears to lock-up (press CTRL-C),
 type 
 <tscreen><verb>(gdb) thread apply all bt full
+(gdb) set logging off
 </verb></tscreen>
 
-All of the output from gdb should be posted to the mythtv-dev mailing
-list, along with the steps you followed to get the program to crash.
+All of the output from <tt>gdb.txt</tt> should be posted to the mythtv-dev
+mailing list, along with the steps you followed to get the program to crash.
 
 If you're trying to troubleshoot and you can't get back to the gdb window
 for some reason, it may be easier to use two systems or to start
@@ -7703,6 +7728,10 @@ ivtvdriver.org.  If you're running SVN, you'd better be on -commits and
 -dev.
 v0.18.16, 2005-12-03.  Remove link to mdz's Debian packages since he's not
 maintaining them anymore.
+v0.18.17, 2005-12-10.  Add some more details about debugging, put text early
+in the doc about what a good bug report should contain, tell people to use
+trac to submit docs patches.
+
 
 -->
 
