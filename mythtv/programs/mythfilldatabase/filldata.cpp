@@ -35,6 +35,7 @@
 #include "libmythtv/frequencytables.h"
 #include "libmythtv/channelutil.h"
 #include "libmythtv/videosource.h"
+#include "libmythtv/remoteutil.h"
 #include "libmyth/util.h"
 
 using namespace std;
@@ -3927,7 +3928,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (usingDataDirect)
+    if ((usingDataDirect) &&
+        (gContext->GetNumSetting("MythFillGrabberSuggestsTime", 1)))
         ddprocessor.getNextSuggestedTime();
 
     VERBOSE(VB_IMPORTANT, "\n"
@@ -3938,7 +3940,9 @@ int main(int argc, char *argv[])
             "===============================================================");
 
     if (grab_data || mark_repeats)
-            ScheduledRecording::signalChange(-1);
+        ScheduledRecording::signalChange(-1);
+
+    RemoteSendMessage("CLEAR_SETTINGS_CACHE");
 
     delete gContext;
 

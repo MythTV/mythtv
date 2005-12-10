@@ -2432,11 +2432,23 @@ static GlobalSpinBox *MythFillMaxHour()
     return bs;
 }
 
+static GlobalCheckBox *MythFillGrabberSuggestsTime()
+{
+    GlobalCheckBox *bc = new GlobalCheckBox("MythFillGrabberSuggestsTime");
+    bc->setLabel(QObject::tr("Run mythfilldatabase at time suggested by the "
+                             "grabber."));
+    bc->setValue(true);
+    bc->setHelpText(QObject::tr("This setting allows a DataDirect guide data "
+                    "provider to specify the next download time in order to "
+                    "distribute load on their servers."));
+    return bc;
+}
+
 static GlobalLineEdit *MythFillDatabasePath()
 {
     GlobalLineEdit *be = new GlobalLineEdit("MythFillDatabasePath");
     be->setLabel(QObject::tr("mythfilldatabase Path"));
-    be->setValue("mythfilldatabase");
+    be->setValue(gContext->GetInstallPrefix() + "/bin/mythfilldatabase");
     be->setHelpText(QObject::tr("Path (including executable) of the "
                     "mythfilldatabase program."));
     return be;
@@ -2510,6 +2522,7 @@ public:
          settings->addChild(MythFillPeriod());
          settings->addChild(MythFillMinHour());
          settings->addChild(MythFillMaxHour());
+         settings->addChild(MythFillGrabberSuggestsTime());
          addTarget("1", settings);
 
          // show nothing if fillEnabled is off

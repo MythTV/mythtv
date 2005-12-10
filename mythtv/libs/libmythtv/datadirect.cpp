@@ -10,6 +10,8 @@
 #include <cerrno>
 
 
+#define LOC QString("DataDirect: ")
+#define LOC_ERR QString("DataDirect, Error: ")
 
 const QString DataDirectURLS[] =
 {
@@ -318,9 +320,9 @@ bool DDStructureParser::characters(const QString& pchars)
 
            QDateTime curTime = QDateTime::currentDateTime();
            if (curTime.daysTo(EDFM) <= 5)
-               VERBOSE(VB_ALL, QString("WARNING: ") + ExpirationDateMessage);
+               VERBOSE(VB_ALL, LOC + QString("WARNING: ") + ExpirationDateMessage);
            else
-               VERBOSE(VB_IMPORTANT, ExpirationDateMessage);
+               VERBOSE(VB_IMPORTANT, LOC + ExpirationDateMessage);
 
            MSqlQuery query(MSqlQuery::DDCon());
 
@@ -473,8 +475,8 @@ FILE *DataDirectProcessor::getInputFile(bool plineupsOnly, QDateTime pstartDate,
         char ctempfilename[] = "/tmp/mythpostXXXXXX";
         if (mkstemp(ctempfilename) == -1) 
         {
-            VERBOSE(VB_IMPORTANT,
-                    QString("DDP: error creating temp files -- %1").
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    QString("Creating temp files -- %1").
                     arg(strerror(errno)));
             return NULL;
         }
@@ -542,8 +544,8 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
     char ctempfilenamesend[] = "/tmp/mythpostXXXXXX";
     if (mkstemp(ctempfilenamesend) == -1) 
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("DDP: error creating temp file for sending -- %1").
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Creating temp file for sending -- %1").
                 arg(strerror(errno)));
         return FALSE;
     }
@@ -552,8 +554,8 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
     char ctempfilenamerecv[] = "/tmp/mythpostXXXXXX";
     if (mkstemp(ctempfilenamerecv) == -1) 
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("DDP: error creating temp file for receiving -- %1").
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Creating temp file for receiving -- %1").
                 arg(strerror(errno)));
         return FALSE;
     }
@@ -576,8 +578,8 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
     }
     else
     {
-        VERBOSE(VB_IMPORTANT,
-                QString("DDP: error creating tmpfilesend -- %1").
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Creating tmpfilesend -- %1").
                 arg(strerror(errno)));
         return FALSE;
     }
@@ -592,10 +594,9 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
                               .arg(ddurl)
                               .arg(tmpfilenamereceive);
 
-    popen(command.ascii(), "r");
+    myth_system(command.ascii());
 
-    QString NextSuggestedTime;
-//    QDateTime NextSuggestedTime;
+    QDateTime NextSuggestedTime;
 
     QFile file(tmpfilenamereceive);
 
@@ -603,9 +604,6 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
 
     if (file.open(IO_ReadOnly)) 
     {
-// There's probably a better way to do this, but we have to wait for the file to get
-// downloaded first, otherwise the while will immediately fall through.
-        sleep (10);
         QTextStream stream(&file);
         QString line;
         while (!stream.atEnd()) 
@@ -614,32 +612,59 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
             if (line.startsWith("<suggestedTime>"))
             {
                 GotNextSuggestedTime = TRUE;
-                NextSuggestedTime = line.mid(15,20);
-//                cout << endl << "timestr is: " << timestr << endl;
-//                QDateTime UTCdt = QDateTime::fromString(timestr, Qt::ISODate);
-//                NextSuggestedTime = MythUTCToLocal(UTCdt);
-//                NextSuggestedTime = timestr;
-                VERBOSE(VB_GENERAL, QString("NextSuggestedTime is: ") 
-//                        + NextSuggestedTime.toString(Qt::LocalDate));
-                        + NextSuggestedTime );
-// + ", localtime is: " 
-//                        + QString(QDateTime(NextSuggestedTime(Qt::LocalDate))));
+                QDateTime UTCdt = QDateTime::fromString(line.mid(15,20),
+                                                        Qt::ISODate);
+                NextSuggestedTime = MythUTCToLocal(UTCdt);
+                VERBOSE(VB_GENERAL, LOC + QString("NextSuggestedTime is: ") 
+                        + NextSuggestedTime.toString(Qt::ISODate));
             }
         }
         file.close();
     }
+    unlink(tmpfilenamesend.ascii());
+    unlink(tmpfilenamereceive.ascii());
+
     if (GotNextSuggestedTime)
     {
+        int today = QDateTime::currentDateTime().toString("d").toInt();
+        int suggestedDay = NextSuggestedTime.toString("d").toInt();
+
+        // Ignore the recommendation and just go 24 hours from now if they
+        // tell us to download again on the same day.
+        if (suggestedDay == today)
+        {
+            VERBOSE(VB_IMPORTANT, LOC + QString("Provider suggested running "
+                    "again at %1, but we just ran for today.  Next run time "
+                    "will be set to 24 hours from now.")
+                    .arg(NextSuggestedTime.toString(Qt::ISODate)));
+            NextSuggestedTime = QDateTime::currentDateTime().addDays(1);
+        }
+
+        int minhr = NextSuggestedTime.toString("h").toInt();
+        int maxhr = NextSuggestedTime.addSecs(7200).toString("h").toInt();
+
+        if (maxhr < minhr)
+        {
+            minhr = 22;
+            maxhr = 24;
+        }
+
         MSqlQuery query(MSqlQuery::DDCon());
+        QString querystr =
+            QString("UPDATE settings SET data = '%1' WHERE value = '%2';");
 
-        QString querystr = (QString("UPDATE settings SET data ='%1' "
-                                    "WHERE value='NextSuggestedMythfilldatabaseRun'")
-                                    .arg(NextSuggestedTime));
-//        cout << "querystr is:" << querystr << endl;
-        query.prepare(querystr);
-
+        query.prepare(querystr.arg(minhr).arg("MythFillMinHour"));
         if (!query.exec())
-            MythContext::DBError("Updating DataDirect Next Suggested Time", query);
+            MythContext::DBError("Updating DataDirect MythFillMinHour", query);
+
+        query.prepare(querystr.arg(maxhr).arg("MythFillMaxHour"));
+        if (!query.exec())
+            MythContext::DBError("Updating DataDirect MythFillMaxHour", query);
+
+        query.prepare(querystr.arg(NextSuggestedTime.toString(Qt::ISODate))
+                              .arg("MythFillSuggestedRunTime"));
+        if (!query.exec())
+            MythContext::DBError("Updating DataDirect Suggested RunTime", query);
     }
     return GotNextSuggestedTime;
 }
@@ -654,7 +679,8 @@ bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
 
     if (fp == NULL) 
     {
-        VERBOSE(VB_IMPORTANT, QString("DDP: Failed to get data (%1) -- %2").
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to get data (%1) -- %2").
                 arg(ferror.ascii()).arg(strerror(errno)));
         return false;
     }
@@ -663,7 +689,7 @@ bool DataDirectProcessor::grabData(bool plineupsOnly, QDateTime pstartDate,
 
     if (!f.open(IO_ReadOnly, fp)) 
     {
-       VERBOSE(VB_GENERAL,"Error opening DataDirect file");
+       VERBOSE(VB_GENERAL, LOC_ERR + "Error opening DataDirect file");
        return false;
     }
     
@@ -776,3 +802,5 @@ void DataDirectProcessor::createTempTables()
             "relevance char(1), INDEX progidx (programid))";
     createATempTable("dd_genre", table);
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */

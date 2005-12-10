@@ -25,6 +25,7 @@ class HouseKeeper
 
     bool wantToRun(const QString &dbTag, int period, int minhour, int maxhour);
     void updateLastrun(const QString &dbTag);
+    QDateTime getLastRun(const QString &dbTag);
     void flushLogs();
     void runFillDatabase();
     void CleanupMyOldRecordings(void);

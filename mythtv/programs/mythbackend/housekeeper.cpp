@@ -51,6 +51,12 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
 {
     bool runOK = false;
     unsigned int oneday = 60 * 60 * 24;
+    unsigned int longEnough = 0;
+
+    if (period)
+        longEnough = ((period * oneday) - 600);
+    else
+        longEnough = oneday / 8;
 
     QDateTime now = QDateTime::currentDateTime();
     QDateTime lastrun;
@@ -67,7 +73,7 @@ bool HouseKeeper::wantToRun(const QString &dbTag, int period, int minhour,
             result.next();
             lastrun = result.value(0).toDateTime();
 
-            if ((now.toTime_t() - lastrun.toTime_t()) > period * oneday)
+            if ((now.toTime_t() - lastrun.toTime_t()) > longEnough)
             {
                 int hour = now.toString(QString("h")).toInt();
                 if ((hour >= minhour) && (hour <= maxhour))
@@ -102,6 +108,25 @@ void HouseKeeper::updateLastrun(const QString &dbTag)
         result.bindValue(":TAG", dbTag);
         result.exec();
     }
+}
+
+QDateTime HouseKeeper::getLastRun(const QString &dbTag)
+{
+    QDateTime lastRun;
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    lastRun.setTime_t(0);
+
+    result.prepare("SELECT lastrun FROM housekeeping WHERE tag = :TAG ;");
+    result.bindValue(":TAG", dbTag);
+
+    if (result.exec() && result.isActive() && result.size() > 0)
+    {
+        result.next();
+        lastRun = result.value(0).toDateTime();
+    }
+
+    return lastRun;
 }
 
 void HouseKeeper::RunHouseKeeping(void)
@@ -154,7 +179,27 @@ void HouseKeeper::RunHouseKeeping(void)
                         maxhr = gContext->GetNumSetting("MythFillMaxHour", 24);
                     }
 
-                    if (wantToRun("MythFillDB", period, minhr, maxhr))
+                    bool runMythFill = false;                    
+                    if (gContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
+                    {
+                        QDateTime nextRun = QDateTime::fromString(
+                            gContext->GetSetting("MythFillSuggestedRunTime",
+                            "1970-01-01T00:00:00"), Qt::ISODate);
+                        QDateTime lastRun = getLastRun("MythFillDB");
+                        QDateTime now = QDateTime::currentDateTime();
+                        int hour = now.toString(QString("h")).toInt();
+
+                        if ((nextRun < now) &&
+                            (lastRun.secsTo(now) > (3 * 60 * 60)) &&
+                            ((minhr <= hour) && (hour <= maxhr)))
+                            runMythFill = true;
+                    }
+                    else if (wantToRun("MythFillDB", period, minhr, maxhr))
+                    {
+                        runMythFill = true;
+                    }
+
+                    if (runMythFill)
                     {
                         QString msg = "Running mythfilldatabase";
                         gContext->LogEntry("mythbackend", LP_DEBUG, msg, "");
@@ -227,7 +272,7 @@ void HouseKeeper::runFillDatabase()
         command = QString("%1 %2").arg(mfpath).arg(mfarg);
     else
         command = QString("%1 %2 >>%3 2>&1").arg(mfpath).arg(mfarg).arg(mflog);
-    
+
     signal(SIGCHLD, &reapChild);
     HouseKeeper_filldb_running = true;
     if (fork() == 0)
