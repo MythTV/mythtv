@@ -236,7 +236,8 @@ void DeviceReadBuffer::fill_ringbuffer(void)
             continue;
 
         // Limit read size for faster return from read
-        size_t read_size = min(dev_read_size, WaitForUnused(TSPacket::SIZE));
+        size_t read_size =
+            min(dev_read_size, (size_t) WaitForUnused(TSPacket::SIZE));
 
         // if read_size > 0 do the read...
         if (read_size)
@@ -369,7 +370,7 @@ bool DeviceReadBuffer::CheckForErrors(ssize_t len, uint &errcnt)
  */
 uint DeviceReadBuffer::Read(unsigned char *buf, const uint count)
 {
-    uint avail = WaitForUsed(min(count, min_read));
+    uint avail = WaitForUsed(min(count, (uint)min_read));
     size_t cnt = min(count, avail);
 
     if (!cnt)
