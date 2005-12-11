@@ -54,7 +54,7 @@ set these options once when you first setup Mythwelcome.
 nvram-wakeup command -  command to set wakeup time in bios
                         
                         if you are really lucky nvram-wakeup will be able 
-                        to recognize your M/B automatically 
+                        to recognise your M/B automatically 
                         "/usr/sbin/nvram-wakeup"
 
                         if you need to explicitly set the info-writer use 
@@ -91,12 +91,16 @@ Start XTerm Command   - This is the command to use to open an XTerm window.
                         TV change the default setting to:
                         'xterm -fa Courier -fs 14' to change the font style and size.   
 
+Start Frontend Command - This is the command mythwelcome should use to start the FE. It
+                         is usefull if you want to change the verbose level or add a log
+                         file to output message etc.
+
 The second set of settings are available by pressing 'i/INFO' key and allow you
 to setup the daily wakeup/shutdown periods and control whether to automatically
 start the mythfrontend when mythwelcome is started and it is determined that it
 was started manually.
 
-Period 1 Start Time  - These setting determine a period of time that the system
+Period 1 Start Time  - These setting determine a period of time that the master backend
 Period 1 End Time      should always wake up for. Set both times to 00:00 to
                        disable this feature. 
 
@@ -108,7 +112,10 @@ Mythfrontend           the system was started to record something or because of 
                        wakeup/shutdown period. If not it will automatically start the
                        frontend. You can disable this feature by unchecking this option.   
 
- 
+Shutdown with Master - (Frontend only machines). If set mythwelcome will shutdown this system
+Backend                when the master backend shutsdown.
+
+
 MYTHBACKEND SETUP OPTIONS
 =========================
 
@@ -225,7 +232,7 @@ The program can be run with the following parameters:
         up period
       
     used by mythwelcome to display a status message to the user and
-    by 'mythshutdown --check' itself to determin if it is safe to shutdown.
+    by 'mythshutdown --check' itself to determine if it is safe to shutdown.
     
 -v/--verbose
     By default mythshutdown is silent and does not produce any output on the
@@ -277,11 +284,19 @@ Unlock Shutdown      -  Allows the system to shutdown when it is idle.
 Run Mythfilldatabase -  Force mythfilldatabase to run now.
 
 Shutdown Now         -  Force the system to shutdown even if it is not idle or is
-                        in a wakeup/shutdown period. Will not shutdown if the backend
-                        is recording or is about to start recording. Requires sudo to
-                        be setup properly to allow mythwelcome to call the mythshutdown
-                        program with root privileges. See above.    
-                        
+                        in a wakeup/shutdown period. 
+
+                        FE only machines simply shutdown using the 'Poweroff command'
+                        that has been setup in settings.
+
+                        Master BE machines will not shutdown if the backend
+                        is recording or is about to start recording otherwise 
+                        mythwelcome sets the time of the next wakeup and shuts down
+                        the system.
+
+                        Requires sudo to be setup properly to allow mythwelcome to call 
+                        the mythshutdown program with root privileges. See above.
+
 Exit                 -  Exit the mythwelcome application.
 
 Cancel               -  Cancel the popup menu.                                     
@@ -300,5 +315,3 @@ TODO
 Make the wakeup/shutdown periods a little more flexible by allowing periods to cross
 midnight.
 
- 
-                      

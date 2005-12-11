@@ -705,7 +705,17 @@ void WelcomeDialog::runEPGGrabber(void)
 void WelcomeDialog::shutdownNow(void)
 {
     cancelPopup();
-    
+
+    // if this is a frontend only machine just shut down now
+    if (gContext->IsFrontendOnly())
+    {
+        VERBOSE(VB_GENERAL, "MythWelcome is shutting this computer down now");
+        QString poweroff_cmd = gContext->GetSetting("MythShutdownPowerOff", "");
+        if (poweroff_cmd != "")
+            system(poweroff_cmd.ascii());
+        return;
+    }
+
     // don't shutdown if we are recording
     if (m_isRecording)
     {
