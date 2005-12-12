@@ -3466,8 +3466,8 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
         if ("message" == it->GetShortName())
             infoMap[QString("message%1").arg(i++)] = it->GetName();
 
-    int   sig = 100;
-    float snr  = 70000.0f, Usnr = 0.0f;
+    uint  sig  = 0;
+    float snr  = 0.0f;
     uint  ber  = 0xffffffff;
     QString pat(""), pmt(""), mgt(""), vct(""), nit(""), sdt("");
     for (it = slist.begin(); it != slist.end(); ++it)
@@ -3477,57 +3477,51 @@ void TV::UpdateOSDSignal(const QStringList& strlist)
 
         infoMap[it->GetShortName()] = QString::number(it->GetValue());
         if ("signal" == it->GetShortName())
-        {
             sig = it->GetNormalizedValue(0, 100);
-            infoMap["signal"] = QString::number(sig);
-        }
         else if ("snr" == it->GetShortName())
-        {
             snr = it->GetValue();
-            Usnr = (uint) it->GetValue();
-        }
         else if ("ber" == it->GetShortName())
             ber = it->GetValue();
         else if ("seen_pat" == it->GetShortName())
-            pat = it->IsGood() ? "a" : " ";
+            pat = it->IsGood() ? "a" : "_";
         else if ("matching_pat" == it->GetShortName())
             pat = it->IsGood() ? "A" : pat;
         else if ("seen_pmt" == it->GetShortName())
-            pmt = it->IsGood() ? "m" : " ";
+            pmt = it->IsGood() ? "m" : "_";
         else if ("matching_pmt" == it->GetShortName())
             pmt = it->IsGood() ? "M" : pmt;
         else if ("seen_mgt" == it->GetShortName())
-            mgt = it->IsGood() ? "g" : " ";
+            mgt = it->IsGood() ? "g" : "_";
         else if ("matching_mgt" == it->GetShortName())
             mgt = it->IsGood() ? "G" : mgt;
         else if ("seen_vct" == it->GetShortName())
-            vct = it->IsGood() ? "v" : " ";
+            vct = it->IsGood() ? "v" : "_";
         else if ("matching_vct" == it->GetShortName())
             vct = it->IsGood() ? "V" : vct;
         else if ("seen_nit" == it->GetShortName())
-            nit = it->IsGood() ? "n" : " ";
+            nit = it->IsGood() ? "n" : "_";
         else if ("matching_nit" == it->GetShortName())
             nit = it->IsGood() ? "N" : nit;
         else if ("seen_sdt" == it->GetShortName())
-            sdt = it->IsGood() ? "s" : " ";
+            sdt = it->IsGood() ? "s" : "_";
         else if ("matching_sdt" == it->GetShortName())
             sdt = it->IsGood() ? "S" : sdt;
     }
+    if (sig)
+        infoMap["signal"] = QString::number(sig); // use normalized value
 
     bool    allGood = SignalMonitorValue::AllGood(slist);
     QString slock   = ("1" == infoMap["slock"]) ? "L" : "l";
     QString lockMsg = (slock=="L") ? tr("Partial Lock") : tr("No Lock");
     QString sigMsg  = allGood ? tr("Lock") : lockMsg;
 
-    QString sigDesc = tr("Signal %1\%").arg(sig);
-    if (sig != 0 && sig != 100);
-    else if (snr < 32766.0f)
-        sigDesc = tr("S/N %1 dB")
-            .arg(log10f((snr < -16384) ? Usnr: snr), 4, 'f', 1);
-    else if (ber < 65535)
-        sigDesc = tr("Bit Errors %1").arg(ber, 4);
+    QString sigDesc = tr("Signal %1\%").arg(sig,2);
+    if (snr > 0.0f)
+        sigDesc += " | " + tr("S/N %1dB").arg(log10f(snr), 3, 'f', 1);
+    if (ber != 0xffffffff)
+        sigDesc += " | " + tr("BE %1", "Bit Errors").arg(ber, 2);
 
-    sigDesc = sigDesc + QString(" (%1%2%3%4%5%6%7) %8")
+    sigDesc = sigDesc + QString(" | (%1%2%3%4%5%6%7) %8")
         .arg(slock).arg(pat).arg(pmt).arg(mgt).arg(vct)
         .arg(nit).arg(sdt).arg(sigMsg);
 
