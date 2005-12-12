@@ -185,10 +185,6 @@
 <context>
     <name>CustomRecord</name>
     <message>
-        <source>Power Search Recording Rule Editor</source>
-        <translation type="obsolete">Inspelningsregeleditor för avancerad sökning</translation>
-    </message>
-    <message>
         <source>Rule Name</source>
         <translation>Regelnamn</translation>
     </message>
@@ -207,14 +203,6 @@
     <message>
         <source>New episodes only</source>
         <translation>Endast nya avsnitt</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (Data Direct)</source>
-        <translation type="obsolete">Uteslut oidentifierade avsnitt (Data Direct)</translation>
-    </message>
-    <message>
-        <source>Exclude unidentified episodes (XMLTV)</source>
-        <translation type="obsolete">Uteslut oidentifierade avsnitt (XMLTV)</translation>
     </message>
     <message>
         <source>Category type</source>
@@ -334,11 +322,11 @@
     </message>
     <message>
         <source>All matches for a genre (Data Direct)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alla matchningar för en genre (Data Direct)</translation>
     </message>
     <message>
         <source>Person named in the credits</source>
-        <translation type="unfinished"></translation>
+        <translation>Person omnämnd som medverkande</translation>
     </message>
     <message>
         <source>Only on a specific station</source>
@@ -350,11 +338,11 @@
     </message>
     <message>
         <source>Additional Tables</source>
-        <translation type="unfinished"></translation>
+        <translation>Ytterligare tabeller</translation>
     </message>
     <message>
         <source>Exclude unidentified episodes</source>
-        <translation type="unfinished"></translation>
+        <translation>Exkludera oidentifierade avsnitt</translation>
     </message>
 </context>
 <context>
@@ -370,10 +358,6 @@
 </context>
 <context>
     <name>DVBConfigurationGroup</name>
-    <message>
-        <source>DisEqC</source>
-        <translation type="obsolete">DisEqC</translation>
-    </message>
     <message>
         <source>Recording Options</source>
         <translation>Inspelningsinställningar</translation>
@@ -700,10 +684,6 @@ Returning to the previous menu.</source>
         <translation>Skapa ny uppspelningsgrupp</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation type="unfinished">Använd tangentbordet eller de numeriska knapparna på din fjärrkontroll för att skriva in gruppnamnet</translation>
-    </message>
-    <message>
         <source>Delete playback group:</source>
         <translation>Ta bort uppspelningsgrupp:</translation>
     </message>
@@ -718,6 +698,10 @@ Returning to the previous menu.</source>
     <message>
         <source>(Create new group)</source>
         <translation>(Skapa ny grupp)</translation>
+    </message>
+    <message>
+        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
+        <translation>Skriv in gruppnamn eller tryck SELECT för att skriva in text med det virtuella tangentbordet</translation>
     </message>
 </context>
 <context>
@@ -775,20 +759,8 @@ Returning to the previous menu.</source>
         <translation>Avsluta inspelning</translation>
     </message>
     <message>
-        <source>Don&apos;t Auto Expire</source>
-        <translation type="obsolete">Autoradera inte</translation>
-    </message>
-    <message>
-        <source>Auto Expire</source>
-        <translation type="obsolete">Autoradera</translation>
-    </message>
-    <message>
         <source>Delete</source>
         <translation>Radera</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Avbryt</translation>
     </message>
     <message>
         <source>Yes, delete it</source>
@@ -845,10 +817,6 @@ Returning to the previous menu.</source>
     <message>
         <source>OK</source>
         <translation>OK</translation>
-    </message>
-    <message>
-        <source>Change Recording Group Password</source>
-        <translation type="obsolete">Ändra lösenord för inspelningsgruppen</translation>
     </message>
     <message>
         <source>Recording Group:</source>
@@ -1133,49 +1101,6 @@ Returning to the previous menu.</source>
     <message>
         <source>Show Program Details</source>
         <translation>Visa programdetaljer</translation>
-    </message>
-</context>
-<context>
-    <name>PreviousBox</name>
-    <message>
-        <source>Previously Recorded</source>
-        <translation type="obsolete">Tidigare inspelat</translation>
-    </message>
-    <message>
-        <source>Select Sort Order</source>
-        <translation type="obsolete">Välj sorteringsordning</translation>
-    </message>
-    <message>
-        <source>Sort by Title</source>
-        <translation type="obsolete">Sortera på titel</translation>
-    </message>
-    <message>
-        <source>Reverse Title</source>
-        <translation type="obsolete">Omvänd titel</translation>
-    </message>
-    <message>
-        <source>Sort by Time</source>
-        <translation type="obsolete">Sortera på tid</translation>
-    </message>
-    <message>
-        <source>Reverse Time</source>
-        <translation type="obsolete">Omvänd tid</translation>
-    </message>
-    <message>
-        <source>NOTE: removing items from this list will not delete any recordings.</source>
-        <translation type="obsolete">OBS: borttagning av poster från denna lista raderar inte några inspelningar.</translation>
-    </message>
-    <message>
-        <source>Keep this episode in the list</source>
-        <translation type="obsolete">Behåll detta avsnitt i listan</translation>
-    </message>
-    <message>
-        <source>Remove this episode from the list</source>
-        <translation type="obsolete">Ta bort detta avsnitt från listan</translation>
-    </message>
-    <message>
-        <source>Remove all episodes for this title</source>
-        <translation type="obsolete">Ta bort alla avsnitt för denna titel</translation>
     </message>
 </context>
 <context>
@@ -1660,16 +1585,8 @@ Returning to the previous menu.</source>
         <translation>Antal minuter operationen framåthopp/bakåthopp (Framåt &gt;&gt;/Bakåt &lt;&lt;) flyttar uppspelningspunkten.</translation>
     </message>
     <message>
-        <source>Fast forward amount (in seconds)</source>
-        <translation type="obsolete">Steglängd vid framåtspolning (sekunder)</translation>
-    </message>
-    <message>
         <source>How many seconds to skip forward on a fast forward.</source>
         <translation>Antal sekunder som operationen &quot;Framåt&quot; flyttar uppspelningspunkten.</translation>
-    </message>
-    <message>
-        <source>Rewind amount (in seconds)</source>
-        <translation type="obsolete">Steglängd vid bakåtspolning (sekunder)</translation>
     </message>
     <message>
         <source>How many seconds to skip backward on a rewind.</source>
@@ -1754,14 +1671,6 @@ Returning to the previous menu.</source>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Setup PIN without first entering the current PIN.</source>
         <translation>PIN-koden för inställningsmenyerna måste matas in innan det går att komma tillbaka hit.</translation>
-    </message>
-    <message>
-        <source>Number of seconds for OSD information</source>
-        <translation type="obsolete">Antal sekunder som information visas</translation>
-    </message>
-    <message>
-        <source>How long the program information remains on the On Screen Display after a channel change.</source>
-        <translation type="obsolete">Antal sekunder som programinformation visas efter ett kanalbyte.</translation>
     </message>
     <message>
         <source>OSD theme</source>
@@ -2826,14 +2735,6 @@ Returning to the previous menu.</source>
         <translation>Korttyp</translation>
     </message>
     <message>
-        <source>Failed to retrieve provider list</source>
-        <translation type="obsolete">Misslyckades med hämtning av leverantörslista</translation>
-    </message>
-    <message>
-        <source>You probably need to update XMLTV.</source>
-        <translation type="obsolete">Du behöver troligen uppdatera XMLTV.</translation>
-    </message>
-    <message>
         <source>Failed to retrieve channel information.</source>
         <translation>Misslyckades med hämtning av kanalinformation.</translation>
     </message>
@@ -2877,20 +2778,8 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>(Ny videokälla)</translation>
     </message>
     <message>
-        <source>ERROR, No inputs found</source>
-        <translation type="obsolete">FEL, inga ingångar hittade</translation>
-    </message>
-    <message>
         <source>XMLTV listings grabber</source>
         <translation>XMLTV grabber</translation>
-    </message>
-    <message>
-        <source>Region</source>
-        <translation type="obsolete">Region</translation>
-    </message>
-    <message>
-        <source>Provider</source>
-        <translation type="obsolete">Leverantör</translation>
     </message>
     <message>
         <source>Channel frequency table</source>
@@ -2899,10 +2788,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Use default unless this source uses a different frequency table than the system wide table defined in the General settings.</source>
         <translation>Använd standard om källan inte använder en annan frekvenstabell än vad som angetts i Globala inställningar för inspelningsservrar (under Generellt).</translation>
-    </message>
-    <message>
-        <source>tv_grab_uk configuration</source>
-        <translation type="obsolete">tv_grab_uk konfiguration</translation>
     </message>
     <message>
         <source>Configuration will run in the terminal window</source>
@@ -2947,22 +2832,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>When you change this setting, the text below should change to the name and type of your card. If the card cannot be opened, an error message will be displayed.</source>
         <translation>När du ändrar denna inställning ska texten nedan ändras till namn och typ på ditt kort. Om kortet inte kan öppnas, kommer ett felmeddelande att visas.</translation>
-    </message>
-    <message>
-        <source>Card Type</source>
-        <translation type="obsolete">Korttyp</translation>
-    </message>
-    <message>
-        <source>Card Name</source>
-        <translation type="obsolete">Kortnamn</translation>
-    </message>
-    <message>
-        <source>Per PID driver buffer size</source>
-        <translation type="obsolete">Bufferstorlek per PID</translation>
-    </message>
-    <message>
-        <source>Packet buffer</source>
-        <translation type="obsolete">Paketbuffer</translation>
     </message>
     <message>
         <source>LNB LOF Switch</source>
@@ -3057,14 +2926,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Alla inspelningar lagras i denna katalog.</translation>
     </message>
     <message>
-        <source>Directory to hold the Live-TV buffers</source>
-        <translation type="obsolete">Katalog för TV-lägesbuffert</translation>
-    </message>
-    <message>
-        <source>All Live-TV buffers will get stored in this directory. These buffers are used to allow you to pause, fast forward and rewind through live TV.</source>
-        <translation type="obsolete">TV-lägesbufferten kommer att lagras i denna katalogen. Bufferten används för att låta dig pausa, spola framåt och bakåt när du tittar på TV.</translation>
-    </message>
-    <message>
         <source>TV format</source>
         <translation>TV-format</translation>
     </message>
@@ -3083,22 +2944,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Select the appropriate frequency table for your system.  If you have an antenna, use a &quot;-bcast&quot; frequency.</source>
         <translation>Välj lämplig frekvenstabell. I Sverige borde &apos;europe-west&apos; vara att föredra.</translation>
-    </message>
-    <message>
-        <source>Live TV buffer (GB)</source>
-        <translation type="obsolete">TV-lägesbuffert (GB)</translation>
-    </message>
-    <message>
-        <source>How large the live TV buffer is allowed to grow.</source>
-        <translation type="obsolete">Hur stor TV-lägesbufferten tillåts att växa.</translation>
-    </message>
-    <message>
-        <source>Minimum free Live TV buffer (MB)</source>
-        <translation type="obsolete">Minimalt ledigt utrymme i TV-lägesbufferten (MB)</translation>
-    </message>
-    <message>
-        <source>How full the live TV buffer is allowed to grow before forcing an unpause.</source>
-        <translation type="obsolete">Hur full TV-lägesbufferten tillåts växa innan pausningen upphävs.</translation>
     </message>
     <message>
         <source>When set and the transcoder is active, the original nuv files will be renamed to nuv.old once the transcoding is complete.</source>
@@ -3221,10 +3066,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Vänta på SEQ-starthuvud.</translation>
     </message>
     <message>
-        <source>Enable channel change buffer warnings</source>
-        <translation type="obsolete">Aktivera buffervarning vid kanalbyte</translation>
-    </message>
-    <message>
         <source>Check this option for budget BT878 based DVB-T cards such as the AverTV DVB-T that require the audio volume left alone.</source>
         <translation>Aktivera detta för DVB-T budgetkort baserade på BT878 som t.ex. AverTV DVT-T som kräver att ljudvolymen lämnas ifred.</translation>
     </message>
@@ -3265,14 +3106,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Visa inspelningar</translation>
     </message>
     <message>
-        <source>%1 behind  --  %2 full</source>
-        <translation type="obsolete">%1 efter - %2 fylld</translation>
-    </message>
-    <message>
-        <source>%1 behind</source>
-        <translation type="obsolete">%1 efter</translation>
-    </message>
-    <message>
         <source>%1 of %2</source>
         <translation>%1 av %2</translation>
     </message>
@@ -3283,10 +3116,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>Commercial Skip Auto-Rewind Amount</source>
         <translation>Tillbakaspolning vid reklamöverhoppning</translation>
-    </message>
-    <message>
-        <source>If set, Myth will automatically rewind this many seconds after performing a commercial skip.</source>
-        <translation type="obsolete">Spola tillbaka så här många sekunder efter ett reklamhopp.</translation>
     </message>
     <message>
         <source>(All)</source>
@@ -3531,10 +3360,6 @@ så du måste ställa in dessa manuellt.</translation>
     <message>
         <source>CC off</source>
         <translation>Textning av</translation>
-    </message>
-    <message>
-        <source>TXT on</source>
-        <translation>Text-TV av</translation>
     </message>
     <message>
         <source>CC</source>
@@ -3793,18 +3618,6 @@ så du måste ställa in dessa manuellt.</translation>
         <translation>Detta kommando körs strax efter inspelningsservern startats. Som parameter kan &apos;$status&apos; användas, vilket blir antingen &apos;auto&apos; eller &apos;user&apos; beroende på hur servern startades.</translation>
     </message>
     <message>
-        <source>Please wait while MythTV retrieves the list of available channels
-.  You might want to check the output as it
-runs by switching to the terminal from which you started
-this program.</source>
-        <translation type="obsolete">Vänta... MythTV hämtar listan 
-med tillgängliga kanaler.
-
-För att välja vilka kanaler som ska hämtas i fortsättningen,
-växla till terminalfönstret som du startade detta
-program ifrån. Detta gör du vanligtvis med Alt+Tab.</translation>
-    </message>
-    <message>
         <source>Please wait while MythTV retrieves the list of available channels.
 You might want to check the output as it
 runs by switching to the terminal from which you started
@@ -3885,10 +3698,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Skapa ny inspelningsgrupp</translation>
     </message>
     <message>
-        <source>Using your keyboard or the numbers keys on your remote enter the group name</source>
-        <translation>Använd tangentbordet eller de numeriska knapparna på din fjärrkontroll för att skriva in gruppnamnet</translation>
-    </message>
-    <message>
         <source>Store in the &quot;%1&quot; recording group</source>
         <translation>Lagra i inspelningsgruppen &quot;%1&quot;</translation>
     </message>
@@ -3915,10 +3724,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>Leave this blank unless you have an external tuner that is connected to the tuner input of your card. If so, you will need to specify the preset channel for the signal (normally 3 or 4).</source>
         <translation>Lämna detta fält blankt såvida du inte har en extern TV-mottagare som är ansluten till tuner-ingången på ditt kort. I så fall måste du ange förvald kanal för signalen (normalt 3 eller 4).</translation>
-    </message>
-    <message>
-        <source>ERROR, V4L support unavailable on this OS</source>
-        <translation type="obsolete">FEL, stöd för V4L saknas under detta OS</translation>
     </message>
     <message>
         <source>MythTV can control the PCM and master mixer volume.  If you prefer to use an external mixer program, then disable this option.</source>
@@ -4047,10 +3852,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>If enabled, Xv picture controls (brightness, contrast, etc.) are used during playback. These are independent of the Video4Linux controls used for recording. The Xv controls may not work properly on some systems.</source>
         <translation>Aktiverar Xv-bildkontrollerna för ljusstyrka, kontrast etc vid uppspelning. Dessa kontroller är skilda från de som används vid inspelning. På vissa system fungerar inte kontrollerna riktigt bra.</translation>
-    </message>
-    <message>
-        <source>If enabled, MythTV will warn you whenever you change the channel but are not caught up to live TV.</source>
-        <translation type="obsolete">Varna om du försöker ändra kanal när du ligger efter verklig tid.</translation>
     </message>
     <message>
         <source>During playback, MythTV will listen for connections from the &quot;mythtvosd&quot; or &quot;mythudprelay&quot; programs on this port.  See the README in contrib/mythnotify/ for additional information.</source>
@@ -4916,7 +4717,7 @@ som du startade detta programmet ifrån.</translation>
     </message>
     <message>
         <source>MythTV server</source>
-        <translation>inspelningsserver</translation>
+        <translation>Inspelningsserver</translation>
     </message>
     <message>
         <source>and the MythTV server</source>
@@ -5025,10 +4826,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>The command executed on this frontend to wake up the database server.</source>
         <translation>Kommandot som körs på denna uppspelningsklient för att väcka databasservern.</translation>
-    </message>
-    <message>
-        <source>Deinterlace algorithm. &apos;Kernel&apos; require SSE. &apos;Bob&apos; requires Xv or XvMC video out.</source>
-        <translation type="obsolete">Avflätningsalgoritm. &apos;Kärna&apos; kräver SSE. &apos;Bob&apos; kräver Xv eller XvMC video ut.</translation>
     </message>
     <message>
         <source>Enable gamma correction for video</source>
@@ -5159,10 +4956,6 @@ som du startade detta programmet ifrån.</translation>
         <translation>Det angivna värdet läggs till prioriteten för inspelningar av typerna &apos;Hitta en&apos;, &apos;Hitta veckovis&apos; och &apos;Hitta dagligen&apos;.</translation>
     </message>
     <message>
-        <source>Use libmpeg2 for decoding</source>
-        <translation type="obsolete">Använd libmpeg2 för avkodning</translation>
-    </message>
-    <message>
         <source>Use on air guide</source>
         <translation>Använd programguide</translation>
     </message>
@@ -5217,18 +5010,6 @@ som du startade detta programmet ifrån.</translation>
     <message>
         <source>If set, only free to air channels will be used.</source>
         <translation>Använd endast &quot;free to air&quot;-kanaler.</translation>
-    </message>
-    <message>
-        <source>The Latitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format 35.78 for 35.78 degrees North Longitude</source>
-        <translation type="obsolete">Latituden för din parabol. Detta används med DiSEqC motorstöd. Ange 35.78 för 35.78 grader nordlig latitud</translation>
-    </message>
-    <message>
-        <source>The Longitude of your satellite dishes location on the Earth..  This is used with DiSEqC Motor Support.  Format -78.93 for 78.93 degrees West Longitude</source>
-        <translation type="obsolete">Longituden för din parabol. Detta används med DiSEqC motorstöd. Ange -78.93 för 78.93 grader västlig longitud</translation>
-    </message>
-    <message>
-        <source>Diseqc Options</source>
-        <translation type="obsolete">DiSEqC-inställningar</translation>
     </message>
     <message>
         <source>6 MHz</source>
@@ -5372,28 +5153,12 @@ som du startade detta programmet ifrån.</translation>
         <translation>x</translation>
     </message>
     <message>
-        <source>Firewire Model</source>
-        <translation type="obsolete">Firewire-modell</translation>
-    </message>
-    <message>
-        <source>Firewire Port</source>
-        <translation type="obsolete">Firewire-port</translation>
-    </message>
-    <message>
         <source>Firewire port on your firewire card.</source>
         <translation>Firewire-port på ditt firewire-kort.</translation>
     </message>
     <message>
-        <source>Firewire Node</source>
-        <translation type="obsolete">Firewire-nod</translation>
-    </message>
-    <message>
         <source>Firewire node is the remote device.</source>
         <translation>Firewire-nod är fjärrenheten.</translation>
-    </message>
-    <message>
-        <source>Firewire Speed</source>
-        <translation type="obsolete">Firewire-hastighet</translation>
     </message>
     <message>
         <source>100Mbps</source>
@@ -5533,10 +5298,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Spela absolut inte in</translation>
     </message>
     <message>
-        <source>Firewire Connection Type</source>
-        <translation type="obsolete">Firewire-anslutningstyp</translation>
-    </message>
-    <message>
         <source>Point to Point</source>
         <translation>Punkt-till-punkt</translation>
     </message>
@@ -5559,14 +5320,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>Cable</source>
         <translation>Kabel</translation>
-    </message>
-    <message>
-        <source>ATSC Transport</source>
-        <translation type="obsolete">ATSC-transport</translation>
-    </message>
-    <message>
-        <source>ATSC transport, cable or terrestrial</source>
-        <translation type="obsolete">ATSC-transport, kabel eller marksänt</translation>
     </message>
     <message>
         <source>Hide Mouse Cursor in Myth</source>
@@ -5751,14 +5504,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
         <translation>Misslyckades återstarta video.</translation>
     </message>
     <message>
-        <source>Use hardware XvMC MPEG Decoding (incompatible with libmpeg2)</source>
-        <translation type="obsolete">Använd XvMC MPEG-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
-    </message>
-    <message>
-        <source>Use hardware XVMC VLD Decoding (incompatible with libmpeg2)</source>
-        <translation type="obsolete">Använd XvMC VLD-hårdvaruavkodning (inkompatibelt med libmpeg2)</translation>
-    </message>
-    <message>
         <source>If set and Auto Commercial Flagging is ON for a recording, the flagging job will be started as soon as the recording starts.  NOT recommended on underpowered systems.</source>
         <translation>Om automatisk reklamflaggning är aktiverad, börja detta så fort inspelningen startar.  EJ rekommenderat på svagare system.</translation>
     </message>
@@ -5843,12 +5588,6 @@ De flesta kort känner av detta automatiskt, ändra endast om det ej fungerar.</
     <message>
         <source>Use the name of the display filter currently applied in place of the term &quot;All Programs&quot; in the playback screen.</source>
         <translation>Använd namnet på det använda visningsfiltret i stället för termen &quot;Alla program&quot; i uppspelningsmenyn.</translation>
-    </message>
-    <message>
-        <source>If enabled, libmpeg2 will be used instead of ffmpeg for decoding MPEG-1 and MPEG-2 video frames. This can be faster.
-WARNING: Enabling this option will disable XvMC video output.</source>
-        <translation type="obsolete">Använd libmpeg2 i stället för ffmpeg för avkodning av MPEG-1 och MPEG-2, vilket kan vara snabbare.
-VARNING: Detta val avaktiverar XvMC-videoutmatning.</translation>
     </message>
     <message>
         <source>Aggressive Sound card Buffering</source>
@@ -6069,26 +5808,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>%1 totalt, %2 använt, %3 (%4%) ledigt.</translation>
     </message>
     <message>
-        <source>, using recording profile &apos;%1&apos;</source>
-        <translation>med inspelningsprofil &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>, using your typical recording profile.</source>
-        <translation>med din typiska inspelningsprofil.</translation>
-    </message>
-    <message>
-        <source>%1 hours left %2</source>
-        <translation>%1 tim kvar %2</translation>
-    </message>
-    <message>
-        <source>%1 hours and %2 minutes left %3</source>
-        <translation>%1 tim och %2 min kvar %3</translation>
-    </message>
-    <message>
-        <source>%1 minutes left %2</source>
-        <translation>%1 min kvar %2</translation>
-    </message>
-    <message>
         <source>Disk usage on %1:</source>
         <translation>Diskanvändning på %1:</translation>
     </message>
@@ -6151,14 +5870,6 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>If enabled, MythTV will warn you whenever you try to watch a something and MythTV can&apos;t access the soundcard.</source>
         <translation>Varna om du försöker titta på en inspelning och MythTV inte kan komma åt ljudkortet.</translation>
-    </message>
-    <message>
-        <source>This enables the hardware accelerated MPEG decoding available with many popular video output cards.  </source>
-        <translation type="obsolete">Aktiverar den hårdvaruaccelererade MPEG-avkodning som finns för många populära grafikkort.  </translation>
-    </message>
-    <message>
-        <source>This is incompatible with libmpeg2 decoding, and will be disabled if libmpeg2 decoding is selected.</source>
-        <translation type="obsolete">Detta är inkompatibelt med libmpeg2-avkodning och stängs därför av om libmpeg2-avkodning väljs.</translation>
     </message>
     <message>
         <source>Do you want to fix these problems?</source>
@@ -6253,18 +5964,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>Tecken som används för att separera ATSC huvud- och underkanaler.</translation>
     </message>
     <message>
-        <source>Time Stretch</source>
-        <translation type="obsolete">Tempo</translation>
-    </message>
-    <message>
-        <source>Default time stretch %1</source>
-        <translation type="obsolete">Förvalt tempo %1</translation>
-    </message>
-    <message>
-        <source>Method used to determine which recorded shows to delete first. Set to &apos;None&apos; to disable Auto Expire (not recommended).</source>
-        <translation type="obsolete">Metod som används för att bestämma vilka inspelningar som raderas först. Sätt till &apos;Ingen&apos; för att avaktivera Autoradera (rekommenderas ej).</translation>
-    </message>
-    <message>
         <source>Auto Expire Default</source>
         <translation>Autoradering påslaget som standard</translation>
     </message>
@@ -6284,14 +5983,6 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>it was marked to never be recorded.</source>
         <translation>den manuellt sattes till att inte spela in.</translation>
-    </message>
-    <message>
-        <source>Status: </source>
-        <translation type="obsolete">Status: </translation>
-    </message>
-    <message>
-        <source>Cable-HRC</source>
-        <translation type="obsolete">Kabel-HRC</translation>
     </message>
     <message>
         <source>Channel Separator</source>
@@ -6324,10 +6015,6 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>DBOX2 Host IP is the remote device.</source>
         <translation>Värddator-IP för fjärrenheten.</translation>
-    </message>
-    <message>
-        <source>Enables the use of Via XvMC hardware MPEG decoding for the Via Unichrome Chipset.  </source>
-        <translation type="obsolete">Aktiverar användning av den hårdvaruacceleration för MPEG-avkodning som finns i Via Unichrome chipsetet.  </translation>
     </message>
     <message>
         <source>Turn on the LCD heartbeat.</source>
@@ -6406,18 +6093,6 @@ Myth kommer nu att avslutas.</translation>
     <message>
         <source>Signal Timeout (msec)</source>
         <translation>Tidsgräns för signal (msek)</translation>
-    </message>
-    <message>
-        <source>Maximum time MythTV waits for any signal when scanning for channels, or when when making recording. This does set the time at which point a recording would be abandoned, see Channel Timeout for that value.</source>
-        <translation type="obsolete">Maximal tid MythTV väntar på signal vid kanalsökning eller inspelning. Se även Tidsgräns för kanal.</translation>
-    </message>
-    <message>
-        <source>Channel Timeout (msec)</source>
-        <translation type="obsolete">Tidsgräns för kanal (msek)</translation>
-    </message>
-    <message>
-        <source>Maximum time MythTV waits for a channel to finish tuning before abandoning a timed recording or issuing a warning in LiveTV.</source>
-        <translation type="obsolete">Maximal tid MythTV väntar på att en kanal ska ställas in innan en inspelning överges eller en varning visas i TV-läge.</translation>
     </message>
     <message>
         <source>Store recordings in TS format.</source>
@@ -6868,10 +6543,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>MythWelcome-inställningar</translation>
     </message>
     <message>
-        <source>Daily Wakeup/ShutDown Period 1</source>
-        <translation type="obsolete">Daglig uppvakningsperiod 1</translation>
-    </message>
-    <message>
         <source>nvram-wakeup Command</source>
         <translation>nvram-wakeup kommando</translation>
     </message>
@@ -6912,10 +6583,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>Kommando för att starta ett terminalfönster. Avaktivera genom att lämna tomt.</translation>
     </message>
     <message>
-        <source>MythShutdown Script Settings</source>
-        <translation type="obsolete">MythShutdown skriptinställningar</translation>
-    </message>
-    <message>
         <source>Perform EIT Scan</source>
         <translation>Utför EIT-scanning</translation>
     </message>
@@ -6932,68 +6599,8 @@ Myth kommer nu att avslutas.</translation>
         <translation>Maximal tid att vänta på programinformation på en digital kanal innan scanningen går vidare till nästa kanal.</translation>
     </message>
     <message>
-        <source>Scan Progress</source>
-        <translation type="obsolete">Sökförlopp</translation>
-    </message>
-    <message>
         <source>Status</source>
-        <translation type="unfinished">Status</translation>
-    </message>
-    <message>
-        <source>Tuning</source>
-        <translation type="obsolete">Justerar</translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation type="obsolete">Sökning</translation>
-    </message>
-    <message>
-        <source>Signal Strength</source>
-        <translation type="obsolete">Signalstyrka</translation>
-    </message>
-    <message>
-        <source>Signal/Noise</source>
-        <translation type="obsolete">Signal/Brus</translation>
-    </message>
-    <message>
-        <source>Locked</source>
-        <translation type="obsolete">Låst</translation>
-    </message>
-    <message>
-        <source>No Lock</source>
-        <translation type="obsolete">Inget lås</translation>
-    </message>
-    <message>
-        <source>Full Scan</source>
-        <translation type="obsolete">Full sökning</translation>
-    </message>
-    <message>
-        <source>Full Scan (Tuned)</source>
-        <translation type="obsolete">Full sökning (justerad)</translation>
-    </message>
-    <message>
-        <source>Import channels.conf</source>
-        <translation type="obsolete">Importera channels.conf</translation>
-    </message>
-    <message>
-        <source>Full Scan of Existing Transports</source>
-        <translation type="obsolete">Full sökning av existerande transporter</translation>
-    </message>
-    <message>
-        <source>Existing Transport Scan</source>
-        <translation type="obsolete">Sök av existerande transporter</translation>
-    </message>
-    <message>
-        <source>Country</source>
-        <translation type="obsolete">Land</translation>
-    </message>
-    <message>
-        <source>Fetching lineups from DataDirect service...</source>
-        <translation type="obsolete">Hämtar programutbud från DataDirect-tjänst...</translation>
-    </message>
-    <message>
-        <source>Fetching lineups from the Myth Plus service...</source>
-        <translation type="obsolete">Hämtar programutbud från Myth Plus-tjänsten...</translation>
+        <translation>Status</translation>
     </message>
     <message>
         <source>This will usually only work with ATSC or DVB channels,</source>
@@ -7004,76 +6611,12 @@ Myth kommer nu att avslutas.</translation>
         <translation>och innehåller oftast data endast för ett par dagar.</translation>
     </message>
     <message>
-        <source>Use channel scanner to find channels for this input.</source>
-        <translation type="obsolete">Använd kanalsökare för att hitta kanaler för denna ingång.</translation>
-    </message>
-    <message>
-        <source>This uses the listings data source to provide the channels for this input.</source>
-        <translation type="obsolete">Använd programlistkällan för att hämta kanalerna för denna ingång.</translation>
-    </message>
-    <message>
-        <source>This can take a long time to run.</source>
-        <translation type="obsolete">Detta kan ta lång tid att köra.</translation>
-    </message>
-    <message>
-        <source>Capture Card Menu</source>
-        <translation type="obsolete">TV-kortsmeny</translation>
-    </message>
-    <message>
-        <source>Edit..</source>
-        <translation type="obsolete">Ändra..</translation>
-    </message>
-    <message>
-        <source>Delete..</source>
-        <translation type="obsolete">Ta bort..</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete ALL capture cards?</source>
-        <translation type="obsolete">Är du säker på att du vill ta bort ALLA TV-kort?</translation>
-    </message>
-    <message>
-        <source>Yes, delete capture cards</source>
-        <translation type="obsolete">Ja, ta bort TV-kort</translation>
-    </message>
-    <message>
-        <source>No, don&apos;t</source>
-        <translation type="obsolete">Nej, låt bli</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this capture card?</source>
-        <translation type="obsolete">Är du säker på att du vill ta bort detta TV-kort?</translation>
-    </message>
-    <message>
-        <source>Yes, delete capture card</source>
-        <translation type="obsolete">Ja, ta bort TV-kortet</translation>
-    </message>
-    <message>
-        <source>Video Source Menu</source>
-        <translation type="obsolete">Videokällsmeny</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete ALL video sources?</source>
-        <translation type="obsolete">Är du säker på att du vill ta bort ALLA videokällor?</translation>
-    </message>
-    <message>
-        <source>Yes, delete video sources</source>
-        <translation type="obsolete">Ja, ta bort videokällor</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete this video source?</source>
-        <translation type="obsolete">Är du säker på att du vill ta bort denna videokälla?</translation>
-    </message>
-    <message>
-        <source>Yes, delete video source</source>
-        <translation type="obsolete">Ja, ta bort videokällan</translation>
-    </message>
-    <message>
         <source>Ignore Signal Timeout</source>
         <translation>Ignorera signaltidsgräns</translation>
     </message>
     <message>
         <source>This option allows you to slow down the scan for broken drivers, such as the DVB drivers for the Leadtek LR6650 DVB card.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sök efter kanaler långsammare så att kort med dåliga drivrutiner fungerar, exempelvis Leadtek LR6650 DVB-kortet.</translation>
     </message>
     <message>
         <source>Use only the transmitted guide data.</source>
@@ -7097,27 +6640,27 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for any signal when scanning for channels.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximal tid MythTV väntar på signal vid kanalsökning.</translation>
     </message>
     <message>
         <source>Tuning Timeout (msec)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidsgräns för sökning (msek)</translation>
     </message>
     <message>
         <source>Maximum time MythTV waits for a channel lock when scanning for channels. Or, for issuing a warning in LiveTV mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximal tid MythTV väntar på kanallåsning vid kanalsökning, eller varnar i LiveTV-läge.</translation>
     </message>
     <message>
         <source>The Cartesian latitude for your location.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den kartesiska latituden för din position.</translation>
     </message>
     <message>
         <source>Use negative numbers for southern and western coordinates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Använd negativa nummer för sydliga och västliga koordinater.</translation>
     </message>
     <message>
         <source>The Cartesian longitude for your location.</source>
-        <translation type="unfinished"></translation>
+        <translation>Den kartesiska longituden för din position.</translation>
     </message>
     <message>
         <source>DiSEqC Options</source>
@@ -7153,7 +6696,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>PIP</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild i bild</translation>
     </message>
     <message>
         <source>Schedule Information</source>
@@ -7204,10 +6747,6 @@ Myth kommer nu att avslutas.</translation>
         <translation>Uppspelningsgrupp</translation>
     </message>
     <message>
-        <source>Store in the &quot;%1&quot; playback group</source>
-        <translation type="obsolete">Lagra i uppspelningsgruppen &quot;%1&quot;</translation>
-    </message>
-    <message>
         <source>Select Playback Group</source>
         <translation>Välj uppspelningsgrupp</translation>
     </message>
@@ -7241,7 +6780,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Värd</translation>
     </message>
     <message>
         <source>Adapter</source>
@@ -7249,7 +6788,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Presenter</source>
-        <translation type="unfinished"></translation>
+        <translation>Presentatör</translation>
     </message>
     <message>
         <source>Commentator</source>
@@ -7269,7 +6808,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Method used to determine which recorded shows to delete first.  LiveTV recordings will always expire before normal recordings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Metod för att avgöra vilka inspelningar som autoraderas först. LiveTV-inspelningar raderas alltid före vanliga inspelningar.</translation>
     </message>
     <message>
         <source>LiveTV recordings Max Age</source>
@@ -7281,15 +6820,15 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Defines a period the master backend should be awake</source>
-        <translation type="unfinished"></translation>
+        <translation>Definierar en period då huvudinspelningsservern ska vara vaken</translation>
     </message>
     <message>
         <source>Shutdown with Master Backend</source>
-        <translation type="unfinished"></translation>
+        <translation>Stäng ned med huvudinspelningsservern</translation>
     </message>
     <message>
         <source>Mythwelcome will automatically shutdown this computer when the master backend shuts down. Should only be set on frontend only machines</source>
-        <translation type="unfinished"></translation>
+        <translation>Mythwelcome stänger automatiskt ned denna dator när huvudinspelningsservern stänger ned. Aktivera endast på uppspelningsklienter.</translation>
     </message>
     <message>
         <source>Command to run to start the Frontend</source>
@@ -7301,15 +6840,59 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>MythShutdown/MythWelcome Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>MythShutdown/MythWelcome-inställningar</translation>
     </message>
     <message>
-        <source>Display Name</source>
-        <translation>Visningsnamn</translation>
+        <source>Display Name (optional)</source>
+        <translation>Visningsnamn (frivillig)</translation>
     </message>
     <message>
-        <source>This name is displayed on screen when live TV begins and when changing the selected input or card.</source>
+        <source>This name is displayed on screen when live TV begins and when changing the selected input or card. If you use this, make sure the information is unique for each input.</source>
         <translation>Detta namn visas när LiveTV startar och när vald ingång eller TV-kort ändras.</translation>
+    </message>
+    <message>
+        <source>, using your %1 rate of %2 Kb/sec</source>
+        <translation>, med %1 bithastighet (%2 Kb/s)</translation>
+    </message>
+    <message>
+        <source>%1 hours left</source>
+        <translation>%1 tim kvar</translation>
+    </message>
+    <message>
+        <source>%1 hours and %2 minutes left</source>
+        <translation>%1 tim och %2 min kvar</translation>
+    </message>
+    <message>
+        <source>%1 minutes left</source>
+        <translation>%1 min kvar</translation>
+    </message>
+    <message>
+        <source>average</source>
+        <translation>medel</translation>
+    </message>
+    <message>
+        <source>maximum</source>
+        <translation>max</translation>
+    </message>
+    <message>
+        <source>Run mythfilldatabase at time suggested by the grabber.</source>
+        <translation>Kör mythfilldatabase på tider som föreslås av grabbern.</translation>
+    </message>
+    <message>
+        <source>This setting allows a DataDirect guide data provider to specify the next download time in order to distribute load on their servers.</source>
+        <translation>Tillåt DataDirect att specificera när nästa nerladdning av guidedata ska ske för att jämna ut fördelningen på deras servrar.</translation>
+    </message>
+    <message>
+        <source>Recording Profile</source>
+        <translation>Inspelningsprofil</translation>
+    </message>
+    <message>
+        <source>Enter group name or press SELECT to enter text via the On Screen Keyboard</source>
+        <translation>Skriv in gruppnamn eller tryck SELECT för att skriva in text med det virtuella tangentbordet</translation>
+    </message>
+    <message>
+        <source>Suggested Next: </source>
+        <translation>Föreslagen nästa körning: </translation>
     </message>
 </context>
 <context>
@@ -7707,14 +7290,6 @@ Inga andra detaljer</translation>
         <translation>Gå till</translation>
     </message>
     <message>
-        <source>You are currently behind real time. If you change channels now, you will lose any unwatched video.</source>
-        <translation type="obsolete">Du ligger efter verklig tid. Om du byter kanal nu kommer du förlora det du inte har sett än.</translation>
-    </message>
-    <message>
-        <source>Change the channel anyway</source>
-        <translation type="obsolete">Byt kanal ändå</translation>
-    </message>
-    <message>
         <source>Zoom Mode OFF</source>
         <translation>Zoomläge AV</translation>
     </message>
@@ -7991,10 +7566,6 @@ Inga andra detaljer</translation>
         <translation>OK</translation>
     </message>
     <message>
-        <source>Manual Record</source>
-        <translation type="obsolete">Manuell inspelning</translation>
-    </message>
-    <message>
         <source>Previous Recording</source>
         <translation>Tidigare inspelning</translation>
     </message>
@@ -8027,14 +7598,6 @@ Inga andra detaljer</translation>
         <translation>Sök:</translation>
     </message>
     <message>
-        <source>CC:</source>
-        <translation type="obsolete">CC:</translation>
-    </message>
-    <message>
-        <source>Reactivate</source>
-        <translation type="obsolete">Återaktivera</translation>
-    </message>
-    <message>
         <source>Cancel Record</source>
         <translation>Avbryt inspelning</translation>
     </message>
@@ -8045,7 +7608,7 @@ Inga andra detaljer</translation>
     <message>
         <source>CC:</source>
         <comment>closed caption, teletext page</comment>
-        <translation type="unfinished">CC:</translation>
+        <translation>Textning:</translation>
     </message>
     <message>
         <source>Seek:</source>
