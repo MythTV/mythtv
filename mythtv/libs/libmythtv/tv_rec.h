@@ -327,10 +327,11 @@ class TVRec : public QObject
     DBox2DBOptions    dboxOpt;
 
     // State variables
-    QMutex  stateChangeLock;
-    TVState internalState;
-    TVState desiredNextState;
-    bool    changeState;
+    QMutex         stateChangeLock;
+    TVState        internalState;
+    TVState        desiredNextState;
+    bool           changeState;
+    bool           pauseNotify;
     uint           stateFlags;
     TuningQueue    tuningRequests;
     TuningRequest  lastTuningRequest;
@@ -374,6 +375,8 @@ class TVRec : public QObject
     static const uint kFlagLiveTV               = 0x00000100;
     /// final result desired is a timed recording
     static const uint kFlagRecording            = 0x00000200;
+    /// antenna adjusting mode (LiveTV without recording).
+    static const uint kFlagAntennaAdjust        = 0x00000400;
     static const uint kFlagRec                  = 0x00000F00;
 
     // Non-recording Commands
@@ -383,8 +386,6 @@ class TVRec : public QObject
     static const uint kFlagCloseRec             = 0x00002000;
     /// close recorder, discard recording
     static const uint kFlagKillRec              = 0x00004000;
-    /// antenna adjusting mode (livetv - recorder).
-    static const uint kFlagAntennaAdjust        = 0x00008000;
 
     static const uint kFlagNoRec                = 0x0000F000;
     static const uint kFlagKillRingBuffer       = 0x00010000;

@@ -114,7 +114,8 @@ TVRec::TVRec(int capturecardnum)
       // State variables
       stateChangeLock(true),
       internalState(kState_None), desiredNextState(kState_None),
-      changeState(false), stateFlags(0), lastTuningRequest(0),
+      changeState(false), pauseNotify(true),
+      stateFlags(0), lastTuningRequest(0),
       // Current recording info
       curRecording(NULL), autoRunJobs(JOB_NONE),
       // Pending recording info
@@ -848,7 +849,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
 void TVRec::TeardownRecorder(bool killFile)
 {
     int filelen = -1;
-
+    pauseNotify = false;
     ispip = false;
 
     if (recorder && HasFlags(kFlagRecorderRunning))
@@ -909,6 +910,7 @@ void TVRec::TeardownRecorder(bool killFile)
 
     MythEvent me("RECORDING_LIST_CHANGE");
     gContext->dispatch(me);
+    pauseNotify = true;
 }    
 
 DVBRecorder *TVRec::GetDVBRecorder(void)
@@ -971,6 +973,7 @@ void TVRec::CloseChannel(void)
         if (dvbOpt.dvb_on_demand)
         {
             TeardownSIParser();
+            ClearFlags(kFlagSIParserRunning);
             GetDVBChannel()->Close();
         }
         return;
@@ -1682,17 +1685,13 @@ int TVRec::SetSignalMonitoringRate(int rate, int notifyFrontend)
     }
 
     ClearFlags(kFlagRingBufferReady);
-    if (rate > 0)
-    {
-        tuningRequests.enqueue(
-            TuningRequest(kFlagKillRec|kFlagKillRingBuffer));
-        tuningRequests.enqueue(TuningRequest(kFlagAntennaAdjust,
-                                             channel->GetCurrentName()));
-    }
-    else
-    {
-        tuningRequests.enqueue(TuningRequest(kFlagLiveTV));
-    }
+
+    TuningRequest req = (rate > 0) ?
+        TuningRequest(kFlagAntennaAdjust, channel->GetCurrentName()) :
+        TuningRequest(kFlagLiveTV);
+
+    tuningRequests.enqueue(req);
+
     // Wait for RingBuffer reset
     while (!HasFlags(kFlagRingBufferReady))
         WaitForEventThreadSleep();
@@ -2511,8 +2510,11 @@ void TVRec::PauseRecorder(void)
  */
 void TVRec::RecorderPaused(void)
 {
-    QMutexLocker lock(&stateChangeLock);
-    triggerEventLoop.wakeAll();
+    if (pauseNotify)
+    {
+        QMutexLocker lock(&stateChangeLock);
+        triggerEventLoop.wakeAll();
+    }
 }
 
 /** \fn TVRec::ToggleChannelFavorite()
@@ -2864,7 +2866,7 @@ void TVRec::HandleTuning(void)
         if (request->flags & (kFlagRecording|kFlagLiveTV|
                               kFlagEITScan|kFlagAntennaAdjust))
         {
-            if (!recorder || genOpt.cardtype == "DVB")
+            if (!recorder)
                 TuningFrequency(*request);
             else
                 SetFlags(kFlagWaitingForRecPause);
@@ -2879,6 +2881,15 @@ void TVRec::HandleTuning(void)
             return;
 
         ClearFlags(kFlagWaitingForRecPause);
+#ifdef USING_DVB
+        if (GetDVBRecorder())
+        {
+            // We currently need to close the file descriptor for
+            // DVB signal monitoring to work with some drivers
+            GetDVBRecorder()->Close();
+            GetDVBRecorder()->SetRingBuffer(NULL);
+        }
+#endif // USING_DVB
         TuningFrequency(lastTuningRequest);
     }
 
@@ -2913,31 +2924,22 @@ void TVRec::HandleTuning(void)
  */
 void TVRec::TuningShutdowns(const TuningRequest &request)
 {
-#ifdef USING_DVB
+#ifdef USING_DVB_EIT
     if (!(request.flags & kFlagEITScan) && HasFlags(kFlagEITScannerRunning))
     {
-#ifdef USING_DVB_EIT
         scanner->StopActiveScan();
-#endif // USING_DVB_EIT
         ClearFlags(kFlagEITScannerRunning);
     }
+#endif // USING_DVB_EIT
 
+#ifdef USING_DVB
     if (HasFlags(kFlagSIParserRunning))
     {
         TeardownSIParser();
         ClearFlags(kFlagSIParserRunning);
-
-        if (recorder)
-        {
-            GetDVBRecorder()->Close();
-            GetDVBRecorder()->SetRingBuffer(NULL);
-        }
     }
     if (HasFlags(kFlagWaitingForSIParser))
         ClearFlags(kFlagWaitingForSIParser);
-    // At this point the SIParser is shut down, the 
-    // recorder is closed, and the ringbuffer reset.
-
 #endif // USING_DVB
 
     if (HasFlags(kFlagSignalMonitorRunning))
@@ -2963,7 +2965,9 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
 
         if (HasFlags(kFlagRecorderRunning))
         {
+            stateChangeLock.unlock();
             TeardownRecorder(request.flags & kFlagKillRec);
+            stateChangeLock.lock();
             ClearFlags(kFlagRecorderRunning);
         }
         // At this point the recorders are shut down
@@ -3116,7 +3120,8 @@ void TVRec::TuningFrequency(const TuningRequest &request)
             }
 
             SetFlags(kFlagSignalMonitorRunning);
-            if (!(request.flags & kFlagAntennaAdjust))
+            ClearFlags(kFlagWaitingForSignal);
+            if (!antadj)
                 SetFlags(kFlagWaitingForSignal);
         }
 
@@ -3130,7 +3135,8 @@ void TVRec::TuningFrequency(const TuningRequest &request)
     }
 
     // Request a recorder, if the command is a recording command
-    if (request.flags & kFlagRec)
+    ClearFlags(kFlagNeedToStartRecorder);
+    if (request.flags & kFlagRec && !antadj)
         SetFlags(kFlagNeedToStartRecorder);
 }
 
@@ -3420,16 +3426,21 @@ void TVRec::TuningRestartRecorder(void)
         delete progInfo;
     }
 
+#ifdef USING_DVB
+    if (GetDVBRecorder())
+    {
+        pauseNotify = false;
+        GetDVBRecorder()->Close();
+        pauseNotify = true;
+        GetDVBRecorder()->Open();
+    }
+#endif // USING_DVB
+
     // Set file descriptor of channel from recorder for V4L
     channel->SetFd(recorder->GetVideoFd());
 
     // Some recorders unpause on Reset, others do not...
     recorder->Unpause();
-
-#ifdef USING_DVB
-    if (GetDVBRecorder())
-        GetDVBRecorder()->Open();
-#endif // USING_DVB
 
     ClearFlags(kFlagNeedToStartRecorder);
 }
