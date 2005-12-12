@@ -22,10 +22,12 @@ using namespace std;
 extern "C" {
 #include "libavcodec/xvmc_render.h"
 }
-#endif
+#endif // USING_XVMC
+
 extern "C" {
 #include "libavcodec/liba52/a52.h"
 #include "../libmythmpeg2/mpeg2.h"
+#include "ivtv_myth.h"
 }
 
 #define LOC QString("AFD: ")
@@ -957,7 +959,7 @@ int AvFormatDecoder::ScanStreams(bool novideo)
             case CODEC_TYPE_DATA:
             {
                 bitrate += enc->bit_rate;
-                VERBOSE(VB_PLAYBACK, LOC + QString("data codec, ignoring (%1)")
+                VERBOSE(VB_PLAYBACK, LOC + QString("data codec (%1)")
                         .arg(codec_type_string(enc->codec_type)));
                 break;
             }
@@ -1603,6 +1605,70 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
     memcpy(prvpkt, pkt->data + pkt->size - 3, 3);
 }
 
+/** \fn AvFormatDecoder::ProcessVBIDataPacket(const AVStream*, const AVPacket*)
+ *  \brief Process ivtv proprietary embedded vertical blanking
+ *         interval captions.
+ *  \sa VBIDecoder
+ */
+void AvFormatDecoder::ProcessVBIDataPacket(
+    const AVStream *stream, const AVPacket *pkt)
+{
+    (void) stream;
+
+    const uint8_t *buf     = pkt->data;
+    uint64_t linemask      = 0;
+    unsigned long long utc = lastccptsu;
+
+    // [i]tv0 means there is a linemask
+    // [I]TV0 means there is no linemask and all lines are present
+    if ((buf[0]=='t') && (buf[1]=='v') && (buf[2] == '0'))
+    {
+        /// TODO this is almost certainly not endian safe....
+        memcpy(&linemask, buf + 3, 8);
+        buf += 11;
+    }
+    else if ((buf[0]=='T') && (buf[1]=='V') && (buf[2] == '0'))
+    {
+        linemask = 0xffffffffffffffffLL;
+        buf += 3;
+    }
+    else
+    {
+        VERBOSE(VB_VBI, LOC + QString("Unknown VBI data stream '%1%2%3'")
+                .arg(QChar(buf[0])).arg(QChar(buf[1])).arg(QChar(buf[2])));
+        return;
+    }
+
+    for (uint i = 0; i < 36; i++)
+    {
+        if (!((linemask >> i) & 0x1))
+            continue;
+
+        static const uint field_lines = 625;
+        const uint line = (i < 18) ? i + 6 : i + 6 + field_lines - 18;
+        const uint id2 = *buf & 0xf;
+        switch (id2)
+        {
+            case VBI_TYPE_TELETEXT:
+                break;
+            case VBI_TYPE_CC:
+                if (ccd && (21==line))
+                {
+                    int data = (buf[2] << 8) | buf[1];
+                    ccd->FormatCCField(utc/1000, 0, data);
+                    utc += 33367;
+                }
+                break;
+            case VBI_TYPE_VPS:
+                break;
+            case VBI_TYPE_WSS:
+                break;
+        }
+        buf += 43;
+    }
+    lastccptsu = utc;
+}
+
 static const float avfmpeg1_aspect[16]={
     0.0000,    1.0000,    0.6735,    0.7031,
     0.7615,    0.8055,    0.8437,    0.8935,
@@ -2160,6 +2226,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                 }
             }
+        }
+
+        if (len > 0 &&
+            curstream->codec->codec_type == CODEC_TYPE_DATA &&
+            curstream->codec->codec_id   == CODEC_ID_MPEG2VBI)
+        {
+            ProcessVBIDataPacket(curstream, pkt);
+
+            av_free_packet(pkt);
+            continue;
         }
 
         if (!curstream->codec->codec)

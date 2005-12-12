@@ -1625,6 +1625,9 @@ static int mpegps_read_packet(AVFormatContext *s,
     } else if (startcode >= 0x20 && startcode <= 0x3f) {
         type = CODEC_TYPE_SUBTITLE;
         codec_id = CODEC_ID_DVD_SUBTITLE;
+    } else if (startcode == 0x69 || startcode == 0x49) {
+        type = CODEC_TYPE_DATA;
+        codec_id = CODEC_ID_MPEG2VBI;
     } else {
     skip:
         /* skip packet */

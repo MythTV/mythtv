@@ -194,7 +194,11 @@ enum CodecID {
     /* subtitle codecs */
     CODEC_ID_DVD_SUBTITLE= 0x17000, 
     CODEC_ID_DVB_SUBTITLE, 
-    
+
+    /* teletext codecs */
+    CODEC_ID_MPEG2VBI,
+    CODEC_ID_DVB_VBI,
+
     CODEC_ID_MPEG2TS= 0x20000, /* _FAKE_ codec to indicate a raw MPEG2 transport
                          stream (only used by libavformat) */
 };

@@ -172,6 +172,8 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     /// Also feeds HandleGopStart for MPEG2 files.
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
 
+    void ProcessVBIDataPacket(const AVStream *stream, const AVPacket *pkt);
+
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
 
