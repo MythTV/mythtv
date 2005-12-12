@@ -173,6 +173,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     void MpegPreProcessPkt(AVStream *stream, AVPacket *pkt);
 
     void ProcessVBIDataPacket(const AVStream *stream, const AVPacket *pkt);
+    void ProcessDVBDataPacket(const AVStream *stream, const AVPacket *pkt);
 
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
@@ -230,7 +231,8 @@ class AvFormatDecoder : public DecoderBase, public CCReader
 
     int maxkeyframedist;
 
-    CCDecoder *ccd;
+    // Caption/Subtitle/Teletext decoders
+    CCDecoder        *ccd;
 
     // Audio
     short int        *audioSamples;

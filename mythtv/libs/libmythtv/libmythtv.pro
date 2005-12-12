@@ -182,6 +182,10 @@ using_frontend {
     SOURCES += guidegrid.cpp            infostructs.cpp
     SOURCES += progfind.cpp             ttfont.cpp
 
+    # Teletext stuff
+    HEADERS += vbilut.h
+    SOURCES += vbilut.cpp
+
     # C stuff
     HEADERS += blend.h
     SOURCES += blend.c

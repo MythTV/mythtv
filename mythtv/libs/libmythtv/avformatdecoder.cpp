@@ -1608,7 +1608,7 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
 /** \fn AvFormatDecoder::ProcessVBIDataPacket(const AVStream*, const AVPacket*)
  *  \brief Process ivtv proprietary embedded vertical blanking
  *         interval captions.
- *  \sa VBIDecoder
+ *  \sa CCDecoder, TeletextDecoder
  */
 void AvFormatDecoder::ProcessVBIDataPacket(
     const AVStream *stream, const AVPacket *pkt)
@@ -1639,34 +1639,82 @@ void AvFormatDecoder::ProcessVBIDataPacket(
         return;
     }
 
+    static const uint min_blank = 6;
     for (uint i = 0; i < 36; i++)
     {
         if (!((linemask >> i) & 0x1))
             continue;
 
-        static const uint field_lines = 625;
-        const uint line = (i < 18) ? i + 6 : i + 6 + field_lines - 18;
+        const uint line  = ((i < 18) ? i : i-18) + min_blank;
+        const uint field = (i<18) ? 0 : 1; 
         const uint id2 = *buf & 0xf;
         switch (id2)
         {
             case VBI_TYPE_TELETEXT:
+                // SECAM lines  6-23 
+                // PAL   lines  6-22
+                // NTSC  lines 10-21 (rare)
+                //ttd->Decode(buf+1, VBI_IVTV);
                 break;
             case VBI_TYPE_CC:
-                if (ccd && (21==line))
+                // PAL   line 22 (rare)
+                // NTSC  line 21
+                if (21 == line)
                 {
                     int data = (buf[2] << 8) | buf[1];
-                    ccd->FormatCCField(utc/1000, 0, data);
+                    ccd->FormatCCField(utc/1000, field, data);
                     utc += 33367;
                 }
                 break;
-            case VBI_TYPE_VPS:
+            case VBI_TYPE_VPS: // Video Programming System
+                // PAL   line 16
+                ccd->DecodeVPS(buf+1); // a.k.a. PDC
                 break;
-            case VBI_TYPE_WSS:
+            case VBI_TYPE_WSS: // Wide Screen Signal
+                // PAL   line 23
+                // NTSC  line 20
+                ccd->DecodeWSS(buf+1);
                 break;
         }
         buf += 43;
     }
     lastccptsu = utc;
+}
+
+/** \fn AvFormatDecoder::ProcessDVBDataPacket(const AVStream*, const AVPacket*)
+ *  \brief Process DVB Teletext.
+ *  \sa TeletextDecoder
+ */
+void AvFormatDecoder::ProcessDVBDataPacket(
+    const AVStream*, const AVPacket *pkt)
+{
+    const uint8_t *buf     = pkt->data;
+    const uint8_t *buf_end = pkt->data + pkt->size;
+
+    while (buf < buf_end);
+    {
+        if (*buf == 0x10)
+            buf++; // skip
+        if (*buf == 0xff)
+            buf += 3; // skip
+
+        if (*buf == 0x02)
+        {
+            buf += 3;
+            //ttd->Decode(buf+1, VBI_DVB);
+        }
+        else if (*buf == 0x03)
+        {
+            buf += 3;
+            //ttd->Decode(buf+1, VBI_DVB_SUBTITLE);
+        }
+        else
+        {
+            VERBOSE(VB_VBI, QString("VBI: Unknown descriptor: %1").arg(*buf));
+        }
+
+        buf += 43;
+    }
 }
 
 static const float avfmpeg1_aspect[16]={
@@ -2233,6 +2281,16 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             curstream->codec->codec_id   == CODEC_ID_MPEG2VBI)
         {
             ProcessVBIDataPacket(curstream, pkt);
+
+            av_free_packet(pkt);
+            continue;
+        }
+
+        if (len > 0 &&
+            curstream->codec->codec_type == CODEC_TYPE_DATA &&
+            curstream->codec->codec_id   == CODEC_ID_MPEG2VBI)
+        {
+            ProcessDVBDataPacket(curstream, pkt);
 
             av_free_packet(pkt);
             continue;

@@ -1,6 +1,8 @@
 #ifndef CCDECODER_H_
 #define CCDECODER_H_
 
+#include <stdint.h>
+
 #include <qstringlist.h>
 
 #include "format.h"
@@ -21,7 +23,10 @@ class CCDecoder
 
     void FormatCC(int tc, int code1, int code2);
     void FormatCCField(int tc, int field, int data);
-                                                          
+
+    void DecodeVPS(const unsigned char *buf);
+    void DecodeWSS(const unsigned char *buf);
+
   private:
     QChar CharCC(int code) const { return stdchar[code]; }
     void ResetCC(int mode);
@@ -58,6 +63,15 @@ class CCDecoder
 
     // temporary buffer
     unsigned char *rbuf;
+
+    // VPS data
+    char            vps_pr_label[20];
+    char            vps_label[20];
+    int             vps_l;
+
+    // WSS data
+    uint            wss_flags;
+    bool            wss_valid;
 };
 
 #endif

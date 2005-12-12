@@ -1,12 +1,17 @@
-#include <qstringlist.h>
 #include <iostream>
 using namespace std;
 
+#include <qstringlist.h>
+
 #include "format.h"
 #include "ccdecoder.h"
+#include "mythcontext.h"
+#include "vbilut.h"
 
 CCDecoder::CCDecoder(CCReader *ccr)
-    : reader(ccr), rbuf(new unsigned char[sizeof(ccsubtitle)+255])
+    : reader(ccr), rbuf(new unsigned char[sizeof(ccsubtitle)+255]),
+      vps_l(0),
+      wss_flags(0), wss_valid(false)
 {
     for (uint i = 0; i < 2; i++)
     {
@@ -48,6 +53,9 @@ CCDecoder::CCDecoder(CCReader *ccr)
     stdchar[125] = 'Ñ';
     stdchar[126] = 'ñ';
     stdchar[127] = 0x2588; /* full block */
+
+    bzero(vps_pr_label, sizeof(vps_pr_label));
+    bzero(vps_label,    sizeof(vps_label));
 }
 
 CCDecoder::~CCDecoder(void)
@@ -698,3 +706,130 @@ int CCDecoder::NewRowCC(int mode, int len)
     return len;
 }
 
+
+static bool IsPrintable(char c)
+{
+    return !(((c) & 0x7F) < 0x20 || ((c) & 0x7F) > 0x7E);
+}
+
+static char Printable(char c)
+{
+    return IsPrintable(c) ? ((c) & 0x7F) : '.';
+}
+
+static int OddParity(unsigned char c)
+{
+    c ^= (c >> 4); c ^= (c >> 2); c ^= (c >> 1);
+    return c & 1;
+}
+
+
+// // // // // // // // // // // // // // // // // // // // // // // //
+// // // // // // // // // // //  VPS  // // // // // // // // // // //
+// // // // // // // // // // // // // // // // // // // // // // // //
+
+void DumpPIL(int pil)
+{
+    int day  = (pil >> 15);
+    int mon  = (pil >> 11) & 0xF;
+    int hour = (pil >> 6 ) & 0x1F;
+    int min  = (pil      ) & 0x3F;
+
+#define _PIL_(day, mon, hour, min) \
+  (((day) << 15) + ((mon) << 11) + ((hour) << 6) + ((min) << 0))
+
+    if (pil == _PIL_(0, 15, 31, 63))
+        VERBOSE(VB_VBI, " PDC: Timer-control (no PDC)");
+    else if (pil == _PIL_(0, 15, 30, 63))
+        VERBOSE(VB_VBI, " PDC: Recording inhibit/terminate");
+    else if (pil == _PIL_(0, 15, 29, 63))
+        VERBOSE(VB_VBI, " PDC: Interruption");
+    else if (pil == _PIL_(0, 15, 28, 63))
+        VERBOSE(VB_VBI, " PDC: Continue");
+    else if (pil == _PIL_(31, 15, 31, 63))
+        VERBOSE(VB_VBI, " PDC: No time");
+    else
+        VERBOSE(VB_VBI, QString(" PDC: %1, 200X-%2-%3 %4:%5")
+                .arg(pil).arg(mon).arg(day).arg(hour).arg(min));
+#undef _PIL_
+}
+
+void CCDecoder::DecodeVPS(const uint8_t *buf)
+{
+    int cni, pcs, pty, pil;
+
+    int c = vbi_bit_reverse[buf[1]];
+
+    if ((int8_t) c < 0)
+    {
+        vps_label[vps_l] = 0;
+        memcpy(vps_pr_label, vps_label, sizeof(vps_pr_label));
+        vps_l = 0;
+    }
+    c &= 0x7F;
+    vps_label[vps_l] = Printable(c);
+    vps_l = (vps_l + 1) % 16;
+
+    VERBOSE(VB_VBI, QString("VPS: 3-10: %1 %2 %3 %4 %5 %6 %7 %8 (\"%9\")")
+            .arg(buf[0]).arg(buf[1]).arg(buf[2]).arg(buf[3]).arg(buf[4])
+            .arg(buf[5]).arg(buf[6]).arg(buf[7]).arg(vps_pr_label));
+
+    pcs = buf[2] >> 6;
+    cni = + ((buf[10] & 3) << 10)
+        + ((buf[11] & 0xC0) << 2)
+        + ((buf[8] & 0xC0) << 0)
+        + (buf[11] & 0x3F);
+    pil = ((buf[8] & 0x3F) << 14) + (buf[9] << 6) + (buf[10] >> 2);
+    pty = buf[12];
+
+    VERBOSE(VB_VBI, QString("CNI: %1 PCS: %2 PTY: %3 ")
+            .arg(cni).arg(pcs).arg(pty));
+
+    DumpPIL(pil);
+
+    // c & 0xf0;
+}
+
+// // // // // // // // // // // // // // // // // // // // // // // //
+// // // // // // // // // // //  WSS  // // // // // // // // // // //
+// // // // // // // // // // // // // // // // // // // // // // // //
+
+void CCDecoder::DecodeWSS(const uint8_t *buf)
+{
+    static const int wss_bits[8] = { 0, 0, 0, 1, 0, 1, 1, 1 };
+    uint wss = 0;
+
+    for (uint i = 0; i < 16; i++)
+    {
+        uint b1 = wss_bits[buf[i] & 7];
+        uint b2 = wss_bits[(buf[i] >> 3) & 7];
+
+        if (b1 == b2)
+            return;
+        wss |= b2 << i;
+    }
+    unsigned char parity = wss & 0xf;
+    parity ^= parity >> 2;
+    parity ^= parity >> 1;
+
+    VERBOSE(VB_VBI,
+            QString("WSS: %1; %2 mode; %3 color coding;\n\t\t\t"
+                    "     %4 helper; reserved b7=%5; %6\n\t\t\t"
+                    "      open subtitles: %7; %scopyright %8; copying %9")
+            .arg(formats[wss & 7]) 
+            .arg((wss & 0x0010) ? "film"                 : "camera") 
+            .arg((wss & 0x0020) ? "MA/CP"                : "standard") 
+            .arg((wss & 0x0040) ? "modulated"            : "no") 
+            .arg(!!(wss & 0x0080)) 
+            .arg((wss & 0x0100) ? "have TTX subtitles; " : "") 
+            .arg(subtitles[(wss >> 9) & 3]) 
+            .arg((wss & 0x0800) ? "surround sound; "     : "") 
+            .arg((wss & 0x1000) ? "asserted"             : "unknown") 
+            .arg((wss & 0x2000) ? "restricted"           : "not restricted"));
+
+    if (parity & 1)
+    {
+        wss_flags = wss;
+        wss_valid = true;
+    }
+}
