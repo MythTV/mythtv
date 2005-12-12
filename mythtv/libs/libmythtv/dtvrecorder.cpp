@@ -160,11 +160,13 @@ void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
     // we have to write them first...
     if (!_payload_buffer.empty())
     {
-        ringBuffer->Write(&_payload_buffer[0], _payload_buffer.size());
+        if (ringBuffer)
+            ringBuffer->Write(&_payload_buffer[0], _payload_buffer.size());
         _payload_buffer.clear();
     }
 
-    ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
+    if (ringBuffer)
+        ringBuffer->Write(tspacket.data(), TSPacket::SIZE);
 }
 
 /** \fn DTVRecorder::FindKeyframes(const TSPacket* tspacket)
