@@ -573,6 +573,8 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
             ParseSDT(&head, &buffer[8], size-8);
             break;
 #ifdef USING_DVB_EIT
+        case 0x4E ... 0x4F:
+            /* Standard Now/Next Event Information Table(s) */
         case 0x50 ... 0x6F:
             /* Standard Future Event Information Table(s) */
             ParseDVBEIT(&head, &buffer[8], size-8);
@@ -1293,7 +1295,8 @@ void SIParser::ParseSDT(tablehead_t *head, uint8_t *buffer, int size)
 
     // TODO: This is temp
     Table[EVENTS]->DependencyMet(SERVICES);
-    Table[EVENTS]->AddPid(0x12,0x00,0x00,true);
+    //Table[EVENTS]->AddPid(0x12,0x00,0x00,true); // see ticket #755
+    Table[EVENTS]->AddPid(0x12,0x7F,0x80,0x12); // see ticket #755
 }
 
 /** \fn GetLanguagePriority(const QString&)
