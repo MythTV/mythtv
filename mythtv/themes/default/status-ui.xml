@@ -4,7 +4,7 @@
 
     <font name="active" face="Arial">
       <color>#ffffff</color>
-      <size>18</size>
+      <size>17</size>
       <bold>yes</bold>
     </font>
 
@@ -17,32 +17,32 @@
 
     <font name="selected" face="Arial">
       <color>#ffff33</color>
-      <size>18</size>
+      <size>17</size>
       <bold>yes</bold>
       <shadow>2,1</shadow>
     </font>
 
     <font name="status" face="Arial">
       <color>#ffffff</color>
-      <size>16</size>
+      <size>14</size>
       <bold>yes</bold>
     </font>
 
     <font name="status_selected" face="Arial">
       <color>#ffff33</color>
-      <size>16</size>
+      <size>14</size>
       <bold>yes</bold>
     </font>
 
     <font name="status_error" face="Arial">
       <color>#ff0000</color>
-      <size>16</size>
+      <size>14</size>
       <bold>yes</bold>
     </font>
 
     <font name="status_warning" face="Arial">
       <color>#ff8429</color>
-      <size>16</size>
+      <size>14</size>
       <bold>yes</bold>
     </font>
 

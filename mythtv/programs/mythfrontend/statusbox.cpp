@@ -622,8 +622,8 @@ void StatusBox::clicked()
 
 void StatusBox::doListingsStatus()
 {
-    QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus, Status;
-    QString querytext, DataDirectMessage;
+    QString mfdLastRunStart, mfdLastRunEnd, mfdLastRunStatus, mfdNextRunStart;
+    QString querytext, Status, DataDirectMessage;
     int DaysOfData;
     QDateTime qdtNow, GuideDataThrough;
     int count = 0;
@@ -649,7 +649,10 @@ void StatusBox::doListingsStatus()
     mfdLastRunStart = gContext->GetSetting("mythfilldatabaseLastRunStart");
     mfdLastRunEnd = gContext->GetSetting("mythfilldatabaseLastRunEnd");
     mfdLastRunStatus = gContext->GetSetting("mythfilldatabaseLastRunStatus");
+    mfdNextRunStart = gContext->GetSetting("MythFillSuggestedRunTime");
     DataDirectMessage = gContext->GetSetting("DataDirectMessage");
+
+    mfdNextRunStart.replace("T", " ");
 
     contentLines[count++] = QObject::tr("Myth version:") + " " +
                                         MYTH_BINARY_VERSION;
@@ -661,6 +664,11 @@ void StatusBox::doListingsStatus()
 
     contentLines[count++] = QObject::tr("Result: ") + mfdLastRunStatus;
 
+
+    if (mfdNextRunStart >= mfdLastRunStart) 
+        contentLines[count++] = QObject::tr("Suggested Next: ") + 
+                                mfdNextRunStart;
+
     DaysOfData = qdtNow.daysTo(GuideDataThrough);
 
     if (GuideDataThrough.isNull())
@@ -671,7 +679,6 @@ void StatusBox::doListingsStatus()
     }
     else
     {
-        contentLines[count++] = "";
         contentLines[count++] = QObject::tr("There is guide data until ") + 
                                 QDateTime(GuideDataThrough)
                                           .toString("yyyy-MM-dd hh:mm");
