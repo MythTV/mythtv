@@ -461,6 +461,7 @@ int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
 
         fftime       = PlayGroup::GetSetting("Default", "skipahead", 30);
         rewtime      = PlayGroup::GetSetting("Default", "skipback", 5);
+        jumptime     = PlayGroup::GetSetting("Default", "jump", 10);
         normal_speed = PlayGroup::GetSetting("Default", "timestretch", 
                                                  100) / 100.0;
 
