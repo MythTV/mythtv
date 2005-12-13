@@ -86,7 +86,7 @@ ProgramInfo::ProgramInfo(void)
     endts = startts;
     recstartts = startts;
     recendts = startts;
-    originalAirDate = startts.date();
+    originalAirDate = QDate::QDate (0, 1, 1);
     lastmodified = startts;
     lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
 
@@ -562,7 +562,9 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     if (repeat)
     {
         progMap["REPEAT"] = QString("(%1) ").arg(QObject::tr("Repeat"));
-        progMap["LONGREPEAT"] = QString("(%1 %2) ")
+        progMap["LONGREPEAT"] = progMap["REPEAT"];
+        if (hasAirDate)
+            progMap["LONGREPEAT"] = QString("(%1 %2) ")
                                 .arg(QObject::tr("Repeat"))
                                 .arg(originalAirDate.toString(fullDateFormat));
     }
@@ -593,9 +595,17 @@ void ProgramInfo::ToMap(QMap<QString, QString> &progMap,
     else
         progMap["stars"] = "";
         
-    progMap["originalairdate"]= originalAirDate.toString(dateFormat);
-    progMap["shortoriginalairdate"]= originalAirDate.toString(shortDateFormat);
-    
+    if (hasAirDate)
+    {
+        progMap["originalairdate"] = originalAirDate.toString(dateFormat);
+        progMap["shortoriginalairdate"] = 
+                                originalAirDate.toString(shortDateFormat);
+    }
+    else
+    {
+        progMap["originalairdate"] = "";
+        progMap["shortoriginalairdate"] = "";
+    }
 }
 
 /** \fn ProgramInfo::CalculateLength(void) const
@@ -809,13 +819,13 @@ ProgramInfo *ProgramInfo::GetProgramFromRecorded(const QString &channel,
         
         if (query.value(17).isNull() || query.value(17).toString().isEmpty())
         {
-            proginfo->originalAirDate = proginfo->startts.date();
+            proginfo->originalAirDate = QDate::QDate (0, 1, 1);
             proginfo->hasAirDate = false;
         }
         else
         {
-            proginfo->originalAirDate = QDate::fromString(query.value(17).toString(),
-                                                          Qt::ISODate);
+            proginfo->originalAirDate =
+                QDate::fromString(query.value(17).toString(), Qt::ISODate);
             proginfo->hasAirDate = true;
         }
         proginfo->hostname = query.value(18).toString();
@@ -3920,7 +3930,7 @@ bool ProgramList::FromProgram(const QString &sql, MSqlBindings &bindings,
         
         if (query.value(17).isNull() || query.value(17).toString().isEmpty())
         {
-            p->originalAirDate = p->startts.date();
+            p->originalAirDate = QDate::QDate (0, 1, 1);
             p->hasAirDate = false;
         }
         else
