@@ -299,7 +299,6 @@ bool TV::Init(bool createWindow)
     }
 
     baseFilters         += gContext->GetSetting("CustomFilters");
-    jumptime             = gContext->GetNumSetting("JumpAmount", 10);
     usePicControls       = gContext->GetNumSetting("UseOutputPictureControls",0);
     smartChannelChange   = gContext->GetNumSetting("SmartChannelChange", 0);
     MuteIndividualChannels=gContext->GetNumSetting("IndividualMuteControl", 0);
@@ -603,6 +602,7 @@ int TV::Playback(ProgramInfo *rcinfo)
 
     fftime = PlayGroup::GetSetting(playbackinfo->playgroup, "skipahead", 30);
     rewtime = PlayGroup::GetSetting(playbackinfo->playgroup, "skipback", 5);
+    jumptime = PlayGroup::GetSetting(playbackinfo->playgroup, "jump", 10);
     normal_speed = PlayGroup::GetSetting(playbackinfo->playgroup, 
                                          "timestretch", 100) / 100.0;
 

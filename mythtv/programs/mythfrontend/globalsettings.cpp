@@ -347,16 +347,6 @@ static HostCheckBox *PBBShowGroupSummary()
     return gc;
 }
 
-static HostSpinBox *JumpAmount()
-{
-    HostSpinBox *gs = new HostSpinBox("JumpAmount", 1, 30, 5, true);
-    gs->setLabel(QObject::tr("Jump amount (in minutes)"));
-    gs->setValue(10);
-    gs->setHelpText(QObject::tr("How many minutes to jump forward or backward "
-                    "when the jump keys are pressed."));
-    return gs;
-}
-
 static HostCheckBox *SmartForward()
 {
     HostCheckBox *gc = new HostCheckBox("SmartForward");
@@ -3048,7 +3038,6 @@ PlaybackSettings::PlaybackSettings()
     seek->addChild(FFRewReposTime());
     seek->addChild(FFRewReverse());
     seek->addChild(ExactSeeking());
-    seek->addChild(JumpAmount());
     addChild(seek);
 
     VerticalConfigurationGroup* comms = new VerticalConfigurationGroup(false);

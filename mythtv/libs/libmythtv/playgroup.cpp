@@ -64,6 +64,17 @@ public:
     };
 };
 
+class JumpMinutes: public SpinBoxSetting, public PlayGroupSetting {
+public:
+    JumpMinutes(const PlayGroup& _parent):
+        SpinBoxSetting(0, 30, 10, true, "(" + QObject::tr("default") + ")"),
+        PlayGroupSetting(_parent, "jump") {
+        setLabel(QObject::tr("Jump amount (in minutes)"));
+        setHelpText(QObject::tr("How many minutes to jump forward or backward "
+                    "when the jump keys are pressed."));
+    };
+};
+
 class TimeStretch: public SpinBoxSetting, public PlayGroupSetting {
 public:
     TimeStretch(const PlayGroup& _parent):
@@ -98,6 +109,7 @@ PlayGroup::PlayGroup(QString _name)
     cgroup->addChild(new TitleMatch(*this));
     cgroup->addChild(new SkipAhead(*this));
     cgroup->addChild(new SkipBack(*this));
+    cgroup->addChild(new JumpMinutes(*this));
     cgroup->addChild(new TimeStretch(*this));
 
     addChild(cgroup);
