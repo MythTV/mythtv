@@ -639,6 +639,7 @@ int AvFormatDecoder::OpenFile(RingBuffer *rbuffer, bool novideo, char testbuf[20
     fmt->flags &= ~AVFMT_NOFILE;
 
     av_estimate_timings(ic);
+    av_read_frame_flush(ic);
 
     // Scan for the initial A/V streams
     ret = ScanStreams(novideo);

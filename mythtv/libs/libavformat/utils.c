@@ -545,6 +545,7 @@ int av_open_input_stream(AVFormatContext **ic_ptr,
     ic->iformat = fmt;
     ic->duration = AV_NOPTS_VALUE;
     ic->start_time = AV_NOPTS_VALUE;
+    ic->last_IP_pts = AV_NOPTS_VALUE;
     pstrcpy(ic->filename, sizeof(ic->filename), filename);
 
     /* allocate private data */
@@ -894,7 +895,13 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
             if(st->last_IP_pts != AV_NOPTS_VALUE)
                 st->cur_dts = pkt->dts = st->last_IP_pts;
             else
-                pkt->dts = st->cur_dts;
+            {
+                /* if any other stream has already seen a pts, use it in preference */
+                if (s->last_IP_pts != AV_NOPTS_VALUE)
+                    st->cur_dts = pkt->dts = s->last_IP_pts;
+                else
+                    pkt->dts = st->cur_dts;
+            }
         } else {
             st->cur_dts = pkt->dts;
         }
@@ -906,6 +913,9 @@ static void compute_pkt_fields(AVFormatContext *s, AVStream *st,
             st->cur_dts += st->last_IP_duration;
         st->last_IP_duration  = pkt->duration;
         st->last_IP_pts= pkt->pts;
+        /* save in case any stream doesn't have pts' */
+        if (s->last_IP_pts == AV_NOPTS_VALUE)
+            s->last_IP_pts = st->last_IP_pts;
         /* cannot compute PTS if not present (we can compute it only
            by knowing the futur */
     } else if(pkt->pts != AV_NOPTS_VALUE || pkt->dts != AV_NOPTS_VALUE || pkt->duration){
@@ -1203,6 +1213,7 @@ void av_read_frame_flush(AVFormatContext *s)
     /* fail safe */
     s->cur_ptr = NULL;
     s->cur_len = 0;
+    s->last_IP_pts = AV_NOPTS_VALUE;
     
     /* for each stream, reset read state */
     for(i = 0; i < s->nb_streams; i++) {
