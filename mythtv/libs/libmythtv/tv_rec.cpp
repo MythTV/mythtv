@@ -1940,12 +1940,10 @@ bool TVRec::CheckChannelPrefix(QString name, bool &unique)
         "FROM channel, capturecard, cardinput "
         "WHERE channel.channum LIKE '%1%%'               AND "
         "      channel.sourceid     = cardinput.sourceid AND "
-        "      cardinput.inputname  = '%2'               AND "
         "      cardinput.cardid     = capturecard.cardid AND "
         "      capturecard.cardid   = '%3'               AND "
         "      capturecard.hostname = '%4'")
         .arg(name)
-        .arg(channelinput)
         .arg(cardid)
         .arg(gContext->GetHostName());
 
