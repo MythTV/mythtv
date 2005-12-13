@@ -434,7 +434,7 @@ bool DVDThread::ripTitle(int title_number,
     QTime job_time;
     job_time.start();
 
-    unsigned char video_data[ 1024 * DVD_VIDEO_LB_LEN ];
+    std::vector<unsigned char> video_data(1024 * DVD_VIDEO_LB_LEN);
     
     int next_cell = start_cell;    
     for(int cur_cell = start_cell; next_cell < cur_pgc->nr_of_cells; )
@@ -472,7 +472,8 @@ bool DVDThread::ripTitle(int title_number,
             //  Read the NAV packet.
             //            
             
-            int len = DVDReadBlocks(title.get(), (int) cur_pack, 1, video_data);
+            int len = DVDReadBlocks(title.get(), (int) cur_pack, 1, 
+                                    &video_data[0]);
             if( len != 1)
             {
                 problem(QString("DVDPerfectThread read failed for block %1").arg(cur_pack));
@@ -488,7 +489,7 @@ bool DVDThread::ripTitle(int title_number,
             //  Parse the contained dsi packet
             //
             
-            navRead_DSI(&dsi_pack, &(video_data[ DSI_START_BYTE ]) );
+            navRead_DSI(&dsi_pack, &video_data[DSI_START_BYTE]);
             //  and another assertion here: assert( cur_pack == dsi_pack.dsi_gi.nv_pck_lbn );
             
             //
@@ -516,7 +517,7 @@ bool DVDThread::ripTitle(int title_number,
             //
             
             len = DVDReadBlocks(title.get(), (int)cur_pack, cur_output_size,
-                    video_data);
+                                &video_data[0]);
             if( len != (int) cur_output_size )
             {
                 problem(QString("DVDPerfectThread read failed for %1 blocks at %2") 
@@ -530,7 +531,7 @@ bool DVDThread::ripTitle(int title_number,
             overall_progress = subjob_progress * sub_to_overall_multiple;
             updateSubjobString(job_time.elapsed() / 1000, 
                                QObject::tr("Ripping to file ~"));
-            if(!ripfile.writeBlocks(video_data,
+            if(!ripfile.writeBlocks(&video_data[0],
                             cur_output_size * DVD_VIDEO_LB_LEN))
             {
                 problem("Couldn't write blocks during a rip. Filesystem size exceeded? Disc full?");
