@@ -8,7 +8,7 @@ SOURCE=$1
 mkdir -p $DESTDIR/$SOURCE || exit 1
 
 find $SOURCE -path '*/.svn' -prune -or -type d -exec mkdir -p $DESTDIR/{} \;
-find $SOURCE -path '*/.svn' -prune -or -type f -exec cp -p {} $DESTDIR/{} \;
+find $SOURCE -path '*/.svn' -prune -or -type f -exec cp {} $DESTDIR/{} \;
 
 
 exit 0
