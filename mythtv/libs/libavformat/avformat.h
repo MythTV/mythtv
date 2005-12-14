@@ -348,7 +348,6 @@ typedef struct AVFormatContext {
     
     int flags;
 #define AVFMT_FLAG_GENPTS       0x0001 ///< generate pts if missing even if it requires parsing future frames
-    int64_t last_IP_pts;
 } AVFormatContext;
 
 typedef struct AVPacketList {
