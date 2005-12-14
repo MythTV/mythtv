@@ -1919,7 +1919,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
             if (ccInputMode)
             {
                 bool valid = false;
-                int page = GetQueuedInputAsInt(&valid, 16) << 16;
+                int page = GetQueuedInputAsInt(&valid, 16);
                 page = (valid) ? page : 0;
                 DoToggleCC(page);
                 ccInputModeExpires.start(); // expire ccInputMode now...
@@ -3053,7 +3053,10 @@ void TV::AddKeyToInputQueue(char key)
     QString inputStr = (do_smart) ? queuedChanNum : queuedInput;
     inputStr = inputStr.isEmpty() ? "?" : inputStr;
     if (ccInputMode)
-        inputStr = tr("CC:", "closed caption, teletext page") + " " + inputStr;
+    {
+        QString entryStr = (vbimode==1) ? tr("TXT:") : tr("CC:");
+        inputStr = entryStr + " " + inputStr;
+    }
     else if (asInputMode)
         inputStr = tr("Seek:", "seek to location") + " " + inputStr;
     UpdateOSDTextEntry(inputStr);
@@ -3087,7 +3090,7 @@ void TV::CommitQueuedInput(void)
     if (ccInputMode)
     {
         bool valid = false;
-        int page = GetQueuedInputAsInt(&valid, 16) << 16;
+        int page = GetQueuedInputAsInt(&valid, 16);
         if (valid && page)
             DoToggleCC(page);
         ccInputModeExpires.start(); // expire ccInputMode
