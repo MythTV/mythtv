@@ -228,7 +228,7 @@ int DummyDTVRecorder::ProcessData(unsigned char *buffer, int len)
         const TSPacket *pkt = reinterpret_cast<const TSPacket*>(&buffer[pos]);
 
         // Parse frame info from video packets
-        int cnt = _frames_seen_count;
+        unsigned long long cnt = _frames_seen_count;
         if (pkt->PID() == DUMMY_VIDEO_PID)
             FindKeyframes(pkt);
 

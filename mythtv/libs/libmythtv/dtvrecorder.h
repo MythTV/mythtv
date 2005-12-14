@@ -57,18 +57,16 @@ class DTVRecorder: public RecorderBase
     int _stream_fd;
 
     // used for scanning pes headers for keyframes
-    bool _keyframe_seen;
-    int  _position_within_gop_header;
-    long long _first_keyframe;
-    long long _last_keyframe_seen;
-    long long _last_gop_seen;
-    long long _last_seq_seen;
+    uint      _header_pos;
+    int       _first_keyframe;
+    unsigned long long _last_gop_seen;
+    unsigned long long _last_seq_seen;
+    unsigned long long _last_keyframe_seen;
 
     /// True if API call has requested a recording be [re]started
     bool _request_recording;
     /// Wait for the a GOP/SEQ-start before sending data
     bool _wait_for_keyframe_option;
-    bool _wait_for_keyframe;
 
     // state tracking variables
     /// True iff recording is actually being performed
@@ -85,8 +83,8 @@ class DTVRecorder: public RecorderBase
     vector<unsigned char> _payload_buffer;
 
     // statistics
-    long long _frames_seen_count;
-    long long _frames_written_count;
+    unsigned long long _frames_seen_count;
+    unsigned long long _frames_written_count;
 
     // position maps for seeking
     QMutex                     _position_map_lock;

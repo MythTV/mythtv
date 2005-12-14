@@ -189,7 +189,6 @@ void DVBRecorder::SetPMTObject(const PMTObject *_pmt)
 
     _reset_pid_filters = true;
 
-    _frames_written_count = 0;
     bzero(_ps_rec_buf, sizeof(unsigned char) * 3);
 }
 
@@ -337,8 +336,6 @@ bool DVBRecorder::OpenFilters(void)
     CloseFilters();
 
     QMutexLocker change_lock(&_pid_lock);
-
-    _wait_for_keyframe = _wait_for_keyframe_option;
 
     _ps_rec_audio_id = 0xC0;
     _ps_rec_video_id = 0xE0;
@@ -783,7 +780,7 @@ bool DVBRecorder::ProcessTSPacket(const TSPacket& tspacket)
         _buffer_packets = !FindKeyframes(&tspacket);
 
     // Sync recording start to first keyframe
-    if (_wait_for_keyframe_option && !_keyframe_seen)
+    if (_wait_for_keyframe_option && _first_keyframe<0)
         return true;
 
     // Sync streams to the first Payload Unit Start Indicator
@@ -1039,7 +1036,7 @@ void DVBRecorder::ProcessDataPS(unsigned char *buffer, uint len)
 
     if (buffer[0] != 0x00 || buffer[1] != 0x00 || buffer[2] != 0x01)
     {
-        if (!_wait_for_keyframe_option || _keyframe_seen)
+        if (!_wait_for_keyframe_option || _first_keyframe>=0)
             ringBuffer->Write(buffer, len);
         return;
     }
@@ -1056,6 +1053,7 @@ void DVBRecorder::ProcessDataPS(unsigned char *buffer, uint len)
         uint state_byte = 0;
         int prvcount = -1;
 
+        uint framesWritten = _frames_written_count;
         while (bufptr < &buffer[pos] + datalen)
         {
             state_byte  = (++prvcount < 3) ? _ps_rec_buf[prvcount] : *bufptr++;
@@ -1075,7 +1073,7 @@ void DVBRecorder::ProcessDataPS(unsigned char *buffer, uint len)
             if (PESStreamID::PictureStartCode == stream_id)
                 _frames_written_count++;
             else if (PESStreamID::SequenceStartCode == stream_id)
-                _keyframe_seen = true;
+                _first_keyframe = framesWritten;
             else if (PESStreamID::GOPStartCode == stream_id)
             {
                 _position_map_lock.lock();
@@ -1095,7 +1093,7 @@ void DVBRecorder::ProcessDataPS(unsigned char *buffer, uint len)
     }
     memcpy(_ps_rec_buf, &buffer[len - 3], 3);
 
-    if (!_wait_for_keyframe_option || _keyframe_seen)
+    if (!_wait_for_keyframe_option || _first_keyframe>=0)
         ringBuffer->Write(buffer, len);
 }
 

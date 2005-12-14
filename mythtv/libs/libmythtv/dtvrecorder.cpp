@@ -36,13 +36,12 @@ DTVRecorder::DTVRecorder(TVRec *rec, const char *name) :
     // file handle for stream
     _stream_fd(-1),
     // used for scanning pes headers for keyframes
-    _keyframe_seen(false),          _position_within_gop_header(0),
-    _first_keyframe(0),             _last_keyframe_seen(0),
+    _header_pos(0),                 _first_keyframe(-1),
     _last_gop_seen(0),              _last_seq_seen(0),
+    _last_keyframe_seen(0),
     // settings
     _request_recording(false),
     _wait_for_keyframe_option(true),
-    _wait_for_keyframe(true),
     // state
     _recording(false),
     _error(false),
@@ -65,7 +64,7 @@ DTVRecorder::~DTVRecorder()
 void DTVRecorder::SetOption(const QString &name, int value)
 {
     if (name == "wait_for_seqstart")
-        _wait_for_keyframe = _wait_for_keyframe_option = (value == 1);
+        _wait_for_keyframe_option = (value == 1);
     else if (name == "pkt_buf_size")
     {
         if (_request_recording)
@@ -125,9 +124,8 @@ void DTVRecorder::Reset(void)
 {
     QMutexLocker locker(&_position_map_lock);
 
-    _keyframe_seen              = false;
-    _position_within_gop_header = 0;
-    _first_keyframe             = 0;
+    _header_pos                 = 0;
+    _first_keyframe             =-1;
     _last_keyframe_seen         = 0;
     _last_gop_seen              = 0;
     _last_seq_seen              = 0;
@@ -144,7 +142,7 @@ void DTVRecorder::Reset(void)
 void DTVRecorder::BufferedWrite(const TSPacket &tspacket)
 {
     // delay until first GOP to avoid decoder crash on res change
-    if (_wait_for_keyframe && !_keyframe_seen)
+    if (_wait_for_keyframe_option && _first_keyframe<0)
         return;
 
     // Do we have to buffer the packet for exact keyframe detection?
@@ -205,8 +203,7 @@ bool DTVRecorder::FindKeyframes(const TSPacket* tspacket)
     // looking for first byte of MPEG start code (3 bytes 0 0 1)
     // otherwise, pick up search where we left off.
     const bool payloadStart = tspacket->PayloadStart();
-    _position_within_gop_header = (payloadStart) ?
-        0 : _position_within_gop_header;
+    _header_pos = (payloadStart) ? 0 : _header_pos;
 
     // if this is not a payload start packet, and aren't waiting
     // for anything then just output this packet..
@@ -214,73 +211,76 @@ bool DTVRecorder::FindKeyframes(const TSPacket* tspacket)
         return true;
 
     // Just make these local for efficiency reasons (gcc not so smart..)
-    const uint maxKFD            = kMaxKeyFrameDistance;
-    const long long frameSeenNum = _frames_seen_count;
-    const unsigned char *buffer  = tspacket->data();
-
-    bool hasKeyFrame = false;
+    const uint maxKFD = kMaxKeyFrameDistance;
+    bool hasFrame     = false;
+    bool hasKeyFrame  = false;
 
     // Scan for PES header codes; specifically picture_start
-    // and group_start (of_pictures).  These should be within
-    // this first TS packet of the PES packet.
+    // sequence_start (SEQ) and group_start (GOP).
     //   00 00 01 00: picture_start_code
     //   00 00 01 B8: group_start_code
     //   00 00 01 B3: seq_start_code
     //   (there are others that we don't care about)
     uint i = tspacket->AFCOffset();
-    for (; (i+1) < TSPacket::SIZE; i++)
+    for (; i < TSPacket::SIZE; i++)
     {
-        const unsigned char k = buffer[i];
-        if (0 == _position_within_gop_header)
-            _position_within_gop_header = (k == 0x00) ? 1 : 0;
-        else if (1 == _position_within_gop_header)
-            _position_within_gop_header = (k == 0x00) ? 2 : 0;
-        else // if (2 == _position_within_gop_header)
+        const unsigned char k = tspacket->data()[i];
+        if (0 == _header_pos)
+            _header_pos = (k == 0x00) ? 1 : 0;
+        else if (1 == _header_pos)
+            _header_pos = (k == 0x00) ? 2 : 0;
+        else if (2 == _header_pos)
+            _header_pos = (k == 0x00) ? 2 : ((k == 0x01) ? 3 : 0);
+        else if (3 == _header_pos)
         {
-            if (0x01 != k)
-            {
-                _position_within_gop_header = (k == 0x00) ? 2 : 0;
-                continue;
-            }
-
+            _header_pos = 0;
             // At this point we have seen the start code 0 0 1
             // the next byte will be the PES packet stream id.
-
-            const int stream_id = buffer[i+1];
+            const int stream_id = k;
             if (PESStreamID::PictureStartCode == stream_id)
-            {
-                _frames_written_count += (_first_keyframe > 0) ? 1 : 0;
-                _frames_seen_count++;
-
-                // If we have seen kMaxKeyFrameDistance frames since the
-                // last GOP or SEQ stream_id, then pretend this picture
-                // is a keyframe. We may get artifacts but at least
-                // we will be able to skip frames.
-                hasKeyFrame |= (0 == (_frames_seen_count & 0xf)) &&
-                    (_last_gop_seen + maxKFD < frameSeenNum) &&
-                    (_last_seq_seen + maxKFD < frameSeenNum);
-            }
+                hasFrame = true;
             else if (PESStreamID::GOPStartCode == stream_id)
             {
-                _last_gop_seen  = frameSeenNum;
+                _last_gop_seen  = _frames_seen_count;
                 hasKeyFrame    |= true;
             }
             else if (PESStreamID::SequenceStartCode == stream_id)
             {
-                _last_seq_seen  = frameSeenNum;
-                hasKeyFrame    |= _last_gop_seen + maxKFD < frameSeenNum;
+                _last_seq_seen  = _frames_seen_count;
+                hasKeyFrame    |=(_last_gop_seen + maxKFD)<_frames_seen_count;
             }
-            _position_within_gop_header = 0;
         }
+    }
+
+    if (hasFrame && !hasKeyFrame)
+    {
+        // If we have seen kMaxKeyFrameDistance frames since the
+        // last GOP or SEQ stream_id, then pretend this picture
+        // is a keyframe. We may get artifacts but at least
+        // we will be able to skip frames.
+        hasKeyFrame = !(_frames_seen_count & 0xf);
+        hasKeyFrame &= (_last_gop_seen + maxKFD) < _frames_seen_count;
+        hasKeyFrame &= (_last_seq_seen + maxKFD) < _frames_seen_count;
     }
 
     if (hasKeyFrame)
     {
-        _last_keyframe_seen = frameSeenNum;
+        _last_keyframe_seen = _frames_seen_count;
         HandleKeyframe();
-        return true;
     }
-    return (_payload_buffer.size() >= (188*50));
+
+    if (hasFrame)
+    {
+        _frames_seen_count++;
+        if (!_wait_for_keyframe_option || _first_keyframe>=0)
+            _frames_written_count++;
+
+        VERBOSE(VB_IMPORTANT, QString("frames seen: %1 written %2 %3")
+                .arg(_frames_seen_count).arg(_frames_written_count)
+                .arg(hasKeyFrame?"key frame":""));
+    }
+
+    return hasKeyFrame || (_payload_buffer.size() >= (188*50));
 }
 
 // documented in recorderbase.h
@@ -315,16 +315,9 @@ void DTVRecorder::ResetForNewFile(void)
  */
 void DTVRecorder::HandleKeyframe(void)
 {
-    unsigned long long frameNum = _frames_written_count ?
-        _frames_written_count - 1 : 0;
+    unsigned long long frameNum = _frames_written_count;
 
-    if (!_keyframe_seen && _frames_seen_count)
-    {
-        if (_first_keyframe > 0)
-            _keyframe_seen = true;
-        else
-            _first_keyframe = (_frames_written_count) ? frameNum : 1;
-    }
+    _first_keyframe = (_first_keyframe < 0) ? frameNum : _first_keyframe;
 
     // Add key frame to position map
     bool save_map = false;
