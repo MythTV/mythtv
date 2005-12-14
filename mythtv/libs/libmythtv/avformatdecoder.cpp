@@ -2202,10 +2202,21 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
             continue;
         }
 
+        // we don't care about other data streams
+        if (curstream->codec->codec_type == CODEC_TYPE_DATA)
+        {
+            av_free_packet(pkt);
+            continue;
+        }
+
         if (!curstream->codec->codec)
         {
-            VERBOSE(VB_PLAYBACK, LOC + QString("No codec for stream index %1")
-                    .arg(pkt->stream_index));
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("No codec for stream index %1, type(%2) id(%3:%4)")
+                    .arg(pkt->stream_index)
+                    .arg(codec_type_string(curstream->codec->codec_type))
+                    .arg(codec_id_string(curstream->codec->codec_id))
+                    .arg(curstream->codec->codec_id));
             av_free_packet(pkt);
             continue;
         }

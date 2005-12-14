@@ -51,7 +51,11 @@ class AudioInfo
     bool do_ac3_passthru;
 
     /// \brief Bits per sample.
-    int bps(void) const { return (8 * sample_size) / channels; }
+    int bps(void) const
+    {
+        uint chan = (channels) ? channels : 2;
+        return (8 * sample_size) / chan;
+    }
     bool operator==(const AudioInfo &o) const
     {
         return (codec_id==o.codec_id        && channels==o.channels       &&
