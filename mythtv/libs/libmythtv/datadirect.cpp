@@ -626,18 +626,22 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
 
     if (GotNextSuggestedTime)
     {
-        int today = QDateTime::currentDateTime().toString("d").toInt();
-        int suggestedDay = NextSuggestedTime.toString("d").toInt();
+        int daysToSuggested =
+                QDateTime::currentDateTime().daysTo(NextSuggestedTime);
+        int desiredPeriod = gContext->GetNumSetting("MythFillPeriod", 1);
 
-        // Ignore the recommendation and just go 24 hours from now if they
-        // tell us to download again on the same day.
-        if (suggestedDay == today)
+
+        if (daysToSuggested != desiredPeriod)
         {
+            QDateTime newTime =
+                NextSuggestedTime.addDays(desiredPeriod - daysToSuggested);
             VERBOSE(VB_IMPORTANT, LOC + QString("Provider suggested running "
-                    "again at %1, but we just ran for today.  Next run time "
-                    "will be set to 24 hours from now.")
-                    .arg(NextSuggestedTime.toString(Qt::ISODate)));
-            NextSuggestedTime = QDateTime::currentDateTime().addDays(1);
+                    "again at %1, but MythFillPeriod is %2.  Next run time "
+                    "will be adjusted to be %3.")
+                    .arg(NextSuggestedTime.toString(Qt::ISODate))
+                    .arg(desiredPeriod)
+                    .arg(newTime.toString(Qt::ISODate)));
+            NextSuggestedTime = newTime;
         }
 
         int minhr = NextSuggestedTime.toString("h").toInt();
