@@ -369,7 +369,8 @@ RecStatusType TVRec::StartRecording(const ProgramInfo *rcinfo)
 
     // We need to do this check early so we don't cancel an overrecord
     // that we're trying to extend.
-    if (curRecording &&
+    if (internalState != kState_WatchingLiveTV && 
+        curRecording &&
         curRecording->title == rcinfo->title &&
         curRecording->chanid == rcinfo->chanid &&
         curRecording->startts == rcinfo->startts)
@@ -671,7 +672,7 @@ void TVRec::HandleStateChange(void)
     }
     else if (TRANSITION(kState_WatchingLiveTV, kState_None))
     {
-        tuningRequests.enqueue(TuningRequest(kFlagKillRec));
+        tuningRequests.enqueue(TuningRequest(kFlagKillRec|kFlagKillRingBuffer));
         SET_NEXT();
     }
     else if (TRANSITION(kState_None, kState_RecordingOnly))
@@ -1169,7 +1170,8 @@ void TVRec::RunTV(void)
         if (curRecording)
             curRecording->UpdateInUseMark();
 
-        if (GetState() == kState_WatchingLiveTV && curRecording)
+        if (GetState() == kState_WatchingLiveTV && curRecording && 
+            !pendingRecording)
         {
             if (QDateTime::currentDateTime() >= curRecording->endts) // change to curRecording->recstartts.addSecs(60) for testing
                 SwitchLiveTVRingBuffer();
@@ -2473,10 +2475,6 @@ void TVRec::StopLiveTV(void)
 
         tvchain = NULL;
     }
-
-    // Tell tuner it is safe to shut down ring buffer.
-    tuningRequests.enqueue(TuningRequest(kFlagKillRingBuffer));
-    triggerEventLoop.wakeAll();
 }
 
 /** \fn TVRec::PauseRecorder(void)

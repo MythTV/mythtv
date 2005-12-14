@@ -435,6 +435,8 @@ class TV : public QObject
     RemoteEncoder *activerecorder;
     /// Main recorder to use after a successful SwitchCards() call.
     RemoteEncoder *switchToRec;
+    /// Storage for keeping the last recorder number around
+    int lastrecordernum;
 
     // LiveTVChain
     LiveTVChain *tvchain;

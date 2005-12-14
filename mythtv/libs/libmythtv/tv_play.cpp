@@ -249,7 +249,7 @@ TV::TV(void)
       nvp(NULL), pipnvp(NULL), activenvp(NULL),
       // Remote Encoders
       recorder(NULL), piprecorder(NULL), activerecorder(NULL),
-      switchToRec(NULL),
+      switchToRec(NULL), lastrecordernum(-1),
       // LiveTVChain
       tvchain(NULL), piptvchain(NULL),
       // RingBuffers
@@ -473,7 +473,7 @@ int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
 int TV::GetLastRecorderNum(void) const
 {
     if (!recorder)
-        return -1;
+        return lastrecordernum;
     return recorder->GetRecorderNumber();
 }
 
@@ -482,7 +482,10 @@ void TV::DeleteRecorder()
     RemoteEncoder *rec = recorder;
     activerecorder = recorder = NULL;
     if (rec)
+    {
+        lastrecordernum = rec->GetRecorderNumber();
         delete rec;
+    }
 }
 
 bool TV::RequestNextRecorder(bool showDialogs)
