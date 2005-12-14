@@ -252,4 +252,24 @@ class PESPacket
     bool _badPacket;    ///< true if a CRC is not good yet
 };
 
+class SequenceHeader
+{
+  public:
+    SequenceHeader() {;}
+    ~SequenceHeader() {;}
+
+    uint width(void)     const { return (data[0]        <<4) | (data[1]>>4); }
+    uint height(void)    const { return ((data[1] & 0xf)<<8) |  data[2];     }
+    uint aspectNum(void) const { return data[3] >> 4;                        }
+    uint fpsNum(void)    const { return data[3] & 0xf;                       }
+    float fps(void)      const { return mpeg2_fps[fpsNum()];                 }
+    float aspect(bool mpeg1) const;
+
+  private:
+    unsigned char data[11];
+    static const float mpeg1_aspect[16];
+    static const float mpeg2_aspect[16];
+    static const float mpeg2_fps[16];
+};
+
 #endif // _PES_PACKET_H_

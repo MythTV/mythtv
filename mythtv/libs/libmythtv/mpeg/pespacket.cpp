@@ -80,6 +80,51 @@ bool PESPacket::AddTSPacket(const TSPacket* packet)
     return false;
 }
 
+/// These are pixel aspect ratios
+const float SequenceHeader::mpeg1_aspect[16] =
+{
+    0.0000f,       1.0000f,       0.6735f,       0.7031f,
+    0.7615f,       0.8055f,       0.8437f,       0.8935f,
+    0.9157f,       0.9815f,       1.0255f,       1.0695f,
+    1.0950f,       1.1575f,       1.2015f,       0.0000f,
+};
+
+/// The negative values are screen aspect ratios,
+/// while the positive ones are pixel aspect ratios
+const float SequenceHeader::mpeg2_aspect[16] =
+{
+    0.0000f,       1.0000f,       -3.0/4.0,     -9.0/16.0,
+    -1.0/2.21,     0.0000f,       0.0000f,       0.0000f,
+    0.0000f,       0.0000f,       0.0000f,       0.0000f,
+    0.0000f,       0.0000f,       0.0000f,       0.0000f,
+};
+
+const float SequenceHeader::mpeg2_fps[16] =
+{
+    0.0f,          24000/1001.0f, 24.0f,        25.0f,
+    30000/1001.0f, 30.0f,         50.0f,        60000/1001.0f,
+    60.0f,         1.0f,          1.0f,         1.0f,
+    1.0f,          1.0f,          1.0f,         1.0f,
+};
+
+/// Returns the screen aspect ratio
+float SequenceHeader::aspect(bool mpeg1) const
+{
+    if (!height())
+        return 1.0f; // avoid segfaults on broken seq data
+
+    uint  index  = aspectNum();
+    float aspect = (mpeg1) ? mpeg1_aspect[index] : mpeg2_aspect[index];
+
+    float retval = 0.0f;
+    retval = (aspect >  0.0f) ? width() / (aspect * height()) : retval;
+    retval = (aspect <  0.0f) ? -1.0f   /  aspect             : retval;
+    retval = (retval <= 0.0f) ? width() * 1.0f / height()     : retval;
+    return retval;
+}
+
+
+
 /////////////////////////////////////////////////////////////////////////
 // Memory allocator to avoid malloc global lock and waste less memory. //
 /////////////////////////////////////////////////////////////////////////

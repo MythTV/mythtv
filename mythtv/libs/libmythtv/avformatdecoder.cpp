@@ -16,6 +16,7 @@ using namespace std;
 #include "mythcontext.h"
 #include "mythdbcon.h"
 #include "iso639.h"
+#include "pespacket.h"
 
 #ifdef USING_XVMC
 #include "videoout_xv.h"
@@ -47,10 +48,10 @@ void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic);
 void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
                        int offset[4], int y, int type, int height);
 
-void align_dimensions(AVCodecContext *avctx, int &width, int &height)
+static void align_dimensions(AVCodecContext *avctx, uint &width, uint &height)
 {
     // minimum buffer alignment
-    avcodec_align_dimensions(avctx, &width, &height);
+    avcodec_align_dimensions(avctx, (int*)&width, (int*)&height);
     // minimum MPEG alignment
     width  = (width  + 15) & (~0xf);
     height = (height + 15) & (~0xf);
@@ -795,8 +796,8 @@ void AvFormatDecoder::InitVideoCodec(AVCodecContext *enc)
         directrendering = true;
     }
 
-    int align_width = enc->width;
-    int align_height = enc->height;
+    uint align_width  = enc->width;
+    uint align_height = enc->height;
 
     align_dimensions(enc, align_width, align_height);
 
@@ -1076,48 +1077,6 @@ int AvFormatDecoder::ScanStreams(bool novideo)
         scanerror = -1;
 
     return scanerror;
-}
-
-bool AvFormatDecoder::CheckVideoParams(int width, int height)
-{
-    if (width == current_width && height == current_height)
-        return false;
-
-    if (current_width && current_height)
-    {
-        VERBOSE(VB_GENERAL, LOC +
-                QString("Video has changed from %1x%2 to %3x%4 pixels.")
-                .arg(current_width).arg(current_height)
-                .arg(width).arg(height));
-    }
-    else
-    {
-        VERBOSE(VB_GENERAL, LOC +
-                QString("Initializing video at %1x%2 pixels.")
-                .arg(width).arg(height));
-    }   
-
-    for (int i = 0; i < ic->nb_streams; i++)
-    {
-        AVCodecContext *enc = ic->streams[i]->codec;
-        switch (enc->codec_type)
-        {
-            case CODEC_TYPE_VIDEO:
-            {
-                AVCodec *codec = enc->codec;
-                if (!codec) {
-                    VERBOSE(VB_IMPORTANT, LOC_ERR + 
-                            QString("Codec for stream %1 is null").arg(i));
-                    break;
-                }
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    return true;
 }
 
 int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
@@ -1414,6 +1373,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
     if (prevgoppos != 0 && keyframedist != 1)
     {
         int tempKeyFrameDist = framesRead - 1 - prevgoppos;
+        bool reset_kfd = false;
 
         if (!gopset) // gopset: we've seen 2 keyframes
         {
@@ -1422,57 +1382,41 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
             SyncPositionMap();
             if (tempKeyFrameDist > 0)
             {
-                gopset = true;
-                keyframedist = tempKeyFrameDist;
-                if (keyframedist > maxkeyframedist)
-                    maxkeyframedist = keyframedist;
-
-                if ((keyframedist == 15) ||
-                    (keyframedist == 12))
-                    positionMapType = MARK_GOP_START;
-                else
-                    positionMapType = MARK_GOP_BYFRAME;
-
                 VERBOSE(VB_PLAYBACK, LOC + "HandleGopStart: " +
                         QString("Initial key frame distance: %1.")
                         .arg(keyframedist));
-
-                GetNVP()->SetKeyframeDistance(keyframedist);
+                gopset       = true;
+                reset_kfd    = true;
             }
         }
-        else
+        else if (keyframedist != tempKeyFrameDist && tempKeyFrameDist > 0)
         {
-            if (keyframedist != tempKeyFrameDist && tempKeyFrameDist > 0)
-            {
-                VERBOSE(VB_PLAYBACK, LOC + "HandleGopStart: " +
-                        QString("Key frame distance changed from %1 to %2.")
-                        .arg(keyframedist).arg(tempKeyFrameDist));
+            VERBOSE(VB_PLAYBACK, LOC + "HandleGopStart: " +
+                    QString("Key frame distance changed from %1 to %2.")
+                    .arg(keyframedist).arg(tempKeyFrameDist));
+            reset_kfd = true;
+        }
 
-                keyframedist = tempKeyFrameDist;
-                if (keyframedist > maxkeyframedist)
-                    maxkeyframedist = keyframedist;
+        if (reset_kfd)
+        {
+            keyframedist    = tempKeyFrameDist;
+            maxkeyframedist = max(keyframedist, maxkeyframedist);
 
-                if ((keyframedist == 15) ||
-                    (keyframedist == 12))
-                    positionMapType = MARK_GOP_START;
-                else
-                    positionMapType = MARK_GOP_BYFRAME;
+            bool is_ivtv    = (keyframedist == 15) || (keyframedist == 12);
+            positionMapType = (is_ivtv) ? MARK_GOP_START : MARK_GOP_BYFRAME;
 
-                GetNVP()->SetKeyframeDistance(keyframedist);
+            GetNVP()->SetKeyframeDistance(keyframedist);
 
 #if 0
-                // also reset length
-                long long index = m_positionMap[m_positionMap.size() - 1].index;
-                long long totframes = index * keyframedist;
-                int length = (int)((totframes * 1.0) / fps);
-
-                VERBOSE(VB_PLAYBACK, LOC + "HandleGopStart: "
-                        QString("Setting file length to %1 seconds, "
-                                "with %2 frames total.")
-                        .arg(length).arg((int)totframes));
+            // also reset length
+            if (!m_positionMap.empty())
+            {
+                long long index       = m_positionMap.back().index;
+                long long totframes   = index * keyframedist;
+                uint length = (uint)((totframes * 1.0f) / fps);
                 GetNVP()->SetFileLength(length, totframes);
-#endif
             }
+#endif
         }
     }
 
@@ -1482,7 +1426,7 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
     {
         long long last_frame = 0;
         if (!m_positionMap.empty())
-            last_frame = m_positionMap[m_positionMap.size() - 1].index;
+            last_frame = m_positionMap.back().index;
         if (keyframedist > 1)
             last_frame *= keyframedist;
 
@@ -1542,65 +1486,69 @@ void AvFormatDecoder::MpegPreProcessPkt(AVStream *stream, AVPacket *pkt)
         else
             v = *bufptr++;
 
-        if (state == 0x000001)
-        {
-            state = ((state << 8) | v) & 0xFFFFFF;
-            if (state >= SLICE_MIN && state <= SLICE_MAX)
-                continue;
-
-            switch (state)
-            {
-                case SEQ_START:
-                {
-                    unsigned char *test = bufptr;
-                    int width = (test[0] << 4) | (test[1] >> 4);
-                    int height = ((test[1] & 0xff) << 8) | test[2];
-
-                    int aspectratioinfo = (test[3] >> 4);
-
-                    float aspect = GetMpegAspect(context, aspectratioinfo,
-                                                 width, height);
-
-                    if (width < 2500 && height < 2000 &&
-                        (CheckVideoParams(width, height) ||
-                         aspect != current_aspect))
-                    {
-                        int align_width = width;
-                        int align_height = height;
-                        align_dimensions(context, align_width, align_height);
-
-                        GetNVP()->SetVideoParams(align_width, align_height,
-                                                 normalized_fps(context),
-                                                 keyframedist, aspect, 
-                                                 kScan_Detect, true);
-                        current_width = width;
-                        current_height = height;
-                        current_aspect = aspect;
-
-                        d->ResetMPEG2();
-
-                        gopset = false;
-                        prevgoppos = 0;
-                        lastapts = lastvpts = lastccptsu = 0;
-                    }
-
-                    seq_count++;
-
-                    if (!seen_gop && seq_count > 1)
-                        HandleGopStart(pkt);
-                }
-                break;
-
-                case GOP_START:
-                {
-                    HandleGopStart(pkt);
-                    seen_gop = true;
-                }
-                break;
-            }
-            continue;
-        }
+        unsigned int last_state = state;
         state = ((state << 8) | v) & 0xFFFFFF;
+
+        if (last_state != 0x000001)
+            continue;
+        else if (state >= SLICE_MIN && state <= SLICE_MAX)
+            continue;
+        else if (SEQ_START == state)
+        {
+            if (bufptr + 11 >= pkt->data + pkt->size)
+                continue; // not enough valid data...
+            SequenceHeader *seq = reinterpret_cast<SequenceHeader*>(bufptr);
+
+            uint  width  = seq->width();
+            uint  height = seq->height();
+            float aspect = seq->aspect(context->sub_id == 1);
+            float seqFPS = seq->fps();
+
+            bool changed = (seqFPS > fps+0.01) || (seqFPS < fps-0.01);
+            changed |= (width  != (uint)current_width );
+            changed |= (height != (uint)current_height);
+            changed |= (aspect != current_aspect);
+
+            if (changed)
+            {
+                uint awidth = width, aheight = height;
+                align_dimensions(context, awidth, aheight);
+
+                GetNVP()->SetVideoParams(awidth, aheight, seqFPS,
+                                         keyframedist, aspect, 
+                                         kScan_Detect, true);
+
+                current_width  = width;
+                current_height = height;
+                current_aspect = aspect;
+                fps            = seqFPS;
+
+                d->ResetMPEG2();
+
+                gopset = false;
+                prevgoppos = 0;
+                lastapts = lastvpts = lastccptsu = 0;
+
+                // fps debugging info
+                float avFPS = normalized_fps(context);
+                if ((seqFPS > avFPS+0.01) || (seqFPS < avFPS-0.01))
+                {
+                    VERBOSE(VB_PLAYBACK, LOC +
+                            QString("avFPS(%1) != seqFPS(%2)")
+                            .arg(avFPS).arg(seqFPS));
+                }
+            }
+
+            seq_count++;
+
+            if (!seen_gop && seq_count > 1)
+                HandleGopStart(pkt);
+        }
+        else if (GOP_START == state)
+        {
+            HandleGopStart(pkt);
+            seen_gop = true;
+        }
     }
 
     memcpy(prvpkt, pkt->data + pkt->size - 3, 3);
@@ -1716,49 +1664,6 @@ void AvFormatDecoder::ProcessDVBDataPacket(
 
         buf += 43;
     }
-}
-
-static const float avfmpeg1_aspect[16]={
-    0.0000,    1.0000,    0.6735,    0.7031,
-    0.7615,    0.8055,    0.8437,    0.8935,
-    0.9157,    0.9815,    1.0255,    1.0695,
-    1.0950,    1.1575,    1.2015,
-};
-
-static const float avfmpeg2_aspect[16]={
-    0,    1.0,    -3.0/4.0,    -9.0/16.0,    -1.0/2.21,
-};
-
-float AvFormatDecoder::GetMpegAspect(AVCodecContext *context,
-                                     int aspect_ratio_info,
-                                     int width, int height)
-{
-    float retval = 0;
-
-    if (aspect_ratio_info > 15)
-        aspect_ratio_info = 15;
-    if (aspect_ratio_info < 0)
-        aspect_ratio_info = 0;
-
-    if (context->sub_id == 1) // mpeg1
-    {
-        float aspect = avfmpeg1_aspect[aspect_ratio_info];
-        if (aspect != 0.0)
-            retval = width / (aspect * height);
-    }
-    else
-    {
-        float aspect = avfmpeg2_aspect[aspect_ratio_info];
-        if (aspect > 0)
-            retval = width / (aspect * height);
-        else if (aspect < 0)
-            retval = -1.0 / aspect;
-    }
-
-    if (retval <= 0)
-        retval = width * 1.0 / height;
-
-    return retval;
 }
 
 void AvFormatDecoder::incCurrentAudioTrack(void)

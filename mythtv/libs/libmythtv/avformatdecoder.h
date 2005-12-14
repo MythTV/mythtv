@@ -181,9 +181,6 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     void SeekReset(long long newKey = 0, int skipFrames = 0,
                    bool needFlush = false);
 
-    /// See if the video parameters have changed, return true if so.
-    bool CheckVideoParams(int width, int height);
-
     bool SetupAudioStream(void);
 
     int EncodeAC3Frame(unsigned char* data, int len, short *samples,
