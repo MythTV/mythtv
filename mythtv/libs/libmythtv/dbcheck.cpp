@@ -1957,12 +1957,12 @@ static bool doUpgradeTVDatabaseSchema(void)
     {
         const QString updates[] = {
 "ALTER TABLE playgroup ADD COLUMN jump INT NOT NULL DEFAULT 0;",
-"UPDATE playgroup SET jump = (SELECT data FROM settings"
-"  WHERE value = 'JumpAmount' GROUP BY value) WHERE name = 'Default';",
-"UPDATE playgroup SET skipahead = (SELECT data FROM settings"
-"  WHERE value = 'FastForwardAmount' GROUP BY value) WHERE name = 'Default';",
-"UPDATE playgroup SET skipback = (SELECT data FROM settings"
-"  WHERE value = 'RewindAmount' GROUP BY value) WHERE name = 'Default';",
+// "UPDATE playgroup SET jump = (SELECT data FROM settings"
+// "  WHERE value = 'JumpAmount' GROUP BY value) WHERE name = 'Default';",
+// "UPDATE playgroup SET skipahead = (SELECT data FROM settings"
+// "  WHERE value = 'FastForwardAmount' GROUP BY value) WHERE name = 'Default';",
+// "UPDATE playgroup SET skipback = (SELECT data FROM settings"
+// "  WHERE value = 'RewindAmount' GROUP BY value) WHERE name = 'Default';",
 ""
 };
         if (!performActualUpdate(updates, "1120", dbver))
