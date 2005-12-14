@@ -550,8 +550,7 @@ FrameScanType NuppelVideoPlayer::detectInterlace(FrameScanType newScan,
 
 void NuppelVideoPlayer::SetKeyframeDistance(int keyframedistance)
 {
-    if (keyframedistance > 0)
-        keyframedist = keyframedistance;
+    keyframedist = (keyframedistance > 0) ? keyframedistance : keyframedist;
 }
 
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
@@ -561,30 +560,25 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
     if (width == 0 || height == 0 || isnan(aspect) || isnan(fps))
         return;
 
-    if (video_width == width && video_height == height && 
-        aspect == video_aspect && fps == video_frame_rate)
+    if ((video_width  == width ) && (video_height     == height) && 
+        (video_aspect == aspect) && (video_frame_rate == fps   ) &&
+        ((keyframedistance <= 0) || (keyframedistance == keyframedist)))
     {
         return;
     }
 
-    if (width > 0)
-        video_width = width;
-    if (height > 0)
-        video_height = height;
-    if (fps > 0 && fps < 120)
+    video_width  = (width  > 0) ? width  : video_width;
+    video_height = (height > 0) ? height : video_height;
+    video_size   = (video_height * video_width * 3) / 2;
+    video_aspect = (aspect > 0.0f) ? aspect : video_aspect;
+    keyframedist = (keyframedistance > 0) ? keyframedistance : keyframedist;
+
+    if (fps > 0.0f && fps < 121.0f)
     {
         video_frame_rate = fps;
-        float temp_speed = (play_speed == 0.0) ? audio_stretchfactor : play_speed;
-        frame_interval = (int)(1000000.0 / video_frame_rate / temp_speed);
-    }
-
-    video_size = video_height * video_width * 3 / 2;
-    if (keyframedistance > 0)
-        keyframedist = keyframedistance;
-
-    if (aspect > 0.0f)
-    {
-        video_aspect = aspect;
+        float temp_speed = (play_speed == 0.0f) ?
+            audio_stretchfactor : play_speed;
+        frame_interval = (int)(1000000.0f / video_frame_rate / temp_speed);
     }
 
     if (reinit)
@@ -597,23 +591,26 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
 
     m_scan = detectInterlace(scan, m_scan, video_frame_rate, video_height);
     VERBOSE(VB_PLAYBACK, QString("Interlaced: %1  video_height: %2  fps: %3")
-                                .arg(toQString(m_scan)).arg(video_height).arg(fps));
+            .arg(toQString(m_scan)).arg(video_height)
+            .arg(fps));
 
     // Set up deinterlacing in the video output method
     m_double_framerate = false;
     if (videoOutput)
+    {
         videoOutput->SetupDeinterlace(false);
-    if (m_scan == kScan_Interlaced && m_DeintSetting) {
-        if (videoOutput && videoOutput->SetupDeinterlace(true)) {
-            if (videoOutput->NeedsDoubleFramerate())
-            {
-                m_double_framerate = true;
-                m_can_double = true;
-            }
+        if ((m_scan == kScan_Interlaced)        &&
+            m_DeintSetting                      &&
+            videoOutput->SetupDeinterlace(true) &&
+            videoOutput->NeedsDoubleFramerate())
+        {
+            m_double_framerate = true;
+            m_can_double = true;
         }
     }
-    // Make sure video sync can do it
-    if (videosync != NULL && m_double_framerate)
+
+    // Make sure video sync can double frame rate
+    if (videosync && m_double_framerate)
     {
         videosync->SetFrameInterval(frame_interval, m_double_framerate);
         if (videosync->UsesFrameInterval())
