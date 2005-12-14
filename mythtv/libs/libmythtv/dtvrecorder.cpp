@@ -274,10 +274,6 @@ bool DTVRecorder::FindKeyframes(const TSPacket* tspacket)
         _frames_seen_count++;
         if (!_wait_for_keyframe_option || _first_keyframe>=0)
             _frames_written_count++;
-
-        VERBOSE(VB_IMPORTANT, QString("frames seen: %1 written %2 %3")
-                .arg(_frames_seen_count).arg(_frames_written_count)
-                .arg(hasKeyFrame?"key frame":""));
     }
 
     return hasKeyFrame || (_payload_buffer.size() >= (188*50));
