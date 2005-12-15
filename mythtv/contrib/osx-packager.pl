@@ -21,6 +21,10 @@ our $svn = `which svn`; chomp $svn;
 #
 our $backend = 0;
 
+# For faster downloads, change this to a local mirror.
+#
+our $sourceforge = 'http://internap.dl.sf.net';
+
 # At the moment, there is mythtv plus these two
 our @components = ( 'myththemes', 'mythplugins' );
 
@@ -50,21 +54,21 @@ our %depend = (
   =>
   {
     'url'
-    =>  'http://unc.dl.sf.net/sourceforge/freetype/freetype-2.1.9.tar.gz',
+    =>  "$sourceforge/sourceforge/freetype/freetype-2.1.10.tar.gz",
   },
 
   'dvdnav'
   =>
   {
     'url'
-    =>  'http://umn.dl.sourceforge.net/sourceforge/dvd/libdvdnav-0.1.10.tar.gz',
+    =>  "$sourceforge/sourceforge/dvd/libdvdnav-0.1.10.tar.gz",
   },
   
   'lame'
   =>
   {
     'url'
-    =>  'http://unc.dl.sf.net/sourceforge/lame/lame-3.96.1.tar.gz',
+    =>  "$sourceforge/sourceforge/lame/lame-3.96.1.tar.gz",
     'conf'
     =>  [
           '--disable-frontend',
@@ -75,7 +79,7 @@ our %depend = (
 #  =>
 #  {
 #    'url'
-#    =>  'http://easynews.dl.sourceforge.net/sourceforge/libcdaudio/libcdaudio-0.99.12.tar.gz'
+#    =>  "$sourceforge/sourceforge/libcdaudio/libcdaudio-0.99.12.tar.gz"
 #  },
 
   'dvdcss'
@@ -116,6 +120,32 @@ our %depend = (
   
   'qt-mt'
   =>
+#   {
+#     'url'
+#     =>  'http://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/sources/qt-mac-opensource-src-4.0.1.tar.gz',
+#     'conf-cmd'
+#     =>  'echo yes | ./configure',
+#     'conf'
+#     =>  [
+#           '-prefix', '"$PREFIX"',
+#           '-system-zlib',
+#           '-fast',
+#           '-qt-sql-mysql',
+#           '-qt-libpng',
+#           '-qt-libjpeg',
+#           '-qt-gif',
+#           '-platform macx-g++',
+#           '-no-tablet',
+#           '-I"$PREFIX/include/mysql"',
+#           '-L"$PREFIX/lib/mysql"',
+#         ],
+#     'post-conf'
+#     =>  'echo "QMAKE_LFLAGS_SHLIB += -single_module" >> src/qt.pro',
+#     'make'
+#     =>  [
+#           'sub-src'
+#         ],
+#   },
   {
     'url'
     =>  'ftp://ftp.iasi.roedu.net/mirrors/ftp.trolltech.com/qt/sources/qt-mac-free-3.3.4.tar.gz',
@@ -165,7 +195,7 @@ our %depend = (
   =>
   {
     'url'
-    =>  'http://unc.dl.sf.net/sourceforge/libexif/libexif-0.6.12.tar.gz',
+    =>  "$sourceforge/sourceforge/libexif/libexif-0.6.12.tar.gz",
     'conf'
     =>  [
           '--disable-nls',
