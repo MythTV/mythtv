@@ -3594,7 +3594,7 @@ int main(int argc, char *argv[])
             cout << "\n";
             cout << "--file <sourceid> <offset> <xmlfile>\n";
             cout << "   Bypass the grabbers and read data directly from a file\n";
-            cout << "   <sourceid> = cardinput\n";
+            cout << "   <sourceid> = number for the video source to use with this file\n";
             cout << "   <offset>   = days from today that xmlfile defines\n";
             cout << "                (-1 means to replace all data, up to 10 days)\n";
             cout << "   <xmlfile>  = file to read\n";
