@@ -451,6 +451,14 @@ TVState TV::GetState(void) const
     return internalState;
 }
 
+void TV::GetPlayGroupSettings(const QString &group)
+{
+    fftime       = PlayGroup::GetSetting(group, "skipahead", 30);
+    rewtime      = PlayGroup::GetSetting(group, "skipback", 5);
+    jumptime     = PlayGroup::GetSetting(group, "jump", 10);
+    normal_speed = PlayGroup::GetSetting(group, "timestretch", 100) / 100.0;
+}
+
 int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
 {
     if (internalState == kState_None && RequestNextRecorder(showDialogs))
@@ -459,11 +467,7 @@ int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
         ChangeState(kState_WatchingLiveTV);
         switchToRec = NULL;
 
-        fftime       = PlayGroup::GetSetting("Default", "skipahead", 30);
-        rewtime      = PlayGroup::GetSetting("Default", "skipback", 5);
-        jumptime     = PlayGroup::GetSetting("Default", "jump", 10);
-        normal_speed = PlayGroup::GetSetting("Default", "timestretch", 
-                                                 100) / 100.0;
+        GetPlayGroupSettings("Default");
 
         return 1;
     }
@@ -604,11 +608,7 @@ int TV::Playback(ProgramInfo *rcinfo)
     else
         ChangeState(kState_WatchingPreRecorded);
 
-    fftime = PlayGroup::GetSetting(playbackinfo->playgroup, "skipahead", 30);
-    rewtime = PlayGroup::GetSetting(playbackinfo->playgroup, "skipback", 5);
-    jumptime = PlayGroup::GetSetting(playbackinfo->playgroup, "jump", 10);
-    normal_speed = PlayGroup::GetSetting(playbackinfo->playgroup, 
-                                         "timestretch", 100) / 100.0;
+    GetPlayGroupSettings(playbackinfo->playgroup);
 
     if (class LCD * lcd = LCD::Get())
         lcd->switchToChannel(rcinfo->chansign, rcinfo->title, rcinfo->subtitle);

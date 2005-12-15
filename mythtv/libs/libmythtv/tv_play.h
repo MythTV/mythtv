@@ -282,6 +282,8 @@ class TV : public QObject
 
     QString PlayMesg(void);
 
+    void GetPlayGroupSettings(const QString &group);
+
     static QStringList GetValidRecorderList(uint chanid);
     static QStringList GetValidRecorderList(const QString &channum);
     static QStringList GetValidRecorderList(uint, const QString&);
