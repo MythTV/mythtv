@@ -10,6 +10,9 @@
 #define DBG_SM(FUNC, MSG) VERBOSE(VB_CHANNEL, \
     "DTVSM("<<channel->GetDevice()<<")::"<<FUNC<<": "<<MSG);
 
+#define LOC QString("DTVSM(%1): ").arg(channel->GetDevice())
+#define LOC_ERR QString("DTVSM(%1) Error: ").arg(channel->GetDevice())
+
 /** \class DTVSignalMonitor
  *  \brief This class is intended to detect the presence of needed tables.
  */
@@ -223,11 +226,16 @@ void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
     AddFlags(kDTVSigMon_PMTSeen);
 
     if (pmt->ProgramNumber() != (uint)programNumber)
-        return; // We are not the PMT you are looking for.
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Wrong PMT; pmt->pn(%1) desired(%2)")
+                .arg(pmt->ProgramNumber()).arg(programNumber));
+        return; // Not the PMT we are looking for...
+    }
 
     if (ignoreEncrypted && pmt->IsEncrypted())
     {
-        VERBOSE(VB_IMPORTANT, "DTVsm: Ignoring encrypted program");
+        VERBOSE(VB_IMPORTANT, LOC + "Ignoring encrypted program");
         return;
     }
 
@@ -245,6 +253,15 @@ void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
         (hasAudio >= GetStreamData()->GetAudioStreamsRequired()))
     {
         AddFlags(kDTVSigMon_PMTMatch);
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("We want %1 audio and %2 video streams")
+                .arg(GetStreamData()->GetAudioStreamsRequired())
+                .arg(GetStreamData()->GetVideoStreamsRequired()) +
+                QString("\n\t\t\tBut have %1 audio and %2 video streams")
+                .arg(hasAudio).arg(hasVideo));
     }
 }
 

@@ -186,23 +186,22 @@ void ProgramMapTable::AppendStream(
 /** \fn ProgramMapTable::IsAudio(uint) const
  *  \brief Returns true iff the stream at index i is an audio stream.
  *
- *   This of course returns true if StreamID::IsAudio() is true, but
- *   if also returns true if there is an AC3 stream in a private
- *   data stream as described by an AC3 descriptor.
+ *   This of course returns true if StreamID::IsAudio() is true.
+ *   And, it also returns true if IsAudio returns true after
+ *   StreamID::Normalize() is used on the stream type.
+ *
  *  \param i index of stream
  */
 bool ProgramMapTable::IsAudio(uint i) const
 {
     if (StreamID::IsAudio(StreamType(i)))
         return true;
-    if (StreamID::PrivData == StreamType(i))
-    {
-        desc_list_t list = MPEGDescriptor::
-            Parse(StreamInfo(i), StreamInfoLength(i));
-        if (MPEGDescriptor::Find(list, DescriptorID::AC3))
-            return true;
-    }
-    return false;
+
+    desc_list_t list = MPEGDescriptor::
+        Parse(StreamInfo(i), StreamInfoLength(i));
+    uint stream_id = StreamID::Normalize(StreamType(i), list);
+
+    return StreamID::IsAudio(stream_id);
 }
 
 bool ProgramMapTable::IsEncrypted(void) const

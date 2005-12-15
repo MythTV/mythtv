@@ -231,6 +231,16 @@ void SignalMonitor::MonitorLoop()
         usleep(update_rate * 1000);
     }
 
+    // We need to send a last informational message because a
+    // signal update may have come in while we were sleeping
+    // if we are using the multithreaded dtvsignalmonitor.
+    if (notify_frontend && capturecardnum>=0)
+    {
+        QStringList slist = GetStatusList(false);
+        MythEvent me(QString("SIGNAL %1").arg(capturecardnum), slist);
+        gContext->dispatch(me);
+    }
+
     //signal(SIGALRM, SIG_DFL);
 
     running = false;
