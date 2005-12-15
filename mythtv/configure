@@ -334,7 +334,7 @@ xvid="no"
 x264="no"
 a52="yes"
 a52bin="no"
-dts="no"
+dts="yes"
 pp="yes"
 shared_pp="no"
 mingw32="no"
@@ -682,7 +682,9 @@ for opt do
   ;;
   --enable-a52bin) a52bin="yes"
   ;;
-  --enable-dts) dts="yes" ; extralibs="$extralibs -ldts"
+  --enable-dts) dts="yes"
+  ;;
+  --disable-dts) dts="no"
   ;;
   --disable-pp) pp="no"
   ;;
@@ -1920,6 +1922,14 @@ if test x"$mandir" = x""; then
 mandir="${prefix}/man"
 fi
 
+if test x"$dts" = x"yes"; then
+    dts="no"
+    if has_library libdts ; then
+        dts="yes"
+        extralibs="$extralibs -ldts"
+    fi
+fi
+
 if test x"$dvb" = x"yes" ; then
     dvb="no"
     if test -f "$dvb_path"/linux/dvb/frontend.h ; then
@@ -2187,6 +2197,7 @@ if test x"$frontend" = x"yes" ; then
   echo "ALSA support     $audio_alsa"
   echo "aRts support     $audio_arts"
   echo "JACK support     $audio_jack"
+  echo "DTS passthrough  $dts"
   echo
   echo "# Video Output Support"
   echo "x11 support      $x11"

@@ -38,17 +38,17 @@ class AudioInfo
   public:
     AudioInfo() :
         codec_id(CODEC_ID_NONE), sample_size(-2),   sample_rate(-1),
-        channels(-1), do_ac3_passthru(false)
+        channels(-1), do_passthru(false)
     {;}
 
-    AudioInfo(CodecID id, int sr, int ch, bool ac3) :
+    AudioInfo(CodecID id, int sr, int ch, bool passthru) :
         codec_id(id), sample_size(ch*2),   sample_rate(sr),
-        channels(ch), do_ac3_passthru(ac3)
+        channels(ch), do_passthru(passthru)
     {;}
 
     CodecID codec_id;
     int sample_size, sample_rate, channels;
-    bool do_ac3_passthru;
+    bool do_passthru;
 
     /// \brief Bits per sample.
     int bps(void) const
@@ -60,14 +60,14 @@ class AudioInfo
     {
         return (codec_id==o.codec_id        && channels==o.channels       &&
                 sample_size==o.sample_size  && sample_rate==o.sample_rate &&
-                do_ac3_passthru==o.do_ac3_passthru);
+                do_passthru==o.do_passthru);
     }
     QString toString() const
     {
         return QString("id(%1) %2Hz %3ch %4bps%5")
             .arg(codec_id_string(codec_id),4).arg(sample_rate,5)
             .arg(channels,2).arg(bps(),3)
-            .arg((do_ac3_passthru) ? "pt":"",3);
+            .arg((do_passthru) ? "pt":"",3);
     }
 };
 
@@ -143,8 +143,8 @@ class AvFormatDecoder : public DecoderBase, public CCReader
 
   protected:
     /// Attempt to find the optimal audio stream to use based on the number of channels,
-    /// and if we're doing AC3 passthrough.  This will select the highest stream number
-    /// that matches our criteria.
+    /// and if we're doing AC3/DTS passthrough.  This will select the highest stream
+    /// number that matches our criteria.
     bool autoSelectAudioTrack();
 
     bool autoSelectSubtitleTrack();
@@ -186,9 +186,6 @@ class AvFormatDecoder : public DecoderBase, public CCReader
                    bool needFlush = false);
 
     bool SetupAudioStream(void);
-
-    int EncodeAC3Frame(unsigned char* data, int len, short *samples,
-                       int &samples_size);
 
     // Update our position map, keyframe distance, and the like.  Called for key frame packets.
     void HandleGopStart(AVPacket *pkt);
@@ -238,6 +235,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     // Audio
     short int        *audioSamples;
     bool              allow_ac3_passthru;
+    bool              allow_dts_passthru;
 
     AudioInfo         audioIn;
     AudioInfo         audioOut;

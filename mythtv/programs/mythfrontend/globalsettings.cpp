@@ -133,6 +133,20 @@ static HostCheckBox *AC3PassThrough()
     return gc;
 }
 
+#ifdef CONFIG_DTS
+static HostCheckBox *DTSPassThrough()
+{
+    HostCheckBox *gc = new HostCheckBox("DTSPassThru");
+    gc->setLabel(QObject::tr("Enable DTS to SPDIF passthrough"));
+    gc->setValue(false);
+    gc->setHelpText(QObject::tr("Enable sending DTS audio directly to your "
+                    "sound card's SPDIF output, on sources which contain "
+                    "DTS soundtracks (usually DVDs).  Requires that the "
+                    "audio output device be set to something suitable."));
+    return gc;
+}
+#endif
+
 static HostCheckBox *Deinterlace()
 {
     HostCheckBox *gc = new HostCheckBox("Deinterlace");
@@ -2059,6 +2073,9 @@ public:
 
          addChild(AudioOutputDevice());
          addChild(AC3PassThrough());
+#ifdef CONFIG_DTS
+         addChild(DTSPassThrough());
+#endif
          addChild(AggressiveBuffer());
 
          Setting* volumeControl = MythControlsVolume();

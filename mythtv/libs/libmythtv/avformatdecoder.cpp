@@ -8,6 +8,7 @@
 using namespace std;
 
 // MythTV headers
+#include "mythconfig.h" // for CONFIG_DTS
 #include "avformatdecoder.h"
 #include "RingBuffer.h"
 #include "NuppelVideoPlayer.h"
@@ -38,6 +39,13 @@ extern "C" {
 
 /** Set to zero to allow any number of AC3 channels. */
 #define MAX_OUTPUT_CHANNELS 2
+
+static int dts_syncinfo(uint8_t *indata_ptr, int *flags,
+                        int *sample_rate, int *bit_rate);
+static int dts_decode_header(uint8_t *indata_ptr, int *rate,
+                             int *nblks, int *sfreq);
+static int encode_frame(bool dts, unsigned char* data, int len,
+                        short *samples, int &samples_size);
 
 extern pthread_mutex_t avcodeclock;
 
@@ -181,6 +189,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       allow_ac3_passthru(false),
+      allow_dts_passthru(false),
       // Audio selection
       wantedAudioStream(),    selectedAudioStream(),
       // Subtitle selection
@@ -197,6 +206,9 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
 
     save_cctc[0] = save_cctc[1] = 0;
     allow_ac3_passthru = gContext->GetNumSetting("AC3PassThru", false);
+#ifdef CONFIG_DTS
+    allow_dts_passthru = gContext->GetNumSetting("DTSPassThru", false);
+#endif
 
     audioIn.sample_size = -32; // force SetupAudioStream to run once
 }
@@ -948,6 +960,16 @@ int AvFormatDecoder::ScanStreams(bool novideo)
                             <<") already open, leaving it alone.");
                 }
                 assert(enc->codec_id);
+
+                // HACK BEGIN REALLY UGLY HACK FOR DTS PASSTHRU
+                if (enc->codec_id == CODEC_ID_DTS)
+                {
+                    enc->sample_rate = 48000;
+                    enc->channels = 2;
+                    // enc->bit_rate = what??;
+                }
+                // HACK END REALLY UGLY HACK FOR DTS PASSTHRU
+
                 bitrate += enc->bit_rate;
                 break;
             }
@@ -1733,7 +1755,7 @@ QStringList AvFormatDecoder::listAudioTracks(void) const
     return list;
 }
 
-vector<int> filter_lang(const sinfo_vec_t &audioStreams, int lang_key)
+static vector<int> filter_lang(const sinfo_vec_t &audioStreams, int lang_key)
 {
     vector<int> ret;
 
@@ -1744,30 +1766,10 @@ vector<int> filter_lang(const sinfo_vec_t &audioStreams, int lang_key)
     return ret;
 }
 
-int filter_ac3(const AVFormatContext *ic,
-               const sinfo_vec_t     &audioStreams,
-               const vector<int>     &fs)
-{
-    int selectedTrack = -1;
-
-    vector<int>::const_iterator it = fs.begin();
-    for (; it != fs.end(); ++it)
-    {
-        const int stream_index    = audioStreams[*it].av_stream_index;
-        const AVCodecContext *ctx = ic->streams[stream_index]->codec;
-        if (CODEC_ID_AC3 == ctx->codec_id)
-        {
-            selectedTrack = *it;
-            break;
-        }
-    }
-
-    return selectedTrack;
-}
-
-int filter_max_ch(const AVFormatContext *ic,
-                  const sinfo_vec_t     &audioStreams,
-                  const vector<int>     &fs)
+static int filter_max_ch(const AVFormatContext *ic,
+                         const sinfo_vec_t     &audioStreams,
+                         const vector<int>     &fs,
+                         enum CodecID           codecId = CODEC_ID_NONE)
 {
     int selectedTrack = -1, max_seen = -1;
 
@@ -1776,7 +1778,8 @@ int filter_max_ch(const AVFormatContext *ic,
     {
         const int stream_index    = audioStreams[*it].av_stream_index;
         const AVCodecContext *ctx = ic->streams[stream_index]->codec;
-        if (max_seen < ctx->channels)
+        if ((codecId == CODEC_ID_NONE || codecId == ctx->codec_id) &&
+            (max_seen < ctx->channels))
         {
             selectedTrack = *it;
             max_seen = ctx->channels;
@@ -1789,25 +1792,43 @@ int filter_max_ch(const AVFormatContext *ic,
 /** \fn AvFormatDecoder::autoSelectAudioTrack(void)
  *  \brief Selects the best audio track.
  *
- *   This function will select the best audio track
- *   available using the following rules:
+ *   This function will select the best audio track available
+ *   using the following criteria, in order of decreasing
+ *   preference:
  *
- *   First we try to select the stream last selected by the
- *   user, which is recalled as the Nth stream in the 
- *   preferred language. If it can not be located we attempt
- *   to find a stream in the same language.
+ *   1) The stream last selected by the user, which is
+ *      recalled as the Nth stream in the preferred language.
+ *      If it can not be located we attempt to find a stream
+ *      in the same language.
  *
- *   If we can not reselect the last user selected stream,
- *   then for each preferred language from most preferred to
- *   least preferred, we try to use the first AC3 track found,
- *   or if no AC3 audio is found then we try to select the
- *   audio track with the greatest number of audio channels.
+ *   2) If we can not reselect the last user selected stream,
+ *      then for each preferred language from most preferred
+ *      to least preferred, we try to find a new stream based
+ *      on the algorithm below.
  *
- *   If we can not select a stream in a preferred language
- *   we try to use the first AC3 track found irrespective
- *   of language, and if no AC3 audio is found then we try
- *   to select the audio track with the greatest number of
- *   audio channels.
+ *   3) If we can not select a stream in a preferred language
+ *      we try to select a stream irrespective of language
+ *      based on the algorithm below.
+ *
+ *   When searching for a new stream (ie. options 2 and 3
+ *   above), the following search is carried out in order:
+ *
+ *   i)   If DTS passthrough is enabled then the DTS track with
+ *        the greatest number of audio channels is selected
+ *        (the first will be chosen if there are several the
+ *        same). If DTS passthrough is not enabled this step
+ *        will be skipped because internal DTS decoding is not
+ *        currently supported.
+ *
+ *   ii)  If no DTS track is chosen, the AC3 track with the
+ *        greatest number of audio channels is selected (the
+ *        first will be chosen if there are several the same).
+ *        Internal decoding of AC3 is supported, so this will
+ *        be used irrespective of whether AC3 passthrough is
+ *        enabled.
+ *
+ *   iii) Lastly the track with the greatest number of audio
+ *        channels irrespective of type will be selected.
  *  \return true if a track was selected, false otherwise
  */
 bool AvFormatDecoder::autoSelectAudioTrack(void)
@@ -1822,10 +1843,13 @@ bool AvFormatDecoder::autoSelectAudioTrack(void)
     {
         int idx = audioStreams[i].av_stream_index;
         AVCodecContext *codec_ctx = ic->streams[idx]->codec;
+        bool do_ac3_passthru = (allow_ac3_passthru && !transcoding &&
+                                (codec_ctx->codec_id == CODEC_ID_AC3));
+        bool do_dts_passthru = (allow_dts_passthru && !transcoding &&
+                                (codec_ctx->codec_id == CODEC_ID_DTS));
         AudioInfo item(codec_ctx->codec_id,
                        codec_ctx->sample_rate, codec_ctx->channels,
-                       (allow_ac3_passthru && !transcoding &&
-                        (codec_ctx->codec_id == CODEC_ID_AC3)));
+                       do_ac3_passthru || do_dts_passthru);
         VERBOSE(VB_AUDIO, LOC + " * " + item.toString());
     }
 #endif
@@ -1855,21 +1879,31 @@ bool AvFormatDecoder::autoSelectAudioTrack(void)
         // try to get best track for most preferred language
         selectedTrack = -1;
         vector<int>::const_iterator it = languagePreference.begin();
-        for (; it !=  languagePreference.end(); ++it)
+        for (; it !=  languagePreference.end() && selectedTrack<0; ++it)
         {
             vector<int> flang = filter_lang(audioStreams, *it);
-            if ((selectedTrack = filter_ac3(ic, audioStreams, flang)) >= 0)
-                break;
-            if ((selectedTrack = filter_max_ch(ic, audioStreams, flang)) >= 0)
-                break;
+            if (allow_dts_passthru && !transcoding)
+                selectedTrack = filter_max_ch(ic, audioStreams, flang,
+                                              CODEC_ID_DTS);
+            if (selectedTrack < 0)
+                selectedTrack = filter_max_ch(ic, audioStreams, flang,
+                                              CODEC_ID_AC3);
+            if (selectedTrack < 0)
+                selectedTrack = filter_max_ch(ic, audioStreams, flang);
         }
         // try to get best track for any language
         if (selectedTrack < 0)
         {
             VERBOSE(VB_AUDIO, LOC + "Trying to select audio track (wo/lang)");
             vector<int> flang = filter_lang(audioStreams, -1);
-            if ((selectedTrack = filter_ac3(ic, audioStreams, flang)) < 0)
-                selectedTrack  = filter_max_ch(ic, audioStreams, flang);
+            if (allow_dts_passthru && !transcoding)
+                selectedTrack = filter_max_ch(ic, audioStreams, flang,
+                                              CODEC_ID_DTS);
+            if (selectedTrack < 0)
+                selectedTrack = filter_max_ch(ic, audioStreams, flang,
+                                              CODEC_ID_AC3);
+            if (selectedTrack < 0)
+                selectedTrack = filter_max_ch(ic, audioStreams, flang);
         }
     }
 
@@ -2282,11 +2316,12 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     pthread_mutex_lock(&avcodeclock);
                     ret = len;
                     data_size = 0;
-                    if (audioOut.do_ac3_passthru)
+                    if (audioOut.do_passthru)
                     {
                         data_size = pkt->size;
-                        ret = EncodeAC3Frame(ptr, len, audioSamples,
-                                             data_size);
+                        bool dts = CODEC_ID_DTS == curstream->codec->codec_id;
+                        ret = encode_frame(dts, ptr, len,
+                                           audioSamples, data_size);
                     }
                     else
                     {
@@ -2314,11 +2349,14 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     }
                     pthread_mutex_unlock(&avcodeclock);
 
-                    ptr += ret;
-                    len -= ret;
-
+                    // BEGIN Is this really safe? -- dtk
                     if (data_size <= 0)
+                    {
+                        ptr += ret;
+                        len -= ret;
                         continue;
+                    }
+                    // END Is this really safe? -- dtk
 
                     long long temppts = lastapts;
 
@@ -2519,9 +2557,11 @@ bool AvFormatDecoder::SetupAudioStream(void)
         codec_ctx = curstream->codec;        
         bool do_ac3_passthru = (allow_ac3_passthru && !transcoding &&
                                 (codec_ctx->codec_id == CODEC_ID_AC3));
+        bool do_dts_passthru = (allow_dts_passthru && !transcoding &&
+                                (codec_ctx->codec_id == CODEC_ID_DTS));
         info = AudioInfo(codec_ctx->codec_id,
                          codec_ctx->sample_rate, codec_ctx->channels,
-                         do_ac3_passthru);
+                         do_ac3_passthru || do_dts_passthru);
     }
 
     if (info == audioIn)
@@ -2531,7 +2571,7 @@ bool AvFormatDecoder::SetupAudioStream(void)
             QString("audio track #%1").arg(currentAudioTrack+1));
 
     audioOut = audioIn = info;
-    if (audioIn.do_ac3_passthru)
+    if (audioIn.do_passthru)
     {
         // A passthru stream looks like a 48KHz 2ch (@ 16bit) to the sound card
         audioOut.channels    = 2;
@@ -2563,8 +2603,8 @@ bool AvFormatDecoder::SetupAudioStream(void)
     return true;
 }
 
-int AvFormatDecoder::EncodeAC3Frame(unsigned char *data, int len,
-                                    short *samples, int &samples_size)
+static int encode_frame(bool dts, unsigned char *data, int len,
+                        short *samples, int &samples_size)
 {
     int enc_len;
     int flags, sample_rate, bit_rate;
@@ -2578,7 +2618,20 @@ int AvFormatDecoder::EncodeAC3Frame(unsigned char *data, int len,
     // ignore, and if so, may as well just assume that it will ignore
     // anything with a bad CRC...
 
-    enc_len = a52_syncinfo(data, &flags, &sample_rate, &bit_rate);
+    uint nr_samples = 0, block_len;
+    if (dts)
+    {
+        enc_len = dts_syncinfo(data, &flags, &sample_rate, &bit_rate);
+        int rate, sfreq, nblks;
+        dts_decode_header(data, &rate, &nblks, &sfreq);
+        nr_samples = nblks * 32;
+        block_len = nr_samples * 2 * 2;
+    }
+    else
+    {
+        enc_len = a52_syncinfo(data, &flags, &sample_rate, &bit_rate);
+        block_len = MAX_AC3_FRAME_SIZE;
+    }
 
     if (enc_len == 0 || enc_len > len)
     {
@@ -2586,29 +2639,147 @@ int AvFormatDecoder::EncodeAC3Frame(unsigned char *data, int len,
         return len;
     }
 
-    if (enc_len > MAX_AC3_FRAME_SIZE - 8)
-        enc_len = MAX_AC3_FRAME_SIZE - 8;
+    enc_len = min((uint)enc_len, block_len - 8);
 
     swab(data, ucsamples + 8, enc_len);
 
-    // the following values come from ao_hwac3.c in mplayer.
+    // the following values come from libmpcodecs/ad_hwac3.c in mplayer.
     // they form a valid IEC958 AC3 header.
     ucsamples[0] = 0x72;
     ucsamples[1] = 0xF8;
     ucsamples[2] = 0x1F;
     ucsamples[3] = 0x4E;
     ucsamples[4] = 0x01;
+    if (dts)
+    {
+        switch(nr_samples)
+        {
+            case 512:
+                ucsamples[4] = 0x0B;      /* DTS-1 (512-sample bursts) */
+                break;
+
+            case 1024:
+                ucsamples[4] = 0x0C;      /* DTS-2 (1024-sample bursts) */
+                break;
+
+            case 2048:
+                ucsamples[4] = 0x0D;      /* DTS-3 (2048-sample bursts) */
+                break;
+
+            default:
+                VERBOSE(VB_IMPORTANT, LOC +
+                        QString("DTS: %1-sample bursts not supported")
+                        .arg(nr_samples));
+                ucsamples[4] = 0x00;
+                break;
+        }
+    }
     ucsamples[5] = 0x00;
     ucsamples[6] = (enc_len << 3) & 0xFF;
     ucsamples[7] = (enc_len >> 5) & 0xFF;
-    memset(ucsamples + 8 + enc_len, 0, MAX_AC3_FRAME_SIZE - 8 - enc_len);
-    samples_size = MAX_AC3_FRAME_SIZE;
+    memset(ucsamples + 8 + enc_len, 0, block_len - 8 - enc_len);
+    samples_size = block_len;
 
-    return len;  // consume whole frame even if len > enc_len ?
+    return enc_len;
 }
 
 void AvFormatDecoder::AddTextData(unsigned char *buf, int len,
                                   long long timecode, char type)
 {
     m_parent->AddTextData((char*)buf, len, timecode, type);
+}
+  
+static int DTS_SAMPLEFREQS[16] =
+{
+    0,      8000,   16000,  32000,  64000,  128000, 11025,  22050,
+    44100,  88200,  176400, 12000,  24000,  48000,  96000,  192000
+};
+
+static int DTS_BITRATES[30] =
+{
+    32000,    56000,    64000,    96000,    112000,   128000,
+    192000,   224000,   256000,   320000,   384000,   448000,
+    512000,   576000,   640000,   768000,   896000,   1024000,
+    1152000,  1280000,  1344000,  1408000,  1411200,  1472000,
+    1536000,  1920000,  2048000,  3072000,  3840000,  4096000
+};
+
+static int dts_syncinfo(uint8_t *indata_ptr, int */*flags*/,
+                        int *sample_rate, int *bit_rate)
+{
+    int nblks;
+    int rate;
+    int sfreq;
+
+    int fsize = dts_decode_header(indata_ptr, &rate, &nblks, &sfreq);
+    if (fsize >= 0)
+    {
+        if (rate >= 0 && rate <= 29)
+            *bit_rate = DTS_BITRATES[rate];
+        else
+            *bit_rate = 0;
+        if (sfreq >= 1 && sfreq <= 15)
+            *sample_rate = DTS_SAMPLEFREQS[sfreq];
+        else
+            *sample_rate = 0;
+    }
+    return fsize;
+}
+
+static int dts_decode_header(uint8_t *indata_ptr, int *rate,
+                             int *nblks, int *sfreq)
+{
+    uint id = ((indata_ptr[0] << 24) | (indata_ptr[1] << 16) |
+               (indata_ptr[2] << 8)  | (indata_ptr[3]));
+
+    if (id != 0x7ffe8001)
+        return -1;
+
+    int ftype = indata_ptr[4] >> 7;
+
+    int surp = (indata_ptr[4] >> 2) & 0x1f;
+    surp = (surp + 1) % 32;
+
+    *nblks = (indata_ptr[4] & 0x01) << 6 | (indata_ptr[5] >> 2);
+    ++*nblks;
+
+    int fsize = (indata_ptr[5] & 0x03) << 12 |
+                (indata_ptr[6]         << 4) | (indata_ptr[7] >> 4);
+    ++fsize;
+
+    *sfreq = (indata_ptr[8] >> 2) & 0x0f;
+    *rate = (indata_ptr[8] & 0x03) << 3 | ((indata_ptr[9] >> 5) & 0x07);
+
+    if (ftype != 1)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DTS: Termination frames not handled (ftype %1)")
+                .arg(ftype));
+        return -1;
+    }
+
+    if (*sfreq != 13)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DTS: Only 48kHz supported (sfreq %1)").arg(*sfreq));
+        return -1;
+    }
+
+    if ((fsize > 8192) || (fsize < 96))
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DTS: fsize: %1 invalid").arg(fsize));
+        return -1;
+    }
+
+    if (*nblks != 8 && *nblks != 16 && *nblks != 32 &&
+        *nblks != 64 && *nblks != 128 && ftype == 1)
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                QString("DTS: nblks %1 not valid for normal frame")
+                .arg(*nblks));
+        return -1;
+    }
+
+    return fsize;
 }
