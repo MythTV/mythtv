@@ -423,7 +423,7 @@ class dvb_channel_t
         QString lnb_lof_hi,        QString lnb_lof_lo,     QString _sistandard,
         QString hp_code_rate,      QString lp_code_rate,   QString constellation,
         QString transmission_mode, QString guard_interval, QString hierarchy,
-        QString modulation,        QString bandwidth);
+        QString modulation,        QString bandwidth,      QString _input_id);
 
     DVBTuning       tuning;
 
@@ -436,6 +436,7 @@ class dvb_channel_t
     uint16_t        transportID;
 
     QString         sistandard;
+    int             input_id;
     uint8_t         version;
   private:
     mutable QMutex  lock;

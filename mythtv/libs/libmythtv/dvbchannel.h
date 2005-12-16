@@ -92,6 +92,8 @@ class DVBChannel : public QObject, public ChannelBase
     bool GetTransportOptions(int mplexid);
     bool GetChannelOptions(const QString &channum);
 
+    void InitializeInputs(void);
+
     void CheckOptions();
     bool CheckModulation(fe_modulation_t modulation) const;
     bool CheckCodeRate(fe_code_rate_t rate) const;

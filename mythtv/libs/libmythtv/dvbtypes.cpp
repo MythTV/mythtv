@@ -906,7 +906,7 @@ bool dvb_channel_t::Parse(
     QString lnb_lof_hi,        QString lnb_lof_lo,     QString _sistandard,
     QString hp_code_rate,      QString lp_code_rate,   QString constellation,
     QString trans_mode,        QString guard_interval, QString hierarchy,
-    QString modulation,        QString bandwidth)
+    QString modulation,        QString bandwidth,      QString _input_id)
 {
     lock.lock();
         
@@ -928,7 +928,8 @@ bool dvb_channel_t::Parse(
         ok = tuning.parseATSC(frequency, modulation);
         
     sistandard = _sistandard;
-        
+    input_id   = _input_id.toInt();
+
     lock.unlock();
     return ok;
 }
