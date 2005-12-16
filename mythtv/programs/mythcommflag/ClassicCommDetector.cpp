@@ -8,6 +8,8 @@
 #include "libmyth/mythcontext.h"
 #include "libmythtv/programinfo.h"
 
+//#include "commercial_debug.h"
+
 // This is used as a bitmask.
 enum SkipTypes {
     COMM_DETECT_OFF         = 0x00,
@@ -2332,7 +2334,7 @@ void ClassicCommDetector::SetLogoMask(unsigned char *mask)
     }
 
 #ifdef SHOW_DEBUG_WIN
-    DumpLogo();
+    DumpLogo(true);
 #endif
 
     logoFrameCount = 0;
