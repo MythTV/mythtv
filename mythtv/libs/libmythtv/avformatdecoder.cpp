@@ -1688,19 +1688,28 @@ void AvFormatDecoder::ProcessDVBDataPacket(
     }
 }
 
+static int safe_incr(int track, int size)
+{
+    if (size)
+        return (max(-1, track) + 1) % size;
+    return -1;
+}
+
+static int safe_decr(int track, int size)
+{
+    if (size)
+        return (max(+0, track) + size - 1) % size;
+    return -1;
+}
+
 void AvFormatDecoder::incCurrentAudioTrack(void)
 {
-    int numStreams = (int)audioStreams.size();
-    int next       = (currentAudioTrack+1) % numStreams;
-    setCurrentAudioTrack((!numStreams) ? -1 : next);
+    setCurrentAudioTrack(safe_incr(currentAudioTrack,audioStreams.size()));
 }
 
 void AvFormatDecoder::decCurrentAudioTrack(void)
 {
-    int numStreams = (int)audioStreams.size();
-    int next       = (currentAudioTrack < 0) ? 0 : currentAudioTrack;
-    next           = (next+numStreams-1) % numStreams;
-    setCurrentAudioTrack((!numStreams) ? -1 : next);
+    setCurrentAudioTrack(safe_decr(currentAudioTrack,audioStreams.size()));
 }
 
 bool AvFormatDecoder::setCurrentAudioTrack(int trackNo)
@@ -1939,17 +1948,14 @@ bool AvFormatDecoder::autoSelectAudioTrack(void)
 
 void AvFormatDecoder::incCurrentSubtitleTrack(void)
 {
-    int numStreams = (int)subtitleStreams.size();
-    int next       = (currentSubtitleTrack+1) % numStreams;
-    setCurrentSubtitleTrack((!numStreams) ? -1 : next);
+    int next = safe_incr(currentSubtitleTrack, subtitleStreams.size());
+    setCurrentSubtitleTrack(next);
 }
 
 void AvFormatDecoder::decCurrentSubtitleTrack(void)
 {
-    int numStreams = (int)subtitleStreams.size();
-    int next       = max(currentSubtitleTrack, 0);
-    next           = (next+numStreams-1) % numStreams;
-    setCurrentSubtitleTrack((!numStreams) ? -1 : next);
+    int next = safe_decr(currentSubtitleTrack, subtitleStreams.size());
+    setCurrentSubtitleTrack(next);
 }
 
 bool AvFormatDecoder::setCurrentSubtitleTrack(int trackNo)
