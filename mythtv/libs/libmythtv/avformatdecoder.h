@@ -124,6 +124,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
 
     MythCodecID GetVideoCodecID() const { return video_codec_id; }
 
+    virtual void SetDisablePassThrough(bool disable);
     virtual void incCurrentAudioTrack();
     virtual void decCurrentAudioTrack();
     virtual bool setCurrentAudioTrack(int trackNo);    
@@ -236,6 +237,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     short int        *audioSamples;
     bool              allow_ac3_passthru;
     bool              allow_dts_passthru;
+    bool              disable_passthru;
 
     AudioInfo         audioIn;
     AudioInfo         audioOut;

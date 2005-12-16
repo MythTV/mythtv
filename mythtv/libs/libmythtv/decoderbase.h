@@ -30,6 +30,8 @@ class DecoderBase
     void SetProgramInfo(ProgramInfo *pginfo);
 
     void SetLowBuffers(bool low) { lowbuffers = low; }
+    /// Disables AC3/DTS pass through
+    virtual void SetDisablePassThrough(bool disable) { (void)disable; }
 
     virtual void setWatchingRecording(bool mode);
     virtual bool GetFrame(int onlyvideo) = 0;

@@ -2775,6 +2775,15 @@ void NuppelVideoPlayer::DoPlay(void)
     if (normal_speed && audioOutput)
     {
         audio_stretchfactor = play_speed;
+        if (decoder)
+        {
+            bool disable = (play_speed < 0.99f) || (play_speed > 1.01f);
+            VERBOSE(VB_PLAYBACK, LOC +
+                    QString("Stretch Factor %1, %2 passthru ")
+                    .arg(audio_stretchfactor)
+                    .arg((disable) ? "disable" : "allow"));
+            decoder->SetDisablePassThrough(disable);
+        }
         audioOutput->SetStretchFactor(play_speed);
 #ifdef USING_DIRECTX
         audioOutput->Reset();

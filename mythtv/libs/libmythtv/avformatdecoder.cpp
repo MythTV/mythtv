@@ -39,7 +39,7 @@ extern "C" {
 
 /** Set to zero to allow any number of AC3 channels. */
 #define MAX_OUTPUT_CHANNELS 2
-
+#define VB_AUDIO VB_IMPORTANT
 static int dts_syncinfo(uint8_t *indata_ptr, int *flags,
                         int *sample_rate, int *bit_rate);
 static int dts_decode_header(uint8_t *indata_ptr, int *rate,
@@ -190,6 +190,7 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
       allow_ac3_passthru(false),
       allow_dts_passthru(false),
+      disable_passthru(false),
       // Audio selection
       wantedAudioStream(),    selectedAudioStream(),
       // Subtitle selection
@@ -1853,8 +1854,10 @@ bool AvFormatDecoder::autoSelectAudioTrack(void)
         int idx = audioStreams[i].av_stream_index;
         AVCodecContext *codec_ctx = ic->streams[idx]->codec;
         bool do_ac3_passthru = (allow_ac3_passthru && !transcoding &&
+                                !disable_passthru &&
                                 (codec_ctx->codec_id == CODEC_ID_AC3));
         bool do_dts_passthru = (allow_dts_passthru && !transcoding &&
+                                !disable_passthru &&
                                 (codec_ctx->codec_id == CODEC_ID_DTS));
         AudioInfo item(codec_ctx->codec_id,
                        codec_ctx->sample_rate, codec_ctx->channels,
@@ -2539,6 +2542,27 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
     return true;
 }
 
+void AvFormatDecoder::SetDisablePassThrough(bool disable)
+{
+    if (selectedAudioStream.av_stream_index < 0)
+    {
+        disable_passthru = disable;
+        return;
+    }
+
+    if (disable != disable_passthru)
+    {
+        disable_passthru = disable;
+        QString msg = (disable) ? "Disabling" : "Allowing";
+        VERBOSE(VB_AUDIO, LOC + msg + " pass through");
+
+        // Force pass through state to be reanalyzed
+        pthread_mutex_lock(&avcodeclock);
+        SetupAudioStream();
+        pthread_mutex_unlock(&avcodeclock);
+    }
+}
+
 /** \fn AvFormatDecoder::SetupAudioStream(void)
  *  \brief Reinitializes audio if it needs to be reinitialized.
  *
@@ -2562,8 +2586,10 @@ bool AvFormatDecoder::SetupAudioStream(void)
         assert(curstream->codec);
         codec_ctx = curstream->codec;        
         bool do_ac3_passthru = (allow_ac3_passthru && !transcoding &&
+                                !disable_passthru &&
                                 (codec_ctx->codec_id == CODEC_ID_AC3));
         bool do_dts_passthru = (allow_dts_passthru && !transcoding &&
+                                !disable_passthru &&
                                 (codec_ctx->codec_id == CODEC_ID_DTS));
         info = AudioInfo(codec_ctx->codec_id,
                          codec_ctx->sample_rate, codec_ctx->channels,
