@@ -622,6 +622,27 @@ void AutoExpire::PrintExpireList(void)
     }
 }
 
+/** \fn AutoExpire::GetAllExpiring()
+ *  \brief Gets the full list of programs that can expire in expiration order
+ */
+void AutoExpire::GetAllExpiring(QStringList &strList)
+{
+    QMutexLocker lockit(&instance_lock);
+
+    UpdateDontExpireSet();
+
+    ClearExpireList();
+    FillDBOrdered(emShortLiveTVPrograms, true);
+    FillDBOrdered(emNormalLiveTVPrograms, true);
+    FillDBOrdered(gContext->GetNumSetting("AutoExpireMethod", 1), true);
+
+    strList << QString::number(expire_list.size());
+
+    pginfolist_t::iterator it = expire_list.begin();
+    for (; it != expire_list.end(); it++)
+        (*it)->ToStringList(strList);
+}
+
 /** \fn AutoExpire::ClearExpireList()
  *  \brief Clears expire_list, freeing any ProgramInfo's.
  */
@@ -635,11 +656,11 @@ void AutoExpire::ClearExpireList(void)
     }
 }
 
-/** \fn AutoExpire::FillDBOrdered(int)
+/** \fn AutoExpire::FillDBOrdered(int, bool)
  *  \brief Creates a list of programs to delete using the database to 
  *         order list.
  */
-void AutoExpire::FillDBOrdered(int expMethod)
+void AutoExpire::FillDBOrdered(int expMethod, bool allHosts)
 {
     QString fileprefix = gContext->GetFilePrefix();
     QString where;
@@ -657,18 +678,21 @@ void AutoExpire::FillDBOrdered(int expMethod)
             orderby = "recorded.recpriority ASC, starttime ASC";
             break;
         case emShortLiveTVPrograms:
-            where = QString("recgroup = 'LiveTV' AND hostname = '%1' "
+            where = "recgroup = 'LiveTV' "
                     "AND endtime < DATE_ADD(starttime, INTERVAL '2' MINUTE) "
-                    "AND endtime <= DATE_ADD(NOW(), INTERVAL '-1' MINUTE) ")
-                    .arg(gContext->GetHostName());
+                    "AND endtime <= DATE_ADD(NOW(), INTERVAL '-1' MINUTE) ";
+            if (!allHosts)
+                where += QString(" AND hostname = '%1' ")
+                                 .arg(gContext->GetHostName());
             orderby = "starttime ASC";
             break;
         case emNormalLiveTVPrograms:
-            int LiveTVMaxAge =
-                    gContext->GetNumSetting("AutoExpireLiveTVMaxAge", 7);
-            where = QString("recgroup = 'LiveTV' AND hostname = '%1' "
-                    "AND endtime <= DATE_ADD(NOW(), INTERVAL '-%2' DAY) ")
-                    .arg(gContext->GetHostName()).arg(LiveTVMaxAge);
+            where = QString("recgroup = 'LiveTV' "
+                    "AND endtime <= DATE_ADD(NOW(), INTERVAL '-%1' DAY) ")
+                    .arg(gContext->GetNumSetting("AutoExpireLiveTVMaxAge", 7));
+            if (!allHosts)
+                where += QString(" AND hostname = '%1' ")
+                                 .arg(gContext->GetHostName());
             orderby = "starttime ASC";
             break;
     }

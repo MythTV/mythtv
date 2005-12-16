@@ -52,6 +52,7 @@ StatusBox::StatusBox(MythMainWindow *parent, const char *name)
     icon_list->SetItemText(item_count++, QObject::tr("Log Entries"));
     icon_list->SetItemText(item_count++, QObject::tr("Job Queue"));
     icon_list->SetItemText(item_count++, QObject::tr("Machine Status"));
+    icon_list->SetItemText(item_count++, QObject::tr("AutoExpire List"));
     icon_list->SetItemCurrent(0);
     icon_list->SetActive(true);
 
@@ -346,6 +347,11 @@ void StatusBox::keyPressEvent(QKeyEvent *e)
                     doLogEntries();
                 }
             }
+            else if ((inContent) &&
+                     (currentItem == QObject::tr("Job Queue")))
+            {
+                clicked();
+            }
         }
         else if (action == "UP")
         {
@@ -488,6 +494,12 @@ void StatusBox::setHelpText()
 
             helptext->SetText(machineStr);
         }
+
+        if (currentItem == QObject::tr("AutoExpire List"))
+            helptext->SetText(QObject::tr("The AutoExpire List shows all "
+                "recordings which may be expired and the order of their "
+                "expiration. Recordings at the top of the list will be "
+                "expired first."));
     }
     update(TopRect);
 }
@@ -618,6 +630,8 @@ void StatusBox::clicked()
         doJobQueueStatus();
     else if (currentItem == QObject::tr("Machine Status"))
         doMachineStatus();
+    else if (currentItem == QObject::tr("AutoExpire List"))
+        doAutoExpireList();
 }
 
 void StatusBox::doListingsStatus()
@@ -1065,7 +1079,7 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
 }
 
 /** \fn StatusBox::doMachineStatus()
- *  \brief Should machine status.
+ *  \brief Show machine status.
  *  
  *   This returns statisics for master backend when using
  *   a frontend only machine. And returns info on the current
@@ -1085,7 +1099,7 @@ void StatusBox::doMachineStatus()
     contentLines.clear();
     contentDetail.clear();
     contentFont.clear();
-    //doScroll = false;??
+    doScroll = true;
 
     detailBegin = count;
     detailString = "";
@@ -1239,6 +1253,72 @@ void StatusBox::doMachineStatus()
 
         detailBegin = count;
         detailString = "";
+    }
+
+    contentTotalLines = count;
+    update(ContentRect);
+}
+
+/** \fn StatusBox::doAutoExpireList()
+ *  \brief Show list of recordings which may AutoExpire
+ */
+void StatusBox::doAutoExpireList()
+{
+    int                   count(0);
+    vector<ProgramInfo *> expList;
+    ProgramInfo*          pginfo;
+    QString               contentLine;
+    QString               detailInfo;
+    QString               staticInfo;
+    long long             totalSize(0);
+    long long             liveTVSize(0);
+    int                   liveTVCount(0);
+
+    contentLines.clear();
+    contentDetail.clear();
+    contentFont.clear();
+    doScroll = true;
+
+    RemoteGetAllExpiringRecordings(expList);
+
+    vector<ProgramInfo *>::iterator it;
+    for (it = expList.begin(); it != expList.end(); it++)
+    {
+        pginfo = *it;
+       
+        totalSize += pginfo->filesize;
+        if (pginfo->recgroup == "LiveTV")
+        {
+            liveTVSize += pginfo->filesize;
+            liveTVCount++;
+        }
+    }
+
+    staticInfo = tr("%1 recordings consuming %2 are allowed to expire")
+                    .arg(expList.size()).arg(sm_str(totalSize / 1024));
+
+    for (it = expList.begin(); it != expList.end(); it++)
+    {
+        pginfo = *it;
+        contentLine = pginfo->recstartts.toString(dateFormat) + " - " +
+                      pginfo->title + " (" + sm_str(pginfo->filesize / 1024) +
+                      ")";
+        detailInfo = staticInfo + "\n\n" + pginfo->title;
+
+        if (pginfo->subtitle != "")
+            detailInfo += " - " + pginfo->subtitle + "";
+
+        detailInfo += " (" + sm_str(pginfo->filesize / 1024) + ")\n";
+
+        if (pginfo->recgroup == "LiveTV")
+            contentLine += " (" + tr("LiveTV") + ")";
+
+        detailInfo += pginfo->recstartts.toString(timeDateFormat) + " - " +
+                      pginfo->recendts.toString(timeDateFormat) + "\n";
+
+        contentLines[count] = contentLine;
+        contentDetail[count] = detailInfo;
+        count++;
     }
 
     contentTotalLines = count;

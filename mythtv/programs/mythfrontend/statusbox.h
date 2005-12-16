@@ -36,6 +36,7 @@ class StatusBox : public MythDialog
     void doLogEntries();
     void doJobQueueStatus();
     void doMachineStatus();
+    void doAutoExpireList();
     void clicked();
     void setHelpText();
     void getActualRecordedBPS(QString hostnames);

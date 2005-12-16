@@ -17,6 +17,7 @@ using namespace std;
 #include "filetransfer.h"
 #include "scheduler.h"
 #include "livetvchain.h"
+#include "autoexpire.h"
 
 class HttpStatus;
 class ProcessRequestThread;
@@ -27,7 +28,7 @@ class MainServer : public QObject
   public:
     MainServer(bool master, int port, int statusport, 
                QMap<int, EncoderLink *> *tvList,
-               Scheduler *sched);
+               Scheduler *sched, AutoExpire *expirer);
 
    ~MainServer();
 
@@ -87,6 +88,7 @@ class MainServer : public QObject
     void HandleGetPendingRecordings(PlaybackSock *pbs, QString table = "", int recordid=-1);
     void HandleGetScheduledRecordings(PlaybackSock *pbs);
     void HandleGetConflictingRecordings(QStringList &slist, PlaybackSock *pbs);
+    void HandleGetExpiringRecordings(PlaybackSock *pbs);
     void HandleGetNextFreeRecorder(QStringList &slist, PlaybackSock *pbs);
     void HandleGetFreeRecorder(PlaybackSock *pbs);
     void HandleGetFreeRecorderCount(PlaybackSock *pbs);
@@ -172,6 +174,7 @@ class MainServer : public QObject
     bool masterBackendOverride;
 
     Scheduler *m_sched;
+    AutoExpire *m_expirer;
 
     QMutex readReadyLock;
 

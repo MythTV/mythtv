@@ -34,6 +34,7 @@ class AutoExpire : public QObject
     void CalcParams(vector<EncoderLink*>);
     void FillExpireList();
     void PrintExpireList();
+    void GetAllExpiring(QStringList &strList);
 
     static void Update(QMap<int, EncoderLink*>*, bool immediately);
   protected:
@@ -45,7 +46,7 @@ class AutoExpire : public QObject
     void ExpireRecordings(void);
     void ExpireEpisodesOverMax(void);
 
-    void FillDBOrdered(int expMethod);
+    void FillDBOrdered(int expMethod, bool allHosts = false);
     void SendDeleteMessages(size_t availFreeKB, size_t desiredFreeKB,
                             bool deleteAll = false);
     void ClearExpireList(void);

@@ -543,7 +543,7 @@ int main(int argc, char **argv)
         }
     }
 
-    new MainServer(ismaster, port, statusport, &tvList, sched);
+    new MainServer(ismaster, port, statusport, &tvList, sched, expirer);
 
     if (ismaster)
     {

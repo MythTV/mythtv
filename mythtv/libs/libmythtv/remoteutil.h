@@ -29,6 +29,8 @@ void RemoteStopRecording(ProgramInfo *pginfo);
 bool RemoteDeleteRecording(ProgramInfo *pginfo, bool forgetHistory,
                            bool forceMetadataDelete = false);
 void RemoteGetAllScheduledRecordings(vector<ProgramInfo *> &scheduledlist);
+void RemoteGetAllExpiringRecordings(vector<ProgramInfo *> &expiringlist);
+int RemoteGetRecordingList(vector<ProgramInfo *> *reclist, QStringList &strList);
 vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo);
 void RemoteSendMessage(const QString &message);
 RemoteEncoder *RemoteRequestRecorder(void);

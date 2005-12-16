@@ -109,9 +109,10 @@ class ProcessRequestThread : public QThread
 
 MainServer::MainServer(bool master, int port, int statusport, 
                        QMap<int, EncoderLink *> *tvList,
-                       Scheduler *sched)
+                       Scheduler *sched, AutoExpire *expirer)
 {
     m_sched = sched;
+    m_expirer = expirer;
 
     ismaster = master;
     masterServer = NULL;
@@ -381,6 +382,10 @@ void MainServer::ProcessRequestWork(RefSocket *sock)
     else if (command == "QUERY_GETCONFLICTING")
     {
         HandleGetConflictingRecordings(listline, pbs);
+    }
+    else if (command == "QUERY_GETEXPIRING")
+    {
+        HandleGetExpiringRecordings(pbs);
     }
     else if (command == "GET_FREE_RECORDER")
     {
@@ -1980,6 +1985,20 @@ void MainServer::HandleGetConflictingRecordings(QStringList &slist,
     SendResponse(pbssock, strlist);
 
     delete pginfo;
+}
+
+void MainServer::HandleGetExpiringRecordings(PlaybackSock *pbs)
+{
+    QSocket *pbssock = pbs->getSocket();
+
+    QStringList strList;
+
+    if (m_expirer)
+        m_expirer->GetAllExpiring(strList);
+    else
+        strList << QString::number(0);
+
+    SendResponse(pbssock, strList);
 }
 
 void MainServer::HandleLockTuner(PlaybackSock *pbs)
@@ -3940,3 +3959,4 @@ void MainServer::FillProgramInfo(QDomDocument *pDoc, QDomElement &e,
     recording.setAttribute( "preRollSeconds", gContext->GetNumSetting("RecordPreRoll", 0));
 }
 
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
