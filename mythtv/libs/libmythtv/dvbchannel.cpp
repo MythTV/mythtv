@@ -132,10 +132,12 @@ void DVBChannel::InitializeInputs(void)
 {
     channelnames.clear();
     inputChannel.clear();
+    inputTuneTo.clear();
     
     MSqlQuery query(MSqlQuery::InitCon());
     query.prepare(
         "SELECT cardinputid, inputname, "
+        "       if (tunechan='', 'Undefined', tunechan), "
         "       if (startchan, startchan, '') "
         "FROM cardinput "
         "WHERE cardid = :CARDID");
@@ -159,7 +161,8 @@ void DVBChannel::InitializeInputs(void)
     {
         int inputNum              = query.value(0).toInt();
         channelnames[inputNum]    = query.value(1).toString();
-        inputChannel[inputNum]    = query.value(2).toString();
+        inputTuneTo[inputNum]     = query.value(2).toString();
+        inputChannel[inputNum]    = query.value(3).toString();
     }
 
     // print em
@@ -170,6 +173,7 @@ void DVBChannel::InitializeInputs(void)
                 .arg(it.key()).arg(*it)
                 .arg(inputChannel[it.key()]));
     }
+    currentcapchannel = nextcapchannel = -1;
 }
 
 bool DVBChannel::Open()
@@ -284,6 +288,7 @@ bool DVBChannel::SetChannelByString(const QString &chan)
     CHANNEL(QString("Tuned to frequency for channel %1.").arg(chan));
 
     currentcapchannel = chan_opts.input_id;
+    nextcapchannel = currentcapchannel;
     inputChannel[currentcapchannel] = curchannelname;
 
     return true;
@@ -300,11 +305,28 @@ void DVBChannel::RecorderStarted()
 
 bool DVBChannel::SwitchToInput(const QString &input, const QString &chan)
 {
-    (void)input;
-    // TODO We should be switching the input even if chan exists on
-    // the current input, currently this will only work correctly if
-    // channum's are unique across inputs. -- dtk  Dec 15, 2005
+    if (input != channelnames[currentcapchannel])
+    {
+        nextcapchannel = GetInputByName(input);
+        if (nextcapchannel == -1)
+        {
+            VERBOSE(VB_IMPORTANT, QString("Failed to locate input %1").
+                    arg(input));
+            nextcapchannel = currentcapchannel;
+        }
+    }
     return SetChannelByString(chan);
+}
+
+bool DVBChannel::SwitchToInput(int newcapchannel, bool setstarting)
+{
+    (void)setstarting;
+    if(inputChannel[newcapchannel] != "")
+     {
+        nextcapchannel = newcapchannel;
+        return SetChannelByString(inputChannel[newcapchannel]);
+    }
+    return false;
 }
 
 /** \fn DVBChannel::GetChannelOptions(const QString&)
@@ -317,13 +339,12 @@ bool DVBChannel::GetChannelOptions(const QString& channum)
     int cardid = GetCardID();
 
     // Reset Channel data
-    inputChannel[currentcapchannel] = "";
     currentATSCMajorChannel = currentATSCMinorChannel = -1;
     currentProgramNum = -1;
     chan_opts.serviceID = 0;
 
     QString thequery =
-        QString("SELECT chanid, serviceid, mplexid, atscsrcid "
+        QString("SELECT chanid, serviceid, mplexid, atscsrcid, cardinputid "
                 "FROM channel, cardinput, capturecard "
                 "WHERE channel.channum='%1' AND "
                 "      cardinput.sourceid = channel.sourceid AND "
@@ -340,24 +361,31 @@ bool DVBChannel::GetChannelOptions(const QString& channum)
         return false;
     }
 
-    if (query.next())
+    bool found = false;
+    int mplexid;
+    while (query.next())
     {
-        // TODO: Fix structs to be more useful to new DB structure
-        currentProgramNum = chan_opts.serviceID = query.value(1).toInt();
-        if (query.value(3).toInt() > 256)
+        int this_inputid = query.value(4).toInt();
+        if (!found || this_inputid == nextcapchannel)
         {
-            currentATSCMajorChannel = query.value(3).toInt() >> 8;
-            currentATSCMinorChannel = query.value(3).toInt() & 0xff;
-            currentProgramNum = -1;
+            found = true;
+            mplexid = query.value(2).toInt();
+            // TODO: Fix structs to be more useful to new DB structure
+            currentProgramNum = chan_opts.serviceID = query.value(1).toInt();
+            if (query.value(3).toInt() > 256)
+            {
+                currentATSCMajorChannel = query.value(3).toInt() >> 8;
+                currentATSCMinorChannel = query.value(3).toInt() & 0xff;
+                currentProgramNum = -1;
+            }
+
         }
     }
-    else
+    if (!found)
     {
         ERROR("Unable to find channel in database.");
         return false;
     }
-
-    int mplexid = query.value(2).toInt();
 
     if (!GetTransportOptions(mplexid))
         return false;
