@@ -1816,10 +1816,23 @@ void JobQueue::DoTranscodeThread(void)
                 program_info->SetRecordBasename(newbase);
             }
 
-            rename (filename, oldfile);
-            rename (tmpfile, newfile);
+            if (rename(filename, oldfile) == -1)
+                perror(QString(
+                    "JobQueue::DoTranscodeThread: Error Renaming '%1' to '%2'")
+                    .arg(filename).arg(oldfile).ascii());
+
+            if (rename(tmpfile, newfile) == -1)
+                perror(QString(
+                    "JobQueue::DoTranscodeThread: Error Renaming '%1' to '%2'")
+                    .arg(tmpfile).arg(newfile).ascii());
+
             if (!gContext->GetNumSetting("SaveTranscoding", 0))
-                unlink(oldfile);
+            {
+                if (unlink(oldfile) == -1)
+                    perror(QString(
+                        "JobQueue::DoTranscodeThread: Error Deleting '%1'")
+                        .arg(oldfile).ascii());
+            }
 
             oldfile = filename + ".png";
             newfile += ".png";
