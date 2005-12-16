@@ -40,7 +40,7 @@ extern "C" {
 	typedef struct ringbuffer {
 		int read_pos;
 		int write_pos;
-		uint16_t size;
+		uint32_t size;
 		uint8_t *buffer;
 	} ringbuffer;
 
