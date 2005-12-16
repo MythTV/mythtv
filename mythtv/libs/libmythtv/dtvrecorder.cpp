@@ -205,11 +205,6 @@ bool DTVRecorder::FindKeyframes(const TSPacket* tspacket)
     const bool payloadStart = tspacket->PayloadStart();
     _header_pos = (payloadStart) ? 0 : _header_pos;
 
-    // if this is not a payload start packet, and aren't waiting
-    // for anything then just output this packet..
-    if (!payloadStart && !haveBufferedData)
-        return true;
-
     // Just make these local for efficiency reasons (gcc not so smart..)
     const uint maxKFD = kMaxKeyFrameDistance;
     bool hasFrame     = false;
