@@ -966,9 +966,20 @@ void DVBRecorder::AutoPID(void)
     }
     else
     {
-        // if this is not for a hardware decoder, record everything.
+        // If this is not for a hardware decoder, record everything
+        // we know about (ffmpeg doesn't like some DVB streams).
         for (it = pmt_list.begin(); it != pmt_list.end(); ++it)
-            (*it).Record = true;
+        {
+            desc_list_t list;
+            DescList_to_desc_list((*it).Descriptors, list);
+            uint type = StreamID::Normalize((*it).Orig_Type, list);
+            if (StreamID::IsAudio(type) || StreamID::IsVideo(type) ||
+                (ES_TYPE_TELETEXT == (*it).Type) ||
+                (ES_TYPE_SUBTITLE == (*it).Type))
+            {                
+                (*it).Record = true;
+            }
+        }
     }
 
     print_pmt_info(LOC, pmt_list,
