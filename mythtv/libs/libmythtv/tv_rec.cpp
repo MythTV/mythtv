@@ -3286,7 +3286,10 @@ void TVRec::TuningNewRecorder(void)
     {
         bool ok;
         if (!ringBuffer)
+        {
             ok = CreateLiveTVRingBuffer();
+            SetFlags(kFlagRingBufferReady);
+        }
         else
             ok = SwitchLiveTVRingBuffer(true, !had_dummyrec);
         if (!ok)
@@ -3620,7 +3623,6 @@ bool TVRec::CreateLiveTVRingBuffer(void)
     bool discont = (tvchain->TotalSize() > 0);
     tvchain->AppendNewProgram(pginfo, channel->GetCurrentName(),
                               channel->GetCurrentInput(), discont);
-    SetFlags(kFlagRingBufferReady);
 
     if (curRecording)
     {

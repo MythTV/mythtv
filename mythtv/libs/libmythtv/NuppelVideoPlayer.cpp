@@ -1905,10 +1905,12 @@ void NuppelVideoPlayer::CheckTVChain(void)
 
 void NuppelVideoPlayer::SwitchToProgram(void)
 {
-    if (videoOutput && videoOutput->ValidVideoFrames() > 3 &&
-        ringBuffer->DataInReadAhead() > 128000)
+    if (videoOutput)
     {
-        return;
+        int  sz  = ringBuffer->DataInReadAhead();
+        uint vvf = videoOutput->ValidVideoFrames();
+        if ((vvf > 3 && sz > 128000) || (sz > 256000))
+            return;
     }
 
     bool discontinuity = false, newtype = false;
@@ -1928,7 +1930,7 @@ void NuppelVideoPlayer::SwitchToProgram(void)
     ringBuffer->Pause();
     ringBuffer->WaitForPause();
 
-    ringBuffer->OpenFile(pginfo->pathname);
+    ringBuffer->OpenFile(pginfo->pathname, 10 /* retries -- about 5 seconds */);
 
     if (eof)
         discontinuity = true;
