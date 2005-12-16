@@ -153,3 +153,12 @@ UnsavedMenu::UnsavedMenu(MythMainWindow *window)
     addButton(tr("Save"), this, SLOT(save()))->setFocus();
     addButton(tr("Exit"), this, SLOT(cancel()));
 }
+
+ConfirmMenu::ConfirmMenu(MythMainWindow *window, QString msg)
+    : MythPopupBox(window, "unsavedmenu")
+{
+    addLabel(tr("Confirm"), Large, false);
+    addLabel(msg);
+    addButton(tr("Confirm"), this, SLOT(confirm()))->setFocus();
+    addButton(tr("Cancel"), this, SLOT(cancel()));
+}

@@ -141,7 +141,7 @@ class OptionsMenu : public MythPopupBox
 
 public:
 
-    enum actons { SAVE, CANCEL };
+    enum actions { SAVE, CANCEL };
 
     /**
      * @brief Create a new action window.
@@ -180,7 +180,7 @@ class ActionMenu : public MythPopupBox
 
 public:
 
-    enum actons { SET, REMOVE, CANCEL };
+    enum actions { SET, REMOVE, CANCEL };
 
     /**
      * @brief Create a new action window.
@@ -222,7 +222,7 @@ class UnsavedMenu : public MythPopupBox
 
 public:
 
-    enum actons { SAVE, EXIT };
+    enum actions { SAVE, EXIT };
 
     /**
      * @brief Create a new action window.
@@ -240,6 +240,43 @@ public slots:
      * @brief Slot to connect to when the save button is pressed.
      */
     inline void save(void) { done(UnsavedMenu::SAVE); }
+
+    /**
+     * @brief Slot to connect to when the cancel button is pressed.
+     */
+    inline void cancel(void) { done(UnsavedMenu::EXIT); }
+
+};
+
+/**
+ * @class ConfirmMenu
+ * @brief A popup confirming an action
+ */
+class ConfirmMenu : public MythPopupBox
+{
+
+    Q_OBJECT;
+
+public:
+
+    enum actions { CONFIRM, CANCEL };
+
+    /**
+     * @brief Create a new action window.
+     */
+    ConfirmMenu(MythMainWindow *window, QString msg);
+
+    /**
+     * @brief Execute the option popup.
+     */
+    inline int getOption(void) { return ExecPopup(this,SLOT(cancel())); }
+
+public slots:
+
+    /**
+     * @brief Slot to connect to when the save button is pressed.
+     */
+    inline void confirm(void) { done(UnsavedMenu::SAVE); }
 
     /**
      * @brief Slot to connect to when the cancel button is pressed.

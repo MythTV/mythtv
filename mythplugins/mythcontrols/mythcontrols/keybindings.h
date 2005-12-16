@@ -84,6 +84,18 @@ public:
     }
 
     /**
+     * @brief Get a list of the actions in a context.
+     * @param context The name of the context.
+     * @return A list of action (names) for the target context.
+     * @note Store this instead of calling repeatedly.  Every time you
+     * do, ActionSet has to iterate over all contexts and actions.
+     */
+    inline void getKeyActions(const QString &key, ActionList &list) const
+    {
+        list = actionset.getActions(key);
+    }
+
+    /**
      * @brief Get an action's keys.
      * @param context_name The name of the context.
      * @param action_name The name of the action.

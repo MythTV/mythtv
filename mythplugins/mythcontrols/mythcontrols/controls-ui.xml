@@ -29,18 +29,37 @@
    <bold>yes</bold>
   </font>
 
-  <font name="infotitle" face="Arial">
+  <font name="options" face="Arial">
    <color>#ffffff</color>
    <size>24</size>
+   <bold>yes</bold>
+  </font>
+
+
+  <font name="infotitle" face="Arial">
+   <color>#ffffff</color>
+   <size>20</size>
    <shadow>10,10</shadow>
    <bold>yes</bold>
   </font>
 
   <container name="controls">
-   <area>20,20,780,380</area>
+   <area>20,20,780,450</area>
 
-   <listbtnarea name="contextlist" draworder="0">
-    <area>0,0,370,360</area>
+   <textarea name="options" draworder="1" align="center">
+    <font>options</font>
+    <area>0,0,780,30</area>
+    <value>(1) Contexts / Actions  (2) Contexts / Keys  (3) Keys / Contexts</value>
+   </textarea>
+
+   <textarea name="leftdesc" draworder="1" align="center">
+    <font>info</font>
+    <area>0,40,370,20</area>
+    <value>Contexts</value>
+   </textarea>
+
+   <listbtnarea name="leftlist" draworder="0">
+    <area>0,60,370,380</area>
     <gradient type="unselected" start="#505050" end="#000000" alpha="100"/>
     <gradient type="selected" start="#52CA38" end="#349838" alpha="255"/>
     <fcnfont name="active" function="active"/>
@@ -48,8 +67,14 @@
     <showarrow>no</showarrow>
    </listbtnarea>
 
-   <listbtnarea name="actionlist" draworder="0">
-    <area>390,0,370,360</area>
+   <textarea name="rightdesc" draworder="1" align="center">
+    <font>info</font>
+    <area>390,40,370,20</area>
+    <value>Actions</value>
+   </textarea>
+
+   <listbtnarea name="rightlist" draworder="0">
+    <area>390,60,370,380</area>
     <gradient type="unselected" start="#505050" end="#000000" alpha="100"/>
     <gradient type="selected" start="#52CA38" end="#349838" alpha="255"/>
     <fcnfont name="active" function="active"/>
@@ -60,30 +85,30 @@
   </container>
 
   <container name="keys_layer">
-   <area>20,400,780,180</area>
+   <area>20,450,780,210</area>
    <textbutton name="action_one" draworder="0">
-    <position>20,20</position>
+    <position>20,0</position>
     <image function="on" filename="kb-button-on.png"/>
     <image function="off" filename="kb-button-off.png"/>
     <font>keys</font>
    </textbutton>
 
    <textbutton name="action_two" draworder="0">
-    <position>200,20</position>
+    <position>200,0</position>
     <image function="on" filename="kb-button-on.png"/>
     <image function="off" filename="kb-button-off.png"/>
     <font>keys</font>
    </textbutton>
 
    <textbutton name="action_three" draworder="0">
-    <position>390,20</position>
+    <position>390,0</position>
     <image function="on" filename="kb-button-on.png"/>
     <image function="off" filename="kb-button-off.png"/>
     <font>keys</font>
    </textbutton>
 
    <textbutton name="action_four" draworder="0">
-    <position>580,20</position>
+    <position>580,0</position>
     <image function="on" filename="kb-button-on.png"/>
     <image function="off" filename="kb-button-off.png"/>
     <font>keys</font>
@@ -91,7 +116,7 @@
 
    <textarea name="description" draworder="1" allign="left">
     <font>info</font>
-    <area>30,100,740,140</area>
+    <area>30,70,740,110</area>
     <multiline>yes</multiline>
    </textarea>
 

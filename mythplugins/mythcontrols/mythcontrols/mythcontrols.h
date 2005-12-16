@@ -29,6 +29,16 @@
 
 #include "keybindings.h"
 
+typedef struct
+{
+    QString key;
+    QString context;
+    QString contextFrom;
+    QString action;
+    int bindlevel;
+} binding_t;
+
+typedef QPtrList<binding_t> BindingList;
 
 /**
  * @class MythControls
@@ -71,6 +81,14 @@ public:
      */
     QString getCurrentAction(void) const;
 
+    /**
+     * @brief Get the currently selected key string
+     * @return The currently selected key string
+     *
+     * If no context is selected, an empty string is returned.
+     */
+    QString getCurrentKey(void) const;
+
     
     
 protected:
@@ -105,7 +123,12 @@ protected:
      * @param context The context, from which actions will be
      * displayed.
      */
-    void refreshActionList(const QString & context);
+    void refreshRightList(void);
+
+    /**
+     * @brief Redisplay both the left and right lists and fix focus
+     */
+    void updateLists(void);
 
     /**
      * @brief Load the settings for a particular host.
@@ -143,6 +166,21 @@ protected:
      */
     void switchListFocus(UIListBtnType *focus, UIListBtnType *unfocus);
 
+    /**
+     * @brief Add bindings to QDict<binding_t> for specified context
+     * @param bindings the QDict to which to add the bindings
+     * @param context the context to grab keybindings from
+     * @param contextParent the context whose keybindings are being calculated
+     * @param bindlevel the bind level associated with this context
+     */
+    void addBindings(QDict<binding_t> &bindings, const QString &context, const QString &contextParent, int bindlevel);
+
+    /**
+     * @brief Create a BindingList for the specified context
+     * @param context the context for which a BindingList should be created
+     */
+    BindingList *getKeyBindings(const QString &context);
+
 private slots:
 
 /**
@@ -161,29 +199,58 @@ void addKeyToAction(void);
     inline void save(void) { key_bindings->commitChanges(); }
 
     /**
-     * @brief Recieves a signal when an item in the context list is
+     * @brief Recieves a signal when an item in the left list is
      * selected.
      * @param item The selected item.
      */
-    void contextSelected(UIListBtnTypeItem *item);
+    void leftSelected(UIListBtnTypeItem *item);
 
     /**
-     * @brief Recieves a signal when an item in the action list is
+     * @brief Recieves a signal when an item in the right list is
      * selected.
      * @param item The selected item.
      */
-    void actionSelected(UIListBtnTypeItem *item);
+    void rightSelected(UIListBtnTypeItem *item);
+
+    /**
+     * @brief Sort a list of keys, removing duplicates
+     * @param keys the list of keys to sort
+     */
+    void sortKeyList(QStringList &keys);
+
+    /**
+     * @brief Refresh binding information
+     */
+    void refreshKeyBindings();
+
+    /**
+     * @brief Jump to a particular key binding
+     * @param e key event to use as jump
+     */
+    bool JumpTo(QKeyEvent *e);
 
 private:
 
     UIType *focused;
-    UIListBtnType *ContextList;
-    UIListBtnType *ActionList;
-    UITextType *description;
+    UIListBtnType *LeftList;
+    UIListBtnType *RightList;
+    UITextType *description, *LeftDesc, *RightDesc;
     UITextButtonType * ActionButtons[Action::MAX_KEYS];
     KeyBindings *key_bindings;
     LayerSet *container;
-    QDict<QStringList> m_contexts;
+
+    QStringList contexts; ///< sorted list of contexts
+    QStringList keys; ///< sorted list of keys
+
+    QDict<QStringList> m_contexts; ///< actions for a given context
+    QDict<BindingList> contextKeys; ///< key bindings for a given context
+    QDict<BindingList> keyActions; ///< actions in each context for a given key
+
+    typedef enum { kContextList, kKeyList, kActionList } ListType;
+    ListType leftType, rightType;
+
+    QString getTypeDesc(ListType type);
+
 };
 
 
