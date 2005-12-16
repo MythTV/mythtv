@@ -158,19 +158,19 @@ void VideoSourceSetting::load()
     }
 }
 
-void TransportSetting::refresh()
+void MultiplexSetting::refresh()
 {
     clearSelections();
     
     MSqlQuery query(MSqlQuery::InitCon());
 
-    QString querystr = QString(
+    query.prepare(
         "SELECT mplexid,   networkid,  transportid, "
         "       frequency, symbolrate, modulation "
-        "FROM dtv_multiplex WHERE sourceid = '%1' "
-        "ORDER by frequency, networkid, transportid").arg(nSourceID);
-
-    query.prepare(querystr);
+        "FROM dtv_multiplex "
+        "WHERE sourceid = :SOURCEID "
+        "ORDER by frequency, networkid, transportid");
+    query.bindValue(":SOURCEID", nSourceID);
 
     if (!query.exec() || !query.isActive() || query.size() <= 0)
         return;
@@ -207,7 +207,7 @@ void TransportSetting::refresh()
     }
 }
 
-void TransportSetting::sourceID(const QString& str)
+void MultiplexSetting::sourceID(const QString& str)
 {
     nSourceID = str.toInt();
     refresh();
@@ -340,8 +340,6 @@ ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
                                       ScanTypeSetting *scanType) : 
     VerticalConfigurationGroup(false,false,true,true),
     country(new ScanCountry()),
-    transport(new TransportSetting()),
-    ignoreSignalTimeoutOne(new IgnoreSignalTimeout()),
     ignoreSignalTimeoutAll(new IgnoreSignalTimeout()),
     filename(new ScanFileImport())
 {
@@ -353,10 +351,6 @@ ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
 
     // There need to be two IgnoreSignalTimeout instances
     // because otherwise Qt will free the one instance twice..
-    VerticalConfigurationGroup *scanOneTransport =
-        new VerticalConfigurationGroup(false,false,true,true);
-    scanOneTransport->addChild(transport);
-    scanOneTransport->addChild(ignoreSignalTimeoutOne);
 
     // There need to be two IgnoreSignalTimeout instances
     // because otherwise Qt will free the one instance twice..
@@ -381,7 +375,7 @@ ScanOptionalConfig::ScanOptionalConfig(ScanWizard *wizard,
     addTarget(QString::number(ScanTypeSetting::FullScan_Analog),
               new BlankSetting());
     addTarget(QString::number(ScanTypeSetting::TransportScan),
-              scanOneTransport);
+              wizard->paneSingle);
     addTarget(QString::number(ScanTypeSetting::FullTransportScan),
               scanAllTransports);
     addTarget(QString::number(ScanTypeSetting::Import),
@@ -413,7 +407,7 @@ ScanWizardScanType::ScanWizardScanType(ScanWizard *_parent, int sourceid)
     addChild(scanConfig);
 
     connect(videoSource, SIGNAL(valueChanged(const QString&)),
-        scanConfig->transport, SLOT(sourceID(const QString&)));
+        _parent->paneSingle, SLOT(sourceID(const QString&)));
     connect(videoSource, SIGNAL(valueChanged(const QString&)),
         capturecard, SLOT(sourceID(const QString&)));
 

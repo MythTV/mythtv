@@ -225,6 +225,9 @@ void DTVSignalMonitor::SetPMT(uint, const ProgramMapTable *pmt)
 {
     AddFlags(kDTVSigMon_PMTSeen);
 
+    if (programNumber < 0)
+        return; // don't print error messages during channel scan.
+
     if (pmt->ProgramNumber() != (uint)programNumber)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR +
@@ -287,6 +290,9 @@ void DTVSignalMonitor::SetVCT(uint, const TerrestrialVirtualChannelTable* tvct)
 { 
     AddFlags(kDTVSigMon_VCTSeen | kDTVSigMon_TVCTSeen);
     int idx = tvct->Find(majorChannel, minorChannel);
+
+    if (minorChannel < 0)
+        return; // don't print error message during channel scan.
 
     if (idx < 0)
     {

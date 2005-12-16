@@ -48,7 +48,6 @@ typedef enum
     TRANSPORT_LIST, ///< Actively scan for channels
 } SCANMODE;
 
-/// PMTs by PID
 typedef QMap<uint, const ProgramMapTable *> PMTMap;
 
 class SIScan : public QObject

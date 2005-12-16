@@ -66,6 +66,9 @@
 /// Percentage to set to after the first tune
 #define TUNED_PCT     3
 
+#define LOC QString("SWizScan: ")
+#define LOC_ERR QString("SWizScan, Error: ")
+
 const QString ScanWizardScanner::strTitle(QObject::tr("Scanning"));
 
 void post_event(QObject *dest, ScannerEvent::TYPE type, int val)
@@ -200,26 +203,13 @@ void ScanWizardScanner::transportScanComplete()
 
 void *ScanWizardScanner::SpawnTune(void *param)
 {
-    bool ok = false;
+    bool ok = true;
     ScanWizardScanner *scanner = (ScanWizardScanner*)param;
 
-    ScannerEvent* e = new ScannerEvent(ScannerEvent::TuneComplete);
-    if (scanner->nScanType == ScanTypeSetting::TransportScan)
-    {
-        int mplexid = scanner->transportToTuneTo();
-        (void) mplexid;
-#ifdef USING_DVB
-        if (scanner->GetDVBChannel())
-            ok = scanner->GetDVBChannel()->TuneMultiplex(mplexid);
-#endif
-#ifdef USING_V4L
-        if (scanner->GetChannel())
-            ok = scanner->GetChannel()->TuneMultiplex(mplexid);
-#endif
-    }
-    else if ((scanner->nScanType == ScanTypeSetting::FullTunedScan_OFDM) ||
-             (scanner->nScanType == ScanTypeSetting::FullTunedScan_QPSK) ||
-             (scanner->nScanType == ScanTypeSetting::FullTunedScan_QAM)) 
+    ScannerEvent* scanEvent = new ScannerEvent(ScannerEvent::TuneComplete);
+    if ((scanner->nScanType == ScanTypeSetting::FullTunedScan_OFDM) ||
+        (scanner->nScanType == ScanTypeSetting::FullTunedScan_QPSK) ||
+        (scanner->nScanType == ScanTypeSetting::FullTunedScan_QAM))
     {
 #ifdef USING_DVB
         if (scanner->GetDVBChannel())
@@ -231,14 +221,10 @@ void *ScanWizardScanner::SpawnTune(void *param)
                                              scanner->modulation);
 #endif
     }
-    else
-    {
-        ok = true;
-    }
 
-    e->intValue((ok) ? ScannerEvent::OK : ScannerEvent::ERROR_TUNE);
+    scanEvent->intValue((ok) ? ScannerEvent::OK : ScannerEvent::ERROR_TUNE);
 
-    QApplication::postEvent(scanner, e);
+    QApplication::postEvent(scanner, scanEvent);
     return NULL;
 }
 
@@ -319,10 +305,10 @@ void ScanWizardScanner::cancelScan()
 
 void ScanWizardScanner::scan()
 {
-    SISCAN(QString("ScanWizardScanner::scan(): "
-                   "type(%1) src(%2) transport(%3) card(%4)")
-           .arg(parent->scanType()).arg(parent->videoSource())
-           .arg(parent->transport()).arg(parent->captureCard()));
+    VERBOSE(VB_SIPARSER, LOC + "scan(): " +
+            QString("type(%1) src(%2) card(%4)")
+            .arg(parent->scanType()).arg(parent->videoSource())
+            .arg(parent->captureCard()));
 
     tunerthread_running = false;
 
@@ -413,7 +399,7 @@ void ScanWizardScanner::scan()
     }
     else // DVB || V4L
     {
-        nTransportToTuneTo = parent->transport();
+        nMultiplexToTuneTo = parent->paneSingle->GetMultiplex();
         int cardid = parent->captureCard();
 
         QString device, cn, card_type;
@@ -605,6 +591,7 @@ ScanWizard::ScanWizard(int sourceid)
     paneOFDM = new OFDMPane();
     paneQPSK = new QPSKPane();
     paneATSC = new ATSCPane();
+    paneSingle = new STPane();
 
     page1 = new ScanWizardScanType(this, sourceid);
     ScanWizardScanner *page2 = new ScanWizardScanner(this);
@@ -652,24 +639,25 @@ void ScanWizard::pageSelected(const QString& strTitle)
 
 void ScanWizardScanner::HandleTuneComplete(void)
 {
-    SISCAN("ScanWizardScanner::HandleTuneComplete()");
+    VERBOSE(VB_SIPARSER, LOC + "HandleTuneComplete()");
 
     if (!scanner)
     {
-        SISCAN("ScanWizardScanner::HandleTuneComplete(): "
-               "Waiting for scan to start.");
+        VERBOSE(VB_SIPARSER, LOC + "HandleTuneComplete(): "
+                "Waiting for scan to start.");
         MythTimer t;
         t.start();
         while (!scanner && t.elapsed() < 500)
             usleep(250);
         if (!scanner)
         {
-            SISCAN("ScanWizardScanner::HandleTuneComplete(): "
-                   "scan() did not start scanner! Aborting.");
+            VERBOSE(VB_SIPARSER, LOC +
+                    "HandleTuneComplete(): "
+                    "scan() did not start scanner! Aborting.");
             return;
         }
-        SISCAN("ScanWizardScanner::HandleTuneComplete(): "
-               "scan() has started scanner.");
+        VERBOSE(VB_SIPARSER, LOC + "HandleTuneComplete(): "
+                "scan() has started scanner.");
         usleep(5000);
     }
 
@@ -696,10 +684,12 @@ void ScanWizardScanner::HandleTuneComplete(void)
     }
 
     bool ok = false;
+
     if ((nScanType == ScanTypeSetting::FullScan_ATSC) ||
         (nScanType == ScanTypeSetting::FullScan_OFDM))
     {
-        SISCAN("ScanTransports("<<std<<", "<<mod<<", "<<country<<")");
+        VERBOSE(VB_SIPARSER, LOC +
+                "ScanTransports("<<std<<", "<<mod<<", "<<country<<")");
         scanner->SetChannelFormat(parent->paneATSC->atscFormat());
         if (parent->paneATSC->DoDeleteChannels())
         {
@@ -720,13 +710,13 @@ void ScanWizardScanner::HandleTuneComplete(void)
              (nScanType == ScanTypeSetting::FullTunedScan_QPSK) ||
              (nScanType == ScanTypeSetting::FullTunedScan_QAM))
     {
-        SISCAN("ScanTransports()");
+        VERBOSE(VB_SIPARSER, LOC + "ScanTransports()");
         scanner->SetRenameChannels(false);
         ok = scanner->ScanTransports("dvb");
     }
     else if (nScanType == ScanTypeSetting::FullTransportScan)
     {
-        SISCAN("ScanServicesSourceID("<<nVideoSource<<")");
+        VERBOSE(VB_SIPARSER, LOC + "ScanServicesSourceID("<<nVideoSource<<")");
         scanner->SetRenameChannels(false);
         ok = scanner->ScanServicesSourceID(nVideoSource);
         post_event(this,
@@ -735,9 +725,20 @@ void ScanWizardScanner::HandleTuneComplete(void)
     }
     else if (nScanType == ScanTypeSetting::TransportScan)
     {
-        SISCAN("ScanTransport("<<nTransportToTuneTo<<")");
-        scanner->SetRenameChannels(false);
-        ok = scanner->ScanTransport(nTransportToTuneTo);
+        VERBOSE(VB_SIPARSER, LOC + "ScanTransport("<<nMultiplexToTuneTo<<")");
+        scanner->SetChannelFormat(parent->paneSingle->atscFormat());
+        if (parent->paneSingle->DoDeleteChannels())
+        {
+            MSqlQuery query(MSqlQuery::InitCon());
+            query.prepare("DELETE FROM channel "
+                          "WHERE sourceid = :SOURCEID AND "
+                          "      mplexid  = :MPLEXID");
+            query.bindValue(":SOURCEID", nVideoSource);
+            query.bindValue(":MPLEXID",  nMultiplexToTuneTo);
+            query.exec();
+        }
+        scanner->SetRenameChannels(parent->paneSingle->DoRenameChannels());
+        ok = scanner->ScanTransport(nMultiplexToTuneTo);
     }
 
     if (!ok)

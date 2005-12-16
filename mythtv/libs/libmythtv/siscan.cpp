@@ -974,6 +974,9 @@ void SIScan::UpdatePATinDB(int tid_db,
     if (db_mplexid == -1)
     {
         VERBOSE(VB_IMPORTANT, "PAT: Warning couldn't find better mplex.");
+        emit ServiceScanUpdateText(
+            tr("Found channel, but it doesn't match existing tsid. You may "
+               "wish to delete existing channels and do a full scan."));
         db_mplexid = tid_db;
     }
 
@@ -1082,6 +1085,9 @@ void SIScan::UpdateVCTinDB(int tid_db,
     {
         VERBOSE(VB_IMPORTANT, "VCT: Error determing what transport this "
                 "service table is associated with so failing");
+        emit ServiceScanUpdateText(
+            tr("Found channel, but it doesn't match existing tsid. You may "
+               "wish to delete existing channels and do a full scan."));
         return;
     }
 
@@ -1228,6 +1234,9 @@ void SIScan::UpdateSDTinDB(int tid_db, const ServiceDescriptionTable *sdt,
     {
         VERBOSE(VB_IMPORTANT, "SDT: Error determing what transport this "
                 "service table is associated with so failing");
+        emit ServiceScanUpdateText(
+            tr("Found channel, but it doesn't match existing tsid. You may "
+               "wish to delete existing channels and do a full scan."));
         return;
     }
 
@@ -1385,6 +1394,9 @@ void SIScan::UpdateServicesInDB(int tid_db, QMap_SDTObject SDT)
     {
         VERBOSE(VB_IMPORTANT, "SRV: Error determing what transport this "
                 "service table is associated with so failing");
+        emit ServiceScanUpdateText(
+            tr("Found channel, but it doesn't match existing tsid. You may "
+               "wish to delete existing channels and do a full scan."));
         return;
     }
 

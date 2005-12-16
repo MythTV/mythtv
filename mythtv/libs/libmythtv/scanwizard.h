@@ -78,8 +78,6 @@ class ScanWizard: public ConfigurationWizard
 
   protected:
     uint videoSource() const { return page1->videoSource->getValue().toInt(); }
-    int transport()    const
-        { return page1->scanConfig->transport->getValue().toInt(); }
     QString country()  const { return page1->scanConfig->country->getValue(); }
     int captureCard()  const { return page1->capturecard->getValue().toInt(); }
     int scanType()     const { return page1->scanType->getValue().toInt();    }
@@ -91,6 +89,7 @@ class ScanWizard: public ConfigurationWizard
     QPSKPane     *paneQPSK;
     ATSCPane     *paneATSC;
     QAMPane      *paneQAM;
+    STPane       *paneSingle;
     int           nVideoDev;
     unsigned      nCardType;
     int           nCaptureCard;
@@ -99,11 +98,13 @@ class ScanWizard: public ConfigurationWizard
 
 bool ScanWizard::ignoreSignalTimeout(void) const
 {
-    return (ScanTypeSetting::TransportScan == scanType()) ?
-        page1->scanConfig->ignoreSignalTimeoutOne->getValue().toInt() :
-        ((ScanTypeSetting::FullTransportScan == scanType()) ?
-         page1->scanConfig->ignoreSignalTimeoutAll->getValue().toInt() :
-         false);
+    bool ts0 = (ScanTypeSetting::TransportScan == scanType());
+    bool vl0 = paneSingle->ignoreSignalTimeout();
+
+    bool ts1 = (ScanTypeSetting::FullTransportScan == scanType());
+    bool vl1 = page1->scanConfig->ignoreSignalTimeoutAll->getValue().toInt();
+
+    return (ts0) ? vl0 : ((ts1) ? vl1 : false);
 }
 
 class ScanWizardScanner :  public VerticalConfigurationGroup
@@ -115,8 +116,6 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
 
     ScanWizardScanner(ScanWizard *_parent);
     ~ScanWizardScanner() { finish(); }
-
-    int transportToTuneTo() { return nTransportToTuneTo;}
 
   protected slots:
     void scan(void);
@@ -152,7 +151,7 @@ class ScanWizardScanner :  public VerticalConfigurationGroup
     pthread_t          tuner_thread;
     ChannelBase       *channel;
     ScanProgressPopup *popupProgress;
-    int                nTransportToTuneTo;
+    int                nMultiplexToTuneTo;
     SIScan            *scanner;
 
     int                nScanType;

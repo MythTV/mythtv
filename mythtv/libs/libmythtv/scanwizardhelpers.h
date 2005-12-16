@@ -124,14 +124,14 @@ class VideoSourceSetting: public ComboBoxSetting
     int sourceid;
 };
 
-class TransportSetting : public ComboBoxSetting
+class MultiplexSetting : public ComboBoxSetting
 {
     Q_OBJECT
   protected:
     int nSourceID;
 
   public:
-    TransportSetting() : nSourceID(0)
+    MultiplexSetting() : nSourceID(0)
         { setLabel(QObject::tr("Transport")); }
     virtual void load() { refresh(); }
     virtual void save() { ; }
@@ -234,8 +234,6 @@ class ScanOptionalConfig: public VerticalConfigurationGroup,
     ScanOptionalConfig(ScanWizard* wizard, ScanTypeSetting* scanType);
 
     ScanCountry         *country;
-    TransportSetting    *transport;
-    IgnoreSignalTimeout *ignoreSignalTimeoutOne;
     IgnoreSignalTimeout *ignoreSignalTimeoutAll;
     ScanFileImport      *filename;
   protected slots:
@@ -682,6 +680,44 @@ class ATSCPane : public VerticalConfigurationGroup
     ScanATSCModulation      *atsc_modulation;
     ScanATSCChannelFormat   *atsc_format;
     ScanOldChannelTreatment *old_channel_treatment;
+};
+
+class STPane : public VerticalConfigurationGroup
+{
+    Q_OBJECT
+  public:
+    STPane() :
+        VerticalConfigurationGroup(false,false,true,false),
+        transport_setting(new MultiplexSetting()),
+        atsc_format(new ScanATSCChannelFormat()),
+        old_channel_treatment(new ScanOldChannelTreatment()),
+        ignore_signal_timeout(new IgnoreSignalTimeout())
+    {
+        addChild(transport_setting);
+        addChild(atsc_format);
+        addChild(old_channel_treatment);
+        addChild(ignore_signal_timeout);
+    }
+
+    QString atscFormat(void) const { return atsc_format->getValue(); }
+    bool DoDeleteChannels(void) const
+        { return old_channel_treatment->getValue() == "delete"; }
+    bool DoRenameChannels(void) const
+        { return old_channel_treatment->getValue() == "rename"; }
+    int  GetMultiplex(void) const
+        { return transport_setting->getValue().toInt(); }
+    bool ignoreSignalTimeout(void) const
+        { return ignore_signal_timeout->getValue().toInt(); }
+
+  public slots:
+    void sourceID(const QString &str)
+        { transport_setting->sourceID(str); }
+
+  protected:
+    MultiplexSetting        *transport_setting;
+    ScanATSCChannelFormat   *atsc_format;
+    ScanOldChannelTreatment *old_channel_treatment;
+    IgnoreSignalTimeout     *ignore_signal_timeout;
 };
 
 class ErrorPane : public HorizontalConfigurationGroup
