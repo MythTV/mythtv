@@ -65,6 +65,9 @@ static void drain_dvb_events(int fd);
 static bool wait_for_backend(int fd, int timeout_ms);
 static bool handle_diseq(const DVBTuning&, DVBDiSEqC*, bool reset);
 
+#define LOC QString("DVB#%1 ").arg(cardnum)
+#define LOC_ERR QString("DVB#%1 ERROR - ").arg(cardnum)
+
 /** \class DVBChannel
  *  \brief Provides interface to the tuning hardware when using DVB drivers
  *
@@ -169,11 +172,13 @@ void DVBChannel::InitializeInputs(void)
     InputNames::const_iterator it;
     for (it = channelnames.begin(); it != channelnames.end(); ++it)
     {
-        VERBOSE(VB_CHANNEL, QString("Input #%1: '%2' schan(%3)")
+        VERBOSE(VB_CHANNEL, LOC + QString("Input #%1: '%2' schan(%3)")
                 .arg(it.key()).arg(*it)
                 .arg(inputChannel[it.key()]));
     }
-    currentcapchannel = nextcapchannel = -1;
+    currentcapchannel = nextcapchannel = GetNextInput();
+    VERBOSE(VB_CHANNEL, LOC + QString("Current Input #%1: '%2'")
+            .arg(GetCurrentInputNum()).arg(GetCurrentInput()));
 }
 
 bool DVBChannel::Open()
@@ -224,7 +229,7 @@ bool DVBChannel::Open()
 
     InitializeInputs();
 
-    return (fd_frontend >= 0 );
+    return (fd_frontend >= 0);
 }
 
 /** \fn DVBChannel::TuneMultiplex(uint mplexid)
