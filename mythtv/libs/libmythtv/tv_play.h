@@ -34,6 +34,25 @@ class LiveTVChain;
 typedef QValueVector<QString> str_vec_t;
 typedef QMap<QString, QString> InfoMap;
 
+class VBIMode
+{
+  public:
+    typedef enum 
+    {
+        None    = 0,
+        PAL_TT  = 1,
+        NTSC_CC = 2,
+    } vbimode_t;
+
+    static uint Parse(QString vbiformat)
+    {
+        QString fmt = vbiformat.lower().left(4);
+        vbimode_t mode;
+        mode = (fmt == "pal ") ? PAL_TT : ((fmt == "ntsc") ? NTSC_CC : None);
+        return (uint) mode;
+    }
+};
+
 class TV : public QObject
 {
     Q_OBJECT
@@ -228,7 +247,6 @@ class TV : public QObject
     float StopFFRew(void);
     void ChangeFFRew(int direction);
     void SetFFRew(int index);
-    void DoToggleCC(int mode);
     void DoSkipCommercials(int direction);
     void DoEditMode(void);
 
@@ -316,7 +334,7 @@ class TV : public QObject
     bool    ff_rew_reverse;
     vector<int> ff_rew_speeds;
 
-    int     vbimode;
+    uint    vbimode;
 
     // State variables
     MythDeque<TVState> nextStates;

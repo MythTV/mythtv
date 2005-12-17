@@ -111,7 +111,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
       // Prebuffering (RingBuffer) control
       prebuffering(false), prebuffer_tries(0),
       // Support for analog captions and teletext
-      vbimode(' '), cc(false), vbipagenr(0x888<<16), ccmode(CC_CC1),
+      vbimode(VBIMode::None),       subtitlesOn(false),
+      ttPageNum(0x888),             ccmode(CC_CC1),
       wtxt(0), rtxt(0), text_size(0), ccline(""), cccol(0), ccrow(0),
       // Support for captions, teletext, etc. decoded by libav
       osdHasSubtitles(false),       osdSubtitlesExpireAt(-1),
@@ -181,8 +182,8 @@ NuppelVideoPlayer::NuppelVideoPlayer(QString inUseID, const ProgramInfo *info)
     // Get VBI page number
     QString mypage = gContext->GetSetting("VBIpageNr", "888");
     bool valid = false;
-    uint tmp = mypage.toInt(&valid, 16) << 16;
-    vbipagenr = (valid) ? tmp : vbipagenr;
+    uint tmp = mypage.toInt(&valid, 16);
+    ttPageNum = (valid) ? tmp : ttPageNum;
 }
 
 NuppelVideoPlayer::~NuppelVideoPlayer(void)
@@ -834,7 +835,7 @@ void NuppelVideoPlayer::AddTextData(char *buffer, int len,
 {
     WrapTimecode(timecode, TC_CC);
 
-    if (cc)
+    if (subtitlesOn)
     {
         if (!tbuffer_numfree())
         {
@@ -992,44 +993,51 @@ void NuppelVideoPlayer::StopEmbedding(void)
     }
 }
 
-void NuppelVideoPlayer::ToggleCC(char mode, int arg)
+/** \fn ToggleCC(uint, uint)
+ *  \brief Sets vbimode. If arg is zero, toggles subtitlesOn,
+ *         otherwise it turns subtitles on and sets a specific
+ *         teletext page or cc text.
+ *
+ *  \param mode VBIMode expressing which VBI decoder to use.
+ *  \param arg  if 0 toggles cc/teletext mode, otherwise specifies
+ *              teletext page or cc text to use.
+ */
+void NuppelVideoPlayer::ToggleCC(uint mode, uint arg)
 {
     QString msg;
 
     vbimode = mode;
-    if (cc && !arg)
+    if (subtitlesOn && !arg)
     {
-        cc = false;
+        subtitlesOn = false;
         ResetCC();
-        msg = (mode == 1) ? QObject::tr("TXT off") : QObject::tr("CC off");
+        bool tt = (vbimode == VBIMode::PAL_TT);
+        msg = tt ? QObject::tr("TXT off") : QObject::tr("CC off");
+        if (osd)
+            osd->SetSettingsText(msg, 3);
+        return;
     }
-    else
+
+    subtitlesOn = true;
+    if (vbimode == VBIMode::PAL_TT)
     {
-        cc = true;
-        if (mode == 1)
+        ttPageNum = (arg) ? arg : ttPageNum;
+        msg = QObject::tr("TXT") + QString(" %1").arg(ttPageNum,3,16);
+    }
+    else if (vbimode == VBIMode::NTSC_CC)
+    {
+        static const uint lk[8] =
         {
-            vbipagenr = (arg) ? arg : vbipagenr;
-            msg = QObject::tr("TXT") + QString(" %1").arg(vbipagenr,3,16);
-        }
-        else if (mode == 2)
+            CC_CC1,  CC_CC2,  CC_CC3,  CC_CC4,
+            CC_TXT1, CC_TXT2, CC_TXT3, CC_TXT4,
+        };
+        if ((1 <= arg) && (arg <= 8))
+            ccmode = lk[arg-1];
+
+        ResetCC();
+
+        switch (ccmode)
         {
-            switch (arg)
-            {
-            case  0:                   break;  // same mode
-            case  2: ccmode = CC_CC2;  break;
-            case  3: ccmode = CC_CC3;  break;
-            case  4: ccmode = CC_CC4;  break;
-            case  5: ccmode = CC_TXT1; break;
-            case  6: ccmode = CC_TXT2; break;
-            case  7: ccmode = CC_TXT3; break;
-            case  8: ccmode = CC_TXT4; break;
-            default: ccmode = CC_CC1;
-            }
-
-            ResetCC();
-
-            switch (ccmode)
-            {
             case CC_CC2 :
                 msg = QString("%1%2").arg(QObject::tr("CC")).arg(2);
                 break;
@@ -1054,11 +1062,10 @@ void NuppelVideoPlayer::ToggleCC(char mode, int arg)
             default     :
                 msg = QString("%1%2").arg(QObject::tr("CC")).arg(1);
                 break;
-            }
         }
-        else
-            msg = QString(QObject::tr("CC/TXT enabled"));
     }
+    else
+        msg = QString(QObject::tr("CC/TXT enabled"));
 
     if (osd)
         osd->SetSettingsText(msg, 3);
@@ -1086,7 +1093,7 @@ void NuppelVideoPlayer::ShowText(void)
             memcpy(&pagenr, inpos, sizeof(int));
             inpos += sizeof(int);
 
-            if (pagenr == vbipagenr)
+            if (pagenr == (ttPageNum<<16))
             {
                 // show teletext subtitles
                 osd->ClearAllCCText();
@@ -1680,7 +1687,7 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
 
     VideoFrame *frame = videoOutput->GetLastShownFrame();
 
-    if (cc)
+    if (subtitlesOn)
     {
         ShowText();
         DisplaySubtitles();
@@ -1824,7 +1831,7 @@ void NuppelVideoPlayer::IvtvVideoLoop(void)
         }
         else
         {
-            if (cc)
+            if (subtitlesOn)
                 ShowText();
             videofiltersLock.lock();
             videoOutput->ProcessFrame(NULL, osd, videoFilters, pipplayer);
@@ -4606,17 +4613,17 @@ void NuppelVideoPlayer::decCurrentSubtitleTrack()
 
 bool NuppelVideoPlayer::setCurrentSubtitleTrack(int trackNo)
 {
-    cc = false;
+    subtitlesOn = false;
     if ((trackNo >= 0) && decoder)
-        cc = decoder->setCurrentSubtitleTrack(trackNo);
-    return cc;
+        subtitlesOn = decoder->setCurrentSubtitleTrack(trackNo);
+    return subtitlesOn;
 }
 
 
 int NuppelVideoPlayer::getCurrentSubtitleTrack() const
 {
     int trackNo = 0;
-    if (cc && decoder)
+    if (subtitlesOn && decoder)
         trackNo = decoder->getCurrentSubtitleTrack() + 1;
     return trackNo;
 }

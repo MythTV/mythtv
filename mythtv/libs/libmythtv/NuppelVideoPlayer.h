@@ -13,6 +13,7 @@
 #include "jitterometer.h"
 #include "recordingprofile.h"
 #include "videooutbase.h"
+#include "tv_play.h"
 
 extern "C" {
 #include "filter.h"
@@ -192,7 +193,7 @@ class NuppelVideoPlayer
     long UpdateStoredFrameNum(long curFrameNum);
 
     // Closed caption and teletext stuff
-    void ToggleCC(char mode, int arg);
+    void ToggleCC(uint mode, uint arg);
     void FlushTxtBuffers(void) { rtxt = wtxt; }
 
     // Edit mode stuff
@@ -447,9 +448,9 @@ class NuppelVideoPlayer
 
     // Support for analog captions and teletext
     // (i.e. Vertical Blanking Interval (VBI) encoded data.)
-    int      vbimode;         ///< VBI decoder to use
-    bool     cc;              ///< true iff vbimode == 2 (NTSC Line 21 CC)
-    int      vbipagenr;       ///< VBI page to display when in PAL vbimode
+    uint     vbimode;         ///< VBI decoder to use
+    bool     subtitlesOn;     ///< true iff cc/tt display is enabled
+    int      ttPageNum;       ///< VBI page to display when in PAL vbimode
     int      ccmode;          ///< VBI text to display when in NTSC vbimode
 
     int      wtxt;            ///< Write position for VBI text

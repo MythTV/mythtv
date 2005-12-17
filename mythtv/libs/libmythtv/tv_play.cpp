@@ -204,7 +204,7 @@ TV::TV(void)
       autoCommercialSkip(false), tryUnflaggedSkip(false),
       smartForward(false), stickykeys(0),
       ff_rew_repos(1.0f), ff_rew_reverse(false),
-      vbimode(0),
+      vbimode(VBIMode::None),
       // State variables
       internalState(kState_None),
       menurunning(false), runMainLoop(false), wantsToQuit(true),
@@ -317,9 +317,7 @@ bool TV::Init(bool createWindow)
         ff_rew_speeds.push_back(
             gContext->GetNumSetting(QString("FFRewSpeed%1").arg(i), def[i]));
 
-    QString vbiformat = gContext->GetSetting("VbiFormat");
-    vbimode = (vbiformat.lower() == "pal teletext") ? 1 : 0;
-    vbimode = (vbiformat.lower().left(4) == "ntsc") ? 2 : vbimode;
+    vbimode = VBIMode::Parse(gContext->GetSetting("VbiFormat"));
 
     if (createWindow)
     {
@@ -1919,12 +1917,14 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
         if (action == "TOGGLECC" && !browsemode)
         {
-            if (ccInputMode)
+            if (vbimode == VBIMode::NTSC_CC)
+                nvp->ToggleCC(vbimode, 0);
+            else if (ccInputMode)
             {
                 bool valid = false;
                 int page = GetQueuedInputAsInt(&valid, 16);
                 page = (valid) ? page : 0;
-                DoToggleCC(page);
+                nvp->ToggleCC(vbimode, page);
                 ccInputModeExpires.start(); // expire ccInputMode now...
                 ClearInputQueues(true);
             }
@@ -2805,11 +2805,6 @@ void TV::DoQueueTranscode(void)
     }
 }
 
-void TV::DoToggleCC(int arg)
-{
-    nvp->ToggleCC(vbimode, arg);
-}
-
 void TV::DoSkipCommercials(int direction)
 {
     NormalSpeed();
@@ -3057,7 +3052,7 @@ void TV::AddKeyToInputQueue(char key)
     inputStr = inputStr.isEmpty() ? "?" : inputStr;
     if (ccInputMode)
     {
-        QString entryStr = (vbimode==1) ? tr("TXT:") : tr("CC:");
+        QString entryStr = (vbimode==VBIMode::PAL_TT) ? tr("TXT:") : tr("CC:");
         inputStr = entryStr + " " + inputStr;
     }
     else if (asInputMode)
@@ -3095,7 +3090,7 @@ void TV::CommitQueuedInput(void)
         bool valid = false;
         int page = GetQueuedInputAsInt(&valid, 16);
         if (valid && page)
-            DoToggleCC(page);
+            nvp->ToggleCC(vbimode, page);
         ccInputModeExpires.start(); // expire ccInputMode
     }
     else if (asInputMode)
@@ -4606,11 +4601,11 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     QString action = item->getAction();
 
     if (action == "TOGGLECC")
-        DoToggleCC(0);
+        nvp->ToggleCC(vbimode, 0);
     else if (action.left(6) == "DISPCC")
-        DoToggleCC(action.right(1).toInt());
+        nvp->ToggleCC(vbimode, action.right(1).toInt());
     else if (action.left(7) == "DISPTXT")
-        DoToggleCC(action.right(1).toInt() + 4);
+        nvp->ToggleCC(vbimode, action.right(1).toInt() + 4);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(true);
     else if (action.left(13) == "TOGGLESTRETCH")
@@ -4843,12 +4838,12 @@ void TV::BuildOSDTreeMenu(void)
                 ((int)i == strack) ? 1 : 0, NULL, "SUBTITLEGROUP");
         }
     }
-    else if (vbimode == 1)
+    else if (vbimode == VBIMode::PAL_TT)
     {
         item = new OSDGenericTree(
             treeMenu, tr("Toggle Teletext"), "TOGGLECC");
     }
-    else if (vbimode == 2)
+    else if (vbimode == VBIMode::NTSC_CC)
     {
         item    = new OSDGenericTree(treeMenu, tr("Closed Captioning"));
         subitem = new OSDGenericTree(item, tr("Toggle CC"), "TOGGLECC");
