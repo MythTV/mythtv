@@ -750,13 +750,16 @@ RecordingProfile::RecordingProfile(QString profName)
         labelName = profName + "->" + QObject::tr("Profile");
     profile->setLabel(labelName);
     profile->addChild(name);
-    tr_lossless = new TranscodeLossless(*this);
-    tr_resize = new TranscodeResize(*this);
+
+    tr_lossless = NULL;
+    tr_resize = NULL;
 
     if (profName != NULL)
     {
         if (profName.left(11) == "Transcoders")
         {
+            tr_lossless = new TranscodeLossless(*this);
+            tr_resize = new TranscodeResize(*this);
             profile->addChild(tr_lossless);
             profile->addChild(tr_resize);
         }
@@ -765,6 +768,8 @@ RecordingProfile::RecordingProfile(QString profName)
     }
     else
     {
+        tr_lossless = new TranscodeLossless(*this);
+        tr_resize = new TranscodeResize(*this);
         profile->addChild(tr_lossless);
         profile->addChild(tr_resize);
         profile->addChild(new AutoTranscode(*this));
@@ -913,7 +918,8 @@ int RecordingProfile::exec()
 {
     MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
     dialog->Show();
-    SetLosslessTranscode(tr_lossless->boolValue());
+    if (tr_lossless)
+        SetLosslessTranscode(tr_lossless->boolValue());
 
     int ret = dialog->exec();
 
