@@ -901,8 +901,7 @@ void TVRec::TeardownRecorder(bool killFile)
             }
         }
 
-        if (tvchain)
-            FinishedRecording(curRecording);
+        FinishedRecording(curRecording);
 
         curRecording->MarkAsInUse(false);
         delete curRecording;
@@ -2954,6 +2953,8 @@ void TVRec::TuningShutdowns(const TuningRequest &request)
         {
             dummyRecorder->StopRecordingThread();
             ClearFlags(kFlagDummyRecorderRunning);
+            FinishedRecording(curRecording);
+            curRecording->MarkAsInUse(false);
         }
 
         if (request.flags & kFlagCloseRec)
@@ -3276,6 +3277,8 @@ void TVRec::TuningNewRecorder(void)
     {
         dummyRecorder->StopRecordingThread();
         ClearFlags(kFlagDummyRecorderRunning);
+        FinishedRecording(curRecording);
+        curRecording->MarkAsInUse(false);
         had_dummyrec = true;
     }
 
@@ -3411,6 +3414,8 @@ void TVRec::TuningRestartRecorder(void)
     {
         dummyRecorder->StopRecordingThread();
         ClearFlags(kFlagDummyRecorderRunning);
+        FinishedRecording(curRecording);
+        curRecording->MarkAsInUse(false);
         had_dummyrec = true;
     }
 
