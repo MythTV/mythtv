@@ -343,6 +343,13 @@ int RingBuffer::safe_read(int fd, void *data, uint sz)
     unsigned errcnt = 0;
     unsigned zerocnt = 0;
 
+    if (fd < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Invalid file descriptor in 'safe_read()'");
+        return 0;
+    }
+
     while (tot < sz)
     {
         ret = read(fd, (char *)data + tot, sz - tot);
