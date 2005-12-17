@@ -36,9 +36,12 @@ protected:
 };
 
 class ImageSize;
+class TranscodeResize;
+class TranscodeLossless;
 
 class RecordingProfile: public ConfigurationWizard
 {
+  Q_OBJECT
   protected:
     class ID: virtual public IntegerSetting,
               public AutoIncrementStorage {
@@ -73,6 +76,7 @@ class RecordingProfile: public ConfigurationWizard
     virtual void loadByID(int id);
     virtual bool loadByCard(QString name, int cardid);
     virtual bool loadByGroup(QString name, QString group);
+    virtual int exec();
 
     // sets
     void setCodecTypes();
@@ -94,11 +98,17 @@ class RecordingProfile: public ConfigurationWizard
     // constants
     static const int TranscoderAutodetect = 0;  ///< sentinel value
     static const int TranscoderGroup = 6;       ///< hard-coded DB value
-                               
+
+  private slots:
+    void ResizeTranscode(bool resize); 
+    void SetLosslessTranscode(bool lossless);
+
   private:
     ID                       *id;
     Name                     *name;
     ImageSize                *imageSize;
+    TranscodeResize          *tr_resize;
+    TranscodeLossless        *tr_lossless;
     VideoCompressionSettings *videoSettings;
     AudioCompressionSettings *audioSettings;
     QString                   profileName;

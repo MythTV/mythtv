@@ -363,24 +363,29 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             return REENCODE_ERROR;
         }
         vidsetting = profile.byName("videocodec")->getValue();
-        if (vidsetting == "MPEG-2"
-        //    || vidsetting == "" && encodingType == "MPEG-2"
-           )
+        audsetting = profile.byName("audiocodec")->getValue();
+
+        if (encodingType == "MPEG-2" &&
+            profile.byName("transcodelossless")->getValue().toInt())
         {
-            VERBOSE(VB_IMPORTANT, "Transcoding aborted, need MPEG-2.");
+            VERBOSE(VB_IMPORTANT, "Switching to MPEG-2 transcoder.");
             return REENCODE_MPEG2TRANS;
         }
 
         // Recorder setup
-
-        // this is ripped from tv_rec SetupRecording. It'd be nice to merge
-        nvr->SetOption("inpixfmt", FMT_YV12);
-
-        if (profile.byName("transcoderesize")->getValue().toInt())
+        if (profile.byName("transcodelossless")->getValue().toInt())
+        {
+            vidsetting = encodingType;
+            audsetting = "MP3";
+        }
+         else if (profile.byName("transcoderesize")->getValue().toInt())
         {
             newWidth = profile.byName("width")->getValue().toInt();
             newHeight = profile.byName("height")->getValue().toInt();
         }
+
+        // this is ripped from tv_rec SetupRecording. It'd be nice to merge
+        nvr->SetOption("inpixfmt", FMT_YV12);
 
         nvr->SetOption("width", newWidth);
         nvr->SetOption("height", newHeight);
@@ -415,7 +420,6 @@ int Transcode::TranscodeFile(char *inputname, char *outputname,
             return REENCODE_ERROR;
         }
 
-        audsetting = profile.byName("audiocodec")->getValue();
         nvr->SetOption("samplerate", arb->eff_audiorate);
         if (audsetting == "MP3")
         {

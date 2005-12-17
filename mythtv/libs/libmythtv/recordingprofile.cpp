@@ -1,6 +1,7 @@
 #include "recordingprofile.h"
 #include "libmyth/mythcontext.h"
 #include "libmyth/mythdbcon.h"
+#include "libmyth/mythwizard.h"
 #include <qsqldatabase.h>
 #include <qheader.h>
 #include <qcursor.h>
@@ -622,8 +623,6 @@ public:
                 // V4L, TRANSCODE (and any undefined types)
                 codecName->addSelection("RTjpeg");
                 codecName->addSelection("MPEG-4");
-                if (groupType == "TRANSCODE")
-                    codecName->addSelection("MPEG-2");
             }
         }
         else
@@ -657,6 +656,23 @@ public:
         CodecParam(parent, "transcoderesize") {
         setLabel(QObject::tr("Resize Video while transcoding"));
         setValue(false);
+        setHelpText(QObject::tr("Allows the transcoder to "
+                                "resize the video during transcoding."));
+    };
+};
+
+class TranscodeLossless: public CodecParam, public CheckBoxSetting {
+public:
+    TranscodeLossless(const RecordingProfile& parent):
+        CodecParam(parent, "transcodelossless") {
+        setLabel(QObject::tr("Lossless transcoding"));
+        setValue(false);
+        setHelpText(QObject::tr("Only reencode where absolutely needed "
+                                "(normally only around cutpoints).  Otherwise "
+                                "keep audio and video formats identical to "
+                                "the source.  This should result in the "
+                                "highest quality, but won't save as much "
+                                "space."));
     };
 };
 
@@ -734,22 +750,50 @@ RecordingProfile::RecordingProfile(QString profName)
         labelName = profName + "->" + QObject::tr("Profile");
     profile->setLabel(labelName);
     profile->addChild(name);
+    tr_lossless = new TranscodeLossless(*this);
+    tr_resize = new TranscodeResize(*this);
 
     if (profName != NULL)
     {
         if (profName.left(11) == "Transcoders")
-            profile->addChild(new TranscodeResize(*this));
+        {
+            profile->addChild(tr_lossless);
+            profile->addChild(tr_resize);
+        }
         else
             profile->addChild(new AutoTranscode(*this));
     }
     else
     {
-        profile->addChild(new TranscodeResize(*this));
+        profile->addChild(tr_lossless);
+        profile->addChild(tr_resize);
         profile->addChild(new AutoTranscode(*this));
     }
 
     addChild(profile);
 };
+
+void RecordingProfile::ResizeTranscode(bool resize)
+{
+    MythWizard *wizard = (MythWizard *)dialog;
+    //page '1' is the Image Size page
+    QWidget *size_page = wizard->page(1);
+    wizard->setAppropriate(size_page, resize);
+}
+
+void RecordingProfile::SetLosslessTranscode(bool lossless)
+{
+    MythWizard *wizard = (MythWizard *)dialog;
+
+    bool show_size = (lossless) ? false : tr_resize->boolValue();
+    wizard->setAppropriate(wizard->page(1), show_size);
+    wizard->setAppropriate(wizard->page(2), ! lossless);
+    wizard->setAppropriate(wizard->page(3), ! lossless);
+    tr_resize->setEnabled(! lossless);
+    wizard->setNextEnabled(wizard->page(0), ! lossless);
+    wizard->setFinishEnabled(wizard->page(0), lossless);
+    
+}
 
 void RecordingProfile::loadByID(int profileId) 
 {
@@ -779,6 +823,14 @@ void RecordingProfile::loadByID(int profileId)
 
         audioSettings = new AudioCompressionSettings(*this, profileName);
         addChild(audioSettings);
+
+        if (profileName && profileName.left(11) == "Transcoders")
+        {
+            connect(tr_resize, SIGNAL(valueChanged   (bool)),
+                    this,      SLOT(  ResizeTranscode(bool)));
+            connect(tr_lossless, SIGNAL(valueChanged        (bool)),
+                    this,        SLOT(  SetLosslessTranscode(bool)));
+        }
     }
 
     id->setValue(profileId);
@@ -855,6 +907,19 @@ void RecordingProfile::setName(const QString& newName)
 {
     name->setValue(newName);
     name->setRW(isEncoder);
+}
+
+int RecordingProfile::exec()
+{
+    MythDialog* dialog = dialogWidget(gContext->GetMainWindow());
+    dialog->Show();
+    SetLosslessTranscode(tr_lossless->boolValue());
+
+    int ret = dialog->exec();
+
+    delete dialog;
+
+    return ret;
 }
 
 void RecordingProfileEditor::open(int id) 
