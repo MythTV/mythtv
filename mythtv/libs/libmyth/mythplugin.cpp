@@ -51,7 +51,10 @@ void MythPlugin::config(void)
     PluginConfigFunc rfunc = (PluginConfigFunc)QLibrary::resolve("mythplugin_config");
 
     if (rfunc)
+    {
         rfunc();
+        gContext->ClearSettingsCache();
+    }
 }
 
 MythPluginType MythPlugin::type(void)
