@@ -411,10 +411,8 @@ bool DVBChannel::GetTransportOptions(int mplexid)
 {
     MSqlQuery query(MSqlQuery::InitCon());
 
-    int capturecardnumber = GetCardID();
-
     // Query for our DVBTuning params
-    QString thequery(
+    query.prepare(
         "SELECT frequency,         inversion,      symbolrate, "
         "       fec,               polarity,       dvb_diseqc_type, "
         "       diseqc_port,       diseqc_pos,     lnb_lof_switch, "
@@ -423,24 +421,26 @@ bool DVBChannel::GetTransportOptions(int mplexid)
         "       transmission_mode, guard_interval, hierarchy, "
         "       modulation,        bandwidth,      cardinputid "
         "FROM dtv_multiplex, cardinput, capturecard "
-        "WHERE dtv_multiplex.sourceid = cardinput.sourceid AND ");
+        "WHERE dtv_multiplex.sourceid = cardinput.sourceid AND "
+        "      dtv_multiplex.mplexid  = :MPLEXID           AND "
+        "      cardinput.cardid       = capturecard.cardid AND "
+        "      cardinput.cardid       = :CARDID");
+    query.bindValue(":MPLEXID", mplexid);
+    query.bindValue(":CARDID",  GetCardID());
 
-    thequery += QString("mplexid = '%1' AND capturecard.cardid = '%2'")
-        .arg(mplexid).arg(capturecardnumber);
-
-    query.prepare(thequery);
     if (!query.exec() || !query.isActive())
     {
         MythContext::DBError("GetChannelOptions - Options", query);
         return false;
     }
-    if (query.size() <= 0)
+
+    if (!query.next())
     {
-       ERROR(QString("Could not find dvb tuning parameters for transport %1")
-                      .arg(mplexid));
-       return false;
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Could not find dvb tuning parameters for " +
+                QString("mplex %1").arg(mplexid));
+        return false;
     }
-    query.next();
 
     // Parse the query into our DVBTuning class
     return chan_opts.Parse(info.type,
