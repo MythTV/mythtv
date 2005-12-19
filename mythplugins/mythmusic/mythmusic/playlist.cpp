@@ -981,7 +981,7 @@ int Playlist::writeTree(GenericTree *tree_to_write_to, int a_counter)
             if (tmpdata)
             {
                 QString a_string = QString("CD: %1 ~ %2 - %3")
-                  .arg(tmpdata->FormatArtist()).arg(tmpdata->Track()).arg(tmpdata->FormatTitle());
+                  .arg(tmpdata->Track()).arg(tmpdata->FormatTitle()).arg(tmpdata->FormatArtist());
 
                 if(tmpdata->FormatArtist().length() < 1 ||
                    tmpdata->FormatTitle().length() < 1)
