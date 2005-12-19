@@ -149,7 +149,7 @@ static void writeout_video(multiplex_t *mx)
 	index_unit *viu = &mx->viu;
 
 #ifdef OUT_DEBUG
-	fprintf(stderr,"writing VIDEO pack");
+	fprintf(stderr,"writing VIDEO pack\n");
 #endif
 
 	if(viu->frame_start) {
@@ -212,7 +212,7 @@ static void writeout_video(multiplex_t *mx)
 		if (mx->VBR) {
 			mx->extra_clock = ptsdiff(viu->dts + mx->video_delay, 
 						  mx->SCR + 500*CLOCK_MS);
-#ifdef OUT_DEBUG
+#ifdef OUT_DEBUG1
 			fprintf(stderr,"EXTRACLOCK2: %lli %lli %lli\n", viu->dts, mx->video_delay, mx->SCR);
 			fprintf(stderr,"EXTRACLOCK2: %lli ", mx->extra_clock);
 			printpts(mx->extra_clock);
@@ -238,6 +238,15 @@ static void writeout_video(multiplex_t *mx)
 	viu->length = length;
 
 	write(mx->fd_out, outbuf, written);
+
+#ifdef OUT_DEBUG
+	fprintf(stderr,"VPTS");
+	printpts(viu->pts);
+	fprintf(stderr," DTS");
+	printpts(viu->dts);
+	printpts(mx->video_delay);
+	fprintf(stderr,"\n");
+#endif
 	
 	if (viu->length == 0){
 		get_next_video_unit(mx, viu);
@@ -410,7 +419,8 @@ void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
 		  int *start)
 {
 	int i;
-	
+	int set_ok = 0;
+
 	memset(audio_ok, 0, N_AUDIO*sizeof(int));
 	memset(ac3_ok, 0, N_AC3*sizeof(int));
 	*video_ok = 0;
@@ -427,7 +437,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
 	} else *start = 0;
 	
 	if (mx->VBR) {
-#ifdef OUT_DEBUG
+#ifdef OUT_DEBUG1
 		fprintf(stderr,"EXTRACLOCK: %lli ", mx->extra_clock);
 		printpts(mx->extra_clock);
 		fprintf(stderr,"\n");
@@ -482,11 +492,11 @@ void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
 	for (i=0;i <mx->ac3n; i++)
 		dummy_delete(&mx->ac3dbuf[i], mx->SCR);
 	
-	
 	if (dummy_space(&mx->vdbuf) > mx->vsize && mx->viu.length > 0 &&
 	    (ptscmp(mx->viu.dts + mx->video_delay, 1000*CLOCK_MS +mx->oldSCR)<0)
 	    && ring_avail(mx->index_vrbuffer)){
 		*video_ok = 1;
+                set_ok = 1;
 	}
 	
 	for (i = 0; i < mx->apidn; i++){
@@ -495,6 +505,7 @@ void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
 		    ptscmp(mx->apts[i], 200*CLOCK_MS + mx->oldSCR) < 0
 		    && ring_avail(&mx->index_arbuffer[i])){
 			audio_ok[i] = 1;
+                        set_ok = 1;
 		}
 	}
 	for (i = 0; i < mx->ac3n; i++){
@@ -503,8 +514,29 @@ void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
 		    ptscmp(mx->ac3pts[i], 200*CLOCK_MS + mx->oldSCR) < 0
 		    && ring_avail(&mx->index_ac3rbuffer[i])){
 			ac3_ok[i] = 1;
+                        set_ok = 1;
 		}
 	}
+#ifdef OUT_DEBUG
+	if (set_ok) {
+		fprintf(stderr, "SCR");
+		printpts(mx->oldSCR);
+		fprintf(stderr, "VDTS");
+		printpts(mx->viu.dts);
+		fprintf(stderr, " (%d)", *video_ok);
+		fprintf(stderr, " AUD");
+		for (i = 0; i < mx->apidn; i++){
+			printpts(mx->apts[i]);
+			fprintf(stderr, " (%d)", audio_ok[i]);
+		}
+		fprintf(stderr, " AC3");
+		for (i = 0; i < mx->ac3n; i++){
+			printpts(mx->ac3pts[i]);
+			fprintf(stderr, " (%d)", ac3_ok[i]);
+		}
+		fprintf(stderr, "\n");
+	}
+#endif
 }
 
 void write_out_packs( multiplex_t *mx, int video_ok, 
@@ -709,7 +741,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head, audio_frame_t *afram
 		data_rate += ac3frame[i].bit_rate;
 
 	
-	mx->muxr = (data_rate / 8 * mx->pack_size) / mx->data_size; 
+	mx->muxr = ((uint64_t)data_rate / 8 * mx->pack_size) / mx->data_size; 
                                      // muxrate of payload in Byte/s
 
 	if (mx->mux_rate) {

@@ -489,7 +489,7 @@ void analyze_video( pes_in_t *p, struct replex *rx, int len)
 				gop = 1;
 				gop_off = c+pos - seq_p;
 				
-				if (ring_peek(rbuf, (char *) buf, 7, 
+				if (ring_peek(rbuf, (uint8_t *) buf, 7, 
 					      off+c+pos) < 0){
 					rx->vpes_abort = len -(c+pos-1);
 					return;
@@ -515,7 +515,7 @@ void analyze_video( pes_in_t *p, struct replex *rx, int len)
 					return;
 				}
 				
-				if (ring_peek(rbuf, (char *) buf, 6,
+				if (ring_peek(rbuf, (uint8_t *) buf, 6,
                                               off+c+pos) < 0) return;
 
 
@@ -1764,7 +1764,7 @@ void fix_audio(struct replex *rx, multiplex_t *mx)
 					exit(1);
 				}	
 			}
-			ring_peek(&rx->index_arbuffer[i], (char *)&aiu, size, 0);
+			ring_peek(&rx->index_arbuffer[i], (uint8_t *)&aiu, size, 0);
 			if ( ptscmp(aiu.pts + rx->first_apts[i], rx->first_vpts) < 0){
 				ring_skip(&rx->index_arbuffer[i], size);
 				ring_skip(&rx->arbuffer[i], aiu.length);
@@ -1790,7 +1790,7 @@ void fix_audio(struct replex *rx, multiplex_t *mx)
 					exit(1);
 				}	
 			}
-			ring_peek(&rx->index_ac3rbuffer[i], (char *)&aiu, 
+			ring_peek(&rx->index_ac3rbuffer[i], (uint8_t *)&aiu, 
 				  size, 0);
 			if ( ptscmp (aiu.pts+rx->first_ac3pts[i], rx->first_vpts) < 0){
 				ring_skip(&rx->index_ac3rbuffer[i], size);

@@ -47,7 +47,7 @@ typedef struct index_unit_s{
 	uint8_t  frame_off;
 	uint8_t  frame_start;
 	uint8_t  err;
-	uint16_t framesize;
+	uint32_t framesize;
 } index_unit;
 
 #define NO_ERR    0
