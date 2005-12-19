@@ -585,19 +585,23 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
                 else if (inputFC->streams[i]->codec->codec_id == CODEC_ID_MP3 ||
                          inputFC->streams[i]->codec->codec_id == CODEC_ID_MP2)
                 {
-                    aud_map[i] = mp2_count++;
-                    aFrame[i] = QPtrList<MPEG2frame> ();
+                    if (inputFC->streams[i]->codec->channels > 0)
+                    {
+                        aud_map[i] = mp2_count++;
+                        aFrame[i] = QPtrList<MPEG2frame> ();
+                    }
+                    else
+                        fprintf(stderr, "Skipping invalid audio stream: %d\n",
+                            i);
                 }
                 else
-                {
-                    fprintf(stderr, "Unsupported audio stream: %d\n",
+                    fprintf(stderr, "Skipping unsupported audio stream: %d\n",
                             inputFC->streams[i]->codec->codec_id);
-                }
                 break;
 
             default:
-                fprintf(stderr, "Skipping unsupported codec %d\n",
-                        inputFC->streams[i]->codec->codec_type);
+                fprintf(stderr, "Skipping unsupported codec %d on stream %d\n",
+                        inputFC->streams[i]->codec->codec_type, i);
         }
     }
 
@@ -1103,6 +1107,8 @@ bool MPEG2fixup::FindStart()
                     if (cmp2x33(af->next()->pkt.pts,
                                 vFrame.first()->pkt.pts) > 0)
                     {
+                        VERBOSE(MPF_PROCESS, QString("Found useful audio "
+                                "frame from stream %1").arg(it.key()));
                         found[it.key()] = 1;
                         break;
                     }
@@ -1119,6 +1125,8 @@ bool MPEG2fixup::FindStart()
                 else if (cmp2x33(af->first()->pkt.pts,
                                  vFrame.first()->pkt.pts) >= 0)
                 {
+                    VERBOSE(MPF_PROCESS, QString("Found useful audio "
+                            "frame from stream %1").arg(it.key()));
                     found[it.key()] = 1;
                     break;
                 }
