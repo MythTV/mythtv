@@ -15,8 +15,6 @@
 #include <getopt.h>
 #include <stdint.h>
 
-#include "libavcodec/avcodec.h"
-
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
 #endif
