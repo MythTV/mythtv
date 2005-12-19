@@ -2000,7 +2000,7 @@ if test x"$firewire_cable_box" = x"yes" ; then
     firewire_cable_box="no"
     if has_library libiec61883 -a has_library libavc1394 ; then
         if test x`which pkg-config 2>/dev/null` != x"" ; then
-            if `pkg-config --atleast-version 0.5.1 libavc1394` ; then
+            if `pkg-config --atleast-version 0.5.0 libavc1394` ; then
                 if `pkg-config --atleast-version 1.0.0 libiec61883` ; then
                     firewire_cable_box="yes"
                 fi
