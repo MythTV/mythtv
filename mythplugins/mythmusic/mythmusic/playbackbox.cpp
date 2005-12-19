@@ -1657,7 +1657,14 @@ void PlaybackBoxMusic::customEvent(QCustomEvent *event)
                 {
                     float percent_heard = maxTime<=0?0.0:((float)rs / 
                                                           (float)curMeta->Length()) * 1000.0;
-                    lcd->setMusicProgress(time_string, percent_heard);
+
+                    QString lcd_time_string = time_string; 
+
+                    // if the string is longer than the LCD width, remove all spaces
+                    if (time_string.length() > lcd->getLCDWidth())
+                        lcd_time_string.remove(' ');
+
+                    lcd->setMusicProgress(lcd_time_string, percent_heard);
                 }
             }
 
