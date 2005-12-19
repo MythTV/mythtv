@@ -142,6 +142,7 @@ class ProgramInfo
     void AddHistory(bool resched = true);
     void DeleteHistory(void);
     void ForgetHistory(void);
+    void SetDupHistory(void);
 
     // Used to update database with recording info
     void StartedRecording(QString prefix, QString ext);

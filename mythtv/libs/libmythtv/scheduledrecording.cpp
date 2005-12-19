@@ -814,7 +814,14 @@ void ScheduledRecording::setProgram(const ProgramInfo *proginfo)
         }
         else
         {
-            findid->setValue(proginfo->findid);
+            if (findid->intValue() > 0)
+                findid->setValue(proginfo->findid);
+            else
+            {
+                QDate epoch = QDate::QDate (1970, 1, 1);
+                findid->setValue(epoch.daysTo(proginfo->startts.date()) +
+                                              719528);
+            }
         }
         category->setValue(proginfo->category);
         

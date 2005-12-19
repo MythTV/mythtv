@@ -685,12 +685,23 @@ void PreviousList::removalDialog()
                              "delete any recordings.");
     
     DialogBox diag(gContext->GetMainWindow(), message);
-    int button = 1, ok = -1, rm_episode = -1, rm_title = -1;
+    int button = 1, ok = -1, cleardup = -1, setdup = -1, rm_episode = -1,
+        rm_title = -1;
     // int rm_generics = -1;
 
-    diag.AddButton(tr("Keep this episode in the list"));
+    diag.AddButton(tr("OK"));
     ok = button++;
 
+    if (pi->duplicate)
+    {
+        diag.AddButton(tr("Allow this episode to re-record"));
+        cleardup = button++;
+    }
+    else
+    {
+        diag.AddButton(tr("Never record this episode"));
+        setdup = button++;
+    }
     diag.AddButton(tr("Remove this episode from the list"));
     rm_episode = button++;
 
@@ -716,6 +727,10 @@ void PreviousList::removalDialog()
         ScheduledRecording::signalChange(0);
         fillItemList();
     }
+    else if (ret == cleardup)
+        pi->ForgetHistory();
+    else if (ret == setdup)
+        pi->SetDupHistory();
 }
 
 void PreviousList::deleteItem()

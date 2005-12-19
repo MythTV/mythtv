@@ -2570,9 +2570,10 @@ void ProgramInfo::ForgetHistory(void)
     result.prepare("UPDATE oldrecorded SET duplicate = 0 "
                    "WHERE duplicate = 1 "
                    "AND title = :TITLE AND "
-                   "((subtitle = :SUBTITLE AND description = :DESC) OR "
-                   "(programid <> '' AND programid = :PROGRAMID) OR "
-                   "(findid <> 0 AND findid = :FINDID))");
+                   "((programid = '' AND subtitle = :SUBTITLE"
+                   "  AND description = :DESC) OR "
+                   " (programid <> '' AND programid = :PROGRAMID) OR "
+                   " (findid <> 0 AND findid = :FINDID))");
     result.bindValue(":TITLE", title.utf8());
     result.bindValue(":SUBTITLE", subtitle.utf8());
     result.bindValue(":DESC", description.utf8());
@@ -2605,6 +2606,33 @@ void ProgramInfo::ForgetHistory(void)
 
     // The removal of an entry from oldrecorded may affect near-future
     // scheduling decisions, so recalculate
+    ScheduledRecording::signalChange(0);
+}
+
+/** \fn ProgramInfo::SetDupHistory(void)
+ *  \brief Set the duplicate flag in oldrecorded.
+ */
+void ProgramInfo::SetDupHistory(void)
+{
+    MSqlQuery result(MSqlQuery::InitCon());
+
+    result.prepare("UPDATE oldrecorded SET duplicate = 1 "
+                   "WHERE duplicate = 0 "
+                   "AND title = :TITLE AND "
+                   "((programid = '' AND subtitle = :SUBTITLE"
+                   "  AND description = :DESC) OR "
+                   " (programid <> '' AND programid = :PROGRAMID) OR "
+                   " (findid <> 0 AND findid = :FINDID))");
+    result.bindValue(":TITLE", title.utf8());
+    result.bindValue(":SUBTITLE", subtitle.utf8());
+    result.bindValue(":DESC", description.utf8());
+    result.bindValue(":PROGRAMID", programid);
+    result.bindValue(":FINDID", findid);
+    
+    result.exec();
+    if (!result.isActive())
+        MythContext::DBError("setDupHistory", result);
+
     ScheduledRecording::signalChange(0);
 }
 
