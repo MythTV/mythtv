@@ -228,6 +228,7 @@ osx-packager.pl - build OS X binary packages for MythTV
    -svntag <str>    build a specified release, instead of Subversion HEAD
    -nohead          don't update to HEAD revision of MythTV before building
    -usehdimage      perform build inside of a case-sensitive disk image
+   -enable-backend  build the backend server as well as the frontend
    -plugins <str>   comma-separated list of plugins to include
                       Available plugins:
    mythbrowser mythcontrols mythdvd mythflix mythgallery mythgame
@@ -293,10 +294,14 @@ Getopt::Long::GetOptions(\%OPT,
                          'nocvs', # This is obsolete, but should stay a while
                          'nohead',
                          'usehdimage',
+                         'enable-backend',
                          'plugins=s',
                         ) or Pod::Usage::pod2usage(2);
 Pod::Usage::pod2usage(1) if $OPT{'help'};
 Pod::Usage::pod2usage('-verbose' => 2) if $OPT{'man'};
+
+if ( $OPT{'enable-backend'} )
+{   $backend = 1  }
 
 # Get version string sorted out
 if ($OPT{'svntag'} && !$OPT{'version'})
@@ -618,7 +623,9 @@ elsif ( $OPT{'svnrev'} )
 elsif ( ! $OPT{'nohead'} )
 {
   # Lookup and use the HEAD revision so we are guaranteed consistent source
-  my $rev = `$svn log $svnrepository --revision HEAD --xml | grep revision`;
+  my $cmd = "$svn log $svnrepository --revision HEAD --xml | grep revision";
+  &Verbose($cmd);
+  my $rev = `$cmd`;
   $rev =~ s/[^[:digit:]]//gs;
 
   $svnrepository .= 'trunk/';
@@ -629,7 +636,7 @@ elsif ( ! $OPT{'nohead'} )
 if (! $OPT{'nohead'})
 {
   # Empty subdirectory 'config' sometimes causes checkout problems
-  &Syscall(['rm', '-fr', $svndir . 'mythtv/config']);
+  &Syscall(['rm', '-fr', $svndir . '/mythtv/config']);
   Verbose("Checking out source code");
   &Syscall([ $svn, 'co', @svnrevision,
             map($svnrepository . $_, @comps), $svndir ]) or die;
@@ -686,12 +693,24 @@ foreach my $comp (@comps)
   {
     # MythTV has an empty subdirectory 'config' that causes problems for me:
     &Syscall('touch config/config.pro');
+
+    # Remove Nigel's frontend speedup hack
+    open(IN,  'programs/programs.pro')       or die;
+    open(OUT, '>programs/programs.pro.orig') or die;
+    while ( <IN> )
+    {
+      if ( m/^# Nigel/ )  # Skip
+      {  last  }
+      print OUT;
+    }
     if ( ! $backend )
     {
       # Nigel's hack to speedup building
-      &Syscall('echo "# Nigel\'s speedup hack:" >> programs/programs.pro');
-      &Syscall('echo SUBDIRS = mythfrontend >> programs/programs.pro');
+      print OUT "# Nigel\'s speedup hack:";
+      print OUT "SUBDIRS = mythfrontend";
     }
+    close IN; close OUT;
+    rename('programs/programs.pro.orig', 'programs/programs.pro');
   }
   
   &Verbose("Making $comp");
@@ -933,7 +952,9 @@ sub ProcessDependencies
     &Verbose("Processing shared library dependencies for $file");
     my ($filebase) = &BaseVers($file);
     
-    my @deps = `otool -L $file`;
+    my $cmd = "otool -L $file";
+    &Verbose($cmd);
+    my @deps = `$cmd`;
     shift @deps;  # first line just repeats filename
     foreach my $dep (@deps)
     {
