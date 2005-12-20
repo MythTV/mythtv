@@ -40,7 +40,7 @@
 
 const int TV::kInitFFRWSpeed  = 0;
 const int TV::kMuteTimeout    = 800;
-const int TV::kLCDTimeout     = 30000;
+const int TV::kLCDTimeout     = 1;    // seconds
 const int TV::kBrowseTimeout  = 30000;
 const int TV::kSMExitTimeout  = 2000;
 const int TV::kInputKeysMax   = 6;
@@ -1496,7 +1496,8 @@ void TV::RunTV(void)
         if (class LCD * lcd = LCD::Get())
         {
             QDateTime curTime = QDateTime::currentDateTime();
-            if (lastLcdUpdate.secsTo(curTime) < 60)
+
+            if (lastLcdUpdate.secsTo(curTime) < kLCDTimeout)
                 continue;
 
             float progress = 0.0;

@@ -506,7 +506,7 @@ class TV : public QObject
     // Constants
     static const int kInitFFRWSpeed; ///< 1x, default to normal speed
     static const int kMuteTimeout;   ///< Channel changing mute timeout in msec
-    static const int kLCDTimeout;    ///< Timeout for updating LCD info in msec
+    static const int kLCDTimeout;    ///< Timeout for updating LCD info in seconds
     static const int kBrowseTimeout; ///< Timeout for browse mode exit in msec
     /// Timeout after last Signal Monitor message for ignoring OSD when exiting.
     static const int kSMExitTimeout;
