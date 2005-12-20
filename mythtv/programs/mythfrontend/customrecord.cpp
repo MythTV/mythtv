@@ -122,6 +122,12 @@ CustomRecord::CustomRecord(MythMainWindow *parent, const char *name)
                "program.starttime = programgenres.starttime ";
     m_csql << "programgenres.genre = 'Reality' ";
 
+    m_clause->insertItem(tr("Limit by MPAA or VCHIP rating (Data Direct)"));
+    m_cfrom << "LEFT JOIN programrating ON "
+               "program.chanid = programrating.chanid AND "
+               "program.starttime = programrating.starttime ";
+    m_csql << "(programrating.rating = 'G' OR programrating.rating LIKE 'TV-Y%') ";
+
     m_clause->insertItem(tr("New episodes only"));
     m_cfrom << "";
     m_csql << "program.previouslyshown = 0 ";
