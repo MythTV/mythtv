@@ -2,6 +2,7 @@
 #define  VIDEO_SCANNER_H
 #include <qobject.h>
 #include <qmap.h>
+#include <qmap.h>
 
 enum VideoFileLocation
 {
@@ -25,7 +26,8 @@ class VideoScanner
         bool m_RemoveAll;
         bool m_KeepAll;
         VideoLoadedMap m_VideoFiles;
-        QStringList m_IgnoreList;
+
+        QMap<QString,bool> m_IgnoreList;
 
         void promptForRemoval(const QString& filename);
         bool ignoreExtension(const QString& extension) const;

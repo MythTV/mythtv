@@ -16,17 +16,18 @@ VideoScanner::VideoScanner()
     m_ListUnknown = gContext->GetNumSetting("VideoListUnknownFileTypes", 1);
 
     MSqlQuery query(MSqlQuery::InitCon());
-    QString thequery("SELECT extension FROM videotypes WHERE f_ignore = 1 ;");
+    QString thequery("SELECT extension,f_ignore FROM videotypes;");
     query.exec(thequery);
 
     if (query.isActive() && query.size() > 0)
     {
         while (query.next())
         {
-            m_IgnoreList.append(query.value(0).toString());
+            QString ext = query.value(0).toString().lower();
+            bool ignore = query.value(1).toBool();
+            m_IgnoreList.insert(ext, ignore);
         }
     }
-
 
 }
 
@@ -163,7 +164,14 @@ void VideoScanner::verifyFiles()
     progressDlg.Close();
 }
  
-
+bool VideoScanner::ignoreExtension(const QString &extension) const
+{
+    QString ext = extension.lower();
+    QMap<QString,bool>::const_iterator it = m_IgnoreList.find(ext);
+    if (it == m_IgnoreList.end())
+        return !m_ListUnknown;
+    return it.data();
+}
 
 void VideoScanner::buildFileList(const QString &directory, 
                                  const QStringList &imageExtensions)
@@ -193,16 +201,9 @@ void VideoScanner::buildFileList(const QString &directory,
         {
             continue;
         }
-        
-        if(!fi->isDir())
-        {
-            r.setPattern("^" + fi->extension(false) + "$");
-            r.setCaseSensitive(false);
-            QStringList result = m_IgnoreList.grep(r);
-            if ((!result.isEmpty() && (!m_ListUnknown))) {
-                continue;
-            }
-        }
+
+        if (!fi->isDir() && ignoreExtension(fi->extension(false)))
+            continue;
         
         QString filename = fi->absFilePath();
         if (fi->isDir())

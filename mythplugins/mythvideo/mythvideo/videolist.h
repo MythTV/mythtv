@@ -3,6 +3,7 @@
 
 #include <qapplication.h>
 #include <qdialog.h>
+#include <qmap.h>
 
 #include <mythtv/mythwidgets.h>
 #include <mythtv/uitypes.h>
@@ -37,7 +38,8 @@ class VideoList
         void buildFsysList(bool flatlist, int parental_level);
         void buildDbList(bool flatlist, int parental_level);
         void buildFileList(const QString& directory);
-        bool ignoreExtension(const QString& extension);
+        bool ignoreExtension(const QString& extension) const;
+
         void removeUpnodes(GenericTree *parent);
         void addUpnodes(GenericTree *parent);
         GenericTree *addDirNode(GenericTree *where_to_add,
@@ -47,7 +49,7 @@ class VideoList
 
         bool m_ListUnknown;
         bool m_LoadMetaData;
-        QStringList m_IgnoreList;
+        QMap<QString,bool> m_IgnoreList;
 
         QSqlDatabase *db;
         int nitems;      // Number of real items in the tree
