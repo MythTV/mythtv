@@ -467,7 +467,7 @@ void VideoGallery::drawIcon(QPainter *p, GenericTree* curTreePos, int curPos, in
         area.setHeight(spaceH);
         ttype->SetDisplayArea(area);
         ttype->calculateScreenArea();
-        itype->SetText(meta ? meta->Title() : curTreePos->getString());
+        ttype->SetText(meta ? meta->Title() : curTreePos->getString());
 
         ttype->Draw(p, 0, 0);
         ttype->Draw(p, 1, 0);
