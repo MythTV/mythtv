@@ -32,7 +32,7 @@ const unsigned char* MPEGDescriptor::Find(const desc_list_t& parsed,
 
 QString MPEGDescriptor::DescriptorTagString() const
 {
-    switch(DescriptorTag())
+    switch (DescriptorTag())
     {
         // MPEG
         case DescriptorID::video:
@@ -242,7 +242,8 @@ QString MPEGDescriptor::DescriptorTagString() const
         case DescriptorID::atsc_content_identifier:
             return QString("Content Identifier");
 
-        default: return QString("Unknown");
+        default:
+            return QString("Unknown(%1)").arg(DescriptorTag());
     }
 }
 

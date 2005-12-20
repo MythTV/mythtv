@@ -121,6 +121,9 @@ class SIParser : public QObject
     void TableLoaded(void);
     void UpdatePMT(const PMTObject *pmt);
 
+  protected:
+    void PrintDescriptorStatistics(void) const;
+
   private:
     uint GetLanguagePriority(const QString &language);
 
@@ -133,11 +136,11 @@ class SIParser : public QObject
     // MPEG Transport Parsers (ATSC and DVB)
     tablehead_t       ParseTableHead(uint8_t* buffer, int size);
 
-    void ParsePAT     (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseCAT     (tablehead_t* head, uint8_t* buffer, int size);
-    void ParsePMT     (tablehead_t* head, uint8_t* buffer, int size);
+    void ParsePAT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
+    void ParseCAT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
+    void ParsePMT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
 
-    void ProcessUnusedDescriptor(const uint8_t *buffer, uint size);
+    void ProcessUnusedDescriptor(uint pid, const uint8_t *buffer, uint size);
 
     // Common Helper Functions
     QString DecodeText(const uint8_t *s, uint length);
@@ -146,9 +149,9 @@ class SIParser : public QObject
     QDateTime ConvertDVBDate(const uint8_t* dvb_buf);
 
     // DVB Table Parsers
-    void ParseNIT       (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseSDT       (tablehead_t* head, uint8_t* buffer, int size);
-    void ParseDVBEIT    (tablehead_t* head, uint8_t* buffer, uint size);
+    void ParseNIT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
+    void ParseSDT(uint pid, tablehead_t* head, uint8_t* buffer, uint size);
+    void ParseDVBEIT(uint pid, tablehead_t* h, uint8_t* buffer, uint size);
 
     // Common Descriptor Parsers
     CAPMTObject ParseDescCA(uint8_t* buffer, int size);
@@ -173,6 +176,7 @@ class SIParser : public QObject
 
     // DVB EIT Table Descriptor processors
     uint ProcessDVBEventDescriptors(
+        uint                         pid,
         const unsigned char          *data,
         uint                         &bestPrioritySE,
         const unsigned char*         &bestDescriptorSE, 
@@ -271,6 +275,10 @@ class SIParser : public QObject
 
     // DVB category descriptions
     QMap<uint,QString>  m_mapCategories;
+
+    // statistics
+    QMap<uint,uint>     descCount;
+    mutable QMutex      descLock;
 };
 
 #define SIPARSER(args...) \

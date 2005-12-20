@@ -114,18 +114,20 @@ SIParser::~SIParser()
 void SIParser::deleteLater(void)
 {
     disconnect(); // disconnect signals we may be sending...
+    PrintDescriptorStatistics();
     QObject::deleteLater();
 }
 
 /* Resets all trackers, and closes all section filters */
 void SIParser::Reset()
 {
-
     ParserInReset = true;
 
     // Close all pids that are open
 
     SIPARSER("About to do a reset");
+
+    PrintDescriptorStatistics();
 
     Table[MGT]->Reset();
 
@@ -144,7 +146,6 @@ void SIParser::Reset()
     pmap_lock.unlock();
 
     SIPARSER("SIParser Reset due to channel change");
-
 }
 
 void SIParser::CheckTrackers()
@@ -529,13 +530,13 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
     /* Parse Common Tables (PAT/CAT/PMT) regardless of SI Standard */
     switch(head.table_id)
     {
-        case 0x00:  ParsePAT(&head, &buffer[8], size-8);
+        case 0x00:  ParsePAT(pid, &head, &buffer[8], size-8);
                     break;
 
-        case 0x01:  ParseCAT(&head, &buffer[8], size-8);
+        case 0x01:  ParseCAT(pid, &head, &buffer[8], size-8);
                     break;
 
-        case 0x02:  ParsePMT(&head, &buffer[8], size-8);
+        case 0x02:  ParsePMT(pid, &head, &buffer[8], size-8);
                     break;
 
     }
@@ -566,18 +567,18 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
         {
         case 0x40:
             /* Network Information Table(s) */
-            ParseNIT(&head, &buffer[8], size-8);
+            ParseNIT(pid, &head, &buffer[8], size-8);
             break;
         case 0x42: /* Service Table(s) */
         case 0x46:  
-            ParseSDT(&head, &buffer[8], size-8);
+            ParseSDT(pid, &head, &buffer[8], size-8);
             break;
 #ifdef USING_DVB_EIT
         case 0x4E ... 0x4F:
             /* Standard Now/Next Event Information Table(s) */
         case 0x50 ... 0x6F:
             /* Standard Future Event Information Table(s) */
-            ParseDVBEIT(&head, &buffer[8], size-8);
+            ParseDVBEIT(pid, &head, &buffer[8], size-8);
             break;
 #endif
       
@@ -660,7 +661,8 @@ tablehead_t SIParser::ParseTableHead(uint8_t *buffer, int size)
 
 }
 
-void SIParser::ParsePAT(tablehead_t *head, uint8_t *buffer,int size)
+void SIParser::ParsePAT(uint /*pid*/, tablehead_t *head,
+                        uint8_t *buffer, uint size)
 {
 
     // Check to see if you have already loaded all of the PAT sections
@@ -674,9 +676,9 @@ void SIParser::ParsePAT(tablehead_t *head, uint8_t *buffer,int size)
              .arg(PrivateTypes.CurrentTransportID));
 
     int pos = -1;
-    while (pos < (size - 4))
+    while (pos < ((int)size - 4))
     {
-        if (pos+4 >= (size-4))
+        if (pos+4 >= ((int)size-4))
         {
             break;
         }
@@ -712,14 +714,15 @@ void SIParser::ParsePAT(tablehead_t *head, uint8_t *buffer,int size)
 
 }
 
-void SIParser::ParseCAT(tablehead_t *head, uint8_t *buffer, int size)
+void SIParser::ParseCAT(uint /*pid*/, tablehead_t *head,
+                        uint8_t *buffer, uint size)
 {
     (void) head;
 
     CAPMTObject c;
 
     int pos = -1;
-    while (pos < (size - 4))
+    while (pos < ((int)size - 4))
     {
         if (buffer[pos+1] == 0x09)
         {
@@ -733,7 +736,8 @@ void SIParser::ParseCAT(tablehead_t *head, uint8_t *buffer, int size)
 
 }
 
-void SIParser::ParsePMT(tablehead_t *head, uint8_t *buffer, int size)
+void SIParser::ParsePMT(uint pid, tablehead_t *head,
+                        uint8_t *buffer, uint size)
 {
     // TODO: Catch serviceMove descriptor and send a signal when you get one
     //       to retune to correct transport or send an error tuning the channel
@@ -757,29 +761,25 @@ void SIParser::ParsePMT(tablehead_t *head, uint8_t *buffer, int size)
     uint16_t tempPos = pos + pidescriptors_length;
     while (pos < tempPos)
     {
-        switch (buffer[pos])
+        if (buffer[pos] == 0x09)
         {
             // Conditional Access Descriptor
-            case 0x09:
-            {
-                CAPMTObject cad = ParseDescCA(&buffer[pos], buffer[pos + 1]);
-                p.CA.append(cad);
-                p.hasCA = true;
-            }
-            break;
-
-            default:
-                ProcessUnusedDescriptor(&buffer[pos], buffer[pos + 1] + 2);
-                p.Descriptors.append(
-                    Descriptor(&buffer[pos], buffer[pos + 1] + 2));
-            break;
+            CAPMTObject cad = ParseDescCA(&buffer[pos], buffer[pos + 1]);
+            p.CA.append(cad);
+            p.hasCA = true;
+        }
+        else
+        {
+            p.Descriptors.append(
+                Descriptor(&buffer[pos], buffer[pos + 1] + 2));
+            ProcessUnusedDescriptor(pid, &buffer[pos], buffer[pos + 1] + 2);
         }
         pos += buffer[pos+1] + 2;
     }
 
 
     // Process streams
-    while ((pos + 4) < size)
+    while ((pos + 4) < (int)size)
     {
 
         ElementaryPIDObject e;
@@ -876,13 +876,10 @@ void SIParser::ParsePMT(tablehead_t *head, uint8_t *buffer, int size)
                         break;
 
                     case 0x6A: // AC3 Descriptor
-                        SIPARSER(QString("AC3 Descriptor"));
                         e.Type = ES_TYPE_AUDIO_AC3;
                         break;
 
                     default:
-                        ProcessUnusedDescriptor(
-                            descriptor, descriptor_len + 2);
                         break;
                 }
             }
@@ -943,12 +940,12 @@ void SIParser::ParsePMT(tablehead_t *head, uint8_t *buffer, int size)
     ((PMTHandler*) Table[PMT])->pmt[head->table_id_ext] = p;
 }
 
-void SIParser::ProcessUnusedDescriptor(const uint8_t *data, uint)
+void SIParser::ProcessUnusedDescriptor(uint pid, const uint8_t *data, uint)
 {
     if (print_verbose_messages & VB_SIPARSER)
     {
-        VERBOSE(VB_SIPARSER, LOC + "Unused Descriptor: \n" +
-                MPEGDescriptor(data).toString());
+        QMutexLocker locker(&descLock);
+        descCount[pid<<8 | data[0]]++;
     }
 }
 
@@ -1052,7 +1049,8 @@ QDateTime SIParser::ConvertDVBDate(const uint8_t *dvb_buf)
  *------------------------------------------------------------------------*/
 
 
-void SIParser::ParseNIT(tablehead_t *head, uint8_t *buffer, int size)
+void SIParser::ParseNIT(uint pid, tablehead_t *head,
+                        uint8_t *buffer, uint size)
 {
     // Only process current network NITs for now
     if (head->table_id != 0x40)
@@ -1090,7 +1088,7 @@ void SIParser::ParseNIT(tablehead_t *head, uint8_t *buffer, int size)
                           ParseDescLinkage(&buffer[pos],buffer[pos+1],n);
                           break;
                default:
-                          ProcessUnusedDescriptor(&buffer[pos],
+                          ProcessUnusedDescriptor(pid, &buffer[pos],
                                                   buffer[pos+1] + 2);
                           break;
            }
@@ -1151,6 +1149,7 @@ void SIParser::ParseNIT(tablehead_t *head, uint8_t *buffer, int size)
                     break;
                 default:
                     ProcessUnusedDescriptor(
+                        pid,
                         &buffer[pos + 6 + dpos], buffer[pos + 7 + dpos] + 2);
                     break;
              }
@@ -1178,7 +1177,8 @@ void SIParser::ParseNIT(tablehead_t *head, uint8_t *buffer, int size)
 
 }
 
-void SIParser::ParseSDT(tablehead_t *head, uint8_t *buffer, int size)
+void SIParser::ParseSDT(uint pid, tablehead_t *head,
+                        uint8_t *buffer, uint size)
 {
     /* Signal to keep scan wizard bars moving */
     emit TableLoaded();
@@ -1251,7 +1251,7 @@ void SIParser::ParseSDT(tablehead_t *head, uint8_t *buffer, int size)
                      buffer[pos + 6 + lentotal], s);
                 break;
             default:
-                ProcessUnusedDescriptor(&buffer[pos + 5 + lentotal],
+                ProcessUnusedDescriptor(pid, &buffer[pos + 5 + lentotal],
                                         buffer[pos + 6 + lentotal] + 2);
                 break;
             }
@@ -1347,7 +1347,8 @@ uint SIParser::GetLanguagePriority(const QString &language)
     return *it;
 }
 
-void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer, uint size)
+void SIParser::ParseDVBEIT(uint pid, tablehead_t *head,
+                           uint8_t *buffer, uint size)
 {
     uint8_t last_segment_number  = buffer[4];
     uint8_t last_table_id        = buffer[5];
@@ -1452,6 +1453,7 @@ void SIParser::ParseDVBEIT(tablehead_t *head, uint8_t *buffer, uint size)
         while ((des_pos < (pos + descriptors_length)) && (des_pos <= size)) 
         { 
             des_pos += ProcessDVBEventDescriptors(
+                pid,
                 &buffer[des_pos],
                 bestPrioritySE, bestDescriptorSE,
                 bestPriorityEE, bestDescriptorsEE, event);
@@ -1951,13 +1953,14 @@ TransportObject SIParser::ParseDescCable(uint8_t *buffer, int)
      return retval;
 }
 
-/** \fn ProcessDVBEventDescriptors(const unsigned char*,QString&,const unsigned char*,QString&, vector<const unsigned char*>&,Event&)
+/** \fn ProcessDVBEventDescriptors(uint,const unsigned char*,QString&,const unsigned char*,QString&, vector<const unsigned char*>&,Event&)
  *  \brief Processes non-language dependent DVB Event descriptors, and caches
  *         language dependent DVB Event descriptors for the most preferred
  *         language.
  * \returns descriptor lenght + 2, aka total descriptor size
  */
 uint SIParser::ProcessDVBEventDescriptors(
+    uint                         pid,
     const unsigned char          *data,
     uint                         &bestPrioritySE,
     const unsigned char*         &bestDescriptorSE, 
@@ -2023,7 +2026,7 @@ uint SIParser::ProcessDVBEventDescriptors(
             break;
 
         default:
-            ProcessUnusedDescriptor(data, descriptorLength + 2);
+            ProcessUnusedDescriptor(pid, data, descriptorLength + 2);
             break;
     }
     return descriptorLength + 2;
@@ -2475,6 +2478,7 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
             break;
             default:
                 ProcessUnusedDescriptor(
+                    pid,
                     &buffer[pos + 2 + lentotal],
                     buffer[pos + 3 + lentotal] + 2);
                 break;
@@ -3446,4 +3450,26 @@ void SIParser::InitializeCategories()
     m_mapCategories[0xB3] = tr("Live Broadcast");
     // UK Freeview custom id
     m_mapCategories[0xF0] = tr("Drama");
+}
+
+void SIParser::PrintDescriptorStatistics(void) const
+{
+    if (!(print_verbose_messages & VB_SIPARSER))
+        return;
+
+    QMutexLocker locker(&descLock);
+    VERBOSE(VB_SIPARSER, LOC + "Descriptor Stats -- begin");
+    QMap<uint,uint>::const_iterator it = descCount.begin();
+    for (;it != descCount.end(); ++it)
+    {
+        uint pid = it.key() >> 8;
+        uint cnt = (*it);
+        unsigned char sid = it.key() & 0xff;
+        VERBOSE(VB_SIPARSER, LOC +
+                QString("On PID 0x%1: Found %2, %3 Descriptor%4")
+                .arg(pid,0,16).arg(cnt)
+                .arg(MPEGDescriptor(&sid).DescriptorTagString())
+                .arg((cnt>1) ? "s" : ""));
+    }
+    VERBOSE(VB_SIPARSER, LOC + "Descriptor Stats -- end");
 }

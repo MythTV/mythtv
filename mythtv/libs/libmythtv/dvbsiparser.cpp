@@ -50,6 +50,9 @@ using namespace std;
 #include "dvbchannel.h"
 #include "dvbrecorder.h"
 
+#define LOC QString("DVBSIParser: ")
+#define LOC_ERR QString("DVBSIParser, Error: ")
+
 DVBSIParser::DVBSIParser(int cardNum, bool start_thread)
     : SIParser("DVBSIParser"),  cardnum(cardNum), 
       exitSectionThread(false), sectionThreadRunning(false),
