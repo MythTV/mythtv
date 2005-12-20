@@ -17,6 +17,7 @@ using namespace std;
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <directfb_version.h>
 
 #define DFBCHECKFAIL(dfbcommand, returnstmt...)\
 {\
@@ -343,17 +344,24 @@ bool VideoOutputDirectfb::Init(int width, int height, float aspect, WId winid,
     //determine output card capacities
 #if (DIRECTFB_MINOR_VERSION <= 9) && (DIRECTFB_MICRO_VERSION <= 22)
     DFBCHECKFAIL(data->dfb->GetCardCapabilities(data->dfb, &(data->cardCapabilities)), false);
-#else
-    DFBCHECKFAIL(data->dfb->GetDeviceDescription(data->dfb, &(data->cardDescription)), false);
-#endif
     VERBOSE(VB_GENERAL, QString("DirectFB output : card : %1")
             .arg((data->cardCapabilities.acceleration_mask & DFXL_BLIT) > 0 ?
                  "hardware blit support" : "NO hardware blit support"));
+#else
+    DFBCHECKFAIL(data->dfb->GetDeviceDescription(data->dfb, &(data->cardDescription)), false);
+    VERBOSE(VB_GENERAL, QString("DirectFB output : card : %1")
+            .arg((data->cardDescription.acceleration_mask & DFXL_BLIT) > 0 ?
+                 "hardware blit support" : "NO hardware blit support"));
+#endif
 
     //clear primary layer
     desc.flags = DSDESC_CAPS;
     desc.caps = DSCAPS_PRIMARY;
+#if (DIRECTFB_MINOR_VERSION <= 9) && (DIRECTFB_MICRO_VERSION <= 22)
     if (data->cardCapabilities.acceleration_mask & DFXL_BLIT)
+#else
+    if (data->cardDescription.acceleration_mask & DFXL_BLIT)
+#endif
         desc.caps = (DFBSurfaceCapabilities)(desc.caps | DSCAPS_DOUBLE);
     DFBCHECKFAIL(data->dfb->CreateSurface(data->dfb, &desc, &(data->primarySurface)), false);
     DFBCHECKFAIL(data->primarySurface->Clear(data->primarySurface, 0, 0, 0, 0xff), false);
@@ -530,7 +538,11 @@ void VideoOutputDirectfb::PrepareFrame(VideoFrame *buffer, FrameScanType)
     }
     if (!bufferSurface)
         return;
+#if (DIRECTFB_MINOR_VERSION <= 9) && (DIRECTFB_MICRO_VERSION <= 22)
     if ((data->cardCapabilities.acceleration_mask & DFXL_BLIT) > 0)
+#else
+    if ((data->cardDescription.acceleration_mask & DFXL_BLIT) > 0)
+#endif
     {
         DFBCHECK(data->videoSurface->Blit(data->videoSurface, bufferSurface, NULL, 0, 0));
     }
