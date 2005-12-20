@@ -866,7 +866,7 @@
         </container>
 
         <container name="videoinfo">
-            <area>0,321,800,300</area>
+            <area>0,297,800,300</area>
             <textarea name="video_title" draworder="4">
                 <area>50,70,530,60</area>
                 <font>largetitle</font>
@@ -890,16 +890,16 @@
                 <font>infofont</font>
             </textarea>
             <image name="video_poster" draworder="1" fleximage="no">
-                <position>551,18</position>
-                <staticsize>166,260</staticsize>
+                <position>550,20</position>
+                <staticsize>167,255</staticsize>
             </image>
             <textarea name="pl_label" draworder="4" align="right">
-                <area>700,255,60,40</area>
+                <area>710,255,60,40</area>
                 <font>labelfont</font>
                 <value>PL </value>
             </textarea>
             <textarea name="pl_value" draworder="4">
-                <area>760,255,20,40</area>
+                <area>770,255,20,40</area>
                 <font>labelfont</font>
                 <value>1</value>
             </textarea>

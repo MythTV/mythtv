@@ -272,8 +272,12 @@ void VideoTree::handleTreeListEntry(int node_int, IntVector*)
         {
             video_poster->SetImage(curitem->CoverFile());
             video_poster->LoadImage();
-        } else
-            video_poster->ResetImage();
+        } 
+        else
+        {
+            video_poster->SetImage("blank.png");
+            video_poster->LoadImage();
+        }
 
         if (video_plot)
                 video_plot->SetText(curitem->Plot());
