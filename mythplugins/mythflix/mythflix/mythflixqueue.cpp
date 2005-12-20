@@ -22,11 +22,13 @@
 #include <iostream>
 
 #include <qnetwork.h>
+#include <qapplication.h>
 #include <qdatetime.h>
 #include <qpainter.h>
 #include <qdir.h>
 #include <qtimer.h>
 #include <qregexp.h>
+#include <qprocess.h>
 
 #include <qurl.h>
 #include "mythtv/mythcontext.h"
@@ -327,6 +329,10 @@ void MythFlixQueue::keyPressEvent(QKeyEvent *e)
             cursorDown();
         else if (action == "PAGEDOWN")
              cursorDown(true);
+        else if (action == "REMOVE")
+             removeFromQueue();
+        else if (action == "MOVETOTOP")
+             moveToTop();
         else
             handled = false;
     }
@@ -388,9 +394,192 @@ void MythFlixQueue::processAndShowNews(NewsSite* site)
     } 
 }
 
+void MythFlixQueue::moveToTop()
+{
+    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+
+    if (articleUIItem && articleUIItem->getData())
+    {
+        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+        if(article)
+        {
+
+            QStringList args = QStringList::split(' ',
+                    gContext->GetSetting("NetFlixMoveToTopCommandLine", 
+                    gContext->GetShareDir() + "mythflix/scripts/netflix.pl -1"));
+
+            QString cmdUrl(article->articleURL());
+            cmdUrl.replace('\'', "%27");
+
+            QUrl url(cmdUrl);
+
+            QString query = url.query();
+            QStringList getArgs = QStringList::split('&', query);
+
+            for (QStringList::Iterator it = getArgs.begin();it != getArgs.end(); ++it) 
+            {
+                QString name = (*it).section('=', 0, 0);
+                QString vale = (*it).section('=', 1);
+
+                args += vale;
+            }
+            // execute external command to obtain list of possible movie matches 
+            QString results = executeExternal(args, "Move To Top");
+        
+            slotRetrieveNews();
+    
+        }
+    } 
+
+}
+
+void MythFlixQueue::removeFromQueue()
+{
+    UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
+
+    if (articleUIItem && articleUIItem->getData())
+    {
+        NewsArticle *article = (NewsArticle*) articleUIItem->getData();
+        if(article)
+        {
+
+            QStringList args = QStringList::split(' ',
+                    gContext->GetSetting("NetFlixRemoveFromQueueCommandLine", 
+                    gContext->GetShareDir() + "mythflix/scripts/netflix.pl -R"));
+
+            QString cmdUrl(article->articleURL());
+            cmdUrl.replace('\'', "%27");
+
+            QUrl url(cmdUrl);
+
+            QString query = url.query();
+            QStringList getArgs = QStringList::split('&', query);
+
+            for (QStringList::Iterator it = getArgs.begin();it != getArgs.end(); ++it) 
+            {
+                QString name = (*it).section('=', 0, 0);
+                QString vale = (*it).section('=', 1);
+
+                args += vale;
+            }
+            // execute external command to obtain list of possible movie matches 
+            QString results = executeExternal(args, "Remove From Queue");
+        
+            slotRetrieveNews();
+    
+        }
+    } 
+
+}
+
 void MythFlixQueue::slotArticleSelected(UIListBtnTypeItem*)
 {
     update(m_ArticlesRect);
     update(m_InfoRect);
 }
+
+// Execute an external command and return results in string
+//   probably should make this routing async vs polling like this
+//   but it would require a lot more code restructuring
+QString MythFlixQueue::executeExternal(const QStringList& args, const QString& purpose) 
+{
+    QString ret = "";
+    QString err = "";
+
+    VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose).
+                      arg(args.join(" ")).local8Bit() );
+    QProcess proc(args, this);
+
+    QString cmd = args[0];
+    QFileInfo info(cmd);
+    
+    if (!info.exists()) 
+    {
+       err = QString("\"%1\" failed: does not exist").arg(cmd.local8Bit());
+    } 
+    else if (!info.isExecutable()) 
+    {
+       err = QString("\"%1\" failed: not executable").arg(cmd.local8Bit());
+    } 
+    else if (proc.start()) 
+    {
+        while (true) 
+        {
+            while (proc.canReadLineStdout() || proc.canReadLineStderr()) 
+            {
+                if (proc.canReadLineStdout()) 
+                {
+                    ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
+                } 
+              
+                if (proc.canReadLineStderr()) 
+                {
+                    if (err == "") 
+                    {
+                        err = cmd + ": ";
+                    }                    
+                 
+                    err += QString::fromLocal8Bit(proc.readLineStderr(),-1) + "\n";
+                }
+            }
+           
+            if (proc.isRunning()) 
+            {
+                qApp->processEvents();
+                usleep(10000);
+            } 
+            else 
+            {
+                if (!proc.normalExit()) 
+                {
+                    err = QString("\"%1\" failed: Process exited abnormally")
+                                  .arg(cmd.local8Bit());
+                } 
+                
+                break;
+            }
+        }
+    } 
+    else 
+    {
+        err = QString("\"%1\" failed: Could not start process")
+                      .arg(cmd.local8Bit());
+    }
+
+    while (proc.canReadLineStdout() || proc.canReadLineStderr()) 
+    {
+        if (proc.canReadLineStdout()) 
+        {
+            ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
+        }
+        
+        if (proc.canReadLineStderr()) 
+        {
+            if (err == "") 
+            {
+                err = cmd + ": ";
+            }                
+           
+            err += QString::fromLocal8Bit(proc.readLineStderr(), -1) + "\n";
+        }
+    }
+
+    if (err != "")
+    {
+        QString tempPurpose(purpose);
+        
+        if (tempPurpose == "")
+            tempPurpose = "Command";
+
+        cerr << err << endl;
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+        QObject::tr(tempPurpose + " failed"), QObject::tr(err + "\n\nCheck NetFlix Settings"));
+        ret = "#ERROR";
+    }
+    
+    VERBOSE(VB_ALL, ret); 
+    return ret;
+}
+
+
 

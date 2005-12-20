@@ -105,9 +105,8 @@ void setupKeys(void)
 {
     REG_JUMP("Browse", "", "", browse);
 
-    REG_KEY("NetFlix", "RETRIEVENEWS", "Update news items", "I");
-    REG_KEY("NetFlix", "FORCERETRIEVE", "Force update news items", "M");
-    REG_KEY("NetFlix", "CANCEL", "Cancel news item updating", "C");
+    REG_KEY("NetFlix", "MOVETOTOP", "Moves movie to top of queue", "1");
+    REG_KEY("NetFlix", "REMOVE", "Removes movie from queue", "D");
 
     //REG_JUMP("MythFlix", "NetFlix", "", runNews);
 

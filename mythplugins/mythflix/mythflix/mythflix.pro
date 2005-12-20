@@ -15,8 +15,10 @@ installfiles.path = $${PREFIX}/share/mythtv/mythflix
 installfiles.files = netflix-rss.xml
 installimages.path = $${PREFIX}/share/mythtv/themes/default
 installimages.files = images/*.png
+installscripts.path = $${PREFIX}/share/mythtv/mythflix/scripts
+installscripts.files = scripts/*.pl
 
-INSTALLS += installfiles installimages installmenus uifiles
+INSTALLS += installfiles installimages installmenus installscripts uifiles
 
 # Input
 HEADERS += mythflixqueue.h mythflix.h mythflixconfig.h newsengine.h

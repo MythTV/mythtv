@@ -62,6 +62,8 @@ private:
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
 
+    QString executeExternal(const QStringList& args, const QString& purpose);
+
     XMLParse      *m_Theme;
 
     UIListBtnType *m_UISites;
@@ -73,10 +75,6 @@ private:
 
     NewsSite::List m_NewsSites;
 
-    QHttp         *http;
-
-    QString        netflixShopperId;
-
 private slots:
     void slotViewArticle();
     void slotRetrieveNews();
@@ -85,7 +83,6 @@ private slots:
     void slotSiteSelected(UIListBtnTypeItem *item);
     void slotArticleSelected(UIListBtnTypeItem *item);
 
-    void slotMovieAdded(const QHttpResponseHeader &resp);
 };
 
 #endif /* MYTHFLIX_H */

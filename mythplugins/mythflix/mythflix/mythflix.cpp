@@ -22,11 +22,13 @@
 #include <iostream>
 
 #include <qnetwork.h>
+#include <qapplication.h>
 #include <qdatetime.h>
 #include <qpainter.h>
 #include <qdir.h>
 #include <qtimer.h>
 #include <qregexp.h>
+#include <qprocess.h>
 
 #include <qurl.h>
 #include "mythtv/mythcontext.h"
@@ -95,9 +97,6 @@ MythFlix::MythFlix(MythMainWindow *parent, const char *name )
             this, SLOT(slotNewsRetrieved(NewsSite*)));
     
     slotRetrieveNews();
-
-    netflixShopperId = gContext->GetSetting("NetflixShopperId");
-    VERBOSE(VB_GENERAL, QString("MythFlix: Using NetflixShopperId %1").arg(netflixShopperId));
 }
 
 MythFlix::~MythFlix()
@@ -533,7 +532,9 @@ void MythFlix::slotViewArticle()
         if(article)
         {
 
-//            updateAddingView();
+            QStringList args = QStringList::split(' ',
+                    gContext->GetSetting("NetFlixAddQueueCommandLine", 
+                    gContext->GetShareDir() + "mythflix/scripts/netflix.pl -A"));
 
             QString cmdUrl(article->articleURL());
             cmdUrl.replace('\'', "%27");
@@ -541,43 +542,124 @@ void MythFlix::slotViewArticle()
             QUrl url(cmdUrl);
 
             QString query = url.query();
+            QStringList getArgs = QStringList::split('&', query);
 
-            QString get("/AddToQueue?");
-            get.append(query);
+            for (QStringList::Iterator it = getArgs.begin();it != getArgs.end(); ++it) 
+            {
+                QString name = (*it).section('=', 0, 0);
+                QString vale = (*it).section('=', 1);
 
-            http = new QHttp();
-            connect(http, SIGNAL(responseHeaderReceived (const QHttpResponseHeader&)), this, SLOT(slotMovieAdded(const QHttpResponseHeader&)));
-            //connect(http, SIGNAL(done (const QHttpResponseHeader&)), this, SLOT(slotMovieAdded(const QHttpResponseHeader&)));
-            
-            QHttpRequestHeader header( "GET", get );
-            header.setValue( "Cookie", "validReEntryCookie=Y; validReEntryConfirmed=Y; NetflixShopperId=" + netflixShopperId + ";" );
-            header.setValue( "Host", "www.netflix.com" );
-
-            http->setHost( "www.netflix.com" );
-            http->request( header );
+                args += vale;
+            }
+		
+			// execute external command to obtain list of possible movie matches 
+			QString results = executeExternal(args, "Add Movie");
+		
         }
     } 
 }
 
-void MythFlix::slotMovieAdded(const QHttpResponseHeader &resp)
+// Execute an external command and return results in string
+//   probably should make this routing async vs polling like this
+//   but it would require a lot more code restructuring
+QString MythFlix::executeExternal(const QStringList& args, const QString& purpose) 
 {
-    QString location = resp.value(QString("Location"));
+    QString ret = "";
+    QString err = "";
 
-    if (location)
+    VERBOSE(VB_GENERAL, QString("%1: Executing '%2'").arg(purpose).
+                      arg(args.join(" ")).local8Bit() );
+    QProcess proc(args, this);
+
+    QString cmd = args[0];
+    QFileInfo info(cmd);
+    
+    if (!info.exists()) 
     {
-        //How do you clean up http objects
-        //do you listen for signal done
-        //delete http;
-
-        VERBOSE(VB_NETWORK, QString("MythFlix: Redirecting to (%1)").arg(location));
-
-        http = new QHttp();
-        connect(http, SIGNAL(responseHeaderReceived (const QHttpResponseHeader&)), this, SLOT(slotMovieAdded(const QHttpResponseHeader&)));
-
-        QHttpRequestHeader header( "GET", location );
-        header.setValue( "Cookie", "validReEntryCookie=Y; validReEntryConfirmed=Y; NetflixShopperId=" + netflixShopperId + ";" );
-        header.setValue( "Host", "www.netflix.com" );
-        http->setHost( "www.netflix.com" );
-        http->request( header );
+       err = QString("\"%1\" failed: does not exist").arg(cmd.local8Bit());
+    } 
+    else if (!info.isExecutable()) 
+    {
+       err = QString("\"%1\" failed: not executable").arg(cmd.local8Bit());
+    } 
+    else if (proc.start()) 
+    {
+        while (true) 
+        {
+            while (proc.canReadLineStdout() || proc.canReadLineStderr()) 
+            {
+                if (proc.canReadLineStdout()) 
+                {
+                    ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
+                } 
+              
+                if (proc.canReadLineStderr()) 
+                {
+                    if (err == "") 
+                    {
+                        err = cmd + ": ";
+                    }                    
+                 
+                    err += QString::fromLocal8Bit(proc.readLineStderr(),-1) + "\n";
+                }
+            }
+           
+            if (proc.isRunning()) 
+            {
+                qApp->processEvents();
+                usleep(10000);
+            } 
+            else 
+            {
+                if (!proc.normalExit()) 
+                {
+                    err = QString("\"%1\" failed: Process exited abnormally")
+                                  .arg(cmd.local8Bit());
+                } 
+                
+                break;
+            }
+        }
+    } 
+    else 
+    {
+        err = QString("\"%1\" failed: Could not start process")
+                      .arg(cmd.local8Bit());
     }
+
+    while (proc.canReadLineStdout() || proc.canReadLineStderr()) 
+    {
+        if (proc.canReadLineStdout()) 
+        {
+            ret += QString::fromLocal8Bit(proc.readLineStdout(),-1) + "\n";
+        }
+        
+        if (proc.canReadLineStderr()) 
+        {
+            if (err == "") 
+            {
+                err = cmd + ": ";
+            }                
+           
+            err += QString::fromLocal8Bit(proc.readLineStderr(), -1) + "\n";
+        }
+    }
+
+    if (err != "")
+    {
+        QString tempPurpose(purpose);
+        
+        if (tempPurpose == "")
+            tempPurpose = "Command";
+
+        cerr << err << endl;
+        MythPopupBox::showOkPopup(gContext->GetMainWindow(),
+        QObject::tr(tempPurpose + " failed"), QObject::tr(err + "\n\nCheck NetFlix Settings"));
+        ret = "#ERROR";
+    }
+    
+    VERBOSE(VB_ALL, ret); 
+    return ret;
 }
+
+

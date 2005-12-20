@@ -23,23 +23,15 @@ Once the make is completed, do a 'make install' as root
   /usr/local/share/mythtv/mythflix directory
 - image files and ui file go to /usr/local/share/mythtv/themes/default
 
-Mythtv menu needs to be modified to support MythFlix plugin.  Patches for the menu 
-xml files are provided.  Apply each patch: patch -p0 < xxxx.patch.  When prompted for
-which file to patch: 
-- main_settings.xml.patch ->  /usr/local/share/mythtv/main_settings.xml
-- info_menu.xml.patch  -> /usr/local/share/mythtv/info_menu.xml
-- info_settings.xml.patch -> /usr/local/share/mythtv/info_settings.xml
-- theme.xml.patch  -> /usr/local/share/mythtv/themes/G.A.N.T./theme.xml
-
-Insert you Netflix ShopperId in the database.  Your Netflix shopperId can be found in
-your browser's cookie. For KDE Konqueuer users, your cookie file is .kde/share/apps//kcookiejar/cookies
-look for cookie key NetflixShopperId.  The cookie value should look like something like P234214938249083290480903298 
-
-    insert settings values ('NetflixShopperId','[NetflixShooperId]', null);
-
 Run mythfrontend and setup the Netflix RSS feeds to include when you browse for movies. 
 You MUST run the mythfrontend first to give the plugin a chance to intial the database
 before continuing. See CONFIGURATION/USAGE.
+
+Currenty, MythFlix plugin lacks a more rebust configuration UI.  So your netflix account settings need to be initilized manually.
+To do this run the following command.  For some reason to properly intialized the netflix cookie you must run script twice.
+
+/usr/local/share/mythtv/mythflix/scripts/netflix.pl -L <userid> <passwd>
+/usr/local/share/mythtv/mythflix/scripts/netflix.pl -L <userid> <passwd>
 
 FINAL INSTALLATION
 ---------------------------------------------------------------------
@@ -67,3 +59,6 @@ left column and corresponding movies on the right). You can
 move between RSS feeds/articles using the UP/DOWN keys and between
 the news sites column and articles column using the LEFT/RIGHT
 keys. 
+
+In the Queue screen, pressing "1" will move an item to the top of the 
+queue while "D" will remove it from the queue.

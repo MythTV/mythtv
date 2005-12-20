@@ -60,6 +60,10 @@ private:
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
 
+    void moveToTop();
+    void removeFromQueue();
+    QString executeExternal(const QStringList& args, const QString& purpose);
+
     XMLParse      *m_Theme;
 
     UIListBtnType *m_UIArticles;
