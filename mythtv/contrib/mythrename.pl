@@ -249,7 +249,7 @@ EOF
         my ($eyear, $emonth, $eday, $ehour, $eminute, $esecond) = $info{'endtime'}   =~ /(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/;
     # Format some fields we may be parsing below
         # Start time
-        my $meridian = ($shour > 12) ? 'AM' : 'PM';
+        my $meridian = ($shour > 12) ? 'PM' : 'AM';
         my $hour = ($shour > 12) ? $shour - 12 : $shour;
         if ($hour < 10) {
             $hour = "0$hour";
@@ -258,7 +258,7 @@ EOF
             $hour = 12;
         }
         # End time
-        my $emeridian = ($ehour > 12) ? 'AM' : 'PM';
+        my $emeridian = ($ehour > 12) ? 'PM' : 'AM';
         my $ethour = ($ehour > 12) ? $ehour - 12 : $ehour;
         if ($ethour < 10) {
             $ethour = "0$ethour";
