@@ -1553,6 +1553,21 @@ int MPEG2fixup::Start()
         expectedPTS[it.key()] = udiff2x33(af->first()->pkt.pts, initPTS);
     }
 
+    if (delMap.count())
+    {
+        QString msg("Cutlist:");
+        int64_t start = -1;
+        if (discard)
+            start = 0;
+        QMap<long long, int>::Iterator it = delMap.begin();
+        for (it = delMap.begin(); it != delMap.end(); ++it)
+            if (*it == 0)
+                msg += QString("\n\t\t%1 - %2").arg(start).arg(it.key());
+            else
+                start = it.key();
+        VERBOSE(MPF_PROCESS, msg);
+    }
+
     InitReplex();
 
     int state = 1;
