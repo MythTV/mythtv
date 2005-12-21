@@ -28,6 +28,11 @@ our $sourceforge = 'http://internap.dl.sf.net';
 # At the moment, there is mythtv plus these two
 our @components = ( 'myththemes', 'mythplugins' );
 
+# The OS X programs that we are likely to be interested in.
+our @targetsFE = ( 'MythFrontend',  'MythCommFlag',
+                   'MythJobQueue',  'MythTranscode');
+our @targetsBE = ( 'MythBackend',   'MythFillDatabase',
+                   'MythTranscode', 'MythTV-Setup');
 
 our %depend_order = (
   'mythtv'
@@ -735,28 +740,42 @@ chomp $VERS;
 $VERS =~ s/^.*\-(.*)\.dylib$/$1/s;
 $VERS .= '.' . $OPT{'version'} if $OPT{'version'};
 
-### Assemble application package
-if (1)
+### Create each package.
+### Note that this is a bit of a waste of disk space,
+### because there are now multiple copies of each library.
+my @targets = @targetsFE;
+if ( $backend )
+{   push @targets, @targetsBE   }
+
+foreach my $target ( @targets )
 {
+  my $finalTarget = "$SCRIPTDIR/$target.app";
+  my $builtTarget = $target;
+  $builtTarget =~ tr/[A-Z]/[a-z]/;
+
   # Get a fresh copy of the app
-  &Verbose("Building self-contained MythFrontend");
+  &Verbose("Building self-contained $target");
+  &Syscall([ 'rm', '-fr', $finalTarget ]) or die;
   &Syscall([ '/bin/cp', '-R',
-             "$PREFIX/bin/mythfrontend.app",
-             $MFE ]) or die;
+             "$PREFIX/bin/$builtTarget.app",
+             $finalTarget ]) or die;
   
   # write a custom Info.plist
-  &FrontendPlist($MFE, $VERS);
+  &FrontendPlist($finalTarget, $VERS);
   
   # Make frameworks from Myth libraries
-  &Verbose("Installing frameworks into MythFrontend");
-  my $fw_dir = "$MFE/Contents/Frameworks";
+  &Verbose("Installing frameworks into $target");
+  my $fw_dir = "$finalTarget/Contents/Frameworks";
   mkdir($fw_dir);
-  my $dephash = &ProcessDependencies("$MFE/Contents/MacOS/mythfrontend",
+  my $dephash = &ProcessDependencies("$finalTarget/Contents/MacOS/$builtTarget",
                                      glob("$PREFIX/lib/mythtv/*/*.dylib"));
   my @deps = values %$dephash;
   while (scalar @deps)
   {
-    my $file = &MakeFramework(&FindLibraryFile(shift @deps), $fw_dir);
+    my $dep = shift @deps;
+    next if $dep =~ m/executable_path/;
+
+    my $file = &MakeFramework(&FindLibraryFile($dep), $fw_dir);
     my $newhash = &ProcessDependencies($file);
     foreach my $base (keys %$newhash)
     {
@@ -766,17 +785,20 @@ if (1)
     }
   }
   
+ if ( $target eq "MythFrontend" or $target eq "MythTV-Setup" )
+ {
   # Install themes, filters, etc.
   &Verbose("Installing resources into MythFrontend");
-  mkdir "$MFE/Contents/Resources";
-  mkdir "$MFE/Contents/Resources/lib";
+  mkdir "$finalTarget/Contents/Resources";
+  mkdir "$finalTarget/Contents/Resources/lib";
   &Syscall([ '/bin/cp', '-R',
              "$PREFIX/lib/mythtv",
-             "$MFE/Contents/Resources/lib" ]) or die;
-  mkdir "$MFE/Contents/Resources/share";
+             "$finalTarget/Contents/Resources/lib" ]) or die;
+  mkdir "$finalTarget/Contents/Resources/share";
   &Syscall([ '/bin/cp', '-R',
              "$PREFIX/share/mythtv",
-             "$MFE/Contents/Resources/share" ]) or die;
+             "$finalTarget/Contents/Resources/share" ]) or die;
+ }
 }
 
 if ($OPT{usehdimage})
@@ -956,11 +978,18 @@ sub ProcessDependencies
     &Verbose($cmd);
     my @deps = `$cmd`;
     shift @deps;  # first line just repeats filename
+    &Verbose("Dependencies for $file = @deps");
     foreach my $dep (@deps)
     {
       chomp $dep;
       $dep =~ s/\s+(.*) \(.*\)$/$1/;
       
+      # otool sometimes lists the framework as depending on itself
+      next if ($file =~ m,/Versions/A/$dep,);
+
+      # Any dependency which is already package relative can be ignored
+      next if $dep =~ m/\@executable_path/;
+
       # skip system library locations
       next if ($dep =~ m|^/System|  ||
                $dep =~ m|^/usr/lib|);
@@ -1002,7 +1031,7 @@ sub BaseVers
     return ($1, undef);
   }
   
-  &Verbose("Could not parse library file name $filename");
+  &Verbose("Not a library file: $filename");
   return $filename;
 } # end BaseVers
   
@@ -1099,8 +1128,9 @@ sub MountHDImage
     {
         if (! -e "$SCRIPTDIR/.osx-packager.dmg")
         {
-            Syscall(['hdiutil', 'create', '-size', '1000m', "$SCRIPTDIR/.osx-packager.dmg",
-                     '-volname', 'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']);
+            Syscall(['hdiutil', 'create', '-size', '1200m',
+                     "$SCRIPTDIR/.osx-packager.dmg", '-volname',
+                     'MythTvPackagerHDImage', '-fs', 'UFS', '-quiet']);
         }
 
         Syscall(['hdiutil', 'mount', "$SCRIPTDIR/.osx-packager.dmg",
