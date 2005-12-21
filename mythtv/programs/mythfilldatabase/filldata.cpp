@@ -2839,7 +2839,7 @@ bool fillData(QValueList<Source> &sourcelist)
     QString querystr;
     QDateTime GuideDataBefore, GuideDataAfter;
 
-    query.exec(QString("SELECT MAX(endtime) FROM program;"));
+    query.exec(QString("SELECT MAX(endtime) FROM program WHERE manualid=0;"));
     if (query.isActive() && query.size() > 0)
     {
         query.next();
@@ -3122,7 +3122,7 @@ bool fillData(QValueList<Source> &sourcelist)
         }
     }
 
-    query.exec(QString("SELECT MAX(endtime) FROM program;"));
+    query.exec(QString("SELECT MAX(endtime) FROM program WHERE manualid=0;"));
     if (query.isActive() && query.size() > 0)
     {
         query.next();
