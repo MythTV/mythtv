@@ -1557,6 +1557,7 @@ int MPEG2fixup::Start()
 
             while (vFrame.current() != vFrame.getLast())
             {
+                bool ptsorder_eq_dtsorder = false;
                 int frame_pos = vFrame.at();
                 int reorder;
                 int64_t dtsExtra = 0;
@@ -1567,6 +1568,10 @@ int MPEG2fixup::Start()
                 {
                     VERBOSE(MPF_IMPORTANT, QString("expectedPTS != expectedDTS"
                               "+ptsIncrement"));
+                    VERBOSE(MPF_PROCESS, QString("%1 != %2 +%3")
+                                       .arg(PtsTime(expectedvPTS / 300))
+                                       .arg(PtsTime(expectedDTS / 300))
+                                       .arg(PtsTime(ptsIncrement)));
                     return TRANSCODE_EXIT_UNKNOWN_ERROR;
                 }
                 //reorder frames in presentation order (to the next I/P frame)
@@ -1642,12 +1647,14 @@ int MPEG2fixup::Start()
                             if (ConvertToI(GetFrameNum(Lreorder[0]), num,
                                              frame_pos))
                                 return TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR;
+                            ptsorder_eq_dtsorder = true;
                         }
                         else if (! new_discard_state &&
                                  GetFrameTypeT(Lreorder[i]) == 'I')
                         {
                             vFrame.remove(frame_pos);
                             vFrame.insert(frame_pos + i, Lreorder[i]);
+                            ptsorder_eq_dtsorder = true;
                         }
 
                         //convert from presentation-order to decode-order
@@ -1740,8 +1747,11 @@ int MPEG2fixup::Start()
 
                     //dtsExtra is applied at the end of this block iff the current
                     //tail has repeat_first_field set
-                    dtsExtra = 150 * ptsIncrement *
-                               (GetNbFields(vFrame.at(frame_pos)) - 2);
+                    if (ptsorder_eq_dtsorder)
+                        dtsExtra = 0;
+                    else
+                        dtsExtra = 150 * ptsIncrement *
+                                   (GetNbFields(vFrame.at(frame_pos)) - 2);
 
                     if (! markedFrame && deltaPTS > (4*ptsIncrement / 5))
                     {
@@ -1785,7 +1795,7 @@ int MPEG2fixup::Start()
                         if (GetFrameTypeT(vFrame.current()) == 'B')
                             vFrame.current()->pkt.pts = (expectedDTS / 300);
                         expectedDTS += 150 * ptsIncrement *
-                                       (i == 0 ?
+                                       ((! ptsorder_eq_dtsorder && i == 0) ?
                                         2 : GetNbFields(vFrame.current()));
                         VERBOSE(MPF_FRAME,QString("VID: %1 #:%2 nb: %3"
                                 " pts: %4 dts: %5")
