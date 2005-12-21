@@ -386,7 +386,8 @@ void MPEG2fixup::InitReplex()
     {
         int i = aud_map[it.key()];
 
-        if (GetStreamType(it.key()) == CODEC_ID_MP2)
+        if (GetStreamType(it.key()) == CODEC_ID_MP2 ||
+            GetStreamType(it.key()) == CODEC_ID_MP3)
         {
             ring_init(&rx.arbuf[i], memsize / 5);
             ring_init(&rx.index_arbuf[i], INDEX_BUF);
@@ -475,7 +476,8 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         rbi = &rx.index_ac3rbuf[aud_map[id]];
         iu.framesize = f->pkt.size;
     }
-    else if (GetStreamType(id) == CODEC_ID_MP2)
+    else if (GetStreamType(id) == CODEC_ID_MP2 ||
+             GetStreamType(id) == CODEC_ID_MP3)
     { //mp2
         rb = &rx.arbuf[aud_map[id]];
         rbi = &rx.index_arbuf[aud_map[id]];
@@ -577,6 +579,11 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
                 break;
 
             case CODEC_TYPE_AUDIO:
+                if (inputFC->streams[i]->codec->channels == 0)
+                {
+                    fprintf(stderr, "Skipping invalid audio stream: %d\n", i);
+                    break;
+                }
                 if (inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3)
                 {
                     aud_map[i] = ac3_count++;
@@ -585,14 +592,8 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
                 else if (inputFC->streams[i]->codec->codec_id == CODEC_ID_MP3 ||
                          inputFC->streams[i]->codec->codec_id == CODEC_ID_MP2)
                 {
-                    if (inputFC->streams[i]->codec->channels > 0)
-                    {
-                        aud_map[i] = mp2_count++;
-                        aFrame[i] = QPtrList<MPEG2frame> ();
-                    }
-                    else
-                        fprintf(stderr, "Skipping invalid audio stream: %d\n",
-                            i);
+                    aud_map[i] = mp2_count++;
+                    aFrame[i] = QPtrList<MPEG2frame> ();
                 }
                 else
                     fprintf(stderr, "Skipping unsupported audio stream: %d\n",
