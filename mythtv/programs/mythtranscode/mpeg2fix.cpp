@@ -46,6 +46,26 @@ void *my_malloc(unsigned size, mpeg2_alloc_t reason)
     return NULL;
 }
 
+void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
+{
+    (void) ptr;
+
+    static QString full_line("");
+    char str[256];
+
+    if (level > AV_LOG_INFO)
+        return;
+    vsprintf(str, fmt, vl);
+
+    full_line += QString(str);
+    if (full_line.endsWith("\n"))
+    {
+        full_line.truncate(full_line.length() - 1);
+        VERBOSE(VB_IMPORTANT, full_line);
+        full_line = QString("");
+    }
+}
+
 MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
                        QMap<long long, int> *deleteMap,
                        const char *fmt, int norp, int fixPTS, int maxf)
@@ -80,6 +100,7 @@ MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
     img_decoder = mpeg2_init();
 
     av_register_all();
+    av_log_set_callback(my_av_print);
 
     pthread_mutex_init(&rx.mutex, NULL);
     pthread_cond_init(&rx.cond, NULL);
@@ -512,8 +533,9 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         if (! ok)
         {
             //deadlock
-            fprintf(stderr, "Deadlock detected.  One buffer is full when\n");
-            fprintf(stderr, "the other is empty!  Aborting\n");
+            VERBOSE(VB_IMPORTANT,
+                    "Deadlock detected.  One buffer is full when\n"
+                    "\t\tthe other is empty!  Aborting\n");
             return 1;
         }
 
@@ -547,7 +569,8 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
 
     if (ret != 0)
     {
-        fprintf(stderr, "Couldn't open input file, error #%d\n", ret);
+        VERBOSE(VB_IMPORTANT,
+                QString("Couldn't open input file, error #%1").arg(ret));
         return 0;
     }
 
@@ -559,7 +582,8 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
 
     if (ret < 0)
     {
-        fprintf(stderr, "Couldn't get stream info, error #%d", ret);
+        VERBOSE(VB_IMPORTANT,
+                QString("Couldn't get stream info, error #%1").arg(ret));
         av_close_input_file(inputFC);
         inputFC = NULL;
         return 0;
@@ -581,7 +605,8 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
             case CODEC_TYPE_AUDIO:
                 if (inputFC->streams[i]->codec->channels == 0)
                 {
-                    fprintf(stderr, "Skipping invalid audio stream: %d\n", i);
+                    VERBOSE(MPF_GENERAL, QString(
+                            "Skipping invalid audio stream: %1").arg(i));
                     break;
                 }
                 if (inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3)
@@ -596,13 +621,15 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
                     aFrame[i] = QPtrList<MPEG2frame> ();
                 }
                 else
-                    fprintf(stderr, "Skipping unsupported audio stream: %d\n",
-                            inputFC->streams[i]->codec->codec_id);
+                    VERBOSE(MPF_GENERAL, QString(
+                            "Skipping unsupported audio stream: %1")
+                            .arg(inputFC->streams[i]->codec->codec_id));
                 break;
 
             default:
-                fprintf(stderr, "Skipping unsupported codec %d on stream %d\n",
-                        inputFC->streams[i]->codec->codec_type, i);
+                VERBOSE(MPF_GENERAL, QString(
+                        "Skipping unsupported codec %1 on stream %2")
+                        .arg(inputFC->streams[i]->codec->codec_type).arg(i));
         }
     }
 
@@ -769,14 +796,15 @@ bool MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
                     break;
 
                 case STATE_BUFFER:
-                    fprintf(stderr, "Warning: partial frame found!\n");
+                    VERBOSE(VB_GENERAL, "Warning: partial frame found!");
                     return 1;
             }
         }
         else if (state == STATE_BUFFER)
         {
             WriteData("abort.dat", vf->pkt.data, vf->pkt.size);
-            fprintf(stderr, "Failed to decode frame.  Position was: %d\n", last_pos);
+            VERBOSE(VB_IMPORTANT, QString(
+                    "Failed to decode frame.  Position was: %1").arg(last_pos));
             return -1;
         } 
         last_pos = (vf->pkt.size - mpeg2_getpos(dec)) - 4;
@@ -916,7 +944,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (! out_codec)
     {
-        fprintf(stderr, "Couldn't find MPEC2 encoder\n");
+        VERBOSE(VB_IMPORTANT, "Couldn't find MPEC2 encoder");
         return 1;
     }
 
@@ -963,7 +991,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (avcodec_open(c, out_codec) < 0)
     {
-        fprintf(stderr, "could not open codec\n");
+        VERBOSE(VB_IMPORTANT, "could not open codec");
         return 1;
     }
 
@@ -997,7 +1025,7 @@ MPEG2frame *MPEG2fixup::GetPoolFrame(AVPacket *pkt)
     {
         if (frame_count >= MAX_FRAMES)
         {
-            fprintf(stderr, "No more queue slots!\n");
+            VERBOSE(VB_IMPORTANT, "No more queue slots!");
             return NULL;
         }
         f = new MPEG2frame(pkt->size);
