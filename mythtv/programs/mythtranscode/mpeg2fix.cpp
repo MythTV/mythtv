@@ -181,7 +181,7 @@ int64_t MPEG2fixup::udiff2x33(int64_t pts1, int64_t pts2)
         if (diff < 0){
                 diff = MAX_PTS + diff;
         }
-        return diff;
+        return (diff % MAX_PTS);
 }
 
 int64_t MPEG2fixup::diff2x33(int64_t pts1, int64_t pts2)
