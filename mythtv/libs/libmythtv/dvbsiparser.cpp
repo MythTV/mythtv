@@ -91,7 +91,6 @@ void DVBSIParser::deleteLater()
     SIParser::deleteLater();
 }
 
-
 /** \fn DVBSIParser::SystemInfoThread(void*)
  *  \brief Thunk that allows siparser_thread pthread to
  *         call DVBSIParser::StartSectionReader().
@@ -107,15 +106,15 @@ void *DVBSIParser::SystemInfoThread(void *param)
 void DVBSIParser::AddPid(uint16_t pid, uint8_t mask, uint8_t filter,
                          bool CheckCRC, int bufferFactor)
 {
-
     struct dmx_sct_filter_params params;
     int fd;
 
     int sect_buf_size = MAX_SECTION_SIZE * bufferFactor;
 
-    SIPARSER(QString("Adding PID 0x%1 Filter 0x%2 Mask 0x%3 Buffer %4")
-             .arg(pid, 4, 16).arg(filter, 2, 16)
-             .arg(mask, 2, 16).arg(sect_buf_size));
+    VERBOSE(VB_SIPARSER, LOC +
+            QString("Adding PID 0x%1 Filter 0x%2 Mask 0x%3 Buffer %4")
+            .arg(pid, 4, 16).arg(filter, 2, 16)
+            .arg(mask, 2, 16).arg(sect_buf_size));
 
     /* Set flag so other processes can get past pollLock */
     filterChange = true;
@@ -176,7 +175,6 @@ void DVBSIParser::AddPid(uint16_t pid, uint8_t mask, uint8_t filter,
     pollLength++;
 
     pollLock.unlock();
-
 }
 
 void DVBSIParser::DelPid(int pid)
@@ -184,7 +182,7 @@ void DVBSIParser::DelPid(int pid)
     PIDFDMap::Iterator it;
     int x = 0;
 
-    SIPARSER(QString("Deleting PID %1").arg(pid,4,16));
+    VERBOSE(VB_SIPARSER, LOC + QString("Deleting PID %1").arg(pid,4,16));
 
     filterChange = true;
 
@@ -225,7 +223,7 @@ void DVBSIParser::DelPid(int pid)
     pollLock.unlock();
 }
 
-void DVBSIParser::DelAllPids()
+void DVBSIParser::DelAllPids(void)
 {
     PIDFDMap::Iterator it;
 
@@ -242,13 +240,11 @@ void DVBSIParser::DelAllPids()
     pollArray = NULL;
 
     pollLock.unlock();
-
 }
 
-void DVBSIParser::StopSectionReader()
+void DVBSIParser::StopSectionReader(void)
 {
-
-   SIPARSER("Stopping DVB Section Reader");
+   VERBOSE(VB_SIPARSER, LOC + "Stopping DVB Section Reader");
    exitSectionThread = true;
    DelAllPids();
    filterChange = true;
@@ -256,15 +252,14 @@ void DVBSIParser::StopSectionReader()
    filterChange = false;
    free(pollArray);
    pollLock.unlock();
-
 }
 
-void DVBSIParser::StartSectionReader()
+void DVBSIParser::StartSectionReader(void)
 {
     uint8_t    buffer[MAX_SECTION_SIZE];
     bool       processed = false;
 
-    SIPARSER("Starting DVB Section Reader thread");
+    VERBOSE(VB_SIPARSER, LOC + "Starting DVB Section Reader thread");
 
     sectionThreadRunning = true;
 
@@ -325,7 +320,6 @@ void DVBSIParser::StartSectionReader()
     }
 
     sectionThreadRunning = false;
-    SIPARSER("DVB Section Reader thread stopped");
-
+    VERBOSE(VB_SIPARSER, LOC + "DVB Section Reader thread stopped");
 }
 

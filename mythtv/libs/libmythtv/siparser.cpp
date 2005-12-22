@@ -27,10 +27,6 @@
 /// functions since this is used by the dvbdatetime function
 #define bcdtoint(i) ((((i & 0xf0) >> 4) * 10) + (i & 0x0f))
 
-/// \TODO Needed for Kenneth's verification functions
-///       which need to be re-written
-#define WORD(i,j)   ((i << 8) | j)
-
 // Set EIT_DEBUG_SID to a valid serviceid to enable EIT debugging
 // #define EIT_DEBUG_SID 1602
 
@@ -93,8 +89,9 @@ SIParser::SIParser(const char *name) :
     {
         if (!(*plit).isEmpty())
         {
-            SIPARSER(QString("Added initial preferred language '%1' "
-                             "with priority %2").arg(*plit).arg(prio));
+            VERBOSE(VB_SIPARSER, LOC +
+                    QString("Added initial preferred language '%1' "
+                            "with priority %2").arg(*plit).arg(prio));
             LanguagePriority[*plit] = prio++;
         }
     }
@@ -125,19 +122,19 @@ void SIParser::Reset()
 
     // Close all pids that are open
 
-    SIPARSER("About to do a reset");
+    VERBOSE(VB_SIPARSER, LOC + "About to do a reset");
 
     PrintDescriptorStatistics();
 
     Table[MGT]->Reset();
 
-    SIPARSER("Closing all PIDs");
+    VERBOSE(VB_SIPARSER, LOC + "Closing all PIDs");
     DelAllPids();
 
     PrivateTypesLoaded = false;
     PrivateTypes.reset();
 
-    SIPARSER("Resetting all Table Handlers");
+    VERBOSE(VB_SIPARSER, LOC + "Resetting all Table Handlers");
     pmap_lock.lock();
 
     for (int x = 0; x < NumHandlers ; x++)
@@ -145,7 +142,7 @@ void SIParser::Reset()
 
     pmap_lock.unlock();
 
-    SIPARSER("SIParser Reset due to channel change");
+    VERBOSE(VB_SIPARSER, LOC + "SIParser Reset due to channel change");
 }
 
 void SIParser::CheckTrackers()
@@ -161,8 +158,8 @@ void SIParser::CheckTrackers()
     {
         if (Table[x]->Complete())
         {
-            SIPARSER(QString("Table[%1]->Complete() == true")
-                     .arg((tabletypes) x));
+            VERBOSE(VB_SIPARSER, LOC + QString("Table[%1]->Complete() == true")
+                    .arg((tabletypes) x));
             for (int y = 0 ; y < NumHandlers ; y++)
                 Table[y]->DependencyMet((tabletypes) x);
 // TODO: Emit completion here for tables to siscan
@@ -174,8 +171,9 @@ void SIParser::CheckTrackers()
     {
         if (Table[x]->RequirePIDs())
         {
-            SIPARSER(QString("Table[%1]->RequirePIDs() == true")
-                     .arg((tabletypes) x));
+            VERBOSE(VB_SIPARSER, LOC +
+                    QString("Table[%1]->RequirePIDs() == true")
+                    .arg((tabletypes) x));
             while (Table[x]->GetPIDs(pid,filter,mask))
             {
                 AddPid(pid, mask, filter, true, 
@@ -192,8 +190,9 @@ void SIParser::CheckTrackers()
     {
         if (Table[x]->EmitRequired())
         {
-            SIPARSER(QString("Table[%1]->EmitRequired() == true")
-                     .arg((tabletypes) x));
+            VERBOSE(VB_SIPARSER, LOC +
+                    QString("Table[%1]->EmitRequired() == true")
+                    .arg((tabletypes) x));
             switch (x)
             {
                 case PMT:
@@ -262,35 +261,39 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
         query.next();
         for (int x = 0 ; x < query.size() ; x++)
         {
-            SIPARSER( QString("Private Type %1 = %2 defined for NetworkID %3")
-                     .arg(query.value(0).toString())
-                     .arg(query.value(1).toString())
-                     .arg(NetworkID) );
+            VERBOSE(VB_SIPARSER, LOC +
+                    QString("Private Type %1 = %2 defined for NetworkID %3")
+                    .arg(query.value(0).toString())
+                    .arg(query.value(1).toString())
+                    .arg(NetworkID) );
 
             if (QString(query.value(0).toString()) == "sdt_mapping")
             {
                 PrivateTypes.SDTMapping = true;
-                SIPARSER("SDT Mapping Incorrect for this Service Fixup Loaded");
+                VERBOSE(VB_SIPARSER, LOC +
+                        "SDT Mapping Incorrect for this Service Fixup Loaded");
             }
             if (QString(query.value(0).toString()) == "channel_numbers")
             {
                 PrivateTypes.ChannelNumbers = query.value(1).toInt();
-                SIPARSER(QString("ChannelNumbers Present using Descriptor %1")
-                         .arg(PrivateTypes.ChannelNumbers));
+                VERBOSE(VB_SIPARSER, LOC +
+                        QString("ChannelNumbers Present using Descriptor %1")
+                        .arg(PrivateTypes.ChannelNumbers));
             }
             if (QString(query.value(0).toString()) == "force_guide_present")
             {
                 if (query.value(1).toString() == "yes")
                 {
                     PrivateTypes.ForceGuidePresent = true;
-                    SIPARSER(QString("Forcing Guide Present"));
+                    VERBOSE(VB_SIPARSER, LOC + "Forcing Guide Present");
                 }
             }
             if (QString(query.value(0).toString()) == "guide_fixup")
             {
                 PrivateTypes.EITFixUp = query.value(1).toInt();
-                SIPARSER(QString("Using Guide Fixup Scheme #%1")
-                         .arg(PrivateTypes.EITFixUp));
+                VERBOSE(VB_SIPARSER, LOC +
+                        QString("Using Guide Fixup Scheme #%1")
+                        .arg(PrivateTypes.EITFixUp));
             }
             if (QString(query.value(0).toString()) == "guide_ranges")
             {
@@ -302,13 +305,14 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
                 PrivateTypes.OtherTransportTableMin = temp[2].toInt();
                 PrivateTypes.OtherTransportTableMax = temp[3].toInt();
                 
-                SIPARSER(QString("Using Guide Custom Range; "
-                                 "CurrentTransport: %1-%2, "
-                                 "OtherTransport: %3-%4")
-                         .arg(PrivateTypes.CurrentTransportTableMin,2,16)
-                         .arg(PrivateTypes.CurrentTransportTableMax,2,16)
-                         .arg(PrivateTypes.OtherTransportTableMin,2,16)
-                         .arg(PrivateTypes.OtherTransportTableMax,2,16));
+                VERBOSE(VB_SIPARSER, LOC +
+                        QString("Using Guide Custom Range; "
+                                "CurrentTransport: %1-%2, "
+                                "OtherTransport: %3-%4")
+                        .arg(PrivateTypes.CurrentTransportTableMin,2,16)
+                        .arg(PrivateTypes.CurrentTransportTableMax,2,16)
+                        .arg(PrivateTypes.OtherTransportTableMin,2,16)
+                        .arg(PrivateTypes.OtherTransportTableMax,2,16));
             }
             if (QString(query.value(0).toString()) == "tv_types")
             {
@@ -319,7 +323,8 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
                 for (i = temp.begin() ; i != temp.end() ; i++)
                 {
                     PrivateTypes.TVServiceTypes[(*i).toInt()] = 1;
-                    SIPARSER(QString("Added TV Type %1").arg((*i).toInt()));
+                    VERBOSE(VB_SIPARSER, LOC +
+                            QString("Added TV Type %1").arg((*i).toInt()));
                 }
             }
             if (QString(query.value(0).toString()) == "parse_subtitle_list")
@@ -330,18 +335,19 @@ void SIParser::LoadPrivateTypes(uint16_t NetworkID)
                 for (QStringList::Iterator i = temp.begin();i!=temp.end();i++)
                 {
                     PrivateTypes.ParseSubtitleServiceIDs[(*i).toInt()]=1;
-                    SIPARSER(
-                        QString("Added ServiceID %1 to list of "
-                                "channels to parse subtitle from")
-                        .arg((*i).toInt()));
+                    VERBOSE(VB_SIPARSER, LOC + 
+                            QString("Added ServiceID %1 to list of "
+                                    "channels to parse subtitle from")
+                            .arg((*i).toInt()));
                 }
             }
             query.next();
         }
     }
     else
-        SIPARSER(QString("No Private Types defined for NetworkID %1")
-                 .arg(NetworkID));
+        VERBOSE(VB_SIPARSER, LOC +
+                QString("No Private Types defined for NetworkID %1")
+                .arg(NetworkID));
 
     PrivateTypesLoaded = true;
 }
@@ -371,18 +377,18 @@ void SIParser::AddPid(uint16_t pid, uint8_t mask, uint8_t filter,
     (void) filter;
     (void) CheckCRC;
     (void) bufferFactor;
-    SIPARSER("Using AddPid from SIParser which does nothing");
+    VERBOSE(VB_SIPARSER, LOC + "AddPid() does nothing");
 }
 
 void SIParser::DelPid(int pid)
 {
     (void) pid;
-    SIPARSER("Using DelPid from SIParser which does nothing");
+    VERBOSE(VB_SIPARSER, LOC + "DelPid() does nothing");
 }
 
 void SIParser::DelAllPids()
 {
-    SIPARSER("Using DelAllPids from SIParser which does nothing");
+    VERBOSE(VB_SIPARSER, LOC + "DelAllPids does nothing");
 }
 
 /** \fn SIParser::FillPMap(SISTANDARD _SIStandard)
@@ -403,7 +409,7 @@ bool SIParser::FillPMap(SISTANDARD _SIStandard)
             .arg((SI_STANDARD_ATSC == _SIStandard) ? "atsc":"dvb"));
 
     pmap_lock.lock();
-    SIPARSER("Requesting PAT");
+    VERBOSE(VB_SIPARSER, LOC + "Requesting PAT");
 
     /* By default open only the PID for PAT */
     Table[PAT]->Request(0);
@@ -459,16 +465,9 @@ bool SIParser::FillPMap(const QString &si_std)
  */
 bool SIParser::AddPMT(uint16_t ServiceID)
 {
-    if (SIStandard == SI_STANDARD_ATSC)
-    {
-        SIPARSER(QString("Adding a PMT, #%1 in PAT, to the request list")
-                 .arg(ServiceID));
-    }
-    else
-    {
-        SIPARSER(QString("Adding the Service with ID %1 in the SDT to "
-                         "the request list").arg(ServiceID));
-    }
+    VERBOSE(VB_SIPARSER, LOC +
+            QString("Adding PMT program number #%1 to the request list")
+            .arg(ServiceID));
 
     pmap_lock.lock();
     Table[PMT]->RequestEmit(ServiceID);
@@ -483,7 +482,7 @@ bool SIParser::AddPMT(uint16_t ServiceID)
  */
 bool SIParser::ReinitSIParser(const QString &si_std, uint service_id)
 {
-    SIPARSER(QString("ReinitSIParser(std %1, %2 #%3)")
+    VERBOSE(VB_SIPARSER, LOC + QString("ReinitSIParser(std %1, %2 #%3)")
              .arg(si_std)
              .arg((si_std.lower() == "atsc") ? "program" : "service")
              .arg(service_id));
@@ -518,9 +517,9 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
 
     if (!(buffer[1] & 0x80))
     {
-        SIPARSER(
-            QString("SECTION_SYNTAX_INDICATOR = 0 - Discarding Table (%1)")
-            .arg(buffer[0],2,16));
+        VERBOSE(VB_SIPARSER, LOC + 
+                QString("SECTION_SYNTAX_INDICATOR = 0 - Discarding Table (%1)")
+                .arg(buffer[0],2,16));
         pmap_lock.unlock();
         return;
     }
@@ -549,12 +548,12 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
         case 0x46:
         case 0x42:  
             SIStandard = SI_STANDARD_DVB;
-            SIPARSER("SI Standard Detected: DVB");
+            VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: DVB");
             standardChange = true;
         break;
         case 0xC7:  
             SIStandard = SI_STANDARD_ATSC;
-            SIPARSER("SI Standard Detected: ATSC");
+            VERBOSE(VB_SIPARSER, LOC + "SI Standard Detected: ATSC");
             standardChange = true;
         break;
         }
@@ -581,7 +580,6 @@ void SIParser::ParseTable(uint8_t *buffer, int size, uint16_t pid)
             ParseDVBEIT(pid, &head, &buffer[8], size-8);
             break;
 #endif
-      
         }
     }
 
@@ -664,15 +662,14 @@ tablehead_t SIParser::ParseTableHead(uint8_t *buffer, int size)
 void SIParser::ParsePAT(uint /*pid*/, tablehead_t *head,
                         uint8_t *buffer, uint size)
 {
-
     // Check to see if you have already loaded all of the PAT sections
     // ISO 13818-1 state that PAT can be segmented, although it rarely is
     if (((PATHandler*) Table[PAT])->Tracker.AddSection(head))
         return;
 
-    SIPARSER(QString("PAT Version = %1").arg(head->version));
+    VERBOSE(VB_SIPARSER, LOC + QString("PAT Version = %1").arg(head->version));
     PrivateTypes.CurrentTransportID = head->table_id_ext;
-    SIPARSER(QString("Tuned to TransportID: %1")
+    VERBOSE(VB_SIPARSER, LOC + QString("Tuned to TransportID: %1")
              .arg(PrivateTypes.CurrentTransportID));
 
     int pos = -1;
@@ -686,7 +683,8 @@ void SIParser::ParsePAT(uint /*pid*/, tablehead_t *head,
         uint16_t pid = ((buffer[pos + 3] & 0x1f)<<8) | buffer[pos + 4];
         if (program != 0)
         {
-            SIPARSER(QString("PMT #%1 on PID 0x%2").arg(program).arg(pid));
+            VERBOSE(VB_SIPARSER, LOC + QString("PMT pn(%1) on PID 0x%2")
+                    .arg(program).arg(pid,0,16));
             ((PATHandler*) Table[PAT])->pids[program]=pid;
             Table[PMT]->AddKey(pid,0);
             ((PMTHandler*) Table[PMT])->pmt[program].PMTPID = pid;
@@ -695,13 +693,13 @@ void SIParser::ParsePAT(uint /*pid*/, tablehead_t *head,
         {
             // Program 0 in the PAT represents the location of the NIT in DVB
             NITPID = pid;
-            SIPARSER(QString("NIT Present on this transport on PID 0x%1")
-                     .arg(NITPID,0,16));
+            VERBOSE(VB_SIPARSER, LOC +
+                    QString("NIT Present on this transport on PID 0x%1")
+                    .arg(NITPID,0,16));
         }
         pos += 4;
 
     }
-
 
     QString ProgramList = QString("Services on this Transport: ");
     QMap_uint16_t::Iterator p;
@@ -709,9 +707,7 @@ void SIParser::ParsePAT(uint /*pid*/, tablehead_t *head,
     for (p = ((PATHandler*) Table[PAT])->pids.begin();
          p != ((PATHandler*) Table[PAT])->pids.end() ; ++p)
         ProgramList += QString("%1 ").arg(p.key());
-    SIPARSER(ProgramList);
-
-
+    VERBOSE(VB_SIPARSER, LOC + ProgramList);
 }
 
 void SIParser::ParseCAT(uint /*pid*/, tablehead_t *head,
@@ -727,13 +723,11 @@ void SIParser::ParseCAT(uint /*pid*/, tablehead_t *head,
         if (buffer[pos+1] == 0x09)
         {
             c = ParseDescCA(&buffer[pos+1],buffer[pos+2]);
-            SIPARSER(QString("CA System 0x%1, EMM PID = %2")
-                     .arg(c.CASystemID,0,16)
-                     .arg(c.PID));
+            VERBOSE(VB_SIPARSER, LOC + QString("CA System 0x%1, EMM PID = %2")
+                    .arg(c.CASystemID,0,16).arg(c.PID));
         }
         pos += buffer[pos+2] + 2;
     }
-
 }
 
 void SIParser::ParsePMT(uint pid, tablehead_t *head,
@@ -745,8 +739,8 @@ void SIParser::ParsePMT(uint pid, tablehead_t *head,
     if (Table[PMT]->AddSection(head,head->table_id_ext,0))
         return;
 
-    SIPARSER(QString("PMT ServiceID: %1 Version = %2")
-             .arg(head->table_id_ext).arg(head->version));
+    VERBOSE(VB_SIPARSER, LOC + QString("PMT pn(%1) version(%2)")
+            .arg(head->table_id_ext).arg(head->version));
 
     // Create a PMTObject and populate it
     PMTObject p;
@@ -777,7 +771,6 @@ void SIParser::ParsePMT(uint pid, tablehead_t *head,
         pos += buffer[pos+1] + 2;
     }
 
-
     // Process streams
     while ((pos + 4) < (int)size)
     {
@@ -790,7 +783,7 @@ void SIParser::ParsePMT(uint pid, tablehead_t *head,
         // Grab PIDs, and set PID Type
         e.PID = (buffer[pos+1] & 0x1F) << 8 | buffer[pos+2];
         e.Orig_Type = buffer[pos];
-        SIPARSER(QString("PID: %1").arg(e.PID));
+        VERBOSE(VB_SIPARSER, LOC + QString("PID: 0x%1").arg(e.PID,0,16));
 
         // The stream type can be detected in two ways:
         // - by stream type field in PMT, if known
@@ -993,7 +986,7 @@ QString SIParser::DecodeText(const uint8_t *src, uint length)
     {
         // TODO: Handle multi-byte encodings
 
-        SIPARSER("Multi-byte coded text - not yet supported!");
+        VERBOSE(VB_SIPARSER, LOC + "Multi-byte coded text - not supported!");
         result = "N/A";
     }
 
@@ -1174,7 +1167,6 @@ void SIParser::ParseNIT(uint pid, tablehead_t *head,
 
         pos += transport_descriptors_length + 6;
     }
-
 }
 
 void SIParser::ParseSDT(uint pid, tablehead_t *head,
@@ -1219,8 +1211,8 @@ void SIParser::ParseSDT(uint pid, tablehead_t *head,
     uint16_t descriptors_loop_length = 0;
     SDTObject s;
 
-    SIPARSER(QString("SDT: NetworkID=%1 TransportID=%2")
-             .arg(network_id).arg(head->table_id_ext));
+    VERBOSE(VB_SIPARSER, LOC + QString("SDT: NetworkID=%1 TransportID=%2")
+            .arg(network_id).arg(head->table_id_ext));
 
     while (pos < (size-4))
     {
@@ -1274,11 +1266,12 @@ void SIParser::ParseSDT(uint pid, tablehead_t *head,
         }
 #endif
 
-        SIPARSER(QString("SDT: sid=%1 type=%2 eit_present=%3 "
-                         "eit_requested=%4 name=%5")
-                 .arg(s.ServiceID).arg(s.ServiceType)
-                 .arg(s.EITPresent).arg(eit_requested)
-                 .arg(s.ServiceName.ascii()));
+        VERBOSE(VB_SIPARSER, LOC +
+                QString("SDT: sid=%1 type=%2 eit_present=%3 "
+                        "eit_requested=%4 name=%5")
+                .arg(s.ServiceID).arg(s.ServiceType)
+                .arg(s.EITPresent).arg(eit_requested)
+                .arg(s.ServiceName));
 
         if (CurrentTransport)
             ((ServiceHandler*) Table[SERVICES])->
@@ -1322,8 +1315,9 @@ uint SIParser::GetLanguagePriority(const QString &language)
         it = LanguagePriority.find(clang);
         if (it != LanguagePriority.end())
         {
-            SIPARSER(QString("Added preferred language '%1' with same "
-                             "priority as '%2'").arg(language).arg(clang));
+            VERBOSE(VB_SIPARSER, LOC +
+                    QString("Added preferred language '%1' with same "
+                            "priority as '%2'").arg(language).arg(clang));
             LanguagePriority[language] = *it;
         }
     }
@@ -1337,8 +1331,9 @@ uint SIParser::GetLanguagePriority(const QString &language)
         for (;it != LanguagePriority.end(); ++it)
             max_priority = max(*it, max_priority);
         // insert new language, and point iterator to it
-        SIPARSER(QString("Added preferred language '%1' with priority %2")
-                 .arg(language).arg(max_priority + 1));
+        VERBOSE(VB_SIPARSER, LOC +
+                QString("Added preferred language '%1' with priority %2")
+                .arg(language).arg(max_priority + 1));
         LanguagePriority[language] = max_priority + 1;
         it = LanguagePriority.find(language);
     }
@@ -2127,7 +2122,7 @@ void SIParser::ProcessComponentDescriptor(
 
 void SIParser::ParseDescTeletext(uint8_t *buffer, int size)
 {
-    SIPARSER(QString("Teletext Descriptor"));
+    VERBOSE(VB_SIPARSER, LOC + QString("Teletext Descriptor"));
 
     buffer += 2;
 
@@ -2138,12 +2133,12 @@ void SIParser::ParseDescTeletext(uint8_t *buffer, int size)
         uint8_t teletext_magazine_number = buffer[3] & 0x07;
         uint8_t teletext_page_number = buffer[4];
 
-        SIPARSER(QString("  lang: %1, type: %2, mag: %3, page: %4")
-                    .arg(language)
-                    .arg(teletext_type)
-                    .arg(teletext_magazine_number)
-                    .arg(teletext_page_number)
-                );
+        VERBOSE(VB_SIPARSER, LOC + "ParseDescTT(): " +
+                QString("lang: %1, type: %2, mag: %3, page: %4")
+                .arg(language)
+                .arg(teletext_type)
+                .arg(teletext_magazine_number)
+                .arg(teletext_page_number));
 
         buffer += 5;
         size -= 5;
@@ -2152,7 +2147,7 @@ void SIParser::ParseDescTeletext(uint8_t *buffer, int size)
 
 void SIParser::ParseDescSubtitling(uint8_t *buffer, int size)
 {
-    SIPARSER(QString("Subtitling Descriptor"));
+    VERBOSE(VB_SIPARSER, LOC + QString("Subtitling Descriptor"));
 
     buffer += 2;
 
@@ -2163,12 +2158,10 @@ void SIParser::ParseDescSubtitling(uint8_t *buffer, int size)
         uint16_t composition_page_id = (buffer[4] << 8) | buffer[5];
         uint16_t ancillary_page_id = (buffer[6] << 8) | buffer[7];
 
-        SIPARSER(QString("  lang: %1, type: %2, comp: %3, anc: %4")
-                    .arg(language)
-                    .arg(subtitling_type)
-                    .arg(composition_page_id)
-                    .arg(ancillary_page_id)
-                );
+        VERBOSE(VB_SIPARSER, LOC + "ParseDescSub(): " +
+                QString("lang: %1, type: %2, comp: %3, anc: %4")
+                .arg(language).arg(subtitling_type)
+                .arg(composition_page_id).arg(ancillary_page_id));
 
         buffer += 8;
         size -= 8;
@@ -2212,7 +2205,7 @@ QString SIParser::ParseMSS(uint8_t *buffer, int size)
    // Bytes = 7
 
     if (buffer[4] > 1)
-        SIPARSER("MSS WITH MORE THAN 1 SEGMENT");
+        VERBOSE(VB_SIPARSER, LOC + "MSS WITH MORE THAN 1 SEGMENT");
 
     switch (buffer[5])
     {
@@ -2269,41 +2262,43 @@ void SIParser::ParseMGT(tablehead_t *head, uint8_t *buffer, int)
                 if (table_type == 0x02)
                 {
                     TableSourcePIDs.ServicesTable = TableID::CVCT;
-                    SIPARSER("CVCT Present on this Transport");
+                    VERBOSE(VB_SIPARSER, LOC + "CVCT Present");
                 }
                 if (table_type == 0x00)
                 {
                     TableSourcePIDs.ServicesTable = TableID::TVCT;
-                    SIPARSER("TVCT Present on this Transport");
+                    VERBOSE(VB_SIPARSER, LOC + "TVCT Present");
                 }
                 break;
             case 0x04:
                 TableSourcePIDs.ChannelETT = table_type_pid;
-                SIPARSER(QString("Channel ETT Present on PID 0x%1 (%2)")
-                         .arg(table_type_pid,4,16).arg(size));
+                VERBOSE(VB_SIPARSER, LOC +
+                        QString("Channel ETT Present on PID 0x%1 (%2)")
+                        .arg(table_type_pid,0,16).arg(size));
                 break;
 
             case 0x100 ... 0x17F:
-                SIPARSER(QString("EIT-%1 Present on PID 0x%2")
-                         .arg(table_type - 0x100)
-                         .arg(table_type_pid,4,16));
-
+                VERBOSE(VB_SIPARSER, LOC +
+                        QString("EIT-%1 Present on PID 0x%2")
+                        .arg(table_type - 0x100)
+                        .arg(table_type_pid,0,16));
                 Table[EVENTS]->AddPid(table_type_pid,0xCB,0xFF,
                                       table_type - 0x100);
                 break;
 
             case 0x200 ... 0x27F:
-                SIPARSER(QString("ETT-%1 Present on PID 0x%2")
-                         .arg(table_type - 0x200)
-                         .arg(table_type_pid,4,16));
+                VERBOSE(VB_SIPARSER, LOC +
+                        QString("ETT-%1 Present on PID 0x%2")
+                        .arg(table_type - 0x200)
+                        .arg(table_type_pid,0,16));
                 Table[EVENTS]->AddPid(table_type_pid,0xCC,0xFF,
                                       table_type - 0x200);
                 break;
 
             default:
-                SIPARSER(QString("Unknown Table %1 in MGT on PID 0x%2")
-                         .arg(table_type,4,16)
-                         .arg(table_type_pid,4,16));
+                VERBOSE(VB_SIPARSER, LOC +
+                        QString("Unknown Table %1 in MGT on PID 0x%2")
+                        .arg(table_type).arg(table_type_pid,0,16));
                 break;
         }                    
         pos += 11;
@@ -2417,15 +2412,15 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
     int atsc_src_id = sourceid_to_channel[head->table_id_ext];
     if (!atsc_src_id)
     {
-        VERBOSE(VB_SIPARSER, QString("ParseATSCEIT: Ignoring data. "
-                                      "Source %1 not in map.")
+        VERBOSE(VB_EIT, LOC + "ParseATSCEIT(): " +
+                QString("Ignoring data. Source %1 not in map.")
                 .arg(head->table_id_ext));
         return;
     }
     else
     {
-        VERBOSE(VB_SIPARSER,
-                QString("ParseATSCEIT: Adding data. ATSC Channel is %1_%2.")
+        VERBOSE(VB_EIT, LOC + "ParseATSCEIT(): " +
+                QString("Adding data. ATSC Channel is %1_%2.")
                 .arg(atsc_src_id >> 8).arg(atsc_src_id & 0xff));
     }   
 
@@ -2452,7 +2447,7 @@ void SIParser::ParseATSCEIT(tablehead_t *head, uint8_t *buffer,
         e.Event_Name = ParseMSS(&buffer[pos+10], title_length);
 
 #ifdef EIT_DEBUG_SID
-        VERBOSE(VB_SIPARSER,
+        VERBOSE(VB_EIT, LOC + "ParseATSCEIT(): " +
                 QString("[%1][%2]: %3\t%4 - %5")
                 .arg(atsc_src_id).arg(event_id)
                 .arg(e.Event_Name.ascii(), 20)
@@ -2538,7 +2533,8 @@ void SIParser::ParseSTT(tablehead_t *head, uint8_t *buffer, int size)
 
     ((STTHandler*) Table[STT])->GPSOffset = buffer[5];
 
-    SIPARSER(QString("GPS Time Offset = %1 Seconds").arg(buffer[5]));
+    VERBOSE(VB_SIPARSER, LOC +
+            QString("GPS time offset is %1 seconds").arg(buffer[5]));
 }
 
 
@@ -2945,7 +2941,6 @@ void SIParser::EITFixUpStyle1(Event &event)
        event.Stereo = true;
        event.Description = event.Description.replace("(Stereo)","");
     }
-
 }
 
 /** \fn SIParser::EITFixUpStyle2(Event&)

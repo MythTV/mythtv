@@ -281,8 +281,5 @@ class SIParser : public QObject
     mutable QMutex      descLock;
 };
 
-#define SIPARSER(args...) \
-    VERBOSE(VB_SIPARSER, QString("SIParser: ") << args);
-        
 #endif // SIPARSER_H
 
