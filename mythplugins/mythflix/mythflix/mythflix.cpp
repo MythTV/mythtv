@@ -21,6 +21,8 @@
 
 #include <iostream>
 
+#include <unistd.h>
+
 #include <qnetwork.h>
 #include <qapplication.h>
 #include <qdatetime.h>
