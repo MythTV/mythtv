@@ -178,6 +178,9 @@ foreach my $url_key (keys(%master_urls)) {
 
 sub stubbed_url {
 	my ($full_url) = @_;
+	if ($full_url =~ m/&/) {
+		$full_url =~ s/&/&amp\;/g;
+	}
 	my ($url, $icon_file) = split_url_from_file($full_url);
 	if (exists $master_urls{$url}) {
 		return "[" . $master_urls{$url} . "]/$icon_file";
