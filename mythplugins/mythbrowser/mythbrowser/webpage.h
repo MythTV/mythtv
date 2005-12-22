@@ -1,8 +1,6 @@
 #ifndef WEBPAGE_H
 #define WEBPAGE_H
 
-#define DEBUG             0
-
 #include <kapplication.h>
 #include <kmainwindow.h>
 #include <kurl.h>

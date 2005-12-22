@@ -82,9 +82,6 @@ WebPage::WebPage (const char *location, int zoom, WFlags flags) : QWidget(NULL,N
     browser->enableJScript(true);
     
     openURL(QString(location));
-    
-    if(DEBUG)
-        qApp->installEventFilter(this);
 }
 
 WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, WFlags flags)
@@ -127,15 +124,10 @@ WebPage::WebPage (const char *location, const KParts::URLArgs &args, int zoom, W
     browser->enableJScript(true);
     
     openURL(QString(location));
-
-    if(DEBUG)
-        qApp->installEventFilter(this);
 }
 
 WebPage::~WebPage()
 {
-    if (DEBUG)
-        printf("deleting web page: %s\n", sUrl.ascii());
 }
 
 void WebPage::openURL(const QString &url)

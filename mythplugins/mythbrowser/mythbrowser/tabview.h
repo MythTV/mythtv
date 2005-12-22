@@ -18,14 +18,6 @@ using namespace std;
 typedef QPtrStack<QWidget> WIDGET_HISTORY;
 typedef QValueStack<QString> URL_HISTORY;
 
-class MyMythPopupBox : public MythPopupBox
-{
-    Q_OBJECT
-
-public:
-    MyMythPopupBox(MythMainWindow *parent, const char *name = 0);
-};
-
 class TabView : public MythMainWindow
 {
     Q_OBJECT
@@ -63,8 +55,6 @@ private slots:
     
     // new URL dialog
     void showEnterURLDialog();
-    void closeEnterURLDialog();
-    void enterURLOkPressed();
 
 private:
     int z,w,h;
@@ -78,11 +68,8 @@ private:
     QCursor *mouse;
 
     bool menuIsOpen;
-    MyMythPopupBox *menu;
-    
-    MyMythPopupBox *enterURL;
-    MythRemoteLineEdit *URLeditor;
-    
+    MythPopupBox *menu;
+
     QWidget *hadFocus;
 
     QPtrList<WIDGET_HISTORY> widgetHistory;
@@ -99,26 +86,6 @@ private:
     QString lastMouseAction;
     int     mouseKeyCount;
     QTime   lastMouseActionTime;
-};
-
-class PopupBox : public QDialog
-{
-    Q_OBJECT
-
-public:
-    PopupBox(QWidget *parent, QString defltUrl);
-    ~PopupBox();
-
-signals:
-    void finished(const char* group, const char* desc,const char* url);
-
-private slots:
-    void slotOkClicked();
-
-private:
-    MythRemoteLineEdit* group;
-    MythRemoteLineEdit* desc;
-    MythRemoteLineEdit* url;
 };
 
 #endif // TABVIEW_H

@@ -44,7 +44,6 @@ TabView::TabView(QStringList urls, int zoom, int width, int height,
                  WFlags flags)
 {
     menuIsOpen = false;
-    enterURL = NULL;
     menu = NULL;
     
     mytab = new QTabWidget(this);
@@ -122,20 +121,23 @@ void TabView::openMenu()
 
     hadFocus = qApp->focusWidget();
 
-    menu = new MyMythPopupBox(this,"popupMenu");
+    menu = new MythPopupBox(this,"popupMenu");
     menu->addLabel(tr("MythBrowser Menu"));
 
-    if(mytab->count()==1) {
-        temp = menu->addButton(tr("         Back         "), this, SLOT(actionBack()));
-    } else {
-        temp = menu->addButton(tr("       Next Tab       "), this, SLOT(actionNextTab()));
-        menu->addButton(tr("       Prev Tab       "), this, SLOT(actionPrevTab()));
-        menu->addButton(tr("      Remove Tab      "), this, SLOT(actionRemoveTab()));
-        menu->addButton(tr("         Back         "), this, SLOT(actionBack()));
+    if(mytab->count()==1) 
+    {
+        temp = menu->addButton(tr("Back"), this, SLOT(actionBack()));
+    } 
+    else 
+    {
+        temp = menu->addButton(tr("Next Tab"), this, SLOT(actionNextTab()));
+        menu->addButton(tr("Prev Tab"), this, SLOT(actionPrevTab()));
+        menu->addButton(tr("Remove Tab"), this, SLOT(actionRemoveTab()));
+        menu->addButton(tr("Back"), this, SLOT(actionBack()));
     }
     menu->addButton(tr("Save Link in Bookmarks"), this, SLOT(actionAddBookmark()));
-    menu->addButton(tr("       Zoom Out       "), this, SLOT(actionZoomOut()));
-    menu->addButton(tr("       Zoom In        "), this, SLOT(actionZoomIn()));
+    menu->addButton(tr("Zoom Out"), this, SLOT(actionZoomOut()));
+    menu->addButton(tr("Zoom In"), this, SLOT(actionZoomIn()));
     temp->setFocus();
 
     menu->ShowPopup(this, SLOT(cancelMenu()));
@@ -144,7 +146,8 @@ void TabView::openMenu()
 
 void TabView::cancelMenu()
 {
-    if (menuIsOpen) {
+    if (menuIsOpen) 
+    {
         menu->hide();
         delete menu;
         menu=NULL;
@@ -267,13 +270,46 @@ void TabView::actionZoomIn()
 void TabView::actionAddBookmark()
 {
     cancelMenu();
-    PopupBox *popupBox = new PopupBox(this,
-        ((WebPage*)mytab->currentPage())->browser->baseURL().htmlURL());
-    connect(popupBox, SIGNAL(finished(const char*,const char*,const char*)),
-            this, SLOT(finishAddBookmark(const char*,const char*,const char*)));
+    hadFocus = qApp->focusWidget();
+
+    MythPopupBox *popup = new MythPopupBox(gContext->GetMainWindow(),
+                                           "addbookmark_popup");
+
+    QLabel *caption = popup->addLabel(tr("Add New Bookmark"), MythPopupBox::Medium);
+    caption->setAlignment(Qt::AlignCenter);
+
+    popup->addLabel(tr("Group:"), MythPopupBox::Small);
+    MythRemoteLineEdit *group = new MythRemoteLineEdit(popup); 
+    popup->addWidget(group);
+
+    popup->addLabel(tr("Description:"), MythPopupBox::Small);
+    MythRemoteLineEdit *desc = new MythRemoteLineEdit(popup); 
+    popup->addWidget(desc);
+
+    popup->addLabel(tr("URL:"), MythPopupBox::Small);
+    MythRemoteLineEdit *url = new MythRemoteLineEdit(popup); 
+    url->setText(((WebPage*)mytab->currentPage())->browser->baseURL().htmlURL());
+    popup->addWidget(url);
+
+    popup->addButton(tr("OK"));
+    popup->addButton(tr("Cancel"));
+
     qApp->removeEventFilter(this);
-    popupBox->exec();
+    int res = popup->ExecPopup();
     qApp->installEventFilter(this);
+
+    if (res == 0)
+    {
+        QString sGroup = group->text();
+        QString sDesc = desc->text();
+        QString sUrl = url->text();
+
+        finishAddBookmark(sGroup, sDesc, sUrl);
+    }
+
+    delete popup;
+    
+    hadFocus->setFocus();
 }
 
 void TabView::finishAddBookmark(const char* group, const char* desc, const char* url)
@@ -319,45 +355,36 @@ void TabView::actionBack()
 
 void TabView::showEnterURLDialog()
 {
-    QButton *button;
-     
     hadFocus = qApp->focusWidget();
 
-    enterURL = new MyMythPopupBox(this, "showURL");
-    enterURL->addLabel(tr("Enter URL"));
+    MythPopupBox *popup = new MythPopupBox(this, "enterURL");
+    popup->addLabel(tr("Enter URL"));
 
-    URLeditor = new MythRemoteLineEdit(enterURL);
-    enterURL->addWidget(URLeditor);
-    URLeditor->setFocus(); 
-    
-    button = enterURL->addButton(tr("OK"), this, SLOT(enterURLOkPressed()));
-    button = enterURL->addButton(tr("Cancel"), this, SLOT(closeEnterURLDialog()));
+    MythRemoteLineEdit *editor = new MythRemoteLineEdit(popup);
+    popup->addWidget(editor);
+    editor->setFocus(); 
 
-    enterURL->ShowPopup(this, SLOT(closeEnterURLDialog()));
-}
+    popup->addButton(tr("OK"));
+    popup->addButton(tr("Cancel"));
 
-void TabView::enterURLOkPressed()
-{
-    QString sURL = URLeditor->text();
-    if (!sURL.startsWith("http://") && !sURL.startsWith("file:/"))
-      sURL = "http://" + sURL;
-    
-    newPage(sURL);
-    
-    closeEnterURLDialog();    
-}
+    qApp->removeEventFilter(this);
+    int res = popup->ExecPopup();
+    qApp->installEventFilter(this);
 
-void TabView::closeEnterURLDialog()
-{
-    if (!enterURL)
-      return;
-      
-    enterURL->hide();
-    delete enterURL;
-    enterURL = NULL;
+    if (res == 0)
+    {
+        QString sURL = editor->text();
+        if (!sURL.startsWith("http://") && !sURL.startsWith("file:/"))
+            sURL = "http://" + sURL;
+
+        newPage(sURL);
+    }
+
+    delete popup;
+
     hadFocus->setFocus();
 }
-    
+
 void TabView::newPage(QString sURL)
 {
     int index = mytab->currentPageIndex();
@@ -527,18 +554,7 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
         {
             QString action = actions[i];
             handled = true;
-            
-            if (enterURL) {
-                if (action == "FOLLOWLINK") {
-                    if (URLeditor->hasFocus()) {
-                        enterURLOkPressed();
-                        return true;
-                    }    
-                }
-                else
-                    return false;    
-            } 
-            
+
             if (action == "TOGGLEINPUT") {
                 inputToggled = !inputToggled;
                 return true;
@@ -595,63 +611,4 @@ bool TabView::eventFilter(QObject* object, QEvent* event)
         }
     }
     return false; // continue processing the event with QObject::event()
-}
-
-// ---------------------------------------------------
-
-MyMythPopupBox::MyMythPopupBox(MythMainWindow *parent, const char *name)
-    : MythPopupBox(parent,name)
-{
-    setCursor(QCursor(Qt::ArrowCursor));
-}
-
-// ---------------------------------------------------
-
-PopupBox::PopupBox(QWidget *parent, QString deflt)
-        : QDialog(parent, 0, true, WType_Popup)
-{
-    setPalette(parent->palette());
-    setFont(parent->font());
-
-    QVBoxLayout *lay  = new QVBoxLayout(this, 5);
-
-    QVGroupBox  *vbox = new QVGroupBox(tr("Add New Website"),this);
-    lay->addWidget(vbox);
-
-    QLabel *groupLabel = new QLabel(tr("Group:"), vbox);
-    groupLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    group = new MythRemoteLineEdit(vbox);
-
-    QLabel *descLabel = new QLabel(tr("Description:"), vbox);
-    descLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    desc = new MythRemoteLineEdit(vbox);
-
-    QLabel *urlLabel =new QLabel(tr("URL:"), vbox);
-    urlLabel->setBackgroundOrigin(QWidget::WindowOrigin);
-    url = new MythRemoteLineEdit(vbox);
-    url->setText(deflt);
-
-    QHBoxLayout *hbox = new QHBoxLayout(lay);
-
-    hbox->addItem(new QSpacerItem(100, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-    MythPushButton *okButton = new MythPushButton("&Ok", this);
-    okButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    hbox->addWidget(okButton);
-
-    hbox->addItem(new QSpacerItem(100, 0, QSizePolicy::Expanding, QSizePolicy::Minimum));
-
-    connect(okButton, SIGNAL(clicked()), this, SLOT(slotOkClicked()));
-
-    gContext->ThemeWidget(this);
-}
-
-PopupBox::~PopupBox()
-{
-}
-
-void PopupBox::slotOkClicked()
-{
-    emit finished(group->text(),desc->text(),url->text());
-    close();
 }
