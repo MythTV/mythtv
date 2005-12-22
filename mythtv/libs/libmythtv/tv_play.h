@@ -177,7 +177,7 @@ class TV : public QObject
     void DeleteRecorder();
 
     static uint GetLockTimeout(uint cardid);
-    bool StartRecorder(int maxWait=-1);
+    bool StartRecorder(RemoteEncoder *rec, int maxWait=-1);
     bool StartPlayer(bool isWatchingRecording, int maxWait=-1);
     void StartOSD(void);
     void StopStuff(bool stopRingbuffers, bool stopPlayers, bool stopRecorders);

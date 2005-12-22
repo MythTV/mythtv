@@ -786,7 +786,7 @@ void TV::HandleStateChange(void)
         gContext->DisableScreensaver();
 
         bool ok = false;
-        if (playbackinfo && StartRecorder())
+        if (playbackinfo && StartRecorder(recorder,-1))
         {
             if (StartPlayer(false))
                 ok = true;
@@ -987,19 +987,19 @@ uint TV::GetLockTimeout(uint cardid)
     return timeout;
 }
 
-/** \fn TV::StartRecorder(int)
+/** \fn TV::StartRecorder(RemoteEncoder*, int)
  *  \brief Starts recorder, must be called before StartPlayer().
  *  \param maxWait How long to wait for RecorderBase to start recording.
  *  \return true when successful, false otherwise.
  */
-bool TV::StartRecorder(int maxWait)
+bool TV::StartRecorder(RemoteEncoder *rec, int maxWait)
 {
     maxWait = (maxWait <= 0) ? 20000 : maxWait;
     MythTimer t;
     t.start();
-    while (!recorder->IsRecording() && !exitPlayer && t.elapsed() < maxWait)
+    while (!rec->IsRecording() && !exitPlayer && t.elapsed() < maxWait)
         usleep(50);
-    if (!recorder->IsRecording() || exitPlayer)
+    if (!rec->IsRecording() || exitPlayer)
     {
         if (!exitPlayer)
             VERBOSE(VB_IMPORTANT, LOC_ERR + "StartRecorder() -- "
@@ -1011,11 +1011,12 @@ bool TV::StartRecorder(int maxWait)
             <<" ms to start recorder.");
 
     // Get timeout for this recorder
-    lockTimeout[recorder->GetRecorderNumber()] =
-        GetLockTimeout(recorder->GetRecorderNumber());
+    lockTimeout[rec->GetRecorderNumber()] =
+        GetLockTimeout(rec->GetRecorderNumber());
 
     // Cache starting frame rate for this recorder
-    frameRate = recorder->GetFrameRate();
+    if (rec == recorder)
+        frameRate = recorder->GetFrameRate();
     return true;
 }
 
@@ -1285,18 +1286,30 @@ void TV::TeardownPipPlayer(void)
     {
         pthread_join(pipdecode, NULL);
         delete pipnvp;
+        pipnvp = NULL;
     }
-    pipnvp = NULL;
 
     if (activerecorder == piprecorder)
         activerecorder = recorder;
 
     if (piprecorder)
+    {
         delete piprecorder;
-    piprecorder = NULL;
+        piprecorder = NULL;
+    }
 
-    delete piprbuffer;
-    piprbuffer = NULL;
+    if (piprbuffer)
+    {
+        delete piprbuffer;
+        piprbuffer = NULL;
+    }
+
+    if (piptvchain)
+    {
+        piptvchain->DestroyChain();
+        delete piptvchain;
+        piptvchain = NULL;
+    }
 }
 
 void *TV::EventThread(void *param)
@@ -2275,8 +2288,8 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 CommitQueuedInput();
             else if (action == "GUIDE")
                 LoadMenu();
-            //else if (action == "TOGGLEPIPMODE")
-            //    TogglePIPView();
+            else if (action == "TOGGLEPIPMODE")
+                TogglePIPView();
             else if (action == "TOGGLEPIPWINDOW")
                 ToggleActiveWindow();
             else if (action == "SWAPPIP")
@@ -2373,54 +2386,67 @@ void TV::ProcessKeypress(QKeyEvent *e)
 
 void TV::TogglePIPView(void)
 {
-#if 0
     if (!pipnvp)
     {
         RemoteEncoder *testrec = RemoteRequestRecorder();
         
-        if (!testrec)
-            return;
-
-        if (!testrec->IsValidRecorder())
+        if (!testrec || !testrec->IsValidRecorder())
         {
-            delete testrec;
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "PiP failed to locate recorder");
+            if (testrec)
+                delete testrec;
             return;
+        }
+
+        testrec->Setup();
+
+        piptvchain = new LiveTVChain();
+        piptvchain->InitializeNewChain("PIP"+gContext->GetHostName());
+        testrec->SpawnLiveTV(piptvchain->GetID(), true);
+        piptvchain->ReloadAll();
+        playbackinfo = piptvchain->GetProgramAt(-1);
+        if (!playbackinfo)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "PiP not successfully started");
+            delete testrec;
+            piptvchain->DestroyChain();
+            delete piptvchain;
+            piptvchain = NULL;
+        }
+        else
+        {
+            piptvchain->SetProgram(playbackinfo);
+            piprbuffer = new RingBuffer(playbackinfo->pathname, false);
+            piprbuffer->SetLiveMode(piptvchain);
         }
 
         piprecorder = testrec;
 
-        QString name = "";
-        long long filesize = 0;
-        long long smudge = 0;
-
-        piprecorder->Setup();
-        if (!piprecorder->SetupRingBuffer(name, filesize, smudge, true))
+        if (StartRecorder(piprecorder, -1))
         {
-            VERBOSE(VB_IMPORTANT, LOC + "HandleStateChange() Error, failed "
-                    "to start RingBuffer for PiP on backend. Aborting.");
-            delete testrec;
-            piprecorder = NULL;
-            return;
+            SetupPipPlayer();
+            VERBOSE(VB_IMPORTANT, "PiP Waiting for NVP");
+            pthread_create(&pipdecode, NULL, SpawnDecode, pipnvp);
+            while (!pipnvp->IsPlaying() && pipnvp->IsDecoderThreadAlive())
+            {
+                piptvchain->ReloadAll();
+                usleep(5000);
+            }
+            VERBOSE(VB_IMPORTANT, "PiP NVP Started");
+
+            if (pipnvp->IsDecoderThreadAlive())
+                nvp->SetPipPlayer(pipnvp);
+            else
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "PiP player failed to start");
+                TeardownPipPlayer();
+            }
         }
-
-        piprbuffer = new RingBuffer(name, filesize, smudge, piprecorder);
-
-        // Get timeout for this recorder
-        lockTimeout[piprecorder->GetRecorderNumber()] =
-            GetLockTimeout(piprecorder->GetRecorderNumber());
-
-        piprecorder->SpawnLiveTV( , true);
-
-        while (!piprecorder->IsRecording())
-            usleep(50);
-    
-        SetupPipPlayer();
-        pthread_create(&pipdecode, NULL, SpawnDecode, pipnvp);
-
-        while (!pipnvp->IsPlaying())
-            usleep(50);
-
-        nvp->SetPipPlayer(pipnvp);        
+        else
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "PiP recorder failed to start");
+            TeardownPipPlayer();
+        }
     }
     else
     {
@@ -2440,9 +2466,8 @@ void TV::TogglePIPView(void)
 
         piprecorder->StopLiveTV();
 
-        TeardownPipPlayer();        
+        TeardownPipPlayer();
     }
-#endif
 }
 
 void TV::ToggleActiveWindow(void)
@@ -2450,6 +2475,7 @@ void TV::ToggleActiveWindow(void)
     if (!pipnvp)
         return;
 
+    lockTimerOn = false;
     if (activenvp == nvp)
     {
         activenvp = pipnvp;
@@ -2462,10 +2488,22 @@ void TV::ToggleActiveWindow(void)
         activerbuffer = prbuffer;
         activerecorder = recorder;
     }
+    LiveTVChain *chain = (activenvp == nvp) ? tvchain : piptvchain;
+    ProgramInfo *pginfo = chain->GetProgramAt(-1);
+    if (pginfo)
+    {
+        SetCurrentlyPlaying(pginfo);
+        delete pginfo;
+    }
 }
 
 void TV::SwapPIP(void)
 {
+#if 0
+// This is disabled because it will fail if the tuners are of
+// different types and extra free tuners of the same types are
+// not available.
+
     if (!pipnvp || !piptvchain || !tvchain) 
         return;
 
@@ -2486,6 +2524,7 @@ void TV::SwapPIP(void)
     ChangeChannel(0, bigchanname);
 
     ToggleActiveWindow();
+#endif
 }
 
 void TV::DoPlay(void)
@@ -4195,7 +4234,8 @@ void TV::customEvent(QCustomEvent *e)
         {
             int cardnum = (QStringList::split(" ", message))[1].toInt();
             QStringList signalList = me->ExtraDataList();
-            bool tc = recorder && (recorder->GetRecorderNumber() == cardnum);
+            bool tc = activerecorder &&
+                (activerecorder->GetRecorderNumber() == cardnum);
             if (tc && signalList.size())
             {
                 UpdateOSDSignal(signalList);
@@ -4654,8 +4694,8 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
     {
         if (action == "GUIDE")
             LoadMenu();
-        //else if (action == "TOGGLEPIPMODE")
-        //    TogglePIPView();
+        else if (action == "TOGGLEPIPMODE")
+            TogglePIPView();
         else if (action == "TOGGLEPIPWINDOW")
             ToggleActiveWindow();
         else if (action == "SWAPPIP")
@@ -5268,7 +5308,7 @@ void TV::ShowNoRecorderDialog(void)
             errorText);
 }
 
-/** \fn TV::PauseLiveTV()
+/** \fn TV::PauseLiveTV(void)
  *  \brief Used in ChangeChannel(), ChangeChannel(),
  *         and ToggleInputs() to temporarily stop video output.
  */
@@ -5302,7 +5342,7 @@ void TV::PauseLiveTV(void)
     }
 }
 
-/** \fn TV::UnpauseLiveTV()
+/** \fn TV::UnpauseLiveTV(void)
  *  \brief Used in ChangeChannel(), ChangeChannel(),
  *         and ToggleInputs() to restart video output.
  */
@@ -5310,21 +5350,24 @@ void TV::UnpauseLiveTV(void)
 {
     VERBOSE(VB_PLAYBACK, LOC + "UnpauseLiveTV()");
 
-    if (activenvp && tvchain)
+    LiveTVChain *chain = (activenvp == nvp) ? tvchain : piptvchain;
+
+    if (activenvp && chain)
     {
-        tvchain->ReloadAll();
-        ProgramInfo *pginfo = tvchain->GetProgramAt(-1);
+        chain->ReloadAll();
+        ProgramInfo *pginfo = chain->GetProgramAt(-1);
         if (pginfo)
         {
             SetCurrentlyPlaying(pginfo);
             delete pginfo;
         }
 
-        tvchain->JumpTo(-1, 1);
+        chain->JumpTo(-1, 1);
 
         QString filters = GetFiltersForChannel();
         activenvp->SetVideoFilters(filters);
         activenvp->Play(normal_speed, true, false);
+        activerbuffer->IgnoreLiveEOF(false);
     }
 
     if (!nvp || (nvp && activenvp == nvp))
