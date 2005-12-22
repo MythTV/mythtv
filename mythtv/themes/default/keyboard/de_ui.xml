@@ -51,7 +51,7 @@
         </key>
         <key name="key2" type="char" draworder="1">
           <position>42,5</position>
-          <char normal="2" shift="\" alt="0x00b2" altshift="\"></char>
+          <char normal="2" shift="0x0022" alt="0x00b2" altshift="0x0022"></char>
           <move left="key1" right="key3" up="key50" down="key16"></move>
         </key>
         <key name="key3" type="char" draworder="1">
@@ -96,12 +96,12 @@
         </key>
         <key name="key11" type="char" draworder="1">
           <position>375,5</position>
-          <char normal="?" shift="0x00df" alt="0x00fc" altshift="0x00df"></char>
+          <char normal="0x00df" shift="?" alt="\" altshift="0x00df"></char>
           <move left="key10" right="key12" up="key53" down="key25"></move>
         </key>
         <key name="key12" type="char" draworder="1">
           <position>412,5</position>
-          <char normal="`" shift="'" alt="`" altshift="'"></char>
+          <char normal="'" shift="`" alt="`" altshift="'"></char>
           <move left="key11" right="key13" up="key53" down="key26"></move>
         </key>
         <key name="key13" type="char" draworder="1">
@@ -111,7 +111,7 @@
         </key>
         <key name="key14" type="char" draworder="1">
           <position>486,5</position>
-          <char normal="#" shift="|" alt="#" altshift="|"></char>
+          <char normal="#" shift="'" alt="#" altshift="`"></char>
           <move left="key13" right="key1" up="key54" down="key55"></move>
         </key>
 
@@ -287,7 +287,7 @@
         </key>
         <key name="key48" type="char" draworder="1">
           <position>375,116</position>
-          <char normal="-" shift="_" alt="_" altshift="_"></char>
+          <char normal="-" shift="_" alt="-" altshift="-"></char>
           <move left="key47" right="key56" up="key36" down="key52"></move>
         </key>
 
@@ -350,7 +350,7 @@
         </key>
         <key name="key55" type="back" draworder="1">
           <position>460,42</position>
-          <char normal="Back" shift="Back" alt="Back" altshift="Back"></char>
+	  <char normal="Zur0x00fcck" shift="Zur0x00fcck" alt="Zur0x00fcck" altshift="Zur0x00fcck"></char>
           <move left="key26" right="key15" up="key14" down="key58"></move>
           <image function="normal" filename="keyboard/key_normal_back.png"></image>
           <image function="focused" filename="keyboard/key_focused_back.png"></image>
@@ -368,7 +368,7 @@
         </key>
         <key name="key57" type="del" draworder="1">
           <position>486,116</position>
-          <char normal="Del" shift="Del" alt="Del" altshift="Del"></char>
+          <char normal="Entf" shift="Entf" alt="Entf" altshift="Entf"></char>
           <move left="key56" right="key38" up="key58" down="key54"></move>
           <image function="normal" filename="keyboard/key_normal_del.png"></image>
           <image function="focused" filename="keyboard/key_focused_del.png"></image>
@@ -377,7 +377,7 @@
         </key>
         <key name="key58" type="done" draworder="1">
           <position>435,79</position>
-          <char normal="Done" shift="Done" alt="Done" altshift="Done"></char>
+          <char normal="Return" shift="Return" alt="Return" altshift="Return"></char>
           <move left="key37" right="key27" up="key55" down="key57"></move>
           <image function="normal" filename="keyboard/key_normal_done.png"></image>
           <image function="focused" filename="keyboard/key_focused_done.png"></image>
