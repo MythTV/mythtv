@@ -87,6 +87,7 @@ typedef QValueList<MPEG2ptsdelta> MPEG2ptsDeltaList;
 class MPEG2replex
 {
   public:
+    MPEG2replex();
     ~MPEG2replex();
     void Start();
     int WaitBuffers();

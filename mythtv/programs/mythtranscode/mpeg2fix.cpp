@@ -281,22 +281,39 @@ int fill_buffers(void *r, int finish)
     return (rx->WaitBuffers());
 }
 
+MPEG2replex::MPEG2replex()
+{
+    memset(&vrbuf, 0, sizeof(ringbuffer));
+    memset(&index_vrbuf, 0, sizeof(ringbuffer));
+    memset(&arbuf, 0, sizeof(ringbuffer) * N_AUDIO);
+    memset(&index_arbuf, 0, sizeof(ringbuffer) * N_AUDIO);
+    memset(&ac3rbuf, 0, sizeof(ringbuffer) * N_AUDIO);
+    memset(&index_ac3rbuf, 0, sizeof(ringbuffer) * N_AUDIO);
+    ac3_count = 0;
+    mp2_count = 0;
+}
+
 MPEG2replex::~MPEG2replex()
 {
-    ring_destroy(&vrbuf);
-    ring_destroy(&index_vrbuf);
+    if (vrbuf.size)
+        ring_destroy(&vrbuf);
+    if (index_vrbuf.size)
+        ring_destroy(&index_vrbuf);
     
     for (int i = 0; i < mp2_count; i++)
     {
-        ring_destroy(&arbuf[i]);
-        ring_destroy(&index_arbuf[i]);
+        if (arbuf[i].size)
+            ring_destroy(&arbuf[i]);
+        if (index_arbuf[i].size)
+            ring_destroy(&index_arbuf[i]);
     }
     for (int i = 0; i < ac3_count; i++)
     {
-        ring_destroy(&ac3rbuf[i]);
-        ring_destroy(&index_ac3rbuf[i]);
+        if (ac3rbuf[i].size)
+            ring_destroy(&ac3rbuf[i]);
+        if (index_ac3rbuf[i].size)
+            ring_destroy(&index_ac3rbuf[i]);
     }
-
 }
 
 int MPEG2replex::WaitBuffers()
@@ -431,6 +448,7 @@ void MPEG2fixup::InitReplex()
 
     rx.mp2_count = mp2_count;
 }
+
 QString MPEG2fixup::PtsTime(int64_t pts)
 {
     bool is_neg = false;
