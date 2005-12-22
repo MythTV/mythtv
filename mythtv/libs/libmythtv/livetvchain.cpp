@@ -5,6 +5,8 @@
 #include "mythdbcon.h"
 #include "programinfo.h"
 
+#define LOC QString("LiveTVChain(%1): ").arg(m_id)
+
 /** \class LiveTVChain
  *  \brief Keeps track of recordings in a current LiveTV instance
  */
@@ -188,8 +190,8 @@ void LiveTVChain::DestroyChain(void)
 void LiveTVChain::ReloadAll(void)
 {
     QMutexLocker lock(&m_lock);
-    VERBOSE(VB_PLAYBACK, "LiveTVChain::ReloadAll()");
 
+    uint prev_size = m_chain.size();
     m_chain.clear();
 
     MSqlQuery query(MSqlQuery::InitCon());
@@ -225,7 +227,13 @@ void LiveTVChain::ReloadAll(void)
         m_curpos = 0;
 
     if (m_switchid >= 0)
-        m_switchid = ProgramIsAt(m_switchentry.chanid, m_switchentry.starttime);
+        m_switchid = ProgramIsAt(m_switchentry.chanid,m_switchentry.starttime);
+
+    if (prev_size!=m_chain.size())
+    {
+        VERBOSE(VB_PLAYBACK, LOC +
+                "ReloadAll(): Added new recording");
+    }
 }
 
 void LiveTVChain::GetEntryAt(int at, LiveTVChainEntry &entry) const
@@ -411,7 +419,7 @@ void LiveTVChain::SwitchTo(int num)
 {
     QMutexLocker lock(&m_lock);
 
-    VERBOSE(VB_PLAYBACK, "LiveTVChain::SwitchTo("<<num<<")");
+    VERBOSE(VB_PLAYBACK, LOC + "SwitchTo("<<num<<")");
 
     int size = m_chain.count();
     if ((num < 0) || (num >= size))
@@ -423,7 +431,7 @@ void LiveTVChain::SwitchTo(int num)
         GetEntryAt(num, m_switchentry);
     }
     else
-        VERBOSE(VB_IMPORTANT, "LiveTVChain::SwitchTo() not switching to current");   
+        VERBOSE(VB_IMPORTANT, LOC + "SwitchTo() not switching to current");   
 
     if (print_verbose_messages & VB_PLAYBACK)
     {
@@ -431,7 +439,7 @@ void LiveTVChain::SwitchTo(int num)
         GetEntryAt(num, e);
         QString msg = QString("%1_%2")
             .arg(e.chanid).arg(e.starttime.toString("yyyyMMddhhmmss"));
-        VERBOSE(VB_PLAYBACK, "LiveTVChain: Entry@"<<num<<": '"<<msg<<"'");
+        VERBOSE(VB_PLAYBACK, LOC + "Entry@"<<num<<": '"<<msg<<"'");
     }
 }
 
@@ -442,7 +450,7 @@ void LiveTVChain::SwitchTo(int num)
  */
 void LiveTVChain::SwitchToNext(bool up)
 {
-    VERBOSE(VB_PLAYBACK, "LiveTVChain::SwitchToNext("<<(up?"up":"down")<<")");
+    //VERBOSE(VB_PLAYBACK, LOC + "SwitchToNext("<<(up?"up":"down")<<")");
     if (up && HasNext())
         SwitchTo(m_curpos + 1);
     else if (!up && HasPrev())
