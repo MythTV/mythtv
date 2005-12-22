@@ -183,8 +183,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     float GetMpegAspect(AVCodecContext *context, int aspect_ratio_info,
                         int width, int height);
 
-    void SeekReset(long long newKey = 0, int skipFrames = 0,
-                   bool needFlush = false);
+    void SeekReset(long long, uint skipFrames, bool doFlush, bool discardFrames);
 
     bool SetupAudioStream(void);
 

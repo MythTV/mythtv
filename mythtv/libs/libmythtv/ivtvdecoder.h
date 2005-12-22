@@ -58,8 +58,8 @@ class IvtvDecoder : public DecoderBase
   private:
     int MpegPreProcessPkt(unsigned char *buf, int len, 
                           long long startpos, long stopframe);
-    void SeekReset(long long newkey = 0, int skipframes = 0,
-                   bool needFlush = false);
+    void SeekReset(long long newkey = 0, uint skipframes = 0,
+                   bool needFlush = false, bool discardFrames = false);
     bool ReadWrite(int onlyvideo, long stopframe = LONG_MAX);
     bool StepFrames(long long start, long long count);
 

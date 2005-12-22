@@ -328,7 +328,7 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
 
     int normalframes = desiredFrame - framesPlayed;
 
-    SeekReset(lastKey, normalframes, doflush);
+    SeekReset(lastKey, normalframes, doflush, doflush);
 
     if (doflush)
     {
@@ -341,12 +341,14 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
     return true;
 }
 
-void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
+void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
+                                bool doflush, bool discardFrames)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "SeekReset("
-            <<skipFrames<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+    VERBOSE(VB_PLAYBACK, LOC + QString("SeekReset(%1, %2 flush, %3 discard)")
+            .arg(skipFrames).arg((doflush) ? "do" : "don't")
+            .arg((discardFrames) ? "do" : "don't"));
 
-    DecoderBase::SeekReset();
+    DecoderBase::SeekReset(newKey, skipFrames, doflush, discardFrames);
 
     lastapts = 0;
     lastvpts = 0;
@@ -357,7 +359,8 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
     
     d->ResetMPEG2();
 
-    // only reset the internal state if we're using our seeking, not libavformat's
+    // Only reset the internal state if we're using our seeking,
+    // not when using libavformat's seeking
     if (recordingHasPositionMap || livetv)
     {
         ic->pb.pos = ringBuffer->GetReadPosition();
@@ -366,6 +369,7 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
         ic->pb.eof_reached = 0;
     }
 
+    // Flush the avcodec buffers
     if (doflush)
     {
         VERBOSE(VB_PLAYBACK, LOC + "SeekReset() flushing");
@@ -377,10 +381,13 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
         }
 
         // TODO here we may need to wait for flushing to complete...
-
-        GetNVP()->DiscardVideoFrames();
     }
 
+    // Discard all the queued up decoded frames
+    if (discardFrames)
+        GetNVP()->DiscardVideoFrames();
+
+    // Free up the stored up packets
     while (storedPackets.count() > 0)
     {
         AVPacket *pkt = storedPackets.first();
@@ -392,15 +399,11 @@ void AvFormatDecoder::SeekReset(long long, int skipFrames, bool doflush)
     prevgoppos = 0;
     gopset = false;
 
-    while (skipFrames > 0)
-    {
-        GetFrame(0);
-        GetNVP()->ReleaseNextVideoFrame();
-
-        if (ateof)
-            break;
-        skipFrames--;
-    }
+    // Skip all the desired number of skipFrames
+    exitafterdecoded = true; // don't actualy get a frame
+    for (;skipFrames > 0 && ateof; skipFrames--)
+        GetFrame(-1); // don't need to return frame...
+    exitafterdecoded = false; // allow frames to be returned again
 }
 
 void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
@@ -408,7 +411,7 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
     VERBOSE(VB_PLAYBACK, LOC + QString("Reset(%1, %2)")
             .arg(reset_video_data).arg(seek_reset));
     if (seek_reset)
-        SeekReset();
+        SeekReset(0, 0, true, true);
 
     if (reset_video_data)
     {
@@ -579,7 +582,7 @@ extern "C" void HandleStreamChange(void* data) {
             "streams_changed "<<data<<" -- stream count "<<cnt);
 
     pthread_mutex_lock(&avcodeclock);
-    decoder->SeekReset();
+    decoder->SeekReset(0, 0, true, true);
     decoder->ScanStreams(false);
     pthread_mutex_unlock(&avcodeclock);
 }
@@ -1137,10 +1140,13 @@ void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic)
         return;
     }
 
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    if (nd && nd->GetNVP() && nd->GetNVP()->getVideoOutput())
+        nd->GetNVP()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
+
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
-    int i;
-    for (i = 0; i < 4; i++)
+    for (uint i = 0; i < 4; i++)
         pic->data[i] = NULL;
 }
 
@@ -1178,8 +1184,6 @@ int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
 
 void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
 {
-    (void)c;
-
     assert(pic->type == FF_BUFFER_TYPE_USER);
 
 #ifdef USING_XVMC
@@ -1187,8 +1191,11 @@ void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic)
     render->state &= ~MP_XVMC_STATE_PREDICTION;
 #endif
 
-    int i;
-    for (i = 0; i < 4; i++)
+    AvFormatDecoder *nd = (AvFormatDecoder *)(c->opaque);
+    if (nd && nd->GetNVP() && nd->GetNVP()->getVideoOutput())
+        nd->GetNVP()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
+
+    for (uint i = 0; i < 4; i++)
         pic->data[i] = NULL;
 
 }
@@ -1212,7 +1219,10 @@ void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src,
         nd->GetNVP()->DrawSlice(frame, 0, y, width, height);
     }
     else
-        cerr<<"render_slice_xvmc called with bad avctx or src"<<endl;
+    {
+        VERBOSE(VB_IMPORTANT, LOC +
+                "render_slice_xvmc called with bad avctx or src");
+    }
 }
 
 void decode_cc_dvd(struct AVCodecContext *s, const uint8_t *buf, int buf_size)
@@ -2160,7 +2170,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
         if (pkt->stream_index > ic->nb_streams)
         {
-            cerr << "bad stream\n";
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Bad stream");
             av_free_packet(pkt);
             continue;
         }
@@ -2411,7 +2421,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     if (ret < 0)
                     {
-                        cerr << "decoding error\n";
+                        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                                "Unknown decoding error");
                         have_err = true;
                         continue;
                     }
@@ -2429,7 +2440,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         AVPicture tmppicture;
  
-                        picframe = GetNVP()->GetNextVideoFrame();
+                        picframe = GetNVP()->GetNextVideoFrame(false);
 
                         tmppicture.data[0] = picframe->buf;
                         tmppicture.data[1] = tmppicture.data[0] + 
@@ -2518,10 +2529,15 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     break;
                 }
                 default:
-                    cerr << "error decoding - " << curstream->codec->codec_type
-                         << endl;
+                {
+                    AVCodecContext *enc = curstream->codec;
+                    VERBOSE(VB_IMPORTANT, LOC_ERR +
+                            QString("Decoding - id(%1) type(%2)")
+                            .arg(codec_id_string(enc->codec_id))
+                            .arg(codec_type_string(enc->codec_type)));
                     have_err = true;
                     break;
+                }
             }
 
             if (!have_err)

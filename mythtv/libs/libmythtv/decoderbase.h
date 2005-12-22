@@ -65,8 +65,8 @@ class DecoderBase
                               int &lower_bound, int &upper_bound);
 
     virtual void SetPositionMap(void);
-    virtual void SeekReset(long long newKey = 0, int skipFrames = 0,
-                           bool needFlush = false);
+    virtual void SeekReset(long long newkey, uint skipFrames,
+                           bool doFlush, bool discardFrames);
 
     const int getCurrentAudioTrack() const { return currentAudioTrack;}
     virtual void incCurrentAudioTrack(){}
@@ -98,6 +98,8 @@ class DecoderBase
     bool DoRewindNormal(long long desiredFrame);
     void DoFastForwardDVD(long long desiredFrame);
     void DoFastForwardNormal(long long desiredFrame, bool &needflush);
+
+    long long GetLastFrameInPosMap(long long desiredFrame);
 
     typedef struct posmapentry
     {

@@ -50,12 +50,10 @@ IvtvDecoder::~IvtvDecoder()
 {
 }
 
-void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
+void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
+                            bool needFlush, bool discardFrames)
 {
-    //fprintf(stderr, "seek reset frame = %llu, skip = %d, exact = %d\n", 
-    //        newkey, skipframes, exactseeks);
-
-    DecoderBase::SeekReset();
+    DecoderBase::SeekReset(newkey, skipframes, needFlush, discardFrames);
 
     if (!exactseeks)
         skipframes = 0;
@@ -101,7 +99,8 @@ void IvtvDecoder::SeekReset(long long newkey, int skipframes, bool needFlush)
                 videoout->Play();
                 do
                     ReadWrite(1);
-                while (videoout->GetFramesPlayed() <= skipframes && !ateof);
+                while (((uint)videoout->GetFramesPlayed() <= skipframes) &&
+                       !ateof);
             }
         }
 

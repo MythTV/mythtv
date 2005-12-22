@@ -1138,10 +1138,10 @@ bool NuppelDecoder::GetFrame(int avignore)
     return true;
 }
 
-void NuppelDecoder::SeekReset(long long, int skipFrames,
-                              bool needFlush)
+void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
+                              bool needFlush, bool discardFrames)
 {
-    DecoderBase::SeekReset();
+    DecoderBase::SeekReset(newKey, skipFrames, needFlush, discardFrames);
 
     if (mpa_codec && needFlush)
         avcodec_flush_buffers(mpa_ctx);

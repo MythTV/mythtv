@@ -240,6 +240,8 @@ class VideoOutput
     /// \brief Releases a frame from the ready for decoding queue onto the
     ///        queue of frames ready for display.
     virtual void ReleaseFrame(VideoFrame *frame) { vbuffers.ReleaseFrame(frame); }
+    /// \brief Releases a frame for reuse if it is in limbo.
+    virtual void DeLimboFrame(VideoFrame *frame) { vbuffers.DeLimboFrame(frame); }
     /// \brief Tell GetLastShownFrame() to return the next frame from the head
     ///        of the queue of frames to display.
     virtual void StartDisplayingFrame(void) { vbuffers.StartDisplayingFrame(); }

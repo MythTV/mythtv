@@ -290,6 +290,10 @@ class NuppelVideoPlayer
     const DecoderBase *GetDecoder(void) const { return decoder; }
     bool DecodeFrame(struct rtframeheader *frameheader,
                      unsigned char *strm, unsigned char *outbuf);
+
+    void CheckPrebuffering(void);
+    bool GetFrameNormal(int onlyvideo);
+    bool GetFrameFFREW(void);
     bool GetFrame(int onlyvideo, bool unsafe = false);
 
     // These actually execute commands requested by public members

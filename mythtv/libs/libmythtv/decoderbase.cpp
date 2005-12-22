@@ -8,6 +8,9 @@
 #include "programinfo.h"
 #include "livetvchain.h"
 
+#define LOC QString("Dec: ")
+#define LOC_ERR QString("Dec, Error: ")
+
 DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo) 
     : m_parent(parent), m_playbackinfo(NULL),
 
@@ -53,7 +56,7 @@ void DecoderBase::SetProgramInfo(ProgramInfo *pginfo)
 
 void DecoderBase::Reset(void)
 {
-    SeekReset(0, 0, true);
+    SeekReset(0, 0, true, true);
 
     m_positionMap.clear();
     framesPlayed = 0;
@@ -62,10 +65,8 @@ void DecoderBase::Reset(void)
     ateof = false;
 }
 
-void DecoderBase::SeekReset(long long newKey, int skipFrames, bool needFlush)
+void DecoderBase::SeekReset(long long, uint, bool, bool)
 {
-    (void)newKey, (void)skipFrames, (void)needFlush;
-
     readAdjust = 0;
 }
 
@@ -408,31 +409,32 @@ void DecoderBase::SetPositionMap(void)
 
 bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
 {
-    VERBOSE(VB_PLAYBACK, "DecorderBase::DoRewind("
+    VERBOSE(VB_PLAYBACK, LOC + "DoRewind("
             <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
 
     if (m_positionMap.empty())
         return false;
 
-    bool ret = true;
-    if (ringBuffer->isDVD())
-        ret = DoRewindDVD(desiredFrame);
-    else
-        ret = DoRewindNormal(desiredFrame);
+    {
+        bool ok = true;
+        if (ringBuffer->isDVD())
+            ok = DoRewindDVD(desiredFrame);
+        else
+            ok = DoRewindNormal(desiredFrame);
 
-    if (!ret)
-        return ret;
+        if (!ok)
+            return false;
+    }
 
     framesPlayed = lastKey;
     framesRead = lastKey;
 
-    int normalframes = desiredFrame - framesPlayed;
+    // Do any Extra frame-by-frame seeking for exactseeks mode
+    // And flush pre-seek frame if we are allowed to and need to..
+    int normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
+    SeekReset(lastKey, normalframes, true, doflush);
 
-    if (!exactseeks)
-        normalframes = 0;
-
-    SeekReset(lastKey, normalframes, doflush);
-
+    // ???
     if (doflush)
     {
         GetNVP()->SetFramesPlayed(framesPlayed+1);
@@ -453,126 +455,124 @@ bool DecoderBase::DoRewindDVD(long long desiredFrame)
 bool DecoderBase::DoRewindNormal(long long desiredFrame)
 {
     // Find keyframe <= desiredFrame, store in lastKey (frames)
-    int pos_idx1, pos_idx2;
+    int pre_idx, post_idx;
+    FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
 
-    FindPosition(desiredFrame, hasKeyFrameAdjustTable, pos_idx1, pos_idx2);
+    bool useAdj   = hasKeyFrameAdjustTable;
+    uint pos_idx  = min(pre_idx, post_idx);
+    PosMapEntry e = m_positionMap[pos_idx];
+    lastKey = (useAdj) ? e.adjFrame : e.index * keyframedist;
 
-    int pos_idx = pos_idx1 < pos_idx2 ? pos_idx1 : pos_idx2;
-
-    if (hasKeyFrameAdjustTable)
-        lastKey = m_positionMap[pos_idx].adjFrame;
-    else
-        lastKey = m_positionMap[pos_idx].index * keyframedist;
-
-    long long keyPos = m_positionMap[pos_idx].pos;
-    long long curPosition = ringBuffer->GetReadPosition();
-    long long diff = keyPos - curPosition;
-
-    // Don't rewind further than we have space to store video
-    while (keyPos <= 0)
+    // ??? Don't rewind past the beginning of the file
+    while (e.pos < 0)
     {
         pos_idx++;
-        if (pos_idx >= (int)m_positionMap.size())
-        {
-            diff = 0;
+        if (pos_idx >= m_positionMap.size())
             return false;
-        }
-        if (hasKeyFrameAdjustTable)
-            lastKey = m_positionMap[pos_idx].adjFrame;
-        else
-            lastKey = m_positionMap[pos_idx].index * keyframedist;
-        keyPos = m_positionMap[pos_idx].pos;
 
-        diff = keyPos - curPosition;
+        e = m_positionMap[pos_idx];
+        lastKey = (useAdj) ? e.adjFrame : e.index * keyframedist;
     }
 
-    ringBuffer->Seek(diff, SEEK_CUR);
+    ringBuffer->Seek(e.pos, SEEK_SET);
 
     return true;
 }
 
-bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
+long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
 {
-    VERBOSE(VB_PLAYBACK, "DecorderBase::DoFastForward("
-            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
-
-    if (desiredFrame < framesPlayed)
-        return DoRewind(desiredFrame, doflush);
-
-    bool oldrawstate = getrawframes;
-    getrawframes = false;
-
     long long last_frame = 0;
-    if (ringBuffer->isDVD())
-        last_frame = m_positionMap[m_positionMap.size()-1].index;
-    else if (!m_positionMap.empty())
-        last_frame = m_positionMap[m_positionMap.size()-1].index * keyframedist;
+    uint mult = (uint) (ringBuffer->isDVD()) ? 1 : keyframedist;
+    if (!m_positionMap.empty())
+        last_frame = mult * m_positionMap.back().index;
 
-    if (desiredFrame > last_frame)
+    // Resync keyframe map if we are trying to seek to a frame
+    // not yet in out map and then check for last frame again.
+    if ((desiredFrame >= 0) && (desiredFrame > last_frame))
     {
-        VERBOSE(VB_PLAYBACK, QString("DoFastForward: Not enough info in "
-                                     "positionMap,\n\t\t\twe need frame %1 but "
-                                     "highest we have is %2")
-                                     .arg((long int)desiredFrame)
-                                     .arg((long int)last_frame));
+        VERBOSE(VB_PLAYBACK, LOC + "DoFastForward: "
+                "Not enough info in positionMap," +
+                QString("\n\t\t\twe need frame %1 but highest we have is %2.")
+                .arg((long int)desiredFrame).arg((long int)last_frame));
+
         SyncPositionMap();
 
-        if (ringBuffer->isDVD())
-            last_frame = m_positionMap[m_positionMap.size()-1].index;
-        else if (!m_positionMap.empty())
-            last_frame = m_positionMap[m_positionMap.size()-1].index * keyframedist;
+        if (!m_positionMap.empty())
+            last_frame = mult * m_positionMap.back().index;
 
         if (desiredFrame > last_frame)
         {
-            VERBOSE(VB_PLAYBACK, QString("DoFastForward: Still Not enough info "
-                                         "in positionMap,\n\t\t\twe need "
-                                         "frame %1 but highest we have is %2.  "
-                                         "Will seek frame-by-frame")
-                                         .arg((long int)desiredFrame)
-                                         .arg((long int)last_frame));
+            VERBOSE(VB_PLAYBACK, LOC + "DoFastForward: "
+                    "Still not enough info in positionMap after sync, " +
+                    QString("\n\t\t\twe need frame %1 but highest we have "
+                            "is %2. Will seek frame-by-frame")
+                    .arg((long int)desiredFrame).arg((long int)last_frame));
         }
     }
+    return last_frame;
+}
 
+bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
+{
+    VERBOSE(VB_PLAYBACK, LOC + "DoFastForward("
+            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+
+    // Rewind if we have already played the desiredFrame.
+    if (desiredFrame < framesPlayed)
+        return DoRewind(desiredFrame, doflush);
+
+    // Save rawframe state, for later restoration...
+    bool oldrawstate = getrawframes;
+    getrawframes = false;
+
+    // Fetch last keyframe in position map
+    long long last_frame = GetLastFrameInPosMap(desiredFrame);
+
+    // If the desiredFrame is past the end of the position map,
+    // do some frame-by-frame seeking until we get to it.
     bool needflush = false;
-
-    while (desiredFrame > last_frame)
+    if (desiredFrame > last_frame)
     {
         needflush = true;
-        
-        exitafterdecoded = true;
-        GetFrame(-1);
-        exitafterdecoded = false;
 
-        if (!m_positionMap.empty())
-            last_frame = m_positionMap[m_positionMap.size()-1].index * 
-                                                                  keyframedist; 
-        
+        exitafterdecoded = true; // don't actualy get a frame
+        while ((desiredFrame > last_frame) && !ateof)
+        {
+            GetFrame(-1); // don't need to return frame...
+            last_frame = GetLastFrameInPosMap(-1);
+        }
+        exitafterdecoded = false; // allow frames to be returned again
+
         if (ateof)
+        {
+            // Re-enable rawframe state if it was enabled before FF
+            getrawframes = oldrawstate;
             return false;
+        }
     }
 
     if (m_positionMap.empty())
         return false;
 
+    // Handle non-frame-by-frame seeking
     if (ringBuffer->isDVD())
         DoFastForwardDVD(desiredFrame);
     else 
         DoFastForwardNormal(desiredFrame, needflush);
 
-    int normalframes = desiredFrame - framesPlayed;
+    // Do any Extra frame-by-frame seeking for exactseeks mode
+    // And flush pre-seek frame if we are allowed to and need to..
+    int normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
+    SeekReset(lastKey, normalframes, needflush, doflush);
 
-    if (!exactseeks)
-        normalframes = 0;
-
-    if (needflush || normalframes)
-        SeekReset(lastKey, normalframes, needflush && doflush);
-
+    // ???
     if (doflush)
     {
         GetNVP()->SetFramesPlayed(framesPlayed+1);
         GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
     }
 
+    // Re-enable rawframe state if it was enabled before FF
     getrawframes = oldrawstate;
 
     return true;
@@ -580,27 +580,19 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
 
 void DecoderBase::DoFastForwardNormal(long long desiredFrame, bool &needflush)
 {
-    // Find keyframe >= desiredFrame, store in lastKey
+    int pre_idx, post_idx;
+    FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
+
     // if exactseeks, use keyframe <= desiredFrame
-    int pos_idx1, pos_idx2;
-    FindPosition(desiredFrame, hasKeyFrameAdjustTable, pos_idx1, pos_idx2);
+    uint pos_idx = (exactseeks) ? pre_idx : max(pre_idx, post_idx);
 
-    int pos_idx = pos_idx1 < pos_idx2 ? pos_idx1 : pos_idx2;
-
-    if (hasKeyFrameAdjustTable)
-        lastKey = m_positionMap[pos_idx].adjFrame;
-    else
-        lastKey = m_positionMap[pos_idx].index * keyframedist;
-
-    long long keyPos = m_positionMap[pos_idx].pos;
+    PosMapEntry e = m_positionMap[pos_idx];
+    lastKey = (hasKeyFrameAdjustTable) ? e.adjFrame : e.index * keyframedist;
 
     if (framesPlayed < lastKey)
     {
-        long long diff = keyPos - ringBuffer->GetReadPosition();
-
-        ringBuffer->Seek(diff, SEEK_CUR);
-        needflush = true;
-    
+        ringBuffer->Seek(e.pos, SEEK_SET);
+        needflush    = true;
         framesPlayed = lastKey;
         framesRead = lastKey;
     }
@@ -666,7 +658,7 @@ void DecoderBase::ChangeDVDTrack(bool ffw)
         uint elapsed = ringBuffer->GetCellStart();
 
         if (elapsed == 0)
-            SeekReset(framesPlayed, 0, true);
+            SeekReset(framesPlayed, 0, true, true);
 
         // update frames played
         long long played = (int)(elapsed * fps);

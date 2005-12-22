@@ -294,7 +294,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
 /**
  * \fn VideoBuffers::ReleaseFrame(VideoFrame*)
  *  Frame is ready to be for filtering or OSD application.
- *  Removed frame from limbo and added it to used queue.
+ *  Removes frame from limbo and adds it to used queue.
  * \param frame Frame to move to used.
  */
 void VideoBuffers::ReleaseFrame(VideoFrame *frame)
@@ -303,6 +303,22 @@ void VideoBuffers::ReleaseFrame(VideoFrame *frame)
     vpos = vbufferMap[frame];
     limbo.remove(frame);
     used.enqueue(frame);
+    global_lock.unlock();
+}
+
+/**
+ * \fn VideoBuffers::DeLimboFrame(VideoFrame*)
+ *  If the frame is still in the limbo state it is added to the available queue.
+ * \param frame Frame to move to used.
+ */
+void VideoBuffers::DeLimboFrame(VideoFrame *frame)
+{
+    global_lock.lock();
+    if (limbo.contains(frame))
+    {
+        limbo.remove(frame);
+        available.enqueue(frame);
+    }
     global_lock.unlock();
 }
 

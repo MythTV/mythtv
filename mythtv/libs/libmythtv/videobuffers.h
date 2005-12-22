@@ -67,6 +67,7 @@ class VideoBuffers
     VideoFrame *GetNextFreeFrame(bool with_lock, bool allow_unsafe,
                                  BufferType enqueue_to = kVideoBuffer_limbo);
     void ReleaseFrame(VideoFrame *frame);
+    void DeLimboFrame(VideoFrame *frame);
     void StartDisplayingFrame(void);
     void DoneDisplayingFrame(void);
     void DiscardFrame(VideoFrame *frame);
