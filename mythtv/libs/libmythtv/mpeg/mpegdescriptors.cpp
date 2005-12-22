@@ -295,14 +295,13 @@ QString MPEGDescriptor::toString() const
     return str;
 }
 
-
 QString RegistrationDescriptor::toString() const
 {
     QString fmt = FormatIdentifierString();
     QString msg = QString("Registration Descriptor: '%1' ").arg(fmt);
     QString msg2 = "Unknown";
     if (fmt == "CUEI")
-        msg2 = "SCTE 35 2003, Digital Program Insertion Cueing Message for Cable";
+        msg2 = "SCTE 35 2003, Cable Digital Program Insertion Cueing Message";
     else if (fmt == "AC-3")
         msg2 = "ATSC audio stream A/52";
     else if (fmt == "GA94")
@@ -312,7 +311,7 @@ QString RegistrationDescriptor::toString() const
     return msg + msg2;
 }
 
-QString  ConditionalAccessDescriptor::toString() const
+QString ConditionalAccessDescriptor::toString() const
 {
     return QString("Conditional Access: sid(0x%1) pid(0x%2) data_size(%3)")
         .arg(SystemID(),0,16).arg(PID(),0,16).arg(DataSize());
