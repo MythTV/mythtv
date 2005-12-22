@@ -1892,6 +1892,12 @@ void OSD::ShowEditArrow(long long number, long long totalframes, int type)
                              osdBounds.width(), osdBounds.height(),
                              wmult, hmult, frameint);
     set->SetAllowFade(false);
+    OSDSet *container = GetSet("editmode");
+    if (container)
+        set->SetPriority(container->GetPriority() - 1);
+    else
+        set->SetPriority(4);
+
     AddSet(set, name, false);
 
     OSDTypeImage *image;
