@@ -650,7 +650,7 @@ void StatusBox::doListingsStatus()
     qdtNow = QDateTime::currentDateTime();
 
     MSqlQuery query(MSqlQuery::InitCon());
-    query.prepare("SELECT max(endtime) FROM program;");
+    query.prepare("SELECT max(endtime) FROM program WHERE manualid=0;");
     query.exec();
 
     if (query.isActive() && query.size())
