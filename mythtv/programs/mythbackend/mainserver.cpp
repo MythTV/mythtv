@@ -609,7 +609,9 @@ void MainServer::customEvent(QCustomEvent *e)
                                                                      startts);
             if (pinfo)
             {
-                pinfo->ForgetHistory(); // allow re-record of auto expired rec
+                // allow re-record if auto expired but not expired live buffers
+                if (pinfo->recgroup != "LiveTV")
+                    pinfo->ForgetHistory();
                 DoHandleDeleteRecording(pinfo, NULL, false);
             }
             else
