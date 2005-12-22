@@ -24,6 +24,7 @@ using namespace std;
 #include "ThreadedFileWriter.h"
 #include "livetvchain.h"
 #include "DVDRingBuffer.h"
+#include "util.h"
 
 #ifndef O_STREAMING
 #define O_STREAMING 0
@@ -788,26 +789,45 @@ int RingBuffer::ReadFromBuf(void *buf, int count)
     }
     
     int avail = ReadBufAvail();
-    readErr = 0;
 
     if (ateof && avail < count)
         count = avail;
     
+    MythTimer t;
+    t.start();
     while (avail < count && !stopreads)
     {
         availWaitMutex.lock();
         wanttoread = count;
-        if (!availWait.wait(&availWaitMutex, 4000))
+        if (!availWait.wait(&availWaitMutex, 250))
         {
-            VERBOSE(VB_IMPORTANT, LOC + "Waited 4 seconds for data to "
-                    "become available, waiting again...");
-
-            readErr++;
-            if (readErr > 7)
+            int elapsed = t.elapsed();
+            if (((elapsed > 2000) && (elapsed < 2250)) ||
+                ((elapsed > 4000) && (elapsed < 4250)) ||
+                ((elapsed > 8000) && (elapsed < 8250)))
             {
-                VERBOSE(VB_IMPORTANT, LOC + "Waited 14 seconds for data to "
-                        "become available, aborting");
+                VERBOSE(VB_IMPORTANT, LOC + "Waited " +
+                        QString("%1").arg(elapsed/1000) +
+                        " seconds for data to become available...");
+            }
 
+            bool quit = false;
+            if (livetvchain)
+            {
+                livetvchain->ReloadAll();
+                quit = livetvchain->HasNext();
+            }
+
+            if (elapsed > 16000 || quit)
+            {
+                if (!quit)
+                {
+                    VERBOSE(VB_IMPORTANT, LOC_ERR + "Waited " +
+                            QString("%1").arg(elapsed/1000) +
+                            " seconds for data, aborting.");
+                }
+
+                ateof = true;
                 wanttoread = 0;
                 stopreads = true;
                 availWaitMutex.unlock();
