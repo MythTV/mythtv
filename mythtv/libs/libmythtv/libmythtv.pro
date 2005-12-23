@@ -95,6 +95,7 @@ HEADERS += ccdecoder.h
 HEADERS += sr_dialog.h              sr_root.h
 HEADERS += sr_items.h               scheduledrecording.h
 HEADERS += signalmonitorvalue.h     viewschdiff.h
+HEADERS += mpeg/tspacket.h          mpeg/pespacket.h
 HEADERS += mpeg/iso639.h
 HEADERS += livetvchain.h
 HEADERS += playgroup.h              progdetails.h
@@ -111,6 +112,7 @@ SOURCES += ccdecoder.cpp
 SOURCES += sr_dialog.cpp            sr_root.cpp
 SOURCES += sr_items.cpp             scheduledrecording.cpp
 SOURCES += signalmonitorvalue.cpp
+SOURCES += mpeg/tspacket.cpp        mpeg/pespacket.cpp
 SOURCES += mpeg/iso639.cpp
 SOURCES += viewschdiff.cpp
 SOURCES += livetvchain.cpp
@@ -218,7 +220,6 @@ using_backend {
     SOURCES += dtvrecorder.cpp             dummydtvrecorder.cpp
 
     # MPEG parsing stuff
-    HEADERS += mpeg/tspacket.h             mpeg/pespacket.h
     HEADERS += mpeg/mpegtables.h           mpeg/atsctables.h
     HEADERS += mpeg/dvbtables.h
     HEADERS += mpeg/mpegstreamdata.h       mpeg/atscstreamdata.h
@@ -226,7 +227,6 @@ using_backend {
     HEADERS += mpeg/mpegdescriptors.h      mpeg/atscdescriptors.h
     HEADERS += mpeg/dvbdescriptors.h
     HEADERS += mpeg/tsstats.h 
-    SOURCES += mpeg/tspacket.cpp           mpeg/pespacket.cpp
     SOURCES += mpeg/mpegtables.cpp         mpeg/atsctables.cpp
     SOURCES += mpeg/dvbtables.cpp
     SOURCES += mpeg/mpegstreamdata.cpp     mpeg/atscstreamdata.cpp
