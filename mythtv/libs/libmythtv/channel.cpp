@@ -1,15 +1,25 @@
+// Std C headers
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
 
+// POSIX headers
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+
+// C++ headers
+#include <algorithm>
+#include <iostream>
+using namespace std;
+
+// Qt headers
 #include <qsqldatabase.h>
 
+// MythTV headers
 #include "videodev_myth.h"
 #include "channel.h"
 #include "frequencies.h"
@@ -18,9 +28,6 @@
 #include "mythdbcon.h"
 #include "channelutil.h"
 #include "videosource.h" // for CardUtil
-
-#include <iostream>
-using namespace std;
 
 #define LOC QString("Channel(%1): ").arg(device)
 #define LOC_ERR QString("Channel(%1) Error: ").arg(device)
@@ -1093,33 +1100,25 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
         card_value = *setfield;
     }
 
-    if (current_value < 0) // Couldn't get from database
-    {
-        if (up)
-        {
-            newvalue = card_value + 655;
-            newvalue = (newvalue > 65535) ? (65535) : (newvalue);
-        }
-        else
-        {
-            newvalue = card_value - 655;
-            newvalue = (newvalue < 0) ? (0) : (newvalue);
-        }
-    }
-    else
-    {
-        if (up)
-        {
-            newvalue = current_value + 655;
-            newvalue = (newvalue > 65535) ? (65535) : (newvalue);
-        }
-        else
-        {
-            newvalue = current_value - 655;
-            newvalue = (newvalue < 0) ? (0) : (newvalue);
-        }
+    newvalue  = (current_value < 0) ? card_value : current_value;
+    newvalue += (up) ? 655 : -655;
 
-        pParent->SetChannelValue(channel_field, newvalue, this, curchannelname);
+    if (V4L2_CID_HUE == attrib)
+    {
+        // wrap around for hue
+        newvalue = (newvalue > 65535) ? newvalue - 65535 : newvalue;
+        newvalue = (newvalue < 0)     ? newvalue + 65535 : newvalue;
+    }
+
+    // make sure we are within bounds
+    newvalue  = min(newvalue, 65535);
+    newvalue  = max(newvalue, 0);
+
+    if (current_value >= 0)
+    {
+        // tell the DB about the new attributes
+        pParent->SetChannelValue(channel_field, newvalue,
+                                 this, curchannelname);
     }
 
     if (usingv4l2)
@@ -1138,13 +1137,11 @@ int Channel::ChangeColourAttribute(int attrib, const char *name, bool up)
                     arg(device).arg(strerror(errno)));
             return -1;
         }
-        ctrl.value = (int)((qctrl.maximum - qctrl.minimum) / 65535.0 * 
-                           newvalue + qctrl.minimum);
-        ctrl.value = ctrl.value > qctrl.maximum
-                        ? qctrl.maximum
-                            : ctrl.value < qctrl.minimum
-                                ? qctrl.minimum
-                                    : ctrl.value;
+        float mult = (qctrl.maximum - qctrl.minimum) / 65535.0;
+        ctrl.value = (int)(mult * newvalue + qctrl.minimum);
+        ctrl.value = min(ctrl.value, qctrl.maximum);
+        ctrl.value = max(ctrl.value, qctrl.minimum);
+
         if (ioctl(videofd, VIDIOC_S_CTRL, &ctrl) < 0)
         {
             VERBOSE(VB_IMPORTANT,

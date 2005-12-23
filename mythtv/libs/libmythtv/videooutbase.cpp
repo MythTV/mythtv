@@ -986,13 +986,16 @@ int VideoOutput::ChangeColour(bool up)
  */
 int VideoOutput::ChangeHue(bool up)
 {
-    int result;
+    int newhue = hue + ((up) ? 1 : -1);
 
-    result = this->ChangePictureAttribute(kPictureAttribute_Hue, 
-                                          hue + ((up) ? 1 : -1) );
-    hue = (result == -1) ? hue : result;
+    // wrap around the hue...
+    newhue = (newhue <  0) ? 99 : newhue;
+    newhue = (newhue > 99) ? 0  : newhue;
 
-    return hue;
+    if (ChangePictureAttribute(kPictureAttribute_Hue, newhue) < 0)
+        return hue;
+
+    return hue = newhue;
 }
 
 /**
