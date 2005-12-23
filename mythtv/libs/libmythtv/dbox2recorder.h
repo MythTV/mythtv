@@ -51,7 +51,7 @@ class DBox2Recorder : public DTVRecorder
 	void SetOptionsFromProfile(RecordingProfile *profile,
 				   const QString &videodev,
 				   const QString &audiodev,
-				   const QString &vbidev, int ispip);
+				   const QString &vbidev);
 	
 	void SetOption(const QString &name, const QString &value);
 	void SetOption(const QString &name, int value);

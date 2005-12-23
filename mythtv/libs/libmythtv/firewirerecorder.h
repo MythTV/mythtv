@@ -42,10 +42,10 @@ class FirewireRecorder : public DTVRecorder
     void StartRecording(void);
     bool Open(void); 
     void ProcessTSPacket(const TSPacket &tspacket);
-    void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
-                                         const QString &videodev,
-                                         const QString &audiodev,
-                                         const QString &vbidev, int ispip);
+    void SetOptionsFromProfile(RecordingProfile *profile,
+                               const QString &videodev,
+                               const QString &audiodev,
+                               const QString &vbidev);
 
     void SetOption(const QString &name, const QString &value);
     void SetOption(const QString &name, int value);

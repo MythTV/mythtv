@@ -325,10 +325,9 @@ void NuppelVideoRecorder::SetOption(const QString &opt, int value)
 }
 
 void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
-                                                const QString &videodev, 
+                                                const QString &videodev,
                                                 const QString &audiodev,
-                                                const QString &vbidev, 
-                                                int ispip)
+                                                const QString &vbidev)
 {
     SetOption("videodevice", videodev);
     SetOption("vbidevice", vbidev);
@@ -404,19 +403,6 @@ void NuppelVideoRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
     SetIntOption(profile, "width");
     SetIntOption(profile, "height");
-
-    if (ispip)
-    {
-        SetOption("codec", "rtjpeg");
-
-        SetOption("width", 160);
-        SetOption("height", 128);
-        SetOption("rtjpegchromafilter", 0);
-        SetOption("rtjpeglumafilter", 0);
-        SetOption("rtjpegquality", 255);
-        SetOption("audiocompression", 0);
-        SetOption("pip_mode", 1);
-    }
 }
 
 void NuppelVideoRecorder::Pause(bool clear)

@@ -65,7 +65,7 @@ class DVBRecorder: public DTVRecorder, private ReaderPausedCB
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev, int ispip);
+                               const QString &vbidev);
 
     void StartRecording(void);
     void Reset(void);

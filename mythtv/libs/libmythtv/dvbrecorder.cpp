@@ -167,7 +167,7 @@ void DVBRecorder::SetOption(const QString &name, int value)
 
 void DVBRecorder::SetOptionsFromProfile(RecordingProfile*, 
                                         const QString &videodev,
-                                        const QString&, const QString&, int)
+                                        const QString&, const QString&)
 {
     SetOption("cardnum", videodev.toInt());
     DTVRecorder::SetOption("tvformat", gContext->GetSetting("TVFormat"));

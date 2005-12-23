@@ -806,7 +806,7 @@ bool TVRec::SetupRecorder(RecordingProfile &profile)
     if (recorder)
     {
         recorder->SetOptionsFromProfile(
-            &profile, genOpt.videodev, genOpt.audiodev, genOpt.vbidev, ispip);
+            &profile, genOpt.videodev, genOpt.audiodev, genOpt.vbidev);
         recorder->SetRingBuffer(ringBuffer);
         recorder->Initialize();
 

@@ -179,12 +179,11 @@ void HDTVRecorder::deleteLater(void)
 void HDTVRecorder::SetOptionsFromProfile(RecordingProfile *profile,
                                          const QString &videodev,
                                          const QString &audiodev,
-                                         const QString &vbidev, int ispip)
+                                         const QString &vbidev)
 {
     (void)audiodev;
     (void)vbidev;
     (void)profile;
-    (void)ispip;
 
     SetOption("videodevice", videodev);
     SetOption("tvformat", gContext->GetSetting("TVFormat"));

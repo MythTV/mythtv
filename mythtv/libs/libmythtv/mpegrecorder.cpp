@@ -208,7 +208,7 @@ void MpegRecorder::SetOption(const QString &opt, const QString &value)
 void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile, 
                                          const QString &videodev, 
                                          const QString &audiodev,
-                                         const QString &vbidev, int ispip)
+                                         const QString &vbidev)
 {
     (void)audiodev;
     (void)vbidev;
@@ -244,14 +244,6 @@ void MpegRecorder::SetOptionsFromProfile(RecordingProfile *profile,
 
     SetIntOption(profile, "width");
     SetIntOption(profile, "height");
-
-    if (ispip)
-    {
-        SetOption("width", 320);
-        SetOption("height", 240);
-        SetOption("mpeg2bitrate", 1000);
-        SetOption("mpeg2maxbitrate", 2000);
-    }
 }
 
 bool MpegRecorder::OpenMpegFileAsInput(void)

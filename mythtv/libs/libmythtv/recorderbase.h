@@ -86,13 +86,12 @@ class RecorderBase : public QObject
      *
      *   SetOptionsFromProfile is used to tell the recorder
      *   about the recording profile as well as the devices
-     *   to use, and whether this is for a picture-in-picture
-     *   "Live TV" display.
+     *   to use.
      */
     virtual void SetOptionsFromProfile(RecordingProfile *profile, 
                                        const QString &videodev, 
                                        const QString &audiodev,
-                                       const QString &vbidev, int ispip) = 0;
+                                       const QString &vbidev) = 0;
 
     /** \brief Sets next recording info, to be applied as soon as practical.
      *

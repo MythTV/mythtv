@@ -54,7 +54,7 @@ class NuppelVideoRecorder : public RecorderBase, public CCReader
     void SetOptionsFromProfile(RecordingProfile *profile,
                                const QString &videodev,
                                const QString &audiodev,
-                               const QString &vbidev, int ispip);
+                               const QString &vbidev);
  
     void Initialize(void);
     void StartRecording(void);

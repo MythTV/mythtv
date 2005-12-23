@@ -23,7 +23,7 @@ class DummyDTVRecorder: public DTVRecorder
     ~DummyDTVRecorder();
 
     void SetOptionsFromProfile(RecordingProfile*, const QString&,
-                               const QString&, const QString&, int) {;}
+                               const QString&, const QString&) {;}
 
     void SetDesiredAttributes(uint width, uint height, double frame_rate);
 

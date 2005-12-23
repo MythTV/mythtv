@@ -197,14 +197,14 @@ void FirewireRecorder::ProcessTSPacket(const TSPacket &tspacket)
 }
 
 void FirewireRecorder::SetOptionsFromProfile(RecordingProfile *profile,
-                                         const QString &videodev,
-                                         const QString &audiodev,
-                                         const QString &vbidev, int ispip) {
+                                             const QString &videodev,
+                                             const QString &audiodev,
+                                             const QString &vbidev)
+{
     (void)videodev;
     (void)audiodev;
     (void)vbidev;
     (void)profile;
-    (void)ispip;
 }
 
 void FirewireRecorder::SetOption(const QString &name, const QString &value) {
