@@ -114,7 +114,7 @@ void SearchDialog::runQuery(QString searchText)
         {
              for (uint i = 0; i < list.count(); i++)
              {
-                 QString stxt = list[i].stripWhiteSpace();
+                 QString stxt = list[i];
                  whereClause += (i) ? " AND ( " : "WHERE (";
                  whereClause +=
                     "filename LIKE '%" + stxt + "%' OR "
@@ -171,7 +171,7 @@ void SearchDialog::runQuery(QString searchText)
             {
                 for (uint i = 0; i < list.count(); i++) 
                 {
-                    QString stxt = list[i].stripWhiteSpace();
+                    QString stxt = list[i];
                     int index = -1;
                     while( (index = text.findRev(stxt, index, false)) != -1 ) 
                     {
