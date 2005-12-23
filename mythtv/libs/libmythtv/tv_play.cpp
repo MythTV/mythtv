@@ -482,8 +482,11 @@ int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
 
         return 1;
     }
-    chain->DestroyChain();
-    delete chain;
+    if (chain)
+    {
+        chain->DestroyChain();
+        delete chain;
+    }
     return 0;
 }
 
@@ -828,12 +831,13 @@ void TV::HandleStateChange(void)
         SET_NEXT();
 
         StopStuff(true, true, true);
-        pbinfoLock.lock();
-        if (playbackinfo)
-            delete playbackinfo;
-        playbackinfo = NULL;
-        pbinfoLock.unlock();
-
+        SetCurrentlyPlaying(NULL);
+        if (tvchain)
+        {
+            tvchain->DestroyChain();
+            delete tvchain;
+            tvchain = NULL;
+        }
         gContext->RestoreScreensaver();
     }
     else if (TRANSITION(kState_WatchingRecording, kState_WatchingPreRecorded))
