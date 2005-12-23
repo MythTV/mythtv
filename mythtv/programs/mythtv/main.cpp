@@ -126,9 +126,6 @@ int main(int argc, char *argv[])
         return TV_EXIT_NO_TV;
     }
 
-    LiveTVChain *tvchain = new LiveTVChain();
-    QString chainid = tvchain->InitializeNewChain(gContext->GetHostName());
-
     if (a.argc() > 1)
     {
         QString filename = a.argv()[1];
@@ -140,7 +137,11 @@ int main(int argc, char *argv[])
         tv->Playback(pginfo);
     }
     else
+    {
+        LiveTVChain *tvchain = new LiveTVChain();
+        tvchain->InitializeNewChain(gContext->GetHostName());
         tv->LiveTV(tvchain, true);
+    }
 
     qApp->unlock();
     while (tv->GetState() != kState_None)
@@ -151,12 +152,6 @@ int main(int argc, char *argv[])
 
     sleep(1);
     delete tv;
-
-    if (tvchain)
-    {
-        tvchain->DestroyChain();
-        delete tvchain;
-    }
 
     if (priv_thread != 0) 
     {

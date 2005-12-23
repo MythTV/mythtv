@@ -440,6 +440,12 @@ TV::~TV(void)
 
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
+
+    if (tvchain)
+    {
+        tvchain->DestroyChain();
+        delete tvchain;
+    }
 }
 
 TVState TV::GetState(void) const
@@ -457,6 +463,13 @@ void TV::GetPlayGroupSettings(const QString &group)
     normal_speed = PlayGroup::GetSetting(group, "timestretch", 100) / 100.0;
 }
 
+/** \fn LiveTV(LiveTVChain*, bool)
+ *  \brief Starts LiveTV
+ *
+ *  The TV class assumes ownership of the LiveTVChain, so you must not
+ *  call LiveTVChain::DestroyChain(void) or delete the chain once you
+ *  have passed it to this method.
+ */
 int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
 {
     if (internalState == kState_None && RequestNextRecorder(showDialogs))
@@ -469,6 +482,8 @@ int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
 
         return 1;
     }
+    chain->DestroyChain();
+    delete chain;
     return 0;
 }
 
@@ -2425,14 +2440,14 @@ void TV::TogglePIPView(void)
         if (StartRecorder(piprecorder, -1))
         {
             SetupPipPlayer();
-            VERBOSE(VB_IMPORTANT, "PiP Waiting for NVP");
+            VERBOSE(VB_PLAYBACK, "PiP Waiting for NVP");
             pthread_create(&pipdecode, NULL, SpawnDecode, pipnvp);
             while (!pipnvp->IsPlaying() && pipnvp->IsDecoderThreadAlive())
             {
                 piptvchain->ReloadAll();
                 usleep(5000);
             }
-            VERBOSE(VB_IMPORTANT, "PiP NVP Started");
+            VERBOSE(VB_PLAYBACK, "PiP NVP Started");
 
             if (pipnvp->IsDecoderThreadAlive())
                 nvp->SetPipPlayer(pipnvp);
@@ -2497,34 +2512,90 @@ void TV::ToggleActiveWindow(void)
     }
 }
 
+struct pip_info
+{
+    RingBuffer    *buffer;
+    RemoteEncoder *recorder;
+    LiveTVChain   *chain;
+    long long      frame;
+};
+
 void TV::SwapPIP(void)
 {
-#if 0
-// This is disabled because it will fail if the tuners are of
-// different types and extra free tuners of the same types are
-// not available.
-
     if (!pipnvp || !piptvchain || !tvchain) 
         return;
 
-    QString dummy;
-    QString pipchanname;
-    QString bigchanname;
+    lockTimerOn = false;
 
-    pipchanname = piptvchain->GetChannelName(-1);
-    bigchanname = tvchain->GetChannelName(-1);
+    struct pip_info main, pip;
+    main.buffer   = prbuffer;
+    main.recorder = recorder;
+    main.chain    = tvchain;
+    main.frame    = nvp->GetFramesPlayed();
+    pip.buffer    = piprbuffer;
+    pip.recorder  = piprecorder;
+    pip.chain     = piptvchain;
+    pip.frame     = pipnvp->GetFramesPlayed();
 
-    if (activenvp != nvp)
-        ToggleActiveWindow();
+    prbuffer->Pause();
+    prbuffer->WaitForPause();
 
-    ChangeChannel(0, pipchanname);
+    piprbuffer->Pause();
+    piprbuffer->WaitForPause();
 
-    ToggleActiveWindow();
+    nvp->StopPlaying();
+    pipnvp->StopPlaying();
+    {
+        QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal using osd...
+        pthread_join(decode, NULL);
+        delete nvp;
+        nvp = NULL;
+        pthread_join(pipdecode, NULL);
+        delete pipnvp;
+        pipnvp = NULL;
+    }
 
-    ChangeChannel(0, bigchanname);
+    activerbuffer  = prbuffer = pip.buffer;
+    activerecorder = recorder = pip.recorder;
+    tvchain                   = pip.chain;
 
-    ToggleActiveWindow();
-#endif
+    piprbuffer  = main.buffer;
+    piprecorder = main.recorder;
+    piptvchain  = main.chain;
+
+    prbuffer->Seek(0, SEEK_SET);
+    prbuffer->Unpause();
+    StartPlayer(false);
+    activenvp = nvp;
+    nvp->FastForward(pip.frame/recorder->GetFrameRate());
+
+    piprbuffer->Seek(0, SEEK_SET);
+    piprbuffer->Unpause();
+    SetupPipPlayer();
+    VERBOSE(VB_PLAYBACK, "PiP Waiting for NVP -- restart");
+    pthread_create(&pipdecode, NULL, SpawnDecode, pipnvp);
+    while (!pipnvp->IsPlaying() && pipnvp->IsDecoderThreadAlive())
+    {
+        piptvchain->ReloadAll();
+        usleep(5000);
+    }
+    VERBOSE(VB_PLAYBACK, "PiP NVP Started -- restart");
+    pipnvp->FastForward(pip.frame/piprecorder->GetFrameRate());
+
+    if (pipnvp->IsDecoderThreadAlive())
+        nvp->SetPipPlayer(pipnvp);
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "PiP player failed to start");
+        TeardownPipPlayer();
+    }
+
+    ProgramInfo *pginfo = tvchain->GetProgramAt(-1);
+    if (pginfo)
+    {
+        SetCurrentlyPlaying(pginfo);
+        delete pginfo;
+    }
 }
 
 void TV::DoPlay(void)
