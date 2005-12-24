@@ -440,12 +440,6 @@ TV::~TV(void)
 
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
-
-    if (tvchain)
-    {
-        tvchain->DestroyChain();
-        delete tvchain;
-    }
 }
 
 TVState TV::GetState(void) const
@@ -465,10 +459,6 @@ void TV::GetPlayGroupSettings(const QString &group)
 
 /** \fn LiveTV(LiveTVChain*, bool)
  *  \brief Starts LiveTV
- *
- *  The TV class assumes ownership of the LiveTVChain, so you must not
- *  call LiveTVChain::DestroyChain(void) or delete the chain once you
- *  have passed it to this method.
  */
 int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
 {
@@ -481,11 +471,6 @@ int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
         GetPlayGroupSettings("Default");
 
         return 1;
-    }
-    if (chain)
-    {
-        chain->DestroyChain();
-        delete chain;
     }
     return 0;
 }
@@ -831,13 +816,12 @@ void TV::HandleStateChange(void)
         SET_NEXT();
 
         StopStuff(true, true, true);
-        SetCurrentlyPlaying(NULL);
-        if (tvchain)
-        {
-            tvchain->DestroyChain();
-            delete tvchain;
-            tvchain = NULL;
-        }
+        pbinfoLock.lock();
+        if (playbackinfo)
+            delete playbackinfo;
+        playbackinfo = NULL;
+        pbinfoLock.unlock();
+
         gContext->RestoreScreensaver();
     }
     else if (TRANSITION(kState_WatchingRecording, kState_WatchingPreRecorded))
@@ -2526,6 +2510,8 @@ struct pip_info
 
 void TV::SwapPIP(void)
 {
+    VERBOSE(VB_IMPORTANT, LOC + "SwapPIP temporarily disabled");
+#if 0
     if (!pipnvp || !piptvchain || !tvchain) 
         return;
 
@@ -2600,6 +2586,7 @@ void TV::SwapPIP(void)
         SetCurrentlyPlaying(pginfo);
         delete pginfo;
     }
+#endif
 }
 
 void TV::DoPlay(void)

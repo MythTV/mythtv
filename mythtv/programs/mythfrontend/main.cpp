@@ -261,7 +261,7 @@ void startTV(void)
     bool showDialogs = true;
 
     LiveTVChain *tvchain = new LiveTVChain();
-    tvchain->InitializeNewChain(gContext->GetHostName());
+    QString chainid = tvchain->InitializeNewChain(gContext->GetHostName());
 
     if (!tv->LiveTV(tvchain, showDialogs))
     {
@@ -345,6 +345,9 @@ void startTV(void)
     }
 
     delete tv;
+
+    tvchain->DestroyChain();
+    delete tvchain;
 }
 
 void showStatus(void)
