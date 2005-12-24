@@ -819,12 +819,14 @@ void NuppelVideoPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
 
 void NuppelVideoPlayer::DiscardVideoFrame(VideoFrame *buffer)
 {
-    videoOutput->DiscardFrame(buffer);
+    if (videoOutput)
+        videoOutput->DiscardFrame(buffer);
 }
 
 void NuppelVideoPlayer::DiscardVideoFrames()
 {
-    videoOutput->DiscardFrames();
+    if (videoOutput)
+        videoOutput->DiscardFrames();
 }
 
 void NuppelVideoPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
