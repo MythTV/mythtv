@@ -137,6 +137,7 @@ void OSD::SetDefaults(void)
         container = new OSDSet(name, true,
                                osdBounds.width(), osdBounds.height(),
                                wmult, hmult, frameint);
+        container->SetPriority(30);
         AddSet(container, name);
 
         int sub_dispw = displaywidth;
@@ -216,6 +217,7 @@ void OSD::SetDefaults(void)
         container = new OSDSet(name, true,
                                osdBounds.width(), osdBounds.height(),
                                wmult, hmult, frameint);
+        container->SetPriority(30);
         AddSet(container, name);
     }
 }
