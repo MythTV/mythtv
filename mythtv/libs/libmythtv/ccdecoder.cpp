@@ -61,7 +61,7 @@ CCDecoder::CCDecoder(CCReader *ccr)
 CCDecoder::~CCDecoder(void)
 {
     if (rbuf)
-        delete rbuf;
+        delete [] rbuf;
 }
 
 void CCDecoder::FormatCC(int tc, int code1, int code2)
