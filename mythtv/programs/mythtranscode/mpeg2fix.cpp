@@ -1918,6 +1918,9 @@ int MPEG2fixup::Start()
                                    .arg(PtsTime(origaPTS[it.key()])));
                         af->first()->pkt.pts = origaPTS[it.key()];
                 }
+                else if (tmpPTS > incPTS) //correct for small discrepencies
+                    incPTS += incPTS;
+
                 //          if(fix_PTS)
                 //            af->first()->pkt.pts = expectedPTS[it.key()];
                 //          else
@@ -1926,6 +1929,7 @@ int MPEG2fixup::Start()
 
                 if (cmp2x33(nextPTS, lastRealvPTS) > 0)
                     break;
+
                 inc2x33(&origaPTS[it.key()], incPTS);
 
                 if (cmp2x33(nextPTS, cutStartPTS) > 0
