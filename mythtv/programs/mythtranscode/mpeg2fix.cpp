@@ -61,7 +61,7 @@ void my_av_print(void *ptr, int level, const char* fmt, va_list vl)
     if (full_line.endsWith("\n"))
     {
         full_line.truncate(full_line.length() - 1);
-        VERBOSE(VB_IMPORTANT, full_line);
+        VERBOSE(MPF_IMPORTANT, full_line);
         full_line = QString("");
     }
 }
@@ -551,7 +551,7 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         if (! ok)
         {
             //deadlock
-            VERBOSE(VB_IMPORTANT,
+            VERBOSE(MPF_IMPORTANT,
                     "Deadlock detected.  One buffer is full when\n"
                     "\t\tthe other is empty!  Aborting\n");
             return 1;
@@ -587,7 +587,7 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
 
     if (ret != 0)
     {
-        VERBOSE(VB_IMPORTANT,
+        VERBOSE(MPF_IMPORTANT,
                 QString("Couldn't open input file, error #%1").arg(ret));
         return 0;
     }
@@ -600,7 +600,7 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
 
     if (ret < 0)
     {
-        VERBOSE(VB_IMPORTANT,
+        VERBOSE(MPF_IMPORTANT,
                 QString("Couldn't get stream info, error #%1").arg(ret));
         av_close_input_file(inputFC);
         inputFC = NULL;
@@ -814,14 +814,14 @@ bool MPEG2fixup::ProcessVideo(MPEG2frame *vf, mpeg2dec_t *dec)
                     break;
 
                 case STATE_BUFFER:
-                    VERBOSE(VB_GENERAL, "Warning: partial frame found!");
+                    VERBOSE(MPF_GENERAL, "Warning: partial frame found!");
                     return 1;
             }
         }
         else if (state == STATE_BUFFER)
         {
             WriteData("abort.dat", vf->pkt.data, vf->pkt.size);
-            VERBOSE(VB_IMPORTANT, QString(
+            VERBOSE(MPF_IMPORTANT, QString(
                     "Failed to decode frame.  Position was: %1").arg(last_pos));
             return -1;
         } 
@@ -962,7 +962,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (! out_codec)
     {
-        VERBOSE(VB_IMPORTANT, "Couldn't find MPEC2 encoder");
+        VERBOSE(MPF_IMPORTANT, "Couldn't find MPEC2 encoder");
         return 1;
     }
 
@@ -1009,7 +1009,7 @@ int MPEG2fixup::BuildFrame(AVPacket *pkt, QString fname)
 
     if (avcodec_open(c, out_codec) < 0)
     {
-        VERBOSE(VB_IMPORTANT, "could not open codec");
+        VERBOSE(MPF_IMPORTANT, "could not open codec");
         return 1;
     }
 
@@ -1043,7 +1043,7 @@ MPEG2frame *MPEG2fixup::GetPoolFrame(AVPacket *pkt)
     {
         if (frame_count >= MAX_FRAMES)
         {
-            VERBOSE(VB_IMPORTANT, "No more queue slots!");
+            VERBOSE(MPF_IMPORTANT, "No more queue slots!");
             return NULL;
         }
         f = new MPEG2frame(pkt->size);
