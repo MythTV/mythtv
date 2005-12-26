@@ -110,6 +110,9 @@ public:
         
     void remove();
     int getRecordID(void) const { return id->intValue(); };
+    QString getRecordTitle(void) const;
+    QString getRecordSubTitle(void) const;
+    QString getRecordDescription(void) const;
     QString getProfileName(void) const;
 
     void findMatchingPrograms(list<ProgramInfo*>& proglist);

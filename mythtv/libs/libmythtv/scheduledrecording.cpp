@@ -702,7 +702,17 @@ QString ScheduledRecording::getProfileName(void) const {
     return profile->getValue();
 }
 
+QString ScheduledRecording::getRecordTitle(void) const {
+    return title->getValue();
+}
 
+QString ScheduledRecording::getRecordSubTitle(void) const {
+    return subtitle->getValue();
+}
+
+QString ScheduledRecording::getRecordDescription(void) const {
+    return description->getValue();
+}
 
 MythDialog* ScheduledRecording::dialogWidget(MythMainWindow *parent,
                                              const char *name)

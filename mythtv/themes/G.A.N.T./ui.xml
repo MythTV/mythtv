@@ -1941,20 +1941,20 @@
     <container name="main_display">
       <area>0,0,800,600</area>
       <textarea name="title" draworder="0">
-        <area>50,30,720,40</area>
+        <area>40,30,720,40</area>
         <font>title</font>
         <value>Program Details:</value>
       </textarea>
 
       <richtextarea name="richtext" draworder="0">
-        <area>40,60,730,530</area>
-        <textarea>65,70,640,485</textarea>
+        <area>30,60,745,500</area>
+        <textarea>55,70,655,462</textarea>
         <font>info</font>
         <value>Program Details</value>
-        <image function="uparrow-reg" filename="blank.png" location="720,90"></image>
-        <image function="downarrow-reg" filename="blank.png" location="720,500"></image>
-        <image function="uparrow-sel" filename="uparrow.png" location="720,90"></image>
-        <image function="downarrow-sel" filename="downarrow.png" location="720,500"></image>
+        <image function="uparrow-reg" filename="blank.png" location="725,90"></image>
+        <image function="downarrow-reg" filename="blank.png" location="725,480"></image>
+        <image function="uparrow-sel" filename="uparrow.png" location="725,90"></image>
+        <image function="downarrow-sel" filename="downarrow.png" location="725,480"></image>
         <backgroundreg>pd-background.png</backgroundreg>
         <backgroundsel>pd-background.png</backgroundsel>
       </richtextarea>

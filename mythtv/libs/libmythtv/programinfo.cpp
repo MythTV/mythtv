@@ -3047,11 +3047,18 @@ void ProgramInfo::showDetails(void) const
     QString fullDateFormat = gContext->GetSetting("DateFormat", "M/d/yyyy");
     if (fullDateFormat.find(QRegExp("yyyy")) < 0)
         fullDateFormat += " yyyy";
-    QString category_type, year, epinum, rating;
+    QString category_type, showtype, year, epinum, rating, colorcode,
+            title_pronounce;
     float stars = 0.0;
     int partnumber = 0, parttotal = 0;
     int stereo = 0, subtitled = 0, hdtv = 0, closecaptioned = 0, generic = 0;
     bool recorded = false;
+
+    if (record == NULL && recordid)
+    {
+        record = new ScheduledRecording();
+        record->loadByID(recordid);
+    }
 
     if (filesize > 0)
         recorded = true;
@@ -3062,9 +3069,10 @@ void ProgramInfo::showDetails(void) const
         if (recorded)
             ptable = "recordedprogram";
 
-        query.prepare(QString("SELECT category_type, airdate, stars, "
+        query.prepare(QString("SELECT category_type, airdate, stars,"
                       " partnumber, parttotal, stereo, subtitled, hdtv,"
-                      " closecaptioned, syndicatedepisodenumber, generic"
+                      " closecaptioned, syndicatedepisodenumber, generic,"
+                      " showtype, colorcode, title_pronounce"
                       " FROM %1 WHERE chanid = :CHANID AND"
                       " starttime = :STARTTIME ;").arg(ptable));
 
@@ -3085,6 +3093,9 @@ void ProgramInfo::showDetails(void) const
             closecaptioned = query.value(8).toInt();
             epinum = query.value(9).toString();
             generic = query.value(10).toInt();
+            showtype = query.value(11).toString();
+            colorcode = query.value(12).toString();
+            title_pronounce = query.value(13).toString();
         }
         else if (!query.isActive())
             MythContext::DBError("ProgramInfo::showDetails", query);
@@ -3133,12 +3144,12 @@ void ProgramInfo::showDetails(void) const
         s += " - \"" + subtitle + "\"";
     ADD_PAR(QObject::tr("Title"), s, msg)
 
+    if (title_pronounce != "")
+        ADD_PAR(QObject::tr("Title Pronounce"), title_pronounce, msg)
+
     s = description; 
 
     QString attr = "";
-
-    if (generic && category_type == "series")
-        attr += QObject::tr("Unidentified Episode") + ", ";
 
     if (partnumber > 0)
         attr += QString(QObject::tr("Part %1 of %2, ")).arg(partnumber).arg(parttotal);
@@ -3159,6 +3170,8 @@ void ProgramInfo::showDetails(void) const
             attr += QString("%1 %2, ").arg(4.0 * stars).arg(str);
         }
     }
+    if (colorcode != "")
+        attr += colorcode + ", ";
     if (hdtv)
         attr += QObject::tr("HDTV") + ", ";
     if (closecaptioned)
@@ -3167,7 +3180,9 @@ void ProgramInfo::showDetails(void) const
         attr += QObject::tr("Subtitled") + ", ";
     if (stereo)
         attr += QObject::tr("Stereo") + ", ";
-    if (repeat)
+    if (generic && category_type == "series")
+        attr += QObject::tr("Unidentified Episode") + ", ";
+    else if (repeat)
         attr += QObject::tr("Repeat") + ", ";
 
     if (attr != "")
@@ -3203,6 +3218,8 @@ void ProgramInfo::showDetails(void) const
         s = category_type;
         if (seriesid != "")
             s += "  (" + seriesid + ")";
+        if (showtype != "")
+            s += "  " + showtype;
         ADD_PAR(QObject::tr("Type","category_type"), s, msg)
     }
 
@@ -3358,6 +3375,19 @@ void ProgramInfo::showDetails(void) const
     ADD_PAR(QString("MythTV " + QObject::tr("Status")), s, msg)
     delete p;
 
+    if (recordid)
+    {
+        s = QString("%1, ").arg(recordid);
+        if (rectype != kNotRecording)
+            s += RecTypeText();
+        if (record->getRecordTitle())
+            s += QString(" \"%2\"").arg(record->getRecordTitle());
+        ADD_PAR(QObject::tr("Recording Rule"), s, msg)
+        if (record->getSearchType() &&
+            record->getSearchType() != kManualSearch)
+            ADD_PAR(QObject::tr("Search Phrase"),
+                    record->getRecordDescription(), msg)
+    }
     if (findid > 0)
     {
         QDate fdate = QDate::QDate (1970, 1, 1);
@@ -3373,7 +3403,7 @@ void ProgramInfo::showDetails(void) const
         tmpSize += QObject::tr("GB", "GigaBytes");
 
         ADD_PAR(QObject::tr("Recording Host"), hostname, msg)
-        ADD_PAR(QObject::tr("Filesize"), tmpSize, msg)
+        ADD_PAR(QObject::tr("Recorded File Size"), tmpSize, msg)
 
         query.prepare("SELECT profile FROM recorded"
                       " WHERE chanid = :CHANID"
@@ -3388,9 +3418,12 @@ void ProgramInfo::showDetails(void) const
                 ADD_PAR(QObject::tr("Recording Profile"),
                         QObject::tr(query.value(0).toString()), msg)
         }
-
         ADD_PAR(QObject::tr("Recording Group"), QObject::tr(recgroup), msg)
         ADD_PAR(QObject::tr("Playback Group"), QObject::tr(playgroup), msg)
+    }
+    else if (recordid)
+    {
+        ADD_PAR(QObject::tr("Recording Profile"), record->getProfileName(),msg)
     }
     msg.remove(QRegExp("<br>$"));
     details_dialog->setDetails(msg);
