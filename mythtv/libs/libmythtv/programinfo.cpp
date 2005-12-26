@@ -3320,7 +3320,7 @@ void ProgramInfo::showDetails(void) const
     }
 
     // Begin MythTV information not found in the listings info
-    msg += "\n<p>";
+    msg += "<p>";
     QDateTime statusDate;
     if (recstatus == rsWillRecord)
         statusDate = startts;
@@ -3386,7 +3386,8 @@ void ProgramInfo::showDetails(void) const
         if (record->getSearchType() &&
             record->getSearchType() != kManualSearch)
             ADD_PAR(QObject::tr("Search Phrase"),
-                    record->getRecordDescription(), msg)
+                    record->getRecordDescription().replace("<", "&lt;")
+                            .replace(">", "&gt;").replace("\n", " "), msg)
     }
     if (findid > 0)
     {
