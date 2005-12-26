@@ -171,19 +171,19 @@ bool DDStructureParser::endElement(const QString &pnamespaceuri,
     else if (pqname == "schedule") 
     {
         QDateTime endtime = curr_schedule.time.addSecs(
-                                        QTime().secsTo(curr_schedule.duration));
+            QTime().secsTo(curr_schedule.duration));
 
         query.prepare("INSERT INTO dd_schedule (programid,stationid,"
-                      "scheduletime,duration,repeat,stereo,subtitled,hdtv,"
+                      "scheduletime,duration,isrepeat,stereo,subtitled,hdtv,"
                       "closecaptioned,tvrating,partnumber,parttotal,endtime) "
                       "VALUES(:PROGRAMID,:STATIONID,:TIME,:DURATION,"
-                      ":REPEAT,:STEREO,:SUBTITLED,:HDTV,:CLOSECAPTIONED,"
+                      ":ISREPEAT,:STEREO,:SUBTITLED,:HDTV,:CLOSECAPTIONED,"
                       ":TVRATING,:PARTNUMBER,:PARTTOTAL,:ENDTIME);");
         query.bindValue(":PROGRAMID", curr_schedule.programid);
         query.bindValue(":STATIONID", curr_schedule.stationid);
         query.bindValue(":TIME", curr_schedule.time);
         query.bindValue(":DURATION", curr_schedule.duration);
-        query.bindValue(":REPEAT", curr_schedule.repeat);
+        query.bindValue(":ISREPEAT", curr_schedule.repeat);
         query.bindValue(":STEREO", curr_schedule.stereo);
         query.bindValue(":SUBTITLED", curr_schedule.subtitled);
         query.bindValue(":HDTV", curr_schedule.hdtv);
@@ -414,7 +414,7 @@ void DataDirectProcessor::updateProgramViewTable(int sourceid)
                        "syndicatedepisodenumber, tvrating, mpaarating, "
                        "programid) "
                        "SELECT chanid, scheduletime, endtime, title, "
-                       "subtitle, description, year, stars, repeat, stereo, "
+                       "subtitle, description, year, stars, isrepeat, stereo, "
                        "subtitled, hdtv, closecaptioned, partnumber, "
                        "parttotal, seriesid, originalairdate, showtype, "
                        "category_type, colorcode, syndicatedepisodenumber, "
@@ -617,7 +617,7 @@ void DataDirectProcessor::createTempTables()
     createATempTable ("dd_v_station", table);
 
     table = "( programid char(12), stationid char(12), scheduletime datetime, "
-            "duration time, repeat bool, stereo bool, subtitled bool, "
+            "duration time, isrepeat bool, stereo bool, subtitled bool, "
             "hdtv bool, closecaptioned bool, tvrating char(5), partnumber int, "
             "parttotal int, endtime datetime, INDEX progidx (programid) )";
     createATempTable("dd_schedule", table); 
@@ -635,7 +635,7 @@ void DataDirectProcessor::createTempTables()
             "endtime datetime, title varchar(128), subtitle varchar(128), "
             "description text, category varchar(64), "
             "category_type varchar(64), airdate year, stars float unsigned, "
-            "previouslyshown tinyint, repeat bool, stereo bool, "
+            "previouslyshown tinyint, isrepeat bool, stereo bool, "
             "subtitled bool, hdtv bool,  closecaptioned bool, partnumber int, "
             "parttotal int, seriesid char(12), originalairdate date, "
             "showtype varchar(30), colorcode varchar(20), "
