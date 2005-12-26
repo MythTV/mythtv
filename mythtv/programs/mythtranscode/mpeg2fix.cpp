@@ -1451,6 +1451,8 @@ int MPEG2fixup::ConvertToI(int frameNum, int numFrames, int headPos)
     {
         if ((spare = DecodeToFrame(i, headPos == 0)) == NULL)
             return 1;
+        if(GetFrameTypeT(spare) == 'I')
+            continue;
         pkt = spare->pkt;
         //pkt.data is a newly malloced area
         {
@@ -1855,13 +1857,8 @@ int MPEG2fixup::Start()
                                 ! new_discard_state &&
                                 GetFrameTypeT(curFrame) == 'P')
                         {
-                            int num = Lreorder.count();
-
-                            if (GetFrameTypeT(Lreorder.getLast()) == 'I')
-                                --num;
-
                             if (ConvertToI(GetFrameNum(Lreorder.getFirst()),
-                                           num, frame_pos))
+                                           Lreorder.count(), frame_pos))
                                 return TRANSCODE_BUGGY_EXIT_WRITE_FRAME_ERROR;
                             ptsorder_eq_dtsorder = true;
                         }
