@@ -83,6 +83,20 @@ class MPEG2ptsdelta
 };
 typedef QValueList<MPEG2ptsdelta> MPEG2ptsDeltaList;
 
+typedef QMap<int64_t, int64_t> ptsmap;
+class PTSOffsetQueue
+{
+  public:
+    PTSOffsetQueue(QValueList<int> keys, int64_t initPTS);
+    void SetNext(int64_t newPTS, int64_t atPTS, bool setOrig);
+    int64_t Get(int idx, int64_t PTS);
+    void UpdateOrigPTS(int idx, int64_t &origPTS);
+  private:
+    QMap<int64_t, ptsmap> offset;
+    QMap<int, ptsmap> orig;
+    QValueList<int> keyList;
+};
+
 //container for all multiplex related variables
 class MPEG2replex
 {
@@ -123,6 +137,14 @@ class MPEG2fixup
     void AddCutlist(QStringList cutlist);
     int BuildKeyframeIndex(QString &file, QMap<long long, long long> &posMap);
 
+
+    static void dec2x33(int64_t *pts1, int64_t pts2);
+    static void inc2x33(int64_t *pts1, int64_t pts2);
+    static int64_t udiff2x33(int64_t pts1, int64_t pts2);
+    static int64_t diff2x33(int64_t pts1, int64_t pts2);
+    static int64_t add2x33(int64_t pts1, int64_t pts2);
+    static int cmp2x33(int64_t pts1, int64_t pts2);
+
   protected:
     static void *ReplexStart(void *data);
     MPEG2replex rx;
@@ -154,6 +176,9 @@ class MPEG2fixup
     int InsertFrame(int frameNum, int64_t deltaPTS,
                      int64_t ptsIncrement, int64_t initPTS);
     void AddSequence(MPEG2frame *frame1, MPEG2frame *frame2);
+    QPtrList<MPEG2frame> ReorderDTStoPTS(QPtrList<MPEG2frame> *dtsOrder);
+    void InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
+                         int64_t &PTSdiscrep, int numframes, bool fix);
     void SetFrameNum(uint8_t *ptr, int num);
     int GetFrameNum(MPEG2frame *frame)
     {
@@ -183,18 +208,13 @@ class MPEG2fixup
         return inputFC->streams[id]->codec;
     }
 
-    void dec2x33(int64_t *pts1, int64_t pts2);
-    void inc2x33(int64_t *pts1, int64_t pts2);
-    int64_t udiff2x33(int64_t pts1, int64_t pts2);
-    int64_t diff2x33(int64_t pts1, int64_t pts2);
-    int64_t add2x33(int64_t pts1, int64_t pts2);
-    int cmp2x33(int64_t pts1, int64_t pts2);
     QPtrList<MPEG2frame> vSecondary;
     bool use_secondary;
 
     QPtrList<MPEG2frame> vFrame;
     QMap<int, QPtrList<MPEG2frame> > aFrame;
     QPtrQueue<MPEG2frame> framePool;
+    QPtrQueue<MPEG2frame> unreadFrames;
     QPtrListIterator<MPEG2frame> *displayFrame;
     mpeg2dec_t *header_decoder;
     mpeg2dec_t *img_decoder;
@@ -218,6 +238,10 @@ class MPEG2fixup
     int no_repeat, fix_PTS, maxframes;
     QString infile;
     const char *format;
+
+    //complete?
+    bool file_end;
+    bool real_file_end;
 };
 
 #ifdef NO_MYTH
