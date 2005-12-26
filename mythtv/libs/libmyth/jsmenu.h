@@ -76,7 +76,7 @@ class JoystickMenuClient : public QObject
     
     void ButtonUp(int button);
     void AxisChange(int axis, int value);
-    void JoystickMenuClient::EmitKey(QString code);
+    void EmitKey(QString code);
     int  ReadConfig(QString config_file);
 
   private:

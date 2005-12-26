@@ -24,6 +24,13 @@ extern "C" {
 
 extern pthread_mutex_t avcodeclock;
 
+int get_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic); 
+int get_avf_buffer(struct AVCodecContext *c, AVFrame *pic); 
+void release_avf_buffer(struct AVCodecContext *c, AVFrame *pic); 
+void release_avf_buffer_xvmc(struct AVCodecContext *c, AVFrame *pic); 
+void render_slice_xvmc(struct AVCodecContext *s, const AVFrame *src, 
+                       int offset[4], int y, int type, int height);
+
 class AvFormatDecoderPrivate
 {
   public:

@@ -27,9 +27,9 @@ class CardUtil
     static bool isCardPresent(const QString &strType);
     static DVB_TYPES cardDVBType(unsigned nVideoDev);
     static DVB_TYPES cardDVBType(unsigned nVideoDev, QString &name);
-    static int CardUtil::videoDeviceFromCardID(unsigned nCardID);
-    static bool CardUtil::isDVB(unsigned nCardID);
-    static DISEQC_TYPES CardUtil::diseqcType(unsigned nCardID);
+    static int videoDeviceFromCardID(unsigned nCardID);
+    static bool isDVB(unsigned nCardID);
+    static DISEQC_TYPES diseqcType(unsigned nCardID);
 };
 
 class VideoSource;

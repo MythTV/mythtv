@@ -34,9 +34,9 @@ class Channel : public ChannelBase
     bool CheckSignal(int msecWait = 5000, 
                      int requiredSignalPercentage = 65,
                      int input = 0);
-    unsigned short *Channel::GetV4L1Field(int attrib, 
+    unsigned short *GetV4L1Field(int attrib, 
                                           struct video_picture &vid_pic);
-    int Channel::ChangeColourAttribute(int attrib, const char *name, bool up);
+    int ChangeColourAttribute(int attrib, const char *name, bool up);
     int ChangeColour(bool up);
     int ChangeBrightness(bool up);
     int ChangeContrast(bool up);

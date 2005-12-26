@@ -16,7 +16,7 @@ class TSPacket;
 class DTVRecorder: public RecorderBase
 {
   public:
-    DTVRecorder::DTVRecorder() : 
+    DTVRecorder() : 
         _first_keyframe(0), _position_within_gop_header(0),
         _keyframe_seen(false), _last_keyframe_seen(0), _last_gop_seen(0),
         _last_seq_seen(0), _stream_fd(-1), _error(false),
