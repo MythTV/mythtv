@@ -2314,7 +2314,8 @@ bool MythContext::SendReceiveStringList(QStringList &strlist, bool quickTimeout)
         {
             qApp->lock();
             VERBOSE(VB_ALL, QString("Reconnection to backend server failed"));
-            MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
+            if (d->m_height && d->m_width)
+                MythPopupBox::showOkPopup(d->mainWindow, "connection failure",
                              tr("The connection to the master backend "
                                 "server has gone away for some reason.. "
                                 "Is it running?"));
