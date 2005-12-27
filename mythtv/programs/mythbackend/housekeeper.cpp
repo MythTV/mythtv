@@ -138,6 +138,7 @@ void HouseKeeper::RunHouseKeeping(void)
 
     while (1)
     {
+        VERBOSE(VB_IMPORTANT, "Running HouseKeeping");
         gContext->LogEntry("mythbackend", LP_DEBUG,
                            "Running housekeeping thread", "");
 
@@ -179,8 +180,25 @@ void HouseKeeper::RunHouseKeeping(void)
                         maxhr = gContext->GetNumSetting("MythFillMaxHour", 24);
                     }
 
-                    bool runMythFill = false;                    
-                    if (gContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
+                    bool grabberSupportsNextTime = false;
+                    MSqlQuery result(MSqlQuery::InitCon());
+                    if (result.isConnected())
+                    {
+                        result.prepare("SELECT COUNT(*) FROM videosource "
+                                       "WHERE xmltvgrabber IN "
+                                           "( 'datadirect', 'technovera' );");
+
+                        if ((result.exec()) &&
+                            (result.isActive()) &&
+                            (result.size() > 0) &&
+                            (result.next()) &&
+                            (result.value(0).toInt() > 0))
+                            grabberSupportsNextTime = true;
+                    }
+
+                    bool runMythFill = false;
+                    if (grabberSupportsNextTime &&
+                        gContext->GetNumSetting("MythFillGrabberSuggestsTime", 1))
                     {
                         QDateTime nextRun = QDateTime::fromString(
                             gContext->GetSetting("MythFillSuggestedRunTime",
@@ -313,3 +331,5 @@ void *HouseKeeper::doHouseKeepingThread(void *param)
  
     return NULL;
 }
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
