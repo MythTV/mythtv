@@ -198,6 +198,7 @@ class AvFormatDecoder : public DecoderBase, public CCReader
     URLContext readcontext;
 
     int frame_decoded;
+    VideoFrame *decoded_video_frame;
 
     bool directrendering;
     bool drawband;

@@ -96,8 +96,7 @@ class DecoderBase
 
     bool DoRewindDVD(long long desiredFrame);
     bool DoRewindNormal(long long desiredFrame);
-    void DoFastForwardDVD(long long desiredFrame);
-    void DoFastForwardNormal(long long desiredFrame, bool &needflush);
+    void DoFastForwardSeek(long long desiredFrame, bool &needflush);
 
     long long GetLastFrameInPosMap(long long desiredFrame);
 

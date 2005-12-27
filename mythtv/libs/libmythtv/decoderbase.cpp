@@ -512,14 +512,25 @@ long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
     return last_frame;
 }
 
-bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
+/** \fn DoFastForward(long long, bool)
+ *  \brief Skips ahead or rewinds to desiredFrame.
+ *
+ *  If discardFrames is true and cached frames are released and playback
+ *  continues at the desiredFrame, if it is not any interviening frames
+ *  between the last frame already in the buffer and the desiredFrame are
+ *  released, but none of the frames decoded at the time this is called
+ *  are released.
+ */
+bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "DoFastForward("
-            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("DoFastForward(%1 (%2), %3 discard frames)")
+            .arg(desiredFrame).arg(framesPlayed)
+            .arg((discardFrames) ? "do" : "don't"));
 
     // Rewind if we have already played the desiredFrame.
     if (desiredFrame < framesPlayed)
-        return DoRewind(desiredFrame, doflush);
+        return DoRewind(desiredFrame, discardFrames);
 
     // Save rawframe state, for later restoration...
     bool oldrawstate = getrawframes;
@@ -552,22 +563,23 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
     }
 
     if (m_positionMap.empty())
+    {
+        // Re-enable rawframe state if it was enabled before FF
+        getrawframes = oldrawstate;
         return false;
+    }
 
     // Handle non-frame-by-frame seeking
-    if (ringBuffer->isDVD())
-        DoFastForwardDVD(desiredFrame);
-    else 
-        DoFastForwardNormal(desiredFrame, needflush);
+    DoFastForwardSeek(desiredFrame, needflush);
 
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
     int normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
-    SeekReset(lastKey, normalframes, needflush, doflush);
+    SeekReset(lastKey, normalframes, needflush, discardFrames);
 
-    // ???
-    if (doflush)
+    if (discardFrames)
     {
+        // We need to tell the NVP and VideoOutput what frame we're on.
         GetNVP()->SetFramesPlayed(framesPlayed+1);
         GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
     }
@@ -578,8 +590,33 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool doflush)
     return true;
 }
 
-void DecoderBase::DoFastForwardNormal(long long desiredFrame, bool &needflush)
+/** \fn DoFastForwardSeek(long long,bool&)
+ *  \brief Seeks to the keyframe just before the desiredFrame if exact
+ *         seeks  is enabled, or the frame just after it if exact seeks
+ *         is not enabled.
+ *
+ *   The seek is not made if framesPlayed is greater than the keyframe
+ *   this would jump too. This means that frame-by-frame seeking after
+ *   a keyframe must be done elsewhere.
+ *
+ *   If the seek is made the needflush parameter is set.
+ *
+ *  \param desiredFrame frame we are attempting to seek to.
+ *  \param needflush    set to true if a seek is made.
+ */
+void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
 {
+    if (ringBuffer->isDVD())
+    {
+        long long pos = DVDFindPosition(desiredFrame);
+        ringBuffer->Seek(pos,SEEK_SET);
+        needflush    = true;
+        lastKey      = desiredFrame+1;
+        framesPlayed = lastKey;
+        framesRead   = lastKey;
+        return;
+    }
+
     int pre_idx, post_idx;
     FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
 
@@ -589,22 +626,14 @@ void DecoderBase::DoFastForwardNormal(long long desiredFrame, bool &needflush)
     PosMapEntry e = m_positionMap[pos_idx];
     lastKey = (hasKeyFrameAdjustTable) ? e.adjFrame : e.index * keyframedist;
 
-    if (framesPlayed < lastKey)
+    // if commented out as a temporary fix for #868.
+    //if (framesPlayed < lastKey)
     {
         ringBuffer->Seek(e.pos, SEEK_SET);
         needflush    = true;
         framesPlayed = lastKey;
         framesRead = lastKey;
     }
-}
-
-void DecoderBase::DoFastForwardDVD(long long desiredFrame)
-{
-     long long pos = DVDFindPosition(desiredFrame);
-     ringBuffer->Seek(pos,SEEK_SET);
-     lastKey = desiredFrame+1;
-     framesPlayed = lastKey;
-     framesRead = lastKey;
 }
 
 void DecoderBase::UpdateFramesPlayed(void)

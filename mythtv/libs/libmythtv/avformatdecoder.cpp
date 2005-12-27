@@ -178,23 +178,28 @@ AvFormatDecoder::AvFormatDecoder(NuppelVideoPlayer *parent,
                                  bool use_null_videoout,
                                  bool allow_libmpeg2)
     : DecoderBase(parent, pginfo),
-      d(new AvFormatDecoderPrivate(allow_libmpeg2)), ic(NULL),
-      frame_decoded(0), directrendering(false), drawband(false), bitrate(0),
-      gopset(false), seen_gop(false), seq_count(0), firstgoppos(0),
-      prevgoppos(0), gotvideo(false), lastvpts(0), lastapts(0),
+      d(new AvFormatDecoderPrivate(allow_libmpeg2)),
+      ic(NULL),
+      frame_decoded(0),             decoded_video_frame(NULL),
+      directrendering(false),       drawband(false),
+      bitrate(0),
+      gopset(false),                seen_gop(false),
+      seq_count(0),                 firstgoppos(0),
+      prevgoppos(0),                gotvideo(false),
+      lastvpts(0),                  lastapts(0),
       lastccptsu(0),
-      using_null_videoout(use_null_videoout), video_codec_id(kCodec_NONE),
+      using_null_videoout(use_null_videoout),
+      video_codec_id(kCodec_NONE),
       maxkeyframedist(-1), 
       ccd(new CCDecoder(this)),
       // Audio
       audioSamples(new short int[AVCODEC_MAX_AUDIO_FRAME_SIZE]),
-      allow_ac3_passthru(false),
-      allow_dts_passthru(false),
+      allow_ac3_passthru(false),    allow_dts_passthru(false),
       disable_passthru(false),
       // Audio selection
-      wantedAudioStream(),    selectedAudioStream(),
+      wantedAudioStream(),          selectedAudioStream(),
       // Subtitle selection
-      wantedSubtitleStream(), selectedSubtitleStream(),
+      wantedSubtitleStream(),       selectedSubtitleStream(),
       // language preference
       languagePreference(iso639_get_language_key_list())
 {
@@ -379,8 +384,6 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             if (enc->codec)
                 avcodec_flush_buffers(enc);
         }
-
-        // TODO here we may need to wait for flushing to complete...
     }
 
     // Discard all the queued up decoded frames
@@ -388,7 +391,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
         GetNVP()->DiscardVideoFrames();
 
     // Free up the stored up packets
-    while (storedPackets.count() > 0)
+    while (doflush && storedPackets.count() > 0)
     {
         AVPacket *pkt = storedPackets.first();
         storedPackets.removeFirst();
@@ -399,11 +402,13 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
     prevgoppos = 0;
     gopset = false;
 
-    // Skip all the desired number of skipFrames
-    exitafterdecoded = true; // don't actualy get a frame
-    for (;skipFrames > 0 && ateof; skipFrames--)
-        GetFrame(-1); // don't need to return frame...
-    exitafterdecoded = false; // allow frames to be returned again
+     // Skip all the desired number of skipFrames
+    for (;skipFrames > 0 && !ateof; skipFrames--)
+    {
+	GetFrame(0);
+        if (decoded_video_frame)
+            GetNVP()->DiscardVideoFrame(decoded_video_frame);
+    }
 }
 
 void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
@@ -2100,6 +2105,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
     gotvideo = false;
 
     frame_decoded = 0;
+    decoded_video_frame = NULL;
 
     bool allowedquit = false;
     bool storevideoframes = false;
@@ -2495,6 +2501,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     if (!directrendering)
                         GetNVP()->DiscardVideoFrame(picframe);
 
+                    decoded_video_frame = picframe;
                     gotvideo = 1;
                     framesPlayed++;
 
