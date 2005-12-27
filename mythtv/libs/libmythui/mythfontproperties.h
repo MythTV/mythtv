@@ -12,7 +12,8 @@ struct MythFontProperties
         color(QColor(Qt::white)),
         hasShadow(false),
         shadowAlpha(255),
-        hasOutline(false) { }
+        hasOutline(false),
+        outlineAlpha(255) { }
 
     QFont   face;
     QColor  color;
@@ -25,6 +26,7 @@ struct MythFontProperties
     bool    hasOutline;
     QColor  outlineColor;
     int     outlineSize;
+    int     outlineAlpha;
 };
 
 #endif
