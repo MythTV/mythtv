@@ -883,8 +883,8 @@ void OSDTypeImage::LoadFromQImage(const QImage &img)
 
     m_isvalid = true;
 
-    int imwidth = (img.width() / 2) * 2;
-    int imheight = (img.height() / 2) * 2;
+    int imwidth = (img.width() + 1) & ~1;
+    int imheight = (img.height() + 1) & ~1;
 
     m_yuv = new unsigned char[imwidth * imheight * 3 / 2];
     m_ybuffer = m_yuv;
@@ -894,7 +894,7 @@ void OSDTypeImage::LoadFromQImage(const QImage &img)
     m_alpha = new unsigned char[imwidth * imheight];
 
     rgb32_to_yuv420p(m_ybuffer, m_ubuffer, m_vbuffer, m_alpha, img.bits(),
-                     imwidth, imheight, img.width());
+                     img.width(), img.height(), img.bytesPerLine() / 4);
 
     m_imagesize = QRect(0, 0, imwidth, imheight);
 }

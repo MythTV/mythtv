@@ -465,11 +465,11 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
 #define A_II  3
 #endif
 
-    wrap = width;
+    wrap = (width + 1) & ~1;
     wrap4 = srcwidth * 4;
     p = src;
-    for(y=0;y<height;y+=2) {
-        for(x=0;x<width;x+=2) {
+    for(y=0;y+1<height;y+=2) {
+        for(x=0;x+1<width;x+=2) {
             r = p[R_II];
             g = p[G_II];
             b = p[B_II];
@@ -527,9 +527,134 @@ void rgb32_to_yuv420p(unsigned char *lum, unsigned char *cb, unsigned char *cr,
             lum += -wrap + 2;
             alpha += -wrap + 2;
         }
-        p += wrap4;
+        if (width & 1) {
+            r = p[R_II];
+            g = p[G_II];
+            b = p[B_II];
+            r1 = r;
+            g1 = g;
+            b1 = b;
+            lum[0] = (FIX(0.29900) * r + FIX(0.58700) * g +
+                      FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
+            alpha[0] = p[A_II];
+
+            lum[1] = 16;
+            alpha[1] = 0;
+
+            p += wrap4;
+            lum += wrap;
+            alpha += wrap;
+
+            r = p[R_II];
+            g = p[G_II];
+            b = p[B_II];
+            r1 += r;
+            g1 += g;
+            b1 += b;
+            lum[0] = (FIX(0.29900) * r + FIX(0.58700) * g +
+                      FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
+            alpha[0] = p[A_II];
+
+            lum[1] = 16;
+            alpha[1] = 0;
+
+            cr[0] = ((- FIX(0.16874) * r1 - FIX(0.33126) * g1 +
+                    FIX(0.50000) * b1 + 2 * ONE_HALF - 1) >> (SCALEBITS + 1)) +
+                    128;
+            cb[0] = ((FIX(0.50000) * r1 - FIX(0.41869) * g1 -
+                    FIX(0.08131) * b1 + 2 * ONE_HALF - 1) >> (SCALEBITS + 1)) +
+                    128;
+
+            cb++;
+            cr++;
+            p += -wrap4 + 4;
+            lum += -wrap + 2;
+            alpha += -wrap + 2;
+        }
+        p += wrap4 * 2 - width * 4;
         lum += wrap;
         alpha += wrap;
+    }
+    if (height & 1) {
+        for(x=0;x+1<width;x+=2) {
+            r = p[R_II];
+            g = p[G_II];
+            b = p[B_II];
+            r1 = r;
+            g1 = g;
+            b1 = b;
+            lum[0] = (FIX(0.29900) * r + FIX(0.58700) * g +
+                      FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
+            alpha[0] = p[A_II];
+
+            r = p[R_II+4];
+            g = p[G_II+4];
+            b = p[B_II+4];
+            r1 += r;
+            g1 += g;
+            b1 += b;
+            lum[1] = (FIX(0.29900) * r + FIX(0.58700) * g +
+                      FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
+            alpha[1] = p[A_II+4];
+
+            lum += wrap;
+            alpha += wrap;
+
+            lum[0] = 16;
+            alpha[0] = 0;
+
+            lum[1] = 16;
+            alpha[1] = 0;
+
+            cr[0] = ((- FIX(0.16874) * r1 - FIX(0.33126) * g1 +
+                    FIX(0.50000) * b1 + 2 * ONE_HALF - 1) >> (SCALEBITS + 1)) +
+                    128;
+            cb[0] = ((FIX(0.50000) * r1 - FIX(0.41869) * g1 -
+                    FIX(0.08131) * b1 + 2 * ONE_HALF - 1) >> (SCALEBITS + 1)) +
+                    128;
+
+            cb++;
+            cr++;
+            p += 2 * 4;
+            lum += -wrap + 2;
+            alpha += -wrap + 2;
+        }
+        if (width & 1) {
+            r = p[R_II];
+            g = p[G_II];
+            b = p[B_II];
+            r1 = r;
+            g1 = g;
+            b1 = b;
+            lum[0] = (FIX(0.29900) * r + FIX(0.58700) * g +
+                      FIX(0.11400) * b + ONE_HALF) >> SCALEBITS;
+            alpha[0] = p[A_II];
+
+            lum[1] = 16;
+            alpha[1] = 0;
+
+            lum += wrap;
+            alpha += wrap;
+
+            lum[0] = 16;
+            alpha[0] = 0;
+
+            lum[1] = 16;
+            alpha[1] = 0;
+
+            cr[0] = ((- FIX(0.16874) * r1 - FIX(0.33126) * g1 +
+                    FIX(0.50000) * b1 + ONE_HALF - 1) >> SCALEBITS) +
+                    128;
+            cb[0] = ((FIX(0.50000) * r1 - FIX(0.41869) * g1 -
+                    FIX(0.08131) * b1 + ONE_HALF - 1) >> SCALEBITS) +
+                    128;
+
+            cb++;
+            cr++;
+            p += 4;
+            lum += -wrap + 2;
+            alpha += -wrap + 2;
+       }
     }
 }
 
