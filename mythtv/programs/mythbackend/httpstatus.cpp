@@ -707,10 +707,13 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
         if (!e.isNull())
         {
+            QString datetimefmt = "yyyy-MM-dd hh:mm";
             int     nDays   = e.attribute( "guideDays", "0" ).toInt();
-            QString    sStatus = e.attribute( "status"   , ""  );
             QString sStart  = e.attribute( "start"    , ""  );
             QString sEnd    = e.attribute( "end"      , ""  );
+            QString sStatus = e.attribute( "status"   , ""  );
+            QDateTime next  = QDateTime::fromString( e.attribute( "next"     , ""  ), Qt::ISODate);
+            QString sNext   = next.isNull() ? "" : next.toString(datetimefmt);
             QString sMsg    = "";
 
             QDateTime thru  = QDateTime::fromString( e.attribute( "guideThru", ""  ), Qt::ISODate);
@@ -731,10 +734,16 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
             os << sStatus << "<br />\r\n";    
 
+            if (!next.isNull() && sNext >= sStart)
+            {
+                os << "    Suggested next mythfilldatabase run: "
+                    << sNext << ".<br />\r\n";
+            }
+
             if (!thru.isNull())
             {
                 os << "    There's guide data until "
-                   << QDateTime( thru ).toString("yyyy-MM-dd hh:mm");
+                   << QDateTime( thru ).toString(datetimefmt);
 
                 if (nDays > 0)
                     os << " (" << nDays << " day" << (nDays == 1 ? "" : "s" ) << ")";
@@ -749,7 +758,7 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
                    << "Have you run mythfilldatabase?";
 
             if (!sMsg.isNull() && !sMsg.isEmpty())
-                os << "<br />\r\nDataDirect Status: " << sMsg;
+                os << "<br />\r\n    DataDirect Status: " << sMsg;
 
             os << "\r\n  </div>\r\n";
         }
@@ -757,3 +766,5 @@ int HttpStatus::PrintMachineInfo( QTextStream &os, QDomElement info )
 
     return( 1 );
 }
+
+// vim:set shiftwidth=4 tabstop=4 expandtab:

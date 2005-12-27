@@ -3882,6 +3882,11 @@ void MainServer::FillStatusXML( QDomDocument *pDoc )
     guide.setAttribute("start", gContext->GetSetting("mythfilldatabaseLastRunStart"));
     guide.setAttribute("end", gContext->GetSetting("mythfilldatabaseLastRunEnd"));
     guide.setAttribute("status", gContext->GetSetting("mythfilldatabaseLastRunStatus"));
+    if (gContext->GetNumSetting("MythFillGrabberSuggestsTime", 0))
+    {
+        guide.setAttribute("next",
+            gContext->GetSetting("MythFillSuggestedRunTime"));
+    }
 
     if (!GuideDataThrough.isNull())
     {
