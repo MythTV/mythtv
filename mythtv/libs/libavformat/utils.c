@@ -2083,6 +2083,10 @@ int av_find_stream_info(AVFormatContext *ic)
             break;
         }
 
+        /* handle ic->packet_buffer being freed by av_read_frame_internal() */
+        if (!ic->packet_buffer)
+              ppktl = &ic->packet_buffer;
+
         /* add the packet in the buffered packet list */
         *ppktl = pktl;
         ppktl = &pktl->next;
