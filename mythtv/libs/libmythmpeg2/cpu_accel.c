@@ -139,7 +139,7 @@ static inline uint32_t arch_accel (void)
 
     canjump = 1;
 
-#ifdef HAVE_ALTIVEC_H	/* gnu */
+#ifdef HAVE_ALTIVEC_H && !defined(CONFIG_DARWIN)	/* gnu */
 #define VAND(a,b,c) "vand " #a "," #b "," #c "\n\t"
 #else			/* apple */
 #define VAND(a,b,c) "vand v" #a ",v" #b ",v" #c "\n\t"
