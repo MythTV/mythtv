@@ -108,18 +108,15 @@ class MPEG2replex
     int done;
     QString outfile;
     ringbuffer vrbuf;
-    ringbuffer arbuf[N_AUDIO];
-    ringbuffer ac3rbuf[N_AUDIO];
+    ringbuffer extrbuf[N_AUDIO];
     ringbuffer index_vrbuf;
-    ringbuffer index_arbuf[N_AUDIO];
-    ringbuffer index_ac3rbuf[N_AUDIO];
-    int ac3_count;
-    int mp2_count;
+    ringbuffer index_extrbuf[N_AUDIO];
+    int ext_count;
+    int exttype[N_AUDIO];
 
     pthread_mutex_t mutex;
     pthread_cond_t cond;
-    audio_frame_t aframe[N_AUDIO];
-    audio_frame_t ac3frame[N_AUDIO];
+    audio_frame_t extframe[N_AUDIO];
     sequence_t seq_head;
 
   private:
@@ -227,7 +224,7 @@ class MPEG2fixup
 
     AVFormatContext *inputFC;
     int vid_id;
-    int ac3_count, mp2_count;
+    int ext_count;
     QMap <int, int> aud_map;
     int aud_stream_count;
     int64_t ptsIncrement;

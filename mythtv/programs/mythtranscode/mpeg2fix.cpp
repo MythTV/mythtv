@@ -72,9 +72,10 @@ void DEBUGpts(QPtrList<MPEG2frame> *vFrame)
     for (vFrame->first(); vFrame->current(); vFrame->next())
     {
         int type = vFrame->current()->mpeg2_pic.flags & PIC_MASK_CODING_TYPE;
-        printf("%s %d #%d %ld\n",(vFrame->at() == pos ? "->" : "  "),
-               type, vFrame->current()->mpeg2_pic.temporal_reference,
-               vFrame->current()->pkt.pts);
+        VERBOSE(MPF_IMPORTANT, QString("%1 %2 #%3 %4")
+               .arg(vFrame->at() == pos ? "->" : "  ").arg(type)
+               .arg(vFrame->current()->mpeg2_pic.temporal_reference)
+               .arg(vFrame->current()->pkt.pts));
     }
     vFrame->at(pos);
 }
@@ -160,8 +161,7 @@ MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
         }
     }
 
-    mp2_count = 0;
-    ac3_count = 0;
+    ext_count = 0;
     vid_id = -1;
     mpeg2_malloc_hooks(my_malloc, NULL);
     header_decoder = mpeg2_init();
@@ -353,12 +353,9 @@ MPEG2replex::MPEG2replex()
 {
     memset(&vrbuf, 0, sizeof(ringbuffer));
     memset(&index_vrbuf, 0, sizeof(ringbuffer));
-    memset(&arbuf, 0, sizeof(ringbuffer) * N_AUDIO);
-    memset(&index_arbuf, 0, sizeof(ringbuffer) * N_AUDIO);
-    memset(&ac3rbuf, 0, sizeof(ringbuffer) * N_AUDIO);
-    memset(&index_ac3rbuf, 0, sizeof(ringbuffer) * N_AUDIO);
-    ac3_count = 0;
-    mp2_count = 0;
+    memset(&extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
+    memset(&index_extrbuf, 0, sizeof(ringbuffer) * N_AUDIO);
+    ext_count = 0;
 }
 
 MPEG2replex::~MPEG2replex()
@@ -368,19 +365,12 @@ MPEG2replex::~MPEG2replex()
     if (index_vrbuf.size)
         ring_destroy(&index_vrbuf);
     
-    for (int i = 0; i < mp2_count; i++)
+    for (int i = 0; i < ext_count; i++)
     {
-        if (arbuf[i].size)
-            ring_destroy(&arbuf[i]);
-        if (index_arbuf[i].size)
-            ring_destroy(&index_arbuf[i]);
-    }
-    for (int i = 0; i < ac3_count; i++)
-    {
-        if (ac3rbuf[i].size)
-            ring_destroy(&ac3rbuf[i]);
-        if (index_ac3rbuf[i].size)
-            ring_destroy(&index_ac3rbuf[i]);
+        if (extrbuf[i].size)
+            ring_destroy(&extrbuf[i]);
+        if (index_extrbuf[i].size)
+            ring_destroy(&index_extrbuf[i]);
     }
 }
 
@@ -394,12 +384,8 @@ int MPEG2replex::WaitBuffers()
         if (ring_avail(&index_vrbuf) < sizeof(index_unit))
             ok = 0;
 
-        for (i = 0; i < mp2_count; i++)
-            if (ring_avail(&index_arbuf[i]) < sizeof(index_unit))
-                ok = 0;
-
-        for (i = 0; i < ac3_count; i++)
-            if (ring_avail(&index_ac3rbuf[i]) < sizeof(index_unit))
+        for (i = 0; i < ext_count; i++)
+            if (ring_avail(&index_extrbuf[i]) < sizeof(index_unit))
                 ok = 0;
 
         if (ok || done)
@@ -434,7 +420,7 @@ void MPEG2replex::Start()
     //array defines number of allowed audio streams
     // note that although only 1 stream is currently supported, multiplex.c
     // expects the size to by N_AUDIO
-    int audio_ok[N_AUDIO], ac3_ok[N_AUDIO];
+    int ext_ok[N_AUDIO];
     int video_ok = 0;
 
     //seq_head should be set only for the 1st sequence header.  If a new
@@ -447,7 +433,7 @@ void MPEG2replex::Start()
     int otype = REPLEX_MPEG2;
 
     memset(&mx, 0, sizeof(mx));
-    memset(audio_ok, 0, sizeof(int));
+    memset(ext_ok, 0, sizeof(ext_ok));
 
     mx.priv = (void *)this;
 
@@ -461,16 +447,15 @@ void MPEG2replex::Start()
 
     mplex = &mx;
 
-    init_multiplex(&mx, &seq_head, aframe, ac3frame, mp2_count,
-                   ac3_count, video_delay, audio_delay, fd_out, fill_buffers,
-                   &vrbuf, &index_vrbuf, arbuf, index_arbuf,
-                   ac3rbuf, index_ac3rbuf, otype);
+    init_multiplex(&mx, &seq_head, extframe, exttype,
+                   video_delay, audio_delay, fd_out, fill_buffers,
+                   &vrbuf, &index_vrbuf, extrbuf, index_extrbuf, otype);
     setup_multiplex(&mx);
 
     while (1)
     {
-        check_times( &mx, &video_ok, audio_ok, ac3_ok, &start);
-        write_out_packs( &mx, video_ok, audio_ok, ac3_ok);
+        check_times( &mx, &video_ok, ext_ok, &start);
+        write_out_packs( &mx, video_ok, ext_ok);
     }
 }
 
@@ -487,34 +472,31 @@ void MPEG2fixup::InitReplex()
     ring_init(&rx.vrbuf, memsize);
     ring_init(&rx.index_vrbuf, INDEX_BUF);
 
+    memset(rx.exttype, 0, sizeof(rx.exttype));
     for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
             it != aFrame.end(); it++)
     {
         int i = aud_map[it.key()];
-
-        if (GetStreamType(it.key()) == CODEC_ID_MP2 ||
-            GetStreamType(it.key()) == CODEC_ID_MP3)
+        ring_init(&rx.extrbuf[i], memsize / 5);
+        ring_init(&rx.index_extrbuf[i], INDEX_BUF);
+        rx.extframe[i].set = 1;
+        rx.extframe[i].bit_rate = getCodecContext(it.key())->bit_rate;
+        switch(GetStreamType(it.key()))
         {
-            ring_init(&rx.arbuf[i], memsize / 5);
-            ring_init(&rx.index_arbuf[i], INDEX_BUF);
-            rx.aframe[i].set = 1;
-            rx.aframe[i].bit_rate = getCodecContext(it.key())->bit_rate;
-        }
-        else if (GetStreamType(it.key()) == CODEC_ID_AC3)
-        {
-            ring_init(&rx.ac3rbuf[i], memsize / 5);
-            ring_init(&rx.index_ac3rbuf[i], INDEX_BUF);
-            rx.ac3frame[i].set = 1;
-            rx.ac3frame[i].bit_rate = getCodecContext(it.key())->bit_rate;
+            case CODEC_ID_MP2:
+            case CODEC_ID_MP3:
+                rx.exttype[i] = 2;
+                break;
+            case CODEC_ID_AC3:
+                rx.exttype[i] = 1;
+                break;
         }
     }
 
     //bit_rate/400
     rx.seq_head.bit_rate = vFrame.first()->mpeg2_seq.byte_rate / 50;
 
-    rx.ac3_count = ac3_count;
-
-    rx.mp2_count = mp2_count;
+    rx.ext_count = ext_count;
 }
 
 QString MPEG2fixup::PtsTime(int64_t pts)
@@ -539,19 +521,12 @@ void MPEG2fixup::FrameInfo(MPEG2frame *f)
                     .arg(PtsTime(f->pkt.pts))
                     .arg(ring_free(&rx.index_vrbuf) / sizeof(index_unit));
 
-    if (mp2_count)
+    if (ext_count)
     {
-        msg += " MP2:";
-        for (int i = 0; i < mp2_count; i++)
-            msg += QString(" %1")
-                   .arg(ring_free(&rx.index_arbuf[i]) / sizeof(index_unit));
-    }
-    if (ac3_count)
-    {
-        msg += " AC3:";
-        for (int i = 0; i < ac3_count; i++)
-            msg += QString(" %1")
-                   .arg(ring_free(&rx.index_ac3rbuf[i]) / sizeof(index_unit));
+        msg += " EXT:";
+        for (int i = 0; i < ext_count; i++)
+            msg += QString(" %2")
+                   .arg(ring_free(&rx.index_extrbuf[i]) / sizeof(index_unit));
     }
     VERBOSE(MPF_RPLXQUEUE, msg);
 }
@@ -577,17 +552,12 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
         iu.frame_off = f->framePos - f->pkt.data;
         iu.dts = f->pkt.dts * 300;
     }
-    else if (GetStreamType(id) == CODEC_ID_AC3)
-    { //ac3
-        rb = &rx.ac3rbuf[aud_map[id]];
-        rbi = &rx.index_ac3rbuf[aud_map[id]];
-        iu.framesize = f->pkt.size;
-    }
     else if (GetStreamType(id) == CODEC_ID_MP2 ||
-             GetStreamType(id) == CODEC_ID_MP3)
-    { //mp2
-        rb = &rx.arbuf[aud_map[id]];
-        rbi = &rx.index_arbuf[aud_map[id]];
+             GetStreamType(id) == CODEC_ID_MP3 ||
+             GetStreamType(id) == CODEC_ID_AC3)
+    {
+        rb = &rx.extrbuf[aud_map[id]];
+        rbi = &rx.index_extrbuf[aud_map[id]];
         iu.framesize = f->pkt.size;
     }
 
@@ -606,14 +576,9 @@ int MPEG2fixup::AddFrame(MPEG2frame *f)
                 ring_avail(&rx.index_vrbuf) < sizeof(index_unit))
             ok = 0;
 
-        for (i = 0; i < mp2_count; i++)
-            if (rbi != &rx.index_arbuf[i] &&
-                    ring_avail(&rx.index_arbuf[i]) < sizeof(index_unit))
-                ok = 0;
-
-        for (i = 0; i < ac3_count; i++)
-            if (rbi != &rx.index_ac3rbuf[i] &&
-                    ring_avail(&rx.index_ac3rbuf[i]) < sizeof(index_unit))
+        for (i = 0; i < ext_count; i++)
+            if (rbi != &rx.index_extrbuf[i] &&
+                    ring_avail(&rx.index_extrbuf[i]) < sizeof(index_unit))
                 ok = 0;
 
         if (! ok)
@@ -695,15 +660,11 @@ int MPEG2fixup::InitAV(const char *inputfile, const char *type, int64_t offset)
                             "Skipping invalid audio stream: %1").arg(i));
                     break;
                 }
-                if (inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3)
+                if (inputFC->streams[i]->codec->codec_id == CODEC_ID_AC3 ||
+                    inputFC->streams[i]->codec->codec_id == CODEC_ID_MP3 ||
+                    inputFC->streams[i]->codec->codec_id == CODEC_ID_MP2)
                 {
-                    aud_map[i] = ac3_count++;
-                    aFrame[i] = QPtrList<MPEG2frame> ();
-                }
-                else if (inputFC->streams[i]->codec->codec_id == CODEC_ID_MP3 ||
-                         inputFC->streams[i]->codec->codec_id == CODEC_ID_MP2)
-                {
-                    aud_map[i] = mp2_count++;
+                    aud_map[i] = ext_count++;
                     aFrame[i] = QPtrList<MPEG2frame> ();
                 }
                 else
@@ -1794,7 +1755,8 @@ int MPEG2fixup::Start()
                         int64_t tmp_origvPTS = origvPTS;
                         int numframes = (maxframes > 1) ? maxframes - 1 : 1;
                         bool done = false;
-                        while (!done && frame_pos + count + 1 < vFrame.count())
+                        while (!done &&
+                               (uint)(frame_pos + count + 1) < vFrame.count())
                         {
                             QPtrList<MPEG2frame> tmpReorder;
                             vFrame.at(frame_pos + count);
@@ -1979,7 +1941,7 @@ int MPEG2fixup::Start()
                     //multiplexer
                     vFrame.at(frame_pos);
 
-                    for (int i = 0; i < Lreorder.count(); i++, vFrame.next())
+                    for (uint i = 0; i < Lreorder.count(); i++, vFrame.next())
                     {
                         if (discard)
                         {

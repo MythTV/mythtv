@@ -60,36 +60,28 @@ typedef struct multiplex_s{
 	int reset_clocks;
 	int write_end_codes;
 	int set_broken_link;
-	unsigned int vsize, asize;
+	unsigned int vsize, extsize;
 	int64_t extra_clock;
 	uint64_t first_vpts;
-	uint64_t first_apts[N_AUDIO];
-	uint64_t first_ac3pts[N_AC3];
+	uint64_t first_extpts[N_AUDIO];
 	uint64_t SCR;
 	uint64_t oldSCR;
 	uint64_t SCRinc;
 	index_unit viu;
-	index_unit aiu[N_AUDIO];
-	index_unit ac3iu[N_AC3];
-	uint64_t apts[N_AUDIO];
-	uint64_t ac3pts[N_AC3];
-	uint64_t ac3pts_off[N_AC3];
-	uint64_t apts_off[N_AUDIO];
-	int aframes[N_AUDIO];
-	int ac3frames[N_AUDIO];
+	index_unit extiu[N_AUDIO];
+	uint64_t extpts[N_AUDIO];
+	uint64_t extpts_off[N_AUDIO];
+	int extframes[N_AUDIO];
+        int exttype[N_AUDIO];
 
 /* needed from replex */
-	int apidn;
-	int ac3n;
+	int extcnt;
 
 	dummy_buffer vdbuf;
-	dummy_buffer adbuf[N_AUDIO];
-	dummy_buffer ac3dbuf[N_AC3];
+	dummy_buffer extdbuf[N_AUDIO];
 
-	ringbuffer *ac3rbuffer;
-	ringbuffer *index_ac3rbuffer;
-	ringbuffer *arbuffer;
-	ringbuffer *index_arbuffer;
+	ringbuffer *extrbuffer;
+	ringbuffer *index_extrbuffer;
 	ringbuffer *vrbuffer;
 	ringbuffer *index_vrbuffer;
 
@@ -97,18 +89,15 @@ typedef struct multiplex_s{
 	void *priv;
 } multiplex_t;
 
-void check_times( multiplex_t *mx, int *video_ok, int *audio_ok, int *ac3_ok,
-		  int *start);
-void write_out_packs( multiplex_t *mx, int video_ok, 
-		      int *audio_ok, int *ac3_ok);
+void check_times( multiplex_t *mx, int *video_ok, int *ext_ok, int *start);
+void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok);
 void finish_mpg(multiplex_t *mx);
-void init_multiplex( multiplex_t *mx, sequence_t *seq_head, audio_frame_t *aframe,
-		     audio_frame_t *ac3frame, int apidn, int ac3n,	
+void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
+		     audio_frame_t *extframe, int *exttype,
 		     uint64_t video_delay, uint64_t audio_delay, int fd,
 		     int (*fill_buffers)(void *p, int f),
 		     ringbuffer *vrbuffer, ringbuffer *index_vrbuffer,	
-		     ringbuffer *arbuffer, ringbuffer *index_arbuffer,
-		     ringbuffer *ac3rbuffer, ringbuffer *index_ac3rbuffer,
+		     ringbuffer *extrbuffer, ringbuffer *index_extrbuffer,
 		     int otype);
 
 void setup_multiplex(multiplex_t *mx);

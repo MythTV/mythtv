@@ -667,12 +667,12 @@ int write_pes_header(uint8_t id, int length , uint64_t PTS, uint64_t DTS,
 	return c;
 }
 
-void write_padding_pes( int pack_size, int apidn, int ac3n, 
+void write_padding_pes( int pack_size, int extcnt, 
 			uint64_t SCR, uint64_t muxr, uint8_t *buf)
 {
 	int pos = 0;
 
-	pos = write_ps_header(buf,SCR,muxr, apidn+ ac3n, 0, 0, 1, 1, 1,
+	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 1,
 			      0);
 
 	pos += write_pes_header( PADDING_STREAM, pack_size-pos, 0, 0, buf+pos,
@@ -680,7 +680,7 @@ void write_padding_pes( int pack_size, int apidn, int ac3n,
 
 }
 
-int write_video_pes( int pack_size, int apidn, int ac3n, uint64_t vpts, 
+int write_video_pes( int pack_size, int extcnt, uint64_t vpts, 
 		     uint64_t vdts, uint64_t SCR, uint64_t muxr, 
 		     uint8_t *buf, int *vlength, 
 		     uint8_t ptsdts, ringbuffer *vrbuffer)
@@ -710,7 +710,7 @@ int write_video_pes( int pack_size, int apidn, int ac3n, uint64_t vpts,
 			length = length+p;
 	}
 
-	pos = write_ps_header(buf,SCR,muxr, apidn+ac3n, 0, 0, 1, 1, 
+	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 
 			      1, 0);
 
 	pos += write_pes_header( 0xE0, length-pos, vpts, vdts, buf+pos, 
@@ -733,7 +733,7 @@ int write_video_pes( int pack_size, int apidn, int ac3n, uint64_t vpts,
 	return pos;
 }
 
-int write_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts, 
+int write_audio_pes(  int pack_size, int extcnt, int n, uint64_t pts, 
 		      uint64_t SCR, uint32_t muxr, uint8_t *buf, int *alength, 
 		      uint8_t ptsdts, 	ringbuffer *arbuffer)
 {
@@ -759,7 +759,7 @@ int write_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts,
 		} else 
 			length = length+p;
 	}
-	pos = write_ps_header(buf,SCR,muxr, apidn + ac3n, 0, 0, 1, 1, 
+	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 
 			      1, 0);
 	pos += write_pes_header( 0xC0+n, length-pos, pts, 0, buf+pos, stuff, 
 				 ptsdts);
@@ -783,7 +783,7 @@ int write_audio_pes(  int pack_size, int apidn, int ac3n, int n, uint64_t pts,
 
 
 
-int write_ac3_pes(  int pack_size, int apidn, int ac3n, int n,
+int write_ac3_pes(  int pack_size, int extcnt, int n,
 		    uint64_t pts, uint64_t SCR, 
 		    uint32_t muxr, uint8_t *buf, int *alength, uint8_t ptsdts,
 		    int nframes,int ac3_off, ringbuffer *ac3rbuffer)
@@ -810,7 +810,7 @@ int write_ac3_pes(  int pack_size, int apidn, int ac3n, int n,
 		} else 
 			length = length+p;
 	}
-	pos = write_ps_header(buf,SCR,muxr, apidn+ac3n, 0, 0, 1, 1, 
+	pos = write_ps_header(buf,SCR,muxr, extcnt, 0, 0, 1, 1, 
 			      1, 0);
 
 	pos += write_pes_header( PRIVATE_STREAM1, length-pos, pts, 0, 
@@ -840,14 +840,14 @@ int write_ac3_pes(  int pack_size, int apidn, int ac3n, int n,
 }
 
 
-int write_nav_pack(int pack_size, int apidn, int ac3n, uint64_t SCR, uint32_t muxr, 
+int write_nav_pack(int pack_size, int extcnt, uint64_t SCR, uint32_t muxr, 
 		   uint8_t *buf)
 {
 	int pos = 0;
         uint8_t headr[5] = {0x00, 0x00, 0x01, PRIVATE_STREAM2, 0x03 };
         (void)pack_size;
 
-	pos = write_ps_header( buf, SCR, muxr, apidn+ac3n, 0, 0, 1, 1, 1, 1);
+	pos = write_ps_header( buf, SCR, muxr, extcnt, 0, 0, 1, 1, 1, 1);
 	memcpy(buf+pos, headr, 5);
 	buf[pos+5] = 0xD4;
 	pos += 6;
