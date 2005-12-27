@@ -244,6 +244,7 @@ EOF
     while (my $ref = $sh->fetchrow_hashref()) {
         my %info = %{$ref};
         die "This script requires mythtv >= 0.19\n" unless ($info{'basename'});
+        next unless (-e "$video_dir/".$info{'basename'});
     # Default times
         my ($syear, $smonth, $sday, $shour, $sminute, $ssecond) = $info{'starttime'} =~ /(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/;
         my ($eyear, $emonth, $eday, $ehour, $eminute, $esecond) = $info{'endtime'}   =~ /(\d+)-(\d+)-(\d+)\s+(\d+):(\d+):(\d+)/;
