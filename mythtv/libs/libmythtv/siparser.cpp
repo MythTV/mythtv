@@ -1219,8 +1219,10 @@ void SIParser::ParseSDT(uint pid, tablehead_t *head,
         s.ServiceID = buffer[pos] << 8 | buffer[pos+1];
         s.TransportID = head->table_id_ext;
         s.NetworkID = network_id;
-        s.EITPresent = PrivateTypes.ForceGuidePresent ?
-            1 : (buffer[pos+2] & 0x02) >> 1;
+        // EIT is present if either EIT_schedule_flag or 
+        // EIT_present_following_flag is set
+	s.EITPresent  = (PrivateTypes.ForceGuidePresent) ? 1 : 0;
+        s.EITPresent |= (buffer[pos+2] & 0x03)           ? 1 : 0;
         s.RunningStatus = (buffer[pos+3] & 0xE0) >> 5;
         s.CAStatus = (buffer[pos+3] & 0x10) >> 4;
         s.Version = head->version;
