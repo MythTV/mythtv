@@ -19,12 +19,14 @@
 #include "libmyth/mythdbcon.h"
 #include "libmyth/langsettings.h"
 #include "libmyth/dialogbox.h"
-#include "libmythtv/videosource.h"
-#include "libmythtv/channeleditor.h"
+#include "libmyth/exitcodes.h"
 #include "libmyth/themedmenu.h"
-#include "backendsettings.h"
 
 #include "libmythtv/dbcheck.h"
+#include "libmythtv/videosource.h"
+#include "libmythtv/channeleditor.h"
+#include "backendsettings.h"
+#include "checksetup.h"
 
 using namespace std;
 
@@ -95,6 +97,8 @@ void SetupMenu(void)
 int main(int argc, char *argv[])
 {
     QString geometry = "";
+    QString verboseString = QString(" important general");
+
 #ifdef Q_WS_X11
     // Remember any -geometry argument which QApplication init will remove
     for(int argpos = 1; argpos + 1 < argc; ++argpos)
@@ -130,18 +134,130 @@ int main(int argc, char *argv[])
                 return -1;
             }            
         }
+        else if ((!strcmp(a.argv()[argpos],"-v") ||
+                  !strcmp(a.argv()[argpos],"--verbose")) && (a.argc() <= argpos))
+        {
+            cerr << "Missing argument to -v/--verbose option\n";
+            return BACKEND_EXIT_INVALID_CMDLINE;
+        }
+        else if ((!strcmp(a.argv()[argpos],"-v") ||
+                  !strcmp(a.argv()[argpos],"--verbose")) && (a.argc() > argpos))
+        {
+            QString temp = a.argv()[argpos+1];
+            if (temp.startsWith("-"))
+            {
+                cerr << "Invalid or missing argument to -v/--verbose option\n";
+                return BACKEND_EXIT_INVALID_CMDLINE;
+            } 
+            else
+            {
+                QStringList verboseOpts;
+                verboseOpts = QStringList::split(',',a.argv()[argpos+1]);
+                ++argpos;
+                for (QStringList::Iterator it = verboseOpts.begin(); 
+                     it != verboseOpts.end(); ++it )
+                {
+                    if (!strcmp(*it,"none"))
+                    {
+                        print_verbose_messages = VB_NONE;
+                        verboseString = "";
+                    }
+                    else if (!strcmp(*it,"all"))
+                    {
+                        print_verbose_messages = VB_ALL;
+                        verboseString = "all";
+                    }
+                    else if (!strcmp(*it,"quiet"))
+                    {
+                        print_verbose_messages = VB_IMPORTANT;
+                        verboseString = "important";
+                    }
+                    else if (!strcmp(*it,"record"))
+                    {
+                        print_verbose_messages |= VB_RECORD;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"playback"))
+                    {
+                        print_verbose_messages |= VB_PLAYBACK;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"channel"))
+                    {
+                        print_verbose_messages |= VB_CHANNEL;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"osd"))
+                    {
+                        print_verbose_messages |= VB_OSD;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"file"))
+                    {
+                        print_verbose_messages |= VB_FILE;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"schedule"))
+                    {
+                        print_verbose_messages |= VB_SCHEDULE;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"network"))
+                    {
+                        print_verbose_messages |= VB_NETWORK;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"commflag"))
+                    {
+                        print_verbose_messages |= VB_COMMFLAG;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"jobqueue"))
+                    {
+                        print_verbose_messages |= VB_JOBQUEUE;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"audio"))
+                    {
+                        print_verbose_messages |= VB_AUDIO;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"libav"))
+                    {
+                        print_verbose_messages |= VB_LIBAV;
+                        verboseString += " " + *it;
+                    }
+                    else if (!strcmp(*it,"siparser"))
+                    {
+                        print_verbose_messages |= VB_SIPARSER;
+                        verboseString += " " + *it;
+                    }
+                    else
+                    {
+                        cerr << "Unknown argument for -v/--verbose: "
+                             << *it << endl;;
+                    }
+                }
+            }
+        } 
         else
         {
-            if (!(!strcmp(a.argv()[argpos],"-h") ||    
+            if (!(!strcmp(a.argv()[argpos],"-h") ||
                 !strcmp(a.argv()[argpos],"--help") ||
                 !strcmp(a.argv()[argpos],"--usage")))
                 cerr << "Invalid argument: " << a.argv()[argpos] << endl;
-            cerr << "Valid options are: \n" << 
+
+            cerr << "Valid options are: "<<endl
 #ifdef Q_WS_X11 
-                    "-display X-server     Create GUI on X-server, not localhost\n" <<
+                 <<"-display X-server              Create GUI on X-server, not localhost"<<endl
 #endif          
-                    "--geometry WxH        Override window size settings\n" <<
-                    "-geometry WxH+X+Y     Override window size and position\n";
+                 <<"--geometry WxH                 Override window size settings"<<endl
+                 <<"-geometry WxH+X+Y              Override window size and position"<<endl
+                 <<"-v or --verbose debug-level    Prints more information\n"
+                 <<"                               Accepts any combination (separated by comma)\n"
+                 <<"                               of all,none,quiet,record,playback,channel,\n"
+                 <<"                               osd,file,schedule,network,commflag,audio,\n"
+                 <<"                               libav,jobqueue"<<endl;
             return -1;
         }
     }
@@ -149,16 +265,16 @@ int main(int argc, char *argv[])
     gContext = NULL;
     gContext = new MythContext(MYTH_BINARY_VERSION);
 
-    if (geometry != "")
-        if (!gContext->ParseGeometryOverride(geometry))
-            cerr << "Illegal -geometry argument '"
-                 << geometry << "' (ignored)\n";
-
     if (!gContext->Init(true))
     {
         VERBOSE(VB_IMPORTANT, "Failed to init MythContext, exiting.");
         return -1;
     }
+
+    if (geometry != "")
+        if (!gContext->ParseGeometryOverride(geometry))
+            cerr << "Illegal -geometry argument '"
+                 << geometry << "' (ignored)\n";
 
     if (!MSqlQuery::testDBConnection())
     {
@@ -189,36 +305,78 @@ int main(int argc, char *argv[])
     LanguageSettings::prompt();
     LanguageSettings::load("mythfrontend");
 
-    DialogBox dboxCard(mainWindow, QObject::tr("Would you like to clear all "
+
+    DialogBox *dia;
+    dia = new DialogBox(mainWindow,
+                        QObject::tr("Would you like to clear all "
                                    "capture card settings before starting "
                                    "configuration?"));
-    dboxCard.AddButton(QObject::tr("No, leave my card settings alone"));
-    dboxCard.AddButton(QObject::tr("Yes, delete my card settings"));
-    if (dboxCard.exec() == 2)
+    dia->AddButton(QObject::tr("No, leave my card settings alone"));
+    dia->AddButton(QObject::tr("Yes, delete my card settings"));
+    if (dia->exec() == 2)
         clearCardDB();
+    delete dia;
     
     // Give the user time to realize the first dialog is gone
     // before we bring up a similar-looking one
     usleep(750000);
-    
-    DialogBox dboxProg(mainWindow, QObject::tr("Would you like to clear all "
+
+    dia = new DialogBox(mainWindow,
+                        QObject::tr("Would you like to clear all "
                                    "program data and channel settings before "
                                    "starting configuration? This will not "
                                    "affect any existing recordings."));
-    dboxProg.AddButton(QObject::tr("No, leave my channel settings alone"));
-    dboxProg.AddButton(QObject::tr("Yes, delete my channel settings"));
-    if (dboxProg.exec() == 2)
+    dia->AddButton(QObject::tr("No, leave my channel settings alone"));
+    dia->AddButton(QObject::tr("Yes, delete my channel settings"));
+    if (dia->exec() == 2)
         clearAllDB();
+    delete dia;
 
     REG_KEY("qt", "DELETE", "Delete", "D");
     REG_KEY("qt", "EDIT", "Edit", "E");
 
-    SetupMenu();
+    bool haveProblems = false;
+    do
+    {
+        // Let the user select buttons, type values, scan for channels, et c.
+        SetupMenu();
 
-    cout << "If this is the master backend server:\n";
-    cout << "Now, please run 'mythfilldatabase' to populate the database\n";
-    cout << "with channel information.\n";
-    cout << endl;
+        // Look for common problems
+        QString *problems = new QString("");
+        haveProblems = CheckSetup(problems);
+
+        if (haveProblems)
+        {
+            QString prompt;
+
+            if (problems->contains("\n") > 1)
+                prompt = QObject::tr("Do you want to fix these problems?");
+            else
+                prompt = QObject::tr("Do you want to fix this problem?");
+
+            dia = new DialogBox(mainWindow, problems->append("\n" + prompt));
+            dia->AddButton(QObject::tr("Yes please"));
+            dia->AddButton(QObject::tr("No, I know what I am doing"));
+
+            if (dia->exec() == 2)
+                haveProblems = false;
+            delete dia;
+        }
+
+        delete problems;
+
+    // Execute UI again until there are no more problems:
+    }
+    while (haveProblems);
+
+    dia = new DialogBox(mainWindow,
+                        QObject::tr("If this is the master backend server, "
+                                    "please run 'mythfilldatabase' "
+                                    "to populate the database "
+                                    "with channel information."));
+    dia->AddButton(QObject::tr("OK"));
+    dia->exec();
+    delete dia;
 
     return 0;
 }
