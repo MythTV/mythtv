@@ -338,14 +338,14 @@ static void writeout_ext(multiplex_t *mx, int type, int n)
 	switch (type) {
 	case MPEG_AUDIO:
 		written = write_audio_pes( mx->pack_size, mx->extcnt,
-					   n, pts, mx->SCR, mx->muxr, 
-					   outbuf, &nlength, PTS_ONLY,
+					   mx->exttypcnt[n], pts, mx->SCR,
+					   mx->muxr, outbuf, &nlength, PTS_ONLY,
 					   &mx->extrbuffer[n]);
 		break;
 	case AC3:
 		written = write_ac3_pes( mx->pack_size, mx->extcnt,
-					 n, pts, mx->SCR, mx->muxr, 
-					 outbuf, &nlength, PTS_ONLY,
+					 mx->exttypcnt[n], pts, mx->SCR,
+					 mx->muxr, outbuf, &nlength, PTS_ONLY,
 					 nframes, ac3_off,
 					 &mx->extrbuffer[n]);
 		break;
@@ -558,7 +558,7 @@ void finish_mpg(multiplex_t *mx)
 
 
 void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
-                     audio_frame_t *extframe, int *exttype,
+                     audio_frame_t *extframe, int *exttype, int *exttypcnt,
 		     uint64_t video_delay, uint64_t audio_delay, int fd,
 		     int (*fill_buffers)(void *p, int f),
 		     ringbuffer *vrbuffer, ringbuffer *index_vrbuffer,	
@@ -628,6 +628,7 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 			mx->extcnt++)
 		;
 	memcpy(mx->exttype, exttype, mx->extcnt);
+	memcpy(mx->exttypcnt, exttypcnt, mx->extcnt);
 
 	mx->vrbuffer = vrbuffer;
 	mx->index_vrbuffer = index_vrbuffer;

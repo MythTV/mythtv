@@ -113,6 +113,7 @@ class MPEG2replex
     ringbuffer index_extrbuf[N_AUDIO];
     int ext_count;
     int exttype[N_AUDIO];
+    int exttypcnt[N_AUDIO];
 
     pthread_mutex_t mutex;
     pthread_cond_t cond;

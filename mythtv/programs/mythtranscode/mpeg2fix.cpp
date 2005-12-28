@@ -447,7 +447,7 @@ void MPEG2replex::Start()
 
     mplex = &mx;
 
-    init_multiplex(&mx, &seq_head, extframe, exttype,
+    init_multiplex(&mx, &seq_head, extframe, exttype, exttypcnt,
                    video_delay, audio_delay, fd_out, fill_buffers,
                    &vrbuf, &index_vrbuf, extrbuf, index_extrbuf, otype);
     setup_multiplex(&mx);
@@ -473,6 +473,8 @@ void MPEG2fixup::InitReplex()
     ring_init(&rx.index_vrbuf, INDEX_BUF);
 
     memset(rx.exttype, 0, sizeof(rx.exttype));
+    memset(rx.exttypcnt, 0, sizeof(rx.exttypcnt));
+    int mp2_count = 0, ac3_count = 0;
     for (QMap<int, QPtrList<MPEG2frame> >::iterator it = aFrame.begin();
             it != aFrame.end(); it++)
     {
@@ -486,9 +488,11 @@ void MPEG2fixup::InitReplex()
             case CODEC_ID_MP2:
             case CODEC_ID_MP3:
                 rx.exttype[i] = 2;
+                rx.exttypcnt[i] = mp2_count++;
                 break;
             case CODEC_ID_AC3:
                 rx.exttype[i] = 1;
+                rx.exttypcnt[i] = ac3_count++;
                 break;
         }
     }
