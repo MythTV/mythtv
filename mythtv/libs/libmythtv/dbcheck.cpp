@@ -10,7 +10,7 @@ using namespace std;
 #include "mythdbcon.h"
 
 /// This is the DB schema version expected by the running MythTV instance.
-const QString currentDatabaseVersion = "1120";
+const QString currentDatabaseVersion = "1121";
 
 static bool UpdateDBVersionNumber(const QString &newnumber);
 static bool performActualUpdate(const QString updates[], QString version,
@@ -1966,6 +1966,17 @@ static bool doUpgradeTVDatabaseSchema(void)
 ""
 };
         if (!performActualUpdate(updates, "1120", dbver))
+            return false;
+    }
+
+    if (dbver == "1120")
+    {
+        const QString updates[] = {
+"UPDATE keybindings SET action = 'ADJUSTSTRETCH' "
+"       WHERE action = 'TOGGLESTRETCH';",
+""
+};
+        if (!performActualUpdate(updates, "1121", dbver))
             return false;
     }
 

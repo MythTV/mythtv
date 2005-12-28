@@ -388,6 +388,7 @@ class TV : public QObject
      *  Ignored when doing Fast Forward or Rewind.
      */
     float normal_speed; 
+    float prev_speed;
 
     float frameRate;     ///< Estimated framerate from recorder
 

@@ -131,7 +131,8 @@ void TV::InitKeys(void)
             "transcoding", "X");
     REG_KEY("TV Playback", "SPEEDINC", "Increase the playback speed", "U");
     REG_KEY("TV Playback", "SPEEDDEC", "Decrease the playback speed", "J");
-    REG_KEY("TV Playback", "TOGGLESTRETCH", "Turn on time stretch control", "A");
+    REG_KEY("TV Playback", "ADJUSTSTRETCH", "Turn on time stretch control", "A");
+    REG_KEY("TV Playback", "TOGGLESTRETCH", "Toggle time stretch speed", "");
     REG_KEY("TV Playback", "TOGGLEPICCONTROLS", "Turn on the playback picture "
             "adjustment controls", "F");
     REG_KEY("TV Playback", "TOGGLERECCONTROLS", "Turn on the recording picture "
@@ -225,7 +226,7 @@ TV::TV(void)
       // Fast forward state
       doing_ff_rew(0), ff_rew_index(0), speed_index(0),
       // Time Stretch state
-      normal_speed(1.0f),
+      normal_speed(1.0f), prev_speed(1.5f), 
       // Estimated framerate from recorder
       frameRate(30.0f),
       // CC/Teletex input state variables
@@ -455,6 +456,10 @@ void TV::GetPlayGroupSettings(const QString &group)
     rewtime      = PlayGroup::GetSetting(group, "skipback", 5);
     jumptime     = PlayGroup::GetSetting(group, "jump", 10);
     normal_speed = PlayGroup::GetSetting(group, "timestretch", 100) / 100.0;
+    if (normal_speed == 1.0f)
+        prev_speed = 1.5f;
+    else
+        prev_speed = normal_speed;
 }
 
 /** \fn LiveTV(LiveTVChain*, bool)
@@ -1885,7 +1890,7 @@ void TV::ProcessKeypress(QKeyEvent *e)
                 ChangeTimeStretch(-5);
             else if (action == "UP")
                 ChangeTimeStretch(5);
-            else if (action == "TOGGLESTRETCH")
+            else if (action == "ADJUSTSTRETCH")
                 ClearOSD();
             else
                 handled = false;
@@ -1977,9 +1982,18 @@ void TV::ProcessKeypress(QKeyEvent *e)
             ChangeSpeed(1);
         else if (action == "SPEEDDEC")
             ChangeSpeed(-1);
+        else if (action == "ADJUSTSTRETCH")
+            ChangeTimeStretch(0);   // just display
         else if (action == "TOGGLESTRETCH")
         {
-            ChangeTimeStretch(0);   // just display
+            if (normal_speed == 1.0f)
+                normal_speed = prev_speed;
+            else
+            {
+                prev_speed = normal_speed;
+                normal_speed = 1.0f;
+            }
+            ChangeTimeStretch(0, false);
         }
         else if (action == "TOGGLEAUDIOSYNC")
             ChangeAudioSync(0);   // just display
@@ -4040,10 +4054,15 @@ void TV::ChangeTimeStretch(int dir, bool allowEdit)
 
     if (GetOSD() && !browsemode)
     {
-        int val = (int)(normal_speed*500);
-        GetOSD()->ShowStatus(val, false, tr("Adjust Time Stretch"), text, 10, 
-                        kOSDFunctionalType_TimeStretchAdjust);
-        update_osd_pos = false;
+        if (!allowEdit)
+            UpdateOSDSeekMessage(PlayMesg(), osd_general_timeout);
+        else
+        {
+            int val = (int)(normal_speed*500);
+            GetOSD()->ShowStatus(val, false, tr("Adjust Time Stretch"), text, 
+                                 10, kOSDFunctionalType_TimeStretchAdjust);
+            update_osd_pos = false;
+        }
     }
 }
 
@@ -4711,7 +4730,7 @@ void TV::TreeMenuSelected(OSDListTreeType *tree, OSDGenericTree *item)
         nvp->ToggleCC(vbimode, action.right(1).toInt() + 4);
     else if (action == "TOGGLEMANUALZOOM")
         SetManualZoom(true);
-    else if (action.left(13) == "TOGGLESTRETCH")
+    else if (action.left(13) == "ADJUSTSTRETCH")
     {
         bool floatRead;
         float stretch = action.right(action.length() - 13).toFloat(&floatRead);
@@ -5015,30 +5034,30 @@ void TV::BuildOSDTreeMenu(void)
 
     int speedX100 = (int)(round(normal_speed * 100));
 
-    item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "TOGGLESTRETCH");
-    subitem = new OSDGenericTree(item, tr("Adjust"), "TOGGLESTRETCH");
-    subitem = new OSDGenericTree(item, tr("0.5X"), "TOGGLESTRETCH0.5",
+    item = new OSDGenericTree(treeMenu, tr("Adjust Time Stretch"), "ADJUSTSTRETCH");
+    subitem = new OSDGenericTree(item, tr("Adjust"), "ADJUSTSTRETCH");
+    subitem = new OSDGenericTree(item, tr("0.5X"), "ADJUSTSTRETCH0.5",
                                  (speedX100 == 50) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("0.9X"), "TOGGLESTRETCH0.9",
+    subitem = new OSDGenericTree(item, tr("0.9X"), "ADJUSTSTRETCH0.9",
                                  (speedX100 == 90) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.0X"), "TOGGLESTRETCH1.0",
+    subitem = new OSDGenericTree(item, tr("1.0X"), "ADJUSTSTRETCH1.0",
                                  (speedX100 == 100) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.1X"), "TOGGLESTRETCH1.1",
+    subitem = new OSDGenericTree(item, tr("1.1X"), "ADJUSTSTRETCH1.1",
                                  (speedX100 == 110) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.2X"), "TOGGLESTRETCH1.2",
+    subitem = new OSDGenericTree(item, tr("1.2X"), "ADJUSTSTRETCH1.2",
                                  (speedX100 == 120) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.3X"), "TOGGLESTRETCH1.3",
+    subitem = new OSDGenericTree(item, tr("1.3X"), "ADJUSTSTRETCH1.3",
                                  (speedX100 == 130) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.4X"), "TOGGLESTRETCH1.4",
+    subitem = new OSDGenericTree(item, tr("1.4X"), "ADJUSTSTRETCH1.4",
                                  (speedX100 == 140) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
-    subitem = new OSDGenericTree(item, tr("1.5X"), "TOGGLESTRETCH1.5",
+    subitem = new OSDGenericTree(item, tr("1.5X"), "ADJUSTSTRETCH1.5",
                                  (speedX100 == 150) ? 1 : 0, NULL,
                                  "STRETCHGROUP");
 
