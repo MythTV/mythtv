@@ -413,17 +413,17 @@ void ChannelBase::StoreInputChannels(
     const QMap<int, QString> &startChanNum)
 {
     int cardid = GetCardID();
-    QString querystr, input;
 
     MSqlQuery query(MSqlQuery::InitCon());
 
-    for (int i = 0;; i++)
-    {
-        input = GetInputByNum(i);
-        if (input.isEmpty())
-            break;
+    QMap<int, QString>::const_iterator it = startChanNum.begin();
 
-        if (startChanNum[i].isEmpty())
+    for (; it != startChanNum.end(); ++it)
+    {
+	int i = it.key();
+        QString input = GetInputByNum(i);
+
+        if (input.isEmpty() || startChanNum[i].isEmpty())
             continue;
 
         query.prepare(
