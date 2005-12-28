@@ -9,7 +9,7 @@ INSTALLS = target
 INCLUDEPATH += ../../libs/libmyth
 INCLUDEPATH += ../..
 LIBS += -L../libmyth -lmyth-$$LIBVERSION
-VERSION = 0.18.1
+VERSION = 0.18.2
 
 # Input
 HEADERS  = mythmainwindow.h mythpainter.h mythimage.h
