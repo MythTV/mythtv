@@ -627,8 +627,8 @@ void init_multiplex( multiplex_t *mx, sequence_t *seq_head,
 	for (mx->extcnt = 0; mx->extcnt < N_AUDIO && exttype[mx->extcnt];
 			mx->extcnt++)
 		;
-	memcpy(mx->exttype, exttype, mx->extcnt);
-	memcpy(mx->exttypcnt, exttypcnt, mx->extcnt);
+	memcpy(mx->exttype, exttype, mx->extcnt*sizeof(int));
+	memcpy(mx->exttypcnt, exttypcnt, mx->extcnt*sizeof(int));
 
 	mx->vrbuffer = vrbuffer;
 	mx->index_vrbuffer = index_vrbuffer;
