@@ -432,6 +432,11 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
     int normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
+
+    // This shouldn't happen, but it's nasty if it does so prevent it
+    if (normalframes < 0)
+        normalframes = 0;
+
     SeekReset(lastKey, normalframes, true, doflush);
 
     // ???
@@ -461,7 +466,7 @@ bool DecoderBase::DoRewindNormal(long long desiredFrame)
     bool useAdj   = hasKeyFrameAdjustTable;
     uint pos_idx  = min(pre_idx, post_idx);
     PosMapEntry e = m_positionMap[pos_idx];
-    lastKey = (useAdj) ? e.adjFrame : e.index * keyframedist;
+    lastKey = (useAdj) ? e.adjFrame : (e.index - 1) * keyframedist;
 
     // ??? Don't rewind past the beginning of the file
     while (e.pos < 0)
@@ -471,7 +476,7 @@ bool DecoderBase::DoRewindNormal(long long desiredFrame)
             return false;
 
         e = m_positionMap[pos_idx];
-        lastKey = (useAdj) ? e.adjFrame : e.index * keyframedist;
+        lastKey = (useAdj) ? e.adjFrame : (e.index - 1) * keyframedist;
     }
 
     ringBuffer->Seek(e.pos, SEEK_SET);
@@ -707,3 +712,5 @@ long long DecoderBase::DVDFindPosition(long long desiredFrame)
     int multiplier = m_positionMap[size].pos / m_positionMap[size].index ;
     return (long long)(desiredFrame * multiplier);
 } 
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
