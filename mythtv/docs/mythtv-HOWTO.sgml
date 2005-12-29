@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-12-10, v0.18.17
+<date>2005-12-29, v0.19.pre
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -109,7 +109,7 @@ name="http://www.mythtv.org/docs/mythtv-HOWTO-singlehtml.html"> or as a PDF
 at <url url="http://www.mythtv.org/docs/mythtv-HOWTO.pdf"
 name="http://www.mythtv.org/docs/mythtv-HOWTO.pdf">.
 
-This HOWTO is for MythTV v0.18.1
+This HOWTO is for MythTV v0.19
 
 <sect1>Document conventions
 <p>The following conventions are used throughout this document.<newline>
@@ -825,20 +825,19 @@ should be brought up with the 3rd-parties (maintainer, lists, bugzillas etc.).
 be obtained from <url url="http://rpm.nyvalls.se/"
 name="http://rpm.nyvalls.se/"> If you have problems with the RPMs, please
 send him email directly at <url url="thac@nyvalls.se" name="thac@nyvalls.se">.
-<!--
 <sect3>Debian
 <p>Debian packages for MythTV and most of its add-on modules are maintained
-by Matt Zimmerman <url url="mailto:mdz@debian.org"
-name="mailto:mdz@debian.org"> and are available at <url
-url="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/"
-name="http://dijkstra.csh.rit.edu/~mdz/debian/dists/unstable/mythtv/">. 
+by Christian Marillat <url url="mailto:marillat@free.fr"
+name="mailto:marillat@free.fr"> and are available at <url
+url="http://debian.video.free.fr/"
+name="http://debian.video.free.fr/">. 
 Installation instructions can be found on those pages as well. All of the
 prerequisites for MythTV are available as Debian packages, most of them from
 the official Debian archive.
 
 If you have followed the instructions on the above page you should have added
 <tscreen><verb>
-deb-src http://dijkstra.csh.rit.edu/~mdz/debian unstable mythtv
+deb ftp://ftp.nerim.net/debian-marillat/ sid main
 </verb></tscreen>
 
 to your <tt>/etc/apt/sources.list</tt> file.  Running <bf>apt-get update</bf> and then
@@ -1068,7 +1067,7 @@ of how to install the required environment for many distributions.
 Subsequent sections of this chapter address the few oddities that you may 
 have to adjust by hand before you compile MythTV.
 
-The reference compilation system for MythTV is Debian.
+The reference compilation system for MythTV is Ubuntu.
 
 <sect1>Shared-Library Requirements for MythTV 
 <sect2>Modifying /etc/ld.so.conf <label id="modifying_ld.so.conf">
@@ -1175,58 +1174,6 @@ warnings. There is an <url url="http://membled.com/work/patches/DateManip/"
 name="http://membled.com/work/patches/DateManip/"> updated version of
 Date::Manip at the XMLTV site fixing this and other XMLTV related
 bugs.
-
-<sect3>Debian
-<p>Debian source packages are available from the same place as the
-binary packages.  These can be used to build customized packages, and
-to automatically satisfy MythTV's build-time dependencies.
-<tscreen><verb>
-[...]
-sh-2.05b# cd /tmp
-sh-2.05b# apt-get source mythtv
-Reading Package Lists...
-Building Dependency Tree...
-Need to get 3085kB of source archives.
-Get:1 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (dsc) [507B]
-Get:2 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (tar) [3071kB]
-Get:3 http://dijkstra.csh.rit.edu unstable/mythtv mythtv 0.11-4 (diff) [13.9kB]
-Fetched 3085kB in 0s (8120kB/s)
-dpkg-source: extracting mythtv in mythtv-0.11
-sh-2.05b# cd mythtv-0.11
-[customize settings.pro, etc.]
-[edit debian/changelog and increment the version number]
-sh-2.05b# dpkg-buildpackage -rfakeroot -us -uc -b
-[...]
-dpkg-deb: building package `mythtv-backend' in `../mythtv-backend_0.11-4_i386.deb'.
-dpkg-deb: building package `mythtv-frontend' in `../mythtv-frontend_0.11-4_i386.deb'.
-dpkg-deb: building package `libmyth-0.11' in `../libmyth-0.11_0.11-4_i386.deb'.
-dpkg-deb: building package `libmyth-0.11-dev' in `../libmyth-0.11-dev_0.11-4_i386.deb'.
- dpkg-genchanges -b
-dpkg-genchanges: binary-only upload - not including any source code
-dpkg-buildpackage: binary only upload (no source included)
-sh-2.05b# ls -l ../*.deb
--rw-r--r--    1 root     root        31734 Sep  6 19:07 ../libmyth-0.11-dev_0.11-4_i386.deb
--rw-r--r--    1 root     root       408444 Sep  6 19:07 ../libmyth-0.11_0.11-4_i386.deb
--rw-r--r--    1 root     root      3324966 Sep  6 19:07 ../mythtv-backend_0.11-4_i386.deb
--rw-r--r--    1 root     root        15350 Sep  6 19:07 ../mythtv-common_0.11-4_all.deb
--rw-r--r--    1 root     root        17978 Sep  6 19:07 ../mythtv-database_0.11-4_all.deb
--rw-r--r--    1 root     root       422232 Sep  6 19:07 ../mythtv-doc_0.11-4_all.deb
--rw-r--r--    1 root     root      4900474 Sep  6 19:07 ../mythtv-frontend_0.11-4_i386.deb
--rw-r--r--    1 root     root        12372 Sep  6 19:07 ../mythtv_0.11-4_all.deb
-</verb></tscreen>
-
-<p>If building from <bf>subversion</bf> instead of the source package, then the QTDIR
-environment variable must be set when building.  On Debian unstable, QTDIR
-should be set to <tt>/usr/share/qt3</tt>.  Edit the <tt>/etc/profile</tt>
-file using your favorite text editor and add something like:
-<tscreen><verb>
-PATH="/usr/local/bin:/usr/bin:/bin:/usr/bin/X11:/usr/games"
-QTDIR="/usr/share/qt3"
-.
-.
-.
-export PATH QTDIR
-</verb></tscreen>
 
 <sect2>Device Permissions <label id="devperms">
 <p>MythTV will need access to the video4linux devices on your system.  By
@@ -1451,10 +1398,7 @@ $ cd mythtv-0.18.1
 $ ./configure
 </verb></tscreen>
 
-As of MythTV version 0.18, there is no need to edit the
-<tt>settings.pro</tt> file to set compile-time options.  The
-<bf>configure</bf> script will configure MythTV appropriately for your
-system.  If you wish to change options, run <bf>./configure --help</bf> to
+If you wish to change options, run <bf>./configure --help</bf> to
 see what is available and to override and automatically detected options. 
 See the <tt>config.log</tt> file after running <bf>configure</bf> to see
 previous runs.
@@ -1673,10 +1617,12 @@ $ cd database
 <p><tscreen><verb>
 $ mysql -u root < mc.sql
 </verb></tscreen>
+<!--
 <sect2>Debian 3.0
 <p><tscreen><verb>
 $ mysql < mc.sql
 </verb></tscreen>
+-->
 <sect2>Gentoo
 <p><tscreen><verb>
 $ su
@@ -2298,7 +2244,7 @@ the IRDA device within a few feet of the box.
 <p>By this point, all of the compile-time prerequisites have been installed,
 <bf>mysql</bf> is running and has had its initial database setup.  It's now
 time to configure MythTV.
-
+<!--
 <figure loc="here">
 <eps file="stop.eps" height="1cm">
 <img src="stop.png">
@@ -2313,7 +2259,7 @@ $ su -
 # apt-get install libqt3c102-mt-mysql
 # exit
 </verb></tscreen>
-
+-->
 <sect1>Configuring the Master backend system
 <p>Open a shell and decide where you will store your video files.  By
 default, MythTV will assume that you will be using <tt>/mnt/store/</tt>, but
@@ -2822,7 +2768,7 @@ during playback. These filters can be used to improve or modify the video
 image, including hiding the effects of an interlaced image or reducing the
 effects of noise in a poor video signal. The following is a brief
 introduction to introduce you to the filters that are available in MythTV
-version 0.18.1.
+version 0.19
 <sect2>Applying filters
 <p>One or more filters can be included in a "filter chain". The filters to
 be used are identified in a "filter string". A filter string is a group of
@@ -3464,20 +3410,6 @@ $
 </verb</tscreen>
 
 The theme will now be available in the mythfrontend Appearance section.
-
-<!-- REMOVE ME START -->
-<sect1>Adding DirecTV information to the database
-<p>A script used to exist for adding DirecTV pay-per-view information into
-the database.  As of 2005-04-01 this script no longer appears to work, and
-this section will be removed from the HOWTO with the release of 0.19.
-
-A script for adding DirecTV information into the database has been
-written by tarek Lubani <url url="mailto:tarek@tarek.2y.net"> and is
-available at <url url="http://tarek.2y.net/myth/ppv.pl"
-name="http://tarek.2y.net/myth/ppv.pl">.  This is currently an external
-user-supplied program, so if you have issues with the script, please contact
-the author.
-<!-- REMOVE ME END -->
 
 <sect1>Adding DishTV information to the database
 <p>A script for adding Pay Per View information into the MythTV database for
@@ -4250,9 +4182,9 @@ name="http://dev.mysql.com/doc/mysql/en/">. This contains a lot of
 information that can be useful for Power Search rules such as the "Date and
 Time Functions". There are many other good resources for SQL on the Web.
 
-While the example clauses demonstrate how many of the data fields may be
-used, you can get a more complete list of all the fields that are available
-by using a MySQL client program:
+While the example clauses demonstrate how to use many of the data fields,
+you can get a more complete list of all the fields that are available by
+using a MySQL client program:
 <tscreen><verb>
 $ mysql -u mythtv -pmythtv mythconverg
 mysql> describe program;
@@ -4265,11 +4197,12 @@ in order to use them effectively with Power Search.
 <item>"program.category_type" holds one of these exact four strings: "movie",
 "series", "sports" or "tvshow".
 
-<item>"program.airdate" is a string representing the year of release for movies
-and may have no meaning for other types of shows.
+<item>"program.airdate" is a string representing the year of release for
+movies and may have no meaning for other types of shows.
 
-<item>"program.stars" is a floating point number from 0.0 to 1.0. On a four star
-scale, 1.0 would be four stars, 0.75 would be three stars and so on.
+<item>"program.stars" is a floating point number from 0.0 to 1.0. On a
+four star scale, 1.0 would be four stars, 0.75 would be three stars and so
+on.
 
 <item>"program.originalairdate" if provided is the date when a show
 was, or will be, first televised. This may be useful for finding
@@ -4282,16 +4215,16 @@ if the show was marked as a repeat and did not have a date for the first
 airing. If this is "0" it usually means that this is a brand new show or a
 rebroadcast within the first two weeks.
 
-<item>"program.programid" is the Tribune Media Service database record identifier
-for each program description. In general, these start with a two letter
-prefix, MV, EP, SP or SH that correspond to the "program.category_type". 
-For most, the last four digits are "0000" except EP where the last four
-digits are the episode number in the series. Note that these are generated
-by TMS and not the show's producers but they are usually in the same order as
-the original air dates for the episodes. Detailed information can be found
-in the Data Direct documentation at <url url="http://labs.zap2it.com/"
-name="http://labs.zap2it.com/"> .
-</itemize>
+<item>"program.programid" is the Tribune Media Service database record
+identifier for each program description. In general, these start with a two
+letter prefix, MV, EP, SP or SH that correspond to the
+"program.category_type".  For most, the last four digits are "0000" except
+EP where the last four digits are the episode number in the series. Note
+that these are generated by TMS and not the show's producers but they are
+usually in the same order as the original air dates for the episodes.
+Detailed information can be found in the Data Direct documentation at <url
+url="http://labs.zap2it.com/" name="http://labs.zap2it.com/"> .  </itemize>
+
 Finally, if you are doing something very experimental and a field is not
 giving you the results you had anticipated, you can always check the MythTV
 source code to see exactly how a field is used. The open source for MythTV
@@ -4299,8 +4232,7 @@ is available from <url url="http://www.mythtv.org/"
 name="http://www.mythtv.org/"> .
 
 <sect>MythPlugins. <label id="mythplugins_">
-<p>MythTV has a rich set of plugins available.  Beginning with MythTV v0.18,
-a single tarball contains all of the plugins. Once you have downloaded
+<p>MythTV has a rich set of plugins available.  Once you have downloaded
 the tarball, untar it and run the <bf>configure</bf> script:
 
 <tscreen><verb>
@@ -4572,17 +4504,19 @@ end
 
 <sect>MythGame.
 <!-- Install instructions by Hary Wilke (harywilke at yahoo.com -->
-<p><url url="http://www.mameworld.net/" name="http://www.mameworld.net/"> is
+<p>MythGame can used as a frontend to start any emulator that your host OS
+runs. This is an example of how to set up xmame on Linux.
+<url url="http://www.mameworld.net/" name="http://www.mameworld.net/"> is
 an excellent resource for all things mame.
 
 Installation overview:
 <enum>
 <item>Setup directory structure
 <item>Download and install xmame
-<item>Download and place files (artwork/catver.ini/etc..)
-<item>Download and install mythgame plugin
-<item>Setup mythgame from inside mythfrontend
-<item>Hints: No joystick solution
+<item>Download and place extra files (artwork/catver.ini/etc..)
+<item>Download and install MythGame plugin
+<item>Setup xmame in MythGame
+<item>Hints
 </enum>
 <sect1>Setup Directory Structure
 <p>To keep things organized, create the following directories for <bf>xmame</bf> to use
@@ -4593,13 +4527,19 @@ $ mkdir -p /usr/local/share/xmame/{highscore,roms,snaps}
 </verb></tscreen>
 
 <sect1>Download and Install xmame
-<p>Download the source to <bf>xmame</bf> from <url url="http://x.mame.net/download/xmame-0.97.tar.bz2"
-name="http://x.mame.net/download/xmame-0.97.tar.bz2">
+<p><bf>NOTE</bf>:  There may be pre-packaged versions of <bf>xmame</bf>
+available for your distribution.  Check <url
+url="http://x.mame.net/download.html"
+name="http://x.mame.net/download.html"> for the latest version.
+
+Download the source to <bf>xmame</bf> from <url
+url="http://x.mame.net/download/xmame-0.102.tar.bz2"
+name="http://x.mame.net/download/xmame-0.102.tar.bz2">
 
 <tscreen><verb>
-$ wget http://x.mame.net/download/xmame-0.97.tar.bz2
-$ tar -xjf xmame-0.97.tar.bz2
-$ cd xmame-0.97
+$ wget http://x.mame.net/download/xmame-0.102.tar.bz2
+$ tar -xjf xmame-0.102.tar.bz2
+$ cd xmame-0.102
 </verb></tscreen>
 
 Edit the Makefile with your favorite editor.  Adjust the options as required for your system.
@@ -4624,15 +4564,13 @@ $ cp docs/xmamerc.dist ~/.xmame/xmamerc
 
 Because some ROMS work better with different display toolkits, or possibly
 even older versions of xmame, it's convenient to keep all of your
-<bf>xmame</bf> binaries and to rename them to include the version number,
-then make a symbolic link to "xmame". If you want to test a different
-version of <bf>xmame</bf> at some point you only need to switch this link.
+<bf>xmame</bf> binaries and to rename them to include the version number. 
+MythGame allows you to match individual roms to preferred binaries.
 
 <tscreen><verb>
 $ su
 (enter password)
-# mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.97.x11
-# ln -s /usr/local/bin/xmame-0.97.x11 /usr/local/bin/xmame
+# mv /usr/local/bin/xmame.x11 /usr/local/bin/xmame-0.102.x11
 # exit
 </verb></tscreen>
 
@@ -4641,6 +4579,18 @@ $ su
 display toolkit you used. Also, you may need to remove and recreate
 <tt>xmamerc</tt> after upgrading since some of the default options may have
 changed.
+
+Edit <tt>~/.xmame/xmamerc</tt> to include your paths.
+<tscreen><verb>
+### Fileio Related ###
+rompath                         /usr/local/share/xmame/roms
+snapshot_directory              /usr/local/share/xmame/snaps
+cheat_file                      /usr/local/share/xmame/cheat.dat
+hiscore_file			/usr/local/share/xmame/hiscore.dat
+hiscore_directory		/usr/local/share/xmame/hiscore
+history_file			/usr/local/share/xmame/history.dat
+mameinfo_file			/usr/local/share/xmame/mameinfo.dat
+</verb></tscreen>
 
 Confirm that <bf>xmame</bf> works before running it inside MythTV. Place
 your ROM in the <tt>/usr/local/share/xmame/roms</tt> directory you created
@@ -4700,8 +4650,8 @@ name="http://www.mameworld.net/highscore/">
 <p>Download from <url url="http://cheat.retrogames.com/"
 name="http://cheat.retrogames.com/">
 
-<sect1>Download and Install Mythgame.
-<p><bf>mythgame</bf> is part of the mythplugins package.  See the instructions
+<sect1>Download and Install MythGame.
+<p><bf>MythGame</bf> is part of the mythplugins package.  See the instructions
 in the <ref id="DownloadAndCompile" name="Downloading and Compiling">
 section to obtain mythplugins.
 
@@ -4721,51 +4671,31 @@ $ su
 # exit
 </verb></tscreen>
 
-<sect1>Setup mythgame
-<p>Start <bf>mythfrontend</bf> and navigate to Utilities/Setup>Setup>Media
-Settings>Game Settings>General Settings
+<sect1>Setup xmame in MythGame
+<p>Start <bf>mythfrontend</bf> and navigate to Utilities/Setup > Setup > Media
+Settings > Game Settings > Game Players. Select <tt>(New Game Player)</tt>.
 
-On page one you can setup the display order of your games, on page 2 and 3
-you need to enter the paths to files and directories that xmame uses.
+To set up a new player for xmame enter the following:
 
 <tscreen><verb>
-MAME binary location:  /usr/local/bin/xmame               (path to xmame binary)
-MAME ROM location:     /usr/local/share/xmame/roms        (where you store all your roms)
-catver.ini file:       /usr/local/share/xmame/catver.ini  (Category and Version information for your ROMs)
-MAME screenshots path: /usr/local/share/xmame/snaps       (screenshots of ROMs in play)
-MAME hiscores path:    /usr/local/share/xmame/hiscore     (directory for mame to create hiscore.hi files)
-MAME hiscores file:    /usr/local/share/xmame/hiscore.dat (file that tells mame how to store hiscores)
-MAME flyers path:      /usr/local/share/xmame/flyers      (not used with mythgame)
-MAME cabinets path:    /usr/local/share/xmame/cabinets    (not used with mythgame)
-MAME history path:     /usr/local/share/xmame/history.dat (a little history about each game)
-MAME cheat files path: /usr/local/share/xmame/cheats
-MAME image downloader                                     (no longer used)
+Player Name:    xmame-0.102.x11                  (Name by which you want your emulator or game called)
+Type:           xmame                           (This is used for display purposes only and does not affect the function of your system)
+Command:        xmame-0.102.x11 -vidmod 1 -fullscreen     (Path and name of binary + any optional parameters)
+Rom Path:       /usr/local/share/xmame/roms     (This tells MythGame what directories to scan for roms to be used with this emulator)
+ScreenShots:    /usr/local/share/xmame/snaps    (This tells MythGame what directories to scan for snapshots to be used with these roms)
+Working Directory:                              (Directory to change to before launching game or emulator. Blank in our case ignores this setting)
+File Extensions:                                (List of all file extension to be used for this emulator. Blank menas any file under the Rom Path)
+[] Allow games to span multiple roms/disks      (will treat game.1.rom game.2.rom game.3.rom as one game)
 </verb></tscreen>
-
-Setup options:
-
-Automatically download images - no longer used
-
-Show disclaimer - show warning about illegal ROMs before starting each ROM.
-
-Show game info - show info about the game, ie:year, maker, CPU, sound,
-screen resolution before starting the game
 
 <sect1>Hints:
-<p>No joystick causing failure to launch.
-
-By default, <bf>mythgame</bf> expects that you have a joystick installed.
-<bf>xmame</bf> will fail to launch because <bf>mythgame</bf> sends the
-option "-joytype 4" to <bf>xmame</bf> by default.  You may reset this using
-the following command:
-
-<bf>NOTE</bf>: The following command will set the joytype to "0" for all
-hosts.  If you need to specify this on a per-host basis you can either
-modify the command below (if you know SQL), or use a tool which simplifies
-access to MySQL such as <bf>phpMyAdmin</bf>.
-<tscreen><verb>
-$ mysql -u root -e "update mythconverg.mamesettings set joytype=0"
-</verb></tscreen>
+<p>
+<itemize>
+<item>Rom name before options: %s can be used as a standin for rom names on the command line.
+<item>Multiple disk/rom games: %d1 %d2 etc can be used as standins for multiple disc games on the command line.
+<item>Associating a rom with an emulator: Browse to the desired rom and press 'M' to enter the settings page for that rom.
+<item>Assign a Game Favorite Status: Browse to the desired game and press "/".
+</itemize>
 
 <sect>MythMusic.  
 <p>MythMusic has a number of prerequisites that must be satisfied before it
@@ -5322,9 +5252,14 @@ information.
 Once at the <tt>(gdb)</tt> prompt, type <tt>run</tt> to start program
 execution.  When the program segfaults or appears to lock-up (press CTRL-C),
 type 
-<tscreen><verb>(gdb) thread apply all bt full
+<tscreen><verb>
+(gdb) thread apply all bt full
 (gdb) set logging off
 </verb></tscreen>
+
+If gdb returns to the gdb prompt with a "Program received signal SIG33,
+Real-time event 33", type <tt>cont</tt> to continue; this is not a "real"
+bug.
 
 All of the output from <tt>gdb.txt</tt> should be posted to the mythtv-dev
 mailing list, along with the steps you followed to get the program to crash.
@@ -7732,7 +7667,7 @@ v0.18.17, 2005-12-10.  Add some more details about debugging, put text early
 in the doc about what a good bug report should contain, tell people to use
 trac to submit docs patches.
 
-
+v0.19pre, 2005-12-  Add "cont" to gdb instructions.
 -->
 
 <!--
