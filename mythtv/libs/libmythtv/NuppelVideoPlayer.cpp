@@ -3808,6 +3808,10 @@ bool NuppelVideoPlayer::FrameIsInMap(long long frameNumber,
                 ((lastType == MARK_COMM_START) ||
                  (lastType == MARK_CUT_START)))
                 return true;
+
+            if ((type == MARK_COMM_START) ||
+                (type == MARK_CUT_START))
+                return false;
         }
 
         lastType = it.data();
