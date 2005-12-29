@@ -132,7 +132,7 @@ void RomInfo::setField(QString field, QString data)
     else if (field == "genre")
         genre = data;
     else if (field == "year")
-        year = data.toInt();
+        year = data;
     else if (field == "favorite")
         favorite = data.toInt();
     else if (field == "rompath")
