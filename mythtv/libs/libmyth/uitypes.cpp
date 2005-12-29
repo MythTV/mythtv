@@ -1771,7 +1771,7 @@ UIRepeatedImageType::UIRepeatedImageType(const QString &name, const QString &fil
         : UIImageType(name, filename, dorder, displaypos)
 {
     m_repeat = 0;
-    m_highest_repeat = 0;
+    m_highest_repeat = 1;
     m_orientation = 0;
 }
 
