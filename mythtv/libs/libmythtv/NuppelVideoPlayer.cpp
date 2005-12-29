@@ -2211,10 +2211,8 @@ void NuppelVideoPlayer::StartPlaying(void)
     if (!commBreakMap.isEmpty())
     {
         hascommbreaktable = true;
-        commBreakIter = commBreakMap.begin();
+        SetCommBreakIter();
     }
-
-    SetCommBreakIter();
     commBreakMapLock.unlock();
 
     while (!killplayer && !errored)
@@ -3079,9 +3077,9 @@ void NuppelVideoPlayer::SetCommBreakIter(void)
 {
     VERBOSE(VB_COMMFLAG, LOC + QString("SetCommBreakIter @ framesPlayed = %1")
                                        .arg(framesPlayed));
-    commBreakIter = commBreakMap.begin();
     if (hascommbreaktable)
     {
+        commBreakIter = commBreakMap.begin();
         while (commBreakIter != commBreakMap.end())
         {
             if ((framesPlayed + 2) > commBreakIter.key())
@@ -3091,11 +3089,11 @@ void NuppelVideoPlayer::SetCommBreakIter(void)
             else
                 break;
         }
-    }
 
-    VERBOSE(VB_COMMFLAG, LOC + QString("new commBreakIter = %1 @ frame %2")
-                                       .arg(commBreakIter.data())
-                                       .arg(commBreakIter.key()));
+        VERBOSE(VB_COMMFLAG, LOC + QString("new commBreakIter = %1 @ frame %2")
+                                           .arg(commBreakIter.data())
+                                           .arg(commBreakIter.key()));
+    }
 }
 
 void NuppelVideoPlayer::SetAutoCommercialSkip(int autoskip)
