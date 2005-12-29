@@ -139,7 +139,7 @@ static GlobalCheckBox *SaveTranscoding()
     gc->setLabel(QObject::tr("Save original files after transcoding (globally)"));
     gc->setValue(false);
     gc->setHelpText(QObject::tr("When set and the transcoder is active, the "
-                    "original nuv files will be renamed to nuv.old once the "
+                    "original files will be renamed to .old once the "
                     "transcoding is complete."));
     return gc;
 };
