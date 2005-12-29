@@ -975,13 +975,9 @@ void DataDirectStationUpdate(Source source)
     // (Not currently done in standard program -- need to verify if required)
 }
 
-void DataDirectProgramUpdate(Source source) 
+void DataDirectProgramUpdate() 
 {
     MSqlQuery query(MSqlQuery::DDCon());
-   
-    //cerr << "Creating program view table...\n";
-    ddprocessor.updateProgramViewTable(source.id);
-    //cerr <<  "Finished creating program view table...\n";
 
     //cerr << "Adding rows to main program table from view table..\n";
     if (!query.exec("INSERT IGNORE INTO program (chanid, starttime, endtime, "
@@ -1121,6 +1117,31 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
                        "WHERE value='mythfilldatabaseLastRunEnd'")
                        .arg(qdtNow.toString("yyyy-MM-dd hh:mm")));
 
+    VERBOSE(VB_GENERAL, "Main temp tables populated.");
+    VERBOSE(VB_GENERAL, "Updating myth channels.");
+    DataDirectStationUpdate(source);
+    VERBOSE(VB_GENERAL, "Channels updated.");
+
+    //cerr << "Creating program view table...\n";
+    ddprocessor.updateProgramViewTable(source.id);
+    //cerr <<  "Finished creating program view table...\n";
+
+    query.exec("SELECT count(*) from dd_v_program;");
+    if (query.isActive() && query.size() > 0)
+    {
+        query.next();
+        if (query.value(0).toInt() < 1)
+        {
+            VERBOSE(VB_GENERAL, "Did not find any new program data.");
+            return false;
+        }
+    }
+    else
+    {
+        VERBOSE(VB_GENERAL, "Failed testing program view table.");
+        return false;
+    }
+
     VERBOSE(VB_GENERAL, "Clearing data for source.");
     QDateTime fromlocaldt = MythUTCToLocal(ddprocessor.getActualListingsFrom());
     QDateTime tolocaldt = MythUTCToLocal(ddprocessor.getActualListingsTo());
@@ -1130,14 +1151,9 @@ bool grabDDData(Source source, int poffset, QDate pdate, int ddSource)
                                   .arg(tolocaldt.toString()));
     clearDataBySource(source.id, fromlocaldt,tolocaldt);
     VERBOSE(VB_GENERAL, "Data for source cleared.");
-
-    VERBOSE(VB_GENERAL, "Main temp tables populated.");
-    VERBOSE(VB_GENERAL, "Updating myth channels.");
-    DataDirectStationUpdate(source);
-    VERBOSE(VB_GENERAL, "Channels updated.");
     
     VERBOSE(VB_GENERAL, "Updating programs.");
-    DataDirectProgramUpdate(source);
+    DataDirectProgramUpdate();
     VERBOSE(VB_GENERAL, "Program table update complete.");
 
     return true;
