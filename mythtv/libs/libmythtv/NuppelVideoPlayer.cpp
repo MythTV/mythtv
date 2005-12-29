@@ -25,6 +25,7 @@ using namespace std;
 #include "audiooutput.h"
 #include "recordingprofile.h"
 #include "osdtypes.h"
+#include "osdsurface.h"
 #include "remoteutil.h"
 #include "programinfo.h"
 #include "mythcontext.h"
@@ -4727,9 +4728,19 @@ void NuppelVideoPlayer::DisplaySubtitles()
                     }
                 }
 
+                // scale the subtitle images which are scaled and positioned for
+                // a 720x576 video resolution to fit the current OSD resolution
+                float hmult = osd->GetSubtitleBounds().width() / 720.0;
+                float vmult = osd->GetSubtitleBounds().height() / 576.0;
+                rect->x = (int)(rect->x * hmult);
+                rect->y = (int)(rect->y * vmult);
+                rect->w = (int)(rect->w * hmult);
+                rect->h = (int)(rect->h * vmult);
+                QImage scaledImage = qImage.smoothScale(rect->w, rect->h);
+
                 OSDTypeImage* image = new OSDTypeImage();
                 image->SetPosition(QPoint(rect->x, rect->y));
-                image->LoadFromQImage(qImage);
+                image->LoadFromQImage(scaledImage);
 
                 subtitleOSD->AddType(image);
 

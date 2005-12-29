@@ -137,6 +137,7 @@ class OSD : public QObject
     void DisableFade(void);
     bool IsSetDisplaying(const QString &name);
     bool HasSet(const QString &name);
+    QRect GetSubtitleBounds();
 
  private:
     void SetDefaults();

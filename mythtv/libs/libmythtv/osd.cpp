@@ -2397,3 +2397,7 @@ bool OSD::HasSet(const QString &name)
     return setMap.contains(name);
 }
 
+QRect OSD::GetSubtitleBounds()
+{
+    return QRect(xoffset, yoffset, displaywidth, displayheight);
+}
