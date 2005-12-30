@@ -65,6 +65,8 @@ static void align_dimensions(AVCodecContext *avctx, uint &width, uint &height)
     height = (height + 15) & (~0xf);
 }
 
+typedef MythDeque<AVFrame*> avframe_q;
+
 class AvFormatDecoderPrivate
 {
   public:
@@ -83,6 +85,7 @@ class AvFormatDecoderPrivate
   private:
     mpeg2dec_t *mpeg2dec;
     bool        allow_mpeg2dec;
+    avframe_q   partialFrames;
 };
 
 bool AvFormatDecoderPrivate::InitMPEG2()
@@ -103,14 +106,28 @@ bool AvFormatDecoderPrivate::InitMPEG2()
 void AvFormatDecoderPrivate::DestroyMPEG2()
 {
     if (mpeg2dec)
+    {
         mpeg2_close(mpeg2dec);
-    mpeg2dec = NULL;
+        mpeg2dec = NULL;
+
+        avframe_q::iterator it = partialFrames.begin();
+        for (; it != partialFrames.end(); ++it)
+            delete (*it);
+        partialFrames.clear();
+    }
 }
 
 void AvFormatDecoderPrivate::ResetMPEG2()
 {
     if (mpeg2dec)
+    {
         mpeg2_reset(mpeg2dec, 0);
+
+        avframe_q::iterator it = partialFrames.begin();
+        for (; it != partialFrames.end(); ++it)
+            delete (*it);
+        partialFrames.clear();
+    }
 }
 
 int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
@@ -145,28 +162,73 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                 mpeg2_set_buf(mpeg2dec, picture->data, picture->opaque);
                 break;
             case STATE_BUFFER:
-                // We're supposed to wait for STATE_SLICE, but
-                // STATE_BUFFER is returned first. Since we handed
-                // libmpeg2 a full frame, we know it should be
-                // done once it's finished with the data.
-                if (info->display_fbuf)
+                // We're finished with the buffer...
+                if (partialFrames.size())
                 {
-                    picture->data[0] = info->display_fbuf->buf[0];
-                    picture->data[1] = info->display_fbuf->buf[1];
-                    picture->data[2] = info->display_fbuf->buf[2];
-                    picture->opaque  = info->display_fbuf->id;
+                    AVFrame *frm = partialFrames.dequeue();
                     *got_picture_ptr = 1;
-                    picture->top_field_first = !!(info->display_picture->flags &
-                                                  PIC_FLAG_TOP_FIELD_FIRST);
-                    picture->interlaced_frame = !(info->display_picture->flags &
-                                                  PIC_FLAG_PROGRESSIVE_FRAME);
+                    *picture = *frm;
+                    delete frm;
                 }
                 return buf_size;
             case STATE_INVALID:
                 // This is the error state. The decoder must be
                 // reset on an error.
-                mpeg2_reset(mpeg2dec, 0);
+                ResetMPEG2();
                 return -1;
+
+            case STATE_SLICE:
+            case STATE_END:
+            case STATE_INVALID_END:
+                if (info->display_fbuf)
+                {
+                    bool exists = false;
+                    avframe_q::iterator it = partialFrames.begin();
+                    for (; it != partialFrames.end(); ++it)
+                        if ((*it)->opaque == info->display_fbuf->id)
+                            exists = true;
+
+                    if (!exists)
+                    {
+                        AVFrame *frm = new AVFrame();
+                        frm->data[0] = info->display_fbuf->buf[0];
+                        frm->data[1] = info->display_fbuf->buf[1];
+                        frm->data[2] = info->display_fbuf->buf[2];
+                        frm->data[3] = NULL;
+                        frm->opaque  = info->display_fbuf->id;
+                        frm->type    = FF_BUFFER_TYPE_USER;
+                        frm->top_field_first =
+                            !!(info->display_picture->flags &
+                               PIC_FLAG_TOP_FIELD_FIRST);
+                        frm->interlaced_frame =
+                            !(info->display_picture->flags &
+                              PIC_FLAG_PROGRESSIVE_FRAME);
+                        partialFrames.enqueue(frm);
+                        
+                    }
+                }
+                if (info->discard_fbuf)
+                {
+                    bool exists = false;
+                    avframe_q::iterator it = partialFrames.begin();
+                    for (; it != partialFrames.end(); ++it)
+                    {
+                        if ((*it)->opaque == info->discard_fbuf->id)
+                        {
+                            exists = true;
+                            (*it)->data[3] = (unsigned char*) 1;
+                        }
+                    }
+
+                    if (!exists)
+                    {
+                        AVFrame frame;
+                        frame.opaque = info->discard_fbuf->id;
+                        frame.type   = FF_BUFFER_TYPE_USER;
+                        avctx->release_buffer(avctx, &frame);
+                    }
+                }
+                break;
             default:
                 break;
         }
@@ -2511,6 +2573,8 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     picframe->frameNumber = framesPlayed;
                     GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
+                    if (d->HasMPEG2Dec() && mpa_pic.data[3])
+                        context->release_buffer(context, &mpa_pic);
 
                     decoded_video_frame = picframe;
                     gotvideo = 1;
