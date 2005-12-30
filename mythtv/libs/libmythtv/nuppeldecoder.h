@@ -99,7 +99,8 @@ class NuppelDecoder : public DecoderBase
 
     int effdsp;
 
-    unsigned char *directbuf;
+    VideoFrame *directframe;
+    VideoFrame *decoded_video_frame;
 
     AVCodec *mpa_codec;
     AVCodecContext *mpa_ctx;

@@ -25,6 +25,8 @@ using namespace std;
 #include "bswap.h"
 #endif
 
+#define LOC QString("NVD: ")
+#define LOC_ERR QString("NVD Error: ")
 
 pthread_mutex_t avcodeclock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -37,7 +39,8 @@ NuppelDecoder::NuppelDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
 #endif
       ffmpeg_extradatasize(0), ffmpeg_extradata(0), usingextradata(false),
       disablevideo(false), totalLength(0), totalFrames(0), effdsp(0), 
-      directbuf(0), mpa_codec(0), mpa_ctx(0), directrendering(false),
+      directframe(NULL),            decoded_video_frame(NULL),
+      mpa_codec(0), mpa_ctx(0), directrendering(false),
       lastct('1'), strm(0), buf(0), buf2(0), 
       videosizetotal(0), videoframesread(0), setreadahead(false)
 {
@@ -566,7 +569,7 @@ int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
     int width = c->width;
     int height = c->height;
 
-    pic->data[0] = nd->directbuf;
+    pic->data[0] = nd->directframe->buf;
     pic->data[1] = pic->data[0] + width * height;
     pic->data[2] = pic->data[1] + width * height / 4;
 
@@ -574,7 +577,7 @@ int get_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
     pic->linesize[1] = width / 2;
     pic->linesize[2] = width / 2;
 
-    pic->opaque = nd;
+    pic->opaque = nd->directframe;
     pic->type = FF_BUFFER_TYPE_USER;
 
     pic->age = 256 * 256 * 256 * 64;
@@ -586,6 +589,10 @@ void release_nuppel_buffer(struct AVCodecContext *c, AVFrame *pic)
 {
     (void)c;
     assert(pic->type == FF_BUFFER_TYPE_USER);
+
+    NuppelDecoder *nd = (NuppelDecoder *)(c->opaque);
+    if (nd && nd->GetNVP() && nd->GetNVP()->getVideoOutput())
+        nd->GetNVP()->getVideoOutput()->DeLimboFrame((VideoFrame*)pic->opaque);
 
     int i;
     for (i = 0; i < 4; i++)
@@ -683,6 +690,7 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
     int compoff = 0;
 
     unsigned char *outbuf = frame->buf;
+    directframe = frame;
 
     if (!buf2)
     {
@@ -759,9 +767,9 @@ bool NuppelDecoder::DecodeFrame(struct rtframeheader *frameheader,
         int gotpicture = 0;
         pthread_mutex_lock(&avcodeclock);
         // if directrendering, writes into buf
-        directbuf = outbuf;
         int ret = avcodec_decode_video(mpa_ctx, &mpa_pic, &gotpicture,
                                        lstrm, frameheader->packetlength);
+        directframe = NULL;
         pthread_mutex_unlock(&avcodeclock);
         if (ret < 0)
         {
@@ -895,6 +903,8 @@ bool NuppelDecoder::GetFrame(int avignore)
     bool gotvideo = false;
     bool ret = false;
     int seeklen = 0;
+
+    decoded_video_frame = NULL;
 
     while (!gotvideo)
     {
@@ -1046,6 +1056,13 @@ bool NuppelDecoder::GetFrame(int avignore)
 
             buf->frameNumber = framesPlayed;
             GetNVP()->ReleaseNextVideoFrame(buf, frameheader.timecode);
+            
+            // We need to make the frame available ourselves
+            // if we are not using ffmpeg/avlib.
+            if (directframe)
+                GetNVP()->getVideoOutput()->DeLimboFrame(buf);
+
+            decoded_video_frame = buf;
             gotvideo = 1;
             if (getrawframes && getrawvideo)
                 StoreRawData(strm);
@@ -1139,19 +1156,27 @@ bool NuppelDecoder::GetFrame(int avignore)
 }
 
 void NuppelDecoder::SeekReset(long long newKey, uint skipFrames,
-                              bool needFlush, bool discardFrames)
+                              bool doFlush, bool discardFrames)
 {
-    DecoderBase::SeekReset(newKey, skipFrames, needFlush, discardFrames);
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("SeekReset(%1, %2, %3 flush, %4 discard)")
+            .arg(newKey).arg(skipFrames)
+            .arg((doFlush) ? "do" : "don't")
+            .arg((discardFrames) ? "do" : "don't"));
+    
+    DecoderBase::SeekReset(newKey, skipFrames, doFlush, discardFrames);
 
-    if (mpa_codec && needFlush)
+    if (mpa_codec && doFlush)
         avcodec_flush_buffers(mpa_ctx);
 
-    while (skipFrames > 0)
+    if (discardFrames)
+        GetNVP()->DiscardVideoFrames();
+
+    for (;(skipFrames > 0) && !ateof; skipFrames--)
     {
         GetFrame(0);
-        if (ateof)
-            break;
-        skipFrames--;
+        if (decoded_video_frame)
+            GetNVP()->DiscardVideoFrame(decoded_video_frame);
     }
 }
 
