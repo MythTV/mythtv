@@ -631,8 +631,7 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
     PosMapEntry e = m_positionMap[pos_idx];
     lastKey = (hasKeyFrameAdjustTable) ? e.adjFrame : e.index * keyframedist;
 
-    // if commented out as a temporary fix for #868.
-    //if (framesPlayed < lastKey)
+    if (framesPlayed < lastKey)
     {
         ringBuffer->Seek(e.pos, SEEK_SET);
         needflush    = true;

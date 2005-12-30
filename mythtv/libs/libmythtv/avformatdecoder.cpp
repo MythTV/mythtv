@@ -349,34 +349,33 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
 void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
                                 bool doflush, bool discardFrames)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("SeekReset(%1, %2 flush, %3 discard)")
-            .arg(skipFrames).arg((doflush) ? "do" : "don't")
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("SeekReset(%1, %2, %3 flush, %4 discard)")
+            .arg(newKey).arg(skipFrames)
+            .arg((doflush) ? "do" : "don't")
             .arg((discardFrames) ? "do" : "don't"));
 
     DecoderBase::SeekReset(newKey, skipFrames, doflush, discardFrames);
 
-    lastapts = 0;
-    lastvpts = 0;
-    lastccptsu = 0;
-    save_cctc[0] = save_cctc[1] = 0;
-
-    av_read_frame_flush(ic);
-    
-    d->ResetMPEG2();
-
-    // Only reset the internal state if we're using our seeking,
-    // not when using libavformat's seeking
-    if (recordingHasPositionMap || livetv)
-    {
-        ic->pb.pos = ringBuffer->GetReadPosition();
-        ic->pb.buf_ptr = ic->pb.buffer;
-        ic->pb.buf_end = ic->pb.buffer;
-        ic->pb.eof_reached = 0;
-    }
-
-    // Flush the avcodec buffers
     if (doflush)
     {
+        lastapts = 0;
+        lastvpts = 0;
+        lastccptsu = 0;
+        save_cctc[0] = save_cctc[1] = 0;
+        av_read_frame_flush(ic);
+
+        // Only reset the internal state if we're using our seeking,
+        // not when using libavformat's seeking
+        if (recordingHasPositionMap || livetv)
+        {
+            ic->pb.pos = ringBuffer->GetReadPosition();
+            ic->pb.buf_ptr = ic->pb.buffer;
+            ic->pb.buf_end = ic->pb.buffer;
+            ic->pb.eof_reached = 0;
+        }
+
+        // Flush the avcodec buffers
         VERBOSE(VB_PLAYBACK, LOC + "SeekReset() flushing");
         for (int i = 0; i < ic->nb_streams; i++)
         {
@@ -384,25 +383,31 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
             if (enc->codec)
                 avcodec_flush_buffers(enc);
         }
+        d->ResetMPEG2();
     }
 
     // Discard all the queued up decoded frames
     if (discardFrames)
         GetNVP()->DiscardVideoFrames();
 
-    // Free up the stored up packets
-    while (doflush && storedPackets.count() > 0)
+    if (doflush)
     {
-        AVPacket *pkt = storedPackets.first();
-        storedPackets.removeFirst();
-        av_free_packet(pkt);
-        delete pkt;
+        // Free up the stored up packets
+        while (storedPackets.count() > 0)
+        {
+            AVPacket *pkt = storedPackets.first();
+            storedPackets.removeFirst();
+            av_free_packet(pkt);
+            delete pkt;
+        }
+
+        prevgoppos = 0;
+        gopset = false;
+        framesPlayed = lastKey;
+        framesRead = lastKey; 
     }
 
-    prevgoppos = 0;
-    gopset = false;
-
-     // Skip all the desired number of skipFrames
+    // Skip all the desired number of skipFrames
     for (;skipFrames > 0 && !ateof; skipFrames--)
     {
 	GetFrame(0);
@@ -416,7 +421,7 @@ void AvFormatDecoder::Reset(bool reset_video_data, bool seek_reset)
     VERBOSE(VB_PLAYBACK, LOC + QString("Reset(%1, %2)")
             .arg(reset_video_data).arg(seek_reset));
     if (seek_reset)
-        SeekReset(0, 0, true, true);
+        SeekReset(0, 0, true, false);
 
     if (reset_video_data)
     {
@@ -2446,6 +2451,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     {
                         AVPicture tmppicture;
  
+                        VideoFrame *xf = picframe;
                         picframe = GetNVP()->GetNextVideoFrame(false);
 
                         tmppicture.data[0] = picframe->buf;
@@ -2463,6 +2469,13 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                                     context->pix_fmt,
                                     context->width,
                                     context->height);
+
+                        // Set the frame flags, but then discard it
+                        // since we are not using it for display.
+                        xf->interlaced_frame = mpa_pic.interlaced_frame;
+                        xf->top_field_first = mpa_pic.top_field_first;
+                        xf->frameNumber = framesPlayed;
+                        GetNVP()->DiscardVideoFrame(xf);
                     }
 
                     long long temppts = pts;
@@ -2498,8 +2511,6 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
 
                     picframe->frameNumber = framesPlayed;
                     GetNVP()->ReleaseNextVideoFrame(picframe, temppts);
-                    if (!directrendering)
-                        GetNVP()->DiscardVideoFrame(picframe);
 
                     decoded_video_frame = picframe;
                     gotvideo = 1;
