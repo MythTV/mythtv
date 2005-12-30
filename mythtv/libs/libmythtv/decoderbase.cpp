@@ -344,7 +344,10 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
                                int &lower_bound, int &upper_bound)
 {
     // Binary search
-    long long upper = m_positionMap.size(), lower = -1;
+    long long size  = (long long) m_positionMap.size();
+    long long lower = -1;
+    long long upper = size;
+
     if (!search_adjusted && keyframedist > 0)
         desired_value /= keyframedist;
 
@@ -374,7 +377,7 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     {
         while (lower >= 0 && m_positionMap[lower].adjFrame > desired_value)
             lower--;
-        while (upper < m_positionMap.size() &&
+        while (upper < size &&
                m_positionMap[upper].adjFrame > desired_value)
             upper++;
     }
@@ -383,13 +386,13 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
         while (lower >= 0 &&
                (m_positionMap[lower].index - indexOffset) > desired_value)
             lower--;
-        while (upper < m_positionMap.size() && 
+        while (upper < size && 
                (m_positionMap[upper].index - indexOffset) < desired_value)
             upper++;
     }
     // keep in bounds
     lower = max(lower, 0LL);
-    upper = min(upper, m_positionMap.size() - 1LL);
+    upper = min(upper, size - 1LL);
 
     upper_bound = upper;
     lower_bound = lower;
