@@ -20,6 +20,7 @@ DecoderBase::DecoderBase(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
       current_aspect(1.33333), fps(29.97),
 
       framesPlayed(0), framesRead(0), lastKey(0), keyframedist(-1),
+      indexOffset(0),
 
       ateof(false), exitafterdecoded(false), transcoding(false),
 
@@ -156,6 +157,7 @@ bool DecoderBase::PosMapFromDb(void)
     {
         VERBOSE(VB_PLAYBACK, QString("Position map filled from DB to: %1")
                 .arg((long int) m_positionMap[m_positionMap.size()-1].index));
+        indexOffset = m_positionMap[0].index;
     }
 
     return true;
@@ -342,18 +344,18 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
                                int &lower_bound, int &upper_bound)
 {
     // Binary search
-    int upper = m_positionMap.size(), lower = -1;
+    long long upper = m_positionMap.size(), lower = -1;
     if (!search_adjusted && keyframedist > 0)
         desired_value /= keyframedist;
 
     while (upper - 1 > lower) 
     {
-        int i = (upper + lower) / 2;
+        long long i = (upper + lower) / 2;
         long long value;
         if (search_adjusted)
             value = m_positionMap[i].adjFrame;
         else
-            value = m_positionMap[i].index;
+            value = m_positionMap[i].index - indexOffset;
         if (value == desired_value) 
         {
             // found it
@@ -372,23 +374,22 @@ bool DecoderBase::FindPosition(long long desired_value, bool search_adjusted,
     {
         while (lower >= 0 && m_positionMap[lower].adjFrame > desired_value)
             lower--;
-        while (upper < (int)m_positionMap.size() &&
+        while (upper < m_positionMap.size() &&
                m_positionMap[upper].adjFrame > desired_value)
             upper++;
     }
     else
     {
-        while (lower >= 0 &&m_positionMap[lower].index > desired_value)
+        while (lower >= 0 &&
+               (m_positionMap[lower].index - indexOffset) > desired_value)
             lower--;
-        while (upper < (int)m_positionMap.size() && 
-               m_positionMap[upper].index < desired_value)
+        while (upper < m_positionMap.size() && 
+               (m_positionMap[upper].index - indexOffset) < desired_value)
             upper++;
     }
     // keep in bounds
-    if (lower < 0)
-        lower = 0;
-    if (upper >= (int)m_positionMap.size())
-        upper = (int)m_positionMap.size() - 1;
+    lower = max(lower, 0LL);
+    upper = min(upper, m_positionMap.size() - 1LL);
 
     upper_bound = upper;
     lower_bound = lower;
@@ -449,6 +450,12 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
     return true;
 }
 
+long long DecoderBase::GetKey(PosMapEntry &e) const
+{
+    long long kf  = (ringBuffer->isDVD()) ? 1LL : keyframedist;
+    return (hasKeyFrameAdjustTable) ? e.adjFrame :(e.index - indexOffset) * kf;
+}
+
 bool DecoderBase::DoRewindDVD(long long desiredFrame)
 {
     long long pos = DVDFindPosition(desiredFrame);
@@ -463,10 +470,9 @@ bool DecoderBase::DoRewindNormal(long long desiredFrame)
     int pre_idx, post_idx;
     FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
 
-    bool useAdj   = hasKeyFrameAdjustTable;
     uint pos_idx  = min(pre_idx, post_idx);
     PosMapEntry e = m_positionMap[pos_idx];
-    lastKey = (useAdj) ? e.adjFrame : (e.index - 1) * keyframedist;
+    lastKey = GetKey(e);
 
     // ??? Don't rewind past the beginning of the file
     while (e.pos < 0)
@@ -476,7 +482,7 @@ bool DecoderBase::DoRewindNormal(long long desiredFrame)
             return false;
 
         e = m_positionMap[pos_idx];
-        lastKey = (useAdj) ? e.adjFrame : (e.index - 1) * keyframedist;
+        lastKey = GetKey(e);
     }
 
     ringBuffer->Seek(e.pos, SEEK_SET);
@@ -487,9 +493,8 @@ bool DecoderBase::DoRewindNormal(long long desiredFrame)
 long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
 {
     long long last_frame = 0;
-    uint mult = (uint) (ringBuffer->isDVD()) ? 1 : keyframedist;
     if (!m_positionMap.empty())
-        last_frame = mult * m_positionMap.back().index;
+        last_frame = GetKey(m_positionMap.back());
 
     // Resync keyframe map if we are trying to seek to a frame
     // not yet in out map and then check for last frame again.
@@ -503,7 +508,7 @@ long long DecoderBase::GetLastFrameInPosMap(long long desiredFrame)
         SyncPositionMap();
 
         if (!m_positionMap.empty())
-            last_frame = mult * m_positionMap.back().index;
+            last_frame = GetKey(m_positionMap.back());
 
         if (desiredFrame > last_frame)
         {
@@ -629,7 +634,7 @@ void DecoderBase::DoFastForwardSeek(long long desiredFrame, bool &needflush)
     uint pos_idx = (exactseeks) ? pre_idx : max(pre_idx, post_idx);
 
     PosMapEntry e = m_positionMap[pos_idx];
-    lastKey = (hasKeyFrameAdjustTable) ? e.adjFrame : e.index * keyframedist;
+    lastKey = GetKey(e);
 
     if (framesPlayed < lastKey)
     {

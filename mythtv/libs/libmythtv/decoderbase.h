@@ -106,6 +106,7 @@ class DecoderBase
         long long adjFrame; // keyFrameAdjustTable adjusted frame number
         long long pos;      // position in stream
     } PosMapEntry;
+    long long GetKey(PosMapEntry &entry) const;
 
     NuppelVideoPlayer *m_parent;
     ProgramInfo *m_playbackinfo;
@@ -122,7 +123,7 @@ class DecoderBase
     long long framesRead;
     long long lastKey;
     int keyframedist;
-
+    long long indexOffset;
 
     bool ateof;
     bool exitafterdecoded;
