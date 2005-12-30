@@ -221,6 +221,15 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
         success = false;
         global_lock.lock();
         frame = available.dequeue();
+
+        // Try to get a frame not being used by the decoder
+        for (uint i = 0; i <= available.size() && decode.contains(frame); i++)
+        {
+            if (!available.contains(frame))
+                available.enqueue(frame);
+            frame = available.dequeue();
+        }
+
         while (frame && used.contains(frame))
         {
             VERBOSE(VB_IMPORTANT,
@@ -243,17 +252,13 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
         }
         if (frame)
         {
-            frame_queue_t *q = queue(enqueue_to);
-            if (q)
-                q->enqueue(frame);
+            safeEnqueue(enqueue_to, frame);
+
             success = true;
             if (with_lock)
                 success = TryLockFrame(frame, "GetNextFreeFrame");
             if (!success)
-            {
-                available.enqueue(frame);
-                q->remove(frame);
-            }
+                safeEnqueue(kVideoBuffer_avail, frame);
         }
 
         global_lock.unlock();
@@ -302,6 +307,7 @@ void VideoBuffers::ReleaseFrame(VideoFrame *frame)
     global_lock.lock();
     vpos = vbufferMap[frame];
     limbo.remove(frame);
+    decode.enqueue(frame);
     used.enqueue(frame);
     global_lock.unlock();
 }
@@ -319,6 +325,7 @@ void VideoBuffers::DeLimboFrame(VideoFrame *frame)
         limbo.remove(frame);
         available.enqueue(frame);
     }
+    decode.remove(frame);
     global_lock.unlock();
 }
 
@@ -441,10 +448,9 @@ VideoFrame *VideoBuffers::head(BufferType type)
     frame_queue_t *q = queue(type);
     if (q)
     {
-        global_lock.lock();
-        VideoFrame *frame = q->head();
-        global_lock.unlock();
-        return frame;
+        QMutexLocker locker(&global_lock);
+        if (q->size())
+            return q->head();
     }
     return NULL;
 }
@@ -454,10 +460,9 @@ VideoFrame *VideoBuffers::tail(BufferType type)
     frame_queue_t *q = queue(type);
     if (q)
     {
-        global_lock.lock();
-        VideoFrame *frame = q->tail();
-        global_lock.unlock();
-        return frame;
+        QMutexLocker locker(&global_lock);
+        if (q->size())
+            return q->tail();
     }
     return NULL;
 }
@@ -633,6 +638,14 @@ void VideoBuffers::DiscardFrames(void)
             }
         }
     }
+
+    // Make sure frames used by decoder are last...
+    // This is for libmpeg2 which still uses the frames after a reset.
+    for (it = decode.begin(); it != decode.end(); ++it)
+        remove(kVideoBuffer_all, *it);
+    for (it = decode.begin(); it != decode.end(); ++it)
+        available.enqueue(*it);
+    decode.clear();
 
     VERBOSE(VB_PLAYBACK, QString("VideoBuffers::DiscardFrames(): %1 -- done()")
             .arg(GetStatus()));
@@ -1185,21 +1198,28 @@ QString VideoBuffers::GetStatus(int n) const
         unsigned long long d = to_bitmap(displayed);
         unsigned long long l = to_bitmap(limbo);
         unsigned long long p = to_bitmap(pause);
+        unsigned long long x = to_bitmap(decode);
         for (uint i=0; i<(uint)n; i++)
         {
             unsigned long long mask = 1<<i;
+            QString tmp("");
             if (a & mask)
-                str += "A";
-            else if (u & mask)
-                str += "U";
-            else if (d & mask)
-                str += "d";
-            else if (l & mask)
-                str += "L";
-            else if (p & mask)
-                str += "p";
-            else
+                tmp += (x & mask) ? "a" : "A";
+            if (u & mask)
+                tmp += (x & mask) ? "u" : "U";
+            if (d & mask)
+                tmp += (x & mask) ? "d" : "D";
+            if (l & mask)
+                tmp += (x & mask) ? "l" : "L";
+            if (p & mask)
+                tmp += (x & mask) ? "p" : "P";
+
+            if (0 == tmp.length())
                 str += " ";
+            else if (1 == tmp.length())
+                str += tmp;
+            else
+                str += "(" + tmp + ")";
         }
         global_lock.unlock();
     }

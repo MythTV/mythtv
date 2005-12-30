@@ -137,7 +137,7 @@ class VideoBuffers
     frame_queue_t         *queue(BufferType type);
     const frame_queue_t   *queue(BufferType type) const;
 
-    frame_queue_t          available, used, limbo, pause, displayed;
+    frame_queue_t          available, used, limbo, pause, displayed, decode;
     vbuffer_map_t          vbufferMap; // videobuffers to buffer's index
     frame_vector_t         buffers;
     uchar_vector_t         allocated_structs; // for DeleteBuffers
