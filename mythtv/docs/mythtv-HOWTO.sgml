@@ -3649,10 +3649,11 @@ Options Page, there are eight different types of rules to help the
 scheduler find which showings you would like to record.
 
 <itemize>
-<item>Single Record -- record only this title at this specific
-time. This is the best way to be sure that a certain showing is
-recorded. However, if the TV listings change and the show is not
-broadcast at that time, the show will not be recorded.
+<item>Single Record -- record only this title at this specific time and
+this station. This is the best way to be sure that a certain showing is
+recorded. However, if the TV listings change and the show is not broadcast
+at that time, the show will not be recorded but will be marked as Not Listed
+to let you know that you should investigate.
 
 <item>Find One -- this will record a title once from any of the times
 that appear in the TV listings. This is useful for recording a movie
@@ -3673,11 +3674,11 @@ of the times that appear in the TV listings beginning from the time of
 the showing that was selected when the rule was set. This is useful
 for news, current events or other programs where the same episode is
 shown several times each week but the listings may not include
-descriptive information. This is not a good choice if there are
+descriptive information. This may not be a good choice if there are
 different episodes shown during the week.
 
 <item>Record Daily -- this records a show whenever the title is listed
-for the time and channel on any day of the week. Here again, a show
+for the time and station on any day of the week. Here again, a show
 will not be recorded if the time was altered by the station.
 
 <item>Find Daily -- this will record a title once per day from any
@@ -3685,11 +3686,11 @@ of the times that appear in the TV listings beginning from the time of
 the showing that was selected when the rule was set. This is useful
 for news, current events or other programs where the same episode is
 shown several times each day but the listings may not include
-descriptive information. This is not a good choice if there are
+descriptive information. This may not be a good choice if there are
 different episodes shown during the day.
 
 <item>Channel Record -- records a show anytime the title is listed on
-this channel.  This is perhaps the most common rule to use for most
+this station.  This is perhaps the most common rule to use for most
 shows.
 
 <item>Record All -- record this title on any channel at any time. This
@@ -3704,7 +3705,7 @@ station when the original airing cannot be recorded.
 <p>By default, all shows you select have equal value to the
 scheduler.  There are a set of rules to make good choices when
 two or more shows are in conflict. However, priority values let the
-scheduler know what you want so that it can set the schedule based
+scheduler know what you prefer so that it can set the schedule based
 on your preferences.
 
 Initially all priority values are set to zero. You may choose to
@@ -3716,13 +3717,13 @@ these over other shows. You might use certain values to rate shows
 so that all favorites are 2. good shows are 1 and extra 'filler'
 shows are all -1 for example. You could sort each title on the "Set
 Priorities" to have a unique value so the scheduler can always know
-which show you'd prefer verses any other show. The choice and style
+which show you'd prefer versus any other show. The choice and style
 are entirely up to you. However, the more information you give to
 the scheduler, the more likely it will make the choices you would
-like in the first place.
+prefer in the first place.
 
 The scheduler choices are based on the total priority for a showing
-by adding up four different priority factors. By default, all of
+by adding up four different priority factors. By default, most of
 these factors are "0" but you may use any combination to express
 your likes and needs.
 
@@ -3733,12 +3734,12 @@ use these values and not use the other factors for the sake of
 simplicity and clarity.
 
 Per record type -- Setup->TV Settings->Recording Priorities->General
-allows you to add to the priority based on the type. It may make
-sense to increase the value for "Single" so that by default they
-have an extra advantage over other shows. You may want to decrease
+allows you to add to the priority based on the type. It may make sense to
+increase the value for "Single" so that by default they have an extra
+advantage over other shows. The default is +1. You may want to decrease
 the value for Find rules so that they will be less likely to interfere
-with regular shows and will be more likely to record in a
-non-conflicting time instead.
+with regular shows and will be more likely to record in a non-conflicting
+time instead. The default is -1.
 
 Per channel -- Setup->TV Settings->Recording Priorities->Channel
 Priorities can be useful if you believe that you prefer any of the
@@ -3814,14 +3815,30 @@ want to record in any situation.
 schedule.
 
 <itemize>
-<item>Currently recording beats not currently recording -- A recording in
-progress can not be moved so it "wins" it's current timeslot.
+<item>Currently recording beats not currently recording -- A recording
+in progress can not be moved to another input or time so it "wins"
+its current timeslot.
 
-<item>Higher total priority beats lower total priority -- This is the core of
-the scheduling process. Episodes of the highest priority show are placed
-on the first available card then the next highest priority and so on.
+<item>Single showing rules with no match are marked Not Listed -- If a
+Single or Override do not match the current listings because the
+listings have changed, they are added to the schedule and marked to
+indicate that they will not record.
 
-<item>Future start time beats passed start time -- If there is an
+<item>Other record statuses beat Inactive or Repeat -- If two rules
+match the same showing of a program, a rule marked as inactive or
+a showing marked as a repeat yield to the other rule.
+
+<item>More specific record type is used in place of less specific -- If
+two rules match the same showing of a program, preference is given to
+Don't Record then Override, Single, Find One, Record Weekly, Find Weekly,
+Record Daily, Find Daily, Channel and finally All.
+
+<item>Higher total priority beats lower total priority -- This is the
+core of the scheduling process. Episodes of the highest priority show
+are placed on the first available input followed by the next highest
+priority show and so on.
+
+<item>Future start time beats past start time -- If there is an
 episode in progress and also a later showing of the same episode, it
 is better to record the complete episode. If there isn't another
 showing, start recording now to record the remaining portion.
@@ -3838,17 +3855,25 @@ All. This only applies if the priorities are the same.
 <item>If both start times have passed, later start time beats earlier start
 time -- This attempts to miss the least amount of time.
 
-<item>If neither start time has passed, earlier start time beats later start
-time -- This rule help assure that the earliest showing of an episode has
-the advantage.
+<item>If neither start time has passed, earlier start time beats later
+start time -- This helps assure that the earliest showing of an episode
+has the advantage.
 
-<item>Lower input id beats higher input id -- The scheduler fills in open
-time slots on the first available card. The next cards is used when there is
-another show already placed for the first card.
+<item>Lower input id beats higher input id -- The scheduler fills in
+open time slots on the first available input for the video source. The
+next input is used when there is another show already placed for the
+card of the first input.
 
 <item>Older record rule beats newer record rule -- If two shows are still
 equal after all of these other checks, the show whose record rule was added
 first is preferred over a more recent addition.
+
+<item>Postpone showings to resolve conflicts -- If Reschedule Higher
+Priorities is set or if a conflict has the same priority as a show
+that was scheduled at the same time, the scheduler will check to see
+if a scheduled show can be moved to another input or later matching
+showing without creating a new conflict so that the conflicting show
+can be scheduled to record.
 
 </itemize>
 
@@ -3860,7 +3885,7 @@ little smarter in certain situations. If this is checked, the scheduler will
 look for situations where a show cannot record because all inputs for the
 channel are used for higher priority shows. It will check to see if any of
 the other shows could be recorded at another time so that the conflicting
-show can be recorded in it's place.
+show can be recorded in its place.
 
 Generally, this is a good strategy but there are tradeoffs. If a higher
 priority show is postponed, you will not get to watch it until it is
@@ -3868,13 +3893,13 @@ recorded in the later timeslot. There is also a risk that the TV listings
 may change and the later showing may go away. In this rare case the higher
 priority show may never record. On the other hand, if you do not use this
 option you will miss recording some lower priority shows unnecessarily
-unless you make similar these changes manually.
+unless you manually make similar changes.
 
 By using Reschedule Higher Priorities, the scheduler will do a better job of
 recording as many of your shows as possible when left unattended. It will
 also be easy to see that shows have been marked to record at a later time.
 You can then decide for yourself when you would prefer to record the first
-showing.
+showing by clicking "Record anyway".
 
 <sect2>Controlling Your Schedule
 <p>The Manage Recordings->Upcoming Recordings page is your control center
@@ -3891,18 +3916,20 @@ that may need your attention. The message in the upper right-hand corner
 will remind you when there are conflicts that would prevent one or more
 shows from being recorded.
 
-The items in the list are colored white for things that will record,
-gray for those that do not need to record and yellow when there is a
-time conflict. Items at the top of the list may also be highlighted
-indicating that the recording is in progress.
+The items in the list are colored in the record color for things that
+will record, white for things that may need attention, gray for those
+that do not need to record and yellow when there is a time conflict.
+Items at the top of the list may also be highlighted indicating that the 
+recording is in progress.
 
-Along with the channels, start times and titles, the right-hand column has a
-status code. Numbers indicate which card number has been assigned to record
-the show. Letters are used to indicate the reason that something will not be
-recorded. Just below the box is a short status message for the highlighted
-item that indicates the type of record rule that was matched and a one or
-two word explanation of the status code. If you press SELECT, you will see
-more information about the status.
+Along with the channels, start times and titles, the right-hand column has
+a status code. Numbers indicate which card number has been assigned to
+record the show. Letters are used to indicate the reason that something
+will not be recorded. Just below the box is a short status message for the
+highlighted item that indicates the type of record rule that was matched,
+the "total priority" for this showing and a one or two word explanation of
+the status code. If you press SELECT, you will see more information about
+the status.
 
 There are a few status codes that may require your attention. "C" indicates
 that there are more overlapping shows to record than there are TV tuners to
@@ -3912,8 +3939,8 @@ your choices and should normally reflect your preferences. However, you may
 notice situations where you would like to modify the scheduler's initial
 choices.
 
-The first thing you can do is to highlight an item and press INFO once or
-twice to see the Recording Options page. From this page you can change the
+The first thing you can do is to highlight an item and press INFO to
+see the recording options page. From this page you can change the
 record rule type, the duplicate matching rules, or raise or lower the
 priority to resolve whatever problem you noticed.
 
@@ -3938,34 +3965,47 @@ Options" will allow you to change the options for the existing record rule
 such as raising the priority so that the show will record. These changes
 would apply to this and all future showings that match this record rule.
 "Add Override" will allow you to set options that apply to the specific
-showing without affecting the existing record rule.
+showing without affecting the recurring record rule.
 
 If you return to an override page after an override has already been set,
-you will also see a "Clear override" to undo your changes. This option makes
+you will also see a "Clear Override" to undo your changes. This option makes
 it very easy to try out some "what if" attempts when deciding on your best
 strategy in a difficult situation.
 
+For a recording in progress, there will be a "Change Ending Time" button.
+This will take you to the options page for a Single or Override or create
+an Override if it is a recurring rule. Here you can go to the Recording
+Options section to change the program end time offset. If you extend the
+end time so that it overlaps upcoming recordings, the schedule will change
+to accommodate the new end time. This may cause a conflict or later showing
+even for a show with higher priority. Therefore, it is a good idea to
+check your schedule after changing the end time of a recording in
+progress.
+
 <sect1>Storage Options
 <sect2>Recording Profile
-<p>Each schedule can be configured with a different recording profile.
-For example, important shows can be configured with a "High Quality"
-profile, while "filler" shows can be configured with a "Low Quality"
-profile. These recording profiles need to be configured first (see
-<ref id="Recording" name="Recording">, above).
+<p>Each recording rule can be configured with a different recording
+profile.  For example, colorful cinematography can be configured with a
+"High Quality" profile, while 'talking heads' interviews shows can be
+configured with a "Low Quality" profile. These recording profiles need to
+be configured before using them (see <ref id="Recording" name="Recording">,
+above).
 
 <sect2>Recording Group <label id="Recording Group">
 <p>For organization of the "Watch Recordings" screen and the MythWeb
-interface, recordings can be grouped into "recording groups".
+interface, recordings can be assigned into "recording groups".
 
-<sect2>Time Stretch
-<p>A default time stretch value can be configured for each schedule;
-this value will automatically be applied when the recordings are
-played back.
+<sect2>Playback Group <label id="Playback Group">
+<p>This selects a set of pre-configured playback parameters which can be
+created and edited in Setup->TV Settings->Playback Groups.  When the
+recording is played, the values from this playback group will be
+used. This allows you to choose a default time stretch value, skip and
+jump amounts appropriate for this type of television program.
 
 <sect2>Auto-Expire <label id="Auto-Expire">
 <p>MythTV will "autoexpire" old recordings to make room for new recordings
 when disk space gets filled up. This option can be set to "Don't allow
-auto expire" to prevent recordings from being automatically deleted
+auto expire" to prevent these recordings from being automatically deleted
 when disk space fills up.
 
 <p>The default setting is for all scheduled recordings to be eligible
@@ -3981,7 +4021,7 @@ chooses to expire the lowest-priority recordings first.
 <p>An episode limit can also be configured to limit the maximum number
 of episodes recorded of a single series, to restrict that series' disk
 usage. If this is set, you can further decide what to do when this
-limit is reached: either stop recording that series, or to delete the
+limit is reached; either stop recording that series, or to delete the
 oldest episodes in favor of the new ones.
 
 <sect1>Post Recording Processing
@@ -4027,7 +4067,7 @@ time in ISO 8601 format.
 </itemize>
 
 <sect1>Advanced Recording Options
-<p>Creating Power Search rules with Custom Record
+<sect2>Creating Power Search rules with Custom Record
 
 MythTV's "Custom Record" feature gives you unlimited control for creating
 specialized search recording rules to meet your needs. It allows you to
@@ -4039,23 +4079,24 @@ in any commercial DVR system.
 
 <sect2>Getting Started
 <p>
-Go to Schedule Recordings->Custom Record. This page, titled "Power Search
-Recording Rule Editor", helps you build a database search one clause at a
-time. Each added clause further limits which showings will be matched in the
-TV listings data. You can test the search at any time and when you are done,
-you can save your search as a recording rule.
+Go to Schedule Recordings->Custom Record. This page, helps you build a
+database search one clause at a time. Each added clause further limits
+which showings will be matched in the TV listings. You can test the
+search at any time and when you are done, you can save your search as a
+recording rule.
 
 To familiarize yourself with how you can create custom rules, create a
 simple rule to record "Nova" only in primetime.
 
-The first item at the top of the page allows you to edit an existing rule or
-create a new rule. Leave it on "&lt;New rule&gt;". Arrow down to the third item
-which says "Match an exact title". Right and left arrows would allow you to
-select any of several prefabricated pieces or full examples but leave it on
-the default for now. Arrow down to "Add this example clause" and press
-SELECT (Enter or Space on a keyboard). The large text box should now show:
+The first item at the top of the page allows you to edit an existing rule
+or create a new rule. Leave it on "&lt;New rule&gt;". Arrow down to the
+third item which says "Match an exact title". Right and left arrows would
+allow you to select any of several prefabricated pieces or full examples
+but leave it on the default for now. Arrow down to "Add this example
+clause" and press SELECT (Enter or Space on a keyboard). The large text
+box should now show:
 <tscreen><verb>
-     program.title = "Nova"
+     program.title = 'Nova'
 </verb></tscreen>
 As you have probably guessed, this says that we want to search for all
 programs with the title "Nova" regardless of the time, day, channel, etc.
@@ -4067,6 +4108,8 @@ keyboard you can simply delete the four letters and type a different title
 between the quotes. With a remote control, you can do 'cell phone' style
 text entry with the number pad. The delete key is the "X" in the grouping
 for "1", zero is grouped with "9" and "0" acts as the "Caps Lock" key.
+With MythTV version 0.19 or later, you can press ENTER in the text box
+to popup a virtual keyboard.
 
 Note: the text box honors many familiar Emacs control keys. It is also
 possible to cut and paste text into the text box so you can edit with a
@@ -4081,7 +4124,7 @@ Press ESC to go back to the Custom Record page. Move to the example
 selector then press the right or left arrows until you find "Only in
 primetime". Click "Add this example clause". You should now see:
 <tscreen><verb>
-	    program.title = "Nova"
+	    program.title = 'Nova'
 	    AND HOUR(program.starttime) >= 19
 	    AND HOUR(program.starttime) < 23
 </verb></tscreen>
@@ -4095,6 +4138,11 @@ title will say "Nova (Power Search)". Set whatever options you would like
 then click "Save these settings". You now have a special rule to record
 "Nova" but only when it is shown in primetime.
 
+You can make further modifications to this rule by returning to the Custom
+Record page then press the right or left arrow keys on "Edit Rule:" until
+you find "Nova". You can experiment and test but the saved rule will not
+be updated until you click "Record" then "Save these settings".
+
 To remove this, or any other rule, you can go to the "Recording Priorities"
 page, arrow down to the title, press Enter and change the the recording type
 to "Do not record this program" then "Save these settings".
@@ -4106,14 +4154,15 @@ Query Language (SQL) to access the data. Information about each TV program
 is stored in the 'program' table and information about each TV station you
 receive is stored in 'channel'. These two tables are used in the scheduler
 queries and their fields are available to be used in your rules. The rules
-you create are stored in 'record'. Normal rules in MythTV simply match the
-title in the rule with the titles in the 'program' table.
+you create are stored in 'record'.
 
-MythTV also has search rules for "Titles", "Keywords" and "People". These
-store the key phrase in the description field of the rule and includes them
-in specialized SQL replacements for the normal title check. There is also a
-type called "Power Search" which takes the raw SQL in the description as the
-replacement for title matching.
+Normal rules in MythTV simply match the title in the rule with the titles
+in the 'program' table. MythTV also has search rules for "Titles",
+"Keywords" and "People". These store the key phrase in the description
+field of the rule and includes them in specialized SQL replacements for
+the normal title check. There is also a type called "Power Search" which
+takes the raw SQL in the description as the replacement for title
+matching.
 
 Custom Record is a tool to help you build valid SQL for Power Search rules.
 You do not need to be a SQL expert to use Custom Record because the
@@ -4167,7 +4216,7 @@ week from being listed in the schedule.
 Notice the word "LIKE" and the "%" at the end. This does wildcard matching
 so that this would match even if the title ended with "2".  "III" or
 ":Revenge of the Snapple Lady". This can be useful where the title may
-change from one season to the next like "Survivor%", "Big Brother%" or
+change from one season to the next like "Survivor: %", "Big Brother%" or
 "The Amazing Race%".
 
 <sect2>Working with SQL
@@ -4223,7 +4272,7 @@ EP where the last four digits are the episode number in the series. Note
 that these are generated by TMS and not the show's producers but they are
 usually in the same order as the original air dates for the episodes.
 Detailed information can be found in the Data Direct documentation at <url
-url="http://labs.zap2it.com/" name="http://labs.zap2it.com/"> .  </itemize>
+url="http://labs.zap2it.com/" name="http://labs.zap2it.com/">.  </itemize>
 
 Finally, if you are doing something very experimental and a field is not
 giving you the results you had anticipated, you can always check the MythTV
@@ -5241,6 +5290,9 @@ This GDB was configured as "i586-mandrake-linux-gnu"...
 (gdb) handle SIGPIPE nostop
 Signal        Stop      Print   Pass to program Description
 SIGPIPE       No        Yes     Yes             Broken pipe
+(gdb) handle SIG33 nostop 
+Signal        Stop      Print   Pass to program Description 
+SIG33         No        Yes     Yes             Real-time event 33
 (gdb) set logging on
 Copying output to gdb.txt.
 (gdb)
