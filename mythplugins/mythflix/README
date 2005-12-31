@@ -60,5 +60,7 @@ move between RSS feeds/articles using the UP/DOWN keys and between
 the news sites column and articles column using the LEFT/RIGHT
 keys. 
 
-In the Queue screen, pressing "1" will move an item to the top of the 
+In the Queue screen, pressing "ENTER" will bring up a menu of options to
+perform on the current selection including "Move to top of queue" and 
+"Remove from queue".  Also, pressing "1" will move an item to the top of the 
 queue while "D" will remove it from the queue.

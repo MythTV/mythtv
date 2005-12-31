@@ -57,11 +57,11 @@ private:
     void cursorUp(bool page=false);
     void cursorDown(bool page=false);
 
+    void displayOptions();
+
     void cancelRetrieve();
     void processAndShowNews(NewsSite *site);
 
-    void moveToTop();
-    void removeFromQueue();
     QString executeExternal(const QStringList& args, const QString& purpose);
 
     XMLParse      *m_Theme;
@@ -69,10 +69,13 @@ private:
     UIListBtnType *m_UIArticles;
     QRect          m_ArticlesRect;
     QRect          m_InfoRect;
+    MythPopupBox  *popup;
 
     NewsSite::List m_NewsSites;
 
     QHttp         *http;
+
+    bool           expectingPopup;
 
 private slots:
     void slotViewArticle();
@@ -82,6 +85,10 @@ private slots:
     void slotSiteSelected(NewsSite*);
     
     void slotArticleSelected(UIListBtnTypeItem *item);
+
+    void slotMoveToTop();
+    void slotRemoveFromQueue();
+    void slotCancelPopup();
 
 };
 

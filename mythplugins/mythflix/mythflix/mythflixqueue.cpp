@@ -332,9 +332,11 @@ void MythFlixQueue::keyPressEvent(QKeyEvent *e)
         else if (action == "PAGEDOWN")
              cursorDown(true);
         else if (action == "REMOVE")
-             removeFromQueue();
+             slotRemoveFromQueue();
         else if (action == "MOVETOTOP")
-             moveToTop();
+             slotMoveToTop();
+        else if (action == "SELECT")
+            displayOptions();
         else
             handled = false;
     }
@@ -396,8 +398,12 @@ void MythFlixQueue::processAndShowNews(NewsSite* site)
     } 
 }
 
-void MythFlixQueue::moveToTop()
+void MythFlixQueue::slotMoveToTop()
 {
+
+    if (expectingPopup)
+        slotCancelPopup();
+
     UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
 
     if (articleUIItem && articleUIItem->getData())
@@ -435,8 +441,12 @@ void MythFlixQueue::moveToTop()
 
 }
 
-void MythFlixQueue::removeFromQueue()
+void MythFlixQueue::slotRemoveFromQueue()
 {
+
+    if (expectingPopup)
+        slotCancelPopup();
+
     UIListBtnTypeItem *articleUIItem = m_UIArticles->GetItemCurrent();
 
     if (articleUIItem && articleUIItem->getData())
@@ -478,6 +488,42 @@ void MythFlixQueue::slotArticleSelected(UIListBtnTypeItem*)
 {
     update(m_ArticlesRect);
     update(m_InfoRect);
+}
+
+void MythFlixQueue::displayOptions()
+{
+
+    popup = new MythPopupBox(gContext->GetMainWindow(), "menu popup");
+
+    QLabel *label = popup->addLabel(tr("Manage Queue"),
+                                  MythPopupBox::Large, false);
+    label->setAlignment(Qt::AlignCenter | Qt::WordBreak);
+
+    QButton *topButton = popup->addButton(tr("Top Of Queue"), this,
+                     SLOT(slotMoveToTop()));
+
+    popup->addButton(tr("Remove From Queue"), this,
+                     SLOT(slotRemoveFromQueue()));
+
+    popup->addButton(tr("Cancel"), this, SLOT(slotCancelPopup()));
+
+    popup->ShowPopup(this, SLOT(slotCancelPopup()));
+
+    topButton->setFocus();
+
+    expectingPopup = true;
+
+}
+
+void MythFlixQueue::slotCancelPopup(void)
+{
+    popup->hide();
+    expectingPopup = false;
+
+    delete popup;
+    popup = NULL;
+
+    setActiveWindow();
 }
 
 // Execute an external command and return results in string
