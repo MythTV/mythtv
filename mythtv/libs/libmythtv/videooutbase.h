@@ -253,7 +253,7 @@ class VideoOutput
     virtual void DiscardFrame(VideoFrame *frame) { vbuffers.DiscardFrame(frame); }
     /// \brief Releases all frames not being actively displayed from any queue
     ///        onto the queue of frames ready for decoding onto.
-    virtual void DiscardFrames(void) { vbuffers.DiscardFrames(); }
+    virtual void DiscardFrames(bool kf) { vbuffers.DiscardFrames(kf); }
 
     /// \bug not implemented correctly. vpos is not updated.
     VideoFrame *GetLastDecodedFrame(void) { return vbuffers.GetLastDecodedFrame(); }

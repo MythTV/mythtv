@@ -59,7 +59,7 @@ class VideoBuffers
     void DeleteBuffers(void);
 
     void Reset(void);
-    void DiscardFrames(void);
+    void DiscardFrames(bool next_frame_keyframe);
     void ClearAfterSeek(void);
 
     void SetPrebuffering(bool normal);

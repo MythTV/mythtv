@@ -288,7 +288,7 @@ VideoFrame *VideoBuffers::GetNextFreeFrame(bool with_lock,
                         QString("GetNextFreeFrame() unable to "
                         "lock frame %1 times. Discarding Frames.")
                         .arg(TRY_LOCK_SPINS));
-                DiscardFrames();
+                DiscardFrames(true);
             }
         }
     }
@@ -597,14 +597,37 @@ const VideoFrame *VideoBuffers::GetScratchFrame(void) const
 }
 
 /**
- * \fn VideoBuffers::DiscardFrames(void)
+ * \fn VideoBuffers::DiscardFrames(bool)
  *  Mark all used frames as ready to be reused, this is for seek.
  */
-void VideoBuffers::DiscardFrames(void)
+void VideoBuffers::DiscardFrames(bool next_frame_keyframe)
 {
-    global_lock.lock();
-    VERBOSE(VB_PLAYBACK, QString("VideoBuffers::DiscardFrames(): %1")
-            .arg(GetStatus()));
+    QMutexLocker locker(&global_lock);
+    VERBOSE(VB_PLAYBACK, QString("VideoBuffers::DiscardFrames(%1): %2")
+            .arg(next_frame_keyframe).arg(GetStatus()));
+
+    if (!next_frame_keyframe)
+    {
+        for (bool change = true; change;)
+        {
+            change = false;
+            frame_queue_t ula(used);
+            frame_queue_t::iterator it = ula.begin();
+            for (; it != ula.end(); ++it)
+            {
+                if (!HasChildren(*it))
+                {
+                    RemoveInheritence(*it);
+                    DiscardFrame(*it);
+                    change = true;
+                }
+            }
+        }
+        VERBOSE(VB_PLAYBACK,
+                QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
+                .arg(next_frame_keyframe).arg(GetStatus()));
+        return;
+    }
 
     // Remove inheritence of all frames not in displayed or pause
     frame_queue_t ula(used);
@@ -650,7 +673,9 @@ void VideoBuffers::DiscardFrames(void)
     VERBOSE(VB_PLAYBACK, QString("VideoBuffers::DiscardFrames(): %1 -- done()")
             .arg(GetStatus()));
 
-    global_lock.unlock();
+    VERBOSE(VB_PLAYBACK,
+            QString("VideoBuffers::DiscardFrames(%1): %2 -- done")
+            .arg(next_frame_keyframe).arg(GetStatus()));
 }
 
 void VideoBuffers::ClearAfterSeek(void)

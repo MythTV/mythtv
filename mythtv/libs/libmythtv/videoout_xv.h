@@ -103,7 +103,7 @@ class VideoOutputXv : public VideoOutput
 
     VideoFrame *GetNextFreeFrame(bool allow_unsafe);
     void DiscardFrame(VideoFrame*);
-    void DiscardFrames(void);
+    void DiscardFrames(bool next_frame_keyframe);
     void DoneDisplayingFrame(void);
 
     void ProcessFrameXvMC(VideoFrame *frame, OSD *osd);

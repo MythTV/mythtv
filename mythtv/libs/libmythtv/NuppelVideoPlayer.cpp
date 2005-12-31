@@ -824,10 +824,21 @@ void NuppelVideoPlayer::DiscardVideoFrame(VideoFrame *buffer)
         videoOutput->DiscardFrame(buffer);
 }
 
-void NuppelVideoPlayer::DiscardVideoFrames()
+/** \fn DiscardVideoFrames(bool)
+ *  \brief Places frames in the available frames queue.
+ *
+ *   If called with 'next_frame_keyframe' set to false then all frames
+ *   not in use by the decoder are made available for decoding. Otherwise,
+ *   all frames are made available for decoding; this is only safe if
+ *   the next frame is a keyframe.
+ *
+ *  \param next_frame_keyframe if this is true all frames are placed
+ *         in the available queue.
+ */
+void NuppelVideoPlayer::DiscardVideoFrames(bool next_frame_keyframe)
 {
     if (videoOutput)
-        videoOutput->DiscardFrames();
+        videoOutput->DiscardFrames(next_frame_keyframe);
 }
 
 void NuppelVideoPlayer::DrawSlice(VideoFrame *frame, int x, int y, int w, int h)
@@ -1659,7 +1670,9 @@ void NuppelVideoPlayer::DisplayNormalFrame(void)
                 VERBOSE(VB_IMPORTANT, LOC + "Prebuffer wait timed out, and"
                         "\n\t\t\tthere are not enough free frames. "
                         "Discarding buffered frames.");
-                DiscardVideoFrames();
+                // This call will result in some ugly frames, but allows us
+                // to recover from serious problems if frames get leaked.
+                DiscardVideoFrames(true);
             }
             prebuffer_tries = 0;
         }
@@ -3013,8 +3026,8 @@ bool NuppelVideoPlayer::IsSkipTooCloseToEnd(int frames) const
 /** \fn NuppelVideoPlayer::ClearAfterSeek(void)
  *  \brief This is to support seeking...
  *
- *   It can be very dangerous as it removes all frames from
- *   the videoOutput, so you can't restart playback immediately.
+ *   This resets the output classes and discards all
+ *   frames no longer being used by the decoder class.
  *
  *   Note: caller should not hold any locks
  */

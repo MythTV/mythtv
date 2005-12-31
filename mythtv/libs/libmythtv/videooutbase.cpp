@@ -422,7 +422,7 @@ void VideoOutput::InputChanged(int width, int height, float aspect)
     XJ_height = height;
     SetVideoAspectRatio(aspect);
     
-    DiscardFrames();
+    DiscardFrames(true);
 }
 
 /**

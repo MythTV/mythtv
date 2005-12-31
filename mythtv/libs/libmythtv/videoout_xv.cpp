@@ -1642,7 +1642,7 @@ bool VideoOutputXv::CreateBuffers(VOSType subtype)
 void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
 {
     (void) subtype;
-    DiscardFrames();
+    DiscardFrames(true);
 
 #ifdef USING_XVMC
     // XvMC buffers
@@ -1651,7 +1651,7 @@ void VideoOutputXv::DeleteBuffers(VOSType subtype, bool delete_pause_frame)
         xvmc_vo_surf_t *surf = (xvmc_vo_surf_t*) xvmc_surfs[i];
         X11S(XvMCHideSurface(XJ_disp, &(surf->surface)));
     }
-    DiscardFrames();
+    DiscardFrames(true);
     for (uint i=0; i<xvmc_surfs.size(); i++)
     {
         xvmc_vo_surf_t *surf = (xvmc_vo_surf_t*) xvmc_surfs[i];
@@ -1824,7 +1824,7 @@ void VideoOutputXv::DiscardFrame(VideoFrame *frame)
 void VideoOutputXv::ClearAfterSeek(void)
 {
     VERBOSE(VB_PLAYBACK, LOC + "ClearAfterSeek()");
-    DiscardFrames();
+    DiscardFrames(false);
 #ifdef USING_XVMC
     if (VideoOutputSubType() > XVideo)
     {
@@ -1833,7 +1833,7 @@ void VideoOutputXv::ClearAfterSeek(void)
             xvmc_vo_surf_t *surf = (xvmc_vo_surf_t*) xvmc_surfs[i];
             X11S(XvMCHideSurface(XJ_disp, &(surf->surface)));
         }
-        DiscardFrames();
+        DiscardFrames(true);
     }
 #endif
 }
@@ -1844,11 +1844,11 @@ void VideoOutputXv::ClearAfterSeek(void)
         vbuffers.end_lock(); \
     } while (0)
 
-void VideoOutputXv::DiscardFrames(void)
+void VideoOutputXv::DiscardFrames(bool next_frame_keyframe)
 { 
     if (VideoOutputSubType() <= XVideo)
     {
-        vbuffers.DiscardFrames();
+        vbuffers.DiscardFrames(next_frame_keyframe);
         return;
     }
 

@@ -210,7 +210,7 @@ class NuppelVideoPlayer
         { videoOutput->ReleaseFrame(GetNextVideoFrame(false)); }
     void ReleaseCurrentFrame(VideoFrame *frame);
     void DiscardVideoFrame(VideoFrame *buffer);
-    void DiscardVideoFrames(void);
+    void DiscardVideoFrames(bool next_frame_keyframe);
     void DrawSlice(VideoFrame *frame, int x, int y, int w, int h);
 
     // Reinit

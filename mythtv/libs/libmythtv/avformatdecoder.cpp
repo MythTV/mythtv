@@ -462,7 +462,7 @@ void AvFormatDecoder::SeekReset(long long newKey, uint skipFrames,
 
     // Discard all the queued up decoded frames
     if (discardFrames)
-        GetNVP()->DiscardVideoFrames();
+        GetNVP()->DiscardVideoFrames(doflush);
 
     if (doflush)
     {
