@@ -169,6 +169,15 @@ int AvFormatDecoderPrivate::DecodeMPEG2Video(AVCodecContext *avctx,
                     *got_picture_ptr = 1;
                     *picture = *frm;
                     delete frm;
+#if 0
+                    QString msg("");
+                    AvFormatDecoder *nd = (AvFormatDecoder *)(avctx->opaque);
+                    if (nd && nd->GetNVP() && nd->GetNVP()->getVideoOutput())
+                        msg = nd->GetNVP()->getVideoOutput()->GetFrameStatus();
+
+                    VERBOSE(VB_IMPORTANT, "ret frame: "<<picture->opaque
+                            <<"           "<<msg);
+#endif
                 }
                 return buf_size;
             case STATE_INVALID:
@@ -316,25 +325,28 @@ static int64_t lsb3full(int64_t lsb, int64_t base_ts, int lsb_bits)
     return  ((lsb - base_ts)&mask);
 }
 
-bool AvFormatDecoder::DoRewind(long long desiredFrame, bool doflush)
+bool AvFormatDecoder::DoRewind(long long desiredFrame, bool discardFrames)
 {
     VERBOSE(VB_PLAYBACK, LOC + "DoRewind("
-            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+            <<desiredFrame<<", "
+            <<( discardFrames ? "do" : "don't" )<<" discard frames)");
 
     if (recordingHasPositionMap || livetv)
-        return DecoderBase::DoRewind(desiredFrame, doflush);
+        return DecoderBase::DoRewind(desiredFrame, discardFrames);
 
     // avformat-based seeking
-    return DoFastForward(desiredFrame, doflush);
+    return DoFastForward(desiredFrame, discardFrames);
 }
 
-bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
+bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool discardFrames)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "DoFastForward("
-            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("DoFastForward(%1 (%2), %3 discard frames)")
+            .arg(desiredFrame).arg(framesPlayed)
+            .arg((discardFrames) ? "do" : "don't"));
 
     if (recordingHasPositionMap || livetv)
-        return DecoderBase::DoFastForward(desiredFrame, doflush);
+        return DecoderBase::DoFastForward(desiredFrame, discardFrames);
 
     bool oldrawstate = getrawframes;
     getrawframes = false;
@@ -395,9 +407,9 @@ bool AvFormatDecoder::DoFastForward(long long desiredFrame, bool doflush)
 
     int normalframes = desiredFrame - framesPlayed;
 
-    SeekReset(lastKey, normalframes, doflush, doflush);
+    SeekReset(lastKey, normalframes, discardFrames, discardFrames);
 
-    if (doflush)
+    if (discardFrames)
     {
         GetNVP()->SetFramesPlayed(framesPlayed + 1);
         GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed + 1);
