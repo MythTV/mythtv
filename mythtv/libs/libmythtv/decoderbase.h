@@ -94,8 +94,7 @@ class DecoderBase
   protected:
     void FileChanged(void);
 
-    bool DoRewindDVD(long long desiredFrame);
-    bool DoRewindNormal(long long desiredFrame);
+    bool DoRewindSeek(long long desiredFrame);
     void DoFastForwardSeek(long long desiredFrame, bool &needflush);
 
     long long GetLastFrameInPosMap(long long desiredFrame);

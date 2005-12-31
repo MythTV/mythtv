@@ -411,24 +411,18 @@ void DecoderBase::SetPositionMap(void)
     }
 }
 
-bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
+bool DecoderBase::DoRewind(long long desiredFrame, bool discardFrames)
 {
-    VERBOSE(VB_PLAYBACK, LOC + "DoRewind("
-            <<desiredFrame<<", "<<( doflush ? "do" : "don't" )<<" flush)");
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("DoRewind(%1 (%2), %3 discard frames)")
+            .arg(desiredFrame).arg(framesPlayed)
+            .arg((discardFrames) ? "do" : "don't"));
 
     if (m_positionMap.empty())
         return false;
 
-    {
-        bool ok = true;
-        if (ringBuffer->isDVD())
-            ok = DoRewindDVD(desiredFrame);
-        else
-            ok = DoRewindNormal(desiredFrame);
-
-        if (!ok)
-            return false;
-    }
+    if (!DoRewindSeek(desiredFrame))
+        return false;
 
     framesPlayed = lastKey;
     framesRead = lastKey;
@@ -436,16 +430,12 @@ bool DecoderBase::DoRewind(long long desiredFrame, bool doflush)
     // Do any Extra frame-by-frame seeking for exactseeks mode
     // And flush pre-seek frame if we are allowed to and need to..
     int normalframes = (exactseeks) ? desiredFrame - framesPlayed : 0;
+    normalframes = max(normalframes, 0);
+    SeekReset(lastKey, normalframes, true, discardFrames);
 
-    // This shouldn't happen, but it's nasty if it does so prevent it
-    if (normalframes < 0)
-        normalframes = 0;
-
-    SeekReset(lastKey, normalframes, true, doflush);
-
-    // ???
-    if (doflush)
+    if (discardFrames)
     {
+        // We need to tell the NVP and VideoOutput what frame we're on.
         GetNVP()->SetFramesPlayed(framesPlayed+1);
         GetNVP()->getVideoOutput()->SetFramesPlayed(framesPlayed+1);
     }
@@ -459,16 +449,16 @@ long long DecoderBase::GetKey(PosMapEntry &e) const
     return (hasKeyFrameAdjustTable) ? e.adjFrame :(e.index - indexOffset) * kf;
 }
 
-bool DecoderBase::DoRewindDVD(long long desiredFrame)
+bool DecoderBase::DoRewindSeek(long long desiredFrame)
 {
-    long long pos = DVDFindPosition(desiredFrame);
-    ringBuffer->Seek(pos, SEEK_SET);
-    lastKey = desiredFrame + 1;
-    return true;
-}
+    if (ringBuffer->isDVD())
+    {
+        long long pos = DVDFindPosition(desiredFrame);
+        ringBuffer->Seek(pos, SEEK_SET);
+        lastKey = desiredFrame + 1;
+        return true;
+    }
 
-bool DecoderBase::DoRewindNormal(long long desiredFrame)
-{
     // Find keyframe <= desiredFrame, store in lastKey (frames)
     int pre_idx, post_idx;
     FindPosition(desiredFrame, hasKeyFrameAdjustTable, pre_idx, post_idx);
@@ -541,9 +531,14 @@ bool DecoderBase::DoFastForward(long long desiredFrame, bool discardFrames)
             .arg(desiredFrame).arg(framesPlayed)
             .arg((discardFrames) ? "do" : "don't"));
 
-    // Rewind if we have already played the desiredFrame.
-    if (desiredFrame < framesPlayed)
+    // Rewind if we have already played the desiredFrame. The +1 is for
+    // MPEG4 NUV files, which need to decode an extra frame sometimes.
+    // This shouldn't effect how this works in general because this is
+    // only triggered on the first keyframe/frame skip when paused. At
+    // that point the decoding is more than one frame ahead of display.
+    if (desiredFrame+1 < framesPlayed)
         return DoRewind(desiredFrame, discardFrames);
+    desiredFrame = max(desiredFrame, framesPlayed);
 
     // Save rawframe state, for later restoration...
     bool oldrawstate = getrawframes;
