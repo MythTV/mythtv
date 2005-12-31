@@ -20,6 +20,9 @@ using namespace std;
 #include "videoout_ivtv.h"
 #include "videodev_myth.h"
 
+#define LOC QString("IVD: ")
+#define LOC_ERR QString("IVD Error: ")
+
 bool IvtvDecoder::ntsc = true;
 
 IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
@@ -53,6 +56,10 @@ IvtvDecoder::~IvtvDecoder()
 void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
                             bool needFlush, bool discardFrames)
 {
+    VERBOSE(VB_PLAYBACK, LOC + QString("SeekReset(%1, %2 flush, %3 discard)")
+            .arg(skipframes).arg((needFlush) ? "do" : "don't")
+            .arg((discardFrames) ? "do" : "don't"));
+
     DecoderBase::SeekReset(newkey, skipframes, needFlush, discardFrames);
 
     if (!exactseeks)
@@ -77,7 +84,7 @@ void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
         vidframes = 0;
         queuedlist.clear();
 
-        videoout->Stop(false);
+        videoout->Stop(false /* hide */);
         videoout->Flush();
 
         videoout->Start(0, skipframes+5);
