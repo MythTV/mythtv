@@ -804,11 +804,27 @@ int NuppelVideoPlayer::tbuffer_numfree(void)
        MAXTBUFFER - 1. */
 }
 
+/** \fn NuppelVideoPlayer::GetNextVideoFrame(bool)
+ *  \brief Removes a frame from the available queue for decoding onto.
+ *
+ *   This places the frame in the limbo queue, from which frames are
+ *   removed if they are added to another queue. Normally a frame is
+ *   freed from limbo either by a ReleaseNextVideoFrame() or
+ *   DiscardVideoFrame() call; but limboed frames are also freed
+ *   during a seek reset.
+ *
+ *  \param allow_unsafe if true then a frame will be taken from the queue
+ *         of frames ready for display if we can't find a frame in the
+ *         available queue.
+ */
 VideoFrame *NuppelVideoPlayer::GetNextVideoFrame(bool allow_unsafe)
 {
     return videoOutput->GetNextFreeFrame(false, allow_unsafe);
 }
 
+/** \fn NuppelVideoPlayer::ReleaseNextVideoFrame(VideoFrame*,long long)
+ *  \brief Places frame on the queue of frames ready for display.
+ */
 void NuppelVideoPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
                                               long long timecode)
 {
@@ -818,6 +834,9 @@ void NuppelVideoPlayer::ReleaseNextVideoFrame(VideoFrame *buffer,
     videoOutput->ReleaseFrame(buffer);
 }
 
+/** \fn NuppelVideoPlayer::DiscardVideoFrame(VideoFrame*)
+ *  \brief Places frame in the available frames queue.
+ */
 void NuppelVideoPlayer::DiscardVideoFrame(VideoFrame *buffer)
 {
     if (videoOutput)
