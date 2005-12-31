@@ -2532,6 +2532,7 @@ void VideoOutputXv::UpdatePauseFrame(void)
             vbuffers.TryLockFrame(vbuffers.GetScratchFrame(),
                                   "UpdatePauseFrame -- scratch"))
         {
+            vbuffers.GetScratchFrame()->frameNumber = framesPlayed - 1;
             CopyFrame(&av_pause_frame, vbuffers.GetScratchFrame());
             vbuffers.UnlockFrame(vbuffers.GetScratchFrame(),
                                  "UpdatePauseFrame -- scratch");
@@ -2948,12 +2949,13 @@ void VideoOutputXv::CheckDisplayedFramesForAvailability(void)
             frame_queue_t children = vbuffers.Children(pframe);
             if (!children.empty())
             {
+#if 0
                 VERBOSE(VB_PLAYBACK, LOC + QString(
                             "Frame %1 w/children: %2 is being held for later "
                             "discarding.")
                         .arg(DebugString(pframe, true))
                         .arg(DebugString(children)));
-
+#endif
                 frame_queue_t::iterator cit;
                 for (cit = children.begin(); cit != children.end(); ++cit)
                 {
