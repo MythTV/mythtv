@@ -956,7 +956,7 @@ static const QString usage_str_kb(long long total,
                                   long long free)
 {
     QString ret = QObject::tr("Unknown");
-    if (total > 0.0 && used > 0.0 && free > 0.0)
+    if (total > 0.0 && free > 0.0)
     {
         double percent = (100.0*free)/total;
         ret = QObject::tr("%1 total, %2 used, %3 (or %4%) free.")
@@ -1063,7 +1063,8 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
     query.prepare(querystr.arg(hostnames));
 
     if (query.exec() && query.isActive() && query.size() > 0 && query.next())
-        recordingProfilesBPS[QObject::tr("average")] = query.value(0).toInt();
+        recordingProfilesBPS[QObject::tr("average")] =
+            (int)(query.value(0).toDouble());
 
     querystr =
         "SELECT max(filesize * 8 / "
@@ -1075,7 +1076,8 @@ void StatusBox::getActualRecordedBPS(QString hostnames)
     query.prepare(querystr.arg(hostnames));
 
     if (query.exec() && query.isActive() && query.size() > 0 && query.next())
-        recordingProfilesBPS[QObject::tr("maximum")] = query.value(0).toInt();
+        recordingProfilesBPS[QObject::tr("maximum")] =
+            (int)(query.value(0).toDouble());
 }
 
 /** \fn StatusBox::doMachineStatus()
