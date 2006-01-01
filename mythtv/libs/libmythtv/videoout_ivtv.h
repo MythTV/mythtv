@@ -30,7 +30,7 @@ class VideoOutputIvtv: public VideoOutput
                       FilterChain *filterList,
                       NuppelVideoPlayer *pipPlayer);
 
-    int WriteBuffer(unsigned char *buf, int count);
+    uint WriteBuffer(unsigned char *buf, int count);
     int Poll(int delay);
     void Pause(void);
     void Start(int skip, int mute);

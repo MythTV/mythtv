@@ -1,20 +1,24 @@
+// ANSI C headers
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
+#include <ctime>
+#include <cerrno>
+
+// POSIX headers
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/time.h>
 #include <unistd.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <cmath>
-#include <ctime>
-#include <cerrno>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
 #include <sys/poll.h>
 #include <sys/param.h>
 
+// C++ headers
 #include <map>
 #include <iostream>
 using namespace std;
@@ -38,6 +42,9 @@ extern "C" {
 #include "../libavcodec/avcodec.h"
 #include "yuv2rgb.h"
 
+#define LOC QString("IVD: ")
+#define LOC_ERR QString("IVD Error: ")
+
 VideoOutputIvtv::VideoOutputIvtv(void)
 {
     videofd = -1;
@@ -59,11 +66,11 @@ VideoOutputIvtv::~VideoOutputIvtv()
 {
     Close();
 
-    if (fbfd > 0)
+    if (fbfd >= 0)
     {
-        ClearOSD();       
+        ClearOSD();
         SetAlpha(kAlpha_Solid);
- 
+
         close(fbfd);
     }
 
@@ -73,24 +80,27 @@ VideoOutputIvtv::~VideoOutputIvtv()
 
 void VideoOutputIvtv::ClearOSD(void) 
 {
-    if (fbfd > 0) 
+    if (fbfd >= 0)
     {
         struct ivtv_osd_coords osdcoords;
-        memset(&osdcoords, 0, sizeof(osdcoords));
+        bzero(&osdcoords, sizeof(osdcoords));
 
         if (ioctl(fbfd, IVTVFB_IOCTL_GET_ACTIVE_BUFFER, &osdcoords) < 0)
-            perror("IVTVFB_IOCTL_GET_ACTIVE_BUFFER");
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to get active buffer for ClearOSD()" + ENO);
+        }
         struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
-        memset(&prep, 0, sizeof(prep));
+        bzero(&prep, sizeof(prep));
 
         prep.source = osdbuf_aligned;
         prep.dest_offset = 0;
         prep.count = osdcoords.max_offset;
 
-        memset(osdbuf_aligned, 0x00, osdbufsize);
+        bzero(osdbuf_aligned, osdbufsize);
 
         if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
-            perror("IVTVFB_IOCTL_PREP_FRAME");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to prepare frame" + ENO);
     }
 }
 
@@ -102,9 +112,9 @@ void VideoOutputIvtv::SetAlpha(eAlphaState newAlphaState)
     alphaState = newAlphaState;
 
     struct ivtvfb_ioctl_state_info fbstate;
-    memset(&fbstate, 0, sizeof(fbstate));
+    bzero(&fbstate, sizeof(fbstate));
     if (ioctl(fbfd, IVTVFB_IOCTL_GET_STATE, &fbstate) < 0)
-        perror("IVTVFB_IOCTL_GET_STATE");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to query alpha state" + ENO);
 
     if (alphaState == kAlpha_Local)
     {
@@ -125,7 +135,8 @@ void VideoOutputIvtv::SetAlpha(eAlphaState newAlphaState)
         fbstate.alpha = gContext->GetNumSetting("PVR350EPGAlphaValue", 164);
 
     if (ioctl(fbfd, IVTVFB_IOCTL_SET_STATE, &fbstate) < 0)
-        perror("IVTVFB_IOCTL_SET_STATE");
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Failed to set ivtv alpha values." + ENO);
 }
 
 void VideoOutputIvtv::InputChanged(int width, int height, float aspect)
@@ -156,22 +167,26 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
 
     Open();
 
-    if (videofd <= 0)
+    if (videofd < 0)
         return false;
 
-    if (fbfd == -1)
+    if (fbfd < 0)
     {
         int fbno = 0;
 
         if (ioctl(videofd, IVTV_IOC_GET_FB, &fbno) < 0)
         {
-            perror("IVTV_IOC_GET_FB");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Framebuffer number query failed." + ENO +
+                    "\n\t\t\tDid you load the ivtv-fb Linux kernel module?");
             return false;
         }
 
         if (fbno < 0)
         {
-            cerr << "invalid fb, are you using the ivtv-fb module?\n";
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to determine framebuffer number." +
+                    "\n\t\t\tDid you load the ivtv-fb Linux kernel module?");
             return false;
         }
 
@@ -179,18 +194,17 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
         fbfd = open(fbdev.ascii(), O_RDWR);
         if (fbfd < 0)
         {
-            perror("ivtv framebuffer open");
-            cerr << "Unable to open the ivtv framebuffer device '"
-                 << fbdev.ascii() << "'\n";
-            cerr << "OSD will be unavailable\n";
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open framebuffer " +
+                    QString("'%1'").arg(fbdev) + ENO +
+                    "\n\t\t\tThis is needed for the OSD.");
             return false;
         }
 
         struct ivtvfb_ioctl_get_frame_buffer igfb;
-        memset(&igfb, 0, sizeof(igfb));
+        bzero(&igfb, sizeof(igfb));
 
         if (ioctl(fbfd, IVTVFB_IOCTL_GET_FRAME_BUFFER, &igfb) < 0)
-            perror("IVTVFB_IOCTL_GET_FRAME_BUFFER");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Getting frame buffer" + ENO);
 
         stride = igfb.sizex * 4;
 
@@ -200,51 +214,58 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
         osdbuf_aligned = osdbuffer + (pagesize - 1);
         osdbuf_aligned = (char *)((unsigned long)osdbuf_aligned & pagemask);
 
-        memset(osdbuf_aligned, 0x00, osdbufsize);
+        bzero(osdbuf_aligned, osdbufsize);
 
         ClearOSD();
 
         struct ivtv_osd_coords osdcoords;
-        memset(&osdcoords, 0, sizeof(osdcoords));
+        bzero(&osdcoords, sizeof(osdcoords));
         osdcoords.lines = XJ_height;
         osdcoords.offset = 0;
         osdcoords.pixel_stride = XJ_width * 2;
 
         if (ioctl(fbfd, IVTVFB_IOCTL_SET_ACTIVE_BUFFER, &osdcoords) < 0)
-            perror("IVTVFB_IOCTL_SET_ACTIVE_BUFFER");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Setting active buffer" + ENO);
     }
 
-    cout << "Using the PVR-350 decoder/TV-out\n";
+    VERBOSE(VB_GENERAL, "Using the PVR-350 decoder/TV-out");
     return true;
 }
 
+/** \fn VideoOutputIvtv::Close(void)
+ *  \brief Closes decoder device
+ */
 void VideoOutputIvtv::Close(void)
 {
     if (videofd < 0)
         return;
 
-    Stop(true);
+    Stop(true /* hide */);
 
     close(videofd);
     videofd = -1;
 }
 
+/** \fn VideoOutputIvtv::Open(void)
+ *  \brief Opens decoder device
+ */
 void VideoOutputIvtv::Open(void)
 {
     if (videofd >= 0)
         return;
 
-    if ((videofd = open(videoDevice.ascii(), 
-        O_WRONLY | O_NONBLOCK, 0555)) < 0)
+    videofd = open(videoDevice.ascii(), O_WRONLY | O_NONBLOCK, 0555);
+    if (videofd < 0)
     {
-        perror("Cannot open ivtv video out device");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open decoder device " +
+                QString("'%1'").arg(videoDevice) + ENO);
         return;
     }
 
     struct v4l2_capability vcap;
-    memset(&vcap, 0, sizeof(vcap));
+    bzero(&vcap, sizeof(vcap));
     if (ioctl(videofd, VIDIOC_QUERYCAP, &vcap) < 0)
-        perror("VIDIOC_QUERYCAP");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to query decoder" + ENO);
     else
         driver_version = vcap.version;
 }
@@ -358,7 +379,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
     (void)filterList;
     (void)frame;
 
-    if (fbfd > 0 && osd)
+    if (fbfd >= 0 && osd)
     {
         bool drawanyway = false;
 
@@ -377,7 +398,7 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
 
         if (ret < 0 && !lastcleared)
         {
-            memset(tmpframe.buf, 0x0, XJ_height * stride);
+            bzero(tmpframe.buf, XJ_height * stride);
             lastcleared = true;
             drawanyway = true;
         }
@@ -404,24 +425,32 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
                 return;
 
             struct ivtvfb_ioctl_dma_host_to_ivtv_args prep;
-            memset(&prep, 0, sizeof(prep));
+            bzero(&prep, sizeof(prep));
 
             prep.source = osdbuf_aligned;
             prep.dest_offset = 0;
             prep.count = XJ_height * stride;
 
             if (ioctl(fbfd, IVTVFB_IOCTL_PREP_FRAME, &prep) < 0)
-                perror("IVTVFB_IOCTL_PREP_FRAME");
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR +
+                        "Failed to process frame" + ENO);
+            }
             if (alphaState != kAlpha_Local)
                 SetAlpha(kAlpha_Local);
         }
     }
 }
 
+/** \fn VideoOutputIvtv::Start(int,int)
+ *  \brief Start decoding
+ *  \param skip Sets GOP offset
+ *  \param mute If true mutes audio
+ */
 void VideoOutputIvtv::Start(int skip, int mute)
 {
     struct ivtv_cfg_start_decode start;
-    memset(&start, 0, sizeof start);
+    bzero(&start, sizeof(start));
     start.gop_offset = skip;
     start.muted_audio_frames = mute;
 
@@ -429,23 +458,27 @@ void VideoOutputIvtv::Start(int skip, int mute)
     {
         if (errno != EBUSY)
         {
-            perror("IVTV_IOC_START_DECODE");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to start decoder" + ENO);
             break;
         }
     }
 }
 
+/** \fn VideoOutputIvtv::Stop(bool)
+ *  \brief Stops decoding
+ *  \param hide If true we hide the last video decoded frame.
+ */
 void VideoOutputIvtv::Stop(bool hide)
 {
     struct ivtv_cfg_stop_decode stop;
-    memset(&stop, 0, sizeof stop);
+    bzero(&stop, sizeof(stop));
     stop.hide_last = hide;
 
     while (ioctl(videofd, IVTV_IOC_STOP_DECODE, &stop) < 0)
     {
         if (errno != EBUSY)
         {
-            perror("IVTV_IOC_STOP_DECODE");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to stop decoder" + ENO);
             break;
         }
     }
@@ -454,18 +487,26 @@ void VideoOutputIvtv::Stop(bool hide)
     internal_offset       = 0;
 }
 
+/** \fn VideoOutputIvtv::Pause(void)
+ *  \brief Pauses decoding
+ */
 void VideoOutputIvtv::Pause(void)
 {
     while (ioctl(videofd, IVTV_IOC_PAUSE, 0) < 0)
     {
         if (errno != EBUSY)
         {
-            perror("IVTV_IOC_PAUSE");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to pause decoder" + ENO);
             break;
         }
     }
 }
 
+/** \fn VideoOutputIvtv::Poll(int)
+ *  \brief Waits for decoder to be ready for more data
+ *  \param delay milliseconds to wait before timing out.
+ *  \return value returned by POSIX poll() function
+ */
 int VideoOutputIvtv::Poll(int delay)
 {
     struct pollfd polls;
@@ -476,42 +517,58 @@ int VideoOutputIvtv::Poll(int delay)
     int res = poll(&polls, 1, delay);
 
     if (res < 0)
-        perror("Polling on videodev");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Polling" + ENO);
 
     return res;
 }
 
-int VideoOutputIvtv::WriteBuffer(unsigned char *buf, int len)
+/** \fn VideoOutputIvtv::WriteBuffer(unsigned char*,int)
+ *  \brief Writes data to the decoder device
+ *  \param buf buffer to write to the decoder
+ *  \param len number of bytes to write
+ *  \return actual number of bytes written
+ */
+uint VideoOutputIvtv::WriteBuffer(unsigned char *buf, int len)
 {
-    int count;
+    int count = write(videofd, buf, len);
 
-    //cerr << "ivtv writing video... ";
-    count = write(videofd, buf, len);
     if (count < 0)
     {
         if (errno != EAGAIN)
         {
-            perror("Writing to videodev");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Writing to decoder" + ENO);
             return count;
         }
         count = 0;
     }
-    //cerr << "wrote " << count << " of " << len << endl;
 
     return count;
 }
 
+/** \fn VideoOutputIvtv::GetFirmwareFramesPlayed(void)
+ *  \brief Returns number of frames decoded as reported by decoder.
+ */
 int VideoOutputIvtv::GetFirmwareFramesPlayed(void)
 {
     struct ivtv_ioctl_framesync frameinfo;
-    memset(&frameinfo, 0, sizeof frameinfo);
+    bzero(&frameinfo, sizeof(frameinfo));
 
     if (ioctl(videofd, IVTV_IOC_GET_TIMING, &frameinfo) < 0)
-        perror("IVTV_IOC_GET_TIMING");
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                "Fetching frames played from decoder" + ENO);
+    }
 
     return frameinfo.frame;
 }
 
+/** \fn VideoOutputIvtv::GetFramesPlayed(void)
+ *  \brief Returns number of frames played since last reset.
+ *
+ *   This adjust the value returned by GetFirmwareFramesPlayed(void)
+ *   to report the number of frames played since playback started
+ *   irrespective of current and past playback speeds.
+ */
 int VideoOutputIvtv::GetFramesPlayed(void)
 {
     int frame = GetFirmwareFramesPlayed();
@@ -519,18 +576,17 @@ int VideoOutputIvtv::GetFramesPlayed(void)
     return (int)round(f);
 }
 
+/** \fn VideoOutputIvtv::Play(float speed, bool normal, int mask)
+ *  \brief Initializes decoder parameters
+ */
 bool VideoOutputIvtv::Play(float speed, bool normal, int mask)
 {
     struct ivtv_speed play;
-    memset(&play, 0, sizeof play);
-    if (speed >= 2.0)
-        play.scale = (int)roundf(speed);
-    else if (speed <= 0.5)
-        play.scale = (int)roundf(1 / speed);
-    else
-        play.scale = 1;
+    bzero(&play, sizeof(play));
+    play.scale = (speed >= 2.0f) ? (int)roundf(speed) : 1;
+    play.scale = (speed <= 0.5f) ? (int)roundf(1.0f / speed) : play.scale;
+    play.speed = (speed > 1.0f);
     play.smooth = 0;
-    play.speed = (speed > 1.0);
     play.direction = 0;
     play.fr_mask = mask;
     play.b_per_gop = 0;
@@ -545,7 +601,8 @@ bool VideoOutputIvtv::Play(float speed, bool normal, int mask)
     {
         if (errno != EBUSY)
         {
-            perror("IVTV_IOC_S_SPEED");
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Setting decoder's playback speed" + ENO);
             break;
         }
     }
@@ -557,23 +614,35 @@ bool VideoOutputIvtv::Play(float speed, bool normal, int mask)
     return true;
 }
 
+/** \fn VideoOutputIvtv::Flush(void)
+ *  \brief Flushes out data already sent to decoder.
+ */
 void VideoOutputIvtv::Flush(void)
 {
     int arg = 0;
 
     if (ioctl(videofd, IVTV_IOC_DEC_FLUSH, &arg) < 0)
-        perror("IVTV_IOC_DEC_FLUSH");
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Flushing decoder" + ENO);
 }
 
+/** \fn VideoOutputIvtv::Step(void)
+ *  \brief Step through video one frame at a time.
+ */
 void VideoOutputIvtv::Step(void)
 {
-    int arg = 0;
+    enum {
+        STEP_FRAME     = 0,
+        STEP_TOP_FIELD = 1,
+        STEP_BOT_FIELD = 2,
+    };
+
+    int arg = STEP_FRAME;
 
     while (ioctl(videofd, IVTV_IOC_DEC_STEP, &arg) < 0)
     {
         if (errno != EBUSY)
         {
-            perror("IVTV_IOC_DEC_STEP");
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "Setting Step" + ENO);
             break;
         }
     }
