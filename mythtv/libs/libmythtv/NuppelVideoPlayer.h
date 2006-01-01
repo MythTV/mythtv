@@ -341,6 +341,7 @@ class NuppelVideoPlayer
     void  InitAVSync(void);
     void  AVSync(void);
     void  ShutdownAVSync(void);
+    void  FallbackDeint(void);
 
     // Private closed caption and teletext stuff
     int   tbuffer_numvalid(void); // number of valid slots in the text buffer

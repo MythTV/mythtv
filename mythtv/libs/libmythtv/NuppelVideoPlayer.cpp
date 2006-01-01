@@ -557,6 +557,23 @@ void NuppelVideoPlayer::SetKeyframeDistance(int keyframedistance)
     keyframedist = (keyframedistance > 0) ? keyframedistance : keyframedist;
 }
 
+/** \fn NuppelVideoPlayer::FallbackDeint(void)
+ *  \brief Fallback to non-bob a deinterlacing method.
+ */
+void NuppelVideoPlayer::FallbackDeint(void)
+{
+     m_double_framerate = false;
+
+     if (videosync)
+         videosync->SetFrameInterval(frame_interval, false);
+
+     if (videoOutput)
+     {
+         videoOutput->SetupDeinterlace(false);
+         videoOutput->SetupDeinterlace(true, "onefield");
+     }
+}
+
 void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
                                        int keyframedistance, float aspect,
                                        FrameScanType scan, bool reinit)
@@ -621,11 +638,7 @@ void NuppelVideoPlayer::SetVideoParams(int width, int height, double fps,
         {
             VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
                     "framerate (refresh rate too low for bob deint)");
-            m_scan = kScan_Ignore;
-            m_double_framerate = false;
-            m_can_double = false;
-            if (videoOutput)
-                videoOutput->SetupDeinterlace(false);
+            FallbackDeint();
         }
     }
 
@@ -1803,11 +1816,9 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
             videosync->SetFrameInterval(frame_interval, m_double_framerate);
             if (videosync->UsesFrameInterval())
             {
-                m_scan = kScan_Ignore;
-                m_double_framerate = false;
-                m_can_double = false;
-                if (videoOutput)
-                    videoOutput->SetupDeinterlace(false);
+                VERBOSE(VB_IMPORTANT, "Video sync method can't support double "
+                        "framerate (refresh rate too low for bob deint)");
+                FallbackDeint();
             }
         }
     }
@@ -2799,10 +2810,7 @@ void NuppelVideoPlayer::DoPlay(void)
         {
             if (!normal_speed || play_speed < 0.99 || play_speed > 1.01)
             {
-                m_double_framerate = false;
-                videosync->SetFrameInterval(frame_interval, false);
-                videoOutput->SetupDeinterlace(false);
-                videoOutput->SetupDeinterlace(true, "onefield");
+                FallbackDeint();
             }
         }
         else if (m_can_double && !m_double_framerate)
