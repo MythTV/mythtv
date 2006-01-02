@@ -3414,9 +3414,13 @@ void TVRec::TuningRestartRecorder(void)
     {
         dummyRecorder->StopRecordingThread();
         ClearFlags(kFlagDummyRecorderRunning);
+        had_dummyrec = true;
+    }
+
+    if (curRecording)
+    {
         FinishedRecording(curRecording);
         curRecording->MarkAsInUse(false);
-        had_dummyrec = true;
     }
 
     SwitchLiveTVRingBuffer(true, !had_dummyrec);
@@ -3677,6 +3681,8 @@ bool TVRec::SwitchLiveTVRingBuffer(bool discont, bool set_rec)
     }
     else if (!set_rec)
     {
+        if (curRecording)
+            delete curRecording;
         curRecording = pginfo;
         SetRingBuffer(rb);
     }

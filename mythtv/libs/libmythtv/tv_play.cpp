@@ -3225,7 +3225,7 @@ void TV::CommitQueuedInput(void)
         }
         else if (activerecorder->CheckChannel(channum))
             ChangeChannel(GetQueuedChanID(), channum);
-        else
+        else if (GetQueuedInput() != "")
             ChangeChannel(GetQueuedChanID(), GetQueuedInput());
     }
 
