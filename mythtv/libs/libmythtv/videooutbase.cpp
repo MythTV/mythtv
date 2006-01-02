@@ -1183,7 +1183,7 @@ void VideoOutput::ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer)
  *  If the destination format is either IA44 or AI44 the osd is
  *  converted to greyscale.
  *
- * \return 1 if changed, 0 otherwise
+ * \return 1 if changed, -1 on error and 0 otherwise
  */ 
 int VideoOutput::DisplayOSD(VideoFrame *frame, OSD *osd, int stride,
                             int revision)
