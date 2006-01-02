@@ -1124,7 +1124,8 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     {
         for(long long i = 0; i < framesProcessed; i++ )
         {
-            if (frameInfo[i].aspect == COMM_ASPECT_NORMAL)
+            if ((frameInfo.contains(i)) &&
+                (frameInfo[i].aspect == COMM_ASPECT_NORMAL))
                 aspectFrames++;
         }
 
@@ -1139,7 +1140,10 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
         for (int i=0;i<COMM_FORMAT_MAX;i++) formatCounts[i]=0;
 
         for(long long i = 0; i < framesProcessed; i++ )
-            formatCounts[frameInfo[i].format]++;
+            if ((frameInfo.contains(i)) &&
+                (frameInfo[i].format >= 0) &&
+                (frameInfo[i].format < COMM_FORMAT_MAX))
+                formatCounts[frameInfo[i].format]++;
 
         for(int i = 0; i < COMM_FORMAT_MAX; i++)
         {
