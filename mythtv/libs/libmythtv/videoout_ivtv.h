@@ -84,8 +84,8 @@ class VideoOutputIvtv: public VideoOutput
 
     char *osdbuffer;
     char *osdbuf_aligned;
-
-    int osdbufsize;
+    int   osdbufsize;
+    int   osdbuf_revision;
 
     float last_speed;
     int   internal_offset;

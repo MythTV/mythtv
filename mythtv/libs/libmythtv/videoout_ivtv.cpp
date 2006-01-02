@@ -41,25 +41,33 @@ extern "C" {
 #include "NuppelVideoPlayer.h"
 #include "../libavcodec/avcodec.h"
 #include "yuv2rgb.h"
+#include "osd.h"
+#include "osdsurface.h"
 
 #define LOC QString("IVD: ")
 #define LOC_ERR QString("IVD Error: ")
 
-VideoOutputIvtv::VideoOutputIvtv(void)
+VideoOutputIvtv::VideoOutputIvtv(void) :
+    videofd(-1),              fbfd(-1),
+    fps(30000.0f/1001.0f),    videoDevice("/dev/video16"),
+    driver_version(0),
+
+    mapped_offset(0),         mapped_memlen(0),
+    mapped_mem(NULL),         pixels(NULL),
+
+    stride(0),
+
+    lastcleared(false),
+    osdbuffer(NULL),          osdbuf_aligned(NULL),
+    osdbufsize(0),            osdbuf_revision(0xfffffff),
+
+    last_speed(1.0f),
+    internal_offset(0),       frame_at_speed_change(0),
+
+    last_normal(true),        last_mask(0x2),
+
+    alphaState(kAlpha_Solid)
 {
-    videofd = -1;
-    fbfd = -1;
-    pixels = NULL;
-    lastcleared = false;
-    videoDevice = "/dev/video16";
-    driver_version = 0;
-    last_speed = 1.0;
-    frame_at_speed_change = 0;
-    internal_offset = 0;
-    last_normal = true;
-    last_mask = 2;
-    osdbuffer = NULL;
-    alphaState = kAlpha_Solid;
 }
 
 VideoOutputIvtv::~VideoOutputIvtv()
@@ -394,11 +402,20 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
         tmpframe.width = stride;
         tmpframe.height = XJ_height;
 
-        int ret = DisplayOSD(&tmpframe, osd, stride);
+        // Clear osdbuf if OSD has changed.
+        OSDSurface *surface = osd->Display();
+        int new_revision = osdbuf_revision;
+        if (surface && (surface->GetRevision() != osdbuf_revision))
+        {
+            bzero(tmpframe.buf, XJ_height * stride);
+            new_revision = surface->GetRevision();
+        }
+
+        int ret = DisplayOSD(&tmpframe, osd, stride, osdbuf_revision);
+        osdbuf_revision = new_revision;
 
         if (ret < 0 && !lastcleared)
         {
-            bzero(tmpframe.buf, XJ_height * stride);
             lastcleared = true;
             drawanyway = true;
         }
