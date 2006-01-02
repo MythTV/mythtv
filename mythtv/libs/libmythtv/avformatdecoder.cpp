@@ -2158,7 +2158,7 @@ bool AvFormatDecoder::autoSelectSubtitleTrack(void)
         }
     }
 
-    currentSubtitleTrack = (selectedTrack < 0) ? 0 : -1;
+    currentSubtitleTrack = (selectedTrack < 0) ? -1 : selectedTrack;
     selectedSubtitleStream = subtitleStreams[currentSubtitleTrack];
     if (wantedSubtitleStream.av_stream_index < 0)
         wantedSubtitleStream = selectedSubtitleStream;
@@ -2169,7 +2169,7 @@ bool AvFormatDecoder::autoSelectSubtitleTrack(void)
             .arg(currentSubtitleTrack+1)
             .arg(iso639_key_toName(lang)).arg(lang));
 
-    return true;
+    return selectedTrack >= 0;
 }
 
 bool AvFormatDecoder::GetFrame(int onlyvideo)
