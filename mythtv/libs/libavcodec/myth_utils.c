@@ -116,6 +116,8 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_AASC:             return "AASC";
         case CODEC_ID_INDEO2:           return "INDEO2";
         case CODEC_ID_FRAPS:            return "FRAPS";
+        case CODEC_ID_TRUEMOTION2:      return "TRUEMOTION2";
+        case CODEC_ID_BMP:              return "BMP";
 
             /* various pcm "codecs" */
         case CODEC_ID_PCM_S16LE:        return "PCM_S16LE";
@@ -190,12 +192,15 @@ const char *codec_id_string(enum CodecID codec_id)
         case CODEC_ID_ALAC:             return "ALAC";
         case CODEC_ID_WESTWOOD_SND1:    return "WESTWOOD_SND1";
         case CODEC_ID_GSM:              return "GSM";
-
+        case CODEC_ID_QDM2:             return "QDM2";
         case CODEC_ID_OGGTHEORA:        return "OGGTHEORA";
 
             /* subtitle codecs */
         case CODEC_ID_DVD_SUBTITLE:     return "DVD_SUBTITLE";
         case CODEC_ID_DVB_SUBTITLE:     return "DVB_SUBTITLE";
+
+        case CODEC_ID_MPEG2VBI:         return "MPEG2VBI";
+        case CODEC_ID_DVB_VBI:          return "DVB_VBI";
 
         case CODEC_ID_MPEG2TS:          return "MPEG2TS";
     }
