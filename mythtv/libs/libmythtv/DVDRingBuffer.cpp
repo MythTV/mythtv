@@ -4,6 +4,9 @@
 #include "mythcontext.h"
 #include <dvdnav/nav_read.h>
 
+#define LOC QString("DVDRB: ")
+#define LOC_ERR QString("DVDRB, Error: ")
+
 static const char *dvdnav_menu_table[] =
 {
     NULL,
@@ -23,7 +26,7 @@ DVDRingBufferPriv::DVDRingBufferPriv()
       cellStart(0),     pgStart(0),
       lastNav(NULL),    part(0),
       title(0),         maxPart(0),
-      mainTitle(0)
+      mainTitle(0),     gotStop(false)
 {
 }
 
@@ -44,6 +47,7 @@ void DVDRingBufferPriv::close(void)
 long long DVDRingBufferPriv::Seek(long long pos, int whence)
 {
     dvdnav_sector_search(this->dvdnav, pos / DVD_BLOCK_SIZE , whence);
+    gotStop = false;
     return GetReadPosition();
 }
             
@@ -157,6 +161,12 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
     int             needed       = sz;
     char           *dest         = (char*) data;
     int             offset       = 0;
+
+    if (gotStop)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "safe_read: called after DVDNAV_STOP");
+        return -1;
+    }
 
     while (needed)
     {
@@ -314,6 +324,11 @@ int DVDRingBufferPriv::safe_read(void *data, unsigned sz)
                 VERBOSE(VB_PLAYBACK, "DVDNAV_WAIT recieved clearing it");
                 dvdnav_wait_skip(dvdnav);
                 break;
+            case DVDNAV_STOP:
+                VERBOSE(VB_GENERAL, "DVDNAV_STOP");
+                sz = tot;
+                gotStop = true;
+                break;
             default:
                 VERBOSE(VB_IMPORTANT, "Got DVD event "<<dvdEvent);
                 break;
@@ -332,6 +347,7 @@ bool DVDRingBufferPriv::nextTrack(void)
     if (newPart < maxPart)
     {
         dvdnav_part_play(dvdnav, title, newPart);
+        gotStop = false;
         return true;
     }
     return false;
@@ -345,6 +361,7 @@ void DVDRingBufferPriv::prevTrack(void)
         dvdnav_part_play(dvdnav, title, newPart);
     else
         Seek(0,SEEK_SET); // May cause picture to become jumpy.
+    gotStop = false;
 }
 
 uint DVDRingBufferPriv::GetTotalTimeOfTitle(void)

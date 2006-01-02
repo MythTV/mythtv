@@ -86,6 +86,7 @@ class DVDRingBufferPriv
     int            title;
     int            maxPart;
     int            mainTitle;
+    bool           gotStop;
 };
 #endif // HAVE_DVDNAV
 #endif // DVD_RING_BUFFER_H_
