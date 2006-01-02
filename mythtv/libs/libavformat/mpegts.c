@@ -275,6 +275,16 @@ void mpegts_close_filter(MpegTSContext *ts, MpegTSFilter *filter)
 #ifdef DEBUG_SI
     av_log(NULL, AV_LOG_DEBUG, "Closing Filter: pid=0x%x\n", pid);
 #endif
+    if (filter == ts->pmt_filter)
+    {
+        av_log(NULL, AV_LOG_DEBUG, "Closing PMT Filter: pid=0x%x\n", pid);
+        ts->pmt_filter = NULL;
+    }
+    if (filter == ts->pat_filter)
+    {
+        av_log(NULL, AV_LOG_DEBUG, "Closing PAT Filter: pid=0x%x\n", pid);
+        ts->pat_filter = NULL;
+    }
 
     if (filter->type == MPEGTS_SECTION)
         av_freep(&filter->u.section_filter.section_buf);
