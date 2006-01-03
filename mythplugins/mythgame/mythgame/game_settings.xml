@@ -25,7 +25,7 @@
       <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Generelle indstillinger</text>
       <text lang="NL">Algemeen</text>
-      <text lang="PT">Configurações Gerais</text>
+      <text lang="PT">Jogadores</text>
       <text lang="SV">Generella inställningar</text>
       <text lang="SI">Splošne nastavitve</text>
       <text lang="FI">Pelaajat</text>
@@ -35,7 +35,7 @@
    <button>
       <type>GAME_SCAN</type>
       <text>Scan for Games</text>
-      <text lang="PT">Procurar Jogos</text>
+      <text lang="PT">Refrescar Lista de Jogos</text>
       <text lang="SV">Sök efter spel</text>
       <text lang="DE">Nach Spielen suchen</text>
       <text lang="SI">Iskanje iger</text>
@@ -52,7 +52,7 @@
       <text lang="DE">Grundeinstellungen</text>
       <text lang="DK">Generelle indstillinger</text>
       <text lang="NL">Algemeen</text>
-      <text lang="PT">Configurações Gerais</text>
+      <text lang="PT">Apagar Dados de Jogos</text>
       <text lang="SV">Generella inställningar</text>
       <text lang="SI">Splošne nastavitve</text>
       <text lang="FI">Tyhjennä Tietueet</text>

@@ -7,7 +7,7 @@
      <text lang="CA">Veure vídeos</text>
      <text lang="DE">Videos ansehen</text>
      <text lang="DK">Gennemse film</text>
-     <text lang="PT">Ver Filmes</text>
+     <text lang="PT">Navegar na Biblioteca de Filmes</text>
      <text lang="SV">Bläddra bland filmer</text>
      <text lang="FR">Parcourir les vidéos</text>
      <text lang="NL">Blader door videos</text>
@@ -42,6 +42,7 @@
      <text lang="SI">Galerija filmov</text>
      <text lang="FI">Videogalleria</text>
      <text lang="SV">Filmgalleri</text>
+     <text lang="PT">Galeria de Filmes</text>
      <action>GALLERY</action>
    </button>
 
@@ -52,7 +53,7 @@
      <text lang="CA">Gestionar vídeos</text>
      <text lang="DK">Film opsætning</text>
      <text lang="DE">Video-Manager</text>
-     <text lang="PT">Gerir Filmes</text>
+     <text lang="PT">Gestor de Filmes</text>
      <text lang="SV">Filmhanterare</text>
      <text lang="FR">Gestionnaire de vidéos</text>
      <text lang="NL">Video's Beheren</text>
