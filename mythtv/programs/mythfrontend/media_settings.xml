@@ -4,7 +4,7 @@
      <type>SETTINGS_MUSIC</type>
      <text>Music Settings</text>
      <text lang="ES">Configurar Música</text>
-     <text lang="FR">Configuration de la musique</text>
+     <text lang="FR">Musique</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
      <text lang="DK">Musik indstillinger</text>
@@ -27,7 +27,7 @@
        <text>Videos Settings</text>
        <text lang="ES">Configurar Vídeos</text>
        <text lang="CA">Configurar Videos</text>
-       <text lang="FR">Configuration de la vidéo</text>
+       <text lang="FR">Vidéos</text>
        <text lang="DE">Videos</text>
        <text lang="DK">Video indstillinger</text>
        <text lang="IS">Stillingar kvikmynda</text>
@@ -51,7 +51,7 @@
      <text lang="PT">Configurar DVD</text>
      <text lang="ES">Configurar DVD</text>
      <text lang="CA">Configurar DVD</text>
-     <text lang="FR">Configuration des DVD</text>
+     <text lang="FR">DVD</text>
      <text lang="IS">Stillingar DVD</text>
      <text lang="NL">DVD Instellingen</text>
      <text lang="SV">DVD</text>
@@ -70,7 +70,7 @@
       <text>Images Settings</text>
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
-      <text lang="FR">Configuration des images</text>
+      <text lang="FR">Images</text>
       <text lang="DE">Bilder</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="IS">Stillingar ljósmynda</text>
@@ -93,7 +93,7 @@
      <text lang="ES">Configurar Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
-     <text lang="FR">Configuration des jeux</text>
+     <text lang="FR">Jeux</text>
      <text lang="DK">Spil indstillinger</text>
      <text lang="IS">Stillingar leikja</text>
      <text lang="NL">Spelen Instellingen</text>
@@ -116,7 +116,7 @@
      <text lang="JA">ラジオ設定</text>
      <text lang="DE">Radio</text>
      <text lang="IS">Stillingar útvarps</text>
-     <text lang="FR">Configuration de la radio</text>
+     <text lang="FR">Radio</text>
      <text lang="FI">Radioasetukset</text>
      <text lang="SI">Radio nastavitve</text>
      <text lang="ET">Raadio seaded</text>
@@ -131,6 +131,7 @@
       <type>SETTINGS_BURN</type>
       <text>Burn DVD Settings</text>
       <text lang="FI">DVD:n Polttoasetukset</text>
+      <text lang="FR">Gravure de DVD</text>
       <action>CONFIGPLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

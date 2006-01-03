@@ -4,6 +4,7 @@
       <type>TV_RECPRIORITIES_SETTINGS_GENERAL</type>
       <text>Set Recording Priorities</text>
       <text lang="DE">Aufnahmen</text>
+      <text lang="FR">Priorités</text>
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="FI">Nauhoitusprioriteetit</text>
       <text lang="JA">録画優先順位設定</text>
@@ -26,7 +27,7 @@
       <text>Set Channel Recording Priorities</text>
       <text lang="DE">Sender</text>
       <text lang="SV">Kanalprioriteter</text>
-      <text lang="FR">Fixer les priorités des chaînes</text>
+      <text lang="FR">Priorités des chaînes</text>
       <text lang="JA">チャンネル録画優先順位設定</text>
       <text lang="FI">Kanavaprioriteetit</text>
       <text lang="NL">Prioriteit per kanaal</text>

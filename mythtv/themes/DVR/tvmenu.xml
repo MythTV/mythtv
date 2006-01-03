@@ -46,6 +46,7 @@
       <text lang="PT">Modo Directo de TV</text>
       <text lang="ES">TV directo</text>
       <text lang="CA">TV directe</text>
+      <text lang="FR">TV directe</text>
       <text lang="DE">TV direkt</text>
       <text lang="SV">TV direkt</text>
       <text lang="JA">パススルーモード</text>
@@ -57,6 +58,7 @@
    <button>
       <type>TV_PREVIOUS</type>
       <text>Previously Recorded</text>
+      <text lang="FR">Enregistré précedemment</text>
       <text lang="SV">Föregående</text>
       <text lang="DE">Alte Aufnahmen</text>
       <text lang="SI">Že posneto</text>

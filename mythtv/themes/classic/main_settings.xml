@@ -39,6 +39,7 @@
     <button>
       <type>SETUP_KEYS</type>
       <text>Edit Keys</text>
+      <text lang="FR">Touches</text>
       <text lang="NL">Toetsen instellen</text>
       <text lang="SV">Ändra knappar</text>
       <text lang="DK">Tasteopsætning</text>
@@ -51,7 +52,7 @@
      <text>TV Settings</text>
      <text lang="CA">Configuració de TV</text>
      <text lang="ES">Configuración de TV</text>
-     <text lang="FR">Options TV</text>
+     <text lang="FR">TV</text>
      <text lang="DE">TV</text>
      <text lang="DK">TV indstillinger</text>
      <text lang="NL">TV Instellingen</text>
@@ -66,6 +67,7 @@
    <button>
      <type>SETTINGS_MUSIC</type>
      <text>Music Settings</text>
+     <text lang="FR">Musique</text>
      <text lang="ES">Configurar Música</text>
      <text lang="CA">Configurar Música</text>
      <text lang="DE">Musik</text>
@@ -84,6 +86,7 @@
        <type>SETTINGS_VIDEO</type>
        <text>Videos Settings</text>
        <text lang="ES">Configurar Videos</text>
+       <text lang="FR">Vidéos</text>
        <text lang="CA">Configurar Videos</text>
        <text lang="DE">Videos</text>
        <text lang="DK">Video Indstillinger</text>
@@ -101,6 +104,7 @@
      <type>SETTINGS_DVD</type>
      <text>DVD Settings</text>
      <text lang="DE">DVD</text>
+     <text lang="FR">DVD</text>
      <text lang="PT">Configurar DVD</text>
      <text lang="ES">Configurar DVD</text>
      <text lang="CA">Configurar DVD</text>
@@ -118,6 +122,7 @@
       <type>SETTINGS_FM</type>
       <text>Radio Settings</text>
       <text lang="DE">Radio</text>
+      <text lang="FR">Radio</text>
       <text lang="SI">Radio nastavitve</text>
       <text lang="ET">Raadio seaded</text>
       <text lang="SV">Radio</text>
@@ -132,6 +137,7 @@
       <text lang="ES">Configurar Fotos</text>
       <text lang="CA">Configurar Imatges</text>
       <text lang="DE">Bilder</text>
+      <text lang="FR">Images</text>
       <text lang="DK">Billed indstillinger</text>
       <text lang="NL">Beelden Instellingen</text>
       <text lang="PT">Configurar Fotos</text>
@@ -149,6 +155,7 @@
      <text lang="ES">Configurar Juegos</text>
      <text lang="CA">Configurar Jocs</text>
      <text lang="DE">Spiele</text>
+     <text lang="FR">Jeux</text>
      <text lang="DK">Spil indstillinger</text>
      <text lang="NL">Spelen Instellingen</text>
      <text lang="PT">Configurar Jogos</text>
@@ -166,6 +173,7 @@
      <text lang="ES">Configurar El Tiempo</text>
      <text lang="CA">Configurar El Temps</text>
      <text lang="DE">Wetter</text>
+     <text lang="FR">Météo</text>
      <text lang="DK">Vejr Indstililnger</text>
      <text lang="NL">"Het Weer" Instellingen</text>
      <text lang="PT">Configurar Meteorologia</text>
@@ -181,6 +189,7 @@
      <type>SETTINGS_NEWS</type>
      <text>News Settings</text>
      <text lang="DE">Nachrichten</text>
+     <text lang="FR">Nouvelles</text>
      <text lang="CA">Configurar Notícies</text>
      <text lang="ES">Configurar Noticias</text>
      <text lang="NL">Nieuws Instellingen</text>
@@ -204,6 +213,7 @@
      <type>SETTINGS_WEBPAGE</type>
      <text>Web Settings</text>
      <text lang="DE">WWW</text>
+     <text lang="FR">WWW</text>
      <text lang="SV">Webb</text>
      <text lang="JA">Web設定</text>
      <text lang="SI">Nastavitve spleta</text>
@@ -217,6 +227,7 @@
       <type>SETTINGS_RECIPE</type>
       <text>Recipe Settings</text>
       <text lang="DE">Rezepte</text>
+      <text lang="FR">Recettes</text>
       <text lang="SI">Nastavitve receptov</text>
       <text lang="ET">Retseptide seaded</text>
       <text lang="SV">Recept</text>
@@ -229,6 +240,7 @@
       <type>PHONE</type>
       <text>Phone Settings</text>
       <text lang="DE">Telefon</text>
+      <text lang="FR">Téléphone</text>
       <text lang="SI">Nastavitve telefona</text>
       <text lang="ET">Telefoni seaded</text>
       <text lang="SV">Telefon</text>
@@ -241,6 +253,7 @@
      <type>SETTINGS_MOVIETIME</type>
      <text>Movie Time Settings</text>
      <text lang="FI">Elokuvien Aika-asetukset</text>
+     <text lang="FR">Movie Time</text>
      <text lang="SI">Nastavitve čas filmov</text>
      <text lang="ET">Filmiaegade seaded</text>
      <text lang="SV">Biotider</text>
@@ -253,6 +266,7 @@
      <type>SETTINGS_XBOX</type>
      <text>Xbox Settings</text>
      <text lang="PT">Configurar XBox</text>
+     <text lang="FR">XBox</text>
      <text lang="CA">Configurar XBox</text>
      <text lang="ES">Configurar XBox</text>
      <text lang="DE">Xbox</text>
@@ -269,6 +283,7 @@
    <button>
       <type>SETTINGS_BURN</type>
       <text>Burn DVD Settings</text>
+      <text lang="FR">Gravure DVD</text>
       <action>CONFIGPLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

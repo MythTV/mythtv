@@ -73,6 +73,7 @@
       <type>TV_SETTINGS_PLAYBACK_GROUPS</type>
       <text>Playback Groups</text>
       <text lang="SV">Uppspelningsgrupper</text>
+      <text lang="FR">Groupes de lecture</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 

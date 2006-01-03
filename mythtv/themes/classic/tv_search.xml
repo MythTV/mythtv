@@ -4,6 +4,7 @@
       <type>TV_SEARCH_TITLES</type>
       <text>Titles</text>
       <text lang="DE">nach Titel</text>
+      <text lang="FR">Titres</text>
       <text lang="SV">Titel</text>
       <text lang="JA">タイトル</text>
       <text lang="NL">Titels</text>
@@ -18,6 +19,7 @@
    <button>
       <type>TV_SEARCH_KEYWORDS</type>
       <text>Keywords</text>
+      <text lang="FR">Contenu</text>
       <text lang="DE">nach Inhalt</text>
       <text lang="SV">Nyckelord</text>
       <text lang="NL">Beschrijving</text>      
@@ -33,6 +35,7 @@
    <button>
       <type>TV_SEARCH_PEOPLE</type>
       <text>People</text>
+      <text lang="FR">Personnages</text>
       <text lang="SV">Person</text>
       <text lang="JA">人</text>
       <text lang="DE">nach Personen</text>
@@ -45,6 +48,7 @@
    <button>
       <type>TV_SEARCH_POWER</type>
       <text>Advanced</text>
+      <text lang="FR">Personnalisé</text>
       <text lang="SV">Avancerad</text>
       <text lang="JA">アドバンスト</text>
       <text lang="DE">Erweiterte Suche</text>
@@ -60,6 +64,7 @@
       <type>TV_SEARCH_NEW_TITLES</type>
       <text>New Titles</text>
       <text lang="DE">Neue Titel</text>
+      <text lang="FR">Nouveaux titres</text>
       <text lang="SV">Nya titlar</text>
       <text lang="JA">新タイトル</text>
       <text lang="NL">Nieuwe Titels</text>
@@ -74,6 +79,7 @@
       <type>TV_SEARCH_MOVIES</type>
       <text>Movies</text>
       <text lang="DE">Spielfilme</text>
+      <text lang="FR">Films</text>
       <text lang="SV">Filmer</text>
       <text lang="JA">映画</text>
       <text lang="NL">Films</text>
@@ -88,6 +94,7 @@
       <type>TV_SEARCH_CATEGORIES</type>
       <text>Categories</text>
       <text lang="DE">Kategorien</text>
+      <text lang="FR">Catégories</text>
       <text lang="SV">Kategori</text>
       <text lang="JA">カテゴリー</text>
       <text lang="NL">Categorie</text>
@@ -102,6 +109,7 @@
       <type>TV_SEARCH_CHANNELS</type>
       <text>Channels</text>
       <text lang="DE">Sender</text>
+      <text lang="FR">Chaînes</text>
       <text lang="SV">Kanal</text>
       <text lang="NL">Zender</text>
       <text lang="JA">チャンネル</text>
@@ -116,6 +124,7 @@
       <type>TV_SEARCH_TIMES</type>
       <text>Time</text>
       <text lang="NL">Tijdstip</text>
+      <text lang="FR">Heure</text>
       <text lang="SV">Tid</text>
       <text lang="JA">時間</text>
       <text lang="DE">Sendezeit</text>

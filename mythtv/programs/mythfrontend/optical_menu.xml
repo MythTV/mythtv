@@ -56,7 +56,7 @@
       <text lang="NL">DVD Importeren</text>
       <text lang="PT">Ler do DVD</text>
       <text lang="SV">Importera DVD</text>
-      <text lang="FR">Ripper un DVD</text>
+      <text lang="FR">Importer un DVD</text>
       <text lang="JA">DVD取込</text>
       <text lang="FI">Kopioi DVD</text>
       <text lang="ZH_TW">輸入DVD</text>
@@ -71,6 +71,7 @@
       <type>BURN</type>
       <text>Burn DVD</text>
       <text lang="FI">Polta DVD</text>
+      <text lang="FR">Graver un DVD</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>
@@ -87,7 +88,7 @@
       <text lang="NL">CD Importeren</text>
       <text lang="PT">Ler do CD</text>
       <text lang="SV">Importera CD</text>
-      <text lang="FR">Ripper un CD audio</text>
+      <text lang="FR">Importer un CD audio</text>
       <text lang="JA">CD取込</text>
       <text lang="FI">Kopioi CD</text>
       <text lang="ZH_TW">輸入音樂CD</text>

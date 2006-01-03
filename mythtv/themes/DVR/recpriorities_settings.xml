@@ -3,6 +3,7 @@
    <button>
       <type>TV_RECPRIORITIES_SETTINGS_GENERAL</type>
       <text>Set Recording Priorities</text>
+      <text lang="FR">Enregistrements</text>
       <text lang="DE">Aufnahmen</text>
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="SI">Nast. snemalne prioritete</text>
@@ -21,6 +22,7 @@
       <type>TV_RECPRIORITIES_CHANNEL</type>
       <text>Set Channel Recording Priorities</text>
       <text lang="DE">Sender</text>
+      <text lang="FR">Chaînes</text>
       <text lang="SV">Kanalprioriteter</text>
       <text lang="JA">チャンネル録画優先順位設定</text>
       <text lang="SI">Nast. kanalne snem. priritete</text>

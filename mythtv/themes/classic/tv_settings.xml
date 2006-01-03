@@ -86,6 +86,7 @@
    <button>
       <type>TV_SETTINGS_RECPRIORITIES</type>
       <text>Recording Priorities</text>
+      <text lang="FR">Priorités</text>
       <text lang="DE">Prioritäten</text>
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>

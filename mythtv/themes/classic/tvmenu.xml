@@ -25,7 +25,7 @@
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="NL">Opnames Plannen</text>
-      <text lang="FR">Programmer des enregistrements</text>
+      <text lang="FR">Planifier les enregistrements</text>
       <text lang="DE">Aufnahmen planen</text>
       <text lang="DK">Optag udsendelse</text>
       <text lang="PT">Gravação Programada</text>
@@ -34,7 +34,7 @@
       <text lang="SI">Planiranje snemanj</text>
       <text lang="ET">Planeeri salvestamisi</text>
       <alttext>Schedule</alttext>
-      <alttext lang="FR">Programmer</alttext>
+      <alttext lang="FR">Planifier</alttext>
       <alttext lang="ES">Temporizadores</alttext>
       <alttext lang="CA">Temporitzadors</alttext>
       <alttext lang="DK">Optagelser</alttext>
@@ -98,6 +98,7 @@
       <text lang="PT">Modo Directo de TV</text>
       <text lang="ES">TV directo</text>
       <text lang="CA">TV directe</text>
+      <text lang="FR">TV directe</text>
       <text lang="DE">TV direkt</text>
       <text lang="SV">TV direkt</text>
       <text lang="JA">パススルーモード</text>
@@ -113,6 +114,7 @@
       <text lang="DE">Alte Aufnahmen</text>
       <text lang="SI">Že posneto</text>
       <text lang="ET">Varem salvestatud</text>
+      <text lang="FR">Déjà enregistré</text>
       <text lang="DK">Tidligere optagelser</text>
       <action>TV_PREVIOUS</action>
    </button>
@@ -121,6 +123,7 @@
       <type>TV_STATUS</type>
       <text>System Status</text>
       <text lang="DE">Systemstatus</text>
+      <text lang="FR">Etat système</text>
       <text lang="SV">Systemstatus</text>
       <text lang="JA">システムステータス</text>
       <text lang="SI">Status sistema</text>

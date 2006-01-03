@@ -64,6 +64,7 @@
       <type>TV_SEARCH_LISTINGS</type>
       <text>Search Listings</text>
       <text lang="DE">Suche</text>
+      <text lang="FR">Recherche</text>
       <text lang="SV">Sök i TV-tablå</text>
       <text lang="NL">Zoekfunctie</text>
       <text lang="JA">リスト検索</text>
@@ -110,6 +111,7 @@
    <button>
       <type>TV_CUSTOM_RECORD</type>
       <text>Custom Record</text>
+      <text lang="FR">Personnalisé</text>
       <text lang="SV">Avancerad</text>
       <text lang="JA">カスタム録画</text>
       <text lang="DE">freie Planung</text>
@@ -124,6 +126,7 @@
       <text lang="ES">Programar Grabaciones</text>
       <text lang="CA">Programar Gravacions</text>
       <text lang="DE">Manuelle Aufnahme</text>
+      <text lang="FR">Manuel</text>
       <text lang="DK">Manuel programmering</text>
       <text lang="NL">Manuele Opname</text>
       <text lang="PT">Gravação Manual</text>
@@ -149,6 +152,7 @@
       <type>TV_RECPRIORITIES</type>
       <text>Recording Priorities</text>
       <text lang="DE">Aufnahmeprioritäten</text>
+      <text lang="FR">Priorités d'enregistrement</text>
       <text lang="NL">Opname Prioriteiten</text>      
       <text lang="SV">Inspelningsprioriteter</text>
       <text lang="JA">録画優先順位</text>
@@ -165,6 +169,7 @@
       <type>TV_CONFLICTS</type>
       <text>Upcoming Recordings</text>
       <text lang="IT">Correggi i conflitti</text>
+      <text lang="FR">Conflicts</text>
       <text lang="ES">Resolver conflictos</text>
       <text lang="CA">Resoldre Conflictes</text>
       <text lang="NL">Geplande Opnames</text>

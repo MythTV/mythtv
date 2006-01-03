@@ -6,6 +6,7 @@
      <text lang="PT">Televisão</text>
      <text lang="SV">TV</text>
      <text lang="DE">TV</text>
+     <text lang="FR">TV</text>
      <text lang="SI">TV</text>
      <text lang="ET">TV</text>
      <text lang="DK">TV</text>
@@ -54,6 +55,7 @@
      <type>DVD</type>
      <text>DVD</text>
      <text lang="DE">DVD</text>
+     <text lang="FR">DVD</text>
      <text lang="PT">DVD</text>
      <text lang="SV">DVD</text>
      <text lang="SI">DVD</text>
@@ -67,6 +69,7 @@
       <type>FM</type>
       <text>Radio</text>
       <text lang="DE">Radio</text>
+      <text lang="FR">Radio</text>
       <text lang="SI">Radio</text>
       <text lang="ET">Raadio</text>
       <text lang="SV">Radio</text>
@@ -136,6 +139,7 @@
      <type>NEWS</type>
      <text>News Feeds</text>
      <text lang="DE">Nachrichten</text>
+     <text lang="FR">Nouvelles</text>
      <text lang="CA">Notícies</text>
      <text lang="ES">Noticias</text>
      <text lang="NL">Nieuws</text>
@@ -159,6 +163,7 @@
       <type>WEBPAGE</type>
       <text>Web</text>
       <text lang="DE">WWW</text>
+      <text lang="FR">Web</text>
       <text lang="SV">Webb</text>
       <text lang="JA">ウェブ</text>
       <text lang="SI">Splet</text>
@@ -171,6 +176,7 @@
    <button>
       <type>PHONE</type>
       <text>Phone</text>
+      <text lang="FR">Téléphone</text>
       <text lang="DE">Telefon</text>
       <text lang="SI">Telefon</text>
       <text lang="ET">Telefon</text>
@@ -183,6 +189,7 @@
    <button>
       <type>RECIPE</type>
       <text>Recipes</text>
+      <text lang="FR">Recettes</text>
       <text lang="DE">Rezepte</text>
       <text lang="SI">Recepti</text>
       <text lang="ET">Retseptid</text>
@@ -194,6 +201,7 @@
    <button>
       <type>BURN</type>
       <text>Burn DVD</text>
+      <text lang="FR">Gravure DVD</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>
@@ -230,6 +238,7 @@
    <!-- <button>
      <type>SHUTDOWN</type>
      <text>Shutdown</text>
+     <text lang="FR">Eteindre</text>
      <text lang="SV">Avstängning</text>
      <text lang="DE">Beenden</text>
      <text lang="ET">Seiska</text>

@@ -7,7 +7,7 @@
       <text lang="ES">Guía de programas</text>
       <text lang="CA">Guia de programes</text>
       <text lang="NL">Programma Gids</text>
-      <text lang="FR">Guide des programmes</text>
+      <text lang="FR">Grille des programmes</text>
       <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
       <text lang="IS">Dagskrá sjónvarps</text>
@@ -110,7 +110,7 @@
       <text>Search Lists</text>
       <text lang="SV">Sök listor</text>
       <text lang="NL">Overzichtslijsten</text>
-      <text lang="FR">Listes de recherches</text>
+      <text lang="FR">Listes prédéfinies</text>
       <text lang="JA">リスト検索</text>
       <text lang="DE">Listensuche</text>
       <text lang="IS">Listaleit</text>
@@ -171,7 +171,7 @@
       <text lang="SV">Avancerad</text>
       <text lang="NL">Geavanceerd Opnameschema</text>
       <text lang="JA">カスタム録画</text>
-      <text lang="FR">Enregistrement avancé</text>
+      <text lang="FR">Enregistrement personnalisé</text>
       <text lang="DE">freie Planung</text>
       <text lang="IS">Sérsniðin upptaka</text>
       <text lang="NL">Opname op maat</text>
@@ -207,7 +207,7 @@
       <alttext lang="ES">Programar</alttext>
       <alttext lang="CA">Programar</alttext>
       <alttext lang="DE">Manuell</alttext>
-      <alttext lang="FR">Prog. Man.</alttext>
+      <alttext lang="FR">Manuelle</alttext>
       <alttext lang="DK">Manuel prog.</alttext>
       <alttext lang="IS">Handvirk tímasetning.</alttext>
       <alttext lang="NL">Manueel</alttext>
