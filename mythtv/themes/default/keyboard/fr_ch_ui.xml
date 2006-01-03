@@ -1,0 +1,404 @@
+<mythuitheme>
+
+  <window name="keyboard">
+
+    <font name="normal" face="Arial">
+      <color>#ffffff</color>
+      <size>14</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="focused" face="Arial">
+      <color>#ffffff</color>
+      <size>14</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="down" face="Arial">
+      <color>#ffffff</color>
+      <size>14</size>
+      <bold>yes</bold>
+    </font>
+
+    <font name="downfocused" face="Arial">
+      <color>#ffffff</color>
+      <size>14</size>
+      <bold>yes</bold>
+    </font>
+
+    <container name="keyboard_container">
+      <area>0,0,537,193</area>
+
+      <keyboard name="keyboard" draworder="2">
+        <area>0,0,537,193</area>
+        <context>-1</context>
+
+        <image function="normal" filename="keyboard/key_normal.png"></image>
+        <image function="focused" filename="keyboard/key_focused.png"></image>
+        <image function="down" filename="keyboard/key_down.png"></image> 
+        <image function="downfocused" filename="keyboard/key_downfocused.png"></image>
+
+        <fcnfont name="normal" function="normal"></fcnfont>
+        <fcnfont name="focused" function="focused"></fcnfont>
+        <fcnfont name="down" function="down"></fcnfont>
+        <fcnfont name="downfocused" function="downfocused"></fcnfont>
+
+        <!-- top row -->
+        <key name="key1" type="char" draworder="1">
+          <position>5,5</position>
+          <char normal="§" shift="°" alt="¬" altshift="¬"></char>
+          <move left="key14" right="key2" up="key50" down="key15"></move>
+        </key>
+        <key name="key2" type="char" draworder="1">
+          <position>42,5</position>
+          <char normal="1" shift="+" alt="|" altshift="¡"></char>
+          <move left="key1" right="key3" up="key50" down="key16"></move>
+        </key>
+        <key name="key3" type="char" draworder="1">
+          <position>79,5</position>
+          <char normal="2" shift="0x0022" alt="@" altshift="⅛"></char>
+          <move left="key2" right="key4" up="key51" down="key17"></move>
+        </key>
+        <key name="key4" type="char" draworder="1">
+          <position>116,5</position>
+          <char normal="3" shift="*" alt="#" altshift="£"></char>
+          <move left="key3" right="key5" up="key51" down="key18"></move>
+        </key>
+        <key name="key5" type="char" draworder="1">
+          <position>153,5</position>
+          <char normal="4" shift="ç" alt="¼" altshift="$"></char>
+          <move left="key4" right="key6" up="key49" down="key19"></move>
+        </key>
+        <key name="key6" type="char" draworder="1">
+          <position>190,5</position>
+          <char normal="5" shift="%" alt="½" altshift="⅜"></char>
+          <move left="key5" right="key7" up="key49" down="key20"></move>
+        </key>
+        <key name="key7" type="char" draworder="1">
+          <position>227,5</position>
+          <char normal="6" shift="0x0026" alt="¬" altshift="⅝"></char>
+          <move left="key6" right="key8" up="key49" down="key21"></move>
+        </key>
+        <key name="key8" type="char" draworder="1">
+          <position>264,5</position>
+          <char normal="7" shift="/" alt="¦" altshift="⅞"></char>
+          <move left="key7" right="key9" up="key59" down="key22"></move>
+        </key>
+        <key name="key9" type="char" draworder="1">
+          <position>301,5</position>
+          <char normal="8" shift="(" alt="¢" altshift="™"></char>
+          <move left="key8" right="key10" up="key59" down="key23"></move>
+        </key>
+        <key name="key10" type="char" draworder="1">
+          <position>338,5</position>
+          <char normal="9" shift=")" alt="]" altshift="±"></char>
+          <move left="key9" right="key11" up="key52" down="key24"></move>
+        </key>
+        <key name="key11" type="char" draworder="1">
+          <position>375,5</position>
+          <char normal="0" shift="=" alt="}" altshift="°"></char>
+          <move left="key10" right="key12" up="key53" down="key25"></move>
+        </key>
+        <key name="key12" type="char" draworder="1">
+          <position>412,5</position>
+          <char normal="'" shift="?" alt="´" altshift="¿"></char>
+          <move left="key11" right="key13" up="key53" down="key26"></move>
+        </key>
+        <key name="key13" type="char" draworder="1">
+          <position>449,5</position>
+          <char normal="^" shift="`" alt="~" altshift="˛"></char>
+          <move left="key12" right="key14" up="key54" down="key55"></move>
+        </key>
+        <key name="key14" type="char" draworder="1">
+          <position>486,5</position>
+          <char normal="$" shift="£" alt="}" altshift="˘"></char>
+          <move left="key13" right="key1" up="key54" down="key55"></move>
+        </key>
+
+        <!-- row 2 -->
+        <key name="key15" type="char" draworder="1">
+          <position>16,42</position>
+          <char normal="q" shift="Q" alt="@" altshift="Ω"></char>
+          <move left="key55" right="key16" up="key1" down="key27"></move>
+        </key>
+        <key name="key16" type="char" draworder="1">
+          <position>53,42</position>
+          <char normal="w" shift="W" alt="ł" altshift="Ł"></char>
+          <move left="key15" right="key17" up="key2" down="key28"></move>
+        </key>
+        <key name="key17" type="char" draworder="1">
+          <position>90,42</position>
+          <char normal="e" shift="E" alt="€" altshift="€"></char>
+          <move left="key16" right="key18" up="key3" down="key29"></move>
+        </key>
+        <key name="key18" type="char" draworder="1">
+          <position>127,42</position>
+          <char normal="r" shift="R" alt="¶" altshift="®"></char>
+          <move left="key17" right="key19" up="key4" down="key30"></move>
+        </key>
+        <key name="key19" type="char" draworder="1">
+          <position>164,42</position>
+          <char normal="t" shift="T" alt="ŧ" altshift="Ŧ"></char>
+          <move left="key18" right="key20" up="key5" down="key31"></move>
+        </key>
+        <key name="key20" type="char" draworder="1">
+          <position>201,42</position>
+          <char normal="z" shift="Z" alt="←" altshift="¥"></char>
+          <move left="key19" right="key21" up="key6" down="key32"></move>
+        </key>
+        <key name="key21" type="char" draworder="1">
+          <position>238,42</position>
+          <char normal="u" shift="U" alt="↓" altshift="↑"></char>
+          <move left="key20" right="key22" up="key7" down="key33"></move>
+        </key>
+        <key name="key22" type="char" draworder="1">
+          <position>275,42</position>
+          <char normal="i" shift="I" alt="→" altshift="ı"></char>
+          <move left="key21" right="key23" up="key8" down="key34"></move>
+        </key>
+        <key name="key23" type="char" draworder="1">
+          <position>312,42</position>
+          <char normal="o" shift="O" alt="ø" altshift="Ø"></char>
+          <move left="key22" right="key24" up="key9" down="key35"></move>
+        </key>
+        <key name="key24" type="char" draworder="1">
+          <position>349,42</position>
+          <char normal="p" shift="P" alt="þ" altshift="Þ"></char>
+          <move left="key23" right="key25" up="key10" down="key36"></move>
+        </key>
+        <key name="key25" type="char" draworder="1">
+          <position>386,42</position>
+          <char normal="è" shift="ü" alt="[" altshift="°"></char>
+          <move left="key24" right="key26" up="key11" down="key37"></move>
+        </key>
+        <key name="key26" type="char" draworder="1">
+          <position>423,42</position>
+          <char normal="¨" shift="!" alt="]" altshift="¯"></char>
+          <move left="key25" right="key55" up="key12" down="key37"></move>
+        </key>
+
+        <!-- row 3 -->
+        <key name="key27" type="char" draworder="1">
+          <position>28,79</position>
+          <char normal="a" shift="A" alt="æ" altshift="Æ"></char>
+          <move left="key58" right="key28" up="key15" down="key39"></move>
+        </key>
+        <key name="key28" type="char" draworder="1">
+          <position>65,79</position>
+          <char normal="s" shift="S" alt="ß" altshift="§"></char>
+          <move left="key27" right="key29" up="key16" down="key40"></move>
+        </key>
+        <key name="key29" type="char" draworder="1">
+          <position>102,79</position>
+          <char normal="d" shift="D" alt="ð" altshift="Ð"></char>
+          <move left="key28" right="key30" up="key17" down="key41"></move>
+        </key>
+        <key name="key30" type="char" draworder="1">
+          <position>139,79</position>
+          <char normal="f" shift="F" alt="đ" altshift="ª"></char>
+          <move left="key29" right="key31" up="key18" down="key42"></move>
+        </key>
+        <key name="key31" type="char" draworder="1">
+          <position>176,79</position>
+          <char normal="g" shift="G" alt="ŋ" altshift="Ŋ"></char>
+          <move left="key30" right="key32" up="key19" down="key43"></move>
+        </key>
+        <key name="key32" type="char" draworder="1">
+          <position>213,79</position>
+          <char normal="h" shift="H" alt="ħ" altshift="Ħ"></char>
+          <move left="key31" right="key33" up="key20" down="key44"></move>
+        </key>
+        <key name="key33" type="char" draworder="1">
+          <position>250,79</position>
+          <char normal="j" shift="J" alt="j" altshift="J"></char>
+          <move left="key32" right="key34" up="key21" down="key45"></move>
+        </key>
+        <key name="key34" type="char" draworder="1">
+          <position>287,79</position>
+          <char normal="k" shift="K" alt="ĸ" altshift="0x0026"></char>
+          <move left="key33" right="key35" up="key22" down="key46"></move>
+        </key>
+        <key name="key35" type="char" draworder="1">
+          <position>324,79</position>
+          <char normal="l" shift="L" alt="ł" altshift="Ł"></char>
+          <move left="key34" right="key36" up="key23" down="key47"></move>
+        </key>
+        <key name="key36" type="char" draworder="1">
+          <position>361,79</position>
+          <char normal="é" shift="ö" alt="´" altshift="˝"></char>
+          <move left="key35" right="key37" up="key24" down="key48"></move>
+        </key>
+        <key name="key37" type="char" draworder="1">
+          <position>398,79</position>
+          <char normal="à" shift="ä" alt="{" altshift="ˇ"></char>
+          <move left="key36" right="key58" up="key25" down="key56"></move>
+        </key>
+
+        <!-- row 4 -->
+        <key name="key38" type="char" draworder="1">
+          <position>5,116</position>
+          <char normal="0x003c" shift=">" alt="0x005c" altshift="¦"></char>
+          <move left="key57" right="key39" up="key27" down="key50"></move>
+        </key>
+        <key name="key39" type="char" draworder="1">
+          <position>42,116</position>
+          <char normal="y" shift="Y" alt="«" altshift="0x003c"></char>
+          <move left="key38" right="key40" up="key27" down="key50"></move>
+        </key>
+        <key name="key40" type="char" draworder="1">
+          <position>79,116</position>
+          <char normal="x" shift="X" alt="»" altshift=">"></char>
+          <move left="key39" right="key41" up="key28" down="key51"></move>
+        </key>
+        <key name="key41" type="char" draworder="1">
+          <position>116,116</position>
+          <char normal="c" shift="C" alt="¢" altshift="©"></char>
+          <move left="key40" right="key42" up="key29" down="key51"></move>
+        </key>
+        <key name="key42" type="char" draworder="1">
+          <position>153,116</position>
+          <char normal="v" shift="V" alt="“" altshift="`"></char>
+          <move left="key41" right="key43" up="key30" down="key51"></move>
+        </key>
+        <key name="key43" type="char" draworder="1">
+          <position>190,116</position>
+          <char normal="b" shift="B" alt="”" altshift="'"></char>
+          <move left="key42" right="key44" up="key31" down="key49"></move>
+        </key>
+        <key name="key44" type="char" draworder="1">
+          <position>227,116</position>
+          <char normal="n" shift="N" alt="n" altshift="N"></char>
+          <move left="key43" right="key45" up="key32" down="key49"></move>
+        </key>
+        <key name="key45" type="char" draworder="1">
+          <position>264,116</position>
+          <char normal="m" shift="M" alt="µ" altshift="º"></char>
+          <move left="key44" right="key46" up="key33" down="key49"></move>
+        </key>
+        <key name="key46" type="char" draworder="1">
+          <position>301,116</position>
+          <char normal="," shift=";" alt="," altshift="×"></char>
+          <move left="key45" right="key47" up="key34" down="key52"></move>
+        </key>
+        <key name="key47" type="char" draworder="1">
+          <position>338,116</position>
+          <char normal="." shift=":" alt="·" altshift="÷"></char>
+          <move left="key46" right="key48" up="key35" down="key52"></move>
+        </key>
+        <key name="key48" type="char" draworder="1">
+          <position>375,116</position>
+          <char normal="-" shift="_" alt="-" altshift="˙"></char>
+          <move left="key47" right="key56" up="key36" down="key52"></move>
+        </key>
+
+        <!-- row 5 -->
+        <key name="key49" type="char" draworder="1">
+          <position>165,153</position>
+          <char normal=" " shift=" " alt=" " altshift=" "></char>
+          <move left="key51" right="key59" up="key44" down="key7"></move>
+          <image function="normal" filename="keyboard/key_normal_space2.png"></image>
+          <image function="focused" filename="keyboard/key_focused_space2.png"></image>
+          <image function="down" filename="keyboard/key_down_space2.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_space2.png"></image>
+        </key>
+
+        <!-- special keys -->
+        <key name="key50" type="shift" draworder="1">
+          <position>5,153</position>
+          <char normal="Shift" shift="Shift" alt="Shift" altshift="Shift"></char>
+          <move left="key54" right="key51" up="key38" down="key1"></move>
+          <image function="normal" filename="keyboard/key_normal_shift.png"></image>
+          <image function="focused" filename="keyboard/key_focused_shift.png"></image>
+          <image function="down" filename="keyboard/key_down_shift.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_shift.png"></image>
+        </key>
+        <key name="key51" type="lock" draworder="1">
+          <position>85,153</position>
+          <char normal="Lock" shift="Lock" alt="Lock" altshift="Lock"></char>
+          <move left="key50" right="key49" up="key40" down="key3"></move>
+          <image function="normal" filename="keyboard/key_normal_shift.png"></image>
+          <image function="focused" filename="keyboard/key_focused_shift.png"></image>
+          <image function="down" filename="keyboard/key_down_shift.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_shift.png"></image>
+        </key>
+        <key name="key52" type="moveleft" draworder="1">
+          <position>350,153</position>
+          <char normal="0x003c-" shift="0x003c-" alt="0x003c-" altshift="0x003c-"></char>
+          <move left="key59" right="key53" up="key48" down="key9"></move>
+          <image function="normal" filename="keyboard/key_normal_move.png"></image>
+          <image function="focused" filename="keyboard/key_focused_move.png"></image>
+          <image function="down" filename="keyboard/key_down_move.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_move.png"></image>
+        </key>
+        <key name="key53" type="moveright" draworder="1">
+          <position>405,153</position>
+          <char normal="->" shift="->" alt="->" altshift="->"></char>
+          <move left="key52" right="key54" up="key56" down="key11"></move>
+          <image function="normal" filename="keyboard/key_normal_move.png"></image>
+          <image function="focused" filename="keyboard/key_focused_move.png"></image>
+          <image function="down" filename="keyboard/key_down_move.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_move.png"></image>
+        </key>
+        <key name="key54" type="shift" draworder="1">
+          <position>460,153</position>
+          <char normal="Shift" shift="Shift" alt="Shift" altshift="Shift"></char>
+          <move left="key53" right="key50" up="key57" down="key13"></move>
+          <image function="normal" filename="keyboard/key_normal_back.png"></image>
+          <image function="focused" filename="keyboard/key_focused_back.png"></image>
+          <image function="down" filename="keyboard/key_down_back.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_back.png"></image>
+        </key>
+        <key name="key55" type="back" draworder="1">
+          <position>460,42</position>
+	  <char normal="Back" shift="Back" alt="Back" altshift="Back"></char>
+          <move left="key26" right="key15" up="key14" down="key58"></move>
+          <image function="normal" filename="keyboard/key_normal_back.png"></image>
+          <image function="focused" filename="keyboard/key_focused_back.png"></image>
+          <image function="down" filename="keyboard/key_down_back.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_back.png"></image>
+        </key>
+        <key name="key56" type="comp" draworder="1">
+          <position>412,116</position>
+          <char normal="Comp" shift="Comp" alt="Comp" altshift="Comp"></char>
+          <move left="key48" right="key57" up="key37" down="key53"></move>
+          <image function="normal" filename="keyboard/key_normal_back.png"></image>
+          <image function="focused" filename="keyboard/key_focused_back.png"></image>
+          <image function="down" filename="keyboard/key_down_back.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_back.png"></image>
+        </key>
+        <key name="key57" type="del" draworder="1">
+          <position>486,116</position>
+          <char normal="Del" shift="Del" alt="Del" altshift="Del"></char>
+          <move left="key56" right="key38" up="key58" down="key54"></move>
+          <image function="normal" filename="keyboard/key_normal_del.png"></image>
+          <image function="focused" filename="keyboard/key_focused_del.png"></image>
+          <image function="down" filename="keyboard/key_down_del.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_del.png"></image>
+        </key>
+        <key name="key58" type="done" draworder="1">
+          <position>435,79</position>
+          <char normal="Fin" shift="Fin" alt="Fin" altshift="Fin"></char>
+          <move left="key37" right="key27" up="key55" down="key57"></move>
+          <image function="normal" filename="keyboard/key_normal_done.png"></image>
+          <image function="focused" filename="keyboard/key_focused_done.png"></image>
+          <image function="down" filename="keyboard/key_down_done.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_done.png"></image>
+         <fcnfont name="test" function="normal"></fcnfont>
+      </key>
+        <key name="key59" type="alt" draworder="1">
+          <position>270,153</position>
+          <char normal="AltGr" shift="AltGr" alt="AltGr" altshift="AltGr"></char>
+          <move left="key49" right="key52" up="key46" down="key9"></move>
+          <image function="normal" filename="keyboard/key_normal_shift.png"></image>
+          <image function="focused" filename="keyboard/key_focused_shift.png"></image>
+          <image function="down" filename="keyboard/key_down_shift.png"></image>
+          <image function="downfocused" filename="keyboard/key_downfocused_shift.png"></image>
+        </key>
+
+      </keyboard>
+
+    </container>
+
+  </window>
+
+</mythuitheme>
