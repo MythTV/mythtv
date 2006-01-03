@@ -716,6 +716,13 @@ int NuppelVideoPlayer::OpenFile(bool skipDsp, uint retries,
         no_audio_out = true; // no audio with ivtv.
         audio_bits = 16;
     }
+    else if (forceVideoOutput == kVideoOutput_IVTV)
+    {
+        VERBOSE(VB_IMPORTANT,
+                QString("NVP: Couldn't open '%1' with ivtv decoder")
+                .arg(ringBuffer->GetFilename()));
+        return -1;
+    }
 #endif
     else if (AvFormatDecoder::CanHandle(testbuf, ringBuffer->GetFilename()))
         SetDecoder(new AvFormatDecoder(this, m_playbackinfo,
@@ -927,8 +934,11 @@ bool NuppelVideoPlayer::GetFrameNormal(int onlyvideo)
 
     CheckPrebuffering();
 
-    if ((audio_stretchfactor > 1.0f) && IsNearEnd())
+    if ((play_speed > 1.01f) && (audio_stretchfactor > 1.01f) && IsNearEnd())
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Near end, Slowing down playback.");
         Play(1.0f, true, true);
+    }
 
     return true;
 }
@@ -1862,6 +1872,13 @@ void NuppelVideoPlayer::OutputVideoLoop(void)
 }
 
 #ifdef USING_IVTV
+/** \fn NuppelVideoPlayer::IvtvVideoLoop(void)
+ *  \brief Handles the compositing of the OSD and PiP window.
+ *
+ *   Unlike OutputVideoLoop(void) this loop does not actually handle
+ *   the display of the video, but only handles things that go on the
+ *   composited OSD surface.
+ */
 void NuppelVideoPlayer::IvtvVideoLoop(void)
 {
     refreshrate = frame_interval;
@@ -2087,6 +2104,12 @@ void NuppelVideoPlayer::JumpToProgram(void)
         OpenFile();
     else
         ResetPlaying();
+
+    if (!GetDecoder())
+    {
+        errored = true;
+        return;
+    }
 
     ringBuffer->Unpause();
     ringBuffer->IgnoreLiveEOF(false);
