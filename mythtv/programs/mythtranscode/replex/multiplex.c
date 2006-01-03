@@ -19,28 +19,32 @@ static int buffers_filled(multiplex_t *mx)
 	return 0;
 }
 
-static int all_ext_ok(int *aok, int n)
+static int use_video(uint64_t vpts, uint64_t *extpts, int *aok, int n)
 {
-	int ok=0,i;
-
-	if (!n) return 0;
-	for (i=0;  i < n ;i++){
-		if (aok[i]) ok ++;
-	}
-	if (ok == n) return 1;
-	return 0;
+	int i;
+	for(i=0; i < n; i++)
+		if(aok[i] && ptscmp(vpts,extpts[i]) > 0)
+			return 0;
+	return 1;
 }
-
-static int rest_ext_ok(int j, int *aok, int n)
+static int which_ext(uint64_t *extpts, int *aok, int n)
 {
-	int ok=0,i;
-
-	if (!(n-j-1)) return 0;
-	for (i=j+1;  i < n ;i++){
-		if (aok[i]) ok ++;
-	}
-	if (ok == (n-j-1)) return 1;
-	return 0;
+	int i;
+	int started = 0;
+	int pos = 0;
+	uint64_t tmppts;
+	for(i=0; i < n; i++)
+		if(aok[i]){
+			if(! started){
+				started=1;
+				tmppts=extpts[i];
+				pos = i;
+			} else if(ptscmp(tmppts, extpts[i]) > 0) {
+				tmppts = extpts[i];
+				pos = i;
+			}
+		}
+	return pos;
 }
 
 static int get_next_video_unit(multiplex_t *mx, index_unit *viu)
@@ -488,16 +492,15 @@ void write_out_packs( multiplex_t *mx, int video_ok, int *ext_ok)
 {
 	int i;
 
-	if (video_ok && !all_ext_ok(ext_ok, mx->extcnt)) {
+	if (video_ok && use_video(mx->viu.dts + mx->video_delay,
+	    mx->extpts, ext_ok, mx->extcnt)) {
 		writeout_video(mx);  
 	} else { // second case(s): audio ok, video in time
+		i = which_ext(mx->extpts, ext_ok, mx->extcnt);
 		int done=0;
-		for ( i = 0; i < mx->extcnt; i++){
-			if ( ext_ok[i] && !rest_ext_ok(i, ext_ok, mx->extcnt)) {
-				writeout_ext(mx, mx->exttype[i], i);
-				done = 1;
-				break;
-			}
+		if(i>=0) {
+			writeout_ext(mx, mx->exttype[i], i);
+			done = 1;
 		}
 		if (!done && !mx->VBR){
 			writeout_padding(mx);
