@@ -6208,7 +6208,7 @@ Myth kommer nu att avslutas.</translation>
     </message>
     <message>
         <source>Changing existing card inputs, deleting anything, or scanning for channels may not work.</source>
-        <translation>Ändra existerande kanalingångar, radera något eller kanalsökningar kanske inte fungerar.</translation>
+        <translation>Att ändra existerande kanalingångar, radera något eller göra kanalsökningar kanske inte fungerar.</translation>
     </message>
     <message>
         <source>Channel Scanner</source>
