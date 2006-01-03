@@ -636,15 +636,15 @@
     </message>
     <message>
         <source>COLD</source>
-        <translation type="unfinished"></translation>
+        <translation>Koldt</translation>
     </message>
     <message>
         <source>COLDEST</source>
-        <translation type="unfinished"></translation>
+        <translation>Koldest</translation>
     </message>
     <message>
         <source>CLOUD TEMPERATURE</source>
-        <translation type="unfinished"></translation>
+        <translation>Sky temperatur</translation>
     </message>
 </context>
 <context>
@@ -794,56 +794,28 @@
         <translation> km.</translation>
     </message>
     <message>
-        <source>SUN</source>
-        <translation type="obsolete">Søn</translation>
-    </message>
-    <message>
         <source>Sunday</source>
         <translation>Søndag</translation>
-    </message>
-    <message>
-        <source>MON</source>
-        <translation type="obsolete">Man</translation>
     </message>
     <message>
         <source>Monday</source>
         <translation>Mandag</translation>
     </message>
     <message>
-        <source>TUE</source>
-        <translation type="obsolete">Tir</translation>
-    </message>
-    <message>
         <source>Tuesday</source>
         <translation>Tirsdag</translation>
-    </message>
-    <message>
-        <source>WED</source>
-        <translation type="obsolete">Ons</translation>
     </message>
     <message>
         <source>Wednesday</source>
         <translation>Onsdag</translation>
     </message>
     <message>
-        <source>THU</source>
-        <translation type="obsolete">Tor</translation>
-    </message>
-    <message>
         <source>Thursday</source>
         <translation>Torsdag</translation>
     </message>
     <message>
-        <source>FRI</source>
-        <translation type="obsolete">Fre</translation>
-    </message>
-    <message>
         <source>Friday</source>
         <translation>Fredag</translation>
-    </message>
-    <message>
-        <source>SAT</source>
-        <translation type="obsolete">Lør</translation>
     </message>
     <message>
         <source>Saturday</source>
@@ -872,18 +844,6 @@
     <message>
         <source> (Not All Information Available)</source>
         <translation> (Ikke al information er tilgængelig)</translation>
-    </message>
-    <message>
-        <source>*** Invalid Area ID Entered *** Use a valid area id.</source>
-        <translation type="obsolete">*** Ugyldigt område-ID indtastet *** Brug et gyldigt område-ID.</translation>
-    </message>
-    <message>
-        <source>Weather Data Not Available</source>
-        <translation type="obsolete">Vejr-data er ikke tilgængelige.</translation>
-    </message>
-    <message>
-        <source>!!! Timeout Limit !!! Change aggressiveness level.</source>
-        <translation type="obsolete">!!! Tidsgrænsen udløb !!! Sæt et andet aggressivitets niveau.</translation>
     </message>
     <message>
         <source>*** Invalid Area ID or Server Error ***</source>
@@ -919,11 +879,11 @@
     </message>
     <message>
         <source>doppler radar</source>
-        <translation type="unfinished">Doppler Radar</translation>
+        <translation>Doppler Radar</translation>
     </message>
     <message>
         <source>satellite image</source>
-        <translation type="unfinished"></translation>
+        <translation>satellit billede</translation>
     </message>
     <message>
         <source>Myth was unable to retrieve your weather data within the time allowed (%1 seconds).

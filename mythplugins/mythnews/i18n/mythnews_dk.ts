@@ -3,57 +3,58 @@
     <name>MythNews</name>
     <message>
         <source>Updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Opdateret</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt</translation>
     </message>
 </context>
 <context>
     <name>MythNewsConfig</name>
     <message>
         <source>Press MENU to set the update frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tryk MENU for ændre opdaterings frekvensen.</translation>
     </message>
     <message>
         <source>Set update frequency by using the up/down arrows.
 The minimum allowed value is 30 Minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sæt opdaterings frekvensen med pil op/ned.     
+Minimum tilladte værdi er 30 minutter.</translation>
     </message>
     <message>
         <source>Press MENU to return to feed selection.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tryke MENU for at vende tilbage til menuen.</translation>
     </message>
 </context>
 <context>
     <name>NewsSite</name>
     <message>
         <source>Failed to retrieve news</source>
-        <translation type="unfinished"></translation>
+        <translation>Det lykkedes ikke at hente nyhederne</translation>
     </message>
     <message>
         <source>Retrieve Failed. </source>
-        <translation type="unfinished"></translation>
+        <translation>Modtagelsen fejlede. </translation>
     </message>
     <message>
         <source>No Cached News</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen cached Nyheder</translation>
     </message>
     <message>
         <source>Failed to read downloaded file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fejl ved læsning af downloadede fil</translation>
     </message>
     <message>
         <source>Showing Cached News</source>
-        <translation type="unfinished"></translation>
+        <translation>Viser cached Nyheder</translation>
     </message>
 </context>
 <context>
     <name>ThemeUI</name>
     <message>
         <source>Minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>Minutter</translation>
     </message>
 </context>
 </TS>

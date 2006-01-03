@@ -51,7 +51,7 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Det tema du bruger indeholder ikke et &apos;musictree&apos; element. Kontakt den der har lavet temaet og bed ham opdatere det. &lt;br&gt;&lt;br&gt; Den næste skærm er tom. ESC for at komme tilbage til menuen.</translation>
     </message>
     <message>
         <source>OK</source>
@@ -87,229 +87,229 @@
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Kunstner:<byte value="x9"/></translation>
     </message>
     <message>
         <source>Album:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Album:<byte value="x9"/></translation>
     </message>
     <message>
         <source>Title:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Titel:<byte value="x9"/></translation>
     </message>
     <message>
         <source>Length:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Længde:<byte value="x9"/></translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation type="unfinished">Genre:</translation>
+        <translation>Genre:</translation>
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Opsamlings kunstner:<byte value="x9"/></translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig</translation>
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>DB statistik</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished">Diverse kunstnere</translation>
+        <translation>Diverse kunstnere</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg en kunstner</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Opsamlings kunstner</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg et album</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg en genre</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem ændringer?</translation>
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem kun til database?</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem kun til fil</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem til fil og database</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Afslut/Gem ikke</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Er du sikker på at du vil gemme ændringerne til denne fil?</translation>
     </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Redigér musikliste</translation>
+        <translation>Redigér musikliste</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="unfinished">Visualisér</translation>
+        <translation>Visualisér</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Redigér musikliste</translation>
+        <translation>3 Redigér musikliste</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualisér</translation>
+        <translation>4 Visualisér</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Bland: Smart</translation>
+        <translation>1 Bland: Smart</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="unfinished">Bland: Smart</translation>
+        <translation>Bland: Smart</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Bland: Tilfældigt</translation>
+        <translation>1 Bland: Tilfældigt</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="unfinished">Bland: Tilfældigt</translation>
+        <translation>Bland: Tilfældigt</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Bland: Ingen</translation>
+        <translation>1 Bland: Ingen</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished">Bland: Ingen</translation>
+        <translation>Bland: Ingen</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Gentag: Alle</translation>
+        <translation>2 Gentag: Alle</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">Gentag: Alle</translation>
+        <translation>Gentag: Alle</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Gentag: Spor</translation>
+        <translation>2 Gentag: Spor</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">Gentag: Spor</translation>
+        <translation>Gentag: Spor</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Gentag: Ingen</translation>
+        <translation>2 Gentag: Ingen</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished">Gentag: Ingen</translation>
+        <translation>Gentag: Ingen</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished">rod af spilleliste</translation>
+        <translation>rod af spilleliste</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">Afspiller musik.</translation>
+        <translation>Afspiller musik.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">Forbereder musik.</translation>
+        <translation>Forbereder musik.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished">Musik sat på pause.</translation>
+        <translation>Musik sat på pause.</translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished">kanaler</translation>
+        <translation>kanaler</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">Output-fejl.</translation>
+        <translation>Output-fejl.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished">Musik stoppet.</translation>
+        <translation>Musik stoppet.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">Musik afsluttet.</translation>
+        <translation>Musik afsluttet.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished">Dekoder-fejl.</translation>
+        <translation>Dekoder-fejl.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="unfinished"></translation>
+        <translation>kbps</translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="unfinished"></translation>
+        <translation>kHz</translation>
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Smarte playlister</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle numre</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Numre af nuværende kunstner</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Numre fra nuværende album</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Numre fra nuværende genre</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Numre fra nuværende år</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Søg</translation>
     </message>
     <message>
         <source>From CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Fra CD</translation>
     </message>
 </context>
 <context>
@@ -324,7 +324,7 @@
     </message>
     <message>
         <source>BumpScope</source>
-        <translation type="unfinished"></translation>
+        <translation>BumpScope</translation>
     </message>
     <message>
         <source>Various Artists</source>
@@ -332,7 +332,7 @@
     </message>
     <message>
         <source>Ogg Vorbis Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogg Vorbis Audio</translation>
     </message>
     <message>
         <source>Unknown</source>
@@ -340,7 +340,7 @@
     </message>
     <message>
         <source>FLAC Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Flac Audio</translation>
     </message>
     <message>
         <source>Directory to hold music</source>
@@ -416,11 +416,11 @@
     </message>
     <message>
         <source>Ogg Vorbis</source>
-        <translation type="unfinished"></translation>
+        <translation>Ogg Vorbis</translation>
     </message>
     <message>
         <source>Lame (MP3)</source>
-        <translation type="unfinished"></translation>
+        <translation>Lame (MP3)</translation>
     </message>
     <message>
         <source>Audio encoder to use for CD ripping. Note that the quality level &apos;Perfect&apos; will use the FLAC encoder.</source>
@@ -437,6 +437,10 @@
     <message>
         <source>Token separator</source>
         <translation>Makro-separator</translation>
+    </message>
+    <message>
+        <source> - </source>
+        <translation> - </translation>
     </message>
     <message>
         <source>Filename tokens will be separated by this string.</source>
@@ -536,7 +540,7 @@
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normal</translation>
     </message>
     <message>
         <source>Random</source>
@@ -588,31 +592,31 @@
     </message>
     <message>
         <source>MonoScope</source>
-        <translation type="unfinished"></translation>
+        <translation>MonoScope</translation>
     </message>
     <message>
         <source>StereoScope</source>
-        <translation type="unfinished"></translation>
+        <translation>StereoScope</translation>
     </message>
     <message>
         <source>Spectrum</source>
-        <translation type="unfinished"></translation>
+        <translation>Spectrum</translation>
     </message>
     <message>
         <source>Goom</source>
-        <translation type="unfinished"></translation>
+        <translation>Goom</translation>
     </message>
     <message>
         <source>Synaesthesia</source>
-        <translation type="unfinished"></translation>
+        <translation>Synaesthesia</translation>
     </message>
     <message>
         <source>Gears</source>
-        <translation type="unfinished"></translation>
+        <translation>Gears</translation>
     </message>
     <message>
         <source>Blank</source>
-        <translation type="unfinished"></translation>
+        <translation>Blank</translation>
     </message>
     <message>
         <source>Default Rip Quality</source>
@@ -656,7 +660,7 @@
     </message>
     <message>
         <source>MPEG Layer 1/2/3 Audio (MAD decoder)</source>
-        <translation type="unfinished"></translation>
+        <translation>MPEG Layer 1/2/3 Audio (MAD dekoder)</translation>
     </message>
     <message>
         <source>Unknown Artist</source>
@@ -680,7 +684,7 @@
     </message>
     <message>
         <source>%1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2</translation>
     </message>
     <message>
         <source>title</source>
@@ -691,8 +695,16 @@
         <translation>Manglende post i database: %1</translation>
     </message>
     <message>
+        <source> ~ </source>
+        <translation> ~ </translation>
+    </message>
+    <message>
         <source>Ooops</source>
         <translation>Hovsa</translation>
+    </message>
+    <message>
+        <source>%1 ~ %2</source>
+        <translation>%1 ~ %2</translation>
     </message>
     <message>
         <source>Not Initialized</source>
@@ -701,6 +713,10 @@
     <message>
         <source>oops</source>
         <translation>hovsa</translation>
+    </message>
+    <message>
+        <source>,%1</source>
+        <translation>,%1</translation>
     </message>
     <message>
         <source>All My Playlists</source>
@@ -760,11 +776,11 @@
     </message>
     <message>
         <source>650MB/75min</source>
-        <translation type="unfinished"></translation>
+        <translation>650MB/75min</translation>
     </message>
     <message>
         <source>700MB/80min</source>
-        <translation type="unfinished"></translation>
+        <translation>700MB/80min</translation>
     </message>
     <message>
         <source>Default CD Capacity.</source>
@@ -781,6 +797,26 @@
     <message>
         <source>Auto</source>
         <translation>Automatisk</translation>
+    </message>
+    <message>
+        <source>1x</source>
+        <translation>1x</translation>
+    </message>
+    <message>
+        <source>2x</source>
+        <translation>2x</translation>
+    </message>
+    <message>
+        <source>4x</source>
+        <translation>4x</translation>
+    </message>
+    <message>
+        <source>8x</source>
+        <translation>8x</translation>
+    </message>
+    <message>
+        <source>16x</source>
+        <translation>16x</translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
@@ -820,35 +856,35 @@
     </message>
     <message>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <source>Track %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Spor %1</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>CD: %1 ~ %2 - %3</translation>
     </message>
     <message>
         <source>Automatically play CDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer %1</translation>
     </message>
     <message>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Orden for musik-hierarkiet. Mulige værdier er en liste (adskilt af mellemrum) med følgende mulige værdier: genre, splitartist, artist, album, og title ELLER &quot;directory&quot; for at indikere at billedet på skærmen har samme struktur som filsystemet.</translation>
     </message>
     <message>
         <source>Select the SCSI or IDE Device for CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg SCSI eller IDE enhed til CD brænding.</translation>
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation type="unfinished"></translation>
+        <translation>Skanner musik filer</translation>
     </message>
     <message>
         <source>Rebuilding music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Genopbygger musik træ</translation>
     </message>
 </context>
 <context>
@@ -907,277 +943,277 @@
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Flere Kunstnere?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Byt Titel  &amp;&amp; Kunstner</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunstner</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Længde</translation>
     </message>
     <message>
         <source>Quality: </source>
-        <translation type="unfinished"></translation>
+        <translation>Kvalitet: </translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation type="unfinished"></translation>
+        <translation>Importerer </translation>
     </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg en kunstner</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg et album</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg en genre</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg en titel</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg en kompilerings kunstner</translation>
     </message>
 </context>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
         <source>Edit Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Ændre dato</translation>
     </message>
     <message>
         <source>Fixed Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Fast Dato</translation>
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>dag</translation>
     </message>
     <message>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>måned</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>år</translation>
     </message>
     <message>
         <source>Use Current Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug dags dato</translation>
     </message>
     <message>
         <source>+/- Days</source>
-        <translation type="unfinished"></translation>
+        <translation>+/- dato</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>Invalid Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Invalid dato</translation>
     </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Orden Pr Felt</translation>
     </message>
     <message>
         <source>1 Add</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tilføj</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Tilføj</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Slet</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet</translation>
     </message>
     <message>
         <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Flyt op</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Flyt op</translation>
     </message>
     <message>
         <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Flyt ned</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Flyt ned</translation>
     </message>
     <message>
         <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Stigende</translation>
     </message>
     <message>
         <source>Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Stigende</translation>
     </message>
     <message>
         <source>6 Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Faldende</translation>
     </message>
     <message>
         <source>Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Faldende</translation>
     </message>
     <message>
         <source>7 OK</source>
-        <translation type="unfinished"></translation>
+        <translation>7 Ok</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished">Ok</translation>
+        <translation>Ok</translation>
     </message>
 </context>
 <context>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart Playlist Resultat visning</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Exit</translation>
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunstner</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Album</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel</translation>
     </message>
     <message>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Year</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nummer.</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart Playlister</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Vælg</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg</translation>
     </message>
     <message>
         <source>2 New</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Ny</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Ændre</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Ændre</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Slette</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Slette</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="unfinished"></translation>
+        <translation>Er du sikker på du vil slette denne Smart Playliste?</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart Playliste Editor</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Matche</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>En</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>af disse muligheder</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vist pr:</translation>
     </message>
     <message>
         <source>Matches:</source>
@@ -1185,7 +1221,7 @@
     </message>
     <message>
         <source>Limit:</source>
-        <translation type="unfinished"></translation>
+        <translation>Grænse:</translation>
     </message>
     <message>
         <source></source>
@@ -1193,39 +1229,39 @@
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem</translation>
     </message>
     <message>
         <source>Show Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis resultat</translation>
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Smart Playliste Kategorier</translation>
     </message>
     <message>
         <source>New Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny kategori</translation>
     </message>
     <message>
         <source>Delete Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet kategori</translation>
     </message>
     <message>
         <source>Rename Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Omdøb kategori</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation type="unfinished"></translation>
+        <translation>Er du sikker på du vil slette denne kategori?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation type="unfinished"></translation>
+        <translation>Så slettes også alle Smarte Playliste som hører til denne kategori.</translation>
     </message>
 </context>
 <context>
@@ -1236,51 +1272,51 @@
     </message>
     <message>
         <source>Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Spor information</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunstner:</translation>
     </message>
     <message>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation>Album:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Titel:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>År:</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Spor Nu.:</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Rating:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspillet:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sidst spillet:</translation>
     </message>
     <message>
         <source>Compilation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kompilering:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filnavn:</translation>
     </message>
 </context>
 </TS>

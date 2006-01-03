@@ -50,6 +50,7 @@
       <text lang="IT">Tipi di file</text>
       <text lang="SI">Tipi datotek</text>
       <text lang="FI">Tiedostotyypit</text>
+      <text lang="DK">Filtyper</text>
       <action>SETTINGS_ASSOCIATIONS</action>
    </button>
 

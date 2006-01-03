@@ -23,7 +23,7 @@
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>
       <text lang="DE">Grundeinstellungen</text>
-      <text lang="DK">Generelle indstillinger</text>
+      <text lang="DK">Spil Systemer</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Jogadores</text>
       <text lang="SV">Generella inställningar</text>
@@ -39,6 +39,7 @@
       <text lang="SV">Sök efter spel</text>
       <text lang="DE">Nach Spielen suchen</text>
       <text lang="SI">Iskanje iger</text>
+      <text lang="DK">Skan efter spil</text>
       <text lang="FI">Etsi Pelejä</text>
       <action>SEARCH_FOR_GAMES</action>
    </button>
@@ -50,7 +51,7 @@
       <text lang="ES">Opciones Generales</text>
       <text lang="CA">Opcions Generals</text>
       <text lang="DE">Grundeinstellungen</text>
-      <text lang="DK">Generelle indstillinger</text>
+      <text lang="DK">Slet spil data</text>
       <text lang="NL">Algemeen</text>
       <text lang="PT">Apagar Dados de Jogos</text>
       <text lang="SV">Generella inställningar</text>

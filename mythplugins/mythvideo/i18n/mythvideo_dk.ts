@@ -3,69 +3,77 @@
     <name>EditMetadataDialog</name>
     <message>
         <source>Level %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Niveau %1</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Intet cover</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig</translation>
     </message>
 </context>
 <context>
     <name>FileAssocDialog</name>
     <message>
         <source>Please enter the new extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Indtast den nye endelse</translation>
     </message>
     <message>
         <source>Create new extension</source>
-        <translation type="unfinished"></translation>
+        <translation>Lav ny endelse</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet</translation>
     </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Directory that holds videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappen hvor videoerne ligger</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo only needs to have read permission to the directory.</source>
-        <translation type="unfinished"></translation>
+        <translation>Denne mappe skal være oprettet, og mythtv brugeren har kun brug for læserettigheder til mappen.</translation>
     </message>
     <message>
         <source>Starting Parental Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Start voksen niveau</translation>
     </message>
     <message>
         <source>4 - Highest</source>
-        <translation type="unfinished"></translation>
+        <translation>4 - Højest</translation>
     </message>
     <message>
         <source>1 - Lowest</source>
-        <translation type="unfinished"></translation>
+        <translation>1 - Lavest</translation>
+    </message>
+    <message>
+        <source>2</source>
+        <translation>2</translation>
+    </message>
+    <message>
+        <source>3</source>
+        <translation>3</translation>
     </message>
     <message>
         <source>This is the &apos;level&apos; that MythVideo starts at. Any videos with a level at or below this will be shown in the list or while browsing by default. The Parental PIN should be set to limit changing of the default level.</source>
@@ -73,7 +81,7 @@
     </message>
     <message>
         <source>Parental Control PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Voksen kontrol kode</translation>
     </message>
     <message>
         <source>If set, you will not be able to return to this screen and reset the Parental PIN without first entering the current PIN. You have been warned.</source>
@@ -81,7 +89,7 @@
     </message>
     <message>
         <source>Show Unknown File Types</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis ukendte fil typer</translation>
     </message>
     <message>
         <source>If set, all files below the Myth Video directory will be displayed unless their extension is explicitly set to be ignored. </source>
@@ -97,35 +105,35 @@
     </message>
     <message>
         <source>Player Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspiler opsætning</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Voksen kode</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Intet cover</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt Rating</translation>
     </message>
     <message>
         <source>Default Player</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard afspiller</translation>
     </message>
     <message>
         <source>Newly scanned files are browsable by default</source>
-        <translation type="unfinished"></translation>
+        <translation>Nye filer vises som standard</translation>
     </message>
     <message>
         <source>If set, newly scanned files in the Video Manager will be marked as browsable and will appear in the &apos;Browse&apos; menu.</source>
@@ -133,7 +141,7 @@
     </message>
     <message>
         <source>New category</source>
-        <translation type="unfinished"></translation>
+        <translation>Ny kategori</translation>
     </message>
     <message>
         <source>This PIN is used to control the current Parental Level. If you want to use this feature, then setting the value to all numbers will make your life much easier.</source>
@@ -141,7 +149,7 @@
     </message>
     <message>
         <source>Command to search for movie listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando til at søge film data</translation>
     </message>
     <message>
         <source>This command must be executable by the user running MythVideo.</source>
@@ -149,15 +157,15 @@
     </message>
     <message>
         <source>Command to search for movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando til at søge efter film billeder</translation>
     </message>
     <message>
         <source>Command to extract data for movies</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando til at udtrække film data</translation>
     </message>
     <message>
         <source>Directory that holds movie posters</source>
-        <translation type="unfinished"></translation>
+        <translation>Mappen hvor film billederne ligger</translation>
     </message>
     <message>
         <source>This directory must exist, and the user running MythVideo needs to have read/write permission to the directory.</source>
@@ -165,36 +173,36 @@
     </message>
     <message>
         <source>Video Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Manager</translation>
     </message>
     <message>
         <source>Could not retrieve poster</source>
-        <translation type="unfinished"></translation>
+        <translation>Kunne ikke hente billeder</translation>
     </message>
     <message>
         <source>A movie poster exists for this movie but Myth could not retrieve it within a reasonable amount of time.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Der findes billeder til denne film, men Myth kunne ikke hente dem indenfor den givne tid.</translation>
     </message>
     <message>
         <source>Default View</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard visning</translation>
     </message>
     <message>
         <source>Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Galleri</translation>
     </message>
     <message>
         <source>Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Browser</translation>
     </message>
     <message>
         <source>Listings</source>
-        <translation type="unfinished"></translation>
+        <translation>Lister</translation>
     </message>
     <message>
         <source>Aggressive Parental Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggressiv voksen kontrol</translation>
     </message>
     <message>
         <source>This is the command used for any file that the extension is not specifically defined. You may also enter the name of one of the playback plugins such as &apos;Internal&apos;.</source>
@@ -202,23 +210,23 @@
     </message>
     <message>
         <source>Rows to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal rækker der vises</translation>
     </message>
     <message>
         <source>Columns to display</source>
-        <translation type="unfinished"></translation>
+        <translation>Antal kolonner der vises</translation>
     </message>
     <message>
         <source>Show title below thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis titel under billede</translation>
     </message>
     <message>
         <source>If set, the additional text will make the thumbnails smaller.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hvis aktiv, vil teksten gøre billedet mindre.</translation>
     </message>
     <message>
         <source>Maintain aspect ratio of thumbnails</source>
-        <translation type="unfinished"></translation>
+        <translation>Behold aspektet på mini billederne</translation>
     </message>
     <message>
         <source>If set, the scaled thumbnails will maintain their original aspect ratio. If not set, they are scaled to match the size of the background icon.</source>
@@ -226,7 +234,7 @@
     </message>
     <message>
         <source>Video Gallery</source>
-        <translation type="unfinished"></translation>
+        <translation>Video galleri</translation>
     </message>
     <message>
         <source>The default view for MythVideo. Other views can be reached via the popup menu available via the MENU key.</source>
@@ -250,11 +258,11 @@
     </message>
     <message>
         <source>General Settings (1/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Generel Opsætning (1/2)</translation>
     </message>
     <message>
         <source>General Settings (2/2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Generel Opsætning (2/2)</translation>
     </message>
 </context>
 <context>
@@ -329,15 +337,15 @@
     </message>
     <message>
         <source>IMDB Num.:</source>
-        <translation type="unfinished"></translation>
+        <translation>IMDB nr.:</translation>
     </message>
     <message>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <source>PL </source>
-        <translation type="unfinished"></translation>
+        <translation>PL </translation>
     </message>
     <message>
         <source>MythVideo File Associations</source>
@@ -345,35 +353,35 @@
     </message>
     <message>
         <source>Extension:</source>
-        <translation type="unfinished"></translation>
+        <translation>Endelse:</translation>
     </message>
     <message>
         <source>Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kommando</translation>
     </message>
     <message>
         <source>Use default player:</source>
-        <translation type="unfinished"></translation>
+        <translation>Brug def. afspiller:</translation>
     </message>
     <message>
         <source>Ignore:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorer:</translation>
     </message>
     <message>
         <source>Edit Video Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Ændre video information</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Navn:</translation>
     </message>
     <message>
         <source>Parental Control:</source>
-        <translation type="unfinished"></translation>
+        <translation>Voksen kontrol:</translation>
     </message>
     <message>
         <source>File to Always Play Next:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fil der skal afspilles bagefter:</translation>
     </message>
     <message>
         <source>Include while Browsing:</source>
@@ -381,47 +389,47 @@
     </message>
     <message>
         <source>Cover Art:</source>
-        <translation type="unfinished"></translation>
+        <translation>Covert grafik:</translation>
     </message>
     <message>
         <source>Unique Player Command:</source>
-        <translation type="unfinished"></translation>
+        <translation>Unik afspiller kommando:</translation>
     </message>
     <message>
         <source>/path/to/the/thing.jpg</source>
-        <translation type="unfinished"></translation>
+        <translation>/sti/til/billede.jpg</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori:</translation>
     </message>
     <message>
         <source>Filters video list</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrér film liste</translation>
     </message>
     <message>
         <source>Category :</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori :</translation>
     </message>
     <message>
         <source>Genre :</source>
-        <translation type="unfinished"></translation>
+        <translation>Genre :</translation>
     </message>
     <message>
         <source>Country :</source>
-        <translation type="unfinished"></translation>
+        <translation>Land :</translation>
     </message>
     <message>
         <source>Year :</source>
-        <translation type="unfinished"></translation>
+        <translation>År :</translation>
     </message>
     <message>
         <source>Runtime :</source>
-        <translation type="unfinished"></translation>
+        <translation>Længde :</translation>
     </message>
     <message>
         <source>User Rating :</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruger Rating :</translation>
     </message>
     <message>
         <source>Browse :</source>
@@ -429,7 +437,7 @@
     </message>
     <message>
         <source>Sort by :</source>
-        <translation type="unfinished"></translation>
+        <translation>Sorter med :</translation>
     </message>
     <message>
         <source>Aucune video</source>
@@ -437,7 +445,7 @@
     </message>
     <message>
         <source>SELECT: Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>SELECT: Ændre</translation>
     </message>
     <message>
         <source></source>
@@ -445,70 +453,70 @@
     </message>
     <message>
         <source>Parental</source>
-        <translation type="unfinished"></translation>
+        <translation>Voksen</translation>
     </message>
     <message>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>Niveau</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>År</translation>
     </message>
     <message>
         <source>Runtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Længde</translation>
     </message>
     <message>
         <source>User Rating</source>
-        <translation type="unfinished"></translation>
+        <translation>Bruger Rating</translation>
     </message>
     <message>
         <source>INFO - Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>INFO - menu</translation>
     </message>
     <message>
         <source>Up/Down, Page Up/Down: Browse   MENU: Options   INFO: Action Menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Op/Ned, Side Op/Ned: Bladre   MENU: Options   INFO: Action Menu</translation>
     </message>
     <message>
         <source>Play File After This:</source>
-        <translation type="unfinished"></translation>
+        <translation>Afspil fil efter denne:</translation>
     </message>
 </context>
 <context>
     <name>VideoBrowser</name>
     <message>
         <source>%1 of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 af %2</translation>
     </message>
     <message>
         <source>No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen film</translation>
     </message>
     <message>
         <source>No rating available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ingen ratings tilgængelig</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minutter</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Se denne video</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis fuldt resume</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrér visning</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
 </context>
 <context>
@@ -519,132 +527,132 @@
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift til Galleri Visning</translation>
     </message>
     <message>
         <source>Switch to List View</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift til Liste visning</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg funktion</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Voksen kode:</translation>
     </message>
 </context>
 <context>
     <name>VideoFilterDialog</name>
     <message>
         <source>Result of this filter : %1 video(s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultat af dette filter : %1 film</translation>
     </message>
     <message>
         <source>Result of this filter : No Videos</source>
-        <translation type="unfinished"></translation>
+        <translation>Resultat af dette filter: Ingen film</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt</translation>
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minutter</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Alt</translation>
     </message>
     <message>
         <source>Save as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Gem som standard</translation>
     </message>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Færdig</translation>
     </message>
 </context>
 <context>
     <name>VideoGallery</name>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrér visning</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Se denne video</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis fuldt resume</translation>
     </message>
     <message>
         <source>View Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis detajler</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
 </context>
 <context>
     <name>VideoManager</name>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minutter</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ja</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Nej</translation>
     </message>
     <message>
         <source>No Cover</source>
-        <translation type="unfinished"></translation>
+        <translation>Intet cover</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Ukendt</translation>
     </message>
     <message>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Intet</translation>
     </message>
     <message>
         <source>NR</source>
-        <translation type="unfinished"></translation>
+        <translation>Nr</translation>
     </message>
     <message>
         <source>delete failed</source>
-        <translation type="unfinished"></translation>
+        <translation>sletning fejlede</translation>
     </message>
     <message>
         <source>Select action:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg funktion</translation>
     </message>
     <message>
         <source>Edit Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Rediger Metadata</translation>
     </message>
     <message>
         <source>Search IMDB</source>
-        <translation type="unfinished"></translation>
+        <translation>Søg IMDB</translation>
     </message>
     <message>
         <source>Manually Enter IMDB #</source>
-        <translation type="unfinished"></translation>
+        <translation>Indtast IMDB nr</translation>
     </message>
     <message>
         <source>Reset Metadata</source>
-        <translation type="unfinished"></translation>
+        <translation>Nulstil Metadata</translation>
     </message>
     <message>
         <source>Toggle Browseable</source>
@@ -652,19 +660,19 @@
     </message>
     <message>
         <source>Remove Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Fjern film</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrér Visning</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>Delete this file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Slet denne fil?</translation>
     </message>
 </context>
 <context>
@@ -675,46 +683,46 @@
     </message>
     <message>
         <source>minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>minutter</translation>
     </message>
 </context>
 <context>
     <name>VideoTree</name>
     <message>
         <source>Parental Pin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Voksen kode:</translation>
     </message>
     <message>
         <source>Select action</source>
-        <translation type="unfinished"></translation>
+        <translation>Vælg funktion</translation>
     </message>
     <message>
         <source>Watch This Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis denne video</translation>
     </message>
     <message>
         <source>View Full Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>Vis fuldt resume</translation>
     </message>
     <message>
         <source>Filter Display</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrér visning</translation>
     </message>
     <message>
         <source>Switch to Browse View</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift til Browse visning</translation>
     </message>
     <message>
         <source>Switch to Gallery View</source>
-        <translation type="unfinished"></translation>
+        <translation>Skift til Galleri Visning</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Afbryd</translation>
     </message>
     <message>
         <source>Ok</source>
-        <translation type="unfinished"></translation>
+        <translation>Ok</translation>
     </message>
 </context>
 </TS>
