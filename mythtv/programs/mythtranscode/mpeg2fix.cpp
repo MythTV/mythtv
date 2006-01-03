@@ -1964,12 +1964,13 @@ int MPEG2fixup::Start()
                                        ((! ptsorder_eq_dtsorder && i == 0) ?
                                         2 : GetNbFields(vFrame.current()));
                         VERBOSE(MPF_FRAME,QString("VID: %1 #:%2 nb: %3"
-                                " pts: %4 dts: %5")
+                                " pts: %4 dts: %5 pos: %6")
                                 .arg(GetFrameTypeT(vFrame.current()))
                                 .arg(GetFrameNum(vFrame.current()))
                                 .arg(GetNbFields(vFrame.current()))
                                 .arg(PtsTime(vFrame.current()->pkt.pts))
-                                .arg(PtsTime(vFrame.current()->pkt.dts)));
+                                .arg(PtsTime(vFrame.current()->pkt.dts))
+                                .arg(vFrame.current()->pkt.pos));
                         if (AddFrame(vFrame.current()))
                             return TRANSCODE_BUGGY_EXIT_DEADLOCK;
 
@@ -2056,8 +2057,10 @@ int MPEG2fixup::Start()
                         poq.Get(it.key(), af->first()->pkt.pts));
                 //expectedPTS[it.key()] = udiff2x33(nextPTS, initPTS);
                 // write_audio(lApkt_tail->pkt, initPTS);
-                VERBOSE(MPF_FRAME, QString("AUD #%1: pts: %2").arg(it.key()) 
-                        .arg(PtsTime(af->current()->pkt.pts)));
+                VERBOSE(MPF_FRAME, QString("AUD #%1: pts: %2 pos: %3")
+                        .arg(it.key()) 
+                        .arg(PtsTime(af->current()->pkt.pts))
+                        .arg(af->current()->pkt.pos));
                 if (AddFrame(af->current()))
                     return TRANSCODE_BUGGY_EXIT_DEADLOCK;
                 framePool.enqueue(af->first());
