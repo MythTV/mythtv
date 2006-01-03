@@ -49,5 +49,13 @@ void strings_null() {
     ThemeUI::tr("Description:");
     ThemeUI::tr("System Status - Select a category to view the status");
     ThemeUI::tr("This screen displays the status of various system components");
-    
+    ThemeUI::tr("Program Details:");
+    ThemeUI::tr("Program Details");    
+    ThemeUI::tr("Welcome to MythTV");
+    ThemeUI::tr("MythTV is idle and will shutdown shortly.");
+    ThemeUI::tr("Current Recording(s)");
+    ThemeUI::tr("Retrieving Recording Status ...");
+    ThemeUI::tr("Next Scheduled Recording(s)");
+    ThemeUI::tr("Retrieving Scheduled Recordings ...");
+    ThemeUI::tr("WARNING: There are conflicting scheduled recordings!");
 }
