@@ -149,8 +149,10 @@ void VideoOutputIvtv::SetAlpha(eAlphaState newAlphaState)
 
 void VideoOutputIvtv::InputChanged(int width, int height, float aspect)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "InputChanged() -- begin");
     VideoOutput::InputChanged(width, height, aspect);
     MoveResize();
+    VERBOSE(VB_PLAYBACK, LOC + "InputChanged() -- end");
 }
 
 int VideoOutputIvtv::GetRefreshRate(void)
@@ -162,6 +164,7 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
                            WId winid, int winx, int winy, int winw, 
                            int winh, WId embedid)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "Init() -- begin");
     allowpreviewepg = false;
 
     videoDevice = gContext->GetSetting("PVR350VideoDev");
@@ -237,6 +240,8 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
     }
 
     VERBOSE(VB_GENERAL, "Using the PVR-350 decoder/TV-out");
+
+    VERBOSE(VB_PLAYBACK, LOC + "Init() -- end");
     return true;
 }
 
@@ -245,13 +250,15 @@ bool VideoOutputIvtv::Init(int width, int height, float aspect,
  */
 void VideoOutputIvtv::Close(void)
 {
-    if (videofd < 0)
-        return;
+    VERBOSE(VB_PLAYBACK, LOC + "Close() -- begin");
+    if (videofd >= 0)
+    {
+        Stop(true /* hide */);
 
-    Stop(true /* hide */);
-
-    close(videofd);
-    videofd = -1;
+        close(videofd);
+        videofd = -1;
+    }
+    VERBOSE(VB_PLAYBACK, LOC + "Close() -- end");
 }
 
 /** \fn VideoOutputIvtv::Open(void)
@@ -259,14 +266,19 @@ void VideoOutputIvtv::Close(void)
  */
 void VideoOutputIvtv::Open(void)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "Open() -- begin");
     if (videofd >= 0)
+    {
+        VERBOSE(VB_PLAYBACK, LOC + "Open() -- end");
         return;
+    }
 
     videofd = open(videoDevice.ascii(), O_WRONLY | O_NONBLOCK, 0555);
     if (videofd < 0)
     {
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to open decoder device " +
                 QString("'%1'").arg(videoDevice) + ENO);
+        VERBOSE(VB_PLAYBACK, LOC + "Open() -- end");
         return;
     }
 
@@ -276,6 +288,7 @@ void VideoOutputIvtv::Open(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Failed to query decoder" + ENO);
     else
         driver_version = vcap.version;
+    VERBOSE(VB_PLAYBACK, LOC + "Open() -- end");
 }
 
 void VideoOutputIvtv::PrepareFrame(VideoFrame *buffer, FrameScanType t)
@@ -466,6 +479,8 @@ void VideoOutputIvtv::ProcessFrame(VideoFrame *frame, OSD *osd,
  */
 void VideoOutputIvtv::Start(int skip, int mute)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "Start("<<skip<<" skipped, "
+            <<mute<<" muted) -- begin");
     struct ivtv_cfg_start_decode start;
     bzero(&start, sizeof(start));
     start.gop_offset = skip;
@@ -479,6 +494,8 @@ void VideoOutputIvtv::Start(int skip, int mute)
             break;
         }
     }
+    VERBOSE(VB_PLAYBACK, LOC + "Start("<<skip<<" skipped, "
+            <<mute<<" muted) -- end");
 }
 
 /** \fn VideoOutputIvtv::Stop(bool)
@@ -487,6 +504,7 @@ void VideoOutputIvtv::Start(int skip, int mute)
  */
 void VideoOutputIvtv::Stop(bool hide)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "Stop("<<hide<<") -- begin");
     struct ivtv_cfg_stop_decode stop;
     bzero(&stop, sizeof(stop));
     stop.hide_last = hide;
@@ -502,6 +520,7 @@ void VideoOutputIvtv::Stop(bool hide)
 
     frame_at_speed_change = 0;
     internal_offset       = 0;
+    VERBOSE(VB_PLAYBACK, LOC + "Stop("<<hide<<") -- end");
 }
 
 /** \fn VideoOutputIvtv::Pause(void)
@@ -509,6 +528,7 @@ void VideoOutputIvtv::Stop(bool hide)
  */
 void VideoOutputIvtv::Pause(void)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "Pause() -- begin");
     while (ioctl(videofd, IVTV_IOC_PAUSE, 0) < 0)
     {
         if (errno != EBUSY)
@@ -517,6 +537,7 @@ void VideoOutputIvtv::Pause(void)
             break;
         }
     }
+    VERBOSE(VB_PLAYBACK, LOC + "Pause() -- end");
 }
 
 /** \fn VideoOutputIvtv::Poll(int)
@@ -526,6 +547,7 @@ void VideoOutputIvtv::Pause(void)
  */
 int VideoOutputIvtv::Poll(int delay)
 {
+    //VERBOSE(VB_PLAYBACK, LOC + "Poll("<<delay<<") -- begin");
     struct pollfd polls;
     polls.fd = videofd;
     polls.events = POLLOUT;
@@ -536,6 +558,7 @@ int VideoOutputIvtv::Poll(int delay)
     if (res < 0)
         VERBOSE(VB_IMPORTANT, LOC_ERR + "Polling" + ENO);
 
+    //VERBOSE(VB_PLAYBACK, LOC + "Poll("<<delay<<") -- end");
     return res;
 }
 
@@ -565,7 +588,7 @@ uint VideoOutputIvtv::WriteBuffer(unsigned char *buf, int len)
 /** \fn VideoOutputIvtv::GetFirmwareFramesPlayed(void)
  *  \brief Returns number of frames decoded as reported by decoder.
  */
-int VideoOutputIvtv::GetFirmwareFramesPlayed(void)
+long long VideoOutputIvtv::GetFirmwareFramesPlayed(void)
 {
     struct ivtv_ioctl_framesync frameinfo;
     bzero(&frameinfo, sizeof(frameinfo));
@@ -575,7 +598,7 @@ int VideoOutputIvtv::GetFirmwareFramesPlayed(void)
         VERBOSE(VB_IMPORTANT, LOC_ERR +
                 "Fetching frames played from decoder" + ENO);
     }
-
+    //cerr<<"<"<<frameinfo.frame<<">";
     return frameinfo.frame;
 }
 
@@ -586,11 +609,11 @@ int VideoOutputIvtv::GetFirmwareFramesPlayed(void)
  *   to report the number of frames played since playback started
  *   irrespective of current and past playback speeds.
  */
-int VideoOutputIvtv::GetFramesPlayed(void)
+long long VideoOutputIvtv::GetFramesPlayed(void)
 {
-    int frame = GetFirmwareFramesPlayed();
+    long long frame = GetFirmwareFramesPlayed();
     float f = internal_offset + (frame - frame_at_speed_change) * last_speed;
-    return (int)round(f);
+    return (long long)round(f);
 }
 
 /** \fn VideoOutputIvtv::Play(float speed, bool normal, int mask)
@@ -598,6 +621,7 @@ int VideoOutputIvtv::GetFramesPlayed(void)
  */
 bool VideoOutputIvtv::Play(float speed, bool normal, int mask)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "Play("<<speed<<", "<<normal<<", "<<mask<<")");
     struct ivtv_speed play;
     bzero(&play, sizeof(play));
     play.scale = (speed >= 2.0f) ? (int)roundf(speed) : 1;
@@ -636,6 +660,7 @@ bool VideoOutputIvtv::Play(float speed, bool normal, int mask)
  */
 void VideoOutputIvtv::Flush(void)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "Flush()");
     int arg = 0;
 
     if (ioctl(videofd, IVTV_IOC_DEC_FLUSH, &arg) < 0)
@@ -647,6 +672,7 @@ void VideoOutputIvtv::Flush(void)
  */
 void VideoOutputIvtv::Step(void)
 {
+    VERBOSE(VB_PLAYBACK, LOC + "Step()");
     enum {
         STEP_FRAME     = 0,
         STEP_TOP_FIELD = 1,

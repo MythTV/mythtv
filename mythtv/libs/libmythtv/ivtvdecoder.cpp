@@ -23,48 +23,50 @@ using namespace std;
 #define LOC QString("IVD: ")
 #define LOC_ERR QString("IVD Error: ")
 
-bool IvtvDecoder::ntsc = true;
+bool IvtvDecoder::device_ok     = false;
+bool IvtvDecoder::ntsc          = true;
+const uint IvtvDecoder::vidmax  = 131072; // must be a power of 2
 
 IvtvDecoder::IvtvDecoder(NuppelVideoPlayer *parent, ProgramInfo *pginfo)
-           : DecoderBase(parent, pginfo)
+    : DecoderBase(parent, pginfo),
+
+      validvpts(false),       gotvideo(false),
+      gopset(false),          needPlay(false),
+      mpeg_state(0xffffffff),
+
+      prevgoppos(0),          firstgoppos(0),
+
+      vidbuf(new unsigned char[vidmax]),
+
+      vidread(0),             vidwrite(0),
+      vidfull(0),             vidframes(0),
+      frame_decoded(0),       videoPlayed(0),
+      lastStartFrame(0),      laststartpos(0),
+
+      nexttoqueue(1),         lastdequeued(0)
 {
-    lastStartFrame = 0;
-    videoPlayed = 0;
-
-    gopset = false;
-    firstgoppos = 0;
-    prevgoppos = 0;
-
-    fps = 29.97;
-    validvpts = false;
-
+    fps = 29.97f;
     lastKey = 0;
-
-    vidread = vidwrite = vidfull = 0;
-    vidframes = 0;
-    mpeg_state = 0xffffffff;
-
-    nexttoqueue = 1;
-    lastdequeued = 0;
-    queuedlist.clear();
 }
 
 IvtvDecoder::~IvtvDecoder()
 {
+    if (vidbuf)
+        delete[] vidbuf;
 }
 
 void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
                             bool needFlush, bool discardFrames)
 {
-    VERBOSE(VB_PLAYBACK, LOC + QString("SeekReset(%1, %2 flush, %3 discard)")
-            .arg(skipframes).arg((needFlush) ? "do" : "don't")
+    VERBOSE(VB_PLAYBACK, LOC +
+            QString("SeekReset(%1, %2, %3 flush, %4 discard)")
+            .arg(newkey).arg(skipframes)
+            .arg((needFlush) ? "do" : "don't")
             .arg((discardFrames) ? "do" : "don't"));
 
     DecoderBase::SeekReset(newkey, skipframes, needFlush, discardFrames);
 
-    if (!exactseeks)
-        skipframes = 0;
-
+    skipframes = (exactseeks) ? skipframes : 0;
     vidread = vidwrite = vidfull = 0;
     mpeg_state = 0xffffffff;
     ateof = false;
@@ -72,8 +74,8 @@ void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
     framesRead = newkey;
     framesPlayed = newkey;
 
-    VideoOutputIvtv *videoout = 
-        (VideoOutputIvtv*)(GetNVP()->getVideoOutput());
+    VideoOutput *vo = GetNVP()->getVideoOutput();
+    VideoOutputIvtv *videoout = (VideoOutputIvtv*) vo;
 
     if (needFlush)
     {
@@ -87,7 +89,7 @@ void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
         videoout->Stop(false /* hide */);
         videoout->Flush();
 
-        videoout->Start(0, skipframes+5);
+        videoout->Start(0, skipframes + 5 /* muted frames */);
 
         if (GetNVP()->GetFFRewSkip() != 1)
             videoout->Play();
@@ -104,10 +106,14 @@ void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
             else
             {
                 videoout->Play();
-                do
+                bool done = false;
+                while (!done)
+                {
                     ReadWrite(1);
-                while (((uint)videoout->GetFramesPlayed() <= skipframes) &&
-                       !ateof);
+                    done  = ateof;
+                    done |= (uint)videoout->GetFramesPlayed() > skipframes;
+                    done |= !skipframes;
+                }
             }
         }
 
@@ -129,8 +135,17 @@ void IvtvDecoder::SeekReset(long long newkey, uint skipframes,
     }
 }
 
-bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
+/** \fn IvtvDecoder::CheckDevice(void)
+ *  \brief Checks the validity of the ivtv output device.
+ *
+ *   If this returns successfully once. The is cached so that CanHandle()
+ *   can be called on RingBuffer changes in the NVP (for LiveTV support).
+ */
+bool IvtvDecoder::CheckDevice(void)
 {
+    if (device_ok)
+        return true;
+
     if (!gContext->GetNumSetting("PVR350OutputEnable", 0))
         return false;
 
@@ -143,9 +158,13 @@ bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
     bool ok = false;
 
     struct v4l2_capability vcap;
-    memset(&vcap, 0, sizeof(vcap));
+    bzero(&vcap, sizeof(vcap));
     if (ioctl(testfd, VIDIOC_QUERYCAP, &vcap) < 0)
-        perror("VIDIOC_QUERYCAP");
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to query capabilities of '%1'")
+                .arg(videodev) + ENO);
+    }
     else
     {
         if (vcap.version < 0x00000109)
@@ -161,7 +180,11 @@ bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
     ntsc = true;
 
     if (ioctl(testfd, VIDIOC_G_STD, &std) < 0)
-        perror("VIDIOC_G_STD");
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Failed to determine video standard used by '%1'.")
+                .arg(videodev) + ENO);
+    }
     else
     {
         if (std & V4L2_STD_625_50)
@@ -171,6 +194,15 @@ bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
     close(testfd);
 
     if (!ok)
+        return false;
+
+    device_ok = true;
+    return true;
+}
+
+bool IvtvDecoder::CanHandle(char testbuf[2048], const QString &filename)
+{
+    if (!CheckDevice())
         return false;
 
     av_register_all();
@@ -491,7 +523,7 @@ bool IvtvDecoder::GetFrame(int onlyvideo)
         ReadWrite(onlyvideo, LONG_MAX);
     else
     {
-        long stopframe = framesRead+ + 1;
+        long stopframe = framesRead + 1;
         while (ReadWrite(onlyvideo, stopframe))
             ;
     }

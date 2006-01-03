@@ -199,9 +199,9 @@ class VideoOutput
     virtual bool hasVLDAcceleration() const { return false; }
 
     /// \brief Sets the number of frames played
-    void SetFramesPlayed(long long fp) { framesPlayed = fp; };
+    virtual void SetFramesPlayed(long long fp) { framesPlayed = fp; };
     /// \brief Returns the number of frames played
-    long long GetFramesPlayed(void) { return framesPlayed; };
+    virtual long long GetFramesPlayed(void) { return framesPlayed; };
 
     /// \brief Returns true if a fatal error has been encountered.
     bool IsErrored() { return errored; }

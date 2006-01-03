@@ -3,6 +3,7 @@
 
 #include <qstring.h>
 #include <qmutex.h>
+#include <cassert>
 
 #include "videooutbase.h"
 
@@ -49,8 +50,13 @@ class VideoOutputIvtv: public VideoOutput
         { last_speed = speed; last_normal = normal; last_mask = mask; };
     void Flush(void);
     void Step(void);
-    int GetFramesPlayed(void);
+    long long GetFramesPlayed(void);
 
+    VideoFrame *GetNextFreeFrame(bool with_lock = false,
+                                 bool allow_unsafe = false)
+    {
+        return NULL;
+    }
   private:
     typedef enum
     {
@@ -62,7 +68,7 @@ class VideoOutputIvtv: public VideoOutput
 
     void ShowPip(VideoFrame *frame, NuppelVideoPlayer *pipplayer);
     void SetAlpha(eAlphaState newAlpha);
-    int  GetFirmwareFramesPlayed(void);
+    long long GetFirmwareFramesPlayed(void);
 
     int videofd;
     int fbfd;
