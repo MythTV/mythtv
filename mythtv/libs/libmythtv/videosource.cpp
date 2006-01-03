@@ -1908,6 +1908,8 @@ void CardInput::channelScanner(void)
 #ifdef USING_BACKEND
     uint num_channels_before = SourceUtil::GetChannelCount(srcid);
 
+    save(); // save info for scanner.
+
     ScanWizard scanwizard(srcid);
     scanwizard.exec(false,true);
 
