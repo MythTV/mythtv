@@ -10,11 +10,30 @@
 #ifndef DVDINFO_H_
 #define DVDINFO_H_
 
-#include <qstring.h>
-#include <qptrlist.h>
+#include <inttypes.h>
 
+#ifndef UINT8_MAX
+#define UINT8_MAX
+#define UINT16_MAX
+#define INT32_MAX
+#define MAXDEFS
+#endif
+
+// C headers
+extern "C" { /* needed for inttypes.h by glibc 2.3.5 */
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_read.h>
+}
+
+#ifdef MAXDEFS
+#undef UINT8_MAX
+#undef UINT16_MAX
+#undef INT32_MAX
+#endif
+
+// Qt headers
+#include <qstring.h>
+#include <qptrlist.h>
 
 class DVDSubTitleInfo
 {

@@ -11,14 +11,33 @@
 #include <iostream>
 using namespace std;
 
+#include <inttypes.h>
+
+#ifndef UINT8_MAX
+#define UINT8_MAX
+#define UINT16_MAX
+#define INT32_MAX
+#define MAXDEFS
+#endif
+
+// C headers
+extern "C" {
 #include <dvdread/dvd_reader.h>
 #include <dvdread/ifo_types.h>
 #include <dvdread/ifo_read.h>
 #include <dvdread/nav_read.h>
+}
+
+#ifdef MAXDEFS
+#undef UINT8_MAX
+#undef UINT16_MAX
+#undef INT32_MAX
+#endif
 
 #include <qdatetime.h>
 #include <qdir.h>
 #include <qapplication.h>
+#include <qprocess.h>
 
 #include <mythtv/mythcontext.h>
 #include <mythtv/mythdbcon.h>
@@ -171,6 +190,63 @@ void JobThread::sendLoggingEvent(const QString &event_string)
 ---------------------------------------------------------------------
 */
 
+namespace 
+{ 
+    class MutexUnlocker 
+    { 
+      public: 
+        MutexUnlocker(QMutex *mutex) : m_mutex(mutex) 
+        { 
+            if (!(m_mutex && m_mutex->locked())) 
+            { 
+                cerr << __FILE__ << ": Invalid mutext passed to MutexUnlocker" 
+                        << endl; 
+            } 
+        } 
+ 
+        ~MutexUnlocker() 
+        { 
+            m_mutex->unlock(); 
+        } 
+ 
+      private: 
+        QMutex *m_mutex; 
+    }; 
+ 
+    template <typename HTYPE, typename CLEANF_RET = void> 
+    class SmartHandle 
+    { 
+      private: 
+        typedef CLEANF_RET (*clean_fun_t)(HTYPE); 
+ 
+      public: 
+        SmartHandle(HTYPE handle, clean_fun_t cleaner) : m_handle(handle),  
+                m_cleaner(cleaner) 
+        { 
+        } 
+ 
+        ~SmartHandle() { 
+            if (m_handle) 
+            { 
+                m_cleaner(m_handle); 
+            } 
+        } 
+
+        HTYPE get() 
+        { 
+            return m_handle; 
+        } 
+ 
+        HTYPE operator->() { 
+            return m_handle; 
+        } 
+ 
+      private: 
+        HTYPE m_handle; 
+        clean_fun_t m_cleaner; 
+    }; 
+} 
+ 
 DVDThread::DVDThread(MTD *owner, 
                      QMutex *drive_mutex, 
                      const QString &dvd_device, 
@@ -185,7 +261,6 @@ DVDThread::DVDThread(MTD *owner,
     dvd_device_location = dvd_device;
     dvd_title = track - 1;
     destination_file_string = dest_file;
-    ripfile = NULL;
     rip_name = name;
 }
 
@@ -229,10 +304,11 @@ bool DVDThread::ripTitle(int title_number,
         }
     }    
 
+    MutexUnlocker qmul(dvd_device_access);
+
     if(!keepGoing())
     {
         problem("abandoned job because master control said we need to shut down");
-        dvd_device_access->unlock();
         return false;
     }
 
@@ -244,16 +320,10 @@ bool DVDThread::ripTitle(int title_number,
     //  Lets open our destination file
     //
     
-    if(ripfile)
+    RipFile ripfile(to_location, extension, true);
+    if(!ripfile.open(IO_WriteOnly | IO_Raw | IO_Truncate, multiple_files))
     {
-        cerr << "jobthread.o: How is it that you already have a ripfile set?" << endl;
-        delete ripfile;
-        ripfile = NULL;
-    }
-    ripfile = new RipFile(to_location, extension);
-    if(!ripfile->open(IO_WriteOnly | IO_Raw | IO_Truncate, multiple_files))
-    {
-        problem(QString("DVDPerfectThread could not open output file: %1").arg(ripfile->name()));
+        problem(QString("DVDPerfectThread could not open output file: %1").arg(ripfile.name()));
         dvd_device_access->unlock();
         return false;
     }
@@ -265,27 +335,20 @@ bool DVDThread::ripTitle(int title_number,
     
     int angle = 0;  // Change that at some point
 
-    the_dvd = DVDOpen(dvd_device_location);
-    if(!the_dvd)
+    SmartHandle<dvd_reader_t *> the_dvd(DVDOpen(dvd_device_location),
+            DVDClose);
+    if(!the_dvd.get())
     {
         problem(QString("DVDPerfectThread could not access this dvd device: %1").arg(dvd_device_location));
-        ripfile->remove();
-        delete ripfile;
-        ripfile = NULL;
-        dvd_device_access->unlock();
+        ripfile.remove();
         return false;
     }
 
 
-    ifo_handle_t *vmg_file = ifoOpen( the_dvd, 0);
-    if(!vmg_file)
+    SmartHandle<ifo_handle_t *> vmg_file(ifoOpen(the_dvd.get(), 0), ifoClose);
+    if(!vmg_file.get())
     {
         problem("DVDPerfectThread could not open VMG info.");
-        ripfile->remove();
-        delete ripfile;
-        ripfile = NULL;
-        DVDClose(the_dvd);
-        dvd_device_access->unlock();
         return false;
     }
     tt_srpt_t *tt_srpt = vmg_file->tt_srpt;
@@ -297,25 +360,15 @@ bool DVDThread::ripTitle(int title_number,
     if(title_number < 0 || title_number > tt_srpt->nr_of_srpts )
     {
         problem(QString("DVDPerfectThread could not open title number %1").arg(title_number + 1));
-        ripfile->remove();
-        delete ripfile;
-        ripfile = NULL;
-        ifoClose(vmg_file);
-        DVDClose(the_dvd);
-        dvd_device_access->unlock();
         return false;
     }
 
-    ifo_handle_t *vts_file = ifoOpen(the_dvd, tt_srpt->title[title_number].title_set_nr);
-    if(!vts_file)
+    SmartHandle<ifo_handle_t *> vts_file(
+            ifoOpen(the_dvd.get(), tt_srpt->title[title_number].title_set_nr),
+            ifoClose);
+    if(!vts_file.get())
     {
         problem("DVDPerfectThread could not open the title's info file");
-        ripfile->remove();
-        delete ripfile;
-        ripfile = NULL;
-        ifoClose(vmg_file);
-        DVDClose(the_dvd);
-        dvd_device_access->unlock();
         return false;
     }
 
@@ -348,19 +401,14 @@ bool DVDThread::ripTitle(int title_number,
     //  OK ... now actually open
     //    
     
-    title = DVDOpenFile(the_dvd, 
-                        tt_srpt->title[ title_number ].title_set_nr, 
-                        DVD_READ_TITLE_VOBS );
-    if(!title)
+    SmartHandle<dvd_file_t *> title(
+            DVDOpenFile(the_dvd.get(),
+                    tt_srpt->title[title_number].title_set_nr,
+                    DVD_READ_TITLE_VOBS),
+            DVDCloseFile);
+    if(!title.get())
     {
         problem("DVDPerfectThread could not open the title's actual VOB(s)");
-        ripfile->remove();
-        delete ripfile;
-        ripfile = NULL;
-        ifoClose(vts_file);
-        ifoClose(vmg_file);
-        DVDClose(the_dvd);
-        dvd_device_access->unlock();
         return false;
     }
     
@@ -368,6 +416,8 @@ bool DVDThread::ripTitle(int title_number,
 
     QTime job_time;
     job_time.start();
+
+    unsigned char video_data[ 1024 * DVD_VIDEO_LB_LEN ];
     
     int next_cell = start_cell;    
     for(int cur_cell = start_cell; next_cell < cur_pgc->nr_of_cells; )
@@ -405,18 +455,10 @@ bool DVDThread::ripTitle(int title_number,
             //  Read the NAV packet.
             //            
             
-            int len = DVDReadBlocks( title, (int) cur_pack, 1, video_data );
+            int len = DVDReadBlocks(title.get(), (int) cur_pack, 1, video_data);
             if( len != 1)
             {
                 problem(QString("DVDPerfectThread read failed for block %1").arg(cur_pack));
-                ifoClose(vts_file);
-                ifoClose(vmg_file);
-                DVDCloseFile( title );
-                DVDClose(the_dvd);
-                dvd_device_access->unlock();
-                ripfile->remove();
-                delete ripfile;
-                ripfile = NULL;
                 return false;
             }
             
@@ -456,21 +498,14 @@ bool DVDThread::ripTitle(int title_number,
             //  Read in and output cursize packs
             //
             
-            len = DVDReadBlocks( title, (int)cur_pack, cur_output_size, video_data );
+            len = DVDReadBlocks(title.get(), (int)cur_pack, cur_output_size,
+                    video_data);
             if( len != (int) cur_output_size )
             {
                 problem(QString("DVDPerfectThread read failed for %1 blocks at %2") 
                         .arg(cur_output_size)
                         .arg(cur_pack)
                        );
-                ripfile->remove();
-                delete ripfile;
-                ripfile = NULL;
-                ifoClose(vts_file);
-                ifoClose(vmg_file);
-                DVDCloseFile( title );
-                DVDClose(the_dvd);
-                dvd_device_access->unlock();
                 return false;
             }
             
@@ -478,17 +513,10 @@ bool DVDThread::ripTitle(int title_number,
             overall_progress = subjob_progress * sub_to_overall_multiple;
             updateSubjobString(job_time.elapsed() / 1000, 
                                QObject::tr("Ripping to file ~"));
-            if(!ripfile->writeBlocks(video_data, cur_output_size * DVD_VIDEO_LB_LEN))
+            if(!ripfile.writeBlocks(video_data,
+                    cur_output_size * DVD_VIDEO_LB_LEN))
             {
                 problem("Couldn't write blocks during a rip. Filesystem size exceeded? Disc full?");
-                ripfile->remove();
-                delete ripfile;
-                ripfile = NULL;
-                DVDCloseFile( title );
-                ifoClose(vts_file);
-                ifoClose(vmg_file);
-                DVDClose(the_dvd);
-                dvd_device_access->unlock();
                 return false;
             }
 
@@ -504,14 +532,6 @@ bool DVDThread::ripTitle(int title_number,
             if(!keepGoing())
             {
                 problem("abandoned job because master control said we need to shut down");
-                ripfile->remove();
-                delete ripfile;
-                ripfile = NULL;
-                DVDCloseFile( title );
-                ifoClose(vts_file);
-                ifoClose(vmg_file);
-                DVDClose(the_dvd);
-                dvd_device_access->unlock();
                 return false;
             }
         }
@@ -521,22 +541,13 @@ bool DVDThread::ripTitle(int title_number,
     //  Wow, we're done.
     //
 
-    ifoClose(vts_file);
-    ifoClose(vmg_file);
-    DVDCloseFile( title );
-    DVDClose(the_dvd);
-    ripfile->close();
-    dvd_device_access->unlock();
+    ripfile.close();
     sendLoggingEvent("job thread finished ripping dvd title");
     return true;
 }
 
 DVDThread::~DVDThread()
 {
-    if(ripfile);
-    {
-        delete ripfile;
-    }
 }
 
 /*
@@ -1232,13 +1243,6 @@ void DVDTranscodeThread::cleanUp()
     //
     if(working_directory)
     {
-        if(ripfile)
-        {
-            ripfile->remove();
-            delete ripfile;
-            ripfile = NULL;
-        }
-            
         if(two_pass)
         {
             working_directory->remove("twopass.log");
@@ -1273,9 +1277,4 @@ DVDTranscodeThread::~DVDTranscodeThread()
     {
         delete tc_process;
     }
-    if(ripfile)
-    {
-        delete ripfile;
-    }
 }
-

@@ -9,14 +9,10 @@
 	Headers for logging object of the myth transcoding daemon
 
 */
-#include <unistd.h>
-#include <iostream>
-using namespace std;
 
 #include <qobject.h>
 #include <qstring.h>
 #include <qfile.h>
-#include <qtextstream.h>
 
 
 class MTDLogger : public QObject

@@ -10,10 +10,9 @@
 
 */
 
-#include <qsocket.h>
 #include <qserversocket.h>
 
-
+class QSocket;
 
 class MTDServerSocket : public QServerSocket
 {
