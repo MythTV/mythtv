@@ -66,7 +66,7 @@ VideoOutput *VideoOutput::InitVideoOut(VideoOutputType type, MythCodecID codec_i
     return new VideoOutputQuartz();
 #endif
 
-    VERBOSE(VB_IMPORTANT, "Not compiled with any usable video output method.");
+    VERBOSE(VB_IMPORTANT, "Not compiled with any useable video output method.");
     return NULL;
 }
 
