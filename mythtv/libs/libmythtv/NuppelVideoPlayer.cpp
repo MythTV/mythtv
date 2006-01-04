@@ -385,6 +385,12 @@ bool NuppelVideoPlayer::InitVideo(void)
             }
         }
 
+        if (!widget)
+        {
+            errored = true;
+            return false;
+        }
+
         videoOutput = VideoOutput::InitVideoOut(forceVideoOutput,
                                                 GetDecoder()->GetVideoCodecID());
 
