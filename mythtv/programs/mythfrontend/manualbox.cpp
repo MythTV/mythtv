@@ -217,7 +217,7 @@ void ManualBox::startPlayer(void)
 
         m_tv->EmbedOutput(m_pixlabel->winId(), 0, 0, (int)(320 * wmult),
                                                      (int)(240 * hmult));
-        if (m_tv->LiveTV(NULL, true))
+        if (m_tv->LiveTV(true))
         {
             qApp->unlock();
             while (m_tv->GetState() == kState_ChangingState)

@@ -441,6 +441,20 @@ TV::~TV(void)
 
     if (class LCD * lcd = LCD::Get())
         lcd->switchToTime();
+
+    if (tvchain)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Deleting TV Chain in destructor");
+        tvchain->DestroyChain();
+        delete tvchain;
+    }
+
+    if (piptvchain)
+    {
+        VERBOSE(VB_IMPORTANT, LOC + "Deleting PiP TV Chain in destructor");
+        piptvchain->DestroyChain();
+        delete piptvchain;
+    }    
 }
 
 TVState TV::GetState(void) const
@@ -462,14 +476,22 @@ void TV::GetPlayGroupSettings(const QString &group)
         prev_speed = normal_speed;
 }
 
-/** \fn LiveTV(LiveTVChain*, bool)
+/** \fn LiveTV(bool)
  *  \brief Starts LiveTV
+ *  \param showDialogs if true error dialogs are shown, if false they are not
  */
-int TV::LiveTV(LiveTVChain *chain, bool showDialogs)
+int TV::LiveTV(bool showDialogs)
 {
     if (internalState == kState_None && RequestNextRecorder(showDialogs))
     {
-        tvchain = chain;
+        if (tvchain)
+        {
+            tvchain->DestroyChain();
+            delete tvchain;
+        }
+        tvchain = new LiveTVChain();
+        tvchain->InitializeNewChain(gContext->GetHostName());
+
         ChangeState(kState_WatchingLiveTV);
         switchToRec = NULL;
 
@@ -1285,6 +1307,13 @@ void TV::TeardownPlayer(void)
     {
         delete piprbuffer;
         piprbuffer = NULL;
+    }
+
+    if (tvchain)
+    {
+        tvchain->DestroyChain();
+        delete tvchain;
+        tvchain = NULL;
     }
 }
 
@@ -2997,7 +3026,7 @@ void TV::SwitchCards(uint chanid, QString channum)
 
     RemoteEncoder *testrec = NULL;
 
-    if (!StateIsLiveTV(GetState()))
+    if (!StateIsLiveTV(GetState()) || (activenvp != nvp) || pipnvp)
         return;
 
     if (/*chanid || */!channum.isEmpty())
@@ -3024,8 +3053,81 @@ void TV::SwitchCards(uint chanid, QString channum)
 
     if (testrec && testrec->IsValidRecorder())
     {
-        switchToRec = testrec;
-        exitPlayer  = true;
+        // shutdown stuff
+        prbuffer->Pause();
+        prbuffer->WaitForPause();
+        nvp->StopPlaying();
+        recorder->StopLiveTV();
+        {
+            QMutexLocker locker(&osdlock); // prevent UpdateOSDSignal using osd
+            pthread_join(decode, NULL);
+            delete nvp;
+            activenvp = nvp = NULL;
+        }
+
+        delete recorder;
+        activerecorder = recorder = NULL;
+
+        delete prbuffer;
+        activerbuffer = prbuffer = NULL;
+
+        if (playbackinfo)
+        {
+            delete playbackinfo;
+            playbackinfo = NULL;
+        }
+
+        // now restart stuff
+        lastSignalUIInfo.clear();
+        lockTimerOn = false;
+
+        activerecorder = recorder = testrec;
+        recorder->Setup();
+        recorder->SpawnLiveTV(tvchain->GetID(), false);
+        tvchain->ReloadAll();
+        playbackinfo = tvchain->GetProgramAt(-1);
+
+        if (!playbackinfo)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "LiveTV not successfully restarted");
+            gContext->RestoreScreensaver();
+            DeleteRecorder();
+
+            exitPlayer = true;
+        }
+        else
+        {
+            tvchain->SetProgram(playbackinfo);
+            prbuffer = new RingBuffer(playbackinfo->pathname, false);
+            prbuffer->SetLiveMode(tvchain);
+        }
+
+        bool ok = false;
+        if (playbackinfo && StartRecorder(recorder,-1))
+        {
+            if (StartPlayer(false))
+                ok = true;
+            else
+                StopStuff(true, true, true);
+        }
+
+        if (!ok)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "LiveTV not successfully started");
+            gContext->RestoreScreensaver();
+            DeleteRecorder();
+
+            exitPlayer = true;
+        }
+        else
+        {
+            activenvp = nvp;
+            activerbuffer = prbuffer;
+            lockTimer.start();
+            lockTimerOn = true;
+        }
     }
     else
     {

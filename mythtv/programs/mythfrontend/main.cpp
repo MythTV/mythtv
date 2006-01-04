@@ -45,7 +45,6 @@ using namespace std;
 #include "statusbox.h"
 #include "lcddevice.h"
 #include "langsettings.h"
-#include "livetvchain.h"
 
 #define NO_EXIT  0
 #define QUIT     1
@@ -244,9 +243,6 @@ void startTV(void)
 {
     TV *tv = new TV();
 
-    MythTimer timer;
-    timer.start();
-
     if (!tv->Init())
     {
         VERBOSE(VB_IMPORTANT, "Experienced fatal error "
@@ -255,15 +251,10 @@ void startTV(void)
         return;
     }
 
-    bool tryTV = false;
-    bool tryRecorder = false;
     bool quitAll = false;
     bool showDialogs = true;
 
-    LiveTVChain *tvchain = new LiveTVChain();
-    QString chainid = tvchain->InitializeNewChain(gContext->GetHostName());
-
-    if (!tv->LiveTV(tvchain, showDialogs))
+    if (!tv->LiveTV(showDialogs))
     {
         tv->StopLiveTV();
         quitAll = true;
@@ -271,46 +262,6 @@ void startTV(void)
 
     while (!quitAll)
     {
-        timer.restart();
-        while (tryRecorder)
-        { //try to play recording, if filenotfound retry until timeout
-
-            if (tv->PlayFromRecorder(tv->GetLastRecorderNum()) == 1)
-                tryRecorder = false;
-            else if (timer.elapsed() > 2000)
-            {
-                tryRecorder = false;
-                tryTV = true;
-            }
-            else
-            {
-                qApp->unlock();
-                qApp->processEvents();
-                usleep(100000);
-                qApp->lock();
-             }
-        }
-
-        timer.restart();
-        while (tryTV)
-        {//try to start livetv
-            bool showDialogs = false;
-            if (tv->LiveTV(tvchain, showDialogs) == 1) //1 == livetv ok
-                tryTV = false;
-            else if (timer.elapsed() > 2000)
-            {
-                tryTV = false;
-                quitAll = true;
-            }
-            else
-            {
-                qApp->unlock();
-                qApp->processEvents();
-                usleep(100000);
-                qApp->lock();
-            }
-        }
-
         while (tv->GetState() != kState_None)
         {
             qApp->unlock();
@@ -319,21 +270,8 @@ void startTV(void)
             qApp->lock();
         }
 
-        if (tv->WantsToQuit() && !tv->IsSwitchingCards())
+        if (tv->WantsToQuit())
             quitAll = true;
-        else
-        {
-            if (tv->IsSwitchingCards())
-            {
-                tryRecorder = false;
-                tryTV = true;
-            }
-            else
-            {
-                tryRecorder = true;
-                tryTV = false;
-            }
-        }
     }
 
     while (tv->IsMenuRunning()) 
@@ -345,9 +283,6 @@ void startTV(void)
     }
 
     delete tv;
-
-    tvchain->DestroyChain();
-    delete tvchain;
 }
 
 void showStatus(void)
