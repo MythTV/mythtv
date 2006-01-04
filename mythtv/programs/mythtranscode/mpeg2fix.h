@@ -6,6 +6,7 @@
 #include <qptrqueue.h>
 #include <qvaluelist.h>
 #include <qstringlist.h>
+#include <qdatetime.h>
 
 extern "C"
 {
@@ -129,7 +130,7 @@ class MPEG2fixup
   public:
     MPEG2fixup(const char *inf, const char *outf,
                QMap<long long, int> *deleteMap, const char *fmt, int norp,
-               int fixPTS, int maxf);
+               int fixPTS, int maxf, bool showprog);
     ~MPEG2fixup();
     int Start();
     void AddCutlist(QStringList cutlist);
@@ -240,6 +241,11 @@ class MPEG2fixup
     //complete?
     bool file_end;
     bool real_file_end;
+
+    //progress indicators
+    QDateTime statustime;
+    bool showprogress;
+    uint64_t filesize;
 };
 
 #ifdef NO_MYTH

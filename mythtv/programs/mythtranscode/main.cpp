@@ -398,7 +398,8 @@ int main(int argc, char *argv[])
             pginfo->GetCutList(deleteMap);
        
         MPEG2fixup *m2f = new MPEG2fixup(infile.ascii(), outfile.ascii(),
-                                         &deleteMap, NULL, false, false, 20);
+                                         &deleteMap, NULL, false, false, 20,
+                                         showprogress);
         if (build_index)
         {
             int err = BuildKeyframeIndex(m2f, infile, posMap, jobID);

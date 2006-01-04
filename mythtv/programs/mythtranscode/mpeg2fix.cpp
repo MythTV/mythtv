@@ -135,7 +135,8 @@ void PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS)
 
 MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
                        QMap<long long, int> *deleteMap,
-                       const char *fmt, int norp, int fixPTS, int maxf)
+                       const char *fmt, int norp, int fixPTS, int maxf,
+                       bool showprog)
 {
     displayFrame = new QPtrListIterator<MPEG2frame> (vFrame);
 
@@ -179,6 +180,18 @@ MPEG2fixup::MPEG2fixup(const char *inf, const char *outf,
     pthread_cond_wait(&rx.cond, &rx.mutex);
     pthread_mutex_unlock(&rx.mutex);
 
+    //initialize progress stats
+    showprogress = showprog;
+    if (showprogress)
+    {
+        statustime = QDateTime::currentDateTime();
+        statustime = statustime.addSecs(5);
+
+        struct stat filestat;
+        if(stat(inf, &filestat)) {
+        }
+        filesize = filestat.st_size;
+    }
 }
 
 MPEG2fixup::~MPEG2fixup()
@@ -1126,7 +1139,13 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
                     aFrame.contains(pkt->stream_index))
                 done = 1;
         }
-
+        if (showprogress && QDateTime::currentDateTime() > statustime)
+        {
+            VERBOSE(MPF_IMPORTANT, QString("%%1 complete")
+                    .arg(100*pkt->pos/filesize));
+            statustime = QDateTime::currentDateTime();
+            statustime = statustime.addSecs(5);
+        }
         MPEG2frame *tmpFrame = GetPoolFrame(pkt);
         if (tmpFrame == NULL)
             return -1;
@@ -2097,6 +2116,7 @@ void usage(char *s)
     fprintf(stderr, "\t--cutlist \"start - end\" -c : Apply a cutlist.  Specify on e'-c' per cut\n");
     fprintf(stderr, "\t--no3to2           -t        : Remove 3:2 pullup\n");
     fprintf(stderr, "\t--fixup            -f        : make PTS contiuous\n");
+    fprintf(stderr, "\t--showprogress     -s        : show progress\n");
     fprintf(stderr, "\t--help             -h        : This screen\n");
     exit(0);
 }
@@ -2106,7 +2126,7 @@ int main(int argc, char **argv)
     QStringList cutlist;
     char *infile = NULL, *outfile = NULL, *format = NULL;
     int no_repeat = 0, fix_PTS = 0, max_frames = 20;
-
+    bool showprogress = 0;
     const struct option long_options[] =
         {
             {"infile", required_argument, NULL, 'i'
@@ -2118,6 +2138,7 @@ int main(int argc, char **argv)
             {"cutlist", required_argument, NULL, 'c'},
             {"no3to2", no_argument, NULL, 't'},
             {"fixup", no_argument, NULL, 'f'},
+            {"showprogress", no_argument, NULL, 's'},
             {"help", no_argument , NULL, 'h'},
             {0, 0, 0, 0}
         };
@@ -2126,7 +2147,7 @@ int main(int argc, char **argv)
     {
         int option_index = 0;
         char c;
-        c = getopt_long (argc, argv, "i:o:d:r:m:c:tfh",
+        c = getopt_long (argc, argv, "i:o:d:r:m:c:tfsh",
                          long_options, &option_index);
 
         if (c == -1)
@@ -2166,6 +2187,10 @@ int main(int argc, char **argv)
                 fix_PTS = 1;
                 break;
 
+            case 's':
+                showprogress = true;
+                break;
+
             case 'h':
 
             case '?':
@@ -2179,7 +2204,8 @@ int main(int argc, char **argv)
         usage(argv[0]);
 
     MPEG2fixup m2f(infile, outfile, NULL, format, 
-                   no_repeat, fix_PTS, max_frames);
+                   no_repeat, fix_PTS, max_frames,
+                   showprogress);
 
     if (cutlist.count())
         m2f.AddCutlist(cutlist);
