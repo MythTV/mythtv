@@ -174,6 +174,8 @@ static int webtv_check(char *buf, int len)
 }
 #endif
 
+#if 0
+// don't use this, blocking IO prevents shuttown of the NVP
 struct cc *cc_open(const char *vbi_name)
 {
     struct cc *cc;
@@ -196,6 +198,7 @@ struct cc *cc_open(const char *vbi_name)
 
     return cc;
 }
+#endif
 
 void cc_close(struct cc *cc)
 {
@@ -209,6 +212,8 @@ void cc_close(struct cc *cc)
 // 2 = new channel 2 data present in outtext
 // -1 = invalid cc data, reset all outtext
 // -2 = readerror
+#if 0
+// don't use this, blocking IO prevents shuttown of the NVP
 void cc_handler(struct cc *cc)
 {
     if (read(cc->fd, cc->buffer, CC_VBIBUFSIZE) != CC_VBIBUFSIZE)
@@ -222,4 +227,15 @@ void cc_handler(struct cc *cc)
         cc->code1 = decode((unsigned char *)(cc->buffer + (2048 * 11)));
         cc->code2 = decode((unsigned char *)(cc->buffer + (2048 * 27)));
     }
+}
+#endif
+
+void cc_decode(struct cc *cc)
+{
+    int spl    = cc->samples_per_line;
+    int sl     = cc->start_line;
+    int l21_f1 = spl * (21 - sl);
+    int l21_f2 = spl * (cc->line_count + 21 - sl);
+    cc->code1 = decode((unsigned char *)(cc->buffer + l21_f1));
+    cc->code2 = decode((unsigned char *)(cc->buffer + l21_f2));
 }

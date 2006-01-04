@@ -2522,42 +2522,100 @@ static void vbi_event(struct VBIData *data, struct vt_event *ev)
     }
 }
 
+/*
+These are the default values for various VBI drivers
+// bttv
+vbi_format  rate: 28636363
+samples_per_line: 2048
+          starts: 10, 273
+          counts: 16, 16
+           flags: 0x0
+// cx88
+vbi_format  rate: 28636363
+samples_per_line: 2048
+          starts: 9, 272
+          counts: 17, 17
+           flags: 0x0
+*/
+
 void NuppelVideoRecorder::doVbiThread(void)
 {
-    struct vbi *vbi = NULL;
-    struct cc *cc = NULL;
-    int vbifd;
+    //VERBOSE(VB_IMPORTANT, LOC + "vbi begin");
+    struct VBIData vbicallbackdata;
+    struct vbi *pal_tt = NULL;
+    struct cc *ntsc_cc = NULL;
+    int vbifd = -1;
+    char *ptr = NULL;
+    char *ptr_end = NULL;
 
-    switch (vbimode)
+    if (VBIMode::PAL_TT == vbimode)
     {
-        case 1:
-            vbi = vbi_open(vbidevice.ascii(), NULL, 99, -1);
-            if (!vbi)
-            {
-                VERBOSE(VB_IMPORTANT, QString("NVR: Can't open vbi device: %1").arg(vbidevice));
-                return;
-            }
-            vbifd = vbi->fd;
-            break;
-        case 2:
-            cc = cc_open(vbidevice.ascii());
-            if (!cc)
-            {
-                VERBOSE(VB_IMPORTANT, QString("NVR: Can't open vbi device: %1").arg(vbidevice));
-                return; 
-            }
-            vbifd = cc->fd;
-            break;
-        case 3:
-        default:
-            return;
+        pal_tt = vbi_open(vbidevice.ascii(), NULL, 99, -1);
+        if (pal_tt)
+        {
+            vbifd = pal_tt->fd;
+            vbicallbackdata.nvr = this;
+            vbi_add_handler(pal_tt, (void*) vbi_event, &vbicallbackdata);
+        }
+    }
+    else if (VBIMode::NTSC_CC == vbimode)
+    {
+        ntsc_cc = new struct cc;
+        bzero(ntsc_cc, sizeof(struct cc));
+        ntsc_cc->fd = open(vbidevice.ascii(), O_RDONLY|O_NONBLOCK);
+        ntsc_cc->code1 = -1;
+        ntsc_cc->code2 = -1;
+
+        vbifd   = ntsc_cc->fd;
+        ptr     = ntsc_cc->buffer;
+
+        if (vbifd < 0)
+            delete ntsc_cc;
+    }
+    else
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR + "Invalid CC/Teletext mode");
+        return;
     }
 
-    struct VBIData vbicallbackdata;
-    vbicallbackdata.nvr = this;
+    if (vbifd < 0)
+    {
+        VERBOSE(VB_IMPORTANT, LOC_ERR +
+                QString("Can't open vbi device: '%1'").arg(vbidevice));
+        return;
+    }
 
-    if (vbimode == 1)
-        vbi_add_handler(vbi, (void*) vbi_event, &vbicallbackdata);
+    if (VBIMode::NTSC_CC == vbimode)
+    {
+        // V4L v1 VBI ioctls
+        struct vbi_format vfmt;
+        bzero(&vfmt, sizeof(vbi_format));
+        if (ioctl(vbifd, VIDIOCGVBIFMT, &vfmt) < 0)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "Failed to query vbi capabilities (v4l1)");
+            return;
+        }
+        VERBOSE(VB_RECORD, "vbi_format  rate: "<<vfmt.sampling_rate
+                <<"\n\t\t\tsamples_per_line: "<<vfmt.samples_per_line
+                <<"\n\t\t\t          starts: "
+                <<vfmt.start[0]<<", "<<vfmt.start[1]
+                <<"\n\t\t\t          counts: "
+                <<vfmt.count[0]<<", "<<vfmt.count[1]
+                <<"\n\t\t\t           flags: "
+                <<QString("0x%1").arg(vfmt.flags));
+        uint sz = vfmt.samples_per_line * (vfmt.count[0] + vfmt.count[1]);
+        ntsc_cc->samples_per_line = vfmt.samples_per_line;
+        ntsc_cc->start_line       = vfmt.start[0];
+        ntsc_cc->line_count       = vfmt.count[0];
+        ptr_end = ntsc_cc->buffer + sz;
+        if (sz > CC_VBIBUFSIZE)
+        {
+            VERBOSE(VB_IMPORTANT, LOC_ERR +
+                    "VBI format has too many samples per frame");
+            return;
+        }
+    }
 
     while (childrenLive) 
     {
@@ -2570,53 +2628,56 @@ void NuppelVideoRecorder::doVbiThread(void)
         struct timeval tv;
         fd_set rdset;
 
-        tv.tv_sec = 5;
-        tv.tv_usec = 0;
+        tv.tv_sec = 0;
+        tv.tv_usec = 5000;
         FD_ZERO(&rdset);
         FD_SET(vbifd, &rdset);
 
-        switch (select(vbifd + 1, &rdset, 0, 0, &tv))
-        {
-            case -1:
-                  perror("vbi select");
-                  continue;
-            case 0:
-                  //printf("vbi select timeout\n");
-                  continue;
-        }
+        int nr = select(vbifd + 1, &rdset, 0, 0, &tv);
+        if (nr < 0)
+            VERBOSE(VB_IMPORTANT, LOC_ERR + "vbi select failed" + ENO);
 
-        switch (vbimode)
+        if (nr <= 0)
+            continue; // either failed or timed out..
+
+        if (VBIMode::PAL_TT == vbimode)
         {
-            case 1:
-                vbicallbackdata.foundteletextpage = false;
-                vbi_handler(vbi, vbi->fd);
-                if (vbicallbackdata.foundteletextpage)
-                {
-                    // decode VBI as teletext subtitles
-                    FormatTeletextSubtitles(&vbicallbackdata);
-                }
-                break;
-            case 2:
-                cc_handler(cc);
-                FormatCC(cc);
-                break;
+            vbicallbackdata.foundteletextpage = false;
+            vbi_handler(pal_tt, pal_tt->fd);
+            if (vbicallbackdata.foundteletextpage)
+            {
+                // decode VBI as teletext subtitles
+                FormatTeletextSubtitles(&vbicallbackdata);
+            }
+        }
+        else if (VBIMode::NTSC_CC == vbimode)
+        {
+            int ret = read(vbifd, ptr, ptr_end - ptr);
+            ptr = (ret > 0) ? ptr + ret : ptr;
+            if ((ptr_end - ptr) == 0)
+            {
+                cc_decode(ntsc_cc);
+                FormatCC(ntsc_cc);
+                ptr = ntsc_cc->buffer;
+            }
+            else if (ret < 0)
+            {
+                VERBOSE(VB_IMPORTANT, LOC_ERR + "Reading VBI data" + ENO);
+            }
         }
     }
+    //VERBOSE(VB_RECORD, LOC + "vbi shutdown");
 
-    switch (vbimode)
+    if (pal_tt)
     {
-        case 1:
-            vbi_del_handler(vbi, (void*) vbi_event, &vbicallbackdata);
-            vbi_close(vbi);
-            vbi = NULL;
-            break;
-        case 2:
-             cc_close(cc);
-             cc = NULL;
-             break;
-        default:
-             return;
+        vbi_del_handler(pal_tt, (void*) vbi_event, &vbicallbackdata);
+        vbi_close(pal_tt);
     }
+
+    if (ntsc_cc)
+        cc_close(ntsc_cc);
+
+    //VERBOSE(VB_RECORD, LOC + "vbi end");
 }
 
 
