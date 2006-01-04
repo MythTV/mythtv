@@ -2553,8 +2553,6 @@ struct pip_info
 
 void TV::SwapPIP(void)
 {
-    VERBOSE(VB_IMPORTANT, LOC + "SwapPIP temporarily disabled");
-#if 0
     if (!pipnvp || !piptvchain || !tvchain) 
         return;
 
@@ -2629,7 +2627,6 @@ void TV::SwapPIP(void)
         SetCurrentlyPlaying(pginfo);
         delete pginfo;
     }
-#endif
 }
 
 void TV::DoPlay(void)
