@@ -45,15 +45,19 @@ ClassicCommDetector::ClassicCommDetector(int commDetectMethod_in,
                                          bool showProgress_in,
                                          bool fullSpeed_in,
                                          NuppelVideoPlayer* nvp_in,
+                                         const QDateTime& startedAt_in,
+                                         const QDateTime& stopsAt_in,
                                          const QDateTime& recordingStartedAt_in,
                                          const QDateTime& recordingStopsAt_in) :
         commDetectMethod(commDetectMethod_in),
         showProgress(showProgress_in),
         fullSpeed(fullSpeed_in),
         nvp(nvp_in),
+        startedAt(startedAt_in),
+        stopsAt(stopsAt_in),
         recordingStartedAt(recordingStartedAt_in),
         recordingStopsAt(recordingStopsAt_in),
-        framesProcessed(0)
+        framesProcessed(0),preRoll(0),postRoll(0)
 {
 
     edgeMask = NULL;
@@ -108,6 +112,9 @@ void ClassicCommDetector::Init()
     width = nvp->GetVideoWidth();
     height = nvp->GetVideoHeight();
     fps = nvp->GetFrameRate();
+
+    preRoll  = (long long)(max(0,recordingStartedAt.secsTo(startedAt)) * fps);
+    postRoll = (long long)(max(0,stopsAt.secsTo(recordingStopsAt)) * fps);
 
 #ifdef SHOW_DEBUG_WIN
     comm_debug_init(width, height);
@@ -250,7 +257,7 @@ bool ClassicCommDetector::go()
     
     int requiredHeadStart = 30;
     if (commDetectMethod & COMM_DETECT_LOGO)
-        requiredHeadStart += commDetectLogoSecondsNeeded;
+        requiredHeadStart += preRoll + commDetectLogoSecondsNeeded;
     else
         requiredHeadStart += 30;
 
@@ -1122,24 +1129,24 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
 
     if (decoderFoundAspectChanges)
     {
-        for(long long i = 0; i < framesProcessed; i++ )
+        for(long long i = preRoll; i < (framesProcessed - postRoll); i++ )
         {
             if ((frameInfo.contains(i)) &&
                 (frameInfo[i].aspect == COMM_ASPECT_NORMAL))
                 aspectFrames++;
         }
 
-        if (aspectFrames < (framesProcessed / 2))
+        if (aspectFrames < ((framesProcessed - preRoll - postRoll) / 2))
         {
             aspect = COMM_ASPECT_WIDE;
-            aspectFrames = framesProcessed - aspectFrames;
+            aspectFrames = framesProcessed - preRoll - postRoll - aspectFrames;
         }
     }
     else
     {
         memset(&formatCounts, 0, sizeof(formatCounts));
 
-        for(long long i = 0; i < framesProcessed; i++ )
+        for(long long i = preRoll; i < (framesProcessed - postRoll); i++ )
             if ((frameInfo.contains(i)) &&
                 (frameInfo[i].format >= 0) &&
                 (frameInfo[i].format < COMM_FORMAT_MAX))
@@ -2504,7 +2511,7 @@ void ClassicCommDetector::SearchForLogo()
         nvp->DiscardVideoFrame(nvp->GetRawVideoFrame(0));
 
         loops = 0;
-        seekFrame = seekIncrement;
+        seekFrame = preRoll + seekIncrement;
 
         while(loops < maxLoops && !nvp->GetEof())
         {

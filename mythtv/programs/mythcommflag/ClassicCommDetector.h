@@ -12,7 +12,9 @@ class ClassicCommDetector : public CommDetectorBase
     public:
         ClassicCommDetector(int commDetectMethod, bool showProgress,
                             bool fullSpeed, NuppelVideoPlayer* nvp,
-                            const QDateTime& recordingStartedAt,
+                            const QDateTime& startedAt_in,
+                            const QDateTime& stopsAt_in,
+                            const QDateTime& recordingStartedAt_in,
                             const QDateTime& recordingStopsAt_in);
         virtual ~ClassicCommDetector();
         bool go();
@@ -94,6 +96,7 @@ class ClassicCommDetector : public CommDetectorBase
         bool showProgress;
         bool fullSpeed;
         NuppelVideoPlayer *nvp;
+        QDateTime startedAt, stopsAt;
         QDateTime recordingStartedAt, recordingStopsAt;
         bool stillRecording;
         QMap<long long,int> lastSentCommBreakMap;
@@ -134,6 +137,8 @@ class ClassicCommDetector : public CommDetectorBase
         int currentAspect;
 
         long long framesProcessed;
+        long long preRoll;
+        long long postRoll;
 
         int totalMinBrightness;
 

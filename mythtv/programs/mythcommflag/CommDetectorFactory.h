@@ -25,8 +25,10 @@ public:
 
 	CommDetectorBase* makeCommDetector(int commDetectMethod, bool showProgress,
                                        bool fullSpeed, NuppelVideoPlayer* nvp,
+                                       const QDateTime& startedAt,
+                                       const QDateTime& stopsAt,
                                        const QDateTime& recordingStartedAt,
-                                       const QDateTime& recordingStopsAt_in);
+                                       const QDateTime& recordingStopsAt);
 };
 
 #endif

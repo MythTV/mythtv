@@ -8,6 +8,8 @@ CommDetectorBase*
     CommDetectorFactory::makeCommDetector(int commDetectMethod,
                                           bool showProgress, bool fullSpeed,
                                           NuppelVideoPlayer* nvp,
+                                          const QDateTime& startedAt,
+                                          const QDateTime& stopsAt,
                                           const QDateTime& recordingStartedAt,
                                           const QDateTime& recordingStopsAt)
 {
@@ -16,7 +18,8 @@ CommDetectorBase*
 		//Future different CommDetect implementations will be created here.
         default:
 			return new ClassicCommDetector(commDetectMethod, showProgress,
-                                           fullSpeed, nvp, recordingStartedAt,
+                                           fullSpeed, nvp, startedAt,
+                                           stopsAt, recordingStartedAt,
                                            recordingStopsAt);
 	}
 	

@@ -301,6 +301,8 @@ int DoFlagCommercials(bool showPercentage, bool fullSpeed, bool inJobQueue,
     CommDetectorFactory factory;
     commDetector = factory.makeCommDetector(commDetectMethod, showPercentage,
                                             fullSpeed, nvp,
+                                            program_info->startts,
+                                            program_info->endts,
                                             program_info->recstartts,
                                             program_info->recendts);
 
