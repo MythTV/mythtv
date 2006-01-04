@@ -1418,13 +1418,13 @@ bool PlaybackBox::FillList()
                     progLists[p->title].prepend(p);
                     sTitle = p->title;
                     sTitle.remove(prefixes);
-                    sortedList[sTitle] = p->title;
+                    sortedList[sTitle.lower()] = p->title;
                 } 
 
                 if (useRecGroups && p->recgroup != "") // Show recording groups                 
                 { 
                     progLists[p->recgroup].prepend(p);
-                    sortedList[p->recgroup] = p->recgroup;
+                    sortedList[p->recgroup.lower()] = p->recgroup;
 
                     // If another view is also used, unset autodelete as another group will do it.
                     if ((useCategories) || (titleView))
@@ -1434,7 +1434,7 @@ bool PlaybackBox::FillList()
                 if (useCategories && p->category != "") // Show categories
                 {
                     progLists[p->category].prepend(p);
-                    sortedList[p->category] = p->category;
+                    sortedList[p->category.lower()] = p->category;
                     // If another view is also used, unset autodelete as another group will do it
                     if ((useRecGroups) || (titleView)) 
                         progLists[p->category].setAutoDelete(false);
