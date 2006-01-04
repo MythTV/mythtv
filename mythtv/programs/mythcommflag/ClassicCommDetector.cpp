@@ -1137,7 +1137,7 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
     }
     else
     {
-        for (int i=0;i<COMM_FORMAT_MAX;i++) formatCounts[i]=0;
+        memset(&formatCounts, 0, sizeof(formatCounts));
 
         for(long long i = 0; i < framesProcessed; i++ )
             if ((frameInfo.contains(i)) &&
@@ -1316,6 +1316,15 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 }
             }
 
+            if ((!decoderFoundAspectChanges) &&
+                (fbp->formatMatch < (fbp->frames * .10)))
+            {
+                if (verboseDebugging)
+                    VERBOSE(VB_COMMFLAG, "      < 10% of frames match show "
+                            "letter/pillar-box format, -20");
+                fbp->score -= 20;
+            }
+
             if ((abs((int)(fbp->frames - (15 * fps))) < 5 ) ||
                 (abs((int)(fbp->frames - (30 * fps))) < 6 ) ||
                 (abs((int)(fbp->frames - (60 * fps))) < 8 ))
@@ -1341,6 +1350,15 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
                 fbp->score -= 10;
             }
 
+            if ((!decoderFoundAspectChanges) &&
+                (fbp->formatMatch < (fbp->frames * .10)))
+            {
+                if (verboseDebugging)
+                    VERBOSE(VB_COMMFLAG, "      < 10% of frames match show "
+                            "letter/pillar-box format, -10");
+                fbp->score -= 10;
+            }
+
             if (fbp->ratingCount > (fbp->frames * 0.25))
             {
                 if (verboseDebugging)
@@ -1350,71 +1368,13 @@ void ClassicCommDetector::BuildAllMethodsCommList(void)
             }
         }
 
-        if (decoderFoundAspectChanges)
+        if ((decoderFoundAspectChanges) &&
+            (fbp->aspectMatch < (fbp->frames * .10)))
         {
-            if (fbp->aspectMatch > (fbp->frames * .90))
-            {
-                if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      > 90% of frames match show "
-                            "aspect, +10");
-                fbp->score += 10;
-
-                if (fbp->aspectMatch > (fbp->frames * .95))
-                {
-                    if (verboseDebugging)
-                        VERBOSE(VB_COMMFLAG, "      > 95% of frames match show "
-                                "aspect, +10");
-                    fbp->score += 10;
-                }
-            }
-            else if (fbp->aspectMatch < (fbp->frames * .10))
-            {
-                if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      < 10% of frames match show "
-                            "aspect, -10");
-                fbp->score -= 10;
-
-                if (fbp->aspectMatch < (fbp->frames * .05))
-                {
-                    if (verboseDebugging)
-                        VERBOSE(VB_COMMFLAG, "      < 5% of frames match show "
-                                "aspect, -10");
-                    fbp->score -= 10;
-                }
-            }
-        }
-        else if (format != COMM_FORMAT_NORMAL)
-        {
-            if (fbp->formatMatch > (fbp->frames * .90))
-            {
-                if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      > 90% of frames match show "
-                            "letter/pillar-box format, +10");
-                fbp->score += 10;
-
-                if (fbp->formatMatch > (fbp->frames * .95))
-                {
-                    if (verboseDebugging)
-                        VERBOSE(VB_COMMFLAG, "      > 95% of frames match show "
-                                "letter/pillar-box format, +10");
-                    fbp->score += 10;
-                }
-            }
-            else if (fbp->formatMatch < (fbp->frames * .10))
-            {
-                if (verboseDebugging)
-                    VERBOSE(VB_COMMFLAG, "      < 10% of frames match show "
-                            "letter/pillar-box format, -10");
-                fbp->score -= 10;
-
-                if (fbp->formatMatch < (fbp->frames * .05))
-                {
-                    if (verboseDebugging)
-                        VERBOSE(VB_COMMFLAG, "      < 5% of frames match show "
-                                "letter/pillar-box format, -10");
-                    fbp->score -= 10;
-                }
-            }
+            if (verboseDebugging)
+                VERBOSE(VB_COMMFLAG, "      < 10% of frames match show "
+                        "aspect, -20");
+            fbp->score -= 20;
         }
 
         msg.sprintf("  NOW %3d:%02d %6ld %6ld %6ld %7.2f %3d %6d %6d %6d "
