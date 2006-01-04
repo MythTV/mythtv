@@ -4325,7 +4325,7 @@ int NuppelVideoPlayer::GetSecondsBehind(void) const
     return (int)((float)(written - played) / video_frame_rate);
 }
 
-void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo) const
+void NuppelVideoPlayer::calcSliderPos(struct StatusPosInfo &posInfo)
 {
     posInfo.desc = "";
     posInfo.position = 0;
