@@ -85,15 +85,18 @@ class MPEG2ptsdelta
 typedef QValueList<MPEG2ptsdelta> MPEG2ptsDeltaList;
 
 typedef QMap<int64_t, int64_t> ptsmap;
+typedef QMap<int64_t, int> offset_keytype;
 class PTSOffsetQueue
 {
   public:
     PTSOffsetQueue(QValueList<int> keys, int64_t initPTS);
-    void SetNext(int64_t newPTS, int64_t atPTS, bool setOrig);
-    int64_t Get(int idx, int64_t PTS);
-    void UpdateOrigPTS(int idx, int64_t &origPTS);
+    void SetNextPTS(int64_t newPTS, int64_t atPTS);
+    void SetNextPos(int64_t newPTS, int64_t atPos);
+    int64_t Get(int idx, int64_t PTS, int64_t Pos);
+    void UpdateOrigPTS(int idx, int64_t &origPTS, int64_t Pos);
   private:
-    QMap<int64_t, ptsmap> offset;
+    QMap<int, ptsmap> offset;
+    QMap<int, offset_keytype> keytype;
     QMap<int, ptsmap> orig;
     QValueList<int> keyList;
 };

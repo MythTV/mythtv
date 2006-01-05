@@ -87,22 +87,32 @@ PTSOffsetQueue::PTSOffsetQueue(QValueList<int> keys, int64_t initPTS)
     keyList.append(0);
     
     for (it = keyList.begin(); it != keyList.end(); ++it)
+    {
         offset[*it][0] = initPTS;
+        keytype[*it][0] = 1;
+    }
 }
 
-int64_t PTSOffsetQueue::Get(int idx, int64_t PTS)
+int64_t PTSOffsetQueue::Get(int idx, int64_t PTS, int64_t Pos)
 {
     QMap<int64_t, int64_t>::Iterator it;
+    QMap<int64_t, int>::Iterator it_key;
     int64_t value = offset[idx][0];
     bool done = false;
 
+    //Be aware: the key for offset can be either a file position OR a PTS
+    //The type is defined by keytype (1==PTS, 2==Pos)
     while (offset[idx].count() > 1 && !done)
     {
         it = ++offset[idx].begin();
-        if (PTS >= it.key())
+        it_key = ++keytype[idx].begin();
+        if (*it_key == 1 && PTS >= it.key() //PTS type
+            || *it_key == 2 && Pos >= it.key()) //Pos type
         {
             offset[idx][0] = *it;
             offset[idx].remove(it);
+            keytype[idx][0] = *it_key;
+            keytype[idx].remove(*it_key);
             value = offset[idx][0];
         }
         else
@@ -111,22 +121,33 @@ int64_t PTSOffsetQueue::Get(int idx, int64_t PTS)
     return value;
 }
 
-void PTSOffsetQueue::SetNext(int64_t newPTS, int64_t atPTS, bool setOrig)
+void PTSOffsetQueue::SetNextPTS(int64_t newPTS, int64_t atPTS)
+{
+    QValueList<int>::Iterator it;
+    
+    for (it = keyList.begin(); it != keyList.end(); ++it)
+    {
+        offset[*it][atPTS] = newPTS;
+        keytype[*it][atPTS] = 1; //offset[] is a PTS type
+    }
+}
+
+void PTSOffsetQueue::SetNextPos(int64_t newPTS, int64_t atPos)
 {
     QValueList<int>::Iterator it;
     int64_t delta = MPEG2fixup::diff2x33(newPTS, (--offset[0].end()).data());
     
     for (it = keyList.begin(); it != keyList.end(); ++it)
     {
-        offset[*it][atPTS] = newPTS;
-        if (setOrig)
-            orig[*it][atPTS] = delta;
+        offset[*it][atPos] = newPTS;
+        keytype[*it][atPos] = 2; //offset[] is a Pos type
+        orig[*it][atPos] = delta;
     }
 }
 
-void PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS)
+void PTSOffsetQueue::UpdateOrigPTS(int idx, int64_t &origPTS, int64_t Pos)
 {
-    while (orig[idx].count() && origPTS > orig[idx].begin().key())
+    while (orig[idx].count() && Pos >= orig[idx].begin().key())
     {
         ptsinc((uint64_t *)&origPTS, 300 * orig[idx].begin().data());
         orig[idx].remove(orig[idx].begin());
@@ -313,7 +334,10 @@ int64_t MPEG2fixup::diff2x33(int64_t pts1, int64_t pts2)
 
 int64_t MPEG2fixup::add2x33(int64_t pts1, int64_t pts2)
 {
-    return (pts1 + pts2) % MAX_PTS;
+    int64_t tmp = pts1 + pts2;
+    if (tmp >= 0)
+        return (pts1 + pts2) % MAX_PTS;
+    return (tmp + MAX_PTS);
 }
 
 int MPEG2fixup::cmp2x33(int64_t pts1, int64_t pts2)
@@ -1582,10 +1606,10 @@ void MPEG2fixup::InitialPTSFixup(MPEG2frame *curFrame, int64_t &origvPTS,
     else if (tmpPTS < -ptsIncrement ||
              tmpPTS > ptsIncrement*numframes)
     {
-        if (tmpPTS > PTSdiscrep || tmpPTS < 0)
+        if (tmpPTS > PTSdiscrep && PTSdiscrep >= 0 ||
+            tmpPTS < PTSdiscrep && PTSdiscrep <= 0)
         {
-            if (tmpPTS > PTSdiscrep)
-                PTSdiscrep = tmpPTS;
+            PTSdiscrep = tmpPTS;
             VERBOSE(MPF_PROCESS,
                 QString("Found invalid PTS (off by %1) at %2")
                        .arg(PtsTime(tmpPTS))
@@ -1610,7 +1634,7 @@ int MPEG2fixup::Start()
     int64_t expectedvPTS, expectedPTS[N_AUDIO];
     int64_t expectedDTS = 0, lastPTS = 0, initPTS = 0, deltaPTS = 0;
     int64_t origvPTS = 0, origaPTS[N_AUDIO];
-    int64_t cutStartPTS = 0, cutEndPTS = 0, lastRealvPTS = 0;
+    int64_t cutStartPTS = 0, cutEndPTS = 0, lastRealvPTS = 0, lastRealvPos = 0;
     int64_t frame_count = 0;
     int new_discard_state = 0;
     //  int i;
@@ -1758,7 +1782,7 @@ int MPEG2fixup::Start()
                 for (MPEG2frame *curFrame = Lreorder.first();
                      curFrame; curFrame = Lreorder.next())
                 {
-                    poq.UpdateOrigPTS(0, origvPTS);
+                    poq.UpdateOrigPTS(0, origvPTS,curFrame->pkt.pos);
                     InitialPTSFixup(curFrame, origvPTS, PTSdiscrep, 
                                     maxframes, true);
                 }
@@ -1797,7 +1821,9 @@ int MPEG2fixup::Start()
                                     PTSdiscrep = 0;
                                     break;
                                 }
-                                if (tmpPTSdiscrep > PTSdiscrep)
+                                if (tmpPTSdiscrep > PTSdiscrep && PTSdiscrep > 0
+                                    || tmpPTSdiscrep < PTSdiscrep && 
+                                       PTSdiscrep < 0)
                                     PTSdiscrep = tmpPTSdiscrep;
                             }
                             count += tmpReorder.count();
@@ -1826,9 +1852,9 @@ int MPEG2fixup::Start()
                         if (! new_discard_state)
                         {
                             cutEndPTS = markedFrameP->pkt.pts;
-                            poq.SetNext(
+                            poq.SetNextPTS(
                                       diff2x33(cutEndPTS, expectedvPTS / 300),
-                                      cutEndPTS, false);
+                                      cutEndPTS);
                         }
                         else
                             cutStartPTS = add2x33(markedFrameP->pkt.pts,
@@ -1869,6 +1895,7 @@ int MPEG2fixup::Start()
                     frame_count++;
                 }
                 lastRealvPTS = Lreorder.getLast()->pkt.pts;
+                lastRealvPos = Lreorder.getLast()->pkt.pos;
 
                 if (markedFrame || ! discard)
                 {
@@ -1885,7 +1912,7 @@ int MPEG2fixup::Start()
                         }
 
                         dec2x33(&curFrame->pkt.pts,
-                                poq.Get(0, curFrame->pkt.pts));
+                              poq.Get(0, curFrame->pkt.pts, curFrame->pkt.pos));
                         deltaPTS = diff2x33(curFrame->pkt.pts,
                                             expectedvPTS / 300);
 
@@ -2008,8 +2035,8 @@ int MPEG2fixup::Start()
                     vFrame.at(frame_pos + Lreorder.count());
                 }
                 if (PTSdiscrep)
-                    poq.SetNext(add2x33(poq.Get(0, 0), PTSdiscrep),
-                                lastRealvPTS, true);
+                    poq.SetNextPos(add2x33(poq.Get(0, 0, 0), PTSdiscrep),
+                                lastRealvPos);
             }
 
             if (discard)
@@ -2033,7 +2060,8 @@ int MPEG2fixup::Start()
                 int64_t incPTS =
                          90000LL * (int64_t)CC->frame_size / CC->sample_rate;
 
-                poq.UpdateOrigPTS(it.key(), origaPTS[it.key()]);
+                poq.UpdateOrigPTS(it.key(), origaPTS[it.key()],
+                                  af->first()->pkt.pos);
                 tmpPTS = diff2x33(af->first()->pkt.pts,
                                   origaPTS[it.key()] / 300);
                 if (tmpPTS < -incPTS)
@@ -2073,7 +2101,8 @@ int MPEG2fixup::Start()
                 }
 
                 dec2x33(&af->first()->pkt.pts,
-                        poq.Get(it.key(), af->first()->pkt.pts));
+                        poq.Get(it.key(), af->first()->pkt.pts,
+                                          af->first()->pkt.pos));
                 //expectedPTS[it.key()] = udiff2x33(nextPTS, initPTS);
                 // write_audio(lApkt_tail->pkt, initPTS);
                 VERBOSE(MPF_FRAME, QString("AUD #%1: pts: %2 pos: %3")
