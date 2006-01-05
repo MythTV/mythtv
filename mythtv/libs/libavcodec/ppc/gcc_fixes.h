@@ -1,6 +1,6 @@
 /*
  * gcc fixes for altivec.
- * Used to workaround broken gcc (FSF gcc-3 pre gcc-3.3) 
+ * Used to workaround broken gcc (FSF gcc-3 pre gcc-3.3)
  * and to stay somewhat compatible with Darwin.
  */
 
@@ -19,7 +19,7 @@
 # endif
 #else
 #define AVV(x...) {x}
-#if (__GNUC__ * 100 + __GNUC_MINOR__ < 303)  
+#if (__GNUC__ * 100 + __GNUC_MINOR__ < 303)
 
 /* This code was provided to me by Bartosch Pixa
  * as a separate header file (broken_mergel.h).
@@ -30,37 +30,37 @@
  */
 
 static inline vector signed char ff_vmrglb (vector signed char const A,
-					  vector signed char const B)
+                                          vector signed char const B)
 {
     static const vector unsigned char lowbyte = {
-	0x08, 0x18, 0x09, 0x19, 0x0a, 0x1a, 0x0b,  0x1b,
-	0x0c, 0x1c, 0x0d, 0x1d, 0x0e, 0x1e, 0x0f, 0x1f
+        0x08, 0x18, 0x09, 0x19, 0x0a, 0x1a, 0x0b,  0x1b,
+        0x0c, 0x1c, 0x0d, 0x1d, 0x0e, 0x1e, 0x0f, 0x1f
     };
     return vec_perm (A, B, lowbyte);
 }
 
 static inline vector signed short ff_vmrglh (vector signed short const A,
-					  vector signed short const B)
+                                          vector signed short const B)
 {
     static const vector unsigned char lowhalf = {
-    	0x08, 0x09, 0x18, 0x19, 0x0a, 0x0b, 0x1a, 0x1b,
-	0x0c, 0x0d, 0x1c, 0x1d, 0x0e, 0x0f, 0x1e, 0x1f
+        0x08, 0x09, 0x18, 0x19, 0x0a, 0x0b, 0x1a, 0x1b,
+        0x0c, 0x0d, 0x1c, 0x1d, 0x0e, 0x0f, 0x1e, 0x1f
     };
     return vec_perm (A, B, lowhalf);
 }
 
 static inline vector signed int ff_vmrglw (vector signed int const A,
-					  vector signed int const B)
+                                          vector signed int const B)
 {
     static const vector unsigned char lowword = {
-    	0x08, 0x09, 0x0a, 0x0b, 0x18, 0x19, 0x1a, 0x1b,
-	0x0c, 0x0d, 0x0e, 0x0f, 0x1c, 0x1d, 0x1e, 0x1f
+        0x08, 0x09, 0x0a, 0x0b, 0x18, 0x19, 0x1a, 0x1b,
+        0x0c, 0x0d, 0x0e, 0x0f, 0x1c, 0x1d, 0x1e, 0x1f
     };
     return vec_perm (A, B, lowword);
 }
-/*#define ff_vmrglb ff_vmrglb 
-#define ff_vmrglh ff_vmrglh 
-#define ff_vmrglw ff_vmrglw 
+/*#define ff_vmrglb ff_vmrglb
+#define ff_vmrglh ff_vmrglh
+#define ff_vmrglw ff_vmrglw
 */
 #undef vec_mergel
 

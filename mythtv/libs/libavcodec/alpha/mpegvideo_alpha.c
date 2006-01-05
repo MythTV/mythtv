@@ -28,22 +28,22 @@ static void dct_unquantize_h263_intra_axp(MpegEncContext *s, DCTELEM *block,
     uint64_t qmul, qadd;
     uint64_t correction;
     DCTELEM *orig_block = block;
-    DCTELEM block0;
+    DCTELEM block0;             /* might not be used uninitialized */
 
     qadd = WORD_VEC((qscale - 1) | 1);
     qmul = qscale << 1;
-    /* This mask kills spill from negative subwords to the next subword.  */ 
+    /* This mask kills spill from negative subwords to the next subword.  */
     correction = WORD_VEC((qmul - 1) + 1); /* multiplication / addition */
 
     if (!s->h263_aic) {
-        if (n < 4) 
+        if (n < 4)
             block0 = block[0] * s->y_dc_scale;
         else
             block0 = block[0] * s->c_dc_scale;
     } else {
         qadd = 0;
     }
-    n_coeffs = 63; // does not always use zigzag table 
+    n_coeffs = 63; // does not always use zigzag table
 
     for(i = 0; i <= n_coeffs; block += 4, i += 4) {
         uint64_t levels, negmask, zeros, add;
@@ -92,12 +92,10 @@ static void dct_unquantize_h263_inter_axp(MpegEncContext *s, DCTELEM *block,
     int i, n_coeffs;
     uint64_t qmul, qadd;
     uint64_t correction;
-    DCTELEM *orig_block = block;
-    DCTELEM block0;
 
     qadd = WORD_VEC((qscale - 1) | 1);
     qmul = qscale << 1;
-    /* This mask kills spill from negative subwords to the next subword.  */ 
+    /* This mask kills spill from negative subwords to the next subword.  */
     correction = WORD_VEC((qmul - 1) + 1); /* multiplication / addition */
 
     n_coeffs = s->intra_scantable.raster_end[s->block_last_index[n]];

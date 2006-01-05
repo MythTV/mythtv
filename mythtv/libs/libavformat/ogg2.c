@@ -2,7 +2,7 @@
  * Ogg bitstream support
  * Luca Barbato <lu_zero@gentoo.org>
  * Based on tcvp implementation
- * 
+ *
  */
 
 /**
@@ -434,7 +434,7 @@ ogg_gptopts (AVFormatContext * s, int i, uint64_t gp)
     uint64_t pts = AV_NOPTS_VALUE;
 
     if(os->codec->gptopts){
-	pts = os->codec->gptopts(s, i, gp);
+        pts = os->codec->gptopts(s, i, gp);
     } else if (codec->codec_type == CODEC_TYPE_AUDIO){
         pts = gp * 1000000LL / codec->sample_rate;
     }else if (codec->codec_type == CODEC_TYPE_VIDEO){
@@ -503,7 +503,7 @@ ogg_read_packet (AVFormatContext * s, AVPacket * pkt)
     ogg_stream_t *os;
     int idx = -1;
 
-    //Get an ogg packet 
+    //Get an ogg packet
     do{
         if (ogg_packet (s, &idx) < 0)
             return AVERROR_IO;
@@ -643,7 +643,7 @@ static AVInputFormat ogg_iformat = {
     ogg_read_packet,
     ogg_read_close,
     ogg_read_seek,
-// ogg_read_timestamp, 
+// ogg_read_timestamp,
     .extensions = "ogg",
 };
 

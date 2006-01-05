@@ -15,7 +15,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
+
 #include "../dsputil.h"
 
 #include "gcc_fixes.h"
@@ -191,33 +191,33 @@ static void OPNAME ## h264_qpel ## SIZE ## _mc32_ ## CODETYPE(uint8_t *dst, uint
 
 /* from dsputil.c */
 static inline void put_pixels8_l2(uint8_t * dst, const uint8_t * src1, const uint8_t * src2, int dst_stride, int src_stride1, int src_stride2, int h) {
-	int             i;
-	for (i = 0; i < h; i++) {
-		uint32_t        a, b;
-		a = (((const struct unaligned_32 *) (&src1[i * src_stride1]))->l);
-		b = (((const struct unaligned_32 *) (&src2[i * src_stride2]))->l);
-		*((uint32_t *) & dst[i * dst_stride]) = rnd_avg32(a, b);
-		a = (((const struct unaligned_32 *) (&src1[i * src_stride1 + 4]))->l);
-		b = (((const struct unaligned_32 *) (&src2[i * src_stride2 + 4]))->l);
-		*((uint32_t *) & dst[i * dst_stride + 4]) = rnd_avg32(a, b);
-	}
+        int             i;
+        for (i = 0; i < h; i++) {
+                uint32_t        a, b;
+                a = (((const struct unaligned_32 *) (&src1[i * src_stride1]))->l);
+                b = (((const struct unaligned_32 *) (&src2[i * src_stride2]))->l);
+                *((uint32_t *) & dst[i * dst_stride]) = rnd_avg32(a, b);
+                a = (((const struct unaligned_32 *) (&src1[i * src_stride1 + 4]))->l);
+                b = (((const struct unaligned_32 *) (&src2[i * src_stride2 + 4]))->l);
+                *((uint32_t *) & dst[i * dst_stride + 4]) = rnd_avg32(a, b);
+        }
 } static inline void avg_pixels8_l2(uint8_t * dst, const uint8_t * src1, const uint8_t * src2, int dst_stride, int src_stride1, int src_stride2, int h) {
-	int             i;
-	for (i = 0; i < h; i++) {
-		uint32_t        a, b;
-		a = (((const struct unaligned_32 *) (&src1[i * src_stride1]))->l);
-		b = (((const struct unaligned_32 *) (&src2[i * src_stride2]))->l);
-		*((uint32_t *) & dst[i * dst_stride]) = rnd_avg32(*((uint32_t *) & dst[i * dst_stride]), rnd_avg32(a, b));
-		a = (((const struct unaligned_32 *) (&src1[i * src_stride1 + 4]))->l);
-		b = (((const struct unaligned_32 *) (&src2[i * src_stride2 + 4]))->l);
-		*((uint32_t *) & dst[i * dst_stride + 4]) = rnd_avg32(*((uint32_t *) & dst[i * dst_stride + 4]), rnd_avg32(a, b));
-	}
+        int             i;
+        for (i = 0; i < h; i++) {
+                uint32_t        a, b;
+                a = (((const struct unaligned_32 *) (&src1[i * src_stride1]))->l);
+                b = (((const struct unaligned_32 *) (&src2[i * src_stride2]))->l);
+                *((uint32_t *) & dst[i * dst_stride]) = rnd_avg32(*((uint32_t *) & dst[i * dst_stride]), rnd_avg32(a, b));
+                a = (((const struct unaligned_32 *) (&src1[i * src_stride1 + 4]))->l);
+                b = (((const struct unaligned_32 *) (&src2[i * src_stride2 + 4]))->l);
+                *((uint32_t *) & dst[i * dst_stride + 4]) = rnd_avg32(*((uint32_t *) & dst[i * dst_stride + 4]), rnd_avg32(a, b));
+        }
 } static inline void put_pixels16_l2(uint8_t * dst, const uint8_t * src1, const uint8_t * src2, int dst_stride, int src_stride1, int src_stride2, int h) {
-	put_pixels8_l2(dst, src1, src2, dst_stride, src_stride1, src_stride2, h);
-	put_pixels8_l2(dst + 8, src1 + 8, src2 + 8, dst_stride, src_stride1, src_stride2, h);
+        put_pixels8_l2(dst, src1, src2, dst_stride, src_stride1, src_stride2, h);
+        put_pixels8_l2(dst + 8, src1 + 8, src2 + 8, dst_stride, src_stride1, src_stride2, h);
 } static inline void avg_pixels16_l2(uint8_t * dst, const uint8_t * src1, const uint8_t * src2, int dst_stride, int src_stride1, int src_stride2, int h) {
-	avg_pixels8_l2(dst, src1, src2, dst_stride, src_stride1, src_stride2, h);
-	avg_pixels8_l2(dst + 8, src1 + 8, src2 + 8, dst_stride, src_stride1, src_stride2, h);
+        avg_pixels8_l2(dst, src1, src2, dst_stride, src_stride1, src_stride2, h);
+        avg_pixels8_l2(dst + 8, src1 + 8, src2 + 8, dst_stride, src_stride1, src_stride2, h);
 }
 
 /* UNIMPLEMENTED YET !! */
@@ -228,7 +228,7 @@ H264_MC(put_, 16, altivec)
      H264_MC(avg_, 16, altivec)
 
 void dsputil_h264_init_ppc(DSPContext* c, AVCodecContext *avctx) {
-    
+
 #ifdef HAVE_ALTIVEC
   if (has_altivec()) {
     c->put_h264_chroma_pixels_tab[0] = put_h264_chroma_mc8_altivec;
@@ -251,16 +251,16 @@ void dsputil_h264_init_ppc(DSPContext* c, AVCodecContext *avctx) {
     c->PFX ## _pixels_tab[IDX][13] = PFX ## NUM ## _mc13_altivec; \
     c->PFX ## _pixels_tab[IDX][14] = PFX ## NUM ## _mc23_altivec; \
     c->PFX ## _pixels_tab[IDX][15] = PFX ## NUM ## _mc33_altivec
-    
+
     dspfunc(put_h264_qpel, 0, 16);
     dspfunc(avg_h264_qpel, 0, 16);
 #undef dspfunc
-    
+
   } else
 #endif /* HAVE_ALTIVEC */
   {
     // Non-AltiVec PPC optimisations
-    
+
     // ... pending ...
   }
 }

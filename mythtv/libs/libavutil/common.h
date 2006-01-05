@@ -10,6 +10,10 @@
 #    define CONFIG_WIN32
 #endif
 
+#if defined(WIN32) && !defined(__MINGW32__) && !defined(__CYGWIN__) && !defined(EMULATE_INTTYPES)
+#    define EMULATE_INTTYPES
+#endif
+
 #ifndef M_PI
 #define M_PI    3.14159265358979323846
 #endif
@@ -104,8 +108,28 @@
 #   endif /* other OS */
 #endif /* EMULATE_INTTYPES */
 
+#ifndef PRId64
+#define PRId64 "lld"
+#endif
+
 #ifndef PRIu64
-#define PRIu64 "lld"
+#define PRIu64 "llu"
+#endif
+
+#ifndef PRIx64
+#define PRIx64 "llx"
+#endif
+
+#ifndef PRId32
+#define PRId32 "d"
+#endif
+
+#ifndef PRIdFAST16
+#define PRIdFAST16 PRId32
+#endif
+
+#ifndef PRIdFAST32
+#define PRIdFAST32 PRId32
 #endif
 
 #ifndef INT16_MIN
@@ -147,8 +171,8 @@ typedef uint64_t      uint_fast64_t;
 #endif
 
 #if defined(CONFIG_OS2) || defined(CONFIG_SUNOS)
-static inline float floorf(float f) { 
-    return floor(f); 
+static inline float floorf(float f) {
+    return floor(f);
 }
 #endif
 
@@ -287,7 +311,7 @@ extern const uint32_t inverse[256];
 #else
 #    define FASTDIV(a,b)   ((a)/(b))
 #endif
- 
+
 /* define it to include statistics code (useful only for optimizing
    codec efficiency */
 //#define STATS
@@ -400,9 +424,9 @@ static inline int ff_sqrt(int a)
     int ret=0;
     int s;
     int ret_sq=0;
-    
+
     if(a<128) return ff_sqrt_tab[a];
-    
+
     for(s=15; s>=0; s--){
         int b= ret_sq + (1<<(s*2)) + (ret<<s)*2;
         if(b<=a){
@@ -429,11 +453,11 @@ static inline int ff_get_fourcc(const char *s){
 #if defined(ARCH_X86) || defined(ARCH_X86_64)
 #define MASK_ABS(mask, level)\
             asm volatile(\
-		"cdq			\n\t"\
-		"xorl %1, %0		\n\t"\
-		"subl %1, %0		\n\t"\
-		: "+a" (level), "=&d" (mask)\
-	    );
+                "cdq                    \n\t"\
+                "xorl %1, %0            \n\t"\
+                "subl %1, %0            \n\t"\
+                : "+a" (level), "=&d" (mask)\
+            );
 #else
 #define MASK_ABS(mask, level)\
             mask= level>>31;\
@@ -444,10 +468,10 @@ static inline int ff_get_fourcc(const char *s){
 #if __CPU__ >= 686 && !defined(RUNTIME_CPUDETECT)
 #define COPY3_IF_LT(x,y,a,b,c,d)\
 asm volatile (\
-    "cmpl %0, %3	\n\t"\
-    "cmovl %3, %0	\n\t"\
-    "cmovl %4, %1	\n\t"\
-    "cmovl %5, %2	\n\t"\
+    "cmpl %0, %3        \n\t"\
+    "cmovl %3, %0       \n\t"\
+    "cmovl %4, %1       \n\t"\
+    "cmovl %5, %2       \n\t"\
     : "+r" (x), "+r" (a), "+r" (c)\
     : "r" (y), "r" (b), "r" (d)\
 );
@@ -464,20 +488,20 @@ if((y)<(x)){\
 #if defined(ARCH_X86_64)
 static inline uint64_t read_time(void)
 {
-	uint64_t a, d;
-	asm volatile(	"rdtsc\n\t"
-		: "=a" (a), "=d" (d)
-	);
-	return (d << 32) | (a & 0xffffffff);
+        uint64_t a, d;
+        asm volatile(   "rdtsc\n\t"
+                : "=a" (a), "=d" (d)
+        );
+        return (d << 32) | (a & 0xffffffff);
 }
 #elif defined(ARCH_X86)
 static inline long long read_time(void)
 {
-	long long l;
-	asm volatile(	"rdtsc\n\t"
-		: "=A" (l)
-	);
-	return l;
+        long long l;
+        asm volatile(   "rdtsc\n\t"
+                : "=A" (l)
+        );
+        return l;
 }
 #else //FIXME check ppc64
 static inline uint64_t read_time(void)
@@ -520,7 +544,7 @@ tend= read_time();\
   }\
 }
 #else
-#define START_TIMER 
+#define START_TIMER
 #define STOP_TIMER(id) {}
 #endif
 

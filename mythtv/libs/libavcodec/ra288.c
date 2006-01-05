@@ -19,25 +19,25 @@
 
 #include "avcodec.h"
 #include "ra288.h"
- 
-typedef struct {
-	float	history[8];
-	float	output[40];
-	float	pr1[36];
-	float	pr2[10];
-	int	phase, phasep;
 
-	float st1a[111],st1b[37],st1[37];
-	float st2a[38],st2b[11],st2[11];
-	float sb[41];
-	float lhist[10];
+typedef struct {
+        float   history[8];
+        float   output[40];
+        float   pr1[36];
+        float   pr2[10];
+        int     phase, phasep;
+
+        float   st1a[111],st1b[37],st1[37];
+        float   st2a[38],st2b[11],st2[11];
+        float   sb[41];
+        float   lhist[10];
 } Real288_internal;
 
 static int ra288_decode_init(AVCodecContext * avctx)
 {
-	Real288_internal *glob=avctx->priv_data;
-	memset(glob,0,sizeof(Real288_internal));
-	return 0;
+        Real288_internal *glob=avctx->priv_data;
+        memset(glob,0,sizeof(Real288_internal));
+        return 0;
 }
 
 static void prodsum(float *tgt, float *src, int len, int n);
@@ -109,7 +109,7 @@ static void decode(Real288_internal *glob, unsigned int input)
   for (sum=32,x=10;x--;sum-=glob->pr2[x]*glob->lhist[x]);
   if (sum<0) sum=0; else if (sum>60) sum=60;
 
-  sumsum=exp(sum*0.1151292546497)*f;	/* pow(10.0,sum/20)*f */
+  sumsum=exp(sum*0.1151292546497)*f;    /* pow(10.0,sum/20)*f */
   for (sum=0,x=5;x--;) { buffer[x]=table[x]*sumsum; sum+=buffer[x]*buffer[x]; }
   if ((sum/=5)<1) sum=1;
 
@@ -180,7 +180,7 @@ static void co(int n, int i, int j, float *in, float *out, float *st1, float *st
     if (x==c) fp=in;
     work[x]=*(table++)*(*(st1++)=*(fp++));
   }
-  
+
   prodsum(buffer1,work+n,i,n);
   prodsum(buffer2,work+a,j,n);
 
@@ -228,41 +228,19 @@ static int ra288_decode_frame(AVCodecContext * avctx,
             void *data, int *data_size,
             uint8_t * buf, int buf_size)
 {
-  if(avctx->extradata_size>=6)
-  {
-//((short*)(avctx->extradata))[0]; /* subpacket size */
-//((short*)(avctx->extradata))[1]; /* subpacket height */
-//((short*)(avctx->extradata))[2]; /* subpacket flavour */
-//((short*)(avctx->extradata))[3]; /* coded frame size */
-//((short*)(avctx->extradata))[4]; /* codec's data length  */
-//((short*)(avctx->extradata))[5...] /* codec's data */
-    int bret;
     void *datao;
-    int w=avctx->block_align; /* 228 */
-    int h=((short*)(avctx->extradata))[1]; /* 12 */
-    int cfs=((short*)(avctx->extradata))[3]; /* coded frame size 38 */
-    int i,j;
-    if(buf_size<w*h)
+
+    if (buf_size < avctx->block_align)
     {
-	av_log(avctx, AV_LOG_ERROR, "ffra288: Error! Input buffer is too small [%d<%d]\n",buf_size,w*h);
-	return 0;
+        av_log(avctx, AV_LOG_ERROR, "ffra288: Error! Input buffer is too small [%d<%d]\n",buf_size,avctx->block_align);
+        return 0;
     }
+
     datao = data;
-    bret = 0;
-    for (j = 0; j < h/2; j++)
-	for (i = 0; i < h; i++)
-    {
-	    data=decode_block(avctx,&buf[j*cfs+cfs*i*h/2],(signed short *)data,cfs);
-	    bret += cfs;
-    }
+    data = decode_block(avctx, buf, (signed short *)data, avctx->block_align);
+
     *data_size = (char *)data - (char *)datao;
-    return bret;
-  }
-  else
-  {
-    av_log(avctx, AV_LOG_ERROR, "ffra288: Error: need extra data!!!\n");
-    return 0;
-  }
+    return avctx->block_align;
 }
 
 AVCodec ra_288_decoder =

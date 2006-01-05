@@ -28,14 +28,14 @@
    formats you want to support */
 
 /**
- * simple call to register all the codecs. 
+ * simple call to register all the codecs.
  */
 void avcodec_register_all(void)
 {
     static int inited = 0;
-    
+
     if (inited != 0)
-	return;
+        return;
     inited = 1;
 
     /* encoders */
@@ -131,6 +131,9 @@ void avcodec_register_all(void)
 #ifdef CONFIG_LJPEG_ENCODER
     register_avcodec(&ljpeg_encoder);
 #endif //CONFIG_LJPEG_ENCODER
+#ifdef CONFIG_JPEGLS_ENCODER
+    register_avcodec(&jpegls_encoder);
+#endif //CONFIG_JPEGLS_ENCODER
 #ifdef CONFIG_ZLIB
 #ifdef CONFIG_PNG_ENCODER
     register_avcodec(&png_encoder);
@@ -308,7 +311,7 @@ void avcodec_register_all(void)
 #ifdef HAVE_XVMC_VLD
 #ifdef CONFIG_MPEG_XVMC_VLD_DECODER
     register_avcodec(&mpeg_xvmc_vld_decoder);
-#endif
+#endif //CONFIG_MPEG_XVMC_VLD_DECODER
 #endif
 #ifdef CONFIG_DVVIDEO_DECODER
     register_avcodec(&dvvideo_decoder);
@@ -496,6 +499,12 @@ void avcodec_register_all(void)
 #ifdef CONFIG_QDM2_DECODER
     register_avcodec(&qdm2_decoder);
 #endif //CONFIG_QDM2_DECODER
+#ifdef CONFIG_COOK_DECODER
+    register_avcodec(&cook_decoder);
+#endif //CONFIG_COOK_DECODER
+#ifdef CONFIG_TRUESPEECH_DECODER
+    register_avcodec(&truespeech_decoder);
+#endif //CONFIG_TRUESPEECH_DECODER
 #ifdef CONFIG_RAWVIDEO_DECODER
     register_avcodec(&rawvideo_decoder);
 #endif //CONFIG_RAWVIDEO_DECODER
@@ -591,7 +600,7 @@ PCM_CODEC(CODEC_ID_ADPCM_YAMAHA, adpcm_yamaha);
     register_avcodec(&dvbsub_encoder);
 #endif
 
-    /* parsers */ 
+    /* parsers */
     av_register_codec_parser(&mpegvideo_parser);
     av_register_codec_parser(&mpeg4video_parser);
 #if defined(CONFIG_H261_DECODER) || defined(CONFIG_H261_ENCODER)

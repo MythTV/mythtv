@@ -28,7 +28,7 @@
  * The video decoder outputs PAL8 colorspace data. The decoder expects
  * a 0x330-byte VMD file header to be transmitted via extradata during
  * codec initialization. Each encoded frame that is sent to this decoder
- * is expected to be prepended with the appropriate 16-byte frame 
+ * is expected to be prepended with the appropriate 16-byte frame
  * information record from the VMD file.
  *
  * The audio decoder, like the video decoder, expects each encoded data
@@ -143,7 +143,7 @@ static void lz_unpack(unsigned char *src, unsigned char *dest, int dest_len)
     }
 }
 
-static int rle_unpack(unsigned char *src, unsigned char *dest, 
+static int rle_unpack(unsigned char *src, unsigned char *dest,
     int src_len, int dest_len)
 {
     unsigned char *ps;
@@ -212,7 +212,7 @@ static void vmd_decode(VmdVideoContext *s)
     if (frame_x || frame_y || (frame_width != s->avctx->width) ||
         (frame_height != s->avctx->height)) {
 
-        memcpy(s->frame.data[0], s->prev_frame.data[0], 
+        memcpy(s->frame.data[0], s->prev_frame.data[0],
             s->avctx->height * s->frame.linesize[0]);
     }
 
@@ -331,7 +331,7 @@ static int vmdvideo_decode_init(AVCodecContext *avctx)
 
     /* make sure the VMD header made it */
     if (s->avctx->extradata_size != VMD_HEADER_SIZE) {
-        av_log(s->avctx, AV_LOG_ERROR, "VMD video: expected extradata size of %d\n", 
+        av_log(s->avctx, AV_LOG_ERROR, "VMD video: expected extradata size of %d\n",
             VMD_HEADER_SIZE);
         return -1;
     }
@@ -431,7 +431,7 @@ static int vmdaudio_decode_init(AVCodecContext *avctx)
     s->block_align = avctx->block_align;
 
     av_log(s->avctx, AV_LOG_DEBUG, "%d channels, %d bits/sample, block align = %d, sample rate = %d\n",
-	    s->channels, s->bits, s->block_align, avctx->sample_rate);
+            s->channels, s->bits, s->block_align, avctx->sample_rate);
 
     /* set up the steps8 and steps16 tables */
     for (i = 0; i < 8; i++) {
@@ -489,7 +489,7 @@ static int vmdaudio_loadsound(VmdAudioContext *s, unsigned char *data,
     int i;
 
     if (silence)
-	av_log(s->avctx, AV_LOG_INFO, "silent block!\n");
+        av_log(s->avctx, AV_LOG_INFO, "silent block!\n");
     if (s->channels == 2) {
 
         /* stereo handling */

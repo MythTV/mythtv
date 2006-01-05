@@ -87,16 +87,16 @@ void powerpc_display_perf_report(void)
   {
     for (j = 0; j < POWERPC_NUM_PMC_ENABLED ; j++)
       {
-	if (perfdata[j][i][powerpc_data_num] != (unsigned long long)0)
-	  av_log(NULL, AV_LOG_INFO,
-		  " Function \"%s\" (pmc%d):\n\tmin: %llu\n\tmax: %llu\n\tavg: %1.2lf (%llu)\n",
-		  perfname[i],
-		  j+1,
-		  perfdata[j][i][powerpc_data_min],
-		  perfdata[j][i][powerpc_data_max],
-		  (double)perfdata[j][i][powerpc_data_sum] /
-		  (double)perfdata[j][i][powerpc_data_num],
-		  perfdata[j][i][powerpc_data_num]);
+        if (perfdata[j][i][powerpc_data_num] != (unsigned long long)0)
+          av_log(NULL, AV_LOG_INFO,
+                  " Function \"%s\" (pmc%d):\n\tmin: %llu\n\tmax: %llu\n\tavg: %1.2lf (%llu)\n",
+                  perfname[i],
+                  j+1,
+                  perfdata[j][i][powerpc_data_min],
+                  perfdata[j][i][powerpc_data_max],
+                  (double)perfdata[j][i][powerpc_data_sum] /
+                  (double)perfdata[j][i][powerpc_data_num],
+                  perfdata[j][i][powerpc_data_num]);
       }
   }
 }
@@ -179,7 +179,7 @@ POWERPC_PERF_START_COUNT(powerpc_clear_blocks_dcbz128, 1);
     }
     else
       for ( ; i < sizeof(DCTELEM)*6*64 ; i += 128) {
-	asm volatile("dcbzl %0,%1" : : "b" (blocks), "r" (i) : "memory");
+        asm volatile("dcbzl %0,%1" : : "b" (blocks), "r" (i) : "memory");
       }
 #else
     memset(blocks, 0, sizeof(DCTELEM)*6*64);
@@ -227,7 +227,7 @@ long check_dcbzl_effect(void)
   }
 
   av_free(fakedata);
-  
+
   return count;
 }
 #else
@@ -257,10 +257,10 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
 
 #ifdef HAVE_ALTIVEC
   dsputil_h264_init_ppc(c, avctx);
-  
+
     if (has_altivec()) {
         mm_flags |= MM_ALTIVEC;
-        
+
         // Altivec specific optimisations
         c->pix_abs[0][1] = sad16_x2_altivec;
         c->pix_abs[0][2] = sad16_y2_altivec;
@@ -284,25 +284,25 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
         c->put_no_rnd_pixels_tab[0][0] = put_pixels16_altivec;
         c->avg_pixels_tab[0][0] = avg_pixels16_altivec;
         c->avg_pixels_tab[1][0] = avg_pixels8_altivec;
-	c->avg_pixels_tab[1][3] = avg_pixels8_xy2_altivec;
+        c->avg_pixels_tab[1][3] = avg_pixels8_xy2_altivec;
         c->put_pixels_tab[1][3] = put_pixels8_xy2_altivec;
         c->put_no_rnd_pixels_tab[1][3] = put_no_rnd_pixels8_xy2_altivec;
         c->put_pixels_tab[0][3] = put_pixels16_xy2_altivec;
         c->put_no_rnd_pixels_tab[0][3] = put_no_rnd_pixels16_xy2_altivec;
-        
-	c->gmc1 = gmc1_altivec;
+
+        c->gmc1 = gmc1_altivec;
 
 #ifdef CONFIG_DARWIN // ATM gcc-3.3 and gcc-3.4 fail to compile these in linux...
-	c->hadamard8_diff[0] = hadamard8_diff16_altivec;
-	c->hadamard8_diff[1] = hadamard8_diff8x8_altivec;
+        c->hadamard8_diff[0] = hadamard8_diff16_altivec;
+        c->hadamard8_diff[1] = hadamard8_diff8x8_altivec;
 #endif
 
 #ifdef CONFIG_ENCODERS
-	if (avctx->dct_algo == FF_DCT_AUTO ||
-	    avctx->dct_algo == FF_DCT_ALTIVEC)
-	{
-	    c->fdct = fdct_altivec;
-	}
+        if (avctx->dct_algo == FF_DCT_AUTO ||
+            avctx->dct_algo == FF_DCT_ALTIVEC)
+        {
+            c->fdct = fdct_altivec;
+        }
 #endif //CONFIG_ENCODERS
 
       if (avctx->lowres==0)
@@ -319,20 +319,20 @@ void dsputil_init_ppc(DSPContext* c, AVCodecContext *avctx)
 #endif /* ALTIVEC_USE_REFERENCE_C_CODE */
         }
       }
-        
+
 #ifdef POWERPC_PERFORMANCE_REPORT
         {
           int i, j;
           for (i = 0 ; i < powerpc_perf_total ; i++)
           {
-	    for (j = 0; j < POWERPC_NUM_PMC_ENABLED ; j++)
-	      {
-		perfdata[j][i][powerpc_data_min] = 0xFFFFFFFFFFFFFFFFULL;
-		perfdata[j][i][powerpc_data_max] = 0x0000000000000000ULL;
-		perfdata[j][i][powerpc_data_sum] = 0x0000000000000000ULL;
-		perfdata[j][i][powerpc_data_num] = 0x0000000000000000ULL;
-	      }
-	  }
+            for (j = 0; j < POWERPC_NUM_PMC_ENABLED ; j++)
+              {
+                perfdata[j][i][powerpc_data_min] = 0xFFFFFFFFFFFFFFFFULL;
+                perfdata[j][i][powerpc_data_max] = 0x0000000000000000ULL;
+                perfdata[j][i][powerpc_data_sum] = 0x0000000000000000ULL;
+                perfdata[j][i][powerpc_data_num] = 0x0000000000000000ULL;
+              }
+          }
         }
 #endif /* POWERPC_PERFORMANCE_REPORT */
     } else

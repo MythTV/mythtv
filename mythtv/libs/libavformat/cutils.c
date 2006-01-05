@@ -59,7 +59,7 @@ int stristart(const char *str, const char *val, const char **ptr)
     p = str;
     q = val;
     while (*q != '\0') {
-	if (toupper(*(const unsigned char *)p) != toupper(*(const unsigned char *)q))
+        if (toupper(*(const unsigned char *)p) != toupper(*(const unsigned char *)q))
             return 0;
         p++;
         q++;
@@ -74,7 +74,7 @@ int stristart(const char *str, const char *val, const char **ptr)
  * 1 then it is clamped to buf_size - 1.
  * NOTE: this function does what strncpy should have done to be
  * useful. NEVER use strncpy.
- * 
+ *
  * @param buf destination buffer
  * @param buf_size size of destination buffer
  * @param str source string
@@ -101,7 +101,7 @@ char *pstrcat(char *buf, int buf_size, const char *s)
 {
     int len;
     len = strlen(buf);
-    if (len < buf_size) 
+    if (len < buf_size)
         pstrcpy(buf + len, buf_size - len, s);
     return buf;
 }
@@ -139,7 +139,7 @@ time_t mktimegm(struct tm *tm)
         y--;
     }
 
-    t = 86400 * 
+    t = 86400 *
         (d + (153 * m - 457) / 5 + 365 * y + y / 4 - y / 100 + y / 400 - 719469);
 
     t += 3600 * tm->tm_hour + 60 * tm->tm_min + tm->tm_sec;
@@ -150,10 +150,10 @@ time_t mktimegm(struct tm *tm)
 #define ISLEAP(y) (((y) % 4 == 0) && (((y) % 100) != 0 || ((y) % 400) == 0))
 #define LEAPS_COUNT(y) ((y)/4 - (y)/100 + (y)/400)
 
-/* this is our own gmtime_r. it differs from its POSIX counterpart in a 
+/* this is our own gmtime_r. it differs from its POSIX counterpart in a
    couple of places, though. */
 struct tm *brktimegm(time_t secs, struct tm *tm)
-{   
+{
     int days, y, ny, m;
     int md[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
@@ -166,13 +166,13 @@ struct tm *brktimegm(time_t secs, struct tm *tm)
     /* oh well, may be someone some day will invent a formula for this stuff */
     y = 1970; /* start "guessing" */
     while (days >= (ISLEAP(y)?366:365)) {
-	ny = (y + days/366);
-	days -= (ny - y) * 365 + LEAPS_COUNT(ny - 1) - LEAPS_COUNT(y - 1);
-	y = ny;
+        ny = (y + days/366);
+        days -= (ny - y) * 365 + LEAPS_COUNT(ny - 1) - LEAPS_COUNT(y - 1);
+        y = ny;
     }
     md[1] = ISLEAP(y)?29:28;
     for (m=0; days >= md[m]; m++)
-	 days -= md[m];
+         days -= md[m];
 
     tm->tm_year = y;  /* unlike gmtime_r we store complete year here */
     tm->tm_mon = m+1; /* unlike gmtime_r tm_mon is from 1 to 12 */
@@ -208,7 +208,7 @@ static int date_get_num(const char **pp,
 }
 
 /* small strptime for ffmpeg */
-const char *small_strptime(const char *p, const char *fmt, 
+const char *small_strptime(const char *p, const char *fmt,
                            struct tm *dt)
 {
     int c, val;

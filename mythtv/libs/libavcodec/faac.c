@@ -16,7 +16,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
- 
+
 /**
  * @file faacaudio.c
  * Interface to libfaac for aac encoding.
@@ -46,7 +46,7 @@ static int Faac_encode_init(AVCodecContext *avctx)
     /* check faac version */
     faac_cfg = faacEncGetCurrentConfiguration(s->faac_handle);
     if (faac_cfg->version != FAAC_CFG_VERSION) {
-	av_log(avctx, AV_LOG_ERROR, "wrong libfaac version (compiled for: %d, using %d)\n", FAAC_CFG_VERSION, faac_cfg->version);
+        av_log(avctx, AV_LOG_ERROR, "wrong libfaac version (compiled for: %d, using %d)\n", FAAC_CFG_VERSION, faac_cfg->version);
         faacEncClose(s->faac_handle);
         return -1;
     }

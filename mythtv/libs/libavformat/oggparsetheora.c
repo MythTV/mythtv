@@ -47,8 +47,8 @@ theora_header (AVFormatContext * s, int idx)
         return 0;
 
     if(!thp){
-	thp = av_mallocz(sizeof(*thp));
-	os->private = thp;
+        thp = av_mallocz(sizeof(*thp));
+        os->private = thp;
     }
 
     if (os->buf[os->pstart] == 0x80) {
@@ -68,13 +68,13 @@ theora_header (AVFormatContext * s, int idx)
         skip_bits(&gb, 64);
         st->codec->time_base.den = get_bits(&gb, 32);
         st->codec->time_base.num = get_bits(&gb, 32);
-        
+
         st->codec->sample_aspect_ratio.num = get_bits(&gb, 24);
         st->codec->sample_aspect_ratio.den = get_bits(&gb, 24);
 
         skip_bits(&gb, 38);
         thp->gpshift = get_bits(&gb, 5);
-	thp->gpmask = (1 << thp->gpshift) - 1;
+        thp->gpmask = (1 << thp->gpshift) - 1;
 
         st->codec->codec_type = CODEC_TYPE_VIDEO;
         st->codec->codec_id = CODEC_ID_THEORA;

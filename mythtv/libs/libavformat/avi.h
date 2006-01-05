@@ -3,12 +3,12 @@
 
 #include "avcodec.h"
 
-#define AVIF_HASINDEX		0x00000010	// Index at end of file?
-#define AVIF_MUSTUSEINDEX	0x00000020
-#define AVIF_ISINTERLEAVED	0x00000100
-#define AVIF_TRUSTCKTYPE	0x00000800	// Use CKType to find key frames?
-#define AVIF_WASCAPTUREFILE	0x00010000
-#define AVIF_COPYRIGHTED	0x00020000
+#define AVIF_HASINDEX           0x00000010        // Index at end of file?
+#define AVIF_MUSTUSEINDEX       0x00000020
+#define AVIF_ISINTERLEAVED      0x00000100
+#define AVIF_TRUSTCKTYPE        0x00000800        // Use CKType to find key frames?
+#define AVIF_WASCAPTUREFILE     0x00010000
+#define AVIF_COPYRIGHTED        0x00020000
 
 #define AVI_MAX_RIFF_SIZE       0x40000000LL
 #define AVI_MASTER_INDEX_SIZE   256
@@ -28,7 +28,7 @@ typedef struct CodecTag {
 void put_bmp_header(ByteIOContext *pb, AVCodecContext *enc, const CodecTag *tags, int for_asf);
 int put_wav_header(ByteIOContext *pb, AVCodecContext *enc);
 int wav_codec_get_id(unsigned int tag, int bps);
-void get_wav_header(ByteIOContext *pb, AVCodecContext *codec, int size); 
+void get_wav_header(ByteIOContext *pb, AVCodecContext *codec, int size);
 
 extern const CodecTag codec_bmp_tags[];
 extern const CodecTag codec_wav_tags[];

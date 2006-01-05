@@ -56,6 +56,10 @@ contains( CONFIG_CINEPAK_DECODER, yes ) {
     SOURCES += cinepak.c
 }
 
+contains( CONFIG_COOK_DECODER, yes ) {
+    SOURCES += cook.c
+}
+
 DO_CLJR = $$CONFIG_CLJR_DECODER $$CONFIG_CLJR_ENCODER
 contains( DO_CLJR, yes ) {
     SOURCES += cljr.c
@@ -219,6 +223,10 @@ contains( CONFIG_TRUEMOTION1_DECODER, yes ) {
 
 contains( CONFIG_TRUEMOTION2_DECODER, yes ) {
     SOURCES += truemotion2.c
+}
+
+contains( CONFIG_TRUESPEECH_DECODER, yes ) {
+    SOURCES += truespeech.c
 }
 
 contains( CONFIG_TSCC_DECODER, yes ) {

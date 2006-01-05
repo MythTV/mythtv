@@ -80,7 +80,7 @@ static void get_pixels_mmi(DCTELEM *block, const uint8_t *pixels, int line_size)
         "pextlb $10, $0, $10    \n\t"
         "sq     $10, 80(%1)     \n\t"
         "pextlb $8, $0, $8      \n\t"
-	"sq     $8, 96(%1)      \n\t"
+        "sq     $8, 96(%1)      \n\t"
         "pextlb $9, $0, $9      \n\t"
         "sq     $9, 112(%1)     \n\t"
         ".set   pop             \n\t"
@@ -112,7 +112,7 @@ static void put_pixels16_mmi(uint8_t *block, const uint8_t *pixels, int line_siz
         asm volatile (
         ".set   push            \n\t"
         ".set   mips3           \n\t"
-	"1:                     \n\t"
+        "1:                     \n\t"
         "ldr    $8, 0(%1)       \n\t"
         "add    $11, %1, %3     \n\t"
         "ldl    $8, 7(%1)       \n\t"
@@ -133,7 +133,7 @@ static void put_pixels16_mmi(uint8_t *block, const uint8_t *pixels, int line_siz
         "bgtz   %2, 1b          \n\t"
         ".set   pop             \n\t"
         : "+r" (block), "+r" (pixels), "+r" (h) : "r" (line_size)
-	: "$8", "$9", "$10", "$11", "$12", "$13", "memory" );
+        : "$8", "$9", "$10", "$11", "$12", "$13", "memory" );
 }
 
 
@@ -150,7 +150,7 @@ void dsputil_init_mmi(DSPContext* c, AVCodecContext *avctx)
     c->put_no_rnd_pixels_tab[0][0] = put_pixels16_mmi;
 
     c->get_pixels = get_pixels_mmi;
-       
+
     if(idct_algo==FF_IDCT_AUTO || idct_algo==FF_IDCT_PS2){
         c->idct_put= ff_mmi_idct_put;
         c->idct_add= ff_mmi_idct_add;
