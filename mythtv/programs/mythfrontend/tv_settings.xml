@@ -33,7 +33,7 @@
       <text lang="DE">Programmübersicht</text>
       <text lang="DK">Program Guide</text>
       <text lang="IS">Dagskrá</text>
-      <text lang="PT">Configurações do Guia</text>
+      <text lang="PT">Configurar Guia de Programação</text>
       <text lang="SV">Programguide</text>
       <text lang="JA">番組ガイド</text>
       <text lang="FI">Ohjelmaopas</text>
@@ -58,7 +58,7 @@
       <text lang="DE">Wiedergabe</text>
       <text lang="DK">Afspilning</text>
       <text lang="IS">Spilun</text>
-      <text lang="PT">Configurações de Leitura</text>
+      <text lang="PT">Config. Visualização</text>
       <text lang="SV">Uppspelning</text>
       <text lang="JA">再生</text>
       <text lang="FI">Toisto</text>
@@ -74,6 +74,7 @@
       <text>Playback Groups</text>
       <text lang="SV">Uppspelningsgrupper</text>
       <text lang="FR">Groupes de lecture</text>
+      <text lang="PT">Grupos de Visualização</text>
       <action>SETTINGS PLAYGROUP</action>
    </button>
 
@@ -88,7 +89,7 @@
       <text lang="DE">Aufnahmeprofile</text>
       <text lang="DK">Optagelse</text>
       <text lang="IS">Upptökur</text>
-      <text lang="PT">Configurações de Gravação</text>
+      <text lang="PT">Perfis de Gravação</text>
       <text lang="SV">Inspelningsprofiler</text>
       <text lang="JA">録画プロフィール</text>
       <text lang="FI">Nauhoitusprofiilit</text>
@@ -99,6 +100,7 @@
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="DE">Profile</alttext>
       <alttext lang="ET">Profiilid</alttext>
+      <alttext lang="PT">Perfis</alttext>
       <action>SETTINGS RECORDING</action>
    </button>
 
@@ -117,9 +119,11 @@
       <text lang="NB">Opptaksprioriteter</text>
       <text lang="DK">Optagelselssprioriteter</text>
       <text lang="ES">Prioridades Grabación</text>
+      <text lang="PT">Prioridades de Gravação</text>
       <alttext lang="DE">Prioritäten</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="ES">Prioridades</alttext>
+      <alttext lang="PT">Prioridades</alttext>
       <action>MENU recpriorities_settings.xml</action>
    </button>
 

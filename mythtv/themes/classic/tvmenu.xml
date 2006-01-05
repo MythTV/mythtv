@@ -28,7 +28,7 @@
       <text lang="FR">Planifier les enregistrements</text>
       <text lang="DE">Aufnahmen planen</text>
       <text lang="DK">Optag udsendelse</text>
-      <text lang="PT">Gravação Programada</text>
+      <text lang="PT">Programar Gravações</text>
       <text lang="SV">Schemalägg inspelningar</text>
       <text lang="JA">録画予約</text>
       <text lang="SI">Planiranje snemanj</text>
@@ -116,6 +116,7 @@
       <text lang="ET">Varem salvestatud</text>
       <text lang="FR">Déjà enregistré</text>
       <text lang="DK">Tidligere optagelser</text>
+      <text lang="PT">Gravações Feitas</text>
       <action>TV_PREVIOUS</action>
    </button>
 
@@ -129,6 +130,7 @@
       <text lang="SI">Status sistema</text>
       <text lang="ET">Süsteemi olek</text>
       <text lang="DK">Systemstatus</text>
+      <text lang="PT">Estado do Sistema</text>
       <action>TV_STATUS</action>
    </button>
 

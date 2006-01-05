@@ -16,6 +16,7 @@
       <text lang="NB">Titler</text>
       <text lang="DK">Titler</text>
       <text lang="ES">Títulos</text>
+      <text lang="PT">Por Títulos</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -35,6 +36,7 @@
       <text lang="NB">Nøkkelord</text>
       <text lang="DK">Nøgleord</text>
       <text lang="ES">Claves</text>
+      <text lang="PT">Por Palavras-Chave</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -53,6 +55,7 @@
       <text lang="NB">Personer</text>
       <text lang="DK">Personer</text>
       <text lang="ES">Personas</text>
+      <text lang="PT">Por Pessoas</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -71,8 +74,10 @@
       <text lang="NB">Avansert</text>
       <text lang="DK">Super Søgning</text>
       <text lang="ES">Avanzada</text>
+      <text lang="PT">Pesquisa Avançada</text>
       <alttext lang="DE">Erweitert</alttext>
       <alttext lang="ET">Muud</alttext>
+      <alttext lang="PT">Avançada</alttext>
       <action>TV_SEARCH_POWER</action>
    </button>
 

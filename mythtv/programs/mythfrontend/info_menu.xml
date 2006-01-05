@@ -15,6 +15,7 @@
      <text lang="NB">Telefon</text>
      <text lang="DK">Telefon</text>
      <text lang="ES">Teléfono</text>
+     <text lang="PT">Telefone</text>
      <action>PLUGIN mythphone</action>
      <depends>mythphone</depends>
    </button>
@@ -36,6 +37,7 @@
      <text lang="ET">Uudised</text>
      <text lang="NB">Nyheter</text>
      <text lang="DK">Nyheder</text>
+     <text lang="PT">Notícias</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -47,6 +49,7 @@
      <text lang="SI">Čas filmov</text>
      <text lang="ET">Filmide ajad</text>
      <text lang="SV">Biotider</text>
+     <text lang="PT">Horário de Cinema</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -78,6 +81,7 @@
      <type>NETFLIX</type>
      <text>NetFlix</text>
      <text lang="FI">MythFlix</text>
+     <text lang="PT">Aluguer de Filmes</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -97,6 +101,7 @@
       <text lang="NB">Nettleser</text>
       <text lang="DK">Web</text>
       <text lang="ES">Web</text>
+      <text lang="PT">Navegação Web</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -117,6 +122,7 @@
      <text lang="NB">Oppskrifter</text>
      <text lang="DK">Opskrifter</text>
      <text lang="ES">Recetas</text>
+     <text lang="PT">Receitas</text>
      <action>PLUGIN mythRecipe</action>
      <depends>mythrecipe</depends>
    </button>
@@ -137,6 +143,7 @@
       <text lang="NB">Systemstatus</text>
       <text lang="DK">Systemstatus</text>
       <text lang="ES">Estado Sistema</text> 
+      <text lang="PT">Estado do Sistema</text>
       <action>TV_STATUS</action>
    </button>
 

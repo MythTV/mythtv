@@ -11,7 +11,7 @@
       <text lang="DE">Fernsehen</text>
       <text lang="DK">Se TV</text>
       <text lang="IS">Horfa á sjónvarp</text>
-      <text lang="PT">Ver TelevisÃ£o</text>
+      <text lang="PT">Ver Televisão</text>
       <text lang="SV">Se på TV</text>
       <text lang="JA">TV放送</text>
       <text lang="FI">Katso TV:tä</text>
@@ -38,8 +38,10 @@
      <text lang="NB">Mediebibliotek</text>
      <text lang="DK">Mediabibliotek</text>
      <text lang="ES">Mediateca</text>
+     <text lang="PT">Galeria Multimédia</text>
      <alttext lang="SV">Bibliotek</alttext>
      <alttext lang="ET">Kataloog</alttext>
+     <alttext lang="PT">Galeria</alttext>
      <action>MENU library.xml</action>
    </button>
    
@@ -54,7 +56,7 @@
       <text lang="DE">Aufnahmen verwalten</text>
       <text lang="DK">Optag udsendelse</text>
       <text lang="IS">Upptaka útsendinga</text>
-      <text lang="PT">Gravação Programada</text>
+      <text lang="PT">Gerir Gravações</text>
       <text lang="SV">Hantera inspelningar</text>
       <text lang="JA">録画予約</text>
       <text lang="FI">Hallitse Nauhoituksia</text>
@@ -66,6 +68,7 @@
       <alttext lang="SV">Hantera</alttext>
       <alttext lang="ET">Salvestused</alttext>
       <alttext lang="ES">Programar</alttext>
+      <alttext lang="PT">Programação</alttext>
       <action>MENU manage_recordings.xml</action>
    </button>
 
@@ -86,10 +89,12 @@
      <text lang="DK">Informationscenter</text>
      <text lang="ES">Centro de Información</text>
      <text lang="EN_GB">Information Centre</text>
+     <text lang="PT">Centro de Informação</text>
      <alttext lang="ES">Información</alttext>
      <alttext lang="DE">Infocenter</alttext>
      <alttext lang="SV">Infocenter</alttext>
      <alttext lang="ET">Info</alttext>
+     <alttext lang="PT">Informação</alttext>
      <action>MENU info_menu.xml</action>
    </button>
 
@@ -110,6 +115,7 @@
      <text lang="DK">CD/DVD</text>
      <text lang="ES">CD/DVD</text>
      <text lang="EN_GB">CD/DVD</text>
+     <text lang="PT">CD/DVD</text>
      <action>MENU optical_menu.xml</action>
      <depends>mythmusic mythdvd</depends>
    </button>
@@ -125,7 +131,7 @@
      <text lang="DK">Konfiguration</text>
      <text lang="IS">Uppsetning</text>
      <text lang="NL">Beheer</text>
-     <text lang="PT">Configurações</text>
+     <text lang="PT">Utensílios</text>
      <text lang="SV">Verktyg / Inställningar</text>
      <text lang="JA">設定</text>
      <text lang="FI">Oheis/Asetukset</text>
@@ -145,6 +151,7 @@
      <text lang="NL">Uitschakelen</text>
      <text lang="DE">Beenden</text>
      <text lang="ET">Seiska</text>
+     <text lang="PT">Gravações</text>
      <action>SHUTDOWN</action>
    </button> -->
 

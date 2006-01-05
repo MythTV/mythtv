@@ -10,7 +10,7 @@
       <text lang="FR">Visionner</text>
       <text lang="DE">Aufnahmen ansehen</text>
       <text lang="DK">Afspil optagelser</text>
-      <text lang="PT">Ver Gravações</text>
+      <text lang="PT">Ver Gravações da TV</text>
       <text lang="SV">Titta på inspelningar</text>
       <text lang="JA">録画再生</text>
       <text lang="SI">Predvajanje snemanj</text>
@@ -52,7 +52,7 @@
       <text lang="FR">Programmer des enregistrements</text>
       <text lang="DE">Aufnahmen planen</text>
       <text lang="DK">Optag udsendelse</text>
-      <text lang="PT">Gravação Programada</text>
+      <text lang="PT">Programar Gravações</text>
       <text lang="SV">Schemalägg inspelningar</text>
       <text lang="JA">録画予約</text>
       <text lang="SI">Plan snemanj</text>
@@ -83,6 +83,7 @@
       <text lang="SI">Snemalne prirotete</text>
       <text lang="ET">Salvestamisprioriteedid</text>
       <text lang="DK">Optagelses prioriteter</text>
+      <text lang="PT">Prioridades de Gravações</text>
       <alttext>Priorities</alttext>
       <alttext lang="SV">Prioriteter</alttext>
       <alttext lang="NL">Prioriteiten</alttext>
@@ -90,6 +91,7 @@
       <alttext lang="SI">Prioritete</alttext>
       <alttext lang="ET">Prioriteedid</alttext>
       <alttext lang="DK">Prioriteter</alttext>
+      <alttext lang="PT">Prioridades</alttext>
       <action>TV_SET_RECPRIORITIES</action>
    </button>
 
@@ -103,7 +105,7 @@
      <text lang="DE">Zubehör / Konfiguration</text>
      <text lang="DK">Konfiguration</text>
      <text lang="NL">Beheer</text>
-     <text lang="PT">Configurações</text>
+     <text lang="PT">Utensílios</text>
      <text lang="SV">Verktyg / Inställningar</text>
      <text lang="JA">設定</text>
      <text lang="FI">Oheis/Asetukset</text>
@@ -122,6 +124,7 @@
      <text lang="DE">Beenden</text>
      <text lang="ET">Seiska</text>
      <text lang="DK">Afslut</text>
+     <text lang="PT">Desligar</text>
      <action>SHUTDOWN</action>
    </button> -->
 

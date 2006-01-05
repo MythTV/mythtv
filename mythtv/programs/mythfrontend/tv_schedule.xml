@@ -34,6 +34,7 @@
       <alttext lang="SI">Vodič</alttext>
       <alttext lang="ET">Kava</alttext>
       <alttext lang="NB">Oversikt</alttext>
+      <alttext lang="PT">Guia</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -91,6 +92,7 @@
       <text lang="NB">Søk etter ord</text>
       <text lang="DK">Søg ord</text>
       <text lang="ES">Buscar Palabras</text>
+      <text lang="PT">Pesquisar Palavras</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoek</alttext>
@@ -102,6 +104,7 @@
       <alttext lang="NB">Søk</alttext>
       <alttext lang="DK">Søg</alttext>
       <alttext lang="ES">Palabras</alttext>
+      <alttext lang="PT">Palavras</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -120,6 +123,7 @@
       <text lang="NB">Søk i lister</text>
       <text lang="DK">Søg i lister</text>
       <text lang="ES">Buscar Listas</text>
+      <text lang="PT">Pesquisar Listas</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="IS">Listar</alttext>
@@ -131,6 +135,7 @@
       <alttext lang="NB">Lister</alttext>
       <alttext lang="DK">Lister</alttext>
       <alttext lang="ES">Listas</alttext>
+      <alttext lang="PT">Listas</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -145,7 +150,7 @@
       <text lang="FR">Enregistrement manuel</text>
       <text lang="DE">Sofortige Aufnahme</text>
       <text lang="DK">Optag lige nu</text>
-      <text lang="PT">Gravar Agora</text>
+      <text lang="PT">Gravação Imediata</text>
       <text lang="SV">Omedelbar inspelning</text>
       <text lang="JA">簡単録画</text>
       <text lang="FI">Välitön Nauhoitus</text>
@@ -157,7 +162,7 @@
       <alttext lang="CA">Grav. inst.</alttext>
       <alttext lang="DK">Optag nu</alttext>
       <alttext lang="NL">Instant</alttext>
-      <alttext lang="PT">Gravar Agora</alttext>
+      <alttext lang="PT">Imediata</alttext>
       <alttext lang="SV">Omedelbar</alttext>
       <alttext lang="JA">簡単録画</alttext>
       <alttext lang="NB">Ta opp nå</alttext>
@@ -181,6 +186,7 @@
       <text lang="NB">Egendefinert opptak</text>
       <text lang="DK">Brugerstyret optagelse</text>
       <text lang="ES">Avanzada</text>
+      <text lang="PT">Regras de Gravação</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 

@@ -4,7 +4,7 @@
       <type>DVD_PLAY</type>
       <text>Play DVD</text>
       <text lang="DK">Afspil DVD</text>
-      <text lang="PT">Tocar DVD</text>
+      <text lang="PT">Ver DVD</text>
       <text lang="IS">Spila DVD</text>
       <text lang="DE">DVD abspielen</text>
       <text lang="SV">Spela DVD</text>
@@ -26,7 +26,7 @@
       <type>VCD_PLAY</type>
       <text>Play VCD</text>
       <text lang="DK">Afspil VCD</text>
-      <text lang="PT">Tocar VCD</text>
+      <text lang="PT">Ver VCD</text>
       <text lang="DE">VCD abspielen</text>
       <text lang="IS">Spila VCD</text>
       <text lang="SV">Spela VCD</text>
@@ -54,7 +54,7 @@
       <text lang="DK">Importér DVD</text>
       <text lang="IS">Hlaða inn DVD</text>
       <text lang="NL">DVD Importeren</text>
-      <text lang="PT">Ler do DVD</text>
+      <text lang="PT">Importar DVD p/ Disco</text>
       <text lang="SV">Importera DVD</text>
       <text lang="FR">Importer un DVD</text>
       <text lang="JA">DVD取込</text>
@@ -72,6 +72,7 @@
       <text>Burn DVD</text>
       <text lang="FI">Polta DVD</text>
       <text lang="FR">Graver un DVD</text>
+      <text lang="PT">Gravar DVD</text>
       <action>PLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>
@@ -86,7 +87,7 @@
       <text lang="DK">Importér CD</text>
       <text lang="IS">Hlaða inn hljóðdisk</text>
       <text lang="NL">CD Importeren</text>
-      <text lang="PT">Ler do CD</text>
+      <text lang="PT">Importar CD p/ Disco</text>
       <text lang="SV">Importera CD</text>
       <text lang="FR">Importer un CD audio</text>
       <text lang="JA">CD取込</text>

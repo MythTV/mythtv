@@ -123,6 +123,7 @@
      <text lang="NB">Radioinnstillinger</text>
      <text lang="DK">Radioindstillinger</text>
      <text lang="ES">Configurar Radio</text>
+     <text lang="PT">Configurar Rádio</text>
      <action>CONFIGPLUGIN mythfm</action>
      <depends>mythfm</depends>
    </button>
@@ -132,6 +133,7 @@
       <text>Burn DVD Settings</text>
       <text lang="FI">DVD:n Polttoasetukset</text>
       <text lang="FR">Gravure de DVD</text>
+      <text lang="PT">Conf. Grav. de DVDs</text>
       <action>CONFIGPLUGIN mythburn</action>
       <depends>mythburn</depends>
    </button>

@@ -16,6 +16,7 @@
       <text lang="NB">Musikkverktøy</text>
       <text lang="DK">Musik tools</text>
       <text lang="ES">Gestionar Música</text>
+      <text lang="PT">Gerir Música</text>
       <action>PLUGIN mythmusic</action>
       <depends>mythmusic</depends>	
    </button>
@@ -52,6 +53,7 @@
       <text lang="DK">Ændre tasteinstillinger</text>
       <text lang="SV">Ändra knappar</text>
       <text lang="ES">Editar Teclas</text>
+      <text lang="PT">Configurar Teclas</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>	
    </button>

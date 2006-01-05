@@ -9,12 +9,14 @@
       <text lang="SI">Nast. snemalne prioritete</text>
       <text lang="ET">Salvestamisprioriteetide määramine</text>
       <text lang="DK">Optagelsesprioriteter</text>
+      <text lang="PT">Definir Prioridades de Gravação</text>
       <alttext>Recording Priorities</alttext>
       <alttext lang="DE">Aufnahmen</alttext>
       <alttext lang="SV">Inspelning</alttext>
       <alttext lang="SI">Snemalne prioritete</alttext>
       <alttext lang="ET">Salvestamisprioriteedid</alttext>
       <alttext lang="DK">Optagelser</alttext>
+      <alttext lang="PT">Prioridades de Gravação</alttext>
       <action>SETTINGS GENERALRECPRIORITIES</action>
    </button>
 
@@ -28,6 +30,7 @@
       <text lang="SI">Nast. kanalne snem. priritete</text>
       <text lang="ET">Kanaliprioriteetide määramine</text>
       <text lang="DK">Kanalprioriteter</text>
+      <text lang="PT">Definir Prioridades de Gravação de Canais</text>
       <alttext>Channel Priorities</alttext>
       <alttext lang="SV">Kanal</alttext>
       <alttext lang="JA">チャンネル優先順位</alttext>
@@ -35,6 +38,7 @@
       <alttext lang="SI">Kanalne prioritete</alttext>
       <alttext lang="ET">Kanaliprioriteedid</alttext>
       <alttext lang="DK">Kanal</alttext>
+      <alttext lang="PT">Prioridades de Canais</alttext>
       <action>SETTINGS CHANNELRECPRIORITIES</action>
    </button>
 

@@ -13,6 +13,7 @@
       <text lang="SI">Novi naslovi</text>
       <text lang="ET">Uued pealkirjad</text>
       <text lang="DK">Nye titler</text>
+      <text lang="PT">Por Novos Títulos</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -29,6 +30,7 @@
       <text lang="SI">Filmi</text>
       <text lang="ET">Filmid</text>
       <text lang="DK">Film</text>
+      <text lang="PT">Por Filme</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -45,6 +47,7 @@
       <text lang="SI">Kategorije</text>
       <text lang="ET">Kategooriad</text>
       <text lang="DK">Kategori</text>
+      <text lang="PT">Por Categoria</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -61,6 +64,7 @@
       <text lang="SI">Kanali</text>
       <text lang="ET">Kanalid</text>
       <text lang="DK">Kanal</text>
+      <text lang="PT">Por Canal</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -77,6 +81,7 @@
       <text lang="SI">Čas</text>
       <text lang="ET">Aeg</text>
       <text lang="DK">Tid</text>
+      <text lang="PT">Por Data e Hora</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 

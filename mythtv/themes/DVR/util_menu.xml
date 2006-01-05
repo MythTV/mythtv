@@ -72,6 +72,7 @@
       <text lang="ET">Raadio</text>
       <text lang="SV">Radio</text>
       <text lang="DK">Radio</text>
+      <text lang="PT">Rádio FM</text>
       <action>PLUGIN mythFM</action>
       <depends>mythFM</depends>
    </button>
@@ -145,6 +146,7 @@
      <text lang="SI">Novice</text>
      <text lang="ET">Uudised</text>
      <text lang="DK">Nyheder</text>
+     <text lang="PT">Notícias</text>
      <action>PLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -158,6 +160,7 @@
       <text lang="SI">Splet</text>
       <text lang="ET">Veeb</text>
       <text lang="DK">Web</text>
+      <text lang="PT">Navegação na Web</text>
       <action>PLUGIN mythbookmarkmanager</action>
       <depends>mythbookmarkmanager</depends>
    </button>
@@ -170,6 +173,7 @@
       <text lang="ET">Telefon</text>
       <text lang="SV">Telefon</text>
       <text lang="DK">Telefon</text>
+      <text lang="PT">Telefone</text>
       <action>PLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>
@@ -178,6 +182,7 @@
        <type>BURN</type>
        <text>Burn DVD</text>
        <action>PLUGIN mythburn</action>
+       <text lang="PT">Gravar DVD</text>
        <depends>mythburn</depends>
    </button>
 
@@ -189,6 +194,7 @@
       <text lang="ET">Retseptid</text>
       <text lang="SV">Recept</text>
       <text lang="DK">Opskrifter</text>
+      <text lang="PT">Receitas</text>
       <action>PLUGIN mythRecipe</action>
       <depends>mythRecipe</depends>
    </button>
@@ -201,6 +207,7 @@
      <text lang="ET">Filmide ajad</text>
      <text lang="SV">Biotider</text>
      <text lang="DK">Biograf</text>
+     <text lang="PT">Horários de Cinema</text>
      <action>PLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -211,6 +218,7 @@
       <text lang="DE">Tastenbelegung ändern</text>
       <text lang="SV">Ändra knappar</text>
       <text lang="DK">Tasteopsætning</text>
+      <text lang="PT">Configurar Teclas</text>
       <action>PLUGIN mythcontrols</action>
       <depends>mythcontrols</depends>
    </button>
@@ -240,12 +248,14 @@
      <text lang="DE">Beenden</text>
      <text lang="ET">Seiskamine</text>
      <text lang="DK">Afslut</text>
+     <text lang="PT">Desligar</text>
      <action>SHUTDOWN</action>
    </button> -->
 
    <button>
      <type>NETFLIX</type>
      <text>NetFlix</text>
+     <text lang="PT">Aluguer de Filmes</text>
      <action>PLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>

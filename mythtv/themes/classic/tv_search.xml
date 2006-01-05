@@ -13,6 +13,7 @@
       <text lang="SI">Naslovi</text>
       <text lang="ET">Pealkirjad</text>
       <text lang="DK">Titel</text>
+      <text lang="PT">Por Títulos</text>
       <action>TV_SEARCH_TITLE</action>
    </button>
    
@@ -29,6 +30,7 @@
       <text lang="SI">Ključne besede</text>
       <text lang="ET">Võtmesõnad</text>
       <text lang="DK">Søgeord</text>
+      <text lang="PT">Por Palavras-Chave</text>
       <action>TV_SEARCH_KEYWORD</action>
    </button>
    
@@ -42,6 +44,7 @@
       <text lang="FI">Ihmiset</text>
       <text lang="SI">Osebe</text>
       <text lang="ET">Inimesed</text>
+      <text lang="PT">Por Pessoas</text>
       <action>TV_SEARCH_PEOPLE</action>
    </button>
    
@@ -56,6 +59,7 @@
       <text lang="SI">Napredno</text>
       <text lang="ET">Muud valikud</text>
       <text lang="DK">Supersøger</text>
+      <text lang="PT">Pesquisa Avançada</text>
       <alttext lang="ET">Muud</alttext>
       <action>TV_SEARCH_POWER</action>
    </button>
@@ -72,6 +76,7 @@
       <text lang="ZH_TW">新標題</text>
       <text lang="SI">Novi naslovi</text>
       <text lang="DK">Nye titler</text>
+      <text lang="PT">Por Novos Títulos</text>
       <action>TV_SEARCH_NEW</action>
    </button>
 
@@ -87,6 +92,7 @@
       <text lang="ZH_TW">電影</text>
       <text lang="SI">Filmi</text>
       <text lang="DK">Film</text>
+      <text lang="PT">Por Filmes</text>
       <action>TV_SEARCH_MOVIE</action>
    </button>
 
@@ -102,6 +108,7 @@
       <text lang="ZH_TW">種類</text>
       <text lang="SI">Kategorije</text>
       <text lang="DK">Kategorier</text>
+      <text lang="PT">Por Categorias</text>
       <action>TV_SEARCH_CATEGORY</action>
    </button>
    
@@ -117,6 +124,7 @@
       <text lang="ZH_TW">電視台</text>
       <text lang="SI">Kanali</text>
       <text lang="DK">Kanal</text>
+      <text lang="PT">Por Canais</text>
       <action>TV_SEARCH_CHANNEL</action>
    </button>
 
@@ -132,6 +140,7 @@
       <text lang="ZH_TW">時間</text>
       <text lang="SI">Čas</text>
       <text lang="DK">Tid</text>
+      <text lang="PT">Por Data e Hora</text>
       <action>TV_SEARCH_TIME</action>
    </button>
 

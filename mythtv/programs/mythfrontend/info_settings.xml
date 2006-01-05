@@ -39,6 +39,7 @@
      <text lang="ET">Uudiste seaded</text>
      <text lang="NB">Innstillinger for nyheter</text>
      <text lang="DK">Nyheds indstillinger</text>
+     <text lang="PT">Configurar Notícias</text>
      <action>CONFIGPLUGIN mythnews</action>
      <depends>mythnews</depends>
    </button>
@@ -50,6 +51,7 @@
      <text lang="SI">Nastavitve čas filmov</text>
      <text lang="ET">Filmiaegade seaded</text>
      <text lang="SV">Biotider</text>
+     <text lang="PT">Configurar Horários de Cinema</text>
      <action>CONFIGPLUGIN mythmovietime</action>
      <depends>mythmovietime</depends>
    </button>
@@ -58,6 +60,7 @@
      <type>SETTINGS_NETFLIX</type>
      <text>NetFlix Settings</text>
      <text lang="FI">MythFlix Asetukset</text>
+     <text lang="PT">Configurar Aluguer de Filmes</text>
      <action>CONFIGPLUGIN mythflix</action>
      <depends>mythflix</depends>
    </button>
@@ -78,6 +81,7 @@
      <text lang="NB">Innstilinger for nettleser</text>
      <text lang="DK">Web instillinger</text>
      <text lang="ES">Configurar Web</text>
+     <text lang="PT">Configurar Navegação Web</text>
      <action>CONFIGPLUGIN mythbookmarkmanager</action>
      <depends>mythbookmarkmanager</depends>
    </button>
@@ -97,8 +101,10 @@
      <text lang="NB">Innstillinger for oppskrifter</text>
      <text lang="DK">Opskrifts indstillinger</text>
      <text lang="ES">Configurar Recetas</text>
+     <text lang="PT">Configurar Receitas</text>
      <alttext lang="DE">Rezepte</alttext>
      <alttext lang="ET">Retseptid</alttext>
+     <alttext lang="PT">Receitas</alttext>
      <action>CONFIGPLUGIN mythrecipe</action>
      <depends>mythrecipe</depends>
    </button>

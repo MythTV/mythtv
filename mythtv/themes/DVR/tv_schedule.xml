@@ -29,6 +29,7 @@
       <alttext lang="ZH_TW">節目</alttext>
       <alttext lang="SI">Vodič</alttext>
       <alttext lang="ET">Kava</alttext>
+      <alttext lang="PT">Guia</alttext>
       <action>TV_SCHEDULE</action>
    </button>
 
@@ -42,7 +43,7 @@
       <text lang="FR">Recherche d'émission</text>
       <text lang="DE">Alphabetische Suche</text>
       <text lang="DK">Program SØger</text>
-      <text lang="PT">Procurar Programa</text>
+      <text lang="PT">Procurar Programas</text>
       <text lang="SV">Programletaren</text>
       <text lang="JA">番組検索</text>
       <text lang="FI">Ohjelman Etsintä</text>
@@ -78,6 +79,7 @@
       <text lang="SI">Besedno iskanje</text>
       <text lang="ET">Otsi sõnu</text>
       <text lang="DK">Søgeord</text>
+      <text lang="PT">Pesquisar Palavras</text>
       <alttext>Search</alttext>
       <alttext lang="FR">Texte</alttext>
       <alttext lang="NL">Zoek</alttext>
@@ -86,6 +88,7 @@
       <alttext lang="SI">Iskanje</alttext>
       <alttext lang="ET">Sõnad</alttext>
       <alttext lang="DK">Ord</alttext>
+      <alttext lang="PT">Palavras</alttext>
       <action>MENU tv_search.xml</action>
    </button>
 
@@ -101,6 +104,7 @@
       <text lang="SI">Seznamsko iskanje</text>
       <text lang="ET">Otsi nimekirju</text>
       <text lang="DK">Søg på lister</text>
+      <text lang="PT">Pesquisar Listas</text>
       <alttext>Lists</alttext>
       <alttext lang="DE">Listen</alttext>
       <alttext lang="SV">Listor</alttext>
@@ -109,6 +113,7 @@
       <alttext lang="SI">Seznami</alttext>
       <alttext lang="ET">Nimekirjad</alttext>
       <alttext lang="DK">Lister</alttext>
+      <alttext lang="PT">Listas</alttext>
       <action>MENU tv_lists.xml</action>
    </button>
 
@@ -123,7 +128,7 @@
       <text lang="FR">Enregistrement manuel</text>
       <text lang="DE">Sofortige Aufnahme</text>
       <text lang="DK">Optag lige nu</text>
-      <text lang="PT">Gravar Agora</text>
+      <text lang="PT">Gravação Imediata</text>
       <text lang="SV">Omedelbar inspelning</text>
       <text lang="JA">簡単録画</text>
       <text lang="FI">Välitön Nauhoitus</text>
@@ -134,7 +139,7 @@
       <alttext lang="CA">Grav. inst.</alttext>
       <alttext lang="DK">Optag nu</alttext>
       <alttext lang="NL">Instant</alttext>
-      <alttext lang="PT">Gravar Agora</alttext>
+      <alttext lang="PT">Gravação Imediata</alttext>
       <alttext lang="SV">Omedelbar</alttext>
       <alttext lang="JA">簡単録画</alttext>
       <action>TV_MANUAL</action>
@@ -154,6 +159,7 @@
       <text lang="SI">Poljubno snemanje</text>
       <text lang="ET">Kohandatud salvestamine</text>
       <text lang="DK">Avanceret</text>
+      <text lang="PT">Regras de Gravação</text>
       <action>TV_CUSTOM_RECORD</action>
    </button>
 

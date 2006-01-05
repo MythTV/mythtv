@@ -60,6 +60,7 @@
      <text lang="ET">TV seaded</text>
      <text lang="NB">TV</text>
      <text lang="DK">TV</text>
+     <text lang="PT">Configurar Televisão</text>
      <action>MENU tv_settings.xml</action>
    </button>
 
@@ -79,6 +80,7 @@
      <text lang="NB">Media</text>
      <text lang="DK">Media</text>
      <text lang="ES">Medios</text>
+     <text lang="PT">Configurar Multimédia</text>
      <action>MENU media_settings.xml</action>
      <depends>mythvideo mythmusic mythgallery mythfm mythgame</depends>
    </button>
@@ -100,6 +102,7 @@
      <text lang="DK">Informationscenter</text>
      <text lang="ES">Centro Información</text>
      <text lang="EN_GB">Info Centre Settings</text>
+     <text lang="PT">Config. Centro de Info.</text>
      <action>MENU info_settings.xml</action>
      <depends>mythnews mythweather mythbookmarkmanager mythrecipe mythflix</depends> 
    </button>
@@ -140,6 +143,7 @@
       <text lang="NB">Telefon</text>
       <text lang="DK">Telefon</text>
       <text lang="ES">Teléfono</text>
+      <text lang="PT">Configurar Telefone</text>
       <action>CONFIGPLUGIN mythphone</action>
       <depends>mythphone</depends>
    </button>

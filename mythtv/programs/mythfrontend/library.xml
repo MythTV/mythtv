@@ -11,7 +11,7 @@
       <text lang="DE">Aufnahmen ansehen</text>
       <text lang="DK">Afspil optagelser</text>
       <text lang="IS">Horfa á upptökur</text>
-      <text lang="PT">Ver Gravações</text>
+      <text lang="PT">Ver Gravações de TV</text>
       <text lang="SV">Visa inspelningar</text>
       <text lang="JA">録画再生</text>
       <text lang="FI">Katso Nauhoitukset</text>
@@ -84,7 +84,9 @@
      <text lang="NB">Hør på radio</text>
      <text lang="DK">Hør radio</text>
      <text lang="ES">Escuchar Radio</text>
+     <text lang="PT">Ouvir Rádio</text>
      <alttext lang="SV">Radio</alttext>
+     <alttext lang="PT">Rádio</alttext>
      <action>PLUGIN mythFM</action>
      <depends>mythFM mythfm</depends>
    </button>
@@ -100,7 +102,7 @@
      <text lang="DE">Bilder ansehen</text>
      <text lang="DK">Billeder</text>
      <text lang="IS">Ljósmyndir</text>
-     <text lang="PT">Fotos</text>
+     <text lang="PT">Ver Fotos</text>
      <text lang="SV">Visa bilder</text>
      <text lang="JA">イメージ</text>
      <text lang="FI">Kuvagalleria</text>
@@ -123,7 +125,7 @@
      <text lang="DE">Spielen</text>
      <text lang="DK">Spil</text>
      <text lang="IS">Spila leiki</text>
-     <text lang="PT">Jogos</text>
+     <text lang="PT">Jogar</text>
      <text lang="SV">Spela spel</text>
      <text lang="JA">ゲーム</text>
      <text lang="FI">Pelit</text>
