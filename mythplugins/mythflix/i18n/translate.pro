@@ -4,4 +4,4 @@ SOURCES += ../mythflix/mythflixqueue.cpp
 SOURCES += ../mythflix/newsengine.cpp
 SOURCES += ./themestrings.h
 
-TRANSLATIONS = mythflix_fi.ts
+TRANSLATIONS = mythflix_fi.ts mythflix_es.ts

@@ -257,6 +257,14 @@
         <source>General Settings (2/2)</source>
         <translation>Configuración General (2/2)</translation>
     </message>
+    <message>
+        <source>Video List Loads Video Meta Data</source>
+        <translation>La Lista Videos carga metadatos</translation>
+    </message>
+    <message>
+        <source>If set along with Browse Files, this will cause the Video List to load any known video metadata from the database. Turning this off can greatly  speed up how long it takes to load the Video List tree</source>
+        <translation>Sí se activa junto con Listar Ficheros, esto causará que la Lista Videos cargue cualquier metadato conocido desde la base de datos. Desactivarlo acelerará la carga del árbol Lista Videos</translation>
+    </message>
 </context>
 <context>
     <name>ThemeUI</name>

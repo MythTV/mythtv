@@ -100,6 +100,10 @@
         <source>Random</source>
         <translation>Aleatorio</translation>
     </message>
+    <message>
+        <source>Delete</source>
+        <translation>Borrar</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -113,7 +117,7 @@
     </message>
     <message>
         <source>Paths to import images from</source>
-        <translation>Camino desde donde se importan las imágenes</translation>
+        <translation>Ruta desde donde se importan las imágenes</translation>
     </message>
     <message>
         <source>Type of transition</source>

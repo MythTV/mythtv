@@ -51,265 +51,301 @@
     </message>
     <message>
         <source>The theme you are using does not contain a &apos;musictree&apos; element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>El tema que está usando no contiene un elemento &apos;musictree&apos;.  Por favor, contacte con el creador del tema y pídale que lo actualice.&lt;br&gt;&lt;br&gt;La siguiente pantalla estará vacía.  Salga para volver al menú.</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Couldn&apos;t create CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Imposible crear CD</translation>
     </message>
     <message>
         <source>CD Created</source>
-        <translation type="unfinished"></translation>
+        <translation>CD Creado</translation>
     </message>
     <message>
         <source>CD-RW Blanking Progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar CD-RW en progreso</translation>
     </message>
     <message>
         <source>Create Audio CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear Audio CD desde la lista</translation>
     </message>
     <message>
         <source>Create MP3 CD from Playlist</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear MP3 CD desde la lista</translation>
     </message>
     <message>
         <source>Clear CD-RW Disk</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar disco CD-RW</translation>
     </message>
     <message>
         <source>The theme you are using does not contain any info lines in the music element.  Please contact the theme creator and ask if they could please update it.&lt;br&gt;&lt;br&gt;The next screen will be empty.  Escape out of it to return to the menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>El tema que está usando no contiene ninguna línea de información en el elemento musica .  Por favor, contacte con el creador del tema y pídale que lo actualice.&lt;br&gt;&lt;br&gt;La siguiente pantalla estará vacía.  Salga para volver al menú.</translation>
     </message>
     <message>
         <source>Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Artista:</translation>
     </message>
     <message>
         <source>Album:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Álbum:</translation>
     </message>
     <message>
         <source>Title:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Título:</translation>
     </message>
     <message>
         <source>Length:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Duración:</translation>
     </message>
     <message>
         <source>Genre: </source>
-        <translation type="unfinished">Género:</translation>
+        <translation>Género:</translation>
     </message>
     <message>
         <source>Compilation Artist:<byte value="x9"/></source>
-        <translation type="unfinished"></translation>
+        <translation>Artista Compilación:</translation>
     </message>
 </context>
 <context>
     <name>EditMetadataDialog</name>
     <message>
         <source>Done</source>
-        <translation type="unfinished"></translation>
+        <translation>Hecho</translation>
     </message>
     <message>
         <source>DB Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Estadísticas BD</translation>
     </message>
     <message>
         <source>Various Artists</source>
-        <translation type="unfinished">Varios artistas</translation>
+        <translation>Varios artistas</translation>
     </message>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un Artista</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija una Compilación</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un Álbum</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un Género</translation>
     </message>
     <message>
         <source>Save Changes?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Guardar cambios?</translation>
     </message>
     <message>
         <source>Save to Database Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar sólo a base de datos</translation>
     </message>
     <message>
         <source>Save to File Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar sólo a fichero</translation>
     </message>
     <message>
         <source>Save to File and Database</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar a fichero y base de datos</translation>
     </message>
     <message>
         <source>Exit/Do Not Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Salir/No guardar</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Are you sure you want to save the modified metadata to the file?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Seguro de guardar los metadatos modificados al fichero?</translation>
     </message>
 </context>
 <context>
     <name>PlaybackBoxMusic</name>
     <message>
         <source>Edit Playlist</source>
-        <translation type="unfinished">Editar Lista</translation>
+        <translation>Editar Lista</translation>
     </message>
     <message>
         <source>Visualize</source>
-        <translation type="unfinished">Visualizar</translation>
+        <translation>Visualizar</translation>
     </message>
     <message>
         <source>3 Edit Playlist</source>
-        <translation type="unfinished">3 Editar Lista</translation>
+        <translation>3 Editar Lista</translation>
     </message>
     <message>
         <source>4 Visualize</source>
-        <translation type="unfinished">4 Visualizar</translation>
+        <translation>4 Visualizar</translation>
     </message>
     <message>
         <source>1 Shuffle: Smart</source>
-        <translation type="unfinished">1 Aleatorio: Preferido</translation>
+        <translation>1 Aleatorio: Preferido</translation>
     </message>
     <message>
         <source>Shuffle: Smart</source>
-        <translation type="unfinished">Aleatorio: Preferido</translation>
+        <translation>Aleatorio: Preferido</translation>
     </message>
     <message>
         <source>1 Shuffle: Rand</source>
-        <translation type="unfinished">1 Aleatorio: Variable</translation>
+        <translation>1 Aleatorio: Variable</translation>
     </message>
     <message>
         <source>Shuffle: Rand</source>
-        <translation type="unfinished">Aleatorio: Variable</translation>
+        <translation>Aleatorio: Variable</translation>
     </message>
     <message>
         <source>1 Shuffle: None</source>
-        <translation type="unfinished">1 Aleatorio: No</translation>
+        <translation>1 Aleatorio: No</translation>
     </message>
     <message>
         <source>Shuffle: None</source>
-        <translation type="unfinished">Aleatorio: No</translation>
+        <translation>Aleatorio: No</translation>
     </message>
     <message>
         <source>2 Repeat: All</source>
-        <translation type="unfinished">2 Repetir: Todo</translation>
+        <translation>2 Repetir: Todo</translation>
     </message>
     <message>
         <source>Repeat: All</source>
-        <translation type="unfinished">Repetir: Todo</translation>
+        <translation>Repetir: Todo</translation>
     </message>
     <message>
         <source>2 Repeat: Track</source>
-        <translation type="unfinished">2 Repetir: Pista</translation>
+        <translation>2 Repetir: Pista</translation>
     </message>
     <message>
         <source>Repeat: Track</source>
-        <translation type="unfinished">Repetir: Pista</translation>
+        <translation>Repetir: Pista</translation>
     </message>
     <message>
         <source>2 Repeat: None</source>
-        <translation type="unfinished">2 Repetir: No</translation>
+        <translation>2 Repetir: No</translation>
     </message>
     <message>
         <source>Repeat: None</source>
-        <translation type="unfinished">Repetir: No</translation>
+        <translation>Repetir: No</translation>
     </message>
     <message>
         <source>playlist root</source>
-        <translation type="unfinished">raiz de la lista</translation>
+        <translation>raiz de la lista</translation>
     </message>
     <message>
         <source>Playing stream.</source>
-        <translation type="unfinished">Reproduciendo.</translation>
+        <translation>Reproduciendo.</translation>
     </message>
     <message>
         <source>Buffering stream.</source>
-        <translation type="unfinished">Cargando reproducción.</translation>
+        <translation>Cargando reproducción.</translation>
     </message>
     <message>
         <source>Stream paused.</source>
-        <translation type="unfinished">Reproducción en pausa.</translation>
+        <translation>Reproducción en pausa.</translation>
     </message>
     <message>
         <source>Output error.</source>
-        <translation type="unfinished">Error de salida.</translation>
+        <translation>Error de salida.</translation>
     </message>
     <message>
         <source>Stream stopped.</source>
-        <translation type="unfinished">Reproducción parada.</translation>
+        <translation>Reproducción parada.</translation>
     </message>
     <message>
         <source>Finished playing stream.</source>
-        <translation type="unfinished">Reproducción finalizada.</translation>
+        <translation>Reproducción finalizada.</translation>
     </message>
     <message>
         <source>Decoder error.</source>
-        <translation type="unfinished">Error de decodificación.</translation>
+        <translation>Error de decodificación.</translation>
     </message>
     <message>
         <source>kbps</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>kHz</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>ch</source>
-        <translation type="unfinished"></translation>
+        <translation>can</translation>
     </message>
     <message>
         <source>Smart playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Listas inteligentes</translation>
     </message>
     <message>
         <source>All Tracks</source>
-        <translation type="unfinished"></translation>
+        <translation>Todas pistas</translation>
     </message>
     <message>
         <source>Tracks by current Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Pistas del artista actual</translation>
     </message>
     <message>
         <source>Tracks from current Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Pistas del álbum actual</translation>
     </message>
     <message>
         <source>Tracks from current Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Pistas del género actual</translation>
     </message>
     <message>
         <source>Tracks from current Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Pistas del año actual</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Búscar</translation>
     </message>
     <message>
         <source>From CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Desde CD</translation>
+    </message>
+    <message>
+        <source>Change Filter</source>
+        <translation>Cambiar filtro</translation>
+    </message>
+    <message>
+        <source>Update Playlist Options</source>
+        <translation>Actualizar Opciones Lista</translation>
+    </message>
+    <message>
+        <source>Replace</source>
+        <translation>Reemplazar</translation>
+    </message>
+    <message>
+        <source>Insert after current track</source>
+        <translation>Insertar después de la pista actual</translation>
+    </message>
+    <message>
+        <source>Append to end</source>
+        <translation>Añadir al final</translation>
+    </message>
+    <message>
+        <source>Continue playing current track</source>
+        <translation>Continuar reproduciendo pista actual</translation>
+    </message>
+    <message>
+        <source>Play first track</source>
+        <translation>Reproducir primera pista</translation>
+    </message>
+    <message>
+        <source>Play first new track</source>
+        <translation>Reproducir primera pista nueva</translation>
+    </message>
+    <message>
+        <source>Remove Duplicates</source>
+        <translation>Eliminar duplicados</translation>
     </message>
 </context>
 <context>
@@ -732,123 +768,127 @@
     </message>
     <message>
         <source>Use variable bitrates</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar bitrates variables</translation>
     </message>
     <message>
         <source>If set, the MP3 encoder will use variable bitrates (VBR) except for the low quality setting. The Ogg encoder will always use variable bitrates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si está activado el codificador MP3 usará bitrates variables (VBR) excepto para el ajuste de baja calidad. El codificaor OGG siempre usará bitrate variable.</translation>
     </message>
     <message>
         <source>CD Ripper Settings (part 2)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes CD Ripper (parte 2)</translation>
     </message>
     <message>
         <source>Enable CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar escritura CD.</translation>
     </message>
     <message>
         <source>Requires a SCSI or an IDE-SCSI CD Writer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Requiere una grabadora SCSI o IDE-SCSI.</translation>
     </message>
     <message>
         <source>CD-Writer Device</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabadora</translation>
     </message>
     <message>
         <source>Disk Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamaño Disco</translation>
     </message>
     <message>
         <source>650MB/75min</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>700MB/80min</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Default CD Capacity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Capacidad CD por defecto.</translation>
     </message>
     <message>
         <source>Enable directories on MP3 Creation</source>
-        <translation type="unfinished"></translation>
+        <translation>Activar directorios en la creación MP3</translation>
     </message>
     <message>
         <source>CD Write Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocidad escritura CD</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>CD Writer speed. Auto will use the recomended speed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Velocidad escritura CD. Auto usará la velocidad recomendada.</translation>
     </message>
     <message>
         <source>CD Blanking Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de borrado CD</translation>
     </message>
     <message>
         <source>Fast</source>
-        <translation type="unfinished"></translation>
+        <translation>Rápido</translation>
     </message>
     <message>
         <source>Complete</source>
-        <translation type="unfinished"></translation>
+        <translation>Completo</translation>
     </message>
     <message>
         <source>Blanking Method. Fast takes 1 minute. Complete can take up to 20 minutes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Método de borrado. Rápido lleva 1 minuto. Completo puede llevar 20 minutos.</translation>
     </message>
     <message>
         <source>CD Recording Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajustes Grabación CD</translation>
     </message>
     <message>
         <source>Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Artistas</translation>
     </message>
     <message>
         <source>Creating CD File System</source>
-        <translation type="unfinished"></translation>
+        <translation>Creando sistema ficheros CD</translation>
     </message>
     <message>
         <source>Burning CD</source>
-        <translation type="unfinished"></translation>
+        <translation>Grabando CD</translation>
     </message>
     <message>
         <source>?</source>
-        <translation type="unfinished"></translation>
+        <translation>?</translation>
     </message>
     <message>
         <source>Track %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Pista %1</translation>
     </message>
     <message>
         <source>Order in which to sort the Music Tree. Possible values are a space-separated list of genre, splitartist, splitartist1, artist, album, and title OR the keyword &quot;directory&quot; to indicate that the onscreen tree mirrors the filesystem.</source>
-        <translation type="unfinished"></translation>
+        <translation>Órden en el que ordenar el Árbol de Música. Valores posibles son: lista separada por espacios de género, splitartist, splitartist1, artista, álbum, y título O la palabra clave &quot;directorio&quot; para indicar que el árbol en pantalla refleja el sistema de ficheros.</translation>
     </message>
     <message>
         <source>Automatically play CDs</source>
-        <translation type="unfinished"></translation>
+        <translation>Reproducir CDs automáticamente</translation>
     </message>
     <message>
         <source>Automatically put a new CD on the playlist and start playing the CD.</source>
-        <translation type="unfinished"></translation>
+        <translation>Poner automáticamente en la lista un nuevo CD y reproducirlo.</translation>
     </message>
     <message>
         <source>Select the SCSI or IDE Device for CD Writing.</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccione el dispositivo SCSI o IDE para la grabación CD.</translation>
     </message>
     <message>
         <source>Scanning music files</source>
-        <translation type="unfinished"></translation>
+        <translation>Explorando ficheros música</translation>
     </message>
     <message>
         <source>Rebuilding music tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Reconstruyendo árbol música</translation>
+    </message>
+    <message>
+        <source>Loading Music</source>
+        <translation>Cargando música</translation>
     </message>
 </context>
 <context>
@@ -907,325 +947,325 @@
     </message>
     <message>
         <source>Multi-Artist?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Multi-Artista?</translation>
     </message>
     <message>
         <source>Switch Titles &amp;&amp; Artists</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar Títulos por Artistas</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">Título</translation>
+        <translation>Título</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished">Artista</translation>
+        <translation>Artista</translation>
     </message>
     <message>
         <source>Length</source>
-        <translation type="unfinished">Duración</translation>
+        <translation>Duración</translation>
     </message>
     <message>
         <source>Quality: </source>
-        <translation type="unfinished"></translation>
+        <translation>Calidad:</translation>
     </message>
     <message>
         <source>Importing </source>
-        <translation type="unfinished"></translation>
+        <translation>Importando</translation>
     </message>
 </context>
 <context>
     <name>SmartPLCriteriaRow</name>
     <message>
         <source>Select an Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un Artista</translation>
     </message>
     <message>
         <source>Select an Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un Álbum</translation>
     </message>
     <message>
         <source>Select a Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un Género</translation>
     </message>
     <message>
         <source>Select a Title</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija un Título</translation>
     </message>
     <message>
         <source>Select a Compilation Artist</source>
-        <translation type="unfinished"></translation>
+        <translation>Elija una Compilación</translation>
     </message>
 </context>
 <context>
     <name>SmartPLDateDialog</name>
     <message>
         <source>Edit Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar Fecha</translation>
     </message>
     <message>
         <source>Fixed Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Fecha Fija</translation>
     </message>
     <message>
         <source>Day</source>
-        <translation type="unfinished"></translation>
+        <translation>Día</translation>
     </message>
     <message>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>Mes</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Año</translation>
     </message>
     <message>
         <source>Use Current Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar Fecha Actual</translation>
     </message>
     <message>
         <source>+/- Days</source>
-        <translation type="unfinished"></translation>
+        <translation>+/- Días</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Invalid Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Fecha inválida</translation>
     </message>
 </context>
 <context>
     <name>SmartPLOrderByDialog</name>
     <message>
         <source>Order By Fields</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordenar por campos</translation>
     </message>
     <message>
         <source>1 Add</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Añadir</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir</translation>
     </message>
     <message>
         <source>2 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Borrar</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar</translation>
     </message>
     <message>
         <source>3 Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Mover arriba</translation>
     </message>
     <message>
         <source>Move Up</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover arriba</translation>
     </message>
     <message>
         <source>4 Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Mover abajo</translation>
     </message>
     <message>
         <source>Move Down</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover abajo</translation>
     </message>
     <message>
         <source>5 Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>5 Ascendente</translation>
     </message>
     <message>
         <source>Ascending</source>
-        <translation type="unfinished"></translation>
+        <translation>Ascendente</translation>
     </message>
     <message>
         <source>6 Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>6 Descendente</translation>
     </message>
     <message>
         <source>Descending</source>
-        <translation type="unfinished"></translation>
+        <translation>Descendente</translation>
     </message>
     <message>
         <source>7 OK</source>
-        <translation type="unfinished"></translation>
+        <translation>7 OK</translation>
     </message>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
     <name>SmartPLResultViewer</name>
     <message>
         <source>Smart Playlist Result Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Visor de resultados de lista inteligente</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Salir</translation>
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>Artist</source>
-        <translation type="unfinished">Artista</translation>
+        <translation>Artista</translation>
     </message>
     <message>
         <source>Album</source>
-        <translation type="unfinished"></translation>
+        <translation>Álbum</translation>
     </message>
     <message>
         <source>Title</source>
-        <translation type="unfinished">Título</translation>
+        <translation>Título</translation>
     </message>
     <message>
         <source>Genre</source>
-        <translation type="unfinished"></translation>
+        <translation>Género</translation>
     </message>
     <message>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>Año</translation>
     </message>
     <message>
         <source>Track No.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nº Pista</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistDialog</name>
     <message>
         <source>Smart Playlists</source>
-        <translation type="unfinished"></translation>
+        <translation>Listas Inteligentes</translation>
     </message>
     <message>
         <source>1 Select</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Seleccionar</translation>
     </message>
     <message>
         <source>Select</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar</translation>
     </message>
     <message>
         <source>2 New</source>
-        <translation type="unfinished"></translation>
+        <translation>2 Nueva</translation>
     </message>
     <message>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Nueva</translation>
     </message>
     <message>
         <source>3 Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>3 Editar</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar</translation>
     </message>
     <message>
         <source>4 Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>4 Borrar</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this SmartPlaylist?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Seguro que desea borrar esta Lista Inteligente?</translation>
     </message>
 </context>
 <context>
     <name>SmartPlaylistEditor</name>
     <message>
         <source>Smart Playlist Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>Editor Listas Inteligentes</translation>
     </message>
     <message>
         <source>Category:</source>
-        <translation type="unfinished"></translation>
+        <translation>Categoría:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Título:</translation>
     </message>
     <message>
         <source>Match</source>
-        <translation type="unfinished"></translation>
+        <translation>Coincidencia</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Todas</translation>
     </message>
     <message>
         <source>Any</source>
-        <translation type="unfinished"></translation>
+        <translation>Alguna</translation>
     </message>
     <message>
         <source>Of The Following Conditions</source>
-        <translation type="unfinished"></translation>
+        <translation>de las siguientes condiciones</translation>
     </message>
     <message>
         <source>Order By:</source>
-        <translation type="unfinished"></translation>
+        <translation>Órden por:</translation>
     </message>
     <message>
         <source>Matches:</source>
-        <translation type="unfinished"></translation>
+        <translation>Coincidencias:</translation>
     </message>
     <message>
         <source>Limit:</source>
-        <translation type="unfinished"></translation>
+        <translation>Límite:</translation>
     </message>
     <message>
         <source></source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar</translation>
     </message>
     <message>
         <source>Show Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar Resultados</translation>
     </message>
     <message>
         <source>Smart Playlist Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>Categorías Listas Inteligentes</translation>
     </message>
     <message>
         <source>New Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Nueva Categoría</translation>
     </message>
     <message>
         <source>Delete Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Borrar Categoría</translation>
     </message>
     <message>
         <source>Rename Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Renombrar Categoría</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this Category?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Seguro que desea borrar esta categoría?</translation>
     </message>
     <message>
         <source>It will also delete any Smart Playlists belonging to this category.</source>
-        <translation type="unfinished"></translation>
+        <translation>También borrará cualquier Lista Inteligente que pertenezca a esta categoría.</translation>
     </message>
 </context>
 <context>
@@ -1236,51 +1276,51 @@
     </message>
     <message>
         <source>Track Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Información Pista</translation>
     </message>
     <message>
         <source>Artist:</source>
-        <translation type="unfinished"></translation>
+        <translation>Artista:</translation>
     </message>
     <message>
         <source>Album:</source>
-        <translation type="unfinished"></translation>
+        <translation>Álbum:</translation>
     </message>
     <message>
         <source>Title:</source>
-        <translation type="unfinished"></translation>
+        <translation>Título:</translation>
     </message>
     <message>
         <source>Genre:</source>
-        <translation type="unfinished"></translation>
+        <translation>Género:</translation>
     </message>
     <message>
         <source>Year:</source>
-        <translation type="unfinished"></translation>
+        <translation>Año:</translation>
     </message>
     <message>
         <source>Track No.:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nº Pista:</translation>
     </message>
     <message>
         <source>Rating:</source>
-        <translation type="unfinished"></translation>
+        <translation>Puntuación:</translation>
     </message>
     <message>
         <source>Play Count:</source>
-        <translation type="unfinished"></translation>
+        <translation>Veces:</translation>
     </message>
     <message>
         <source>Last Play:</source>
-        <translation type="unfinished"></translation>
+        <translation>Última vez:</translation>
     </message>
     <message>
         <source>Compilation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Compilación:</translation>
     </message>
     <message>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre Fichero:</translation>
     </message>
 </context>
 </TS>
