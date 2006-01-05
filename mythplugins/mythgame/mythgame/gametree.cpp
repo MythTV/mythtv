@@ -166,11 +166,6 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     //  create a few top level nodes - this could be moved to a config based
     //  approach with multiple roots if/when someone has the time to create
     //  the relevant dialog screens
-    levels = gContext->GetSetting("GameAllTreeLevels");
-    root = new GameTreeRoot(levels, systemFilter);
-    m_gameTreeRoots.push_back(root);
-    m_gameTreeItems.push_back(new GameTreeItem(root));
-    node = m_gameTree->addNode(tr("All Games"), m_gameTreeItems.size(), false);
 
     levels = gContext->GetSetting("GameFavTreeLevels");
     root = new GameTreeRoot(levels, systemFilter + " and favorite=1");
@@ -179,6 +174,11 @@ GameTree::GameTree(MythMainWindow *parent, QString windowName,
     node = m_gameTree->addNode(tr("Favourites"), m_gameTreeItems.size(), false);
     m_favouriteNode = node;
 
+    levels = gContext->GetSetting("GameAllTreeLevels");
+    root = new GameTreeRoot(levels, systemFilter);
+    m_gameTreeRoots.push_back(root);
+    m_gameTreeItems.push_back(new GameTreeItem(root));
+    node = m_gameTree->addNode(tr("All Games"), m_gameTreeItems.size(), false);
 
     root = new GameTreeRoot("genre gamename", systemFilter);
     m_gameTreeRoots.push_back(root);
