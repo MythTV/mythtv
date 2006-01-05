@@ -472,19 +472,10 @@ In the United States, you may use a card such as the TwinHan to obtain
 unencrypted Free-To-Air satellite channels.
 
 <sect3>HDTV.
-<p>Currently there are two HDTV card with Linux drivers which are known to
-operate in the United States - the HD-2000/HD-3000 cards available from
-<url url="http://www.pchdtv.com/" name="http://www.pchdtv.com/"> or <url
-url="http://mythic.tv/" name="http://mythic.tv/"> and the Air2PC-ATSC-PCI
-available from <url
-url="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103"
-name="http://www.cyberestore.com/product_info.php?cPath=28&amp;products_id=103">
-or <url url="http://mythic.tv/" name="http://mythic.tv/">. 
-
-<!-- The Air2PC card
-can be configured to capture unencrypted QAM and 8VSB.  8VSB is the standard
-used for over-the-air ATSC signals, QAM is used on cable TV systems. --> The
-Air2PC is supported using the linux-dvb drivers.
+<p>There are a number of HDTV card with Linux drivers which are known to
+operate in the United States; a complete list of cards with DVB drivers can
+be found at <url url="http://www.linuxtv.org/wiki/index.php/ATSC_cards"
+name="http://www.linuxtv.org/wiki/index.php/ATSC_cards">
 
 To playback HDTV content, plan on a powerful CPU.  "How powerful?" depends
 on a number of factors, such as the capture resolution, whether the video is
@@ -1670,7 +1661,8 @@ mysql> grant all on mythconverg.* to mythtv@"%.mydomain.com" identified by "myth
 mysql> flush privileges;
 </verb></tscreen>
 
-Finally, if you just want to restrict by IP subnet:
+Finally, if you just want to restrict by IP subnet (in this example, the
+192.168.1. network):
 <tscreen><verb>
 $ mysql -u root mythconverg
 mysql> grant all on mythconverg.* to mythtv@"192.168.1.%" identified by "mythtv";
@@ -7349,11 +7341,8 @@ leading to dropped frames.
 installed as a DVB device and is supported within MythTV.  
 
 First, you must compile a version of the Linux kernel to support the new
-tuner device.  <!--Version 2.6.11 supports the card in 8VSB mode.  If you wish
-to use QAM, you will need to patch the kernel, or wait until 2.6.12. -->
+tuner device.  
 
-Download the source to 2.6.11.  <!--Downloading the <tt>nxt2002-qam.patch</tt> file will allow you to use QAM mode
-to capture unencrypted HDTV. -->
 <tscreen><verb>
 $ su
 # cd /usr/src
