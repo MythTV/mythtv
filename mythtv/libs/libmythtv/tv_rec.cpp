@@ -604,7 +604,7 @@ void TVRec::FinishedRecording(ProgramInfo *curRec)
         return;
 
     curRec->recstatus = rsRecorded;
-    curRec->recendts = QDateTime::currentDateTime();
+    curRec->recendts = mythCurrentDateTime();
 
     if (tvchain)
         tvchain->FinishedRecording(curRec);
@@ -3579,7 +3579,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
 
     QString chanids = QString::number(chanid);
     ProgramInfo *prog = ProgramInfo::GetProgramAtDateTime(chanids, 
-                                                  QDateTime::currentDateTime(),
+                                                  mythCurrentDateTime(),
                                                   true);
 
     if (prog->recstartts == prog->recendts)
@@ -3590,7 +3590,7 @@ bool TVRec::GetProgramRingBufferForLiveTV(ProgramInfo **pginfo,
         prog->endts = prog->recendts = prog->recstartts.addSecs(3600);
     }
 
-    prog->recstartts = QDateTime::currentDateTime();
+    prog->recstartts = mythCurrentDateTime();
     StartedRecording(prog);
 
     *rb = new RingBuffer(prog->GetFileName(), true);

@@ -962,8 +962,6 @@ void Scheduler::getAllPending(RecList *retList)
         retList->pop_back();
     }
 
-    QDateTime now = QDateTime::currentDateTime();
-
     RecIter i = reclist.begin();
     for (; i != reclist.end(); i++)
     {
@@ -979,8 +977,6 @@ void Scheduler::getAllPending(QStringList &strList)
 
     strList << QString::number(hasconflicts);
     strList << QString::number(reclist.size());
-
-    QDateTime now = QDateTime::currentDateTime();
 
     RecList *retList = new RecList;
 
@@ -1293,7 +1289,7 @@ void Scheduler::RunScheduler(void)
                 continue;
 
             nextRecording->recstartts = 
-                QDateTime::currentDateTime().addSecs(30);
+                mythCurrentDateTime().addSecs(30);
             nextRecording->recstartts.setTime(QTime(
                 nextRecording->recstartts.time().hour(),
                 nextRecording->recstartts.time().minute()));

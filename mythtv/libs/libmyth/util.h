@@ -37,6 +37,8 @@ class MythTimer
     QTime m_timer;
 };
 
+QDateTime mythCurrentDateTime();
+
 QString SocDevErrStr(int error);
 
 // QSockectDevice (frontend)

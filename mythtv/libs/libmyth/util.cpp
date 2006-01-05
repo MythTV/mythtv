@@ -47,6 +47,17 @@ using namespace std;
 #include "jsmenuevent.h"
 #endif
 
+/** \fn mythCurrentDateTime()
+ *  \brief Returns the current QDateTime object, stripped of its msec component
+ */
+QDateTime mythCurrentDateTime()
+{
+    QDateTime rettime = QDateTime::currentDateTime();
+    QTime orig = rettime.time();
+    rettime.setTime(orig.addMSecs(-orig.msec()));
+    return rettime;
+}
+
 #define SOCKET_BUF_SIZE  128000 //< Socket buffer size
 
 /** \fn SocDevErrStr(int)

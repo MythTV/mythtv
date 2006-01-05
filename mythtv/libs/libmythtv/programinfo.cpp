@@ -82,13 +82,13 @@ ProgramInfo::ProgramInfo(void)
     programflags = 0;
     transcoder = 0;
 
-    startts = QDateTime::currentDateTime();
+    startts = mythCurrentDateTime();
     endts = startts;
     recstartts = startts;
     recendts = startts;
     originalAirDate = QDate::QDate (0, 1, 1);
     lastmodified = startts;
-    lastInUseTime = QDateTime::currentDateTime().addSecs(-4 * 60 * 60);
+    lastInUseTime = startts.addSecs(-4 * 60 * 60);
 
     recstatus = rsUnknown;
     oldrecstatus = rsUnknown;
@@ -3517,7 +3517,7 @@ void ProgramInfo::MarkAsInUse(bool inuse, QString usedFor)
         return;
     }
 
-    lastInUseTime = QDateTime::currentDateTime();
+    lastInUseTime = mythCurrentDateTime();
 
     query.prepare("INSERT INTO inuseprograms "
                   " (chanid, starttime, recusage, hostname, lastupdatetime) "
