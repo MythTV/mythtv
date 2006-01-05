@@ -2619,9 +2619,9 @@ bool grabData(Source source, int offset, QDate *qCurrentDate = 0)
                         filename.ascii());
     else if (xmltv_grabber == "tv_grab_fi")
         // Use the default of 10 days for Finland's grabber
-        command.sprintf("nice %s --offset %d --config-file '%s' --output %s",
-                        xmltv_grabber.ascii(), offset,
-                        configfile.ascii(), filename.ascii());
+        command.sprintf("nice %s --config-file '%s' --output %s",
+                        xmltv_grabber.ascii(), configfile.ascii(),
+                        filename.ascii());
     else if (xmltv_grabber == "tv_grab_es")
         // Use fixed interval of 3 days for Spanish grabber
         command.sprintf("nice %s --days=4  --config-file '%s' --output %s",
@@ -2846,14 +2846,19 @@ void clearOldDBEntries(void)
     query.exec();
 }
 
+/** \fn filldata(QValueList<Source> &sourcelist)
+ *  \brief Goes through the sourcelist and updates its channels with
+ *         program info grabbed with the associated grabber.
+ *  \return true if there was no failures
+ */
 bool fillData(QValueList<Source> &sourcelist)
 {
     QValueList<Source>::Iterator it;
 
-    QString status;
+    QString status, querystr;
     MSqlQuery query(MSqlQuery::InitCon());
-    QString querystr;
     QDateTime GuideDataBefore, GuideDataAfter;
+    int failures = 0;
 
     query.exec(QString("SELECT MAX(endtime) FROM program WHERE manualid=0;"));
     if (query.isActive() && query.size() > 0)
@@ -2865,25 +2870,23 @@ bool fillData(QValueList<Source> &sourcelist)
                                                     Qt::ISODate);
     }
 
-    QString sidStr = QString("Filling Data for sourceid: %1");
+    QString sidStr = QString("Updating source #%1 (%2) with grabber %3");
 
-    int failures = 0;
     for (it = sourcelist.begin(); it != sourcelist.end(); ++it) {
-        VERBOSE(VB_GENERAL, sidStr.arg((*it).id));
+        VERBOSE(VB_GENERAL, sidStr.arg((*it).id)
+                                  .arg((*it).name)
+                                  .arg((*it).xmltvgrabber));
 
         QString xmltv_grabber = (*it).xmltvgrabber;
         if (xmltv_grabber == "tv_grab_uk" || xmltv_grabber == "tv_grab_uk_rt" ||
             xmltv_grabber == "tv_grab_fi" || xmltv_grabber == "tv_grab_es" ||
             xmltv_grabber == "tv_grab_nl" || xmltv_grabber == "tv_grab_au" ||
             xmltv_grabber == "tv_grab_fr" || xmltv_grabber == "tv_grab_jp" ||
-            xmltv_grabber == "tv_grab_pt" || xmltv_grabber == "tv_grab_ee")
+            xmltv_grabber == "tv_grab_pt" || xmltv_grabber == "tv_grab_ee" ||
+            xmltv_grabber == "tv_grab_dk")
         {
             // These don't support the --offset option, so just grab the max.
-            if (!grabData(*it, -1))
-                ++failures;
-        }
-        else if (xmltv_grabber == "tv_grab_dk")
-        {
+            // TODO: tv_grab_fi/dk/is seems to support --offset, maybe more. Needs verification.
             if (!grabData(*it, 0))
                 ++failures;
         }
@@ -2903,65 +2906,34 @@ bool fillData(QValueList<Source> &sourcelist)
                  xmltv_grabber == "tv_grab_is" ||
                  xmltv_grabber == "tv_grab_br")
         {
+            // Grabbers supporting the --offset option
+
             if (xmltv_grabber == "tv_grab_no")
                 listing_wrap_offset = 6 * 3600;
 
             QDate qCurrentDate = QDate::currentDate();
 
-            if (maxDays == 1)
-            {
-                refresh_today = true;
-                refresh_tomorrow = false;
-            }
+            int grabdays = 9;
 
-            if (refresh_today || refresh_all)
-            {
-                VERBOSE(VB_IMPORTANT, "Refreshing Today's data");
-                if (!grabData(*it, 0, &qCurrentDate))
-                    ++failures;
-            }
-
-            if (refresh_tomorrow || refresh_all)
-            {
-                VERBOSE(VB_IMPORTANT, "Refreshing Tomorrow's data");
-                if (!grabData(*it, 1, &qCurrentDate))
-                    ++failures;
-            }
-
-            if (refresh_second || refresh_all)
-            {
-                VERBOSE(VB_IMPORTANT, "Refreshing data for 2 days from today");
-                if (!grabData(*it, 2, &qCurrentDate))
-                    ++failures;
-            }
-
-            int maxday = 9;
-
-            if (xmltv_grabber == "datadirect")
-                maxday = 14;
-            else if (xmltv_grabber == "technovera")
-                maxday = 14;                
-            else if (xmltv_grabber == "tv_grab_no")
-                maxday = 7;
+            // Grab different amount of days for the different grabbers,
+            // often decided by the person maintaining the grabbers.
+            if (maxDays > 0) // passed with --max-days
+                grabdays = maxDays;
+            else if (xmltv_grabber == "datadirect" ||
+                     xmltv_grabber == "technovera")
+                grabdays = 14;
             else if (xmltv_grabber == "tv_grab_se_swedb")
-                maxday = 10;
-            else if (xmltv_grabber == "tv_grab_de_tvtoday")
-                maxday = 7;
-            else if (xmltv_grabber == "tv_grab_be_tvb")
-                maxday = 5;
-            else if (xmltv_grabber == "tv_grab_be_tlm")
-                maxday = 5;
+                grabdays = 10;
+            else if (xmltv_grabber == "tv_grab_no" ||
+                     xmltv_grabber == "tv_grab_de_tvtoday")
+                grabdays = 7;
+            else if (xmltv_grabber == "tv_grab_be_tvb" ||
+                     xmltv_grabber == "tv_grab_be_tlm")
+                grabdays = 5;
 
-            if (maxDays > 0)
-                maxday = maxDays;
-
-            for (int i = 0; i < maxday; i++)
+            for (int i = 0; i < grabdays; i++)
             {
-                if ((i == 0 && refresh_today) || (i == 1 && refresh_tomorrow) ||
-                    (i == 2 && refresh_second))
-                    continue;
-
-                // we need to check and see if the current date has changed 
+                // We need to check and see if the current date has changed 
                 // since we started in this loop.  If it has, we need to adjust
                 // the value of 'i' to compensate for this.
                 if (QDate::currentDate() != qCurrentDate)
@@ -2980,7 +2952,6 @@ bool fillData(QValueList<Source> &sourcelist)
                         QString("Checking day @ offset %1, date: ").arg(i) +
                         currDate);
 
-                // Check to see if we already downloaded data for this date
                 bool download_needed = false;
 
                 if (refresh_all)
@@ -2989,8 +2960,24 @@ bool fillData(QValueList<Source> &sourcelist)
                             "Data Refresh needed because of --refresh-all");
                     download_needed = true;
                 }
+                else if ((i == 0 && refresh_today) || (i == 1 && refresh_tomorrow) ||
+                         (i == 2 && refresh_second))
+                {
+                    // Always refresh if the user specified today/tomorrow/second.
+                    download_needed = true;
+                }
+                else if (xmltv_grabber == "tv_grab_se_swedb")
+                {
+                    // Since tv_grab_se_swedb handles caching internally,
+                    // let it do its job and always grab new data.
+                    VERBOSE(VB_GENERAL,
+                            "Data Refresh needed because the grabber relies on "
+                            "internal caching.");
+                    download_needed = true;
+                }
                 else
                 {
+                    // Check to see if we already downloaded data for this date.
                     int chanCount = 0;         // Channels with data only
                     int previousDayCount = 0;
                     int currentDayCount = 0;
