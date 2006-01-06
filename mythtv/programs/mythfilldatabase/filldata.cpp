@@ -2200,18 +2200,37 @@ void handleChannels(int id, QValueList<ChanInfo> *chanlist)
                 if ((mplexid > 0) || (minor == 0))
                     chanid = ChannelUtil::CreateChanID(id, (*i).chanstr);
 
-                if ((*i).callsign == "")
-                    (*i).callsign = QString::number(chanid);
+                if ((*i).callsign.isEmpty())
+                {
+                    QStringList words = QStringList::split(" ",
+                                        (*i).name.simplifyWhiteSpace().upper());
+                    QString callsign = "";
+                    if (words[0].isEmpty())
+                        callsign = QString::number(chanid);
+                    else if (words[1].isEmpty())
+                        callsign = words[0].left(5);
+                    else
+                    {
+                        callsign = words[0].left(words[1].length() == 1 ? 4:3);
+                        callsign += words[1].left(5 - callsign.length());
+                    }
+                    (*i).callsign = callsign;
+                }
 
                 if (chanid > 0)
                 {
+                    QString cstr = QString((*i).chanstr);
+                    if(channel_preset && cstr.isEmpty())
+                        cstr = QString::number(chanid % 1000);
+
                     ChannelUtil::CreateChannel(
-                        mplexid,          id,        chanid, 
-                        (*i).callsign,    (*i).name, (*i).chanstr,
+                        mplexid,          id,        chanid,
+                        (*i).callsign,    (*i).name, cstr,
                         0 /*service id*/, major,     minor,
                         false /*use on air guide*/,  false /*hidden*/,
                         false /*hidden in guide*/,
-                        freqid,      localfile, (*i).tvformat);
+                        freqid,      localfile, (*i).tvformat,
+                        (*i).xmltvid);
                 }
             }
         }
