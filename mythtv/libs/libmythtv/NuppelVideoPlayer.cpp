@@ -2844,7 +2844,8 @@ void NuppelVideoPlayer::DoPlay(void)
         }
         else if (m_can_double && !m_double_framerate)
         {
-            if (normal_speed && play_speed > 0.99 && play_speed < 1.01)
+            if (normal_speed && play_speed > 0.99 && play_speed < 1.01 &&
+                (m_scan == kScan_Interlaced && m_DeintSetting))
             {
                 videosync->SetFrameInterval(frame_interval, true);
                 videoOutput->SetupDeinterlace(false);
