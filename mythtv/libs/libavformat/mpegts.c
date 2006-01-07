@@ -784,7 +784,7 @@ static int is_desired_stream(int type)
         case STREAM_TYPE_AUDIO_AAC:
         case STREAM_TYPE_AUDIO_AC3:
         case STREAM_TYPE_AUDIO_DTS:
-        case STREAM_TYPE_PRIVATE_DATA:
+//        case STREAM_TYPE_PRIVATE_DATA:
         case STREAM_TYPE_SUBTITLE_DVB:
             val = 1;
             break;
@@ -1273,10 +1273,10 @@ static void init_stream(AVStream *st, int stream_type, int code)
             codec_type = CODEC_TYPE_AUDIO;
             codec_id = CODEC_ID_DTS;
             break;
-        case STREAM_TYPE_PRIVATE_DATA:
-            codec_type = CODEC_TYPE_DATA;
-            codec_id = CODEC_ID_DVB_VBI;
-            break;
+//        case STREAM_TYPE_PRIVATE_DATA:
+//            codec_type = CODEC_TYPE_DATA;
+//            codec_id = CODEC_ID_DVB_VBI;
+//            break;
         case STREAM_TYPE_SUBTITLE_DVB:
             codec_type = CODEC_TYPE_SUBTITLE;
             codec_id = CODEC_ID_DVB_SUBTITLE;
