@@ -1569,7 +1569,16 @@ static HostComboBox *MythDateFormat()
     HostComboBox *gc = new HostComboBox("DateFormat");
     gc->setLabel(QObject::tr("Date format"));
 
-    QDate sampdate(2004, 1, 31);
+    QDate sampdate = QDate::currentDate();
+    QString sampleStr =
+        QObject::tr("Samples are shown using today's date.");
+
+    if (sampdate.month() == sampdate.day())
+    {
+        sampdate = sampdate.addDays(1);
+        sampleStr =
+            QObject::tr("Samples are shown using tomorrow's date.");
+    }
 
     gc->addSelection(sampdate.toString("ddd MMM d"), "ddd MMM d");
     gc->addSelection(sampdate.toString("ddd MMMM d"), "ddd MMMM d");
@@ -1580,7 +1589,9 @@ static HostComboBox *MythDateFormat()
     gc->addSelection(sampdate.toString("M/d/yyyy"), "M/d/yyyy");
     gc->addSelection(sampdate.toString("dd.MM.yyyy"), "dd.MM.yyyy");
     gc->addSelection(sampdate.toString("yyyy-MM-dd"), "yyyy-MM-dd");
-    gc->setHelpText(QObject::tr("Your preferred date format."));
+    gc->addSelection(sampdate.toString("ddd yyyy-MM-dd"), "ddd yyyy-MM-dd");
+    gc->setHelpText(QObject::tr("Your preferred date format.") + " " +
+                    sampleStr);
     return gc;
 }
 
@@ -1589,7 +1600,16 @@ static HostComboBox *MythShortDateFormat()
     HostComboBox *gc = new HostComboBox("ShortDateFormat");
     gc->setLabel(QObject::tr("Short Date format"));
 
-    QDate sampdate(2004, 1, 31);
+    QDate sampdate = QDate::currentDate();
+    QString sampleStr =
+        QObject::tr("Samples are shown using today's date.");
+
+    if (sampdate.month() == sampdate.day())
+    {
+        sampdate = sampdate.addDays(1);
+        sampleStr =
+            QObject::tr("Samples are shown using tomorrow's date.");
+    }
 
     gc->addSelection(sampdate.toString("M/d"), "M/d");
     gc->addSelection(sampdate.toString("d/M"), "d/M");
@@ -1603,7 +1623,8 @@ static HostComboBox *MythShortDateFormat()
     gc->addSelection(sampdate.toString("d ddd"), "d ddd");
     gc->addSelection(sampdate.toString("ddd M/d"), "ddd M/d");
     gc->addSelection(sampdate.toString("M/d ddd"), "M/d ddd");
-    gc->setHelpText(QObject::tr("Your preferred short date format."));
+    gc->setHelpText(QObject::tr("Your preferred short date format.") + " " +
+                    sampleStr);
     return gc;
 }
 
@@ -1612,7 +1633,7 @@ static HostComboBox *MythTimeFormat()
     HostComboBox *gc = new HostComboBox("TimeFormat");
     gc->setLabel(QObject::tr("Time format"));
 
-    QTime samptime(6, 56, 0);
+    QTime samptime = QTime::currentTime();
 
     gc->addSelection(samptime.toString("h:mm AP"), "h:mm AP");
     gc->addSelection(samptime.toString("h:mm ap"), "h:mm ap");
@@ -1620,10 +1641,9 @@ static HostComboBox *MythTimeFormat()
     gc->addSelection(samptime.toString("hh:mm ap"), "hh:mm ap");
     gc->addSelection(samptime.toString("h:mm"), "h:mm");
     gc->addSelection(samptime.toString("hh:mm"), "hh:mm");
-    gc->setHelpText(QObject::tr("Your preferred time format.  Choose a format "
-                    "with \"AP\" in it for an AM/PM display, otherwise "
-                    "your time display will be 24-hour or \"military\" "
-                    "time."));
+    gc->setHelpText(QObject::tr("Your preferred time format.  You must choose "
+                    "a format with \"AM\" or \"PM\" in it, otherwise your "
+                    "time display will be 24-hour or \"military\" time."));
     return gc;
 }
 
