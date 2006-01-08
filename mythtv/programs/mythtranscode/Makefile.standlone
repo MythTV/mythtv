@@ -1,6 +1,6 @@
 CC       ?= gcc
 CXX      ?= g++
-CFLAGS   ?= -g -O0 -fno-inline -fno-default-inline -DNO_MYTH
+CFLAGS   ?= -g -O0 -fno-inline -fno-default-inline -DNO_MYTH -D_FILE_OFFSET_BITS=64
 TOOL = mpeg2fix
 
 
@@ -12,11 +12,11 @@ OBJS = $(TOOL).o helper.o replex/libreplex.a
 LIBS = -L./libavformat -L./libavcodec -L./libavutil -L./libmpeg2 -L./replex
 
 #if using libav from mythtv, use this:
-LIBS += -lmythavformat-0.18
+LIBS += -lmythavformat-0.19
 #if using libav from ffmpeg, use this instead:
 #LIBS += -lavformat -lavcodec -lavutil -lz -ldl -lmp3lame -lvorbisenc -lvorbis -logg -lqt-mt
 
-LIBS += -lmythmpeg2-0.18
+LIBS += -lmythmpeg2-0.19
 LIBS += -lreplex -lpthread -lqt-mt -lm
 
 all: $(TOOL)

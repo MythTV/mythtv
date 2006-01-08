@@ -1165,8 +1165,8 @@ int MPEG2fixup::GetFrame(AVPacket *pkt)
         }
         if (showprogress && QDateTime::currentDateTime() > statustime)
         {
-            VERBOSE(MPF_IMPORTANT, QString("%%1 complete")
-                    .arg(100*pkt->pos/filesize));
+            VERBOSE(MPF_IMPORTANT, QString("%1% complete")
+                    .arg(100.0 * pkt->pos / filesize, 0, 'f', 1));
             statustime = QDateTime::currentDateTime();
             statustime = statustime.addSecs(5);
         }
