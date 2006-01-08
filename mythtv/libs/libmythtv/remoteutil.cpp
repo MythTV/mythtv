@@ -216,12 +216,7 @@ vector<ProgramInfo *> *RemoteGetConflictList(ProgramInfo *pginfo)
 
     vector<ProgramInfo *> *retlist = new vector<ProgramInfo *>;
 
-    if (!RemoteGetRecordingList(retlist, strlist))
-    {
-        delete retlist;
-        return NULL;
-    }
- 
+    RemoteGetRecordingList(retlist, strlist);
     return retlist;
 }
 
