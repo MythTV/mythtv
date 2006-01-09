@@ -295,7 +295,9 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
+    gContext->ActivateSettingsCache(false);
     UpgradeDVDDatabaseSchema();
+    gContext->ActivateSettingsCache(true);
 
     DVDGeneralSettings gsettings;
     gsettings.load();

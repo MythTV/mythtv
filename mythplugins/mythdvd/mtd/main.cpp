@@ -118,7 +118,9 @@ int main(int argc, char **argv)
         return FRONTEND_EXIT_DB_ERROR;
     }
 
+    gContext->ActivateSettingsCache(false);
     UpgradeDVDDatabaseSchema();
+    gContext->ActivateSettingsCache(true);
  
     //
     //  Figure out port to listen on

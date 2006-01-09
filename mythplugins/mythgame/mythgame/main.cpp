@@ -103,12 +103,14 @@ int mythplugin_init(const char *libversion)
         return -1;
 
 
+    gContext->ActivateSettingsCache(false);
     if (!UpgradeGameDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade database to new schema, exiting.");
         return -1;
     }
+    gContext->ActivateSettingsCache(true);
 
     MythGamePlayerSettings settings;
 //    settings.load();

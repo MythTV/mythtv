@@ -245,7 +245,9 @@ int mythplugin_init(const char *libversion)
         return -1;
     }
 
+    gContext->ActivateSettingsCache(false);
     UpgradePhoneDatabaseSchema();
+    gContext->ActivateSettingsCache(true);
 
     MythPhoneSettings mpSettings;
     mpSettings.load();

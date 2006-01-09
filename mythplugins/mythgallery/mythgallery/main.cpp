@@ -77,7 +77,9 @@ int mythplugin_init(const char *libversion)
     qInitTiffIO();
     
 
+    gContext->ActivateSettingsCache(false);
     UpgradeGalleryDatabaseSchema();
+    gContext->ActivateSettingsCache(true);
 
     GallerySettings settings;
     settings.load();

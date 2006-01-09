@@ -513,7 +513,9 @@ int mythplugin_init(const char *libversion)
                                     MYTH_BINARY_VERSION))
         return -1;
 
+    gContext->ActivateSettingsCache(false);
     UpgradeMusicDatabaseSchema();
+    gContext->ActivateSettingsCache(true);
 
     MusicGeneralSettings general;
     general.load();
