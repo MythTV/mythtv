@@ -661,60 +661,54 @@ void PlaybackBox::updateProgramInfo(QPainter *p, QRect& pr, QPixmap& pix)
         if (itype)
         {
             if (flags & FL_COMMFLAG)
-                itype->ResetFilename();
+                itype->show();
             else
-                itype->SetImage("blank.png");
-            itype->LoadImage();
+                itype->hide();
         }
 
         itype = (UIImageType *)container->GetType("cutlist");
         if (itype)
         {
             if (flags & FL_CUTLIST)
-                itype->ResetFilename();
+                itype->show();
             else
-                itype->SetImage("blank.png");
-            itype->LoadImage();
+                itype->hide();
         }
 
         itype = (UIImageType *)container->GetType("autoexpire");
         if (itype)
         {
             if (flags & FL_AUTOEXP)
-                itype->ResetFilename();
+                itype->show();
             else
-                itype->SetImage("blank.png");
-            itype->LoadImage();
+                itype->hide();
         }
 
         itype = (UIImageType *)container->GetType("processing");
         if (itype)
         {
             if (flags & FL_EDITING)
-                itype->ResetFilename();
+                itype->show();
             else
-                itype->SetImage("blank.png");
-            itype->LoadImage();
+                itype->hide();
         }
 
         itype = (UIImageType *)container->GetType("inuse");
         if (itype)
         {
             if (flags & (FL_INUSERECORDING | FL_INUSEPLAYING))
-                itype->ResetFilename();
+                itype->show();
             else
-                itype->SetImage("blank.png");
-            itype->LoadImage();
+                itype->hide();
         }
 
         itype = (UIImageType *)container->GetType("bookmark");
         if (itype)
         {
             if (flags & FL_BOOKMARK)
-                itype->ResetFilename();
+                itype->show();
             else
-                itype->SetImage("blank.png");
-            itype->LoadImage();
+                itype->hide();
         }
     }
 
