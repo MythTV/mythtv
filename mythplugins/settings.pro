@@ -5,7 +5,7 @@ isEmpty( PREFIX ) {
     PREFIX = /usr/local
 }
 
-LIBVERSION = 0.18.1
+LIBVERSION = 0.18.2
 
 INCLUDEPATH += $${PREFIX}/include
 #INCLUDEPATH += /usr/include/cdda
