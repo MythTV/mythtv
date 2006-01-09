@@ -84,24 +84,20 @@ class MPEG2ptsdelta
 };
 typedef QValueList<MPEG2ptsdelta> MPEG2ptsDeltaList;
 
-typedef struct {
-    int64_t newPTS;
-    int64_t pos_pts;
-    int framenum;
-    bool type;
-} poq_idx_t;
-
+typedef QMap<int64_t, int64_t> ptsmap;
+typedef QMap<int64_t, int> offset_keytype;
 class PTSOffsetQueue
 {
   public:
     PTSOffsetQueue(QValueList<int> keys, int64_t initPTS);
     void SetNextPTS(int64_t newPTS, int64_t atPTS);
-    void SetNextPos(int64_t newPTS, AVPacket &pkt);
-    int64_t Get(int idx, AVPacket *pkt);
-    int64_t UpdateOrigPTS(int idx, int64_t &origPTS, AVPacket &pkt);
+    void SetNextPos(int64_t newPTS, int64_t atPos);
+    int64_t Get(int idx, int64_t PTS, int64_t Pos);
+    void UpdateOrigPTS(int idx, int64_t &origPTS, int64_t Pos);
   private:
-    QMap<int, QValueList<poq_idx_t> > offset;
-    QMap<int, QValueList<poq_idx_t> > orig;
+    QMap<int, ptsmap> offset;
+    QMap<int, offset_keytype> keytype;
+    QMap<int, ptsmap> orig;
     QValueList<int> keyList;
 };
 
@@ -158,6 +154,7 @@ class MPEG2fixup
   private:
     int FindMPEG2Header(uint8_t *buf, int size, uint8_t code);
     void InitReplex();
+    QString PtsTime(int64_t pts);
     void FrameInfo(MPEG2frame *f);
     int AddFrame(MPEG2frame *f);
     int InitAV(const char *inputfile, const char *type, int64_t offset);
@@ -252,7 +249,6 @@ class MPEG2fixup
     QDateTime statustime;
     bool showprogress;
     uint64_t filesize;
-    int framenum;
 };
 
 #ifdef NO_MYTH
