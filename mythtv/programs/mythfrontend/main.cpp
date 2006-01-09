@@ -915,12 +915,14 @@ int main(int argc, char **argv)
     }
     setuid(getuid());
 
+    gContext->ActivateSettingsCache(false);
     if (!UpgradeTVDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT,
                 "Couldn't upgrade database to new schema, exiting.");
         return FRONTEND_EXIT_DB_OUTOFDATE;
     }
+    gContext->ActivateSettingsCache(true);
 
     VERBOSE(VB_ALL, QString("%1 version: %2 www.mythtv.org")
                             .arg(binname).arg(MYTH_BINARY_VERSION));

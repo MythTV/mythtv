@@ -402,11 +402,13 @@ int main(int argc, char **argv)
 
     close(0);
 
+    gContext->ActivateSettingsCache(false);
     if (!UpgradeTVDatabaseSchema())
     {
         VERBOSE(VB_IMPORTANT, "Couldn't upgrade database to new schema");
         return BACKEND_EXIT_DB_OUTOFDATE;
     }    
+    gContext->ActivateSettingsCache(true);
 
     if (printsched || testsched)
     {
