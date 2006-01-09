@@ -3129,11 +3129,12 @@ void TV::SwitchCards(uint chanid, QString channum)
     else
     {
         VERBOSE(VB_GENERAL, LOC + "No recorder to switch to...");
-        // If activenvp is main nvp, show old input in on screen display
-        if (nvp && activenvp == nvp)
-            UpdateOSDInput();
         delete testrec;
     }
+
+    // If activenvp is main nvp, show input in on-screen-display
+    if (nvp && activenvp == nvp)
+        UpdateOSDInput();
 }
 
 void TV::ToggleInputs(void)
