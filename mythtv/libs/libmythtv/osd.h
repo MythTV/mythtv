@@ -77,7 +77,7 @@ class OSD : public QObject
     void SetSettingsText(const QString &text, int length);
 
     void NewDialogBox(const QString &name, const QString &message, 
-                      QStringList &options, int length);
+                      QStringList &options, int length, int sel = 0);
     void DialogUp(const QString &name);
     void DialogDown(const QString &name);
     bool DialogShowing(const QString &name);

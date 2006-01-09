@@ -1676,7 +1676,8 @@ void OSD::SetSettingsText(const QString &text, int length)
 }
 
 void OSD::NewDialogBox(const QString &name, const QString &message, 
-                       QStringList &options, int length)
+                       QStringList &options, int length,
+                       int initial_selection)
 {
     osdlock.lock();
     OSDSet *container = GetSet(name);
@@ -1716,10 +1717,12 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
     while (text);
 
     int numoptions = options.size();
+    int offset = availoptions - numoptions;
+    initial_selection = max(min(numoptions - 1, initial_selection), 0);
 
     for (int i = 1; i <= numoptions && i <= availoptions; i++)
     {
-        QString name = QString("option%1").arg(availoptions - numoptions + i);
+        QString name = QString("option%1").arg(offset + i);
         text = (OSDTypeText *)container->GetType(name);
         if (!text)
         {
@@ -1740,12 +1743,12 @@ void OSD::NewDialogBox(const QString &name, const QString &message,
         return;
     }
 
-    opr->SetOffset(availoptions - numoptions);
-    opr->SetPosition(0);
+    opr->SetOffset(offset);
+    opr->SetPosition(initial_selection);
 
     dialogResponseList[name] = 0;
 
-    HighlightDialogSelection(container, availoptions - numoptions);
+    HighlightDialogSelection(container, offset + initial_selection);
 
     if (length > 0)
         container->DisplayFor(length * 1000000);
