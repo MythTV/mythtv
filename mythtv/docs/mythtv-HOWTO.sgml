@@ -3,7 +3,7 @@
 <title>Installing and using MythTV
 <author>Robert Kulagowski, <url url="mailto:rkulagow@rocketmail.com"
 name="mailto:rkulagow@rocketmail.com">
-<date>2005-12-29, v0.19.pre
+<date>2006-01, v0.19.pre
 <abstract>
 Initially, installation of MythTV seems like a huge task.  There are lots
 of dependencies, and various distributions seem to do the same thing
@@ -5297,16 +5297,38 @@ Once at the <tt>(gdb)</tt> prompt, type <tt>run</tt> to start program
 execution.  When the program segfaults or appears to lock-up (press CTRL-C),
 type 
 <tscreen><verb>
+(gdb) set pagination off
 (gdb) thread apply all bt full
 (gdb) set logging off
 </verb></tscreen>
 
-If gdb returns to the gdb prompt with a "Program received signal SIG33,
-Real-time event 33", type <tt>cont</tt> to continue; this is not a "real"
-bug.
-
 All of the output from <tt>gdb.txt</tt> should be posted to the mythtv-dev
 mailing list, along with the steps you followed to get the program to crash.
+
+You can also setup <bf>gdb</bf> to run in a semi-automated mode using the
+<tt>~/.gdbinit</tt> file.  In this example we'll be debugging the
+<bf>mythbackend</bf> program:
+
+<tscreen><verb>
+handle SIGPIPE nostop noprint
+handle SIG33 nostop noprint
+set logging on
+set pagination off
+file mythbackend
+set args -l mythbackend.log -v record,channel,siparser
+run
+thread apply all bt full
+set logging off
+</verb></tscreen>
+
+Using the <tt>.gdbinit</tt> file in conjunction with a <bf>while</bf> loop
+will ensure that <bf>gdb</bf> creates a trace file and then restarts:
+
+<tscreen><verb>
+$ while true; do date >> gdb.txt; gdb; done;
+</verb></tscreen>
+
+<bf>NOTE</bf>: To exit this loop you will need to kill the while loop.
 
 If you're trying to troubleshoot and you can't get back to the gdb window
 for some reason, it may be easier to use two systems or to start
@@ -5321,12 +5343,6 @@ session, or by switching back to the text console by pressing CTRL-ALT-F1.
 You can now continue troubleshooting using <bf/gdb</> as detailed in the
 instructions.
 
-<sect2>Illegal Instruction
-<!-- REMOVE ME in 0.19 -->
-<p>This error used to occur when users compiled MythTV with incorrect CPU
-options.  This should no longer occur with the new <bf>configure</bf>
-script.
-<!-- REMOVE ME END -->
 <sect2>MythTV is crashing your system
 <p>When run as a non-privileged user, MythTV <em>can not</em> crash your
 system.  If your system is crashing when you run MythTV, then you have some
@@ -7708,7 +7724,9 @@ v0.18.17, 2005-12-10.  Add some more details about debugging, put text early
 in the doc about what a good bug report should contain, tell people to use
 trac to submit docs patches.
 
-v0.19pre, 2005-12-  Add "cont" to gdb instructions.
+v0.19pre, 2006-01-  Add "cont" to gdb instructions.  Put in a gdb example of
+using .gdbinit and a while loop.  Start deleting older cruft.
+
 -->
 
 <!--
