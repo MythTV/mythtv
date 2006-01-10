@@ -1562,9 +1562,6 @@ void AvFormatDecoder::HandleGopStart(AVPacket *pkt)
                     .arg(prevgoppos / keyframedist)
                     .arg((int)startpos));
 
-            // Grow positionMap vector several entries at a time
-            if (m_positionMap.capacity() == m_positionMap.size())
-                m_positionMap.reserve(m_positionMap.size() + 60);
             PosMapEntry entry = {prevgoppos / keyframedist,
                                  prevgoppos, startpos};
             m_positionMap.push_back(entry);
