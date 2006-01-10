@@ -167,7 +167,7 @@ sub getMovieData {
    my @genres;
    my $lgenres = "";
    $count = 0;
-   $data = parseBetween($response, "<b class=\"ch\">Genre:</b>","<a href=\"/rg/title-tease/keywords/title/tt$movieid/keywords\">(more)</a>"); 
+   $data = parseBetween($response, "<b class=\"ch\">Genre:</b>","<b class=\"ch\">User Comments:</b>"); 
    if ($data) {
       my $beg = "/\">"; 
       my $end = "</a>";
