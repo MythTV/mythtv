@@ -4,8 +4,6 @@ include (../../settings.pro )
 INCLUDEPATH += /usr/include/kde
 INCLUDEPATH += /opt/kde3/include
 
-LIBS += -L/usr/local/lib
-
 TEMPLATE = app
 CONFIG += thread
 TARGET = mythbrowser
