@@ -2486,6 +2486,7 @@ bool AvFormatDecoder::GetFrame(int onlyvideo)
                     if (onlyvideo < 0)
                     {
                         framesPlayed++;
+                        gotvideo = 1;
                         ptr += pkt->size;
                         len -= pkt->size;
                         continue;
