@@ -631,7 +631,7 @@ bool DataDirectProcessor::getNextSuggestedTime(void)
         int desiredPeriod = gContext->GetNumSetting("MythFillPeriod", 1);
 
 
-        if (daysToSuggested != desiredPeriod)
+        if (daysToSuggested > desiredPeriod)
         {
             QDateTime newTime =
                 NextSuggestedTime.addDays(desiredPeriod - daysToSuggested);
