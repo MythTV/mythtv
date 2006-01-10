@@ -193,4 +193,14 @@
   <catcolor category="Musical" color="turquoise3"></catcolor>
   <catcolor category="Ecologia" color="ForestGreen"></catcolor>
   <catcolor category="Novela" color="MediumTurquoise"></catcolor>
+
+  <!-- Categories introduced by tv_grab_cz -->
+  <catcolor category="Zpravy" color="DarkOrange3"></catcolor>
+  <catcolor category="Dokument" color="goldenrod"></catcolor>
+  <catcolor category="Sport" color="DarkCyan"></catcolor>
+  <catcolor category="Film" color="Blue"></catcolor>
+  <catcolor category="Pro deti" color="MediumSlateBlue"></catcolor>
+  <catcolor category="Serial" color="DarkOrchid"></catcolor>
+  <catcolor category="Zabava" color="MediumTurquoise"></catcolor>
 </categorycolors>
+

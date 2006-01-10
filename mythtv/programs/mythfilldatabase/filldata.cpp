@@ -2923,7 +2923,8 @@ bool fillData(QValueList<Source> &sourcelist)
                  xmltv_grabber == "tv_grab_be_tvb" ||
                  xmltv_grabber == "tv_grab_be_tlm" ||
                  xmltv_grabber == "tv_grab_is" ||
-                 xmltv_grabber == "tv_grab_br")
+                 xmltv_grabber == "tv_grab_br" ||
+                 xmltv_grabber == "tv_grab_cz")
         {
             // Grabbers supporting the --offset option
 
